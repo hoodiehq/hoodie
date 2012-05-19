@@ -45,9 +45,10 @@ define('remote', ['errors'], function(ERROR) {
     };
 
     Remote.prototype.disconnect = function() {
+      var _ref;
       this._connected = false;
-      if (this._changes_request) {
-        this._changes_request.abort();
+      if ((_ref = this._changes_request) != null) {
+        _ref.abort();
       }
       this.app.store.db.removeItem('_couch.remote.seq');
       this.app.unbind('store:dirty:idle', this.push_changes);

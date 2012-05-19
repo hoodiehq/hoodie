@@ -37,7 +37,7 @@ define 'remote', ['errors'], (ERROR) ->
     # stop pulling changes from the userDB
     disconnect : =>
       @_connected = false
-      @_changes_request.abort() if @_changes_request
+      @_changes_request?.abort()
       
       @app.store.db.removeItem '_couch.remote.seq'
       @app.unbind 'store:dirty:idle', @push_changes

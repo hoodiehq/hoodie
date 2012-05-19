@@ -8,7 +8,7 @@ define('specs/account', ['mocks/hoodie', 'account'], function(CangMock, Account)
       spyOn(this.app, "request");
       return spyOn(this.app, "trigger");
     });
-    describe("new", function() {
+    describe(".constructor()", function() {
       beforeEach(function() {
         spyOn(Account.prototype, "authenticate");
         return spyOn(Account.prototype, "on");
@@ -44,7 +44,7 @@ define('specs/account', ['mocks/hoodie', 'account'], function(CangMock, Account)
       });
     });
     describe("event handlers", function() {
-      describe("_handle_sign_in", function() {
+      describe("._handle_sign_in(@email)", function() {
         beforeEach(function() {
           spyOn(this.app.store.db, "setItem");
           return this.account._handle_sign_in('joe@example.com');
@@ -65,7 +65,7 @@ define('specs/account', ['mocks/hoodie', 'account'], function(CangMock, Account)
           return expect(this.account._authenticated).toBe(true);
         });
       });
-      return describe("_handle_sign_out", function() {
+      return describe("._handle_sign_out()", function() {
         it("should set @email", function() {
           this.account.email = 'joe@example.com';
           this.account._handle_sign_out({

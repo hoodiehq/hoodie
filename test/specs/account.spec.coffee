@@ -8,10 +8,9 @@ define 'specs/account', ['mocks/hoodie', 'account'], (CangMock, Account) ->
       # requests
       spyOn(@app, "request")
       spyOn(@app, "trigger")
-      
-    # /description
   
-    describe "new", ->
+  
+    describe ".constructor()", ->
       beforeEach ->
         spyOn(Account.prototype, "authenticate")
         spyOn(Account.prototype, "on")
@@ -37,11 +36,11 @@ define 'specs/account', ['mocks/hoodie', 'account'], (CangMock, Account) ->
       it "should bind to sign_out event", ->
         account = new Account @app
         expect(@account.on).wasCalledWith 'signed_out', account._handle_sign_out
-    # /new
+    # /.constructor()
+    
     
     describe "event handlers", ->
-      
-      describe "_handle_sign_in", ->
+      describe "._handle_sign_in(@email)", ->
         beforeEach ->
           spyOn(@app.store.db, "setItem")
           @account._handle_sign_in 'joe@example.com'
@@ -56,9 +55,9 @@ define 'specs/account', ['mocks/hoodie', 'account'], (CangMock, Account) ->
           @account._authenticated = false
           @account._handle_sign_in {"ok":true,"name":"joe@example.com","roles":[]}
           expect(@account._authenticated).toBe true
-      # /_handle_sign_in
+      # /._handle_sign_in(@email)
       
-      describe "_handle_sign_out", ->
+      describe "._handle_sign_out()", ->
         it "should set @email", ->
           @account.email = 'joe@example.com'
           @account._handle_sign_out {"ok":true}
@@ -73,11 +72,11 @@ define 'specs/account', ['mocks/hoodie', 'account'], (CangMock, Account) ->
           @account._authenticated = true
           @account._handle_sign_out {"ok":true}
           expect(@account._authenticated).toBe false
-      # /_handle_sign_out
+      # /._handle_sign_out()
     # /event handlers
     
+    
     describe ".authenticate()", ->
-      
       _when "@email is undefined", ->
         beforeEach ->
           delete @account.email
@@ -164,9 +163,8 @@ define 'specs/account', ['mocks/hoodie', 'account'], (CangMock, Account) ->
             
             it "should reject the promise", ->
               expect(@promise).toBeRejectedWith 'error data'
-            
-              
     # /.authenticate()
+  
   
     describe ".sign_up(email, password)", ->
       beforeEach ->
@@ -202,8 +200,7 @@ define 'specs/account', ['mocks/hoodie', 'account'], (CangMock, Account) ->
         [@type, @path, @options] = @app.request.mostRecentCall.args
         @data = JSON.parse @options.data
         expect(@data.password).toBeUndefined()
-      
-        
+              
       _when "sign_up successful", ->
         beforeEach ->
           @app.request.andCallFake (type, path, options) -> options.success()
@@ -216,6 +213,7 @@ define 'specs/account', ['mocks/hoodie', 'account'], (CangMock, Account) ->
           @account.sign_up('joe@example.com', 'secret')
           expect(@app.trigger).wasCalledWith 'account:signed_in', 'joe@example.com'
     # /.sign_up(email, password)
+  
   
     describe ".sign_in(email, password)", ->
       beforeEach ->
@@ -242,9 +240,11 @@ define 'specs/account', ['mocks/hoodie', 'account'], (CangMock, Account) ->
           expect(@app.trigger).wasCalledWith 'account:signed_in', 'joe@example.com'
     # /.sign_in(email, password)
   
+  
     describe ".change_password(email, password)", ->
       it "should have some specs"
     # /.change_password(email, password)
+  
   
     describe ".sign_out()", ->
       beforeEach ->
@@ -265,6 +265,7 @@ define 'specs/account', ['mocks/hoodie', 'account'], (CangMock, Account) ->
           expect(@app.trigger).wasCalledWith 'account:signed_out'
     # /.sign_in(email, password)
     
+    
     describe ".on(event, callback)", ->
       beforeEach ->
         spyOn(@app, "on")
@@ -275,6 +276,7 @@ define 'specs/account', ['mocks/hoodie', 'account'], (CangMock, Account) ->
         (expect @app.on).wasCalledWith('account:funky', party)
     # /.on(event, callback)
     
+    
     describe ".user_db", ->
       _when "email is set to 'joe.doe@example.com'", ->
         beforeEach ->
@@ -282,6 +284,5 @@ define 'specs/account', ['mocks/hoodie', 'account'], (CangMock, Account) ->
         
         it "should return 'joe$example_com", ->
           (expect @account.user_db()).toEqual('joe_doe$example_com')
-          
-        
+    # /.user_db()
   # /Account
