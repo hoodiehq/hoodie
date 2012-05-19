@@ -1,0 +1,20 @@
+define 'mocks/changes_response', ->
+  -> `{
+    "results":
+    [
+      {
+        "seq"     :2,
+        "id"      :"todo/abc3",
+        "changes" :[{"rev":"2-123"}],
+        "doc"     :{"_id":"todo/abc3","_rev":"2-123","_deleted":true},
+        "deleted" :true
+      },
+      {
+        "seq"     :3,
+        "id"      :"todo/abc2",
+        "changes" :[{"rev":"1-123"}],
+        "doc"     :{"_id":"todo/abc2","_rev":"1-123","content":"remember the milk","done":false,"order":1, "type":"todo"}
+      }
+    ],
+    "last_seq":20
+  }`

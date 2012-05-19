@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Jasmine Test Runner</title>
+  <link rel="stylesheet" type="text/css" href="lib/jasmine-1.1.0/jasmine.css">
+  
+  <script src="lib/jasmine-1.1.0/jasmine.js"></script>
+  <script src="lib/jasmine-1.1.0/jasmine-html.js"></script>
+  <script src="../compiled/test/lib/jasmine-helpers.js"></script>
+
+  <script src="../vendor/require-1.0.7.js"></script>
+  <script src="../vendor/jquery-1.7.2.min.js"></script>
+
+  <!--   
+	  <script src="http://code.jquery.com/jquery-1.7.2.js"></script>
+  -->
+
+
+  <script src="../compiled/src/errors.js"></script>
+  <script src="../compiled/src/events.js"></script>
+  <script src="../compiled/src/store.js"></script>
+  <script src="../compiled/src/account.js"></script>
+  <script src="../compiled/src/remote.js"></script>
+  <script src="../compiled/src/email.js"></script>
+  <script src="../compiled/src/hoodie.js"></script>
+  
+  <script src="../compiled/test/mocks/hoodie.mock.js"></script>
+  <script src="../compiled/test/mocks/changes_response.mock.js"></script>
+  <script src="../compiled/test/mocks/changed_docs.mock.js"></script>
+  <script src="../compiled/test/mocks/bulk_update_response.mock.js"></script>
+  
+  <script src="../compiled/test/specs/hoodie.spec.js"></script>
+  <script src="../compiled/test/specs/store.spec.js"></script>
+  <script src="../compiled/test/specs/account.spec.js"></script>
+  <script src="../compiled/test/specs/remote.spec.js"></script>
+  <script src="../compiled/test/specs/email.spec.js"></script>
+  <script src="../compiled/test/specs/events.spec.js"></script>
+</head>
+<body>
+
+  <script>
+    jas = jasmine.getEnv()
+    jas.addReporter(new jasmine.TrivialReporter()); 
+
+    require([
+      'mocks/hoodie',
+      'mocks/changes_response',
+      'mocks/changed_docs',
+      'mocks/bulk_update_response',
+      
+      'specs/store',
+      'specs/account',
+      'specs/remote',
+      'specs/events',
+      'specs/email',
+      'specs/hoodie'
+    ], function () {
+      jas.execute();
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,192 @@
+<!DOCTYPE html>  <html> <head>   <title>remote.coffee</title>   <meta http-equiv="content-type" content="text/html; charset=UTF-8">   <link rel="stylesheet" media="all" href="docco.css" /> </head> <body>   <div id="container">     <div id="background"></div>            <div id="jump_to">         Jump To &hellip;         <div id="jump_wrapper">           <div id="jump_page">                                           <a class="source" href="account.html">                 account.coffee               </a>                                           <a class="source" href="email.html">                 email.coffee               </a>                                           <a class="source" href="errors.html">                 errors.coffee               </a>                                           <a class="source" href="events.html">                 events.coffee               </a>                                           <a class="source" href="hoodie.html">                 hoodie.coffee               </a>                                           <a class="source" href="remote.html">                 remote.coffee               </a>                                           <a class="source" href="store.html">                 store.coffee               </a>                        </div>         </div>       </div>          <table cellpadding="0" cellspacing="0">       <thead>         <tr>           <th class="docs">             <h1>               remote.coffee             </h1>           </th>           <th class="code">           </th>         </tr>       </thead>       <tbody>                               <tr id="section-1">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-1">&#182;</a>               </div>               <p>Connection / Socket to our couch</p>
+
+<p>Remote is using couchDB's <code>_changes</code> feed to listen to changes
+and <code>_bulk_docs</code> to push local changes</p>             </td>             <td class="code">               <div class="highlight"><pre><span class="nx">define</span> <span class="s1">&#39;remote&#39;</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;errors&#39;</span><span class="p">],</span> <span class="nf">(ERROR) -&gt;</span>
+  </pre></div>             </td>           </tr>                               <tr id="section-2">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-2">&#182;</a>               </div>               <p>'use strict'</p>             </td>             <td class="code">               <div class="highlight"><pre>  
+  <span class="k">class</span> <span class="nx">Remote</span>
+  </pre></div>             </td>           </tr>                               <tr id="section-3">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-3">&#182;</a>               </div>               <h2>Constructor</h2>             </td>             <td class="code">               <div class="highlight"><pre>    <span class="nv">constructor : </span><span class="nf">(@app) -&gt;</span>
+      
+      <span class="nx">@app</span><span class="p">.</span><span class="kc">on</span> <span class="s1">&#39;account:signed_in&#39;</span><span class="p">,</span>  <span class="nx">@connect</span>
+      <span class="nx">@app</span><span class="p">.</span><span class="kc">on</span> <span class="s1">&#39;account:signed_out&#39;</span><span class="p">,</span> <span class="nx">@disconnect</span>
+      <span class="nx">@connect</span><span class="p">()</span>
+      
+      </pre></div>             </td>           </tr>                               <tr id="section-4">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-4">&#182;</a>               </div>               <h2>Connect</h2>
+
+<p>start pulling changes from the userDB</p>             </td>             <td class="code">               <div class="highlight"><pre>    <span class="nv">connect : </span><span class="o">=&gt;</span>
+      
+      <span class="k">return</span> <span class="k">if</span> <span class="nx">@_connected</span>
+      <span class="nx">@app</span><span class="p">.</span><span class="nx">account</span><span class="p">.</span><span class="nx">authenticate</span><span class="p">().</span><span class="k">then</span> <span class="o">=&gt;</span>
+        <span class="nx">@app</span><span class="p">.</span><span class="kc">on</span> <span class="s1">&#39;store:dirty:idle&#39;</span><span class="p">,</span> <span class="nx">@push_changes</span>
+        <span class="nx">@pull_changes</span><span class="p">()</span>
+        <span class="nx">@push_changes</span><span class="p">()</span>
+      
+      </pre></div>             </td>           </tr>                               <tr id="section-5">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-5">&#182;</a>               </div>               <h2>Disconnect</h2>
+
+<p>stop pulling changes from the userDB</p>             </td>             <td class="code">               <div class="highlight"><pre>    <span class="nv">disconnect : </span><span class="o">=&gt;</span>
+      <span class="vi">@_connected = </span><span class="kc">false</span>
+      <span class="nx">@_changes_request</span><span class="p">.</span><span class="nx">abort</span><span class="p">()</span> <span class="k">if</span> <span class="nx">@_changes_request</span>
+      
+      <span class="nx">@app</span><span class="p">.</span><span class="nx">store</span><span class="p">.</span><span class="nx">db</span><span class="p">.</span><span class="nx">removeItem</span> <span class="s1">&#39;_couch.remote.seq&#39;</span>
+      <span class="nx">@app</span><span class="p">.</span><span class="nx">unbind</span> <span class="s1">&#39;store:dirty:idle&#39;</span><span class="p">,</span> <span class="nx">@push_changes</span>
+      <span class="k">delete</span> <span class="nx">@_seq</span></pre></div>             </td>           </tr>                               <tr id="section-6">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-6">&#182;</a>               </div>               <h2>pull changes</h2>
+
+<p>a.k.a. make a longpoll AJAX request to CouchDB's <code>_changes</code> feed.</p>             </td>             <td class="code">               <div class="highlight"><pre>    <span class="nv">pull_changes: </span><span class="o">=&gt;</span>
+      <span class="vi">@_connected = </span><span class="kc">true</span>
+      
+      <span class="vi">@_changes_request = </span><span class="nx">@app</span><span class="p">.</span><span class="nx">request</span> <span class="s1">&#39;GET&#39;</span><span class="p">,</span> <span class="nx">@_changes_path</span><span class="p">(),</span>
+        <span class="nv">success: </span>     <span class="nx">@_changes_success</span>
+        <span class="nv">error: </span>       <span class="nx">@_changes_error</span>
+      
+      <span class="nb">window</span><span class="p">.</span><span class="nx">clearTimeout</span> <span class="nx">@_changes_request_timeout</span>
+      <span class="vi">@_changes_request_timeout = </span><span class="nb">window</span><span class="p">.</span><span class="nx">setTimeout</span> <span class="nx">@_restart_changes_request</span><span class="p">,</span> <span class="mi">25000</span> <span class="c1"># 25 sec</span>
+      
+      </pre></div>             </td>           </tr>                               <tr id="section-7">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-7">&#182;</a>               </div>               <h2>Push changes</h2>
+
+<p>Push locally changed objects to userDB using the
+using the <code>_bulk_docs</code> API</p>             </td>             <td class="code">               <div class="highlight"><pre>    <span class="nv">push_changes : </span><span class="p">()</span> <span class="o">=&gt;</span>
+
+      <span class="nv">docs    = </span><span class="nx">@app</span><span class="p">.</span><span class="nx">store</span><span class="p">.</span><span class="nx">changed_docs</span><span class="p">()</span>
+      <span class="k">return</span> <span class="nx">@_promise</span><span class="p">().</span><span class="nx">resolve</span><span class="p">([])</span> <span class="k">if</span> <span class="nx">docs</span><span class="p">.</span><span class="nx">length</span> <span class="o">is</span> <span class="mi">0</span>
+        
+      <span class="nv">docs = </span><span class="k">for</span> <span class="nx">doc</span> <span class="k">in</span> <span class="nx">docs</span>
+        <span class="nx">@_parse_for_remote</span> <span class="nx">doc</span> 
+      
+      <span class="nx">@app</span><span class="p">.</span><span class="nx">request</span> <span class="s1">&#39;POST&#39;</span><span class="p">,</span> <span class="s2">&quot;/#{encodeURIComponent @app.account.user_db()}/_bulk_docs&quot;</span><span class="p">,</span> 
+        <span class="nv">dataType: </span>    <span class="s1">&#39;json&#39;</span>
+        <span class="nv">processData: </span> <span class="kc">false</span>
+        <span class="nv">contentType: </span> <span class="s1">&#39;application/json&#39;</span>
+      
+        <span class="nv">data        : </span><span class="nx">JSON</span><span class="p">.</span><span class="nx">stringify</span><span class="p">(</span><span class="nv">docs: </span><span class="nx">docs</span><span class="p">)</span>
+        <span class="nv">success     : </span><span class="nx">@_handle_push_changes</span>
+      
+      </pre></div>             </td>           </tr>                               <tr id="section-8">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-8">&#182;</a>               </div>               <h2>Get / Set seq</h2>
+
+<p>the <code>seq</code> number gets passed to couchDB's <code>_changes</code> feed.</p>             </td>             <td class="code">               <div class="highlight"><pre>    <span class="nv">get_seq : </span>      <span class="o">-&gt;</span> <span class="nx">@_seq</span> <span class="o">or=</span> <span class="nx">@app</span><span class="p">.</span><span class="nx">store</span><span class="p">.</span><span class="nx">db</span><span class="p">.</span><span class="nx">getItem</span><span class="p">(</span><span class="s1">&#39;_couch.remote.seq&#39;</span><span class="p">)</span> <span class="o">or</span> <span class="mi">0</span>
+    <span class="nv">set_seq : </span><span class="nf">(seq) -&gt;</span> <span class="vi">@_seq   = </span><span class="nx">@app</span><span class="p">.</span><span class="nx">store</span><span class="p">.</span><span class="nx">db</span><span class="p">.</span><span class="nx">setItem</span><span class="p">(</span><span class="s1">&#39;_couch.remote.seq&#39;</span><span class="p">,</span> <span class="nx">seq</span><span class="p">)</span>
+    
+    </pre></div>             </td>           </tr>                               <tr id="section-9">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-9">&#182;</a>               </div>               <h2>On</h2>
+
+<p>alias for <code>app.on</code></p>             </td>             <td class="code">               <div class="highlight"><pre>    <span class="kc">on</span> <span class="o">:</span> <span class="nf">(event, cb) -&gt;</span> <span class="nx">@app</span><span class="p">.</span><span class="kc">on</span> <span class="s2">&quot;remote:#{event}&quot;</span><span class="p">,</span> <span class="nx">cb</span>
+    
+    </pre></div>             </td>           </tr>                               <tr id="section-10">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-10">&#182;</a>               </div>               <h2>Private</h2>             </td>             <td class="code">               <div class="highlight"><pre>    </pre></div>             </td>           </tr>                               <tr id="section-11">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-11">&#182;</a>               </div>               <p>changes url</p>
+
+<p>long poll url with heartbeat = 10 seconds</p>             </td>             <td class="code">               <div class="highlight"><pre>    <span class="nv">_changes_path : </span><span class="o">-&gt;</span>
+      <span class="nv">since = </span><span class="nx">@get_seq</span><span class="p">()</span>
+      <span class="s2">&quot;/#{encodeURIComponent @app.account.user_db()}/_changes?include_docs=true&amp;heartbeat=10000&amp;feed=longpoll&amp;since=#{since}&quot;</span>
+    </pre></div>             </td>           </tr>                               <tr id="section-12">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-12">&#182;</a>               </div>               <p>request gets restarted automaticcally in @<em>changes</em>error</p>             </td>             <td class="code">               <div class="highlight"><pre>    <span class="nv">_restart_changes_request: </span><span class="o">=&gt;</span> <span class="nx">@_changes_request</span><span class="o">?</span><span class="p">.</span><span class="nx">abort</span><span class="p">()</span>
+      </pre></div>             </td>           </tr>                               <tr id="section-13">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-13">&#182;</a>               </div>               <p>changes success handler </p>
+
+<p>handle the incoming changes, then send the next request</p>             </td>             <td class="code">               <div class="highlight"><pre>    <span class="nv">_changes_success : </span><span class="p">(</span><span class="nx">response</span><span class="p">)</span> <span class="o">=&gt;</span>
+      
+      <span class="k">return</span> <span class="nx">unless</span> <span class="nx">@_connected</span>
+      <span class="nx">@set_seq</span> <span class="nx">response</span><span class="p">.</span><span class="nx">last_seq</span>
+      <span class="nx">@_handle_pull_changes</span><span class="p">(</span><span class="nx">response</span><span class="p">.</span><span class="nx">results</span><span class="p">)</span>
+      <span class="nx">do</span> <span class="nx">@pull_changes</span>
+      </pre></div>             </td>           </tr>                               <tr id="section-14">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-14">&#182;</a>               </div>               <p>changes error handler </p>
+
+<p>when there is a change, trigger event, 
+then check for another change</p>             </td>             <td class="code">               <div class="highlight"><pre>    <span class="nv">_changes_error : </span><span class="p">(</span><span class="nx">xhr</span><span class="p">,</span> <span class="nx">error</span><span class="p">,</span> <span class="nx">resp</span><span class="p">)</span> <span class="o">=&gt;</span>
+      <span class="k">return</span> <span class="nx">unless</span> <span class="nx">@_connected</span>
+    
+      <span class="k">switch</span> <span class="nx">xhr</span><span class="p">.</span><span class="nx">status</span>
+    </pre></div>             </td>           </tr>                               <tr id="section-15">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-15">&#182;</a>               </div>               <p>This happens when users session got invalidated on server</p>             </td>             <td class="code">               <div class="highlight"><pre>        <span class="k">when</span> <span class="mi">403</span>
+          <span class="nx">@app</span><span class="p">.</span><span class="nx">trigger</span> <span class="s1">&#39;remote:error:unauthenticated&#39;</span>
+          <span class="nx">do</span> <span class="nx">@disconnect</span>
+        </pre></div>             </td>           </tr>                               <tr id="section-16">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-16">&#182;</a>               </div>               <p>the 404 comes, when the requested DB of the User has been removed. 
+Should really not happen. </p>
+
+<p>BUT: it might also happen that the profileDB is not ready yet. 
+     Therefore, we try it again in 3 seconds</p>
+
+<p>TODO: review / rethink that.</p>             </td>             <td class="code">               <div class="highlight"><pre>        <span class="k">when</span> <span class="mi">404</span>
+          <span class="nb">window</span><span class="p">.</span><span class="nx">setTimeout</span> <span class="nx">@pull_changes</span><span class="p">,</span> <span class="mi">3000</span>
+        </pre></div>             </td>           </tr>                               <tr id="section-17">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-17">&#182;</a>               </div>               <p>Please server, don't give us these. At least not persistently </p>             </td>             <td class="code">               <div class="highlight"><pre>        <span class="k">when</span> <span class="mi">500</span>
+          <span class="nx">@app</span><span class="p">.</span><span class="nx">trigger</span> <span class="s1">&#39;remote:error:server&#39;</span>
+          <span class="nb">window</span><span class="p">.</span><span class="nx">setTimeout</span> <span class="nx">@pull_changes</span><span class="p">,</span> <span class="mi">3000</span>
+        </pre></div>             </td>           </tr>                               <tr id="section-18">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-18">&#182;</a>               </div>               <p>usually a 0, which stands for timeout or server not reachable.</p>             </td>             <td class="code">               <div class="highlight"><pre>        <span class="k">else</span>
+          <span class="k">if</span> <span class="nx">xhr</span><span class="p">.</span><span class="nx">statusText</span> <span class="o">is</span> <span class="s1">&#39;abort&#39;</span></pre></div>             </td>           </tr>                               <tr id="section-19">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-19">&#182;</a>               </div>               <p>manual abort after 25sec. reload changes directly.</p>             </td>             <td class="code">               <div class="highlight"><pre>            <span class="nx">do</span> <span class="nx">@pull_changes</span>
+          <span class="k">else</span>    
+              </pre></div>             </td>           </tr>                               <tr id="section-20">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-20">&#182;</a>               </div>               <p>oops. This might be caused by an unreachable server.
+Or the server canceld it for what ever reason, e.g.
+heroku kills the request after ~30s.
+we'll try again after a 3s timeout</p>             </td>             <td class="code">               <div class="highlight"><pre>            <span class="nb">window</span><span class="p">.</span><span class="nx">setTimeout</span> <span class="nx">@pull_changes</span><span class="p">,</span> <span class="mi">3000</span>
+  </pre></div>             </td>           </tr>                               <tr id="section-21">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-21">&#182;</a>               </div>               <p>map of valid couchDB doc attributes starting with an underscore</p>             </td>             <td class="code">               <div class="highlight"><pre>    <span class="nv">_valid_special_attributes:</span>
+      <span class="s1">&#39;_id&#39;</span>      <span class="o">:</span> <span class="mi">1</span>
+      <span class="s1">&#39;_rev&#39;</span>     <span class="o">:</span> <span class="mi">1</span>
+      <span class="s1">&#39;_deleted&#39;</span> <span class="o">:</span> <span class="mi">1</span>
+  
+  </pre></div>             </td>           </tr>                               <tr id="section-22">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-22">&#182;</a>               </div>               <p>parse object for remote storage. All attributes starting with an 
+<code>underscore</code> do not get synchronized despite the special attributes
+<code>_id</code>, <code>_rev</code> and <code>_deleted</code></p>
+
+<p>Also <code>id</code> attribute gets renamed to <code>_id</code></p>             </td>             <td class="code">               <div class="highlight"><pre>    <span class="nv">_parse_for_remote: </span><span class="nf">(obj) -&gt;</span>
+      <span class="nv">attributes = </span><span class="nx">$</span><span class="p">.</span><span class="nx">extend</span> <span class="p">{},</span> <span class="nx">obj</span>
+    
+      <span class="k">for</span> <span class="nx">attr</span> <span class="k">of</span> <span class="nx">attributes</span>
+        <span class="k">continue</span> <span class="k">if</span> <span class="nx">@_valid_special_attributes</span><span class="p">[</span><span class="nx">attr</span><span class="p">]</span>
+        <span class="k">continue</span> <span class="nx">unless</span> <span class="sr">/^_/</span><span class="p">.</span><span class="nx">test</span> <span class="nx">attr</span>
+        <span class="k">delete</span> <span class="nx">attributes</span><span class="p">[</span><span class="nx">attr</span><span class="p">]</span>
+     
+      <span class="nv">attributes._id = </span><span class="s2">&quot;#{attributes.type}/#{attributes.id}&quot;</span>
+      <span class="k">delete</span> <span class="nx">attributes</span><span class="p">.</span><span class="nx">id</span>
+      
+      <span class="k">return</span> <span class="nx">attributes</span>
+      
+      </pre></div>             </td>           </tr>                               <tr id="section-23">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-23">&#182;</a>               </div>               <p>parse object for local storage. </p>
+
+<p>renames <code>_id</code> attribute to <code>id</code> and removes the type from the id,
+e.g. <code>document/123</code> -> <code>123</code></p>             </td>             <td class="code">               <div class="highlight"><pre>    <span class="nv">_parse_from_remote: </span><span class="nf">(obj) -&gt;</span>
+      <span class="nv">id = </span><span class="nx">obj</span><span class="p">.</span><span class="nx">_id</span> <span class="o">or</span> <span class="nx">obj</span><span class="p">.</span><span class="nx">id</span>
+      <span class="k">delete</span> <span class="nx">obj</span><span class="p">.</span><span class="nx">_id</span>
+      <span class="k">if</span> <span class="nx">id</span> <span class="o">is</span> <span class="kc">undefined</span>
+        <span class="nx">console</span><span class="p">.</span><span class="nx">log</span> <span class="s1">&#39;obj&#39;</span>
+        <span class="nx">console</span><span class="p">.</span><span class="nx">log</span> <span class="nx">JSON</span><span class="p">.</span><span class="nx">stringify</span> <span class="nx">obj</span>
+        
+      <span class="p">[</span><span class="nx">obj</span><span class="p">.</span><span class="nx">type</span><span class="p">,</span> <span class="nx">obj</span><span class="p">.</span><span class="nx">id</span><span class="p">]</span> <span class="o">=</span> <span class="nx">id</span><span class="p">.</span><span class="nx">split</span><span class="p">(</span><span class="sr">/\//</span><span class="p">)</span>
+      
+      <span class="nv">obj.created_at = </span><span class="k">new</span> <span class="nb">Date</span><span class="p">(</span><span class="nb">Date</span><span class="p">.</span><span class="nx">parse</span> <span class="nx">obj</span><span class="p">.</span><span class="nx">created_at</span><span class="p">)</span> <span class="k">if</span> <span class="nx">obj</span><span class="p">.</span><span class="nx">created_at</span>
+      <span class="nv">obj.updated_at = </span><span class="k">new</span> <span class="nb">Date</span><span class="p">(</span><span class="nb">Date</span><span class="p">.</span><span class="nx">parse</span> <span class="nx">obj</span><span class="p">.</span><span class="nx">updated_at</span><span class="p">)</span> <span class="k">if</span> <span class="nx">obj</span><span class="p">.</span><span class="nx">updated_at</span>
+      
+      <span class="k">return</span> <span class="nx">obj</span>
+  </pre></div>             </td>           </tr>                               <tr id="section-24">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-24">&#182;</a>               </div>               <p>handle changes from remote</p>             </td>             <td class="code">               <div class="highlight"><pre>    <span class="nv">_handle_pull_changes: </span><span class="p">(</span><span class="nx">changes</span><span class="p">)</span> <span class="o">=&gt;</span>
+      <span class="k">for</span> <span class="p">{</span><span class="nx">doc</span><span class="p">}</span> <span class="k">in</span> <span class="nx">changes</span>
+        <span class="nv">_doc = </span><span class="nx">@_parse_from_remote</span><span class="p">(</span><span class="nx">doc</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nx">_doc</span><span class="p">.</span><span class="nx">_deleted</span>
+          <span class="nx">@app</span><span class="p">.</span><span class="nx">store</span><span class="p">.</span><span class="nx">destroy</span><span class="p">(</span><span class="nx">_doc</span><span class="p">.</span><span class="nx">type</span><span class="p">,</span> <span class="nx">_doc</span><span class="p">.</span><span class="nx">id</span><span class="p">,</span> <span class="nv">remote: </span><span class="kc">true</span><span class="p">)</span>
+          <span class="p">.</span><span class="k">then</span> <span class="p">(</span><span class="nx">object</span><span class="p">)</span> <span class="o">=&gt;</span> 
+            <span class="nx">@app</span><span class="p">.</span><span class="nx">trigger</span> <span class="s1">&#39;remote:destroyed&#39;</span><span class="p">,</span> <span class="nx">_doc</span><span class="p">.</span><span class="nx">type</span><span class="p">,</span>   <span class="nx">_doc</span><span class="p">.</span><span class="nx">id</span><span class="p">,</span>    <span class="nx">object</span>
+            <span class="nx">@app</span><span class="p">.</span><span class="nx">trigger</span> <span class="s2">&quot;remote:destroyed:#{_doc.type}&quot;</span><span class="p">,</span> <span class="nx">_doc</span><span class="p">.</span><span class="nx">id</span><span class="p">,</span>    <span class="nx">object</span>
+            <span class="nx">@app</span><span class="p">.</span><span class="nx">trigger</span> <span class="s2">&quot;remote:destroyed:#{_doc.type}:#{_doc.id}&quot;</span><span class="p">,</span>  <span class="nx">object</span>
+            
+            <span class="nx">@app</span><span class="p">.</span><span class="nx">trigger</span> <span class="s1">&#39;remote:changed&#39;</span><span class="p">,</span>                         <span class="s1">&#39;destroyed&#39;</span><span class="p">,</span> <span class="nx">_doc</span><span class="p">.</span><span class="nx">type</span><span class="p">,</span> <span class="nx">_doc</span><span class="p">.</span><span class="nx">id</span><span class="p">,</span> <span class="nx">object</span>
+            <span class="nx">@app</span><span class="p">.</span><span class="nx">trigger</span> <span class="s2">&quot;remote:changed:#{_doc.type}&quot;</span><span class="p">,</span>            <span class="s1">&#39;destroyed&#39;</span><span class="p">,</span>            <span class="nx">_doc</span><span class="p">.</span><span class="nx">id</span><span class="p">,</span> <span class="nx">object</span>
+            <span class="nx">@app</span><span class="p">.</span><span class="nx">trigger</span> <span class="s2">&quot;remote:changed:#{_doc.type}:#{_doc.id}&quot;</span><span class="p">,</span> <span class="s1">&#39;destroyed&#39;</span><span class="p">,</span>                     <span class="nx">object</span>
+        <span class="k">else</span>
+          <span class="nx">@app</span><span class="p">.</span><span class="nx">store</span><span class="p">.</span><span class="nx">save</span><span class="p">(</span><span class="nx">_doc</span><span class="p">.</span><span class="nx">type</span><span class="p">,</span> <span class="nx">_doc</span><span class="p">.</span><span class="nx">id</span><span class="p">,</span> <span class="nx">_doc</span><span class="p">,</span> <span class="nv">remote: </span><span class="kc">true</span><span class="p">)</span>
+          <span class="p">.</span><span class="k">then</span> <span class="p">(</span><span class="nx">object</span><span class="p">,</span> <span class="nx">object_was_created</span><span class="p">)</span> <span class="o">=&gt;</span> 
+            <span class="k">if</span> <span class="nx">object_was_created</span>
+              <span class="nx">@app</span><span class="p">.</span><span class="nx">trigger</span> <span class="s1">&#39;remote:created&#39;</span><span class="p">,</span> <span class="nx">_doc</span><span class="p">.</span><span class="nx">type</span><span class="p">,</span>   <span class="nx">_doc</span><span class="p">.</span><span class="nx">id</span><span class="p">,</span>   <span class="nx">object</span>
+              <span class="nx">@app</span><span class="p">.</span><span class="nx">trigger</span> <span class="s2">&quot;remote:created:#{_doc.type}&quot;</span><span class="p">,</span> <span class="nx">_doc</span><span class="p">.</span><span class="nx">id</span><span class="p">,</span>   <span class="nx">object</span>
+              <span class="nx">@app</span><span class="p">.</span><span class="nx">trigger</span> <span class="s2">&quot;remote:created:#{_doc.type}:#{_doc.id}&quot;</span><span class="p">,</span> <span class="nx">object</span>
+              
+              <span class="nx">@app</span><span class="p">.</span><span class="nx">trigger</span> <span class="s1">&#39;remote:changed&#39;</span><span class="p">,</span>                         <span class="s1">&#39;created&#39;</span><span class="p">,</span> <span class="nx">_doc</span><span class="p">.</span><span class="nx">type</span><span class="p">,</span> <span class="nx">_doc</span><span class="p">.</span><span class="nx">id</span><span class="p">,</span> <span class="nx">object</span>
+              <span class="nx">@app</span><span class="p">.</span><span class="nx">trigger</span> <span class="s2">&quot;remote:changed:#{_doc.type}&quot;</span><span class="p">,</span>            <span class="s1">&#39;created&#39;</span><span class="p">,</span>            <span class="nx">_doc</span><span class="p">.</span><span class="nx">id</span><span class="p">,</span> <span class="nx">object</span>
+              <span class="nx">@app</span><span class="p">.</span><span class="nx">trigger</span> <span class="s2">&quot;remote:changed:#{_doc.type}:#{_doc.id}&quot;</span><span class="p">,</span> <span class="s1">&#39;created&#39;</span><span class="p">,</span>                     <span class="nx">object</span>
+            <span class="k">else</span>
+              <span class="nx">@app</span><span class="p">.</span><span class="nx">trigger</span> <span class="s1">&#39;remote:updated&#39;</span><span class="p">,</span> <span class="nx">_doc</span><span class="p">.</span><span class="nx">type</span><span class="p">,</span>   <span class="nx">_doc</span><span class="p">.</span><span class="nx">id</span><span class="p">,</span>   <span class="nx">object</span>
+              <span class="nx">@app</span><span class="p">.</span><span class="nx">trigger</span> <span class="s2">&quot;remote:updated:#{_doc.type}&quot;</span><span class="p">,</span> <span class="nx">_doc</span><span class="p">.</span><span class="nx">id</span><span class="p">,</span>   <span class="nx">object</span>
+              <span class="nx">@app</span><span class="p">.</span><span class="nx">trigger</span> <span class="s2">&quot;remote:updated:#{_doc.type}:#{_doc.id}&quot;</span><span class="p">,</span> <span class="nx">object</span>
+              
+              <span class="nx">@app</span><span class="p">.</span><span class="nx">trigger</span> <span class="s1">&#39;remote:changed&#39;</span><span class="p">,</span>                         <span class="s1">&#39;updated&#39;</span><span class="p">,</span> <span class="nx">_doc</span><span class="p">.</span><span class="nx">type</span><span class="p">,</span> <span class="nx">_doc</span><span class="p">.</span><span class="nx">id</span><span class="p">,</span> <span class="nx">object</span>
+              <span class="nx">@app</span><span class="p">.</span><span class="nx">trigger</span> <span class="s2">&quot;remote:changed:#{_doc.type}&quot;</span><span class="p">,</span>            <span class="s1">&#39;updated&#39;</span><span class="p">,</span>            <span class="nx">_doc</span><span class="p">.</span><span class="nx">id</span><span class="p">,</span> <span class="nx">object</span>
+              <span class="nx">@app</span><span class="p">.</span><span class="nx">trigger</span> <span class="s2">&quot;remote:changed:#{_doc.type}:#{_doc.id}&quot;</span><span class="p">,</span> <span class="s1">&#39;updated&#39;</span><span class="p">,</span>                     <span class="nx">object</span>
+        </pre></div>             </td>           </tr>                               <tr id="section-25">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-25">&#182;</a>               </div>               <p>Gets response to POST <em>bulk</em>docs request from couchDB.
+Updates to documents (e.g. new _rev stamps) come through the _changes feed anyway
+and do not need to handle it twice. </p>
+
+<p>But what needs to be handled are conflicts.</p>             </td>             <td class="code">               <div class="highlight"><pre>    <span class="nv">_handle_push_changes: </span><span class="p">(</span><span class="nx">doc_responses</span><span class="p">)</span> <span class="o">=&gt;</span>
+      <span class="k">for</span> <span class="nx">response</span> <span class="k">in</span> <span class="nx">doc_responses</span> <span class="k">when</span> <span class="nx">response</span><span class="p">.</span><span class="nx">error</span> <span class="o">is</span> <span class="s1">&#39;conflict&#39;</span>
+        <span class="nx">@app</span><span class="p">.</span><span class="nx">trigger</span> <span class="s1">&#39;remote:error:conflict&#39;</span><span class="p">,</span> <span class="nx">response</span><span class="p">.</span><span class="nx">id</span>
+    </pre></div>             </td>           </tr>                               <tr id="section-26">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-26">&#182;</a>               </div>                            </td>             <td class="code">               <div class="highlight"><pre>    <span class="nv">_promise: </span><span class="nx">$</span><span class="p">.</span><span class="nx">Deferred</span>
+
+</pre></div>             </td>           </tr>                </tbody>     </table>   </div> </body> </html> 
