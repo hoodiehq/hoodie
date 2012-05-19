@@ -158,11 +158,11 @@ define 'specs/account', ['mocks/hoodie', 'account'], (CangMock, Account) ->
               
           _when "authentication request has an error", ->
             beforeEach ->
-              @app.request.andCallFake (type, path, options = {}) -> options.error? 'error data'
+              @app.request.andCallFake (type, path, options = {}) -> options.error? responseText: 'error data'
               @promise = @account.authenticate()
             
             it "should reject the promise", ->
-              expect(@promise).toBeRejectedWith 'error data'
+              expect(@promise).toBeRejectedWith error: 'error data'
     # /.authenticate()
   
   
@@ -207,7 +207,9 @@ define 'specs/account', ['mocks/hoodie', 'account'], (CangMock, Account) ->
               
       _when "sign_up successful", ->
         beforeEach ->
-          @app.request.andCallFake (type, path, options) -> options.success()
+          @app.request.andCallFake (type, path, options) -> 
+            response = {"ok":true,"id":"org.couchdb.user:bizbiz","rev":"1-a0134f4a9909d3b20533285c839ed830"}
+            options.success response
         
         it "should trigger `account:signed_up` event", ->
           @account.sign_up('joe@example.com', 'secret')
@@ -216,6 +218,18 @@ define 'specs/account', ['mocks/hoodie', 'account'], (CangMock, Account) ->
         it "should trigger `account:signed_in` event", ->
           @account.sign_up('joe@example.com', 'secret')
           expect(@app.trigger).wasCalledWith 'account:signed_in', 'joe@example.com'
+          
+        it "should resolve its promise", ->
+          promise = @account.sign_up('joe@example.com', 'secret')
+          expect(promise).toBeResolvedWith 'joe@example.com'
+          
+      _when "sign_up has an error", ->
+        beforeEach ->
+          @app.request.andCallFake (type, path, options) -> options.error responseText: '{"error":"forbidden","reason":"Username may not start with underscore."}'
+        
+        it "should reject its promise", ->
+          promise = @account.sign_up('joe@example.com', 'secret')
+          expect(promise).toBeRejectedWith error:"forbidden", reason: "Username may not start with underscore."
     # /.sign_up(email, password, attributes)
   
   
@@ -289,4 +303,37 @@ define 'specs/account', ['mocks/hoodie', 'account'], (CangMock, Account) ->
         it "should return 'joe$example_com", ->
           (expect @account.user_db()).toEqual('joe_doe$example_com')
     # /.user_db()
+    
+    describe ".fetch()", ->
+      
+      _when "email is not set", ->
+        beforeEach ->
+          @account.email = null
+          @account.fetch()
+        
+        it "should not send any request", ->
+          expect(@app.request).wasNotCalled()
+        
+      
+      _when "email is joe@example.com", ->
+        beforeEach ->
+          @account.email = 'joe@example.com'
+          @account.fetch()
+          [@type, @path, @options] = @app.request.mostRecentCall.args
+        
+        it "should send a GET request to http://my.cou.ch/_users/org.couchdb.user%3Ajoe%40example.com", ->
+          expect(@app.request).wasCalled()
+          expect(@type).toBe 'GET'
+          expect(@path).toBe  '/_users/org.couchdb.user%3Ajoe%40example.com'
+        
+        _when "successful", ->
+          beforeEach ->
+            @response = {"_id":"org.couchdb.user:baz","_rev":"3-33e4d43a6dff5b29a4bd33f576c7824f","name":"baz","salt":"82163606fa5c100e0095ad63598de810","password_sha":"e2e2a4d99632dc5e3fdb41d5d1ff98743a1f344e","type":"user","roles":[]}
+            @app.request.andCallFake (type, path, options) => 
+              options.success @response
+          
+          it "should resolve its promise", ->
+            promise = @account.fetch()
+            expect(promise).toBeResolvedWith @response
+    # /.fetch()
   # /Account

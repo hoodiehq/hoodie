@@ -46,36 +46,58 @@ define('account', function() {
             return defer.reject();
           }
         },
-        error: defer.reject
+        error: function(xhr) {
+          var error;
+          try {
+            error = JSON.parse(xhr.responseText);
+          } catch (e) {
+            error = {
+              error: xhr.responseText || "unknown"
+            };
+          }
+          return defer.reject(error);
+        }
       });
       return defer.promise();
     };
 
     Account.prototype.sign_up = function(email, password, attributes) {
-      var defer, key, prefix,
+      var defer, key,
         _this = this;
       if (attributes == null) {
         attributes = {};
       }
       defer = this.app.defer();
-      prefix = 'org.couchdb.user';
-      key = "" + prefix + ":" + email;
+      key = "" + this._prefix + ":" + email;
+      this._doc = {
+        _id: key,
+        name: email,
+        type: 'user',
+        roles: [],
+        attributes: attributes
+      };
       this.app.request('PUT', "/_users/" + (encodeURIComponent(key)), {
-        data: JSON.stringify({
-          _id: key,
-          name: email,
-          type: 'user',
-          roles: [],
-          password: password,
-          attributes: attributes
-        }),
+        data: JSON.stringify($.extend({
+          password: password
+        }, this._doc)),
         contentType: 'application/json',
-        success: function() {
+        success: function(response) {
+          _this._doc._rev = response.rev;
           _this.app.trigger('account:signed_up', email);
           _this.app.trigger('account:signed_in', email);
           return defer.resolve(email);
         },
-        error: defer.reject
+        error: function(xhr) {
+          var error;
+          try {
+            error = JSON.parse(xhr.responseText);
+          } catch (e) {
+            error = {
+              error: xhr.responseText || "unknown"
+            };
+          }
+          return defer.reject(error);
+        }
       });
       return defer.promise();
     };
@@ -93,7 +115,17 @@ define('account', function() {
           _this.app.trigger('account:signed_in', email);
           return defer.resolve(email);
         },
-        error: defer.reject
+        error: function(xhr) {
+          var error;
+          try {
+            error = JSON.parse(xhr.responseText);
+          } catch (e) {
+            error = {
+              error: xhr.responseText || "unknown"
+            };
+          }
+          return defer.reject(error);
+        }
       });
       return defer.promise();
     };
@@ -123,6 +155,43 @@ define('account', function() {
       var _ref;
       return (_ref = this.email) != null ? _ref.toLowerCase().replace(/@/, "$").replace(/\./g, "_") : void 0;
     };
+
+    Account.prototype.fetch = function() {
+      var defer, key,
+        _this = this;
+      defer = this.app.defer();
+      if (!this.email) {
+        defer.reject({
+          error: "unauthenticated",
+          reason: "not logged in"
+        });
+        return defer.promise();
+      }
+      key = "" + this._prefix + ":" + this.email;
+      this.app.request('GET', "/_users/" + (encodeURIComponent(key)), {
+        success: function(response) {
+          delete response.password_sha;
+          _this._doc = response;
+          return defer.resolve(response);
+        },
+        error: function(xhr) {
+          var error;
+          try {
+            error = JSON.parse(xhr.responseText);
+          } catch (e) {
+            error = {
+              error: xhr.responseText || "unknown"
+            };
+          }
+          return defer.reject(error);
+        }
+      });
+      return defer.promise();
+    };
+
+    Account.prototype._prefix = 'org.couchdb.user';
+
+    Account.prototype._doc = {};
 
     Account.prototype._handle_sign_in = function(email) {
       this.email = email;

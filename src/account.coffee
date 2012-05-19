@@ -40,7 +40,8 @@ define 'account', ->
       
       # @_authenticated is undefined
       @app.request 'GET', "/_session"
-        success: (response) =>
+      
+        success     : (response) =>
           if response.userCtx.name
             @_authenticated = true
             @email = response.userCtx.name
@@ -50,7 +51,13 @@ define 'account', ->
             @app.trigger 'account:error:unauthenticated'
             defer.reject()
             
-        error: defer.reject
+        error       : (xhr) ->
+          try
+            error = JSON.parse(xhr.responseText)
+          catch e
+            error = error: xhr.responseText or "unknown"
+            
+          defer.reject(error)
           
       return defer.promise()
       
@@ -65,30 +72,35 @@ define 'account', ->
     sign_up : (email, password, attributes = {}) ->
       defer = @app.defer()
       
-      prefix  = 'org.couchdb.user'
-      key     = "#{prefix}:#{email}"
+      key     = "#{@_prefix}:#{email}"
+
+      @_doc = 
+        _id        : key
+        name       : email
+        type       : 'user'
+        roles      : []
+        attributes : attributes
 
       @app.request 'PUT', "/_users/#{encodeURIComponent key}",
+        data        : JSON.stringify $.extend(password: password, @_doc)
+        contentType : 'application/json'
         
-        data: JSON.stringify
-          _id        : key
-          name       : email
-          type       : 'user'
-          roles      : []
-          password   : password
-          attributes : attributes
-          
-        contentType:  'application/json'
-        
-        success   : => 
-          # {"ok":true,"id":"org.couchdb.user:funk","rev":"1-0a8c05f25b227b4689bbdcf55af06afc"}
+        success     : (response) =>
+          @_doc._rev = response.rev
           @app.trigger 'account:signed_up', email
           @app.trigger 'account:signed_in', email
           defer.resolve email
           
-        error: defer.reject
+        error       : (xhr) ->
+          try
+            error = JSON.parse(xhr.responseText)
+          catch e
+            error = error: xhr.responseText or "unknown"
+            
+          defer.reject(error)
         
       return defer.promise()
+
 
     # ## sign in with email & password
     #
@@ -102,10 +114,17 @@ define 'account', ->
           name      : email
           password  : password
           
-        success : => 
+        success     : => 
           @app.trigger 'account:signed_in', email
           defer.resolve email
-        error   : defer.reject
+        
+        error       : (xhr) ->
+          try
+            error = JSON.parse(xhr.responseText)
+          catch e
+            error = error: xhr.responseText or "unknown"
+            
+          defer.reject(error)
       
       return defer.promise()
 
@@ -154,11 +173,41 @@ define 'account', ->
     #
     user_db : -> 
       @email?.toLowerCase().replace(/@/, "$").replace(/\./g, "_");
-    
-    # 
+      
+    # ## fetch
+    #
+    # fetches _users doc from CouchDB and caches it in _doc,
+    # without password / password_sha
+    fetch : ->
+      defer = @app.defer()
+      unless @email
+        defer.reject error: "unauthenticated", reason: "not logged in"
+        return defer.promise()
+      
+      key = "#{@_prefix}:#{@email}"
+      @app.request 'GET', "/_users/#{encodeURIComponent key}",
+      
+        success     : (response) => 
+          delete response.password_sha
+          @_doc = response
+          defer.resolve response
+        
+        error       : (xhr) ->
+          try
+            error = JSON.parse(xhr.responseText)
+          catch e
+            error = error: xhr.responseText or "unknown"
+            
+          defer.reject(error) 
+          
+      return defer.promise()
 
     # ## PRIVATE
     #
+    _prefix : 'org.couchdb.user'
+    
+    # couchDB _users doc
+    _doc : {}
     
     #
     _handle_sign_in: (@email) =>

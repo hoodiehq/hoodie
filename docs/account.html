@@ -23,7 +23,8 @@
       <span class="k">if</span> <span class="nx">@_authenticated</span> <span class="o">is</span> <span class="kc">false</span>
         <span class="k">return</span> <span class="nx">defer</span><span class="p">.</span><span class="nx">reject</span><span class="p">().</span><span class="nx">promise</span><span class="p">()</span>
       </pre></div>             </td>           </tr>                               <tr id="section-7">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-7">&#182;</a>               </div>               <p>@_authenticated is undefined</p>             </td>             <td class="code">               <div class="highlight"><pre>      <span class="nx">@app</span><span class="p">.</span><span class="nx">request</span> <span class="s1">&#39;GET&#39;</span><span class="p">,</span> <span class="s2">&quot;/_session&quot;</span>
-        <span class="nv">success: </span><span class="p">(</span><span class="nx">response</span><span class="p">)</span> <span class="o">=&gt;</span>
+      
+        <span class="nv">success     : </span><span class="p">(</span><span class="nx">response</span><span class="p">)</span> <span class="o">=&gt;</span>
           <span class="k">if</span> <span class="nx">response</span><span class="p">.</span><span class="nx">userCtx</span><span class="p">.</span><span class="nx">name</span>
             <span class="vi">@_authenticated = </span><span class="kc">true</span>
             <span class="vi">@email = </span><span class="nx">response</span><span class="p">.</span><span class="nx">userCtx</span><span class="p">.</span><span class="nx">name</span>
@@ -33,7 +34,13 @@
             <span class="nx">@app</span><span class="p">.</span><span class="nx">trigger</span> <span class="s1">&#39;account:error:unauthenticated&#39;</span>
             <span class="nx">defer</span><span class="p">.</span><span class="nx">reject</span><span class="p">()</span>
             
-        <span class="nv">error: </span><span class="nx">defer</span><span class="p">.</span><span class="nx">reject</span>
+        <span class="nv">error       : </span><span class="nf">(xhr) -&gt;</span>
+          <span class="k">try</span>
+            <span class="nv">error = </span><span class="nx">JSON</span><span class="p">.</span><span class="nx">parse</span><span class="p">(</span><span class="nx">xhr</span><span class="p">.</span><span class="nx">responseText</span><span class="p">)</span>
+          <span class="k">catch</span> <span class="nx">e</span>
+            <span class="nv">error = error: </span><span class="nx">xhr</span><span class="p">.</span><span class="nx">responseText</span> <span class="o">or</span> <span class="s2">&quot;unknown&quot;</span>
+            
+          <span class="nx">defer</span><span class="p">.</span><span class="nx">reject</span><span class="p">(</span><span class="nx">error</span><span class="p">)</span>
           
       <span class="k">return</span> <span class="nx">defer</span><span class="p">.</span><span class="nx">promise</span><span class="p">()</span>
       
@@ -45,28 +52,34 @@ The backend will automatically create a userDB based on the email
 address.</p>             </td>             <td class="code">               <div class="highlight"><pre>    <span class="nv">sign_up : </span><span class="nf">(email, password, attributes = {}) -&gt;</span>
       <span class="nv">defer = </span><span class="nx">@app</span><span class="p">.</span><span class="nx">defer</span><span class="p">()</span>
       
-      <span class="nv">prefix  = </span><span class="s1">&#39;org.couchdb.user&#39;</span>
-      <span class="nv">key     = </span><span class="s2">&quot;#{prefix}:#{email}&quot;</span>
+      <span class="nv">key     = </span><span class="s2">&quot;#{@_prefix}:#{email}&quot;</span>
+
+      <span class="vi">@_doc = </span>
+        <span class="nv">_id        : </span><span class="nx">key</span>
+        <span class="nv">name       : </span><span class="nx">email</span>
+        <span class="nv">type       : </span><span class="s1">&#39;user&#39;</span>
+        <span class="nv">roles      : </span><span class="p">[]</span>
+        <span class="nv">attributes : </span><span class="nx">attributes</span>
 
       <span class="nx">@app</span><span class="p">.</span><span class="nx">request</span> <span class="s1">&#39;PUT&#39;</span><span class="p">,</span> <span class="s2">&quot;/_users/#{encodeURIComponent key}&quot;</span><span class="p">,</span>
+        <span class="nv">data        : </span><span class="nx">JSON</span><span class="p">.</span><span class="nx">stringify</span> <span class="nx">$</span><span class="p">.</span><span class="nx">extend</span><span class="p">(</span><span class="nv">password: </span><span class="nx">password</span><span class="p">,</span> <span class="nx">@_doc</span><span class="p">)</span>
+        <span class="nv">contentType : </span><span class="s1">&#39;application/json&#39;</span>
         
-        <span class="nv">data: </span><span class="nx">JSON</span><span class="p">.</span><span class="nx">stringify</span>
-          <span class="nv">_id        : </span><span class="nx">key</span>
-          <span class="nv">name       : </span><span class="nx">email</span>
-          <span class="nv">type       : </span><span class="s1">&#39;user&#39;</span>
-          <span class="nv">roles      : </span><span class="p">[]</span>
-          <span class="nv">password   : </span><span class="nx">password</span>
-          <span class="nv">attributes : </span><span class="nx">attributes</span>
-          
-        <span class="nv">contentType: </span> <span class="s1">&#39;application/json&#39;</span>
-        
-        <span class="nv">success   : </span><span class="o">=&gt;</span> </pre></div>             </td>           </tr>                               <tr id="section-9">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-9">&#182;</a>               </div>               <p>{"ok":true,"id":"org.couchdb.user:funk","rev":"1-0a8c05f25b227b4689bbdcf55af06afc"}</p>             </td>             <td class="code">               <div class="highlight"><pre>          <span class="nx">@app</span><span class="p">.</span><span class="nx">trigger</span> <span class="s1">&#39;account:signed_up&#39;</span><span class="p">,</span> <span class="nx">email</span>
+        <span class="nv">success     : </span><span class="p">(</span><span class="nx">response</span><span class="p">)</span> <span class="o">=&gt;</span>
+          <span class="vi">@_doc._rev = </span><span class="nx">response</span><span class="p">.</span><span class="nx">rev</span>
+          <span class="nx">@app</span><span class="p">.</span><span class="nx">trigger</span> <span class="s1">&#39;account:signed_up&#39;</span><span class="p">,</span> <span class="nx">email</span>
           <span class="nx">@app</span><span class="p">.</span><span class="nx">trigger</span> <span class="s1">&#39;account:signed_in&#39;</span><span class="p">,</span> <span class="nx">email</span>
           <span class="nx">defer</span><span class="p">.</span><span class="nx">resolve</span> <span class="nx">email</span>
           
-        <span class="nv">error: </span><span class="nx">defer</span><span class="p">.</span><span class="nx">reject</span>
+        <span class="nv">error       : </span><span class="nf">(xhr) -&gt;</span>
+          <span class="k">try</span>
+            <span class="nv">error = </span><span class="nx">JSON</span><span class="p">.</span><span class="nx">parse</span><span class="p">(</span><span class="nx">xhr</span><span class="p">.</span><span class="nx">responseText</span><span class="p">)</span>
+          <span class="k">catch</span> <span class="nx">e</span>
+            <span class="nv">error = error: </span><span class="nx">xhr</span><span class="p">.</span><span class="nx">responseText</span> <span class="o">or</span> <span class="s2">&quot;unknown&quot;</span>
+            
+          <span class="nx">defer</span><span class="p">.</span><span class="nx">reject</span><span class="p">(</span><span class="nx">error</span><span class="p">)</span>
         
-      <span class="k">return</span> <span class="nx">defer</span><span class="p">.</span><span class="nx">promise</span><span class="p">()</span></pre></div>             </td>           </tr>                               <tr id="section-10">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-10">&#182;</a>               </div>               <h2>sign in with email &amp; password</h2>
+      <span class="k">return</span> <span class="nx">defer</span><span class="p">.</span><span class="nx">promise</span><span class="p">()</span></pre></div>             </td>           </tr>                               <tr id="section-9">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-9">&#182;</a>               </div>               <h2>sign in with email &amp; password</h2>
 
 <p>uses standard couchDB API to create a new user session (POST /_session)</p>             </td>             <td class="code">               <div class="highlight"><pre>    <span class="nv">sign_in : </span><span class="nf">(email, password) -&gt;</span>
       <span class="nv">defer = </span><span class="nx">@app</span><span class="p">.</span><span class="nx">defer</span><span class="p">()</span>
@@ -76,25 +89,32 @@ address.</p>             </td>             <td class="code">               <div 
           <span class="nv">name      : </span><span class="nx">email</span>
           <span class="nv">password  : </span><span class="nx">password</span>
           
-        <span class="nv">success : </span><span class="o">=&gt;</span> 
+        <span class="nv">success     : </span><span class="o">=&gt;</span> 
           <span class="nx">@app</span><span class="p">.</span><span class="nx">trigger</span> <span class="s1">&#39;account:signed_in&#39;</span><span class="p">,</span> <span class="nx">email</span>
           <span class="nx">defer</span><span class="p">.</span><span class="nx">resolve</span> <span class="nx">email</span>
-        <span class="nv">error   : </span><span class="nx">defer</span><span class="p">.</span><span class="nx">reject</span>
+        
+        <span class="nv">error       : </span><span class="nf">(xhr) -&gt;</span>
+          <span class="k">try</span>
+            <span class="nv">error = </span><span class="nx">JSON</span><span class="p">.</span><span class="nx">parse</span><span class="p">(</span><span class="nx">xhr</span><span class="p">.</span><span class="nx">responseText</span><span class="p">)</span>
+          <span class="k">catch</span> <span class="nx">e</span>
+            <span class="nv">error = error: </span><span class="nx">xhr</span><span class="p">.</span><span class="nx">responseText</span> <span class="o">or</span> <span class="s2">&quot;unknown&quot;</span>
+            
+          <span class="nx">defer</span><span class="p">.</span><span class="nx">reject</span><span class="p">(</span><span class="nx">error</span><span class="p">)</span>
       
-      <span class="k">return</span> <span class="nx">defer</span><span class="p">.</span><span class="nx">promise</span><span class="p">()</span></pre></div>             </td>           </tr>                               <tr id="section-11">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-11">&#182;</a>               </div>               <p>alias</p>             </td>             <td class="code">               <div class="highlight"><pre>    <span class="nv">login: </span><span class="err">@</span><span class="o">::</span><span class="nx">sign_in</span></pre></div>             </td>           </tr>                               <tr id="section-12">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-12">&#182;</a>               </div>               <h2>change password</h2>
+      <span class="k">return</span> <span class="nx">defer</span><span class="p">.</span><span class="nx">promise</span><span class="p">()</span></pre></div>             </td>           </tr>                               <tr id="section-10">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-10">&#182;</a>               </div>               <p>alias</p>             </td>             <td class="code">               <div class="highlight"><pre>    <span class="nv">login: </span><span class="err">@</span><span class="o">::</span><span class="nx">sign_in</span></pre></div>             </td>           </tr>                               <tr id="section-11">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-11">&#182;</a>               </div>               <h2>change password</h2>
 
 <p>to be done.</p>             </td>             <td class="code">               <div class="highlight"><pre>    <span class="nv">change_password : </span><span class="nf">(current_password, new_password) -&gt;</span>
-      <span class="nx">alert</span><span class="p">(</span><span class="s1">&#39;change password is not yet implementd&#39;</span><span class="p">)</span></pre></div>             </td>           </tr>                               <tr id="section-13">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-13">&#182;</a>               </div>               <h2>sign out</h2>
+      <span class="nx">alert</span><span class="p">(</span><span class="s1">&#39;change password is not yet implementd&#39;</span><span class="p">)</span></pre></div>             </td>           </tr>                               <tr id="section-12">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-12">&#182;</a>               </div>               <h2>sign out</h2>
 
 <p>uses standard couchDB API to destroy a user session (DELETE /_session)</p>
 
 <p>TODO: handle errors</p>             </td>             <td class="code">               <div class="highlight"><pre>    <span class="nv">sign_out: </span><span class="o">-&gt;</span>
       <span class="nx">@app</span><span class="p">.</span><span class="nx">request</span> <span class="s1">&#39;DELETE&#39;</span><span class="p">,</span> <span class="s1">&#39;/_session&#39;</span><span class="p">,</span> 
-        <span class="nv">success : </span><span class="o">=&gt;</span> <span class="nx">@app</span><span class="p">.</span><span class="nx">trigger</span> <span class="s1">&#39;account:signed_out&#39;</span></pre></div>             </td>           </tr>                               <tr id="section-14">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-14">&#182;</a>               </div>               <p>alias</p>             </td>             <td class="code">               <div class="highlight"><pre>    <span class="nv">logout: </span><span class="err">@</span><span class="o">::</span><span class="nx">sign_out</span>
-    </pre></div>             </td>           </tr>                               <tr id="section-15">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-15">&#182;</a>               </div>               <h2>On</h2>
+        <span class="nv">success : </span><span class="o">=&gt;</span> <span class="nx">@app</span><span class="p">.</span><span class="nx">trigger</span> <span class="s1">&#39;account:signed_out&#39;</span></pre></div>             </td>           </tr>                               <tr id="section-13">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-13">&#182;</a>               </div>               <p>alias</p>             </td>             <td class="code">               <div class="highlight"><pre>    <span class="nv">logout: </span><span class="err">@</span><span class="o">::</span><span class="nx">sign_out</span>
+    </pre></div>             </td>           </tr>                               <tr id="section-14">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-14">&#182;</a>               </div>               <h2>On</h2>
 
 <p>alias for <code>app.on</code></p>             </td>             <td class="code">               <div class="highlight"><pre>    <span class="kc">on</span> <span class="o">:</span> <span class="nf">(event, cb) -&gt;</span> <span class="nx">@app</span><span class="p">.</span><span class="kc">on</span> <span class="s2">&quot;account:#{event}&quot;</span><span class="p">,</span> <span class="nx">cb</span>
-    </pre></div>             </td>           </tr>                               <tr id="section-16">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-16">&#182;</a>               </div>               <h2>user_db</h2>
+    </pre></div>             </td>           </tr>                               <tr id="section-15">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-15">&#182;</a>               </div>               <h2>user_db</h2>
 
 <p>escape user email (or what ever he uses to sign up)
 to make it a valid couchDB database name</p>
@@ -108,7 +128,34 @@ Notes:
  can't reverse because _ are valid before the @.
 </code></pre>             </td>             <td class="code">               <div class="highlight"><pre>    <span class="nv">user_db : </span><span class="o">-&gt;</span> 
       <span class="nx">@email</span><span class="o">?</span><span class="p">.</span><span class="nx">toLowerCase</span><span class="p">().</span><span class="nx">replace</span><span class="p">(</span><span class="sr">/@/</span><span class="p">,</span> <span class="s2">&quot;$&quot;</span><span class="p">).</span><span class="nx">replace</span><span class="p">(</span><span class="sr">/\./g</span><span class="p">,</span> <span class="s2">&quot;_&quot;</span><span class="p">);</span>
-    </pre></div>             </td>           </tr>                               <tr id="section-17">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-17">&#182;</a>               </div>                            </td>             <td class="code">               <div class="highlight"><pre></pre></div>             </td>           </tr>                               <tr id="section-18">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-18">&#182;</a>               </div>               <h2>PRIVATE</h2>             </td>             <td class="code">               <div class="highlight"><pre>    </pre></div>             </td>           </tr>                               <tr id="section-19">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-19">&#182;</a>               </div>                            </td>             <td class="code">               <div class="highlight"><pre>    <span class="nv">_handle_sign_in: </span><span class="p">(</span><span class="nx">@email</span><span class="p">)</span> <span class="o">=&gt;</span>
+      </pre></div>             </td>           </tr>                               <tr id="section-16">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-16">&#182;</a>               </div>               <h2>fetch</h2>
+
+<p>fetches <em>users doc from CouchDB and caches it in _doc,
+without password / password</em>sha</p>             </td>             <td class="code">               <div class="highlight"><pre>    <span class="nv">fetch : </span><span class="o">-&gt;</span>
+      <span class="nv">defer = </span><span class="nx">@app</span><span class="p">.</span><span class="nx">defer</span><span class="p">()</span>
+      <span class="nx">unless</span> <span class="nx">@email</span>
+        <span class="nx">defer</span><span class="p">.</span><span class="nx">reject</span> <span class="nv">error: </span><span class="s2">&quot;unauthenticated&quot;</span><span class="p">,</span> <span class="nv">reason: </span><span class="s2">&quot;not logged in&quot;</span>
+        <span class="k">return</span> <span class="nx">defer</span><span class="p">.</span><span class="nx">promise</span><span class="p">()</span>
+      
+      <span class="nv">key = </span><span class="s2">&quot;#{@_prefix}:#{@email}&quot;</span>
+      <span class="nx">@app</span><span class="p">.</span><span class="nx">request</span> <span class="s1">&#39;GET&#39;</span><span class="p">,</span> <span class="s2">&quot;/_users/#{encodeURIComponent key}&quot;</span><span class="p">,</span>
+      
+        <span class="nv">success     : </span><span class="p">(</span><span class="nx">response</span><span class="p">)</span> <span class="o">=&gt;</span> 
+          <span class="k">delete</span> <span class="nx">response</span><span class="p">.</span><span class="nx">password_sha</span>
+          <span class="vi">@_doc = </span><span class="nx">response</span>
+          <span class="nx">defer</span><span class="p">.</span><span class="nx">resolve</span> <span class="nx">response</span>
+        
+        <span class="nv">error       : </span><span class="nf">(xhr) -&gt;</span>
+          <span class="k">try</span>
+            <span class="nv">error = </span><span class="nx">JSON</span><span class="p">.</span><span class="nx">parse</span><span class="p">(</span><span class="nx">xhr</span><span class="p">.</span><span class="nx">responseText</span><span class="p">)</span>
+          <span class="k">catch</span> <span class="nx">e</span>
+            <span class="nv">error = error: </span><span class="nx">xhr</span><span class="p">.</span><span class="nx">responseText</span> <span class="o">or</span> <span class="s2">&quot;unknown&quot;</span>
+            
+          <span class="nx">defer</span><span class="p">.</span><span class="nx">reject</span><span class="p">(</span><span class="nx">error</span><span class="p">)</span> 
+          
+      <span class="k">return</span> <span class="nx">defer</span><span class="p">.</span><span class="nx">promise</span><span class="p">()</span></pre></div>             </td>           </tr>                               <tr id="section-17">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-17">&#182;</a>               </div>               <h2>PRIVATE</h2>             </td>             <td class="code">               <div class="highlight"><pre>    <span class="nv">_prefix : </span><span class="s1">&#39;org.couchdb.user&#39;</span>
+    </pre></div>             </td>           </tr>                               <tr id="section-18">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-18">&#182;</a>               </div>               <p>couchDB _users doc</p>             </td>             <td class="code">               <div class="highlight"><pre>    <span class="nv">_doc : </span><span class="p">{}</span>
+    </pre></div>             </td>           </tr>                               <tr id="section-19">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-19">&#182;</a>               </div>                            </td>             <td class="code">               <div class="highlight"><pre>    <span class="nv">_handle_sign_in: </span><span class="p">(</span><span class="nx">@email</span><span class="p">)</span> <span class="o">=&gt;</span>
       <span class="nx">@app</span><span class="p">.</span><span class="nx">store</span><span class="p">.</span><span class="nx">db</span><span class="p">.</span><span class="nx">setItem</span> <span class="s1">&#39;_couch.account.email&#39;</span><span class="p">,</span> <span class="nx">@email</span>
       <span class="vi">@_authenticated = </span><span class="kc">true</span>
     </pre></div>             </td>           </tr>                               <tr id="section-20">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-20">&#182;</a>               </div>                            </td>             <td class="code">               <div class="highlight"><pre>    <span class="nv">_handle_sign_out: </span><span class="o">=&gt;</span>

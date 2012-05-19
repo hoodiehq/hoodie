@@ -196,12 +196,16 @@ define('specs/account', ['mocks/hoodie', 'account'], function(CangMock, Account)
                 if (options == null) {
                   options = {};
                 }
-                return typeof options.error === "function" ? options.error('error data') : void 0;
+                return typeof options.error === "function" ? options.error({
+                  responseText: 'error data'
+                }) : void 0;
               });
               return this.promise = this.account.authenticate();
             });
             return it("should reject the promise", function() {
-              return expect(this.promise).toBeRejectedWith('error data');
+              return expect(this.promise).toBeRejectedWith({
+                error: 'error data'
+              });
             });
           });
         });
@@ -251,19 +255,47 @@ define('specs/account', ['mocks/hoodie', 'account'], function(CangMock, Account)
         expect(this.data.attributes.name).toBe('Joe Doe');
         return expect(this.data.attributes.nick).toBe('Foo');
       });
-      return _when("sign_up successful", function() {
+      _when("sign_up successful", function() {
         beforeEach(function() {
           return this.app.request.andCallFake(function(type, path, options) {
-            return options.success();
+            var response;
+            response = {
+              "ok": true,
+              "id": "org.couchdb.user:bizbiz",
+              "rev": "1-a0134f4a9909d3b20533285c839ed830"
+            };
+            return options.success(response);
           });
         });
         it("should trigger `account:signed_up` event", function() {
           this.account.sign_up('joe@example.com', 'secret');
           return expect(this.app.trigger).wasCalledWith('account:signed_up', 'joe@example.com');
         });
-        return it("should trigger `account:signed_in` event", function() {
+        it("should trigger `account:signed_in` event", function() {
           this.account.sign_up('joe@example.com', 'secret');
           return expect(this.app.trigger).wasCalledWith('account:signed_in', 'joe@example.com');
+        });
+        return it("should resolve its promise", function() {
+          var promise;
+          promise = this.account.sign_up('joe@example.com', 'secret');
+          return expect(promise).toBeResolvedWith('joe@example.com');
+        });
+      });
+      return _when("sign_up has an error", function() {
+        beforeEach(function() {
+          return this.app.request.andCallFake(function(type, path, options) {
+            return options.error({
+              responseText: '{"error":"forbidden","reason":"Username may not start with underscore."}'
+            });
+          });
+        });
+        return it("should reject its promise", function() {
+          var promise;
+          promise = this.account.sign_up('joe@example.com', 'secret');
+          return expect(promise).toBeRejectedWith({
+            error: "forbidden",
+            reason: "Username may not start with underscore."
+          });
         });
       });
     });
@@ -333,13 +365,59 @@ define('specs/account', ['mocks/hoodie', 'account'], function(CangMock, Account)
         return (expect(this.app.on)).wasCalledWith('account:funky', party);
       });
     });
-    return describe(".user_db", function() {
+    describe(".user_db", function() {
       return _when("email is set to 'joe.doe@example.com'", function() {
         beforeEach(function() {
           return this.account.email = 'joe.doe@example.com';
         });
         return it("should return 'joe$example_com", function() {
           return (expect(this.account.user_db())).toEqual('joe_doe$example_com');
+        });
+      });
+    });
+    return describe(".fetch()", function() {
+      _when("email is not set", function() {
+        beforeEach(function() {
+          this.account.email = null;
+          return this.account.fetch();
+        });
+        return it("should not send any request", function() {
+          return expect(this.app.request).wasNotCalled();
+        });
+      });
+      return _when("email is joe@example.com", function() {
+        beforeEach(function() {
+          var _ref;
+          this.account.email = 'joe@example.com';
+          this.account.fetch();
+          return _ref = this.app.request.mostRecentCall.args, this.type = _ref[0], this.path = _ref[1], this.options = _ref[2], _ref;
+        });
+        it("should send a GET request to http://my.cou.ch/_users/org.couchdb.user%3Ajoe%40example.com", function() {
+          expect(this.app.request).wasCalled();
+          expect(this.type).toBe('GET');
+          return expect(this.path).toBe('/_users/org.couchdb.user%3Ajoe%40example.com');
+        });
+        return _when("successful", function() {
+          beforeEach(function() {
+            var _this = this;
+            this.response = {
+              "_id": "org.couchdb.user:baz",
+              "_rev": "3-33e4d43a6dff5b29a4bd33f576c7824f",
+              "name": "baz",
+              "salt": "82163606fa5c100e0095ad63598de810",
+              "password_sha": "e2e2a4d99632dc5e3fdb41d5d1ff98743a1f344e",
+              "type": "user",
+              "roles": []
+            };
+            return this.app.request.andCallFake(function(type, path, options) {
+              return options.success(_this.response);
+            });
+          });
+          return it("should resolve its promise", function() {
+            var promise;
+            promise = this.account.fetch();
+            return expect(promise).toBeResolvedWith(this.response);
+          });
         });
       });
     });
