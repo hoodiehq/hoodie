@@ -42,7 +42,7 @@
 
 <p>uses standard couchDB API to create a new document in _users db.
 The backend will automatically create a userDB based on the email
-address.</p>             </td>             <td class="code">               <div class="highlight"><pre>    <span class="nv">sign_up : </span><span class="nf">(email, password) -&gt;</span>
+address.</p>             </td>             <td class="code">               <div class="highlight"><pre>    <span class="nv">sign_up : </span><span class="nf">(email, password, attributes = {}) -&gt;</span>
       <span class="nv">defer = </span><span class="nx">@app</span><span class="p">.</span><span class="nx">defer</span><span class="p">()</span>
       
       <span class="nv">prefix  = </span><span class="s1">&#39;org.couchdb.user&#39;</span>
@@ -51,11 +51,12 @@ address.</p>             </td>             <td class="code">               <div 
       <span class="nx">@app</span><span class="p">.</span><span class="nx">request</span> <span class="s1">&#39;PUT&#39;</span><span class="p">,</span> <span class="s2">&quot;/_users/#{encodeURIComponent key}&quot;</span><span class="p">,</span>
         
         <span class="nv">data: </span><span class="nx">JSON</span><span class="p">.</span><span class="nx">stringify</span>
-          <span class="nv">_id       : </span><span class="nx">key</span>
-          <span class="nv">name      : </span><span class="nx">email</span>
-          <span class="nv">type      : </span><span class="s1">&#39;user&#39;</span>
-          <span class="nv">roles     : </span><span class="p">[]</span>
-          <span class="nv">password  : </span><span class="nx">password</span>
+          <span class="nv">_id        : </span><span class="nx">key</span>
+          <span class="nv">name       : </span><span class="nx">email</span>
+          <span class="nv">type       : </span><span class="s1">&#39;user&#39;</span>
+          <span class="nv">roles      : </span><span class="p">[]</span>
+          <span class="nv">password   : </span><span class="nx">password</span>
+          <span class="nv">attributes : </span><span class="nx">attributes</span>
           
         <span class="nv">contentType: </span> <span class="s1">&#39;application/json&#39;</span>
         

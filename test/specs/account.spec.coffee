@@ -166,9 +166,9 @@ define 'specs/account', ['mocks/hoodie', 'account'], (CangMock, Account) ->
     # /.authenticate()
   
   
-    describe ".sign_up(email, password)", ->
+    describe ".sign_up(email, password, attributes = {})", ->
       beforeEach ->
-        @account.sign_up('joe@example.com', 'secret')
+        @account.sign_up('joe@example.com', 'secret', name: "Joe Doe", nick: "Foo")
         [@type, @path, @options] = @app.request.mostRecentCall.args
         @data = JSON.parse @options.data
     
@@ -200,6 +200,10 @@ define 'specs/account', ['mocks/hoodie', 'account'], (CangMock, Account) ->
         [@type, @path, @options] = @app.request.mostRecentCall.args
         @data = JSON.parse @options.data
         expect(@data.password).toBeUndefined()
+        
+      it "should allow to set additional attributes for the use", ->
+        expect(@data.attributes.name).toBe 'Joe Doe'
+        expect(@data.attributes.nick).toBe 'Foo'
               
       _when "sign_up successful", ->
         beforeEach ->
@@ -212,7 +216,7 @@ define 'specs/account', ['mocks/hoodie', 'account'], (CangMock, Account) ->
         it "should trigger `account:signed_in` event", ->
           @account.sign_up('joe@example.com', 'secret')
           expect(@app.trigger).wasCalledWith 'account:signed_in', 'joe@example.com'
-    # /.sign_up(email, password)
+    # /.sign_up(email, password, attributes)
   
   
     describe ".sign_in(email, password)", ->

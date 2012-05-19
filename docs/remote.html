@@ -24,7 +24,7 @@ and <code>_bulk_docs</code> to push local changes</p>             </td>         
 
 <p>stop pulling changes from the userDB</p>             </td>             <td class="code">               <div class="highlight"><pre>    <span class="nv">disconnect : </span><span class="o">=&gt;</span>
       <span class="vi">@_connected = </span><span class="kc">false</span>
-      <span class="nx">@_changes_request</span><span class="p">.</span><span class="nx">abort</span><span class="p">()</span> <span class="k">if</span> <span class="nx">@_changes_request</span>
+      <span class="nx">@_changes_request</span><span class="o">?</span><span class="p">.</span><span class="nx">abort</span><span class="p">()</span>
       
       <span class="nx">@app</span><span class="p">.</span><span class="nx">store</span><span class="p">.</span><span class="nx">db</span><span class="p">.</span><span class="nx">removeItem</span> <span class="s1">&#39;_couch.remote.seq&#39;</span>
       <span class="nx">@app</span><span class="p">.</span><span class="nx">unbind</span> <span class="s1">&#39;store:dirty:idle&#39;</span><span class="p">,</span> <span class="nx">@push_changes</span>

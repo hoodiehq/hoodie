@@ -207,10 +207,13 @@ define('specs/account', ['mocks/hoodie', 'account'], function(CangMock, Account)
         });
       });
     });
-    describe(".sign_up(email, password)", function() {
+    describe(".sign_up(email, password, attributes = {})", function() {
       beforeEach(function() {
         var _ref;
-        this.account.sign_up('joe@example.com', 'secret');
+        this.account.sign_up('joe@example.com', 'secret', {
+          name: "Joe Doe",
+          nick: "Foo"
+        });
         _ref = this.app.request.mostRecentCall.args, this.type = _ref[0], this.path = _ref[1], this.options = _ref[2];
         return this.data = JSON.parse(this.options.data);
       });
@@ -243,6 +246,10 @@ define('specs/account', ['mocks/hoodie', 'account'], function(CangMock, Account)
         _ref = this.app.request.mostRecentCall.args, this.type = _ref[0], this.path = _ref[1], this.options = _ref[2];
         this.data = JSON.parse(this.options.data);
         return expect(this.data.password).toBeUndefined();
+      });
+      it("should allow to set additional attributes for the use", function() {
+        expect(this.data.attributes.name).toBe('Joe Doe');
+        return expect(this.data.attributes.nick).toBe('Foo');
       });
       return _when("sign_up successful", function() {
         beforeEach(function() {

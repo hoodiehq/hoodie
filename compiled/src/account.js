@@ -51,9 +51,12 @@ define('account', function() {
       return defer.promise();
     };
 
-    Account.prototype.sign_up = function(email, password) {
+    Account.prototype.sign_up = function(email, password, attributes) {
       var defer, key, prefix,
         _this = this;
+      if (attributes == null) {
+        attributes = {};
+      }
       defer = this.app.defer();
       prefix = 'org.couchdb.user';
       key = "" + prefix + ":" + email;
@@ -63,7 +66,8 @@ define('account', function() {
           name: email,
           type: 'user',
           roles: [],
-          password: password
+          password: password,
+          attributes: attributes
         }),
         contentType: 'application/json',
         success: function() {

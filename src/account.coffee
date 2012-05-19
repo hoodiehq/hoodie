@@ -62,7 +62,7 @@ define 'account', ->
     # The backend will automatically create a userDB based on the email
     # address.
     #
-    sign_up : (email, password) ->
+    sign_up : (email, password, attributes = {}) ->
       defer = @app.defer()
       
       prefix  = 'org.couchdb.user'
@@ -71,11 +71,12 @@ define 'account', ->
       @app.request 'PUT', "/_users/#{encodeURIComponent key}",
         
         data: JSON.stringify
-          _id       : key
-          name      : email
-          type      : 'user'
-          roles     : []
-          password  : password
+          _id        : key
+          name       : email
+          type       : 'user'
+          roles      : []
+          password   : password
+          attributes : attributes
           
         contentType:  'application/json'
         
