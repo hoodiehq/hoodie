@@ -275,10 +275,15 @@ define('specs/account', ['mocks/hoodie', 'account'], function(CangMock, Account)
           this.account.sign_up('joe@example.com', 'secret');
           return expect(this.app.trigger).wasCalledWith('account:signed_in', 'joe@example.com');
         });
-        return it("should resolve its promise", function() {
+        it("should resolve its promise", function() {
           var promise;
           promise = this.account.sign_up('joe@example.com', 'secret');
           return expect(promise).toBeResolvedWith('joe@example.com');
+        });
+        return it("should fetch the _users doc", function() {
+          spyOn(this.account, "fetch");
+          this.account.sign_up('joe@example.com', 'secret');
+          return expect(this.account.fetch).wasCalled();
         });
       });
       return _when("sign_up has an error", function() {
@@ -334,7 +339,94 @@ define('specs/account', ['mocks/hoodie', 'account'], function(CangMock, Account)
       });
     });
     describe(".change_password(email, password)", function() {
-      return it("should have some specs");
+      beforeEach(function() {
+        var _ref;
+        this.account.email = 'joe@example.com';
+        this.account._doc = {
+          _id: 'org.couchdb.user:joe@example.com',
+          name: 'joe@example.com',
+          type: 'user',
+          roles: [],
+          salt: 'absalt',
+          password_sha: 'pwcdef'
+        };
+        this.account.change_password('current_secret', 'new_secret');
+        _ref = this.app.request.mostRecentCall.args, this.type = _ref[0], this.path = _ref[1], this.options = _ref[2];
+        return this.data = JSON.parse(this.options.data);
+      });
+      it("should send a PUT request to http://my.cou.ch/_users/org.couchdb.user%3Ajoe%40example.com", function() {
+        expect(this.app.request).wasCalled();
+        expect(this.type).toBe('PUT');
+        return expect(this.path).toBe('/_users/org.couchdb.user%3Ajoe%40example.com');
+      });
+      it("should set contentType to 'application/json'", function() {
+        return expect(this.options.contentType).toBe('application/json');
+      });
+      it("should stringify the data", function() {
+        return expect(typeof this.options.data).toBe('string');
+      });
+      it("should have set _id to 'org.couchdb.user:joe@example.com'", function() {
+        return expect(this.data._id).toBe('org.couchdb.user:joe@example.com');
+      });
+      it("should have set name to 'joe@example.com", function() {
+        return expect(this.data.name).toBe('joe@example.com');
+      });
+      it("should have set type to 'user", function() {
+        return expect(this.data.type).toBe('user');
+      });
+      it("should pass password", function() {
+        return expect(this.data.password).toBe('new_secret');
+      });
+      it("should allow to set empty password", function() {
+        var _ref;
+        this.account.change_password('current_secret', '');
+        _ref = this.app.request.mostRecentCall.args, this.type = _ref[0], this.path = _ref[1], this.options = _ref[2];
+        this.data = JSON.parse(this.options.data);
+        return expect(this.data.password).toBe('');
+      });
+      it("should not send salt", function() {
+        return expect(this.data.salt).toBeUndefined();
+      });
+      it("should not send password_sha", function() {
+        return expect(this.data.password_sha).toBeUndefined();
+      });
+      _when("change password successful", function() {
+        beforeEach(function() {
+          return this.app.request.andCallFake(function(type, path, options) {
+            var response;
+            response = {
+              "ok": true,
+              "id": "org.couchdb.user:bizbiz",
+              "rev": "2-345"
+            };
+            return options.success(response);
+          });
+        });
+        it("should resolve its promise", function() {
+          var promise;
+          promise = this.account.change_password('current_secret', 'new_secret');
+          return expect(promise).toBeResolved();
+        });
+        return it("should fetch the _users doc", function() {
+          spyOn(this.account, "fetch");
+          this.account.change_password('current_secret', 'new_secret');
+          return expect(this.account.fetch).wasCalled();
+        });
+      });
+      return _when("sign_up has an error", function() {
+        beforeEach(function() {
+          return this.app.request.andCallFake(function(type, path, options) {
+            return options.error({});
+          });
+        });
+        return it("should reject its promise", function() {
+          var promise;
+          promise = this.account.change_password('current_secret', 'new_secret');
+          return expect(promise).toBeRejectedWith({
+            error: "unknown"
+          });
+        });
+      });
     });
     describe(".sign_out()", function() {
       beforeEach(function() {

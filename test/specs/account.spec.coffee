@@ -223,6 +223,11 @@ define 'specs/account', ['mocks/hoodie', 'account'], (CangMock, Account) ->
           promise = @account.sign_up('joe@example.com', 'secret')
           expect(promise).toBeResolvedWith 'joe@example.com'
           
+        it "should fetch the _users doc", ->
+          spyOn(@account, "fetch")
+          @account.sign_up('joe@example.com', 'secret')
+          expect(@account.fetch).wasCalled()
+          
       _when "sign_up has an error", ->
         beforeEach ->
           @app.request.andCallFake (type, path, options) -> options.error responseText: '{"error":"forbidden","reason":"Username may not start with underscore."}'
@@ -265,7 +270,79 @@ define 'specs/account', ['mocks/hoodie', 'account'], (CangMock, Account) ->
   
   
     describe ".change_password(email, password)", ->
-      it "should have some specs"
+      beforeEach ->
+        @account.email = 'joe@example.com'
+        @account._doc  = 
+          _id          : 'org.couchdb.user:joe@example.com'
+          name         : 'joe@example.com'
+          type         : 'user'
+          roles        : []
+          salt         : 'absalt'
+          password_sha : 'pwcdef'
+          
+          
+        @account.change_password('current_secret', 'new_secret')
+        [@type, @path, @options] = @app.request.mostRecentCall.args
+        @data = JSON.parse @options.data
+    
+      it "should send a PUT request to http://my.cou.ch/_users/org.couchdb.user%3Ajoe%40example.com", ->
+        expect(@app.request).wasCalled()
+        expect(@type).toBe 'PUT'
+        expect(@path).toBe  '/_users/org.couchdb.user%3Ajoe%40example.com'
+        
+      it "should set contentType to 'application/json'", ->
+        expect(@options.contentType).toBe 'application/json'
+      
+      it "should stringify the data", ->
+        expect(typeof @options.data).toBe 'string'
+    
+      it "should have set _id to 'org.couchdb.user:joe@example.com'", ->
+        expect(@data._id).toBe 'org.couchdb.user:joe@example.com'
+      
+      it "should have set name to 'joe@example.com", ->
+        expect(@data.name).toBe 'joe@example.com'
+        
+      it "should have set type to 'user", ->
+        expect(@data.type).toBe 'user'
+
+      it "should pass password", ->
+        expect(@data.password).toBe 'new_secret'
+        
+      it "should allow to set empty password", ->
+        @account.change_password('current_secret','')
+        [@type, @path, @options] = @app.request.mostRecentCall.args
+        @data = JSON.parse @options.data
+        expect(@data.password).toBe ''
+        
+      it "should not send salt", ->
+        expect(@data.salt).toBeUndefined()
+        
+      it "should not send password_sha", ->
+        expect(@data.password_sha).toBeUndefined()
+        
+              
+      _when "change password successful", ->
+        beforeEach ->
+          @app.request.andCallFake (type, path, options) -> 
+            response = {"ok":true,"id":"org.couchdb.user:bizbiz","rev":"2-345"}
+            options.success response
+          
+        it "should resolve its promise", ->
+          promise = @account.change_password('current_secret', 'new_secret')
+          expect(promise).toBeResolved()
+          
+        it "should fetch the _users doc", ->
+          spyOn(@account, "fetch")
+          @account.change_password('current_secret', 'new_secret')
+          expect(@account.fetch).wasCalled()
+          
+      _when "sign_up has an error", ->
+        beforeEach ->
+          @app.request.andCallFake (type, path, options) -> options.error {}
+        
+        it "should reject its promise", ->
+          promise = @account.change_password('current_secret', 'new_secret')
+          expect(promise).toBeRejectedWith error:"unknown"
     # /.change_password(email, password)
   
   

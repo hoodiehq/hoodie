@@ -136,9 +136,13 @@ define 'account', ->
 
     # ## change password
     #
-    # to be done.
+    # NOTE: simple implementation, current_password is ignored.
     #
     change_password : (current_password, new_password) ->
+      defer = @app.defer()
+      unless @email
+        defer.reject error: "unauthenticated", reason: "not logged in"
+        return defer.promise()
       
       key = "#{@_prefix}:#{@email}"
       
@@ -148,8 +152,8 @@ define 'account', ->
       data.password = new_password
       
       @app.request 'PUT',  "/_users/#{encodeURIComponent key}",
-        data: JSON.stringify data
-        
+        data        : JSON.stringify data
+        contentType : "application/json"
         success     : (response) =>
           @fetch()
           defer.resolve()
@@ -161,8 +165,6 @@ define 'account', ->
             error = error: xhr.responseText or "unknown"
             
           defer.reject(error)
-      
-      alert('change password is not yet implementd')
 
 
     # ## sign out 

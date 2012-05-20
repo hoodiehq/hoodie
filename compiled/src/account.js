@@ -133,15 +133,24 @@ define('account', function() {
     Account.prototype.login = Account.prototype.sign_in;
 
     Account.prototype.change_password = function(current_password, new_password) {
-      var data, key,
+      var data, defer, key,
         _this = this;
+      defer = this.app.defer();
+      if (!this.email) {
+        defer.reject({
+          error: "unauthenticated",
+          reason: "not logged in"
+        });
+        return defer.promise();
+      }
       key = "" + this._prefix + ":" + this.email;
       data = $.extend({}, this._doc);
       delete data.salt;
       delete data.password_sha;
       data.password = new_password;
-      this.app.request('PUT', "/_users/" + (encodeURIComponent(key)), {
+      return this.app.request('PUT', "/_users/" + (encodeURIComponent(key)), {
         data: JSON.stringify(data),
+        contentType: "application/json",
         success: function(response) {
           _this.fetch();
           return defer.resolve();
@@ -158,7 +167,6 @@ define('account', function() {
           return defer.reject(error);
         }
       });
-      return alert('change password is not yet implementd');
     };
 
     Account.prototype.sign_out = function() {
