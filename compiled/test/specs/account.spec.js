@@ -211,7 +211,7 @@ define('specs/account', ['mocks/hoodie', 'account'], function(CangMock, Account)
         });
       });
     });
-    describe(".sign_up(email, password, attributes = {})", function() {
+    describe(".sign_up(email, password, user_data = {})", function() {
       beforeEach(function() {
         var _ref;
         this.account.sign_up('joe@example.com', 'secret', {
@@ -251,9 +251,9 @@ define('specs/account', ['mocks/hoodie', 'account'], function(CangMock, Account)
         this.data = JSON.parse(this.options.data);
         return expect(this.data.password).toBeUndefined();
       });
-      it("should allow to set additional attributes for the use", function() {
-        expect(this.data.attributes.name).toBe('Joe Doe');
-        return expect(this.data.attributes.nick).toBe('Foo');
+      it("should allow to set additional user_data for the use", function() {
+        expect(this.data.user_data.name).toBe('Joe Doe');
+        return expect(this.data.user_data.nick).toBe('Foo');
       });
       _when("sign_up successful", function() {
         beforeEach(function() {
@@ -322,9 +322,14 @@ define('specs/account', ['mocks/hoodie', 'account'], function(CangMock, Account)
             return options.success();
           });
         });
-        return it("should trigger `account:signed_in` event", function() {
+        it("should trigger `account:signed_in` event", function() {
           this.account.sign_in('joe@example.com', 'secret');
           return expect(this.app.trigger).wasCalledWith('account:signed_in', 'joe@example.com');
+        });
+        return it("should fetch the _users doc", function() {
+          spyOn(this.account, "fetch");
+          this.account.sign_in('joe@example.com', 'secret');
+          return expect(this.account.fetch).wasCalled();
         });
       });
     });
@@ -404,6 +409,9 @@ define('specs/account', ['mocks/hoodie', 'account'], function(CangMock, Account)
               "_id": "org.couchdb.user:baz",
               "_rev": "3-33e4d43a6dff5b29a4bd33f576c7824f",
               "name": "baz",
+              "user_data": {
+                "funky": "fresh"
+              },
               "salt": "82163606fa5c100e0095ad63598de810",
               "password_sha": "e2e2a4d99632dc5e3fdb41d5d1ff98743a1f344e",
               "type": "user",
@@ -413,10 +421,14 @@ define('specs/account', ['mocks/hoodie', 'account'], function(CangMock, Account)
               return options.success(_this.response);
             });
           });
-          return it("should resolve its promise", function() {
+          it("should resolve its promise", function() {
             var promise;
             promise = this.account.fetch();
             return expect(promise).toBeResolvedWith(this.response);
+          });
+          return it("should set account.user_data()", function() {
+            this.account.fetch();
+            return expect(this.account.user_data().funky).toBe('fresh');
           });
         });
       });

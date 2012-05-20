@@ -9,7 +9,7 @@ define 'account', ->
   class Account
     
     # ## Properties
-    email: undefined
+    email      : undefined
     
     # ## Constructor
     #
@@ -69,26 +69,27 @@ define 'account', ->
     # The backend will automatically create a userDB based on the email
     # address.
     #
-    sign_up : (email, password, attributes = {}) ->
+    sign_up : (email, password, user_data = {}) ->
       defer = @app.defer()
       
       key     = "#{@_prefix}:#{email}"
 
-      @_doc = 
+      data = 
         _id        : key
         name       : email
         type       : 'user'
         roles      : []
-        attributes : attributes
+        user_data  : user_data
+        password   : password
 
       @app.request 'PUT', "/_users/#{encodeURIComponent key}",
-        data        : JSON.stringify $.extend(password: password, @_doc)
+        data        : JSON.stringify data
         contentType : 'application/json'
         
         success     : (response) =>
-          @_doc._rev = response.rev
           @app.trigger 'account:signed_up', email
-          @app.trigger 'account:signed_in', email
+          @app.trigger 'account:signed_in', email;
+          @fetch()
           defer.resolve email
           
         error       : (xhr) ->
@@ -116,6 +117,7 @@ define 'account', ->
           
         success     : => 
           @app.trigger 'account:signed_in', email
+          @fetch()
           defer.resolve email
         
         error       : (xhr) ->
@@ -137,6 +139,29 @@ define 'account', ->
     # to be done.
     #
     change_password : (current_password, new_password) ->
+      
+      key = "#{@_prefix}:#{@email}"
+      
+      data = $.extend {}, @_doc
+      delete data.salt
+      delete data.password_sha
+      data.password = new_password
+      
+      @app.request 'PUT',  "/_users/#{encodeURIComponent key}",
+        data: JSON.stringify data
+        
+        success     : (response) =>
+          @fetch()
+          defer.resolve()
+          
+        error       : (xhr) ->
+          try
+            error = JSON.parse(xhr.responseText)
+          catch e
+            error = error: xhr.responseText or "unknown"
+            
+          defer.reject(error)
+      
       alert('change password is not yet implementd')
 
 
@@ -176,8 +201,7 @@ define 'account', ->
       
     # ## fetch
     #
-    # fetches _users doc from CouchDB and caches it in _doc,
-    # without password / password_sha
+    # fetches _users doc from CouchDB and caches it in _doc
     fetch : ->
       defer = @app.defer()
       unless @email
@@ -188,7 +212,6 @@ define 'account', ->
       @app.request 'GET', "/_users/#{encodeURIComponent key}",
       
         success     : (response) => 
-          delete response.password_sha
           @_doc = response
           defer.resolve response
         
@@ -201,6 +224,9 @@ define 'account', ->
           defer.reject(error) 
           
       return defer.promise()
+      
+    user_data : ->
+      @_doc?.user_data
 
     # ## PRIVATE
     #

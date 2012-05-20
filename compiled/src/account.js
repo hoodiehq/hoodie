@@ -61,30 +61,29 @@ define('account', function() {
       return defer.promise();
     };
 
-    Account.prototype.sign_up = function(email, password, attributes) {
-      var defer, key,
+    Account.prototype.sign_up = function(email, password, user_data) {
+      var data, defer, key,
         _this = this;
-      if (attributes == null) {
-        attributes = {};
+      if (user_data == null) {
+        user_data = {};
       }
       defer = this.app.defer();
       key = "" + this._prefix + ":" + email;
-      this._doc = {
+      data = {
         _id: key,
         name: email,
         type: 'user',
         roles: [],
-        attributes: attributes
+        user_data: user_data,
+        password: password
       };
       this.app.request('PUT', "/_users/" + (encodeURIComponent(key)), {
-        data: JSON.stringify($.extend({
-          password: password
-        }, this._doc)),
+        data: JSON.stringify(data),
         contentType: 'application/json',
         success: function(response) {
-          _this._doc._rev = response.rev;
           _this.app.trigger('account:signed_up', email);
           _this.app.trigger('account:signed_in', email);
+          _this.fetch();
           return defer.resolve(email);
         },
         error: function(xhr) {
@@ -113,6 +112,7 @@ define('account', function() {
         },
         success: function() {
           _this.app.trigger('account:signed_in', email);
+          _this.fetch();
           return defer.resolve(email);
         },
         error: function(xhr) {
@@ -133,6 +133,31 @@ define('account', function() {
     Account.prototype.login = Account.prototype.sign_in;
 
     Account.prototype.change_password = function(current_password, new_password) {
+      var data, key,
+        _this = this;
+      key = "" + this._prefix + ":" + this.email;
+      data = $.extend({}, this._doc);
+      delete data.salt;
+      delete data.password_sha;
+      data.password = new_password;
+      this.app.request('PUT', "/_users/" + (encodeURIComponent(key)), {
+        data: JSON.stringify(data),
+        success: function(response) {
+          _this.fetch();
+          return defer.resolve();
+        },
+        error: function(xhr) {
+          var error;
+          try {
+            error = JSON.parse(xhr.responseText);
+          } catch (e) {
+            error = {
+              error: xhr.responseText || "unknown"
+            };
+          }
+          return defer.reject(error);
+        }
+      });
       return alert('change password is not yet implementd');
     };
 
@@ -170,7 +195,6 @@ define('account', function() {
       key = "" + this._prefix + ":" + this.email;
       this.app.request('GET', "/_users/" + (encodeURIComponent(key)), {
         success: function(response) {
-          delete response.password_sha;
           _this._doc = response;
           return defer.resolve(response);
         },
@@ -187,6 +211,11 @@ define('account', function() {
         }
       });
       return defer.promise();
+    };
+
+    Account.prototype.user_data = function() {
+      var _ref;
+      return (_ref = this._doc) != null ? _ref.user_data : void 0;
     };
 
     Account.prototype._prefix = 'org.couchdb.user';

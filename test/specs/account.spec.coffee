@@ -166,7 +166,7 @@ define 'specs/account', ['mocks/hoodie', 'account'], (CangMock, Account) ->
     # /.authenticate()
   
   
-    describe ".sign_up(email, password, attributes = {})", ->
+    describe ".sign_up(email, password, user_data = {})", ->
       beforeEach ->
         @account.sign_up('joe@example.com', 'secret', name: "Joe Doe", nick: "Foo")
         [@type, @path, @options] = @app.request.mostRecentCall.args
@@ -201,9 +201,9 @@ define 'specs/account', ['mocks/hoodie', 'account'], (CangMock, Account) ->
         @data = JSON.parse @options.data
         expect(@data.password).toBeUndefined()
         
-      it "should allow to set additional attributes for the use", ->
-        expect(@data.attributes.name).toBe 'Joe Doe'
-        expect(@data.attributes.nick).toBe 'Foo'
+      it "should allow to set additional user_data for the use", ->
+        expect(@data.user_data.name).toBe 'Joe Doe'
+        expect(@data.user_data.nick).toBe 'Foo'
               
       _when "sign_up successful", ->
         beforeEach ->
@@ -230,7 +230,7 @@ define 'specs/account', ['mocks/hoodie', 'account'], (CangMock, Account) ->
         it "should reject its promise", ->
           promise = @account.sign_up('joe@example.com', 'secret')
           expect(promise).toBeRejectedWith error:"forbidden", reason: "Username may not start with underscore."
-    # /.sign_up(email, password, attributes)
+    # /.sign_up(email, password, user_data)
   
   
     describe ".sign_in(email, password)", ->
@@ -256,6 +256,11 @@ define 'specs/account', ['mocks/hoodie', 'account'], (CangMock, Account) ->
         it "should trigger `account:signed_in` event", ->
           @account.sign_in('joe@example.com', 'secret')
           expect(@app.trigger).wasCalledWith 'account:signed_in', 'joe@example.com'
+          
+        it "should fetch the _users doc", ->
+          spyOn(@account, "fetch")
+          @account.sign_in('joe@example.com', 'secret')
+          expect(@account.fetch).wasCalled()
     # /.sign_in(email, password)
   
   
@@ -328,12 +333,16 @@ define 'specs/account', ['mocks/hoodie', 'account'], (CangMock, Account) ->
         
         _when "successful", ->
           beforeEach ->
-            @response = {"_id":"org.couchdb.user:baz","_rev":"3-33e4d43a6dff5b29a4bd33f576c7824f","name":"baz","salt":"82163606fa5c100e0095ad63598de810","password_sha":"e2e2a4d99632dc5e3fdb41d5d1ff98743a1f344e","type":"user","roles":[]}
+            @response = {"_id":"org.couchdb.user:baz","_rev":"3-33e4d43a6dff5b29a4bd33f576c7824f","name":"baz","user_data":{"funky":"fresh"},"salt":"82163606fa5c100e0095ad63598de810","password_sha":"e2e2a4d99632dc5e3fdb41d5d1ff98743a1f344e","type":"user","roles":[]}
             @app.request.andCallFake (type, path, options) => 
               options.success @response
           
           it "should resolve its promise", ->
             promise = @account.fetch()
             expect(promise).toBeResolvedWith @response
+            
+          it "should set account.user_data()", ->
+            @account.fetch()
+            expect(@account.user_data().funky).toBe 'fresh'
     # /.fetch()
   # /Account
