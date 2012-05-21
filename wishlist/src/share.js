@@ -32,7 +32,7 @@
 // 
 
 // ### Making a user_db publict
-// 
+
 // The simplest case, when I in general want to share all data of my account, I'd suggest
 // to introduce an `access` setting to the user account.
 app.account.sign_up('anonymous_id345', null, {access: 'public_read'})
