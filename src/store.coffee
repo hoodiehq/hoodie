@@ -144,22 +144,36 @@ define 'store', ['errors'], (ERROR) ->
   
     # ## loadAll
     #
-    # when `type` passed, return all documents from Store of that type,
-    # otherwise return all objects from Store.
+    # returns all objects from store. 
+    # Can be filtered by type name and a filter function
     #
     # example usage:
     #
     #     store.loadAll()
     #     store.loadAll('car')
-    loadAll: (type) ->
+    #     store.loadAll('car', function(obj) { return obj.brand == 'Tesla' })
+    loadAll: (type, filter) ->
       defer = @app.defer()
       keys = @_index()
     
       try
-      
-        results = for key in keys when (type is undefined or key.indexOf(type) is 0) and @_is_semantic_id key
-          [_type, id] = key.split '/'
-          @cache _type, id
+        results = switch true
+          when !!type and !!filter
+            for key in keys when (key.indexOf(type) is 0) and @_is_semantic_id key
+              [_type, id] = key.split '/'
+              obj = @cache _type, id
+              if filter(obj)
+                obj
+              else
+                continue
+          when !!type
+            for key in keys when (key.indexOf(type) is 0) and @_is_semantic_id key
+              [_type, id] = key.split '/'
+              @cache _type, id
+          else
+            for key in keys when @_is_semantic_id key
+              [_type, id] = key.split '/'
+              @cache _type, id
 
         defer.resolve(results).promise()
       catch error
@@ -174,7 +188,7 @@ define 'store', ['errors'], (ERROR) ->
     # 
     # when object has been synced before, mark it as deleted. 
     # Otherwise remove it from Store.
-    delete: (type, id, options = {}) ->
+    delete : (type, id, options = {}) ->
       defer = @app.defer()
       object  = @cache type, id
       
@@ -236,7 +250,7 @@ define 'store', ['errors'], (ERROR) ->
     #
     # removes an object from the list of objects that are flagged to by synched (dirty)
     # and triggers a `store:dirty` event
-    clear_changed: (type, id) ->
+    clear_changed : (type, id) ->
     
       if type and id
         key = "#{type}/#{id}"
@@ -259,7 +273,7 @@ define 'store', ['errors'], (ERROR) ->
     #
     # Marks object as changed (dirty). Triggers a `store:dirty` event immediately and a 
     # `store:dirty:idle` event once there is no change within 2 seconds
-    mark_as_changed: (type, id, object) ->
+    mark_as_changed : (type, id, object) ->
       key = "#{type}/#{id}"
       
       @_dirty[key] = object
@@ -272,7 +286,7 @@ define 'store', ['errors'], (ERROR) ->
     # ## changed docs
     #
     # returns an Array of all dirty documents
-    changed_docs: -> 
+    changed_docs : -> 
       object for key, object of @_dirty
       
          
@@ -283,7 +297,7 @@ define 'store', ['errors'], (ERROR) ->
     #
     # Otherwise it returns `true` or `false` for the passed object. An object is dirty
     # if it has no `_synced_at` attribute or if `updated_at` is more recent than `_synced_at`
-    is_dirty: (type, id) ->
+    is_dirty : (type, id) ->
       unless type
         return $.isEmptyObject @_dirty
         
@@ -294,7 +308,7 @@ define 'store', ['errors'], (ERROR) ->
     #
     # clears localStorage and cache
     # TODO: do not clear entire localStorage, clear only item that have been stored before
-    clear: =>
+    clear : =>
       defer = @app.defer()
     
       try
@@ -346,26 +360,24 @@ define 'store', ['errors'], (ERROR) ->
     # ## UUID
     #
     # helper to generate uuids.
-    uuid: (len = 7) ->
+    uuid : (len = 7) ->
       chars = '0123456789abcdefghijklmnopqrstuvwxyz'.split('')
       radix = chars.length
       (
         chars[ 0 | Math.random()*radix ] for i in [0...len]
       ).join('')
-  
-    
-    
     
     # ## Private
     
     # more advanced localStorage wrappers to load/store objects
-    _setObject  : (type, id, object) ->
+    _setObject : (type, id, object) ->
       key = "#{type}/#{id}"
       store = $.extend {}, object
       delete store.type
       delete store.id
       @db.setItem key, JSON.stringify store
-    _getObject  : (type, id) ->
+      
+    _getObject : (type, id) ->
       key = "#{type}/#{id}"
       json = @db.getItem(key)
       if json
@@ -382,27 +394,27 @@ define 'store', ['errors'], (ERROR) ->
         false
   
     #
-    _now: -> new Date
+    _now : -> new Date
   
     # only lowercase letters and numbers are allowed for ids
-    _is_valid_id: (key) ->
+    _is_valid_id : (key) ->
       /^[a-z0-9]+$/.test key
       
-    # just like ids, but can start with an _ (internal types)
-    _is_valid_type: (key) ->
-      /^\$?[a-z0-9]+$/.test key
+    # just like ids, but must start with a letter or a $ (internal types)
+    _is_valid_type : (key) ->
+      /^[a-z$][a-z0-9]+$/.test key
       
-    _is_semantic_id: (key) ->
-      /^[a-z0-9]+\/[a-z0-9]+$/.test key
+    _is_semantic_id : (key) ->
+      /^[a-z$][a-z0-9]+\/[a-z0-9]+$/.test key
 
     # cache of localStorage for quicker access
-    _cached: {}
+    _cached : {}
   
     # map of dirty objects by their ids
-    _dirty: {}
+    _dirty : {}
     
     # is dirty?
-    _is_dirty: (object) ->
+    _is_dirty : (object) ->
       
       return true  unless object._synced_at  # no synced_at? uuhh, that's dirty.
       return false unless object.updated_at # no updated_at? no dirt then
@@ -410,11 +422,11 @@ define 'store', ['errors'], (ERROR) ->
       object._synced_at.getTime() < object.updated_at.getTime()
   
     # marked as deleted?
-    _is_marked_as_deleted: (object) ->
+    _is_marked_as_deleted : (object) ->
       object._deleted is true
 
     # document key index
     #
     # TODO: make this cachy
-    _index: ->
+    _index : ->
       @db.key(i) for i in [0...@db.length()]

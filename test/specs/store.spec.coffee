@@ -131,16 +131,29 @@ define 'specs/store', ['store', 'mocks/hoodie'], (Store, CangMock) ->
         [type, id, object] = @store.cache.mostRecentCall.args
         expect(object.created_at).toBe 'check12'
     
-      it "should allow numbers and lowercase letters for for type & id only", ->
-        invalid = ['UPPERCASE', 'under_lines', '-?&$']
-    
+      it "should allow numbers and lowercase letters for for type only. And must start with a letter or $", ->
+        invalid = ['UPPERCASE', 'under_lines', '-?&$', '12345', 'a']
+        valid   = ['car', '$email']
+        
         for key in invalid
           promise = @store.save key, 'valid', {}
           expect(promise).toBeRejected()
+         
+        for key in valid
+          promise = @store.save key, 'valid', {}
+          expect(promise).toBeResolved()
+      
+      it "should allow numbers and lowercase letters for for id only", ->
+        invalid = ['UPPERCASE', 'under_lines', '-?&$']
+        valid   = ['abc4567', '1', 123]
     
         for key in invalid
           promise = @store.save 'valid', key, {}
           expect(promise).toBeRejected()
+        
+        for key in valid
+          promise = @store.save 'valid', key, {}
+          expect(promise).toBeResolved()
           
       _when "called without id", ->
         beforeEach ->
@@ -243,14 +256,13 @@ define 'specs/store', ['store', 'mocks/hoodie'], (Store, CangMock) ->
         expect(@store.db.getItem.callCount).toBe 1
     # /.get(type, id)
 
-    describe ".loadAll(type)", ->
+    describe ".loadAll(type, conditions)", ->
       with_2_cats_and_3_dogs = (specs) ->
         _and "two cat and three dog objects exist in the store", ->
           beforeEach ->
             spyOn(@store, "_index").andReturn ["cat/1", "cat/2", "dog/1", "dog/2", "dog/3"]
-            spyOn(@store, "cache").andReturn name: 'becks'
+            spyOn(@store, "cache").andCallFake (type, id) -> name: "#{type}#{id}", age: parseInt(id)
           specs()
-  
   
       it "should return a promise", ->
         promise = @store.loadAll 'document'
@@ -296,10 +308,20 @@ define 'specs/store', ['store', 'mocks/hoodie'], (Store, CangMock) ->
             
             results = success.mostRecentCall.args[0]
             expect(results.length).toBe 2
+            
+      _when "called with type = 'dog' and filter `function(obj) { return obj.age === 1}` ", ->
+        with_2_cats_and_3_dogs ->
+          it "should return one dog", ->
+            success = jasmine.createSpy 'success'
+            promise = @store.loadAll 'dog', (obj) -> obj.age is 1
+            promise.done success
+            
+            results = success.mostRecentCall.args[0]
+            expect(results.length).toBe 1
+        
     # /.loadAll(type)
 
     describe ".delete(type, id)", ->
-  
       _when "objecet cannot be found", ->
         beforeEach ->
           spyOn(@store, "cache").andReturn false

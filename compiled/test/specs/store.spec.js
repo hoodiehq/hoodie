@@ -178,19 +178,37 @@ define('specs/store', ['store', 'mocks/hoodie'], function(Store, CangMock) {
         _ref = this.store.cache.mostRecentCall.args, type = _ref[0], id = _ref[1], object = _ref[2];
         return expect(object.created_at).toBe('check12');
       });
-      it("should allow numbers and lowercase letters for for type & id only", function() {
-        var invalid, key, promise, _i, _j, _len, _len1, _results;
-        invalid = ['UPPERCASE', 'under_lines', '-?&$'];
+      it("should allow numbers and lowercase letters for for type only. And must start with a letter or $", function() {
+        var invalid, key, promise, valid, _i, _j, _len, _len1, _results;
+        invalid = ['UPPERCASE', 'under_lines', '-?&$', '12345', 'a'];
+        valid = ['car', '$email'];
         for (_i = 0, _len = invalid.length; _i < _len; _i++) {
           key = invalid[_i];
           promise = this.store.save(key, 'valid', {});
           expect(promise).toBeRejected();
         }
         _results = [];
-        for (_j = 0, _len1 = invalid.length; _j < _len1; _j++) {
-          key = invalid[_j];
+        for (_j = 0, _len1 = valid.length; _j < _len1; _j++) {
+          key = valid[_j];
+          promise = this.store.save(key, 'valid', {});
+          _results.push(expect(promise).toBeResolved());
+        }
+        return _results;
+      });
+      it("should allow numbers and lowercase letters for for id only", function() {
+        var invalid, key, promise, valid, _i, _j, _len, _len1, _results;
+        invalid = ['UPPERCASE', 'under_lines', '-?&$'];
+        valid = ['abc4567', '1', 123];
+        for (_i = 0, _len = invalid.length; _i < _len; _i++) {
+          key = invalid[_i];
           promise = this.store.save('valid', key, {});
-          _results.push(expect(promise).toBeRejected());
+          expect(promise).toBeRejected();
+        }
+        _results = [];
+        for (_j = 0, _len1 = valid.length; _j < _len1; _j++) {
+          key = valid[_j];
+          promise = this.store.save('valid', key, {});
+          _results.push(expect(promise).toBeResolved());
         }
         return _results;
       });
@@ -325,14 +343,17 @@ define('specs/store', ['store', 'mocks/hoodie'], function(Store, CangMock) {
         return expect(this.store.db.getItem.callCount).toBe(1);
       });
     });
-    describe(".loadAll(type)", function() {
+    describe(".loadAll(type, conditions)", function() {
       var with_2_cats_and_3_dogs;
       with_2_cats_and_3_dogs = function(specs) {
         return _and("two cat and three dog objects exist in the store", function() {
           beforeEach(function() {
             spyOn(this.store, "_index").andReturn(["cat/1", "cat/2", "dog/1", "dog/2", "dog/3"]);
-            return spyOn(this.store, "cache").andReturn({
-              name: 'becks'
+            return spyOn(this.store, "cache").andCallFake(function(type, id) {
+              return {
+                name: "" + type + id,
+                age: parseInt(id)
+              };
             });
           });
           return specs();
@@ -379,7 +400,7 @@ define('specs/store', ['store', 'mocks/hoodie'], function(Store, CangMock) {
           });
         });
       });
-      return _when("called with type = 'cat'", function() {
+      _when("called with type = 'cat'", function() {
         return with_2_cats_and_3_dogs(function() {
           return it("should return only the cat objects", function() {
             var promise, results, success;
@@ -388,6 +409,20 @@ define('specs/store', ['store', 'mocks/hoodie'], function(Store, CangMock) {
             promise.done(success);
             results = success.mostRecentCall.args[0];
             return expect(results.length).toBe(2);
+          });
+        });
+      });
+      return _when("called with type = 'dog' and filter `function(obj) { return obj.age === 1}` ", function() {
+        return with_2_cats_and_3_dogs(function() {
+          return it("should return one dog", function() {
+            var promise, results, success;
+            success = jasmine.createSpy('success');
+            promise = this.store.loadAll('dog', function(obj) {
+              return obj.age === 1;
+            });
+            promise.done(success);
+            results = success.mostRecentCall.args[0];
+            return expect(results.length).toBe(1);
           });
         });
       });

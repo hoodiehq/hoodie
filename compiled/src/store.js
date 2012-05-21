@@ -136,23 +136,55 @@ define('store', ['errors'], function(ERROR) {
       return defer.promise();
     };
 
-    Store.prototype.loadAll = function(type) {
-      var defer, id, key, keys, results, _type;
+    Store.prototype.loadAll = function(type, filter) {
+      var defer, id, key, keys, obj, results, _type;
       defer = this.app.defer();
       keys = this._index();
       try {
         results = (function() {
-          var _i, _len, _ref, _results;
-          _results = [];
-          for (_i = 0, _len = keys.length; _i < _len; _i++) {
-            key = keys[_i];
-            if (!((type === void 0 || key.indexOf(type) === 0) && this._is_semantic_id(key))) {
-              continue;
-            }
-            _ref = key.split('/'), _type = _ref[0], id = _ref[1];
-            _results.push(this.cache(_type, id));
+          var _i, _j, _k, _len, _len1, _len2, _ref, _ref1, _ref2, _results, _results1, _results2;
+          switch (true) {
+            case !!type && !!filter:
+              _results = [];
+              for (_i = 0, _len = keys.length; _i < _len; _i++) {
+                key = keys[_i];
+                if (!((key.indexOf(type) === 0) && this._is_semantic_id(key))) {
+                  continue;
+                }
+                _ref = key.split('/'), _type = _ref[0], id = _ref[1];
+                obj = this.cache(_type, id);
+                if (filter(obj)) {
+                  _results.push(obj);
+                } else {
+                  continue;
+                }
+              }
+              return _results;
+              break;
+            case !!type:
+              _results1 = [];
+              for (_j = 0, _len1 = keys.length; _j < _len1; _j++) {
+                key = keys[_j];
+                if (!((key.indexOf(type) === 0) && this._is_semantic_id(key))) {
+                  continue;
+                }
+                _ref1 = key.split('/'), _type = _ref1[0], id = _ref1[1];
+                _results1.push(this.cache(_type, id));
+              }
+              return _results1;
+              break;
+            default:
+              _results2 = [];
+              for (_k = 0, _len2 = keys.length; _k < _len2; _k++) {
+                key = keys[_k];
+                if (!(this._is_semantic_id(key))) {
+                  continue;
+                }
+                _ref2 = key.split('/'), _type = _ref2[0], id = _ref2[1];
+                _results2.push(this.cache(_type, id));
+              }
+              return _results2;
           }
-          return _results;
         }).call(this);
         defer.resolve(results).promise();
       } catch (error) {
@@ -356,11 +388,11 @@ define('store', ['errors'], function(ERROR) {
     };
 
     Store.prototype._is_valid_type = function(key) {
-      return /^\$?[a-z0-9]+$/.test(key);
+      return /^[a-z$][a-z0-9]+$/.test(key);
     };
 
     Store.prototype._is_semantic_id = function(key) {
-      return /^[a-z0-9]+\/[a-z0-9]+$/.test(key);
+      return /^[a-z$][a-z0-9]+\/[a-z0-9]+$/.test(key);
     };
 
     Store.prototype._cached = {};

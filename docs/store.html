@@ -112,22 +112,36 @@ but only changes the passed attributes of an exsting object, if it exists</p>   
   
   </pre></div>             </td>           </tr>                               <tr id="section-16">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-16">&#182;</a>               </div>               <h2>loadAll</h2>
 
-<p>when <code>type</code> passed, return all documents from Store of that type,
-otherwise return all objects from Store.</p>
+<p>returns all objects from store. 
+Can be filtered by type name and a filter function</p>
 
 <p>example usage:</p>
 
 <pre><code>store.loadAll()
 store.loadAll('car')
-</code></pre>             </td>             <td class="code">               <div class="highlight"><pre>    <span class="nv">loadAll: </span><span class="nf">(type) -&gt;</span>
+store.loadAll('car', function(obj) { return obj.brand == 'Tesla' })
+</code></pre>             </td>             <td class="code">               <div class="highlight"><pre>    <span class="nv">loadAll: </span><span class="nf">(type, filter) -&gt;</span>
       <span class="nv">defer = </span><span class="nx">@app</span><span class="p">.</span><span class="nx">defer</span><span class="p">()</span>
       <span class="nv">keys = </span><span class="nx">@_index</span><span class="p">()</span>
     
       <span class="k">try</span>
-      
-        <span class="nv">results = </span><span class="k">for</span> <span class="nx">key</span> <span class="k">in</span> <span class="nx">keys</span> <span class="k">when</span> <span class="p">(</span><span class="nx">type</span> <span class="o">is</span> <span class="kc">undefined</span> <span class="o">or</span> <span class="nx">key</span><span class="p">.</span><span class="nx">indexOf</span><span class="p">(</span><span class="nx">type</span><span class="p">)</span> <span class="o">is</span> <span class="mi">0</span><span class="p">)</span> <span class="o">and</span> <span class="nx">@_is_semantic_id</span> <span class="nx">key</span>
-          <span class="p">[</span><span class="nx">_type</span><span class="p">,</span> <span class="nx">id</span><span class="p">]</span> <span class="o">=</span> <span class="nx">key</span><span class="p">.</span><span class="nx">split</span> <span class="s1">&#39;/&#39;</span>
-          <span class="nx">@cache</span> <span class="nx">_type</span><span class="p">,</span> <span class="nx">id</span>
+        <span class="nv">results = </span><span class="k">switch</span> <span class="kc">true</span>
+          <span class="k">when</span> <span class="o">!!</span><span class="nx">type</span> <span class="o">and</span> <span class="o">!!</span><span class="nx">filter</span>
+            <span class="k">for</span> <span class="nx">key</span> <span class="k">in</span> <span class="nx">keys</span> <span class="k">when</span> <span class="p">(</span><span class="nx">key</span><span class="p">.</span><span class="nx">indexOf</span><span class="p">(</span><span class="nx">type</span><span class="p">)</span> <span class="o">is</span> <span class="mi">0</span><span class="p">)</span> <span class="o">and</span> <span class="nx">@_is_semantic_id</span> <span class="nx">key</span>
+              <span class="p">[</span><span class="nx">_type</span><span class="p">,</span> <span class="nx">id</span><span class="p">]</span> <span class="o">=</span> <span class="nx">key</span><span class="p">.</span><span class="nx">split</span> <span class="s1">&#39;/&#39;</span>
+              <span class="nv">obj = </span><span class="nx">@cache</span> <span class="nx">_type</span><span class="p">,</span> <span class="nx">id</span>
+              <span class="k">if</span> <span class="nx">filter</span><span class="p">(</span><span class="nx">obj</span><span class="p">)</span>
+                <span class="nx">obj</span>
+              <span class="k">else</span>
+                <span class="k">continue</span>
+          <span class="k">when</span> <span class="o">!!</span><span class="nx">type</span>
+            <span class="k">for</span> <span class="nx">key</span> <span class="k">in</span> <span class="nx">keys</span> <span class="k">when</span> <span class="p">(</span><span class="nx">key</span><span class="p">.</span><span class="nx">indexOf</span><span class="p">(</span><span class="nx">type</span><span class="p">)</span> <span class="o">is</span> <span class="mi">0</span><span class="p">)</span> <span class="o">and</span> <span class="nx">@_is_semantic_id</span> <span class="nx">key</span>
+              <span class="p">[</span><span class="nx">_type</span><span class="p">,</span> <span class="nx">id</span><span class="p">]</span> <span class="o">=</span> <span class="nx">key</span><span class="p">.</span><span class="nx">split</span> <span class="s1">&#39;/&#39;</span>
+              <span class="nx">@cache</span> <span class="nx">_type</span><span class="p">,</span> <span class="nx">id</span>
+          <span class="k">else</span>
+            <span class="k">for</span> <span class="nx">key</span> <span class="k">in</span> <span class="nx">keys</span> <span class="k">when</span> <span class="nx">@_is_semantic_id</span> <span class="nx">key</span>
+              <span class="p">[</span><span class="nx">_type</span><span class="p">,</span> <span class="nx">id</span><span class="p">]</span> <span class="o">=</span> <span class="nx">key</span><span class="p">.</span><span class="nx">split</span> <span class="s1">&#39;/&#39;</span>
+              <span class="nx">@cache</span> <span class="nx">_type</span><span class="p">,</span> <span class="nx">id</span>
 
         <span class="nx">defer</span><span class="p">.</span><span class="nx">resolve</span><span class="p">(</span><span class="nx">results</span><span class="p">).</span><span class="nx">promise</span><span class="p">()</span>
       <span class="k">catch</span> <span class="nx">error</span>
@@ -140,7 +154,7 @@ store.loadAll('car')
 <p>Deletes one object specified by <code>type</code> and <code>id</code>. </p>
 
 <p>when object has been synced before, mark it as deleted. 
-Otherwise remove it from Store.</p>             </td>             <td class="code">               <div class="highlight"><pre>    <span class="k">delete</span><span class="o">:</span> <span class="nf">(type, id, options = {}) -&gt;</span>
+Otherwise remove it from Store.</p>             </td>             <td class="code">               <div class="highlight"><pre>    <span class="k">delete</span> <span class="o">:</span> <span class="nf">(type, id, options = {}) -&gt;</span>
       <span class="nv">defer = </span><span class="nx">@app</span><span class="p">.</span><span class="nx">defer</span><span class="p">()</span>
       <span class="nv">object  = </span><span class="nx">@cache</span> <span class="nx">type</span><span class="p">,</span> <span class="nx">id</span>
       
@@ -196,7 +210,7 @@ and caches it for faster future access. Updates cache when <code>value</code> is
   </pre></div>             </td>           </tr>                               <tr id="section-20">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-20">&#182;</a>               </div>               <h2>Clear changed</h2>
 
 <p>removes an object from the list of objects that are flagged to by synched (dirty)
-and triggers a <code>store:dirty</code> event</p>             </td>             <td class="code">               <div class="highlight"><pre>    <span class="nv">clear_changed: </span><span class="nf">(type, id) -&gt;</span>
+and triggers a <code>store:dirty</code> event</p>             </td>             <td class="code">               <div class="highlight"><pre>    <span class="nv">clear_changed : </span><span class="nf">(type, id) -&gt;</span>
     
       <span class="k">if</span> <span class="nx">type</span> <span class="o">and</span> <span class="nx">id</span>
         <span class="nv">key = </span><span class="s2">&quot;#{type}/#{id}&quot;</span>
@@ -215,7 +229,7 @@ it cannot be removed from store but gets a <code>_deleted: true</code> attribute
     </pre></div>             </td>           </tr>                               <tr id="section-22">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-22">&#182;</a>               </div>               <h2>Mark as changed</h2>
 
 <p>Marks object as changed (dirty). Triggers a <code>store:dirty</code> event immediately and a 
-<code>store:dirty:idle</code> event once there is no change within 2 seconds</p>             </td>             <td class="code">               <div class="highlight"><pre>    <span class="nv">mark_as_changed: </span><span class="nf">(type, id, object) -&gt;</span>
+<code>store:dirty:idle</code> event once there is no change within 2 seconds</p>             </td>             <td class="code">               <div class="highlight"><pre>    <span class="nv">mark_as_changed : </span><span class="nf">(type, id, object) -&gt;</span>
       <span class="nv">key = </span><span class="s2">&quot;#{type}/#{id}&quot;</span>
       
       <span class="nx">@_dirty</span><span class="p">[</span><span class="nx">key</span><span class="p">]</span> <span class="o">=</span> <span class="nx">object</span>
@@ -226,7 +240,7 @@ it cannot be removed from store but gets a <code>_deleted: true</code> attribute
       <span class="vi">@_dirty_timeout = </span><span class="nb">window</span><span class="p">.</span><span class="nx">setTimeout</span> <span class="p">(</span> <span class="o">=&gt;</span> <span class="nx">@app</span><span class="p">.</span><span class="nx">trigger</span> <span class="s1">&#39;store:dirty:idle&#39;</span> <span class="p">),</span> <span class="nx">timeout</span>
       </pre></div>             </td>           </tr>                               <tr id="section-23">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-23">&#182;</a>               </div>               <h2>changed docs</h2>
 
-<p>returns an Array of all dirty documents</p>             </td>             <td class="code">               <div class="highlight"><pre>    <span class="nv">changed_docs: </span><span class="o">-&gt;</span> 
+<p>returns an Array of all dirty documents</p>             </td>             <td class="code">               <div class="highlight"><pre>    <span class="nv">changed_docs : </span><span class="o">-&gt;</span> 
       <span class="nx">object</span> <span class="k">for</span> <span class="nx">key</span><span class="p">,</span> <span class="nx">object</span> <span class="k">of</span> <span class="nx">@_dirty</span>
       
          </pre></div>             </td>           </tr>                               <tr id="section-24">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-24">&#182;</a>               </div>               <h2>Is dirty?</h2>
@@ -235,7 +249,7 @@ it cannot be removed from store but gets a <code>_deleted: true</code> attribute
 dirty objects in the store.</p>
 
 <p>Otherwise it returns <code>true</code> or <code>false</code> for the passed object. An object is dirty
-if it has no <code>_synced_at</code> attribute or if <code>updated_at</code> is more recent than <code>_synced_at</code></p>             </td>             <td class="code">               <div class="highlight"><pre>    <span class="nv">is_dirty: </span><span class="nf">(type, id) -&gt;</span>
+if it has no <code>_synced_at</code> attribute or if <code>updated_at</code> is more recent than <code>_synced_at</code></p>             </td>             <td class="code">               <div class="highlight"><pre>    <span class="nv">is_dirty : </span><span class="nf">(type, id) -&gt;</span>
       <span class="nx">unless</span> <span class="nx">type</span>
         <span class="k">return</span> <span class="nx">$</span><span class="p">.</span><span class="nx">isEmptyObject</span> <span class="nx">@_dirty</span>
         
@@ -244,7 +258,7 @@ if it has no <code>_synced_at</code> attribute or if <code>updated_at</code> is 
   </pre></div>             </td>           </tr>                               <tr id="section-25">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-25">&#182;</a>               </div>               <h2>Clear</h2>
 
 <p>clears localStorage and cache
-TODO: do not clear entire localStorage, clear only item that have been stored before</p>             </td>             <td class="code">               <div class="highlight"><pre>    <span class="nv">clear: </span><span class="o">=&gt;</span>
+TODO: do not clear entire localStorage, clear only item that have been stored before</p>             </td>             <td class="code">               <div class="highlight"><pre>    <span class="nv">clear : </span><span class="o">=&gt;</span>
       <span class="nv">defer = </span><span class="nx">@app</span><span class="p">.</span><span class="nx">defer</span><span class="p">()</span>
     
       <span class="k">try</span>
@@ -279,22 +293,20 @@ as it is when Safari's private browsing mode is active.</p>             </td>   
     
     </pre></div>             </td>           </tr>                               <tr id="section-33">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-33">&#182;</a>               </div>               <h2>UUID</h2>
 
-<p>helper to generate uuids.</p>             </td>             <td class="code">               <div class="highlight"><pre>    <span class="nv">uuid: </span><span class="nf">(len = 7) -&gt;</span>
+<p>helper to generate uuids.</p>             </td>             <td class="code">               <div class="highlight"><pre>    <span class="nv">uuid : </span><span class="nf">(len = 7) -&gt;</span>
       <span class="nv">chars = </span><span class="s1">&#39;0123456789abcdefghijklmnopqrstuvwxyz&#39;</span><span class="p">.</span><span class="nx">split</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
       <span class="nv">radix = </span><span class="nx">chars</span><span class="p">.</span><span class="nx">length</span>
       <span class="p">(</span>
         <span class="nx">chars</span><span class="p">[</span> <span class="mi">0</span> <span class="o">|</span> <span class="nb">Math</span><span class="p">.</span><span class="nx">random</span><span class="p">()</span><span class="o">*</span><span class="nx">radix</span> <span class="p">]</span> <span class="k">for</span> <span class="nx">i</span> <span class="k">in</span> <span class="p">[</span><span class="mi">0</span><span class="p">...</span><span class="nx">len</span><span class="p">]</span>
       <span class="p">).</span><span class="nx">join</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
-  
-    
-    
-    </pre></div>             </td>           </tr>                               <tr id="section-34">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-34">&#182;</a>               </div>               <h2>Private</h2>             </td>             <td class="code">               <div class="highlight"><pre>    </pre></div>             </td>           </tr>                               <tr id="section-35">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-35">&#182;</a>               </div>               <p>more advanced localStorage wrappers to load/store objects</p>             </td>             <td class="code">               <div class="highlight"><pre>    <span class="nv">_setObject  : </span><span class="nf">(type, id, object) -&gt;</span>
+    </pre></div>             </td>           </tr>                               <tr id="section-34">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-34">&#182;</a>               </div>               <h2>Private</h2>             </td>             <td class="code">               <div class="highlight"><pre>    </pre></div>             </td>           </tr>                               <tr id="section-35">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-35">&#182;</a>               </div>               <p>more advanced localStorage wrappers to load/store objects</p>             </td>             <td class="code">               <div class="highlight"><pre>    <span class="nv">_setObject : </span><span class="nf">(type, id, object) -&gt;</span>
       <span class="nv">key = </span><span class="s2">&quot;#{type}/#{id}&quot;</span>
       <span class="nv">store = </span><span class="nx">$</span><span class="p">.</span><span class="nx">extend</span> <span class="p">{},</span> <span class="nx">object</span>
       <span class="k">delete</span> <span class="nx">store</span><span class="p">.</span><span class="nx">type</span>
       <span class="k">delete</span> <span class="nx">store</span><span class="p">.</span><span class="nx">id</span>
       <span class="nx">@db</span><span class="p">.</span><span class="nx">setItem</span> <span class="nx">key</span><span class="p">,</span> <span class="nx">JSON</span><span class="p">.</span><span class="nx">stringify</span> <span class="nx">store</span>
-    <span class="nv">_getObject  : </span><span class="nf">(type, id) -&gt;</span>
+      
+    <span class="nv">_getObject : </span><span class="nf">(type, id) -&gt;</span>
       <span class="nv">key = </span><span class="s2">&quot;#{type}/#{id}&quot;</span>
       <span class="nv">json = </span><span class="nx">@db</span><span class="p">.</span><span class="nx">getItem</span><span class="p">(</span><span class="nx">key</span><span class="p">)</span>
       <span class="k">if</span> <span class="nx">json</span>
@@ -309,25 +321,25 @@ as it is when Safari's private browsing mode is active.</p>             </td>   
         <span class="nx">obj</span>
       <span class="k">else</span>
         <span class="kc">false</span>
-  </pre></div>             </td>           </tr>                               <tr id="section-36">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-36">&#182;</a>               </div>                            </td>             <td class="code">               <div class="highlight"><pre>    <span class="nv">_now: </span><span class="o">-&gt;</span> <span class="k">new</span> <span class="nb">Date</span>
-  </pre></div>             </td>           </tr>                               <tr id="section-37">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-37">&#182;</a>               </div>               <p>only lowercase letters and numbers are allowed for ids</p>             </td>             <td class="code">               <div class="highlight"><pre>    <span class="nv">_is_valid_id: </span><span class="nf">(key) -&gt;</span>
+  </pre></div>             </td>           </tr>                               <tr id="section-36">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-36">&#182;</a>               </div>                            </td>             <td class="code">               <div class="highlight"><pre>    <span class="nv">_now : </span><span class="o">-&gt;</span> <span class="k">new</span> <span class="nb">Date</span>
+  </pre></div>             </td>           </tr>                               <tr id="section-37">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-37">&#182;</a>               </div>               <p>only lowercase letters and numbers are allowed for ids</p>             </td>             <td class="code">               <div class="highlight"><pre>    <span class="nv">_is_valid_id : </span><span class="nf">(key) -&gt;</span>
       <span class="o">/^</span><span class="p">[</span><span class="nx">a</span><span class="o">-</span><span class="nx">z0</span><span class="o">-</span><span class="mi">9</span><span class="p">]</span><span class="o">+</span><span class="nx">$</span><span class="err">/.test key</span>
-      </pre></div>             </td>           </tr>                               <tr id="section-38">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-38">&#182;</a>               </div>               <p>just like ids, but can start with an _ (internal types)</p>             </td>             <td class="code">               <div class="highlight"><pre>    <span class="nv">_is_valid_type: </span><span class="nf">(key) -&gt;</span>
-      <span class="o">/^</span><span class="err">\</span><span class="nx">$</span><span class="o">?</span><span class="p">[</span><span class="nx">a</span><span class="o">-</span><span class="nx">z0</span><span class="o">-</span><span class="mi">9</span><span class="p">]</span><span class="o">+</span><span class="nx">$</span><span class="err">/.test key</span>
+      </pre></div>             </td>           </tr>                               <tr id="section-38">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-38">&#182;</a>               </div>               <p>just like ids, but must start with a letter or a $ (internal types)</p>             </td>             <td class="code">               <div class="highlight"><pre>    <span class="nv">_is_valid_type : </span><span class="nf">(key) -&gt;</span>
+      <span class="o">/^</span><span class="p">[</span><span class="nx">a</span><span class="o">-</span><span class="nx">z$</span><span class="p">][</span><span class="nx">a</span><span class="o">-</span><span class="nx">z0</span><span class="o">-</span><span class="mi">9</span><span class="p">]</span><span class="o">+</span><span class="nx">$</span><span class="err">/.test key</span>
       
-    <span class="nv">_is_semantic_id: </span><span class="nf">(key) -&gt;</span>
-      <span class="o">/^</span><span class="p">[</span><span class="nx">a</span><span class="o">-</span><span class="nx">z0</span><span class="o">-</span><span class="mi">9</span><span class="p">]</span><span class="o">+</span><span class="err">\</span><span class="o">/</span><span class="p">[</span><span class="nx">a</span><span class="o">-</span><span class="nx">z0</span><span class="o">-</span><span class="mi">9</span><span class="p">]</span><span class="o">+</span><span class="nx">$</span><span class="err">/.test key</span></pre></div>             </td>           </tr>                               <tr id="section-39">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-39">&#182;</a>               </div>               <p>cache of localStorage for quicker access</p>             </td>             <td class="code">               <div class="highlight"><pre>    <span class="nv">_cached: </span><span class="p">{}</span>
-  </pre></div>             </td>           </tr>                               <tr id="section-40">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-40">&#182;</a>               </div>               <p>map of dirty objects by their ids</p>             </td>             <td class="code">               <div class="highlight"><pre>    <span class="nv">_dirty: </span><span class="p">{}</span>
-    </pre></div>             </td>           </tr>                               <tr id="section-41">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-41">&#182;</a>               </div>               <p>is dirty?</p>             </td>             <td class="code">               <div class="highlight"><pre>    <span class="nv">_is_dirty: </span><span class="nf">(object) -&gt;</span>
+    <span class="nv">_is_semantic_id : </span><span class="nf">(key) -&gt;</span>
+      <span class="o">/^</span><span class="p">[</span><span class="nx">a</span><span class="o">-</span><span class="nx">z$</span><span class="p">][</span><span class="nx">a</span><span class="o">-</span><span class="nx">z0</span><span class="o">-</span><span class="mi">9</span><span class="p">]</span><span class="o">+</span><span class="err">\</span><span class="o">/</span><span class="p">[</span><span class="nx">a</span><span class="o">-</span><span class="nx">z0</span><span class="o">-</span><span class="mi">9</span><span class="p">]</span><span class="o">+</span><span class="nx">$</span><span class="err">/.test key</span></pre></div>             </td>           </tr>                               <tr id="section-39">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-39">&#182;</a>               </div>               <p>cache of localStorage for quicker access</p>             </td>             <td class="code">               <div class="highlight"><pre>    <span class="nv">_cached : </span><span class="p">{}</span>
+  </pre></div>             </td>           </tr>                               <tr id="section-40">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-40">&#182;</a>               </div>               <p>map of dirty objects by their ids</p>             </td>             <td class="code">               <div class="highlight"><pre>    <span class="nv">_dirty : </span><span class="p">{}</span>
+    </pre></div>             </td>           </tr>                               <tr id="section-41">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-41">&#182;</a>               </div>               <p>is dirty?</p>             </td>             <td class="code">               <div class="highlight"><pre>    <span class="nv">_is_dirty : </span><span class="nf">(object) -&gt;</span>
       
       <span class="k">return</span> <span class="kc">true</span>  <span class="nx">unless</span> <span class="nx">object</span><span class="p">.</span><span class="nx">_synced_at</span>  <span class="c1"># no synced_at? uuhh, that&#39;s dirty.</span>
       <span class="k">return</span> <span class="kc">false</span> <span class="nx">unless</span> <span class="nx">object</span><span class="p">.</span><span class="nx">updated_at</span> <span class="c1"># no updated_at? no dirt then</span>
     
       <span class="nx">object</span><span class="p">.</span><span class="nx">_synced_at</span><span class="p">.</span><span class="nx">getTime</span><span class="p">()</span> <span class="o">&lt;</span> <span class="nx">object</span><span class="p">.</span><span class="nx">updated_at</span><span class="p">.</span><span class="nx">getTime</span><span class="p">()</span>
-  </pre></div>             </td>           </tr>                               <tr id="section-42">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-42">&#182;</a>               </div>               <p>marked as deleted?</p>             </td>             <td class="code">               <div class="highlight"><pre>    <span class="nv">_is_marked_as_deleted: </span><span class="nf">(object) -&gt;</span>
+  </pre></div>             </td>           </tr>                               <tr id="section-42">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-42">&#182;</a>               </div>               <p>marked as deleted?</p>             </td>             <td class="code">               <div class="highlight"><pre>    <span class="nv">_is_marked_as_deleted : </span><span class="nf">(object) -&gt;</span>
       <span class="nx">object</span><span class="p">.</span><span class="nx">_deleted</span> <span class="o">is</span> <span class="kc">true</span></pre></div>             </td>           </tr>                               <tr id="section-43">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-43">&#182;</a>               </div>               <p>document key index</p>
 
-<p>TODO: make this cachy</p>             </td>             <td class="code">               <div class="highlight"><pre>    <span class="nv">_index: </span><span class="o">-&gt;</span>
+<p>TODO: make this cachy</p>             </td>             <td class="code">               <div class="highlight"><pre>    <span class="nv">_index : </span><span class="o">-&gt;</span>
       <span class="nx">@db</span><span class="p">.</span><span class="nx">key</span><span class="p">(</span><span class="nx">i</span><span class="p">)</span> <span class="k">for</span> <span class="nx">i</span> <span class="k">in</span> <span class="p">[</span><span class="mi">0</span><span class="p">...</span><span class="nx">@db</span><span class="p">.</span><span class="nx">length</span><span class="p">()]</span>
 
 </pre></div>             </td>           </tr>                </tbody>     </table>   </div> </body> </html> 
