@@ -12,7 +12,7 @@
 # based on [Events implementations from Spine](https://github.com/maccman/spine/blob/master/src/spine.coffee#L1)
 #
 
-define 'events', ->
+define 'hoodie/events', ->
   
   # 'use strict'
   

@@ -3,26 +3,26 @@
 define('specs/hoodie', ['hoodie'], function(Hoodie) {
   return describe("Hoodie", function() {
     beforeEach(function() {
-      this.app = new Hoodie('http://couch.example.com');
+      this.hoodie = new Hoodie('http://couch.example.com');
       return spyOn($, "ajax").andReturn($.Deferred());
     });
     describe("new", function() {
       it("should store the couchDB URL", function() {
-        var app;
-        app = new Hoodie('http://couch.example.com');
-        return expect(app.base_url).toBe('http://couch.example.com');
+        var hoodie;
+        hoodie = new Hoodie('http://couch.example.com');
+        return expect(hoodie.base_url).toBe('http://couch.example.com');
       });
       return it("should remove trailing slash from passed URL", function() {
-        var app;
-        app = new Hoodie('http://couch.example.com/');
-        return expect(app.base_url).toBe('http://couch.example.com');
+        var hoodie;
+        hoodie = new Hoodie('http://couch.example.com/');
+        return expect(hoodie.base_url).toBe('http://couch.example.com');
       });
     });
     return describe("request(type, path, options)", function() {
       _when("request('GET', '/')", function() {
         beforeEach(function() {
           var args;
-          this.app.request('GET', '/');
+          this.hoodie.request('GET', '/');
           return this.args = args = $.ajax.mostRecentCall.args[0];
         });
         it("should send a GET request to http://couch.example.com/", function() {
@@ -42,13 +42,13 @@ define('specs/hoodie', ['hoodie'], function(Hoodie) {
           var promise;
           promise = $.Deferred();
           $.ajax.andReturn(promise);
-          return expect(this.app.request('GET', '/')).toBe(promise);
+          return expect(this.hoodie.request('GET', '/')).toBe(promise);
         });
       });
       return _when("request 'POST', '/test', data: funky: 'fresh'", function() {
         beforeEach(function() {
           var args;
-          this.app.request('POST', '/test', {
+          this.hoodie.request('POST', '/test', {
             data: {
               funky: 'fresh'
             }

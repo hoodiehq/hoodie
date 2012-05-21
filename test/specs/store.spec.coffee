@@ -1,9 +1,9 @@
-define 'specs/store', ['store', 'mocks/hoodie'], (Store, CangMock) ->
+define 'specs/store', ['hoodie/store', 'mocks/hoodie'], (Store, HoodieMock) ->
   
   describe "Store", ->  
     beforeEach ->
-      @app = new CangMock 
-      @store = new Store @app
+      @hoodie = new HoodieMock 
+      @store = new Store @hoodie
       
       spyOn(@store, "_setObject").andCallThrough()
       spyOn(@store, "_getObject").andCallThrough()
@@ -15,9 +15,9 @@ define 'specs/store', ['store', 'mocks/hoodie'], (Store, CangMock) ->
     
     describe "new", ->
       it "should subscribe to account:signed_out event", ->
-        spyOn(@app, "on")
-        store = new Store @app
-        expect(@app.on).wasCalledWith 'account:signed_out', store.clear
+        spyOn(@hoodie, "on")
+        store = new Store @hoodie
+        expect(@hoodie.on).wasCalledWith 'account:signed_out', store.clear
     # /new
     
     describe ".save(type, id, object, options)", ->
@@ -555,14 +555,14 @@ define 'specs/store', ['store', 'mocks/hoodie'], (Store, CangMock) ->
         
         spyOn(window, "setTimeout").andReturn 'new_timeout'
         spyOn(window, "clearTimeout")
-        spyOn(@app, "trigger")
+        spyOn(@hoodie, "trigger")
         @store.mark_as_changed 'couch', '123', color: 'red'
       
       it "should add it to the dirty list", ->
         expect(@store._dirty['couch/123'].color).toBe 'red'
         
       it "should should trigger an `store:dirty` event", ->
-        expect(@app.trigger).wasCalledWith 'store:dirty'
+        expect(@hoodie.trigger).wasCalledWith 'store:dirty'
         
       it "should start dirty timeout for 2 seconds", ->
         args = window.setTimeout.mostRecentCall.args
@@ -627,9 +627,9 @@ define 'specs/store', ['store', 'mocks/hoodie'], (Store, CangMock) ->
           do expect($.isEmptyObject @store._dirty).toBeTruthy
         
       it "should trigger a `store:dirty` event", ->
-        spyOn(@app, "trigger")
+        spyOn(@hoodie, "trigger")
         @store.clear_changed()
-        expect(@app.trigger).wasCalledWith 'store:dirty'
+        expect(@hoodie.trigger).wasCalledWith 'store:dirty'
     # /.clear_changed()
     
     describe ".uuid(num = 7)", ->

@@ -1,7 +1,7 @@
-<!DOCTYPE html>  <html> <head>   <title>store.coffee</title>   <meta http-equiv="content-type" content="text/html; charset=UTF-8">   <link rel="stylesheet" media="all" href="docco.css" /> </head> <body>   <div id="container">     <div id="background"></div>            <div id="jump_to">         Jump To &hellip;         <div id="jump_wrapper">           <div id="jump_page">                                           <a class="source" href="account.html">                 account.coffee               </a>                                           <a class="source" href="email.html">                 email.coffee               </a>                                           <a class="source" href="errors.html">                 errors.coffee               </a>                                           <a class="source" href="events.html">                 events.coffee               </a>                                           <a class="source" href="hoodie.html">                 hoodie.coffee               </a>                                           <a class="source" href="remote.html">                 remote.coffee               </a>                                           <a class="source" href="store.html">                 store.coffee               </a>                        </div>         </div>       </div>          <table cellpadding="0" cellspacing="0">       <thead>         <tr>           <th class="docs">             <h1>               store.coffee             </h1>           </th>           <th class="code">           </th>         </tr>       </thead>       <tbody>                               <tr id="section-1">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-1">&#182;</a>               </div>               <p>window.localStrage wrapper and more</p>             </td>             <td class="code">               <div class="highlight"><pre><span class="nx">define</span> <span class="s1">&#39;store&#39;</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;errors&#39;</span><span class="p">],</span> <span class="nf">(ERROR) -&gt;</span>
+<!DOCTYPE html>  <html> <head>   <title>store.coffee</title>   <meta http-equiv="content-type" content="text/html; charset=UTF-8">   <link rel="stylesheet" media="all" href="docco.css" /> </head> <body>   <div id="container">     <div id="background"></div>            <div id="jump_to">         Jump To &hellip;         <div id="jump_wrapper">           <div id="jump_page">                                           <a class="source" href="account.html">                 account.coffee               </a>                                           <a class="source" href="email.html">                 email.coffee               </a>                                           <a class="source" href="errors.html">                 errors.coffee               </a>                                           <a class="source" href="events.html">                 events.coffee               </a>                                           <a class="source" href="hoodie.html">                 hoodie.coffee               </a>                                           <a class="source" href="remote.html">                 remote.coffee               </a>                                           <a class="source" href="store.html">                 store.coffee               </a>                        </div>         </div>       </div>          <table cellpadding="0" cellspacing="0">       <thead>         <tr>           <th class="docs">             <h1>               store.coffee             </h1>           </th>           <th class="code">           </th>         </tr>       </thead>       <tbody>                               <tr id="section-1">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-1">&#182;</a>               </div>               <p>window.localStrage wrapper and more</p>             </td>             <td class="code">               <div class="highlight"><pre><span class="nx">define</span> <span class="s1">&#39;hoodie/store&#39;</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;hoodie/errors&#39;</span><span class="p">],</span> <span class="nf">(ERROR) -&gt;</span>
   </pre></div>             </td>           </tr>                               <tr id="section-2">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-2">&#182;</a>               </div>               <p>'use strict'</p>             </td>             <td class="code">               <div class="highlight"><pre>  
   <span class="k">class</span> <span class="nx">Store</span>
-  </pre></div>             </td>           </tr>                               <tr id="section-3">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-3">&#182;</a>               </div>               <h2>Constructor</h2>             </td>             <td class="code">               <div class="highlight"><pre>    <span class="nv">constructor : </span><span class="nf">(@app) -&gt;</span>
+  </pre></div>             </td>           </tr>                               <tr id="section-3">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-3">&#182;</a>               </div>               <h2>Constructor</h2>             </td>             <td class="code">               <div class="highlight"><pre>    <span class="nv">constructor : </span><span class="nf">(@hoodie) -&gt;</span>
     </pre></div>             </td>           </tr>                               <tr id="section-4">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-4">&#182;</a>               </div>               <p>if browser does not support local storage persistence,
 e.g. Safari in private mode, overite the respective methods. </p>             </td>             <td class="code">               <div class="highlight"><pre>      <span class="nx">unless</span> <span class="nx">@is_persistent</span><span class="p">()</span>
         <span class="vi">@db =</span>
@@ -11,7 +11,7 @@ e.g. Safari in private mode, overite the respective methods. </p>             </
           <span class="nv">key        : </span><span class="o">-&gt;</span> <span class="kc">null</span>
           <span class="nv">length     : </span><span class="o">-&gt;</span> <span class="mi">0</span>
           <span class="nv">clear      : </span><span class="o">-&gt;</span> <span class="kc">null</span>
-      </pre></div>             </td>           </tr>                               <tr id="section-5">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-5">&#182;</a>               </div>               <p>handle sign outs</p>             </td>             <td class="code">               <div class="highlight"><pre>      <span class="nx">@app</span><span class="p">.</span><span class="kc">on</span> <span class="s1">&#39;account:signed_out&#39;</span><span class="p">,</span> <span class="nx">@clear</span>
+      </pre></div>             </td>           </tr>                               <tr id="section-5">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-5">&#182;</a>               </div>               <p>handle sign outs</p>             </td>             <td class="code">               <div class="highlight"><pre>      <span class="nx">@hoodie</span><span class="p">.</span><span class="kc">on</span> <span class="s1">&#39;account:signed_out&#39;</span><span class="p">,</span> <span class="nx">@clear</span>
       
     </pre></div>             </td>           </tr>                               <tr id="section-6">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-6">&#182;</a>               </div>               <p>localStorage proxy</p>             </td>             <td class="code">               <div class="highlight"><pre>    <span class="nv">db: </span>
       <span class="nv">getItem    : </span><span class="nf">(key)         -&gt;</span> <span class="nb">window</span><span class="p">.</span><span class="nx">localStorage</span><span class="p">.</span><span class="nx">getItem</span><span class="p">(</span><span class="nx">key</span><span class="p">)</span>
@@ -39,7 +39,7 @@ document with same type &amp; id.</p>
 <pre><code>store.save('car', undefined, {color: 'red'})
 store.save('car', 'abc4567', {color: 'red'})
 </code></pre>             </td>             <td class="code">               <div class="highlight"><pre>    <span class="nv">save: </span><span class="nf">(type, id, object, options = {}) -&gt;</span>
-      <span class="nv">defer = </span><span class="nx">@app</span><span class="p">.</span><span class="nx">defer</span><span class="p">()</span>
+      <span class="nv">defer = </span><span class="nx">@hoodie</span><span class="p">.</span><span class="nx">defer</span><span class="p">()</span>
     
       <span class="nx">unless</span> <span class="k">typeof</span> <span class="nx">object</span> <span class="o">is</span> <span class="s1">&#39;object&#39;</span>
         <span class="nx">defer</span><span class="p">.</span><span class="nx">reject</span> <span class="nx">ERROR</span><span class="p">.</span><span class="nx">INVALID_ARGUMENTS</span> <span class="s2">&quot;object is #{typeof object}&quot;</span>
@@ -93,7 +93,7 @@ but only changes the passed attributes of an exsting object, if it exists</p>   
 
 <pre><code>store.load('car', 'abc4567')
 </code></pre>             </td>             <td class="code">               <div class="highlight"><pre>    <span class="nv">load : </span><span class="nf">(type, id) -&gt;</span>
-      <span class="nv">defer = </span><span class="nx">@app</span><span class="p">.</span><span class="nx">defer</span><span class="p">()</span>
+      <span class="nv">defer = </span><span class="nx">@hoodie</span><span class="p">.</span><span class="nx">defer</span><span class="p">()</span>
     
       <span class="nx">unless</span> <span class="k">typeof</span> <span class="nx">type</span> <span class="o">is</span> <span class="s1">&#39;string&#39;</span> <span class="o">and</span> <span class="k">typeof</span> <span class="nx">id</span> <span class="o">is</span> <span class="s1">&#39;string&#39;</span>
         <span class="k">return</span> <span class="nx">defer</span><span class="p">.</span><span class="nx">reject</span><span class="p">(</span> <span class="nx">ERROR</span><span class="p">.</span><span class="nx">INVALID_ARGUMENTS</span> <span class="s2">&quot;type &amp; id are required&quot;</span> <span class="p">).</span><span class="nx">promise</span><span class="p">()</span>
@@ -121,7 +121,7 @@ Can be filtered by type name and a filter function</p>
 store.loadAll('car')
 store.loadAll('car', function(obj) { return obj.brand == 'Tesla' })
 </code></pre>             </td>             <td class="code">               <div class="highlight"><pre>    <span class="nv">loadAll: </span><span class="nf">(type, filter) -&gt;</span>
-      <span class="nv">defer = </span><span class="nx">@app</span><span class="p">.</span><span class="nx">defer</span><span class="p">()</span>
+      <span class="nv">defer = </span><span class="nx">@hoodie</span><span class="p">.</span><span class="nx">defer</span><span class="p">()</span>
       <span class="nv">keys = </span><span class="nx">@_index</span><span class="p">()</span>
     
       <span class="k">try</span>
@@ -155,7 +155,7 @@ store.loadAll('car', function(obj) { return obj.brand == 'Tesla' })
 
 <p>when object has been synced before, mark it as deleted. 
 Otherwise remove it from Store.</p>             </td>             <td class="code">               <div class="highlight"><pre>    <span class="k">delete</span> <span class="o">:</span> <span class="nf">(type, id, options = {}) -&gt;</span>
-      <span class="nv">defer = </span><span class="nx">@app</span><span class="p">.</span><span class="nx">defer</span><span class="p">()</span>
+      <span class="nv">defer = </span><span class="nx">@hoodie</span><span class="p">.</span><span class="nx">defer</span><span class="p">()</span>
       <span class="nv">object  = </span><span class="nx">@cache</span> <span class="nx">type</span><span class="p">,</span> <span class="nx">id</span>
       
       <span class="nx">unless</span> <span class="nx">object</span>
@@ -218,7 +218,7 @@ and triggers a <code>store:dirty</code> event</p>             </td>             
       <span class="k">else</span>
         <span class="vi">@_dirty = </span><span class="p">{}</span>
     
-      <span class="nx">@app</span><span class="p">.</span><span class="nx">trigger</span> <span class="s1">&#39;store:dirty&#39;</span>
+      <span class="nx">@hoodie</span><span class="p">.</span><span class="nx">trigger</span> <span class="s1">&#39;store:dirty&#39;</span>
     
     </pre></div>             </td>           </tr>                               <tr id="section-21">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-21">&#182;</a>               </div>               <h2>Marked as deleted?</h2>
 
@@ -233,11 +233,11 @@ it cannot be removed from store but gets a <code>_deleted: true</code> attribute
       <span class="nv">key = </span><span class="s2">&quot;#{type}/#{id}&quot;</span>
       
       <span class="nx">@_dirty</span><span class="p">[</span><span class="nx">key</span><span class="p">]</span> <span class="o">=</span> <span class="nx">object</span>
-      <span class="nx">@app</span><span class="p">.</span><span class="nx">trigger</span> <span class="s1">&#39;store:dirty&#39;</span>
+      <span class="nx">@hoodie</span><span class="p">.</span><span class="nx">trigger</span> <span class="s1">&#39;store:dirty&#39;</span>
       
       <span class="nv">timeout = </span><span class="mi">2000</span> <span class="c1"># 2 seconds timout before triggering the `store:dirty:idle` event</span>
       <span class="nb">window</span><span class="p">.</span><span class="nx">clearTimeout</span> <span class="nx">@_dirty_timeout</span>
-      <span class="vi">@_dirty_timeout = </span><span class="nb">window</span><span class="p">.</span><span class="nx">setTimeout</span> <span class="p">(</span> <span class="o">=&gt;</span> <span class="nx">@app</span><span class="p">.</span><span class="nx">trigger</span> <span class="s1">&#39;store:dirty:idle&#39;</span> <span class="p">),</span> <span class="nx">timeout</span>
+      <span class="vi">@_dirty_timeout = </span><span class="nb">window</span><span class="p">.</span><span class="nx">setTimeout</span> <span class="p">(</span> <span class="o">=&gt;</span> <span class="nx">@hoodie</span><span class="p">.</span><span class="nx">trigger</span> <span class="s1">&#39;store:dirty:idle&#39;</span> <span class="p">),</span> <span class="nx">timeout</span>
       </pre></div>             </td>           </tr>                               <tr id="section-23">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-23">&#182;</a>               </div>               <h2>changed docs</h2>
 
 <p>returns an Array of all dirty documents</p>             </td>             <td class="code">               <div class="highlight"><pre>    <span class="nv">changed_docs : </span><span class="o">-&gt;</span> 
@@ -259,7 +259,7 @@ if it has no <code>_synced_at</code> attribute or if <code>updated_at</code> is 
 
 <p>clears localStorage and cache
 TODO: do not clear entire localStorage, clear only item that have been stored before</p>             </td>             <td class="code">               <div class="highlight"><pre>    <span class="nv">clear : </span><span class="o">=&gt;</span>
-      <span class="nv">defer = </span><span class="nx">@app</span><span class="p">.</span><span class="nx">defer</span><span class="p">()</span>
+      <span class="nv">defer = </span><span class="nx">@hoodie</span><span class="p">.</span><span class="nx">defer</span><span class="p">()</span>
     
       <span class="k">try</span>
         <span class="nx">@db</span><span class="p">.</span><span class="nx">clear</span><span class="p">()</span>

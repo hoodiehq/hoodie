@@ -2,24 +2,24 @@ define 'specs/hoodie', ['hoodie'], (Hoodie) ->
   
   describe "Hoodie", ->
     beforeEach ->
-      @app = new Hoodie 'http://couch.example.com'
+      @hoodie = new Hoodie 'http://couch.example.com'
       spyOn($, "ajax").andReturn $.Deferred()
     
     
     describe "new", ->
       it "should store the couchDB URL", ->
-        app = new Hoodie 'http://couch.example.com'
-        expect(app.base_url).toBe 'http://couch.example.com'
+        hoodie = new Hoodie 'http://couch.example.com'
+        expect(hoodie.base_url).toBe 'http://couch.example.com'
         
       it "should remove trailing slash from passed URL", ->
-        app = new Hoodie 'http://couch.example.com/'
-        expect(app.base_url).toBe 'http://couch.example.com'
+        hoodie = new Hoodie 'http://couch.example.com/'
+        expect(hoodie.base_url).toBe 'http://couch.example.com'
     # /new
     
     describe "request(type, path, options)", ->
       _when "request('GET', '/')", ->
         beforeEach ->
-          @app.request('GET', '/')
+          @hoodie.request('GET', '/')
           @args = args = $.ajax.mostRecentCall.args[0]
           
         it "should send a GET request to http://couch.example.com/", ->
@@ -38,11 +38,11 @@ define 'specs/hoodie', ['hoodie'], (Hoodie) ->
         it "should return a promise", ->
           promise = $.Deferred()
           $.ajax.andReturn promise
-          expect(@app.request('GET', '/')).toBe promise
+          expect(@hoodie.request('GET', '/')).toBe promise
       
       _when "request 'POST', '/test', data: funky: 'fresh'", ->
         beforeEach ->
-          @app.request 'POST', '/test', data: funky: 'fresh'
+          @hoodie.request 'POST', '/test', data: funky: 'fresh'
           @args = args = $.ajax.mostRecentCall.args[0]
           
         it "should send a POST request to http://couch.example.com/test", ->

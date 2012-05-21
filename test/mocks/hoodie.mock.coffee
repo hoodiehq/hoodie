@@ -1,6 +1,6 @@
 define 'mocks/hoodie', ->
     
-  class CangMock
+  class HoodieMock
     base_url : 'http://my.cou.ch'
     
     trigger       : ->

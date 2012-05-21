@@ -2,7 +2,7 @@
 # window.localStrage wrapper and more
 #
 
-define 'account', ->
+define 'hoodie/account', ->
   
   # 'use strict'
   
@@ -13,10 +13,10 @@ define 'account', ->
     
     # ## Constructor
     #
-    constructor : (@app) ->
+    constructor : (@hoodie) ->
       
       # handle evtl session
-      @email = @app.store.db.getItem '_couch.account.email'
+      @email = @hoodie.store.db.getItem '_couch.account.email'
       @authenticate()
       
       @on 'signed_in',  @_handle_sign_in
@@ -25,9 +25,9 @@ define 'account', ->
     # ## Authenticate
     # 
     # Use this method to assure that the user is authenticated:
-    # `app.account.authenticate().done( do_something ).fail( handle_error )`
+    # `hoodie.account.authenticate().done( do_something ).fail( handle_error )`
     authenticate : ->
-      defer = @app.defer()
+      defer = @hoodie.defer()
       
       unless @email
         return defer.reject().promise()
@@ -39,7 +39,7 @@ define 'account', ->
         return defer.reject().promise()
       
       # @_authenticated is undefined
-      @app.request 'GET', "/_session"
+      @hoodie.request 'GET', "/_session"
       
         success     : (response) =>
           if response.userCtx.name
@@ -48,7 +48,7 @@ define 'account', ->
             defer.resolve @email
           else
             @_authenticated = false
-            @app.trigger 'account:error:unauthenticated'
+            @hoodie.trigger 'account:error:unauthenticated'
             defer.reject()
             
         error       : (xhr) ->
@@ -70,7 +70,7 @@ define 'account', ->
     # address.
     #
     sign_up : (email, password, user_data = {}) ->
-      defer = @app.defer()
+      defer = @hoodie.defer()
       
       key     = "#{@_prefix}:#{email}"
 
@@ -82,13 +82,13 @@ define 'account', ->
         user_data  : user_data
         password   : password
 
-      @app.request 'PUT', "/_users/#{encodeURIComponent key}",
+      @hoodie.request 'PUT', "/_users/#{encodeURIComponent key}",
         data        : JSON.stringify data
         contentType : 'application/json'
         
         success     : (response) =>
-          @app.trigger 'account:signed_up', email
-          @app.trigger 'account:signed_in', email;
+          @hoodie.trigger 'account:signed_up', email
+          @hoodie.trigger 'account:signed_in', email;
           @fetch()
           defer.resolve email
           
@@ -108,15 +108,15 @@ define 'account', ->
     # uses standard couchDB API to create a new user session (POST /_session)
     #
     sign_in : (email, password) ->
-      defer = @app.defer()
+      defer = @hoodie.defer()
 
-      @app.request 'POST', '/_session', 
+      @hoodie.request 'POST', '/_session', 
         data: 
           name      : email
           password  : password
           
         success     : => 
-          @app.trigger 'account:signed_in', email
+          @hoodie.trigger 'account:signed_in', email
           @fetch()
           defer.resolve email
         
@@ -139,7 +139,7 @@ define 'account', ->
     # NOTE: simple implementation, current_password is ignored.
     #
     change_password : (current_password, new_password) ->
-      defer = @app.defer()
+      defer = @hoodie.defer()
       unless @email
         defer.reject error: "unauthenticated", reason: "not logged in"
         return defer.promise()
@@ -151,7 +151,7 @@ define 'account', ->
       delete data.password_sha
       data.password = new_password
       
-      @app.request 'PUT',  "/_users/#{encodeURIComponent key}",
+      @hoodie.request 'PUT',  "/_users/#{encodeURIComponent key}",
         data        : JSON.stringify data
         contentType : "application/json"
         success     : (response) =>
@@ -173,16 +173,16 @@ define 'account', ->
     #
     # TODO: handle errors
     sign_out: ->
-      @app.request 'DELETE', '/_session', 
-        success : => @app.trigger 'account:signed_out'
+      @hoodie.request 'DELETE', '/_session', 
+        success : => @hoodie.trigger 'account:signed_out'
 
     # alias
     logout: @::sign_out
     
     # ## On
     #
-    # alias for `app.on`
-    on : (event, cb) -> @app.on "account:#{event}", cb
+    # alias for `hoodie.on`
+    on : (event, cb) -> @hoodie.on "account:#{event}", cb
     
     # ## user_db
     #
@@ -205,13 +205,13 @@ define 'account', ->
     #
     # fetches _users doc from CouchDB and caches it in _doc
     fetch : ->
-      defer = @app.defer()
+      defer = @hoodie.defer()
       unless @email
         defer.reject error: "unauthenticated", reason: "not logged in"
         return defer.promise()
       
       key = "#{@_prefix}:#{@email}"
-      @app.request 'GET', "/_users/#{encodeURIComponent key}",
+      @hoodie.request 'GET', "/_users/#{encodeURIComponent key}",
       
         success     : (response) => 
           @_doc = response
@@ -239,11 +239,11 @@ define 'account', ->
     
     #
     _handle_sign_in: (@email) =>
-      @app.store.db.setItem '_couch.account.email', @email
+      @hoodie.store.db.setItem '_couch.account.email', @email
       @_authenticated = true
     
     #
     _handle_sign_out: =>
       delete @email
-      @app.store.db.removeItem '_couch.account.email'
+      @hoodie.store.db.removeItem '_couch.account.email'
       @_authenticated = false

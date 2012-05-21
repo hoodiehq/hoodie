@@ -5,7 +5,7 @@
 # and `_bulk_docs` to push local changes
 #
 
-define 'email', ['errors'], (ERROR) ->
+define 'hoodie/email', ['hoodie/errors'], (ERROR) ->
   
   # 'use strict'
   
@@ -13,27 +13,27 @@ define 'email', ['errors'], (ERROR) ->
   
     # ## Constructor
     #
-    constructor : (@app) ->
+    constructor : (@hoodie) ->
       
       # TODO
       # let's subscribe to general `_email` changes and provide
       # an `on` interface, so devs can listen to events like:
       # 
-      # * app.email.on 'sent',  -> ...
-      # * app.email.on 'error', -> ...
+      # * hoodie.email.on 'sent',  -> ...
+      # * hoodie.email.on 'error', -> ...
     
     # ## send
     #
     # sends an email and returns a promise
     send : (email_attributes = {}) ->
-      defer      = @app.defer()
+      defer      = @hoodie.defer()
       attributes = $.extend {}, email_attributes
       
       unless @_is_valid_email email_attributes.to
         attributes.error = "Invalid email address (#{attributes.to or 'empty'})"
         return defer.reject(attributes).promise()
       
-      @app.store.create('$email', attributes).then (obj) =>
+      @hoodie.store.create('$email', attributes).then (obj) =>
         @_handle_email_update(defer, obj)
         
       defer.promise()
@@ -49,4 +49,4 @@ define 'email', ['errors'], (ERROR) ->
       else if attributes.delivered_at
         defer.resolve attributes
       else
-        @app.one "remote:updated:$email:#{attributes.id}", (attributes) => @_handle_email_update(defer, attributes)
+        @hoodie.one "remote:updated:$email:#{attributes.id}", (attributes) => @_handle_email_update(defer, attributes)

@@ -2,7 +2,7 @@
 # one place to rule them all!
 #
 
-define "errors", ->  
+define "hoodie/errors", ->  
   
   # 'use strict'
   

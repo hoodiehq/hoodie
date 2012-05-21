@@ -2,7 +2,7 @@
 # window.localStrage wrapper and more
 #
 
-define 'store', ['errors'], (ERROR) ->
+define 'hoodie/store', ['hoodie/errors'], (ERROR) ->
   
   # 'use strict'
   
@@ -10,7 +10,7 @@ define 'store', ['errors'], (ERROR) ->
   
     # ## Constructor
     #
-    constructor : (@app) ->
+    constructor : (@hoodie) ->
     
       # if browser does not support local storage persistence,
       # e.g. Safari in private mode, overite the respective methods. 
@@ -24,7 +24,7 @@ define 'store', ['errors'], (ERROR) ->
           clear      : -> null
       
       # handle sign outs
-      @app.on 'account:signed_out', @clear
+      @hoodie.on 'account:signed_out', @clear
       
     
     # localStorage proxy
@@ -55,7 +55,7 @@ define 'store', ['errors'], (ERROR) ->
     #     store.save('car', undefined, {color: 'red'})
     #     store.save('car', 'abc4567', {color: 'red'})
     save: (type, id, object, options = {}) ->
-      defer = @app.defer()
+      defer = @hoodie.defer()
     
       unless typeof object is 'object'
         defer.reject ERROR.INVALID_ARGUMENTS "object is #{typeof object}"
@@ -124,7 +124,7 @@ define 'store', ['errors'], (ERROR) ->
     #
     #     store.load('car', 'abc4567')
     load : (type, id) ->
-      defer = @app.defer()
+      defer = @hoodie.defer()
     
       unless typeof type is 'string' and typeof id is 'string'
         return defer.reject( ERROR.INVALID_ARGUMENTS "type & id are required" ).promise()
@@ -153,7 +153,7 @@ define 'store', ['errors'], (ERROR) ->
     #     store.loadAll('car')
     #     store.loadAll('car', function(obj) { return obj.brand == 'Tesla' })
     loadAll: (type, filter) ->
-      defer = @app.defer()
+      defer = @hoodie.defer()
       keys = @_index()
     
       try
@@ -189,7 +189,7 @@ define 'store', ['errors'], (ERROR) ->
     # when object has been synced before, mark it as deleted. 
     # Otherwise remove it from Store.
     delete : (type, id, options = {}) ->
-      defer = @app.defer()
+      defer = @hoodie.defer()
       object  = @cache type, id
       
       unless object
@@ -258,7 +258,7 @@ define 'store', ['errors'], (ERROR) ->
       else
         @_dirty = {}
     
-      @app.trigger 'store:dirty'
+      @hoodie.trigger 'store:dirty'
     
     
     # ## Marked as deleted?
@@ -277,11 +277,11 @@ define 'store', ['errors'], (ERROR) ->
       key = "#{type}/#{id}"
       
       @_dirty[key] = object
-      @app.trigger 'store:dirty'
+      @hoodie.trigger 'store:dirty'
       
       timeout = 2000 # 2 seconds timout before triggering the `store:dirty:idle` event
       window.clearTimeout @_dirty_timeout
-      @_dirty_timeout = window.setTimeout ( => @app.trigger 'store:dirty:idle' ), timeout
+      @_dirty_timeout = window.setTimeout ( => @hoodie.trigger 'store:dirty:idle' ), timeout
       
     # ## changed docs
     #
@@ -309,7 +309,7 @@ define 'store', ['errors'], (ERROR) ->
     # clears localStorage and cache
     # TODO: do not clear entire localStorage, clear only item that have been stored before
     clear : =>
-      defer = @app.defer()
+      defer = @hoodie.defer()
     
       try
         @db.clear()

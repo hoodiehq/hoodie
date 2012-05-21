@@ -1,32 +1,32 @@
-define 'specs/remote', ['remote', 'mocks/hoodie', 'mocks/changes_response', 'mocks/changed_docs', 'mocks/bulk_update_response'], (Remote, CangMock, ChangesResponseMock, ChangedDocsMock, BulkUpdateResponseMock) ->
+define 'specs/remote', ['hoodie/remote', 'mocks/hoodie', 'mocks/changes_response', 'mocks/changed_docs', 'mocks/bulk_update_response'], (Remote, HoodieMock, ChangesResponseMock, ChangedDocsMock, BulkUpdateResponseMock) ->
   
   describe "Remote", ->  
     beforeEach ->
-      @app    = new CangMock 
-      @remote = new Remote @app
-      spyOn(@app, "on")
-      spyOn(@app, "unbind")
-      spyOn(@app, "trigger")
-      spyOn(@app, "request")
-      spyOn(@app.store, "destroy").andReturn then: (cb) -> cb('object_from_store')
-      spyOn(@app.store, "save").andReturn then: (cb) -> cb('object_from_store', false)
+      @hoodie    = new HoodieMock 
+      @remote = new Remote @hoodie
+      spyOn(@hoodie, "on")
+      spyOn(@hoodie, "unbind")
+      spyOn(@hoodie, "trigger")
+      spyOn(@hoodie, "request")
+      spyOn(@hoodie.store, "destroy").andReturn then: (cb) -> cb('object_from_store')
+      spyOn(@hoodie.store, "save").andReturn then: (cb) -> cb('object_from_store', false)
       spyOn(window, "setTimeout")
     
-    describe ".constructor(@app)", ->
+    describe ".constructor(@hoodie)", ->
       beforeEach ->
         spyOn(Remote.prototype, "connect")
-        @remote = new Remote @app
+        @remote = new Remote @hoodie
       
       it "should subscribe to `signed_in` event", ->
-        expect(@app.on).wasCalledWith 'account:signed_in', @remote.connect
+        expect(@hoodie.on).wasCalledWith 'account:signed_in', @remote.connect
         
       it "should subscribe to `signed_out` event", ->
-        expect(@app.on).wasCalledWith 'account:signed_out', @remote.disconnect
+        expect(@hoodie.on).wasCalledWith 'account:signed_out', @remote.disconnect
         
       it "should connect", ->
         # why doesn't work @remote.connect?
         expect(Remote::connect).wasCalled()
-    # /.constructor(@app)
+    # /.constructor(@hoodie)
     
     describe ".connect()", ->  
       beforeEach ->
@@ -35,7 +35,7 @@ define 'specs/remote', ['remote', 'mocks/hoodie', 'mocks/changes_response', 'moc
         
       _when "account is authenticated", ->
         beforeEach ->
-          spyOn(@app.account, "authenticate").andReturn
+          spyOn(@hoodie.account, "authenticate").andReturn
             then: (cb) -> cb()
           @remote.connect()
         
@@ -46,11 +46,11 @@ define 'specs/remote', ['remote', 'mocks/hoodie', 'mocks/changes_response', 'moc
           expect(@remote.push_changes).wasCalled()
         
         it "should subscribe to account's dirty idle event", ->
-          expect(@app.on).wasCalledWith 'store:dirty:idle', @remote.push_changes
+          expect(@hoodie.on).wasCalledWith 'store:dirty:idle', @remote.push_changes
           
       _when "account is not authenticated", ->
         beforeEach ->
-          spyOn(@app.account, "authenticate").andReturn then: -> null
+          spyOn(@hoodie.account, "authenticate").andReturn then: -> null
           @remote.connect()
           
         it "shouldn't pull changes", ->
@@ -60,68 +60,68 @@ define 'specs/remote', ['remote', 'mocks/hoodie', 'mocks/changes_response', 'moc
           expect(@remote.push_changes).wasNotCalled()
         
         it "shouldn't subscribe to account's dirty idle event", ->
-          expect(@app.on).wasNotCalled()
+          expect(@hoodie.on).wasNotCalled()
     # /.connect()
     
     describe ".disconnect()", ->  
       it "should reset the seq number", ->
         @remote._seq = 123
-        spyOn(@app.store.db, "removeItem")
+        spyOn(@hoodie.store.db, "removeItem")
         @remote.disconnect()
         expect(@remote._seq).toBeUndefined()
-        expect(@app.store.db.removeItem).wasCalledWith '_couch.remote.seq'
+        expect(@hoodie.store.db.removeItem).wasCalledWith '_couch.remote.seq'
         
       it "should unsubscribe from account's dirty idle event", ->
         @remote.disconnect()
-        expect(@app.unbind).wasCalledWith 'store:dirty:idle', @remote.push_changes
+        expect(@hoodie.unbind).wasCalledWith 'store:dirty:idle', @remote.push_changes
     # /.disconnect()
     
     describe ".pull_changes()", ->  
       it "should send a longpoll GET request to user's db _changes feed", ->
-        spyOn(@app.account, "user_db").andReturn 'joe$examle_com'
+        spyOn(@hoodie.account, "user_db").andReturn 'joe$examle_com'
         @remote.pull_changes()
-        expect(@app.request).wasCalled()
-        [method, path] = @app.request.mostRecentCall.args
+        expect(@hoodie.request).wasCalled()
+        [method, path] = @hoodie.request.mostRecentCall.args
         expect(method).toBe 'GET'
         expect(path).toBe '/joe%24examle_com/_changes?include_docs=true&heartbeat=10000&feed=longpoll&since=0'
       
       _when "request is successful / returns changes", ->
         beforeEach ->
-          @app.request.andCallFake (method, path, options) => 
+          @hoodie.request.andCallFake (method, path, options) => 
             # avoid endless recursive execution
-            @app.request.andCallFake ->
+            @hoodie.request.andCallFake ->
             options.success ChangesResponseMock()
             
           @remote.pull_changes()
         
         it "should remove `todo/abc3` from store", ->
-          expect(@app.store.destroy).wasCalledWith 'todo', 'abc3', remote: true
+          expect(@hoodie.store.destroy).wasCalledWith 'todo', 'abc3', remote: true
 
         it "should save `todo/abc2` in store", ->
-          expect(@app.store.save).wasCalledWith 'todo', 'abc2', { _rev : '1-123', content : 'remember the milk', done : false, order : 1, type : 'todo', id : 'abc2' }, { remote : true }
+          expect(@hoodie.store.save).wasCalledWith 'todo', 'abc2', { _rev : '1-123', content : 'remember the milk', done : false, order : 1, type : 'todo', id : 'abc2' }, { remote : true }
         
         it "should trigger remote events", ->
           # {"_id":"todo/abc3","_rev":"2-123","_deleted":true}
-          expect(@app.trigger).wasCalledWith 'remote:destroyed', 'todo', 'abc3', 'object_from_store'
-          expect(@app.trigger).wasCalledWith 'remote:destroyed:todo',    'abc3', 'object_from_store'
-          expect(@app.trigger).wasCalledWith 'remote:destroyed:todo:abc3',       'object_from_store'
-          expect(@app.trigger).wasCalledWith 'remote:changed',           'destroyed', 'todo', 'abc3', 'object_from_store'
-          expect(@app.trigger).wasCalledWith 'remote:changed:todo',      'destroyed',         'abc3', 'object_from_store'
-          expect(@app.trigger).wasCalledWith 'remote:changed:todo:abc3', 'destroyed',                 'object_from_store'        
+          expect(@hoodie.trigger).wasCalledWith 'remote:destroyed', 'todo', 'abc3', 'object_from_store'
+          expect(@hoodie.trigger).wasCalledWith 'remote:destroyed:todo',    'abc3', 'object_from_store'
+          expect(@hoodie.trigger).wasCalledWith 'remote:destroyed:todo:abc3',       'object_from_store'
+          expect(@hoodie.trigger).wasCalledWith 'remote:changed',           'destroyed', 'todo', 'abc3', 'object_from_store'
+          expect(@hoodie.trigger).wasCalledWith 'remote:changed:todo',      'destroyed',         'abc3', 'object_from_store'
+          expect(@hoodie.trigger).wasCalledWith 'remote:changed:todo:abc3', 'destroyed',                 'object_from_store'        
           
           # {"_id":"todo/abc2","_rev":"1-123","content":"remember the milk","done":false,"order":1, "type":"todo"}
-          expect(@app.trigger).wasCalledWith 'remote:updated', 'todo', 'abc2', 'object_from_store'
-          expect(@app.trigger).wasCalledWith 'remote:updated:todo',    'abc2', 'object_from_store'
-          expect(@app.trigger).wasCalledWith 'remote:updated:todo:abc2',       'object_from_store'
-          expect(@app.trigger).wasCalledWith 'remote:changed',           'updated', 'todo', 'abc2', 'object_from_store'
-          expect(@app.trigger).wasCalledWith 'remote:changed:todo',      'updated',         'abc2', 'object_from_store'
-          expect(@app.trigger).wasCalledWith 'remote:changed:todo:abc2', 'updated',                 'object_from_store'
+          expect(@hoodie.trigger).wasCalledWith 'remote:updated', 'todo', 'abc2', 'object_from_store'
+          expect(@hoodie.trigger).wasCalledWith 'remote:updated:todo',    'abc2', 'object_from_store'
+          expect(@hoodie.trigger).wasCalledWith 'remote:updated:todo:abc2',       'object_from_store'
+          expect(@hoodie.trigger).wasCalledWith 'remote:changed',           'updated', 'todo', 'abc2', 'object_from_store'
+          expect(@hoodie.trigger).wasCalledWith 'remote:changed:todo',      'updated',         'abc2', 'object_from_store'
+          expect(@hoodie.trigger).wasCalledWith 'remote:changed:todo:abc2', 'updated',                 'object_from_store'
           
       _when "request errors with 403 unauthorzied", ->
         beforeEach ->
-          @app.request.andCallFake (method, path, options) => 
+          @hoodie.request.andCallFake (method, path, options) => 
             # avoid endless recursive execution
-            @app.request.andCallFake ->
+            @hoodie.request.andCallFake ->
             options.error status: 403
         
         it "should disconnect", ->
@@ -131,13 +131,13 @@ define 'specs/remote', ['remote', 'mocks/hoodie', 'mocks/changes_response', 'moc
           
         it "should trigger an unauthenticated error", ->
           @remote.pull_changes()
-          expect(@app.trigger).wasCalledWith 'remote:error:unauthenticated'
+          expect(@hoodie.trigger).wasCalledWith 'remote:error:unauthenticated'
           
       _when "request errors with 404 not found", ->
         beforeEach ->
-          @app.request.andCallFake (method, path, options) => 
+          @hoodie.request.andCallFake (method, path, options) => 
             # avoid endless recursive execution
-            @app.request.andCallFake ->
+            @hoodie.request.andCallFake ->
             options.error status: 404
         
           
@@ -147,9 +147,9 @@ define 'specs/remote', ['remote', 'mocks/hoodie', 'mocks/changes_response', 'moc
       
       _when "request errors with 500 oooops", ->
         beforeEach ->
-          @app.request.andCallFake (method, path, options) => 
+          @hoodie.request.andCallFake (method, path, options) => 
             # avoid endless recursive execution
-            @app.request.andCallFake ->
+            @hoodie.request.andCallFake ->
             options.error status: 500
         
         it "should try again in 3 seconds (and hope it was only a hiccup ...)", ->
@@ -158,13 +158,13 @@ define 'specs/remote', ['remote', 'mocks/hoodie', 'mocks/changes_response', 'moc
           
         it "should trigger a server error event", ->
           @remote.pull_changes()
-          expect(@app.trigger).wasCalledWith 'remote:error:server'
+          expect(@hoodie.trigger).wasCalledWith 'remote:error:server'
           
       _when "request was aborted manually", ->
         beforeEach ->
-          @app.request.andCallFake (method, path, options) => 
+          @hoodie.request.andCallFake (method, path, options) => 
             # avoid endless recursive execution
-            @app.request.andCallFake ->
+            @hoodie.request.andCallFake ->
             options.error statusText: 'abort'
         
         it "should try again", ->
@@ -174,9 +174,9 @@ define 'specs/remote', ['remote', 'mocks/hoodie', 'mocks/changes_response', 'moc
       
       _when "there is a different error", ->
         beforeEach ->
-          @app.request.andCallFake (method, path, options) => 
+          @hoodie.request.andCallFake (method, path, options) => 
             # avoid endless recursive execution
-            @app.request.andCallFake ->
+            @hoodie.request.andCallFake ->
             options.error {}
             
         it "should try again in 3 seconds", ->
@@ -187,19 +187,19 @@ define 'specs/remote', ['remote', 'mocks/hoodie', 'mocks/changes_response', 'moc
     describe ".push_changes()", ->  
       _when "there are no changed docs", ->
         beforeEach ->
-          spyOn(@app.store, "changed_docs").andReturn []
+          spyOn(@hoodie.store, "changed_docs").andReturn []
           @remote.push_changes()
           
         it "shouldn't do anything", ->
-          expect(@app.request).wasNotCalled()
+          expect(@hoodie.request).wasNotCalled()
           
       _when "there is one deleted and one changed doc", ->
         beforeEach ->
-          spyOn(@app.store, "changed_docs").andReturn ChangedDocsMock()
-          spyOn(@app.account, "user_db").andReturn 'joe$examle_com'
+          spyOn(@hoodie.store, "changed_docs").andReturn ChangedDocsMock()
+          spyOn(@hoodie.account, "user_db").andReturn 'joe$examle_com'
           @remote.push_changes()
-          expect(@app.request).wasCalled()
-          [@method, @path, @options] = @app.request.mostRecentCall.args
+          expect(@hoodie.request).wasCalled()
+          [@method, @path, @options] = @hoodie.request.mostRecentCall.args
         
         it "should post the changes to the user's db _bulk_docs API", ->
           expect(@method).toBe 'POST'
@@ -223,19 +223,19 @@ define 'specs/remote', ['remote', 'mocks/hoodie', 'mocks/changes_response', 'moc
           
         _and "the request is successful, but with one conflict error", ->
           beforeEach ->
-            @app.request.andCallFake (method, path, options) => 
+            @hoodie.request.andCallFake (method, path, options) => 
               options.success BulkUpdateResponseMock()
               
             @remote.push_changes()
             
           it "should trigger conflict event", ->
-            expect(@app.trigger).wasCalledWith 'remote:error:conflict', 'todo/abc2'
+            expect(@hoodie.trigger).wasCalledWith 'remote:error:conflict', 'todo/abc2'
     # /.push_changes()
     
     describe ".on(event, callback)", ->  
       it "should namespace events with `remote`", ->
         cb = jasmine.createSpy 'test'
         @remote.on 'funky', cb
-        expect(@app.on).wasCalledWith 'remote:funky', cb
+        expect(@hoodie.on).wasCalledWith 'remote:funky', cb
     # /.on(event, callback)
   # /Remote

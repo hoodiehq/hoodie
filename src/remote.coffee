@@ -5,7 +5,7 @@
 # and `_bulk_docs` to push local changes
 #
 
-define 'remote', ['errors'], (ERROR) ->
+define 'hoodie/remote', ['hoodie/errors'], (ERROR) ->
   
   # 'use strict'
   
@@ -13,10 +13,10 @@ define 'remote', ['errors'], (ERROR) ->
   
     # ## Constructor
     #
-    constructor : (@app) ->
+    constructor : (@hoodie) ->
       
-      @app.on 'account:signed_in',  @connect
-      @app.on 'account:signed_out', @disconnect
+      @hoodie.on 'account:signed_in',  @connect
+      @hoodie.on 'account:signed_out', @disconnect
       @connect()
       
       
@@ -26,8 +26,8 @@ define 'remote', ['errors'], (ERROR) ->
     connect : =>
       
       return if @_connected
-      @app.account.authenticate().then =>
-        @app.on 'store:dirty:idle', @push_changes
+      @hoodie.account.authenticate().then =>
+        @hoodie.on 'store:dirty:idle', @push_changes
         @pull_changes()
         @push_changes()
       
@@ -39,8 +39,8 @@ define 'remote', ['errors'], (ERROR) ->
       @_connected = false
       @_changes_request?.abort()
       
-      @app.store.db.removeItem '_couch.remote.seq'
-      @app.unbind 'store:dirty:idle', @push_changes
+      @hoodie.store.db.removeItem '_couch.remote.seq'
+      @hoodie.unbind 'store:dirty:idle', @push_changes
       delete @_seq
 
 
@@ -51,7 +51,7 @@ define 'remote', ['errors'], (ERROR) ->
     pull_changes: =>
       @_connected = true
       
-      @_changes_request = @app.request 'GET', @_changes_path(),
+      @_changes_request = @hoodie.request 'GET', @_changes_path(),
         success:      @_changes_success
         error:        @_changes_error
       
@@ -65,13 +65,13 @@ define 'remote', ['errors'], (ERROR) ->
     # using the `_bulk_docs` API
     push_changes : () =>
 
-      docs    = @app.store.changed_docs()
+      docs    = @hoodie.store.changed_docs()
       return @_promise().resolve([]) if docs.length is 0
         
       docs = for doc in docs
         @_parse_for_remote doc 
       
-      @app.request 'POST', "/#{encodeURIComponent @app.account.user_db()}/_bulk_docs", 
+      @hoodie.request 'POST', "/#{encodeURIComponent @hoodie.account.user_db()}/_bulk_docs", 
         dataType:     'json'
         processData:  false
         contentType:  'application/json'
@@ -84,14 +84,14 @@ define 'remote', ['errors'], (ERROR) ->
     #
     # the `seq` number gets passed to couchDB's `_changes` feed.
     # 
-    get_seq :       -> @_seq or= @app.store.db.getItem('_couch.remote.seq') or 0
-    set_seq : (seq) -> @_seq   = @app.store.db.setItem('_couch.remote.seq', seq)
+    get_seq :       -> @_seq or= @hoodie.store.db.getItem('_couch.remote.seq') or 0
+    set_seq : (seq) -> @_seq   = @hoodie.store.db.setItem('_couch.remote.seq', seq)
     
     
     # ## On
     #
-    # alias for `app.on`
-    on : (event, cb) -> @app.on "remote:#{event}", cb
+    # alias for `hoodie.on`
+    on : (event, cb) -> @hoodie.on "remote:#{event}", cb
     
     
     # ## Private
@@ -103,7 +103,7 @@ define 'remote', ['errors'], (ERROR) ->
     #
     _changes_path : ->
       since = @get_seq()
-      "/#{encodeURIComponent @app.account.user_db()}/_changes?include_docs=true&heartbeat=10000&feed=longpoll&since=#{since}"
+      "/#{encodeURIComponent @hoodie.account.user_db()}/_changes?include_docs=true&heartbeat=10000&feed=longpoll&since=#{since}"
     
     # request gets restarted automaticcally in @_changes_error
     _restart_changes_request: => @_changes_request?.abort()
@@ -133,7 +133,7 @@ define 'remote', ['errors'], (ERROR) ->
     
         # This happens when users session got invalidated on server
         when 403
-          @app.trigger 'remote:error:unauthenticated'
+          @hoodie.trigger 'remote:error:unauthenticated'
           do @disconnect
         
         # the 404 comes, when the requested DB of the User has been removed. 
@@ -148,7 +148,7 @@ define 'remote', ['errors'], (ERROR) ->
         
         # Please server, don't give us these. At least not persistently 
         when 500
-          @app.trigger 'remote:error:server'
+          @hoodie.trigger 'remote:error:server'
           window.setTimeout @pull_changes, 3000
         
         # usually a 0, which stands for timeout or server not reachable.
@@ -216,34 +216,34 @@ define 'remote', ['errors'], (ERROR) ->
       for {doc} in changes
         _doc = @_parse_from_remote(doc)
         if _doc._deleted
-          @app.store.destroy(_doc.type, _doc.id, remote: true)
+          @hoodie.store.destroy(_doc.type, _doc.id, remote: true)
           .then (object) => 
-            @app.trigger 'remote:destroyed', _doc.type,   _doc.id,    object
-            @app.trigger "remote:destroyed:#{_doc.type}", _doc.id,    object
-            @app.trigger "remote:destroyed:#{_doc.type}:#{_doc.id}",  object
+            @hoodie.trigger 'remote:destroyed', _doc.type,   _doc.id,    object
+            @hoodie.trigger "remote:destroyed:#{_doc.type}", _doc.id,    object
+            @hoodie.trigger "remote:destroyed:#{_doc.type}:#{_doc.id}",  object
             
-            @app.trigger 'remote:changed',                         'destroyed', _doc.type, _doc.id, object
-            @app.trigger "remote:changed:#{_doc.type}",            'destroyed',            _doc.id, object
-            @app.trigger "remote:changed:#{_doc.type}:#{_doc.id}", 'destroyed',                     object
+            @hoodie.trigger 'remote:changed',                         'destroyed', _doc.type, _doc.id, object
+            @hoodie.trigger "remote:changed:#{_doc.type}",            'destroyed',            _doc.id, object
+            @hoodie.trigger "remote:changed:#{_doc.type}:#{_doc.id}", 'destroyed',                     object
         else
-          @app.store.save(_doc.type, _doc.id, _doc, remote: true)
+          @hoodie.store.save(_doc.type, _doc.id, _doc, remote: true)
           .then (object, object_was_created) => 
             if object_was_created
-              @app.trigger 'remote:created', _doc.type,   _doc.id,   object
-              @app.trigger "remote:created:#{_doc.type}", _doc.id,   object
-              @app.trigger "remote:created:#{_doc.type}:#{_doc.id}", object
+              @hoodie.trigger 'remote:created', _doc.type,   _doc.id,   object
+              @hoodie.trigger "remote:created:#{_doc.type}", _doc.id,   object
+              @hoodie.trigger "remote:created:#{_doc.type}:#{_doc.id}", object
               
-              @app.trigger 'remote:changed',                         'created', _doc.type, _doc.id, object
-              @app.trigger "remote:changed:#{_doc.type}",            'created',            _doc.id, object
-              @app.trigger "remote:changed:#{_doc.type}:#{_doc.id}", 'created',                     object
+              @hoodie.trigger 'remote:changed',                         'created', _doc.type, _doc.id, object
+              @hoodie.trigger "remote:changed:#{_doc.type}",            'created',            _doc.id, object
+              @hoodie.trigger "remote:changed:#{_doc.type}:#{_doc.id}", 'created',                     object
             else
-              @app.trigger 'remote:updated', _doc.type,   _doc.id,   object
-              @app.trigger "remote:updated:#{_doc.type}", _doc.id,   object
-              @app.trigger "remote:updated:#{_doc.type}:#{_doc.id}", object
+              @hoodie.trigger 'remote:updated', _doc.type,   _doc.id,   object
+              @hoodie.trigger "remote:updated:#{_doc.type}", _doc.id,   object
+              @hoodie.trigger "remote:updated:#{_doc.type}:#{_doc.id}", object
               
-              @app.trigger 'remote:changed',                         'updated', _doc.type, _doc.id, object
-              @app.trigger "remote:changed:#{_doc.type}",            'updated',            _doc.id, object
-              @app.trigger "remote:changed:#{_doc.type}:#{_doc.id}", 'updated',                     object
+              @hoodie.trigger 'remote:changed',                         'updated', _doc.type, _doc.id, object
+              @hoodie.trigger "remote:changed:#{_doc.type}",            'updated',            _doc.id, object
+              @hoodie.trigger "remote:changed:#{_doc.type}:#{_doc.id}", 'updated',                     object
         
 
     # Gets response to POST _bulk_docs request from couchDB.
@@ -253,7 +253,7 @@ define 'remote', ['errors'], (ERROR) ->
     # But what needs to be handled are conflicts.
     _handle_push_changes: (doc_responses) =>
       for response in doc_responses when response.error is 'conflict'
-        @app.trigger 'remote:error:conflict', response.id
+        @hoodie.trigger 'remote:error:conflict', response.id
     
     #
     _promise: $.Deferred

@@ -4,7 +4,7 @@
 #
 # the door to world domination (apps)
 #
-define 'hoodie', ['events', 'store', 'account', 'remote', 'email'], (Events, Store, Account, Remote, Email) ->
+define 'hoodie', ['hoodie/events', 'hoodie/store', 'hoodie/account', 'hoodie/remote', 'hoodie/email'], (Events, Store, Account, Remote, Email) ->
   
   # 'use strict'
 

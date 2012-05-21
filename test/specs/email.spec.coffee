@@ -1,4 +1,4 @@
-define 'specs/email', ['mocks/hoodie', 'email'], (CangMock, Email) ->
+define 'specs/email', ['mocks/hoodie', 'hoodie/email'], (HoodieMock, Email) ->
 
   # ## ref success
   # {
@@ -18,8 +18,8 @@ define 'specs/email', ['mocks/hoodie', 'email'], (CangMock, Email) ->
   
   describe "Email", ->  
     beforeEach ->
-      @app   = new CangMock 
-      @email = new Email @app
+      @hoodie   = new HoodieMock 
+      @email = new Email @hoodie
       
       @errorSpy   = jasmine.createSpy 'error'
       @successSpy = jasmine.createSpy 'success'
@@ -30,7 +30,7 @@ define 'specs/email', ['mocks/hoodie', 'email'], (CangMock, Email) ->
           to      : 'jim@be.am'
           subject : 'subject'
           body    : 'body'
-        (spyOn @app.store, "create").andReturn
+        (spyOn @hoodie.store, "create").andReturn
           then: (cb) -> cb $.extend {}, @email_attributes, id: 'abc4567'
       
       it "should reject the promise", ->
@@ -38,13 +38,13 @@ define 'specs/email', ['mocks/hoodie', 'email'], (CangMock, Email) ->
         
       it "should save the email as object with type: $email", ->
         @email.send(@email_attributes)
-        (expect @app.store.create).wasCalledWith('$email', @email_attributes)
+        (expect @hoodie.store.create).wasCalledWith('$email', @email_attributes)
         
       it "should listen to server response", ->
-        (spyOn @app, "one")
+        (spyOn @hoodie, "one")
         @email.send(@email_attributes)
-        (expect @app.one).wasCalled()
-        (expect @app.one.mostRecentCall.args[0]).toEqual "remote:updated:$email:abc4567"
+        (expect @hoodie.one).wasCalled()
+        (expect @hoodie.one.mostRecentCall.args[0]).toEqual "remote:updated:$email:abc4567"
       
       _when "email.to is not provided", ->
         beforeEach ->
@@ -67,7 +67,7 @@ define 'specs/email', ['mocks/hoodie', 'email'], (CangMock, Email) ->
       _when "sending email was successful", ->
         beforeEach ->
           @email_response_attributes = $.extend {}, @email_attributes, id: 'abc4567', delivered_at: "2012-05-05 15:00 UTC"
-          (spyOn @app, "one").andCallFake (event, cb) =>
+          (spyOn @hoodie, "one").andCallFake (event, cb) =>
             cb @email_response_attributes
           @promise = @email.send(@email_attributes)
           
@@ -78,7 +78,7 @@ define 'specs/email', ['mocks/hoodie', 'email'], (CangMock, Email) ->
       _when "sending email had an error", ->
         beforeEach ->
           @email_response_attributes = $.extend {}, @email_attributes, id: 'abc4567', error: "U SPAM!"
-          (spyOn @app, "one").andCallFake (event, cb) =>
+          (spyOn @hoodie, "one").andCallFake (event, cb) =>
             cb @email_response_attributes
           @promise = @email.send(@email_attributes)
           

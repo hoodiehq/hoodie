@@ -1,13 +1,13 @@
-define 'specs/account', ['mocks/hoodie', 'account'], (CangMock, Account) ->
+define 'specs/account', ['mocks/hoodie', 'hoodie/account'], (HoodieMock, Account) ->
   
   describe "Account", ->
     beforeEach ->
-      @app = new CangMock
-      @account = new Account @app    
+      @hoodie = new HoodieMock
+      @account = new Account @hoodie    
     
       # requests
-      spyOn(@app, "request")
-      spyOn(@app, "trigger")
+      spyOn(@hoodie, "request")
+      spyOn(@hoodie, "trigger")
   
   
     describe ".constructor()", ->
@@ -17,24 +17,24 @@ define 'specs/account', ['mocks/hoodie', 'account'], (CangMock, Account) ->
       
       _when "_couch.account.email is set", ->
         beforeEach ->
-          spyOn(@app.store.db, "getItem").andCallFake (key) ->
+          spyOn(@hoodie.store.db, "getItem").andCallFake (key) ->
             if key is '_couch.account.email'
               return 'joe@example.com'
               
           it "should set @email", ->
-            account = new Account @app
+            account = new Account @hoodie
             expect(account.email).toBe 'joe@example.com'          
             
       it "should authenticate", ->
-        account = new Account @app
+        account = new Account @hoodie
         expect(account.authenticate).wasCalled()
         
       it "should bind to sign_in event", ->
-        account = new Account @app
+        account = new Account @hoodie
         expect(@account.on).wasCalledWith 'signed_in', account._handle_sign_in
       
       it "should bind to sign_out event", ->
-        account = new Account @app
+        account = new Account @hoodie
         expect(@account.on).wasCalledWith 'signed_out', account._handle_sign_out
     # /.constructor()
     
@@ -42,14 +42,14 @@ define 'specs/account', ['mocks/hoodie', 'account'], (CangMock, Account) ->
     describe "event handlers", ->
       describe "._handle_sign_in(@email)", ->
         beforeEach ->
-          spyOn(@app.store.db, "setItem")
+          spyOn(@hoodie.store.db, "setItem")
           @account._handle_sign_in 'joe@example.com'
         
         it "should set @email", ->
           expect(@account.email).toBe 'joe@example.com'
           
         it "should store @email persistantly", ->
-          expect(@app.store.db.setItem).wasCalledWith '_couch.account.email', 'joe@example.com'
+          expect(@hoodie.store.db.setItem).wasCalledWith '_couch.account.email', 'joe@example.com'
           
         it "should set _authenticated to true", ->
           @account._authenticated = false
@@ -64,9 +64,9 @@ define 'specs/account', ['mocks/hoodie', 'account'], (CangMock, Account) ->
           do expect(@account.email).toBeUndefined
           
         it "should store @email persistantly", ->
-          spyOn(@app.store.db, "removeItem")
+          spyOn(@hoodie.store.db, "removeItem")
           @account._handle_sign_out {"ok":true}
-          expect(@app.store.db.removeItem).wasCalledWith '_couch.account.email'
+          expect(@hoodie.store.db.removeItem).wasCalledWith '_couch.account.email'
           
         it "should set _authenticated to false", ->
           @account._authenticated = true
@@ -123,8 +123,8 @@ define 'specs/account', ['mocks/hoodie', 'account'], (CangMock, Account) ->
             
           it "should send a GET /_session", ->
             @account.authenticate()
-            expect(@app.request).wasCalled()
-            args = @app.request.mostRecentCall.args
+            expect(@hoodie.request).wasCalled()
+            args = @hoodie.request.mostRecentCall.args
             expect(args[0]).toBe 'GET'
             expect(args[1]).toBe '/_session'
           
@@ -132,7 +132,7 @@ define 'specs/account', ['mocks/hoodie', 'account'], (CangMock, Account) ->
           # {"ok":true,"userCtx":{"name":"@example.com","roles":[]},"info":{"authentication_db":"_users","authentication_handlers":["oauth","cookie","default"],"authenticated":"cookie"}}
           _when "authentication request is successful and returns joe@example.com", ->
             beforeEach ->
-              @app.request.andCallFake (type, path, options = {}) -> options.success? userCtx: name: 'joe@example.com'
+              @hoodie.request.andCallFake (type, path, options = {}) -> options.success? userCtx: name: 'joe@example.com'
               @promise = @account.authenticate()
               
             it "should set account as authenticated", ->
@@ -144,7 +144,7 @@ define 'specs/account', ['mocks/hoodie', 'account'], (CangMock, Account) ->
           # {"ok":true,"userCtx":{"name":null,"roles":[]},"info":{"authentication_db":"_users","authentication_handlers":["oauth","cookie","default"]}}
           _when "authentication request is successful and returns `name: joe@example.com`", ->
             beforeEach ->
-              @app.request.andCallFake (type, path, options = {}) -> options.success? userCtx: name: null
+              @hoodie.request.andCallFake (type, path, options = {}) -> options.success? userCtx: name: null
               @promise = @account.authenticate()
               
             it "should set account as unauthenticated", ->
@@ -154,11 +154,11 @@ define 'specs/account', ['mocks/hoodie', 'account'], (CangMock, Account) ->
               expect(@promise).toBeRejected()
               
             it "should trigger an `account:error:unauthenticated` event", ->
-              expect(@app.trigger).wasCalledWith 'account:error:unauthenticated'
+              expect(@hoodie.trigger).wasCalledWith 'account:error:unauthenticated'
               
           _when "authentication request has an error", ->
             beforeEach ->
-              @app.request.andCallFake (type, path, options = {}) -> options.error? responseText: 'error data'
+              @hoodie.request.andCallFake (type, path, options = {}) -> options.error? responseText: 'error data'
               @promise = @account.authenticate()
             
             it "should reject the promise", ->
@@ -169,11 +169,11 @@ define 'specs/account', ['mocks/hoodie', 'account'], (CangMock, Account) ->
     describe ".sign_up(email, password, user_data = {})", ->
       beforeEach ->
         @account.sign_up('joe@example.com', 'secret', name: "Joe Doe", nick: "Foo")
-        [@type, @path, @options] = @app.request.mostRecentCall.args
+        [@type, @path, @options] = @hoodie.request.mostRecentCall.args
         @data = JSON.parse @options.data
     
       it "should send a PUT request to http://my.cou.ch/_users/org.couchdb.user%3Ajoe%40example.com", ->
-        expect(@app.request).wasCalled()
+        expect(@hoodie.request).wasCalled()
         expect(@type).toBe 'PUT'
         expect(@path).toBe  '/_users/org.couchdb.user%3Ajoe%40example.com'
         
@@ -197,7 +197,7 @@ define 'specs/account', ['mocks/hoodie', 'account'], (CangMock, Account) ->
         
       it "should allow to signup without password", ->
         @account.sign_up('joe@example.com')
-        [@type, @path, @options] = @app.request.mostRecentCall.args
+        [@type, @path, @options] = @hoodie.request.mostRecentCall.args
         @data = JSON.parse @options.data
         expect(@data.password).toBeUndefined()
         
@@ -207,17 +207,17 @@ define 'specs/account', ['mocks/hoodie', 'account'], (CangMock, Account) ->
               
       _when "sign_up successful", ->
         beforeEach ->
-          @app.request.andCallFake (type, path, options) -> 
+          @hoodie.request.andCallFake (type, path, options) -> 
             response = {"ok":true,"id":"org.couchdb.user:bizbiz","rev":"1-a0134f4a9909d3b20533285c839ed830"}
             options.success response
         
         it "should trigger `account:signed_up` event", ->
           @account.sign_up('joe@example.com', 'secret')
-          expect(@app.trigger).wasCalledWith 'account:signed_up', 'joe@example.com'
+          expect(@hoodie.trigger).wasCalledWith 'account:signed_up', 'joe@example.com'
           
         it "should trigger `account:signed_in` event", ->
           @account.sign_up('joe@example.com', 'secret')
-          expect(@app.trigger).wasCalledWith 'account:signed_in', 'joe@example.com'
+          expect(@hoodie.trigger).wasCalledWith 'account:signed_in', 'joe@example.com'
           
         it "should resolve its promise", ->
           promise = @account.sign_up('joe@example.com', 'secret')
@@ -230,7 +230,7 @@ define 'specs/account', ['mocks/hoodie', 'account'], (CangMock, Account) ->
           
       _when "sign_up has an error", ->
         beforeEach ->
-          @app.request.andCallFake (type, path, options) -> options.error responseText: '{"error":"forbidden","reason":"Username may not start with underscore."}'
+          @hoodie.request.andCallFake (type, path, options) -> options.error responseText: '{"error":"forbidden","reason":"Username may not start with underscore."}'
         
         it "should reject its promise", ->
           promise = @account.sign_up('joe@example.com', 'secret')
@@ -241,10 +241,10 @@ define 'specs/account', ['mocks/hoodie', 'account'], (CangMock, Account) ->
     describe ".sign_in(email, password)", ->
       beforeEach ->
         @account.sign_in('joe@example.com', 'secret')
-        [@type, @path, @options] = @app.request.mostRecentCall.args
+        [@type, @path, @options] = @hoodie.request.mostRecentCall.args
     
       it "should send a POST request to http://my.cou.ch/_session", ->
-        expect(@app.request).wasCalled()
+        expect(@hoodie.request).wasCalled()
         expect(@type).toBe 'POST'
         expect(@path).toBe  '/_session'
       
@@ -256,11 +256,11 @@ define 'specs/account', ['mocks/hoodie', 'account'], (CangMock, Account) ->
         
       _when "sign_up successful", ->
         beforeEach ->
-          @app.request.andCallFake (type, path, options) -> options.success()
+          @hoodie.request.andCallFake (type, path, options) -> options.success()
           
         it "should trigger `account:signed_in` event", ->
           @account.sign_in('joe@example.com', 'secret')
-          expect(@app.trigger).wasCalledWith 'account:signed_in', 'joe@example.com'
+          expect(@hoodie.trigger).wasCalledWith 'account:signed_in', 'joe@example.com'
           
         it "should fetch the _users doc", ->
           spyOn(@account, "fetch")
@@ -282,11 +282,11 @@ define 'specs/account', ['mocks/hoodie', 'account'], (CangMock, Account) ->
           
           
         @account.change_password('current_secret', 'new_secret')
-        [@type, @path, @options] = @app.request.mostRecentCall.args
+        [@type, @path, @options] = @hoodie.request.mostRecentCall.args
         @data = JSON.parse @options.data
     
       it "should send a PUT request to http://my.cou.ch/_users/org.couchdb.user%3Ajoe%40example.com", ->
-        expect(@app.request).wasCalled()
+        expect(@hoodie.request).wasCalled()
         expect(@type).toBe 'PUT'
         expect(@path).toBe  '/_users/org.couchdb.user%3Ajoe%40example.com'
         
@@ -310,7 +310,7 @@ define 'specs/account', ['mocks/hoodie', 'account'], (CangMock, Account) ->
         
       it "should allow to set empty password", ->
         @account.change_password('current_secret','')
-        [@type, @path, @options] = @app.request.mostRecentCall.args
+        [@type, @path, @options] = @hoodie.request.mostRecentCall.args
         @data = JSON.parse @options.data
         expect(@data.password).toBe ''
         
@@ -323,7 +323,7 @@ define 'specs/account', ['mocks/hoodie', 'account'], (CangMock, Account) ->
               
       _when "change password successful", ->
         beforeEach ->
-          @app.request.andCallFake (type, path, options) -> 
+          @hoodie.request.andCallFake (type, path, options) -> 
             response = {"ok":true,"id":"org.couchdb.user:bizbiz","rev":"2-345"}
             options.success response
           
@@ -338,7 +338,7 @@ define 'specs/account', ['mocks/hoodie', 'account'], (CangMock, Account) ->
           
       _when "sign_up has an error", ->
         beforeEach ->
-          @app.request.andCallFake (type, path, options) -> options.error {}
+          @hoodie.request.andCallFake (type, path, options) -> options.error {}
         
         it "should reject its promise", ->
           promise = @account.change_password('current_secret', 'new_secret')
@@ -349,31 +349,31 @@ define 'specs/account', ['mocks/hoodie', 'account'], (CangMock, Account) ->
     describe ".sign_out()", ->
       beforeEach ->
         @account.sign_out()
-        [@type, @path, @options] = @app.request.mostRecentCall.args
+        [@type, @path, @options] = @hoodie.request.mostRecentCall.args
     
       it "should send a DELETE request to http://my.cou.ch/_session", ->
-        expect(@app.request).wasCalled()
+        expect(@hoodie.request).wasCalled()
         expect(@type).toBe 'DELETE'
         expect(@path).toBe  '/_session'
         
       _when "sign_up successful", ->
         beforeEach ->
-          @app.request.andCallFake (type, path, options) -> options.success()
+          @hoodie.request.andCallFake (type, path, options) -> options.success()
           
         it "should trigger `account:signed_out` event", ->
           @account.sign_out('joe@example.com', 'secret')
-          expect(@app.trigger).wasCalledWith 'account:signed_out'
+          expect(@hoodie.trigger).wasCalledWith 'account:signed_out'
     # /.sign_in(email, password)
     
     
     describe ".on(event, callback)", ->
       beforeEach ->
-        spyOn(@app, "on")
+        spyOn(@hoodie, "on")
         
-      it "should proxy to @app.on() and namespace with account", ->
+      it "should proxy to @hoodie.on() and namespace with account", ->
         party = jasmine.createSpy 'party'
         @account.on('funky', party)
-        (expect @app.on).wasCalledWith('account:funky', party)
+        (expect @hoodie.on).wasCalledWith('account:funky', party)
     # /.on(event, callback)
     
     
@@ -394,24 +394,24 @@ define 'specs/account', ['mocks/hoodie', 'account'], (CangMock, Account) ->
           @account.fetch()
         
         it "should not send any request", ->
-          expect(@app.request).wasNotCalled()
+          expect(@hoodie.request).wasNotCalled()
         
       
       _when "email is joe@example.com", ->
         beforeEach ->
           @account.email = 'joe@example.com'
           @account.fetch()
-          [@type, @path, @options] = @app.request.mostRecentCall.args
+          [@type, @path, @options] = @hoodie.request.mostRecentCall.args
         
         it "should send a GET request to http://my.cou.ch/_users/org.couchdb.user%3Ajoe%40example.com", ->
-          expect(@app.request).wasCalled()
+          expect(@hoodie.request).wasCalled()
           expect(@type).toBe 'GET'
           expect(@path).toBe  '/_users/org.couchdb.user%3Ajoe%40example.com'
         
         _when "successful", ->
           beforeEach ->
             @response = {"_id":"org.couchdb.user:baz","_rev":"3-33e4d43a6dff5b29a4bd33f576c7824f","name":"baz","user_data":{"funky":"fresh"},"salt":"82163606fa5c100e0095ad63598de810","password_sha":"e2e2a4d99632dc5e3fdb41d5d1ff98743a1f344e","type":"user","roles":[]}
-            @app.request.andCallFake (type, path, options) => 
+            @hoodie.request.andCallFake (type, path, options) => 
               options.success @response
           
           it "should resolve its promise", ->
