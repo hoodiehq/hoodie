@@ -14,7 +14,7 @@ define 'hoodie', ['hoodie/events', 'hoodie/store', 'hoodie/account', 'hoodie/rem
     # ## initialization
     #
     # Inits the Hoodie, a couchDB URL needs to be passed
-    constructor : (@base_url) ->
+    constructor : (@base_url = '') ->
     
       # remove trailing slash(es)
       @base_url = @base_url.replace /\/+$/, ''
