@@ -15,19 +15,18 @@
 // 
 // 
 //     {
-//       _id         : "sharing/abc4567",
-//       type        : "sharing",
-//       private     : true,
-//       continuous  : true,
-//       collaborate : true,
-//       source      : 'user_db1',
-//       target      : 'user_db2',
-//       via         : 'abc4567',
-//       status      : 'active',
-//       filter      : function(doc) { return doc.shared },
-//       approved_at : '2012-03-29T20:01:58.331Z',
-//       created_at  : '2012-03-29T20:01:58.331Z',
-//       updated_at  : '2012-03-29T20:01:58.331Z'
+//       _id           : "sharing/abc4567",
+//       type          : "$sharing",
+//       private       : false,
+//       continuous    : false,
+//       collaborative : false,
+//       filter        : "function(doc) { return doc.shared }",
+//       recipients    : ['joe@example.com', 'joey@eaxmle.com'],
+// 
+//       status        : "done",
+//       done_at       : "2012-04-29T20:01:58.331Z",
+//       created_at    : "2012-03-29T20:01:58.331Z",
+//       updated_at    : "2012-03-29T20:01:58.331Z" 
 //     }
 // 
 
@@ -48,7 +47,7 @@ app.sharing.open('anonymous_id345').loadAll().done( /* ... */ )
 // ### Share all my data (manually)
 // 
 // I want to make all my current data and make it accessible by others, without exposing my user_db
-app.sharing.save({target: 'uuid567'}).done( function(sharing) {
+app.sharing.create().done( function(sharing) {
   alert('your data has been shared.')
 })
 
@@ -56,20 +55,15 @@ app.sharing.save({target: 'uuid567'}).done( function(sharing) {
 // 
 // after I made changes, I might want to share my data again. I don't want
 // a new DB to be created, instead, I want my shared docs to be updated
-app.sharing.load('uuid567').restart()
-
-// has the same effect:
-app.sharing.save({target: 'uuid567'})
+app.sharing.load('uuid567').update()
 
 // ### Share only objects of one specific type
-app.sharing.save({
-  id     : 'shared_uuid567',
+app.sharing.create({
   filter : { type: 'type'}
 }).done( /* ... */ )
 
 // ### Share only on specific object
 app.sharing.save({
-  target : 'shared_uuid567',
   filter : { type: 'type', id: 'uuid567'}
 }).done( /* ... */ )
 
@@ -78,7 +72,6 @@ app.sharing.save({
 // custom filters are simple JavaScript functions. Any object gets passed as parameter,
 // one by one. When the filter returns true, share the doc, otherwise not.
 app.sharing.save({
-  target : 'uuid567',
   filter : function(obj) { return obj.is_public }
 }).done( /* ... */ )
 
@@ -86,7 +79,6 @@ app.sharing.save({
 // 
 // instead of updating my shared data manually, I can set it to be continuously updated
 app.sharing.save({
-  target       : 'uuid567',
   continuously : true
 })
 
@@ -126,6 +118,5 @@ app.sharing.open( shared_id ).on('destroyed:type', function(id, object) { /* ...
 
 app.sharing.save({
   target    : 'joe@example.com',
-  via       : 'uuid4567'
-  'private' : true
+  private   : true
 })

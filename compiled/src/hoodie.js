@@ -11,7 +11,7 @@ define('hoodie', ['hoodie/events', 'hoodie/store', 'hoodie/account', 'hoodie/rem
     Hoodie.name = 'Hoodie';
 
     function Hoodie(base_url) {
-      this.base_url = base_url;
+      this.base_url = base_url != null ? base_url : '';
       this.base_url = this.base_url.replace(/\/+$/, '');
       this.store = new Store(this);
       this.account = new Account(this);

@@ -14,6 +14,11 @@ define 'specs/hoodie', ['hoodie'], (Hoodie) ->
       it "should remove trailing slash from passed URL", ->
         hoodie = new Hoodie 'http://couch.example.com/'
         expect(hoodie.base_url).toBe 'http://couch.example.com'
+        
+      it "should default the couchDB URL to ''", ->
+        hoodie = new Hoodie
+        expect(hoodie.base_url).toBe ''
+      
     # /new
     
     describe "request(type, path, options)", ->

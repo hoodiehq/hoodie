@@ -12,10 +12,15 @@ define('specs/hoodie', ['hoodie'], function(Hoodie) {
         hoodie = new Hoodie('http://couch.example.com');
         return expect(hoodie.base_url).toBe('http://couch.example.com');
       });
-      return it("should remove trailing slash from passed URL", function() {
+      it("should remove trailing slash from passed URL", function() {
         var hoodie;
         hoodie = new Hoodie('http://couch.example.com/');
         return expect(hoodie.base_url).toBe('http://couch.example.com');
+      });
+      return it("should default the couchDB URL to ''", function() {
+        var hoodie;
+        hoodie = new Hoodie;
+        return expect(hoodie.base_url).toBe('');
       });
     });
     return describe("request(type, path, options)", function() {
