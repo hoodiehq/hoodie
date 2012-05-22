@@ -13,7 +13,7 @@ define 'hoodie', ['hoodie/events', 'hoodie/store', 'hoodie/account', 'hoodie/rem
   
     # ## initialization
     #
-    # Inits the Hoodie, a couchDB URL needs to be passed
+    # Inits the Hoodie, an optional couchDB URL can be passed
     constructor : (@base_url = '') ->
     
       # remove trailing slash(es)
@@ -23,7 +23,6 @@ define 'hoodie', ['hoodie/events', 'hoodie/store', 'hoodie/account', 'hoodie/rem
       @account = new Account this
       @remote  = new Remote  this
       @email   = new Email   this
-      
     
     # ## Request
     #
