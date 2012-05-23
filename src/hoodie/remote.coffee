@@ -39,7 +39,7 @@ define 'hoodie/remote', ['hoodie/errors'], (ERROR) ->
       @_connected = false
       @_changes_request?.abort()
       
-      @hoodie.store.db.removeItem '_couch.remote.seq'
+      @reset_seq()
       @hoodie.unbind 'store:dirty:idle', @push_changes
       delete @_seq
 
@@ -84,8 +84,9 @@ define 'hoodie/remote', ['hoodie/errors'], (ERROR) ->
     #
     # the `seq` number gets passed to couchDB's `_changes` feed.
     # 
-    get_seq :       -> @_seq or= @hoodie.store.db.getItem('_couch.remote.seq') or 0
-    set_seq : (seq) -> @_seq   = @hoodie.store.db.setItem('_couch.remote.seq', seq)
+    get_seq   :       -> @_seq or= @hoodie.store.db.getItem('_couch.remote.seq') or 0
+    set_seq   : (seq) -> @_seq   = @hoodie.store.db.setItem('_couch.remote.seq', seq)
+    reset_seq :       -> @hoodie.store.db.removeItem '_couch.remote.seq'
     
     
     # ## On

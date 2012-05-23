@@ -50,7 +50,7 @@ define('hoodie/remote', ['hoodie/errors'], function(ERROR) {
       if ((_ref = this._changes_request) != null) {
         _ref.abort();
       }
-      this.hoodie.store.db.removeItem('_couch.remote.seq');
+      this.reset_seq();
       this.hoodie.unbind('store:dirty:idle', this.push_changes);
       return delete this._seq;
     };
@@ -97,6 +97,10 @@ define('hoodie/remote', ['hoodie/errors'], function(ERROR) {
 
     Remote.prototype.set_seq = function(seq) {
       return this._seq = this.hoodie.store.db.setItem('_couch.remote.seq', seq);
+    };
+
+    Remote.prototype.reset_seq = function() {
+      return this.hoodie.store.db.removeItem('_couch.remote.seq');
     };
 
     Remote.prototype.on = function(event, cb) {
