@@ -86,4 +86,4 @@ define 'specs/email', ['mocks/hoodie', 'hoodie/email'], (HoodieMock, Email) ->
           @promise.fail @errorSpy
           (expect @errorSpy).wasCalledWith @email_response_attributes
     # /.send(email)
-  # /Remote
+  # /Email

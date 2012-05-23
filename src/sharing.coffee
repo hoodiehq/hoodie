@@ -21,7 +21,7 @@ define 'hoodie/sharing', ->
     #
     #     id:            (default: random uuid)
     #                    sets the name of your sharing.
-    #     filter:        (optional)
+    #     filters:       (optional)
     #                    one or multiple key/value hashes with conditions 
     #                    for the objects to be filtered.
     #     private:       (default: false)
@@ -50,7 +50,7 @@ define 'hoodie/sharing', ->
     #         "joey@example.com"
     #         "frank@example.com"
     #       ]
-    #       filter   : [
+    #       filters   : [
     #         id           : todo_list.id
     #         todo_list_id : todo_list.id
     #       ]
@@ -59,17 +59,38 @@ define 'hoodie/sharing', ->
     #     # shared and keep them updated
     #     hoodie.sharing.create
     #       continuous : true
-    #       filter     : shared: true
+    #       filters     : shared: true
     #
     create : (options) ->
       defer = @hoodie.defer()
       
       id              = options.id
       options.private = true if options.invitees?
+      if options.filters
+        unless Array.isArray options.filters
+          options.filters = [options.filters]
+        
+        conditions = []
+        for filter in options.filters
+          current_condition = []
+          for key, value of filter
+            
+            # no code injection, please
+            continue if /'/.test key
+            
+            if typeof value is 'string'
+              current_condition.push "obj['#{key}'] == '#{value}'"
+            else
+              current_condition.push "obj['#{key}'] == #{value}"
+              
+          conditions.push current_condition.join " && "
+          
+        options.filter = "function(obj) { return #{conditions.join " || "} }"
+        delete options.filters
       
       delete options.id
       @hoodie.store.save "$sharing", id, options
-      @hoodie.remote.one "created:$sharing:#{id}", defer.resolve
+      @hoodie.one "remote:created:$sharing:#{id}", defer.resolve
       
       defer.promise()
       

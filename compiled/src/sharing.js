@@ -11,15 +11,40 @@ define('hoodie/sharing', function() {
     }
 
     Sharing.prototype.create = function(options) {
-      var defer, id;
+      var conditions, current_condition, defer, filter, id, key, value, _i, _len, _ref;
       defer = this.hoodie.defer();
       id = options.id;
       if (options.invitees != null) {
         options["private"] = true;
       }
+      if (options.filters) {
+        if (!Array.isArray(options.filters)) {
+          options.filters = [options.filters];
+        }
+        conditions = [];
+        _ref = options.filters;
+        for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+          filter = _ref[_i];
+          current_condition = [];
+          for (key in filter) {
+            value = filter[key];
+            if (/'/.test(key)) {
+              continue;
+            }
+            if (typeof value === 'string') {
+              current_condition.push("obj['" + key + "'] == '" + value + "'");
+            } else {
+              current_condition.push("obj['" + key + "'] == " + value);
+            }
+          }
+          conditions.push(current_condition.join(" && "));
+        }
+        options.filter = "function(obj) { return " + (conditions.join(" || ")) + " }";
+        delete options.filters;
+      }
       delete options.id;
       this.hoodie.store.save("$sharing", id, options);
-      this.hoodie.remote.one("created:$sharing:" + id, defer.resolve);
+      this.hoodie.one("remote:created:$sharing:" + id, defer.resolve);
       return defer.promise();
     };
 

@@ -38,6 +38,36 @@ page = new WebPage()
 # Route "console.log()" calls from within the Page context to the main Phantom context (i.e. current "this")
 page.onConsoleMessage = (msg, line, file)-> 
   console.log msg
+  
+page.onError = (msg, trace) ->
+    
+    trace_parts =  for item in trace
+      "#{item.file}:#{item.line}"
+    
+    eval """
+         getScriptPosition = function() {
+           var line = #{trace[0].line},
+               before = 10,
+               after  = 10;
+           $.get('#{trace[0].file}', function(data) { 
+             lines = data.split(/\\n/)
+             
+             console.log("")
+             console.log("ERROR")
+             console.log("#{msg}")
+             console.log("")
+             console.log("#{trace_parts.shift()}")
+             for(var i = line - before; i <= line + after; i++) {
+               console.log(i, (i == line) ? ': => ' : ':    ', lines[i - 1])
+             }
+             console.log("")
+             console.log("TRACE")
+             console.log("#{trace_parts.join "\\n"}")
+           })
+         }
+         """
+    
+    page.evaluate getScriptPosition
 
 
 page.open phantom.args[0], (status) ->
