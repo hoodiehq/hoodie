@@ -11,11 +11,11 @@
 // 
 //    I've created stuff that I want to share with specific other accounts.
 // 
-// Sharings are special type of couchDB docs, they look like this:
+// Sharings are a special type of hoodie doc
 // 
 // 
 //     {
-//       _id           : "sharing/abc4567",
+//       id            : "abc4567",
 //       type          : "$sharing",
 //       private       : false,
 //       continuous    : false,
@@ -29,6 +29,15 @@
 //       updated_at    : "2012-03-29T20:01:58.331Z" 
 //     }
 // 
+//
+// Technically, for the couchDB implementation, there are two different types
+// of sharing:
+// 
+// 1. manual sharing, with manual pushing of the updates directly to the 
+//    shared database
+// 2. automated, continuous sharing
+// 
+// The former cannot be private, continuous or collaborative.
 
 // ### Making a user_db publict
 
