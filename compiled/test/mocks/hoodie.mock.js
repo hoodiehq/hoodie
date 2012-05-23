@@ -35,7 +35,8 @@ define('mocks/hoodie', function() {
       },
       save: function() {
         return {
-          then: function() {}
+          then: function() {},
+          done: function() {}
         };
       },
       changed_docs: function() {},

@@ -7,7 +7,7 @@ define 'specs/sharing', ['mocks/hoodie', 'hoodie/sharing'], (HoodieMock, Sharing
     
     describe ".create(options)", ->
       beforeEach ->
-        spyOn(@hoodie.store, "save")
+        spyOn(@hoodie.store, "save").andCallThrough()
       
       it "should set private to true when invitees passed", ->
         @sharing.create

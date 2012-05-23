@@ -8,7 +8,7 @@ define('specs/sharing', ['mocks/hoodie', 'hoodie/sharing'], function(HoodieMock,
     });
     return describe(".create(options)", function() {
       beforeEach(function() {
-        return spyOn(this.hoodie.store, "save");
+        return spyOn(this.hoodie.store, "save").andCallThrough();
       });
       it("should set private to true when invitees passed", function() {
         this.sharing.create({

@@ -4,7 +4,7 @@
 #
 # the door to world domination (apps)
 #
-define 'hoodie', ['hoodie/events', 'hoodie/store', 'hoodie/account', 'hoodie/remote', 'hoodie/email'], (Events, Store, Account, Remote, Email) ->
+define 'hoodie', ['hoodie/events', 'hoodie/store', 'hoodie/account', 'hoodie/remote', 'hoodie/email', 'hoodie/sharing'], (Events, Store, Account, Remote, Email, Sharing) ->
   
   # 'use strict'
 
@@ -19,10 +19,11 @@ define 'hoodie', ['hoodie/events', 'hoodie/store', 'hoodie/account', 'hoodie/rem
       # remove trailing slash(es)
       @base_url = @base_url.replace /\/+$/, ''
     
-      @store   = new Store   this
-      @account = new Account this
-      @remote  = new Remote  this
-      @email   = new Email   this
+      @store     = new Store   this
+      @account   = new Account this
+      @remote    = new Remote  this
+      @email     = new Email   this
+      @sharing   = new Sharing this
     
     # ## Request
     #

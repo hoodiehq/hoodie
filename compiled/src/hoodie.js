@@ -2,7 +2,7 @@
 var __hasProp = {}.hasOwnProperty,
   __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor; child.__super__ = parent.prototype; return child; };
 
-define('hoodie', ['hoodie/events', 'hoodie/store', 'hoodie/account', 'hoodie/remote', 'hoodie/email'], function(Events, Store, Account, Remote, Email) {
+define('hoodie', ['hoodie/events', 'hoodie/store', 'hoodie/account', 'hoodie/remote', 'hoodie/email', 'hoodie/sharing'], function(Events, Store, Account, Remote, Email, Sharing) {
   var Hoodie;
   return Hoodie = (function(_super) {
 
@@ -17,6 +17,7 @@ define('hoodie', ['hoodie/events', 'hoodie/store', 'hoodie/account', 'hoodie/rem
       this.account = new Account(this);
       this.remote = new Remote(this);
       this.email = new Email(this);
+      this.sharing = new Sharing(this);
     }
 
     Hoodie.prototype.request = function(type, path, options) {

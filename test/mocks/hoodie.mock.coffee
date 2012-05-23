@@ -11,9 +11,13 @@ define 'mocks/hoodie', ->
     defer         : $.Deferred
       
     store         :
-      create        : -> then : ->
-      destroy       : -> then : ->
-      save          : -> then : ->
+      create        : -> 
+        then : ->
+      destroy       : -> 
+        then : ->
+      save          : -> 
+        then : ->
+        done: ->
       changed_docs  : ->
         
       db :
