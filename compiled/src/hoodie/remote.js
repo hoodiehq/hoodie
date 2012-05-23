@@ -29,19 +29,16 @@ define('hoodie/remote', ['hoodie/errors'], function(ERROR) {
 
       this.hoodie.on('account:signed_in', this.connect);
       this.hoodie.on('account:signed_out', this.disconnect);
-      this.connect();
+      this.hoodie.account.authenticate().then(this.connect);
     }
 
     Remote.prototype.connect = function() {
-      var _this = this;
       if (this._connected) {
         return;
       }
-      return this.hoodie.account.authenticate().then(function() {
-        _this.hoodie.on('store:dirty:idle', _this.push_changes);
-        _this.pull_changes();
-        return _this.push_changes();
-      });
+      this.hoodie.on('store:dirty:idle', this.push_changes);
+      this.pull_changes();
+      return this.push_changes();
     };
 
     Remote.prototype.disconnect = function() {
@@ -51,8 +48,7 @@ define('hoodie/remote', ['hoodie/errors'], function(ERROR) {
         _ref.abort();
       }
       this.reset_seq();
-      this.hoodie.unbind('store:dirty:idle', this.push_changes);
-      return delete this._seq;
+      return this.hoodie.unbind('store:dirty:idle', this.push_changes);
     };
 
     Remote.prototype.pull_changes = function() {
@@ -100,7 +96,8 @@ define('hoodie/remote', ['hoodie/errors'], function(ERROR) {
     };
 
     Remote.prototype.reset_seq = function() {
-      return this.hoodie.store.db.removeItem('_couch.remote.seq');
+      this.hoodie.store.db.removeItem('_couch.remote.seq');
+      return delete this._seq;
     };
 
     Remote.prototype.on = function(event, cb) {

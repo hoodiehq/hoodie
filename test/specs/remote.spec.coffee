@@ -14,7 +14,6 @@ define 'specs/remote', ['hoodie/remote', 'mocks/hoodie', 'mocks/changes_response
     
     describe ".constructor(@hoodie)", ->
       beforeEach ->
-        spyOn(Remote.prototype, "connect")
         @remote = new Remote @hoodie
       
       it "should subscribe to `signed_in` event", ->
@@ -23,44 +22,44 @@ define 'specs/remote', ['hoodie/remote', 'mocks/hoodie', 'mocks/changes_response
       it "should subscribe to `signed_out` event", ->
         expect(@hoodie.on).wasCalledWith 'account:signed_out', @remote.disconnect
         
-      it "should connect", ->
-        # why doesn't work @remote.connect?
-        expect(Remote::connect).wasCalled()
+        
+      _when "account is authenticated", ->
+        beforeEach ->
+          spyOn(Remote.prototype, "connect")
+          spyOn(@hoodie.account, "authenticate").andReturn then: (cb) -> cb()
+          
+        it "should connect", ->
+          remote = new Remote @hoodie
+          # why doesn't work @remote.connect?
+          expect(Remote::connect).wasCalled()
+          
+      _when "account is not authenticated", ->
+        beforeEach ->
+          spyOn(Remote.prototype, "connect")
+          spyOn(@hoodie.account, "authenticate").andReturn then: -> null
+          
+        it "should not connect", ->
+          remote = new Remote @hoodie
+          # why doesn't work @remote.connect?
+          expect(Remote::connect).wasNotCalled()
+        
     # /.constructor(@hoodie)
     
     describe ".connect()", ->  
       beforeEach ->
         spyOn(@remote, "pull_changes")
         spyOn(@remote, "push_changes")
-        
-      _when "account is authenticated", ->
-        beforeEach ->
-          spyOn(@hoodie.account, "authenticate").andReturn
-            then: (cb) -> cb()
-          @remote.connect()
-        
-        it "should pull changes", ->
-          expect(@remote.pull_changes).wasCalled()
-        
-        it "should push changes", ->
-          expect(@remote.push_changes).wasCalled()
-        
-        it "should subscribe to account's dirty idle event", ->
-          expect(@hoodie.on).wasCalledWith 'store:dirty:idle', @remote.push_changes
+        @remote.connect()
           
-      _when "account is not authenticated", ->
-        beforeEach ->
-          spyOn(@hoodie.account, "authenticate").andReturn then: -> null
-          @remote.connect()
-          
-        it "shouldn't pull changes", ->
-          expect(@remote.pull_changes).wasNotCalled()
         
-        it "shouldn't push changes", ->
-          expect(@remote.push_changes).wasNotCalled()
-        
-        it "shouldn't subscribe to account's dirty idle event", ->
-          expect(@hoodie.on).wasNotCalled()
+      it "should pull changes", ->
+        expect(@remote.pull_changes).wasCalled()
+      
+      it "should push changes", ->
+        expect(@remote.push_changes).wasCalled()
+      
+      it "should subscribe to account's dirty idle event", ->
+        expect(@hoodie.on).wasCalledWith 'store:dirty:idle', @remote.push_changes
     # /.connect()
     
     describe ".disconnect()", ->  

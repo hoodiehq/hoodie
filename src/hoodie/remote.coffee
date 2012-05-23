@@ -17,7 +17,7 @@ define 'hoodie/remote', ['hoodie/errors'], (ERROR) ->
       
       @hoodie.on 'account:signed_in',  @connect
       @hoodie.on 'account:signed_out', @disconnect
-      @connect()
+      @hoodie.account.authenticate().then @connect
       
       
     # ## Connect
@@ -26,10 +26,9 @@ define 'hoodie/remote', ['hoodie/errors'], (ERROR) ->
     connect : =>
       
       return if @_connected
-      @hoodie.account.authenticate().then =>
-        @hoodie.on 'store:dirty:idle', @push_changes
-        @pull_changes()
-        @push_changes()
+      @hoodie.on 'store:dirty:idle', @push_changes
+      @pull_changes()
+      @push_changes()
     
       
     # ## Disconnect
@@ -41,7 +40,6 @@ define 'hoodie/remote', ['hoodie/errors'], (ERROR) ->
       
       @reset_seq()
       @hoodie.unbind 'store:dirty:idle', @push_changes
-      delete @_seq
 
 
     # ## pull changes
@@ -86,7 +84,9 @@ define 'hoodie/remote', ['hoodie/errors'], (ERROR) ->
     # 
     get_seq   :       -> @_seq or= @hoodie.store.db.getItem('_couch.remote.seq') or 0
     set_seq   : (seq) -> @_seq   = @hoodie.store.db.setItem('_couch.remote.seq', seq)
-    reset_seq :       -> @hoodie.store.db.removeItem '_couch.remote.seq'
+    reset_seq : -> 
+      @hoodie.store.db.removeItem '_couch.remote.seq'
+      delete @_seq
     
     
     # ## On
