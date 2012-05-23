@@ -20,8 +20,8 @@
 //       private       : false,
 //       continuous    : false,
 //       collaborative : false,
-//       filter        : "function(doc) { return doc.shared }",
-//       recipients    : ['joe@example.com', 'joey@eaxmle.com'],
+//       filter        : {shared: true},
+//       invitees      : ['joe@example.com', 'joey@eaxmle.com'],
 // 
 //       status        : "done",
 //       done_at       : "2012-04-29T20:01:58.331Z",

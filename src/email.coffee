@@ -1,11 +1,8 @@
 #
-# Connection / Socket to our couch
-#
-# Remote is using couchDB's `_changes` feed to listen to changes
-# and `_bulk_docs` to push local changes
+# Sending emails. Not unicorns
 #
 
-define 'hoodie/email', ['hoodie/errors'], (ERROR) ->
+define 'hoodie/email', ->
   
   # 'use strict'
   

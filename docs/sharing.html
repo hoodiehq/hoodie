@@ -1,0 +1,54 @@
+<!DOCTYPE html>  <html> <head>   <title>sharing.coffee</title>   <meta http-equiv="content-type" content="text/html; charset=UTF-8">   <link rel="stylesheet" media="all" href="docco.css" /> </head> <body>   <div id="container">     <div id="background"></div>            <div id="jump_to">         Jump To &hellip;         <div id="jump_wrapper">           <div id="jump_page">                                           <a class="source" href="account.html">                 account.coffee               </a>                                           <a class="source" href="email.html">                 email.coffee               </a>                                           <a class="source" href="errors.html">                 errors.coffee               </a>                                           <a class="source" href="events.html">                 events.coffee               </a>                                           <a class="source" href="hoodie.html">                 hoodie.coffee               </a>                                           <a class="source" href="remote.html">                 remote.coffee               </a>                                           <a class="source" href="sharing.html">                 sharing.coffee               </a>                                           <a class="source" href="store.html">                 store.coffee               </a>                        </div>         </div>       </div>          <table cellpadding="0" cellspacing="0">       <thead>         <tr>           <th class="docs">             <h1>               sharing.coffee             </h1>           </th>           <th class="code">           </th>         </tr>       </thead>       <tbody>                               <tr id="section-1">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-1">&#182;</a>               </div>               <p>Sharing your data</p>             </td>             <td class="code">               <div class="highlight"><pre><span class="nx">define</span> <span class="s1">&#39;hoodie/sharing&#39;</span><span class="p">,</span> <span class="o">-&gt;</span>
+  </pre></div>             </td>           </tr>                               <tr id="section-2">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-2">&#182;</a>               </div>               <p>'use strict'</p>             </td>             <td class="code">               <div class="highlight"><pre>  
+  <span class="k">class</span> <span class="nx">Sharing</span>
+  </pre></div>             </td>           </tr>                               <tr id="section-3">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-3">&#182;</a>               </div>               <h2>Constructor</h2>             </td>             <td class="code">               <div class="highlight"><pre>    <span class="nv">constructor : </span><span class="nf">(@hoodie) -&gt;</span>
+      </pre></div>             </td>           </tr>                               <tr id="section-4">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-4">&#182;</a>               </div>               <h2>create</h2>
+
+<p>creates a new sharing &amp; returns a promise.
+Options</p>
+
+<pre><code>id:            _(default: random uuid)_
+               sets the name of your sharing.
+filter:        _(optional)_
+               one or multiple key/value hashes with conditions 
+               for the objects to be filtered.
+private:       _(default: false)_
+               when set to true, nobody but the creator and the
+               invitees have acces
+invitees:      _(optional)_
+               an array of user names (emails) that should have
+               to the shared documents
+continuous:    _(default: false)_
+               if set to true, the shared objects will be
+               continuously updated.
+collaborative: _(default: false)_
+               if set to true, others are invited to make changes
+               to the shared documents
+</code></pre>
+
+<p>Examples</p>
+
+<pre><code># share all my stuff
+hoodie.sharing.create().done (sharing) -&gt; 
+  alert "find by stuff at /#{sharing.id}"
+
+# share my todo list with Joey and Frank
+hoodie.sharing.create
+  private  : true
+  invitees : [
+    "joey@example.com"
+    "frank@example.com"
+  ]
+  filter   : [
+    id           : todo_list.id
+    todo_list_id : todo_list.id
+  ]
+
+# share all my documents that I marked as
+# shared and keep them updated
+hoodie.sharing.create
+  continuous : true
+  filter     : shared: true
+</code></pre>             </td>             <td class="code">               <div class="highlight"><pre>    
+
+</pre></div>             </td>           </tr>                </tbody>     </table>   </div> </body> </html> 
