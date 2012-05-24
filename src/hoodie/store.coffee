@@ -102,18 +102,20 @@ define 'hoodie/store', ['hoodie/errors'], (ERROR) ->
     #
     # `.create` is an alias for `.save`, with the difference that there is no id argument.
     # Internally it simply calls `.save(type, undefined, object).
-    create: (type, object, options = {}) ->
+    create : (type, object, options = {}) ->
       @save type, undefined, object
       
     # ## Update
     #
     # In contrast to `.save`, the `.update` method does not replace the stored object,
     # but only changes the passed attributes of an exsting object, if it exists
-    update: (type, id, object_update, options = {}) ->
+    update : (type, id, object_update, options = {}) ->
       
-      @load(type, id)
-      .pipe (current_obj) => 
+      promise = @load(type, id).pipe (current_obj) => 
         @save(type, id, $.extend(current_obj, object_update))
+        
+      # if not found, create it
+      promise.fail => @save(type, id, object_update)
     
     
     # ## load

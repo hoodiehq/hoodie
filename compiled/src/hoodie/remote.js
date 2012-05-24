@@ -76,7 +76,7 @@ define('hoodie/remote', ['hoodie/errors'], function(ERROR) {
         }
         return _results;
       }).call(this);
-      return this.hoodie.request('POST', "/" + (encodeURIComponent(this.hoodie.account.user_db())) + "/_bulk_docs", {
+      return this.hoodie.request('POST', "/" + (encodeURIComponent(this.hoodie.account.db())) + "/_bulk_docs", {
         dataType: 'json',
         processData: false,
         contentType: 'application/json',
@@ -88,15 +88,15 @@ define('hoodie/remote', ['hoodie/errors'], function(ERROR) {
     };
 
     Remote.prototype.get_seq = function() {
-      return this._seq || (this._seq = this.hoodie.store.db.getItem('_couch.remote.seq') || 0);
+      return this._seq || (this._seq = this.hoodie.config.get('_remote.seq') || 0);
     };
 
     Remote.prototype.set_seq = function(seq) {
-      return this._seq = this.hoodie.store.db.setItem('_couch.remote.seq', seq);
+      return this._seq = this.hoodie.config.set('_remote.seq', seq);
     };
 
     Remote.prototype.reset_seq = function() {
-      this.hoodie.store.db.removeItem('_couch.remote.seq');
+      this.hoodie.config.remove('_remote.seq');
       return delete this._seq;
     };
 
@@ -107,7 +107,7 @@ define('hoodie/remote', ['hoodie/errors'], function(ERROR) {
     Remote.prototype._changes_path = function() {
       var since;
       since = this.get_seq();
-      return "/" + (encodeURIComponent(this.hoodie.account.user_db())) + "/_changes?include_docs=true&heartbeat=10000&feed=longpoll&since=" + since;
+      return "/" + (encodeURIComponent(this.hoodie.account.db())) + "/_changes?include_docs=true&heartbeat=10000&feed=longpoll&since=" + since;
     };
 
     Remote.prototype._restart_changes_request = function() {

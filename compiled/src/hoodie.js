@@ -2,7 +2,7 @@
 var __hasProp = {}.hasOwnProperty,
   __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor; child.__super__ = parent.prototype; return child; };
 
-define('hoodie', ['hoodie/events', 'hoodie/store', 'hoodie/account', 'hoodie/remote', 'hoodie/email', 'hoodie/sharing'], function(Events, Store, Account, Remote, Email, Sharing) {
+define('hoodie', ['hoodie/events', 'hoodie/store', 'hoodie/account', 'hoodie/remote', 'hoodie/email', 'hoodie/sharing', 'hoodie/config'], function(Events, Store, Account, Remote, Email, Sharing, Config) {
   var Hoodie;
   return Hoodie = (function(_super) {
 
@@ -14,6 +14,7 @@ define('hoodie', ['hoodie/events', 'hoodie/store', 'hoodie/account', 'hoodie/rem
       this.base_url = base_url != null ? base_url : '';
       this.base_url = this.base_url.replace(/\/+$/, '');
       this.store = new Store(this);
+      this.config = new Config(this);
       this.account = new Account(this);
       this.remote = new Remote(this);
       this.email = new Email(this);

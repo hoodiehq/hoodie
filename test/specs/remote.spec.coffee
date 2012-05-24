@@ -65,10 +65,10 @@ define 'specs/remote', ['hoodie/remote', 'mocks/hoodie', 'mocks/changes_response
     describe ".disconnect()", ->  
       it "should reset the seq number", ->
         @remote._seq = 123
-        spyOn(@hoodie.store.db, "removeItem")
+        spyOn(@hoodie.config, "remove")
         @remote.disconnect()
         expect(@remote._seq).toBeUndefined()
-        expect(@hoodie.store.db.removeItem).wasCalledWith '_couch.remote.seq'
+        expect(@hoodie.config.remove).wasCalledWith '_remote.seq'
         
       it "should unsubscribe from account's dirty idle event", ->
         @remote.disconnect()
@@ -77,7 +77,7 @@ define 'specs/remote', ['hoodie/remote', 'mocks/hoodie', 'mocks/changes_response
     
     describe ".pull_changes()", ->  
       it "should send a longpoll GET request to user's db _changes feed", ->
-        spyOn(@hoodie.account, "user_db").andReturn 'joe$examle_com'
+        spyOn(@hoodie.account, "db").andReturn 'joe$examle_com'
         @remote.pull_changes()
         expect(@hoodie.request).wasCalled()
         [method, path] = @hoodie.request.mostRecentCall.args
@@ -195,7 +195,7 @@ define 'specs/remote', ['hoodie/remote', 'mocks/hoodie', 'mocks/changes_response
       _when "there is one deleted and one changed doc", ->
         beforeEach ->
           spyOn(@hoodie.store, "changed_docs").andReturn ChangedDocsMock()
-          spyOn(@hoodie.account, "user_db").andReturn 'joe$examle_com'
+          spyOn(@hoodie.account, "db").andReturn 'joe$examle_com'
           @remote.push_changes()
           expect(@hoodie.request).wasCalled()
           [@method, @path, @options] = @hoodie.request.mostRecentCall.args

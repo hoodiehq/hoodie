@@ -3,6 +3,7 @@
 define('specs/account', ['mocks/hoodie', 'hoodie/account'], function(HoodieMock, Account) {
   return describe("Account", function() {
     beforeEach(function() {
+      localStorage.clear();
       this.hoodie = new HoodieMock;
       this.account = new Account(this.hoodie);
       spyOn(this.hoodie, "request");
@@ -13,10 +14,10 @@ define('specs/account', ['mocks/hoodie', 'hoodie/account'], function(HoodieMock,
         spyOn(Account.prototype, "authenticate");
         return spyOn(Account.prototype, "on");
       });
-      _when("_couch.account.email is set", function() {
+      _when("_account.email is set", function() {
         return beforeEach(function() {
-          spyOn(this.hoodie.store.db, "getItem").andCallFake(function(key) {
-            if (key === '_couch.account.email') {
+          spyOn(this.hoodie.store, "get").andCallFake(function(key) {
+            if (key === '_account.email') {
               return 'joe@example.com';
             }
           });
@@ -46,14 +47,14 @@ define('specs/account', ['mocks/hoodie', 'hoodie/account'], function(HoodieMock,
     describe("event handlers", function() {
       describe("._handle_sign_in(@email)", function() {
         beforeEach(function() {
-          spyOn(this.hoodie.store.db, "setItem");
+          spyOn(this.hoodie.config, "set");
           return this.account._handle_sign_in('joe@example.com');
         });
         it("should set @email", function() {
           return expect(this.account.email).toBe('joe@example.com');
         });
-        it("should store @email persistantly", function() {
-          return expect(this.hoodie.store.db.setItem).wasCalledWith('_couch.account.email', 'joe@example.com');
+        it("should store @email to config", function() {
+          return expect(this.hoodie.config.set).wasCalledWith('_account.email', 'joe@example.com');
         });
         return it("should set _authenticated to true", function() {
           this.account._authenticated = false;
@@ -74,11 +75,11 @@ define('specs/account', ['mocks/hoodie', 'hoodie/account'], function(HoodieMock,
           return expect(this.account.email).toBeUndefined();
         });
         it("should store @email persistantly", function() {
-          spyOn(this.hoodie.store.db, "removeItem");
+          spyOn(this.hoodie.config, "remove");
           this.account._handle_sign_out({
             "ok": true
           });
-          return expect(this.hoodie.store.db.removeItem).wasCalledWith('_couch.account.email');
+          return expect(this.hoodie.config.remove).wasCalledWith('_account.email');
         });
         return it("should set _authenticated to false", function() {
           this.account._authenticated = true;
@@ -462,13 +463,13 @@ define('specs/account', ['mocks/hoodie', 'hoodie/account'], function(HoodieMock,
         return (expect(this.hoodie.on)).wasCalledWith('account:funky', party);
       });
     });
-    describe(".user_db", function() {
+    describe(".db", function() {
       return _when("email is set to 'joe.doe@example.com'", function() {
         beforeEach(function() {
           return this.account.email = 'joe.doe@example.com';
         });
         return it("should return 'joe$example_com", function() {
-          return (expect(this.account.user_db())).toEqual('joe_doe$example_com');
+          return (expect(this.account.db())).toEqual('joe_doe$example_com');
         });
       });
     });

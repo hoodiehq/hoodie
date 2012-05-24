@@ -39,6 +39,20 @@ define('mocks/hoodie', function() {
           done: function() {}
         };
       },
+      update: function() {
+        return {
+          pipe: function() {},
+          fail: function() {},
+          done: function() {}
+        };
+      },
+      load: function() {
+        return {
+          pipe: function() {},
+          fail: function() {},
+          done: function() {}
+        };
+      },
       changed_docs: function() {},
       db: {
         getItem: function() {},
@@ -53,8 +67,14 @@ define('mocks/hoodie', function() {
           then: function() {}
         };
       },
-      user_db: function() {},
+      db: function() {},
       on: function() {}
+    };
+
+    HoodieMock.prototype.config = {
+      set: function() {},
+      get: function() {},
+      remove: function() {}
     };
 
     return HoodieMock;

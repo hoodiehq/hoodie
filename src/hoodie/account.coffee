@@ -16,7 +16,7 @@ define 'hoodie/account', ->
     constructor : (@hoodie) ->
       
       # handle evtl session
-      @email = @hoodie.store.db.getItem '_couch.account.email'
+      @email = @hoodie.config.get '_account.email'
       @authenticate()
       
       @on 'signed_in',  @_handle_sign_in
@@ -184,7 +184,7 @@ define 'hoodie/account', ->
     # alias for `hoodie.on`
     on : (event, cb) -> @hoodie.on "account:#{event}", cb
     
-    # ## user_db
+    # ## db
     #
     # escape user email (or what ever he uses to sign up)
     # to make it a valid couchDB database name
@@ -198,7 +198,7 @@ define 'hoodie/account', ->
     #      can't reverse because _ are valid before the @.
     #
     #
-    user_db : -> 
+    db : -> 
       @email?.toLowerCase().replace(/@/, "$").replace(/\./g, "_");
       
     # ## fetch
@@ -239,11 +239,11 @@ define 'hoodie/account', ->
     
     #
     _handle_sign_in: (@email) =>
-      @hoodie.store.db.setItem '_couch.account.email', @email
+      @hoodie.config.set '_account.email', @email
       @_authenticated = true
     
     #
     _handle_sign_out: =>
       delete @email
-      @hoodie.store.db.removeItem '_couch.account.email'
+      @hoodie.config.remove '_account.email'
       @_authenticated = false

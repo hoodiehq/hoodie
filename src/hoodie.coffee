@@ -4,12 +4,11 @@
 #
 # the door to world domination (apps)
 #
-define 'hoodie', ['hoodie/events', 'hoodie/store', 'hoodie/account', 'hoodie/remote', 'hoodie/email', 'hoodie/sharing'], (Events, Store, Account, Remote, Email, Sharing) ->
+define 'hoodie', ['hoodie/events', 'hoodie/store', 'hoodie/account', 'hoodie/remote', 'hoodie/email', 'hoodie/sharing', 'hoodie/config'], (Events, Store, Account, Remote, Email, Sharing, Config) ->
   
   # 'use strict'
 
   class Hoodie extends Events
-  
   
     # ## initialization
     #
@@ -19,7 +18,8 @@ define 'hoodie', ['hoodie/events', 'hoodie/store', 'hoodie/account', 'hoodie/rem
       # remove trailing slash(es)
       @base_url = @base_url.replace /\/+$/, ''
     
-      @store     = new Store   this
+      @store     = new Store   this      
+      @config    = new Config  this
       @account   = new Account this
       @remote    = new Remote  this
       @email     = new Email   this

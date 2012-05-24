@@ -15,7 +15,7 @@ define('hoodie/account', function() {
 
       this._handle_sign_in = __bind(this._handle_sign_in, this);
 
-      this.email = this.hoodie.store.db.getItem('_couch.account.email');
+      this.email = this.hoodie.config.get('_account.email');
       this.authenticate();
       this.on('signed_in', this._handle_sign_in);
       this.on('signed_out', this._handle_sign_out);
@@ -184,7 +184,7 @@ define('hoodie/account', function() {
       return this.hoodie.on("account:" + event, cb);
     };
 
-    Account.prototype.user_db = function() {
+    Account.prototype.db = function() {
       var _ref;
       return (_ref = this.email) != null ? _ref.toLowerCase().replace(/@/, "$").replace(/\./g, "_") : void 0;
     };
@@ -232,13 +232,13 @@ define('hoodie/account', function() {
 
     Account.prototype._handle_sign_in = function(email) {
       this.email = email;
-      this.hoodie.store.db.setItem('_couch.account.email', this.email);
+      this.hoodie.config.set('_account.email', this.email);
       return this._authenticated = true;
     };
 
     Account.prototype._handle_sign_out = function() {
       delete this.email;
-      this.hoodie.store.db.removeItem('_couch.account.email');
+      this.hoodie.config.remove('_account.email');
       return this._authenticated = false;
     };
 

@@ -18,6 +18,14 @@ define 'mocks/hoodie', ->
       save          : -> 
         then : ->
         done: ->
+      update        : -> 
+        pipe : ->
+        fail : ->
+        done : ->
+      load          : -> 
+        pipe : ->
+        fail : ->
+        done : ->
       changed_docs  : ->
         
       db :
@@ -27,5 +35,10 @@ define 'mocks/hoodie', ->
                     
     account       : 
       authenticate  : -> then : ->   
-      user_db       : ->
+      db       : ->
       on            : ->
+        
+    config :
+      set : ->
+      get : ->
+      remove : ->

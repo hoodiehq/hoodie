@@ -17,13 +17,14 @@ define 'hoodie/remote', ['hoodie/errors'], (ERROR) ->
       
       @hoodie.on 'account:signed_in',  @connect
       @hoodie.on 'account:signed_out', @disconnect
+      
       @hoodie.account.authenticate().then @connect
       
       
     # ## Connect
     #
     # start pulling changes from the userDB
-    connect : =>
+    connect : () =>
       
       return if @_connected
       @hoodie.on 'store:dirty:idle', @push_changes
@@ -69,7 +70,7 @@ define 'hoodie/remote', ['hoodie/errors'], (ERROR) ->
       docs = for doc in docs
         @_parse_for_remote doc 
       
-      @hoodie.request 'POST', "/#{encodeURIComponent @hoodie.account.user_db()}/_bulk_docs", 
+      @hoodie.request 'POST', "/#{encodeURIComponent @hoodie.account.db()}/_bulk_docs", 
         dataType:     'json'
         processData:  false
         contentType:  'application/json'
@@ -82,10 +83,10 @@ define 'hoodie/remote', ['hoodie/errors'], (ERROR) ->
     #
     # the `seq` number gets passed to couchDB's `_changes` feed.
     # 
-    get_seq   :       -> @_seq or= @hoodie.store.db.getItem('_couch.remote.seq') or 0
-    set_seq   : (seq) -> @_seq   = @hoodie.store.db.setItem('_couch.remote.seq', seq)
+    get_seq   :       -> @_seq or= @hoodie.config.get('_remote.seq') or 0
+    set_seq   : (seq) -> @_seq   = @hoodie.config.set('_remote.seq', seq)
     reset_seq : -> 
-      @hoodie.store.db.removeItem '_couch.remote.seq'
+      @hoodie.config.remove '_remote.seq'
       delete @_seq
     
     
@@ -104,7 +105,7 @@ define 'hoodie/remote', ['hoodie/errors'], (ERROR) ->
     #
     _changes_path : ->
       since = @get_seq()
-      "/#{encodeURIComponent @hoodie.account.user_db()}/_changes?include_docs=true&heartbeat=10000&feed=longpoll&since=#{since}"
+      "/#{encodeURIComponent @hoodie.account.db()}/_changes?include_docs=true&heartbeat=10000&feed=longpoll&since=#{since}"
     
     # request gets restarted automaticcally in @_changes_error
     _restart_changes_request: => @_changes_request?.abort()

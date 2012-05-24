@@ -109,12 +109,16 @@ define('hoodie/store', ['hoodie/errors'], function(ERROR) {
     };
 
     Store.prototype.update = function(type, id, object_update, options) {
-      var _this = this;
+      var promise,
+        _this = this;
       if (options == null) {
         options = {};
       }
-      return this.load(type, id).pipe(function(current_obj) {
+      promise = this.load(type, id).pipe(function(current_obj) {
         return _this.save(type, id, $.extend(current_obj, object_update));
+      });
+      return promise.fail(function() {
+        return _this.save(type, id, object_update);
       });
     };
 

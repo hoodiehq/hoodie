@@ -2,6 +2,7 @@ define 'specs/account', ['mocks/hoodie', 'hoodie/account'], (HoodieMock, Account
   
   describe "Account", ->
     beforeEach ->
+      localStorage.clear()
       @hoodie = new HoodieMock
       @account = new Account @hoodie    
     
@@ -15,10 +16,10 @@ define 'specs/account', ['mocks/hoodie', 'hoodie/account'], (HoodieMock, Account
         spyOn(Account.prototype, "authenticate")
         spyOn(Account.prototype, "on")
       
-      _when "_couch.account.email is set", ->
+      _when "_account.email is set", ->
         beforeEach ->
-          spyOn(@hoodie.store.db, "getItem").andCallFake (key) ->
-            if key is '_couch.account.email'
+          spyOn(@hoodie.store, "get").andCallFake (key) ->
+            if key is '_account.email'
               return 'joe@example.com'
               
           it "should set @email", ->
@@ -42,14 +43,14 @@ define 'specs/account', ['mocks/hoodie', 'hoodie/account'], (HoodieMock, Account
     describe "event handlers", ->
       describe "._handle_sign_in(@email)", ->
         beforeEach ->
-          spyOn(@hoodie.store.db, "setItem")
+          spyOn(@hoodie.config, "set")
           @account._handle_sign_in 'joe@example.com'
         
         it "should set @email", ->
           expect(@account.email).toBe 'joe@example.com'
           
-        it "should store @email persistantly", ->
-          expect(@hoodie.store.db.setItem).wasCalledWith '_couch.account.email', 'joe@example.com'
+        it "should store @email to config", ->
+          expect(@hoodie.config.set).wasCalledWith '_account.email', 'joe@example.com'
           
         it "should set _authenticated to true", ->
           @account._authenticated = false
@@ -64,9 +65,9 @@ define 'specs/account', ['mocks/hoodie', 'hoodie/account'], (HoodieMock, Account
           do expect(@account.email).toBeUndefined
           
         it "should store @email persistantly", ->
-          spyOn(@hoodie.store.db, "removeItem")
+          spyOn(@hoodie.config, "remove")
           @account._handle_sign_out {"ok":true}
-          expect(@hoodie.store.db.removeItem).wasCalledWith '_couch.account.email'
+          expect(@hoodie.config.remove).wasCalledWith '_account.email'
           
         it "should set _authenticated to false", ->
           @account._authenticated = true
@@ -377,14 +378,14 @@ define 'specs/account', ['mocks/hoodie', 'hoodie/account'], (HoodieMock, Account
     # /.on(event, callback)
     
     
-    describe ".user_db", ->
+    describe ".db", ->
       _when "email is set to 'joe.doe@example.com'", ->
         beforeEach ->
           @account.email = 'joe.doe@example.com'
         
         it "should return 'joe$example_com", ->
-          (expect @account.user_db()).toEqual('joe_doe$example_com')
-    # /.user_db()
+          (expect @account.db()).toEqual('joe_doe$example_com')
+    # /.db()
     
     describe ".fetch()", ->
       

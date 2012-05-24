@@ -81,10 +81,10 @@ define('specs/remote', ['hoodie/remote', 'mocks/hoodie', 'mocks/changes_response
     describe(".disconnect()", function() {
       it("should reset the seq number", function() {
         this.remote._seq = 123;
-        spyOn(this.hoodie.store.db, "removeItem");
+        spyOn(this.hoodie.config, "remove");
         this.remote.disconnect();
         expect(this.remote._seq).toBeUndefined();
-        return expect(this.hoodie.store.db.removeItem).wasCalledWith('_couch.remote.seq');
+        return expect(this.hoodie.config.remove).wasCalledWith('_remote.seq');
       });
       return it("should unsubscribe from account's dirty idle event", function() {
         this.remote.disconnect();
@@ -94,7 +94,7 @@ define('specs/remote', ['hoodie/remote', 'mocks/hoodie', 'mocks/changes_response
     describe(".pull_changes()", function() {
       it("should send a longpoll GET request to user's db _changes feed", function() {
         var method, path, _ref;
-        spyOn(this.hoodie.account, "user_db").andReturn('joe$examle_com');
+        spyOn(this.hoodie.account, "db").andReturn('joe$examle_com');
         this.remote.pull_changes();
         expect(this.hoodie.request).wasCalled();
         _ref = this.hoodie.request.mostRecentCall.args, method = _ref[0], path = _ref[1];
@@ -240,7 +240,7 @@ define('specs/remote', ['hoodie/remote', 'mocks/hoodie', 'mocks/changes_response
         beforeEach(function() {
           var _ref;
           spyOn(this.hoodie.store, "changed_docs").andReturn(ChangedDocsMock());
-          spyOn(this.hoodie.account, "user_db").andReturn('joe$examle_com');
+          spyOn(this.hoodie.account, "db").andReturn('joe$examle_com');
           this.remote.push_changes();
           expect(this.hoodie.request).wasCalled();
           return _ref = this.hoodie.request.mostRecentCall.args, this.method = _ref[0], this.path = _ref[1], this.options = _ref[2], _ref;
