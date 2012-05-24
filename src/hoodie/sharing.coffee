@@ -2,6 +2,38 @@
 # Sharing your data
 #
 
+#
+# technically, sharing works in two different ways, depending on whether the user has an
+# account or not.
+#
+# 1. with account
+#
+#    If the user has an account, sharing is handled by the $sharing backend worker. When
+#    a sharing gets created, a $sharing doc gets stored and synched to users database.
+#    From there the $sharing worker handles the rest:
+#    
+#    * creating a sharing database
+#    * creating a user if a password is used
+#    * handling the replications
+#
+#    The worker updates the $sharing doc status, which gets synched back to the frontend.
+#    When the user deletes the $sharing doc, the worker removes the database, the user
+#    and all replications
+#
+# 2. without an account
+#
+#    If the use has no account, the $sharing database gets created right from the frontend.
+#    With an adjusted Hoodie class, a special user for the sharing gets created, which will
+#    also create a sharing database with the help of the userDB worker. Once the db is
+#    created, the docs, filtered by the sharing filter, will be pushed to the sharing database.
+#
+#    When the sharing gets destroyed, the sharing user will me deleted and the userDB worker
+#    will handle the rest.
+#
+#    Once a user signes up, the custom $sharing sockets will be closed and the $sharing workers
+#    will take over.
+#
+
 define 'hoodie/sharing', ->
   
   # 'use strict'
