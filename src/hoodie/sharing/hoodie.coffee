@@ -11,6 +11,6 @@ define 'hoodie/sharing/hoodie', ['hoodie'], (Hoodie) ->
     modules: ['hoodie/account', 'hoodie/remote'] 
     
     constructor: (hoodie, sharing) ->
-      @config = sharing.config
       @store  = hoodie.store
+      @config = sharing.config
       super(hoodie.base_url)

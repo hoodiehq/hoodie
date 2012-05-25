@@ -2,9 +2,34 @@
 
 define('specs/hoodie/sharing/instance', ['mocks/hoodie', 'hoodie/sharing/instance'], function(HoodieMock, SharingInstance) {
   return describe("SharingInstance", function() {
-    return beforeEach(function() {
+    beforeEach(function() {
       this.hoodie = new HoodieMock;
       return this.sharing = new SharingInstance(this.hoodie);
+    });
+    describe("constructor", function() {
+      return it("should set private to true when invitees passed", function() {
+        var sharing;
+        sharing = new SharingInstance(this.hoodie, {
+          invitees: ['joe@example.com', 'bill@example.com']
+        });
+        return expect(sharing["private"]).toBeTruthy();
+      });
+    });
+    return describe("attributes(options)", function() {
+      return it("should turn passed filters into a stringified fuction", function() {
+        var attributes;
+        attributes = this.sharing.attributes({
+          filters: [
+            {
+              shared: true,
+              "public": true,
+              price: 0,
+              autor: "Joe Doe"
+            }
+          ]
+        });
+        return expect(attributes.filter).toBe("function(obj) { return obj['shared'] == true && obj['public'] == true && obj['price'] == 0 && obj['autor'] == 'Joe Doe' }");
+      });
     });
   });
 });

@@ -13,8 +13,8 @@ define('hoodie/sharing/hoodie', ['hoodie'], function(Hoodie) {
     SharingHoodie.prototype.modules = ['hoodie/account', 'hoodie/remote'];
 
     function SharingHoodie(hoodie, sharing) {
-      this.config = sharing.config;
       this.store = hoodie.store;
+      this.config = sharing.config;
       SharingHoodie.__super__.constructor.call(this, hoodie.base_url);
     }
 

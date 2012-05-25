@@ -43,6 +43,7 @@ define 'specs/hoodie/account', ['mocks/hoodie', 'hoodie/account'], (HoodieMock, 
     describe "event handlers", ->
       describe "._handle_sign_in(@username)", ->
         beforeEach ->
+          expect(@account.username).toBeUndefined()
           spyOn(@hoodie.config, "set")
           @account._handle_sign_in 'joe@example.com'
         
@@ -54,7 +55,7 @@ define 'specs/hoodie/account', ['mocks/hoodie', 'hoodie/account'], (HoodieMock, 
           
         it "should set _authenticated to true", ->
           @account._authenticated = false
-          @account._handle_sign_in {"ok":true,"name":"joe@example.com","roles":[]}
+          @account._handle_sign_in "joe@example.com"
           expect(@account._authenticated).toBe true
       # /._handle_sign_in(@username)
       
@@ -146,6 +147,7 @@ define 'specs/hoodie/account', ['mocks/hoodie', 'hoodie/account'], (HoodieMock, 
           _when "authentication request is successful and returns `name: joe@example.com`", ->
             beforeEach ->
               @hoodie.request.andCallFake (type, path, options = {}) -> options.success? userCtx: name: null
+              @account.username = 'joe@example.com'
               @promise = @account.authenticate()
               
             it "should set account as unauthenticated", ->
@@ -157,6 +159,9 @@ define 'specs/hoodie/account', ['mocks/hoodie', 'hoodie/account'], (HoodieMock, 
             it "should trigger an `account:error:unauthenticated` event", ->
               expect(@hoodie.trigger).wasCalledWith 'account:error:unauthenticated'
               
+            it "should unset username", ->
+              expect(@account.username).toBeUndefined()
+              
           _when "authentication request has an error", ->
             beforeEach ->
               @hoodie.request.andCallFake (type, path, options = {}) -> options.error? responseText: 'error data'
@@ -164,6 +169,7 @@ define 'specs/hoodie/account', ['mocks/hoodie', 'hoodie/account'], (HoodieMock, 
             
             it "should reject the promise", ->
               expect(@promise).toBeRejectedWith error: 'error data'
+            
     # /.authenticate()
   
   

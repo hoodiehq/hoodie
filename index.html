@@ -7,8 +7,8 @@
   <script src="vendor/jquery-1.7.2.min.js"></script>
   
   <script>
-    require(["compiled/src/errors.js", "compiled/src/events.js", "compiled/src/store.js", "compiled/src/account.js", "compiled/src/remote.js", "compiled/src/email.js"], function() {
-      require(["compiled/src/hoodie.js"])
+    require.config({
+      baseUrl: "./compiled/src/",
     })
   </script>
   
@@ -23,34 +23,34 @@
     // initialize your Hoodie App
     Hoodie = require('hoodie');
     couchDB_endpoint = 'http://corscouch.example.com';
-    app = new Hoodie(couchDB_endpoint);
+    hoodie = new Hoodie(couchDB_endpoint);
     
     // 
     // Account 
     //
     
     // sign up
-    app.account.sign_up('joe@example.com', 'secret')
+    hoodie.account.sign_up('joe@example.com', 'secret')
       .done( function(user) { } ) 
       .fail( function(err)  { } )
       
     // sign in
-    app.account.sign_in('joe@example.com', 'secret')
+    hoodie.account.sign_in('joe@example.com', 'secret')
       .done( function(user) { } ) 
       .fail( function(err)  { } )
       
     // sign out
-    app.account.sign_out()
+    hoodie.account.sign_out()
       .done( function(user) { } ) 
       .fail( function(err)  { } )
     
     // change password (coming soon)
-    app.account.change_password('current_secret', 'new_secret')
+    hoodie.account.change_password('current_secret', 'new_secret')
       .done( function(user) { } ) 
       .fail( function(err)  { } )
       
     // forgot password (coming soon)
-    app.account.forgot_password('joe@example.com')
+    hoodie.account.forgot_password('joe@example.com')
       .done( function(user) { } ) 
       .fail( function(err)  { } )
       
@@ -59,12 +59,12 @@
     //
     
     // helper to generate uuids
-    uuid = app.store.uuid(length)
+    uuid = hoodie.store.uuid(length)
     
     // create a new object
     type = 'couch'
     attributes = {color: "red"}
-    app.store.create(type, attributes )
+    hoodie.store.create(type, attributes )
       .done ( function(new_object) { } )
       .fail ( function(err)        { } )
       
@@ -72,7 +72,7 @@
     type = 'couch'
     id   = 'abc4567'
     attributes  = {color: "red", name: "relax"}
-    app.store.save( type, id, attributes )
+    hoodie.store.save( type, id, attributes )
       .done ( function(new_object) { } )
       .fail ( function(err)        { } )
       
@@ -80,32 +80,32 @@
     type = 'couch'
     id   = 'abc4567'
     update = {size: 2}
-    app.store.update( type, id, update )
+    hoodie.store.update( type, id, update )
       .done ( function(updated_object) { } )
       .fail ( function(err)            { } )
     
     // load one object
     type = 'couch'
     id   = 'abc4567'
-    app.store.load( type, id )
+    hoodie.store.load( type, id )
       .done ( function(object) { } )
       .fail ( function(err)    { } )
       
     // Load all objects
-    app.store.loadAll()
+    hoodie.store.loadAll()
       .done ( function(objects) { } )
       .fail ( function(err)     { } )
       
     // Load all objects from one type
     type = 'couch'
-    app.store.loadAll( type )
+    hoodie.store.loadAll( type )
       .done ( function(objects) { } )
       .fail ( function(err)     { } )
       
     // delete an existing object
     type = 'couch'
     id   = 'abc4567'
-    app.store.delete( type, id )
+    hoodie.store.delete( type, id )
       .done ( function(deleted_object) { } )
       .fail ( function(err)            { } )
       
@@ -117,22 +117,22 @@
     // 
     
     // new doc created
-    app.remote.on( 'created', function( type, id, created_object) { } )
+    hoodie.remote.on( 'created', function( type, id, created_object) { } )
 
     // existing doc updated
-    app.remote.on( 'updated', function( type, id, updated_object) { } )
+    hoodie.remote.on( 'updated', function( type, id, updated_object) { } )
 
     // doc deleted
-    app.remote.on( 'deleted', function( type, id, deleted_object) { } )
+    hoodie.remote.on( 'deleted', function( type, id, deleted_object) { } )
 
     // any of above events
-    app.remote.on( 'changed', function( type, id, changed_object) { } )
+    hoodie.remote.on( 'changed', function( type, id, changed_object) { } )
 
     // all listeners can be filtered by type
-    app.remote.on( "created:couch", function( id, created_object) { } )
-    app.remote.on( "updated:couch", function( id, updated_object)  { } )
-    app.remote.on( "deleted:couch", function( id, deleted_object) { } )
-    app.remote.on( "changed:couch", function( id, changed_object) { } )
+    hoodie.remote.on( "created:couch", function( id, created_object) { } )
+    hoodie.remote.on( "updated:couch", function( id, updated_object)  { } )
+    hoodie.remote.on( "deleted:couch", function( id, deleted_object) { } )
+    hoodie.remote.on( "changed:couch", function( id, changed_object) { } )
     
     //
     // Send emails (coming soon)
@@ -144,7 +144,7 @@
       body    : "we can do it!\nSigned, Joe"
     }
 
-    app.email.send( email )
+    hoodie.email.send( email )
 
       // synched to server
       .progress ( function(email) { } )

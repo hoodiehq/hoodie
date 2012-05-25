@@ -6,33 +6,87 @@ define('hoodie/sharing/instance', ['hoodie/config'], function(Config) {
 
     SharingInstance.name = 'SharingInstance';
 
+    SharingInstance.prototype.anonymous = void 0;
+
     function SharingInstance(hoodie, attributes) {
-      var funky;
+      var _this = this;
       this.hoodie = hoodie;
       if (attributes == null) {
         attributes = {};
       }
-      attributes.id || (attributes.id = this.hoodie.store.uuid(7));
+      this.anonymous = this.hoodie.account.username === void 0;
+      this.attributes(attributes);
+      this.id || (this.id = this.hoodie.store.uuid(7));
       this.config = new Config(this.hoodie, {
         type: '$sharing',
-        id: attributes.id
+        id: this.id
       });
-      funky = 1;
+      if (this.anonymous) {
+        require(['hoodie/sharing/hoodie'], function(SharingHoodie) {
+          return _this.hoodie = new SharingHoodie(_this.hoodie, _this);
+        });
+      }
     }
+
+    SharingInstance.prototype.attributes = function(update) {
+      if (update) {
+        if (update.invitees != null) {
+          update["private"] = true;
+        }
+        if (!update.password) {
+          update.password = '';
+        }
+        this.id = update.id, this.filters = update.filters, this["private"] = update["private"], this.invitees = update.invitees, this.continuous = update.continuous, this.collaborative = update.collaborative;
+      }
+      return {
+        "private": this["private"],
+        invitees: this.invitees,
+        continuous: this.continuous,
+        collaborative: this.collaborative,
+        filter: this._turn_filters_into_function(this.filters)
+      };
+    };
 
     SharingInstance.prototype.create = function() {
       var defer,
         _this = this;
       defer = this.hoodie.defer();
-      if (options.invitees != null) {
-        options["private"] = true;
+      this.hoodie.store.save("$sharing", this.id, this.attributes());
+      if (this.anonymous) {
+        this.hoodie.account.sign_up("sharing/" + this.id, this.password).fail(function(error) {
+          if (error.error === 'conflict') {
+            return alert("sharing/" + _this.id + " has been shared before");
+          }
+        });
+      } else {
+        this.hoodie.one("remote:updated:$sharing:" + this.id, defer.resolve);
       }
-      options.filter = this._turn_filters_into_function(options.filters);
-      delete options.filters;
-      this.hoodie.store.save("$sharing", options.id, options).done(function(sharing) {
-        return _this.hoodie.one("remote:created:$sharing:" + sharing.id, defer.resolve);
-      });
       return defer.promise();
+    };
+
+    SharingInstance.prototype._turn_filters_into_function = function(filters) {
+      var all_conditions, current_condition, filter, key, value, _i, _len;
+      if (!filters) {
+        return;
+      }
+      all_conditions = [];
+      for (_i = 0, _len = filters.length; _i < _len; _i++) {
+        filter = filters[_i];
+        current_condition = [];
+        for (key in filter) {
+          value = filter[key];
+          if (/'/.test("" + key + value)) {
+            continue;
+          }
+          if (typeof value === 'string') {
+            current_condition.push("obj['" + key + "'] == '" + value + "'");
+          } else {
+            current_condition.push("obj['" + key + "'] == " + value);
+          }
+        }
+        all_conditions.push(current_condition.join(" && "));
+      }
+      return "function(obj) { return " + (all_conditions.join(" || ")) + " }";
     };
 
     return SharingInstance;

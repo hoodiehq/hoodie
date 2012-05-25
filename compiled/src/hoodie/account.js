@@ -42,6 +42,7 @@ define('hoodie/account', function() {
             return defer.resolve(_this.username);
           } else {
             _this._authenticated = false;
+            delete _this.username;
             _this.hoodie.trigger('account:error:unauthenticated');
             return defer.reject();
           }

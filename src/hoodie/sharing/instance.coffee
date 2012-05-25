@@ -2,19 +2,97 @@ define 'hoodie/sharing/instance', ['hoodie/config'], (Config) ->
 
   class SharingInstance
 
+    # if the current user isn't anonymous (has an accoutn), a backend worker is 
+    # used for the whole sharing magic, all we need to do is creating the $sharing 
+    # doc and listen to its remote changes
+    #
+    # if the user is anonymous, we need to handle it manually. To achieve that
+    # we use a customized hoodie, with a custom connection
+    anonymous: undefined
+      
     constructor: (@hoodie, attributes = {}) ->
-      attributes.id or= @hoodie.store.uuid(7)
-      @config = new Config @hoodie, type: '$sharing', id: attributes.id
-      funky = 1
+      
+      @anonymous = @hoodie.account.username is undefined
+      
+      # setting attributes
+      @attributes attributes
+      
+      # make sure we have an id, as we need it for the config
+      @id or= @hoodie.store.uuid(7)
+      
+      # user the $sharing doc directly for configuration settings
+      @config = new Config @hoodie, type: '$sharing', id: @id
+      
+
+      if @anonymous
         
+        require ['hoodie/sharing/hoodie'], (SharingHoodie) =>
+          @hoodie = new SharingHoodie @hoodie, this
+    
+    # ## attributes
+    #
+    # attributes getter & setter
+    attributes: (update) ->
+      if update
+        update.private  = true  if     update.invitees?
+        update.password = ''    unless update.password
+        
+        {
+          @id, 
+          @filters, 
+          @private, 
+          @invitees, 
+          @continuous, 
+          @collaborative
+        } = update
+      
+      private       : @private  
+      invitees      : @invitees  
+      continuous    : @continuous  
+      collaborative : @collaborative
+      filter        : @_turn_filters_into_function @filters
+       
     create: ->
       defer = @hoodie.defer()
       
-      options.private = true if options.invitees?
-      options.filter   = @_turn_filters_into_function options.filters
-      delete options.filters
+      @hoodie.store.save( "$sharing", @id, @attributes() )
       
-      @hoodie.store.save("$sharing", options.id, options)
-      .done (sharing) => @hoodie.one "remote:created:$sharing:#{sharing.id}", defer.resolve
+      # when anonymous, we need to create the sharing db manually,
+      # by signing up as a user with the neame of the sharing db.
+      if @anonymous
+        @hoodie.account.sign_up( "sharing/#{@id}", @password )
+        
+        # TODO: better error handling
+        .fail (error) =>
+          if error.error is 'conflict'
+            alert "sharing/#{@id} has been shared before"
+            
+      else
+        @hoodie.one "remote:updated:$sharing:#{@id}", defer.resolve
       
       defer.promise()
+      
+    # ## Private
+  
+    #
+    # get an array of hashes and turn into a stringified function
+    #
+    _turn_filters_into_function: (filters) ->
+      return unless filters
+    
+      all_conditions = []
+      for filter in filters
+        current_condition = []
+        for key, value of filter
+        
+          # no code injection, please
+          continue if /'/.test "#{key}#{value}"
+        
+          if typeof value is 'string'
+            current_condition.push "obj['#{key}'] == '#{value}'"
+          else
+            current_condition.push "obj['#{key}'] == #{value}"
+          
+        all_conditions.push current_condition.join " && "
+      
+      "function(obj) { return #{all_conditions.join " || "} }"

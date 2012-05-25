@@ -48,6 +48,7 @@ define 'hoodie/account', ->
             defer.resolve @username
           else
             @_authenticated = false
+            delete @username
             @hoodie.trigger 'account:error:unauthenticated'
             defer.reject()
             
@@ -88,7 +89,7 @@ define 'hoodie/account', ->
         
         success     : (response) =>
           @hoodie.trigger 'account:signed_up', username
-          @hoodie.trigger 'account:signed_in', username;
+          @hoodie.trigger 'account:signed_in', username
           @fetch()
           defer.resolve username
           

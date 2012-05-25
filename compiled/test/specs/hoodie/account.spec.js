@@ -47,6 +47,7 @@ define('specs/hoodie/account', ['mocks/hoodie', 'hoodie/account'], function(Hood
     describe("event handlers", function() {
       describe("._handle_sign_in(@username)", function() {
         beforeEach(function() {
+          expect(this.account.username).toBeUndefined();
           spyOn(this.hoodie.config, "set");
           return this.account._handle_sign_in('joe@example.com');
         });
@@ -58,11 +59,7 @@ define('specs/hoodie/account', ['mocks/hoodie', 'hoodie/account'], function(Hood
         });
         return it("should set _authenticated to true", function() {
           this.account._authenticated = false;
-          this.account._handle_sign_in({
-            "ok": true,
-            "name": "joe@example.com",
-            "roles": []
-          });
+          this.account._handle_sign_in("joe@example.com");
           return expect(this.account._authenticated).toBe(true);
         });
       });
@@ -179,6 +176,7 @@ define('specs/hoodie/account', ['mocks/hoodie', 'hoodie/account'], function(Hood
                   }
                 }) : void 0;
               });
+              this.account.username = 'joe@example.com';
               return this.promise = this.account.authenticate();
             });
             it("should set account as unauthenticated", function() {
@@ -187,8 +185,11 @@ define('specs/hoodie/account', ['mocks/hoodie', 'hoodie/account'], function(Hood
             it("should reject the promise", function() {
               return expect(this.promise).toBeRejected();
             });
-            return it("should trigger an `account:error:unauthenticated` event", function() {
+            it("should trigger an `account:error:unauthenticated` event", function() {
               return expect(this.hoodie.trigger).wasCalledWith('account:error:unauthenticated');
+            });
+            return it("should unset username", function() {
+              return expect(this.account.username).toBeUndefined();
             });
           });
           return _when("authentication request has an error", function() {

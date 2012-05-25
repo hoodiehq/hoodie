@@ -24,7 +24,7 @@ define('mocks/hoodie', function() {
 
     HoodieMock.prototype.store = {
       uuid: function() {
-        return 'abc3456';
+        return 'abc4567';
       },
       create: function() {
         return {

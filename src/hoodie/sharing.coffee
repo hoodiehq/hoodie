@@ -34,7 +34,7 @@
 #    will take over.
 #
 
-define 'hoodie/sharing', ->
+define 'hoodie/sharing', ['hoodie/sharing/instance'], (SharingInstance) ->
   
   
   class Sharing
@@ -42,10 +42,6 @@ define 'hoodie/sharing', ->
     # ## Constructor
     #
     constructor : (@hoodie) ->
-      
-      require ['hoodie/sharing/instance'], (SharingInstance) =>
-        sharing   = new SharingInstance @hoodie
-        # @test     = new SharingHoodie @hoodie, sharing
       
       # do some smart stuff in here!
       
@@ -96,17 +92,9 @@ define 'hoodie/sharing', ->
     #       continuous : true
     #       filters     : shared: true
     #
-    create : (options) ->
-      defer = @hoodie.defer()
-      
-      options.private = true if options.invitees?
-      options.filter   = @_turn_filters_into_function options.filters
-      delete options.filters
-      
-      @hoodie.store.save("$sharing", options.id, options)
-      .done (sharing) => @hoodie.one "remote:created:$sharing:#{sharing.id}", defer.resolve
-      
-      defer.promise()
+    create : (options = {}) ->
+      sharing = new SharingInstance @hoodie, options
+      sharing.create()
       
     # ## destroy
     #
@@ -117,28 +105,3 @@ define 'hoodie/sharing', ->
     
     # alias
     delete: @::destroy
-    
-    # ## Private
-  
-    #
-    # get an array of hashes and turn into a stringified function
-    #
-    _turn_filters_into_function: (filters) ->
-      return unless filters
-    
-      all_conditions = []
-      for filter in filters
-        current_condition = []
-        for key, value of filter
-        
-          # no code injection, please
-          continue if /'/.test "#{key}#{value}"
-        
-          if typeof value is 'string'
-            current_condition.push "obj['#{key}'] == '#{value}'"
-          else
-            current_condition.push "obj['#{key}'] == #{value}"
-          
-        all_conditions.push current_condition.join " && "
-      
-      "function(obj) { return #{all_conditions.join " || "} }"
