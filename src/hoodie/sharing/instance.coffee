@@ -1,13 +1,11 @@
-define 'hoodie/sharing/instance', ->
+define 'hoodie/sharing/instance', ['hoodie/config'], (Config) ->
 
   class SharingInstance
 
-    constructor: ->
-    
-    config:
-      set     : ->
-      get     : ->
-      remove  : ->
+    constructor: (@hoodie, attributes = {}) ->
+      attributes.id or= @hoodie.store.uuid(7)
+      @config = new Config @hoodie, type: '$sharing', id: attributes.id
+      funky = 1
         
     create: ->
       defer = @hoodie.defer()

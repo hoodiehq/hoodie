@@ -34,12 +34,6 @@
 #    will take over.
 #
 
-# define 'hoodie/sharing', ['hoodie'], (Hoodie) ->
-#   
-#   class SharingHoodie extends Hoodie
-#     
-#     # w00t w00t
-
 define 'hoodie/sharing', ->
   
   
@@ -49,8 +43,8 @@ define 'hoodie/sharing', ->
     #
     constructor : (@hoodie) ->
       
-      require ['hoodie/sharing/instance'], (SharingInstance) ->        
-        sharing   = new SharingInstance
+      require ['hoodie/sharing/instance'], (SharingInstance) =>
+        sharing   = new SharingInstance @hoodie
         # @test     = new SharingHoodie @hoodie, sharing
       
       # do some smart stuff in here!

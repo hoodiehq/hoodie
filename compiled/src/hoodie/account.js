@@ -7,7 +7,7 @@ define('hoodie/account', function() {
 
     Account.name = 'Account';
 
-    Account.prototype.email = void 0;
+    Account.prototype.username = void 0;
 
     function Account(hoodie) {
       this.hoodie = hoodie;
@@ -15,7 +15,7 @@ define('hoodie/account', function() {
 
       this._handle_sign_in = __bind(this._handle_sign_in, this);
 
-      this.email = this.hoodie.config.get('_account.email');
+      this.username = this.hoodie.config.get('_account.username');
       this.authenticate();
       this.on('signed_in', this._handle_sign_in);
       this.on('signed_out', this._handle_sign_out);
@@ -25,11 +25,11 @@ define('hoodie/account', function() {
       var defer,
         _this = this;
       defer = this.hoodie.defer();
-      if (!this.email) {
+      if (!this.username) {
         return defer.reject().promise();
       }
       if (this._authenticated === true) {
-        return defer.resolve(this.email).promise();
+        return defer.resolve(this.username).promise();
       }
       if (this._authenticated === false) {
         return defer.reject().promise();
@@ -38,8 +38,8 @@ define('hoodie/account', function() {
         success: function(response) {
           if (response.userCtx.name) {
             _this._authenticated = true;
-            _this.email = response.userCtx.name;
-            return defer.resolve(_this.email);
+            _this.username = response.userCtx.name;
+            return defer.resolve(_this.username);
           } else {
             _this._authenticated = false;
             _this.hoodie.trigger('account:error:unauthenticated');
@@ -61,17 +61,17 @@ define('hoodie/account', function() {
       return defer.promise();
     };
 
-    Account.prototype.sign_up = function(email, password, user_data) {
+    Account.prototype.sign_up = function(username, password, user_data) {
       var data, defer, key,
         _this = this;
       if (user_data == null) {
         user_data = {};
       }
       defer = this.hoodie.defer();
-      key = "" + this._prefix + ":" + email;
+      key = "" + this._prefix + ":" + username;
       data = {
         _id: key,
-        name: email,
+        name: username,
         type: 'user',
         roles: [],
         user_data: user_data,
@@ -81,10 +81,10 @@ define('hoodie/account', function() {
         data: JSON.stringify(data),
         contentType: 'application/json',
         success: function(response) {
-          _this.hoodie.trigger('account:signed_up', email);
-          _this.hoodie.trigger('account:signed_in', email);
+          _this.hoodie.trigger('account:signed_up', username);
+          _this.hoodie.trigger('account:signed_in', username);
           _this.fetch();
-          return defer.resolve(email);
+          return defer.resolve(username);
         },
         error: function(xhr) {
           var error;
@@ -101,19 +101,19 @@ define('hoodie/account', function() {
       return defer.promise();
     };
 
-    Account.prototype.sign_in = function(email, password) {
+    Account.prototype.sign_in = function(username, password) {
       var defer,
         _this = this;
       defer = this.hoodie.defer();
       this.hoodie.request('POST', '/_session', {
         data: {
-          name: email,
+          name: username,
           password: password
         },
         success: function() {
-          _this.hoodie.trigger('account:signed_in', email);
+          _this.hoodie.trigger('account:signed_in', username);
           _this.fetch();
-          return defer.resolve(email);
+          return defer.resolve(username);
         },
         error: function(xhr) {
           var error;
@@ -136,14 +136,14 @@ define('hoodie/account', function() {
       var data, defer, key,
         _this = this;
       defer = this.hoodie.defer();
-      if (!this.email) {
+      if (!this.username) {
         defer.reject({
           error: "unauthenticated",
           reason: "not logged in"
         });
         return defer.promise();
       }
-      key = "" + this._prefix + ":" + this.email;
+      key = "" + this._prefix + ":" + this.username;
       data = $.extend({}, this._doc);
       delete data.salt;
       delete data.password_sha;
@@ -186,21 +186,21 @@ define('hoodie/account', function() {
 
     Account.prototype.db = function() {
       var _ref;
-      return (_ref = this.email) != null ? _ref.toLowerCase().replace(/@/, "$").replace(/\./g, "_") : void 0;
+      return (_ref = this.username) != null ? _ref.toLowerCase().replace(/@/, "$").replace(/\./g, "_") : void 0;
     };
 
     Account.prototype.fetch = function() {
       var defer, key,
         _this = this;
       defer = this.hoodie.defer();
-      if (!this.email) {
+      if (!this.username) {
         defer.reject({
           error: "unauthenticated",
           reason: "not logged in"
         });
         return defer.promise();
       }
-      key = "" + this._prefix + ":" + this.email;
+      key = "" + this._prefix + ":" + this.username;
       this.hoodie.request('GET', "/_users/" + (encodeURIComponent(key)), {
         success: function(response) {
           _this._doc = response;
@@ -230,15 +230,15 @@ define('hoodie/account', function() {
 
     Account.prototype._doc = {};
 
-    Account.prototype._handle_sign_in = function(email) {
-      this.email = email;
-      this.hoodie.config.set('_account.email', this.email);
+    Account.prototype._handle_sign_in = function(username) {
+      this.username = username;
+      this.hoodie.config.set('_account.username', this.username);
       return this._authenticated = true;
     };
 
     Account.prototype._handle_sign_out = function() {
-      delete this.email;
-      this.hoodie.config.remove('_account.email');
+      delete this.username;
+      this.hoodie.config.remove('_account.username');
       return this._authenticated = false;
     };
 

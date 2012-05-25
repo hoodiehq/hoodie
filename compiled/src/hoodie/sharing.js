@@ -7,10 +7,11 @@ define('hoodie/sharing', function() {
     Sharing.name = 'Sharing';
 
     function Sharing(hoodie) {
+      var _this = this;
       this.hoodie = hoodie;
       require(['hoodie/sharing/instance'], function(SharingInstance) {
         var sharing;
-        return sharing = new SharingInstance;
+        return sharing = new SharingInstance(_this.hoodie);
       });
     }
 

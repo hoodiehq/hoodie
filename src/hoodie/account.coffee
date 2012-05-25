@@ -9,14 +9,14 @@ define 'hoodie/account', ->
   class Account
     
     # ## Properties
-    email      : undefined
+    username    : undefined
     
     # ## Constructor
     #
     constructor : (@hoodie) ->
       
       # handle evtl session
-      @email = @hoodie.config.get '_account.email'
+      @username = @hoodie.config.get '_account.username'
       @authenticate()
       
       @on 'signed_in',  @_handle_sign_in
@@ -29,11 +29,11 @@ define 'hoodie/account', ->
     authenticate : ->
       defer = @hoodie.defer()
       
-      unless @email
+      unless @username
         return defer.reject().promise()
         
       if @_authenticated is true
-        return defer.resolve(@email).promise()
+        return defer.resolve(@username).promise()
         
       if @_authenticated is false
         return defer.reject().promise()
@@ -44,8 +44,8 @@ define 'hoodie/account', ->
         success     : (response) =>
           if response.userCtx.name
             @_authenticated = true
-            @email = response.userCtx.name
-            defer.resolve @email
+            @username = response.userCtx.name
+            defer.resolve @username
           else
             @_authenticated = false
             @hoodie.trigger 'account:error:unauthenticated'
@@ -63,20 +63,20 @@ define 'hoodie/account', ->
       
       
         
-    # ## sign up with email & password
+    # ## sign up with username & password
     #
     # uses standard couchDB API to create a new document in _users db.
-    # The backend will automatically create a userDB based on the email
+    # The backend will automatically create a userDB based on the username
     # address.
     #
-    sign_up : (email, password, user_data = {}) ->
+    sign_up : (username, password, user_data = {}) ->
       defer = @hoodie.defer()
       
-      key     = "#{@_prefix}:#{email}"
+      key     = "#{@_prefix}:#{username}"
 
       data = 
         _id        : key
-        name       : email
+        name       : username
         type       : 'user'
         roles      : []
         user_data  : user_data
@@ -87,10 +87,10 @@ define 'hoodie/account', ->
         contentType : 'application/json'
         
         success     : (response) =>
-          @hoodie.trigger 'account:signed_up', email
-          @hoodie.trigger 'account:signed_in', email;
+          @hoodie.trigger 'account:signed_up', username
+          @hoodie.trigger 'account:signed_in', username;
           @fetch()
-          defer.resolve email
+          defer.resolve username
           
         error       : (xhr) ->
           try
@@ -103,22 +103,22 @@ define 'hoodie/account', ->
       return defer.promise()
 
 
-    # ## sign in with email & password
+    # ## sign in with username & password
     #
     # uses standard couchDB API to create a new user session (POST /_session)
     #
-    sign_in : (email, password) ->
+    sign_in : (username, password) ->
       defer = @hoodie.defer()
 
       @hoodie.request 'POST', '/_session', 
         data: 
-          name      : email
+          name      : username
           password  : password
           
         success     : => 
-          @hoodie.trigger 'account:signed_in', email
+          @hoodie.trigger 'account:signed_in', username
           @fetch()
-          defer.resolve email
+          defer.resolve username
         
         error       : (xhr) ->
           try
@@ -140,11 +140,11 @@ define 'hoodie/account', ->
     #
     change_password : (current_password, new_password) ->
       defer = @hoodie.defer()
-      unless @email
+      unless @username
         defer.reject error: "unauthenticated", reason: "not logged in"
         return defer.promise()
       
-      key = "#{@_prefix}:#{@email}"
+      key = "#{@_prefix}:#{@username}"
       
       data = $.extend {}, @_doc
       delete data.salt
@@ -186,10 +186,10 @@ define 'hoodie/account', ->
     
     # ## db
     #
-    # escape user email (or what ever he uses to sign up)
+    # escape user username (or what ever he uses to sign up)
     # to make it a valid couchDB database name
     # 
-    #     Converts an email address user name to a valid database name
+    #     Converts an username address user name to a valid database name
     #     The character replacement rules are:
     #       [A-Z] -> [a-z]
     #       @ -> $
@@ -199,18 +199,18 @@ define 'hoodie/account', ->
     #
     #
     db : -> 
-      @email?.toLowerCase().replace(/@/, "$").replace(/\./g, "_");
+      @username?.toLowerCase().replace(/@/, "$").replace(/\./g, "_");
       
     # ## fetch
     #
     # fetches _users doc from CouchDB and caches it in _doc
     fetch : ->
       defer = @hoodie.defer()
-      unless @email
+      unless @username
         defer.reject error: "unauthenticated", reason: "not logged in"
         return defer.promise()
       
-      key = "#{@_prefix}:#{@email}"
+      key = "#{@_prefix}:#{@username}"
       @hoodie.request 'GET', "/_users/#{encodeURIComponent key}",
       
         success     : (response) => 
@@ -238,12 +238,12 @@ define 'hoodie/account', ->
     _doc : {}
     
     #
-    _handle_sign_in: (@email) =>
-      @hoodie.config.set '_account.email', @email
+    _handle_sign_in: (@username) =>
+      @hoodie.config.set '_account.username', @username
       @_authenticated = true
     
     #
     _handle_sign_out: =>
-      delete @email
-      @hoodie.config.remove '_account.email'
+      delete @username
+      @hoodie.config.remove '_account.username'
       @_authenticated = false

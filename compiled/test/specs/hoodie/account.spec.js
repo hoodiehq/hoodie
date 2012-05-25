@@ -14,17 +14,17 @@ define('specs/hoodie/account', ['mocks/hoodie', 'hoodie/account'], function(Hood
         spyOn(Account.prototype, "authenticate");
         return spyOn(Account.prototype, "on");
       });
-      _when("_account.email is set", function() {
+      _when("_account.username is set", function() {
         return beforeEach(function() {
           spyOn(this.hoodie.store, "get").andCallFake(function(key) {
-            if (key === '_account.email') {
+            if (key === '_account.username') {
               return 'joe@example.com';
             }
           });
-          return it("should set @email", function() {
+          return it("should set @username", function() {
             var account;
             account = new Account(this.hoodie);
-            return expect(account.email).toBe('joe@example.com');
+            return expect(account.username).toBe('joe@example.com');
           });
         });
       });
@@ -45,16 +45,16 @@ define('specs/hoodie/account', ['mocks/hoodie', 'hoodie/account'], function(Hood
       });
     });
     describe("event handlers", function() {
-      describe("._handle_sign_in(@email)", function() {
+      describe("._handle_sign_in(@username)", function() {
         beforeEach(function() {
           spyOn(this.hoodie.config, "set");
           return this.account._handle_sign_in('joe@example.com');
         });
-        it("should set @email", function() {
-          return expect(this.account.email).toBe('joe@example.com');
+        it("should set @username", function() {
+          return expect(this.account.username).toBe('joe@example.com');
         });
-        it("should store @email to config", function() {
-          return expect(this.hoodie.config.set).wasCalledWith('_account.email', 'joe@example.com');
+        it("should store @username to config", function() {
+          return expect(this.hoodie.config.set).wasCalledWith('_account.username', 'joe@example.com');
         });
         return it("should set _authenticated to true", function() {
           this.account._authenticated = false;
@@ -67,19 +67,19 @@ define('specs/hoodie/account', ['mocks/hoodie', 'hoodie/account'], function(Hood
         });
       });
       return describe("._handle_sign_out()", function() {
-        it("should set @email", function() {
-          this.account.email = 'joe@example.com';
+        it("should set @username", function() {
+          this.account.username = 'joe@example.com';
           this.account._handle_sign_out({
             "ok": true
           });
-          return expect(this.account.email).toBeUndefined();
+          return expect(this.account.username).toBeUndefined();
         });
-        it("should store @email persistantly", function() {
+        it("should store @username persistantly", function() {
           spyOn(this.hoodie.config, "remove");
           this.account._handle_sign_out({
             "ok": true
           });
-          return expect(this.hoodie.config.remove).wasCalledWith('_account.email');
+          return expect(this.hoodie.config.remove).wasCalledWith('_account.username');
         });
         return it("should set _authenticated to false", function() {
           this.account._authenticated = true;
@@ -91,9 +91,9 @@ define('specs/hoodie/account', ['mocks/hoodie', 'hoodie/account'], function(Hood
       });
     });
     describe(".authenticate()", function() {
-      _when("@email is undefined", function() {
+      _when("@username is undefined", function() {
         beforeEach(function() {
-          delete this.account.email;
+          delete this.account.username;
           return this.promise = this.account.authenticate();
         });
         it("should return a promise", function() {
@@ -103,9 +103,9 @@ define('specs/hoodie/account', ['mocks/hoodie', 'hoodie/account'], function(Hood
           return expect(this.promise).toBeRejected();
         });
       });
-      return _when("@email is 'joe@example.com", function() {
+      return _when("@username is 'joe@example.com", function() {
         beforeEach(function() {
-          return this.account.email = 'joe@example.com';
+          return this.account.username = 'joe@example.com';
         });
         _and("account is already authenticated", function() {
           beforeEach(function() {
@@ -212,7 +212,7 @@ define('specs/hoodie/account', ['mocks/hoodie', 'hoodie/account'], function(Hood
         });
       });
     });
-    describe(".sign_up(email, password, user_data = {})", function() {
+    describe(".sign_up(username, password, user_data = {})", function() {
       beforeEach(function() {
         var _ref;
         this.account.sign_up('joe@example.com', 'secret', {
@@ -305,7 +305,7 @@ define('specs/hoodie/account', ['mocks/hoodie', 'hoodie/account'], function(Hood
         });
       });
     });
-    describe(".sign_in(email, password)", function() {
+    describe(".sign_in(username, password)", function() {
       beforeEach(function() {
         var _ref;
         this.account.sign_in('joe@example.com', 'secret');
@@ -316,7 +316,7 @@ define('specs/hoodie/account', ['mocks/hoodie', 'hoodie/account'], function(Hood
         expect(this.type).toBe('POST');
         return expect(this.path).toBe('/_session');
       });
-      it("should send email as name parameter", function() {
+      it("should send username as name parameter", function() {
         return expect(this.options.data.name).toBe('joe@example.com');
       });
       it("should send password", function() {
@@ -339,10 +339,10 @@ define('specs/hoodie/account', ['mocks/hoodie', 'hoodie/account'], function(Hood
         });
       });
     });
-    describe(".change_password(email, password)", function() {
+    describe(".change_password(username, password)", function() {
       beforeEach(function() {
         var _ref;
-        this.account.email = 'joe@example.com';
+        this.account.username = 'joe@example.com';
         this.account._doc = {
           _id: 'org.couchdb.user:joe@example.com',
           name: 'joe@example.com',
@@ -464,9 +464,9 @@ define('specs/hoodie/account', ['mocks/hoodie', 'hoodie/account'], function(Hood
       });
     });
     describe(".db", function() {
-      return _when("email is set to 'joe.doe@example.com'", function() {
+      return _when("username is set to 'joe.doe@example.com'", function() {
         beforeEach(function() {
-          return this.account.email = 'joe.doe@example.com';
+          return this.account.username = 'joe.doe@example.com';
         });
         return it("should return 'joe$example_com", function() {
           return (expect(this.account.db())).toEqual('joe_doe$example_com');
@@ -474,19 +474,19 @@ define('specs/hoodie/account', ['mocks/hoodie', 'hoodie/account'], function(Hood
       });
     });
     return describe(".fetch()", function() {
-      _when("email is not set", function() {
+      _when("username is not set", function() {
         beforeEach(function() {
-          this.account.email = null;
+          this.account.username = null;
           return this.account.fetch();
         });
         return it("should not send any request", function() {
           return expect(this.hoodie.request).wasNotCalled();
         });
       });
-      return _when("email is joe@example.com", function() {
+      return _when("username is joe@example.com", function() {
         beforeEach(function() {
           var _ref;
-          this.account.email = 'joe@example.com';
+          this.account.username = 'joe@example.com';
           this.account.fetch();
           return _ref = this.hoodie.request.mostRecentCall.args, this.type = _ref[0], this.path = _ref[1], this.options = _ref[2], _ref;
         });

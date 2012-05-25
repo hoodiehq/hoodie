@@ -16,15 +16,15 @@ define 'specs/hoodie/account', ['mocks/hoodie', 'hoodie/account'], (HoodieMock, 
         spyOn(Account.prototype, "authenticate")
         spyOn(Account.prototype, "on")
       
-      _when "_account.email is set", ->
+      _when "_account.username is set", ->
         beforeEach ->
           spyOn(@hoodie.store, "get").andCallFake (key) ->
-            if key is '_account.email'
+            if key is '_account.username'
               return 'joe@example.com'
               
-          it "should set @email", ->
+          it "should set @username", ->
             account = new Account @hoodie
-            expect(account.email).toBe 'joe@example.com'          
+            expect(account.username).toBe 'joe@example.com'          
             
       it "should authenticate", ->
         account = new Account @hoodie
@@ -41,33 +41,33 @@ define 'specs/hoodie/account', ['mocks/hoodie', 'hoodie/account'], (HoodieMock, 
     
     
     describe "event handlers", ->
-      describe "._handle_sign_in(@email)", ->
+      describe "._handle_sign_in(@username)", ->
         beforeEach ->
           spyOn(@hoodie.config, "set")
           @account._handle_sign_in 'joe@example.com'
         
-        it "should set @email", ->
-          expect(@account.email).toBe 'joe@example.com'
+        it "should set @username", ->
+          expect(@account.username).toBe 'joe@example.com'
           
-        it "should store @email to config", ->
-          expect(@hoodie.config.set).wasCalledWith '_account.email', 'joe@example.com'
+        it "should store @username to config", ->
+          expect(@hoodie.config.set).wasCalledWith '_account.username', 'joe@example.com'
           
         it "should set _authenticated to true", ->
           @account._authenticated = false
           @account._handle_sign_in {"ok":true,"name":"joe@example.com","roles":[]}
           expect(@account._authenticated).toBe true
-      # /._handle_sign_in(@email)
+      # /._handle_sign_in(@username)
       
       describe "._handle_sign_out()", ->
-        it "should set @email", ->
-          @account.email = 'joe@example.com'
+        it "should set @username", ->
+          @account.username = 'joe@example.com'
           @account._handle_sign_out {"ok":true}
-          do expect(@account.email).toBeUndefined
+          do expect(@account.username).toBeUndefined
           
-        it "should store @email persistantly", ->
+        it "should store @username persistantly", ->
           spyOn(@hoodie.config, "remove")
           @account._handle_sign_out {"ok":true}
-          expect(@hoodie.config.remove).wasCalledWith '_account.email'
+          expect(@hoodie.config.remove).wasCalledWith '_account.username'
           
         it "should set _authenticated to false", ->
           @account._authenticated = true
@@ -78,9 +78,9 @@ define 'specs/hoodie/account', ['mocks/hoodie', 'hoodie/account'], (HoodieMock, 
     
     
     describe ".authenticate()", ->
-      _when "@email is undefined", ->
+      _when "@username is undefined", ->
         beforeEach ->
-          delete @account.email
+          delete @account.username
           @promise = @account.authenticate()
               
         it "should return a promise", ->
@@ -89,9 +89,9 @@ define 'specs/hoodie/account', ['mocks/hoodie', 'hoodie/account'], (HoodieMock, 
         it "should reject the promise", ->
           expect(@promise).toBeRejected()
           
-      _when "@email is 'joe@example.com", ->
+      _when "@username is 'joe@example.com", ->
         beforeEach ->
-          @account.email = 'joe@example.com'
+          @account.username = 'joe@example.com'
         
         _and "account is already authenticated", ->
           beforeEach ->
@@ -167,7 +167,7 @@ define 'specs/hoodie/account', ['mocks/hoodie', 'hoodie/account'], (HoodieMock, 
     # /.authenticate()
   
   
-    describe ".sign_up(email, password, user_data = {})", ->
+    describe ".sign_up(username, password, user_data = {})", ->
       beforeEach ->
         @account.sign_up('joe@example.com', 'secret', name: "Joe Doe", nick: "Foo")
         [@type, @path, @options] = @hoodie.request.mostRecentCall.args
@@ -236,10 +236,10 @@ define 'specs/hoodie/account', ['mocks/hoodie', 'hoodie/account'], (HoodieMock, 
         it "should reject its promise", ->
           promise = @account.sign_up('joe@example.com', 'secret')
           expect(promise).toBeRejectedWith error:"forbidden", reason: "Username may not start with underscore."
-    # /.sign_up(email, password, user_data)
+    # /.sign_up(username, password, user_data)
   
   
-    describe ".sign_in(email, password)", ->
+    describe ".sign_in(username, password)", ->
       beforeEach ->
         @account.sign_in('joe@example.com', 'secret')
         [@type, @path, @options] = @hoodie.request.mostRecentCall.args
@@ -249,7 +249,7 @@ define 'specs/hoodie/account', ['mocks/hoodie', 'hoodie/account'], (HoodieMock, 
         expect(@type).toBe 'POST'
         expect(@path).toBe  '/_session'
       
-      it "should send email as name parameter", ->
+      it "should send username as name parameter", ->
         expect(@options.data.name).toBe 'joe@example.com'
     
       it "should send password", ->
@@ -267,12 +267,12 @@ define 'specs/hoodie/account', ['mocks/hoodie', 'hoodie/account'], (HoodieMock, 
           spyOn(@account, "fetch")
           @account.sign_in('joe@example.com', 'secret')
           expect(@account.fetch).wasCalled()
-    # /.sign_in(email, password)
+    # /.sign_in(username, password)
   
   
-    describe ".change_password(email, password)", ->
+    describe ".change_password(username, password)", ->
       beforeEach ->
-        @account.email = 'joe@example.com'
+        @account.username = 'joe@example.com'
         @account._doc  = 
           _id          : 'org.couchdb.user:joe@example.com'
           name         : 'joe@example.com'
@@ -344,7 +344,7 @@ define 'specs/hoodie/account', ['mocks/hoodie', 'hoodie/account'], (HoodieMock, 
         it "should reject its promise", ->
           promise = @account.change_password('current_secret', 'new_secret')
           expect(promise).toBeRejectedWith error:"unknown"
-    # /.change_password(email, password)
+    # /.change_password(username, password)
   
   
     describe ".sign_out()", ->
@@ -364,7 +364,7 @@ define 'specs/hoodie/account', ['mocks/hoodie', 'hoodie/account'], (HoodieMock, 
         it "should trigger `account:signed_out` event", ->
           @account.sign_out('joe@example.com', 'secret')
           expect(@hoodie.trigger).wasCalledWith 'account:signed_out'
-    # /.sign_in(email, password)
+    # /.sign_in(username, password)
     
     
     describe ".on(event, callback)", ->
@@ -379,9 +379,9 @@ define 'specs/hoodie/account', ['mocks/hoodie', 'hoodie/account'], (HoodieMock, 
     
     
     describe ".db", ->
-      _when "email is set to 'joe.doe@example.com'", ->
+      _when "username is set to 'joe.doe@example.com'", ->
         beforeEach ->
-          @account.email = 'joe.doe@example.com'
+          @account.username = 'joe.doe@example.com'
         
         it "should return 'joe$example_com", ->
           (expect @account.db()).toEqual('joe_doe$example_com')
@@ -389,18 +389,18 @@ define 'specs/hoodie/account', ['mocks/hoodie', 'hoodie/account'], (HoodieMock, 
     
     describe ".fetch()", ->
       
-      _when "email is not set", ->
+      _when "username is not set", ->
         beforeEach ->
-          @account.email = null
+          @account.username = null
           @account.fetch()
         
         it "should not send any request", ->
           expect(@hoodie.request).wasNotCalled()
         
       
-      _when "email is joe@example.com", ->
+      _when "username is joe@example.com", ->
         beforeEach ->
-          @account.email = 'joe@example.com'
+          @account.username = 'joe@example.com'
           @account.fetch()
           [@type, @path, @options] = @hoodie.request.mostRecentCall.args
         
