@@ -6,7 +6,9 @@ define('hoodie/config', function() {
 
     Config.name = 'Config';
 
-    Config.prototype.namespace = 'hoodie';
+    Config.prototype.type = '$config';
+
+    Config.prototype.id = 'hoodie';
 
     Config.prototype.cache = {};
 
@@ -16,10 +18,13 @@ define('hoodie/config', function() {
       if (options == null) {
         options = {};
       }
-      if (options.namespace) {
-        this.namespace = options.namespace;
+      if (options.type) {
+        this.type = options.type;
       }
-      this.hoodie.store.load('$config', this.namespace).done(function(obj) {
+      if (options.id) {
+        this.id = options.id;
+      }
+      this.hoodie.store.load(this.type, this.id).done(function(obj) {
         return _this.cache = obj;
       });
     }
@@ -28,7 +33,7 @@ define('hoodie/config', function() {
       var update;
       update = {};
       update[key] = value;
-      this.hoodie.store.update("$config", this.namespace, update);
+      this.hoodie.store.update(this.type, this.id, update);
       return this.cache[key] = value;
     };
 

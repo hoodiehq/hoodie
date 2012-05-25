@@ -6,9 +6,13 @@ define 'specs/hoodie/config', ['mocks/hoodie', 'hoodie/config'], (HoodieMock, Co
       @config = new Config @hoodie
     
     describe ".constructor(@hoodie, options)", ->
-      it "should default @prefix to 'hoodie'", ->
+      it "should default @type to '$config'", ->
         config = new Config @hoodie 
-        expect(config.namespace).toBe 'hoodie'
+        expect(config.type).toBe '$config'
+        
+      it "should default @id to 'hoodie'", ->
+        config = new Config @hoodie 
+        expect(config.id).toBe 'hoodie'
     # /.constructor(@hoodie, options)
      
     describe ".set(key, value)", ->

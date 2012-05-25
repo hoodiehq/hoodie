@@ -7,10 +7,15 @@ define('specs/hoodie/config', ['mocks/hoodie', 'hoodie/config'], function(Hoodie
       return this.config = new Config(this.hoodie);
     });
     describe(".constructor(@hoodie, options)", function() {
-      return it("should default @prefix to 'hoodie'", function() {
+      it("should default @type to '$config'", function() {
         var config;
         config = new Config(this.hoodie);
-        return expect(config.namespace).toBe('hoodie');
+        return expect(config.type).toBe('$config');
+      });
+      return it("should default @id to 'hoodie'", function() {
+        var config;
+        config = new Config(this.hoodie);
+        return expect(config.id).toBe('hoodie');
       });
     });
     describe(".set(key, value)", function() {

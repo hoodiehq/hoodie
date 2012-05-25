@@ -9,7 +9,8 @@ define 'hoodie/config', ->
   class Config
     
     # used as attribute name in localStorage
-    namespace : 'hoodie'
+    type : '$config'
+    id   : 'hoodie'
     
     # memory cache
     cache : {}
@@ -18,8 +19,9 @@ define 'hoodie/config', ->
     # ## Constructor
     #
     constructor : (@hoodie, options = {}) ->
-      @namespace = options.namespace if options.namespace
-      @hoodie.store.load('$config', @namespace).done (obj) => @cache = obj
+      @type   = options.type if options.type
+      @id     = options.id   if options.id
+      @hoodie.store.load(@type, @id).done (obj) => @cache = obj
     
       
     # ## set
@@ -29,7 +31,7 @@ define 'hoodie/config', ->
     set : (key, value) ->
       update = {}
       update[key] = value
-      @hoodie.store.update "$config", @namespace, update
+      @hoodie.store.update @type, @id, update
       @cache[key] = value
       
     
