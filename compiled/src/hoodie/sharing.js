@@ -8,6 +8,10 @@ define('hoodie/sharing', function() {
 
     function Sharing(hoodie) {
       this.hoodie = hoodie;
+      require(['hoodie/sharing/instance'], function(SharingInstance) {
+        var sharing;
+        return sharing = new SharingInstance;
+      });
     }
 
     Sharing.prototype.create = function(options) {

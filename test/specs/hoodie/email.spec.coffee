@@ -1,4 +1,4 @@
-define 'specs/email', ['mocks/hoodie', 'hoodie/email'], (HoodieMock, Email) ->
+define 'specs/hoodie/email', ['mocks/hoodie', 'hoodie/email'], (HoodieMock, Email) ->
 
   # ## ref success
   # {

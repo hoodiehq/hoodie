@@ -34,15 +34,24 @@
 #    will take over.
 #
 
+# define 'hoodie/sharing', ['hoodie'], (Hoodie) ->
+#   
+#   class SharingHoodie extends Hoodie
+#     
+#     # w00t w00t
+
 define 'hoodie/sharing', ->
   
-  # 'use strict'
   
   class Sharing
   
     # ## Constructor
     #
     constructor : (@hoodie) ->
+      
+      require ['hoodie/sharing/instance'], (SharingInstance) ->        
+        sharing   = new SharingInstance
+        # @test     = new SharingHoodie @hoodie, sharing
       
       # do some smart stuff in here!
       
@@ -111,13 +120,15 @@ define 'hoodie/sharing', ->
     #
     destroy: (id) ->
       @hoodie.store.destroy "$sharing", id
-      
+    
     # alias
     delete: @::destroy
     
-    
     # ## Private
   
+    #
+    # get an array of hashes and turn into a stringified function
+    #
     _turn_filters_into_function: (filters) ->
       return unless filters
     

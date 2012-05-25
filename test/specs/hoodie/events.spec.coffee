@@ -1,4 +1,4 @@
-define 'specs/events', ['hoodie/events'], (Events) ->
+define 'specs/hoodie/events', ['hoodie/events'], (Events) ->
   
   describe "Events", ->
     beforeEach ->

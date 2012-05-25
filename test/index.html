@@ -24,7 +24,10 @@
   <script src="../compiled/src/hoodie/events.js"></script>
   <script src="../compiled/src/hoodie/remote.js"></script>
   <script src="../compiled/src/hoodie/sharing.js"></script>
+  <script src="../compiled/src/hoodie/sharing/hoodie.js"></script>
+  <script src="../compiled/src/hoodie/sharing/instance.js"></script>
   <script src="../compiled/src/hoodie/store.js"></script>
+  
 
   <!-- mocks -->
   <script src="../compiled/test/mocks/hoodie.mock.js"></script>
@@ -34,34 +37,39 @@
   
   <!-- specs -->
   <script src="../compiled/test/specs/hoodie.spec.js"></script>
-  <script src="../compiled/test/specs/store.spec.js"></script>
-  <script src="../compiled/test/specs/account.spec.js"></script>
-  <script src="../compiled/test/specs/remote.spec.js"></script>
-  <script src="../compiled/test/specs/email.spec.js"></script>
-  <script src="../compiled/test/specs/sharing.spec.js"></script>
-  <script src="../compiled/test/specs/events.spec.js"></script>
-  <script src="../compiled/test/specs/config.spec.js"></script>
+  <script src="../compiled/test/specs/hoodie/account.spec.js"></script>
+  <script src="../compiled/test/specs/hoodie/config.spec.js"></script>
+  <script src="../compiled/test/specs/hoodie/email.spec.js"></script>
+  <script src="../compiled/test/specs/hoodie/events.spec.js"></script>
+  <script src="../compiled/test/specs/hoodie/remote.spec.js"></script>
+  <script src="../compiled/test/specs/hoodie/sharing.spec.js"></script>
+  <script src="../compiled/test/specs/hoodie/sharing/hoodie.spec.js"></script>
+  <script src="../compiled/test/specs/hoodie/sharing/instance.spec.js"></script>
+  <script src="../compiled/test/specs/hoodie/store.spec.js"></script>
+
 </head>
 <body>
 
   <script>
     jas = jasmine.getEnv()
     jas.addReporter(new jasmine.TrivialReporter()); 
-
+    
     require([
       'mocks/hoodie',
       'mocks/changes_response',
       'mocks/changed_docs',
       'mocks/bulk_update_response',
       
-      'specs/store',
-      'specs/account',
-      'specs/remote',
-      'specs/events',
-      'specs/email',
-      'specs/sharing',
       'specs/hoodie',
-      'specs/config'
+      'specs/hoodie/store',
+      'specs/hoodie/account',
+      'specs/hoodie/remote',
+      'specs/hoodie/events',
+      'specs/hoodie/email',
+      'specs/hoodie/sharing',
+      'specs/hoodie/sharing/hoodie',
+      'specs/hoodie/sharing/instance',
+      'specs/hoodie/config'
     ], function () {
       jas.execute();
     });

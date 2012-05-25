@@ -1,4 +1,4 @@
-define 'specs/sharing', ['mocks/hoodie', 'hoodie/sharing'], (HoodieMock, Sharing) ->
+define 'specs/hoodie/sharing', ['mocks/hoodie', 'hoodie/sharing'], (HoodieMock, Sharing) ->
   
   describe "Sharing", ->  
     beforeEach ->

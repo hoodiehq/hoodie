@@ -4,11 +4,13 @@
 #
 # the door to world domination (apps)
 #
-define 'hoodie', ['hoodie/events', 'hoodie/store', 'hoodie/account', 'hoodie/remote', 'hoodie/email', 'hoodie/sharing', 'hoodie/config'], (Events, Store, Account, Remote, Email, Sharing, Config) ->
+define 'hoodie', ['hoodie/events'], (Events) ->
   
   # 'use strict'
 
   class Hoodie extends Events
+  
+    modules: ['hoodie/store', 'hoodie/config', 'hoodie/account', 'hoodie/remote', 'hoodie/email', 'hoodie/sharing'] 
   
     # ## initialization
     #
@@ -18,12 +20,7 @@ define 'hoodie', ['hoodie/events', 'hoodie/store', 'hoodie/account', 'hoodie/rem
       # remove trailing slash(es)
       @base_url = @base_url.replace /\/+$/, ''
     
-      @store     = new Store   this      
-      @config    = new Config  this
-      @account   = new Account this
-      @remote    = new Remote  this
-      @email     = new Email   this
-      @sharing   = new Sharing this
+      @_load_modules()
     
     # ## Request
     #
@@ -37,9 +34,18 @@ define 'hoodie', ['hoodie/events', 'hoodie/store', 'hoodie/account', 'hoodie/rem
         dataType    : 'json'
 
       $.ajax $.extend defaults, options
-      
     
     # ## Promise
     #
     # returns a promise skeletton for custom promise handlings
     defer: $.Deferred
+    
+    
+    # ## Private
+    
+    #
+    _load_modules: ->
+      require @modules, (ModuleClasses...) =>
+        for Module in ModuleClasses
+          instance_name = Module.name.toLowerCase()
+          @[instance_name] = new Module this

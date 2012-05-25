@@ -1,4 +1,4 @@
-define 'specs/config', ['mocks/hoodie', 'hoodie/config'], (HoodieMock, Config) ->
+define 'specs/hoodie/config', ['mocks/hoodie', 'hoodie/config'], (HoodieMock, Config) ->
   
   describe "Config", ->  
     beforeEach ->

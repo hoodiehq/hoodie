@@ -1,4 +1,4 @@
-define 'specs/store', ['hoodie/store', 'mocks/hoodie'], (Store, HoodieMock) ->
+define 'specs/hoodie/store', ['hoodie/store', 'mocks/hoodie'], (Store, HoodieMock) ->
   
   describe "Store", ->  
     beforeEach ->

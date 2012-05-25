@@ -1,4 +1,4 @@
-define 'specs/remote', ['hoodie/remote', 'mocks/hoodie', 'mocks/changes_response', 'mocks/changed_docs', 'mocks/bulk_update_response'], (Remote, HoodieMock, ChangesResponseMock, ChangedDocsMock, BulkUpdateResponseMock) ->
+define 'specs/hoodie/remote', ['hoodie/remote', 'mocks/hoodie', 'mocks/changes_response', 'mocks/changed_docs', 'mocks/bulk_update_response'], (Remote, HoodieMock, ChangesResponseMock, ChangedDocsMock, BulkUpdateResponseMock) ->
   
   describe "Remote", ->  
     beforeEach ->
