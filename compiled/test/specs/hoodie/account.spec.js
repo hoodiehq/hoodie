@@ -474,7 +474,7 @@ define('specs/hoodie/account', ['mocks/hoodie', 'hoodie/account'], function(Hood
         });
       });
     });
-    return describe(".fetch()", function() {
+    describe(".fetch()", function() {
       _when("username is not set", function() {
         beforeEach(function() {
           this.account.username = null;
@@ -525,6 +525,23 @@ define('specs/hoodie/account', ['mocks/hoodie', 'hoodie/account'], function(Hood
             return expect(this.account.user_data().funky).toBe('fresh');
           });
         });
+      });
+    });
+    return describe("destroy()", function() {
+      beforeEach(function() {
+        spyOn(this.account, "fetch").andReturn(this.hoodie.defer().resolve().promise());
+        this.account.username = 'joe@example.com';
+        return this.account._doc = {
+          _rev: '1-234'
+        };
+      });
+      it("should fetch the account", function() {
+        this.account.destroy();
+        return expect(this.account.fetch).wasCalled();
+      });
+      return it("should send a DELETE request to /_users/org.couchdb.user%3Ajoe%40example.com?rev=1-234", function() {
+        this.account.destroy();
+        return expect(this.hoodie.request).wasCalledWith('DELETE', '/_users/org.couchdb.user%3Ajoe%40example.com?rev=1-234');
       });
     });
   });

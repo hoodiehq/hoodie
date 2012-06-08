@@ -160,7 +160,9 @@
   <!-- <link href="http://google-code-prettify.googlecode.com/svn/trunk/src/prettify.css" type="text/css" rel="stylesheet" /> -->
   <script src="http://google-code-prettify.googlecode.com/svn/trunk/src/prettify.js"></script>
   <script>
-    prettyPrint()
+    if (typeof prettyPrint == 'function') {
+      prettyPrint()
+    };
   </script>
   
   

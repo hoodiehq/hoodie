@@ -228,6 +228,14 @@ define 'hoodie/account', ->
           
       return defer.promise()
       
+    # ## destroy
+    #
+    # destroys a user' account  
+    destroy: ->
+      @fetch().pipe =>
+        key = "#{@_prefix}:#{@username}"
+        @hoodie.request 'DELETE', "/_users/#{encodeURIComponent key}?rev=#{@_doc._rev}"
+    
     user_data : ->
       @_doc?.user_data
 

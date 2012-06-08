@@ -1,4 +1,3 @@
-* add restriction: sign up only with valid email
 * remove dependency on jQuery / zepto.js, then uncomment `use strict` statements
 * do some kind of modularization: add a moduleLoader for the built in modules 
   like email, store and remote but also use it for custom modules.

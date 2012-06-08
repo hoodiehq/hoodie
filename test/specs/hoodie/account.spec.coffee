@@ -394,7 +394,6 @@ define 'specs/hoodie/account', ['mocks/hoodie', 'hoodie/account'], (HoodieMock, 
     # /.db()
     
     describe ".fetch()", ->
-      
       _when "username is not set", ->
         beforeEach ->
           @account.username = null
@@ -429,4 +428,19 @@ define 'specs/hoodie/account', ['mocks/hoodie', 'hoodie/account'], (HoodieMock, 
             @account.fetch()
             expect(@account.user_data().funky).toBe 'fresh'
     # /.fetch()
+    
+    describe "destroy()", ->
+      beforeEach ->
+        spyOn(@account, "fetch").andReturn @hoodie.defer().resolve().promise()
+        @account.username = 'joe@example.com'
+        @account._doc = _rev : '1-234'
+      
+      it "should fetch the account", ->
+        @account.destroy()
+        expect(@account.fetch).wasCalled()
+      
+      it "should send a DELETE request to /_users/org.couchdb.user%3Ajoe%40example.com?rev=1-234", ->
+        @account.destroy()
+        expect(@hoodie.request).wasCalledWith 'DELETE', '/_users/org.couchdb.user%3Ajoe%40example.com?rev=1-234'
+    # /destroy()
   # /Account

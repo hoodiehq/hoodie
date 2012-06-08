@@ -222,6 +222,15 @@ define('hoodie/account', function() {
       return defer.promise();
     };
 
+    Account.prototype.destroy = function() {
+      var _this = this;
+      return this.fetch().pipe(function() {
+        var key;
+        key = "" + _this._prefix + ":" + _this.username;
+        return _this.hoodie.request('DELETE', "/_users/" + (encodeURIComponent(key)) + "?rev=" + _this._doc._rev);
+      });
+    };
+
     Account.prototype.user_data = function() {
       var _ref;
       return (_ref = this._doc) != null ? _ref.user_data : void 0;

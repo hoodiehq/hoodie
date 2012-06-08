@@ -1,4 +1,4 @@
-define 'hoodie/sharing/instance', ['hoodie/config'], (Config) ->
+define 'hoodie/sharing/instance', ['hoodie/config', 'hoodie/sharing/hoodie'], (Config, SharingHoodie) ->
 
   class SharingInstance
 
@@ -14,28 +14,26 @@ define 'hoodie/sharing/instance', ['hoodie/config'], (Config) ->
       
       @anonymous = @hoodie.account.username is undefined
       
-      # setting attributes
-      @attributes attributes
-      
       # make sure we have an id, as we need it for the config
       @id or= @hoodie.store.uuid(7)
+      
+      # setting attributes
+      @attributes attributes
       
       # user the $sharing doc directly for configuration settings
       @config = new Config @hoodie, type: '$sharing', id: @id
       
 
       if @anonymous
-        
-        require ['hoodie/sharing/hoodie'], (SharingHoodie) =>
-          @hoodie = new SharingHoodie @hoodie, this
+        @hoodie = new SharingHoodie @hoodie, this
     
     # ## attributes
     #
     # attributes getter & setter
     attributes: (update) ->
       if update
-        update.private  = true  if     update.invitees?
-        update.password = ''    unless update.password
+        update.private    = true if update.invitees?
+        update.password or= @id
         
         {
           @id, 
@@ -43,13 +41,15 @@ define 'hoodie/sharing/instance', ['hoodie/config'], (Config) ->
           @private, 
           @invitees, 
           @continuous, 
-          @collaborative
+          @collaborative,
+          @password
         } = update
       
       private       : @private  
       invitees      : @invitees  
       continuous    : @continuous  
       collaborative : @collaborative
+      password      : @password
       filter        : @_turn_filters_into_function @filters
        
     create: ->

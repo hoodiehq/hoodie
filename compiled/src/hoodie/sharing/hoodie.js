@@ -13,10 +13,39 @@ define('hoodie/sharing/hoodie', ['hoodie'], function(Hoodie) {
     SharingHoodie.prototype.modules = ['hoodie/account', 'hoodie/remote'];
 
     function SharingHoodie(hoodie, sharing) {
+      this.sharing = sharing;
       this.store = hoodie.store;
       this.config = sharing.config;
       SharingHoodie.__super__.constructor.call(this, hoodie.base_url);
     }
+
+    SharingHoodie.prototype.request = function(type, path, options) {
+      var auth, defaults, hash;
+      if (options == null) {
+        options = {};
+      }
+      defaults = {
+        type: type,
+        url: "" + this.base_url + path,
+        xhrFields: {
+          withCredentials: true
+        },
+        crossDomain: true,
+        dataType: 'json'
+      };
+      console.log("@account.username", this.account.username);
+      if (this.account.username) {
+        console.log("hash: ", "sharing/" + this.sharing.id + ":" + this.sharing.password);
+        hash = btoa("sharing/" + this.sharing.id + ":" + this.sharing.password);
+        auth = "Basic " + hash;
+        $.extend(defaults, {
+          headers: {
+            Authorization: auth
+          }
+        });
+      }
+      return $.ajax($.extend(defaults, options));
+    };
 
     return SharingHoodie;
 

@@ -10,7 +10,32 @@ define 'hoodie/sharing/hoodie', ['hoodie'], (Hoodie) ->
     
     modules: ['hoodie/account', 'hoodie/remote'] 
     
-    constructor: (hoodie, sharing) ->
+    constructor: (hoodie, @sharing) ->
       @store  = hoodie.store
       @config = sharing.config
       super(hoodie.base_url)
+      
+    # ## SharingHoodie Request
+    #
+    # the only difference to Hoodies default request:
+    # we send the creds directly as authorization header
+    request: (type, path, options = {}) ->
+      
+      defaults =
+        type        : type
+        url         : "#{@base_url}#{path}"
+        xhrFields   : withCredentials: true
+        crossDomain : true
+        dataType    : 'json'
+      
+      console.log "@account.username", @account.username
+      if @account.username
+        console.log "hash: ", "sharing/#{@sharing.id}:#{@sharing.password}"
+        hash = btoa "sharing/#{@sharing.id}:#{@sharing.password}"
+        auth = "Basic #{hash}"
+        
+        $.extend defaults,
+          headers     :
+            Authorization : auth
+      
+      $.ajax $.extend defaults, options
