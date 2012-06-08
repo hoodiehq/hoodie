@@ -3,12 +3,13 @@ define 'specs/hoodie/sharing/instance', ['mocks/hoodie', 'hoodie/sharing/instanc
   describe "SharingInstance", ->  
     beforeEach ->
       @hoodie  = new HoodieMock 
-      @sharing = new SharingInstance @hoodie
+      SharingInstance.hoodie = @hoodie
+      @sharing = new SharingInstance
     
     describe "constructor", ->
       
       it "should set private to true when invitees passed", ->
-        sharing = new SharingInstance @hoodie,
+        sharing = new SharingInstance 
           invitees: ['joe@example.com', 'bill@example.com']
         
         expect(sharing.private).toBeTruthy()

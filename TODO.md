@@ -1,6 +1,15 @@
 * remove dependency on jQuery / zepto.js, then uncomment `use strict` statements
 * do some kind of modularization: add a moduleLoader for the built in modules 
   like email, store and remote but also use it for custom modules.
+  
+
+### Sharing
+
+# spec current code
+# destroying sharings
+# filters?
+# build it into minutes.io
+
 
 ### Account
 

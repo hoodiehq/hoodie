@@ -2,16 +2,33 @@ define 'hoodie/sharing/instance', ['hoodie/config', 'hoodie/sharing/hoodie'], (C
 
   class SharingInstance
 
-    # if the current user isn't anonymous (has an accoutn), a backend worker is 
+    # ## clas methods
+    
+    # will be set by HoodieSharing.constructor
+    @hoodie: null
+    
+    # 
+    @create: (options) ->
+      sharing = new this @hoodie, options
+      sharing.create()
+
+    # 
+    @destroy: (id) ->
+      @hoodie.store.load('$sharing', id).pipe (obj) =>
+        sharing = new this @hoodie, obj
+        sharing.destroy()
+
+    # if the current user isn't anonymous (has an account), a backend worker is 
     # used for the whole sharing magic, all we need to do is creating the $sharing 
     # doc and listen to its remote changes
     #
     # if the user is anonymous, we need to handle it manually. To achieve that
-    # we use a customized hoodie, with a custom connection
+    # we use a customized hoodie, with its own socket
     anonymous: undefined
       
-    constructor: (@hoodie, attributes = {}) ->
+    constructor: (attributes = {}) ->
       
+      @hoodie = @constructor.hoodie
       @anonymous = @hoodie.account.username is undefined
       
       # make sure we have an id, as we need it for the config
@@ -20,9 +37,8 @@ define 'hoodie/sharing/instance', ['hoodie/config', 'hoodie/sharing/hoodie'], (C
       # setting attributes
       @attributes attributes
       
-      # user the $sharing doc directly for configuration settings
+      # use the $sharing doc directly for configuration settings
       @config = new Config @hoodie, type: '$sharing', id: @id
-      
 
       if @anonymous
         @hoodie = new SharingHoodie @hoodie, this
@@ -51,7 +67,10 @@ define 'hoodie/sharing/instance', ['hoodie/config', 'hoodie/sharing/hoodie'], (C
       collaborative : @collaborative
       password      : @password
       filter        : @_turn_filters_into_function @filters
-       
+    
+    # ## create
+    #
+    # creates a new $sharing doc.
     create: ->
       defer = @hoodie.defer()
       

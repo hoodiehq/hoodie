@@ -4,12 +4,13 @@ define('specs/hoodie/sharing/instance', ['mocks/hoodie', 'hoodie/sharing/instanc
   return describe("SharingInstance", function() {
     beforeEach(function() {
       this.hoodie = new HoodieMock;
-      return this.sharing = new SharingInstance(this.hoodie);
+      SharingInstance.hoodie = this.hoodie;
+      return this.sharing = new SharingInstance;
     });
     describe("constructor", function() {
       return it("should set private to true when invitees passed", function() {
         var sharing;
-        sharing = new SharingInstance(this.hoodie, {
+        sharing = new SharingInstance({
           invitees: ['joe@example.com', 'bill@example.com']
         });
         return expect(sharing["private"]).toBeTruthy();

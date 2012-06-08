@@ -27,7 +27,7 @@
 #    also create a sharing database with the help of the userDB worker. Once the db is
 #    created, the docs, filtered by the sharing filter, will be pushed to the sharing database.
 #
-#    When the sharing gets destroyed, the sharing user will me deleted and the userDB worker
+#    When the sharing gets destroyed, the sharing user will be deleted and the userDB worker
 #    will handle the rest.
 #
 #    Once a user signes up, the custom $sharing sockets will be closed and the $sharing workers
@@ -43,25 +43,26 @@ define 'hoodie/sharing', ['hoodie/sharing/instance'], (SharingInstance) ->
     #
     constructor : (@hoodie) ->
       
-      # do some smart stuff in here!
+      # give all Sharing instances access to our core hoodie
+      SharingInstance.hoodie = @hoodie
       
     # ## create
     #
     # creates a new sharing & returns a promise.
     # Options
     #
-    #     id:            (default: random uuid)
-    #                    sets the name of your sharing.
+    #     id:            (optional, defaults to random uuid)
+    #                    name of sharing.
     #     filters:       (optional)
     #                    one or multiple key/value hashes with conditions 
     #                    for the objects to be filtered.
     #     private:       (default: false)
     #                    when set to true, nobody but the creator and the
-    #                    invitees have acces. Set to true automatically
+    #                    invitees have access. Set to true automatically
     #                    when invitees passed
     #     invitees:      (optional)
     #                    an array of user names (emails) that should have
-    #                    to the shared documents
+    #                    access to the shared documents
     #     continuous:    (default: false)
     #                    if set to true, the shared objects will be
     #                    continuously updated.
@@ -93,15 +94,14 @@ define 'hoodie/sharing', ['hoodie/sharing/instance'], (SharingInstance) ->
     #       filters     : shared: true
     #
     create : (options = {}) ->
-      sharing = new SharingInstance @hoodie, options
-      sharing.create()
+      SharingInstance.create options
       
     # ## destroy
     #
     # deletes an existing sharing
     #
     destroy: (id) ->
-      @hoodie.store.destroy "$sharing", id
+      SharingInstance.destroy id
     
     # alias
     delete: @::destroy

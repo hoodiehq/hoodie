@@ -6,13 +6,30 @@ define('hoodie/sharing/instance', ['hoodie/config', 'hoodie/sharing/hoodie'], fu
 
     SharingInstance.name = 'SharingInstance';
 
+    SharingInstance.hoodie = null;
+
+    SharingInstance.create = function(options) {
+      var sharing;
+      sharing = new this(this.hoodie, options);
+      return sharing.create();
+    };
+
+    SharingInstance.destroy = function(id) {
+      var _this = this;
+      return this.hoodie.store.load('$sharing', id).pipe(function(obj) {
+        var sharing;
+        sharing = new _this(_this.hoodie, obj);
+        return sharing.destroy();
+      });
+    };
+
     SharingInstance.prototype.anonymous = void 0;
 
-    function SharingInstance(hoodie, attributes) {
-      this.hoodie = hoodie;
+    function SharingInstance(attributes) {
       if (attributes == null) {
         attributes = {};
       }
+      this.hoodie = this.constructor.hoodie;
       this.anonymous = this.hoodie.account.username === void 0;
       this.id || (this.id = this.hoodie.store.uuid(7));
       this.attributes(attributes);
