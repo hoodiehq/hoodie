@@ -15,8 +15,10 @@ define 'hoodie/account', ->
     #
     constructor : (@hoodie) ->
       
-      # handle evtl session
-      @username = @hoodie.config.get '_account.username'
+      @uuid = @hoodie.config.get('account.uuid') or @hoodie.store.uuid()
+      
+      # handle session
+      @username = @hoodie.config.get 'account.username'
       @authenticate()
       
       @on 'signed_in',  @_handle_sign_in
@@ -248,11 +250,11 @@ define 'hoodie/account', ->
     
     #
     _handle_sign_in: (@username) =>
-      @hoodie.config.set '_account.username', @username
+      @hoodie.config.set 'account.username', @username
       @_authenticated = true
     
     #
     _handle_sign_out: =>
       delete @username
-      @hoodie.config.remove '_account.username'
+      @hoodie.config.remove 'account.username'
       @_authenticated = false
