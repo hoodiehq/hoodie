@@ -153,6 +153,7 @@ define 'hoodie/sharing/instance', ['hoodie/config', 'hoodie/sharing/hoodie'], (C
     remove: (objects) -> 
       @toggle objects, false
     
+    
     # ## toggle (add or remove, depending on passed flag)
     #
     # if do_add is true, add the passed objects to sharing, otherwise
@@ -192,7 +193,7 @@ define 'hoodie/sharing/instance', ['hoodie/config', 'hoodie/sharing/hoodie'], (C
               obj.$sharings.push @id
       
       @hoodie.store.updateAll objects, update
-        
+      
     
     # ## sync
     #
@@ -202,9 +203,9 @@ define 'hoodie/sharing/instance', ['hoodie/config', 'hoodie/sharing/hoodie'], (C
     # We need 1. in order to find out if there are documents that are
     # not to be shared anymore and therefore need to be removed.
     sync: ->
-      promise = @hoodie.store.loadAll(@_is_my_shared_object_and_changed)
-      .done @hoodie.remote.push_changes
-      promise.fail -> console.log arguments
+      @hoodie.store.loadAll(@_is_my_shared_object_and_changed)
+      .pile @hoodie.remote.pull_changes
+      .pile @hoodie.remote.push_changes
       
     # ## Private
   
