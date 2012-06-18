@@ -38,10 +38,6 @@ define('hoodie/sharing/instance', ['hoodie/config', 'hoodie/sharing/hoodie'], fu
       this.anonymous = this.hoodie.account.username === void 0;
       this.id = attributes.id || this.hoodie.store.uuid(7);
       this.attributes(attributes);
-      if (this.invitees != null) {
-        this["private"] = true;
-      }
-      this.password || (this.password = this.id);
       this.config = new Config(this.hoodie, {
         type: '$sharing',
         id: this.id
@@ -84,6 +80,10 @@ define('hoodie/sharing/instance', ['hoodie/config', 'hoodie/sharing/hoodie'], fu
         if (update._user_rev) {
           this._user_rev = update._user_rev;
         }
+        if (this.invitees != null) {
+          this["private"] = true;
+        }
+        this.password || (this.password = this.id);
       }
       return {
         owner_uuid: this.owner_uuid(),

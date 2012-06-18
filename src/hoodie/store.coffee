@@ -154,28 +154,43 @@ define 'hoodie/store', ['hoodie/errors'], (ERROR) ->
     #     store.loadAll()
     #     store.loadAll('car')
     #     store.loadAll('car', function(obj) { return obj.brand == 'Tesla' })
+    #     store.loadAll(function(obj) { return obj.brand == 'Tesla' })
     loadAll: (type, filter) ->
       defer = @hoodie.defer()
       keys = @_index()
+      
+      if typeof type is 'function'
+        filter = type
+        type   = undefined
     
       try
+        # coffeescript gathers the result of the respective for key in keys loops
+        # and returns it as array, which will be stored in the results variable
         results = switch true
-          when type? and filter?
-            for key in keys when (key.indexOf(type) is 0) and @_is_semantic_id key
-              [_type, id] = key.split '/'
-              obj = @cache _type, id
-              if filter(obj)
-                obj
-              else
-                continue
+        
+          # when type set
           when type?
             for key in keys when (key.indexOf(type) is 0) and @_is_semantic_id key
               [_type, id] = key.split '/'
-              @cache _type, id
+              obj = @cache _type, id
+              if filter?(obj)
+                obj
+              else if not filter
+                obj
+              else
+                continue
+          
+          # load all
           else
             for key in keys when @_is_semantic_id key
               [_type, id] = key.split '/'
-              @cache _type, id
+              obj = @cache _type, id
+              if filter?(obj)
+                obj
+              else if not filter
+                obj
+              else
+                continue
 
         defer.resolve(results).promise()
       catch error

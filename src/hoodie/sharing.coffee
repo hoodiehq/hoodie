@@ -56,9 +56,8 @@ define 'hoodie/sharing', ['hoodie/sharing/instance'], (SharingInstance) ->
     #
     #     id:            (optional, defaults to random uuid)
     #                    name of sharing.
-    #     filters:       (optional)
-    #                    one or multiple key/value hashes with conditions 
-    #                    for the objects to be filtered.
+    #     objects:       (optional)
+    #                    array of objects that should be shared
     #     private:       (default: false)
     #                    when set to true, nobody but the creator and the
     #                    invitees have access. Set to true automatically
@@ -85,16 +84,15 @@ define 'hoodie/sharing', ['hoodie/sharing/instance'], (SharingInstance) ->
     #         "joey@example.com"
     #         "frank@example.com"
     #       ]
-    #       filters   : [
-    #         id           : todo_list.id
-    #         todo_list_id : todo_list.id
+    #       objects : [
+    #         todo_list, todo1, todo2, todo3
     #       ]
     #     
     #     # share all my documents that I marked as
     #     # shared and keep them updated
     #     hoodie.sharing.create
     #       continuous : true
-    #       filters     : shared: true
+    #       objects    : hoodie.store.loadAll (obj) -> obj.is_shared
     #
     create : (options = {}) ->
       SharingInstance.create options
@@ -106,6 +104,12 @@ define 'hoodie/sharing', ['hoodie/sharing/instance'], (SharingInstance) ->
     load : (id) ->
       SharingInstance.load id
     
+    
+    # ## find or create
+    #
+    # 1. Try to find a sharing by given id
+    # 2. If sharing could be found, return it
+    # 3. If not, create one and return it.
     find_or_create: (options) ->
       defer = @hoodie.defer()
       SharingInstance.load(options.id)
@@ -127,7 +131,7 @@ define 'hoodie/sharing', ['hoodie/sharing/instance'], (SharingInstance) ->
     #
     # Copy all data of a sharing to own database
     open: (id, options = {}) ->
-      
+      # tbd ...
     
     # alias
     delete: @::destroy

@@ -42,9 +42,6 @@ define 'hoodie/sharing/instance', ['hoodie/config', 'hoodie/sharing/hoodie'], (C
       # setting attributes
       @attributes attributes
       
-      @private    = true if @.invitees?
-      @password or= @id
-      
       # use the $sharing doc directly for configuration settings
       @config = new Config @hoodie, type: '$sharing', id: @id
 
@@ -79,13 +76,16 @@ define 'hoodie/sharing/instance', ['hoodie/config', 'hoodie/sharing/hoodie'], (C
     attributes: (update) ->
       
       if update
-        @private       = update.private       if update.private  
-        @invitees      = update.invitees      if update.invitees  
-        @continuous    = update.continuous    if update.continuous  
-        @collaborative = update.collaborative if update.collaborative
-        @password      = update.password      if update.password
-        @filters       = update.filters       if update.filters
-        @_user_rev     = update._user_rev     if update._user_rev
+        @private        = update.private       if update.private  
+        @invitees       = update.invitees      if update.invitees  
+        @continuous     = update.continuous    if update.continuous  
+        @collaborative  = update.collaborative if update.collaborative
+        @password       = update.password      if update.password
+        @filters        = update.filters       if update.filters
+        @_user_rev      = update._user_rev     if update._user_rev
+                        
+        @private        = true if @.invitees?
+        @password     or= @id
         
       owner_uuid    : @owner_uuid()
       private       : @private  

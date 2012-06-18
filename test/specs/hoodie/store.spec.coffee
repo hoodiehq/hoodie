@@ -317,8 +317,17 @@ define 'specs/hoodie/store', ['hoodie/store', 'mocks/hoodie'], (Store, HoodieMoc
             promise.done success
             
             results = success.mostRecentCall.args[0]
-            expect(results.length).toBe 1
-        
+            expect(results.length).toBe 1   
+            
+      _when "called only with filter `function(obj) { return obj.age === 1}` ", ->
+        with_2_cats_and_3_dogs ->
+          it "should return one dog", ->
+            success = jasmine.createSpy 'success'
+            promise = @store.loadAll (obj) -> obj.age is 1
+            promise.done success
+            
+            results = success.mostRecentCall.args[0]
+            expect(results.length).toBe 2   
     # /.loadAll(type)
 
     describe ".delete(type, id)", ->

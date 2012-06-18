@@ -412,7 +412,7 @@ define('specs/hoodie/store', ['hoodie/store', 'mocks/hoodie'], function(Store, H
           });
         });
       });
-      return _when("called with type = 'dog' and filter `function(obj) { return obj.age === 1}` ", function() {
+      _when("called with type = 'dog' and filter `function(obj) { return obj.age === 1}` ", function() {
         return with_2_cats_and_3_dogs(function() {
           return it("should return one dog", function() {
             var promise, results, success;
@@ -423,6 +423,20 @@ define('specs/hoodie/store', ['hoodie/store', 'mocks/hoodie'], function(Store, H
             promise.done(success);
             results = success.mostRecentCall.args[0];
             return expect(results.length).toBe(1);
+          });
+        });
+      });
+      return _when("called only with filter `function(obj) { return obj.age === 1}` ", function() {
+        return with_2_cats_and_3_dogs(function() {
+          return it("should return one dog", function() {
+            var promise, results, success;
+            success = jasmine.createSpy('success');
+            promise = this.store.loadAll(function(obj) {
+              return obj.age === 1;
+            });
+            promise.done(success);
+            results = success.mostRecentCall.args[0];
+            return expect(results.length).toBe(2);
           });
         });
       });
