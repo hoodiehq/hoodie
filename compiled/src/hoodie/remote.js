@@ -247,7 +247,6 @@ define('hoodie/remote', ['hoodie/errors'], function(ERROR) {
           update = {
             _rev: doc._rev
           };
-          console.log("update to " + response.id, update);
           _results.push(this.hoodie.store.update(doc.type, doc.id, update, {
             remote: true
           }));

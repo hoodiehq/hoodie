@@ -271,7 +271,6 @@ define 'hoodie/remote', ['hoodie/errors'], (ERROR) ->
           doc     = @_parse_from_remote(response)
           update  = _rev: doc._rev 
           
-          console.log "update to #{response.id}", update
           @hoodie.store.update(doc.type, doc.id, update, remote: true)
     
     #

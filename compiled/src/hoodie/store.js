@@ -138,56 +138,37 @@ define('hoodie/store', ['hoodie/errors'], function(ERROR) {
       return defer.promise();
     };
 
-    Store.prototype.loadAll = function(type, filter) {
-      var defer, id, key, keys, obj, results, _type;
+    Store.prototype.loadAll = function(searched_type, filter) {
+      var current_type, defer, id, key, keys, obj, results;
       defer = this.hoodie.defer();
       keys = this._index();
-      if (typeof type === 'function') {
-        filter = type;
-        type = void 0;
+      if (typeof searched_type === 'function') {
+        filter = searched_type;
+        searched_type = void 0;
       }
       try {
         results = (function() {
-          var _i, _j, _len, _len1, _ref, _ref1, _results, _results1;
-          switch (true) {
-            case type != null:
-              _results = [];
-              for (_i = 0, _len = keys.length; _i < _len; _i++) {
-                key = keys[_i];
-                if (!((key.indexOf(type) === 0) && this._is_semantic_id(key))) {
-                  continue;
-                }
-                _ref = key.split('/'), _type = _ref[0], id = _ref[1];
-                obj = this.cache(_type, id);
-                if (typeof filter === "function" ? filter(obj) : void 0) {
-                  _results.push(obj);
-                } else if (!filter) {
-                  _results.push(obj);
-                } else {
-                  continue;
-                }
-              }
-              return _results;
-              break;
-            default:
-              _results1 = [];
-              for (_j = 0, _len1 = keys.length; _j < _len1; _j++) {
-                key = keys[_j];
-                if (!(this._is_semantic_id(key))) {
-                  continue;
-                }
-                _ref1 = key.split('/'), _type = _ref1[0], id = _ref1[1];
-                obj = this.cache(_type, id);
-                if (typeof filter === "function" ? filter(obj) : void 0) {
-                  _results1.push(obj);
-                } else if (!filter) {
-                  _results1.push(obj);
-                } else {
-                  continue;
-                }
-              }
-              return _results1;
+          var _i, _len, _ref, _results;
+          _results = [];
+          for (_i = 0, _len = keys.length; _i < _len; _i++) {
+            key = keys[_i];
+            if (!(this._is_semantic_id(key))) {
+              continue;
+            }
+            _ref = key.split('/'), current_type = _ref[0], id = _ref[1];
+            if (searched_type && current_type !== searched_type) {
+              continue;
+            }
+            obj = this.cache(current_type, id);
+            if (filter === void 0) {
+              _results.push(obj);
+            } else if (typeof filter === "function" ? filter(obj) : void 0) {
+              _results.push(obj);
+            } else {
+              continue;
+            }
           }
+          return _results;
         }).call(this);
         defer.resolve(results).promise();
       } catch (error) {
