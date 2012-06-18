@@ -47,25 +47,10 @@ define('specs/hoodie/sharing/instance', ['mocks/hoodie', 'hoodie/sharing/instanc
       });
     });
     return describe(".attributes(options)", function() {
-      it("should add the owner_uuid as attribute", function() {
+      return it("should add the owner_uuid as attribute", function() {
         spyOn(this.sharing, "owner_uuid").andReturn('owner987');
         return expect(this.sharing.attributes().owner_uuid).toBe('owner987');
       });
-      it("should turn passed filters into a stringified fuction", function() {
-        var attributes;
-        attributes = this.sharing.attributes({
-          filters: [
-            {
-              shared: true,
-              "public": true,
-              price: 0,
-              autor: "Joe Doe"
-            }
-          ]
-        });
-        return expect(attributes.filter).toBe("function(obj) { return obj['shared'] == true && obj['public'] == true && obj['price'] == 0 && obj['autor'] == 'Joe Doe' }");
-      });
-      return it("should add owner_uuid to the options", function() {});
     });
   });
 });

@@ -7,6 +7,8 @@ jasmine.Matchers.prototype.toBePromise = ->
   
 jasmine.Matchers.prototype.toBeRejected = -> this.actual.isRejected()
 jasmine.Matchers.prototype.toBeResolved = -> this.actual.isResolved()
+jasmine.Matchers.prototype.notToBeRejected = -> not this.actual.isRejected()
+jasmine.Matchers.prototype.notToBeResolved = -> not this.actual.isResolved()
 
 jasmine.Matchers.prototype.toBeResolvedWith = -> 
   expectedArgs = jasmine.util.argsToArray(arguments);

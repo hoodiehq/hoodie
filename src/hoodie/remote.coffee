@@ -60,11 +60,11 @@ define 'hoodie/remote', ['hoodie/errors'], (ERROR) ->
       
     # ## Push changes
     #
-    # Push locally changed objects to userDB using the
-    # using the `_bulk_docs` API
-    push_changes : () =>
-
-      docs    = @hoodie.store.changed_docs()
+    # Push objects to userDB using the `_bulk_docs` API.
+    # If no objects passed, push all changed documents
+    push_changes : (docs) =>
+      
+      docs = @hoodie.store.changed_docs() unless docs
       return @_promise().resolve([]) if docs.length is 0
         
       docs = for doc in docs
@@ -88,7 +88,6 @@ define 'hoodie/remote', ['hoodie/errors'], (ERROR) ->
     reset_seq : -> 
       @hoodie.config.remove '_remote.seq'
       delete @_seq
-    
     
     # ## On
     #

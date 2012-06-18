@@ -20,6 +20,8 @@ define('mocks/hoodie', function() {
 
     HoodieMock.prototype.defer = $.Deferred;
 
+    HoodieMock.prototype.isPromise = function() {};
+
     HoodieMock.prototype.store = {
       uuid: function() {
         return 'mock567';

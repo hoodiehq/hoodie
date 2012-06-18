@@ -40,6 +40,12 @@ define 'hoodie', ['hoodie/events'], (Events) ->
     # returns a promise skeletton for custom promise handlings
     defer: $.Deferred
     
+    # ## Utils
+    
+    isPromise: (obj) ->
+      typeof obj.done is 'function' and typeof obj.fail is 'function'
+    
+    
     _ready_callbacks: []
     _ready: false
     ready: (callback) ->

@@ -258,7 +258,7 @@ define('specs/hoodie/store', ['hoodie/store', 'mocks/hoodie'], function(Store, H
         return expect(promise).toBe('promise');
       });
     });
-    describe(".update(type, id, object, options)", function() {
+    describe(".update(type, id, update, options)", function() {
       beforeEach(function() {
         spyOn(this.store, "load");
         return spyOn(this.store, "save");
@@ -275,22 +275,118 @@ define('specs/hoodie/store', ['hoodie/store', 'mocks/hoodie'], function(Store, H
         });
       });
       return _when("object can be found", function() {
-        beforeEach(function() {
-          this.store.load.andReturn($.Deferred().resolve({
-            style: 'baws'
-          }));
-          return this.promise = this.store.update('couch', '123', {
-            funky: 'fresh'
+        _and("update is an object", function() {
+          beforeEach(function() {
+            this.store.load.andReturn($.Deferred().resolve({
+              style: 'baws'
+            }));
+            return this.promise = this.store.update('couch', '123', {
+              funky: 'fresh'
+            });
+          });
+          it("should save the updated object", function() {
+            return expect(this.store.save).wasCalledWith('couch', '123', {
+              style: 'baws',
+              funky: 'fresh'
+            }, {});
+          });
+          return it("should return a resolved promise", function() {
+            return expect(this.promise).toBeResolved();
           });
         });
-        it("should save the updated object", function() {
-          return expect(this.store.save).wasCalledWith('couch', '123', {
-            style: 'baws',
-            funky: 'fresh'
-          }, {});
+        return _and("update is a function", function() {
+          beforeEach(function() {
+            this.store.load.andReturn($.Deferred().resolve({
+              style: 'baws'
+            }));
+            return this.promise = this.store.update('couch', '123', function(obj) {
+              return obj.funky = 'fresh';
+            });
+          });
+          it("should save the updated object", function() {
+            return expect(this.store.save).wasCalledWith('couch', '123', {
+              style: 'baws',
+              funky: 'fresh'
+            }, {});
+          });
+          return it("should return a resolved promise", function() {
+            return expect(this.promise).toBeResolved();
+          });
         });
-        return it("should return a resolved promise", function() {
-          return expect(this.promise).toBeResolved();
+      });
+    });
+    describe(".updateAll(objects)", function() {
+      beforeEach(function() {
+        spyOn(this.hoodie, "isPromise").andReturn(false);
+        return this.todo_objects = [
+          {
+            type: 'todo',
+            id: '1'
+          }, {
+            type: 'todo',
+            id: '2'
+          }, {
+            type: 'todo',
+            id: '3'
+          }
+        ];
+      });
+      it("should return a promise", function() {
+        return expect(this.store.updateAll(this.todo_objects, {})).toBePromise();
+      });
+      it("should update objects", function() {
+        var obj, _i, _len, _ref, _results;
+        spyOn(this.store, "update");
+        this.store.updateAll(this.todo_objects, {
+          funky: 'update'
+        });
+        _ref = this.todo_objects;
+        _results = [];
+        for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+          obj = _ref[_i];
+          _results.push(expect(this.store.update).wasCalledWith(obj.type, obj.id, {
+            funky: 'update'
+          }, {}));
+        }
+        return _results;
+      });
+      it("should resolve the returned promise once all objects have been updated", function() {
+        var promise;
+        promise = this.hoodie.defer().resolve().promise();
+        spyOn(this.store, "update").andReturn(promise);
+        return expect(this.store.updateAll(this.todo_objects, {})).toBeResolved();
+      });
+      it("should not resolve the retunred promise unless object updates have been finished", function() {
+        var promise;
+        promise = this.hoodie.defer().promise();
+        spyOn(this.store, "update").andReturn(promise);
+        return expect(this.store.updateAll(this.todo_objects, {})).notToBeResolved();
+      });
+      return _when("passed objects is a promise", function() {
+        beforeEach(function() {
+          return this.hoodie.isPromise.andReturn(true);
+        });
+        return it("should update objects returned by promise", function() {
+          var obj, promise, _i, _len, _ref, _results,
+            _this = this;
+          promise = {
+            pipe: function(cb) {
+              return cb(_this.todo_objects);
+            }
+          };
+          spyOn(this.store, "update");
+          this.store.updateAll(promise, {
+            funky: 'update'
+          });
+          _ref = this.todo_objects;
+          _results = [];
+          for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+            obj = _ref[_i];
+            _results.push(expect(this.store.update).wasCalledWith(obj.type, obj.id, {
+              funky: 'update'
+            }, {}));
+          }
+          return _results;
         });
       });
     });
@@ -343,7 +439,7 @@ define('specs/hoodie/store', ['hoodie/store', 'mocks/hoodie'], function(Store, H
         return expect(this.store.db.getItem.callCount).toBe(1);
       });
     });
-    describe(".loadAll(type, conditions)", function() {
+    describe(".loadAll(filter)", function() {
       var with_2_cats_and_3_dogs;
       with_2_cats_and_3_dogs = function(specs) {
         return _and("two cat and three dog objects exist in the store", function() {
@@ -361,7 +457,7 @@ define('specs/hoodie/store', ['hoodie/store', 'mocks/hoodie'], function(Store, H
       };
       it("should return a promise", function() {
         var promise;
-        promise = this.store.loadAll('document');
+        promise = this.store.loadAll();
         return expect(promise).toBePromise();
       });
       _when("called without a type", function() {
@@ -394,32 +490,6 @@ define('specs/hoodie/store', ['hoodie/store', 'mocks/hoodie'], function(Store, H
             var promise, results, success;
             success = jasmine.createSpy('success');
             promise = this.store.loadAll();
-            promise.done(success);
-            results = success.mostRecentCall.args[0];
-            return expect(results.length).toBe(1);
-          });
-        });
-      });
-      _when("called with type = 'cat'", function() {
-        return with_2_cats_and_3_dogs(function() {
-          return it("should return only the cat objects", function() {
-            var promise, results, success;
-            success = jasmine.createSpy('success');
-            promise = this.store.loadAll('cat');
-            promise.done(success);
-            results = success.mostRecentCall.args[0];
-            return expect(results.length).toBe(2);
-          });
-        });
-      });
-      _when("called with type = 'dog' and filter `function(obj) { return obj.age === 1}` ", function() {
-        return with_2_cats_and_3_dogs(function() {
-          return it("should return one dog", function() {
-            var promise, results, success;
-            success = jasmine.createSpy('success');
-            promise = this.store.loadAll('dog', function(obj) {
-              return obj.age === 1;
-            });
             promise.done(success);
             results = success.mostRecentCall.args[0];
             return expect(results.length).toBe(1);

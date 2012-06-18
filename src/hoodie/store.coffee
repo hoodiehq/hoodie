@@ -109,13 +109,57 @@ define 'hoodie/store', ['hoodie/errors'], (ERROR) ->
     #
     # In contrast to `.save`, the `.update` method does not replace the stored object,
     # but only changes the passed attributes of an exsting object, if it exists
+    #
+    # both a hash of key/values or a function that applies the update to the passed
+    # object can be passed.
+    #
+    # example usage
+    #
+    # hoodie.store.update('car', 'abc4567', {sold: true})
+    # hoodie.store.update('car', 'abc4567', function(obj) { obj.sold = true })
     update : (type, id, object_update, options = {}) ->
+      defer = @hoodie.defer()
       
-      promise = @load(type, id).pipe (current_obj) => 
-        @save(type, id, $.extend(current_obj, object_update), options)
+      _load_promise = @load(type, id).pipe (current_obj) => 
+        if typeof object_update is 'function'
+          object_update(current_obj)
+        else
+          current_obj = $.extend(current_obj, object_update)
+        @save(type, id, current_obj, options).then defer.resolve, defer.reject
         
       # if not found, create it
-      promise.fail => @save(type, id, object_update)
+      _load_promise.fail => 
+        @save(type, id, object_update).then defer.resolve, defer.reject
+      
+      defer.promise()
+      
+    # ## updateAll
+    #
+    # update all objects in the store, can be optionally filtered by a function
+    # As an alternative, an array of objects can be passed
+    #
+    # example usage
+    #
+    # hoodie.store.updateAll()
+    updateAll : (filter_or_objects, object_update, options = {}) ->
+      
+      # normalize the input: make sure we have all objects
+      if @hoodie.isPromise(filter_or_objects)
+        promise = filter_or_objects
+      else
+        promise = @hoodie.defer().resolve( filter_or_objects ).resolve()
+      
+      promise.pipe (objects) =>
+        
+        # no we update all objects one by one and return a promise
+        # that will be resolved once all updates have been finished
+        defer = @hoodie.defer()
+        _update_promises = for object in objects
+          @update(object.type, object.id, object_update, options) 
+        $.when.apply(null, _update_promises).then defer.resolve
+        
+        return defer.promise()
+      
     
     
     # ## load
@@ -147,34 +191,24 @@ define 'hoodie/store', ['hoodie/errors'], (ERROR) ->
     # ## loadAll
     #
     # returns all objects from store. 
-    # Can be filtered by type name and a filter function
+    # Can be optionally filtered by passed function
     #
     # example usage:
     #
     #     store.loadAll()
-    #     store.loadAll('car')
-    #     store.loadAll('car', function(obj) { return obj.brand == 'Tesla' })
     #     store.loadAll(function(obj) { return obj.brand == 'Tesla' })
-    loadAll: (searched_type, filter) ->
+    loadAll: (filter = -> true) ->
       defer = @hoodie.defer()
       keys = @_index()
-      
-      if typeof searched_type is 'function'
-        filter        = searched_type
-        searched_type = undefined
     
       try
         # coffeescript gathers the result of the respective for key in keys loops
         # and returns it as array, which will be stored in the results variable
         results = for key in keys when @_is_semantic_id key
           [current_type, id] = key.split '/'
-          if searched_type and current_type isnt searched_type
-            continue
           
           obj = @cache current_type, id
-          if filter is undefined
-            obj
-          else if filter?(obj)
+          if filter(obj)
             obj
           else
             continue

@@ -183,53 +183,68 @@ define 'specs/hoodie/remote', ['hoodie/remote', 'mocks/hoodie', 'mocks/changes_r
           expect(window.setTimeout).wasCalledWith @remote.pull_changes, 3000
     # /.pull_changes()
     
-    describe ".push_changes()", ->  
-      _when "there are no changed docs", ->
-        beforeEach ->
-          spyOn(@hoodie.store, "changed_docs").andReturn []
-          @remote.push_changes()
-          
-        it "shouldn't do anything", ->
-          expect(@hoodie.request).wasNotCalled()
-          
-      _when "there is one deleted and one changed doc", ->
-        beforeEach ->
-          spyOn(@hoodie.store, "changed_docs").andReturn ChangedDocsMock()
-          spyOn(@hoodie.account, "db").andReturn 'joe$examle_com'
-          @remote.push_changes()
-          expect(@hoodie.request).wasCalled()
-          [@method, @path, @options] = @hoodie.request.mostRecentCall.args
-        
-        it "should post the changes to the user's db _bulk_docs API", ->
-          expect(@method).toBe 'POST'
-          expect(@path).toBe '/joe%24examle_com/_bulk_docs'
-          
-        it "should set dataType to json", ->
-          expect(@options.dataType).toBe 'json'
-          
-        it "should set processData to false", ->
-          expect(@options.processData).toBe false
-        
-        it "should set contentType to 'application/json'", ->
-          expect(@options.contentType).toBe 'application/json'
-          
-        it "should send the docs in appropriate format", ->
-          {docs} = JSON.parse @options.data
-          doc = docs[0]
-          expect(doc.id).toBeUndefined()
-          expect(doc._id).toBe 'todo/abc3'
-          expect(doc._localInfo).toBeUndefined()
-          
-        _and "the request is successful, but with one conflict error", ->
+    describe ".push_changes(docs)", ->  
+      _when "no docs passed", ->        
+        _and "there are no changed docs", ->
           beforeEach ->
-            @hoodie.request.andCallFake (method, path, options) => 
-              options.success BulkUpdateResponseMock()
-              
+            spyOn(@hoodie.store, "changed_docs").andReturn []
             @remote.push_changes()
+        
+          it "shouldn't do anything", ->
+            expect(@hoodie.request).wasNotCalled()
+        
+        _and "there is one deleted and one changed doc", ->
+          beforeEach ->
+            spyOn(@hoodie.store, "changed_docs").andReturn ChangedDocsMock()
+            spyOn(@hoodie.account, "db").andReturn 'joe$examle_com'
+            @remote.push_changes()
+            expect(@hoodie.request).wasCalled()
+            [@method, @path, @options] = @hoodie.request.mostRecentCall.args
+      
+          it "should post the changes to the user's db _bulk_docs API", ->
+            expect(@method).toBe 'POST'
+            expect(@path).toBe '/joe%24examle_com/_bulk_docs'
+        
+          it "should set dataType to json", ->
+            expect(@options.dataType).toBe 'json'
+        
+          it "should set processData to false", ->
+            expect(@options.processData).toBe false
+      
+          it "should set contentType to 'application/json'", ->
+            expect(@options.contentType).toBe 'application/json'
+        
+          it "should send the docs in appropriate format", ->
+            {docs} = JSON.parse @options.data
+            doc = docs[0]
+            expect(doc.id).toBeUndefined()
+            expect(doc._id).toBe 'todo/abc3'
+            expect(doc._localInfo).toBeUndefined()
+        
+          _and "the request is successful, but with one conflict error", ->
+            beforeEach ->
+              @hoodie.request.andCallFake (method, path, options) => 
+                options.success BulkUpdateResponseMock()
             
-          it "should trigger conflict event", ->
-            expect(@hoodie.trigger).wasCalledWith 'remote:error:conflict', 'todo/abc2'
-    # /.push_changes()
+              @remote.push_changes()
+          
+            it "should trigger conflict event", ->
+              expect(@hoodie.trigger).wasCalledWith 'remote:error:conflict', 'todo/abc2'
+        
+        _when "Array of docs passed", ->
+          beforeEach ->
+            @todo_objects = [
+              {type: 'todo', id: '1'}
+              {type: 'todo', id: '2'}
+              {type: 'todo', id: '3'}
+            ]
+            @remote.push_changes @todo_objects
+          
+          it "should POST the passed objects", ->
+            expect(@hoodie.request).wasCalled()
+            data = JSON.parse @hoodie.request.mostRecentCall.args[2].data
+            expect(data.docs.length).toBe 3
+    # /.push_changes(docs)
     
     describe ".on(event, callback)", ->  
       it "should namespace events with `remote`", ->

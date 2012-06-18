@@ -226,56 +226,81 @@ define('specs/hoodie/remote', ['hoodie/remote', 'mocks/hoodie', 'mocks/changes_r
         });
       });
     });
-    describe(".push_changes()", function() {
-      _when("there are no changed docs", function() {
-        beforeEach(function() {
-          spyOn(this.hoodie.store, "changed_docs").andReturn([]);
-          return this.remote.push_changes();
-        });
-        return it("shouldn't do anything", function() {
-          return expect(this.hoodie.request).wasNotCalled();
-        });
-      });
-      return _when("there is one deleted and one changed doc", function() {
-        beforeEach(function() {
-          var _ref;
-          spyOn(this.hoodie.store, "changed_docs").andReturn(ChangedDocsMock());
-          spyOn(this.hoodie.account, "db").andReturn('joe$examle_com');
-          this.remote.push_changes();
-          expect(this.hoodie.request).wasCalled();
-          return _ref = this.hoodie.request.mostRecentCall.args, this.method = _ref[0], this.path = _ref[1], this.options = _ref[2], _ref;
-        });
-        it("should post the changes to the user's db _bulk_docs API", function() {
-          expect(this.method).toBe('POST');
-          return expect(this.path).toBe('/joe%24examle_com/_bulk_docs');
-        });
-        it("should set dataType to json", function() {
-          return expect(this.options.dataType).toBe('json');
-        });
-        it("should set processData to false", function() {
-          return expect(this.options.processData).toBe(false);
-        });
-        it("should set contentType to 'application/json'", function() {
-          return expect(this.options.contentType).toBe('application/json');
-        });
-        it("should send the docs in appropriate format", function() {
-          var doc, docs;
-          docs = JSON.parse(this.options.data).docs;
-          doc = docs[0];
-          expect(doc.id).toBeUndefined();
-          expect(doc._id).toBe('todo/abc3');
-          return expect(doc._localInfo).toBeUndefined();
-        });
-        return _and("the request is successful, but with one conflict error", function() {
+    describe(".push_changes(docs)", function() {
+      return _when("no docs passed", function() {
+        _and("there are no changed docs", function() {
           beforeEach(function() {
-            var _this = this;
-            this.hoodie.request.andCallFake(function(method, path, options) {
-              return options.success(BulkUpdateResponseMock());
-            });
+            spyOn(this.hoodie.store, "changed_docs").andReturn([]);
             return this.remote.push_changes();
           });
-          return it("should trigger conflict event", function() {
-            return expect(this.hoodie.trigger).wasCalledWith('remote:error:conflict', 'todo/abc2');
+          return it("shouldn't do anything", function() {
+            return expect(this.hoodie.request).wasNotCalled();
+          });
+        });
+        _and("there is one deleted and one changed doc", function() {
+          beforeEach(function() {
+            var _ref;
+            spyOn(this.hoodie.store, "changed_docs").andReturn(ChangedDocsMock());
+            spyOn(this.hoodie.account, "db").andReturn('joe$examle_com');
+            this.remote.push_changes();
+            expect(this.hoodie.request).wasCalled();
+            return _ref = this.hoodie.request.mostRecentCall.args, this.method = _ref[0], this.path = _ref[1], this.options = _ref[2], _ref;
+          });
+          it("should post the changes to the user's db _bulk_docs API", function() {
+            expect(this.method).toBe('POST');
+            return expect(this.path).toBe('/joe%24examle_com/_bulk_docs');
+          });
+          it("should set dataType to json", function() {
+            return expect(this.options.dataType).toBe('json');
+          });
+          it("should set processData to false", function() {
+            return expect(this.options.processData).toBe(false);
+          });
+          it("should set contentType to 'application/json'", function() {
+            return expect(this.options.contentType).toBe('application/json');
+          });
+          it("should send the docs in appropriate format", function() {
+            var doc, docs;
+            docs = JSON.parse(this.options.data).docs;
+            doc = docs[0];
+            expect(doc.id).toBeUndefined();
+            expect(doc._id).toBe('todo/abc3');
+            return expect(doc._localInfo).toBeUndefined();
+          });
+          return _and("the request is successful, but with one conflict error", function() {
+            beforeEach(function() {
+              var _this = this;
+              this.hoodie.request.andCallFake(function(method, path, options) {
+                return options.success(BulkUpdateResponseMock());
+              });
+              return this.remote.push_changes();
+            });
+            return it("should trigger conflict event", function() {
+              return expect(this.hoodie.trigger).wasCalledWith('remote:error:conflict', 'todo/abc2');
+            });
+          });
+        });
+        return _when("Array of docs passed", function() {
+          beforeEach(function() {
+            this.todo_objects = [
+              {
+                type: 'todo',
+                id: '1'
+              }, {
+                type: 'todo',
+                id: '2'
+              }, {
+                type: 'todo',
+                id: '3'
+              }
+            ];
+            return this.remote.push_changes(this.todo_objects);
+          });
+          return it("should POST the passed objects", function() {
+            var data;
+            expect(this.hoodie.request).wasCalled();
+            data = JSON.parse(this.hoodie.request.mostRecentCall.args[2].data);
+            return expect(data.docs.length).toBe(3);
           });
         });
       });

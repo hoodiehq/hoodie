@@ -9,6 +9,7 @@ define 'mocks/hoodie', ->
     one           : ->
     unbind        : ->
     defer         : $.Deferred
+    isPromise     : -> 
       
     store         :
       uuid          : -> 'mock567'

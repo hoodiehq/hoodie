@@ -36,6 +36,10 @@ define('hoodie', ['hoodie/events'], function(Events) {
 
     Hoodie.prototype.defer = $.Deferred;
 
+    Hoodie.prototype.isPromise = function(obj) {
+      return typeof obj.done === 'function' && typeof obj.fail === 'function';
+    };
+
     Hoodie.prototype._ready_callbacks = [];
 
     Hoodie.prototype._ready = false;

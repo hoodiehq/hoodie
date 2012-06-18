@@ -190,7 +190,7 @@ define 'specs/hoodie/store', ['hoodie/store', 'mocks/hoodie'], (Store, HoodieMoc
         expect(promise).toBe 'promise'
     # /.create(type, object, options)
     
-    describe ".update(type, id, object, options)", ->
+    describe ".update(type, id, update, options)", ->
       beforeEach ->
         spyOn(@store, "load")
         spyOn(@store, "save")
@@ -204,16 +204,70 @@ define 'specs/hoodie/store', ['hoodie/store', 'mocks/hoodie'], (Store, HoodieMoc
           expect(@promise).toBeRejected()
       
       _when "object can be found", ->
+        
+        _and "update is an object", ->          
+          beforeEach ->
+            @store.load.andReturn $.Deferred().resolve { style: 'baws' }
+            @promise = @store.update 'couch', '123', { funky: 'fresh' }
+        
+          it "should save the updated object", ->
+            expect(@store.save).wasCalledWith 'couch', '123', { style: 'baws', funky: 'fresh' }, {}
+        
+          it "should return a resolved promise", ->
+            expect(@promise).toBeResolved()
+          
+        _and "update is a function", ->
+          beforeEach ->
+            @store.load.andReturn $.Deferred().resolve { style: 'baws' }
+            @promise = @store.update 'couch', '123', (obj) -> obj.funky = 'fresh'
+
+          it "should save the updated object", ->
+            expect(@store.save).wasCalledWith 'couch', '123', { style: 'baws', funky: 'fresh' }, {}
+
+          it "should return a resolved promise", ->
+            expect(@promise).toBeResolved()
+    # /.update(type, id, update, options)
+    
+    describe ".updateAll(objects)", ->
+      beforeEach ->
+        spyOn(@hoodie, "isPromise").andReturn false
+        @todo_objects = [
+          {type: 'todo', id: '1'}
+          {type: 'todo', id: '2'}
+          {type: 'todo', id: '3'}
+        ]
+      
+      it "should return a promise", ->
+        expect(@store.updateAll(@todo_objects, {})).toBePromise()
+      
+      it "should update objects", ->
+        spyOn(@store, "update")
+        @store.updateAll @todo_objects, {funky: 'update'}
+        for obj in @todo_objects
+          expect(@store.update).wasCalledWith obj.type, obj.id, {funky: 'update'}, {}
+      
+      it "should resolve the returned promise once all objects have been updated", ->
+        promise = @hoodie.defer().resolve().promise()
+        spyOn(@store, "update").andReturn promise
+        expect(@store.updateAll(@todo_objects, {})).toBeResolved()
+      
+      it "should not resolve the retunred promise unless object updates have been finished", ->
+        promise = @hoodie.defer().promise()
+        spyOn(@store, "update").andReturn promise
+        expect(@store.updateAll(@todo_objects, {})).notToBeResolved()
+      
+       
+      _when "passed objects is a promise", ->
         beforeEach ->
-          @store.load.andReturn $.Deferred().resolve { style: 'baws' }
-          @promise = @store.update 'couch', '123', { funky: 'fresh' }
-        
-        it "should save the updated object", ->
-          expect(@store.save).wasCalledWith 'couch', '123', { style: 'baws', funky: 'fresh' }, {}
-        
-        it "should return a resolved promise", ->
-          expect(@promise).toBeResolved()
-    # /.update(type, id, object, options)
+          @hoodie.isPromise.andReturn true
+          
+        it "should update objects returned by promise", ->
+          promise = pipe : (cb) => cb(@todo_objects)
+          spyOn(@store, "update")
+          @store.updateAll promise, {funky: 'update'}
+          for obj in @todo_objects
+            expect(@store.update).wasCalledWith obj.type, obj.id, {funky: 'update'}, {}
+    # /.updateAll(objects)
 
     describe ".load(type, id)", ->
       beforeEach ->
@@ -256,7 +310,7 @@ define 'specs/hoodie/store', ['hoodie/store', 'mocks/hoodie'], (Store, HoodieMoc
         expect(@store.db.getItem.callCount).toBe 1
     # /.get(type, id)
 
-    describe ".loadAll(type, conditions)", ->
+    describe ".loadAll(filter)", ->
       with_2_cats_and_3_dogs = (specs) ->
         _and "two cat and three dog objects exist in the store", ->
           beforeEach ->
@@ -265,7 +319,7 @@ define 'specs/hoodie/store', ['hoodie/store', 'mocks/hoodie'], (Store, HoodieMoc
           specs()
   
       it "should return a promise", ->
-        promise = @store.loadAll 'document'
+        promise = @store.loadAll()
         expect(promise).toBePromise()
     
       _when "called without a type", ->
@@ -298,26 +352,6 @@ define 'specs/hoodie/store', ['hoodie/store', 'mocks/hoodie'], (Store, HoodieMoc
             
             results = success.mostRecentCall.args[0]
             expect(results.length).toBe 1
-      
-      _when "called with type = 'cat'", ->
-        with_2_cats_and_3_dogs ->
-          it "should return only the cat objects", ->
-            success = jasmine.createSpy 'success'
-            promise = @store.loadAll('cat')
-            promise.done success
-            
-            results = success.mostRecentCall.args[0]
-            expect(results.length).toBe 2
-            
-      _when "called with type = 'dog' and filter `function(obj) { return obj.age === 1}` ", ->
-        with_2_cats_and_3_dogs ->
-          it "should return one dog", ->
-            success = jasmine.createSpy 'success'
-            promise = @store.loadAll 'dog', (obj) -> obj.age is 1
-            promise.done success
-            
-            results = success.mostRecentCall.args[0]
-            expect(results.length).toBe 1   
             
       _when "called only with filter `function(obj) { return obj.age === 1}` ", ->
         with_2_cats_and_3_dogs ->

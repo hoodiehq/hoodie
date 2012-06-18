@@ -107,16 +107,51 @@ define('hoodie/store', ['hoodie/errors'], function(ERROR) {
     };
 
     Store.prototype.update = function(type, id, object_update, options) {
+      var defer, _load_promise,
+        _this = this;
+      if (options == null) {
+        options = {};
+      }
+      defer = this.hoodie.defer();
+      _load_promise = this.load(type, id).pipe(function(current_obj) {
+        if (typeof object_update === 'function') {
+          object_update(current_obj);
+        } else {
+          current_obj = $.extend(current_obj, object_update);
+        }
+        return _this.save(type, id, current_obj, options).then(defer.resolve, defer.reject);
+      });
+      _load_promise.fail(function() {
+        return _this.save(type, id, object_update).then(defer.resolve, defer.reject);
+      });
+      return defer.promise();
+    };
+
+    Store.prototype.updateAll = function(filter_or_objects, object_update, options) {
       var promise,
         _this = this;
       if (options == null) {
         options = {};
       }
-      promise = this.load(type, id).pipe(function(current_obj) {
-        return _this.save(type, id, $.extend(current_obj, object_update), options);
-      });
-      return promise.fail(function() {
-        return _this.save(type, id, object_update);
+      if (this.hoodie.isPromise(filter_or_objects)) {
+        promise = filter_or_objects;
+      } else {
+        promise = this.hoodie.defer().resolve(filter_or_objects).resolve();
+      }
+      return promise.pipe(function(objects) {
+        var defer, object, _update_promises;
+        defer = _this.hoodie.defer();
+        _update_promises = (function() {
+          var _i, _len, _results;
+          _results = [];
+          for (_i = 0, _len = objects.length; _i < _len; _i++) {
+            object = objects[_i];
+            _results.push(this.update(object.type, object.id, object_update, options));
+          }
+          return _results;
+        }).call(_this);
+        $.when.apply(null, _update_promises).then(defer.resolve);
+        return defer.promise();
       });
     };
 
@@ -138,14 +173,15 @@ define('hoodie/store', ['hoodie/errors'], function(ERROR) {
       return defer.promise();
     };
 
-    Store.prototype.loadAll = function(searched_type, filter) {
+    Store.prototype.loadAll = function(filter) {
       var current_type, defer, id, key, keys, obj, results;
+      if (filter == null) {
+        filter = function() {
+          return true;
+        };
+      }
       defer = this.hoodie.defer();
       keys = this._index();
-      if (typeof searched_type === 'function') {
-        filter = searched_type;
-        searched_type = void 0;
-      }
       try {
         results = (function() {
           var _i, _len, _ref, _results;
@@ -156,13 +192,8 @@ define('hoodie/store', ['hoodie/errors'], function(ERROR) {
               continue;
             }
             _ref = key.split('/'), current_type = _ref[0], id = _ref[1];
-            if (searched_type && current_type !== searched_type) {
-              continue;
-            }
             obj = this.cache(current_type, id);
-            if (filter === void 0) {
-              _results.push(obj);
-            } else if (typeof filter === "function" ? filter(obj) : void 0) {
+            if (filter(obj)) {
               _results.push(obj);
             } else {
               continue;

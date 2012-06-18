@@ -59,9 +59,11 @@ define('hoodie/remote', ['hoodie/errors'], function(ERROR) {
       return this._changes_request_timeout = window.setTimeout(this._restart_changes_request, 25000);
     };
 
-    Remote.prototype.push_changes = function() {
-      var doc, docs;
-      docs = this.hoodie.store.changed_docs();
+    Remote.prototype.push_changes = function(docs) {
+      var doc;
+      if (!docs) {
+        docs = this.hoodie.store.changed_docs();
+      }
       if (docs.length === 0) {
         return this._promise().resolve([]);
       }

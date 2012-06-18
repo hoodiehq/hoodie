@@ -25,6 +25,14 @@ jasmine.Matchers.prototype.toBeResolved = function() {
   return this.actual.isResolved();
 };
 
+jasmine.Matchers.prototype.notToBeRejected = function() {
+  return !this.actual.isRejected();
+};
+
+jasmine.Matchers.prototype.notToBeResolved = function() {
+  return !this.actual.isResolved();
+};
+
 jasmine.Matchers.prototype.toBeResolvedWith = function() {
   var done, expectedArgs;
   expectedArgs = jasmine.util.argsToArray(arguments);

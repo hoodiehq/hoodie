@@ -44,6 +44,9 @@ define 'hoodie/sharing/instance', ['hoodie/config', 'hoodie/sharing/hoodie'], (C
       
       # use the $sharing doc directly for configuration settings
       @config = new Config @hoodie, type: '$sharing', id: @id
+      
+      # if objects passed, add them to the sharing
+      @add attributes.objects if attributes.objects
 
       if @anonymous
         @hoodie = new SharingHoodie @hoodie, this
@@ -81,7 +84,6 @@ define 'hoodie/sharing/instance', ['hoodie/config', 'hoodie/sharing/hoodie'], (C
         @continuous     = update.continuous    if update.continuous  
         @collaborative  = update.collaborative if update.collaborative
         @password       = update.password      if update.password
-        @filters        = update.filters       if update.filters
         @_user_rev      = update._user_rev     if update._user_rev
                         
         @private        = true if @.invitees?
@@ -93,7 +95,6 @@ define 'hoodie/sharing/instance', ['hoodie/config', 'hoodie/sharing/hoodie'], (C
       continuous    : @continuous  
       collaborative : @collaborative
       password      : @password
-      filter        : @_turn_filters_into_function @filters
       _user_rev     : @_user_rev
       
     
@@ -102,7 +103,6 @@ define 'hoodie/sharing/instance', ['hoodie/config', 'hoodie/sharing/hoodie'], (C
     # creates a new $sharing doc.
     create: ->
       defer = @hoodie.defer()
-      
       
       @hoodie.store.save( "$sharing", @id, @attributes() )
       
@@ -129,6 +129,71 @@ define 'hoodie/sharing/instance', ['hoodie/config', 'hoodie/sharing/hoodie'], (C
       defer.promise()
       
     
+    # ## add
+    #
+    # add one or multiple objects to sharing
+    #
+    # usage
+    #
+    # sharing.add(todo_object)
+    # sharing.add([todo_object1, todo_object2, todo_object3])
+    # sharing.add( hoodie.store.findAll (obj) -> obj.is_shared )
+    add: (objects) ->
+      @toggle objects, true
+        
+    # ## remove
+    #
+    # remove one or multiple objects from sharing
+    #
+    # usage
+    #
+    # sharing.remove(todo_object)
+    # sharing.remove([todo_object1, todo_object2, todo_object3])
+    # sharing.remove( hoodie.store.findAll (obj) -> obj.is_shared )
+    remove: (objects) -> 
+      @toggle objects, false
+    
+    # ## toggle (add or remove, depending on passed flag)
+    #
+    # if do_add is true, add the passed objects to sharing, otherwise
+    # remove them
+    toggle: (objects, do_add) ->
+      
+      # normalize input
+      unless @hoodie.isPromise objects
+        objects = [objects] unless $.isArray objects
+        
+      update = switch do_add
+      
+        # add objects to sharing
+        when true
+          (obj) => 
+            obj.$sharings or= []
+            obj.$sharings.push @id
+            
+        # remove objects to sharing
+        when false
+          (obj) =>
+            try
+              idx = obj.$sharings.indexOf @id
+              obj.$sharings.splice idx, 1 if ~idx
+        
+        # add/remove depending on current state of object
+        else
+          (obj) => 
+            idx = -1
+            try
+              idx = obj.$sharings.indexOf @id
+            
+            if ~idx  # returns false for -1
+              obj.$sharings.splice idx, 1
+            else
+              obj.$sharings or= []
+              obj.$sharings.push @id
+      
+      @hoodie.store.updateAll objects, update
+        
+    
     # ## sync
     #
     # 1. get all docs from sharing db
@@ -136,30 +201,12 @@ define 'hoodie/sharing/instance', ['hoodie/config', 'hoodie/sharing/hoodie'], (C
     #
     # We need 1. in order to find out if there are documents that are
     # not to be shared anymore and therefore need to be removed.
-      
-      
+    sync: ->
+      promise = @hoodie.store.loadAll(@_is_my_shared_object_and_changed)
+      .done @hoodie.remote.push_changes
+      promise.fail -> console.log arguments
       
     # ## Private
   
-    #
-    # get an array of hashes and turn into a stringified function
-    #
-    _turn_filters_into_function: (filters) ->
-      return unless filters
-    
-      all_conditions = []
-      for filter in filters
-        current_condition = []
-        for key, value of filter
-        
-          # no code injection, please
-          continue if /'/.test "#{key}#{value}"
-        
-          if typeof value is 'string'
-            current_condition.push "obj['#{key}'] == '#{value}'"
-          else
-            current_condition.push "obj['#{key}'] == #{value}"
-          
-        all_conditions.push current_condition.join " && "
-      
-      "function(obj) { return #{all_conditions.join " || "} }"
+    _is_my_shared_object_and_changed: (obj) =>
+      obj.$sharings and ~obj.$sharings.indexOf(@id) and @hoodie.store.is_dirty(obj.type, obj.id)
