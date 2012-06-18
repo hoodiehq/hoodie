@@ -22,6 +22,15 @@ define 'specs/hoodie/sharing', ['mocks/hoodie', 'hoodie/sharing', 'hoodie/sharin
         expect(SharingInstance.create).wasCalledWith options
     # /.create
 
+    describe ".load", ->
+      beforeEach ->
+        spyOn(SharingInstance, "load")
+
+      it "should call SharingInstance.load", ->
+        @sharing.load 123
+        expect(SharingInstance.load).wasCalledWith 123
+    # /.load
+
     describe ".destroy", ->
       beforeEach ->
         spyOn(SharingInstance, "destroy")
@@ -29,4 +38,7 @@ define 'specs/hoodie/sharing', ['mocks/hoodie', 'hoodie/sharing', 'hoodie/sharin
       it "should call SharingInstance.destroy", ->
         @sharing.destroy 123
         expect(SharingInstance.destroy).wasCalledWith 123
+        
+      it "should be aliased as delete", ->
+        expect(@sharing.destroy).toBe @sharing.delete
     # /.destroy

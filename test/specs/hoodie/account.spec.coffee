@@ -16,19 +16,20 @@ define 'specs/hoodie/account', ['mocks/hoodie', 'hoodie/account'], (HoodieMock, 
         spyOn(Account.prototype, "authenticate")
         spyOn(Account.prototype, "on")
       
-      _when "_account.username is set", ->
+      _when "account.username is set", ->
         beforeEach ->
-          spyOn(@hoodie.store, "get").andCallFake (key) ->
-            if key is '_account.username'
+          spyOn(@hoodie.config, "get").andCallFake (key) ->
+            if key is 'account.username'
               return 'joe@example.com'
               
-          it "should set @username", ->
-            account = new Account @hoodie
-            expect(account.username).toBe 'joe@example.com'          
+        it "should set @username", ->
+          account = new Account @hoodie
+          expect(account.username).toBe 'joe@example.com'
             
       it "should authenticate", ->
+        spyOn(window, "setTimeout")
         account = new Account @hoodie
-        expect(account.authenticate).wasCalled()
+        expect(window.setTimeout).wasCalledWith account.authenticate
         
       it "should bind to sign_in event", ->
         account = new Account @hoodie
@@ -51,7 +52,7 @@ define 'specs/hoodie/account', ['mocks/hoodie', 'hoodie/account'], (HoodieMock, 
           expect(@account.username).toBe 'joe@example.com'
           
         it "should store @username to config", ->
-          expect(@hoodie.config.set).wasCalledWith '_account.username', 'joe@example.com'
+          expect(@hoodie.config.set).wasCalledWith 'account.username', 'joe@example.com'
           
         it "should set _authenticated to true", ->
           @account._authenticated = false
@@ -68,7 +69,7 @@ define 'specs/hoodie/account', ['mocks/hoodie', 'hoodie/account'], (HoodieMock, 
         it "should store @username persistantly", ->
           spyOn(@hoodie.config, "remove")
           @account._handle_sign_out {"ok":true}
-          expect(@hoodie.config.remove).wasCalledWith '_account.username'
+          expect(@hoodie.config.remove).wasCalledWith 'account.username'
           
         it "should set _authenticated to false", ->
           @account._authenticated = true
@@ -214,9 +215,9 @@ define 'specs/hoodie/account', ['mocks/hoodie', 'hoodie/account'], (HoodieMock, 
               
       _when "sign_up successful", ->
         beforeEach ->
-          @hoodie.request.andCallFake (type, path, options) -> 
-            response = {"ok":true,"id":"org.couchdb.user:bizbiz","rev":"1-a0134f4a9909d3b20533285c839ed830"}
-            options.success response
+          @response = response = {"ok":true,"id":"org.couchdb.user:bizbiz","rev":"1-a0134f4a9909d3b20533285c839ed830"}
+          @hoodie.request.andCallFake (type, path, options) => 
+            options.success @response
         
         it "should trigger `account:signed_up` event", ->
           @account.sign_up('joe@example.com', 'secret')
@@ -228,7 +229,7 @@ define 'specs/hoodie/account', ['mocks/hoodie', 'hoodie/account'], (HoodieMock, 
           
         it "should resolve its promise", ->
           promise = @account.sign_up('joe@example.com', 'secret')
-          expect(promise).toBeResolvedWith 'joe@example.com'
+          expect(promise).toBeResolvedWith 'joe@example.com', @response
           
         it "should fetch the _users doc", ->
           spyOn(@account, "fetch")

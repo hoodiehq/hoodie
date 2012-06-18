@@ -11,7 +11,7 @@ define 'mocks/hoodie', ->
     defer         : $.Deferred
       
     store         :
-      uuid          : -> 'abc4567'
+      uuid          : -> 'mock567'
       create        : -> 
         then : ->
       destroy       : -> 

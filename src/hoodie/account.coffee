@@ -15,12 +15,11 @@ define 'hoodie/account', ->
     #
     constructor : (@hoodie) ->
       
-      @uuid = @hoodie.config.get('account.uuid') or @hoodie.store.uuid()
-      
       # handle session
       @username = @hoodie.config.get 'account.username'
-      @authenticate()
       
+      # authenticate on next tick
+      window.setTimeout @authenticate
       @on 'signed_in',  @_handle_sign_in
       @on 'signed_out', @_handle_sign_out
     
@@ -28,7 +27,7 @@ define 'hoodie/account', ->
     # 
     # Use this method to assure that the user is authenticated:
     # `hoodie.account.authenticate().done( do_something ).fail( handle_error )`
-    authenticate : ->
+    authenticate : =>
       defer = @hoodie.defer()
       
       unless @username
@@ -93,7 +92,7 @@ define 'hoodie/account', ->
           @hoodie.trigger 'account:signed_up', username
           @hoodie.trigger 'account:signed_in', username
           @fetch()
-          defer.resolve username
+          defer.resolve username, response
           
         error       : (xhr) ->
           try

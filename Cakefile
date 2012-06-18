@@ -53,9 +53,9 @@ task 'docs', 'create docs from code', ->
   docco.stdout.on 'data', (data) -> print data.toString()
   docco.on 'exit', (status) -> callback?() if status is 0
   
-  docco = spawn 'docco', ['src/**/*.coffee']
-  docco.stdout.on 'data', (data) -> print data.toString()
-  docco.on 'exit', (status) -> callback?() if status is 0
+  # docco = spawn 'docco', ['src/**/*.coffee']
+  # docco.stdout.on 'data', (data) -> print data.toString()
+  # docco.on 'exit', (status) -> callback?() if status is 0
   
   # fs.readdir 'src', (err, contents) ->
   #   files = []

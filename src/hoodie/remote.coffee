@@ -198,55 +198,65 @@ define 'hoodie/remote', ['hoodie/errors'], (ERROR) ->
     # renames `_id` attribute to `id` and removes the type from the id,
     # e.g. `document/123` -> `123`
     _parse_from_remote: (obj) ->
+      
+      # handle id and type
       id = obj._id or obj.id
       delete obj._id
-      if id is undefined
-        console.log 'obj'
-        console.log JSON.stringify obj
-        
       [obj.type, obj.id] = id.split(/\//)
       
+      # handle timestameps
       obj.created_at = new Date(Date.parse obj.created_at) if obj.created_at
       obj.updated_at = new Date(Date.parse obj.updated_at) if obj.updated_at
+      
+      # handle rev
+      if obj.rev
+        obj._rev = obj.rev
+        delete obj.rev
       
       return obj
   
     #
     # handle changes from remote
     #
+    # note: we don't trigger any events until all changes have been taken care of.
+    #       Reason is, that on object could depend on a different object that has
+    #       not been stored yet, but is within the same bulk of changes. This 
+    #       is especially the case during initial bootstraps after a user logins.
+    #
     _handle_pull_changes: (changes) =>
+      _destroyed_docs = []
+      _changed_docs   = []
+      
+      # 1. update or remove objects from local store
       for {doc} in changes
-        _doc = @_parse_from_remote(doc)
-        if _doc._deleted
-          @hoodie.store.destroy(_doc.type, _doc.id, remote: true)
-          .then (object) => 
-            @hoodie.trigger 'remote:destroyed', _doc.type,   _doc.id,    object
-            @hoodie.trigger "remote:destroyed:#{_doc.type}", _doc.id,    object
-            @hoodie.trigger "remote:destroyed:#{_doc.type}:#{_doc.id}",  object
-            
-            @hoodie.trigger 'remote:changed',                         'destroyed', _doc.type, _doc.id, object
-            @hoodie.trigger "remote:changed:#{_doc.type}",            'destroyed',            _doc.id, object
-            @hoodie.trigger "remote:changed:#{_doc.type}:#{_doc.id}", 'destroyed',                     object
+        doc = @_parse_from_remote(doc)
+        if doc._deleted
+          _destroyed_docs.push [doc, @hoodie.store.destroy(doc.type, doc.id, remote: true)]
         else
-          @hoodie.store.save(_doc.type, _doc.id, _doc, remote: true)
-          .then (object, object_was_created) => 
-            if object_was_created
-              @hoodie.trigger 'remote:created', _doc.type,   _doc.id,   object
-              @hoodie.trigger "remote:created:#{_doc.type}", _doc.id,   object
-              @hoodie.trigger "remote:created:#{_doc.type}:#{_doc.id}", object
-              
-              @hoodie.trigger 'remote:changed',                         'created', _doc.type, _doc.id, object
-              @hoodie.trigger "remote:changed:#{_doc.type}",            'created',            _doc.id, object
-              @hoodie.trigger "remote:changed:#{_doc.type}:#{_doc.id}", 'created',                     object
-            else
-              @hoodie.trigger 'remote:updated', _doc.type,   _doc.id,   object
-              @hoodie.trigger "remote:updated:#{_doc.type}", _doc.id,   object
-              @hoodie.trigger "remote:updated:#{_doc.type}:#{_doc.id}", object
-              
-              @hoodie.trigger 'remote:changed',                         'updated', _doc.type, _doc.id, object
-              @hoodie.trigger "remote:changed:#{_doc.type}",            'updated',            _doc.id, object
-              @hoodie.trigger "remote:changed:#{_doc.type}:#{_doc.id}", 'updated',                     object
+          _changed_docs.push   [doc, @hoodie.store.save(doc.type, doc.id, doc, remote: true)]
+      
+      # 2. trigger events
+      for [doc, promise] in _destroyed_docs
+        promise.then (object) => 
+          @hoodie.trigger 'remote:destroyed', doc.type,   doc.id,    object
+          @hoodie.trigger "remote:destroyed:#{doc.type}", doc.id,    object
+          @hoodie.trigger "remote:destroyed:#{doc.type}:#{doc.id}",  object
+          
+          @hoodie.trigger 'remote:changed',                       'destroyed', doc.type, doc.id, object
+          @hoodie.trigger "remote:changed:#{doc.type}",           'destroyed',            doc.id, object
+          @hoodie.trigger "remote:changed:#{doc.type}:#{doc.id}", 'destroyed',                     object
+      
+      for [doc, promise] in _changed_docs
+        promise.then (object, object_was_created) => 
+          event = if object_was_created then 'created' else 'updated'
+          @hoodie.trigger "remote:#{event}", doc.type,   doc.id,   object
+          @hoodie.trigger "remote:#{event}:#{doc.type}", doc.id,   object
+          @hoodie.trigger "remote:#{event}:#{doc.type}:#{doc.id}", object
         
+          @hoodie.trigger "remote:changed",                       event, doc.type, doc.id, object
+          @hoodie.trigger "remote:changed:#{doc.type}",           event,            doc.id, object
+          @hoodie.trigger "remote:changed:#{doc.type}:#{doc.id}", event,                     object
+
 
     # Gets response to POST _bulk_docs request from couchDB.
     # Updates to documents (e.g. new _rev stamps) come through the _changes feed anyway
@@ -254,8 +264,15 @@ define 'hoodie/remote', ['hoodie/errors'], (ERROR) ->
     #
     # But what needs to be handled are conflicts.
     _handle_push_changes: (doc_responses) =>
-      for response in doc_responses when response.error is 'conflict'
-        @hoodie.trigger 'remote:error:conflict', response.id
+      for response in doc_responses
+        if response.error is 'conflict'
+          @hoodie.trigger 'remote:error:conflict', response.id
+        else
+          doc     = @_parse_from_remote(response)
+          update  = _rev: doc._rev 
+          
+          console.log "update to #{response.id}", update
+          @hoodie.store.update(doc.type, doc.id, update, remote: true)
     
     #
     _promise: $.Deferred

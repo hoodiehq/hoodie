@@ -40,6 +40,13 @@ define 'hoodie', ['hoodie/events'], (Events) ->
     # returns a promise skeletton for custom promise handlings
     defer: $.Deferred
     
+    _ready_callbacks: []
+    _ready: false
+    ready: (callback) ->
+      if @_ready
+        callback()
+      else
+        @_ready_callbacks.push callback
     
     # ## Private
     
@@ -49,3 +56,6 @@ define 'hoodie', ['hoodie/events'], (Events) ->
         for Module in ModuleClasses
           instance_name = Module.name.toLowerCase()
           @[instance_name] = new Module this
+          
+        cb(this) while cb = @_ready_callbacks.shift()
+        @_ready = true

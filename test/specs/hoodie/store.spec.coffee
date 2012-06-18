@@ -209,7 +209,7 @@ define 'specs/hoodie/store', ['hoodie/store', 'mocks/hoodie'], (Store, HoodieMoc
           @promise = @store.update 'couch', '123', { funky: 'fresh' }
         
         it "should save the updated object", ->
-          expect(@store.save).wasCalledWith 'couch', '123', { style: 'baws', funky: 'fresh' }
+          expect(@store.save).wasCalledWith 'couch', '123', { style: 'baws', funky: 'fresh' }, {}
         
         it "should return a resolved promise", ->
           expect(@promise).toBeResolved()

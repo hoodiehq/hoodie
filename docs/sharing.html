@@ -22,32 +22,34 @@ With an adjusted Hoodie class, a special user for the sharing gets created, whic
 also create a sharing database with the help of the userDB worker. Once the db is
 created, the docs, filtered by the sharing filter, will be pushed to the sharing database.</p>
 
-<p>When the sharing gets destroyed, the sharing user will me deleted and the userDB worker
+<p>When the sharing gets destroyed, the sharing user will be deleted and the userDB worker
 will handle the rest.</p>
 
 <p>Once a user signes up, the custom $sharing sockets will be closed and the $sharing workers
 will take over.</p></li>
-</ol>             </td>             <td class="code">               <div class="highlight"><pre><span class="nx">define</span> <span class="s1">&#39;hoodie/sharing&#39;</span><span class="p">,</span> <span class="o">-&gt;</span>
-  </pre></div>             </td>           </tr>                               <tr id="section-3">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-3">&#182;</a>               </div>               <p>'use strict'</p>             </td>             <td class="code">               <div class="highlight"><pre>  
+</ol>             </td>             <td class="code">               <div class="highlight"><pre><span class="nx">define</span> <span class="s1">&#39;hoodie/sharing&#39;</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;hoodie/sharing/instance&#39;</span><span class="p">],</span> <span class="nf">(SharingInstance) -&gt;</span>
+  
+  
   <span class="k">class</span> <span class="nx">Sharing</span>
-  </pre></div>             </td>           </tr>                               <tr id="section-4">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-4">&#182;</a>               </div>               <h2>Constructor</h2>             </td>             <td class="code">               <div class="highlight"><pre>    <span class="nv">constructor : </span><span class="nf">(@hoodie) -&gt;</span>
-      </pre></div>             </td>           </tr>                               <tr id="section-5">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-5">&#182;</a>               </div>               <p>do some smart stuff in here!</p>             </td>             <td class="code">               <div class="highlight"><pre>      </pre></div>             </td>           </tr>                               <tr id="section-6">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-6">&#182;</a>               </div>               <h2>create</h2>
+  </pre></div>             </td>           </tr>                               <tr id="section-3">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-3">&#182;</a>               </div>               <h2>Constructor</h2>             </td>             <td class="code">               <div class="highlight"><pre>    <span class="nv">constructor : </span><span class="nf">(@hoodie) -&gt;</span>
+      </pre></div>             </td>           </tr>                               <tr id="section-4">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-4">&#182;</a>               </div>               <p>give all Sharing instances access to our core hoodie</p>             </td>             <td class="code">               <div class="highlight"><pre>      <span class="nv">SharingInstance.hoodie = </span><span class="nx">@hoodie</span>
+      </pre></div>             </td>           </tr>                               <tr id="section-5">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-5">&#182;</a>               </div>               <h2>create</h2>
 
 <p>creates a new sharing &amp; returns a promise.
 Options</p>
 
-<pre><code>id:            (default: random uuid)
-               sets the name of your sharing.
+<pre><code>id:            (optional, defaults to random uuid)
+               name of sharing.
 filters:       (optional)
                one or multiple key/value hashes with conditions 
                for the objects to be filtered.
 private:       (default: false)
                when set to true, nobody but the creator and the
-               invitees have acces. Set to true automatically
+               invitees have access. Set to true automatically
                when invitees passed
 invitees:      (optional)
                an array of user names (emails) that should have
-               to the shared documents
+               access to the shared documents
 continuous:    (default: false)
                if set to true, the shared objects will be
                continuously updated.
@@ -60,7 +62,7 @@ collaborative: (default: false)
 
 <pre><code># share all my stuff
 hoodie.sharing.create().done (sharing) -&gt; 
-  alert "find by stuff at /#{sharing.id}"
+  alert "find my stuff at /#{sharing.id}"
 
 # share my todo list with Joey and Frank
 hoodie.sharing.create
@@ -78,40 +80,20 @@ hoodie.sharing.create
 hoodie.sharing.create
   continuous : true
   filters     : shared: true
-</code></pre>             </td>             <td class="code">               <div class="highlight"><pre>    <span class="nv">create : </span><span class="nf">(options) -&gt;</span>
-      <span class="nv">defer = </span><span class="nx">@hoodie</span><span class="p">.</span><span class="nx">defer</span><span class="p">()</span>
-      
-      <span class="nv">options.private = </span><span class="kc">true</span> <span class="k">if</span> <span class="nx">options</span><span class="p">.</span><span class="nx">invitees</span><span class="o">?</span>
-      <span class="nv">options.filter   = </span><span class="nx">@_turn_filters_into_function</span> <span class="nx">options</span><span class="p">.</span><span class="nx">filters</span>
-      <span class="k">delete</span> <span class="nx">options</span><span class="p">.</span><span class="nx">filters</span>
-      
-      <span class="nx">@hoodie</span><span class="p">.</span><span class="nx">store</span><span class="p">.</span><span class="nx">save</span><span class="p">(</span><span class="s2">&quot;$sharing&quot;</span><span class="p">,</span> <span class="nx">options</span><span class="p">.</span><span class="nx">id</span><span class="p">,</span> <span class="nx">options</span><span class="p">)</span>
-      <span class="p">.</span><span class="nx">done</span> <span class="p">(</span><span class="nx">sharing</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="nx">@hoodie</span><span class="p">.</span><span class="nx">one</span> <span class="s2">&quot;remote:created:$sharing:#{sharing.id}&quot;</span><span class="p">,</span> <span class="nx">defer</span><span class="p">.</span><span class="nx">resolve</span>
-      
-      <span class="nx">defer</span><span class="p">.</span><span class="nx">promise</span><span class="p">()</span>
-      </pre></div>             </td>           </tr>                               <tr id="section-7">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-7">&#182;</a>               </div>               <h2>destroy</h2>
+</code></pre>             </td>             <td class="code">               <div class="highlight"><pre>    <span class="nv">create : </span><span class="nf">(options = {}) -&gt;</span>
+      <span class="nx">SharingInstance</span><span class="p">.</span><span class="nx">create</span> <span class="nx">options</span>
+    </pre></div>             </td>           </tr>                               <tr id="section-6">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-6">&#182;</a>               </div>               <h2>load</h2>
+
+<p>load an existing sharing</p>             </td>             <td class="code">               <div class="highlight"><pre>    <span class="nv">load : </span><span class="nf">(id) -&gt;</span>
+      <span class="nx">SharingInstance</span><span class="p">.</span><span class="nx">load</span> <span class="nx">id</span>
+    </pre></div>             </td>           </tr>                               <tr id="section-7">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-7">&#182;</a>               </div>               <h2>destroy</h2>
 
 <p>deletes an existing sharing</p>             </td>             <td class="code">               <div class="highlight"><pre>    <span class="nv">destroy: </span><span class="nf">(id) -&gt;</span>
-      <span class="nx">@hoodie</span><span class="p">.</span><span class="nx">store</span><span class="p">.</span><span class="nx">destroy</span> <span class="s2">&quot;$sharing&quot;</span><span class="p">,</span> <span class="nx">id</span>
-      </pre></div>             </td>           </tr>                               <tr id="section-8">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-8">&#182;</a>               </div>               <p>alias</p>             </td>             <td class="code">               <div class="highlight"><pre>    <span class="k">delete</span><span class="o">:</span> <span class="err">@</span><span class="o">::</span><span class="nx">destroy</span>
-    
-    </pre></div>             </td>           </tr>                               <tr id="section-9">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-9">&#182;</a>               </div>               <h2>Private</h2>             </td>             <td class="code">               <div class="highlight"><pre>  
-    <span class="nv">_turn_filters_into_function: </span><span class="nf">(filters) -&gt;</span>
-      <span class="k">return</span> <span class="nx">unless</span> <span class="nx">filters</span>
-    
-      <span class="nv">all_conditions = </span><span class="p">[]</span>
-      <span class="k">for</span> <span class="nx">filter</span> <span class="k">in</span> <span class="nx">filters</span>
-        <span class="nv">current_condition = </span><span class="p">[]</span>
-        <span class="k">for</span> <span class="nx">key</span><span class="p">,</span> <span class="nx">value</span> <span class="k">of</span> <span class="nx">filter</span>
-        </pre></div>             </td>           </tr>                               <tr id="section-10">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-10">&#182;</a>               </div>               <p>no code injection, please</p>             </td>             <td class="code">               <div class="highlight"><pre>          <span class="k">continue</span> <span class="k">if</span> <span class="sr">/&#39;/</span><span class="p">.</span><span class="nx">test</span> <span class="s2">&quot;#{key}#{value}&quot;</span>
-        
-          <span class="k">if</span> <span class="k">typeof</span> <span class="nx">value</span> <span class="o">is</span> <span class="s1">&#39;string&#39;</span>
-            <span class="nx">current_condition</span><span class="p">.</span><span class="nx">push</span> <span class="s2">&quot;obj[&#39;#{key}&#39;] == &#39;#{value}&#39;&quot;</span>
-          <span class="k">else</span>
-            <span class="nx">current_condition</span><span class="p">.</span><span class="nx">push</span> <span class="s2">&quot;obj[&#39;#{key}&#39;] == #{value}&quot;</span>
-          
-        <span class="nx">all_conditions</span><span class="p">.</span><span class="nx">push</span> <span class="nx">current_condition</span><span class="p">.</span><span class="nx">join</span> <span class="s2">&quot; &amp;&amp; &quot;</span>
+      <span class="nx">SharingInstance</span><span class="p">.</span><span class="nx">destroy</span> <span class="nx">id</span>
+      </pre></div>             </td>           </tr>                               <tr id="section-8">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-8">&#182;</a>               </div>               <h2>open</h2>
+
+<p>Copy all data of a sharing to own database</p>             </td>             <td class="code">               <div class="highlight"><pre>    <span class="nv">open: </span><span class="nf">(id, options = {}) -&gt;</span>
       
-      <span class="s2">&quot;function(obj) { return #{all_conditions.join &quot;</span> <span class="o">||</span> <span class="s2">&quot;} }&quot;</span>
+    </pre></div>             </td>           </tr>                               <tr id="section-9">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-9">&#182;</a>               </div>               <p>alias</p>             </td>             <td class="code">               <div class="highlight"><pre>    <span class="k">delete</span><span class="o">:</span> <span class="err">@</span><span class="o">::</span><span class="nx">destroy</span>
 
 </pre></div>             </td>           </tr>                </tbody>     </table>   </div> </body> </html> 

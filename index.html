@@ -9,6 +9,7 @@
   <script>
     require.config({
       baseUrl: "./compiled/src/",
+      urlArgs: "bust=" +  (new Date()).getTime()
     })
   </script>
   

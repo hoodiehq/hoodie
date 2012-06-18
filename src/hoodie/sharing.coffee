@@ -34,6 +34,7 @@
 #    will take over.
 #
 
+
 define 'hoodie/sharing', ['hoodie/sharing/instance'], (SharingInstance) ->
   
   
@@ -44,6 +45,8 @@ define 'hoodie/sharing', ['hoodie/sharing/instance'], (SharingInstance) ->
     constructor : (@hoodie) ->
       
       # give all Sharing instances access to our core hoodie
+      # as sharings might use custom hoodies, in case the user
+      # has no account yet
       SharingInstance.hoodie = @hoodie
       
     # ## create
@@ -74,7 +77,7 @@ define 'hoodie/sharing', ['hoodie/sharing/instance'], (SharingInstance) ->
     #
     #     # share all my stuff
     #     hoodie.sharing.create().done (sharing) -> 
-    #       alert "find by stuff at /#{sharing.id}"
+    #       alert "find my stuff at /#{sharing.id}"
     # 
     #     # share my todo list with Joey and Frank
     #     hoodie.sharing.create
@@ -95,13 +98,36 @@ define 'hoodie/sharing', ['hoodie/sharing/instance'], (SharingInstance) ->
     #
     create : (options = {}) ->
       SharingInstance.create options
-      
+    
+    # ## load
+    #
+    # load an existing sharing
+    #
+    load : (id) ->
+      SharingInstance.load id
+    
+    find_or_create: (options) ->
+      defer = @hoodie.defer()
+      SharingInstance.load(options.id)
+      .done (sharing) ->
+        defer.resolve sharing
+      .fail -> 
+        SharingInstance.create(options).then defer.resolve, defer.reject 
+    
+      return defer.promise()
+    
     # ## destroy
     #
     # deletes an existing sharing
     #
     destroy: (id) ->
       SharingInstance.destroy id
+      
+    # ## open
+    #
+    # Copy all data of a sharing to own database
+    open: (id, options = {}) ->
+      
     
     # alias
     delete: @::destroy
