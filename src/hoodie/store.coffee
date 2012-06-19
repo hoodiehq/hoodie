@@ -129,7 +129,7 @@ define 'hoodie/store', ['hoodie/errors'], (ERROR) ->
         
       # if not found, create it
       _load_promise.fail => 
-        @save(type, id, object_update).then defer.resolve, defer.reject
+        @save(type, id, object_update, options).then defer.resolve, defer.reject
       
       defer.promise()
       

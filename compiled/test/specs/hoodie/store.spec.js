@@ -261,7 +261,9 @@ define('specs/hoodie/store', ['hoodie/store', 'mocks/hoodie'], function(Store, H
     describe(".update(type, id, update, options)", function() {
       beforeEach(function() {
         spyOn(this.store, "load");
-        return spyOn(this.store, "save");
+        return spyOn(this.store, "save").andReturn({
+          then: function() {}
+        });
       });
       _when("object cannot be found", function() {
         beforeEach(function() {
@@ -270,16 +272,23 @@ define('specs/hoodie/store', ['hoodie/store', 'mocks/hoodie'], function(Store, H
             funky: 'fresh'
           });
         });
-        return it("should return a rejected promise", function() {
-          return expect(this.promise).toBeRejected();
+        return it("should create it", function() {
+          return expect(this.store.save).wasCalledWith('couch', '123', {
+            funky: 'fresh'
+          }, {});
         });
       });
       return _when("object can be found", function() {
+        beforeEach(function() {
+          this.store.load.andReturn($.Deferred().resolve({
+            style: 'baws'
+          }));
+          return this.store.save.andReturn($.Deferred().resolve({
+            style: 'baws'
+          }));
+        });
         _and("update is an object", function() {
           beforeEach(function() {
-            this.store.load.andReturn($.Deferred().resolve({
-              style: 'baws'
-            }));
             return this.promise = this.store.update('couch', '123', {
               funky: 'fresh'
             });
@@ -296,9 +305,6 @@ define('specs/hoodie/store', ['hoodie/store', 'mocks/hoodie'], function(Store, H
         });
         return _and("update is a function", function() {
           beforeEach(function() {
-            this.store.load.andReturn($.Deferred().resolve({
-              style: 'baws'
-            }));
             return this.promise = this.store.update('couch', '123', function(obj) {
               return obj.funky = 'fresh';
             });

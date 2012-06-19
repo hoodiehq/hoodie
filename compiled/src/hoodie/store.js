@@ -122,7 +122,7 @@ define('hoodie/store', ['hoodie/errors'], function(ERROR) {
         return _this.save(type, id, current_obj, options).then(defer.resolve, defer.reject);
       });
       _load_promise.fail(function() {
-        return _this.save(type, id, object_update).then(defer.resolve, defer.reject);
+        return _this.save(type, id, object_update, options).then(defer.resolve, defer.reject);
       });
       return defer.promise();
     };

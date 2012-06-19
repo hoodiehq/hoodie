@@ -193,21 +193,24 @@ define 'specs/hoodie/store', ['hoodie/store', 'mocks/hoodie'], (Store, HoodieMoc
     describe ".update(type, id, update, options)", ->
       beforeEach ->
         spyOn(@store, "load")
-        spyOn(@store, "save")
+        spyOn(@store, "save").andReturn then: ->
       
       _when "object cannot be found", ->
         beforeEach ->
           @store.load.andReturn $.Deferred().reject()
           @promise = @store.update 'couch', '123', funky: 'fresh'
         
-        it "should return a rejected promise", ->
-          expect(@promise).toBeRejected()
+        it "should create it", ->
+          expect(@store.save).wasCalledWith 'couch', '123', funky: 'fresh', {}
+          # expect(@promise).toBeRejected()
       
-      _when "object can be found", ->
-        
+      _when "object can be found", ->        
+        beforeEach ->
+          @store.load.andReturn $.Deferred().resolve { style: 'baws' }
+          @store.save.andReturn $.Deferred().resolve { style: 'baws' }
+          
         _and "update is an object", ->          
           beforeEach ->
-            @store.load.andReturn $.Deferred().resolve { style: 'baws' }
             @promise = @store.update 'couch', '123', { funky: 'fresh' }
         
           it "should save the updated object", ->
@@ -218,7 +221,6 @@ define 'specs/hoodie/store', ['hoodie/store', 'mocks/hoodie'], (Store, HoodieMoc
           
         _and "update is a function", ->
           beforeEach ->
-            @store.load.andReturn $.Deferred().resolve { style: 'baws' }
             @promise = @store.update 'couch', '123', (obj) -> obj.funky = 'fresh'
 
           it "should save the updated object", ->
