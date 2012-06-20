@@ -29,9 +29,8 @@ define 'hoodie/sharing/hoodie', ['hoodie'], (Hoodie) ->
       
       # ignore requests to /_session as we don't use cookie authentication anyway, 
       # every request is authenticated by basic auth header
-      #
-      # we also ignore it, as hoodie.remote starts synching when session is successful.
-      return if path is '/_session'
+      if path is '/_session'
+        @defer().resolve().promise()
       
       defaults =
         type        : type

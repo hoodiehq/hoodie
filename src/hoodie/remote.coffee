@@ -41,7 +41,6 @@ define 'hoodie/remote', ['hoodie/errors'], (ERROR) ->
       
       @hoodie.on 'account:signed_out',    @disconnect
       @hoodie.on 'account:signed_in',     @sync
-      @hoodie.on 'store:dirty:idle',      @push
       
       # start syncing
       @hoodie.account.authenticate().pipe @sync
@@ -53,9 +52,11 @@ define 'hoodie/remote', ['hoodie/errors'], (ERROR) ->
     disconnect : =>
       @hoodie.config.set 'remote.active',  @active = false
       
-      @hoodie.unbind 'store:dirty:idle',   @push
       @hoodie.unbind 'account:signed_in',  @sync
       @hoodie.unbind 'account:signed_out', @disconnect
+      
+      # binding comes from @sync
+      @hoodie.unbind 'store:dirty:idle',   @push
       
       # binding comes from 403 unauthorized responses
       @hoodie.unbind 'account:signed_in',  @connect
@@ -103,6 +104,10 @@ define 'hoodie/remote', ['hoodie/errors'], (ERROR) ->
     #
     # pull ... and push ;-)
     sync : =>
+      if @active
+        @hoodie.unbind 'store:dirty:idle', @push
+        @hoodie.on 'store:dirty:idle',     @push
+      
       @pull()
       @push()
       
@@ -202,9 +207,9 @@ define 'hoodie/remote', ['hoodie/errors'], (ERROR) ->
   
     # parse object for remote storage. All attributes starting with an 
     # `underscore` do not get synchronized despite the special attributes
-    # `_id`, `_rev` and `_deleted`
+    # `_id`, `_rev` and `_deleted` (see above)
     # 
-    # Also `id` attribute gets renamed to `_id`
+    # Also `id` gets replaced with `_id` which consists of type & id
     #
     _parse_for_remote: (obj) ->
       attributes = $.extend {}, obj
@@ -258,9 +263,9 @@ define 'hoodie/remote', ['hoodie/errors'], (ERROR) ->
       for {doc} in changes
         doc = @_parse_from_remote(doc)
         if doc._deleted
-          _destroyed_docs.push [doc, @hoodie.store.destroy(doc.type, doc.id, remote: true)]
-        else
-          _changed_docs.push   [doc, @hoodie.store.save(doc.type, doc.id, doc, remote: true)]
+          _destroyed_docs.push [doc, @hoodie.store.destroy  doc.type, doc.id,      remote: true]
+        else                                                
+          _changed_docs.push   [doc, @hoodie.store.save     doc.type, doc.id, doc, remote: true]
       
       # 2. trigger events
       for [doc, promise] in _destroyed_docs
@@ -286,15 +291,17 @@ define 'hoodie/remote', ['hoodie/errors'], (ERROR) ->
 
 
     # Gets response to POST _bulk_docs request from couchDB.
-    # Updates to documents (e.g. new _rev stamps) come through the _changes feed anyway
-    # and do not need to handle it twice. 
+    #
+    # when remote is active, _rev attributes of the pushed documents don't need
+    # to be updated as the continuous pull feed will recognize and handle the changes
+    # already.
     #
     # But what needs to be handled are conflicts.
     _handle_push: (doc_responses) =>
       for response in doc_responses
         if response.error is 'conflict'
           @hoodie.trigger 'remote:error:conflict', response.id
-        else
+        else unless @active
           doc     = @_parse_from_remote(response)
           update  = _rev: doc._rev 
           

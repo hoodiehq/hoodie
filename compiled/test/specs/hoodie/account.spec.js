@@ -214,7 +214,7 @@ define('specs/hoodie/account', ['mocks/hoodie', 'hoodie/account'], function(Hood
         });
       });
     });
-    describe(".sign_up(username, password, user_data = {})", function() {
+    describe(".sign_up(username, password)", function() {
       beforeEach(function() {
         var _ref;
         this.account.sign_up('joe@example.com', 'secret', {
@@ -253,10 +253,6 @@ define('specs/hoodie/account', ['mocks/hoodie', 'hoodie/account'], function(Hood
         _ref = this.hoodie.request.mostRecentCall.args, this.type = _ref[0], this.path = _ref[1], this.options = _ref[2];
         this.data = JSON.parse(this.options.data);
         return expect(this.data.password).toBeUndefined();
-      });
-      it("should allow to set additional user_data for the use", function() {
-        expect(this.data.user_data.name).toBe('Joe Doe');
-        return expect(this.data.user_data.nick).toBe('Foo');
       });
       _when("sign_up successful", function() {
         beforeEach(function() {
@@ -508,9 +504,6 @@ define('specs/hoodie/account', ['mocks/hoodie', 'hoodie/account'], function(Hood
               "_id": "org.couchdb.user:baz",
               "_rev": "3-33e4d43a6dff5b29a4bd33f576c7824f",
               "name": "baz",
-              "user_data": {
-                "funky": "fresh"
-              },
               "salt": "82163606fa5c100e0095ad63598de810",
               "password_sha": "e2e2a4d99632dc5e3fdb41d5d1ff98743a1f344e",
               "type": "user",
@@ -520,14 +513,10 @@ define('specs/hoodie/account', ['mocks/hoodie', 'hoodie/account'], function(Hood
               return options.success(_this.response);
             });
           });
-          it("should resolve its promise", function() {
+          return it("should resolve its promise", function() {
             var promise;
             promise = this.account.fetch();
             return expect(promise).toBeResolvedWith(this.response);
-          });
-          return it("should set account.user_data()", function() {
-            this.account.fetch();
-            return expect(this.account.user_data().funky).toBe('fresh');
           });
         });
       });

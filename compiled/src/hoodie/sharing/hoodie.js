@@ -24,7 +24,7 @@ define('hoodie/sharing/hoodie', ['hoodie'], function(Hoodie) {
         options = {};
       }
       if (path === '/_session') {
-        return;
+        this.defer().resolve().promise();
       }
       defaults = {
         type: type,

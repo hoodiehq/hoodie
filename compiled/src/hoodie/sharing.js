@@ -26,7 +26,9 @@ define('hoodie/sharing', ['hoodie/sharing/instance'], function(SharingInstance) 
       SharingInstance.load(options.id).done(function(sharing) {
         return defer.resolve(sharing);
       }).fail(function() {
-        return SharingInstance.create(options).then(defer.resolve, defer.reject);
+        var test;
+        test = SharingInstance.create(options).then(defer.resolve, defer.reject);
+        return console.log(test, test.isResolved());
       });
       return defer.promise();
     };

@@ -62,12 +62,9 @@ define('hoodie/account', function() {
       return defer.promise();
     };
 
-    Account.prototype.sign_up = function(username, password, user_data) {
+    Account.prototype.sign_up = function(username, password) {
       var data, defer, key,
         _this = this;
-      if (user_data == null) {
-        user_data = {};
-      }
       defer = this.hoodie.defer();
       key = "" + this._prefix + ":" + username;
       data = {
@@ -75,7 +72,6 @@ define('hoodie/account', function() {
         name: username,
         type: 'user',
         roles: [],
-        user_data: user_data,
         password: password
       };
       this.hoodie.request('PUT', "/_users/" + (encodeURIComponent(key)), {
@@ -227,11 +223,6 @@ define('hoodie/account', function() {
         key = "" + _this._prefix + ":" + _this.username;
         return _this.hoodie.request('DELETE', "/_users/" + (encodeURIComponent(key)) + "?rev=" + _this._doc._rev);
       });
-    };
-
-    Account.prototype.user_data = function() {
-      var _ref;
-      return (_ref = this._doc) != null ? _ref.user_data : void 0;
     };
 
     Account.prototype._prefix = 'org.couchdb.user';

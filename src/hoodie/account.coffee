@@ -73,7 +73,7 @@ define 'hoodie/account', ->
     # The backend will automatically create a userDB based on the username
     # address.
     #
-    sign_up : (username, password, user_data = {}) ->
+    sign_up : (username, password) ->
       defer = @hoodie.defer()
       
       key     = "#{@_prefix}:#{username}"
@@ -83,7 +83,6 @@ define 'hoodie/account', ->
         name       : username
         type       : 'user'
         roles      : []
-        user_data  : user_data
         password   : password
 
       @hoodie.request 'PUT', "/_users/#{encodeURIComponent key}",
@@ -241,10 +240,7 @@ define 'hoodie/account', ->
       @fetch().pipe =>
         key = "#{@_prefix}:#{@username}"
         @hoodie.request 'DELETE', "/_users/#{encodeURIComponent key}?rev=#{@_doc._rev}"
-    
-    
-    user_data : ->
-      @_doc?.user_data
+
 
     # ## PRIVATE
     #
