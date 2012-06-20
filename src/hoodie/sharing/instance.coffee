@@ -201,11 +201,10 @@ define 'hoodie/sharing/instance', ['hoodie/config', 'hoodie/sharing/hoodie'], (C
     # 2. push local changes
     #
     # We need 1. in order to find out if there are documents that are
-    # not to be shared anymore and therefore need to be removed.
+    # not shared anymore and therefore need to be removed.
     sync: ->
       @hoodie.store.loadAll(@_is_my_shared_object_and_changed)
-      .pile @hoodie.remote.pull_changes
-      .pile @hoodie.remote.push_changes
+      .pipe @hoodie.remote.sync
       
     # ## Private
   

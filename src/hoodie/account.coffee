@@ -8,8 +8,10 @@ define 'hoodie/account', ->
   
   class Account
     
+    
     # ## Properties
     username    : undefined
+    
     
     # ## Constructor
     #
@@ -22,6 +24,7 @@ define 'hoodie/account', ->
       window.setTimeout @authenticate
       @on 'signed_in',  @_handle_sign_in
       @on 'signed_out', @_handle_sign_out
+    
     
     # ## Authenticate
     # 
@@ -64,7 +67,6 @@ define 'hoodie/account', ->
       return defer.promise()
       
       
-        
     # ## sign up with username & password
     #
     # uses standard couchDB API to create a new document in _users db.
@@ -90,9 +92,7 @@ define 'hoodie/account', ->
         
         success     : (response) =>
           @hoodie.trigger 'account:signed_up', username
-          @hoodie.trigger 'account:signed_in', username
-          @fetch()
-          defer.resolve username, response
+          @sign_in(username, password).then defer.resolve, defer.reject
           
         error       : (xhr) ->
           try
@@ -117,10 +117,10 @@ define 'hoodie/account', ->
           name      : username
           password  : password
           
-        success     : => 
+        success     : (response) =>
           @hoodie.trigger 'account:signed_in', username
           @fetch()
-          defer.resolve username
+          defer.resolve username, response
         
         error       : (xhr) ->
           try
@@ -181,10 +181,12 @@ define 'hoodie/account', ->
     # alias
     logout: @::sign_out
     
+    
     # ## On
     #
     # alias for `hoodie.on`
     on : (event, cb) -> @hoodie.on "account:#{event}", cb
+    
     
     # ## db
     #
@@ -203,11 +205,13 @@ define 'hoodie/account', ->
     db : -> 
       @username?.toLowerCase().replace(/@/, "$").replace(/\./g, "_");
       
+      
     # ## fetch
     #
     # fetches _users doc from CouchDB and caches it in _doc
     fetch : ->
       defer = @hoodie.defer()
+      
       unless @username
         defer.reject error: "unauthenticated", reason: "not logged in"
         return defer.promise()
@@ -229,6 +233,7 @@ define 'hoodie/account', ->
           
       return defer.promise()
       
+      
     # ## destroy
     #
     # destroys a user' account  
@@ -236,6 +241,7 @@ define 'hoodie/account', ->
       @fetch().pipe =>
         key = "#{@_prefix}:#{@username}"
         @hoodie.request 'DELETE', "/_users/#{encodeURIComponent key}?rev=#{@_doc._rev}"
+    
     
     user_data : ->
       @_doc?.user_data

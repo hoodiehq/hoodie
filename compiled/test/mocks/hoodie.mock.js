@@ -67,7 +67,12 @@ define('mocks/hoodie', function() {
     HoodieMock.prototype.account = {
       authenticate: function() {
         return {
-          then: function() {}
+          then: function() {},
+          pipe: function() {
+            return {
+              fail: function() {}
+            };
+          }
         };
       },
       db: function() {},

@@ -275,9 +275,12 @@ define('specs/hoodie/account', ['mocks/hoodie', 'hoodie/account'], function(Hood
           this.account.sign_up('joe@example.com', 'secret');
           return expect(this.hoodie.trigger).wasCalledWith('account:signed_up', 'joe@example.com');
         });
-        it("should trigger `account:signed_in` event", function() {
+        it("should sign in", function() {
+          spyOn(this.account, "sign_in").andReturn({
+            then: function() {}
+          });
           this.account.sign_up('joe@example.com', 'secret');
-          return expect(this.hoodie.trigger).wasCalledWith('account:signed_in', 'joe@example.com');
+          return expect(this.account.sign_in).wasCalledWith('joe@example.com', 'secret');
         });
         it("should resolve its promise", function() {
           var promise;

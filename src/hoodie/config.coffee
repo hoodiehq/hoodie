@@ -40,7 +40,7 @@ define 'hoodie/config', ->
     # receives a configuration
     #
     get : (key) ->
-      return @cache[key] if @cache[key]
+      return @cache[key]
       
     
     # ## remove

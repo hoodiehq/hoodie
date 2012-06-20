@@ -14,6 +14,7 @@ define('hoodie/sharing/hoodie', ['hoodie'], function(Hoodie) {
       this.sharing = sharing;
       this.store = hoodie.store;
       this.config = this.sharing.config;
+      this.config.set('remote.active', this.sharing.continuous === true);
       SharingHoodie.__super__.constructor.call(this, hoodie.base_url);
     }
 

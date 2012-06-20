@@ -3,7 +3,8 @@ define 'specs/hoodie/account', ['mocks/hoodie', 'hoodie/account'], (HoodieMock, 
   describe "Account", ->
     beforeEach ->
       localStorage.clear()
-      @hoodie = new HoodieMock
+      
+      @hoodie  = new HoodieMock
       @account = new Account @hoodie    
     
       # requests
@@ -223,9 +224,10 @@ define 'specs/hoodie/account', ['mocks/hoodie', 'hoodie/account'], (HoodieMock, 
           @account.sign_up('joe@example.com', 'secret')
           expect(@hoodie.trigger).wasCalledWith 'account:signed_up', 'joe@example.com'
           
-        it "should trigger `account:signed_in` event", ->
-          @account.sign_up('joe@example.com', 'secret')
-          expect(@hoodie.trigger).wasCalledWith 'account:signed_in', 'joe@example.com'
+        it "should sign in", ->
+          spyOn(@account, "sign_in").andReturn then: ->
+          @account.sign_up 'joe@example.com', 'secret'
+          expect(@account.sign_in).wasCalledWith 'joe@example.com', 'secret'
           
         it "should resolve its promise", ->
           promise = @account.sign_up('joe@example.com', 'secret')

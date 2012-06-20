@@ -36,8 +36,11 @@ define 'mocks/hoodie', ->
         removeItem    : ->
                     
     account       : 
-      authenticate  : -> then : ->   
-      db       : ->
+      authenticate  : -> 
+        then : ->   
+        pipe : ->   
+          fail : ->
+      db            : ->
       on            : ->
         
     config :

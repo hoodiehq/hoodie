@@ -174,7 +174,7 @@ define('hoodie/sharing/instance', ['hoodie/config', 'hoodie/sharing/hoodie'], fu
     };
 
     SharingInstance.prototype.sync = function() {
-      return this.hoodie.store.loadAll(this._is_my_shared_object_and_changed).pile(this.hoodie.remote.pull_changes.pile(this.hoodie.remote.push_changes));
+      return this.hoodie.store.loadAll(this._is_my_shared_object_and_changed).pipe(this.hoodie.remote.sync);
     };
 
     SharingInstance.prototype._is_my_shared_object_and_changed = function(obj) {

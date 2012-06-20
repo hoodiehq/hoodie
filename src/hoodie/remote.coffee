@@ -4,79 +4,107 @@
 # Remote is using couchDB's `_changes` feed to listen to changes
 # and `_bulk_docs` to push local changes
 #
+# When hoodie.remote is active (default), it will continuously 
+# synchronize, otherwise you sync, pull or push can be called
+# manually
+#
 
 define 'hoodie/remote', ['hoodie/errors'], (ERROR) ->
   
   # 'use strict'
   
   class Remote
+    
+    # ## properties
+    
+    # active
+    # if remote is active, it will continuously synchronize data
+    # as soon as the user is authenticated.
+    active: true
+  
   
     # ## Constructor
     #
-    constructor : (@hoodie) ->
+    constructor : (@hoodie, options = {}) ->      
       
-      @hoodie.on 'account:signed_in',  @connect
-      @hoodie.on 'account:signed_out', @disconnect
+      # overwrite default with remote.active config, if set
+      if @hoodie.config.get('remote.active')?
+        @active = @hoodie.config.get('remote.active')
       
-      @hoodie.account.authenticate().then @connect
-      
+      @connect() if @active
       
     # ## Connect
     #
-    # start pulling changes from the userDB
+    # start syncing changes from the userDB
     connect : () =>
+      @hoodie.config.set 'remote.active', @active = true
       
-      return if @_connected
-      @hoodie.on 'store:dirty:idle', @push_changes
-      @pull_changes()
-      @push_changes()
+      @hoodie.on 'account:signed_out',    @disconnect
+      @hoodie.on 'account:signed_in',     @sync
+      @hoodie.on 'store:dirty:idle',      @push
+      
+      # start syncing
+      @hoodie.account.authenticate().pipe @sync
     
       
     # ## Disconnect
     #
-    # stop pulling changes from the userDB
+    # stop syncing changes from the userDB
     disconnect : =>
-      @_connected = false
-      @_changes_request?.abort()
+      @hoodie.config.set 'remote.active',  @active = false
       
-      @reset_seq()
-      @hoodie.unbind 'store:dirty:idle', @push_changes
+      @hoodie.unbind 'store:dirty:idle',   @push
+      @hoodie.unbind 'account:signed_in',  @sync
+      @hoodie.unbind 'account:signed_out', @disconnect
+      
+      # binding comes from 403 unauthorized responses
+      @hoodie.unbind 'account:signed_in',  @connect
+      
+      @_pull_request?.abort()
+      @_push_request?.abort()
 
 
     # ## pull changes
     #
-    # a.k.a. make a longpoll AJAX request to CouchDB's `_changes` feed.
+    # a.k.a. make a GET request to CouchDB's `_changes` feed.
     #
-    pull_changes: =>
-      @_connected = true
+    pull : =>
+      @_pull_request = @hoodie.request 'GET', @_pull_url()
       
-      @_changes_request = @hoodie.request 'GET', @_changes_path(),
-        success:      @_changes_success
-        error:        @_changes_error
+      if @active
+        window.clearTimeout @_pull_request_timeout
+        @_pull_request_timeout = window.setTimeout @_restart_pull_request, 25000 # 25 sec
       
-      window.clearTimeout @_changes_request_timeout
-      @_changes_request_timeout = window.setTimeout @_restart_changes_request, 25000 # 25 sec
+      @_pull_request.then @_handle_pull_success, @_handle_pull_error
       
       
-    # ## Push changes
+    # ## push changes
     #
     # Push objects to userDB using the `_bulk_docs` API.
     # If no objects passed, push all changed documents
-    push_changes : (docs) =>
+    push : (docs) =>
       
-      docs = @hoodie.store.changed_docs() unless docs
+      docs = @hoodie.store.changed_docs() unless $.isArray docs
       return @_promise().resolve([]) if docs.length is 0
         
       docs = for doc in docs
         @_parse_for_remote doc 
       
-      @hoodie.request 'POST', "/#{encodeURIComponent @hoodie.account.db()}/_bulk_docs", 
+      @_push_request = @hoodie.request 'POST', "/#{encodeURIComponent @hoodie.account.db()}/_bulk_docs", 
         dataType:     'json'
         processData:  false
         contentType:  'application/json'
       
         data        : JSON.stringify(docs: docs)
-        success     : @_handle_push_changes
+        success     : @_handle_push
+        
+    
+    # ## sync changes
+    #
+    # pull ... and push ;-)
+    sync : =>
+      @pull()
+      @push()
       
       
     # ## Get / Set seq
@@ -85,9 +113,6 @@ define 'hoodie/remote', ['hoodie/errors'], (ERROR) ->
     # 
     get_seq   :       -> @_seq or= @hoodie.config.get('_remote.seq') or 0
     set_seq   : (seq) -> @_seq   = @hoodie.config.set('_remote.seq', seq)
-    reset_seq : -> 
-      @hoodie.config.remove '_remote.seq'
-      delete @_seq
     
     # ## On
     #
@@ -98,44 +123,47 @@ define 'hoodie/remote', ['hoodie/errors'], (ERROR) ->
     # ## Private
     
     #
-    # changes url
+    # pull url
     #
-    # long poll url with heartbeat = 10 seconds
+    # Depending on whether remote is active, return a longpoll URL or not
     #
-    _changes_path : ->
+    _pull_url : ->
       since = @get_seq()
-      "/#{encodeURIComponent @hoodie.account.db()}/_changes?include_docs=true&heartbeat=10000&feed=longpoll&since=#{since}"
+      if @active # make a long poll request
+        "/#{encodeURIComponent @hoodie.account.db()}/_changes?include_docs=true&heartbeat=10000&feed=longpoll&since=#{since}"
+      else
+        "/#{encodeURIComponent @hoodie.account.db()}/_changes?include_docs=true&since=#{since}"
     
-    # request gets restarted automaticcally in @_changes_error
-    _restart_changes_request: => @_changes_request?.abort()
+    # request gets restarted automaticcally in @_handle_pull_error
+    _restart_pull_request: => @_pull_request?.abort()
       
     #
-    # changes success handler 
+    # pull success handler 
     #
     # handle the incoming changes, then send the next request
     #
-    _changes_success : (response) =>
-      
-      return unless @_connected
+    _handle_pull_success : (response) =>
       @set_seq response.last_seq
-      @_handle_pull_changes(response.results)
-      do @pull_changes
+      @_handle_pull_results(response.results)
+      
+      @pull() if @active
       
     # 
-    # changes error handler 
+    # pull error handler 
     #
     # when there is a change, trigger event, 
     # then check for another change
     #
-    _changes_error : (xhr, error, resp) =>
-      return unless @_connected
+    _handle_pull_error : (xhr, error, resp) =>
     
       switch xhr.status
     
-        # This happens when users session got invalidated on server
+        # Session is invalid. User is still login, but needs to reauthenticate
+        # before sync can be continued
         when 403
-          @hoodie.trigger 'remote:error:unauthenticated'
-          do @disconnect
+          @hoodie.trigger 'remote:error:unauthenticated', error
+          @disconnect()
+          @hoodie.one 'account:signed_in', @connect if @active
         
         # the 404 comes, when the requested DB of the User has been removed. 
         # Should really not happen. 
@@ -145,31 +173,31 @@ define 'hoodie/remote', ['hoodie/errors'], (ERROR) ->
         #
         # TODO: review / rethink that.
         when 404
-          window.setTimeout @pull_changes, 3000
+          window.setTimeout @pull, 3000
         
         # Please server, don't give us these. At least not persistently 
         when 500
-          @hoodie.trigger 'remote:error:server'
-          window.setTimeout @pull_changes, 3000
+          @hoodie.trigger 'remote:error:server', error
+          window.setTimeout @pull, 3000
         
         # usually a 0, which stands for timeout or server not reachable.
         else
+          return unless @active
           if xhr.statusText is 'abort'
-            # manual abort after 25sec. reload changes directly.
-            do @pull_changes
+            # manual abort after 25sec. restart pulling changes directly when remote is active
+            @pull() if @active
           else    
               
             # oops. This might be caused by an unreachable server.
             # Or the server canceld it for what ever reason, e.g.
             # heroku kills the request after ~30s.
             # we'll try again after a 3s timeout
-            window.setTimeout @pull_changes, 3000
+            window.setTimeout @pull, 3000 if @active
   
-    # map of valid couchDB doc attributes starting with an underscore
-    _valid_special_attributes:
-      '_id'      : 1
-      '_rev'     : 1
-      '_deleted' : 1
+    # valid couchDB doc attributes starting with an underscore
+    _valid_special_attributes: [
+      '_id', '_rev', '_deleted'
+    ]
   
   
     # parse object for remote storage. All attributes starting with an 
@@ -182,7 +210,7 @@ define 'hoodie/remote', ['hoodie/errors'], (ERROR) ->
       attributes = $.extend {}, obj
     
       for attr of attributes
-        continue if @_valid_special_attributes[attr]
+        continue if ~@_valid_special_attributes.indexOf(attr)
         continue unless /^_/.test attr
         delete attributes[attr]
      
@@ -222,7 +250,7 @@ define 'hoodie/remote', ['hoodie/errors'], (ERROR) ->
     #       not been stored yet, but is within the same bulk of changes. This 
     #       is especially the case during initial bootstraps after a user logins.
     #
-    _handle_pull_changes: (changes) =>
+    _handle_pull_results: (changes) =>
       _destroyed_docs = []
       _changed_docs   = []
       
@@ -262,7 +290,7 @@ define 'hoodie/remote', ['hoodie/errors'], (ERROR) ->
     # and do not need to handle it twice. 
     #
     # But what needs to be handled are conflicts.
-    _handle_push_changes: (doc_responses) =>
+    _handle_push: (doc_responses) =>
       for response in doc_responses
         if response.error is 'conflict'
           @hoodie.trigger 'remote:error:conflict', response.id

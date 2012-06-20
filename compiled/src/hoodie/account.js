@@ -83,9 +83,7 @@ define('hoodie/account', function() {
         contentType: 'application/json',
         success: function(response) {
           _this.hoodie.trigger('account:signed_up', username);
-          _this.hoodie.trigger('account:signed_in', username);
-          _this.fetch();
-          return defer.resolve(username, response);
+          return _this.sign_in(username, password).then(defer.resolve, defer.reject);
         },
         error: function(xhr) {
           var error;
@@ -111,10 +109,10 @@ define('hoodie/account', function() {
           name: username,
           password: password
         },
-        success: function() {
+        success: function(response) {
           _this.hoodie.trigger('account:signed_in', username);
           _this.fetch();
-          return defer.resolve(username);
+          return defer.resolve(username, response);
         },
         error: function(xhr) {
           var error;

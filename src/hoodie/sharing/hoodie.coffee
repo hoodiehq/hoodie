@@ -15,6 +15,10 @@ define 'hoodie/sharing/hoodie', ['hoodie'], (Hoodie) ->
       # config is directly stored on the sharing document
       @config = @sharing.config
       
+      # depending on whether sharing is continuous, we activate
+      # continuous synching ... or not.
+      @config.set 'remote.active', @sharing.continuous is true
+      
       super(hoodie.base_url)
       
     # ## SharingHoodie Request

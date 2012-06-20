@@ -5,63 +5,74 @@ define('hoodie/remote', ['hoodie/errors'], function(ERROR) {
   var Remote;
   return Remote = (function() {
 
-    function Remote(hoodie) {
+    Remote.prototype.active = true;
+
+    function Remote(hoodie, options) {
       this.hoodie = hoodie;
-      this._handle_push_changes = __bind(this._handle_push_changes, this);
+      if (options == null) {
+        options = {};
+      }
+      this._handle_push = __bind(this._handle_push, this);
 
-      this._handle_pull_changes = __bind(this._handle_pull_changes, this);
+      this._handle_pull_results = __bind(this._handle_pull_results, this);
 
-      this._changes_error = __bind(this._changes_error, this);
+      this._handle_pull_error = __bind(this._handle_pull_error, this);
 
-      this._changes_success = __bind(this._changes_success, this);
+      this._handle_pull_success = __bind(this._handle_pull_success, this);
 
-      this._restart_changes_request = __bind(this._restart_changes_request, this);
+      this._restart_pull_request = __bind(this._restart_pull_request, this);
 
-      this.push_changes = __bind(this.push_changes, this);
+      this.sync = __bind(this.sync, this);
 
-      this.pull_changes = __bind(this.pull_changes, this);
+      this.push = __bind(this.push, this);
+
+      this.pull = __bind(this.pull, this);
 
       this.disconnect = __bind(this.disconnect, this);
 
       this.connect = __bind(this.connect, this);
 
-      this.hoodie.on('account:signed_in', this.connect);
-      this.hoodie.on('account:signed_out', this.disconnect);
-      this.hoodie.account.authenticate().then(this.connect);
+      if (this.hoodie.config.get('remote.active') != null) {
+        this.active = this.hoodie.config.get('remote.active');
+      }
+      if (this.active) {
+        this.connect();
+      }
     }
 
     Remote.prototype.connect = function() {
-      if (this._connected) {
-        return;
-      }
-      this.hoodie.on('store:dirty:idle', this.push_changes);
-      this.pull_changes();
-      return this.push_changes();
+      this.hoodie.config.set('remote.active', this.active = true);
+      this.hoodie.on('account:signed_out', this.disconnect);
+      this.hoodie.on('account:signed_in', this.sync);
+      this.hoodie.on('store:dirty:idle', this.push);
+      return this.hoodie.account.authenticate().pipe(this.sync);
     };
 
     Remote.prototype.disconnect = function() {
-      var _ref;
-      this._connected = false;
-      if ((_ref = this._changes_request) != null) {
+      var _ref, _ref1;
+      this.hoodie.config.set('remote.active', this.active = false);
+      this.hoodie.unbind('store:dirty:idle', this.push);
+      this.hoodie.unbind('account:signed_in', this.sync);
+      this.hoodie.unbind('account:signed_out', this.disconnect);
+      this.hoodie.unbind('account:signed_in', this.connect);
+      if ((_ref = this._pull_request) != null) {
         _ref.abort();
       }
-      this.reset_seq();
-      return this.hoodie.unbind('store:dirty:idle', this.push_changes);
+      return (_ref1 = this._push_request) != null ? _ref1.abort() : void 0;
     };
 
-    Remote.prototype.pull_changes = function() {
-      this._connected = true;
-      this._changes_request = this.hoodie.request('GET', this._changes_path(), {
-        success: this._changes_success,
-        error: this._changes_error
-      });
-      window.clearTimeout(this._changes_request_timeout);
-      return this._changes_request_timeout = window.setTimeout(this._restart_changes_request, 25000);
+    Remote.prototype.pull = function() {
+      this._pull_request = this.hoodie.request('GET', this._pull_url());
+      if (this.active) {
+        window.clearTimeout(this._pull_request_timeout);
+        this._pull_request_timeout = window.setTimeout(this._restart_pull_request, 25000);
+      }
+      return this._pull_request.then(this._handle_pull_success, this._handle_pull_error);
     };
 
-    Remote.prototype.push_changes = function(docs) {
+    Remote.prototype.push = function(docs) {
       var doc;
-      if (!docs) {
+      if (!$.isArray(docs)) {
         docs = this.hoodie.store.changed_docs();
       }
       if (docs.length === 0) {
@@ -76,15 +87,20 @@ define('hoodie/remote', ['hoodie/errors'], function(ERROR) {
         }
         return _results;
       }).call(this);
-      return this.hoodie.request('POST', "/" + (encodeURIComponent(this.hoodie.account.db())) + "/_bulk_docs", {
+      return this._push_request = this.hoodie.request('POST', "/" + (encodeURIComponent(this.hoodie.account.db())) + "/_bulk_docs", {
         dataType: 'json',
         processData: false,
         contentType: 'application/json',
         data: JSON.stringify({
           docs: docs
         }),
-        success: this._handle_push_changes
+        success: this._handle_push
       });
+    };
+
+    Remote.prototype.sync = function() {
+      this.pull();
+      return this.push();
     };
 
     Remote.prototype.get_seq = function() {
@@ -95,68 +111,70 @@ define('hoodie/remote', ['hoodie/errors'], function(ERROR) {
       return this._seq = this.hoodie.config.set('_remote.seq', seq);
     };
 
-    Remote.prototype.reset_seq = function() {
-      this.hoodie.config.remove('_remote.seq');
-      return delete this._seq;
-    };
-
     Remote.prototype.on = function(event, cb) {
       return this.hoodie.on("remote:" + event, cb);
     };
 
-    Remote.prototype._changes_path = function() {
+    Remote.prototype._pull_url = function() {
       var since;
       since = this.get_seq();
-      return "/" + (encodeURIComponent(this.hoodie.account.db())) + "/_changes?include_docs=true&heartbeat=10000&feed=longpoll&since=" + since;
+      if (this.active) {
+        return "/" + (encodeURIComponent(this.hoodie.account.db())) + "/_changes?include_docs=true&heartbeat=10000&feed=longpoll&since=" + since;
+      } else {
+        return "/" + (encodeURIComponent(this.hoodie.account.db())) + "/_changes?include_docs=true&since=" + since;
+      }
     };
 
-    Remote.prototype._restart_changes_request = function() {
+    Remote.prototype._restart_pull_request = function() {
       var _ref;
-      return (_ref = this._changes_request) != null ? _ref.abort() : void 0;
+      return (_ref = this._pull_request) != null ? _ref.abort() : void 0;
     };
 
-    Remote.prototype._changes_success = function(response) {
-      if (!this._connected) {
-        return;
-      }
+    Remote.prototype._handle_pull_success = function(response) {
       this.set_seq(response.last_seq);
-      this._handle_pull_changes(response.results);
-      return this.pull_changes();
+      this._handle_pull_results(response.results);
+      if (this.active) {
+        return this.pull();
+      }
     };
 
-    Remote.prototype._changes_error = function(xhr, error, resp) {
-      if (!this._connected) {
-        return;
-      }
+    Remote.prototype._handle_pull_error = function(xhr, error, resp) {
       switch (xhr.status) {
         case 403:
-          this.hoodie.trigger('remote:error:unauthenticated');
-          return this.disconnect();
+          this.hoodie.trigger('remote:error:unauthenticated', error);
+          this.disconnect();
+          if (this.active) {
+            return this.hoodie.one('account:signed_in', this.connect);
+          }
+          break;
         case 404:
-          return window.setTimeout(this.pull_changes, 3000);
+          return window.setTimeout(this.pull, 3000);
         case 500:
-          this.hoodie.trigger('remote:error:server');
-          return window.setTimeout(this.pull_changes, 3000);
+          this.hoodie.trigger('remote:error:server', error);
+          return window.setTimeout(this.pull, 3000);
         default:
+          if (!this.active) {
+            return;
+          }
           if (xhr.statusText === 'abort') {
-            return this.pull_changes();
+            if (this.active) {
+              return this.pull();
+            }
           } else {
-            return window.setTimeout(this.pull_changes, 3000);
+            if (this.active) {
+              return window.setTimeout(this.pull, 3000);
+            }
           }
       }
     };
 
-    Remote.prototype._valid_special_attributes = {
-      '_id': 1,
-      '_rev': 1,
-      '_deleted': 1
-    };
+    Remote.prototype._valid_special_attributes = ['_id', '_rev', '_deleted'];
 
     Remote.prototype._parse_for_remote = function(obj) {
       var attr, attributes;
       attributes = $.extend({}, obj);
       for (attr in attributes) {
-        if (this._valid_special_attributes[attr]) {
+        if (~this._valid_special_attributes.indexOf(attr)) {
           continue;
         }
         if (!/^_/.test(attr)) {
@@ -187,7 +205,7 @@ define('hoodie/remote', ['hoodie/errors'], function(ERROR) {
       return obj;
     };
 
-    Remote.prototype._handle_pull_changes = function(changes) {
+    Remote.prototype._handle_pull_results = function(changes) {
       var doc, promise, _changed_docs, _destroyed_docs, _i, _j, _k, _len, _len1, _len2, _ref, _ref1, _results,
         _this = this;
       _destroyed_docs = [];
@@ -237,7 +255,7 @@ define('hoodie/remote', ['hoodie/errors'], function(ERROR) {
       return _results;
     };
 
-    Remote.prototype._handle_push_changes = function(doc_responses) {
+    Remote.prototype._handle_push = function(doc_responses) {
       var doc, response, update, _i, _len, _results;
       _results = [];
       for (_i = 0, _len = doc_responses.length; _i < _len; _i++) {

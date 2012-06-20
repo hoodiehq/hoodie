@@ -36,9 +36,7 @@ define('hoodie/config', function() {
     };
 
     Config.prototype.get = function(key) {
-      if (this.cache[key]) {
-        return this.cache[key];
-      }
+      return this.cache[key];
     };
 
     Config.prototype.remove = Config.prototype.set;

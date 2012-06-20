@@ -6,116 +6,193 @@ define('specs/hoodie/remote', ['hoodie/remote', 'mocks/hoodie', 'mocks/changes_r
       this.hoodie = new HoodieMock;
       this.remote = new Remote(this.hoodie);
       spyOn(this.hoodie, "on");
+      spyOn(this.hoodie, "one");
       spyOn(this.hoodie, "unbind");
+      spyOn(this.hoodie, "request").andReturn({
+        then: jasmine.createSpy('then')
+      });
+      spyOn(window, "setTimeout");
       spyOn(this.hoodie, "trigger");
-      spyOn(this.hoodie, "request");
       spyOn(this.hoodie.store, "destroy").andReturn({
         then: function(cb) {
           return cb('object_from_store');
         }
       });
-      spyOn(this.hoodie.store, "save").andReturn({
+      return spyOn(this.hoodie.store, "save").andReturn({
         then: function(cb) {
           return cb('object_from_store', false);
         }
       });
-      return spyOn(window, "setTimeout");
     });
-    describe(".constructor(@hoodie)", function() {
+    describe(".constructor(@hoodie, options = {})", function() {
       beforeEach(function() {
+        spyOn(Remote.prototype, "connect");
         return this.remote = new Remote(this.hoodie);
       });
-      it("should subscribe to `signed_in` event", function() {
-        return expect(this.hoodie.on).wasCalledWith('account:signed_in', this.remote.connect);
+      it("should be active by default", function() {
+        return expect(this.remote.active).toBeTruthy();
       });
-      it("should subscribe to `signed_out` event", function() {
-        return expect(this.hoodie.on).wasCalledWith('account:signed_out', this.remote.disconnect);
+      it("should connect", function() {
+        return expect(Remote.prototype.connect).wasCalled();
       });
-      _when("account is authenticated", function() {
+      return _when("config remote.active is false", function() {
         beforeEach(function() {
-          spyOn(Remote.prototype, "connect");
-          return spyOn(this.hoodie.account, "authenticate").andReturn({
-            then: function(cb) {
-              return cb();
-            }
-          });
+          spyOn(this.hoodie.config, "get").andReturn(false);
+          return this.remote = new Remote(this.hoodie);
         });
-        return it("should connect", function() {
-          var remote;
-          remote = new Remote(this.hoodie);
-          return expect(Remote.prototype.connect).wasCalled();
-        });
-      });
-      return _when("account is not authenticated", function() {
-        beforeEach(function() {
-          spyOn(Remote.prototype, "connect");
-          return spyOn(this.hoodie.account, "authenticate").andReturn({
-            then: function() {
-              return null;
-            }
-          });
-        });
-        return it("should not connect", function() {
-          var remote;
-          remote = new Remote(this.hoodie);
-          return expect(Remote.prototype.connect).wasNotCalled();
+        return it("should set active to false", function() {
+          return expect(this.remote.active).toBeFalsy();
         });
       });
     });
     describe(".connect()", function() {
       beforeEach(function() {
-        spyOn(this.remote, "pull_changes");
-        spyOn(this.remote, "push_changes");
-        return this.remote.connect();
+        return spyOn(this.remote, "sync");
       });
-      it("should pull changes", function() {
-        return expect(this.remote.pull_changes).wasCalled();
+      it("should set remote.active to true", function() {
+        this.remote.active = false;
+        this.remote.connect();
+        return expect(this.remote.active).toBeTruthy();
       });
-      it("should push changes", function() {
-        return expect(this.remote.push_changes).wasCalled();
+      it("should set config remote.active to true", function() {
+        spyOn(this.hoodie.config, "set");
+        this.remote.connect();
+        return expect(this.hoodie.config.set).wasCalledWith('remote.active', true);
       });
-      return it("should subscribe to account's dirty idle event", function() {
-        return expect(this.hoodie.on).wasCalledWith('store:dirty:idle', this.remote.push_changes);
+      it("should subscribe to `signed_out` event", function() {
+        this.remote.connect();
+        return expect(this.hoodie.on).wasCalledWith('account:signed_out', this.remote.disconnect);
+      });
+      it("should authenticate", function() {
+        spyOn(this.hoodie.account, "authenticate").andCallThrough();
+        this.remote.connect();
+        return expect(this.hoodie.account.authenticate).wasCalled();
+      });
+      _when("successful", function() {
+        beforeEach(function() {
+          return spyOn(this.hoodie.account, "authenticate").andReturn({
+            pipe: function(cb) {
+              cb();
+              return {
+                fail: function() {}
+              };
+            }
+          });
+        });
+        return it("should sync", function() {
+          this.remote.connect();
+          return expect(this.remote.sync).wasCalled();
+        });
+      });
+      return _when("not successful", function() {
+        beforeEach(function() {
+          return spyOn(this.hoodie.account, "authenticate").andReturn({
+            pipe: function() {
+              return {
+                fail: function(cb) {
+                  return cb();
+                }
+              };
+            }
+          });
+        });
+        return it("should subscribe to account:sign_in with sync", function() {
+          this.remote.connect();
+          return expect(this.hoodie.on).wasCalledWith('account:signed_in', this.remote.sync);
+        });
       });
     });
     describe(".disconnect()", function() {
-      it("should reset the seq number", function() {
-        this.remote._seq = 123;
-        spyOn(this.hoodie.config, "remove");
+      it("should set remote.active to false", function() {
+        this.remote.active = true;
         this.remote.disconnect();
-        expect(this.remote._seq).toBeUndefined();
-        return expect(this.hoodie.config.remove).wasCalledWith('_remote.seq');
+        return expect(this.remote.active).toBeFalsy();
       });
-      return it("should unsubscribe from account's dirty idle event", function() {
+      it("should set config remote.active to true", function() {
+        spyOn(this.hoodie.config, "set");
         this.remote.disconnect();
-        return expect(this.hoodie.unbind).wasCalledWith('store:dirty:idle', this.remote.push_changes);
+        return expect(this.hoodie.config.set).wasCalledWith('remote.active', false);
+      });
+      it("should abort the pull request", function() {
+        this.remote._pull_request = {
+          abort: jasmine.createSpy('pull')
+        };
+        this.remote.disconnect();
+        return expect(this.remote._pull_request.abort).wasCalled();
+      });
+      it("should abort the push request", function() {
+        this.remote._push_request = {
+          abort: jasmine.createSpy('push')
+        };
+        this.remote.disconnect();
+        return expect(this.remote._push_request.abort).wasCalled();
+      });
+      it("should unsubscribe from stores's dirty idle event", function() {
+        this.remote.disconnect();
+        return expect(this.hoodie.unbind).wasCalledWith('store:dirty:idle', this.remote.push);
+      });
+      it("should unsubscribe from account's signed_in idle event", function() {
+        this.remote.disconnect();
+        return expect(this.hoodie.unbind).wasCalledWith('account:signed_in', this.remote.connect);
+      });
+      return it("should unsubscribe from account's signed_out idle event", function() {
+        this.remote.disconnect();
+        return expect(this.hoodie.unbind).wasCalledWith('account:signed_out', this.remote.disconnect);
       });
     });
-    describe(".pull_changes()", function() {
-      it("should send a longpoll GET request to user's db _changes feed", function() {
-        var method, path, _ref;
-        spyOn(this.hoodie.account, "db").andReturn('joe$examle_com');
-        this.remote.pull_changes();
-        expect(this.hoodie.request).wasCalled();
-        _ref = this.hoodie.request.mostRecentCall.args, method = _ref[0], path = _ref[1];
-        expect(method).toBe('GET');
-        return expect(path).toBe('/joe%24examle_com/_changes?include_docs=true&heartbeat=10000&feed=longpoll&since=0');
+    describe(".pull()", function() {
+      _when("remote is active", function() {
+        beforeEach(function() {
+          return this.remote.active = true;
+        });
+        it("should send a longpoll GET request to user's db _changes feed", function() {
+          var method, path, _ref;
+          spyOn(this.hoodie.account, "db").andReturn('joe$examle_com');
+          this.remote.pull();
+          expect(this.hoodie.request).wasCalled();
+          _ref = this.hoodie.request.mostRecentCall.args, method = _ref[0], path = _ref[1];
+          expect(method).toBe('GET');
+          return expect(path).toBe('/joe%24examle_com/_changes?include_docs=true&heartbeat=10000&feed=longpoll&since=0');
+        });
+        return it("should set a timeout to restart the pull request", function() {
+          this.remote.pull();
+          return expect(window.setTimeout).wasCalledWith(this.remote._restart_pull_request, 25000);
+        });
+      });
+      _when("remote is not active", function() {
+        beforeEach(function() {
+          return this.remote.active = false;
+        });
+        return it("should send a normal GET request to user's db _changes feed", function() {
+          var method, path, _ref;
+          spyOn(this.hoodie.account, "db").andReturn('joe$examle_com');
+          this.remote.pull();
+          expect(this.hoodie.request).wasCalled();
+          _ref = this.hoodie.request.mostRecentCall.args, method = _ref[0], path = _ref[1];
+          expect(method).toBe('GET');
+          return expect(path).toBe('/joe%24examle_com/_changes?include_docs=true&since=0');
+        });
       });
       _when("request is successful / returns changes", function() {
         beforeEach(function() {
           var _this = this;
-          this.hoodie.request.andCallFake(function(method, path, options) {
-            _this.hoodie.request.andCallFake(function() {});
-            return options.success(ChangesResponseMock());
+          return this.hoodie.request.andReturn({
+            then: function(success) {
+              _this.hoodie.request.andReturn({
+                then: function() {}
+              });
+              return success(ChangesResponseMock());
+            }
           });
-          return this.remote.pull_changes();
         });
         it("should remove `todo/abc3` from store", function() {
+          this.remote.pull();
           return expect(this.hoodie.store.destroy).wasCalledWith('todo', 'abc3', {
             remote: true
           });
         });
         it("should save `todo/abc2` in store", function() {
+          this.remote.pull();
           return expect(this.hoodie.store.save).wasCalledWith('todo', 'abc2', {
             _rev: '1-123',
             content: 'remember the milk',
@@ -127,7 +204,8 @@ define('specs/hoodie/remote', ['hoodie/remote', 'mocks/hoodie', 'mocks/changes_r
             remote: true
           });
         });
-        return it("should trigger remote events", function() {
+        it("should trigger remote events", function() {
+          this.remote.pull();
           expect(this.hoodie.trigger).wasCalledWith('remote:destroyed', 'todo', 'abc3', 'object_from_store');
           expect(this.hoodie.trigger).wasCalledWith('remote:destroyed:todo', 'abc3', 'object_from_store');
           expect(this.hoodie.trigger).wasCalledWith('remote:destroyed:todo:abc3', 'object_from_store');
@@ -141,97 +219,155 @@ define('specs/hoodie/remote', ['hoodie/remote', 'mocks/hoodie', 'mocks/changes_r
           expect(this.hoodie.trigger).wasCalledWith('remote:changed:todo', 'updated', 'abc2', 'object_from_store');
           return expect(this.hoodie.trigger).wasCalledWith('remote:changed:todo:abc2', 'updated', 'object_from_store');
         });
+        return _and("remote is active", function() {
+          beforeEach(function() {
+            this.remote.active = true;
+            return spyOn(this.remote, "pull").andCallThrough();
+          });
+          return it("should pull again", function() {
+            this.remote.pull();
+            return expect(this.remote.pull.callCount).toBe(2);
+          });
+        });
       });
       _when("request errors with 403 unauthorzied", function() {
         beforeEach(function() {
           var _this = this;
-          return this.hoodie.request.andCallFake(function(method, path, options) {
-            _this.hoodie.request.andCallFake(function() {});
-            return options.error({
-              status: 403
-            });
+          this.hoodie.request.andReturn({
+            then: function(success, error) {
+              _this.hoodie.request.andReturn({
+                then: function() {}
+              });
+              return error({
+                status: 403
+              }, 'error object');
+            }
           });
+          return spyOn(this.remote, "disconnect");
         });
         it("should disconnect", function() {
-          spyOn(this.remote, "disconnect");
-          this.remote.pull_changes();
+          this.remote.pull();
           return expect(this.remote.disconnect).wasCalled();
         });
-        return it("should trigger an unauthenticated error", function() {
-          this.remote.pull_changes();
-          return expect(this.hoodie.trigger).wasCalledWith('remote:error:unauthenticated');
+        it("should trigger an unauthenticated error", function() {
+          this.remote.pull();
+          return expect(this.hoodie.trigger).wasCalledWith('remote:error:unauthenticated', 'error object');
+        });
+        _and("remote is active", function() {
+          beforeEach(function() {
+            return this.remote.active = true;
+          });
+          return it("should reconnect when reauthenticated", function() {
+            this.remote.pull();
+            return expect(this.hoodie.one).wasCalledWith('account:signed_in', this.remote.connect);
+          });
+        });
+        return _and("remote isn't active", function() {
+          beforeEach(function() {
+            return this.remote.active = false;
+          });
+          return it("should not reconnect when reauthenticated", function() {
+            this.remote.pull();
+            return expect(this.hoodie.one).wasNotCalledWith('account:signed_in', this.remote.connect);
+          });
         });
       });
       _when("request errors with 404 not found", function() {
         beforeEach(function() {
           var _this = this;
-          return this.hoodie.request.andCallFake(function(method, path, options) {
-            _this.hoodie.request.andCallFake(function() {});
-            return options.error({
-              status: 404
-            });
+          return this.hoodie.request.andReturn({
+            then: function(success, error) {
+              _this.hoodie.request.andReturn({
+                then: function() {}
+              });
+              return error({
+                status: 404
+              }, 'error object');
+            }
           });
         });
         return it("should try again in 3 seconds (it migh be due to a sign up, the userDB might be created yet)", function() {
-          this.remote.pull_changes();
-          return expect(window.setTimeout).wasCalledWith(this.remote.pull_changes, 3000);
+          this.remote.pull();
+          return expect(window.setTimeout).wasCalledWith(this.remote.pull, 3000);
         });
       });
       _when("request errors with 500 oooops", function() {
         beforeEach(function() {
           var _this = this;
-          return this.hoodie.request.andCallFake(function(method, path, options) {
-            _this.hoodie.request.andCallFake(function() {});
-            return options.error({
-              status: 500
-            });
+          return this.hoodie.request.andReturn({
+            then: function(success, error) {
+              _this.hoodie.request.andReturn({
+                then: function() {}
+              });
+              return error({
+                status: 500
+              }, 'error object');
+            }
           });
         });
         it("should try again in 3 seconds (and hope it was only a hiccup ...)", function() {
-          this.remote.pull_changes();
-          return expect(window.setTimeout).wasCalledWith(this.remote.pull_changes, 3000);
+          this.remote.pull();
+          return expect(window.setTimeout).wasCalledWith(this.remote.pull, 3000);
         });
         return it("should trigger a server error event", function() {
-          this.remote.pull_changes();
-          return expect(this.hoodie.trigger).wasCalledWith('remote:error:server');
+          this.remote.pull();
+          return expect(this.hoodie.trigger).wasCalledWith('remote:error:server', 'error object');
         });
       });
       _when("request was aborted manually", function() {
         beforeEach(function() {
           var _this = this;
-          return this.hoodie.request.andCallFake(function(method, path, options) {
-            _this.hoodie.request.andCallFake(function() {});
-            return options.error({
-              statusText: 'abort'
-            });
+          return this.hoodie.request.andReturn({
+            then: function(success, error) {
+              _this.hoodie.request.andReturn({
+                then: function() {}
+              });
+              return error({
+                statusText: 'abort'
+              }, 'error object');
+            }
           });
         });
-        return it("should try again", function() {
-          spyOn(this.remote, "pull_changes").andCallThrough();
-          this.remote.pull_changes();
-          return expect(this.remote.pull_changes.callCount).toBe(2);
+        return it("should try again when remote is active", function() {
+          spyOn(this.remote, "pull").andCallThrough();
+          this.remote.active = true;
+          this.remote.pull();
+          expect(this.remote.pull.callCount).toBe(2);
+          this.remote.pull.reset();
+          this.remote.active = false;
+          this.remote.pull();
+          return expect(this.remote.pull.callCount).toBe(1);
         });
       });
       return _when("there is a different error", function() {
         beforeEach(function() {
           var _this = this;
-          return this.hoodie.request.andCallFake(function(method, path, options) {
-            _this.hoodie.request.andCallFake(function() {});
-            return options.error({});
+          return this.hoodie.request.andReturn({
+            then: function(success, error) {
+              _this.hoodie.request.andReturn({
+                then: function() {}
+              });
+              return error({}, 'error object');
+            }
           });
         });
-        return it("should try again in 3 seconds", function() {
-          this.remote.pull_changes();
-          return expect(window.setTimeout).wasCalledWith(this.remote.pull_changes, 3000);
+        return it("should try again in 3 seconds if remote is active", function() {
+          this.remote.active = true;
+          this.remote.pull();
+          expect(window.setTimeout).wasCalledWith(this.remote.pull, 3000);
+          window.setTimeout.reset();
+          this.remote.active = false;
+          this.remote.pull();
+          return expect(window.setTimeout).wasNotCalledWith(this.remote.pull, 3000);
         });
       });
     });
-    describe(".push_changes(docs)", function() {
+    describe(".push(docs)", function() {
       return _when("no docs passed", function() {
         _and("there are no changed docs", function() {
           beforeEach(function() {
             spyOn(this.hoodie.store, "changed_docs").andReturn([]);
-            return this.remote.push_changes();
+            return this.remote.push();
           });
           return it("shouldn't do anything", function() {
             return expect(this.hoodie.request).wasNotCalled();
@@ -242,7 +378,7 @@ define('specs/hoodie/remote', ['hoodie/remote', 'mocks/hoodie', 'mocks/changes_r
             var _ref;
             spyOn(this.hoodie.store, "changed_docs").andReturn(ChangedDocsMock());
             spyOn(this.hoodie.account, "db").andReturn('joe$examle_com');
-            this.remote.push_changes();
+            this.remote.push();
             expect(this.hoodie.request).wasCalled();
             return _ref = this.hoodie.request.mostRecentCall.args, this.method = _ref[0], this.path = _ref[1], this.options = _ref[2], _ref;
           });
@@ -273,7 +409,7 @@ define('specs/hoodie/remote', ['hoodie/remote', 'mocks/hoodie', 'mocks/changes_r
               this.hoodie.request.andCallFake(function(method, path, options) {
                 return options.success(BulkUpdateResponseMock());
               });
-              return this.remote.push_changes();
+              return this.remote.push();
             });
             return it("should trigger conflict event", function() {
               return expect(this.hoodie.trigger).wasCalledWith('remote:error:conflict', 'todo/abc2');
@@ -294,7 +430,7 @@ define('specs/hoodie/remote', ['hoodie/remote', 'mocks/hoodie', 'mocks/changes_r
                 id: '3'
               }
             ];
-            return this.remote.push_changes(this.todo_objects);
+            return this.remote.push(this.todo_objects);
           });
           return it("should POST the passed objects", function() {
             var data;
