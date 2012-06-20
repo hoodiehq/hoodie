@@ -29,7 +29,7 @@
 
 ### Remote
 
-* spec in _parse_from_remote
+* spec in _parse_from_pull
 
   # handle rev
   if obj.rev
@@ -39,3 +39,16 @@
 ### Store
 
 * spec `update`: make sure that options get passed to save
+
+
+
+### Dev shortcuts
+
+# delete all user accounts
+$.couch.db('_users').allDocs( {success: function(response) {
+  var user_docs = []
+  $.each(response.rows, function() {
+    if (/org.couchdb.user/.test(this.id)) user_docs.push({_id: this.id, _rev: this.value.rev})
+  })
+  $.couch.db('_users').bulkRemove({docs: user_docs})
+}})

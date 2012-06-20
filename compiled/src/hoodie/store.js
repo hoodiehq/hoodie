@@ -66,13 +66,7 @@ define('hoodie/store', ['hoodie/errors'], function(ERROR) {
         return defer.promise();
       }
       object = $.extend({}, object);
-      if (id) {
-        is_new = typeof this._cached["" + type + "/" + id] !== 'object';
-      } else {
-        is_new = true;
-        id = this.uuid();
-      }
-      if (!this._is_valid_id(id)) {
+      if (id && !this._is_valid_id(id)) {
         return defer.reject(ERROR.INVALID_KEY({
           id: id
         })).promise();
@@ -82,9 +76,15 @@ define('hoodie/store', ['hoodie/errors'], function(ERROR) {
           type: type
         })).promise();
       }
+      if (id) {
+        is_new = typeof this._cached["" + type + "/" + id] !== 'object';
+      } else {
+        is_new = true;
+        id = this.uuid();
+      }
       if (options.remote) {
         object._synced_at = this._now();
-      } else {
+      } else if (!options.silent) {
         object.updated_at = this._now();
         object.created_at || (object.created_at = object.updated_at);
       }
@@ -114,10 +114,25 @@ define('hoodie/store', ['hoodie/errors'], function(ERROR) {
       }
       defer = this.hoodie.defer();
       _load_promise = this.load(type, id).pipe(function(current_obj) {
+        var changed_properties, key, value;
         if (typeof object_update === 'function') {
-          object_update(current_obj);
-        } else {
-          current_obj = $.extend(current_obj, object_update);
+          object_update = object_update($.extend({}, current_obj));
+        }
+        changed_properties = (function() {
+          var _results;
+          _results = [];
+          for (key in object_update) {
+            value = object_update[key];
+            if (!(current_obj[key] !== value)) {
+              continue;
+            }
+            current_obj[key] = value;
+            _results.push(key);
+          }
+          return _results;
+        })();
+        if (!changed_properties.length) {
+          return defer.resolve(current_obj);
         }
         return _this.save(type, id, current_obj, options).then(defer.resolve, defer.reject);
       });

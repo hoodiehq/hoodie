@@ -17,7 +17,8 @@ define 'hoodie/sharing/hoodie', ['hoodie'], (Hoodie) ->
       
       # depending on whether sharing is continuous, we activate
       # continuous synching ... or not.
-      @config.set 'remote.active', @sharing.continuous is true
+      @config.set '_account.username', "sharing/#{@sharing.id}"
+      @config.set '_remote.active',    @sharing.continuous is true
       
       super(hoodie.base_url)
       
@@ -30,7 +31,7 @@ define 'hoodie/sharing/hoodie', ['hoodie'], (Hoodie) ->
       # ignore requests to /_session as we don't use cookie authentication anyway, 
       # every request is authenticated by basic auth header
       if path is '/_session'
-        @defer().resolve().promise()
+        return @defer().resolve().promise()
       
       defaults =
         type        : type
@@ -40,7 +41,6 @@ define 'hoodie/sharing/hoodie', ['hoodie'], (Hoodie) ->
         dataType    : 'json'
         
       unless type is 'PUT' # no authentication header for sign up request
-        console.log "hash: ", "sharing/#{@sharing.id}:#{@sharing.password}", @sharing
         hash = btoa "sharing/#{@sharing.id}:#{@sharing.password}"
         auth = "Basic #{hash}"
         

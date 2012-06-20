@@ -32,8 +32,8 @@ define('hoodie/remote', ['hoodie/errors'], function(ERROR) {
 
       this.connect = __bind(this.connect, this);
 
-      if (this.hoodie.config.get('remote.active') != null) {
-        this.active = this.hoodie.config.get('remote.active');
+      if (this.hoodie.config.get('_remote.active') != null) {
+        this.active = this.hoodie.config.get('_remote.active');
       }
       if (this.active) {
         this.connect();
@@ -41,7 +41,7 @@ define('hoodie/remote', ['hoodie/errors'], function(ERROR) {
     }
 
     Remote.prototype.connect = function() {
-      this.hoodie.config.set('remote.active', this.active = true);
+      this.hoodie.config.set('_remote.active', this.active = true);
       this.hoodie.on('account:signed_out', this.disconnect);
       this.hoodie.on('account:signed_in', this.sync);
       return this.hoodie.account.authenticate().pipe(this.sync);
@@ -49,7 +49,7 @@ define('hoodie/remote', ['hoodie/errors'], function(ERROR) {
 
     Remote.prototype.disconnect = function() {
       var _ref, _ref1;
-      this.hoodie.config.set('remote.active', this.active = false);
+      this.hoodie.config.set('_remote.active', this.active = false);
       this.hoodie.unbind('account:signed_in', this.sync);
       this.hoodie.unbind('account:signed_out', this.disconnect);
       this.hoodie.unbind('store:dirty:idle', this.push);
@@ -97,13 +97,12 @@ define('hoodie/remote', ['hoodie/errors'], function(ERROR) {
       });
     };
 
-    Remote.prototype.sync = function() {
+    Remote.prototype.sync = function(docs) {
       if (this.active) {
         this.hoodie.unbind('store:dirty:idle', this.push);
         this.hoodie.on('store:dirty:idle', this.push);
       }
-      this.pull();
-      return this.push();
+      return this.push(docs).pipe(this.pull);
     };
 
     Remote.prototype.get_seq = function() {
@@ -190,7 +189,7 @@ define('hoodie/remote', ['hoodie/errors'], function(ERROR) {
       return attributes;
     };
 
-    Remote.prototype._parse_from_remote = function(obj) {
+    Remote.prototype._parse_from_pull = function(obj) {
       var id, _ref;
       id = obj._id || obj.id;
       delete obj._id;
@@ -208,6 +207,16 @@ define('hoodie/remote', ['hoodie/errors'], function(ERROR) {
       return obj;
     };
 
+    Remote.prototype._parse_from_push = function(obj) {
+      var id, _ref;
+      id = obj._id || delete obj._id;
+      _ref = obj.id.split(/\//), obj.type = _ref[0], obj.id = _ref[1];
+      obj._rev = obj.rev;
+      delete obj.rev;
+      delete obj.ok;
+      return obj;
+    };
+
     Remote.prototype._handle_pull_results = function(changes) {
       var doc, promise, _changed_docs, _destroyed_docs, _i, _j, _k, _len, _len1, _len2, _ref, _ref1, _results,
         _this = this;
@@ -215,7 +224,7 @@ define('hoodie/remote', ['hoodie/errors'], function(ERROR) {
       _changed_docs = [];
       for (_i = 0, _len = changes.length; _i < _len; _i++) {
         doc = changes[_i].doc;
-        doc = this._parse_from_remote(doc);
+        doc = this._parse_from_pull(doc);
         if (doc._deleted) {
           _destroyed_docs.push([
             doc, this.hoodie.store.destroy(doc.type, doc.id, {
@@ -266,7 +275,7 @@ define('hoodie/remote', ['hoodie/errors'], function(ERROR) {
         if (response.error === 'conflict') {
           _results.push(this.hoodie.trigger('remote:error:conflict', response.id));
         } else if (!this.active) {
-          doc = this._parse_from_remote(response);
+          doc = this._parse_from_push(response);
           update = {
             _rev: doc._rev
           };

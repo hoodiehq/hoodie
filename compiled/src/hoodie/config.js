@@ -29,9 +29,18 @@ define('hoodie/config', function() {
 
     Config.prototype.set = function(key, value) {
       var update;
+      if (this.cache[key] === value) {
+        return;
+      }
       update = {};
       update[key] = value;
-      this.hoodie.store.update(this.type, this.id, update);
+      if (key.charAt(0) === '_') {
+        this.hoodie.store.update(this.type, this.id, update, {
+          silent: true
+        });
+      } else {
+        this.hoodie.store.update(this.type, this.id, update);
+      }
       return this.cache[key] = value;
     };
 

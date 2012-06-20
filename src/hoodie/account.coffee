@@ -18,10 +18,10 @@ define 'hoodie/account', ->
     constructor : (@hoodie) ->
       
       # handle session
-      @username = @hoodie.config.get 'account.username'
+      @username = @hoodie.config.get '_account.username'
       
       # authenticate on next tick
-      window.setTimeout @authenticate
+      # window.setTimeout @authenticate
       @on 'signed_in',  @_handle_sign_in
       @on 'signed_out', @_handle_sign_out
     
@@ -251,11 +251,11 @@ define 'hoodie/account', ->
     
     #
     _handle_sign_in: (@username) =>
-      @hoodie.config.set 'account.username', @username
+      @hoodie.config.set '_account.username', @username
       @_authenticated = true
     
     #
     _handle_sign_out: =>
       delete @username
-      @hoodie.config.remove 'account.username'
+      @hoodie.config.remove '_account.username'
       @_authenticated = false

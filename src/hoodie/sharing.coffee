@@ -116,8 +116,7 @@ define 'hoodie/sharing', ['hoodie/sharing/instance'], (SharingInstance) ->
       .done (sharing) ->
         defer.resolve sharing
       .fail -> 
-        test = SharingInstance.create(options).then defer.resolve, defer.reject 
-        console.log test, test.isResolved()
+        SharingInstance.create(options).then defer.resolve, defer.reject 
     
       return defer.promise()
     

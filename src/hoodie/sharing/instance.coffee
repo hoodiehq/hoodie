@@ -163,34 +163,47 @@ define 'hoodie/sharing/instance', ['hoodie/config', 'hoodie/sharing/hoodie'], (C
       # normalize input
       unless @hoodie.isPromise objects
         objects = [objects] unless $.isArray objects
-        
+      
       update = switch do_add
       
         # add objects to sharing
         when true
           (obj) => 
-            obj.$sharings or= []
-            obj.$sharings.push @id
+            $sharings = obj.$sharings
+            if $sharings
+              $sharings: $sharings.concat @id unless ~$sharings.indexOf(@id)
+            else
+              $sharings: [@id]
             
         # remove objects to sharing
         when false
           (obj) =>
             try
-              idx = obj.$sharings.indexOf @id
-              obj.$sharings.splice idx, 1 if ~idx
+              $sharings = obj.$sharings
+              
+              if ~(idx = $sharings.indexOf @id)
+                $sharings.splice(idx, 1) 
+              
+              $sharings: if $sharings.length then $sharings else undefined
+          
         
         # add/remove depending on current state of object
         else
           (obj) => 
-            idx = -1
+            $sharings = obj.$sharings
+          
             try
-              idx = obj.$sharings.indexOf @id
+              idx = $sharings.indexOf @id
+            catch e
+              idx = -1
             
-            if ~idx  # returns false for -1
-              obj.$sharings.splice idx, 1
+            if ~idx # returns false for -1
+              $sharings.splice idx, 1
             else
-              obj.$sharings or= []
-              obj.$sharings.push @id
+              $sharings or= []
+              $sharings.push @id
+            
+            $sharings: if $sharings.length then $sharings else undefined
       
       @hoodie.store.updateAll objects, update
       
@@ -209,4 +222,6 @@ define 'hoodie/sharing/instance', ['hoodie/config', 'hoodie/sharing/hoodie'], (C
     # ## Private
   
     _is_my_shared_object_and_changed: (obj) =>
-      obj.$sharings and ~obj.$sharings.indexOf(@id) and @hoodie.store.is_dirty(obj.type, obj.id)
+      if (obj.id is @id or obj.$sharings and ~obj.$sharings.indexOf(@id)) and @hoodie.store.is_dirty(obj.type, obj.id)
+        console.log obj.type, obj.id, obj.text
+      (obj.id is @id or obj.$sharings and ~obj.$sharings.indexOf(@id)) and @hoodie.store.is_dirty(obj.type, obj.id)

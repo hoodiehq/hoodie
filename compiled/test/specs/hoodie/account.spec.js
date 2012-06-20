@@ -17,7 +17,7 @@ define('specs/hoodie/account', ['mocks/hoodie', 'hoodie/account'], function(Hood
       _when("account.username is set", function() {
         beforeEach(function() {
           return spyOn(this.hoodie.config, "get").andCallFake(function(key) {
-            if (key === 'account.username') {
+            if (key === '_account.username') {
               return 'joe@example.com';
             }
           });
@@ -27,12 +27,6 @@ define('specs/hoodie/account', ['mocks/hoodie', 'hoodie/account'], function(Hood
           account = new Account(this.hoodie);
           return expect(account.username).toBe('joe@example.com');
         });
-      });
-      it("should authenticate", function() {
-        var account;
-        spyOn(window, "setTimeout");
-        account = new Account(this.hoodie);
-        return expect(window.setTimeout).wasCalledWith(account.authenticate);
       });
       it("should bind to sign_in event", function() {
         var account;
@@ -56,7 +50,7 @@ define('specs/hoodie/account', ['mocks/hoodie', 'hoodie/account'], function(Hood
           return expect(this.account.username).toBe('joe@example.com');
         });
         it("should store @username to config", function() {
-          return expect(this.hoodie.config.set).wasCalledWith('account.username', 'joe@example.com');
+          return expect(this.hoodie.config.set).wasCalledWith('_account.username', 'joe@example.com');
         });
         return it("should set _authenticated to true", function() {
           this.account._authenticated = false;
@@ -77,7 +71,7 @@ define('specs/hoodie/account', ['mocks/hoodie', 'hoodie/account'], function(Hood
           this.account._handle_sign_out({
             "ok": true
           });
-          return expect(this.hoodie.config.remove).wasCalledWith('account.username');
+          return expect(this.hoodie.config.remove).wasCalledWith('_account.username');
         });
         return it("should set _authenticated to false", function() {
           this.account._authenticated = true;

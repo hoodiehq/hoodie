@@ -29,9 +29,17 @@ define 'hoodie/config', ->
     # adds a configuration
     #
     set : (key, value) ->
+      return if @cache[key] is value
+      
       update = {}
       update[key] = value
-      @hoodie.store.update @type, @id, update
+      
+      if key.charAt(0) is '_'
+        # silent update
+        @hoodie.store.update @type, @id, update, silent: true
+      else
+        @hoodie.store.update @type, @id, update
+        
       @cache[key] = value
       
     

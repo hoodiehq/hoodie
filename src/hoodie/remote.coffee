@@ -27,17 +27,18 @@ define 'hoodie/remote', ['hoodie/errors'], (ERROR) ->
     #
     constructor : (@hoodie, options = {}) ->      
       
-      # overwrite default with remote.active config, if set
-      if @hoodie.config.get('remote.active')?
-        @active = @hoodie.config.get('remote.active')
+      # overwrite default with _remote.active config, if set
+      if @hoodie.config.get('_remote.active')?
+        @active = @hoodie.config.get('_remote.active')
       
       @connect() if @active
+      
       
     # ## Connect
     #
     # start syncing changes from the userDB
     connect : () =>
-      @hoodie.config.set 'remote.active', @active = true
+      @hoodie.config.set '_remote.active', @active = true
       
       @hoodie.on 'account:signed_out',    @disconnect
       @hoodie.on 'account:signed_in',     @sync
@@ -50,7 +51,7 @@ define 'hoodie/remote', ['hoodie/errors'], (ERROR) ->
     #
     # stop syncing changes from the userDB
     disconnect : =>
-      @hoodie.config.set 'remote.active',  @active = false
+      @hoodie.config.set '_remote.active',  @active = false
       
       @hoodie.unbind 'account:signed_in',  @sync
       @hoodie.unbind 'account:signed_out', @disconnect
@@ -103,13 +104,12 @@ define 'hoodie/remote', ['hoodie/errors'], (ERROR) ->
     # ## sync changes
     #
     # pull ... and push ;-)
-    sync : =>
+    sync : (docs) =>
       if @active
         @hoodie.unbind 'store:dirty:idle', @push
-        @hoodie.on 'store:dirty:idle',     @push
+        @hoodie.on     'store:dirty:idle', @push
       
-      @pull()
-      @push()
+      @push(docs).pipe @pull
       
       
     # ## Get / Set seq
@@ -225,11 +225,11 @@ define 'hoodie/remote', ['hoodie/errors'], (ERROR) ->
       return attributes
       
       
-    # parse object for local storage. 
+    # parse object coming from pull for local storage. 
     # 
     # renames `_id` attribute to `id` and removes the type from the id,
     # e.g. `document/123` -> `123`
-    _parse_from_remote: (obj) ->
+    _parse_from_pull: (obj) ->
       
       # handle id and type
       id = obj._id or obj.id
@@ -246,6 +246,28 @@ define 'hoodie/remote', ['hoodie/errors'], (ERROR) ->
         delete obj.rev
       
       return obj
+    
+    # parse object response coming from push for local storage. 
+    # 
+    # removes the type from the id, e.g. `document/123` -> `123`
+    # also removes attribute ok
+    _parse_from_push: (obj) ->
+      
+      # handle id and type
+      id = obj._id or 
+      delete obj._id
+      [obj.type, obj.id] = obj.id.split(/\//)
+      
+      # handle rev
+      obj._rev = obj.rev
+      delete obj.rev
+      
+      # remove ok attribute
+      delete obj.ok
+      
+      return obj
+    
+    
   
     #
     # handle changes from remote
@@ -261,11 +283,11 @@ define 'hoodie/remote', ['hoodie/errors'], (ERROR) ->
       
       # 1. update or remove objects from local store
       for {doc} in changes
-        doc = @_parse_from_remote(doc)
+        doc = @_parse_from_pull(doc)
         if doc._deleted
-          _destroyed_docs.push [doc, @hoodie.store.destroy  doc.type, doc.id,      remote: true]
+          _destroyed_docs.push [doc, @hoodie.store.destroy(  doc.type, doc.id,      remote: true)]
         else                                                
-          _changed_docs.push   [doc, @hoodie.store.save     doc.type, doc.id, doc, remote: true]
+          _changed_docs.push   [doc, @hoodie.store.save(     doc.type, doc.id, doc, remote: true)]
       
       # 2. trigger events
       for [doc, promise] in _destroyed_docs
@@ -301,11 +323,12 @@ define 'hoodie/remote', ['hoodie/errors'], (ERROR) ->
       for response in doc_responses
         if response.error is 'conflict'
           @hoodie.trigger 'remote:error:conflict', response.id
+          
         else unless @active
-          doc     = @_parse_from_remote(response)
+          doc     = @_parse_from_push response
           update  = _rev: doc._rev 
           
-          @hoodie.store.update(doc.type, doc.id, update, remote: true)
+          @hoodie.store.update doc.type, doc.id, update, remote: true
     
     #
     _promise: $.Deferred

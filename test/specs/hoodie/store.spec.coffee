@@ -62,6 +62,13 @@ define 'specs/hoodie/store', ['hoodie/store', 'mocks/hoodie'], (Store, HoodieMoc
             @store.save 'document', '123', { name: 'test' }, { remote: true }
             object = @store.cache.mostRecentCall.args[2]
             expect(object._synced_at).toBe 'now'
+        
+        _and "options.silent is true", ->
+          it "should not touch created_at / updated_at timestamps", ->
+            @store.save 'document', '123', { name: 'test' }, { silent: true }
+            object = @store.cache.mostRecentCall.args[2]
+            expect(object.created_at).toBeUndefined()
+            expect(object.updated_at).toBeUndefined()
           
         
         it "should pass options", ->
@@ -204,12 +211,12 @@ define 'specs/hoodie/store', ['hoodie/store', 'mocks/hoodie'], (Store, HoodieMoc
           expect(@store.save).wasCalledWith 'couch', '123', funky: 'fresh', {}
           # expect(@promise).toBeRejected()
       
-      _when "object can be found", ->        
+      _when "object can be found", ->
         beforeEach ->
           @store.load.andReturn $.Deferred().resolve { style: 'baws' }
-          @store.save.andReturn $.Deferred().resolve { style: 'baws' }
+          @store.save.andReturn $.Deferred().resolve 'resolved by save'
           
-        _and "update is an object", ->          
+        _and "update is an object", ->
           beforeEach ->
             @promise = @store.update 'couch', '123', { funky: 'fresh' }
         
@@ -217,17 +224,28 @@ define 'specs/hoodie/store', ['hoodie/store', 'mocks/hoodie'], (Store, HoodieMoc
             expect(@store.save).wasCalledWith 'couch', '123', { style: 'baws', funky: 'fresh' }, {}
         
           it "should return a resolved promise", ->
-            expect(@promise).toBeResolved()
+            expect(@promise).toBeResolvedWith 'resolved by save'
           
         _and "update is a function", ->
           beforeEach ->
-            @promise = @store.update 'couch', '123', (obj) -> obj.funky = 'fresh'
+            @promise = @store.update 'couch', '123', (obj) -> funky: 'fresh'
 
           it "should save the updated object", ->
             expect(@store.save).wasCalledWith 'couch', '123', { style: 'baws', funky: 'fresh' }, {}
 
           it "should return a resolved promise", ->
-            expect(@promise).toBeResolved()
+            expect(@promise).toBeResolvedWith 'resolved by save'
+            
+        _and "update wouldn't make a change", ->
+          beforeEach ->
+            @promise = @store.update 'couch', '123', (obj) -> style: 'baws'
+            
+          it "should save the object", ->
+            expect(@store.save).wasNotCalled()
+
+          it "should return a resolved promise", ->
+            expect(@promise).toBeResolvedWith {style: 'baws'}
+          
     # /.update(type, id, update, options)
     
     describe ".updateAll(objects)", ->

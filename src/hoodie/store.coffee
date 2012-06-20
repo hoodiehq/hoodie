@@ -64,26 +64,26 @@ define 'hoodie/store', ['hoodie/errors'], (ERROR) ->
       # make sure we don't mess with the passed object directly
       object = $.extend {}, object
       
+      # validations
+      if id and not @_is_valid_id id
+        return defer.reject( ERROR.INVALID_KEY id: id ).promise()
+        
+      unless @_is_valid_type type
+        return defer.reject( ERROR.INVALID_KEY type: type ).promise()
+      
       # generate an id if necessary
       if id
         is_new = typeof @_cached["#{type}/#{id}"] isnt 'object'
       else
         is_new = true
-        id = @uuid()
-    
-      # validations
-      unless @_is_valid_id id
-        return defer.reject( ERROR.INVALID_KEY id: id ).promise()
-        
-      unless @_is_valid_type type
-        return defer.reject( ERROR.INVALID_KEY type: type ).promise()
+        id     = @uuid()
     
       # add timestamps
       if options.remote
         object._synced_at = @_now()
-      else
+      else unless options.silent
         object.updated_at = @_now()
-        object.created_at ||= object.updated_at
+        object.created_at or= object.updated_at
     
       # remove `id` and `type` attributes before saving,
       # as the Store key contains this information
@@ -98,13 +98,15 @@ define 'hoodie/store', ['hoodie/errors'], (ERROR) ->
     
       return defer.promise()
     
+    
     # ## Create
     #
     # `.create` is an alias for `.save`, with the difference that there is no id argument.
     # Internally it simply calls `.save(type, undefined, object).
     create : (type, object, options = {}) ->
       @save type, undefined, object
-      
+    
+    
     # ## Update
     #
     # In contrast to `.save`, the `.update` method does not replace the stored object,
@@ -121,10 +123,19 @@ define 'hoodie/store', ['hoodie/errors'], (ERROR) ->
       defer = @hoodie.defer()
       
       _load_promise = @load(type, id).pipe (current_obj) => 
-        if typeof object_update is 'function'
-          object_update(current_obj)
-        else
-          current_obj = $.extend(current_obj, object_update)
+        
+        # normalize input
+        object_update = object_update( $.extend {}, current_obj ) if typeof object_update is 'function'
+        
+        # check if something changed
+        changed_properties = for key, value of object_update when current_obj[key] isnt value
+          # workaround for undefined values, as $.extend ignores these
+          current_obj[key] = value
+          key
+          
+        return defer.resolve current_obj unless changed_properties.length
+        
+        # apply update 
         @save(type, id, current_obj, options).then defer.resolve, defer.reject
         
       # if not found, create it
@@ -132,7 +143,8 @@ define 'hoodie/store', ['hoodie/errors'], (ERROR) ->
         @save(type, id, object_update, options).then defer.resolve, defer.reject
       
       defer.promise()
-      
+    
+    
     # ## updateAll
     #
     # update all objects in the store, can be optionally filtered by a function
@@ -159,7 +171,6 @@ define 'hoodie/store', ['hoodie/errors'], (ERROR) ->
         $.when.apply(null, _update_promises).then defer.resolve
         
         return defer.promise()
-      
     
     
     # ## load
@@ -186,8 +197,8 @@ define 'hoodie/store', ['hoodie/errors'], (ERROR) ->
         defer.reject error
       
       return defer.promise()
-  
-  
+    
+    
     # ## loadAll
     #
     # returns all objects from store. 

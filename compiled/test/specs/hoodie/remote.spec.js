@@ -57,7 +57,7 @@ define('specs/hoodie/remote', ['hoodie/remote', 'mocks/hoodie', 'mocks/changes_r
       it("should set config remote.active to true", function() {
         spyOn(this.hoodie.config, "set");
         this.remote.connect();
-        return expect(this.hoodie.config.set).wasCalledWith('remote.active', true);
+        return expect(this.hoodie.config.set).wasCalledWith('_remote.active', true);
       });
       it("should subscribe to `signed_out` event", function() {
         this.remote.connect();
@@ -111,7 +111,7 @@ define('specs/hoodie/remote', ['hoodie/remote', 'mocks/hoodie', 'mocks/changes_r
       it("should set config remote.active to true", function() {
         spyOn(this.hoodie.config, "set");
         this.remote.disconnect();
-        return expect(this.hoodie.config.set).wasCalledWith('remote.active', false);
+        return expect(this.hoodie.config.set).wasCalledWith('_remote.active', false);
       });
       it("should abort the pull request", function() {
         this.remote._pull_request = {
@@ -438,6 +438,42 @@ define('specs/hoodie/remote', ['hoodie/remote', 'mocks/hoodie', 'mocks/changes_r
             data = JSON.parse(this.hoodie.request.mostRecentCall.args[2].data);
             return expect(data.docs.length).toBe(3);
           });
+        });
+      });
+    });
+    describe(".sync(docs)", function() {
+      beforeEach(function() {
+        spyOn(this.remote, "push");
+        return spyOn(this.remote, "pull");
+      });
+      it("should push changes and pass arguments", function() {
+        this.remote.sync([1, 2, 3]);
+        return expect(this.remote.push).wasCalledWith([1, 2, 3]);
+      });
+      it("should pull changes and pass arguments", function() {
+        this.remote.sync([1, 2, 3]);
+        return expect(this.remote.pull).wasCalledWith([1, 2, 3]);
+      });
+      return _when("remote is active", function() {
+        beforeEach(function() {
+          return this.remote.active = true;
+        });
+        it("should bind to store:dirty:idle event", function() {
+          this.remote.sync();
+          return expect(this.hoodie.on).wasCalledWith('store:dirty:idle', this.remote.push);
+        });
+        return it("should unbind from store:dirty:idle event before it binds to it", function() {
+          var order;
+          order = [];
+          this.hoodie.unbind.andCallFake(function(event) {
+            return order.push("unbind " + event);
+          });
+          this.hoodie.on.andCallFake(function(event) {
+            return order.push("bind " + event);
+          });
+          this.remote.sync();
+          expect(order[0]).toBe('unbind store:dirty:idle');
+          return expect(order[1]).toBe('bind store:dirty:idle');
         });
       });
     });

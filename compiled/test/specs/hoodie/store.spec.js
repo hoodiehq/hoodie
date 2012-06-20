@@ -86,6 +86,19 @@ define('specs/hoodie/store', ['hoodie/store', 'mocks/hoodie'], function(Store, H
             return expect(object._synced_at).toBe('now');
           });
         });
+        _and("options.silent is true", function() {
+          return it("should not touch created_at / updated_at timestamps", function() {
+            var object;
+            this.store.save('document', '123', {
+              name: 'test'
+            }, {
+              silent: true
+            });
+            object = this.store.cache.mostRecentCall.args[2];
+            expect(object.created_at).toBeUndefined();
+            return expect(object.updated_at).toBeUndefined();
+          });
+        });
         it("should pass options", function() {
           var options;
           options = this.store.cache.mostRecentCall.args[3];
@@ -283,9 +296,7 @@ define('specs/hoodie/store', ['hoodie/store', 'mocks/hoodie'], function(Store, H
           this.store.load.andReturn($.Deferred().resolve({
             style: 'baws'
           }));
-          return this.store.save.andReturn($.Deferred().resolve({
-            style: 'baws'
-          }));
+          return this.store.save.andReturn($.Deferred().resolve('resolved by save'));
         });
         _and("update is an object", function() {
           beforeEach(function() {
@@ -300,13 +311,15 @@ define('specs/hoodie/store', ['hoodie/store', 'mocks/hoodie'], function(Store, H
             }, {});
           });
           return it("should return a resolved promise", function() {
-            return expect(this.promise).toBeResolved();
+            return expect(this.promise).toBeResolvedWith('resolved by save');
           });
         });
-        return _and("update is a function", function() {
+        _and("update is a function", function() {
           beforeEach(function() {
             return this.promise = this.store.update('couch', '123', function(obj) {
-              return obj.funky = 'fresh';
+              return {
+                funky: 'fresh'
+              };
             });
           });
           it("should save the updated object", function() {
@@ -316,7 +329,24 @@ define('specs/hoodie/store', ['hoodie/store', 'mocks/hoodie'], function(Store, H
             }, {});
           });
           return it("should return a resolved promise", function() {
-            return expect(this.promise).toBeResolved();
+            return expect(this.promise).toBeResolvedWith('resolved by save');
+          });
+        });
+        return _and("update wouldn't make a change", function() {
+          beforeEach(function() {
+            return this.promise = this.store.update('couch', '123', function(obj) {
+              return {
+                style: 'baws'
+              };
+            });
+          });
+          it("should save the object", function() {
+            return expect(this.store.save).wasNotCalled();
+          });
+          return it("should return a resolved promise", function() {
+            return expect(this.promise).toBeResolvedWith({
+              style: 'baws'
+            });
           });
         });
       });

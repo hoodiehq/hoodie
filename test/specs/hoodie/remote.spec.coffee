@@ -47,7 +47,7 @@ define 'specs/hoodie/remote', ['hoodie/remote', 'mocks/hoodie', 'mocks/changes_r
       it "should set config remote.active to true", ->
         spyOn(@hoodie.config, "set")
         @remote.connect()
-        expect(@hoodie.config.set).wasCalledWith 'remote.active', true
+        expect(@hoodie.config.set).wasCalledWith '_remote.active', true
         
       it "should subscribe to `signed_out` event", ->
         @remote.connect()
@@ -86,7 +86,7 @@ define 'specs/hoodie/remote', ['hoodie/remote', 'mocks/hoodie', 'mocks/changes_r
       it "should set config remote.active to true", ->
         spyOn(@hoodie.config, "set")
         @remote.disconnect()
-        expect(@hoodie.config.set).wasCalledWith 'remote.active', false
+        expect(@hoodie.config.set).wasCalledWith '_remote.active', false
         
       it "should abort the pull request", ->
         @remote._pull_request = abort: jasmine.createSpy 'pull'
@@ -346,6 +346,36 @@ define 'specs/hoodie/remote', ['hoodie/remote', 'mocks/hoodie', 'mocks/changes_r
             data = JSON.parse @hoodie.request.mostRecentCall.args[2].data
             expect(data.docs.length).toBe 3
     # /.push(docs)
+    
+    describe ".sync(docs)", ->
+      beforeEach ->
+        spyOn(@remote, "push")
+        spyOn(@remote, "pull")
+      
+      it "should push changes and pass arguments", ->
+        @remote.sync [1,2,3]
+        expect(@remote.push).wasCalledWith [1,2,3]
+
+      it "should pull changes and pass arguments", ->
+        @remote.sync [1,2,3]
+        expect(@remote.pull).wasCalledWith [1,2,3]
+        
+      _when "remote is active", ->
+        beforeEach ->
+          @remote.active = true
+          
+        it "should bind to store:dirty:idle event", ->
+          @remote.sync()
+          expect(@hoodie.on).wasCalledWith 'store:dirty:idle', @remote.push
+          
+        it "should unbind from store:dirty:idle event before it binds to it", ->
+          order = []
+          @hoodie.unbind.andCallFake (event) -> order.push "unbind #{event}"
+          @hoodie.on.andCallFake (event) -> order.push "bind #{event}"
+          @remote.sync()
+          expect(order[0]).toBe 'unbind store:dirty:idle'
+          expect(order[1]).toBe 'bind store:dirty:idle'
+    # /.sync(docs)
     
     describe ".on(event, callback)", ->  
       it "should namespace events with `remote`", ->

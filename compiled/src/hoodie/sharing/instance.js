@@ -141,32 +141,51 @@ define('hoodie/sharing/instance', ['hoodie/config', 'hoodie/sharing/hoodie'], fu
         switch (do_add) {
           case true:
             return function(obj) {
-              obj.$sharings || (obj.$sharings = []);
-              return obj.$sharings.push(_this.id);
+              var $sharings;
+              $sharings = obj.$sharings;
+              if ($sharings) {
+                if (!~$sharings.indexOf(_this.id)) {
+                  return {
+                    $sharings: $sharings.concat(_this.id)
+                  };
+                }
+              } else {
+                return {
+                  $sharings: [_this.id]
+                };
+              }
             };
           case false:
             return function(obj) {
-              var idx;
+              var $sharings, idx;
               try {
-                idx = obj.$sharings.indexOf(_this.id);
-                if (~idx) {
-                  return obj.$sharings.splice(idx, 1);
+                $sharings = obj.$sharings;
+                if (~(idx = $sharings.indexOf(_this.id))) {
+                  $sharings.splice(idx, 1);
                 }
+                return {
+                  $sharings: $sharings.length ? $sharings : void 0
+                };
               } catch (_error) {}
             };
           default:
             return function(obj) {
-              var idx;
-              idx = -1;
+              var $sharings, idx;
+              $sharings = obj.$sharings;
               try {
-                idx = obj.$sharings.indexOf(_this.id);
-              } catch (_error) {}
-              if (~idx) {
-                return obj.$sharings.splice(idx, 1);
-              } else {
-                obj.$sharings || (obj.$sharings = []);
-                return obj.$sharings.push(_this.id);
+                idx = $sharings.indexOf(_this.id);
+              } catch (e) {
+                idx = -1;
               }
+              if (~idx) {
+                $sharings.splice(idx, 1);
+              } else {
+                $sharings || ($sharings = []);
+                $sharings.push(_this.id);
+              }
+              return {
+                $sharings: $sharings.length ? $sharings : void 0
+              };
             };
         }
       }).call(this);
@@ -178,7 +197,10 @@ define('hoodie/sharing/instance', ['hoodie/config', 'hoodie/sharing/hoodie'], fu
     };
 
     SharingInstance.prototype._is_my_shared_object_and_changed = function(obj) {
-      return obj.$sharings && ~obj.$sharings.indexOf(this.id) && this.hoodie.store.is_dirty(obj.type, obj.id);
+      if ((obj.id === this.id || obj.$sharings && ~obj.$sharings.indexOf(this.id)) && this.hoodie.store.is_dirty(obj.type, obj.id)) {
+        console.log(obj.type, obj.id, obj.text);
+      }
+      return (obj.id === this.id || obj.$sharings && ~obj.$sharings.indexOf(this.id)) && this.hoodie.store.is_dirty(obj.type, obj.id);
     };
 
     return SharingInstance;

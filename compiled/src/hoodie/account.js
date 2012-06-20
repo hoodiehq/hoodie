@@ -15,8 +15,7 @@ define('hoodie/account', function() {
 
       this.authenticate = __bind(this.authenticate, this);
 
-      this.username = this.hoodie.config.get('account.username');
-      window.setTimeout(this.authenticate);
+      this.username = this.hoodie.config.get('_account.username');
       this.on('signed_in', this._handle_sign_in);
       this.on('signed_out', this._handle_sign_out);
     }
@@ -231,13 +230,13 @@ define('hoodie/account', function() {
 
     Account.prototype._handle_sign_in = function(username) {
       this.username = username;
-      this.hoodie.config.set('account.username', this.username);
+      this.hoodie.config.set('_account.username', this.username);
       return this._authenticated = true;
     };
 
     Account.prototype._handle_sign_out = function() {
       delete this.username;
-      this.hoodie.config.remove('account.username');
+      this.hoodie.config.remove('_account.username');
       return this._authenticated = false;
     };
 
