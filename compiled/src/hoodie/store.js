@@ -118,6 +118,9 @@ define('hoodie/store', ['hoodie/errors'], function(ERROR) {
         if (typeof object_update === 'function') {
           object_update = object_update($.extend({}, current_obj));
         }
+        if (!object_update) {
+          return defer.resolve(current_obj);
+        }
         changed_properties = (function() {
           var _results;
           _results = [];

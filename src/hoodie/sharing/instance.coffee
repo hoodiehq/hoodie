@@ -51,14 +51,6 @@ define 'hoodie/sharing/instance', ['hoodie/config', 'hoodie/sharing/hoodie'], (C
       if @anonymous
         @hoodie = new SharingHoodie @hoodie, this
         
-        # unbind remote from starting to sync on sign up
-        # unless the sharing is set to be continuous
-        #
-        # if sharing is not continuous, pull & push happens manually
-        unless @continuous
-          @hoodie.unbind 'account:signed_in',  @hoodie.remote.connect
-          @hoodie.unbind 'account:signed_out', @hoodie.remote.disconnect
-        
     
     # ## owner uuid
     #
@@ -164,6 +156,9 @@ define 'hoodie/sharing/instance', ['hoodie/config', 'hoodie/sharing/hoodie'], (C
       unless @hoodie.isPromise objects
         objects = [objects] unless $.isArray objects
       
+      _push_removed_docs_timeout = null
+      _push_removed_docs = []
+      
       update = switch do_add
       
         # add objects to sharing
@@ -183,9 +178,15 @@ define 'hoodie/sharing/instance', ['hoodie/config', 'hoodie/sharing/hoodie'], (C
               
               if ~(idx = $sharings.indexOf @id)
                 $sharings.splice(idx, 1) 
-              
-              $sharings: if $sharings.length then $sharings else undefined
-          
+                
+                _push_removed_docs.push($.extend obj, _deleted: true)
+                
+                window.clearTimeout(_push_removed_docs_timeout)
+                _push_removed_docs_timeout = window.setTimeout => 
+                  @hoodie.remote.push(_push_removed_docs)
+                
+                
+                $sharings: if $sharings.length then $sharings else undefined
         
         # add/remove depending on current state of object
         else

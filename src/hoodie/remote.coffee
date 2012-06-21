@@ -119,6 +119,7 @@ define 'hoodie/remote', ['hoodie/errors'], (ERROR) ->
     get_seq   :       -> @_seq or= @hoodie.config.get('_remote.seq') or 0
     set_seq   : (seq) -> @_seq   = @hoodie.config.set('_remote.seq', seq)
     
+    
     # ## On
     #
     # alias for `hoodie.on`
@@ -126,6 +127,7 @@ define 'hoodie/remote', ['hoodie/errors'], (ERROR) ->
     
     
     # ## Private
+    
     
     #
     # pull url
@@ -141,7 +143,8 @@ define 'hoodie/remote', ['hoodie/errors'], (ERROR) ->
     
     # request gets restarted automaticcally in @_handle_pull_error
     _restart_pull_request: => @_pull_request?.abort()
-      
+    
+    
     #
     # pull success handler 
     #
@@ -152,7 +155,8 @@ define 'hoodie/remote', ['hoodie/errors'], (ERROR) ->
       @_handle_pull_results(response.results)
       
       @pull() if @active
-      
+    
+    
     # 
     # pull error handler 
     #
@@ -247,6 +251,7 @@ define 'hoodie/remote', ['hoodie/errors'], (ERROR) ->
       
       return obj
     
+    
     # parse object response coming from push for local storage. 
     # 
     # removes the type from the id, e.g. `document/123` -> `123`
@@ -266,7 +271,6 @@ define 'hoodie/remote', ['hoodie/errors'], (ERROR) ->
       delete obj.ok
       
       return obj
-    
     
   
     #

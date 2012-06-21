@@ -60,6 +60,7 @@ define('hoodie', ['hoodie/events'], function(Events) {
         for (_i = 0, _len = ModuleClasses.length; _i < _len; _i++) {
           Module = ModuleClasses[_i];
           instance_name = Module.name.toLowerCase();
+          console.log('instance_name', instance_name);
           _this[instance_name] = new Module(_this);
         }
         while (cb = _this._ready_callbacks.shift()) {

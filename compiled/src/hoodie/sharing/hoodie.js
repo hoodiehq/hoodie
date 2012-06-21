@@ -8,10 +8,11 @@ define('hoodie/sharing/hoodie', ['hoodie'], function(Hoodie) {
 
     __extends(SharingHoodie, _super);
 
-    SharingHoodie.prototype.modules = ['hoodie/account', 'hoodie/remote'];
+    SharingHoodie.prototype.modules = ['hoodie/account', 'hoodie/sharing/remote'];
 
     function SharingHoodie(hoodie, sharing) {
       this.sharing = sharing;
+      console.log('b==a=wft=wft=awf=tawf=tafw');
       this.store = hoodie.store;
       this.config = this.sharing.config;
       this.config.set('_account.username', "sharing/" + this.sharing.id);

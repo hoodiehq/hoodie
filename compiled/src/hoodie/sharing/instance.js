@@ -50,10 +50,6 @@ define('hoodie/sharing/instance', ['hoodie/config', 'hoodie/sharing/hoodie'], fu
       }
       if (this.anonymous) {
         this.hoodie = new SharingHoodie(this.hoodie, this);
-        if (!this.continuous) {
-          this.hoodie.unbind('account:signed_in', this.hoodie.remote.connect);
-          this.hoodie.unbind('account:signed_out', this.hoodie.remote.disconnect);
-        }
       }
     }
 
@@ -130,12 +126,14 @@ define('hoodie/sharing/instance', ['hoodie/config', 'hoodie/sharing/hoodie'], fu
     };
 
     SharingInstance.prototype.toggle = function(objects, do_add) {
-      var update;
+      var update, _push_removed_docs, _push_removed_docs_timeout;
       if (!this.hoodie.isPromise(objects)) {
         if (!$.isArray(objects)) {
           objects = [objects];
         }
       }
+      _push_removed_docs_timeout = null;
+      _push_removed_docs = [];
       update = (function() {
         var _this = this;
         switch (do_add) {
@@ -162,10 +160,17 @@ define('hoodie/sharing/instance', ['hoodie/config', 'hoodie/sharing/hoodie'], fu
                 $sharings = obj.$sharings;
                 if (~(idx = $sharings.indexOf(_this.id))) {
                   $sharings.splice(idx, 1);
+                  _push_removed_docs.push($.extend(obj, {
+                    _deleted: true
+                  }));
+                  window.clearTimeout(_push_removed_docs_timeout);
+                  _push_removed_docs_timeout = window.setTimeout(function() {
+                    return _this.hoodie.remote.push(_push_removed_docs);
+                  });
+                  return {
+                    $sharings: $sharings.length ? $sharings : void 0
+                  };
                 }
-                return {
-                  $sharings: $sharings.length ? $sharings : void 0
-                };
               } catch (_error) {}
             };
           default:

@@ -127,6 +127,8 @@ define 'hoodie/store', ['hoodie/errors'], (ERROR) ->
         # normalize input
         object_update = object_update( $.extend {}, current_obj ) if typeof object_update is 'function'
         
+        return defer.resolve current_obj unless object_update
+        
         # check if something changed
         changed_properties = for key, value of object_update when current_obj[key] isnt value
           # workaround for undefined values, as $.extend ignores these

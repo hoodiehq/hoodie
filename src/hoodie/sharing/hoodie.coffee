@@ -7,9 +7,10 @@ define 'hoodie/sharing/hoodie', ['hoodie'], (Hoodie) ->
   #
   class SharingHoodie extends Hoodie
     
-    modules: ['hoodie/account', 'hoodie/remote'] 
+    modules: ['hoodie/account', 'hoodie/sharing/remote'] 
     
     constructor: (hoodie, @sharing) ->
+      console.log 'b==a=wft=wft=awf=tawf=tafw'
       @store  = hoodie.store
       
       # config is directly stored on the sharing document

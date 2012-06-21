@@ -60,7 +60,9 @@ define 'hoodie', ['hoodie/events'], (Events) ->
     _load_modules: ->
       require @modules, (ModuleClasses...) =>
         for Module in ModuleClasses
+          
           instance_name = Module.name.toLowerCase()
+          console.log 'instance_name', instance_name
           @[instance_name] = new Module this
           
         cb(this) while cb = @_ready_callbacks.shift()
