@@ -211,9 +211,10 @@ define('specs/hoodie/account', ['mocks/hoodie', 'hoodie/account'], function(Hood
     describe(".sign_up(username, password)", function() {
       beforeEach(function() {
         var _ref;
+        this.defer = this.hoodie.defer();
+        this.hoodie.request.andReturn(this.defer.promise());
         this.account.sign_up('joe@example.com', 'secret', {
-          name: "Joe Doe",
-          nick: "Foo"
+          name: "Joe Doe"
         });
         _ref = this.hoodie.request.mostRecentCall.args, this.type = _ref[0], this.path = _ref[1], this.options = _ref[2];
         return this.data = JSON.parse(this.options.data);
@@ -250,16 +251,13 @@ define('specs/hoodie/account', ['mocks/hoodie', 'hoodie/account'], function(Hood
       });
       _when("sign_up successful", function() {
         beforeEach(function() {
-          var response,
-            _this = this;
+          var response;
           this.response = response = {
             "ok": true,
             "id": "org.couchdb.user:bizbiz",
             "rev": "1-a0134f4a9909d3b20533285c839ed830"
           };
-          return this.hoodie.request.andCallFake(function(type, path, options) {
-            return options.success(_this.response);
-          });
+          return this.defer.resolve(this.response).promise();
         });
         it("should trigger `account:signed_up` event", function() {
           this.account.sign_up('joe@example.com', 'secret');
@@ -285,18 +283,15 @@ define('specs/hoodie/account', ['mocks/hoodie', 'hoodie/account'], function(Hood
       });
       return _when("sign_up has an error", function() {
         beforeEach(function() {
-          return this.hoodie.request.andCallFake(function(type, path, options) {
-            return options.error({
-              responseText: '{"error":"forbidden","reason":"Username may not start with underscore."}'
-            });
+          return this.defer.reject({
+            responseText: '{"error":"forbidden","reason":"Username may not start with underscore."}'
           });
         });
         return it("should reject its promise", function() {
           var promise;
-          promise = this.account.sign_up('joe@example.com', 'secret');
+          promise = this.account.sign_up('_joe@example.com', 'secret');
           return expect(promise).toBeRejectedWith({
-            error: "forbidden",
-            reason: "Username may not start with underscore."
+            responseText: '{"error":"forbidden","reason":"Username may not start with underscore."}'
           });
         });
       });
@@ -304,6 +299,8 @@ define('specs/hoodie/account', ['mocks/hoodie', 'hoodie/account'], function(Hood
     describe(".sign_in(username, password)", function() {
       beforeEach(function() {
         var _ref;
+        this.defer = this.hoodie.defer();
+        this.hoodie.request.andReturn(this.defer.promise());
         this.account.sign_in('joe@example.com', 'secret');
         return _ref = this.hoodie.request.mostRecentCall.args, this.type = _ref[0], this.path = _ref[1], this.options = _ref[2], _ref;
       });
@@ -320,9 +317,7 @@ define('specs/hoodie/account', ['mocks/hoodie', 'hoodie/account'], function(Hood
       });
       return _when("sign_up successful", function() {
         beforeEach(function() {
-          return this.hoodie.request.andCallFake(function(type, path, options) {
-            return options.success();
-          });
+          return this.defer.resolve();
         });
         it("should trigger `account:signed_in` event", function() {
           this.account.sign_in('joe@example.com', 'secret');

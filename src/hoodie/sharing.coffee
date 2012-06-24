@@ -40,14 +40,16 @@ define 'hoodie/sharing', ['hoodie/sharing/instance'], (SharingInstance) ->
   
   class Sharing
   
+  
     # ## Constructor
     #
     constructor : (@hoodie) ->
       
       # give all Sharing instances access to our core hoodie
-      # as sharings might use custom hoodies, in case the user
+      # as sharings use custom hoodies, as long as the user
       # has no account yet
       SharingInstance.hoodie = @hoodie
+      
       
     # ## create
     #
@@ -95,14 +97,17 @@ define 'hoodie/sharing', ['hoodie/sharing/instance'], (SharingInstance) ->
     #       objects    : hoodie.store.loadAll (obj) -> obj.is_shared
     #
     create : (options = {}) ->
-      SharingInstance.create options
+      sharing = new SharingInstance options
+      sharing.save()
+      
     
     # ## load
     #
     # load an existing sharing
     #
     load : (id) ->
-      SharingInstance.load id
+      @hoodie.store.load('$sharing', id).pipe (obj) =>
+        new SharingInstance obj
     
     
     # ## find or create
@@ -110,28 +115,32 @@ define 'hoodie/sharing', ['hoodie/sharing/instance'], (SharingInstance) ->
     # 1. Try to find a sharing by given id
     # 2. If sharing could be found, return it
     # 3. If not, create one and return it.
-    find_or_create: (options) ->
+    find_or_create : (options) ->
       defer = @hoodie.defer()
-      SharingInstance.load(options.id)
+      @load(options.id)
       .done (sharing) ->
         defer.resolve sharing
-      .fail -> 
-        SharingInstance.create(options).then defer.resolve, defer.reject 
+      .fail => 
+        @create(options).then defer.resolve, defer.reject 
     
       return defer.promise()
+    
     
     # ## destroy
     #
     # deletes an existing sharing
     #
-    destroy: (id) ->
-      SharingInstance.destroy id
+    destroy : (id) ->
+      @load(id).pipe (obj) =>
+        sharing = new SharingInstance obj
+        sharing.destroy()
       
+    # alias
+    delete : @::destroy
+    
+    
     # ## open
     #
     # Copy all data of a sharing to own database
-    open: (id, options = {}) ->
+    open : (id, options = {}) ->
       # tbd ...
-    
-    # alias
-    delete: @::destroy

@@ -10,38 +10,49 @@ define('hoodie/sharing', ['hoodie/sharing/instance'], function(SharingInstance) 
     }
 
     Sharing.prototype.create = function(options) {
+      var sharing;
       if (options == null) {
         options = {};
       }
-      return SharingInstance.create(options);
+      sharing = new SharingInstance(options);
+      return sharing.save();
     };
 
     Sharing.prototype.load = function(id) {
-      return SharingInstance.load(id);
+      var _this = this;
+      return this.hoodie.store.load('$sharing', id).pipe(function(obj) {
+        return new SharingInstance(obj);
+      });
     };
 
     Sharing.prototype.find_or_create = function(options) {
-      var defer;
+      var defer,
+        _this = this;
       defer = this.hoodie.defer();
-      SharingInstance.load(options.id).done(function(sharing) {
+      this.load(options.id).done(function(sharing) {
         return defer.resolve(sharing);
       }).fail(function() {
-        return SharingInstance.create(options).then(defer.resolve, defer.reject);
+        return _this.create(options).then(defer.resolve, defer.reject);
       });
       return defer.promise();
     };
 
     Sharing.prototype.destroy = function(id) {
-      return SharingInstance.destroy(id);
+      var _this = this;
+      return this.load(id).pipe(function(obj) {
+        var sharing;
+        sharing = new SharingInstance(obj);
+        return sharing.destroy();
+      });
     };
+
+    Sharing.prototype["delete"] = Sharing.prototype.destroy;
 
     Sharing.prototype.open = function(id, options) {
       if (options == null) {
         options = {};
       }
     };
-
-    Sharing.prototype["delete"] = Sharing.prototype.destroy;
 
     return Sharing;
 

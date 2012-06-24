@@ -443,7 +443,13 @@ define('specs/hoodie/remote', ['hoodie/remote', 'mocks/hoodie', 'mocks/changes_r
     });
     describe(".sync(docs)", function() {
       beforeEach(function() {
-        spyOn(this.remote, "push");
+        spyOn(this.remote, "push").andCallFake(function(docs) {
+          return {
+            pipe: function(cb) {
+              return cb(docs);
+            }
+          };
+        });
         return spyOn(this.remote, "pull");
       });
       it("should push changes and pass arguments", function() {

@@ -45,13 +45,13 @@ jasmine.Matchers.prototype.toBeRejectedWith = ->
   this.message = ->
     if fail.callCount == 0
       return [
-        "Expected spy " + fail.identity + " to have been resolved with " + jasmine.pp(expectedArgs) + " but it was never resolved.",
-        "Expected spy " + fail.identity + " not to have been resolved with " + jasmine.pp(expectedArgs) + " but it was."
+        "Expected spy " + fail.identity + " to have been rejected with " + jasmine.pp(expectedArgs) + " but it was never rejected.",
+        "Expected spy " + fail.identity + " not to have been rejected with " + jasmine.pp(expectedArgs) + " but it was."
       ];
     else
       return [
-        "Expected spy " + fail.identity + " to have been resolved with " + jasmine.pp(expectedArgs) + " but was resolved with " + jasmine.pp(fail.argsForCall),
-        "Expected spy " + fail.identity + " not to have been resolved with " + jasmine.pp(expectedArgs) + " but was resolved with " + jasmine.pp(fail.argsForCall)
+        "Expected spy " + fail.identity + " to have been rejected with " + jasmine.pp(expectedArgs) + " but was rejected with " + jasmine.pp(fail.argsForCall),
+        "Expected spy " + fail.identity + " not to have been rejected with " + jasmine.pp(expectedArgs) + " but was rejected with " + jasmine.pp(fail.argsForCall)
       ];
 
   return this.env.contains_(fail.argsForCall, expectedArgs);

@@ -32,16 +32,16 @@ define('hoodie/config', function() {
       if (this.cache[key] === value) {
         return;
       }
+      this.cache[key] = value;
       update = {};
       update[key] = value;
       if (key.charAt(0) === '_') {
-        this.hoodie.store.update(this.type, this.id, update, {
+        return this.hoodie.store.update(this.type, this.id, update, {
           silent: true
         });
       } else {
-        this.hoodie.store.update(this.type, this.id, update);
+        return this.hoodie.store.update(this.type, this.id, update);
       }
-      return this.cache[key] = value;
     };
 
     Config.prototype.get = function(key) {

@@ -15,7 +15,7 @@ define('hoodie/sharing/remote', ['hoodie/remote'], function(Remote) {
       var since;
       since = this.get_seq();
       if (this.active) {
-        return "/" + (encodeURIComponent(this.hoodie.account.db())) + "/_changes?filter=%24sharing_" + this.hoodie.sharing.id + "/owned&include_docs=true&heartbeat=10000&feed=longpoll&since=" + since;
+        return "/" + (encodeURIComponent(this.hoodie.account.db())) + "/_changes?filter=%24sharing_" + this.hoodie.sharing.id + "/owned&include_docs=true&since=" + since + "&heartbeat=10000&feed=longpoll";
       } else {
         return "/" + (encodeURIComponent(this.hoodie.account.db())) + "/_changes?filter=%24sharing_" + this.hoodie.sharing.id + "/owned&include_docs=true&since=" + since;
       }

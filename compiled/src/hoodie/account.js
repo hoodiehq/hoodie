@@ -62,7 +62,7 @@ define('hoodie/account', function() {
     };
 
     Account.prototype.sign_up = function(username, password) {
-      var data, defer, key,
+      var data, defer, handle_succes, key, request_promise,
         _this = this;
       defer = this.hoodie.defer();
       key = "" + this._prefix + ":" + username;
@@ -73,54 +73,35 @@ define('hoodie/account', function() {
         roles: [],
         password: password
       };
-      this.hoodie.request('PUT', "/_users/" + (encodeURIComponent(key)), {
+      request_promise = this.hoodie.request('PUT', "/_users/" + (encodeURIComponent(key)), {
         data: JSON.stringify(data),
-        contentType: 'application/json',
-        success: function(response) {
-          _this.hoodie.trigger('account:signed_up', username);
-          return _this.sign_in(username, password).then(defer.resolve, defer.reject);
-        },
-        error: function(xhr) {
-          var error;
-          try {
-            error = JSON.parse(xhr.responseText);
-          } catch (e) {
-            error = {
-              error: xhr.responseText || "unknown"
-            };
-          }
-          return defer.reject(error);
-        }
+        contentType: 'application/json'
       });
+      handle_succes = function(response) {
+        _this.hoodie.trigger('account:signed_up', username);
+        _this._doc._rev = response.rev;
+        return _this.sign_in(username, password).then(defer.resolve, defer.reject);
+      };
+      request_promise.then(handle_succes, defer.reject);
       return defer.promise();
     };
 
     Account.prototype.sign_in = function(username, password) {
-      var defer,
+      var defer, handle_succes, request_promise,
         _this = this;
       defer = this.hoodie.defer();
-      this.hoodie.request('POST', '/_session', {
+      request_promise = this.hoodie.request('POST', '/_session', {
         data: {
           name: username,
           password: password
-        },
-        success: function(response) {
-          _this.hoodie.trigger('account:signed_in', username);
-          _this.fetch();
-          return defer.resolve(username, response);
-        },
-        error: function(xhr) {
-          var error;
-          try {
-            error = JSON.parse(xhr.responseText);
-          } catch (e) {
-            error = {
-              error: xhr.responseText || "unknown"
-            };
-          }
-          return defer.reject(error);
         }
       });
+      handle_succes = function(response) {
+        _this.hoodie.trigger('account:signed_in', username);
+        _this.fetch();
+        return defer.resolve(username, response);
+      };
+      request_promise.then(handle_succes, defer.reject);
       return defer.promise();
     };
 

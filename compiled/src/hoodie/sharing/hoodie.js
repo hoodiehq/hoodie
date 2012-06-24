@@ -12,9 +12,12 @@ define('hoodie/sharing/hoodie', ['hoodie'], function(Hoodie) {
 
     function SharingHoodie(hoodie, sharing) {
       this.sharing = sharing;
-      console.log('b==a=wft=wft=awf=tawf=tafw');
       this.store = hoodie.store;
-      this.config = this.sharing.config;
+      this.config = {
+        set: this.sharing.set,
+        get: this.sharing.get,
+        remove: this.sharing.set
+      };
       this.config.set('_account.username', "sharing/" + this.sharing.id);
       this.config.set('_remote.active', this.sharing.continuous === true);
       SharingHoodie.__super__.constructor.call(this, hoodie.base_url);

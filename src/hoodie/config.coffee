@@ -15,12 +15,12 @@ define 'hoodie/config', ->
     # memory cache
     cache : {}
     
-    
     # ## Constructor
     #
     constructor : (@hoodie, options = {}) ->
-      @type   = options.type if options.type
-      @id     = options.id   if options.id
+      @type       = options.type       if options.type
+      @id         = options.id         if options.id
+      
       @hoodie.store.load(@type, @id).done (obj) => @cache = obj
     
       
@@ -31,6 +31,8 @@ define 'hoodie/config', ->
     set : (key, value) ->
       return if @cache[key] is value
       
+      @cache[key] = value
+      
       update = {}
       update[key] = value
       
@@ -40,20 +42,17 @@ define 'hoodie/config', ->
       else
         @hoodie.store.update @type, @id, update
         
-      @cache[key] = value
-      
     
     # ## get
     #
     # receives a configuration
     #
-    get : (key) ->
-      return @cache[key]
-      
+    get : (key) -> 
+      @cache[key]
+    
     
     # ## remove
     # 
     # removes a configuration, is a simple alias for config.set(key, undefined)
     #
     remove : @::set
-    

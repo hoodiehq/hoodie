@@ -25,7 +25,7 @@ define 'hoodie/remote', ['hoodie/errors'], (ERROR) ->
   
     # ## Constructor
     #
-    constructor : (@hoodie, options = {}) ->      
+    constructor : (@hoodie) ->      
       
       # overwrite default with _remote.active config, if set
       if @hoodie.config.get('_remote.active')?
@@ -71,7 +71,7 @@ define 'hoodie/remote', ['hoodie/errors'], (ERROR) ->
     # a.k.a. make a GET request to CouchDB's `_changes` feed.
     #
     pull : =>
-      @_pull_request = @hoodie.request 'GET', @_pull_url()
+      @_pull_request = @hoodie.request 'GET', @_pull_url(), contentType: 'application/json'
       
       if @active
         window.clearTimeout @_pull_request_timeout
@@ -89,8 +89,7 @@ define 'hoodie/remote', ['hoodie/errors'], (ERROR) ->
       docs = @hoodie.store.changed_docs() unless $.isArray docs
       return @_promise().resolve([]) if docs.length is 0
         
-      docs = for doc in docs
-        @_parse_for_remote doc 
+      docs = (@_parse_for_remote doc for doc in docs)
       
       @_push_request = @hoodie.request 'POST', "/#{encodeURIComponent @hoodie.account.db()}/_bulk_docs", 
         dataType:     'json'
@@ -152,7 +151,7 @@ define 'hoodie/remote', ['hoodie/errors'], (ERROR) ->
     #
     _handle_pull_success : (response) =>
       @set_seq response.last_seq
-      @_handle_pull_results(response.results)
+      @_handle_pull_results response.results
       
       @pull() if @active
     

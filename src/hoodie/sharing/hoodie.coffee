@@ -10,18 +10,20 @@ define 'hoodie/sharing/hoodie', ['hoodie'], (Hoodie) ->
     modules: ['hoodie/account', 'hoodie/sharing/remote'] 
     
     constructor: (hoodie, @sharing) ->
-      console.log 'b==a=wft=wft=awf=tawf=tafw'
       @store  = hoodie.store
       
-      # config is directly stored on the sharing document
-      @config = @sharing.config
+      # proxy config to the sharing object
+      @config =
+        set    : @sharing.set
+        get    : @sharing.get
+        remove : @sharing.set
       
       # depending on whether sharing is continuous, we activate
       # continuous synching ... or not.
       @config.set '_account.username', "sharing/#{@sharing.id}"
       @config.set '_remote.active',    @sharing.continuous is true
       
-      super(hoodie.base_url)
+      super hoodie.base_url
       
     # ## SharingHoodie Request
     #

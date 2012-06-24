@@ -7,11 +7,8 @@ define('hoodie/remote', ['hoodie/errors'], function(ERROR) {
 
     Remote.prototype.active = true;
 
-    function Remote(hoodie, options) {
+    function Remote(hoodie) {
       this.hoodie = hoodie;
-      if (options == null) {
-        options = {};
-      }
       this._handle_push = __bind(this._handle_push, this);
 
       this._handle_pull_results = __bind(this._handle_pull_results, this);
@@ -61,7 +58,9 @@ define('hoodie/remote', ['hoodie/errors'], function(ERROR) {
     };
 
     Remote.prototype.pull = function() {
-      this._pull_request = this.hoodie.request('GET', this._pull_url());
+      this._pull_request = this.hoodie.request('GET', this._pull_url(), {
+        contentType: 'application/json'
+      });
       if (this.active) {
         window.clearTimeout(this._pull_request_timeout);
         this._pull_request_timeout = window.setTimeout(this._restart_pull_request, 25000);

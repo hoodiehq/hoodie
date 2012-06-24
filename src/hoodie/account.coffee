@@ -85,21 +85,16 @@ define 'hoodie/account', ->
         roles      : []
         password   : password
 
-      @hoodie.request 'PUT', "/_users/#{encodeURIComponent key}",
+      request_promise = @hoodie.request 'PUT', "/_users/#{encodeURIComponent key}",
         data        : JSON.stringify data
         contentType : 'application/json'
         
-        success     : (response) =>
+      handle_succes = (response) =>
           @hoodie.trigger 'account:signed_up', username
+          @_doc._rev = response.rev
           @sign_in(username, password).then defer.resolve, defer.reject
-          
-        error       : (xhr) ->
-          try
-            error = JSON.parse(xhr.responseText)
-          catch e
-            error = error: xhr.responseText or "unknown"
-            
-          defer.reject(error)
+
+      request_promise.then handle_succes, defer.reject
         
       return defer.promise()
 
@@ -111,23 +106,17 @@ define 'hoodie/account', ->
     sign_in : (username, password) ->
       defer = @hoodie.defer()
 
-      @hoodie.request 'POST', '/_session', 
+      request_promise = @hoodie.request 'POST', '/_session', 
         data: 
           name      : username
           password  : password
           
-        success     : (response) =>
-          @hoodie.trigger 'account:signed_in', username
-          @fetch()
-          defer.resolve username, response
-        
-        error       : (xhr) ->
-          try
-            error = JSON.parse(xhr.responseText)
-          catch e
-            error = error: xhr.responseText or "unknown"
-            
-          defer.reject(error)
+      handle_succes = (response) =>
+        @hoodie.trigger 'account:signed_in', username
+        @fetch()
+        defer.resolve username, response
+      
+      request_promise.then handle_succes, defer.reject
       
       return defer.promise()
 

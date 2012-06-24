@@ -349,7 +349,7 @@ define 'specs/hoodie/remote', ['hoodie/remote', 'mocks/hoodie', 'mocks/changes_r
     
     describe ".sync(docs)", ->
       beforeEach ->
-        spyOn(@remote, "push")
+        spyOn(@remote, "push").andCallFake (docs) -> pipe: (cb) -> cb(docs)
         spyOn(@remote, "pull")
       
       it "should push changes and pass arguments", ->

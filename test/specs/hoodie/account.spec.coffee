@@ -172,7 +172,9 @@ define 'specs/hoodie/account', ['mocks/hoodie', 'hoodie/account'], (HoodieMock, 
   
     describe ".sign_up(username, password)", ->
       beforeEach ->
-        @account.sign_up('joe@example.com', 'secret', name: "Joe Doe", nick: "Foo")
+        @defer = @hoodie.defer()
+        @hoodie.request.andReturn @defer.promise()
+        @account.sign_up('joe@example.com', 'secret', name: "Joe Doe")
         [@type, @path, @options] = @hoodie.request.mostRecentCall.args
         @data = JSON.parse @options.data
     
@@ -208,8 +210,7 @@ define 'specs/hoodie/account', ['mocks/hoodie', 'hoodie/account'], (HoodieMock, 
       _when "sign_up successful", ->
         beforeEach ->
           @response = response = {"ok":true,"id":"org.couchdb.user:bizbiz","rev":"1-a0134f4a9909d3b20533285c839ed830"}
-          @hoodie.request.andCallFake (type, path, options) => 
-            options.success @response
+          @defer.resolve(@response).promise()
         
         it "should trigger `account:signed_up` event", ->
           @account.sign_up('joe@example.com', 'secret')
@@ -231,16 +232,18 @@ define 'specs/hoodie/account', ['mocks/hoodie', 'hoodie/account'], (HoodieMock, 
           
       _when "sign_up has an error", ->
         beforeEach ->
-          @hoodie.request.andCallFake (type, path, options) -> options.error responseText: '{"error":"forbidden","reason":"Username may not start with underscore."}'
+          @defer.reject responseText: '{"error":"forbidden","reason":"Username may not start with underscore."}'
         
         it "should reject its promise", ->
-          promise = @account.sign_up('joe@example.com', 'secret')
-          expect(promise).toBeRejectedWith error:"forbidden", reason: "Username may not start with underscore."
+          promise = @account.sign_up('_joe@example.com', 'secret')
+          expect(promise).toBeRejectedWith responseText: '{"error":"forbidden","reason":"Username may not start with underscore."}'
     # /.sign_up(username, password)
   
   
     describe ".sign_in(username, password)", ->
       beforeEach ->
+        @defer = @hoodie.defer()
+        @hoodie.request.andReturn @defer.promise()
         @account.sign_in('joe@example.com', 'secret')
         [@type, @path, @options] = @hoodie.request.mostRecentCall.args
     
@@ -257,7 +260,7 @@ define 'specs/hoodie/account', ['mocks/hoodie', 'hoodie/account'], (HoodieMock, 
         
       _when "sign_up successful", ->
         beforeEach ->
-          @hoodie.request.andCallFake (type, path, options) -> options.success()
+          @defer.resolve()
           
         it "should trigger `account:signed_in` event", ->
           @account.sign_in('joe@example.com', 'secret')

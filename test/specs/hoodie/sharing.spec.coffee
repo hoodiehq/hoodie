@@ -2,7 +2,7 @@ define 'specs/hoodie/sharing', ['mocks/hoodie', 'hoodie/sharing', 'hoodie/sharin
   
   describe "Sharing", ->  
     beforeEach ->
-      @hoodie = new HoodieMock 
+      @hoodie  = new HoodieMock 
       @sharing = new Sharing @hoodie
 
     describe ".constructor", ->
@@ -11,34 +11,6 @@ define 'specs/hoodie/sharing', ['mocks/hoodie', 'hoodie/sharing', 'hoodie/sharin
         new Sharing hoodie
         expect(SharingInstance.hoodie).toBe 'check 1,2'
     # /.constructor
-
-    describe ".create", ->
-      beforeEach ->
-        spyOn(SharingInstance, "create")
-
-      it "should call SharingInstance.create", ->
-        options = funky: 'fresh'
-        @sharing.create options
-        expect(SharingInstance.create).wasCalledWith options
-    # /.create
-
-    describe ".load", ->
-      beforeEach ->
-        spyOn(SharingInstance, "load")
-
-      it "should call SharingInstance.load", ->
-        @sharing.load 123
-        expect(SharingInstance.load).wasCalledWith 123
-    # /.load
-
-    describe ".destroy", ->
-      beforeEach ->
-        spyOn(SharingInstance, "destroy")
-
-      it "should call SharingInstance.destroy", ->
-        @sharing.destroy 123
-        expect(SharingInstance.destroy).wasCalledWith 123
-        
-      it "should be aliased as delete", ->
-        expect(@sharing.destroy).toBe @sharing.delete
-    # /.destroy
+    
+    # don't know how to spec the SharingInstance usage
+    # within the Sharing class ...

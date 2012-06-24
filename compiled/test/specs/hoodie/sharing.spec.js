@@ -6,46 +6,12 @@ define('specs/hoodie/sharing', ['mocks/hoodie', 'hoodie/sharing', 'hoodie/sharin
       this.hoodie = new HoodieMock;
       return this.sharing = new Sharing(this.hoodie);
     });
-    describe(".constructor", function() {
+    return describe(".constructor", function() {
       return it("should set SharingInstance.hoodie", function() {
         var hoodie;
         hoodie = 'check 1,2';
         new Sharing(hoodie);
         return expect(SharingInstance.hoodie).toBe('check 1,2');
-      });
-    });
-    describe(".create", function() {
-      beforeEach(function() {
-        return spyOn(SharingInstance, "create");
-      });
-      return it("should call SharingInstance.create", function() {
-        var options;
-        options = {
-          funky: 'fresh'
-        };
-        this.sharing.create(options);
-        return expect(SharingInstance.create).wasCalledWith(options);
-      });
-    });
-    describe(".load", function() {
-      beforeEach(function() {
-        return spyOn(SharingInstance, "load");
-      });
-      return it("should call SharingInstance.load", function() {
-        this.sharing.load(123);
-        return expect(SharingInstance.load).wasCalledWith(123);
-      });
-    });
-    return describe(".destroy", function() {
-      beforeEach(function() {
-        return spyOn(SharingInstance, "destroy");
-      });
-      it("should call SharingInstance.destroy", function() {
-        this.sharing.destroy(123);
-        return expect(SharingInstance.destroy).wasCalledWith(123);
-      });
-      return it("should be aliased as delete", function() {
-        return expect(this.sharing.destroy).toBe(this.sharing["delete"]);
       });
     });
   });

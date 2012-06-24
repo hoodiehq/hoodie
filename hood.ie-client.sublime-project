@@ -1,0 +1,17 @@
+{
+	"folders":
+	[
+		{
+			"path": "src"
+		},
+		{
+			"path": "test"
+		},
+		{
+			"path": "vendor"
+		},
+		{
+			"path": "wishlist"
+		}
+	]
+}

@@ -1,7 +1,3 @@
-* bootstrapping: the initial load of data is a special case. Some docs might
-  depend on others, so the initial load of data should give hoodie a special
-  state or similar. Just a thought at the moment
-
 * remove dependency on jQuery / zepto.js, then uncomment `use strict` statements
 * do some kind of modularization: add a moduleLoader for the built in modules 
   like email, store and remote but also use it for custom modules.
