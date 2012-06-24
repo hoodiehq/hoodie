@@ -28,18 +28,24 @@ define 'hoodie/remote', ['hoodie/errors'], (ERROR) ->
     constructor : (@hoodie) ->      
       
       # overwrite default with _remote.active config, if set
-      if @hoodie.config.get('_remote.active')?
-        @active = @hoodie.config.get('_remote.active')
+      @active = @hoodie.config.get('_remote.active') if @hoodie.config.get('_remote.active')?
       
       @connect() if @active
-      
+    
+    #
+    activate : =>
+      @hoodie.config.set '_remote.active', @active = true
+      @connect()
+
+    #
+    deactivate : =>
+      @hoodie.config.set '_remote.active',  @active = false
+      @disconnect()
       
     # ## Connect
     #
     # start syncing changes from the userDB
     connect : () =>
-      @hoodie.config.set '_remote.active', @active = true
-      
       @hoodie.on 'account:signed_out',    @disconnect
       @hoodie.on 'account:signed_in',     @sync
       
@@ -51,8 +57,6 @@ define 'hoodie/remote', ['hoodie/errors'], (ERROR) ->
     #
     # stop syncing changes from the userDB
     disconnect : =>
-      @hoodie.config.set '_remote.active',  @active = false
-      
       @hoodie.unbind 'account:signed_in',  @sync
       @hoodie.unbind 'account:signed_out', @disconnect
       
@@ -96,8 +100,9 @@ define 'hoodie/remote', ['hoodie/errors'], (ERROR) ->
         processData:  false
         contentType:  'application/json'
       
-        data        : JSON.stringify(docs: docs)
-        success     : @_handle_push
+        data        : JSON.stringify
+                        docs      : docs
+                        new_edits : false
         
     
     # ## sync changes
@@ -109,14 +114,6 @@ define 'hoodie/remote', ['hoodie/errors'], (ERROR) ->
         @hoodie.on     'store:dirty:idle', @push
       
       @push(docs).pipe @pull
-      
-      
-    # ## Get / Set seq
-    #
-    # the `seq` number gets passed to couchDB's `_changes` feed.
-    # 
-    get_seq   :       -> @_seq or= @hoodie.config.get('_remote.seq') or 0
-    set_seq   : (seq) -> @_seq   = @hoodie.config.set('_remote.seq', seq)
     
     
     # ## On
@@ -134,7 +131,7 @@ define 'hoodie/remote', ['hoodie/errors'], (ERROR) ->
     # Depending on whether remote is active, return a longpoll URL or not
     #
     _pull_url : ->
-      since = @get_seq()
+      since = @hoodie.config.get('_remote.seq') or 0
       if @active # make a long poll request
         "/#{encodeURIComponent @hoodie.account.db()}/_changes?include_docs=true&heartbeat=10000&feed=longpoll&since=#{since}"
       else
@@ -150,7 +147,7 @@ define 'hoodie/remote', ['hoodie/errors'], (ERROR) ->
     # handle the incoming changes, then send the next request
     #
     _handle_pull_success : (response) =>
-      @set_seq response.last_seq
+      @hoodie.config.set '_remote.seq', response.last_seq
       @_handle_pull_results response.results
       
       @pull() if @active
@@ -204,7 +201,7 @@ define 'hoodie/remote', ['hoodie/errors'], (ERROR) ->
   
     # valid couchDB doc attributes starting with an underscore
     _valid_special_attributes: [
-      '_id', '_rev', '_deleted'
+      '_id', '_rev', '_deleted', '_revisions'
     ]
   
   
@@ -222,10 +219,37 @@ define 'hoodie/remote', ['hoodie/errors'], (ERROR) ->
         continue unless /^_/.test attr
         delete attributes[attr]
      
+      # prepare couchDB id
       attributes._id = "#{attributes.type}/#{attributes.id}"
       delete attributes.id
+
+      # prepare revision
+      @_add_revision_shizzle_to attributes
       
       return attributes
+
+    #
+    # get new revision number
+    #
+    _add_revision_shizzle_to: (attributes) ->
+      # get timezone offset
+      @_timezone_offset or= new Date().getTimezoneOffset() * 60
+
+      try [current_rev_nr, current_rev_id] = attributes._rev.split /-/
+      current_rev_nr = parseInt(current_rev_nr) or 0
+
+      timestamp   = Date.now() + @_timezone_offset
+      uuid        = @hoodie.store.uuid(5)
+
+      new_revision_id       = "#{uuid}##{timestamp}"
+      attributes._rev       = "#{current_rev_nr + 1}-#{new_revision_id}"
+      attributes._revisions = 
+        start : 1
+        ids   : [new_revision_id]
+
+      if current_rev_id
+        attributes._revisions.start += current_rev_nr
+        attributes._revisions.ids.push current_rev_id
       
       
     # parse object coming from pull for local storage. 
@@ -300,8 +324,8 @@ define 'hoodie/remote', ['hoodie/errors'], (ERROR) ->
           @hoodie.trigger "remote:destroyed:#{doc.type}:#{doc.id}",  object
           
           @hoodie.trigger 'remote:changed',                       'destroyed', doc.type, doc.id, object
-          @hoodie.trigger "remote:changed:#{doc.type}",           'destroyed',            doc.id, object
-          @hoodie.trigger "remote:changed:#{doc.type}:#{doc.id}", 'destroyed',                     object
+          @hoodie.trigger "remote:changed:#{doc.type}",           'destroyed',           doc.id, object
+          @hoodie.trigger "remote:changed:#{doc.type}:#{doc.id}", 'destroyed',                   object
       
       for [doc, promise] in _changed_docs
         promise.then (object, object_was_created) => 
@@ -311,27 +335,8 @@ define 'hoodie/remote', ['hoodie/errors'], (ERROR) ->
           @hoodie.trigger "remote:#{event}:#{doc.type}:#{doc.id}", object
         
           @hoodie.trigger "remote:changed",                       event, doc.type, doc.id, object
-          @hoodie.trigger "remote:changed:#{doc.type}",           event,            doc.id, object
-          @hoodie.trigger "remote:changed:#{doc.type}:#{doc.id}", event,                     object
-
-
-    # Gets response to POST _bulk_docs request from couchDB.
-    #
-    # when remote is active, _rev attributes of the pushed documents don't need
-    # to be updated as the continuous pull feed will recognize and handle the changes
-    # already.
-    #
-    # But what needs to be handled are conflicts.
-    _handle_push: (doc_responses) =>
-      for response in doc_responses
-        if response.error is 'conflict'
-          @hoodie.trigger 'remote:error:conflict', response.id
-          
-        else unless @active
-          doc     = @_parse_from_push response
-          update  = _rev: doc._rev 
-          
-          @hoodie.store.update doc.type, doc.id, update, remote: true
+          @hoodie.trigger "remote:changed:#{doc.type}",           event,           doc.id, object
+          @hoodie.trigger "remote:changed:#{doc.type}:#{doc.id}", event,                   object
     
     #
     _promise: $.Deferred

@@ -34,21 +34,33 @@ define 'specs/hoodie/remote', ['hoodie/remote', 'mocks/hoodie', 'mocks/changes_r
         it "should set active to false", ->
           expect(@remote.active).toBeFalsy()
        
-        
-    describe ".connect()", ->
-      beforeEach ->
-        spyOn(@remote, "sync")
-      
+
+    describe ".activate", ->
       it "should set remote.active to true", ->
         @remote.active = false
-        @remote.connect()
+        @remote.activate()
         expect(@remote.active).toBeTruthy()
       
       it "should set config remote.active to true", ->
         spyOn(@hoodie.config, "set")
-        @remote.connect()
+        @remote.activate()
         expect(@hoodie.config.set).wasCalledWith '_remote.active', true
         
+    describe ".deactivate", ->
+      it "should set remote.active to false", ->
+        @remote.active = true
+        @remote.deactivate()
+        expect(@remote.active).toBeFalsy()
+      
+      it "should set config remote.active to false", ->
+        spyOn(@hoodie.config, "set")
+        @remote.deactivate()
+        expect(@hoodie.config.set).wasCalledWith '_remote.active', false
+
+    describe ".connect()", ->
+      beforeEach ->
+        spyOn(@remote, "sync")
+      
       it "should subscribe to `signed_out` event", ->
         @remote.connect()
         expect(@hoodie.on).wasCalledWith 'account:signed_out', @remote.disconnect
@@ -78,16 +90,6 @@ define 'specs/hoodie/remote', ['hoodie/remote', 'mocks/hoodie', 'mocks/changes_r
     # /.connect()
 
     describe ".disconnect()", ->  
-      it "should set remote.active to false", ->
-        @remote.active = true
-        @remote.disconnect()
-        expect(@remote.active).toBeFalsy()
-      
-      it "should set config remote.active to true", ->
-        spyOn(@hoodie.config, "set")
-        @remote.disconnect()
-        expect(@hoodie.config.set).wasCalledWith '_remote.active', false
-        
       it "should abort the pull request", ->
         @remote._pull_request = abort: jasmine.createSpy 'pull'
         @remote.disconnect()
@@ -111,11 +113,7 @@ define 'specs/hoodie/remote', ['hoodie/remote', 'mocks/hoodie', 'mocks/changes_r
         expect(@hoodie.unbind).wasCalledWith 'account:signed_out', @remote.disconnect
     # /.disconnect()
     
-    describe ".pull()", ->  
-      # it "shold handle the request response", ->
-      #   @remote.pull()
-      #   expect(@hoodie.request().then).wasCalledWith @remote._changes_success, @remote._changes_error
-      
+    describe ".pull()", ->        
       _when "remote is active", ->
         beforeEach ->
           @remote.active = true
@@ -165,6 +163,7 @@ define 'specs/hoodie/remote', ['hoodie/remote', 'mocks/hoodie', 'mocks/changes_r
           expect(@hoodie.trigger).wasCalledWith 'remote:destroyed', 'todo', 'abc3', 'object_from_store'
           expect(@hoodie.trigger).wasCalledWith 'remote:destroyed:todo',    'abc3', 'object_from_store'
           expect(@hoodie.trigger).wasCalledWith 'remote:destroyed:todo:abc3',       'object_from_store'
+
           expect(@hoodie.trigger).wasCalledWith 'remote:changed',           'destroyed', 'todo', 'abc3', 'object_from_store'
           expect(@hoodie.trigger).wasCalledWith 'remote:changed:todo',      'destroyed',         'abc3', 'object_from_store'
           expect(@hoodie.trigger).wasCalledWith 'remote:changed:todo:abc3', 'destroyed',                 'object_from_store'        
@@ -173,6 +172,7 @@ define 'specs/hoodie/remote', ['hoodie/remote', 'mocks/hoodie', 'mocks/changes_r
           expect(@hoodie.trigger).wasCalledWith 'remote:updated', 'todo', 'abc2', 'object_from_store'
           expect(@hoodie.trigger).wasCalledWith 'remote:updated:todo',    'abc2', 'object_from_store'
           expect(@hoodie.trigger).wasCalledWith 'remote:updated:todo:abc2',       'object_from_store'
+          
           expect(@hoodie.trigger).wasCalledWith 'remote:changed',           'updated', 'todo', 'abc2', 'object_from_store'
           expect(@hoodie.trigger).wasCalledWith 'remote:changed:todo',      'updated',         'abc2', 'object_from_store'
           expect(@hoodie.trigger).wasCalledWith 'remote:changed:todo:abc2', 'updated',                 'object_from_store'
@@ -284,7 +284,11 @@ define 'specs/hoodie/remote', ['hoodie/remote', 'mocks/hoodie', 'mocks/changes_r
     
     
 
-    describe ".push(docs)", ->  
+    describe ".push(docs)", -> 
+      beforeEach ->
+        spyOn(Date, "now").andReturn 10
+        @remote._timezone_offset = 1
+        
       _when "no docs passed", ->        
         _and "there are no changed docs", ->
           beforeEach ->
@@ -294,7 +298,7 @@ define 'specs/hoodie/remote', ['hoodie/remote', 'mocks/hoodie', 'mocks/changes_r
           it "shouldn't do anything", ->
             expect(@hoodie.request).wasNotCalled()
         
-        _and "there is one deleted and one changed doc", ->
+        _and "there is one deleted and one new doc", ->
           beforeEach ->
             spyOn(@hoodie.store, "changed_docs").andReturn ChangedDocsMock()
             spyOn(@hoodie.account, "db").andReturn 'joe$examle_com'
@@ -321,16 +325,23 @@ define 'specs/hoodie/remote', ['hoodie/remote', 'mocks/hoodie', 'mocks/changes_r
             expect(doc.id).toBeUndefined()
             expect(doc._id).toBe 'todo/abc3'
             expect(doc._localInfo).toBeUndefined()
-        
-          _and "the request is successful, but with one conflict error", ->
-            beforeEach ->
-              @hoodie.request.andCallFake (method, path, options) => 
-                options.success BulkUpdateResponseMock()
-            
-              @remote.push()
-          
-            it "should trigger conflict event", ->
-              expect(@hoodie.trigger).wasCalledWith 'remote:error:conflict', 'todo/abc2'
+
+          it "should set data.new_edits to false", ->
+            {new_edits} = JSON.parse @options.data
+            expect(new_edits).toBe false
+
+          it "should set new _revision ids", ->
+            {docs} = JSON.parse @options.data
+            [deleted_doc, new_doc] = docs
+            expect(deleted_doc._rev).toBe '3-mock567#11'
+            expect(new_doc._rev).toMatch '1-mock567#11'
+
+            expect(deleted_doc._revisions.start).toBe 3
+            expect(deleted_doc._revisions.ids[0]).toBe 'mock567#11'
+            expect(deleted_doc._revisions.ids[1]).toBe '123'
+
+            expect(new_doc._revisions.start).toBe 1
+            expect(new_doc._revisions.ids[0]).toBe 'mock567#11'
         
         _when "Array of docs passed", ->
           beforeEach ->

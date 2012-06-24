@@ -247,7 +247,7 @@ define('specs/hoodie/account', ['mocks/hoodie', 'hoodie/account'], function(Hood
         this.account.sign_up('joe@example.com');
         _ref = this.hoodie.request.mostRecentCall.args, this.type = _ref[0], this.path = _ref[1], this.options = _ref[2];
         this.data = JSON.parse(this.options.data);
-        return expect(this.data.password).toBeUndefined();
+        return expect(this.data.password).toBe('');
       });
       _when("sign_up successful", function() {
         beforeEach(function() {
@@ -314,6 +314,13 @@ define('specs/hoodie/account', ['mocks/hoodie', 'hoodie/account'], function(Hood
       });
       it("should send password", function() {
         return expect(this.options.data.password).toBe('secret');
+      });
+      it("should allow to sign in without password", function() {
+        var data, _ref;
+        this.account.sign_in('joe@example.com');
+        _ref = this.hoodie.request.mostRecentCall.args, this.type = _ref[0], this.path = _ref[1], this.options = _ref[2];
+        data = this.options.data;
+        return expect(data.password).toBe('');
       });
       return _when("sign_up successful", function() {
         beforeEach(function() {

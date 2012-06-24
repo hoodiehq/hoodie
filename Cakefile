@@ -12,6 +12,7 @@ build = (callback, watch = false) ->
   coffee.stderr.on 'data', (data) ->
     process.stderr.write data.toString()
   coffee.stdout.on 'data', (data) ->
+    clear()
     print data.toString()
     
     if callback and watch
@@ -20,6 +21,9 @@ build = (callback, watch = false) ->
     
   coffee.on 'exit', (code) ->
     callback?() if code is 0
+
+clear = ->
+  process.stdout.write '\u001B[2J\u001B[0;0f'
 
 test = ->
   phantom = spawn 'phantomjs', ['test/lib/phantomjs_test_runner.coffee', 'test/index.html']

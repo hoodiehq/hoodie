@@ -45,19 +45,33 @@ define('specs/hoodie/remote', ['hoodie/remote', 'mocks/hoodie', 'mocks/changes_r
         });
       });
     });
+    describe(".activate", function() {
+      it("should set remote.active to true", function() {
+        this.remote.active = false;
+        this.remote.activate();
+        return expect(this.remote.active).toBeTruthy();
+      });
+      return it("should set config remote.active to true", function() {
+        spyOn(this.hoodie.config, "set");
+        this.remote.activate();
+        return expect(this.hoodie.config.set).wasCalledWith('_remote.active', true);
+      });
+    });
+    describe(".deactivate", function() {
+      it("should set remote.active to false", function() {
+        this.remote.active = true;
+        this.remote.deactivate();
+        return expect(this.remote.active).toBeFalsy();
+      });
+      return it("should set config remote.active to false", function() {
+        spyOn(this.hoodie.config, "set");
+        this.remote.deactivate();
+        return expect(this.hoodie.config.set).wasCalledWith('_remote.active', false);
+      });
+    });
     describe(".connect()", function() {
       beforeEach(function() {
         return spyOn(this.remote, "sync");
-      });
-      it("should set remote.active to true", function() {
-        this.remote.active = false;
-        this.remote.connect();
-        return expect(this.remote.active).toBeTruthy();
-      });
-      it("should set config remote.active to true", function() {
-        spyOn(this.hoodie.config, "set");
-        this.remote.connect();
-        return expect(this.hoodie.config.set).wasCalledWith('_remote.active', true);
       });
       it("should subscribe to `signed_out` event", function() {
         this.remote.connect();
@@ -103,16 +117,6 @@ define('specs/hoodie/remote', ['hoodie/remote', 'mocks/hoodie', 'mocks/changes_r
       });
     });
     describe(".disconnect()", function() {
-      it("should set remote.active to false", function() {
-        this.remote.active = true;
-        this.remote.disconnect();
-        return expect(this.remote.active).toBeFalsy();
-      });
-      it("should set config remote.active to true", function() {
-        spyOn(this.hoodie.config, "set");
-        this.remote.disconnect();
-        return expect(this.hoodie.config.set).wasCalledWith('_remote.active', false);
-      });
       it("should abort the pull request", function() {
         this.remote._pull_request = {
           abort: jasmine.createSpy('pull')
@@ -363,6 +367,10 @@ define('specs/hoodie/remote', ['hoodie/remote', 'mocks/hoodie', 'mocks/changes_r
       });
     });
     describe(".push(docs)", function() {
+      beforeEach(function() {
+        spyOn(Date, "now").andReturn(10);
+        return this.remote._timezone_offset = 1;
+      });
       return _when("no docs passed", function() {
         _and("there are no changed docs", function() {
           beforeEach(function() {
@@ -373,7 +381,7 @@ define('specs/hoodie/remote', ['hoodie/remote', 'mocks/hoodie', 'mocks/changes_r
             return expect(this.hoodie.request).wasNotCalled();
           });
         });
-        _and("there is one deleted and one changed doc", function() {
+        _and("there is one deleted and one new doc", function() {
           beforeEach(function() {
             var _ref;
             spyOn(this.hoodie.store, "changed_docs").andReturn(ChangedDocsMock());
@@ -403,17 +411,22 @@ define('specs/hoodie/remote', ['hoodie/remote', 'mocks/hoodie', 'mocks/changes_r
             expect(doc._id).toBe('todo/abc3');
             return expect(doc._localInfo).toBeUndefined();
           });
-          return _and("the request is successful, but with one conflict error", function() {
-            beforeEach(function() {
-              var _this = this;
-              this.hoodie.request.andCallFake(function(method, path, options) {
-                return options.success(BulkUpdateResponseMock());
-              });
-              return this.remote.push();
-            });
-            return it("should trigger conflict event", function() {
-              return expect(this.hoodie.trigger).wasCalledWith('remote:error:conflict', 'todo/abc2');
-            });
+          it("should set data.new_edits to false", function() {
+            var new_edits;
+            new_edits = JSON.parse(this.options.data).new_edits;
+            return expect(new_edits).toBe(false);
+          });
+          return it("should set new _revision ids", function() {
+            var deleted_doc, docs, new_doc;
+            docs = JSON.parse(this.options.data).docs;
+            deleted_doc = docs[0], new_doc = docs[1];
+            expect(deleted_doc._rev).toBe('3-mock567#11');
+            expect(new_doc._rev).toMatch('1-mock567#11');
+            expect(deleted_doc._revisions.start).toBe(3);
+            expect(deleted_doc._revisions.ids[0]).toBe('mock567#11');
+            expect(deleted_doc._revisions.ids[1]).toBe('123');
+            expect(new_doc._revisions.start).toBe(1);
+            return expect(new_doc._revisions.ids[0]).toBe('mock567#11');
           });
         });
         return _when("Array of docs passed", function() {

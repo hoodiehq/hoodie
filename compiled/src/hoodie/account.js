@@ -64,6 +64,9 @@ define('hoodie/account', function() {
     Account.prototype.sign_up = function(username, password) {
       var data, defer, handle_succes, key, request_promise,
         _this = this;
+      if (password == null) {
+        password = '';
+      }
       defer = this.hoodie.defer();
       key = "" + this._prefix + ":" + username;
       data = {
@@ -89,6 +92,9 @@ define('hoodie/account', function() {
     Account.prototype.sign_in = function(username, password) {
       var defer, handle_succes, request_promise,
         _this = this;
+      if (password == null) {
+        password = '';
+      }
       defer = this.hoodie.defer();
       request_promise = this.hoodie.request('POST', '/_session', {
         data: {
@@ -110,6 +116,9 @@ define('hoodie/account', function() {
     Account.prototype.change_password = function(current_password, new_password) {
       var data, defer, key,
         _this = this;
+      if (current_password == null) {
+        current_password = '';
+      }
       defer = this.hoodie.defer();
       if (!this.username) {
         defer.reject({

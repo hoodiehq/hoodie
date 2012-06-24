@@ -205,7 +205,7 @@ define 'specs/hoodie/account', ['mocks/hoodie', 'hoodie/account'], (HoodieMock, 
         @account.sign_up('joe@example.com')
         [@type, @path, @options] = @hoodie.request.mostRecentCall.args
         @data = JSON.parse @options.data
-        expect(@data.password).toBeUndefined()
+        expect(@data.password).toBe ''
               
       _when "sign_up successful", ->
         beforeEach ->
@@ -257,6 +257,12 @@ define 'specs/hoodie/account', ['mocks/hoodie', 'hoodie/account'], (HoodieMock, 
     
       it "should send password", ->
         expect(@options.data.password).toBe 'secret'
+
+      it "should allow to sign in without password", ->
+        @account.sign_in('joe@example.com')
+        [@type, @path, @options] = @hoodie.request.mostRecentCall.args
+        data = @options.data
+        expect(data.password).toBe ''
         
       _when "sign_up successful", ->
         beforeEach ->

@@ -17,7 +17,6 @@ define 'mocks/changed_docs', ->
         done      : false
         type      : "todo"
         id        : "abc2"
-        _rev      : '1-123'
         updated_at: "2012-20-12T12:00:00.000Z"
         created_at: "2012-20-12T12:00:00.000Z"
       }

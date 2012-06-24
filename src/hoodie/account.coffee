@@ -73,7 +73,7 @@ define 'hoodie/account', ->
     # The backend will automatically create a userDB based on the username
     # address.
     #
-    sign_up : (username, password) ->
+    sign_up : (username, password = '') ->
       defer = @hoodie.defer()
       
       key     = "#{@_prefix}:#{username}"
@@ -103,7 +103,7 @@ define 'hoodie/account', ->
     #
     # uses standard couchDB API to create a new user session (POST /_session)
     #
-    sign_in : (username, password) ->
+    sign_in : (username, password = '') ->
       defer = @hoodie.defer()
 
       request_promise = @hoodie.request 'POST', '/_session', 
@@ -128,7 +128,7 @@ define 'hoodie/account', ->
     #
     # NOTE: simple implementation, current_password is ignored.
     #
-    change_password : (current_password, new_password) ->
+    change_password : (current_password = '', new_password) ->
       defer = @hoodie.defer()
       unless @username
         defer.reject error: "unauthenticated", reason: "not logged in"
