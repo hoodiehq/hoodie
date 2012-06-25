@@ -28,7 +28,7 @@ define 'hoodie/sharing/hoodie', ['hoodie'], (Hoodie) ->
         hoodie.on event, => @trigger event
 
       super hoodie.base_url
-      
+
     # ## SharingHoodie Request
     #
     # the only difference to Hoodies default request:

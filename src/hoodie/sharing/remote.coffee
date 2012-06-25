@@ -15,9 +15,20 @@ define 'hoodie/sharing/remote', ['hoodie/remote'], (Remote) ->
   # see: Hoodie::_load_modules
   class Remote extends Remote
     
-    push : =>
-      console.log "PPPUUSSHSH!!"
-      super
+
+    #
+    # we only want to push stuff that belongs to this sharing
+    #
+    push : (docs) =>
+      unless $.isArray docs
+        # walk through all changed docs, check if it's
+        # 1. the sharing object itself or
+        # 2. an object belonging to the sharing
+        docs = for obj in @hoodie.store.changed_docs() when obj.id is @hoodie.sharing.id or obj.$sharings and ~obj.$sharings.indexOf(@hoodie.sharing.id)
+          obj 
+
+      super(docs)
+
 
     # pull url
     #

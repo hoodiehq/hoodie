@@ -15,9 +15,23 @@ define('hoodie/sharing/remote', ['hoodie/remote'], function(Remote) {
       return Remote.__super__.constructor.apply(this, arguments);
     }
 
-    Remote.prototype.push = function() {
-      console.log("PPPUUSSHSH!!");
-      return Remote.__super__.push.apply(this, arguments);
+    Remote.prototype.push = function(docs) {
+      var obj;
+      if (!$.isArray(docs)) {
+        docs = (function() {
+          var _i, _len, _ref, _results;
+          _ref = this.hoodie.store.changed_docs();
+          _results = [];
+          for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+            obj = _ref[_i];
+            if (obj.id === this.hoodie.sharing.id || obj.$sharings && ~obj.$sharings.indexOf(this.hoodie.sharing.id)) {
+              _results.push(obj);
+            }
+          }
+          return _results;
+        }).call(this);
+      }
+      return Remote.__super__.push.call(this, docs);
     };
 
     Remote.prototype._pull_url = function() {
