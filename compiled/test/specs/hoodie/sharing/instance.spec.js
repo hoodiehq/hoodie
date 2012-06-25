@@ -13,11 +13,6 @@ define('specs/hoodie/sharing/instance', ['mocks/hoodie', 'hoodie/sharing/instanc
         spyOn(SharingInstance.prototype, "set");
         return spyOn(SharingInstance.prototype, "add");
       });
-      it("should generate an id", function() {
-        var sharing;
-        sharing = new SharingInstance;
-        return expect(sharing.id).toBe('new_id');
-      });
       it("should set the attributes", function() {
         var sharing;
         sharing = new SharingInstance({

@@ -2,29 +2,21 @@ define 'hoodie/sharing/instance', ['hoodie/config', 'hoodie/sharing/hoodie'], (C
 
   class SharingInstance
 
-    # ## clas methods
-
-    # if the current user isn't anonymous (has an account), a backend worker is 
-    # used for the whole sharing magic, all we need to do is creating the $sharing 
-    # doc and listen to its remote changes
-    #
-    # if the user is anonymous, we need to handle it manually. To achieve that
-    # we use a customized hoodie, with its own socket
-    anonymous: undefined
-    
-      
     #
     constructor: (options = {}) ->
       
       @hoodie    = @constructor.hoodie
+
+      # if the current user isn't anonymous (has an account), a backend worker is 
+      # used for the whole sharing magic, all we need to do is creating the $sharing 
+      # doc and listen to its remote changes
+      #
+      # if the user is anonymous, we need to handle it manually. To achieve that
+      # we use a customized hoodie, with its own socket
       @anonymous = @hoodie.account.username is undefined
       
       # setting attributes
       @set options
-      
-      # make sure we have an id, as we need it 
-      # for the config and the  default password
-      @id or= @hoodie.store.uuid(7)
 
       # also make sure we have an owner_uuid in oredr to differentiate between my 
       # sharings and the sharings by others
@@ -47,9 +39,6 @@ define 'hoodie/sharing/instance', ['hoodie/config', 'hoodie/sharing/hoodie'], (C
 
       # make sure sharing is private if invitees are set
       @private = @_memory.private = true if @invitees?.length
-      
-      # default password to sharing id
-      @_memory.password = @password or= @id
 
       return undefined
       
@@ -205,8 +194,8 @@ define 'hoodie/sharing/instance', ['hoodie/config', 'hoodie/sharing/hoodie'], (C
         [@id]
 
       if new_value
-        delete @docs_to_remove["#{obj.type}/#{obj.id}"]
-        @set 'docs_to_remove', @docs_to_remove 
+        delete @$docs_to_remove["#{obj.type}/#{obj.id}"]
+        @set '$docs_to_remove', @$docs_to_remove 
 
       $sharings: new_value
 
@@ -214,9 +203,9 @@ define 'hoodie/sharing/instance', ['hoodie/config', 'hoodie/sharing/hoodie'], (C
     # returns a hash update to update the passed object
     # so that it gets removed from the current sharing
     #
-    # on top of that, the object gets stored in the docs_to_remove
+    # on top of that, the object gets stored in the $docs_to_remove
     # property. These will removed from the sharing database on next sync
-    docs_to_remove: {}
+    $docs_to_remove: {}
     _remove : (obj) =>
       try
         $sharings = obj.$sharings
@@ -225,14 +214,14 @@ define 'hoodie/sharing/instance', ['hoodie/config', 'hoodie/sharing/hoodie'], (C
           $sharings.splice(idx, 1) 
 
           # TODO:
-          # when anonymous, use _docs_to_remove and push the deletion
+          # when anonymous, use $docs_to_remove and push the deletion
           # manually, so that the _rev stamps do get updated.
-          # When user signes up, rename the attribut to docs_to_remove,
+          # When user signes up, rename the attribut to $docs_to_remove,
           # so that the worker can take over
           #
           # Alternative: find a way to create a new revions locally.
-          @docs_to_remove["#{obj.type}/#{obj.id}"] = obj._rev
-          @set 'docs_to_remove', @docs_to_remove
+          @$docs_to_remove["#{obj.type}/#{obj.id}"] = _rev: obj._rev
+          @set '$docs_to_remove', @$docs_to_remove
 
           $sharings: if $sharings.length then $sharings else undefined
         

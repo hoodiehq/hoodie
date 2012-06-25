@@ -6,8 +6,6 @@ define('hoodie/sharing/instance', ['hoodie/config', 'hoodie/sharing/hoodie'], fu
   var SharingInstance;
   return SharingInstance = (function() {
 
-    SharingInstance.prototype.anonymous = void 0;
-
     function SharingInstance(options) {
       if (options == null) {
         options = {};
@@ -31,7 +29,6 @@ define('hoodie/sharing/instance', ['hoodie/config', 'hoodie/sharing/hoodie'], fu
       this.hoodie = this.constructor.hoodie;
       this.anonymous = this.hoodie.account.username === void 0;
       this.set(options);
-      this.id || (this.id = this.hoodie.store.uuid(7));
       this._assure_owner_uuid();
       if (this.anonymous) {
         this.hoodie = new SharingHoodie(this.hoodie, this);
@@ -53,7 +50,6 @@ define('hoodie/sharing/instance', ['hoodie/config', 'hoodie/sharing/hoodie'], fu
       if ((_ref = this.invitees) != null ? _ref.length : void 0) {
         this["private"] = this._memory["private"] = true;
       }
-      this._memory.password = this.password || (this.password = this.id);
       return void 0;
     };
 
@@ -147,15 +143,15 @@ define('hoodie/sharing/instance', ['hoodie/config', 'hoodie/sharing/hoodie'], fu
       var new_value;
       new_value = obj.$sharings ? !~obj.$sharings.indexOf(this.id) ? obj.$sharings.concat(this.id) : void 0 : [this.id];
       if (new_value) {
-        delete this.docs_to_remove["" + obj.type + "/" + obj.id];
-        this.set('docs_to_remove', this.docs_to_remove);
+        delete this.$docs_to_remove["" + obj.type + "/" + obj.id];
+        this.set('$docs_to_remove', this.$docs_to_remove);
       }
       return {
         $sharings: new_value
       };
     };
 
-    SharingInstance.prototype.docs_to_remove = {};
+    SharingInstance.prototype.$docs_to_remove = {};
 
     SharingInstance.prototype._remove = function(obj) {
       var $sharings, idx;
@@ -163,8 +159,10 @@ define('hoodie/sharing/instance', ['hoodie/config', 'hoodie/sharing/hoodie'], fu
         $sharings = obj.$sharings;
         if (~(idx = $sharings.indexOf(this.id))) {
           $sharings.splice(idx, 1);
-          this.docs_to_remove["" + obj.type + "/" + obj.id] = obj._rev;
-          this.set('docs_to_remove', this.docs_to_remove);
+          this.$docs_to_remove["" + obj.type + "/" + obj.id] = {
+            _rev: obj._rev
+          };
+          this.set('$docs_to_remove', this.$docs_to_remove);
           return {
             $sharings: $sharings.length ? $sharings : void 0
           };

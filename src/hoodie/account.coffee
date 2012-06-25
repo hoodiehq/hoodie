@@ -43,26 +43,26 @@ define 'hoodie/account', ->
         return defer.reject().promise()
       
       # @_authenticated is undefined
-      @hoodie.request 'GET', "/_session"
-      
-        success     : (response) =>
-          if response.userCtx.name
-            @_authenticated = true
-            @username = response.userCtx.name
-            defer.resolve @username
-          else
-            @_authenticated = false
-            delete @username
-            @hoodie.trigger 'account:error:unauthenticated'
-            defer.reject()
+      @_auth_request = @hoodie.request 'GET', "/_session"
+
+      @_auth_request.done (response) =>
+        if response.userCtx.name
+          @_authenticated = true
+          @username = response.userCtx.name
+          defer.resolve @username
+        else
+          @_authenticated = false
+          delete @username
+          @hoodie.trigger 'account:error:unauthenticated'
+          defer.reject()
             
-        error       : (xhr) ->
-          try
-            error = JSON.parse(xhr.responseText)
-          catch e
-            error = error: xhr.responseText or "unknown"
-            
-          defer.reject(error)
+      @_auth_request.fail (xhr) ->
+        try
+          error = JSON.parse(xhr.responseText)
+        catch e
+          error = error: xhr.responseText or "unknown"
+          
+        defer.reject(error)
           
       return defer.promise()
       

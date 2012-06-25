@@ -33,30 +33,29 @@ define('hoodie/account', function() {
       if (this._authenticated === false) {
         return defer.reject().promise();
       }
-      this.hoodie.request('GET', "/_session", {
-        success: function(response) {
-          if (response.userCtx.name) {
-            _this._authenticated = true;
-            _this.username = response.userCtx.name;
-            return defer.resolve(_this.username);
-          } else {
-            _this._authenticated = false;
-            delete _this.username;
-            _this.hoodie.trigger('account:error:unauthenticated');
-            return defer.reject();
-          }
-        },
-        error: function(xhr) {
-          var error;
-          try {
-            error = JSON.parse(xhr.responseText);
-          } catch (e) {
-            error = {
-              error: xhr.responseText || "unknown"
-            };
-          }
-          return defer.reject(error);
+      this._auth_request = this.hoodie.request('GET', "/_session");
+      this._auth_request.done(function(response) {
+        if (response.userCtx.name) {
+          _this._authenticated = true;
+          _this.username = response.userCtx.name;
+          return defer.resolve(_this.username);
+        } else {
+          _this._authenticated = false;
+          delete _this.username;
+          _this.hoodie.trigger('account:error:unauthenticated');
+          return defer.reject();
         }
+      });
+      this._auth_request.fail(function(xhr) {
+        var error;
+        try {
+          error = JSON.parse(xhr.responseText);
+        } catch (e) {
+          error = {
+            error: xhr.responseText || "unknown"
+          };
+        }
+        return defer.reject(error);
       });
       return defer.promise();
     };

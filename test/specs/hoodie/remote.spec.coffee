@@ -7,7 +7,8 @@ define 'specs/hoodie/remote', ['hoodie/remote', 'mocks/hoodie', 'mocks/changes_r
       spyOn(@hoodie, "on")
       spyOn(@hoodie, "one")
       spyOn(@hoodie, "unbind")
-      spyOn(@hoodie, "request").andReturn then: jasmine.createSpy 'then'
+      @request_defer = @hoodie.defer()
+      spyOn(@hoodie, "request").andReturn @request_defer.promise()
       spyOn(window, "setTimeout")
       
       spyOn(@hoodie, "trigger")
@@ -45,6 +46,14 @@ define 'specs/hoodie/remote', ['hoodie/remote', 'mocks/hoodie', 'mocks/changes_r
         spyOn(@hoodie.config, "set")
         @remote.activate()
         expect(@hoodie.config.set).wasCalledWith '_remote.active', true
+
+      it "should subscribe to `signed_out` event", ->
+        @remote.activate()
+        expect(@hoodie.on).wasCalledWith 'account:signed_out', @remote.disconnect
+
+      it "should subscribe to account:sign_in with sync", ->
+        @remote.activate()
+        expect(@hoodie.on).wasCalledWith 'account:signed_in', @remote.sync
         
     describe ".deactivate", ->
       it "should set remote.active to false", ->
@@ -57,13 +66,17 @@ define 'specs/hoodie/remote', ['hoodie/remote', 'mocks/hoodie', 'mocks/changes_r
         @remote.deactivate()
         expect(@hoodie.config.set).wasCalledWith '_remote.active', false
 
+      it "should unsubscribe from account's signed_in idle event", ->
+        @remote.deactivate()
+        expect(@hoodie.unbind).wasCalledWith 'account:signed_in', @remote.connect
+        
+      it "should unsubscribe from account's signed_out idle event", ->
+        @remote.deactivate()
+        expect(@hoodie.unbind).wasCalledWith 'account:signed_out', @remote.disconnect
+
     describe ".connect()", ->
       beforeEach ->
         spyOn(@remote, "sync")
-      
-      it "should subscribe to `signed_out` event", ->
-        @remote.connect()
-        expect(@hoodie.on).wasCalledWith 'account:signed_out', @remote.disconnect
         
       it "should authenticate", ->
         spyOn(@hoodie.account, "authenticate").andCallThrough()
@@ -79,14 +92,6 @@ define 'specs/hoodie/remote', ['hoodie/remote', 'mocks/hoodie', 'mocks/changes_r
         it "should sync", ->
           @remote.connect()
           expect(@remote.sync).wasCalled()
-        
-      _when "not successful", ->
-        beforeEach ->
-          spyOn(@hoodie.account, "authenticate").andReturn pipe: -> fail: (cb) -> cb()
-        
-        it "should subscribe to account:sign_in with sync", ->
-          @remote.connect()
-          expect(@hoodie.on).wasCalledWith 'account:signed_in', @remote.sync
     # /.connect()
 
     describe ".disconnect()", ->  
@@ -103,14 +108,6 @@ define 'specs/hoodie/remote', ['hoodie/remote', 'mocks/hoodie', 'mocks/changes_r
       it "should unsubscribe from stores's dirty idle event", ->
         @remote.disconnect()
         expect(@hoodie.unbind).wasCalledWith 'store:dirty:idle', @remote.push
-        
-      it "should unsubscribe from account's signed_in idle event", ->
-        @remote.disconnect()
-        expect(@hoodie.unbind).wasCalledWith 'account:signed_in', @remote.connect
-        
-      it "should unsubscribe from account's signed_out idle event", ->
-        @remote.disconnect()
-        expect(@hoodie.unbind).wasCalledWith 'account:signed_out', @remote.disconnect
     # /.disconnect()
     
     describe ".pull()", ->        
@@ -288,6 +285,7 @@ define 'specs/hoodie/remote', ['hoodie/remote', 'mocks/hoodie', 'mocks/changes_r
       beforeEach ->
         spyOn(Date, "now").andReturn 10
         @remote._timezone_offset = 1
+        @defer = @hoodie.defer()
         
       _when "no docs passed", ->        
         _and "there are no changed docs", ->
@@ -342,6 +340,16 @@ define 'specs/hoodie/remote', ['hoodie/remote', 'mocks/hoodie', 'mocks/changes_r
 
             expect(new_doc._revisions.start).toBe 1
             expect(new_doc._revisions.ids[0]).toBe 'mock567#11'
+
+          _and "push was successful", ->
+            beforeEach ->
+              spyOn(@hoodie.store, "update")
+              @request_defer.resolve()
+
+            it "should update the docs in store", ->
+              
+            
+            
         
         _when "Array of docs passed", ->
           beforeEach ->

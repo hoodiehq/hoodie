@@ -5,8 +5,7 @@
 # and `_bulk_docs` to push local changes
 #
 # When hoodie.remote is active (default), it will continuously 
-# synchronize, otherwise you sync, pull or push can be called
-# manually
+# synchronize, otherwise sync, pull or push can be called manually
 #
 
 define 'hoodie/remote', ['hoodie/errors'], (ERROR) ->
@@ -30,24 +29,31 @@ define 'hoodie/remote', ['hoodie/errors'], (ERROR) ->
       # overwrite default with _remote.active config, if set
       @active = @hoodie.config.get('_remote.active') if @hoodie.config.get('_remote.active')?
       
-      @connect() if @active
+      @activate() if @active
     
     #
     activate : =>
-      @hoodie.config.set '_remote.active', @active = true
+      @hoodie.config.set '_remote.active', true
+
+      @hoodie.on 'account:signed_out',    @disconnect
+      @hoodie.on 'account:signed_in',     @sync
+
       @connect()
 
     #
     deactivate : =>
-      @hoodie.config.set '_remote.active',  @active = false
+      @hoodie.config.set '_remote.active', false
+
+      @hoodie.unbind 'account:signed_in',  @sync
+      @hoodie.unbind 'account:signed_out', @disconnect
+
       @disconnect()
       
     # ## Connect
     #
     # start syncing changes from the userDB
-    connect : () =>
-      @hoodie.on 'account:signed_out',    @disconnect
-      @hoodie.on 'account:signed_in',     @sync
+    connect : =>
+      @active = true
       
       # start syncing
       @hoodie.account.authenticate().pipe @sync
@@ -57,8 +63,7 @@ define 'hoodie/remote', ['hoodie/errors'], (ERROR) ->
     #
     # stop syncing changes from the userDB
     disconnect : =>
-      @hoodie.unbind 'account:signed_in',  @sync
-      @hoodie.unbind 'account:signed_out', @disconnect
+      @active = false
       
       # binding comes from @sync
       @hoodie.unbind 'store:dirty:idle',   @push
@@ -91,20 +96,23 @@ define 'hoodie/remote', ['hoodie/errors'], (ERROR) ->
     push : (docs) =>
       
       docs = @hoodie.store.changed_docs() unless $.isArray docs
-      return @_promise().resolve([]) if docs.length is 0
+      return @hoodie.defer().resolve([]).promise() if docs.length is 0
         
-      docs = (@_parse_for_remote doc for doc in docs)
+      docs_for_remote = (@_parse_for_remote doc for doc in docs)
       
       @_push_request = @hoodie.request 'POST', "/#{encodeURIComponent @hoodie.account.db()}/_bulk_docs", 
         dataType:     'json'
         processData:  false
         contentType:  'application/json'
       
-        data        : JSON.stringify
-                        docs      : docs
-                        new_edits : false
-        
-    
+        data  : JSON.stringify
+                  docs      : docs_for_remote
+                  new_edits : false
+
+      # when push is successful, update the local store with the generated _rev numbers
+      @_push_request.done @_handle_push_success docs, docs_for_remote
+
+
     # ## sync changes
     #
     # pull ... and push ;-)
@@ -114,7 +122,7 @@ define 'hoodie/remote', ['hoodie/errors'], (ERROR) ->
         @hoodie.on     'store:dirty:idle', @push
       
       @push(docs).pipe @pull
-    
+
     
     # ## On
     #
@@ -138,7 +146,7 @@ define 'hoodie/remote', ['hoodie/errors'], (ERROR) ->
         "/#{encodeURIComponent @hoodie.account.db()}/_changes?include_docs=true&since=#{since}"
     
     # request gets restarted automaticcally in @_handle_pull_error
-    _restart_pull_request: => @_pull_request?.abort()
+    _restart_pull_request : => @_pull_request?.abort()
     
     
     #
@@ -199,8 +207,9 @@ define 'hoodie/remote', ['hoodie/errors'], (ERROR) ->
             # we'll try again after a 3s timeout
             window.setTimeout @pull, 3000 if @active
   
+
     # valid couchDB doc attributes starting with an underscore
-    _valid_special_attributes: [
+    _valid_special_attributes : [
       '_id', '_rev', '_deleted', '_revisions'
     ]
   
@@ -211,7 +220,7 @@ define 'hoodie/remote', ['hoodie/errors'], (ERROR) ->
     # 
     # Also `id` gets replaced with `_id` which consists of type & id
     #
-    _parse_for_remote: (obj) ->
+    _parse_for_remote : (obj) ->
       attributes = $.extend {}, obj
     
       for attr of attributes
@@ -224,24 +233,32 @@ define 'hoodie/remote', ['hoodie/errors'], (ERROR) ->
       delete attributes.id
 
       # prepare revision
-      @_add_revision_shizzle_to attributes
+      @_add_revision_to attributes
       
       return attributes
+    
+
+    #
+    # generates a revision id in the for of {uuid}#{UTC timestamp}
+    # Beware that it does not include a leading revision number
+    _generate_new_revision_id:  ->
+      # get timezone offset
+      @_timezone_offset or= new Date().getTimezoneOffset() * 60
+
+      timestamp   = Date.now() + @_timezone_offset
+      uuid        = @hoodie.store.uuid(5)
+      "#{uuid}##{timestamp}"
+    
 
     #
     # get new revision number
     #
-    _add_revision_shizzle_to: (attributes) ->
-      # get timezone offset
-      @_timezone_offset or= new Date().getTimezoneOffset() * 60
+    _add_revision_to : (attributes) ->
 
       try [current_rev_nr, current_rev_id] = attributes._rev.split /-/
       current_rev_nr = parseInt(current_rev_nr) or 0
 
-      timestamp   = Date.now() + @_timezone_offset
-      uuid        = @hoodie.store.uuid(5)
-
-      new_revision_id       = "#{uuid}##{timestamp}"
+      new_revision_id       = @_generate_new_revision_id()
       attributes._rev       = "#{current_rev_nr + 1}-#{new_revision_id}"
       attributes._revisions = 
         start : 1
@@ -256,7 +273,7 @@ define 'hoodie/remote', ['hoodie/errors'], (ERROR) ->
     # 
     # renames `_id` attribute to `id` and removes the type from the id,
     # e.g. `document/123` -> `123`
-    _parse_from_pull: (obj) ->
+    _parse_from_pull : (obj) ->
       
       # handle id and type
       id = obj._id or obj.id
@@ -279,7 +296,7 @@ define 'hoodie/remote', ['hoodie/errors'], (ERROR) ->
     # 
     # removes the type from the id, e.g. `document/123` -> `123`
     # also removes attribute ok
-    _parse_from_push: (obj) ->
+    _parse_from_push : (obj) ->
       
       # handle id and type
       id = obj._id or 
@@ -304,7 +321,7 @@ define 'hoodie/remote', ['hoodie/errors'], (ERROR) ->
     #       not been stored yet, but is within the same bulk of changes. This 
     #       is especially the case during initial bootstraps after a user logins.
     #
-    _handle_pull_results: (changes) =>
+    _handle_pull_results : (changes) =>
       _destroyed_docs = []
       _changed_docs   = []
       
@@ -337,6 +354,15 @@ define 'hoodie/remote', ['hoodie/errors'], (ERROR) ->
           @hoodie.trigger "remote:changed",                       event, doc.type, doc.id, object
           @hoodie.trigger "remote:changed:#{doc.type}",           event,           doc.id, object
           @hoodie.trigger "remote:changed:#{doc.type}:#{doc.id}", event,                   object
-    
+
+
     #
-    _promise: $.Deferred
+    # handle push success
+    #
+    # 
+    _handle_push_success: (docs, pushed_docs) =>
+      =>
+        for doc, i in docs
+          update  = {_rev: pushed_docs[i]._rev}
+          options = remote : true
+          @hoodie.store.update(doc.type, doc.id, update, options) 

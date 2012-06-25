@@ -7,7 +7,7 @@ define 'hoodie/sharing/hoodie', ['hoodie'], (Hoodie) ->
   #
   class SharingHoodie extends Hoodie
     
-    modules: ['hoodie/account', 'hoodie/sharing/remote'] 
+    modules: ['hoodie/sharing/account', 'hoodie/sharing/remote'] 
     
     constructor: (hoodie, @sharing) ->
       @store  = hoodie.store
@@ -23,6 +23,10 @@ define 'hoodie/sharing/hoodie', ['hoodie'], (Hoodie) ->
       @config.set '_account.username', "sharing/#{@sharing.id}"
       @config.set '_remote.active',    @sharing.continuous is true
       
+      # proxy certain request from core hoodie
+      for event in ['store:dirty:idle']
+        hoodie.on event, => @trigger event
+
       super hoodie.base_url
       
     # ## SharingHoodie Request
@@ -30,11 +34,6 @@ define 'hoodie/sharing/hoodie', ['hoodie'], (Hoodie) ->
     # the only difference to Hoodies default request:
     # we send the creds directly as authorization header
     request: (type, path, options = {}) ->
-      
-      # ignore requests to /_session as we don't use cookie authentication anyway, 
-      # every request is authenticated by basic auth header
-      if path is '/_session'
-        return @defer().resolve().promise()
       
       defaults =
         type        : type
@@ -44,7 +43,7 @@ define 'hoodie/sharing/hoodie', ['hoodie'], (Hoodie) ->
         dataType    : 'json'
         
       unless type is 'PUT' # no authentication header for sign up request
-        hash = btoa "sharing/#{@sharing.id}:#{@sharing.password}"
+        hash = btoa "sharing/#{@sharing.id}:#{@sharing.password or ''}"
         auth = "Basic #{hash}"
         
         $.extend defaults,

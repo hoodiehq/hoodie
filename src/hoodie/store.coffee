@@ -329,10 +329,12 @@ define 'hoodie/store', ['hoodie/errors'], (ERROR) ->
       
       @_dirty[key] = object
       @hoodie.trigger 'store:dirty'
-      
+
       timeout = 2000 # 2 seconds timout before triggering the `store:dirty:idle` event
       window.clearTimeout @_dirty_timeout
-      @_dirty_timeout = window.setTimeout ( => @hoodie.trigger 'store:dirty:idle' ), timeout
+      @_dirty_timeout = window.setTimeout ( =>
+        @hoodie.trigger 'store:dirty:idle'
+      ), timeout
       
     # ## changed docs
     #

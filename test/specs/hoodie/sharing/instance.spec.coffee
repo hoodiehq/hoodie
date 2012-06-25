@@ -11,10 +11,6 @@ define 'specs/hoodie/sharing/instance', ['mocks/hoodie', 'hoodie/sharing/instanc
         spyOn(@hoodie.store, "uuid").andReturn 'new_id'
         spyOn(SharingInstance::, "set")
         spyOn(SharingInstance::, "add")
-      
-      it "should generate an id", ->
-        sharing = new SharingInstance
-        expect(sharing.id).toBe 'new_id'
         
       it "should set the attributes", ->
         sharing = new SharingInstance {funky: 'options'}

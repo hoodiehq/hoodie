@@ -8,9 +8,8 @@ define('specs/hoodie/remote', ['hoodie/remote', 'mocks/hoodie', 'mocks/changes_r
       spyOn(this.hoodie, "on");
       spyOn(this.hoodie, "one");
       spyOn(this.hoodie, "unbind");
-      spyOn(this.hoodie, "request").andReturn({
-        then: jasmine.createSpy('then')
-      });
+      this.request_defer = this.hoodie.defer();
+      spyOn(this.hoodie, "request").andReturn(this.request_defer.promise());
       spyOn(window, "setTimeout");
       spyOn(this.hoodie, "trigger");
       spyOn(this.hoodie.store, "destroy").andReturn({
@@ -51,10 +50,18 @@ define('specs/hoodie/remote', ['hoodie/remote', 'mocks/hoodie', 'mocks/changes_r
         this.remote.activate();
         return expect(this.remote.active).toBeTruthy();
       });
-      return it("should set config remote.active to true", function() {
+      it("should set config remote.active to true", function() {
         spyOn(this.hoodie.config, "set");
         this.remote.activate();
         return expect(this.hoodie.config.set).wasCalledWith('_remote.active', true);
+      });
+      it("should subscribe to `signed_out` event", function() {
+        this.remote.activate();
+        return expect(this.hoodie.on).wasCalledWith('account:signed_out', this.remote.disconnect);
+      });
+      return it("should subscribe to account:sign_in with sync", function() {
+        this.remote.activate();
+        return expect(this.hoodie.on).wasCalledWith('account:signed_in', this.remote.sync);
       });
     });
     describe(".deactivate", function() {
@@ -63,26 +70,30 @@ define('specs/hoodie/remote', ['hoodie/remote', 'mocks/hoodie', 'mocks/changes_r
         this.remote.deactivate();
         return expect(this.remote.active).toBeFalsy();
       });
-      return it("should set config remote.active to false", function() {
+      it("should set config remote.active to false", function() {
         spyOn(this.hoodie.config, "set");
         this.remote.deactivate();
         return expect(this.hoodie.config.set).wasCalledWith('_remote.active', false);
+      });
+      it("should unsubscribe from account's signed_in idle event", function() {
+        this.remote.deactivate();
+        return expect(this.hoodie.unbind).wasCalledWith('account:signed_in', this.remote.connect);
+      });
+      return it("should unsubscribe from account's signed_out idle event", function() {
+        this.remote.deactivate();
+        return expect(this.hoodie.unbind).wasCalledWith('account:signed_out', this.remote.disconnect);
       });
     });
     describe(".connect()", function() {
       beforeEach(function() {
         return spyOn(this.remote, "sync");
       });
-      it("should subscribe to `signed_out` event", function() {
-        this.remote.connect();
-        return expect(this.hoodie.on).wasCalledWith('account:signed_out', this.remote.disconnect);
-      });
       it("should authenticate", function() {
         spyOn(this.hoodie.account, "authenticate").andCallThrough();
         this.remote.connect();
         return expect(this.hoodie.account.authenticate).wasCalled();
       });
-      _when("successful", function() {
+      return _when("successful", function() {
         beforeEach(function() {
           return spyOn(this.hoodie.account, "authenticate").andReturn({
             pipe: function(cb) {
@@ -96,23 +107,6 @@ define('specs/hoodie/remote', ['hoodie/remote', 'mocks/hoodie', 'mocks/changes_r
         return it("should sync", function() {
           this.remote.connect();
           return expect(this.remote.sync).wasCalled();
-        });
-      });
-      return _when("not successful", function() {
-        beforeEach(function() {
-          return spyOn(this.hoodie.account, "authenticate").andReturn({
-            pipe: function() {
-              return {
-                fail: function(cb) {
-                  return cb();
-                }
-              };
-            }
-          });
-        });
-        return it("should subscribe to account:sign_in with sync", function() {
-          this.remote.connect();
-          return expect(this.hoodie.on).wasCalledWith('account:signed_in', this.remote.sync);
         });
       });
     });
@@ -131,17 +125,9 @@ define('specs/hoodie/remote', ['hoodie/remote', 'mocks/hoodie', 'mocks/changes_r
         this.remote.disconnect();
         return expect(this.remote._push_request.abort).wasCalled();
       });
-      it("should unsubscribe from stores's dirty idle event", function() {
+      return it("should unsubscribe from stores's dirty idle event", function() {
         this.remote.disconnect();
         return expect(this.hoodie.unbind).wasCalledWith('store:dirty:idle', this.remote.push);
-      });
-      it("should unsubscribe from account's signed_in idle event", function() {
-        this.remote.disconnect();
-        return expect(this.hoodie.unbind).wasCalledWith('account:signed_in', this.remote.connect);
-      });
-      return it("should unsubscribe from account's signed_out idle event", function() {
-        this.remote.disconnect();
-        return expect(this.hoodie.unbind).wasCalledWith('account:signed_out', this.remote.disconnect);
       });
     });
     describe(".pull()", function() {
@@ -369,7 +355,8 @@ define('specs/hoodie/remote', ['hoodie/remote', 'mocks/hoodie', 'mocks/changes_r
     describe(".push(docs)", function() {
       beforeEach(function() {
         spyOn(Date, "now").andReturn(10);
-        return this.remote._timezone_offset = 1;
+        this.remote._timezone_offset = 1;
+        return this.defer = this.hoodie.defer();
       });
       return _when("no docs passed", function() {
         _and("there are no changed docs", function() {
@@ -416,7 +403,7 @@ define('specs/hoodie/remote', ['hoodie/remote', 'mocks/hoodie', 'mocks/changes_r
             new_edits = JSON.parse(this.options.data).new_edits;
             return expect(new_edits).toBe(false);
           });
-          return it("should set new _revision ids", function() {
+          it("should set new _revision ids", function() {
             var deleted_doc, docs, new_doc;
             docs = JSON.parse(this.options.data).docs;
             deleted_doc = docs[0], new_doc = docs[1];
@@ -427,6 +414,13 @@ define('specs/hoodie/remote', ['hoodie/remote', 'mocks/hoodie', 'mocks/changes_r
             expect(deleted_doc._revisions.ids[1]).toBe('123');
             expect(new_doc._revisions.start).toBe(1);
             return expect(new_doc._revisions.ids[0]).toBe('mock567#11');
+          });
+          return _and("push was successful", function() {
+            beforeEach(function() {
+              spyOn(this.hoodie.store, "update");
+              return this.request_defer.resolve();
+            });
+            return it("should update the docs in store", function() {});
           });
         });
         return _when("Array of docs passed", function() {

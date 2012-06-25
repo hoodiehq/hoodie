@@ -6,9 +6,11 @@ define 'specs/hoodie/account', ['mocks/hoodie', 'hoodie/account'], (HoodieMock, 
       
       @hoodie  = new HoodieMock
       @account = new Account @hoodie    
+
+      @request_defer = @hoodie.defer()
+      spyOn(@hoodie, "request").andReturn @request_defer.promise()
     
       # requests
-      spyOn(@hoodie, "request")
       spyOn(@hoodie, "trigger")
   
   
@@ -131,7 +133,7 @@ define 'specs/hoodie/account', ['mocks/hoodie', 'hoodie/account'], (HoodieMock, 
           # {"ok":true,"userCtx":{"name":"@example.com","roles":[]},"info":{"authentication_db":"_users","authentication_handlers":["oauth","cookie","default"],"authenticated":"cookie"}}
           _when "authentication request is successful and returns joe@example.com", ->
             beforeEach ->
-              @hoodie.request.andCallFake (type, path, options = {}) -> options.success? userCtx: name: 'joe@example.com'
+              @request_defer.resolve userCtx: name: 'joe@example.com'
               @promise = @account.authenticate()
               
             it "should set account as authenticated", ->
@@ -141,9 +143,9 @@ define 'specs/hoodie/account', ['mocks/hoodie', 'hoodie/account'], (HoodieMock, 
               expect(@promise).toBeResolvedWith 'joe@example.com'
           
           # {"ok":true,"userCtx":{"name":null,"roles":[]},"info":{"authentication_db":"_users","authentication_handlers":["oauth","cookie","default"]}}
-          _when "authentication request is successful and returns `name: joe@example.com`", ->
+          _when "authentication request is successful and returns `name: null`", ->
             beforeEach ->
-              @hoodie.request.andCallFake (type, path, options = {}) -> options.success? userCtx: name: null
+              @request_defer.resolve userCtx: name: null
               @account.username = 'joe@example.com'
               @promise = @account.authenticate()
               
@@ -161,7 +163,7 @@ define 'specs/hoodie/account', ['mocks/hoodie', 'hoodie/account'], (HoodieMock, 
               
           _when "authentication request has an error", ->
             beforeEach ->
-              @hoodie.request.andCallFake (type, path, options = {}) -> options.error? responseText: 'error data'
+              @request_defer.reject responseText: 'error data'
               @promise = @account.authenticate()
             
             it "should reject the promise", ->

@@ -8,9 +8,11 @@ define('hoodie/sharing/hoodie', ['hoodie'], function(Hoodie) {
 
     __extends(SharingHoodie, _super);
 
-    SharingHoodie.prototype.modules = ['hoodie/account', 'hoodie/sharing/remote'];
+    SharingHoodie.prototype.modules = ['hoodie/sharing/account', 'hoodie/sharing/remote'];
 
     function SharingHoodie(hoodie, sharing) {
+      var event, _i, _len, _ref,
+        _this = this;
       this.sharing = sharing;
       this.store = hoodie.store;
       this.config = {
@@ -20,6 +22,13 @@ define('hoodie/sharing/hoodie', ['hoodie'], function(Hoodie) {
       };
       this.config.set('_account.username', "sharing/" + this.sharing.id);
       this.config.set('_remote.active', this.sharing.continuous === true);
+      _ref = ['store:dirty:idle'];
+      for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+        event = _ref[_i];
+        hoodie.on(event, function() {
+          return _this.trigger(event);
+        });
+      }
       SharingHoodie.__super__.constructor.call(this, hoodie.base_url);
     }
 
@@ -27,9 +36,6 @@ define('hoodie/sharing/hoodie', ['hoodie'], function(Hoodie) {
       var auth, defaults, hash;
       if (options == null) {
         options = {};
-      }
-      if (path === '/_session') {
-        return this.defer().resolve().promise();
       }
       defaults = {
         type: type,
@@ -41,7 +47,7 @@ define('hoodie/sharing/hoodie', ['hoodie'], function(Hoodie) {
         dataType: 'json'
       };
       if (type !== 'PUT') {
-        hash = btoa("sharing/" + this.sharing.id + ":" + this.sharing.password);
+        hash = btoa("sharing/" + this.sharing.id + ":" + (this.sharing.password || ''));
         auth = "Basic " + hash;
         $.extend(defaults, {
           headers: {

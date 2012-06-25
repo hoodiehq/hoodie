@@ -6,7 +6,8 @@ define('specs/hoodie/account', ['mocks/hoodie', 'hoodie/account'], function(Hood
       localStorage.clear();
       this.hoodie = new HoodieMock;
       this.account = new Account(this.hoodie);
-      spyOn(this.hoodie, "request");
+      this.request_defer = this.hoodie.defer();
+      spyOn(this.hoodie, "request").andReturn(this.request_defer.promise());
       return spyOn(this.hoodie, "trigger");
     });
     describe(".constructor()", function() {
@@ -140,15 +141,10 @@ define('specs/hoodie/account', ['mocks/hoodie', 'hoodie/account'], function(Hood
           });
           _when("authentication request is successful and returns joe@example.com", function() {
             beforeEach(function() {
-              this.hoodie.request.andCallFake(function(type, path, options) {
-                if (options == null) {
-                  options = {};
+              this.request_defer.resolve({
+                userCtx: {
+                  name: 'joe@example.com'
                 }
-                return typeof options.success === "function" ? options.success({
-                  userCtx: {
-                    name: 'joe@example.com'
-                  }
-                }) : void 0;
               });
               return this.promise = this.account.authenticate();
             });
@@ -159,17 +155,12 @@ define('specs/hoodie/account', ['mocks/hoodie', 'hoodie/account'], function(Hood
               return expect(this.promise).toBeResolvedWith('joe@example.com');
             });
           });
-          _when("authentication request is successful and returns `name: joe@example.com`", function() {
+          _when("authentication request is successful and returns `name: null`", function() {
             beforeEach(function() {
-              this.hoodie.request.andCallFake(function(type, path, options) {
-                if (options == null) {
-                  options = {};
+              this.request_defer.resolve({
+                userCtx: {
+                  name: null
                 }
-                return typeof options.success === "function" ? options.success({
-                  userCtx: {
-                    name: null
-                  }
-                }) : void 0;
               });
               this.account.username = 'joe@example.com';
               return this.promise = this.account.authenticate();
@@ -189,13 +180,8 @@ define('specs/hoodie/account', ['mocks/hoodie', 'hoodie/account'], function(Hood
           });
           return _when("authentication request has an error", function() {
             beforeEach(function() {
-              this.hoodie.request.andCallFake(function(type, path, options) {
-                if (options == null) {
-                  options = {};
-                }
-                return typeof options.error === "function" ? options.error({
-                  responseText: 'error data'
-                }) : void 0;
+              this.request_defer.reject({
+                responseText: 'error data'
               });
               return this.promise = this.account.authenticate();
             });
