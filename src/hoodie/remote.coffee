@@ -210,7 +210,7 @@ define 'hoodie/remote', ['hoodie/errors'], (ERROR) ->
 
     # valid couchDB doc attributes starting with an underscore
     _valid_special_attributes : [
-      '_id', '_rev', '_deleted', '_revisions'
+      '_id', '_rev', '_deleted', '_revisions', '_attachments'
     ]
   
   
@@ -331,7 +331,7 @@ define 'hoodie/remote', ['hoodie/errors'], (ERROR) ->
         if doc._deleted
           _destroyed_docs.push [doc, @hoodie.store.destroy(  doc.type, doc.id,      remote: true)]
         else                                                
-          _changed_docs.push   [doc, @hoodie.store.save(     doc.type, doc.id, doc, remote: true)]
+          _changed_docs.push   [doc, @hoodie.store.update(   doc.type, doc.id, doc, remote: true)]
       
       # 2. trigger events
       for [doc, promise] in _destroyed_docs

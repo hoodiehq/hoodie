@@ -22,6 +22,8 @@ define 'hoodie/config', ->
       @id         = options.id         if options.id
       
       @hoodie.store.load(@type, @id).done (obj) => @cache = obj
+
+      @hoodie.on 'account:signed_out', @clear
     
       
     # ## set
@@ -36,12 +38,9 @@ define 'hoodie/config', ->
       update = {}
       update[key] = value
       
-      if key.charAt(0) is '_'
-        # silent update
-        @hoodie.store.update @type, @id, update, silent: true
-      else
-        @hoodie.store.update @type, @id, update
-        
+      is_silent = key.charAt(0) is '_'
+      @hoodie.store.update @type, @id, update, silent: is_silent
+      
     
     # ## get
     #
@@ -49,6 +48,14 @@ define 'hoodie/config', ->
     #
     get : (key) -> 
       @cache[key]
+
+
+    # ## clear
+    #
+    # clears cache and removes object from store
+    clear : =>
+      @cache = {}
+      @hoodie.store.destroy @type, @id
     
     
     # ## remove

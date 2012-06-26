@@ -219,6 +219,7 @@ define('hoodie/account', function() {
 
     Account.prototype._handle_sign_in = function(username) {
       this.username = username;
+      console.log('_handle_sign_in', this.username);
       this.hoodie.config.set('_account.username', this.username);
       return this._authenticated = true;
     };

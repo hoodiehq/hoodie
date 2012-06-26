@@ -17,7 +17,7 @@ define('specs/hoodie/remote', ['hoodie/remote', 'mocks/hoodie', 'mocks/changes_r
           return cb('object_from_store');
         }
       });
-      return spyOn(this.hoodie.store, "save").andReturn({
+      return spyOn(this.hoodie.store, "update").andReturn({
         then: function(cb) {
           return cb('object_from_store', false);
         }
@@ -183,7 +183,7 @@ define('specs/hoodie/remote', ['hoodie/remote', 'mocks/hoodie', 'mocks/changes_r
         });
         it("should save `todo/abc2` in store", function() {
           this.remote.pull();
-          return expect(this.hoodie.store.save).wasCalledWith('todo', 'abc2', {
+          return expect(this.hoodie.store.update).wasCalledWith('todo', 'abc2', {
             _rev: '1-123',
             content: 'remember the milk',
             done: false,
@@ -403,7 +403,7 @@ define('specs/hoodie/remote', ['hoodie/remote', 'mocks/hoodie', 'mocks/changes_r
             new_edits = JSON.parse(this.options.data).new_edits;
             return expect(new_edits).toBe(false);
           });
-          it("should set new _revision ids", function() {
+          return it("should set new _revision ids", function() {
             var deleted_doc, docs, new_doc;
             docs = JSON.parse(this.options.data).docs;
             deleted_doc = docs[0], new_doc = docs[1];
@@ -414,13 +414,6 @@ define('specs/hoodie/remote', ['hoodie/remote', 'mocks/hoodie', 'mocks/changes_r
             expect(deleted_doc._revisions.ids[1]).toBe('123');
             expect(new_doc._revisions.start).toBe(1);
             return expect(new_doc._revisions.ids[0]).toBe('mock567#11');
-          });
-          return _and("push was successful", function() {
-            beforeEach(function() {
-              spyOn(this.hoodie.store, "update");
-              return this.request_defer.resolve();
-            });
-            return it("should update the docs in store", function() {});
           });
         });
         return _when("Array of docs passed", function() {

@@ -21,7 +21,12 @@ define 'specs/hoodie/config', ['mocks/hoodie', 'hoodie/config'], (HoodieMock, Co
       
       it "should save a $config with key: value", ->
         @config.set('funky', 'fresh')
-        expect(@hoodie.store.update).wasCalledWith '$config', 'hoodie', funky: 'fresh'
+        expect(@hoodie.store.update).wasCalledWith '$config', 'hoodie', {funky: 'fresh'}, silent: false
+
+      it "should make the save silent for local settings starting with _", ->
+        @config.set('_local', 'fresh')
+        expect(@hoodie.store.update).wasCalledWith '$config', 'hoodie', {_local: 'fresh'}, silent: true
+      
     # /.set(key, value)
     
     describe ".get(key)", ->
@@ -39,5 +44,5 @@ define 'specs/hoodie/config', ['mocks/hoodie', 'hoodie/config'], (HoodieMock, Co
         
       it "should remove the config using store", ->
         @config.remove('funky')
-        expect(@hoodie.store.update).wasCalledWith '$config', 'hoodie', funky: undefined
+        expect(@hoodie.store.update).wasCalledWith '$config', 'hoodie', {funky: undefined}, silent: false
     # /.remove(key)

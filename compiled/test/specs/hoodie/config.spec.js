@@ -22,10 +22,20 @@ define('specs/hoodie/config', ['mocks/hoodie', 'hoodie/config'], function(Hoodie
       beforeEach(function() {
         return spyOn(this.hoodie.store, "update");
       });
-      return it("should save a $config with key: value", function() {
+      it("should save a $config with key: value", function() {
         this.config.set('funky', 'fresh');
         return expect(this.hoodie.store.update).wasCalledWith('$config', 'hoodie', {
           funky: 'fresh'
+        }, {
+          silent: false
+        });
+      });
+      return it("should make the save silent for local settings starting with _", function() {
+        this.config.set('_local', 'fresh');
+        return expect(this.hoodie.store.update).wasCalledWith('$config', 'hoodie', {
+          _local: 'fresh'
+        }, {
+          silent: true
         });
       });
     });
@@ -48,6 +58,8 @@ define('specs/hoodie/config', ['mocks/hoodie', 'hoodie/config'], function(Hoodie
         this.config.remove('funky');
         return expect(this.hoodie.store.update).wasCalledWith('$config', 'hoodie', {
           funky: void 0
+        }, {
+          silent: false
         });
       });
     });

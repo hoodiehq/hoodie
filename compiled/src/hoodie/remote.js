@@ -176,7 +176,7 @@ define('hoodie/remote', ['hoodie/errors'], function(ERROR) {
       }
     };
 
-    Remote.prototype._valid_special_attributes = ['_id', '_rev', '_deleted', '_revisions'];
+    Remote.prototype._valid_special_attributes = ['_id', '_rev', '_deleted', '_revisions', '_attachments'];
 
     Remote.prototype._parse_for_remote = function(obj) {
       var attr, attributes;
@@ -266,7 +266,7 @@ define('hoodie/remote', ['hoodie/errors'], function(ERROR) {
           ]);
         } else {
           _changed_docs.push([
-            doc, this.hoodie.store.save(doc.type, doc.id, doc, {
+            doc, this.hoodie.store.update(doc.type, doc.id, doc, {
               remote: true
             })
           ]);

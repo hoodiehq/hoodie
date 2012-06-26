@@ -13,7 +13,7 @@ define 'specs/hoodie/remote', ['hoodie/remote', 'mocks/hoodie', 'mocks/changes_r
       
       spyOn(@hoodie, "trigger")
       spyOn(@hoodie.store, "destroy").andReturn then: (cb) -> cb('object_from_store')
-      spyOn(@hoodie.store, "save").andReturn    then: (cb) -> cb('object_from_store', false)
+      spyOn(@hoodie.store, "update").andReturn  then: (cb) -> cb('object_from_store', false)
     
     
     describe ".constructor(@hoodie, options = {})", ->
@@ -152,7 +152,7 @@ define 'specs/hoodie/remote', ['hoodie/remote', 'mocks/hoodie', 'mocks/changes_r
   
         it "should save `todo/abc2` in store", ->
           @remote.pull()
-          expect(@hoodie.store.save).wasCalledWith 'todo', 'abc2', { _rev : '1-123', content : 'remember the milk', done : false, order : 1, type : 'todo', id : 'abc2' }, { remote : true }
+          expect(@hoodie.store.update).wasCalledWith 'todo', 'abc2', { _rev : '1-123', content : 'remember the milk', done : false, order : 1, type : 'todo', id : 'abc2' }, { remote : true }
         
         it "should trigger remote events", ->
           @remote.pull()
@@ -340,16 +340,6 @@ define 'specs/hoodie/remote', ['hoodie/remote', 'mocks/hoodie', 'mocks/changes_r
 
             expect(new_doc._revisions.start).toBe 1
             expect(new_doc._revisions.ids[0]).toBe 'mock567#11'
-
-          _and "push was successful", ->
-            beforeEach ->
-              spyOn(@hoodie.store, "update")
-              @request_defer.resolve()
-
-            it "should update the docs in store", ->
-              
-            
-            
         
         _when "Array of docs passed", ->
           beforeEach ->
