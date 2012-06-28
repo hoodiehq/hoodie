@@ -6,9 +6,10 @@ Setup
 -----
 
 ```javascript
-Hoodie = require('hoodie')
 couchDB_endpoint = 'http://worlddominatorapp.iriscouch.com';
-app = new Hoodie(couchDB_endpoint);
+new Hoodie(couchDB_endpoint).ready( function(hoodie) {
+  // use your hoodie here
+})
 ```
 
 
