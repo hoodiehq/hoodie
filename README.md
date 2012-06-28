@@ -48,6 +48,7 @@ app.account.sign_in('joe@example.com', 'secret')
   } ) 
 ```
 
+
 ### Change password
 
 ```javascript
@@ -56,6 +57,7 @@ app.account.change_password('current_secret', 'new_secret')
   .done( function(user) { } ) 
   .fail( function(err)  { } )
 ```
+
 
 ### Sign Out
 
