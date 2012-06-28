@@ -31,8 +31,12 @@ will take over.</p></li>
   
   
   <span class="k">class</span> <span class="nx">Sharing</span>
+  
   </pre></div>             </td>           </tr>                               <tr id="section-3">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-3">&#182;</a>               </div>               <h2>Constructor</h2>             </td>             <td class="code">               <div class="highlight"><pre>    <span class="nv">constructor : </span><span class="nf">(@hoodie) -&gt;</span>
-      </pre></div>             </td>           </tr>                               <tr id="section-4">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-4">&#182;</a>               </div>               <p>give all Sharing instances access to our core hoodie</p>             </td>             <td class="code">               <div class="highlight"><pre>      <span class="nv">SharingInstance.hoodie = </span><span class="nx">@hoodie</span>
+      </pre></div>             </td>           </tr>                               <tr id="section-4">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-4">&#182;</a>               </div>               <p>give all Sharing instances access to our core hoodie
+as sharings use custom hoodies, as long as the user
+has no account yet</p>             </td>             <td class="code">               <div class="highlight"><pre>      <span class="nv">SharingInstance.hoodie = </span><span class="nx">@hoodie</span>
+      
       </pre></div>             </td>           </tr>                               <tr id="section-5">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-5">&#182;</a>               </div>               <h2>create</h2>
 
 <p>creates a new sharing &amp; returns a promise.
@@ -40,9 +44,8 @@ Options</p>
 
 <pre><code>id:            (optional, defaults to random uuid)
                name of sharing.
-filters:       (optional)
-               one or multiple key/value hashes with conditions 
-               for the objects to be filtered.
+objects:       (optional)
+               array of objects that should be shared
 private:       (default: false)
                when set to true, nobody but the creator and the
                invitees have access. Set to true automatically
@@ -70,30 +73,49 @@ hoodie.sharing.create
     "joey@example.com"
     "frank@example.com"
   ]
-  filters   : [
-    id           : todo_list.id
-    todo_list_id : todo_list.id
+  objects : [
+    todo_list, todo1, todo2, todo3
   ]
 
 # share all my documents that I marked as
 # shared and keep them updated
 hoodie.sharing.create
   continuous : true
-  filters     : shared: true
+  objects    : hoodie.store.loadAll (obj) -&gt; obj.is_shared
 </code></pre>             </td>             <td class="code">               <div class="highlight"><pre>    <span class="nv">create : </span><span class="nf">(options = {}) -&gt;</span>
-      <span class="nx">SharingInstance</span><span class="p">.</span><span class="nx">create</span> <span class="nx">options</span>
+      <span class="nv">sharing = </span><span class="k">new</span> <span class="nx">SharingInstance</span> <span class="nx">options</span>
+      <span class="nx">sharing</span><span class="p">.</span><span class="nx">save</span><span class="p">()</span>
+      
     </pre></div>             </td>           </tr>                               <tr id="section-6">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-6">&#182;</a>               </div>               <h2>load</h2>
 
 <p>load an existing sharing</p>             </td>             <td class="code">               <div class="highlight"><pre>    <span class="nv">load : </span><span class="nf">(id) -&gt;</span>
-      <span class="nx">SharingInstance</span><span class="p">.</span><span class="nx">load</span> <span class="nx">id</span>
-    </pre></div>             </td>           </tr>                               <tr id="section-7">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-7">&#182;</a>               </div>               <h2>destroy</h2>
+      <span class="nx">@hoodie</span><span class="p">.</span><span class="nx">store</span><span class="p">.</span><span class="nx">load</span><span class="p">(</span><span class="s1">&#39;$sharing&#39;</span><span class="p">,</span> <span class="nx">id</span><span class="p">).</span><span class="nx">pipe</span> <span class="p">(</span><span class="nx">obj</span><span class="p">)</span> <span class="o">=&gt;</span>
+        <span class="k">new</span> <span class="nx">SharingInstance</span> <span class="nx">obj</span>
+    
+    </pre></div>             </td>           </tr>                               <tr id="section-7">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-7">&#182;</a>               </div>               <h2>find or create</h2>
 
-<p>deletes an existing sharing</p>             </td>             <td class="code">               <div class="highlight"><pre>    <span class="nv">destroy: </span><span class="nf">(id) -&gt;</span>
-      <span class="nx">SharingInstance</span><span class="p">.</span><span class="nx">destroy</span> <span class="nx">id</span>
-      </pre></div>             </td>           </tr>                               <tr id="section-8">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-8">&#182;</a>               </div>               <h2>open</h2>
+<ol>
+<li>Try to find a sharing by given id</li>
+<li>If sharing could be found, return it</li>
+<li>If not, create one and return it.</li>
+</ol>             </td>             <td class="code">               <div class="highlight"><pre>    <span class="nv">find_or_create : </span><span class="nf">(options) -&gt;</span>
+      <span class="nv">defer = </span><span class="nx">@hoodie</span><span class="p">.</span><span class="nx">defer</span><span class="p">()</span>
+      <span class="nx">@load</span><span class="p">(</span><span class="nx">options</span><span class="p">.</span><span class="nx">id</span><span class="p">)</span>
+      <span class="p">.</span><span class="nx">done</span> <span class="nf">(sharing) -&gt;</span>
+        <span class="nx">defer</span><span class="p">.</span><span class="nx">resolve</span> <span class="nx">sharing</span>
+      <span class="p">.</span><span class="nx">fail</span> <span class="o">=&gt;</span> 
+        <span class="nx">@create</span><span class="p">(</span><span class="nx">options</span><span class="p">).</span><span class="k">then</span> <span class="nx">defer</span><span class="p">.</span><span class="nx">resolve</span><span class="p">,</span> <span class="nx">defer</span><span class="p">.</span><span class="nx">reject</span> 
+    
+      <span class="k">return</span> <span class="nx">defer</span><span class="p">.</span><span class="nx">promise</span><span class="p">()</span>
+    
+    </pre></div>             </td>           </tr>                               <tr id="section-8">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-8">&#182;</a>               </div>               <h2>destroy</h2>
 
-<p>Copy all data of a sharing to own database</p>             </td>             <td class="code">               <div class="highlight"><pre>    <span class="nv">open: </span><span class="nf">(id, options = {}) -&gt;</span>
-      
-    </pre></div>             </td>           </tr>                               <tr id="section-9">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-9">&#182;</a>               </div>               <p>alias</p>             </td>             <td class="code">               <div class="highlight"><pre>    <span class="k">delete</span><span class="o">:</span> <span class="err">@</span><span class="o">::</span><span class="nx">destroy</span>
+<p>deletes an existing sharing</p>             </td>             <td class="code">               <div class="highlight"><pre>    <span class="nv">destroy : </span><span class="nf">(id) -&gt;</span>
+      <span class="nx">@load</span><span class="p">(</span><span class="nx">id</span><span class="p">).</span><span class="nx">pipe</span> <span class="p">(</span><span class="nx">obj</span><span class="p">)</span> <span class="o">=&gt;</span>
+        <span class="nv">sharing = </span><span class="k">new</span> <span class="nx">SharingInstance</span> <span class="nx">obj</span>
+        <span class="nx">sharing</span><span class="p">.</span><span class="nx">destroy</span><span class="p">()</span>
+      </pre></div>             </td>           </tr>                               <tr id="section-9">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-9">&#182;</a>               </div>               <p>alias</p>             </td>             <td class="code">               <div class="highlight"><pre>    <span class="k">delete</span> <span class="o">:</span> <span class="err">@</span><span class="o">::</span><span class="nx">destroy</span>
+    
+    </pre></div>             </td>           </tr>                               <tr id="section-10">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-10">&#182;</a>               </div>               <h2>open</h2>
 
-</pre></div>             </td>           </tr>                </tbody>     </table>   </div> </body> </html> 
+<p>Copy all data of a sharing to own database</p>             </td>             <td class="code">               <div class="highlight"><pre>    <span class="nv">open : </span><span class="nf">(id, options = {}) -&gt;</span></pre></div>             </td>           </tr>                               <tr id="section-11">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-11">&#182;</a>               </div>               <p>tbd ...</p>             </td>             <td class="code">               <div class="highlight"><pre></pre></div>             </td>           </tr>                </tbody>     </table>   </div> </body> </html> 

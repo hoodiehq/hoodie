@@ -4,28 +4,38 @@
     </pre></div>             </td>           </tr>                               <tr id="section-3">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-3">&#182;</a>               </div>               <p>used as attribute name in localStorage</p>             </td>             <td class="code">               <div class="highlight"><pre>    <span class="nv">type : </span><span class="s1">&#39;$config&#39;</span>
     <span class="nv">id   : </span><span class="s1">&#39;hoodie&#39;</span>
     </pre></div>             </td>           </tr>                               <tr id="section-4">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-4">&#182;</a>               </div>               <p>memory cache</p>             </td>             <td class="code">               <div class="highlight"><pre>    <span class="nv">cache : </span><span class="p">{}</span>
-    
     </pre></div>             </td>           </tr>                               <tr id="section-5">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-5">&#182;</a>               </div>               <h2>Constructor</h2>             </td>             <td class="code">               <div class="highlight"><pre>    <span class="nv">constructor : </span><span class="nf">(@hoodie, options = {}) -&gt;</span>
-      <span class="vi">@type   = </span><span class="nx">options</span><span class="p">.</span><span class="nx">type</span> <span class="k">if</span> <span class="nx">options</span><span class="p">.</span><span class="nx">type</span>
-      <span class="vi">@id     = </span><span class="nx">options</span><span class="p">.</span><span class="nx">id</span>   <span class="k">if</span> <span class="nx">options</span><span class="p">.</span><span class="nx">id</span>
+      <span class="vi">@type       = </span><span class="nx">options</span><span class="p">.</span><span class="nx">type</span>       <span class="k">if</span> <span class="nx">options</span><span class="p">.</span><span class="nx">type</span>
+      <span class="vi">@id         = </span><span class="nx">options</span><span class="p">.</span><span class="nx">id</span>         <span class="k">if</span> <span class="nx">options</span><span class="p">.</span><span class="nx">id</span>
+      
       <span class="nx">@hoodie</span><span class="p">.</span><span class="nx">store</span><span class="p">.</span><span class="nx">load</span><span class="p">(</span><span class="nx">@type</span><span class="p">,</span> <span class="nx">@id</span><span class="p">).</span><span class="nx">done</span> <span class="p">(</span><span class="nx">obj</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="vi">@cache = </span><span class="nx">obj</span>
+
+      <span class="nx">@hoodie</span><span class="p">.</span><span class="kc">on</span> <span class="s1">&#39;account:signed_out&#39;</span><span class="p">,</span> <span class="nx">@clear</span>
     
       </pre></div>             </td>           </tr>                               <tr id="section-6">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-6">&#182;</a>               </div>               <h2>set</h2>
 
 <p>adds a configuration</p>             </td>             <td class="code">               <div class="highlight"><pre>    <span class="nv">set : </span><span class="nf">(key, value) -&gt;</span>
+      <span class="k">return</span> <span class="k">if</span> <span class="nx">@cache</span><span class="p">[</span><span class="nx">key</span><span class="p">]</span> <span class="o">is</span> <span class="nx">value</span>
+      
+      <span class="nx">@cache</span><span class="p">[</span><span class="nx">key</span><span class="p">]</span> <span class="o">=</span> <span class="nx">value</span>
+      
       <span class="nv">update = </span><span class="p">{}</span>
       <span class="nx">update</span><span class="p">[</span><span class="nx">key</span><span class="p">]</span> <span class="o">=</span> <span class="nx">value</span>
-      <span class="nx">@hoodie</span><span class="p">.</span><span class="nx">store</span><span class="p">.</span><span class="nx">update</span> <span class="nx">@type</span><span class="p">,</span> <span class="nx">@id</span><span class="p">,</span> <span class="nx">update</span>
-      <span class="nx">@cache</span><span class="p">[</span><span class="nx">key</span><span class="p">]</span> <span class="o">=</span> <span class="nx">value</span>
+      
+      <span class="nv">is_silent = </span><span class="nx">key</span><span class="p">.</span><span class="nx">charAt</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span> <span class="o">is</span> <span class="s1">&#39;_&#39;</span>
+      <span class="nx">@hoodie</span><span class="p">.</span><span class="nx">store</span><span class="p">.</span><span class="nx">update</span> <span class="nx">@type</span><span class="p">,</span> <span class="nx">@id</span><span class="p">,</span> <span class="nx">update</span><span class="p">,</span> <span class="nv">silent: </span><span class="nx">is_silent</span>
       
     </pre></div>             </td>           </tr>                               <tr id="section-7">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-7">&#182;</a>               </div>               <h2>get</h2>
 
-<p>receives a configuration</p>             </td>             <td class="code">               <div class="highlight"><pre>    <span class="nv">get : </span><span class="nf">(key) -&gt;</span>
-      <span class="k">return</span> <span class="nx">@cache</span><span class="p">[</span><span class="nx">key</span><span class="p">]</span> <span class="k">if</span> <span class="nx">@cache</span><span class="p">[</span><span class="nx">key</span><span class="p">]</span>
-      
-    </pre></div>             </td>           </tr>                               <tr id="section-8">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-8">&#182;</a>               </div>               <h2>remove</h2>
+<p>receives a configuration</p>             </td>             <td class="code">               <div class="highlight"><pre>    <span class="nv">get : </span><span class="nf">(key) -&gt;</span> 
+      <span class="nx">@cache</span><span class="p">[</span><span class="nx">key</span><span class="p">]</span></pre></div>             </td>           </tr>                               <tr id="section-8">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-8">&#182;</a>               </div>               <h2>clear</h2>
+
+<p>clears cache and removes object from store</p>             </td>             <td class="code">               <div class="highlight"><pre>    <span class="nv">clear : </span><span class="o">=&gt;</span>
+      <span class="vi">@cache = </span><span class="p">{}</span>
+      <span class="nx">@hoodie</span><span class="p">.</span><span class="nx">store</span><span class="p">.</span><span class="nx">destroy</span> <span class="nx">@type</span><span class="p">,</span> <span class="nx">@id</span>
+    
+    </pre></div>             </td>           </tr>                               <tr id="section-9">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-9">&#182;</a>               </div>               <h2>remove</h2>
 
 <p>removes a configuration, is a simple alias for config.set(key, undefined)</p>             </td>             <td class="code">               <div class="highlight"><pre>    <span class="nv">remove : </span><span class="err">@</span><span class="o">::</span><span class="nx">set</span>
-    
 
 </pre></div>             </td>           </tr>                </tbody>     </table>   </div> </body> </html> 
