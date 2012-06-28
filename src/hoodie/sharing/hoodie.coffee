@@ -1,5 +1,5 @@
 define 'hoodie/sharing/hoodie', ['hoodie'], (Hoodie) ->
-      
+  
   # ## SharingHoodie
   #
   # SharingHoodie is a subset of the original Hoodie class and used for

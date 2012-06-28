@@ -192,7 +192,7 @@ define('hoodie/store', ['hoodie/errors'], function(ERROR) {
     };
 
     Store.prototype.loadAll = function(filter) {
-      var current_type, defer, id, key, keys, obj, results;
+      var current_type, defer, id, key, keys, obj, results, type;
       if (filter == null) {
         filter = function() {
           return true;
@@ -200,6 +200,12 @@ define('hoodie/store', ['hoodie/errors'], function(ERROR) {
       }
       defer = this.hoodie.defer();
       keys = this._index();
+      if (typeof filter === 'string') {
+        type = filter;
+        filter = function(obj) {
+          return obj.type === type;
+        };
+      }
       try {
         results = (function() {
           var _i, _len, _ref, _results;
@@ -417,7 +423,7 @@ define('hoodie/store', ['hoodie/errors'], function(ERROR) {
     };
 
     Store.prototype._is_valid_id = function(key) {
-      return /^[a-z0-9]+$/.test(key);
+      return /^[a-z0-9\-]+$/.test(key);
     };
 
     Store.prototype._is_valid_type = function(key) {

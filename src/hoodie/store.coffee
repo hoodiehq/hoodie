@@ -204,15 +204,21 @@ define 'hoodie/store', ['hoodie/errors'], (ERROR) ->
     # ## loadAll
     #
     # returns all objects from store. 
-    # Can be optionally filtered by passed function
+    # Can be optionally filtered by a type or a function
     #
     # example usage:
     #
     #     store.loadAll()
+    #     store.loadAll('car')
     #     store.loadAll(function(obj) { return obj.brand == 'Tesla' })
     loadAll: (filter = -> true) ->
       defer = @hoodie.defer()
       keys = @_index()
+
+      # t
+      if typeof filter is 'string'
+        type   = filter
+        filter = (obj) -> obj.type is type
     
       try
         # coffeescript gathers the result of the respective for key in keys loops
@@ -451,7 +457,7 @@ define 'hoodie/store', ['hoodie/errors'], (ERROR) ->
   
     # only lowercase letters and numbers are allowed for ids
     _is_valid_id : (key) ->
-      /^[a-z0-9]+$/.test key
+      /^[a-z0-9\-]+$/.test key
       
     # just like ids, but must start with a letter or a $ (internal types)
     _is_valid_type : (key) ->

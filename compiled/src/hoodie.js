@@ -3,6 +3,27 @@ var __hasProp = {}.hasOwnProperty,
   __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; },
   __slice = [].slice;
 
+window.Hoodie = (function() {
+
+  function Hoodie(url) {
+    this.url = url;
+  }
+
+  Hoodie.prototype.ready = function(cb) {
+    var _this = this;
+    return requirejs(['hoodie'], function(Hoodie) {
+      var hoodie;
+      hoodie = new Hoodie(_this.url);
+      return hoodie.ready(function() {
+        return cb(hoodie);
+      });
+    });
+  };
+
+  return Hoodie;
+
+})();
+
 define('hoodie', ['hoodie/events'], function(Events) {
   var Hoodie;
   return Hoodie = (function(_super) {

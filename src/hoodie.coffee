@@ -1,3 +1,15 @@
+# convenience shortcut:
+# new Hoodie('http://localhost:9292/localhost:5984').ready( function(hoodie) {
+#   // do something with your hoodie yo!      
+# });
+class window.Hoodie
+  constructor: (@url) ->
+  
+  ready: (cb) ->
+    requirejs ['hoodie'], (Hoodie) =>
+      hoodie = new Hoodie @url
+      hoodie.ready -> cb(hoodie)
+
 #
 # Hoodie
 # --------
@@ -66,3 +78,4 @@ define 'hoodie', ['hoodie/events'], (Events) ->
           
         cb(this) while cb = @_ready_callbacks.shift()
         @_ready = true
+
