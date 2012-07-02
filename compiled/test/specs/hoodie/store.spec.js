@@ -208,10 +208,10 @@ define('specs/hoodie/store', ['hoodie/store', 'mocks/hoodie'], function(Store, H
         }
         return _results;
       });
-      it("should allow numbers and lowercase letters for for id only", function() {
+      it("should allow numbers, lowercase letters and dashes for for id only", function() {
         var invalid, key, promise, valid, _i, _j, _len, _len1, _results;
         invalid = ['UPPERCASE', 'under_lines', '-?&$'];
-        valid = ['abc4567', '1', 123];
+        valid = ['abc4567', '1', 123, 'abc-567'];
         for (_i = 0, _len = invalid.length; _i < _len; _i++) {
           key = invalid[_i];
           promise = this.store.save('valid', key, {});

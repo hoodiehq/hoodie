@@ -150,9 +150,9 @@ define 'specs/hoodie/store', ['hoodie/store', 'mocks/hoodie'], (Store, HoodieMoc
           promise = @store.save key, 'valid', {}
           expect(promise).toBeResolved()
       
-      it "should allow numbers and lowercase letters for for id only", ->
+      it "should allow numbers, lowercase letters and dashes for for id only", ->
         invalid = ['UPPERCASE', 'under_lines', '-?&$']
-        valid   = ['abc4567', '1', 123]
+        valid   = ['abc4567', '1', 123, 'abc-567']
     
         for key in invalid
           promise = @store.save 'valid', key, {}

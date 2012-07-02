@@ -11,7 +11,7 @@ window.Hoodie = (function() {
 
   Hoodie.prototype.ready = function(cb) {
     var _this = this;
-    return requirejs(['hoodie'], function(Hoodie) {
+    return require(['hoodie'], function(Hoodie) {
       var hoodie;
       hoodie = new Hoodie(_this.url);
       return hoodie.ready(function() {

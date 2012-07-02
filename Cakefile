@@ -45,8 +45,8 @@ task 'test', 'test', ->
 task 'autotest', 'autotest', ->
   build( test, true)
   
-task 'build', 'build hoodie-client.min.js', ->
-  build = spawn 'r.js', ['-o', 'name=hoodie', 'optimize=none', 'wrap.start=(function() {', 'wrap.end=}())', 'baseUrl=./compiled/src', 'paths.requireLib=../../vendor/require-1.0.7', 'out=hoodie.min.js', 'include=requireLib,hoodie,hoodie/store,hoodie/config,hoodie/account,hoodie/remote,hoodie/email,hoodie/sharing,hoodie/sharing/account,hoodie/sharing/remote']
+task 'build', 'build hoodie-client.min.js', -> 
+  build = spawn 'r.js', ['-o', 'name=hoodie', 'optimize=none', 'wrap.start=(function() {', 'wrap.end=}())', 'baseUrl=./compiled/src', 'paths.requireLib=../../vendor/require-1.0.7', 'out=hoodie.min.js', 'include=requireLib,hoodie,test,hoodie/store,hoodie/config,hoodie/account,hoodie/remote,hoodie/email,hoodie/sharing,hoodie/sharing/account,hoodie/sharing/remote']
   build.stdout.on 'data', (data) -> print data.toString()
   # build.stderr.on 'data', (data) -> print data.toString()
   build.on 'exit', (status) -> callback?() if status is 0

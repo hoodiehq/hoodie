@@ -455,7 +455,7 @@ define 'hoodie/store', ['hoodie/errors'], (ERROR) ->
     #
     _now : -> new Date
   
-    # only lowercase letters and numbers are allowed for ids
+    # only lowercase letters, numbers and dashes are allowed for ids
     _is_valid_id : (key) ->
       /^[a-z0-9\-]+$/.test key
       

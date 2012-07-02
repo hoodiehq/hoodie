@@ -3,12 +3,14 @@
 #   // do something with your hoodie yo!      
 # });
 class window.Hoodie
+
   constructor: (@url) ->
-  
+
   ready: (cb) ->
-    requirejs ['hoodie'], (Hoodie) =>
+    require ['hoodie'], (Hoodie) =>
       hoodie = new Hoodie @url
       hoodie.ready -> cb(hoodie)
+
 
 #
 # Hoodie
@@ -78,4 +80,3 @@ define 'hoodie', ['hoodie/events'], (Events) ->
           
         cb(this) while cb = @_ready_callbacks.shift()
         @_ready = true
-
