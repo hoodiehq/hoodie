@@ -1,4 +1,4 @@
-<!DOCTYPE html>  <html> <head>   <title>events.coffee</title>   <meta http-equiv="content-type" content="text/html; charset=UTF-8">   <link rel="stylesheet" media="all" href="docco.css" /> </head> <body>   <div id="container">     <div id="background"></div>            <div id="jump_to">         Jump To &hellip;         <div id="jump_wrapper">           <div id="jump_page">                                           <a class="source" href="account.html">                 account.coffee               </a>                                           <a class="source" href="config.html">                 config.coffee               </a>                                           <a class="source" href="email.html">                 email.coffee               </a>                                           <a class="source" href="errors.html">                 errors.coffee               </a>                                           <a class="source" href="events.html">                 events.coffee               </a>                                           <a class="source" href="remote.html">                 remote.coffee               </a>                                           <a class="source" href="sharing.html">                 sharing.coffee               </a>                                           <a class="source" href="store.html">                 store.coffee               </a>                        </div>         </div>       </div>          <table cellpadding="0" cellspacing="0">       <thead>         <tr>           <th class="docs">             <h1>               events.coffee             </h1>           </th>           <th class="code">           </th>         </tr>       </thead>       <tbody>                               <tr id="section-1">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-1">&#182;</a>               </div>               <h2>Events</h2>
+<!DOCTYPE html>  <html> <head>   <title>events.coffee</title>   <meta http-equiv="content-type" content="text/html; charset=UTF-8">   <link rel="stylesheet" media="all" href="docco.css" /> </head> <body>   <div id="container">     <div id="background"></div>            <div id="jump_to">         Jump To &hellip;         <div id="jump_wrapper">           <div id="jump_page">                                           <a class="source" href="events.html">                 events.coffee               </a>                                           <a class="source" href="hoodie.html">                 hoodie.coffee               </a>                        </div>         </div>       </div>          <table cellpadding="0" cellspacing="0">       <thead>         <tr>           <th class="docs">             <h1>               events.coffee             </h1>           </th>           <th class="code">           </th>         </tr>       </thead>       <tbody>                               <tr id="section-1">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-1">&#182;</a>               </div>               <h2>Events</h2>
 
 <p>extend any Class with support for</p>
 
@@ -9,43 +9,41 @@
 <li><code>object.one('ev', cb)</code></li>
 </ul>
 
-<p>based on <a href="https://github.com/maccman/spine/blob/master/src/spine.coffee#L1">Events implementations from Spine</a></p>             </td>             <td class="code">               <div class="highlight"><pre><span class="nx">define</span> <span class="s1">&#39;hoodie/events&#39;</span><span class="p">,</span> <span class="o">-&gt;</span>
-  </pre></div>             </td>           </tr>                               <tr id="section-2">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-2">&#182;</a>               </div>               <p>'use strict'</p>             </td>             <td class="code">               <div class="highlight"><pre>  
-  <span class="k">class</span> <span class="nx">Events</span></pre></div>             </td>           </tr>                               <tr id="section-3">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-3">&#182;</a>               </div>               <h2>Bind</h2>
+<p>based on <a href="https://github.com/maccman/spine/blob/master/src/spine.coffee#L1">Events implementations from Spine</a></p>             </td>             <td class="code">               <div class="highlight"><pre>  
+<span class="k">class</span> <span class="nx">Events</span></pre></div>             </td>           </tr>                               <tr id="section-2">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-2">&#182;</a>               </div>               <h2>Bind</h2>
 
 <p>bind a callback to an event triggerd by the object</p>
 
 <pre><code>object.bind 'cheat', blame
-</code></pre>             </td>             <td class="code">               <div class="highlight"><pre>    <span class="nv">bind: </span><span class="nf">(ev, callback) -&gt;</span>
-      <span class="nv">evs   = </span><span class="nx">ev</span><span class="p">.</span><span class="nx">split</span><span class="p">(</span><span class="s1">&#39; &#39;</span><span class="p">)</span>
-      <span class="nv">calls = </span><span class="nx">@hasOwnProperty</span><span class="p">(</span><span class="s1">&#39;_callbacks&#39;</span><span class="p">)</span> <span class="o">and</span> <span class="nx">@_callbacks</span> <span class="o">or=</span> <span class="p">{}</span>
+</code></pre>             </td>             <td class="code">               <div class="highlight"><pre>  <span class="nv">bind: </span><span class="nf">(ev, callback) -&gt;</span>
+    <span class="nv">evs   = </span><span class="nx">ev</span><span class="p">.</span><span class="nx">split</span><span class="p">(</span><span class="s1">&#39; &#39;</span><span class="p">)</span>
+    <span class="nv">calls = </span><span class="nx">@hasOwnProperty</span><span class="p">(</span><span class="s1">&#39;_callbacks&#39;</span><span class="p">)</span> <span class="o">and</span> <span class="nx">@_callbacks</span> <span class="o">or=</span> <span class="p">{}</span>
 
-      <span class="k">for</span> <span class="nx">name</span> <span class="k">in</span> <span class="nx">evs</span>
-        <span class="nx">calls</span><span class="p">[</span><span class="nx">name</span><span class="p">]</span> <span class="o">or=</span> <span class="p">[]</span>
-        <span class="nx">calls</span><span class="p">[</span><span class="nx">name</span><span class="p">].</span><span class="nx">push</span><span class="p">(</span><span class="nx">callback</span><span class="p">)</span>
-    </pre></div>             </td>           </tr>                               <tr id="section-4">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-4">&#182;</a>               </div>               <p>alias</p>             </td>             <td class="code">               <div class="highlight"><pre>    <span class="kc">on</span><span class="o">:</span> <span class="err">@</span><span class="o">::</span><span class="nx">bind</span></pre></div>             </td>           </tr>                               <tr id="section-5">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-5">&#182;</a>               </div>               <h2>one</h2>
+    <span class="k">for</span> <span class="nx">name</span> <span class="k">in</span> <span class="nx">evs</span>
+      <span class="nx">calls</span><span class="p">[</span><span class="nx">name</span><span class="p">]</span> <span class="o">or=</span> <span class="p">[]</span>
+      <span class="nx">calls</span><span class="p">[</span><span class="nx">name</span><span class="p">].</span><span class="nx">push</span><span class="p">(</span><span class="nx">callback</span><span class="p">)</span>
+  </pre></div>             </td>           </tr>                               <tr id="section-3">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-3">&#182;</a>               </div>               <p>alias</p>             </td>             <td class="code">               <div class="highlight"><pre>  <span class="kc">on</span><span class="o">:</span> <span class="err">@</span><span class="o">::</span><span class="nx">bind</span></pre></div>             </td>           </tr>                               <tr id="section-4">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-4">&#182;</a>               </div>               <h2>one</h2>
 
 <p>same as <code>bind</code>, but does get executed only once</p>
 
 <pre><code>object.one 'ground_touch', game_over
-</code></pre>             </td>             <td class="code">               <div class="highlight"><pre>    <span class="nv">one: </span><span class="nf">(ev, callback) -&gt;</span>
-      <span class="nx">@bind</span> <span class="nx">ev</span><span class="p">,</span> <span class="o">-&gt;</span>
-        <span class="nx">@unbind</span><span class="p">(</span><span class="nx">ev</span><span class="p">,</span> <span class="nx">arguments</span><span class="p">.</span><span class="nx">callee</span><span class="p">)</span>
-        <span class="nx">callback</span><span class="p">.</span><span class="nx">apply</span><span class="p">(</span><span class="err">@</span><span class="p">,</span> <span class="nx">arguments</span><span class="p">)</span></pre></div>             </td>           </tr>                               <tr id="section-6">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-6">&#182;</a>               </div>               <h2>trigger</h2>
+</code></pre>             </td>             <td class="code">               <div class="highlight"><pre>  <span class="nv">one: </span><span class="nf">(ev, callback) -&gt;</span>
+    <span class="nx">@bind</span> <span class="nx">ev</span><span class="p">,</span> <span class="o">-&gt;</span>
+      <span class="nx">@unbind</span><span class="p">(</span><span class="nx">ev</span><span class="p">,</span> <span class="nx">arguments</span><span class="p">.</span><span class="nx">callee</span><span class="p">)</span>
+      <span class="nx">callback</span><span class="p">.</span><span class="nx">apply</span><span class="p">(</span><span class="err">@</span><span class="p">,</span> <span class="nx">arguments</span><span class="p">)</span></pre></div>             </td>           </tr>                               <tr id="section-5">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-5">&#182;</a>               </div>               <h2>trigger</h2>
 
 <p>trigger an event and pass optional parameters for binding.</p>
 
 <pre><code>object.trigger 'win', score: 1230
-</code></pre>             </td>             <td class="code">               <div class="highlight"><pre>    <span class="nv">trigger: </span><span class="nf">(args...) -&gt;</span>
-      <span class="nv">ev = </span><span class="nx">args</span><span class="p">.</span><span class="nx">shift</span><span class="p">()</span>
+</code></pre>             </td>             <td class="code">               <div class="highlight"><pre>  <span class="nv">trigger: </span><span class="nf">(args...) -&gt;</span>
+    <span class="nv">ev = </span><span class="nx">args</span><span class="p">.</span><span class="nx">shift</span><span class="p">()</span>
 
-      <span class="nv">list = </span><span class="nx">@hasOwnProperty</span><span class="p">(</span><span class="s1">&#39;_callbacks&#39;</span><span class="p">)</span> <span class="o">and</span> <span class="nx">@_callbacks</span><span class="o">?</span><span class="p">[</span><span class="nx">ev</span><span class="p">]</span>
-      <span class="k">return</span> <span class="nx">unless</span> <span class="nx">list</span>
+    <span class="nv">list = </span><span class="nx">@hasOwnProperty</span><span class="p">(</span><span class="s1">&#39;_callbacks&#39;</span><span class="p">)</span> <span class="o">and</span> <span class="nx">@_callbacks</span><span class="o">?</span><span class="p">[</span><span class="nx">ev</span><span class="p">]</span>
+    <span class="k">return</span> <span class="nx">unless</span> <span class="nx">list</span>
 
-      <span class="nx">callback</span><span class="p">.</span><span class="nx">apply</span><span class="p">(</span><span class="err">@</span><span class="p">,</span> <span class="nx">args</span><span class="p">)</span> <span class="k">for</span> <span class="nx">callback</span> <span class="k">in</span> <span class="nx">list</span>
-        
-      <span class="k">return</span> <span class="kc">true</span>
- </pre></div>             </td>           </tr>                               <tr id="section-7">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-7">&#182;</a>               </div>               <h2>unbind</h2>
+    <span class="nx">callback</span><span class="p">.</span><span class="nx">apply</span><span class="p">(</span><span class="err">@</span><span class="p">,</span> <span class="nx">args</span><span class="p">)</span> <span class="k">for</span> <span class="nx">callback</span> <span class="k">in</span> <span class="nx">list</span>
+      
+    <span class="k">return</span> <span class="kc">true</span></pre></div>             </td>           </tr>                               <tr id="section-6">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-6">&#182;</a>               </div>               <h2>unbind</h2>
 
 <p>unbind to from all bindings, from all bindings of a specific event
 or from a specific binding.</p>
@@ -53,24 +51,24 @@ or from a specific binding.</p>
 <pre><code>object.unbind()
 object.unbind 'move'
 object.unbind 'move', follow
-</code></pre>             </td>             <td class="code">               <div class="highlight"><pre>    <span class="nv">unbind: </span><span class="nf">(ev, callback) -&gt;</span>
-      <span class="nx">unless</span> <span class="nx">ev</span>
-        <span class="vi">@_callbacks = </span><span class="p">{}</span>
-        <span class="k">return</span> <span class="k">this</span>
-
-      <span class="nv">list = </span><span class="nx">@_callbacks</span><span class="o">?</span><span class="p">[</span><span class="nx">ev</span><span class="p">]</span>
-      <span class="k">return</span> <span class="k">this</span> <span class="nx">unless</span> <span class="nx">list</span>
-
-      <span class="nx">unless</span> <span class="nx">callback</span>
-        <span class="k">delete</span> <span class="nx">@_callbacks</span><span class="p">[</span><span class="nx">ev</span><span class="p">]</span>
-        <span class="k">return</span> <span class="k">this</span>
-
-      <span class="k">for</span> <span class="nx">cb</span><span class="p">,</span> <span class="nx">i</span> <span class="k">in</span> <span class="nx">list</span> <span class="k">when</span> <span class="nx">cb</span> <span class="o">is</span> <span class="nx">callback</span>
-        <span class="nv">list = </span><span class="nx">list</span><span class="p">.</span><span class="nx">slice</span><span class="p">()</span>
-        <span class="nx">list</span><span class="p">.</span><span class="nx">splice</span><span class="p">(</span><span class="nx">i</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
-        <span class="nx">@_callbacks</span><span class="p">[</span><span class="nx">ev</span><span class="p">]</span> <span class="o">=</span> <span class="nx">list</span>
-        <span class="k">break</span>
-      
+</code></pre>             </td>             <td class="code">               <div class="highlight"><pre>  <span class="nv">unbind: </span><span class="nf">(ev, callback) -&gt;</span>
+    <span class="nx">unless</span> <span class="nx">ev</span>
+      <span class="vi">@_callbacks = </span><span class="p">{}</span>
       <span class="k">return</span> <span class="k">this</span>
+
+    <span class="nv">list = </span><span class="nx">@_callbacks</span><span class="o">?</span><span class="p">[</span><span class="nx">ev</span><span class="p">]</span>
+    <span class="k">return</span> <span class="k">this</span> <span class="nx">unless</span> <span class="nx">list</span>
+
+    <span class="nx">unless</span> <span class="nx">callback</span>
+      <span class="k">delete</span> <span class="nx">@_callbacks</span><span class="p">[</span><span class="nx">ev</span><span class="p">]</span>
+      <span class="k">return</span> <span class="k">this</span>
+
+    <span class="k">for</span> <span class="nx">cb</span><span class="p">,</span> <span class="nx">i</span> <span class="k">in</span> <span class="nx">list</span> <span class="k">when</span> <span class="nx">cb</span> <span class="o">is</span> <span class="nx">callback</span>
+      <span class="nv">list = </span><span class="nx">list</span><span class="p">.</span><span class="nx">slice</span><span class="p">()</span>
+      <span class="nx">list</span><span class="p">.</span><span class="nx">splice</span><span class="p">(</span><span class="nx">i</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+      <span class="nx">@_callbacks</span><span class="p">[</span><span class="nx">ev</span><span class="p">]</span> <span class="o">=</span> <span class="nx">list</span>
+      <span class="k">break</span>
+    
+    <span class="k">return</span> <span class="k">this</span>
 
 </pre></div>             </td>           </tr>                </tbody>     </table>   </div> </body> </html> 
