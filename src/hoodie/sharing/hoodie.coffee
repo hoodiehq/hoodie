@@ -1,13 +1,13 @@
-define 'hoodie/sharing/hoodie', ['hoodie'], (Hoodie) ->
-  
   # ## SharingHoodie
   #
   # SharingHoodie is a subset of the original Hoodie class and used for
   # "manual" sharing, when user is not signed up yet.
   #
-  class SharingHoodie extends Hoodie
+  class Hoodie.Sharing.Hoodie extends Hoodie
     
-    modules: ['hoodie/sharing/account', 'hoodie/sharing/remote'] 
+    modules : ->
+      "account": Hoodie.Sharing.Account
+      "remote" : Hoodie.Sharing.Remote
     
     constructor: (hoodie, @sharing) ->
       @store  = hoodie.store

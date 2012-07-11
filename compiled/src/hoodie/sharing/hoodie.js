@@ -2,63 +2,65 @@
 var __hasProp = {}.hasOwnProperty,
   __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
 
-define('hoodie/sharing/hoodie', ['hoodie'], function(Hoodie) {
-  var SharingHoodie;
-  return SharingHoodie = (function(_super) {
+Hoodie.Sharing.Hoodie = (function(_super) {
 
-    __extends(SharingHoodie, _super);
+  __extends(Hoodie, _super);
 
-    SharingHoodie.prototype.modules = ['hoodie/sharing/account', 'hoodie/sharing/remote'];
-
-    function SharingHoodie(hoodie, sharing) {
-      var event, _i, _len, _ref,
-        _this = this;
-      this.sharing = sharing;
-      this.store = hoodie.store;
-      this.config = {
-        set: this.sharing.set,
-        get: this.sharing.get,
-        remove: this.sharing.set
-      };
-      this.config.set('_account.username', "sharing/" + this.sharing.id);
-      this.config.set('_remote.active', this.sharing.continuous === true);
-      _ref = ['store:dirty:idle'];
-      for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-        event = _ref[_i];
-        hoodie.on(event, function() {
-          return _this.trigger(event);
-        });
-      }
-      SharingHoodie.__super__.constructor.call(this, hoodie.base_url);
-    }
-
-    SharingHoodie.prototype.request = function(type, path, options) {
-      var auth, defaults, hash;
-      if (options == null) {
-        options = {};
-      }
-      defaults = {
-        type: type,
-        url: "" + this.base_url + path,
-        xhrFields: {
-          withCredentials: true
-        },
-        crossDomain: true,
-        dataType: 'json'
-      };
-      if (type !== 'PUT') {
-        hash = btoa("sharing/" + this.sharing.id + ":" + (this.sharing.password || ''));
-        auth = "Basic " + hash;
-        $.extend(defaults, {
-          headers: {
-            Authorization: auth
-          }
-        });
-      }
-      return $.ajax($.extend(defaults, options));
+  Hoodie.prototype.modules = function() {
+    return {
+      "account": Hoodie.Sharing.Account,
+      "remote": Hoodie.Sharing.Remote
     };
+  };
 
-    return SharingHoodie;
+  function Hoodie(hoodie, sharing) {
+    var event, _i, _len, _ref,
+      _this = this;
+    this.sharing = sharing;
+    this.store = hoodie.store;
+    this.config = {
+      set: this.sharing.set,
+      get: this.sharing.get,
+      remove: this.sharing.set
+    };
+    this.config.set('_account.username', "sharing/" + this.sharing.id);
+    this.config.set('_remote.active', this.sharing.continuous === true);
+    _ref = ['store:dirty:idle'];
+    for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+      event = _ref[_i];
+      hoodie.on(event, function() {
+        return _this.trigger(event);
+      });
+    }
+    Hoodie.__super__.constructor.call(this, hoodie.base_url);
+  }
 
-  })(Hoodie);
-});
+  Hoodie.prototype.request = function(type, path, options) {
+    var auth, defaults, hash;
+    if (options == null) {
+      options = {};
+    }
+    defaults = {
+      type: type,
+      url: "" + this.base_url + path,
+      xhrFields: {
+        withCredentials: true
+      },
+      crossDomain: true,
+      dataType: 'json'
+    };
+    if (type !== 'PUT') {
+      hash = btoa("sharing/" + this.sharing.id + ":" + (this.sharing.password || ''));
+      auth = "Basic " + hash;
+      $.extend(defaults, {
+        headers: {
+          Authorization: auth
+        }
+      });
+    }
+    return $.ajax($.extend(defaults, options));
+  };
+
+  return Hoodie;
+
+})(Hoodie);

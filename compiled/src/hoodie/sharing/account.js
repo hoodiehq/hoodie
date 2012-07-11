@@ -2,33 +2,31 @@
 var __hasProp = {}.hasOwnProperty,
   __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
 
-define('hoodie/sharing/account', ['hoodie/account'], function(Account) {
-  return Account = (function(_super) {
+Hoodie.Sharing.Account = (function(_super) {
 
-    __extends(Account, _super);
+  __extends(Account, _super);
 
-    function Account() {
-      Account.__super__.constructor.apply(this, arguments);
-      this._sharing_auth_promise = this.hoodie.defer().resolve(this.username).promise();
-    }
+  function Account() {
+    Account.__super__.constructor.apply(this, arguments);
+    this._sharing_auth_promise = this.hoodie.defer().resolve(this.username).promise();
+  }
 
-    Account.prototype.authenticate = function() {
-      return this._sharing_auth_promise;
-    };
+  Account.prototype.authenticate = function() {
+    return this._sharing_auth_promise;
+  };
 
-    Account.prototype.sign_up = function() {
-      return this._sharing_auth_promise;
-    };
+  Account.prototype.sign_up = function() {
+    return this._sharing_auth_promise;
+  };
 
-    Account.prototype.sign_in = function() {
-      return this._sharing_auth_promise;
-    };
+  Account.prototype.sign_in = function() {
+    return this._sharing_auth_promise;
+  };
 
-    Account.prototype.sign_out = function() {
-      return this._sharing_auth_promise;
-    };
+  Account.prototype.sign_out = function() {
+    return this._sharing_auth_promise;
+  };
 
-    return Account;
+  return Account;
 
-  })(Account);
-});
+})(Hoodie.Account);

@@ -8,7 +8,13 @@
 class Hoodie extends Events
 
   # modules to be loaded
-  modules: ['Store', 'Config', 'Account', 'Remote', 'Email'] 
+  modules: ->
+    'store'   : Hoodie.Store
+    'config'  : Hoodie.Config
+    'account' : Hoodie.Account
+    'remote'  : Hoodie.Remote
+    'email'   : Hoodie.Email
+
 
 
   # ## initialization
@@ -51,12 +57,6 @@ class Hoodie extends Events
   # ## Private
   
   #
-  _makeInstanceName: (moduleName) ->
-    firstLetter = moduleName[0].toLowerCase()
-    firstLetter + moduleName.substr(1)
-
-  #
   _load_modules: ->
-    for module in @modules
-      instance_name = @_makeInstanceName module
-      @[instance_name] = new Hoodie[module] this
+    for instance_name, Module of @modules()
+      @[instance_name] = new Module this
