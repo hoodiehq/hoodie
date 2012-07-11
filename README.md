@@ -7,9 +7,7 @@ Setup
 
 ```javascript
 couchDB_endpoint = 'http://worlddominatorapp.iriscouch.com';
-new Hoodie(couchDB_endpoint).ready( function(hoodie) {
-  // use your hoodie here
-})
+hoodie = new Hoodie(couchDB_endpoint);
 ```
 
 
