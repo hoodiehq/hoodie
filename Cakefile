@@ -46,10 +46,19 @@ task 'autotest', 'autotest', ->
   build( test, true)
   
 task 'build', 'build hoodie-client.min.js', -> 
-  build = spawn 'r.js', ['-o', 'name=hoodie', 'optimize=none', 'wrap.start=(function() {', 'wrap.end=}())', 'baseUrl=./compiled/src', 'paths.requireLib=../../vendor/require-1.0.7', 'out=hoodie.min.js', 'include=requireLib,hoodie,test,hoodie/store,hoodie/config,hoodie/account,hoodie/remote,hoodie/email,hoodie/sharing,hoodie/sharing/account,hoodie/sharing/remote']
-  build.stdout.on 'data', (data) -> print data.toString()
+  try fs.unlinkSync 'hoodie.js'
+
+  js_code = ''
+  build = spawn 'cat', ['compiled/src/events.js', 'compiled/src/hoodie.js', 'compiled/src/hoodie/account.js', 'compiled/src/hoodie/config.js', 'compiled/src/hoodie/email.js', 'compiled/src/hoodie/errors.js', 'compiled/src/hoodie/remote.js', 'compiled/src/hoodie/store.js']
+
+  build.stdout.on 'data', (data) -> 
+    console.log 'data!'
+    js_code += data
+
   # build.stderr.on 'data', (data) -> print data.toString()
-  build.on 'exit', (status) -> callback?() if status is 0
+  build.on 'exit', (status) -> 
+    fs.writeFileSync 'hoodie.js', js_code
+    callback?() if status is 0
   
 task 'docs', 'create docs from code', ->
   
