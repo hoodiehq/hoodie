@@ -35,112 +35,110 @@
 #
 
 
-define 'hoodie/sharing', ['hoodie/sharing/instance'], (SharingInstance) ->
+# define 'hoodie/sharing', ['hoodie/sharing/instance'], (SharingInstance) ->
+class Sharing
+
+
+  # ## Constructor
+  #
+  constructor : (@hoodie) ->
+    
+    # give all Sharing instances access to our core hoodie
+    # as sharings use custom hoodies, as long as the user
+    # has no account yet
+    SharingInstance.hoodie = @hoodie
+    
+    
+  # ## create
+  #
+  # creates a new sharing & returns a promise.
+  # Options
+  #
+  #     id:            (optional, defaults to random uuid)
+  #                    name of sharing.
+  #     objects:       (optional)
+  #                    array of objects that should be shared
+  #     private:       (default: false)
+  #                    when set to true, nobody but the creator and the
+  #                    invitees have access. Set to true automatically
+  #                    when invitees passed
+  #     invitees:      (optional)
+  #                    an array of user names (emails) that should have
+  #                    access to the shared documents
+  #     continuous:    (default: false)
+  #                    if set to true, the shared objects will be
+  #                    continuously updated.
+  #     collaborative: (default: false)
+  #                    if set to true, others are invited to make changes
+  #                    to the shared documents
+  #
+  # Examples
+  #
+  #     # share all my stuff
+  #     hoodie.sharing.create().done (sharing) -> 
+  #       alert "find my stuff at /#{sharing.id}"
+  # 
+  #     # share my todo list with Joey and Frank
+  #     hoodie.sharing.create
+  #       invitees : [
+  #         "joey@example.com"
+  #         "frank@example.com"
+  #       ]
+  #       objects : [
+  #         todo_list, todo1, todo2, todo3
+  #       ]
+  #     
+  #     # share all my documents that I marked as
+  #     # shared and keep them updated
+  #     hoodie.sharing.create
+  #       continuous : true
+  #       objects    : hoodie.store.loadAll (obj) -> obj.is_shared
+  #
+  create : (options = {}) ->
+    sharing = new SharingInstance options
+    sharing.save()
+    
+  
+  # ## load
+  #
+  # load an existing sharing
+  #
+  load : (id) ->
+    @hoodie.store.load('$sharing', id).pipe (obj) =>
+      new SharingInstance obj
   
   
-  class Sharing
+  # ## find or create
+  #
+  # 1. Try to find a sharing by given id
+  # 2. If sharing could be found, return it
+  # 3. If not, create one and return it.
+  find_or_create : (options) ->
+    defer = @hoodie.defer()
+    @load(options.id)
+    .done (sharing) ->
+      defer.resolve sharing
+    .fail => 
+      @create(options).then defer.resolve, defer.reject 
+  
+    return defer.promise()
   
   
-    # ## Constructor
-    #
-    constructor : (@hoodie) ->
-      
-      # give all Sharing instances access to our core hoodie
-      # as sharings use custom hoodies, as long as the user
-      # has no account yet
-      SharingInstance.hoodie = @hoodie
-      
-      
-    # ## create
-    #
-    # creates a new sharing & returns a promise.
-    # Options
-    #
-    #     id:            (optional, defaults to random uuid)
-    #                    name of sharing.
-    #     objects:       (optional)
-    #                    array of objects that should be shared
-    #     private:       (default: false)
-    #                    when set to true, nobody but the creator and the
-    #                    invitees have access. Set to true automatically
-    #                    when invitees passed
-    #     invitees:      (optional)
-    #                    an array of user names (emails) that should have
-    #                    access to the shared documents
-    #     continuous:    (default: false)
-    #                    if set to true, the shared objects will be
-    #                    continuously updated.
-    #     collaborative: (default: false)
-    #                    if set to true, others are invited to make changes
-    #                    to the shared documents
-    #
-    # Examples
-    #
-    #     # share all my stuff
-    #     hoodie.sharing.create().done (sharing) -> 
-    #       alert "find my stuff at /#{sharing.id}"
-    # 
-    #     # share my todo list with Joey and Frank
-    #     hoodie.sharing.create
-    #       invitees : [
-    #         "joey@example.com"
-    #         "frank@example.com"
-    #       ]
-    #       objects : [
-    #         todo_list, todo1, todo2, todo3
-    #       ]
-    #     
-    #     # share all my documents that I marked as
-    #     # shared and keep them updated
-    #     hoodie.sharing.create
-    #       continuous : true
-    #       objects    : hoodie.store.loadAll (obj) -> obj.is_shared
-    #
-    create : (options = {}) ->
-      sharing = new SharingInstance options
-      sharing.save()
-      
+  # ## destroy
+  #
+  # deletes an existing sharing
+  #
+  destroy : (id) ->
+    @load(id).pipe (obj) =>
+      sharing = new SharingInstance obj
+      sharing.destroy()
     
-    # ## load
-    #
-    # load an existing sharing
-    #
-    load : (id) ->
-      @hoodie.store.load('$sharing', id).pipe (obj) =>
-        new SharingInstance obj
-    
-    
-    # ## find or create
-    #
-    # 1. Try to find a sharing by given id
-    # 2. If sharing could be found, return it
-    # 3. If not, create one and return it.
-    find_or_create : (options) ->
-      defer = @hoodie.defer()
-      @load(options.id)
-      .done (sharing) ->
-        defer.resolve sharing
-      .fail => 
-        @create(options).then defer.resolve, defer.reject 
-    
-      return defer.promise()
-    
-    
-    # ## destroy
-    #
-    # deletes an existing sharing
-    #
-    destroy : (id) ->
-      @load(id).pipe (obj) =>
-        sharing = new SharingInstance obj
-        sharing.destroy()
-      
-    # alias
-    delete : @::destroy
-    
-    
-    # ## open
-    #
-    # Copy all data of a sharing to own database
-    open : (id, options = {}) ->
-      # tbd ...
+  # alias
+  delete : @::destroy
+  
+  
+  # ## open
+  #
+  # Copy all data of a sharing to own database
+  open : (id, options = {}) ->
+    # tbd ...

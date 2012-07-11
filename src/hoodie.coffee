@@ -1,16 +1,3 @@
-# convenience shortcut:
-# new Hoodie('http://localhost:9292/localhost:5984').ready( function(hoodie) {
-#   // do something with your hoodie yo!      
-# });
-class window.Hoodie
-
-  constructor: (@url) ->
-
-  ready: (cb) ->
-    require ['hoodie'], (Hoodie) =>
-      hoodie = new Hoodie @url
-      hoodie.ready -> cb(hoodie)
-
 
 #
 # Hoodie
@@ -18,65 +5,58 @@ class window.Hoodie
 #
 # the door to world domination (apps)
 #
-define 'hoodie', ['hoodie/events'], (Events) ->
-  
-  # 'use strict'
+class Hoodie extends Events
 
-  class Hoodie extends Events
-  
-    modules: ['hoodie/store', 'hoodie/config', 'hoodie/account', 'hoodie/remote', 'hoodie/email', 'hoodie/sharing'] 
-  
-    # ## initialization
-    #
-    # Inits the Hoodie, an optional couchDB URL can be passed
-    constructor : (@base_url = '') ->
-    
-      # remove trailing slash(es)
-      @base_url = @base_url.replace /\/+$/, ''
-    
-      @_load_modules()
-    
-    # ## Request
-    #
-    # use this method to send AJAX request to the Couch.
-    request: (type, path, options = {}) ->
-      defaults =
-        type        : type
-        url         : "#{@base_url}#{path}"
-        xhrFields   : withCredentials: true
-        crossDomain : true
-        dataType    : 'json'
+  # modules to be loaded
+  modules: ['Store', 'Config', 'Account', 'Remote', 'Email'] 
 
-      $.ajax $.extend defaults, options
-    
-    # ## Promise
-    #
-    # returns a promise skeletton for custom promise handlings
-    defer: $.Deferred
-    
-    # ## Utils
-    
-    isPromise: (obj) ->
-      typeof obj.done is 'function' and typeof obj.fail is 'function'
-    
-    
-    _ready_callbacks: []
-    _ready: false
-    ready: (callback) ->
-      if @_ready
-        callback()
-      else
-        @_ready_callbacks.push callback
-    
-    # ## Private
-    
-    #
-    _load_modules: ->
-      require @modules, (ModuleClasses...) =>
-        for Module in ModuleClasses
-          
-          instance_name = Module.name.toLowerCase()
-          @[instance_name] = new Module this
-          
-        cb(this) while cb = @_ready_callbacks.shift()
-        @_ready = true
+
+  # ## initialization
+  #
+  # Inits the Hoodie, an optional couchDB URL can be passed
+  constructor : (@base_url = '') ->
+  
+    # remove trailing slash(es)
+    @base_url = @base_url.replace /\/+$/, ''
+  
+    @_load_modules()
+  
+
+  # ## Request
+  #
+  # use this method to send AJAX request to the Couch.
+  request: (type, path, options = {}) ->
+    defaults =
+      type        : type
+      url         : "#{@base_url}#{path}"
+      xhrFields   : withCredentials: true
+      crossDomain : true
+      dataType    : 'json'
+
+    $.ajax $.extend defaults, options
+  
+
+  # ## Promise
+  #
+  # returns a promise skeletton for custom promise handlings
+  defer: $.Deferred
+  
+
+  # ## Utils
+  
+  isPromise: (obj) ->
+    typeof obj.done is 'function' and typeof obj.fail is 'function'
+  
+
+  # ## Private
+  
+  #
+  _makeInstanceName: (moduleName) ->
+    firstLetter = moduleName[0].toLowerCase()
+    firstLetter + moduleName.substr(1)
+
+  #
+  _load_modules: ->
+    for module in @modules
+      instance_name = @_makeInstanceName module
+      @[instance_name] = new Hoodie[module] this
