@@ -58,6 +58,23 @@ app.account.change_password('current_secret', 'new_secret')
 ```
 
 
+### Authenticate
+
+If you want to make sure that a user is authenticated with a valid
+session, you can use the `authenticate` method.
+
+```javascript
+app.account.authenticate()
+
+  .done( function(user) {
+    // you are authenticated, your session is valid
+  } ) 
+  .fail( function(err) {
+    // sorry, but your not authenticated, probably your session expired
+  } ) 
+```
+
+
 ### Sign Out
 
 ```javascript
