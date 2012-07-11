@@ -237,7 +237,6 @@ class Hoodie.Account
   
   #
   _handle_sign_in: (@username) =>
-    console.log '_handle_sign_in', @username
     @hoodie.config.set '_account.username', @username
     @_authenticated = true
   

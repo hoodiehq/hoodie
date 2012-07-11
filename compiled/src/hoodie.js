@@ -9,11 +9,11 @@ Hoodie = (function(_super) {
 
   Hoodie.prototype.modules = function() {
     return {
-      'store': Hoodie.Store,
-      'config': Hoodie.Config,
-      'account': Hoodie.Account,
-      'remote': Hoodie.Remote,
-      'email': Hoodie.Email
+      store: Hoodie.Store,
+      config: Hoodie.Config,
+      account: Hoodie.Account,
+      remote: Hoodie.Remote,
+      email: Hoodie.Email
     };
   };
 

@@ -35,8 +35,7 @@
 #
 
 
-# define 'hoodie/sharing', ['hoodie/sharing/instance'], (SharingInstance) ->
-class Sharing
+class Hoodie.Sharing
 
 
   # ## Constructor
@@ -46,7 +45,7 @@ class Sharing
     # give all Sharing instances access to our core hoodie
     # as sharings use custom hoodies, as long as the user
     # has no account yet
-    SharingInstance.hoodie = @hoodie
+    Hoodie.Sharing.Instance.hoodie = @hoodie
     
     
   # ## create
@@ -95,7 +94,7 @@ class Sharing
   #       objects    : hoodie.store.loadAll (obj) -> obj.is_shared
   #
   create : (options = {}) ->
-    sharing = new SharingInstance options
+    sharing = new Hoodie.Sharing.Instance options
     sharing.save()
     
   
@@ -105,7 +104,7 @@ class Sharing
   #
   load : (id) ->
     @hoodie.store.load('$sharing', id).pipe (obj) =>
-      new SharingInstance obj
+      new Hoodie.Sharing.Instance obj
   
   
   # ## find or create
@@ -130,7 +129,7 @@ class Sharing
   #
   destroy : (id) ->
     @load(id).pipe (obj) =>
-      sharing = new SharingInstance obj
+      sharing = new Hoodie.Sharing.Instance obj
       sharing.destroy()
     
   # alias

@@ -1,4 +1,5 @@
-define 'mocks/bulk_update_response', ->
+window.Mocks or= {}
+Mocks.bulk_update_response = ->
   ->
     [
       {

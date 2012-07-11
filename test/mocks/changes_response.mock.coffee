@@ -1,5 +1,6 @@
-define 'mocks/changes_response', ->
-  -> `{
+window.Mocks or= {}
+Mocks.changes_response = ->
+  `{
     "results":
     [
       {

@@ -1,6 +1,4 @@
-define 'specs/hoodie/sharing/hoodie', ['mocks/hoodie', 'hoodie/sharing/hoodie'], (HoodieMock, SharingHoodie) ->
-  
-  describe "SharingHoodie", ->  
-    beforeEach ->
-      @hoodie = new HoodieMock 
-      @sharing_hoodie  = new SharingHoodie @hoodie
+describe "Hoodie.Sharing.Hoodie", ->  
+  beforeEach ->
+    @hoodie = new Mocks.Hoodie 
+    @sharing_hoodie  = new Hoodie.Sharing.Hoodie @hoodie

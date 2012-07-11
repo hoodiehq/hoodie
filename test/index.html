@@ -8,12 +8,9 @@
   <script src="lib/jasmine-1.1.0/jasmine-html.js"></script>
   <script src="../compiled/test/lib/jasmine-helpers.js"></script>
 
-  <script src="../vendor/require-1.0.7.js"></script>
+  <!-- dependencies -->
   <script src="../vendor/jquery-1.7.2.min.js"></script>
-
-  <!--   
-	  <script src="http://code.jquery.com/jquery-1.7.2.js"></script>
-  -->
+  <script src="../compiled/src/events.js"></script>
 
   <!-- base classes -->
   <script src="../compiled/src/hoodie.js"></script>
@@ -21,12 +18,14 @@
   <script src="../compiled/src/hoodie/config.js"></script>
   <script src="../compiled/src/hoodie/email.js"></script>
   <script src="../compiled/src/hoodie/errors.js"></script>
-  <script src="../compiled/src/hoodie/events.js"></script>
   <script src="../compiled/src/hoodie/remote.js"></script>
+  <script src="../compiled/src/hoodie/store.js"></script>
+
   <script src="../compiled/src/hoodie/sharing.js"></script>
+  <script src="../compiled/src/hoodie/sharing/account.js"></script>
+  <script src="../compiled/src/hoodie/sharing/remote.js"></script>
   <script src="../compiled/src/hoodie/sharing/hoodie.js"></script>
   <script src="../compiled/src/hoodie/sharing/instance.js"></script>
-  <script src="../compiled/src/hoodie/store.js"></script>
   
 
   <!-- mocks -->
@@ -36,16 +35,23 @@
   <script src="../compiled/test/mocks/bulk_update_response.mock.js"></script>
   
   <!-- specs -->
+  <script src="../compiled/test/specs/events.spec.js"></script>
   <script src="../compiled/test/specs/hoodie.spec.js"></script>
   <script src="../compiled/test/specs/hoodie/account.spec.js"></script>
+  
+  
+
   <script src="../compiled/test/specs/hoodie/config.spec.js"></script>
   <script src="../compiled/test/specs/hoodie/email.spec.js"></script>
-  <script src="../compiled/test/specs/hoodie/events.spec.js"></script>
   <script src="../compiled/test/specs/hoodie/remote.spec.js"></script>
+  <script src="../compiled/test/specs/hoodie/store.spec.js"></script>
+
   <script src="../compiled/test/specs/hoodie/sharing.spec.js"></script>
   <script src="../compiled/test/specs/hoodie/sharing/hoodie.spec.js"></script>
   <script src="../compiled/test/specs/hoodie/sharing/instance.spec.js"></script>
-  <script src="../compiled/test/specs/hoodie/store.spec.js"></script>
+  
+  <!-- 
+  -->
 
 </head>
 <body>
@@ -53,26 +59,7 @@
   <script>
     jas = jasmine.getEnv()
     jas.addReporter(new jasmine.TrivialReporter()); 
-    
-    require([
-      'mocks/hoodie',
-      'mocks/changes_response',
-      'mocks/changed_docs',
-      'mocks/bulk_update_response',
-      
-      'specs/hoodie',
-      'specs/hoodie/store',
-      'specs/hoodie/account',
-      'specs/hoodie/remote',
-      'specs/hoodie/events',
-      'specs/hoodie/email',
-      'specs/hoodie/sharing',
-      'specs/hoodie/sharing/hoodie',
-      'specs/hoodie/sharing/instance',
-      'specs/hoodie/config'
-    ], function () {
-      jas.execute();
-    });
+    jas.execute();
   </script>
 </body>
 </html>

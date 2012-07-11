@@ -43,7 +43,10 @@ task 'test', 'test', ->
   test()
     
 task 'autotest', 'autotest', ->
-  build( test, true)
+  build ( -> 
+    clear();
+    test() 
+  ), true
   
 task 'build', 'build hoodie-client.min.js', -> 
   try fs.unlinkSync 'hoodie.js'

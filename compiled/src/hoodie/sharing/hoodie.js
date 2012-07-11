@@ -8,8 +8,8 @@ Hoodie.Sharing.Hoodie = (function(_super) {
 
   Hoodie.prototype.modules = function() {
     return {
-      "account": Hoodie.Sharing.Account,
-      "remote": Hoodie.Sharing.Remote
+      account: Hoodie.Sharing.Account,
+      remote: Hoodie.Sharing.Remote
     };
   };
 
@@ -59,6 +59,11 @@ Hoodie.Sharing.Hoodie = (function(_super) {
       });
     }
     return $.ajax($.extend(defaults, options));
+  };
+
+  Hoodie.prototype._load_modules = function() {
+    console.log('Hoodie.Sharing.Hoodie _load_modules');
+    return Hoodie.__super__._load_modules.apply(this, arguments);
   };
 
   return Hoodie;

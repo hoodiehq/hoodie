@@ -1,4 +1,3 @@
-
 #
 # Hoodie
 # --------
@@ -9,12 +8,11 @@ class Hoodie extends Events
 
   # modules to be loaded
   modules: ->
-    'store'   : Hoodie.Store
-    'config'  : Hoodie.Config
-    'account' : Hoodie.Account
-    'remote'  : Hoodie.Remote
-    'email'   : Hoodie.Email
-
+    store   : Hoodie.Store
+    config  : Hoodie.Config
+    account : Hoodie.Account
+    remote  : Hoodie.Remote
+    email   : Hoodie.Email
 
 
   # ## initialization
@@ -24,7 +22,6 @@ class Hoodie extends Events
   
     # remove trailing slash(es)
     @base_url = @base_url.replace /\/+$/, ''
-  
     @_load_modules()
   
 
