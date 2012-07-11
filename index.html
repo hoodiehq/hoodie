@@ -31,139 +31,137 @@
     // initialize your Hoodie App
     
     couchDB_endpoint = 'http://corscouch.example.com';
-    new Hoodie(couchDB_endpoint).ready( function(hoodie) {
+    hoodie = new Hoodie(couchDB_endpoint)
     
-      // 
-      // Account 
-      //
+    // 
+    // Account 
+    //
+    
+    // sign up
+    hoodie.account.sign_up('joe@example.com', 'secret')
+      .done( function(user) { } ) 
+      .fail( function(err)  { } )
       
-      // sign up
-      hoodie.account.sign_up('joe@example.com', 'secret')
-        .done( function(user) { } ) 
-        .fail( function(err)  { } )
-        
-      // sign in
-      hoodie.account.sign_in('joe@example.com', 'secret')
-        .done( function(user) { } ) 
-        .fail( function(err)  { } )
-        
-      // sign out
-      hoodie.account.sign_out()
-        .done( function(user) { } ) 
-        .fail( function(err)  { } )
+    // sign in
+    hoodie.account.sign_in('joe@example.com', 'secret')
+      .done( function(user) { } ) 
+      .fail( function(err)  { } )
       
-      // change password (coming soon)
-      hoodie.account.change_password('current_secret', 'new_secret')
-        .done( function(user) { } ) 
-        .fail( function(err)  { } )
-        
-      // forgot password (coming soon)
-      hoodie.account.forgot_password('joe@example.com')
-        .done( function(user) { } ) 
-        .fail( function(err)  { } )
-        
-      //
-      // Store
-      //
+    // sign out
+    hoodie.account.sign_out()
+      .done( function(user) { } ) 
+      .fail( function(err)  { } )
+    
+    // change password (coming soon)
+    hoodie.account.change_password('current_secret', 'new_secret')
+      .done( function(user) { } ) 
+      .fail( function(err)  { } )
       
-      // helper to generate uuids
-      uuid = hoodie.store.uuid(length)
+    // forgot password (coming soon)
+    hoodie.account.forgot_password('joe@example.com')
+      .done( function(user) { } ) 
+      .fail( function(err)  { } )
       
-      // create a new object
-      type = 'couch'
-      attributes = {color: "red"}
-      hoodie.store.create(type, attributes )
-        .done ( function(new_object) { } )
-        .fail ( function(err)        { } )
-        
-      // save an object
-      type = 'couch'
-      id   = 'abc4567'
-      attributes  = {color: "red", name: "relax"}
-      hoodie.store.save( type, id, attributes )
-        .done ( function(object) { } )
-        .fail ( function(err)        { } )
-        
-      // update an existing object
-      type = 'couch'
-      id   = 'abc4567'
-      update = {size: 2}
-      hoodie.store.update( type, id, update )
-        .done ( function(updated_object) { } )
-        .fail ( function(err)            { } )
+    //
+    // Store
+    //
+    
+    // helper to generate uuids
+    uuid = hoodie.store.uuid(length)
+    
+    // create a new object
+    type = 'couch'
+    attributes = {color: "red"}
+    hoodie.store.create(type, attributes )
+      .done ( function(new_object) { } )
+      .fail ( function(err)        { } )
       
-      // load one object
-      type = 'couch'
-      id   = 'abc4567'
-      hoodie.store.load( type, id )
-        .done ( function(object) { } )
-        .fail ( function(err)    { } )
-        
-      // Load all objects
-      hoodie.store.loadAll()
-        .done ( function(objects) { } )
-        .fail ( function(err)     { } )
-        
-      // Load all objects from one type
-      type = 'couch'
-      hoodie.store.loadAll( type )
-        .done ( function(objects) { } )
-        .fail ( function(err)     { } )
-        
-      // delete an existing object
-      type = 'couch'
-      id   = 'abc4567'
-      hoodie.store.delete( type, id )
-        .done ( function(deleted_object) { } )
-        .fail ( function(err)            { } )
-        
-      //
-      // Synchronization
-      //
-      // When signed in, local changes do get synched automatically.
-      // You can subscribe to remote updates
-      // 
+    // save an object
+    type = 'couch'
+    id   = 'abc4567'
+    attributes  = {color: "red", name: "relax"}
+    hoodie.store.save( type, id, attributes )
+      .done ( function(object) { } )
+      .fail ( function(err)        { } )
       
-      // new doc created
-      hoodie.remote.on( 'created', function( type, id, created_object) { } )
-
-      // existing doc updated
-      hoodie.remote.on( 'updated', function( type, id, updated_object) { } )
-
-      // doc deleted
-      hoodie.remote.on( 'deleted', function( type, id, deleted_object) { } )
-
-      // any of above events
-      hoodie.remote.on( 'changed', function( type, id, changed_object) { } )
-
-      // all listeners can be filtered by type
-      hoodie.remote.on( "created:couch", function( id, created_object) { } )
-      hoodie.remote.on( "updated:couch", function( id, updated_object)  { } )
-      hoodie.remote.on( "deleted:couch", function( id, deleted_object) { } )
-      hoodie.remote.on( "changed:couch", function( id, changed_object) { } )
+    // update an existing object
+    type = 'couch'
+    id   = 'abc4567'
+    update = {size: 2}
+    hoodie.store.update( type, id, update )
+      .done ( function(updated_object) { } )
+      .fail ( function(err)            { } )
+    
+    // load one object
+    type = 'couch'
+    id   = 'abc4567'
+    hoodie.store.load( type, id )
+      .done ( function(object) { } )
+      .fail ( function(err)    { } )
       
-      //
-      // Send emails (coming soon)
-      // 
-      email = {
-        to      : ['you@roundthewor.ld'],
-        cc      : ['rest@roundthewor.ld'],
-        subject : 'rule the wolrd',
-        body    : "we can do it!\nSigned, Joe"
-      }
+    // Load all objects
+    hoodie.store.loadAll()
+      .done ( function(objects) { } )
+      .fail ( function(err)     { } )
+      
+    // Load all objects from one type
+    type = 'couch'
+    hoodie.store.loadAll( type )
+      .done ( function(objects) { } )
+      .fail ( function(err)     { } )
+      
+    // delete an existing object
+    type = 'couch'
+    id   = 'abc4567'
+    hoodie.store.delete( type, id )
+      .done ( function(deleted_object) { } )
+      .fail ( function(err)            { } )
+      
+    //
+    // Synchronization
+    //
+    // When signed in, local changes do get synched automatically.
+    // You can subscribe to remote updates
+    // 
+    
+    // new doc created
+    hoodie.remote.on( 'created', function( type, id, created_object) { } )
 
-      hoodie.email.send( email )
+    // existing doc updated
+    hoodie.remote.on( 'updated', function( type, id, updated_object) { } )
 
-        // synched to server
-        .progress ( function(email) { } )
+    // doc deleted
+    hoodie.remote.on( 'deleted', function( type, id, deleted_object) { } )
 
-        // email sent successfully
-        .done     ( function(email) { } )
+    // any of above events
+    hoodie.remote.on( 'changed', function( type, id, changed_object) { } )
 
-        // something went wrong
-        .fail     ( function(err)   { } )
-        
-    })
+    // all listeners can be filtered by type
+    hoodie.remote.on( "created:couch", function( id, created_object) { } )
+    hoodie.remote.on( "updated:couch", function( id, updated_object)  { } )
+    hoodie.remote.on( "deleted:couch", function( id, deleted_object) { } )
+    hoodie.remote.on( "changed:couch", function( id, changed_object) { } )
+    
+    //
+    // Send emails (coming soon)
+    // 
+    email = {
+      to      : ['you@roundthewor.ld'],
+      cc      : ['rest@roundthewor.ld'],
+      subject : 'rule the wolrd',
+      body    : "we can do it!\nSigned, Joe"
+    }
+
+    hoodie.email.send( email )
+
+      // synched to server
+      .progress ( function(email) { } )
+
+      // email sent successfully
+      .done     ( function(email) { } )
+
+      // something went wrong
+      .fail     ( function(err)   { } )
     </code></pre>
   </div>
   
