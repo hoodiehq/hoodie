@@ -19,8 +19,8 @@ class Hoodie.Account
     
     # authenticate on next tick
     # window.setTimeout @authenticate
-    @on 'signIn',  @_handleSignIn
-    @on 'signOut', @_handleSignOut
+    @on 'signin',  @_handleSignIn
+    @on 'signout', @_handleSignOut
   
   
   # ## Authenticate

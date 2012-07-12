@@ -29,11 +29,11 @@ describe "Hoodie.Account", ->
       
     it "should bind to signIn event", ->
       account = new Hoodie.Account @hoodie
-      expect(@account.on).wasCalledWith 'signIn', account._handleSignIn
+      expect(@account.on).wasCalledWith 'signin', account._handleSignIn
     
     it "should bind to signOut event", ->
       account = new Hoodie.Account @hoodie
-      expect(@account.on).wasCalledWith 'signOut', account._handleSignOut
+      expect(@account.on).wasCalledWith 'signout', account._handleSignOut
   # /.constructor()
   
   
@@ -218,7 +218,7 @@ describe "Hoodie.Account", ->
         expect(@hoodie.trigger).wasCalledWith 'account:signup', 'joe@example.com'
         
       it "should sign in", ->
-        spyOn(@account, "signIn").andReturn then: ->
+        spyOn(@account, 'signin").andReturn then: ->
         @account.signUp 'joe@example.com', 'secret'
         expect(@account.signIn).wasCalledWith 'joe@example.com', 'secret'
         

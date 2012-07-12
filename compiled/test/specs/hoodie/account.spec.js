@@ -31,12 +31,12 @@ describe("Hoodie.Account", function() {
     it("should bind to signIn event", function() {
       var account;
       account = new Hoodie.Account(this.hoodie);
-      return expect(this.account.on).wasCalledWith('signIn', account._handleSignIn);
+      return expect(this.account.on).wasCalledWith('signin', account._handleSignIn);
     });
     return it("should bind to signOut event", function() {
       var account;
       account = new Hoodie.Account(this.hoodie);
-      return expect(this.account.on).wasCalledWith('signOut', account._handleSignOut);
+      return expect(this.account.on).wasCalledWith('signout', account._handleSignOut);
     });
   });
   describe("event handlers", function() {
@@ -249,7 +249,7 @@ describe("Hoodie.Account", function() {
         return expect(this.hoodie.trigger).wasCalledWith('account:signup', 'joe@example.com');
       });
       it("should sign in", function() {
-        spyOn(this.account, "signIn").andReturn({
+        spyOn(this.account, 'signin").andReturn({
           then: function() {}
         });
         this.account.signUp('joe@example.com', 'secret');

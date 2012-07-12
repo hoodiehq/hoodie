@@ -14,8 +14,8 @@ Hoodie.Account = (function() {
     this.authenticate = __bind(this.authenticate, this);
 
     this.username = this.hoodie.config.get('_account.username');
-    this.on('signIn', this._handleSignIn);
-    this.on('signOut', this._handleSignOut);
+    this.on('signin', this._handleSignIn);
+    this.on('signout', this._handleSignOut);
   }
 
   Account.prototype.authenticate = function() {
