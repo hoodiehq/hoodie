@@ -19,7 +19,7 @@ class Hoodie.Config
     
     @hoodie.store.load(@type, @id).done (obj) => @cache = obj
 
-    @hoodie.on 'account:signed_out', @clear
+    @hoodie.on 'account:signedOut', @clear
   
     
   # ## set
@@ -34,8 +34,8 @@ class Hoodie.Config
     update = {}
     update[key] = value
     
-    is_silent = key.charAt(0) is '_'
-    @hoodie.store.update @type, @id, update, silent: is_silent
+    isSilent = key.charAt(0) is '_'
+    @hoodie.store.update @type, @id, update, silent: isSilent
     
   
   # ## get

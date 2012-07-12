@@ -7,15 +7,15 @@ Hoodie.Remote = (function() {
 
   function Remote(hoodie) {
     this.hoodie = hoodie;
-    this._handle_push_success = __bind(this._handle_push_success, this);
+    this._handlePushSuccess = __bind(this._handlePushSuccess, this);
 
-    this._handle_pull_results = __bind(this._handle_pull_results, this);
+    this._handlePullResults = __bind(this._handlePullResults, this);
 
-    this._handle_pull_error = __bind(this._handle_pull_error, this);
+    this._handlePullError = __bind(this._handlePullError, this);
 
-    this._handle_pull_success = __bind(this._handle_pull_success, this);
+    this._handlePullSuccess = __bind(this._handlePullSuccess, this);
 
-    this._restart_pull_request = __bind(this._restart_pull_request, this);
+    this._restartPullRequest = __bind(this._restartPullRequest, this);
 
     this.sync = __bind(this.sync, this);
 
@@ -41,15 +41,15 @@ Hoodie.Remote = (function() {
 
   Remote.prototype.activate = function() {
     this.hoodie.config.set('_remote.active', this.active = true);
-    this.hoodie.on('account:signed_out', this.disconnect);
-    this.hoodie.on('account:signed_in', this.connect);
+    this.hoodie.on('account:signedOut', this.disconnect);
+    this.hoodie.on('account:signedIn', this.connect);
     return this.connect();
   };
 
   Remote.prototype.deactivate = function() {
     this.hoodie.config.set('_remote.active', this.active = false);
-    this.hoodie.unbind('account:signed_in', this.connect);
-    this.hoodie.unbind('account:signed_out', this.disconnect);
+    this.hoodie.unbind('account:signedIn', this.connect);
+    this.hoodie.unbind('account:signedOut', this.disconnect);
     return this.disconnect();
   };
 
@@ -62,50 +62,50 @@ Hoodie.Remote = (function() {
     var _ref, _ref1;
     this.connected = false;
     this.hoodie.unbind('store:dirty:idle', this.push);
-    if ((_ref = this._pull_request) != null) {
+    if ((_ref = this._pullRequest) != null) {
       _ref.abort();
     }
-    return (_ref1 = this._push_request) != null ? _ref1.abort() : void 0;
+    return (_ref1 = this._pushRequest) != null ? _ref1.abort() : void 0;
   };
 
   Remote.prototype.pull = function() {
-    this._pull_request = this.hoodie.request('GET', this._pull_url(), {
+    this._pullRequest = this.hoodie.request('GET', this._pullUrl(), {
       contentType: 'application/json'
     });
     if (this.connected && this.active) {
-      window.clearTimeout(this._pull_request_timeout);
-      this._pull_request_timeout = window.setTimeout(this._restart_pull_request, 25000);
+      window.clearTimeout(this._pullRequestTimeout);
+      this._pullRequestTimeout = window.setTimeout(this._restartPullRequest, 25000);
     }
-    return this._pull_request.then(this._handle_pull_success, this._handle_pull_error);
+    return this._pullRequest.then(this._handlePullSuccess, this._handlePullError);
   };
 
   Remote.prototype.push = function(docs) {
-    var doc, docs_for_remote;
+    var doc, docsForRemote;
     if (!$.isArray(docs)) {
-      docs = this.hoodie.store.changed_docs();
+      docs = this.hoodie.store.changedDocs();
     }
     if (docs.length === 0) {
       return this.hoodie.defer().resolve([]).promise();
     }
-    docs_for_remote = (function() {
+    docsForRemote = (function() {
       var _i, _len, _results;
       _results = [];
       for (_i = 0, _len = docs.length; _i < _len; _i++) {
         doc = docs[_i];
-        _results.push(this._parse_for_remote(doc));
+        _results.push(this._parseForRemote(doc));
       }
       return _results;
     }).call(this);
-    this._push_request = this.hoodie.request('POST', "/" + (encodeURIComponent(this.hoodie.account.db())) + "/_bulk_docs", {
+    this._pushRequest = this.hoodie.request('POST', "/" + (encodeURIComponent(this.hoodie.account.db())) + "/_bulkDocs", {
       dataType: 'json',
       processData: false,
       contentType: 'application/json',
       data: JSON.stringify({
-        docs: docs_for_remote,
-        new_edits: false
+        docs: docsForRemote,
+        newEdits: false
       })
     });
-    return this._push_request.done(this._handle_push_success(docs, docs_for_remote));
+    return this._pushRequest.done(this._handlePushSuccess(docs, docsForRemote));
   };
 
   Remote.prototype.sync = function(docs) {
@@ -120,30 +120,30 @@ Hoodie.Remote = (function() {
     return this.hoodie.on("remote:" + event, cb);
   };
 
-  Remote.prototype._pull_url = function() {
+  Remote.prototype._pullUrl = function() {
     var since;
     since = this.hoodie.config.get('_remote.seq') || 0;
     if (this.active) {
-      return "/" + (encodeURIComponent(this.hoodie.account.db())) + "/_changes?include_docs=true&heartbeat=10000&feed=longpoll&since=" + since;
+      return "/" + (encodeURIComponent(this.hoodie.account.db())) + "/_changes?includeDocs=true&heartbeat=10000&feed=longpoll&since=" + since;
     } else {
-      return "/" + (encodeURIComponent(this.hoodie.account.db())) + "/_changes?include_docs=true&since=" + since;
+      return "/" + (encodeURIComponent(this.hoodie.account.db())) + "/_changes?includeDocs=true&since=" + since;
     }
   };
 
-  Remote.prototype._restart_pull_request = function() {
+  Remote.prototype._restartPullRequest = function() {
     var _ref;
-    return (_ref = this._pull_request) != null ? _ref.abort() : void 0;
+    return (_ref = this._pullRequest) != null ? _ref.abort() : void 0;
   };
 
-  Remote.prototype._handle_pull_success = function(response) {
-    this.hoodie.config.set('_remote.seq', response.last_seq);
-    this._handle_pull_results(response.results);
+  Remote.prototype._handlePullSuccess = function(response) {
+    this.hoodie.config.set('_remote.seq', response.lastSeq);
+    this._handlePullResults(response.results);
     if (this.connected && this.active) {
       return this.pull();
     }
   };
 
-  Remote.prototype._handle_pull_error = function(xhr, error, resp) {
+  Remote.prototype._handlePullError = function(xhr, error, resp) {
     if (!this.connected) {
       return;
     }
@@ -168,13 +168,13 @@ Hoodie.Remote = (function() {
     }
   };
 
-  Remote.prototype._valid_special_attributes = ['_id', '_rev', '_deleted', '_revisions', '_attachments'];
+  Remote.prototype._validSpecialAttributes = ['_id', '_rev', '_deleted', '_revisions', '_attachments'];
 
-  Remote.prototype._parse_for_remote = function(obj) {
+  Remote.prototype._parseForRemote = function(obj) {
     var attr, attributes;
     attributes = $.extend({}, obj);
     for (attr in attributes) {
-      if (~this._valid_special_attributes.indexOf(attr)) {
+      if (~this._validSpecialAttributes.indexOf(attr)) {
         continue;
       }
       if (!/^_/.test(attr)) {
@@ -184,46 +184,46 @@ Hoodie.Remote = (function() {
     }
     attributes._id = "" + attributes.type + "/" + attributes.id;
     delete attributes.id;
-    this._add_revision_to(attributes);
+    this._addRevisionTo(attributes);
     return attributes;
   };
 
-  Remote.prototype._generate_new_revision_id = function() {
+  Remote.prototype._generateNewRevisionId = function() {
     var timestamp, uuid;
-    this._timezone_offset || (this._timezone_offset = new Date().getTimezoneOffset() * 60);
-    timestamp = Date.now() + this._timezone_offset;
+    this._timezoneOffset || (this._timezoneOffset = new Date().getTimezoneOffset() * 60);
+    timestamp = Date.now() + this._timezoneOffset;
     uuid = this.hoodie.store.uuid(5);
     return "" + uuid + "#" + timestamp;
   };
 
-  Remote.prototype._add_revision_to = function(attributes) {
-    var current_rev_id, current_rev_nr, new_revision_id, _ref;
+  Remote.prototype._addRevisionTo = function(attributes) {
+    var currentRevId, currentRevNr, newRevisionId, _ref;
     try {
-      _ref = attributes._rev.split(/-/), current_rev_nr = _ref[0], current_rev_id = _ref[1];
+      _ref = attributes._rev.split(/-/), currentRevNr = _ref[0], currentRevId = _ref[1];
     } catch (_error) {}
-    current_rev_nr = parseInt(current_rev_nr) || 0;
-    new_revision_id = this._generate_new_revision_id();
-    attributes._rev = "" + (current_rev_nr + 1) + "-" + new_revision_id;
+    currentRevNr = parseInt(currentRevNr) || 0;
+    newRevisionId = this._generateNewRevisionId();
+    attributes._rev = "" + (currentRevNr + 1) + "-" + newRevisionId;
     attributes._revisions = {
       start: 1,
-      ids: [new_revision_id]
+      ids: [newRevisionId]
     };
-    if (current_rev_id) {
-      attributes._revisions.start += current_rev_nr;
-      return attributes._revisions.ids.push(current_rev_id);
+    if (currentRevId) {
+      attributes._revisions.start += currentRevNr;
+      return attributes._revisions.ids.push(currentRevId);
     }
   };
 
-  Remote.prototype._parse_from_pull = function(obj) {
+  Remote.prototype._parseFromPull = function(obj) {
     var id, _ref;
     id = obj._id || obj.id;
     delete obj._id;
     _ref = id.split(/\//), obj.type = _ref[0], obj.id = _ref[1];
-    if (obj.created_at) {
-      obj.created_at = new Date(Date.parse(obj.created_at));
+    if (obj.createdAt) {
+      obj.createdAt = new Date(Date.parse(obj.createdAt));
     }
-    if (obj.updated_at) {
-      obj.updated_at = new Date(Date.parse(obj.updated_at));
+    if (obj.updatedAt) {
+      obj.updatedAt = new Date(Date.parse(obj.updatedAt));
     }
     if (obj.rev) {
       obj._rev = obj.rev;
@@ -232,7 +232,7 @@ Hoodie.Remote = (function() {
     return obj;
   };
 
-  Remote.prototype._parse_from_push = function(obj) {
+  Remote.prototype._parseFromPush = function(obj) {
     var id, _ref;
     id = obj._id || delete obj._id;
     _ref = obj.id.split(/\//), obj.type = _ref[0], obj.id = _ref[1];
@@ -242,30 +242,30 @@ Hoodie.Remote = (function() {
     return obj;
   };
 
-  Remote.prototype._handle_pull_results = function(changes) {
-    var doc, promise, _changed_docs, _destroyed_docs, _i, _j, _k, _len, _len1, _len2, _ref, _ref1, _results,
+  Remote.prototype._handlePullResults = function(changes) {
+    var doc, promise, _changedDocs, _destroyedDocs, _i, _j, _k, _len, _len1, _len2, _ref, _ref1, _results,
       _this = this;
-    _destroyed_docs = [];
-    _changed_docs = [];
+    _destroyedDocs = [];
+    _changedDocs = [];
     for (_i = 0, _len = changes.length; _i < _len; _i++) {
       doc = changes[_i].doc;
-      doc = this._parse_from_pull(doc);
+      doc = this._parseFromPull(doc);
       if (doc._deleted) {
-        _destroyed_docs.push([
+        _destroyedDocs.push([
           doc, this.hoodie.store.destroy(doc.type, doc.id, {
             remote: true
           })
         ]);
       } else {
-        _changed_docs.push([
+        _changedDocs.push([
           doc, this.hoodie.store.update(doc.type, doc.id, doc, {
             remote: true
           })
         ]);
       }
     }
-    for (_j = 0, _len1 = _destroyed_docs.length; _j < _len1; _j++) {
-      _ref = _destroyed_docs[_j], doc = _ref[0], promise = _ref[1];
+    for (_j = 0, _len1 = _destroyedDocs.length; _j < _len1; _j++) {
+      _ref = _destroyedDocs[_j], doc = _ref[0], promise = _ref[1];
       promise.then(function(object) {
         _this.hoodie.trigger('remote:destroy', object);
         _this.hoodie.trigger("remote:destroy:" + doc.type, object);
@@ -276,11 +276,11 @@ Hoodie.Remote = (function() {
       });
     }
     _results = [];
-    for (_k = 0, _len2 = _changed_docs.length; _k < _len2; _k++) {
-      _ref1 = _changed_docs[_k], doc = _ref1[0], promise = _ref1[1];
-      _results.push(promise.then(function(object, object_was_created) {
+    for (_k = 0, _len2 = _changedDocs.length; _k < _len2; _k++) {
+      _ref1 = _changedDocs[_k], doc = _ref1[0], promise = _ref1[1];
+      _results.push(promise.then(function(object, objectWasCreated) {
         var event;
-        event = object_was_created ? 'create' : 'update';
+        event = objectWasCreated ? 'create' : 'update';
         _this.hoodie.trigger("remote:" + event, object);
         _this.hoodie.trigger("remote:" + event + ":" + doc.type, object);
         _this.hoodie.trigger("remote:" + event + ":" + doc.type + ":" + doc.id, object);
@@ -292,7 +292,7 @@ Hoodie.Remote = (function() {
     return _results;
   };
 
-  Remote.prototype._handle_push_success = function(docs, pushed_docs) {
+  Remote.prototype._handlePushSuccess = function(docs, pushedDocs) {
     var _this = this;
     return function() {
       var doc, i, options, update, _i, _len, _results;
@@ -300,7 +300,7 @@ Hoodie.Remote = (function() {
       for (i = _i = 0, _len = docs.length; _i < _len; i = ++_i) {
         doc = docs[i];
         update = {
-          _rev: pushed_docs[i]._rev
+          _rev: pushedDocs[i]._rev
         };
         options = {
           remote: true

@@ -3,6 +3,6 @@
 describe("Hoodie.Sharing.Hoodie", function() {
   return beforeEach(function() {
     this.hoodie = new Mocks.Hoodie;
-    return this.sharing_hoodie = new Hoodie.Sharing.Hoodie(this.hoodie);
+    return this.sharingHoodie = new Hoodie.Sharing.Hoodie(this.hoodie);
   });
 });

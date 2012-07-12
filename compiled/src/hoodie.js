@@ -17,10 +17,10 @@ Hoodie = (function(_super) {
     };
   };
 
-  function Hoodie(base_url) {
-    this.base_url = base_url != null ? base_url : '';
-    this.base_url = this.base_url.replace(/\/+$/, '');
-    this._load_modules();
+  function Hoodie(baseUrl) {
+    this.baseUrl = baseUrl != null ? baseUrl : '';
+    this.baseUrl = this.baseUrl.replace(/\/+$/, '');
+    this._loadModules();
   }
 
   Hoodie.prototype.request = function(type, path, options) {
@@ -30,7 +30,7 @@ Hoodie = (function(_super) {
     }
     defaults = {
       type: type,
-      url: "" + this.base_url + path,
+      url: "" + this.baseUrl + path,
       xhrFields: {
         withCredentials: true
       },
@@ -46,13 +46,13 @@ Hoodie = (function(_super) {
     return typeof obj.done === 'function' && typeof obj.fail === 'function';
   };
 
-  Hoodie.prototype._load_modules = function() {
-    var Module, instance_name, _ref, _results;
+  Hoodie.prototype._loadModules = function() {
+    var Module, instanceName, _ref, _results;
     _ref = this.modules();
     _results = [];
-    for (instance_name in _ref) {
-      Module = _ref[instance_name];
-      _results.push(this[instance_name] = new Module(this));
+    for (instanceName in _ref) {
+      Module = _ref[instanceName];
+      _results.push(this[instanceName] = new Module(this));
     }
     return _results;
   };

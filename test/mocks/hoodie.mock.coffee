@@ -1,7 +1,7 @@
 window.Mocks or= {}
 Mocks.Hoodie = ->
   
-  base_url : 'http://my.cou.ch'
+  baseUrl : 'http://my.cou.ch'
   
   trigger       : ->
   request       : ->
@@ -28,7 +28,7 @@ Mocks.Hoodie = ->
       pipe : ->
       fail : ->
       done : ->
-    changed_docs  : ->
+    changedDocs  : ->
       
     db :
       getItem       : ->

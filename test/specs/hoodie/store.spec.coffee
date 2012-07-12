@@ -12,16 +12,16 @@ describe "Hoodie.Store", ->
     spyOn(@store.db, "clear").andCallThrough()
   
   describe "new", ->
-    it "should subscribe to account:sign_out event", ->
+    it "should subscribe to account:signout event", ->
       spyOn(@hoodie, "on")
       store = new Hoodie.Store @hoodie
-      expect(@hoodie.on).wasCalledWith 'account:sign_out', store.clear
+      expect(@hoodie.on).wasCalledWith 'account:signout', store.clear
   # /new
   
   describe ".save(type, id, object, options)", ->
     beforeEach ->
       spyOn(@store, "_now").andReturn 'now'
-      spyOn(@store, "cache").andReturn 'cached_object'
+      spyOn(@store, "cache").andReturn 'cachedObject'
     
     it "should return a promise", ->
       promise = @store.save 'document', '123', name: 'test'
@@ -46,27 +46,27 @@ describe "Hoodie.Store", ->
     
       it "should add timestamps", ->
         object = @store.cache.mostRecentCall.args[2]
-        expect(object.created_at).toBe 'now'
-        expect(object.updated_at).toBe 'now'
+        expect(object.createdAt).toBe 'now'
+        expect(object.updatedAt).toBe 'now'
       
       _and "options.remote is true", ->
-        it "should not touch created_at / updated_at timestamps", ->
+        it "should not touch createdAt / updatedAt timestamps", ->
           @store.save 'document', '123', { name: 'test' }, { remote: true }
           object = @store.cache.mostRecentCall.args[2]
-          expect(object.created_at).toBeUndefined()
-          expect(object.updated_at).toBeUndefined()
+          expect(object.createdAt).toBeUndefined()
+          expect(object.updatedAt).toBeUndefined()
           
-        it "should add a _synced_at timestamp", ->
+        it "should add a _syncedAt timestamp", ->
           @store.save 'document', '123', { name: 'test' }, { remote: true }
           object = @store.cache.mostRecentCall.args[2]
-          expect(object._synced_at).toBe 'now'
+          expect(object._syncedAt).toBe 'now'
       
       _and "options.silent is true", ->
-        it "should not touch created_at / updated_at timestamps", ->
+        it "should not touch createdAt / updatedAt timestamps", ->
           @store.save 'document', '123', { name: 'test' }, { silent: true }
           object = @store.cache.mostRecentCall.args[2]
-          expect(object.created_at).toBeUndefined()
-          expect(object.updated_at).toBeUndefined()
+          expect(object.createdAt).toBeUndefined()
+          expect(object.updatedAt).toBeUndefined()
         
       
       it "should pass options", ->
@@ -82,7 +82,7 @@ describe "Hoodie.Store", ->
           expect(@promise).toBeResolved()
     
         it "should pass the object to done callback", ->
-          expect(@promise).toBeResolvedWith 'cached_object', true
+          expect(@promise).toBeResolvedWith 'cachedObject', true
           
         _and "object did exist before", ->
           beforeEach ->
@@ -131,13 +131,13 @@ describe "Hoodie.Store", ->
         expect(@promise).toBeResolved()
       
     
-    it "should not overwrite created_at attribute", ->
-      @store.save 'document', '123', { created_at: 'check12'  }
+    it "should not overwrite createdAt attribute", ->
+      @store.save 'document', '123', { createdAt: 'check12'  }
       [type, id, object] = @store.cache.mostRecentCall.args
-      expect(object.created_at).toBe 'check12'
+      expect(object.createdAt).toBe 'check12'
   
     it "should allow numbers and lowercase letters for for type only. And must start with a letter or $", ->
-      invalid = ['UPPERCASE', 'under_lines', '-?&$', '12345', 'a']
+      invalid = ['UPPERCASE', 'underLines', '-?&$', '12345', 'a']
       valid   = ['car', '$email']
       
       for key in invalid
@@ -149,7 +149,7 @@ describe "Hoodie.Store", ->
         expect(promise).toBeResolved()
     
     it "should allow numbers, lowercase letters and dashes for for id only", ->
-      invalid = ['UPPERCASE', 'under_lines', '-?&$']
+      invalid = ['UPPERCASE', 'underLines', '-?&$']
       valid   = ['abc4567', '1', 123, 'abc-567']
   
       for key in invalid
@@ -179,10 +179,10 @@ describe "Hoodie.Store", ->
           expect(@promise).toBeResolved()
     
         it "should pass the object to done callback", ->
-          expect(@promise).toBeResolvedWith 'cached_object', true
+          expect(@promise).toBeResolvedWith 'cachedObject', true
           
         it "should pass true (= created) as the second param to the done callback", ->
-          expect(@promise).toBeResolvedWith 'cached_object', true
+          expect(@promise).toBeResolvedWith 'cachedObject', true
   # /.save(type, id, object, options)
   
   describe ".create(type, object, options)", ->
@@ -249,30 +249,30 @@ describe "Hoodie.Store", ->
   describe ".updateAll(objects)", ->
     beforeEach ->
       spyOn(@hoodie, "isPromise").andReturn false
-      @todo_objects = [
+      @todoObjects = [
         {type: 'todo', id: '1'}
         {type: 'todo', id: '2'}
         {type: 'todo', id: '3'}
       ]
     
     it "should return a promise", ->
-      expect(@store.updateAll(@todo_objects, {})).toBePromise()
+      expect(@store.updateAll(@todoObjects, {})).toBePromise()
     
     it "should update objects", ->
       spyOn(@store, "update")
-      @store.updateAll @todo_objects, {funky: 'update'}
-      for obj in @todo_objects
+      @store.updateAll @todoObjects, {funky: 'update'}
+      for obj in @todoObjects
         expect(@store.update).wasCalledWith obj.type, obj.id, {funky: 'update'}, {}
     
     it "should resolve the returned promise once all objects have been updated", ->
       promise = @hoodie.defer().resolve().promise()
       spyOn(@store, "update").andReturn promise
-      expect(@store.updateAll(@todo_objects, {})).toBeResolved()
+      expect(@store.updateAll(@todoObjects, {})).toBeResolved()
     
     it "should not resolve the retunred promise unless object updates have been finished", ->
       promise = @hoodie.defer().promise()
       spyOn(@store, "update").andReturn promise
-      expect(@store.updateAll(@todo_objects, {})).notToBeResolved()
+      expect(@store.updateAll(@todoObjects, {})).notToBeResolved()
     
      
     _when "passed objects is a promise", ->
@@ -280,10 +280,10 @@ describe "Hoodie.Store", ->
         @hoodie.isPromise.andReturn true
         
       it "should update objects returned by promise", ->
-        promise = pipe : (cb) => cb(@todo_objects)
+        promise = pipe : (cb) => cb(@todoObjects)
         spyOn(@store, "update")
         @store.updateAll promise, {funky: 'update'}
-        for obj in @todo_objects
+        for obj in @todoObjects
           expect(@store.update).wasCalledWith obj.type, obj.id, {funky: 'update'}, {}
   # /.updateAll(objects)
 
@@ -329,7 +329,7 @@ describe "Hoodie.Store", ->
   # /.get(type, id)
 
   describe ".loadAll(filter)", ->
-    with_2_cats_and_3_dogs = (specs) ->
+    with_2CatsAnd_3Dogs = (specs) ->
       _and "two cat and three dog objects exist in the store", ->
         beforeEach ->
           spyOn(@store, "_index").andReturn ["cat/1", "cat/2", "dog/1", "dog/2", "dog/3"]
@@ -341,7 +341,7 @@ describe "Hoodie.Store", ->
       expect(promise).toBePromise()
   
     _when "called without a type", ->
-      with_2_cats_and_3_dogs ->
+      with_2CatsAnd_3Dogs ->
         it "should return'em all", ->
           success = jasmine.createSpy 'success'
           promise = @store.loadAll()
@@ -360,7 +360,7 @@ describe "Hoodie.Store", ->
   
       _and "there are other documents in localStorage not stored with store", ->
         beforeEach ->
-          spyOn(@store, "_index").andReturn ["_some_config", "some_other_shizzle", "whatever", "valid/123"]
+          spyOn(@store, "_index").andReturn ["_someConfig", "someOtherShizzle", "whatever", "valid/123"]
           spyOn(@store, "cache").andReturn {}
     
         it "should not return them", ->
@@ -372,7 +372,7 @@ describe "Hoodie.Store", ->
           expect(results.length).toBe 1
           
     _when "called only with filter `function(obj) { return obj.age === 1}` ", ->
-      with_2_cats_and_3_dogs ->
+      with_2CatsAnd_3Dogs ->
         it "should return one dog", ->
           success = jasmine.createSpy 'success'
           promise = @store.loadAll (obj) -> obj.age is 1
@@ -405,9 +405,9 @@ describe "Hoodie.Store", ->
         expect(@store._cached['document/123']).toBe false
         
       it "should clear document from changed", ->
-        spyOn(@store, "clear_changed")
+        spyOn(@store, "clearChanged")
         @store.delete 'document', '123'
-        expect(@store.clear_changed).wasCalledWith 'document', '123'
+        expect(@store.clearChanged).wasCalledWith 'document', '123'
       
       it "should return a resolved promise", ->
         promise = @store.delete 'document', '123'
@@ -420,7 +420,7 @@ describe "Hoodie.Store", ->
     
     _when "object can be found and delete comes from remote", ->
       beforeEach ->
-        spyOn(@store, "cache").andReturn {_synced_at: 'now'}
+        spyOn(@store, "cache").andReturn {_syncedAt: 'now'}
       
       it "should remove the object", ->
         @store.delete 'document', '123', remote: true
@@ -428,11 +428,11 @@ describe "Hoodie.Store", ->
         
     _when "object can be found and was synched before", ->
       beforeEach ->
-        spyOn(@store, "cache").andReturn {_synced_at: 'now'}
+        spyOn(@store, "cache").andReturn {_syncedAt: 'now'}
         
       it "should mark the object as deleted and cache it", ->
         promise = @store.delete 'document', '123'
-        expect(@store.cache).wasCalledWith 'document', '123', {_synced_at: 'now', _deleted: true}
+        expect(@store.cache).wasCalledWith 'document', '123', {_syncedAt: 'now', _deleted: true}
         
       it "should not remove the object from store", ->
         @store.delete 'document', '123'
@@ -449,10 +449,10 @@ describe "Hoodie.Store", ->
 
   describe ".cache(type, id, object)", ->
     beforeEach ->
-      spyOn(@store, "mark_as_changed")
-      spyOn(@store, "clear_changed")
-      spyOn(@store, "_is_dirty")
-      spyOn(@store, "_is_marked_as_deleted")
+      spyOn(@store, "markAsChanged")
+      spyOn(@store, "clearChanged")
+      spyOn(@store, "_isDirty")
+      spyOn(@store, "_isMarkedAsDeleted")
       @store._cached = {}
       
     _when "object passed", ->
@@ -463,7 +463,7 @@ describe "Hoodie.Store", ->
       _when "`options.remote = true` passed", ->
         it "should clear changed object", ->
           @store.cache('couch', '123', {color: 'red'}, remote: true)
-          expect(@store.clear_changed).wasCalledWith 'couch', '123'
+          expect(@store.clearChanged).wasCalledWith 'couch', '123'
     
     _when "no object passed", ->
       _and "object is already cached", ->
@@ -503,28 +503,28 @@ describe "Hoodie.Store", ->
           
     
     _when "object is dirty", ->
-      beforeEach -> @store._is_dirty.andReturn true
+      beforeEach -> @store._isDirty.andReturn true
       
       it "should mark it as changed", ->
         @store.cache 'couch', '123'
-        expect(@store.mark_as_changed).wasCalledWith 'couch', '123', color: 'red', type: 'couch', id: '123'
+        expect(@store.markAsChanged).wasCalledWith 'couch', '123', color: 'red', type: 'couch', id: '123'
     
     _when "object is not dirty", ->
-      beforeEach -> @store._is_dirty.andReturn false
+      beforeEach -> @store._isDirty.andReturn false
       
       _and "not marked as deleted", ->
-        beforeEach -> @store._is_marked_as_deleted.andReturn false
+        beforeEach -> @store._isMarkedAsDeleted.andReturn false
         
         it "should clean it", ->
           @store.cache 'couch', '123'
-          expect(@store.clear_changed).wasCalledWith 'couch', '123'
+          expect(@store.clearChanged).wasCalledWith 'couch', '123'
           
       _but "marked as deleted", ->
-        beforeEach -> @store._is_marked_as_deleted.andReturn true
+        beforeEach -> @store._isMarkedAsDeleted.andReturn true
       
         it "should mark it as changed", ->
           @store.cache 'couch', '123'
-          expect(@store.mark_as_changed).wasCalledWith 'couch', '123', color: 'red', type: 'couch', id: '123'
+          expect(@store.markAsChanged).wasCalledWith 'couch', '123', color: 'red', type: 'couch', id: '123'
     
     it "should return the object including type & id attributes", ->
       obj = @store.cache 'couch', '123', color: 'red'
@@ -550,9 +550,9 @@ describe "Hoodie.Store", ->
       expect($.isEmptyObject @store._cached).toBeTruthy()
 
     it "should clear dirty docs", ->
-      spyOn(@store, "clear_changed")
+      spyOn(@store, "clearChanged")
       @store.clear()      
-      do expect(@store.clear_changed).wasCalled
+      do expect(@store.clearChanged).wasCalled
       
     it "should resolve promise", ->
       promise = @store.clear()
@@ -560,64 +560,64 @@ describe "Hoodie.Store", ->
     
     _when "an error occurs", ->
       beforeEach ->
-        spyOn(@store, "clear_changed").andCallFake -> throw new Error('ooops')
+        spyOn(@store, "clearChanged").andCallFake -> throw new Error('ooops')
       
       it "should reject the promise", ->
         promise = @store.clear()      
         expect(promise).toBeRejected()
   # /.clear()
 
-  describe ".is_dirty(type, id)", ->
+  describe ".isDirty(type, id)", ->
     _when "no arguments passed", ->
       it "returns true when there are no dirty documents", ->
         @store._dirty ={}
-        expect(@store.is_dirty()).toBeTruthy()
+        expect(@store.isDirty()).toBeTruthy()
         
     _when "type & id passed", ->
       _and "object was not yet synced", ->
         beforeEach ->
-          spyOn(@store, "cache").andReturn _synced_at: undefined
+          spyOn(@store, "cache").andReturn _syncedAt: undefined
         
         it "should return true", ->
-          do expect(@store.is_dirty 'couch', '123').toBeTruthy
+          do expect(@store.isDirty 'couch', '123').toBeTruthy
       
       _and "object was synced", ->
         _and "object was not updated yet", ->
           beforeEach ->
             spyOn(@store, "cache").andReturn 
-              _synced_at : new Date(0)
-              updated_at: undefined
+              _syncedAt : new Date(0)
+              updatedAt: undefined
           
           it "should return false", ->
-            do expect(@store.is_dirty 'couch', '123').toBeFalsy
+            do expect(@store.isDirty 'couch', '123').toBeFalsy
             
         _and "object was updated at the same time", ->
           beforeEach ->
             spyOn(@store, "cache").andReturn 
-              _synced_at : new Date(0)
-              updated_at: new Date(0)
+              _syncedAt : new Date(0)
+              updatedAt: new Date(0)
               
           it "should return false", ->
-            do expect(@store.is_dirty 'couch', '123').toBeFalsy
+            do expect(@store.isDirty 'couch', '123').toBeFalsy
             
         _and "object was updated later", ->
           beforeEach ->
             spyOn(@store, "cache").andReturn 
-              _synced_at : new Date(0)
-              updated_at: new Date(1)
+              _syncedAt : new Date(0)
+              updatedAt: new Date(1)
               
           it "should return true", ->
-            do expect(@store.is_dirty 'couch', '123').toBeTruthy
-  # /.is_dirty(type, id)
+            do expect(@store.isDirty 'couch', '123').toBeTruthy
+  # /.isDirty(type, id)
   
-  describe ".mark_as_changed(type, id, object)", ->
+  describe ".markAsChanged(type, id, object)", ->
     beforeEach ->
       @store._dirty = {}
       
-      spyOn(window, "setTimeout").andReturn 'new_timeout'
+      spyOn(window, "setTimeout").andReturn 'newTimeout'
       spyOn(window, "clearTimeout")
       spyOn(@hoodie, "trigger")
-      @store.mark_as_changed 'couch', '123', color: 'red'
+      @store.markAsChanged 'couch', '123', color: 'red'
     
     it "should add it to the dirty list", ->
       expect(@store._dirty['couch/123'].color).toBe 'red'
@@ -628,22 +628,22 @@ describe "Hoodie.Store", ->
     it "should start dirty timeout for 2 seconds", ->
       args = window.setTimeout.mostRecentCall.args
       expect(args[1]).toBe 2000
-      expect(@store._dirty_timeout).toBe 'new_timeout'
+      expect(@store._dirtyTimeout).toBe 'newTimeout'
       
     it "should clear dirty timeout", ->
-      @store._dirty_timeout = 'timeout'
-      @store.mark_as_changed 'couch', '123', color: 'red'
+      @store._dirtyTimeout = 'timeout'
+      @store.markAsChanged 'couch', '123', color: 'red'
       expect(window.clearTimeout).wasCalledWith 'timeout'
-  # /.mark_as_changed(type, id, object)
+  # /.markAsChanged(type, id, object)
   
-  describe ".changed_docs()", ->
+  describe ".changedDocs()", ->
     _when "there are no changed docs", ->
       beforeEach ->
         @store._dirty = {}
         
       it "should return an empty array", ->
-        expect($.isArray @store.changed_docs()).toBeTruthy()
-        expect(@store.changed_docs().length).toBe 0
+        expect($.isArray @store.changedDocs()).toBeTruthy()
+        expect(@store.changedDocs().length).toBe 0
         
     _when "there are 2 dirty docs", ->
       beforeEach ->
@@ -653,30 +653,30 @@ describe "Hoodie.Store", ->
         ]
         
       it "should return the two docs", ->
-        expect(@store.changed_docs().length).toBe 2
-  # /.changed_docs()
+        expect(@store.changedDocs().length).toBe 2
+  # /.changedDocs()
 
-  describe ".is_marked_as_deleted(type, id)", ->
+  describe ".isMarkedAsDeleted(type, id)", ->
     _when "object 'couch/123' is marked as deleted", ->
       beforeEach ->
         spyOn(@store, "cache").andReturn _deleted: true
       
       it "should return true", ->
-        expect(@store.is_marked_as_deleted('couch', '123')).toBeTruthy()
+        expect(@store.isMarkedAsDeleted('couch', '123')).toBeTruthy()
         
     _when "object 'couch/123' isn't marked as deleted", ->
       beforeEach ->
         spyOn(@store, "cache").andReturn {}
         
       it "should return false", ->
-        expect(@store.is_marked_as_deleted('couch', '123')).toBeFalsy()
-  # /.is_marked_as_deleted(type, id)
+        expect(@store.isMarkedAsDeleted('couch', '123')).toBeFalsy()
+  # /.isMarkedAsDeleted(type, id)
 
-  describe ".clear_changed(type, id)", ->
+  describe ".clearChanged(type, id)", ->
     _when "type & id passed", ->
       it "should remove the respective object from the dirty list", ->
         @store._dirty['couch/123'] = {color: 'red'}
-        @store.clear_changed 'couch', 123
+        @store.clearChanged 'couch', 123
         expect(@store._dirty['couch/123']).toBeUndefined()
     
     _when "no arguments passed", ->
@@ -684,14 +684,14 @@ describe "Hoodie.Store", ->
         @store._dirty =
           'couch/123': color: 'red'
           'couch/456': color: 'green'
-        @store.clear_changed()
+        @store.clearChanged()
         do expect($.isEmptyObject @store._dirty).toBeTruthy
       
     it "should trigger a `store:dirty` event", ->
       spyOn(@hoodie, "trigger")
-      @store.clear_changed()
+      @store.clearChanged()
       expect(@hoodie.trigger).wasCalledWith 'store:dirty'
-  # /.clear_changed()
+  # /.clearChanged()
   
   describe ".uuid(num = 7)", ->
     it "should default to a length of 7", ->

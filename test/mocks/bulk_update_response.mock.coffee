@@ -1,5 +1,5 @@
 window.Mocks or= {}
-Mocks.bulk_update_response = ->
+Mocks.bulkUpdateResponse = ->
   ->
     [
       {

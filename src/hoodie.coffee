@@ -18,11 +18,11 @@ class Hoodie extends Events
   # ## initialization
   #
   # Inits the Hoodie, an optional couchDB URL can be passed
-  constructor : (@base_url = '') ->
+  constructor : (@baseUrl = '') ->
   
     # remove trailing slash(es)
-    @base_url = @base_url.replace /\/+$/, ''
-    @_load_modules()
+    @baseUrl = @baseUrl.replace /\/+$/, ''
+    @_loadModules()
   
 
   # ## Request
@@ -31,7 +31,7 @@ class Hoodie extends Events
   request: (type, path, options = {}) ->
     defaults =
       type        : type
-      url         : "#{@base_url}#{path}"
+      url         : "#{@baseUrl}#{path}"
       xhrFields   : withCredentials: true
       crossDomain : true
       dataType    : 'json'
@@ -54,6 +54,6 @@ class Hoodie extends Events
   # ## Private
   
   #
-  _load_modules: ->
-    for instance_name, Module of @modules()
-      @[instance_name] = new Module this
+  _loadModules: ->
+    for instanceName, Module of @modules()
+      @[instanceName] = new Module this

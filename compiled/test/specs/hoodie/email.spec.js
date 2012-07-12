@@ -7,56 +7,56 @@ describe("Hoodie.Email", function() {
     this.errorSpy = jasmine.createSpy('error');
     return this.successSpy = jasmine.createSpy('success');
   });
-  return describe(".send(email_attributes)", function() {
+  return describe(".send(emailAttributes)", function() {
     beforeEach(function() {
-      this.email_attributes = {
+      this.emailAttributes = {
         to: 'jim@be.am',
         subject: 'subject',
         body: 'body'
       };
       return (spyOn(this.hoodie.store, "create")).andReturn({
         then: function(cb) {
-          return cb($.extend({}, this.email_attributes, {
+          return cb($.extend({}, this.emailAttributes, {
             id: 'abc4567'
           }));
         }
       });
     });
     it("should reject the promise", function() {
-      return expect(this.email.send(this.email_attributes)).toBePromise();
+      return expect(this.email.send(this.emailAttributes)).toBePromise();
     });
     it("should save the email as object with type: $email", function() {
-      this.email.send(this.email_attributes);
-      return (expect(this.hoodie.store.create)).wasCalledWith('$email', this.email_attributes);
+      this.email.send(this.emailAttributes);
+      return (expect(this.hoodie.store.create)).wasCalledWith('$email', this.emailAttributes);
     });
     it("should listen to server response", function() {
       spyOn(this.hoodie, "one");
-      this.email.send(this.email_attributes);
+      this.email.send(this.emailAttributes);
       (expect(this.hoodie.one)).wasCalled();
       return (expect(this.hoodie.one.mostRecentCall.args[0])).toEqual("remote:updated:$email:abc4567");
     });
     _when("email.to is not provided", function() {
       beforeEach(function() {
-        return this.email_attributes.to = '';
+        return this.emailAttributes.to = '';
       });
       return it("should reject the promise", function() {
         var promise;
-        promise = this.email.send(this.email_attributes);
+        promise = this.email.send(this.emailAttributes);
         promise.fail(this.errorSpy);
-        return (expect(this.errorSpy)).wasCalledWith($.extend(this.email_attributes, {
+        return (expect(this.errorSpy)).wasCalledWith($.extend(this.emailAttributes, {
           error: 'Invalid email address (empty)'
         }));
       });
     });
     _when("email.to is 'invalid'", function() {
       beforeEach(function() {
-        return this.email_attributes.to = 'invalid';
+        return this.emailAttributes.to = 'invalid';
       });
       return it("should reject the promise", function() {
         var promise;
-        promise = this.email.send(this.email_attributes);
+        promise = this.email.send(this.emailAttributes);
         promise.fail(this.errorSpy);
-        return (expect(this.errorSpy)).wasCalledWith($.extend(this.email_attributes, {
+        return (expect(this.errorSpy)).wasCalledWith($.extend(this.emailAttributes, {
           error: 'Invalid email address (invalid)'
         }));
       });
@@ -64,35 +64,35 @@ describe("Hoodie.Email", function() {
     _when("sending email was successful", function() {
       beforeEach(function() {
         var _this = this;
-        this.email_response_attributes = $.extend({}, this.email_attributes, {
+        this.emailResponseAttributes = $.extend({}, this.emailAttributes, {
           id: 'abc4567',
-          delivered_at: "2012-05-05 15:00 UTC"
+          deliveredAt: "2012-05-05 15:00 UTC"
         });
         (spyOn(this.hoodie, "one")).andCallFake(function(event, cb) {
-          return cb(_this.email_response_attributes);
+          return cb(_this.emailResponseAttributes);
         });
-        return this.promise = this.email.send(this.email_attributes);
+        return this.promise = this.email.send(this.emailAttributes);
       });
       return it("should resolve the promise", function() {
         this.promise.done(this.successSpy);
-        return (expect(this.successSpy)).wasCalledWith(this.email_response_attributes);
+        return (expect(this.successSpy)).wasCalledWith(this.emailResponseAttributes);
       });
     });
     return _when("sending email had an error", function() {
       beforeEach(function() {
         var _this = this;
-        this.email_response_attributes = $.extend({}, this.email_attributes, {
+        this.emailResponseAttributes = $.extend({}, this.emailAttributes, {
           id: 'abc4567',
           error: "U SPAM!"
         });
         (spyOn(this.hoodie, "one")).andCallFake(function(event, cb) {
-          return cb(_this.email_response_attributes);
+          return cb(_this.emailResponseAttributes);
         });
-        return this.promise = this.email.send(this.email_attributes);
+        return this.promise = this.email.send(this.emailAttributes);
       });
       return it("should resolve the promise", function() {
         this.promise.fail(this.errorSpy);
-        return (expect(this.errorSpy)).wasCalledWith(this.email_response_attributes);
+        return (expect(this.errorSpy)).wasCalledWith(this.emailResponseAttributes);
       });
     });
   });

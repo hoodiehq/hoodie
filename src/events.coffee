@@ -35,7 +35,7 @@ class Events
   # 
   # same as `bind`, but does get executed only once
   # 
-  #     object.one 'ground_touch', game_over
+  #     object.one 'groundTouch', gameOver
   one: (ev, callback) ->
     @bind ev, ->
       @unbind(ev, arguments.callee)

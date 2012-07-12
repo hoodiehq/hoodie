@@ -7,15 +7,15 @@ describe "Hoodie", ->
   describe "new", ->
     it "should store the couchDB URL", ->
       hoodie = new Hoodie 'http://couch.example.com'
-      expect(hoodie.base_url).toBe 'http://couch.example.com'
+      expect(hoodie.baseUrl).toBe 'http://couch.example.com'
       
     it "should remove trailing slash from passed URL", ->
       hoodie = new Hoodie 'http://couch.example.com/'
-      expect(hoodie.base_url).toBe 'http://couch.example.com'
+      expect(hoodie.baseUrl).toBe 'http://couch.example.com'
       
     it "should default the couchDB URL to ''", ->
       hoodie = new Hoodie
-      expect(hoodie.base_url).toBe ''
+      expect(hoodie.baseUrl).toBe ''
     
   # /new
   

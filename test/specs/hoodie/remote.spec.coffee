@@ -5,13 +5,13 @@ describe "Hoodie.Remote", ->
     spyOn(@hoodie, "on")
     spyOn(@hoodie, "one")
     spyOn(@hoodie, "unbind")
-    @request_defer = @hoodie.defer()
-    spyOn(@hoodie, "request").andReturn @request_defer.promise()
+    @requestDefer = @hoodie.defer()
+    spyOn(@hoodie, "request").andReturn @requestDefer.promise()
     spyOn(window, "setTimeout")
     
     spyOn(@hoodie, "trigger")
-    spyOn(@hoodie.store, "destroy").andReturn then: (cb) -> cb('object_from_store')
-    spyOn(@hoodie.store, "update").andReturn  then: (cb) -> cb('object_from_store', false)
+    spyOn(@hoodie.store, "destroy").andReturn then: (cb) -> cb('objectFromStore')
+    spyOn(@hoodie.store, "update").andReturn  then: (cb) -> cb('objectFromStore', false)
   
   
   describe ".constructor(@hoodie, options = {})", ->
@@ -45,13 +45,13 @@ describe "Hoodie.Remote", ->
       @remote.activate()
       expect(@hoodie.config.set).wasCalledWith '_remote.active', true
 
-    it "should subscribe to `signed_out` event", ->
+    it "should subscribe to `signedOut` event", ->
       @remote.activate()
-      expect(@hoodie.on).wasCalledWith 'account:signed_out', @remote.disconnect
+      expect(@hoodie.on).wasCalledWith 'account:signedOut', @remote.disconnect
 
-    it "should subscribe to account:sign_in with sync", ->
+    it "should subscribe to account:signin with sync", ->
       @remote.activate()
-      expect(@hoodie.on).wasCalledWith 'account:signed_in', @remote.connect
+      expect(@hoodie.on).wasCalledWith 'account:signedIn', @remote.connect
       
   describe ".deactivate", ->
     it "should set remote.active to false", ->
@@ -64,13 +64,13 @@ describe "Hoodie.Remote", ->
       @remote.deactivate()
       expect(@hoodie.config.set).wasCalledWith '_remote.active', false
 
-    it "should unsubscribe from account's signed_in idle event", ->
+    it "should unsubscribe from account's signedIn idle event", ->
       @remote.deactivate()
-      expect(@hoodie.unbind).wasCalledWith 'account:signed_in', @remote.connect
+      expect(@hoodie.unbind).wasCalledWith 'account:signedIn', @remote.connect
       
-    it "should unsubscribe from account's signed_out idle event", ->
+    it "should unsubscribe from account's signedOut idle event", ->
       @remote.deactivate()
-      expect(@hoodie.unbind).wasCalledWith 'account:signed_out', @remote.disconnect
+      expect(@hoodie.unbind).wasCalledWith 'account:signedOut', @remote.disconnect
 
   describe ".connect()", ->
     beforeEach ->
@@ -94,14 +94,14 @@ describe "Hoodie.Remote", ->
 
   describe ".disconnect()", ->  
     it "should abort the pull request", ->
-      @remote._pull_request = abort: jasmine.createSpy 'pull'
+      @remote._pullRequest = abort: jasmine.createSpy 'pull'
       @remote.disconnect()
-      expect(@remote._pull_request.abort).wasCalled()
+      expect(@remote._pullRequest.abort).wasCalled()
     
     it "should abort the push request", ->
-      @remote._push_request = abort: jasmine.createSpy 'push'
+      @remote._pushRequest = abort: jasmine.createSpy 'push'
       @remote.disconnect()
-      expect(@remote._push_request.abort).wasCalled()
+      expect(@remote._pushRequest.abort).wasCalled()
       
     it "should unsubscribe from stores's dirty idle event", ->
       @remote.disconnect()
@@ -114,35 +114,35 @@ describe "Hoodie.Remote", ->
         @remote.active = true
       
       it "should send a longpoll GET request to user's db _changes feed", ->
-        spyOn(@hoodie.account, "db").andReturn 'joe$examle_com'
+        spyOn(@hoodie.account, "db").andReturn 'joe$examleCom'
         @remote.pull()
         expect(@hoodie.request).wasCalled()
         [method, path] = @hoodie.request.mostRecentCall.args
         expect(method).toBe 'GET'
-        expect(path).toBe '/joe%24examle_com/_changes?include_docs=true&heartbeat=10000&feed=longpoll&since=0'
+        expect(path).toBe '/joe%24examleCom/_changes?includeDocs=true&heartbeat=10000&feed=longpoll&since=0'
         
       it "should set a timeout to restart the pull request", ->
         @remote.pull()
-        expect(window.setTimeout).wasCalledWith @remote._restart_pull_request, 25000
+        expect(window.setTimeout).wasCalledWith @remote._restartPullRequest, 25000
         
     _when "remote is not active", ->
       beforeEach ->
         @remote.active = false
       
       it "should send a normal GET request to user's db _changes feed", ->
-        spyOn(@hoodie.account, "db").andReturn 'joe$examle_com'
+        spyOn(@hoodie.account, "db").andReturn 'joe$examleCom'
         @remote.pull()
         expect(@hoodie.request).wasCalled()
         [method, path] = @hoodie.request.mostRecentCall.args
         expect(method).toBe 'GET'
-        expect(path).toBe '/joe%24examle_com/_changes?include_docs=true&since=0'
+        expect(path).toBe '/joe%24examleCom/_changes?includeDocs=true&since=0'
 
     _when "request is successful / returns changes", ->
       beforeEach ->
         @hoodie.request.andReturn then: (success) =>
           # avoid recursion
           @hoodie.request.andReturn then: ->
-          success Mocks.changes_response()
+          success Mocks.changesResponse()
       
       it "should remove `todo/abc3` from store", ->
         @remote.pull()
@@ -156,22 +156,22 @@ describe "Hoodie.Remote", ->
         @remote.pull()
 
         # {"_id":"todo/abc3","_rev":"2-123","_deleted":true}
-        expect(@hoodie.trigger).wasCalledWith 'remote:destroy',           'object_from_store'
-        expect(@hoodie.trigger).wasCalledWith 'remote:destroy:todo',      'object_from_store'
-        expect(@hoodie.trigger).wasCalledWith 'remote:destroy:todo:abc3', 'object_from_store'
+        expect(@hoodie.trigger).wasCalledWith 'remote:destroy',           'objectFromStore'
+        expect(@hoodie.trigger).wasCalledWith 'remote:destroy:todo',      'objectFromStore'
+        expect(@hoodie.trigger).wasCalledWith 'remote:destroy:todo:abc3', 'objectFromStore'
 
-        expect(@hoodie.trigger).wasCalledWith 'remote:change',            'destroy', 'object_from_store'
-        expect(@hoodie.trigger).wasCalledWith 'remote:change:todo',       'destroy', 'object_from_store'
-        expect(@hoodie.trigger).wasCalledWith 'remote:change:todo:abc3',  'destroy', 'object_from_store'        
+        expect(@hoodie.trigger).wasCalledWith 'remote:change',            'destroy', 'objectFromStore'
+        expect(@hoodie.trigger).wasCalledWith 'remote:change:todo',       'destroy', 'objectFromStore'
+        expect(@hoodie.trigger).wasCalledWith 'remote:change:todo:abc3',  'destroy', 'objectFromStore'        
         
         # {"_id":"todo/abc2","_rev":"1-123","content":"remember the milk","done":false,"order":1, "type":"todo"}
-        expect(@hoodie.trigger).wasCalledWith 'remote:update',            'object_from_store'
-        expect(@hoodie.trigger).wasCalledWith 'remote:update:todo',       'object_from_store'
-        expect(@hoodie.trigger).wasCalledWith 'remote:update:todo:abc2',  'object_from_store'
+        expect(@hoodie.trigger).wasCalledWith 'remote:update',            'objectFromStore'
+        expect(@hoodie.trigger).wasCalledWith 'remote:update:todo',       'objectFromStore'
+        expect(@hoodie.trigger).wasCalledWith 'remote:update:todo:abc2',  'objectFromStore'
 
-        expect(@hoodie.trigger).wasCalledWith 'remote:change',            'update', 'object_from_store'
-        expect(@hoodie.trigger).wasCalledWith 'remote:change:todo',       'update', 'object_from_store'
-        expect(@hoodie.trigger).wasCalledWith 'remote:change:todo:abc2',  'update', 'object_from_store'
+        expect(@hoodie.trigger).wasCalledWith 'remote:change',            'update', 'objectFromStore'
+        expect(@hoodie.trigger).wasCalledWith 'remote:change:todo',       'update', 'objectFromStore'
+        expect(@hoodie.trigger).wasCalledWith 'remote:change:todo:abc2',  'update', 'objectFromStore'
         
       _and "remote is active", ->
         beforeEach ->
@@ -275,13 +275,13 @@ describe "Hoodie.Remote", ->
   describe ".push(docs)", -> 
     beforeEach ->
       spyOn(Date, "now").andReturn 10
-      @remote._timezone_offset = 1
+      @remote._timezoneOffset = 1
       @defer = @hoodie.defer()
       
     _when "no docs passed", ->        
       _and "there are no changed docs", ->
         beforeEach ->
-          spyOn(@hoodie.store, "changed_docs").andReturn []
+          spyOn(@hoodie.store, "changedDocs").andReturn []
           @remote.push()
       
         it "shouldn't do anything", ->
@@ -289,15 +289,15 @@ describe "Hoodie.Remote", ->
       
       _and "there is one deleted and one new doc", ->
         beforeEach ->
-          spyOn(@hoodie.store, "changed_docs").andReturn Mocks.changed_docs()
-          spyOn(@hoodie.account, "db").andReturn 'joe$examle_com'
+          spyOn(@hoodie.store, "changedDocs").andReturn Mocks.changedDocs()
+          spyOn(@hoodie.account, "db").andReturn 'joe$examleCom'
           @remote.push()
           expect(@hoodie.request).wasCalled()
           [@method, @path, @options] = @hoodie.request.mostRecentCall.args
     
-        it "should post the changes to the user's db _bulk_docs API", ->
+        it "should post the changes to the user's db _bulkDocs API", ->
           expect(@method).toBe 'POST'
-          expect(@path).toBe '/joe%24examle_com/_bulk_docs'
+          expect(@path).toBe '/joe%24examleCom/_bulkDocs'
       
         it "should set dataType to json", ->
           expect(@options.dataType).toBe 'json'
@@ -315,31 +315,31 @@ describe "Hoodie.Remote", ->
           expect(doc._id).toBe 'todo/abc3'
           expect(doc._localInfo).toBeUndefined()
 
-        it "should set data.new_edits to false", ->
-          {new_edits} = JSON.parse @options.data
-          expect(new_edits).toBe false
+        it "should set data.newEdits to false", ->
+          {newEdits} = JSON.parse @options.data
+          expect(newEdits).toBe false
 
         it "should set new _revision ids", ->
           {docs} = JSON.parse @options.data
-          [deleted_doc, new_doc] = docs
-          expect(deleted_doc._rev).toBe '3-mock567#11'
-          expect(new_doc._rev).toMatch '1-mock567#11'
+          [deletedDoc, newDoc] = docs
+          expect(deletedDoc._rev).toBe '3-mock567#11'
+          expect(newDoc._rev).toMatch '1-mock567#11'
 
-          expect(deleted_doc._revisions.start).toBe 3
-          expect(deleted_doc._revisions.ids[0]).toBe 'mock567#11'
-          expect(deleted_doc._revisions.ids[1]).toBe '123'
+          expect(deletedDoc._revisions.start).toBe 3
+          expect(deletedDoc._revisions.ids[0]).toBe 'mock567#11'
+          expect(deletedDoc._revisions.ids[1]).toBe '123'
 
-          expect(new_doc._revisions.start).toBe 1
-          expect(new_doc._revisions.ids[0]).toBe 'mock567#11'
+          expect(newDoc._revisions.start).toBe 1
+          expect(newDoc._revisions.ids[0]).toBe 'mock567#11'
       
       _when "Array of docs passed", ->
         beforeEach ->
-          @todo_objects = [
+          @todoObjects = [
             {type: 'todo', id: '1'}
             {type: 'todo', id: '2'}
             {type: 'todo', id: '3'}
           ]
-          @remote.push @todo_objects
+          @remote.push @todoObjects
         
         it "should POST the passed objects", ->
           expect(@hoodie.request).wasCalled()

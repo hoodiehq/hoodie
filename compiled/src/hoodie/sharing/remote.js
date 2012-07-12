@@ -8,7 +8,7 @@ Hoodie.Sharing.Remote = (function(_super) {
   __extends(Remote, _super);
 
   function Remote() {
-    this._handle_push_success = __bind(this._handle_push_success, this);
+    this._handlePushSuccess = __bind(this._handlePushSuccess, this);
 
     this.push = __bind(this.push, this);
     return Remote.__super__.constructor.apply(this, arguments);
@@ -19,7 +19,7 @@ Hoodie.Sharing.Remote = (function(_super) {
     if (!$.isArray(docs)) {
       docs = (function() {
         var _i, _len, _ref, _results;
-        _ref = this.hoodie.store.changed_docs();
+        _ref = this.hoodie.store.changedDocs();
         _results = [];
         for (_i = 0, _len = _ref.length; _i < _len; _i++) {
           obj = _ref[_i];
@@ -33,38 +33,38 @@ Hoodie.Sharing.Remote = (function(_super) {
     return Remote.__super__.push.call(this, docs);
   };
 
-  Remote.prototype._pull_url = function() {
+  Remote.prototype._pullUrl = function() {
     var since;
     since = this.hoodie.config.get('_remote.seq') || 0;
     if (this.active) {
-      return "/" + (encodeURIComponent(this.hoodie.account.db())) + "/_changes?filter=%24sharing_" + this.hoodie.sharing.id + "/owned&include_docs=true&since=" + since + "&heartbeat=10000&feed=longpoll";
+      return "/" + (encodeURIComponent(this.hoodie.account.db())) + "/_changes?filter=%24sharing_" + this.hoodie.sharing.id + "/owned&includeDocs=true&since=" + since + "&heartbeat=10000&feed=longpoll";
     } else {
-      return "/" + (encodeURIComponent(this.hoodie.account.db())) + "/_changes?filter=%24sharing_" + this.hoodie.sharing.id + "/owned&include_docs=true&since=" + since;
+      return "/" + (encodeURIComponent(this.hoodie.account.db())) + "/_changes?filter=%24sharing_" + this.hoodie.sharing.id + "/owned&includeDocs=true&since=" + since;
     }
   };
 
-  Remote.prototype._add_revision_to = function(obj) {
+  Remote.prototype._addRevisionTo = function(obj) {
     var doc, key, _ref;
-    if (obj.$docs_to_remove) {
-      console.log("obj.$docs_to_remove");
-      console.log(obj.$docs_to_remove);
-      _ref = obj.$docs_to_remove;
+    if (obj.$docsToRemove) {
+      console.log("obj.$docsToRemove");
+      console.log(obj.$docsToRemove);
+      _ref = obj.$docsToRemove;
       for (key in _ref) {
         doc = _ref[key];
-        this._add_revision_to(doc);
+        this._addRevisionTo(doc);
       }
     }
-    return Remote.__super__._add_revision_to.call(this, obj);
+    return Remote.__super__._addRevisionTo.call(this, obj);
   };
 
-  Remote.prototype._handle_push_success = function(docs, pushed_docs) {
+  Remote.prototype._handlePushSuccess = function(docs, pushedDocs) {
     var _this = this;
     return function() {
-      var doc, i, id, key, pushed_doc, type, update, _i, _j, _len, _len1, _ref, _ref1;
-      for (_i = 0, _len = pushed_docs.length; _i < _len; _i++) {
-        pushed_doc = pushed_docs[_i];
-        if (pushed_doc.$docs_to_remove) {
-          _ref = pushed_doc.$docs_to_remove;
+      var doc, i, id, key, pushedDoc, type, update, _i, _j, _len, _len1, _ref, _ref1;
+      for (_i = 0, _len = pushedDocs.length; _i < _len; _i++) {
+        pushedDoc = pushedDocs[_i];
+        if (pushedDoc.$docsToRemove) {
+          _ref = pushedDoc.$docsToRemove;
           for (key in _ref) {
             doc = _ref[key];
             _ref1 = key.split(/\//), type = _ref1[0], id = _ref1[1];
@@ -80,7 +80,7 @@ Hoodie.Sharing.Remote = (function(_super) {
           }
         }
       }
-      return Remote.__super__._handle_push_success.call(_this, docs, pushed_docs)();
+      return Remote.__super__._handlePushSuccess.call(_this, docs, pushedDocs)();
     };
   };
 

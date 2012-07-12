@@ -18,28 +18,28 @@ class Hoodie.Email
   # ## send
   #
   # sends an email and returns a promise
-  send : (email_attributes = {}) ->
+  send : (emailAttributes = {}) ->
     defer      = @hoodie.defer()
-    attributes = $.extend {}, email_attributes
+    attributes = $.extend {}, emailAttributes
     
-    unless @_is_valid_email email_attributes.to
+    unless @_isValidEmail emailAttributes.to
       attributes.error = "Invalid email address (#{attributes.to or 'empty'})"
       return defer.reject(attributes).promise()
     
     @hoodie.store.create('$email', attributes).then (obj) =>
-      @_handle_email_update(defer, obj)
+      @_handleEmailUpdate(defer, obj)
       
     defer.promise()
     
   # ## PRIVATE
   #
-  _is_valid_email : (email = '') ->
+  _isValidEmail : (email = '') ->
      /@/.test email
      
-  _handle_email_update : (defer, attributes = {}) =>
+  _handleEmailUpdate : (defer, attributes = {}) =>
     if attributes.error
       defer.reject attributes
-    else if attributes.delivered_at
+    else if attributes.deliveredAt
       defer.resolve attributes
     else
-      @hoodie.one "remote:updated:$email:#{attributes.id}", (attributes) => @_handle_email_update(defer, attributes)
+      @hoodie.one "remote:updated:$email:#{attributes.id}", (attributes) => @_handleEmailUpdate(defer, attributes)

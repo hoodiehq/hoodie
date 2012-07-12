@@ -8,7 +8,7 @@
 #
 
 # needs to to have the same name due to hoodie's loading mechanism
-# see: Hoodie::_load_modules
+# see: Hoodie::_loadModules
 class Hoodie.Sharing.Remote extends Hoodie.Remote
   
 
@@ -20,7 +20,7 @@ class Hoodie.Sharing.Remote extends Hoodie.Remote
       # walk through all changed docs, check if it's
       # 1. the sharing object itself or
       # 2. an object belonging to the sharing
-      docs = for obj in @hoodie.store.changed_docs() when obj.id is @hoodie.sharing.id or obj.$sharings and ~obj.$sharings.indexOf(@hoodie.sharing.id)
+      docs = for obj in @hoodie.store.changedDocs() when obj.id is @hoodie.sharing.id or obj.$sharings and ~obj.$sharings.indexOf(@hoodie.sharing.id)
         obj 
 
     super(docs)
@@ -31,23 +31,23 @@ class Hoodie.Sharing.Remote extends Hoodie.Remote
   # The pull URL has an addition filter to only pull for the documents
   # that belong to the sharing, see above
   #
-  _pull_url : ->
+  _pullUrl : ->
     since = @hoodie.config.get('_remote.seq') or 0
     if @active # make a long poll request
-      "/#{encodeURIComponent @hoodie.account.db()}/_changes?filter=%24sharing_#{@hoodie.sharing.id}/owned&include_docs=true&since=#{since}&heartbeat=10000&feed=longpoll"
+      "/#{encodeURIComponent @hoodie.account.db()}/_changes?filter=%24sharing_#{@hoodie.sharing.id}/owned&includeDocs=true&since=#{since}&heartbeat=10000&feed=longpoll"
     else
-      "/#{encodeURIComponent @hoodie.account.db()}/_changes?filter=%24sharing_#{@hoodie.sharing.id}/owned&include_docs=true&since=#{since}"
+      "/#{encodeURIComponent @hoodie.account.db()}/_changes?filter=%24sharing_#{@hoodie.sharing.id}/owned&includeDocs=true&since=#{since}"
 
 
   # add revision to object
   #
-  # in addition to the standard behavior, we check for the $docs_to_remove
+  # in addition to the standard behavior, we check for the $docsToRemove
   # attribute, to add new revision to these as well.
-  _add_revision_to : (obj) ->
-    if obj.$docs_to_remove
-      console.log "obj.$docs_to_remove"
-      console.log obj.$docs_to_remove
-      @_add_revision_to(doc) for key, doc of obj.$docs_to_remove
+  _addRevisionTo : (obj) ->
+    if obj.$docsToRemove
+      console.log "obj.$docsToRemove"
+      console.log obj.$docsToRemove
+      @_addRevisionTo(doc) for key, doc of obj.$docsToRemove
 
     super obj
 
@@ -55,15 +55,15 @@ class Hoodie.Sharing.Remote extends Hoodie.Remote
   # handle push success
   #
   # before handing over the docs (that have been replicated to the couch)
-  # to the default procedure, we check for the $docs_to_remove attribute
+  # to the default procedure, we check for the $docsToRemove attribute
   # again, and handle these documents upfront
-  _handle_push_success: (docs, pushed_docs) =>
+  _handlePushSuccess: (docs, pushedDocs) =>
     =>
-      for pushed_doc in pushed_docs
-        if pushed_doc.$docs_to_remove
-          for key, doc of pushed_doc.$docs_to_remove
+      for pushedDoc in pushedDocs
+        if pushedDoc.$docsToRemove
+          for key, doc of pushedDoc.$docsToRemove
             [type, id] = key.split /\//
             update = _rev: doc._rev
             @hoodie.store.update(type, id, update, remote: true) for doc, i in docs
 
-      super(docs, pushed_docs)()
+      super(docs, pushedDocs)()

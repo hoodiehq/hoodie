@@ -69,14 +69,14 @@ hoodie.sharing.create
     "frank@example.com"
   ]
   objects : [
-    todo_list, todo1, todo2, todo3
+    todoList, todo1, todo2, todo3
   ]
 
 # share all my documents that I marked as
 # shared and keep them updated
 hoodie.sharing.create
   continuous : true
-  objects    : hoodie.store.loadAll (obj) -&gt; obj.is_shared
+  objects    : hoodie.store.loadAll (obj) -&gt; obj.isShared
 </code></pre></div></div><div class="code"><div class="wrapper">  <span class="nv">create : </span><span class="nf">(options = {}) -&gt;</span>
     <span class="nv">sharing = </span><span class="k">new</span> <span class="nx">Hoodie</span><span class="p">.</span><span class="nx">Sharing</span><span class="p">.</span><span class="nx">Instance</span> <span class="nx">options</span>
     <span class="nx">sharing</span><span class="p">.</span><span class="nx">save</span><span class="p">()</span>
@@ -93,7 +93,7 @@ hoodie.sharing.create
 <li>Try to find a sharing by given id</li>
 <li>If sharing could be found, return it</li>
 <li>If not, create one and return it.</li>
-</ol></div></div><div class="code"><div class="wrapper">  <span class="nv">find_or_create : </span><span class="nf">(options) -&gt;</span>
+</ol></div></div><div class="code"><div class="wrapper">  <span class="nv">findOrCreate : </span><span class="nf">(options) -&gt;</span>
     <span class="nv">defer = </span><span class="nx">@hoodie</span><span class="p">.</span><span class="nx">defer</span><span class="p">()</span>
     <span class="nx">@load</span><span class="p">(</span><span class="nx">options</span><span class="p">.</span><span class="nx">id</span><span class="p">)</span>
     <span class="p">.</span><span class="nx">done</span> <span class="nf">(sharing) -&gt;</span>

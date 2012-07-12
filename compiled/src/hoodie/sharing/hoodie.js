@@ -32,7 +32,7 @@ Hoodie.Sharing.Hoodie = (function(_super) {
         return _this.trigger(event);
       });
     }
-    Hoodie.__super__.constructor.call(this, hoodie.base_url);
+    Hoodie.__super__.constructor.call(this, hoodie.baseUrl);
   }
 
   Hoodie.prototype.request = function(type, path, options) {
@@ -42,7 +42,7 @@ Hoodie.Sharing.Hoodie = (function(_super) {
     }
     defaults = {
       type: type,
-      url: "" + this.base_url + path,
+      url: "" + this.baseUrl + path,
       xhrFields: {
         withCredentials: true
       },
@@ -61,9 +61,9 @@ Hoodie.Sharing.Hoodie = (function(_super) {
     return $.ajax($.extend(defaults, options));
   };
 
-  Hoodie.prototype._load_modules = function() {
-    console.log('Hoodie.Sharing.Hoodie _load_modules');
-    return Hoodie.__super__._load_modules.apply(this, arguments);
+  Hoodie.prototype._loadModules = function() {
+    console.log('Hoodie.Sharing.Hoodie _loadModules');
+    return Hoodie.__super__._loadModules.apply(this, arguments);
   };
 
   return Hoodie;

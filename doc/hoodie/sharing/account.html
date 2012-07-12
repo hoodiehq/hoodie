@@ -2,14 +2,14 @@
 
 <p>Sharing does not use Cookies for authentication but the authorization header
 (basic authentication). Therefore sign up/in/out is ... useless.</p></div></div><div class="code"><div class="wrapper">  </div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>needs to to have the same name due to hoodie's loading mechanism
-see: Hoodie::<em>load</em>modules</p></div></div><div class="code"><div class="wrapper"><span class="k">class</span> <span class="nx">Hoodie</span><span class="p">.</span><span class="nx">Sharing</span><span class="p">.</span><span class="nx">Account</span> <span class="k">extends</span> <span class="nx">Hoodie</span><span class="p">.</span><span class="nx">Account</span>
+see: Hoodie::_loadModules</p></div></div><div class="code"><div class="wrapper"><span class="k">class</span> <span class="nx">Hoodie</span><span class="p">.</span><span class="nx">Sharing</span><span class="p">.</span><span class="nx">Account</span> <span class="k">extends</span> <span class="nx">Hoodie</span><span class="p">.</span><span class="nx">Account</span>
 
   <span class="nv">constructor : </span><span class="o">-&gt;</span>
     <span class="k">super</span>
-    <span class="vi">@_sharing_auth_promise = </span><span class="nx">@hoodie</span><span class="p">.</span><span class="nx">defer</span><span class="p">().</span><span class="nx">resolve</span><span class="p">(</span><span class="nx">@username</span><span class="p">).</span><span class="nx">promise</span><span class="p">()</span>
+    <span class="vi">@_sharingAuthPromise = </span><span class="nx">@hoodie</span><span class="p">.</span><span class="nx">defer</span><span class="p">().</span><span class="nx">resolve</span><span class="p">(</span><span class="nx">@username</span><span class="p">).</span><span class="nx">promise</span><span class="p">()</span>
     
 
-  <span class="nv">authenticate : </span><span class="o">-&gt;</span> <span class="nx">@_sharing_auth_promise</span>
-  <span class="nv">sign_up      : </span><span class="o">-&gt;</span> <span class="nx">@_sharing_auth_promise</span>
-  <span class="nv">sign_in      : </span><span class="o">-&gt;</span> <span class="nx">@_sharing_auth_promise</span>
-  <span class="nv">sign_out     : </span><span class="o">-&gt;</span> <span class="nx">@_sharing_auth_promise</span></div></div></div></div></body></html>
+  <span class="nv">authenticate : </span><span class="o">-&gt;</span> <span class="nx">@_sharingAuthPromise</span>
+  <span class="nv">signUp      : </span><span class="o">-&gt;</span> <span class="nx">@_sharingAuthPromise</span>
+  <span class="nv">signIn      : </span><span class="o">-&gt;</span> <span class="nx">@_sharingAuthPromise</span>
+  <span class="nv">signOut     : </span><span class="o">-&gt;</span> <span class="nx">@_sharingAuthPromise</span></div></div></div></div></body></html>

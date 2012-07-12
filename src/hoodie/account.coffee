@@ -19,14 +19,14 @@ class Hoodie.Account
     
     # authenticate on next tick
     # window.setTimeout @authenticate
-    @on 'sign_in',  @_handle_sign_in
-    @on 'sign_out', @_handle_sign_out
+    @on 'signin',  @_handleSignIn
+    @on 'signout', @_handleSignOut
   
   
   # ## Authenticate
   # 
   # Use this method to assure that the user is authenticated:
-  # `hoodie.account.authenticate().done( do_something ).fail( handle_error )`
+  # `hoodie.account.authenticate().done( doSomething ).fail( handleError )`
   authenticate : =>
     defer = @hoodie.defer()
     
@@ -40,9 +40,9 @@ class Hoodie.Account
       return defer.reject().promise()
     
     # @_authenticated is undefined
-    @_auth_request = @hoodie.request 'GET', "/_session"
+    @_authRequest = @hoodie.request 'GET', "/_session"
 
-    @_auth_request.done (response) =>
+    @_authRequest.done (response) =>
       if response.userCtx.name
         @_authenticated = true
         @username = response.userCtx.name
@@ -53,7 +53,7 @@ class Hoodie.Account
         @hoodie.trigger 'account:error:unauthenticated'
         defer.reject()
           
-    @_auth_request.fail (xhr) ->
+    @_authRequest.fail (xhr) ->
       try
         error = JSON.parse(xhr.responseText)
       catch e
@@ -70,7 +70,7 @@ class Hoodie.Account
   # The backend will automatically create a userDB based on the username
   # address.
   #
-  sign_up : (username, password = '') ->
+  signUp : (username, password = '') ->
     defer = @hoodie.defer()
     
     key     = "#{@_prefix}:#{username}"
@@ -82,16 +82,16 @@ class Hoodie.Account
       roles      : []
       password   : password
 
-    request_promise = @hoodie.request 'PUT', "/_users/#{encodeURIComponent key}",
+    requestPromise = @hoodie.request 'PUT', "/_users/#{encodeURIComponent key}",
       data        : JSON.stringify data
       contentType : 'application/json'
       
-    handle_succes = (response) =>
-        @hoodie.trigger 'account:sign_up', username
+    handleSucces = (response) =>
+        @hoodie.trigger 'account:signup', username
         @_doc._rev = response.rev
-        @sign_in(username, password).then defer.resolve, defer.reject
+        @signIn(username, password).then defer.resolve, defer.reject
 
-    request_promise.then handle_succes, defer.reject
+    requestPromise.then handleSucces, defer.reject
       
     return defer.promise()
 
@@ -100,32 +100,32 @@ class Hoodie.Account
   #
   # uses standard couchDB API to create a new user session (POST /_session)
   #
-  sign_in : (username, password = '') ->
+  signIn : (username, password = '') ->
     defer = @hoodie.defer()
 
-    request_promise = @hoodie.request 'POST', '/_session', 
+    requestPromise = @hoodie.request 'POST', '/_session', 
       data: 
         name      : username
         password  : password
         
-    handle_succes = (response) =>
-      @hoodie.trigger 'account:sign_in', username
+    handleSucces = (response) =>
+      @hoodie.trigger 'account:signin', username
       @fetch()
       defer.resolve username, response
     
-    request_promise.then handle_succes, defer.reject
+    requestPromise.then handleSucces, defer.reject
     
     return defer.promise()
 
   # alias
-  login: @::sign_in
+  login: @::signIn
 
 
   # ## change password
   #
-  # NOTE: simple implementation, current_password is ignored.
+  # NOTE: simple implementation, currentPassword is ignored.
   #
-  change_password : (current_password = '', new_password) ->
+  changePassword : (currentPassword = '', newPassword) ->
     defer = @hoodie.defer()
     unless @username
       defer.reject error: "unauthenticated", reason: "not logged in"
@@ -135,8 +135,8 @@ class Hoodie.Account
     
     data = $.extend {}, @_doc
     delete data.salt
-    delete data.password_sha
-    data.password = new_password
+    delete data.passwordSha
+    data.password = newPassword
     
     @hoodie.request 'PUT',  "/_users/#{encodeURIComponent key}",
       data        : JSON.stringify data
@@ -159,12 +159,12 @@ class Hoodie.Account
   # uses standard couchDB API to destroy a user session (DELETE /_session)
   #
   # TODO: handle errors
-  sign_out: ->
+  signOut: ->
     @hoodie.request 'DELETE', '/_session', 
-      success : => @hoodie.trigger 'account:sign_out'
+      success : => @hoodie.trigger 'account:signout'
 
   # alias
-  logout: @::sign_out
+  logout: @::signOut
   
   
   # ## On
@@ -236,12 +236,12 @@ class Hoodie.Account
   _doc : {}
   
   #
-  _handle_sign_in: (@username) =>
+  _handleSignIn: (@username) =>
     @hoodie.config.set '_account.username', @username
     @_authenticated = true
   
   #
-  _handle_sign_out: =>
+  _handleSignOut: =>
     delete @username
     @hoodie.config.remove '_account.username'
     @_authenticated = false

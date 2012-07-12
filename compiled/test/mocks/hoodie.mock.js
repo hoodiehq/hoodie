@@ -4,7 +4,7 @@ window.Mocks || (window.Mocks = {});
 
 Mocks.Hoodie = function() {
   return {
-    base_url: 'http://my.cou.ch',
+    baseUrl: 'http://my.cou.ch',
     trigger: function() {},
     request: function() {},
     on: function() {},
@@ -46,7 +46,7 @@ Mocks.Hoodie = function() {
           done: function() {}
         };
       },
-      changed_docs: function() {},
+      changedDocs: function() {},
       db: {
         getItem: function() {},
         setItem: function() {},

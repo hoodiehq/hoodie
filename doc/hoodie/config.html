@@ -8,7 +8,7 @@
     
     <span class="nx">@hoodie</span><span class="p">.</span><span class="nx">store</span><span class="p">.</span><span class="nx">load</span><span class="p">(</span><span class="nx">@type</span><span class="p">,</span> <span class="nx">@id</span><span class="p">).</span><span class="nx">done</span> <span class="p">(</span><span class="nx">obj</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="vi">@cache = </span><span class="nx">obj</span>
 
-    <span class="nx">@hoodie</span><span class="p">.</span><span class="kc">on</span> <span class="s1">&#39;account:signed_out&#39;</span><span class="p">,</span> <span class="nx">@clear</span>
+    <span class="nx">@hoodie</span><span class="p">.</span><span class="kc">on</span> <span class="s1">&#39;account:signedOut&#39;</span><span class="p">,</span> <span class="nx">@clear</span>
   
     </div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h2 id="set">set</h2>
 
@@ -20,8 +20,8 @@
     <span class="nv">update = </span><span class="p">{}</span>
     <span class="nx">update</span><span class="p">[</span><span class="nx">key</span><span class="p">]</span> <span class="o">=</span> <span class="nx">value</span>
     
-    <span class="nv">is_silent = </span><span class="nx">key</span><span class="p">.</span><span class="nx">charAt</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span> <span class="o">is</span> <span class="s1">&#39;_&#39;</span>
-    <span class="nx">@hoodie</span><span class="p">.</span><span class="nx">store</span><span class="p">.</span><span class="nx">update</span> <span class="nx">@type</span><span class="p">,</span> <span class="nx">@id</span><span class="p">,</span> <span class="nx">update</span><span class="p">,</span> <span class="nv">silent: </span><span class="nx">is_silent</span>
+    <span class="nv">isSilent = </span><span class="nx">key</span><span class="p">.</span><span class="nx">charAt</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span> <span class="o">is</span> <span class="s1">&#39;_&#39;</span>
+    <span class="nx">@hoodie</span><span class="p">.</span><span class="nx">store</span><span class="p">.</span><span class="nx">update</span> <span class="nx">@type</span><span class="p">,</span> <span class="nx">@id</span><span class="p">,</span> <span class="nx">update</span><span class="p">,</span> <span class="nv">silent: </span><span class="nx">isSilent</span>
     
   </div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h2 id="get">get</h2>
 

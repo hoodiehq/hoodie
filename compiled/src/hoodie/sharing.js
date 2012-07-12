@@ -23,7 +23,7 @@ Hoodie.Sharing = (function() {
     });
   };
 
-  Sharing.prototype.find_or_create = function(options) {
+  Sharing.prototype.findOrCreate = function(options) {
     var defer,
       _this = this;
     defer = this.hoodie.defer();

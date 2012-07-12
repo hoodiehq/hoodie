@@ -26,7 +26,7 @@
 
 <p>same as <code>bind</code>, but does get executed only once</p>
 
-<pre><code>object.one 'ground_touch', game_over
+<pre><code>object.one 'groundTouch', gameOver
 </code></pre></div></div><div class="code"><div class="wrapper">  <span class="nv">one: </span><span class="nf">(ev, callback) -&gt;</span>
     <span class="nx">@bind</span> <span class="nx">ev</span><span class="p">,</span> <span class="o">-&gt;</span>
       <span class="nx">@unbind</span><span class="p">(</span><span class="nx">ev</span><span class="p">,</span> <span class="nx">arguments</span><span class="p">.</span><span class="nx">callee</span><span class="p">)</span>

@@ -12,17 +12,17 @@ describe("Hoodie.Store", function() {
     return spyOn(this.store.db, "clear").andCallThrough();
   });
   describe("new", function() {
-    return it("should subscribe to account:sign_out event", function() {
+    return it("should subscribe to account:signout event", function() {
       var store;
       spyOn(this.hoodie, "on");
       store = new Hoodie.Store(this.hoodie);
-      return expect(this.hoodie.on).wasCalledWith('account:sign_out', store.clear);
+      return expect(this.hoodie.on).wasCalledWith('account:signout', store.clear);
     });
   });
   describe(".save(type, id, object, options)", function() {
     beforeEach(function() {
       spyOn(this.store, "_now").andReturn('now');
-      return spyOn(this.store, "cache").andReturn('cached_object');
+      return spyOn(this.store, "cache").andReturn('cachedObject');
     });
     it("should return a promise", function() {
       var promise;
@@ -59,11 +59,11 @@ describe("Hoodie.Store", function() {
       it("should add timestamps", function() {
         var object;
         object = this.store.cache.mostRecentCall.args[2];
-        expect(object.created_at).toBe('now');
-        return expect(object.updated_at).toBe('now');
+        expect(object.createdAt).toBe('now');
+        return expect(object.updatedAt).toBe('now');
       });
       _and("options.remote is true", function() {
-        it("should not touch created_at / updated_at timestamps", function() {
+        it("should not touch createdAt / updatedAt timestamps", function() {
           var object;
           this.store.save('document', '123', {
             name: 'test'
@@ -71,10 +71,10 @@ describe("Hoodie.Store", function() {
             remote: true
           });
           object = this.store.cache.mostRecentCall.args[2];
-          expect(object.created_at).toBeUndefined();
-          return expect(object.updated_at).toBeUndefined();
+          expect(object.createdAt).toBeUndefined();
+          return expect(object.updatedAt).toBeUndefined();
         });
-        return it("should add a _synced_at timestamp", function() {
+        return it("should add a _syncedAt timestamp", function() {
           var object;
           this.store.save('document', '123', {
             name: 'test'
@@ -82,11 +82,11 @@ describe("Hoodie.Store", function() {
             remote: true
           });
           object = this.store.cache.mostRecentCall.args[2];
-          return expect(object._synced_at).toBe('now');
+          return expect(object._syncedAt).toBe('now');
         });
       });
       _and("options.silent is true", function() {
-        return it("should not touch created_at / updated_at timestamps", function() {
+        return it("should not touch createdAt / updatedAt timestamps", function() {
           var object;
           this.store.save('document', '123', {
             name: 'test'
@@ -94,8 +94,8 @@ describe("Hoodie.Store", function() {
             silent: true
           });
           object = this.store.cache.mostRecentCall.args[2];
-          expect(object.created_at).toBeUndefined();
-          return expect(object.updated_at).toBeUndefined();
+          expect(object.createdAt).toBeUndefined();
+          return expect(object.updatedAt).toBeUndefined();
         });
       });
       it("should pass options", function() {
@@ -111,7 +111,7 @@ describe("Hoodie.Store", function() {
           return expect(this.promise).toBeResolved();
         });
         it("should pass the object to done callback", function() {
-          return expect(this.promise).toBeResolvedWith('cached_object', true);
+          return expect(this.promise).toBeResolvedWith('cachedObject', true);
         });
         _and("object did exist before", function() {
           beforeEach(function() {
@@ -182,17 +182,17 @@ describe("Hoodie.Store", function() {
         return expect(this.promise).toBeResolved();
       });
     });
-    it("should not overwrite created_at attribute", function() {
+    it("should not overwrite createdAt attribute", function() {
       var id, object, type, _ref;
       this.store.save('document', '123', {
-        created_at: 'check12'
+        createdAt: 'check12'
       });
       _ref = this.store.cache.mostRecentCall.args, type = _ref[0], id = _ref[1], object = _ref[2];
-      return expect(object.created_at).toBe('check12');
+      return expect(object.createdAt).toBe('check12');
     });
     it("should allow numbers and lowercase letters for for type only. And must start with a letter or $", function() {
       var invalid, key, promise, valid, _i, _j, _len, _len1, _results;
-      invalid = ['UPPERCASE', 'under_lines', '-?&$', '12345', 'a'];
+      invalid = ['UPPERCASE', 'underLines', '-?&$', '12345', 'a'];
       valid = ['car', '$email'];
       for (_i = 0, _len = invalid.length; _i < _len; _i++) {
         key = invalid[_i];
@@ -209,7 +209,7 @@ describe("Hoodie.Store", function() {
     });
     it("should allow numbers, lowercase letters and dashes for for id only", function() {
       var invalid, key, promise, valid, _i, _j, _len, _len1, _results;
-      invalid = ['UPPERCASE', 'under_lines', '-?&$'];
+      invalid = ['UPPERCASE', 'underLines', '-?&$'];
       valid = ['abc4567', '1', 123, 'abc-567'];
       for (_i = 0, _len = invalid.length; _i < _len; _i++) {
         key = invalid[_i];
@@ -247,10 +247,10 @@ describe("Hoodie.Store", function() {
           return expect(this.promise).toBeResolved();
         });
         it("should pass the object to done callback", function() {
-          return expect(this.promise).toBeResolvedWith('cached_object', true);
+          return expect(this.promise).toBeResolvedWith('cachedObject', true);
         });
         return it("should pass true (= created) as the second param to the done callback", function() {
-          return expect(this.promise).toBeResolvedWith('cached_object', true);
+          return expect(this.promise).toBeResolvedWith('cachedObject', true);
         });
       });
     });
@@ -353,7 +353,7 @@ describe("Hoodie.Store", function() {
   describe(".updateAll(objects)", function() {
     beforeEach(function() {
       spyOn(this.hoodie, "isPromise").andReturn(false);
-      return this.todo_objects = [
+      return this.todoObjects = [
         {
           type: 'todo',
           id: '1'
@@ -367,15 +367,15 @@ describe("Hoodie.Store", function() {
       ];
     });
     it("should return a promise", function() {
-      return expect(this.store.updateAll(this.todo_objects, {})).toBePromise();
+      return expect(this.store.updateAll(this.todoObjects, {})).toBePromise();
     });
     it("should update objects", function() {
       var obj, _i, _len, _ref, _results;
       spyOn(this.store, "update");
-      this.store.updateAll(this.todo_objects, {
+      this.store.updateAll(this.todoObjects, {
         funky: 'update'
       });
-      _ref = this.todo_objects;
+      _ref = this.todoObjects;
       _results = [];
       for (_i = 0, _len = _ref.length; _i < _len; _i++) {
         obj = _ref[_i];
@@ -389,13 +389,13 @@ describe("Hoodie.Store", function() {
       var promise;
       promise = this.hoodie.defer().resolve().promise();
       spyOn(this.store, "update").andReturn(promise);
-      return expect(this.store.updateAll(this.todo_objects, {})).toBeResolved();
+      return expect(this.store.updateAll(this.todoObjects, {})).toBeResolved();
     });
     it("should not resolve the retunred promise unless object updates have been finished", function() {
       var promise;
       promise = this.hoodie.defer().promise();
       spyOn(this.store, "update").andReturn(promise);
-      return expect(this.store.updateAll(this.todo_objects, {})).notToBeResolved();
+      return expect(this.store.updateAll(this.todoObjects, {})).notToBeResolved();
     });
     return _when("passed objects is a promise", function() {
       beforeEach(function() {
@@ -406,14 +406,14 @@ describe("Hoodie.Store", function() {
           _this = this;
         promise = {
           pipe: function(cb) {
-            return cb(_this.todo_objects);
+            return cb(_this.todoObjects);
           }
         };
         spyOn(this.store, "update");
         this.store.updateAll(promise, {
           funky: 'update'
         });
-        _ref = this.todo_objects;
+        _ref = this.todoObjects;
         _results = [];
         for (_i = 0, _len = _ref.length; _i < _len; _i++) {
           obj = _ref[_i];
@@ -475,8 +475,8 @@ describe("Hoodie.Store", function() {
     });
   });
   describe(".loadAll(filter)", function() {
-    var with_2_cats_and_3_dogs;
-    with_2_cats_and_3_dogs = function(specs) {
+    var with_2CatsAnd_3Dogs;
+    with_2CatsAnd_3Dogs = function(specs) {
       return _and("two cat and three dog objects exist in the store", function() {
         beforeEach(function() {
           spyOn(this.store, "_index").andReturn(["cat/1", "cat/2", "dog/1", "dog/2", "dog/3"]);
@@ -496,7 +496,7 @@ describe("Hoodie.Store", function() {
       return expect(promise).toBePromise();
     });
     _when("called without a type", function() {
-      with_2_cats_and_3_dogs(function() {
+      with_2CatsAnd_3Dogs(function() {
         return it("should return'em all", function() {
           var promise, results, success;
           success = jasmine.createSpy('success');
@@ -518,7 +518,7 @@ describe("Hoodie.Store", function() {
       });
       return _and("there are other documents in localStorage not stored with store", function() {
         beforeEach(function() {
-          spyOn(this.store, "_index").andReturn(["_some_config", "some_other_shizzle", "whatever", "valid/123"]);
+          spyOn(this.store, "_index").andReturn(["_someConfig", "someOtherShizzle", "whatever", "valid/123"]);
           return spyOn(this.store, "cache").andReturn({});
         });
         return it("should not return them", function() {
@@ -532,7 +532,7 @@ describe("Hoodie.Store", function() {
       });
     });
     return _when("called only with filter `function(obj) { return obj.age === 1}` ", function() {
-      return with_2_cats_and_3_dogs(function() {
+      return with_2CatsAnd_3Dogs(function() {
         return it("should return one dog", function() {
           var promise, results, success;
           success = jasmine.createSpy('success');
@@ -571,9 +571,9 @@ describe("Hoodie.Store", function() {
         return expect(this.store._cached['document/123']).toBe(false);
       });
       it("should clear document from changed", function() {
-        spyOn(this.store, "clear_changed");
+        spyOn(this.store, "clearChanged");
         this.store["delete"]('document', '123');
-        return expect(this.store.clear_changed).wasCalledWith('document', '123');
+        return expect(this.store.clearChanged).wasCalledWith('document', '123');
       });
       it("should return a resolved promise", function() {
         var promise;
@@ -592,7 +592,7 @@ describe("Hoodie.Store", function() {
     _when("object can be found and delete comes from remote", function() {
       beforeEach(function() {
         return spyOn(this.store, "cache").andReturn({
-          _synced_at: 'now'
+          _syncedAt: 'now'
         });
       });
       return it("should remove the object", function() {
@@ -605,14 +605,14 @@ describe("Hoodie.Store", function() {
     _when("object can be found and was synched before", function() {
       beforeEach(function() {
         return spyOn(this.store, "cache").andReturn({
-          _synced_at: 'now'
+          _syncedAt: 'now'
         });
       });
       it("should mark the object as deleted and cache it", function() {
         var promise;
         promise = this.store["delete"]('document', '123');
         return expect(this.store.cache).wasCalledWith('document', '123', {
-          _synced_at: 'now',
+          _syncedAt: 'now',
           _deleted: true
         });
       });
@@ -629,10 +629,10 @@ describe("Hoodie.Store", function() {
   });
   describe(".cache(type, id, object)", function() {
     beforeEach(function() {
-      spyOn(this.store, "mark_as_changed");
-      spyOn(this.store, "clear_changed");
-      spyOn(this.store, "_is_dirty");
-      spyOn(this.store, "_is_marked_as_deleted");
+      spyOn(this.store, "markAsChanged");
+      spyOn(this.store, "clearChanged");
+      spyOn(this.store, "_isDirty");
+      spyOn(this.store, "_isMarkedAsDeleted");
       return this.store._cached = {};
     });
     _when("object passed", function() {
@@ -649,7 +649,7 @@ describe("Hoodie.Store", function() {
           }, {
             remote: true
           });
-          return expect(this.store.clear_changed).wasCalledWith('couch', '123');
+          return expect(this.store.clearChanged).wasCalledWith('couch', '123');
         });
       });
     });
@@ -699,11 +699,11 @@ describe("Hoodie.Store", function() {
     });
     _when("object is dirty", function() {
       beforeEach(function() {
-        return this.store._is_dirty.andReturn(true);
+        return this.store._isDirty.andReturn(true);
       });
       return it("should mark it as changed", function() {
         this.store.cache('couch', '123');
-        return expect(this.store.mark_as_changed).wasCalledWith('couch', '123', {
+        return expect(this.store.markAsChanged).wasCalledWith('couch', '123', {
           color: 'red',
           type: 'couch',
           id: '123'
@@ -712,24 +712,24 @@ describe("Hoodie.Store", function() {
     });
     _when("object is not dirty", function() {
       beforeEach(function() {
-        return this.store._is_dirty.andReturn(false);
+        return this.store._isDirty.andReturn(false);
       });
       _and("not marked as deleted", function() {
         beforeEach(function() {
-          return this.store._is_marked_as_deleted.andReturn(false);
+          return this.store._isMarkedAsDeleted.andReturn(false);
         });
         return it("should clean it", function() {
           this.store.cache('couch', '123');
-          return expect(this.store.clear_changed).wasCalledWith('couch', '123');
+          return expect(this.store.clearChanged).wasCalledWith('couch', '123');
         });
       });
       return _but("marked as deleted", function() {
         beforeEach(function() {
-          return this.store._is_marked_as_deleted.andReturn(true);
+          return this.store._isMarkedAsDeleted.andReturn(true);
         });
         return it("should mark it as changed", function() {
           this.store.cache('couch', '123');
-          return expect(this.store.mark_as_changed).wasCalledWith('couch', '123', {
+          return expect(this.store.markAsChanged).wasCalledWith('couch', '123', {
             color: 'red',
             type: 'couch',
             id: '123'
@@ -763,9 +763,9 @@ describe("Hoodie.Store", function() {
       return expect($.isEmptyObject(this.store._cached)).toBeTruthy();
     });
     it("should clear dirty docs", function() {
-      spyOn(this.store, "clear_changed");
+      spyOn(this.store, "clearChanged");
       this.store.clear();
-      return expect(this.store.clear_changed).wasCalled();
+      return expect(this.store.clearChanged).wasCalled();
     });
     it("should resolve promise", function() {
       var promise;
@@ -774,7 +774,7 @@ describe("Hoodie.Store", function() {
     });
     return _when("an error occurs", function() {
       beforeEach(function() {
-        return spyOn(this.store, "clear_changed").andCallFake(function() {
+        return spyOn(this.store, "clearChanged").andCallFake(function() {
           throw new Error('ooops');
         });
       });
@@ -785,68 +785,68 @@ describe("Hoodie.Store", function() {
       });
     });
   });
-  describe(".is_dirty(type, id)", function() {
+  describe(".isDirty(type, id)", function() {
     _when("no arguments passed", function() {
       return it("returns true when there are no dirty documents", function() {
         this.store._dirty = {};
-        return expect(this.store.is_dirty()).toBeTruthy();
+        return expect(this.store.isDirty()).toBeTruthy();
       });
     });
     return _when("type & id passed", function() {
       _and("object was not yet synced", function() {
         beforeEach(function() {
           return spyOn(this.store, "cache").andReturn({
-            _synced_at: void 0
+            _syncedAt: void 0
           });
         });
         return it("should return true", function() {
-          return expect(this.store.is_dirty('couch', '123')).toBeTruthy();
+          return expect(this.store.isDirty('couch', '123')).toBeTruthy();
         });
       });
       return _and("object was synced", function() {
         _and("object was not updated yet", function() {
           beforeEach(function() {
             return spyOn(this.store, "cache").andReturn({
-              _synced_at: new Date(0),
-              updated_at: void 0
+              _syncedAt: new Date(0),
+              updatedAt: void 0
             });
           });
           return it("should return false", function() {
-            return expect(this.store.is_dirty('couch', '123')).toBeFalsy();
+            return expect(this.store.isDirty('couch', '123')).toBeFalsy();
           });
         });
         _and("object was updated at the same time", function() {
           beforeEach(function() {
             return spyOn(this.store, "cache").andReturn({
-              _synced_at: new Date(0),
-              updated_at: new Date(0)
+              _syncedAt: new Date(0),
+              updatedAt: new Date(0)
             });
           });
           return it("should return false", function() {
-            return expect(this.store.is_dirty('couch', '123')).toBeFalsy();
+            return expect(this.store.isDirty('couch', '123')).toBeFalsy();
           });
         });
         return _and("object was updated later", function() {
           beforeEach(function() {
             return spyOn(this.store, "cache").andReturn({
-              _synced_at: new Date(0),
-              updated_at: new Date(1)
+              _syncedAt: new Date(0),
+              updatedAt: new Date(1)
             });
           });
           return it("should return true", function() {
-            return expect(this.store.is_dirty('couch', '123')).toBeTruthy();
+            return expect(this.store.isDirty('couch', '123')).toBeTruthy();
           });
         });
       });
     });
   });
-  describe(".mark_as_changed(type, id, object)", function() {
+  describe(".markAsChanged(type, id, object)", function() {
     beforeEach(function() {
       this.store._dirty = {};
-      spyOn(window, "setTimeout").andReturn('new_timeout');
+      spyOn(window, "setTimeout").andReturn('newTimeout');
       spyOn(window, "clearTimeout");
       spyOn(this.hoodie, "trigger");
-      return this.store.mark_as_changed('couch', '123', {
+      return this.store.markAsChanged('couch', '123', {
         color: 'red'
       });
     });
@@ -860,24 +860,24 @@ describe("Hoodie.Store", function() {
       var args;
       args = window.setTimeout.mostRecentCall.args;
       expect(args[1]).toBe(2000);
-      return expect(this.store._dirty_timeout).toBe('new_timeout');
+      return expect(this.store._dirtyTimeout).toBe('newTimeout');
     });
     return it("should clear dirty timeout", function() {
-      this.store._dirty_timeout = 'timeout';
-      this.store.mark_as_changed('couch', '123', {
+      this.store._dirtyTimeout = 'timeout';
+      this.store.markAsChanged('couch', '123', {
         color: 'red'
       });
       return expect(window.clearTimeout).wasCalledWith('timeout');
     });
   });
-  describe(".changed_docs()", function() {
+  describe(".changedDocs()", function() {
     _when("there are no changed docs", function() {
       beforeEach(function() {
         return this.store._dirty = {};
       });
       return it("should return an empty array", function() {
-        expect($.isArray(this.store.changed_docs())).toBeTruthy();
-        return expect(this.store.changed_docs().length).toBe(0);
+        expect($.isArray(this.store.changedDocs())).toBeTruthy();
+        return expect(this.store.changedDocs().length).toBe(0);
       });
     });
     return _when("there are 2 dirty docs", function() {
@@ -895,11 +895,11 @@ describe("Hoodie.Store", function() {
         ];
       });
       return it("should return the two docs", function() {
-        return expect(this.store.changed_docs().length).toBe(2);
+        return expect(this.store.changedDocs().length).toBe(2);
       });
     });
   });
-  describe(".is_marked_as_deleted(type, id)", function() {
+  describe(".isMarkedAsDeleted(type, id)", function() {
     _when("object 'couch/123' is marked as deleted", function() {
       beforeEach(function() {
         return spyOn(this.store, "cache").andReturn({
@@ -907,7 +907,7 @@ describe("Hoodie.Store", function() {
         });
       });
       return it("should return true", function() {
-        return expect(this.store.is_marked_as_deleted('couch', '123')).toBeTruthy();
+        return expect(this.store.isMarkedAsDeleted('couch', '123')).toBeTruthy();
       });
     });
     return _when("object 'couch/123' isn't marked as deleted", function() {
@@ -915,17 +915,17 @@ describe("Hoodie.Store", function() {
         return spyOn(this.store, "cache").andReturn({});
       });
       return it("should return false", function() {
-        return expect(this.store.is_marked_as_deleted('couch', '123')).toBeFalsy();
+        return expect(this.store.isMarkedAsDeleted('couch', '123')).toBeFalsy();
       });
     });
   });
-  describe(".clear_changed(type, id)", function() {
+  describe(".clearChanged(type, id)", function() {
     _when("type & id passed", function() {
       return it("should remove the respective object from the dirty list", function() {
         this.store._dirty['couch/123'] = {
           color: 'red'
         };
-        this.store.clear_changed('couch', 123);
+        this.store.clearChanged('couch', 123);
         return expect(this.store._dirty['couch/123']).toBeUndefined();
       });
     });
@@ -939,13 +939,13 @@ describe("Hoodie.Store", function() {
             color: 'green'
           }
         };
-        this.store.clear_changed();
+        this.store.clearChanged();
         return expect($.isEmptyObject(this.store._dirty)).toBeTruthy();
       });
     });
     return it("should trigger a `store:dirty` event", function() {
       spyOn(this.hoodie, "trigger");
-      this.store.clear_changed();
+      this.store.clearChanged();
       return expect(this.hoodie.trigger).wasCalledWith('store:dirty');
     });
   });

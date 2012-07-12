@@ -8,9 +8,9 @@ Hoodie.Errors =
   #
   # thrown when invalid keys are used to store an object
   #
-  INVALID_KEY:(id_or_type) ->
-    key = if id_or_type.id then 'id' else 'type'
-    new Error "invalid #{key} '#{id_or_type[key]}': numbers and lowercase letters allowed only"
+  INVALID_KEY:(idOrType) ->
+    key = if idOrType.id then 'id' else 'type'
+    new Error "invalid #{key} '#{idOrType[key]}': numbers and lowercase letters allowed only"
 
   # ## INVALID_ARGUMENTS
   #

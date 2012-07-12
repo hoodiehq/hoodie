@@ -9,17 +9,17 @@ describe("Hoodie", function() {
     it("should store the couchDB URL", function() {
       var hoodie;
       hoodie = new Hoodie('http://couch.example.com');
-      return expect(hoodie.base_url).toBe('http://couch.example.com');
+      return expect(hoodie.baseUrl).toBe('http://couch.example.com');
     });
     it("should remove trailing slash from passed URL", function() {
       var hoodie;
       hoodie = new Hoodie('http://couch.example.com/');
-      return expect(hoodie.base_url).toBe('http://couch.example.com');
+      return expect(hoodie.baseUrl).toBe('http://couch.example.com');
     });
     return it("should default the couchDB URL to ''", function() {
       var hoodie;
       hoodie = new Hoodie;
-      return expect(hoodie.base_url).toBe('');
+      return expect(hoodie.baseUrl).toBe('');
     });
   });
   return describe("request(type, path, options)", function() {

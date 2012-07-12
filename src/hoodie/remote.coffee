@@ -2,7 +2,7 @@
 # Connection / Socket to our couch
 #
 # Remote is using couchDB's `_changes` feed to listen to changes
-# and `_bulk_docs` to push local changes
+# and `_bulkDocs` to push local changes
 #
 # When hoodie.remote is active (default), it will continuously 
 # synchronize, otherwise sync, pull or push can be called manually
@@ -30,8 +30,8 @@ class Hoodie.Remote
   activate : =>
     @hoodie.config.set '_remote.active', @active = true
 
-    @hoodie.on 'account:signed_out',    @disconnect
-    @hoodie.on 'account:signed_in',     @connect
+    @hoodie.on 'account:signedOut',    @disconnect
+    @hoodie.on 'account:signedIn',     @connect
 
     @connect()
 
@@ -39,8 +39,8 @@ class Hoodie.Remote
   deactivate : =>
     @hoodie.config.set '_remote.active', @active = false
 
-    @hoodie.unbind 'account:signed_in',  @connect
-    @hoodie.unbind 'account:signed_out', @disconnect
+    @hoodie.unbind 'account:signedIn',  @connect
+    @hoodie.unbind 'account:signedOut', @disconnect
 
     @disconnect()
     
@@ -63,8 +63,8 @@ class Hoodie.Remote
     # binding comes from @sync
     @hoodie.unbind 'store:dirty:idle',   @push
     
-    @_pull_request?.abort()
-    @_push_request?.abort()
+    @_pullRequest?.abort()
+    @_pushRequest?.abort()
 
 
   # ## pull changes
@@ -72,37 +72,37 @@ class Hoodie.Remote
   # a.k.a. make a GET request to CouchDB's `_changes` feed.
   #
   pull : =>
-    @_pull_request = @hoodie.request 'GET', @_pull_url(), contentType: 'application/json'
+    @_pullRequest = @hoodie.request 'GET', @_pullUrl(), contentType: 'application/json'
     
     if @connected and @active
-      window.clearTimeout @_pull_request_timeout
-      @_pull_request_timeout = window.setTimeout @_restart_pull_request, 25000 # 25 sec
+      window.clearTimeout @_pullRequestTimeout
+      @_pullRequestTimeout = window.setTimeout @_restartPullRequest, 25000 # 25 sec
     
-    @_pull_request.then @_handle_pull_success, @_handle_pull_error
+    @_pullRequest.then @_handlePullSuccess, @_handlePullError
     
     
   # ## push changes
   #
-  # Push objects to userDB using the `_bulk_docs` API.
+  # Push objects to userDB using the `_bulkDocs` API.
   # If no objects passed, push all changed documents
   push : (docs) =>
     
-    docs = @hoodie.store.changed_docs() unless $.isArray docs
+    docs = @hoodie.store.changedDocs() unless $.isArray docs
     return @hoodie.defer().resolve([]).promise() if docs.length is 0
       
-    docs_for_remote = (@_parse_for_remote doc for doc in docs)
+    docsForRemote = (@_parseForRemote doc for doc in docs)
     
-    @_push_request = @hoodie.request 'POST', "/#{encodeURIComponent @hoodie.account.db()}/_bulk_docs", 
+    @_pushRequest = @hoodie.request 'POST', "/#{encodeURIComponent @hoodie.account.db()}/_bulkDocs", 
       dataType:     'json'
       processData:  false
       contentType:  'application/json'
     
       data  : JSON.stringify
-                docs      : docs_for_remote
-                new_edits : false
+                docs      : docsForRemote
+                newEdits : false
 
     # when push is successful, update the local store with the generated _rev numbers
-    @_push_request.done @_handle_push_success docs, docs_for_remote
+    @_pushRequest.done @_handlePushSuccess docs, docsForRemote
 
 
   # ## sync changes
@@ -130,15 +130,15 @@ class Hoodie.Remote
   #
   # Depending on whether remote is active, return a longpoll URL or not
   #
-  _pull_url : ->
+  _pullUrl : ->
     since = @hoodie.config.get('_remote.seq') or 0
     if @active # make a long poll request
-      "/#{encodeURIComponent @hoodie.account.db()}/_changes?include_docs=true&heartbeat=10000&feed=longpoll&since=#{since}"
+      "/#{encodeURIComponent @hoodie.account.db()}/_changes?includeDocs=true&heartbeat=10000&feed=longpoll&since=#{since}"
     else
-      "/#{encodeURIComponent @hoodie.account.db()}/_changes?include_docs=true&since=#{since}"
+      "/#{encodeURIComponent @hoodie.account.db()}/_changes?includeDocs=true&since=#{since}"
   
-  # request gets restarted automaticcally in @_handle_pull_error
-  _restart_pull_request : => @_pull_request?.abort()
+  # request gets restarted automaticcally in @_handlePullError
+  _restartPullRequest : => @_pullRequest?.abort()
   
   
   #
@@ -146,9 +146,9 @@ class Hoodie.Remote
   #
   # handle the incoming changes, then send the next request
   #
-  _handle_pull_success : (response) =>
-    @hoodie.config.set '_remote.seq', response.last_seq
-    @_handle_pull_results response.results
+  _handlePullSuccess : (response) =>
+    @hoodie.config.set '_remote.seq', response.lastSeq
+    @_handlePullResults response.results
     
     @pull() if @connected and @active
   
@@ -159,7 +159,7 @@ class Hoodie.Remote
   # when there is a change, trigger event, 
   # then check for another change
   #
-  _handle_pull_error : (xhr, error, resp) =>
+  _handlePullError : (xhr, error, resp) =>
     
     return unless @connected
 
@@ -203,7 +203,7 @@ class Hoodie.Remote
 
 
   # valid couchDB doc attributes starting with an underscore
-  _valid_special_attributes : [
+  _validSpecialAttributes : [
     '_id', '_rev', '_deleted', '_revisions', '_attachments'
   ]
 
@@ -214,11 +214,11 @@ class Hoodie.Remote
   # 
   # Also `id` gets replaced with `_id` which consists of type & id
   #
-  _parse_for_remote : (obj) ->
+  _parseForRemote : (obj) ->
     attributes = $.extend {}, obj
   
     for attr of attributes
-      continue if ~@_valid_special_attributes.indexOf(attr)
+      continue if ~@_validSpecialAttributes.indexOf(attr)
       continue unless /^_/.test attr
       delete attributes[attr]
    
@@ -227,7 +227,7 @@ class Hoodie.Remote
     delete attributes.id
 
     # prepare revision
-    @_add_revision_to attributes
+    @_addRevisionTo attributes
     
     return attributes
   
@@ -235,11 +235,11 @@ class Hoodie.Remote
   #
   # generates a revision id in the for of {uuid}#{UTC timestamp}
   # Beware that it does not include a leading revision number
-  _generate_new_revision_id:  ->
+  _generateNewRevisionId:  ->
     # get timezone offset
-    @_timezone_offset or= new Date().getTimezoneOffset() * 60
+    @_timezoneOffset or= new Date().getTimezoneOffset() * 60
 
-    timestamp   = Date.now() + @_timezone_offset
+    timestamp   = Date.now() + @_timezoneOffset
     uuid        = @hoodie.store.uuid(5)
     "#{uuid}##{timestamp}"
   
@@ -247,27 +247,27 @@ class Hoodie.Remote
   #
   # get new revision number
   #
-  _add_revision_to : (attributes) ->
+  _addRevisionTo : (attributes) ->
 
-    try [current_rev_nr, current_rev_id] = attributes._rev.split /-/
-    current_rev_nr = parseInt(current_rev_nr) or 0
+    try [currentRevNr, currentRevId] = attributes._rev.split /-/
+    currentRevNr = parseInt(currentRevNr) or 0
 
-    new_revision_id       = @_generate_new_revision_id()
-    attributes._rev       = "#{current_rev_nr + 1}-#{new_revision_id}"
+    newRevisionId       = @_generateNewRevisionId()
+    attributes._rev       = "#{currentRevNr + 1}-#{newRevisionId}"
     attributes._revisions = 
       start : 1
-      ids   : [new_revision_id]
+      ids   : [newRevisionId]
 
-    if current_rev_id
-      attributes._revisions.start += current_rev_nr
-      attributes._revisions.ids.push current_rev_id
+    if currentRevId
+      attributes._revisions.start += currentRevNr
+      attributes._revisions.ids.push currentRevId
     
     
   # parse object coming from pull for local storage. 
   # 
   # renames `_id` attribute to `id` and removes the type from the id,
   # e.g. `document/123` -> `123`
-  _parse_from_pull : (obj) ->
+  _parseFromPull : (obj) ->
     
     # handle id and type
     id = obj._id or obj.id
@@ -275,8 +275,8 @@ class Hoodie.Remote
     [obj.type, obj.id] = id.split(/\//)
     
     # handle timestameps
-    obj.created_at = new Date(Date.parse obj.created_at) if obj.created_at
-    obj.updated_at = new Date(Date.parse obj.updated_at) if obj.updated_at
+    obj.createdAt = new Date(Date.parse obj.createdAt) if obj.createdAt
+    obj.updatedAt = new Date(Date.parse obj.updatedAt) if obj.updatedAt
     
     # handle rev
     if obj.rev
@@ -290,7 +290,7 @@ class Hoodie.Remote
   # 
   # removes the type from the id, e.g. `document/123` -> `123`
   # also removes attribute ok
-  _parse_from_push : (obj) ->
+  _parseFromPush : (obj) ->
     
     # handle id and type
     id = obj._id or 
@@ -315,20 +315,20 @@ class Hoodie.Remote
   #       not been stored yet, but is within the same bulk of changes. This 
   #       is especially the case during initial bootstraps after a user logins.
   #
-  _handle_pull_results : (changes) =>
-    _destroyed_docs = []
-    _changed_docs   = []
+  _handlePullResults : (changes) =>
+    _destroyedDocs = []
+    _changedDocs   = []
     
     # 1. update or remove objects from local store
     for {doc} in changes
-      doc = @_parse_from_pull(doc)
+      doc = @_parseFromPull(doc)
       if doc._deleted
-        _destroyed_docs.push [doc, @hoodie.store.destroy(  doc.type, doc.id,      remote: true)]
+        _destroyedDocs.push [doc, @hoodie.store.destroy(  doc.type, doc.id,      remote: true)]
       else                                                
-        _changed_docs.push   [doc, @hoodie.store.update(   doc.type, doc.id, doc, remote: true)]
+        _changedDocs.push   [doc, @hoodie.store.update(   doc.type, doc.id, doc, remote: true)]
     
     # 2. trigger events
-    for [doc, promise] in _destroyed_docs
+    for [doc, promise] in _destroyedDocs
       promise.then (object) => 
         @hoodie.trigger 'remote:destroy',                       object
         @hoodie.trigger "remote:destroy:#{doc.type}",           object
@@ -338,9 +338,9 @@ class Hoodie.Remote
         @hoodie.trigger "remote:change:#{doc.type}",            'destroy', object
         @hoodie.trigger "remote:change:#{doc.type}:#{doc.id}",  'destroy', object
     
-    for [doc, promise] in _changed_docs
-      promise.then (object, object_was_created) => 
-        event = if object_was_created then 'create' else 'update'
+    for [doc, promise] in _changedDocs
+      promise.then (object, objectWasCreated) => 
+        event = if objectWasCreated then 'create' else 'update'
         @hoodie.trigger "remote:#{event}",                       object
         @hoodie.trigger "remote:#{event}:#{doc.type}",           object
         @hoodie.trigger "remote:#{event}:#{doc.type}:#{doc.id}", object
@@ -354,9 +354,9 @@ class Hoodie.Remote
   # handle push success
   #
   # 
-  _handle_push_success: (docs, pushed_docs) =>
+  _handlePushSuccess: (docs, pushedDocs) =>
     =>
       for doc, i in docs
-        update  = {_rev: pushed_docs[i]._rev}
+        update  = {_rev: pushedDocs[i]._rev}
         options = remote : true
         @hoodie.store.update(doc.type, doc.id, update, options) 
