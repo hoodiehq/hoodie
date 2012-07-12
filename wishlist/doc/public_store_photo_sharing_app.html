@@ -1,0 +1,21 @@
+<!DOCTYPE html><html lang="en"><head><title>public_store_photo_sharing_app</title></head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0"><meta name="groc-relative-root" content=""><meta name="groc-document-path" content="public_store_photo_sharing_app"><meta name="groc-project-path" content="public_store_photo_sharing_app.js"><link rel="stylesheet" type="text/css" media="all" href="assets/style.css"><script type="text/javascript" src="assets/behavior.js"></script><body><div id="meta"><div class="file-path">public_store_photo_sharing_app.js</div></div><div id="document"><div class="segment"><div class="comments"><div class="wrapper"><h1 id="example-app-private-instagram-thingy">example app: private instagram thingy</h1>
+
+<p>Our photo sharing exmaple app to showcase hoodie:
+hoodiehq.github.com/app-photo</p>
+
+<h2 id="models">Models</h2>
+
+<ul>
+<li>Photo</li>
+</ul>
+
+<h2 id="hoodie-challanges">Hoodie Challanges</h2>
+
+<ol>
+<li>A picture can be private, so everyone knowing my username
+can see it in my public photo stream.</li>
+</ol></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h2 id="scenario-1">Scenario 1</h2>
+
+<p>I want to make a photo public</p></div></div><div class="code"><div class="wrapper"><span class="nx">hoodie</span><span class="p">.</span><span class="nx">my</span><span class="p">.</span><span class="nx">store</span><span class="p">.</span><span class="nx">update</span><span class="p">(</span><span class="s2">&quot;photo&quot;</span><span class="p">,</span> <span class="s2">&quot;abc4567&quot;</span><span class="p">,</span> <span class="p">{},</span> <span class="p">{</span><span class="kr">public</span><span class="o">:</span> <span class="kc">true</span><span class="p">})</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h2 id="scenario-2">Scenario 2</h2>
+
+<p>I want to make a public photo private again</p></div></div><div class="code"><div class="wrapper"><span class="nx">hoodie</span><span class="p">.</span><span class="nx">my</span><span class="p">.</span><span class="nx">store</span><span class="p">.</span><span class="nx">update</span><span class="p">(</span><span class="s2">&quot;photo&quot;</span><span class="p">,</span> <span class="s2">&quot;abc4567&quot;</span><span class="p">,</span> <span class="p">{},</span> <span class="p">{</span><span class="kr">public</span><span class="o">:</span> <span class="kc">false</span><span class="p">})</span></div></div></div></div></body></html>

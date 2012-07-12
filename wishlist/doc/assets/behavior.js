@@ -14,19 +14,111 @@ f.event={add:function(a,c,d,e,g){var h,i,j,k,l,m,n,o,p,q,r,s;if(!(a.nodeType===3
           "singleLineComment": ["//"],
           "name": "JavaScript"
         },
-        "sourcePath": "/Users/gregor/JavaScripts/hood.ie/hoodie-client.js/wishlist/public_user_and_global_stores.js",
-        "projectPath": "public_user_and_global_stores.js",
-        "targetPath": "public_user_and_global_stores",
-        "title": "public_user_and_global_stores"
+        "sourcePath": "/Users/gregor/JavaScripts/hood.ie/hoodie-client.js/wishlist/public_store_photo_sharing_app.js",
+        "projectPath": "public_store_photo_sharing_app.js",
+        "targetPath": "public_store_photo_sharing_app",
+        "firstHeader": {
+          "type": "heading",
+          "data": {
+            "level": 1,
+            "title": "example app: private instagram thingy",
+            "slug": "example-app-private-instagram-thingy",
+            "isFileHeader": true
+          },
+          "depth": 1,
+          "children": [
+            {
+              "type": "heading",
+              "data": {
+                "level": 2,
+                "title": "Models",
+                "slug": "models"
+              },
+              "depth": 2
+            }, {
+              "type": "heading",
+              "data": {
+                "level": 2,
+                "title": "Hoodie Challanges",
+                "slug": "hoodie-challanges"
+              },
+              "depth": 2
+            }, {
+              "type": "heading",
+              "data": {
+                "level": 2,
+                "title": "Scenario 1",
+                "slug": "scenario-1"
+              },
+              "depth": 2
+            }, {
+              "type": "heading",
+              "data": {
+                "level": 2,
+                "title": "Scenario 2",
+                "slug": "scenario-2"
+              },
+              "depth": 2
+            }
+          ]
+        },
+        "title": "example app: private instagram thingy"
       },
       "depth": 1,
       "outline": [
         {
           "type": "heading",
           "data": {
+            "level": 2,
+            "title": "Models",
+            "slug": "models"
+          },
+          "depth": 2
+        }, {
+          "type": "heading",
+          "data": {
+            "level": 2,
+            "title": "Hoodie Challanges",
+            "slug": "hoodie-challanges"
+          },
+          "depth": 2
+        }, {
+          "type": "heading",
+          "data": {
+            "level": 2,
+            "title": "Scenario 1",
+            "slug": "scenario-1"
+          },
+          "depth": 2
+        }, {
+          "type": "heading",
+          "data": {
+            "level": 2,
+            "title": "Scenario 2",
+            "slug": "scenario-2"
+          },
+          "depth": 2
+        }
+      ]
+    }, {
+      "type": "file",
+      "data": {
+        "language": {
+          "nameMatchers": [".js"],
+          "pygmentsLexer": "javascript",
+          "singleLineComment": ["//"],
+          "name": "JavaScript"
+        },
+        "sourcePath": "/Users/gregor/JavaScripts/hood.ie/hoodie-client.js/wishlist/public_user_and_global_stores.js",
+        "projectPath": "public_user_and_global_stores.js",
+        "targetPath": "public_user_and_global_stores",
+        "firstHeader": {
+          "type": "heading",
+          "data": {
             "level": 1,
             "title": "example app: whiskie.net",
-            "slug": "example-app-whiskienet"
+            "slug": "example-app-whiskienet",
+            "isFileHeader": true
           },
           "depth": 1,
           "children": [
@@ -80,6 +172,59 @@ f.event={add:function(a,c,d,e,g){var h,i,j,k,l,m,n,o,p,q,r,s;if(!(a.nodeType===3
               "depth": 2
             }
           ]
+        },
+        "title": "example app: whiskie.net"
+      },
+      "depth": 1,
+      "outline": [
+        {
+          "type": "heading",
+          "data": {
+            "level": 2,
+            "title": "Models",
+            "slug": "models"
+          },
+          "depth": 2
+        }, {
+          "type": "heading",
+          "data": {
+            "level": 2,
+            "title": "Hoodie Challanges",
+            "slug": "hoodie-challanges"
+          },
+          "depth": 2
+        }, {
+          "type": "heading",
+          "data": {
+            "level": 2,
+            "title": "Scenario 1",
+            "slug": "scenario-1"
+          },
+          "depth": 2
+        }, {
+          "type": "heading",
+          "data": {
+            "level": 2,
+            "title": "Scenario 2",
+            "slug": "scenario-2"
+          },
+          "depth": 2
+        }, {
+          "type": "heading",
+          "data": {
+            "level": 2,
+            "title": "Scenario 3",
+            "slug": "scenario-3"
+          },
+          "depth": 2
+        }, {
+          "type": "heading",
+          "data": {
+            "level": 2,
+            "title": "Scenario 4",
+            "slug": "scenario-4"
+          },
+          "depth": 2
         }
       ]
     }, {
