@@ -92,10 +92,10 @@ Hoodie = (function(_super) {
     };
   };
 
-  function Hoodie(base_url) {
-    this.base_url = base_url != null ? base_url : '';
-    this.base_url = this.base_url.replace(/\/+$/, '');
-    this._load_modules();
+  function Hoodie(baseUrl) {
+    this.baseUrl = baseUrl != null ? baseUrl : '';
+    this.baseUrl = this.baseUrl.replace(/\/+$/, '');
+    this._loadModules();
   }
 
   Hoodie.prototype.request = function(type, path, options) {
@@ -105,7 +105,7 @@ Hoodie = (function(_super) {
     }
     defaults = {
       type: type,
-      url: "" + this.base_url + path,
+      url: "" + this.baseUrl + path,
       xhrFields: {
         withCredentials: true
       },
@@ -121,13 +121,13 @@ Hoodie = (function(_super) {
     return typeof obj.done === 'function' && typeof obj.fail === 'function';
   };
 
-  Hoodie.prototype._load_modules = function() {
-    var Module, instance_name, _ref, _results;
+  Hoodie.prototype._loadModules = function() {
+    var Module, instanceName, _ref, _results;
     _ref = this.modules();
     _results = [];
-    for (instance_name in _ref) {
-      Module = _ref[instance_name];
-      _results.push(this[instance_name] = new Module(this));
+    for (instanceName in _ref) {
+      Module = _ref[instanceName];
+      _results.push(this[instanceName] = new Module(this));
     }
     return _results;
   };
@@ -144,15 +144,15 @@ Hoodie.Account = (function() {
 
   function Account(hoodie) {
     this.hoodie = hoodie;
-    this._handle_sign_out = __bind(this._handle_sign_out, this);
+    this._handleSignOut = __bind(this._handleSignOut, this);
 
-    this._handle_sign_in = __bind(this._handle_sign_in, this);
+    this._handleSignIn = __bind(this._handleSignIn, this);
 
     this.authenticate = __bind(this.authenticate, this);
 
     this.username = this.hoodie.config.get('_account.username');
-    this.on('signed_in', this._handle_sign_in);
-    this.on('signed_out', this._handle_sign_out);
+    this.on('signin', this._handleSignIn);
+    this.on('signout', this._handleSignOut);
   }
 
   Account.prototype.authenticate = function() {
@@ -168,8 +168,8 @@ Hoodie.Account = (function() {
     if (this._authenticated === false) {
       return defer.reject().promise();
     }
-    this._auth_request = this.hoodie.request('GET', "/_session");
-    this._auth_request.done(function(response) {
+    this._authRequest = this.hoodie.request('GET', "/_session");
+    this._authRequest.done(function(response) {
       if (response.userCtx.name) {
         _this._authenticated = true;
         _this.username = response.userCtx.name;
@@ -181,7 +181,7 @@ Hoodie.Account = (function() {
         return defer.reject();
       }
     });
-    this._auth_request.fail(function(xhr) {
+    this._authRequest.fail(function(xhr) {
       var error;
       try {
         error = JSON.parse(xhr.responseText);
@@ -195,8 +195,8 @@ Hoodie.Account = (function() {
     return defer.promise();
   };
 
-  Account.prototype.sign_up = function(username, password) {
-    var data, defer, handle_succes, key, request_promise,
+  Account.prototype.signUp = function(username, password) {
+    var data, defer, handleSucces, key, requestPromise,
       _this = this;
     if (password == null) {
       password = '';
@@ -210,48 +210,48 @@ Hoodie.Account = (function() {
       roles: [],
       password: password
     };
-    request_promise = this.hoodie.request('PUT', "/_users/" + (encodeURIComponent(key)), {
+    requestPromise = this.hoodie.request('PUT', "/_users/" + (encodeURIComponent(key)), {
       data: JSON.stringify(data),
       contentType: 'application/json'
     });
-    handle_succes = function(response) {
-      _this.hoodie.trigger('account:signed_up', username);
+    handleSucces = function(response) {
+      _this.hoodie.trigger('account:signup', username);
       _this._doc._rev = response.rev;
-      return _this.sign_in(username, password).then(defer.resolve, defer.reject);
+      return _this.signIn(username, password).then(defer.resolve, defer.reject);
     };
-    request_promise.then(handle_succes, defer.reject);
+    requestPromise.then(handleSucces, defer.reject);
     return defer.promise();
   };
 
-  Account.prototype.sign_in = function(username, password) {
-    var defer, handle_succes, request_promise,
+  Account.prototype.signIn = function(username, password) {
+    var defer, handleSucces, requestPromise,
       _this = this;
     if (password == null) {
       password = '';
     }
     defer = this.hoodie.defer();
-    request_promise = this.hoodie.request('POST', '/_session', {
+    requestPromise = this.hoodie.request('POST', '/_session', {
       data: {
         name: username,
         password: password
       }
     });
-    handle_succes = function(response) {
-      _this.hoodie.trigger('account:signed_in', username);
+    handleSucces = function(response) {
+      _this.hoodie.trigger('account:signin', username);
       _this.fetch();
       return defer.resolve(username, response);
     };
-    request_promise.then(handle_succes, defer.reject);
+    requestPromise.then(handleSucces, defer.reject);
     return defer.promise();
   };
 
-  Account.prototype.login = Account.prototype.sign_in;
+  Account.prototype.login = Account.prototype.signIn;
 
-  Account.prototype.change_password = function(current_password, new_password) {
+  Account.prototype.changePassword = function(currentPassword, newPassword) {
     var data, defer, key,
       _this = this;
-    if (current_password == null) {
-      current_password = '';
+    if (currentPassword == null) {
+      currentPassword = '';
     }
     defer = this.hoodie.defer();
     if (!this.username) {
@@ -264,8 +264,8 @@ Hoodie.Account = (function() {
     key = "" + this._prefix + ":" + this.username;
     data = $.extend({}, this._doc);
     delete data.salt;
-    delete data.password_sha;
-    data.password = new_password;
+    delete data.passwordSha;
+    data.password = newPassword;
     return this.hoodie.request('PUT', "/_users/" + (encodeURIComponent(key)), {
       data: JSON.stringify(data),
       contentType: "application/json",
@@ -287,16 +287,16 @@ Hoodie.Account = (function() {
     });
   };
 
-  Account.prototype.sign_out = function() {
+  Account.prototype.signOut = function() {
     var _this = this;
     return this.hoodie.request('DELETE', '/_session', {
       success: function() {
-        return _this.hoodie.trigger('account:signed_out');
+        return _this.hoodie.trigger('account:signout');
       }
     });
   };
 
-  Account.prototype.logout = Account.prototype.sign_out;
+  Account.prototype.logout = Account.prototype.signOut;
 
   Account.prototype.on = function(event, cb) {
     return this.hoodie.on("account:" + event, cb);
@@ -352,13 +352,13 @@ Hoodie.Account = (function() {
 
   Account.prototype._doc = {};
 
-  Account.prototype._handle_sign_in = function(username) {
+  Account.prototype._handleSignIn = function(username) {
     this.username = username;
     this.hoodie.config.set('_account.username', this.username);
     return this._authenticated = true;
   };
 
-  Account.prototype._handle_sign_out = function() {
+  Account.prototype._handleSignOut = function() {
     delete this.username;
     this.hoodie.config.remove('_account.username');
     return this._authenticated = false;
@@ -395,20 +395,20 @@ Hoodie.Config = (function() {
     this.hoodie.store.load(this.type, this.id).done(function(obj) {
       return _this.cache = obj;
     });
-    this.hoodie.on('account:signed_out', this.clear);
+    this.hoodie.on('account:signedOut', this.clear);
   }
 
   Config.prototype.set = function(key, value) {
-    var is_silent, update;
+    var isSilent, update;
     if (this.cache[key] === value) {
       return;
     }
     this.cache[key] = value;
     update = {};
     update[key] = value;
-    is_silent = key.charAt(0) === '_';
+    isSilent = key.charAt(0) === '_';
     return this.hoodie.store.update(this.type, this.id, update, {
-      silent: is_silent
+      silent: isSilent
     });
   };
 
@@ -433,47 +433,47 @@ Hoodie.Email = (function() {
 
   function Email(hoodie) {
     this.hoodie = hoodie;
-    this._handle_email_update = __bind(this._handle_email_update, this);
+    this._handleEmailUpdate = __bind(this._handleEmailUpdate, this);
 
   }
 
-  Email.prototype.send = function(email_attributes) {
+  Email.prototype.send = function(emailAttributes) {
     var attributes, defer,
       _this = this;
-    if (email_attributes == null) {
-      email_attributes = {};
+    if (emailAttributes == null) {
+      emailAttributes = {};
     }
     defer = this.hoodie.defer();
-    attributes = $.extend({}, email_attributes);
-    if (!this._is_valid_email(email_attributes.to)) {
+    attributes = $.extend({}, emailAttributes);
+    if (!this._isValidEmail(emailAttributes.to)) {
       attributes.error = "Invalid email address (" + (attributes.to || 'empty') + ")";
       return defer.reject(attributes).promise();
     }
     this.hoodie.store.create('$email', attributes).then(function(obj) {
-      return _this._handle_email_update(defer, obj);
+      return _this._handleEmailUpdate(defer, obj);
     });
     return defer.promise();
   };
 
-  Email.prototype._is_valid_email = function(email) {
+  Email.prototype._isValidEmail = function(email) {
     if (email == null) {
       email = '';
     }
     return /@/.test(email);
   };
 
-  Email.prototype._handle_email_update = function(defer, attributes) {
+  Email.prototype._handleEmailUpdate = function(defer, attributes) {
     var _this = this;
     if (attributes == null) {
       attributes = {};
     }
     if (attributes.error) {
       return defer.reject(attributes);
-    } else if (attributes.delivered_at) {
+    } else if (attributes.deliveredAt) {
       return defer.resolve(attributes);
     } else {
       return this.hoodie.one("remote:updated:$email:" + attributes.id, function(attributes) {
-        return _this._handle_email_update(defer, attributes);
+        return _this._handleEmailUpdate(defer, attributes);
       });
     }
   };
@@ -484,10 +484,10 @@ Hoodie.Email = (function() {
 // Generated by CoffeeScript 1.3.3
 
 Hoodie.Errors = {
-  INVALID_KEY: function(id_or_type) {
+  INVALID_KEY: function(idOrType) {
     var key;
-    key = id_or_type.id ? 'id' : 'type';
-    return new Error("invalid " + key + " '" + id_or_type[key] + "': numbers and lowercase letters allowed only");
+    key = idOrType.id ? 'id' : 'type';
+    return new Error("invalid " + key + " '" + idOrType[key] + "': numbers and lowercase letters allowed only");
   },
   INVALID_ARGUMENTS: function(msg) {
     return new Error(msg);
@@ -505,15 +505,15 @@ Hoodie.Remote = (function() {
 
   function Remote(hoodie) {
     this.hoodie = hoodie;
-    this._handle_push_success = __bind(this._handle_push_success, this);
+    this._handlePushSuccess = __bind(this._handlePushSuccess, this);
 
-    this._handle_pull_results = __bind(this._handle_pull_results, this);
+    this._handlePullResults = __bind(this._handlePullResults, this);
 
-    this._handle_pull_error = __bind(this._handle_pull_error, this);
+    this._handlePullError = __bind(this._handlePullError, this);
 
-    this._handle_pull_success = __bind(this._handle_pull_success, this);
+    this._handlePullSuccess = __bind(this._handlePullSuccess, this);
 
-    this._restart_pull_request = __bind(this._restart_pull_request, this);
+    this._restartPullRequest = __bind(this._restartPullRequest, this);
 
     this.sync = __bind(this.sync, this);
 
@@ -539,15 +539,15 @@ Hoodie.Remote = (function() {
 
   Remote.prototype.activate = function() {
     this.hoodie.config.set('_remote.active', this.active = true);
-    this.hoodie.on('account:signed_out', this.disconnect);
-    this.hoodie.on('account:signed_in', this.connect);
+    this.hoodie.on('account:signedOut', this.disconnect);
+    this.hoodie.on('account:signedIn', this.connect);
     return this.connect();
   };
 
   Remote.prototype.deactivate = function() {
     this.hoodie.config.set('_remote.active', this.active = false);
-    this.hoodie.unbind('account:signed_in', this.connect);
-    this.hoodie.unbind('account:signed_out', this.disconnect);
+    this.hoodie.unbind('account:signedIn', this.connect);
+    this.hoodie.unbind('account:signedOut', this.disconnect);
     return this.disconnect();
   };
 
@@ -560,50 +560,50 @@ Hoodie.Remote = (function() {
     var _ref, _ref1;
     this.connected = false;
     this.hoodie.unbind('store:dirty:idle', this.push);
-    if ((_ref = this._pull_request) != null) {
+    if ((_ref = this._pullRequest) != null) {
       _ref.abort();
     }
-    return (_ref1 = this._push_request) != null ? _ref1.abort() : void 0;
+    return (_ref1 = this._pushRequest) != null ? _ref1.abort() : void 0;
   };
 
   Remote.prototype.pull = function() {
-    this._pull_request = this.hoodie.request('GET', this._pull_url(), {
+    this._pullRequest = this.hoodie.request('GET', this._pullUrl(), {
       contentType: 'application/json'
     });
     if (this.connected && this.active) {
-      window.clearTimeout(this._pull_request_timeout);
-      this._pull_request_timeout = window.setTimeout(this._restart_pull_request, 25000);
+      window.clearTimeout(this._pullRequestTimeout);
+      this._pullRequestTimeout = window.setTimeout(this._restartPullRequest, 25000);
     }
-    return this._pull_request.then(this._handle_pull_success, this._handle_pull_error);
+    return this._pullRequest.then(this._handlePullSuccess, this._handlePullError);
   };
 
   Remote.prototype.push = function(docs) {
-    var doc, docs_for_remote;
+    var doc, docsForRemote;
     if (!$.isArray(docs)) {
-      docs = this.hoodie.store.changed_docs();
+      docs = this.hoodie.store.changedDocs();
     }
     if (docs.length === 0) {
       return this.hoodie.defer().resolve([]).promise();
     }
-    docs_for_remote = (function() {
+    docsForRemote = (function() {
       var _i, _len, _results;
       _results = [];
       for (_i = 0, _len = docs.length; _i < _len; _i++) {
         doc = docs[_i];
-        _results.push(this._parse_for_remote(doc));
+        _results.push(this._parseForRemote(doc));
       }
       return _results;
     }).call(this);
-    this._push_request = this.hoodie.request('POST', "/" + (encodeURIComponent(this.hoodie.account.db())) + "/_bulk_docs", {
+    this._pushRequest = this.hoodie.request('POST', "/" + (encodeURIComponent(this.hoodie.account.db())) + "/_bulkDocs", {
       dataType: 'json',
       processData: false,
       contentType: 'application/json',
       data: JSON.stringify({
-        docs: docs_for_remote,
-        new_edits: false
+        docs: docsForRemote,
+        newEdits: false
       })
     });
-    return this._push_request.done(this._handle_push_success(docs, docs_for_remote));
+    return this._pushRequest.done(this._handlePushSuccess(docs, docsForRemote));
   };
 
   Remote.prototype.sync = function(docs) {
@@ -618,30 +618,30 @@ Hoodie.Remote = (function() {
     return this.hoodie.on("remote:" + event, cb);
   };
 
-  Remote.prototype._pull_url = function() {
+  Remote.prototype._pullUrl = function() {
     var since;
     since = this.hoodie.config.get('_remote.seq') || 0;
     if (this.active) {
-      return "/" + (encodeURIComponent(this.hoodie.account.db())) + "/_changes?include_docs=true&heartbeat=10000&feed=longpoll&since=" + since;
+      return "/" + (encodeURIComponent(this.hoodie.account.db())) + "/_changes?includeDocs=true&heartbeat=10000&feed=longpoll&since=" + since;
     } else {
-      return "/" + (encodeURIComponent(this.hoodie.account.db())) + "/_changes?include_docs=true&since=" + since;
+      return "/" + (encodeURIComponent(this.hoodie.account.db())) + "/_changes?includeDocs=true&since=" + since;
     }
   };
 
-  Remote.prototype._restart_pull_request = function() {
+  Remote.prototype._restartPullRequest = function() {
     var _ref;
-    return (_ref = this._pull_request) != null ? _ref.abort() : void 0;
+    return (_ref = this._pullRequest) != null ? _ref.abort() : void 0;
   };
 
-  Remote.prototype._handle_pull_success = function(response) {
-    this.hoodie.config.set('_remote.seq', response.last_seq);
-    this._handle_pull_results(response.results);
+  Remote.prototype._handlePullSuccess = function(response) {
+    this.hoodie.config.set('_remote.seq', response.lastSeq);
+    this._handlePullResults(response.results);
     if (this.connected && this.active) {
       return this.pull();
     }
   };
 
-  Remote.prototype._handle_pull_error = function(xhr, error, resp) {
+  Remote.prototype._handlePullError = function(xhr, error, resp) {
     if (!this.connected) {
       return;
     }
@@ -666,13 +666,13 @@ Hoodie.Remote = (function() {
     }
   };
 
-  Remote.prototype._valid_special_attributes = ['_id', '_rev', '_deleted', '_revisions', '_attachments'];
+  Remote.prototype._validSpecialAttributes = ['_id', '_rev', '_deleted', '_revisions', '_attachments'];
 
-  Remote.prototype._parse_for_remote = function(obj) {
+  Remote.prototype._parseForRemote = function(obj) {
     var attr, attributes;
     attributes = $.extend({}, obj);
     for (attr in attributes) {
-      if (~this._valid_special_attributes.indexOf(attr)) {
+      if (~this._validSpecialAttributes.indexOf(attr)) {
         continue;
       }
       if (!/^_/.test(attr)) {
@@ -682,46 +682,46 @@ Hoodie.Remote = (function() {
     }
     attributes._id = "" + attributes.type + "/" + attributes.id;
     delete attributes.id;
-    this._add_revision_to(attributes);
+    this._addRevisionTo(attributes);
     return attributes;
   };
 
-  Remote.prototype._generate_new_revision_id = function() {
+  Remote.prototype._generateNewRevisionId = function() {
     var timestamp, uuid;
-    this._timezone_offset || (this._timezone_offset = new Date().getTimezoneOffset() * 60);
-    timestamp = Date.now() + this._timezone_offset;
+    this._timezoneOffset || (this._timezoneOffset = new Date().getTimezoneOffset() * 60);
+    timestamp = Date.now() + this._timezoneOffset;
     uuid = this.hoodie.store.uuid(5);
     return "" + uuid + "#" + timestamp;
   };
 
-  Remote.prototype._add_revision_to = function(attributes) {
-    var current_rev_id, current_rev_nr, new_revision_id, _ref;
+  Remote.prototype._addRevisionTo = function(attributes) {
+    var currentRevId, currentRevNr, newRevisionId, _ref;
     try {
-      _ref = attributes._rev.split(/-/), current_rev_nr = _ref[0], current_rev_id = _ref[1];
+      _ref = attributes._rev.split(/-/), currentRevNr = _ref[0], currentRevId = _ref[1];
     } catch (_error) {}
-    current_rev_nr = parseInt(current_rev_nr) || 0;
-    new_revision_id = this._generate_new_revision_id();
-    attributes._rev = "" + (current_rev_nr + 1) + "-" + new_revision_id;
+    currentRevNr = parseInt(currentRevNr) || 0;
+    newRevisionId = this._generateNewRevisionId();
+    attributes._rev = "" + (currentRevNr + 1) + "-" + newRevisionId;
     attributes._revisions = {
       start: 1,
-      ids: [new_revision_id]
+      ids: [newRevisionId]
     };
-    if (current_rev_id) {
-      attributes._revisions.start += current_rev_nr;
-      return attributes._revisions.ids.push(current_rev_id);
+    if (currentRevId) {
+      attributes._revisions.start += currentRevNr;
+      return attributes._revisions.ids.push(currentRevId);
     }
   };
 
-  Remote.prototype._parse_from_pull = function(obj) {
+  Remote.prototype._parseFromPull = function(obj) {
     var id, _ref;
     id = obj._id || obj.id;
     delete obj._id;
     _ref = id.split(/\//), obj.type = _ref[0], obj.id = _ref[1];
-    if (obj.created_at) {
-      obj.created_at = new Date(Date.parse(obj.created_at));
+    if (obj.createdAt) {
+      obj.createdAt = new Date(Date.parse(obj.createdAt));
     }
-    if (obj.updated_at) {
-      obj.updated_at = new Date(Date.parse(obj.updated_at));
+    if (obj.updatedAt) {
+      obj.updatedAt = new Date(Date.parse(obj.updatedAt));
     }
     if (obj.rev) {
       obj._rev = obj.rev;
@@ -730,7 +730,7 @@ Hoodie.Remote = (function() {
     return obj;
   };
 
-  Remote.prototype._parse_from_push = function(obj) {
+  Remote.prototype._parseFromPush = function(obj) {
     var id, _ref;
     id = obj._id || delete obj._id;
     _ref = obj.id.split(/\//), obj.type = _ref[0], obj.id = _ref[1];
@@ -740,57 +740,57 @@ Hoodie.Remote = (function() {
     return obj;
   };
 
-  Remote.prototype._handle_pull_results = function(changes) {
-    var doc, promise, _changed_docs, _destroyed_docs, _i, _j, _k, _len, _len1, _len2, _ref, _ref1, _results,
+  Remote.prototype._handlePullResults = function(changes) {
+    var doc, promise, _changedDocs, _destroyedDocs, _i, _j, _k, _len, _len1, _len2, _ref, _ref1, _results,
       _this = this;
-    _destroyed_docs = [];
-    _changed_docs = [];
+    _destroyedDocs = [];
+    _changedDocs = [];
     for (_i = 0, _len = changes.length; _i < _len; _i++) {
       doc = changes[_i].doc;
-      doc = this._parse_from_pull(doc);
+      doc = this._parseFromPull(doc);
       if (doc._deleted) {
-        _destroyed_docs.push([
+        _destroyedDocs.push([
           doc, this.hoodie.store.destroy(doc.type, doc.id, {
             remote: true
           })
         ]);
       } else {
-        _changed_docs.push([
+        _changedDocs.push([
           doc, this.hoodie.store.update(doc.type, doc.id, doc, {
             remote: true
           })
         ]);
       }
     }
-    for (_j = 0, _len1 = _destroyed_docs.length; _j < _len1; _j++) {
-      _ref = _destroyed_docs[_j], doc = _ref[0], promise = _ref[1];
+    for (_j = 0, _len1 = _destroyedDocs.length; _j < _len1; _j++) {
+      _ref = _destroyedDocs[_j], doc = _ref[0], promise = _ref[1];
       promise.then(function(object) {
         _this.hoodie.trigger('remote:destroy', object);
         _this.hoodie.trigger("remote:destroy:" + doc.type, object);
         _this.hoodie.trigger("remote:destroy:" + doc.type + ":" + doc.id, object);
-        _this.hoodie.trigger('remote:changed', 'destroyed', object);
-        _this.hoodie.trigger("remote:changed:" + doc.type, 'destroyed', object);
-        return _this.hoodie.trigger("remote:changed:" + doc.type + ":" + doc.id, 'destroyed', object);
+        _this.hoodie.trigger('remote:change', 'destroy', object);
+        _this.hoodie.trigger("remote:change:" + doc.type, 'destroy', object);
+        return _this.hoodie.trigger("remote:change:" + doc.type + ":" + doc.id, 'destroy', object);
       });
     }
     _results = [];
-    for (_k = 0, _len2 = _changed_docs.length; _k < _len2; _k++) {
-      _ref1 = _changed_docs[_k], doc = _ref1[0], promise = _ref1[1];
-      _results.push(promise.then(function(object, object_was_created) {
+    for (_k = 0, _len2 = _changedDocs.length; _k < _len2; _k++) {
+      _ref1 = _changedDocs[_k], doc = _ref1[0], promise = _ref1[1];
+      _results.push(promise.then(function(object, objectWasCreated) {
         var event;
-        event = object_was_created ? 'created' : 'updated';
+        event = objectWasCreated ? 'create' : 'update';
         _this.hoodie.trigger("remote:" + event, object);
-        _this.hoodie.trigger("remote:" + event + ":" + doc.type, doc.id, object);
+        _this.hoodie.trigger("remote:" + event + ":" + doc.type, object);
         _this.hoodie.trigger("remote:" + event + ":" + doc.type + ":" + doc.id, object);
-        _this.hoodie.trigger("remote:changed", event, object);
-        _this.hoodie.trigger("remote:changed:" + doc.type, event, object);
-        return _this.hoodie.trigger("remote:changed:" + doc.type + ":" + doc.id, event, object);
+        _this.hoodie.trigger("remote:change", event, object);
+        _this.hoodie.trigger("remote:change:" + doc.type, event, object);
+        return _this.hoodie.trigger("remote:change:" + doc.type + ":" + doc.id, event, object);
       }));
     }
     return _results;
   };
 
-  Remote.prototype._handle_push_success = function(docs, pushed_docs) {
+  Remote.prototype._handlePushSuccess = function(docs, pushedDocs) {
     var _this = this;
     return function() {
       var doc, i, options, update, _i, _len, _results;
@@ -798,7 +798,7 @@ Hoodie.Remote = (function() {
       for (i = _i = 0, _len = docs.length; _i < _len; i = ++_i) {
         doc = docs[i];
         update = {
-          _rev: pushed_docs[i]._rev
+          _rev: pushedDocs[i]._rev
         };
         options = {
           remote: true
@@ -821,7 +821,7 @@ Hoodie.Store = (function() {
     this.hoodie = hoodie;
     this.clear = __bind(this.clear, this);
 
-    if (!this.is_persistent()) {
+    if (!this.isPersistent()) {
       this.db = {
         getItem: function() {
           return null;
@@ -843,7 +843,7 @@ Hoodie.Store = (function() {
         }
       };
     }
-    this.hoodie.on('account:signed_out', this.clear);
+    this.hoodie.on('account:signout', this.clear);
   }
 
   Store.prototype.db = {
@@ -868,7 +868,7 @@ Hoodie.Store = (function() {
   };
 
   Store.prototype.save = function(type, id, object, options) {
-    var defer, is_new;
+    var defer, isNew;
     if (options == null) {
       options = {};
     }
@@ -878,33 +878,33 @@ Hoodie.Store = (function() {
       return defer.promise();
     }
     object = $.extend({}, object);
-    if (id && !this._is_valid_id(id)) {
+    if (id && !this._isValidId(id)) {
       return defer.reject(Hoodie.Errors.INVALID_KEY({
         id: id
       })).promise();
     }
-    if (!this._is_valid_type(type)) {
+    if (!this._isValidType(type)) {
       return defer.reject(Hoodie.Errors.INVALID_KEY({
         type: type
       })).promise();
     }
     if (id) {
-      is_new = typeof this._cached["" + type + "/" + id] !== 'object';
+      isNew = typeof this._cached["" + type + "/" + id] !== 'object';
     } else {
-      is_new = true;
+      isNew = true;
       id = this.uuid();
     }
     if (options.remote) {
-      object._synced_at = this._now();
+      object._syncedAt = this._now();
     } else if (!options.silent) {
-      object.updated_at = this._now();
-      object.created_at || (object.created_at = object.updated_at);
+      object.updatedAt = this._now();
+      object.createdAt || (object.createdAt = object.updatedAt);
     }
     delete object.id;
     delete object.type;
     try {
       object = this.cache(type, id, object, options);
-      defer.resolve(object, is_new).promise();
+      defer.resolve(object, isNew).promise();
     } catch (error) {
       defer.reject(error).promise();
     }
@@ -918,69 +918,69 @@ Hoodie.Store = (function() {
     return this.save(type, void 0, object);
   };
 
-  Store.prototype.update = function(type, id, object_update, options) {
-    var defer, _load_promise,
+  Store.prototype.update = function(type, id, objectUpdate, options) {
+    var defer, _loadPromise,
       _this = this;
     if (options == null) {
       options = {};
     }
     defer = this.hoodie.defer();
-    _load_promise = this.load(type, id).pipe(function(current_obj) {
-      var changed_properties, key, value;
-      if (typeof object_update === 'function') {
-        object_update = object_update($.extend({}, current_obj));
+    _loadPromise = this.load(type, id).pipe(function(currentObj) {
+      var changedProperties, key, value;
+      if (typeof objectUpdate === 'function') {
+        objectUpdate = objectUpdate($.extend({}, currentObj));
       }
-      if (!object_update) {
-        return defer.resolve(current_obj);
+      if (!objectUpdate) {
+        return defer.resolve(currentObj);
       }
-      changed_properties = (function() {
+      changedProperties = (function() {
         var _results;
         _results = [];
-        for (key in object_update) {
-          value = object_update[key];
-          if (!(current_obj[key] !== value)) {
+        for (key in objectUpdate) {
+          value = objectUpdate[key];
+          if (!(currentObj[key] !== value)) {
             continue;
           }
-          current_obj[key] = value;
+          currentObj[key] = value;
           _results.push(key);
         }
         return _results;
       })();
-      if (!changed_properties.length) {
-        return defer.resolve(current_obj);
+      if (!changedProperties.length) {
+        return defer.resolve(currentObj);
       }
-      return _this.save(type, id, current_obj, options).then(defer.resolve, defer.reject);
+      return _this.save(type, id, currentObj, options).then(defer.resolve, defer.reject);
     });
-    _load_promise.fail(function() {
-      return _this.save(type, id, object_update, options).then(defer.resolve, defer.reject);
+    _loadPromise.fail(function() {
+      return _this.save(type, id, objectUpdate, options).then(defer.resolve, defer.reject);
     });
     return defer.promise();
   };
 
-  Store.prototype.updateAll = function(filter_or_objects, object_update, options) {
+  Store.prototype.updateAll = function(filterOrObjects, objectUpdate, options) {
     var promise,
       _this = this;
     if (options == null) {
       options = {};
     }
-    if (this.hoodie.isPromise(filter_or_objects)) {
-      promise = filter_or_objects;
+    if (this.hoodie.isPromise(filterOrObjects)) {
+      promise = filterOrObjects;
     } else {
-      promise = this.hoodie.defer().resolve(filter_or_objects).resolve();
+      promise = this.hoodie.defer().resolve(filterOrObjects).resolve();
     }
     return promise.pipe(function(objects) {
-      var defer, object, _update_promises;
+      var defer, object, _updatePromises;
       defer = _this.hoodie.defer();
-      _update_promises = (function() {
+      _updatePromises = (function() {
         var _i, _len, _results;
         _results = [];
         for (_i = 0, _len = objects.length; _i < _len; _i++) {
           object = objects[_i];
-          _results.push(this.update(object.type, object.id, object_update, options));
+          _results.push(this.update(object.type, object.id, objectUpdate, options));
         }
         return _results;
       }).call(_this);
-      $.when.apply(null, _update_promises).then(defer.resolve);
+      $.when.apply(null, _updatePromises).then(defer.resolve);
       return defer.promise();
     });
   };
@@ -1004,7 +1004,7 @@ Hoodie.Store = (function() {
   };
 
   Store.prototype.loadAll = function(filter) {
-    var current_type, defer, id, key, keys, obj, results, type;
+    var currentType, defer, id, key, keys, obj, results, type;
     if (filter == null) {
       filter = function() {
         return true;
@@ -1024,11 +1024,11 @@ Hoodie.Store = (function() {
         _results = [];
         for (_i = 0, _len = keys.length; _i < _len; _i++) {
           key = keys[_i];
-          if (!(this._is_semantic_id(key))) {
+          if (!(this._isSemanticId(key))) {
             continue;
           }
-          _ref = key.split('/'), current_type = _ref[0], id = _ref[1];
-          obj = this.cache(current_type, id);
+          _ref = key.split('/'), currentType = _ref[0], id = _ref[1];
+          obj = this.cache(currentType, id);
           if (filter(obj)) {
             _results.push(obj);
           } else {
@@ -1054,14 +1054,14 @@ Hoodie.Store = (function() {
     if (!object) {
       return defer.reject(Hoodie.Errors.NOT_FOUND(type, id)).promise();
     }
-    if (object._synced_at && !options.remote) {
+    if (object._syncedAt && !options.remote) {
       object._deleted = true;
       this.cache(type, id, object);
     } else {
       key = "" + type + "/" + id;
       this.db.removeItem(key);
       this._cached[key] = false;
-      this.clear_changed(type, id);
+      this.clearChanged(type, id);
     }
     return defer.resolve($.extend({}, object)).promise();
   };
@@ -1084,7 +1084,7 @@ Hoodie.Store = (function() {
       });
       this._setObject(type, id, object);
       if (options.remote) {
-        this.clear_changed(type, id);
+        this.clearChanged(type, id);
         return $.extend({}, this._cached[key]);
       }
     } else {
@@ -1093,10 +1093,10 @@ Hoodie.Store = (function() {
       }
       this._cached[key] = this._getObject(type, id);
     }
-    if (this._cached[key] && (this._is_dirty(this._cached[key]) || this._is_marked_as_deleted(this._cached[key]))) {
-      this.mark_as_changed(type, id, this._cached[key]);
+    if (this._cached[key] && (this._isDirty(this._cached[key]) || this._isMarkedAsDeleted(this._cached[key]))) {
+      this.markAsChanged(type, id, this._cached[key]);
     } else {
-      this.clear_changed(type, id);
+      this.clearChanged(type, id);
     }
     if (this._cached[key]) {
       return $.extend({}, this._cached[key]);
@@ -1105,7 +1105,7 @@ Hoodie.Store = (function() {
     }
   };
 
-  Store.prototype.clear_changed = function(type, id) {
+  Store.prototype.clearChanged = function(type, id) {
     var key;
     if (type && id) {
       key = "" + type + "/" + id;
@@ -1116,24 +1116,24 @@ Hoodie.Store = (function() {
     return this.hoodie.trigger('store:dirty');
   };
 
-  Store.prototype.is_marked_as_deleted = function(type, id) {
-    return this._is_marked_as_deleted(this.cache(type, id));
+  Store.prototype.isMarkedAsDeleted = function(type, id) {
+    return this._isMarkedAsDeleted(this.cache(type, id));
   };
 
-  Store.prototype.mark_as_changed = function(type, id, object) {
+  Store.prototype.markAsChanged = function(type, id, object) {
     var key, timeout,
       _this = this;
     key = "" + type + "/" + id;
     this._dirty[key] = object;
     this.hoodie.trigger('store:dirty');
     timeout = 2000;
-    window.clearTimeout(this._dirty_timeout);
-    return this._dirty_timeout = window.setTimeout((function() {
+    window.clearTimeout(this._dirtyTimeout);
+    return this._dirtyTimeout = window.setTimeout((function() {
       return _this.hoodie.trigger('store:dirty:idle');
     }), timeout);
   };
 
-  Store.prototype.changed_docs = function() {
+  Store.prototype.changedDocs = function() {
     var key, object, _ref, _results;
     _ref = this._dirty;
     _results = [];
@@ -1144,11 +1144,11 @@ Hoodie.Store = (function() {
     return _results;
   };
 
-  Store.prototype.is_dirty = function(type, id) {
+  Store.prototype.isDirty = function(type, id) {
     if (!type) {
       return $.isEmptyObject(this._dirty);
     }
-    return this._is_dirty(this.cache(type, id));
+    return this._isDirty(this.cache(type, id));
   };
 
   Store.prototype.clear = function() {
@@ -1157,7 +1157,7 @@ Hoodie.Store = (function() {
     try {
       this.db.clear();
       this._cached = {};
-      this.clear_changed();
+      this.clearChanged();
       defer.resolve();
     } catch (error) {
       defer.reject(error);
@@ -1165,7 +1165,7 @@ Hoodie.Store = (function() {
     return defer.promise();
   };
 
-  Store.prototype.is_persistent = function() {
+  Store.prototype.isPersistent = function() {
     try {
       if (!window.localStorage) {
         return false;
@@ -1215,14 +1215,14 @@ Hoodie.Store = (function() {
       obj = JSON.parse(json);
       obj.type = type;
       obj.id = id;
-      if (obj.created_at) {
-        obj.created_at = new Date(Date.parse(obj.created_at));
+      if (obj.createdAt) {
+        obj.createdAt = new Date(Date.parse(obj.createdAt));
       }
-      if (obj.updated_at) {
-        obj.updated_at = new Date(Date.parse(obj.updated_at));
+      if (obj.updatedAt) {
+        obj.updatedAt = new Date(Date.parse(obj.updatedAt));
       }
-      if (obj._synced_at) {
-        obj._synced_at = new Date(Date.parse(obj._synced_at));
+      if (obj._syncedAt) {
+        obj._syncedAt = new Date(Date.parse(obj._syncedAt));
       }
       return obj;
     } else {
@@ -1234,15 +1234,15 @@ Hoodie.Store = (function() {
     return new Date;
   };
 
-  Store.prototype._is_valid_id = function(key) {
+  Store.prototype._isValidId = function(key) {
     return /^[a-z0-9\-]+$/.test(key);
   };
 
-  Store.prototype._is_valid_type = function(key) {
+  Store.prototype._isValidType = function(key) {
     return /^[a-z$][a-z0-9]+$/.test(key);
   };
 
-  Store.prototype._is_semantic_id = function(key) {
+  Store.prototype._isSemanticId = function(key) {
     return /^[a-z$][a-z0-9]+\/[a-z0-9]+$/.test(key);
   };
 
@@ -1250,17 +1250,17 @@ Hoodie.Store = (function() {
 
   Store.prototype._dirty = {};
 
-  Store.prototype._is_dirty = function(object) {
-    if (!object._synced_at) {
+  Store.prototype._isDirty = function(object) {
+    if (!object._syncedAt) {
       return true;
     }
-    if (!object.updated_at) {
+    if (!object.updatedAt) {
       return false;
     }
-    return object._synced_at.getTime() < object.updated_at.getTime();
+    return object._syncedAt.getTime() < object.updatedAt.getTime();
   };
 
-  Store.prototype._is_marked_as_deleted = function(object) {
+  Store.prototype._isMarkedAsDeleted = function(object) {
     return object._deleted === true;
   };
 
