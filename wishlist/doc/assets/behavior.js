@@ -125,6 +125,85 @@ f.event={add:function(a,c,d,e,g){var h,i,j,k,l,m,n,o,p,q,r,s;if(!(a.nodeType===3
           "singleLineComment": ["//"],
           "name": "JavaScript"
         },
+        "sourcePath": "/Users/gregor/JavaScripts/hood.ie/hoodie-client.js/wishlist/public_store_step_by_step.js",
+        "projectPath": "public_store_step_by_step.js",
+        "targetPath": "public_store_step_by_step",
+        "firstHeader": {
+          "type": "heading",
+          "data": {
+            "level": 1,
+            "title": "Implementation of public user stores",
+            "slug": "implementation-of-public-user-stores",
+            "isFileHeader": true
+          },
+          "depth": 1,
+          "children": [
+            {
+              "type": "heading",
+              "data": {
+                "level": 2,
+                "title": "Step one: create or make an object public",
+                "slug": "step-one-create-or-make-an-object-public"
+              },
+              "depth": 2
+            }, {
+              "type": "heading",
+              "data": {
+                "level": 2,
+                "title": "Step 2: Synchronization with public store",
+                "slug": "step-2-synchronization-with-public-store"
+              },
+              "depth": 2
+            }, {
+              "type": "heading",
+              "data": {
+                "level": 2,
+                "title": "the worker",
+                "slug": "the-worker"
+              },
+              "depth": 2
+            }
+          ]
+        },
+        "title": "Implementation of public user stores"
+      },
+      "depth": 1,
+      "outline": [
+        {
+          "type": "heading",
+          "data": {
+            "level": 2,
+            "title": "Step one: create or make an object public",
+            "slug": "step-one-create-or-make-an-object-public"
+          },
+          "depth": 2
+        }, {
+          "type": "heading",
+          "data": {
+            "level": 2,
+            "title": "Step 2: Synchronization with public store",
+            "slug": "step-2-synchronization-with-public-store"
+          },
+          "depth": 2
+        }, {
+          "type": "heading",
+          "data": {
+            "level": 2,
+            "title": "the worker",
+            "slug": "the-worker"
+          },
+          "depth": 2
+        }
+      ]
+    }, {
+      "type": "file",
+      "data": {
+        "language": {
+          "nameMatchers": [".js"],
+          "pygmentsLexer": "javascript",
+          "singleLineComment": ["//"],
+          "name": "JavaScript"
+        },
         "sourcePath": "/Users/gregor/JavaScripts/hood.ie/hoodie-client.js/wishlist/public_user_and_global_stores.js",
         "projectPath": "public_user_and_global_stores.js",
         "targetPath": "public_user_and_global_stores",
