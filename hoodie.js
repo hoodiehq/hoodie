@@ -765,9 +765,9 @@ Hoodie.Remote = (function() {
     for (_j = 0, _len1 = _destroyed_docs.length; _j < _len1; _j++) {
       _ref = _destroyed_docs[_j], doc = _ref[0], promise = _ref[1];
       promise.then(function(object) {
-        _this.hoodie.trigger('remote:destroyed', object);
-        _this.hoodie.trigger("remote:destroyed:" + doc.type, object);
-        _this.hoodie.trigger("remote:destroyed:" + doc.type + ":" + doc.id, object);
+        _this.hoodie.trigger('remote:destroy', object);
+        _this.hoodie.trigger("remote:destroy:" + doc.type, object);
+        _this.hoodie.trigger("remote:destroy:" + doc.type + ":" + doc.id, object);
         _this.hoodie.trigger('remote:changed', 'destroyed', object);
         _this.hoodie.trigger("remote:changed:" + doc.type, 'destroyed', object);
         return _this.hoodie.trigger("remote:changed:" + doc.type + ":" + doc.id, 'destroyed', object);

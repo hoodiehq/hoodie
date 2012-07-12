@@ -195,18 +195,18 @@ describe("Hoodie.Remote", function() {
       });
       it("should trigger remote events", function() {
         this.remote.pull();
-        expect(this.hoodie.trigger).wasCalledWith('remote:destroyed', 'object_from_store');
-        expect(this.hoodie.trigger).wasCalledWith('remote:destroyed:todo', 'object_from_store');
-        expect(this.hoodie.trigger).wasCalledWith('remote:destroyed:todo:abc3', 'object_from_store');
-        expect(this.hoodie.trigger).wasCalledWith('remote:changed', 'destroyed', 'object_from_store');
-        expect(this.hoodie.trigger).wasCalledWith('remote:changed:todo', 'destroyed', 'object_from_store');
-        expect(this.hoodie.trigger).wasCalledWith('remote:changed:todo:abc3', 'destroyed', 'object_from_store');
-        expect(this.hoodie.trigger).wasCalledWith('remote:updated', 'object_from_store');
-        expect(this.hoodie.trigger).wasCalledWith('remote:updated:todo', 'object_from_store');
-        expect(this.hoodie.trigger).wasCalledWith('remote:updated:todo:abc2', 'object_from_store');
-        expect(this.hoodie.trigger).wasCalledWith('remote:changed', 'updated', 'object_from_store');
-        expect(this.hoodie.trigger).wasCalledWith('remote:changed:todo', 'updated', 'object_from_store');
-        return expect(this.hoodie.trigger).wasCalledWith('remote:changed:todo:abc2', 'updated', 'object_from_store');
+        expect(this.hoodie.trigger).wasCalledWith('remote:destroy', 'object_from_store');
+        expect(this.hoodie.trigger).wasCalledWith('remote:destroy:todo', 'object_from_store');
+        expect(this.hoodie.trigger).wasCalledWith('remote:destroy:todo:abc3', 'object_from_store');
+        expect(this.hoodie.trigger).wasCalledWith('remote:change', 'destroy', 'object_from_store');
+        expect(this.hoodie.trigger).wasCalledWith('remote:change:todo', 'destroy', 'object_from_store');
+        expect(this.hoodie.trigger).wasCalledWith('remote:change:todo:abc3', 'destroy', 'object_from_store');
+        expect(this.hoodie.trigger).wasCalledWith('remote:update', 'object_from_store');
+        expect(this.hoodie.trigger).wasCalledWith('remote:update:todo', 'object_from_store');
+        expect(this.hoodie.trigger).wasCalledWith('remote:update:todo:abc2', 'object_from_store');
+        expect(this.hoodie.trigger).wasCalledWith('remote:change', 'update', 'object_from_store');
+        expect(this.hoodie.trigger).wasCalledWith('remote:change:todo', 'update', 'object_from_store');
+        return expect(this.hoodie.trigger).wasCalledWith('remote:change:todo:abc2', 'update', 'object_from_store');
       });
       return _and("remote is active", function() {
         beforeEach(function() {

@@ -267,12 +267,12 @@ Hoodie.Remote = (function() {
     for (_j = 0, _len1 = _destroyed_docs.length; _j < _len1; _j++) {
       _ref = _destroyed_docs[_j], doc = _ref[0], promise = _ref[1];
       promise.then(function(object) {
-        _this.hoodie.trigger('remote:destroyed', object);
-        _this.hoodie.trigger("remote:destroyed:" + doc.type, object);
-        _this.hoodie.trigger("remote:destroyed:" + doc.type + ":" + doc.id, object);
-        _this.hoodie.trigger('remote:changed', 'destroyed', object);
-        _this.hoodie.trigger("remote:changed:" + doc.type, 'destroyed', object);
-        return _this.hoodie.trigger("remote:changed:" + doc.type + ":" + doc.id, 'destroyed', object);
+        _this.hoodie.trigger('remote:destroy', object);
+        _this.hoodie.trigger("remote:destroy:" + doc.type, object);
+        _this.hoodie.trigger("remote:destroy:" + doc.type + ":" + doc.id, object);
+        _this.hoodie.trigger('remote:change', 'destroy', object);
+        _this.hoodie.trigger("remote:change:" + doc.type, 'destroy', object);
+        return _this.hoodie.trigger("remote:change:" + doc.type + ":" + doc.id, 'destroy', object);
       });
     }
     _results = [];
@@ -280,13 +280,13 @@ Hoodie.Remote = (function() {
       _ref1 = _changed_docs[_k], doc = _ref1[0], promise = _ref1[1];
       _results.push(promise.then(function(object, object_was_created) {
         var event;
-        event = object_was_created ? 'created' : 'updated';
+        event = object_was_created ? 'create' : 'update';
         _this.hoodie.trigger("remote:" + event, object);
         _this.hoodie.trigger("remote:" + event + ":" + doc.type, object);
         _this.hoodie.trigger("remote:" + event + ":" + doc.type + ":" + doc.id, object);
-        _this.hoodie.trigger("remote:changed", event, object);
-        _this.hoodie.trigger("remote:changed:" + doc.type, event, object);
-        return _this.hoodie.trigger("remote:changed:" + doc.type + ":" + doc.id, event, object);
+        _this.hoodie.trigger("remote:change", event, object);
+        _this.hoodie.trigger("remote:change:" + doc.type, event, object);
+        return _this.hoodie.trigger("remote:change:" + doc.type + ":" + doc.id, event, object);
       }));
     }
     return _results;

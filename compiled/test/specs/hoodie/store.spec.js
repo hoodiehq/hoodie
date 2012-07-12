@@ -12,11 +12,11 @@ describe("Hoodie.Store", function() {
     return spyOn(this.store.db, "clear").andCallThrough();
   });
   describe("new", function() {
-    return it("should subscribe to account:signed_out event", function() {
+    return it("should subscribe to account:sign_out event", function() {
       var store;
       spyOn(this.hoodie, "on");
       store = new Hoodie.Store(this.hoodie);
-      return expect(this.hoodie.on).wasCalledWith('account:signed_out', store.clear);
+      return expect(this.hoodie.on).wasCalledWith('account:sign_out', store.clear);
     });
   });
   describe(".save(type, id, object, options)", function() {

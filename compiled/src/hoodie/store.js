@@ -29,7 +29,7 @@ Hoodie.Store = (function() {
         }
       };
     }
-    this.hoodie.on('account:signed_out', this.clear);
+    this.hoodie.on('account:sign_out', this.clear);
   }
 
   Store.prototype.db = {

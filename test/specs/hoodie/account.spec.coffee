@@ -1,4 +1,3 @@
-
 describe "Hoodie.Account", ->
   beforeEach ->
     localStorage.clear()
@@ -30,11 +29,11 @@ describe "Hoodie.Account", ->
       
     it "should bind to sign_in event", ->
       account = new Hoodie.Account @hoodie
-      expect(@account.on).wasCalledWith 'signed_in', account._handle_sign_in
+      expect(@account.on).wasCalledWith 'sign_in', account._handle_sign_in
     
     it "should bind to sign_out event", ->
       account = new Hoodie.Account @hoodie
-      expect(@account.on).wasCalledWith 'signed_out', account._handle_sign_out
+      expect(@account.on).wasCalledWith 'sign_out', account._handle_sign_out
   # /.constructor()
   
   
@@ -214,9 +213,9 @@ describe "Hoodie.Account", ->
         @response = response = {"ok":true,"id":"org.couchdb.user:bizbiz","rev":"1-a0134f4a9909d3b20533285c839ed830"}
         @defer.resolve(@response).promise()
       
-      it "should trigger `account:signed_up` event", ->
+      it "should trigger `account:sign_up` event", ->
         @account.sign_up('joe@example.com', 'secret')
-        expect(@hoodie.trigger).wasCalledWith 'account:signed_up', 'joe@example.com'
+        expect(@hoodie.trigger).wasCalledWith 'account:sign_up', 'joe@example.com'
         
       it "should sign in", ->
         spyOn(@account, "sign_in").andReturn then: ->
@@ -270,9 +269,9 @@ describe "Hoodie.Account", ->
       beforeEach ->
         @defer.resolve()
         
-      it "should trigger `account:signed_in` event", ->
+      it "should trigger `account:sign_in` event", ->
         @account.sign_in('joe@example.com', 'secret')
-        expect(@hoodie.trigger).wasCalledWith 'account:signed_in', 'joe@example.com'
+        expect(@hoodie.trigger).wasCalledWith 'account:sign_in', 'joe@example.com'
         
       it "should fetch the _users doc", ->
         spyOn(@account, "fetch")
@@ -372,9 +371,9 @@ describe "Hoodie.Account", ->
       beforeEach ->
         @hoodie.request.andCallFake (type, path, options) -> options.success()
         
-      it "should trigger `account:signed_out` event", ->
+      it "should trigger `account:sign_out` event", ->
         @account.sign_out('joe@example.com', 'secret')
-        expect(@hoodie.trigger).wasCalledWith 'account:signed_out'
+        expect(@hoodie.trigger).wasCalledWith 'account:sign_out'
   # /.sign_in(username, password)
   
   

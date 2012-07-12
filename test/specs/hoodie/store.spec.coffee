@@ -12,10 +12,10 @@ describe "Hoodie.Store", ->
     spyOn(@store.db, "clear").andCallThrough()
   
   describe "new", ->
-    it "should subscribe to account:signed_out event", ->
+    it "should subscribe to account:sign_out event", ->
       spyOn(@hoodie, "on")
       store = new Hoodie.Store @hoodie
-      expect(@hoodie.on).wasCalledWith 'account:signed_out', store.clear
+      expect(@hoodie.on).wasCalledWith 'account:sign_out', store.clear
   # /new
   
   describe ".save(type, id, object, options)", ->

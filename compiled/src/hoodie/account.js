@@ -14,8 +14,8 @@ Hoodie.Account = (function() {
     this.authenticate = __bind(this.authenticate, this);
 
     this.username = this.hoodie.config.get('_account.username');
-    this.on('signed_in', this._handle_sign_in);
-    this.on('signed_out', this._handle_sign_out);
+    this.on('sign_in', this._handle_sign_in);
+    this.on('sign_out', this._handle_sign_out);
   }
 
   Account.prototype.authenticate = function() {
@@ -78,7 +78,7 @@ Hoodie.Account = (function() {
       contentType: 'application/json'
     });
     handle_succes = function(response) {
-      _this.hoodie.trigger('account:signed_up', username);
+      _this.hoodie.trigger('account:sign_up', username);
       _this._doc._rev = response.rev;
       return _this.sign_in(username, password).then(defer.resolve, defer.reject);
     };
@@ -100,7 +100,7 @@ Hoodie.Account = (function() {
       }
     });
     handle_succes = function(response) {
-      _this.hoodie.trigger('account:signed_in', username);
+      _this.hoodie.trigger('account:sign_in', username);
       _this.fetch();
       return defer.resolve(username, response);
     };
@@ -154,7 +154,7 @@ Hoodie.Account = (function() {
     var _this = this;
     return this.hoodie.request('DELETE', '/_session', {
       success: function() {
-        return _this.hoodie.trigger('account:signed_out');
+        return _this.hoodie.trigger('account:sign_out');
       }
     });
   };

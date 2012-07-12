@@ -330,24 +330,24 @@ class Hoodie.Remote
     # 2. trigger events
     for [doc, promise] in _destroyed_docs
       promise.then (object) => 
-        @hoodie.trigger 'remote:destroyed',                       object
-        @hoodie.trigger "remote:destroyed:#{doc.type}",           object
-        @hoodie.trigger "remote:destroyed:#{doc.type}:#{doc.id}", object
+        @hoodie.trigger 'remote:destroy',                       object
+        @hoodie.trigger "remote:destroy:#{doc.type}",           object
+        @hoodie.trigger "remote:destroy:#{doc.type}:#{doc.id}", object
         
-        @hoodie.trigger 'remote:changed',                         'destroyed', object
-        @hoodie.trigger "remote:changed:#{doc.type}",             'destroyed', object
-        @hoodie.trigger "remote:changed:#{doc.type}:#{doc.id}",   'destroyed', object
+        @hoodie.trigger 'remote:change',                        'destroy', object
+        @hoodie.trigger "remote:change:#{doc.type}",            'destroy', object
+        @hoodie.trigger "remote:change:#{doc.type}:#{doc.id}",  'destroy', object
     
     for [doc, promise] in _changed_docs
       promise.then (object, object_was_created) => 
-        event = if object_was_created then 'created' else 'updated'
-        @hoodie.trigger "remote:#{event}",                        object
-        @hoodie.trigger "remote:#{event}:#{doc.type}",            object
-        @hoodie.trigger "remote:#{event}:#{doc.type}:#{doc.id}",  object
+        event = if object_was_created then 'create' else 'update'
+        @hoodie.trigger "remote:#{event}",                       object
+        @hoodie.trigger "remote:#{event}:#{doc.type}",           object
+        @hoodie.trigger "remote:#{event}:#{doc.type}:#{doc.id}", object
       
-        @hoodie.trigger "remote:changed",                         event, object
-        @hoodie.trigger "remote:changed:#{doc.type}",             event, object
-        @hoodie.trigger "remote:changed:#{doc.type}:#{doc.id}",   event, object
+        @hoodie.trigger "remote:change",                         event, object
+        @hoodie.trigger "remote:change:#{doc.type}",             event, object
+        @hoodie.trigger "remote:change:#{doc.type}:#{doc.id}",   event, object
 
 
   #

@@ -156,22 +156,22 @@ describe "Hoodie.Remote", ->
         @remote.pull()
 
         # {"_id":"todo/abc3","_rev":"2-123","_deleted":true}
-        expect(@hoodie.trigger).wasCalledWith 'remote:destroyed',           'object_from_store'
-        expect(@hoodie.trigger).wasCalledWith 'remote:destroyed:todo',      'object_from_store'
-        expect(@hoodie.trigger).wasCalledWith 'remote:destroyed:todo:abc3', 'object_from_store'
+        expect(@hoodie.trigger).wasCalledWith 'remote:destroy',           'object_from_store'
+        expect(@hoodie.trigger).wasCalledWith 'remote:destroy:todo',      'object_from_store'
+        expect(@hoodie.trigger).wasCalledWith 'remote:destroy:todo:abc3', 'object_from_store'
 
-        expect(@hoodie.trigger).wasCalledWith 'remote:changed',           'destroyed', 'object_from_store'
-        expect(@hoodie.trigger).wasCalledWith 'remote:changed:todo',      'destroyed', 'object_from_store'
-        expect(@hoodie.trigger).wasCalledWith 'remote:changed:todo:abc3', 'destroyed', 'object_from_store'        
+        expect(@hoodie.trigger).wasCalledWith 'remote:change',            'destroy', 'object_from_store'
+        expect(@hoodie.trigger).wasCalledWith 'remote:change:todo',       'destroy', 'object_from_store'
+        expect(@hoodie.trigger).wasCalledWith 'remote:change:todo:abc3',  'destroy', 'object_from_store'        
         
         # {"_id":"todo/abc2","_rev":"1-123","content":"remember the milk","done":false,"order":1, "type":"todo"}
-        expect(@hoodie.trigger).wasCalledWith 'remote:updated',           'object_from_store'
-        expect(@hoodie.trigger).wasCalledWith 'remote:updated:todo',      'object_from_store'
-        expect(@hoodie.trigger).wasCalledWith 'remote:updated:todo:abc2', 'object_from_store'
-        
-        expect(@hoodie.trigger).wasCalledWith 'remote:changed',           'updated', 'object_from_store'
-        expect(@hoodie.trigger).wasCalledWith 'remote:changed:todo',      'updated', 'object_from_store'
-        expect(@hoodie.trigger).wasCalledWith 'remote:changed:todo:abc2', 'updated', 'object_from_store'
+        expect(@hoodie.trigger).wasCalledWith 'remote:update',            'object_from_store'
+        expect(@hoodie.trigger).wasCalledWith 'remote:update:todo',       'object_from_store'
+        expect(@hoodie.trigger).wasCalledWith 'remote:update:todo:abc2',  'object_from_store'
+
+        expect(@hoodie.trigger).wasCalledWith 'remote:change',            'update', 'object_from_store'
+        expect(@hoodie.trigger).wasCalledWith 'remote:change:todo',       'update', 'object_from_store'
+        expect(@hoodie.trigger).wasCalledWith 'remote:change:todo:abc2',  'update', 'object_from_store'
         
       _and "remote is active", ->
         beforeEach ->

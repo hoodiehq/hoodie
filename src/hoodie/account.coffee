@@ -8,7 +8,7 @@ class Hoodie.Account
   
   # ## Properties
   username    : undefined
-  
+
   
   # ## Constructor
   #
@@ -19,8 +19,8 @@ class Hoodie.Account
     
     # authenticate on next tick
     # window.setTimeout @authenticate
-    @on 'signed_in',  @_handle_sign_in
-    @on 'signed_out', @_handle_sign_out
+    @on 'sign_in',  @_handle_sign_in
+    @on 'sign_out', @_handle_sign_out
   
   
   # ## Authenticate
@@ -87,7 +87,7 @@ class Hoodie.Account
       contentType : 'application/json'
       
     handle_succes = (response) =>
-        @hoodie.trigger 'account:signed_up', username
+        @hoodie.trigger 'account:sign_up', username
         @_doc._rev = response.rev
         @sign_in(username, password).then defer.resolve, defer.reject
 
@@ -109,7 +109,7 @@ class Hoodie.Account
         password  : password
         
     handle_succes = (response) =>
-      @hoodie.trigger 'account:signed_in', username
+      @hoodie.trigger 'account:sign_in', username
       @fetch()
       defer.resolve username, response
     
@@ -161,7 +161,7 @@ class Hoodie.Account
   # TODO: handle errors
   sign_out: ->
     @hoodie.request 'DELETE', '/_session', 
-      success : => @hoodie.trigger 'account:signed_out'
+      success : => @hoodie.trigger 'account:sign_out'
 
   # alias
   logout: @::sign_out

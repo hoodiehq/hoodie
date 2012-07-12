@@ -31,12 +31,12 @@ describe("Hoodie.Account", function() {
     it("should bind to sign_in event", function() {
       var account;
       account = new Hoodie.Account(this.hoodie);
-      return expect(this.account.on).wasCalledWith('signed_in', account._handle_sign_in);
+      return expect(this.account.on).wasCalledWith('sign_in', account._handle_sign_in);
     });
     return it("should bind to sign_out event", function() {
       var account;
       account = new Hoodie.Account(this.hoodie);
-      return expect(this.account.on).wasCalledWith('signed_out', account._handle_sign_out);
+      return expect(this.account.on).wasCalledWith('sign_out', account._handle_sign_out);
     });
   });
   describe("event handlers", function() {
@@ -244,9 +244,9 @@ describe("Hoodie.Account", function() {
         };
         return this.defer.resolve(this.response).promise();
       });
-      it("should trigger `account:signed_up` event", function() {
+      it("should trigger `account:sign_up` event", function() {
         this.account.sign_up('joe@example.com', 'secret');
-        return expect(this.hoodie.trigger).wasCalledWith('account:signed_up', 'joe@example.com');
+        return expect(this.hoodie.trigger).wasCalledWith('account:sign_up', 'joe@example.com');
       });
       it("should sign in", function() {
         spyOn(this.account, "sign_in").andReturn({
@@ -311,9 +311,9 @@ describe("Hoodie.Account", function() {
       beforeEach(function() {
         return this.defer.resolve();
       });
-      it("should trigger `account:signed_in` event", function() {
+      it("should trigger `account:sign_in` event", function() {
         this.account.sign_in('joe@example.com', 'secret');
-        return expect(this.hoodie.trigger).wasCalledWith('account:signed_in', 'joe@example.com');
+        return expect(this.hoodie.trigger).wasCalledWith('account:sign_in', 'joe@example.com');
       });
       return it("should fetch the _users doc", function() {
         spyOn(this.account, "fetch");
@@ -429,9 +429,9 @@ describe("Hoodie.Account", function() {
           return options.success();
         });
       });
-      return it("should trigger `account:signed_out` event", function() {
+      return it("should trigger `account:sign_out` event", function() {
         this.account.sign_out('joe@example.com', 'secret');
-        return expect(this.hoodie.trigger).wasCalledWith('account:signed_out');
+        return expect(this.hoodie.trigger).wasCalledWith('account:sign_out');
       });
     });
   });
