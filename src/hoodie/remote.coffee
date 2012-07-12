@@ -17,7 +17,6 @@ class Hoodie.Remote
   # as soon as the user is authenticated.
   active: true
 
-
   # ## Constructor
   #
   constructor : (@hoodie) ->      
@@ -29,18 +28,18 @@ class Hoodie.Remote
   
   #
   activate : =>
-    @hoodie.config.set '_remote.active', true
+    @hoodie.config.set '_remote.active', @active = true
 
     @hoodie.on 'account:signed_out',    @disconnect
-    @hoodie.on 'account:signed_in',     @sync
+    @hoodie.on 'account:signed_in',     @connect
 
     @connect()
 
   #
   deactivate : =>
-    @hoodie.config.set '_remote.active', false
+    @hoodie.config.set '_remote.active', @active = false
 
-    @hoodie.unbind 'account:signed_in',  @sync
+    @hoodie.unbind 'account:signed_in',  @connect
     @hoodie.unbind 'account:signed_out', @disconnect
 
     @disconnect()
@@ -49,7 +48,7 @@ class Hoodie.Remote
   #
   # start syncing changes from the userDB
   connect : =>
-    @active = true
+    @connected = true
     
     # start syncing
     @hoodie.account.authenticate().pipe @sync
@@ -59,13 +58,10 @@ class Hoodie.Remote
   #
   # stop syncing changes from the userDB
   disconnect : =>
-    @active = false
+    @connected = false
     
     # binding comes from @sync
     @hoodie.unbind 'store:dirty:idle',   @push
-    
-    # binding comes from 403 unauthorized responses
-    @hoodie.unbind 'account:signed_in',  @connect
     
     @_pull_request?.abort()
     @_push_request?.abort()
@@ -78,7 +74,7 @@ class Hoodie.Remote
   pull : =>
     @_pull_request = @hoodie.request 'GET', @_pull_url(), contentType: 'application/json'
     
-    if @active
+    if @connected and @active
       window.clearTimeout @_pull_request_timeout
       @_pull_request_timeout = window.setTimeout @_restart_pull_request, 25000 # 25 sec
     
@@ -154,7 +150,7 @@ class Hoodie.Remote
     @hoodie.config.set '_remote.seq', response.last_seq
     @_handle_pull_results response.results
     
-    @pull() if @active
+    @pull() if @connected and @active
   
   
   # 
@@ -164,7 +160,9 @@ class Hoodie.Remote
   # then check for another change
   #
   _handle_pull_error : (xhr, error, resp) =>
-  
+    
+    return unless @connected
+
     switch xhr.status
   
       # Session is invalid. User is still login, but needs to reauthenticate
@@ -172,7 +170,6 @@ class Hoodie.Remote
       when 403
         @hoodie.trigger 'remote:error:unauthenticated', error
         @disconnect()
-        @hoodie.one 'account:signed_in', @connect if @active
       
       # the 404 comes, when the requested DB of the User has been removed. 
       # Should really not happen. 
@@ -192,16 +189,17 @@ class Hoodie.Remote
       # usually a 0, which stands for timeout or server not reachable.
       else
         return unless @active
+
         if xhr.statusText is 'abort'
           # manual abort after 25sec. restart pulling changes directly when remote is active
-          @pull() if @active
+          @pull()
         else    
             
           # oops. This might be caused by an unreachable server.
           # Or the server canceld it for what ever reason, e.g.
           # heroku kills the request after ~30s.
           # we'll try again after a 3s timeout
-          window.setTimeout @pull, 3000 if @active
+          window.setTimeout @pull, 3000
 
 
   # valid couchDB doc attributes starting with an underscore
@@ -332,24 +330,24 @@ class Hoodie.Remote
     # 2. trigger events
     for [doc, promise] in _destroyed_docs
       promise.then (object) => 
-        @hoodie.trigger 'remote:destroyed', doc.type,   doc.id,    object
-        @hoodie.trigger "remote:destroyed:#{doc.type}", doc.id,    object
-        @hoodie.trigger "remote:destroyed:#{doc.type}:#{doc.id}",  object
+        @hoodie.trigger 'remote:destroyed',                       object
+        @hoodie.trigger "remote:destroyed:#{doc.type}",           object
+        @hoodie.trigger "remote:destroyed:#{doc.type}:#{doc.id}", object
         
-        @hoodie.trigger 'remote:changed',                       'destroyed', doc.type, doc.id, object
-        @hoodie.trigger "remote:changed:#{doc.type}",           'destroyed',           doc.id, object
-        @hoodie.trigger "remote:changed:#{doc.type}:#{doc.id}", 'destroyed',                   object
+        @hoodie.trigger 'remote:changed',                         'destroyed', object
+        @hoodie.trigger "remote:changed:#{doc.type}",             'destroyed', object
+        @hoodie.trigger "remote:changed:#{doc.type}:#{doc.id}",   'destroyed', object
     
     for [doc, promise] in _changed_docs
       promise.then (object, object_was_created) => 
         event = if object_was_created then 'created' else 'updated'
-        @hoodie.trigger "remote:#{event}", doc.type,   doc.id,   object
-        @hoodie.trigger "remote:#{event}:#{doc.type}", doc.id,   object
-        @hoodie.trigger "remote:#{event}:#{doc.type}:#{doc.id}", object
+        @hoodie.trigger "remote:#{event}",                        object
+        @hoodie.trigger "remote:#{event}:#{doc.type}",            object
+        @hoodie.trigger "remote:#{event}:#{doc.type}:#{doc.id}",  object
       
-        @hoodie.trigger "remote:changed",                       event, doc.type, doc.id, object
-        @hoodie.trigger "remote:changed:#{doc.type}",           event,           doc.id, object
-        @hoodie.trigger "remote:changed:#{doc.type}:#{doc.id}", event,                   object
+        @hoodie.trigger "remote:changed",                         event, object
+        @hoodie.trigger "remote:changed:#{doc.type}",             event, object
+        @hoodie.trigger "remote:changed:#{doc.type}:#{doc.id}",   event, object
 
 
   #

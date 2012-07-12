@@ -84,11 +84,11 @@ Hoodie = (function(_super) {
 
   Hoodie.prototype.modules = function() {
     return {
-      'store': Hoodie.Store,
-      'config': Hoodie.Config,
-      'account': Hoodie.Account,
-      'remote': Hoodie.Remote,
-      'email': Hoodie.Email
+      store: Hoodie.Store,
+      config: Hoodie.Config,
+      account: Hoodie.Account,
+      remote: Hoodie.Remote,
+      email: Hoodie.Email
     };
   };
 
@@ -354,7 +354,6 @@ Hoodie.Account = (function() {
 
   Account.prototype._handle_sign_in = function(username) {
     this.username = username;
-    console.log('_handle_sign_in', this.username);
     this.hoodie.config.set('_account.username', this.username);
     return this._authenticated = true;
   };
@@ -539,29 +538,28 @@ Hoodie.Remote = (function() {
   }
 
   Remote.prototype.activate = function() {
-    this.hoodie.config.set('_remote.active', true);
+    this.hoodie.config.set('_remote.active', this.active = true);
     this.hoodie.on('account:signed_out', this.disconnect);
-    this.hoodie.on('account:signed_in', this.sync);
+    this.hoodie.on('account:signed_in', this.connect);
     return this.connect();
   };
 
   Remote.prototype.deactivate = function() {
-    this.hoodie.config.set('_remote.active', false);
-    this.hoodie.unbind('account:signed_in', this.sync);
+    this.hoodie.config.set('_remote.active', this.active = false);
+    this.hoodie.unbind('account:signed_in', this.connect);
     this.hoodie.unbind('account:signed_out', this.disconnect);
     return this.disconnect();
   };
 
   Remote.prototype.connect = function() {
-    this.active = true;
+    this.connected = true;
     return this.hoodie.account.authenticate().pipe(this.sync);
   };
 
   Remote.prototype.disconnect = function() {
     var _ref, _ref1;
-    this.active = false;
+    this.connected = false;
     this.hoodie.unbind('store:dirty:idle', this.push);
-    this.hoodie.unbind('account:signed_in', this.connect);
     if ((_ref = this._pull_request) != null) {
       _ref.abort();
     }
@@ -572,7 +570,7 @@ Hoodie.Remote = (function() {
     this._pull_request = this.hoodie.request('GET', this._pull_url(), {
       contentType: 'application/json'
     });
-    if (this.active) {
+    if (this.connected && this.active) {
       window.clearTimeout(this._pull_request_timeout);
       this._pull_request_timeout = window.setTimeout(this._restart_pull_request, 25000);
     }
@@ -638,20 +636,19 @@ Hoodie.Remote = (function() {
   Remote.prototype._handle_pull_success = function(response) {
     this.hoodie.config.set('_remote.seq', response.last_seq);
     this._handle_pull_results(response.results);
-    if (this.active) {
+    if (this.connected && this.active) {
       return this.pull();
     }
   };
 
   Remote.prototype._handle_pull_error = function(xhr, error, resp) {
+    if (!this.connected) {
+      return;
+    }
     switch (xhr.status) {
       case 403:
         this.hoodie.trigger('remote:error:unauthenticated', error);
-        this.disconnect();
-        if (this.active) {
-          return this.hoodie.one('account:signed_in', this.connect);
-        }
-        break;
+        return this.disconnect();
       case 404:
         return window.setTimeout(this.pull, 3000);
       case 500:
@@ -662,13 +659,9 @@ Hoodie.Remote = (function() {
           return;
         }
         if (xhr.statusText === 'abort') {
-          if (this.active) {
-            return this.pull();
-          }
+          return this.pull();
         } else {
-          if (this.active) {
-            return window.setTimeout(this.pull, 3000);
-          }
+          return window.setTimeout(this.pull, 3000);
         }
     }
   };
@@ -772,11 +765,11 @@ Hoodie.Remote = (function() {
     for (_j = 0, _len1 = _destroyed_docs.length; _j < _len1; _j++) {
       _ref = _destroyed_docs[_j], doc = _ref[0], promise = _ref[1];
       promise.then(function(object) {
-        _this.hoodie.trigger('remote:destroyed', doc.type, doc.id, object);
-        _this.hoodie.trigger("remote:destroyed:" + doc.type, doc.id, object);
+        _this.hoodie.trigger('remote:destroyed', object);
+        _this.hoodie.trigger("remote:destroyed:" + doc.type, object);
         _this.hoodie.trigger("remote:destroyed:" + doc.type + ":" + doc.id, object);
-        _this.hoodie.trigger('remote:changed', 'destroyed', doc.type, doc.id, object);
-        _this.hoodie.trigger("remote:changed:" + doc.type, 'destroyed', doc.id, object);
+        _this.hoodie.trigger('remote:changed', 'destroyed', object);
+        _this.hoodie.trigger("remote:changed:" + doc.type, 'destroyed', object);
         return _this.hoodie.trigger("remote:changed:" + doc.type + ":" + doc.id, 'destroyed', object);
       });
     }
@@ -786,11 +779,11 @@ Hoodie.Remote = (function() {
       _results.push(promise.then(function(object, object_was_created) {
         var event;
         event = object_was_created ? 'created' : 'updated';
-        _this.hoodie.trigger("remote:" + event, doc.type, doc.id, object);
+        _this.hoodie.trigger("remote:" + event, object);
         _this.hoodie.trigger("remote:" + event + ":" + doc.type, doc.id, object);
         _this.hoodie.trigger("remote:" + event + ":" + doc.type + ":" + doc.id, object);
-        _this.hoodie.trigger("remote:changed", event, doc.type, doc.id, object);
-        _this.hoodie.trigger("remote:changed:" + doc.type, event, doc.id, object);
+        _this.hoodie.trigger("remote:changed", event, object);
+        _this.hoodie.trigger("remote:changed:" + doc.type, event, object);
         return _this.hoodie.trigger("remote:changed:" + doc.type + ":" + doc.id, event, object);
       }));
     }

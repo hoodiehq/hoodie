@@ -60,7 +60,7 @@ describe("Hoodie.Remote", function() {
     });
     return it("should subscribe to account:sign_in with sync", function() {
       this.remote.activate();
-      return expect(this.hoodie.on).wasCalledWith('account:signed_in', this.remote.sync);
+      return expect(this.hoodie.on).wasCalledWith('account:signed_in', this.remote.connect);
     });
   });
   describe(".deactivate", function() {
@@ -195,17 +195,17 @@ describe("Hoodie.Remote", function() {
       });
       it("should trigger remote events", function() {
         this.remote.pull();
-        expect(this.hoodie.trigger).wasCalledWith('remote:destroyed', 'todo', 'abc3', 'object_from_store');
-        expect(this.hoodie.trigger).wasCalledWith('remote:destroyed:todo', 'abc3', 'object_from_store');
+        expect(this.hoodie.trigger).wasCalledWith('remote:destroyed', 'object_from_store');
+        expect(this.hoodie.trigger).wasCalledWith('remote:destroyed:todo', 'object_from_store');
         expect(this.hoodie.trigger).wasCalledWith('remote:destroyed:todo:abc3', 'object_from_store');
-        expect(this.hoodie.trigger).wasCalledWith('remote:changed', 'destroyed', 'todo', 'abc3', 'object_from_store');
-        expect(this.hoodie.trigger).wasCalledWith('remote:changed:todo', 'destroyed', 'abc3', 'object_from_store');
+        expect(this.hoodie.trigger).wasCalledWith('remote:changed', 'destroyed', 'object_from_store');
+        expect(this.hoodie.trigger).wasCalledWith('remote:changed:todo', 'destroyed', 'object_from_store');
         expect(this.hoodie.trigger).wasCalledWith('remote:changed:todo:abc3', 'destroyed', 'object_from_store');
-        expect(this.hoodie.trigger).wasCalledWith('remote:updated', 'todo', 'abc2', 'object_from_store');
-        expect(this.hoodie.trigger).wasCalledWith('remote:updated:todo', 'abc2', 'object_from_store');
+        expect(this.hoodie.trigger).wasCalledWith('remote:updated', 'object_from_store');
+        expect(this.hoodie.trigger).wasCalledWith('remote:updated:todo', 'object_from_store');
         expect(this.hoodie.trigger).wasCalledWith('remote:updated:todo:abc2', 'object_from_store');
-        expect(this.hoodie.trigger).wasCalledWith('remote:changed', 'updated', 'todo', 'abc2', 'object_from_store');
-        expect(this.hoodie.trigger).wasCalledWith('remote:changed:todo', 'updated', 'abc2', 'object_from_store');
+        expect(this.hoodie.trigger).wasCalledWith('remote:changed', 'updated', 'object_from_store');
+        expect(this.hoodie.trigger).wasCalledWith('remote:changed:todo', 'updated', 'object_from_store');
         return expect(this.hoodie.trigger).wasCalledWith('remote:changed:todo:abc2', 'updated', 'object_from_store');
       });
       return _and("remote is active", function() {
@@ -243,21 +243,13 @@ describe("Hoodie.Remote", function() {
         return expect(this.hoodie.trigger).wasCalledWith('remote:error:unauthenticated', 'error object');
       });
       _and("remote is active", function() {
-        beforeEach(function() {
+        return beforeEach(function() {
           return this.remote.active = true;
-        });
-        return it("should reconnect when reauthenticated", function() {
-          this.remote.pull();
-          return expect(this.hoodie.one).wasCalledWith('account:signed_in', this.remote.connect);
         });
       });
       return _and("remote isn't active", function() {
-        beforeEach(function() {
+        return beforeEach(function() {
           return this.remote.active = false;
-        });
-        return it("should not reconnect when reauthenticated", function() {
-          this.remote.pull();
-          return expect(this.hoodie.one).wasNotCalledWith('account:signed_in', this.remote.connect);
         });
       });
     });

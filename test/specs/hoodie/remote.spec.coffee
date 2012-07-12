@@ -51,7 +51,7 @@ describe "Hoodie.Remote", ->
 
     it "should subscribe to account:sign_in with sync", ->
       @remote.activate()
-      expect(@hoodie.on).wasCalledWith 'account:signed_in', @remote.sync
+      expect(@hoodie.on).wasCalledWith 'account:signed_in', @remote.connect
       
   describe ".deactivate", ->
     it "should set remote.active to false", ->
@@ -154,23 +154,24 @@ describe "Hoodie.Remote", ->
       
       it "should trigger remote events", ->
         @remote.pull()
-        # {"_id":"todo/abc3","_rev":"2-123","_deleted":true}
-        expect(@hoodie.trigger).wasCalledWith 'remote:destroyed', 'todo', 'abc3', 'object_from_store'
-        expect(@hoodie.trigger).wasCalledWith 'remote:destroyed:todo',    'abc3', 'object_from_store'
-        expect(@hoodie.trigger).wasCalledWith 'remote:destroyed:todo:abc3',       'object_from_store'
 
-        expect(@hoodie.trigger).wasCalledWith 'remote:changed',           'destroyed', 'todo', 'abc3', 'object_from_store'
-        expect(@hoodie.trigger).wasCalledWith 'remote:changed:todo',      'destroyed',         'abc3', 'object_from_store'
-        expect(@hoodie.trigger).wasCalledWith 'remote:changed:todo:abc3', 'destroyed',                 'object_from_store'        
+        # {"_id":"todo/abc3","_rev":"2-123","_deleted":true}
+        expect(@hoodie.trigger).wasCalledWith 'remote:destroyed',           'object_from_store'
+        expect(@hoodie.trigger).wasCalledWith 'remote:destroyed:todo',      'object_from_store'
+        expect(@hoodie.trigger).wasCalledWith 'remote:destroyed:todo:abc3', 'object_from_store'
+
+        expect(@hoodie.trigger).wasCalledWith 'remote:changed',           'destroyed', 'object_from_store'
+        expect(@hoodie.trigger).wasCalledWith 'remote:changed:todo',      'destroyed', 'object_from_store'
+        expect(@hoodie.trigger).wasCalledWith 'remote:changed:todo:abc3', 'destroyed', 'object_from_store'        
         
         # {"_id":"todo/abc2","_rev":"1-123","content":"remember the milk","done":false,"order":1, "type":"todo"}
-        expect(@hoodie.trigger).wasCalledWith 'remote:updated', 'todo', 'abc2', 'object_from_store'
-        expect(@hoodie.trigger).wasCalledWith 'remote:updated:todo',    'abc2', 'object_from_store'
-        expect(@hoodie.trigger).wasCalledWith 'remote:updated:todo:abc2',       'object_from_store'
+        expect(@hoodie.trigger).wasCalledWith 'remote:updated',           'object_from_store'
+        expect(@hoodie.trigger).wasCalledWith 'remote:updated:todo',      'object_from_store'
+        expect(@hoodie.trigger).wasCalledWith 'remote:updated:todo:abc2', 'object_from_store'
         
-        expect(@hoodie.trigger).wasCalledWith 'remote:changed',           'updated', 'todo', 'abc2', 'object_from_store'
-        expect(@hoodie.trigger).wasCalledWith 'remote:changed:todo',      'updated',         'abc2', 'object_from_store'
-        expect(@hoodie.trigger).wasCalledWith 'remote:changed:todo:abc2', 'updated',                 'object_from_store'
+        expect(@hoodie.trigger).wasCalledWith 'remote:changed',           'updated', 'object_from_store'
+        expect(@hoodie.trigger).wasCalledWith 'remote:changed:todo',      'updated', 'object_from_store'
+        expect(@hoodie.trigger).wasCalledWith 'remote:changed:todo:abc2', 'updated', 'object_from_store'
         
       _and "remote is active", ->
         beforeEach ->
@@ -201,18 +202,10 @@ describe "Hoodie.Remote", ->
       _and "remote is active", ->
         beforeEach ->
           @remote.active = true
-          
-        it "should reconnect when reauthenticated", ->
-          @remote.pull()
-          expect(@hoodie.one).wasCalledWith 'account:signed_in', @remote.connect
       
       _and "remote isn't active", ->
         beforeEach ->
           @remote.active = false
-          
-        it "should not reconnect when reauthenticated", ->
-          @remote.pull()
-          expect(@hoodie.one).wasNotCalledWith 'account:signed_in', @remote.connect
 
     _when "request errors with 404 not found", ->
       beforeEach ->
