@@ -17,35 +17,35 @@
     <pre class="prettyprint"><code class="language-js">
     // initialize your Hoodie App
     
-    couchDB_endpoint = 'http://corscouch.example.com';
-    hoodie = new Hoodie(couchDB_endpoint)
+    hoodieAppUrl = 'http://myapp.hood.ie';
+    hoodie = new Hoodie(hoodieAppUrl)
     
     // 
     // Account 
     //
     
     // sign up
-    hoodie.account.sign_up('joe@example.com', 'secret')
+    hoodie.account.signUp('joe@example.com', 'secret')
       .done( function(user) { } ) 
       .fail( function(err)  { } )
       
     // sign in
-    hoodie.account.sign_in('joe@example.com', 'secret')
+    hoodie.account.signIn('joe@example.com', 'secret')
       .done( function(user) { } ) 
       .fail( function(err)  { } )
       
     // sign out
-    hoodie.account.sign_out()
+    hoodie.account.signOut()
       .done( function(user) { } ) 
       .fail( function(err)  { } )
     
     // change password (coming soon)
-    hoodie.account.change_password('current_secret', 'new_secret')
+    hoodie.account.changePassword('currentsecret', 'newsecret')
       .done( function(user) { } ) 
       .fail( function(err)  { } )
       
     // forgot password (coming soon)
-    hoodie.account.forgot_password('joe@example.com')
+    hoodie.account.forgotPassword('joe@example.com')
       .done( function(user) { } ) 
       .fail( function(err)  { } )
       
@@ -60,7 +60,7 @@
     type = 'couch'
     attributes = {color: "red"}
     hoodie.store.create(type, attributes )
-      .done ( function(new_object) { } )
+      .done ( function(newObject) { } )
       .fail ( function(err)        { } )
       
     // save an object
@@ -76,7 +76,7 @@
     id   = 'abc4567'
     update = {size: 2}
     hoodie.store.update( type, id, update )
-      .done ( function(updated_object) { } )
+      .done ( function(updatedObject) { } )
       .fail ( function(err)            { } )
     
     // load one object
@@ -101,7 +101,7 @@
     type = 'couch'
     id   = 'abc4567'
     hoodie.store.delete( type, id )
-      .done ( function(deleted_object) { } )
+      .done ( function(deletedObject) { } )
       .fail ( function(err)            { } )
       
     //
@@ -112,22 +112,22 @@
     // 
     
     // new doc created
-    hoodie.remote.on( 'created', function( type, id, created_object) { } )
+    hoodie.remote.on( 'created', function( type, id, createdObject) { } )
 
     // existing doc updated
-    hoodie.remote.on( 'updated', function( type, id, updated_object) { } )
+    hoodie.remote.on( 'updated', function( type, id, updatedObject) { } )
 
     // doc deleted
-    hoodie.remote.on( 'deleted', function( type, id, deleted_object) { } )
+    hoodie.remote.on( 'deleted', function( type, id, deletedObject) { } )
 
     // any of above events
-    hoodie.remote.on( 'changed', function( type, id, changed_object) { } )
+    hoodie.remote.on( 'changed', function( type, id, changedObject) { } )
 
     // all listeners can be filtered by type
-    hoodie.remote.on( "created:couch", function( id, created_object) { } )
-    hoodie.remote.on( "updated:couch", function( id, updated_object)  { } )
-    hoodie.remote.on( "deleted:couch", function( id, deleted_object) { } )
-    hoodie.remote.on( "changed:couch", function( id, changed_object) { } )
+    hoodie.remote.on( "created:couch", function( id, createdObject) { } )
+    hoodie.remote.on( "updated:couch", function( id, updatedObject)  { } )
+    hoodie.remote.on( "deleted:couch", function( id, deletedObject) { } )
+    hoodie.remote.on( "changed:couch", function( id, changedObject) { } )
     
     //
     // Send emails (coming soon)
