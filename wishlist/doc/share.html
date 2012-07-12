@@ -1,0 +1,87 @@
+<!DOCTYPE html><html lang="en"><head><title>share</title></head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0"><meta name="groc-relative-root" content=""><meta name="groc-document-path" content="share"><meta name="groc-project-path" content="share.js"><link rel="stylesheet" type="text/css" media="all" href="assets/style.css"><script type="text/javascript" src="assets/behavior.js"></script><body><div id="meta"><div class="file-path">share.js</div></div><div id="document"><div class="segment"><div class="comments"><div class="wrapper"><h2 id="sharing-wishlist">Sharing (Wishlist)</h2>
+
+<p>Use cases:</p>
+
+<ol>
+<li><p>Public Sharing</p>
+
+<p>I've created stuff that I want to share with anybody</p></li>
+<li><p>Private Sharing</p>
+
+<p>I've created stuff that I want to share with specific other accounts.</p></li>
+</ol>
+
+<p>Sharings are a special type of hoodie doc</p>
+
+<pre><code>{
+  id            : "abc4567",
+  type          : "$sharing",
+  private       : false,
+  continuous    : false,
+  collaborative : false,
+  filter        : {shared: true},
+  invitees      : ['joe@example.com', 'joey@eaxmle.com'],
+
+  status        : "done",
+  done_at       : "2012-04-29T20:01:58.331Z",
+  created_at    : "2012-03-29T20:01:58.331Z",
+  updated_at    : "2012-03-29T20:01:58.331Z" 
+}
+</code></pre>
+
+<p>Technically, for the couchDB implementation, there are two different types
+of sharing:</p>
+
+<ol>
+<li>manual sharing, with manual pushing of the updates directly to the 
+shared database</li>
+<li>automated, continuous sharing</li>
+</ol>
+
+<p>The former cannot be private, continuous or collaborative.</p></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h3 id="making-a-user-db-publict">Making a user_db publict</h3></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>The simplest case, when I in general want to share all data of my account, I'd suggest
+to introduce an <code>access</code> setting to the user account.</p></div></div><div class="code"><div class="wrapper"><span class="nx">app</span><span class="p">.</span><span class="nx">account</span><span class="p">.</span><span class="nx">sign_up</span><span class="p">(</span><span class="s1">&#39;anonymous_id345&#39;</span><span class="p">,</span> <span class="kc">null</span><span class="p">,</span> <span class="p">{</span><span class="nx">access</span><span class="o">:</span> <span class="s1">&#39;public_read&#39;</span><span class="p">})</span>
+<span class="nx">app</span><span class="p">.</span><span class="nx">account</span><span class="p">.</span><span class="nx">settings</span><span class="p">(</span><span class="s1">&#39;access&#39;</span><span class="p">,</span> <span class="s1">&#39;public_read&#39;</span><span class="p">)</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>When a user_db is set to <code>public_read</code>, anybody can read its data</p></div></div><div class="code"><div class="wrapper"><span class="nx">app</span><span class="p">.</span><span class="nx">sharing</span><span class="p">.</span><span class="nx">open</span><span class="p">(</span><span class="s1">&#39;anonymous_id345&#39;</span><span class="p">).</span><span class="nx">loadAll</span><span class="p">().</span><span class="nx">done</span><span class="p">(</span> <span class="cm">/* ... */</span> <span class="p">)</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h2 id="public-sharing">Public Sharing</h2></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h3 id="share-all-my-data-manually">Share all my data (manually)</h3>
+
+<p>I want to make all my current data and make it accessible by others, without exposing my user_db</p></div></div><div class="code"><div class="wrapper"><span class="nx">app</span><span class="p">.</span><span class="nx">sharing</span><span class="p">.</span><span class="nx">create</span><span class="p">().</span><span class="nx">done</span><span class="p">(</span> <span class="kd">function</span><span class="p">(</span><span class="nx">sharing</span><span class="p">)</span> <span class="p">{</span>
+  <span class="nx">alert</span><span class="p">(</span><span class="s1">&#39;your data has been shared.&#39;</span><span class="p">)</span>
+<span class="p">})</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h3 id="share-again">Share again</h3>
+
+<p>after I made changes, I might want to share my data again. I don't want
+a new DB to be created, instead, I want my shared docs to be updated</p></div></div><div class="code"><div class="wrapper"><span class="nx">app</span><span class="p">.</span><span class="nx">sharing</span><span class="p">.</span><span class="nx">load</span><span class="p">(</span><span class="s1">&#39;uuid567&#39;</span><span class="p">).</span><span class="nx">update</span><span class="p">()</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h3 id="share-only-objects-of-one-specific-type">Share only objects of one specific type</h3></div></div></div><div class="segment"><div class="code"><div class="wrapper"><span class="nx">app</span><span class="p">.</span><span class="nx">sharing</span><span class="p">.</span><span class="nx">create</span><span class="p">({</span>
+  <span class="nx">filter</span> <span class="o">:</span> <span class="p">{</span> <span class="nx">type</span><span class="o">:</span> <span class="s1">&#39;type&#39;</span><span class="p">}</span>
+<span class="p">}).</span><span class="nx">done</span><span class="p">(</span> <span class="cm">/* ... */</span> <span class="p">)</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h3 id="share-only-on-specific-object">Share only on specific object</h3></div></div></div><div class="segment"><div class="code"><div class="wrapper"><span class="nx">app</span><span class="p">.</span><span class="nx">sharing</span><span class="p">.</span><span class="nx">save</span><span class="p">({</span>
+  <span class="nx">filter</span> <span class="o">:</span> <span class="p">{</span> <span class="nx">type</span><span class="o">:</span> <span class="s1">&#39;type&#39;</span><span class="p">,</span> <span class="nx">id</span><span class="o">:</span> <span class="s1">&#39;uuid567&#39;</span><span class="p">}</span>
+<span class="p">}).</span><span class="nx">done</span><span class="p">(</span> <span class="cm">/* ... */</span> <span class="p">)</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h3 id="share-objects-with-a-custom-filter">Share objects with a custom filter</h3>
+
+<p>custom filters are simple JavaScript functions. Any object gets passed as parameter,
+one by one. When the filter returns true, share the doc, otherwise not.</p></div></div><div class="code"><div class="wrapper"><span class="nx">app</span><span class="p">.</span><span class="nx">sharing</span><span class="p">.</span><span class="nx">save</span><span class="p">({</span>
+  <span class="nx">filter</span> <span class="o">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">obj</span><span class="p">)</span> <span class="p">{</span> <span class="k">return</span> <span class="nx">obj</span><span class="p">.</span><span class="nx">is_public</span> <span class="p">}</span>
+<span class="p">}).</span><span class="nx">done</span><span class="p">(</span> <span class="cm">/* ... */</span> <span class="p">)</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h3 id="share-continuously">Share continuously</h3>
+
+<p>instead of updating my shared data manually, I can set it to be continuously updated</p></div></div><div class="code"><div class="wrapper"><span class="nx">app</span><span class="p">.</span><span class="nx">sharing</span><span class="p">.</span><span class="nx">save</span><span class="p">({</span>
+  <span class="nx">continuously</span> <span class="o">:</span> <span class="kc">true</span>
+<span class="p">})</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h3 id="receive-shared-docs">Receive shared docs</h3>
+
+<p>The API to load shared data should match the <code>app.store</code> API.</p></div></div><div class="code"><div class="wrapper"><span class="nx">app</span><span class="p">.</span><span class="nx">sharing</span><span class="p">.</span><span class="nx">open</span><span class="p">(</span> <span class="nx">shared_id</span> <span class="p">).</span><span class="nx">loadAll</span><span class="p">().</span><span class="nx">done</span><span class="p">(</span> <span class="kd">function</span><span class="p">(</span><span class="nx">objects</span><span class="p">)</span>   <span class="p">{</span> <span class="cm">/* ... */</span> <span class="p">})</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h3 id="change-shared-docs">change shared docs</h3>
+
+<p>The API to change shared data should match the <code>app.store</code> API as well.
+Whether I'm allowed to change the data or not is set on the shared_db security.</p></div></div><div class="code"><div class="wrapper"><span class="nx">app</span><span class="p">.</span><span class="nx">sharing</span><span class="p">.</span><span class="nx">open</span><span class="p">(</span> <span class="nx">shared_id</span> <span class="p">).</span><span class="nx">save</span><span class="p">(</span><span class="nx">type</span><span class="p">,</span> <span class="nx">id</span><span class="p">,</span> <span class="nx">object</span><span class="p">).</span><span class="nx">done</span><span class="p">(</span> <span class="kd">function</span><span class="p">(</span><span class="nx">object</span><span class="p">,</span> <span class="nx">was_new</span><span class="p">)</span> <span class="p">{</span> <span class="cm">/* ... */</span> <span class="p">})</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h3 id="subscribe-to-changes-of-shared-docs">Subscribe to changes of shared docs</h3>
+
+<p>The API to sbscribe to changes should match the <code>app.remote</code> API.</p></div></div><div class="code"><div class="wrapper"><span class="nx">app</span><span class="p">.</span><span class="nx">sharing</span><span class="p">.</span><span class="nx">open</span><span class="p">(</span> <span class="nx">shared_id</span> <span class="p">).</span><span class="nx">on</span><span class="p">(</span><span class="s1">&#39;changed&#39;</span><span class="p">,</span>        <span class="kd">function</span><span class="p">(</span><span class="nx">type</span><span class="p">,</span> <span class="nx">id</span><span class="p">,</span> <span class="nx">object</span><span class="p">)</span> <span class="p">{</span> <span class="cm">/* ... */</span> <span class="p">})</span>
+<span class="nx">app</span><span class="p">.</span><span class="nx">sharing</span><span class="p">.</span><span class="nx">open</span><span class="p">(</span> <span class="nx">shared_id</span> <span class="p">).</span><span class="nx">on</span><span class="p">(</span><span class="s1">&#39;changed:type&#39;</span><span class="p">,</span>   <span class="kd">function</span><span class="p">(</span><span class="nx">id</span><span class="p">,</span> <span class="nx">object</span><span class="p">)</span> <span class="p">{</span> <span class="cm">/* ... */</span> <span class="p">})</span>
+<span class="nx">app</span><span class="p">.</span><span class="nx">sharing</span><span class="p">.</span><span class="nx">open</span><span class="p">(</span> <span class="nx">shared_id</span> <span class="p">).</span><span class="nx">on</span><span class="p">(</span><span class="s1">&#39;created&#39;</span><span class="p">,</span>        <span class="kd">function</span><span class="p">(</span><span class="nx">type</span><span class="p">,</span> <span class="nx">id</span><span class="p">,</span> <span class="nx">object</span><span class="p">)</span> <span class="p">{</span> <span class="cm">/* ... */</span> <span class="p">})</span>
+<span class="nx">app</span><span class="p">.</span><span class="nx">sharing</span><span class="p">.</span><span class="nx">open</span><span class="p">(</span> <span class="nx">shared_id</span> <span class="p">).</span><span class="nx">on</span><span class="p">(</span><span class="s1">&#39;created:type&#39;</span><span class="p">,</span>   <span class="kd">function</span><span class="p">(</span><span class="nx">id</span><span class="p">,</span> <span class="nx">object</span><span class="p">)</span> <span class="p">{</span> <span class="cm">/* ... */</span> <span class="p">})</span>
+<span class="nx">app</span><span class="p">.</span><span class="nx">sharing</span><span class="p">.</span><span class="nx">open</span><span class="p">(</span> <span class="nx">shared_id</span> <span class="p">).</span><span class="nx">on</span><span class="p">(</span><span class="s1">&#39;updated&#39;</span><span class="p">,</span>        <span class="kd">function</span><span class="p">(</span><span class="nx">type</span><span class="p">,</span> <span class="nx">id</span><span class="p">,</span> <span class="nx">object</span><span class="p">)</span> <span class="p">{</span> <span class="cm">/* ... */</span> <span class="p">})</span>
+<span class="nx">app</span><span class="p">.</span><span class="nx">sharing</span><span class="p">.</span><span class="nx">open</span><span class="p">(</span> <span class="nx">shared_id</span> <span class="p">).</span><span class="nx">on</span><span class="p">(</span><span class="s1">&#39;updated:type&#39;</span><span class="p">,</span>   <span class="kd">function</span><span class="p">(</span><span class="nx">id</span><span class="p">,</span> <span class="nx">object</span><span class="p">)</span> <span class="p">{</span> <span class="cm">/* ... */</span> <span class="p">})</span>
+<span class="nx">app</span><span class="p">.</span><span class="nx">sharing</span><span class="p">.</span><span class="nx">open</span><span class="p">(</span> <span class="nx">shared_id</span> <span class="p">).</span><span class="nx">on</span><span class="p">(</span><span class="s1">&#39;destroyed&#39;</span><span class="p">,</span>      <span class="kd">function</span><span class="p">(</span><span class="nx">type</span><span class="p">,</span> <span class="nx">id</span><span class="p">,</span> <span class="nx">object</span><span class="p">)</span> <span class="p">{</span> <span class="cm">/* ... */</span> <span class="p">})</span>
+<span class="nx">app</span><span class="p">.</span><span class="nx">sharing</span><span class="p">.</span><span class="nx">open</span><span class="p">(</span> <span class="nx">shared_id</span> <span class="p">).</span><span class="nx">on</span><span class="p">(</span><span class="s1">&#39;destroyed:type&#39;</span><span class="p">,</span> <span class="kd">function</span><span class="p">(</span><span class="nx">id</span><span class="p">,</span> <span class="nx">object</span><span class="p">)</span> <span class="p">{</span> <span class="cm">/* ... */</span> <span class="p">})</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h2 id="private-sharing">Private Sharing</h2>
+
+<p>Private sharing means, I want to share all or some of my data with one or several
+other accounts and give them read access or both read &amp; write access.</p>
+
+<p>When I share data privately, a shared db gets created as well, but it is not
+accessible directly. Instead, its data gets replicated directly into other
+user dbs</p></div></div><div class="code"><div class="wrapper"><span class="nx">app</span><span class="p">.</span><span class="nx">sharing</span><span class="p">.</span><span class="nx">save</span><span class="p">({</span>
+  <span class="nx">target</span>    <span class="o">:</span> <span class="s1">&#39;joe@example.com&#39;</span><span class="p">,</span>
+  <span class="kr">private</span>   <span class="o">:</span> <span class="kc">true</span>
+<span class="p">})</span></div></div></div></div></body></html>
