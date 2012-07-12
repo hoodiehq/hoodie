@@ -87,7 +87,7 @@ class Hoodie.Account
       contentType : 'application/json'
       
     handleSucces = (response) =>
-        @hoodie.trigger 'account:signUp', username
+        @hoodie.trigger 'account:signup', username
         @_doc._rev = response.rev
         @signIn(username, password).then defer.resolve, defer.reject
 
@@ -109,7 +109,7 @@ class Hoodie.Account
         password  : password
         
     handleSucces = (response) =>
-      @hoodie.trigger 'account:signIn', username
+      @hoodie.trigger 'account:signin', username
       @fetch()
       defer.resolve username, response
     
@@ -161,7 +161,7 @@ class Hoodie.Account
   # TODO: handle errors
   signOut: ->
     @hoodie.request 'DELETE', '/_session', 
-      success : => @hoodie.trigger 'account:signOut'
+      success : => @hoodie.trigger 'account:signout'
 
   # alias
   logout: @::signOut

@@ -20,7 +20,7 @@ class Hoodie.Store
         clear      : -> null
     
     # handle sign outs
-    @hoodie.on 'account:signOut', @clear
+    @hoodie.on 'account:signout', @clear
     
   
   # localStorage proxy

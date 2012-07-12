@@ -49,7 +49,7 @@ describe "Hoodie.Remote", ->
       @remote.activate()
       expect(@hoodie.on).wasCalledWith 'account:signedOut', @remote.disconnect
 
-    it "should subscribe to account:signIn with sync", ->
+    it "should subscribe to account:signin with sync", ->
       @remote.activate()
       expect(@hoodie.on).wasCalledWith 'account:signedIn', @remote.connect
       

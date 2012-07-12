@@ -78,7 +78,7 @@ Hoodie.Account = (function() {
       contentType: 'application/json'
     });
     handleSucces = function(response) {
-      _this.hoodie.trigger('account:signUp', username);
+      _this.hoodie.trigger('account:signup', username);
       _this._doc._rev = response.rev;
       return _this.signIn(username, password).then(defer.resolve, defer.reject);
     };
@@ -100,7 +100,7 @@ Hoodie.Account = (function() {
       }
     });
     handleSucces = function(response) {
-      _this.hoodie.trigger('account:signIn', username);
+      _this.hoodie.trigger('account:signin', username);
       _this.fetch();
       return defer.resolve(username, response);
     };
@@ -154,7 +154,7 @@ Hoodie.Account = (function() {
     var _this = this;
     return this.hoodie.request('DELETE', '/_session', {
       success: function() {
-        return _this.hoodie.trigger('account:signOut');
+        return _this.hoodie.trigger('account:signout');
       }
     });
   };

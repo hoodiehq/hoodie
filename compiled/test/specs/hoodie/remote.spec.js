@@ -58,7 +58,7 @@ describe("Hoodie.Remote", function() {
       this.remote.activate();
       return expect(this.hoodie.on).wasCalledWith('account:signedOut', this.remote.disconnect);
     });
-    return it("should subscribe to account:signIn with sync", function() {
+    return it("should subscribe to account:signin with sync", function() {
       this.remote.activate();
       return expect(this.hoodie.on).wasCalledWith('account:signedIn', this.remote.connect);
     });

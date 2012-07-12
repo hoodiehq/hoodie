@@ -213,9 +213,9 @@ describe "Hoodie.Account", ->
         @response = response = {"ok":true,"id":"org.couchdb.user:bizbiz","rev":"1-a0134f4a9909d3b20533285c839ed830"}
         @defer.resolve(@response).promise()
       
-      it "should trigger `account:signUp` event", ->
+      it "should trigger `account:signup` event", ->
         @account.signUp('joe@example.com', 'secret')
-        expect(@hoodie.trigger).wasCalledWith 'account:signUp', 'joe@example.com'
+        expect(@hoodie.trigger).wasCalledWith 'account:signup', 'joe@example.com'
         
       it "should sign in", ->
         spyOn(@account, "signIn").andReturn then: ->
@@ -269,9 +269,9 @@ describe "Hoodie.Account", ->
       beforeEach ->
         @defer.resolve()
         
-      it "should trigger `account:signIn` event", ->
+      it "should trigger `account:signin` event", ->
         @account.signIn('joe@example.com', 'secret')
-        expect(@hoodie.trigger).wasCalledWith 'account:signIn', 'joe@example.com'
+        expect(@hoodie.trigger).wasCalledWith 'account:signin', 'joe@example.com'
         
       it "should fetch the _users doc", ->
         spyOn(@account, "fetch")
@@ -371,9 +371,9 @@ describe "Hoodie.Account", ->
       beforeEach ->
         @hoodie.request.andCallFake (type, path, options) -> options.success()
         
-      it "should trigger `account:signOut` event", ->
+      it "should trigger `account:signout` event", ->
         @account.signOut('joe@example.com', 'secret')
-        expect(@hoodie.trigger).wasCalledWith 'account:signOut'
+        expect(@hoodie.trigger).wasCalledWith 'account:signout'
   # /.signIn(username, password)
   
   

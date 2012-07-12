@@ -244,9 +244,9 @@ describe("Hoodie.Account", function() {
         };
         return this.defer.resolve(this.response).promise();
       });
-      it("should trigger `account:signUp` event", function() {
+      it("should trigger `account:signup` event", function() {
         this.account.signUp('joe@example.com', 'secret');
-        return expect(this.hoodie.trigger).wasCalledWith('account:signUp', 'joe@example.com');
+        return expect(this.hoodie.trigger).wasCalledWith('account:signup', 'joe@example.com');
       });
       it("should sign in", function() {
         spyOn(this.account, "signIn").andReturn({
@@ -311,9 +311,9 @@ describe("Hoodie.Account", function() {
       beforeEach(function() {
         return this.defer.resolve();
       });
-      it("should trigger `account:signIn` event", function() {
+      it("should trigger `account:signin` event", function() {
         this.account.signIn('joe@example.com', 'secret');
-        return expect(this.hoodie.trigger).wasCalledWith('account:signIn', 'joe@example.com');
+        return expect(this.hoodie.trigger).wasCalledWith('account:signin', 'joe@example.com');
       });
       return it("should fetch the _users doc", function() {
         spyOn(this.account, "fetch");
@@ -429,9 +429,9 @@ describe("Hoodie.Account", function() {
           return options.success();
         });
       });
-      return it("should trigger `account:signOut` event", function() {
+      return it("should trigger `account:signout` event", function() {
         this.account.signOut('joe@example.com', 'secret');
-        return expect(this.hoodie.trigger).wasCalledWith('account:signOut');
+        return expect(this.hoodie.trigger).wasCalledWith('account:signout');
       });
     });
   });
