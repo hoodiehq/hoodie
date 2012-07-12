@@ -2,7 +2,7 @@
 
 window.Mocks || (window.Mocks = {});
 
-Mocks.changes_response = function() {
+Mocks.changesResponse = function() {
   return {
     "results":
     [
@@ -20,6 +20,6 @@ Mocks.changes_response = function() {
         "doc"     :{"_id":"todo/abc2","_rev":"1-123","content":"remember the milk","done":false,"order":1, "type":"todo"}
       }
     ],
-    "last_seq":20
+    "lastSeq":20
   };
 };

@@ -1,5 +1,5 @@
 window.Mocks or= {}
-Mocks.changed_docs = ->
+Mocks.changedDocs = ->
   [
     {
       content   : "this is done"
@@ -9,15 +9,15 @@ Mocks.changed_docs = ->
       _rev      : '2-123'
       _deleted  : true
       _localInfo: 'funky'
-      updated_at: "2012-20-12T12:00:00.000Z"
-      created_at: "2012-20-12T12:00:00.000Z"
+      updatedAt: "2012-20-12T12:00:00.000Z"
+      createdAt: "2012-20-12T12:00:00.000Z"
     },
     {
       content   : "remember the milk"
       done      : false
       type      : "todo"
       id        : "abc2"
-      updated_at: "2012-20-12T12:00:00.000Z"
-      created_at: "2012-20-12T12:00:00.000Z"
+      updatedAt: "2012-20-12T12:00:00.000Z"
+      createdAt: "2012-20-12T12:00:00.000Z"
     }
   ]

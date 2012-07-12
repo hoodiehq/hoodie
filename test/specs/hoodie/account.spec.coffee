@@ -5,8 +5,8 @@ describe "Hoodie.Account", ->
     @hoodie  = new Mocks.Hoodie
     @account = new Hoodie.Account @hoodie
 
-    @request_defer = @hoodie.defer()
-    spyOn(@hoodie, "request").andReturn @request_defer.promise()
+    @requestDefer = @hoodie.defer()
+    spyOn(@hoodie, "request").andReturn @requestDefer.promise()
   
     # requests
     spyOn(@hoodie, "trigger")
@@ -27,23 +27,23 @@ describe "Hoodie.Account", ->
         account = new Hoodie.Account @hoodie
         expect(account.username).toBe 'joe@example.com'
       
-    it "should bind to sign_in event", ->
+    it "should bind to signIn event", ->
       account = new Hoodie.Account @hoodie
-      expect(@account.on).wasCalledWith 'sign_in', account._handle_sign_in
+      expect(@account.on).wasCalledWith 'signIn', account._handleSignIn
     
-    it "should bind to sign_out event", ->
+    it "should bind to signOut event", ->
       account = new Hoodie.Account @hoodie
-      expect(@account.on).wasCalledWith 'sign_out', account._handle_sign_out
+      expect(@account.on).wasCalledWith 'signOut', account._handleSignOut
   # /.constructor()
   
   
 
   describe "event handlers", ->
-    describe "._handle_sign_in(@username)", ->
+    describe "._handleSignIn(@username)", ->
       beforeEach ->
         expect(@account.username).toBeUndefined()
         spyOn(@hoodie.config, "set")
-        @account._handle_sign_in 'joe@example.com'
+        @account._handleSignIn 'joe@example.com'
       
       it "should set @username", ->
         expect(@account.username).toBe 'joe@example.com'
@@ -53,26 +53,26 @@ describe "Hoodie.Account", ->
         
       it "should set _authenticated to true", ->
         @account._authenticated = false
-        @account._handle_sign_in "joe@example.com"
+        @account._handleSignIn "joe@example.com"
         expect(@account._authenticated).toBe true
-    # /._handle_sign_in(@username)
+    # /._handleSignIn(@username)
     
-    describe "._handle_sign_out()", ->
+    describe "._handleSignOut()", ->
       it "should set @username", ->
         @account.username = 'joe@example.com'
-        @account._handle_sign_out {"ok":true}
+        @account._handleSignOut {"ok":true}
         do expect(@account.username).toBeUndefined
         
       it "should store @username persistantly", ->
         spyOn(@hoodie.config, "remove")
-        @account._handle_sign_out {"ok":true}
+        @account._handleSignOut {"ok":true}
         expect(@hoodie.config.remove).wasCalledWith '_account.username'
         
       it "should set _authenticated to false", ->
         @account._authenticated = true
-        @account._handle_sign_out {"ok":true}
+        @account._handleSignOut {"ok":true}
         expect(@account._authenticated).toBe false
-    # /._handle_sign_out()
+    # /._handleSignOut()
   # /event handlers
   
   
@@ -129,10 +129,10 @@ describe "Hoodie.Account", ->
           expect(args[1]).toBe '/_session'
         
 
-        # {"ok":true,"userCtx":{"name":"@example.com","roles":[]},"info":{"authentication_db":"_users","authentication_handlers":["oauth","cookie","default"],"authenticated":"cookie"}}
+        # {"ok":true,"userCtx":{"name":"@example.com","roles":[]},"info":{"authenticationDb":"_users","authenticationHandlers":["oauth","cookie","default"],"authenticated":"cookie"}}
         _when "authentication request is successful and returns joe@example.com", ->
           beforeEach ->
-            @request_defer.resolve userCtx: name: 'joe@example.com'
+            @requestDefer.resolve userCtx: name: 'joe@example.com'
             @promise = @account.authenticate()
             
           it "should set account as authenticated", ->
@@ -141,10 +141,10 @@ describe "Hoodie.Account", ->
           it "should resolve the promise with 'joe@example.com'", ->
             expect(@promise).toBeResolvedWith 'joe@example.com'
         
-        # {"ok":true,"userCtx":{"name":null,"roles":[]},"info":{"authentication_db":"_users","authentication_handlers":["oauth","cookie","default"]}}
+        # {"ok":true,"userCtx":{"name":null,"roles":[]},"info":{"authenticationDb":"_users","authenticationHandlers":["oauth","cookie","default"]}}
         _when "authentication request is successful and returns `name: null`", ->
           beforeEach ->
-            @request_defer.resolve userCtx: name: null
+            @requestDefer.resolve userCtx: name: null
             @account.username = 'joe@example.com'
             @promise = @account.authenticate()
             
@@ -162,7 +162,7 @@ describe "Hoodie.Account", ->
             
         _when "authentication request has an error", ->
           beforeEach ->
-            @request_defer.reject responseText: 'error data'
+            @requestDefer.reject responseText: 'error data'
             @promise = @account.authenticate()
           
           it "should reject the promise", ->
@@ -171,11 +171,11 @@ describe "Hoodie.Account", ->
   # /.authenticate()
 
 
-  describe ".sign_up(username, password)", ->
+  describe ".signUp(username, password)", ->
     beforeEach ->
       @defer = @hoodie.defer()
       @hoodie.request.andReturn @defer.promise()
-      @account.sign_up('joe@example.com', 'secret', name: "Joe Doe")
+      @account.signUp('joe@example.com', 'secret', name: "Joe Doe")
       [@type, @path, @options] = @hoodie.request.mostRecentCall.args
       @data = JSON.parse @options.data
   
@@ -203,49 +203,49 @@ describe "Hoodie.Account", ->
       expect(@data.password).toBe 'secret'
       
     it "should allow to signup without password", ->
-      @account.sign_up('joe@example.com')
+      @account.signUp('joe@example.com')
       [@type, @path, @options] = @hoodie.request.mostRecentCall.args
       @data = JSON.parse @options.data
       expect(@data.password).toBe ''
             
-    _when "sign_up successful", ->
+    _when "signUp successful", ->
       beforeEach ->
         @response = response = {"ok":true,"id":"org.couchdb.user:bizbiz","rev":"1-a0134f4a9909d3b20533285c839ed830"}
         @defer.resolve(@response).promise()
       
-      it "should trigger `account:sign_up` event", ->
-        @account.sign_up('joe@example.com', 'secret')
-        expect(@hoodie.trigger).wasCalledWith 'account:sign_up', 'joe@example.com'
+      it "should trigger `account:signUp` event", ->
+        @account.signUp('joe@example.com', 'secret')
+        expect(@hoodie.trigger).wasCalledWith 'account:signUp', 'joe@example.com'
         
       it "should sign in", ->
-        spyOn(@account, "sign_in").andReturn then: ->
-        @account.sign_up 'joe@example.com', 'secret'
-        expect(@account.sign_in).wasCalledWith 'joe@example.com', 'secret'
+        spyOn(@account, "signIn").andReturn then: ->
+        @account.signUp 'joe@example.com', 'secret'
+        expect(@account.signIn).wasCalledWith 'joe@example.com', 'secret'
         
       it "should resolve its promise", ->
-        promise = @account.sign_up('joe@example.com', 'secret')
+        promise = @account.signUp('joe@example.com', 'secret')
         expect(promise).toBeResolvedWith 'joe@example.com', @response
         
       it "should fetch the _users doc", ->
         spyOn(@account, "fetch")
-        @account.sign_up('joe@example.com', 'secret')
+        @account.signUp('joe@example.com', 'secret')
         expect(@account.fetch).wasCalled()
         
-    _when "sign_up has an error", ->
+    _when "signUp has an error", ->
       beforeEach ->
         @defer.reject responseText: '{"error":"forbidden","reason":"Username may not start with underscore."}'
       
       it "should reject its promise", ->
-        promise = @account.sign_up('_joe@example.com', 'secret')
+        promise = @account.signUp('_joe@example.com', 'secret')
         expect(promise).toBeRejectedWith responseText: '{"error":"forbidden","reason":"Username may not start with underscore."}'
-  # /.sign_up(username, password)
+  # /.signUp(username, password)
 
 
-  describe ".sign_in(username, password)", ->
+  describe ".signIn(username, password)", ->
     beforeEach ->
       @defer = @hoodie.defer()
       @hoodie.request.andReturn @defer.promise()
-      @account.sign_in('joe@example.com', 'secret')
+      @account.signIn('joe@example.com', 'secret')
       [@type, @path, @options] = @hoodie.request.mostRecentCall.args
   
     it "should send a POST request to http://my.cou.ch/_session", ->
@@ -260,27 +260,27 @@ describe "Hoodie.Account", ->
       expect(@options.data.password).toBe 'secret'
 
     it "should allow to sign in without password", ->
-      @account.sign_in('joe@example.com')
+      @account.signIn('joe@example.com')
       [@type, @path, @options] = @hoodie.request.mostRecentCall.args
       data = @options.data
       expect(data.password).toBe ''
       
-    _when "sign_up successful", ->
+    _when "signUp successful", ->
       beforeEach ->
         @defer.resolve()
         
-      it "should trigger `account:sign_in` event", ->
-        @account.sign_in('joe@example.com', 'secret')
-        expect(@hoodie.trigger).wasCalledWith 'account:sign_in', 'joe@example.com'
+      it "should trigger `account:signIn` event", ->
+        @account.signIn('joe@example.com', 'secret')
+        expect(@hoodie.trigger).wasCalledWith 'account:signIn', 'joe@example.com'
         
       it "should fetch the _users doc", ->
         spyOn(@account, "fetch")
-        @account.sign_in('joe@example.com', 'secret')
+        @account.signIn('joe@example.com', 'secret')
         expect(@account.fetch).wasCalled()
-  # /.sign_in(username, password)
+  # /.signIn(username, password)
 
 
-  describe ".change_password(username, password)", ->
+  describe ".changePassword(username, password)", ->
     beforeEach ->
       @account.username = 'joe@example.com'
       @account._doc  = 
@@ -289,10 +289,10 @@ describe "Hoodie.Account", ->
         type         : 'user'
         roles        : []
         salt         : 'absalt'
-        password_sha : 'pwcdef'
+        passwordSha : 'pwcdef'
         
         
-      @account.change_password('current_secret', 'new_secret')
+      @account.changePassword('currentSecret', 'newSecret')
       [@type, @path, @options] = @hoodie.request.mostRecentCall.args
       @data = JSON.parse @options.data
   
@@ -317,10 +317,10 @@ describe "Hoodie.Account", ->
       expect(@data.type).toBe 'user'
 
     it "should pass password", ->
-      expect(@data.password).toBe 'new_secret'
+      expect(@data.password).toBe 'newSecret'
       
     it "should allow to set empty password", ->
-      @account.change_password('current_secret','')
+      @account.changePassword('currentSecret','')
       [@type, @path, @options] = @hoodie.request.mostRecentCall.args
       @data = JSON.parse @options.data
       expect(@data.password).toBe ''
@@ -328,8 +328,8 @@ describe "Hoodie.Account", ->
     it "should not send salt", ->
       expect(@data.salt).toBeUndefined()
       
-    it "should not send password_sha", ->
-      expect(@data.password_sha).toBeUndefined()
+    it "should not send passwordSha", ->
+      expect(@data.passwordSha).toBeUndefined()
       
             
     _when "change password successful", ->
@@ -339,27 +339,27 @@ describe "Hoodie.Account", ->
           options.success response
         
       it "should resolve its promise", ->
-        promise = @account.change_password('current_secret', 'new_secret')
+        promise = @account.changePassword('currentSecret', 'newSecret')
         expect(promise).toBeResolved()
         
       it "should fetch the _users doc", ->
         spyOn(@account, "fetch")
-        @account.change_password('current_secret', 'new_secret')
+        @account.changePassword('currentSecret', 'newSecret')
         expect(@account.fetch).wasCalled()
         
-    _when "sign_up has an error", ->
+    _when "signUp has an error", ->
       beforeEach ->
         @hoodie.request.andCallFake (type, path, options) -> options.error {}
       
       it "should reject its promise", ->
-        promise = @account.change_password('current_secret', 'new_secret')
+        promise = @account.changePassword('currentSecret', 'newSecret')
         expect(promise).toBeRejectedWith error:"unknown"
-  # /.change_password(username, password)
+  # /.changePassword(username, password)
 
 
-  describe ".sign_out()", ->
+  describe ".signOut()", ->
     beforeEach ->
-      @account.sign_out()
+      @account.signOut()
       [@type, @path, @options] = @hoodie.request.mostRecentCall.args
   
     it "should send a DELETE request to http://my.cou.ch/_session", ->
@@ -367,14 +367,14 @@ describe "Hoodie.Account", ->
       expect(@type).toBe 'DELETE'
       expect(@path).toBe  '/_session'
       
-    _when "sign_up successful", ->
+    _when "signUp successful", ->
       beforeEach ->
         @hoodie.request.andCallFake (type, path, options) -> options.success()
         
-      it "should trigger `account:sign_out` event", ->
-        @account.sign_out('joe@example.com', 'secret')
-        expect(@hoodie.trigger).wasCalledWith 'account:sign_out'
-  # /.sign_in(username, password)
+      it "should trigger `account:signOut` event", ->
+        @account.signOut('joe@example.com', 'secret')
+        expect(@hoodie.trigger).wasCalledWith 'account:signOut'
+  # /.signIn(username, password)
   
   
   describe ".on(event, callback)", ->
@@ -393,7 +393,7 @@ describe "Hoodie.Account", ->
       beforeEach ->
         @account.username = 'joe.doe@example.com'
       
-      it "should return 'joe$example_com", ->
+      it "should return 'joe$exampleCom", ->
         (expect @account.db()).toEqual('joe_doe$example_com')
   # /.db()
   
@@ -420,7 +420,7 @@ describe "Hoodie.Account", ->
       
       _when "successful", ->
         beforeEach ->
-          @response = {"_id":"org.couchdb.user:baz","_rev":"3-33e4d43a6dff5b29a4bd33f576c7824f","name":"baz","salt":"82163606fa5c100e0095ad63598de810","password_sha":"e2e2a4d99632dc5e3fdb41d5d1ff98743a1f344e","type":"user","roles":[]}
+          @response = {"_id":"org.couchdb.user:baz","_rev":"3-33e4d43a6dff5b29a4bd33f576c7824f","name":"baz","salt":"82163606fa5c100e0095ad63598de810","passwordSha":"e2e2a4d99632dc5e3fdb41d5d1ff98743a1f344e","type":"user","roles":[]}
           @hoodie.request.andCallFake (type, path, options) => 
             options.success @response
         

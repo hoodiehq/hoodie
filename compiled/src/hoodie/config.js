@@ -26,20 +26,20 @@ Hoodie.Config = (function() {
     this.hoodie.store.load(this.type, this.id).done(function(obj) {
       return _this.cache = obj;
     });
-    this.hoodie.on('account:signed_out', this.clear);
+    this.hoodie.on('account:signedOut', this.clear);
   }
 
   Config.prototype.set = function(key, value) {
-    var is_silent, update;
+    var isSilent, update;
     if (this.cache[key] === value) {
       return;
     }
     this.cache[key] = value;
     update = {};
     update[key] = value;
-    is_silent = key.charAt(0) === '_';
+    isSilent = key.charAt(0) === '_';
     return this.hoodie.store.update(this.type, this.id, update, {
-      silent: is_silent
+      silent: isSilent
     });
   };
 

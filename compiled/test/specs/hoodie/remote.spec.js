@@ -7,18 +7,18 @@ describe("Hoodie.Remote", function() {
     spyOn(this.hoodie, "on");
     spyOn(this.hoodie, "one");
     spyOn(this.hoodie, "unbind");
-    this.request_defer = this.hoodie.defer();
-    spyOn(this.hoodie, "request").andReturn(this.request_defer.promise());
+    this.requestDefer = this.hoodie.defer();
+    spyOn(this.hoodie, "request").andReturn(this.requestDefer.promise());
     spyOn(window, "setTimeout");
     spyOn(this.hoodie, "trigger");
     spyOn(this.hoodie.store, "destroy").andReturn({
       then: function(cb) {
-        return cb('object_from_store');
+        return cb('objectFromStore');
       }
     });
     return spyOn(this.hoodie.store, "update").andReturn({
       then: function(cb) {
-        return cb('object_from_store', false);
+        return cb('objectFromStore', false);
       }
     });
   });
@@ -54,13 +54,13 @@ describe("Hoodie.Remote", function() {
       this.remote.activate();
       return expect(this.hoodie.config.set).wasCalledWith('_remote.active', true);
     });
-    it("should subscribe to `signed_out` event", function() {
+    it("should subscribe to `signedOut` event", function() {
       this.remote.activate();
-      return expect(this.hoodie.on).wasCalledWith('account:signed_out', this.remote.disconnect);
+      return expect(this.hoodie.on).wasCalledWith('account:signedOut', this.remote.disconnect);
     });
-    return it("should subscribe to account:sign_in with sync", function() {
+    return it("should subscribe to account:signIn with sync", function() {
       this.remote.activate();
-      return expect(this.hoodie.on).wasCalledWith('account:signed_in', this.remote.connect);
+      return expect(this.hoodie.on).wasCalledWith('account:signedIn', this.remote.connect);
     });
   });
   describe(".deactivate", function() {
@@ -74,13 +74,13 @@ describe("Hoodie.Remote", function() {
       this.remote.deactivate();
       return expect(this.hoodie.config.set).wasCalledWith('_remote.active', false);
     });
-    it("should unsubscribe from account's signed_in idle event", function() {
+    it("should unsubscribe from account's signedIn idle event", function() {
       this.remote.deactivate();
-      return expect(this.hoodie.unbind).wasCalledWith('account:signed_in', this.remote.connect);
+      return expect(this.hoodie.unbind).wasCalledWith('account:signedIn', this.remote.connect);
     });
-    return it("should unsubscribe from account's signed_out idle event", function() {
+    return it("should unsubscribe from account's signedOut idle event", function() {
       this.remote.deactivate();
-      return expect(this.hoodie.unbind).wasCalledWith('account:signed_out', this.remote.disconnect);
+      return expect(this.hoodie.unbind).wasCalledWith('account:signedOut', this.remote.disconnect);
     });
   });
   describe(".connect()", function() {
@@ -111,18 +111,18 @@ describe("Hoodie.Remote", function() {
   });
   describe(".disconnect()", function() {
     it("should abort the pull request", function() {
-      this.remote._pull_request = {
+      this.remote._pullRequest = {
         abort: jasmine.createSpy('pull')
       };
       this.remote.disconnect();
-      return expect(this.remote._pull_request.abort).wasCalled();
+      return expect(this.remote._pullRequest.abort).wasCalled();
     });
     it("should abort the push request", function() {
-      this.remote._push_request = {
+      this.remote._pushRequest = {
         abort: jasmine.createSpy('push')
       };
       this.remote.disconnect();
-      return expect(this.remote._push_request.abort).wasCalled();
+      return expect(this.remote._pushRequest.abort).wasCalled();
     });
     return it("should unsubscribe from stores's dirty idle event", function() {
       this.remote.disconnect();
@@ -136,16 +136,16 @@ describe("Hoodie.Remote", function() {
       });
       it("should send a longpoll GET request to user's db _changes feed", function() {
         var method, path, _ref;
-        spyOn(this.hoodie.account, "db").andReturn('joe$examle_com');
+        spyOn(this.hoodie.account, "db").andReturn('joe$examleCom');
         this.remote.pull();
         expect(this.hoodie.request).wasCalled();
         _ref = this.hoodie.request.mostRecentCall.args, method = _ref[0], path = _ref[1];
         expect(method).toBe('GET');
-        return expect(path).toBe('/joe%24examle_com/_changes?include_docs=true&heartbeat=10000&feed=longpoll&since=0');
+        return expect(path).toBe('/joe%24examleCom/_changes?includeDocs=true&heartbeat=10000&feed=longpoll&since=0');
       });
       return it("should set a timeout to restart the pull request", function() {
         this.remote.pull();
-        return expect(window.setTimeout).wasCalledWith(this.remote._restart_pull_request, 25000);
+        return expect(window.setTimeout).wasCalledWith(this.remote._restartPullRequest, 25000);
       });
     });
     _when("remote is not active", function() {
@@ -154,12 +154,12 @@ describe("Hoodie.Remote", function() {
       });
       return it("should send a normal GET request to user's db _changes feed", function() {
         var method, path, _ref;
-        spyOn(this.hoodie.account, "db").andReturn('joe$examle_com');
+        spyOn(this.hoodie.account, "db").andReturn('joe$examleCom');
         this.remote.pull();
         expect(this.hoodie.request).wasCalled();
         _ref = this.hoodie.request.mostRecentCall.args, method = _ref[0], path = _ref[1];
         expect(method).toBe('GET');
-        return expect(path).toBe('/joe%24examle_com/_changes?include_docs=true&since=0');
+        return expect(path).toBe('/joe%24examleCom/_changes?includeDocs=true&since=0');
       });
     });
     _when("request is successful / returns changes", function() {
@@ -170,7 +170,7 @@ describe("Hoodie.Remote", function() {
             _this.hoodie.request.andReturn({
               then: function() {}
             });
-            return success(Mocks.changes_response());
+            return success(Mocks.changesResponse());
           }
         });
       });
@@ -195,18 +195,18 @@ describe("Hoodie.Remote", function() {
       });
       it("should trigger remote events", function() {
         this.remote.pull();
-        expect(this.hoodie.trigger).wasCalledWith('remote:destroy', 'object_from_store');
-        expect(this.hoodie.trigger).wasCalledWith('remote:destroy:todo', 'object_from_store');
-        expect(this.hoodie.trigger).wasCalledWith('remote:destroy:todo:abc3', 'object_from_store');
-        expect(this.hoodie.trigger).wasCalledWith('remote:change', 'destroy', 'object_from_store');
-        expect(this.hoodie.trigger).wasCalledWith('remote:change:todo', 'destroy', 'object_from_store');
-        expect(this.hoodie.trigger).wasCalledWith('remote:change:todo:abc3', 'destroy', 'object_from_store');
-        expect(this.hoodie.trigger).wasCalledWith('remote:update', 'object_from_store');
-        expect(this.hoodie.trigger).wasCalledWith('remote:update:todo', 'object_from_store');
-        expect(this.hoodie.trigger).wasCalledWith('remote:update:todo:abc2', 'object_from_store');
-        expect(this.hoodie.trigger).wasCalledWith('remote:change', 'update', 'object_from_store');
-        expect(this.hoodie.trigger).wasCalledWith('remote:change:todo', 'update', 'object_from_store');
-        return expect(this.hoodie.trigger).wasCalledWith('remote:change:todo:abc2', 'update', 'object_from_store');
+        expect(this.hoodie.trigger).wasCalledWith('remote:destroy', 'objectFromStore');
+        expect(this.hoodie.trigger).wasCalledWith('remote:destroy:todo', 'objectFromStore');
+        expect(this.hoodie.trigger).wasCalledWith('remote:destroy:todo:abc3', 'objectFromStore');
+        expect(this.hoodie.trigger).wasCalledWith('remote:change', 'destroy', 'objectFromStore');
+        expect(this.hoodie.trigger).wasCalledWith('remote:change:todo', 'destroy', 'objectFromStore');
+        expect(this.hoodie.trigger).wasCalledWith('remote:change:todo:abc3', 'destroy', 'objectFromStore');
+        expect(this.hoodie.trigger).wasCalledWith('remote:update', 'objectFromStore');
+        expect(this.hoodie.trigger).wasCalledWith('remote:update:todo', 'objectFromStore');
+        expect(this.hoodie.trigger).wasCalledWith('remote:update:todo:abc2', 'objectFromStore');
+        expect(this.hoodie.trigger).wasCalledWith('remote:change', 'update', 'objectFromStore');
+        expect(this.hoodie.trigger).wasCalledWith('remote:change:todo', 'update', 'objectFromStore');
+        return expect(this.hoodie.trigger).wasCalledWith('remote:change:todo:abc2', 'update', 'objectFromStore');
       });
       return _and("remote is active", function() {
         beforeEach(function() {
@@ -346,13 +346,13 @@ describe("Hoodie.Remote", function() {
   describe(".push(docs)", function() {
     beforeEach(function() {
       spyOn(Date, "now").andReturn(10);
-      this.remote._timezone_offset = 1;
+      this.remote._timezoneOffset = 1;
       return this.defer = this.hoodie.defer();
     });
     return _when("no docs passed", function() {
       _and("there are no changed docs", function() {
         beforeEach(function() {
-          spyOn(this.hoodie.store, "changed_docs").andReturn([]);
+          spyOn(this.hoodie.store, "changedDocs").andReturn([]);
           return this.remote.push();
         });
         return it("shouldn't do anything", function() {
@@ -362,15 +362,15 @@ describe("Hoodie.Remote", function() {
       _and("there is one deleted and one new doc", function() {
         beforeEach(function() {
           var _ref;
-          spyOn(this.hoodie.store, "changed_docs").andReturn(Mocks.changed_docs());
-          spyOn(this.hoodie.account, "db").andReturn('joe$examle_com');
+          spyOn(this.hoodie.store, "changedDocs").andReturn(Mocks.changedDocs());
+          spyOn(this.hoodie.account, "db").andReturn('joe$examleCom');
           this.remote.push();
           expect(this.hoodie.request).wasCalled();
           return _ref = this.hoodie.request.mostRecentCall.args, this.method = _ref[0], this.path = _ref[1], this.options = _ref[2], _ref;
         });
-        it("should post the changes to the user's db _bulk_docs API", function() {
+        it("should post the changes to the user's db _bulkDocs API", function() {
           expect(this.method).toBe('POST');
-          return expect(this.path).toBe('/joe%24examle_com/_bulk_docs');
+          return expect(this.path).toBe('/joe%24examleCom/_bulkDocs');
         });
         it("should set dataType to json", function() {
           return expect(this.options.dataType).toBe('json');
@@ -389,27 +389,27 @@ describe("Hoodie.Remote", function() {
           expect(doc._id).toBe('todo/abc3');
           return expect(doc._localInfo).toBeUndefined();
         });
-        it("should set data.new_edits to false", function() {
-          var new_edits;
-          new_edits = JSON.parse(this.options.data).new_edits;
-          return expect(new_edits).toBe(false);
+        it("should set data.newEdits to false", function() {
+          var newEdits;
+          newEdits = JSON.parse(this.options.data).newEdits;
+          return expect(newEdits).toBe(false);
         });
         return it("should set new _revision ids", function() {
-          var deleted_doc, docs, new_doc;
+          var deletedDoc, docs, newDoc;
           docs = JSON.parse(this.options.data).docs;
-          deleted_doc = docs[0], new_doc = docs[1];
-          expect(deleted_doc._rev).toBe('3-mock567#11');
-          expect(new_doc._rev).toMatch('1-mock567#11');
-          expect(deleted_doc._revisions.start).toBe(3);
-          expect(deleted_doc._revisions.ids[0]).toBe('mock567#11');
-          expect(deleted_doc._revisions.ids[1]).toBe('123');
-          expect(new_doc._revisions.start).toBe(1);
-          return expect(new_doc._revisions.ids[0]).toBe('mock567#11');
+          deletedDoc = docs[0], newDoc = docs[1];
+          expect(deletedDoc._rev).toBe('3-mock567#11');
+          expect(newDoc._rev).toMatch('1-mock567#11');
+          expect(deletedDoc._revisions.start).toBe(3);
+          expect(deletedDoc._revisions.ids[0]).toBe('mock567#11');
+          expect(deletedDoc._revisions.ids[1]).toBe('123');
+          expect(newDoc._revisions.start).toBe(1);
+          return expect(newDoc._revisions.ids[0]).toBe('mock567#11');
         });
       });
       return _when("Array of docs passed", function() {
         beforeEach(function() {
-          this.todo_objects = [
+          this.todoObjects = [
             {
               type: 'todo',
               id: '1'
@@ -421,7 +421,7 @@ describe("Hoodie.Remote", function() {
               id: '3'
             }
           ];
-          return this.remote.push(this.todo_objects);
+          return this.remote.push(this.todoObjects);
         });
         return it("should POST the passed objects", function() {
           var data;

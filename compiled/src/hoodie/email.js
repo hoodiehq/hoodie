@@ -5,47 +5,47 @@ Hoodie.Email = (function() {
 
   function Email(hoodie) {
     this.hoodie = hoodie;
-    this._handle_email_update = __bind(this._handle_email_update, this);
+    this._handleEmailUpdate = __bind(this._handleEmailUpdate, this);
 
   }
 
-  Email.prototype.send = function(email_attributes) {
+  Email.prototype.send = function(emailAttributes) {
     var attributes, defer,
       _this = this;
-    if (email_attributes == null) {
-      email_attributes = {};
+    if (emailAttributes == null) {
+      emailAttributes = {};
     }
     defer = this.hoodie.defer();
-    attributes = $.extend({}, email_attributes);
-    if (!this._is_valid_email(email_attributes.to)) {
+    attributes = $.extend({}, emailAttributes);
+    if (!this._isValidEmail(emailAttributes.to)) {
       attributes.error = "Invalid email address (" + (attributes.to || 'empty') + ")";
       return defer.reject(attributes).promise();
     }
     this.hoodie.store.create('$email', attributes).then(function(obj) {
-      return _this._handle_email_update(defer, obj);
+      return _this._handleEmailUpdate(defer, obj);
     });
     return defer.promise();
   };
 
-  Email.prototype._is_valid_email = function(email) {
+  Email.prototype._isValidEmail = function(email) {
     if (email == null) {
       email = '';
     }
     return /@/.test(email);
   };
 
-  Email.prototype._handle_email_update = function(defer, attributes) {
+  Email.prototype._handleEmailUpdate = function(defer, attributes) {
     var _this = this;
     if (attributes == null) {
       attributes = {};
     }
     if (attributes.error) {
       return defer.reject(attributes);
-    } else if (attributes.delivered_at) {
+    } else if (attributes.deliveredAt) {
       return defer.resolve(attributes);
     } else {
       return this.hoodie.one("remote:updated:$email:" + attributes.id, function(attributes) {
-        return _this._handle_email_update(defer, attributes);
+        return _this._handleEmailUpdate(defer, attributes);
       });
     }
   };

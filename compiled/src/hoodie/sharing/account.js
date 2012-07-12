@@ -8,23 +8,23 @@ Hoodie.Sharing.Account = (function(_super) {
 
   function Account() {
     Account.__super__.constructor.apply(this, arguments);
-    this._sharing_auth_promise = this.hoodie.defer().resolve(this.username).promise();
+    this._sharingAuthPromise = this.hoodie.defer().resolve(this.username).promise();
   }
 
   Account.prototype.authenticate = function() {
-    return this._sharing_auth_promise;
+    return this._sharingAuthPromise;
   };
 
-  Account.prototype.sign_up = function() {
-    return this._sharing_auth_promise;
+  Account.prototype.signUp = function() {
+    return this._sharingAuthPromise;
   };
 
-  Account.prototype.sign_in = function() {
-    return this._sharing_auth_promise;
+  Account.prototype.signIn = function() {
+    return this._sharingAuthPromise;
   };
 
-  Account.prototype.sign_out = function() {
-    return this._sharing_auth_promise;
+  Account.prototype.signOut = function() {
+    return this._sharingAuthPromise;
   };
 
   return Account;

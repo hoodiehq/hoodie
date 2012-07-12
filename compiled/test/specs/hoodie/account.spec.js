@@ -5,8 +5,8 @@ describe("Hoodie.Account", function() {
     localStorage.clear();
     this.hoodie = new Mocks.Hoodie;
     this.account = new Hoodie.Account(this.hoodie);
-    this.request_defer = this.hoodie.defer();
-    spyOn(this.hoodie, "request").andReturn(this.request_defer.promise());
+    this.requestDefer = this.hoodie.defer();
+    spyOn(this.hoodie, "request").andReturn(this.requestDefer.promise());
     return spyOn(this.hoodie, "trigger");
   });
   describe(".constructor()", function() {
@@ -28,23 +28,23 @@ describe("Hoodie.Account", function() {
         return expect(account.username).toBe('joe@example.com');
       });
     });
-    it("should bind to sign_in event", function() {
+    it("should bind to signIn event", function() {
       var account;
       account = new Hoodie.Account(this.hoodie);
-      return expect(this.account.on).wasCalledWith('sign_in', account._handle_sign_in);
+      return expect(this.account.on).wasCalledWith('signIn', account._handleSignIn);
     });
-    return it("should bind to sign_out event", function() {
+    return it("should bind to signOut event", function() {
       var account;
       account = new Hoodie.Account(this.hoodie);
-      return expect(this.account.on).wasCalledWith('sign_out', account._handle_sign_out);
+      return expect(this.account.on).wasCalledWith('signOut', account._handleSignOut);
     });
   });
   describe("event handlers", function() {
-    describe("._handle_sign_in(@username)", function() {
+    describe("._handleSignIn(@username)", function() {
       beforeEach(function() {
         expect(this.account.username).toBeUndefined();
         spyOn(this.hoodie.config, "set");
-        return this.account._handle_sign_in('joe@example.com');
+        return this.account._handleSignIn('joe@example.com');
       });
       it("should set @username", function() {
         return expect(this.account.username).toBe('joe@example.com');
@@ -54,28 +54,28 @@ describe("Hoodie.Account", function() {
       });
       return it("should set _authenticated to true", function() {
         this.account._authenticated = false;
-        this.account._handle_sign_in("joe@example.com");
+        this.account._handleSignIn("joe@example.com");
         return expect(this.account._authenticated).toBe(true);
       });
     });
-    return describe("._handle_sign_out()", function() {
+    return describe("._handleSignOut()", function() {
       it("should set @username", function() {
         this.account.username = 'joe@example.com';
-        this.account._handle_sign_out({
+        this.account._handleSignOut({
           "ok": true
         });
         return expect(this.account.username).toBeUndefined();
       });
       it("should store @username persistantly", function() {
         spyOn(this.hoodie.config, "remove");
-        this.account._handle_sign_out({
+        this.account._handleSignOut({
           "ok": true
         });
         return expect(this.hoodie.config.remove).wasCalledWith('_account.username');
       });
       return it("should set _authenticated to false", function() {
         this.account._authenticated = true;
-        this.account._handle_sign_out({
+        this.account._handleSignOut({
           "ok": true
         });
         return expect(this.account._authenticated).toBe(false);
@@ -140,7 +140,7 @@ describe("Hoodie.Account", function() {
         });
         _when("authentication request is successful and returns joe@example.com", function() {
           beforeEach(function() {
-            this.request_defer.resolve({
+            this.requestDefer.resolve({
               userCtx: {
                 name: 'joe@example.com'
               }
@@ -156,7 +156,7 @@ describe("Hoodie.Account", function() {
         });
         _when("authentication request is successful and returns `name: null`", function() {
           beforeEach(function() {
-            this.request_defer.resolve({
+            this.requestDefer.resolve({
               userCtx: {
                 name: null
               }
@@ -179,7 +179,7 @@ describe("Hoodie.Account", function() {
         });
         return _when("authentication request has an error", function() {
           beforeEach(function() {
-            this.request_defer.reject({
+            this.requestDefer.reject({
               responseText: 'error data'
             });
             return this.promise = this.account.authenticate();
@@ -193,12 +193,12 @@ describe("Hoodie.Account", function() {
       });
     });
   });
-  describe(".sign_up(username, password)", function() {
+  describe(".signUp(username, password)", function() {
     beforeEach(function() {
       var _ref;
       this.defer = this.hoodie.defer();
       this.hoodie.request.andReturn(this.defer.promise());
-      this.account.sign_up('joe@example.com', 'secret', {
+      this.account.signUp('joe@example.com', 'secret', {
         name: "Joe Doe"
       });
       _ref = this.hoodie.request.mostRecentCall.args, this.type = _ref[0], this.path = _ref[1], this.options = _ref[2];
@@ -229,12 +229,12 @@ describe("Hoodie.Account", function() {
     });
     it("should allow to signup without password", function() {
       var _ref;
-      this.account.sign_up('joe@example.com');
+      this.account.signUp('joe@example.com');
       _ref = this.hoodie.request.mostRecentCall.args, this.type = _ref[0], this.path = _ref[1], this.options = _ref[2];
       this.data = JSON.parse(this.options.data);
       return expect(this.data.password).toBe('');
     });
-    _when("sign_up successful", function() {
+    _when("signUp successful", function() {
       beforeEach(function() {
         var response;
         this.response = response = {
@@ -244,29 +244,29 @@ describe("Hoodie.Account", function() {
         };
         return this.defer.resolve(this.response).promise();
       });
-      it("should trigger `account:sign_up` event", function() {
-        this.account.sign_up('joe@example.com', 'secret');
-        return expect(this.hoodie.trigger).wasCalledWith('account:sign_up', 'joe@example.com');
+      it("should trigger `account:signUp` event", function() {
+        this.account.signUp('joe@example.com', 'secret');
+        return expect(this.hoodie.trigger).wasCalledWith('account:signUp', 'joe@example.com');
       });
       it("should sign in", function() {
-        spyOn(this.account, "sign_in").andReturn({
+        spyOn(this.account, "signIn").andReturn({
           then: function() {}
         });
-        this.account.sign_up('joe@example.com', 'secret');
-        return expect(this.account.sign_in).wasCalledWith('joe@example.com', 'secret');
+        this.account.signUp('joe@example.com', 'secret');
+        return expect(this.account.signIn).wasCalledWith('joe@example.com', 'secret');
       });
       it("should resolve its promise", function() {
         var promise;
-        promise = this.account.sign_up('joe@example.com', 'secret');
+        promise = this.account.signUp('joe@example.com', 'secret');
         return expect(promise).toBeResolvedWith('joe@example.com', this.response);
       });
       return it("should fetch the _users doc", function() {
         spyOn(this.account, "fetch");
-        this.account.sign_up('joe@example.com', 'secret');
+        this.account.signUp('joe@example.com', 'secret');
         return expect(this.account.fetch).wasCalled();
       });
     });
-    return _when("sign_up has an error", function() {
+    return _when("signUp has an error", function() {
       beforeEach(function() {
         return this.defer.reject({
           responseText: '{"error":"forbidden","reason":"Username may not start with underscore."}'
@@ -274,19 +274,19 @@ describe("Hoodie.Account", function() {
       });
       return it("should reject its promise", function() {
         var promise;
-        promise = this.account.sign_up('_joe@example.com', 'secret');
+        promise = this.account.signUp('_joe@example.com', 'secret');
         return expect(promise).toBeRejectedWith({
           responseText: '{"error":"forbidden","reason":"Username may not start with underscore."}'
         });
       });
     });
   });
-  describe(".sign_in(username, password)", function() {
+  describe(".signIn(username, password)", function() {
     beforeEach(function() {
       var _ref;
       this.defer = this.hoodie.defer();
       this.hoodie.request.andReturn(this.defer.promise());
-      this.account.sign_in('joe@example.com', 'secret');
+      this.account.signIn('joe@example.com', 'secret');
       return _ref = this.hoodie.request.mostRecentCall.args, this.type = _ref[0], this.path = _ref[1], this.options = _ref[2], _ref;
     });
     it("should send a POST request to http://my.cou.ch/_session", function() {
@@ -302,27 +302,27 @@ describe("Hoodie.Account", function() {
     });
     it("should allow to sign in without password", function() {
       var data, _ref;
-      this.account.sign_in('joe@example.com');
+      this.account.signIn('joe@example.com');
       _ref = this.hoodie.request.mostRecentCall.args, this.type = _ref[0], this.path = _ref[1], this.options = _ref[2];
       data = this.options.data;
       return expect(data.password).toBe('');
     });
-    return _when("sign_up successful", function() {
+    return _when("signUp successful", function() {
       beforeEach(function() {
         return this.defer.resolve();
       });
-      it("should trigger `account:sign_in` event", function() {
-        this.account.sign_in('joe@example.com', 'secret');
-        return expect(this.hoodie.trigger).wasCalledWith('account:sign_in', 'joe@example.com');
+      it("should trigger `account:signIn` event", function() {
+        this.account.signIn('joe@example.com', 'secret');
+        return expect(this.hoodie.trigger).wasCalledWith('account:signIn', 'joe@example.com');
       });
       return it("should fetch the _users doc", function() {
         spyOn(this.account, "fetch");
-        this.account.sign_in('joe@example.com', 'secret');
+        this.account.signIn('joe@example.com', 'secret');
         return expect(this.account.fetch).wasCalled();
       });
     });
   });
-  describe(".change_password(username, password)", function() {
+  describe(".changePassword(username, password)", function() {
     beforeEach(function() {
       var _ref;
       this.account.username = 'joe@example.com';
@@ -332,9 +332,9 @@ describe("Hoodie.Account", function() {
         type: 'user',
         roles: [],
         salt: 'absalt',
-        password_sha: 'pwcdef'
+        passwordSha: 'pwcdef'
       };
-      this.account.change_password('current_secret', 'new_secret');
+      this.account.changePassword('currentSecret', 'newSecret');
       _ref = this.hoodie.request.mostRecentCall.args, this.type = _ref[0], this.path = _ref[1], this.options = _ref[2];
       return this.data = JSON.parse(this.options.data);
     });
@@ -359,11 +359,11 @@ describe("Hoodie.Account", function() {
       return expect(this.data.type).toBe('user');
     });
     it("should pass password", function() {
-      return expect(this.data.password).toBe('new_secret');
+      return expect(this.data.password).toBe('newSecret');
     });
     it("should allow to set empty password", function() {
       var _ref;
-      this.account.change_password('current_secret', '');
+      this.account.changePassword('currentSecret', '');
       _ref = this.hoodie.request.mostRecentCall.args, this.type = _ref[0], this.path = _ref[1], this.options = _ref[2];
       this.data = JSON.parse(this.options.data);
       return expect(this.data.password).toBe('');
@@ -371,8 +371,8 @@ describe("Hoodie.Account", function() {
     it("should not send salt", function() {
       return expect(this.data.salt).toBeUndefined();
     });
-    it("should not send password_sha", function() {
-      return expect(this.data.password_sha).toBeUndefined();
+    it("should not send passwordSha", function() {
+      return expect(this.data.passwordSha).toBeUndefined();
     });
     _when("change password successful", function() {
       beforeEach(function() {
@@ -388,16 +388,16 @@ describe("Hoodie.Account", function() {
       });
       it("should resolve its promise", function() {
         var promise;
-        promise = this.account.change_password('current_secret', 'new_secret');
+        promise = this.account.changePassword('currentSecret', 'newSecret');
         return expect(promise).toBeResolved();
       });
       return it("should fetch the _users doc", function() {
         spyOn(this.account, "fetch");
-        this.account.change_password('current_secret', 'new_secret');
+        this.account.changePassword('currentSecret', 'newSecret');
         return expect(this.account.fetch).wasCalled();
       });
     });
-    return _when("sign_up has an error", function() {
+    return _when("signUp has an error", function() {
       beforeEach(function() {
         return this.hoodie.request.andCallFake(function(type, path, options) {
           return options.error({});
@@ -405,17 +405,17 @@ describe("Hoodie.Account", function() {
       });
       return it("should reject its promise", function() {
         var promise;
-        promise = this.account.change_password('current_secret', 'new_secret');
+        promise = this.account.changePassword('currentSecret', 'newSecret');
         return expect(promise).toBeRejectedWith({
           error: "unknown"
         });
       });
     });
   });
-  describe(".sign_out()", function() {
+  describe(".signOut()", function() {
     beforeEach(function() {
       var _ref;
-      this.account.sign_out();
+      this.account.signOut();
       return _ref = this.hoodie.request.mostRecentCall.args, this.type = _ref[0], this.path = _ref[1], this.options = _ref[2], _ref;
     });
     it("should send a DELETE request to http://my.cou.ch/_session", function() {
@@ -423,15 +423,15 @@ describe("Hoodie.Account", function() {
       expect(this.type).toBe('DELETE');
       return expect(this.path).toBe('/_session');
     });
-    return _when("sign_up successful", function() {
+    return _when("signUp successful", function() {
       beforeEach(function() {
         return this.hoodie.request.andCallFake(function(type, path, options) {
           return options.success();
         });
       });
-      return it("should trigger `account:sign_out` event", function() {
-        this.account.sign_out('joe@example.com', 'secret');
-        return expect(this.hoodie.trigger).wasCalledWith('account:sign_out');
+      return it("should trigger `account:signOut` event", function() {
+        this.account.signOut('joe@example.com', 'secret');
+        return expect(this.hoodie.trigger).wasCalledWith('account:signOut');
       });
     });
   });
@@ -451,7 +451,7 @@ describe("Hoodie.Account", function() {
       beforeEach(function() {
         return this.account.username = 'joe.doe@example.com';
       });
-      return it("should return 'joe$example_com", function() {
+      return it("should return 'joe$exampleCom", function() {
         return (expect(this.account.db())).toEqual('joe_doe$example_com');
       });
     });
@@ -486,7 +486,7 @@ describe("Hoodie.Account", function() {
             "_rev": "3-33e4d43a6dff5b29a4bd33f576c7824f",
             "name": "baz",
             "salt": "82163606fa5c100e0095ad63598de810",
-            "password_sha": "e2e2a4d99632dc5e3fdb41d5d1ff98743a1f344e",
+            "passwordSha": "e2e2a4d99632dc5e3fdb41d5d1ff98743a1f344e",
             "type": "user",
             "roles": []
           };

@@ -10,7 +10,7 @@ class Hoodie.Store
   
     # if browser does not support local storage persistence,
     # e.g. Safari in private mode, overite the respective methods. 
-    unless @is_persistent()
+    unless @isPersistent()
       @db =
         getItem    : -> null
         setItem    : -> null
@@ -20,7 +20,7 @@ class Hoodie.Store
         clear      : -> null
     
     # handle sign outs
-    @hoodie.on 'account:sign_out', @clear
+    @hoodie.on 'account:signOut', @clear
     
   
   # localStorage proxy
@@ -41,9 +41,9 @@ class Hoodie.Store
   #
   # It also adds timestamps along the way:
   # 
-  # * `created_at` unless it already exists
-  # * `updated_at` every time
-  # * `synced_at`  if changes comes from remote
+  # * `createdAt` unless it already exists
+  # * `updatedAt` every time
+  # * `syncedAt`  if changes comes from remote
   #
   #
   # example usage:
@@ -61,25 +61,25 @@ class Hoodie.Store
     object = $.extend {}, object
     
     # validations
-    if id and not @_is_valid_id id
+    if id and not @_isValidId id
       return defer.reject( Hoodie.Errors.INVALID_KEY id: id ).promise()
       
-    unless @_is_valid_type type
+    unless @_isValidType type
       return defer.reject( Hoodie.Errors.INVALID_KEY type: type ).promise()
     
     # generate an id if necessary
     if id
-      is_new = typeof @_cached["#{type}/#{id}"] isnt 'object'
+      isNew = typeof @_cached["#{type}/#{id}"] isnt 'object'
     else
-      is_new = true
+      isNew = true
       id     = @uuid()
   
     # add timestamps
     if options.remote
-      object._synced_at = @_now()
+      object._syncedAt = @_now()
     else unless options.silent
-      object.updated_at = @_now()
-      object.created_at or= object.updated_at
+      object.updatedAt = @_now()
+      object.createdAt or= object.updatedAt
   
     # remove `id` and `type` attributes before saving,
     # as the Store key contains this information
@@ -88,7 +88,7 @@ class Hoodie.Store
   
     try 
       object = @cache type, id, object, options
-      defer.resolve( object, is_new ).promise()
+      defer.resolve( object, isNew ).promise()
     catch error
       defer.reject(error).promise()
   
@@ -115,30 +115,30 @@ class Hoodie.Store
   #
   # hoodie.store.update('car', 'abc4567', {sold: true})
   # hoodie.store.update('car', 'abc4567', function(obj) { obj.sold = true })
-  update : (type, id, object_update, options = {}) ->
+  update : (type, id, objectUpdate, options = {}) ->
     defer = @hoodie.defer()
     
-    _load_promise = @load(type, id).pipe (current_obj) => 
+    _loadPromise = @load(type, id).pipe (currentObj) => 
       
       # normalize input
-      object_update = object_update( $.extend {}, current_obj ) if typeof object_update is 'function'
+      objectUpdate = objectUpdate( $.extend {}, currentObj ) if typeof objectUpdate is 'function'
       
-      return defer.resolve current_obj unless object_update
+      return defer.resolve currentObj unless objectUpdate
       
       # check if something changed
-      changed_properties = for key, value of object_update when current_obj[key] isnt value
+      changedProperties = for key, value of objectUpdate when currentObj[key] isnt value
         # workaround for undefined values, as $.extend ignores these
-        current_obj[key] = value
+        currentObj[key] = value
         key
         
-      return defer.resolve current_obj unless changed_properties.length
+      return defer.resolve currentObj unless changedProperties.length
       
       # apply update 
-      @save(type, id, current_obj, options).then defer.resolve, defer.reject
+      @save(type, id, currentObj, options).then defer.resolve, defer.reject
       
     # if not found, create it
-    _load_promise.fail => 
-      @save(type, id, object_update, options).then defer.resolve, defer.reject
+    _loadPromise.fail => 
+      @save(type, id, objectUpdate, options).then defer.resolve, defer.reject
     
     defer.promise()
   
@@ -151,22 +151,22 @@ class Hoodie.Store
   # example usage
   #
   # hoodie.store.updateAll()
-  updateAll : (filter_or_objects, object_update, options = {}) ->
+  updateAll : (filterOrObjects, objectUpdate, options = {}) ->
     
     # normalize the input: make sure we have all objects
-    if @hoodie.isPromise(filter_or_objects)
-      promise = filter_or_objects
+    if @hoodie.isPromise(filterOrObjects)
+      promise = filterOrObjects
     else
-      promise = @hoodie.defer().resolve( filter_or_objects ).resolve()
+      promise = @hoodie.defer().resolve( filterOrObjects ).resolve()
     
     promise.pipe (objects) =>
       
       # no we update all objects one by one and return a promise
       # that will be resolved once all updates have been finished
       defer = @hoodie.defer()
-      _update_promises = for object in objects
-        @update(object.type, object.id, object_update, options) 
-      $.when.apply(null, _update_promises).then defer.resolve
+      _updatePromises = for object in objects
+        @update(object.type, object.id, objectUpdate, options) 
+      $.when.apply(null, _updatePromises).then defer.resolve
       
       return defer.promise()
   
@@ -219,10 +219,10 @@ class Hoodie.Store
     try
       # coffeescript gathers the result of the respective for key in keys loops
       # and returns it as array, which will be stored in the results variable
-      results = for key in keys when @_is_semantic_id key
-        [current_type, id] = key.split '/'
+      results = for key in keys when @_isSemanticId key
+        [currentType, id] = key.split '/'
         
-        obj = @cache current_type, id
+        obj = @cache currentType, id
         if filter(obj)
           obj
         else
@@ -248,7 +248,7 @@ class Hoodie.Store
     unless object
       return defer.reject(Hoodie.Errors.NOT_FOUND type, id).promise()
     
-    if object._synced_at and not options.remote
+    if object._syncedAt and not options.remote
       object._deleted = true
       @cache type, id, object
     
@@ -257,7 +257,7 @@ class Hoodie.Store
       @db.removeItem key
   
       @_cached[key] = false
-      @clear_changed type, id
+      @clearChanged type, id
   
     defer.resolve($.extend {}, object).promise()
   
@@ -281,17 +281,17 @@ class Hoodie.Store
       @_setObject type, id, object
       
       if options.remote
-        @clear_changed type, id 
+        @clearChanged type, id 
         return $.extend {}, @_cached[key]
     
     else
       return $.extend {}, @_cached[key] if @_cached[key]?
       @_cached[key] = @_getObject type, id
     
-    if @_cached[key] and (@_is_dirty(@_cached[key]) or @_is_marked_as_deleted(@_cached[key]))
-      @mark_as_changed type, id, @_cached[key]
+    if @_cached[key] and (@_isDirty(@_cached[key]) or @_isMarkedAsDeleted(@_cached[key]))
+      @markAsChanged type, id, @_cached[key]
     else
-      @clear_changed type, id
+      @clearChanged type, id
     
     if @_cached[key]
       $.extend {}, @_cached[key]
@@ -303,7 +303,7 @@ class Hoodie.Store
   #
   # removes an object from the list of objects that are flagged to by synched (dirty)
   # and triggers a `store:dirty` event
-  clear_changed : (type, id) ->
+  clearChanged : (type, id) ->
   
     if type and id
       key = "#{type}/#{id}"
@@ -318,30 +318,30 @@ class Hoodie.Store
   #
   # when an object gets deleted that has been synched before (`_rev` attribute),
   # it cannot be removed from store but gets a `_deleted: true` attribute
-  is_marked_as_deleted : (type, id) ->
-    @_is_marked_as_deleted @cache(type, id)
+  isMarkedAsDeleted : (type, id) ->
+    @_isMarkedAsDeleted @cache(type, id)
       
   
   # ## Mark as changed
   #
   # Marks object as changed (dirty). Triggers a `store:dirty` event immediately and a 
   # `store:dirty:idle` event once there is no change within 2 seconds
-  mark_as_changed : (type, id, object) ->
+  markAsChanged : (type, id, object) ->
     key = "#{type}/#{id}"
     
     @_dirty[key] = object
     @hoodie.trigger 'store:dirty'
 
     timeout = 2000 # 2 seconds timout before triggering the `store:dirty:idle` event
-    window.clearTimeout @_dirty_timeout
-    @_dirty_timeout = window.setTimeout ( =>
+    window.clearTimeout @_dirtyTimeout
+    @_dirtyTimeout = window.setTimeout ( =>
       @hoodie.trigger 'store:dirty:idle'
     ), timeout
     
   # ## changed docs
   #
   # returns an Array of all dirty documents
-  changed_docs : -> 
+  changedDocs : -> 
     object for key, object of @_dirty
     
        
@@ -351,12 +351,12 @@ class Hoodie.Store
   # dirty objects in the store.
   #
   # Otherwise it returns `true` or `false` for the passed object. An object is dirty
-  # if it has no `_synced_at` attribute or if `updated_at` is more recent than `_synced_at`
-  is_dirty : (type, id) ->
+  # if it has no `_syncedAt` attribute or if `updatedAt` is more recent than `_syncedAt`
+  isDirty : (type, id) ->
     unless type
       return $.isEmptyObject @_dirty
       
-    @_is_dirty @cache(type, id)
+    @_isDirty @cache(type, id)
 
 
   # ## Clear
@@ -369,7 +369,7 @@ class Hoodie.Store
     try
       @db.clear()
       @_cached = {}
-      @clear_changed()
+      @clearChanged()
     
       defer.resolve()
     catch error
@@ -386,7 +386,7 @@ class Hoodie.Store
   # inspired by this cappuccino commit
   # https://github.com/cappuccino/cappuccino/commit/063b05d9643c35b303568a28809e4eb3224f71ec
   #
-  is_persistent : ->
+  isPersistent : ->
   
     try 
       # pussies ... we've to put this in here. I've seen Firefox throwing `Security error: 1000`
@@ -440,9 +440,9 @@ class Hoodie.Store
       obj.type  = type
       obj.id    = id
       
-      obj.created_at = new Date(Date.parse obj.created_at) if obj.created_at
-      obj.updated_at = new Date(Date.parse obj.updated_at) if obj.updated_at
-      obj._synced_at = new Date(Date.parse obj._synced_at) if obj._synced_at
+      obj.createdAt = new Date(Date.parse obj.createdAt) if obj.createdAt
+      obj.updatedAt = new Date(Date.parse obj.updatedAt) if obj.updatedAt
+      obj._syncedAt = new Date(Date.parse obj._syncedAt) if obj._syncedAt
       
       obj
     else
@@ -452,14 +452,14 @@ class Hoodie.Store
   _now : -> new Date
 
   # only lowercase letters, numbers and dashes are allowed for ids
-  _is_valid_id : (key) ->
+  _isValidId : (key) ->
     /^[a-z0-9\-]+$/.test key
     
   # just like ids, but must start with a letter or a $ (internal types)
-  _is_valid_type : (key) ->
+  _isValidType : (key) ->
     /^[a-z$][a-z0-9]+$/.test key
     
-  _is_semantic_id : (key) ->
+  _isSemanticId : (key) ->
     /^[a-z$][a-z0-9]+\/[a-z0-9]+$/.test key
 
   # cache of localStorage for quicker access
@@ -469,15 +469,15 @@ class Hoodie.Store
   _dirty : {}
   
   # is dirty?
-  _is_dirty : (object) ->
+  _isDirty : (object) ->
     
-    return true  unless object._synced_at  # no synced_at? uuhh, that's dirty.
-    return false unless object.updated_at # no updated_at? no dirt then
+    return true  unless object._syncedAt  # no syncedAt? uuhh, that's dirty.
+    return false unless object.updatedAt # no updatedAt? no dirt then
   
-    object._synced_at.getTime() < object.updated_at.getTime()
+    object._syncedAt.getTime() < object.updatedAt.getTime()
 
   # marked as deleted?
-  _is_marked_as_deleted : (object) ->
+  _isMarkedAsDeleted : (object) ->
     object._deleted is true
 
   # document key index

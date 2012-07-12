@@ -1,5 +1,5 @@
 window.Mocks or= {}
-Mocks.changes_response = ->
+Mocks.changesResponse = ->
   `{
     "results":
     [
@@ -17,5 +17,5 @@ Mocks.changes_response = ->
         "doc"     :{"_id":"todo/abc2","_rev":"1-123","content":"remember the milk","done":false,"order":1, "type":"todo"}
       }
     ],
-    "last_seq":20
+    "lastSeq":20
   }`

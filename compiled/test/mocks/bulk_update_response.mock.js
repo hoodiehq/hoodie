@@ -2,7 +2,7 @@
 
 window.Mocks || (window.Mocks = {});
 
-Mocks.bulk_update_response = function() {
+Mocks.bulkUpdateResponse = function() {
   return function() {
     return [
       {

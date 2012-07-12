@@ -84,14 +84,14 @@ class Hoodie.Sharing
   #         "frank@example.com"
   #       ]
   #       objects : [
-  #         todo_list, todo1, todo2, todo3
+  #         todoList, todo1, todo2, todo3
   #       ]
   #     
   #     # share all my documents that I marked as
   #     # shared and keep them updated
   #     hoodie.sharing.create
   #       continuous : true
-  #       objects    : hoodie.store.loadAll (obj) -> obj.is_shared
+  #       objects    : hoodie.store.loadAll (obj) -> obj.isShared
   #
   create : (options = {}) ->
     sharing = new Hoodie.Sharing.Instance options
@@ -112,7 +112,7 @@ class Hoodie.Sharing
   # 1. Try to find a sharing by given id
   # 2. If sharing could be found, return it
   # 3. If not, create one and return it.
-  find_or_create : (options) ->
+  findOrCreate : (options) ->
     defer = @hoodie.defer()
     @load(options.id)
     .done (sharing) ->

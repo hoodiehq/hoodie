@@ -7,15 +7,15 @@ Hoodie.Account = (function() {
 
   function Account(hoodie) {
     this.hoodie = hoodie;
-    this._handle_sign_out = __bind(this._handle_sign_out, this);
+    this._handleSignOut = __bind(this._handleSignOut, this);
 
-    this._handle_sign_in = __bind(this._handle_sign_in, this);
+    this._handleSignIn = __bind(this._handleSignIn, this);
 
     this.authenticate = __bind(this.authenticate, this);
 
     this.username = this.hoodie.config.get('_account.username');
-    this.on('sign_in', this._handle_sign_in);
-    this.on('sign_out', this._handle_sign_out);
+    this.on('signIn', this._handleSignIn);
+    this.on('signOut', this._handleSignOut);
   }
 
   Account.prototype.authenticate = function() {
@@ -31,8 +31,8 @@ Hoodie.Account = (function() {
     if (this._authenticated === false) {
       return defer.reject().promise();
     }
-    this._auth_request = this.hoodie.request('GET', "/_session");
-    this._auth_request.done(function(response) {
+    this._authRequest = this.hoodie.request('GET', "/_session");
+    this._authRequest.done(function(response) {
       if (response.userCtx.name) {
         _this._authenticated = true;
         _this.username = response.userCtx.name;
@@ -44,7 +44,7 @@ Hoodie.Account = (function() {
         return defer.reject();
       }
     });
-    this._auth_request.fail(function(xhr) {
+    this._authRequest.fail(function(xhr) {
       var error;
       try {
         error = JSON.parse(xhr.responseText);
@@ -58,8 +58,8 @@ Hoodie.Account = (function() {
     return defer.promise();
   };
 
-  Account.prototype.sign_up = function(username, password) {
-    var data, defer, handle_succes, key, request_promise,
+  Account.prototype.signUp = function(username, password) {
+    var data, defer, handleSucces, key, requestPromise,
       _this = this;
     if (password == null) {
       password = '';
@@ -73,48 +73,48 @@ Hoodie.Account = (function() {
       roles: [],
       password: password
     };
-    request_promise = this.hoodie.request('PUT', "/_users/" + (encodeURIComponent(key)), {
+    requestPromise = this.hoodie.request('PUT', "/_users/" + (encodeURIComponent(key)), {
       data: JSON.stringify(data),
       contentType: 'application/json'
     });
-    handle_succes = function(response) {
-      _this.hoodie.trigger('account:sign_up', username);
+    handleSucces = function(response) {
+      _this.hoodie.trigger('account:signUp', username);
       _this._doc._rev = response.rev;
-      return _this.sign_in(username, password).then(defer.resolve, defer.reject);
+      return _this.signIn(username, password).then(defer.resolve, defer.reject);
     };
-    request_promise.then(handle_succes, defer.reject);
+    requestPromise.then(handleSucces, defer.reject);
     return defer.promise();
   };
 
-  Account.prototype.sign_in = function(username, password) {
-    var defer, handle_succes, request_promise,
+  Account.prototype.signIn = function(username, password) {
+    var defer, handleSucces, requestPromise,
       _this = this;
     if (password == null) {
       password = '';
     }
     defer = this.hoodie.defer();
-    request_promise = this.hoodie.request('POST', '/_session', {
+    requestPromise = this.hoodie.request('POST', '/_session', {
       data: {
         name: username,
         password: password
       }
     });
-    handle_succes = function(response) {
-      _this.hoodie.trigger('account:sign_in', username);
+    handleSucces = function(response) {
+      _this.hoodie.trigger('account:signIn', username);
       _this.fetch();
       return defer.resolve(username, response);
     };
-    request_promise.then(handle_succes, defer.reject);
+    requestPromise.then(handleSucces, defer.reject);
     return defer.promise();
   };
 
-  Account.prototype.login = Account.prototype.sign_in;
+  Account.prototype.login = Account.prototype.signIn;
 
-  Account.prototype.change_password = function(current_password, new_password) {
+  Account.prototype.changePassword = function(currentPassword, newPassword) {
     var data, defer, key,
       _this = this;
-    if (current_password == null) {
-      current_password = '';
+    if (currentPassword == null) {
+      currentPassword = '';
     }
     defer = this.hoodie.defer();
     if (!this.username) {
@@ -127,8 +127,8 @@ Hoodie.Account = (function() {
     key = "" + this._prefix + ":" + this.username;
     data = $.extend({}, this._doc);
     delete data.salt;
-    delete data.password_sha;
-    data.password = new_password;
+    delete data.passwordSha;
+    data.password = newPassword;
     return this.hoodie.request('PUT', "/_users/" + (encodeURIComponent(key)), {
       data: JSON.stringify(data),
       contentType: "application/json",
@@ -150,16 +150,16 @@ Hoodie.Account = (function() {
     });
   };
 
-  Account.prototype.sign_out = function() {
+  Account.prototype.signOut = function() {
     var _this = this;
     return this.hoodie.request('DELETE', '/_session', {
       success: function() {
-        return _this.hoodie.trigger('account:sign_out');
+        return _this.hoodie.trigger('account:signOut');
       }
     });
   };
 
-  Account.prototype.logout = Account.prototype.sign_out;
+  Account.prototype.logout = Account.prototype.signOut;
 
   Account.prototype.on = function(event, cb) {
     return this.hoodie.on("account:" + event, cb);
@@ -215,13 +215,13 @@ Hoodie.Account = (function() {
 
   Account.prototype._doc = {};
 
-  Account.prototype._handle_sign_in = function(username) {
+  Account.prototype._handleSignIn = function(username) {
     this.username = username;
     this.hoodie.config.set('_account.username', this.username);
     return this._authenticated = true;
   };
 
-  Account.prototype._handle_sign_out = function() {
+  Account.prototype._handleSignOut = function() {
     delete this.username;
     this.hoodie.config.remove('_account.username');
     return this._authenticated = false;

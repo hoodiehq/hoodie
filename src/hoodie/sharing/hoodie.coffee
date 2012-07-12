@@ -27,7 +27,7 @@ class Hoodie.Sharing.Hoodie extends Hoodie
     for event in ['store:dirty:idle']
       hoodie.on event, => @trigger event
 
-    super hoodie.base_url
+    super hoodie.baseUrl
 
   # ## SharingHoodie Request
   #
@@ -37,7 +37,7 @@ class Hoodie.Sharing.Hoodie extends Hoodie
     
     defaults =
       type        : type
-      url         : "#{@base_url}#{path}"
+      url         : "#{@baseUrl}#{path}"
       xhrFields   : withCredentials: true
       crossDomain : true
       dataType    : 'json'
@@ -52,6 +52,6 @@ class Hoodie.Sharing.Hoodie extends Hoodie
     
     $.ajax $.extend defaults, options
 
-  _load_modules: ->
-    console.log 'Hoodie.Sharing.Hoodie _load_modules'
+  _loadModules: ->
+    console.log 'Hoodie.Sharing.Hoodie _loadModules'
     super
