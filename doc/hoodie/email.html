@@ -8,25 +8,25 @@ an <code>on</code> interface, so devs can listen to events like:</p>
 <li>hoodie.email.on 'error', -> ...</li>
 </ul></div></div><div class="code"><div class="wrapper">  </div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h2 id="send">send</h2>
 
-<p>sends an email and returns a promise</p></div></div><div class="code"><div class="wrapper">  <span class="nv">send : </span><span class="nf">(email_attributes = {}) -&gt;</span>
+<p>sends an email and returns a promise</p></div></div><div class="code"><div class="wrapper">  <span class="nv">send : </span><span class="nf">(emailAttributes = {}) -&gt;</span>
     <span class="nv">defer      = </span><span class="nx">@hoodie</span><span class="p">.</span><span class="nx">defer</span><span class="p">()</span>
-    <span class="nv">attributes = </span><span class="nx">$</span><span class="p">.</span><span class="nx">extend</span> <span class="p">{},</span> <span class="nx">email_attributes</span>
+    <span class="nv">attributes = </span><span class="nx">$</span><span class="p">.</span><span class="nx">extend</span> <span class="p">{},</span> <span class="nx">emailAttributes</span>
     
-    <span class="nx">unless</span> <span class="nx">@_is_valid_email</span> <span class="nx">email_attributes</span><span class="p">.</span><span class="nx">to</span>
+    <span class="nx">unless</span> <span class="nx">@_isValidEmail</span> <span class="nx">emailAttributes</span><span class="p">.</span><span class="nx">to</span>
       <span class="nv">attributes.error = </span><span class="s2">&quot;Invalid email address (#{attributes.to or &#39;empty&#39;})&quot;</span>
       <span class="k">return</span> <span class="nx">defer</span><span class="p">.</span><span class="nx">reject</span><span class="p">(</span><span class="nx">attributes</span><span class="p">).</span><span class="nx">promise</span><span class="p">()</span>
     
     <span class="nx">@hoodie</span><span class="p">.</span><span class="nx">store</span><span class="p">.</span><span class="nx">create</span><span class="p">(</span><span class="s1">&#39;$email&#39;</span><span class="p">,</span> <span class="nx">attributes</span><span class="p">).</span><span class="k">then</span> <span class="p">(</span><span class="nx">obj</span><span class="p">)</span> <span class="o">=&gt;</span>
-      <span class="nx">@_handle_email_update</span><span class="p">(</span><span class="nx">defer</span><span class="p">,</span> <span class="nx">obj</span><span class="p">)</span>
+      <span class="nx">@_handleEmailUpdate</span><span class="p">(</span><span class="nx">defer</span><span class="p">,</span> <span class="nx">obj</span><span class="p">)</span>
       
     <span class="nx">defer</span><span class="p">.</span><span class="nx">promise</span><span class="p">()</span>
-    </div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h2 id="private">PRIVATE</h2></div></div></div><div class="segment"><div class="code"><div class="wrapper">  <span class="nv">_is_valid_email : </span><span class="nf">(email = &#39;&#39;) -&gt;</span>
+    </div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h2 id="private">PRIVATE</h2></div></div></div><div class="segment"><div class="code"><div class="wrapper">  <span class="nv">_isValidEmail : </span><span class="nf">(email = &#39;&#39;) -&gt;</span>
      <span class="o">/</span><span class="err">@</span><span class="o">/</span><span class="p">.</span><span class="nx">test</span> <span class="nx">email</span>
      
-  <span class="nv">_handle_email_update : </span><span class="p">(</span><span class="nx">defer</span><span class="p">,</span> <span class="nv">attributes = </span><span class="p">{})</span> <span class="o">=&gt;</span>
+  <span class="nv">_handleEmailUpdate : </span><span class="p">(</span><span class="nx">defer</span><span class="p">,</span> <span class="nv">attributes = </span><span class="p">{})</span> <span class="o">=&gt;</span>
     <span class="k">if</span> <span class="nx">attributes</span><span class="p">.</span><span class="nx">error</span>
       <span class="nx">defer</span><span class="p">.</span><span class="nx">reject</span> <span class="nx">attributes</span>
-    <span class="k">else</span> <span class="k">if</span> <span class="nx">attributes</span><span class="p">.</span><span class="nx">delivered_at</span>
+    <span class="k">else</span> <span class="k">if</span> <span class="nx">attributes</span><span class="p">.</span><span class="nx">deliveredAt</span>
       <span class="nx">defer</span><span class="p">.</span><span class="nx">resolve</span> <span class="nx">attributes</span>
     <span class="k">else</span>
-      <span class="nx">@hoodie</span><span class="p">.</span><span class="nx">one</span> <span class="s2">&quot;remote:updated:$email:#{attributes.id}&quot;</span><span class="p">,</span> <span class="p">(</span><span class="nx">attributes</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="nx">@_handle_email_update</span><span class="p">(</span><span class="nx">defer</span><span class="p">,</span> <span class="nx">attributes</span><span class="p">)</span></div></div></div></div></body></html>
+      <span class="nx">@hoodie</span><span class="p">.</span><span class="nx">one</span> <span class="s2">&quot;remote:updated:$email:#{attributes.id}&quot;</span><span class="p">,</span> <span class="p">(</span><span class="nx">attributes</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="nx">@_handleEmailUpdate</span><span class="p">(</span><span class="nx">defer</span><span class="p">,</span> <span class="nx">attributes</span><span class="p">)</span></div></div></div></div></body></html>

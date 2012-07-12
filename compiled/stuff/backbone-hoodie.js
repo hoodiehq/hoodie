@@ -4,10 +4,10 @@ Backbone.connect = function(url) {
   return Backbone.hoodie = new Hoodie(url);
 };
 
-Backbone.sync = function(method, model_or_collection, options) {
+Backbone.sync = function(method, modelOrCollection, options) {
   var attributes, id, promise, type;
-  id = model_or_collection.id, attributes = model_or_collection.attributes, type = model_or_collection.type;
-  type || (type = model_or_collection.model.prototype.type);
+  id = modelOrCollection.id, attributes = modelOrCollection.attributes, type = modelOrCollection.type;
+  type || (type = modelOrCollection.model.prototype.type);
   promise = (function() {
     switch (method) {
       case "read":
@@ -47,14 +47,14 @@ Backbone.Collection.prototype.initialize = function() {
     remote: true
   };
   if (this.model.prototype.type) {
-    Backbone.hoodie.remote.on("created:" + this.model.prototype.type, function(id, attributes) {
+    Backbone.hoodie.remote.on("create:" + this.model.prototype.type, function(id, attributes) {
       return _this.add(attributes, opts);
     });
-    Backbone.hoodie.remote.on("destroyed:" + this.model.prototype.type, function(id, attributes) {
+    Backbone.hoodie.remote.on("destroye:" + this.model.prototype.type, function(id, attributes) {
       var _ref;
       return (_ref = _this.get(id)) != null ? _ref.destroy(opts) : void 0;
     });
-    return Backbone.hoodie.remote.on("updated:" + this.model.prototype.type, function(id, attributes) {
+    return Backbone.hoodie.remote.on("update:" + this.model.prototype.type, function(id, attributes) {
       var _ref;
       return (_ref = _this.get(id)) != null ? _ref.merge(attributes, opts) : void 0;
     });

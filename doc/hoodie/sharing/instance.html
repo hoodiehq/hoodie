@@ -6,8 +6,8 @@ doc and listen to its remote changes</p>
 
 <p>if the user is anonymous, we need to handle it manually. To achieve that
 we use a customized hoodie, with its own socket</p></div></div><div class="code"><div class="wrapper">    <span class="vi">@anonymous = </span><span class="nx">@hoodie</span><span class="p">.</span><span class="nx">account</span><span class="p">.</span><span class="nx">username</span> <span class="o">is</span> <span class="kc">undefined</span>
-    </div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>setting attributes</p></div></div><div class="code"><div class="wrapper">    <span class="nx">@set</span> <span class="nx">options</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>also make sure we have an owner_uuid in oredr to differentiate between my 
-sharings and the sharings by others</p></div></div><div class="code"><div class="wrapper">    <span class="nx">@_assure_owner_uuid</span><span class="p">()</span> 
+    </div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>setting attributes</p></div></div><div class="code"><div class="wrapper">    <span class="nx">@set</span> <span class="nx">options</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>also make sure we have an ownerUuid in oredr to differentiate between my 
+sharings and the sharings by others</p></div></div><div class="code"><div class="wrapper">    <span class="nx">@_assureOwnerUuid</span><span class="p">()</span> 
     </div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>use the custom Sharing Hoodie for users witouth an account</p></div></div><div class="code"><div class="wrapper">    <span class="vi">@hoodie = </span><span class="k">new</span> <span class="nx">Hoodie</span><span class="p">.</span><span class="nx">Sharing</span><span class="p">.</span><span class="nx">Hoodie</span> <span class="nx">@hoodie</span><span class="p">,</span> <span class="k">this</span> <span class="k">if</span> <span class="nx">@anonymous</span>
   
   </div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h2 id="set">set</h2>
@@ -37,10 +37,10 @@ coming from the custom config module</p></div></div><div class="code"><div class
     <span class="nv">defer = </span><span class="nx">@hoodie</span><span class="p">.</span><span class="nx">defer</span><span class="p">()</span>
 
     <span class="nx">@set</span><span class="p">(</span><span class="nx">update</span><span class="p">)</span> <span class="k">if</span> <span class="nx">update</span>
-    <span class="nv">_handle_update = </span><span class="p">(</span><span class="nx">properties</span><span class="p">,</span> <span class="nx">was_created</span><span class="p">)</span> <span class="o">=&gt;</span> </div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>reset memory</p></div></div><div class="code"><div class="wrapper">      <span class="vi">@_memory = </span><span class="p">{}</span>
+    <span class="nv">_handleUpdate = </span><span class="p">(</span><span class="nx">properties</span><span class="p">,</span> <span class="nx">wasCreated</span><span class="p">)</span> <span class="o">=&gt;</span> </div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>reset memory</p></div></div><div class="code"><div class="wrapper">      <span class="vi">@_memory = </span><span class="p">{}</span>
       <span class="nx">$</span><span class="p">.</span><span class="nx">extend</span> <span class="k">this</span><span class="p">,</span> <span class="nx">properties</span>
       <span class="nx">defer</span><span class="p">.</span><span class="nx">resolve</span><span class="p">(</span><span class="k">this</span><span class="p">)</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>persist memory to store</p></div></div><div class="code"><div class="wrapper">    <span class="nx">@hoodie</span><span class="p">.</span><span class="nx">store</span><span class="p">.</span><span class="nx">update</span><span class="p">(</span><span class="s2">&quot;$sharing&quot;</span><span class="p">,</span> <span class="nx">@id</span><span class="p">,</span> <span class="nx">@_memory</span><span class="p">,</span> <span class="nx">options</span><span class="p">)</span>
-    <span class="p">.</span><span class="k">then</span> <span class="nx">_handle_update</span><span class="p">,</span> <span class="nx">defer</span><span class="p">.</span><span class="nx">reject</span>
+    <span class="p">.</span><span class="k">then</span> <span class="nx">_handleUpdate</span><span class="p">,</span> <span class="nx">defer</span><span class="p">.</span><span class="nx">reject</span>
 
     <span class="k">return</span> <span class="nx">defer</span><span class="p">.</span><span class="nx">promise</span><span class="p">()</span>
     
@@ -51,9 +51,9 @@ resolve with an array of objects can be passed as well.</p>
 
 <p>usage</p>
 
-<p>sharing.add(todo<em>object)
-sharing.add([todo</em>object1, todo<em>object2, todo</em>object3])
-sharing.add( hoodie.store.findAll (obj) -> obj.is_shared )</p></div></div><div class="code"><div class="wrapper">  <span class="nv">add: </span><span class="nf">(objects) -&gt;</span>
+<p>sharing.add(todoObject)
+sharing.add([todoObject1, todoObject2, todoObject3])
+sharing.add( hoodie.store.findAll (obj) -> obj.isShared )</p></div></div><div class="code"><div class="wrapper">  <span class="nv">add: </span><span class="nf">(objects) -&gt;</span>
     <span class="nx">@toggle</span> <span class="nx">objects</span><span class="p">,</span> <span class="kc">true</span>
     
       </div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h2 id="remove">remove</h2>
@@ -63,22 +63,22 @@ resolve with an array of objects can be passed as well.</p>
 
 <p>usage</p>
 
-<p>sharing.remove(todo<em>object)
-sharing.remove([todo</em>object1, todo<em>object2, todo</em>object3])
-sharing.remove( hoodie.store.findAll (obj) -> obj.is_shared )</p></div></div><div class="code"><div class="wrapper">  <span class="nv">remove: </span><span class="nf">(objects) -&gt;</span> 
+<p>sharing.remove(todoObject)
+sharing.remove([todoObject1, todoObject2, todoObject3])
+sharing.remove( hoodie.store.findAll (obj) -> obj.isShared )</p></div></div><div class="code"><div class="wrapper">  <span class="nv">remove: </span><span class="nf">(objects) -&gt;</span> 
     <span class="nx">@toggle</span> <span class="nx">objects</span><span class="p">,</span> <span class="kc">false</span>
   
   </div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h2 id="toggle-">toggle ()</h2>
 
-<p>add or remove, depending on passed flag or current state</p></div></div><div class="code"><div class="wrapper">  <span class="nv">toggle: </span><span class="nf">(objects, do_add) -&gt;</span>
+<p>add or remove, depending on passed flag or current state</p></div></div><div class="code"><div class="wrapper">  <span class="nv">toggle: </span><span class="nf">(objects, doAdd) -&gt;</span>
     </div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>normalize input</p></div></div><div class="code"><div class="wrapper">    <span class="nx">unless</span> <span class="nx">@hoodie</span><span class="p">.</span><span class="nx">isPromise</span><span class="p">(</span><span class="nx">objects</span><span class="p">)</span> <span class="o">or</span> <span class="nx">$</span><span class="p">.</span><span class="nx">isArray</span><span class="p">(</span><span class="nx">objects</span><span class="p">)</span>
       <span class="nv">objects = </span><span class="p">[</span><span class="nx">objects</span><span class="p">]</span>
-    </div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>get the update method to add/remove an object to/from sharing</p></div></div><div class="code"><div class="wrapper">    <span class="nv">update_method = </span><span class="k">switch</span> <span class="nx">do_add</span>
+    </div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>get the update method to add/remove an object to/from sharing</p></div></div><div class="code"><div class="wrapper">    <span class="nv">updateMethod = </span><span class="k">switch</span> <span class="nx">doAdd</span>
       <span class="k">when</span> <span class="kc">true</span>  <span class="k">then</span> <span class="nx">@_add</span>
       <span class="k">when</span> <span class="kc">false</span> <span class="k">then</span> <span class="nx">@_remove</span>
       <span class="k">else</span> <span class="nx">@_toggle</span>
     
-    <span class="nx">@hoodie</span><span class="p">.</span><span class="nx">store</span><span class="p">.</span><span class="nx">updateAll</span><span class="p">(</span><span class="nx">objects</span><span class="p">,</span> <span class="nx">update_method</span><span class="p">)</span>
+    <span class="nx">@hoodie</span><span class="p">.</span><span class="nx">store</span><span class="p">.</span><span class="nx">updateAll</span><span class="p">(</span><span class="nx">objects</span><span class="p">,</span> <span class="nx">updateMethod</span><span class="p">)</span>
     
   </div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h2 id="sync">sync</h2>
 
@@ -91,76 +91,76 @@ Before the first execution, we make sure that an account exist.</p>
       </div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>otherwise we need to create the sharing db manually,
 by signing up as a user with the neame of the sharing db.</p></div></div><div class="code"><div class="wrapper">    <span class="k">else</span>
       
-      <span class="nx">@hoodie</span><span class="p">.</span><span class="nx">account</span><span class="p">.</span><span class="nx">sign_up</span><span class="p">(</span> <span class="s2">&quot;sharing/#{@id}&quot;</span><span class="p">,</span> <span class="nx">@password</span> <span class="p">)</span>
+      <span class="nx">@hoodie</span><span class="p">.</span><span class="nx">account</span><span class="p">.</span><span class="nx">signUp</span><span class="p">(</span> <span class="s2">&quot;sharing/#{@id}&quot;</span><span class="p">,</span> <span class="nx">@password</span> <span class="p">)</span>
       <span class="p">.</span><span class="nx">done</span> <span class="p">(</span><span class="nx">username</span><span class="p">,</span> <span class="nx">response</span><span class="p">)</span> <span class="o">=&gt;</span>
-        </div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>remember that we signed up successfully for the future</p></div></div><div class="code"><div class="wrapper">        <span class="nx">@save</span> <span class="nv">_user_rev: </span><span class="nx">@hoodie</span><span class="p">.</span><span class="nx">account</span><span class="p">.</span><span class="nx">_doc</span><span class="p">.</span><span class="nx">_rev</span>
+        </div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>remember that we signed up successfully for the future</p></div></div><div class="code"><div class="wrapper">        <span class="nx">@save</span> <span class="nv">_userRev: </span><span class="nx">@hoodie</span><span class="p">.</span><span class="nx">account</span><span class="p">.</span><span class="nx">_doc</span><span class="p">.</span><span class="nx">_rev</span>
         </div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>finally: start the sync and make it the default behavior
 from now on</p></div></div><div class="code"><div class="wrapper">        <span class="nx">do</span> <span class="vi">@sync = </span><span class="nx">@_sync</span>
   
   </div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h2 id="hasaccount">hasAccount</h2>
 
 <p>returns true if either user or the sharing has a couchDB account</p></div></div><div class="code"><div class="wrapper">  <span class="nv">hasAccount: </span><span class="o">-&gt;</span>
-    <span class="o">not</span> <span class="nx">@anonymous</span> <span class="o">or</span> <span class="nx">@_user_rev</span><span class="o">?</span>
+    <span class="o">not</span> <span class="nx">@anonymous</span> <span class="o">or</span> <span class="nx">@_userRev</span><span class="o">?</span>
     
     </div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h2 id="private">Private</h2></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>owner uuid</p>
 
 <p>in order to differentiate between my sharings and sharings by others,
 each account gets a uuid assigned that will be stored with every $sharing doc.</p>
 
-<p>at the moment we store the owner_uuid with the $config/hoodie config. Not sure
+<p>at the moment we store the ownerUuid with the $config/hoodie config. Not sure
 if that's the right place for it, but it works.</p>
 
 <p>Another possibility would be to assign a uuid to each user on sign up and use 
-this uuid here, but this has not yet been discussed.</p></div></div><div class="code"><div class="wrapper">  <span class="nv">_assure_owner_uuid : </span><span class="o">-&gt;</span>
-    <span class="k">return</span> <span class="k">if</span> <span class="nx">@owner_uuid</span>
+this uuid here, but this has not yet been discussed.</p></div></div><div class="code"><div class="wrapper">  <span class="nv">_assureOwnerUuid : </span><span class="o">-&gt;</span>
+    <span class="k">return</span> <span class="k">if</span> <span class="nx">@ownerUuid</span>
 
     <span class="nv">config      = </span><span class="nx">@constructor</span><span class="p">.</span><span class="nx">hoodie</span><span class="p">.</span><span class="nx">config</span>
-    <span class="vi">@owner_uuid = </span><span class="nx">config</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="s1">&#39;sharing.owner_uuid&#39;</span><span class="p">)</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>if this is the very first sharing, we generate and store an owner_uuid</p></div></div><div class="code"><div class="wrapper">    <span class="nx">unless</span> <span class="nx">@owner_uuid</span>
-      <span class="vi">@owner_uuid = </span><span class="nx">@constructor</span><span class="p">.</span><span class="nx">hoodie</span><span class="p">.</span><span class="nx">store</span><span class="p">.</span><span class="nx">uuid</span><span class="p">()</span>
-      <span class="nx">config</span><span class="p">.</span><span class="nx">set</span> <span class="s1">&#39;sharing.owner_uuid&#39;</span><span class="p">,</span> <span class="nx">@owner_uuid</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>I appologize for this mess of code ~gr2m</p></div></div><div class="code"><div class="wrapper">  <span class="nv">_is_my_shared_object_and_changed: </span><span class="p">(</span><span class="nx">obj</span><span class="p">)</span> <span class="o">=&gt;</span>
-    <span class="nv">belongs_to_me = </span><span class="nx">obj</span><span class="p">.</span><span class="nx">id</span> <span class="o">is</span> <span class="nx">@id</span> <span class="o">or</span> <span class="nx">obj</span><span class="p">.</span><span class="nx">$sharings</span> <span class="o">and</span> <span class="o">~</span><span class="nx">obj</span><span class="p">.</span><span class="nx">$sharings</span><span class="p">.</span><span class="nx">indexOf</span><span class="p">(</span><span class="nx">@id</span><span class="p">)</span>
-    <span class="k">return</span> <span class="nx">belongs_to_me</span> <span class="o">and</span> <span class="nx">@hoodie</span><span class="p">.</span><span class="nx">store</span><span class="p">.</span><span class="nx">is_dirty</span><span class="p">(</span><span class="nx">obj</span><span class="p">.</span><span class="nx">type</span><span class="p">,</span> <span class="nx">obj</span><span class="p">.</span><span class="nx">id</span><span class="p">)</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>returns a hash update to update the passed object
+    <span class="vi">@ownerUuid = </span><span class="nx">config</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="s1">&#39;sharing.ownerUuid&#39;</span><span class="p">)</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>if this is the very first sharing, we generate and store an ownerUuid</p></div></div><div class="code"><div class="wrapper">    <span class="nx">unless</span> <span class="nx">@ownerUuid</span>
+      <span class="vi">@ownerUuid = </span><span class="nx">@constructor</span><span class="p">.</span><span class="nx">hoodie</span><span class="p">.</span><span class="nx">store</span><span class="p">.</span><span class="nx">uuid</span><span class="p">()</span>
+      <span class="nx">config</span><span class="p">.</span><span class="nx">set</span> <span class="s1">&#39;sharing.ownerUuid&#39;</span><span class="p">,</span> <span class="nx">@ownerUuid</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>I appologize for this mess of code ~gr2m</p></div></div><div class="code"><div class="wrapper">  <span class="nv">_isMySharedObjectAndChanged: </span><span class="p">(</span><span class="nx">obj</span><span class="p">)</span> <span class="o">=&gt;</span>
+    <span class="nv">belongsToMe = </span><span class="nx">obj</span><span class="p">.</span><span class="nx">id</span> <span class="o">is</span> <span class="nx">@id</span> <span class="o">or</span> <span class="nx">obj</span><span class="p">.</span><span class="nx">$sharings</span> <span class="o">and</span> <span class="o">~</span><span class="nx">obj</span><span class="p">.</span><span class="nx">$sharings</span><span class="p">.</span><span class="nx">indexOf</span><span class="p">(</span><span class="nx">@id</span><span class="p">)</span>
+    <span class="k">return</span> <span class="nx">belongsToMe</span> <span class="o">and</span> <span class="nx">@hoodie</span><span class="p">.</span><span class="nx">store</span><span class="p">.</span><span class="nx">isDirty</span><span class="p">(</span><span class="nx">obj</span><span class="p">.</span><span class="nx">type</span><span class="p">,</span> <span class="nx">obj</span><span class="p">.</span><span class="nx">id</span><span class="p">)</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>returns a hash update to update the passed object
 so that it gets added to the sharing</p></div></div><div class="code"><div class="wrapper">  <span class="nv">_add: </span><span class="p">(</span><span class="nx">obj</span><span class="p">)</span> <span class="o">=&gt;</span> 
-    <span class="nv">new_value = </span><span class="k">if</span> <span class="nx">obj</span><span class="p">.</span><span class="nx">$sharings</span>
+    <span class="nv">newValue = </span><span class="k">if</span> <span class="nx">obj</span><span class="p">.</span><span class="nx">$sharings</span>
       <span class="nx">obj</span><span class="p">.</span><span class="nx">$sharings</span><span class="p">.</span><span class="nx">concat</span> <span class="nx">@id</span> <span class="nx">unless</span> <span class="o">~</span><span class="nx">obj</span><span class="p">.</span><span class="nx">$sharings</span><span class="p">.</span><span class="nx">indexOf</span><span class="p">(</span><span class="nx">@id</span><span class="p">)</span>
     <span class="k">else</span>
       <span class="p">[</span><span class="nx">@id</span><span class="p">]</span>
 
-    <span class="k">if</span> <span class="nx">new_value</span>
-      <span class="k">delete</span> <span class="nx">@$docs_to_remove</span><span class="p">[</span><span class="s2">&quot;#{obj.type}/#{obj.id}&quot;</span><span class="p">]</span>
-      <span class="nx">@set</span> <span class="s1">&#39;$docs_to_remove&#39;</span><span class="p">,</span> <span class="nx">@$docs_to_remove</span> 
+    <span class="k">if</span> <span class="nx">newValue</span>
+      <span class="k">delete</span> <span class="nx">@$docsToRemove</span><span class="p">[</span><span class="s2">&quot;#{obj.type}/#{obj.id}&quot;</span><span class="p">]</span>
+      <span class="nx">@set</span> <span class="s1">&#39;$docsToRemove&#39;</span><span class="p">,</span> <span class="nx">@$docsToRemove</span> 
 
-    <span class="nv">$sharings: </span><span class="nx">new_value</span>
+    <span class="nv">$sharings: </span><span class="nx">newValue</span>
 
   </div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>returns a hash update to update the passed object
 so that it gets removed from the current sharing</p>
 
-<p>on top of that, the object gets stored in the $docs<em>to</em>remove
-property. These will removed from the sharing database on next sync</p></div></div><div class="code"><div class="wrapper">  <span class="nv">$docs_to_remove: </span><span class="p">{}</span>
+<p>on top of that, the object gets stored in the $docsToRemove
+property. These will removed from the sharing database on next sync</p></div></div><div class="code"><div class="wrapper">  <span class="nv">$docsToRemove: </span><span class="p">{}</span>
   <span class="nv">_remove : </span><span class="p">(</span><span class="nx">obj</span><span class="p">)</span> <span class="o">=&gt;</span>
     <span class="k">try</span>
       <span class="nv">$sharings = </span><span class="nx">obj</span><span class="p">.</span><span class="nx">$sharings</span>
       
       <span class="k">if</span> <span class="o">~</span><span class="p">(</span><span class="nv">idx = </span><span class="nx">$sharings</span><span class="p">.</span><span class="nx">indexOf</span> <span class="nx">@id</span><span class="p">)</span>
         <span class="nx">$sharings</span><span class="p">.</span><span class="nx">splice</span><span class="p">(</span><span class="nx">idx</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span> </div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>TODO:
-when anonymous, use $docs<em>to</em>remove and push the deletion
-manually, so that the <em>rev stamps do get updated.
-When user signes up, rename the attribut to $docs</em>to_remove,
+when anonymous, use $docsToRemove and push the deletion
+manually, so that the _rev stamps do get updated.
+When user signes up, rename the attribut to $docsToRemove,
 so that the worker can take over</p>
 
-<p>Alternative: find a way to create a new revions locally.</p></div></div><div class="code"><div class="wrapper">        <span class="nx">@$docs_to_remove</span><span class="p">[</span><span class="s2">&quot;#{obj.type}/#{obj.id}&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="nv">_rev: </span><span class="nx">obj</span><span class="p">.</span><span class="nx">_rev</span>
-        <span class="nx">@set</span> <span class="s1">&#39;$docs_to_remove&#39;</span><span class="p">,</span> <span class="nx">@$docs_to_remove</span>
+<p>Alternative: find a way to create a new revions locally.</p></div></div><div class="code"><div class="wrapper">        <span class="nx">@$docsToRemove</span><span class="p">[</span><span class="s2">&quot;#{obj.type}/#{obj.id}&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="nv">_rev: </span><span class="nx">obj</span><span class="p">.</span><span class="nx">_rev</span>
+        <span class="nx">@set</span> <span class="s1">&#39;$docsToRemove&#39;</span><span class="p">,</span> <span class="nx">@$docsToRemove</span>
 
         <span class="nv">$sharings: </span><span class="k">if</span> <span class="nx">$sharings</span><span class="p">.</span><span class="nx">length</span> <span class="k">then</span> <span class="nx">$sharings</span> <span class="k">else</span> <span class="kc">undefined</span>
       </div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>depending on whether the passed object belongs to the
 sharing or not, an update will be returned to add/remove 
 it to/from sharing</p></div></div><div class="code"><div class="wrapper">  <span class="nv">_toggle : </span><span class="o">=&gt;</span> 
     <span class="k">try</span>
-      <span class="nv">do_add = </span><span class="o">~</span><span class="nx">obj</span><span class="p">.</span><span class="nx">$sharings</span><span class="p">.</span><span class="nx">indexOf</span> <span class="nx">@id</span>
+      <span class="nv">doAdd = </span><span class="o">~</span><span class="nx">obj</span><span class="p">.</span><span class="nx">$sharings</span><span class="p">.</span><span class="nx">indexOf</span> <span class="nx">@id</span>
     <span class="k">catch</span> <span class="nx">e</span>
-      <span class="nv">do_add = </span><span class="kc">true</span>
+      <span class="nv">doAdd = </span><span class="kc">true</span>
 
-    <span class="k">if</span> <span class="nx">do_add</span>
+    <span class="k">if</span> <span class="nx">doAdd</span>
       <span class="nx">@_add</span><span class="p">(</span><span class="nx">obj</span><span class="p">)</span>
     <span class="k">else</span>
       <span class="nx">@_remove</span><span class="p">(</span><span class="nx">obj</span><span class="p">)</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><ol>
@@ -169,8 +169,8 @@ it to/from sharing</p></div></div><div class="code"><div class="wrapper">  <span
 <li>sync all these with sharing's remote</li>
 </ol></div></div><div class="code"><div class="wrapper">  <span class="nv">_sync : </span><span class="o">=&gt;</span>
     <span class="nx">@save</span><span class="p">()</span>
-    <span class="p">.</span><span class="nx">pipe</span> <span class="nx">@hoodie</span><span class="p">.</span><span class="nx">store</span><span class="p">.</span><span class="nx">loadAll</span><span class="p">(</span><span class="nx">@_is_my_shared_object_and_changed</span><span class="p">)</span>
-    <span class="p">.</span><span class="nx">pipe</span> <span class="p">(</span><span class="nx">shared_object_that_changed</span><span class="p">)</span> <span class="o">=&gt;</span>
-      <span class="nx">@hoodie</span><span class="p">.</span><span class="nx">remote</span><span class="p">.</span><span class="nx">sync</span><span class="p">(</span><span class="nx">shared_object_that_changed</span><span class="p">)</span>
-      <span class="p">.</span><span class="k">then</span> <span class="nx">@_handle_remote_changes</span></div></div></div><div class="segment"><div class="code"><div class="wrapper">  <span class="nv">_handle_remote_changes: </span><span class="o">-&gt;</span>
-    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span> <span class="s1">&#39;_handle_remote_changes&#39;</span><span class="p">,</span> <span class="nx">arguments</span><span class="p">...</span></div></div></div></div></body></html>
+    <span class="p">.</span><span class="nx">pipe</span> <span class="nx">@hoodie</span><span class="p">.</span><span class="nx">store</span><span class="p">.</span><span class="nx">loadAll</span><span class="p">(</span><span class="nx">@_isMySharedObjectAndChanged</span><span class="p">)</span>
+    <span class="p">.</span><span class="nx">pipe</span> <span class="p">(</span><span class="nx">sharedObjectThatChanged</span><span class="p">)</span> <span class="o">=&gt;</span>
+      <span class="nx">@hoodie</span><span class="p">.</span><span class="nx">remote</span><span class="p">.</span><span class="nx">sync</span><span class="p">(</span><span class="nx">sharedObjectThatChanged</span><span class="p">)</span>
+      <span class="p">.</span><span class="k">then</span> <span class="nx">@_handleRemoteChanges</span></div></div></div><div class="segment"><div class="code"><div class="wrapper">  <span class="nv">_handleRemoteChanges: </span><span class="o">-&gt;</span>
+    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span> <span class="s1">&#39;_handleRemoteChanges&#39;</span><span class="p">,</span> <span class="nx">arguments</span><span class="p">...</span></div></div></div></div></body></html>

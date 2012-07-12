@@ -19,14 +19,14 @@ continuous synching ... or not.</p></div></div><div class="code"><div class="wra
     </div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>proxy certain request from core hoodie</p></div></div><div class="code"><div class="wrapper">    <span class="k">for</span> <span class="nx">event</span> <span class="k">in</span> <span class="p">[</span><span class="s1">&#39;store:dirty:idle&#39;</span><span class="p">]</span>
       <span class="nx">hoodie</span><span class="p">.</span><span class="kc">on</span> <span class="nx">event</span><span class="p">,</span> <span class="o">=&gt;</span> <span class="nx">@trigger</span> <span class="nx">event</span>
 
-    <span class="k">super</span> <span class="nx">hoodie</span><span class="p">.</span><span class="nx">base_url</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h2 id="sharinghoodie-request">SharingHoodie Request</h2>
+    <span class="k">super</span> <span class="nx">hoodie</span><span class="p">.</span><span class="nx">baseUrl</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h2 id="sharinghoodie-request">SharingHoodie Request</h2>
 
 <p>the only difference to Hoodies default request:
 we send the creds directly as authorization header</p></div></div><div class="code"><div class="wrapper">  <span class="nv">request: </span><span class="nf">(type, path, options = {}) -&gt;</span>
     
     <span class="nv">defaults =</span>
       <span class="nv">type        : </span><span class="nx">type</span>
-      <span class="nv">url         : </span><span class="s2">&quot;#{@base_url}#{path}&quot;</span>
+      <span class="nv">url         : </span><span class="s2">&quot;#{@baseUrl}#{path}&quot;</span>
       <span class="nv">xhrFields   : withCredentials: </span><span class="kc">true</span>
       <span class="nv">crossDomain : </span><span class="kc">true</span>
       <span class="nv">dataType    : </span><span class="s1">&#39;json&#39;</span>
@@ -41,6 +41,6 @@ we send the creds directly as authorization header</p></div></div><div class="co
     
     <span class="nx">$</span><span class="p">.</span><span class="nx">ajax</span> <span class="nx">$</span><span class="p">.</span><span class="nx">extend</span> <span class="nx">defaults</span><span class="p">,</span> <span class="nx">options</span>
 
-  <span class="nv">_load_modules: </span><span class="o">-&gt;</span>
-    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span> <span class="s1">&#39;Hoodie.Sharing.Hoodie _load_modules&#39;</span>
+  <span class="nv">_loadModules: </span><span class="o">-&gt;</span>
+    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span> <span class="s1">&#39;Hoodie.Sharing.Hoodie _loadModules&#39;</span>
     <span class="k">super</span></div></div></div></div></body></html>

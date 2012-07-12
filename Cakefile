@@ -65,23 +65,9 @@ task 'build', 'build hoodie-client.min.js', ->
   
 task 'docs', 'create docs from code', ->
   
-  docco = spawn 'docco', ['src/*.coffee']
+  docco = spawn 'groc', ['src/**/*.coffee']
   docco.stdout.on 'data', (data) -> print data.toString()
   docco.on 'exit', (status) -> callback?() if status is 0
-  
-  # docco = spawn 'docco', ['src/**/*.coffee']
-  # docco.stdout.on 'data', (data) -> print data.toString()
-  # docco.on 'exit', (status) -> callback?() if status is 0
-  
-  # fs.readdir 'src', (err, contents) ->
-  #   files = []
-  #   files = ("src/#{file}" for file in contents when /\.coffee$/.test file)
-  #   
-  #   console.log files
-  #   docco = spawn 'docco', files
-  #   docco.stdout.on 'data', (data) -> print data.toString()
-  #   # docco.stderr.on 'data', (data) -> print data.toString()
-  #   docco.on 'exit', (status) -> callback?() if status is 0
     
 task 'all', 'one cake to rule them all', ->
   exec 'cake compile && cake build && cake docs', (err) ->

@@ -1,9 +1,9 @@
 Backbone.connect = (url) ->
   Backbone.hoodie = new Hoodie url
 
-Backbone.sync = (method, model_or_collection, options) ->
-  {id, attributes, type} = model_or_collection
-  type                 or= model_or_collection.model::type
+Backbone.sync = (method, modelOrCollection, options) ->
+  {id, attributes, type} = modelOrCollection
+  type                 or= modelOrCollection.model::type
 
   promise = switch method
     when "read"
@@ -35,6 +35,6 @@ Backbone.Collection::initialize = ->
   opts = remote: true
   
   if @model::type
-    Backbone.hoodie.remote.on   "created:#{@model::type}", (id, attributes) => @add attributes, opts
-    Backbone.hoodie.remote.on "destroyed:#{@model::type}", (id, attributes) => @get(id)?.destroy opts
-    Backbone.hoodie.remote.on   "updated:#{@model::type}", (id, attributes) => @get(id)?.merge attributes, opts
+    Backbone.hoodie.remote.on   "create:#{@model::type}", (id, attributes) => @add attributes, opts
+    Backbone.hoodie.remote.on "destroye:#{@model::type}", (id, attributes) => @get(id)?.destroy opts
+    Backbone.hoodie.remote.on   "update:#{@model::type}", (id, attributes) => @get(id)?.merge attributes, opts
