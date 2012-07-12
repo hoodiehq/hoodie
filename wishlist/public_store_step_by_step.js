@@ -63,12 +63,14 @@ hoodie.my.store.update("profile", "uuid567", {}, { public: true })
 hoodie.my.store.update("profile", "uuid567", {}, { public: ["name"] })
 
 // when you want to make an object private again, simply set public to false.
-// This will remove the `$public` attribute from the resulting couchDB doc.
+// We now could simply remove the $public attribut, but we intentionally set
+// it to false, otherwise the public store worke would ignore it (see blelow)
 // 
 //     {
 //       "_id"       : "profile/uuid567",
 //       "_ref"      : "4-ldva53g",
 //       "type"      : "profile",
+//       "$public"   : "false",
 //       "name"      : "Joe Doe",
 //       "email"     : "joe@example.com",
 //       "createdAt" : "2012-07-12T21:55:42.228Z",
@@ -123,11 +125,8 @@ hoodie.my.store.update("profile", "uuid567", {}, { public: false })
 }
 
 // When a user makes a public object private again the `$private` attribute
-// will be removed as mentioned above. But to assure that the respective
-// document gets removed from the public store, hoodie will create an
-// internal object which will instruct the public store worker to remove the
-// respective document from the public store. The internal document looks
-// like this:
+// will be set to false as mentioned above. he public store worker would
+// turn it into the following doc, which will remove it form the public store
 {
   "_id"       : "$public/profile/uuid567",
   "_ref"      : "2-cr3m5g8",
@@ -171,8 +170,8 @@ function changes_doc_parser(obj) {
       return obj
 
     // make public object private again, remove it from public store
-    case obj._id.indexOf("$public") = 0 && obj._deleted == true:
+    case obj.$public === false:
+      obj._deleted = true
       return obj
   }
-
 }

@@ -50,12 +50,14 @@ The resulting couchDB doc will look like this:</p>
   "updatedAt" : "2012-07-12T21:55:42.228Z"
 }
 </code></pre></div></div><div class="code"><div class="wrapper"><span class="nx">hoodie</span><span class="p">.</span><span class="nx">my</span><span class="p">.</span><span class="nx">store</span><span class="p">.</span><span class="nx">update</span><span class="p">(</span><span class="s2">&quot;profile&quot;</span><span class="p">,</span> <span class="s2">&quot;uuid567&quot;</span><span class="p">,</span> <span class="p">{},</span> <span class="p">{</span> <span class="kr">public</span><span class="o">:</span> <span class="p">[</span><span class="s2">&quot;name&quot;</span><span class="p">]</span> <span class="p">})</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>when you want to make an object private again, simply set public to false.
-This will remove the <code>$public</code> attribute from the resulting couchDB doc.</p>
+We now could simply remove the $public attribut, but we intentionally set
+it to false, otherwise the public store worke would ignore it (see blelow)</p>
 
 <pre><code>{
   "_id"       : "profile/uuid567",
   "_ref"      : "4-ldva53g",
   "type"      : "profile",
+  "$public"   : "false",
   "name"      : "Joe Doe",
   "email"     : "joe@example.com",
   "createdAt" : "2012-07-12T21:55:42.228Z",
@@ -97,11 +99,8 @@ turn it into the following doc:</p></div></div><div class="code"><div class="wra
   <span class="s2">&quot;type&quot;</span>      <span class="o">:</span> <span class="s2">&quot;profile&quot;</span><span class="p">,</span>
   <span class="s2">&quot;name&quot;</span>      <span class="o">:</span> <span class="s2">&quot;Joe Doe&quot;</span>
 <span class="p">}</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>When a user makes a public object private again the <code>$private</code> attribute
-will be removed as mentioned above. But to assure that the respective
-document gets removed from the public store, hoodie will create an
-internal object which will instruct the public store worker to remove the
-respective document from the public store. The internal document looks
-like this:</p></div></div><div class="code"><div class="wrapper"><span class="p">{</span>
+will be set to false as mentioned above. he public store worker would
+turn it into the following doc, which will remove it form the public store</p></div></div><div class="code"><div class="wrapper"><span class="p">{</span>
   <span class="s2">&quot;_id&quot;</span>       <span class="o">:</span> <span class="s2">&quot;$public/profile/uuid567&quot;</span><span class="p">,</span>
   <span class="s2">&quot;_ref&quot;</span>      <span class="o">:</span> <span class="s2">&quot;2-cr3m5g8&quot;</span><span class="p">,</span>
   <span class="s2">&quot;_deleted&quot;</span>  <span class="o">:</span> <span class="kc">true</span>
@@ -130,8 +129,8 @@ function returns an object, the object will be PUT to users public store.</p></d
         <span class="nx">newObj</span><span class="p">[</span><span class="nx">attr</span><span class="p">]</span> <span class="o">=</span> <span class="nx">obj</span><span class="p">[</span><span class="nx">attr</span><span class="p">]</span>
       <span class="p">};</span>
       <span class="nx">obj</span><span class="p">.</span><span class="nx">_id</span> <span class="o">=</span> <span class="s2">&quot;$public/&quot;</span> <span class="o">+</span> <span class="nx">obj</span><span class="p">.</span><span class="nx">_id</span>
-      <span class="k">return</span> <span class="nx">obj</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>make public object private again, remove it from public store</p></div></div><div class="code"><div class="wrapper">    <span class="k">case</span> <span class="nx">obj</span><span class="p">.</span><span class="nx">_id</span><span class="p">.</span><span class="nx">indexOf</span><span class="p">(</span><span class="s2">&quot;$public&quot;</span><span class="p">)</span> <span class="o">=</span> <span class="mi">0</span> <span class="o">&amp;&amp;</span> <span class="nx">obj</span><span class="p">.</span><span class="nx">_deleted</span> <span class="o">==</span> <span class="kc">true</span><span class="o">:</span>
+      <span class="k">return</span> <span class="nx">obj</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>make public object private again, remove it from public store</p></div></div><div class="code"><div class="wrapper">    <span class="k">case</span> <span class="nx">obj</span><span class="p">.</span><span class="nx">$public</span> <span class="o">===</span> <span class="kc">false</span><span class="o">:</span>
+      <span class="nx">obj</span><span class="p">.</span><span class="nx">_deleted</span> <span class="o">=</span> <span class="kc">true</span>
       <span class="k">return</span> <span class="nx">obj</span>
   <span class="p">}</span>
-
 <span class="p">}</span></div></div></div></div></body></html>
