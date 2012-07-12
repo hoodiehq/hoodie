@@ -28,3 +28,13 @@ hoodie.my.store.update("photo", "abc4567", {}, {public: true})
 // I want to make a public photo private again
 // 
 hoodie.my.store.update("photo", "abc4567", {}, {public: false})
+
+
+// ## Scenario 3
+// 
+// show most recently uploaded public photos
+// 
+hoodie.global.store.loadList("most_recent_photos", {page: 2})
+.done( function(photos) {
+  renderPhotos(photos)
+})

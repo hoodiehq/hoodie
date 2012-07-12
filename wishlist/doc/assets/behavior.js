@@ -59,6 +59,14 @@ f.event={add:function(a,c,d,e,g){var h,i,j,k,l,m,n,o,p,q,r,s;if(!(a.nodeType===3
                 "slug": "scenario-2"
               },
               "depth": 2
+            }, {
+              "type": "heading",
+              "data": {
+                "level": 2,
+                "title": "Scenario 3",
+                "slug": "scenario-3"
+              },
+              "depth": 2
             }
           ]
         },
@@ -96,6 +104,14 @@ f.event={add:function(a,c,d,e,g){var h,i,j,k,l,m,n,o,p,q,r,s;if(!(a.nodeType===3
             "level": 2,
             "title": "Scenario 2",
             "slug": "scenario-2"
+          },
+          "depth": 2
+        }, {
+          "type": "heading",
+          "data": {
+            "level": 2,
+            "title": "Scenario 3",
+            "slug": "scenario-3"
           },
           "depth": 2
         }
