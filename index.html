@@ -112,22 +112,22 @@
     // 
     
     // new doc created
-    hoodie.remote.on( 'created', function( type, id, createdObject) { } )
+    hoodie.remote.on( 'create', function( type, id, createdObject) { } )
 
     // existing doc updated
-    hoodie.remote.on( 'updated', function( type, id, updatedObject) { } )
+    hoodie.remote.on( 'update', function( type, id, updatedObject) { } )
 
     // doc deleted
-    hoodie.remote.on( 'deleted', function( type, id, deletedObject) { } )
+    hoodie.remote.on( 'delete', function( type, id, deletedObject) { } )
 
     // any of above events
-    hoodie.remote.on( 'changed', function( type, id, changedObject) { } )
+    hoodie.remote.on( 'change', function( type, id, changedObject) { } )
 
     // all listeners can be filtered by type
-    hoodie.remote.on( "created:couch", function( id, createdObject) { } )
-    hoodie.remote.on( "updated:couch", function( id, updatedObject)  { } )
-    hoodie.remote.on( "deleted:couch", function( id, deletedObject) { } )
-    hoodie.remote.on( "changed:couch", function( id, changedObject) { } )
+    hoodie.remote.on( "create:couch", function( id, createdObject) { } )
+    hoodie.remote.on( "update:couch", function( id, updatedObject)  { } )
+    hoodie.remote.on( "delete:couch", function( id, deletedObject) { } )
+    hoodie.remote.on( "change:couch", function( id, changedObject) { } )
     
     //
     // Send emails (coming soon)
