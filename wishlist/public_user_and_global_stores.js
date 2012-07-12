@@ -1,6 +1,3 @@
-
-
-
 // 
 // # example app: whiskie.net
 // 
