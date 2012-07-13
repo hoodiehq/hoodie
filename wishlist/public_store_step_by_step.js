@@ -124,8 +124,8 @@ hoodie.my.store.update("profile", "uuid567", {}, { public: false })
   "name"      : "Joe Doe"
 }
 
-// When a user makes a public object private again the `$private` attribute
-// will be set to false as mentioned above. he public store worker would
+// When a user makes a public object private again the `$public` attribute
+// will be set to false as mentioned above. The public store worker would
 // turn it into the following doc, which will remove it form the public store
 {
   "_id"       : "$public/profile/uuid567",
