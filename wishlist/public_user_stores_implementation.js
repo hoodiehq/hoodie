@@ -1,10 +1,10 @@
-// # Implementation of public user stores
+// # Public User Stores (Implementation)
 // 
 // From hoodie's frontend API perspective, every user has a store which
 // is private by default. Nobody but the user himself is able to access
 // this data, authenticated by a username and a password.
 // 
-// Above that, objects can selectively be set to be public. Entire objects
+// Beyond that, objects can selectively be set to be public. Entire objects
 // or only some of the attributes.
 
 // ## Step one: create or make an object public

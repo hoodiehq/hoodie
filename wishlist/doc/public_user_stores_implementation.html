@@ -1,10 +1,10 @@
-<!DOCTYPE html><html lang="en"><head><title>public_store_step_by_step</title></head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0"><meta name="groc-relative-root" content=""><meta name="groc-document-path" content="public_store_step_by_step"><meta name="groc-project-path" content="public_store_step_by_step.js"><link rel="stylesheet" type="text/css" media="all" href="assets/style.css"><script type="text/javascript" src="assets/behavior.js"></script><body><div id="meta"><div class="file-path">public_store_step_by_step.js</div></div><div id="document"><div class="segment"><div class="comments"><div class="wrapper"><h1 id="implementation-of-public-user-stores">Implementation of public user stores</h1>
+<!DOCTYPE html><html lang="en"><head><title>public_user_stores_implementation</title></head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0"><meta name="groc-relative-root" content=""><meta name="groc-document-path" content="public_user_stores_implementation"><meta name="groc-project-path" content="public_user_stores_implementation.js"><link rel="stylesheet" type="text/css" media="all" href="assets/style.css"><script type="text/javascript" src="assets/behavior.js"></script><body><div id="meta"><div class="file-path">public_user_stores_implementation.js</div></div><div id="document"><div class="segment"><div class="comments"><div class="wrapper"><h1 id="public-user-stores-implementation">Public User Stores (Implementation)</h1>
 
 <p>From hoodie's frontend API perspective, every user has a store which
 is private by default. Nobody but the user himself is able to access
 this data, authenticated by a username and a password.</p>
 
-<p>Above that, objects can selectively be set to be public. Entire objects
+<p>Beyond that, objects can selectively be set to be public. Entire objects
 or only some of the attributes.</p></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h2 id="step-one-create-or-make-an-object-public">Step one: create or make an object public</h2></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>We create a profile with a name and an email address. This will internally
 create and sync a CouchDB doc that looks like this:</p>
 

@@ -14,15 +14,15 @@ f.event={add:function(a,c,d,e,g){var h,i,j,k,l,m,n,o,p,q,r,s;if(!(a.nodeType===3
           "singleLineComment": ["//"],
           "name": "JavaScript"
         },
-        "sourcePath": "/Users/gregor/JavaScripts/hood.ie/hoodie-client.js/wishlist/public_store_photo_sharing_app.js",
-        "projectPath": "public_store_photo_sharing_app.js",
-        "targetPath": "public_store_photo_sharing_app",
+        "sourcePath": "/Users/gregor/JavaScripts/hood.ie/hoodie-client.js/wishlist/public_user_stores.js",
+        "projectPath": "public_user_stores.js",
+        "targetPath": "public_user_stores",
         "firstHeader": {
           "type": "heading",
           "data": {
             "level": 1,
-            "title": "example app: private instagram thingy",
-            "slug": "example-app-private-instagram-thingy",
+            "title": "Public User Stores",
+            "slug": "public-user-stores",
             "isFileHeader": true
           },
           "depth": 1,
@@ -31,46 +31,108 @@ f.event={add:function(a,c,d,e,g){var h,i,j,k,l,m,n,o,p,q,r,s;if(!(a.nodeType===3
               "type": "heading",
               "data": {
                 "level": 2,
-                "title": "Models",
-                "slug": "models"
+                "title": "Make objects public",
+                "slug": "make-objects-public"
               },
               "depth": 2
             }, {
               "type": "heading",
               "data": {
                 "level": 2,
-                "title": "Hoodie Challanges",
-                "slug": "hoodie-challanges"
+                "title": "Open public objects",
+                "slug": "open-public-objects"
               },
               "depth": 2
             }, {
               "type": "heading",
               "data": {
                 "level": 2,
-                "title": "Scenario 1",
-                "slug": "scenario-1"
+                "title": "use case1: private instagram-ish app",
+                "slug": "use-case1-private-instagram-ish-app"
               },
-              "depth": 2
+              "depth": 2,
+              "children": [
+                {
+                  "type": "heading",
+                  "data": {
+                    "level": 3,
+                    "title": "Scenario 1",
+                    "slug": "scenario-1"
+                  },
+                  "depth": 3
+                }, {
+                  "type": "heading",
+                  "data": {
+                    "level": 3,
+                    "title": "Scenario 2",
+                    "slug": "scenario-2"
+                  },
+                  "depth": 3
+                }, {
+                  "type": "heading",
+                  "data": {
+                    "level": 3,
+                    "title": "Scenario 3",
+                    "slug": "scenario-3"
+                  },
+                  "depth": 3
+                }, {
+                  "type": "heading",
+                  "data": {
+                    "level": 3,
+                    "title": "Scenario 4",
+                    "slug": "scenario-4"
+                  },
+                  "depth": 3
+                }
+              ]
             }, {
               "type": "heading",
               "data": {
                 "level": 2,
-                "title": "Scenario 2",
-                "slug": "scenario-2"
+                "title": "usecase 2: whiskie.net",
+                "slug": "usecase-2-whiskienet"
               },
-              "depth": 2
-            }, {
-              "type": "heading",
-              "data": {
-                "level": 2,
-                "title": "Scenario 3",
-                "slug": "scenario-3"
-              },
-              "depth": 2
+              "depth": 2,
+              "children": [
+                {
+                  "type": "heading",
+                  "data": {
+                    "level": 3,
+                    "title": "Scenario 1",
+                    "slug": "scenario-1"
+                  },
+                  "depth": 3
+                }, {
+                  "type": "heading",
+                  "data": {
+                    "level": 3,
+                    "title": "Scenario 2",
+                    "slug": "scenario-2"
+                  },
+                  "depth": 3
+                }, {
+                  "type": "heading",
+                  "data": {
+                    "level": 3,
+                    "title": "Scenario 3",
+                    "slug": "scenario-3"
+                  },
+                  "depth": 3
+                }, {
+                  "type": "heading",
+                  "data": {
+                    "level": 3,
+                    "title": "Scenario 4",
+                    "slug": "scenario-4"
+                  },
+                  "depth": 3
+                }
+              ]
             }
           ]
         },
-        "title": "example app: private instagram thingy"
+        "title": "Public User Stores"
       },
       "depth": 1,
       "outline": [
@@ -78,42 +140,104 @@ f.event={add:function(a,c,d,e,g){var h,i,j,k,l,m,n,o,p,q,r,s;if(!(a.nodeType===3
           "type": "heading",
           "data": {
             "level": 2,
-            "title": "Models",
-            "slug": "models"
+            "title": "Make objects public",
+            "slug": "make-objects-public"
           },
           "depth": 2
         }, {
           "type": "heading",
           "data": {
             "level": 2,
-            "title": "Hoodie Challanges",
-            "slug": "hoodie-challanges"
+            "title": "Open public objects",
+            "slug": "open-public-objects"
           },
           "depth": 2
         }, {
           "type": "heading",
           "data": {
             "level": 2,
-            "title": "Scenario 1",
-            "slug": "scenario-1"
+            "title": "use case1: private instagram-ish app",
+            "slug": "use-case1-private-instagram-ish-app"
           },
-          "depth": 2
+          "depth": 2,
+          "children": [
+            {
+              "type": "heading",
+              "data": {
+                "level": 3,
+                "title": "Scenario 1",
+                "slug": "scenario-1"
+              },
+              "depth": 3
+            }, {
+              "type": "heading",
+              "data": {
+                "level": 3,
+                "title": "Scenario 2",
+                "slug": "scenario-2"
+              },
+              "depth": 3
+            }, {
+              "type": "heading",
+              "data": {
+                "level": 3,
+                "title": "Scenario 3",
+                "slug": "scenario-3"
+              },
+              "depth": 3
+            }, {
+              "type": "heading",
+              "data": {
+                "level": 3,
+                "title": "Scenario 4",
+                "slug": "scenario-4"
+              },
+              "depth": 3
+            }
+          ]
         }, {
           "type": "heading",
           "data": {
             "level": 2,
-            "title": "Scenario 2",
-            "slug": "scenario-2"
+            "title": "usecase 2: whiskie.net",
+            "slug": "usecase-2-whiskienet"
           },
-          "depth": 2
-        }, {
-          "type": "heading",
-          "data": {
-            "level": 2,
-            "title": "Scenario 3",
-            "slug": "scenario-3"
-          },
-          "depth": 2
+          "depth": 2,
+          "children": [
+            {
+              "type": "heading",
+              "data": {
+                "level": 3,
+                "title": "Scenario 1",
+                "slug": "scenario-1"
+              },
+              "depth": 3
+            }, {
+              "type": "heading",
+              "data": {
+                "level": 3,
+                "title": "Scenario 2",
+                "slug": "scenario-2"
+              },
+              "depth": 3
+            }, {
+              "type": "heading",
+              "data": {
+                "level": 3,
+                "title": "Scenario 3",
+                "slug": "scenario-3"
+              },
+              "depth": 3
+            }, {
+              "type": "heading",
+              "data": {
+                "level": 3,
+                "title": "Scenario 4",
+                "slug": "scenario-4"
+              },
+              "depth": 3
+            }
+          ]
         }
       ]
     }, {
@@ -125,15 +249,15 @@ f.event={add:function(a,c,d,e,g){var h,i,j,k,l,m,n,o,p,q,r,s;if(!(a.nodeType===3
           "singleLineComment": ["//"],
           "name": "JavaScript"
         },
-        "sourcePath": "/Users/gregor/JavaScripts/hood.ie/hoodie-client.js/wishlist/public_store_step_by_step.js",
-        "projectPath": "public_store_step_by_step.js",
-        "targetPath": "public_store_step_by_step",
+        "sourcePath": "/Users/gregor/JavaScripts/hood.ie/hoodie-client.js/wishlist/public_user_stores_implementation.js",
+        "projectPath": "public_user_stores_implementation.js",
+        "targetPath": "public_user_stores_implementation",
         "firstHeader": {
           "type": "heading",
           "data": {
             "level": 1,
-            "title": "Implementation of public user stores",
-            "slug": "implementation-of-public-user-stores",
+            "title": "Public User Stores (Implementation)",
+            "slug": "public-user-stores-implementation",
             "isFileHeader": true
           },
           "depth": 1,
@@ -165,7 +289,7 @@ f.event={add:function(a,c,d,e,g){var h,i,j,k,l,m,n,o,p,q,r,s;if(!(a.nodeType===3
             }
           ]
         },
-        "title": "Implementation of public user stores"
+        "title": "Public User Stores (Implementation)"
       },
       "depth": 1,
       "outline": [
@@ -191,133 +315,6 @@ f.event={add:function(a,c,d,e,g){var h,i,j,k,l,m,n,o,p,q,r,s;if(!(a.nodeType===3
             "level": 2,
             "title": "the worker",
             "slug": "the-worker"
-          },
-          "depth": 2
-        }
-      ]
-    }, {
-      "type": "file",
-      "data": {
-        "language": {
-          "nameMatchers": [".js"],
-          "pygmentsLexer": "javascript",
-          "singleLineComment": ["//"],
-          "name": "JavaScript"
-        },
-        "sourcePath": "/Users/gregor/JavaScripts/hood.ie/hoodie-client.js/wishlist/public_user_and_global_stores.js",
-        "projectPath": "public_user_and_global_stores.js",
-        "targetPath": "public_user_and_global_stores",
-        "firstHeader": {
-          "type": "heading",
-          "data": {
-            "level": 1,
-            "title": "example app: whiskie.net",
-            "slug": "example-app-whiskienet",
-            "isFileHeader": true
-          },
-          "depth": 1,
-          "children": [
-            {
-              "type": "heading",
-              "data": {
-                "level": 2,
-                "title": "Models",
-                "slug": "models"
-              },
-              "depth": 2
-            }, {
-              "type": "heading",
-              "data": {
-                "level": 2,
-                "title": "Hoodie Challanges",
-                "slug": "hoodie-challanges"
-              },
-              "depth": 2
-            }, {
-              "type": "heading",
-              "data": {
-                "level": 2,
-                "title": "Scenario 1",
-                "slug": "scenario-1"
-              },
-              "depth": 2
-            }, {
-              "type": "heading",
-              "data": {
-                "level": 2,
-                "title": "Scenario 2",
-                "slug": "scenario-2"
-              },
-              "depth": 2
-            }, {
-              "type": "heading",
-              "data": {
-                "level": 2,
-                "title": "Scenario 3",
-                "slug": "scenario-3"
-              },
-              "depth": 2
-            }, {
-              "type": "heading",
-              "data": {
-                "level": 2,
-                "title": "Scenario 4",
-                "slug": "scenario-4"
-              },
-              "depth": 2
-            }
-          ]
-        },
-        "title": "example app: whiskie.net"
-      },
-      "depth": 1,
-      "outline": [
-        {
-          "type": "heading",
-          "data": {
-            "level": 2,
-            "title": "Models",
-            "slug": "models"
-          },
-          "depth": 2
-        }, {
-          "type": "heading",
-          "data": {
-            "level": 2,
-            "title": "Hoodie Challanges",
-            "slug": "hoodie-challanges"
-          },
-          "depth": 2
-        }, {
-          "type": "heading",
-          "data": {
-            "level": 2,
-            "title": "Scenario 1",
-            "slug": "scenario-1"
-          },
-          "depth": 2
-        }, {
-          "type": "heading",
-          "data": {
-            "level": 2,
-            "title": "Scenario 2",
-            "slug": "scenario-2"
-          },
-          "depth": 2
-        }, {
-          "type": "heading",
-          "data": {
-            "level": 2,
-            "title": "Scenario 3",
-            "slug": "scenario-3"
-          },
-          "depth": 2
-        }, {
-          "type": "heading",
-          "data": {
-            "level": 2,
-            "title": "Scenario 4",
-            "slug": "scenario-4"
           },
           "depth": 2
         }
@@ -549,6 +546,32 @@ f.event={add:function(a,c,d,e,g){var h,i,j,k,l,m,n,o,p,q,r,s;if(!(a.nodeType===3
               "depth": 3
             }
           ]
+        }
+      ]
+    }, {
+      "type": "file",
+      "data": {
+        "language": {
+          "nameMatchers": [".js"],
+          "pygmentsLexer": "javascript",
+          "singleLineComment": ["//"],
+          "name": "JavaScript"
+        },
+        "sourcePath": "/Users/gregor/JavaScripts/hood.ie/hoodie-client.js/wishlist/subscription.js",
+        "projectPath": "subscription.js",
+        "targetPath": "subscription",
+        "title": "subscription"
+      },
+      "depth": 1,
+      "outline": [
+        {
+          "type": "heading",
+          "data": {
+            "level": 3,
+            "title": "Usecase 8: Share Subscriptions",
+            "slug": "usecase-8-share-subscriptions"
+          },
+          "depth": 3
         }
       ]
     }

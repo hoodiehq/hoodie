@@ -258,20 +258,16 @@ hoodie.share.open( "mytodolist123", {password: "secret"} )
 
 // ### Usecase 8: Share Subscriptions
 
-// I can subscribe to a share by others. It can be used just like the `open`
-// method, with the difference that an internal $shareAccess object will be 
-// added to my store. This allows me to get a list of all shares I've access 
-// to.
-hoodie.share.subscription.create("share_id")
+// I can subscribe to a share by others using the subscription module.
+hoodie.subscription.create("share_id")
 
 /* or */
 hoodie.share.open( "share_id" ).done( function(share) {
   share.subscribe()
 })
 
-// I can pass options when creating a subscription, like password for protected
-// shares or continuous if I want to continuously synchronize with the 
-// share 
+// I can pass options when creating a subscription, like a password for 
+// protected shares or continuous if I want to continuously synchronize with // the share 
 hoodie.share.subscription.create("share_id", {
   continuous: true,
   password: "secret"
@@ -282,13 +278,11 @@ hoodie.share.subscription.create("share_id", {
 
 // I can open a share and listen to changes of its containing objects
 // 
-app.share.open( "shared_id" ).done( function(share) {
-  share.on('changed',        function(object) { /* ... */ })
-  share.on('changed:type',   function(object) { /* ... */ })
-  share.on('created',        function(object) { /* ... */ })
-  share.on('created:type',   function(object) { /* ... */ })
-  share.on('updated',        function(object) { /* ... */ })
-  share.on('updated:type',   function(object) { /* ... */ })
-  share.on('destroyed',      function(object) { /* ... */ })
-  share.on('destroyed:type', function(object) { /* ... */ })
-})
+hoodie.share.on('shared_id', 'changed',        function(object) { /* ... */ })
+hoodie.share.on('shared_id', 'changed:type',   function(object) { /* ... */ })
+hoodie.share.on('shared_id', 'created',        function(object) { /* ... */ })
+hoodie.share.on('shared_id', 'created:type',   function(object) { /* ... */ })
+hoodie.share.on('shared_id', 'updated',        function(object) { /* ... */ })
+hoodie.share.on('shared_id', 'updated:type',   function(object) { /* ... */ })
+hoodie.share.on('shared_id', 'destroyed',      function(object) { /* ... */ })
+hoodie.share.on('shared_id', 'destroyed:type', function(object) { /* ... */ })
