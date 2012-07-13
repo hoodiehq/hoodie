@@ -331,15 +331,15 @@ f.event={add:function(a,c,d,e,g){var h,i,j,k,l,m,n,o,p,q,r,s;if(!(a.nodeType===3
           "singleLineComment": ["//"],
           "name": "JavaScript"
         },
-        "sourcePath": "/Users/gregor/JavaScripts/hood.ie/hoodie-client.js/wishlist/sharing.js",
-        "projectPath": "sharing.js",
-        "targetPath": "sharing",
+        "sourcePath": "/Users/gregor/JavaScripts/hood.ie/hoodie-client.js/wishlist/share.js",
+        "projectPath": "share.js",
+        "targetPath": "share",
         "firstHeader": {
           "type": "heading",
           "data": {
             "level": 1,
-            "title": "Sharing",
-            "slug": "sharing",
+            "title": "Share",
+            "slug": "share",
             "isFileHeader": true
           },
           "depth": 1,
@@ -348,8 +348,8 @@ f.event={add:function(a,c,d,e,g){var h,i,j,k,l,m,n,o,p,q,r,s;if(!(a.nodeType===3
               "type": "heading",
               "data": {
                 "level": 2,
-                "title": "Sharing objects",
-                "slug": "sharing-objects"
+                "title": "Share objects",
+                "slug": "share-objects"
               },
               "depth": 2,
               "children": [
@@ -357,72 +357,72 @@ f.event={add:function(a,c,d,e,g){var h,i,j,k,l,m,n,o,p,q,r,s;if(!(a.nodeType===3
                   "type": "heading",
                   "data": {
                     "level": 3,
-                    "title": "Usecase 1: Public Sharing",
-                    "slug": "usecase-1-public-sharing"
+                    "title": "Usecase 1: Public Share",
+                    "slug": "usecase-1-public-share"
                   },
                   "depth": 3
                 }, {
                   "type": "heading",
                   "data": {
                     "level": 3,
-                    "title": "Usecase 2: Private Sharing",
-                    "slug": "usecase-2-private-sharing"
+                    "title": "Usecase 2: Private Share",
+                    "slug": "usecase-2-private-share"
                   },
                   "depth": 3
                 }, {
                   "type": "heading",
                   "data": {
                     "level": 3,
-                    "title": "Usecase 3: Continuous Sharing",
-                    "slug": "usecase-3-continuous-sharing"
+                    "title": "Usecase 3: Continuous Share",
+                    "slug": "usecase-3-continuous-share"
                   },
                   "depth": 3
                 }, {
                   "type": "heading",
                   "data": {
                     "level": 3,
-                    "title": "Usecase 4: Manual Sharing",
-                    "slug": "usecase-4-manual-sharing"
+                    "title": "Usecase 4: Manual Share",
+                    "slug": "usecase-4-manual-share"
                   },
                   "depth": 3
                 }, {
                   "type": "heading",
                   "data": {
                     "level": 3,
-                    "title": "Usecase 5: Read only Sharing",
-                    "slug": "usecase-5-read-only-sharing"
+                    "title": "Usecase 5: Read only Share",
+                    "slug": "usecase-5-read-only-share"
                   },
                   "depth": 3
                 }, {
                   "type": "heading",
                   "data": {
                     "level": 3,
-                    "title": "Usecase 6: Collaborative Sharings",
-                    "slug": "usecase-6-collaborative-sharings"
+                    "title": "Usecase 6: Collaborative Shares",
+                    "slug": "usecase-6-collaborative-shares"
                   },
                   "depth": 3
                 }, {
                   "type": "heading",
                   "data": {
                     "level": 3,
-                    "title": "Usecase 7: Public, password protected sharings",
-                    "slug": "usecase-7-public-password-protected-sharings"
+                    "title": "Usecase 7: Public, password protected shares",
+                    "slug": "usecase-7-public-password-protected-shares"
                   },
                   "depth": 3
                 }, {
                   "type": "heading",
                   "data": {
                     "level": 3,
-                    "title": "Usecase 8: Sharing Subscriptions",
-                    "slug": "usecase-8-sharing-subscriptions"
+                    "title": "Usecase 8: Share Subscriptions",
+                    "slug": "usecase-8-share-subscriptions"
                   },
                   "depth": 3
                 }, {
                   "type": "heading",
                   "data": {
                     "level": 3,
-                    "title": "Usecase 9: Subscribing to events in Sharings",
-                    "slug": "usecase-9-subscribing-to-events-in-sharings"
+                    "title": "Usecase 9: Subscribing to events in Shares",
+                    "slug": "usecase-9-subscribing-to-events-in-shares"
                   },
                   "depth": 3
                 }
@@ -430,7 +430,7 @@ f.event={add:function(a,c,d,e,g){var h,i,j,k,l,m,n,o,p,q,r,s;if(!(a.nodeType===3
             }
           ]
         },
-        "title": "Sharing"
+        "title": "Share"
       },
       "depth": 1,
       "outline": [
@@ -438,8 +438,8 @@ f.event={add:function(a,c,d,e,g){var h,i,j,k,l,m,n,o,p,q,r,s;if(!(a.nodeType===3
           "type": "heading",
           "data": {
             "level": 2,
-            "title": "Sharing objects",
-            "slug": "sharing-objects"
+            "title": "Share objects",
+            "slug": "share-objects"
           },
           "depth": 2,
           "children": [
@@ -447,72 +447,72 @@ f.event={add:function(a,c,d,e,g){var h,i,j,k,l,m,n,o,p,q,r,s;if(!(a.nodeType===3
               "type": "heading",
               "data": {
                 "level": 3,
-                "title": "Usecase 1: Public Sharing",
-                "slug": "usecase-1-public-sharing"
+                "title": "Usecase 1: Public Share",
+                "slug": "usecase-1-public-share"
               },
               "depth": 3
             }, {
               "type": "heading",
               "data": {
                 "level": 3,
-                "title": "Usecase 2: Private Sharing",
-                "slug": "usecase-2-private-sharing"
+                "title": "Usecase 2: Private Share",
+                "slug": "usecase-2-private-share"
               },
               "depth": 3
             }, {
               "type": "heading",
               "data": {
                 "level": 3,
-                "title": "Usecase 3: Continuous Sharing",
-                "slug": "usecase-3-continuous-sharing"
+                "title": "Usecase 3: Continuous Share",
+                "slug": "usecase-3-continuous-share"
               },
               "depth": 3
             }, {
               "type": "heading",
               "data": {
                 "level": 3,
-                "title": "Usecase 4: Manual Sharing",
-                "slug": "usecase-4-manual-sharing"
+                "title": "Usecase 4: Manual Share",
+                "slug": "usecase-4-manual-share"
               },
               "depth": 3
             }, {
               "type": "heading",
               "data": {
                 "level": 3,
-                "title": "Usecase 5: Read only Sharing",
-                "slug": "usecase-5-read-only-sharing"
+                "title": "Usecase 5: Read only Share",
+                "slug": "usecase-5-read-only-share"
               },
               "depth": 3
             }, {
               "type": "heading",
               "data": {
                 "level": 3,
-                "title": "Usecase 6: Collaborative Sharings",
-                "slug": "usecase-6-collaborative-sharings"
+                "title": "Usecase 6: Collaborative Shares",
+                "slug": "usecase-6-collaborative-shares"
               },
               "depth": 3
             }, {
               "type": "heading",
               "data": {
                 "level": 3,
-                "title": "Usecase 7: Public, password protected sharings",
-                "slug": "usecase-7-public-password-protected-sharings"
+                "title": "Usecase 7: Public, password protected shares",
+                "slug": "usecase-7-public-password-protected-shares"
               },
               "depth": 3
             }, {
               "type": "heading",
               "data": {
                 "level": 3,
-                "title": "Usecase 8: Sharing Subscriptions",
-                "slug": "usecase-8-sharing-subscriptions"
+                "title": "Usecase 8: Share Subscriptions",
+                "slug": "usecase-8-share-subscriptions"
               },
               "depth": 3
             }, {
               "type": "heading",
               "data": {
                 "level": 3,
-                "title": "Usecase 9: Subscribing to events in Sharings",
-                "slug": "usecase-9-subscribing-to-events-in-sharings"
+                "title": "Usecase 9: Subscribing to events in Shares",
+                "slug": "usecase-9-subscribing-to-events-in-shares"
               },
               "depth": 3
             }
