@@ -161,7 +161,7 @@ function changes_doc_parser(obj) {
       var newObj = {},
           defaultPublicAtts = ['_ref', 'type']
 
-      obj.$public.concat(defaultPublicAtts)
+      obj.$public = obj.$public.concat(defaultPublicAtts)
       for (var i = 0, attr; i < obj.$public.length; i++) {
         attr = obj.$public[i]
         newObj[attr] = obj[attr]
