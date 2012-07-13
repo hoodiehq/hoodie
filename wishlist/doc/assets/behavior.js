@@ -348,8 +348,24 @@ f.event={add:function(a,c,d,e,g){var h,i,j,k,l,m,n,o,p,q,r,s;if(!(a.nodeType===3
               "type": "heading",
               "data": {
                 "level": 2,
-                "title": "Share objects",
-                "slug": "share-objects"
+                "title": "Share options",
+                "slug": "share-options"
+              },
+              "depth": 2
+            }, {
+              "type": "heading",
+              "data": {
+                "level": 2,
+                "title": "Share API",
+                "slug": "share-api"
+              },
+              "depth": 2
+            }, {
+              "type": "heading",
+              "data": {
+                "level": 2,
+                "title": "Use cases",
+                "slug": "use-cases"
               },
               "depth": 2,
               "children": [
@@ -438,8 +454,24 @@ f.event={add:function(a,c,d,e,g){var h,i,j,k,l,m,n,o,p,q,r,s;if(!(a.nodeType===3
           "type": "heading",
           "data": {
             "level": 2,
-            "title": "Share objects",
-            "slug": "share-objects"
+            "title": "Share options",
+            "slug": "share-options"
+          },
+          "depth": 2
+        }, {
+          "type": "heading",
+          "data": {
+            "level": 2,
+            "title": "Share API",
+            "slug": "share-api"
+          },
+          "depth": 2
+        }, {
+          "type": "heading",
+          "data": {
+            "level": 2,
+            "title": "Use cases",
+            "slug": "use-cases"
           },
           "depth": 2,
           "children": [
