@@ -2,7 +2,7 @@
 
 // Sharing
 // ==========
-//
+
 // A sharing has 3 main paramters, that can be combined with each other:
 // 
 //     private:       true || false
@@ -58,7 +58,7 @@
 
 // Sharing objects
 // -----------------
-// 
+
 // A sharing has its own internal object, used only by hoodie. To create a
 // new sharing with default settings, use this syntax:
 hoodie.sharing.create().done( function(sharing) {
@@ -98,8 +98,8 @@ hoodie.sharing.open("sharing_id").done( function(sharing) {
 })
 
 
-// 1. Public Sharing
-// 
+// ### Usecase 1: Public Sharing
+
 // Let's say we have a todolist with id "tl11111" that we want to share 
 // publicly with others with an secret URL. First we add the todolist
 // (by passing an object with the respective type & id) and the we
@@ -116,8 +116,8 @@ hoodie.sharing.create({public: true})
 })
 
 
-// 2. Private Sharing
-// 
+// ### Usecase 2: Private Sharing
+
 // Let's say I've another todolist with id "ptl2222" that I want to share only 
 // with my collegues aj@example.com and bj@example.com. I want the todolist to
 // to be accessible for AJ, BJ and myself only.
@@ -131,8 +131,8 @@ hoodie.sharing.create({collaborators: ["aj@example.com", "bj@example.com"]})
 })
 
 
-// 3. Continuous Sharing
-// 
+// ### Usecase 3: Continuous Sharing
+
 // If you don't want to manually pull and push changes to shared objects, you
 // can set the sharing to be continuous
 hoodie.sharing.create( {continuous: true} )
@@ -147,8 +147,8 @@ hoodie.sharing.create( {continuous: true} )
 })
 
 
-// 4. Manual Sharing
-// 
+// ### Usecase 4: Manual Sharing
+
 // Manual sharing means you have to manually push and pull changes of shared
 // objects, it's the default behavior. Each of the following methods returns
 // a promise
@@ -158,8 +158,8 @@ hoodie.sharing.pull("sharing_id")
 hoodie.sharing.sync("sharing_id") // push & pull
 
 
-// 5. Read only Sharing
-// 
+// ### Usecase 5: Read only Sharing
+
 // Sharings are read only be default. This means others can see the shared
 // objects (if they have access), but they cannot make changes to them, or 
 // to be precise, they cannot push their local changes
@@ -167,8 +167,8 @@ hoodie.sharing.sync("sharing_id") // push & pull
 hoodie.sharing.push( "sharing_id" ) // will fail for other users
 
 
-// 6. Collaborative Sharings
-// 
+// ### Usecase 6: Collaborative Sharings
+
 // If I want to invite others to collaborate on my objects, I need to set the
 // collaborative setting to true
 // 
@@ -179,8 +179,8 @@ hoodie.sharing.create( {collaborative: true} )
 })
 
 
-// 7. Public, password protected sharings
-// 
+// ### Usecase 7: Public, password protected sharings
+
 // I can optionally assign a password to a sharing that needs to be provided by
 // others when trying to accessing it:
 /* me */
@@ -196,8 +196,8 @@ hoodie.sharing.open( "mytodolist123", {password: "secret"} )
   alert("welcome to my todolist!")
 })
 
-// 8. Sharing Subscriptions
-// 
+// ### Usecase 8: Sharing Subscriptions
+
 // I can subscribe to a sharing by others. It can be used just like the `open`
 // method, with the difference that an internal $sharingAccess object will be 
 // added to my store. This allows me to get a list of all sharings I've access 
@@ -218,8 +218,8 @@ hoodie.sharing.subscription.create("sharing_id", {
 })
 
 
-// 9. Subscribing to events in Sharings
-// 
+// ### Usecase 9: Subscribing to events in Sharings
+
 // I can open a sharing and listen to changes of its containing objects
 // 
 app.sharing.open( "shared_id" ).done( function(sharing) {
