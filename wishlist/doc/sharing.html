@@ -1,8 +1,8 @@
-<!DOCTYPE html><html lang="en"><head><title>sharing</title></head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0"><meta name="groc-relative-root" content=""><meta name="groc-document-path" content="sharing"><meta name="groc-project-path" content="sharing.js"><link rel="stylesheet" type="text/css" media="all" href="assets/style.css"><script type="text/javascript" src="assets/behavior.js"></script><body><div id="meta"><div class="file-path">sharing.js</div></div><div id="document"><div class="segment"></div><div class="segment"><div class="comments"><div class="wrapper"><h1 id="sharing">Sharing</h1></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>A sharing has 3 main paramters, that can be combined with each other:</p>
+<!DOCTYPE html><html lang="en"><head><title>sharing</title></head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0"><meta name="groc-relative-root" content=""><meta name="groc-document-path" content="sharing"><meta name="groc-project-path" content="sharing.js"><link rel="stylesheet" type="text/css" media="all" href="assets/style.css"><script type="text/javascript" src="assets/behavior.js"></script><body><div id="meta"><div class="file-path">sharing.js</div></div><div id="document"><div class="segment"><div class="comments"><div class="wrapper"><h1 id="sharing">Sharing</h1></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>A sharing has 3 main paramters, that can be combined with each other:</p>
 
 <pre><code>private:       true || false
 continuous:    true || false
-collaborative: true || false`
+collaborative: true || false
 </code></pre>
 
 <p>As examples we take a todo app where I can create muliple todo lists that 
@@ -21,7 +21,7 @@ URL.</p></li>
 
 <p>I want updates to my shared objects to be continuously synchronized.
 If I made a change I want it to be pushed immediately and if one of
-the collaborators made a chagne I want his changes to appear immediately
+the collaborators made a change I want his changes to appear immediately
 in my store.</p></li>
 <li><p>Manual Sharing</p>
 
@@ -40,12 +40,10 @@ private and public sharings.</p></li>
 a password to access the shared objects</p></li>
 <li><p>Subscribe to a Sharing</p>
 
-<p>Persistant access to sharings by others</p></li>
+<p>Persistent access to sharings by others</p></li>
 <li><p>Subscribing to events in Sharings</p></li>
 </ol></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h2 id="sharing-objects">Sharing objects</h2></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>A sharing has its own internal object, used only by hoodie. To create a
-new sharing with default settings, use this syntax:</p></div></div><div class="code"><div class="wrapper"><span class="nx">hoodie</span><span class="p">.</span><span class="nx">sharing</span><span class="p">.</span><span class="nx">create</span><span class="p">().</span><span class="nx">done</span><span class="p">(</span> <span class="kd">function</span><span class="p">(</span><span class="nx">sharing</span><span class="p">)</span> <span class="p">{</span>
-  <span class="nx">alert</span><span class="p">(</span><span class="s1">&#39;your data has been shared.&#39;</span><span class="p">)</span>
-<span class="p">})</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>Sharings are a special (hidden) type of hoodie objects, identified by 
+new sharing with default settings, use this syntax:</p></div></div><div class="code"><div class="wrapper"><span class="nx">hoodie</span><span class="p">.</span><span class="nx">sharing</span><span class="p">.</span><span class="nx">create</span><span class="p">().</span><span class="nx">done</span><span class="p">(</span> <span class="kd">function</span><span class="p">(</span><span class="nx">sharing</span><span class="p">)</span> <span class="p">{</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>sharing instance initiated, ready to add/remove objects</p></div></div><div class="code"><div class="wrapper"><span class="p">})</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>Sharings are a special (hidden) type of hoodie objects, identified by 
 the <code>$sharing</code> type. In general, objects of types starting with a <code>$</code>
 are hidden objects, mostly used to trigger actions in the workers.</p></div></div><div class="code"><div class="wrapper"><span class="p">{</span>
   <span class="nx">id</span>            <span class="o">:</span> <span class="s2">&quot;abc4567&quot;</span><span class="p">,</span>
@@ -56,7 +54,7 @@ are hidden objects, mostly used to trigger actions in the workers.</p></div></di
 
   <span class="nx">created_at</span>    <span class="o">:</span> <span class="s2">&quot;2012-03-29T20:01:58.331Z&quot;</span><span class="p">,</span>
   <span class="nx">updated_at</span>    <span class="o">:</span> <span class="s2">&quot;2012-03-29T20:01:58.331Z&quot;</span> 
-<span class="p">}</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>To add one or multiple objects to a sharing, <code>use</code> the add method. Use the
+<span class="p">}</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>To add one or multiple objects to a sharing, use the <code>add</code> method. Use the
 <code>remove</code> method to unshare documents again</p></div></div><div class="code"><div class="wrapper"><span class="nx">hoodie</span><span class="p">.</span><span class="nx">sharing</span><span class="p">.</span><span class="nx">open</span><span class="p">(</span><span class="s2">&quot;sharing_id&quot;</span><span class="p">).</span><span class="nx">done</span><span class="p">(</span> <span class="kd">function</span><span class="p">(</span><span class="nx">sharing</span><span class="p">)</span> <span class="p">{</span>
   <span class="nx">sharing</span><span class="p">.</span><span class="nx">add</span><span class="p">([</span><span class="nx">todolist1</span><span class="p">,</span> <span class="nx">todolist2</span><span class="p">])</span>
   <span class="nx">sharing</span><span class="p">.</span><span class="nx">remove</span><span class="p">([</span><span class="nx">todolist3</span><span class="p">])</span>
@@ -85,7 +83,7 @@ to be accessible for AJ, BJ and myself only.</p></div></div><div class="code"><d
 
   <span class="nx">sharing_url</span> <span class="o">=</span> <span class="s2">&quot;http://mytodoapp.com/shared/&quot;</span> <span class="o">+</span> <span class="nx">sharing</span><span class="p">.</span><span class="nx">id</span>
   <span class="nx">alert</span><span class="p">(</span><span class="s2">&quot;AJ and BJ can access the todolist at &quot;</span> <span class="o">+</span> <span class="nx">sharing_url</span><span class="p">)</span>
-<span class="p">})</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h3 id="usecase-3-continuous-sharing">Usecase 3: Continuous Sharing</h3></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>If you don't want to manually pull and push changes to shared objects, you
+<span class="p">})</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h3 id="usecase-3-continuous-sharing">Usecase 3: Continuous Sharing</h3></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>If you don't want to manually pull and push changes of shared objects, you
 can set the sharing to be continuous</p></div></div><div class="code"><div class="wrapper"><span class="nx">hoodie</span><span class="p">.</span><span class="nx">sharing</span><span class="p">.</span><span class="nx">create</span><span class="p">(</span> <span class="p">{</span><span class="nx">continuous</span><span class="o">:</span> <span class="kc">true</span><span class="p">}</span> <span class="p">)</span>
 <span class="p">.</span><span class="nx">done</span><span class="p">(</span> <span class="kd">function</span><span class="p">(</span><span class="nx">sharing</span><span class="p">){</span>
   <span class="nx">hoodie</span><span class="p">.</span><span class="nx">store</span><span class="p">.</span><span class="nx">load</span><span class="p">(</span><span class="s2">&quot;todolist&quot;</span><span class="p">,</span> <span class="nx">id</span><span class="o">:</span> <span class="s2">&quot;tl11111&quot;</span><span class="p">)</span>

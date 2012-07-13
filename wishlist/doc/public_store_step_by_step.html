@@ -51,7 +51,7 @@ The resulting CouchDB doc will look like this:</p>
 }
 </code></pre></div></div><div class="code"><div class="wrapper"><span class="nx">hoodie</span><span class="p">.</span><span class="nx">my</span><span class="p">.</span><span class="nx">store</span><span class="p">.</span><span class="nx">update</span><span class="p">(</span><span class="s2">&quot;profile&quot;</span><span class="p">,</span> <span class="s2">&quot;uuid567&quot;</span><span class="p">,</span> <span class="p">{},</span> <span class="p">{</span> <span class="kr">public</span><span class="o">:</span> <span class="p">[</span><span class="s2">&quot;name&quot;</span><span class="p">]</span> <span class="p">})</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>when you want to make an object private again, simply set public to false.
 We now could simply remove the $public attribut, but we intentionally set
-it to false, otherwise the public store worke would ignore it (see blelow)</p>
+it to false, otherwise the public store worker would ignore it (see blelow)</p>
 
 <pre><code>{
   "_id"       : "profile/uuid567",
@@ -96,8 +96,8 @@ turn it into the following doc:</p></div></div><div class="code"><div class="wra
   <span class="s2">&quot;_ref&quot;</span>      <span class="o">:</span> <span class="s2">&quot;2-cr3m5g8&quot;</span><span class="p">,</span>
   <span class="s2">&quot;type&quot;</span>      <span class="o">:</span> <span class="s2">&quot;profile&quot;</span><span class="p">,</span>
   <span class="s2">&quot;name&quot;</span>      <span class="o">:</span> <span class="s2">&quot;Joe Doe&quot;</span>
-<span class="p">}</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>When a user makes a public object private again the <code>$private</code> attribute
-will be set to false as mentioned above. he public store worker would
+<span class="p">}</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>When a user makes a public object private again the <code>$public</code> attribute
+will be set to false as mentioned above. The public store worker would
 turn it into the following doc, which will remove it form the public store</p></div></div><div class="code"><div class="wrapper"><span class="p">{</span>
   <span class="s2">&quot;_id&quot;</span>       <span class="o">:</span> <span class="s2">&quot;$public/profile/uuid567&quot;</span><span class="p">,</span>
   <span class="s2">&quot;_ref&quot;</span>      <span class="o">:</span> <span class="s2">&quot;2-cr3m5g8&quot;</span><span class="p">,</span>
