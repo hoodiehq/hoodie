@@ -60,7 +60,7 @@
 // A sharing has its own internal object, used only by hoodie. To create a
 // new sharing with default settings, use this syntax:
 hoodie.sharing.create().done( function(sharing) {
-  alert('your data has been shared.')
+  // sharing instance initiated, ready to add/remove objects
 })
 
 // Sharings are a special (hidden) type of hoodie objects, identified by 
@@ -79,7 +79,7 @@ hoodie.sharing.create().done( function(sharing) {
   updated_at    : "2012-03-29T20:01:58.331Z" 
 }
 
-// To add one or multiple objects to a sharing, `use` the add method. Use the
+// To add one or multiple objects to a sharing, use the `add` method. Use the
 // `remove` method to unshare documents again
 hoodie.sharing.open("sharing_id").done( function(sharing) {
   sharing.add([todolist1, todolist2])
