@@ -1,5 +1,3 @@
-
-
 // Sharing
 // ==========
 
@@ -7,7 +5,7 @@
 // 
 //     private:       true || false
 //     continuous:    true || false
-//     collaborative: true || false`
+//     collaborative: true || false
 // 
 // As examples we take a todo app where I can create muliple todo lists that 
 // can be shared in different ways. We'll make uses case for each possible
@@ -26,7 +24,7 @@
 // 
 //    I want updates to my shared objects to be continuously synchronized.
 //    If I made a change I want it to be pushed immediately and if one of
-//    the collaborators made a chagne I want his changes to appear immediately
+//    the collaborators made a change I want his changes to appear immediately
 //    in my store.
 // 
 // 4. Manual Sharing
@@ -50,7 +48,7 @@
 // 
 // 8. Subscribe to a Sharing
 // 
-//    Persistant access to sharings by others
+//    Persistent access to sharings by others
 // 
 // 9. Subscribing to events in Sharings
 // 
@@ -133,7 +131,7 @@ hoodie.sharing.create({collaborators: ["aj@example.com", "bj@example.com"]})
 
 // ### Usecase 3: Continuous Sharing
 
-// If you don't want to manually pull and push changes to shared objects, you
+// If you don't want to manually pull and push changes of shared objects, you
 // can set the sharing to be continuous
 hoodie.sharing.create( {continuous: true} )
 .done( function(sharing){
