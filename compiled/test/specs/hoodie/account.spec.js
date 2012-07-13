@@ -249,7 +249,7 @@ describe("Hoodie.Account", function() {
         return expect(this.hoodie.trigger).wasCalledWith('account:signup', 'joe@example.com');
       });
       it("should sign in", function() {
-        spyOn(this.account, 'signin').andReturn({
+        spyOn(this.account, 'signIn').andReturn({
           then: function() {}
         });
         this.account.signUp('joe@example.com', 'secret');

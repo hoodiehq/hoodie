@@ -218,7 +218,7 @@ describe "Hoodie.Account", ->
         expect(@hoodie.trigger).wasCalledWith 'account:signup', 'joe@example.com'
         
       it "should sign in", ->
-        spyOn(@account, 'signin').andReturn then: ->
+        spyOn(@account, 'signIn').andReturn then: ->
         @account.signUp 'joe@example.com', 'secret'
         expect(@account.signIn).wasCalledWith 'joe@example.com', 'secret'
         
