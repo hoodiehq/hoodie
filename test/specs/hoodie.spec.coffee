@@ -5,7 +5,7 @@ describe "Hoodie", ->
   
   
   describe "new", ->
-    it "should store the couchDB URL", ->
+    it "should store the CouchDB URL", ->
       hoodie = new Hoodie 'http://couch.example.com'
       expect(hoodie.baseUrl).toBe 'http://couch.example.com'
       
@@ -13,7 +13,7 @@ describe "Hoodie", ->
       hoodie = new Hoodie 'http://couch.example.com/'
       expect(hoodie.baseUrl).toBe 'http://couch.example.com'
       
-    it "should default the couchDB URL to ''", ->
+    it "should default the CouchDB URL to ''", ->
       hoodie = new Hoodie
       expect(hoodie.baseUrl).toBe ''
     

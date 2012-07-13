@@ -66,7 +66,7 @@ class Hoodie.Account
     
   # ## sign up with username & password
   #
-  # uses standard couchDB API to create a new document in _users db.
+  # uses standard CouchDB API to create a new document in _users db.
   # The backend will automatically create a userDB based on the username
   # address.
   #
@@ -98,7 +98,7 @@ class Hoodie.Account
 
   # ## sign in with username & password
   #
-  # uses standard couchDB API to create a new user session (POST /_session)
+  # uses standard CouchDB API to create a new user session (POST /_session)
   #
   signIn : (username, password = '') ->
     defer = @hoodie.defer()
@@ -156,7 +156,7 @@ class Hoodie.Account
 
   # ## sign out 
   #
-  # uses standard couchDB API to destroy a user session (DELETE /_session)
+  # uses standard CouchDB API to destroy a user session (DELETE /_session)
   #
   # TODO: handle errors
   signOut: ->
@@ -176,7 +176,7 @@ class Hoodie.Account
   # ## db
   #
   # escape user username (or what ever he uses to sign up)
-  # to make it a valid couchDB database name
+  # to make it a valid CouchDB database name
   # 
   #     Converts an username address user name to a valid database name
   #     The character replacement rules are:
@@ -232,7 +232,7 @@ class Hoodie.Account
   #
   _prefix : 'org.couchdb.user'
   
-  # couchDB _users doc
+  # CouchDB _users doc
   _doc : {}
   
   #

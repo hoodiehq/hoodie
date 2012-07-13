@@ -48,7 +48,7 @@ window.setTimeout @authenticate</p></div></div><div class="code"><div class="wra
     
     </div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h2 id="sign-up-with-username-amp-password">sign up with username &amp; password</h2>
 
-<p>uses standard couchDB API to create a new document in _users db.
+<p>uses standard CouchDB API to create a new document in _users db.
 The backend will automatically create a userDB based on the username
 address.</p></div></div><div class="code"><div class="wrapper">  <span class="nv">signUp : </span><span class="nf">(username, password = &#39;&#39;) -&gt;</span>
     <span class="nv">defer = </span><span class="nx">@hoodie</span><span class="p">.</span><span class="nx">defer</span><span class="p">()</span>
@@ -75,7 +75,7 @@ address.</p></div></div><div class="code"><div class="wrapper">  <span class="nv
       
     <span class="k">return</span> <span class="nx">defer</span><span class="p">.</span><span class="nx">promise</span><span class="p">()</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h2 id="sign-in-with-username-amp-password">sign in with username &amp; password</h2>
 
-<p>uses standard couchDB API to create a new user session (POST /_session)</p></div></div><div class="code"><div class="wrapper">  <span class="nv">signIn : </span><span class="nf">(username, password = &#39;&#39;) -&gt;</span>
+<p>uses standard CouchDB API to create a new user session (POST /_session)</p></div></div><div class="code"><div class="wrapper">  <span class="nv">signIn : </span><span class="nf">(username, password = &#39;&#39;) -&gt;</span>
     <span class="nv">defer = </span><span class="nx">@hoodie</span><span class="p">.</span><span class="nx">defer</span><span class="p">()</span>
 
     <span class="nv">requestPromise = </span><span class="nx">@hoodie</span><span class="p">.</span><span class="nx">request</span> <span class="s1">&#39;POST&#39;</span><span class="p">,</span> <span class="s1">&#39;/_session&#39;</span><span class="p">,</span> 
@@ -120,7 +120,7 @@ address.</p></div></div><div class="code"><div class="wrapper">  <span class="nv
           
         <span class="nx">defer</span><span class="p">.</span><span class="nx">reject</span><span class="p">(</span><span class="nx">error</span><span class="p">)</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h2 id="sign-out">sign out</h2>
 
-<p>uses standard couchDB API to destroy a user session (DELETE /_session)</p>
+<p>uses standard CouchDB API to destroy a user session (DELETE /_session)</p>
 
 <p>TODO: handle errors</p></div></div><div class="code"><div class="wrapper">  <span class="nv">signOut: </span><span class="o">-&gt;</span>
     <span class="nx">@hoodie</span><span class="p">.</span><span class="nx">request</span> <span class="s1">&#39;DELETE&#39;</span><span class="p">,</span> <span class="s1">&#39;/_session&#39;</span><span class="p">,</span> 
@@ -133,7 +133,7 @@ address.</p></div></div><div class="code"><div class="wrapper">  <span class="nv
   </div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h2 id="db">db</h2>
 
 <p>escape user username (or what ever he uses to sign up)
-to make it a valid couchDB database name</p>
+to make it a valid CouchDB database name</p>
 
 <pre><code>Converts an username address user name to a valid database name
 The character replacement rules are:
@@ -177,7 +177,7 @@ Notes:
     <span class="nx">@fetch</span><span class="p">().</span><span class="nx">pipe</span> <span class="o">=&gt;</span>
       <span class="nv">key = </span><span class="s2">&quot;#{@_prefix}:#{@username}&quot;</span>
       <span class="nx">@hoodie</span><span class="p">.</span><span class="nx">request</span> <span class="s1">&#39;DELETE&#39;</span><span class="p">,</span> <span class="s2">&quot;/_users/#{encodeURIComponent key}?rev=#{@_doc._rev}&quot;</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h2 id="private">PRIVATE</h2></div></div></div><div class="segment"><div class="code"><div class="wrapper">  <span class="nv">_prefix : </span><span class="s1">&#39;org.couchdb.user&#39;</span>
-  </div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>couchDB _users doc</p></div></div><div class="code"><div class="wrapper">  <span class="nv">_doc : </span><span class="p">{}</span>
+  </div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>CouchDB _users doc</p></div></div><div class="code"><div class="wrapper">  <span class="nv">_doc : </span><span class="p">{}</span>
   </div></div></div><div class="segment"><div class="code"><div class="wrapper">  <span class="nv">_handleSignIn: </span><span class="p">(</span><span class="nx">@username</span><span class="p">)</span> <span class="o">=&gt;</span>
     <span class="nx">@hoodie</span><span class="p">.</span><span class="nx">config</span><span class="p">.</span><span class="nx">set</span> <span class="s1">&#39;_account.username&#39;</span><span class="p">,</span> <span class="nx">@username</span>
     <span class="vi">@_authenticated = </span><span class="kc">true</span>

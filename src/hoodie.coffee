@@ -17,7 +17,7 @@ class Hoodie extends Events
 
   # ## initialization
   #
-  # Inits the Hoodie, an optional couchDB URL can be passed
+  # Inits the Hoodie, an optional CouchDB URL can be passed
   constructor : (@baseUrl = '') ->
   
     # remove trailing slash(es)

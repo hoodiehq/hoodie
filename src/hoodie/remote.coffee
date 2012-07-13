@@ -1,7 +1,7 @@
 #
 # Connection / Socket to our couch
 #
-# Remote is using couchDB's `_changes` feed to listen to changes
+# Remote is using CouchDB's `_changes` feed to listen to changes
 # and `_bulkDocs` to push local changes
 #
 # When hoodie.remote is active (default), it will continuously 
@@ -202,7 +202,7 @@ class Hoodie.Remote
           window.setTimeout @pull, 3000
 
 
-  # valid couchDB doc attributes starting with an underscore
+  # valid CouchDB doc attributes starting with an underscore
   _validSpecialAttributes : [
     '_id', '_rev', '_deleted', '_revisions', '_attachments'
   ]
@@ -222,7 +222,7 @@ class Hoodie.Remote
       continue unless /^_/.test attr
       delete attributes[attr]
    
-    # prepare couchDB id
+    # prepare CouchDB id
     attributes._id = "#{attributes.type}/#{attributes.id}"
     delete attributes.id
 

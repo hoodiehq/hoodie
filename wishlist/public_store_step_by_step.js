@@ -10,7 +10,7 @@
 // ## Step one: create or make an object public
 
 // We create a profile with a name and an email address. This will internally
-// create an sync a couchDB doc that looks like this:
+// create and sync a CouchDB doc that looks like this:
 // 
 //     {
 //       "_id"       : "profile/uuid567",
@@ -30,7 +30,7 @@ hoodie.my.store.create("profile", {
 // To make it available to other users, it needs to be made public. We use
 // the `store.update` method for it. Simply leave the update object empty 
 // and pass a `{ public: true }` hash as the forth parameter. This will update
-// the couchDB document and look like this:
+// the CouchDB document and look like this:
 // 
 //     {
 //       "_id"       : "profile/uuid567",
@@ -47,7 +47,7 @@ hoodie.my.store.update("profile", "uuid567", {}, { public: true })
 
 // instead of making the entire profile public, we can select specific
 // attributes to be made publicly available while the rest will be hidden.
-// The resulting couchDB doc will look like this:
+// The resulting CouchDB doc will look like this:
 // 
 //     {
 //       "_id"       : "profile/uuid567",
@@ -80,8 +80,8 @@ hoodie.my.store.update("profile", "uuid567", {}, { public: false })
 
 // ## Step 2: Synchronization with public store
 
-// In hoodie's internal implementation with couchDB, each user will have two
-// couchDB database when public stores are enabled. The first is the standard
+// In hoodie's internal implementation with CouchDB, each user will have two
+// CouchDB database when public stores are enabled. The first is the standard
 // one and is private, only accessible by by the user after authentication.
 // The second one is the "public user store" and contains only the objects
 // that have been set to be public as described above.

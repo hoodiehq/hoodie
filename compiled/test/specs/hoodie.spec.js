@@ -6,7 +6,7 @@ describe("Hoodie", function() {
     return spyOn($, "ajax").andReturn($.Deferred());
   });
   describe("new", function() {
-    it("should store the couchDB URL", function() {
+    it("should store the CouchDB URL", function() {
       var hoodie;
       hoodie = new Hoodie('http://couch.example.com');
       return expect(hoodie.baseUrl).toBe('http://couch.example.com');
@@ -16,7 +16,7 @@ describe("Hoodie", function() {
       hoodie = new Hoodie('http://couch.example.com/');
       return expect(hoodie.baseUrl).toBe('http://couch.example.com');
     });
-    return it("should default the couchDB URL to ''", function() {
+    return it("should default the CouchDB URL to ''", function() {
       var hoodie;
       hoodie = new Hoodie;
       return expect(hoodie.baseUrl).toBe('');

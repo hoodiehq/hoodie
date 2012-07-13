@@ -6,8 +6,8 @@ Setup
 -----
 
 ```javascript
-couchDB_endpoint = 'http://worlddominatorapp.iriscouch.com';
-hoodie = new Hoodie(couchDB_endpoint);
+CouchDB_endpoint = 'http://worlddominatorapp.iriscouch.com';
+hoodie = new Hoodie(CouchDB_endpoint);
 ```
 
 
@@ -136,6 +136,7 @@ app.store.save( type, id, {name: "rule the world"} )
   .fail ( function(err)        { } )
   
 // update an existing object
+// Note: this changes only the passed attributes of the object
 id   = 'abc4567'
 type = 'rule'
 app.store.update( type, id, {nr: 1} )

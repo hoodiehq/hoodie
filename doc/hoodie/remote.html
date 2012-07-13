@@ -1,6 +1,6 @@
 <!DOCTYPE html><html lang="en"><head><title>hoodie/remote</title></head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0"><meta name="groc-relative-root" content="../"><meta name="groc-document-path" content="hoodie/remote"><meta name="groc-project-path" content="src/hoodie/remote.coffee"><link rel="stylesheet" type="text/css" media="all" href="../assets/style.css"><script type="text/javascript" src="../assets/behavior.js"></script><body><div id="meta"><div class="file-path">src/hoodie/remote.coffee</div></div><div id="document"><div class="segment"><div class="comments"><div class="wrapper"><p>Connection / Socket to our couch</p>
 
-<p>Remote is using couchDB's <code>_changes</code> feed to listen to changes
+<p>Remote is using CouchDB's <code>_changes</code> feed to listen to changes
 and <code>_bulkDocs</code> to push local changes</p>
 
 <p>When hoodie.remote is active (default), it will continuously 
@@ -129,7 +129,7 @@ Should really not happen. </p>
             </div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>oops. This might be caused by an unreachable server.
 Or the server canceld it for what ever reason, e.g.
 heroku kills the request after ~30s.
-we'll try again after a 3s timeout</p></div></div><div class="code"><div class="wrapper">          <span class="nb">window</span><span class="p">.</span><span class="nx">setTimeout</span> <span class="nx">@pull</span><span class="p">,</span> <span class="mi">3000</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>valid couchDB doc attributes starting with an underscore</p></div></div><div class="code"><div class="wrapper">  <span class="nv">_validSpecialAttributes : </span><span class="p">[</span>
+we'll try again after a 3s timeout</p></div></div><div class="code"><div class="wrapper">          <span class="nb">window</span><span class="p">.</span><span class="nx">setTimeout</span> <span class="nx">@pull</span><span class="p">,</span> <span class="mi">3000</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>valid CouchDB doc attributes starting with an underscore</p></div></div><div class="code"><div class="wrapper">  <span class="nv">_validSpecialAttributes : </span><span class="p">[</span>
     <span class="s1">&#39;_id&#39;</span><span class="p">,</span> <span class="s1">&#39;_rev&#39;</span><span class="p">,</span> <span class="s1">&#39;_deleted&#39;</span><span class="p">,</span> <span class="s1">&#39;_revisions&#39;</span><span class="p">,</span> <span class="s1">&#39;_attachments&#39;</span>
   <span class="p">]</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>parse object for remote storage. All attributes starting with an 
 <code>underscore</code> do not get synchronized despite the special attributes
@@ -142,7 +142,7 @@ we'll try again after a 3s timeout</p></div></div><div class="code"><div class="
       <span class="k">continue</span> <span class="k">if</span> <span class="o">~</span><span class="nx">@_validSpecialAttributes</span><span class="p">.</span><span class="nx">indexOf</span><span class="p">(</span><span class="nx">attr</span><span class="p">)</span>
       <span class="k">continue</span> <span class="nx">unless</span> <span class="sr">/^_/</span><span class="p">.</span><span class="nx">test</span> <span class="nx">attr</span>
       <span class="k">delete</span> <span class="nx">attributes</span><span class="p">[</span><span class="nx">attr</span><span class="p">]</span>
-   </div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>prepare couchDB id</p></div></div><div class="code"><div class="wrapper">    <span class="nv">attributes._id = </span><span class="s2">&quot;#{attributes.type}/#{attributes.id}&quot;</span>
+   </div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>prepare CouchDB id</p></div></div><div class="code"><div class="wrapper">    <span class="nv">attributes._id = </span><span class="s2">&quot;#{attributes.type}/#{attributes.id}&quot;</span>
     <span class="k">delete</span> <span class="nx">attributes</span><span class="p">.</span><span class="nx">id</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>prepare revision</p></div></div><div class="code"><div class="wrapper">    <span class="nx">@_addRevisionTo</span> <span class="nx">attributes</span>
     
     <span class="k">return</span> <span class="nx">attributes</span>

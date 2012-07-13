@@ -149,7 +149,7 @@ class Hoodie.Sharing.Instance
   
   # ## hasAccount
   #
-  # returns true if either user or the sharing has a couchDB account
+  # returns true if either user or the sharing has a CouchDB account
   hasAccount: ->
     not @anonymous or @_userRev?
     

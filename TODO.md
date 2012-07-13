@@ -10,7 +10,7 @@
 # filters?
 # build it into minutes.io
 
-=> required couchDB setting
+=> required CouchDB setting
    httpd.authentication_handlers:
    put cookies to the end to allow authenticated requests as a different user
    than I'm currently signed in.

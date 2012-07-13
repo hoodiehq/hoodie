@@ -6,7 +6,7 @@ this data, authenticated by a username and a password.</p>
 
 <p>Above that, objects can selectively be set to be public. Entire objects
 or only some of the attributes.</p></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h2 id="step-one-create-or-make-an-object-public">Step one: create or make an object public</h2></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>We create a profile with a name and an email address. This will internally
-create an sync a couchDB doc that looks like this:</p>
+create and sync a CouchDB doc that looks like this:</p>
 
 <pre><code>{
   "_id"       : "profile/uuid567",
@@ -23,7 +23,7 @@ create an sync a couchDB doc that looks like this:</p>
 <span class="p">})</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>To make it available to other users, it needs to be made public. We use
 the <code>store.update</code> method for it. Simply leave the update object empty 
 and pass a <code>{ public: true }</code> hash as the forth parameter. This will update
-the couchDB document and look like this:</p>
+the CouchDB document and look like this:</p>
 
 <pre><code>{
   "_id"       : "profile/uuid567",
@@ -37,7 +37,7 @@ the couchDB document and look like this:</p>
 }
 </code></pre></div></div><div class="code"><div class="wrapper"><span class="nx">hoodie</span><span class="p">.</span><span class="nx">my</span><span class="p">.</span><span class="nx">store</span><span class="p">.</span><span class="nx">update</span><span class="p">(</span><span class="s2">&quot;profile&quot;</span><span class="p">,</span> <span class="s2">&quot;uuid567&quot;</span><span class="p">,</span> <span class="p">{},</span> <span class="p">{</span> <span class="kr">public</span><span class="o">:</span> <span class="kc">true</span> <span class="p">})</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>instead of making the entire profile public, we can select specific
 attributes to be made publicly available while the rest will be hidden.
-The resulting couchDB doc will look like this:</p>
+The resulting CouchDB doc will look like this:</p>
 
 <pre><code>{
   "_id"       : "profile/uuid567",
@@ -63,8 +63,8 @@ it to false, otherwise the public store worke would ignore it (see blelow)</p>
   "createdAt" : "2012-07-12T21:55:42.228Z",
   "updatedAt" : "2012-07-12T21:55:42.228Z"
 }
-</code></pre></div></div><div class="code"><div class="wrapper"><span class="nx">hoodie</span><span class="p">.</span><span class="nx">my</span><span class="p">.</span><span class="nx">store</span><span class="p">.</span><span class="nx">update</span><span class="p">(</span><span class="s2">&quot;profile&quot;</span><span class="p">,</span> <span class="s2">&quot;uuid567&quot;</span><span class="p">,</span> <span class="p">{},</span> <span class="p">{</span> <span class="kr">public</span><span class="o">:</span> <span class="kc">false</span> <span class="p">})</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h2 id="step-2-synchronization-with-public-store">Step 2: Synchronization with public store</h2></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>In hoodie's internal implementation with couchDB, each user will have two
-couchDB database when public stores are enabled. The first is the standard
+</code></pre></div></div><div class="code"><div class="wrapper"><span class="nx">hoodie</span><span class="p">.</span><span class="nx">my</span><span class="p">.</span><span class="nx">store</span><span class="p">.</span><span class="nx">update</span><span class="p">(</span><span class="s2">&quot;profile&quot;</span><span class="p">,</span> <span class="s2">&quot;uuid567&quot;</span><span class="p">,</span> <span class="p">{},</span> <span class="p">{</span> <span class="kr">public</span><span class="o">:</span> <span class="kc">false</span> <span class="p">})</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h2 id="step-2-synchronization-with-public-store">Step 2: Synchronization with public store</h2></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>In hoodie's internal implementation with CouchDB, each user will have two
+CouchDB database when public stores are enabled. The first is the standard
 one and is private, only accessible by by the user after authentication.
 The second one is the "public user store" and contains only the objects
 that have been set to be public as described above.</p></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>Let's say the user created a public profile object which gets synchronized
