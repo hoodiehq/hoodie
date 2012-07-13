@@ -21,7 +21,7 @@
 
 
 // ## Scenario 1
-// 
+
 // A user plays a song. We need to make sure that the track object exists
 // and then we want to increase its play count by creating a related
 // play object.
@@ -45,7 +45,7 @@ playTrack( tumblrTrack )
 
 
 // ## Scenario 2
-// 
+
 // I want to favorite or unfavorite a track
 // 
 function favoriteTrack( track ) {
@@ -63,7 +63,7 @@ function unfavoriteTrack( track ) {
 }
 
 // ## Scenario 3
-// 
+
 // Show favorites from a user http://whiskie.net/user/espy
 // 
 hoodie.user('espy').store.loadAll("favorite")
@@ -87,7 +87,7 @@ function renderFavorites (favorites) {
 }
 
 // ## Scenario 4
-// 
+
 // Currently trendings songs
 // 
 hoodie.global.store.loadList("trending_tracks")

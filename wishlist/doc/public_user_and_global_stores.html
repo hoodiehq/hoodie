@@ -17,9 +17,7 @@ counts track plays to meassure its popularity</p>
 <ol>
 <li>public profiles of users with their favorites</li>
 <li>global play counts of tracks</li>
-</ol></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h2 id="scenario-1">Scenario 1</h2>
-
-<p>A user plays a song. We need to make sure that the track object exists
+</ol></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h2 id="scenario-1">Scenario 1</h2></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>A user plays a song. We need to make sure that the track object exists
 and then we want to increase its play count by creating a related
 play object.</p></div></div><div class="code"><div class="wrapper"><span class="kd">function</span> <span class="nx">playTrack</span><span class="p">(</span> <span class="nx">track</span> <span class="p">)</span> <span class="p">{</span>
 
@@ -36,9 +34,7 @@ play object.</p></div></div><div class="code"><div class="wrapper"><span class="
   <span class="s2">&quot;url&quot;</span>         <span class="o">:</span> <span class="s2">&quot;http://tumblr.com/awoft32p&quot;</span><span class="p">,</span>
   <span class="s2">&quot;coverImgUrl&quot;</span> <span class="o">:</span> <span class="s2">&quot;http://images.tumblr.com/ytaw3t.png&quot;</span>
 <span class="p">}</span>
-<span class="nx">playTrack</span><span class="p">(</span> <span class="nx">tumblrTrack</span> <span class="p">)</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h2 id="scenario-2">Scenario 2</h2>
-
-<p>I want to favorite or unfavorite a track</p></div></div><div class="code"><div class="wrapper"><span class="kd">function</span> <span class="nx">favoriteTrack</span><span class="p">(</span> <span class="nx">track</span> <span class="p">)</span> <span class="p">{</span>
+<span class="nx">playTrack</span><span class="p">(</span> <span class="nx">tumblrTrack</span> <span class="p">)</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h2 id="scenario-2">Scenario 2</h2></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>I want to favorite or unfavorite a track</p></div></div><div class="code"><div class="wrapper"><span class="kd">function</span> <span class="nx">favoriteTrack</span><span class="p">(</span> <span class="nx">track</span> <span class="p">)</span> <span class="p">{</span>
   <span class="nx">hoodie</span><span class="p">.</span><span class="nx">my</span><span class="p">.</span><span class="nx">store</span><span class="p">.</span><span class="nx">create</span><span class="p">(</span> <span class="s2">&quot;favorite&quot;</span><span class="p">,</span> <span class="p">{</span>
     <span class="nx">trackId</span> <span class="o">=</span> <span class="nx">track</span><span class="p">.</span><span class="nx">id</span>
   <span class="p">})</span>
@@ -50,9 +46,7 @@ play object.</p></div></div><div class="code"><div class="wrapper"><span class="
   <span class="p">}).</span><span class="nx">done</span><span class="p">(</span> <span class="kd">function</span><span class="p">(</span> <span class="nx">arrTrackAtts</span> <span class="p">)</span> <span class="p">{</span>
     <span class="nx">hoodie</span><span class="p">.</span><span class="nx">my</span><span class="p">.</span><span class="nx">store</span><span class="p">.</span><span class="k">delete</span><span class="p">(</span> <span class="s2">&quot;favorite&quot;</span><span class="p">,</span> <span class="nx">arrTrackAtts</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="nx">trackId</span> <span class="p">)</span>
   <span class="p">})</span>
-<span class="p">}</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h2 id="scenario-3">Scenario 3</h2>
-
-<p>Show favorites from a user http://whiskie.net/user/espy</p></div></div><div class="code"><div class="wrapper"><span class="nx">hoodie</span><span class="p">.</span><span class="nx">user</span><span class="p">(</span><span class="s1">&#39;espy&#39;</span><span class="p">).</span><span class="nx">store</span><span class="p">.</span><span class="nx">loadAll</span><span class="p">(</span><span class="s2">&quot;favorite&quot;</span><span class="p">)</span>
+<span class="p">}</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h2 id="scenario-3">Scenario 3</h2></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>Show favorites from a user http://whiskie.net/user/espy</p></div></div><div class="code"><div class="wrapper"><span class="nx">hoodie</span><span class="p">.</span><span class="nx">user</span><span class="p">(</span><span class="s1">&#39;espy&#39;</span><span class="p">).</span><span class="nx">store</span><span class="p">.</span><span class="nx">loadAll</span><span class="p">(</span><span class="s2">&quot;favorite&quot;</span><span class="p">)</span>
 <span class="p">.</span><span class="nx">done</span><span class="p">(</span> <span class="kd">function</span><span class="p">(</span> <span class="nx">favorites</span> <span class="p">)</span> <span class="p">{</span>
   <span class="nx">renderFavorites</span><span class="p">(</span> <span class="nx">favorites</span> <span class="p">)</span>
 <span class="p">}</span> <span class="p">)</span> 
@@ -68,7 +62,5 @@ play object.</p></div></div><div class="code"><div class="wrapper"><span class="
       <span class="nx">$</span><span class="p">(</span><span class="s2">&quot;&lt;li&gt;&quot;</span><span class="o">+</span><span class="nx">track</span><span class="p">.</span><span class="nx">name</span><span class="o">+</span><span class="s2">&quot; (&quot;</span><span class="o">+</span><span class="nx">track</span><span class="p">.</span><span class="nx">playCount</span><span class="o">+</span><span class="s2">&quot;)&lt;/li&gt;&quot;</span><span class="p">).</span><span class="nx">appendTo</span><span class="p">(</span><span class="s2">&quot;#tracks&quot;</span><span class="p">)</span>
     <span class="p">};</span>
   <span class="p">})</span>
-<span class="p">}</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h2 id="scenario-4">Scenario 4</h2>
-
-<p>Currently trendings songs</p></div></div><div class="code"><div class="wrapper"><span class="nx">hoodie</span><span class="p">.</span><span class="nx">global</span><span class="p">.</span><span class="nx">store</span><span class="p">.</span><span class="nx">loadList</span><span class="p">(</span><span class="s2">&quot;trending_tracks&quot;</span><span class="p">)</span>
+<span class="p">}</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h2 id="scenario-4">Scenario 4</h2></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>Currently trendings songs</p></div></div><div class="code"><div class="wrapper"><span class="nx">hoodie</span><span class="p">.</span><span class="nx">global</span><span class="p">.</span><span class="nx">store</span><span class="p">.</span><span class="nx">loadList</span><span class="p">(</span><span class="s2">&quot;trending_tracks&quot;</span><span class="p">)</span>
 <span class="p">.</span><span class="nx">done</span><span class="p">(</span> <span class="nx">renderTrendingTracks</span> <span class="p">)</span></div></div></div></div></body></html>

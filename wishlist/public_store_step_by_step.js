@@ -79,7 +79,7 @@ hoodie.my.store.update("profile", "uuid567", {}, { public: ["name"] })
 hoodie.my.store.update("profile", "uuid567", {}, { public: false })
 
 // ## Step 2: Synchronization with public store
-// 
+
 // In hoodie's internal implementation with couchDB, each user will have two
 // couchDB database when public stores are enabled. The first is the standard
 // one and is private, only accessible by by the user after authentication.
@@ -135,7 +135,7 @@ hoodie.my.store.update("profile", "uuid567", {}, { public: false })
 
 
 // ## the worker
-// 
+
 // the public store worker could be described as an extended filtered 
 // replication. It listens for specific documents in Database A
 // (user private store) and replicates them to Database B
