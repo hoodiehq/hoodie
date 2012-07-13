@@ -171,7 +171,10 @@ function changes_doc_parser(obj) {
 
     // make public object private again, remove it from public store
     case obj.$public === false:
-      obj._deleted = true
-      return obj
+      return {
+        _id     : "$public/" + obj._id,
+        _rev    : obj._rev,
+        _deleted: true
+      }
   }
 }
