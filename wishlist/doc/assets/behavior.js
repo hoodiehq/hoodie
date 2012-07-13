@@ -331,123 +331,32 @@ f.event={add:function(a,c,d,e,g){var h,i,j,k,l,m,n,o,p,q,r,s;if(!(a.nodeType===3
           "singleLineComment": ["//"],
           "name": "JavaScript"
         },
-        "sourcePath": "/Users/gregor/JavaScripts/hood.ie/hoodie-client.js/wishlist/share.js",
-        "projectPath": "share.js",
-        "targetPath": "share",
-        "title": "share"
+        "sourcePath": "/Users/gregor/JavaScripts/hood.ie/hoodie-client.js/wishlist/sharing.js",
+        "projectPath": "sharing.js",
+        "targetPath": "sharing",
+        "title": "sharing"
       },
       "depth": 1,
       "outline": [
         {
           "type": "heading",
           "data": {
-            "level": 2,
-            "title": "Sharing (Wishlist)",
-            "slug": "sharing-wishlist"
+            "level": 1,
+            "title": "Sharing",
+            "slug": "sharing"
           },
-          "depth": 2,
+          "depth": 1,
           "children": [
             {
               "type": "heading",
               "data": {
-                "level": 3,
-                "title": "Making a user_db publict",
-                "slug": "making-a-user-db-publict"
+                "level": 2,
+                "title": "Sharing objects",
+                "slug": "sharing-objects"
               },
-              "depth": 3
+              "depth": 2
             }
           ]
-        }, {
-          "type": "heading",
-          "data": {
-            "level": 2,
-            "title": "Public Sharing",
-            "slug": "public-sharing"
-          },
-          "depth": 2,
-          "children": [
-            {
-              "type": "heading",
-              "data": {
-                "level": 3,
-                "title": "Share all my data (manually)",
-                "slug": "share-all-my-data-manually"
-              },
-              "depth": 3
-            }, {
-              "type": "heading",
-              "data": {
-                "level": 3,
-                "title": "Share again",
-                "slug": "share-again"
-              },
-              "depth": 3
-            }, {
-              "type": "heading",
-              "data": {
-                "level": 3,
-                "title": "Share only objects of one specific type",
-                "slug": "share-only-objects-of-one-specific-type"
-              },
-              "depth": 3
-            }, {
-              "type": "heading",
-              "data": {
-                "level": 3,
-                "title": "Share only on specific object",
-                "slug": "share-only-on-specific-object"
-              },
-              "depth": 3
-            }, {
-              "type": "heading",
-              "data": {
-                "level": 3,
-                "title": "Share objects with a custom filter",
-                "slug": "share-objects-with-a-custom-filter"
-              },
-              "depth": 3
-            }, {
-              "type": "heading",
-              "data": {
-                "level": 3,
-                "title": "Share continuously",
-                "slug": "share-continuously"
-              },
-              "depth": 3
-            }, {
-              "type": "heading",
-              "data": {
-                "level": 3,
-                "title": "Receive shared docs",
-                "slug": "receive-shared-docs"
-              },
-              "depth": 3
-            }, {
-              "type": "heading",
-              "data": {
-                "level": 3,
-                "title": "change shared docs",
-                "slug": "change-shared-docs"
-              },
-              "depth": 3
-            }, {
-              "type": "heading",
-              "data": {
-                "level": 3,
-                "title": "Subscribe to changes of shared docs",
-                "slug": "subscribe-to-changes-of-shared-docs"
-              },
-              "depth": 3
-            }
-          ]
-        }, {
-          "type": "heading",
-          "data": {
-            "level": 2,
-            "title": "Private Sharing",
-            "slug": "private-sharing"
-          },
-          "depth": 2
         }
       ]
     }

@@ -123,14 +123,17 @@ function returns an object, the object will be PUT to users public store.</p></d
       <span class="kd">var</span> <span class="nx">newObj</span> <span class="o">=</span> <span class="p">{},</span>
           <span class="nx">defaultPublicAtts</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;_ref&#39;</span><span class="p">,</span> <span class="s1">&#39;type&#39;</span><span class="p">]</span>
 
-      <span class="nx">obj</span><span class="p">.</span><span class="nx">$public</span><span class="p">.</span><span class="nx">concat</span><span class="p">(</span><span class="nx">defaultPublicAtts</span><span class="p">)</span>
+      <span class="nx">obj</span><span class="p">.</span><span class="nx">$public</span> <span class="o">=</span> <span class="nx">obj</span><span class="p">.</span><span class="nx">$public</span><span class="p">.</span><span class="nx">concat</span><span class="p">(</span><span class="nx">defaultPublicAtts</span><span class="p">)</span>
       <span class="k">for</span> <span class="p">(</span><span class="kd">var</span> <span class="nx">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="nx">attr</span><span class="p">;</span> <span class="nx">i</span> <span class="o">&lt;</span> <span class="nx">obj</span><span class="p">.</span><span class="nx">$public</span><span class="p">.</span><span class="nx">length</span><span class="p">;</span> <span class="nx">i</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
         <span class="nx">attr</span> <span class="o">=</span> <span class="nx">obj</span><span class="p">.</span><span class="nx">$public</span><span class="p">[</span><span class="nx">i</span><span class="p">]</span>
         <span class="nx">newObj</span><span class="p">[</span><span class="nx">attr</span><span class="p">]</span> <span class="o">=</span> <span class="nx">obj</span><span class="p">[</span><span class="nx">attr</span><span class="p">]</span>
       <span class="p">};</span>
       <span class="nx">obj</span><span class="p">.</span><span class="nx">_id</span> <span class="o">=</span> <span class="s2">&quot;$public/&quot;</span> <span class="o">+</span> <span class="nx">obj</span><span class="p">.</span><span class="nx">_id</span>
       <span class="k">return</span> <span class="nx">obj</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>make public object private again, remove it from public store</p></div></div><div class="code"><div class="wrapper">    <span class="k">case</span> <span class="nx">obj</span><span class="p">.</span><span class="nx">$public</span> <span class="o">===</span> <span class="kc">false</span><span class="o">:</span>
-      <span class="nx">obj</span><span class="p">.</span><span class="nx">_deleted</span> <span class="o">=</span> <span class="kc">true</span>
-      <span class="k">return</span> <span class="nx">obj</span>
+      <span class="k">return</span> <span class="p">{</span>
+        <span class="nx">_id</span>     <span class="o">:</span> <span class="s2">&quot;$public/&quot;</span> <span class="o">+</span> <span class="nx">obj</span><span class="p">.</span><span class="nx">_id</span><span class="p">,</span>
+        <span class="nx">_rev</span>    <span class="o">:</span> <span class="nx">obj</span><span class="p">.</span><span class="nx">_rev</span><span class="p">,</span>
+        <span class="nx">_deleted</span><span class="o">:</span> <span class="kc">true</span>
+      <span class="p">}</span>
   <span class="p">}</span>
 <span class="p">}</span></div></div></div></div></body></html>

@@ -1,0 +1,177 @@
+<!DOCTYPE html><html lang="en"><head><title>sharing</title></head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0"><meta name="groc-relative-root" content=""><meta name="groc-document-path" content="sharing"><meta name="groc-project-path" content="sharing.js"><link rel="stylesheet" type="text/css" media="all" href="assets/style.css"><script type="text/javascript" src="assets/behavior.js"></script><body><div id="meta"><div class="file-path">sharing.js</div></div><div id="document"><div class="segment"></div><div class="segment"><div class="comments"><div class="wrapper"><h1 id="sharing">Sharing</h1>
+
+<p>A sharing has 3 main paramters, that can be combined with each other:</p>
+
+<pre><code>private:       true || false
+continuous:    true || false
+collaborative: true || false`
+</code></pre>
+
+<p>As examples we take a todo app where I can create muliple todo lists that 
+can be shared in different ways. We'll make uses case for each possible
+sharing setting:</p>
+
+<ol>
+<li><p>Public Sharing</p>
+
+<p>I've created stuff that I want to share with anybody, through a secret
+URL.</p></li>
+<li><p>Private Sharing</p>
+
+<p>I've created stuff that I want to share with specific other accounts.</p></li>
+<li><p>Continuous Sharing</p>
+
+<p>I want updates to my shared objects to be continuously synchronized.
+If I made a change I want it to be pushed immediately and if one of
+the collaborators made a chagne I want his changes to appear immediately
+in my store.</p></li>
+<li><p>Manual Sharing</p>
+
+<p>I want to work on objects that are shared and then manually synchronize
+the changes whenever I want to</p></li>
+<li><p>Read only Sharing</p>
+
+<p>By default, my shared objects should be read only to others.</p></li>
+<li><p>Collaborative Sharings</p>
+
+<p>I want to enable Collaborators to make changes on sharings. On both,
+private and public sharings.</p></li>
+<li><p>Public, password protected sharings</p>
+
+<p>Same as 1., but besides the secret URL, the users need to know the
+a password to access the shared objects</p></li>
+<li><p>Subscribe to a Sharing</p>
+
+<p>Persistant access to sharings by others</p></li>
+<li><p>Subscribing to events in Sharings</p></li>
+</ol></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h2 id="sharing-objects">Sharing objects</h2>
+
+<p>A sharing has its own internal object, used only by hoodie. To create a
+new sharing with default settings, use this syntax:</p></div></div><div class="code"><div class="wrapper"><span class="nx">hoodie</span><span class="p">.</span><span class="nx">sharing</span><span class="p">.</span><span class="nx">create</span><span class="p">().</span><span class="nx">done</span><span class="p">(</span> <span class="kd">function</span><span class="p">(</span><span class="nx">sharing</span><span class="p">)</span> <span class="p">{</span>
+  <span class="nx">alert</span><span class="p">(</span><span class="s1">&#39;your data has been shared.&#39;</span><span class="p">)</span>
+<span class="p">})</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>Sharings are a special (hidden) type of hoodie objects, identified by 
+the <code>$sharing</code> type. In general, objects of types starting with a <code>$</code>
+are hidden objects, mostly used to trigger actions in the workers.</p></div></div><div class="code"><div class="wrapper"><span class="p">{</span>
+  <span class="nx">id</span>            <span class="o">:</span> <span class="s2">&quot;abc4567&quot;</span><span class="p">,</span>
+  <span class="nx">type</span>          <span class="o">:</span> <span class="s2">&quot;$sharing&quot;</span><span class="p">,</span>
+  <span class="kr">private</span>       <span class="o">:</span> <span class="kc">false</span><span class="p">,</span>
+  <span class="nx">continuous</span>    <span class="o">:</span> <span class="kc">false</span><span class="p">,</span>
+  <span class="nx">collaborative</span> <span class="o">:</span> <span class="kc">false</span><span class="p">,</span>
+
+  <span class="nx">created_at</span>    <span class="o">:</span> <span class="s2">&quot;2012-03-29T20:01:58.331Z&quot;</span><span class="p">,</span>
+  <span class="nx">updated_at</span>    <span class="o">:</span> <span class="s2">&quot;2012-03-29T20:01:58.331Z&quot;</span> 
+<span class="p">}</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>To add one or multiple objects to a sharing, <code>use</code> the add method. Use the
+<code>remove</code> method to unshare documents again</p></div></div><div class="code"><div class="wrapper"><span class="nx">hoodie</span><span class="p">.</span><span class="nx">sharing</span><span class="p">.</span><span class="nx">open</span><span class="p">(</span><span class="s2">&quot;sharing_id&quot;</span><span class="p">).</span><span class="nx">done</span><span class="p">(</span> <span class="kd">function</span><span class="p">(</span><span class="nx">sharing</span><span class="p">)</span> <span class="p">{</span>
+  <span class="nx">sharing</span><span class="p">.</span><span class="nx">add</span><span class="p">([</span><span class="nx">todolist1</span><span class="p">,</span> <span class="nx">todolist2</span><span class="p">])</span>
+  <span class="nx">sharing</span><span class="p">.</span><span class="nx">remove</span><span class="p">([</span><span class="nx">todolist3</span><span class="p">])</span>
+<span class="p">})</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>Shared documents are not available to others automatically. They need to be
+synchronized manually by calling the <code>push</code> methdod on <code>hoodie.sharing</code> or
+the sharing instance itself. There are also <code>pull</code> and <code>sync</code> methods, if
+you want to update shared objects from other users.</p></div></div><div class="code"><div class="wrapper"><span class="nx">hoodie</span><span class="p">.</span><span class="nx">sharing</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="s2">&quot;sharing_id&quot;</span><span class="p">)</span>
+<span class="nx">hoodie</span><span class="p">.</span><span class="nx">sharing</span><span class="p">.</span><span class="nx">open</span><span class="p">(</span><span class="s2">&quot;sharing_id&quot;</span><span class="p">).</span><span class="nx">done</span><span class="p">(</span> <span class="kd">function</span><span class="p">(</span><span class="nx">sharing</span><span class="p">)</span> <span class="p">{</span>
+  <span class="nx">sharing</span><span class="p">.</span><span class="nx">push</span><span class="p">()</span>
+<span class="p">})</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><ol>
+<li>Public Sharing</li>
+</ol>
+
+<p>Let's say we have a todolist with id "tl11111" that we want to share 
+publicly with others with an secret URL. First we add the todolist
+(by passing an object with the respective type &amp; id) and the we
+push the todolist will be available to others at the secret URL</p></div></div><div class="code"><div class="wrapper"><span class="nx">hoodie</span><span class="p">.</span><span class="nx">sharing</span><span class="p">.</span><span class="nx">create</span><span class="p">({</span><span class="kr">public</span><span class="o">:</span> <span class="kc">true</span><span class="p">})</span>
+<span class="p">.</span><span class="nx">done</span><span class="p">(</span> <span class="kd">function</span><span class="p">(</span><span class="nx">sharing</span><span class="p">)</span> <span class="p">{</span>
+  
+  <span class="nx">sharing</span><span class="p">.</span><span class="nx">add</span><span class="p">({</span><span class="nx">type</span><span class="o">:</span> <span class="s2">&quot;todolist&quot;</span><span class="p">,</span> <span class="nx">id</span><span class="o">:</span> <span class="s2">&quot;tl11111&quot;</span><span class="p">}).</span><span class="nx">push</span><span class="p">()</span>
+  <span class="p">.</span><span class="nx">done</span><span class="p">(</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+    <span class="nx">sharing_url</span> <span class="o">=</span> <span class="s2">&quot;http://mytodoapp.com/shared/&quot;</span> <span class="o">+</span> <span class="nx">sharing</span><span class="p">.</span><span class="nx">id</span>
+    <span class="nx">alert</span><span class="p">(</span><span class="s2">&quot;Share your todolist at &quot;</span> <span class="o">+</span> <span class="nx">sharing_url</span><span class="p">)</span>
+  <span class="p">})</span>
+<span class="p">})</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><ol>
+<li>Private Sharing</li>
+</ol>
+
+<p>Let's say I've another todolist with id "ptl2222" that I want to share only 
+with my collegues aj@example.com and bj@example.com. I want the todolist to
+to be accessible for AJ, BJ and myself only.</p></div></div><div class="code"><div class="wrapper"><span class="nx">hoodie</span><span class="p">.</span><span class="nx">sharing</span><span class="p">.</span><span class="nx">create</span><span class="p">({</span><span class="nx">collaborators</span><span class="o">:</span> <span class="p">[</span><span class="s2">&quot;aj@example.com&quot;</span><span class="p">,</span> <span class="s2">&quot;bj@example.com&quot;</span><span class="p">]})</span>
+<span class="p">.</span><span class="nx">done</span><span class="p">(</span> <span class="kd">function</span><span class="p">(</span><span class="nx">sharing</span><span class="p">)</span> <span class="p">{</span>
+  <span class="nx">sharing</span><span class="p">.</span><span class="nx">add</span><span class="p">({</span><span class="nx">type</span><span class="o">:</span> <span class="s2">&quot;todolist&quot;</span><span class="p">,</span> <span class="nx">id</span><span class="o">:</span> <span class="s2">&quot;tl11111&quot;</span><span class="p">})</span>
+
+  <span class="nx">sharing_url</span> <span class="o">=</span> <span class="s2">&quot;http://mytodoapp.com/shared/&quot;</span> <span class="o">+</span> <span class="nx">sharing</span><span class="p">.</span><span class="nx">id</span>
+  <span class="nx">alert</span><span class="p">(</span><span class="s2">&quot;AJ and BJ can access the todolist at &quot;</span> <span class="o">+</span> <span class="nx">sharing_url</span><span class="p">)</span>
+<span class="p">})</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><ol>
+<li>Continuous Sharing</li>
+</ol>
+
+<p>If you don't want to manually pull and push changes to shared objects, you
+can set the sharing to be continuous</p></div></div><div class="code"><div class="wrapper"><span class="nx">hoodie</span><span class="p">.</span><span class="nx">sharing</span><span class="p">.</span><span class="nx">create</span><span class="p">(</span> <span class="p">{</span><span class="nx">continuous</span><span class="o">:</span> <span class="kc">true</span><span class="p">}</span> <span class="p">)</span>
+<span class="p">.</span><span class="nx">done</span><span class="p">(</span> <span class="kd">function</span><span class="p">(</span><span class="nx">sharing</span><span class="p">){</span>
+  <span class="nx">hoodie</span><span class="p">.</span><span class="nx">store</span><span class="p">.</span><span class="nx">load</span><span class="p">(</span><span class="s2">&quot;todolist&quot;</span><span class="p">,</span> <span class="nx">id</span><span class="o">:</span> <span class="s2">&quot;tl11111&quot;</span><span class="p">)</span>
+  <span class="p">.</span><span class="nx">done</span><span class="p">(</span> <span class="kd">function</span><span class="p">(</span><span class="nx">todolist</span><span class="p">)</span> <span class="p">{</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>added todolists will be synched right away</p></div></div><div class="code"><div class="wrapper">    <span class="nx">sharing</span><span class="p">.</span><span class="nx">add</span><span class="p">(</span><span class="nx">todolist</span><span class="p">)</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>changes to added todolists will be synched right away</p></div></div><div class="code"><div class="wrapper">    <span class="nx">hoodie</span><span class="p">.</span><span class="nx">store</span><span class="p">.</span><span class="nx">update</span><span class="p">(</span><span class="nx">todolist</span><span class="p">,</span> <span class="p">{</span><span class="nx">name</span><span class="o">:</span> <span class="s2">&quot;new name&quot;</span><span class="p">})</span>
+  <span class="p">})</span>
+<span class="p">})</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><ol>
+<li>Manual Sharing</li>
+</ol>
+
+<p>Manual sharing means you have to manually push and pull changes of shared
+objects, it's the default behavior. Each of the following methods returns
+a promise</p></div></div><div class="code"><div class="wrapper"><span class="nx">hoodie</span><span class="p">.</span><span class="nx">sharing</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="s2">&quot;sharing_id&quot;</span><span class="p">)</span>
+<span class="nx">hoodie</span><span class="p">.</span><span class="nx">sharing</span><span class="p">.</span><span class="nx">pull</span><span class="p">(</span><span class="s2">&quot;sharing_id&quot;</span><span class="p">)</span>
+<span class="nx">hoodie</span><span class="p">.</span><span class="nx">sharing</span><span class="p">.</span><span class="nx">sync</span><span class="p">(</span><span class="s2">&quot;sharing_id&quot;</span><span class="p">)</span> <span class="c1">// push &amp; pull</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><ol>
+<li>Read only Sharing</li>
+</ol>
+
+<p>Sharings are read only be default. This means others can see the shared
+objects (if they have access), but they cannot make changes to them, or 
+to be precise, they cannot push their local changes</p></div></div><div class="code"><div class="wrapper"><span class="nx">hoodie</span><span class="p">.</span><span class="nx">sharing</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span> <span class="s2">&quot;sharing_id&quot;</span> <span class="p">)</span> <span class="c1">// will fail for other users</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><ol>
+<li>Collaborative Sharings</li>
+</ol>
+
+<p>If I want to invite others to collaborate on my objects, I need to set the
+collaborative setting to true</p></div></div><div class="code"><div class="wrapper"><span class="nx">hoodie</span><span class="p">.</span><span class="nx">sharing</span><span class="p">.</span><span class="nx">create</span><span class="p">(</span> <span class="p">{</span><span class="nx">collaborative</span><span class="o">:</span> <span class="kc">true</span><span class="p">}</span> <span class="p">)</span>
+<span class="p">.</span><span class="nx">done</span><span class="p">(</span> <span class="kd">function</span><span class="p">(</span><span class="nx">sharing</span><span class="p">){</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>others will be able to push their changes on todolist1 and its todos</p></div></div><div class="code"><div class="wrapper">  <span class="nx">sharing</span><span class="p">.</span><span class="nx">add</span><span class="p">([</span><span class="nx">todolist1</span><span class="p">,</span> <span class="nx">todo1</span><span class="p">,</span> <span class="nx">todo2</span><span class="p">,</span> <span class="nx">todo3</span><span class="p">]).</span><span class="nx">push</span><span class="p">()</span> 
+<span class="p">})</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><ol>
+<li>Public, password protected sharings</li>
+</ol>
+
+<p>I can optionally assign a password to a sharing that needs to be provided by
+others when trying to accessing it:</p></div></div><div class="code"><div class="wrapper"><span class="cm">/* me */</span>
+<span class="nx">hoodie</span><span class="p">.</span><span class="nx">sharing</span><span class="p">.</span><span class="nx">create</span><span class="p">(</span> <span class="p">{</span> 
+  <span class="nx">id</span>       <span class="o">:</span><span class="s2">&quot;mytodolist123&quot;</span><span class="p">,</span> 
+  <span class="kr">public</span>   <span class="o">:</span><span class="kc">true</span><span class="p">,</span> 
+  <span class="nx">password</span> <span class="o">:</span> <span class="s2">&quot;secret&quot;</span>
+<span class="p">}).</span><span class="nx">push</span><span class="p">()</span>
+
+<span class="cm">/* they */</span>
+<span class="nx">hoodie</span><span class="p">.</span><span class="nx">sharing</span><span class="p">.</span><span class="nx">open</span><span class="p">(</span> <span class="s2">&quot;mytodolist123&quot;</span><span class="p">,</span> <span class="p">{</span><span class="nx">password</span><span class="o">:</span> <span class="s2">&quot;secret&quot;</span><span class="p">}</span> <span class="p">)</span>
+<span class="p">.</span><span class="nx">done</span><span class="p">(</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+  <span class="nx">alert</span><span class="p">(</span><span class="s2">&quot;welcome to my todolist!&quot;</span><span class="p">)</span>
+<span class="p">})</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><ol>
+<li>Sharing Subscriptions</li>
+</ol>
+
+<p>I can subscribe to a sharing by others. It can be used just like the <code>open</code>
+method, with the difference that an internal $sharingAccess object will be 
+added to my store. This allows me to get a list of all sharings I've access 
+to.</p></div></div><div class="code"><div class="wrapper"><span class="nx">hoodie</span><span class="p">.</span><span class="nx">sharing</span><span class="p">.</span><span class="nx">subscription</span><span class="p">.</span><span class="nx">create</span><span class="p">(</span><span class="s2">&quot;sharing_id&quot;</span><span class="p">)</span>
+
+<span class="cm">/* or */</span>
+<span class="nx">hoodie</span><span class="p">.</span><span class="nx">sharing</span><span class="p">.</span><span class="nx">open</span><span class="p">(</span> <span class="s2">&quot;sharing_id&quot;</span> <span class="p">).</span><span class="nx">done</span><span class="p">(</span> <span class="kd">function</span><span class="p">(</span><span class="nx">sharing</span><span class="p">)</span> <span class="p">{</span>
+  <span class="nx">sharing</span><span class="p">.</span><span class="nx">subscribe</span><span class="p">()</span>
+<span class="p">})</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>I can pass options when creating a subscription, like password for protected
+sharings or continuous if I want to continuously synchronize with the 
+sharing </p></div></div><div class="code"><div class="wrapper"><span class="nx">hoodie</span><span class="p">.</span><span class="nx">sharing</span><span class="p">.</span><span class="nx">subscription</span><span class="p">.</span><span class="nx">create</span><span class="p">(</span><span class="s2">&quot;sharing_id&quot;</span><span class="p">,</span> <span class="p">{</span>
+  <span class="nx">continuous</span><span class="o">:</span> <span class="kc">true</span><span class="p">,</span>
+  <span class="nx">password</span><span class="o">:</span> <span class="s2">&quot;secret&quot;</span>
+<span class="p">})</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><ol>
+<li>Subscribing to events in Sharings</li>
+</ol>
+
+<p>I can open a sharing and listen to changes of its containing objects</p></div></div><div class="code"><div class="wrapper"><span class="nx">app</span><span class="p">.</span><span class="nx">sharing</span><span class="p">.</span><span class="nx">open</span><span class="p">(</span> <span class="s2">&quot;shared_id&quot;</span> <span class="p">).</span><span class="nx">done</span><span class="p">(</span> <span class="kd">function</span><span class="p">(</span><span class="nx">sharing</span><span class="p">)</span> <span class="p">{</span>
+  <span class="nx">sharing</span><span class="p">.</span><span class="nx">on</span><span class="p">(</span><span class="s1">&#39;changed&#39;</span><span class="p">,</span>        <span class="kd">function</span><span class="p">(</span><span class="nx">object</span><span class="p">)</span> <span class="p">{</span> <span class="cm">/* ... */</span> <span class="p">})</span>
+  <span class="nx">sharing</span><span class="p">.</span><span class="nx">on</span><span class="p">(</span><span class="s1">&#39;changed:type&#39;</span><span class="p">,</span>   <span class="kd">function</span><span class="p">(</span><span class="nx">object</span><span class="p">)</span> <span class="p">{</span> <span class="cm">/* ... */</span> <span class="p">})</span>
+  <span class="nx">sharing</span><span class="p">.</span><span class="nx">on</span><span class="p">(</span><span class="s1">&#39;created&#39;</span><span class="p">,</span>        <span class="kd">function</span><span class="p">(</span><span class="nx">object</span><span class="p">)</span> <span class="p">{</span> <span class="cm">/* ... */</span> <span class="p">})</span>
+  <span class="nx">sharing</span><span class="p">.</span><span class="nx">on</span><span class="p">(</span><span class="s1">&#39;created:type&#39;</span><span class="p">,</span>   <span class="kd">function</span><span class="p">(</span><span class="nx">object</span><span class="p">)</span> <span class="p">{</span> <span class="cm">/* ... */</span> <span class="p">})</span>
+  <span class="nx">sharing</span><span class="p">.</span><span class="nx">on</span><span class="p">(</span><span class="s1">&#39;updated&#39;</span><span class="p">,</span>        <span class="kd">function</span><span class="p">(</span><span class="nx">object</span><span class="p">)</span> <span class="p">{</span> <span class="cm">/* ... */</span> <span class="p">})</span>
+  <span class="nx">sharing</span><span class="p">.</span><span class="nx">on</span><span class="p">(</span><span class="s1">&#39;updated:type&#39;</span><span class="p">,</span>   <span class="kd">function</span><span class="p">(</span><span class="nx">object</span><span class="p">)</span> <span class="p">{</span> <span class="cm">/* ... */</span> <span class="p">})</span>
+  <span class="nx">sharing</span><span class="p">.</span><span class="nx">on</span><span class="p">(</span><span class="s1">&#39;destroyed&#39;</span><span class="p">,</span>      <span class="kd">function</span><span class="p">(</span><span class="nx">object</span><span class="p">)</span> <span class="p">{</span> <span class="cm">/* ... */</span> <span class="p">})</span>
+  <span class="nx">sharing</span><span class="p">.</span><span class="nx">on</span><span class="p">(</span><span class="s1">&#39;destroyed:type&#39;</span><span class="p">,</span> <span class="kd">function</span><span class="p">(</span><span class="nx">object</span><span class="p">)</span> <span class="p">{</span> <span class="cm">/* ... */</span> <span class="p">})</span>
+<span class="p">})</span></div></div></div></div></body></html>
