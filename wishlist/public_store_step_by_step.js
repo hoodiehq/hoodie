@@ -148,32 +148,33 @@ hoodie.my.store.update("profile", "uuid567", {}, { public: false })
 // function returns an object, the object will be PUT to users public store.
 
 // The function might look like this:
-function changes_doc_parser(obj) {
+function parseObjectForPublicStore(object) {
+
   switch(true) {
-    // make object entirely public
-    case obj.$public === true:
-      delete obj.$public
-      obj._id = "$public/" + obj._id
-      return obj
+    // make objectect entirely public
+    case object.$public === true:
+      delete object.$public
+      object._id = "$public/" + object._id
+      return object
 
     // make certain attributes public
-    case Array.isArray(obj.$public):
-      var newObj = {},
+    case Array.isArray(object.$public):
+      var newobject = {},
           defaultPublicAtts = ['_ref', 'type']
 
-      obj.$public = obj.$public.concat(defaultPublicAtts)
-      for (var i = 0, attr; i < obj.$public.length; i++) {
-        attr = obj.$public[i]
-        newObj[attr] = obj[attr]
+      object.$public = object.$public.concat(defaultPublicAtts)
+      for (var i = 0, attr; i < object.$public.length; i++) {
+        attr = object.$public[i]
+        newobject[attr] = object[attr]
       };
-      obj._id = "$public/" + obj._id
-      return obj
+      object._id = "$public/" + object._id
+      return object
 
-    // make public object private again, remove it from public store
-    case obj.$public === false:
+    // make public objectect private again, remove it from public store
+    case object.$public === false:
       return {
-        _id     : "$public/" + obj._id,
-        _rev    : obj._rev,
+        _id     : "$public/" + object._id,
+        _rev    : object._rev,
         _deleted: true
       }
   }
