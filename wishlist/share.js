@@ -179,7 +179,7 @@ hoodie.share.create({public: true})
 // with my collegues aj@example.com and bj@example.com. I want the todolist to
 // to be accessible for AJ, BJ and myself only.
 // 
-hoodie.share.create({collaborators: ["aj@example.com", "bj@example.com"]})
+hoodie.share.create({public: ["aj@example.com", "bj@example.com"]})
 .done( function(share) {
   share.add(todolist)
 
