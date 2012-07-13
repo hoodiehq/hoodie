@@ -64,7 +64,7 @@ hoodie.my.store.update("profile", "uuid567", {}, { public: ["name"] })
 
 // when you want to make an object private again, simply set public to false.
 // We now could simply remove the $public attribut, but we intentionally set
-// it to false, otherwise the public store worke would ignore it (see blelow)
+// it to false, otherwise the public store worker would ignore it (see blelow)
 // 
 //     {
 //       "_id"       : "profile/uuid567",
