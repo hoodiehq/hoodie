@@ -1,6 +1,6 @@
 # UserStore
 # ===========
-#
+
 # the User Store provides an API to load objects from other users that
 # have been made available publicly.
 #
@@ -8,7 +8,6 @@
 #
 #     hoodie.user("joe").loadAll().done( handleObjects)
 #
-
 class Hoodie.UserStore
 
   constructor: (hoodie) ->

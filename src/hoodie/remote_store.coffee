@@ -1,7 +1,9 @@
-#
+# RemoteStore
+# ============
+
 # Connection / Socket to our couch
 #
-# Remote is using CouchDB's `_changes` feed to listen to changes
+# RemoteStore is using CouchDB's `_changes` feed to listen to changes
 # and `_bulkDocs` to push local changes
 #
 # When hoodie.my.remoteStore is active (default), it will continuously 

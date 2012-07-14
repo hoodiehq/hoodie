@@ -1,4 +1,6 @@
-#
+# LocalStore
+# ============
+
 # window.localStrage wrapper and more
 #
 
