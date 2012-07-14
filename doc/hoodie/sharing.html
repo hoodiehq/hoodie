@@ -76,7 +76,7 @@ hoodie.sharing.create
 # shared and keep them updated
 hoodie.sharing.create
   continuous : true
-  objects    : hoodie.store.loadAll (obj) -&gt; obj.isShared
+  objects    : hoodie.my.localStore.loadAll (obj) -&gt; obj.isShared
 </code></pre></div></div><div class="code"><div class="wrapper">  <span class="nv">create : </span><span class="nf">(options = {}) -&gt;</span>
     <span class="nv">sharing = </span><span class="k">new</span> <span class="nx">Hoodie</span><span class="p">.</span><span class="nx">Sharing</span><span class="p">.</span><span class="nx">Instance</span> <span class="nx">options</span>
     <span class="nx">sharing</span><span class="p">.</span><span class="nx">save</span><span class="p">()</span>

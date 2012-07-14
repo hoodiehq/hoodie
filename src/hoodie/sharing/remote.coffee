@@ -20,7 +20,7 @@ class Hoodie.Sharing.Remote extends Hoodie.Remote
       # walk through all changed docs, check if it's
       # 1. the sharing object itself or
       # 2. an object belonging to the sharing
-      docs = for obj in @hoodie.store.changedDocs() when obj.id is @hoodie.sharing.id or obj.$sharings and ~obj.$sharings.indexOf(@hoodie.sharing.id)
+      docs = for obj in @hoodie.my.localStore.changedDocs() when obj.id is @hoodie.sharing.id or obj.$sharings and ~obj.$sharings.indexOf(@hoodie.sharing.id)
         obj 
 
     super(docs)
@@ -32,11 +32,11 @@ class Hoodie.Sharing.Remote extends Hoodie.Remote
   # that belong to the sharing, see above
   #
   _pullUrl : ->
-    since = @hoodie.config.get('_remote.seq') or 0
+    since = @hoodie.my.config.get('_remote.seq') or 0
     if @active # make a long poll request
-      "/#{encodeURIComponent @hoodie.account.db()}/_changes?filter=%24sharing_#{@hoodie.sharing.id}/owned&includeDocs=true&since=#{since}&heartbeat=10000&feed=longpoll"
+      "/#{encodeURIComponent @hoodie.my.account.db()}/_changes?filter=%24sharing_#{@hoodie.sharing.id}/owned&includeDocs=true&since=#{since}&heartbeat=10000&feed=longpoll"
     else
-      "/#{encodeURIComponent @hoodie.account.db()}/_changes?filter=%24sharing_#{@hoodie.sharing.id}/owned&includeDocs=true&since=#{since}"
+      "/#{encodeURIComponent @hoodie.my.account.db()}/_changes?filter=%24sharing_#{@hoodie.sharing.id}/owned&includeDocs=true&since=#{since}"
 
 
   # add revision to object
@@ -64,6 +64,6 @@ class Hoodie.Sharing.Remote extends Hoodie.Remote
           for key, doc of pushedDoc.$docsToRemove
             [type, id] = key.split /\//
             update = _rev: doc._rev
-            @hoodie.store.update(type, id, update, remote: true) for doc, i in docs
+            @hoodie.my.localStore.update(type, id, update, remote: true) for doc, i in docs
 
       super(docs, pushedDocs)()

@@ -53,7 +53,7 @@ resolve with an array of objects can be passed as well.</p>
 
 <p>sharing.add(todoObject)
 sharing.add([todoObject1, todoObject2, todoObject3])
-sharing.add( hoodie.store.findAll (obj) -> obj.isShared )</p></div></div><div class="code"><div class="wrapper">  <span class="nv">add: </span><span class="nf">(objects) -&gt;</span>
+sharing.add( hoodie.my.localStore.findAll (obj) -> obj.isShared )</p></div></div><div class="code"><div class="wrapper">  <span class="nv">add: </span><span class="nf">(objects) -&gt;</span>
     <span class="nx">@toggle</span> <span class="nx">objects</span><span class="p">,</span> <span class="kc">true</span>
     
       </div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h2 id="remove">remove</h2>
@@ -65,7 +65,7 @@ resolve with an array of objects can be passed as well.</p>
 
 <p>sharing.remove(todoObject)
 sharing.remove([todoObject1, todoObject2, todoObject3])
-sharing.remove( hoodie.store.findAll (obj) -> obj.isShared )</p></div></div><div class="code"><div class="wrapper">  <span class="nv">remove: </span><span class="nf">(objects) -&gt;</span> 
+sharing.remove( hoodie.my.localStore.findAll (obj) -> obj.isShared )</p></div></div><div class="code"><div class="wrapper">  <span class="nv">remove: </span><span class="nf">(objects) -&gt;</span> 
     <span class="nx">@toggle</span> <span class="nx">objects</span><span class="p">,</span> <span class="kc">false</span>
   
   </div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h2 id="toggle-">toggle ()</h2>

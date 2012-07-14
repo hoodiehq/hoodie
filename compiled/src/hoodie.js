@@ -8,16 +8,11 @@ Hoodie = (function(_super) {
   __extends(Hoodie, _super);
 
   Hoodie.prototype.modules = {
-    store: "Store",
-    config: "Config",
-    account: "Account",
-    remote: "Remote",
-    email: "Email",
     my: {
-      account: "Account",
       localStore: "Store",
-      remoteStore: "Remote",
-      config: "Config"
+      config: "Config",
+      account: "Account",
+      remoteStore: "Remote"
     }
   };
 

@@ -11,39 +11,40 @@ Mocks.Hoodie = ->
   defer         : $.Deferred
   isPromise     : -> 
     
-  store         :
-    uuid          : -> 'mock567'
-    create        : -> 
-      then : ->
-    destroy       : -> 
-      then : ->
-    save          : -> 
-      then : ->
-      done: ->
-    update        : -> 
-      pipe : ->
-      fail : ->
-      done : ->
-    load          : -> 
-      pipe : ->
-      fail : ->
-      done : ->
-    changedDocs  : ->
-      
-    db :
-      getItem       : ->
-      setItem       : ->
-      removeItem    : ->
-                  
-  account       : 
-    authenticate  : -> 
-      then : ->   
-      pipe : ->   
+  my :
+    localStore         :
+      uuid          : -> 'mock567'
+      create        : -> 
+        then : ->
+      destroy       : -> 
+        then : ->
+      save          : -> 
+        then : ->
+        done: ->
+      update        : -> 
+        pipe : ->
         fail : ->
-    db            : ->
-    on            : ->
+        done : ->
+      load          : -> 
+        pipe : ->
+        fail : ->
+        done : ->
+      changedDocs  : ->
+        
+      db :
+        getItem       : ->
+        setItem       : ->
+        removeItem    : ->
+                  
+    account       : 
+      authenticate  : -> 
+        then : ->   
+        pipe : ->   
+          fail : ->
+      db            : ->
+      on            : ->
       
-  config :
-    set : ->
-    get : ->
-    remove : ->
+    config :
+      set : ->
+      get : ->
+      remove : ->

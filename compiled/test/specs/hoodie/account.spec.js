@@ -16,7 +16,7 @@ describe("Hoodie.Account", function() {
     });
     _when("account.username is set", function() {
       beforeEach(function() {
-        return spyOn(this.hoodie.config, "get").andCallFake(function(key) {
+        return spyOn(this.hoodie.my.config, "get").andCallFake(function(key) {
           if (key === '_account.username') {
             return 'joe@example.com';
           }
@@ -43,14 +43,14 @@ describe("Hoodie.Account", function() {
     describe("._handleSignIn(@username)", function() {
       beforeEach(function() {
         expect(this.account.username).toBeUndefined();
-        spyOn(this.hoodie.config, "set");
+        spyOn(this.hoodie.my.config, "set");
         return this.account._handleSignIn('joe@example.com');
       });
       it("should set @username", function() {
         return expect(this.account.username).toBe('joe@example.com');
       });
       it("should store @username to config", function() {
-        return expect(this.hoodie.config.set).wasCalledWith('_account.username', 'joe@example.com');
+        return expect(this.hoodie.my.config.set).wasCalledWith('_account.username', 'joe@example.com');
       });
       return it("should set _authenticated to true", function() {
         this.account._authenticated = false;
@@ -67,11 +67,11 @@ describe("Hoodie.Account", function() {
         return expect(this.account.username).toBeUndefined();
       });
       it("should store @username persistantly", function() {
-        spyOn(this.hoodie.config, "remove");
+        spyOn(this.hoodie.my.config, "remove");
         this.account._handleSignOut({
           "ok": true
         });
-        return expect(this.hoodie.config.remove).wasCalledWith('_account.username');
+        return expect(this.hoodie.my.config.remove).wasCalledWith('_account.username');
       });
       return it("should set _authenticated to false", function() {
         this.account._authenticated = true;

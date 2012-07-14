@@ -13,7 +13,7 @@ Hoodie.Account = (function() {
 
     this.authenticate = __bind(this.authenticate, this);
 
-    this.username = this.hoodie.config.get('_account.username');
+    this.username = this.hoodie.my.config.get('_account.username');
     this.on('signin', this._handleSignIn);
     this.on('signout', this._handleSignOut);
   }
@@ -217,13 +217,13 @@ Hoodie.Account = (function() {
 
   Account.prototype._handleSignIn = function(username) {
     this.username = username;
-    this.hoodie.config.set('_account.username', this.username);
+    this.hoodie.my.config.set('_account.username', this.username);
     return this._authenticated = true;
   };
 
   Account.prototype._handleSignOut = function() {
     delete this.username;
-    this.hoodie.config.remove('_account.username');
+    this.hoodie.my.config.remove('_account.username');
     return this._authenticated = false;
   };
 

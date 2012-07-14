@@ -3,7 +3,7 @@
 <p>Remote is using CouchDB's <code>_changes</code> feed to listen to changes
 and <code>_bulkDocs</code> to push local changes</p>
 
-<p>When hoodie.remote is active (default), it will continuously 
+<p>When hoodie.my.remoteStore is active (default), it will continuously 
 synchronize, otherwise sync, pull or push can be called manually</p></div></div><div class="code"><div class="wrapper">  
 <span class="k">class</span> <span class="nx">Hoodie</span><span class="p">.</span><span class="nx">Remote</span>
   </div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h2 id="properties">properties</h2></div></div><div class="code"><div class="wrapper">  </div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>active
@@ -59,7 +59,7 @@ If no objects passed, push all changed documents</p></div></div><div class="code
       
     <span class="nv">docsForRemote = </span><span class="p">(</span><span class="nx">@_parseForRemote</span> <span class="nx">doc</span> <span class="k">for</span> <span class="nx">doc</span> <span class="k">in</span> <span class="nx">docs</span><span class="p">)</span>
     
-    <span class="vi">@_pushRequest = </span><span class="nx">@hoodie</span><span class="p">.</span><span class="nx">request</span> <span class="s1">&#39;POST&#39;</span><span class="p">,</span> <span class="s2">&quot;/#{encodeURIComponent @hoodie.account.db()}/_bulkDocs&quot;</span><span class="p">,</span> 
+    <span class="vi">@_pushRequest = </span><span class="nx">@hoodie</span><span class="p">.</span><span class="nx">request</span> <span class="s1">&#39;POST&#39;</span><span class="p">,</span> <span class="s2">&quot;/#{encodeURIComponent @hoodie.my.account.db()}/_bulkDocs&quot;</span><span class="p">,</span> 
       <span class="nv">dataType: </span>    <span class="s1">&#39;json&#39;</span>
       <span class="nv">processData: </span> <span class="kc">false</span>
       <span class="nv">contentType: </span> <span class="s1">&#39;application/json&#39;</span>
@@ -85,9 +85,9 @@ If no objects passed, push all changed documents</p></div></div><div class="code
 <p>Depending on whether remote is active, return a longpoll URL or not</p></div></div><div class="code"><div class="wrapper">  <span class="nv">_pullUrl : </span><span class="o">-&gt;</span>
     <span class="nv">since = </span><span class="nx">@hoodie</span><span class="p">.</span><span class="nx">config</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="s1">&#39;_remote.seq&#39;</span><span class="p">)</span> <span class="o">or</span> <span class="mi">0</span>
     <span class="k">if</span> <span class="nx">@active</span> <span class="c1"># make a long poll request</span>
-      <span class="s2">&quot;/#{encodeURIComponent @hoodie.account.db()}/_changes?includeDocs=true&amp;heartbeat=10000&amp;feed=longpoll&amp;since=#{since}&quot;</span>
+      <span class="s2">&quot;/#{encodeURIComponent @hoodie.my.account.db()}/_changes?includeDocs=true&amp;heartbeat=10000&amp;feed=longpoll&amp;since=#{since}&quot;</span>
     <span class="k">else</span>
-      <span class="s2">&quot;/#{encodeURIComponent @hoodie.account.db()}/_changes?includeDocs=true&amp;since=#{since}&quot;</span>
+      <span class="s2">&quot;/#{encodeURIComponent @hoodie.my.account.db()}/_changes?includeDocs=true&amp;since=#{since}&quot;</span>
   </div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>request gets restarted automaticcally in @_handlePullError</p></div></div><div class="code"><div class="wrapper">  <span class="nv">_restartPullRequest : </span><span class="o">=&gt;</span> <span class="nx">@_pullRequest</span><span class="o">?</span><span class="p">.</span><span class="nx">abort</span><span class="p">()</span>
   
   </div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>pull success handler </p>

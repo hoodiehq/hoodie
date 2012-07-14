@@ -4,7 +4,7 @@
 # Remote is using CouchDB's `_changes` feed to listen to changes
 # and `_bulkDocs` to push local changes
 #
-# When hoodie.remote is active (default), it will continuously 
+# When hoodie.my.remoteStore is active (default), it will continuously 
 # synchronize, otherwise sync, pull or push can be called manually
 #
   
@@ -22,13 +22,13 @@ class Hoodie.Remote
   constructor : (@hoodie) ->      
     
     # overwrite default with _remote.active config, if set
-    @active = @hoodie.config.get('_remote.active') if @hoodie.config.get('_remote.active')?
+    @active = @hoodie.my.config.get('_remote.active') if @hoodie.my.config.get('_remote.active')?
     
     @activate() if @active
   
   #
   activate : =>
-    @hoodie.config.set '_remote.active', @active = true
+    @hoodie.my.config.set '_remote.active', @active = true
 
     @hoodie.on 'account:signedOut',    @disconnect
     @hoodie.on 'account:signedIn',     @connect
@@ -37,7 +37,7 @@ class Hoodie.Remote
 
   #
   deactivate : =>
-    @hoodie.config.set '_remote.active', @active = false
+    @hoodie.my.config.set '_remote.active', @active = false
 
     @hoodie.unbind 'account:signedIn',  @connect
     @hoodie.unbind 'account:signedOut', @disconnect
@@ -51,7 +51,7 @@ class Hoodie.Remote
     @connected = true
     
     # start syncing
-    @hoodie.account.authenticate().pipe @sync
+    @hoodie.my.account.authenticate().pipe @sync
   
     
   # ## Disconnect
@@ -87,12 +87,12 @@ class Hoodie.Remote
   # If no objects passed, push all changed documents
   push : (docs) =>
     
-    docs = @hoodie.store.changedDocs() unless $.isArray docs
+    docs = @hoodie.my.localStore.changedDocs() unless $.isArray docs
     return @hoodie.defer().resolve([]).promise() if docs.length is 0
       
     docsForRemote = (@_parseForRemote doc for doc in docs)
     
-    @_pushRequest = @hoodie.request 'POST', "/#{encodeURIComponent @hoodie.account.db()}/_bulkDocs", 
+    @_pushRequest = @hoodie.request 'POST', "/#{encodeURIComponent @hoodie.my.account.db()}/_bulkDocs", 
       dataType:     'json'
       processData:  false
       contentType:  'application/json'
@@ -131,11 +131,11 @@ class Hoodie.Remote
   # Depending on whether remote is active, return a longpoll URL or not
   #
   _pullUrl : ->
-    since = @hoodie.config.get('_remote.seq') or 0
+    since = @hoodie.my.config.get('_remote.seq') or 0
     if @active # make a long poll request
-      "/#{encodeURIComponent @hoodie.account.db()}/_changes?includeDocs=true&heartbeat=10000&feed=longpoll&since=#{since}"
+      "/#{encodeURIComponent @hoodie.my.account.db()}/_changes?includeDocs=true&heartbeat=10000&feed=longpoll&since=#{since}"
     else
-      "/#{encodeURIComponent @hoodie.account.db()}/_changes?includeDocs=true&since=#{since}"
+      "/#{encodeURIComponent @hoodie.my.account.db()}/_changes?includeDocs=true&since=#{since}"
   
   # request gets restarted automaticcally in @_handlePullError
   _restartPullRequest : => @_pullRequest?.abort()
@@ -147,7 +147,7 @@ class Hoodie.Remote
   # handle the incoming changes, then send the next request
   #
   _handlePullSuccess : (response) =>
-    @hoodie.config.set '_remote.seq', response.lastSeq
+    @hoodie.my.config.set '_remote.seq', response.lastSeq
     @_handlePullResults response.results
     
     @pull() if @connected and @active
@@ -240,7 +240,7 @@ class Hoodie.Remote
     @_timezoneOffset or= new Date().getTimezoneOffset() * 60
 
     timestamp   = Date.now() + @_timezoneOffset
-    uuid        = @hoodie.store.uuid(5)
+    uuid        = @hoodie.my.localStore.uuid(5)
     "#{uuid}##{timestamp}"
   
 
@@ -323,9 +323,9 @@ class Hoodie.Remote
     for {doc} in changes
       doc = @_parseFromPull(doc)
       if doc._deleted
-        _destroyedDocs.push [doc, @hoodie.store.destroy(  doc.type, doc.id,      remote: true)]
+        _destroyedDocs.push [doc, @hoodie.my.localStore.destroy(  doc.type, doc.id,      remote: true)]
       else                                                
-        _changedDocs.push   [doc, @hoodie.store.update(   doc.type, doc.id, doc, remote: true)]
+        _changedDocs.push   [doc, @hoodie.my.localStore.update(   doc.type, doc.id, doc, remote: true)]
     
     # 2. trigger events
     for [doc, promise] in _destroyedDocs
@@ -359,4 +359,4 @@ class Hoodie.Remote
       for doc, i in docs
         update  = {_rev: pushedDocs[i]._rev}
         options = remote : true
-        @hoodie.store.update(doc.type, doc.id, update, options) 
+        @hoodie.my.localStore.update(doc.type, doc.id, update, options) 

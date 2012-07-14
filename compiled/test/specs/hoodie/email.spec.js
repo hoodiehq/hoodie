@@ -14,7 +14,7 @@ describe("Hoodie.Email", function() {
         subject: 'subject',
         body: 'body'
       };
-      return (spyOn(this.hoodie.store, "create")).andReturn({
+      return (spyOn(this.hoodie.my.localStore, "create")).andReturn({
         then: function(cb) {
           return cb($.extend({}, this.emailAttributes, {
             id: 'abc4567'
@@ -27,7 +27,7 @@ describe("Hoodie.Email", function() {
     });
     it("should save the email as object with type: $email", function() {
       this.email.send(this.emailAttributes);
-      return (expect(this.hoodie.store.create)).wasCalledWith('$email', this.emailAttributes);
+      return (expect(this.hoodie.my.localStore.create)).wasCalledWith('$email', this.emailAttributes);
     });
     it("should listen to server response", function() {
       spyOn(this.hoodie, "one");

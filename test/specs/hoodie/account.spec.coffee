@@ -19,7 +19,7 @@ describe "Hoodie.Account", ->
     
     _when "account.username is set", ->
       beforeEach ->
-        spyOn(@hoodie.config, "get").andCallFake (key) ->
+        spyOn(@hoodie.my.config, "get").andCallFake (key) ->
           if key is '_account.username'
             return 'joe@example.com'
             
@@ -42,14 +42,14 @@ describe "Hoodie.Account", ->
     describe "._handleSignIn(@username)", ->
       beforeEach ->
         expect(@account.username).toBeUndefined()
-        spyOn(@hoodie.config, "set")
+        spyOn(@hoodie.my.config, "set")
         @account._handleSignIn 'joe@example.com'
       
       it "should set @username", ->
         expect(@account.username).toBe 'joe@example.com'
         
       it "should store @username to config", ->
-        expect(@hoodie.config.set).wasCalledWith '_account.username', 'joe@example.com'
+        expect(@hoodie.my.config.set).wasCalledWith '_account.username', 'joe@example.com'
         
       it "should set _authenticated to true", ->
         @account._authenticated = false
@@ -64,9 +64,9 @@ describe "Hoodie.Account", ->
         do expect(@account.username).toBeUndefined
         
       it "should store @username persistantly", ->
-        spyOn(@hoodie.config, "remove")
+        spyOn(@hoodie.my.config, "remove")
         @account._handleSignOut {"ok":true}
-        expect(@hoodie.config.remove).wasCalledWith '_account.username'
+        expect(@hoodie.my.config.remove).wasCalledWith '_account.username'
         
       it "should set _authenticated to false", ->
         @account._authenticated = true

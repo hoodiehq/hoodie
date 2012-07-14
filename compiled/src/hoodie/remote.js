@@ -31,8 +31,8 @@ Hoodie.Remote = (function() {
 
     this.activate = __bind(this.activate, this);
 
-    if (this.hoodie.config.get('_remote.active') != null) {
-      this.active = this.hoodie.config.get('_remote.active');
+    if (this.hoodie.my.config.get('_remote.active') != null) {
+      this.active = this.hoodie.my.config.get('_remote.active');
     }
     if (this.active) {
       this.activate();
@@ -40,14 +40,14 @@ Hoodie.Remote = (function() {
   }
 
   Remote.prototype.activate = function() {
-    this.hoodie.config.set('_remote.active', this.active = true);
+    this.hoodie.my.config.set('_remote.active', this.active = true);
     this.hoodie.on('account:signedOut', this.disconnect);
     this.hoodie.on('account:signedIn', this.connect);
     return this.connect();
   };
 
   Remote.prototype.deactivate = function() {
-    this.hoodie.config.set('_remote.active', this.active = false);
+    this.hoodie.my.config.set('_remote.active', this.active = false);
     this.hoodie.unbind('account:signedIn', this.connect);
     this.hoodie.unbind('account:signedOut', this.disconnect);
     return this.disconnect();
@@ -55,7 +55,7 @@ Hoodie.Remote = (function() {
 
   Remote.prototype.connect = function() {
     this.connected = true;
-    return this.hoodie.account.authenticate().pipe(this.sync);
+    return this.hoodie.my.account.authenticate().pipe(this.sync);
   };
 
   Remote.prototype.disconnect = function() {
@@ -82,7 +82,7 @@ Hoodie.Remote = (function() {
   Remote.prototype.push = function(docs) {
     var doc, docsForRemote;
     if (!$.isArray(docs)) {
-      docs = this.hoodie.store.changedDocs();
+      docs = this.hoodie.my.localStore.changedDocs();
     }
     if (docs.length === 0) {
       return this.hoodie.defer().resolve([]).promise();
@@ -96,7 +96,7 @@ Hoodie.Remote = (function() {
       }
       return _results;
     }).call(this);
-    this._pushRequest = this.hoodie.request('POST', "/" + (encodeURIComponent(this.hoodie.account.db())) + "/_bulkDocs", {
+    this._pushRequest = this.hoodie.request('POST', "/" + (encodeURIComponent(this.hoodie.my.account.db())) + "/_bulkDocs", {
       dataType: 'json',
       processData: false,
       contentType: 'application/json',
@@ -122,11 +122,11 @@ Hoodie.Remote = (function() {
 
   Remote.prototype._pullUrl = function() {
     var since;
-    since = this.hoodie.config.get('_remote.seq') || 0;
+    since = this.hoodie.my.config.get('_remote.seq') || 0;
     if (this.active) {
-      return "/" + (encodeURIComponent(this.hoodie.account.db())) + "/_changes?includeDocs=true&heartbeat=10000&feed=longpoll&since=" + since;
+      return "/" + (encodeURIComponent(this.hoodie.my.account.db())) + "/_changes?includeDocs=true&heartbeat=10000&feed=longpoll&since=" + since;
     } else {
-      return "/" + (encodeURIComponent(this.hoodie.account.db())) + "/_changes?includeDocs=true&since=" + since;
+      return "/" + (encodeURIComponent(this.hoodie.my.account.db())) + "/_changes?includeDocs=true&since=" + since;
     }
   };
 
@@ -136,7 +136,7 @@ Hoodie.Remote = (function() {
   };
 
   Remote.prototype._handlePullSuccess = function(response) {
-    this.hoodie.config.set('_remote.seq', response.lastSeq);
+    this.hoodie.my.config.set('_remote.seq', response.lastSeq);
     this._handlePullResults(response.results);
     if (this.connected && this.active) {
       return this.pull();
@@ -192,7 +192,7 @@ Hoodie.Remote = (function() {
     var timestamp, uuid;
     this._timezoneOffset || (this._timezoneOffset = new Date().getTimezoneOffset() * 60);
     timestamp = Date.now() + this._timezoneOffset;
-    uuid = this.hoodie.store.uuid(5);
+    uuid = this.hoodie.my.localStore.uuid(5);
     return "" + uuid + "#" + timestamp;
   };
 
@@ -252,13 +252,13 @@ Hoodie.Remote = (function() {
       doc = this._parseFromPull(doc);
       if (doc._deleted) {
         _destroyedDocs.push([
-          doc, this.hoodie.store.destroy(doc.type, doc.id, {
+          doc, this.hoodie.my.localStore.destroy(doc.type, doc.id, {
             remote: true
           })
         ]);
       } else {
         _changedDocs.push([
-          doc, this.hoodie.store.update(doc.type, doc.id, doc, {
+          doc, this.hoodie.my.localStore.update(doc.type, doc.id, doc, {
             remote: true
           })
         ]);
@@ -305,7 +305,7 @@ Hoodie.Remote = (function() {
         options = {
           remote: true
         };
-        _results.push(_this.hoodie.store.update(doc.type, doc.id, update, options));
+        _results.push(_this.hoodie.my.localStore.update(doc.type, doc.id, update, options));
       }
       return _results;
     };

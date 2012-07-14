@@ -11,12 +11,12 @@ describe("Hoodie.Remote", function() {
     spyOn(this.hoodie, "request").andReturn(this.requestDefer.promise());
     spyOn(window, "setTimeout");
     spyOn(this.hoodie, "trigger");
-    spyOn(this.hoodie.store, "destroy").andReturn({
+    spyOn(this.hoodie.my.localStore, "destroy").andReturn({
       then: function(cb) {
         return cb('objectFromStore');
       }
     });
-    return spyOn(this.hoodie.store, "update").andReturn({
+    return spyOn(this.hoodie.my.localStore, "update").andReturn({
       then: function(cb) {
         return cb('objectFromStore', false);
       }
@@ -35,7 +35,7 @@ describe("Hoodie.Remote", function() {
     });
     return _when("config remote.active is false", function() {
       beforeEach(function() {
-        spyOn(this.hoodie.config, "get").andReturn(false);
+        spyOn(this.hoodie.my.config, "get").andReturn(false);
         return this.remote = new Hoodie.Remote(this.hoodie);
       });
       return it("should set active to false", function() {
@@ -50,9 +50,9 @@ describe("Hoodie.Remote", function() {
       return expect(this.remote.active).toBeTruthy();
     });
     it("should set config remote.active to true", function() {
-      spyOn(this.hoodie.config, "set");
+      spyOn(this.hoodie.my.config, "set");
       this.remote.activate();
-      return expect(this.hoodie.config.set).wasCalledWith('_remote.active', true);
+      return expect(this.hoodie.my.config.set).wasCalledWith('_remote.active', true);
     });
     it("should subscribe to `signedOut` event", function() {
       this.remote.activate();
@@ -70,9 +70,9 @@ describe("Hoodie.Remote", function() {
       return expect(this.remote.active).toBeFalsy();
     });
     it("should set config remote.active to false", function() {
-      spyOn(this.hoodie.config, "set");
+      spyOn(this.hoodie.my.config, "set");
       this.remote.deactivate();
-      return expect(this.hoodie.config.set).wasCalledWith('_remote.active', false);
+      return expect(this.hoodie.my.config.set).wasCalledWith('_remote.active', false);
     });
     it("should unsubscribe from account's signedIn idle event", function() {
       this.remote.deactivate();
@@ -88,13 +88,13 @@ describe("Hoodie.Remote", function() {
       return spyOn(this.remote, "sync");
     });
     it("should authenticate", function() {
-      spyOn(this.hoodie.account, "authenticate").andCallThrough();
+      spyOn(this.hoodie.my.account, "authenticate").andCallThrough();
       this.remote.connect();
-      return expect(this.hoodie.account.authenticate).wasCalled();
+      return expect(this.hoodie.my.account.authenticate).wasCalled();
     });
     return _when("successful", function() {
       beforeEach(function() {
-        return spyOn(this.hoodie.account, "authenticate").andReturn({
+        return spyOn(this.hoodie.my.account, "authenticate").andReturn({
           pipe: function(cb) {
             cb();
             return {
@@ -136,7 +136,7 @@ describe("Hoodie.Remote", function() {
       });
       it("should send a longpoll GET request to user's db _changes feed", function() {
         var method, path, _ref;
-        spyOn(this.hoodie.account, "db").andReturn('joe$examleCom');
+        spyOn(this.hoodie.my.account, "db").andReturn('joe$examleCom');
         this.remote.pull();
         expect(this.hoodie.request).wasCalled();
         _ref = this.hoodie.request.mostRecentCall.args, method = _ref[0], path = _ref[1];
@@ -154,7 +154,7 @@ describe("Hoodie.Remote", function() {
       });
       return it("should send a normal GET request to user's db _changes feed", function() {
         var method, path, _ref;
-        spyOn(this.hoodie.account, "db").andReturn('joe$examleCom');
+        spyOn(this.hoodie.my.account, "db").andReturn('joe$examleCom');
         this.remote.pull();
         expect(this.hoodie.request).wasCalled();
         _ref = this.hoodie.request.mostRecentCall.args, method = _ref[0], path = _ref[1];
@@ -176,13 +176,13 @@ describe("Hoodie.Remote", function() {
       });
       it("should remove `todo/abc3` from store", function() {
         this.remote.pull();
-        return expect(this.hoodie.store.destroy).wasCalledWith('todo', 'abc3', {
+        return expect(this.hoodie.my.localStore.destroy).wasCalledWith('todo', 'abc3', {
           remote: true
         });
       });
       it("should save `todo/abc2` in store", function() {
         this.remote.pull();
-        return expect(this.hoodie.store.update).wasCalledWith('todo', 'abc2', {
+        return expect(this.hoodie.my.localStore.update).wasCalledWith('todo', 'abc2', {
           _rev: '1-123',
           content: 'remember the milk',
           done: false,
@@ -352,7 +352,7 @@ describe("Hoodie.Remote", function() {
     return _when("no docs passed", function() {
       _and("there are no changed docs", function() {
         beforeEach(function() {
-          spyOn(this.hoodie.store, "changedDocs").andReturn([]);
+          spyOn(this.hoodie.my.localStore, "changedDocs").andReturn([]);
           return this.remote.push();
         });
         return it("shouldn't do anything", function() {
@@ -362,8 +362,8 @@ describe("Hoodie.Remote", function() {
       _and("there is one deleted and one new doc", function() {
         beforeEach(function() {
           var _ref;
-          spyOn(this.hoodie.store, "changedDocs").andReturn(Mocks.changedDocs());
-          spyOn(this.hoodie.account, "db").andReturn('joe$examleCom');
+          spyOn(this.hoodie.my.localStore, "changedDocs").andReturn(Mocks.changedDocs());
+          spyOn(this.hoodie.my.account, "db").andReturn('joe$examleCom');
           this.remote.push();
           expect(this.hoodie.request).wasCalled();
           return _ref = this.hoodie.request.mostRecentCall.args, this.method = _ref[0], this.path = _ref[1], this.options = _ref[2], _ref;

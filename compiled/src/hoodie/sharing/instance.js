@@ -25,7 +25,7 @@ Hoodie.Sharing.Instance = (function() {
     this.set = __bind(this.set, this);
 
     this.hoodie = this.constructor.hoodie;
-    this.anonymous = this.hoodie.account.username === void 0;
+    this.anonymous = this.hoodie.my.account.username === void 0;
     this.set(options);
     this._assureOwnerUuid();
     if (this.anonymous) {
@@ -70,7 +70,7 @@ Hoodie.Sharing.Instance = (function() {
       $.extend(_this, properties);
       return defer.resolve(_this);
     };
-    this.hoodie.store.update("$sharing", this.id, this._memory, options).then(_handleUpdate, defer.reject);
+    this.hoodie.my.localStore.update("$sharing", this.id, this._memory, options).then(_handleUpdate, defer.reject);
     return defer.promise();
   };
 
@@ -97,7 +97,7 @@ Hoodie.Sharing.Instance = (function() {
           return this._toggle;
       }
     }).call(this);
-    return this.hoodie.store.updateAll(objects, updateMethod);
+    return this.hoodie.my.localStore.updateAll(objects, updateMethod);
   };
 
   Instance.prototype.sync = function() {
@@ -105,9 +105,9 @@ Hoodie.Sharing.Instance = (function() {
     if (this.hasAccount()) {
       return (this.sync = this._sync)();
     } else {
-      return this.hoodie.account.signUp("sharing/" + this.id, this.password).done(function(username, response) {
+      return this.hoodie.my.account.signUp("sharing/" + this.id, this.password).done(function(username, response) {
         _this.save({
-          _userRev: _this.hoodie.account._doc._rev
+          _userRev: _this.hoodie.my.account._doc._rev
         });
         return (_this.sync = _this._sync)();
       });
@@ -123,10 +123,10 @@ Hoodie.Sharing.Instance = (function() {
     if (this.ownerUuid) {
       return;
     }
-    config = this.constructor.hoodie.config;
+    config = this.constructor.hoodie.my.config;
     this.ownerUuid = config.get('sharing.ownerUuid');
     if (!this.ownerUuid) {
-      this.ownerUuid = this.constructor.hoodie.store.uuid();
+      this.ownerUuid = this.constructor.hoodie.my.localStore.uuid();
       return config.set('sharing.ownerUuid', this.ownerUuid);
     }
   };
@@ -134,7 +134,7 @@ Hoodie.Sharing.Instance = (function() {
   Instance.prototype._isMySharedObjectAndChanged = function(obj) {
     var belongsToMe;
     belongsToMe = obj.id === this.id || obj.$sharings && ~obj.$sharings.indexOf(this.id);
-    return belongsToMe && this.hoodie.store.isDirty(obj.type, obj.id);
+    return belongsToMe && this.hoodie.my.localStore.isDirty(obj.type, obj.id);
   };
 
   Instance.prototype._add = function(obj) {
@@ -184,8 +184,8 @@ Hoodie.Sharing.Instance = (function() {
 
   Instance.prototype._sync = function() {
     var _this = this;
-    return this.save().pipe(this.hoodie.store.loadAll(this._isMySharedObjectAndChanged).pipe(function(sharedObjectThatChanged) {
-      return _this.hoodie.remote.sync(sharedObjectThatChanged).then(_this._handleRemoteChanges);
+    return this.save().pipe(this.hoodie.my.localStore.loadAll(this._isMySharedObjectAndChanged).pipe(function(sharedObjectThatChanged) {
+      return _this.hoodie.my.remoteStore.sync(sharedObjectThatChanged).then(_this._handleRemoteChanges);
     }));
   };
 

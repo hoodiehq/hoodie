@@ -17,7 +17,7 @@ Hoodie.Sharing.Hoodie = (function(_super) {
     var event, _i, _len, _ref,
       _this = this;
     this.sharing = sharing;
-    this.store = hoodie.store;
+    this.store = hoodie.my.localStore;
     this.config = {
       set: this.sharing.set,
       get: this.sharing.get,

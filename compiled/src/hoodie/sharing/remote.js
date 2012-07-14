@@ -19,7 +19,7 @@ Hoodie.Sharing.Remote = (function(_super) {
     if (!$.isArray(docs)) {
       docs = (function() {
         var _i, _len, _ref, _results;
-        _ref = this.hoodie.store.changedDocs();
+        _ref = this.hoodie.my.localStore.changedDocs();
         _results = [];
         for (_i = 0, _len = _ref.length; _i < _len; _i++) {
           obj = _ref[_i];
@@ -35,11 +35,11 @@ Hoodie.Sharing.Remote = (function(_super) {
 
   Remote.prototype._pullUrl = function() {
     var since;
-    since = this.hoodie.config.get('_remote.seq') || 0;
+    since = this.hoodie.my.config.get('_remote.seq') || 0;
     if (this.active) {
-      return "/" + (encodeURIComponent(this.hoodie.account.db())) + "/_changes?filter=%24sharing_" + this.hoodie.sharing.id + "/owned&includeDocs=true&since=" + since + "&heartbeat=10000&feed=longpoll";
+      return "/" + (encodeURIComponent(this.hoodie.my.account.db())) + "/_changes?filter=%24sharing_" + this.hoodie.sharing.id + "/owned&includeDocs=true&since=" + since + "&heartbeat=10000&feed=longpoll";
     } else {
-      return "/" + (encodeURIComponent(this.hoodie.account.db())) + "/_changes?filter=%24sharing_" + this.hoodie.sharing.id + "/owned&includeDocs=true&since=" + since;
+      return "/" + (encodeURIComponent(this.hoodie.my.account.db())) + "/_changes?filter=%24sharing_" + this.hoodie.sharing.id + "/owned&includeDocs=true&since=" + since;
     }
   };
 
@@ -73,7 +73,7 @@ Hoodie.Sharing.Remote = (function(_super) {
             };
             for (i = _j = 0, _len1 = docs.length; _j < _len1; i = ++_j) {
               doc = docs[i];
-              _this.hoodie.store.update(type, id, update, {
+              _this.hoodie.my.localStore.update(type, id, update, {
                 remote: true
               });
             }

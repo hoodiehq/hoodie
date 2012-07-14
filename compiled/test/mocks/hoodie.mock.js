@@ -12,65 +12,67 @@ Mocks.Hoodie = function() {
     unbind: function() {},
     defer: $.Deferred,
     isPromise: function() {},
-    store: {
-      uuid: function() {
-        return 'mock567';
+    my: {
+      localStore: {
+        uuid: function() {
+          return 'mock567';
+        },
+        create: function() {
+          return {
+            then: function() {}
+          };
+        },
+        destroy: function() {
+          return {
+            then: function() {}
+          };
+        },
+        save: function() {
+          return {
+            then: function() {},
+            done: function() {}
+          };
+        },
+        update: function() {
+          return {
+            pipe: function() {},
+            fail: function() {},
+            done: function() {}
+          };
+        },
+        load: function() {
+          return {
+            pipe: function() {},
+            fail: function() {},
+            done: function() {}
+          };
+        },
+        changedDocs: function() {},
+        db: {
+          getItem: function() {},
+          setItem: function() {},
+          removeItem: function() {}
+        }
       },
-      create: function() {
-        return {
-          then: function() {}
-        };
+      account: {
+        authenticate: function() {
+          return {
+            then: function() {},
+            pipe: function() {
+              return {
+                fail: function() {}
+              };
+            }
+          };
+        },
+        db: function() {},
+        on: function() {}
       },
-      destroy: function() {
-        return {
-          then: function() {}
-        };
-      },
-      save: function() {
-        return {
-          then: function() {},
-          done: function() {}
-        };
-      },
-      update: function() {
-        return {
-          pipe: function() {},
-          fail: function() {},
-          done: function() {}
-        };
-      },
-      load: function() {
-        return {
-          pipe: function() {},
-          fail: function() {},
-          done: function() {}
-        };
-      },
-      changedDocs: function() {},
-      db: {
-        getItem: function() {},
-        setItem: function() {},
-        removeItem: function() {}
+      config: {
+        set: function() {},
+        get: function() {},
+        remove: function() {}
       }
-    },
-    account: {
-      authenticate: function() {
-        return {
-          then: function() {},
-          pipe: function() {
-            return {
-              fail: function() {}
-            };
-          }
-        };
-      },
-      db: function() {},
-      on: function() {}
-    },
-    config: {
-      set: function() {},
-      get: function() {},
-      remove: function() {}
     }
   };
 };

@@ -15,7 +15,7 @@ class Hoodie.Account
   constructor : (@hoodie) ->
     
     # handle session
-    @username = @hoodie.config.get '_account.username'
+    @username = @hoodie.my.config.get '_account.username'
     
     # authenticate on next tick
     # window.setTimeout @authenticate
@@ -26,7 +26,7 @@ class Hoodie.Account
   # ## Authenticate
   # 
   # Use this method to assure that the user is authenticated:
-  # `hoodie.account.authenticate().done( doSomething ).fail( handleError )`
+  # `hoodie.my.account.authenticate().done( doSomething ).fail( handleError )`
   authenticate : =>
     defer = @hoodie.defer()
     
@@ -237,11 +237,11 @@ class Hoodie.Account
   
   #
   _handleSignIn: (@username) =>
-    @hoodie.config.set '_account.username', @username
+    @hoodie.my.config.set '_account.username', @username
     @_authenticated = true
   
   #
   _handleSignOut: =>
     delete @username
-    @hoodie.config.remove '_account.username'
+    @hoodie.my.config.remove '_account.username'
     @_authenticated = false

@@ -17,7 +17,7 @@ class Hoodie.Config
     @type       = options.type       if options.type
     @id         = options.id         if options.id
     
-    @hoodie.store.load(@type, @id).done (obj) => @cache = obj
+    @hoodie.my.localStore.load(@type, @id).done (obj) => @cache = obj
 
     @hoodie.on 'account:signedOut', @clear
   
@@ -35,7 +35,7 @@ class Hoodie.Config
     update[key] = value
     
     isSilent = key.charAt(0) is '_'
-    @hoodie.store.update @type, @id, update, silent: isSilent
+    @hoodie.my.localStore.update @type, @id, update, silent: isSilent
     
   
   # ## get
@@ -51,7 +51,7 @@ class Hoodie.Config
   # clears cache and removes object from store
   clear : =>
     @cache = {}
-    @hoodie.store.destroy @type, @id
+    @hoodie.my.localStore.destroy @type, @id
   
   
   # ## remove

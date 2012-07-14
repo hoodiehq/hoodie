@@ -20,7 +20,7 @@
 
 * spec `window.setTimeout @authenticate` in constructor
 * what if @email is different from what GET /_session returns? Can there be a case like that?
-* before sign in / sign out: sign out if `hoodie.config.get('account.email')` is a different email address
+* before sign in / sign out: sign out if `hoodie.my.config.get('account.email')` is a different email address
 
 
 ### Remote

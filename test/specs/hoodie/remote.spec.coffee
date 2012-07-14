@@ -10,8 +10,8 @@ describe "Hoodie.Remote", ->
     spyOn(window, "setTimeout")
     
     spyOn(@hoodie, "trigger")
-    spyOn(@hoodie.store, "destroy").andReturn then: (cb) -> cb('objectFromStore')
-    spyOn(@hoodie.store, "update").andReturn  then: (cb) -> cb('objectFromStore', false)
+    spyOn(@hoodie.my.localStore, "destroy").andReturn then: (cb) -> cb('objectFromStore')
+    spyOn(@hoodie.my.localStore, "update").andReturn  then: (cb) -> cb('objectFromStore', false)
   
   
   describe ".constructor(@hoodie, options = {})", ->
@@ -27,7 +27,7 @@ describe "Hoodie.Remote", ->
         
     _when "config remote.active is false", ->
       beforeEach ->
-        spyOn(@hoodie.config, "get").andReturn false
+        spyOn(@hoodie.my.config, "get").andReturn false
         @remote = new Hoodie.Remote @hoodie
         
       it "should set active to false", ->
@@ -41,9 +41,9 @@ describe "Hoodie.Remote", ->
       expect(@remote.active).toBeTruthy()
     
     it "should set config remote.active to true", ->
-      spyOn(@hoodie.config, "set")
+      spyOn(@hoodie.my.config, "set")
       @remote.activate()
-      expect(@hoodie.config.set).wasCalledWith '_remote.active', true
+      expect(@hoodie.my.config.set).wasCalledWith '_remote.active', true
 
     it "should subscribe to `signedOut` event", ->
       @remote.activate()
@@ -60,9 +60,9 @@ describe "Hoodie.Remote", ->
       expect(@remote.active).toBeFalsy()
     
     it "should set config remote.active to false", ->
-      spyOn(@hoodie.config, "set")
+      spyOn(@hoodie.my.config, "set")
       @remote.deactivate()
-      expect(@hoodie.config.set).wasCalledWith '_remote.active', false
+      expect(@hoodie.my.config.set).wasCalledWith '_remote.active', false
 
     it "should unsubscribe from account's signedIn idle event", ->
       @remote.deactivate()
@@ -77,13 +77,13 @@ describe "Hoodie.Remote", ->
       spyOn(@remote, "sync")
       
     it "should authenticate", ->
-      spyOn(@hoodie.account, "authenticate").andCallThrough()
+      spyOn(@hoodie.my.account, "authenticate").andCallThrough()
       @remote.connect()
-      expect(@hoodie.account.authenticate).wasCalled()
+      expect(@hoodie.my.account.authenticate).wasCalled()
       
     _when "successful", ->
       beforeEach ->
-        spyOn(@hoodie.account, "authenticate").andReturn pipe: (cb) -> 
+        spyOn(@hoodie.my.account, "authenticate").andReturn pipe: (cb) -> 
           cb()
           fail: ->
         
@@ -114,7 +114,7 @@ describe "Hoodie.Remote", ->
         @remote.active = true
       
       it "should send a longpoll GET request to user's db _changes feed", ->
-        spyOn(@hoodie.account, "db").andReturn 'joe$examleCom'
+        spyOn(@hoodie.my.account, "db").andReturn 'joe$examleCom'
         @remote.pull()
         expect(@hoodie.request).wasCalled()
         [method, path] = @hoodie.request.mostRecentCall.args
@@ -130,7 +130,7 @@ describe "Hoodie.Remote", ->
         @remote.active = false
       
       it "should send a normal GET request to user's db _changes feed", ->
-        spyOn(@hoodie.account, "db").andReturn 'joe$examleCom'
+        spyOn(@hoodie.my.account, "db").andReturn 'joe$examleCom'
         @remote.pull()
         expect(@hoodie.request).wasCalled()
         [method, path] = @hoodie.request.mostRecentCall.args
@@ -146,11 +146,11 @@ describe "Hoodie.Remote", ->
       
       it "should remove `todo/abc3` from store", ->
         @remote.pull()
-        expect(@hoodie.store.destroy).wasCalledWith 'todo', 'abc3', remote: true
+        expect(@hoodie.my.localStore.destroy).wasCalledWith 'todo', 'abc3', remote: true
 
       it "should save `todo/abc2` in store", ->
         @remote.pull()
-        expect(@hoodie.store.update).wasCalledWith 'todo', 'abc2', { _rev : '1-123', content : 'remember the milk', done : false, order : 1, type : 'todo', id : 'abc2' }, { remote : true }
+        expect(@hoodie.my.localStore.update).wasCalledWith 'todo', 'abc2', { _rev : '1-123', content : 'remember the milk', done : false, order : 1, type : 'todo', id : 'abc2' }, { remote : true }
       
       it "should trigger remote events", ->
         @remote.pull()
@@ -281,7 +281,7 @@ describe "Hoodie.Remote", ->
     _when "no docs passed", ->        
       _and "there are no changed docs", ->
         beforeEach ->
-          spyOn(@hoodie.store, "changedDocs").andReturn []
+          spyOn(@hoodie.my.localStore, "changedDocs").andReturn []
           @remote.push()
       
         it "shouldn't do anything", ->
@@ -289,8 +289,8 @@ describe "Hoodie.Remote", ->
       
       _and "there is one deleted and one new doc", ->
         beforeEach ->
-          spyOn(@hoodie.store, "changedDocs").andReturn Mocks.changedDocs()
-          spyOn(@hoodie.account, "db").andReturn 'joe$examleCom'
+          spyOn(@hoodie.my.localStore, "changedDocs").andReturn Mocks.changedDocs()
+          spyOn(@hoodie.my.account, "db").andReturn 'joe$examleCom'
           @remote.push()
           expect(@hoodie.request).wasCalled()
           [@method, @path, @options] = @hoodie.request.mostRecentCall.args

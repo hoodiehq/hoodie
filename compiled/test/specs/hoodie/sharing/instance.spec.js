@@ -10,7 +10,7 @@ describe "Hoodie.Sharing.Instance", ->
   
   describe "constructor", ->
     beforeEach ->
-      spyOn(@hoodie.store, "uuid").andReturn 'newId'
+      spyOn(@hoodie.my.localStore, "uuid").andReturn 'newId'
       spyOn(Hoodie.Sharing.Instance::, "set")
       spyOn(Hoodie.Sharing.Instance::, "add")
       
@@ -21,7 +21,7 @@ describe "Hoodie.Sharing.Instance", ->
     
     _when "user is anonymous", ->
       beforeEach ->
-        @hoodie.account.username = undefined
+        @hoodie.my.account.username = undefined
       
       it "should use the SharingHoodie", ->
         sharing = new Hoodie.Sharing.Instance
@@ -34,7 +34,7 @@ describe "Hoodie.Sharing.Instance", ->
         
     _when "user has an account", ->
       beforeEach ->
-        @hoodie.account.username = 'joe@example.com'
+        @hoodie.my.account.username = 'joe@example.com'
       
       it "should use the SharingHoodie", ->
         sharing = new Hoodie.Sharing.Instance

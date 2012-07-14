@@ -11,7 +11,7 @@ class Hoodie.Sharing.Instance
     #
     # if the user is anonymous, we need to handle it manually. To achieve that
     # we use a customized hoodie, with its own socket
-    @anonymous = @hoodie.account.username is undefined
+    @anonymous = @hoodie.my.account.username is undefined
     
     # setting attributes
     @set options
@@ -66,7 +66,7 @@ class Hoodie.Sharing.Instance
       defer.resolve(this)
 
     # persist memory to store
-    @hoodie.store.update("$sharing", @id, @_memory, options)
+    @hoodie.my.localStore.update("$sharing", @id, @_memory, options)
     .then _handleUpdate, defer.reject
 
     return defer.promise()
@@ -81,7 +81,7 @@ class Hoodie.Sharing.Instance
   #
   # sharing.add(todoObject)
   # sharing.add([todoObject1, todoObject2, todoObject3])
-  # sharing.add( hoodie.store.findAll (obj) -> obj.isShared )
+  # sharing.add( hoodie.my.localStore.findAll (obj) -> obj.isShared )
   add: (objects) ->
     @toggle objects, true
     
@@ -95,7 +95,7 @@ class Hoodie.Sharing.Instance
   #
   # sharing.remove(todoObject)
   # sharing.remove([todoObject1, todoObject2, todoObject3])
-  # sharing.remove( hoodie.store.findAll (obj) -> obj.isShared )
+  # sharing.remove( hoodie.my.localStore.findAll (obj) -> obj.isShared )
   remove: (objects) -> 
     @toggle objects, false
   
@@ -115,7 +115,7 @@ class Hoodie.Sharing.Instance
       when false then @_remove
       else @_toggle
     
-    @hoodie.store.updateAll(objects, updateMethod)
+    @hoodie.my.localStore.updateAll(objects, updateMethod)
     
   
   # ## sync
@@ -136,11 +136,11 @@ class Hoodie.Sharing.Instance
     # by signing up as a user with the neame of the sharing db.
     else
       
-      @hoodie.account.signUp( "sharing/#{@id}", @password )
+      @hoodie.my.account.signUp( "sharing/#{@id}", @password )
       .done (username, response) =>
         
         # remember that we signed up successfully for the future
-        @save _userRev: @hoodie.account._doc._rev
+        @save _userRev: @hoodie.my.account._doc._rev
         
         # finally: start the sync and make it the default behavior
         # from now on
@@ -169,18 +169,18 @@ class Hoodie.Sharing.Instance
   _assureOwnerUuid : ->
     return if @ownerUuid
 
-    config      = @constructor.hoodie.config
+    config      = @constructor.hoodie.my.config
     @ownerUuid = config.get('sharing.ownerUuid')
 
     # if this is the very first sharing, we generate and store an ownerUuid
     unless @ownerUuid
-      @ownerUuid = @constructor.hoodie.store.uuid()
+      @ownerUuid = @constructor.hoodie.my.localStore.uuid()
       config.set 'sharing.ownerUuid', @ownerUuid
 
   # I appologize for this mess of code ~gr2m
   _isMySharedObjectAndChanged: (obj) =>
     belongsToMe = obj.id is @id or obj.$sharings and ~obj.$sharings.indexOf(@id)
-    return belongsToMe and @hoodie.store.isDirty(obj.type, obj.id)
+    return belongsToMe and @hoodie.my.localStore.isDirty(obj.type, obj.id)
 
 
   # returns a hash update to update the passed object
@@ -247,9 +247,9 @@ class Hoodie.Sharing.Instance
   #
   _sync : =>
     @save()
-    .pipe @hoodie.store.loadAll(@_isMySharedObjectAndChanged)
+    .pipe @hoodie.my.localStore.loadAll(@_isMySharedObjectAndChanged)
     .pipe (sharedObjectThatChanged) =>
-      @hoodie.remote.sync(sharedObjectThatChanged)
+      @hoodie.my.remoteStore.sync(sharedObjectThatChanged)
       .then @_handleRemoteChanges
 
   #

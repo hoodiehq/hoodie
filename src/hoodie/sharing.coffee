@@ -91,7 +91,7 @@ class Hoodie.Sharing
   #     # shared and keep them updated
   #     hoodie.sharing.create
   #       continuous : true
-  #       objects    : hoodie.store.loadAll (obj) -> obj.isShared
+  #       objects    : hoodie.my.localStore.loadAll (obj) -> obj.isShared
   #
   create : (options = {}) ->
     sharing = new Hoodie.Sharing.Instance options
@@ -103,7 +103,7 @@ class Hoodie.Sharing
   # load an existing sharing
   #
   load : (id) ->
-    @hoodie.store.load('$sharing', id).pipe (obj) =>
+    @hoodie.my.localStore.load('$sharing', id).pipe (obj) =>
       new Hoodie.Sharing.Instance obj
   
   
