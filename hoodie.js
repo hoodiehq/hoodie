@@ -90,8 +90,7 @@ Hoodie = (function(_super) {
       remoteStore: "RemoteStore"
     },
     user: "UserStore",
-    email: "Email",
-    sharing: "Sharing"
+    email: "Email"
   };
 
   function Hoodie(baseUrl) {

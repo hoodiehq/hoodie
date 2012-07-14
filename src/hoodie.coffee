@@ -16,14 +16,14 @@ class Hoodie extends Events
 
     user    : "UserStore"
     email   : "Email"
-    sharing : "Sharing"
+    # sharing : "Sharing"
 
 
   # ## initialization
   #
   # Inits the Hoodie, an optional CouchDB URL can be passed
   constructor : (@baseUrl = '') ->
-  
+
     # remove trailing slash(es)
     @baseUrl = @baseUrl.replace /\/+$/, ''
     @_loadModules()
