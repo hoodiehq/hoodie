@@ -128,6 +128,25 @@
     hoodie.my.remoteStore.on( "update:couch", function( id, updatedObject)  { } )
     hoodie.my.remoteStore.on( "delete:couch", function( id, deletedObject) { } )
     hoodie.my.remoteStore.on( "change:couch", function( id, changedObject) { } )
+
+
+    //
+    // Public Sharing
+    //
+    // Select data you want to share with others and control exactly what will
+    // be shared
+    //
+
+    // make couch with id "abc4567" public
+    hoodie.my.localStore.update("couch","abc4567", {}, {public: true})
+
+    // make couch with id "abc4567" public, but do only show the color, hide
+    // all other attributes
+    hoodie.my.localStore.update("couch","abc4567", {}, {public: ["color"]})
+
+    // make couch with id "abc4567" private again
+    hoodie.my.localStore.update("couch","abc4567", {}, {public: false})
+    
     
     //
     // Send emails (coming soon)
