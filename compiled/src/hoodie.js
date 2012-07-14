@@ -13,7 +13,9 @@ Hoodie = (function(_super) {
       config: "Config",
       account: "Account",
       remoteStore: "RemoteStore"
-    }
+    },
+    email: "Email",
+    sharing: "Sharing"
   };
 
   function Hoodie(baseUrl) {
