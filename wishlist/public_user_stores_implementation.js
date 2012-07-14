@@ -179,3 +179,7 @@ function parseObjectForPublicStore(object) {
       }
   }
 }
+
+// idea: besides creating the new object for the public store, we could
+// update the source objects with an publishedAt timestamp and remove
+// the $public attribute when an object has been unpublished
