@@ -1,4 +1,4 @@
-describe "Hoodie.Remote", ->  
+describe "Hoodie.RemoteStore", ->  
   beforeEach ->
     @hoodie = new Mocks.Hoodie 
     @remote = new Hoodie.RemoteStore @hoodie

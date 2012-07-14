@@ -14,6 +14,7 @@ class Hoodie extends Events
       account     : "Account"
       remoteStore : "RemoteStore"
 
+    user    : "UserStore"
     email   : "Email"
     sharing : "Sharing"
 

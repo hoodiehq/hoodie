@@ -14,6 +14,7 @@ Hoodie = (function(_super) {
       account: "Account",
       remoteStore: "RemoteStore"
     },
+    user: "UserStore",
     email: "Email",
     sharing: "Sharing"
   };

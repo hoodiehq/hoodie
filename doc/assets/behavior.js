@@ -863,6 +863,53 @@ f.event={add:function(a,c,d,e,g){var h,i,j,k,l,m,n,o,p,q,r,s;if(!(a.nodeType===3
               "outline": []
             }
           ]
+        }, {
+          "type": "file",
+          "data": {
+            "language": {
+              "nameMatchers": [".coffee"],
+              "pygmentsLexer": "coffee-script",
+              "singleLineComment": ["#"],
+              "name": "CoffeeScript"
+            },
+            "sourcePath": "/Users/gregor/JavaScripts/hood.ie/hoodie-client.js/src/hoodie/user_store.coffee",
+            "projectPath": "src/hoodie/user_store.coffee",
+            "targetPath": "hoodie/user_store",
+            "firstHeader": {
+              "type": "heading",
+              "data": {
+                "level": 1,
+                "title": "UserStore",
+                "slug": "userstore",
+                "isFileHeader": true
+              },
+              "depth": 1,
+              "children": [
+                {
+                  "type": "heading",
+                  "data": {
+                    "level": 2,
+                    "title": "private",
+                    "slug": "private"
+                  },
+                  "depth": 2
+                }
+              ]
+            },
+            "title": "UserStore"
+          },
+          "depth": 2,
+          "outline": [
+            {
+              "type": "heading",
+              "data": {
+                "level": 2,
+                "title": "private",
+                "slug": "private"
+              },
+              "depth": 2
+            }
+          ]
         }
       ]
     }
