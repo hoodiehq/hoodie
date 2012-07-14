@@ -146,6 +146,9 @@
 
     // make couch with id "abc4567" private again
     hoodie.my.localStore.update("couch","abc4567", {}, {public: false})
+
+    // load all couches from user "joe"
+    hoodie.user("joe").loadAll("couch").done( function(couches) { ... })
     
     
     //
