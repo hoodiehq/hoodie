@@ -3,7 +3,7 @@
 describe("Hoodie.Store", function() {
   beforeEach(function() {
     this.hoodie = new Mocks.Hoodie;
-    this.store = new Hoodie.Store(this.hoodie);
+    this.store = new Hoodie.LocalStore(this.hoodie);
     spyOn(this.store, "_setObject").andCallThrough();
     spyOn(this.store, "_getObject").andCallThrough();
     spyOn(this.store.db, "getItem").andCallThrough();
@@ -15,7 +15,7 @@ describe("Hoodie.Store", function() {
     return it("should subscribe to account:signout event", function() {
       var store;
       spyOn(this.hoodie, "on");
-      store = new Hoodie.Store(this.hoodie);
+      store = new Hoodie.LocalStore(this.hoodie);
       return expect(this.hoodie.on).wasCalledWith('account:signout', store.clear);
     });
   });

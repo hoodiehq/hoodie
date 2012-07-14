@@ -3,7 +3,7 @@
 describe("Hoodie.Remote", function() {
   beforeEach(function() {
     this.hoodie = new Mocks.Hoodie;
-    this.remote = new Hoodie.Remote(this.hoodie);
+    this.remote = new Hoodie.RemoteStore(this.hoodie);
     spyOn(this.hoodie, "on");
     spyOn(this.hoodie, "one");
     spyOn(this.hoodie, "unbind");
@@ -24,19 +24,19 @@ describe("Hoodie.Remote", function() {
   });
   describe(".constructor(@hoodie, options = {})", function() {
     beforeEach(function() {
-      spyOn(Hoodie.Remote.prototype, "connect");
-      return this.remote = new Hoodie.Remote(this.hoodie);
+      spyOn(Hoodie.RemoteStore.prototype, "connect");
+      return this.remote = new Hoodie.RemoteStore(this.hoodie);
     });
     it("should be active by default", function() {
       return expect(this.remote.active).toBeTruthy();
     });
     it("should connect", function() {
-      return expect(Hoodie.Remote.prototype.connect).wasCalled();
+      return expect(Hoodie.RemoteStore.prototype.connect).wasCalled();
     });
     return _when("config remote.active is false", function() {
       beforeEach(function() {
         spyOn(this.hoodie.my.config, "get").andReturn(false);
-        return this.remote = new Hoodie.Remote(this.hoodie);
+        return this.remote = new Hoodie.RemoteStore(this.hoodie);
       });
       return it("should set active to false", function() {
         return expect(this.remote.active).toBeFalsy();

@@ -1,7 +1,7 @@
 describe "Hoodie.Remote", ->  
   beforeEach ->
     @hoodie = new Mocks.Hoodie 
-    @remote = new Hoodie.Remote @hoodie
+    @remote = new Hoodie.RemoteStore @hoodie
     spyOn(@hoodie, "on")
     spyOn(@hoodie, "one")
     spyOn(@hoodie, "unbind")
@@ -16,19 +16,19 @@ describe "Hoodie.Remote", ->
   
   describe ".constructor(@hoodie, options = {})", ->
     beforeEach ->
-      spyOn(Hoodie.Remote::, "connect")
-      @remote = new Hoodie.Remote @hoodie
+      spyOn(Hoodie.RemoteStore::, "connect")
+      @remote = new Hoodie.RemoteStore @hoodie
     
     it "should be active by default", ->
       expect(@remote.active).toBeTruthy()
     
     it "should connect", ->
-      expect(Hoodie.Remote::connect).wasCalled()
+      expect(Hoodie.RemoteStore::connect).wasCalled()
         
     _when "config remote.active is false", ->
       beforeEach ->
         spyOn(@hoodie.my.config, "get").andReturn false
-        @remote = new Hoodie.Remote @hoodie
+        @remote = new Hoodie.RemoteStore @hoodie
         
       it "should set active to false", ->
         expect(@remote.active).toBeFalsy()
@@ -383,4 +383,4 @@ describe "Hoodie.Remote", ->
       @remote.on 'funky', cb
       expect(@hoodie.on).wasCalledWith 'remote:funky', cb
   # /.on(event, callback)
-# /Hoodie.Remote
+# /Hoodie.RemoteStore

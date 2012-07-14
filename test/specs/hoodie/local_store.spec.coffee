@@ -1,7 +1,7 @@
 describe "Hoodie.Store", ->  
   beforeEach ->
     @hoodie = new Mocks.Hoodie 
-    @store = new Hoodie.Store @hoodie
+    @store = new Hoodie.LocalStore @hoodie
     
     spyOn(@store, "_setObject").andCallThrough()
     spyOn(@store, "_getObject").andCallThrough()
@@ -14,7 +14,7 @@ describe "Hoodie.Store", ->
   describe "new", ->
     it "should subscribe to account:signout event", ->
       spyOn(@hoodie, "on")
-      store = new Hoodie.Store @hoodie
+      store = new Hoodie.LocalStore @hoodie
       expect(@hoodie.on).wasCalledWith 'account:signout', store.clear
   # /new
   
@@ -701,4 +701,4 @@ describe "Hoodie.Store", ->
       it "should generate an id with length = 5", ->
         expect(@store.uuid(5).length).toBe 5
   # /.uuid(num)
-# /Hoodie.Store
+# /Hoodie.LocalStore
