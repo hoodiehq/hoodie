@@ -80,6 +80,9 @@ Hoodie.LocalStore = (function() {
       isNew = true;
       id = this.uuid();
     }
+    if (options["public"] != null) {
+      object.$public = options["public"];
+    }
     if (options.remote) {
       object._syncedAt = this._now();
     } else if (!options.silent) {

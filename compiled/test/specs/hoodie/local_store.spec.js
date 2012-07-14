@@ -224,7 +224,7 @@ describe("Hoodie.Store", function() {
       }
       return _results;
     });
-    return _when("called without id", function() {
+    _when("called without id", function() {
       beforeEach(function() {
         var _ref;
         this.promise = this.store.save('document', void 0, {
@@ -252,6 +252,42 @@ describe("Hoodie.Store", function() {
         return it("should pass true (= created) as the second param to the done callback", function() {
           return expect(this.promise).toBeResolvedWith('cachedObject', true);
         });
+      });
+    });
+    _when("passed public: true option", function() {
+      return it("should save object with $public attribute set to true", function() {
+        var key, object, type, _ref;
+        this.store.save('document', 'abc4567', {
+          name: 'test'
+        }, {
+          "public": true
+        });
+        _ref = this.store.cache.mostRecentCall.args, type = _ref[0], key = _ref[1], object = _ref[2];
+        return expect(object.$public).toBe(true);
+      });
+    });
+    _when("passed public: false option", function() {
+      return it("should save object with $public attribute set to false", function() {
+        var key, object, type, _ref;
+        this.store.save('document', 'abc4567', {
+          name: 'test'
+        }, {
+          "public": false
+        });
+        _ref = this.store.cache.mostRecentCall.args, type = _ref[0], key = _ref[1], object = _ref[2];
+        return expect(object.$public).toBe(false);
+      });
+    });
+    return _when("passed public: ['aj@example.com', 'bj@example.com'] option", function() {
+      return it("should save object with $public attribute set to ['aj@example.com', 'bj@example.com']", function() {
+        var key, object, type, _ref;
+        this.store.save('document', 'abc4567', {
+          name: 'test'
+        }, {
+          "public": ['aj@example.com', 'bj@example.com']
+        });
+        _ref = this.store.cache.mostRecentCall.args, type = _ref[0], key = _ref[1], object = _ref[2];
+        return expect(object.$public.join()).toBe(['aj@example.com', 'bj@example.com'].join());
       });
     });
   });

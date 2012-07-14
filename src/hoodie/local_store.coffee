@@ -73,6 +73,9 @@ class Hoodie.LocalStore
     else
       isNew = true
       id     = @uuid()
+
+    # handle public option
+    object.$public = options.public if options.public?
   
     # add timestamps
     if options.remote

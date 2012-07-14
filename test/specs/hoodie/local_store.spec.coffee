@@ -183,6 +183,25 @@ describe "Hoodie.Store", ->
           
         it "should pass true (= created) as the second param to the done callback", ->
           expect(@promise).toBeResolvedWith 'cachedObject', true
+
+    _when "passed public: true option", ->
+      it "should save object with $public attribute set to true", ->
+        @store.save 'document', 'abc4567', { name: 'test' }, { public: true }
+        [type, key, object] = @store.cache.mostRecentCall.args
+        expect(object.$public).toBe true
+
+    _when "passed public: false option", ->
+      it "should save object with $public attribute set to false", ->
+        @store.save 'document', 'abc4567', { name: 'test' }, { public: false }
+        [type, key, object] = @store.cache.mostRecentCall.args
+        expect(object.$public).toBe false
+
+    _when "passed public: ['aj@example.com', 'bj@example.com'] option", ->
+      it "should save object with $public attribute set to ['aj@example.com', 'bj@example.com']", ->
+        @store.save 'document', 'abc4567', { name: 'test' }, { public: ['aj@example.com', 'bj@example.com'] }
+        [type, key, object] = @store.cache.mostRecentCall.args
+        expect(object.$public.join()).toBe ['aj@example.com', 'bj@example.com'].join()
+      
   # /.save(type, id, object, options)
   
   describe ".create(type, object, options)", ->
