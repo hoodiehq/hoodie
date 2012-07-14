@@ -86,4 +86,4 @@ Hoodie.Sharing.Remote = (function(_super) {
 
   return Remote;
 
-})(Hoodie.Remote);
+})(Hoodie.RemoteStore);

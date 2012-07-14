@@ -2,7 +2,7 @@
 # window.localStrage wrapper and more
 #
 
-class Hoodie.Store
+class Hoodie.LocalStore
 
   # ## Constructor
   #

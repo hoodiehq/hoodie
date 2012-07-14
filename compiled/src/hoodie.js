@@ -9,10 +9,10 @@ Hoodie = (function(_super) {
 
   Hoodie.prototype.modules = {
     my: {
-      localStore: "Store",
+      localStore: "LocalStore",
       config: "Config",
       account: "Account",
-      remoteStore: "Remote"
+      remoteStore: "RemoteStore"
     }
   };
 
