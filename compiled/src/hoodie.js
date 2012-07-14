@@ -7,14 +7,18 @@ Hoodie = (function(_super) {
 
   __extends(Hoodie, _super);
 
-  Hoodie.prototype.modules = function() {
-    return {
-      store: Hoodie.Store,
-      config: Hoodie.Config,
-      account: Hoodie.Account,
-      remote: Hoodie.Remote,
-      email: Hoodie.Email
-    };
+  Hoodie.prototype.modules = {
+    store: "Store",
+    config: "Config",
+    account: "Account",
+    remote: "Remote",
+    email: "Email",
+    my: {
+      account: "Account",
+      localStore: "Store",
+      remoteStore: "Remote",
+      config: "Config"
+    }
   };
 
   function Hoodie(baseUrl) {
@@ -46,13 +50,24 @@ Hoodie = (function(_super) {
     return typeof obj.done === 'function' && typeof obj.fail === 'function';
   };
 
-  Hoodie.prototype._loadModules = function() {
-    var Module, instanceName, _ref, _results;
-    _ref = this.modules();
+  Hoodie.prototype._loadModules = function(context, modules) {
+    var instanceName, moduleName, namespace, _results;
+    if (context == null) {
+      context = this;
+    }
+    if (modules == null) {
+      modules = this.modules;
+    }
     _results = [];
-    for (instanceName in _ref) {
-      Module = _ref[instanceName];
-      _results.push(this[instanceName] = new Module(this));
+    for (instanceName in modules) {
+      moduleName = modules[instanceName];
+      if (typeof moduleName === 'string') {
+        _results.push(context[instanceName] = new Hoodie[moduleName](this));
+      } else {
+        namespace = instanceName;
+        context[namespace] = {};
+        _results.push(this._loadModules(context[namespace], modules[namespace]));
+      }
     }
     return _results;
   };
