@@ -84,7 +84,7 @@ hoodie.sharing.create
   </div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h2 id="load">load</h2>
 
 <p>load an existing sharing</p></div></div><div class="code"><div class="wrapper">  <span class="nv">load : </span><span class="nf">(id) -&gt;</span>
-    <span class="nx">@hoodie</span><span class="p">.</span><span class="nx">store</span><span class="p">.</span><span class="nx">load</span><span class="p">(</span><span class="s1">&#39;$sharing&#39;</span><span class="p">,</span> <span class="nx">id</span><span class="p">).</span><span class="nx">pipe</span> <span class="p">(</span><span class="nx">obj</span><span class="p">)</span> <span class="o">=&gt;</span>
+    <span class="nx">@hoodie</span><span class="p">.</span><span class="nx">my</span><span class="p">.</span><span class="nx">localStore</span><span class="p">.</span><span class="nx">load</span><span class="p">(</span><span class="s1">&#39;$sharing&#39;</span><span class="p">,</span> <span class="nx">id</span><span class="p">).</span><span class="nx">pipe</span> <span class="p">(</span><span class="nx">obj</span><span class="p">)</span> <span class="o">=&gt;</span>
       <span class="k">new</span> <span class="nx">Hoodie</span><span class="p">.</span><span class="nx">Sharing</span><span class="p">.</span><span class="nx">Instance</span> <span class="nx">obj</span>
   
   </div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h2 id="find-or-create">find or create</h2>

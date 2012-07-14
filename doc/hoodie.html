@@ -1,17 +1,14 @@
 <!DOCTYPE html><html lang="en"><head><title>hoodie</title></head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0"><meta name="groc-relative-root" content=""><meta name="groc-document-path" content="hoodie"><meta name="groc-project-path" content="src/hoodie.coffee"><link rel="stylesheet" type="text/css" media="all" href="assets/style.css"><script type="text/javascript" src="assets/behavior.js"></script><body><div id="meta"><div class="file-path">src/hoodie.coffee</div></div><div id="document"><div class="segment"><div class="comments"><div class="wrapper"><h2 id="hoodie">Hoodie</h2>
 
 <p>the door to world domination (apps)</p></div></div><div class="code"><div class="wrapper"><span class="k">class</span> <span class="nx">Hoodie</span> <span class="k">extends</span> <span class="nx">Events</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>modules to be loaded</p></div></div><div class="code"><div class="wrapper">  <span class="nv">modules:</span>
-    <span class="nv">store   : </span><span class="s2">&quot;Store&quot;</span>
-    <span class="nv">config  : </span><span class="s2">&quot;Config&quot;</span>
-    <span class="nv">account : </span><span class="s2">&quot;Account&quot;</span>
-    <span class="nv">remote  : </span><span class="s2">&quot;Remote&quot;</span>
-    <span class="nv">email   : </span><span class="s2">&quot;Email&quot;</span>
-
     <span class="nv">my :</span>
+      <span class="nv">localStore  : </span><span class="s2">&quot;LocalStore&quot;</span>
+      <span class="nv">config      : </span><span class="s2">&quot;Config&quot;</span>
       <span class="nv">account     : </span><span class="s2">&quot;Account&quot;</span>
-      <span class="nv">localStore  : </span><span class="s2">&quot;Store&quot;</span>
-      <span class="nv">remoteStore : </span><span class="s2">&quot;Remote&quot;</span>
-      <span class="nv">config      : </span><span class="s2">&quot;Config&quot;</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h2 id="initialization">initialization</h2>
+      <span class="nv">remoteStore : </span><span class="s2">&quot;RemoteStore&quot;</span>
+
+    <span class="nv">email   : </span><span class="s2">&quot;Email&quot;</span>
+    <span class="nv">sharing : </span><span class="s2">&quot;Sharing&quot;</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h2 id="initialization">initialization</h2>
 
 <p>Inits the Hoodie, an optional CouchDB URL can be passed</p></div></div><div class="code"><div class="wrapper">  <span class="nv">constructor : </span><span class="nf">(@baseUrl = &#39;&#39;) -&gt;</span>
   </div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>remove trailing slash(es)</p></div></div><div class="code"><div class="wrapper">    <span class="vi">@baseUrl = </span><span class="nx">@baseUrl</span><span class="p">.</span><span class="nx">replace</span> <span class="sr">/\/+$/</span><span class="p">,</span> <span class="s1">&#39;&#39;</span>
