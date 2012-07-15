@@ -426,16 +426,8 @@ f.event={add:function(a,c,d,e,g){var h,i,j,k,l,m,n,o,p,q,r,s;if(!(a.nodeType===3
                   "type": "heading",
                   "data": {
                     "level": 3,
-                    "title": "Usecase 8: Share Subscriptions",
-                    "slug": "usecase-8-share-subscriptions"
-                  },
-                  "depth": 3
-                }, {
-                  "type": "heading",
-                  "data": {
-                    "level": 3,
-                    "title": "Usecase 9: Subscribing to events in Shares",
-                    "slug": "usecase-9-subscribing-to-events-in-shares"
+                    "title": "Usecase 8: Subscribing to events in Shares",
+                    "slug": "usecase-8-subscribing-to-events-in-shares"
                   },
                   "depth": 3
                 }
@@ -532,16 +524,8 @@ f.event={add:function(a,c,d,e,g){var h,i,j,k,l,m,n,o,p,q,r,s;if(!(a.nodeType===3
               "type": "heading",
               "data": {
                 "level": 3,
-                "title": "Usecase 8: Share Subscriptions",
-                "slug": "usecase-8-share-subscriptions"
-              },
-              "depth": 3
-            }, {
-              "type": "heading",
-              "data": {
-                "level": 3,
-                "title": "Usecase 9: Subscribing to events in Shares",
-                "slug": "usecase-9-subscribing-to-events-in-shares"
+                "title": "Usecase 8: Subscribing to events in Shares",
+                "slug": "usecase-8-subscribing-to-events-in-shares"
               },
               "depth": 3
             }
