@@ -257,6 +257,9 @@ hoodie.share.open( "mytodolist123", {password: "secret"} )
 })
 
 // ### Usecase 8: Share Subscriptions
+// 
+// the subscription module is a module on its own and can be used
+// to subscribe to other stores than shares, e.g. public user stores.
 
 // I can subscribe to a share by others using the subscription module.
 hoodie.subscription.create("share_id")
