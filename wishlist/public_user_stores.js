@@ -79,7 +79,7 @@ hoodie.user("friendname").store.loadAll( showPhotos )
 
 // show most recently uploaded public photos
 // 
-hoodie.global.store.loadList("most_recent_photos", {page: 2})
+hoodie.global.get("most_recent_photos", {page: 2})
 .done( function(photos) {
   renderPhotos(photos)
 })
@@ -157,7 +157,7 @@ function renderFavorites (favorites) {
   /* get global playcounts */
   var favoritesIds = favorites.map( function(fav) { return fav.id })
 
-  hoodie.global.store.loadList("tracks_with_play_counts", {
+  hoodie.global.get("tracks_with_play_counts", {
     ids: favoritesIds
   }).done( function(tracks) {
 
@@ -172,5 +172,5 @@ function renderFavorites (favorites) {
 
 // Currently trendings tracks
 // 
-hoodie.global.store.loadList("trending_tracks")
+hoodie.global.get("trending_tracks")
 .done( renderTrendingTracks )
