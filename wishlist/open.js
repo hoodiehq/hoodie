@@ -54,16 +54,16 @@ hoodie.open("share/abc8320", {
 
 // sync: continuously sync with store
 hoodie.open("share/abc8320", {
-  sync: 'continuous'
+  sync: true
 })
 
 // pull: continuously pull from store
 hoodie.open("share/abc8320", {
-  sync: { pull: 'continuous' }
+  sync: { pull: true }
 })
 
 // push: continuously push to store
 hoodie.open("share/abc8320", {
-  sync: { push: 'continuous' }
+  sync: { push: true }
 })
 
