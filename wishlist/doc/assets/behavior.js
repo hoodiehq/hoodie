@@ -14,6 +14,22 @@ f.event={add:function(a,c,d,e,g){var h,i,j,k,l,m,n,o,p,q,r,s;if(!(a.nodeType===3
           "singleLineComment": ["//"],
           "name": "JavaScript"
         },
+        "sourcePath": "/Users/gregor/JavaScripts/hood.ie/hoodie-client.js/wishlist/open.js",
+        "projectPath": "open.js",
+        "targetPath": "open",
+        "title": "open"
+      },
+      "depth": 1,
+      "outline": []
+    }, {
+      "type": "file",
+      "data": {
+        "language": {
+          "nameMatchers": [".js"],
+          "pygmentsLexer": "javascript",
+          "singleLineComment": ["//"],
+          "name": "JavaScript"
+        },
         "sourcePath": "/Users/gregor/JavaScripts/hood.ie/hoodie-client.js/wishlist/public_user_stores.js",
         "projectPath": "public_user_stores.js",
         "targetPath": "public_user_stores",
@@ -356,7 +372,26 @@ f.event={add:function(a,c,d,e,g){var h,i,j,k,l,m,n,o,p,q,r,s;if(!(a.nodeType===3
                 "title": "Share API",
                 "slug": "share-api"
               },
-              "depth": 2
+              "depth": 2,
+              "children": [
+                {
+                  "type": "heading",
+                  "data": {
+                    "level": 3,
+                    "title": "Share Module methods",
+                    "slug": "share-module-methods"
+                  },
+                  "depth": 3
+                }, {
+                  "type": "heading",
+                  "data": {
+                    "level": 3,
+                    "title": "Share Instance methods",
+                    "slug": "share-instance-methods"
+                  },
+                  "depth": 3
+                }
+              ]
             }, {
               "type": "heading",
               "data": {
@@ -454,7 +489,26 @@ f.event={add:function(a,c,d,e,g){var h,i,j,k,l,m,n,o,p,q,r,s;if(!(a.nodeType===3
             "title": "Share API",
             "slug": "share-api"
           },
-          "depth": 2
+          "depth": 2,
+          "children": [
+            {
+              "type": "heading",
+              "data": {
+                "level": 3,
+                "title": "Share Module methods",
+                "slug": "share-module-methods"
+              },
+              "depth": 3
+            }, {
+              "type": "heading",
+              "data": {
+                "level": 3,
+                "title": "Share Instance methods",
+                "slug": "share-instance-methods"
+              },
+              "depth": 3
+            }
+          ]
         }, {
           "type": "heading",
           "data": {

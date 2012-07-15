@@ -119,13 +119,36 @@ hoodie.my.share.create({access: true, password: "secret"}).done( function(share)
 
 // ## Share API
 
+
+// ### Share Module methods
+
 // * direct call    
-//   opens a share, gives access to its objects, etc
+//   opens a share, gives access to its api
 hoodie.my.share("share_id")
 
 // * create  
 //   create a new share
 hoodie.my.share.create({})
+
+// * loadAll  
+//   lad all my sharings
+hoodie.my.share.loadAll()
+
+// * updateAll  
+//   update all my sharings
+hoodie.my.share.updateAll({access: false})
+hoodie.my.share.updateAll( function(share) {
+  share.access: false
+})
+
+// * deleteAll  
+//   delete all my sharings
+hoodie.my.share.deleteAll()
+
+
+
+
+// ### Share Instance methods
 
 // * save  
 //   save a share, overwrites all settings if share existed before
@@ -144,10 +167,21 @@ hoodie.my.share("share_id").delete()
 hoodie.my.share("share_id").add(object)
 hoodie.my.share("share_id").add([object1, object2])
 
+// * loadAll  
+//   loads all objects belonging to a store
+hoodie.my.share("share_id").loadAll()
+hoodie.my.share("share_id").loadAll("type")
+
 // * remove  
 //   remove object(s) from the share
 hoodie.my.share("share_id").remove(object)
 hoodie.my.share("share_id").remove([object1, object2])
+
+// * removeAll  
+//   remove all objects from the share
+hoodie.my.share("share_id").removeAll()
+hoodie.my.share("share_id").removeAll("type")
+
 
 // * push  
 //   push local changes to share

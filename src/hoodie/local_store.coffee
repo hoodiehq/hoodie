@@ -212,11 +212,11 @@ class Hoodie.LocalStore
   #     store.loadAll()
   #     store.loadAll('car')
   #     store.loadAll(function(obj) { return obj.brand == 'Tesla' })
-  loadAll: (filter = -> true) ->
+  loadAll : (filter = -> true) ->
     defer = @hoodie.defer()
     keys = @_index()
 
-    # t
+    # normalize filter
     if typeof filter is 'string'
       type   = filter
       filter = (obj) -> obj.type is type

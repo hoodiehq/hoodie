@@ -48,13 +48,25 @@ as example. I can create multiple todo lists with it and can share these.</p></d
 <span class="p">})</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>password set to "secret"</p></div></div><div class="code"><div class="wrapper"><span class="nx">hoodie</span><span class="p">.</span><span class="nx">my</span><span class="p">.</span><span class="nx">share</span><span class="p">.</span><span class="nx">create</span><span class="p">({</span><span class="nx">access</span><span class="o">:</span> <span class="kc">true</span><span class="p">,</span> <span class="nx">password</span><span class="o">:</span> <span class="s2">&quot;secret&quot;</span><span class="p">}).</span><span class="nx">done</span><span class="p">(</span> <span class="kd">function</span><span class="p">(</span><span class="nx">share</span><span class="p">)</span> <span class="p">{</span>
   <span class="cm">/* Others will need both the share.id and the password</span>
 <span class="cm">     in order to access the share */</span>
-<span class="p">})</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h2 id="share-api">Share API</h2></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><ul>
+<span class="p">})</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h2 id="share-api">Share API</h2></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h3 id="share-module-methods">Share Module methods</h3></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><ul>
 <li>direct call <br />
-opens a share, gives access to its objects, etc</li>
+opens a share, gives access to its api</li>
 </ul></div></div><div class="code"><div class="wrapper"><span class="nx">hoodie</span><span class="p">.</span><span class="nx">my</span><span class="p">.</span><span class="nx">share</span><span class="p">(</span><span class="s2">&quot;share_id&quot;</span><span class="p">)</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><ul>
 <li>create <br />
 create a new share</li>
 </ul></div></div><div class="code"><div class="wrapper"><span class="nx">hoodie</span><span class="p">.</span><span class="nx">my</span><span class="p">.</span><span class="nx">share</span><span class="p">.</span><span class="nx">create</span><span class="p">({})</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><ul>
+<li>loadAll <br />
+lad all my sharings</li>
+</ul></div></div><div class="code"><div class="wrapper"><span class="nx">hoodie</span><span class="p">.</span><span class="nx">my</span><span class="p">.</span><span class="nx">share</span><span class="p">.</span><span class="nx">loadAll</span><span class="p">()</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><ul>
+<li>updateAll <br />
+update all my sharings</li>
+</ul></div></div><div class="code"><div class="wrapper"><span class="nx">hoodie</span><span class="p">.</span><span class="nx">my</span><span class="p">.</span><span class="nx">share</span><span class="p">.</span><span class="nx">updateAll</span><span class="p">({</span><span class="nx">access</span><span class="o">:</span> <span class="kc">false</span><span class="p">})</span>
+<span class="nx">hoodie</span><span class="p">.</span><span class="nx">my</span><span class="p">.</span><span class="nx">share</span><span class="p">.</span><span class="nx">updateAll</span><span class="p">(</span> <span class="kd">function</span><span class="p">(</span><span class="nx">share</span><span class="p">)</span> <span class="p">{</span>
+  <span class="nx">share</span><span class="p">.</span><span class="nx">access</span><span class="o">:</span> <span class="kc">false</span>
+<span class="p">})</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><ul>
+<li>deleteAll <br />
+delete all my sharings</li>
+</ul></div></div><div class="code"><div class="wrapper"><span class="nx">hoodie</span><span class="p">.</span><span class="nx">my</span><span class="p">.</span><span class="nx">share</span><span class="p">.</span><span class="nx">deleteAll</span><span class="p">()</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h3 id="share-instance-methods">Share Instance methods</h3></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><ul>
 <li>save <br />
 save a share, overwrites all settings if share existed before</li>
 </ul></div></div><div class="code"><div class="wrapper"><span class="nx">hoodie</span><span class="p">.</span><span class="nx">my</span><span class="p">.</span><span class="nx">share</span><span class="p">(</span><span class="s2">&quot;share_id&quot;</span><span class="p">).</span><span class="nx">save</span><span class="p">({})</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><ul>
@@ -68,10 +80,18 @@ deletes a share, unshares all its objects</li>
 add object(s) to the share</li>
 </ul></div></div><div class="code"><div class="wrapper"><span class="nx">hoodie</span><span class="p">.</span><span class="nx">my</span><span class="p">.</span><span class="nx">share</span><span class="p">(</span><span class="s2">&quot;share_id&quot;</span><span class="p">).</span><span class="nx">add</span><span class="p">(</span><span class="nx">object</span><span class="p">)</span>
 <span class="nx">hoodie</span><span class="p">.</span><span class="nx">my</span><span class="p">.</span><span class="nx">share</span><span class="p">(</span><span class="s2">&quot;share_id&quot;</span><span class="p">).</span><span class="nx">add</span><span class="p">([</span><span class="nx">object1</span><span class="p">,</span> <span class="nx">object2</span><span class="p">])</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><ul>
+<li>loadAll <br />
+loads all objects belonging to a store</li>
+</ul></div></div><div class="code"><div class="wrapper"><span class="nx">hoodie</span><span class="p">.</span><span class="nx">my</span><span class="p">.</span><span class="nx">share</span><span class="p">(</span><span class="s2">&quot;share_id&quot;</span><span class="p">).</span><span class="nx">loadAll</span><span class="p">()</span>
+<span class="nx">hoodie</span><span class="p">.</span><span class="nx">my</span><span class="p">.</span><span class="nx">share</span><span class="p">(</span><span class="s2">&quot;share_id&quot;</span><span class="p">).</span><span class="nx">loadAll</span><span class="p">(</span><span class="s2">&quot;type&quot;</span><span class="p">)</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><ul>
 <li>remove <br />
 remove object(s) from the share</li>
 </ul></div></div><div class="code"><div class="wrapper"><span class="nx">hoodie</span><span class="p">.</span><span class="nx">my</span><span class="p">.</span><span class="nx">share</span><span class="p">(</span><span class="s2">&quot;share_id&quot;</span><span class="p">).</span><span class="nx">remove</span><span class="p">(</span><span class="nx">object</span><span class="p">)</span>
 <span class="nx">hoodie</span><span class="p">.</span><span class="nx">my</span><span class="p">.</span><span class="nx">share</span><span class="p">(</span><span class="s2">&quot;share_id&quot;</span><span class="p">).</span><span class="nx">remove</span><span class="p">([</span><span class="nx">object1</span><span class="p">,</span> <span class="nx">object2</span><span class="p">])</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><ul>
+<li>removeAll <br />
+remove all objects from the share</li>
+</ul></div></div><div class="code"><div class="wrapper"><span class="nx">hoodie</span><span class="p">.</span><span class="nx">my</span><span class="p">.</span><span class="nx">share</span><span class="p">(</span><span class="s2">&quot;share_id&quot;</span><span class="p">).</span><span class="nx">removeAll</span><span class="p">()</span>
+<span class="nx">hoodie</span><span class="p">.</span><span class="nx">my</span><span class="p">.</span><span class="nx">share</span><span class="p">(</span><span class="s2">&quot;share_id&quot;</span><span class="p">).</span><span class="nx">removeAll</span><span class="p">(</span><span class="s2">&quot;type&quot;</span><span class="p">)</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><ul>
 <li>push <br />
 push local changes to share</li>
 </ul></div></div><div class="code"><div class="wrapper"><span class="nx">hoodie</span><span class="p">.</span><span class="nx">my</span><span class="p">.</span><span class="nx">share</span><span class="p">(</span><span class="s2">&quot;share_id&quot;</span><span class="p">).</span><span class="nx">push</span><span class="p">()</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><ul>
