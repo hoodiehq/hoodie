@@ -1,27 +1,27 @@
-# ## SharingHoodie
+# ## ShareHoodie
 #
-# SharingHoodie is a subset of the original Hoodie class and used for
-# "manual" sharing, when user is not signed up yet.
+# ShareHoodie is a subset of the original Hoodie class and used for
+# "manual" share, when user is not signed up yet.
 #
-class Hoodie.Sharing.Hoodie extends Hoodie
+class Hoodie.Share.Hoodie extends Hoodie
   
   modules : ->
-    account : Hoodie.Sharing.Account
-    remote  : Hoodie.Sharing.Remote
+    account : Hoodie.Share.Account
+    remote  : Hoodie.Share.Remote
   
-  constructor: (hoodie, @sharing) ->
+  constructor: (hoodie, @share) ->
     @store  = hoodie.my.localStore
     
-    # proxy config to the sharing object
+    # proxy config to the share object
     @config =
-      set    : @sharing.set
-      get    : @sharing.get
-      remove : @sharing.set
+      set    : @share.set
+      get    : @share.get
+      remove : @share.set
     
-    # depending on whether sharing is continuous, we activate
+    # depending on whether share is continuous, we activate
     # continuous synching ... or not.
-    @config.set '_account.username', "sharing/#{@sharing.id}"
-    @config.set '_remote.active',    @sharing.continuous is true
+    @config.set '_account.username', "share/#{@share.id}"
+    @config.set '_remote.active',    @share.continuous is true
     
     # proxy certain request from core hoodie
     for event in ['store:dirty:idle']
@@ -29,7 +29,7 @@ class Hoodie.Sharing.Hoodie extends Hoodie
 
     super hoodie.baseUrl
 
-  # ## SharingHoodie Request
+  # ## ShareHoodie Request
   #
   # the only difference to Hoodies default request:
   # we send the creds directly as authorization header
@@ -43,7 +43,7 @@ class Hoodie.Sharing.Hoodie extends Hoodie
       dataType    : 'json'
       
     unless type is 'PUT' # no authentication header for sign up request
-      hash = btoa "sharing/#{@sharing.id}:#{@sharing.password or ''}"
+      hash = btoa "share/#{@share.id}:#{@share.password or ''}"
       auth = "Basic #{hash}"
       
       $.extend defaults,
@@ -53,5 +53,5 @@ class Hoodie.Sharing.Hoodie extends Hoodie
     $.ajax $.extend defaults, options
 
   _loadModules: ->
-    console.log 'Hoodie.Sharing.Hoodie _loadModules'
+    console.log 'Hoodie.Share.Hoodie _loadModules'
     super

@@ -3,10 +3,10 @@
   like email, store and remote but also use it for custom modules.
   
 
-### Sharing
+### Share
 
 # spec current code
-# destroying sharings
+# destroying shares
 # filters?
 # build it into minutes.io
 

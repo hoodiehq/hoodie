@@ -2,7 +2,7 @@
 var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
   __slice = [].slice;
 
-Hoodie.Sharing.Instance = (function() {
+Hoodie.Share.Instance = (function() {
 
   function Instance(options) {
     if (options == null) {
@@ -29,7 +29,7 @@ Hoodie.Sharing.Instance = (function() {
     this.set(options);
     this._assureOwnerUuid();
     if (this.anonymous) {
-      this.hoodie = new Hoodie.Sharing.Hoodie(this.hoodie, this);
+      this.hoodie = new Hoodie.Share.Hoodie(this.hoodie, this);
     }
   }
 
@@ -70,7 +70,7 @@ Hoodie.Sharing.Instance = (function() {
       $.extend(_this, properties);
       return defer.resolve(_this);
     };
-    this.hoodie.my.localStore.update("$sharing", this.id, this._memory, options).then(_handleUpdate, defer.reject);
+    this.hoodie.my.localStore.update("$share", this.id, this._memory, options).then(_handleUpdate, defer.reject);
     return defer.promise();
   };
 
@@ -105,7 +105,7 @@ Hoodie.Sharing.Instance = (function() {
     if (this.hasAccount()) {
       return (this.sync = this._sync)();
     } else {
-      return this.hoodie.my.account.signUp("sharing/" + this.id, this.password).done(function(username, response) {
+      return this.hoodie.my.account.signUp("share/" + this.id, this.password).done(function(username, response) {
         _this.save({
           _userRev: _this.hoodie.my.account._doc._rev
         });
@@ -124,45 +124,45 @@ Hoodie.Sharing.Instance = (function() {
       return;
     }
     config = this.constructor.hoodie.my.config;
-    this.ownerUuid = config.get('sharing.ownerUuid');
+    this.ownerUuid = config.get('share.ownerUuid');
     if (!this.ownerUuid) {
       this.ownerUuid = this.constructor.hoodie.my.localStore.uuid();
-      return config.set('sharing.ownerUuid', this.ownerUuid);
+      return config.set('share.ownerUuid', this.ownerUuid);
     }
   };
 
   Instance.prototype._isMySharedObjectAndChanged = function(obj) {
     var belongsToMe;
-    belongsToMe = obj.id === this.id || obj.$sharings && ~obj.$sharings.indexOf(this.id);
+    belongsToMe = obj.id === this.id || obj.$shares && ~obj.$shares.indexOf(this.id);
     return belongsToMe && this.hoodie.my.localStore.isDirty(obj.type, obj.id);
   };
 
   Instance.prototype._add = function(obj) {
     var newValue;
-    newValue = obj.$sharings ? !~obj.$sharings.indexOf(this.id) ? obj.$sharings.concat(this.id) : void 0 : [this.id];
+    newValue = obj.$shares ? !~obj.$shares.indexOf(this.id) ? obj.$shares.concat(this.id) : void 0 : [this.id];
     if (newValue) {
       delete this.$docsToRemove["" + obj.type + "/" + obj.id];
       this.set('$docsToRemove', this.$docsToRemove);
     }
     return {
-      $sharings: newValue
+      $shares: newValue
     };
   };
 
   Instance.prototype.$docsToRemove = {};
 
   Instance.prototype._remove = function(obj) {
-    var $sharings, idx;
+    var $shares, idx;
     try {
-      $sharings = obj.$sharings;
-      if (~(idx = $sharings.indexOf(this.id))) {
-        $sharings.splice(idx, 1);
+      $shares = obj.$shares;
+      if (~(idx = $shares.indexOf(this.id))) {
+        $shares.splice(idx, 1);
         this.$docsToRemove["" + obj.type + "/" + obj.id] = {
           _rev: obj._rev
         };
         this.set('$docsToRemove', this.$docsToRemove);
         return {
-          $sharings: $sharings.length ? $sharings : void 0
+          $shares: $shares.length ? $shares : void 0
         };
       }
     } catch (_error) {}
@@ -171,7 +171,7 @@ Hoodie.Sharing.Instance = (function() {
   Instance.prototype._toggle = function() {
     var doAdd;
     try {
-      doAdd = ~obj.$sharings.indexOf(this.id);
+      doAdd = ~obj.$shares.indexOf(this.id);
     } catch (e) {
       doAdd = true;
     }

@@ -2,29 +2,29 @@
 var __hasProp = {}.hasOwnProperty,
   __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
 
-Hoodie.Sharing.Account = (function(_super) {
+Hoodie.Share.Account = (function(_super) {
 
   __extends(Account, _super);
 
   function Account() {
     Account.__super__.constructor.apply(this, arguments);
-    this._sharingAuthPromise = this.hoodie.defer().resolve(this.username).promise();
+    this._shareAuthPromise = this.hoodie.defer().resolve(this.username).promise();
   }
 
   Account.prototype.authenticate = function() {
-    return this._sharingAuthPromise;
+    return this._shareAuthPromise;
   };
 
   Account.prototype.signUp = function() {
-    return this._sharingAuthPromise;
+    return this._shareAuthPromise;
   };
 
   Account.prototype.signIn = function() {
-    return this._sharingAuthPromise;
+    return this._shareAuthPromise;
   };
 
   Account.prototype.signOut = function() {
-    return this._sharingAuthPromise;
+    return this._shareAuthPromise;
   };
 
   return Account;

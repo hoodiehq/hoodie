@@ -889,10 +889,10 @@ f.event={add:function(a,c,d,e,g){var h,i,j,k,l,m,n,o,p,q,r,s;if(!(a.nodeType===3
               "singleLineComment": ["#"],
               "name": "CoffeeScript"
             },
-            "sourcePath": "/Users/gregor/JavaScripts/hood.ie/hoodie-client.js/src/hoodie/sharing.coffee",
-            "projectPath": "src/hoodie/sharing.coffee",
-            "targetPath": "hoodie/sharing",
-            "title": "sharing"
+            "sourcePath": "/Users/gregor/JavaScripts/hood.ie/hoodie-client.js/src/hoodie/share.coffee",
+            "projectPath": "src/hoodie/share.coffee",
+            "targetPath": "hoodie/share",
+            "title": "share"
           },
           "depth": 2,
           "outline": [
@@ -956,9 +956,9 @@ f.event={add:function(a,c,d,e,g){var h,i,j,k,l,m,n,o,p,q,r,s;if(!(a.nodeType===3
                   "singleLineComment": ["#"],
                   "name": "CoffeeScript"
                 },
-                "sourcePath": "/Users/gregor/JavaScripts/hood.ie/hoodie-client.js/src/hoodie/sharing/account.coffee",
-                "projectPath": "src/hoodie/sharing/account.coffee",
-                "targetPath": "hoodie/sharing/account",
+                "sourcePath": "/Users/gregor/JavaScripts/hood.ie/hoodie-client.js/src/hoodie/share/account.coffee",
+                "projectPath": "src/hoodie/share/account.coffee",
+                "targetPath": "hoodie/share/account",
                 "title": "account"
               },
               "depth": 3,
@@ -972,9 +972,9 @@ f.event={add:function(a,c,d,e,g){var h,i,j,k,l,m,n,o,p,q,r,s;if(!(a.nodeType===3
                   "singleLineComment": ["#"],
                   "name": "CoffeeScript"
                 },
-                "sourcePath": "/Users/gregor/JavaScripts/hood.ie/hoodie-client.js/src/hoodie/sharing/hoodie.coffee",
-                "projectPath": "src/hoodie/sharing/hoodie.coffee",
-                "targetPath": "hoodie/sharing/hoodie",
+                "sourcePath": "/Users/gregor/JavaScripts/hood.ie/hoodie-client.js/src/hoodie/share/hoodie.coffee",
+                "projectPath": "src/hoodie/share/hoodie.coffee",
+                "targetPath": "hoodie/share/hoodie",
                 "title": "hoodie"
               },
               "depth": 3,
@@ -983,16 +983,16 @@ f.event={add:function(a,c,d,e,g){var h,i,j,k,l,m,n,o,p,q,r,s;if(!(a.nodeType===3
                   "type": "heading",
                   "data": {
                     "level": 2,
-                    "title": "SharingHoodie",
-                    "slug": "sharinghoodie"
+                    "title": "ShareHoodie",
+                    "slug": "sharehoodie"
                   },
                   "depth": 2
                 }, {
                   "type": "heading",
                   "data": {
                     "level": 2,
-                    "title": "SharingHoodie Request",
-                    "slug": "sharinghoodie-request"
+                    "title": "ShareHoodie Request",
+                    "slug": "sharehoodie-request"
                   },
                   "depth": 2
                 }
@@ -1006,9 +1006,9 @@ f.event={add:function(a,c,d,e,g){var h,i,j,k,l,m,n,o,p,q,r,s;if(!(a.nodeType===3
                   "singleLineComment": ["#"],
                   "name": "CoffeeScript"
                 },
-                "sourcePath": "/Users/gregor/JavaScripts/hood.ie/hoodie-client.js/src/hoodie/sharing/instance.coffee",
-                "projectPath": "src/hoodie/sharing/instance.coffee",
-                "targetPath": "hoodie/sharing/instance",
+                "sourcePath": "/Users/gregor/JavaScripts/hood.ie/hoodie-client.js/src/hoodie/share/instance.coffee",
+                "projectPath": "src/hoodie/share/instance.coffee",
+                "targetPath": "hoodie/share/instance",
                 "title": "instance"
               },
               "depth": 3,
@@ -1096,9 +1096,9 @@ f.event={add:function(a,c,d,e,g){var h,i,j,k,l,m,n,o,p,q,r,s;if(!(a.nodeType===3
                   "singleLineComment": ["#"],
                   "name": "CoffeeScript"
                 },
-                "sourcePath": "/Users/gregor/JavaScripts/hood.ie/hoodie-client.js/src/hoodie/sharing/remote.coffee",
-                "projectPath": "src/hoodie/sharing/remote.coffee",
-                "targetPath": "hoodie/sharing/remote",
+                "sourcePath": "/Users/gregor/JavaScripts/hood.ie/hoodie-client.js/src/hoodie/share/remote.coffee",
+                "projectPath": "src/hoodie/share/remote.coffee",
+                "targetPath": "hoodie/share/remote",
                 "title": "remote"
               },
               "depth": 3,

@@ -1,47 +1,47 @@
 ###
 to be fixed ...
 
-describe "Hoodie.Sharing.Instance", ->  
+describe "Hoodie.Share.Instance", ->  
   beforeEach ->
     @hoodie  = new Mocks.Hoodie 
-    Hoodie.Sharing.Instance.hoodie = @hoodie
-    @sharing = new Hoodie.Sharing.Instance
+    Hoodie.Share.Instance.hoodie = @hoodie
+    @share = new Hoodie.Share.Instance
   
   describe "constructor", ->
     beforeEach ->
       spyOn(@hoodie.my.localStore, "uuid").andReturn 'newId'
-      spyOn(Hoodie.Sharing.Instance::, "set")
-      spyOn(Hoodie.Sharing.Instance::, "add")
+      spyOn(Hoodie.Share.Instance::, "set")
+      spyOn(Hoodie.Share.Instance::, "add")
       
     it "should set the attributes", ->
-      sharing = new Hoodie.Sharing.Instance {funky: 'options'}
-      expect(Hoodie.Sharing.Instance::set).wasCalledWith {funky: 'options'}
+      share = new Hoodie.Share.Instance {funky: 'options'}
+      expect(Hoodie.Share.Instance::set).wasCalledWith {funky: 'options'}
     
     
     _when "user is anonymous", ->
       beforeEach ->
         @hoodie.my.account.username = undefined
       
-      it "should use the SharingHoodie", ->
-        sharing = new Hoodie.Sharing.Instance
-        expect(sharing.hoodie.constructor).toBe SharingHoodie
+      it "should use the ShareHoodie", ->
+        share = new Hoodie.Share.Instance
+        expect(share.hoodie.constructor).toBe ShareHoodie
         
       it "should set anonymous to true", ->
-        sharing = new Hoodie.Sharing.Instance
-        expect(sharing.anonymous).toBeTruthy()
+        share = new Hoodie.Share.Instance
+        expect(share.anonymous).toBeTruthy()
       
         
     _when "user has an account", ->
       beforeEach ->
         @hoodie.my.account.username = 'joe@example.com'
       
-      it "should use the SharingHoodie", ->
-        sharing = new Hoodie.Sharing.Instance
-        expect(sharing.hoodie.constructor).toBe HoodieMock
+      it "should use the ShareHoodie", ->
+        share = new Hoodie.Share.Instance
+        expect(share.hoodie.constructor).toBe HoodieMock
         
       it "should set anonymous to false", ->
-        sharing = new Hoodie.Sharing.Instance
-        expect(sharing.anonymous).toBeFalsy()
+        share = new Hoodie.Share.Instance
+        expect(share.anonymous).toBeFalsy()
     
   # /constructor
 ###

@@ -16,7 +16,7 @@ class Hoodie extends Events
 
     user    : "UserStore"
     email   : "Email"
-    # sharing : "Sharing"
+    # share : "Share"
 
 
   # ## initialization

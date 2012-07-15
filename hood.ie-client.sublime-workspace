@@ -39,15 +39,15 @@
 		"/Users/gregor/JavaScripts/hood.ie/hoodie-client.js/src/hoodie/account.coffee",
 		"/Users/gregor/JavaScripts/hood.ie/hoodie-client.js/test/specs/hoodie/account.spec.coffee",
 		"/Users/gregor/JavaScripts/hood.ie/hoodie-client.js/test/index.html",
-		"/Users/gregor/JavaScripts/hood.ie/hoodie-client.js/src/hoodie/sharing/instance.coffee",
+		"/Users/gregor/JavaScripts/hood.ie/hoodie-client.js/src/hoodie/share/instance.coffee",
 		"/Users/gregor/JavaScripts/hood.ie/hoodie-client.js/src/hoodie/remote.coffee",
-		"/Users/gregor/JavaScripts/hood.ie/hoodie-client.js/src/hoodie/sharing/remote.coffee",
+		"/Users/gregor/JavaScripts/hood.ie/hoodie-client.js/src/hoodie/share/remote.coffee",
 		"/Users/gregor/JavaScripts/hood.ie/hoodie-client.js/src/hoodie.coffee",
 		"/Users/gregor/JavaScripts/hood.ie/hoodie-client.js/Cakefile",
 		"/Users/gregor/JavaScripts/hood.ie/hoodie-client.js/TODO.md",
 		"/Users/gregor/JavaScripts/hood.ie/hoodie-client.js/index.html",
 		"/Users/gregor/JavaScripts/hood.ie/hoodie-client.js/README.md",
-		"/Users/gregor/JavaScripts/hoodie-sharing-example/index.html",
+		"/Users/gregor/JavaScripts/hoodie-share-example/index.html",
 		"/Users/gregor/Library/Application Support/Sublime Text 2/Packages/User/Distraction Free.sublime-settings",
 		"/Users/gregor/Library/Application Support/Sublime Text 2/Packages/User/Preferences.sublime-settings"
 	],
@@ -78,7 +78,7 @@
 			"_removed_docs",
 			"docs_to_removed",
 			"_removed_docs",
-			"$sharings"
+			"$shares"
 		],
 		"highlight": true,
 		"in_selection": false,
@@ -159,11 +159,11 @@
 			],
 			[
 				"insta",
-				"src/hoodie/sharing/instance.coffee"
+				"src/hoodie/share/instance.coffee"
 			],
 			[
-				"sharingremote",
-				"src/hoodie/sharing/remote.coffee"
+				"shareremote",
+				"src/hoodie/share/remote.coffee"
 			],
 			[
 				"hoo",
@@ -171,11 +171,11 @@
 			],
 			[
 				"sha",
-				"src/hoodie/sharing.coffee"
+				"src/hoodie/share.coffee"
 			],
 			[
 				"hoodiecoff",
-				"src/hoodie/sharing/hoodie.coffee"
+				"src/hoodie/share/hoodie.coffee"
 			],
 			[
 				"con",
@@ -183,11 +183,11 @@
 			],
 			[
 				"instan",
-				"src/hoodie/sharing/instance.coffee"
+				"src/hoodie/share/instance.coffee"
 			],
 			[
 				"isnta",
-				"src/hoodie/sharing/instance.coffee"
+				"src/hoodie/share/instance.coffee"
 			],
 			[
 				"",

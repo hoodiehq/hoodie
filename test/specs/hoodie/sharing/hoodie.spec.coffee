@@ -1,4 +1,4 @@
-describe "Hoodie.Sharing.Hoodie", ->  
+describe "Hoodie.Share.Hoodie", ->  
   beforeEach ->
     @hoodie = new Mocks.Hoodie 
-    @sharingHoodie  = new Hoodie.Sharing.Hoodie @hoodie
+    @shareHoodie  = new Hoodie.Share.Hoodie @hoodie

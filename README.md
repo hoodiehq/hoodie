@@ -236,7 +236,7 @@ app.email.send( email )
 Future Ideas
 ------------
 
-* sharing
+* share
 * searching
 * payments
 * file conversion

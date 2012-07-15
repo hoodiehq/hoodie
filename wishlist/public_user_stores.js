@@ -46,7 +46,7 @@ hoodie.user("joey").store.pull()
 
 // ## use case1: private instagram-ish app
 // 
-// Our photo sharing exmaple app to showcase hoodie:
+// Our photo share exmaple app to showcase hoodie:
 // hoodiehq.github.com/app-photo
 // 
 // There is only one Model: Photo. The challange is that a 

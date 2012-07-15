@@ -2,29 +2,29 @@
 var __hasProp = {}.hasOwnProperty,
   __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
 
-Hoodie.Sharing.Hoodie = (function(_super) {
+Hoodie.Share.Hoodie = (function(_super) {
 
   __extends(Hoodie, _super);
 
   Hoodie.prototype.modules = function() {
     return {
-      account: Hoodie.Sharing.Account,
-      remote: Hoodie.Sharing.Remote
+      account: Hoodie.Share.Account,
+      remote: Hoodie.Share.Remote
     };
   };
 
-  function Hoodie(hoodie, sharing) {
+  function Hoodie(hoodie, share) {
     var event, _i, _len, _ref,
       _this = this;
-    this.sharing = sharing;
+    this.share = share;
     this.store = hoodie.my.localStore;
     this.config = {
-      set: this.sharing.set,
-      get: this.sharing.get,
-      remove: this.sharing.set
+      set: this.share.set,
+      get: this.share.get,
+      remove: this.share.set
     };
-    this.config.set('_account.username', "sharing/" + this.sharing.id);
-    this.config.set('_remote.active', this.sharing.continuous === true);
+    this.config.set('_account.username', "share/" + this.share.id);
+    this.config.set('_remote.active', this.share.continuous === true);
     _ref = ['store:dirty:idle'];
     for (_i = 0, _len = _ref.length; _i < _len; _i++) {
       event = _ref[_i];
@@ -50,7 +50,7 @@ Hoodie.Sharing.Hoodie = (function(_super) {
       dataType: 'json'
     };
     if (type !== 'PUT') {
-      hash = btoa("sharing/" + this.sharing.id + ":" + (this.sharing.password || ''));
+      hash = btoa("share/" + this.share.id + ":" + (this.share.password || ''));
       auth = "Basic " + hash;
       $.extend(defaults, {
         headers: {
@@ -62,7 +62,7 @@ Hoodie.Sharing.Hoodie = (function(_super) {
   };
 
   Hoodie.prototype._loadModules = function() {
-    console.log('Hoodie.Sharing.Hoodie _loadModules');
+    console.log('Hoodie.Share.Hoodie _loadModules');
     return Hoodie.__super__._loadModules.apply(this, arguments);
   };
 

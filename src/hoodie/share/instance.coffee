@@ -1,4 +1,4 @@
-class Hoodie.Sharing.Instance
+class Hoodie.Share.Instance
 
   #
   constructor: (options = {}) ->
@@ -6,7 +6,7 @@ class Hoodie.Sharing.Instance
     @hoodie    = @constructor.hoodie
 
     # if the current user isn't anonymous (has an account), a backend worker is 
-    # used for the whole sharing magic, all we need to do is creating the $sharing 
+    # used for the whole share magic, all we need to do is creating the $share 
     # doc and listen to its remote changes
     #
     # if the user is anonymous, we need to handle it manually. To achieve that
@@ -17,11 +17,11 @@ class Hoodie.Sharing.Instance
     @set options
 
     # also make sure we have an ownerUuid in oredr to differentiate between my 
-    # sharings and the sharings by others
+    # shares and the shares by others
     @_assureOwnerUuid() 
     
-    # use the custom Sharing Hoodie for users witouth an account
-    @hoodie = new Hoodie.Sharing.Hoodie @hoodie, this if @anonymous
+    # use the custom Share Hoodie for users witouth an account
+    @hoodie = new Hoodie.Share.Hoodie @hoodie, this if @anonymous
   
   
   # ## set
@@ -35,7 +35,7 @@ class Hoodie.Sharing.Instance
     else 
       @[key]  = @_memory[key]  = value
 
-    # make sure sharing is private if invitees are set
+    # make sure share is private if invitees are set
     @private = @_memory.private = true if @invitees?.length
 
     return undefined
@@ -51,9 +51,9 @@ class Hoodie.Sharing.Instance
   # ## save
   #
   # attributes getter & setter. It always returns all properties that
-  # are actual attributes of the sharing object that gets stored.
+  # are actual attributes of the share object that gets stored.
   #
-  # But beware of other data that gets stored with the sharing object,
+  # But beware of other data that gets stored with the share object,
   # coming from the custom config module
   save : (update = {}, options) ->
     defer = @hoodie.defer()
@@ -66,7 +66,7 @@ class Hoodie.Sharing.Instance
       defer.resolve(this)
 
     # persist memory to store
-    @hoodie.my.localStore.update("$sharing", @id, @_memory, options)
+    @hoodie.my.localStore.update("$share", @id, @_memory, options)
     .then _handleUpdate, defer.reject
 
     return defer.promise()
@@ -74,28 +74,28 @@ class Hoodie.Sharing.Instance
   
   # ## add
   #
-  # add one or multiple objects to sharing. A promise that will
+  # add one or multiple objects to share. A promise that will
   # resolve with an array of objects can be passed as well.
   #
   # usage
   #
-  # sharing.add(todoObject)
-  # sharing.add([todoObject1, todoObject2, todoObject3])
-  # sharing.add( hoodie.my.localStore.findAll (obj) -> obj.isShared )
+  # share.add(todoObject)
+  # share.add([todoObject1, todoObject2, todoObject3])
+  # share.add( hoodie.my.localStore.findAll (obj) -> obj.isShared )
   add: (objects) ->
     @toggle objects, true
     
       
   # ## remove
   #
-  # remove one or multiple objects from sharing. A promise that will
+  # remove one or multiple objects from share. A promise that will
   # resolve with an array of objects can be passed as well.
   #
   # usage
   #
-  # sharing.remove(todoObject)
-  # sharing.remove([todoObject1, todoObject2, todoObject3])
-  # sharing.remove( hoodie.my.localStore.findAll (obj) -> obj.isShared )
+  # share.remove(todoObject)
+  # share.remove([todoObject1, todoObject2, todoObject3])
+  # share.remove( hoodie.my.localStore.findAll (obj) -> obj.isShared )
   remove: (objects) -> 
     @toggle objects, false
   
@@ -109,7 +109,7 @@ class Hoodie.Sharing.Instance
     unless @hoodie.isPromise(objects) or $.isArray(objects)
       objects = [objects]
     
-    # get the update method to add/remove an object to/from sharing
+    # get the update method to add/remove an object to/from share
     updateMethod = switch doAdd
       when true  then @_add
       when false then @_remove
@@ -120,7 +120,7 @@ class Hoodie.Sharing.Instance
   
   # ## sync
   #
-  # loads all local documents that belong to sharing and sync them.
+  # loads all local documents that belong to share and sync them.
   # Before the first execution, we make sure that an account exist.
   #
   # The logic of the actual sync is in the private _sync method
@@ -132,11 +132,11 @@ class Hoodie.Sharing.Instance
       # sync now and make it the default behavior from now on
       do @sync = @_sync
       
-    # otherwise we need to create the sharing db manually,
-    # by signing up as a user with the neame of the sharing db.
+    # otherwise we need to create the share db manually,
+    # by signing up as a user with the neame of the share db.
     else
       
-      @hoodie.my.account.signUp( "sharing/#{@id}", @password )
+      @hoodie.my.account.signUp( "share/#{@id}", @password )
       .done (username, response) =>
         
         # remember that we signed up successfully for the future
@@ -149,7 +149,7 @@ class Hoodie.Sharing.Instance
   
   # ## hasAccount
   #
-  # returns true if either user or the sharing has a CouchDB account
+  # returns true if either user or the share has a CouchDB account
   hasAccount: ->
     not @anonymous or @_userRev?
     
@@ -158,8 +158,8 @@ class Hoodie.Sharing.Instance
 
   # owner uuid
   #
-  # in order to differentiate between my sharings and sharings by others,
-  # each account gets a uuid assigned that will be stored with every $sharing doc.
+  # in order to differentiate between my shares and shares by others,
+  # each account gets a uuid assigned that will be stored with every $share doc.
   #
   # at the moment we store the ownerUuid with the $config/hoodie config. Not sure
   # if that's the right place for it, but it works.
@@ -170,24 +170,24 @@ class Hoodie.Sharing.Instance
     return if @ownerUuid
 
     config      = @constructor.hoodie.my.config
-    @ownerUuid = config.get('sharing.ownerUuid')
+    @ownerUuid = config.get('share.ownerUuid')
 
-    # if this is the very first sharing, we generate and store an ownerUuid
+    # if this is the very first share, we generate and store an ownerUuid
     unless @ownerUuid
       @ownerUuid = @constructor.hoodie.my.localStore.uuid()
-      config.set 'sharing.ownerUuid', @ownerUuid
+      config.set 'share.ownerUuid', @ownerUuid
 
   # I appologize for this mess of code ~gr2m
   _isMySharedObjectAndChanged: (obj) =>
-    belongsToMe = obj.id is @id or obj.$sharings and ~obj.$sharings.indexOf(@id)
+    belongsToMe = obj.id is @id or obj.$shares and ~obj.$shares.indexOf(@id)
     return belongsToMe and @hoodie.my.localStore.isDirty(obj.type, obj.id)
 
 
   # returns a hash update to update the passed object
-  # so that it gets added to the sharing
+  # so that it gets added to the share
   _add: (obj) => 
-    newValue = if obj.$sharings
-      obj.$sharings.concat @id unless ~obj.$sharings.indexOf(@id)
+    newValue = if obj.$shares
+      obj.$shares.concat @id unless ~obj.$shares.indexOf(@id)
     else
       [@id]
 
@@ -195,21 +195,21 @@ class Hoodie.Sharing.Instance
       delete @$docsToRemove["#{obj.type}/#{obj.id}"]
       @set '$docsToRemove', @$docsToRemove 
 
-    $sharings: newValue
+    $shares: newValue
 
   
   # returns a hash update to update the passed object
-  # so that it gets removed from the current sharing
+  # so that it gets removed from the current share
   #
   # on top of that, the object gets stored in the $docsToRemove
-  # property. These will removed from the sharing database on next sync
+  # property. These will removed from the share database on next sync
   $docsToRemove: {}
   _remove : (obj) =>
     try
-      $sharings = obj.$sharings
+      $shares = obj.$shares
       
-      if ~(idx = $sharings.indexOf @id)
-        $sharings.splice(idx, 1) 
+      if ~(idx = $shares.indexOf @id)
+        $shares.splice(idx, 1) 
 
         # TODO:
         # when anonymous, use $docsToRemove and push the deletion
@@ -221,16 +221,16 @@ class Hoodie.Sharing.Instance
         @$docsToRemove["#{obj.type}/#{obj.id}"] = _rev: obj._rev
         @set '$docsToRemove', @$docsToRemove
 
-        $sharings: if $sharings.length then $sharings else undefined
+        $shares: if $shares.length then $shares else undefined
       
 
 
   # depending on whether the passed object belongs to the
-  # sharing or not, an update will be returned to add/remove 
-  # it to/from sharing
+  # share or not, an update will be returned to add/remove 
+  # it to/from share
   _toggle : => 
     try
-      doAdd = ~obj.$sharings.indexOf @id
+      doAdd = ~obj.$shares.indexOf @id
     catch e
       doAdd = true
 
@@ -241,9 +241,9 @@ class Hoodie.Sharing.Instance
 
 
   #
-  # 1. load all objects that belong to sharing and that have local changes
-  # 2. combine these with the docs that have been removed from the sharing
-  # 3. sync all these with sharing's remote
+  # 1. load all objects that belong to share and that have local changes
+  # 2. combine these with the docs that have been removed from the share
+  # 3. sync all these with share's remote
   #
   _sync : =>
     @save()

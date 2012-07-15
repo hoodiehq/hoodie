@@ -1,11 +1,11 @@
-describe "Hoodie.Sharing", ->  
+describe "Hoodie.Share", ->  
   beforeEach ->
     @hoodie  = new Mocks.Hoodie 
-    @sharing = new Hoodie.Sharing @hoodie
+    @share = new Hoodie.Share @hoodie
 
   describe ".constructor", ->
-    it "should set Hoodie.Sharing.Instance.hoodie", ->
+    it "should set Hoodie.Share.Instance.hoodie", ->
       hoodie = 'check 1,2'
-      new Hoodie.Sharing hoodie
-      expect(Hoodie.Sharing.Instance.hoodie).toBe 'check 1,2'
+      new Hoodie.Share hoodie
+      expect(Hoodie.Share.Instance.hoodie).toBe 'check 1,2'
   # /.constructor

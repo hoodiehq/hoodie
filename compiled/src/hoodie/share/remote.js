@@ -3,7 +3,7 @@ var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments)
   __hasProp = {}.hasOwnProperty,
   __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
 
-Hoodie.Sharing.Remote = (function(_super) {
+Hoodie.Share.Remote = (function(_super) {
 
   __extends(Remote, _super);
 
@@ -23,7 +23,7 @@ Hoodie.Sharing.Remote = (function(_super) {
         _results = [];
         for (_i = 0, _len = _ref.length; _i < _len; _i++) {
           obj = _ref[_i];
-          if (obj.id === this.hoodie.sharing.id || obj.$sharings && ~obj.$sharings.indexOf(this.hoodie.sharing.id)) {
+          if (obj.id === this.hoodie.share.id || obj.$shares && ~obj.$shares.indexOf(this.hoodie.share.id)) {
             _results.push(obj);
           }
         }
@@ -37,9 +37,9 @@ Hoodie.Sharing.Remote = (function(_super) {
     var since;
     since = this.hoodie.my.config.get('_remote.seq') || 0;
     if (this.active) {
-      return "/" + (encodeURIComponent(this.hoodie.my.account.db())) + "/_changes?filter=%24sharing_" + this.hoodie.sharing.id + "/owned&includeDocs=true&since=" + since + "&heartbeat=10000&feed=longpoll";
+      return "/" + (encodeURIComponent(this.hoodie.my.account.db())) + "/_changes?filter=%24share_" + this.hoodie.share.id + "/owned&includeDocs=true&since=" + since + "&heartbeat=10000&feed=longpoll";
     } else {
-      return "/" + (encodeURIComponent(this.hoodie.my.account.db())) + "/_changes?filter=%24sharing_" + this.hoodie.sharing.id + "/owned&includeDocs=true&since=" + since;
+      return "/" + (encodeURIComponent(this.hoodie.my.account.db())) + "/_changes?filter=%24share_" + this.hoodie.share.id + "/owned&includeDocs=true&since=" + since;
     }
   };
 
