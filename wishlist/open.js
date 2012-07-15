@@ -47,7 +47,7 @@ store.sync()
 
 // ## options
 
-// secret
+// password
 hoodie.open("share/abc8320", {
   password: "secret"
 })
