@@ -199,7 +199,7 @@ hoodie.share.create( {continuous: true} )
   share.add(todolist)
 
   // * changes to added todolists will be synched right away
-  hoodie.store.update(todolist, {name: "new name"})
+  hoodie.my.localStore.update(todolist, {name: "new name"})
 
   // * removed docs will be removed from the share right away
   share.remove(todolist)
@@ -268,7 +268,7 @@ hoodie.share.open( "share_id" ).done( function(share) {
 
 // I can pass options when creating a subscription, like a password for 
 // protected shares or continuous if I want to continuously synchronize with // the share 
-hoodie.share.subscription.create("share_id", {
+hoodie.subscription.create("share_id", {
   continuous: true,
   password: "secret"
 })
