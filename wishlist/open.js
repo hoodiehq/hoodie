@@ -24,8 +24,10 @@ hoodie.global.on("created:track", function(track) {})
 // store. An "opened" store does always provide the same API whereat
 // some might require special privileges. The all return a promise
 
+// instantiate
 store = hoodie.open("share/abc8320")
 
+// store / load objects
 store.load("todolist","xy20ad9")
 store.loadAll("todo")
 store.create("todo", {name: "remember the milk"})
@@ -37,15 +39,31 @@ store.deleteAll("todo")
 store.get("completed_todos")
 store.post("notify", {"email": "jane@xmpl.com"})
 
+// sync
 store.pull()
 store.push()
 store.sync()
-store.subscribe()
 
 
 // ## options
 
+// secret
 hoodie.open("share/abc8320", {
-  password: "secret",
-  subscribe: true
+  password: "secret"
 })
+
+// sync: continuously sync with store
+hoodie.open("share/abc8320", {
+  sync: 'continuous'
+})
+
+// pull: continuously pull from store
+hoodie.open("share/abc8320", {
+  sync: { pull: 'continuous' }
+})
+
+// push: continuously push to store
+hoodie.open("share/abc8320", {
+  sync: { push: 'continuous' }
+})
+
