@@ -135,9 +135,9 @@ class Hoodie.RemoteStore
   _pullUrl : ->
     since = @hoodie.my.config.get('_remote.seq') or 0
     if @active # make a long poll request
-      "/#{encodeURIComponent @hoodie.my.account.db()}/_changes?includeDocs=true&heartbeat=10000&feed=longpoll&since=#{since}"
+      "/#{encodeURIComponent @hoodie.my.account.db()}/_changes?include_docs=true&heartbeat=10000&feed=longpoll&since=#{since}"
     else
-      "/#{encodeURIComponent @hoodie.my.account.db()}/_changes?includeDocs=true&since=#{since}"
+      "/#{encodeURIComponent @hoodie.my.account.db()}/_changes?include_docs=true&since=#{since}"
   
   # request gets restarted automaticcally in @_handlePullError
   _restartPullRequest : => @_pullRequest?.abort()

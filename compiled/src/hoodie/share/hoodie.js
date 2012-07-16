@@ -61,11 +61,6 @@ Hoodie.Share.Hoodie = (function(_super) {
     return $.ajax($.extend(defaults, options));
   };
 
-  Hoodie.prototype._loadModules = function() {
-    console.log('Hoodie.Share.Hoodie _loadModules');
-    return Hoodie.__super__._loadModules.apply(this, arguments);
-  };
-
   return Hoodie;
 
 })(Hoodie);

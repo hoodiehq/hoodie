@@ -1121,8 +1121,8 @@ f.event={add:function(a,c,d,e,g){var h,i,j,k,l,m,n,o,p,q,r,s;if(!(a.nodeType===3
               "type": "heading",
               "data": {
                 "level": 1,
-                "title": "UserStore",
-                "slug": "userstore",
+                "title": "User &amp; UserStore",
+                "slug": "user-amp-userstore",
                 "isFileHeader": true
               },
               "depth": 1,
@@ -1138,7 +1138,7 @@ f.event={add:function(a,c,d,e,g){var h,i,j,k,l,m,n,o,p,q,r,s;if(!(a.nodeType===3
                 }
               ]
             },
-            "title": "UserStore"
+            "title": "User &amp; UserStore"
           },
           "depth": 2,
           "outline": [

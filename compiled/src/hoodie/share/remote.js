@@ -37,9 +37,9 @@ Hoodie.Share.Remote = (function(_super) {
     var since;
     since = this.hoodie.my.config.get('_remote.seq') || 0;
     if (this.active) {
-      return "/" + (encodeURIComponent(this.hoodie.my.account.db())) + "/_changes?filter=%24share_" + this.hoodie.share.id + "/owned&includeDocs=true&since=" + since + "&heartbeat=10000&feed=longpoll";
+      return "/" + (encodeURIComponent(this.hoodie.my.account.db())) + "/_changes?filter=%24share_" + this.hoodie.share.id + "/owned&include_docs=true&since=" + since + "&heartbeat=10000&feed=longpoll";
     } else {
-      return "/" + (encodeURIComponent(this.hoodie.my.account.db())) + "/_changes?filter=%24share_" + this.hoodie.share.id + "/owned&includeDocs=true&since=" + since;
+      return "/" + (encodeURIComponent(this.hoodie.my.account.db())) + "/_changes?filter=%24share_" + this.hoodie.share.id + "/owned&include_docs=true&since=" + since;
     }
   };
 

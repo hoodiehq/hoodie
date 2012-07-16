@@ -40,9 +40,12 @@ store.get("completed_todos")
 store.post("notify", {"email": "jane@xmpl.com"})
 
 // sync
+store.connect()
+store.disconnect()
 store.pull()
 store.push()
 store.sync()
+store.on("event", callback)
 
 
 // ## options

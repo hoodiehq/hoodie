@@ -42,7 +42,7 @@ class Hoodie.Share.Hoodie extends Hoodie
       crossDomain : true
       dataType    : 'json'
       
-    unless type is 'PUT' # no authentication header for sign up request
+    unless type is 'PUT' # no authentication header for "signup" request
       hash = btoa "share/#{@share.id}:#{@share.password or ''}"
       auth = "Basic #{hash}"
       
@@ -51,7 +51,3 @@ class Hoodie.Share.Hoodie extends Hoodie
           Authorization : auth
     
     $.ajax $.extend defaults, options
-
-  _loadModules: ->
-    console.log 'Hoodie.Share.Hoodie _loadModules'
-    super

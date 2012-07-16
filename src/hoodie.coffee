@@ -9,10 +9,10 @@ class Hoodie extends Events
   # modules to be loaded
   modules:
     my :
-      store       : "LocalStore"
-      config      : "Config"
-      account     : "Account"
-      remote : "RemoteStore"
+      store   : "LocalStore"
+      config  : "Config"
+      account : "Account"
+      remote  : "RemoteStore"
 
     user    : "UserStore"
     email   : "Email"
@@ -32,6 +32,7 @@ class Hoodie extends Events
   # ## Request
   #
   # use this method to send AJAX request to the Couch.
+  #
   request: (type, path, options = {}) ->
     defaults =
       type        : type

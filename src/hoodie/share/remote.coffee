@@ -34,9 +34,9 @@ class Hoodie.Share.Remote extends Hoodie.RemoteStore
   _pullUrl : ->
     since = @hoodie.my.config.get('_remote.seq') or 0
     if @active # make a long poll request
-      "/#{encodeURIComponent @hoodie.my.account.db()}/_changes?filter=%24share_#{@hoodie.share.id}/owned&includeDocs=true&since=#{since}&heartbeat=10000&feed=longpoll"
+      "/#{encodeURIComponent @hoodie.my.account.db()}/_changes?filter=%24share_#{@hoodie.share.id}/owned&include_docs=true&since=#{since}&heartbeat=10000&feed=longpoll"
     else
-      "/#{encodeURIComponent @hoodie.my.account.db()}/_changes?filter=%24share_#{@hoodie.share.id}/owned&includeDocs=true&since=#{since}"
+      "/#{encodeURIComponent @hoodie.my.account.db()}/_changes?filter=%24share_#{@hoodie.share.id}/owned&include_docs=true&since=#{since}"
 
 
   # add revision to object

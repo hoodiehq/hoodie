@@ -141,7 +141,7 @@ describe("Hoodie.RemoteStore", function() {
         expect(this.hoodie.request).wasCalled();
         _ref = this.hoodie.request.mostRecentCall.args, method = _ref[0], path = _ref[1];
         expect(method).toBe('GET');
-        return expect(path).toBe('/joe%24examleCom/_changes?includeDocs=true&heartbeat=10000&feed=longpoll&since=0');
+        return expect(path).toBe('/joe%24examleCom/_changes?include_docs=true&heartbeat=10000&feed=longpoll&since=0');
       });
       return it("should set a timeout to restart the pull request", function() {
         this.remote.pull();
@@ -159,7 +159,7 @@ describe("Hoodie.RemoteStore", function() {
         expect(this.hoodie.request).wasCalled();
         _ref = this.hoodie.request.mostRecentCall.args, method = _ref[0], path = _ref[1];
         expect(method).toBe('GET');
-        return expect(path).toBe('/joe%24examleCom/_changes?includeDocs=true&since=0');
+        return expect(path).toBe('/joe%24examleCom/_changes?include_docs=true&since=0');
       });
     });
     _when("request is successful / returns changes", function() {

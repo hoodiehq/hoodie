@@ -16,7 +16,7 @@ class Hoodie.Share.Instance
     # setting attributes
     @set options
 
-    # also make sure we have an ownerUuid in oredr to differentiate between my 
+    # also make sure we have an ownerUuid in order to differentiate between my 
     # shares and the shares by others
     @_assureOwnerUuid() 
     

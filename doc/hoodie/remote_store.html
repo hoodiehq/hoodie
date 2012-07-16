@@ -85,9 +85,9 @@ If no objects passed, push all changed documents</p></div></div><div class="code
 <p>Depending on whether remote is active, return a longpoll URL or not</p></div></div><div class="code"><div class="wrapper">  <span class="nv">_pullUrl : </span><span class="o">-&gt;</span>
     <span class="nv">since = </span><span class="nx">@hoodie</span><span class="p">.</span><span class="nx">my</span><span class="p">.</span><span class="nx">config</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="s1">&#39;_remote.seq&#39;</span><span class="p">)</span> <span class="o">or</span> <span class="mi">0</span>
     <span class="k">if</span> <span class="nx">@active</span> <span class="c1"># make a long poll request</span>
-      <span class="s2">&quot;/#{encodeURIComponent @hoodie.my.account.db()}/_changes?includeDocs=true&amp;heartbeat=10000&amp;feed=longpoll&amp;since=#{since}&quot;</span>
+      <span class="s2">&quot;/#{encodeURIComponent @hoodie.my.account.db()}/_changes?include_docs=true&amp;heartbeat=10000&amp;feed=longpoll&amp;since=#{since}&quot;</span>
     <span class="k">else</span>
-      <span class="s2">&quot;/#{encodeURIComponent @hoodie.my.account.db()}/_changes?includeDocs=true&amp;since=#{since}&quot;</span>
+      <span class="s2">&quot;/#{encodeURIComponent @hoodie.my.account.db()}/_changes?include_docs=true&amp;since=#{since}&quot;</span>
   </div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>request gets restarted automaticcally in @_handlePullError</p></div></div><div class="code"><div class="wrapper">  <span class="nv">_restartPullRequest : </span><span class="o">=&gt;</span> <span class="nx">@_pullRequest</span><span class="o">?</span><span class="p">.</span><span class="nx">abort</span><span class="p">()</span>
   
   </div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>pull success handler </p>

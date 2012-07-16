@@ -119,7 +119,7 @@ describe "Hoodie.RemoteStore", ->
         expect(@hoodie.request).wasCalled()
         [method, path] = @hoodie.request.mostRecentCall.args
         expect(method).toBe 'GET'
-        expect(path).toBe '/joe%24examleCom/_changes?includeDocs=true&heartbeat=10000&feed=longpoll&since=0'
+        expect(path).toBe '/joe%24examleCom/_changes?include_docs=true&heartbeat=10000&feed=longpoll&since=0'
         
       it "should set a timeout to restart the pull request", ->
         @remote.pull()
@@ -135,7 +135,7 @@ describe "Hoodie.RemoteStore", ->
         expect(@hoodie.request).wasCalled()
         [method, path] = @hoodie.request.mostRecentCall.args
         expect(method).toBe 'GET'
-        expect(path).toBe '/joe%24examleCom/_changes?includeDocs=true&since=0'
+        expect(path).toBe '/joe%24examleCom/_changes?include_docs=true&since=0'
 
     _when "request is successful / returns changes", ->
       beforeEach ->

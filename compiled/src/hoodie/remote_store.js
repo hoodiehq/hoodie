@@ -124,9 +124,9 @@ Hoodie.RemoteStore = (function() {
     var since;
     since = this.hoodie.my.config.get('_remote.seq') || 0;
     if (this.active) {
-      return "/" + (encodeURIComponent(this.hoodie.my.account.db())) + "/_changes?includeDocs=true&heartbeat=10000&feed=longpoll&since=" + since;
+      return "/" + (encodeURIComponent(this.hoodie.my.account.db())) + "/_changes?include_docs=true&heartbeat=10000&feed=longpoll&since=" + since;
     } else {
-      return "/" + (encodeURIComponent(this.hoodie.my.account.db())) + "/_changes?includeDocs=true&since=" + since;
+      return "/" + (encodeURIComponent(this.hoodie.my.account.db())) + "/_changes?include_docs=true&since=" + since;
     }
   };
 
