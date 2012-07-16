@@ -13,7 +13,7 @@
       <span class="nv">set    : </span><span class="nx">@share</span><span class="p">.</span><span class="nx">set</span>
       <span class="nv">get    : </span><span class="nx">@share</span><span class="p">.</span><span class="nx">get</span>
       <span class="nv">remove : </span><span class="nx">@share</span><span class="p">.</span><span class="nx">set</span>
-    </div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>depending on whether share is continuous, we activate
+    </div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>depending on whether share is continuous, we startSyncing
 continuous synching ... or not.</p></div></div><div class="code"><div class="wrapper">    <span class="nx">@config</span><span class="p">.</span><span class="nx">set</span> <span class="s1">&#39;_account.username&#39;</span><span class="p">,</span> <span class="s2">&quot;share/#{@share.id}&quot;</span>
     <span class="nx">@config</span><span class="p">.</span><span class="nx">set</span> <span class="s1">&#39;_remote.active&#39;</span><span class="p">,</span>    <span class="nx">@share</span><span class="p">.</span><span class="nx">continuous</span> <span class="o">is</span> <span class="kc">true</span>
     </div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>proxy certain request from core hoodie</p></div></div><div class="code"><div class="wrapper">    <span class="k">for</span> <span class="nx">event</span> <span class="k">in</span> <span class="p">[</span><span class="s1">&#39;store:dirty:idle&#39;</span><span class="p">]</span>

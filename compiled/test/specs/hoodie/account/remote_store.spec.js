@@ -47,43 +47,43 @@ describe("Hoodie.Account.RemoteStore", function() {
       });
     });
   });
-  describe(".activate", function() {
+  describe(".startSyncing", function() {
     it("should make isContinuouslySyncing() to return true", function() {
       this.remote._sync = false;
-      this.remote.activate();
+      this.remote.startSyncing();
       return expect(this.remote.isContinuouslySyncing()).toBeTruthy();
     });
     it("should set config _remote.sync to true", function() {
       spyOn(this.hoodie.my.config, "set");
-      this.remote.activate();
+      this.remote.startSyncing();
       return expect(this.hoodie.my.config.set).wasCalledWith('_remote.sync', true);
     });
     it("should subscribe to `signedOut` event", function() {
-      this.remote.activate();
+      this.remote.startSyncing();
       return expect(this.hoodie.on).wasCalledWith('account:signedOut', this.remote.disconnect);
     });
     return it("should subscribe to account:signin with sync", function() {
-      this.remote.activate();
+      this.remote.startSyncing();
       return expect(this.hoodie.on).wasCalledWith('account:signedIn', this.remote.connect);
     });
   });
-  describe(".deactivate", function() {
+  describe(".stopSyncing", function() {
     it("should set _remote.sync to false", function() {
       this.remote._sync = true;
-      this.remote.deactivate();
+      this.remote.stopSyncing();
       return expect(this.remote.isContinuouslySyncing()).toBeFalsy();
     });
     it("should set config remote.syncContinuously to false", function() {
       spyOn(this.hoodie.my.config, "set");
-      this.remote.deactivate();
+      this.remote.stopSyncing();
       return expect(this.hoodie.my.config.set).wasCalledWith('_remote.sync', false);
     });
     it("should unsubscribe from account's signedIn idle event", function() {
-      this.remote.deactivate();
+      this.remote.stopSyncing();
       return expect(this.hoodie.unbind).wasCalledWith('account:signedIn', this.remote.connect);
     });
     return it("should unsubscribe from account's signedOut idle event", function() {
-      this.remote.deactivate();
+      this.remote.stopSyncing();
       return expect(this.hoodie.unbind).wasCalledWith('account:signedOut', this.remote.disconnect);
     });
   });

@@ -39,42 +39,42 @@ describe "Hoodie.Account.RemoteStore", ->
         expect(@remote.syncContinuously).toBeFalsy()
      
 
-  describe ".activate", ->
+  describe ".startSyncing", ->
     it "should make isContinuouslySyncing() to return true", ->
       @remote._sync = false
-      @remote.activate()
+      @remote.startSyncing()
       expect(@remote.isContinuouslySyncing()).toBeTruthy()
     
     it "should set config _remote.sync to true", ->
       spyOn(@hoodie.my.config, "set")
-      @remote.activate()
+      @remote.startSyncing()
       expect(@hoodie.my.config.set).wasCalledWith '_remote.sync', true
 
     it "should subscribe to `signedOut` event", ->
-      @remote.activate()
+      @remote.startSyncing()
       expect(@hoodie.on).wasCalledWith 'account:signedOut', @remote.disconnect
 
     it "should subscribe to account:signin with sync", ->
-      @remote.activate()
+      @remote.startSyncing()
       expect(@hoodie.on).wasCalledWith 'account:signedIn', @remote.connect
       
-  describe ".deactivate", ->
+  describe ".stopSyncing", ->
     it "should set _remote.sync to false", ->
       @remote._sync = true
-      @remote.deactivate()
+      @remote.stopSyncing()
       expect(@remote.isContinuouslySyncing()).toBeFalsy()
     
     it "should set config remote.syncContinuously to false", ->
       spyOn(@hoodie.my.config, "set")
-      @remote.deactivate()
+      @remote.stopSyncing()
       expect(@hoodie.my.config.set).wasCalledWith '_remote.sync', false
 
     it "should unsubscribe from account's signedIn idle event", ->
-      @remote.deactivate()
+      @remote.stopSyncing()
       expect(@hoodie.unbind).wasCalledWith 'account:signedIn', @remote.connect
       
     it "should unsubscribe from account's signedOut idle event", ->
-      @remote.deactivate()
+      @remote.stopSyncing()
       expect(@hoodie.unbind).wasCalledWith 'account:signedOut', @remote.disconnect
 
   describe ".connect()", ->

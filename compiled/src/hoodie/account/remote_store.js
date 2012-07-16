@@ -12,27 +12,27 @@ Hoodie.Account.RemoteStore = (function(_super) {
   function RemoteStore() {
     this.connect = __bind(this.connect, this);
 
-    this.deactivate = __bind(this.deactivate, this);
+    this.stopSyncing = __bind(this.stopSyncing, this);
 
-    this.activate = __bind(this.activate, this);
+    this.startSyncing = __bind(this.startSyncing, this);
     RemoteStore.__super__.constructor.apply(this, arguments);
     this.basePath = "/" + (encodeURIComponent(this.hoodie.my.account.db()));
     if (this.hoodie.my.config.get('_remote.sync') != null) {
       this._sync = this.hoodie.my.config.get('_remote.sync');
     }
     if (this.isContinuouslySyncing()) {
-      this.activate();
+      this.startSyncing();
     }
   }
 
-  RemoteStore.prototype.activate = function() {
+  RemoteStore.prototype.startSyncing = function() {
     this.hoodie.my.config.set('_remote.sync', this._sync = true);
     this.hoodie.on('account:signedOut', this.disconnect);
     this.hoodie.on('account:signedIn', this.connect);
     return this.connect();
   };
 
-  RemoteStore.prototype.deactivate = function() {
+  RemoteStore.prototype.stopSyncing = function() {
     this.hoodie.my.config.set('_remote.sync', this._sync = false);
     this.hoodie.unbind('account:signedIn', this.connect);
     this.hoodie.unbind('account:signedOut', this.disconnect);

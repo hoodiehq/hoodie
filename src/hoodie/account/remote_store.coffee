@@ -27,10 +27,10 @@ class Hoodie.Account.RemoteStore extends Hoodie.RemoteStore
     # overwrite default with _remote.sync config, if set
     @_sync = @hoodie.my.config.get('_remote.sync') if @hoodie.my.config.get('_remote.sync')?
     
-    @activate() if @isContinuouslySyncing()
+    @startSyncing() if @isContinuouslySyncing()
   
   #
-  activate : =>
+  startSyncing : =>
     @hoodie.my.config.set '_remote.sync', @_sync = true
 
     @hoodie.on 'account:signedOut',    @disconnect
@@ -39,7 +39,7 @@ class Hoodie.Account.RemoteStore extends Hoodie.RemoteStore
     @connect()
 
   #
-  deactivate : =>
+  stopSyncing : =>
     @hoodie.my.config.set '_remote.sync', @_sync = false
 
     @hoodie.unbind 'account:signedIn',  @connect

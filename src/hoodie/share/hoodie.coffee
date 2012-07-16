@@ -18,7 +18,7 @@ class Hoodie.Share.Hoodie extends Hoodie
       get    : @share.get
       remove : @share.set
     
-    # depending on whether share is continuous, we activate
+    # depending on whether share is continuous, we startSyncing
     # continuous synching ... or not.
     @config.set '_account.username', "share/#{@share.id}"
     @config.set '_remote.active',    @share.continuous is true
