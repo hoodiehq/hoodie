@@ -31,32 +31,32 @@ describe("Hoodie.Account.RemoteStore", function() {
     it("should set basePath to users database name", function() {
       return expect(this.remote.basePath).toBe("/joe%24example.com");
     });
-    it("should be active by default", function() {
-      return expect(this.remote.active).toBeTruthy();
+    it("should sync continously by default", function() {
+      return expect(this.remote.isContinuouslySyncing()).toBeTruthy();
     });
     it("should connect", function() {
       return expect(Hoodie.Account.RemoteStore.prototype.connect).wasCalled();
     });
-    return _when("config remote.active is false", function() {
+    return _when("config remote.syncContinuously is false", function() {
       beforeEach(function() {
         spyOn(this.hoodie.my.config, "get").andReturn(false);
         return this.remote = new Hoodie.Account.RemoteStore(this.hoodie);
       });
-      return it("should set active to false", function() {
-        return expect(this.remote.active).toBeFalsy();
+      return it("should set syncContinuously to false", function() {
+        return expect(this.remote.syncContinuously).toBeFalsy();
       });
     });
   });
   describe(".activate", function() {
-    it("should set remote.active to true", function() {
-      this.remote.active = false;
+    it("should make isContinuouslySyncing() to return true", function() {
+      this.remote._sync = false;
       this.remote.activate();
-      return expect(this.remote.active).toBeTruthy();
+      return expect(this.remote.isContinuouslySyncing()).toBeTruthy();
     });
-    it("should set config remote.active to true", function() {
+    it("should set config _remote.sync to true", function() {
       spyOn(this.hoodie.my.config, "set");
       this.remote.activate();
-      return expect(this.hoodie.my.config.set).wasCalledWith('_remote.active', true);
+      return expect(this.hoodie.my.config.set).wasCalledWith('_remote.sync', true);
     });
     it("should subscribe to `signedOut` event", function() {
       this.remote.activate();
@@ -68,15 +68,15 @@ describe("Hoodie.Account.RemoteStore", function() {
     });
   });
   describe(".deactivate", function() {
-    it("should set remote.active to false", function() {
-      this.remote.active = true;
+    it("should set _remote.sync to false", function() {
+      this.remote._sync = true;
       this.remote.deactivate();
-      return expect(this.remote.active).toBeFalsy();
+      return expect(this.remote.isContinuouslySyncing()).toBeFalsy();
     });
-    it("should set config remote.active to false", function() {
+    it("should set config remote.syncContinuously to false", function() {
       spyOn(this.hoodie.my.config, "set");
       this.remote.deactivate();
-      return expect(this.hoodie.my.config.set).wasCalledWith('_remote.active', false);
+      return expect(this.hoodie.my.config.set).wasCalledWith('_remote.sync', false);
     });
     it("should unsubscribe from account's signedIn idle event", function() {
       this.remote.deactivate();
@@ -134,9 +134,12 @@ describe("Hoodie.Account.RemoteStore", function() {
     });
   });
   describe(".pull()", function() {
-    _when("remote is active", function() {
+    beforeEach(function() {
+      return this.remote.connected = true;
+    });
+    _when(".isContinuouslyPulling() is true", function() {
       beforeEach(function() {
-        return this.remote.active = true;
+        return spyOn(this.remote, "isContinuouslyPulling").andReturn(true);
       });
       it("should send a longpoll GET request to user's db _changes feed", function() {
         var method, path, _ref;
@@ -151,9 +154,9 @@ describe("Hoodie.Account.RemoteStore", function() {
         return expect(window.setTimeout).wasCalledWith(this.remote._restartPullRequest, 25000);
       });
     });
-    _when("remote is not active", function() {
+    _when(".isContinuouslyPulling() is false", function() {
       beforeEach(function() {
-        return this.remote.active = false;
+        return spyOn(this.remote, "isContinuouslyPulling").andReturn(false);
       });
       return it("should send a normal GET request to user's db _changes feed", function() {
         var method, path, _ref;
@@ -210,9 +213,9 @@ describe("Hoodie.Account.RemoteStore", function() {
         expect(this.hoodie.trigger).wasCalledWith('remote:change:todo', 'update', 'objectFromStore');
         return expect(this.hoodie.trigger).wasCalledWith('remote:change:todo:abc2', 'update', 'objectFromStore');
       });
-      return _and("remote is active", function() {
+      return _and(".isContinuouslyPulling() returns true", function() {
         beforeEach(function() {
-          this.remote.active = true;
+          spyOn(this.remote, "isContinuouslyPulling").andReturn(true);
           return spyOn(this.remote, "pull").andCallThrough();
         });
         return it("should pull again", function() {
@@ -244,14 +247,14 @@ describe("Hoodie.Account.RemoteStore", function() {
         this.remote.pull();
         return expect(this.hoodie.trigger).wasCalledWith('remote:error:unauthenticated', 'error object');
       });
-      _and("remote is active", function() {
+      _and("remote is pullContinuously", function() {
         return beforeEach(function() {
-          return this.remote.active = true;
+          return this.remote.pullContinuously = true;
         });
       });
-      return _and("remote isn't active", function() {
+      return _and("remote isn't pullContinuously", function() {
         return beforeEach(function() {
-          return this.remote.active = false;
+          return this.remote.pullContinuously = false;
         });
       });
     });
@@ -311,13 +314,13 @@ describe("Hoodie.Account.RemoteStore", function() {
           }
         });
       });
-      return it("should try again when remote is active", function() {
+      return it("should try again when .isContinuouslyPulling() returns true", function() {
         spyOn(this.remote, "pull").andCallThrough();
-        this.remote.active = true;
+        spyOn(this.remote, "isContinuouslyPulling").andReturn(true);
         this.remote.pull();
         expect(this.remote.pull.callCount).toBe(2);
         this.remote.pull.reset();
-        this.remote.active = false;
+        this.remote.isContinuouslyPulling.andReturn(false);
         this.remote.pull();
         return expect(this.remote.pull.callCount).toBe(1);
       });
@@ -334,12 +337,12 @@ describe("Hoodie.Account.RemoteStore", function() {
           }
         });
       });
-      return it("should try again in 3 seconds if remote is active", function() {
-        this.remote.active = true;
+      return it("should try again in 3 seconds if .isContinuouslyPulling() returns false", function() {
+        spyOn(this.remote, "isContinuouslyPulling").andReturn(true);
         this.remote.pull();
         expect(window.setTimeout).wasCalledWith(this.remote.pull, 3000);
         window.setTimeout.reset();
-        this.remote.active = false;
+        this.remote.isContinuouslyPulling.andReturn(false);
         this.remote.pull();
         return expect(window.setTimeout).wasNotCalledWith(this.remote.pull, 3000);
       });
@@ -452,9 +455,9 @@ describe("Hoodie.Account.RemoteStore", function() {
       this.remote.sync([1, 2, 3]);
       return expect(this.remote.pull).wasCalledWith([1, 2, 3]);
     });
-    return _when("remote is active", function() {
+    return _when(".isContinuouslyPushing() returns true", function() {
       beforeEach(function() {
-        return this.remote.active = true;
+        return spyOn(this.remote, "isContinuouslyPushing").andReturn(true);
       });
       it("should bind to store:dirty:idle event", function() {
         this.remote.sync();

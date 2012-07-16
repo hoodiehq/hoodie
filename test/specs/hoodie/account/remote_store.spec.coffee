@@ -13,7 +13,6 @@ describe "Hoodie.Account.RemoteStore", ->
     spyOn(@hoodie.my.store, "destroy").andReturn then: (cb) -> cb('objectFromStore')
     spyOn(@hoodie.my.store, "update").andReturn  then: (cb) -> cb('objectFromStore', false)
 
-    
     @remote = new Hoodie.Account.RemoteStore @hoodie
   
   
@@ -25,31 +24,31 @@ describe "Hoodie.Account.RemoteStore", ->
     it "should set basePath to users database name", ->
       expect(@remote.basePath).toBe "/joe%24example.com"
 
-    it "should be active by default", ->
-      expect(@remote.active).toBeTruthy()
+    it "should sync continously by default", ->
+      expect(@remote.isContinuouslySyncing()).toBeTruthy()
     
     it "should connect", ->
       expect(Hoodie.Account.RemoteStore::connect).wasCalled()
         
-    _when "config remote.active is false", ->
+    _when "config remote.syncContinuously is false", ->
       beforeEach ->
         spyOn(@hoodie.my.config, "get").andReturn false
         @remote = new Hoodie.Account.RemoteStore @hoodie
         
-      it "should set active to false", ->
-        expect(@remote.active).toBeFalsy()
+      it "should set syncContinuously to false", ->
+        expect(@remote.syncContinuously).toBeFalsy()
      
 
   describe ".activate", ->
-    it "should set remote.active to true", ->
-      @remote.active = false
+    it "should make isContinuouslySyncing() to return true", ->
+      @remote._sync = false
       @remote.activate()
-      expect(@remote.active).toBeTruthy()
+      expect(@remote.isContinuouslySyncing()).toBeTruthy()
     
-    it "should set config remote.active to true", ->
+    it "should set config _remote.sync to true", ->
       spyOn(@hoodie.my.config, "set")
       @remote.activate()
-      expect(@hoodie.my.config.set).wasCalledWith '_remote.active', true
+      expect(@hoodie.my.config.set).wasCalledWith '_remote.sync', true
 
     it "should subscribe to `signedOut` event", ->
       @remote.activate()
@@ -60,15 +59,15 @@ describe "Hoodie.Account.RemoteStore", ->
       expect(@hoodie.on).wasCalledWith 'account:signedIn', @remote.connect
       
   describe ".deactivate", ->
-    it "should set remote.active to false", ->
-      @remote.active = true
+    it "should set _remote.sync to false", ->
+      @remote._sync = true
       @remote.deactivate()
-      expect(@remote.active).toBeFalsy()
+      expect(@remote.isContinuouslySyncing()).toBeFalsy()
     
-    it "should set config remote.active to false", ->
+    it "should set config remote.syncContinuously to false", ->
       spyOn(@hoodie.my.config, "set")
       @remote.deactivate()
-      expect(@hoodie.my.config.set).wasCalledWith '_remote.active', false
+      expect(@hoodie.my.config.set).wasCalledWith '_remote.sync', false
 
     it "should unsubscribe from account's signedIn idle event", ->
       @remote.deactivate()
@@ -115,9 +114,12 @@ describe "Hoodie.Account.RemoteStore", ->
   # /.disconnect()
   
   describe ".pull()", ->        
-    _when "remote is active", ->
+    beforeEach ->
+      @remote.connected = true
+    
+    _when ".isContinuouslyPulling() is true", ->
       beforeEach ->
-        @remote.active = true
+        spyOn(@remote, "isContinuouslyPulling").andReturn true
       
       it "should send a longpoll GET request to user's db _changes feed", ->
         @remote.pull()
@@ -130,9 +132,9 @@ describe "Hoodie.Account.RemoteStore", ->
         @remote.pull()
         expect(window.setTimeout).wasCalledWith @remote._restartPullRequest, 25000
         
-    _when "remote is not active", ->
+    _when ".isContinuouslyPulling() is false", ->
       beforeEach ->
-        @remote.active = false
+        spyOn(@remote, "isContinuouslyPulling").andReturn false
       
       it "should send a normal GET request to user's db _changes feed", ->
         @remote.pull()
@@ -177,9 +179,9 @@ describe "Hoodie.Account.RemoteStore", ->
         expect(@hoodie.trigger).wasCalledWith 'remote:change:todo',       'update', 'objectFromStore'
         expect(@hoodie.trigger).wasCalledWith 'remote:change:todo:abc2',  'update', 'objectFromStore'
         
-      _and "remote is active", ->
+      _and ".isContinuouslyPulling() returns true", ->
         beforeEach ->
-          @remote.active = true
+          spyOn(@remote, "isContinuouslyPulling").andReturn true
           spyOn(@remote, "pull").andCallThrough()
         
         it "should pull again", ->
@@ -203,13 +205,13 @@ describe "Hoodie.Account.RemoteStore", ->
         @remote.pull()
         expect(@hoodie.trigger).wasCalledWith 'remote:error:unauthenticated', 'error object'
       
-      _and "remote is active", ->
+      _and "remote is pullContinuously", ->
         beforeEach ->
-          @remote.active = true
+          @remote.pullContinuously = true
       
-      _and "remote isn't active", ->
+      _and "remote isn't pullContinuously", ->
         beforeEach ->
-          @remote.active = false
+          @remote.pullContinuously = false
 
     _when "request errors with 404 not found", ->
       beforeEach ->
@@ -244,15 +246,14 @@ describe "Hoodie.Account.RemoteStore", ->
           @hoodie.request.andReturn then: ->
           error statusText: 'abort', 'error object'
       
-      it "should try again when remote is active", ->
+      it "should try again when .isContinuouslyPulling() returns true", ->
         spyOn(@remote, "pull").andCallThrough()
-        
-        @remote.active = true
+        spyOn(@remote, "isContinuouslyPulling").andReturn true
         @remote.pull()
         expect(@remote.pull.callCount).toBe 2
         
         @remote.pull.reset()
-        @remote.active = false
+        @remote.isContinuouslyPulling.andReturn false
         @remote.pull()
         expect(@remote.pull.callCount).toBe 1
 
@@ -263,13 +264,13 @@ describe "Hoodie.Account.RemoteStore", ->
           @hoodie.request.andReturn then: ->
           error {}, 'error object'
           
-      it "should try again in 3 seconds if remote is active", ->
-        @remote.active = true
+      it "should try again in 3 seconds if .isContinuouslyPulling() returns false", ->
+        spyOn(@remote, "isContinuouslyPulling").andReturn true
         @remote.pull()
         expect(window.setTimeout).wasCalledWith @remote.pull, 3000
         
         window.setTimeout.reset()
-        @remote.active = false
+        @remote.isContinuouslyPulling.andReturn false
         @remote.pull()
         expect(window.setTimeout).wasNotCalledWith @remote.pull, 3000
   # /.pull()
@@ -363,9 +364,9 @@ describe "Hoodie.Account.RemoteStore", ->
       @remote.sync [1,2,3]
       expect(@remote.pull).wasCalledWith [1,2,3]
       
-    _when "remote is active", ->
+    _when ".isContinuouslyPushing() returns true", ->
       beforeEach ->
-        @remote.active = true
+        spyOn(@remote, "isContinuouslyPushing").andReturn true
         
       it "should bind to store:dirty:idle event", ->
         @remote.sync()

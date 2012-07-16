@@ -3,11 +3,13 @@ var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments)
 
 Hoodie.RemoteStore = (function() {
 
-  RemoteStore.prototype.active = true;
+  RemoteStore.prototype._sync = false;
 
-  function RemoteStore(hoodie, _arg) {
+  function RemoteStore(hoodie, options) {
     this.hoodie = hoodie;
-    this.basePath = (_arg != null ? _arg : {}).basePath;
+    if (options == null) {
+      options = {};
+    }
     this._handlePushSuccess = __bind(this._handlePushSuccess, this);
 
     this._handlePullResults = __bind(this._handlePullResults, this);
@@ -28,6 +30,10 @@ Hoodie.RemoteStore = (function() {
 
     this.connect = __bind(this.connect, this);
 
+    this.basePath = options.basePath;
+    if (options.sync) {
+      this._sync = options.sync;
+    }
   }
 
   RemoteStore.prototype.connect = function() {
@@ -45,11 +51,25 @@ Hoodie.RemoteStore = (function() {
     return (_ref1 = this._pushRequest) != null ? _ref1.abort() : void 0;
   };
 
+  RemoteStore.prototype.isContinuouslyPulling = function() {
+    var _ref;
+    return this._sync === true || ((_ref = this._sync) != null ? _ref.pull : void 0) === true;
+  };
+
+  RemoteStore.prototype.isContinuouslyPushing = function() {
+    var _ref;
+    return this._sync === true || ((_ref = this._sync) != null ? _ref.push : void 0) === true;
+  };
+
+  RemoteStore.prototype.isContinuouslySyncing = function() {
+    return this._sync === true;
+  };
+
   RemoteStore.prototype.pull = function() {
     this._pullRequest = this.hoodie.request('GET', this._pullUrl(), {
       contentType: 'application/json'
     });
-    if (this.connected && this.active) {
+    if (this.connected && this.isContinuouslyPulling()) {
       window.clearTimeout(this._pullRequestTimeout);
       this._pullRequestTimeout = window.setTimeout(this._restartPullRequest, 25000);
     }
@@ -86,7 +106,7 @@ Hoodie.RemoteStore = (function() {
   };
 
   RemoteStore.prototype.sync = function(docs) {
-    if (this.active) {
+    if (this.isContinuouslyPushing()) {
       this.hoodie.unbind('store:dirty:idle', this.push);
       this.hoodie.on('store:dirty:idle', this.push);
     }
@@ -100,7 +120,7 @@ Hoodie.RemoteStore = (function() {
   RemoteStore.prototype._pullUrl = function() {
     var since;
     since = this.hoodie.my.config.get('_remote.seq') || 0;
-    if (this.active) {
+    if (this.isContinuouslyPulling()) {
       return "" + this.basePath + "/_changes?include_docs=true&heartbeat=10000&feed=longpoll&since=" + since;
     } else {
       return "" + this.basePath + "/_changes?include_docs=true&since=" + since;
@@ -115,7 +135,7 @@ Hoodie.RemoteStore = (function() {
   RemoteStore.prototype._handlePullSuccess = function(response) {
     this.hoodie.my.config.set('_remote.seq', response.last_seq);
     this._handlePullResults(response.results);
-    if (this.connected && this.active) {
+    if (this.connected && this.isContinuouslyPulling()) {
       return this.pull();
     }
   };
@@ -134,7 +154,7 @@ Hoodie.RemoteStore = (function() {
         this.hoodie.trigger('remote:error:server', error);
         return window.setTimeout(this.pull, 3000);
       default:
-        if (!this.active) {
+        if (!this.isContinuouslyPulling()) {
           return;
         }
         if (xhr.statusText === 'abort') {

@@ -35,20 +35,21 @@
 # * on(event, callback)
 #
 class Hoodie.RemoteStore
-  
 
   # ## properties
   
-  # active
-  # if remote is active, it will continuously synchronize data
-  # as soon as the user is authenticated.
-  active: true
+  # sync  
+  # if set to true, updates will be continuously pulled
+  # and pushed. Alternatively, `_sync` can be set to
+  # `pull: true` or `push: true`.
+  _sync: false
 
 
   # ## Constructor
   #
-  constructor : (@hoodie, {@basePath} = {}) ->
-    
+  constructor : (@hoodie, options = {}) ->
+    @basePath = options.basePath
+    @_sync    = options.sync      if options.sync
 
   # ## Connect
   #
@@ -71,14 +72,33 @@ class Hoodie.RemoteStore
     @_pushRequest?.abort()
 
 
+  # ## isContinuouslyPulling
+  #
+  # returns true if pulling is set to be continous
+  isContinuouslyPulling: ->
+    @_sync is true or @_sync?.pull is true
+
+  # ## isContinuouslyPushing
+  #
+  # returns true if pulling is set to be continous
+  isContinuouslyPushing: ->
+    @_sync is true or @_sync?.push is true
+
+  # ## isContinuouslySyncing
+  #
+  # returns true if pulling is set to be continous
+  isContinuouslySyncing: ->
+    @_sync is true
+
+
   # ## pull changes
   #
   # a.k.a. make a GET request to CouchDB's `_changes` feed.
   #
   pull : =>
     @_pullRequest = @hoodie.request 'GET', @_pullUrl(), contentType: 'application/json'
-    
-    if @connected and @active
+
+    if @connected and @isContinuouslyPulling()
       window.clearTimeout @_pullRequestTimeout
       @_pullRequestTimeout = window.setTimeout @_restartPullRequest, 25000 # 25 sec
     
@@ -97,13 +117,13 @@ class Hoodie.RemoteStore
     docsForRemote = (@_parseForRemote doc for doc in docs)
     
     @_pushRequest = @hoodie.request 'POST', "#{@basePath}/_bulk_docs", 
-      dataType:     'json'
-      processData:  false
-      contentType:  'application/json'
+      dataType    : 'json'
+      processData : false
+      contentType : 'application/json'
     
-      data  : JSON.stringify
-                docs      : docsForRemote
-                newEdits : false
+      data : JSON.stringify
+        docs      : docsForRemote
+        newEdits  : false
 
     # when push is successful, update the local store with the generated _rev numbers
     @_pushRequest.done @_handlePushSuccess docs, docsForRemote
@@ -113,7 +133,7 @@ class Hoodie.RemoteStore
   #
   # pull ... and push ;-)
   sync : (docs) =>
-    if @active
+    if @isContinuouslyPushing()
       @hoodie.unbind 'store:dirty:idle', @push
       @hoodie.on     'store:dirty:idle', @push
     
@@ -132,11 +152,11 @@ class Hoodie.RemoteStore
   #
   # pull url
   #
-  # Depending on whether remote is active, return a longpoll URL or not
+  # Depending on whether isContinuouslyPulling() is true, return a longpoll URL or not
   #
   _pullUrl : ->
     since = @hoodie.my.config.get('_remote.seq') or 0
-    if @active # make a long poll request
+    if @isContinuouslyPulling() # make a long poll request
       "#{@basePath}/_changes?include_docs=true&heartbeat=10000&feed=longpoll&since=#{since}"
     else
       "#{@basePath}/_changes?include_docs=true&since=#{since}"
@@ -154,7 +174,7 @@ class Hoodie.RemoteStore
     @hoodie.my.config.set '_remote.seq', response.last_seq
     @_handlePullResults response.results
     
-    @pull() if @connected and @active
+    @pull() if @connected and @isContinuouslyPulling()
   
   
   # 
@@ -192,10 +212,10 @@ class Hoodie.RemoteStore
       
       # usually a 0, which stands for timeout or server not reachable.
       else
-        return unless @active
+        return unless @isContinuouslyPulling()
 
         if xhr.statusText is 'abort'
-          # manual abort after 25sec. restart pulling changes directly when remote is active
+          # manual abort after 25sec. restart pulling changes directly when isContinuouslyPulling() is true
           @pull()
         else    
             
