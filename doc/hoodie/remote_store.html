@@ -1,35 +1,78 @@
-<!DOCTYPE html><html lang="en"><head><title>hoodie/remote_store</title></head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0"><meta name="groc-relative-root" content="../"><meta name="groc-document-path" content="hoodie/remote_store"><meta name="groc-project-path" content="src/hoodie/remote_store.coffee"><link rel="stylesheet" type="text/css" media="all" href="../assets/style.css"><script type="text/javascript" src="../assets/behavior.js"></script><body><div id="meta"><div class="file-path">src/hoodie/remote_store.coffee</div></div><div id="document"><div class="segment"><div class="comments"><div class="wrapper"><h1 id="remotestore">RemoteStore</h1></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>Connection / Socket to our couch</p>
+<!DOCTYPE html><html lang="en"><head><title>hoodie/remote_store</title></head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0"><meta name="groc-relative-root" content="../"><meta name="groc-document-path" content="hoodie/remote_store"><meta name="groc-project-path" content="src/hoodie/remote_store.coffee"><link rel="stylesheet" type="text/css" media="all" href="../assets/style.css"><script type="text/javascript" src="../assets/behavior.js"></script><body><div id="meta"><div class="file-path">src/hoodie/remote_store.coffee</div></div><div id="document"><div class="segment"><div class="comments"><div class="wrapper"><h1 id="remotestore">RemoteStore</h1></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>Connection to Couch Database</p>
 
-<p>RemoteStore is using CouchDB's <code>_changes</code> feed to listen to changes
-and <code>_bulk_docs</code> to push local changes</p>
+<h2 id="api">API</h2>
 
-<p>When hoodie.my.remote is active (default), it will continuously 
-synchronize, otherwise sync, pull or push can be called manually</p></div></div><div class="code"><div class="wrapper">  
-<span class="k">class</span> <span class="nx">Hoodie</span><span class="p">.</span><span class="nx">RemoteStore</span>
-  </div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h2 id="properties">properties</h2></div></div><div class="code"><div class="wrapper">  </div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>active
-if remote is active, it will continuously synchronize data
-as soon as the user is authenticated.</p></div></div><div class="code"><div class="wrapper">  <span class="nv">active: </span><span class="kc">true</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h2 id="constructor">Constructor</h2></div></div></div><div class="segment"><div class="code"><div class="wrapper">  <span class="nv">constructor : </span><span class="nf">(@hoodie) -&gt;</span>      
-    </div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>overwrite default with _remote.active config, if set</p></div></div><div class="code"><div class="wrapper">    <span class="vi">@active = </span><span class="nx">@hoodie</span><span class="p">.</span><span class="nx">my</span><span class="p">.</span><span class="nx">config</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="s1">&#39;_remote.active&#39;</span><span class="p">)</span> <span class="k">if</span> <span class="nx">@hoodie</span><span class="p">.</span><span class="nx">my</span><span class="p">.</span><span class="nx">config</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="s1">&#39;_remote.active&#39;</span><span class="p">)</span><span class="o">?</span>
-    
-    <span class="nx">@startSyncing</span><span class="p">()</span> <span class="k">if</span> <span class="nx">@active</span>
-  </div></div></div><div class="segment"><div class="code"><div class="wrapper">  <span class="nv">startSyncing : </span><span class="o">=&gt;</span>
-    <span class="nx">@hoodie</span><span class="p">.</span><span class="nx">my</span><span class="p">.</span><span class="nx">config</span><span class="p">.</span><span class="nx">set</span> <span class="s1">&#39;_remote.active&#39;</span><span class="p">,</span> <span class="vi">@active = </span><span class="kc">true</span>
+<p>object loading / updating / deleting</p>
 
-    <span class="nx">@hoodie</span><span class="p">.</span><span class="kc">on</span> <span class="s1">&#39;account:signedOut&#39;</span><span class="p">,</span>    <span class="nx">@disconnect</span>
-    <span class="nx">@hoodie</span><span class="p">.</span><span class="kc">on</span> <span class="s1">&#39;account:signedIn&#39;</span><span class="p">,</span>     <span class="nx">@connect</span>
+<ul>
+<li>load(type, id)</li>
+<li>loadAll(type )</li>
+<li>create(type, object)</li>
+<li>save(type, id, object)</li>
+<li>update(new_properties )</li>
+<li>updateAll( type, new_properties)</li>
+<li>delete(type, id)</li>
+<li>deleteAll(type)</li>
+</ul>
 
-    <span class="nx">@connect</span><span class="p">()</span></div></div></div><div class="segment"><div class="code"><div class="wrapper">  <span class="nv">stopSyncing : </span><span class="o">=&gt;</span>
-    <span class="nx">@hoodie</span><span class="p">.</span><span class="nx">my</span><span class="p">.</span><span class="nx">config</span><span class="p">.</span><span class="nx">set</span> <span class="s1">&#39;_remote.active&#39;</span><span class="p">,</span> <span class="vi">@active = </span><span class="kc">false</span>
+<p>custom requests</p>
 
-    <span class="nx">@hoodie</span><span class="p">.</span><span class="nx">unbind</span> <span class="s1">&#39;account:signedIn&#39;</span><span class="p">,</span>  <span class="nx">@connect</span>
-    <span class="nx">@hoodie</span><span class="p">.</span><span class="nx">unbind</span> <span class="s1">&#39;account:signedOut&#39;</span><span class="p">,</span> <span class="nx">@disconnect</span>
+<ul>
+<li>get(view, params)</li>
+<li>post(view, params)</li>
+</ul>
 
-    <span class="nx">@disconnect</span><span class="p">()</span>
-    </div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h2 id="connect">Connect</h2>
+<p>synchronization</p>
 
-<p>start syncing changes from the userDB</p></div></div><div class="code"><div class="wrapper">  <span class="nv">connect : </span><span class="o">=&gt;</span>
+<ul>
+<li>connect()</li>
+<li>disconnect()</li>
+<li>pull()</li>
+<li>push()</li>
+<li>sync()</li>
+</ul>
+
+<p>event binding</p>
+
+<ul>
+<li>on(event, callback)</li>
+</ul></div></div><div class="code"><div class="wrapper"><span class="k">class</span> <span class="nx">Hoodie</span><span class="p">.</span><span class="nx">RemoteStore</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h2 id="properties">properties</h2></div></div><div class="code"><div class="wrapper">  </div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>sync  </p>
+
+<p>if set to true, updates will be continuously pulled
+and pushed. Alternatively, <code>_sync</code> can be set to
+<code>pull: true</code> or <code>push: true</code>.</p></div></div><div class="code"><div class="wrapper">  <span class="nv">_sync: </span><span class="kc">false</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h2 id="constructor">Constructor</h2></div></div></div><div class="segment"><div class="code"><div class="wrapper">  <span class="nv">constructor : </span><span class="nf">(@hoodie, options = {}) -&gt;</span>
+    <span class="vi">@basePath = </span><span class="nx">options</span><span class="p">.</span><span class="nx">basePath</span>
+    <span class="vi">@_sync    = </span><span class="nx">options</span><span class="p">.</span><span class="nx">sync</span>      <span class="k">if</span> <span class="nx">options</span><span class="p">.</span><span class="nx">sync</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h2 id="object-loading--updating--deleting">object loading / updating / deleting</h2></div></div><div class="code"><div class="wrapper">  </div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h2 id="load">load</h2></div></div></div><div class="segment"><div class="code"><div class="wrapper">  <span class="nv">load: </span><span class="nf">(type, id) -&gt;</span>
+    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span> <span class="s2">&quot;.load() not yet implemented&quot;</span><span class="p">,</span> <span class="nx">arguments</span><span class="p">...</span>
+
+  </div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h2 id="loadall">loadAll</h2></div></div></div><div class="segment"><div class="code"><div class="wrapper">  <span class="nv">loadAll: </span><span class="nf">(type) -&gt;</span>
+    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span> <span class="s2">&quot;.loadAll() not yet implemented&quot;</span><span class="p">,</span> <span class="nx">arguments</span><span class="p">...</span>
+
+  </div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h2 id="create">create</h2></div></div></div><div class="segment"><div class="code"><div class="wrapper">  <span class="nv">create: </span><span class="nf">(type, object) -&gt;</span>
+    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span> <span class="s2">&quot;.create() not yet implemented&quot;</span><span class="p">,</span> <span class="nx">arguments</span><span class="p">...</span>
+
+  </div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h2 id="save">save</h2></div></div></div><div class="segment"><div class="code"><div class="wrapper">  <span class="nv">save: </span><span class="nf">(type, id, object) -&gt;</span>
+    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span> <span class="s2">&quot;.save() not yet implemented&quot;</span><span class="p">,</span> <span class="nx">arguments</span><span class="p">...</span>
+
+  </div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h2 id="update">update</h2></div></div></div><div class="segment"><div class="code"><div class="wrapper">  <span class="nv">update: </span><span class="nf">(new_properties) -&gt;</span>
+    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span> <span class="s2">&quot;.update() not yet implemented&quot;</span><span class="p">,</span> <span class="nx">arguments</span><span class="p">...</span>
+
+  </div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h2 id="updateall">updateAll</h2></div></div></div><div class="segment"><div class="code"><div class="wrapper">  <span class="nv">updateAll: </span><span class="nf">(type, new_properties) -&gt;</span>
+    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span> <span class="s2">&quot;.updateAll() not yet implemented&quot;</span><span class="p">,</span> <span class="nx">arguments</span><span class="p">...</span>
+
+  </div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h2 id="delete">delete</h2></div></div></div><div class="segment"><div class="code"><div class="wrapper">  <span class="k">delete</span><span class="o">:</span> <span class="nf">(type, id) -&gt;</span>
+    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span> <span class="s2">&quot;.delete() not yet implemented&quot;</span><span class="p">,</span> <span class="nx">arguments</span><span class="p">...</span>
+
+  </div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h2 id="deleteall">deleteAll</h2></div></div></div><div class="segment"><div class="code"><div class="wrapper">  <span class="nv">deleteAll: </span><span class="nf">(type) -&gt;</span>
+    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span> <span class="s2">&quot;.deleteAll() not yet implemented&quot;</span><span class="p">,</span> <span class="nx">arguments</span><span class="p">...</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h2 id="custom-requests">custom requests</h2></div></div><div class="code"><div class="wrapper">  </div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h2 id="get">get</h2></div></div></div><div class="segment"><div class="code"><div class="wrapper">  <span class="nv">get: </span><span class="nf">(view, params) -&gt;</span>
+    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span> <span class="s2">&quot;.get() not yet implemented&quot;</span><span class="p">,</span> <span class="nx">arguments</span><span class="p">...</span>
+  
+  </div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h2 id="post">post</h2></div></div></div><div class="segment"><div class="code"><div class="wrapper">  <span class="nv">post: </span><span class="nf">(view, params) -&gt;</span>
+    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span> <span class="s2">&quot;.post() not yet implemented&quot;</span><span class="p">,</span> <span class="nx">arguments</span><span class="p">...</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h2 id="synchronization">synchronization</h2></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h2 id="connect">Connect</h2>
+
+<p>start syncing</p></div></div><div class="code"><div class="wrapper">  <span class="nv">connect : </span><span class="o">=&gt;</span>
     <span class="vi">@connected = </span><span class="kc">true</span>
-    </div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>start syncing</p></div></div><div class="code"><div class="wrapper">    <span class="nx">@hoodie</span><span class="p">.</span><span class="nx">my</span><span class="p">.</span><span class="nx">account</span><span class="p">.</span><span class="nx">authenticate</span><span class="p">().</span><span class="nx">pipe</span> <span class="nx">@sync</span>
+    <span class="nx">@sync</span><span class="p">()</span>
   
     </div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h2 id="disconnect">Disconnect</h2>
 
@@ -38,12 +81,21 @@ as soon as the user is authenticated.</p></div></div><div class="code"><div clas
     </div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>binding comes from @sync</p></div></div><div class="code"><div class="wrapper">    <span class="nx">@hoodie</span><span class="p">.</span><span class="nx">unbind</span> <span class="s1">&#39;store:dirty:idle&#39;</span><span class="p">,</span>   <span class="nx">@push</span>
     
     <span class="nx">@_pullRequest</span><span class="o">?</span><span class="p">.</span><span class="nx">abort</span><span class="p">()</span>
-    <span class="nx">@_pushRequest</span><span class="o">?</span><span class="p">.</span><span class="nx">abort</span><span class="p">()</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h2 id="pull-changes">pull changes</h2>
+    <span class="nx">@_pushRequest</span><span class="o">?</span><span class="p">.</span><span class="nx">abort</span><span class="p">()</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h2 id="iscontinuouslypulling">isContinuouslyPulling</h2>
+
+<p>returns true if pulling is set to be continous</p></div></div><div class="code"><div class="wrapper">  <span class="nv">isContinuouslyPulling: </span><span class="o">-&gt;</span>
+    <span class="nx">@_sync</span> <span class="o">is</span> <span class="kc">true</span> <span class="o">or</span> <span class="nx">@_sync</span><span class="o">?</span><span class="p">.</span><span class="nx">pull</span> <span class="o">is</span> <span class="kc">true</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h2 id="iscontinuouslypushing">isContinuouslyPushing</h2>
+
+<p>returns true if pulling is set to be continous</p></div></div><div class="code"><div class="wrapper">  <span class="nv">isContinuouslyPushing: </span><span class="o">-&gt;</span>
+    <span class="nx">@_sync</span> <span class="o">is</span> <span class="kc">true</span> <span class="o">or</span> <span class="nx">@_sync</span><span class="o">?</span><span class="p">.</span><span class="nx">push</span> <span class="o">is</span> <span class="kc">true</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h2 id="iscontinuouslysyncing">isContinuouslySyncing</h2>
+
+<p>returns true if pulling is set to be continous</p></div></div><div class="code"><div class="wrapper">  <span class="nv">isContinuouslySyncing: </span><span class="o">-&gt;</span>
+    <span class="nx">@_sync</span> <span class="o">is</span> <span class="kc">true</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h2 id="pull-changes">pull changes</h2>
 
 <p>a.k.a. make a GET request to CouchDB's <code>_changes</code> feed.</p></div></div><div class="code"><div class="wrapper">  <span class="nv">pull : </span><span class="o">=&gt;</span>
     <span class="vi">@_pullRequest = </span><span class="nx">@hoodie</span><span class="p">.</span><span class="nx">request</span> <span class="s1">&#39;GET&#39;</span><span class="p">,</span> <span class="nx">@_pullUrl</span><span class="p">(),</span> <span class="nv">contentType: </span><span class="s1">&#39;application/json&#39;</span>
-    
-    <span class="k">if</span> <span class="nx">@connected</span> <span class="o">and</span> <span class="nx">@active</span>
+
+    <span class="k">if</span> <span class="nx">@connected</span> <span class="o">and</span> <span class="nx">@isContinuouslyPulling</span><span class="p">()</span>
       <span class="nb">window</span><span class="p">.</span><span class="nx">clearTimeout</span> <span class="nx">@_pullRequestTimeout</span>
       <span class="vi">@_pullRequestTimeout = </span><span class="nb">window</span><span class="p">.</span><span class="nx">setTimeout</span> <span class="nx">@_restartPullRequest</span><span class="p">,</span> <span class="mi">25000</span> <span class="c1"># 25 sec</span>
     
@@ -59,17 +111,17 @@ If no objects passed, push all changed documents</p></div></div><div class="code
       
     <span class="nv">docsForRemote = </span><span class="p">(</span><span class="nx">@_parseForRemote</span> <span class="nx">doc</span> <span class="k">for</span> <span class="nx">doc</span> <span class="k">in</span> <span class="nx">docs</span><span class="p">)</span>
     
-    <span class="vi">@_pushRequest = </span><span class="nx">@hoodie</span><span class="p">.</span><span class="nx">request</span> <span class="s1">&#39;POST&#39;</span><span class="p">,</span> <span class="s2">&quot;/#{encodeURIComponent @hoodie.my.account.db()}/_bulk_docs&quot;</span><span class="p">,</span> 
-      <span class="nv">dataType: </span>    <span class="s1">&#39;json&#39;</span>
-      <span class="nv">processData: </span> <span class="kc">false</span>
-      <span class="nv">contentType: </span> <span class="s1">&#39;application/json&#39;</span>
+    <span class="vi">@_pushRequest = </span><span class="nx">@hoodie</span><span class="p">.</span><span class="nx">request</span> <span class="s1">&#39;POST&#39;</span><span class="p">,</span> <span class="s2">&quot;#{@basePath}/_bulk_docs&quot;</span><span class="p">,</span> 
+      <span class="nv">dataType    : </span><span class="s1">&#39;json&#39;</span>
+      <span class="nv">processData : </span><span class="kc">false</span>
+      <span class="nv">contentType : </span><span class="s1">&#39;application/json&#39;</span>
     
-      <span class="nv">data  : </span><span class="nx">JSON</span><span class="p">.</span><span class="nx">stringify</span>
-                <span class="nv">docs      : </span><span class="nx">docsForRemote</span>
-                <span class="nv">newEdits : </span><span class="kc">false</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>when push is successful, update the local store with the generated _rev numbers</p></div></div><div class="code"><div class="wrapper">    <span class="nx">@_pushRequest</span><span class="p">.</span><span class="nx">done</span> <span class="nx">@_handlePushSuccess</span> <span class="nx">docs</span><span class="p">,</span> <span class="nx">docsForRemote</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h2 id="sync-changes">sync changes</h2>
+      <span class="nv">data : </span><span class="nx">JSON</span><span class="p">.</span><span class="nx">stringify</span>
+        <span class="nv">docs      : </span><span class="nx">docsForRemote</span>
+        <span class="nv">newEdits  : </span><span class="kc">false</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>when push is successful, update the local store with the generated _rev numbers</p></div></div><div class="code"><div class="wrapper">    <span class="nx">@_pushRequest</span><span class="p">.</span><span class="nx">done</span> <span class="nx">@_handlePushSuccess</span> <span class="nx">docs</span><span class="p">,</span> <span class="nx">docsForRemote</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h2 id="sync-changes">sync changes</h2>
 
 <p>pull ... and push ;-)</p></div></div><div class="code"><div class="wrapper">  <span class="nv">sync : </span><span class="p">(</span><span class="nx">docs</span><span class="p">)</span> <span class="o">=&gt;</span>
-    <span class="k">if</span> <span class="nx">@active</span>
+    <span class="k">if</span> <span class="nx">@isContinuouslyPushing</span><span class="p">()</span>
       <span class="nx">@hoodie</span><span class="p">.</span><span class="nx">unbind</span> <span class="s1">&#39;store:dirty:idle&#39;</span><span class="p">,</span> <span class="nx">@push</span>
       <span class="nx">@hoodie</span><span class="p">.</span><span class="kc">on</span>     <span class="s1">&#39;store:dirty:idle&#39;</span><span class="p">,</span> <span class="nx">@push</span>
     
@@ -82,12 +134,12 @@ If no objects passed, push all changed documents</p></div></div><div class="code
   </div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h2 id="private">Private</h2></div></div><div class="code"><div class="wrapper">  
   </div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>pull url</p>
 
-<p>Depending on whether remote is active, return a longpoll URL or not</p></div></div><div class="code"><div class="wrapper">  <span class="nv">_pullUrl : </span><span class="o">-&gt;</span>
+<p>Depending on whether isContinuouslyPulling() is true, return a longpoll URL or not</p></div></div><div class="code"><div class="wrapper">  <span class="nv">_pullUrl : </span><span class="o">-&gt;</span>
     <span class="nv">since = </span><span class="nx">@hoodie</span><span class="p">.</span><span class="nx">my</span><span class="p">.</span><span class="nx">config</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="s1">&#39;_remote.seq&#39;</span><span class="p">)</span> <span class="o">or</span> <span class="mi">0</span>
-    <span class="k">if</span> <span class="nx">@active</span> <span class="c1"># make a long poll request</span>
-      <span class="s2">&quot;/#{encodeURIComponent @hoodie.my.account.db()}/_changes?include_docs=true&amp;heartbeat=10000&amp;feed=longpoll&amp;since=#{since}&quot;</span>
+    <span class="k">if</span> <span class="nx">@isContinuouslyPulling</span><span class="p">()</span> <span class="c1"># make a long poll request</span>
+      <span class="s2">&quot;#{@basePath}/_changes?include_docs=true&amp;heartbeat=10000&amp;feed=longpoll&amp;since=#{since}&quot;</span>
     <span class="k">else</span>
-      <span class="s2">&quot;/#{encodeURIComponent @hoodie.my.account.db()}/_changes?include_docs=true&amp;since=#{since}&quot;</span>
+      <span class="s2">&quot;#{@basePath}/_changes?include_docs=true&amp;since=#{since}&quot;</span>
   </div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>request gets restarted automaticcally in @_handlePullError</p></div></div><div class="code"><div class="wrapper">  <span class="nv">_restartPullRequest : </span><span class="o">=&gt;</span> <span class="nx">@_pullRequest</span><span class="o">?</span><span class="p">.</span><span class="nx">abort</span><span class="p">()</span>
   
   </div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>pull success handler </p>
@@ -96,7 +148,7 @@ If no objects passed, push all changed documents</p></div></div><div class="code
     <span class="nx">@hoodie</span><span class="p">.</span><span class="nx">my</span><span class="p">.</span><span class="nx">config</span><span class="p">.</span><span class="nx">set</span> <span class="s1">&#39;_remote.seq&#39;</span><span class="p">,</span> <span class="nx">response</span><span class="p">.</span><span class="nx">last_seq</span>
     <span class="nx">@_handlePullResults</span> <span class="nx">response</span><span class="p">.</span><span class="nx">results</span>
     
-    <span class="nx">@pull</span><span class="p">()</span> <span class="k">if</span> <span class="nx">@connected</span> <span class="o">and</span> <span class="nx">@active</span>
+    <span class="nx">@pull</span><span class="p">()</span> <span class="k">if</span> <span class="nx">@connected</span> <span class="o">and</span> <span class="nx">@isContinuouslyPulling</span><span class="p">()</span>
   
   </div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>pull error handler </p>
 
@@ -122,9 +174,9 @@ Should really not happen. </p>
         <span class="nx">@hoodie</span><span class="p">.</span><span class="nx">trigger</span> <span class="s1">&#39;remote:error:server&#39;</span><span class="p">,</span> <span class="nx">error</span>
         <span class="nb">window</span><span class="p">.</span><span class="nx">setTimeout</span> <span class="nx">@pull</span><span class="p">,</span> <span class="mi">3000</span>
       </div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>usually a 0, which stands for timeout or server not reachable.</p></div></div><div class="code"><div class="wrapper">      <span class="k">else</span>
-        <span class="k">return</span> <span class="nx">unless</span> <span class="nx">@active</span>
+        <span class="k">return</span> <span class="nx">unless</span> <span class="nx">@isContinuouslyPulling</span><span class="p">()</span>
 
-        <span class="k">if</span> <span class="nx">xhr</span><span class="p">.</span><span class="nx">statusText</span> <span class="o">is</span> <span class="s1">&#39;abort&#39;</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>manual abort after 25sec. restart pulling changes directly when remote is active</p></div></div><div class="code"><div class="wrapper">          <span class="nx">@pull</span><span class="p">()</span>
+        <span class="k">if</span> <span class="nx">xhr</span><span class="p">.</span><span class="nx">statusText</span> <span class="o">is</span> <span class="s1">&#39;abort&#39;</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>manual abort after 25sec. restart pulling changes directly when isContinuouslyPulling() is true</p></div></div><div class="code"><div class="wrapper">          <span class="nx">@pull</span><span class="p">()</span>
         <span class="k">else</span>    
             </div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>oops. This might be caused by an unreachable server.
 Or the server canceld it for what ever reason, e.g.

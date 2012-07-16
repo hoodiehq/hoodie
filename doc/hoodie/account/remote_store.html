@@ -1,0 +1,32 @@
+<!DOCTYPE html><html lang="en"><head><title>hoodie/account/remote_store</title></head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0"><meta name="groc-relative-root" content="../../"><meta name="groc-document-path" content="hoodie/account/remote_store"><meta name="groc-project-path" content="src/hoodie/account/remote_store.coffee"><link rel="stylesheet" type="text/css" media="all" href="../../assets/style.css"><script type="text/javascript" src="../../assets/behavior.js"></script><body><div id="meta"><div class="file-path">src/hoodie/account/remote_store.coffee</div></div><div id="document"><div class="segment"><div class="comments"><div class="wrapper"><h1 id="remotestore">RemoteStore</h1></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>Connection / Socket to our couch</p>
+
+<p>RemoteStore is using CouchDB's <code>_changes</code> feed to listen to changes
+and <code>_bulk_docs</code> to push local changes</p>
+
+<p>When hoodie.my.remote is continuously syncing (default), it will continuously 
+synchronize, otherwise sync, pull or push can be called manually</p></div></div><div class="code"><div class="wrapper"><span class="k">class</span> <span class="nx">Hoodie</span><span class="p">.</span><span class="nx">Account</span><span class="p">.</span><span class="nx">RemoteStore</span> <span class="k">extends</span> <span class="nx">Hoodie</span><span class="p">.</span><span class="nx">RemoteStore</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h2 id="properties">properties</h2></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>sync by default</p></div></div><div class="code"><div class="wrapper">  <span class="nv">_sync: </span><span class="kc">true</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h2 id="constructor">Constructor</h2></div></div></div><div class="segment"><div class="code"><div class="wrapper">  <span class="nv">constructor : </span><span class="o">-&gt;</span>
+    <span class="k">super</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>set basePath to user's DB name</p></div></div><div class="code"><div class="wrapper">    <span class="vi">@basePath = </span><span class="s2">&quot;/#{encodeURIComponent @hoodie.my.account.db()}&quot;</span>
+    </div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>overwrite default with _remote.sync config, if set</p></div></div><div class="code"><div class="wrapper">    <span class="vi">@_sync = </span><span class="nx">@hoodie</span><span class="p">.</span><span class="nx">my</span><span class="p">.</span><span class="nx">config</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="s1">&#39;_remote.sync&#39;</span><span class="p">)</span> <span class="k">if</span> <span class="nx">@hoodie</span><span class="p">.</span><span class="nx">my</span><span class="p">.</span><span class="nx">config</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="s1">&#39;_remote.sync&#39;</span><span class="p">)</span><span class="o">?</span>
+    
+    <span class="nx">@startSyncing</span><span class="p">()</span> <span class="k">if</span> <span class="nx">@isContinuouslySyncing</span><span class="p">()</span>
+  </div></div></div><div class="segment"><div class="code"><div class="wrapper">  <span class="nv">startSyncing : </span><span class="o">=&gt;</span>
+    <span class="nx">@hoodie</span><span class="p">.</span><span class="nx">my</span><span class="p">.</span><span class="nx">config</span><span class="p">.</span><span class="nx">set</span> <span class="s1">&#39;_remote.sync&#39;</span><span class="p">,</span> <span class="vi">@_sync = </span><span class="kc">true</span>
+
+    <span class="nx">@hoodie</span><span class="p">.</span><span class="kc">on</span> <span class="s1">&#39;account:signedOut&#39;</span><span class="p">,</span>    <span class="nx">@disconnect</span>
+    <span class="nx">@hoodie</span><span class="p">.</span><span class="kc">on</span> <span class="s1">&#39;account:signedIn&#39;</span><span class="p">,</span>     <span class="nx">@connect</span>
+
+    <span class="nx">@connect</span><span class="p">()</span></div></div></div><div class="segment"><div class="code"><div class="wrapper">  <span class="nv">stopSyncing : </span><span class="o">=&gt;</span>
+    <span class="nx">@hoodie</span><span class="p">.</span><span class="nx">my</span><span class="p">.</span><span class="nx">config</span><span class="p">.</span><span class="nx">set</span> <span class="s1">&#39;_remote.sync&#39;</span><span class="p">,</span> <span class="vi">@_sync = </span><span class="kc">false</span>
+
+    <span class="nx">@hoodie</span><span class="p">.</span><span class="nx">unbind</span> <span class="s1">&#39;account:signedIn&#39;</span><span class="p">,</span>  <span class="nx">@connect</span>
+    <span class="nx">@hoodie</span><span class="p">.</span><span class="nx">unbind</span> <span class="s1">&#39;account:signedOut&#39;</span><span class="p">,</span> <span class="nx">@disconnect</span>
+
+    <span class="nx">@disconnect</span><span class="p">()</span>
+    </div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h2 id="connect">Connect</h2>
+
+<p>do not start to sync immediately, but authenticate beforehand</p></div></div><div class="code"><div class="wrapper">  <span class="nv">connect : </span><span class="o">=&gt;</span>
+    <span class="nx">@hoodie</span><span class="p">.</span><span class="nx">my</span><span class="p">.</span><span class="nx">account</span><span class="p">.</span><span class="nx">authenticate</span><span class="p">().</span><span class="nx">pipe</span> <span class="o">=&gt;</span>  
+      <span class="k">super</span>
+    
+
+  </div></div></div></div></body></html>

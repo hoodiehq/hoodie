@@ -39,17 +39,93 @@ class Hoodie.RemoteStore
   # ## properties
   
   # sync  
+  #
   # if set to true, updates will be continuously pulled
   # and pushed. Alternatively, `_sync` can be set to
   # `pull: true` or `push: true`.
   _sync: false
 
 
-  # ## Constructor
+  # ## Constructor 
   #
   constructor : (@hoodie, options = {}) ->
     @basePath = options.basePath
     @_sync    = options.sync      if options.sync
+
+
+
+  # object loading / updating / deleting
+  # --------------------------------------
+
+  
+  # ## load
+  #
+  load: (type, id) ->
+    console.log ".load() not yet implemented", arguments...
+
+  
+  # ## loadAll
+  #
+  loadAll: (type) ->
+    console.log ".loadAll() not yet implemented", arguments...
+
+  
+  # ## create
+  #
+  create: (type, object) ->
+    console.log ".create() not yet implemented", arguments...
+
+  
+  # ## save
+  #
+  save: (type, id, object) ->
+    console.log ".save() not yet implemented", arguments...
+
+  
+  # ## update
+  #
+  update: (new_properties) ->
+    console.log ".update() not yet implemented", arguments...
+
+  
+  # ## updateAll
+  #
+  updateAll: (type, new_properties) ->
+    console.log ".updateAll() not yet implemented", arguments...
+
+  
+  # ## delete
+  #
+  delete: (type, id) ->
+    console.log ".delete() not yet implemented", arguments...
+
+  
+  # ## deleteAll
+  #
+  deleteAll: (type) ->
+    console.log ".deleteAll() not yet implemented", arguments...
+
+
+
+  # custom requests
+  # -----------------
+
+  
+  # ## get
+  #
+  get: (view, params) ->
+    console.log ".get() not yet implemented", arguments...
+  
+  
+  # ## post
+  #  
+  post: (view, params) ->
+    console.log ".post() not yet implemented", arguments...
+
+
+
+  # synchronization
+  # -----------------
 
   # ## Connect
   #
@@ -146,6 +222,7 @@ class Hoodie.RemoteStore
   on : (event, cb) -> @hoodie.on "remote:#{event}", cb
   
   
+
   # ## Private
   
   
