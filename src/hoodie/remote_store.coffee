@@ -6,7 +6,7 @@
 # RemoteStore is using CouchDB's `_changes` feed to listen to changes
 # and `_bulkDocs` to push local changes
 #
-# When hoodie.my.remoteStore is active (default), it will continuously 
+# When hoodie.my.remote is active (default), it will continuously 
 # synchronize, otherwise sync, pull or push can be called manually
 #
   
@@ -89,7 +89,7 @@ class Hoodie.RemoteStore
   # If no objects passed, push all changed documents
   push : (docs) =>
     
-    docs = @hoodie.my.localStore.changedDocs() unless $.isArray docs
+    docs = @hoodie.my.store.changedDocs() unless $.isArray docs
     return @hoodie.defer().resolve([]).promise() if docs.length is 0
       
     docsForRemote = (@_parseForRemote doc for doc in docs)
@@ -242,7 +242,7 @@ class Hoodie.RemoteStore
     @_timezoneOffset or= new Date().getTimezoneOffset() * 60
 
     timestamp   = Date.now() + @_timezoneOffset
-    uuid        = @hoodie.my.localStore.uuid(5)
+    uuid        = @hoodie.my.store.uuid(5)
     "#{uuid}##{timestamp}"
   
 
@@ -325,9 +325,9 @@ class Hoodie.RemoteStore
     for {doc} in changes
       doc = @_parseFromPull(doc)
       if doc._deleted
-        _destroyedDocs.push [doc, @hoodie.my.localStore.destroy(  doc.type, doc.id,      remote: true)]
+        _destroyedDocs.push [doc, @hoodie.my.store.destroy(  doc.type, doc.id,      remote: true)]
       else                                                
-        _changedDocs.push   [doc, @hoodie.my.localStore.update(   doc.type, doc.id, doc, remote: true)]
+        _changedDocs.push   [doc, @hoodie.my.store.update(   doc.type, doc.id, doc, remote: true)]
     
     # 2. trigger events
     for [doc, promise] in _destroyedDocs
@@ -361,4 +361,4 @@ class Hoodie.RemoteStore
       for doc, i in docs
         update  = {_rev: pushedDocs[i]._rev}
         options = remote : true
-        @hoodie.my.localStore.update(doc.type, doc.id, update, options) 
+        @hoodie.my.store.update(doc.type, doc.id, update, options) 

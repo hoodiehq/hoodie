@@ -8,18 +8,18 @@ Backbone.sync = (method, modelOrCollection, options) ->
   promise = switch method
     when "read"
       if id
-        Backbone.hoodie.my.localStore.load(type, id)
+        Backbone.hoodie.my.store.load(type, id)
       else
-        Backbone.hoodie.my.localStore.loadAll()
+        Backbone.hoodie.my.store.loadAll()
 
     when "create"
-      Backbone.hoodie.my.localStore.create(type, attributes)
+      Backbone.hoodie.my.store.create(type, attributes)
       
     when "update"
-      Backbone.hoodie.my.localStore.update(type, id, attributes)
+      Backbone.hoodie.my.store.update(type, id, attributes)
       
     when "delete"
-      Backbone.hoodie.my.localStore.delete(type, id)
+      Backbone.hoodie.my.store.delete(type, id)
 
   promise.done options.success if options.success
   promise.fail options.error   if options.error
@@ -35,6 +35,6 @@ Backbone.Collection::initialize = ->
   opts = remote: true
   
   if @model::type
-    Backbone.hoodie.my.remoteStore.on   "create:#{@model::type}", (id, attributes) => @add attributes, opts
-    Backbone.hoodie.my.remoteStore.on "destroye:#{@model::type}", (id, attributes) => @get(id)?.destroy opts
-    Backbone.hoodie.my.remoteStore.on   "update:#{@model::type}", (id, attributes) => @get(id)?.merge attributes, opts
+    Backbone.hoodie.my.remote.on   "create:#{@model::type}", (id, attributes) => @add attributes, opts
+    Backbone.hoodie.my.remote.on "destroye:#{@model::type}", (id, attributes) => @get(id)?.destroy opts
+    Backbone.hoodie.my.remote.on   "update:#{@model::type}", (id, attributes) => @get(id)?.merge attributes, opts

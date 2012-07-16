@@ -13,7 +13,7 @@ Mocks.Hoodie = function() {
     defer: $.Deferred,
     isPromise: function() {},
     my: {
-      localStore: {
+      store: {
         uuid: function() {
           return 'mock567';
         },

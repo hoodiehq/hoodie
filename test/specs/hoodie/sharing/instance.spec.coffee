@@ -9,7 +9,7 @@ describe "Hoodie.Share.Instance", ->
   
   describe "constructor", ->
     beforeEach ->
-      spyOn(@hoodie.my.localStore, "uuid").andReturn 'newId'
+      spyOn(@hoodie.my.store, "uuid").andReturn 'newId'
       spyOn(Hoodie.Share.Instance::, "set")
       spyOn(Hoodie.Share.Instance::, "add")
       

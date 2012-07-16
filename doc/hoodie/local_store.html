@@ -85,8 +85,8 @@ object can be passed.</p>
 
 <p>example usage</p>
 
-<p>hoodie.my.localStore.update('car', 'abc4567', {sold: true})
-hoodie.my.localStore.update('car', 'abc4567', function(obj) { obj.sold = true })</p></div></div><div class="code"><div class="wrapper">  <span class="nv">update : </span><span class="nf">(type, id, objectUpdate, options = {}) -&gt;</span>
+<p>hoodie.my.store.update('car', 'abc4567', {sold: true})
+hoodie.my.store.update('car', 'abc4567', function(obj) { obj.sold = true })</p></div></div><div class="code"><div class="wrapper">  <span class="nv">update : </span><span class="nf">(type, id, objectUpdate, options = {}) -&gt;</span>
     <span class="nv">defer = </span><span class="nx">@hoodie</span><span class="p">.</span><span class="nx">defer</span><span class="p">()</span>
     
     <span class="nv">_loadPromise = </span><span class="nx">@load</span><span class="p">(</span><span class="nx">type</span><span class="p">,</span> <span class="nx">id</span><span class="p">).</span><span class="nx">pipe</span> <span class="p">(</span><span class="nx">currentObj</span><span class="p">)</span> <span class="o">=&gt;</span> 
@@ -110,7 +110,7 @@ As an alternative, an array of objects can be passed</p>
 
 <p>example usage</p>
 
-<p>hoodie.my.localStore.updateAll()</p></div></div><div class="code"><div class="wrapper">  <span class="nv">updateAll : </span><span class="nf">(filterOrObjects, objectUpdate, options = {}) -&gt;</span>
+<p>hoodie.my.store.updateAll()</p></div></div><div class="code"><div class="wrapper">  <span class="nv">updateAll : </span><span class="nf">(filterOrObjects, objectUpdate, options = {}) -&gt;</span>
     </div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>normalize the input: make sure we have all objects</p></div></div><div class="code"><div class="wrapper">    <span class="k">if</span> <span class="nx">@hoodie</span><span class="p">.</span><span class="nx">isPromise</span><span class="p">(</span><span class="nx">filterOrObjects</span><span class="p">)</span>
       <span class="nv">promise = </span><span class="nx">filterOrObjects</span>
     <span class="k">else</span>
@@ -160,9 +160,9 @@ Can be optionally filtered by a type or a function</p>
 <pre><code>store.loadAll()
 store.loadAll('car')
 store.loadAll(function(obj) { return obj.brand == 'Tesla' })
-</code></pre></div></div><div class="code"><div class="wrapper">  <span class="nv">loadAll: </span><span class="nf">(filter = -&gt; true) -&gt;</span>
+</code></pre></div></div><div class="code"><div class="wrapper">  <span class="nv">loadAll : </span><span class="nf">(filter = -&gt; true) -&gt;</span>
     <span class="nv">defer = </span><span class="nx">@hoodie</span><span class="p">.</span><span class="nx">defer</span><span class="p">()</span>
-    <span class="nv">keys = </span><span class="nx">@_index</span><span class="p">()</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>t</p></div></div><div class="code"><div class="wrapper">    <span class="k">if</span> <span class="k">typeof</span> <span class="nx">filter</span> <span class="o">is</span> <span class="s1">&#39;string&#39;</span>
+    <span class="nv">keys = </span><span class="nx">@_index</span><span class="p">()</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>normalize filter</p></div></div><div class="code"><div class="wrapper">    <span class="k">if</span> <span class="k">typeof</span> <span class="nx">filter</span> <span class="o">is</span> <span class="s1">&#39;string&#39;</span>
       <span class="nv">type   = </span><span class="nx">filter</span>
       <span class="nv">filter = </span><span class="nf">(obj) -&gt;</span> <span class="nx">obj</span><span class="p">.</span><span class="nx">type</span> <span class="o">is</span> <span class="nx">type</span>
   

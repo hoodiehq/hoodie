@@ -20,7 +20,7 @@ class Hoodie.Share.Remote extends Hoodie.RemoteStore
       # walk through all changed docs, check if it's
       # 1. the share object itself or
       # 2. an object belonging to the share
-      docs = for obj in @hoodie.my.localStore.changedDocs() when obj.id is @hoodie.share.id or obj.$shares and ~obj.$shares.indexOf(@hoodie.share.id)
+      docs = for obj in @hoodie.my.store.changedDocs() when obj.id is @hoodie.share.id or obj.$shares and ~obj.$shares.indexOf(@hoodie.share.id)
         obj 
 
     super(docs)
@@ -64,6 +64,6 @@ class Hoodie.Share.Remote extends Hoodie.RemoteStore
           for key, doc of pushedDoc.$docsToRemove
             [type, id] = key.split /\//
             update = _rev: doc._rev
-            @hoodie.my.localStore.update(type, id, update, remote: true) for doc, i in docs
+            @hoodie.my.store.update(type, id, update, remote: true) for doc, i in docs
 
       super(docs, pushedDocs)()

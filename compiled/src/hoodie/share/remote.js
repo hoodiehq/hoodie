@@ -19,7 +19,7 @@ Hoodie.Share.Remote = (function(_super) {
     if (!$.isArray(docs)) {
       docs = (function() {
         var _i, _len, _ref, _results;
-        _ref = this.hoodie.my.localStore.changedDocs();
+        _ref = this.hoodie.my.store.changedDocs();
         _results = [];
         for (_i = 0, _len = _ref.length; _i < _len; _i++) {
           obj = _ref[_i];
@@ -73,7 +73,7 @@ Hoodie.Share.Remote = (function(_super) {
             };
             for (i = _j = 0, _len1 = docs.length; _j < _len1; i = ++_j) {
               doc = docs[i];
-              _this.hoodie.my.localStore.update(type, id, update, {
+              _this.hoodie.my.store.update(type, id, update, {
                 remote: true
               });
             }

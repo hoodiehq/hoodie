@@ -118,8 +118,8 @@ class Hoodie.LocalStore
   #
   # example usage
   #
-  # hoodie.my.localStore.update('car', 'abc4567', {sold: true})
-  # hoodie.my.localStore.update('car', 'abc4567', function(obj) { obj.sold = true })
+  # hoodie.my.store.update('car', 'abc4567', {sold: true})
+  # hoodie.my.store.update('car', 'abc4567', function(obj) { obj.sold = true })
   update : (type, id, objectUpdate, options = {}) ->
     defer = @hoodie.defer()
     
@@ -155,7 +155,7 @@ class Hoodie.LocalStore
   #
   # example usage
   #
-  # hoodie.my.localStore.updateAll()
+  # hoodie.my.store.updateAll()
   updateAll : (filterOrObjects, objectUpdate, options = {}) ->
     
     # normalize the input: make sure we have all objects

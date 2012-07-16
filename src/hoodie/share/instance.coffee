@@ -66,7 +66,7 @@ class Hoodie.Share.Instance
       defer.resolve(this)
 
     # persist memory to store
-    @hoodie.my.localStore.update("$share", @id, @_memory, options)
+    @hoodie.my.store.update("$share", @id, @_memory, options)
     .then _handleUpdate, defer.reject
 
     return defer.promise()
@@ -81,7 +81,7 @@ class Hoodie.Share.Instance
   #
   # share.add(todoObject)
   # share.add([todoObject1, todoObject2, todoObject3])
-  # share.add( hoodie.my.localStore.findAll (obj) -> obj.isShared )
+  # share.add( hoodie.my.store.findAll (obj) -> obj.isShared )
   add: (objects) ->
     @toggle objects, true
     
@@ -95,7 +95,7 @@ class Hoodie.Share.Instance
   #
   # share.remove(todoObject)
   # share.remove([todoObject1, todoObject2, todoObject3])
-  # share.remove( hoodie.my.localStore.findAll (obj) -> obj.isShared )
+  # share.remove( hoodie.my.store.findAll (obj) -> obj.isShared )
   remove: (objects) -> 
     @toggle objects, false
   
@@ -115,7 +115,7 @@ class Hoodie.Share.Instance
       when false then @_remove
       else @_toggle
     
-    @hoodie.my.localStore.updateAll(objects, updateMethod)
+    @hoodie.my.store.updateAll(objects, updateMethod)
     
   
   # ## sync
@@ -174,13 +174,13 @@ class Hoodie.Share.Instance
 
     # if this is the very first share, we generate and store an ownerUuid
     unless @ownerUuid
-      @ownerUuid = @constructor.hoodie.my.localStore.uuid()
+      @ownerUuid = @constructor.hoodie.my.store.uuid()
       config.set 'share.ownerUuid', @ownerUuid
 
   # I appologize for this mess of code ~gr2m
   _isMySharedObjectAndChanged: (obj) =>
     belongsToMe = obj.id is @id or obj.$shares and ~obj.$shares.indexOf(@id)
-    return belongsToMe and @hoodie.my.localStore.isDirty(obj.type, obj.id)
+    return belongsToMe and @hoodie.my.store.isDirty(obj.type, obj.id)
 
 
   # returns a hash update to update the passed object
@@ -247,9 +247,9 @@ class Hoodie.Share.Instance
   #
   _sync : =>
     @save()
-    .pipe @hoodie.my.localStore.loadAll(@_isMySharedObjectAndChanged)
+    .pipe @hoodie.my.store.loadAll(@_isMySharedObjectAndChanged)
     .pipe (sharedObjectThatChanged) =>
-      @hoodie.my.remoteStore.sync(sharedObjectThatChanged)
+      @hoodie.my.remote.sync(sharedObjectThatChanged)
       .then @_handleRemoteChanges
 
   #

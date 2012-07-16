@@ -9,10 +9,10 @@ class Hoodie extends Events
   # modules to be loaded
   modules:
     my :
-      localStore  : "LocalStore"
+      store       : "LocalStore"
       config      : "Config"
       account     : "Account"
-      remoteStore : "RemoteStore"
+      remote : "RemoteStore"
 
     user    : "UserStore"
     email   : "Email"

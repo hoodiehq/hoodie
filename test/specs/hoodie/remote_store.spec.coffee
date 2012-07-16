@@ -10,8 +10,8 @@ describe "Hoodie.RemoteStore", ->
     spyOn(window, "setTimeout")
     
     spyOn(@hoodie, "trigger")
-    spyOn(@hoodie.my.localStore, "destroy").andReturn then: (cb) -> cb('objectFromStore')
-    spyOn(@hoodie.my.localStore, "update").andReturn  then: (cb) -> cb('objectFromStore', false)
+    spyOn(@hoodie.my.store, "destroy").andReturn then: (cb) -> cb('objectFromStore')
+    spyOn(@hoodie.my.store, "update").andReturn  then: (cb) -> cb('objectFromStore', false)
   
   
   describe ".constructor(@hoodie, options = {})", ->
@@ -146,11 +146,11 @@ describe "Hoodie.RemoteStore", ->
       
       it "should remove `todo/abc3` from store", ->
         @remote.pull()
-        expect(@hoodie.my.localStore.destroy).wasCalledWith 'todo', 'abc3', remote: true
+        expect(@hoodie.my.store.destroy).wasCalledWith 'todo', 'abc3', remote: true
 
       it "should save `todo/abc2` in store", ->
         @remote.pull()
-        expect(@hoodie.my.localStore.update).wasCalledWith 'todo', 'abc2', { _rev : '1-123', content : 'remember the milk', done : false, order : 1, type : 'todo', id : 'abc2' }, { remote : true }
+        expect(@hoodie.my.store.update).wasCalledWith 'todo', 'abc2', { _rev : '1-123', content : 'remember the milk', done : false, order : 1, type : 'todo', id : 'abc2' }, { remote : true }
       
       it "should trigger remote events", ->
         @remote.pull()
@@ -281,7 +281,7 @@ describe "Hoodie.RemoteStore", ->
     _when "no docs passed", ->        
       _and "there are no changed docs", ->
         beforeEach ->
-          spyOn(@hoodie.my.localStore, "changedDocs").andReturn []
+          spyOn(@hoodie.my.store, "changedDocs").andReturn []
           @remote.push()
       
         it "shouldn't do anything", ->
@@ -289,7 +289,7 @@ describe "Hoodie.RemoteStore", ->
       
       _and "there is one deleted and one new doc", ->
         beforeEach ->
-          spyOn(@hoodie.my.localStore, "changedDocs").andReturn Mocks.changedDocs()
+          spyOn(@hoodie.my.store, "changedDocs").andReturn Mocks.changedDocs()
           spyOn(@hoodie.my.account, "db").andReturn 'joe$examleCom'
           @remote.push()
           expect(@hoodie.request).wasCalled()

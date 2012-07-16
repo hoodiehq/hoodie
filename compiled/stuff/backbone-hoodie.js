@@ -12,17 +12,17 @@ Backbone.sync = function(method, modelOrCollection, options) {
     switch (method) {
       case "read":
         if (id) {
-          return Backbone.hoodie.my.localStore.load(type, id);
+          return Backbone.hoodie.my.store.load(type, id);
         } else {
-          return Backbone.hoodie.my.localStore.loadAll();
+          return Backbone.hoodie.my.store.loadAll();
         }
         break;
       case "create":
-        return Backbone.hoodie.my.localStore.create(type, attributes);
+        return Backbone.hoodie.my.store.create(type, attributes);
       case "update":
-        return Backbone.hoodie.my.localStore.update(type, id, attributes);
+        return Backbone.hoodie.my.store.update(type, id, attributes);
       case "delete":
-        return Backbone.hoodie.my.localStore["delete"](type, id);
+        return Backbone.hoodie.my.store["delete"](type, id);
     }
   })();
   if (options.success) {
@@ -47,14 +47,14 @@ Backbone.Collection.prototype.initialize = function() {
     remote: true
   };
   if (this.model.prototype.type) {
-    Backbone.hoodie.my.remoteStore.on("create:" + this.model.prototype.type, function(id, attributes) {
+    Backbone.hoodie.my.remote.on("create:" + this.model.prototype.type, function(id, attributes) {
       return _this.add(attributes, opts);
     });
-    Backbone.hoodie.my.remoteStore.on("destroye:" + this.model.prototype.type, function(id, attributes) {
+    Backbone.hoodie.my.remote.on("destroye:" + this.model.prototype.type, function(id, attributes) {
       var _ref;
       return (_ref = _this.get(id)) != null ? _ref.destroy(opts) : void 0;
     });
-    return Backbone.hoodie.my.remoteStore.on("update:" + this.model.prototype.type, function(id, attributes) {
+    return Backbone.hoodie.my.remote.on("update:" + this.model.prototype.type, function(id, attributes) {
       var _ref;
       return (_ref = _this.get(id)) != null ? _ref.merge(attributes, opts) : void 0;
     });

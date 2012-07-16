@@ -18,7 +18,7 @@ Hoodie.Share = (function() {
 
   Share.prototype.load = function(id) {
     var _this = this;
-    return this.hoodie.my.localStore.load('$share', id).pipe(function(obj) {
+    return this.hoodie.my.store.load('$share', id).pipe(function(obj) {
       return new Hoodie.Share.Instance(obj);
     });
   };

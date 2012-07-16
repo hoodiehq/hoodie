@@ -28,7 +28,7 @@ describe "Hoodie.Email", ->
         to      : 'jim@be.am'
         subject : 'subject'
         body    : 'body'
-      (spyOn @hoodie.my.localStore, "create").andReturn
+      (spyOn @hoodie.my.store, "create").andReturn
         then: (cb) -> cb $.extend {}, @emailAttributes, id: 'abc4567'
     
     it "should reject the promise", ->
@@ -36,7 +36,7 @@ describe "Hoodie.Email", ->
       
     it "should save the email as object with type: $email", ->
       @email.send(@emailAttributes)
-      (expect @hoodie.my.localStore.create).wasCalledWith('$email', @emailAttributes)
+      (expect @hoodie.my.store.create).wasCalledWith('$email', @emailAttributes)
       
     it "should listen to server response", ->
       (spyOn @hoodie, "one")

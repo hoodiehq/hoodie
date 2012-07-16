@@ -11,12 +11,12 @@ describe("Hoodie.RemoteStore", function() {
     spyOn(this.hoodie, "request").andReturn(this.requestDefer.promise());
     spyOn(window, "setTimeout");
     spyOn(this.hoodie, "trigger");
-    spyOn(this.hoodie.my.localStore, "destroy").andReturn({
+    spyOn(this.hoodie.my.store, "destroy").andReturn({
       then: function(cb) {
         return cb('objectFromStore');
       }
     });
-    return spyOn(this.hoodie.my.localStore, "update").andReturn({
+    return spyOn(this.hoodie.my.store, "update").andReturn({
       then: function(cb) {
         return cb('objectFromStore', false);
       }
@@ -176,13 +176,13 @@ describe("Hoodie.RemoteStore", function() {
       });
       it("should remove `todo/abc3` from store", function() {
         this.remote.pull();
-        return expect(this.hoodie.my.localStore.destroy).wasCalledWith('todo', 'abc3', {
+        return expect(this.hoodie.my.store.destroy).wasCalledWith('todo', 'abc3', {
           remote: true
         });
       });
       it("should save `todo/abc2` in store", function() {
         this.remote.pull();
-        return expect(this.hoodie.my.localStore.update).wasCalledWith('todo', 'abc2', {
+        return expect(this.hoodie.my.store.update).wasCalledWith('todo', 'abc2', {
           _rev: '1-123',
           content: 'remember the milk',
           done: false,
@@ -352,7 +352,7 @@ describe("Hoodie.RemoteStore", function() {
     return _when("no docs passed", function() {
       _and("there are no changed docs", function() {
         beforeEach(function() {
-          spyOn(this.hoodie.my.localStore, "changedDocs").andReturn([]);
+          spyOn(this.hoodie.my.store, "changedDocs").andReturn([]);
           return this.remote.push();
         });
         return it("shouldn't do anything", function() {
@@ -362,7 +362,7 @@ describe("Hoodie.RemoteStore", function() {
       _and("there is one deleted and one new doc", function() {
         beforeEach(function() {
           var _ref;
-          spyOn(this.hoodie.my.localStore, "changedDocs").andReturn(Mocks.changedDocs());
+          spyOn(this.hoodie.my.store, "changedDocs").andReturn(Mocks.changedDocs());
           spyOn(this.hoodie.my.account, "db").andReturn('joe$examleCom');
           this.remote.push();
           expect(this.hoodie.request).wasCalled();

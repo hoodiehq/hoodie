@@ -70,7 +70,7 @@ Hoodie.Share.Instance = (function() {
       $.extend(_this, properties);
       return defer.resolve(_this);
     };
-    this.hoodie.my.localStore.update("$share", this.id, this._memory, options).then(_handleUpdate, defer.reject);
+    this.hoodie.my.store.update("$share", this.id, this._memory, options).then(_handleUpdate, defer.reject);
     return defer.promise();
   };
 
@@ -97,7 +97,7 @@ Hoodie.Share.Instance = (function() {
           return this._toggle;
       }
     }).call(this);
-    return this.hoodie.my.localStore.updateAll(objects, updateMethod);
+    return this.hoodie.my.store.updateAll(objects, updateMethod);
   };
 
   Instance.prototype.sync = function() {
@@ -126,7 +126,7 @@ Hoodie.Share.Instance = (function() {
     config = this.constructor.hoodie.my.config;
     this.ownerUuid = config.get('share.ownerUuid');
     if (!this.ownerUuid) {
-      this.ownerUuid = this.constructor.hoodie.my.localStore.uuid();
+      this.ownerUuid = this.constructor.hoodie.my.store.uuid();
       return config.set('share.ownerUuid', this.ownerUuid);
     }
   };
@@ -134,7 +134,7 @@ Hoodie.Share.Instance = (function() {
   Instance.prototype._isMySharedObjectAndChanged = function(obj) {
     var belongsToMe;
     belongsToMe = obj.id === this.id || obj.$shares && ~obj.$shares.indexOf(this.id);
-    return belongsToMe && this.hoodie.my.localStore.isDirty(obj.type, obj.id);
+    return belongsToMe && this.hoodie.my.store.isDirty(obj.type, obj.id);
   };
 
   Instance.prototype._add = function(obj) {
@@ -184,8 +184,8 @@ Hoodie.Share.Instance = (function() {
 
   Instance.prototype._sync = function() {
     var _this = this;
-    return this.save().pipe(this.hoodie.my.localStore.loadAll(this._isMySharedObjectAndChanged).pipe(function(sharedObjectThatChanged) {
-      return _this.hoodie.my.remoteStore.sync(sharedObjectThatChanged).then(_this._handleRemoteChanges);
+    return this.save().pipe(this.hoodie.my.store.loadAll(this._isMySharedObjectAndChanged).pipe(function(sharedObjectThatChanged) {
+      return _this.hoodie.my.remote.sync(sharedObjectThatChanged).then(_this._handleRemoteChanges);
     }));
   };
 

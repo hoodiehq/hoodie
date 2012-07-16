@@ -12,7 +12,7 @@ Mocks.Hoodie = ->
   isPromise     : -> 
     
   my :
-    localStore         :
+    store         :
       uuid          : -> 'mock567'
       create        : -> 
         then : ->

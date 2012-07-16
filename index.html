@@ -54,12 +54,12 @@
     //
     
     // helper to generate uuids
-    uuid = hoodie.my.localStore.uuid(length)
+    uuid = hoodie.my.store.uuid(length)
     
     // create a new object
     type = 'couch'
     attributes = {color: "red"}
-    hoodie.my.localStore.create(type, attributes )
+    hoodie.my.store.create(type, attributes )
       .done ( function(newObject) { } )
       .fail ( function(err)        { } )
       
@@ -67,7 +67,7 @@
     type = 'couch'
     id   = 'abc4567'
     attributes  = {color: "red", name: "relax"}
-    hoodie.my.localStore.save( type, id, attributes )
+    hoodie.my.store.save( type, id, attributes )
       .done ( function(object) { } )
       .fail ( function(err)        { } )
       
@@ -75,32 +75,32 @@
     type = 'couch'
     id   = 'abc4567'
     update = {size: 2}
-    hoodie.my.localStore.update( type, id, update )
+    hoodie.my.store.update( type, id, update )
       .done ( function(updatedObject) { } )
       .fail ( function(err)            { } )
     
     // load one object
     type = 'couch'
     id   = 'abc4567'
-    hoodie.my.localStore.load( type, id )
+    hoodie.my.store.load( type, id )
       .done ( function(object) { } )
       .fail ( function(err)    { } )
       
     // Load all objects
-    hoodie.my.localStore.loadAll()
+    hoodie.my.store.loadAll()
       .done ( function(objects) { } )
       .fail ( function(err)     { } )
       
     // Load all objects from one type
     type = 'couch'
-    hoodie.my.localStore.loadAll( type )
+    hoodie.my.store.loadAll( type )
       .done ( function(objects) { } )
       .fail ( function(err)     { } )
       
     // delete an existing object
     type = 'couch'
     id   = 'abc4567'
-    hoodie.my.localStore.delete( type, id )
+    hoodie.my.store.delete( type, id )
       .done ( function(deletedObject) { } )
       .fail ( function(err)            { } )
       
@@ -112,22 +112,22 @@
     // 
     
     // new doc created
-    hoodie.my.remoteStore.on( 'create', function( type, id, createdObject) { } )
+    hoodie.my.remote.on( 'create', function( type, id, createdObject) { } )
 
     // existing doc updated
-    hoodie.my.remoteStore.on( 'update', function( type, id, updatedObject) { } )
+    hoodie.my.remote.on( 'update', function( type, id, updatedObject) { } )
 
     // doc deleted
-    hoodie.my.remoteStore.on( 'delete', function( type, id, deletedObject) { } )
+    hoodie.my.remote.on( 'delete', function( type, id, deletedObject) { } )
 
     // any of above events
-    hoodie.my.remoteStore.on( 'change', function( type, id, changedObject) { } )
+    hoodie.my.remote.on( 'change', function( type, id, changedObject) { } )
 
     // all listeners can be filtered by type
-    hoodie.my.remoteStore.on( "create:couch", function( id, createdObject) { } )
-    hoodie.my.remoteStore.on( "update:couch", function( id, updatedObject)  { } )
-    hoodie.my.remoteStore.on( "delete:couch", function( id, deletedObject) { } )
-    hoodie.my.remoteStore.on( "change:couch", function( id, changedObject) { } )
+    hoodie.my.remote.on( "create:couch", function( id, createdObject) { } )
+    hoodie.my.remote.on( "update:couch", function( id, updatedObject)  { } )
+    hoodie.my.remote.on( "delete:couch", function( id, deletedObject) { } )
+    hoodie.my.remote.on( "change:couch", function( id, changedObject) { } )
 
 
     //
@@ -138,14 +138,14 @@
     //
 
     // make couch with id "abc4567" public
-    hoodie.my.localStore.update("couch","abc4567", {}, {public: true})
+    hoodie.my.store.update("couch","abc4567", {}, {public: true})
 
     // make couch with id "abc4567" public, but do only show the color, hide
     // all other attributes
-    hoodie.my.localStore.update("couch","abc4567", {}, {public: ["color"]})
+    hoodie.my.store.update("couch","abc4567", {}, {public: ["color"]})
 
     // make couch with id "abc4567" private again
-    hoodie.my.localStore.update("couch","abc4567", {}, {public: false})
+    hoodie.my.store.update("couch","abc4567", {}, {public: false})
 
     // load all couches from user "joe"
     hoodie.user("joe").loadAll("couch").done( function(couches) { ... })

@@ -261,7 +261,7 @@ hoodie.my.share.create( {continuous: true} )
   share.add(todolist)
 
   // * changes to added todolists will be synched right away
-  hoodie.my.localStore.update(todolist, {name: "new name"})
+  hoodie.my.store.update(todolist, {name: "new name"})
 
   // * removed docs will be removed from the share right away
   share.remove(todolist)

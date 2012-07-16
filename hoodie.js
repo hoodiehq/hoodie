@@ -84,10 +84,10 @@ Hoodie = (function(_super) {
 
   Hoodie.prototype.modules = {
     my: {
-      localStore: "LocalStore",
+      store: "LocalStore",
       config: "Config",
       account: "Account",
-      remoteStore: "RemoteStore"
+      remote: "RemoteStore"
     },
     user: "UserStore",
     email: "Email"
@@ -404,7 +404,7 @@ Hoodie.Config = (function() {
     if (options.id) {
       this.id = options.id;
     }
-    this.hoodie.my.localStore.load(this.type, this.id).done(function(obj) {
+    this.hoodie.my.store.load(this.type, this.id).done(function(obj) {
       return _this.cache = obj;
     });
     this.hoodie.on('account:signedOut', this.clear);
@@ -419,7 +419,7 @@ Hoodie.Config = (function() {
     update = {};
     update[key] = value;
     isSilent = key.charAt(0) === '_';
-    return this.hoodie.my.localStore.update(this.type, this.id, update, {
+    return this.hoodie.my.store.update(this.type, this.id, update, {
       silent: isSilent
     });
   };
@@ -430,7 +430,7 @@ Hoodie.Config = (function() {
 
   Config.prototype.clear = function() {
     this.cache = {};
-    return this.hoodie.my.localStore.destroy(this.type, this.id);
+    return this.hoodie.my.store.destroy(this.type, this.id);
   };
 
   Config.prototype.remove = Config.prototype.set;
@@ -461,7 +461,7 @@ Hoodie.Email = (function() {
       attributes.error = "Invalid email address (" + (attributes.to || 'empty') + ")";
       return defer.reject(attributes).promise();
     }
-    this.hoodie.my.localStore.create('$email', attributes).then(function(obj) {
+    this.hoodie.my.store.create('$email', attributes).then(function(obj) {
       return _this._handleEmailUpdate(defer, obj);
     });
     return defer.promise();
@@ -592,7 +592,7 @@ Hoodie.RemoteStore = (function() {
   RemoteStore.prototype.push = function(docs) {
     var doc, docsForRemote;
     if (!$.isArray(docs)) {
-      docs = this.hoodie.my.localStore.changedDocs();
+      docs = this.hoodie.my.store.changedDocs();
     }
     if (docs.length === 0) {
       return this.hoodie.defer().resolve([]).promise();
@@ -702,7 +702,7 @@ Hoodie.RemoteStore = (function() {
     var timestamp, uuid;
     this._timezoneOffset || (this._timezoneOffset = new Date().getTimezoneOffset() * 60);
     timestamp = Date.now() + this._timezoneOffset;
-    uuid = this.hoodie.my.localStore.uuid(5);
+    uuid = this.hoodie.my.store.uuid(5);
     return "" + uuid + "#" + timestamp;
   };
 
@@ -762,13 +762,13 @@ Hoodie.RemoteStore = (function() {
       doc = this._parseFromPull(doc);
       if (doc._deleted) {
         _destroyedDocs.push([
-          doc, this.hoodie.my.localStore.destroy(doc.type, doc.id, {
+          doc, this.hoodie.my.store.destroy(doc.type, doc.id, {
             remote: true
           })
         ]);
       } else {
         _changedDocs.push([
-          doc, this.hoodie.my.localStore.update(doc.type, doc.id, doc, {
+          doc, this.hoodie.my.store.update(doc.type, doc.id, doc, {
             remote: true
           })
         ]);
@@ -815,7 +815,7 @@ Hoodie.RemoteStore = (function() {
         options = {
           remote: true
         };
-        _results.push(_this.hoodie.my.localStore.update(doc.type, doc.id, update, options));
+        _results.push(_this.hoodie.my.store.update(doc.type, doc.id, update, options));
       }
       return _results;
     };

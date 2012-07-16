@@ -82,7 +82,7 @@ Hoodie.RemoteStore = (function() {
   RemoteStore.prototype.push = function(docs) {
     var doc, docsForRemote;
     if (!$.isArray(docs)) {
-      docs = this.hoodie.my.localStore.changedDocs();
+      docs = this.hoodie.my.store.changedDocs();
     }
     if (docs.length === 0) {
       return this.hoodie.defer().resolve([]).promise();
@@ -192,7 +192,7 @@ Hoodie.RemoteStore = (function() {
     var timestamp, uuid;
     this._timezoneOffset || (this._timezoneOffset = new Date().getTimezoneOffset() * 60);
     timestamp = Date.now() + this._timezoneOffset;
-    uuid = this.hoodie.my.localStore.uuid(5);
+    uuid = this.hoodie.my.store.uuid(5);
     return "" + uuid + "#" + timestamp;
   };
 
@@ -252,13 +252,13 @@ Hoodie.RemoteStore = (function() {
       doc = this._parseFromPull(doc);
       if (doc._deleted) {
         _destroyedDocs.push([
-          doc, this.hoodie.my.localStore.destroy(doc.type, doc.id, {
+          doc, this.hoodie.my.store.destroy(doc.type, doc.id, {
             remote: true
           })
         ]);
       } else {
         _changedDocs.push([
-          doc, this.hoodie.my.localStore.update(doc.type, doc.id, doc, {
+          doc, this.hoodie.my.store.update(doc.type, doc.id, doc, {
             remote: true
           })
         ]);
@@ -305,7 +305,7 @@ Hoodie.RemoteStore = (function() {
         options = {
           remote: true
         };
-        _results.push(_this.hoodie.my.localStore.update(doc.type, doc.id, update, options));
+        _results.push(_this.hoodie.my.store.update(doc.type, doc.id, update, options));
       }
       return _results;
     };

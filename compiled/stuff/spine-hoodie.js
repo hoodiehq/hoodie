@@ -9,19 +9,19 @@ Spine.Model.Hoodie = {
     this.change(function(object, event, data) {
       switch (event) {
         case 'create':
-          return Spine.hoodie.my.localStore.create(type, object.toJSON());
+          return Spine.hoodie.my.store.create(type, object.toJSON());
         case 'update':
-          return Spine.hoodie.my.localStore.update(type, object.id, object.toJSON());
+          return Spine.hoodie.my.store.update(type, object.id, object.toJSON());
         case 'destroy':
-          return Spine.hoodie.my.localStore.destroy(type, object.id);
+          return Spine.hoodie.my.store.destroy(type, object.id);
       }
     });
     this.fetch(function() {
-      return Spine.hoodie.my.localStore.loadAll(type).done(function(records) {
+      return Spine.hoodie.my.store.loadAll(type).done(function(records) {
         return _this.refresh(records);
       });
     });
-    return Spine.hoodie.my.remoteStore.on("change:" + type, function(event, remoteObject) {
+    return Spine.hoodie.my.remote.on("change:" + type, function(event, remoteObject) {
       var attr, localObject, value;
       switch (event) {
         case 'create':
