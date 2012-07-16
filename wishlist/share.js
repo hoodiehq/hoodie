@@ -138,7 +138,7 @@ hoodie.my.share.loadAll()
 //   update all my sharings
 hoodie.my.share.updateAll({access: false})
 hoodie.my.share.updateAll( function(share) {
-  share.access: false
+  share.access = false
 })
 
 // * deleteAll  
