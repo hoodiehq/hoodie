@@ -1,13 +1,38 @@
 # RemoteStore
 # ============
 
-# Connection / Socket to our couch
+# Connection to Couch Database
 #
-# RemoteStore is using CouchDB's `_changes` feed to listen to changes
-# and `_bulk_docs` to push local changes
+# API
+# -----
 #
-# When hoodie.my.remote is active (default), it will continuously 
-# synchronize, otherwise sync, pull or push can be called manually
+# object loading / updating / deleting
+#
+# * load(type, id)
+# * loadAll(type )
+# * create(type, object)
+# * save(type, id, object)
+# * update(new_properties )
+# * updateAll( type, new_properties)
+# * delete(type, id)
+# * deleteAll(type)
+#
+# custom requests
+#
+# * get(view, params)
+# * post(view, params)
+#
+# synchronization
+#
+# * connect()
+# * disconnect()
+# * pull()
+# * push()
+# * sync()
+#
+# event binding
+#
+# * on(event, callback)
 #
 class Hoodie.RemoteStore
   
