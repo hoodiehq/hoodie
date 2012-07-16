@@ -9,7 +9,6 @@
 # When hoodie.my.remote is active (default), it will continuously 
 # synchronize, otherwise sync, pull or push can be called manually
 #
-  
 class Hoodie.RemoteStore
   
   # ## properties

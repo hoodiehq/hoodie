@@ -60,8 +60,8 @@ Hoodie = (function(_super) {
     _results = [];
     for (instanceName in modules) {
       Module = modules[instanceName];
-      if (typeof Module === 'string') {
-        _results.push(context[instanceName] = new Hoodie[Module](this));
+      if (typeof Module === 'function') {
+        _results.push(context[instanceName] = new Module(this));
       } else {
         namespace = instanceName;
         context[namespace] = {};

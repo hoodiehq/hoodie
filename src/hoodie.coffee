@@ -60,10 +60,12 @@ class Hoodie extends Events
   
   #
   _loadModules: (context = this, modules = @modules()) ->
+
     for instanceName, Module of modules
       
-      if typeof Module is 'string'
-        context[instanceName] = new Hoodie[Module] this
+      if typeof Module is 'function'
+        context[instanceName] = new Module this
+        
       else
         namespace = instanceName
         context[namespace] = {}

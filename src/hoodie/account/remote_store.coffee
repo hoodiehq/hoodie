@@ -9,8 +9,9 @@
 # When hoodie.my.remote is active (default), it will continuously 
 # synchronize, otherwise sync, pull or push can be called manually
 #
-  
-class Hoodie.Account.RemoteStore
+class Hoodie.Account.RemoteStore extends Hoodie.RemoteStore
+
+  ###
   
   # ## properties
   
@@ -362,3 +363,4 @@ class Hoodie.Account.RemoteStore
         update  = {_rev: pushedDocs[i]._rev}
         options = remote : true
         @hoodie.my.store.update(doc.type, doc.id, update, options) 
+  ###
