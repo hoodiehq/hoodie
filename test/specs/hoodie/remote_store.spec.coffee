@@ -8,8 +8,12 @@ describe "Hoodie.RemoteStore", ->
   
   
   describe ".constructor(@hoodie, options = {})", ->
+    it "should set @basePath", ->
+      remote = new Hoodie.RemoteStore @hoodie, basePath: '/base/path'
+      expect(remote.basePath).toBe '/base/path'
+    
   # /.constructor
-  
+
 
   # object loading / updating / deleting
   # -------------------------------------

@@ -5,8 +5,9 @@ Hoodie.RemoteStore = (function() {
 
   RemoteStore.prototype.active = true;
 
-  function RemoteStore(hoodie) {
+  function RemoteStore(hoodie, _arg) {
     this.hoodie = hoodie;
+    this.basePath = (_arg != null ? _arg : {}).basePath;
     this._handlePushSuccess = __bind(this._handlePushSuccess, this);
 
     this._handlePullResults = __bind(this._handlePullResults, this);
@@ -27,35 +28,11 @@ Hoodie.RemoteStore = (function() {
 
     this.connect = __bind(this.connect, this);
 
-    this.deactivate = __bind(this.deactivate, this);
-
-    this.activate = __bind(this.activate, this);
-
-    if (this.hoodie.my.config.get('_remote.active') != null) {
-      this.active = this.hoodie.my.config.get('_remote.active');
-    }
-    if (this.active) {
-      this.activate();
-    }
   }
-
-  RemoteStore.prototype.activate = function() {
-    this.hoodie.my.config.set('_remote.active', this.active = true);
-    this.hoodie.on('account:signedOut', this.disconnect);
-    this.hoodie.on('account:signedIn', this.connect);
-    return this.connect();
-  };
-
-  RemoteStore.prototype.deactivate = function() {
-    this.hoodie.my.config.set('_remote.active', this.active = false);
-    this.hoodie.unbind('account:signedIn', this.connect);
-    this.hoodie.unbind('account:signedOut', this.disconnect);
-    return this.disconnect();
-  };
 
   RemoteStore.prototype.connect = function() {
     this.connected = true;
-    return this.hoodie.my.account.authenticate().pipe(this.sync);
+    return this.sync();
   };
 
   RemoteStore.prototype.disconnect = function() {
@@ -96,7 +73,7 @@ Hoodie.RemoteStore = (function() {
       }
       return _results;
     }).call(this);
-    this._pushRequest = this.hoodie.request('POST', "/" + (encodeURIComponent(this.hoodie.my.account.db())) + "/_bulk_docs", {
+    this._pushRequest = this.hoodie.request('POST', "" + this.basePath + "/_bulk_docs", {
       dataType: 'json',
       processData: false,
       contentType: 'application/json',
@@ -124,9 +101,9 @@ Hoodie.RemoteStore = (function() {
     var since;
     since = this.hoodie.my.config.get('_remote.seq') || 0;
     if (this.active) {
-      return "/" + (encodeURIComponent(this.hoodie.my.account.db())) + "/_changes?include_docs=true&heartbeat=10000&feed=longpoll&since=" + since;
+      return "" + this.basePath + "/_changes?include_docs=true&heartbeat=10000&feed=longpoll&since=" + since;
     } else {
-      return "/" + (encodeURIComponent(this.hoodie.my.account.db())) + "/_changes?include_docs=true&since=" + since;
+      return "" + this.basePath + "/_changes?include_docs=true&since=" + since;
     }
   };
 

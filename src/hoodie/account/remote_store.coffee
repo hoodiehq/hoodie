@@ -11,8 +11,6 @@
 #
 class Hoodie.Account.RemoteStore extends Hoodie.RemoteStore
 
-  ###
-  
   # ## properties
   
   # active
@@ -20,9 +18,14 @@ class Hoodie.Account.RemoteStore extends Hoodie.RemoteStore
   # as soon as the user is authenticated.
   active: true
 
+
   # ## Constructor
   #
-  constructor : (@hoodie) ->
+  constructor : ->
+    super
+
+    # set basePath to user's DB name
+    @basePath = "/#{encodeURIComponent @hoodie.my.account.db()}"
     
     # overwrite default with _remote.active config, if set
     @active = @hoodie.my.config.get('_remote.active') if @hoodie.my.config.get('_remote.active')?
@@ -49,14 +52,16 @@ class Hoodie.Account.RemoteStore extends Hoodie.RemoteStore
     
   # ## Connect
   #
-  # start syncing changes from the userDB
+  # do not start to sync immediately, but authenticate beforehand
   connect : =>
     @connected = true
     
     # start syncing
     @hoodie.my.account.authenticate().pipe @sync
-  
     
+
+  ###
+
   # ## Disconnect
   #
   # stop syncing changes from the userDB

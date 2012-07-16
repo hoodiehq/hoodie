@@ -36,6 +36,7 @@
 #
 class Hoodie.RemoteStore
   
+
   # ## properties
   
   # active
@@ -43,41 +44,18 @@ class Hoodie.RemoteStore
   # as soon as the user is authenticated.
   active: true
 
+
   # ## Constructor
   #
-  constructor : (@hoodie) ->
+  constructor : (@hoodie, {@basePath} = {}) ->
     
-    # overwrite default with _remote.active config, if set
-    @active = @hoodie.my.config.get('_remote.active') if @hoodie.my.config.get('_remote.active')?
-    
-    @activate() if @active
-  
-  #
-  activate : =>
-    @hoodie.my.config.set '_remote.active', @active = true
 
-    @hoodie.on 'account:signedOut',    @disconnect
-    @hoodie.on 'account:signedIn',     @connect
-
-    @connect()
-
-  #
-  deactivate : =>
-    @hoodie.my.config.set '_remote.active', @active = false
-
-    @hoodie.unbind 'account:signedIn',  @connect
-    @hoodie.unbind 'account:signedOut', @disconnect
-
-    @disconnect()
-    
   # ## Connect
   #
-  # start syncing changes from the userDB
+  # start syncing
   connect : =>
     @connected = true
-    
-    # start syncing
-    @hoodie.my.account.authenticate().pipe @sync
+    @sync()
   
     
   # ## Disconnect
@@ -118,7 +96,7 @@ class Hoodie.RemoteStore
       
     docsForRemote = (@_parseForRemote doc for doc in docs)
     
-    @_pushRequest = @hoodie.request 'POST', "/#{encodeURIComponent @hoodie.my.account.db()}/_bulk_docs", 
+    @_pushRequest = @hoodie.request 'POST', "#{@basePath}/_bulk_docs", 
       dataType:     'json'
       processData:  false
       contentType:  'application/json'
@@ -159,9 +137,9 @@ class Hoodie.RemoteStore
   _pullUrl : ->
     since = @hoodie.my.config.get('_remote.seq') or 0
     if @active # make a long poll request
-      "/#{encodeURIComponent @hoodie.my.account.db()}/_changes?include_docs=true&heartbeat=10000&feed=longpoll&since=#{since}"
+      "#{@basePath}/_changes?include_docs=true&heartbeat=10000&feed=longpoll&since=#{since}"
     else
-      "/#{encodeURIComponent @hoodie.my.account.db()}/_changes?include_docs=true&since=#{since}"
+      "#{@basePath}/_changes?include_docs=true&since=#{since}"
   
   # request gets restarted automaticcally in @_handlePullError
   _restartPullRequest : => @_pullRequest?.abort()

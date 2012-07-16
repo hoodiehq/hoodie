@@ -8,7 +8,15 @@ describe("Hoodie.RemoteStore", function() {
     spyOn(this.hoodie, "one");
     return spyOn(this.hoodie, "unbind");
   });
-  describe(".constructor(@hoodie, options = {})", function() {});
+  describe(".constructor(@hoodie, options = {})", function() {
+    return it("should set @basePath", function() {
+      var remote;
+      remote = new Hoodie.RemoteStore(this.hoodie, {
+        basePath: '/base/path'
+      });
+      return expect(remote.basePath).toBe('/base/path');
+    });
+  });
   describe("load(type, id)", function() {});
   describe("loadAll(type )", function() {});
   describe("create(type, object)", function() {});

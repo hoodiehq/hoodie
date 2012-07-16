@@ -3,29 +3,33 @@
 describe("Hoodie.Account.RemoteStore", function() {
   beforeEach(function() {
     this.hoodie = new Mocks.Hoodie;
-    this.remote = new Hoodie.Account.RemoteStore(this.hoodie);
     spyOn(this.hoodie, "on");
     spyOn(this.hoodie, "one");
     spyOn(this.hoodie, "unbind");
     this.requestDefer = this.hoodie.defer();
     spyOn(this.hoodie, "request").andReturn(this.requestDefer.promise());
     spyOn(window, "setTimeout");
+    spyOn(this.hoodie.my.account, "db").andReturn('joe$example.com');
     spyOn(this.hoodie, "trigger");
     spyOn(this.hoodie.my.store, "destroy").andReturn({
       then: function(cb) {
         return cb('objectFromStore');
       }
     });
-    return spyOn(this.hoodie.my.store, "update").andReturn({
+    spyOn(this.hoodie.my.store, "update").andReturn({
       then: function(cb) {
         return cb('objectFromStore', false);
       }
     });
+    return this.remote = new Hoodie.Account.RemoteStore(this.hoodie);
   });
   describe(".constructor(@hoodie, options = {})", function() {
     beforeEach(function() {
       spyOn(Hoodie.Account.RemoteStore.prototype, "connect");
       return this.remote = new Hoodie.Account.RemoteStore(this.hoodie);
+    });
+    it("should set basePath to users database name", function() {
+      return expect(this.remote.basePath).toBe("/joe%24example.com");
     });
     it("should be active by default", function() {
       return expect(this.remote.active).toBeTruthy();
@@ -136,12 +140,11 @@ describe("Hoodie.Account.RemoteStore", function() {
       });
       it("should send a longpoll GET request to user's db _changes feed", function() {
         var method, path, _ref;
-        spyOn(this.hoodie.my.account, "db").andReturn('joe$examleCom');
         this.remote.pull();
         expect(this.hoodie.request).wasCalled();
         _ref = this.hoodie.request.mostRecentCall.args, method = _ref[0], path = _ref[1];
         expect(method).toBe('GET');
-        return expect(path).toBe('/joe%24examleCom/_changes?include_docs=true&heartbeat=10000&feed=longpoll&since=0');
+        return expect(path).toBe('/joe%24example.com/_changes?include_docs=true&heartbeat=10000&feed=longpoll&since=0');
       });
       return it("should set a timeout to restart the pull request", function() {
         this.remote.pull();
@@ -154,12 +157,11 @@ describe("Hoodie.Account.RemoteStore", function() {
       });
       return it("should send a normal GET request to user's db _changes feed", function() {
         var method, path, _ref;
-        spyOn(this.hoodie.my.account, "db").andReturn('joe$examleCom');
         this.remote.pull();
         expect(this.hoodie.request).wasCalled();
         _ref = this.hoodie.request.mostRecentCall.args, method = _ref[0], path = _ref[1];
         expect(method).toBe('GET');
-        return expect(path).toBe('/joe%24examleCom/_changes?include_docs=true&since=0');
+        return expect(path).toBe('/joe%24example.com/_changes?include_docs=true&since=0');
       });
     });
     _when("request is successful / returns changes", function() {
@@ -363,14 +365,13 @@ describe("Hoodie.Account.RemoteStore", function() {
         beforeEach(function() {
           var _ref;
           spyOn(this.hoodie.my.store, "changedDocs").andReturn(Mocks.changedDocs());
-          spyOn(this.hoodie.my.account, "db").andReturn('joe$examleCom');
           this.remote.push();
           expect(this.hoodie.request).wasCalled();
           return _ref = this.hoodie.request.mostRecentCall.args, this.method = _ref[0], this.path = _ref[1], this.options = _ref[2], _ref;
         });
         it("should post the changes to the user's db _bulk_docs API", function() {
           expect(this.method).toBe('POST');
-          return expect(this.path).toBe('/joe%24examleCom/_bulk_docs');
+          return expect(this.path).toBe('/joe%24example.com/_bulk_docs');
         });
         it("should set dataType to json", function() {
           return expect(this.options.dataType).toBe('json');

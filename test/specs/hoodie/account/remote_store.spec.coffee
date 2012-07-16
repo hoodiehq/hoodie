@@ -1,17 +1,20 @@
 describe "Hoodie.Account.RemoteStore", ->  
   beforeEach ->
     @hoodie = new Mocks.Hoodie 
-    @remote = new Hoodie.Account.RemoteStore @hoodie
     spyOn(@hoodie, "on")
     spyOn(@hoodie, "one")
     spyOn(@hoodie, "unbind")
     @requestDefer = @hoodie.defer()
     spyOn(@hoodie, "request").andReturn @requestDefer.promise()
     spyOn(window, "setTimeout")
+    spyOn(@hoodie.my.account, "db").andReturn 'joe$example.com'
     
     spyOn(@hoodie, "trigger")
     spyOn(@hoodie.my.store, "destroy").andReturn then: (cb) -> cb('objectFromStore')
     spyOn(@hoodie.my.store, "update").andReturn  then: (cb) -> cb('objectFromStore', false)
+
+    
+    @remote = new Hoodie.Account.RemoteStore @hoodie
   
   
   describe ".constructor(@hoodie, options = {})", ->
@@ -19,6 +22,9 @@ describe "Hoodie.Account.RemoteStore", ->
       spyOn(Hoodie.Account.RemoteStore::, "connect")
       @remote = new Hoodie.Account.RemoteStore @hoodie
     
+    it "should set basePath to users database name", ->
+      expect(@remote.basePath).toBe "/joe%24example.com"
+
     it "should be active by default", ->
       expect(@remote.active).toBeTruthy()
     
@@ -114,12 +120,11 @@ describe "Hoodie.Account.RemoteStore", ->
         @remote.active = true
       
       it "should send a longpoll GET request to user's db _changes feed", ->
-        spyOn(@hoodie.my.account, "db").andReturn 'joe$examleCom'
         @remote.pull()
         expect(@hoodie.request).wasCalled()
         [method, path] = @hoodie.request.mostRecentCall.args
         expect(method).toBe 'GET'
-        expect(path).toBe '/joe%24examleCom/_changes?include_docs=true&heartbeat=10000&feed=longpoll&since=0'
+        expect(path).toBe '/joe%24example.com/_changes?include_docs=true&heartbeat=10000&feed=longpoll&since=0'
         
       it "should set a timeout to restart the pull request", ->
         @remote.pull()
@@ -130,12 +135,11 @@ describe "Hoodie.Account.RemoteStore", ->
         @remote.active = false
       
       it "should send a normal GET request to user's db _changes feed", ->
-        spyOn(@hoodie.my.account, "db").andReturn 'joe$examleCom'
         @remote.pull()
         expect(@hoodie.request).wasCalled()
         [method, path] = @hoodie.request.mostRecentCall.args
         expect(method).toBe 'GET'
-        expect(path).toBe '/joe%24examleCom/_changes?include_docs=true&since=0'
+        expect(path).toBe '/joe%24example.com/_changes?include_docs=true&since=0'
 
     _when "request is successful / returns changes", ->
       beforeEach ->
@@ -290,14 +294,13 @@ describe "Hoodie.Account.RemoteStore", ->
       _and "there is one deleted and one new doc", ->
         beforeEach ->
           spyOn(@hoodie.my.store, "changedDocs").andReturn Mocks.changedDocs()
-          spyOn(@hoodie.my.account, "db").andReturn 'joe$examleCom'
           @remote.push()
           expect(@hoodie.request).wasCalled()
           [@method, @path, @options] = @hoodie.request.mostRecentCall.args
     
         it "should post the changes to the user's db _bulk_docs API", ->
           expect(@method).toBe 'POST'
-          expect(@path).toBe '/joe%24examleCom/_bulk_docs'
+          expect(@path).toBe '/joe%24example.com/_bulk_docs'
       
         it "should set dataType to json", ->
           expect(@options.dataType).toBe 'json'
