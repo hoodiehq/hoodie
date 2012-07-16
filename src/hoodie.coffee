@@ -7,16 +7,16 @@
 class Hoodie extends Events
 
   # modules to be loaded
-  modules:
+  modules: ->
     my :
-      store   : "LocalStore"
-      config  : "Config"
-      account : "Account"
-      remote  : "RemoteStore"
+      store   : Hoodie.LocalStore
+      config  : Hoodie.Config
+      account : Hoodie.Account
+      remote  : Hoodie.Account.RemoteStore
 
-    user    : "UserStore"
-    email   : "Email"
-    # share : "Share"
+    user    : Hoodie.UserStore
+    email   : Hoodie.Email
+    # share : Hoodie.Share
 
 
   # ## initialization
@@ -59,11 +59,11 @@ class Hoodie extends Events
   # ## Private
   
   #
-  _loadModules: (context = this, modules = @modules) ->
-    for instanceName, moduleName of modules
+  _loadModules: (context = this, modules = @modules()) ->
+    for instanceName, Module of modules
       
-      if typeof moduleName is 'string'
-        context[instanceName] = new Hoodie[moduleName] this
+      if typeof Module is 'string'
+        context[instanceName] = new Hoodie[Module] this
       else
         namespace = instanceName
         context[namespace] = {}

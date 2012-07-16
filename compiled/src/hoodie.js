@@ -7,15 +7,17 @@ Hoodie = (function(_super) {
 
   __extends(Hoodie, _super);
 
-  Hoodie.prototype.modules = {
-    my: {
-      store: "LocalStore",
-      config: "Config",
-      account: "Account",
-      remote: "RemoteStore"
-    },
-    user: "UserStore",
-    email: "Email"
+  Hoodie.prototype.modules = function() {
+    return {
+      my: {
+        store: Hoodie.LocalStore,
+        config: Hoodie.Config,
+        account: Hoodie.Account,
+        remote: Hoodie.Account.RemoteStore
+      },
+      user: Hoodie.UserStore,
+      email: Hoodie.Email
+    };
   };
 
   function Hoodie(baseUrl) {
@@ -48,18 +50,18 @@ Hoodie = (function(_super) {
   };
 
   Hoodie.prototype._loadModules = function(context, modules) {
-    var instanceName, moduleName, namespace, _results;
+    var Module, instanceName, namespace, _results;
     if (context == null) {
       context = this;
     }
     if (modules == null) {
-      modules = this.modules;
+      modules = this.modules();
     }
     _results = [];
     for (instanceName in modules) {
-      moduleName = modules[instanceName];
-      if (typeof moduleName === 'string') {
-        _results.push(context[instanceName] = new Hoodie[moduleName](this));
+      Module = modules[instanceName];
+      if (typeof Module === 'string') {
+        _results.push(context[instanceName] = new Hoodie[Module](this));
       } else {
         namespace = instanceName;
         context[namespace] = {};

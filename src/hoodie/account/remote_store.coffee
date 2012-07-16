@@ -10,7 +10,7 @@
 # synchronize, otherwise sync, pull or push can be called manually
 #
   
-class Hoodie.RemoteStore
+class Hoodie.Account.RemoteStore
   
   # ## properties
   
