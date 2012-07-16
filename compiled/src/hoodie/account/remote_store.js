@@ -41,9 +41,8 @@ Hoodie.Account.RemoteStore = (function(_super) {
 
   RemoteStore.prototype.connect = function() {
     var _this = this;
-    this.connected = true;
     return this.hoodie.my.account.authenticate().pipe(function() {
-      return _this.sync();
+      return RemoteStore.__super__.connect.apply(_this, arguments);
     });
   };
 

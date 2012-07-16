@@ -51,13 +51,8 @@ class Hoodie.Account.RemoteStore extends Hoodie.RemoteStore
   #
   # do not start to sync immediately, but authenticate beforehand
   connect : =>
-
-    # TODO: should be set after authentication was successful
-    @connected = true
-
-    # start syncing
     @hoodie.my.account.authenticate().pipe =>  
-      @sync()
+      super
     
 
   
