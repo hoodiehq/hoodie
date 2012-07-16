@@ -295,9 +295,9 @@ describe "Hoodie.RemoteStore", ->
           expect(@hoodie.request).wasCalled()
           [@method, @path, @options] = @hoodie.request.mostRecentCall.args
     
-        it "should post the changes to the user's db _bulkDocs API", ->
+        it "should post the changes to the user's db _bulk_docs API", ->
           expect(@method).toBe 'POST'
-          expect(@path).toBe '/joe%24examleCom/_bulkDocs'
+          expect(@path).toBe '/joe%24examleCom/_bulk_docs'
       
         it "should set dataType to json", ->
           expect(@options.dataType).toBe 'json'

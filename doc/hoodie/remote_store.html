@@ -1,7 +1,7 @@
 <!DOCTYPE html><html lang="en"><head><title>hoodie/remote_store</title></head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0"><meta name="groc-relative-root" content="../"><meta name="groc-document-path" content="hoodie/remote_store"><meta name="groc-project-path" content="src/hoodie/remote_store.coffee"><link rel="stylesheet" type="text/css" media="all" href="../assets/style.css"><script type="text/javascript" src="../assets/behavior.js"></script><body><div id="meta"><div class="file-path">src/hoodie/remote_store.coffee</div></div><div id="document"><div class="segment"><div class="comments"><div class="wrapper"><h1 id="remotestore">RemoteStore</h1></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>Connection / Socket to our couch</p>
 
 <p>RemoteStore is using CouchDB's <code>_changes</code> feed to listen to changes
-and <code>_bulkDocs</code> to push local changes</p>
+and <code>_bulk_docs</code> to push local changes</p>
 
 <p>When hoodie.my.remote is active (default), it will continuously 
 synchronize, otherwise sync, pull or push can be called manually</p></div></div><div class="code"><div class="wrapper">  
@@ -51,7 +51,7 @@ as soon as the user is authenticated.</p></div></div><div class="code"><div clas
     
     </div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h2 id="push-changes">push changes</h2>
 
-<p>Push objects to userDB using the <code>_bulkDocs</code> API.
+<p>Push objects to userDB using the <code>_bulk_docs</code> API.
 If no objects passed, push all changed documents</p></div></div><div class="code"><div class="wrapper">  <span class="nv">push : </span><span class="p">(</span><span class="nx">docs</span><span class="p">)</span> <span class="o">=&gt;</span>
     
     <span class="nv">docs = </span><span class="nx">@hoodie</span><span class="p">.</span><span class="nx">my</span><span class="p">.</span><span class="nx">store</span><span class="p">.</span><span class="nx">changedDocs</span><span class="p">()</span> <span class="nx">unless</span> <span class="nx">$</span><span class="p">.</span><span class="nx">isArray</span> <span class="nx">docs</span>
@@ -59,7 +59,7 @@ If no objects passed, push all changed documents</p></div></div><div class="code
       
     <span class="nv">docsForRemote = </span><span class="p">(</span><span class="nx">@_parseForRemote</span> <span class="nx">doc</span> <span class="k">for</span> <span class="nx">doc</span> <span class="k">in</span> <span class="nx">docs</span><span class="p">)</span>
     
-    <span class="vi">@_pushRequest = </span><span class="nx">@hoodie</span><span class="p">.</span><span class="nx">request</span> <span class="s1">&#39;POST&#39;</span><span class="p">,</span> <span class="s2">&quot;/#{encodeURIComponent @hoodie.my.account.db()}/_bulkDocs&quot;</span><span class="p">,</span> 
+    <span class="vi">@_pushRequest = </span><span class="nx">@hoodie</span><span class="p">.</span><span class="nx">request</span> <span class="s1">&#39;POST&#39;</span><span class="p">,</span> <span class="s2">&quot;/#{encodeURIComponent @hoodie.my.account.db()}/_bulk_docs&quot;</span><span class="p">,</span> 
       <span class="nv">dataType: </span>    <span class="s1">&#39;json&#39;</span>
       <span class="nv">processData: </span> <span class="kc">false</span>
       <span class="nv">contentType: </span> <span class="s1">&#39;application/json&#39;</span>
@@ -93,7 +93,7 @@ If no objects passed, push all changed documents</p></div></div><div class="code
   </div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>pull success handler </p>
 
 <p>handle the incoming changes, then send the next request</p></div></div><div class="code"><div class="wrapper">  <span class="nv">_handlePullSuccess : </span><span class="p">(</span><span class="nx">response</span><span class="p">)</span> <span class="o">=&gt;</span>
-    <span class="nx">@hoodie</span><span class="p">.</span><span class="nx">my</span><span class="p">.</span><span class="nx">config</span><span class="p">.</span><span class="nx">set</span> <span class="s1">&#39;_remote.seq&#39;</span><span class="p">,</span> <span class="nx">response</span><span class="p">.</span><span class="nx">lastSeq</span>
+    <span class="nx">@hoodie</span><span class="p">.</span><span class="nx">my</span><span class="p">.</span><span class="nx">config</span><span class="p">.</span><span class="nx">set</span> <span class="s1">&#39;_remote.seq&#39;</span><span class="p">,</span> <span class="nx">response</span><span class="p">.</span><span class="nx">last_seq</span>
     <span class="nx">@_handlePullResults</span> <span class="nx">response</span><span class="p">.</span><span class="nx">results</span>
     
     <span class="nx">@pull</span><span class="p">()</span> <span class="k">if</span> <span class="nx">@connected</span> <span class="o">and</span> <span class="nx">@active</span>

@@ -4,7 +4,7 @@
 # Connection / Socket to our couch
 #
 # RemoteStore is using CouchDB's `_changes` feed to listen to changes
-# and `_bulkDocs` to push local changes
+# and `_bulk_docs` to push local changes
 #
 # When hoodie.my.remote is active (default), it will continuously 
 # synchronize, otherwise sync, pull or push can be called manually
@@ -85,7 +85,7 @@ class Hoodie.RemoteStore
     
   # ## push changes
   #
-  # Push objects to userDB using the `_bulkDocs` API.
+  # Push objects to userDB using the `_bulk_docs` API.
   # If no objects passed, push all changed documents
   push : (docs) =>
     
@@ -94,7 +94,7 @@ class Hoodie.RemoteStore
       
     docsForRemote = (@_parseForRemote doc for doc in docs)
     
-    @_pushRequest = @hoodie.request 'POST', "/#{encodeURIComponent @hoodie.my.account.db()}/_bulkDocs", 
+    @_pushRequest = @hoodie.request 'POST', "/#{encodeURIComponent @hoodie.my.account.db()}/_bulk_docs", 
       dataType:     'json'
       processData:  false
       contentType:  'application/json'
@@ -149,7 +149,7 @@ class Hoodie.RemoteStore
   # handle the incoming changes, then send the next request
   #
   _handlePullSuccess : (response) =>
-    @hoodie.my.config.set '_remote.seq', response.lastSeq
+    @hoodie.my.config.set '_remote.seq', response.last_seq
     @_handlePullResults response.results
     
     @pull() if @connected and @active

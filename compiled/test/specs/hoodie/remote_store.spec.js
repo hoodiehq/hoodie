@@ -368,9 +368,9 @@ describe("Hoodie.RemoteStore", function() {
           expect(this.hoodie.request).wasCalled();
           return _ref = this.hoodie.request.mostRecentCall.args, this.method = _ref[0], this.path = _ref[1], this.options = _ref[2], _ref;
         });
-        it("should post the changes to the user's db _bulkDocs API", function() {
+        it("should post the changes to the user's db _bulk_docs API", function() {
           expect(this.method).toBe('POST');
-          return expect(this.path).toBe('/joe%24examleCom/_bulkDocs');
+          return expect(this.path).toBe('/joe%24examleCom/_bulk_docs');
         });
         it("should set dataType to json", function() {
           return expect(this.options.dataType).toBe('json');

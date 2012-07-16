@@ -606,7 +606,7 @@ Hoodie.RemoteStore = (function() {
       }
       return _results;
     }).call(this);
-    this._pushRequest = this.hoodie.request('POST', "/" + (encodeURIComponent(this.hoodie.my.account.db())) + "/_bulkDocs", {
+    this._pushRequest = this.hoodie.request('POST', "/" + (encodeURIComponent(this.hoodie.my.account.db())) + "/_bulk_docs", {
       dataType: 'json',
       processData: false,
       contentType: 'application/json',
@@ -646,7 +646,7 @@ Hoodie.RemoteStore = (function() {
   };
 
   RemoteStore.prototype._handlePullSuccess = function(response) {
-    this.hoodie.my.config.set('_remote.seq', response.lastSeq);
+    this.hoodie.my.config.set('_remote.seq', response.last_seq);
     this._handlePullResults(response.results);
     if (this.connected && this.active) {
       return this.pull();

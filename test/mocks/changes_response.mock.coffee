@@ -17,5 +17,5 @@ Mocks.changesResponse = ->
         "doc"     :{"_id":"todo/abc2","_rev":"1-123","content":"remember the milk","done":false,"order":1, "type":"todo"}
       }
     ],
-    "lastSeq":20
+    "last_seq":20
   }`
