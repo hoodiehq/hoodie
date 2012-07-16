@@ -8,9 +8,19 @@ describe "Hoodie.RemoteStore", ->
   
   
   describe ".constructor(@hoodie, options = {})", ->
+
     it "should set @basePath", ->
       remote = new Hoodie.RemoteStore @hoodie, basePath: '/base/path'
       expect(remote.basePath).toBe '/base/path'
+
+    it "should set _sync to false by default", ->
+      remote = new Hoodie.RemoteStore @hoodie
+      expect(remote._sync).toBe false
+
+    it "should set _sync to false from pased sync option", ->
+      remote = new Hoodie.RemoteStore @hoodie, sync: true
+      expect(remote._sync).toBe true
+    
     
   # /.constructor
 
@@ -61,6 +71,72 @@ describe "Hoodie.RemoteStore", ->
 
   describe ".disconnect()", -> 
   # /.disconnect()
+
+  describe ".isContinuouslyPulling()", ->
+    _when "remote._sync is false", ->
+      it "should return false", ->
+        @remote._sync = false
+        expect(@remote.isContinuouslyPulling()).toBe false
+
+    _when "remote._sync is true", ->
+      it "should return true", ->
+        @remote._sync = true
+        expect(@remote.isContinuouslyPulling()).toBe true
+
+    _when "remote._sync is pull: true", ->
+      it "should return true", ->
+        @remote._sync = pull: true
+        expect(@remote.isContinuouslyPulling()).toBe true
+
+    _when "remote._sync is push: true", ->
+      it "should return false", ->
+        @remote._sync = push: true
+        expect(@remote.isContinuouslyPulling()).toBe false
+  # /.isContinuouslySyncing()
+
+  describe ".isContinuouslyPushing()", ->
+    _when "remote._sync is false", ->
+      it "should return false", ->
+        @remote._sync = false
+        expect(@remote.isContinuouslyPushing()).toBe false
+
+    _when "remote._sync is true", ->
+      it "should return true", ->
+        @remote._sync = true
+        expect(@remote.isContinuouslyPushing()).toBe true
+
+    _when "remote._sync is pull: true", ->
+      it "should return false", ->
+        @remote._sync = pull: true
+        expect(@remote.isContinuouslyPushing()).toBe false
+
+    _when "remote._sync is push: true", ->
+      it "should return true", ->
+        @remote._sync = push: true
+        expect(@remote.isContinuouslyPushing()).toBe true
+  # /.isContinuouslySyncing()
+
+  describe ".isContinuouslySyncing()", ->
+    _when "remote._sync is false", ->
+      it "should return false", ->
+        @remote._sync = false
+        expect(@remote.isContinuouslySyncing()).toBe false
+
+    _when "remote._sync is true", ->
+      it "should return true", ->
+        @remote._sync = true
+        expect(@remote.isContinuouslySyncing()).toBe true
+
+    _when "remote._sync is pull: true", ->
+      it "should return false", ->
+        @remote._sync = pull: true
+        expect(@remote.isContinuouslySyncing()).toBe false
+
+    _when "remote._sync is push: true", ->
+      it "should return false", ->
+        @remote._sync = push: true
+        expect(@remote.isContinuouslySyncing()).toBe false
+  # /.isContinuouslySyncing()
 
   describe ".pull()", ->
   # /.pull()

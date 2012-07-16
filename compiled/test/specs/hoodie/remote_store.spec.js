@@ -9,12 +9,24 @@ describe("Hoodie.RemoteStore", function() {
     return spyOn(this.hoodie, "unbind");
   });
   describe(".constructor(@hoodie, options = {})", function() {
-    return it("should set @basePath", function() {
+    it("should set @basePath", function() {
       var remote;
       remote = new Hoodie.RemoteStore(this.hoodie, {
         basePath: '/base/path'
       });
       return expect(remote.basePath).toBe('/base/path');
+    });
+    it("should set _sync to false by default", function() {
+      var remote;
+      remote = new Hoodie.RemoteStore(this.hoodie);
+      return expect(remote._sync).toBe(false);
+    });
+    return it("should set _sync to false from pased sync option", function() {
+      var remote;
+      remote = new Hoodie.RemoteStore(this.hoodie, {
+        sync: true
+      });
+      return expect(remote._sync).toBe(true);
     });
   });
   describe("load(type, id)", function() {});
@@ -29,6 +41,96 @@ describe("Hoodie.RemoteStore", function() {
   describe("post(view, params)", function() {});
   describe(".connect()", function() {});
   describe(".disconnect()", function() {});
+  describe(".isContinuouslyPulling()", function() {
+    _when("remote._sync is false", function() {
+      return it("should return false", function() {
+        this.remote._sync = false;
+        return expect(this.remote.isContinuouslyPulling()).toBe(false);
+      });
+    });
+    _when("remote._sync is true", function() {
+      return it("should return true", function() {
+        this.remote._sync = true;
+        return expect(this.remote.isContinuouslyPulling()).toBe(true);
+      });
+    });
+    _when("remote._sync is pull: true", function() {
+      return it("should return true", function() {
+        this.remote._sync = {
+          pull: true
+        };
+        return expect(this.remote.isContinuouslyPulling()).toBe(true);
+      });
+    });
+    return _when("remote._sync is push: true", function() {
+      return it("should return false", function() {
+        this.remote._sync = {
+          push: true
+        };
+        return expect(this.remote.isContinuouslyPulling()).toBe(false);
+      });
+    });
+  });
+  describe(".isContinuouslyPushing()", function() {
+    _when("remote._sync is false", function() {
+      return it("should return false", function() {
+        this.remote._sync = false;
+        return expect(this.remote.isContinuouslyPushing()).toBe(false);
+      });
+    });
+    _when("remote._sync is true", function() {
+      return it("should return true", function() {
+        this.remote._sync = true;
+        return expect(this.remote.isContinuouslyPushing()).toBe(true);
+      });
+    });
+    _when("remote._sync is pull: true", function() {
+      return it("should return false", function() {
+        this.remote._sync = {
+          pull: true
+        };
+        return expect(this.remote.isContinuouslyPushing()).toBe(false);
+      });
+    });
+    return _when("remote._sync is push: true", function() {
+      return it("should return true", function() {
+        this.remote._sync = {
+          push: true
+        };
+        return expect(this.remote.isContinuouslyPushing()).toBe(true);
+      });
+    });
+  });
+  describe(".isContinuouslySyncing()", function() {
+    _when("remote._sync is false", function() {
+      return it("should return false", function() {
+        this.remote._sync = false;
+        return expect(this.remote.isContinuouslySyncing()).toBe(false);
+      });
+    });
+    _when("remote._sync is true", function() {
+      return it("should return true", function() {
+        this.remote._sync = true;
+        return expect(this.remote.isContinuouslySyncing()).toBe(true);
+      });
+    });
+    _when("remote._sync is pull: true", function() {
+      return it("should return false", function() {
+        this.remote._sync = {
+          pull: true
+        };
+        return expect(this.remote.isContinuouslySyncing()).toBe(false);
+      });
+    });
+    return _when("remote._sync is push: true", function() {
+      return it("should return false", function() {
+        this.remote._sync = {
+          push: true
+        };
+        return expect(this.remote.isContinuouslySyncing()).toBe(false);
+      });
+    });
+  });
   describe(".pull()", function() {});
   describe(".push(docs)", function() {});
   describe(".sync(docs)", function() {});
