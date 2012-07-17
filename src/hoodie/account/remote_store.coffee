@@ -31,7 +31,7 @@ class Hoodie.Account.RemoteStore extends Hoodie.RemoteStore
   
 
   # ## startSyncing
-  #
+
   # start continuous syncing with current users store
   # 
   startSyncing : =>
@@ -43,7 +43,7 @@ class Hoodie.Account.RemoteStore extends Hoodie.RemoteStore
     @connect()
 
   # ## stopSyncing
-  #
+
   # stop continuous syncing with current users store
   # 
   stopSyncing : =>
@@ -56,7 +56,7 @@ class Hoodie.Account.RemoteStore extends Hoodie.RemoteStore
     
 
   # ## Connect
-  #
+
   # do not start to sync immediately, but authenticate beforehand
   connect : =>
     @hoodie.my.account.authenticate().pipe =>  
@@ -64,7 +64,7 @@ class Hoodie.Account.RemoteStore extends Hoodie.RemoteStore
     
 
   # ## get and set since nr
-  #
+
   # we store the last since number from the current user's store
   # in his config
   getSinceNr: (since) ->
@@ -74,7 +74,7 @@ class Hoodie.Account.RemoteStore extends Hoodie.RemoteStore
 
 
   # ## push
-  #
+
   # if no docs passed to be pushed, we default to users changed objects
   # in his store
   push: (docs) =>

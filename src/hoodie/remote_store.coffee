@@ -40,7 +40,7 @@ class Hoodie.RemoteStore
   # ## properties
   
   # sync  
-  #
+
   # if set to true, updates will be continuously pulled
   # and pushed. Alternatively, `_sync` can be set to
   # `pull: true` or `push: true`.
@@ -48,7 +48,8 @@ class Hoodie.RemoteStore
 
 
   # ## Constructor 
-  #
+  
+  # sets basePath (think: namespace) and some other options
   constructor : (@hoodie, options = {}) ->
     @basePath = options.basePath or ''
     @_sync    = options.sync      if options.sync
@@ -60,49 +61,58 @@ class Hoodie.RemoteStore
 
   
   # ## load
-  #
+  
+  # load one object
   load: (type, id) ->
     console.log ".load() not yet implemented", arguments...
 
   
   # ## loadAll
-  #
+  
+  # load all objects, can be filetered by a type
   loadAll: (type) ->
     console.log ".loadAll() not yet implemented", arguments...
 
   
   # ## create
-  #
+  
+  # create a new object
   create: (type, object) ->
     console.log ".create() not yet implemented", arguments...
 
   
   # ## save
-  #
+  
+  # save a new object. If it existed before, all properties
+  # will be overwritten 
   save: (type, id, object) ->
     console.log ".save() not yet implemented", arguments...
 
   
   # ## update
-  #
+  
+  # update an existing object
   update: (new_properties) ->
     console.log ".update() not yet implemented", arguments...
 
   
   # ## updateAll
-  #
+  
+  # update all existing objects, can be filetered by type
   updateAll: (type, new_properties) ->
     console.log ".updateAll() not yet implemented", arguments...
 
   
   # ## delete
-  #
+  
+  # delete one object
   delete: (type, id) ->
     console.log ".delete() not yet implemented", arguments...
 
   
   # ## deleteAll
-  #
+  
+  # delete all objects, can be filtered by type
   deleteAll: (type) ->
     console.log ".deleteAll() not yet implemented", arguments...
 
@@ -113,7 +123,7 @@ class Hoodie.RemoteStore
 
   
   # ## request
-  #
+  
   # wrapper for hoodie.request, with some store specific defaults
   # and a prefixed path
   request: (type, path, options = {}) ->
@@ -127,14 +137,16 @@ class Hoodie.RemoteStore
     @hoodie.request type, path, options
 
   # ## get
-  #
-  get: (view, params) ->
+  
+  # send a GET request to the named view
+  get: (view_name, params) ->
     console.log ".get() not yet implemented", arguments...
   
   
   # ## post
-  #  
-  post: (view, params) ->
+  
+  # sends a POST request to the specified updated_function
+  post: (update_function_name, params) ->
     console.log ".post() not yet implemented", arguments...
 
 
@@ -143,7 +155,7 @@ class Hoodie.RemoteStore
   # -----------------
 
   # ## Connect
-  #
+
   # start syncing
   connect : =>
     @connected = true
@@ -151,7 +163,7 @@ class Hoodie.RemoteStore
   
     
   # ## Disconnect
-  #
+
   # stop syncing changes from the userDB
   disconnect : =>
     @connected = false
@@ -164,32 +176,32 @@ class Hoodie.RemoteStore
 
 
   # ## isContinuouslyPulling
-  #
+
   # returns true if pulling is set to be continous
   isContinuouslyPulling: ->
     @_sync is true or @_sync?.pull is true
 
   # ## isContinuouslyPushing
-  #
+
   # returns true if pulling is set to be continous
   isContinuouslyPushing: ->
     @_sync is true or @_sync?.push is true
 
   # ## isContinuouslySyncing
-  #
+
   # returns true if pulling is set to be continous
   isContinuouslySyncing: ->
     @_sync is true
 
   # ## getSinceNr
-  #
+
   # returns the sequence number from wich to start to load changes in pull
   #
   getSinceNr: ->
     @_since or 0
 
   # ## setSinceNr
-  #
+
   # sets the sequence number from wich to start to load changes in pull
   #
   setSinceNr: (seq) ->
@@ -197,7 +209,7 @@ class Hoodie.RemoteStore
 
 
   # ## pull changes
-  #
+
   # a.k.a. make a GET request to CouchDB's `_changes` feed.
   #
   pull : =>
@@ -211,7 +223,7 @@ class Hoodie.RemoteStore
     
     
   # ## push changes
-  #
+
   # Push objects to userDB using the `_bulk_docs` API.
   # If no objects passed, push all changed documents
   push : (docs) =>
@@ -230,7 +242,7 @@ class Hoodie.RemoteStore
 
 
   # ## sync changes
-  #
+
   # pull ... and push ;-)
   sync : (docs) =>
     if @isContinuouslyPushing()
@@ -241,7 +253,7 @@ class Hoodie.RemoteStore
 
   
   # ## On
-  #
+
   # alias for `hoodie.on`
   on : (event, cb) -> @hoodie.on "remote:#{event}", cb
   
@@ -250,9 +262,8 @@ class Hoodie.RemoteStore
   # ## Private
   
   
-  #
-  # pull url
-  #
+  # ### pull url
+
   # Depending on whether isContinuouslyPulling() is true, return a longpoll URL or not
   #
   _pullUrl : ->
@@ -266,9 +277,9 @@ class Hoodie.RemoteStore
   _restartPullRequest : => @_pullRequest?.abort()
   
   
-  #
-  # pull success handler 
-  #
+
+  # ### pull success handler 
+
   # handle the incoming changes, then send the next request
   #
   _handlePullSuccess : (response) =>
@@ -278,9 +289,9 @@ class Hoodie.RemoteStore
     @pull() if @connected and @isContinuouslyPulling()
   
   
-  # 
-  # pull error handler 
-  #
+
+  # ### pull error handler 
+
   # when there is a change, trigger event, 
   # then check for another change
   #
@@ -333,6 +344,8 @@ class Hoodie.RemoteStore
   ]
 
 
+  # ### parse from remote
+
   # parse object for remote storage. All attributes starting with an 
   # `underscore` do not get synchronized despite the special attributes
   # `_id`, `_rev` and `_deleted` (see above)
@@ -357,7 +370,8 @@ class Hoodie.RemoteStore
     return attributes
   
 
-  #
+  # ### generate new revision id
+
   # generates a revision id in the for of {uuid}#{UTC timestamp}
   # Beware that it does not include a leading revision number
   _generateNewRevisionId:  ->
@@ -369,7 +383,8 @@ class Hoodie.RemoteStore
     "#{uuid}##{timestamp}"
   
 
-  #
+  # ### and new revion to objecet
+
   # get new revision number
   #
   _addRevisionTo : (attributes) ->
@@ -387,9 +402,10 @@ class Hoodie.RemoteStore
       attributes._revisions.start += currentRevNr
       attributes._revisions.ids.push currentRevId
     
-    
-  # parse object coming from pull for local storage. 
-  # 
+  
+
+  # ### parse object coming from pull for local storage. 
+
   # renames `_id` attribute to `id` and removes the type from the id,
   # e.g. `document/123` -> `123`
   _parseFromPull : (obj) ->
@@ -411,8 +427,8 @@ class Hoodie.RemoteStore
     return obj
   
   
-  # parse object response coming from push for local storage. 
-  # 
+  # ### parse object response coming from push for local storage. 
+
   # removes the type from the id, e.g. `document/123` -> `123`
   # also removes attribute ok
   _parseFromPush : (obj) ->
@@ -432,9 +448,9 @@ class Hoodie.RemoteStore
     return obj
   
 
-  #
-  # handle changes from remote
-  #
+
+  # ### handle changes from remote
+  
   # note: we don't trigger any events until all changes have been taken care of.
   #       Reason is, that on object could depend on a different object that has
   #       not been stored yet, but is within the same bulk of changes. This 
@@ -475,10 +491,11 @@ class Hoodie.RemoteStore
         @hoodie.trigger "remote:change:#{doc.type}:#{doc.id}",   event, object
 
 
+
+  # ### handle push success
+
+  # bli bla blup :-)
   #
-  # handle push success
-  #
-  # 
   _handlePushSuccess: (docs, pushedDocs) =>
     =>
       for doc, i in docs

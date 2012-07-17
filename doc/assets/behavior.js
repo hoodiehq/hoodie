@@ -1104,7 +1104,90 @@ f.event={add:function(a,c,d,e,g){var h,i,j,k,l,m,n,o,p,q,r,s;if(!(a.nodeType===3
                     "title": "Private",
                     "slug": "private"
                   },
-                  "depth": 2
+                  "depth": 2,
+                  "children": [
+                    {
+                      "type": "heading",
+                      "data": {
+                        "level": 3,
+                        "title": "pull url",
+                        "slug": "pull-url"
+                      },
+                      "depth": 3
+                    }, {
+                      "type": "heading",
+                      "data": {
+                        "level": 3,
+                        "title": "pull success handler",
+                        "slug": "pull-success-handler"
+                      },
+                      "depth": 3
+                    }, {
+                      "type": "heading",
+                      "data": {
+                        "level": 3,
+                        "title": "pull error handler",
+                        "slug": "pull-error-handler"
+                      },
+                      "depth": 3
+                    }, {
+                      "type": "heading",
+                      "data": {
+                        "level": 3,
+                        "title": "parse from remote",
+                        "slug": "parse-from-remote"
+                      },
+                      "depth": 3
+                    }, {
+                      "type": "heading",
+                      "data": {
+                        "level": 3,
+                        "title": "generate new revision id",
+                        "slug": "generate-new-revision-id"
+                      },
+                      "depth": 3
+                    }, {
+                      "type": "heading",
+                      "data": {
+                        "level": 3,
+                        "title": "and new revion to objecet",
+                        "slug": "and-new-revion-to-objecet"
+                      },
+                      "depth": 3
+                    }, {
+                      "type": "heading",
+                      "data": {
+                        "level": 3,
+                        "title": "parse object coming from pull for local storage.",
+                        "slug": "parse-object-coming-from-pull-for-local-storage"
+                      },
+                      "depth": 3
+                    }, {
+                      "type": "heading",
+                      "data": {
+                        "level": 3,
+                        "title": "parse object response coming from push for local storage.",
+                        "slug": "parse-object-response-coming-from-push-for-local-storage"
+                      },
+                      "depth": 3
+                    }, {
+                      "type": "heading",
+                      "data": {
+                        "level": 3,
+                        "title": "handle changes from remote",
+                        "slug": "handle-changes-from-remote"
+                      },
+                      "depth": 3
+                    }, {
+                      "type": "heading",
+                      "data": {
+                        "level": 3,
+                        "title": "handle push success",
+                        "slug": "handle-push-success"
+                      },
+                      "depth": 3
+                    }
+                  ]
                 }
               ]
             },
@@ -1343,7 +1426,90 @@ f.event={add:function(a,c,d,e,g){var h,i,j,k,l,m,n,o,p,q,r,s;if(!(a.nodeType===3
                 "title": "Private",
                 "slug": "private"
               },
-              "depth": 2
+              "depth": 2,
+              "children": [
+                {
+                  "type": "heading",
+                  "data": {
+                    "level": 3,
+                    "title": "pull url",
+                    "slug": "pull-url"
+                  },
+                  "depth": 3
+                }, {
+                  "type": "heading",
+                  "data": {
+                    "level": 3,
+                    "title": "pull success handler",
+                    "slug": "pull-success-handler"
+                  },
+                  "depth": 3
+                }, {
+                  "type": "heading",
+                  "data": {
+                    "level": 3,
+                    "title": "pull error handler",
+                    "slug": "pull-error-handler"
+                  },
+                  "depth": 3
+                }, {
+                  "type": "heading",
+                  "data": {
+                    "level": 3,
+                    "title": "parse from remote",
+                    "slug": "parse-from-remote"
+                  },
+                  "depth": 3
+                }, {
+                  "type": "heading",
+                  "data": {
+                    "level": 3,
+                    "title": "generate new revision id",
+                    "slug": "generate-new-revision-id"
+                  },
+                  "depth": 3
+                }, {
+                  "type": "heading",
+                  "data": {
+                    "level": 3,
+                    "title": "and new revion to objecet",
+                    "slug": "and-new-revion-to-objecet"
+                  },
+                  "depth": 3
+                }, {
+                  "type": "heading",
+                  "data": {
+                    "level": 3,
+                    "title": "parse object coming from pull for local storage.",
+                    "slug": "parse-object-coming-from-pull-for-local-storage"
+                  },
+                  "depth": 3
+                }, {
+                  "type": "heading",
+                  "data": {
+                    "level": 3,
+                    "title": "parse object response coming from push for local storage.",
+                    "slug": "parse-object-response-coming-from-push-for-local-storage"
+                  },
+                  "depth": 3
+                }, {
+                  "type": "heading",
+                  "data": {
+                    "level": 3,
+                    "title": "handle changes from remote",
+                    "slug": "handle-changes-from-remote"
+                  },
+                  "depth": 3
+                }, {
+                  "type": "heading",
+                  "data": {
+                    "level": 3,
+                    "title": "handle push success",
+                    "slug": "handle-push-success"
+                  },
+                  "depth": 3
+                }
+              ]
             }
           ]
         }, {
