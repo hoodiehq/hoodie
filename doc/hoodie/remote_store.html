@@ -45,8 +45,13 @@ and pushed. Alternatively, <code>_sync</code> can be set to
     <span class="nx">console</span><span class="p">.</span><span class="nx">log</span> <span class="s2">&quot;.load() not yet implemented&quot;</span><span class="p">,</span> <span class="nx">arguments</span><span class="p">...</span>
 
   </div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h2 id="loadall">loadAll</h2></div></div><div class="code"><div class="wrapper">  </div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>load all objects, can be filetered by a type</p></div></div><div class="code"><div class="wrapper">  <span class="nv">loadAll: </span><span class="nf">(type) -&gt;</span>
-    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span> <span class="s2">&quot;.loadAll() not yet implemented&quot;</span><span class="p">,</span> <span class="nx">arguments</span><span class="p">...</span>
+    <span class="nv">defer = </span><span class="nx">@hoodie</span><span class="p">.</span><span class="nx">defer</span><span class="p">()</span>
+    <span class="nv">promise = </span><span class="nx">@request</span> <span class="s2">&quot;GET&quot;</span><span class="p">,</span> <span class="s2">&quot;/_all_docs&quot;</span>
+    <span class="nx">promise</span><span class="p">.</span><span class="nx">fail</span> <span class="nx">defer</span><span class="p">.</span><span class="nx">reject</span>
+    <span class="nx">promise</span><span class="p">.</span><span class="nx">done</span> <span class="nf">(response) -&gt;</span>
+      <span class="nx">defer</span><span class="p">.</span><span class="nx">resolve</span> <span class="nx">response</span><span class="p">.</span><span class="nx">rows</span>
 
+    <span class="nx">defer</span><span class="p">.</span><span class="nx">promise</span><span class="p">()</span>
   </div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h2 id="create">create</h2></div></div><div class="code"><div class="wrapper">  </div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>create a new object</p></div></div><div class="code"><div class="wrapper">  <span class="nv">create: </span><span class="nf">(type, object) -&gt;</span>
     <span class="nx">console</span><span class="p">.</span><span class="nx">log</span> <span class="s2">&quot;.create() not yet implemented&quot;</span><span class="p">,</span> <span class="nx">arguments</span><span class="p">...</span>
 

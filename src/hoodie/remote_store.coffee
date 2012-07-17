@@ -71,8 +71,13 @@ class Hoodie.RemoteStore
   
   # load all objects, can be filetered by a type
   loadAll: (type) ->
-    console.log ".loadAll() not yet implemented", arguments...
+    defer = @hoodie.defer()
+    promise = @request "GET", "/_all_docs"
+    promise.fail defer.reject
+    promise.done (response) ->
+      defer.resolve response.rows
 
+    defer.promise()
   
   # ## create
   

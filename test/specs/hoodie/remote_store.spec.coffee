@@ -43,7 +43,7 @@ describe "Hoodie.RemoteStore", ->
   describe "load(type, id)", ->
   # /load(type, id)
 
-  describe "loadAll(type )", ->
+  describe "loadAll(type)", ->
   # /loadAll(type )
 
   describe "create(type, object)", ->

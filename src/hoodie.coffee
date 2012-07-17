@@ -21,7 +21,7 @@ class Hoodie extends Events
 
 
   # ## initialization
-  #
+
   # Inits the Hoodie, an optional CouchDB URL can be passed
   constructor : (@baseUrl = '') ->
 
@@ -31,10 +31,10 @@ class Hoodie extends Events
   
 
   # ## Request
-  #
+
   # use this method to send AJAX request to the Couch.
   #
-  request: (type, path, options = {}) ->
+  request : (type, path, options = {}) ->
     defaults =
       type        : type
       url         : "#{@baseUrl}#{path}"
@@ -43,10 +43,26 @@ class Hoodie extends Events
       dataType    : 'json'
 
     $.ajax $.extend defaults, options
-  
+
+
+  # ## open
+
+  # generic method to open a store. Used by
+  #
+  # * hoodie.my.remote
+  # * hoodie.user("joe")
+  # * hoodie.global
+  # * ... and more
+  #
+  # usage: `hoodie.open("some_store_name").loadAll()`
+  #
+  open : (store_name) ->
+    new Hoodie.RemoteStore this, basePath: "/#{encodeURIComponent store_name}"
+
+
 
   # ## Promise
-  #
+
   # returns a promise skeletton for custom promise handlings
   defer: $.Deferred
   

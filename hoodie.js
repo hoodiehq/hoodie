@@ -119,6 +119,12 @@ Hoodie = (function(_super) {
     return $.ajax($.extend(defaults, options));
   };
 
+  Hoodie.prototype.open = function(store_name) {
+    return new Hoodie.RemoteStore(this, {
+      basePath: "/" + (encodeURIComponent(store_name))
+    });
+  };
+
   Hoodie.prototype.defer = $.Deferred;
 
   Hoodie.prototype.isPromise = function(obj) {
@@ -426,7 +432,14 @@ Hoodie.RemoteStore = (function() {
   };
 
   RemoteStore.prototype.loadAll = function(type) {
-    return console.log.apply(console, [".loadAll() not yet implemented"].concat(__slice.call(arguments)));
+    var defer, promise;
+    defer = this.hoodie.defer();
+    promise = this.request("GET", "/_all_docs");
+    promise.fail(defer.reject);
+    promise.done(function(response) {
+      return defer.resolve(response.rows);
+    });
+    return defer.promise();
   };
 
   RemoteStore.prototype.create = function(type, object) {

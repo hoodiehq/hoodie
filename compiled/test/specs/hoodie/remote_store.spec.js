@@ -49,7 +49,7 @@ describe("Hoodie.RemoteStore", function() {
     });
   });
   describe("load(type, id)", function() {});
-  describe("loadAll(type )", function() {});
+  describe("loadAll(type)", function() {});
   describe("create(type, object)", function() {});
   describe("save(type, id, object)", function() {});
   describe("update(new_properties )", function() {});
