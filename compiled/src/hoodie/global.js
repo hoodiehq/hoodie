@@ -3,9 +3,7 @@
 Hoodie.Global = (function() {
 
   function Global(hoodie) {
-    return new Hoodie.RemoteStore(hoodie, {
-      basePath: "/global"
-    });
+    return hoodie.open("global");
   }
 
   return Global;

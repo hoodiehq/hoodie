@@ -18,4 +18,4 @@ class Hoodie.Global
 
     # vanilla API syntax:
     # hoodie.global.loadAll()
-    return new Hoodie.RemoteStore hoodie, basePath: "/global"
+    return hoodie.open "global"

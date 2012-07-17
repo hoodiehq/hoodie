@@ -15,8 +15,8 @@ class Hoodie.User
     # vanilla API syntax:
     # hoodie.user('joe').loadAll()
     return (username) => 
-      new Hoodie.RemoteStore hoodie, basePath: @_userPublicStoreUrl(username)
+      hoodie.open @_userPublicStoreName(username)
 
-  _userPublicStoreUrl: (username) ->
+  _userPublicStoreName: (username) ->
     dbName = username.toLowerCase().replace(/@/, "$").replace(/\./g, "_");
-    "/" + encodeURIComponent "#{dbName}/public"
+    "#{dbName}/public"

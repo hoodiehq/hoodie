@@ -1433,16 +1433,14 @@ Hoodie.User = (function() {
   function User(hoodie) {
     var _this = this;
     return function(username) {
-      return new Hoodie.RemoteStore(hoodie, {
-        basePath: _this._userPublicStoreUrl(username)
-      });
+      return hoodie.open(_this._userPublicStoreName(username));
     };
   }
 
-  User.prototype._userPublicStoreUrl = function(username) {
+  User.prototype._userPublicStoreName = function(username) {
     var dbName;
     dbName = username.toLowerCase().replace(/@/, "$").replace(/\./g, "_");
-    return "/" + encodeURIComponent("" + dbName + "/public");
+    return "" + dbName + "/public";
   };
 
   return User;
@@ -1453,9 +1451,7 @@ Hoodie.User = (function() {
 Hoodie.Global = (function() {
 
   function Global(hoodie) {
-    return new Hoodie.RemoteStore(hoodie, {
-      basePath: "/global"
-    });
+    return hoodie.open("global");
   }
 
   return Global;
