@@ -22,7 +22,7 @@ hoodie.global.on("created:track", function(track) {})
 // 
 // I can open any kind of named store, like a sharing or a users public
 // store. An "opened" store does always provide the same API whereat
-// some might require special privileges. The all return a promise
+// some might require special privileges. They all return a promise
 
 // instantiate
 store = hoodie.open("share/abc8320")
@@ -45,6 +45,8 @@ store.disconnect()
 store.pull()
 store.push()
 store.sync()
+
+// event binding
 store.on("event", callback)
 
 
