@@ -131,7 +131,7 @@
 
 
     //
-    // Public Share
+    // Public Shares (Public User Stores)
     //
     // Select data you want to share with others and control exactly what will
     // be shared
@@ -149,6 +149,18 @@
 
     // load all couches from user "joe"
     hoodie.user("joe").loadAll("couch").done( function(couches) { ... })
+
+
+    //
+    // Global Public Store
+    // 
+    // When enabled, all publicly shared objects by all users will be 
+    // available through the hoodie.global API
+    //
+
+    // load all public songs from all users
+    hoodie.global.loadAll("song").done( function(songs) { ... })
+
     
     
     //
