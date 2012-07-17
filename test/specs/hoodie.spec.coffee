@@ -51,6 +51,12 @@ describe "Hoodie", ->
       it "should send a POST request to http://couch.example.com/test", ->
         expect(@args.type).toBe 'POST'
         expect(@args.url).toBe 'http://couch.example.com/test'
-      
   # /request(type, path, options)
+
+  describe "open(store, options)", ->
+    it "should instantiate a RemoteStore instance", ->
+      spyOn(Hoodie, "RemoteStore")
+      @hoodie.open "store_name", option: "value"
+      expect(Hoodie.RemoteStore).wasCalledWith @hoodie, basePath: "/store_name", option: "value"
+  # /open(store, options)
 # /Hoodie

@@ -22,7 +22,7 @@ describe("Hoodie", function() {
       return expect(hoodie.baseUrl).toBe('');
     });
   });
-  return describe("request(type, path, options)", function() {
+  describe("request(type, path, options)", function() {
     _when("request('GET', '/')", function() {
       beforeEach(function() {
         var args;
@@ -62,6 +62,18 @@ describe("Hoodie", function() {
       return it("should send a POST request to http://couch.example.com/test", function() {
         expect(this.args.type).toBe('POST');
         return expect(this.args.url).toBe('http://couch.example.com/test');
+      });
+    });
+  });
+  return describe("open(store, options)", function() {
+    return it("should instantiate a RemoteStore instance", function() {
+      spyOn(Hoodie, "RemoteStore");
+      this.hoodie.open("store_name", {
+        option: "value"
+      });
+      return expect(Hoodie.RemoteStore).wasCalledWith(this.hoodie, {
+        basePath: "/store_name",
+        option: "value"
       });
     });
   });

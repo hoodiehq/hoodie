@@ -56,14 +56,14 @@ class Hoodie extends Events
   #
   # usage: `hoodie.open("some_store_name").loadAll()`
   #
-  open : (store_name) ->
-    new Hoodie.RemoteStore this, basePath: "/#{encodeURIComponent store_name}"
+  open : (store_name, options = {}) ->
+    $.extend options, basePath: "/#{encodeURIComponent store_name}"
+    new Hoodie.RemoteStore this, options
 
 
+  # ## Defer
 
-  # ## Promise
-
-  # returns a promise skeletton for custom promise handlings
+  # returns a defer object for custom promise handlings
   defer: $.Deferred
   
 

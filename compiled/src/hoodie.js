@@ -44,10 +44,14 @@ Hoodie = (function(_super) {
     return $.ajax($.extend(defaults, options));
   };
 
-  Hoodie.prototype.open = function(store_name) {
-    return new Hoodie.RemoteStore(this, {
+  Hoodie.prototype.open = function(store_name, options) {
+    if (options == null) {
+      options = {};
+    }
+    $.extend(options, {
       basePath: "/" + (encodeURIComponent(store_name))
     });
+    return new Hoodie.RemoteStore(this, options);
   };
 
   Hoodie.prototype.defer = $.Deferred;
