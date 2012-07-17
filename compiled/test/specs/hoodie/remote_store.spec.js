@@ -53,16 +53,41 @@ describe("Hoodie.RemoteStore", function() {
     beforeEach(function() {
       return spyOn(this.remote, "request").andReturn(this.requestDefer.promise());
     });
+    it("should return a promise", function() {
+      return expect(this.remote.loadAll()).toBePromise();
+    });
     _when("type is not set", function() {
       return it("should send a GET to /_all_docs", function() {
         this.remote.loadAll();
         return expect(this.remote.request).wasCalledWith("GET", "/_all_docs");
       });
     });
-    return _when("type is todo", function() {
+    _when("type is todo", function() {
       return it('should send a GET to /_all_docs?startkey="todo"&endkey="todo0"', function() {
         this.remote.loadAll('todo');
         return expect(this.remote.request).wasCalledWith("GET", '/_all_docs?startkey="todo"&endkey="todo0"');
+      });
+    });
+    _when("request success", function() {
+      beforeEach(function() {
+        return this.requestDefer.resolve({
+          rows: "rows_array"
+        });
+      });
+      return it("should be resolved with array of objects", function() {
+        var promise;
+        promise = this.remote.loadAll();
+        return expect(promise).toBeResolvedWith("rows_array");
+      });
+    });
+    return _when("request has an error", function() {
+      beforeEach(function() {
+        return this.requestDefer.reject("error");
+      });
+      return it("should be rejected with the response error", function() {
+        var promise;
+        promise = this.remote.loadAll();
+        return expect(promise).toBeRejectedWith("error");
       });
     });
   });

@@ -41,12 +41,16 @@ describe "Hoodie.RemoteStore", ->
   # -------------------------------------
 
   describe "load(type, id)", ->
+
   # /load(type, id)
 
   describe "loadAll(type)", ->
     beforeEach ->
       spyOn(@remote, "request").andReturn @requestDefer.promise()
     
+    it "should return a promise", ->
+      expect(@remote.loadAll()).toBePromise()
+
     _when "type is not set", ->
       it "should send a GET to /_all_docs", ->
         @remote.loadAll()
@@ -56,7 +60,23 @@ describe "Hoodie.RemoteStore", ->
       it 'should send a GET to /_all_docs?startkey="todo"&endkey="todo0"', ->
         @remote.loadAll('todo')
         expect(@remote.request).wasCalledWith "GET", '/_all_docs?startkey="todo"&endkey="todo0"'
-      
+
+    _when "request success", ->
+      beforeEach ->
+        @requestDefer.resolve 
+          rows: "rows_array"
+
+      it "should be resolved with array of objects", ->
+        promise = @remote.loadAll()
+        expect(promise).toBeResolvedWith "rows_array"
+
+    _when "request has an error", ->
+      beforeEach ->
+        @requestDefer.reject "error"
+
+      it "should be rejected with the response error", ->
+        promise = @remote.loadAll()
+        expect(promise).toBeRejectedWith "error"
   # /loadAll(type )
 
   describe "create(type, object)", ->
