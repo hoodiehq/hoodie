@@ -14,7 +14,8 @@ class Hoodie extends Events
       account : Hoodie.Account
       remote  : Hoodie.Account.RemoteStore
 
-    user    : Hoodie.UserStore
+    user    : Hoodie.User
+    global  : Hoodie.Global
     email   : Hoodie.Email
     # share : Hoodie.Share
 

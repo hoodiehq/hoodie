@@ -82,11 +82,11 @@ Hoodie.RemoteStore = (function() {
     return this.hoodie.request(type, path, options);
   };
 
-  RemoteStore.prototype.get = function(view, params) {
+  RemoteStore.prototype.get = function(view_name, params) {
     return console.log.apply(console, [".get() not yet implemented"].concat(__slice.call(arguments)));
   };
 
-  RemoteStore.prototype.post = function(view, params) {
+  RemoteStore.prototype.post = function(update_function_name, params) {
     return console.log.apply(console, [".post() not yet implemented"].concat(__slice.call(arguments)));
   };
 

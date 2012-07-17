@@ -541,6 +541,32 @@ f.event={add:function(a,c,d,e,g){var h,i,j,k,l,m,n,o,p,q,r,s;if(!(a.nodeType===3
               "singleLineComment": ["#"],
               "name": "CoffeeScript"
             },
+            "sourcePath": "/Users/gregor/JavaScripts/hood.ie/hoodie-client.js/src/hoodie/global.coffee",
+            "projectPath": "src/hoodie/global.coffee",
+            "targetPath": "hoodie/global",
+            "firstHeader": {
+              "type": "heading",
+              "data": {
+                "level": 1,
+                "title": "Public",
+                "slug": "public",
+                "isFileHeader": true
+              },
+              "depth": 1
+            },
+            "title": "Public"
+          },
+          "depth": 2,
+          "outline": []
+        }, {
+          "type": "file",
+          "data": {
+            "language": {
+              "nameMatchers": [".coffee"],
+              "pygmentsLexer": "coffee-script",
+              "singleLineComment": ["#"],
+              "name": "CoffeeScript"
+            },
             "sourcePath": "/Users/gregor/JavaScripts/hood.ie/hoodie-client.js/src/hoodie/local_store.coffee",
             "projectPath": "src/hoodie/local_store.coffee",
             "targetPath": "hoodie/local_store",
@@ -1746,44 +1772,23 @@ f.event={add:function(a,c,d,e,g){var h,i,j,k,l,m,n,o,p,q,r,s;if(!(a.nodeType===3
               "singleLineComment": ["#"],
               "name": "CoffeeScript"
             },
-            "sourcePath": "/Users/gregor/JavaScripts/hood.ie/hoodie-client.js/src/hoodie/user_store.coffee",
-            "projectPath": "src/hoodie/user_store.coffee",
-            "targetPath": "hoodie/user_store",
+            "sourcePath": "/Users/gregor/JavaScripts/hood.ie/hoodie-client.js/src/hoodie/user.coffee",
+            "projectPath": "src/hoodie/user.coffee",
+            "targetPath": "hoodie/user",
             "firstHeader": {
               "type": "heading",
               "data": {
                 "level": 1,
-                "title": "User &amp; UserStore",
-                "slug": "user-amp-userstore",
+                "title": "User",
+                "slug": "user",
                 "isFileHeader": true
               },
-              "depth": 1,
-              "children": [
-                {
-                  "type": "heading",
-                  "data": {
-                    "level": 2,
-                    "title": "private",
-                    "slug": "private"
-                  },
-                  "depth": 2
-                }
-              ]
+              "depth": 1
             },
-            "title": "User &amp; UserStore"
+            "title": "User"
           },
           "depth": 2,
-          "outline": [
-            {
-              "type": "heading",
-              "data": {
-                "level": 2,
-                "title": "private",
-                "slug": "private"
-              },
-              "depth": 2
-            }
-          ]
+          "outline": []
         }
       ]
     }

@@ -59,6 +59,7 @@ hoodie.open("share/abc8320", {
 
 // sync: continuously sync with store
 hoodie.open("share/abc8320", {
+  // funky!
   sync: true
 })
 
