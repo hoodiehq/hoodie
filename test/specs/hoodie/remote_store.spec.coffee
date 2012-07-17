@@ -41,7 +41,12 @@ describe "Hoodie.RemoteStore", ->
   # -------------------------------------
 
   describe "load(type, id)", ->
+    beforeEach ->
+      spyOn(@remote, "request").andReturn "request_promise"
 
+    it "should return the request promise", ->
+      expect(@remote.load("todo", "1")).toBe 'request_promise'
+    
   # /load(type, id)
 
   describe "loadAll(type)", ->
@@ -80,6 +85,15 @@ describe "Hoodie.RemoteStore", ->
   # /loadAll(type )
 
   describe "create(type, object)", ->
+    beforeEach ->
+      spyOn(@remote, "save").andReturn "save_promise"
+
+    it "should proxy to save method", ->
+      @remote.create("test", {funky: "value"})
+      expect(@remote.save).wasCalledWith "test", undefined, funky: "value"
+
+    it "should return promise of save method", ->
+      expect(@remote.create()).toBe 'save_promise'
   # /create(type, object)
 
   describe "save(type, id, object)", ->

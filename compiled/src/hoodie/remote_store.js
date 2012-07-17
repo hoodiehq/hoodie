@@ -38,7 +38,9 @@ Hoodie.RemoteStore = (function() {
   }
 
   RemoteStore.prototype.load = function(type, id) {
-    return console.log.apply(console, [".load() not yet implemented"].concat(__slice.call(arguments)));
+    var path;
+    path = "/" + encodeURIComponent("" + type + "/" + id);
+    return this.request("GET", path);
   };
 
   RemoteStore.prototype.loadAll = function(type) {
@@ -57,7 +59,7 @@ Hoodie.RemoteStore = (function() {
   };
 
   RemoteStore.prototype.create = function(type, object) {
-    return console.log.apply(console, [".create() not yet implemented"].concat(__slice.call(arguments)));
+    return this.save(type, void 0, object);
   };
 
   RemoteStore.prototype.save = function(type, id, object) {

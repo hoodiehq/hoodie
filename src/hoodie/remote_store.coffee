@@ -64,7 +64,8 @@ class Hoodie.RemoteStore
   
   # load one object
   load: (type, id) ->
-    console.log ".load() not yet implemented", arguments...
+    path = "/" + encodeURIComponent "#{type}/#{id}"
+    @request "GET", path
 
   
   # ## loadAll
@@ -88,7 +89,7 @@ class Hoodie.RemoteStore
   
   # create a new object
   create: (type, object) ->
-    console.log ".create() not yet implemented", arguments...
+    @save type, undefined, object
 
   
   # ## save

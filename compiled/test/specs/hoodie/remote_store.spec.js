@@ -48,7 +48,14 @@ describe("Hoodie.RemoteStore", function() {
       return expect(remote._sync).toBe(true);
     });
   });
-  describe("load(type, id)", function() {});
+  describe("load(type, id)", function() {
+    beforeEach(function() {
+      return spyOn(this.remote, "request").andReturn("request_promise");
+    });
+    return it("should return the request promise", function() {
+      return expect(this.remote.load("todo", "1")).toBe('request_promise');
+    });
+  });
   describe("loadAll(type)", function() {
     beforeEach(function() {
       return spyOn(this.remote, "request").andReturn(this.requestDefer.promise());
@@ -91,7 +98,22 @@ describe("Hoodie.RemoteStore", function() {
       });
     });
   });
-  describe("create(type, object)", function() {});
+  describe("create(type, object)", function() {
+    beforeEach(function() {
+      return spyOn(this.remote, "save").andReturn("save_promise");
+    });
+    it("should proxy to save method", function() {
+      this.remote.create("test", {
+        funky: "value"
+      });
+      return expect(this.remote.save).wasCalledWith("test", void 0, {
+        funky: "value"
+      });
+    });
+    return it("should return promise of save method", function() {
+      return expect(this.remote.create()).toBe('save_promise');
+    });
+  });
   describe("save(type, id, object)", function() {});
   describe("update(new_properties )", function() {});
   describe("updateAll( type, new_properties)", function() {});

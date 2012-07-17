@@ -166,7 +166,7 @@ class Hoodie.LocalStore
     
     promise.pipe (objects) =>
       
-      # no we update all objects one by one and return a promise
+      # now we update all objects one by one and return a promise
       # that will be resolved once all updates have been finished
       defer = @hoodie.defer()
       _updatePromises = for object in objects
