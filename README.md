@@ -18,7 +18,7 @@ Accounts / Sessions
 ### Sign Up
 
 ```javascript
-app.account.sign_up('joe@example.com', 'secret')
+hoodie.my.account.sign_up('joe@example.com', 'secret')
 
   .done( function(user) {
     user.email // 'joe@example.com'
@@ -37,7 +37,7 @@ app.account.sign_up('joe@example.com', 'secret')
 ### Sign In
 
 ```javascript
-app.account.sign_in('joe@example.com', 'secret')
+hoodie.my.account.sign_in('joe@example.com', 'secret')
 
   .done( function(user) {
     // data sync kicks in
@@ -51,7 +51,7 @@ app.account.sign_in('joe@example.com', 'secret')
 ### Change password
 
 ```javascript
-app.account.change_password('current_secret', 'new_secret')
+hoodie.my.account.change_password('current_secret', 'new_secret')
 
   .done( function(user) { } ) 
   .fail( function(err)  { } )
@@ -64,7 +64,7 @@ If you want to make sure that a user is authenticated with a valid
 session, you can use the `authenticate` method.
 
 ```javascript
-app.account.authenticate()
+hoodie.my.account.authenticate()
 
   .done( function(user) {
     // you are authenticated, your session is valid
@@ -78,7 +78,7 @@ app.account.authenticate()
 ### Sign Out
 
 ```javascript
-app.account.sign_out()
+hoodie.my.account.sign_out()
 
   .done( function() {
     // session ends, local data gets cleaned up
@@ -92,7 +92,7 @@ app.account.sign_out()
 ### Forgot Password
 
 ```javascript
-app.account.forgot_password('joe@example.com')
+hoodie.my.account.forgot_password('joe@example.com')
 
   .done( function() {
     alert( "Link has been sent to joe@example.com")
@@ -106,14 +106,6 @@ app.account.forgot_password('joe@example.com')
 Data Storage / Sync
 -------------------
 
-### uuid
-
-helper to generate unique IDs that you can use to store your objects.
-
-```javascript
-uuid = app.store.uuid(length)
-```
-
 
 ### Create / Update
 
@@ -122,7 +114,7 @@ create or update an object.
 ```javascript
 // create a new object
 type = 'rule'
-app.store.create( type, {name: "rule the world"} )
+hoodie.my.store.create( type, {name: "rule the world"} )
   
   .done ( function(new_object) { } )
   .fail ( function(err)        { } )
@@ -130,7 +122,7 @@ app.store.create( type, {name: "rule the world"} )
 // save an object
 id   = 'abc4567'
 type = 'rule'
-app.store.save( type, id, {name: "rule the world"} )
+hoodie.my.store.save( type, id, {name: "rule the world"} )
   
   .done ( function(object) { } )
   .fail ( function(err)        { } )
@@ -139,7 +131,7 @@ app.store.save( type, id, {name: "rule the world"} )
 // Note: this changes only the passed attributes of the object
 id   = 'abc4567'
 type = 'rule'
-app.store.update( type, id, {nr: 1} )
+hoodie.my.store.update( type, id, {nr: 1} )
   
   .done ( function(updated_object) { } )
   .fail ( function(err)        { } )
@@ -151,7 +143,7 @@ app.store.update( type, id, {nr: 1} )
 load an existing object
 
 ```javascript
-app.store.load( type, id )
+hoodie.my.store.load( type, id )
 
   .done ( function(object) { } )
   .fail ( function(err)    { } )
@@ -163,7 +155,7 @@ app.store.load( type, id )
 load all objects available or from a specific type
 
 ```javascript
-app.store.loadAll( type )
+hoodie.my.store.loadAll( type )
 
   .done ( function(objects) { } )
   .fail ( function(err)     { } )
@@ -175,35 +167,88 @@ app.store.loadAll( type )
 delete an existing object
 
 ```javascript
-app.store.delete( type, id )
+hoodie.my.store.delete( type, id )
 
   .done ( function(deleted_object) { } )
   .fail ( function(err)            { } )
 ```
 
 
-### Remote Updates
+### Remote
 
-subscribe to changes from remote
+Remote module does synchronize a users data continuously by default, as soon as he signes up. To enable / disable continuous synchronization, use the following methods:
+
+```javascript
+hoodie.my.remote.startSyncing()
+hoodie.my.remote.stopSyncing()
+```
+
+When you want to manually trigger syncing, use:
+
+```javascript
+hoodie.my.remote.push()
+hoodie.my.remote.pull()
+hoodie.my.remote.sync()
+```
+
+Subscribe to changes from remote
 
 ```javascript
 // new doc created
-app.remote.on( 'created', function( type, id, created_object) { } )
+hoodie.my.remote.on( 'created', function( created_object) { } )
 
 // existing doc updated
-app.remote.on( 'updated', function( type, id, updated_object) { } )
+hoodie.my.remote.on( 'updated', function( updated_object) { } )
 
 // doc deleted
-app.remote.on( 'deleted', function( type, id, deleted_object) { } )
+hoodie.my.remote.on( 'deleted', function( deleted_object) { } )
 
 // any of above events
-app.remote.on( 'changed', function( type, id, changed_object) { } )
+hoodie.my.remote.on( 'changed', function( changed_object) { } )
 
 // all listeners can be filtered by type
-app.remote.on( "created:couch", function( id, created_object) { } )
-app.remote.on( "updated:couch", function( id, updated_object)  { } )
-app.remote.on( "deleted:couch", function( id, deleted_object) { } )
-app.remote.on( "changed:couch", function( id, changed_object) { } )
+hoodie.my.remote.on( "created:couch", function( created_object) { } )
+hoodie.my.remote.on( "updated:couch", function( updated_object) { } )
+hoodie.my.remote.on( "deleted:couch", function( deleted_object) { } )
+hoodie.my.remote.on( "changed:couch", function( changed_object) { } )
+
+// and even by id
+hoodie.my.remote.on( "created:couch:abc4567", function( created_object) { } )
+hoodie.my.remote.on( "updated:couch:abc4567", function( updated_object) { } )
+hoodie.my.remote.on( "deleted:couch:abc4567", function( deleted_object) { } )
+hoodie.my.remote.on( "changed:couch:abc4567", function( changed_object) { } )
+```
+
+
+### Public Shares (Public User Stores)
+
+Users can share their data with, controlling exactly what will
+be shared.
+
+```javascript
+// make couch with id "abc4567" public
+hoodie.my.store.update("couch","abc4567", {}, {public: true})
+
+// make couch with id "abc4567" public, but do only show the color, hide
+// all other attributes
+hoodie.my.store.update("couch","abc4567", {}, {public: ["color"]})
+
+// make couch with id "abc4567" private again
+hoodie.my.store.update("couch","abc4567", {}, {public: false})
+
+// load all couches from user "joe"
+hoodie.user("joe").loadAll("couch").done( function(couches) { ... })
+```
+
+
+### Global Store
+
+When enabled, all publicly shared objects by all users will be 
+available through the hoodie.global API
+
+```javascript
+// load all public songs from all users
+hoodie.global.loadAll("song").done( function(songs) { ... })
 ```
 
 
@@ -236,7 +281,7 @@ app.email.send( email )
 Future Ideas
 ------------
 
-* share
+* shares & collaborations
 * searching
 * payments
 * file conversion
@@ -246,8 +291,7 @@ Future Ideas
 Dependencies
 ------------
 
-Hoodie depends on and [require.js](http://requirejs.org).
-It currently also depends on jQuery/[zepto](http://zeptojs.com/), but we will remove the dependance soon.
+Hoodie depends on on jQuery/[zepto](http://zeptojs.com/), but we will remove the dependance at some point.
 
 
 Contribute
@@ -255,7 +299,7 @@ Contribute
 
 When you feel like contributing, I highly recommend to install [PhantomJS](http://www.phantomjs.org/) for automated, headless testing. Run `$ cake autotest` to have test running in the background while hacking.
 
-When you're done with changes, make sure to run `$ r.js -o name=hoodie baseUrl=./compiled out=hoodie.min.js` to update the concatenated & minified js file for production use.
+When you're done with changes, make sure to run `$ cake build` to update the concatenated for testing.
 
 
 License & Copyright

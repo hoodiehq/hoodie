@@ -189,8 +189,8 @@ class Hoodie.Account
   #
   db : -> 
     @username?.toLowerCase().replace(/@/, "$").replace(/\./g, "_");
-    
-    
+  
+  
   # ## fetch
   #
   # fetches _users doc from CouchDB and caches it in _doc
