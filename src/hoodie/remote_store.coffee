@@ -19,6 +19,7 @@
 #
 # custom requests
 #
+# * request(view, params)
 # * get(view, params)
 # * post(view, params)
 #
@@ -49,7 +50,7 @@ class Hoodie.RemoteStore
   # ## Constructor 
   #
   constructor : (@hoodie, options = {}) ->
-    @basePath = options.basePath
+    @basePath = options.basePath or ''
     @_sync    = options.sync      if options.sync
 
 
@@ -111,6 +112,20 @@ class Hoodie.RemoteStore
   # -----------------
 
   
+  # ## request
+  #
+  # wrapper for hoodie.request, with some store specific defaults
+  # and a prefixed path
+  request: (type, path, options = {}) ->
+    path = @basePath + path
+
+    options.contentType or= 'application/json'
+    if type is 'POST'
+      options.dataType    or= 'json'
+      options.processData or= false
+
+    @hoodie.request type, path, options
+
   # ## get
   #
   get: (view, params) ->
@@ -166,13 +181,27 @@ class Hoodie.RemoteStore
   isContinuouslySyncing: ->
     @_sync is true
 
+  # ## getSinceNr
+  #
+  # returns the sequence number from wich to start to load changes in pull
+  #
+  getSinceNr: ->
+    @_since or 0
+
+  # ## setSinceNr
+  #
+  # sets the sequence number from wich to start to load changes in pull
+  #
+  setSinceNr: (seq) ->
+    @_since = seq
+
 
   # ## pull changes
   #
   # a.k.a. make a GET request to CouchDB's `_changes` feed.
   #
   pull : =>
-    @_pullRequest = @hoodie.request 'GET', @_pullUrl(), contentType: 'application/json'
+    @_pullRequest = @request 'GET', @_pullUrl()
 
     if @connected and @isContinuouslyPulling()
       window.clearTimeout @_pullRequestTimeout
@@ -187,16 +216,11 @@ class Hoodie.RemoteStore
   # If no objects passed, push all changed documents
   push : (docs) =>
     
-    docs = @hoodie.my.store.changedDocs() unless $.isArray docs
-    return @hoodie.defer().resolve([]).promise() if docs.length is 0
+    return @hoodie.defer().resolve([]).promise() unless docs?.length
       
     docsForRemote = (@_parseForRemote doc for doc in docs)
     
-    @_pushRequest = @hoodie.request 'POST', "#{@basePath}/_bulk_docs", 
-      dataType    : 'json'
-      processData : false
-      contentType : 'application/json'
-    
+    @_pushRequest = @request 'POST', "/_bulk_docs"
       data : JSON.stringify
         docs      : docsForRemote
         newEdits  : false
@@ -232,11 +256,11 @@ class Hoodie.RemoteStore
   # Depending on whether isContinuouslyPulling() is true, return a longpoll URL or not
   #
   _pullUrl : ->
-    since = @hoodie.my.config.get('_remote.seq') or 0
+    since = @getSinceNr()
     if @isContinuouslyPulling() # make a long poll request
-      "#{@basePath}/_changes?include_docs=true&heartbeat=10000&feed=longpoll&since=#{since}"
+      "/_changes?include_docs=true&heartbeat=10000&feed=longpoll&since=#{since}"
     else
-      "#{@basePath}/_changes?include_docs=true&since=#{since}"
+      "/_changes?include_docs=true&since=#{since}"
   
   # request gets restarted automaticcally in @_handlePullError
   _restartPullRequest : => @_pullRequest?.abort()
@@ -248,7 +272,7 @@ class Hoodie.RemoteStore
   # handle the incoming changes, then send the next request
   #
   _handlePullSuccess : (response) =>
-    @hoodie.my.config.set '_remote.seq', response.last_seq
+    @setSinceNr response.last_seq
     @_handlePullResults response.results
     
     @pull() if @connected and @isContinuouslyPulling()

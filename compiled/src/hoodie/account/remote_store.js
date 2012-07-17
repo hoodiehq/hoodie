@@ -10,6 +10,8 @@ Hoodie.Account.RemoteStore = (function(_super) {
   RemoteStore.prototype._sync = true;
 
   function RemoteStore() {
+    this.push = __bind(this.push, this);
+
     this.connect = __bind(this.connect, this);
 
     this.stopSyncing = __bind(this.stopSyncing, this);
@@ -44,6 +46,21 @@ Hoodie.Account.RemoteStore = (function(_super) {
     return this.hoodie.my.account.authenticate().pipe(function() {
       return RemoteStore.__super__.connect.apply(_this, arguments);
     });
+  };
+
+  RemoteStore.prototype.getSinceNr = function(since) {
+    return this.hoodie.my.config.get('_remote.since') || 0;
+  };
+
+  RemoteStore.prototype.setSinceNr = function(since) {
+    return this.hoodie.my.config.set('_remote.since', since);
+  };
+
+  RemoteStore.prototype.push = function(docs) {
+    if (!$.isArray(docs)) {
+      docs = this.hoodie.my.store.changedDocs();
+    }
+    return RemoteStore.__super__.push.call(this, docs);
   };
 
   return RemoteStore;

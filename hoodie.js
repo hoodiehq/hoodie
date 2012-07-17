@@ -414,7 +414,7 @@ Hoodie.RemoteStore = (function() {
 
     this.connect = __bind(this.connect, this);
 
-    this.basePath = options.basePath;
+    this.basePath = options.basePath || '';
     if (options.sync) {
       this._sync = options.sync;
     }
@@ -450,6 +450,19 @@ Hoodie.RemoteStore = (function() {
 
   RemoteStore.prototype.deleteAll = function(type) {
     return console.log.apply(console, [".deleteAll() not yet implemented"].concat(__slice.call(arguments)));
+  };
+
+  RemoteStore.prototype.request = function(type, path, options) {
+    if (options == null) {
+      options = {};
+    }
+    path = this.basePath + path;
+    options.contentType || (options.contentType = 'application/json');
+    if (type === 'POST') {
+      options.dataType || (options.dataType = 'json');
+      options.processData || (options.processData = false);
+    }
+    return this.hoodie.request(type, path, options);
   };
 
   RemoteStore.prototype.get = function(view, params) {
@@ -489,10 +502,16 @@ Hoodie.RemoteStore = (function() {
     return this._sync === true;
   };
 
+  RemoteStore.prototype.getSinceNr = function() {
+    return this._since || 0;
+  };
+
+  RemoteStore.prototype.setSinceNr = function(seq) {
+    return this._since = seq;
+  };
+
   RemoteStore.prototype.pull = function() {
-    this._pullRequest = this.hoodie.request('GET', this._pullUrl(), {
-      contentType: 'application/json'
-    });
+    this._pullRequest = this.request('GET', this._pullUrl());
     if (this.connected && this.isContinuouslyPulling()) {
       window.clearTimeout(this._pullRequestTimeout);
       this._pullRequestTimeout = window.setTimeout(this._restartPullRequest, 25000);
@@ -502,10 +521,7 @@ Hoodie.RemoteStore = (function() {
 
   RemoteStore.prototype.push = function(docs) {
     var doc, docsForRemote;
-    if (!$.isArray(docs)) {
-      docs = this.hoodie.my.store.changedDocs();
-    }
-    if (docs.length === 0) {
+    if (!(docs != null ? docs.length : void 0)) {
       return this.hoodie.defer().resolve([]).promise();
     }
     docsForRemote = (function() {
@@ -517,10 +533,7 @@ Hoodie.RemoteStore = (function() {
       }
       return _results;
     }).call(this);
-    this._pushRequest = this.hoodie.request('POST', "" + this.basePath + "/_bulk_docs", {
-      dataType: 'json',
-      processData: false,
-      contentType: 'application/json',
+    this._pushRequest = this.request('POST', "/_bulk_docs", {
       data: JSON.stringify({
         docs: docsForRemote,
         newEdits: false
@@ -543,11 +556,11 @@ Hoodie.RemoteStore = (function() {
 
   RemoteStore.prototype._pullUrl = function() {
     var since;
-    since = this.hoodie.my.config.get('_remote.seq') || 0;
+    since = this.getSinceNr();
     if (this.isContinuouslyPulling()) {
-      return "" + this.basePath + "/_changes?include_docs=true&heartbeat=10000&feed=longpoll&since=" + since;
+      return "/_changes?include_docs=true&heartbeat=10000&feed=longpoll&since=" + since;
     } else {
-      return "" + this.basePath + "/_changes?include_docs=true&since=" + since;
+      return "/_changes?include_docs=true&since=" + since;
     }
   };
 
@@ -557,7 +570,7 @@ Hoodie.RemoteStore = (function() {
   };
 
   RemoteStore.prototype._handlePullSuccess = function(response) {
-    this.hoodie.my.config.set('_remote.seq', response.last_seq);
+    this.setSinceNr(response.last_seq);
     this._handlePullResults(response.results);
     if (this.connected && this.isContinuouslyPulling()) {
       return this.pull();
@@ -747,6 +760,8 @@ Hoodie.Account.RemoteStore = (function(_super) {
   RemoteStore.prototype._sync = true;
 
   function RemoteStore() {
+    this.push = __bind(this.push, this);
+
     this.connect = __bind(this.connect, this);
 
     this.stopSyncing = __bind(this.stopSyncing, this);
@@ -781,6 +796,21 @@ Hoodie.Account.RemoteStore = (function(_super) {
     return this.hoodie.my.account.authenticate().pipe(function() {
       return RemoteStore.__super__.connect.apply(_this, arguments);
     });
+  };
+
+  RemoteStore.prototype.getSinceNr = function(since) {
+    return this.hoodie.my.config.get('_remote.since') || 0;
+  };
+
+  RemoteStore.prototype.setSinceNr = function(since) {
+    return this.hoodie.my.config.set('_remote.since', since);
+  };
+
+  RemoteStore.prototype.push = function(docs) {
+    if (!$.isArray(docs)) {
+      docs = this.hoodie.my.store.changedDocs();
+    }
+    return RemoteStore.__super__.push.call(this, docs);
   };
 
   return RemoteStore;

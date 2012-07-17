@@ -29,7 +29,11 @@ class Hoodie.Account.RemoteStore extends Hoodie.RemoteStore
     
     @startSyncing() if @isContinuouslySyncing()
   
+
+  # ## startSyncing
   #
+  # start continuous syncing with current users store
+  # 
   startSyncing : =>
     @hoodie.my.config.set '_remote.sync', @_sync = true
 
@@ -38,7 +42,10 @@ class Hoodie.Account.RemoteStore extends Hoodie.RemoteStore
 
     @connect()
 
+  # ## stopSyncing
   #
+  # stop continuous syncing with current users store
+  # 
   stopSyncing : =>
     @hoodie.my.config.set '_remote.sync', @_sync = false
 
@@ -47,6 +54,7 @@ class Hoodie.Account.RemoteStore extends Hoodie.RemoteStore
 
     @disconnect()
     
+
   # ## Connect
   #
   # do not start to sync immediately, but authenticate beforehand
@@ -55,4 +63,20 @@ class Hoodie.Account.RemoteStore extends Hoodie.RemoteStore
       super
     
 
-  
+  # ## get and set since nr
+  #
+  # we store the last since number from the current user's store
+  # in his config
+  getSinceNr: (since) ->
+    @hoodie.my.config.get('_remote.since') or 0
+  setSinceNr: (since) ->
+    @hoodie.my.config.set '_remote.since', since
+
+
+  # ## push
+  #
+  # if no docs passed to be pushed, we default to users changed objects
+  # in his store
+  push: (docs) =>
+    docs = @hoodie.my.store.changedDocs() unless $.isArray docs
+    super(docs)
