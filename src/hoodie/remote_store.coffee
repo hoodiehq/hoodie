@@ -72,13 +72,18 @@ class Hoodie.RemoteStore
   # load all objects, can be filetered by a type
   loadAll: (type) ->
     defer = @hoodie.defer()
-    promise = @request "GET", "/_all_docs"
+    path = "/_all_docs"
+    if type
+      path = "#{path}?startkey=\"#{type}\"&endkey=\"#{type}0\""
+
+    promise = @request "GET", path
     promise.fail defer.reject
     promise.done (response) ->
       defer.resolve response.rows
 
-    defer.promise()
+    return defer.promise()
   
+
   # ## create
   
   # create a new object

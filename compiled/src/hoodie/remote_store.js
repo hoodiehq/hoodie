@@ -42,9 +42,13 @@ Hoodie.RemoteStore = (function() {
   };
 
   RemoteStore.prototype.loadAll = function(type) {
-    var defer, promise;
+    var defer, path, promise;
     defer = this.hoodie.defer();
-    promise = this.request("GET", "/_all_docs");
+    path = "/_all_docs";
+    if (type) {
+      path = "" + path + "?startkey=\"" + type + "\"&endkey=\"" + type + "0\"";
+    }
+    promise = this.request("GET", path);
     promise.fail(defer.reject);
     promise.done(function(response) {
       return defer.resolve(response.rows);

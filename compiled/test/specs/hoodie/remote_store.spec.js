@@ -49,7 +49,23 @@ describe("Hoodie.RemoteStore", function() {
     });
   });
   describe("load(type, id)", function() {});
-  describe("loadAll(type)", function() {});
+  describe("loadAll(type)", function() {
+    beforeEach(function() {
+      return spyOn(this.remote, "request").andReturn(this.requestDefer.promise());
+    });
+    _when("type is not set", function() {
+      return it("should send a GET to /_all_docs", function() {
+        this.remote.loadAll();
+        return expect(this.remote.request).wasCalledWith("GET", "/_all_docs");
+      });
+    });
+    return _when("type is todo", function() {
+      return it('should send a GET to /_all_docs?startkey="todo"&endkey="todo0"', function() {
+        this.remote.loadAll('todo');
+        return expect(this.remote.request).wasCalledWith("GET", '/_all_docs?startkey="todo"&endkey="todo0"');
+      });
+    });
+  });
   describe("create(type, object)", function() {});
   describe("save(type, id, object)", function() {});
   describe("update(new_properties )", function() {});

@@ -44,6 +44,19 @@ describe "Hoodie.RemoteStore", ->
   # /load(type, id)
 
   describe "loadAll(type)", ->
+    beforeEach ->
+      spyOn(@remote, "request").andReturn @requestDefer.promise()
+    
+    _when "type is not set", ->
+      it "should send a GET to /_all_docs", ->
+        @remote.loadAll()
+        expect(@remote.request).wasCalledWith "GET", "/_all_docs"
+
+    _when "type is todo", ->
+      it 'should send a GET to /_all_docs?startkey="todo"&endkey="todo0"', ->
+        @remote.loadAll('todo')
+        expect(@remote.request).wasCalledWith "GET", '/_all_docs?startkey="todo"&endkey="todo0"'
+      
   # /loadAll(type )
 
   describe "create(type, object)", ->
