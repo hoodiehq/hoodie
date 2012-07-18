@@ -535,7 +535,7 @@ describe("Hoodie.RemoteStore", function() {
       return it("should POST the passed objects", function() {
         var data;
         expect(this.remote.request).wasCalled();
-        data = JSON.parse(this.remote.request.mostRecentCall.args[2].data);
+        data = this.remote.request.mostRecentCall.args[2].data;
         return expect(data.docs.length).toBe(3);
       });
     });
@@ -552,7 +552,7 @@ describe("Hoodie.RemoteStore", function() {
       });
       it("should send the docs in appropriate format", function() {
         var doc, docs;
-        docs = JSON.parse(this.options.data).docs;
+        docs = this.options.data.docs;
         doc = docs[0];
         expect(doc.id).toBeUndefined();
         expect(doc._id).toBe('todo/abc3');
@@ -560,12 +560,12 @@ describe("Hoodie.RemoteStore", function() {
       });
       it("should set data.new_edits to false", function() {
         var new_edits;
-        new_edits = JSON.parse(this.options.data).new_edits;
+        new_edits = this.options.data.new_edits;
         return expect(new_edits).toBe(false);
       });
       return it("should set new _revision ids", function() {
         var deletedDoc, docs, newDoc;
-        docs = JSON.parse(this.options.data).docs;
+        docs = this.options.data.docs;
         deletedDoc = docs[0], newDoc = docs[1];
         expect(deletedDoc._rev).toBe('3-mock567#11');
         expect(newDoc._rev).toMatch('1-mock567#11');

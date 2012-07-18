@@ -74,7 +74,7 @@ class Hoodie.RemoteStore extends Hoodie.Store
   # ## loadAll
   
   # load all objects, can be filetered by a type
-  loadAll: (type) ->
+  loadAll : (type) ->
     defer = super
     return defer if @hoodie.isPromise(defer)
 
@@ -93,20 +93,31 @@ class Hoodie.RemoteStore extends Hoodie.Store
   
   # save a new object. If it existed before, all properties
   # will be overwritten 
-  save: (type, id, object) ->
+  save : (type, id, object) ->
     defer = super
     return defer if @hoodie.isPromise(defer)
 
+    id = @uuid() unless id 
     object = $.extend {}, object
     object.type = type
     object.id   = id
-    @push [object]
+
+    # possibility 1:
+    # use _bulk_push API
+    if false
+      @push [object]
+
+    # possibily 2:
+    doc   = @_parseForRemote object
+    path  = "/" + encodeURIComponent doc._id
+
+    @request "PUT", path, data: doc
 
   
   # ## delete
   
   # delete one object
-  delete: (type, id) ->
+  delete : (type, id) ->
     defer = super
     return defer if @hoodie.isPromise(defer)
 
@@ -116,7 +127,7 @@ class Hoodie.RemoteStore extends Hoodie.Store
   # ## deleteAll
   
   # delete all objects, can be filtered by type
-  deleteAll: (type) ->
+  deleteAll : (type) ->
     defer = super
     return defer if @hoodie.isPromise(defer)
 
@@ -132,13 +143,14 @@ class Hoodie.RemoteStore extends Hoodie.Store
   
   # wrapper for hoodie.request, with some store specific defaults
   # and a prefixed path
-  request: (type, path, options = {}) ->
+  request : (type, path, options = {}) ->
     path = @basePath + path
 
     options.contentType or= 'application/json'
-    if type is 'POST'
+    if type is 'POST' or type is 'PUT'
       options.dataType    or= 'json'
       options.processData or= false
+      options.data = JSON.stringify options.data
 
     @hoodie.request type, path, options
 
@@ -239,7 +251,7 @@ class Hoodie.RemoteStore extends Hoodie.Store
     docsForRemote = (@_parseForRemote doc for doc in docs)
     
     @_pushRequest = @request 'POST', "/_bulk_docs"
-      data : JSON.stringify
+      data :
         docs      : docsForRemote
         new_edits : false
 

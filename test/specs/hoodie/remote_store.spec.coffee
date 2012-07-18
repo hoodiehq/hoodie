@@ -446,7 +446,7 @@ describe "Hoodie.RemoteStore", ->
       
       it "should POST the passed objects", ->
         expect(@remote.request).wasCalled()
-        data = JSON.parse @remote.request.mostRecentCall.args[2].data
+        data = @remote.request.mostRecentCall.args[2].data
         expect(data.docs.length).toBe 3
 
     _and "one deleted and one new doc passed", ->
@@ -460,18 +460,18 @@ describe "Hoodie.RemoteStore", ->
         expect(@path).toBe '/_bulk_docs'
     
       it "should send the docs in appropriate format", ->
-        {docs} = JSON.parse @options.data
+        {docs} = @options.data
         doc = docs[0]
         expect(doc.id).toBeUndefined()
         expect(doc._id).toBe 'todo/abc3'
         expect(doc._localInfo).toBeUndefined()
 
       it "should set data.new_edits to false", ->
-        {new_edits} = JSON.parse @options.data
+        {new_edits} = @options.data
         expect(new_edits).toBe false
 
       it "should set new _revision ids", ->
-        {docs} = JSON.parse @options.data
+        {docs} = @options.data
         [deletedDoc, newDoc] = docs
         expect(deletedDoc._rev).toBe '3-mock567#11'
         expect(newDoc._rev).toMatch '1-mock567#11'

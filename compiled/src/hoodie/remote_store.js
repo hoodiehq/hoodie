@@ -70,15 +70,25 @@ Hoodie.RemoteStore = (function(_super) {
   };
 
   RemoteStore.prototype.save = function(type, id, object) {
-    var defer;
+    var defer, doc, path;
     defer = RemoteStore.__super__.save.apply(this, arguments);
     if (this.hoodie.isPromise(defer)) {
       return defer;
     }
+    if (!id) {
+      id = this.uuid();
+    }
     object = $.extend({}, object);
     object.type = type;
     object.id = id;
-    return this.push([object]);
+    if (false) {
+      this.push([object]);
+    }
+    doc = this._parseForRemote(object);
+    path = "/" + encodeURIComponent(doc._id);
+    return this.request("PUT", path, {
+      data: doc
+    });
   };
 
   RemoteStore.prototype["delete"] = function(type, id) {
@@ -105,9 +115,10 @@ Hoodie.RemoteStore = (function(_super) {
     }
     path = this.basePath + path;
     options.contentType || (options.contentType = 'application/json');
-    if (type === 'POST') {
+    if (type === 'POST' || type === 'PUT') {
       options.dataType || (options.dataType = 'json');
       options.processData || (options.processData = false);
+      options.data = JSON.stringify(options.data);
     }
     return this.hoodie.request(type, path, options);
   };
@@ -181,10 +192,10 @@ Hoodie.RemoteStore = (function(_super) {
       return _results;
     }).call(this);
     this._pushRequest = this.request('POST', "/_bulk_docs", {
-      data: JSON.stringify({
+      data: {
         docs: docsForRemote,
         new_edits: false
-      })
+      }
     });
     return this._pushRequest.done(this._handlePushSuccess(docs, docsForRemote));
   };
