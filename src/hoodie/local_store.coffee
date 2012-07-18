@@ -86,11 +86,6 @@ class Hoodie.LocalStore
       object.updatedAt = @_now()
       object.createdAt or= object.updatedAt
   
-    # remove `id` and `type` attributes before saving,
-    # as the Store key contains this information
-    delete object.id
-    delete object.type
-  
     try 
       object = @cache type, id, object, options
       defer.resolve( object, isNew ).promise()
@@ -282,7 +277,7 @@ class Hoodie.LocalStore
     key = "#{type}/#{id}"
   
     if object
-      @_cached[key] = $.extend object, type: type, id: id
+      @_cached[key] = $.extend object, { type: type, id: id }
       @_setObject type, id, object
       
       if options.remote

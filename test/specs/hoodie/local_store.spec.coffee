@@ -1,7 +1,7 @@
 describe "Hoodie.Store", ->  
   beforeEach ->
     @hoodie = new Mocks.Hoodie 
-    @store = new Hoodie.LocalStore @hoodie
+    @store  = new Hoodie.LocalStore @hoodie
     
     spyOn(@store, "_setObject").andCallThrough()
     spyOn(@store, "_getObject").andCallThrough()
@@ -115,12 +115,6 @@ describe "Hoodie.Store", ->
         # keep promise, key, and stored object for assertions
         @store.save 'document', '123', {id: '123', type: 'document', name: 'test'}
         [type, key, @object] = @store.cache.mostRecentCall.args
-  
-      it "should cache the object without the id attribute", ->
-        expect(@object.id).toBeUndefined()
-  
-      it "should store the object without the type attribute", ->
-        expect(@object.type).toBeUndefined()
     
     _when "id is '123', type is '$internal', object is {action: 'do some background magic'}}", ->
       beforeEach ->
@@ -136,7 +130,7 @@ describe "Hoodie.Store", ->
       [type, id, object] = @store.cache.mostRecentCall.args
       expect(object.createdAt).toBe 'check12'
   
-    it "should allow numbers and lowercase letters for for type only. And must start with a letter or $", ->
+    it "should allow numbers and lowercase letters for type only. And must start with a letter or $", ->
       invalid = ['UPPERCASE', 'underLines', '-?&$', '12345', 'a']
       valid   = ['car', '$email']
       

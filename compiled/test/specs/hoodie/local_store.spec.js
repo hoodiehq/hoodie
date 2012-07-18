@@ -156,7 +156,7 @@ describe("Hoodie.Store", function() {
       });
     });
     _when("id is '123', type is 'document', object is {id: '123', type: 'document', name: 'test'}", function() {
-      beforeEach(function() {
+      return beforeEach(function() {
         var key, type, _ref;
         this.store.save('document', '123', {
           id: '123',
@@ -164,12 +164,6 @@ describe("Hoodie.Store", function() {
           name: 'test'
         });
         return _ref = this.store.cache.mostRecentCall.args, type = _ref[0], key = _ref[1], this.object = _ref[2], _ref;
-      });
-      it("should cache the object without the id attribute", function() {
-        return expect(this.object.id).toBeUndefined();
-      });
-      return it("should store the object without the type attribute", function() {
-        return expect(this.object.type).toBeUndefined();
       });
     });
     _when("id is '123', type is '$internal', object is {action: 'do some background magic'}}", function() {
@@ -190,7 +184,7 @@ describe("Hoodie.Store", function() {
       _ref = this.store.cache.mostRecentCall.args, type = _ref[0], id = _ref[1], object = _ref[2];
       return expect(object.createdAt).toBe('check12');
     });
-    it("should allow numbers and lowercase letters for for type only. And must start with a letter or $", function() {
+    it("should allow numbers and lowercase letters for type only. And must start with a letter or $", function() {
       var invalid, key, promise, valid, _i, _j, _len, _len1, _results;
       invalid = ['UPPERCASE', 'underLines', '-?&$', '12345', 'a'];
       valid = ['car', '$email'];

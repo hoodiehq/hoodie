@@ -89,8 +89,6 @@ Hoodie.LocalStore = (function() {
       object.updatedAt = this._now();
       object.createdAt || (object.createdAt = object.updatedAt);
     }
-    delete object.id;
-    delete object.type;
     try {
       object = this.cache(type, id, object, options);
       defer.resolve(object, isNew).promise();
