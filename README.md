@@ -6,8 +6,8 @@ Setup
 -----
 
 ```javascript
-CouchDB_endpoint = 'http://worlddominatorapp.iriscouch.com';
-hoodie = new Hoodie(CouchDB_endpoint);
+CouchDBEndpoint = 'http://worlddominatorapp.iriscouch.com';
+hoodie = new Hoodie(CouchDBEndpoint);
 ```
 
 
@@ -18,7 +18,7 @@ Accounts / Sessions
 ### Sign Up
 
 ```javascript
-hoodie.my.account.sign_up('joe@example.com', 'secret')
+hoodie.my.account.signUp('joe@example.com', 'secret')
 
   .done( function(user) {
     user.email // 'joe@example.com'
@@ -37,7 +37,7 @@ hoodie.my.account.sign_up('joe@example.com', 'secret')
 ### Sign In
 
 ```javascript
-hoodie.my.account.sign_in('joe@example.com', 'secret')
+hoodie.my.account.signIn('joe@example.com', 'secret')
 
   .done( function(user) {
     // data sync kicks in
@@ -51,7 +51,7 @@ hoodie.my.account.sign_in('joe@example.com', 'secret')
 ### Change password
 
 ```javascript
-hoodie.my.account.change_password('current_secret', 'new_secret')
+hoodie.my.account.changePassword('current_secret', 'new_secret')
 
   .done( function(user) { } ) 
   .fail( function(err)  { } )
@@ -78,7 +78,7 @@ hoodie.my.account.authenticate()
 ### Sign Out
 
 ```javascript
-hoodie.my.account.sign_out()
+hoodie.my.account.signOut()
 
   .done( function() {
     // session ends, local data gets cleaned up
@@ -92,7 +92,7 @@ hoodie.my.account.sign_out()
 ### Forgot Password
 
 ```javascript
-hoodie.my.account.forgot_password('joe@example.com')
+hoodie.my.account.forgotPassword('joe@example.com')
 
   .done( function() {
     alert( "Link has been sent to joe@example.com")
@@ -116,7 +116,7 @@ create or update an object.
 type = 'rule'
 hoodie.my.store.create( type, {name: "rule the world"} )
   
-  .done ( function(new_object) { } )
+  .done ( function(newObject) { } )
   .fail ( function(err)        { } )
   
 // save an object
@@ -133,7 +133,7 @@ id   = 'abc4567'
 type = 'rule'
 hoodie.my.store.update( type, id, {nr: 1} )
   
-  .done ( function(updated_object) { } )
+  .done ( function(updatedObject) { } )
   .fail ( function(err)        { } )
 ```
 
@@ -169,7 +169,7 @@ delete an existing object
 ```javascript
 hoodie.my.store.delete( type, id )
 
-  .done ( function(deleted_object) { } )
+  .done ( function(deletedObject) { } )
   .fail ( function(err)            { } )
 ```
 
@@ -195,28 +195,28 @@ Subscribe to changes from remote
 
 ```javascript
 // new doc created
-hoodie.my.remote.on( 'created', function( created_object) { } )
+hoodie.my.remote.on( 'created', function( createdObject) { } )
 
 // existing doc updated
-hoodie.my.remote.on( 'updated', function( updated_object) { } )
+hoodie.my.remote.on( 'updated', function( updatedObject) { } )
 
 // doc deleted
-hoodie.my.remote.on( 'deleted', function( deleted_object) { } )
+hoodie.my.remote.on( 'deleted', function( deletedObject) { } )
 
 // any of above events
-hoodie.my.remote.on( 'changed', function( changed_object) { } )
+hoodie.my.remote.on( 'changed', function( changedObject) { } )
 
 // all listeners can be filtered by type
-hoodie.my.remote.on( "created:couch", function( created_object) { } )
-hoodie.my.remote.on( "updated:couch", function( updated_object) { } )
-hoodie.my.remote.on( "deleted:couch", function( deleted_object) { } )
-hoodie.my.remote.on( "changed:couch", function( changed_object) { } )
+hoodie.my.remote.on( "created:couch", function( createdObject) { } )
+hoodie.my.remote.on( "updated:couch", function( updatedObject) { } )
+hoodie.my.remote.on( "deleted:couch", function( deletedObject) { } )
+hoodie.my.remote.on( "changed:couch", function( changedObject) { } )
 
 // and even by id
-hoodie.my.remote.on( "created:couch:abc4567", function( created_object) { } )
-hoodie.my.remote.on( "updated:couch:abc4567", function( updated_object) { } )
-hoodie.my.remote.on( "deleted:couch:abc4567", function( deleted_object) { } )
-hoodie.my.remote.on( "changed:couch:abc4567", function( changed_object) { } )
+hoodie.my.remote.on( "created:couch:abc4567", function( createdObject) { } )
+hoodie.my.remote.on( "updated:couch:abc4567", function( updatedObject) { } )
+hoodie.my.remote.on( "deleted:couch:abc4567", function( deletedObject) { } )
+hoodie.my.remote.on( "changed:couch:abc4567", function( changedObject) { } )
 ```
 
 

@@ -81,9 +81,6 @@ Hoodie.RemoteStore = (function(_super) {
     object = $.extend({}, object);
     object.type = type;
     object.id = id;
-    if (false) {
-      this.push([object]);
-    }
     doc = this._parseForRemote(object);
     path = "/" + encodeURIComponent(doc._id);
     return this.request("PUT", path, {

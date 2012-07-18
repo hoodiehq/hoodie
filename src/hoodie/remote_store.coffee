@@ -102,12 +102,6 @@ class Hoodie.RemoteStore extends Hoodie.Store
     object.type = type
     object.id   = id
 
-    # possibility 1:
-    # use _bulk_push API
-    if false
-      @push [object]
-
-    # possibily 2:
     doc   = @_parseForRemote object
     path  = "/" + encodeURIComponent doc._id
 
