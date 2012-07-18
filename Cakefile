@@ -47,6 +47,19 @@ task 'autotest', 'autotest', ->
     clear();
     test() 
   ), true
+
+
+task 'console', 'run a browser console, from command line, hell yeah', ->
+  spawn 'subl', ['/tmp/phantom_command.coffee']
+
+  phantom = spawn 'touch', ['/tmp/phantom_command.coffee']
+  phantom = spawn 'coffee', ['-b', '-c', '-w', '/tmp/phantom_command.coffee']
+  phantom = spawn 'phantomjs', ['test/lib/phantomjs_console.coffee', 'index.html']
+  phantom.stderr.on 'data', (data) ->
+    process.stderr.write data.toString()
+  phantom.stdout.on 'data', (data) ->
+    print data.toString()
+   
   
 task 'build', 'build hoodie-client.min.js', -> 
   try fs.unlinkSync 'hoodie.js'
