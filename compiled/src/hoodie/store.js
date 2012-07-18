@@ -81,10 +81,18 @@ Hoodie.Store = (function() {
     if (options == null) {
       options = {};
     }
-    if (this.hoodie.isPromise(filterOrObjects)) {
-      promise = filterOrObjects;
-    } else {
-      promise = this.hoodie.defer().resolve(filterOrObjects).resolve();
+    switch (true) {
+      case typeof filterOrObjects === 'string':
+        promise = this.loadAll(filterOrObjects);
+        break;
+      case this.hoodie.isPromise(filterOrObjects):
+        promise = filterOrObjects;
+        break;
+      case $.isArray(filterOrObjects):
+        promise = this.hoodie.defer().resolve(filterOrObjects).resolve();
+        break;
+      default:
+        promise = this.loadAll();
     }
     return promise.pipe(function(objects) {
       var defer, object, _updatePromises;

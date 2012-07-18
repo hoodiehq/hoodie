@@ -208,7 +208,7 @@ describe("Hoodie.Store", function() {
       spyOn(this.store, "update").andReturn(promise);
       return expect(this.store.updateAll(this.todoObjects, {})).notToBeResolved();
     });
-    return _when("passed objects is a promise", function() {
+    _when("passed objects is a promise", function() {
       beforeEach(function() {
         return this.hoodie.isPromise.andReturn(true);
       });
@@ -233,6 +233,37 @@ describe("Hoodie.Store", function() {
           }, {}));
         }
         return _results;
+      });
+    });
+    _when("passed objects is a type (string)", function() {
+      beforeEach(function() {
+        var findAll_promise;
+        findAll_promise = jasmine.createSpy("findAll_promise");
+        return spyOn(this.store, "loadAll").andReturn({
+          pipe: findAll_promise
+        });
+      });
+      return it("should update objects return by findAll(type)", function() {
+        this.store.updateAll("car", {
+          funky: 'update'
+        });
+        return expect(this.store.loadAll).wasCalledWith("car");
+      });
+    });
+    return _when("no objects passed", function() {
+      beforeEach(function() {
+        var findAll_promise;
+        findAll_promise = jasmine.createSpy("findAll_promise");
+        return spyOn(this.store, "loadAll").andReturn({
+          pipe: findAll_promise
+        });
+      });
+      return it("should update all objects", function() {
+        this.store.updateAll(null, {
+          funky: 'update'
+        });
+        expect(this.store.loadAll).wasCalled();
+        return expect(this.store.loadAll.mostRecentCall.args.length).toBe(0);
       });
     });
   });

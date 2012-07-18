@@ -100,10 +100,15 @@ class Hoodie.Store
   updateAll : (filterOrObjects, objectUpdate, options = {}) ->
     
     # normalize the input: make sure we have all objects
-    if @hoodie.isPromise(filterOrObjects)
-      promise = filterOrObjects
-    else
-      promise = @hoodie.defer().resolve( filterOrObjects ).resolve()
+    switch true
+      when typeof filterOrObjects is 'string'
+        promise = @loadAll filterOrObjects
+      when @hoodie.isPromise(filterOrObjects)
+        promise = filterOrObjects  
+      when $.isArray filterOrObjects
+        promise = @hoodie.defer().resolve( filterOrObjects ).resolve()
+      else # e.g. null, update all
+        promise = @loadAll()
     
     promise.pipe (objects) =>
       

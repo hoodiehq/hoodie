@@ -149,6 +149,25 @@ describe "Hoodie.Store", ->
         @store.updateAll promise, {funky: 'update'}
         for obj in @todoObjects
           expect(@store.update).wasCalledWith obj.type, obj.id, {funky: 'update'}, {}
+
+    _when "passed objects is a type (string)", ->
+      beforeEach ->
+        findAll_promise = jasmine.createSpy "findAll_promise"
+        spyOn(@store, "loadAll").andReturn pipe: findAll_promise
+      
+      it "should update objects return by findAll(type)", ->
+        @store.updateAll "car", {funky: 'update'}
+        expect(@store.loadAll).wasCalledWith "car"
+
+    _when "no objects passed", ->
+      beforeEach ->
+        findAll_promise = jasmine.createSpy "findAll_promise"
+        spyOn(@store, "loadAll").andReturn pipe: findAll_promise
+      
+      it "should update all objects", ->
+        @store.updateAll null, {funky: 'update'}
+        expect(@store.loadAll).wasCalled()
+        expect(@store.loadAll.mostRecentCall.args.length).toBe 0
   # /.updateAll(objects)
 
 

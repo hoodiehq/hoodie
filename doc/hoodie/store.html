@@ -61,10 +61,15 @@ As an alternative, an array of objects can be passed</p>
 <p>example usage</p>
 
 <p>hoodie.my.store.updateAll()</p></div></div><div class="code"><div class="wrapper">  <span class="nv">updateAll : </span><span class="nf">(filterOrObjects, objectUpdate, options = {}) -&gt;</span>
-    </div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>normalize the input: make sure we have all objects</p></div></div><div class="code"><div class="wrapper">    <span class="k">if</span> <span class="nx">@hoodie</span><span class="p">.</span><span class="nx">isPromise</span><span class="p">(</span><span class="nx">filterOrObjects</span><span class="p">)</span>
-      <span class="nv">promise = </span><span class="nx">filterOrObjects</span>
-    <span class="k">else</span>
-      <span class="nv">promise = </span><span class="nx">@hoodie</span><span class="p">.</span><span class="nx">defer</span><span class="p">().</span><span class="nx">resolve</span><span class="p">(</span> <span class="nx">filterOrObjects</span> <span class="p">).</span><span class="nx">resolve</span><span class="p">()</span>
+    </div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>normalize the input: make sure we have all objects</p></div></div><div class="code"><div class="wrapper">    <span class="k">switch</span> <span class="kc">true</span>
+      <span class="k">when</span> <span class="k">typeof</span> <span class="nx">filterOrObjects</span> <span class="o">is</span> <span class="s1">&#39;string&#39;</span>
+        <span class="nv">promise = </span><span class="nx">@loadAll</span> <span class="nx">filterOrObjects</span>
+      <span class="k">when</span> <span class="nx">@hoodie</span><span class="p">.</span><span class="nx">isPromise</span><span class="p">(</span><span class="nx">filterOrObjects</span><span class="p">)</span>
+        <span class="nv">promise = </span><span class="nx">filterOrObjects</span>  
+      <span class="k">when</span> <span class="nx">$</span><span class="p">.</span><span class="nx">isArray</span> <span class="nx">filterOrObjects</span>
+        <span class="nv">promise = </span><span class="nx">@hoodie</span><span class="p">.</span><span class="nx">defer</span><span class="p">().</span><span class="nx">resolve</span><span class="p">(</span> <span class="nx">filterOrObjects</span> <span class="p">).</span><span class="nx">resolve</span><span class="p">()</span>
+      <span class="k">else</span> <span class="c1"># e.g. null, update all</span>
+        <span class="nv">promise = </span><span class="nx">@loadAll</span><span class="p">()</span>
     
     <span class="nx">promise</span><span class="p">.</span><span class="nx">pipe</span> <span class="p">(</span><span class="nx">objects</span><span class="p">)</span> <span class="o">=&gt;</span>
       </div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>now we update all objects one by one and return a promise
