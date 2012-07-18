@@ -89,6 +89,7 @@ class Hoodie.RemoteStore extends Hoodie.Store
 
     return defer.promise()
   
+
   # ## save
   
   # save a new object. If it existed before, all properties
@@ -98,9 +99,10 @@ class Hoodie.RemoteStore extends Hoodie.Store
     return defer if @hoodie.isPromise(defer)
 
     id = @uuid() unless id 
-    object = $.extend {}, object
-    object.type = type
-    object.id   = id
+    object = $.extend {
+      type: type
+      id  : id
+    }, object
 
     doc   = @_parseForRemote object
     path  = "/" + encodeURIComponent doc._id
@@ -112,20 +114,14 @@ class Hoodie.RemoteStore extends Hoodie.Store
   
   # delete one object
   delete : (type, id) ->
-    defer = super
-    return defer if @hoodie.isPromise(defer)
-
-    console.log ".delete() not yet implemented", arguments...
+    @update type, id, _deleted: true
 
   
   # ## deleteAll
   
   # delete all objects, can be filtered by type
   deleteAll : (type) ->
-    defer = super
-    return defer if @hoodie.isPromise(defer)
-
-    console.log ".deleteAll() not yet implemented", arguments...
+    @updateAll type, _deleted: true
 
 
 
@@ -242,7 +238,9 @@ class Hoodie.RemoteStore extends Hoodie.Store
     
     return @hoodie.defer().resolve([]).promise() unless docs?.length
       
-    docsForRemote = (@_parseForRemote doc for doc in docs)
+    docsForRemote = for doc in docs
+      @_addRevisionTo doc
+      @_parseForRemote doc 
     
     @_pushRequest = @request 'POST', "/_bulk_docs"
       data :
@@ -375,9 +373,6 @@ class Hoodie.RemoteStore extends Hoodie.Store
     # prepare CouchDB id
     attributes._id = "#{attributes.type}/#{attributes.id}"
     delete attributes.id
-
-    # prepare revision
-    @_addRevisionTo attributes
     
     return attributes
   

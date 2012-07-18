@@ -83,18 +83,63 @@ describe "Hoodie.RemoteStore", ->
   # /loadAll(type )
 
   describe "save(type, id, object)", ->
+    beforeEach ->
+      spyOn(@remote, "uuid").andReturn "uuid567"
+      spyOn(@remote, "request").andReturn "request_promise"
+    
+    it "should generate an id if it is undefined", ->
+      @remote.save("car", undefined, {})
+      expect(@remote.uuid).wasCalled()
+
+    it "should not generate an id if id is set", ->
+      @remote.save("car", 123, {})
+      expect(@remote.uuid).wasNotCalled()
+
+
+    it "should return promise by @request", ->
+      expect(@remote.save("car", 123, {})).toBe 'request_promise'
+    
+    _when "saving car/123 with color: red", ->
+      beforeEach ->
+        
+        @remote.save "car", 123, color: "red"
+        [@type, @path, {@data}] = @remote.request.mostRecentCall.args
+
+      it "should send a PUT request to `/car%2F123`", ->
+        expect(@type).toBe 'PUT'
+        expect(@path).toBe '/car%2F123'
+
+      it "should add type to saved object", -> 
+        expect(@data.type).toBe 'car'
+
+      it "should set _id to `car/123`", ->
+        expect(@data._id).toBe 'car/123'
   # /save(type, id, object)
 
-  describe "update(new_properties )", ->
-  # /update(new_properties )
-
-  describe "updateAll( type, new_properties)", ->
-  # /updateAll( type, new_properties)
-
   describe "delete(type, id)", ->
+    beforeEach ->
+      spyOn(@remote, "update").andReturn "update_promise"
+    
+    it "should proxy to update with _deleted: true", ->
+      @remote.delete 'car', 123
+      expect(@remote.update).wasCalledWith 'car', 123, _deleted: true
+    
+    it "should return promise of update", ->
+       expect(@remote.delete 'car', 123).toBe 'update_promise'
+      
+    
   # /delete(type, id)
 
   describe "deleteAll(type)", ->
+    beforeEach ->
+      spyOn(@remote, "updateAll").andReturn "updateAll_promise"
+    
+    it "should proxy to updateAll with _deleted: true", ->
+      @remote.deleteAll 'car'
+      expect(@remote.updateAll).wasCalledWith 'car', _deleted: true
+    
+    it "should return promise of updateAll", ->
+       expect(@remote.deleteAll 'car').toBe 'updateAll_promise'
   # /deleteAll(type)
 
 

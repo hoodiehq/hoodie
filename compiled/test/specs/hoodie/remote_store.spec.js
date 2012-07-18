@@ -98,11 +98,70 @@ describe("Hoodie.RemoteStore", function() {
       });
     });
   });
-  describe("save(type, id, object)", function() {});
-  describe("update(new_properties )", function() {});
-  describe("updateAll( type, new_properties)", function() {});
-  describe("delete(type, id)", function() {});
-  describe("deleteAll(type)", function() {});
+  describe("save(type, id, object)", function() {
+    beforeEach(function() {
+      spyOn(this.remote, "uuid").andReturn("uuid567");
+      return spyOn(this.remote, "request").andReturn("request_promise");
+    });
+    it("should generate an id if it is undefined", function() {
+      this.remote.save("car", void 0, {});
+      return expect(this.remote.uuid).wasCalled();
+    });
+    it("should not generate an id if id is set", function() {
+      this.remote.save("car", 123, {});
+      return expect(this.remote.uuid).wasNotCalled();
+    });
+    it("should return promise by @request", function() {
+      return expect(this.remote.save("car", 123, {})).toBe('request_promise');
+    });
+    return _when("saving car/123 with color: red", function() {
+      beforeEach(function() {
+        var _ref, _ref1;
+        this.remote.save("car", 123, {
+          color: "red"
+        });
+        return _ref = this.remote.request.mostRecentCall.args, this.type = _ref[0], this.path = _ref[1], (_ref1 = _ref[2], this.data = _ref1.data), _ref;
+      });
+      it("should send a PUT request to `/car%2F123`", function() {
+        expect(this.type).toBe('PUT');
+        return expect(this.path).toBe('/car%2F123');
+      });
+      it("should add type to saved object", function() {
+        return expect(this.data.type).toBe('car');
+      });
+      return it("should set _id to `car/123`", function() {
+        return expect(this.data._id).toBe('car/123');
+      });
+    });
+  });
+  describe("delete(type, id)", function() {
+    beforeEach(function() {
+      return spyOn(this.remote, "update").andReturn("update_promise");
+    });
+    it("should proxy to update with _deleted: true", function() {
+      this.remote["delete"]('car', 123);
+      return expect(this.remote.update).wasCalledWith('car', 123, {
+        _deleted: true
+      });
+    });
+    return it("should return promise of update", function() {
+      return expect(this.remote["delete"]('car', 123)).toBe('update_promise');
+    });
+  });
+  describe("deleteAll(type)", function() {
+    beforeEach(function() {
+      return spyOn(this.remote, "updateAll").andReturn("updateAll_promise");
+    });
+    it("should proxy to updateAll with _deleted: true", function() {
+      this.remote.deleteAll('car');
+      return expect(this.remote.updateAll).wasCalledWith('car', {
+        _deleted: true
+      });
+    });
+    return it("should return promise of updateAll", function() {
+      return expect(this.remote.deleteAll('car')).toBe('updateAll_promise');
+    });
+  });
   describe("request(type, path, options)", function() {
     beforeEach(function() {
       return spyOn(this.hoodie, "request");

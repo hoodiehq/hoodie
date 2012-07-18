@@ -647,12 +647,10 @@ Hoodie.RemoteStore = (function(_super) {
     if (!id) {
       id = this.uuid();
     }
-    object = $.extend({}, object);
-    object.type = type;
-    object.id = id;
-    if (false) {
-      this.push([object]);
-    }
+    object = $.extend({
+      type: type,
+      id: id
+    }, object);
     doc = this._parseForRemote(object);
     path = "/" + encodeURIComponent(doc._id);
     return this.request("PUT", path, {
@@ -661,21 +659,15 @@ Hoodie.RemoteStore = (function(_super) {
   };
 
   RemoteStore.prototype["delete"] = function(type, id) {
-    var defer;
-    defer = RemoteStore.__super__["delete"].apply(this, arguments);
-    if (this.hoodie.isPromise(defer)) {
-      return defer;
-    }
-    return console.log.apply(console, [".delete() not yet implemented"].concat(__slice.call(arguments)));
+    return this.update(type, id, {
+      _deleted: true
+    });
   };
 
   RemoteStore.prototype.deleteAll = function(type) {
-    var defer;
-    defer = RemoteStore.__super__.deleteAll.apply(this, arguments);
-    if (this.hoodie.isPromise(defer)) {
-      return defer;
-    }
-    return console.log.apply(console, [".deleteAll() not yet implemented"].concat(__slice.call(arguments)));
+    return this.updateAll(type, {
+      _deleted: true
+    });
   };
 
   RemoteStore.prototype.request = function(type, path, options) {
@@ -756,6 +748,7 @@ Hoodie.RemoteStore = (function(_super) {
       _results = [];
       for (_i = 0, _len = docs.length; _i < _len; _i++) {
         doc = docs[_i];
+        this._addRevisionTo(doc);
         _results.push(this._parseForRemote(doc));
       }
       return _results;
@@ -845,7 +838,6 @@ Hoodie.RemoteStore = (function(_super) {
     }
     attributes._id = "" + attributes.type + "/" + attributes.id;
     delete attributes.id;
-    this._addRevisionTo(attributes);
     return attributes;
   };
 
