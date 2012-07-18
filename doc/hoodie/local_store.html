@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><title>hoodie/local_store</title></head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0"><meta name="groc-relative-root" content="../"><meta name="groc-document-path" content="hoodie/local_store"><meta name="groc-project-path" content="src/hoodie/local_store.coffee"><link rel="stylesheet" type="text/css" media="all" href="../assets/style.css"><script type="text/javascript" src="../assets/behavior.js"></script><body><div id="meta"><div class="file-path">src/hoodie/local_store.coffee</div></div><div id="document"><div class="segment"><div class="comments"><div class="wrapper"><h1 id="localstore">LocalStore</h1></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>window.localStrage wrapper and more</p></div></div><div class="code"><div class="wrapper"><span class="k">class</span> <span class="nx">Hoodie</span><span class="p">.</span><span class="nx">LocalStore</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h2 id="constructor">Constructor</h2></div></div></div><div class="segment"><div class="code"><div class="wrapper">  <span class="nv">constructor : </span><span class="nf">(@hoodie) -&gt;</span>
+<!DOCTYPE html><html lang="en"><head><title>hoodie/local_store</title></head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0"><meta name="groc-relative-root" content="../"><meta name="groc-document-path" content="hoodie/local_store"><meta name="groc-project-path" content="src/hoodie/local_store.coffee"><link rel="stylesheet" type="text/css" media="all" href="../assets/style.css"><script type="text/javascript" src="../assets/behavior.js"></script><body><div id="meta"><div class="file-path">src/hoodie/local_store.coffee</div></div><div id="document"><div class="segment"><div class="comments"><div class="wrapper"><h1 id="localstore">LocalStore</h1></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>window.localStrage wrapper and more</p></div></div><div class="code"><div class="wrapper"><span class="k">class</span> <span class="nx">Hoodie</span><span class="p">.</span><span class="nx">LocalStore</span> <span class="k">extends</span> <span class="nx">Hoodie</span><span class="p">.</span><span class="nx">Store</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h2 id="constructor">Constructor</h2></div></div></div><div class="segment"><div class="code"><div class="wrapper">  <span class="nv">constructor : </span><span class="nf">(@hoodie) -&gt;</span>
   </div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>if browser does not support local storage persistence,
 e.g. Safari in private mode, overite the respective methods. </p></div></div><div class="code"><div class="wrapper">    <span class="nx">unless</span> <span class="nx">@isPersistent</span><span class="p">()</span>
       <span class="vi">@db =</span>
@@ -36,17 +36,8 @@ document with same type &amp; id.</p>
 <pre><code>store.save('car', undefined, {color: 'red'})
 store.save('car', 'abc4567', {color: 'red'})
 </code></pre></div></div><div class="code"><div class="wrapper">  <span class="nv">save : </span><span class="nf">(type, id, object, options = {}) -&gt;</span>
-    <span class="nv">defer = </span><span class="nx">@hoodie</span><span class="p">.</span><span class="nx">defer</span><span class="p">()</span>
-  
-    <span class="nx">unless</span> <span class="k">typeof</span> <span class="nx">object</span> <span class="o">is</span> <span class="s1">&#39;object&#39;</span>
-      <span class="nx">defer</span><span class="p">.</span><span class="nx">reject</span> <span class="nx">Hoodie</span><span class="p">.</span><span class="nx">Errors</span><span class="p">.</span><span class="nx">INVALID_ARGUMENTS</span> <span class="s2">&quot;object is #{typeof object}&quot;</span>
-      <span class="k">return</span> <span class="nx">defer</span><span class="p">.</span><span class="nx">promise</span><span class="p">()</span>
-    </div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>make sure we don't mess with the passed object directly</p></div></div><div class="code"><div class="wrapper">    <span class="nv">object = </span><span class="nx">$</span><span class="p">.</span><span class="nx">extend</span> <span class="p">{},</span> <span class="nx">object</span>
-    </div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>validations</p></div></div><div class="code"><div class="wrapper">    <span class="k">if</span> <span class="nx">id</span> <span class="o">and</span> <span class="o">not</span> <span class="nx">@_isValidId</span> <span class="nx">id</span>
-      <span class="k">return</span> <span class="nx">defer</span><span class="p">.</span><span class="nx">reject</span><span class="p">(</span> <span class="nx">Hoodie</span><span class="p">.</span><span class="nx">Errors</span><span class="p">.</span><span class="nx">INVALID_KEY</span> <span class="nv">id: </span><span class="nx">id</span> <span class="p">).</span><span class="nx">promise</span><span class="p">()</span>
-      
-    <span class="nx">unless</span> <span class="nx">@_isValidType</span> <span class="nx">type</span>
-      <span class="k">return</span> <span class="nx">defer</span><span class="p">.</span><span class="nx">reject</span><span class="p">(</span> <span class="nx">Hoodie</span><span class="p">.</span><span class="nx">Errors</span><span class="p">.</span><span class="nx">INVALID_KEY</span> <span class="nv">type: </span><span class="nx">type</span> <span class="p">).</span><span class="nx">promise</span><span class="p">()</span>
+    <span class="nv">defer = </span><span class="k">super</span>
+    <span class="k">return</span> <span class="nx">defer</span> <span class="k">if</span> <span class="nx">@hoodie</span><span class="p">.</span><span class="nx">isPromise</span><span class="p">(</span><span class="nx">defer</span><span class="p">)</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>make sure we don't mess with the passed object directly</p></div></div><div class="code"><div class="wrapper">    <span class="nv">object = </span><span class="nx">$</span><span class="p">.</span><span class="nx">extend</span> <span class="p">{},</span> <span class="nx">object</span>
     </div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>generate an id if necessary</p></div></div><div class="code"><div class="wrapper">    <span class="k">if</span> <span class="nx">id</span>
       <span class="nv">isNew = </span><span class="k">typeof</span> <span class="nx">@_cached</span><span class="p">[</span><span class="s2">&quot;#{type}/#{id}&quot;</span><span class="p">]</span> <span class="o">isnt</span> <span class="s1">&#39;object&#39;</span>
     <span class="k">else</span>
@@ -57,9 +48,6 @@ store.save('car', 'abc4567', {color: 'red'})
     <span class="k">else</span> <span class="nx">unless</span> <span class="nx">options</span><span class="p">.</span><span class="nx">silent</span>
       <span class="nv">object.updatedAt = </span><span class="nx">@_now</span><span class="p">()</span>
       <span class="nx">object</span><span class="p">.</span><span class="nx">createdAt</span> <span class="o">or=</span> <span class="nx">object</span><span class="p">.</span><span class="nx">updatedAt</span>
-  </div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>remove <code>id</code> and <code>type</code> attributes before saving,
-as the Store key contains this information</p></div></div><div class="code"><div class="wrapper">    <span class="k">delete</span> <span class="nx">object</span><span class="p">.</span><span class="nx">id</span>
-    <span class="k">delete</span> <span class="nx">object</span><span class="p">.</span><span class="nx">type</span>
   
     <span class="k">try</span> 
       <span class="nv">object = </span><span class="nx">@cache</span> <span class="nx">type</span><span class="p">,</span> <span class="nx">id</span><span class="p">,</span> <span class="nx">object</span><span class="p">,</span> <span class="nx">options</span>
@@ -69,62 +57,6 @@ as the Store key contains this information</p></div></div><div class="code"><div
   
     <span class="k">return</span> <span class="nx">defer</span><span class="p">.</span><span class="nx">promise</span><span class="p">()</span>
   
-  </div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h2 id="create">Create</h2>
-
-<p><code>.create</code> is an alias for <code>.save</code>, with the difference that there is no id argument.
-Internally it simply calls `.save(type, undefined, object).</p></div></div><div class="code"><div class="wrapper">  <span class="nv">create : </span><span class="nf">(type, object, options = {}) -&gt;</span>
-    <span class="nx">@save</span> <span class="nx">type</span><span class="p">,</span> <span class="kc">undefined</span><span class="p">,</span> <span class="nx">object</span>
-  
-  </div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h2 id="update">Update</h2>
-
-<p>In contrast to <code>.save</code>, the <code>.update</code> method does not replace the stored object,
-but only changes the passed attributes of an exsting object, if it exists</p>
-
-<p>both a hash of key/values or a function that applies the update to the passed
-object can be passed.</p>
-
-<p>example usage</p>
-
-<p>hoodie.my.store.update('car', 'abc4567', {sold: true})
-hoodie.my.store.update('car', 'abc4567', function(obj) { obj.sold = true })</p></div></div><div class="code"><div class="wrapper">  <span class="nv">update : </span><span class="nf">(type, id, objectUpdate, options = {}) -&gt;</span>
-    <span class="nv">defer = </span><span class="nx">@hoodie</span><span class="p">.</span><span class="nx">defer</span><span class="p">()</span>
-    
-    <span class="nv">_loadPromise = </span><span class="nx">@load</span><span class="p">(</span><span class="nx">type</span><span class="p">,</span> <span class="nx">id</span><span class="p">).</span><span class="nx">pipe</span> <span class="p">(</span><span class="nx">currentObj</span><span class="p">)</span> <span class="o">=&gt;</span> 
-      </div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>normalize input</p></div></div><div class="code"><div class="wrapper">      <span class="nv">objectUpdate = </span><span class="nx">objectUpdate</span><span class="p">(</span> <span class="nx">$</span><span class="p">.</span><span class="nx">extend</span> <span class="p">{},</span> <span class="nx">currentObj</span> <span class="p">)</span> <span class="k">if</span> <span class="k">typeof</span> <span class="nx">objectUpdate</span> <span class="o">is</span> <span class="s1">&#39;function&#39;</span>
-      
-      <span class="k">return</span> <span class="nx">defer</span><span class="p">.</span><span class="nx">resolve</span> <span class="nx">currentObj</span> <span class="nx">unless</span> <span class="nx">objectUpdate</span>
-      </div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>check if something changed</p></div></div><div class="code"><div class="wrapper">      <span class="nv">changedProperties = </span><span class="k">for</span> <span class="nx">key</span><span class="p">,</span> <span class="nx">value</span> <span class="k">of</span> <span class="nx">objectUpdate</span> <span class="k">when</span> <span class="nx">currentObj</span><span class="p">[</span><span class="nx">key</span><span class="p">]</span> <span class="o">isnt</span> <span class="nx">value</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>workaround for undefined values, as $.extend ignores these</p></div></div><div class="code"><div class="wrapper">        <span class="nx">currentObj</span><span class="p">[</span><span class="nx">key</span><span class="p">]</span> <span class="o">=</span> <span class="nx">value</span>
-        <span class="nx">key</span>
-        
-      <span class="k">return</span> <span class="nx">defer</span><span class="p">.</span><span class="nx">resolve</span> <span class="nx">currentObj</span> <span class="nx">unless</span> <span class="nx">changedProperties</span><span class="p">.</span><span class="nx">length</span>
-      </div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>apply update </p></div></div><div class="code"><div class="wrapper">      <span class="nx">@save</span><span class="p">(</span><span class="nx">type</span><span class="p">,</span> <span class="nx">id</span><span class="p">,</span> <span class="nx">currentObj</span><span class="p">,</span> <span class="nx">options</span><span class="p">).</span><span class="k">then</span> <span class="nx">defer</span><span class="p">.</span><span class="nx">resolve</span><span class="p">,</span> <span class="nx">defer</span><span class="p">.</span><span class="nx">reject</span>
-      </div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>if not found, create it</p></div></div><div class="code"><div class="wrapper">    <span class="nx">_loadPromise</span><span class="p">.</span><span class="nx">fail</span> <span class="o">=&gt;</span> 
-      <span class="nx">@save</span><span class="p">(</span><span class="nx">type</span><span class="p">,</span> <span class="nx">id</span><span class="p">,</span> <span class="nx">objectUpdate</span><span class="p">,</span> <span class="nx">options</span><span class="p">).</span><span class="k">then</span> <span class="nx">defer</span><span class="p">.</span><span class="nx">resolve</span><span class="p">,</span> <span class="nx">defer</span><span class="p">.</span><span class="nx">reject</span>
-    
-    <span class="nx">defer</span><span class="p">.</span><span class="nx">promise</span><span class="p">()</span>
-  
-  </div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h2 id="updateall">updateAll</h2>
-
-<p>update all objects in the store, can be optionally filtered by a function
-As an alternative, an array of objects can be passed</p>
-
-<p>example usage</p>
-
-<p>hoodie.my.store.updateAll()</p></div></div><div class="code"><div class="wrapper">  <span class="nv">updateAll : </span><span class="nf">(filterOrObjects, objectUpdate, options = {}) -&gt;</span>
-    </div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>normalize the input: make sure we have all objects</p></div></div><div class="code"><div class="wrapper">    <span class="k">if</span> <span class="nx">@hoodie</span><span class="p">.</span><span class="nx">isPromise</span><span class="p">(</span><span class="nx">filterOrObjects</span><span class="p">)</span>
-      <span class="nv">promise = </span><span class="nx">filterOrObjects</span>
-    <span class="k">else</span>
-      <span class="nv">promise = </span><span class="nx">@hoodie</span><span class="p">.</span><span class="nx">defer</span><span class="p">().</span><span class="nx">resolve</span><span class="p">(</span> <span class="nx">filterOrObjects</span> <span class="p">).</span><span class="nx">resolve</span><span class="p">()</span>
-    
-    <span class="nx">promise</span><span class="p">.</span><span class="nx">pipe</span> <span class="p">(</span><span class="nx">objects</span><span class="p">)</span> <span class="o">=&gt;</span>
-      </div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>no we update all objects one by one and return a promise
-that will be resolved once all updates have been finished</p></div></div><div class="code"><div class="wrapper">      <span class="nv">defer = </span><span class="nx">@hoodie</span><span class="p">.</span><span class="nx">defer</span><span class="p">()</span>
-      <span class="nv">_updatePromises = </span><span class="k">for</span> <span class="nx">object</span> <span class="k">in</span> <span class="nx">objects</span>
-        <span class="nx">@update</span><span class="p">(</span><span class="nx">object</span><span class="p">.</span><span class="nx">type</span><span class="p">,</span> <span class="nx">object</span><span class="p">.</span><span class="nx">id</span><span class="p">,</span> <span class="nx">objectUpdate</span><span class="p">,</span> <span class="nx">options</span><span class="p">)</span> 
-      <span class="nx">$</span><span class="p">.</span><span class="k">when</span><span class="p">.</span><span class="nx">apply</span><span class="p">(</span><span class="kc">null</span><span class="p">,</span> <span class="nx">_updatePromises</span><span class="p">).</span><span class="k">then</span> <span class="nx">defer</span><span class="p">.</span><span class="nx">resolve</span>
-      
-      <span class="k">return</span> <span class="nx">defer</span><span class="p">.</span><span class="nx">promise</span><span class="p">()</span>
-  
   </div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h2 id="load">load</h2>
 
 <p>loads one object from Store, specified by <code>type</code> and <code>id</code></p>
@@ -133,10 +65,8 @@ that will be resolved once all updates have been finished</p></div></div><div cl
 
 <pre><code>store.load('car', 'abc4567')
 </code></pre></div></div><div class="code"><div class="wrapper">  <span class="nv">load : </span><span class="nf">(type, id) -&gt;</span>
-    <span class="nv">defer = </span><span class="nx">@hoodie</span><span class="p">.</span><span class="nx">defer</span><span class="p">()</span>
-  
-    <span class="nx">unless</span> <span class="k">typeof</span> <span class="nx">type</span> <span class="o">is</span> <span class="s1">&#39;string&#39;</span> <span class="o">and</span> <span class="k">typeof</span> <span class="nx">id</span> <span class="o">is</span> <span class="s1">&#39;string&#39;</span>
-      <span class="k">return</span> <span class="nx">defer</span><span class="p">.</span><span class="nx">reject</span><span class="p">(</span> <span class="nx">Hoodie</span><span class="p">.</span><span class="nx">Errors</span><span class="p">.</span><span class="nx">INVALID_ARGUMENTS</span> <span class="s2">&quot;type &amp; id are required&quot;</span> <span class="p">).</span><span class="nx">promise</span><span class="p">()</span>
+    <span class="nv">defer = </span><span class="k">super</span>
+    <span class="k">return</span> <span class="nx">defer</span> <span class="k">if</span> <span class="nx">@hoodie</span><span class="p">.</span><span class="nx">isPromise</span><span class="p">(</span><span class="nx">defer</span><span class="p">)</span>
   
     <span class="k">try</span>
       <span class="nv">object = </span><span class="nx">@cache</span> <span class="nx">type</span><span class="p">,</span> <span class="nx">id</span>
@@ -161,7 +91,9 @@ Can be optionally filtered by a type or a function</p>
 store.loadAll('car')
 store.loadAll(function(obj) { return obj.brand == 'Tesla' })
 </code></pre></div></div><div class="code"><div class="wrapper">  <span class="nv">loadAll : </span><span class="nf">(filter = -&gt; true) -&gt;</span>
-    <span class="nv">defer = </span><span class="nx">@hoodie</span><span class="p">.</span><span class="nx">defer</span><span class="p">()</span>
+    <span class="nv">defer = </span><span class="k">super</span>
+    <span class="k">return</span> <span class="nx">defer</span> <span class="k">if</span> <span class="nx">@hoodie</span><span class="p">.</span><span class="nx">isPromise</span><span class="p">(</span><span class="nx">defer</span><span class="p">)</span>
+
     <span class="nv">keys = </span><span class="nx">@_index</span><span class="p">()</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>normalize filter</p></div></div><div class="code"><div class="wrapper">    <span class="k">if</span> <span class="k">typeof</span> <span class="nx">filter</span> <span class="o">is</span> <span class="s1">&#39;string&#39;</span>
       <span class="nv">type   = </span><span class="nx">filter</span>
       <span class="nv">filter = </span><span class="nf">(obj) -&gt;</span> <span class="nx">obj</span><span class="p">.</span><span class="nx">type</span> <span class="o">is</span> <span class="nx">type</span>
@@ -188,7 +120,9 @@ and returns it as array, which will be stored in the results variable</p></div><
 
 <p>when object has been synced before, mark it as deleted. 
 Otherwise remove it from Store.</p></div></div><div class="code"><div class="wrapper">  <span class="k">delete</span> <span class="o">:</span> <span class="nf">(type, id, options = {}) -&gt;</span>
-    <span class="nv">defer = </span><span class="nx">@hoodie</span><span class="p">.</span><span class="nx">defer</span><span class="p">()</span>
+    <span class="nv">defer = </span><span class="k">super</span>
+    <span class="k">return</span> <span class="nx">defer</span> <span class="k">if</span> <span class="nx">@hoodie</span><span class="p">.</span><span class="nx">isPromise</span><span class="p">(</span><span class="nx">defer</span><span class="p">)</span>
+
     <span class="nv">object  = </span><span class="nx">@cache</span> <span class="nx">type</span><span class="p">,</span> <span class="nx">id</span>
     
     <span class="nx">unless</span> <span class="nx">object</span>
@@ -206,7 +140,6 @@ Otherwise remove it from Store.</p></div></div><div class="code"><div class="wra
       <span class="nx">@clearChanged</span> <span class="nx">type</span><span class="p">,</span> <span class="nx">id</span>
   
     <span class="nx">defer</span><span class="p">.</span><span class="nx">resolve</span><span class="p">(</span><span class="nx">$</span><span class="p">.</span><span class="nx">extend</span> <span class="p">{},</span> <span class="nx">object</span><span class="p">).</span><span class="nx">promise</span><span class="p">()</span>
-  </div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>alias</p></div></div><div class="code"><div class="wrapper">  <span class="nv">destroy: </span><span class="err">@</span><span class="o">::</span><span class="k">delete</span>
   
   </div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h2 id="cache">Cache</h2>
 
@@ -219,7 +152,7 @@ and caches it for faster future access. Updates cache when <code>value</code> is
     <span class="nv">key = </span><span class="s2">&quot;#{type}/#{id}&quot;</span>
   
     <span class="k">if</span> <span class="nx">object</span>
-      <span class="nx">@_cached</span><span class="p">[</span><span class="nx">key</span><span class="p">]</span> <span class="o">=</span> <span class="nx">$</span><span class="p">.</span><span class="nx">extend</span> <span class="nx">object</span><span class="p">,</span> <span class="nv">type: </span><span class="nx">type</span><span class="p">,</span> <span class="nv">id: </span><span class="nx">id</span>
+      <span class="nx">@_cached</span><span class="p">[</span><span class="nx">key</span><span class="p">]</span> <span class="o">=</span> <span class="nx">$</span><span class="p">.</span><span class="nx">extend</span> <span class="nx">object</span><span class="p">,</span> <span class="p">{</span> <span class="nv">type: </span><span class="nx">type</span><span class="p">,</span> <span class="nv">id: </span><span class="nx">id</span> <span class="p">}</span>
       <span class="nx">@_setObject</span> <span class="nx">type</span><span class="p">,</span> <span class="nx">id</span><span class="p">,</span> <span class="nx">object</span>
       
       <span class="k">if</span> <span class="nx">options</span><span class="p">.</span><span class="nx">remote</span>
