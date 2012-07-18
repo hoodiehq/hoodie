@@ -4,7 +4,7 @@
 # window.localStrage wrapper and more
 #
 
-class Hoodie.LocalStore
+class Hoodie.LocalStore extends Hoodie.Store
 
   # ## Constructor
   #
@@ -53,21 +53,11 @@ class Hoodie.LocalStore
   #     store.save('car', undefined, {color: 'red'})
   #     store.save('car', 'abc4567', {color: 'red'})
   save : (type, id, object, options = {}) ->
-    defer = @hoodie.defer()
-  
-    unless typeof object is 'object'
-      defer.reject Hoodie.Errors.INVALID_ARGUMENTS "object is #{typeof object}"
-      return defer.promise()
-    
+    defer = super
+    return defer if @hoodie.isPromise(defer)
+
     # make sure we don't mess with the passed object directly
     object = $.extend {}, object
-    
-    # validations
-    if id and not @_isValidId id
-      return defer.reject( Hoodie.Errors.INVALID_KEY id: id ).promise()
-      
-    unless @_isValidType type
-      return defer.reject( Hoodie.Errors.INVALID_KEY type: type ).promise()
     
     # generate an id if necessary
     if id
@@ -95,82 +85,6 @@ class Hoodie.LocalStore
     return defer.promise()
   
   
-  # ## Create
-  #
-  # `.create` is an alias for `.save`, with the difference that there is no id argument.
-  # Internally it simply calls `.save(type, undefined, object).
-  create : (type, object, options = {}) ->
-    @save type, undefined, object
-  
-  
-  # ## Update
-  #
-  # In contrast to `.save`, the `.update` method does not replace the stored object,
-  # but only changes the passed attributes of an exsting object, if it exists
-  #
-  # both a hash of key/values or a function that applies the update to the passed
-  # object can be passed.
-  #
-  # example usage
-  #
-  # hoodie.my.store.update('car', 'abc4567', {sold: true})
-  # hoodie.my.store.update('car', 'abc4567', function(obj) { obj.sold = true })
-  update : (type, id, objectUpdate, options = {}) ->
-    defer = @hoodie.defer()
-    
-    _loadPromise = @load(type, id).pipe (currentObj) => 
-      
-      # normalize input
-      objectUpdate = objectUpdate( $.extend {}, currentObj ) if typeof objectUpdate is 'function'
-      
-      return defer.resolve currentObj unless objectUpdate
-      
-      # check if something changed
-      changedProperties = for key, value of objectUpdate when currentObj[key] isnt value
-        # workaround for undefined values, as $.extend ignores these
-        currentObj[key] = value
-        key
-        
-      return defer.resolve currentObj unless changedProperties.length
-      
-      # apply update 
-      @save(type, id, currentObj, options).then defer.resolve, defer.reject
-      
-    # if not found, create it
-    _loadPromise.fail => 
-      @save(type, id, objectUpdate, options).then defer.resolve, defer.reject
-    
-    defer.promise()
-  
-  
-  # ## updateAll
-  #
-  # update all objects in the store, can be optionally filtered by a function
-  # As an alternative, an array of objects can be passed
-  #
-  # example usage
-  #
-  # hoodie.my.store.updateAll()
-  updateAll : (filterOrObjects, objectUpdate, options = {}) ->
-    
-    # normalize the input: make sure we have all objects
-    if @hoodie.isPromise(filterOrObjects)
-      promise = filterOrObjects
-    else
-      promise = @hoodie.defer().resolve( filterOrObjects ).resolve()
-    
-    promise.pipe (objects) =>
-      
-      # now we update all objects one by one and return a promise
-      # that will be resolved once all updates have been finished
-      defer = @hoodie.defer()
-      _updatePromises = for object in objects
-        @update(object.type, object.id, objectUpdate, options) 
-      $.when.apply(null, _updatePromises).then defer.resolve
-      
-      return defer.promise()
-  
-  
   # ## load
   #
   # loads one object from Store, specified by `type` and `id`
@@ -179,10 +93,8 @@ class Hoodie.LocalStore
   #
   #     store.load('car', 'abc4567')
   load : (type, id) ->
-    defer = @hoodie.defer()
-  
-    unless typeof type is 'string' and typeof id is 'string'
-      return defer.reject( Hoodie.Errors.INVALID_ARGUMENTS "type & id are required" ).promise()
+    defer = super
+    return defer if @hoodie.isPromise(defer)
   
     try
       object = @cache type, id
@@ -208,7 +120,9 @@ class Hoodie.LocalStore
   #     store.loadAll('car')
   #     store.loadAll(function(obj) { return obj.brand == 'Tesla' })
   loadAll : (filter = -> true) ->
-    defer = @hoodie.defer()
+    defer = super
+    return defer if @hoodie.isPromise(defer)
+
     keys = @_index()
 
     # normalize filter
@@ -242,7 +156,9 @@ class Hoodie.LocalStore
   # when object has been synced before, mark it as deleted. 
   # Otherwise remove it from Store.
   delete : (type, id, options = {}) ->
-    defer = @hoodie.defer()
+    defer = super
+    return defer if @hoodie.isPromise(defer)
+
     object  = @cache type, id
     
     unless object
@@ -260,9 +176,6 @@ class Hoodie.LocalStore
       @clearChanged type, id
   
     defer.resolve($.extend {}, object).promise()
-  
-  # alias
-  destroy: @::delete
   
   
   # ## Cache

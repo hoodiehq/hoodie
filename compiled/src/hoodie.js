@@ -57,7 +57,7 @@ Hoodie = (function(_super) {
   Hoodie.prototype.defer = $.Deferred;
 
   Hoodie.prototype.isPromise = function(obj) {
-    return typeof obj.done === 'function' && typeof obj.fail === 'function';
+    return typeof obj.done === 'function' && typeof obj.resolve === 'undefined';
   };
 
   Hoodie.prototype._loadModules = function(context, modules) {

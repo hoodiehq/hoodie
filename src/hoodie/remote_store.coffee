@@ -35,7 +35,7 @@
 #
 # * on(event, callback)
 #
-class Hoodie.RemoteStore
+class Hoodie.RemoteStore extends Hoodie.Store
 
   # ## properties
   
@@ -64,6 +64,9 @@ class Hoodie.RemoteStore
   
   # load one object
   load: (type, id) ->
+    defer = super
+    return defer if @hoodie.isPromise(defer)
+
     path = "/" + encodeURIComponent "#{type}/#{id}"
     @request "GET", path
 
@@ -72,7 +75,9 @@ class Hoodie.RemoteStore
   
   # load all objects, can be filetered by a type
   loadAll: (type) ->
-    defer = @hoodie.defer()
+    defer = super
+    return defer if @hoodie.isPromise(defer)
+
     path = "/_all_docs"
     if type
       path = "#{path}?startkey=\"#{type}\"&endkey=\"#{type}0\""
@@ -84,40 +89,27 @@ class Hoodie.RemoteStore
 
     return defer.promise()
   
-
-  # ## create
-  
-  # create a new object
-  create: (type, object) ->
-    @save type, undefined, object
-
-  
   # ## save
   
   # save a new object. If it existed before, all properties
   # will be overwritten 
   save: (type, id, object) ->
-    console.log ".save() not yet implemented", arguments...
+    defer = super
+    return defer if @hoodie.isPromise(defer)
 
-  
-  # ## update
-  
-  # update an existing object
-  update: (new_properties) ->
-    console.log ".update() not yet implemented", arguments...
-
-  
-  # ## updateAll
-  
-  # update all existing objects, can be filetered by type
-  updateAll: (type, new_properties) ->
-    console.log ".updateAll() not yet implemented", arguments...
+    object = $.extend {}, object
+    object.type = type
+    object.id   = id
+    @push [object]
 
   
   # ## delete
   
   # delete one object
   delete: (type, id) ->
+    defer = super
+    return defer if @hoodie.isPromise(defer)
+
     console.log ".delete() not yet implemented", arguments...
 
   
@@ -125,6 +117,9 @@ class Hoodie.RemoteStore
   
   # delete all objects, can be filtered by type
   deleteAll: (type) ->
+    defer = super
+    return defer if @hoodie.isPromise(defer)
+
     console.log ".deleteAll() not yet implemented", arguments...
 
 
@@ -246,7 +241,7 @@ class Hoodie.RemoteStore
     @_pushRequest = @request 'POST', "/_bulk_docs"
       data : JSON.stringify
         docs      : docsForRemote
-        newEdits  : false
+        new_edits : false
 
     # when push is successful, update the local store with the generated _rev numbers
     @_pushRequest.done @_handlePushSuccess docs, docsForRemote

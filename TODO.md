@@ -3,6 +3,10 @@
   like email, store and remote but also use it for custom modules.
   
 
+### Hoodie
+
+* spec Hoodie.isPromise
+
 ### Share
 
 # spec current code

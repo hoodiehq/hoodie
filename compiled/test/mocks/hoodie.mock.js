@@ -11,7 +11,7 @@ Mocks.Hoodie = function() {
     one: function() {},
     unbind: function() {},
     defer: $.Deferred,
-    isPromise: function() {},
+    isPromise: Hoodie.prototype.isPromise,
     my: {
       store: {
         uuid: function() {

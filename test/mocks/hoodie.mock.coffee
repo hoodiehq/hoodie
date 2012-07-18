@@ -9,7 +9,7 @@ Mocks.Hoodie = ->
   one           : ->
   unbind        : ->
   defer         : $.Deferred
-  isPromise     : -> 
+  isPromise     : Hoodie::isPromise
     
   my :
     store         :

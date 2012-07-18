@@ -1,4 +1,4 @@
-describe "Hoodie.Store", ->  
+describe "Hoodie.LocalStore", ->  
   beforeEach ->
     @hoodie = new Mocks.Hoodie 
     @store  = new Hoodie.LocalStore @hoodie
@@ -450,14 +450,6 @@ describe "Hoodie.Store", ->
       it "should not remove the object from store", ->
         @store.delete 'document', '123'
         expect(@store.db.removeItem).wasNotCalled()
-      
-      
-      
-    
-    describe "aliases", ->
-      it "should allow to use .destroy", ->
-        expect(@store.destroy).toBe @store.delete
-    # /aliases
   # /.destroy(type, id)
 
   describe ".cache(type, id, object)", ->
@@ -705,13 +697,4 @@ describe "Hoodie.Store", ->
       @store.clearChanged()
       expect(@hoodie.trigger).wasCalledWith 'store:dirty'
   # /.clearChanged()
-  
-  describe ".uuid(num = 7)", ->
-    it "should default to a length of 7", ->
-      expect(@store.uuid().length).toBe 7
-    
-    _when "called with num = 5", ->
-      it "should generate an id with length = 5", ->
-        expect(@store.uuid(5).length).toBe 5
-  # /.uuid(num)
 # /Hoodie.LocalStore

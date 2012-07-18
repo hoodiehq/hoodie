@@ -3,7 +3,12 @@ _and  = (description, specs) -> describe("and " + description, specs)
 _but  = (description, specs) -> describe("but " + description, specs)
 
 jasmine.Matchers.prototype.toBePromise = ->
-  this.actual.done && !this.actual.resolve
+  this.actual.done and !this.actual.resolve
+
+jasmine.Matchers.prototype.toBeDefer = ->
+  this.actual.done and this.actual.resolve
+
+
   
 jasmine.Matchers.prototype.toBeRejected = -> this.actual.isRejected()
 jasmine.Matchers.prototype.toBeResolved = -> this.actual.isResolved()

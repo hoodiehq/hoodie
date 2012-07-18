@@ -17,6 +17,10 @@ jasmine.Matchers.prototype.toBePromise = function() {
   return this.actual.done && !this.actual.resolve;
 };
 
+jasmine.Matchers.prototype.toBeDefer = function() {
+  return this.actual.done && this.actual.resolve;
+};
+
 jasmine.Matchers.prototype.toBeRejected = function() {
   return this.actual.isRejected();
 };

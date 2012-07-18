@@ -32,8 +32,6 @@ describe "Hoodie.RemoteStore", ->
     it "should set _sync to false from pased sync option", ->
       remote = new Hoodie.RemoteStore @hoodie, sync: true
       expect(remote._sync).toBe true
-    
-    
   # /.constructor
 
 
@@ -83,18 +81,6 @@ describe "Hoodie.RemoteStore", ->
         promise = @remote.loadAll()
         expect(promise).toBeRejectedWith "error"
   # /loadAll(type )
-
-  describe "create(type, object)", ->
-    beforeEach ->
-      spyOn(@remote, "save").andReturn "save_promise"
-
-    it "should proxy to save method", ->
-      @remote.create("test", {funky: "value"})
-      expect(@remote.save).wasCalledWith "test", undefined, funky: "value"
-
-    it "should return promise of save method", ->
-      expect(@remote.create()).toBe 'save_promise'
-  # /create(type, object)
 
   describe "save(type, id, object)", ->
   # /save(type, id, object)
@@ -480,9 +466,9 @@ describe "Hoodie.RemoteStore", ->
         expect(doc._id).toBe 'todo/abc3'
         expect(doc._localInfo).toBeUndefined()
 
-      it "should set data.newEdits to false", ->
-        {newEdits} = JSON.parse @options.data
-        expect(newEdits).toBe false
+      it "should set data.new_edits to false", ->
+        {new_edits} = JSON.parse @options.data
+        expect(new_edits).toBe false
 
       it "should set new _revision ids", ->
         {docs} = JSON.parse @options.data

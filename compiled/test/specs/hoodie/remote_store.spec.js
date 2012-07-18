@@ -98,22 +98,6 @@ describe("Hoodie.RemoteStore", function() {
       });
     });
   });
-  describe("create(type, object)", function() {
-    beforeEach(function() {
-      return spyOn(this.remote, "save").andReturn("save_promise");
-    });
-    it("should proxy to save method", function() {
-      this.remote.create("test", {
-        funky: "value"
-      });
-      return expect(this.remote.save).wasCalledWith("test", void 0, {
-        funky: "value"
-      });
-    });
-    return it("should return promise of save method", function() {
-      return expect(this.remote.create()).toBe('save_promise');
-    });
-  });
   describe("save(type, id, object)", function() {});
   describe("update(new_properties )", function() {});
   describe("updateAll( type, new_properties)", function() {});
@@ -574,10 +558,10 @@ describe("Hoodie.RemoteStore", function() {
         expect(doc._id).toBe('todo/abc3');
         return expect(doc._localInfo).toBeUndefined();
       });
-      it("should set data.newEdits to false", function() {
-        var newEdits;
-        newEdits = JSON.parse(this.options.data).newEdits;
-        return expect(newEdits).toBe(false);
+      it("should set data.new_edits to false", function() {
+        var new_edits;
+        new_edits = JSON.parse(this.options.data).new_edits;
+        return expect(new_edits).toBe(false);
       });
       return it("should set new _revision ids", function() {
         var deletedDoc, docs, newDoc;
