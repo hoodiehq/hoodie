@@ -73,7 +73,7 @@ class Hoodie.Account
   signUp : (username, password = '') ->
     defer = @hoodie.defer()
     
-    key     = "#{@_prefix}:#{username}"
+    key = "#{@_prefix}:#{username}"
 
     data = 
       _id        : key
@@ -89,6 +89,7 @@ class Hoodie.Account
     handleSucces = (response) =>
         @hoodie.trigger 'account:signup', username
         @_doc._rev = response.rev
+
         @signIn(username, password).then defer.resolve, defer.reject
 
     requestPromise.then handleSucces, defer.reject

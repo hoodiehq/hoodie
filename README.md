@@ -20,10 +20,7 @@ Accounts / Sessions
 ```javascript
 hoodie.my.account.signUp('joe@example.com', 'secret')
 
-  .done( function(user) {
-    user.email // 'joe@example.com'
-    user.uuid  // auto generated
-    
+  .done( function() {  
     // data sync kicks in
   } ) 
   
@@ -39,7 +36,7 @@ hoodie.my.account.signUp('joe@example.com', 'secret')
 ```javascript
 hoodie.my.account.signIn('joe@example.com', 'secret')
 
-  .done( function(user) {
+  .done( function() {
     // data sync kicks in
   } ) 
   .fail( function(err) {
@@ -53,7 +50,7 @@ hoodie.my.account.signIn('joe@example.com', 'secret')
 ```javascript
 hoodie.my.account.changePassword('current_secret', 'new_secret')
 
-  .done( function(user) { } ) 
+  .done( function() { } ) 
   .fail( function(err)  { } )
 ```
 
@@ -66,7 +63,7 @@ session, you can use the `authenticate` method.
 ```javascript
 hoodie.my.account.authenticate()
 
-  .done( function(user) {
+  .done( function() {
     // you are authenticated, your session is valid
   } ) 
   .fail( function(err) {
@@ -116,8 +113,9 @@ create or update an object.
 type = 'rule'
 hoodie.my.store.create( type, {name: "rule the world"} )
   
-  .done ( function(newObject) { } )
+  .done ( function(newObject)  { } )
   .fail ( function(err)        { } )
+
   
 // save an object
 id   = 'abc4567'
@@ -125,7 +123,8 @@ type = 'rule'
 hoodie.my.store.save( type, id, {name: "rule the world"} )
   
   .done ( function(object) { } )
-  .fail ( function(err)        { } )
+  .fail ( function(err)    { } )
+  
   
 // update an existing object
 // Note: this changes only the passed attributes of the object
