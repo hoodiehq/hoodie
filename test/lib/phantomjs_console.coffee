@@ -48,9 +48,6 @@ page.open phantom.args[0], (status) ->
   else
       
     console.log ""
-    console.log "Put your commands in the following file:"
-    console.log "$EDITOR /tmp/phantom_command.js"
-    console.log ""
     console.log "Exit with ^ + C"
     console.log ""
 
