@@ -8,8 +8,8 @@
 #
 # object loading / updating / deleting
 #
-# * load(type, id)
-# * loadAll(type )
+# * find(type, id)
+# * findAll(type )
 # * create(type, object)
 # * save(type, id, object)
 # * update(new_properties )
@@ -60,10 +60,10 @@ class Hoodie.RemoteStore extends Hoodie.Store
   # --------------------------------------
 
   
-  # ## load
+  # ## find
   
-  # load one object
-  load: (type, id) ->
+  # find one object
+  find: (type, id) ->
     defer = super
     return defer if @hoodie.isPromise(defer)
 
@@ -71,10 +71,10 @@ class Hoodie.RemoteStore extends Hoodie.Store
     @request "GET", path
 
   
-  # ## loadAll
+  # ## findAll
   
-  # load all objects, can be filetered by a type
-  loadAll : (type) ->
+  # find all objects, can be filetered by a type
+  findAll : (type) ->
     defer = super
     return defer if @hoodie.isPromise(defer)
 
@@ -203,14 +203,14 @@ class Hoodie.RemoteStore extends Hoodie.Store
 
   # ## getSinceNr
 
-  # returns the sequence number from wich to start to load changes in pull
+  # returns the sequence number from wich to start to find changes in pull
   #
   getSinceNr: ->
     @_since or 0
 
   # ## setSinceNr
 
-  # sets the sequence number from wich to start to load changes in pull
+  # sets the sequence number from wich to start to find changes in pull
   #
   setSinceNr: (seq) ->
     @_since = seq

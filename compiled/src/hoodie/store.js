@@ -43,7 +43,7 @@ Hoodie.Store = (function() {
       options = {};
     }
     defer = this.hoodie.defer();
-    _loadPromise = this.load(type, id).pipe(function(currentObj) {
+    _loadPromise = this.find(type, id).pipe(function(currentObj) {
       var changedProperties, key, value;
       if (typeof objectUpdate === 'function') {
         objectUpdate = objectUpdate($.extend({}, currentObj));
@@ -83,7 +83,7 @@ Hoodie.Store = (function() {
     }
     switch (true) {
       case typeof filterOrObjects === 'string':
-        promise = this.loadAll(filterOrObjects);
+        promise = this.findAll(filterOrObjects);
         break;
       case this.hoodie.isPromise(filterOrObjects):
         promise = filterOrObjects;
@@ -92,7 +92,7 @@ Hoodie.Store = (function() {
         promise = this.hoodie.defer().resolve(filterOrObjects).resolve();
         break;
       default:
-        promise = this.loadAll();
+        promise = this.findAll();
     }
     return promise.pipe(function(objects) {
       var defer, object, _updatePromises;
@@ -111,7 +111,7 @@ Hoodie.Store = (function() {
     });
   };
 
-  Store.prototype.load = function(type, id) {
+  Store.prototype.find = function(type, id) {
     var defer;
     defer = this.hoodie.defer();
     if (!(typeof type === 'string' && typeof id === 'string')) {
@@ -120,26 +120,22 @@ Hoodie.Store = (function() {
     return defer;
   };
 
-  Store.prototype.find = function() {
-    return this.load.apply(this, arguments);
-  };
-
   Store.prototype.findOrCreate = function(attributes) {
     var defer,
       _this = this;
     defer = this.hoodie.defer();
-    this.load(attributes.id).done(defer.resolve).fail(function() {
+    this.find(attributes.id).done(defer.resolve).fail(function() {
       return _this.create(attributes).then(defer.resolve, defer.reject);
     });
     return defer.promise();
   };
 
-  Store.prototype.loadAll = function() {
+  Store.prototype.findAll = function() {
     return this.hoodie.defer();
   };
 
-  Store.prototype.findAll = function() {
-    return this.loadAll.apply(this, arguments);
+  Store.prototype.loadAll = function() {
+    return this.findAll.apply(this, arguments);
   };
 
   Store.prototype["delete"] = function(type, id, options) {

@@ -64,7 +64,7 @@ class Hoodie.Store
   update : (type, id, objectUpdate, options = {}) ->
     defer = @hoodie.defer()
     
-    _loadPromise = @load(type, id).pipe (currentObj) => 
+    _loadPromise = @find(type, id).pipe (currentObj) => 
       
       # normalize input
       objectUpdate = objectUpdate( $.extend {}, currentObj ) if typeof objectUpdate is 'function'
@@ -102,13 +102,13 @@ class Hoodie.Store
     # normalize the input: make sure we have all objects
     switch true
       when typeof filterOrObjects is 'string'
-        promise = @loadAll filterOrObjects
+        promise = @findAll filterOrObjects
       when @hoodie.isPromise(filterOrObjects)
         promise = filterOrObjects  
       when $.isArray filterOrObjects
         promise = @hoodie.defer().resolve( filterOrObjects ).resolve()
       else # e.g. null, update all
-        promise = @loadAll()
+        promise = @findAll()
     
     promise.pipe (objects) =>
       
@@ -122,14 +122,14 @@ class Hoodie.Store
       return defer.promise()
   
 
-  # ## load
+  # ## find
 
   # loads one object from Store, specified by `type` and `id`
   #
   # example usage:
   #
-  #     store.load('car', 'abc4567')
-  load : (type, id) ->
+  #     store.find('car', 'abc4567')
+  find : (type, id) ->
     defer = @hoodie.defer()
   
     unless typeof type is 'string' and typeof id is 'string'
@@ -138,7 +138,7 @@ class Hoodie.Store
     return defer
 
   # alias
-  find: -> @load arguments...
+  # find: -> @find arguments...
   
 
   # ## find or create
@@ -148,7 +148,7 @@ class Hoodie.Store
   # 3. If not, create one and return it.
   findOrCreate : (attributes) ->
     defer = @hoodie.defer()
-    @load(attributes.id)
+    @find(attributes.id)
     .done( defer.resolve )
     .fail => 
       @create(attributes).then defer.resolve, defer.reject 
@@ -156,14 +156,14 @@ class Hoodie.Store
     return defer.promise()
   
   
-  # ## loadAll
+  # ## findAll
 
   # returns all objects from store. 
   # Can be optionally filtered by a type or a function
-  loadAll : -> @hoodie.defer()
+  findAll : -> @hoodie.defer()
 
   # alias
-  findAll : -> @loadAll arguments...
+  loadAll : -> @findAll arguments...
   
   
   # ## Delete

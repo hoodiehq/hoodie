@@ -40,7 +40,7 @@ describe("Hoodie.Config", function() {
   });
   describe(".get(key)", function() {
     beforeEach(function() {
-      spyOn(this.hoodie.my.store, "load").andReturn(this.hoodie.defer().resolve({
+      spyOn(this.hoodie.my.store, "find").andReturn(this.hoodie.defer().resolve({
         funky: 'fresh'
       }));
       return this.config = new Hoodie.Config(this.hoodie);

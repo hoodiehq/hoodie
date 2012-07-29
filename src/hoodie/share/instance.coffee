@@ -44,7 +44,7 @@ class Hoodie.Share.Instance
   #     # shared and keep them updated
   #     hoodie.share.create
   #       continuous : true
-  #       objects    : hoodie.my.store.loadAll (obj) -> obj.isShared
+  #       objects    : hoodie.my.store.findAll (obj) -> obj.isShared
   #
   constructor: (options = {}) ->
     
@@ -286,13 +286,13 @@ class Hoodie.Share.Instance
 
 
   #
-  # 1. load all objects that belong to share and that have local changes
+  # 1. find all objects that belong to share and that have local changes
   # 2. combine these with the docs that have been removed from the share
   # 3. sync all these with share's remote
   #
   _sync : =>
     @save()
-    .pipe @hoodie.my.store.loadAll(@_isMySharedObjectAndChanged)
+    .pipe @hoodie.my.store.findAll(@_isMySharedObjectAndChanged)
     .pipe (sharedObjectThatChanged) =>
       @hoodie.my.remote.sync(sharedObjectThatChanged)
       .then @_handleRemoteChanges

@@ -83,14 +83,14 @@ describe("Hoodie.Store", function() {
   });
   describe(".update(type, id, update, options)", function() {
     beforeEach(function() {
-      spyOn(this.store, "load");
+      spyOn(this.store, "find");
       return spyOn(this.store, "save").andReturn({
         then: function() {}
       });
     });
     _when("object cannot be found", function() {
       beforeEach(function() {
-        this.store.load.andReturn($.Deferred().reject());
+        this.store.find.andReturn($.Deferred().reject());
         return this.promise = this.store.update('couch', '123', {
           funky: 'fresh'
         });
@@ -103,7 +103,7 @@ describe("Hoodie.Store", function() {
     });
     return _when("object can be found", function() {
       beforeEach(function() {
-        this.store.load.andReturn($.Deferred().resolve({
+        this.store.find.andReturn($.Deferred().resolve({
           style: 'baws'
         }));
         return this.store.save.andReturn($.Deferred().resolve('resolved by save'));
@@ -239,7 +239,7 @@ describe("Hoodie.Store", function() {
       beforeEach(function() {
         var findAll_promise;
         findAll_promise = jasmine.createSpy("findAll_promise");
-        return spyOn(this.store, "loadAll").andReturn({
+        return spyOn(this.store, "findAll").andReturn({
           pipe: findAll_promise
         });
       });
@@ -247,14 +247,14 @@ describe("Hoodie.Store", function() {
         this.store.updateAll("car", {
           funky: 'update'
         });
-        return expect(this.store.loadAll).wasCalledWith("car");
+        return expect(this.store.findAll).wasCalledWith("car");
       });
     });
     return _when("no objects passed", function() {
       beforeEach(function() {
         var findAll_promise;
         findAll_promise = jasmine.createSpy("findAll_promise");
-        return spyOn(this.store, "loadAll").andReturn({
+        return spyOn(this.store, "findAll").andReturn({
           pipe: findAll_promise
         });
       });
@@ -262,54 +262,54 @@ describe("Hoodie.Store", function() {
         this.store.updateAll(null, {
           funky: 'update'
         });
-        expect(this.store.loadAll).wasCalled();
-        return expect(this.store.loadAll.mostRecentCall.args.length).toBe(0);
+        expect(this.store.findAll).wasCalled();
+        return expect(this.store.findAll.mostRecentCall.args.length).toBe(0);
       });
     });
   });
-  describe(".load(type, id)", function() {
+  describe(".find(type, id)", function() {
     it("should return a defer", function() {
       var defer;
-      defer = this.store.load('document', '123');
+      defer = this.store.find('document', '123');
       return expect(defer).toBeDefer();
     });
     describe("invalid arguments", function() {
       _when("no arguments passed", function() {
         return it("should be rejected", function() {
           var promise;
-          promise = this.store.load();
+          promise = this.store.find();
           return expect(promise).toBeRejected();
         });
       });
       return _when("no id passed", function() {
         return it("should be rejected", function() {
           var promise;
-          promise = this.store.load('document');
+          promise = this.store.find('document');
           return expect(promise).toBeRejected();
         });
       });
     });
     return describe("aliases", function() {
       beforeEach(function() {
-        return spyOn(this.store, "load");
+        return spyOn(this.store, "find");
       });
       return it("should allow to use .find", function() {
         this.store.find('test', '123');
-        return expect(this.store.load).wasCalledWith('test', '123');
+        return expect(this.store.find).wasCalledWith('test', '123');
       });
     });
   });
-  describe(".loadAll(type)", function() {
+  describe(".findAll(type)", function() {
     it("should return a defer", function() {
-      return expect(this.store.loadAll()).toBeDefer();
+      return expect(this.store.findAll()).toBeDefer();
     });
     return describe("aliases", function() {
       beforeEach(function() {
-        return spyOn(this.store, "loadAll");
+        return spyOn(this.store, "findAll");
       });
-      return it("should allow to use .findAll", function() {
-        this.store.findAll('test');
-        return expect(this.store.loadAll).wasCalledWith('test');
+      return it("should allow to use .loadAll", function() {
+        this.store.loadAll('test');
+        return expect(this.store.findAll).wasCalledWith('test');
       });
     });
   });
@@ -318,7 +318,7 @@ describe("Hoodie.Store", function() {
       beforeEach(function() {
         var promise;
         promise = this.hoodie.defer().resolve('existing_object').promise();
-        return spyOn(this.store, "load").andReturn(promise);
+        return spyOn(this.store, "find").andReturn(promise);
       });
       return it("should resolve with existing object", function() {
         var promise;
@@ -331,7 +331,7 @@ describe("Hoodie.Store", function() {
     });
     return _when("object does not exist", function() {
       beforeEach(function() {
-        return spyOn(this.store, "load").andReturn(this.hoodie.defer().reject().promise());
+        return spyOn(this.store, "find").andReturn(this.hoodie.defer().reject().promise());
       });
       it("should call `.create` with passed attributes", function() {
         var promise;

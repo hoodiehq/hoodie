@@ -7,13 +7,13 @@
 
 // open a "store"
 hoodie.open("user/joe").push()
-hoodie.open("user/jane/public").loadAll( function(objects) {})
+hoodie.open("user/jane/public").findAll( function(objects) {})
 hoodie.open("share/abc8320", {password: "secret"}).pull()
 hoodie.open("global").on("created:track", function(track) {})
 
 // shortcuts
 hoodie.my.remote.push()
-hoodie.user('jane').loadAll( function(objects) {})
+hoodie.user('jane').findAll( function(objects) {})
 hoodie.share('abc832', {password: "secret"}).pull()
 hoodie.global.on("created:track", function(track) {})
 
@@ -27,9 +27,9 @@ hoodie.global.on("created:track", function(track) {})
 // instantiate
 store = hoodie.open("share/abc8320")
 
-// store / load objects
-store.load("todolist","xy20ad9")
-store.loadAll("todo")
+// store / find objects
+store.find("todolist","xy20ad9")
+store.findAll("todo")
 store.create("todo", {name: "remember the milk"})
 store.save("todo", "exists7", {name: "get some rest"})
 store.update("todo", "exists7", {name: "get some rest"})

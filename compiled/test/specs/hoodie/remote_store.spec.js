@@ -48,30 +48,30 @@ describe("Hoodie.RemoteStore", function() {
       return expect(remote._sync).toBe(true);
     });
   });
-  describe("load(type, id)", function() {
+  describe("find(type, id)", function() {
     beforeEach(function() {
       return spyOn(this.remote, "request").andReturn("request_promise");
     });
     return it("should return the request promise", function() {
-      return expect(this.remote.load("todo", "1")).toBe('request_promise');
+      return expect(this.remote.find("todo", "1")).toBe('request_promise');
     });
   });
-  describe("loadAll(type)", function() {
+  describe("findAll(type)", function() {
     beforeEach(function() {
       return spyOn(this.remote, "request").andReturn(this.requestDefer.promise());
     });
     it("should return a promise", function() {
-      return expect(this.remote.loadAll()).toBePromise();
+      return expect(this.remote.findAll()).toBePromise();
     });
     _when("type is not set", function() {
       return it("should send a GET to /_all_docs", function() {
-        this.remote.loadAll();
+        this.remote.findAll();
         return expect(this.remote.request).wasCalledWith("GET", "/_all_docs");
       });
     });
     _when("type is todo", function() {
       return it('should send a GET to /_all_docs?startkey="todo"&endkey="todo0"', function() {
-        this.remote.loadAll('todo');
+        this.remote.findAll('todo');
         return expect(this.remote.request).wasCalledWith("GET", '/_all_docs?startkey="todo"&endkey="todo0"');
       });
     });
@@ -83,7 +83,7 @@ describe("Hoodie.RemoteStore", function() {
       });
       return it("should be resolved with array of objects", function() {
         var promise;
-        promise = this.remote.loadAll();
+        promise = this.remote.findAll();
         return expect(promise).toBeResolvedWith("rows_array");
       });
     });
@@ -93,7 +93,7 @@ describe("Hoodie.RemoteStore", function() {
       });
       return it("should be rejected with the response error", function() {
         var promise;
-        promise = this.remote.loadAll();
+        promise = this.remote.findAll();
         return expect(promise).toBeRejectedWith("error");
       });
     });

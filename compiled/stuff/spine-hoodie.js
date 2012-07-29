@@ -17,7 +17,7 @@ Spine.Model.Hoodie = {
       }
     });
     this.fetch(function() {
-      return Spine.hoodie.my.store.loadAll(type).done(function(records) {
+      return Spine.hoodie.my.store.findAll(type).done(function(records) {
         return _this.refresh(records);
       });
     });

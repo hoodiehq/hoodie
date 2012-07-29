@@ -40,7 +40,7 @@ Mocks.Hoodie = function() {
             done: function() {}
           };
         },
-        load: function() {
+        find: function() {
           return {
             pipe: function() {},
             fail: function() {},

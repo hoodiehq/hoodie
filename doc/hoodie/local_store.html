@@ -57,14 +57,14 @@ store.save('car', 'abc4567', {color: 'red'})
   
     <span class="k">return</span> <span class="nx">defer</span><span class="p">.</span><span class="nx">promise</span><span class="p">()</span>
   
-  </div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h2 id="load">load</h2>
+  </div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h2 id="find">find</h2>
 
 <p>loads one object from Store, specified by <code>type</code> and <code>id</code></p>
 
 <p>example usage:</p>
 
-<pre><code>store.load('car', 'abc4567')
-</code></pre></div></div><div class="code"><div class="wrapper">  <span class="nv">load : </span><span class="nf">(type, id) -&gt;</span>
+<pre><code>store.find('car', 'abc4567')
+</code></pre></div></div><div class="code"><div class="wrapper">  <span class="nv">find : </span><span class="nf">(type, id) -&gt;</span>
     <span class="nv">defer = </span><span class="k">super</span>
     <span class="k">return</span> <span class="nx">defer</span> <span class="k">if</span> <span class="nx">@hoodie</span><span class="p">.</span><span class="nx">isPromise</span><span class="p">(</span><span class="nx">defer</span><span class="p">)</span>
   
@@ -80,17 +80,17 @@ store.save('car', 'abc4567', {color: 'red'})
     
     <span class="k">return</span> <span class="nx">defer</span><span class="p">.</span><span class="nx">promise</span><span class="p">()</span>
   
-  </div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h2 id="loadall">loadAll</h2>
+  </div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h2 id="findall">findAll</h2>
 
 <p>returns all objects from store. 
 Can be optionally filtered by a type or a function</p>
 
 <p>example usage:</p>
 
-<pre><code>store.loadAll()
-store.loadAll('car')
-store.loadAll(function(obj) { return obj.brand == 'Tesla' })
-</code></pre></div></div><div class="code"><div class="wrapper">  <span class="nv">loadAll : </span><span class="nf">(filter = -&gt; true) -&gt;</span>
+<pre><code>store.findAll()
+store.findAll('car')
+store.findAll(function(obj) { return obj.brand == 'Tesla' })
+</code></pre></div></div><div class="code"><div class="wrapper">  <span class="nv">findAll : </span><span class="nf">(filter = -&gt; true) -&gt;</span>
     <span class="nv">defer = </span><span class="k">super</span>
     <span class="k">return</span> <span class="nx">defer</span> <span class="k">if</span> <span class="nx">@hoodie</span><span class="p">.</span><span class="nx">isPromise</span><span class="p">(</span><span class="nx">defer</span><span class="p">)</span>
 
@@ -262,7 +262,7 @@ as it is when Safari's private browsing mode is active.</p></div></div><div clas
     <span class="p">(</span>
       <span class="nx">chars</span><span class="p">[</span> <span class="mi">0</span> <span class="o">|</span> <span class="nb">Math</span><span class="p">.</span><span class="nx">random</span><span class="p">()</span><span class="o">*</span><span class="nx">radix</span> <span class="p">]</span> <span class="k">for</span> <span class="nx">i</span> <span class="k">in</span> <span class="p">[</span><span class="mi">0</span><span class="p">...</span><span class="nx">len</span><span class="p">]</span>
     <span class="p">).</span><span class="nx">join</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
-  </div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h2 id="private">Private</h2></div></div><div class="code"><div class="wrapper">  </div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>more advanced localStorage wrappers to load/store objects</p></div></div><div class="code"><div class="wrapper">  <span class="nv">_setObject : </span><span class="nf">(type, id, object) -&gt;</span>
+  </div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h2 id="private">Private</h2></div></div><div class="code"><div class="wrapper">  </div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>more advanced localStorage wrappers to find/store objects</p></div></div><div class="code"><div class="wrapper">  <span class="nv">_setObject : </span><span class="nf">(type, id, object) -&gt;</span>
     <span class="nv">key = </span><span class="s2">&quot;#{type}/#{id}&quot;</span>
     <span class="nv">store = </span><span class="nx">$</span><span class="p">.</span><span class="nx">extend</span> <span class="p">{},</span> <span class="nx">object</span>
     <span class="k">delete</span> <span class="nx">store</span><span class="p">.</span><span class="nx">type</span>

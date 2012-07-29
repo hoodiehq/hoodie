@@ -23,7 +23,7 @@ Hoodie.Config = (function() {
     if (options.id) {
       this.id = options.id;
     }
-    this.hoodie.my.store.load(this.type, this.id).done(function(obj) {
+    this.hoodie.my.store.find(this.type, this.id).done(function(obj) {
       return _this.cache = obj;
     });
     this.hoodie.on('account:signedOut', this.clear);

@@ -302,14 +302,14 @@ describe("Hoodie.LocalStore", function() {
   });
   describe(".update(type, id, update, options)", function() {
     beforeEach(function() {
-      spyOn(this.store, "load");
+      spyOn(this.store, "find");
       return spyOn(this.store, "save").andReturn({
         then: function() {}
       });
     });
     _when("object cannot be found", function() {
       beforeEach(function() {
-        this.store.load.andReturn($.Deferred().reject());
+        this.store.find.andReturn($.Deferred().reject());
         return this.promise = this.store.update('couch', '123', {
           funky: 'fresh'
         });
@@ -322,7 +322,7 @@ describe("Hoodie.LocalStore", function() {
     });
     return _when("object can be found", function() {
       beforeEach(function() {
-        this.store.load.andReturn($.Deferred().resolve({
+        this.store.find.andReturn($.Deferred().resolve({
           style: 'baws'
         }));
         return this.store.save.andReturn($.Deferred().resolve('resolved by save'));
@@ -455,25 +455,25 @@ describe("Hoodie.LocalStore", function() {
       });
     });
   });
-  describe(".load(type, id)", function() {
+  describe(".find(type, id)", function() {
     beforeEach(function() {
       return spyOn(this.store, "cache").andCallThrough();
     });
     it("should return a promise", function() {
-      return this.promise = this.store.load('document', '123');
+      return this.promise = this.store.find('document', '123');
     });
     describe("invalid arguments", function() {
       _when("no arguments passed", function() {
         return it("should call the fail callback", function() {
           var promise;
-          promise = this.store.load();
+          promise = this.store.find();
           return expect(promise).toBeRejected();
         });
       });
       return _when("no id passed", function() {
         return it("should call the fail callback", function() {
           var promise;
-          promise = this.store.load('document');
+          promise = this.store.find('document');
           return expect(promise).toBeRejected();
         });
       });
@@ -483,7 +483,7 @@ describe("Hoodie.LocalStore", function() {
         this.store.cache.andReturn({
           name: 'test'
         });
-        return this.promise = this.store.load('document', 'abc4567');
+        return this.promise = this.store.find('document', 'abc4567');
       });
       return it("should call the done callback", function() {
         return expect(this.promise).toBeResolved();
@@ -492,19 +492,19 @@ describe("Hoodie.LocalStore", function() {
     _when("object cannot be found", function() {
       beforeEach(function() {
         this.store.cache.andReturn(false);
-        return this.promise = this.store.load('document', 'abc4567');
+        return this.promise = this.store.find('document', 'abc4567');
       });
       return it("should call the fail callback", function() {
         return expect(this.promise).toBeRejected();
       });
     });
     return it("should cache the object after the first get", function() {
-      this.store.load('document', 'abc4567');
-      this.store.load('document', 'abc4567');
+      this.store.find('document', 'abc4567');
+      this.store.find('document', 'abc4567');
       return expect(this.store.db.getItem.callCount).toBe(1);
     });
   });
-  describe(".loadAll(filter)", function() {
+  describe(".findAll(filter)", function() {
     var with_2CatsAnd_3Dogs;
     with_2CatsAnd_3Dogs = function(specs) {
       return _and("two cat and three dog objects exist in the store", function() {
@@ -522,7 +522,7 @@ describe("Hoodie.LocalStore", function() {
     };
     it("should return a promise", function() {
       var promise;
-      promise = this.store.loadAll();
+      promise = this.store.findAll();
       return expect(promise).toBePromise();
     });
     _when("called without a type", function() {
@@ -530,7 +530,7 @@ describe("Hoodie.LocalStore", function() {
         return it("should return'em all", function() {
           var promise, results, success;
           success = jasmine.createSpy('success');
-          promise = this.store.loadAll();
+          promise = this.store.findAll();
           promise.done(success);
           results = success.mostRecentCall.args[0];
           return expect(results.length).toBe(5);
@@ -542,7 +542,7 @@ describe("Hoodie.LocalStore", function() {
         });
         return it("should return an empty array", function() {
           var promise;
-          promise = this.store.loadAll();
+          promise = this.store.findAll();
           return expect(promise).toBeResolvedWith([]);
         });
       });
@@ -554,7 +554,7 @@ describe("Hoodie.LocalStore", function() {
         return it("should not return them", function() {
           var promise, results, success;
           success = jasmine.createSpy('success');
-          promise = this.store.loadAll();
+          promise = this.store.findAll();
           promise.done(success);
           results = success.mostRecentCall.args[0];
           return expect(results.length).toBe(1);
@@ -566,7 +566,7 @@ describe("Hoodie.LocalStore", function() {
         return it("should return one dog", function() {
           var promise, results, success;
           success = jasmine.createSpy('success');
-          promise = this.store.loadAll(function(obj) {
+          promise = this.store.findAll(function(obj) {
             return obj.age === 1;
           });
           promise.done(success);
@@ -685,7 +685,7 @@ describe("Hoodie.LocalStore", function() {
             color: 'red'
           };
         });
-        return it("should not load it from localStorage", function() {
+        return it("should not find it from localStorage", function() {
           this.store.cache('couch', '123');
           return expect(this.store.db.getItem).wasNotCalled();
         });

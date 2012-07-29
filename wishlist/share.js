@@ -136,9 +136,9 @@ hoodie.my.share("share_id")
 //   create a new share
 hoodie.my.share.create({})
 
-// * loadAll  
+// * findAll  
 //   lad all my sharings
-hoodie.my.share.loadAll()
+hoodie.my.share.findAll()
 
 // * updateAll  
 //   update all my sharings
@@ -302,7 +302,7 @@ hoodie.my.share.create( {
 
 /* they */
 hoodie.my.share( "mytodolist123", {password: "secret"} )
-.loadAll( function() {
+.findAll( function() {
   alert("welcome to my todolist!")
 })
 

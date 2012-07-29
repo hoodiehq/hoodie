@@ -210,12 +210,12 @@ describe "Hoodie.LocalStore", ->
   
   describe ".update(type, id, update, options)", ->
     beforeEach ->
-      spyOn(@store, "load")
+      spyOn(@store, "find")
       spyOn(@store, "save").andReturn then: ->
     
     _when "object cannot be found", ->
       beforeEach ->
-        @store.load.andReturn $.Deferred().reject()
+        @store.find.andReturn $.Deferred().reject()
         @promise = @store.update 'couch', '123', funky: 'fresh'
       
       it "should create it", ->
@@ -224,7 +224,7 @@ describe "Hoodie.LocalStore", ->
     
     _when "object can be found", ->
       beforeEach ->
-        @store.load.andReturn $.Deferred().resolve { style: 'baws' }
+        @store.find.andReturn $.Deferred().resolve { style: 'baws' }
         @store.save.andReturn $.Deferred().resolve 'resolved by save'
         
       _and "update is an object", ->
@@ -300,28 +300,28 @@ describe "Hoodie.LocalStore", ->
           expect(@store.update).wasCalledWith obj.type, obj.id, {funky: 'update'}, {}
   # /.updateAll(objects)
 
-  describe ".load(type, id)", ->
+  describe ".find(type, id)", ->
     beforeEach ->
       spyOn(@store, "cache").andCallThrough()
     
     it "should return a promise", ->
-      @promise = @store.load 'document', '123'
+      @promise = @store.find 'document', '123'
 
     describe "invalid arguments", ->
       _when "no arguments passed", ->          
         it "should call the fail callback", ->
-          promise = @store.load()
+          promise = @store.find()
           expect(promise).toBeRejected()
 
       _when "no id passed", ->
         it "should call the fail callback", ->
-          promise = @store.load 'document'
+          promise = @store.find 'document'
           expect(promise).toBeRejected()
       
     _when "object can be found", ->
       beforeEach ->
         @store.cache.andReturn name: 'test'
-        @promise = @store.load 'document', 'abc4567'
+        @promise = @store.find 'document', 'abc4567'
   
       it "should call the done callback", ->
         expect(@promise).toBeResolved()
@@ -329,19 +329,19 @@ describe "Hoodie.LocalStore", ->
     _when "object cannot be found", ->
       beforeEach ->
         @store.cache.andReturn false
-        @promise = @store.load 'document', 'abc4567'
+        @promise = @store.find 'document', 'abc4567'
     
       it "should call the fail callback", ->
         expect(@promise).toBeRejected()
 
     it "should cache the object after the first get", ->
-      @store.load 'document', 'abc4567'
-      @store.load 'document', 'abc4567'
+      @store.find 'document', 'abc4567'
+      @store.find 'document', 'abc4567'
 
       expect(@store.db.getItem.callCount).toBe 1
   # /.get(type, id)
 
-  describe ".loadAll(filter)", ->
+  describe ".findAll(filter)", ->
     with_2CatsAnd_3Dogs = (specs) ->
       _and "two cat and three dog objects exist in the store", ->
         beforeEach ->
@@ -350,14 +350,14 @@ describe "Hoodie.LocalStore", ->
         specs()
 
     it "should return a promise", ->
-      promise = @store.loadAll()
+      promise = @store.findAll()
       expect(promise).toBePromise()
   
     _when "called without a type", ->
       with_2CatsAnd_3Dogs ->
         it "should return'em all", ->
           success = jasmine.createSpy 'success'
-          promise = @store.loadAll()
+          promise = @store.findAll()
           promise.done success
           
           results = success.mostRecentCall.args[0]
@@ -368,7 +368,7 @@ describe "Hoodie.LocalStore", ->
           spyOn(@store, "_index").andReturn []
     
         it "should return an empty array", ->
-          promise = @store.loadAll()
+          promise = @store.findAll()
           expect(promise).toBeResolvedWith []
   
       _and "there are other documents in localStorage not stored with store", ->
@@ -378,7 +378,7 @@ describe "Hoodie.LocalStore", ->
     
         it "should not return them", ->
           success = jasmine.createSpy 'success'
-          promise = @store.loadAll()
+          promise = @store.findAll()
           promise.done success
           
           results = success.mostRecentCall.args[0]
@@ -388,12 +388,12 @@ describe "Hoodie.LocalStore", ->
       with_2CatsAnd_3Dogs ->
         it "should return one dog", ->
           success = jasmine.createSpy 'success'
-          promise = @store.loadAll (obj) -> obj.age is 1
+          promise = @store.findAll (obj) -> obj.age is 1
           promise.done success
           
           results = success.mostRecentCall.args[0]
           expect(results.length).toBe 2   
-  # /.loadAll(type)
+  # /.findAll(type)
 
   describe ".delete(type, id)", ->
     _when "objecet cannot be found", ->
@@ -475,7 +475,7 @@ describe "Hoodie.LocalStore", ->
         beforeEach ->
           @store._cached['couch/123'] = color: 'red'
         
-        it "should not load it from localStorage", ->
+        it "should not find it from localStorage", ->
           @store.cache 'couch', '123'
           expect(@store.db.getItem).wasNotCalled()
           

@@ -35,7 +35,7 @@ hoodie.my.store.update("profile", "uuid567", {}, options)
 // ## Open public objects
 
 // I can acces public objects from other users.
-hoodie.user("joey").store.loadAll( function(publicObjects){
+hoodie.user("joey").store.findAll( function(publicObjects){
   /* do something with Joey's public objects */
 })
 
@@ -72,7 +72,7 @@ hoodie.my.store.update("photo", "abc4567", {}, {public: false})
 
 // I want to see my friends photos
 // 
-hoodie.user("friendname").store.loadAll( showPhotos )
+hoodie.user("friendname").store.findAll( showPhotos )
 
 
 // ### Scenario 4
@@ -137,7 +137,7 @@ function favoriteTrack( track ) {
 }
 
 function unfavoriteTrack( track ) {
-  hoodie.my.store.loadAll( function(trackAtts) {
+  hoodie.my.store.findAll( function(trackAtts) {
     return trackAtts.type === "track" && trackAtts.trackId === track.id
   }).done( function( arrTrackAtts ) {
     hoodie.my.store.delete( "favorite", arrTrackAtts[0].trackId )
@@ -148,7 +148,7 @@ function unfavoriteTrack( track ) {
 
 // Show favorites from a user http://whiskie.net/user/espy
 // 
-hoodie.user('espy').store.loadAll("favorite")
+hoodie.user('espy').store.findAll("favorite")
 .done( function( favorites ) {
   renderFavorites( favorites )
 } ) 

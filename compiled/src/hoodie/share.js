@@ -23,16 +23,16 @@ Hoodie.Share = (function() {
     return share.save();
   };
 
-  Share.prototype.load = function(id) {
+  Share.prototype.find = function(id) {
     var _this = this;
-    return this.hoodie.my.store.load('$share', id).pipe(function(obj) {
+    return this.hoodie.my.store.find('$share', id).pipe(function(obj) {
       return new Hoodie.Share.Instance(obj);
     });
   };
 
   Share.prototype.destroy = function(id) {
     var _this = this;
-    return this.load(id).pipe(function(obj) {
+    return this.find(id).pipe(function(obj) {
       var share;
       share = new Hoodie.Share.Instance(obj);
       return share.destroy();

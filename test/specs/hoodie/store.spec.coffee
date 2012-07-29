@@ -62,12 +62,12 @@ describe "Hoodie.Store", ->
   
   describe ".update(type, id, update, options)", ->
     beforeEach ->
-      spyOn(@store, "load")
+      spyOn(@store, "find")
       spyOn(@store, "save").andReturn then: ->
     
     _when "object cannot be found", ->
       beforeEach ->
-        @store.load.andReturn $.Deferred().reject()
+        @store.find.andReturn $.Deferred().reject()
         @promise = @store.update 'couch', '123', funky: 'fresh'
       
       it "should create it", ->
@@ -76,7 +76,7 @@ describe "Hoodie.Store", ->
     
     _when "object can be found", ->
       beforeEach ->
-        @store.load.andReturn $.Deferred().resolve { style: 'baws' }
+        @store.find.andReturn $.Deferred().resolve { style: 'baws' }
         @store.save.andReturn $.Deferred().resolve 'resolved by save'
         
       _and "update is an object", ->
@@ -153,69 +153,69 @@ describe "Hoodie.Store", ->
     _when "passed objects is a type (string)", ->
       beforeEach ->
         findAll_promise = jasmine.createSpy "findAll_promise"
-        spyOn(@store, "loadAll").andReturn pipe: findAll_promise
+        spyOn(@store, "findAll").andReturn pipe: findAll_promise
       
       it "should update objects return by findAll(type)", ->
         @store.updateAll "car", {funky: 'update'}
-        expect(@store.loadAll).wasCalledWith "car"
+        expect(@store.findAll).wasCalledWith "car"
 
     _when "no objects passed", ->
       beforeEach ->
         findAll_promise = jasmine.createSpy "findAll_promise"
-        spyOn(@store, "loadAll").andReturn pipe: findAll_promise
+        spyOn(@store, "findAll").andReturn pipe: findAll_promise
       
       it "should update all objects", ->
         @store.updateAll null, {funky: 'update'}
-        expect(@store.loadAll).wasCalled()
-        expect(@store.loadAll.mostRecentCall.args.length).toBe 0
+        expect(@store.findAll).wasCalled()
+        expect(@store.findAll.mostRecentCall.args.length).toBe 0
   # /.updateAll(objects)
 
 
-  describe ".load(type, id)", ->
+  describe ".find(type, id)", ->
     it "should return a defer", ->
-      defer = @store.load 'document', '123'
+      defer = @store.find 'document', '123'
       expect(defer).toBeDefer()
 
     describe "invalid arguments", ->
       _when "no arguments passed", ->          
         it "should be rejected", ->
-          promise = @store.load()
+          promise = @store.find()
           expect(promise).toBeRejected()
 
       _when "no id passed", ->
         it "should be rejected", ->
-          promise = @store.load 'document'
+          promise = @store.find 'document'
           expect(promise).toBeRejected()
 
     describe "aliases", ->
       beforeEach ->
-        spyOn(@store, "load")
+        spyOn(@store, "find")
       
       it "should allow to use .find", ->
         @store.find 'test', '123'
-        expect(@store.load).wasCalledWith 'test', '123'
-  # /.load(type, id)
+        expect(@store.find).wasCalledWith 'test', '123'
+  # /.find(type, id)
 
 
-  describe ".loadAll(type)", ->
+  describe ".findAll(type)", ->
     it "should return a defer", ->
-      expect(@store.loadAll()).toBeDefer()
+      expect(@store.findAll()).toBeDefer()
 
     describe "aliases", ->
       beforeEach ->
-        spyOn(@store, "loadAll")
+        spyOn(@store, "findAll")
       
-      it "should allow to use .findAll", ->
-        @store.findAll 'test'
-        expect(@store.loadAll).wasCalledWith 'test'
-  # /.loadAll(type)
+      it "should allow to use .loadAll", ->
+        @store.loadAll 'test'
+        expect(@store.findAll).wasCalledWith 'test'
+  # /.findAll(type)
 
 
   describe ".findOrCreate(attributes)", ->
     _when "object exists", ->
       beforeEach ->
         promise = @hoodie.defer().resolve('existing_object').promise()
-        spyOn(@store, "load").andReturn promise
+        spyOn(@store, "find").andReturn promise
 
       it "should resolve with existing object", ->
         promise = @store.findOrCreate id: '123', attribute: 'value'
@@ -223,7 +223,7 @@ describe "Hoodie.Store", ->
 
     _when "object does not exist", ->
       beforeEach ->
-        spyOn(@store, "load").andReturn @hoodie.defer().reject().promise()
+        spyOn(@store, "find").andReturn @hoodie.defer().reject().promise()
       
       it "should call `.create` with passed attributes", ->
         spyOn(@store, "create").andReturn @hoodie.defer().promise()

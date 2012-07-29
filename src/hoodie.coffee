@@ -54,7 +54,7 @@ class Hoodie extends Events
   # * hoodie.global
   # * ... and more
   #
-  # usage: `hoodie.open("some_store_name").loadAll()`
+  # usage: `hoodie.open("some_store_name").findAll()`
   #
   open : (store_name, options = {}) ->
     $.extend options, basePath: "/#{encodeURIComponent store_name}"

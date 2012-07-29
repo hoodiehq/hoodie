@@ -41,9 +41,9 @@ Hoodie.RemoteStore = (function(_super) {
     }
   }
 
-  RemoteStore.prototype.load = function(type, id) {
+  RemoteStore.prototype.find = function(type, id) {
     var defer, path;
-    defer = RemoteStore.__super__.load.apply(this, arguments);
+    defer = RemoteStore.__super__.find.apply(this, arguments);
     if (this.hoodie.isPromise(defer)) {
       return defer;
     }
@@ -51,9 +51,9 @@ Hoodie.RemoteStore = (function(_super) {
     return this.request("GET", path);
   };
 
-  RemoteStore.prototype.loadAll = function(type) {
+  RemoteStore.prototype.findAll = function(type) {
     var defer, path, promise;
-    defer = RemoteStore.__super__.loadAll.apply(this, arguments);
+    defer = RemoteStore.__super__.findAll.apply(this, arguments);
     if (this.hoodie.isPromise(defer)) {
       return defer;
     }

@@ -139,10 +139,10 @@ hoodie.my.store.update( type, id, {nr: 1} )
 
 ### Load
 
-load an existing object
+find an existing object
 
 ```javascript
-hoodie.my.store.load( type, id )
+hoodie.my.store.find( type, id )
 
   .done ( function(object) { } )
   .fail ( function(err)    { } )
@@ -151,10 +151,10 @@ hoodie.my.store.load( type, id )
 
 ### Load all
 
-load all objects available or from a specific type
+find all objects available or from a specific type
 
 ```javascript
-hoodie.my.store.loadAll( type )
+hoodie.my.store.findAll( type )
 
   .done ( function(objects) { } )
   .fail ( function(err)     { } )
@@ -235,8 +235,8 @@ hoodie.my.store.update("couch","abc4567", {}, {public: ["color"]})
 // make couch with id "abc4567" private again
 hoodie.my.store.update("couch","abc4567", {}, {public: false})
 
-// load all couches from user "joe"
-hoodie.user("joe").loadAll("couch").done( function(couches) { ... })
+// find all couches from user "joe"
+hoodie.user("joe").findAll("couch").done( function(couches) { ... })
 ```
 
 
@@ -246,8 +246,8 @@ When enabled, all publicly shared objects by all users will be
 available through the hoodie.global API
 
 ```javascript
-// load all public songs from all users
-hoodie.global.loadAll("song").done( function(songs) { ... })
+// find all public songs from all users
+hoodie.global.findAll("song").done( function(songs) { ... })
 ```
 
 

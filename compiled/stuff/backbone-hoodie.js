@@ -12,9 +12,9 @@ Backbone.sync = function(method, modelOrCollection, options) {
     switch (method) {
       case "read":
         if (id) {
-          return Backbone.hoodie.my.store.load(type, id);
+          return Backbone.hoodie.my.store.find(type, id);
         } else {
-          return Backbone.hoodie.my.store.loadAll();
+          return Backbone.hoodie.my.store.findAll();
         }
         break;
       case "create":

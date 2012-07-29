@@ -34,7 +34,7 @@ Spine.Model.Hoodie =
 
     # fetch records from hoodie.my.store
     @fetch =>
-      Spine.hoodie.my.store.loadAll(type)
+      Spine.hoodie.my.store.findAll(type)
       .done (records) => @refresh(records)
 
     # listen to remote events on records

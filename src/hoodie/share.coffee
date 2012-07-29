@@ -68,12 +68,12 @@ class Hoodie.Share
     share.save()
     
   
-  # ## load
+  # ## find
   #
-  # load an existing share
+  # find an existing share
   #
-  load : (id) ->
-    @hoodie.my.store.load('$share', id).pipe (obj) =>
+  find : (id) ->
+    @hoodie.my.store.find('$share', id).pipe (obj) =>
       new Hoodie.Share.Instance obj
   
   # ## destroy
@@ -81,7 +81,7 @@ class Hoodie.Share
   # deletes an existing share
   #
   destroy : (id) ->
-    @load(id).pipe (obj) =>
+    @find(id).pipe (obj) =>
       share = new Hoodie.Share.Instance obj
       share.destroy()
     

@@ -1,13 +1,13 @@
 # Public
 # ========
 
-# the Public Module provides a simple API to load objects from the global 
+# the Public Module provides a simple API to find objects from the global 
 # stores
 #
-# For example, the syntax to load all objects from the global store
+# For example, the syntax to find all objects from the global store
 # looks like this:
 #
-#     hoodie.global.loadAll().done( handleObjects )
+#     hoodie.global.findAll().done( handleObjects )
 #
 # okay, might not be the best idea to do that with 1+ million objects, but
 # you get the point
@@ -17,5 +17,5 @@ class Hoodie.Global
   constructor: (hoodie) ->
 
     # vanilla API syntax:
-    # hoodie.global.loadAll()
+    # hoodie.global.findAll()
     return hoodie.open "global"

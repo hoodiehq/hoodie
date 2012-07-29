@@ -85,14 +85,14 @@ class Hoodie.LocalStore extends Hoodie.Store
     return defer.promise()
   
   
-  # ## load
+  # ## find
   #
   # loads one object from Store, specified by `type` and `id`
   #
   # example usage:
   #
-  #     store.load('car', 'abc4567')
-  load : (type, id) ->
+  #     store.find('car', 'abc4567')
+  find : (type, id) ->
     defer = super
     return defer if @hoodie.isPromise(defer)
   
@@ -109,17 +109,17 @@ class Hoodie.LocalStore extends Hoodie.Store
     return defer.promise()
   
   
-  # ## loadAll
+  # ## findAll
   #
   # returns all objects from store. 
   # Can be optionally filtered by a type or a function
   #
   # example usage:
   #
-  #     store.loadAll()
-  #     store.loadAll('car')
-  #     store.loadAll(function(obj) { return obj.brand == 'Tesla' })
-  loadAll : (filter = -> true) ->
+  #     store.findAll()
+  #     store.findAll('car')
+  #     store.findAll(function(obj) { return obj.brand == 'Tesla' })
+  findAll : (filter = -> true) ->
     defer = super
     return defer if @hoodie.isPromise(defer)
 
@@ -337,7 +337,7 @@ class Hoodie.LocalStore extends Hoodie.Store
   
   # ## Private
   
-  # more advanced localStorage wrappers to load/store objects
+  # more advanced localStorage wrappers to find/store objects
   _setObject : (type, id, object) ->
     key = "#{type}/#{id}"
     store = $.extend {}, object

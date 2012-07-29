@@ -6,7 +6,7 @@
     <span class="vi">@type       = </span><span class="nx">options</span><span class="p">.</span><span class="nx">type</span>       <span class="k">if</span> <span class="nx">options</span><span class="p">.</span><span class="nx">type</span>
     <span class="vi">@id         = </span><span class="nx">options</span><span class="p">.</span><span class="nx">id</span>         <span class="k">if</span> <span class="nx">options</span><span class="p">.</span><span class="nx">id</span>
     
-    <span class="nx">@hoodie</span><span class="p">.</span><span class="nx">my</span><span class="p">.</span><span class="nx">store</span><span class="p">.</span><span class="nx">load</span><span class="p">(</span><span class="nx">@type</span><span class="p">,</span> <span class="nx">@id</span><span class="p">).</span><span class="nx">done</span> <span class="p">(</span><span class="nx">obj</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="vi">@cache = </span><span class="nx">obj</span>
+    <span class="nx">@hoodie</span><span class="p">.</span><span class="nx">my</span><span class="p">.</span><span class="nx">store</span><span class="p">.</span><span class="nx">find</span><span class="p">(</span><span class="nx">@type</span><span class="p">,</span> <span class="nx">@id</span><span class="p">).</span><span class="nx">done</span> <span class="p">(</span><span class="nx">obj</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="vi">@cache = </span><span class="nx">obj</span>
 
     <span class="nx">@hoodie</span><span class="p">.</span><span class="kc">on</span> <span class="s1">&#39;account:signedOut&#39;</span><span class="p">,</span> <span class="nx">@clear</span>
   

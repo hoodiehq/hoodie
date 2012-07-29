@@ -61,9 +61,9 @@ opens a share, gives access to its api</li>
 <li>create <br />
 create a new share</li>
 </ul></div></div><div class="code"><div class="wrapper"><span class="nx">hoodie</span><span class="p">.</span><span class="nx">my</span><span class="p">.</span><span class="nx">share</span><span class="p">.</span><span class="nx">create</span><span class="p">({})</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><ul>
-<li>loadAll <br />
+<li>findAll <br />
 lad all my sharings</li>
-</ul></div></div><div class="code"><div class="wrapper"><span class="nx">hoodie</span><span class="p">.</span><span class="nx">my</span><span class="p">.</span><span class="nx">share</span><span class="p">.</span><span class="nx">loadAll</span><span class="p">()</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><ul>
+</ul></div></div><div class="code"><div class="wrapper"><span class="nx">hoodie</span><span class="p">.</span><span class="nx">my</span><span class="p">.</span><span class="nx">share</span><span class="p">.</span><span class="nx">findAll</span><span class="p">()</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><ul>
 <li>updateAll <br />
 update all my sharings</li>
 </ul></div></div><div class="code"><div class="wrapper"><span class="nx">hoodie</span><span class="p">.</span><span class="nx">my</span><span class="p">.</span><span class="nx">share</span><span class="p">.</span><span class="nx">updateAll</span><span class="p">({</span><span class="nx">access</span><span class="o">:</span> <span class="kc">false</span><span class="p">})</span>
@@ -168,7 +168,7 @@ others when trying to accessing it:</p></div></div><div class="code"><div class=
 
 <span class="cm">/* they */</span>
 <span class="nx">hoodie</span><span class="p">.</span><span class="nx">my</span><span class="p">.</span><span class="nx">share</span><span class="p">(</span> <span class="s2">&quot;mytodolist123&quot;</span><span class="p">,</span> <span class="p">{</span><span class="nx">password</span><span class="o">:</span> <span class="s2">&quot;secret&quot;</span><span class="p">}</span> <span class="p">)</span>
-<span class="p">.</span><span class="nx">loadAll</span><span class="p">(</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+<span class="p">.</span><span class="nx">findAll</span><span class="p">(</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
   <span class="nx">alert</span><span class="p">(</span><span class="s2">&quot;welcome to my todolist!&quot;</span><span class="p">)</span>
 <span class="p">})</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h3 id="usecase-8-subscribing-to-events-in-shares">Usecase 8: Subscribing to events in Shares</h3></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>I can open a share and listen to changes of its containing objects</p></div></div><div class="code"><div class="wrapper"><span class="nx">hoodie</span><span class="p">.</span><span class="nx">my</span><span class="p">.</span><span class="nx">share</span><span class="p">(</span><span class="s1">&#39;shared_id&#39;</span><span class="p">).</span><span class="nx">on</span><span class="p">(</span><span class="s1">&#39;changed&#39;</span><span class="p">,</span>        <span class="kd">function</span><span class="p">(</span><span class="nx">object</span><span class="p">)</span> <span class="p">{</span> <span class="cm">/*...*/</span> <span class="p">})</span>
 <span class="nx">hoodie</span><span class="p">.</span><span class="nx">my</span><span class="p">.</span><span class="nx">share</span><span class="p">(</span><span class="s1">&#39;shared_id&#39;</span><span class="p">).</span><span class="nx">on</span><span class="p">(</span><span class="s1">&#39;changed:type&#39;</span><span class="p">,</span>   <span class="kd">function</span><span class="p">(</span><span class="nx">object</span><span class="p">)</span> <span class="p">{</span> <span class="cm">/*...*/</span> <span class="p">})</span>

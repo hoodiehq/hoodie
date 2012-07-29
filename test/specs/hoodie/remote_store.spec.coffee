@@ -38,30 +38,30 @@ describe "Hoodie.RemoteStore", ->
   # object loading / updating / deleting
   # -------------------------------------
 
-  describe "load(type, id)", ->
+  describe "find(type, id)", ->
     beforeEach ->
       spyOn(@remote, "request").andReturn "request_promise"
 
     it "should return the request promise", ->
-      expect(@remote.load("todo", "1")).toBe 'request_promise'
+      expect(@remote.find("todo", "1")).toBe 'request_promise'
     
-  # /load(type, id)
+  # /find(type, id)
 
-  describe "loadAll(type)", ->
+  describe "findAll(type)", ->
     beforeEach ->
       spyOn(@remote, "request").andReturn @requestDefer.promise()
     
     it "should return a promise", ->
-      expect(@remote.loadAll()).toBePromise()
+      expect(@remote.findAll()).toBePromise()
 
     _when "type is not set", ->
       it "should send a GET to /_all_docs", ->
-        @remote.loadAll()
+        @remote.findAll()
         expect(@remote.request).wasCalledWith "GET", "/_all_docs"
 
     _when "type is todo", ->
       it 'should send a GET to /_all_docs?startkey="todo"&endkey="todo0"', ->
-        @remote.loadAll('todo')
+        @remote.findAll('todo')
         expect(@remote.request).wasCalledWith "GET", '/_all_docs?startkey="todo"&endkey="todo0"'
 
     _when "request success", ->
@@ -70,7 +70,7 @@ describe "Hoodie.RemoteStore", ->
           rows: "rows_array"
 
       it "should be resolved with array of objects", ->
-        promise = @remote.loadAll()
+        promise = @remote.findAll()
         expect(promise).toBeResolvedWith "rows_array"
 
     _when "request has an error", ->
@@ -78,9 +78,9 @@ describe "Hoodie.RemoteStore", ->
         @requestDefer.reject "error"
 
       it "should be rejected with the response error", ->
-        promise = @remote.loadAll()
+        promise = @remote.findAll()
         expect(promise).toBeRejectedWith "error"
-  # /loadAll(type )
+  # /findAll(type )
 
   describe "save(type, id, object)", ->
     beforeEach ->

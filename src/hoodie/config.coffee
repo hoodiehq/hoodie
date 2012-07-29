@@ -17,7 +17,7 @@ class Hoodie.Config
     @type       = options.type       if options.type
     @id         = options.id         if options.id
     
-    @hoodie.my.store.load(@type, @id).done (obj) => @cache = obj
+    @hoodie.my.store.find(@type, @id).done (obj) => @cache = obj
 
     @hoodie.on 'account:signedOut', @clear
   

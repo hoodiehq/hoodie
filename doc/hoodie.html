@@ -28,7 +28,7 @@
 <li>... and more</li>
 </ul>
 
-<p>usage: <code>hoodie.open("some_store_name").loadAll()</code></p></div></div><div class="code"><div class="wrapper">  <span class="nv">open : </span><span class="nf">(store_name, options = {}) -&gt;</span>
+<p>usage: <code>hoodie.open("some_store_name").findAll()</code></p></div></div><div class="code"><div class="wrapper">  <span class="nv">open : </span><span class="nf">(store_name, options = {}) -&gt;</span>
     <span class="nx">$</span><span class="p">.</span><span class="nx">extend</span> <span class="nx">options</span><span class="p">,</span> <span class="nv">basePath: </span><span class="s2">&quot;/#{encodeURIComponent store_name}&quot;</span>
     <span class="k">new</span> <span class="nx">Hoodie</span><span class="p">.</span><span class="nx">RemoteStore</span> <span class="k">this</span><span class="p">,</span> <span class="nx">options</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h2 id="defer">Defer</h2></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>returns a defer object for custom promise handlings</p></div></div><div class="code"><div class="wrapper">  <span class="nv">defer: </span><span class="nx">$</span><span class="p">.</span><span class="nx">Deferred</span>
   </div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h2 id="utils">Utils</h2></div></div></div><div class="segment"><div class="code"><div class="wrapper">  

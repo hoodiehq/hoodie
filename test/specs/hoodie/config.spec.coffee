@@ -29,7 +29,7 @@ describe "Hoodie.Config", ->
   
   describe ".get(key)", ->
     beforeEach ->
-      spyOn(@hoodie.my.store, "load").andReturn @hoodie.defer().resolve funky: 'fresh'
+      spyOn(@hoodie.my.store, "find").andReturn @hoodie.defer().resolve funky: 'fresh'
       @config = new Hoodie.Config @hoodie
     
     it "should get the config using store", ->

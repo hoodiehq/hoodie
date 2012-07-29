@@ -437,7 +437,7 @@ Hoodie.Store = (function() {
       options = {};
     }
     defer = this.hoodie.defer();
-    _loadPromise = this.load(type, id).pipe(function(currentObj) {
+    _loadPromise = this.find(type, id).pipe(function(currentObj) {
       var changedProperties, key, value;
       if (typeof objectUpdate === 'function') {
         objectUpdate = objectUpdate($.extend({}, currentObj));
@@ -477,7 +477,7 @@ Hoodie.Store = (function() {
     }
     switch (true) {
       case typeof filterOrObjects === 'string':
-        promise = this.loadAll(filterOrObjects);
+        promise = this.findAll(filterOrObjects);
         break;
       case this.hoodie.isPromise(filterOrObjects):
         promise = filterOrObjects;
@@ -486,7 +486,7 @@ Hoodie.Store = (function() {
         promise = this.hoodie.defer().resolve(filterOrObjects).resolve();
         break;
       default:
-        promise = this.loadAll();
+        promise = this.findAll();
     }
     return promise.pipe(function(objects) {
       var defer, object, _updatePromises;
@@ -505,7 +505,7 @@ Hoodie.Store = (function() {
     });
   };
 
-  Store.prototype.load = function(type, id) {
+  Store.prototype.find = function(type, id) {
     var defer;
     defer = this.hoodie.defer();
     if (!(typeof type === 'string' && typeof id === 'string')) {
@@ -515,25 +515,25 @@ Hoodie.Store = (function() {
   };
 
   Store.prototype.find = function() {
-    return this.load.apply(this, arguments);
+    return this.find.apply(this, arguments);
   };
 
   Store.prototype.findOrCreate = function(attributes) {
     var defer,
       _this = this;
     defer = this.hoodie.defer();
-    this.load(attributes.id).done(defer.resolve).fail(function() {
+    this.find(attributes.id).done(defer.resolve).fail(function() {
       return _this.create(attributes).then(defer.resolve, defer.reject);
     });
     return defer.promise();
   };
 
-  Store.prototype.loadAll = function() {
+  Store.prototype.findAll = function() {
     return this.hoodie.defer();
   };
 
-  Store.prototype.findAll = function() {
-    return this.loadAll.apply(this, arguments);
+  Store.prototype.loadAll = function() {
+    return this.findAll.apply(this, arguments);
   };
 
   Store.prototype["delete"] = function(type, id, options) {
@@ -636,9 +636,9 @@ Hoodie.RemoteStore = (function(_super) {
     }
   }
 
-  RemoteStore.prototype.load = function(type, id) {
+  RemoteStore.prototype.find = function(type, id) {
     var defer, path;
-    defer = RemoteStore.__super__.load.apply(this, arguments);
+    defer = RemoteStore.__super__.find.apply(this, arguments);
     if (this.hoodie.isPromise(defer)) {
       return defer;
     }
@@ -646,9 +646,9 @@ Hoodie.RemoteStore = (function(_super) {
     return this.request("GET", path);
   };
 
-  RemoteStore.prototype.loadAll = function(type) {
+  RemoteStore.prototype.findAll = function(type) {
     var defer, path, promise;
-    defer = RemoteStore.__super__.loadAll.apply(this, arguments);
+    defer = RemoteStore.__super__.findAll.apply(this, arguments);
     if (this.hoodie.isPromise(defer)) {
       return defer;
     }
@@ -1086,7 +1086,7 @@ Hoodie.Config = (function() {
     if (options.id) {
       this.id = options.id;
     }
-    this.hoodie.my.store.load(this.type, this.id).done(function(obj) {
+    this.hoodie.my.store.find(this.type, this.id).done(function(obj) {
       return _this.cache = obj;
     });
     this.hoodie.on('account:signedOut', this.clear);
@@ -1283,9 +1283,9 @@ Hoodie.LocalStore = (function(_super) {
     return defer.promise();
   };
 
-  LocalStore.prototype.load = function(type, id) {
+  LocalStore.prototype.find = function(type, id) {
     var defer, object;
-    defer = LocalStore.__super__.load.apply(this, arguments);
+    defer = LocalStore.__super__.find.apply(this, arguments);
     if (this.hoodie.isPromise(defer)) {
       return defer;
     }
@@ -1301,14 +1301,14 @@ Hoodie.LocalStore = (function(_super) {
     return defer.promise();
   };
 
-  LocalStore.prototype.loadAll = function(filter) {
+  LocalStore.prototype.findAll = function(filter) {
     var currentType, defer, id, key, keys, obj, results, type;
     if (filter == null) {
       filter = function() {
         return true;
       };
     }
-    defer = LocalStore.__super__.loadAll.apply(this, arguments);
+    defer = LocalStore.__super__.findAll.apply(this, arguments);
     if (this.hoodie.isPromise(defer)) {
       return defer;
     }

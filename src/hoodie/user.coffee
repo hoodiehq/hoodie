@@ -1,19 +1,19 @@
 # User
 # ======
 
-# the User Module provides a simple API to load objects from other users public
+# the User Module provides a simple API to find objects from other users public
 # stores
 #
-# For example, the syntax to load all objects from user "Joe" looks like this:
+# For example, the syntax to find all objects from user "Joe" looks like this:
 #
-#     hoodie.user("Joe").loadAll().done( handleObjects)
+#     hoodie.user("Joe").findAll().done( handleObjects)
 #
 class Hoodie.User
 
   constructor: (hoodie) ->
 
     # vanilla API syntax:
-    # hoodie.user('joe').loadAll()
+    # hoodie.user('joe').findAll()
     return (username) => 
       hoodie.open @_userPublicStoreName(username)
 

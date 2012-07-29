@@ -25,7 +25,7 @@ Mocks.Hoodie = ->
         pipe : ->
         fail : ->
         done : ->
-      load          : -> 
+      find          : -> 
         pipe : ->
         fail : ->
         done : ->

@@ -42,7 +42,7 @@ hoodie.share.create
 # shared and keep them updated
 hoodie.share.create
   continuous : true
-  objects    : hoodie.my.store.loadAll (obj) -&gt; obj.isShared
+  objects    : hoodie.my.store.findAll (obj) -&gt; obj.isShared
 </code></pre></div></div><div class="code"><div class="wrapper">  <span class="nv">constructor: </span><span class="nf">(options = {}) -&gt;</span>
     
     <span class="vi">@hoodie    = </span><span class="nx">@constructor</span><span class="p">.</span><span class="nx">hoodie</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>if the current user isn't anonymous (has an account), a backend worker is 
@@ -209,12 +209,12 @@ it to/from share</p></div></div><div class="code"><div class="wrapper">  <span c
       <span class="nx">@_add</span><span class="p">(</span><span class="nx">obj</span><span class="p">)</span>
     <span class="k">else</span>
       <span class="nx">@_remove</span><span class="p">(</span><span class="nx">obj</span><span class="p">)</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><ol>
-<li>load all objects that belong to share and that have local changes</li>
+<li>find all objects that belong to share and that have local changes</li>
 <li>combine these with the docs that have been removed from the share</li>
 <li>sync all these with share's remote</li>
 </ol></div></div><div class="code"><div class="wrapper">  <span class="nv">_sync : </span><span class="o">=&gt;</span>
     <span class="nx">@save</span><span class="p">()</span>
-    <span class="p">.</span><span class="nx">pipe</span> <span class="nx">@hoodie</span><span class="p">.</span><span class="nx">my</span><span class="p">.</span><span class="nx">store</span><span class="p">.</span><span class="nx">loadAll</span><span class="p">(</span><span class="nx">@_isMySharedObjectAndChanged</span><span class="p">)</span>
+    <span class="p">.</span><span class="nx">pipe</span> <span class="nx">@hoodie</span><span class="p">.</span><span class="nx">my</span><span class="p">.</span><span class="nx">store</span><span class="p">.</span><span class="nx">findAll</span><span class="p">(</span><span class="nx">@_isMySharedObjectAndChanged</span><span class="p">)</span>
     <span class="p">.</span><span class="nx">pipe</span> <span class="p">(</span><span class="nx">sharedObjectThatChanged</span><span class="p">)</span> <span class="o">=&gt;</span>
       <span class="nx">@hoodie</span><span class="p">.</span><span class="nx">my</span><span class="p">.</span><span class="nx">remote</span><span class="p">.</span><span class="nx">sync</span><span class="p">(</span><span class="nx">sharedObjectThatChanged</span><span class="p">)</span>
       <span class="p">.</span><span class="k">then</span> <span class="nx">@_handleRemoteChanges</span></div></div></div><div class="segment"><div class="code"><div class="wrapper">  <span class="nv">_handleRemoteChanges: </span><span class="o">-&gt;</span>

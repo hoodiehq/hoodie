@@ -8,9 +8,9 @@ Backbone.sync = (method, modelOrCollection, options) ->
   promise = switch method
     when "read"
       if id
-        Backbone.hoodie.my.store.load(type, id)
+        Backbone.hoodie.my.store.find(type, id)
       else
-        Backbone.hoodie.my.store.loadAll()
+        Backbone.hoodie.my.store.findAll()
 
     when "create"
       Backbone.hoodie.my.store.create(type, attributes)

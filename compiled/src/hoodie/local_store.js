@@ -91,9 +91,9 @@ Hoodie.LocalStore = (function(_super) {
     return defer.promise();
   };
 
-  LocalStore.prototype.load = function(type, id) {
+  LocalStore.prototype.find = function(type, id) {
     var defer, object;
-    defer = LocalStore.__super__.load.apply(this, arguments);
+    defer = LocalStore.__super__.find.apply(this, arguments);
     if (this.hoodie.isPromise(defer)) {
       return defer;
     }
@@ -109,14 +109,14 @@ Hoodie.LocalStore = (function(_super) {
     return defer.promise();
   };
 
-  LocalStore.prototype.loadAll = function(filter) {
+  LocalStore.prototype.findAll = function(filter) {
     var currentType, defer, id, key, keys, obj, results, type;
     if (filter == null) {
       filter = function() {
         return true;
       };
     }
-    defer = LocalStore.__super__.loadAll.apply(this, arguments);
+    defer = LocalStore.__super__.findAll.apply(this, arguments);
     if (this.hoodie.isPromise(defer)) {
       return defer;
     }
