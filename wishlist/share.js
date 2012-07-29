@@ -5,16 +5,21 @@
 // as example. I can create multiple todo lists with it and can share these.
 
 
-
-// ## Share options
+// Share options
+// ---------------
 // 
 // * access     (default: false)
 // * continuous (default: false)
 // * password   (default: _no password_)
 
 
-
 // ### the `access` setting (default: false)
+// 
+// the access setting defines which user (group) has read or write access.
+// When set to true, the sharing is public and everybody who knows the share
+// id can access and edit it. To limit to read only, set access to read: true.
+// You can also define specific user names to give them access. Write access
+// does always include read access as well.
 
 // 
 // access: false (default)
@@ -56,7 +61,7 @@ hoodie.my.share.create({access: {read: true}}).done( function(share) {
 hoodie.my.share.create({
   access: {
     write: ['aj@foo.com', 'bj@foo.com']
-  }
+    }
 }).done( function(share) {
   /* Everybody will be able to acces the todo list, 
      but only AJ, BJ and me can edit it */
@@ -91,9 +96,9 @@ hoodie.my.share.create().done( function(share) {
 })
 
 // 
-// continuous: true (default)
+// continuous: true
 // 
-hoodie.my.share.create().done( function(share) {
+hoodie.my.share.create({continuous: true}).done( function(share) {
   /* changes get synchronized continuously, no need to push / pull them */
   share.add(todolist)
 })
@@ -117,7 +122,8 @@ hoodie.my.share.create({access: true, password: "secret"}).done( function(share)
 
 
 
-// ## Share API
+// Share API
+// -----------
 
 
 // ### Share Module methods
@@ -147,10 +153,15 @@ hoodie.my.share.deleteAll()
 
 
 
-
 // ### Share Instance methods
+// 
+// A Share inherits from the RemoteStore Module and gets namespaced by 
+// its id. It adds additional methods to add and remove objects and alters
+// methods save, update and delete so when these are called withoud type
+// and id, they get applied on the share object directly.
+// 
 
-// * save  
+// * save
 //   save a share, overwrites all settings if share existed before
 hoodie.my.share("share_id").save({})
 
@@ -162,38 +173,15 @@ hoodie.my.share("share_id").update({})
 //   deletes a share, unshares all its objects
 hoodie.my.share("share_id").delete()
 
-// * add    
+// * add
 //   add object(s) to the share
 hoodie.my.share("share_id").add(object)
 hoodie.my.share("share_id").add([object1, object2])
-
-// * loadAll  
-//   loads all objects belonging to a store
-hoodie.my.share("share_id").loadAll()
-hoodie.my.share("share_id").loadAll("type")
 
 // * remove  
 //   remove object(s) from the share
 hoodie.my.share("share_id").remove(object)
 hoodie.my.share("share_id").remove([object1, object2])
-
-// * removeAll  
-//   remove all objects from the share
-hoodie.my.share("share_id").removeAll()
-hoodie.my.share("share_id").removeAll("type")
-
-
-// * push  
-//   push local changes to share
-hoodie.my.share("share_id").push()
-
-// * pull  
-//   pull changes from the share
-hoodie.my.share("share_id").pull()
-
-// * sync  
-//   push & pull changes of the share
-hoodie.my.share("share_id").sync()
 
 
 
@@ -224,7 +212,7 @@ hoodie.my.share("share_id").sync()
 // (by passing an object with the respective type & id) and the we
 // push the todolist will be available to others at the secret URL
 // 
-hoodie.my.share.create({public: true})
+hoodie.my.share.create({access: true})
 .done( function(share) {
   
   share.add(todolist).push()
@@ -241,7 +229,7 @@ hoodie.my.share.create({public: true})
 // with my collegues aj@example.com and bj@example.com. I want the todolist to
 // to be accessible for AJ, BJ and myself only.
 // 
-hoodie.my.share.create({public: ["aj@example.com", "bj@example.com"]})
+hoodie.my.share.create({access: ["aj@example.com", "bj@example.com"]})
 .done( function(share) {
   share.add(todolist)
 
@@ -281,22 +269,22 @@ hoodie.my.share("share_id").sync()
 
 // ### Usecase 5: Read only Share
 
-// Shares are read only be default. This means others can see the shared
-// objects (if they have access), but they cannot make changes to them, or 
-// to be precise, they cannot push their local changes
+// ...
 // 
 
 /* will fail for other users */
+hoodie.my.share.create( {access: {read: true}} )
 hoodie.my.share( "share_id" ).push()
 
 
 // ### Usecase 6: Collaborative Shares
 
-// If I want to invite others to collaborate on my objects, I need to set the
-// collaborative setting to true
+// If you want to invite others to collaborate on my objects, you need
+// to set the collaborative setting to true
 // 
-hoodie.my.share.create( {collaborative: true} )
+hoodie.my.share.create( {access: true} )
 .done( function(share){
+
   // others will be able to push their changes on the todolist and its todos
   share.add([todolist, todo1, todo2, todo3]).push() 
 })
@@ -308,7 +296,7 @@ hoodie.my.share.create( {collaborative: true} )
 // others when trying to accessing it:
 /* me */
 hoodie.my.share.create( { 
-  acess    :true, 
+  acess    : true, 
   password : "secret"
 }).push()
 

@@ -5,12 +5,21 @@ describe("Hoodie.Share", function() {
     this.hoodie = new Mocks.Hoodie;
     return this.share = new Hoodie.Share(this.hoodie);
   });
-  return describe(".constructor", function() {
+  describe(".constructor", function() {
     return it("should set Hoodie.Share.Instance.hoodie", function() {
       var hoodie;
       hoodie = 'check 1,2';
       new Hoodie.Share(hoodie);
       return expect(Hoodie.Share.Instance.hoodie).toBe('check 1,2');
     });
+  });
+  describe("('share_id') // called as function", function() {
+    return it("should open the sharing");
+  });
+  describe(".instance", function() {
+    return it("should point to Hoodie.Share.Instance");
+  });
+  return describe(".create(options)", function() {
+    return it("should initiate a new Hoodie.Share.Instance and save it", function() {});
   });
 });

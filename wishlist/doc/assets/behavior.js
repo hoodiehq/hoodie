@@ -14,7 +14,7 @@ f.event={add:function(a,c,d,e,g){var h,i,j,k,l,m,n,o,p,q,r,s;if(!(a.nodeType===3
           "singleLineComment": ["//"],
           "name": "JavaScript"
         },
-        "sourcePath": "/Users/gregor/JavaScripts/hood.ie/hoodie-client.js/wishlist/open.js",
+        "sourcePath": "/Users/gregor/JavaScripts/hood.ie/hoodie.js/wishlist/open.js",
         "projectPath": "open.js",
         "targetPath": "open",
         "title": "open"
@@ -59,7 +59,7 @@ f.event={add:function(a,c,d,e,g){var h,i,j,k,l,m,n,o,p,q,r,s;if(!(a.nodeType===3
           "singleLineComment": ["//"],
           "name": "JavaScript"
         },
-        "sourcePath": "/Users/gregor/JavaScripts/hood.ie/hoodie-client.js/wishlist/public_user_stores.js",
+        "sourcePath": "/Users/gregor/JavaScripts/hood.ie/hoodie.js/wishlist/public_user_stores.js",
         "projectPath": "public_user_stores.js",
         "targetPath": "public_user_stores",
         "firstHeader": {
@@ -294,7 +294,7 @@ f.event={add:function(a,c,d,e,g){var h,i,j,k,l,m,n,o,p,q,r,s;if(!(a.nodeType===3
           "singleLineComment": ["//"],
           "name": "JavaScript"
         },
-        "sourcePath": "/Users/gregor/JavaScripts/hood.ie/hoodie-client.js/wishlist/public_user_stores_implementation.js",
+        "sourcePath": "/Users/gregor/JavaScripts/hood.ie/hoodie.js/wishlist/public_user_stores_implementation.js",
         "projectPath": "public_user_stores_implementation.js",
         "targetPath": "public_user_stores_implementation",
         "firstHeader": {
@@ -373,7 +373,7 @@ f.event={add:function(a,c,d,e,g){var h,i,j,k,l,m,n,o,p,q,r,s;if(!(a.nodeType===3
           "singleLineComment": ["//"],
           "name": "JavaScript"
         },
-        "sourcePath": "/Users/gregor/JavaScripts/hood.ie/hoodie-client.js/wishlist/share.js",
+        "sourcePath": "/Users/gregor/JavaScripts/hood.ie/hoodie.js/wishlist/share.js",
         "projectPath": "share.js",
         "targetPath": "share",
         "firstHeader": {
@@ -624,7 +624,7 @@ f.event={add:function(a,c,d,e,g){var h,i,j,k,l,m,n,o,p,q,r,s;if(!(a.nodeType===3
           "singleLineComment": ["//"],
           "name": "JavaScript"
         },
-        "sourcePath": "/Users/gregor/JavaScripts/hood.ie/hoodie-client.js/wishlist/subscription.js",
+        "sourcePath": "/Users/gregor/JavaScripts/hood.ie/hoodie.js/wishlist/subscription.js",
         "projectPath": "subscription.js",
         "targetPath": "subscription",
         "title": "subscription"
@@ -634,11 +634,11 @@ f.event={add:function(a,c,d,e,g){var h,i,j,k,l,m,n,o,p,q,r,s;if(!(a.nodeType===3
         {
           "type": "heading",
           "data": {
-            "level": 3,
-            "title": "Usecase 8: Share Subscriptions",
-            "slug": "usecase-8-share-subscriptions"
+            "level": 1,
+            "title": "Subscriptions",
+            "slug": "subscriptions"
           },
-          "depth": 3
+          "depth": 1
         }
       ]
     }

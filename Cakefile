@@ -66,7 +66,19 @@ task 'build', 'build hoodie-client.min.js', ->
   try fs.unlinkSync 'hoodie.js'
 
   js_code = ''
-  build = spawn 'cat', ['compiled/src/events.js', 'compiled/src/hoodie.js', 'compiled/src/hoodie/account.js', 'compiled/src/hoodie/store.js', 'compiled/src/hoodie/remote_store.js', 'compiled/src/hoodie/account/remote_store.js', 'compiled/src/hoodie/config.js', 'compiled/src/hoodie/email.js', 'compiled/src/hoodie/errors.js', 'compiled/src/hoodie/local_store.js', 'compiled/src/hoodie/user.js', 'compiled/src/hoodie/global.js']
+  build = spawn 'cat', 
+    'compiled/src/events.js'
+    'compiled/src/hoodie.js'
+    'compiled/src/hoodie/account.js'
+    'compiled/src/hoodie/store.js'
+    'compiled/src/hoodie/remote_store.js'
+    'compiled/src/hoodie/account/remote_store.js'
+    'compiled/src/hoodie/config.js'
+    'compiled/src/hoodie/email.js'
+    'compiled/src/hoodie/errors.js'
+    'compiled/src/hoodie/local_store.js'
+    'compiled/src/hoodie/user.js'
+    'compiled/src/hoodie/global.js'
 
   build.stdout.on 'data', (data) -> 
     console.log 'data!'
@@ -80,6 +92,11 @@ task 'build', 'build hoodie-client.min.js', ->
 task 'docs', 'create docs from code', ->
   
   docco = spawn 'groc', ['src/**/*.coffee']
+  docco.stdout.on 'data', (data) -> print data.toString()
+  docco.on 'exit', (status) -> callback?() if status is 0
+
+task 'wishlist', 'create docs from code', ->
+  docco = spawn 'groc', ['-o whishlist/doc' 'wishlist/**/*.js']
   docco.stdout.on 'data', (data) -> print data.toString()
   docco.on 'exit', (status) -> callback?() if status is 0
     

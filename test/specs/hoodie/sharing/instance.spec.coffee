@@ -17,6 +17,35 @@ describe "Hoodie.Share.Instance", ->
       share = new Hoodie.Share.Instance {funky: 'options'}
       expect(Hoodie.Share.Instance::set).wasCalledWith {funky: 'options'}
     
+    _when "called without options", ->
+      it "should have some specs"
+
+    _when "called with id: 'uuid567'", ->
+      it "should have some specs"
+
+    _when "called with access: true", ->
+      it "should have some specs"
+
+    _when "called with access: [user1, user2]", ->
+      it "should have some specs"
+
+    _when "called with access: { read: true }", ->
+      it "should have some specs"
+
+    _when "called with access: { write: [user1, user2] }", ->
+      it "should have some specs"
+
+    _when "called with access: { read: [user1], write: [user2, user3] }", ->
+      it "should have some specs"
+
+    _when "called with continuous: true", ->
+      it "should have some specs"
+
+    _when "called with password: 'secret'", ->
+      it "should have some specs"
+
+    _when "called with objects: [obj1, obj2]", ->
+      it "should have some specs"
     
     _when "user is anonymous", ->
       beforeEach ->

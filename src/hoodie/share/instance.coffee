@@ -1,5 +1,50 @@
 class Hoodie.Share.Instance
 
+  # ## constructor
+  #
+  # initializes a new share & returns a promise.
+  #
+  # ### Options
+  #
+  #     id:            (optional, defaults to random uuid)
+  #                    name of share.
+  #     objects:       (optional)
+  #                    array of objects that should be shared
+  #     access:        (default: false)
+  #                    **false**
+  #                    nobody but the creator and the invitees have access.
+  #                    **true**
+  #                    public sharing, read & write access
+  #                    **{ read: true }**
+  #                    public sharing, read only
+  #                    **[user1, user2]**
+  #                    only user1 & user2 have access
+  #                    **{ read: [user1, user2] }**
+  #                    only user1 & user2 have access (read only)
+  #     continuous:    (default: false)
+  #                    if set to true, the shared objects will be
+  #                    continuously updated.
+  #     password:      (optional)
+  #                    a sharing can be optionally protected with a password.
+  #
+  # Examples
+  #
+  # 
+  #     # share my todo list with Joey and Frank
+  #     hoodie.share.create
+  #       access : [
+  #         "joey@example.com"
+  #         "frank@example.com"
+  #       ]
+  #       objects : [
+  #         todoList, todo1, todo2, todo3
+  #       ]
+  #     
+  #     # share all my documents that I marked as
+  #     # shared and keep them updated
+  #     hoodie.share.create
+  #       continuous : true
+  #       objects    : hoodie.my.store.loadAll (obj) -> obj.isShared
   #
   constructor: (options = {}) ->
     

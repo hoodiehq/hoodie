@@ -14,7 +14,7 @@ f.event={add:function(a,c,d,e,g){var h,i,j,k,l,m,n,o,p,q,r,s;if(!(a.nodeType===3
           "singleLineComment": ["#"],
           "name": "CoffeeScript"
         },
-        "sourcePath": "/Users/gregor/JavaScripts/hood.ie/hoodie-client.js/src/events.coffee",
+        "sourcePath": "/Users/gregor/JavaScripts/hood.ie/hoodie.js/src/events.coffee",
         "projectPath": "src/events.coffee",
         "targetPath": "events",
         "title": "events"
@@ -72,7 +72,7 @@ f.event={add:function(a,c,d,e,g){var h,i,j,k,l,m,n,o,p,q,r,s;if(!(a.nodeType===3
           "singleLineComment": ["#"],
           "name": "CoffeeScript"
         },
-        "sourcePath": "/Users/gregor/JavaScripts/hood.ie/hoodie-client.js/src/hoodie.coffee",
+        "sourcePath": "/Users/gregor/JavaScripts/hood.ie/hoodie.js/src/hoodie.coffee",
         "projectPath": "src/hoodie.coffee",
         "targetPath": "hoodie",
         "title": "hoodie"
@@ -147,7 +147,7 @@ f.event={add:function(a,c,d,e,g){var h,i,j,k,l,m,n,o,p,q,r,s;if(!(a.nodeType===3
               "singleLineComment": ["#"],
               "name": "CoffeeScript"
             },
-            "sourcePath": "/Users/gregor/JavaScripts/hood.ie/hoodie-client.js/src/hoodie/account.coffee",
+            "sourcePath": "/Users/gregor/JavaScripts/hood.ie/hoodie.js/src/hoodie/account.coffee",
             "projectPath": "src/hoodie/account.coffee",
             "targetPath": "hoodie/account",
             "title": "account"
@@ -262,7 +262,7 @@ f.event={add:function(a,c,d,e,g){var h,i,j,k,l,m,n,o,p,q,r,s;if(!(a.nodeType===3
                   "singleLineComment": ["#"],
                   "name": "CoffeeScript"
                 },
-                "sourcePath": "/Users/gregor/JavaScripts/hood.ie/hoodie-client.js/src/hoodie/account/remote_store.coffee",
+                "sourcePath": "/Users/gregor/JavaScripts/hood.ie/hoodie.js/src/hoodie/account/remote_store.coffee",
                 "projectPath": "src/hoodie/account/remote_store.coffee",
                 "targetPath": "hoodie/account/remote_store",
                 "firstHeader": {
@@ -407,7 +407,7 @@ f.event={add:function(a,c,d,e,g){var h,i,j,k,l,m,n,o,p,q,r,s;if(!(a.nodeType===3
               "singleLineComment": ["#"],
               "name": "CoffeeScript"
             },
-            "sourcePath": "/Users/gregor/JavaScripts/hood.ie/hoodie-client.js/src/hoodie/config.coffee",
+            "sourcePath": "/Users/gregor/JavaScripts/hood.ie/hoodie.js/src/hoodie/config.coffee",
             "projectPath": "src/hoodie/config.coffee",
             "targetPath": "hoodie/config",
             "title": "config"
@@ -465,7 +465,7 @@ f.event={add:function(a,c,d,e,g){var h,i,j,k,l,m,n,o,p,q,r,s;if(!(a.nodeType===3
               "singleLineComment": ["#"],
               "name": "CoffeeScript"
             },
-            "sourcePath": "/Users/gregor/JavaScripts/hood.ie/hoodie-client.js/src/hoodie/email.coffee",
+            "sourcePath": "/Users/gregor/JavaScripts/hood.ie/hoodie.js/src/hoodie/email.coffee",
             "projectPath": "src/hoodie/email.coffee",
             "targetPath": "hoodie/email",
             "title": "email"
@@ -507,7 +507,7 @@ f.event={add:function(a,c,d,e,g){var h,i,j,k,l,m,n,o,p,q,r,s;if(!(a.nodeType===3
               "singleLineComment": ["#"],
               "name": "CoffeeScript"
             },
-            "sourcePath": "/Users/gregor/JavaScripts/hood.ie/hoodie-client.js/src/hoodie/errors.coffee",
+            "sourcePath": "/Users/gregor/JavaScripts/hood.ie/hoodie.js/src/hoodie/errors.coffee",
             "projectPath": "src/hoodie/errors.coffee",
             "targetPath": "hoodie/errors",
             "title": "errors"
@@ -549,7 +549,7 @@ f.event={add:function(a,c,d,e,g){var h,i,j,k,l,m,n,o,p,q,r,s;if(!(a.nodeType===3
               "singleLineComment": ["#"],
               "name": "CoffeeScript"
             },
-            "sourcePath": "/Users/gregor/JavaScripts/hood.ie/hoodie-client.js/src/hoodie/global.coffee",
+            "sourcePath": "/Users/gregor/JavaScripts/hood.ie/hoodie.js/src/hoodie/global.coffee",
             "projectPath": "src/hoodie/global.coffee",
             "targetPath": "hoodie/global",
             "firstHeader": {
@@ -575,7 +575,7 @@ f.event={add:function(a,c,d,e,g){var h,i,j,k,l,m,n,o,p,q,r,s;if(!(a.nodeType===3
               "singleLineComment": ["#"],
               "name": "CoffeeScript"
             },
-            "sourcePath": "/Users/gregor/JavaScripts/hood.ie/hoodie-client.js/src/hoodie/local_store.coffee",
+            "sourcePath": "/Users/gregor/JavaScripts/hood.ie/hoodie.js/src/hoodie/local_store.coffee",
             "projectPath": "src/hoodie/local_store.coffee",
             "targetPath": "hoodie/local_store",
             "firstHeader": {
@@ -846,7 +846,7 @@ f.event={add:function(a,c,d,e,g){var h,i,j,k,l,m,n,o,p,q,r,s;if(!(a.nodeType===3
               "singleLineComment": ["#"],
               "name": "CoffeeScript"
             },
-            "sourcePath": "/Users/gregor/JavaScripts/hood.ie/hoodie-client.js/src/hoodie/remote_store.coffee",
+            "sourcePath": "/Users/gregor/JavaScripts/hood.ie/hoodie.js/src/hoodie/remote_store.coffee",
             "projectPath": "src/hoodie/remote_store.coffee",
             "targetPath": "hoodie/remote_store",
             "firstHeader": {
@@ -1459,7 +1459,7 @@ f.event={add:function(a,c,d,e,g){var h,i,j,k,l,m,n,o,p,q,r,s;if(!(a.nodeType===3
               "singleLineComment": ["#"],
               "name": "CoffeeScript"
             },
-            "sourcePath": "/Users/gregor/JavaScripts/hood.ie/hoodie-client.js/src/hoodie/share.coffee",
+            "sourcePath": "/Users/gregor/JavaScripts/hood.ie/hoodie.js/src/hoodie/share.coffee",
             "projectPath": "src/hoodie/share.coffee",
             "targetPath": "hoodie/share",
             "title": "share"
@@ -1526,7 +1526,7 @@ f.event={add:function(a,c,d,e,g){var h,i,j,k,l,m,n,o,p,q,r,s;if(!(a.nodeType===3
                   "singleLineComment": ["#"],
                   "name": "CoffeeScript"
                 },
-                "sourcePath": "/Users/gregor/JavaScripts/hood.ie/hoodie-client.js/src/hoodie/share/account.coffee",
+                "sourcePath": "/Users/gregor/JavaScripts/hood.ie/hoodie.js/src/hoodie/share/account.coffee",
                 "projectPath": "src/hoodie/share/account.coffee",
                 "targetPath": "hoodie/share/account",
                 "title": "account"
@@ -1542,7 +1542,7 @@ f.event={add:function(a,c,d,e,g){var h,i,j,k,l,m,n,o,p,q,r,s;if(!(a.nodeType===3
                   "singleLineComment": ["#"],
                   "name": "CoffeeScript"
                 },
-                "sourcePath": "/Users/gregor/JavaScripts/hood.ie/hoodie-client.js/src/hoodie/share/hoodie.coffee",
+                "sourcePath": "/Users/gregor/JavaScripts/hood.ie/hoodie.js/src/hoodie/share/hoodie.coffee",
                 "projectPath": "src/hoodie/share/hoodie.coffee",
                 "targetPath": "hoodie/share/hoodie",
                 "title": "hoodie"
@@ -1576,7 +1576,7 @@ f.event={add:function(a,c,d,e,g){var h,i,j,k,l,m,n,o,p,q,r,s;if(!(a.nodeType===3
                   "singleLineComment": ["#"],
                   "name": "CoffeeScript"
                 },
-                "sourcePath": "/Users/gregor/JavaScripts/hood.ie/hoodie-client.js/src/hoodie/share/instance.coffee",
+                "sourcePath": "/Users/gregor/JavaScripts/hood.ie/hoodie.js/src/hoodie/share/instance.coffee",
                 "projectPath": "src/hoodie/share/instance.coffee",
                 "targetPath": "hoodie/share/instance",
                 "title": "instance"
@@ -1666,7 +1666,7 @@ f.event={add:function(a,c,d,e,g){var h,i,j,k,l,m,n,o,p,q,r,s;if(!(a.nodeType===3
                   "singleLineComment": ["#"],
                   "name": "CoffeeScript"
                 },
-                "sourcePath": "/Users/gregor/JavaScripts/hood.ie/hoodie-client.js/src/hoodie/share/remote.coffee",
+                "sourcePath": "/Users/gregor/JavaScripts/hood.ie/hoodie.js/src/hoodie/share/remote.coffee",
                 "projectPath": "src/hoodie/share/remote.coffee",
                 "targetPath": "hoodie/share/remote",
                 "title": "remote"
@@ -1684,7 +1684,7 @@ f.event={add:function(a,c,d,e,g){var h,i,j,k,l,m,n,o,p,q,r,s;if(!(a.nodeType===3
               "singleLineComment": ["#"],
               "name": "CoffeeScript"
             },
-            "sourcePath": "/Users/gregor/JavaScripts/hood.ie/hoodie-client.js/src/hoodie/store.coffee",
+            "sourcePath": "/Users/gregor/JavaScripts/hood.ie/hoodie.js/src/hoodie/store.coffee",
             "projectPath": "src/hoodie/store.coffee",
             "targetPath": "hoodie/store",
             "firstHeader": {
@@ -1891,7 +1891,7 @@ f.event={add:function(a,c,d,e,g){var h,i,j,k,l,m,n,o,p,q,r,s;if(!(a.nodeType===3
               "singleLineComment": ["#"],
               "name": "CoffeeScript"
             },
-            "sourcePath": "/Users/gregor/JavaScripts/hood.ie/hoodie-client.js/src/hoodie/user.coffee",
+            "sourcePath": "/Users/gregor/JavaScripts/hood.ie/hoodie.js/src/hoodie/user.coffee",
             "projectPath": "src/hoodie/user.coffee",
             "targetPath": "hoodie/user",
             "firstHeader": {
