@@ -9,41 +9,111 @@ Hoodie.Share = (function() {
     this.open = __bind(this.open, this);
 
     api = this.open;
-    api.instance = Hoodie.Share.Instance;
-    api.instance.hoodie = this.hoodie;
+    this.instance = Hoodie.Share.Instance;
+    this.instance.hoodie = this.hoodie;
+    $.extend(api, this);
     return api;
   }
 
-  Share.prototype.create = function(options) {
+  Share.prototype.open = function(share_id, options) {
+    return new this.instance({
+      id: share_id
+    }, options);
+  };
+
+  Share.prototype.create = function(attributes) {
     var share;
-    if (options == null) {
-      options = {};
+    if (attributes == null) {
+      attributes = {};
     }
-    share = new Hoodie.Share.Instance(options);
+    share = new this.instance(attributes);
     return share.save();
   };
 
   Share.prototype.find = function(id) {
     var _this = this;
-    return this.hoodie.my.store.find('$share', id).pipe(function(obj) {
-      return new Hoodie.Share.Instance(obj);
+    return this.hoodie.my.store.find('$share', id).pipe(function(object) {
+      return new _this.instance(object);
     });
   };
 
-  Share.prototype.destroy = function(id) {
+  Share.prototype.findAll = function() {
+    var _this = this;
+    return this.hoodie.my.store.findAll('$share').pipe(function(objects) {
+      var obj, _i, _len, _results;
+      _results = [];
+      for (_i = 0, _len = objects.length; _i < _len; _i++) {
+        obj = objects[_i];
+        _results.push(new _this.instance(obj));
+      }
+      return _results;
+    });
+  };
+
+  Share.prototype.findOrCreate = function(attributes) {
+    var _this = this;
+    attributes.type = '$share';
+    return this.hoodie.my.store.findOrCreate(attributes).pipe(function(object) {
+      return new _this.instance(object);
+    });
+  };
+
+  Share.prototype.save = function(id, attributes) {
+    var _this = this;
+    return this.hoodie.my.store.save('$share', id, attributes).pipe(function(object) {
+      return new _this.instance(object);
+    });
+  };
+
+  Share.prototype.update = function(id, attributes) {
+    var _this = this;
+    return this.hoodie.my.store.update('$share', id, attributes).pipe(function(object) {
+      return new _this.instance(object);
+    });
+  };
+
+  Share.prototype.updateAll = function(changed_attributes) {
+    var _this = this;
+    return this.hoodie.my.store.updateAll('$share', changed_attributes).pipe(function(objects) {
+      var obj, _i, _len, _results;
+      _results = [];
+      for (_i = 0, _len = objects.length; _i < _len; _i++) {
+        obj = objects[_i];
+        _results.push(new _this.instance(obj));
+      }
+      return _results;
+    });
+  };
+
+  Share.prototype["delete"] = function(id) {
     var _this = this;
     return this.find(id).pipe(function(obj) {
       var share;
-      share = new Hoodie.Share.Instance(obj);
+      share = new _this.instance(obj);
       return share.destroy();
     });
   };
 
-  Share.prototype["delete"] = Share.prototype.destroy;
+  Share.prototype.destroy = function() {
+    return this["delete"].apply(this, arguments);
+  };
 
-  Share.prototype.open = function() {
-    var _ref;
-    return (_ref = this.instance).open.apply(_ref, arguments);
+  Share.prototype.deleteAll = function() {
+    var _this = this;
+    return this.findAll().pipe(function(objects) {
+      var obj, share, _i, _len, _results;
+      _results = [];
+      for (_i = 0, _len = objects.length; _i < _len; _i++) {
+        obj = objects[_i];
+        share = new _this.instance(obj);
+        _results.push(share.destroy());
+      }
+      return _results;
+    });
+  };
+
+  Share.prototype.destroyAll = function() {
+    return this.deleteAll.apply(this, arguments);
   };
 
   return Share;

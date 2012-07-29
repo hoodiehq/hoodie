@@ -3,23 +3,279 @@
 describe("Hoodie.Share", function() {
   beforeEach(function() {
     this.hoodie = new Mocks.Hoodie;
-    return this.share = new Hoodie.Share(this.hoodie);
+    this.share = new Hoodie.Share(this.hoodie);
+    return spyOn(this.share, "instance");
   });
   describe(".constructor", function() {
-    return it("should set Hoodie.Share.Instance.hoodie", function() {
+    it("should set Hoodie.Share.Instance.hoodie", function() {
       var hoodie;
       hoodie = 'check 1,2';
       new Hoodie.Share(hoodie);
       return expect(Hoodie.Share.Instance.hoodie).toBe('check 1,2');
     });
+    return it("should return the @open method as api", function() {
+      var share;
+      spyOn(Hoodie.Share.prototype, "open");
+      share = new Hoodie.Share(this.hoodie);
+      share('funk');
+      return expect(Hoodie.Share.prototype.open).wasCalledWith('funk');
+    });
   });
-  describe("('share_id') // called as function", function() {
-    return it("should open the sharing");
+  describe("('share_id', options) // called directly", function() {
+    beforeEach(function() {
+      return spyOn(Hoodie.Share.prototype, "open");
+    });
+    return it("should initiate a new Share Instance and pass options", function() {
+      var share;
+      share = new Hoodie.Share(this.hoodie);
+      share('funk');
+      return expect(Hoodie.Share.prototype.open).wasCalledWith('funk');
+    });
   });
   describe(".instance", function() {
-    return it("should point to Hoodie.Share.Instance");
+    return it("should point to Hoodie.Share.Instance", function() {
+      var share;
+      share = new Hoodie.Share(this.hoodie);
+      return expect(share.instance).toBe(Hoodie.Share.Instance);
+    });
   });
-  return describe(".create(options)", function() {
-    return it("should initiate a new Hoodie.Share.Instance and save it", function() {});
+  describe(".create(attributes)", function() {
+    beforeEach(function() {
+      this.saveSpy = jasmine.createSpy("save").andReturn('saveReturn');
+      return this.share.instance.andReturn({
+        save: this.saveSpy
+      });
+    });
+    return it("should initiate a new Hoodie.Share.Instance and save it", function() {
+      var returnValue;
+      returnValue = this.share.create({
+        funky: 'fresh'
+      });
+      expect(this.share.instance).wasCalledWith({
+        funky: 'fresh'
+      });
+      expect(this.saveSpy).wasCalled();
+      return expect(returnValue).toBe('saveReturn');
+    });
+  });
+  describe(".find(share_id)", function() {
+    beforeEach(function() {
+      var promise;
+      promise = this.hoodie.defer().resolve({
+        funky: 'fresh'
+      }).promise();
+      spyOn(this.hoodie.my.store, "find").andReturn(promise);
+      return this.share.instance.andCallFake(function() {
+        return this.foo = 'bar';
+      });
+    });
+    it("should proxy to store.find('$share', share_id)", function() {
+      var promise;
+      promise = this.share.find('123');
+      return expect(this.hoodie.my.store.find).wasCalledWith('$share', '123');
+    });
+    return it("should resolve with a Share Instance", function() {
+      var promise;
+      this.hoodie.my.store.find.andReturn(this.hoodie.defer().resolve({}).promise());
+      this.share.instance.andCallFake(function() {
+        return this.foo = 'bar';
+      });
+      promise = this.share.find('123');
+      return expect(promise).toBeResolvedWith({
+        foo: 'bar'
+      });
+    });
+  });
+  describe(".findOrCreate(share_attributes)", function() {
+    beforeEach(function() {
+      return spyOn(this.hoodie.my.store, "findOrCreate").andCallThrough();
+    });
+    it("should proxy to hoodie.my.store.findOrCreate with type set to '$share'", function() {
+      this.share.findOrCreate({});
+      return expect(this.hoodie.my.store.findOrCreate).wasCalledWith({
+        type: '$share'
+      });
+    });
+    return it("should resolve with a Share Instance", function() {
+      var promise;
+      this.hoodie.my.store.findOrCreate.andReturn(this.hoodie.defer().resolve({}).promise());
+      this.share.instance.andCallFake(function() {
+        return this.foo = 'bar';
+      });
+      promise = this.share.findOrCreate({});
+      return expect(promise).toBeResolvedWith({
+        foo: 'bar'
+      });
+    });
+  });
+  describe(".findAll()", function() {
+    beforeEach(function() {
+      return spyOn(this.hoodie.my.store, "findAll").andCallThrough();
+    });
+    it("should proxy to hoodie.my.store.findAll('$share')", function() {
+      this.hoodie.my.store.findAll.andCallThrough();
+      this.share.findAll();
+      return expect(this.hoodie.my.store.findAll).wasCalledWith('$share');
+    });
+    return it("should resolve with an array of Share instances", function() {
+      var promise;
+      this.hoodie.my.store.findAll.andReturn(this.hoodie.defer().resolve([{}, {}]).promise());
+      this.share.instance.andCallFake(function() {
+        return this.foo = 'bar';
+      });
+      promise = this.share.findAll();
+      return expect(promise).toBeResolvedWith([
+        {
+          foo: 'bar'
+        }, {
+          foo: 'bar'
+        }
+      ]);
+    });
+  });
+  describe(".save('share_id', attributes)", function() {
+    beforeEach(function() {
+      return spyOn(this.hoodie.my.store, "save").andCallThrough();
+    });
+    it("should proxy to hoodie.my.store.save('$share', 'share_id', attributes)", function() {
+      this.share.save('abc4567', {
+        funky: 'fresh'
+      });
+      return expect(this.hoodie.my.store.save).wasCalledWith('$share', 'abc4567', {
+        funky: 'fresh'
+      });
+    });
+    return it("should resolve with a Share Instance", function() {
+      var promise;
+      this.hoodie.my.store.save.andReturn(this.hoodie.defer().resolve({}).promise());
+      this.share.instance.andCallFake(function() {
+        return this.foo = 'bar';
+      });
+      promise = this.share.save({});
+      return expect(promise).toBeResolvedWith({
+        foo: 'bar'
+      });
+    });
+  });
+  describe(".update('share_id', changed_attributes)", function() {
+    beforeEach(function() {
+      return spyOn(this.hoodie.my.store, "update").andCallThrough();
+    });
+    it("should proxy to hoodie.my.store.update('$share', 'share_id', attributes)", function() {
+      this.share.update('abc4567', {
+        funky: 'fresh'
+      });
+      return expect(this.hoodie.my.store.update).wasCalledWith('$share', 'abc4567', {
+        funky: 'fresh'
+      });
+    });
+    return it("should resolve with a Share Instance", function() {
+      var promise;
+      this.hoodie.my.store.update.andReturn(this.hoodie.defer().resolve({}).promise());
+      this.share.instance.andCallFake(function() {
+        return this.foo = 'bar';
+      });
+      promise = this.share.update({});
+      return expect(promise).toBeResolvedWith({
+        foo: 'bar'
+      });
+    });
+  });
+  describe(".updateAll(changed_attributes)", function() {
+    beforeEach(function() {
+      return spyOn(this.hoodie.my.store, "updateAll").andCallThrough();
+    });
+    it("should proxy to hoodie.my.store.updateAll('$share', changed_attributes)", function() {
+      this.hoodie.my.store.updateAll.andCallThrough();
+      this.share.updateAll({
+        funky: 'fresh'
+      });
+      return expect(this.hoodie.my.store.updateAll).wasCalledWith('$share', {
+        funky: 'fresh'
+      });
+    });
+    return it("should resolve with an array of Share instances", function() {
+      var promise;
+      this.hoodie.my.store.updateAll.andReturn(this.hoodie.defer().resolve([{}, {}]).promise());
+      this.share.instance.andCallFake(function() {
+        return this.foo = 'bar';
+      });
+      promise = this.share.updateAll({
+        funky: 'fresh'
+      });
+      return expect(promise).toBeResolvedWith([
+        {
+          foo: 'bar'
+        }, {
+          foo: 'bar'
+        }
+      ]);
+    });
+  });
+  describe(".delete(share_id)", function() {
+    beforeEach(function() {
+      var promise;
+      promise = this.hoodie.defer().resolve({
+        funky: 'fresh'
+      }).promise();
+      spyOn(this.hoodie.my.store, "find").andReturn(promise);
+      return this.share.instance = (function() {
+
+        function instance() {}
+
+        instance.prototype.destroy = function() {
+          return 'delete_promise';
+        };
+
+        return instance;
+
+      })();
+    });
+    it("should try to find the object with store.find('$share', share_id)", function() {
+      var promise;
+      promise = this.share["delete"]('123');
+      return expect(this.hoodie.my.store.find).wasCalledWith('$share', '123');
+    });
+    return it("should init the share instance and destroy it", function() {
+      var promise;
+      this.hoodie.my.store.find.andReturn(this.hoodie.defer().resolve({}).promise());
+      promise = this.share["delete"]('123');
+      return expect(promise).toBeResolvedWith('delete_promise');
+    });
+  });
+  return describe(".deleteAll()", function() {
+    beforeEach(function() {
+      var promise;
+      promise = this.hoodie.defer().resolve([
+        {
+          funky: 'fresh'
+        }, {
+          funky: 'fresh'
+        }
+      ]).promise();
+      spyOn(this.hoodie.my.store, "findAll").andReturn(promise);
+      return this.share.instance = (function() {
+
+        function instance() {}
+
+        instance.prototype.destroy = function() {
+          return 'deleteAll_promise';
+        };
+
+        return instance;
+
+      })();
+    });
+    it("should try to find the object with store.findAll('$share')", function() {
+      var promise;
+      promise = this.share.deleteAll();
+      return expect(this.hoodie.my.store.findAll).wasCalled();
+    });
+    return it("should init the share instance and destroy it", function() {
+      var promise;
+      this.hoodie.my.store.findAll.andReturn(this.hoodie.defer().resolve([{}, {}]).promise());
+      promise = this.share.deleteAll();
+      return expect(promise).toBeResolvedWith(['deleteAll_promise', 'deleteAll_promise']);
+    });
   });
 });

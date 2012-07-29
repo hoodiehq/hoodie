@@ -148,7 +148,7 @@ class Hoodie.Store
   # 3. If not, create one and return it.
   findOrCreate : (attributes) ->
     defer = @hoodie.defer()
-    @find(attributes.id)
+    @find(attributes.type, attributes.id)
     .done( defer.resolve )
     .fail => 
       @create(attributes).then defer.resolve, defer.reject 

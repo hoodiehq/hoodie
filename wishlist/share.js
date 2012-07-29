@@ -136,9 +136,25 @@ hoodie.my.share("share_id")
 //   create a new share
 hoodie.my.share.create({})
 
+// * find  
+//   find an existing sharings
+hoodie.my.share.find(share_id)
+
+// * findOrCreate  
+//   finds an existing sharing, otherwise creates it
+hoodie.my.share.findOrCreate(share_attributes)
+
 // * findAll  
-//   lad all my sharings
+//   find all my sharings
 hoodie.my.share.findAll()
+
+// * save  
+//   overwrites or creates a new share
+hoodie.my.share.save('share_id', {})
+
+// * update  
+//   updates an existing share
+hoodie.my.share.update('share_id', changed_attributes)
 
 // * updateAll  
 //   update all my sharings
@@ -147,8 +163,12 @@ hoodie.my.share.updateAll( function(share) {
   share.access = false
 })
 
+// * delete  
+//   deletes a share
+hoodie.my.share.delete('share_id')
+
 // * deleteAll  
-//   delete all my sharings
+//   delete all my shares
 hoodie.my.share.deleteAll()
 
 

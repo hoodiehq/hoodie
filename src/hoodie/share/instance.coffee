@@ -1,4 +1,4 @@
-class Hoodie.Share.Instance
+class Hoodie.Share.Instance extends Hoodie.RemoteStore
 
   # ## constructor
   #

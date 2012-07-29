@@ -37,8 +37,8 @@
 # -----
 # 
 
+#
 class Hoodie.Share
-
 
   # ## Constructor
   #
@@ -49,47 +49,106 @@ class Hoodie.Share
     api = @open
 
     # set pointer to Hoodie.Share.Instance
-    api.instance = Hoodie.Share.Instance
+    @instance = Hoodie.Share.Instance
 
     # give all Share instances access to our core hoodie
     # as shares use custom hoodies, as long as the user
     # has no account yet
-    api.instance.hoodie = @hoodie
+    @instance.hoodie = @hoodie
+
+    $.extend api, this
 
     return api
+  
+  
+  # ## open
+  
+  # 
+  # open a sharing
+  # 
+  open : (share_id, options) =>
+    new @instance id: share_id, options
 
 
   # ## create
-  #
+
   # creates a new share & returns a promise.
   #
-  create : (options = {}) ->
-    share = new Hoodie.Share.Instance options
+  create : (attributes = {}) ->
+    share = new @instance attributes
     share.save()
     
   
   # ## find
-  #
+
   # find an existing share
   #
   find : (id) ->
-    @hoodie.my.store.find('$share', id).pipe (obj) =>
-      new Hoodie.Share.Instance obj
-  
-  # ## destroy
+    @hoodie.my.store.find('$share', id).pipe (object) =>
+      new @instance object
+
+
+  # ## findAll
+
+  # find all my existing shares
   #
+  findAll : ->
+    @hoodie.my.store.findAll('$share').pipe (objects) =>
+      new @instance obj for obj in objects
+
+
+  # ## findOrCreate
+
+  # find or create a new share
+  #
+  findOrCreate : (attributes) ->
+    attributes.type = '$share'
+    @hoodie.my.store.findOrCreate(attributes).pipe (object) =>
+      new @instance object
+
+
+  # ## save
+
+  # create or overwrite a share
+  #
+  save : (id, attributes) ->
+    @hoodie.my.store.save('$share', id, attributes).pipe (object) =>
+      new @instance object
+
+
+  # ## update
+
+  # create or overwrite a share
+  #
+  update : (id, attributes) ->
+    @hoodie.my.store.update('$share', id, attributes).pipe (object) =>
+      new @instance object
+
+
+  # ## updateAll
+
+  # update all my existing shares
+  #
+  updateAll : ( changed_attributes ) ->
+    @hoodie.my.store.updateAll('$share', changed_attributes).pipe (objects) =>
+      new @instance obj for obj in objects
+
+
+  # ## destroy
+
   # deletes an existing share
   #
-  destroy : (id) ->
+  delete : (id) ->
     @find(id).pipe (obj) =>
-      share = new Hoodie.Share.Instance obj
+      share = new @instance obj
       share.destroy()
-    
-  # alias
-  delete : @::destroy
-  
-  
-  # ## open
-  # 
-  open : =>
-    @instance.open arguments...
+
+  destroy: -> @delete arguments...
+
+  deleteAll : () ->
+    @findAll().pipe (objects) =>
+      for obj in objects
+        share = new @instance obj
+        share.destroy()
+
+  destroyAll: -> @deleteAll arguments...

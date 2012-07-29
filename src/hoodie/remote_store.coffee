@@ -52,7 +52,7 @@ class Hoodie.RemoteStore extends Hoodie.Store
   # sets basePath (think: namespace) and some other options
   constructor : (@hoodie, options = {}) ->
     @basePath = options.basePath or ''
-    @_sync    = options.sync      if options.sync
+    @_sync    = options.sync     if options.sync
 
 
 

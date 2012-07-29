@@ -1,4 +1,11 @@
 window.Mocks or= {}
+
+promiseMock = 
+  pipe : ->
+  fail : ->
+  done : ->
+  then : ->
+
 Mocks.Hoodie = ->
   
   baseUrl : 'http://my.cou.ch'
@@ -14,22 +21,17 @@ Mocks.Hoodie = ->
   my :
     store         :
       uuid          : -> 'mock567'
-      create        : -> 
-        then : ->
-      destroy       : -> 
-        then : ->
-      save          : -> 
-        then : ->
-        done: ->
-      update        : -> 
-        pipe : ->
-        fail : ->
-        done : ->
-      find          : -> 
-        pipe : ->
-        fail : ->
-        done : ->
-      changedDocs  : ->
+      create        : -> promiseMock 
+      destroy       : -> promiseMock 
+      save          : -> promiseMock 
+      update        : -> promiseMock 
+      updateAll     : -> promiseMock 
+      find          : -> promiseMock 
+      findAll       : -> promiseMock
+      findOrCreate  : -> promiseMock 
+      delete        : -> promiseMock 
+      deleteAll     : -> promiseMock 
+      changedDocs   : ->
         
       db :
         getItem       : ->
