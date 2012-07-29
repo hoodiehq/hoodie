@@ -138,7 +138,7 @@ Hoodie.Store = (function() {
     return this.findAll.apply(this, arguments);
   };
 
-  Store.prototype["delete"] = function(type, id, options) {
+  Store.prototype.destroy = function(type, id, options) {
     var defer;
     if (options == null) {
       options = {};
@@ -150,18 +150,16 @@ Hoodie.Store = (function() {
     return defer;
   };
 
-  Store.prototype.destroy = function() {
-    return this["delete"].apply(this, arguments);
+  Store.prototype["delete"] = function() {
+    return this.destroy.apply(this, arguments);
   };
 
-  Store.prototype.deleteAll = function(type, options) {
+  Store.prototype.destroyAll = function(type, options) {
     if (options == null) {
       options = {};
     }
     return this.hoodie.defer();
   };
-
-  Store.prototype.destroyAll = Store.prototype.deleteAll;
 
   Store.prototype.uuid = function(len) {
     var chars, i, radix;

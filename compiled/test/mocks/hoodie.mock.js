@@ -52,7 +52,7 @@ Mocks.Hoodie = function() {
         "delete": function() {
           return promiseMock;
         },
-        deleteAll: function() {
+        destroyAll: function() {
           return promiseMock;
         },
         changedDocs: function() {},

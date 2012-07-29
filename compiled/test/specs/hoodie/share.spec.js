@@ -212,7 +212,7 @@ describe("Hoodie.Share", function() {
       ]);
     });
   });
-  describe(".delete(share_id)", function() {
+  describe(".destroy(share_id)", function() {
     beforeEach(function() {
       var promise;
       promise = this.hoodie.defer().resolve({
@@ -233,17 +233,17 @@ describe("Hoodie.Share", function() {
     });
     it("should try to find the object with store.find('$share', share_id)", function() {
       var promise;
-      promise = this.share["delete"]('123');
+      promise = this.share.destroy('123');
       return expect(this.hoodie.my.store.find).wasCalledWith('$share', '123');
     });
     return it("should init the share instance and destroy it", function() {
       var promise;
       this.hoodie.my.store.find.andReturn(this.hoodie.defer().resolve({}).promise());
-      promise = this.share["delete"]('123');
+      promise = this.share.destroy('123');
       return expect(promise).toBeResolvedWith('delete_promise');
     });
   });
-  return describe(".deleteAll()", function() {
+  return describe(".destroyAll()", function() {
     beforeEach(function() {
       var promise;
       promise = this.hoodie.defer().resolve([
@@ -259,7 +259,7 @@ describe("Hoodie.Share", function() {
         function instance() {}
 
         instance.prototype.destroy = function() {
-          return 'deleteAll_promise';
+          return 'destroyAll_promise';
         };
 
         return instance;
@@ -268,14 +268,14 @@ describe("Hoodie.Share", function() {
     });
     it("should try to find the object with store.findAll('$share')", function() {
       var promise;
-      promise = this.share.deleteAll();
+      promise = this.share.destroyAll();
       return expect(this.hoodie.my.store.findAll).wasCalled();
     });
     return it("should init the share instance and destroy it", function() {
       var promise;
       this.hoodie.my.store.findAll.andReturn(this.hoodie.defer().resolve([{}, {}]).promise());
-      promise = this.share.deleteAll();
-      return expect(promise).toBeResolvedWith(['deleteAll_promise', 'deleteAll_promise']);
+      promise = this.share.destroyAll();
+      return expect(promise).toBeResolvedWith(['destroyAll_promise', 'destroyAll_promise']);
     });
   });
 });

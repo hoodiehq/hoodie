@@ -30,7 +30,7 @@ Mocks.Hoodie = ->
       findAll       : -> promiseMock
       findOrCreate  : -> promiseMock 
       delete        : -> promiseMock 
-      deleteAll     : -> promiseMock 
+      destroyAll     : -> promiseMock 
       changedDocs   : ->
         
       db :

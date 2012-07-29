@@ -14,8 +14,8 @@
 # * save(type, id, object)
 # * update(new_properties )
 # * updateAll( type, new_properties)
-# * delete(type, id)
-# * deleteAll(type)
+# * destroy(type, id)
+# * destroyAll(type)
 #
 # custom requests
 #
@@ -110,17 +110,17 @@ class Hoodie.RemoteStore extends Hoodie.Store
     @request "PUT", path, data: doc
 
   
-  # ## delete
+  # ## destroy
   
-  # delete one object
-  delete : (type, id) ->
+  # destroy one object
+  destroy : (type, id) ->
     @update type, id, _deleted: true
 
   
-  # ## deleteAll
+  # ## destroyAll
   
-  # delete all objects, can be filtered by type
-  deleteAll : (type) ->
+  # destroy all objects, can be filtered by type
+  destroyAll : (type) ->
     @updateAll type, _deleted: true
 
 

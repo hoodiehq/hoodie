@@ -89,13 +89,13 @@ Hoodie.RemoteStore = (function(_super) {
     });
   };
 
-  RemoteStore.prototype["delete"] = function(type, id) {
+  RemoteStore.prototype.destroy = function(type, id) {
     return this.update(type, id, {
       _deleted: true
     });
   };
 
-  RemoteStore.prototype.deleteAll = function(type) {
+  RemoteStore.prototype.destroyAll = function(type) {
     return this.updateAll(type, {
       _deleted: true
     });

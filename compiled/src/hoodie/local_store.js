@@ -153,12 +153,12 @@ Hoodie.LocalStore = (function(_super) {
     return defer.promise();
   };
 
-  LocalStore.prototype["delete"] = function(type, id, options) {
+  LocalStore.prototype.destroy = function(type, id, options) {
     var defer, key, object;
     if (options == null) {
       options = {};
     }
-    defer = LocalStore.__super__["delete"].apply(this, arguments);
+    defer = LocalStore.__super__.destroy.apply(this, arguments);
     if (this.hoodie.isPromise(defer)) {
       return defer;
     }

@@ -97,12 +97,12 @@
       .done ( function(objects) { } )
       .fail ( function(err)     { } )
       
-    // delete an existing object
+    // destroy an existing object
     type = 'couch'
     id   = 'abc4567'
-    hoodie.my.store.delete( type, id )
-      .done ( function(deletedObject) { } )
-      .fail ( function(err)            { } )
+    hoodie.my.store.destroy( type, id )
+      .done ( function(destroyedObject) { } )
+      .fail ( function(err)             { } )
       
     //
     // Synchronization
@@ -117,8 +117,8 @@
     // existing doc updated
     hoodie.my.remote.on( 'update', function( type, id, updatedObject) { } )
 
-    // doc deleted
-    hoodie.my.remote.on( 'delete', function( type, id, deletedObject) { } )
+    // doc destroyed
+    hoodie.my.remote.on( 'destroy', function( type, id, destroyedObject) { } )
 
     // any of above events
     hoodie.my.remote.on( 'change', function( type, id, changedObject) { } )
@@ -126,7 +126,7 @@
     // all listeners can be filtered by type
     hoodie.my.remote.on( "create:couch", function( id, createdObject) { } )
     hoodie.my.remote.on( "update:couch", function( id, updatedObject)  { } )
-    hoodie.my.remote.on( "delete:couch", function( id, deletedObject) { } )
+    hoodie.my.remote.on( "destroy:couch", function( id, destroyedObject) { } )
     hoodie.my.remote.on( "change:couch", function( id, changedObject) { } )
 
 

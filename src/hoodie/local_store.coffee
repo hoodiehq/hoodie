@@ -155,7 +155,7 @@ class Hoodie.LocalStore extends Hoodie.Store
   # 
   # when object has been synced before, mark it as deleted. 
   # Otherwise remove it from Store.
-  delete : (type, id, options = {}) ->
+  destroy : (type, id, options = {}) ->
     defer = super
     return defer if @hoodie.isPromise(defer)
 

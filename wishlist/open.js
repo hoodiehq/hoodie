@@ -35,7 +35,7 @@ store.save("todo", "exists7", {name: "get some rest"})
 store.update("todo", "exists7", {name: "get some rest"})
 store.updateAll("todo", {done: true})
 store.delete("todo", "exists7")
-store.deleteAll("todo")
+store.destroyAll("todo")
 store.get("completed_todos")
 store.post("notify", {"email": "jane@xmpl.com"})
 

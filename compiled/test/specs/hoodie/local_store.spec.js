@@ -576,14 +576,14 @@ describe("Hoodie.LocalStore", function() {
       });
     });
   });
-  describe(".delete(type, id)", function() {
+  describe(".destroy(type, id)", function() {
     _when("objecet cannot be found", function() {
       beforeEach(function() {
         return spyOn(this.store, "cache").andReturn(false);
       });
       return it("should return a rejected the promise", function() {
         var promise;
-        promise = this.store["delete"]('document', '123');
+        promise = this.store.destroy('document', '123');
         return expect(promise).toBeRejected();
       });
     });
@@ -592,41 +592,41 @@ describe("Hoodie.LocalStore", function() {
         return spyOn(this.store, "cache").andReturn({});
       });
       it("should remove the object", function() {
-        this.store["delete"]('document', '123');
+        this.store.destroy('document', '123');
         return expect(this.store.db.removeItem).wasCalledWith('document/123');
       });
       it("should set the _cached object to false", function() {
         delete this.store._cached['document/123'];
-        this.store["delete"]('document', '123');
+        this.store.destroy('document', '123');
         return expect(this.store._cached['document/123']).toBe(false);
       });
       it("should clear document from changed", function() {
         spyOn(this.store, "clearChanged");
-        this.store["delete"]('document', '123');
+        this.store.destroy('document', '123');
         return expect(this.store.clearChanged).wasCalledWith('document', '123');
       });
       it("should return a resolved promise", function() {
         var promise;
-        promise = this.store["delete"]('document', '123');
+        promise = this.store.destroy('document', '123');
         return expect(promise).toBeResolved();
       });
       return it("should return a clone of the cached object (before it was deleted)", function() {
         var promise;
         spyOn($, "extend");
-        promise = this.store["delete"]('document', '123', {
+        promise = this.store.destroy('document', '123', {
           remote: true
         });
         return expect($.extend).wasCalled();
       });
     });
-    _when("object can be found and delete comes from remote", function() {
+    _when("object can be found and destroy comes from remote", function() {
       beforeEach(function() {
         return spyOn(this.store, "cache").andReturn({
           _syncedAt: 'now'
         });
       });
       return it("should remove the object", function() {
-        this.store["delete"]('document', '123', {
+        this.store.destroy('document', '123', {
           remote: true
         });
         return expect(this.store.db.removeItem).wasCalledWith('document/123');
@@ -640,14 +640,14 @@ describe("Hoodie.LocalStore", function() {
       });
       it("should mark the object as deleted and cache it", function() {
         var promise;
-        promise = this.store["delete"]('document', '123');
+        promise = this.store.destroy('document', '123');
         return expect(this.store.cache).wasCalledWith('document', '123', {
           _syncedAt: 'now',
           _deleted: true
         });
       });
       return it("should not remove the object from store", function() {
-        this.store["delete"]('document', '123');
+        this.store.destroy('document', '123');
         return expect(this.store.db.removeItem).wasNotCalled();
       });
     });

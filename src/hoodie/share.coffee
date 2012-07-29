@@ -138,17 +138,17 @@ class Hoodie.Share
 
   # deletes an existing share
   #
-  delete : (id) ->
+  destroy : (id) ->
     @find(id).pipe (obj) =>
       share = new @instance obj
       share.destroy()
 
-  destroy: -> @delete arguments...
+  delete: -> @destroy arguments...
 
-  deleteAll : () ->
+  destroyAll : () ->
     @findAll().pipe (objects) =>
       for obj in objects
         share = new @instance obj
         share.destroy()
 
-  destroyAll: -> @deleteAll arguments...
+  deleteAll: -> @destroyAll arguments...

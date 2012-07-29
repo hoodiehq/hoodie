@@ -395,13 +395,13 @@ describe "Hoodie.LocalStore", ->
           expect(results.length).toBe 2   
   # /.findAll(type)
 
-  describe ".delete(type, id)", ->
+  describe ".destroy(type, id)", ->
     _when "objecet cannot be found", ->
       beforeEach ->
         spyOn(@store, "cache").andReturn false
         
       it "should return a rejected the promise", ->
-        promise = @store.delete 'document', '123'
+        promise = @store.destroy 'document', '123'
         expect(promise).toBeRejected()
         
     _when "object can be found and has not been synched before", ->
@@ -409,34 +409,34 @@ describe "Hoodie.LocalStore", ->
         spyOn(@store, "cache").andReturn {}
         
       it "should remove the object", ->
-        @store.delete 'document', '123'
+        @store.destroy 'document', '123'
         expect(@store.db.removeItem).wasCalledWith 'document/123'
         
       it "should set the _cached object to false", ->
         delete @store._cached['document/123']
-        @store.delete 'document', '123'
+        @store.destroy 'document', '123'
         expect(@store._cached['document/123']).toBe false
         
       it "should clear document from changed", ->
         spyOn(@store, "clearChanged")
-        @store.delete 'document', '123'
+        @store.destroy 'document', '123'
         expect(@store.clearChanged).wasCalledWith 'document', '123'
       
       it "should return a resolved promise", ->
-        promise = @store.delete 'document', '123'
+        promise = @store.destroy 'document', '123'
         expect(promise).toBeResolved()
       
       it "should return a clone of the cached object (before it was deleted)", ->
         spyOn($, "extend")
-        promise = @store.delete 'document', '123', remote: true
+        promise = @store.destroy 'document', '123', remote: true
         expect($.extend).wasCalled()
     
-    _when "object can be found and delete comes from remote", ->
+    _when "object can be found and destroy comes from remote", ->
       beforeEach ->
         spyOn(@store, "cache").andReturn {_syncedAt: 'now'}
       
       it "should remove the object", ->
-        @store.delete 'document', '123', remote: true
+        @store.destroy 'document', '123', remote: true
         expect(@store.db.removeItem).wasCalledWith 'document/123'
         
     _when "object can be found and was synched before", ->
@@ -444,11 +444,11 @@ describe "Hoodie.LocalStore", ->
         spyOn(@store, "cache").andReturn {_syncedAt: 'now'}
         
       it "should mark the object as deleted and cache it", ->
-        promise = @store.delete 'document', '123'
+        promise = @store.destroy 'document', '123'
         expect(@store.cache).wasCalledWith 'document', '123', {_syncedAt: 'now', _deleted: true}
         
       it "should not remove the object from store", ->
-        @store.delete 'document', '123'
+        @store.destroy 'document', '123'
         expect(@store.db.removeItem).wasNotCalled()
   # /.destroy(type, id)
 

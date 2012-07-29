@@ -366,49 +366,49 @@ describe("Hoodie.Store", function() {
       });
     });
   });
-  describe(".delete(type, id)", function() {
+  describe(".destroy(type, id)", function() {
     it("should return a defer", function() {
       var defer;
-      defer = this.store["delete"]('document', '123');
+      defer = this.store.destroy('document', '123');
       return expect(defer).toBeDefer();
     });
     describe("invalid arguments", function() {
       _when("no arguments passed", function() {
         return it("should be rejected", function() {
           var promise;
-          promise = this.store["delete"]();
+          promise = this.store.destroy();
           return expect(promise).toBeRejected();
         });
       });
       return _when("no id passed", function() {
         return it("should be rejected", function() {
           var promise;
-          promise = this.store["delete"]('document');
+          promise = this.store.destroy('document');
           return expect(promise).toBeRejected();
         });
       });
     });
     return describe("aliases", function() {
       beforeEach(function() {
-        return spyOn(this.store, "delete");
+        return spyOn(this.store, "destroy");
       });
       return it("should allow to use .destroy", function() {
         this.store.destroy("test", 12, {
           option: "value"
         });
-        return expect(this.store["delete"]).wasCalledWith("test", 12, {
+        return expect(this.store.destroy).wasCalledWith("test", 12, {
           option: "value"
         });
       });
     });
   });
-  describe(".deleteAll(type)", function() {
+  describe(".destroyAll(type)", function() {
     it("should return a defer", function() {
-      return expect(this.store.deleteAll()).toBeDefer();
+      return expect(this.store.destroyAll()).toBeDefer();
     });
     return describe("aliases", function() {
       return it("should allow to use .destroyAll", function() {
-        return expect(this.store.destroyAll).toBe(this.store.deleteAll);
+        return expect(this.store.destroyAll).toBe(this.store.destroyAll);
       });
     });
   });

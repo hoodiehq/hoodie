@@ -243,41 +243,41 @@ describe "Hoodie.Store", ->
   # /.findOrCreate(attributes)
 
   
-  describe ".delete(type, id)", ->
+  describe ".destroy(type, id)", ->
     it "should return a defer", ->
-      defer = @store.delete 'document', '123'
+      defer = @store.destroy 'document', '123'
       expect(defer).toBeDefer()
 
     describe "invalid arguments", ->
       _when "no arguments passed", ->          
         it "should be rejected", ->
-          promise = @store.delete()
+          promise = @store.destroy()
           expect(promise).toBeRejected()
 
       _when "no id passed", ->
         it "should be rejected", ->
-          promise = @store.delete 'document'
+          promise = @store.destroy 'document'
           expect(promise).toBeRejected()
 
     describe "aliases", ->
       beforeEach ->
-        spyOn(@store, "delete")
+        spyOn(@store, "destroy")
       
       it "should allow to use .destroy", ->
         @store.destroy "test", 12, {option: "value"}
-        expect(@store.delete).wasCalledWith "test", 12, {option: "value"}
+        expect(@store.destroy).wasCalledWith "test", 12, {option: "value"}
     # /aliases
   # /.destroy(type, id)
 
 
-  describe ".deleteAll(type)", ->
+  describe ".destroyAll(type)", ->
     it "should return a defer", ->
-      expect(@store.deleteAll()).toBeDefer()
+      expect(@store.destroyAll()).toBeDefer()
   
     describe "aliases", ->
       it "should allow to use .destroyAll", ->
-        expect(@store.destroyAll).toBe @store.deleteAll
-  # /.deleteAll(type)
+        expect(@store.destroyAll).toBe @store.destroyAll
+  # /.destroyAll(type)
 
 
   describe ".uuid(num = 7)", ->

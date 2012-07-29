@@ -532,7 +532,7 @@ Hoodie.Store = (function() {
     return this.findAll.apply(this, arguments);
   };
 
-  Store.prototype["delete"] = function(type, id, options) {
+  Store.prototype.destroy = function(type, id, options) {
     var defer;
     if (options == null) {
       options = {};
@@ -544,18 +544,16 @@ Hoodie.Store = (function() {
     return defer;
   };
 
-  Store.prototype.destroy = function() {
-    return this["delete"].apply(this, arguments);
+  Store.prototype["delete"] = function() {
+    return this.destroy.apply(this, arguments);
   };
 
-  Store.prototype.deleteAll = function(type, options) {
+  Store.prototype.destroyAll = function(type, options) {
     if (options == null) {
       options = {};
     }
     return this.hoodie.defer();
   };
-
-  Store.prototype.destroyAll = Store.prototype.deleteAll;
 
   Store.prototype.uuid = function(len) {
     var chars, i, radix;
@@ -680,13 +678,13 @@ Hoodie.RemoteStore = (function(_super) {
     });
   };
 
-  RemoteStore.prototype["delete"] = function(type, id) {
+  RemoteStore.prototype.destroy = function(type, id) {
     return this.update(type, id, {
       _deleted: true
     });
   };
 
-  RemoteStore.prototype.deleteAll = function(type) {
+  RemoteStore.prototype.destroyAll = function(type) {
     return this.updateAll(type, {
       _deleted: true
     });
@@ -1341,12 +1339,12 @@ Hoodie.LocalStore = (function(_super) {
     return defer.promise();
   };
 
-  LocalStore.prototype["delete"] = function(type, id, options) {
+  LocalStore.prototype.destroy = function(type, id, options) {
     var defer, key, object;
     if (options == null) {
       options = {};
     }
-    defer = LocalStore.__super__["delete"].apply(this, arguments);
+    defer = LocalStore.__super__.destroy.apply(this, arguments);
     if (this.hoodie.isPromise(defer)) {
       return defer;
     }

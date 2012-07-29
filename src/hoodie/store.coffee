@@ -172,7 +172,7 @@ class Hoodie.Store
   # 
   # when object has been synced before, mark it as deleted. 
   # Otherwise remove it from Store.
-  delete : (type, id, options = {}) ->
+  destroy : (type, id, options = {}) ->
     defer = @hoodie.defer()
   
     unless typeof type is 'string' and typeof id is 'string'
@@ -181,17 +181,14 @@ class Hoodie.Store
     return defer
   
   # alias
-  destroy: -> @delete arguments...
+  delete: -> @destroy arguments...
 
 
-  # ## deleteAll
+  # ## destroyAll
 
   # Deletes all objects. Can be filtered by a type
-  deleteAll : (type, options = {}) -> 
+  destroyAll : (type, options = {}) -> 
     @hoodie.defer()
-
-  # alias
-  destroyAll: @::deleteAll  
 
   # ## UUID
 

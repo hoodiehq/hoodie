@@ -163,12 +163,12 @@ hoodie.my.store.findAll( type )
 
 ### Delete
 
-delete an existing object
+destroy an existing object
 
 ```javascript
-hoodie.my.store.delete( type, id )
+hoodie.my.store.destroy( type, id )
 
-  .done ( function(deletedObject) { } )
+  .done ( function(destroyedObject) { } )
   .fail ( function(err)            { } )
 ```
 
@@ -199,8 +199,8 @@ hoodie.my.remote.on( 'created', function( createdObject) { } )
 // existing doc updated
 hoodie.my.remote.on( 'updated', function( updatedObject) { } )
 
-// doc deleted
-hoodie.my.remote.on( 'deleted', function( deletedObject) { } )
+// doc destroyed
+hoodie.my.remote.on( 'destroyed', function( destroyedObject) { } )
 
 // any of above events
 hoodie.my.remote.on( 'changed', function( changedObject) { } )
@@ -208,13 +208,13 @@ hoodie.my.remote.on( 'changed', function( changedObject) { } )
 // all listeners can be filtered by type
 hoodie.my.remote.on( "created:couch", function( createdObject) { } )
 hoodie.my.remote.on( "updated:couch", function( updatedObject) { } )
-hoodie.my.remote.on( "deleted:couch", function( deletedObject) { } )
+hoodie.my.remote.on( "destroyed:couch", function( destroyedObject) { } )
 hoodie.my.remote.on( "changed:couch", function( changedObject) { } )
 
 // and even by id
 hoodie.my.remote.on( "created:couch:abc4567", function( createdObject) { } )
 hoodie.my.remote.on( "updated:couch:abc4567", function( updatedObject) { } )
-hoodie.my.remote.on( "deleted:couch:abc4567", function( deletedObject) { } )
+hoodie.my.remote.on( "destroyed:couch:abc4567", function( destroyedObject) { } )
 hoodie.my.remote.on( "changed:couch:abc4567", function( changedObject) { } )
 ```
 

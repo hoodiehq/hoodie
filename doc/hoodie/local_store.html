@@ -119,7 +119,7 @@ and returns it as array, which will be stored in the results variable</p></div><
 <p>Deletes one object specified by <code>type</code> and <code>id</code>. </p>
 
 <p>when object has been synced before, mark it as deleted. 
-Otherwise remove it from Store.</p></div></div><div class="code"><div class="wrapper">  <span class="k">delete</span> <span class="o">:</span> <span class="nf">(type, id, options = {}) -&gt;</span>
+Otherwise remove it from Store.</p></div></div><div class="code"><div class="wrapper">  <span class="nv">destroy : </span><span class="nf">(type, id, options = {}) -&gt;</span>
     <span class="nv">defer = </span><span class="k">super</span>
     <span class="k">return</span> <span class="nx">defer</span> <span class="k">if</span> <span class="nx">@hoodie</span><span class="p">.</span><span class="nx">isPromise</span><span class="p">(</span><span class="nx">defer</span><span class="p">)</span>
 

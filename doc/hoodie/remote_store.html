@@ -11,8 +11,8 @@
 <li>save(type, id, object)</li>
 <li>update(new_properties )</li>
 <li>updateAll( type, new_properties)</li>
-<li>delete(type, id)</li>
-<li>deleteAll(type)</li>
+<li>destroy(type, id)</li>
+<li>destroyAll(type)</li>
 </ul>
 
 <p>custom requests</p>
@@ -78,10 +78,10 @@ will be overwritten </p></div></div><div class="code"><div class="wrapper">  <sp
 
     <span class="nx">@request</span> <span class="s2">&quot;PUT&quot;</span><span class="p">,</span> <span class="nx">path</span><span class="p">,</span> <span class="nv">data: </span><span class="nx">doc</span>
 
-  </div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h2 id="delete">delete</h2></div></div><div class="code"><div class="wrapper">  </div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>delete one object</p></div></div><div class="code"><div class="wrapper">  <span class="k">delete</span> <span class="o">:</span> <span class="nf">(type, id) -&gt;</span>
+  </div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h2 id="destroy">destroy</h2></div></div><div class="code"><div class="wrapper">  </div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>destroy one object</p></div></div><div class="code"><div class="wrapper">  <span class="nv">destroy : </span><span class="nf">(type, id) -&gt;</span>
     <span class="nx">@update</span> <span class="nx">type</span><span class="p">,</span> <span class="nx">id</span><span class="p">,</span> <span class="nv">_deleted: </span><span class="kc">true</span>
 
-  </div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h2 id="deleteall">deleteAll</h2></div></div><div class="code"><div class="wrapper">  </div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>delete all objects, can be filtered by type</p></div></div><div class="code"><div class="wrapper">  <span class="nv">deleteAll : </span><span class="nf">(type) -&gt;</span>
+  </div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h2 id="destroyall">destroyAll</h2></div></div><div class="code"><div class="wrapper">  </div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>destroy all objects, can be filtered by type</p></div></div><div class="code"><div class="wrapper">  <span class="nv">destroyAll : </span><span class="nf">(type) -&gt;</span>
     <span class="nx">@updateAll</span> <span class="nx">type</span><span class="p">,</span> <span class="nv">_deleted: </span><span class="kc">true</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h2 id="custom-requests">custom requests</h2></div></div><div class="code"><div class="wrapper">  </div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h2 id="request">request</h2></div></div><div class="code"><div class="wrapper">  </div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>wrapper for hoodie.request, with some store specific defaults
 and a prefixed path</p></div></div><div class="code"><div class="wrapper">  <span class="nv">request : </span><span class="nf">(type, path, options = {}) -&gt;</span>
     <span class="nv">path = </span><span class="nx">@basePath</span> <span class="o">+</span> <span class="nx">path</span>

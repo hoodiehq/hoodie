@@ -134,32 +134,32 @@ describe("Hoodie.RemoteStore", function() {
       });
     });
   });
-  describe("delete(type, id)", function() {
+  describe("destroy(type, id)", function() {
     beforeEach(function() {
       return spyOn(this.remote, "update").andReturn("update_promise");
     });
     it("should proxy to update with _deleted: true", function() {
-      this.remote["delete"]('car', 123);
+      this.remote.destroy('car', 123);
       return expect(this.remote.update).wasCalledWith('car', 123, {
         _deleted: true
       });
     });
     return it("should return promise of update", function() {
-      return expect(this.remote["delete"]('car', 123)).toBe('update_promise');
+      return expect(this.remote.destroy('car', 123)).toBe('update_promise');
     });
   });
-  describe("deleteAll(type)", function() {
+  describe("destroyAll(type)", function() {
     beforeEach(function() {
       return spyOn(this.remote, "updateAll").andReturn("updateAll_promise");
     });
     it("should proxy to updateAll with _deleted: true", function() {
-      this.remote.deleteAll('car');
+      this.remote.destroyAll('car');
       return expect(this.remote.updateAll).wasCalledWith('car', {
         _deleted: true
       });
     });
     return it("should return promise of updateAll", function() {
-      return expect(this.remote.deleteAll('car')).toBe('updateAll_promise');
+      return expect(this.remote.destroyAll('car')).toBe('updateAll_promise');
     });
   });
   describe("request(type, path, options)", function() {

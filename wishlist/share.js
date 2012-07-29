@@ -167,9 +167,9 @@ hoodie.my.share.updateAll( function(share) {
 //   deletes a share
 hoodie.my.share.delete('share_id')
 
-// * deleteAll  
+// * destroyAll  
 //   delete all my shares
-hoodie.my.share.deleteAll()
+hoodie.my.share.destroyAll()
 
 
 
