@@ -514,15 +514,11 @@ Hoodie.Store = (function() {
     return defer;
   };
 
-  Store.prototype.find = function() {
-    return this.find.apply(this, arguments);
-  };
-
   Store.prototype.findOrCreate = function(attributes) {
     var defer,
       _this = this;
     defer = this.hoodie.defer();
-    this.find(attributes.id).done(defer.resolve).fail(function() {
+    this.find(attributes.type, attributes.id).done(defer.resolve).fail(function() {
       return _this.create(attributes).then(defer.resolve, defer.reject);
     });
     return defer.promise();
