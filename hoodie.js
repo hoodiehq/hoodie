@@ -514,8 +514,26 @@ Hoodie.Store = (function() {
     return defer;
   };
 
+  Store.prototype.find = function() {
+    return this.load.apply(this, arguments);
+  };
+
+  Store.prototype.findOrCreate = function(attributes) {
+    var defer,
+      _this = this;
+    defer = this.hoodie.defer();
+    this.load(attributes.id).done(defer.resolve).fail(function() {
+      return _this.create(attributes).then(defer.resolve, defer.reject);
+    });
+    return defer.promise();
+  };
+
   Store.prototype.loadAll = function() {
     return this.hoodie.defer();
+  };
+
+  Store.prototype.findAll = function() {
+    return this.loadAll.apply(this, arguments);
   };
 
   Store.prototype["delete"] = function(type, id, options) {

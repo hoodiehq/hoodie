@@ -76,23 +76,6 @@ class Hoodie.Share
     @hoodie.my.store.load('$share', id).pipe (obj) =>
       new Hoodie.Share.Instance obj
   
-  
-  # ## find or create
-  #
-  # 1. Try to find a share by given id
-  # 2. If share could be found, return it
-  # 3. If not, create one and return it.
-  findOrCreate : (options) ->
-    defer = @hoodie.defer()
-    @load(options.id)
-    .done (share) ->
-      defer.resolve share
-    .fail => 
-      @create(options).then defer.resolve, defer.reject 
-  
-    return defer.promise()
-  
-  
   # ## destroy
   #
   # deletes an existing share

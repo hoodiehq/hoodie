@@ -273,7 +273,7 @@ describe("Hoodie.Store", function() {
       defer = this.store.load('document', '123');
       return expect(defer).toBeDefer();
     });
-    return describe("invalid arguments", function() {
+    describe("invalid arguments", function() {
       _when("no arguments passed", function() {
         return it("should be rejected", function() {
           var promise;
@@ -289,10 +289,81 @@ describe("Hoodie.Store", function() {
         });
       });
     });
+    return describe("aliases", function() {
+      beforeEach(function() {
+        return spyOn(this.store, "load");
+      });
+      return it("should allow to use .find", function() {
+        this.store.find('test', '123');
+        return expect(this.store.load).wasCalledWith('test', '123');
+      });
+    });
   });
   describe(".loadAll(type)", function() {
-    return it("should return a defer", function() {
+    it("should return a defer", function() {
       return expect(this.store.loadAll()).toBeDefer();
+    });
+    return describe("aliases", function() {
+      beforeEach(function() {
+        return spyOn(this.store, "loadAll");
+      });
+      return it("should allow to use .findAll", function() {
+        this.store.findAll('test');
+        return expect(this.store.loadAll).wasCalledWith('test');
+      });
+    });
+  });
+  describe(".findOrCreate(attributes)", function() {
+    _when("object exists", function() {
+      beforeEach(function() {
+        var promise;
+        promise = this.hoodie.defer().resolve('existing_object').promise();
+        return spyOn(this.store, "load").andReturn(promise);
+      });
+      return it("should resolve with existing object", function() {
+        var promise;
+        promise = this.store.findOrCreate({
+          id: '123',
+          attribute: 'value'
+        });
+        return expect(promise).toBeResolvedWith('existing_object');
+      });
+    });
+    return _when("object does not exist", function() {
+      beforeEach(function() {
+        return spyOn(this.store, "load").andReturn(this.hoodie.defer().reject().promise());
+      });
+      it("should call `.create` with passed attributes", function() {
+        var promise;
+        spyOn(this.store, "create").andReturn(this.hoodie.defer().promise());
+        promise = this.store.findOrCreate({
+          id: '123',
+          attribute: 'value'
+        });
+        return expect(this.store.create).wasCalledWith({
+          id: '123',
+          attribute: 'value'
+        });
+      });
+      it("should reject when `.create` was rejected", function() {
+        var promise;
+        spyOn(this.store, "create").andReturn(this.hoodie.defer().reject().promise());
+        promise = this.store.findOrCreate({
+          id: '123',
+          attribute: 'value'
+        });
+        return expect(promise).toBeRejected();
+      });
+      return it("should resolve when `.create` was resolved", function() {
+        var promise;
+        promise = this.hoodie.defer().resolve('new_object').promise();
+        spyOn(this.store, "create").andReturn(promise);
+        promise = this.store.findOrCreate({
+          id: '123',
+          attribute: 'value'
+        });
+        return expect(promise).toBeResolvedWith('new_object');
+      });
     });
   });
   describe(".delete(type, id)", function() {

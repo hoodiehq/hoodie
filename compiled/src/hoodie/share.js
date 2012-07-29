@@ -30,18 +30,6 @@ Hoodie.Share = (function() {
     });
   };
 
-  Share.prototype.findOrCreate = function(options) {
-    var defer,
-      _this = this;
-    defer = this.hoodie.defer();
-    this.load(options.id).done(function(share) {
-      return defer.resolve(share);
-    }).fail(function() {
-      return _this.create(options).then(defer.resolve, defer.reject);
-    });
-    return defer.promise();
-  };
-
   Share.prototype.destroy = function(id) {
     var _this = this;
     return this.load(id).pipe(function(obj) {

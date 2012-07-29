@@ -1,4 +1,49 @@
-<!DOCTYPE html><html lang="en"><head><title>hoodie/share/instance</title></head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0"><meta name="groc-relative-root" content="../../"><meta name="groc-document-path" content="hoodie/share/instance"><meta name="groc-project-path" content="src/hoodie/share/instance.coffee"><link rel="stylesheet" type="text/css" media="all" href="../../assets/style.css"><script type="text/javascript" src="../../assets/behavior.js"></script><body><div id="meta"><div class="file-path">src/hoodie/share/instance.coffee</div></div><div id="document"><div class="segment"><div class="code"><div class="wrapper"><span class="k">class</span> <span class="nx">Hoodie</span><span class="p">.</span><span class="nx">Share</span><span class="p">.</span><span class="nx">Instance</span></div></div></div><div class="segment"><div class="code"><div class="wrapper">  <span class="nv">constructor: </span><span class="nf">(options = {}) -&gt;</span>
+<!DOCTYPE html><html lang="en"><head><title>hoodie/share/instance</title></head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0"><meta name="groc-relative-root" content="../../"><meta name="groc-document-path" content="hoodie/share/instance"><meta name="groc-project-path" content="src/hoodie/share/instance.coffee"><link rel="stylesheet" type="text/css" media="all" href="../../assets/style.css"><script type="text/javascript" src="../../assets/behavior.js"></script><body><div id="meta"><div class="file-path">src/hoodie/share/instance.coffee</div></div><div id="document"><div class="segment"><div class="code"><div class="wrapper"><span class="k">class</span> <span class="nx">Hoodie</span><span class="p">.</span><span class="nx">Share</span><span class="p">.</span><span class="nx">Instance</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h2 id="constructor">constructor</h2>
+
+<p>initializes a new share &amp; returns a promise.</p>
+
+<h3 id="options">Options</h3>
+
+<pre><code>id:            (optional, defaults to random uuid)
+               name of share.
+objects:       (optional)
+               array of objects that should be shared
+access:        (default: false)
+               **false**
+               nobody but the creator and the invitees have access.
+               **true**
+               public sharing, read &amp; write access
+               **{ read: true }**
+               public sharing, read only
+               **[user1, user2]**
+               only user1 &amp; user2 have access
+               **{ read: [user1, user2] }**
+               only user1 &amp; user2 have access (read only)
+continuous:    (default: false)
+               if set to true, the shared objects will be
+               continuously updated.
+password:      (optional)
+               a sharing can be optionally protected with a password.
+</code></pre>
+
+<p>Examples</p>
+
+<pre><code># share my todo list with Joey and Frank
+hoodie.share.create
+  access : [
+    "joey@example.com"
+    "frank@example.com"
+  ]
+  objects : [
+    todoList, todo1, todo2, todo3
+  ]
+
+# share all my documents that I marked as
+# shared and keep them updated
+hoodie.share.create
+  continuous : true
+  objects    : hoodie.my.store.loadAll (obj) -&gt; obj.isShared
+</code></pre></div></div><div class="code"><div class="wrapper">  <span class="nv">constructor: </span><span class="nf">(options = {}) -&gt;</span>
     
     <span class="vi">@hoodie    = </span><span class="nx">@constructor</span><span class="p">.</span><span class="nx">hoodie</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>if the current user isn't anonymous (has an account), a backend worker is 
 used for the whole share magic, all we need to do is creating the $share 

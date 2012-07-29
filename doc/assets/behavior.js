@@ -1462,11 +1462,80 @@ f.event={add:function(a,c,d,e,g){var h,i,j,k,l,m,n,o,p,q,r,s;if(!(a.nodeType===3
             "sourcePath": "/Users/gregor/JavaScripts/hood.ie/hoodie.js/src/hoodie/share.coffee",
             "projectPath": "src/hoodie/share.coffee",
             "targetPath": "hoodie/share",
-            "title": "share"
+            "firstHeader": {
+              "type": "heading",
+              "data": {
+                "level": 1,
+                "title": "Share Module",
+                "slug": "share-module",
+                "isFileHeader": true
+              },
+              "depth": 1,
+              "children": [
+                {
+                  "type": "heading",
+                  "data": {
+                    "level": 2,
+                    "title": "API",
+                    "slug": "api"
+                  },
+                  "depth": 2
+                }, {
+                  "type": "heading",
+                  "data": {
+                    "level": 2,
+                    "title": "Constructor",
+                    "slug": "constructor"
+                  },
+                  "depth": 2
+                }, {
+                  "type": "heading",
+                  "data": {
+                    "level": 2,
+                    "title": "create",
+                    "slug": "create"
+                  },
+                  "depth": 2
+                }, {
+                  "type": "heading",
+                  "data": {
+                    "level": 2,
+                    "title": "load",
+                    "slug": "load"
+                  },
+                  "depth": 2
+                }, {
+                  "type": "heading",
+                  "data": {
+                    "level": 2,
+                    "title": "destroy",
+                    "slug": "destroy"
+                  },
+                  "depth": 2
+                }, {
+                  "type": "heading",
+                  "data": {
+                    "level": 2,
+                    "title": "open",
+                    "slug": "open"
+                  },
+                  "depth": 2
+                }
+              ]
+            },
+            "title": "Share Module"
           },
           "depth": 2,
           "outline": [
             {
+              "type": "heading",
+              "data": {
+                "level": 2,
+                "title": "API",
+                "slug": "api"
+              },
+              "depth": 2
+            }, {
               "type": "heading",
               "data": {
                 "level": 2,
@@ -1488,14 +1557,6 @@ f.event={add:function(a,c,d,e,g){var h,i,j,k,l,m,n,o,p,q,r,s;if(!(a.nodeType===3
                 "level": 2,
                 "title": "load",
                 "slug": "load"
-              },
-              "depth": 2
-            }, {
-              "type": "heading",
-              "data": {
-                "level": 2,
-                "title": "find or create",
-                "slug": "find-or-create"
               },
               "depth": 2
             }, {
@@ -1584,6 +1645,25 @@ f.event={add:function(a,c,d,e,g){var h,i,j,k,l,m,n,o,p,q,r,s;if(!(a.nodeType===3
               "depth": 3,
               "outline": [
                 {
+                  "type": "heading",
+                  "data": {
+                    "level": 2,
+                    "title": "constructor",
+                    "slug": "constructor"
+                  },
+                  "depth": 2,
+                  "children": [
+                    {
+                      "type": "heading",
+                      "data": {
+                        "level": 3,
+                        "title": "Options",
+                        "slug": "options"
+                      },
+                      "depth": 3
+                    }
+                  ]
+                }, {
                   "type": "heading",
                   "data": {
                     "level": 2,
@@ -1749,6 +1829,14 @@ f.event={add:function(a,c,d,e,g){var h,i,j,k,l,m,n,o,p,q,r,s;if(!(a.nodeType===3
                   "type": "heading",
                   "data": {
                     "level": 2,
+                    "title": "find or create",
+                    "slug": "find-or-create"
+                  },
+                  "depth": 2
+                }, {
+                  "type": "heading",
+                  "data": {
+                    "level": 2,
                     "title": "loadAll",
                     "slug": "loadall"
                   },
@@ -1838,6 +1926,14 @@ f.event={add:function(a,c,d,e,g){var h,i,j,k,l,m,n,o,p,q,r,s;if(!(a.nodeType===3
                 "level": 2,
                 "title": "load",
                 "slug": "load"
+              },
+              "depth": 2
+            }, {
+              "type": "heading",
+              "data": {
+                "level": 2,
+                "title": "find or create",
+                "slug": "find-or-create"
               },
               "depth": 2
             }, {

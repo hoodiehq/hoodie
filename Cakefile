@@ -48,7 +48,6 @@ task 'autotest', 'autotest', ->
     test() 
   ), true
 
-
 task 'console', 'run a browser console, from command line, hell yeah', ->
   spawn process.env["EDITOR"], ['/tmp/phantom_command.coffee']
 
@@ -66,7 +65,7 @@ task 'build', 'build hoodie-client.min.js', ->
   try fs.unlinkSync 'hoodie.js'
 
   js_code = ''
-  build = spawn 'cat', 
+  build = spawn 'cat', [
     'compiled/src/events.js'
     'compiled/src/hoodie.js'
     'compiled/src/hoodie/account.js'
@@ -79,6 +78,7 @@ task 'build', 'build hoodie-client.min.js', ->
     'compiled/src/hoodie/local_store.js'
     'compiled/src/hoodie/user.js'
     'compiled/src/hoodie/global.js'
+  ]
 
   build.stdout.on 'data', (data) -> 
     console.log 'data!'
@@ -96,7 +96,7 @@ task 'docs', 'create docs from code', ->
   docco.on 'exit', (status) -> callback?() if status is 0
 
 task 'wishlist', 'create docs from code', ->
-  docco = spawn 'groc', ['-o whishlist/doc' 'wishlist/**/*.js']
+  docco = spawn 'groc', ['-o whishlist/doc', 'wishlist/**/*.js']
   docco.stdout.on 'data', (data) -> print data.toString()
   docco.on 'exit', (status) -> callback?() if status is 0
     

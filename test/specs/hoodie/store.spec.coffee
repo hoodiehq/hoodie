@@ -186,12 +186,61 @@ describe "Hoodie.Store", ->
         it "should be rejected", ->
           promise = @store.load 'document'
           expect(promise).toBeRejected()
+
+    describe "aliases", ->
+      beforeEach ->
+        spyOn(@store, "load")
+      
+      it "should allow to use .find", ->
+        @store.find 'test', '123'
+        expect(@store.load).wasCalledWith 'test', '123'
   # /.load(type, id)
+
 
   describe ".loadAll(type)", ->
     it "should return a defer", ->
       expect(@store.loadAll()).toBeDefer()
+
+    describe "aliases", ->
+      beforeEach ->
+        spyOn(@store, "loadAll")
+      
+      it "should allow to use .findAll", ->
+        @store.findAll 'test'
+        expect(@store.loadAll).wasCalledWith 'test'
   # /.loadAll(type)
+
+
+  describe ".findOrCreate(attributes)", ->
+    _when "object exists", ->
+      beforeEach ->
+        promise = @hoodie.defer().resolve('existing_object').promise()
+        spyOn(@store, "load").andReturn promise
+
+      it "should resolve with existing object", ->
+        promise = @store.findOrCreate id: '123', attribute: 'value'
+        expect(promise).toBeResolvedWith 'existing_object'
+
+    _when "object does not exist", ->
+      beforeEach ->
+        spyOn(@store, "load").andReturn @hoodie.defer().reject().promise()
+      
+      it "should call `.create` with passed attributes", ->
+        spyOn(@store, "create").andReturn @hoodie.defer().promise()
+        promise = @store.findOrCreate id: '123', attribute: 'value'
+        expect(@store.create).wasCalledWith id: '123', attribute: 'value'
+
+      it "should reject when `.create` was rejected", ->
+        spyOn(@store, "create").andReturn @hoodie.defer().reject().promise()
+        promise = @store.findOrCreate id: '123', attribute: 'value'
+        expect(promise).toBeRejected()
+
+      it "should resolve when `.create` was resolved", ->
+        promise = @hoodie.defer().resolve('new_object').promise()
+        spyOn(@store, "create").andReturn promise
+        promise = @store.findOrCreate id: '123', attribute: 'value'
+        expect(promise).toBeResolvedWith 'new_object'
+  # /.findOrCreate(attributes)
 
   
   describe ".delete(type, id)", ->
@@ -220,6 +269,7 @@ describe "Hoodie.Store", ->
     # /aliases
   # /.destroy(type, id)
 
+
   describe ".deleteAll(type)", ->
     it "should return a defer", ->
       expect(@store.deleteAll()).toBeDefer()
@@ -228,6 +278,7 @@ describe "Hoodie.Store", ->
       it "should allow to use .destroyAll", ->
         expect(@store.destroyAll).toBe @store.deleteAll
   # /.deleteAll(type)
+
 
   describe ".uuid(num = 7)", ->
     it "should default to a length of 7", ->

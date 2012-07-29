@@ -121,7 +121,7 @@ class Hoodie.Store
       
       return defer.promise()
   
-  
+
   # ## load
 
   # loads one object from Store, specified by `type` and `id`
@@ -136,14 +136,34 @@ class Hoodie.Store
       return defer.reject( Hoodie.Errors.INVALID_ARGUMENTS "type & id are required" ).promise()
   
     return defer
+
+  # alias
+  find: -> @load arguments...
+  
+
+  # ## find or create
+  
+  # 1. Try to find a share by given id
+  # 2. If share could be found, return it
+  # 3. If not, create one and return it.
+  findOrCreate : (attributes) ->
+    defer = @hoodie.defer()
+    @load(attributes.id)
+    .done( defer.resolve )
+    .fail => 
+      @create(attributes).then defer.resolve, defer.reject 
+  
+    return defer.promise()
   
   
   # ## loadAll
 
   # returns all objects from store. 
   # Can be optionally filtered by a type or a function
-  loadAll : () ->
-    @hoodie.defer()
+  loadAll : -> @hoodie.defer()
+
+  # alias
+  findAll : -> @loadAll arguments...
   
   
   # ## Delete

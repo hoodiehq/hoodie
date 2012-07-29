@@ -1,83 +1,44 @@
-<!DOCTYPE html><html lang="en"><head><title>hoodie/share</title></head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0"><meta name="groc-relative-root" content="../"><meta name="groc-document-path" content="hoodie/share"><meta name="groc-project-path" content="src/hoodie/share.coffee"><link rel="stylesheet" type="text/css" media="all" href="../assets/style.css"><script type="text/javascript" src="../assets/behavior.js"></script><body><div id="meta"><div class="file-path">src/hoodie/share.coffee</div></div><div id="document"><div class="segment"><div class="comments"><div class="wrapper"><p>Share your data</p></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>technically, share works in two different ways, depending on whether the user has an
-account or not.</p>
+<!DOCTYPE html><html lang="en"><head><title>hoodie/share</title></head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0"><meta name="groc-relative-root" content="../"><meta name="groc-document-path" content="hoodie/share"><meta name="groc-project-path" content="src/hoodie/share.coffee"><link rel="stylesheet" type="text/css" media="all" href="../assets/style.css"><script type="text/javascript" src="../assets/behavior.js"></script><body><div id="meta"><div class="file-path">src/hoodie/share.coffee</div></div><div id="document"><div class="segment"><div class="comments"><div class="wrapper"><h1 id="share-module">Share Module</h1></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>technically, sharing objects works in two different ways, 
+depending on whether the user has an account or not.</p>
 
 <ol>
 <li><p>with account</p>
 
-<p>If the user has an account, share is handled by the $share backend worker. When
-a share gets created, a $share doc gets stored and synched to users database.
-From there the $share worker handles the rest:</p>
+<p>If the user has an account, share is handled by the $share backend worker.
+When a share gets created, a $share doc gets stored and synched to users 
+database. From there the $share worker handles the rest:</p>
 
 <ul><li>creating a share database</li>
 <li>creating a user if a password is used</li>
 <li>handling the replications</li></ul>
 
-<p>The worker updates the $share doc status, which gets synched back to the frontend.
-When the user deletes the $share doc, the worker removes the database, the user
-and all replications</p></li>
+<p>The worker updates the $share doc status, which gets synched back to the 
+frontend. When the user deletes the $share doc, the worker removes the 
+database, the user and all replications</p></li>
 <li><p>without an account</p>
 
-<p>If the use has no account, the $share database gets created right from the frontend.
-With an adjusted Hoodie class, a special user for the share gets created, which will
-also create a share database with the help of the userDB worker. Once the db is
-created, the docs, filtered by the share filter, will be pushed to the share database.</p>
+<p>If the use has no account, the $share database gets created right from 
+the frontend. With an adjusted Hoodie class, a special user for the share 
+gets created, which will also create a share database with the help of 
+the userDB worker. Once the db is created, the docs, filtered by the 
+share filter, will be pushed to the share database.</p>
 
-<p>When the share gets destroyed, the share user will be deleted and the userDB worker
-will handle the rest.</p>
+<p>When the share gets destroyed, the share user will be deleted and the 
+userDB worker will handle the rest.</p>
 
-<p>Once a user signes up, the custom $share sockets will be closed and the $share workers
-will take over.</p></li>
-</ol></div></div><div class="code"><div class="wrapper"><span class="k">class</span> <span class="nx">Hoodie</span><span class="p">.</span><span class="nx">Share</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h2 id="constructor">Constructor</h2></div></div></div><div class="segment"><div class="code"><div class="wrapper">  <span class="nv">constructor : </span><span class="nf">(@hoodie) -&gt;</span>
-    </div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>give all Share instances access to our core hoodie
+<p>Once a user signes up, the custom $share sockets will be closed and the 
+$share workers will take over.</p></li>
+</ol>
+
+<h2 id="api">API</h2></div></div><div class="code"><div class="wrapper"><span class="k">class</span> <span class="nx">Hoodie</span><span class="p">.</span><span class="nx">Share</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h2 id="constructor">Constructor</h2></div></div></div><div class="segment"><div class="code"><div class="wrapper">  <span class="nv">constructor : </span><span class="nf">(@hoodie) -&gt;</span>
+    </div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>allow hoodie.share to be called as function:
+hoodie.share('share_id') // opens a share</p></div></div><div class="code"><div class="wrapper">    <span class="nv">api = </span><span class="nx">@open</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>set pointer to Hoodie.Share.Instance</p></div></div><div class="code"><div class="wrapper">    <span class="nv">api.instance = </span><span class="nx">Hoodie</span><span class="p">.</span><span class="nx">Share</span><span class="p">.</span><span class="nx">Instance</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>give all Share instances access to our core hoodie
 as shares use custom hoodies, as long as the user
-has no account yet</p></div></div><div class="code"><div class="wrapper">    <span class="nv">Hoodie.Share.Instance.hoodie = </span><span class="nx">@hoodie</span>
-    
-    </div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h2 id="create">create</h2>
+has no account yet</p></div></div><div class="code"><div class="wrapper">    <span class="nv">api.instance.hoodie = </span><span class="nx">@hoodie</span>
 
-<p>creates a new share &amp; returns a promise.
-Options</p>
+    <span class="k">return</span> <span class="nx">api</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h2 id="create">create</h2>
 
-<pre><code>id:            (optional, defaults to random uuid)
-               name of share.
-objects:       (optional)
-               array of objects that should be shared
-private:       (default: false)
-               when set to true, nobody but the creator and the
-               invitees have access. Set to true automatically
-               when invitees passed
-invitees:      (optional)
-               an array of user names (emails) that should have
-               access to the shared documents
-continuous:    (default: false)
-               if set to true, the shared objects will be
-               continuously updated.
-collaborative: (default: false)
-               if set to true, others are invited to make changes
-               to the shared documents
-</code></pre>
-
-<p>Examples</p>
-
-<pre><code># share all my stuff
-hoodie.share.create().done (share) -&gt; 
-  alert "find my stuff at /#{share.id}"
-
-# share my todo list with Joey and Frank
-hoodie.share.create
-  invitees : [
-    "joey@example.com"
-    "frank@example.com"
-  ]
-  objects : [
-    todoList, todo1, todo2, todo3
-  ]
-
-# share all my documents that I marked as
-# shared and keep them updated
-hoodie.share.create
-  continuous : true
-  objects    : hoodie.my.store.loadAll (obj) -&gt; obj.isShared
-</code></pre></div></div><div class="code"><div class="wrapper">  <span class="nv">create : </span><span class="nf">(options = {}) -&gt;</span>
+<p>creates a new share &amp; returns a promise.</p></div></div><div class="code"><div class="wrapper">  <span class="nv">create : </span><span class="nf">(options = {}) -&gt;</span>
     <span class="nv">share = </span><span class="k">new</span> <span class="nx">Hoodie</span><span class="p">.</span><span class="nx">Share</span><span class="p">.</span><span class="nx">Instance</span> <span class="nx">options</span>
     <span class="nx">share</span><span class="p">.</span><span class="nx">save</span><span class="p">()</span>
     
@@ -86,23 +47,6 @@ hoodie.share.create
 <p>load an existing share</p></div></div><div class="code"><div class="wrapper">  <span class="nv">load : </span><span class="nf">(id) -&gt;</span>
     <span class="nx">@hoodie</span><span class="p">.</span><span class="nx">my</span><span class="p">.</span><span class="nx">store</span><span class="p">.</span><span class="nx">load</span><span class="p">(</span><span class="s1">&#39;$share&#39;</span><span class="p">,</span> <span class="nx">id</span><span class="p">).</span><span class="nx">pipe</span> <span class="p">(</span><span class="nx">obj</span><span class="p">)</span> <span class="o">=&gt;</span>
       <span class="k">new</span> <span class="nx">Hoodie</span><span class="p">.</span><span class="nx">Share</span><span class="p">.</span><span class="nx">Instance</span> <span class="nx">obj</span>
-  
-  </div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h2 id="find-or-create">find or create</h2>
-
-<ol>
-<li>Try to find a share by given id</li>
-<li>If share could be found, return it</li>
-<li>If not, create one and return it.</li>
-</ol></div></div><div class="code"><div class="wrapper">  <span class="nv">findOrCreate : </span><span class="nf">(options) -&gt;</span>
-    <span class="nv">defer = </span><span class="nx">@hoodie</span><span class="p">.</span><span class="nx">defer</span><span class="p">()</span>
-    <span class="nx">@load</span><span class="p">(</span><span class="nx">options</span><span class="p">.</span><span class="nx">id</span><span class="p">)</span>
-    <span class="p">.</span><span class="nx">done</span> <span class="nf">(share) -&gt;</span>
-      <span class="nx">defer</span><span class="p">.</span><span class="nx">resolve</span> <span class="nx">share</span>
-    <span class="p">.</span><span class="nx">fail</span> <span class="o">=&gt;</span> 
-      <span class="nx">@create</span><span class="p">(</span><span class="nx">options</span><span class="p">).</span><span class="k">then</span> <span class="nx">defer</span><span class="p">.</span><span class="nx">resolve</span><span class="p">,</span> <span class="nx">defer</span><span class="p">.</span><span class="nx">reject</span> 
-  
-    <span class="k">return</span> <span class="nx">defer</span><span class="p">.</span><span class="nx">promise</span><span class="p">()</span>
-  
   </div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h2 id="destroy">destroy</h2>
 
 <p>deletes an existing share</p></div></div><div class="code"><div class="wrapper">  <span class="nv">destroy : </span><span class="nf">(id) -&gt;</span>
@@ -111,6 +55,5 @@ hoodie.share.create
       <span class="nx">share</span><span class="p">.</span><span class="nx">destroy</span><span class="p">()</span>
     </div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>alias</p></div></div><div class="code"><div class="wrapper">  <span class="k">delete</span> <span class="o">:</span> <span class="err">@</span><span class="o">::</span><span class="nx">destroy</span>
   
-  </div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h2 id="open">open</h2>
-
-<p>Copy all data of a share to own database</p></div></div><div class="code"><div class="wrapper">  <span class="nv">open : </span><span class="nf">(id, options = {}) -&gt;</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>tbd ...</p></div></div></div></div></body></html>
+  </div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h2 id="open">open</h2></div></div></div><div class="segment"><div class="code"><div class="wrapper">  <span class="nv">open : </span><span class="o">=&gt;</span>
+    <span class="nx">@instance</span><span class="p">.</span><span class="nx">open</span> <span class="nx">arguments</span><span class="p">...</span></div></div></div></div></body></html>
