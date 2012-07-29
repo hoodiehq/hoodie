@@ -161,7 +161,7 @@ hoodie.my.store.findAll( type )
 ```
 
 
-### Delete
+### Destroy
 
 destroy an existing object
 

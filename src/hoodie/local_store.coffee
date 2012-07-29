@@ -149,9 +149,9 @@ class Hoodie.LocalStore extends Hoodie.Store
     return defer.promise()
   
   
-  # ## Delete
+  # ## Destroy
   #
-  # Deletes one object specified by `type` and `id`. 
+  # Destroys one object specified by `type` and `id`. 
   # 
   # when object has been synced before, mark it as deleted. 
   # Otherwise remove it from Store.

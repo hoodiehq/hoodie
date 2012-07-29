@@ -166,9 +166,9 @@ class Hoodie.Store
   loadAll : -> @findAll arguments...
   
   
-  # ## Delete
+  # ## Destroy
 
-  # Deletes one object specified by `type` and `id`. 
+  # Destroyes one object specified by `type` and `id`. 
   # 
   # when object has been synced before, mark it as deleted. 
   # Otherwise remove it from Store.
@@ -186,7 +186,7 @@ class Hoodie.Store
 
   # ## destroyAll
 
-  # Deletes all objects. Can be filtered by a type
+  # Destroyes all objects. Can be filtered by a type
   destroyAll : (type, options = {}) -> 
     @hoodie.defer()
 
