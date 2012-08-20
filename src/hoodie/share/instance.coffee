@@ -222,11 +222,6 @@ class Hoodie.Share.Instance extends Hoodie.RemoteStore
       @ownerUuid = @constructor.hoodie.my.store.uuid()
       config.set 'share.ownerUuid', @ownerUuid
 
-  # I appologize for this mess of code ~gr2m
-  _isMySharedObjectAndChanged: (obj) =>
-    belongsToMe = obj.id is @id or obj.$shares and ~obj.$shares.indexOf(@id)
-    return belongsToMe and @hoodie.my.store.isDirty(obj.type, obj.id)
-
 
   # returns a hash update to update the passed object
   # so that it gets added to the share
@@ -296,6 +291,12 @@ class Hoodie.Share.Instance extends Hoodie.RemoteStore
     .pipe (sharedObjectThatChanged) =>
       @hoodie.my.remote.sync(sharedObjectThatChanged)
       .then @_handleRemoteChanges
+
+
+  # I appologize for this mess of code. Yes, you're right. ~gr2m
+  _isMySharedObjectAndChanged: (obj) =>
+    belongsToMe = obj.id is @id or obj.$shares and ~obj.$shares.indexOf(@id)
+    return belongsToMe and @hoodie.my.store.isDirty(obj.type, obj.id)
 
   #
   _handleRemoteChanges: ->

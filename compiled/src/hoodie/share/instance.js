@@ -12,6 +12,8 @@ Hoodie.Share.Instance = (function(_super) {
     if (options == null) {
       options = {};
     }
+    this._isMySharedObjectAndChanged = __bind(this._isMySharedObjectAndChanged, this);
+
     this._sync = __bind(this._sync, this);
 
     this._toggle = __bind(this._toggle, this);
@@ -19,8 +21,6 @@ Hoodie.Share.Instance = (function(_super) {
     this._remove = __bind(this._remove, this);
 
     this._add = __bind(this._add, this);
-
-    this._isMySharedObjectAndChanged = __bind(this._isMySharedObjectAndChanged, this);
 
     this.sync = __bind(this.sync, this);
 
@@ -135,12 +135,6 @@ Hoodie.Share.Instance = (function(_super) {
     }
   };
 
-  Instance.prototype._isMySharedObjectAndChanged = function(obj) {
-    var belongsToMe;
-    belongsToMe = obj.id === this.id || obj.$shares && ~obj.$shares.indexOf(this.id);
-    return belongsToMe && this.hoodie.my.store.isDirty(obj.type, obj.id);
-  };
-
   Instance.prototype._add = function(obj) {
     var newValue;
     newValue = obj.$shares ? !~obj.$shares.indexOf(this.id) ? obj.$shares.concat(this.id) : void 0 : [this.id];
@@ -191,6 +185,12 @@ Hoodie.Share.Instance = (function(_super) {
     return this.save().pipe(this.hoodie.my.store.findAll(this._isMySharedObjectAndChanged).pipe(function(sharedObjectThatChanged) {
       return _this.hoodie.my.remote.sync(sharedObjectThatChanged).then(_this._handleRemoteChanges);
     }));
+  };
+
+  Instance.prototype._isMySharedObjectAndChanged = function(obj) {
+    var belongsToMe;
+    belongsToMe = obj.id === this.id || obj.$shares && ~obj.$shares.indexOf(this.id);
+    return belongsToMe && this.hoodie.my.store.isDirty(obj.type, obj.id);
   };
 
   Instance.prototype._handleRemoteChanges = function() {
