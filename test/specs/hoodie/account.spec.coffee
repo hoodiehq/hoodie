@@ -26,6 +26,33 @@ describe "Hoodie.Account", ->
       it "should set @username", ->
         account = new Hoodie.Account @hoodie
         expect(account.username).toBe 'joe@example.com'
+
+    _when "account.owner is set", ->
+      beforeEach ->
+        spyOn(@hoodie.my.config, "get").andCallFake (key) ->
+          if key is '_account.owner'
+            return 'owner_hash123'
+            
+      it "should set @owner", ->
+        account = new Hoodie.Account @hoodie
+        expect(account.owner).toBe 'owner_hash123'
+
+    _when "account.owner isn't set", ->
+      beforeEach ->
+        spyOn(@hoodie.my.config, "get").andCallFake (key) ->
+          if key is '_account.owner'
+            return undefined
+
+        spyOn(@hoodie.my.store, "uuid").andReturn 'new_generated_owner_hash'
+        spyOn(@hoodie.my.config, "set")
+            
+      it "should set @owner", ->
+        account = new Hoodie.Account @hoodie
+        expect(account.owner).toBe 'new_generated_owner_hash'
+
+      it "should set account.owner", ->
+         account = new Hoodie.Account @hoodie
+         expect(account.hoodie.my.config.set).wasCalledWith '_account.owner', 'new_generated_owner_hash'
       
     it "should bind to signIn event", ->
       account = new Hoodie.Account @hoodie
@@ -58,15 +85,20 @@ describe "Hoodie.Account", ->
     # /._handleSignIn(@username)
     
     describe "._handleSignOut()", ->
-      it "should set @username", ->
+      it "should unset @username", ->
         @account.username = 'joe@example.com'
         @account._handleSignOut {"ok":true}
         do expect(@account.username).toBeUndefined
         
-      it "should store @username persistantly", ->
+      it "should remove @username from persistent config", ->
         spyOn(@hoodie.my.config, "remove")
         @account._handleSignOut {"ok":true}
         expect(@hoodie.my.config.remove).wasCalledWith '_account.username'
+
+      it "should remove @owner from persistent config", ->
+        spyOn(@hoodie.my.config, "remove")
+        @account._handleSignOut {"ok":true}
+        expect(@hoodie.my.config.remove).wasCalledWith '_account.owner'
         
       it "should set _authenticated to false", ->
         @account._authenticated = true

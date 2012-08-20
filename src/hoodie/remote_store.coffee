@@ -354,7 +354,7 @@ class Hoodie.RemoteStore extends Hoodie.Store
   ]
 
 
-  # ### parse from remote
+  # ### parse for remote
 
   # parse object for remote storage. All attributes starting with an 
   # `underscore` do not get synchronized despite the special attributes

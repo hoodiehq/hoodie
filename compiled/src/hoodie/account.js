@@ -14,6 +14,11 @@ Hoodie.Account = (function() {
     this.authenticate = __bind(this.authenticate, this);
 
     this.username = this.hoodie.my.config.get('_account.username');
+    this.owner = this.hoodie.my.config.get('_account.owner');
+    if (!this.owner) {
+      this.owner = this.hoodie.my.store.uuid();
+      this.hoodie.my.config.set('_account.owner', this.owner);
+    }
     this.on('signin', this._handleSignIn);
     this.on('signout', this._handleSignOut);
   }
@@ -224,6 +229,7 @@ Hoodie.Account = (function() {
   Account.prototype._handleSignOut = function() {
     delete this.username;
     this.hoodie.my.config.remove('_account.username');
+    this.hoodie.my.config.remove('_account.owner');
     return this._authenticated = false;
   };
 

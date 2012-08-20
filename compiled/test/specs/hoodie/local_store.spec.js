@@ -62,6 +62,11 @@ describe("Hoodie.LocalStore", function() {
         expect(object.createdAt).toBe('now');
         return expect(object.updatedAt).toBe('now');
       });
+      it("should pass options", function() {
+        var options;
+        options = this.store.cache.mostRecentCall.args[3];
+        return expect(options.option).toBe('value');
+      });
       _and("options.remote is true", function() {
         it("should not touch createdAt / updatedAt timestamps", function() {
           var object;
@@ -98,11 +103,6 @@ describe("Hoodie.LocalStore", function() {
           return expect(object.updatedAt).toBeUndefined();
         });
       });
-      it("should pass options", function() {
-        var options;
-        options = this.store.cache.mostRecentCall.args[3];
-        return expect(options.option).toBe('value');
-      });
       _when("successful", function() {
         beforeEach(function() {
           return this.store.cache.andReturn('doc');
@@ -135,8 +135,13 @@ describe("Hoodie.LocalStore", function() {
               option: 'value'
             });
           });
-          return it("should pass true (= new created) as the second param to the done callback", function() {
+          it("should pass true (= new created) as the second param to the done callback", function() {
             return expect(this.promise).toBeResolvedWith('doc', true);
+          });
+          return it("should set the $owner attribute", function() {
+            var object;
+            object = this.store.cache.mostRecentCall.args[2];
+            return expect(object.$owner).toBe('owner_hash');
           });
         });
       });
@@ -230,6 +235,9 @@ describe("Hoodie.LocalStore", function() {
       });
       it("should generate an id", function() {
         return expect(this.key).toMatch(/^[a-z0-9]{7}$/);
+      });
+      it("should set $owner", function() {
+        return expect(this.object.$owner).toBe('owner_hash');
       });
       it("should pass options", function() {
         var options;

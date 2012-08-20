@@ -30,7 +30,7 @@ Mocks.Hoodie = ->
       findAll       : -> promiseMock
       findOrCreate  : -> promiseMock 
       delete        : -> promiseMock 
-      destroyAll     : -> promiseMock 
+      destroyAll    : -> promiseMock 
       changedDocs   : ->
         
       db :
@@ -45,6 +45,7 @@ Mocks.Hoodie = ->
           fail : ->
       db            : ->
       on            : ->
+      owner         : 'owner_hash'
       
     config :
       set : ->

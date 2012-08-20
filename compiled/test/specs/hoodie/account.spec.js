@@ -28,6 +28,41 @@ describe("Hoodie.Account", function() {
         return expect(account.username).toBe('joe@example.com');
       });
     });
+    _when("account.owner is set", function() {
+      beforeEach(function() {
+        return spyOn(this.hoodie.my.config, "get").andCallFake(function(key) {
+          if (key === '_account.owner') {
+            return 'owner_hash123';
+          }
+        });
+      });
+      return it("should set @owner", function() {
+        var account;
+        account = new Hoodie.Account(this.hoodie);
+        return expect(account.owner).toBe('owner_hash123');
+      });
+    });
+    _when("account.owner isn't set", function() {
+      beforeEach(function() {
+        spyOn(this.hoodie.my.config, "get").andCallFake(function(key) {
+          if (key === '_account.owner') {
+            return void 0;
+          }
+        });
+        spyOn(this.hoodie.my.store, "uuid").andReturn('new_generated_owner_hash');
+        return spyOn(this.hoodie.my.config, "set");
+      });
+      it("should set @owner", function() {
+        var account;
+        account = new Hoodie.Account(this.hoodie);
+        return expect(account.owner).toBe('new_generated_owner_hash');
+      });
+      return it("should set account.owner", function() {
+        var account;
+        account = new Hoodie.Account(this.hoodie);
+        return expect(account.hoodie.my.config.set).wasCalledWith('_account.owner', 'new_generated_owner_hash');
+      });
+    });
     it("should bind to signIn event", function() {
       var account;
       account = new Hoodie.Account(this.hoodie);
@@ -59,19 +94,26 @@ describe("Hoodie.Account", function() {
       });
     });
     return describe("._handleSignOut()", function() {
-      it("should set @username", function() {
+      it("should unset @username", function() {
         this.account.username = 'joe@example.com';
         this.account._handleSignOut({
           "ok": true
         });
         return expect(this.account.username).toBeUndefined();
       });
-      it("should store @username persistantly", function() {
+      it("should remove @username from persistent config", function() {
         spyOn(this.hoodie.my.config, "remove");
         this.account._handleSignOut({
           "ok": true
         });
         return expect(this.hoodie.my.config.remove).wasCalledWith('_account.username');
+      });
+      it("should remove @owner from persistent config", function() {
+        spyOn(this.hoodie.my.config, "remove");
+        this.account._handleSignOut({
+          "ok": true
+        });
+        return expect(this.hoodie.my.config.remove).wasCalledWith('_account.owner');
       });
       return it("should set _authenticated to false", function() {
         this.account._authenticated = true;

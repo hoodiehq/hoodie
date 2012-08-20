@@ -48,6 +48,10 @@ describe "Hoodie.LocalStore", ->
         object = @store.cache.mostRecentCall.args[2]
         expect(object.createdAt).toBe 'now'
         expect(object.updatedAt).toBe 'now'
+        
+      it "should pass options", ->
+        options = @store.cache.mostRecentCall.args[3]
+        expect(options.option).toBe 'value'
       
       _and "options.remote is true", ->
         it "should not touch createdAt / updatedAt timestamps", ->
@@ -67,17 +71,11 @@ describe "Hoodie.LocalStore", ->
           object = @store.cache.mostRecentCall.args[2]
           expect(object.createdAt).toBeUndefined()
           expect(object.updatedAt).toBeUndefined()
-        
-      
-      it "should pass options", ->
-        options = @store.cache.mostRecentCall.args[3]
-        expect(options.option).toBe 'value'
     
       _when "successful", ->
         beforeEach ->
           @store.cache.andReturn 'doc'
         
-    
         it "should resolve the promise", ->
           expect(@promise).toBeResolved()
     
@@ -92,7 +90,6 @@ describe "Hoodie.LocalStore", ->
           it "should pass false (= not created) as the second param to the done callback", ->
             expect(@promise).toBeResolvedWith 'doc', false
 
-          
         _and "object did not exist before", ->            
           beforeEach ->
             delete @store._cached['document/123']
@@ -100,6 +97,10 @@ describe "Hoodie.LocalStore", ->
           
           it "should pass true (= new created) as the second param to the done callback", ->
             expect(@promise).toBeResolvedWith 'doc', true
+
+          it "should set the $owner attribute", ->
+            object = @store.cache.mostRecentCall.args[2]
+            expect(object.$owner).toBe 'owner_hash'
     
       _when "failed", ->
         beforeEach ->
@@ -162,6 +163,9 @@ describe "Hoodie.LocalStore", ->
   
       it "should generate an id", ->
         expect(@key).toMatch /^[a-z0-9]{7}$/
+
+      it "should set $owner", ->
+        expect(@object.$owner).toBe 'owner_hash'
         
       it "should pass options", ->
         options = @store.cache.mostRecentCall.args[3]

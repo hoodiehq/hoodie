@@ -16,6 +16,11 @@ class Hoodie.Account
     
     # handle session
     @username = @hoodie.my.config.get '_account.username'
+    @owner    = @hoodie.my.config.get '_account.owner'
+
+    unless @owner
+      @owner = @hoodie.my.store.uuid()
+      @hoodie.my.config.set '_account.owner', @owner
     
     # authenticate on next tick
     # window.setTimeout @authenticate
@@ -245,4 +250,5 @@ class Hoodie.Account
   _handleSignOut: =>
     delete @username
     @hoodie.my.config.remove '_account.username'
+    @hoodie.my.config.remove '_account.owner'
     @_authenticated = false

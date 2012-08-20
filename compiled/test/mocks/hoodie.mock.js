@@ -74,7 +74,8 @@ Mocks.Hoodie = function() {
           };
         },
         db: function() {},
-        on: function() {}
+        on: function() {},
+        owner: 'owner_hash'
       },
       config: {
         set: function() {},

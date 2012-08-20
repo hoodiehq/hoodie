@@ -64,10 +64,14 @@ class Hoodie.LocalStore extends Hoodie.Store
       isNew = typeof @_cached["#{type}/#{id}"] isnt 'object'
     else
       isNew = true
-      id     = @uuid()
+      id    = @uuid()
 
+    # add owner hash to new objects
+    if isNew and @hoodie.my.account
+      object.$owner or= @hoodie.my.account.owner
+   
     # handle public option
-    object.$public = options.public if options.public?
+    object.$public = options.public if options.public? 
   
     # add timestamps
     if options.remote
