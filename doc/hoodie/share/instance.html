@@ -45,14 +45,15 @@ hoodie.share.create
   objects    : hoodie.my.store.findAll (obj) -&gt; obj.isShared
 </code></pre></div></div><div class="code"><div class="wrapper">  <span class="nv">constructor: </span><span class="nf">(options = {}) -&gt;</span>
     
-    <span class="vi">@hoodie    = </span><span class="nx">@constructor</span><span class="p">.</span><span class="nx">hoodie</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>if the current user isn't anonymous (has an account), a backend worker is 
+    <span class="vi">@hoodie = </span><span class="nx">@constructor</span><span class="p">.</span><span class="nx">hoodie</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>if the current user isn't anonymous (has an account), a backend worker is 
 used for the whole share magic, all we need to do is creating the $share 
 doc and listen to its remote changes</p>
 
 <p>if the user is anonymous, we need to handle it manually. To achieve that
 we use a customized hoodie, with its own socket</p></div></div><div class="code"><div class="wrapper">    <span class="vi">@anonymous = </span><span class="nx">@hoodie</span><span class="p">.</span><span class="nx">my</span><span class="p">.</span><span class="nx">account</span><span class="p">.</span><span class="nx">username</span> <span class="o">is</span> <span class="kc">undefined</span>
     </div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>setting attributes</p></div></div><div class="code"><div class="wrapper">    <span class="nx">@set</span> <span class="nx">options</span>
-    </div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>use the custom Share Hoodie for users witouth an account</p></div></div><div class="code"><div class="wrapper">    <span class="vi">@hoodie = </span><span class="k">new</span> <span class="nx">Hoodie</span><span class="p">.</span><span class="nx">Share</span><span class="p">.</span><span class="nx">Hoodie</span> <span class="nx">@hoodie</span><span class="p">,</span> <span class="k">this</span> <span class="k">if</span> <span class="nx">@anonymous</span>
+    </div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>use the custom Share Hoodie for users witouth an account</p></div></div><div class="code"><div class="wrapper">    <span class="k">if</span> <span class="nx">@anonymous</span>
+      <span class="vi">@hoodie = </span><span class="k">new</span> <span class="nx">Hoodie</span><span class="p">.</span><span class="nx">Share</span><span class="p">.</span><span class="nx">Hoodie</span> <span class="nx">@hoodie</span><span class="p">,</span> <span class="k">this</span> 
   
   </div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h2 id="set">set</h2>
 
@@ -73,11 +74,8 @@ alternatively, a hash of key/value pairs can be passed</p></div></div><div class
   
   </div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h2 id="save">save</h2>
 
-<p>attributes getter &amp; setter. It always returns all properties that
-are actual attributes of the share object that gets stored.</p>
-
-<p>But beware of other data that gets stored with the share object,
-coming from the custom config module</p></div></div><div class="code"><div class="wrapper">  <span class="nv">save : </span><span class="nf">(update = {}, options) -&gt;</span>
+<p>save the updates made with <code>.set</code> to my.store. And optional
+key/value update can be passed as first argument</p></div></div><div class="code"><div class="wrapper">  <span class="nv">save : </span><span class="nf">(update = {}, options) -&gt;</span>
     <span class="nv">defer = </span><span class="nx">@hoodie</span><span class="p">.</span><span class="nx">defer</span><span class="p">()</span>
 
     <span class="nx">@set</span><span class="p">(</span><span class="nx">update</span><span class="p">)</span> <span class="k">if</span> <span class="nx">update</span>
@@ -112,9 +110,7 @@ share.remove([todoObject1, todoObject2, todoObject3])
 share.remove( hoodie.my.store.findAll (obj) -> obj.isShared )</p></div></div><div class="code"><div class="wrapper">  <span class="nv">remove: </span><span class="nf">(objects) -&gt;</span> 
     <span class="nx">@toggle</span> <span class="nx">objects</span><span class="p">,</span> <span class="kc">false</span>
   
-  </div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h2 id="toggle-">toggle ()</h2>
-
-<p>add or remove, depending on passed flag or current state</p></div></div><div class="code"><div class="wrapper">  <span class="nv">toggle: </span><span class="nf">(objects, doAdd) -&gt;</span>
+  </div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h2 id="toggle-">toggle ()</h2></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>add or remove, depending on passed flag or current state</p></div></div><div class="code"><div class="wrapper">  <span class="nv">toggle: </span><span class="nf">(objects, doAdd) -&gt;</span>
     </div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>normalize input</p></div></div><div class="code"><div class="wrapper">    <span class="nx">unless</span> <span class="nx">@hoodie</span><span class="p">.</span><span class="nx">isPromise</span><span class="p">(</span><span class="nx">objects</span><span class="p">)</span> <span class="o">or</span> <span class="nx">$</span><span class="p">.</span><span class="nx">isArray</span><span class="p">(</span><span class="nx">objects</span><span class="p">)</span>
       <span class="nv">objects = </span><span class="p">[</span><span class="nx">objects</span><span class="p">]</span>
     </div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>get the update method to add/remove an object to/from share</p></div></div><div class="code"><div class="wrapper">    <span class="nv">updateMethod = </span><span class="k">switch</span> <span class="nx">doAdd</span>
@@ -124,9 +120,7 @@ share.remove( hoodie.my.store.findAll (obj) -> obj.isShared )</p></div></div><di
     
     <span class="nx">@hoodie</span><span class="p">.</span><span class="nx">my</span><span class="p">.</span><span class="nx">store</span><span class="p">.</span><span class="nx">updateAll</span><span class="p">(</span><span class="nx">objects</span><span class="p">,</span> <span class="nx">updateMethod</span><span class="p">)</span>
     
-  </div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h2 id="sync">sync</h2>
-
-<p>loads all local documents that belong to share and sync them.
+  </div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h2 id="sync">sync</h2></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>loads all local documents that belong to share and sync them.
 Before the first execution, we make sure that an account exist.</p>
 
 <p>The logic of the actual sync is in the private _sync method</p></div></div><div class="code"><div class="wrapper">  <span class="nv">sync: </span><span class="o">=&gt;</span>
@@ -141,9 +135,7 @@ by signing up as a user with the neame of the share db.</p></div></div><div clas
         </div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>finally: start the sync and make it the default behavior
 from now on</p></div></div><div class="code"><div class="wrapper">        <span class="nx">do</span> <span class="vi">@sync = </span><span class="nx">@_sync</span>
   
-  </div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h2 id="hasaccount">hasAccount</h2>
-
-<p>returns true if either user or the share has a CouchDB account</p></div></div><div class="code"><div class="wrapper">  <span class="nv">hasAccount: </span><span class="o">-&gt;</span>
+  </div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h2 id="hasaccount">hasAccount</h2></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>returns true if either user or the share has a CouchDB account</p></div></div><div class="code"><div class="wrapper">  <span class="nv">hasAccount: </span><span class="o">-&gt;</span>
     <span class="o">not</span> <span class="nx">@anonymous</span> <span class="o">or</span> <span class="nx">@_userRev</span><span class="o">?</span>
     
     </div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h2 id="private">Private</h2></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>returns a hash update to update the passed object

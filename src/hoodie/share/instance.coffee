@@ -48,7 +48,7 @@ class Hoodie.Share.Instance extends Hoodie.RemoteStore
   #
   constructor: (options = {}) ->
     
-    @hoodie    = @constructor.hoodie
+    @hoodie = @constructor.hoodie
 
     # if the current user isn't anonymous (has an account), a backend worker is 
     # used for the whole share magic, all we need to do is creating the $share 
@@ -62,7 +62,8 @@ class Hoodie.Share.Instance extends Hoodie.RemoteStore
     @set options
     
     # use the custom Share Hoodie for users witouth an account
-    @hoodie = new Hoodie.Share.Hoodie @hoodie, this if @anonymous
+    if @anonymous
+      @hoodie = new Hoodie.Share.Hoodie @hoodie, this 
   
   
   # ## set
@@ -91,11 +92,8 @@ class Hoodie.Share.Instance extends Hoodie.RemoteStore
   
   # ## save
   #
-  # attributes getter & setter. It always returns all properties that
-  # are actual attributes of the share object that gets stored.
-  #
-  # But beware of other data that gets stored with the share object,
-  # coming from the custom config module
+  # save the updates made with `.set` to my.store. And optional
+  # key/value update can be passed as first argument
   save : (update = {}, options) ->
     defer = @hoodie.defer()
 
@@ -142,7 +140,7 @@ class Hoodie.Share.Instance extends Hoodie.RemoteStore
   
   
   # ## toggle ()
-  #
+
   # add or remove, depending on passed flag or current state
   toggle: (objects, doAdd) ->
     
@@ -160,7 +158,7 @@ class Hoodie.Share.Instance extends Hoodie.RemoteStore
     
   
   # ## sync
-  #
+
   # loads all local documents that belong to share and sync them.
   # Before the first execution, we make sure that an account exist.
   #
@@ -189,7 +187,7 @@ class Hoodie.Share.Instance extends Hoodie.RemoteStore
   
   
   # ## hasAccount
-  #
+
   # returns true if either user or the share has a CouchDB account
   hasAccount: ->
     not @anonymous or @_userRev?
