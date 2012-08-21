@@ -135,8 +135,9 @@ class Hoodie.Account
       unless ~response.roles.indexOf("confirmed")
         return defer.reject error: "unconfirmed", reason: "account has not been confirmed yet"
 
-      @owner = response.roles.shift()
-      @hoodie.my.config.set '_account.owner', @owner
+      unless @owner
+        @owner = response.roles.shift()
+        @hoodie.my.config.set '_account.owner', @owner
 
       @hoodie.trigger 'account:signin', username
       @fetch()

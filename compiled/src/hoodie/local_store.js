@@ -206,10 +206,12 @@ Hoodie.LocalStore = (function(_super) {
       }
       this._cached[key] = this._getObject(type, id);
     }
-    if (this._cached[key] && (this._isDirty(this._cached[key]) || this._isMarkedAsDeleted(this._cached[key]))) {
-      this.markAsChanged(type, id, this._cached[key]);
-    } else {
-      this.clearChanged(type, id);
+    if (!options.silent) {
+      if (this._cached[key] && (this._isDirty(this._cached[key]) || this._isMarkedAsDeleted(this._cached[key]))) {
+        this.markAsChanged(type, id, this._cached[key]);
+      } else {
+        this.clearChanged(type, id);
+      }
     }
     if (this._cached[key]) {
       return $.extend({}, this._cached[key]);

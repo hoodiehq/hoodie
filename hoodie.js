@@ -287,8 +287,10 @@ Hoodie.Account = (function() {
           reason: "account has not been confirmed yet"
         });
       }
-      _this.owner = response.roles.shift();
-      _this.hoodie.my.config.set('_account.owner', _this.owner);
+      if (!_this.owner) {
+        _this.owner = response.roles.shift();
+        _this.hoodie.my.config.set('_account.owner', _this.owner);
+      }
       _this.hoodie.trigger('account:signin', username);
       _this.fetch();
       return defer.resolve(username, response);
@@ -1045,15 +1047,15 @@ Hoodie.Account.RemoteStore = (function(_super) {
 
   RemoteStore.prototype.startSyncing = function() {
     this.hoodie.my.config.set('_remote.sync', this._sync = true);
-    this.hoodie.on('account:signedOut', this.disconnect);
-    this.hoodie.on('account:signedIn', this.connect);
+    this.hoodie.on('account:signout', this.disconnect);
+    this.hoodie.on('account:signin', this.connect);
     return this.connect();
   };
 
   RemoteStore.prototype.stopSyncing = function() {
     this.hoodie.my.config.set('_remote.sync', this._sync = false);
-    this.hoodie.unbind('account:signedIn', this.connect);
-    this.hoodie.unbind('account:signedOut', this.disconnect);
+    this.hoodie.unbind('account:signin', this.connect);
+    this.hoodie.unbind('account:signout', this.disconnect);
     return this.disconnect();
   };
 
@@ -1419,10 +1421,12 @@ Hoodie.LocalStore = (function(_super) {
       }
       this._cached[key] = this._getObject(type, id);
     }
-    if (this._cached[key] && (this._isDirty(this._cached[key]) || this._isMarkedAsDeleted(this._cached[key]))) {
-      this.markAsChanged(type, id, this._cached[key]);
-    } else {
-      this.clearChanged(type, id);
+    if (!options.silent) {
+      if (this._cached[key] && (this._isDirty(this._cached[key]) || this._isMarkedAsDeleted(this._cached[key]))) {
+        this.markAsChanged(type, id, this._cached[key]);
+      } else {
+        this.clearChanged(type, id);
+      }
     }
     if (this._cached[key]) {
       return $.extend({}, this._cached[key]);

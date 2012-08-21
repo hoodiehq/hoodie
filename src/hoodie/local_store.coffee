@@ -205,10 +205,11 @@ class Hoodie.LocalStore extends Hoodie.Store
       return $.extend {}, @_cached[key] if @_cached[key]?
       @_cached[key] = @_getObject type, id
     
-    if @_cached[key] and (@_isDirty(@_cached[key]) or @_isMarkedAsDeleted(@_cached[key]))
-      @markAsChanged type, id, @_cached[key]
-    else
-      @clearChanged type, id
+    unless options.silent
+      if @_cached[key] and (@_isDirty(@_cached[key]) or @_isMarkedAsDeleted(@_cached[key]))
+        @markAsChanged type, id, @_cached[key]
+      else
+        @clearChanged type, id
     
     if @_cached[key]
       $.extend {}, @_cached[key]

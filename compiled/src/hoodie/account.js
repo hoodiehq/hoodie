@@ -125,8 +125,10 @@ Hoodie.Account = (function() {
           reason: "account has not been confirmed yet"
         });
       }
-      _this.owner = response.roles.shift();
-      _this.hoodie.my.config.set('_account.owner', _this.owner);
+      if (!_this.owner) {
+        _this.owner = response.roles.shift();
+        _this.hoodie.my.config.set('_account.owner', _this.owner);
+      }
       _this.hoodie.trigger('account:signin', username);
       _this.fetch();
       return defer.resolve(username, response);

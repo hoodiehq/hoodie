@@ -29,15 +29,15 @@ Hoodie.Account.RemoteStore = (function(_super) {
 
   RemoteStore.prototype.startSyncing = function() {
     this.hoodie.my.config.set('_remote.sync', this._sync = true);
-    this.hoodie.on('account:signedOut', this.disconnect);
-    this.hoodie.on('account:signedIn', this.connect);
+    this.hoodie.on('account:signout', this.disconnect);
+    this.hoodie.on('account:signin', this.connect);
     return this.connect();
   };
 
   RemoteStore.prototype.stopSyncing = function() {
     this.hoodie.my.config.set('_remote.sync', this._sync = false);
-    this.hoodie.unbind('account:signedIn', this.connect);
-    this.hoodie.unbind('account:signedOut', this.disconnect);
+    this.hoodie.unbind('account:signin', this.connect);
+    this.hoodie.unbind('account:signout', this.disconnect);
     return this.disconnect();
   };
 

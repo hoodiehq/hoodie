@@ -64,13 +64,13 @@ describe("Hoodie.Account.RemoteStore", function() {
       this.remote.startSyncing();
       return expect(this.hoodie.my.config.set).wasCalledWith('_remote.sync', true);
     });
-    it("should subscribe to `signedOut` event", function() {
+    it("should subscribe to `signout` event", function() {
       this.remote.startSyncing();
-      return expect(this.hoodie.on).wasCalledWith('account:signedOut', this.remote.disconnect);
+      return expect(this.hoodie.on).wasCalledWith('account:signout', this.remote.disconnect);
     });
     return it("should subscribe to account:signin with sync", function() {
       this.remote.startSyncing();
-      return expect(this.hoodie.on).wasCalledWith('account:signedIn', this.remote.connect);
+      return expect(this.hoodie.on).wasCalledWith('account:signin', this.remote.connect);
     });
   });
   describe(".stopSyncing", function() {
@@ -84,13 +84,13 @@ describe("Hoodie.Account.RemoteStore", function() {
       this.remote.stopSyncing();
       return expect(this.hoodie.my.config.set).wasCalledWith('_remote.sync', false);
     });
-    it("should unsubscribe from account's signedIn idle event", function() {
+    it("should unsubscribe from account's signin idle event", function() {
       this.remote.stopSyncing();
-      return expect(this.hoodie.unbind).wasCalledWith('account:signedIn', this.remote.connect);
+      return expect(this.hoodie.unbind).wasCalledWith('account:signin', this.remote.connect);
     });
-    return it("should unsubscribe from account's signedOut idle event", function() {
+    return it("should unsubscribe from account's signout idle event", function() {
       this.remote.stopSyncing();
-      return expect(this.hoodie.unbind).wasCalledWith('account:signedOut', this.remote.disconnect);
+      return expect(this.hoodie.unbind).wasCalledWith('account:signout', this.remote.disconnect);
     });
   });
   describe(".connect()", function() {
