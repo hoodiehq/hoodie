@@ -195,7 +195,7 @@ class Hoodie.Account
   #
   #
   db : -> 
-    @username?.toLowerCase().replace(/@/, "$").replace(/\./g, "_");
+    "user/#{@owner}"
   
   
   # ## fetch

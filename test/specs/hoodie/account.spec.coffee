@@ -425,12 +425,12 @@ describe "Hoodie.Account", ->
   
   
   describe ".db", ->
-    _when "username is set to 'joe.doe@example.com'", ->
+    _when "account.owner is 'owner_hash123'", ->
       beforeEach ->
-        @account.username = 'joe.doe@example.com'
+        @account.owner = 'owner_hash123'
       
       it "should return 'joe$exampleCom", ->
-        (expect @account.db()).toEqual('joe_doe$example_com')
+        (expect @account.db()).toEqual('user/owner_hash123')
   # /.db()
   
   describe ".fetch()", ->

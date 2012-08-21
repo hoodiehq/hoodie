@@ -493,12 +493,12 @@ describe("Hoodie.Account", function() {
     });
   });
   describe(".db", function() {
-    return _when("username is set to 'joe.doe@example.com'", function() {
+    return _when("account.owner is 'owner_hash123'", function() {
       beforeEach(function() {
-        return this.account.username = 'joe.doe@example.com';
+        return this.account.owner = 'owner_hash123';
       });
       return it("should return 'joe$exampleCom", function() {
-        return (expect(this.account.db())).toEqual('joe_doe$example_com');
+        return (expect(this.account.db())).toEqual('user/owner_hash123');
       });
     });
   });

@@ -172,8 +172,7 @@ Hoodie.Account = (function() {
   };
 
   Account.prototype.db = function() {
-    var _ref;
-    return (_ref = this.username) != null ? _ref.toLowerCase().replace(/@/, "$").replace(/\./g, "_") : void 0;
+    return "user/" + this.owner;
   };
 
   Account.prototype.fetch = function() {
