@@ -86,6 +86,7 @@ class Hoodie.Account
       type       : 'user'
       roles      : []
       password   : password
+      $owner     : @owner
 
     requestPromise = @hoodie.request 'PUT', "/_users/#{encodeURIComponent key}",
       data        : JSON.stringify data

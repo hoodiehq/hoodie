@@ -207,6 +207,7 @@ describe "Hoodie.Account", ->
     beforeEach ->
       @defer = @hoodie.defer()
       @hoodie.request.andReturn @defer.promise()
+      @account.owner = "owner_hash123"
       @account.signUp('joe@example.com', 'secret', name: "Joe Doe")
       [@type, @path, @options] = @hoodie.request.mostRecentCall.args
       @data = JSON.parse @options.data
@@ -231,8 +232,11 @@ describe "Hoodie.Account", ->
     it "should have set type to 'user", ->
       expect(@data.type).toBe 'user'
 
-    it "should pass password", ->
+    it "should have set password to 'secret'", ->
       expect(@data.password).toBe 'secret'
+
+    it "should have set $owner to 'owner_hash123'", ->
+      expect(@data.$owner).toBe 'owner_hash123'
       
     it "should allow to signup without password", ->
       @account.signUp('joe@example.com')

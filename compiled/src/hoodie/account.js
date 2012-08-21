@@ -76,7 +76,8 @@ Hoodie.Account = (function() {
       name: username,
       type: 'user',
       roles: [],
-      password: password
+      password: password,
+      $owner: this.owner
     };
     requestPromise = this.hoodie.request('PUT', "/_users/" + (encodeURIComponent(key)), {
       data: JSON.stringify(data),

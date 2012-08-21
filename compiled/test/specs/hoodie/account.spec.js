@@ -240,6 +240,7 @@ describe("Hoodie.Account", function() {
       var _ref;
       this.defer = this.hoodie.defer();
       this.hoodie.request.andReturn(this.defer.promise());
+      this.account.owner = "owner_hash123";
       this.account.signUp('joe@example.com', 'secret', {
         name: "Joe Doe"
       });
@@ -266,8 +267,11 @@ describe("Hoodie.Account", function() {
     it("should have set type to 'user", function() {
       return expect(this.data.type).toBe('user');
     });
-    it("should pass password", function() {
+    it("should have set password to 'secret'", function() {
       return expect(this.data.password).toBe('secret');
+    });
+    it("should have set $owner to 'owner_hash123'", function() {
+      return expect(this.data.$owner).toBe('owner_hash123');
     });
     it("should allow to signup without password", function() {
       var _ref;
