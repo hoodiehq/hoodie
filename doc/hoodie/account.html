@@ -108,8 +108,9 @@ Besides the standard sign in we also check if the account has been confirmed
       <span class="nx">unless</span> <span class="o">~</span><span class="nx">response</span><span class="p">.</span><span class="nx">roles</span><span class="p">.</span><span class="nx">indexOf</span><span class="p">(</span><span class="s2">&quot;confirmed&quot;</span><span class="p">)</span>
         <span class="k">return</span> <span class="nx">defer</span><span class="p">.</span><span class="nx">reject</span> <span class="nv">error: </span><span class="s2">&quot;unconfirmed&quot;</span><span class="p">,</span> <span class="nv">reason: </span><span class="s2">&quot;account has not been confirmed yet&quot;</span>
 
-      <span class="vi">@owner = </span><span class="nx">response</span><span class="p">.</span><span class="nx">roles</span><span class="p">.</span><span class="nx">shift</span><span class="p">()</span>
-      <span class="nx">@hoodie</span><span class="p">.</span><span class="nx">my</span><span class="p">.</span><span class="nx">config</span><span class="p">.</span><span class="nx">set</span> <span class="s1">&#39;_account.owner&#39;</span><span class="p">,</span> <span class="nx">@owner</span>
+      <span class="nx">unless</span> <span class="nx">@owner</span>
+        <span class="vi">@owner = </span><span class="nx">response</span><span class="p">.</span><span class="nx">roles</span><span class="p">.</span><span class="nx">shift</span><span class="p">()</span>
+        <span class="nx">@hoodie</span><span class="p">.</span><span class="nx">my</span><span class="p">.</span><span class="nx">config</span><span class="p">.</span><span class="nx">set</span> <span class="s1">&#39;_account.owner&#39;</span><span class="p">,</span> <span class="nx">@owner</span>
 
       <span class="nx">@hoodie</span><span class="p">.</span><span class="nx">trigger</span> <span class="s1">&#39;account:signin&#39;</span><span class="p">,</span> <span class="nx">username</span>
       <span class="nx">@fetch</span><span class="p">()</span>
