@@ -186,7 +186,7 @@ Or the server canceld it for what ever reason, e.g.
 heroku kills the request after ~30s.
 we'll try again after a 3s timeout</p></div></div><div class="code"><div class="wrapper">          <span class="nb">window</span><span class="p">.</span><span class="nx">setTimeout</span> <span class="nx">@pull</span><span class="p">,</span> <span class="mi">3000</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>valid CouchDB doc attributes starting with an underscore</p></div></div><div class="code"><div class="wrapper">  <span class="nv">_validSpecialAttributes : </span><span class="p">[</span>
     <span class="s1">&#39;_id&#39;</span><span class="p">,</span> <span class="s1">&#39;_rev&#39;</span><span class="p">,</span> <span class="s1">&#39;_deleted&#39;</span><span class="p">,</span> <span class="s1">&#39;_revisions&#39;</span><span class="p">,</span> <span class="s1">&#39;_attachments&#39;</span>
-  <span class="p">]</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h3 id="parse-from-remote">parse from remote</h3></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>parse object for remote storage. All attributes starting with an 
+  <span class="p">]</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h3 id="parse-for-remote">parse for remote</h3></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>parse object for remote storage. All attributes starting with an 
 <code>underscore</code> do not get synchronized despite the special attributes
 <code>_id</code>, <code>_rev</code> and <code>_deleted</code> (see above)</p>
 

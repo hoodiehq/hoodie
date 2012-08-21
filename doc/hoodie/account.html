@@ -5,6 +5,11 @@
 
   </div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h2 id="constructor">Constructor</h2></div></div></div><div class="segment"><div class="code"><div class="wrapper">  <span class="nv">constructor : </span><span class="nf">(@hoodie) -&gt;</span>
     </div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>handle session</p></div></div><div class="code"><div class="wrapper">    <span class="vi">@username = </span><span class="nx">@hoodie</span><span class="p">.</span><span class="nx">my</span><span class="p">.</span><span class="nx">config</span><span class="p">.</span><span class="nx">get</span> <span class="s1">&#39;_account.username&#39;</span>
+    <span class="vi">@owner    = </span><span class="nx">@hoodie</span><span class="p">.</span><span class="nx">my</span><span class="p">.</span><span class="nx">config</span><span class="p">.</span><span class="nx">get</span> <span class="s1">&#39;_account.owner&#39;</span>
+
+    <span class="nx">unless</span> <span class="nx">@owner</span>
+      <span class="vi">@owner = </span><span class="nx">@hoodie</span><span class="p">.</span><span class="nx">my</span><span class="p">.</span><span class="nx">store</span><span class="p">.</span><span class="nx">uuid</span><span class="p">()</span>
+      <span class="nx">@hoodie</span><span class="p">.</span><span class="nx">my</span><span class="p">.</span><span class="nx">config</span><span class="p">.</span><span class="nx">set</span> <span class="s1">&#39;_account.owner&#39;</span><span class="p">,</span> <span class="nx">@owner</span>
     </div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>authenticate on next tick
 window.setTimeout @authenticate</p></div></div><div class="code"><div class="wrapper">    <span class="nx">@on</span> <span class="s1">&#39;signin&#39;</span><span class="p">,</span>  <span class="nx">@_handleSignIn</span>
     <span class="nx">@on</span> <span class="s1">&#39;signout&#39;</span><span class="p">,</span> <span class="nx">@_handleSignOut</span>
@@ -185,4 +190,5 @@ Notes:
   </div></div></div><div class="segment"><div class="code"><div class="wrapper">  <span class="nv">_handleSignOut: </span><span class="o">=&gt;</span>
     <span class="k">delete</span> <span class="nx">@username</span>
     <span class="nx">@hoodie</span><span class="p">.</span><span class="nx">my</span><span class="p">.</span><span class="nx">config</span><span class="p">.</span><span class="nx">remove</span> <span class="s1">&#39;_account.username&#39;</span>
+    <span class="nx">@hoodie</span><span class="p">.</span><span class="nx">my</span><span class="p">.</span><span class="nx">config</span><span class="p">.</span><span class="nx">remove</span> <span class="s1">&#39;_account.owner&#39;</span>
     <span class="vi">@_authenticated = </span><span class="kc">false</span></div></div></div></div></body></html>
