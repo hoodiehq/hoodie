@@ -226,7 +226,7 @@ Hoodie.Account = (function() {
   };
 
   Account.prototype.signUp = function(username, password) {
-    var data, defer, handleSucces, key, requestPromise,
+    var data, defer, delaydSignIn, handleError, handleSucces, key, requestPromise,
       _this = this;
     if (password == null) {
       password = '';
@@ -238,16 +238,30 @@ Hoodie.Account = (function() {
       name: username,
       type: 'user',
       roles: [],
-      password: password
+      password: password,
+      $owner: this.owner,
+      database: this.db()
     };
     requestPromise = this.hoodie.request('PUT', "/_users/" + (encodeURIComponent(key)), {
       data: JSON.stringify(data),
       contentType: 'application/json'
     });
+    delaydSignIn = function() {
+      return window.setTimeout((function() {
+        return _this.signIn(username, password).then(defer.resolve, handleError);
+      }), 300);
+    };
     handleSucces = function(response) {
       _this.hoodie.trigger('account:signup', username);
       _this._doc._rev = response.rev;
-      return _this.signIn(username, password).then(defer.resolve, defer.reject);
+      return delaydSignIn();
+    };
+    handleError = function(error) {
+      if (error.error === 'unconfirmed') {
+        return delaydSignIn();
+      } else {
+        return defer.reject.apply(defer, arguments);
+      }
     };
     requestPromise.then(handleSucces, defer.reject);
     return defer.promise();
@@ -267,6 +281,14 @@ Hoodie.Account = (function() {
       }
     });
     handleSucces = function(response) {
+      if (!~response.roles.indexOf("confirmed")) {
+        return defer.reject({
+          error: "unconfirmed",
+          reason: "account has not been confirmed yet"
+        });
+      }
+      _this.owner = response.roles.shift();
+      _this.hoodie.my.config.set('_account.owner', _this.owner);
       _this.hoodie.trigger('account:signin', username);
       _this.fetch();
       return defer.resolve(username, response);
@@ -333,8 +355,7 @@ Hoodie.Account = (function() {
   };
 
   Account.prototype.db = function() {
-    var _ref;
-    return (_ref = this.username) != null ? _ref.toLowerCase().replace(/@/, "$").replace(/\./g, "_") : void 0;
+    return "user/" + this.owner;
   };
 
   Account.prototype.fetch = function() {

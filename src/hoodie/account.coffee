@@ -73,7 +73,9 @@ class Hoodie.Account
   #
   # uses standard CouchDB API to create a new document in _users db.
   # The backend will automatically create a userDB based on the username
-  # address.
+  # address and approve the account by adding a "confirmed" role to the
+  # user doc. The account confirmation might take a while, so we keep trying
+  # to sign in with a 300ms timeout.
   #
   signUp : (username, password = '') ->
     defer = @hoodie.defer()
@@ -93,11 +95,22 @@ class Hoodie.Account
       data        : JSON.stringify data
       contentType : 'application/json'
       
-    handleSucces = (response) =>
-        @hoodie.trigger 'account:signup', username
-        @_doc._rev = response.rev
+    delaydSignIn = =>
+      window.setTimeout ( =>
+        @signIn(username, password).then defer.resolve, handleError
+      ), 300
 
-        @signIn(username, password).then defer.resolve, defer.reject
+    handleSucces = (response) =>
+      @hoodie.trigger 'account:signup', username
+      @_doc._rev = response.rev
+      delaydSignIn()
+    
+    handleError = (error) =>
+      if error.error is 'unconfirmed'
+        # It might take a bit until the account has been confirmed
+        delaydSignIn()
+      else
+        defer.reject arguments...
 
     requestPromise.then handleSucces, defer.reject
       
@@ -106,7 +119,9 @@ class Hoodie.Account
 
   # ## sign in with username & password
   #
-  # uses standard CouchDB API to create a new user session (POST /_session)
+  # uses standard CouchDB API to create a new user session (POST /_session).
+  # Besides the standard sign in we also check if the account has been confirmed
+  # (roles include "confirmed" role).
   #
   signIn : (username, password = '') ->
     defer = @hoodie.defer()
@@ -117,6 +132,12 @@ class Hoodie.Account
         password  : password
         
     handleSucces = (response) =>
+      unless ~response.roles.indexOf("confirmed")
+        return defer.reject error: "unconfirmed", reason: "account has not been confirmed yet"
+
+      @owner = response.roles.shift()
+      @hoodie.my.config.set '_account.owner', @owner
+
       @hoodie.trigger 'account:signin', username
       @fetch()
       defer.resolve username, response

@@ -240,6 +240,9 @@ describe("Hoodie.Account", function() {
       var _ref;
       this.defer = this.hoodie.defer();
       this.hoodie.request.andReturn(this.defer.promise());
+      spyOn(this.account, "signIn").andReturn({
+        then: function() {}
+      });
       this.account.owner = "owner_hash123";
       this.account.signUp('joe@example.com', 'secret', {
         name: "Joe Doe"
@@ -286,33 +289,53 @@ describe("Hoodie.Account", function() {
     _when("signUp successful", function() {
       beforeEach(function() {
         var response;
-        this.response = response = {
+        spyOn(window, "setTimeout").andCallFake(function(cb) {
+          return cb();
+        });
+        response = {
           "ok": true,
           "id": "org.couchdb.user:bizbiz",
           "rev": "1-a0134f4a9909d3b20533285c839ed830"
         };
-        return this.defer.resolve(this.response).promise();
+        return this.defer.resolve(response);
       });
       it("should trigger `account:signup` event", function() {
         this.account.signUp('joe@example.com', 'secret');
         return expect(this.hoodie.trigger).wasCalledWith('account:signup', 'joe@example.com');
       });
       it("should sign in", function() {
-        spyOn(this.account, 'signIn').andReturn({
-          then: function() {}
-        });
         this.account.signUp('joe@example.com', 'secret');
         return expect(this.account.signIn).wasCalledWith('joe@example.com', 'secret');
       });
-      it("should resolve its promise", function() {
-        var promise;
-        promise = this.account.signUp('joe@example.com', 'secret');
-        return expect(promise).toBeResolvedWith('joe@example.com', this.response);
+      _and("signIn successful", function() {
+        beforeEach(function() {
+          var _this = this;
+          return this.account.signIn.andReturn({
+            then: function(done, fail) {
+              return done("joe@example.com", 'response');
+            }
+          });
+        });
+        return it("should resolve its promise", function() {
+          var promise;
+          promise = this.account.signUp('joe@example.com', 'secret');
+          return expect(promise).toBeResolvedWith('joe@example.com', 'response');
+        });
       });
-      return it("should fetch the _users doc", function() {
-        spyOn(this.account, "fetch");
-        this.account.signUp('joe@example.com', 'secret');
-        return expect(this.account.fetch).wasCalled();
+      return _and("signIn not successful", function() {
+        beforeEach(function() {
+          var _this = this;
+          return this.account.signIn.andReturn({
+            then: function(done, fail) {
+              return fail('error');
+            }
+          });
+        });
+        return it("should resolve its promise", function() {
+          var promise;
+          promise = this.account.signUp('joe@example.com', 'secret');
+          return expect(promise).toBeRejectedWith('error');
+        });
       });
     });
     return _when("signUp has an error", function() {
@@ -356,18 +379,41 @@ describe("Hoodie.Account", function() {
       data = this.options.data;
       return expect(data.password).toBe('');
     });
-    return _when("signUp successful", function() {
-      beforeEach(function() {
-        return this.defer.resolve();
+    return _when("signIn successful", function() {
+      _and("account is confirmed", function() {
+        beforeEach(function() {
+          return this.defer.resolve({
+            "ok": true,
+            "name": "joe@example.com",
+            "roles": ["user_has", "confirmed"]
+          });
+        });
+        it("should trigger `account:signin` event", function() {
+          this.account.signIn('joe@example.com', 'secret');
+          return expect(this.hoodie.trigger).wasCalledWith('account:signin', 'joe@example.com');
+        });
+        return it("should fetch the _users doc", function() {
+          spyOn(this.account, "fetch");
+          this.account.signIn('joe@example.com', 'secret');
+          return expect(this.account.fetch).wasCalled();
+        });
       });
-      it("should trigger `account:signin` event", function() {
-        this.account.signIn('joe@example.com', 'secret');
-        return expect(this.hoodie.trigger).wasCalledWith('account:signin', 'joe@example.com');
-      });
-      return it("should fetch the _users doc", function() {
-        spyOn(this.account, "fetch");
-        this.account.signIn('joe@example.com', 'secret');
-        return expect(this.account.fetch).wasCalled();
+      return _and("account not approved", function() {
+        beforeEach(function() {
+          return this.defer.resolve({
+            "ok": true,
+            "name": "joe@example.com",
+            "roles": []
+          });
+        });
+        return it("should reject with unconfirmed error.", function() {
+          var promise;
+          promise = this.account.signIn('joe@example.com', 'secret');
+          return expect(promise).toBeRejectedWith({
+            error: "unconfirmed",
+            reason: "account has not been confirmed yet"
+          });
+        });
       });
     });
   });
@@ -500,7 +546,7 @@ describe("Hoodie.Account", function() {
       beforeEach(function() {
         return this.account.owner = 'owner_hash123';
       });
-      return it("should return 'joe$exampleCom", function() {
+      return it("should return 'joe$example.com", function() {
         return (expect(this.account.db())).toEqual('user/owner_hash123');
       });
     });

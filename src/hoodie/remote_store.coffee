@@ -317,11 +317,12 @@ class Hoodie.RemoteStore extends Hoodie.Store
         @hoodie.trigger 'remote:error:unauthenticated', error
         @disconnect()
       
-      # the 404 comes, when the requested DB of the User has been removed. 
-      # Should really not happen. 
+      # the 404 comes, when the requested DB has been removed
+      # or does not exist yet.
       # 
-      # BUT: it might also happen that the profileDB is not ready yet. 
-      #      Therefore, we try it again in 3 seconds
+      # BUT: it might also happen that the background workers did
+      #      not create a pending database yet. Therefore,
+      #      we try it again in 3 seconds
       #
       # TODO: review / rethink that.
       when 404

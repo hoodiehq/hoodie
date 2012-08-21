@@ -207,6 +207,7 @@ describe "Hoodie.Account", ->
     beforeEach ->
       @defer = @hoodie.defer()
       @hoodie.request.andReturn @defer.promise()
+      spyOn(@account, "signIn").andReturn then: ->
       @account.owner = "owner_hash123"
       @account.signUp('joe@example.com', 'secret', name: "Joe Doe")
       [@type, @path, @options] = @hoodie.request.mostRecentCall.args
@@ -249,26 +250,33 @@ describe "Hoodie.Account", ->
             
     _when "signUp successful", ->
       beforeEach ->
-        @response = response = {"ok":true,"id":"org.couchdb.user:bizbiz","rev":"1-a0134f4a9909d3b20533285c839ed830"}
-        @defer.resolve(@response).promise()
+        spyOn(window, "setTimeout").andCallFake (cb) -> cb()
+        response = {"ok":true,"id":"org.couchdb.user:bizbiz","rev":"1-a0134f4a9909d3b20533285c839ed830"}
+        @defer.resolve response
       
       it "should trigger `account:signup` event", ->
         @account.signUp('joe@example.com', 'secret')
         expect(@hoodie.trigger).wasCalledWith 'account:signup', 'joe@example.com'
         
       it "should sign in", ->
-        spyOn(@account, 'signIn').andReturn then: ->
         @account.signUp 'joe@example.com', 'secret'
         expect(@account.signIn).wasCalledWith 'joe@example.com', 'secret'
-        
-      it "should resolve its promise", ->
-        promise = @account.signUp('joe@example.com', 'secret')
-        expect(promise).toBeResolvedWith 'joe@example.com', @response
-        
-      it "should fetch the _users doc", ->
-        spyOn(@account, "fetch")
-        @account.signUp('joe@example.com', 'secret')
-        expect(@account.fetch).wasCalled()
+      
+      _and "signIn successful", ->
+        beforeEach ->
+          @account.signIn.andReturn then: (done, fail) => done "joe@example.com", 'response'
+
+        it "should resolve its promise", ->
+          promise = @account.signUp('joe@example.com', 'secret')
+          expect(promise).toBeResolvedWith 'joe@example.com', 'response'
+
+      _and "signIn not successful", ->
+        beforeEach ->
+          @account.signIn.andReturn then: (done, fail) => fail 'error'
+
+        it "should resolve its promise", ->
+          promise = @account.signUp('joe@example.com', 'secret')
+          expect(promise).toBeRejectedWith 'error'
         
     _when "signUp has an error", ->
       beforeEach ->
@@ -304,18 +312,29 @@ describe "Hoodie.Account", ->
       data = @options.data
       expect(data.password).toBe ''
       
-    _when "signUp successful", ->
-      beforeEach ->
-        @defer.resolve()
+    _when "signIn successful", ->
+      _and "account is confirmed", ->
+        beforeEach ->
+          @defer.resolve {"ok":true,"name":"joe@example.com","roles":["user_has","confirmed"]}
         
-      it "should trigger `account:signin` event", ->
-        @account.signIn('joe@example.com', 'secret')
-        expect(@hoodie.trigger).wasCalledWith 'account:signin', 'joe@example.com'
+        it "should trigger `account:signin` event", ->
+          @account.signIn('joe@example.com', 'secret')
+          expect(@hoodie.trigger).wasCalledWith 'account:signin', 'joe@example.com'
         
-      it "should fetch the _users doc", ->
-        spyOn(@account, "fetch")
-        @account.signIn('joe@example.com', 'secret')
-        expect(@account.fetch).wasCalled()
+        it "should fetch the _users doc", ->
+          spyOn(@account, "fetch")
+          @account.signIn('joe@example.com', 'secret')
+          expect(@account.fetch).wasCalled()
+
+      _and "account not approved", ->
+        beforeEach ->
+          @defer.resolve {"ok":true,"name":"joe@example.com","roles":[]}
+
+        it "should reject with unconfirmed error.", ->
+          promise = @account.signIn('joe@example.com', 'secret')
+          expect(promise).toBeRejectedWith error: "unconfirmed", reason: "account has not been confirmed yet"
+        
+      
   # /.signIn(username, password)
 
 
@@ -432,7 +451,7 @@ describe "Hoodie.Account", ->
       beforeEach ->
         @account.owner = 'owner_hash123'
       
-      it "should return 'joe$exampleCom", ->
+      it "should return 'joe$example.com", ->
         (expect @account.db()).toEqual('user/owner_hash123')
   # /.db()
   
