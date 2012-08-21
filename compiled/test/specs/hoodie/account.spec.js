@@ -273,6 +273,9 @@ describe("Hoodie.Account", function() {
     it("should have set $owner to 'owner_hash123'", function() {
       return expect(this.data.$owner).toBe('owner_hash123');
     });
+    it("should have set database to 'user/owner_hash123'", function() {
+      return expect(this.data.database).toBe('user/owner_hash123');
+    });
     it("should allow to signup without password", function() {
       var _ref;
       this.account.signUp('joe@example.com');

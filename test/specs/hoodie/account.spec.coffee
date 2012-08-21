@@ -237,6 +237,9 @@ describe "Hoodie.Account", ->
 
     it "should have set $owner to 'owner_hash123'", ->
       expect(@data.$owner).toBe 'owner_hash123'
+
+    it "should have set database to 'user/owner_hash123'", ->
+      expect(@data.database).toBe 'user/owner_hash123'
       
     it "should allow to signup without password", ->
       @account.signUp('joe@example.com')
