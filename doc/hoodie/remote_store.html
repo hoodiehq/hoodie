@@ -165,11 +165,12 @@ then check for another change</p></div></div><div class="code"><div class="wrapp
 before sync can be continued</p></div></div><div class="code"><div class="wrapper">      <span class="k">when</span> <span class="mi">403</span>
         <span class="nx">@hoodie</span><span class="p">.</span><span class="nx">trigger</span> <span class="s1">&#39;remote:error:unauthenticated&#39;</span><span class="p">,</span> <span class="nx">error</span>
         <span class="nx">@disconnect</span><span class="p">()</span>
-      </div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>the 404 comes, when the requested DB of the User has been removed. 
-Should really not happen. </p>
+      </div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>the 404 comes, when the requested DB has been removed
+or does not exist yet.</p>
 
-<p>BUT: it might also happen that the profileDB is not ready yet. 
-     Therefore, we try it again in 3 seconds</p>
+<p>BUT: it might also happen that the background workers did
+     not create a pending database yet. Therefore,
+     we try it again in 3 seconds</p>
 
 <p>TODO: review / rethink that.</p></div></div><div class="code"><div class="wrapper">      <span class="k">when</span> <span class="mi">404</span>
         <span class="nb">window</span><span class="p">.</span><span class="nx">setTimeout</span> <span class="nx">@pull</span><span class="p">,</span> <span class="mi">3000</span>
