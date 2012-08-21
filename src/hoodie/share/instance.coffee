@@ -60,10 +60,6 @@ class Hoodie.Share.Instance extends Hoodie.RemoteStore
     
     # setting attributes
     @set options
-
-    # also make sure we have an ownerUuid in order to differentiate between my 
-    # shares and the shares by others
-    @_assureOwnerUuid() 
     
     # use the custom Share Hoodie for users witouth an account
     @hoodie = new Hoodie.Share.Hoodie @hoodie, this if @anonymous
@@ -200,28 +196,6 @@ class Hoodie.Share.Instance extends Hoodie.RemoteStore
     
     
   # ## Private
-
-  # owner uuid
-  #
-  # in order to differentiate between my shares and shares by others,
-  # each account gets a uuid assigned that will be stored with every $share doc.
-  #
-  # at the moment we store the ownerUuid with the $config/hoodie config. Not sure
-  # if that's the right place for it, but it works.
-  #
-  # Another possibility would be to assign a uuid to each user on sign up and use 
-  # this uuid here, but this has not yet been discussed.
-  _assureOwnerUuid : ->
-    return if @ownerUuid
-
-    config      = @constructor.hoodie.my.config
-    @ownerUuid = config.get('share.ownerUuid')
-
-    # if this is the very first share, we generate and store an ownerUuid
-    unless @ownerUuid
-      @ownerUuid = @constructor.hoodie.my.store.uuid()
-      config.set 'share.ownerUuid', @ownerUuid
-
 
   # returns a hash update to update the passed object
   # so that it gets added to the share

@@ -31,7 +31,6 @@ Hoodie.Share.Instance = (function(_super) {
     this.hoodie = this.constructor.hoodie;
     this.anonymous = this.hoodie.my.account.username === void 0;
     this.set(options);
-    this._assureOwnerUuid();
     if (this.anonymous) {
       this.hoodie = new Hoodie.Share.Hoodie(this.hoodie, this);
     }
@@ -120,19 +119,6 @@ Hoodie.Share.Instance = (function(_super) {
 
   Instance.prototype.hasAccount = function() {
     return !this.anonymous || (this._userRev != null);
-  };
-
-  Instance.prototype._assureOwnerUuid = function() {
-    var config;
-    if (this.ownerUuid) {
-      return;
-    }
-    config = this.constructor.hoodie.my.config;
-    this.ownerUuid = config.get('share.ownerUuid');
-    if (!this.ownerUuid) {
-      this.ownerUuid = this.constructor.hoodie.my.store.uuid();
-      return config.set('share.ownerUuid', this.ownerUuid);
-    }
   };
 
   Instance.prototype._add = function(obj) {

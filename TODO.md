@@ -12,7 +12,6 @@
 # spec current code
 # destroying shares
 # filters?
-# build it into minutes.io
 
 => required CouchDB setting
    httpd.authentication_handlers:
