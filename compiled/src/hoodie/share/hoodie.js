@@ -18,12 +18,15 @@ Hoodie.Share.Hoodie = (function(_super) {
       _this = this;
     this.share = share;
     this.store = hoodie.my.store;
-    this.config = {
-      set: this.share.set,
-      get: this.share.get,
-      remove: this.share.set
+    this.my = {
+      config: {
+        set: this.share.set,
+        get: this.share.get,
+        remove: this.share.set
+      }
     };
     this.config.set('_account.username', "share/" + this.share.id);
+    this.config.set('_account.owner', hoodie.my.account.owner);
     this.config.set('_remote.active', this.share.continuous === true);
     _ref = ['store:dirty:idle'];
     for (_i = 0, _len = _ref.length; _i < _len; _i++) {

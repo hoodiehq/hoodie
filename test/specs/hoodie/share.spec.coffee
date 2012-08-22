@@ -63,18 +63,18 @@ describe "Hoodie.Share", ->
       expect(promise).toBeResolvedWith foo: 'bar'
   # /.find(share_id)
 
-  describe ".findOrCreate(share_attributes)", ->
+  describe ".findOrCreate(id, share_attributes)", ->
     beforeEach ->
       spyOn(@hoodie.my.store, "findOrCreate").andCallThrough()
     
     it "should proxy to hoodie.my.store.findOrCreate with type set to '$share'", ->
-      @share.findOrCreate {}
-      expect(@hoodie.my.store.findOrCreate).wasCalledWith type: '$share'
+      @share.findOrCreate 'id123', {}
+      expect(@hoodie.my.store.findOrCreate).wasCalledWith '$share', 'id123', {}
 
     it "should resolve with a Share Instance", ->
       @hoodie.my.store.findOrCreate.andReturn @hoodie.defer().resolve({}).promise()
       @share.instance.andCallFake -> this.foo = 'bar'
-      promise = @share.findOrCreate {}
+      promise = @share.findOrCreate 'id123', {}
       expect(promise).toBeResolvedWith foo: 'bar'
   # /.findOrCreate(share_attributes)
 

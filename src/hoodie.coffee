@@ -17,7 +17,7 @@ class Hoodie extends Events
     user    : Hoodie.User
     global  : Hoodie.Global
     email   : Hoodie.Email
-    # share : Hoodie.Share
+    share   : Hoodie.Share
 
 
   # ## initialization

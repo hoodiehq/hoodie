@@ -313,7 +313,7 @@ describe("Hoodie.Store", function() {
       });
     });
   });
-  describe(".findOrCreate(attributes)", function() {
+  describe(".findOrCreate(type, id, attributes)", function() {
     _when("object exists", function() {
       beforeEach(function() {
         var promise;
@@ -322,8 +322,7 @@ describe("Hoodie.Store", function() {
       });
       return it("should resolve with existing object", function() {
         var promise;
-        promise = this.store.findOrCreate({
-          id: '123',
+        promise = this.store.findOrCreate('type', '123', {
           attribute: 'value'
         });
         return expect(promise).toBeResolvedWith('existing_object');
@@ -336,12 +335,11 @@ describe("Hoodie.Store", function() {
       it("should call `.create` with passed attributes", function() {
         var promise;
         spyOn(this.store, "create").andReturn(this.hoodie.defer().promise());
-        promise = this.store.findOrCreate({
-          id: '123',
+        promise = this.store.findOrCreate('type', 'id123', {
           attribute: 'value'
         });
-        return expect(this.store.create).wasCalledWith({
-          id: '123',
+        return expect(this.store.create).wasCalledWith('type', {
+          id: 'id123',
           attribute: 'value'
         });
       });

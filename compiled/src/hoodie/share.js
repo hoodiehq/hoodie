@@ -50,10 +50,9 @@ Hoodie.Share = (function() {
     });
   };
 
-  Share.prototype.findOrCreate = function(attributes) {
+  Share.prototype.findOrCreate = function(id, attributes) {
     var _this = this;
-    attributes.type = '$share';
-    return this.hoodie.my.store.findOrCreate(attributes).pipe(function(object) {
+    return this.hoodie.my.store.findOrCreate('$share', id, attributes).pipe(function(object) {
       return new _this.instance(object);
     });
   };

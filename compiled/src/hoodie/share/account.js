@@ -6,7 +6,8 @@ Hoodie.Share.Account = (function(_super) {
 
   __extends(Account, _super);
 
-  function Account() {
+  function Account(hoodie) {
+    this.hoodie = hoodie;
     Account.__super__.constructor.apply(this, arguments);
     this._shareAuthPromise = this.hoodie.defer().resolve(this.username).promise();
   }
@@ -25,6 +26,10 @@ Hoodie.Share.Account = (function(_super) {
 
   Account.prototype.signOut = function() {
     return this._shareAuthPromise;
+  };
+
+  Account.prototype.db = function() {
+    return this.username;
   };
 
   return Account;

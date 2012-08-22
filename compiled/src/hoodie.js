@@ -17,7 +17,8 @@ Hoodie = (function(_super) {
       },
       user: Hoodie.User,
       global: Hoodie.Global,
-      email: Hoodie.Email
+      email: Hoodie.Email,
+      share: Hoodie.Share
     };
   };
 

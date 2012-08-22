@@ -95,12 +95,13 @@ find: -> @find arguments...</p></div></div><div class="code"><div class="wrapper
 <li>Try to find a share by given id</li>
 <li>If share could be found, return it</li>
 <li>If not, create one and return it.</li>
-</ol></div></div><div class="code"><div class="wrapper">  <span class="nv">findOrCreate : </span><span class="nf">(attributes) -&gt;</span>
+</ol></div></div><div class="code"><div class="wrapper">  <span class="nv">findOrCreate : </span><span class="nf">(type, id, attributes) -&gt;</span>
     <span class="nv">defer = </span><span class="nx">@hoodie</span><span class="p">.</span><span class="nx">defer</span><span class="p">()</span>
-    <span class="nx">@find</span><span class="p">(</span><span class="nx">attributes</span><span class="p">.</span><span class="nx">type</span><span class="p">,</span> <span class="nx">attributes</span><span class="p">.</span><span class="nx">id</span><span class="p">)</span>
+    <span class="nx">@find</span><span class="p">(</span><span class="nx">type</span><span class="p">,</span> <span class="nx">id</span><span class="p">)</span>
     <span class="p">.</span><span class="nx">done</span><span class="p">(</span> <span class="nx">defer</span><span class="p">.</span><span class="nx">resolve</span> <span class="p">)</span>
     <span class="p">.</span><span class="nx">fail</span> <span class="o">=&gt;</span> 
-      <span class="nx">@create</span><span class="p">(</span><span class="nx">attributes</span><span class="p">).</span><span class="k">then</span> <span class="nx">defer</span><span class="p">.</span><span class="nx">resolve</span><span class="p">,</span> <span class="nx">defer</span><span class="p">.</span><span class="nx">reject</span> 
+      <span class="nv">newAttributes = </span><span class="nx">$</span><span class="p">.</span><span class="nx">extend</span> <span class="nv">id: </span><span class="nx">id</span><span class="p">,</span> <span class="nx">attributes</span>
+      <span class="nx">@create</span><span class="p">(</span><span class="nx">type</span><span class="p">,</span> <span class="nx">newAttributes</span><span class="p">).</span><span class="k">then</span> <span class="nx">defer</span><span class="p">.</span><span class="nx">resolve</span><span class="p">,</span> <span class="nx">defer</span><span class="p">.</span><span class="nx">reject</span> 
   
     <span class="k">return</span> <span class="nx">defer</span><span class="p">.</span><span class="nx">promise</span><span class="p">()</span>
   

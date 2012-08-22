@@ -120,12 +120,16 @@ Hoodie.Store = (function() {
     return defer;
   };
 
-  Store.prototype.findOrCreate = function(attributes) {
+  Store.prototype.findOrCreate = function(type, id, attributes) {
     var defer,
       _this = this;
     defer = this.hoodie.defer();
-    this.find(attributes.type, attributes.id).done(defer.resolve).fail(function() {
-      return _this.create(attributes).then(defer.resolve, defer.reject);
+    this.find(type, id).done(defer.resolve).fail(function() {
+      var newAttributes;
+      newAttributes = $.extend({
+        id: id
+      }, attributes);
+      return _this.create(type, newAttributes).then(defer.resolve, defer.reject);
     });
     return defer.promise();
   };

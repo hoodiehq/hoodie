@@ -211,14 +211,14 @@ describe "Hoodie.Store", ->
   # /.findAll(type)
 
 
-  describe ".findOrCreate(attributes)", ->
+  describe ".findOrCreate(type, id, attributes)", ->
     _when "object exists", ->
       beforeEach ->
         promise = @hoodie.defer().resolve('existing_object').promise()
         spyOn(@store, "find").andReturn promise
 
       it "should resolve with existing object", ->
-        promise = @store.findOrCreate id: '123', attribute: 'value'
+        promise = @store.findOrCreate 'type', '123', attribute: 'value'
         expect(promise).toBeResolvedWith 'existing_object'
 
     _when "object does not exist", ->
@@ -227,8 +227,8 @@ describe "Hoodie.Store", ->
       
       it "should call `.create` with passed attributes", ->
         spyOn(@store, "create").andReturn @hoodie.defer().promise()
-        promise = @store.findOrCreate id: '123', attribute: 'value'
-        expect(@store.create).wasCalledWith id: '123', attribute: 'value'
+        promise = @store.findOrCreate 'type', 'id123', attribute: 'value'
+        expect(@store.create).wasCalledWith 'type', id: 'id123', attribute: 'value'
 
       it "should reject when `.create` was rejected", ->
         spyOn(@store, "create").andReturn @hoodie.defer().reject().promise()

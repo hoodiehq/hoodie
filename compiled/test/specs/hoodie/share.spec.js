@@ -86,15 +86,13 @@ describe("Hoodie.Share", function() {
       });
     });
   });
-  describe(".findOrCreate(share_attributes)", function() {
+  describe(".findOrCreate(id, share_attributes)", function() {
     beforeEach(function() {
       return spyOn(this.hoodie.my.store, "findOrCreate").andCallThrough();
     });
     it("should proxy to hoodie.my.store.findOrCreate with type set to '$share'", function() {
-      this.share.findOrCreate({});
-      return expect(this.hoodie.my.store.findOrCreate).wasCalledWith({
-        type: '$share'
-      });
+      this.share.findOrCreate('id123', {});
+      return expect(this.hoodie.my.store.findOrCreate).wasCalledWith('$share', 'id123', {});
     });
     return it("should resolve with a Share Instance", function() {
       var promise;
@@ -102,7 +100,7 @@ describe("Hoodie.Share", function() {
       this.share.instance.andCallFake(function() {
         return this.foo = 'bar';
       });
-      promise = this.share.findOrCreate({});
+      promise = this.share.findOrCreate('id123', {});
       return expect(promise).toBeResolvedWith({
         foo: 'bar'
       });

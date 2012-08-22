@@ -48,7 +48,7 @@
 #     hoodie.share.create(attributes)
 #     hoodie.share.find('share_id')
 #     hoodie.share.findAll()
-#     hoodie.share.findOrCreate(attributes)
+#     hoodie.share.findOrCreate(id, attributes)
 #     hoodie.share.save(id, attributes)
 #     hoodie.share.update(id, changed_attributes)
 #     hoodie.share.updateAll(changed_attributes)
@@ -121,9 +121,8 @@ class Hoodie.Share
 
   # find or create a new share
   #
-  findOrCreate : (attributes) ->
-    attributes.type = '$share'
-    @hoodie.my.store.findOrCreate(attributes).pipe (object) =>
+  findOrCreate : (id, attributes) ->
+    @hoodie.my.store.findOrCreate('$share', id, attributes).pipe (object) =>
       new @instance object
 
 
