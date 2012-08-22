@@ -547,6 +547,9 @@ Hoodie.Store = (function() {
   Store.prototype.findOrCreate = function(type, id, attributes) {
     var defer,
       _this = this;
+    if (attributes == null) {
+      attributes = {};
+    }
     defer = this.hoodie.defer();
     this.find(type, id).done(defer.resolve).fail(function() {
       var newAttributes;

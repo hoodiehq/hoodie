@@ -146,7 +146,7 @@ class Hoodie.Store
   # 1. Try to find a share by given id
   # 2. If share could be found, return it
   # 3. If not, create one and return it.
-  findOrCreate : (type, id, attributes) ->
+  findOrCreate : (type, id, attributes = {}) ->
     defer = @hoodie.defer()
     @find(type, id)
     .done( defer.resolve )
