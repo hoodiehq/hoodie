@@ -12,7 +12,7 @@ class Hoodie.Share.Instance extends Hoodie.RemoteStore
   #                    array of objects that should be shared
   #     access:        (default: false)
   #                    **false**
-  #                    nobody but the creator and the invitees have access.
+  #                    only the creator has access.
   #                    **true**
   #                    public sharing, read & write access
   #                    **{ read: true }**
@@ -21,6 +21,8 @@ class Hoodie.Share.Instance extends Hoodie.RemoteStore
   #                    only user1 & user2 have access
   #                    **{ read: [user1, user2] }**
   #                    only user1 & user2 have access (read only)
+  #                    **{ read: true, write: [user1, user2] }**
+  #                    public sharing, but only user1 & user 2 can edit
   #     continuous:    (default: false)
   #                    if set to true, the shared objects will be
   #                    continuously updated.
@@ -39,16 +41,14 @@ class Hoodie.Share.Instance extends Hoodie.RemoteStore
   #       objects : [
   #         todoList, todo1, todo2, todo3
   #       ]
-  #     
-  #     # share all my documents that I marked as
-  #     # shared and keep them updated
-  #     hoodie.share.create
-  #       continuous : true
-  #       objects    : hoodie.my.store.findAll (obj) -> obj.isShared
   #
   constructor: (options = {}) ->
     
     @hoodie = @constructor.hoodie
+
+    # setting attributes
+    {id, access, continuous, password} = options
+    @set {id, access, continuous, password}
 
     # if the current user isn't anonymous (has an account), a backend worker is 
     # used for the whole share magic, all we need to do is creating the $share 
@@ -57,10 +57,7 @@ class Hoodie.Share.Instance extends Hoodie.RemoteStore
     # if the user is anonymous, we need to handle it manually. To achieve that
     # we use a customized hoodie, with its own socket
     @anonymous = @hoodie.my.account.username is undefined
-    
-    # setting attributes
-    @set options
-    
+
     # use the custom Share Hoodie for users witouth an account
     if @anonymous
       @hoodie = new Hoodie.Share.Hoodie @hoodie, this 
@@ -92,7 +89,7 @@ class Hoodie.Share.Instance extends Hoodie.RemoteStore
   
   # ## save
   #
-  # save the updates made with `.set` to my.store. And optional
+  # make the made with `.set` persistent. An optional
   # key/value update can be passed as first argument
   save : (update = {}, options) ->
     defer = @hoodie.defer()

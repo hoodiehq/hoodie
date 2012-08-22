@@ -10,7 +10,7 @@ objects:       (optional)
                array of objects that should be shared
 access:        (default: false)
                **false**
-               nobody but the creator and the invitees have access.
+               only the creator has access.
                **true**
                public sharing, read &amp; write access
                **{ read: true }**
@@ -19,6 +19,8 @@ access:        (default: false)
                only user1 &amp; user2 have access
                **{ read: [user1, user2] }**
                only user1 &amp; user2 have access (read only)
+               **{ read: true, write: [user1, user2] }**
+               public sharing, but only user1 &amp; user 2 can edit
 continuous:    (default: false)
                if set to true, the shared objects will be
                continuously updated.
@@ -37,22 +39,15 @@ hoodie.share.create
   objects : [
     todoList, todo1, todo2, todo3
   ]
-
-# share all my documents that I marked as
-# shared and keep them updated
-hoodie.share.create
-  continuous : true
-  objects    : hoodie.my.store.findAll (obj) -&gt; obj.isShared
 </code></pre></div></div><div class="code"><div class="wrapper">  <span class="nv">constructor: </span><span class="nf">(options = {}) -&gt;</span>
     
-    <span class="vi">@hoodie = </span><span class="nx">@constructor</span><span class="p">.</span><span class="nx">hoodie</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>if the current user isn't anonymous (has an account), a backend worker is 
+    <span class="vi">@hoodie = </span><span class="nx">@constructor</span><span class="p">.</span><span class="nx">hoodie</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>setting attributes</p></div></div><div class="code"><div class="wrapper">    <span class="p">{</span><span class="nx">id</span><span class="p">,</span> <span class="nx">access</span><span class="p">,</span> <span class="nx">continuous</span><span class="p">,</span> <span class="nx">password</span><span class="p">}</span> <span class="o">=</span> <span class="nx">options</span>
+    <span class="nx">@set</span> <span class="p">{</span><span class="nx">id</span><span class="p">,</span> <span class="nx">access</span><span class="p">,</span> <span class="nx">continuous</span><span class="p">,</span> <span class="nx">password</span><span class="p">}</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>if the current user isn't anonymous (has an account), a backend worker is 
 used for the whole share magic, all we need to do is creating the $share 
 doc and listen to its remote changes</p>
 
 <p>if the user is anonymous, we need to handle it manually. To achieve that
-we use a customized hoodie, with its own socket</p></div></div><div class="code"><div class="wrapper">    <span class="vi">@anonymous = </span><span class="nx">@hoodie</span><span class="p">.</span><span class="nx">my</span><span class="p">.</span><span class="nx">account</span><span class="p">.</span><span class="nx">username</span> <span class="o">is</span> <span class="kc">undefined</span>
-    </div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>setting attributes</p></div></div><div class="code"><div class="wrapper">    <span class="nx">@set</span> <span class="nx">options</span>
-    </div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>use the custom Share Hoodie for users witouth an account</p></div></div><div class="code"><div class="wrapper">    <span class="k">if</span> <span class="nx">@anonymous</span>
+we use a customized hoodie, with its own socket</p></div></div><div class="code"><div class="wrapper">    <span class="vi">@anonymous = </span><span class="nx">@hoodie</span><span class="p">.</span><span class="nx">my</span><span class="p">.</span><span class="nx">account</span><span class="p">.</span><span class="nx">username</span> <span class="o">is</span> <span class="kc">undefined</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>use the custom Share Hoodie for users witouth an account</p></div></div><div class="code"><div class="wrapper">    <span class="k">if</span> <span class="nx">@anonymous</span>
       <span class="vi">@hoodie = </span><span class="k">new</span> <span class="nx">Hoodie</span><span class="p">.</span><span class="nx">Share</span><span class="p">.</span><span class="nx">Hoodie</span> <span class="nx">@hoodie</span><span class="p">,</span> <span class="k">this</span> 
   
   </div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h2 id="set">set</h2>
@@ -74,7 +69,7 @@ alternatively, a hash of key/value pairs can be passed</p></div></div><div class
   
   </div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h2 id="save">save</h2>
 
-<p>save the updates made with <code>.set</code> to my.store. And optional
+<p>make the made with <code>.set</code> persistent. An optional
 key/value update can be passed as first argument</p></div></div><div class="code"><div class="wrapper">  <span class="nv">save : </span><span class="nf">(update = {}, options) -&gt;</span>
     <span class="nv">defer = </span><span class="nx">@hoodie</span><span class="p">.</span><span class="nx">defer</span><span class="p">()</span>
 

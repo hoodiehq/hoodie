@@ -9,6 +9,7 @@ Hoodie.Share.Instance = (function(_super) {
   __extends(Instance, _super);
 
   function Instance(options) {
+    var access, continuous, id, password;
     if (options == null) {
       options = {};
     }
@@ -29,8 +30,14 @@ Hoodie.Share.Instance = (function(_super) {
     this.set = __bind(this.set, this);
 
     this.hoodie = this.constructor.hoodie;
+    id = options.id, access = options.access, continuous = options.continuous, password = options.password;
+    this.set({
+      id: id,
+      access: access,
+      continuous: continuous,
+      password: password
+    });
     this.anonymous = this.hoodie.my.account.username === void 0;
-    this.set(options);
     if (this.anonymous) {
       this.hoodie = new Hoodie.Share.Hoodie(this.hoodie, this);
     }
