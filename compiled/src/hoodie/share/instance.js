@@ -168,8 +168,8 @@ Hoodie.Share.Instance = (function(_super) {
 
   Instance.prototype._sync = function() {
     var _this = this;
-    return this.save().pipe(this.hoodie.my.store.findAll(this._isMySharedObjectAndChanged).pipe(function(sharedObjectThatChanged) {
-      return _this.hoodie.my.remote.sync(sharedObjectThatChanged).then(_this._handleRemoteChanges);
+    return this.save().pipe(this.hoodie.my.store.findAll(this._isMySharedObjectAndChanged).pipe(function(sharedObjectsThatChanged) {
+      return _this.hoodie.my.remote.sync(sharedObjectsThatChanged).then(_this._handleRemoteChanges);
     }));
   };
 

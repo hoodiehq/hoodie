@@ -12,18 +12,18 @@ class Hoodie.Share.Hoodie extends Hoodie
   constructor: (hoodie, @share) ->
     @store  = hoodie.my.store
     
-    # proxy config to the share object
+    # proxy hoodie.config to the share object
     @config =
       set    : @share.set
       get    : @share.get
       remove : @share.set
     
-    # depending on whether share is continuous, we startSyncing
+    # depending on whether share is continuous, we start
     # continuous synching ... or not.
     @config.set '_account.username', "share/#{@share.id}"
     @config.set '_remote.active',    @share.continuous is true
     
-    # proxy certain request from core hoodie
+    # proxy certain events from core hoodie
     for event in ['store:dirty:idle']
       hoodie.on event, => @trigger event
 

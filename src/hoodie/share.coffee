@@ -20,7 +20,7 @@
 #
 # 2. without an account
 #
-#    If the use has no account, the $share database gets created right from 
+#    If the userrs has no account, the $share database gets created right from 
 #    the frontend. With an adjusted Hoodie class, a special user for the share 
 #    gets created, which will also create a share database with the help of 
 #    the userDB worker. Once the db is created, the docs, filtered by the 
@@ -35,25 +35,45 @@
 #
 # API
 # -----
-# 
+#     
+#     // these are equivalent. They return a share instance 
+#     // with share.id set to 'share_id'
+#     hoodie.share('share_id')
+#     hoodie.share.open('share_id')
+#     
+#     // the rest of the API is a standard store API, with the 
+#     // difference that no type has to be set and the returned
+#     // promises are resolved with share instances instead of
+#     // simple objects
+#     hoodie.share.create(attributes)
+#     hoodie.share.find('share_id')
+#     hoodie.share.findAll()
+#     hoodie.share.findOrCreate(attributes)
+#     hoodie.share.save(id, attributes)
+#     hoodie.share.update(id, changed_attributes)
+#     hoodie.share.updateAll(changed_attributes)
 
 #
 class Hoodie.Share
 
-  # ## Constructor
+  # Constructor
+  # -------------
+
+  # the constructor returns a function, so it can be called
+  # like this: hoodie.share('share_id')
   #
+  # The rest of the API is still available though.
   constructor : (@hoodie) ->
     
-    # allow hoodie.share to be called as function:
-    # hoodie.share('share_id') // opens a share
     api = @open
 
     # set pointer to Hoodie.Share.Instance
     @instance = Hoodie.Share.Instance
 
-    # give all Share instances access to our core hoodie
-    # as shares use custom hoodies, as long as the user
-    # has no account yet
+    # give all Share instances access to our core hoodie.
+    # That's need if the user has no account yet, as shares
+    # use custom hoodie instances then to create shares on
+    # the server
     @instance.hoodie = @hoodie
 
     $.extend api, this
@@ -120,8 +140,8 @@ class Hoodie.Share
 
   # create or overwrite a share
   #
-  update : (id, attributes) ->
-    @hoodie.my.store.update('$share', id, attributes).pipe (object) =>
+  update : (id, changed_attributes) ->
+    @hoodie.my.store.update('$share', id, changed_attributes).pipe (object) =>
       new @instance object
 
 

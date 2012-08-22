@@ -17,7 +17,7 @@ frontend. When the user deletes the $share doc, the worker removes the
 database, the user and all replications</p></li>
 <li><p>without an account</p>
 
-<p>If the use has no account, the $share database gets created right from 
+<p>If the userrs has no account, the $share database gets created right from 
 the frontend. With an adjusted Hoodie class, a special user for the share 
 gets created, which will also create a share database with the help of 
 the userDB worker. Once the db is created, the docs, filtered by the 
@@ -30,11 +30,33 @@ userDB worker will handle the rest.</p>
 $share workers will take over.</p></li>
 </ol>
 
-<h2 id="api">API</h2></div></div></div><div class="segment"><div class="code"><div class="wrapper"><span class="k">class</span> <span class="nx">Hoodie</span><span class="p">.</span><span class="nx">Share</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h2 id="constructor">Constructor</h2></div></div></div><div class="segment"><div class="code"><div class="wrapper">  <span class="nv">constructor : </span><span class="nf">(@hoodie) -&gt;</span>
-    </div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>allow hoodie.share to be called as function:
-hoodie.share('share_id') // opens a share</p></div></div><div class="code"><div class="wrapper">    <span class="nv">api = </span><span class="nx">@open</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>set pointer to Hoodie.Share.Instance</p></div></div><div class="code"><div class="wrapper">    <span class="vi">@instance = </span><span class="nx">Hoodie</span><span class="p">.</span><span class="nx">Share</span><span class="p">.</span><span class="nx">Instance</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>give all Share instances access to our core hoodie
-as shares use custom hoodies, as long as the user
-has no account yet</p></div></div><div class="code"><div class="wrapper">    <span class="vi">@instance.hoodie = </span><span class="nx">@hoodie</span>
+<h2 id="api">API</h2>
+
+<pre><code>// these are equivalent. They return a share instance 
+// with share.id set to 'share_id'
+hoodie.share('share_id')
+hoodie.share.open('share_id')
+
+// the rest of the API is a standard store API, with the 
+// difference that no type has to be set and the returned
+// promises are resolved with share instances instead of
+// simple objects
+hoodie.share.create(attributes)
+hoodie.share.find('share_id')
+hoodie.share.findAll()
+hoodie.share.findOrCreate(attributes)
+hoodie.share.save(id, attributes)
+hoodie.share.update(id, changed_attributes)
+hoodie.share.updateAll(changed_attributes)
+</code></pre></div></div></div><div class="segment"><div class="code"><div class="wrapper"><span class="k">class</span> <span class="nx">Hoodie</span><span class="p">.</span><span class="nx">Share</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h2 id="constructor">Constructor</h2></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>the constructor returns a function, so it can be called
+like this: hoodie.share('share_id')</p>
+
+<p>The rest of the API is still available though.</p></div></div><div class="code"><div class="wrapper">  <span class="nv">constructor : </span><span class="nf">(@hoodie) -&gt;</span>
+    
+    <span class="nv">api = </span><span class="nx">@open</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>set pointer to Hoodie.Share.Instance</p></div></div><div class="code"><div class="wrapper">    <span class="vi">@instance = </span><span class="nx">Hoodie</span><span class="p">.</span><span class="nx">Share</span><span class="p">.</span><span class="nx">Instance</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>give all Share instances access to our core hoodie.
+That's need if the user has no account yet, as shares
+use custom hoodie instances then to create shares on
+the server</p></div></div><div class="code"><div class="wrapper">    <span class="vi">@instance.hoodie = </span><span class="nx">@hoodie</span>
 
     <span class="nx">$</span><span class="p">.</span><span class="nx">extend</span> <span class="nx">api</span><span class="p">,</span> <span class="k">this</span>
 
@@ -54,8 +76,8 @@ has no account yet</p></div></div><div class="code"><div class="wrapper">    <sp
     <span class="nx">@hoodie</span><span class="p">.</span><span class="nx">my</span><span class="p">.</span><span class="nx">store</span><span class="p">.</span><span class="nx">findOrCreate</span><span class="p">(</span><span class="nx">attributes</span><span class="p">).</span><span class="nx">pipe</span> <span class="p">(</span><span class="nx">object</span><span class="p">)</span> <span class="o">=&gt;</span>
       <span class="k">new</span> <span class="nx">@instance</span> <span class="nx">object</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h2 id="save">save</h2></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>create or overwrite a share</p></div></div><div class="code"><div class="wrapper">  <span class="nv">save : </span><span class="nf">(id, attributes) -&gt;</span>
     <span class="nx">@hoodie</span><span class="p">.</span><span class="nx">my</span><span class="p">.</span><span class="nx">store</span><span class="p">.</span><span class="nx">save</span><span class="p">(</span><span class="s1">&#39;$share&#39;</span><span class="p">,</span> <span class="nx">id</span><span class="p">,</span> <span class="nx">attributes</span><span class="p">).</span><span class="nx">pipe</span> <span class="p">(</span><span class="nx">object</span><span class="p">)</span> <span class="o">=&gt;</span>
-      <span class="k">new</span> <span class="nx">@instance</span> <span class="nx">object</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h2 id="update">update</h2></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>create or overwrite a share</p></div></div><div class="code"><div class="wrapper">  <span class="nv">update : </span><span class="nf">(id, attributes) -&gt;</span>
-    <span class="nx">@hoodie</span><span class="p">.</span><span class="nx">my</span><span class="p">.</span><span class="nx">store</span><span class="p">.</span><span class="nx">update</span><span class="p">(</span><span class="s1">&#39;$share&#39;</span><span class="p">,</span> <span class="nx">id</span><span class="p">,</span> <span class="nx">attributes</span><span class="p">).</span><span class="nx">pipe</span> <span class="p">(</span><span class="nx">object</span><span class="p">)</span> <span class="o">=&gt;</span>
+      <span class="k">new</span> <span class="nx">@instance</span> <span class="nx">object</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h2 id="update">update</h2></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>create or overwrite a share</p></div></div><div class="code"><div class="wrapper">  <span class="nv">update : </span><span class="nf">(id, changed_attributes) -&gt;</span>
+    <span class="nx">@hoodie</span><span class="p">.</span><span class="nx">my</span><span class="p">.</span><span class="nx">store</span><span class="p">.</span><span class="nx">update</span><span class="p">(</span><span class="s1">&#39;$share&#39;</span><span class="p">,</span> <span class="nx">id</span><span class="p">,</span> <span class="nx">changed_attributes</span><span class="p">).</span><span class="nx">pipe</span> <span class="p">(</span><span class="nx">object</span><span class="p">)</span> <span class="o">=&gt;</span>
       <span class="k">new</span> <span class="nx">@instance</span> <span class="nx">object</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h2 id="updateall">updateAll</h2></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>update all my existing shares</p></div></div><div class="code"><div class="wrapper">  <span class="nv">updateAll : </span><span class="nf">( changed_attributes ) -&gt;</span>
     <span class="nx">@hoodie</span><span class="p">.</span><span class="nx">my</span><span class="p">.</span><span class="nx">store</span><span class="p">.</span><span class="nx">updateAll</span><span class="p">(</span><span class="s1">&#39;$share&#39;</span><span class="p">,</span> <span class="nx">changed_attributes</span><span class="p">).</span><span class="nx">pipe</span> <span class="p">(</span><span class="nx">objects</span><span class="p">)</span> <span class="o">=&gt;</span>
       <span class="k">new</span> <span class="nx">@instance</span> <span class="nx">obj</span> <span class="k">for</span> <span class="nx">obj</span> <span class="k">in</span> <span class="nx">objects</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h2 id="destroy">destroy</h2></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>deletes an existing share</p></div></div><div class="code"><div class="wrapper">  <span class="nv">destroy : </span><span class="nf">(id) -&gt;</span>

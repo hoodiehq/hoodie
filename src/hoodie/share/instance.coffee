@@ -260,8 +260,8 @@ class Hoodie.Share.Instance extends Hoodie.RemoteStore
   _sync : =>
     @save()
     .pipe @hoodie.my.store.findAll(@_isMySharedObjectAndChanged)
-    .pipe (sharedObjectThatChanged) =>
-      @hoodie.my.remote.sync(sharedObjectThatChanged)
+    .pipe (sharedObjectsThatChanged) =>
+      @hoodie.my.remote.sync(sharedObjectsThatChanged)
       .then @_handleRemoteChanges
 
 

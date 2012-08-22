@@ -65,9 +65,9 @@ Hoodie.Share = (function() {
     });
   };
 
-  Share.prototype.update = function(id, attributes) {
+  Share.prototype.update = function(id, changed_attributes) {
     var _this = this;
-    return this.hoodie.my.store.update('$share', id, attributes).pipe(function(object) {
+    return this.hoodie.my.store.update('$share', id, changed_attributes).pipe(function(object) {
       return new _this.instance(object);
     });
   };
