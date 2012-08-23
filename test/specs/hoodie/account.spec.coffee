@@ -12,7 +12,7 @@ describe "Hoodie.Account", ->
     spyOn(@hoodie, "trigger")
 
 
-  describe ".constructor()", ->
+  describe "constructor", ->
     beforeEach ->
       spyOn(Hoodie.Account.prototype, "authenticate")
       spyOn(Hoodie.Account.prototype, "on")
@@ -446,7 +446,7 @@ describe "Hoodie.Account", ->
   # /.on(event, callback)
   
   
-  describe ".db", ->
+  describe ".db()", ->
     _when "account.owner is 'owner_hash123'", ->
       beforeEach ->
         @account.owner = 'owner_hash123'
@@ -487,7 +487,7 @@ describe "Hoodie.Account", ->
           expect(promise).toBeResolvedWith @response
   # /.fetch()
   
-  describe "destroy()", ->
+  describe ".destroy()", ->
     beforeEach ->
       spyOn(@account, "fetch").andReturn @hoodie.defer().resolve().promise()
       @account.username = 'joe@example.com'
@@ -497,9 +497,12 @@ describe "Hoodie.Account", ->
       @account.destroy()
       expect(@account.fetch).wasCalled()
     
-    it "should send a DELETE request to /_users/org.couchdb.user%3Ajoe%40example.com?rev=1-234", ->
+    it "should send a PUT request to /_users/org.couchdb.user%3Ajoe%40example.com", ->
       @account.destroy()
-      expect(@hoodie.request).wasCalledWith 'DELETE', '/_users/org.couchdb.user%3Ajoe%40example.com?rev=1-234'
+      expect(@hoodie.request).wasCalledWith 'PUT', '/_users/org.couchdb.user%3Ajoe%40example.com'
+        data : JSON.stringify
+          _rev     : '1-234'
+          _deleted : true
+        contentType : 'application/json' 
   # /destroy()
 # /Hoodie.Account
-

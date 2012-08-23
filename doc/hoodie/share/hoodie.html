@@ -9,10 +9,9 @@
       <span class="nv">account : </span><span class="nx">Hoodie</span><span class="p">.</span><span class="nx">Share</span><span class="p">.</span><span class="nx">Account</span>
       <span class="nv">remote  : </span><span class="nx">Hoodie</span><span class="p">.</span><span class="nx">Share</span><span class="p">.</span><span class="nx">Remote</span>
   
-  <span class="nv">constructor: </span><span class="nf">(hoodie, @share) -&gt;</span>
-    <span class="vi">@store  = </span><span class="nx">hoodie</span><span class="p">.</span><span class="nx">my</span><span class="p">.</span><span class="nx">store</span>
-    </div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>proxy hoodie.config to the share object</p></div></div><div class="code"><div class="wrapper">    <span class="vi">@my =</span>
-      <span class="nv">config:</span>
+  <span class="nv">constructor: </span><span class="nf">(hoodie, @share) -&gt;</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>proxy hoodie.config to the share object</p></div></div><div class="code"><div class="wrapper">    <span class="vi">@my =</span>
+      <span class="nv">store  : </span><span class="nx">hoodie</span><span class="p">.</span><span class="nx">my</span><span class="p">.</span><span class="nx">store</span>
+      <span class="nv">config :</span>
         <span class="nv">set    : </span><span class="nx">@share</span><span class="p">.</span><span class="nx">set</span>
         <span class="nv">get    : </span><span class="nx">@share</span><span class="p">.</span><span class="nx">get</span>
         <span class="nv">remove : </span><span class="nx">@share</span><span class="p">.</span><span class="nx">set</span>

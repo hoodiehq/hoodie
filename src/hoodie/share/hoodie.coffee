@@ -12,11 +12,10 @@ class Hoodie.Share.Hoodie extends Hoodie
       remote  : Hoodie.Share.Remote
   
   constructor: (hoodie, @share) ->
-    @store  = hoodie.my.store
-    
     # proxy hoodie.config to the share object
     @my =
-      config:
+      store  : hoodie.my.store
+      config :
         set    : @share.set
         get    : @share.get
         remove : @share.set

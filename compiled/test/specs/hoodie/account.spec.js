@@ -9,7 +9,7 @@ describe("Hoodie.Account", function() {
     spyOn(this.hoodie, "request").andReturn(this.requestDefer.promise());
     return spyOn(this.hoodie, "trigger");
   });
-  describe(".constructor()", function() {
+  describe("constructor", function() {
     beforeEach(function() {
       spyOn(Hoodie.Account.prototype, "authenticate");
       return spyOn(Hoodie.Account.prototype, "on");
@@ -541,7 +541,7 @@ describe("Hoodie.Account", function() {
       return (expect(this.hoodie.on)).wasCalledWith('account:funky', party);
     });
   });
-  describe(".db", function() {
+  describe(".db()", function() {
     return _when("account.owner is 'owner_hash123'", function() {
       beforeEach(function() {
         return this.account.owner = 'owner_hash123';
@@ -597,7 +597,7 @@ describe("Hoodie.Account", function() {
       });
     });
   });
-  return describe("destroy()", function() {
+  return describe(".destroy()", function() {
     beforeEach(function() {
       spyOn(this.account, "fetch").andReturn(this.hoodie.defer().resolve().promise());
       this.account.username = 'joe@example.com';
@@ -609,9 +609,15 @@ describe("Hoodie.Account", function() {
       this.account.destroy();
       return expect(this.account.fetch).wasCalled();
     });
-    return it("should send a DELETE request to /_users/org.couchdb.user%3Ajoe%40example.com?rev=1-234", function() {
+    return it("should send a PUT request to /_users/org.couchdb.user%3Ajoe%40example.com", function() {
       this.account.destroy();
-      return expect(this.hoodie.request).wasCalledWith('DELETE', '/_users/org.couchdb.user%3Ajoe%40example.com?rev=1-234');
+      return expect(this.hoodie.request).wasCalledWith('PUT', '/_users/org.couchdb.user%3Ajoe%40example.com', {
+        data: JSON.stringify({
+          _rev: '1-234',
+          _deleted: true
+        }),
+        contentType: 'application/json'
+      });
     });
   });
 });
