@@ -6,8 +6,10 @@
 class Hoodie.Share.Hoodie extends Hoodie
   
   modules : ->
-    account : Hoodie.Share.Account
-    remote  : Hoodie.Share.Remote
+
+    my :
+      account : Hoodie.Share.Account
+      remote  : Hoodie.Share.Remote
   
   constructor: (hoodie, @share) ->
     @store  = hoodie.my.store
@@ -21,9 +23,9 @@ class Hoodie.Share.Hoodie extends Hoodie
     
     # depending on whether share is continuous, we start
     # continuous synching ... or not.
-    @config.set '_account.username', "share/#{@share.id}"
-    @config.set '_account.owner',    hoodie.my.account.owner
-    @config.set '_remote.active',    @share.continuous is true
+    @my.config.set '_account.username', "share/#{@share.id}"
+    @my.config.set '_account.owner',    hoodie.my.account.owner
+    @my.config.set '_remote.active',    @share.continuous is true
     
     # proxy certain events from core hoodie
     for event in ['store:dirty:idle']

@@ -151,7 +151,7 @@ Hoodie = (function(_super) {
         _results.push(context[instanceName] = new Module(this));
       } else {
         namespace = instanceName;
-        context[namespace] = {};
+        context[namespace] || (context[namespace] = {});
         _results.push(this._loadModules(context[namespace], modules[namespace]));
       }
     }
@@ -398,7 +398,11 @@ Hoodie.Account = (function() {
     return this.fetch().pipe(function() {
       var key;
       key = "" + _this._prefix + ":" + _this.username;
-      return _this.hoodie.request('DELETE', "/_users/" + (encodeURIComponent(key)) + "?rev=" + _this._doc._rev);
+      _this._doc._deleted = true;
+      return _this.hoodie.request('PUT', "/_users/" + (encodeURIComponent(key)), {
+        data: JSON.stringify(_this._doc),
+        contentType: 'application/json'
+      });
     });
   };
 
@@ -1775,8 +1779,10 @@ Hoodie.Share.Hoodie = (function(_super) {
 
   Hoodie.prototype.modules = function() {
     return {
-      account: Hoodie.Share.Account,
-      remote: Hoodie.Share.Remote
+      my: {
+        account: Hoodie.Share.Account,
+        remote: Hoodie.Share.Remote
+      }
     };
   };
 
@@ -1792,9 +1798,9 @@ Hoodie.Share.Hoodie = (function(_super) {
         remove: this.share.set
       }
     };
-    this.config.set('_account.username', "share/" + this.share.id);
-    this.config.set('_account.owner', hoodie.my.account.owner);
-    this.config.set('_remote.active', this.share.continuous === true);
+    this.my.config.set('_account.username', "share/" + this.share.id);
+    this.my.config.set('_account.owner', hoodie.my.account.owner);
+    this.my.config.set('_remote.active', this.share.continuous === true);
     _ref = ['store:dirty:idle'];
     for (_i = 0, _len = _ref.length; _i < _len; _i++) {
       event = _ref[_i];

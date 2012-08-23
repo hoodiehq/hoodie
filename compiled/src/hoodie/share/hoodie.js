@@ -8,8 +8,10 @@ Hoodie.Share.Hoodie = (function(_super) {
 
   Hoodie.prototype.modules = function() {
     return {
-      account: Hoodie.Share.Account,
-      remote: Hoodie.Share.Remote
+      my: {
+        account: Hoodie.Share.Account,
+        remote: Hoodie.Share.Remote
+      }
     };
   };
 
@@ -25,9 +27,9 @@ Hoodie.Share.Hoodie = (function(_super) {
         remove: this.share.set
       }
     };
-    this.config.set('_account.username', "share/" + this.share.id);
-    this.config.set('_account.owner', hoodie.my.account.owner);
-    this.config.set('_remote.active', this.share.continuous === true);
+    this.my.config.set('_account.username', "share/" + this.share.id);
+    this.my.config.set('_account.owner', hoodie.my.account.owner);
+    this.my.config.set('_remote.active', this.share.continuous === true);
     _ref = ['store:dirty:idle'];
     for (_i = 0, _len = _ref.length; _i < _len; _i++) {
       event = _ref[_i];

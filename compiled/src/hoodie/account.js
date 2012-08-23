@@ -235,7 +235,11 @@ Hoodie.Account = (function() {
     return this.fetch().pipe(function() {
       var key;
       key = "" + _this._prefix + ":" + _this.username;
-      return _this.hoodie.request('DELETE', "/_users/" + (encodeURIComponent(key)) + "?rev=" + _this._doc._rev);
+      _this._doc._deleted = true;
+      return _this.hoodie.request('PUT', "/_users/" + (encodeURIComponent(key)), {
+        data: JSON.stringify(_this._doc),
+        contentType: 'application/json'
+      });
     });
   };
 

@@ -255,7 +255,10 @@ class Hoodie.Account
   destroy: ->
     @fetch().pipe =>
       key = "#{@_prefix}:#{@username}"
-      @hoodie.request 'DELETE', "/_users/#{encodeURIComponent key}?rev=#{@_doc._rev}"
+      @_doc._deleted = true
+      @hoodie.request 'PUT', "/_users/#{encodeURIComponent key}",
+        data        : JSON.stringify @_doc
+        contentType : 'application/json'
 
 
   # ## PRIVATE

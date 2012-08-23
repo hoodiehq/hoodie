@@ -85,6 +85,6 @@ class Hoodie extends Events
         
       else
         namespace = instanceName
-        context[namespace] = {}
+        context[namespace] or= {}
         @_loadModules context[namespace], modules[namespace]
       ###

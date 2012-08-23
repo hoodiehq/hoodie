@@ -76,7 +76,7 @@ Hoodie = (function(_super) {
         _results.push(context[instanceName] = new Module(this));
       } else {
         namespace = instanceName;
-        context[namespace] = {};
+        context[namespace] || (context[namespace] = {});
         _results.push(this._loadModules(context[namespace], modules[namespace]));
       }
     }
