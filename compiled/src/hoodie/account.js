@@ -255,8 +255,7 @@ Hoodie.Account = (function() {
 
   Account.prototype._handleSignOut = function() {
     delete this.username;
-    this.hoodie.my.config.remove('_account.username');
-    this.hoodie.my.config.remove('_account.owner');
+    this.hoodie.my.config.clear();
     return this._authenticated = false;
   };
 

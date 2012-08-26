@@ -16,10 +16,6 @@ Hoodie.Share.Account = (function(_super) {
     return this._shareAuthPromise;
   };
 
-  Account.prototype.signUp = function() {
-    return this._shareAuthPromise;
-  };
-
   Account.prototype.signIn = function() {
     return this._shareAuthPromise;
   };

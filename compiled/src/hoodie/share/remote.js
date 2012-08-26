@@ -11,7 +11,12 @@ Hoodie.Share.Remote = (function(_super) {
     this._handlePushSuccess = __bind(this._handlePushSuccess, this);
 
     this.push = __bind(this.push, this);
-    return Remote.__super__.constructor.apply(this, arguments);
+    Remote.__super__.constructor.apply(this, arguments);
+    this.basePath = "/" + (encodeURIComponent(this.hoodie.my.account.db()));
+    if (this.hoodie.share.continuous === true) {
+      this._sync = true;
+      this.connect();
+    }
   }
 
   Remote.prototype.push = function(docs) {
@@ -34,13 +39,9 @@ Hoodie.Share.Remote = (function(_super) {
   };
 
   Remote.prototype._pullUrl = function() {
-    var since;
-    since = this.hoodie.my.config.get('_remote.seq') || 0;
-    if (this.active) {
-      return "/" + (encodeURIComponent(this.hoodie.my.account.db())) + "/_changes?filter=%24share_" + this.hoodie.share.id + "/owned&include_docs=true&since=" + since + "&heartbeat=10000&feed=longpoll";
-    } else {
-      return "/" + (encodeURIComponent(this.hoodie.my.account.db())) + "/_changes?filter=%24share_" + this.hoodie.share.id + "/owned&include_docs=true&since=" + since;
-    }
+    var url;
+    url = Remote.__super__._pullUrl.apply(this, arguments);
+    return "" + url + "&filter=filters/share";
   };
 
   Remote.prototype._addRevisionTo = function(obj) {

@@ -62,8 +62,6 @@ describe "Hoodie.Account", ->
       account = new Hoodie.Account @hoodie
       expect(@account.on).wasCalledWith 'signout', account._handleSignOut
   # /.constructor()
-  
-  
 
   describe "event handlers", ->
     describe "._handleSignIn(@username)", ->
@@ -90,15 +88,10 @@ describe "Hoodie.Account", ->
         @account._handleSignOut {"ok":true}
         do expect(@account.username).toBeUndefined
         
-      it "should remove @username from persistent config", ->
-        spyOn(@hoodie.my.config, "remove")
+      it "should clear config", ->
+        spyOn(@hoodie.my.config, "clear")
         @account._handleSignOut {"ok":true}
-        expect(@hoodie.my.config.remove).wasCalledWith '_account.username'
-
-      it "should remove @owner from persistent config", ->
-        spyOn(@hoodie.my.config, "remove")
-        @account._handleSignOut {"ok":true}
-        expect(@hoodie.my.config.remove).wasCalledWith '_account.owner'
+        expect(@hoodie.my.config.clear).wasCalled()
         
       it "should set _authenticated to false", ->
         @account._authenticated = true

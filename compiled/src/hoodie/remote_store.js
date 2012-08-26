@@ -209,7 +209,7 @@ Hoodie.RemoteStore = (function(_super) {
     var since;
     since = this.getSinceNr();
     if (this.isContinuouslyPulling()) {
-      return "/_changes?include_docs=true&heartbeat=10000&feed=longpoll&since=" + since;
+      return "/_changes?include_docs=true&since=" + since + "&heartbeat=10000&feed=longpoll";
     } else {
       return "/_changes?include_docs=true&since=" + since;
     }

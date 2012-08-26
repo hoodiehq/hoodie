@@ -418,8 +418,7 @@ Hoodie.Account = (function() {
 
   Account.prototype._handleSignOut = function() {
     delete this.username;
-    this.hoodie.my.config.remove('_account.username');
-    this.hoodie.my.config.remove('_account.owner');
+    this.hoodie.my.config.clear();
     return this._authenticated = false;
   };
 
@@ -839,7 +838,7 @@ Hoodie.RemoteStore = (function(_super) {
     var since;
     since = this.getSinceNr();
     if (this.isContinuouslyPulling()) {
-      return "/_changes?include_docs=true&heartbeat=10000&feed=longpoll&since=" + since;
+      return "/_changes?include_docs=true&since=" + since + "&heartbeat=10000&feed=longpoll";
     } else {
       return "/_changes?include_docs=true&since=" + since;
     }
@@ -1800,7 +1799,7 @@ Hoodie.Share.Hoodie = (function(_super) {
     };
     this.my.config.set('_account.username', "share/" + this.share.id);
     this.my.config.set('_account.owner', hoodie.my.account.owner);
-    this.my.config.set('_remote.active', this.share.continuous === true);
+    this.my.config.set('_remote.sync', this.share.continuous === true);
     _ref = ['store:dirty:idle'];
     for (_i = 0, _len = _ref.length; _i < _len; _i++) {
       event = _ref[_i];
@@ -1858,10 +1857,6 @@ Hoodie.Share.Account = (function(_super) {
     return this._shareAuthPromise;
   };
 
-  Account.prototype.signUp = function() {
-    return this._shareAuthPromise;
-  };
-
   Account.prototype.signIn = function() {
     return this._shareAuthPromise;
   };
@@ -1890,7 +1885,12 @@ Hoodie.Share.Remote = (function(_super) {
     this._handlePushSuccess = __bind(this._handlePushSuccess, this);
 
     this.push = __bind(this.push, this);
-    return Remote.__super__.constructor.apply(this, arguments);
+    Remote.__super__.constructor.apply(this, arguments);
+    this.basePath = "/" + (encodeURIComponent(this.hoodie.my.account.db()));
+    if (this.hoodie.share.continuous === true) {
+      this._sync = true;
+      this.connect();
+    }
   }
 
   Remote.prototype.push = function(docs) {
@@ -1913,13 +1913,9 @@ Hoodie.Share.Remote = (function(_super) {
   };
 
   Remote.prototype._pullUrl = function() {
-    var since;
-    since = this.hoodie.my.config.get('_remote.seq') || 0;
-    if (this.active) {
-      return "/" + (encodeURIComponent(this.hoodie.my.account.db())) + "/_changes?filter=%24share_" + this.hoodie.share.id + "/owned&include_docs=true&since=" + since + "&heartbeat=10000&feed=longpoll";
-    } else {
-      return "/" + (encodeURIComponent(this.hoodie.my.account.db())) + "/_changes?filter=%24share_" + this.hoodie.share.id + "/owned&include_docs=true&since=" + since;
-    }
+    var url;
+    url = Remote.__super__._pullUrl.apply(this, arguments);
+    return "" + url + "&filter=filters/share";
   };
 
   Remote.prototype._addRevisionTo = function(obj) {

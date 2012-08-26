@@ -51,3 +51,4 @@ Mocks.Hoodie = ->
       set : ->
       get : ->
       remove : ->
+      clear : ->

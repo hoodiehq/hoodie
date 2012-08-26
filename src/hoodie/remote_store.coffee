@@ -279,7 +279,7 @@ class Hoodie.RemoteStore extends Hoodie.Store
   _pullUrl : ->
     since = @getSinceNr()
     if @isContinuouslyPulling() # make a long poll request
-      "/_changes?include_docs=true&heartbeat=10000&feed=longpoll&since=#{since}"
+      "/_changes?include_docs=true&since=#{since}&heartbeat=10000&feed=longpoll"
     else
       "/_changes?include_docs=true&since=#{since}"
   

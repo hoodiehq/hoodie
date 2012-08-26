@@ -29,7 +29,7 @@ Hoodie.Share.Hoodie = (function(_super) {
     };
     this.my.config.set('_account.username', "share/" + this.share.id);
     this.my.config.set('_account.owner', hoodie.my.account.owner);
-    this.my.config.set('_remote.active', this.share.continuous === true);
+    this.my.config.set('_remote.sync', this.share.continuous === true);
     _ref = ['store:dirty:idle'];
     for (_i = 0, _len = _ref.length; _i < _len; _i++) {
       event = _ref[_i];

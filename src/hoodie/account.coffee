@@ -1,7 +1,7 @@
-#
 # Hoodie.Account
+# ================
 #
-# write something here ...
+# tell something smart in here.
 #
 
 class Hoodie.Account
@@ -276,6 +276,5 @@ class Hoodie.Account
   #
   _handleSignOut: =>
     delete @username
-    @hoodie.my.config.remove '_account.username'
-    @hoodie.my.config.remove '_account.owner'
+    @hoodie.my.config.clear()
     @_authenticated = false

@@ -24,7 +24,7 @@ class Hoodie.Share.Hoodie extends Hoodie
     # continuous synching ... or not.
     @my.config.set '_account.username', "share/#{@share.id}"
     @my.config.set '_account.owner',    hoodie.my.account.owner
-    @my.config.set '_remote.active',    @share.continuous is true
+    @my.config.set '_remote.sync',      @share.continuous is true
     
     # proxy certain events from core hoodie
     for event in ['store:dirty:idle']

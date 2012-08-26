@@ -319,7 +319,7 @@ describe "Hoodie.RemoteStore", ->
         expect(@remote.request).wasCalled()
         [method, path] = @remote.request.mostRecentCall.args
         expect(method).toBe 'GET'
-        expect(path).toBe '/_changes?include_docs=true&heartbeat=10000&feed=longpoll&since=0'
+        expect(path).toBe '/_changes?include_docs=true&since=0&heartbeat=10000&feed=longpoll'
         
       it "should set a timeout to restart the pull request", ->
         @remote.pull()

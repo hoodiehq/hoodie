@@ -361,7 +361,7 @@ describe("Hoodie.RemoteStore", function() {
         expect(this.remote.request).wasCalled();
         _ref = this.remote.request.mostRecentCall.args, method = _ref[0], path = _ref[1];
         expect(method).toBe('GET');
-        return expect(path).toBe('/_changes?include_docs=true&heartbeat=10000&feed=longpoll&since=0');
+        return expect(path).toBe('/_changes?include_docs=true&since=0&heartbeat=10000&feed=longpoll');
       });
       return it("should set a timeout to restart the pull request", function() {
         this.remote.pull();

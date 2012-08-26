@@ -101,19 +101,12 @@ describe("Hoodie.Account", function() {
         });
         return expect(this.account.username).toBeUndefined();
       });
-      it("should remove @username from persistent config", function() {
-        spyOn(this.hoodie.my.config, "remove");
+      it("should clear config", function() {
+        spyOn(this.hoodie.my.config, "clear");
         this.account._handleSignOut({
           "ok": true
         });
-        return expect(this.hoodie.my.config.remove).wasCalledWith('_account.username');
-      });
-      it("should remove @owner from persistent config", function() {
-        spyOn(this.hoodie.my.config, "remove");
-        this.account._handleSignOut({
-          "ok": true
-        });
-        return expect(this.hoodie.my.config.remove).wasCalledWith('_account.owner');
+        return expect(this.hoodie.my.config.clear).wasCalled();
       });
       return it("should set _authenticated to false", function() {
         this.account._authenticated = true;
