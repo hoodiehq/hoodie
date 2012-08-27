@@ -35,7 +35,7 @@ we send the creds directly as authorization header</p></div></div><div class="co
       <span class="nv">crossDomain : </span><span class="kc">true</span>
       <span class="nv">dataType    : </span><span class="s1">&#39;json&#39;</span>
       
-    <span class="nx">unless</span> <span class="nx">type</span> <span class="o">is</span> <span class="s1">&#39;PUT&#39;</span> <span class="c1"># no authentication header for &quot;signup&quot; request</span>
+    <span class="nx">unless</span> <span class="nx">@share</span><span class="p">.</span><span class="nx">_userRev</span> <span class="c1"># no authentication header for &quot;signup&quot; request</span>
       <span class="nv">hash = </span><span class="nx">btoa</span> <span class="s2">&quot;share/#{@share.id}:#{@share.password or &#39;&#39;}&quot;</span>
       <span class="nv">auth = </span><span class="s2">&quot;Basic #{hash}&quot;</span>
       

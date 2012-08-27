@@ -27,12 +27,12 @@ Hoodie.Share.Remote = (function(_super) {
       var obj;
       if (!$.isArray(docs)) {
         docs = (function() {
-          var _i, _len, _ref, _results;
+          var _i, _len, _ref, _ref1, _results;
           _ref = this.hoodie.my.store.changedDocs();
           _results = [];
           for (_i = 0, _len = _ref.length; _i < _len; _i++) {
             obj = _ref[_i];
-            if (obj.id === this.hoodie.share.id || obj.$shares && ~obj.$shares.indexOf(this.hoodie.share.id)) {
+            if (obj.id === this.hoodie.share.id || ((_ref1 = obj.$shares) != null ? _ref1[this.hoodie.share.id] : void 0)) {
               _results.push(obj);
             }
           }
@@ -72,45 +72,39 @@ Hoodie.Share.Remote = (function(_super) {
     return "" + url + "&filter=filters/share";
   };
 
-  Remote.prototype._addRevisionTo = function(obj) {
-    var doc, key, _ref;
-    if (obj.$docsToRemove) {
-      console.log("obj.$docsToRemove");
-      console.log(obj.$docsToRemove);
-      _ref = obj.$docsToRemove;
-      for (key in _ref) {
-        doc = _ref[key];
-        this._addRevisionTo(doc);
-      }
-    }
-    return Remote.__super__._addRevisionTo.call(this, obj);
-  };
-
   Remote.prototype._handlePushSuccess = function(docs, pushedDocs) {
     var _this = this;
     return function() {
-      var doc, i, id, key, pushedDoc, type, update, _i, _j, _len, _len1, _ref, _ref1;
-      for (_i = 0, _len = pushedDocs.length; _i < _len; _i++) {
-        pushedDoc = pushedDocs[_i];
-        if (pushedDoc.$docsToRemove) {
-          _ref = pushedDoc.$docsToRemove;
-          for (key in _ref) {
-            doc = _ref[key];
-            _ref1 = key.split(/\//), type = _ref1[0], id = _ref1[1];
-            update = {
-              _rev: doc._rev
-            };
-            for (i = _j = 0, _len1 = docs.length; _j < _len1; i = ++_j) {
-              doc = docs[i];
-              _this.hoodie.my.store.update(type, id, update, {
-                remote: true
-              });
-            }
+      var doc, update, _i, _len, _ref, _ref1;
+      for (_i = 0, _len = docs.length; _i < _len; _i++) {
+        doc = docs[_i];
+        if (((_ref = doc.$shares) != null ? _ref[_this.hoodie.share.id] : void 0) === false) {
+          if ((_ref1 = doc.$shares) != null) {
+            delete _ref1[_this.hoodie.share.id];
           }
+          if ($.isEmptyObject(doc.$shares)) {
+            doc.$shares = void 0;
+          }
+          update = {
+            $shares: doc.$shares
+          };
+          _this.hoodie.my.store.update(type, id, update, {
+            remote: true
+          });
         }
       }
       return Remote.__super__._handlePushSuccess.call(_this, docs, pushedDocs)();
     };
+  };
+
+  Remote.prototype._parseForRemote = function(obj) {
+    var attributes;
+    attributes = Remote.__super__._parseForRemote.apply(this, arguments);
+    attributes._id = "$share/" + this.hoodie.share.id + "/" + attributes._id;
+    if (attributes.$shares[this.hoodie.share.id] === false) {
+      attributes._deleted = true;
+    }
+    return this.hoodie.share;
   };
 
   return Remote;

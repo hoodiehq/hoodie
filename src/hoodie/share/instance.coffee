@@ -1,7 +1,8 @@
 class Hoodie.Share.Instance extends Hoodie.RemoteStore
 
-  # ## constructor
-  #
+  # constructor
+  # -------------
+  
   # initializes a new share & returns a promise.
   #
   # ### Options
@@ -63,8 +64,9 @@ class Hoodie.Share.Instance extends Hoodie.RemoteStore
       @hoodie = new Hoodie.Share.Hoodie @hoodie, this 
   
   
-  # ## set
-  #
+  # set
+  # -----
+  
   # set an attribute, without making the change persistent yet.
   # alternatively, a hash of key/value pairs can be passed
   _memory: {}
@@ -80,15 +82,17 @@ class Hoodie.Share.Instance extends Hoodie.RemoteStore
     return undefined
     
   
-  # ## get
-  #
+  # get
+  # -----
+  
   # get an attribute
   get : (key) =>
     @[key]
   
   
-  # ## save
-  #
+  # save
+  # ------
+  
   # make the made with `.set` persistent. An optional
   # key/value update can be passed as first argument
   save : (update = {}, options) ->
@@ -108,8 +112,9 @@ class Hoodie.Share.Instance extends Hoodie.RemoteStore
     return defer.promise()
     
   
-  # ## add
-  #
+  # add
+  # -----
+  
   # add one or multiple objects to share. A promise that will
   # resolve with an array of objects can be passed as well.
   #
@@ -122,8 +127,9 @@ class Hoodie.Share.Instance extends Hoodie.RemoteStore
     @toggle objects, true
     
       
-  # ## remove
-  #
+  # remove
+  # --------
+  
   # remove one or multiple objects from share. A promise that will
   # resolve with an array of objects can be passed as well.
   #
@@ -136,7 +142,8 @@ class Hoodie.Share.Instance extends Hoodie.RemoteStore
     @toggle objects, false
   
   
-  # ## toggle ()
+  # toggle
+  # --------
 
   # add or remove, depending on passed flag or current state
   toggle: (objects, doAdd) ->
@@ -154,7 +161,8 @@ class Hoodie.Share.Instance extends Hoodie.RemoteStore
     @hoodie.my.store.updateAll(objects, updateMethod)
     
   
-  # ## sync
+  # sync
+  # ------
 
   #
   # 1. find all objects that belong to share and that have local changes
@@ -167,62 +175,59 @@ class Hoodie.Share.Instance extends Hoodie.RemoteStore
     .pipe (sharedObjectsThatChanged) =>
       @hoodie.my.remote.sync(sharedObjectsThatChanged)
       .then @_handleRemoteChanges
+
+
+  # destroy
+  # ---------
+
+  # remove all objects from share, then destroy share itself
+  destroy: =>
+    @remove( @hoodie.my.store.findAll(@_isMySharedObject) )
+    .then =>
+      @hoodie.my.store.destroy("$share", @id)
+
+      if @anonymous
+        @hoodie.my.account.destroy()
   
   
-  # ## hasAccount
+  # hasAccount
+  # ------------
 
   # returns true if either user or the share has a CouchDB account
   hasAccount: ->
     not @anonymous or @_userRev?
     
     
-  # ## Private
+  # Private
+  # ---------
 
+  # _add
+  #
   # returns a hash update to update the passed object
   # so that it gets added to the share
   _add: (obj) => 
-    newValue = if obj.$shares
-      obj.$shares.concat @id unless ~obj.$shares.indexOf(@id)
-    else
-      [@id]
-
-    if newValue
-      delete @$docsToRemove["#{obj.type}/#{obj.id}"]
-      @set '$docsToRemove', @$docsToRemove 
+    obj.$shares or= {}
+    obj.$shares[@id] = true
 
     $shares: newValue
 
   
-  # returns a hash update to update the passed object
-  # so that it gets removed from the current share
+  # _remove
   #
-  # on top of that, the object gets stored in the $docsToRemove
-  # property. These will removed from the share database on next sync
-  $docsToRemove: {}
+  # returns a hash update to update the passed object
+  # so that it gets removed from the current share 
   _remove : (obj) =>
-    try
-      $shares = obj.$shares
-      
-      if ~(idx = $shares.indexOf @id)
-        $shares.splice(idx, 1) 
+    return {} unless obj.$shares
 
-        # TODO:
-        # when anonymous, use $docsToRemove and push the deletion
-        # manually, so that the _rev stamps do get updated.
-        # When user signes up, rename the attribut to $docsToRemove,
-        # so that the worker can take over
-        #
-        # Alternative: find a way to create a new revions locally.
-        @$docsToRemove["#{obj.type}/#{obj.id}"] = _rev: obj._rev
-        @set '$docsToRemove', @$docsToRemove
-
-        $shares: if $shares.length then $shares else undefined
+    delete obj.$shares[@id]
+    obj.$shares = undefined if $.isEmptyObject obj.$shares
+    $shares: obj.$shares
       
 
   # depending on whether the passed object belongs to the
   # share or not, an update will be returned to add/remove 
   # it to/from share
-  _toggle : => 
+  _toggle : (obj) => 
     try
       doAdd = ~obj.$shares.indexOf @id
     catch e
@@ -233,10 +238,14 @@ class Hoodie.Share.Instance extends Hoodie.RemoteStore
     else
       @_remove(obj)
 
-
-  # I appologize for this mess of code. Yes, you're right. ~gr2m
+  # all objects which $shares hash has share.id as key
+  _isMySharedObject: (obj) =>
+    obj.$shares?[@id]?
+  
+  # an object belongs to Share if it has the same id (its the actual share object)
+  # or its $shares hash has share.id as key
   _isMySharedObjectAndChanged: (obj) =>
-    belongsToMe = obj.id is @id or obj.$shares and ~obj.$shares.indexOf(@id)
+    belongsToMe = obj.id is @id or obj.$shares?[@id]?
     return belongsToMe and @hoodie.my.store.isDirty(obj.type, obj.id)
 
   #

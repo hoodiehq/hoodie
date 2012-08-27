@@ -1827,7 +1827,7 @@ Hoodie.Share.Hoodie = (function(_super) {
       crossDomain: true,
       dataType: 'json'
     };
-    if (type !== 'PUT') {
+    if (!this.share._userRev) {
       hash = btoa("share/" + this.share.id + ":" + (this.share.password || ''));
       auth = "Basic " + hash;
       $.extend(defaults, {
@@ -1904,12 +1904,12 @@ Hoodie.Share.Remote = (function(_super) {
       var obj;
       if (!$.isArray(docs)) {
         docs = (function() {
-          var _i, _len, _ref, _results;
+          var _i, _len, _ref, _ref1, _results;
           _ref = this.hoodie.my.store.changedDocs();
           _results = [];
           for (_i = 0, _len = _ref.length; _i < _len; _i++) {
             obj = _ref[_i];
-            if (obj.id === this.hoodie.share.id || obj.$shares && ~obj.$shares.indexOf(this.hoodie.share.id)) {
+            if (obj.id === this.hoodie.share.id || ((_ref1 = obj.$shares) != null ? _ref1[this.hoodie.share.id] : void 0)) {
               _results.push(obj);
             }
           }
@@ -1949,45 +1949,39 @@ Hoodie.Share.Remote = (function(_super) {
     return "" + url + "&filter=filters/share";
   };
 
-  Remote.prototype._addRevisionTo = function(obj) {
-    var doc, key, _ref;
-    if (obj.$docsToRemove) {
-      console.log("obj.$docsToRemove");
-      console.log(obj.$docsToRemove);
-      _ref = obj.$docsToRemove;
-      for (key in _ref) {
-        doc = _ref[key];
-        this._addRevisionTo(doc);
-      }
-    }
-    return Remote.__super__._addRevisionTo.call(this, obj);
-  };
-
   Remote.prototype._handlePushSuccess = function(docs, pushedDocs) {
     var _this = this;
     return function() {
-      var doc, i, id, key, pushedDoc, type, update, _i, _j, _len, _len1, _ref, _ref1;
-      for (_i = 0, _len = pushedDocs.length; _i < _len; _i++) {
-        pushedDoc = pushedDocs[_i];
-        if (pushedDoc.$docsToRemove) {
-          _ref = pushedDoc.$docsToRemove;
-          for (key in _ref) {
-            doc = _ref[key];
-            _ref1 = key.split(/\//), type = _ref1[0], id = _ref1[1];
-            update = {
-              _rev: doc._rev
-            };
-            for (i = _j = 0, _len1 = docs.length; _j < _len1; i = ++_j) {
-              doc = docs[i];
-              _this.hoodie.my.store.update(type, id, update, {
-                remote: true
-              });
-            }
+      var doc, update, _i, _len, _ref, _ref1;
+      for (_i = 0, _len = docs.length; _i < _len; _i++) {
+        doc = docs[_i];
+        if (((_ref = doc.$shares) != null ? _ref[_this.hoodie.share.id] : void 0) === false) {
+          if ((_ref1 = doc.$shares) != null) {
+            delete _ref1[_this.hoodie.share.id];
           }
+          if ($.isEmptyObject(doc.$shares)) {
+            doc.$shares = void 0;
+          }
+          update = {
+            $shares: doc.$shares
+          };
+          _this.hoodie.my.store.update(type, id, update, {
+            remote: true
+          });
         }
       }
       return Remote.__super__._handlePushSuccess.call(_this, docs, pushedDocs)();
     };
+  };
+
+  Remote.prototype._parseForRemote = function(obj) {
+    var attributes;
+    attributes = Remote.__super__._parseForRemote.apply(this, arguments);
+    attributes._id = "$share/" + this.hoodie.share.id + "/" + attributes._id;
+    if (attributes.$shares[this.hoodie.share.id] === false) {
+      attributes._deleted = true;
+    }
+    return this.hoodie.share;
   };
 
   return Remote;
@@ -2010,11 +2004,15 @@ Hoodie.Share.Instance = (function(_super) {
     }
     this._isMySharedObjectAndChanged = __bind(this._isMySharedObjectAndChanged, this);
 
+    this._isMySharedObject = __bind(this._isMySharedObject, this);
+
     this._toggle = __bind(this._toggle, this);
 
     this._remove = __bind(this._remove, this);
 
     this._add = __bind(this._add, this);
+
+    this.destroy = __bind(this.destroy, this);
 
     this.sync = __bind(this.sync, this);
 
@@ -2110,42 +2108,42 @@ Hoodie.Share.Instance = (function(_super) {
     }));
   };
 
+  Instance.prototype.destroy = function() {
+    var _this = this;
+    return this.remove(this.hoodie.my.store.findAll(this._isMySharedObject)).then(function() {
+      _this.hoodie.my.store.destroy("$share", _this.id);
+      if (_this.anonymous) {
+        return _this.hoodie.my.account.destroy();
+      }
+    });
+  };
+
   Instance.prototype.hasAccount = function() {
     return !this.anonymous || (this._userRev != null);
   };
 
   Instance.prototype._add = function(obj) {
-    var newValue;
-    newValue = obj.$shares ? !~obj.$shares.indexOf(this.id) ? obj.$shares.concat(this.id) : void 0 : [this.id];
-    if (newValue) {
-      delete this.$docsToRemove["" + obj.type + "/" + obj.id];
-      this.set('$docsToRemove', this.$docsToRemove);
-    }
+    obj.$shares || (obj.$shares = {});
+    obj.$shares[this.id] = true;
     return {
       $shares: newValue
     };
   };
 
-  Instance.prototype.$docsToRemove = {};
-
   Instance.prototype._remove = function(obj) {
-    var $shares, idx;
-    try {
-      $shares = obj.$shares;
-      if (~(idx = $shares.indexOf(this.id))) {
-        $shares.splice(idx, 1);
-        this.$docsToRemove["" + obj.type + "/" + obj.id] = {
-          _rev: obj._rev
-        };
-        this.set('$docsToRemove', this.$docsToRemove);
-        return {
-          $shares: $shares.length ? $shares : void 0
-        };
-      }
-    } catch (_error) {}
+    if (!obj.$shares) {
+      return {};
+    }
+    delete obj.$shares[this.id];
+    if ($.isEmptyObject(obj.$shares)) {
+      obj.$shares = void 0;
+    }
+    return {
+      $shares: obj.$shares
+    };
   };
 
-  Instance.prototype._toggle = function() {
+  Instance.prototype._toggle = function(obj) {
     var doAdd;
     try {
       doAdd = ~obj.$shares.indexOf(this.id);
@@ -2159,9 +2157,14 @@ Hoodie.Share.Instance = (function(_super) {
     }
   };
 
+  Instance.prototype._isMySharedObject = function(obj) {
+    var _ref;
+    return ((_ref = obj.$shares) != null ? _ref[this.id] : void 0) != null;
+  };
+
   Instance.prototype._isMySharedObjectAndChanged = function(obj) {
-    var belongsToMe;
-    belongsToMe = obj.id === this.id || obj.$shares && ~obj.$shares.indexOf(this.id);
+    var belongsToMe, _ref;
+    belongsToMe = obj.id === this.id || (((_ref = obj.$shares) != null ? _ref[this.id] : void 0) != null);
     return belongsToMe && this.hoodie.my.store.isDirty(obj.type, obj.id);
   };
 

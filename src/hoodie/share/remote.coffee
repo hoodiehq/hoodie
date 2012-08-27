@@ -37,7 +37,7 @@ class Hoodie.Share.Remote extends Hoodie.RemoteStore
         # walk through all changed docs, check if it's
         # 1. the share object itself or
         # 2. an object belonging to the share
-        docs = for obj in @hoodie.my.store.changedDocs() when obj.id is @hoodie.share.id or obj.$shares and ~obj.$shares.indexOf(@hoodie.share.id)
+        docs = for obj in @hoodie.my.store.changedDocs() when obj.id is @hoodie.share.id or obj.$shares?[@hoodie.share.id]
           obj 
 
       super(docs)
@@ -86,32 +86,37 @@ class Hoodie.Share.Remote extends Hoodie.RemoteStore
     "#{url}&filter=filters/share"
 
 
-  # add revision to object
-
-  # in addition to the standard behavior, we check for the $docsToRemove
-  # attribute, to add new revision to these as well.
-  _addRevisionTo : (obj) ->
-    if obj.$docsToRemove
-      console.log "obj.$docsToRemove"
-      console.log obj.$docsToRemove
-      @_addRevisionTo(doc) for key, doc of obj.$docsToRemove
-
-    super obj
-
-
   # handle push success
 
   # before handing over the docs (that have been replicated to the couch)
-  # to the default procedure, we check for the $docsToRemove attribute
-  # again, and handle these documents upfront
+  # to the default procedure, we update the doc.$shares hash
   _handlePushSuccess: (docs, pushedDocs) =>
     =>
-      for pushedDoc in pushedDocs
-        if pushedDoc.$docsToRemove
-          for key, doc of pushedDoc.$docsToRemove
-            [type, id] = key.split /\//
-            update = _rev: doc._rev
-            @hoodie.my.store.update(type, id, update, remote: true) for doc, i in docs
+      for doc in docs
+        if doc.$shares?[@hoodie.share.id] is false
+          delete doc.$shares?[@hoodie.share.id]
+          doc.$shares = undefined if $.isEmptyObject doc.$shares
+          update = $shares : doc.$shares
+          @hoodie.my.store.update(type, id, update, remote: true)
 
       super(docs, pushedDocs)()
 
+
+  # parse for remote
+
+  # on top of the default parsing, we make some adjustments before pushing
+  # an object to the share remote store:
+  #
+  # 1. we munge the `_id` by prepending it with share._id
+  # 2. if obj.$shares[share.id] is false, we mark the object as deleted
+  # 3. if obj.$shares[share.id] is an array (attributes marked to be shared),
+  #    we remove all other attributes.
+  # 4. we remove the $shares attribute
+  _parseForRemote : (obj) ->
+    attributes = super
+    attributes._id = "$share/#{@hoodie.share.id}/#{attributes._id}"
+
+    if attributes.$shares[@hoodie.share.id] is false
+      attributes._deleted = true
+
+    @hoodie.share

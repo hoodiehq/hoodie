@@ -252,7 +252,7 @@ class Hoodie.Account
   # ## destroy
   #
   # destroys a user' account  
-  destroy: ->
+  destroy : ->
     @fetch().pipe =>
       key = "#{@_prefix}:#{@username}"
       @_doc._deleted = true

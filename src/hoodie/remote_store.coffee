@@ -502,8 +502,7 @@ class Hoodie.RemoteStore extends Hoodie.Store
 
   # ### handle push success
 
-  # bli bla blup :-)
-  #
+  # update local _rev attributes after changes pushed
   _handlePushSuccess: (docs, pushedDocs) =>
     =>
       for doc, i in docs

@@ -15,11 +15,15 @@ Hoodie.Share.Instance = (function(_super) {
     }
     this._isMySharedObjectAndChanged = __bind(this._isMySharedObjectAndChanged, this);
 
+    this._isMySharedObject = __bind(this._isMySharedObject, this);
+
     this._toggle = __bind(this._toggle, this);
 
     this._remove = __bind(this._remove, this);
 
     this._add = __bind(this._add, this);
+
+    this.destroy = __bind(this.destroy, this);
 
     this.sync = __bind(this.sync, this);
 
@@ -115,42 +119,42 @@ Hoodie.Share.Instance = (function(_super) {
     }));
   };
 
+  Instance.prototype.destroy = function() {
+    var _this = this;
+    return this.remove(this.hoodie.my.store.findAll(this._isMySharedObject)).then(function() {
+      _this.hoodie.my.store.destroy("$share", _this.id);
+      if (_this.anonymous) {
+        return _this.hoodie.my.account.destroy();
+      }
+    });
+  };
+
   Instance.prototype.hasAccount = function() {
     return !this.anonymous || (this._userRev != null);
   };
 
   Instance.prototype._add = function(obj) {
-    var newValue;
-    newValue = obj.$shares ? !~obj.$shares.indexOf(this.id) ? obj.$shares.concat(this.id) : void 0 : [this.id];
-    if (newValue) {
-      delete this.$docsToRemove["" + obj.type + "/" + obj.id];
-      this.set('$docsToRemove', this.$docsToRemove);
-    }
+    obj.$shares || (obj.$shares = {});
+    obj.$shares[this.id] = true;
     return {
       $shares: newValue
     };
   };
 
-  Instance.prototype.$docsToRemove = {};
-
   Instance.prototype._remove = function(obj) {
-    var $shares, idx;
-    try {
-      $shares = obj.$shares;
-      if (~(idx = $shares.indexOf(this.id))) {
-        $shares.splice(idx, 1);
-        this.$docsToRemove["" + obj.type + "/" + obj.id] = {
-          _rev: obj._rev
-        };
-        this.set('$docsToRemove', this.$docsToRemove);
-        return {
-          $shares: $shares.length ? $shares : void 0
-        };
-      }
-    } catch (_error) {}
+    if (!obj.$shares) {
+      return {};
+    }
+    delete obj.$shares[this.id];
+    if ($.isEmptyObject(obj.$shares)) {
+      obj.$shares = void 0;
+    }
+    return {
+      $shares: obj.$shares
+    };
   };
 
-  Instance.prototype._toggle = function() {
+  Instance.prototype._toggle = function(obj) {
     var doAdd;
     try {
       doAdd = ~obj.$shares.indexOf(this.id);
@@ -164,9 +168,14 @@ Hoodie.Share.Instance = (function(_super) {
     }
   };
 
+  Instance.prototype._isMySharedObject = function(obj) {
+    var _ref;
+    return ((_ref = obj.$shares) != null ? _ref[this.id] : void 0) != null;
+  };
+
   Instance.prototype._isMySharedObjectAndChanged = function(obj) {
-    var belongsToMe;
-    belongsToMe = obj.id === this.id || obj.$shares && ~obj.$shares.indexOf(this.id);
+    var belongsToMe, _ref;
+    belongsToMe = obj.id === this.id || (((_ref = obj.$shares) != null ? _ref[this.id] : void 0) != null);
     return belongsToMe && this.hoodie.my.store.isDirty(obj.type, obj.id);
   };
 
