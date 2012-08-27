@@ -181,12 +181,13 @@ class Hoodie.Share.Instance extends Hoodie.RemoteStore
   # ---------
 
   # remove all objects from share, then destroy share itself
-  destroy: =>
+  destroy : =>
     @remove( @hoodie.my.store.findAll(@_isMySharedObject) )
     .then =>
       @hoodie.my.store.destroy("$share", @id)
 
       if @anonymous
+        @hoodie.my.remote.disconnect()
         @hoodie.my.account.destroy()
   
   

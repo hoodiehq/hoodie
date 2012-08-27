@@ -124,6 +124,7 @@ Hoodie.Share.Instance = (function(_super) {
     return this.remove(this.hoodie.my.store.findAll(this._isMySharedObject)).then(function() {
       _this.hoodie.my.store.destroy("$share", _this.id);
       if (_this.anonymous) {
+        _this.hoodie.my.remote.disconnect();
         return _this.hoodie.my.account.destroy();
       }
     });
