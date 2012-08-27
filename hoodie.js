@@ -2131,7 +2131,7 @@ Hoodie.Share.Instance = (function(_super) {
     obj.$shares || (obj.$shares = {});
     obj.$shares[this.id] = true;
     return {
-      $shares: newValue
+      $shares: obj.$shares[this.id]
     };
   };
 
