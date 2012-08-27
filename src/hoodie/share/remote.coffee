@@ -114,9 +114,13 @@ class Hoodie.Share.Remote extends Hoodie.RemoteStore
   # 4. we remove the $shares attribute
   _parseForRemote : (obj) ->
     attributes = super
-    attributes._id = "$share/#{@hoodie.share.id}/#{attributes._id}"
 
-    if attributes.$shares[@hoodie.share.id] is false
-      attributes._deleted = true
+    if obj.id is @hoodie.share.id
+      attributes
+    else
+      attributes._id = "$share/#{@hoodie.share.id}/#{attributes._id}"
 
-    @hoodie.share
+      if attributes.$shares[@hoodie.share.id] is false
+        attributes._deleted = true
+
+      attributes

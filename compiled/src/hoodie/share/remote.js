@@ -100,11 +100,15 @@ Hoodie.Share.Remote = (function(_super) {
   Remote.prototype._parseForRemote = function(obj) {
     var attributes;
     attributes = Remote.__super__._parseForRemote.apply(this, arguments);
-    attributes._id = "$share/" + this.hoodie.share.id + "/" + attributes._id;
-    if (attributes.$shares[this.hoodie.share.id] === false) {
-      attributes._deleted = true;
+    if (obj.id === this.hoodie.share.id) {
+      return attributes;
+    } else {
+      attributes._id = "$share/" + this.hoodie.share.id + "/" + attributes._id;
+      if (attributes.$shares[this.hoodie.share.id] === false) {
+        attributes._deleted = true;
+      }
+      return attributes;
     }
-    return this.hoodie.share;
   };
 
   return Remote;
