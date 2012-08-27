@@ -10,6 +10,8 @@ Hoodie.Share.Remote = (function(_super) {
   function Remote() {
     this._handlePushSuccess = __bind(this._handlePushSuccess, this);
 
+    this.pull = __bind(this.pull, this);
+
     this.push = __bind(this.push, this);
     Remote.__super__.constructor.apply(this, arguments);
     this.basePath = "/" + (encodeURIComponent(this.hoodie.my.account.db()));
@@ -20,22 +22,48 @@ Hoodie.Share.Remote = (function(_super) {
   }
 
   Remote.prototype.push = function(docs) {
-    var obj;
-    if (!$.isArray(docs)) {
-      docs = (function() {
-        var _i, _len, _ref, _results;
-        _ref = this.hoodie.my.store.changedDocs();
-        _results = [];
-        for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-          obj = _ref[_i];
-          if (obj.id === this.hoodie.share.id || obj.$shares && ~obj.$shares.indexOf(this.hoodie.share.id)) {
-            _results.push(obj);
+    var _this = this;
+    return this._assureExistingShareAccount(function() {
+      var obj;
+      if (!$.isArray(docs)) {
+        docs = (function() {
+          var _i, _len, _ref, _results;
+          _ref = this.hoodie.my.store.changedDocs();
+          _results = [];
+          for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+            obj = _ref[_i];
+            if (obj.id === this.hoodie.share.id || obj.$shares && ~obj.$shares.indexOf(this.hoodie.share.id)) {
+              _results.push(obj);
+            }
           }
-        }
-        return _results;
-      }).call(this);
+          return _results;
+        }).call(_this);
+      }
+      return Remote.__super__.push.call(_this, docs);
+    });
+  };
+
+  Remote.prototype.pull = function() {
+    var _this = this;
+    return this._assureExistingShareAccount(function() {
+      return Remote.__super__.pull.apply(_this, arguments);
+    });
+  };
+
+  Remote.prototype._assureExistingShareAccount = function(callback) {
+    var defer,
+      _this = this;
+    defer = this.hoodie.defer();
+    if (this.hoodie.share.hasAccount()) {
+      return defer.resolve().pipe(callback());
     }
-    return Remote.__super__.push.call(this, docs);
+    this.hoodie.my.account.signUp("share/" + this.hoodie.share.id, this.hoodie.share.password).done(function(username, response) {
+      _this.hoodie.share.save({
+        _userRev: _this.hoodie.my.account._doc._rev
+      });
+      return defer.resolve().pipe(callback());
+    });
+    return defer.promise();
   };
 
   Remote.prototype._pullUrl = function() {

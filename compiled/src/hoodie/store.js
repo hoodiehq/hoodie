@@ -30,10 +30,13 @@ Hoodie.Store = (function() {
   };
 
   Store.prototype.create = function(type, object, options) {
+    if (object == null) {
+      object = {};
+    }
     if (options == null) {
       options = {};
     }
-    return this.save(type, void 0, object);
+    return this.save(type, object.id, object);
   };
 
   Store.prototype.update = function(type, id, objectUpdate, options) {

@@ -457,10 +457,13 @@ Hoodie.Store = (function() {
   };
 
   Store.prototype.create = function(type, object, options) {
+    if (object == null) {
+      object = {};
+    }
     if (options == null) {
       options = {};
     }
-    return this.save(type, void 0, object);
+    return this.save(type, object.id, object);
   };
 
   Store.prototype.update = function(type, id, objectUpdate, options) {
@@ -1798,7 +1801,7 @@ Hoodie.Share.Hoodie = (function(_super) {
       }
     };
     this.my.config.set('_account.username', "share/" + this.share.id);
-    this.my.config.set('_account.owner', hoodie.my.account.owner);
+    this.my.config.set('_account.owner', "share/" + this.share.id);
     this.my.config.set('_remote.sync', this.share.continuous === true);
     _ref = ['store:dirty:idle'];
     for (_i = 0, _len = _ref.length; _i < _len; _i++) {
@@ -1884,6 +1887,8 @@ Hoodie.Share.Remote = (function(_super) {
   function Remote() {
     this._handlePushSuccess = __bind(this._handlePushSuccess, this);
 
+    this.pull = __bind(this.pull, this);
+
     this.push = __bind(this.push, this);
     Remote.__super__.constructor.apply(this, arguments);
     this.basePath = "/" + (encodeURIComponent(this.hoodie.my.account.db()));
@@ -1894,22 +1899,48 @@ Hoodie.Share.Remote = (function(_super) {
   }
 
   Remote.prototype.push = function(docs) {
-    var obj;
-    if (!$.isArray(docs)) {
-      docs = (function() {
-        var _i, _len, _ref, _results;
-        _ref = this.hoodie.my.store.changedDocs();
-        _results = [];
-        for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-          obj = _ref[_i];
-          if (obj.id === this.hoodie.share.id || obj.$shares && ~obj.$shares.indexOf(this.hoodie.share.id)) {
-            _results.push(obj);
+    var _this = this;
+    return this._assureExistingShareAccount(function() {
+      var obj;
+      if (!$.isArray(docs)) {
+        docs = (function() {
+          var _i, _len, _ref, _results;
+          _ref = this.hoodie.my.store.changedDocs();
+          _results = [];
+          for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+            obj = _ref[_i];
+            if (obj.id === this.hoodie.share.id || obj.$shares && ~obj.$shares.indexOf(this.hoodie.share.id)) {
+              _results.push(obj);
+            }
           }
-        }
-        return _results;
-      }).call(this);
+          return _results;
+        }).call(_this);
+      }
+      return Remote.__super__.push.call(_this, docs);
+    });
+  };
+
+  Remote.prototype.pull = function() {
+    var _this = this;
+    return this._assureExistingShareAccount(function() {
+      return Remote.__super__.pull.apply(_this, arguments);
+    });
+  };
+
+  Remote.prototype._assureExistingShareAccount = function(callback) {
+    var defer,
+      _this = this;
+    defer = this.hoodie.defer();
+    if (this.hoodie.share.hasAccount()) {
+      return defer.resolve().pipe(callback());
     }
-    return Remote.__super__.push.call(this, docs);
+    this.hoodie.my.account.signUp("share/" + this.hoodie.share.id, this.hoodie.share.password).done(function(username, response) {
+      _this.hoodie.share.save({
+        _userRev: _this.hoodie.my.account._doc._rev
+      });
+      return defer.resolve().pipe(callback());
+    });
+    return defer.promise();
   };
 
   Remote.prototype._pullUrl = function() {
@@ -1978,8 +2009,6 @@ Hoodie.Share.Instance = (function(_super) {
       options = {};
     }
     this._isMySharedObjectAndChanged = __bind(this._isMySharedObjectAndChanged, this);
-
-    this._sync = __bind(this._sync, this);
 
     this._toggle = __bind(this._toggle, this);
 
@@ -2076,16 +2105,9 @@ Hoodie.Share.Instance = (function(_super) {
 
   Instance.prototype.sync = function() {
     var _this = this;
-    if (this.hasAccount()) {
-      return (this.sync = this._sync)();
-    } else {
-      return this.hoodie.my.account.signUp("share/" + this.id, this.password).done(function(username, response) {
-        _this.save({
-          _userRev: _this.hoodie.my.account._doc._rev
-        });
-        return (_this.sync = _this._sync)();
-      });
-    }
+    return this.save().pipe(this.hoodie.my.store.findAll(this._isMySharedObjectAndChanged).pipe(function(sharedObjectsThatChanged) {
+      return _this.hoodie.my.remote.sync(sharedObjectsThatChanged).then(_this._handleRemoteChanges);
+    }));
   };
 
   Instance.prototype.hasAccount = function() {
@@ -2135,13 +2157,6 @@ Hoodie.Share.Instance = (function(_super) {
     } else {
       return this._remove(obj);
     }
-  };
-
-  Instance.prototype._sync = function() {
-    var _this = this;
-    return this.save().pipe(this.hoodie.my.store.findAll(this._isMySharedObjectAndChanged).pipe(function(sharedObjectsThatChanged) {
-      return _this.hoodie.my.remote.sync(sharedObjectsThatChanged).then(_this._handleRemoteChanges);
-    }));
   };
 
   Instance.prototype._isMySharedObjectAndChanged = function(obj) {

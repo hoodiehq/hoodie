@@ -45,8 +45,8 @@ class Hoodie.Store
 
   # `.create` is an alias for `.save`, with the difference that there is no id argument.
   # Internally it simply calls `.save(type, undefined, object).
-  create : (type, object, options = {}) ->
-    @save type, undefined, object
+  create : (type, object = {}, options = {}) ->
+    @save type, object.id, object
   
   
   # ## Update

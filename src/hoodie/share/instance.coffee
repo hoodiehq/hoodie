@@ -156,31 +156,17 @@ class Hoodie.Share.Instance extends Hoodie.RemoteStore
   
   # ## sync
 
-  # loads all local documents that belong to share and sync them.
-  # Before the first execution, we make sure that an account exist.
   #
-  # The logic of the actual sync is in the private _sync method
+  # 1. find all objects that belong to share and that have local changes
+  # 2. combine these with the docs that have been removed from the share
+  # 3. sync all these with share's remote
+  #
   sync: =>
-      
-    # when user has an account, we're good to go.
-    if @hasAccount()
-      
-      # sync now and make it the default behavior from now on
-      do @sync = @_sync
-      
-    # otherwise we need to create the share db manually,
-    # by signing up as a user with the neame of the share db.
-    else
-      
-      @hoodie.my.account.signUp( "share/#{@id}", @password )
-      .done (username, response) =>
-        
-        # remember that we signed up successfully for the future
-        @save _userRev: @hoodie.my.account._doc._rev
-        
-        # finally: start the sync and make it the default behavior
-        # from now on
-        do @sync = @_sync
+    @save()
+    .pipe @hoodie.my.store.findAll(@_isMySharedObjectAndChanged)
+    .pipe (sharedObjectsThatChanged) =>
+      @hoodie.my.remote.sync(sharedObjectsThatChanged)
+      .then @_handleRemoteChanges
   
   
   # ## hasAccount
@@ -233,7 +219,6 @@ class Hoodie.Share.Instance extends Hoodie.RemoteStore
         $shares: if $shares.length then $shares else undefined
       
 
-
   # depending on whether the passed object belongs to the
   # share or not, an update will be returned to add/remove 
   # it to/from share
@@ -247,19 +232,6 @@ class Hoodie.Share.Instance extends Hoodie.RemoteStore
       @_add(obj)
     else
       @_remove(obj)
-
-
-  #
-  # 1. find all objects that belong to share and that have local changes
-  # 2. combine these with the docs that have been removed from the share
-  # 3. sync all these with share's remote
-  #
-  _sync : =>
-    @save()
-    .pipe @hoodie.my.store.findAll(@_isMySharedObjectAndChanged)
-    .pipe (sharedObjectsThatChanged) =>
-      @hoodie.my.remote.sync(sharedObjectsThatChanged)
-      .then @_handleRemoteChanges
 
 
   # I appologize for this mess of code. Yes, you're right. ~gr2m

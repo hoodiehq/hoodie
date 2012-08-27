@@ -115,20 +115,16 @@ share.remove( hoodie.my.store.findAll (obj) -> obj.isShared )</p></div></div><di
     
     <span class="nx">@hoodie</span><span class="p">.</span><span class="nx">my</span><span class="p">.</span><span class="nx">store</span><span class="p">.</span><span class="nx">updateAll</span><span class="p">(</span><span class="nx">objects</span><span class="p">,</span> <span class="nx">updateMethod</span><span class="p">)</span>
     
-  </div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h2 id="sync">sync</h2></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>loads all local documents that belong to share and sync them.
-Before the first execution, we make sure that an account exist.</p>
-
-<p>The logic of the actual sync is in the private _sync method</p></div></div><div class="code"><div class="wrapper">  <span class="nv">sync: </span><span class="o">=&gt;</span>
-      </div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>when user has an account, we're good to go.</p></div></div><div class="code"><div class="wrapper">    <span class="k">if</span> <span class="nx">@hasAccount</span><span class="p">()</span>
-      </div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>sync now and make it the default behavior from now on</p></div></div><div class="code"><div class="wrapper">      <span class="nx">do</span> <span class="vi">@sync = </span><span class="nx">@_sync</span>
-      </div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>otherwise we need to create the share db manually,
-by signing up as a user with the neame of the share db.</p></div></div><div class="code"><div class="wrapper">    <span class="k">else</span>
-      
-      <span class="nx">@hoodie</span><span class="p">.</span><span class="nx">my</span><span class="p">.</span><span class="nx">account</span><span class="p">.</span><span class="nx">signUp</span><span class="p">(</span> <span class="s2">&quot;share/#{@id}&quot;</span><span class="p">,</span> <span class="nx">@password</span> <span class="p">)</span>
-      <span class="p">.</span><span class="nx">done</span> <span class="p">(</span><span class="nx">username</span><span class="p">,</span> <span class="nx">response</span><span class="p">)</span> <span class="o">=&gt;</span>
-        </div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>remember that we signed up successfully for the future</p></div></div><div class="code"><div class="wrapper">        <span class="nx">@save</span> <span class="nv">_userRev: </span><span class="nx">@hoodie</span><span class="p">.</span><span class="nx">my</span><span class="p">.</span><span class="nx">account</span><span class="p">.</span><span class="nx">_doc</span><span class="p">.</span><span class="nx">_rev</span>
-        </div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>finally: start the sync and make it the default behavior
-from now on</p></div></div><div class="code"><div class="wrapper">        <span class="nx">do</span> <span class="vi">@sync = </span><span class="nx">@_sync</span>
+  </div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h2 id="sync">sync</h2></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><ol>
+<li>find all objects that belong to share and that have local changes</li>
+<li>combine these with the docs that have been removed from the share</li>
+<li>sync all these with share's remote</li>
+</ol></div></div><div class="code"><div class="wrapper">  <span class="nv">sync: </span><span class="o">=&gt;</span>
+    <span class="nx">@save</span><span class="p">()</span>
+    <span class="p">.</span><span class="nx">pipe</span> <span class="nx">@hoodie</span><span class="p">.</span><span class="nx">my</span><span class="p">.</span><span class="nx">store</span><span class="p">.</span><span class="nx">findAll</span><span class="p">(</span><span class="nx">@_isMySharedObjectAndChanged</span><span class="p">)</span>
+    <span class="p">.</span><span class="nx">pipe</span> <span class="p">(</span><span class="nx">sharedObjectsThatChanged</span><span class="p">)</span> <span class="o">=&gt;</span>
+      <span class="nx">@hoodie</span><span class="p">.</span><span class="nx">my</span><span class="p">.</span><span class="nx">remote</span><span class="p">.</span><span class="nx">sync</span><span class="p">(</span><span class="nx">sharedObjectsThatChanged</span><span class="p">)</span>
+      <span class="p">.</span><span class="k">then</span> <span class="nx">@_handleRemoteChanges</span>
   
   </div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h2 id="hasaccount">hasAccount</h2></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>returns true if either user or the share has a CouchDB account</p></div></div><div class="code"><div class="wrapper">  <span class="nv">hasAccount: </span><span class="o">-&gt;</span>
     <span class="o">not</span> <span class="nx">@anonymous</span> <span class="o">or</span> <span class="nx">@_userRev</span><span class="o">?</span>
@@ -177,16 +173,7 @@ it to/from share</p></div></div><div class="code"><div class="wrapper">  <span c
     <span class="k">if</span> <span class="nx">doAdd</span>
       <span class="nx">@_add</span><span class="p">(</span><span class="nx">obj</span><span class="p">)</span>
     <span class="k">else</span>
-      <span class="nx">@_remove</span><span class="p">(</span><span class="nx">obj</span><span class="p">)</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><ol>
-<li>find all objects that belong to share and that have local changes</li>
-<li>combine these with the docs that have been removed from the share</li>
-<li>sync all these with share's remote</li>
-</ol></div></div><div class="code"><div class="wrapper">  <span class="nv">_sync : </span><span class="o">=&gt;</span>
-    <span class="nx">@save</span><span class="p">()</span>
-    <span class="p">.</span><span class="nx">pipe</span> <span class="nx">@hoodie</span><span class="p">.</span><span class="nx">my</span><span class="p">.</span><span class="nx">store</span><span class="p">.</span><span class="nx">findAll</span><span class="p">(</span><span class="nx">@_isMySharedObjectAndChanged</span><span class="p">)</span>
-    <span class="p">.</span><span class="nx">pipe</span> <span class="p">(</span><span class="nx">sharedObjectsThatChanged</span><span class="p">)</span> <span class="o">=&gt;</span>
-      <span class="nx">@hoodie</span><span class="p">.</span><span class="nx">my</span><span class="p">.</span><span class="nx">remote</span><span class="p">.</span><span class="nx">sync</span><span class="p">(</span><span class="nx">sharedObjectsThatChanged</span><span class="p">)</span>
-      <span class="p">.</span><span class="k">then</span> <span class="nx">@_handleRemoteChanges</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>I appologize for this mess of code. Yes, you're right. ~gr2m</p></div></div><div class="code"><div class="wrapper">  <span class="nv">_isMySharedObjectAndChanged: </span><span class="p">(</span><span class="nx">obj</span><span class="p">)</span> <span class="o">=&gt;</span>
+      <span class="nx">@_remove</span><span class="p">(</span><span class="nx">obj</span><span class="p">)</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>I appologize for this mess of code. Yes, you're right. ~gr2m</p></div></div><div class="code"><div class="wrapper">  <span class="nv">_isMySharedObjectAndChanged: </span><span class="p">(</span><span class="nx">obj</span><span class="p">)</span> <span class="o">=&gt;</span>
     <span class="nv">belongsToMe = </span><span class="nx">obj</span><span class="p">.</span><span class="nx">id</span> <span class="o">is</span> <span class="nx">@id</span> <span class="o">or</span> <span class="nx">obj</span><span class="p">.</span><span class="nx">$shares</span> <span class="o">and</span> <span class="o">~</span><span class="nx">obj</span><span class="p">.</span><span class="nx">$shares</span><span class="p">.</span><span class="nx">indexOf</span><span class="p">(</span><span class="nx">@id</span><span class="p">)</span>
     <span class="k">return</span> <span class="nx">belongsToMe</span> <span class="o">and</span> <span class="nx">@hoodie</span><span class="p">.</span><span class="nx">my</span><span class="p">.</span><span class="nx">store</span><span class="p">.</span><span class="nx">isDirty</span><span class="p">(</span><span class="nx">obj</span><span class="p">.</span><span class="nx">type</span><span class="p">,</span> <span class="nx">obj</span><span class="p">.</span><span class="nx">id</span><span class="p">)</span></div></div></div><div class="segment"><div class="code"><div class="wrapper">  <span class="nv">_handleRemoteChanges: </span><span class="o">-&gt;</span>
     <span class="nx">console</span><span class="p">.</span><span class="nx">log</span> <span class="s1">&#39;_handleRemoteChanges&#39;</span><span class="p">,</span> <span class="nx">arguments</span><span class="p">...</span></div></div></div></div></body></html>
