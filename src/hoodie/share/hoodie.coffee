@@ -47,7 +47,7 @@ class Hoodie.Share.Hoodie extends Hoodie
       crossDomain : true
       dataType    : 'json'
       
-    unless @share._userRev # no authentication header for "signup" request
+    if @share._userRev # no authentication header for "signup" request
       hash = btoa "share/#{@share.id}:#{@share.password or ''}"
       auth = "Basic #{hash}"
       

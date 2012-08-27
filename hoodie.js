@@ -1827,7 +1827,7 @@ Hoodie.Share.Hoodie = (function(_super) {
       crossDomain: true,
       dataType: 'json'
     };
-    if (!this.share._userRev) {
+    if (this.share._userRev) {
       hash = btoa("share/" + this.share.id + ":" + (this.share.password || ''));
       auth = "Basic " + hash;
       $.extend(defaults, {
