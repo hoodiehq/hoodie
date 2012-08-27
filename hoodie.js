@@ -1937,6 +1937,8 @@ Hoodie.Share.Remote = (function(_super) {
     this.hoodie.my.account.signUp("share/" + this.hoodie.share.id, this.hoodie.share.password).done(function(username, response) {
       _this.hoodie.share.save({
         _userRev: _this.hoodie.my.account._doc._rev
+      }, {
+        remote: true
       });
       return defer.resolve().pipe(callback());
     });
@@ -2002,7 +2004,7 @@ Hoodie.Share.Instance = (function(_super) {
   __extends(Instance, _super);
 
   function Instance(options) {
-    var access, continuous, id, password;
+    var access, continuous, id, password, _userRev;
     if (options == null) {
       options = {};
     }
@@ -2025,12 +2027,13 @@ Hoodie.Share.Instance = (function(_super) {
     this.set = __bind(this.set, this);
 
     this.hoodie = this.constructor.hoodie;
-    id = options.id, access = options.access, continuous = options.continuous, password = options.password;
+    id = options.id, access = options.access, continuous = options.continuous, password = options.password, _userRev = options._userRev;
     this.set({
       id: id,
       access: access,
       continuous: continuous,
-      password: password
+      password: password,
+      _userRev: _userRev
     });
     this.anonymous = this.hoodie.my.account.username === void 0;
     if (this.anonymous) {

@@ -11,7 +11,6 @@ class Hoodie.Share.Account extends Hoodie.Account
     @_shareAuthPromise = @hoodie.defer().resolve(@username).promise()
 
   authenticate : -> @_shareAuthPromise
-  # signUp       : -> @_shareAuthPromise
   signIn       : -> @_shareAuthPromise
   signOut      : -> @_shareAuthPromise
 

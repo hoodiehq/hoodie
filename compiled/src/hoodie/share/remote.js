@@ -60,6 +60,8 @@ Hoodie.Share.Remote = (function(_super) {
     this.hoodie.my.account.signUp("share/" + this.hoodie.share.id, this.hoodie.share.password).done(function(username, response) {
       _this.hoodie.share.save({
         _userRev: _this.hoodie.my.account._doc._rev
+      }, {
+        remote: true
       });
       return defer.resolve().pipe(callback());
     });

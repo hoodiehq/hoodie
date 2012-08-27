@@ -48,8 +48,8 @@ class Hoodie.Share.Instance extends Hoodie.RemoteStore
     @hoodie = @constructor.hoodie
 
     # setting attributes
-    {id, access, continuous, password} = options
-    @set {id, access, continuous, password}
+    {id, access, continuous, password, _userRev} = options
+    @set {id, access, continuous, password, _userRev}
 
     # if the current user isn't anonymous (has an account), a backend worker is 
     # used for the whole share magic, all we need to do is creating the $share 

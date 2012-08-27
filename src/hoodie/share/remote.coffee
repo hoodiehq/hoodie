@@ -68,7 +68,7 @@ class Hoodie.Share.Remote extends Hoodie.RemoteStore
     .done (username, response) =>
       
       # remember that we signed up successfully for the future
-      @hoodie.share.save _userRev: @hoodie.my.account._doc._rev
+      @hoodie.share.save { _userRev: @hoodie.my.account._doc._rev }, remote: true
       
       # finally: start the sync and make it the default behavior
       # from now on
