@@ -205,8 +205,7 @@ class Hoodie.Account
     resetPasswordId = @hoodie.my.config.get '_account.resetPasswordId'
 
     if resetPasswordId
-      console.log 'Password already resetted'
-      return defer.resolve().promise()
+      return @_checkPasswordResetStatus()
     else
       resetPasswordId = "#{username}/#{@hoodie.my.store.uuid()}"
       @hoodie.my.config.set '_account.resetPasswordId', resetPasswordId
@@ -224,7 +223,7 @@ class Hoodie.Account
       data        : JSON.stringify data
       contentType : "application/json"
       success     : (response) =>
-        @_checkPasswordResetStatus().then defer.resolve
+        @_checkPasswordResetStatus().then defer.resolve, defer.reject
         
       error       : (xhr) ->
         # shouldn't happen, really

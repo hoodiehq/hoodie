@@ -24,9 +24,7 @@ Hoodie.Account = (function() {
     }
     this.on('signin', this._handleSignIn);
     this.on('signout', this._handleSignOut);
-    if (this.hoodie.my.config.get('_account.resetPasswordId')) {
-      this._checkPasswordResetStatus();
-    }
+    this._checkPasswordResetStatus();
   }
 
   Account.prototype.authenticate = function() {
@@ -188,8 +186,7 @@ Hoodie.Account = (function() {
     defer = this.hoodie.defer();
     resetPasswordId = this.hoodie.my.config.get('_account.resetPasswordId');
     if (resetPasswordId) {
-      console.log('Password already resetted');
-      return defer.resolve().promise();
+      return this._checkPasswordResetStatus();
     } else {
       resetPasswordId = "" + username + "/" + (this.hoodie.my.store.uuid());
       this.hoodie.my.config.set('_account.resetPasswordId', resetPasswordId);
@@ -207,7 +204,7 @@ Hoodie.Account = (function() {
       data: JSON.stringify(data),
       contentType: "application/json",
       success: function(response) {
-        return _this._checkPasswordResetStatus().then(defer.resolve);
+        return _this._checkPasswordResetStatus().then(defer.resolve, defer.reject);
       },
       error: function(xhr) {
         var error;

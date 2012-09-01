@@ -68,10 +68,16 @@ describe("Hoodie.Account", function() {
       account = new Hoodie.Account(this.hoodie);
       return expect(this.account.on).wasCalledWith('signin', account._handleSignIn);
     });
-    return it("should bind to signOut event", function() {
+    it("should bind to signOut event", function() {
       var account;
       account = new Hoodie.Account(this.hoodie);
       return expect(this.account.on).wasCalledWith('signout', account._handleSignOut);
+    });
+    return it("should check for a pending password request", function() {
+      var account;
+      spyOn(Hoodie.Account.prototype, "_checkPasswordResetStatus");
+      account = new Hoodie.Account(this.hoodie);
+      return expect(Hoodie.Account.prototype._checkPasswordResetStatus).wasCalled();
     });
   });
   describe("event handlers", function() {
@@ -594,7 +600,7 @@ describe("Hoodie.Account", function() {
       });
     });
   });
-  return describe(".destroy()", function() {
+  describe(".destroy()", function() {
     beforeEach(function() {
       spyOn(this.account, "fetch").andReturn(this.hoodie.defer().resolve().promise());
       this.account.username = 'joe@example.com';
@@ -614,6 +620,29 @@ describe("Hoodie.Account", function() {
           _deleted: true
         }),
         contentType: 'application/json'
+      });
+    });
+  });
+  return describe(".resetPassword(username)", function() {
+    beforeEach(function() {
+      return spyOn(this.account, "_checkPasswordResetStatus");
+    });
+    _when("there is a pending password reset request", function() {
+      beforeEach(function() {
+        spyOn(this.hoodie.my.config, "get").andReturn("joe/uuid567");
+        return this.account.resetPassword();
+      });
+      it("should not send another request", function() {
+        return expect(this.hoodie.request).wasNotCalled();
+      });
+      return it("should check for the status of the pending request", function() {
+        return expect(this.account._checkPasswordResetStatus).wasCalled();
+      });
+    });
+    return _when("there is no pending password reset request", function() {
+      return beforeEach(function() {
+        spyOn(this.hoodie.my.config, "get").andReturn(void 0);
+        return this.account.resetPassword();
       });
     });
   });

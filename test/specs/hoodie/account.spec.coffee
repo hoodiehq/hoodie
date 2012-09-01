@@ -61,6 +61,11 @@ describe "Hoodie.Account", ->
     it "should bind to signOut event", ->
       account = new Hoodie.Account @hoodie
       expect(@account.on).wasCalledWith 'signout', account._handleSignOut
+
+    it "should check for a pending password request", ->
+      spyOn(Hoodie.Account.prototype, "_checkPasswordResetStatus")
+      account = new Hoodie.Account @hoodie
+      expect(Hoodie.Account.prototype._checkPasswordResetStatus).wasCalled()
   # /.constructor()
 
   describe "event handlers", ->
@@ -502,4 +507,25 @@ describe "Hoodie.Account", ->
           _deleted : true
         contentType : 'application/json' 
   # /destroy()
+
+  describe ".resetPassword(username)", ->
+    beforeEach ->
+      spyOn(@account, "_checkPasswordResetStatus")
+    
+    _when "there is a pending password reset request", ->
+      beforeEach ->
+        spyOn(@hoodie.my.config, "get").andReturn "joe/uuid567"
+        @account.resetPassword()
+
+      it "should not send another request", ->
+        expect(@hoodie.request).wasNotCalled() 
+
+      it "should check for the status of the pending request", ->
+        expect(@account._checkPasswordResetStatus).wasCalled()
+
+    _when "there is no pending password reset request", ->
+      beforeEach ->
+        spyOn(@hoodie.my.config, "get").andReturn undefined
+        @account.resetPassword()
+  # /.resetPassword(username)
 # /Hoodie.Account
