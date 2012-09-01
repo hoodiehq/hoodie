@@ -410,7 +410,7 @@ describe("Hoodie.Account", function() {
       });
     });
   });
-  describe(".changePassword(username, password)", function() {
+  describe(".changePassword(currentPassword, newPassword)", function() {
     beforeEach(function() {
       var _ref;
       this.account.username = 'joe@example.com';
@@ -420,7 +420,7 @@ describe("Hoodie.Account", function() {
         type: 'user',
         roles: [],
         salt: 'absalt',
-        passwordSha: 'pwcdef'
+        password_sha: 'pwcdef'
       };
       this.account.changePassword('currentSecret', 'newSecret');
       _ref = this.hoodie.request.mostRecentCall.args, this.type = _ref[0], this.path = _ref[1], this.options = _ref[2];
@@ -459,8 +459,8 @@ describe("Hoodie.Account", function() {
     it("should not send salt", function() {
       return expect(this.data.salt).toBeUndefined();
     });
-    it("should not send passwordSha", function() {
-      return expect(this.data.passwordSha).toBeUndefined();
+    it("should not send password_sha", function() {
+      return expect(this.data.password_sha).toBeUndefined();
     });
     _when("change password successful", function() {
       beforeEach(function() {
@@ -503,8 +503,12 @@ describe("Hoodie.Account", function() {
   describe(".signOut()", function() {
     beforeEach(function() {
       var _ref;
+      spyOn(this.hoodie.my.remote, "disconnect");
       this.account.signOut();
       return _ref = this.hoodie.request.mostRecentCall.args, this.type = _ref[0], this.path = _ref[1], this.options = _ref[2], _ref;
+    });
+    it("should disconnect", function() {
+      return expect(this.hoodie.my.remote.disconnect).wasCalled();
     });
     it("should send a DELETE request to http://my.cou.ch/_session", function() {
       expect(this.hoodie.request).wasCalled();
@@ -574,7 +578,7 @@ describe("Hoodie.Account", function() {
             "_rev": "3-33e4d43a6dff5b29a4bd33f576c7824f",
             "name": "baz",
             "salt": "82163606fa5c100e0095ad63598de810",
-            "passwordSha": "e2e2a4d99632dc5e3fdb41d5d1ff98743a1f344e",
+            "password_sha": "e2e2a4d99632dc5e3fdb41d5d1ff98743a1f344e",
             "type": "user",
             "roles": []
           };

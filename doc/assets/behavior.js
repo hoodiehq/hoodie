@@ -212,8 +212,16 @@ f.event={add:function(a,c,d,e,g){var h,i,j,k,l,m,n,o,p,q,r,s;if(!(a.nodeType===3
                   "type": "heading",
                   "data": {
                     "level": 2,
-                    "title": "sign out",
-                    "slug": "sign-out"
+                    "title": "reset password",
+                    "slug": "reset-password"
+                  },
+                  "depth": 2
+                }, {
+                  "type": "heading",
+                  "data": {
+                    "level": 2,
+                    "title": "sign out ",
+                    "slug": "sign-out-"
                   },
                   "depth": 2
                 }, {
@@ -315,8 +323,16 @@ f.event={add:function(a,c,d,e,g){var h,i,j,k,l,m,n,o,p,q,r,s;if(!(a.nodeType===3
               "type": "heading",
               "data": {
                 "level": 2,
-                "title": "sign out",
-                "slug": "sign-out"
+                "title": "reset password",
+                "slug": "reset-password"
+              },
+              "depth": 2
+            }, {
+              "type": "heading",
+              "data": {
+                "level": 2,
+                "title": "sign out ",
+                "slug": "sign-out-"
               },
               "depth": 2
             }, {

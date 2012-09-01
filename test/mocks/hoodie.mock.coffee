@@ -52,3 +52,7 @@ Mocks.Hoodie = ->
       get : ->
       remove : ->
       clear : ->
+
+    remote :
+      connect : ->
+      disconnect : ->

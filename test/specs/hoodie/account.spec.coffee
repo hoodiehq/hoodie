@@ -331,7 +331,7 @@ describe "Hoodie.Account", ->
   # /.signIn(username, password)
 
 
-  describe ".changePassword(username, password)", ->
+  describe ".changePassword(currentPassword, newPassword)", ->
     beforeEach ->
       @account.username = 'joe@example.com'
       @account._doc  = 
@@ -340,7 +340,7 @@ describe "Hoodie.Account", ->
         type         : 'user'
         roles        : []
         salt         : 'absalt'
-        passwordSha : 'pwcdef'
+        password_sha : 'pwcdef'
         
         
       @account.changePassword('currentSecret', 'newSecret')
@@ -379,8 +379,8 @@ describe "Hoodie.Account", ->
     it "should not send salt", ->
       expect(@data.salt).toBeUndefined()
       
-    it "should not send passwordSha", ->
-      expect(@data.passwordSha).toBeUndefined()
+    it "should not send password_sha", ->
+      expect(@data.password_sha).toBeUndefined()
       
             
     _when "change password successful", ->
@@ -410,9 +410,13 @@ describe "Hoodie.Account", ->
 
   describe ".signOut()", ->
     beforeEach ->
+      spyOn(@hoodie.my.remote, "disconnect")
       @account.signOut()
       [@type, @path, @options] = @hoodie.request.mostRecentCall.args
-  
+    
+    it "should disconnect", ->
+      expect(@hoodie.my.remote.disconnect).wasCalled() 
+
     it "should send a DELETE request to http://my.cou.ch/_session", ->
       expect(@hoodie.request).wasCalled()
       expect(@type).toBe 'DELETE'
@@ -471,7 +475,7 @@ describe "Hoodie.Account", ->
       
       _when "successful", ->
         beforeEach ->
-          @response = {"_id":"org.couchdb.user:baz","_rev":"3-33e4d43a6dff5b29a4bd33f576c7824f","name":"baz","salt":"82163606fa5c100e0095ad63598de810","passwordSha":"e2e2a4d99632dc5e3fdb41d5d1ff98743a1f344e","type":"user","roles":[]}
+          @response = {"_id":"org.couchdb.user:baz","_rev":"3-33e4d43a6dff5b29a4bd33f576c7824f","name":"baz","salt":"82163606fa5c100e0095ad63598de810","password_sha":"e2e2a4d99632dc5e3fdb41d5d1ff98743a1f344e","type":"user","roles":[]}
           @hoodie.request.andCallFake (type, path, options) => 
             options.success @response
         
