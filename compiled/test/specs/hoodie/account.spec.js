@@ -625,7 +625,7 @@ describe("Hoodie.Account", function() {
   });
   return describe(".resetPassword(username)", function() {
     beforeEach(function() {
-      return spyOn(this.account, "_checkPasswordResetStatus");
+      return spyOn(this.account, "_checkPasswordResetStatus").andReturn("checkPasswordResetPromise");
     });
     _when("there is a pending password reset request", function() {
       beforeEach(function() {
@@ -635,14 +635,75 @@ describe("Hoodie.Account", function() {
       it("should not send another request", function() {
         return expect(this.hoodie.request).wasNotCalled();
       });
-      return it("should check for the status of the pending request", function() {
+      it("should check for the status of the pending request", function() {
         return expect(this.account._checkPasswordResetStatus).wasCalled();
+      });
+      return it("should return the promise by the status request", function() {
+        return expect(this.account.resetPassword()).toBe('checkPasswordResetPromise');
       });
     });
     return _when("there is no pending password reset request", function() {
-      return beforeEach(function() {
+      beforeEach(function() {
+        var _ref;
         spyOn(this.hoodie.my.config, "get").andReturn(void 0);
-        return this.account.resetPassword();
+        spyOn(this.hoodie.my.config, "set");
+        spyOn(this.hoodie.my.store, "uuid").andReturn('uuid567');
+        this.account.resetPassword("joe@example.com");
+        _ref = this.hoodie.request.mostRecentCall.args, this.method = _ref[0], this.path = _ref[1], this.options = _ref[2];
+        return this.data = JSON.parse(this.options.data);
+      });
+      it("should generate a reset Password Id and store it locally", function() {
+        return expect(this.hoodie.my.config.set).wasCalledWith("_account.resetPasswordId", "joe@example.com/uuid567");
+      });
+      it("should send a PUT request to /_users/org.couchdb.user%3A%24passwordReset%2Fjoe%40example.com%2Fuuid567", function() {
+        expect(this.method).toBe('PUT');
+        return expect(this.path).toBe('/_users/org.couchdb.user%3A%24passwordReset%2Fjoe%40example.com%2Fuuid567');
+      });
+      it("should send data with contentType 'application/json'", function() {
+        return expect(this.options.contentType).toBe('application/json');
+      });
+      it("should send a new _users object", function() {
+        expect(this.data._id).toBe('org.couchdb.user:$passwordReset/joe@example.com/uuid567');
+        expect(this.data.name).toBe("$passwordReset/joe@example.com/uuid567");
+        expect(this.data.type).toBe('user');
+        expect(this.data.password).toBe('joe@example.com/uuid567');
+        expect(this.data.createdAt).toBeDefined();
+        return expect(this.data.updatedAt).toBeDefined();
+      });
+      it("should return a promise", function() {
+        return expect(this.account.resetPassword("joe@example.com")).toBePromise();
+      });
+      _when("reset Password request successful", function() {
+        beforeEach(function() {
+          this.promiseSpy = jasmine.createSpy('promiseSpy');
+          this.account._checkPasswordResetStatus.andReturn({
+            then: this.promiseSpy
+          });
+          return this.hoodie.request.andCallFake(function(method, path, options) {
+            return options.success();
+          });
+        });
+        it("should check for the request status", function() {
+          this.account.resetPassword('joe@example.com');
+          return expect(this.account._checkPasswordResetStatus).wasCalled();
+        });
+        return it("should be resolved", function() {
+          return expect(this.account.resetPassword('joe@example.com')).toBeResolved();
+        });
+      });
+      return _when("reset Password request is not successful", function() {
+        beforeEach(function() {
+          return this.hoodie.request.andCallFake(function(method, path, options) {
+            return options.error({
+              responseText: '{"error": "ooops"}'
+            });
+          });
+        });
+        return it("should be rejected with the error", function() {
+          return expect(this.account.resetPassword('joe@example.com')).toBeRejectedWith({
+            error: 'ooops'
+          });
+        });
       });
     });
   });

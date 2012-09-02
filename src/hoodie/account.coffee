@@ -195,20 +195,19 @@ class Hoodie.Account
 
   # This is kind of a hack. We need to create an object anonymously
   # that is not exposed to others. The only CouchDB API othering such 
-  # functionality is the _users database. So we actualy sign up a new
-  # couchDB user with some special attributes. It will be picked up
-  # by the password reset worker and destroyed once the password was
-  # resetted.
+  # functionality is the _users database.
+  # 
+  # So we actualy sign up a new couchDB user with some special attributes.
+  # It will be picked up by the password reset worker and destroyed
+  # once the password was resetted.
   resetPassword : (username) ->
     defer = @hoodie.defer()
 
-    resetPasswordId = @hoodie.my.config.get '_account.resetPasswordId'
-
-    if resetPasswordId
+    if resetPasswordId = @hoodie.my.config.get '_account.resetPasswordId'
       return @_checkPasswordResetStatus()
-    else
-      resetPasswordId = "#{username}/#{@hoodie.my.store.uuid()}"
-      @hoodie.my.config.set '_account.resetPasswordId', resetPasswordId
+      
+    resetPasswordId = "#{username}/#{@hoodie.my.store.uuid()}"
+    @hoodie.my.config.set '_account.resetPasswordId', resetPasswordId
     
     key = "#{@_prefix}:$passwordReset/#{resetPasswordId}"
     data = 
@@ -223,19 +222,18 @@ class Hoodie.Account
       data        : JSON.stringify data
       contentType : "application/json"
       success     : (response) =>
-        @_checkPasswordResetStatus().then defer.resolve, defer.reject
+        defer.resolve()
+        @_checkPasswordResetStatus()
         
       error       : (xhr) ->
-        # shouldn't happen, really
-        alert('resetPassword error')
-        console.log "resetPassword", arguments...
-
         try
           error = JSON.parse(xhr.responseText)
         catch e
           error = error: xhr.responseText or "unknown"
         
         defer.reject(error)
+
+    return defer.promise()
 
 
   # sign out 
@@ -339,9 +337,18 @@ class Hoodie.Account
     @hoodie.my.config.clear()
     @_authenticated = false
 
+  #
   # check for the status of a password reset. It might take
   # a while until the password reset worker picks up the job
   # and updates it
+  #
+  # If a password reset request was successful, the $passwordRequest
+  # doc gets removed from _users by the worker, therefore a 401 is
+  # what we are waiting for.
+  #
+  # Once called, it continues to request the status update with a
+  # 1s timeout.
+  #
   _checkPasswordResetStatus : =>
     defer = @hoodie.defer()
     resetPasswordId = @hoodie.my.config.get '_account.resetPasswordId'
@@ -372,9 +379,6 @@ class Hoodie.Account
       success     : (response) =>
         if response.$error
           return defer.reject error: response.$error
-
-        if response.$state is 'done'
-          return defer.resolve()
 
         defer.reject error: 'pending'
         

@@ -197,7 +197,6 @@ describe "Hoodie.Account", ->
           
           it "should reject the promise", ->
             expect(@promise).toBeRejectedWith error: 'error data'
-          
   # /.authenticate()
 
 
@@ -331,8 +330,6 @@ describe "Hoodie.Account", ->
         it "should reject with unconfirmed error.", ->
           promise = @account.signIn('joe@example.com', 'secret')
           expect(promise).toBeRejectedWith error: "unconfirmed", reason: "account has not been confirmed yet"
-        
-      
   # /.signIn(username, password)
 
 
@@ -510,8 +507,8 @@ describe "Hoodie.Account", ->
 
   describe ".resetPassword(username)", ->
     beforeEach ->
-      spyOn(@account, "_checkPasswordResetStatus")
-    
+      spyOn(@account, "_checkPasswordResetStatus").andReturn "checkPasswordResetPromise"
+
     _when "there is a pending password reset request", ->
       beforeEach ->
         spyOn(@hoodie.my.config, "get").andReturn "joe/uuid567"
@@ -523,9 +520,57 @@ describe "Hoodie.Account", ->
       it "should check for the status of the pending request", ->
         expect(@account._checkPasswordResetStatus).wasCalled()
 
+      it "should return the promise by the status request", ->
+        expect(@account.resetPassword()).toBe 'checkPasswordResetPromise'
+
     _when "there is no pending password reset request", ->
       beforeEach ->
         spyOn(@hoodie.my.config, "get").andReturn undefined
-        @account.resetPassword()
+        spyOn(@hoodie.my.config, "set")
+        spyOn(@hoodie.my.store, "uuid").andReturn 'uuid567'
+        @account.resetPassword("joe@example.com")
+        [@method, @path, @options] = @hoodie.request.mostRecentCall.args
+        @data = JSON.parse @options.data
+
+      it "should generate a reset Password Id and store it locally", ->
+        expect(@hoodie.my.config.set).wasCalledWith "_account.resetPasswordId", "joe@example.com/uuid567"
+
+      it "should send a PUT request to /_users/org.couchdb.user%3A%24passwordReset%2Fjoe%40example.com%2Fuuid567", ->
+        expect(@method).toBe 'PUT'
+        expect(@path).toBe '/_users/org.couchdb.user%3A%24passwordReset%2Fjoe%40example.com%2Fuuid567'
+
+      it "should send data with contentType 'application/json'", ->
+        expect(@options.contentType).toBe 'application/json' 
+
+      it "should send a new _users object", ->
+        expect(@data._id).toBe      'org.couchdb.user:$passwordReset/joe@example.com/uuid567'
+        expect(@data.name).toBe     "$passwordReset/joe@example.com/uuid567"
+        expect(@data.type).toBe     'user'
+        expect(@data.password).toBe 'joe@example.com/uuid567'
+        expect(@data.createdAt).toBeDefined()
+        expect(@data.updatedAt).toBeDefined()
+
+      it "should return a promise", ->
+         expect(@account.resetPassword("joe@example.com")).toBePromise()
+
+      _when "reset Password request successful", ->
+        beforeEach ->
+          @promiseSpy = jasmine.createSpy 'promiseSpy'
+          @account._checkPasswordResetStatus.andReturn then: @promiseSpy
+          @hoodie.request.andCallFake (method, path, options) -> options.success()
+
+        it "should check for the request status", ->
+          @account.resetPassword('joe@example.com')
+          expect(@account._checkPasswordResetStatus).wasCalled() 
+
+        it "should be resolved", ->
+          expect(@account.resetPassword('joe@example.com')).toBeResolved()
+          
+      _when "reset Password request is not successful", ->
+        beforeEach ->
+          @hoodie.request.andCallFake (method, path, options) -> options.error(responseText: '{"error": "ooops"}')
+
+        it "should be rejected with the error", ->
+          expect(@account.resetPassword('joe@example.com')).toBeRejectedWith error: 'ooops'
   # /.resetPassword(username)
 # /Hoodie.Account

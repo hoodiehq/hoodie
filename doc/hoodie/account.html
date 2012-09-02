@@ -12,7 +12,8 @@
       <span class="nx">@hoodie</span><span class="p">.</span><span class="nx">my</span><span class="p">.</span><span class="nx">config</span><span class="p">.</span><span class="nx">set</span> <span class="s1">&#39;_account.owner&#39;</span><span class="p">,</span> <span class="nx">@owner</span>
     </div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>authenticate on next tick
 window.setTimeout @authenticate</p></div></div><div class="code"><div class="wrapper">    <span class="nx">@on</span> <span class="s1">&#39;signin&#39;</span><span class="p">,</span>  <span class="nx">@_handleSignIn</span>
-    <span class="nx">@on</span> <span class="s1">&#39;signout&#39;</span><span class="p">,</span> <span class="nx">@_handleSignOut</span>
+    <span class="nx">@on</span> <span class="s1">&#39;signout&#39;</span><span class="p">,</span> <span class="nx">@_handleSignOut</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>is there a pending password reset?</p></div></div><div class="code"><div class="wrapper">    <span class="nx">@_checkPasswordResetStatus</span><span class="p">()</span>
+      
   
   </div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h2 id="authenticate">Authenticate</h2></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>Use this method to assure that the user is authenticated:
 <code>hoodie.my.account.authenticate().done( doSomething ).fail( handleError )</code></p></div></div><div class="code"><div class="wrapper">  <span class="nv">authenticate : </span><span class="o">=&gt;</span>
@@ -140,20 +141,18 @@ Besides the standard sign in we also check if the account has been confirmed
           
         <span class="nx">defer</span><span class="p">.</span><span class="nx">reject</span><span class="p">(</span><span class="nx">error</span><span class="p">)</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h2 id="reset-password">reset password</h2></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>This is kind of a hack. We need to create an object anonymously
 that is not exposed to others. The only CouchDB API othering such 
-functionality is the _users database. So we actualy sign up a new
-couchDB user with some special attributes. It will be picked up
-by the password reset worker and destroyed once the password was
-resetted.</p></div></div><div class="code"><div class="wrapper">  <span class="nv">resetPassword : </span><span class="nf">(username) -&gt;</span>
+functionality is the _users database.</p>
+
+<p>So we actualy sign up a new couchDB user with some special attributes.
+It will be picked up by the password reset worker and destroyed
+once the password was resetted.</p></div></div><div class="code"><div class="wrapper">  <span class="nv">resetPassword : </span><span class="nf">(username) -&gt;</span>
     <span class="nv">defer = </span><span class="nx">@hoodie</span><span class="p">.</span><span class="nx">defer</span><span class="p">()</span>
 
-    <span class="nv">resetPasswordId = </span><span class="nx">@hoodie</span><span class="p">.</span><span class="nx">my</span><span class="p">.</span><span class="nx">config</span><span class="p">.</span><span class="nx">get</span> <span class="s1">&#39;_account.resetPasswordId&#39;</span>
-
-    <span class="k">if</span> <span class="nx">resetPasswordId</span>
-      <span class="nx">console</span><span class="p">.</span><span class="nx">log</span> <span class="s1">&#39;Password already resetted&#39;</span>
-      <span class="k">return</span> <span class="nx">defer</span><span class="p">.</span><span class="nx">resolve</span><span class="p">().</span><span class="nx">promise</span><span class="p">()</span>
-    <span class="k">else</span>
-      <span class="nv">resetPasswordId = </span><span class="s2">&quot;#{username}/#{@hoodie.my.store.uuid()}&quot;</span>
-      <span class="nx">@hoodie</span><span class="p">.</span><span class="nx">my</span><span class="p">.</span><span class="nx">config</span><span class="p">.</span><span class="nx">set</span> <span class="s1">&#39;_account.resetPasswordId&#39;</span><span class="p">,</span> <span class="nx">resetPasswordId</span>
+    <span class="k">if</span> <span class="nv">resetPasswordId = </span><span class="nx">@hoodie</span><span class="p">.</span><span class="nx">my</span><span class="p">.</span><span class="nx">config</span><span class="p">.</span><span class="nx">get</span> <span class="s1">&#39;_account.resetPasswordId&#39;</span>
+      <span class="k">return</span> <span class="nx">@_checkPasswordResetStatus</span><span class="p">()</span>
+      
+    <span class="nv">resetPasswordId = </span><span class="s2">&quot;#{username}/#{@hoodie.my.store.uuid()}&quot;</span>
+    <span class="nx">@hoodie</span><span class="p">.</span><span class="nx">my</span><span class="p">.</span><span class="nx">config</span><span class="p">.</span><span class="nx">set</span> <span class="s1">&#39;_account.resetPasswordId&#39;</span><span class="p">,</span> <span class="nx">resetPasswordId</span>
     
     <span class="nv">key = </span><span class="s2">&quot;#{@_prefix}:$passwordReset/#{resetPasswordId}&quot;</span>
     <span class="nv">data = </span>
@@ -168,21 +167,18 @@ resetted.</p></div></div><div class="code"><div class="wrapper">  <span class="n
       <span class="nv">data        : </span><span class="nx">JSON</span><span class="p">.</span><span class="nx">stringify</span> <span class="nx">data</span>
       <span class="nv">contentType : </span><span class="s2">&quot;application/json&quot;</span>
       <span class="nv">success     : </span><span class="p">(</span><span class="nx">response</span><span class="p">)</span> <span class="o">=&gt;</span>
-        <span class="nx">alert</span><span class="p">(</span><span class="s1">&#39;resetPassword success&#39;</span><span class="p">)</span>
-        <span class="nx">console</span><span class="p">.</span><span class="nx">log</span> <span class="s2">&quot;resetPassword&quot;</span><span class="p">,</span> <span class="nx">arguments</span><span class="p">...</span>
-
-        <span class="nx">@_checkPasswordResetStatus</span><span class="p">()</span>
         <span class="nx">defer</span><span class="p">.</span><span class="nx">resolve</span><span class="p">()</span>
+        <span class="nx">@_checkPasswordResetStatus</span><span class="p">()</span>
         
-      <span class="nv">error       : </span><span class="nf">(xhr) -&gt;</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>shouldn't happen, really</p></div></div><div class="code"><div class="wrapper">        <span class="nx">alert</span><span class="p">(</span><span class="s1">&#39;resetPassword error&#39;</span><span class="p">)</span>
-        <span class="nx">console</span><span class="p">.</span><span class="nx">log</span> <span class="s2">&quot;resetPassword&quot;</span><span class="p">,</span> <span class="nx">arguments</span><span class="p">...</span>
-
+      <span class="nv">error       : </span><span class="nf">(xhr) -&gt;</span>
         <span class="k">try</span>
           <span class="nv">error = </span><span class="nx">JSON</span><span class="p">.</span><span class="nx">parse</span><span class="p">(</span><span class="nx">xhr</span><span class="p">.</span><span class="nx">responseText</span><span class="p">)</span>
         <span class="k">catch</span> <span class="nx">e</span>
           <span class="nv">error = error: </span><span class="nx">xhr</span><span class="p">.</span><span class="nx">responseText</span> <span class="o">or</span> <span class="s2">&quot;unknown&quot;</span>
         
-        <span class="nx">defer</span><span class="p">.</span><span class="nx">reject</span><span class="p">(</span><span class="nx">error</span><span class="p">)</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h2 id="sign-out-">sign out </h2></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>uses standard CouchDB API to destroy a user session (DELETE /_session)</p>
+        <span class="nx">defer</span><span class="p">.</span><span class="nx">reject</span><span class="p">(</span><span class="nx">error</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="nx">defer</span><span class="p">.</span><span class="nx">promise</span><span class="p">()</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h2 id="sign-out-">sign out </h2></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>uses standard CouchDB API to destroy a user session (DELETE /_session)</p>
 
 <p>TODO: handle errors</p></div></div><div class="code"><div class="wrapper">  <span class="nv">signOut: </span><span class="o">-&gt;</span>
     <span class="nx">@hoodie</span><span class="p">.</span><span class="nx">my</span><span class="p">.</span><span class="nx">remote</span><span class="p">.</span><span class="nx">disconnect</span><span class="p">()</span>
@@ -244,36 +240,45 @@ Notes:
     <span class="nx">@hoodie</span><span class="p">.</span><span class="nx">my</span><span class="p">.</span><span class="nx">config</span><span class="p">.</span><span class="nx">clear</span><span class="p">()</span>
     <span class="vi">@_authenticated = </span><span class="kc">false</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>check for the status of a password reset. It might take
 a while until the password reset worker picks up the job
-and updates it</p></div></div><div class="code"><div class="wrapper">  <span class="nv">_checkPasswordResetStatus : </span><span class="o">=&gt;</span>
+and updates it</p>
+
+<p>If a password reset request was successful, the $passwordRequest
+doc gets removed from _users by the worker, therefore a 401 is
+what we are waiting for.</p>
+
+<p>Once called, it continues to request the status update with a
+1s timeout.</p></div></div><div class="code"><div class="wrapper">  <span class="nv">_checkPasswordResetStatus : </span><span class="o">=&gt;</span>
     <span class="nv">defer = </span><span class="nx">@hoodie</span><span class="p">.</span><span class="nx">defer</span><span class="p">()</span>
     <span class="nv">resetPasswordId = </span><span class="nx">@hoodie</span><span class="p">.</span><span class="nx">my</span><span class="p">.</span><span class="nx">config</span><span class="p">.</span><span class="nx">get</span> <span class="s1">&#39;_account.resetPasswordId&#39;</span>
 
     <span class="nx">unless</span> <span class="nx">resetPasswordId</span>
       <span class="k">return</span> <span class="nx">defer</span><span class="p">.</span><span class="nx">reject</span><span class="p">(</span><span class="nv">error: </span><span class="s2">&quot;missing&quot;</span><span class="p">).</span><span class="nx">promise</span><span class="p">()</span>
 
+    <span class="nx">defer</span><span class="p">.</span><span class="nx">done</span> <span class="o">=&gt;</span> 
+      <span class="nx">@hoodie</span><span class="p">.</span><span class="nx">my</span><span class="p">.</span><span class="nx">config</span><span class="p">.</span><span class="nx">remove</span> <span class="s1">&#39;_account.resetPasswordId&#39;</span>
+      <span class="nx">@hoodie</span><span class="p">.</span><span class="nx">trigger</span> <span class="s1">&#39;account:password_reset:success&#39;</span>
     <span class="nx">defer</span><span class="p">.</span><span class="nx">fail</span> <span class="p">(</span><span class="nx">error</span><span class="p">)</span> <span class="o">=&gt;</span>
       <span class="k">if</span> <span class="nx">error</span><span class="p">.</span><span class="nx">error</span> <span class="o">is</span> <span class="s1">&#39;pending&#39;</span>
         <span class="nb">window</span><span class="p">.</span><span class="nx">setTimeout</span> <span class="nx">@_checkPasswordResetStatus</span><span class="p">,</span> <span class="mi">1000</span>
+        <span class="k">return</span>
+
+      <span class="nx">@hoodie</span><span class="p">.</span><span class="nx">my</span><span class="p">.</span><span class="nx">config</span><span class="p">.</span><span class="nx">remove</span> <span class="s1">&#39;_account.resetPasswordId&#39;</span>
+      <span class="nx">@hoodie</span><span class="p">.</span><span class="nx">trigger</span> <span class="s1">&#39;account:password_reset:error&#39;</span>
     
     <span class="nv">username  = </span><span class="s2">&quot;$passwordReset/#{resetPasswordId}&quot;</span>
-    <span class="nv">key       = </span><span class="s2">&quot;#{@_prefix}:#{username}&quot;</span>
     <span class="nv">hash      = </span><span class="nx">btoa</span> <span class="s2">&quot;#{username}:#{resetPasswordId}&quot;</span>
     <span class="nv">auth      = </span><span class="s2">&quot;Basic #{hash}&quot;</span>
 
-    <span class="nx">@hoodie</span><span class="p">.</span><span class="nx">request</span> <span class="s1">&#39;GET&#39;</span><span class="p">,</span>  <span class="s2">&quot;/_users/#{encodeURIComponent key}&quot;</span><span class="p">,</span>
+    <span class="nx">@hoodie</span><span class="p">.</span><span class="nx">request</span> <span class="s1">&#39;GET&#39;</span><span class="p">,</span>  <span class="s2">&quot;/_users/#{encodeURIComponent &quot;</span><span class="c1">#{@_prefix}:#{username}&quot;}&quot;,</span>
       <span class="nv">headers     :</span>
         <span class="nv">Authorization : </span><span class="nx">auth</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>beforeSend: (req) ->
  req.setRequestHeader 'Authorization', auth</p></div></div><div class="code"><div class="wrapper">      <span class="nv">success     : </span><span class="p">(</span><span class="nx">response</span><span class="p">)</span> <span class="o">=&gt;</span>
         <span class="k">if</span> <span class="nx">response</span><span class="p">.</span><span class="nx">$error</span>
           <span class="k">return</span> <span class="nx">defer</span><span class="p">.</span><span class="nx">reject</span> <span class="nv">error: </span><span class="nx">response</span><span class="p">.</span><span class="nx">$error</span>
 
-        <span class="k">if</span> <span class="nx">response</span><span class="p">.</span><span class="nx">$state</span> <span class="o">is</span> <span class="s1">&#39;done&#39;</span>
-          <span class="k">return</span> <span class="nx">defer</span><span class="p">.</span><span class="nx">resolve</span><span class="p">()</span>
-
         <span class="nx">defer</span><span class="p">.</span><span class="nx">reject</span> <span class="nv">error: </span><span class="s1">&#39;pending&#39;</span>
         
-      <span class="nv">error       : </span><span class="nf">(xhr) -&gt;</span>
-        <span class="k">if</span> <span class="nx">xhr</span><span class="p">.</span><span class="nx">status</span> <span class="o">is</span> <span class="mi">404</span>
+      <span class="nv">error       : </span><span class="nf">(xhr) -&gt;</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>document deleted, therefore invalid authorization</p></div></div><div class="code"><div class="wrapper">        <span class="k">if</span> <span class="nx">xhr</span><span class="p">.</span><span class="nx">status</span> <span class="o">is</span> <span class="mi">401</span>
           <span class="k">return</span> <span class="nx">defer</span><span class="p">.</span><span class="nx">resolve</span><span class="p">()</span>
 
         <span class="k">try</span>
