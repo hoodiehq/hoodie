@@ -623,7 +623,7 @@ describe("Hoodie.Account", function() {
       });
     });
   });
-  return describe(".resetPassword(username)", function() {
+  describe(".resetPassword(username)", function() {
     beforeEach(function() {
       return spyOn(this.account, "_checkPasswordResetStatus").andReturn("checkPasswordResetPromise");
     });
@@ -705,6 +705,20 @@ describe("Hoodie.Account", function() {
           });
         });
       });
+    });
+  });
+  return describe(".changeUsername(currentPassword, newUsername)", function() {
+    beforeEach(function() {
+      spyOn(this.account, "authenticate").andReturn({
+        pipe: function() {}
+      });
+      return this.account.changeUsername('secret', 'new.joe@example.com');
+    });
+    it("should authenticate", function() {
+      return expect(this.account.authenticate).wasCalled();
+    });
+    return it("should return a promise", function() {
+      return expect(this.account.changeUsername()).toBePromise();
     });
   });
 });

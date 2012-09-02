@@ -573,4 +573,16 @@ describe "Hoodie.Account", ->
         it "should be rejected with the error", ->
           expect(@account.resetPassword('joe@example.com')).toBeRejectedWith error: 'ooops'
   # /.resetPassword(username)
+
+  describe ".changeUsername(currentPassword, newUsername)", ->
+    beforeEach ->
+      spyOn(@account, "authenticate").andReturn pipe: ->
+      @account.changeUsername('secret', 'new.joe@example.com')
+    
+    it "should authenticate", ->
+       expect(@account.authenticate).wasCalled()
+
+    it "should return a promise", ->
+       expect(@account.changeUsername()).toBePromise()
+  # /.changeUsername(currentPassword, newUsername)
 # /Hoodie.Account

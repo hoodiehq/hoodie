@@ -142,6 +142,58 @@ Hoodie.Account = (function() {
 
   Account.prototype.login = Account.prototype.signIn;
 
+  Account.prototype.signOut = function() {
+    var _this = this;
+    this.hoodie.my.remote.disconnect();
+    return this.hoodie.request('DELETE', '/_session', {
+      success: function() {
+        return _this.hoodie.trigger('account:signout');
+      }
+    });
+  };
+
+  Account.prototype.logout = Account.prototype.signOut;
+
+  Account.prototype.on = function(event, cb) {
+    return this.hoodie.on("account:" + event, cb);
+  };
+
+  Account.prototype.db = function() {
+    return "user/" + this.owner;
+  };
+
+  Account.prototype.fetch = function() {
+    var defer, key,
+      _this = this;
+    defer = this.hoodie.defer();
+    if (!this.username) {
+      defer.reject({
+        error: "unauthenticated",
+        reason: "not logged in"
+      });
+      return defer.promise();
+    }
+    key = "" + this._prefix + ":" + this.username;
+    this.hoodie.request('GET', "/_users/" + (encodeURIComponent(key)), {
+      success: function(response) {
+        _this._doc = response;
+        return defer.resolve(response);
+      },
+      error: function(xhr) {
+        var error;
+        try {
+          error = JSON.parse(xhr.responseText);
+        } catch (e) {
+          error = {
+            error: xhr.responseText || "unknown"
+          };
+        }
+        return defer.reject(error);
+      }
+    });
+    return defer.promise();
+  };
+
   Account.prototype.changePassword = function(currentPassword, newPassword) {
     var data, defer, key,
       _this = this;
@@ -219,54 +271,22 @@ Hoodie.Account = (function() {
     return defer.promise();
   };
 
-  Account.prototype.signOut = function() {
-    var _this = this;
-    this.hoodie.my.remote.disconnect();
-    return this.hoodie.request('DELETE', '/_session', {
-      success: function() {
-        return _this.hoodie.trigger('account:signout');
-      }
-    });
-  };
-
-  Account.prototype.logout = Account.prototype.signOut;
-
-  Account.prototype.on = function(event, cb) {
-    return this.hoodie.on("account:" + event, cb);
-  };
-
-  Account.prototype.db = function() {
-    return "user/" + this.owner;
-  };
-
-  Account.prototype.fetch = function() {
-    var defer, key,
+  Account.prototype.changeUsername = function(currentPassword, newUsername) {
+    var defer,
       _this = this;
     defer = this.hoodie.defer();
-    if (!this.username) {
-      defer.reject({
-        error: "unauthenticated",
-        reason: "not logged in"
+    this.authenticate().pipe(function() {
+      var key, reqPromise;
+      key = "" + _this._prefix + ":" + _this.username;
+      _this._doc.$newUsername = newUsername;
+      reqPromise = _this.hoodie.request('PUT', "/_users/" + (encodeURIComponent(key)), {
+        data: JSON.stringify(_this._doc),
+        contentType: 'application/json'
       });
-      return defer.promise();
-    }
-    key = "" + this._prefix + ":" + this.username;
-    this.hoodie.request('GET', "/_users/" + (encodeURIComponent(key)), {
-      success: function(response) {
-        _this._doc = response;
-        return defer.resolve(response);
-      },
-      error: function(xhr) {
-        var error;
-        try {
-          error = JSON.parse(xhr.responseText);
-        } catch (e) {
-          error = {
-            error: xhr.responseText || "unknown"
-          };
-        }
-        return defer.reject(error);
-      }
+      reqPromise.fail(defer.reject);
+      return reqPromise.done(function() {
+        return _this.signIn(newUsername, currentPassword).then(defer.resolve, defer.reject);
+      });
     });
     return defer.promise();
   };

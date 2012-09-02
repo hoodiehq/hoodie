@@ -159,8 +159,82 @@ class Hoodie.Account
   login: @::signIn
 
 
+  # sign out 
+  # ---------
+
+  # uses standard CouchDB API to destroy a user session (DELETE /_session)
+  #
+  # TODO: handle errors
+  signOut: ->
+    @hoodie.my.remote.disconnect()
+    @hoodie.request 'DELETE', '/_session', 
+      success : => @hoodie.trigger 'account:signout'
+
+  # alias
+  logout: @::signOut
+  
+  
+  # On
+  # ---
+
+  # alias for `hoodie.on`
+  on : (event, cb) -> @hoodie.on "account:#{event}", cb
+  
+  
+  # db
+  # ----
+
+  # escape user username (or what ever he uses to sign up)
+  # to make it a valid CouchDB database name
+  # 
+  #     Converts an username address user name to a valid database name
+  #     The character replacement rules are:
+  #       [A-Z] -> [a-z]
+  #       @ -> $
+  #       . -> _
+  #     Notes:
+  #      can't reverse because _ are valid before the @.
+  #
+  #
+  db : -> 
+    "user/#{@owner}"
+  
+  
+  # fetch
+  # -------
+
+  # fetches _users doc from CouchDB and caches it in _doc
+  fetch : ->
+    defer = @hoodie.defer()
+    
+    unless @username
+      defer.reject error: "unauthenticated", reason: "not logged in"
+      return defer.promise()
+    
+    key = "#{@_prefix}:#{@username}"
+    @hoodie.request 'GET', "/_users/#{encodeURIComponent key}",
+    
+      success     : (response) => 
+        @_doc = response
+        defer.resolve response
+      
+      error       : (xhr) ->
+        try
+          error = JSON.parse(xhr.responseText)
+        catch e
+          error = error: xhr.responseText or "unknown"
+          
+        defer.reject(error) 
+        
+    return defer.promise()
+    
+
   # change password
   # -----------------
+
+  # Note: the hoodie API requires the currentPassword for security reasons,
+  # but couchDb doesn't require it for a password change, so it's ignored
+  # in this implementation of the hoodie API.
   changePassword : (currentPassword, newPassword) ->
     defer = @hoodie.defer()
     unless @username
@@ -236,76 +310,32 @@ class Hoodie.Account
     return defer.promise()
 
 
-  # sign out 
-  # ---------
+  # change username
+  # -----------------
 
-  # uses standard CouchDB API to destroy a user session (DELETE /_session)
+  # Note: the hoodie API requires the current password for security reasons,
+  # but technically we cannot (yet) prevent the user to change the username 
+  # without knowing the current password, so it's not impulemented in the current
+  # implementation of the hoodie API.
   #
-  # TODO: handle errors
-  signOut: ->
-    @hoodie.my.remote.disconnect()
-    @hoodie.request 'DELETE', '/_session', 
-      success : => @hoodie.trigger 'account:signout'
-
-  # alias
-  logout: @::signOut
-  
-  
-  # On
-  # ---
-
-  # alias for `hoodie.on`
-  on : (event, cb) -> @hoodie.on "account:#{event}", cb
-  
-  
-  # db
-  # ----
-
-  # escape user username (or what ever he uses to sign up)
-  # to make it a valid CouchDB database name
-  # 
-  #     Converts an username address user name to a valid database name
-  #     The character replacement rules are:
-  #       [A-Z] -> [a-z]
-  #       @ -> $
-  #       . -> _
-  #     Notes:
-  #      can't reverse because _ are valid before the @.
-  #
-  #
-  db : -> 
-    "user/#{@owner}"
-  
-  
-  # fetch
-  # -------
-
-  # fetches _users doc from CouchDB and caches it in _doc
-  fetch : ->
+  # But the current password is needed to login with the new username.
+  changeUsername : (currentPassword, newUsername) ->
     defer = @hoodie.defer()
     
-    unless @username
-      defer.reject error: "unauthenticated", reason: "not logged in"
-      return defer.promise()
-    
-    key = "#{@_prefix}:#{@username}"
-    @hoodie.request 'GET', "/_users/#{encodeURIComponent key}",
-    
-      success     : (response) => 
-        @_doc = response
-        defer.resolve response
-      
-      error       : (xhr) ->
-        try
-          error = JSON.parse(xhr.responseText)
-        catch e
-          error = error: xhr.responseText or "unknown"
-          
-        defer.reject(error) 
-        
+    @authenticate().pipe =>
+      key = "#{@_prefix}:#{@username}"
+      @_doc.$newUsername = newUsername
+      reqPromise = @hoodie.request 'PUT', "/_users/#{encodeURIComponent key}",
+        data        : JSON.stringify @_doc
+        contentType : 'application/json'
+
+      reqPromise.fail defer.reject
+      reqPromise.done =>
+        @signIn(newUsername, currentPassword).then defer.resolve, defer.reject
+
     return defer.promise()
-    
-    
+
+
   # destroy
   # ---------
 
