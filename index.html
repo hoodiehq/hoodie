@@ -39,13 +39,18 @@
       .done( function(user) { } ) 
       .fail( function(err)  { } )
     
-    // change password (coming soon)
-    hoodie.my.account.changePassword('currentsecret', 'newsecret')
+    // change password
+    hoodie.my.account.changePassword('currentpassword', 'newpassword')
+      .done( function(user) { } ) 
+      .fail( function(err)  { } )
+
+    // change username
+    hoodie.my.account.changeUsername('currentpassword', 'newusername')
       .done( function(user) { } ) 
       .fail( function(err)  { } )
       
-    // forgot password (coming soon)
-    hoodie.my.account.forgotPassword('joe@example.com')
+    // forgot password
+    hoodie.my.account.resetPassword('joe@example.com')
       .done( function(user) { } ) 
       .fail( function(err)  { } )
       

@@ -240,7 +240,7 @@ Hoodie.Account = (function() {
     defer = this.hoodie.defer();
     if (this.hasAnonymousAccount()) {
       currentPassword = this.hoodie.my.config.get('_account.anonymousPassword');
-      this.changeUsername(currentPassword, username, password).fail(defer.reject).done(function() {
+      this._changeUserNameAndPassword(currentPassword, username, password).fail(defer.reject).done(function() {
         _this.hoodie.my.config.remove('_account.anonymousPassword');
         return defer.resolve.apply(defer, arguments);
       });
@@ -458,33 +458,8 @@ Hoodie.Account = (function() {
     return defer.promise();
   };
 
-  Account.prototype.changeUsername = function(currentPassword, newUsername, newPassword) {
-    var defer,
-      _this = this;
-    defer = this.hoodie.defer();
-    this.authenticate().pipe(function() {
-      var data, key, reqPromise;
-      key = "" + _this._prefix + ":" + _this.username;
-      data = $.extend({}, _this._doc);
-      data.$newUsername = newUsername;
-      if (newPassword) {
-        delete data.salt;
-        delete data.password_sha;
-        data.password = newPassword;
-      }
-      reqPromise = _this.hoodie.request('PUT', "/_users/" + (encodeURIComponent(key)), {
-        data: JSON.stringify(data),
-        contentType: 'application/json'
-      });
-      reqPromise.fail(defer.reject);
-      return reqPromise.done(function() {
-        _this.hoodie.my.remote.disconnect();
-        return window.setTimeout((function() {
-          return _this.signIn(newUsername, newPassword || currentPassword).then(defer.resolve, defer.reject);
-        }), 1000);
-      });
-    });
-    return defer.promise();
+  Account.prototype.changeUsername = function(currentPassword, newUsername) {
+    return this._changeUserNameAndPassword(currentPassword, newUsername);
   };
 
   Account.prototype.destroy = function() {
@@ -570,6 +545,35 @@ Hoodie.Account = (function() {
         }
         return defer.reject(error);
       }
+    });
+    return defer.promise();
+  };
+
+  Account.prototype._changeUserNameAndPassword = function(currentPassword, newUsername, newPassword) {
+    var defer,
+      _this = this;
+    defer = this.hoodie.defer();
+    this.authenticate().pipe(function() {
+      var data, key, reqPromise;
+      key = "" + _this._prefix + ":" + _this.username;
+      data = $.extend({}, _this._doc);
+      data.$newUsername = newUsername;
+      if (newPassword) {
+        delete data.salt;
+        delete data.password_sha;
+        data.password = newPassword;
+      }
+      reqPromise = _this.hoodie.request('PUT', "/_users/" + (encodeURIComponent(key)), {
+        data: JSON.stringify(data),
+        contentType: 'application/json'
+      });
+      reqPromise.fail(defer.reject);
+      return reqPromise.done(function() {
+        _this.hoodie.my.remote.disconnect();
+        return window.setTimeout((function() {
+          return _this.signIn(newUsername, newPassword || currentPassword).then(defer.resolve, defer.reject);
+        }), 1000);
+      });
     });
     return defer.promise();
   };

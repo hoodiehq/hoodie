@@ -86,13 +86,41 @@ hoodie.my.account.signOut()
 ```
 
 
-### Forgot Password
+### Change Password
 
 ```javascript
-hoodie.my.account.forgotPassword('joe@example.com')
+hoodie.my.account.changePassword('currentpassword', 'newpassword')
+
+  .done( function() {
+    alert( "Password updated")
+  } ) 
+  .fail( function(err) {
+    alert("Oops: " + err.message)
+  } )
+```
+
+
+### reset Password
+
+```javascript
+hoodie.my.account.resetPassword('joe@example.com')
 
   .done( function() {
     alert( "Link has been sent to joe@example.com")
+  } ) 
+  .fail( function(err) {
+    alert("Oops: " + err.message)
+  } )
+```
+
+
+### Change Username
+
+```javascript
+hoodie.my.account.changeUsername('currentpassword', 'newusername')
+
+  .done( function() {
+    alert( "Username updated")
   } ) 
   .fail( function(err) {
     alert("Oops: " + err.message)
