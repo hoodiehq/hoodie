@@ -284,6 +284,24 @@ describe "Hoodie.Account", ->
         expect(promise).toBeRejectedWith responseText: '{"error":"forbidden","reason":"Username may not start with underscore."}'
   # /.signUp(username, password)
 
+  
+  describe ".anonymousSignUp()", ->
+    beforeEach ->
+      spyOn(@account, "signUp") 
+      spyOn(@hoodie.my.store, "uuid").andReturn "crazyuuid123"
+      spyOn(@hoodie.my.config, "set")
+      @account.owner = "owner_hash123"
+
+    it "should generate a password and store it locally in _account.anonymousPassword", ->
+      @account.anonymousSignUp()
+      expect(@hoodie.my.store.uuid).wasCalledWith 10
+      expect(@hoodie.my.config.set).wasCalledWith '_account.anonymousPassword', 'crazyuuid123'
+       
+    it "should sign up with username = 'anonymous/ownerHash' and the random password", ->
+      @account.anonymousSignUp()
+      expect(@account.signUp).wasCalledWith 'anonymous/owner_hash123', 'crazyuuid123'
+  # /.anonymousSignUp()
+
 
   describe ".signIn(username, password)", ->
     beforeEach ->
@@ -432,6 +450,29 @@ describe "Hoodie.Account", ->
         @account.signOut('joe@example.com', 'secret')
         expect(@hoodie.trigger).wasCalledWith 'account:signout'
   # /.signIn(username, password)
+
+
+  describe ".hasAnonymousAccount()", ->
+    _when "_account.anonymousPassword is set", ->
+      beforeEach ->
+        spyOn(@hoodie.my.config, "get").andCallFake (key) ->
+          if key is '_account.username'
+            return 'password'
+
+        it "should return true", ->
+           expect(@account.hasAnonymousAccount()).toBe true
+
+    _when "_account.anonymousPassword is not set", ->
+      beforeEach ->
+        spyOn(@hoodie.my.config, "get").andCallFake (key) ->
+          if key is '_account.username'
+            return undefined
+
+      it "should return false", ->
+         expect(@account.hasAnonymousAccount()).toBe false
+
+      
+  # /.hasAnonymousAccount
   
   
   describe ".on(event, callback)", ->
@@ -488,9 +529,14 @@ describe "Hoodie.Account", ->
   
   describe ".destroy()", ->
     beforeEach ->
+      spyOn(@hoodie.my.remote, "disconnect")
       spyOn(@account, "fetch").andReturn @hoodie.defer().resolve().promise()
       @account.username = 'joe@example.com'
       @account._doc = _rev : '1-234'
+    
+    it "should disconnect", ->
+      @account.destroy()
+      expect(@hoodie.my.remote.disconnect).wasCalled()
     
     it "should fetch the account", ->
       @account.destroy()

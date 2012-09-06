@@ -19,6 +19,8 @@ class Hoodie.Account
     @username = @hoodie.my.config.get '_account.username'
     @owner    = @hoodie.my.config.get '_account.owner'
 
+    # the owner hash gets stored in every object created by the user.
+    # Make sure we have one.
     unless @owner
       @owner = @hoodie.my.store.uuid()
       @hoodie.my.config.set '_account.owner', @owner
@@ -87,42 +89,72 @@ class Hoodie.Account
   signUp : (username, password = '') ->
     defer = @hoodie.defer()
     
-    key = "#{@_prefix}:#{username}"
+    if @hasAnonymousAccount()
+      currentPassword = @hoodie.my.config.get '_account.anonymousPassword'
+      @_changeUserNameAndPassword(currentPassword, username, password)
+      .fail(defer.reject)
+      .done => 
+        @hoodie.my.config.remove '_account.anonymousPassword'
+        defer.resolve arguments...
 
-    data = 
-      _id        : key
-      name       : username
-      type       : 'user'
-      roles      : []
-      password   : password
-      $owner     : @owner
-      database   : @db()
+    else
+      key  = "#{@_prefix}:#{username}"
+      data = 
+        _id        : key
+        name       : username
+        type       : 'user'
+        roles      : []
+        password   : password
+        $owner     : @owner
+        database   : @db()
 
-    requestPromise = @hoodie.request 'PUT', "/_users/#{encodeURIComponent key}",
-      data        : JSON.stringify data
-      contentType : 'application/json'
-      
-    delaydSignIn = =>
-      window.setTimeout ( =>
-        @signIn(username, password).then defer.resolve, handleError
-      ), 300
+      requestPromise = @hoodie.request 'PUT', "/_users/#{encodeURIComponent key}",
+        data        : JSON.stringify data
+        contentType : 'application/json'
+        
+      delaydSignIn = =>
+        window.setTimeout ( =>
+          @signIn(username, password).then defer.resolve, handleSignInError
+        ), 300
 
-    handleSucces = (response) =>
-      @hoodie.trigger 'account:signup', username
-      @_doc._rev = response.rev
-      delaydSignIn()
-    
-    handleError = (error) =>
-      if error.error is 'unconfirmed'
-        # It might take a bit until the account has been confirmed
+      handleSignUpSucces = (response) =>
+        @hoodie.trigger 'account:signup', username
+        @_doc._rev = response.rev
         delaydSignIn()
-      else
-        defer.reject arguments...
-
-    requestPromise.then handleSucces, defer.reject
       
+      handleSignInError = (error) =>
+        if error.error is 'unconfirmed'
+          # It might take a bit until the account has been confirmed
+          delaydSignIn()
+        else
+          defer.reject arguments...
+
+      requestPromise.then handleSignUpSucces, defer.reject
+        
     return defer.promise()
 
+  
+  # anonymous sign up
+  # -------------------
+
+  # If the user did not sign up himself yet, but data needs to be transfered
+  # to the couch, e.g. to send an email or to share data, the anonymousSignUp
+  # method can be used. It generates a random password and stores it locally
+  # in the browser until the user decides to sign up manually.
+  #
+  anonymousSignUp: ->
+    password = @hoodie.my.store.uuid(10)
+    username = "anonymous/#{@owner}"
+    @signUp username, password
+    @hoodie.my.config.set '_account.anonymousPassword', password
+
+
+  # hasAnonymousAccount
+  # ---------------------
+  
+  #
+  hasAnonymousAccount: ->
+    @hoodie.my.config.get('_account.anonymousPassword')?
 
   # sign in with username & password
   # ----------------------------------
@@ -133,13 +165,17 @@ class Hoodie.Account
   #
   signIn : (username, password = '') ->
     defer = @hoodie.defer()
-
-    requestPromise = @hoodie.request 'POST', '/_session', 
-      data: 
-        name      : username
-        password  : password
         
     handleSucces = (response) =>
+
+      # TODO:
+      # handle errors. If an error occurs, the workers stores it in
+      # the _users doc's $error attribute. We have to fetch the _users
+      # doc and check if it has an error at this point. Otherwise
+      # it will keep trying to sign in, which doesn't make any sense.
+      #
+      # IDEA: we add a role "error", so that we don't need to fetch
+      #       the _users doc to find out if there is an error
       unless ~response.roles.indexOf("confirmed")
         return defer.reject error: "unconfirmed", reason: "account has not been confirmed yet"
 
@@ -150,9 +186,14 @@ class Hoodie.Account
       @hoodie.trigger 'account:signin', username
       @fetch()
       defer.resolve username, response
-    
+
+    requestPromise = @hoodie.request 'POST', '/_session', 
+      data: 
+        name      : username
+        password  : password
+
     requestPromise.then handleSucces, defer.reject
-    
+
     return defer.promise()
 
   # alias
@@ -204,7 +245,7 @@ class Hoodie.Account
   # -------
 
   # fetches _users doc from CouchDB and caches it in _doc
-  fetch : ->
+  fetch : =>
     defer = @hoodie.defer()
     
     unless @username
@@ -252,8 +293,10 @@ class Hoodie.Account
       data        : JSON.stringify data
       contentType : "application/json"
       success     : (response) =>
-        @fetch()
-        defer.resolve()
+        window.setTimeout ( => 
+          @hoodie.my.remote.disconnect()
+          @signIn(@username, newPassword).then defer.resolve, defer.reject
+        ), 1000
         
       error       : (xhr) ->
         try
@@ -320,20 +363,7 @@ class Hoodie.Account
   #
   # But the current password is needed to login with the new username.
   changeUsername : (currentPassword, newUsername) ->
-    defer = @hoodie.defer()
-    
-    @authenticate().pipe =>
-      key = "#{@_prefix}:#{@username}"
-      @_doc.$newUsername = newUsername
-      reqPromise = @hoodie.request 'PUT', "/_users/#{encodeURIComponent key}",
-        data        : JSON.stringify @_doc
-        contentType : 'application/json'
-
-      reqPromise.fail defer.reject
-      reqPromise.done =>
-        @signIn(newUsername, currentPassword).then defer.resolve, defer.reject
-
-    return defer.promise()
+    @_changeUserNameAndPassword(currentPassword, newUsername)
 
 
   # destroy
@@ -341,6 +371,7 @@ class Hoodie.Account
 
   # destroys a user' account  
   destroy : ->
+    @hoodie.my.remote.disconnect()
     @fetch().pipe =>
       key = "#{@_prefix}:#{@username}"
       @_doc._deleted = true
@@ -423,5 +454,35 @@ class Hoodie.Account
           error = error: xhr.responseText or "unknown"
         
         defer.reject(error)
+
+    return defer.promise()
+
+  #
+  #
+  #
+  _changeUserNameAndPassword: (currentPassword, newUsername, newPassword) ->
+    defer = @hoodie.defer()
+    
+    @authenticate().pipe =>
+      key = "#{@_prefix}:#{@username}"
+
+      data = $.extend {}, @_doc
+      data.$newUsername = newUsername
+
+      if newPassword
+        delete data.salt
+        delete data.password_sha
+        data.password = newPassword
+
+      reqPromise = @hoodie.request 'PUT', "/_users/#{encodeURIComponent key}",
+        data        : JSON.stringify data
+        contentType : 'application/json'
+
+      reqPromise.fail defer.reject
+      reqPromise.done =>
+        @hoodie.my.remote.disconnect()
+        window.setTimeout ( =>
+          @signIn(newUsername, newPassword or currentPassword).then defer.resolve, defer.reject
+        ), 1000
 
     return defer.promise()

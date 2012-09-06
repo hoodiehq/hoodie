@@ -352,6 +352,23 @@ describe("Hoodie.Account", function() {
       });
     });
   });
+  describe(".anonymousSignUp()", function() {
+    beforeEach(function() {
+      spyOn(this.account, "signUp");
+      spyOn(this.hoodie.my.store, "uuid").andReturn("crazyuuid123");
+      spyOn(this.hoodie.my.config, "set");
+      return this.account.owner = "owner_hash123";
+    });
+    it("should generate a password and store it locally in _account.anonymousPassword", function() {
+      this.account.anonymousSignUp();
+      expect(this.hoodie.my.store.uuid).wasCalledWith(10);
+      return expect(this.hoodie.my.config.set).wasCalledWith('_account.anonymousPassword', 'crazyuuid123');
+    });
+    return it("should sign up with username = 'anonymous/ownerHash' and the random password", function() {
+      this.account.anonymousSignUp();
+      return expect(this.account.signUp).wasCalledWith('anonymous/owner_hash123', 'crazyuuid123');
+    });
+  });
   describe(".signIn(username, password)", function() {
     beforeEach(function() {
       var _ref;
@@ -533,6 +550,32 @@ describe("Hoodie.Account", function() {
       });
     });
   });
+  describe(".hasAnonymousAccount()", function() {
+    _when("_account.anonymousPassword is set", function() {
+      return beforeEach(function() {
+        spyOn(this.hoodie.my.config, "get").andCallFake(function(key) {
+          if (key === '_account.username') {
+            return 'password';
+          }
+        });
+        return it("should return true", function() {
+          return expect(this.account.hasAnonymousAccount()).toBe(true);
+        });
+      });
+    });
+    return _when("_account.anonymousPassword is not set", function() {
+      beforeEach(function() {
+        return spyOn(this.hoodie.my.config, "get").andCallFake(function(key) {
+          if (key === '_account.username') {
+            return void 0;
+          }
+        });
+      });
+      return it("should return false", function() {
+        return expect(this.account.hasAnonymousAccount()).toBe(false);
+      });
+    });
+  });
   describe(".on(event, callback)", function() {
     beforeEach(function() {
       return spyOn(this.hoodie, "on");
@@ -602,11 +645,16 @@ describe("Hoodie.Account", function() {
   });
   describe(".destroy()", function() {
     beforeEach(function() {
+      spyOn(this.hoodie.my.remote, "disconnect");
       spyOn(this.account, "fetch").andReturn(this.hoodie.defer().resolve().promise());
       this.account.username = 'joe@example.com';
       return this.account._doc = {
         _rev: '1-234'
       };
+    });
+    it("should disconnect", function() {
+      this.account.destroy();
+      return expect(this.hoodie.my.remote.disconnect).wasCalled();
     });
     it("should fetch the account", function() {
       this.account.destroy();
