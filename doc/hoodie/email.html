@@ -1,14 +1,20 @@
-<!DOCTYPE html><html lang="en"><head><title>hoodie/email</title></head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0"><meta name="groc-relative-root" content="../"><meta name="groc-document-path" content="hoodie/email"><meta name="groc-project-path" content="src/hoodie/email.coffee"><link rel="stylesheet" type="text/css" media="all" href="../assets/style.css"><script type="text/javascript" src="../assets/behavior.js"></script><body><div id="meta"><div class="file-path">src/hoodie/email.coffee</div></div><div id="document"><div class="segment"><div class="comments"><div class="wrapper"><p>Sending emails. Not unicorns</p></div></div><div class="code"><div class="wrapper"><span class="k">class</span> <span class="nx">Hoodie</span><span class="p">.</span><span class="nx">Email</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h2 id="constructor">Constructor</h2></div></div></div><div class="segment"><div class="code"><div class="wrapper">  <span class="nv">constructor : </span><span class="nf">(@hoodie) -&gt;</span>
-    </div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>TODO
-let's subscribe to general <code>_email</code> changes and provide
-an <code>on</code> interface, so devs can listen to events like:</p>
+<!DOCTYPE html><html lang="en"><head><title>hoodie/email</title></head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0"><meta name="groc-relative-root" content="../"><meta name="groc-document-path" content="hoodie/email"><meta name="groc-project-path" content="src/hoodie/email.coffee"><link rel="stylesheet" type="text/css" media="all" href="../assets/style.css"><script type="text/javascript" src="../assets/behavior.js"></script><body><div id="meta"><div class="file-path">src/hoodie/email.coffee</div></div><div id="document"><div class="segment"><div class="comments"><div class="wrapper"><p>Sending emails. Not unicorns</p></div></div><div class="code"><div class="wrapper"><span class="k">class</span> <span class="nx">Hoodie</span><span class="p">.</span><span class="nx">Email</span>
 
-<ul>
-<li>hoodie.email.on 'sent',  -> ...</li>
-<li>hoodie.email.on 'error', -> ...</li>
-</ul></div></div><div class="code"><div class="wrapper">  </div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h2 id="send">send</h2>
-
-<p>sends an email and returns a promise</p></div></div><div class="code"><div class="wrapper">  <span class="nv">send : </span><span class="nf">(emailAttributes = {}) -&gt;</span>
+  <span class="c1"># ## Constructor</span>
+  <span class="c1">#</span>
+  <span class="nv">constructor : </span><span class="nf">(@hoodie) -&gt;</span>
+    
+    <span class="c1"># TODO</span>
+    <span class="c1"># let&#39;s subscribe to general `_email` changes and provide</span>
+    <span class="c1"># an `on` interface, so devs can listen to events like:</span>
+    <span class="c1"># </span>
+    <span class="c1"># * hoodie.email.on &#39;sent&#39;,  -&gt; ...</span>
+    <span class="c1"># * hoodie.email.on &#39;error&#39;, -&gt; ...</span>
+  
+  <span class="c1"># ## send</span>
+  <span class="c1">#</span>
+  <span class="c1"># sends an email and returns a promise</span>
+  <span class="nv">send : </span><span class="nf">(emailAttributes = {}) -&gt;</span>
     <span class="nv">defer      = </span><span class="nx">@hoodie</span><span class="p">.</span><span class="nx">defer</span><span class="p">()</span>
     <span class="nv">attributes = </span><span class="nx">$</span><span class="p">.</span><span class="nx">extend</span> <span class="p">{},</span> <span class="nx">emailAttributes</span>
     
@@ -20,7 +26,10 @@ an <code>on</code> interface, so devs can listen to events like:</p>
       <span class="nx">@_handleEmailUpdate</span><span class="p">(</span><span class="nx">defer</span><span class="p">,</span> <span class="nx">obj</span><span class="p">)</span>
       
     <span class="nx">defer</span><span class="p">.</span><span class="nx">promise</span><span class="p">()</span>
-    </div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h2 id="private">PRIVATE</h2></div></div></div><div class="segment"><div class="code"><div class="wrapper">  <span class="nv">_isValidEmail : </span><span class="nf">(email = &#39;&#39;) -&gt;</span>
+    
+  <span class="c1"># ## PRIVATE</span>
+  <span class="c1">#</span>
+  <span class="nv">_isValidEmail : </span><span class="nf">(email = &#39;&#39;) -&gt;</span>
      <span class="o">/</span><span class="err">@</span><span class="o">/</span><span class="p">.</span><span class="nx">test</span> <span class="nx">email</span>
      
   <span class="nv">_handleEmailUpdate : </span><span class="p">(</span><span class="nx">defer</span><span class="p">,</span> <span class="nv">attributes = </span><span class="p">{})</span> <span class="o">=&gt;</span>

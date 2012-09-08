@@ -37,18 +37,46 @@
 
 <ul>
 <li>on(event, callback)</li>
-</ul></div></div><div class="code"><div class="wrapper"><span class="k">class</span> <span class="nx">Hoodie</span><span class="p">.</span><span class="nx">RemoteStore</span> <span class="k">extends</span> <span class="nx">Hoodie</span><span class="p">.</span><span class="nx">Store</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h2 id="properties">properties</h2></div></div><div class="code"><div class="wrapper">  </div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>sync  </p></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>if set to true, updates will be continuously pulled
-and pushed. Alternatively, <code>_sync</code> can be set to
-<code>pull: true</code> or <code>push: true</code>.</p></div></div><div class="code"><div class="wrapper">  <span class="nv">_sync: </span><span class="kc">false</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h2 id="constructor">Constructor</h2></div></div><div class="code"><div class="wrapper">  </div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>sets basePath (think: namespace) and some other options</p></div></div><div class="code"><div class="wrapper">  <span class="nv">constructor : </span><span class="nf">(@hoodie, options = {}) -&gt;</span>
+</ul></div></div><div class="code"><div class="wrapper"><span class="k">class</span> <span class="nx">Hoodie</span><span class="p">.</span><span class="nx">RemoteStore</span> <span class="k">extends</span> <span class="nx">Hoodie</span><span class="p">.</span><span class="nx">Store</span>
+
+  <span class="c1"># ## properties</span>
+  
+  <span class="c1"># sync  </span>
+
+  <span class="c1"># if set to true, updates will be continuously pulled</span>
+  <span class="c1"># and pushed. Alternatively, `_sync` can be set to</span>
+  <span class="c1"># `pull: true` or `push: true`.</span>
+  <span class="nv">_sync: </span><span class="kc">false</span>
+
+
+  <span class="c1"># ## Constructor </span>
+  
+  <span class="c1"># sets basePath (think: namespace) and some other options</span>
+  <span class="nv">constructor : </span><span class="nf">(@hoodie, options = {}) -&gt;</span>
     <span class="vi">@basePath = </span><span class="nx">options</span><span class="p">.</span><span class="nx">basePath</span> <span class="o">or</span> <span class="s1">&#39;&#39;</span>
-    <span class="vi">@_sync    = </span><span class="nx">options</span><span class="p">.</span><span class="nx">sync</span>     <span class="k">if</span> <span class="nx">options</span><span class="p">.</span><span class="nx">sync</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h2 id="object-loading--updating--deleting">object loading / updating / deleting</h2></div></div><div class="code"><div class="wrapper">  </div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h2 id="find">find</h2></div></div><div class="code"><div class="wrapper">  </div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>find one object</p></div></div><div class="code"><div class="wrapper">  <span class="nv">find: </span><span class="nf">(type, id) -&gt;</span>
+    <span class="vi">@_sync    = </span><span class="nx">options</span><span class="p">.</span><span class="nx">sync</span>     <span class="k">if</span> <span class="nx">options</span><span class="p">.</span><span class="nx">sync</span>
+
+
+
+  <span class="c1"># object loading / updating / deleting</span>
+  <span class="c1"># --------------------------------------</span>
+
+  
+  <span class="c1"># ## find</span>
+  
+  <span class="c1"># find one object</span>
+  <span class="nv">find: </span><span class="nf">(type, id) -&gt;</span>
     <span class="nv">defer = </span><span class="k">super</span>
     <span class="k">return</span> <span class="nx">defer</span> <span class="k">if</span> <span class="nx">@hoodie</span><span class="p">.</span><span class="nx">isPromise</span><span class="p">(</span><span class="nx">defer</span><span class="p">)</span>
 
     <span class="nv">path = </span><span class="s2">&quot;/&quot;</span> <span class="o">+</span> <span class="nb">encodeURIComponent</span> <span class="s2">&quot;#{type}/#{id}&quot;</span>
     <span class="nx">@request</span> <span class="s2">&quot;GET&quot;</span><span class="p">,</span> <span class="nx">path</span>
 
-  </div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h2 id="findall">findAll</h2></div></div><div class="code"><div class="wrapper">  </div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>find all objects, can be filetered by a type</p></div></div><div class="code"><div class="wrapper">  <span class="nv">findAll : </span><span class="nf">(type) -&gt;</span>
+  
+  <span class="c1"># ## findAll</span>
+  
+  <span class="c1"># find all objects, can be filetered by a type</span>
+  <span class="nv">findAll : </span><span class="nf">(type) -&gt;</span>
     <span class="nv">defer = </span><span class="k">super</span>
     <span class="k">return</span> <span class="nx">defer</span> <span class="k">if</span> <span class="nx">@hoodie</span><span class="p">.</span><span class="nx">isPromise</span><span class="p">(</span><span class="nx">defer</span><span class="p">)</span>
 
@@ -62,8 +90,13 @@ and pushed. Alternatively, <code>_sync</code> can be set to
       <span class="nx">defer</span><span class="p">.</span><span class="nx">resolve</span> <span class="nx">response</span><span class="p">.</span><span class="nx">rows</span>
 
     <span class="k">return</span> <span class="nx">defer</span><span class="p">.</span><span class="nx">promise</span><span class="p">()</span>
-  </div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h2 id="save">save</h2></div></div><div class="code"><div class="wrapper">  </div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>save a new object. If it existed before, all properties
-will be overwritten </p></div></div><div class="code"><div class="wrapper">  <span class="nv">save : </span><span class="nf">(type, id, object) -&gt;</span>
+  
+
+  <span class="c1"># ## save</span>
+  
+  <span class="c1"># save a new object. If it existed before, all properties</span>
+  <span class="c1"># will be overwritten </span>
+  <span class="nv">save : </span><span class="nf">(type, id, object) -&gt;</span>
     <span class="nv">defer = </span><span class="k">super</span>
     <span class="k">return</span> <span class="nx">defer</span> <span class="k">if</span> <span class="nx">@hoodie</span><span class="p">.</span><span class="nx">isPromise</span><span class="p">(</span><span class="nx">defer</span><span class="p">)</span>
 
@@ -78,12 +111,31 @@ will be overwritten </p></div></div><div class="code"><div class="wrapper">  <sp
 
     <span class="nx">@request</span> <span class="s2">&quot;PUT&quot;</span><span class="p">,</span> <span class="nx">path</span><span class="p">,</span> <span class="nv">data: </span><span class="nx">doc</span>
 
-  </div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h2 id="destroy">destroy</h2></div></div><div class="code"><div class="wrapper">  </div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>destroy one object</p></div></div><div class="code"><div class="wrapper">  <span class="nv">destroy : </span><span class="nf">(type, id) -&gt;</span>
+  
+  <span class="c1"># ## destroy</span>
+  
+  <span class="c1"># destroy one object</span>
+  <span class="nv">destroy : </span><span class="nf">(type, id) -&gt;</span>
     <span class="nx">@update</span> <span class="nx">type</span><span class="p">,</span> <span class="nx">id</span><span class="p">,</span> <span class="nv">_deleted: </span><span class="kc">true</span>
 
-  </div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h2 id="destroyall">destroyAll</h2></div></div><div class="code"><div class="wrapper">  </div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>destroy all objects, can be filtered by type</p></div></div><div class="code"><div class="wrapper">  <span class="nv">destroyAll : </span><span class="nf">(type) -&gt;</span>
-    <span class="nx">@updateAll</span> <span class="nx">type</span><span class="p">,</span> <span class="nv">_deleted: </span><span class="kc">true</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h2 id="custom-requests">custom requests</h2></div></div><div class="code"><div class="wrapper">  </div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h2 id="request">request</h2></div></div><div class="code"><div class="wrapper">  </div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>wrapper for hoodie.request, with some store specific defaults
-and a prefixed path</p></div></div><div class="code"><div class="wrapper">  <span class="nv">request : </span><span class="nf">(type, path, options = {}) -&gt;</span>
+  
+  <span class="c1"># ## destroyAll</span>
+  
+  <span class="c1"># destroy all objects, can be filtered by type</span>
+  <span class="nv">destroyAll : </span><span class="nf">(type) -&gt;</span>
+    <span class="nx">@updateAll</span> <span class="nx">type</span><span class="p">,</span> <span class="nv">_deleted: </span><span class="kc">true</span>
+
+
+
+  <span class="c1"># custom requests</span>
+  <span class="c1"># -----------------</span>
+
+  
+  <span class="c1"># ## request</span>
+  
+  <span class="c1"># wrapper for hoodie.request, with some store specific defaults</span>
+  <span class="c1"># and a prefixed path</span>
+  <span class="nv">request : </span><span class="nf">(type, path, options = {}) -&gt;</span>
     <span class="nv">path = </span><span class="nx">@basePath</span> <span class="o">+</span> <span class="nx">path</span>
 
     <span class="nx">options</span><span class="p">.</span><span class="nx">contentType</span> <span class="o">or=</span> <span class="s1">&#39;application/json&#39;</span>
@@ -92,25 +144,85 @@ and a prefixed path</p></div></div><div class="code"><div class="wrapper">  <spa
       <span class="nx">options</span><span class="p">.</span><span class="nx">processData</span> <span class="o">or=</span> <span class="kc">false</span>
       <span class="nv">options.data = </span><span class="nx">JSON</span><span class="p">.</span><span class="nx">stringify</span> <span class="nx">options</span><span class="p">.</span><span class="nx">data</span>
 
-    <span class="nx">@hoodie</span><span class="p">.</span><span class="nx">request</span> <span class="nx">type</span><span class="p">,</span> <span class="nx">path</span><span class="p">,</span> <span class="nx">options</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h2 id="get">get</h2></div></div><div class="code"><div class="wrapper">  </div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>send a GET request to the named view</p></div></div><div class="code"><div class="wrapper">  <span class="nv">get: </span><span class="nf">(view_name, params) -&gt;</span>
+    <span class="nx">@hoodie</span><span class="p">.</span><span class="nx">request</span> <span class="nx">type</span><span class="p">,</span> <span class="nx">path</span><span class="p">,</span> <span class="nx">options</span>
+
+  <span class="c1"># ## get</span>
+  
+  <span class="c1"># send a GET request to the named view</span>
+  <span class="nv">get: </span><span class="nf">(view_name, params) -&gt;</span>
     <span class="nx">console</span><span class="p">.</span><span class="nx">log</span> <span class="s2">&quot;.get() not yet implemented&quot;</span><span class="p">,</span> <span class="nx">arguments</span><span class="p">...</span>
   
-  </div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h2 id="post">post</h2></div></div><div class="code"><div class="wrapper">  </div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>sends a POST request to the specified updated_function</p></div></div><div class="code"><div class="wrapper">  <span class="nv">post: </span><span class="nf">(update_function_name, params) -&gt;</span>
-    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span> <span class="s2">&quot;.post() not yet implemented&quot;</span><span class="p">,</span> <span class="nx">arguments</span><span class="p">...</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h2 id="synchronization">synchronization</h2></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h2 id="connect">Connect</h2></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>start syncing</p></div></div><div class="code"><div class="wrapper">  <span class="nv">connect : </span><span class="o">=&gt;</span>
+  
+  <span class="c1"># ## post</span>
+  
+  <span class="c1"># sends a POST request to the specified updated_function</span>
+  <span class="nv">post: </span><span class="nf">(update_function_name, params) -&gt;</span>
+    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span> <span class="s2">&quot;.post() not yet implemented&quot;</span><span class="p">,</span> <span class="nx">arguments</span><span class="p">...</span>
+
+
+
+  <span class="c1"># synchronization</span>
+  <span class="c1"># -----------------</span>
+
+  <span class="c1"># ## Connect</span>
+
+  <span class="c1"># start syncing</span>
+  <span class="nv">connect : </span><span class="o">=&gt;</span>
     <span class="vi">@connected = </span><span class="kc">true</span>
     <span class="nx">@sync</span><span class="p">()</span>
   
-    </div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h2 id="disconnect">Disconnect</h2></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>stop syncing changes from the userDB</p></div></div><div class="code"><div class="wrapper">  <span class="nv">disconnect : </span><span class="o">=&gt;</span>
+    
+  <span class="c1"># ## Disconnect</span>
+
+  <span class="c1"># stop syncing changes from the userDB</span>
+  <span class="nv">disconnect : </span><span class="o">=&gt;</span>
     <span class="vi">@connected = </span><span class="kc">false</span>
-    </div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>binding comes from @sync</p></div></div><div class="code"><div class="wrapper">    <span class="nx">@hoodie</span><span class="p">.</span><span class="nx">unbind</span> <span class="s1">&#39;store:dirty:idle&#39;</span><span class="p">,</span>   <span class="nx">@push</span>
+    
+    <span class="c1"># binding comes from @sync</span>
+    <span class="nx">@hoodie</span><span class="p">.</span><span class="nx">unbind</span> <span class="s1">&#39;store:dirty:idle&#39;</span><span class="p">,</span>   <span class="nx">@push</span>
     
     <span class="nx">@_pullRequest</span><span class="o">?</span><span class="p">.</span><span class="nx">abort</span><span class="p">()</span>
-    <span class="nx">@_pushRequest</span><span class="o">?</span><span class="p">.</span><span class="nx">abort</span><span class="p">()</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h2 id="iscontinuouslypulling">isContinuouslyPulling</h2></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>returns true if pulling is set to be continous</p></div></div><div class="code"><div class="wrapper">  <span class="nv">isContinuouslyPulling: </span><span class="o">-&gt;</span>
-    <span class="nx">@_sync</span> <span class="o">is</span> <span class="kc">true</span> <span class="o">or</span> <span class="nx">@_sync</span><span class="o">?</span><span class="p">.</span><span class="nx">pull</span> <span class="o">is</span> <span class="kc">true</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h2 id="iscontinuouslypushing">isContinuouslyPushing</h2></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>returns true if pulling is set to be continous</p></div></div><div class="code"><div class="wrapper">  <span class="nv">isContinuouslyPushing: </span><span class="o">-&gt;</span>
-    <span class="nx">@_sync</span> <span class="o">is</span> <span class="kc">true</span> <span class="o">or</span> <span class="nx">@_sync</span><span class="o">?</span><span class="p">.</span><span class="nx">push</span> <span class="o">is</span> <span class="kc">true</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h2 id="iscontinuouslysyncing">isContinuouslySyncing</h2></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>returns true if pulling is set to be continous</p></div></div><div class="code"><div class="wrapper">  <span class="nv">isContinuouslySyncing: </span><span class="o">-&gt;</span>
-    <span class="nx">@_sync</span> <span class="o">is</span> <span class="kc">true</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h2 id="getsincenr">getSinceNr</h2></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>returns the sequence number from wich to start to find changes in pull</p></div></div><div class="code"><div class="wrapper">  <span class="nv">getSinceNr: </span><span class="o">-&gt;</span>
-    <span class="nx">@_since</span> <span class="o">or</span> <span class="mi">0</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h2 id="setsincenr">setSinceNr</h2></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>sets the sequence number from wich to start to find changes in pull</p></div></div><div class="code"><div class="wrapper">  <span class="nv">setSinceNr: </span><span class="nf">(seq) -&gt;</span>
-    <span class="vi">@_since = </span><span class="nx">seq</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h2 id="pull-changes">pull changes</h2></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>a.k.a. make a GET request to CouchDB's <code>_changes</code> feed.</p></div></div><div class="code"><div class="wrapper">  <span class="nv">pull : </span><span class="o">=&gt;</span>
+    <span class="nx">@_pushRequest</span><span class="o">?</span><span class="p">.</span><span class="nx">abort</span><span class="p">()</span>
+
+
+  <span class="c1"># ## isContinuouslyPulling</span>
+
+  <span class="c1"># returns true if pulling is set to be continous</span>
+  <span class="nv">isContinuouslyPulling: </span><span class="o">-&gt;</span>
+    <span class="nx">@_sync</span> <span class="o">is</span> <span class="kc">true</span> <span class="o">or</span> <span class="nx">@_sync</span><span class="o">?</span><span class="p">.</span><span class="nx">pull</span> <span class="o">is</span> <span class="kc">true</span>
+
+  <span class="c1"># ## isContinuouslyPushing</span>
+
+  <span class="c1"># returns true if pulling is set to be continous</span>
+  <span class="nv">isContinuouslyPushing: </span><span class="o">-&gt;</span>
+    <span class="nx">@_sync</span> <span class="o">is</span> <span class="kc">true</span> <span class="o">or</span> <span class="nx">@_sync</span><span class="o">?</span><span class="p">.</span><span class="nx">push</span> <span class="o">is</span> <span class="kc">true</span>
+
+  <span class="c1"># ## isContinuouslySyncing</span>
+
+  <span class="c1"># returns true if pulling is set to be continous</span>
+  <span class="nv">isContinuouslySyncing: </span><span class="o">-&gt;</span>
+    <span class="nx">@_sync</span> <span class="o">is</span> <span class="kc">true</span>
+
+  <span class="c1"># ## getSinceNr</span>
+
+  <span class="c1"># returns the sequence number from wich to start to find changes in pull</span>
+  <span class="c1">#</span>
+  <span class="nv">getSinceNr: </span><span class="o">-&gt;</span>
+    <span class="nx">@_since</span> <span class="o">or</span> <span class="mi">0</span>
+
+  <span class="c1"># ## setSinceNr</span>
+
+  <span class="c1"># sets the sequence number from wich to start to find changes in pull</span>
+  <span class="c1">#</span>
+  <span class="nv">setSinceNr: </span><span class="nf">(seq) -&gt;</span>
+    <span class="vi">@_since = </span><span class="nx">seq</span>
+
+
+  <span class="c1"># ## pull changes</span>
+
+  <span class="c1"># a.k.a. make a GET request to CouchDB&#39;s `_changes` feed.</span>
+  <span class="c1">#</span>
+  <span class="nv">pull : </span><span class="o">=&gt;</span>
     <span class="vi">@_pullRequest = </span><span class="nx">@request</span> <span class="s1">&#39;GET&#39;</span><span class="p">,</span> <span class="nx">@_pullUrl</span><span class="p">()</span>
 
     <span class="k">if</span> <span class="nx">@connected</span> <span class="o">and</span> <span class="nx">@isContinuouslyPulling</span><span class="p">()</span>
@@ -119,8 +231,12 @@ and a prefixed path</p></div></div><div class="code"><div class="wrapper">  <spa
     
     <span class="nx">@_pullRequest</span><span class="p">.</span><span class="k">then</span> <span class="nx">@_handlePullSuccess</span><span class="p">,</span> <span class="nx">@_handlePullError</span>
     
-    </div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h2 id="push-changes">push changes</h2></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>Push objects to userDB using the <code>_bulk_docs</code> API.
-If no objects passed, push all changed documents</p></div></div><div class="code"><div class="wrapper">  <span class="nv">push : </span><span class="p">(</span><span class="nx">docs</span><span class="p">)</span> <span class="o">=&gt;</span>
+    
+  <span class="c1"># ## push changes</span>
+
+  <span class="c1"># Push objects to userDB using the `_bulk_docs` API.</span>
+  <span class="c1"># If no objects passed, push all changed documents</span>
+  <span class="nv">push : </span><span class="p">(</span><span class="nx">docs</span><span class="p">)</span> <span class="o">=&gt;</span>
     
     <span class="k">return</span> <span class="nx">@hoodie</span><span class="p">.</span><span class="nx">defer</span><span class="p">().</span><span class="nx">resolve</span><span class="p">([]).</span><span class="nx">promise</span><span class="p">()</span> <span class="nx">unless</span> <span class="nx">docs</span><span class="o">?</span><span class="p">.</span><span class="nx">length</span>
       
@@ -131,84 +247,157 @@ If no objects passed, push all changed documents</p></div></div><div class="code
     <span class="vi">@_pushRequest = </span><span class="nx">@request</span> <span class="s1">&#39;POST&#39;</span><span class="p">,</span> <span class="s2">&quot;/_bulk_docs&quot;</span>
       <span class="nv">data :</span>
         <span class="nv">docs      : </span><span class="nx">docsForRemote</span>
-        <span class="nv">new_edits : </span><span class="kc">false</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>when push is successful, update the local store with the generated _rev numbers</p></div></div><div class="code"><div class="wrapper">    <span class="nx">@_pushRequest</span><span class="p">.</span><span class="nx">done</span> <span class="nx">@_handlePushSuccess</span> <span class="nx">docs</span><span class="p">,</span> <span class="nx">docsForRemote</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h2 id="sync-changes">sync changes</h2></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>pull ... and push ;-)</p></div></div><div class="code"><div class="wrapper">  <span class="nv">sync : </span><span class="p">(</span><span class="nx">docs</span><span class="p">)</span> <span class="o">=&gt;</span>
+        <span class="nv">new_edits : </span><span class="kc">false</span>
+
+    <span class="c1"># when push is successful, update the local store with the generated _rev numbers</span>
+    <span class="nx">@_pushRequest</span><span class="p">.</span><span class="nx">done</span> <span class="nx">@_handlePushSuccess</span> <span class="nx">docs</span><span class="p">,</span> <span class="nx">docsForRemote</span>
+
+
+  <span class="c1"># ## sync changes</span>
+
+  <span class="c1"># pull ... and push ;-)</span>
+  <span class="nv">sync : </span><span class="p">(</span><span class="nx">docs</span><span class="p">)</span> <span class="o">=&gt;</span>
     <span class="k">if</span> <span class="nx">@isContinuouslyPushing</span><span class="p">()</span>
       <span class="nx">@hoodie</span><span class="p">.</span><span class="nx">unbind</span> <span class="s1">&#39;store:dirty:idle&#39;</span><span class="p">,</span> <span class="nx">@push</span>
       <span class="nx">@hoodie</span><span class="p">.</span><span class="kc">on</span>     <span class="s1">&#39;store:dirty:idle&#39;</span><span class="p">,</span> <span class="nx">@push</span>
     
     <span class="nx">@push</span><span class="p">(</span><span class="nx">docs</span><span class="p">).</span><span class="nx">pipe</span> <span class="nx">@pull</span>
 
-  </div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h2 id="on">On</h2></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>alias for <code>hoodie.on</code></p></div></div><div class="code"><div class="wrapper">  <span class="kc">on</span> <span class="o">:</span> <span class="nf">(event, cb) -&gt;</span> <span class="nx">@hoodie</span><span class="p">.</span><span class="kc">on</span> <span class="s2">&quot;remote:#{event}&quot;</span><span class="p">,</span> <span class="nx">cb</span>
   
-  </div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h2 id="private">Private</h2></div></div><div class="code"><div class="wrapper">  
-  </div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h3 id="pull-url">pull url</h3></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>Depending on whether isContinuouslyPulling() is true, return a longpoll URL or not</p></div></div><div class="code"><div class="wrapper">  <span class="nv">_pullUrl : </span><span class="o">-&gt;</span>
+  <span class="c1"># ## On</span>
+
+  <span class="c1"># alias for `hoodie.on`</span>
+  <span class="kc">on</span> <span class="o">:</span> <span class="nf">(event, cb) -&gt;</span> <span class="nx">@hoodie</span><span class="p">.</span><span class="kc">on</span> <span class="s2">&quot;remote:#{event}&quot;</span><span class="p">,</span> <span class="nx">cb</span>
+  
+  
+
+  <span class="c1"># ## Private</span>
+  
+  
+  <span class="c1"># ### pull url</span>
+
+  <span class="c1"># Depending on whether isContinuouslyPulling() is true, return a longpoll URL or not</span>
+  <span class="c1">#</span>
+  <span class="nv">_pullUrl : </span><span class="o">-&gt;</span>
     <span class="nv">since = </span><span class="nx">@getSinceNr</span><span class="p">()</span>
     <span class="k">if</span> <span class="nx">@isContinuouslyPulling</span><span class="p">()</span> <span class="c1"># make a long poll request</span>
       <span class="s2">&quot;/_changes?include_docs=true&amp;since=#{since}&amp;heartbeat=10000&amp;feed=longpoll&quot;</span>
     <span class="k">else</span>
       <span class="s2">&quot;/_changes?include_docs=true&amp;since=#{since}&quot;</span>
-  </div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>request gets restarted automaticcally in @_handlePullError</p></div></div><div class="code"><div class="wrapper">  <span class="nv">_restartPullRequest : </span><span class="o">=&gt;</span> <span class="nx">@_pullRequest</span><span class="o">?</span><span class="p">.</span><span class="nx">abort</span><span class="p">()</span>
   
-  </div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h3 id="pull-success-handler">pull success handler</h3></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>handle the incoming changes, then send the next request</p></div></div><div class="code"><div class="wrapper">  <span class="nv">_handlePullSuccess : </span><span class="p">(</span><span class="nx">response</span><span class="p">)</span> <span class="o">=&gt;</span>
+  <span class="c1"># request gets restarted automaticcally in @_handlePullError</span>
+  <span class="nv">_restartPullRequest : </span><span class="o">=&gt;</span> <span class="nx">@_pullRequest</span><span class="o">?</span><span class="p">.</span><span class="nx">abort</span><span class="p">()</span>
+  
+  
+
+  <span class="c1"># ### pull success handler </span>
+
+  <span class="c1"># handle the incoming changes, then send the next request</span>
+  <span class="c1">#</span>
+  <span class="nv">_handlePullSuccess : </span><span class="p">(</span><span class="nx">response</span><span class="p">)</span> <span class="o">=&gt;</span>
     <span class="nx">@setSinceNr</span> <span class="nx">response</span><span class="p">.</span><span class="nx">last_seq</span>
     <span class="nx">@_handlePullResults</span> <span class="nx">response</span><span class="p">.</span><span class="nx">results</span>
     
     <span class="nx">@pull</span><span class="p">()</span> <span class="k">if</span> <span class="nx">@connected</span> <span class="o">and</span> <span class="nx">@isContinuouslyPulling</span><span class="p">()</span>
   
-  </div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h3 id="pull-error-handler">pull error handler</h3></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>when there is a change, trigger event, 
-then check for another change</p></div></div><div class="code"><div class="wrapper">  <span class="nv">_handlePullError : </span><span class="p">(</span><span class="nx">xhr</span><span class="p">,</span> <span class="nx">error</span><span class="p">,</span> <span class="nx">resp</span><span class="p">)</span> <span class="o">=&gt;</span>
+  
+
+  <span class="c1"># ### pull error handler </span>
+
+  <span class="c1"># when there is a change, trigger event, </span>
+  <span class="c1"># then check for another change</span>
+  <span class="c1">#</span>
+  <span class="nv">_handlePullError : </span><span class="p">(</span><span class="nx">xhr</span><span class="p">,</span> <span class="nx">error</span><span class="p">,</span> <span class="nx">resp</span><span class="p">)</span> <span class="o">=&gt;</span>
     
     <span class="k">return</span> <span class="nx">unless</span> <span class="nx">@connected</span>
 
     <span class="k">switch</span> <span class="nx">xhr</span><span class="p">.</span><span class="nx">status</span>
-  </div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>Session is invalid. User is still login, but needs to reauthenticate
-before sync can be continued</p></div></div><div class="code"><div class="wrapper">      <span class="k">when</span> <span class="mi">403</span>
+  
+      <span class="c1"># Session is invalid. User is still login, but needs to reauthenticate</span>
+      <span class="c1"># before sync can be continued</span>
+      <span class="k">when</span> <span class="mi">403</span>
         <span class="nx">@hoodie</span><span class="p">.</span><span class="nx">trigger</span> <span class="s1">&#39;remote:error:unauthenticated&#39;</span><span class="p">,</span> <span class="nx">error</span>
         <span class="nx">@disconnect</span><span class="p">()</span>
-      </div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>the 404 comes, when the requested DB has been removed
-or does not exist yet.</p>
-
-<p>BUT: it might also happen that the background workers did
-     not create a pending database yet. Therefore,
-     we try it again in 3 seconds</p>
-
-<p>TODO: review / rethink that.</p></div></div><div class="code"><div class="wrapper">      <span class="k">when</span> <span class="mi">404</span>
+      
+      <span class="c1"># the 404 comes, when the requested DB has been removed</span>
+      <span class="c1"># or does not exist yet.</span>
+      <span class="c1"># </span>
+      <span class="c1"># BUT: it might also happen that the background workers did</span>
+      <span class="c1">#      not create a pending database yet. Therefore,</span>
+      <span class="c1">#      we try it again in 3 seconds</span>
+      <span class="c1">#</span>
+      <span class="c1"># TODO: review / rethink that.</span>
+      <span class="k">when</span> <span class="mi">404</span>
         <span class="nb">window</span><span class="p">.</span><span class="nx">setTimeout</span> <span class="nx">@pull</span><span class="p">,</span> <span class="mi">3000</span>
-      </div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>Please server, don't give us these. At least not persistently </p></div></div><div class="code"><div class="wrapper">      <span class="k">when</span> <span class="mi">500</span>
+      
+      <span class="c1"># Please server, don&#39;t give us these. At least not persistently </span>
+      <span class="k">when</span> <span class="mi">500</span>
         <span class="nx">@hoodie</span><span class="p">.</span><span class="nx">trigger</span> <span class="s1">&#39;remote:error:server&#39;</span><span class="p">,</span> <span class="nx">error</span>
         <span class="nb">window</span><span class="p">.</span><span class="nx">setTimeout</span> <span class="nx">@pull</span><span class="p">,</span> <span class="mi">3000</span>
-      </div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>usually a 0, which stands for timeout or server not reachable.</p></div></div><div class="code"><div class="wrapper">      <span class="k">else</span>
+      
+      <span class="c1"># usually a 0, which stands for timeout or server not reachable.</span>
+      <span class="k">else</span>
         <span class="k">return</span> <span class="nx">unless</span> <span class="nx">@isContinuouslyPulling</span><span class="p">()</span>
 
-        <span class="k">if</span> <span class="nx">xhr</span><span class="p">.</span><span class="nx">statusText</span> <span class="o">is</span> <span class="s1">&#39;abort&#39;</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>manual abort after 25sec. restart pulling changes directly when isContinuouslyPulling() is true</p></div></div><div class="code"><div class="wrapper">          <span class="nx">@pull</span><span class="p">()</span>
+        <span class="k">if</span> <span class="nx">xhr</span><span class="p">.</span><span class="nx">statusText</span> <span class="o">is</span> <span class="s1">&#39;abort&#39;</span>
+          <span class="c1"># manual abort after 25sec. restart pulling changes directly when isContinuouslyPulling() is true</span>
+          <span class="nx">@pull</span><span class="p">()</span>
         <span class="k">else</span>    
-            </div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>oops. This might be caused by an unreachable server.
-Or the server canceld it for what ever reason, e.g.
-heroku kills the request after ~30s.
-we'll try again after a 3s timeout</p></div></div><div class="code"><div class="wrapper">          <span class="nb">window</span><span class="p">.</span><span class="nx">setTimeout</span> <span class="nx">@pull</span><span class="p">,</span> <span class="mi">3000</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>valid CouchDB doc attributes starting with an underscore</p></div></div><div class="code"><div class="wrapper">  <span class="nv">_validSpecialAttributes : </span><span class="p">[</span>
-    <span class="s1">&#39;_id&#39;</span><span class="p">,</span> <span class="s1">&#39;_rev&#39;</span><span class="p">,</span> <span class="s1">&#39;_deleted&#39;</span><span class="p">,</span> <span class="s1">&#39;_revisions&#39;</span><span class="p">,</span> <span class="s1">&#39;_attachments&#39;</span>
-  <span class="p">]</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h3 id="parse-for-remote">parse for remote</h3></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>parse object for remote storage. All attributes starting with an 
-<code>underscore</code> do not get synchronized despite the special attributes
-<code>_id</code>, <code>_rev</code> and <code>_deleted</code> (see above)</p>
+            
+          <span class="c1"># oops. This might be caused by an unreachable server.</span>
+          <span class="c1"># Or the server canceld it for what ever reason, e.g.</span>
+          <span class="c1"># heroku kills the request after ~30s.</span>
+          <span class="c1"># we&#39;ll try again after a 3s timeout</span>
+          <span class="nb">window</span><span class="p">.</span><span class="nx">setTimeout</span> <span class="nx">@pull</span><span class="p">,</span> <span class="mi">3000</span>
 
-<p>Also <code>id</code> gets replaced with <code>_id</code> which consists of type &amp; id</p></div></div><div class="code"><div class="wrapper">  <span class="nv">_parseForRemote : </span><span class="nf">(obj) -&gt;</span>
+
+  <span class="c1"># valid CouchDB doc attributes starting with an underscore</span>
+  <span class="nv">_validSpecialAttributes : </span><span class="p">[</span>
+    <span class="s1">&#39;_id&#39;</span><span class="p">,</span> <span class="s1">&#39;_rev&#39;</span><span class="p">,</span> <span class="s1">&#39;_deleted&#39;</span><span class="p">,</span> <span class="s1">&#39;_revisions&#39;</span><span class="p">,</span> <span class="s1">&#39;_attachments&#39;</span>
+  <span class="p">]</span>
+
+
+  <span class="c1"># ### parse for remote</span>
+
+  <span class="c1"># parse object for remote storage. All attributes starting with an </span>
+  <span class="c1"># `underscore` do not get synchronized despite the special attributes</span>
+  <span class="c1"># `_id`, `_rev` and `_deleted` (see above)</span>
+  <span class="c1"># </span>
+  <span class="c1"># Also `id` gets replaced with `_id` which consists of type &amp; id</span>
+  <span class="c1">#</span>
+  <span class="nv">_parseForRemote : </span><span class="nf">(obj) -&gt;</span>
     <span class="nv">attributes = </span><span class="nx">$</span><span class="p">.</span><span class="nx">extend</span> <span class="p">{},</span> <span class="nx">obj</span>
   
     <span class="k">for</span> <span class="nx">attr</span> <span class="k">of</span> <span class="nx">attributes</span>
       <span class="k">continue</span> <span class="k">if</span> <span class="o">~</span><span class="nx">@_validSpecialAttributes</span><span class="p">.</span><span class="nx">indexOf</span><span class="p">(</span><span class="nx">attr</span><span class="p">)</span>
       <span class="k">continue</span> <span class="nx">unless</span> <span class="sr">/^_/</span><span class="p">.</span><span class="nx">test</span> <span class="nx">attr</span>
       <span class="k">delete</span> <span class="nx">attributes</span><span class="p">[</span><span class="nx">attr</span><span class="p">]</span>
-   </div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>prepare CouchDB id</p></div></div><div class="code"><div class="wrapper">    <span class="nv">attributes._id = </span><span class="s2">&quot;#{attributes.type}/#{attributes.id}&quot;</span>
+   
+    <span class="c1"># prepare CouchDB id</span>
+    <span class="nv">attributes._id = </span><span class="s2">&quot;#{attributes.type}/#{attributes.id}&quot;</span>
     <span class="k">delete</span> <span class="nx">attributes</span><span class="p">.</span><span class="nx">id</span>
     
     <span class="k">return</span> <span class="nx">attributes</span>
-  </div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h3 id="generate-new-revision-id">generate new revision id</h3></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>generates a revision id in the for of {uuid}#{UTC timestamp}
-Beware that it does not include a leading revision number</p></div></div><div class="code"><div class="wrapper">  <span class="nv">_generateNewRevisionId: </span> <span class="o">-&gt;</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>get timezone offset</p></div></div><div class="code"><div class="wrapper">    <span class="nx">@_timezoneOffset</span> <span class="o">or=</span> <span class="k">new</span> <span class="nb">Date</span><span class="p">().</span><span class="nx">getTimezoneOffset</span><span class="p">()</span> <span class="o">*</span> <span class="mi">60</span>
+  
+
+  <span class="c1"># ### generate new revision id</span>
+
+  <span class="c1"># generates a revision id in the for of {uuid}#{UTC timestamp}</span>
+  <span class="c1"># Beware that it does not include a leading revision number</span>
+  <span class="nv">_generateNewRevisionId: </span> <span class="o">-&gt;</span>
+    <span class="c1"># get timezone offset</span>
+    <span class="nx">@_timezoneOffset</span> <span class="o">or=</span> <span class="k">new</span> <span class="nb">Date</span><span class="p">().</span><span class="nx">getTimezoneOffset</span><span class="p">()</span> <span class="o">*</span> <span class="mi">60</span>
 
     <span class="nv">timestamp   = </span><span class="nb">Date</span><span class="p">.</span><span class="nx">now</span><span class="p">()</span> <span class="o">+</span> <span class="nx">@_timezoneOffset</span>
     <span class="nv">uuid        = </span><span class="nx">@hoodie</span><span class="p">.</span><span class="nx">my</span><span class="p">.</span><span class="nx">store</span><span class="p">.</span><span class="nx">uuid</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span>
     <span class="s2">&quot;#{uuid}##{timestamp}&quot;</span>
-  </div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h3 id="and-new-revion-to-objecet">and new revion to objecet</h3></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>get new revision number</p></div></div><div class="code"><div class="wrapper">  <span class="nv">_addRevisionTo : </span><span class="nf">(attributes) -&gt;</span>
+  
+
+  <span class="c1"># ### and new revion to objecet</span>
+
+  <span class="c1"># get new revision number</span>
+  <span class="c1">#</span>
+  <span class="nv">_addRevisionTo : </span><span class="nf">(attributes) -&gt;</span>
 
     <span class="k">try</span> <span class="p">[</span><span class="nx">currentRevNr</span><span class="p">,</span> <span class="nx">currentRevId</span><span class="p">]</span> <span class="o">=</span> <span class="nx">attributes</span><span class="p">.</span><span class="nx">_rev</span><span class="p">.</span><span class="nx">split</span> <span class="sr">/-/</span>
     <span class="nv">currentRevNr = </span><span class="nb">parseInt</span><span class="p">(</span><span class="nx">currentRevNr</span><span class="p">)</span> <span class="o">or</span> <span class="mi">0</span>
@@ -223,46 +412,74 @@ Beware that it does not include a leading revision number</p></div></div><div cl
       <span class="nx">attributes</span><span class="p">.</span><span class="nx">_revisions</span><span class="p">.</span><span class="nx">start</span> <span class="o">+=</span> <span class="nx">currentRevNr</span>
       <span class="nx">attributes</span><span class="p">.</span><span class="nx">_revisions</span><span class="p">.</span><span class="nx">ids</span><span class="p">.</span><span class="nx">push</span> <span class="nx">currentRevId</span>
     
-  </div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h3 id="parse-object-coming-from-pull-for-local-storage">parse object coming from pull for local storage.</h3></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>renames <code>_id</code> attribute to <code>id</code> and removes the type from the id,
-e.g. <code>document/123</code> -> <code>123</code></p></div></div><div class="code"><div class="wrapper">  <span class="nv">_parseFromPull : </span><span class="nf">(obj) -&gt;</span>
-    </div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>handle id and type</p></div></div><div class="code"><div class="wrapper">    <span class="nv">id = </span><span class="nx">obj</span><span class="p">.</span><span class="nx">_id</span> <span class="o">or</span> <span class="nx">obj</span><span class="p">.</span><span class="nx">id</span>
+  
+
+  <span class="c1"># ### parse object coming from pull for local storage. </span>
+
+  <span class="c1"># renames `_id` attribute to `id` and removes the type from the id,</span>
+  <span class="c1"># e.g. `document/123` -&gt; `123`</span>
+  <span class="nv">_parseFromPull : </span><span class="nf">(obj) -&gt;</span>
+    
+    <span class="c1"># handle id and type</span>
+    <span class="nv">id = </span><span class="nx">obj</span><span class="p">.</span><span class="nx">_id</span> <span class="o">or</span> <span class="nx">obj</span><span class="p">.</span><span class="nx">id</span>
     <span class="k">delete</span> <span class="nx">obj</span><span class="p">.</span><span class="nx">_id</span>
     <span class="p">[</span><span class="nx">obj</span><span class="p">.</span><span class="nx">type</span><span class="p">,</span> <span class="nx">obj</span><span class="p">.</span><span class="nx">id</span><span class="p">]</span> <span class="o">=</span> <span class="nx">id</span><span class="p">.</span><span class="nx">split</span><span class="p">(</span><span class="sr">/\//</span><span class="p">)</span>
-    </div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>handle timestameps</p></div></div><div class="code"><div class="wrapper">    <span class="nv">obj.createdAt = </span><span class="k">new</span> <span class="nb">Date</span><span class="p">(</span><span class="nb">Date</span><span class="p">.</span><span class="nx">parse</span> <span class="nx">obj</span><span class="p">.</span><span class="nx">createdAt</span><span class="p">)</span> <span class="k">if</span> <span class="nx">obj</span><span class="p">.</span><span class="nx">createdAt</span>
+    
+    <span class="c1"># handle timestameps</span>
+    <span class="nv">obj.createdAt = </span><span class="k">new</span> <span class="nb">Date</span><span class="p">(</span><span class="nb">Date</span><span class="p">.</span><span class="nx">parse</span> <span class="nx">obj</span><span class="p">.</span><span class="nx">createdAt</span><span class="p">)</span> <span class="k">if</span> <span class="nx">obj</span><span class="p">.</span><span class="nx">createdAt</span>
     <span class="nv">obj.updatedAt = </span><span class="k">new</span> <span class="nb">Date</span><span class="p">(</span><span class="nb">Date</span><span class="p">.</span><span class="nx">parse</span> <span class="nx">obj</span><span class="p">.</span><span class="nx">updatedAt</span><span class="p">)</span> <span class="k">if</span> <span class="nx">obj</span><span class="p">.</span><span class="nx">updatedAt</span>
-    </div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>handle rev</p></div></div><div class="code"><div class="wrapper">    <span class="k">if</span> <span class="nx">obj</span><span class="p">.</span><span class="nx">rev</span>
+    
+    <span class="c1"># handle rev</span>
+    <span class="k">if</span> <span class="nx">obj</span><span class="p">.</span><span class="nx">rev</span>
       <span class="nv">obj._rev = </span><span class="nx">obj</span><span class="p">.</span><span class="nx">rev</span>
       <span class="k">delete</span> <span class="nx">obj</span><span class="p">.</span><span class="nx">rev</span>
     
     <span class="k">return</span> <span class="nx">obj</span>
   
-  </div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h3 id="parse-object-response-coming-from-push-for-local-storage">parse object response coming from push for local storage.</h3></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>removes the type from the id, e.g. <code>document/123</code> -> <code>123</code>
-also removes attribute ok</p></div></div><div class="code"><div class="wrapper">  <span class="nv">_parseFromPush : </span><span class="nf">(obj) -&gt;</span>
-    </div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>handle id and type</p></div></div><div class="code"><div class="wrapper">    <span class="nv">id = </span><span class="nx">obj</span><span class="p">.</span><span class="nx">_id</span> <span class="o">or</span> 
+  
+  <span class="c1"># ### parse object response coming from push for local storage. </span>
+
+  <span class="c1"># removes the type from the id, e.g. `document/123` -&gt; `123`</span>
+  <span class="c1"># also removes attribute ok</span>
+  <span class="nv">_parseFromPush : </span><span class="nf">(obj) -&gt;</span>
+    
+    <span class="c1"># handle id and type</span>
+    <span class="nv">id = </span><span class="nx">obj</span><span class="p">.</span><span class="nx">_id</span> <span class="o">or</span> 
     <span class="k">delete</span> <span class="nx">obj</span><span class="p">.</span><span class="nx">_id</span>
     <span class="p">[</span><span class="nx">obj</span><span class="p">.</span><span class="nx">type</span><span class="p">,</span> <span class="nx">obj</span><span class="p">.</span><span class="nx">id</span><span class="p">]</span> <span class="o">=</span> <span class="nx">obj</span><span class="p">.</span><span class="nx">id</span><span class="p">.</span><span class="nx">split</span><span class="p">(</span><span class="sr">/\//</span><span class="p">)</span>
-    </div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>handle rev</p></div></div><div class="code"><div class="wrapper">    <span class="nv">obj._rev = </span><span class="nx">obj</span><span class="p">.</span><span class="nx">rev</span>
+    
+    <span class="c1"># handle rev</span>
+    <span class="nv">obj._rev = </span><span class="nx">obj</span><span class="p">.</span><span class="nx">rev</span>
     <span class="k">delete</span> <span class="nx">obj</span><span class="p">.</span><span class="nx">rev</span>
-    </div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>remove ok attribute</p></div></div><div class="code"><div class="wrapper">    <span class="k">delete</span> <span class="nx">obj</span><span class="p">.</span><span class="nx">ok</span>
+    
+    <span class="c1"># remove ok attribute</span>
+    <span class="k">delete</span> <span class="nx">obj</span><span class="p">.</span><span class="nx">ok</span>
     
     <span class="k">return</span> <span class="nx">obj</span>
-  </div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h3 id="handle-changes-from-remote">handle changes from remote</h3></div></div><div class="code"><div class="wrapper">  </div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>note: we don't trigger any events until all changes have been taken care of.
-      Reason is, that on object could depend on a different object that has
-      not been stored yet, but is within the same bulk of changes. This 
-      is especially the case during initial bootstraps after a user logins.</p></div></div><div class="code"><div class="wrapper">  <span class="nv">_handlePullResults : </span><span class="p">(</span><span class="nx">changes</span><span class="p">)</span> <span class="o">=&gt;</span>
+  
+
+
+  <span class="c1"># ### handle changes from remote</span>
+  
+  <span class="c1"># note: we don&#39;t trigger any events until all changes have been taken care of.</span>
+  <span class="c1">#       Reason is, that on object could depend on a different object that has</span>
+  <span class="c1">#       not been stored yet, but is within the same bulk of changes. This </span>
+  <span class="c1">#       is especially the case during initial bootstraps after a user logins.</span>
+  <span class="c1">#</span>
+  <span class="nv">_handlePullResults : </span><span class="p">(</span><span class="nx">changes</span><span class="p">)</span> <span class="o">=&gt;</span>
     <span class="nv">_destroyedDocs = </span><span class="p">[]</span>
     <span class="nv">_changedDocs   = </span><span class="p">[]</span>
-    </div></div></div><div class="segment"><div class="comments"><div class="wrapper"><ol>
-<li>update or remove objects from local store</li>
-</ol></div></div><div class="code"><div class="wrapper">    <span class="k">for</span> <span class="p">{</span><span class="nx">doc</span><span class="p">}</span> <span class="k">in</span> <span class="nx">changes</span>
+    
+    <span class="c1"># 1. update or remove objects from local store</span>
+    <span class="k">for</span> <span class="p">{</span><span class="nx">doc</span><span class="p">}</span> <span class="k">in</span> <span class="nx">changes</span>
       <span class="nv">doc = </span><span class="nx">@_parseFromPull</span><span class="p">(</span><span class="nx">doc</span><span class="p">)</span>
       <span class="k">if</span> <span class="nx">doc</span><span class="p">.</span><span class="nx">_deleted</span>
         <span class="nx">_destroyedDocs</span><span class="p">.</span><span class="nx">push</span> <span class="p">[</span><span class="nx">doc</span><span class="p">,</span> <span class="nx">@hoodie</span><span class="p">.</span><span class="nx">my</span><span class="p">.</span><span class="nx">store</span><span class="p">.</span><span class="nx">destroy</span><span class="p">(</span>  <span class="nx">doc</span><span class="p">.</span><span class="nx">type</span><span class="p">,</span> <span class="nx">doc</span><span class="p">.</span><span class="nx">id</span><span class="p">,</span>      <span class="nv">remote: </span><span class="kc">true</span><span class="p">)]</span>
       <span class="k">else</span>                                                
         <span class="nx">_changedDocs</span><span class="p">.</span><span class="nx">push</span>   <span class="p">[</span><span class="nx">doc</span><span class="p">,</span> <span class="nx">@hoodie</span><span class="p">.</span><span class="nx">my</span><span class="p">.</span><span class="nx">store</span><span class="p">.</span><span class="nx">update</span><span class="p">(</span>   <span class="nx">doc</span><span class="p">.</span><span class="nx">type</span><span class="p">,</span> <span class="nx">doc</span><span class="p">.</span><span class="nx">id</span><span class="p">,</span> <span class="nx">doc</span><span class="p">,</span> <span class="nv">remote: </span><span class="kc">true</span><span class="p">)]</span>
-    </div></div></div><div class="segment"><div class="comments"><div class="wrapper"><ol>
-<li>trigger events</li>
-</ol></div></div><div class="code"><div class="wrapper">    <span class="k">for</span> <span class="p">[</span><span class="nx">doc</span><span class="p">,</span> <span class="nx">promise</span><span class="p">]</span> <span class="k">in</span> <span class="nx">_destroyedDocs</span>
+    
+    <span class="c1"># 2. trigger events</span>
+    <span class="k">for</span> <span class="p">[</span><span class="nx">doc</span><span class="p">,</span> <span class="nx">promise</span><span class="p">]</span> <span class="k">in</span> <span class="nx">_destroyedDocs</span>
       <span class="nx">promise</span><span class="p">.</span><span class="k">then</span> <span class="p">(</span><span class="nx">object</span><span class="p">)</span> <span class="o">=&gt;</span> 
         <span class="nx">@hoodie</span><span class="p">.</span><span class="nx">trigger</span> <span class="s1">&#39;remote:destroy&#39;</span><span class="p">,</span>                       <span class="nx">object</span>
         <span class="nx">@hoodie</span><span class="p">.</span><span class="nx">trigger</span> <span class="s2">&quot;remote:destroy:#{doc.type}&quot;</span><span class="p">,</span>           <span class="nx">object</span>
@@ -281,7 +498,14 @@ also removes attribute ok</p></div></div><div class="code"><div class="wrapper">
       
         <span class="nx">@hoodie</span><span class="p">.</span><span class="nx">trigger</span> <span class="s2">&quot;remote:change&quot;</span><span class="p">,</span>                         <span class="nx">event</span><span class="p">,</span> <span class="nx">object</span>
         <span class="nx">@hoodie</span><span class="p">.</span><span class="nx">trigger</span> <span class="s2">&quot;remote:change:#{doc.type}&quot;</span><span class="p">,</span>             <span class="nx">event</span><span class="p">,</span> <span class="nx">object</span>
-        <span class="nx">@hoodie</span><span class="p">.</span><span class="nx">trigger</span> <span class="s2">&quot;remote:change:#{doc.type}:#{doc.id}&quot;</span><span class="p">,</span>   <span class="nx">event</span><span class="p">,</span> <span class="nx">object</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h3 id="handle-push-success">handle push success</h3></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>update local _rev attributes after changes pushed</p></div></div><div class="code"><div class="wrapper">  <span class="nv">_handlePushSuccess: </span><span class="p">(</span><span class="nx">docs</span><span class="p">,</span> <span class="nx">pushedDocs</span><span class="p">)</span> <span class="o">=&gt;</span>
+        <span class="nx">@hoodie</span><span class="p">.</span><span class="nx">trigger</span> <span class="s2">&quot;remote:change:#{doc.type}:#{doc.id}&quot;</span><span class="p">,</span>   <span class="nx">event</span><span class="p">,</span> <span class="nx">object</span>
+
+
+
+  <span class="c1"># ### handle push success</span>
+
+  <span class="c1"># update local _rev attributes after changes pushed</span>
+  <span class="nv">_handlePushSuccess: </span><span class="p">(</span><span class="nx">docs</span><span class="p">,</span> <span class="nx">pushedDocs</span><span class="p">)</span> <span class="o">=&gt;</span>
     <span class="o">=&gt;</span>
       <span class="k">for</span> <span class="nx">doc</span><span class="p">,</span> <span class="nx">i</span> <span class="k">in</span> <span class="nx">docs</span>
         <span class="nv">update  = </span><span class="p">{</span><span class="nv">_rev: </span><span class="nx">pushedDocs</span><span class="p">[</span><span class="nx">i</span><span class="p">].</span><span class="nx">_rev</span><span class="p">}</span>

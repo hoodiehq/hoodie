@@ -6,8 +6,11 @@ stores</p>
 <pre><code>hoodie.user("Joe").findAll().done( handleObjects)
 </code></pre></div></div><div class="code"><div class="wrapper"><span class="k">class</span> <span class="nx">Hoodie</span><span class="p">.</span><span class="nx">User</span>
 
-  <span class="nv">constructor: </span><span class="nf">(hoodie) -&gt;</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>vanilla API syntax:
-hoodie.user('joe').findAll()</p></div></div><div class="code"><div class="wrapper">    <span class="k">return</span> <span class="p">(</span><span class="nx">username</span><span class="p">)</span> <span class="o">=&gt;</span> 
+  <span class="nv">constructor: </span><span class="nf">(hoodie) -&gt;</span>
+
+    <span class="c1"># vanilla API syntax:</span>
+    <span class="c1"># hoodie.user(&#39;joe&#39;).findAll()</span>
+    <span class="k">return</span> <span class="p">(</span><span class="nx">username</span><span class="p">)</span> <span class="o">=&gt;</span> 
       <span class="nx">hoodie</span><span class="p">.</span><span class="nx">open</span> <span class="nx">@_userPublicStoreName</span><span class="p">(</span><span class="nx">username</span><span class="p">)</span>
 
   <span class="nv">_userPublicStoreName: </span><span class="nf">(username) -&gt;</span>

@@ -96,14 +96,14 @@ task 'build', 'build hoodie-client.min.js', ->
   
 task 'docs', 'create docs from code', ->
   
-  docco = spawn 'groc', ['src/**/*.coffee']
-  docco.stdout.on 'data', (data) -> print data.toString()
-  docco.on 'exit', (status) -> callback?() if status is 0
+  groc = spawn 'groc', ['src/**/*.coffee']
+  groc.stdout.on 'data', (data) -> print data.toString()
+  groc.on 'exit', (status) -> callback?() if status is 0
 
 task 'wishlist', 'create docs from code', ->
-  docco = spawn 'groc', ['-o whishlist/doc', 'wishlist/**/*.js']
-  docco.stdout.on 'data', (data) -> print data.toString()
-  docco.on 'exit', (status) -> callback?() if status is 0
+  groc = spawn 'groc', ['-o whishlist/doc', 'wishlist/**/*.js']
+  groc.stdout.on 'data', (data) -> print data.toString()
+  groc.on 'exit', (status) -> callback?() if status is 0
     
 task 'all', 'one cake to rule them all', ->
   exec 'cake compile && cake build && cake docs', (err) ->

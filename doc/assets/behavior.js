@@ -6,137 +6,12 @@ f.event={add:function(a,c,d,e,g){var h,i,j,k,l,m,n,o,p,q,r,s;if(!(a.nodeType===3
 
   tableOfContents = [
     {
-      "type": "file",
+      "type": "folder",
       "data": {
-        "language": {
-          "nameMatchers": [".coffee"],
-          "pygmentsLexer": "coffee-script",
-          "singleLineComment": ["#"],
-          "name": "CoffeeScript"
-        },
-        "sourcePath": "/Users/gregor/JavaScripts/hood.ie/hoodie.js/src/events.coffee",
-        "projectPath": "src/events.coffee",
-        "targetPath": "events",
-        "title": "events"
-      },
-      "depth": 1,
-      "outline": [
-        {
-          "type": "heading",
-          "data": {
-            "level": 2,
-            "title": "Events",
-            "slug": "events"
-          },
-          "depth": 2
-        }, {
-          "type": "heading",
-          "data": {
-            "level": 2,
-            "title": "Bind",
-            "slug": "bind"
-          },
-          "depth": 2
-        }, {
-          "type": "heading",
-          "data": {
-            "level": 2,
-            "title": "one",
-            "slug": "one"
-          },
-          "depth": 2
-        }, {
-          "type": "heading",
-          "data": {
-            "level": 2,
-            "title": "trigger",
-            "slug": "trigger"
-          },
-          "depth": 2
-        }, {
-          "type": "heading",
-          "data": {
-            "level": 2,
-            "title": "unbind",
-            "slug": "unbind"
-          },
-          "depth": 2
-        }
-      ]
-    }, {
-      "type": "file",
-      "data": {
-        "language": {
-          "nameMatchers": [".coffee"],
-          "pygmentsLexer": "coffee-script",
-          "singleLineComment": ["#"],
-          "name": "CoffeeScript"
-        },
-        "sourcePath": "/Users/gregor/JavaScripts/hood.ie/hoodie.js/src/hoodie.coffee",
-        "projectPath": "src/hoodie.coffee",
-        "targetPath": "hoodie",
+        "path": "hoodie",
         "title": "hoodie"
       },
       "depth": 1,
-      "outline": [
-        {
-          "type": "heading",
-          "data": {
-            "level": 2,
-            "title": "Hoodie",
-            "slug": "hoodie"
-          },
-          "depth": 2
-        }, {
-          "type": "heading",
-          "data": {
-            "level": 2,
-            "title": "initialization",
-            "slug": "initialization"
-          },
-          "depth": 2
-        }, {
-          "type": "heading",
-          "data": {
-            "level": 2,
-            "title": "Request",
-            "slug": "request"
-          },
-          "depth": 2
-        }, {
-          "type": "heading",
-          "data": {
-            "level": 2,
-            "title": "open",
-            "slug": "open"
-          },
-          "depth": 2
-        }, {
-          "type": "heading",
-          "data": {
-            "level": 2,
-            "title": "Defer",
-            "slug": "defer"
-          },
-          "depth": 2
-        }, {
-          "type": "heading",
-          "data": {
-            "level": 2,
-            "title": "Utils",
-            "slug": "utils"
-          },
-          "depth": 2
-        }, {
-          "type": "heading",
-          "data": {
-            "level": 2,
-            "title": "Private",
-            "slug": "private"
-          },
-          "depth": 2
-        }
-      ],
       "children": [
         {
           "type": "file",
@@ -158,419 +33,12 @@ f.event={add:function(a,c,d,e,g){var h,i,j,k,l,m,n,o,p,q,r,s;if(!(a.nodeType===3
                 "slug": "hoodieaccount",
                 "isFileHeader": true
               },
-              "depth": 1,
-              "children": [
-                {
-                  "type": "heading",
-                  "data": {
-                    "level": 2,
-                    "title": "Properties",
-                    "slug": "properties"
-                  },
-                  "depth": 2
-                }, {
-                  "type": "heading",
-                  "data": {
-                    "level": 2,
-                    "title": "Constructor",
-                    "slug": "constructor"
-                  },
-                  "depth": 2
-                }, {
-                  "type": "heading",
-                  "data": {
-                    "level": 2,
-                    "title": "Authenticate",
-                    "slug": "authenticate"
-                  },
-                  "depth": 2
-                }, {
-                  "type": "heading",
-                  "data": {
-                    "level": 2,
-                    "title": "sign up with username &amp; password",
-                    "slug": "sign-up-with-username-amp-password"
-                  },
-                  "depth": 2
-                }, {
-                  "type": "heading",
-                  "data": {
-                    "level": 2,
-                    "title": "anonymous sign up",
-                    "slug": "anonymous-sign-up"
-                  },
-                  "depth": 2
-                }, {
-                  "type": "heading",
-                  "data": {
-                    "level": 2,
-                    "title": "hasAnonymousAccount",
-                    "slug": "hasanonymousaccount"
-                  },
-                  "depth": 2
-                }, {
-                  "type": "heading",
-                  "data": {
-                    "level": 2,
-                    "title": "sign in with username &amp; password",
-                    "slug": "sign-in-with-username-amp-password"
-                  },
-                  "depth": 2
-                }, {
-                  "type": "heading",
-                  "data": {
-                    "level": 2,
-                    "title": "sign out ",
-                    "slug": "sign-out-"
-                  },
-                  "depth": 2
-                }, {
-                  "type": "heading",
-                  "data": {
-                    "level": 2,
-                    "title": "On",
-                    "slug": "on"
-                  },
-                  "depth": 2
-                }, {
-                  "type": "heading",
-                  "data": {
-                    "level": 2,
-                    "title": "db",
-                    "slug": "db"
-                  },
-                  "depth": 2
-                }, {
-                  "type": "heading",
-                  "data": {
-                    "level": 2,
-                    "title": "fetch",
-                    "slug": "fetch"
-                  },
-                  "depth": 2
-                }, {
-                  "type": "heading",
-                  "data": {
-                    "level": 2,
-                    "title": "change password",
-                    "slug": "change-password"
-                  },
-                  "depth": 2
-                }, {
-                  "type": "heading",
-                  "data": {
-                    "level": 2,
-                    "title": "reset password",
-                    "slug": "reset-password"
-                  },
-                  "depth": 2
-                }, {
-                  "type": "heading",
-                  "data": {
-                    "level": 2,
-                    "title": "change username",
-                    "slug": "change-username"
-                  },
-                  "depth": 2
-                }, {
-                  "type": "heading",
-                  "data": {
-                    "level": 2,
-                    "title": "destroy",
-                    "slug": "destroy"
-                  },
-                  "depth": 2
-                }, {
-                  "type": "heading",
-                  "data": {
-                    "level": 2,
-                    "title": "PRIVATE",
-                    "slug": "private"
-                  },
-                  "depth": 2
-                }
-              ]
+              "depth": 1
             },
             "title": "Hoodie.Account"
           },
           "depth": 2,
-          "outline": [
-            {
-              "type": "heading",
-              "data": {
-                "level": 2,
-                "title": "Properties",
-                "slug": "properties"
-              },
-              "depth": 2
-            }, {
-              "type": "heading",
-              "data": {
-                "level": 2,
-                "title": "Constructor",
-                "slug": "constructor"
-              },
-              "depth": 2
-            }, {
-              "type": "heading",
-              "data": {
-                "level": 2,
-                "title": "Authenticate",
-                "slug": "authenticate"
-              },
-              "depth": 2
-            }, {
-              "type": "heading",
-              "data": {
-                "level": 2,
-                "title": "sign up with username &amp; password",
-                "slug": "sign-up-with-username-amp-password"
-              },
-              "depth": 2
-            }, {
-              "type": "heading",
-              "data": {
-                "level": 2,
-                "title": "anonymous sign up",
-                "slug": "anonymous-sign-up"
-              },
-              "depth": 2
-            }, {
-              "type": "heading",
-              "data": {
-                "level": 2,
-                "title": "hasAnonymousAccount",
-                "slug": "hasanonymousaccount"
-              },
-              "depth": 2
-            }, {
-              "type": "heading",
-              "data": {
-                "level": 2,
-                "title": "sign in with username &amp; password",
-                "slug": "sign-in-with-username-amp-password"
-              },
-              "depth": 2
-            }, {
-              "type": "heading",
-              "data": {
-                "level": 2,
-                "title": "sign out ",
-                "slug": "sign-out-"
-              },
-              "depth": 2
-            }, {
-              "type": "heading",
-              "data": {
-                "level": 2,
-                "title": "On",
-                "slug": "on"
-              },
-              "depth": 2
-            }, {
-              "type": "heading",
-              "data": {
-                "level": 2,
-                "title": "db",
-                "slug": "db"
-              },
-              "depth": 2
-            }, {
-              "type": "heading",
-              "data": {
-                "level": 2,
-                "title": "fetch",
-                "slug": "fetch"
-              },
-              "depth": 2
-            }, {
-              "type": "heading",
-              "data": {
-                "level": 2,
-                "title": "change password",
-                "slug": "change-password"
-              },
-              "depth": 2
-            }, {
-              "type": "heading",
-              "data": {
-                "level": 2,
-                "title": "reset password",
-                "slug": "reset-password"
-              },
-              "depth": 2
-            }, {
-              "type": "heading",
-              "data": {
-                "level": 2,
-                "title": "change username",
-                "slug": "change-username"
-              },
-              "depth": 2
-            }, {
-              "type": "heading",
-              "data": {
-                "level": 2,
-                "title": "destroy",
-                "slug": "destroy"
-              },
-              "depth": 2
-            }, {
-              "type": "heading",
-              "data": {
-                "level": 2,
-                "title": "PRIVATE",
-                "slug": "private"
-              },
-              "depth": 2
-            }
-          ],
-          "children": [
-            {
-              "type": "file",
-              "data": {
-                "language": {
-                  "nameMatchers": [".coffee"],
-                  "pygmentsLexer": "coffee-script",
-                  "singleLineComment": ["#"],
-                  "name": "CoffeeScript"
-                },
-                "sourcePath": "/Users/gregor/JavaScripts/hood.ie/hoodie.js/src/hoodie/account/remote_store.coffee",
-                "projectPath": "src/hoodie/account/remote_store.coffee",
-                "targetPath": "hoodie/account/remote_store",
-                "firstHeader": {
-                  "type": "heading",
-                  "data": {
-                    "level": 1,
-                    "title": "RemoteStore",
-                    "slug": "remotestore",
-                    "isFileHeader": true
-                  },
-                  "depth": 1,
-                  "children": [
-                    {
-                      "type": "heading",
-                      "data": {
-                        "level": 2,
-                        "title": "properties",
-                        "slug": "properties"
-                      },
-                      "depth": 2
-                    }, {
-                      "type": "heading",
-                      "data": {
-                        "level": 2,
-                        "title": "Constructor",
-                        "slug": "constructor"
-                      },
-                      "depth": 2
-                    }, {
-                      "type": "heading",
-                      "data": {
-                        "level": 2,
-                        "title": "startSyncing",
-                        "slug": "startsyncing"
-                      },
-                      "depth": 2
-                    }, {
-                      "type": "heading",
-                      "data": {
-                        "level": 2,
-                        "title": "stopSyncing",
-                        "slug": "stopsyncing"
-                      },
-                      "depth": 2
-                    }, {
-                      "type": "heading",
-                      "data": {
-                        "level": 2,
-                        "title": "Connect",
-                        "slug": "connect"
-                      },
-                      "depth": 2
-                    }, {
-                      "type": "heading",
-                      "data": {
-                        "level": 2,
-                        "title": "get and set since nr",
-                        "slug": "get-and-set-since-nr"
-                      },
-                      "depth": 2
-                    }, {
-                      "type": "heading",
-                      "data": {
-                        "level": 2,
-                        "title": "push",
-                        "slug": "push"
-                      },
-                      "depth": 2
-                    }
-                  ]
-                },
-                "title": "RemoteStore"
-              },
-              "depth": 3,
-              "outline": [
-                {
-                  "type": "heading",
-                  "data": {
-                    "level": 2,
-                    "title": "properties",
-                    "slug": "properties"
-                  },
-                  "depth": 2
-                }, {
-                  "type": "heading",
-                  "data": {
-                    "level": 2,
-                    "title": "Constructor",
-                    "slug": "constructor"
-                  },
-                  "depth": 2
-                }, {
-                  "type": "heading",
-                  "data": {
-                    "level": 2,
-                    "title": "startSyncing",
-                    "slug": "startsyncing"
-                  },
-                  "depth": 2
-                }, {
-                  "type": "heading",
-                  "data": {
-                    "level": 2,
-                    "title": "stopSyncing",
-                    "slug": "stopsyncing"
-                  },
-                  "depth": 2
-                }, {
-                  "type": "heading",
-                  "data": {
-                    "level": 2,
-                    "title": "Connect",
-                    "slug": "connect"
-                  },
-                  "depth": 2
-                }, {
-                  "type": "heading",
-                  "data": {
-                    "level": 2,
-                    "title": "get and set since nr",
-                    "slug": "get-and-set-since-nr"
-                  },
-                  "depth": 2
-                }, {
-                  "type": "heading",
-                  "data": {
-                    "level": 2,
-                    "title": "push",
-                    "slug": "push"
-                  },
-                  "depth": 2
-                }
-              ]
-            }
-          ]
+          "outline": []
         }, {
           "type": "file",
           "data": {
@@ -586,49 +54,7 @@ f.event={add:function(a,c,d,e,g){var h,i,j,k,l,m,n,o,p,q,r,s;if(!(a.nodeType===3
             "title": "config"
           },
           "depth": 2,
-          "outline": [
-            {
-              "type": "heading",
-              "data": {
-                "level": 2,
-                "title": "Constructor",
-                "slug": "constructor"
-              },
-              "depth": 2
-            }, {
-              "type": "heading",
-              "data": {
-                "level": 2,
-                "title": "set",
-                "slug": "set"
-              },
-              "depth": 2
-            }, {
-              "type": "heading",
-              "data": {
-                "level": 2,
-                "title": "get",
-                "slug": "get"
-              },
-              "depth": 2
-            }, {
-              "type": "heading",
-              "data": {
-                "level": 2,
-                "title": "clear",
-                "slug": "clear"
-              },
-              "depth": 2
-            }, {
-              "type": "heading",
-              "data": {
-                "level": 2,
-                "title": "remove",
-                "slug": "remove"
-              },
-              "depth": 2
-            }
-          ]
+          "outline": []
         }, {
           "type": "file",
           "data": {
@@ -644,33 +70,7 @@ f.event={add:function(a,c,d,e,g){var h,i,j,k,l,m,n,o,p,q,r,s;if(!(a.nodeType===3
             "title": "email"
           },
           "depth": 2,
-          "outline": [
-            {
-              "type": "heading",
-              "data": {
-                "level": 2,
-                "title": "Constructor",
-                "slug": "constructor"
-              },
-              "depth": 2
-            }, {
-              "type": "heading",
-              "data": {
-                "level": 2,
-                "title": "send",
-                "slug": "send"
-              },
-              "depth": 2
-            }, {
-              "type": "heading",
-              "data": {
-                "level": 2,
-                "title": "PRIVATE",
-                "slug": "private"
-              },
-              "depth": 2
-            }
-          ]
+          "outline": []
         }, {
           "type": "file",
           "data": {
@@ -686,33 +86,7 @@ f.event={add:function(a,c,d,e,g){var h,i,j,k,l,m,n,o,p,q,r,s;if(!(a.nodeType===3
             "title": "errors"
           },
           "depth": 2,
-          "outline": [
-            {
-              "type": "heading",
-              "data": {
-                "level": 2,
-                "title": "INVALID_KEY",
-                "slug": "invalid-key"
-              },
-              "depth": 2
-            }, {
-              "type": "heading",
-              "data": {
-                "level": 2,
-                "title": "INVALID_ARGUMENTS",
-                "slug": "invalid-arguments"
-              },
-              "depth": 2
-            }, {
-              "type": "heading",
-              "data": {
-                "level": 2,
-                "title": "NOT_FOUND",
-                "slug": "not-found"
-              },
-              "depth": 2
-            }
-          ]
+          "outline": []
         }, {
           "type": "file",
           "data": {
@@ -759,257 +133,12 @@ f.event={add:function(a,c,d,e,g){var h,i,j,k,l,m,n,o,p,q,r,s;if(!(a.nodeType===3
                 "slug": "localstore",
                 "isFileHeader": true
               },
-              "depth": 1,
-              "children": [
-                {
-                  "type": "heading",
-                  "data": {
-                    "level": 2,
-                    "title": "Constructor",
-                    "slug": "constructor"
-                  },
-                  "depth": 2
-                }, {
-                  "type": "heading",
-                  "data": {
-                    "level": 2,
-                    "title": "Save",
-                    "slug": "save"
-                  },
-                  "depth": 2
-                }, {
-                  "type": "heading",
-                  "data": {
-                    "level": 2,
-                    "title": "find",
-                    "slug": "find"
-                  },
-                  "depth": 2
-                }, {
-                  "type": "heading",
-                  "data": {
-                    "level": 2,
-                    "title": "findAll",
-                    "slug": "findall"
-                  },
-                  "depth": 2
-                }, {
-                  "type": "heading",
-                  "data": {
-                    "level": 2,
-                    "title": "Destroy",
-                    "slug": "destroy"
-                  },
-                  "depth": 2
-                }, {
-                  "type": "heading",
-                  "data": {
-                    "level": 2,
-                    "title": "Cache",
-                    "slug": "cache"
-                  },
-                  "depth": 2
-                }, {
-                  "type": "heading",
-                  "data": {
-                    "level": 2,
-                    "title": "Clear changed",
-                    "slug": "clear-changed"
-                  },
-                  "depth": 2
-                }, {
-                  "type": "heading",
-                  "data": {
-                    "level": 2,
-                    "title": "Marked as deleted?",
-                    "slug": "marked-as-deleted"
-                  },
-                  "depth": 2
-                }, {
-                  "type": "heading",
-                  "data": {
-                    "level": 2,
-                    "title": "Mark as changed",
-                    "slug": "mark-as-changed"
-                  },
-                  "depth": 2
-                }, {
-                  "type": "heading",
-                  "data": {
-                    "level": 2,
-                    "title": "changed docs",
-                    "slug": "changed-docs"
-                  },
-                  "depth": 2
-                }, {
-                  "type": "heading",
-                  "data": {
-                    "level": 2,
-                    "title": "Is dirty?",
-                    "slug": "is-dirty"
-                  },
-                  "depth": 2
-                }, {
-                  "type": "heading",
-                  "data": {
-                    "level": 2,
-                    "title": "Clear",
-                    "slug": "clear"
-                  },
-                  "depth": 2
-                }, {
-                  "type": "heading",
-                  "data": {
-                    "level": 2,
-                    "title": "Is persistant?",
-                    "slug": "is-persistant"
-                  },
-                  "depth": 2
-                }, {
-                  "type": "heading",
-                  "data": {
-                    "level": 2,
-                    "title": "UUID",
-                    "slug": "uuid"
-                  },
-                  "depth": 2
-                }, {
-                  "type": "heading",
-                  "data": {
-                    "level": 2,
-                    "title": "Private",
-                    "slug": "private"
-                  },
-                  "depth": 2
-                }
-              ]
+              "depth": 1
             },
             "title": "LocalStore"
           },
           "depth": 2,
-          "outline": [
-            {
-              "type": "heading",
-              "data": {
-                "level": 2,
-                "title": "Constructor",
-                "slug": "constructor"
-              },
-              "depth": 2
-            }, {
-              "type": "heading",
-              "data": {
-                "level": 2,
-                "title": "Save",
-                "slug": "save"
-              },
-              "depth": 2
-            }, {
-              "type": "heading",
-              "data": {
-                "level": 2,
-                "title": "find",
-                "slug": "find"
-              },
-              "depth": 2
-            }, {
-              "type": "heading",
-              "data": {
-                "level": 2,
-                "title": "findAll",
-                "slug": "findall"
-              },
-              "depth": 2
-            }, {
-              "type": "heading",
-              "data": {
-                "level": 2,
-                "title": "Destroy",
-                "slug": "destroy"
-              },
-              "depth": 2
-            }, {
-              "type": "heading",
-              "data": {
-                "level": 2,
-                "title": "Cache",
-                "slug": "cache"
-              },
-              "depth": 2
-            }, {
-              "type": "heading",
-              "data": {
-                "level": 2,
-                "title": "Clear changed",
-                "slug": "clear-changed"
-              },
-              "depth": 2
-            }, {
-              "type": "heading",
-              "data": {
-                "level": 2,
-                "title": "Marked as deleted?",
-                "slug": "marked-as-deleted"
-              },
-              "depth": 2
-            }, {
-              "type": "heading",
-              "data": {
-                "level": 2,
-                "title": "Mark as changed",
-                "slug": "mark-as-changed"
-              },
-              "depth": 2
-            }, {
-              "type": "heading",
-              "data": {
-                "level": 2,
-                "title": "changed docs",
-                "slug": "changed-docs"
-              },
-              "depth": 2
-            }, {
-              "type": "heading",
-              "data": {
-                "level": 2,
-                "title": "Is dirty?",
-                "slug": "is-dirty"
-              },
-              "depth": 2
-            }, {
-              "type": "heading",
-              "data": {
-                "level": 2,
-                "title": "Clear",
-                "slug": "clear"
-              },
-              "depth": 2
-            }, {
-              "type": "heading",
-              "data": {
-                "level": 2,
-                "title": "Is persistant?",
-                "slug": "is-persistant"
-              },
-              "depth": 2
-            }, {
-              "type": "heading",
-              "data": {
-                "level": 2,
-                "title": "UUID",
-                "slug": "uuid"
-              },
-              "depth": 2
-            }, {
-              "type": "heading",
-              "data": {
-                "level": 2,
-                "title": "Private",
-                "slug": "private"
-              },
-              "depth": 2
-            }
-          ]
+          "outline": []
         }, {
           "type": "file",
           "data": {
@@ -1040,289 +169,6 @@ f.event={add:function(a,c,d,e,g){var h,i,j,k,l,m,n,o,p,q,r,s;if(!(a.nodeType===3
                     "slug": "api"
                   },
                   "depth": 2
-                }, {
-                  "type": "heading",
-                  "data": {
-                    "level": 2,
-                    "title": "properties",
-                    "slug": "properties"
-                  },
-                  "depth": 2
-                }, {
-                  "type": "heading",
-                  "data": {
-                    "level": 2,
-                    "title": "Constructor",
-                    "slug": "constructor"
-                  },
-                  "depth": 2
-                }, {
-                  "type": "heading",
-                  "data": {
-                    "level": 2,
-                    "title": "object loading / updating / deleting",
-                    "slug": "object-loading--updating--deleting"
-                  },
-                  "depth": 2
-                }, {
-                  "type": "heading",
-                  "data": {
-                    "level": 2,
-                    "title": "find",
-                    "slug": "find"
-                  },
-                  "depth": 2
-                }, {
-                  "type": "heading",
-                  "data": {
-                    "level": 2,
-                    "title": "findAll",
-                    "slug": "findall"
-                  },
-                  "depth": 2
-                }, {
-                  "type": "heading",
-                  "data": {
-                    "level": 2,
-                    "title": "save",
-                    "slug": "save"
-                  },
-                  "depth": 2
-                }, {
-                  "type": "heading",
-                  "data": {
-                    "level": 2,
-                    "title": "destroy",
-                    "slug": "destroy"
-                  },
-                  "depth": 2
-                }, {
-                  "type": "heading",
-                  "data": {
-                    "level": 2,
-                    "title": "destroyAll",
-                    "slug": "destroyall"
-                  },
-                  "depth": 2
-                }, {
-                  "type": "heading",
-                  "data": {
-                    "level": 2,
-                    "title": "custom requests",
-                    "slug": "custom-requests"
-                  },
-                  "depth": 2
-                }, {
-                  "type": "heading",
-                  "data": {
-                    "level": 2,
-                    "title": "request",
-                    "slug": "request"
-                  },
-                  "depth": 2
-                }, {
-                  "type": "heading",
-                  "data": {
-                    "level": 2,
-                    "title": "get",
-                    "slug": "get"
-                  },
-                  "depth": 2
-                }, {
-                  "type": "heading",
-                  "data": {
-                    "level": 2,
-                    "title": "post",
-                    "slug": "post"
-                  },
-                  "depth": 2
-                }, {
-                  "type": "heading",
-                  "data": {
-                    "level": 2,
-                    "title": "synchronization",
-                    "slug": "synchronization"
-                  },
-                  "depth": 2
-                }, {
-                  "type": "heading",
-                  "data": {
-                    "level": 2,
-                    "title": "Connect",
-                    "slug": "connect"
-                  },
-                  "depth": 2
-                }, {
-                  "type": "heading",
-                  "data": {
-                    "level": 2,
-                    "title": "Disconnect",
-                    "slug": "disconnect"
-                  },
-                  "depth": 2
-                }, {
-                  "type": "heading",
-                  "data": {
-                    "level": 2,
-                    "title": "isContinuouslyPulling",
-                    "slug": "iscontinuouslypulling"
-                  },
-                  "depth": 2
-                }, {
-                  "type": "heading",
-                  "data": {
-                    "level": 2,
-                    "title": "isContinuouslyPushing",
-                    "slug": "iscontinuouslypushing"
-                  },
-                  "depth": 2
-                }, {
-                  "type": "heading",
-                  "data": {
-                    "level": 2,
-                    "title": "isContinuouslySyncing",
-                    "slug": "iscontinuouslysyncing"
-                  },
-                  "depth": 2
-                }, {
-                  "type": "heading",
-                  "data": {
-                    "level": 2,
-                    "title": "getSinceNr",
-                    "slug": "getsincenr"
-                  },
-                  "depth": 2
-                }, {
-                  "type": "heading",
-                  "data": {
-                    "level": 2,
-                    "title": "setSinceNr",
-                    "slug": "setsincenr"
-                  },
-                  "depth": 2
-                }, {
-                  "type": "heading",
-                  "data": {
-                    "level": 2,
-                    "title": "pull changes",
-                    "slug": "pull-changes"
-                  },
-                  "depth": 2
-                }, {
-                  "type": "heading",
-                  "data": {
-                    "level": 2,
-                    "title": "push changes",
-                    "slug": "push-changes"
-                  },
-                  "depth": 2
-                }, {
-                  "type": "heading",
-                  "data": {
-                    "level": 2,
-                    "title": "sync changes",
-                    "slug": "sync-changes"
-                  },
-                  "depth": 2
-                }, {
-                  "type": "heading",
-                  "data": {
-                    "level": 2,
-                    "title": "On",
-                    "slug": "on"
-                  },
-                  "depth": 2
-                }, {
-                  "type": "heading",
-                  "data": {
-                    "level": 2,
-                    "title": "Private",
-                    "slug": "private"
-                  },
-                  "depth": 2,
-                  "children": [
-                    {
-                      "type": "heading",
-                      "data": {
-                        "level": 3,
-                        "title": "pull url",
-                        "slug": "pull-url"
-                      },
-                      "depth": 3
-                    }, {
-                      "type": "heading",
-                      "data": {
-                        "level": 3,
-                        "title": "pull success handler",
-                        "slug": "pull-success-handler"
-                      },
-                      "depth": 3
-                    }, {
-                      "type": "heading",
-                      "data": {
-                        "level": 3,
-                        "title": "pull error handler",
-                        "slug": "pull-error-handler"
-                      },
-                      "depth": 3
-                    }, {
-                      "type": "heading",
-                      "data": {
-                        "level": 3,
-                        "title": "parse for remote",
-                        "slug": "parse-for-remote"
-                      },
-                      "depth": 3
-                    }, {
-                      "type": "heading",
-                      "data": {
-                        "level": 3,
-                        "title": "generate new revision id",
-                        "slug": "generate-new-revision-id"
-                      },
-                      "depth": 3
-                    }, {
-                      "type": "heading",
-                      "data": {
-                        "level": 3,
-                        "title": "and new revion to objecet",
-                        "slug": "and-new-revion-to-objecet"
-                      },
-                      "depth": 3
-                    }, {
-                      "type": "heading",
-                      "data": {
-                        "level": 3,
-                        "title": "parse object coming from pull for local storage.",
-                        "slug": "parse-object-coming-from-pull-for-local-storage"
-                      },
-                      "depth": 3
-                    }, {
-                      "type": "heading",
-                      "data": {
-                        "level": 3,
-                        "title": "parse object response coming from push for local storage.",
-                        "slug": "parse-object-response-coming-from-push-for-local-storage"
-                      },
-                      "depth": 3
-                    }, {
-                      "type": "heading",
-                      "data": {
-                        "level": 3,
-                        "title": "handle changes from remote",
-                        "slug": "handle-changes-from-remote"
-                      },
-                      "depth": 3
-                    }, {
-                      "type": "heading",
-                      "data": {
-                        "level": 3,
-                        "title": "handle push success",
-                        "slug": "handle-push-success"
-                      },
-                      "depth": 3
-                    }
-                  ]
                 }
               ]
             },
@@ -1338,289 +184,6 @@ f.event={add:function(a,c,d,e,g){var h,i,j,k,l,m,n,o,p,q,r,s;if(!(a.nodeType===3
                 "slug": "api"
               },
               "depth": 2
-            }, {
-              "type": "heading",
-              "data": {
-                "level": 2,
-                "title": "properties",
-                "slug": "properties"
-              },
-              "depth": 2
-            }, {
-              "type": "heading",
-              "data": {
-                "level": 2,
-                "title": "Constructor",
-                "slug": "constructor"
-              },
-              "depth": 2
-            }, {
-              "type": "heading",
-              "data": {
-                "level": 2,
-                "title": "object loading / updating / deleting",
-                "slug": "object-loading--updating--deleting"
-              },
-              "depth": 2
-            }, {
-              "type": "heading",
-              "data": {
-                "level": 2,
-                "title": "find",
-                "slug": "find"
-              },
-              "depth": 2
-            }, {
-              "type": "heading",
-              "data": {
-                "level": 2,
-                "title": "findAll",
-                "slug": "findall"
-              },
-              "depth": 2
-            }, {
-              "type": "heading",
-              "data": {
-                "level": 2,
-                "title": "save",
-                "slug": "save"
-              },
-              "depth": 2
-            }, {
-              "type": "heading",
-              "data": {
-                "level": 2,
-                "title": "destroy",
-                "slug": "destroy"
-              },
-              "depth": 2
-            }, {
-              "type": "heading",
-              "data": {
-                "level": 2,
-                "title": "destroyAll",
-                "slug": "destroyall"
-              },
-              "depth": 2
-            }, {
-              "type": "heading",
-              "data": {
-                "level": 2,
-                "title": "custom requests",
-                "slug": "custom-requests"
-              },
-              "depth": 2
-            }, {
-              "type": "heading",
-              "data": {
-                "level": 2,
-                "title": "request",
-                "slug": "request"
-              },
-              "depth": 2
-            }, {
-              "type": "heading",
-              "data": {
-                "level": 2,
-                "title": "get",
-                "slug": "get"
-              },
-              "depth": 2
-            }, {
-              "type": "heading",
-              "data": {
-                "level": 2,
-                "title": "post",
-                "slug": "post"
-              },
-              "depth": 2
-            }, {
-              "type": "heading",
-              "data": {
-                "level": 2,
-                "title": "synchronization",
-                "slug": "synchronization"
-              },
-              "depth": 2
-            }, {
-              "type": "heading",
-              "data": {
-                "level": 2,
-                "title": "Connect",
-                "slug": "connect"
-              },
-              "depth": 2
-            }, {
-              "type": "heading",
-              "data": {
-                "level": 2,
-                "title": "Disconnect",
-                "slug": "disconnect"
-              },
-              "depth": 2
-            }, {
-              "type": "heading",
-              "data": {
-                "level": 2,
-                "title": "isContinuouslyPulling",
-                "slug": "iscontinuouslypulling"
-              },
-              "depth": 2
-            }, {
-              "type": "heading",
-              "data": {
-                "level": 2,
-                "title": "isContinuouslyPushing",
-                "slug": "iscontinuouslypushing"
-              },
-              "depth": 2
-            }, {
-              "type": "heading",
-              "data": {
-                "level": 2,
-                "title": "isContinuouslySyncing",
-                "slug": "iscontinuouslysyncing"
-              },
-              "depth": 2
-            }, {
-              "type": "heading",
-              "data": {
-                "level": 2,
-                "title": "getSinceNr",
-                "slug": "getsincenr"
-              },
-              "depth": 2
-            }, {
-              "type": "heading",
-              "data": {
-                "level": 2,
-                "title": "setSinceNr",
-                "slug": "setsincenr"
-              },
-              "depth": 2
-            }, {
-              "type": "heading",
-              "data": {
-                "level": 2,
-                "title": "pull changes",
-                "slug": "pull-changes"
-              },
-              "depth": 2
-            }, {
-              "type": "heading",
-              "data": {
-                "level": 2,
-                "title": "push changes",
-                "slug": "push-changes"
-              },
-              "depth": 2
-            }, {
-              "type": "heading",
-              "data": {
-                "level": 2,
-                "title": "sync changes",
-                "slug": "sync-changes"
-              },
-              "depth": 2
-            }, {
-              "type": "heading",
-              "data": {
-                "level": 2,
-                "title": "On",
-                "slug": "on"
-              },
-              "depth": 2
-            }, {
-              "type": "heading",
-              "data": {
-                "level": 2,
-                "title": "Private",
-                "slug": "private"
-              },
-              "depth": 2,
-              "children": [
-                {
-                  "type": "heading",
-                  "data": {
-                    "level": 3,
-                    "title": "pull url",
-                    "slug": "pull-url"
-                  },
-                  "depth": 3
-                }, {
-                  "type": "heading",
-                  "data": {
-                    "level": 3,
-                    "title": "pull success handler",
-                    "slug": "pull-success-handler"
-                  },
-                  "depth": 3
-                }, {
-                  "type": "heading",
-                  "data": {
-                    "level": 3,
-                    "title": "pull error handler",
-                    "slug": "pull-error-handler"
-                  },
-                  "depth": 3
-                }, {
-                  "type": "heading",
-                  "data": {
-                    "level": 3,
-                    "title": "parse for remote",
-                    "slug": "parse-for-remote"
-                  },
-                  "depth": 3
-                }, {
-                  "type": "heading",
-                  "data": {
-                    "level": 3,
-                    "title": "generate new revision id",
-                    "slug": "generate-new-revision-id"
-                  },
-                  "depth": 3
-                }, {
-                  "type": "heading",
-                  "data": {
-                    "level": 3,
-                    "title": "and new revion to objecet",
-                    "slug": "and-new-revion-to-objecet"
-                  },
-                  "depth": 3
-                }, {
-                  "type": "heading",
-                  "data": {
-                    "level": 3,
-                    "title": "parse object coming from pull for local storage.",
-                    "slug": "parse-object-coming-from-pull-for-local-storage"
-                  },
-                  "depth": 3
-                }, {
-                  "type": "heading",
-                  "data": {
-                    "level": 3,
-                    "title": "parse object response coming from push for local storage.",
-                    "slug": "parse-object-response-coming-from-push-for-local-storage"
-                  },
-                  "depth": 3
-                }, {
-                  "type": "heading",
-                  "data": {
-                    "level": 3,
-                    "title": "handle changes from remote",
-                    "slug": "handle-changes-from-remote"
-                  },
-                  "depth": 3
-                }, {
-                  "type": "heading",
-                  "data": {
-                    "level": 3,
-                    "title": "handle push success",
-                    "slug": "handle-push-success"
-                  },
-                  "depth": 3
-                }
-              ]
             }
           ]
         }, {
@@ -1653,86 +216,6 @@ f.event={add:function(a,c,d,e,g){var h,i,j,k,l,m,n,o,p,q,r,s;if(!(a.nodeType===3
                     "slug": "api"
                   },
                   "depth": 2
-                }, {
-                  "type": "heading",
-                  "data": {
-                    "level": 2,
-                    "title": "Constructor",
-                    "slug": "constructor"
-                  },
-                  "depth": 2
-                }, {
-                  "type": "heading",
-                  "data": {
-                    "level": 2,
-                    "title": "open",
-                    "slug": "open"
-                  },
-                  "depth": 2
-                }, {
-                  "type": "heading",
-                  "data": {
-                    "level": 2,
-                    "title": "create",
-                    "slug": "create"
-                  },
-                  "depth": 2
-                }, {
-                  "type": "heading",
-                  "data": {
-                    "level": 2,
-                    "title": "find",
-                    "slug": "find"
-                  },
-                  "depth": 2
-                }, {
-                  "type": "heading",
-                  "data": {
-                    "level": 2,
-                    "title": "findAll",
-                    "slug": "findall"
-                  },
-                  "depth": 2
-                }, {
-                  "type": "heading",
-                  "data": {
-                    "level": 2,
-                    "title": "findOrCreate",
-                    "slug": "findorcreate"
-                  },
-                  "depth": 2
-                }, {
-                  "type": "heading",
-                  "data": {
-                    "level": 2,
-                    "title": "save",
-                    "slug": "save"
-                  },
-                  "depth": 2
-                }, {
-                  "type": "heading",
-                  "data": {
-                    "level": 2,
-                    "title": "update",
-                    "slug": "update"
-                  },
-                  "depth": 2
-                }, {
-                  "type": "heading",
-                  "data": {
-                    "level": 2,
-                    "title": "updateAll",
-                    "slug": "updateall"
-                  },
-                  "depth": 2
-                }, {
-                  "type": "heading",
-                  "data": {
-                    "level": 2,
-                    "title": "destroy",
-                    "slug": "destroy"
-                  },
-                  "depth": 2
                 }
               ]
             },
@@ -1748,306 +231,6 @@ f.event={add:function(a,c,d,e,g){var h,i,j,k,l,m,n,o,p,q,r,s;if(!(a.nodeType===3
                 "slug": "api"
               },
               "depth": 2
-            }, {
-              "type": "heading",
-              "data": {
-                "level": 2,
-                "title": "Constructor",
-                "slug": "constructor"
-              },
-              "depth": 2
-            }, {
-              "type": "heading",
-              "data": {
-                "level": 2,
-                "title": "open",
-                "slug": "open"
-              },
-              "depth": 2
-            }, {
-              "type": "heading",
-              "data": {
-                "level": 2,
-                "title": "create",
-                "slug": "create"
-              },
-              "depth": 2
-            }, {
-              "type": "heading",
-              "data": {
-                "level": 2,
-                "title": "find",
-                "slug": "find"
-              },
-              "depth": 2
-            }, {
-              "type": "heading",
-              "data": {
-                "level": 2,
-                "title": "findAll",
-                "slug": "findall"
-              },
-              "depth": 2
-            }, {
-              "type": "heading",
-              "data": {
-                "level": 2,
-                "title": "findOrCreate",
-                "slug": "findorcreate"
-              },
-              "depth": 2
-            }, {
-              "type": "heading",
-              "data": {
-                "level": 2,
-                "title": "save",
-                "slug": "save"
-              },
-              "depth": 2
-            }, {
-              "type": "heading",
-              "data": {
-                "level": 2,
-                "title": "update",
-                "slug": "update"
-              },
-              "depth": 2
-            }, {
-              "type": "heading",
-              "data": {
-                "level": 2,
-                "title": "updateAll",
-                "slug": "updateall"
-              },
-              "depth": 2
-            }, {
-              "type": "heading",
-              "data": {
-                "level": 2,
-                "title": "destroy",
-                "slug": "destroy"
-              },
-              "depth": 2
-            }
-          ],
-          "children": [
-            {
-              "type": "file",
-              "data": {
-                "language": {
-                  "nameMatchers": [".coffee"],
-                  "pygmentsLexer": "coffee-script",
-                  "singleLineComment": ["#"],
-                  "name": "CoffeeScript"
-                },
-                "sourcePath": "/Users/gregor/JavaScripts/hood.ie/hoodie.js/src/hoodie/share/account.coffee",
-                "projectPath": "src/hoodie/share/account.coffee",
-                "targetPath": "hoodie/share/account",
-                "title": "account"
-              },
-              "depth": 3,
-              "outline": []
-            }, {
-              "type": "file",
-              "data": {
-                "language": {
-                  "nameMatchers": [".coffee"],
-                  "pygmentsLexer": "coffee-script",
-                  "singleLineComment": ["#"],
-                  "name": "CoffeeScript"
-                },
-                "sourcePath": "/Users/gregor/JavaScripts/hood.ie/hoodie.js/src/hoodie/share/hoodie.coffee",
-                "projectPath": "src/hoodie/share/hoodie.coffee",
-                "targetPath": "hoodie/share/hoodie",
-                "title": "hoodie"
-              },
-              "depth": 3,
-              "outline": [
-                {
-                  "type": "heading",
-                  "data": {
-                    "level": 2,
-                    "title": "ShareHoodie",
-                    "slug": "sharehoodie"
-                  },
-                  "depth": 2
-                }, {
-                  "type": "heading",
-                  "data": {
-                    "level": 2,
-                    "title": "ShareHoodie Request",
-                    "slug": "sharehoodie-request"
-                  },
-                  "depth": 2
-                }
-              ]
-            }, {
-              "type": "file",
-              "data": {
-                "language": {
-                  "nameMatchers": [".coffee"],
-                  "pygmentsLexer": "coffee-script",
-                  "singleLineComment": ["#"],
-                  "name": "CoffeeScript"
-                },
-                "sourcePath": "/Users/gregor/JavaScripts/hood.ie/hoodie.js/src/hoodie/share/instance.coffee",
-                "projectPath": "src/hoodie/share/instance.coffee",
-                "targetPath": "hoodie/share/instance",
-                "title": "instance"
-              },
-              "depth": 3,
-              "outline": [
-                {
-                  "type": "heading",
-                  "data": {
-                    "level": 2,
-                    "title": "constructor",
-                    "slug": "constructor"
-                  },
-                  "depth": 2,
-                  "children": [
-                    {
-                      "type": "heading",
-                      "data": {
-                        "level": 3,
-                        "title": "Options",
-                        "slug": "options"
-                      },
-                      "depth": 3
-                    }
-                  ]
-                }, {
-                  "type": "heading",
-                  "data": {
-                    "level": 2,
-                    "title": "set",
-                    "slug": "set"
-                  },
-                  "depth": 2
-                }, {
-                  "type": "heading",
-                  "data": {
-                    "level": 2,
-                    "title": "get",
-                    "slug": "get"
-                  },
-                  "depth": 2
-                }, {
-                  "type": "heading",
-                  "data": {
-                    "level": 2,
-                    "title": "save",
-                    "slug": "save"
-                  },
-                  "depth": 2
-                }, {
-                  "type": "heading",
-                  "data": {
-                    "level": 2,
-                    "title": "add",
-                    "slug": "add"
-                  },
-                  "depth": 2
-                }, {
-                  "type": "heading",
-                  "data": {
-                    "level": 2,
-                    "title": "remove",
-                    "slug": "remove"
-                  },
-                  "depth": 2
-                }, {
-                  "type": "heading",
-                  "data": {
-                    "level": 2,
-                    "title": "toggle",
-                    "slug": "toggle"
-                  },
-                  "depth": 2
-                }, {
-                  "type": "heading",
-                  "data": {
-                    "level": 2,
-                    "title": "sync",
-                    "slug": "sync"
-                  },
-                  "depth": 2
-                }, {
-                  "type": "heading",
-                  "data": {
-                    "level": 2,
-                    "title": "destroy",
-                    "slug": "destroy"
-                  },
-                  "depth": 2
-                }, {
-                  "type": "heading",
-                  "data": {
-                    "level": 2,
-                    "title": "hasAccount",
-                    "slug": "hasaccount"
-                  },
-                  "depth": 2
-                }, {
-                  "type": "heading",
-                  "data": {
-                    "level": 2,
-                    "title": "Private",
-                    "slug": "private"
-                  },
-                  "depth": 2
-                }
-              ]
-            }, {
-              "type": "file",
-              "data": {
-                "language": {
-                  "nameMatchers": [".coffee"],
-                  "pygmentsLexer": "coffee-script",
-                  "singleLineComment": ["#"],
-                  "name": "CoffeeScript"
-                },
-                "sourcePath": "/Users/gregor/JavaScripts/hood.ie/hoodie.js/src/hoodie/share/remote.coffee",
-                "projectPath": "src/hoodie/share/remote.coffee",
-                "targetPath": "hoodie/share/remote",
-                "title": "remote"
-              },
-              "depth": 3,
-              "outline": [
-                {
-                  "type": "heading",
-                  "data": {
-                    "level": 2,
-                    "title": "Constructor",
-                    "slug": "constructor"
-                  },
-                  "depth": 2
-                }, {
-                  "type": "heading",
-                  "data": {
-                    "level": 2,
-                    "title": "push",
-                    "slug": "push"
-                  },
-                  "depth": 2
-                }, {
-                  "type": "heading",
-                  "data": {
-                    "level": 2,
-                    "title": "pull",
-                    "slug": "pull"
-                  },
-                  "depth": 2
-                }, {
-                  "type": "heading",
-                  "data": {
-                    "level": 2,
-                    "title": "PRIVATE",
-                    "slug": "private"
-                  },
-                  "depth": 2
-                }
-              ]
             }
           ]
         }, {
@@ -2070,209 +253,12 @@ f.event={add:function(a,c,d,e,g){var h,i,j,k,l,m,n,o,p,q,r,s;if(!(a.nodeType===3
                 "slug": "store",
                 "isFileHeader": true
               },
-              "depth": 1,
-              "children": [
-                {
-                  "type": "heading",
-                  "data": {
-                    "level": 2,
-                    "title": "Constructor",
-                    "slug": "constructor"
-                  },
-                  "depth": 2
-                }, {
-                  "type": "heading",
-                  "data": {
-                    "level": 2,
-                    "title": "Save",
-                    "slug": "save"
-                  },
-                  "depth": 2
-                }, {
-                  "type": "heading",
-                  "data": {
-                    "level": 2,
-                    "title": "Create",
-                    "slug": "create"
-                  },
-                  "depth": 2
-                }, {
-                  "type": "heading",
-                  "data": {
-                    "level": 2,
-                    "title": "Update",
-                    "slug": "update"
-                  },
-                  "depth": 2
-                }, {
-                  "type": "heading",
-                  "data": {
-                    "level": 2,
-                    "title": "updateAll",
-                    "slug": "updateall"
-                  },
-                  "depth": 2
-                }, {
-                  "type": "heading",
-                  "data": {
-                    "level": 2,
-                    "title": "find",
-                    "slug": "find"
-                  },
-                  "depth": 2
-                }, {
-                  "type": "heading",
-                  "data": {
-                    "level": 2,
-                    "title": "find or create",
-                    "slug": "find-or-create"
-                  },
-                  "depth": 2
-                }, {
-                  "type": "heading",
-                  "data": {
-                    "level": 2,
-                    "title": "findAll",
-                    "slug": "findall"
-                  },
-                  "depth": 2
-                }, {
-                  "type": "heading",
-                  "data": {
-                    "level": 2,
-                    "title": "Destroy",
-                    "slug": "destroy"
-                  },
-                  "depth": 2
-                }, {
-                  "type": "heading",
-                  "data": {
-                    "level": 2,
-                    "title": "destroyAll",
-                    "slug": "destroyall"
-                  },
-                  "depth": 2
-                }, {
-                  "type": "heading",
-                  "data": {
-                    "level": 2,
-                    "title": "UUID",
-                    "slug": "uuid"
-                  },
-                  "depth": 2
-                }, {
-                  "type": "heading",
-                  "data": {
-                    "level": 2,
-                    "title": "Private",
-                    "slug": "private"
-                  },
-                  "depth": 2
-                }
-              ]
+              "depth": 1
             },
             "title": "Store"
           },
           "depth": 2,
-          "outline": [
-            {
-              "type": "heading",
-              "data": {
-                "level": 2,
-                "title": "Constructor",
-                "slug": "constructor"
-              },
-              "depth": 2
-            }, {
-              "type": "heading",
-              "data": {
-                "level": 2,
-                "title": "Save",
-                "slug": "save"
-              },
-              "depth": 2
-            }, {
-              "type": "heading",
-              "data": {
-                "level": 2,
-                "title": "Create",
-                "slug": "create"
-              },
-              "depth": 2
-            }, {
-              "type": "heading",
-              "data": {
-                "level": 2,
-                "title": "Update",
-                "slug": "update"
-              },
-              "depth": 2
-            }, {
-              "type": "heading",
-              "data": {
-                "level": 2,
-                "title": "updateAll",
-                "slug": "updateall"
-              },
-              "depth": 2
-            }, {
-              "type": "heading",
-              "data": {
-                "level": 2,
-                "title": "find",
-                "slug": "find"
-              },
-              "depth": 2
-            }, {
-              "type": "heading",
-              "data": {
-                "level": 2,
-                "title": "find or create",
-                "slug": "find-or-create"
-              },
-              "depth": 2
-            }, {
-              "type": "heading",
-              "data": {
-                "level": 2,
-                "title": "findAll",
-                "slug": "findall"
-              },
-              "depth": 2
-            }, {
-              "type": "heading",
-              "data": {
-                "level": 2,
-                "title": "Destroy",
-                "slug": "destroy"
-              },
-              "depth": 2
-            }, {
-              "type": "heading",
-              "data": {
-                "level": 2,
-                "title": "destroyAll",
-                "slug": "destroyall"
-              },
-              "depth": 2
-            }, {
-              "type": "heading",
-              "data": {
-                "level": 2,
-                "title": "UUID",
-                "slug": "uuid"
-              },
-              "depth": 2
-            }, {
-              "type": "heading",
-              "data": {
-                "level": 2,
-                "title": "Private",
-                "slug": "private"
-              },
-              "depth": 2
-            }
-          ]
+          "outline": []
         }, {
           "type": "file",
           "data": {
@@ -2330,7 +316,9 @@ f.event={add:function(a,c,d,e,g){var h,i,j,k,l,m,n,o,p,q,r,s;if(!(a.nodeType===3
     var currentNodeBottom, currentNodeTop;
     currentNodeTop = currentNode$.offset().top - toc$.children(':visible').first().offset().top;
     currentNodeBottom = currentNodeTop + currentNode$.children('.label').height();
-    if (currentNodeTop < toc$.scrollTop()) toc$.scrollTop(currentNodeTop);
+    if (currentNodeTop < toc$.scrollTop()) {
+      toc$.scrollTop(currentNodeTop);
+    }
     if (currentNodeBottom > toc$.scrollTop() + toc$.height()) {
       return toc$.scrollTop(currentNodeBottom - toc$.height());
     }
@@ -2345,7 +333,9 @@ f.event={add:function(a,c,d,e,g){var h,i,j,k,l,m,n,o,p,q,r,s;if(!(a.nodeType===3
         currentNode$.removeClass('expanded');
       } else {
         parents$ = currentNode$.parents('li');
-        if (parents$.length > 0) selectNode(parents$.first());
+        if (parents$.length > 0) {
+          selectNode(parents$.first());
+        }
       }
     }
     return focusCurrentNode();
@@ -2360,7 +350,9 @@ f.event={add:function(a,c,d,e,g){var h,i,j,k,l,m,n,o,p,q,r,s;if(!(a.nodeType===3
 
   selectNodeByDocumentPath = function(documentPath, headerSlug) {
     var link, urlChunks, _i, _len, _ref;
-    if (headerSlug == null) headerSlug = null;
+    if (headerSlug == null) {
+      headerSlug = null;
+    }
     currentNode$ = fileMap[documentPath];
     if (headerSlug) {
       _ref = currentNode$.find('.outline a');
@@ -2379,14 +371,16 @@ f.event={add:function(a,c,d,e,g){var h,i,j,k,l,m,n,o,p,q,r,s;if(!(a.nodeType===3
   };
 
   moveCurrentNode = function(up) {
-    var i, newIndex, node, visibleNodes$, _len;
+    var i, newIndex, node, visibleNodes$, _i, _len;
     visibleNodes$ = toc$.find('li:visible:not(.filtered)');
     newIndex = 0;
-    for (i = 0, _len = visibleNodes$.length; i < _len; i++) {
+    for (i = _i = 0, _len = visibleNodes$.length; _i < _len; i = ++_i) {
       node = visibleNodes$[i];
       if (node === currentNode$[0]) {
         newIndex = up ? i - 1 : i + 1;
-        if (newIndex < 0) newIndex = 0;
+        if (newIndex < 0) {
+          newIndex = 0;
+        }
         if (newIndex > visibleNodes$.length - 1) {
           newIndex = visibleNodes$.length - 1;
         }
@@ -2399,7 +393,9 @@ f.event={add:function(a,c,d,e,g){var h,i,j,k,l,m,n,o,p,q,r,s;if(!(a.nodeType===3
   visitCurrentNode = function() {
     var labelLink$;
     labelLink$ = currentNode$.children('a.label');
-    if (labelLink$.length > 0) return window.location = labelLink$.attr('href');
+    if (labelLink$.length > 0) {
+      return window.location = labelLink$.attr('href');
+    }
   };
 
   MAX_FILTER_SIZE = 10;
@@ -2415,11 +411,15 @@ f.event={add:function(a,c,d,e,g){var h,i,j,k,l,m,n,o,p,q,r,s;if(!(a.nodeType===3
   currentQuery = '';
 
   searchNodes = function(queryString) {
-    var c, filtered, matched, matcher, nodeInfo, p, _i, _j, _k, _len, _len2, _len3, _results;
+    var c, filtered, matched, matcher, nodeInfo, p, _i, _j, _k, _len, _len1, _len2, _results;
     queryString = queryString.toLowerCase().replace(/\s+/, '');
-    if (queryString === currentQuery) return;
+    if (queryString === currentQuery) {
+      return;
+    }
     currentQuery = queryString;
-    if (queryString === '') return clearFilter();
+    if (queryString === '') {
+      return clearFilter();
+    }
     matcher = new RegExp(((function() {
       var _i, _len, _results;
       _results = [];
@@ -2439,29 +439,31 @@ f.event={add:function(a,c,d,e,g){var h,i,j,k,l,m,n,o,p,q,r,s;if(!(a.nodeType===3
         filtered.push(nodeInfo);
       }
     }
-    if (matched.length > MAX_FILTER_SIZE) return clearFilter();
+    if (matched.length > MAX_FILTER_SIZE) {
+      return clearFilter();
+    }
     nav$.addClass('searching');
-    for (_j = 0, _len2 = filtered.length; _j < _len2; _j++) {
+    for (_j = 0, _len1 = filtered.length; _j < _len1; _j++) {
       nodeInfo = filtered[_j];
       nodeInfo[1].removeClass('matched-child');
       nodeInfo[1].addClass('filtered');
       clearHighlight(nodeInfo[2]);
     }
     _results = [];
-    for (_k = 0, _len3 = matched.length; _k < _len3; _k++) {
+    for (_k = 0, _len2 = matched.length; _k < _len2; _k++) {
       nodeInfo = matched[_k];
       nodeInfo[1].removeClass('filtered matched-child');
       nodeInfo[1].addClass('matched');
       highlightMatch(nodeInfo[2], queryString);
       _results.push((function() {
-        var _l, _len4, _ref, _results2;
+        var _l, _len3, _ref, _results1;
         _ref = nodeInfo[1].parents('li');
-        _results2 = [];
-        for (_l = 0, _len4 = _ref.length; _l < _len4; _l++) {
+        _results1 = [];
+        for (_l = 0, _len3 = _ref.length; _l < _len3; _l++) {
           p = _ref[_l];
-          _results2.push($(p).addClass('matched-child'));
+          _results1.push($(p).addClass('matched-child'));
         }
-        return _results2;
+        return _results1;
       })());
     }
     return _results;
@@ -2521,7 +523,7 @@ f.event={add:function(a,c,d,e,g){var h,i,j,k,l,m,n,o,p,q,r,s;if(!(a.nodeType===3
   };
 
   buildTOCNode = function(node, metaInfo) {
-    var c, children$, discloser$, label$, node$, _i, _len, _ref, _ref2, _ref3;
+    var c, children$, discloser$, label$, node$, _i, _len, _ref, _ref1, _ref2;
     node$ = $("<li class=\"" + node.type + "\"/>");
     switch (node.type) {
       case 'file':
@@ -2532,9 +534,9 @@ f.event={add:function(a,c,d,e,g){var h,i,j,k,l,m,n,o,p,q,r,s;if(!(a.nodeType===3
     }
     if (((_ref = node.children) != null ? _ref.length : void 0) > 0) {
       children$ = $('<ol class="children"/>');
-      _ref2 = node.children;
-      for (_i = 0, _len = _ref2.length; _i < _len; _i++) {
-        c = _ref2[_i];
+      _ref1 = node.children;
+      for (_i = 0, _len = _ref1.length; _i < _len; _i++) {
+        c = _ref1[_i];
         children$.append(buildTOCNode(c, metaInfo));
       }
       node$.append(children$);
@@ -2544,14 +546,16 @@ f.event={add:function(a,c,d,e,g){var h,i,j,k,l,m,n,o,p,q,r,s;if(!(a.nodeType===3
       return selectNode(node$);
     });
     discloser$ = $('<span class="discloser"/>').prependTo(label$);
-    if (!(((_ref3 = node.children) != null ? _ref3.length : void 0) > 0)) {
+    if (!(((_ref2 = node.children) != null ? _ref2.length : void 0) > 0)) {
       discloser$.addClass('placeholder');
     }
     discloser$.click(function(evt) {
       node$.toggleClass('expanded');
       return evt.preventDefault();
     });
-    if (node.type === 'file') fileMap[node.data.targetPath] = node$;
+    if (node.type === 'file') {
+      fileMap[node.data.targetPath] = node$;
+    }
     appendSearchNode(node$);
     return node$;
   };
@@ -2573,7 +577,9 @@ f.event={add:function(a,c,d,e,g){var h,i,j,k,l,m,n,o,p,q,r,s;if(!(a.nodeType===3
     });
     lastMousedownTimestamp = null;
     nav$.mousedown(function(evt) {
-      if (evt.target !== toggle$[0]) return lastMousedownTimestamp = evt.timeStamp;
+      if (evt.target !== toggle$[0]) {
+        return lastMousedownTimestamp = evt.timeStamp;
+      }
     });
     search$.blur(function(evt) {
       if (evt.timeStamp - lastMousedownTimestamp < 10) {
