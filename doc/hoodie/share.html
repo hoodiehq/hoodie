@@ -1,34 +1,15 @@
-<!DOCTYPE html><html lang="en"><head><title>hoodie/share</title></head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0"><meta name="groc-relative-root" content="../"><meta name="groc-document-path" content="hoodie/share"><meta name="groc-project-path" content="src/hoodie/share.coffee"><link rel="stylesheet" type="text/css" media="all" href="../assets/style.css"><script type="text/javascript" src="../assets/behavior.js"></script><body><div id="meta"><div class="file-path">src/hoodie/share.coffee</div></div><div id="document"><div class="segment"><div class="comments"><div class="wrapper"><h1 id="share-module">Share Module</h1></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>technically, sharing objects works in two different ways, 
-depending on whether the user has an account or not.</p>
-
-<ol>
-<li><p>with account</p>
-
-<p>If the user has an account, share is handled by the $share backend worker.
-When a share gets created, a $share doc gets stored and synched to users 
+<!DOCTYPE html><html lang="en"><head><title>hoodie/share</title></head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0"><meta name="groc-relative-root" content="../"><meta name="groc-document-path" content="hoodie/share"><meta name="groc-project-path" content="src/hoodie/share.coffee"><link rel="stylesheet" type="text/css" media="all" href="../assets/style.css"><script type="text/javascript" src="../assets/behavior.js"></script><body><div id="meta"><div class="file-path">src/hoodie/share.coffee</div></div><div id="document"><div class="segment"><div class="comments"><div class="wrapper"><h1 id="share-module">Share Module</h1></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>When a share gets created, a $share doc gets stored and synched to users 
 database. From there the $share worker handles the rest:</p>
 
-<ul><li>creating a share database</li>
-<li>creating a user if a password is used</li>
-<li>handling the replications</li></ul>
+<ul>
+<li>creating a share database</li>
+<li>creating a share user if a password is used</li>
+<li>handling the replications</li>
+</ul>
 
 <p>The worker updates the $share doc status, which gets synched back to the 
 frontend. When the user deletes the $share doc, the worker removes the 
-database, the user and all replications</p></li>
-<li><p>without an account</p>
-
-<p>If the userrs has no account, the $share database gets created right from 
-the frontend. With an adjusted Hoodie class, a special user for the share 
-gets created, which will also create a share database with the help of 
-the userDB worker. Once the db is created, the docs, filtered by the 
-share filter, will be pushed to the share database.</p>
-
-<p>When the share gets destroyed, the share user will be deleted and the 
-userDB worker will handle the rest.</p>
-
-<p>Once a user signes up, the custom $share sockets will be closed and the 
-$share workers will take over.</p></li>
-</ol>
+database, the user and all replications</p>
 
 <h2 id="api">API</h2>
 
