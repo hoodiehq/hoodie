@@ -406,11 +406,9 @@ describe "Hoodie.Account", ->
       
     _when "change password successful", ->
       beforeEach ->
-        @signInPromise = @hoodie.defer()
-        spyOn(@account, "signIn").andReturn @signInPromise.promise()
-        @hoodie.request.andCallFake (type, path, options) -> 
-          response = {"ok":true,"id":"org.couchdb.user:bizbiz","rev":"2-345"}
-          options.success response
+        @signInDefer = @hoodie.defer()
+        spyOn(@account, "signIn").andReturn @signInDefer.promise()
+        @requestDefer.resolve {"ok":true,"id":"org.couchdb.user:bizbiz","rev":"2-345"}
 
       it "should sign in", ->
         @account.changePassword('currentSecret', 'newSecret')
@@ -418,7 +416,7 @@ describe "Hoodie.Account", ->
         
       _when "sign in successful", ->
         beforeEach ->
-          @signInPromise.resolve()
+          @signInDefer.resolve()
 
         it "should resolve its promise", ->
           promise = @account.changePassword('currentSecret', 'newSecret')
@@ -426,7 +424,7 @@ describe "Hoodie.Account", ->
       
       _when "sign in not successful", ->
         beforeEach ->
-          @signInPromise.reject()
+          @signInDefer.reject()
 
         it "should reject its promise", ->
           promise = @account.changePassword('currentSecret', 'newSecret')
@@ -434,7 +432,7 @@ describe "Hoodie.Account", ->
         
     _when "signUp has an error", ->
       beforeEach ->
-        @hoodie.request.andCallFake (type, path, options) -> options.error {}
+        @requestDefer.reject()
       
       it "should reject its promise", ->
         promise = @account.changePassword('currentSecret', 'newSecret')
@@ -541,8 +539,7 @@ describe "Hoodie.Account", ->
       _when "successful", ->
         beforeEach ->
           @response = {"_id":"org.couchdb.user:baz","_rev":"3-33e4d43a6dff5b29a4bd33f576c7824f","name":"baz","salt":"82163606fa5c100e0095ad63598de810","password_sha":"e2e2a4d99632dc5e3fdb41d5d1ff98743a1f344e","type":"user","roles":[]}
-          @hoodie.request.andCallFake (type, path, options) => 
-            options.success @response
+          @requestDefer.resolve(@response)
         
         it "should resolve its promise", ->
           promise = @account.fetch()
@@ -625,7 +622,7 @@ describe "Hoodie.Account", ->
         beforeEach ->
           @promiseSpy = jasmine.createSpy 'promiseSpy'
           @account._checkPasswordResetStatus.andReturn then: @promiseSpy
-          @hoodie.request.andCallFake (method, path, options) -> options.success()
+          @requestDefer.resolve()
 
         it "should check for the request status", ->
           @account.resetPassword('joe@example.com')
@@ -636,7 +633,7 @@ describe "Hoodie.Account", ->
           
       _when "reset Password request is not successful", ->
         beforeEach ->
-          @hoodie.request.andCallFake (method, path, options) -> options.error(responseText: '{"error": "ooops"}')
+          @requestDefer.reject responseText: '{"error": "ooops"}'
 
         it "should be rejected with the error", ->
           expect(@account.resetPassword('joe@example.com')).toBeRejectedWith error: 'ooops'

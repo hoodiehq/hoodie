@@ -7,6 +7,8 @@ Hoodie.Account = (function() {
 
   function Account(hoodie) {
     this.hoodie = hoodie;
+    this._handleDestroySucces = __bind(this._handleDestroySucces, this);
+
     this._handlePasswordResetStatusRequestError = __bind(this._handlePasswordResetStatusRequestError, this);
 
     this._handlePasswordResetStatusRequestSuccess = __bind(this._handlePasswordResetStatusRequestSuccess, this);
@@ -90,18 +92,17 @@ Hoodie.Account = (function() {
   };
 
   Account.prototype.signIn = function(username, password) {
-    var defer, options;
+    var options;
     if (password == null) {
       password = '';
     }
-    defer = this.hoodie.defer();
     options = {
       data: {
         name: username,
         password: password
       }
     };
-    return this.hoodie.request('POST', '/_session', options).pipe(this._handleSignInSuccess).then(defer.resolve, defer.reject);
+    return this.hoodie.request('POST', '/_session', options).pipe(this._handleSignInSuccess);
   };
 
   Account.prototype.login = Account.prototype.signIn;
@@ -122,83 +123,45 @@ Hoodie.Account = (function() {
   };
 
   Account.prototype.fetch = function(username) {
-    var defer, key,
-      _this = this;
+    var key;
     if (username == null) {
       username = this.username;
     }
-    defer = this.hoodie.defer();
     if (!username) {
-      defer.reject({
+      return this.hoodie.defer().reject({
         error: "unauthenticated",
         reason: "not logged in"
-      });
-      return defer.promise();
+      }).promise();
     }
     key = "" + this._prefix + ":" + username;
-    this.hoodie.request('GET', "/_users/" + (encodeURIComponent(key)), {
-      success: function(response) {
-        _this._doc = response;
-        return defer.resolve(response);
-      },
-      error: function(xhr) {
-        var error;
-        try {
-          error = JSON.parse(xhr.responseText);
-        } catch (e) {
-          error = {
-            error: xhr.responseText || "unknown"
-          };
-        }
-        return defer.reject(error);
-      }
+    return this.hoodie.request('GET', "/_users/" + (encodeURIComponent(key))).pipe(null, this._handleRequestError).done(function(response) {
+      return response = this._doc;
     });
-    return defer.promise();
   };
 
   Account.prototype.changePassword = function(currentPassword, newPassword) {
-    var data, defer, key,
-      _this = this;
-    defer = this.hoodie.defer();
+    var data, key, options;
     if (!this.username) {
-      defer.reject({
+      return this.hoodie.defer().reject({
         error: "unauthenticated",
         reason: "not logged in"
-      });
-      return defer.promise();
+      }).promise();
     }
     key = "" + this._prefix + ":" + this.username;
     data = $.extend({}, this._doc);
+    data.password = newPassword;
     delete data.salt;
     delete data.password_sha;
-    data.password = newPassword;
-    return this.hoodie.request('PUT', "/_users/" + (encodeURIComponent(key)), {
+    options = {
       data: JSON.stringify(data),
-      contentType: "application/json",
-      success: function(response) {
-        return window.setTimeout((function() {
-          _this.hoodie.my.remote.disconnect();
-          return _this.signIn(_this.username, newPassword).then(defer.resolve, defer.reject);
-        }), 1000);
-      },
-      error: function(xhr) {
-        var error;
-        try {
-          error = JSON.parse(xhr.responseText);
-        } catch (e) {
-          error = {
-            error: xhr.responseText || "unknown"
-          };
-        }
-        return defer.reject(error);
-      }
-    });
+      contentType: "application/json"
+    };
+    this.hoodie.my.remote.disconnect();
+    return this.hoodie.request('PUT', "/_users/" + (encodeURIComponent(key)), options).pipe(this._handleChangePasswordSuccess(newPassword), this._handleRequestError);
   };
 
   Account.prototype.resetPassword = function(username) {
-    var data, defer, key, resetPasswordId,
-      _this = this;
-    defer = this.hoodie.defer();
+    var data, key, options, resetPasswordId;
     if (resetPasswordId = this.hoodie.my.config.get('_account.resetPasswordId')) {
       return this._checkPasswordResetStatus();
     }
@@ -213,26 +176,11 @@ Hoodie.Account = (function() {
       createdAt: new Date,
       updatedAt: new Date
     };
-    this.hoodie.request('PUT', "/_users/" + (encodeURIComponent(key)), {
+    options = {
       data: JSON.stringify(data),
-      contentType: "application/json",
-      success: function(response) {
-        defer.resolve();
-        return _this._checkPasswordResetStatus();
-      },
-      error: function(xhr) {
-        var error;
-        try {
-          error = JSON.parse(xhr.responseText);
-        } catch (e) {
-          error = {
-            error: xhr.responseText || "unknown"
-          };
-        }
-        return defer.reject(error);
-      }
-    });
-    return defer.promise();
+      contentType: "application/json"
+    };
+    return this.hoodie.request('PUT', "/_users/" + (encodeURIComponent(key)), options).pipe(null, this._handleRequestError).done(this._checkPasswordResetStatus);
   };
 
   Account.prototype.changeUsername = function(currentPassword, newUsername) {
@@ -240,17 +188,7 @@ Hoodie.Account = (function() {
   };
 
   Account.prototype.destroy = function() {
-    var _this = this;
-    this.hoodie.my.remote.disconnect();
-    return this.fetch().pipe(function() {
-      var key;
-      key = "" + _this._prefix + ":" + _this.username;
-      _this._doc._deleted = true;
-      return _this.hoodie.request('PUT', "/_users/" + (encodeURIComponent(key)), {
-        data: JSON.stringify(_this._doc),
-        contentType: 'application/json'
-      });
-    });
+    return this.fetch().pipe(this._handleDestroySucces, this._handleRequestError);
   };
 
   Account.prototype._prefix = 'org.couchdb.user';
@@ -285,6 +223,9 @@ Hoodie.Account = (function() {
 
   Account.prototype._handleRequestError = function(xhr) {
     var error;
+    if (xhr == null) {
+      xhr = {};
+    }
     try {
       error = JSON.parse(xhr.responseText);
     } catch (e) {
@@ -344,14 +285,19 @@ Hoodie.Account = (function() {
         reason: "account has not been confirmed yet"
       });
     }
-    this.username = response.name;
     this._authenticated = true;
-    this.owner = response.roles[0];
-    this.hoodie.my.config.set('_account.username', this.username);
-    this.hoodie.my.config.set('_account.owner', this.owner);
+    this._setUsername(response.name);
+    this._setOwner(response.roles[0]);
     this.hoodie.trigger('account:signin', this.username);
     this.fetch();
     return defer.resolve(this.username, response);
+  };
+
+  Account.prototype._handleChangePasswordSuccess = function(newPassword) {
+    var _this = this;
+    return function() {
+      return _this.signIn(_this.username, newPassword);
+    };
   };
 
   Account.prototype._handleSignOutSuccess = function() {
@@ -442,6 +388,17 @@ Hoodie.Account = (function() {
     currentPassword = this.hoodie.my.config.get('_account.anonymousPassword');
     return this._changeUsernameAndPassword(currentPassword, username, password).done(function() {
       return _this.hoodie.my.config.remove('_account.anonymousPassword');
+    });
+  };
+
+  Account.prototype._handleDestroySucces = function() {
+    var key;
+    this.hoodie.my.remote.disconnect();
+    key = "" + this._prefix + ":" + this.username;
+    this._doc._deleted = true;
+    return this.hoodie.request('PUT', "/_users/" + (encodeURIComponent(key)), {
+      data: JSON.stringify(this._doc),
+      contentType: 'application/json'
     });
   };
 

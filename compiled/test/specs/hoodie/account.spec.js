@@ -474,16 +474,12 @@ describe("Hoodie.Account", function() {
     });
     _when("change password successful", function() {
       beforeEach(function() {
-        this.signInPromise = this.hoodie.defer();
-        spyOn(this.account, "signIn").andReturn(this.signInPromise.promise());
-        return this.hoodie.request.andCallFake(function(type, path, options) {
-          var response;
-          response = {
-            "ok": true,
-            "id": "org.couchdb.user:bizbiz",
-            "rev": "2-345"
-          };
-          return options.success(response);
+        this.signInDefer = this.hoodie.defer();
+        spyOn(this.account, "signIn").andReturn(this.signInDefer.promise());
+        return this.requestDefer.resolve({
+          "ok": true,
+          "id": "org.couchdb.user:bizbiz",
+          "rev": "2-345"
         });
       });
       it("should sign in", function() {
@@ -492,7 +488,7 @@ describe("Hoodie.Account", function() {
       });
       _when("sign in successful", function() {
         beforeEach(function() {
-          return this.signInPromise.resolve();
+          return this.signInDefer.resolve();
         });
         return it("should resolve its promise", function() {
           var promise;
@@ -502,7 +498,7 @@ describe("Hoodie.Account", function() {
       });
       return _when("sign in not successful", function() {
         beforeEach(function() {
-          return this.signInPromise.reject();
+          return this.signInDefer.reject();
         });
         return it("should reject its promise", function() {
           var promise;
@@ -513,9 +509,7 @@ describe("Hoodie.Account", function() {
     });
     return _when("signUp has an error", function() {
       beforeEach(function() {
-        return this.hoodie.request.andCallFake(function(type, path, options) {
-          return options.error({});
-        });
+        return this.requestDefer.reject();
       });
       return it("should reject its promise", function() {
         var promise;
@@ -632,7 +626,6 @@ describe("Hoodie.Account", function() {
       });
       return _when("successful", function() {
         beforeEach(function() {
-          var _this = this;
           this.response = {
             "_id": "org.couchdb.user:baz",
             "_rev": "3-33e4d43a6dff5b29a4bd33f576c7824f",
@@ -642,9 +635,7 @@ describe("Hoodie.Account", function() {
             "type": "user",
             "roles": []
           };
-          return this.hoodie.request.andCallFake(function(type, path, options) {
-            return options.success(_this.response);
-          });
+          return this.requestDefer.resolve(this.response);
         });
         return it("should resolve its promise", function() {
           var promise;
@@ -738,9 +729,7 @@ describe("Hoodie.Account", function() {
           this.account._checkPasswordResetStatus.andReturn({
             then: this.promiseSpy
           });
-          return this.hoodie.request.andCallFake(function(method, path, options) {
-            return options.success();
-          });
+          return this.requestDefer.resolve();
         });
         it("should check for the request status", function() {
           this.account.resetPassword('joe@example.com');
@@ -752,10 +741,8 @@ describe("Hoodie.Account", function() {
       });
       return _when("reset Password request is not successful", function() {
         beforeEach(function() {
-          return this.hoodie.request.andCallFake(function(method, path, options) {
-            return options.error({
-              responseText: '{"error": "ooops"}'
-            });
+          return this.requestDefer.reject({
+            responseText: '{"error": "ooops"}'
           });
         });
         return it("should be rejected with the error", function() {

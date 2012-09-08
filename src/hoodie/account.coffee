@@ -110,6 +110,7 @@ class Hoodie.Account
   hasAnonymousAccount: ->
     @hoodie.my.config.get('_account.anonymousPassword')?
 
+
   # sign in with username & password
   # ----------------------------------
 
@@ -118,14 +119,12 @@ class Hoodie.Account
   # (roles include "confirmed" role).
   #
   signIn : (username, password = '') ->
-    defer   = @hoodie.defer()
     options = data: 
                 name      : username
                 password  : password
 
     @hoodie.request('POST', '/_session', options)
     .pipe(@_handleSignInSuccess)
-    .then defer.resolve, defer.reject
 
   # alias
   login: @::signIn
@@ -155,20 +154,8 @@ class Hoodie.Account
   # db
   # ----
 
-  # escape user username (or what ever he uses to sign up)
-  # to make it a valid CouchDB database name
-  # 
-  #     Converts an username address user name to a valid database name
-  #     The character replacement rules are:
-  #       [A-Z] -> [a-z]
-  #       @ -> $
-  #       . -> _
-  #     Notes:
-  #      can't reverse because _ are valid before the @.
-  #
-  #
-  db : -> 
-    "user/#{@owner}"
+  # return name of db
+  db : -> "user/#{@owner}"
   
   
   # fetch
@@ -176,28 +163,13 @@ class Hoodie.Account
 
   # fetches _users doc from CouchDB and caches it in _doc
   fetch : (username = @username) =>
-    defer = @hoodie.defer()
-    
     unless username
-      defer.reject error: "unauthenticated", reason: "not logged in"
-      return defer.promise()
+      return @hoodie.defer().reject(error: "unauthenticated", reason: "not logged in").promise()
     
     key = "#{@_prefix}:#{username}"
-    @hoodie.request 'GET', "/_users/#{encodeURIComponent key}",
-    
-      success     : (response) => 
-        @_doc = response
-        defer.resolve response
-      
-      error       : (xhr) ->
-        try
-          error = JSON.parse(xhr.responseText)
-        catch e
-          error = error: xhr.responseText or "unknown"
-          
-        defer.reject(error) 
-        
-    return defer.promise()
+    @hoodie.request('GET', "/_users/#{encodeURIComponent key}")
+    .pipe(null, @_handleRequestError)
+    .done (response) -> response = @_doc
     
 
   # change password
@@ -207,34 +179,22 @@ class Hoodie.Account
   # but couchDb doesn't require it for a password change, so it's ignored
   # in this implementation of the hoodie API.
   changePassword : (currentPassword, newPassword) ->
-    defer = @hoodie.defer()
+
     unless @username
-      defer.reject error: "unauthenticated", reason: "not logged in"
-      return defer.promise()
+      return @hoodie.defer().reject(error: "unauthenticated", reason: "not logged in").promise()
     
-    key = "#{@_prefix}:#{@username}"
-    
+    key  = "#{@_prefix}:#{@username}"
     data = $.extend {}, @_doc
+    data.password = newPassword
     delete data.salt
     delete data.password_sha
-    data.password = newPassword
-    
-    @hoodie.request 'PUT',  "/_users/#{encodeURIComponent key}",
+    options = 
       data        : JSON.stringify data
       contentType : "application/json"
-      success     : (response) =>
-        window.setTimeout ( => 
-          @hoodie.my.remote.disconnect()
-          @signIn(@username, newPassword).then defer.resolve, defer.reject
-        ), 1000
-        
-      error       : (xhr) ->
-        try
-          error = JSON.parse(xhr.responseText)
-        catch e
-          error = error: xhr.responseText or "unknown"
-          
-        defer.reject(error)
+
+    @hoodie.my.remote.disconnect()
+    @hoodie.request('PUT',  "/_users/#{encodeURIComponent key}", options)
+    .pipe( @_handleChangePasswordSuccess(newPassword), @_handleRequestError )
 
 
   # reset password
@@ -248,8 +208,6 @@ class Hoodie.Account
   # It will be picked up by the password reset worker and destroyed
   # once the password was resetted.
   resetPassword : (username) ->
-    defer = @hoodie.defer()
-
     if resetPasswordId = @hoodie.my.config.get '_account.resetPasswordId'
       return @_checkPasswordResetStatus()
       
@@ -264,23 +222,14 @@ class Hoodie.Account
       password  : resetPasswordId
       createdAt : new Date
       updatedAt : new Date
-    
-    @hoodie.request 'PUT',  "/_users/#{encodeURIComponent key}",
+
+    options =
       data        : JSON.stringify data
       contentType : "application/json"
-      success     : (response) =>
-        defer.resolve()
-        @_checkPasswordResetStatus()
-        
-      error       : (xhr) ->
-        try
-          error = JSON.parse(xhr.responseText)
-        catch e
-          error = error: xhr.responseText or "unknown"
-        
-        defer.reject(error)
-
-    return defer.promise()
+    
+    @hoodie.request('PUT',  "/_users/#{encodeURIComponent key}", options)
+    .pipe(null, @_handleRequestError)
+    .done @_checkPasswordResetStatus
 
 
   # change username
@@ -301,13 +250,7 @@ class Hoodie.Account
 
   # destroys a user' account  
   destroy : ->
-    @hoodie.my.remote.disconnect()
-    @fetch().pipe =>
-      key = "#{@_prefix}:#{@username}"
-      @_doc._deleted = true
-      @hoodie.request 'PUT', "/_users/#{encodeURIComponent key}",
-        data        : JSON.stringify @_doc
-        contentType : 'application/json'
+    @fetch().pipe @_handleDestroySucces, @_handleRequestError
 
 
   # PRIVATE
@@ -321,7 +264,7 @@ class Hoodie.Account
 
   # setters
   _setUsername: (@username) -> @hoodie.my.config.set '_account.username', @username
-  _setOwner   : (@owner)    -> @hoodie.my.config.set '_account.owner', @owner
+  _setOwner   : (@owner)    -> @hoodie.my.config.set '_account.owner',    @owner
 
   #
   # handle a successful authentication request.
@@ -333,8 +276,8 @@ class Hoodie.Account
       @_authenticated = true
       @_setUsername response.userCtx.name
       @_setOwner    response.userCtx.roles[0]
-      
       defer.resolve @username
+
     else
       @_authenticated = false
       @hoodie.trigger 'account:error:unauthenticated'
@@ -342,7 +285,7 @@ class Hoodie.Account
 
     return defer.promise()
 
-  _handleRequestError: (xhr) =>
+  _handleRequestError: (xhr = {}) =>
     try
       error = JSON.parse(xhr.responseText)
     catch e
@@ -419,17 +362,23 @@ class Hoodie.Account
     unless ~response.roles.indexOf("confirmed")
       return defer.reject error: "unconfirmed", reason: "account has not been confirmed yet"
     
-    @username       = response.name
     @_authenticated = true
-    @owner          = response.roles[0]
-    @hoodie.my.config.set '_account.username', @username
-    @hoodie.my.config.set '_account.owner',    @owner
+    @_setUsername response.name
+    @_setOwner    response.roles[0]
     @hoodie.trigger 'account:signin', @username
 
     @fetch()
     defer.resolve(@username, response)
     
-  
+
+  #
+  #
+  #
+  _handleChangePasswordSuccess: (newPassword) ->
+    => @signIn(@username, newPassword)
+
+  #
+  #
   #
   _handleSignOutSuccess: =>
     delete @username
@@ -533,3 +482,14 @@ class Hoodie.Account
     @_changeUsernameAndPassword(currentPassword, username, password)
     .done => 
       @hoodie.my.config.remove '_account.anonymousPassword'
+
+  #
+  #
+  #
+  _handleDestroySucces: =>
+    @hoodie.my.remote.disconnect()
+    key = "#{@_prefix}:#{@username}"
+    @_doc._deleted = true
+    @hoodie.request 'PUT', "/_users/#{encodeURIComponent key}",
+      data        : JSON.stringify @_doc
+      contentType : 'application/json'
