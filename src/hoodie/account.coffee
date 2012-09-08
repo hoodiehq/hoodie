@@ -263,13 +263,13 @@ class Hoodie.Account
   _doc : {}
 
   # setters
-  _setUsername: (@username) -> @hoodie.my.config.set '_account.username', @username
-  _setOwner   : (@owner)    -> @hoodie.my.config.set '_account.owner',    @owner
+  _setUsername : (@username) -> @hoodie.my.config.set '_account.username', @username
+  _setOwner    : (@owner)    -> @hoodie.my.config.set '_account.owner',    @owner
 
   #
   # handle a successful authentication request.
   # 
-  _handleAuthenticateSuccess: (response) =>
+  _handleAuthenticateSuccess : (response) =>
     defer = @hoodie.defer()
 
     if response.userCtx.name
@@ -285,7 +285,10 @@ class Hoodie.Account
 
     return defer.promise()
 
-  _handleRequestError: (xhr = {}) =>
+  #
+  # standard error handling for AJAX requests
+  #
+  _handleRequestError : (xhr = {}) =>
     try
       error = JSON.parse(xhr.responseText)
     catch e
@@ -303,7 +306,7 @@ class Hoodie.Account
   #         "rev": "1-e8747d9ae9776706da92810b1baa4248"
   #     }
   #
-  _handleSignUpSucces: (username, password) =>
+  _handleSignUpSucces : (username, password) =>
     defer = @hoodie.defer()
 
     (response) =>
@@ -311,7 +314,7 @@ class Hoodie.Account
       @_doc._rev = response.rev
       @_delayedSignIn(username, password)
 
-  _delayedSignIn: (username, password) =>
+  _delayedSignIn : (username, password) =>
     defer = @hoodie.defer()
     window.setTimeout ( =>
       promise = @signIn(username, password)
@@ -339,7 +342,7 @@ class Hoodie.Account
   #         ]
   #     }
   #
-  _handleSignInSuccess: (response) =>
+  _handleSignInSuccess : (response) =>
     defer = @hoodie.defer()
 
     # if an error occured, the userDB worker stores it to the $error attribute
@@ -374,13 +377,13 @@ class Hoodie.Account
   #
   #
   #
-  _handleChangePasswordSuccess: (newPassword) ->
+  _handleChangePasswordSuccess : (newPassword) ->
     => @signIn(@username, newPassword)
 
   #
   #
   #
-  _handleSignOutSuccess: =>
+  _handleSignOutSuccess : =>
     delete @username
     delete @owner
     @hoodie.my.config.clear()
@@ -451,7 +454,7 @@ class Hoodie.Account
   # 2. update _users doc with new username and new password (if provided)
   # 3. sign in with new credentials to create new sesion.
   #
-  _changeUsernameAndPassword: (currentPassword, newUsername, newPassword) ->
+  _changeUsernameAndPassword : (currentPassword, newUsername, newPassword) ->
     @authenticate().pipe =>
 
       # prepare updated _users doc
@@ -477,7 +480,7 @@ class Hoodie.Account
   #
   # turn an anonymous account into a real account
   #
-  _upgradeAnonymousAccount: (username, password) ->
+  _upgradeAnonymousAccount : (username, password) ->
     currentPassword = @hoodie.my.config.get '_account.anonymousPassword'
     @_changeUsernameAndPassword(currentPassword, username, password)
     .done => 
@@ -486,7 +489,7 @@ class Hoodie.Account
   #
   #
   #
-  _handleDestroySucces: =>
+  _handleDestroySucces : =>
     @hoodie.my.remote.disconnect()
     key = "#{@_prefix}:#{@username}"
     @_doc._deleted = true
