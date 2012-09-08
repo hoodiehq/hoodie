@@ -1,9 +1,8 @@
 # Hoodie.Account
 # ================
-#
-# tell something smart in here.
-#
 
+# tell something smart in here.
+# 
 class Hoodie.Account
   
   # Properties
