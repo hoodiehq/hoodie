@@ -51,17 +51,8 @@ class Hoodie.Share.Instance extends Hoodie.RemoteStore
     {id, access, continuous, password, _userRev} = options
     @set {id, access, continuous, password, _userRev}
 
-    # if the current user isn't anonymous (has an account), a backend worker is 
-    # used for the whole share magic, all we need to do is creating the $share 
-    # doc and listen to its remote changes
-    #
-    # if the user is anonymous, we need to handle it manually. To achieve that
-    # we use a customized hoodie, with its own socket
-    @anonymous = @hoodie.my.account.username is undefined
-
-    # use the custom Share Hoodie for users witouth an account
-    if @anonymous
-      @hoodie = new Hoodie.Share.Hoodie @hoodie, this 
+    # generate an id unless one has been provided
+    @id or= @hoodie.my.store.uuid()
   
   
   # set
@@ -93,23 +84,26 @@ class Hoodie.Share.Instance extends Hoodie.RemoteStore
   # save
   # ------
   
-  # make the made with `.set` persistent. An optional
+  # make changes made with `.set` persistent. An optional
   # key/value update can be passed as first argument
+  #
+  # Obviously, sharing object only works if my local data
+  # gets synchronized. To make this happen for users without
+  # an account, we do an anonymous signUp.
   save : (update = {}, options) ->
-    defer = @hoodie.defer()
+    
+    @hoodie.my.account.anonymousSignUp()
 
     @set(update) if update
     _handleUpdate = (properties, wasCreated) => 
       # reset memory
       @_memory = {}
       $.extend this, properties
-      defer.resolve(this)
+      return this
 
     # persist memory to store
     @hoodie.my.store.update("$share", @id, @_memory, options)
-    .then _handleUpdate, defer.reject
-
-    return defer.promise()
+    .pipe(_handleUpdate)
     
   
   # add

@@ -1,36 +1,16 @@
 # Share Module
 # ==============
 
-# technically, sharing objects works in two different ways, 
-# depending on whether the user has an account or not.
+# When a share gets created, a $share doc gets stored and synched to users 
+# database. From there the $share worker handles the rest:
+# 
+# * creating a share database
+# * creating a share user if a password is used
+# * handling the replications
 #
-# 1. with account
-#
-#    If the user has an account, share is handled by the $share backend worker.
-#    When a share gets created, a $share doc gets stored and synched to users 
-#    database. From there the $share worker handles the rest:
-#    
-#    * creating a share database
-#    * creating a user if a password is used
-#    * handling the replications
-#
-#    The worker updates the $share doc status, which gets synched back to the 
-#    frontend. When the user deletes the $share doc, the worker removes the 
-#    database, the user and all replications
-#
-# 2. without an account
-#
-#    If the userrs has no account, the $share database gets created right from 
-#    the frontend. With an adjusted Hoodie class, a special user for the share 
-#    gets created, which will also create a share database with the help of 
-#    the userDB worker. Once the db is created, the docs, filtered by the 
-#    share filter, will be pushed to the share database.
-#
-#    When the share gets destroyed, the share user will be deleted and the 
-#    userDB worker will handle the rest.
-#
-#    Once a user signes up, the custom $share sockets will be closed and the 
-#    $share workers will take over.
+# The worker updates the $share doc status, which gets synched back to the 
+# frontend. When the user deletes the $share doc, the worker removes the 
+# database, the user and all replications
 #
 #
 # API

@@ -40,10 +40,7 @@ Hoodie.Share.Instance = (function(_super) {
       password: password,
       _userRev: _userRev
     });
-    this.anonymous = this.hoodie.my.account.username === void 0;
-    if (this.anonymous) {
-      this.hoodie = new Hoodie.Share.Hoodie(this.hoodie, this);
-    }
+    this.id || (this.id = this.hoodie.my.store.uuid());
   }
 
   Instance.prototype._memory = {};
@@ -69,22 +66,21 @@ Hoodie.Share.Instance = (function(_super) {
   };
 
   Instance.prototype.save = function(update, options) {
-    var defer, _handleUpdate,
+    var _handleUpdate,
       _this = this;
     if (update == null) {
       update = {};
     }
-    defer = this.hoodie.defer();
+    this.hoodie.my.account.anonymousSignUp();
     if (update) {
       this.set(update);
     }
     _handleUpdate = function(properties, wasCreated) {
       _this._memory = {};
       $.extend(_this, properties);
-      return defer.resolve(_this);
+      return _this;
     };
-    this.hoodie.my.store.update("$share", this.id, this._memory, options).then(_handleUpdate, defer.reject);
-    return defer.promise();
+    return this.hoodie.my.store.update("$share", this.id, this._memory, options).pipe(_handleUpdate);
   };
 
   Instance.prototype.add = function(objects) {
