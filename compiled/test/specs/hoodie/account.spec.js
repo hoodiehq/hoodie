@@ -295,19 +295,25 @@ describe("Hoodie.Account", function() {
   });
   describe(".anonymousSignUp()", function() {
     beforeEach(function() {
-      spyOn(this.account, "signUp");
+      this.signUpDefer = this.hoodie.defer();
+      spyOn(this.account, "signUp").andReturn(this.signUpDefer.promise());
       spyOn(this.hoodie.my.store, "uuid").andReturn("crazyuuid123");
       spyOn(this.hoodie.my.config, "set");
       return this.account.owner = "owner_hash123";
     });
-    it("should generate a password and store it locally in _account.anonymousPassword", function() {
-      this.account.anonymousSignUp();
-      expect(this.hoodie.my.store.uuid).wasCalledWith(10);
-      return expect(this.hoodie.my.config.set).wasCalledWith('_account.anonymousPassword', 'crazyuuid123');
-    });
-    return it("should sign up with username = 'anonymous/ownerHash' and the random password", function() {
+    it("should sign up with username = 'anonymous/ownerHash' and the random password", function() {
       this.account.anonymousSignUp();
       return expect(this.account.signUp).wasCalledWith('anonymous/owner_hash123', 'crazyuuid123');
+    });
+    return _when("signUp successful", function() {
+      beforeEach(function() {
+        return this.signUpDefer.resolve();
+      });
+      return it("should generate a password and store it locally in _account.anonymousPassword", function() {
+        this.account.anonymousSignUp();
+        expect(this.hoodie.my.store.uuid).wasCalledWith(10);
+        return expect(this.hoodie.my.config.set).wasCalledWith('_account.anonymousPassword', 'crazyuuid123');
+      });
     });
   });
   describe(".signIn(username, password)", function() {
@@ -537,11 +543,21 @@ describe("Hoodie.Account", function() {
     });
     return _when("signUp successful", function() {
       beforeEach(function() {
-        return this.requestDefer.resolve();
+        this.requestDefer.resolve();
+        spyOn(this.hoodie.my.config, "clear");
+        return this.account.signOut('joe@example.com', 'secret');
       });
-      return it("should trigger `account:signout` event", function() {
-        this.account.signOut('joe@example.com', 'secret');
+      it("should trigger `account:signout` event", function() {
         return expect(this.hoodie.trigger).wasCalledWith('account:signout');
+      });
+      it("should unset @owner", function() {
+        return expect(this.account.owner).toBeUndefined();
+      });
+      it("should unset @username", function() {
+        return expect(this.account.username).toBeUndefined();
+      });
+      return it("should clear config", function() {
+        return expect(this.hoodie.my.config.clear).wasCalled();
       });
     });
   });
@@ -752,9 +768,8 @@ describe("Hoodie.Account", function() {
   });
   return describe(".changeUsername(currentPassword, newUsername)", function() {
     beforeEach(function() {
-      spyOn(this.account, "authenticate").andReturn({
-        pipe: function() {}
-      });
+      this.authenticateDefer = this.hoodie.defer();
+      spyOn(this.account, "authenticate").andReturn(this.authenticateDefer.promise());
       return this.account.changeUsername('secret', 'new.joe@example.com');
     });
     it("should authenticate", function() {

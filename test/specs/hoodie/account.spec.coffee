@@ -251,19 +251,25 @@ describe "Hoodie.Account", ->
   
   describe ".anonymousSignUp()", ->
     beforeEach ->
-      spyOn(@account, "signUp") 
+      @signUpDefer = @hoodie.defer()
+      spyOn(@account, "signUp").andReturn @signUpDefer.promise()
       spyOn(@hoodie.my.store, "uuid").andReturn "crazyuuid123"
       spyOn(@hoodie.my.config, "set")
       @account.owner = "owner_hash123"
-
-    it "should generate a password and store it locally in _account.anonymousPassword", ->
-      @account.anonymousSignUp()
-      expect(@hoodie.my.store.uuid).wasCalledWith 10
-      expect(@hoodie.my.config.set).wasCalledWith '_account.anonymousPassword', 'crazyuuid123'
        
     it "should sign up with username = 'anonymous/ownerHash' and the random password", ->
       @account.anonymousSignUp()
       expect(@account.signUp).wasCalledWith 'anonymous/owner_hash123', 'crazyuuid123'
+
+    _when "signUp successful", ->
+      beforeEach ->
+        @signUpDefer.resolve()
+
+      it "should generate a password and store it locally in _account.anonymousPassword", ->
+        @account.anonymousSignUp()
+        expect(@hoodie.my.store.uuid).wasCalledWith 10
+        expect(@hoodie.my.config.set).wasCalledWith '_account.anonymousPassword', 'crazyuuid123'
+      
   # /.anonymousSignUp()
 
 
@@ -453,10 +459,20 @@ describe "Hoodie.Account", ->
     _when "signUp successful", ->
       beforeEach ->
         @requestDefer.resolve()
+        spyOn(@hoodie.my.config, "clear")
+        @account.signOut('joe@example.com', 'secret')
         
       it "should trigger `account:signout` event", ->
-        @account.signOut('joe@example.com', 'secret')
         expect(@hoodie.trigger).wasCalledWith 'account:signout'
+
+      it "should unset @owner", ->
+         expect(@account.owner).toBeUndefined()
+
+      it "should unset @username", ->
+         expect(@account.username).toBeUndefined()
+
+      it "should clear config", ->
+        expect(@hoodie.my.config.clear).wasCalled() 
   # /.signIn(username, password)
 
 
@@ -628,7 +644,8 @@ describe "Hoodie.Account", ->
 
   describe ".changeUsername(currentPassword, newUsername)", ->
     beforeEach ->
-      spyOn(@account, "authenticate").andReturn pipe: ->
+      @authenticateDefer = @hoodie.defer()
+      spyOn(@account, "authenticate").andReturn @authenticateDefer.promise()
       @account.changeUsername('secret', 'new.joe@example.com')
     
     it "should authenticate", ->

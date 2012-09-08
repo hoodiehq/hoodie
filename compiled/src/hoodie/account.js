@@ -7,6 +7,10 @@ Hoodie.Account = (function() {
 
   function Account(hoodie) {
     this.hoodie = hoodie;
+    this._handlePasswordResetStatusRequestError = __bind(this._handlePasswordResetStatusRequestError, this);
+
+    this._handlePasswordResetStatusRequestSuccess = __bind(this._handlePasswordResetStatusRequestSuccess, this);
+
     this._checkPasswordResetStatus = __bind(this._checkPasswordResetStatus, this);
 
     this._handleSignOutSuccess = __bind(this._handleSignOutSuccess, this);
@@ -48,43 +52,37 @@ Hoodie.Account = (function() {
   };
 
   Account.prototype.signUp = function(username, password) {
-    var currentPassword, defer, key, options,
-      _this = this;
+    var key, options;
     if (password == null) {
       password = '';
     }
     if (this.hasAnonymousAccount()) {
-      defer = this.hoodie.defer();
-      currentPassword = this.hoodie.my.config.get('_account.anonymousPassword');
-      this._changeUserNameAndPassword(currentPassword, username, password).fail(defer.reject).done(function() {
-        _this.hoodie.my.config.remove('_account.anonymousPassword');
-        return defer.resolve.apply(defer, arguments);
-      });
-      return defer.promise();
-    } else {
-      key = "" + this._prefix + ":" + username;
-      options = {
-        data: JSON.stringify({
-          _id: key,
-          name: username,
-          type: 'user',
-          roles: [],
-          password: password,
-          $owner: this.owner,
-          database: this.db()
-        }),
-        contentType: 'application/json'
-      };
-      return this.hoodie.request('PUT', "/_users/" + (encodeURIComponent(key)), options).pipe(this._handleSignUpSucces(username, password), this._handleRequestError);
+      return this._upgradeAnonymousAccount(username, password);
     }
+    key = "" + this._prefix + ":" + username;
+    options = {
+      data: JSON.stringify({
+        _id: key,
+        name: username,
+        type: 'user',
+        roles: [],
+        password: password,
+        $owner: this.owner,
+        database: this.db()
+      }),
+      contentType: 'application/json'
+    };
+    return this.hoodie.request('PUT', "/_users/" + (encodeURIComponent(key)), options).pipe(this._handleSignUpSucces(username, password), this._handleRequestError);
   };
 
   Account.prototype.anonymousSignUp = function() {
-    var password, username;
+    var password, username,
+      _this = this;
     password = this.hoodie.my.store.uuid(10);
     username = "anonymous/" + this.owner;
-    this.signUp(username, password);
-    return this.hoodie.my.config.set('_account.anonymousPassword', password);
+    return this.signUp(username, password).fail(this._handleRequestError).done(function() {
+      return _this.hoodie.my.config.set('_account.anonymousPassword', password);
+    });
   };
 
   Account.prototype.hasAnonymousAccount = function() {
@@ -238,7 +236,7 @@ Hoodie.Account = (function() {
   };
 
   Account.prototype.changeUsername = function(currentPassword, newUsername) {
-    return this._changeUserNameAndPassword(currentPassword, newUsername);
+    return this._changeUsernameAndPassword(currentPassword, newUsername);
   };
 
   Account.prototype.destroy = function() {
@@ -259,15 +257,23 @@ Hoodie.Account = (function() {
 
   Account.prototype._doc = {};
 
+  Account.prototype._setUsername = function(username) {
+    this.username = username;
+    return this.hoodie.my.config.set('_account.username', this.username);
+  };
+
+  Account.prototype._setOwner = function(owner) {
+    this.owner = owner;
+    return this.hoodie.my.config.set('_account.owner', this.owner);
+  };
+
   Account.prototype._handleAuthenticateSuccess = function(response) {
     var defer;
     defer = this.hoodie.defer();
     if (response.userCtx.name) {
       this._authenticated = true;
-      this.username = response.userCtx.name;
-      this.owner = response.userCtx.roles[0];
-      this.hoodie.my.config.set('_account.username', this.username);
-      this.hoodie.my.config.set('_account.owner', this.owner);
+      this._setUsername(response.userCtx.name);
+      this._setOwner(response.userCtx.roles[0]);
       defer.resolve(this.username);
     } else {
       this._authenticated = false;
@@ -350,74 +356,67 @@ Hoodie.Account = (function() {
 
   Account.prototype._handleSignOutSuccess = function() {
     delete this.username;
+    delete this.owner;
     this.hoodie.my.config.clear();
     this._authenticated = false;
     return this.hoodie.trigger('account:signout');
   };
 
   Account.prototype._checkPasswordResetStatus = function() {
-    var auth, defer, hash, resetPasswordId, username,
+    var hash, options, resetPasswordId, url, username,
       _this = this;
-    defer = this.hoodie.defer();
     resetPasswordId = this.hoodie.my.config.get('_account.resetPasswordId');
     if (!resetPasswordId) {
-      return defer.reject({
+      return this.hoodie.defer().reject({
         error: "missing"
       }).promise();
     }
-    defer.done(function() {
-      _this.hoodie.my.config.remove('_account.resetPasswordId');
-      return _this.hoodie.trigger('account:password_reset:success');
-    });
-    defer.fail(function(error) {
+    username = "$passwordReset/" + resetPasswordId;
+    url = "/_users/" + (encodeURIComponent("" + this._prefix + ":" + username));
+    hash = btoa("" + username + ":" + resetPasswordId);
+    options = {
+      headers: {
+        Authorization: "Basic " + hash
+      }
+    };
+    return this.hoodie.request('GET', url, options).pipe(this._handlePasswordResetStatusRequestSuccess, this._handlePasswordResetStatusRequestError).fail(function() {
       if (error.error === 'pending') {
         window.setTimeout(_this._checkPasswordResetStatus, 1000);
         return;
       }
-      _this.hoodie.my.config.remove('_account.resetPasswordId');
       return _this.hoodie.trigger('account:password_reset:error');
     });
-    username = "$passwordReset/" + resetPasswordId;
-    hash = btoa("" + username + ":" + resetPasswordId);
-    auth = "Basic " + hash;
-    this.hoodie.request('GET', "/_users/" + (encodeURIComponent("" + this._prefix + ":" + username)), {
-      headers: {
-        Authorization: auth
-      },
-      success: function(response) {
-        if (response.$error) {
-          return defer.reject({
-            error: response.$error
-          });
-        }
-        return defer.reject({
-          error: 'pending'
-        });
-      },
-      error: function(xhr) {
-        var error;
-        if (xhr.status === 401) {
-          return defer.resolve();
-        }
-        try {
-          error = JSON.parse(xhr.responseText);
-        } catch (e) {
-          error = {
-            error: xhr.responseText || "unknown"
-          };
-        }
-        return defer.reject(error);
-      }
-    });
+  };
+
+  Account.prototype._handlePasswordResetStatusRequestSuccess = function() {
+    var defer;
+    defer = this.hoodie.defer();
+    if (response.$error) {
+      defer.reject({
+        error: response.$error
+      });
+    } else {
+      defer.reject({
+        error: 'pending'
+      });
+    }
     return defer.promise();
   };
 
-  Account.prototype._changeUserNameAndPassword = function(currentPassword, newUsername, newPassword) {
-    var defer,
-      _this = this;
-    defer = this.hoodie.defer();
-    this.authenticate().pipe(function() {
-      var data, key, reqPromise;
+  Account.prototype._handlePasswordResetStatusRequestError = function(xhr) {
+    if (xhr.status === 401) {
+      this.hoodie.defer().resolve();
+      this.hoodie.my.config.remove('_account.resetPasswordId');
+      return this.hoodie.trigger('account:password_reset:success');
+    } else {
+      return this._handleRequestError(xhr);
+    }
+  };
+
+  Account.prototype._changeUsernameAndPassword = function(currentPassword, newUsername, newPassword) {
+    var _this = this;
+    return this.authenticate().pipe(function() {
+      var data, key, options;
       key = "" + _this._prefix + ":" + _this.username;
       data = $.extend({}, _this._doc);
       data.$newUsername = newUsername;
@@ -426,19 +425,24 @@ Hoodie.Account = (function() {
         delete data.password_sha;
         data.password = newPassword;
       }
-      reqPromise = _this.hoodie.request('PUT', "/_users/" + (encodeURIComponent(key)), {
+      options = {
         data: JSON.stringify(data),
         contentType: 'application/json'
-      });
-      reqPromise.fail(defer.reject);
-      return reqPromise.done(function() {
+      };
+      return _this.hoodie.request('PUT', "/_users/" + (encodeURIComponent(key)), options).pipe(function() {
         _this.hoodie.my.remote.disconnect();
-        return window.setTimeout((function() {
-          return _this.signIn(newUsername, newPassword || currentPassword).then(defer.resolve, defer.reject);
-        }), 1000);
+        return _this._delayedSignIn(newUsername, newPassword || currentPassword);
       });
     });
-    return defer.promise();
+  };
+
+  Account.prototype._upgradeAnonymousAccount = function(username, password) {
+    var currentPassword,
+      _this = this;
+    currentPassword = this.hoodie.my.config.get('_account.anonymousPassword');
+    return this._changeUsernameAndPassword(currentPassword, username, password).done(function() {
+      return _this.hoodie.my.config.remove('_account.anonymousPassword');
+    });
   };
 
   return Account;

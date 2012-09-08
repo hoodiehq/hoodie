@@ -63,33 +63,23 @@ class Hoodie.Account
   #
   signUp : (username, password = '') ->
     if @hasAnonymousAccount()
-      defer = @hoodie.defer()
+      return @_upgradeAnonymousAccount username, password
 
-      currentPassword = @hoodie.my.config.get '_account.anonymousPassword'
-      @_changeUserNameAndPassword(currentPassword, username, password)
-      .fail(defer.reject)
-      .done => 
-        @hoodie.my.config.remove '_account.anonymousPassword'
-        defer.resolve arguments...
+    key  = "#{@_prefix}:#{username}"
 
-      return defer.promise()
+    options =
+      data        : JSON.stringify
+        _id        : key
+        name       : username
+        type       : 'user'
+        roles      : []
+        password   : password
+        $owner     : @owner
+        database   : @db()
+      contentType : 'application/json'
 
-    else
-      key  = "#{@_prefix}:#{username}"
-
-      options =
-        data        : JSON.stringify
-          _id        : key
-          name       : username
-          type       : 'user'
-          roles      : []
-          password   : password
-          $owner     : @owner
-          database   : @db()
-        contentType : 'application/json'
-
-      @hoodie.request('PUT', "/_users/#{encodeURIComponent key}", options)
-      .pipe @_handleSignUpSucces(username, password), @_handleRequestError
+    @hoodie.request('PUT', "/_users/#{encodeURIComponent key}", options)
+    .pipe @_handleSignUpSucces(username, password), @_handleRequestError
 
   
   # anonymous sign up
@@ -106,8 +96,11 @@ class Hoodie.Account
   anonymousSignUp: ->
     password = @hoodie.my.store.uuid(10)
     username = "anonymous/#{@owner}"
-    @signUp username, password
-    @hoodie.my.config.set '_account.anonymousPassword', password
+
+    @signUp(username, password)
+    .fail(@_handleRequestError)
+    .done =>
+      @hoodie.my.config.set '_account.anonymousPassword', password
 
 
   # hasAnonymousAccount
@@ -300,7 +293,7 @@ class Hoodie.Account
   #
   # But the current password is needed to login with the new username.
   changeUsername : (currentPassword, newUsername) ->
-    @_changeUserNameAndPassword(currentPassword, newUsername)
+    @_changeUsernameAndPassword(currentPassword, newUsername)
 
 
   # destroy
@@ -326,6 +319,10 @@ class Hoodie.Account
   # CouchDB _users doc
   _doc : {}
 
+  # setters
+  _setUsername: (@username) -> @hoodie.my.config.set '_account.username', @username
+  _setOwner   : (@owner)    -> @hoodie.my.config.set '_account.owner', @owner
+
   #
   # handle a successful authentication request.
   # 
@@ -334,10 +331,8 @@ class Hoodie.Account
 
     if response.userCtx.name
       @_authenticated = true
-      @username       = response.userCtx.name
-      @owner          = response.userCtx.roles[0]
-      @hoodie.my.config.set '_account.username', @username
-      @hoodie.my.config.set '_account.owner',    @owner
+      @_setUsername response.userCtx.name
+      @_setOwner    response.userCtx.roles[0]
       
       defer.resolve @username
     else
@@ -438,6 +433,7 @@ class Hoodie.Account
   #
   _handleSignOutSuccess: =>
     delete @username
+    delete @owner
     @hoodie.my.config.clear()
     @_authenticated = false
     @hoodie.trigger 'account:signout'
@@ -455,78 +451,85 @@ class Hoodie.Account
   # 1s timeout.
   #
   _checkPasswordResetStatus : =>
-    defer = @hoodie.defer()
+
+    # reject if there is no pending password reset request
     resetPasswordId = @hoodie.my.config.get '_account.resetPasswordId'
-
     unless resetPasswordId
-      return defer.reject(error: "missing").promise()
+      return @hoodie.defer().reject(error: "missing").promise()
+      
+    # send request to check status of password reset
+    username  = "$passwordReset/#{resetPasswordId}"
+    url       = "/_users/#{encodeURIComponent "#{@_prefix}:#{username}"}"
+    hash      = btoa "#{username}:#{resetPasswordId}"
+    options   =
+      headers:
+        Authorization : "Basic #{hash}"
 
-    defer.done => 
-      @hoodie.my.config.remove '_account.resetPasswordId'
-      @hoodie.trigger 'account:password_reset:success'
-    defer.fail (error) =>
+    @hoodie.request('GET', url, options)
+    .pipe(@_handlePasswordResetStatusRequestSuccess, @_handlePasswordResetStatusRequestError)
+    .fail =>
       if error.error is 'pending'
         window.setTimeout @_checkPasswordResetStatus, 1000
         return
 
-      @hoodie.my.config.remove '_account.resetPasswordId'
       @hoodie.trigger 'account:password_reset:error'
-    
-    username  = "$passwordReset/#{resetPasswordId}"
-    hash      = btoa "#{username}:#{resetPasswordId}"
-    auth      = "Basic #{hash}"
 
-    @hoodie.request 'GET',  "/_users/#{encodeURIComponent "#{@_prefix}:#{username}"}",
-      headers     :
-        Authorization : auth
-      # beforeSend: (req) ->
-      #  req.setRequestHeader 'Authorization', auth
-      success     : (response) =>
-        if response.$error
-          return defer.reject error: response.$error
+  _handlePasswordResetStatusRequestSuccess : =>
+    defer = @hoodie.defer()
 
-        defer.reject error: 'pending'
-        
-      error       : (xhr) ->
-        # document deleted, therefore invalid authorization
-        if xhr.status is 401
-          return defer.resolve()
-
-        try
-          error = JSON.parse(xhr.responseText)
-        catch e
-          error = error: xhr.responseText or "unknown"
-        
-        defer.reject(error)
+    if response.$error
+      defer.reject error: response.$error
+    else
+      defer.reject error: 'pending'
 
     return defer.promise()
 
-  #
-  #
-  #
-  _changeUserNameAndPassword: (currentPassword, newUsername, newPassword) ->
-    defer = @hoodie.defer()
-    
-    @authenticate().pipe =>
-      key = "#{@_prefix}:#{@username}"
 
+  _handlePasswordResetStatusRequestError : (xhr) =>
+    if xhr.status is 401
+      @hoodie.defer().resolve()
+
+      @hoodie.my.config.remove '_account.resetPasswordId'
+      @hoodie.trigger 'account:password_reset:success'
+    else
+      @_handleRequestError(xhr)
+
+
+  #
+  # change username and password in 3 steps
+  # 
+  # 1. assure we have a valid session
+  # 2. update _users doc with new username and new password (if provided)
+  # 3. sign in with new credentials to create new sesion.
+  #
+  _changeUsernameAndPassword: (currentPassword, newUsername, newPassword) ->
+    @authenticate().pipe =>
+
+      # prepare updated _users doc
+      key = "#{@_prefix}:#{@username}"
       data = $.extend {}, @_doc
       data.$newUsername = newUsername
 
+      # trigger password update when newPassword set
       if newPassword
         delete data.salt
         delete data.password_sha
         data.password = newPassword
 
-      reqPromise = @hoodie.request 'PUT', "/_users/#{encodeURIComponent key}",
+      options =
         data        : JSON.stringify data
         contentType : 'application/json'
 
-      reqPromise.fail defer.reject
-      reqPromise.done =>
+      @hoodie.request('PUT', "/_users/#{encodeURIComponent key}", options)
+      .pipe =>
         @hoodie.my.remote.disconnect()
-        window.setTimeout ( =>
-          @signIn(newUsername, newPassword or currentPassword).then defer.resolve, defer.reject
-        ), 1000
-
-    return defer.promise()
+        @_delayedSignIn newUsername, newPassword or currentPassword
+  
+  #
+  # turn an anonymous account into a real account
+  #
+  _upgradeAnonymousAccount: (username, password) ->
+    currentPassword = @hoodie.my.config.get '_account.anonymousPassword'
+    @_changeUsernameAndPassword(currentPassword, username, password)
+    .done => 
+      @hoodie.my.config.remove '_account.anonymousPassword'
