@@ -259,13 +259,13 @@
   <span class="nv">_doc : </span><span class="p">{}</span>
 
   <span class="c1"># setters</span>
-  <span class="nv">_setUsername: </span><span class="nf">(@username) -&gt;</span> <span class="nx">@hoodie</span><span class="p">.</span><span class="nx">my</span><span class="p">.</span><span class="nx">config</span><span class="p">.</span><span class="nx">set</span> <span class="s1">&#39;_account.username&#39;</span><span class="p">,</span> <span class="nx">@username</span>
-  <span class="nv">_setOwner   : </span><span class="nf">(@owner)    -&gt;</span> <span class="nx">@hoodie</span><span class="p">.</span><span class="nx">my</span><span class="p">.</span><span class="nx">config</span><span class="p">.</span><span class="nx">set</span> <span class="s1">&#39;_account.owner&#39;</span><span class="p">,</span>    <span class="nx">@owner</span>
+  <span class="nv">_setUsername : </span><span class="nf">(@username) -&gt;</span> <span class="nx">@hoodie</span><span class="p">.</span><span class="nx">my</span><span class="p">.</span><span class="nx">config</span><span class="p">.</span><span class="nx">set</span> <span class="s1">&#39;_account.username&#39;</span><span class="p">,</span> <span class="nx">@username</span>
+  <span class="nv">_setOwner    : </span><span class="nf">(@owner)    -&gt;</span> <span class="nx">@hoodie</span><span class="p">.</span><span class="nx">my</span><span class="p">.</span><span class="nx">config</span><span class="p">.</span><span class="nx">set</span> <span class="s1">&#39;_account.owner&#39;</span><span class="p">,</span>    <span class="nx">@owner</span>
 
   <span class="c1">#</span>
   <span class="c1"># handle a successful authentication request.</span>
   <span class="c1"># </span>
-  <span class="nv">_handleAuthenticateSuccess: </span><span class="p">(</span><span class="nx">response</span><span class="p">)</span> <span class="o">=&gt;</span>
+  <span class="nv">_handleAuthenticateSuccess : </span><span class="p">(</span><span class="nx">response</span><span class="p">)</span> <span class="o">=&gt;</span>
     <span class="nv">defer = </span><span class="nx">@hoodie</span><span class="p">.</span><span class="nx">defer</span><span class="p">()</span>
 
     <span class="k">if</span> <span class="nx">response</span><span class="p">.</span><span class="nx">userCtx</span><span class="p">.</span><span class="nx">name</span>
@@ -281,7 +281,10 @@
 
     <span class="k">return</span> <span class="nx">defer</span><span class="p">.</span><span class="nx">promise</span><span class="p">()</span>
 
-  <span class="nv">_handleRequestError: </span><span class="p">(</span><span class="nv">xhr = </span><span class="p">{})</span> <span class="o">=&gt;</span>
+  <span class="c1">#</span>
+  <span class="c1"># standard error handling for AJAX requests</span>
+  <span class="c1">#</span>
+  <span class="nv">_handleRequestError : </span><span class="p">(</span><span class="nv">xhr = </span><span class="p">{})</span> <span class="o">=&gt;</span>
     <span class="k">try</span>
       <span class="nv">error = </span><span class="nx">JSON</span><span class="p">.</span><span class="nx">parse</span><span class="p">(</span><span class="nx">xhr</span><span class="p">.</span><span class="nx">responseText</span><span class="p">)</span>
     <span class="k">catch</span> <span class="nx">e</span>
@@ -299,7 +302,7 @@
   <span class="c1">#         &quot;rev&quot;: &quot;1-e8747d9ae9776706da92810b1baa4248&quot;</span>
   <span class="c1">#     }</span>
   <span class="c1">#</span>
-  <span class="nv">_handleSignUpSucces: </span><span class="p">(</span><span class="nx">username</span><span class="p">,</span> <span class="nx">password</span><span class="p">)</span> <span class="o">=&gt;</span>
+  <span class="nv">_handleSignUpSucces : </span><span class="p">(</span><span class="nx">username</span><span class="p">,</span> <span class="nx">password</span><span class="p">)</span> <span class="o">=&gt;</span>
     <span class="nv">defer = </span><span class="nx">@hoodie</span><span class="p">.</span><span class="nx">defer</span><span class="p">()</span>
 
     <span class="p">(</span><span class="nx">response</span><span class="p">)</span> <span class="o">=&gt;</span>
@@ -307,7 +310,7 @@
       <span class="vi">@_doc._rev = </span><span class="nx">response</span><span class="p">.</span><span class="nx">rev</span>
       <span class="nx">@_delayedSignIn</span><span class="p">(</span><span class="nx">username</span><span class="p">,</span> <span class="nx">password</span><span class="p">)</span>
 
-  <span class="nv">_delayedSignIn: </span><span class="p">(</span><span class="nx">username</span><span class="p">,</span> <span class="nx">password</span><span class="p">)</span> <span class="o">=&gt;</span>
+  <span class="nv">_delayedSignIn : </span><span class="p">(</span><span class="nx">username</span><span class="p">,</span> <span class="nx">password</span><span class="p">)</span> <span class="o">=&gt;</span>
     <span class="nv">defer = </span><span class="nx">@hoodie</span><span class="p">.</span><span class="nx">defer</span><span class="p">()</span>
     <span class="nb">window</span><span class="p">.</span><span class="nx">setTimeout</span> <span class="p">(</span> <span class="o">=&gt;</span>
       <span class="nv">promise = </span><span class="nx">@signIn</span><span class="p">(</span><span class="nx">username</span><span class="p">,</span> <span class="nx">password</span><span class="p">)</span>
@@ -335,7 +338,7 @@
   <span class="c1">#         ]</span>
   <span class="c1">#     }</span>
   <span class="c1">#</span>
-  <span class="nv">_handleSignInSuccess: </span><span class="p">(</span><span class="nx">response</span><span class="p">)</span> <span class="o">=&gt;</span>
+  <span class="nv">_handleSignInSuccess : </span><span class="p">(</span><span class="nx">response</span><span class="p">)</span> <span class="o">=&gt;</span>
     <span class="nv">defer = </span><span class="nx">@hoodie</span><span class="p">.</span><span class="nx">defer</span><span class="p">()</span>
 
     <span class="c1"># if an error occured, the userDB worker stores it to the $error attribute</span>
@@ -370,13 +373,13 @@
   <span class="c1">#</span>
   <span class="c1">#</span>
   <span class="c1">#</span>
-  <span class="nv">_handleChangePasswordSuccess: </span><span class="nf">(newPassword) -&gt;</span>
+  <span class="nv">_handleChangePasswordSuccess : </span><span class="nf">(newPassword) -&gt;</span>
     <span class="o">=&gt;</span> <span class="nx">@signIn</span><span class="p">(</span><span class="nx">@username</span><span class="p">,</span> <span class="nx">newPassword</span><span class="p">)</span>
 
   <span class="c1">#</span>
   <span class="c1">#</span>
   <span class="c1">#</span>
-  <span class="nv">_handleSignOutSuccess: </span><span class="o">=&gt;</span>
+  <span class="nv">_handleSignOutSuccess : </span><span class="o">=&gt;</span>
     <span class="k">delete</span> <span class="nx">@username</span>
     <span class="k">delete</span> <span class="nx">@owner</span>
     <span class="nx">@hoodie</span><span class="p">.</span><span class="nx">my</span><span class="p">.</span><span class="nx">config</span><span class="p">.</span><span class="nx">clear</span><span class="p">()</span>
@@ -447,7 +450,7 @@
   <span class="c1"># 2. update _users doc with new username and new password (if provided)</span>
   <span class="c1"># 3. sign in with new credentials to create new sesion.</span>
   <span class="c1">#</span>
-  <span class="nv">_changeUsernameAndPassword: </span><span class="nf">(currentPassword, newUsername, newPassword) -&gt;</span>
+  <span class="nv">_changeUsernameAndPassword : </span><span class="nf">(currentPassword, newUsername, newPassword) -&gt;</span>
     <span class="nx">@authenticate</span><span class="p">().</span><span class="nx">pipe</span> <span class="o">=&gt;</span>
 
       <span class="c1"># prepare updated _users doc</span>
@@ -473,7 +476,7 @@
   <span class="c1">#</span>
   <span class="c1"># turn an anonymous account into a real account</span>
   <span class="c1">#</span>
-  <span class="nv">_upgradeAnonymousAccount: </span><span class="nf">(username, password) -&gt;</span>
+  <span class="nv">_upgradeAnonymousAccount : </span><span class="nf">(username, password) -&gt;</span>
     <span class="nv">currentPassword = </span><span class="nx">@hoodie</span><span class="p">.</span><span class="nx">my</span><span class="p">.</span><span class="nx">config</span><span class="p">.</span><span class="nx">get</span> <span class="s1">&#39;_account.anonymousPassword&#39;</span>
     <span class="nx">@_changeUsernameAndPassword</span><span class="p">(</span><span class="nx">currentPassword</span><span class="p">,</span> <span class="nx">username</span><span class="p">,</span> <span class="nx">password</span><span class="p">)</span>
     <span class="p">.</span><span class="nx">done</span> <span class="o">=&gt;</span> 
@@ -482,7 +485,7 @@
   <span class="c1">#</span>
   <span class="c1">#</span>
   <span class="c1">#</span>
-  <span class="nv">_handleDestroySucces: </span><span class="o">=&gt;</span>
+  <span class="nv">_handleDestroySucces : </span><span class="o">=&gt;</span>
     <span class="nx">@hoodie</span><span class="p">.</span><span class="nx">my</span><span class="p">.</span><span class="nx">remote</span><span class="p">.</span><span class="nx">disconnect</span><span class="p">()</span>
     <span class="nv">key = </span><span class="s2">&quot;#{@_prefix}:#{@username}&quot;</span>
     <span class="vi">@_doc._deleted = </span><span class="kc">true</span>
