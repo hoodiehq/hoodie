@@ -27,12 +27,9 @@ class Hoodie.Account
     
     # authenticate on next tick
     # window.setTimeout @authenticate
-    @on 'signin',  @_handleSignIn
-    @on 'signout', @_handleSignOut
 
     # is there a pending password reset?
     @_checkPasswordResetStatus()
-      
   
   
   # Authenticate
@@ -140,7 +137,10 @@ class Hoodie.Account
   # If the user did not sign up himself yet, but data needs to be transfered
   # to the couch, e.g. to send an email or to share data, the anonymousSignUp
   # method can be used. It generates a random password and stores it locally
-  # in the browser until the user decides to sign up manually.
+  # in the browser.
+  #
+  # If the user signes up for real later, we change his username and password
+  # internally instead of creating another user. 
   #
   anonymousSignUp: ->
     password = @hoodie.my.store.uuid(10)

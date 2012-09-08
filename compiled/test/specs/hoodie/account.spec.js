@@ -66,16 +66,6 @@ describe("Hoodie.Account", function() {
         return expect(account.hoodie.my.config.set).wasCalledWith('_account.owner', 'new_generated_owner_hash');
       });
     });
-    it("should bind to signIn event", function() {
-      var account;
-      account = new Hoodie.Account(this.hoodie);
-      return expect(this.account.on).wasCalledWith('signin', account._handleSignIn);
-    });
-    it("should bind to signOut event", function() {
-      var account;
-      account = new Hoodie.Account(this.hoodie);
-      return expect(this.account.on).wasCalledWith('signout', account._handleSignOut);
-    });
     return it("should check for a pending password request", function() {
       var account;
       spyOn(Hoodie.Account.prototype, "_checkPasswordResetStatus");

@@ -57,13 +57,13 @@ describe "Hoodie.Account", ->
          account = new Hoodie.Account @hoodie
          expect(account.hoodie.my.config.set).wasCalledWith '_account.owner', 'new_generated_owner_hash'
       
-    it "should bind to signIn event", ->
-      account = new Hoodie.Account @hoodie
-      expect(@account.on).wasCalledWith 'signin', account._handleSignIn
+    # it "should bind to signIn event", ->
+    #   account = new Hoodie.Account @hoodie
+    #   expect(@account.on).wasCalledWith 'signin', account._handleSignIn
     
-    it "should bind to signOut event", ->
-      account = new Hoodie.Account @hoodie
-      expect(@account.on).wasCalledWith 'signout', account._handleSignOut
+    # it "should bind to signOut event", ->
+    #   account = new Hoodie.Account @hoodie
+    #   expect(@account.on).wasCalledWith 'signout', account._handleSignOut
 
     it "should check for a pending password request", ->
       spyOn(Hoodie.Account.prototype, "_checkPasswordResetStatus")
@@ -483,9 +483,7 @@ describe "Hoodie.Account", ->
             return undefined
 
       it "should return false", ->
-         expect(@account.hasAnonymousAccount()).toBe false
-
-      
+         expect(@account.hasAnonymousAccount()).toBe false      
   # /.hasAnonymousAccount
   
   

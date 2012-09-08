@@ -23,8 +23,6 @@ Hoodie.Account = (function() {
       this.owner = this.hoodie.my.store.uuid();
       this.hoodie.my.config.set('_account.owner', this.owner);
     }
-    this.on('signin', this._handleSignIn);
-    this.on('signout', this._handleSignOut);
     this._checkPasswordResetStatus();
   }
 
