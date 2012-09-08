@@ -70,13 +70,11 @@ describe "Hoodie.Account", ->
         delete @account.username
         @promise = @account.authenticate()
             
-      it "should return a promise", ->
+      it "should return a rejected promise", ->
         expect(@promise).toBePromise()
-        
-      it "should reject the promise", ->
         expect(@promise).toBeRejected()
         
-    _when "@username is 'joe@example.com", ->
+    _when "@username is 'joe@example.com'", ->
       beforeEach ->
         @account.username = 'joe@example.com'
       
@@ -117,10 +115,13 @@ describe "Hoodie.Account", ->
           expect(args[1]).toBe '/_session'
         
 
-        # {"ok":true,"userCtx":{"name":"@example.com","roles":[]},"info":{"authenticationDb":"_users","authenticationHandlers":["oauth","cookie","default"],"authenticated":"cookie"}}
-        _when "authentication request is successful and returns joe@example.com", ->
+        _when "authentication request is successful and returns session info for joe@example.com", ->
           beforeEach ->
-            @requestDefer.resolve userCtx: name: 'joe@example.com'
+            spyOn(@hoodie.my.config, "set")
+            @response = userCtx:
+                          name: "joe@example.com",
+                          roles: [ "user_hash", "confirmed" ]
+            @requestDefer.resolve @response
             @promise = @account.authenticate()
             
           it "should set account as authenticated", ->
@@ -128,6 +129,14 @@ describe "Hoodie.Account", ->
             
           it "should resolve the promise with 'joe@example.com'", ->
             expect(@promise).toBeResolvedWith 'joe@example.com'
+
+          it "should set account.username", ->
+            expect(@account.username).toBe 'joe@example.com'
+            expect(@hoodie.my.config.set).wasCalledWith '_account.username', 'joe@example.com'
+
+          it "should set account.owner", ->
+             expect(@account.owner).toBe 'user_hash'
+             expect(@hoodie.my.config.set).wasCalledWith '_account.owner', 'user_hash'
         
         # {"ok":true,"userCtx":{"name":null,"roles":[]},"info":{"authenticationDb":"_users","authenticationHandlers":["oauth","cookie","default"]}}
         _when "authentication request is successful and returns `name: null`", ->
@@ -145,9 +154,6 @@ describe "Hoodie.Account", ->
           it "should trigger an `account:error:unauthenticated` event", ->
             expect(@hoodie.trigger).wasCalledWith 'account:error:unauthenticated'
             
-          it "should unset username", ->
-            expect(@account.username).toBeUndefined()
-            
         _when "authentication request has an error", ->
           beforeEach ->
             @requestDefer.reject responseText: 'error data'
@@ -160,9 +166,8 @@ describe "Hoodie.Account", ->
 
   describe ".signUp(username, password)", ->
     beforeEach ->
-      @defer = @hoodie.defer()
-      @hoodie.request.andReturn @defer.promise()
-      spyOn(@account, "signIn").andReturn then: ->
+      @signInDefer = @hoodie.defer()
+      spyOn(@account, "signIn").andReturn @signInDefer.promise()
       @account.owner = "owner_hash123"
       @account.signUp('joe@example.com', 'secret', name: "Joe Doe")
       [@type, @path, @options] = @hoodie.request.mostRecentCall.args
@@ -206,7 +211,7 @@ describe "Hoodie.Account", ->
     _when "signUp successful", ->
       beforeEach ->
         response = {"ok":true,"id":"org.couchdb.user:bizbiz","rev":"1-a0134f4a9909d3b20533285c839ed830"}
-        @defer.resolve response
+        @requestDefer.resolve response
       
       it "should trigger `account:signup` event", ->
         @account.signUp('joe@example.com', 'secret')
@@ -218,7 +223,7 @@ describe "Hoodie.Account", ->
       
       _and "signIn successful", ->
         beforeEach ->
-          @account.signIn.andReturn then: (done, fail) => done "joe@example.com", 'response'
+          @signInDefer.resolve("joe@example.com", 'response')
 
         it "should resolve its promise", ->
           promise = @account.signUp('joe@example.com', 'secret')
@@ -226,7 +231,7 @@ describe "Hoodie.Account", ->
 
       _and "signIn not successful", ->
         beforeEach ->
-          @account.signIn.andReturn then: (done, fail) => fail 'error'
+          @signInDefer.reject 'error'
 
         it "should resolve its promise", ->
           promise = @account.signUp('joe@example.com', 'secret')
@@ -234,11 +239,13 @@ describe "Hoodie.Account", ->
         
     _when "signUp has an error", ->
       beforeEach ->
-        @defer.reject responseText: '{"error":"forbidden","reason":"Username may not start with underscore."}'
+        @requestDefer.reject responseText: '{"error":"forbidden","reason":"Username may not start with underscore."}'
       
       it "should reject its promise", ->
         promise = @account.signUp('_joe@example.com', 'secret')
-        expect(promise).toBeRejectedWith responseText: '{"error":"forbidden","reason":"Username may not start with underscore."}'
+        expect(promise).toBeRejectedWith 
+          error  : 'forbidden'
+          reason : 'Username may not start with underscore.'
   # /.signUp(username, password)
 
   

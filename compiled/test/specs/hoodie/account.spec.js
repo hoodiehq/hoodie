@@ -79,14 +79,12 @@ describe("Hoodie.Account", function() {
         delete this.account.username;
         return this.promise = this.account.authenticate();
       });
-      it("should return a promise", function() {
-        return expect(this.promise).toBePromise();
-      });
-      return it("should reject the promise", function() {
+      return it("should return a rejected promise", function() {
+        expect(this.promise).toBePromise();
         return expect(this.promise).toBeRejected();
       });
     });
-    return _when("@username is 'joe@example.com", function() {
+    return _when("@username is 'joe@example.com'", function() {
       beforeEach(function() {
         return this.account.username = 'joe@example.com';
       });
@@ -129,20 +127,31 @@ describe("Hoodie.Account", function() {
           expect(args[0]).toBe('GET');
           return expect(args[1]).toBe('/_session');
         });
-        _when("authentication request is successful and returns joe@example.com", function() {
+        _when("authentication request is successful and returns session info for joe@example.com", function() {
           beforeEach(function() {
-            this.requestDefer.resolve({
+            spyOn(this.hoodie.my.config, "set");
+            this.response = {
               userCtx: {
-                name: 'joe@example.com'
+                name: "joe@example.com",
+                roles: ["user_hash", "confirmed"]
               }
-            });
+            };
+            this.requestDefer.resolve(this.response);
             return this.promise = this.account.authenticate();
           });
           it("should set account as authenticated", function() {
             return expect(this.account._authenticated).toBe(true);
           });
-          return it("should resolve the promise with 'joe@example.com'", function() {
+          it("should resolve the promise with 'joe@example.com'", function() {
             return expect(this.promise).toBeResolvedWith('joe@example.com');
+          });
+          it("should set account.username", function() {
+            expect(this.account.username).toBe('joe@example.com');
+            return expect(this.hoodie.my.config.set).wasCalledWith('_account.username', 'joe@example.com');
+          });
+          return it("should set account.owner", function() {
+            expect(this.account.owner).toBe('user_hash');
+            return expect(this.hoodie.my.config.set).wasCalledWith('_account.owner', 'user_hash');
           });
         });
         _when("authentication request is successful and returns `name: null`", function() {
@@ -161,11 +170,8 @@ describe("Hoodie.Account", function() {
           it("should reject the promise", function() {
             return expect(this.promise).toBeRejected();
           });
-          it("should trigger an `account:error:unauthenticated` event", function() {
+          return it("should trigger an `account:error:unauthenticated` event", function() {
             return expect(this.hoodie.trigger).wasCalledWith('account:error:unauthenticated');
-          });
-          return it("should unset username", function() {
-            return expect(this.account.username).toBeUndefined();
           });
         });
         return _when("authentication request has an error", function() {
@@ -187,11 +193,8 @@ describe("Hoodie.Account", function() {
   describe(".signUp(username, password)", function() {
     beforeEach(function() {
       var _ref;
-      this.defer = this.hoodie.defer();
-      this.hoodie.request.andReturn(this.defer.promise());
-      spyOn(this.account, "signIn").andReturn({
-        then: function() {}
-      });
+      this.signInDefer = this.hoodie.defer();
+      spyOn(this.account, "signIn").andReturn(this.signInDefer.promise());
       this.account.owner = "owner_hash123";
       this.account.signUp('joe@example.com', 'secret', {
         name: "Joe Doe"
@@ -243,7 +246,7 @@ describe("Hoodie.Account", function() {
           "id": "org.couchdb.user:bizbiz",
           "rev": "1-a0134f4a9909d3b20533285c839ed830"
         };
-        return this.defer.resolve(response);
+        return this.requestDefer.resolve(response);
       });
       it("should trigger `account:signup` event", function() {
         this.account.signUp('joe@example.com', 'secret');
@@ -255,12 +258,7 @@ describe("Hoodie.Account", function() {
       });
       _and("signIn successful", function() {
         beforeEach(function() {
-          var _this = this;
-          return this.account.signIn.andReturn({
-            then: function(done, fail) {
-              return done("joe@example.com", 'response');
-            }
-          });
+          return this.signInDefer.resolve("joe@example.com", 'response');
         });
         return it("should resolve its promise", function() {
           var promise;
@@ -270,12 +268,7 @@ describe("Hoodie.Account", function() {
       });
       return _and("signIn not successful", function() {
         beforeEach(function() {
-          var _this = this;
-          return this.account.signIn.andReturn({
-            then: function(done, fail) {
-              return fail('error');
-            }
-          });
+          return this.signInDefer.reject('error');
         });
         return it("should resolve its promise", function() {
           var promise;
@@ -286,7 +279,7 @@ describe("Hoodie.Account", function() {
     });
     return _when("signUp has an error", function() {
       beforeEach(function() {
-        return this.defer.reject({
+        return this.requestDefer.reject({
           responseText: '{"error":"forbidden","reason":"Username may not start with underscore."}'
         });
       });
@@ -294,7 +287,8 @@ describe("Hoodie.Account", function() {
         var promise;
         promise = this.account.signUp('_joe@example.com', 'secret');
         return expect(promise).toBeRejectedWith({
-          responseText: '{"error":"forbidden","reason":"Username may not start with underscore."}'
+          error: 'forbidden',
+          reason: 'Username may not start with underscore.'
         });
       });
     });

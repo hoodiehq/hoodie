@@ -38,40 +38,18 @@ class Hoodie.Account
   # Use this method to assure that the user is authenticated:
   # `hoodie.my.account.authenticate().done( doSomething ).fail( handleError )`
   authenticate : =>
-    defer = @hoodie.defer()
-    
     unless @username
-      return defer.reject().promise()
+      return @hoodie.defer().reject().promise()
       
     if @_authenticated is true
-      return defer.resolve(@username).promise()
+      return @hoodie.defer().resolve(@username).promise()
       
     if @_authenticated is false
-      return defer.reject().promise()
+      return @hoodie.defer().reject().promise()
     
     # @_authenticated is undefined
-    @_authRequest = @hoodie.request 'GET', "/_session"
-
-    @_authRequest.done (response) =>
-      if response.userCtx.name
-        @_authenticated = true
-        @username = response.userCtx.name
-        defer.resolve @username
-      else
-        @_authenticated = false
-        delete @username
-        @hoodie.trigger 'account:error:unauthenticated'
-        defer.reject()
-          
-    @_authRequest.fail (xhr) ->
-      try
-        error = JSON.parse(xhr.responseText)
-      catch e
-        error = error: xhr.responseText or "unknown"
-        
-      defer.reject(error)
-        
-    return defer.promise()
+    @hoodie.request('GET', "/_session")
+    .pipe @_handleAuthenticateSuccess, @_handleRequestError
     
     
   # sign up with username & password
@@ -84,9 +62,9 @@ class Hoodie.Account
   # to sign in with a 300ms timeout.
   #
   signUp : (username, password = '') ->
-    defer = @hoodie.defer()
-    
     if @hasAnonymousAccount()
+      defer = @hoodie.defer()
+
       currentPassword = @hoodie.my.config.get '_account.anonymousPassword'
       @_changeUserNameAndPassword(currentPassword, username, password)
       .fail(defer.reject)
@@ -94,41 +72,24 @@ class Hoodie.Account
         @hoodie.my.config.remove '_account.anonymousPassword'
         defer.resolve arguments...
 
+      return defer.promise()
+
     else
       key  = "#{@_prefix}:#{username}"
-      data = 
-        _id        : key
-        name       : username
-        type       : 'user'
-        roles      : []
-        password   : password
-        $owner     : @owner
-        database   : @db()
 
-      requestPromise = @hoodie.request 'PUT', "/_users/#{encodeURIComponent key}",
-        data        : JSON.stringify data
+      options =
+        data        : JSON.stringify
+          _id        : key
+          name       : username
+          type       : 'user'
+          roles      : []
+          password   : password
+          $owner     : @owner
+          database   : @db()
         contentType : 'application/json'
-        
-      delaydSignIn = =>
-        window.setTimeout ( =>
-          @signIn(username, password).then defer.resolve, handleSignInError
-        ), 300
 
-      handleSignUpSucces = (response) =>
-        @hoodie.trigger 'account:signup', username
-        @_doc._rev = response.rev
-        delaydSignIn()
-      
-      handleSignInError = (error) =>
-        if error.error is 'unconfirmed'
-          # It might take a bit until the account has been confirmed
-          delaydSignIn()
-        else
-          defer.reject arguments...
-
-      requestPromise.then handleSignUpSucces, defer.reject
-        
-    return defer.promise()
+      @hoodie.request('PUT', "/_users/#{encodeURIComponent key}", options)
+      .pipe @_handleSignUpSucces(username, password), @_handleRequestError
 
   
   # anonymous sign up
@@ -172,8 +133,6 @@ class Hoodie.Account
     @hoodie.request('POST', '/_session', options)
     .pipe(@_handleSignInSuccess)
     .then defer.resolve, defer.reject
-
-    return defer.promise()
 
   # alias
   login: @::signIn
@@ -360,11 +319,75 @@ class Hoodie.Account
 
   # PRIVATE
   # ---------
+
+  # default couchDB user doc prefix
   _prefix : 'org.couchdb.user'
   
   # CouchDB _users doc
   _doc : {}
+
+  #
+  # handle a successful authentication request.
+  # 
+  _handleAuthenticateSuccess: (response) =>
+    defer = @hoodie.defer()
+
+    if response.userCtx.name
+      @_authenticated = true
+      @username       = response.userCtx.name
+      @owner          = response.userCtx.roles[0]
+      @hoodie.my.config.set '_account.username', @username
+      @hoodie.my.config.set '_account.owner',    @owner
+      
+      defer.resolve @username
+    else
+      @_authenticated = false
+      @hoodie.trigger 'account:error:unauthenticated'
+      defer.reject()
+
+    return defer.promise()
+
+  _handleRequestError: (xhr) =>
+    try
+      error = JSON.parse(xhr.responseText)
+    catch e
+      error = error: xhr.responseText or "unknown"
+      
+    @hoodie.defer().reject(error).promise()
   
+  # 
+  # handle response of a successful signUp request. 
+  # Response looks like:
+  #
+  #     {
+  #         "ok": true,
+  #         "id": "org.couchdb.user:furz",
+  #         "rev": "1-e8747d9ae9776706da92810b1baa4248"
+  #     }
+  #
+  _handleSignUpSucces: (username, password) =>
+    defer = @hoodie.defer()
+
+    (response) =>
+      @hoodie.trigger 'account:signup', username
+      @_doc._rev = response.rev
+      @_delayedSignIn(username, password)
+
+  _delayedSignIn: (username, password) =>
+    defer = @hoodie.defer()
+    window.setTimeout ( =>
+      promise = @signIn(username, password)
+      promise.done(defer.resolve)
+      promise.fail (error) =>
+        if error.error is 'unconfirmed'
+          # It might take a bit until the account has been confirmed
+          @_delayedSignIn(username, password)
+        else
+          defer.reject arguments...
+    ), 300
+
+    return defer.promise()
+
   #
   # handle a successful sign in to couchDB.
   # Response looks like:
