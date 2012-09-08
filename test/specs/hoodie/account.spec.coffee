@@ -11,6 +11,9 @@ describe "Hoodie.Account", ->
     # requests
     spyOn(@hoodie, "trigger")
 
+    # skip timeouts
+    spyOn(window, "setTimeout").andCallFake (cb) -> cb()
+
 
   describe "constructor", ->
     beforeEach ->
@@ -247,7 +250,6 @@ describe "Hoodie.Account", ->
             
     _when "signUp successful", ->
       beforeEach ->
-        spyOn(window, "setTimeout").andCallFake (cb) -> cb()
         response = {"ok":true,"id":"org.couchdb.user:bizbiz","rev":"1-a0134f4a9909d3b20533285c839ed830"}
         @defer.resolve response
       
@@ -402,21 +404,33 @@ describe "Hoodie.Account", ->
     it "should not send password_sha", ->
       expect(@data.password_sha).toBeUndefined()
       
-            
     _when "change password successful", ->
       beforeEach ->
+        @signInPromise = @hoodie.defer()
+        spyOn(@account, "signIn").andReturn @signInPromise.promise()
         @hoodie.request.andCallFake (type, path, options) -> 
           response = {"ok":true,"id":"org.couchdb.user:bizbiz","rev":"2-345"}
           options.success response
-        
-      it "should resolve its promise", ->
-        promise = @account.changePassword('currentSecret', 'newSecret')
-        expect(promise).toBeResolved()
-        
-      it "should fetch the _users doc", ->
-        spyOn(@account, "fetch")
+
+      it "should sign in", ->
         @account.changePassword('currentSecret', 'newSecret')
-        expect(@account.fetch).wasCalled()
+        expect(@account.signIn).wasCalledWith 'joe@example.com', 'newSecret'
+        
+      _when "sign in successful", ->
+        beforeEach ->
+          @signInPromise.resolve()
+
+        it "should resolve its promise", ->
+          promise = @account.changePassword('currentSecret', 'newSecret')
+          expect(promise).toBeResolved()
+      
+      _when "sign in not successful", ->
+        beforeEach ->
+          @signInPromise.reject()
+
+        it "should reject its promise", ->
+          promise = @account.changePassword('currentSecret', 'newSecret')
+          expect(promise).toBeRejected()
         
     _when "signUp has an error", ->
       beforeEach ->

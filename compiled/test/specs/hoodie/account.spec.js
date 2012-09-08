@@ -7,7 +7,10 @@ describe("Hoodie.Account", function() {
     this.account = new Hoodie.Account(this.hoodie);
     this.requestDefer = this.hoodie.defer();
     spyOn(this.hoodie, "request").andReturn(this.requestDefer.promise());
-    return spyOn(this.hoodie, "trigger");
+    spyOn(this.hoodie, "trigger");
+    return spyOn(window, "setTimeout").andCallFake(function(cb) {
+      return cb();
+    });
   });
   describe("constructor", function() {
     beforeEach(function() {
@@ -288,9 +291,6 @@ describe("Hoodie.Account", function() {
     _when("signUp successful", function() {
       beforeEach(function() {
         var response;
-        spyOn(window, "setTimeout").andCallFake(function(cb) {
-          return cb();
-        });
         response = {
           "ok": true,
           "id": "org.couchdb.user:bizbiz",
@@ -487,6 +487,8 @@ describe("Hoodie.Account", function() {
     });
     _when("change password successful", function() {
       beforeEach(function() {
+        this.signInPromise = this.hoodie.defer();
+        spyOn(this.account, "signIn").andReturn(this.signInPromise.promise());
         return this.hoodie.request.andCallFake(function(type, path, options) {
           var response;
           response = {
@@ -497,15 +499,29 @@ describe("Hoodie.Account", function() {
           return options.success(response);
         });
       });
-      it("should resolve its promise", function() {
-        var promise;
-        promise = this.account.changePassword('currentSecret', 'newSecret');
-        return expect(promise).toBeResolved();
-      });
-      return it("should fetch the _users doc", function() {
-        spyOn(this.account, "fetch");
+      it("should sign in", function() {
         this.account.changePassword('currentSecret', 'newSecret');
-        return expect(this.account.fetch).wasCalled();
+        return expect(this.account.signIn).wasCalledWith('joe@example.com', 'newSecret');
+      });
+      _when("sign in successful", function() {
+        beforeEach(function() {
+          return this.signInPromise.resolve();
+        });
+        return it("should resolve its promise", function() {
+          var promise;
+          promise = this.account.changePassword('currentSecret', 'newSecret');
+          return expect(promise).toBeResolved();
+        });
+      });
+      return _when("sign in not successful", function() {
+        beforeEach(function() {
+          return this.signInPromise.reject();
+        });
+        return it("should reject its promise", function() {
+          var promise;
+          promise = this.account.changePassword('currentSecret', 'newSecret');
+          return expect(promise).toBeRejected();
+        });
       });
     });
     return _when("signUp has an error", function() {
