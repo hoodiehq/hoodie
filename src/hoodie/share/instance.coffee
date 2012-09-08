@@ -48,8 +48,8 @@ class Hoodie.Share.Instance extends Hoodie.RemoteStore
     @hoodie = @constructor.hoodie
 
     # setting attributes
-    {id, access, continuous, password, _userRev} = options
-    @set {id, access, continuous, password, _userRev}
+    {id, access, continuous, password} = options
+    @set {id, access, continuous, password}
 
     # generate an id unless one has been provided
     @id or= @hoodie.my.store.uuid()
@@ -179,18 +179,6 @@ class Hoodie.Share.Instance extends Hoodie.RemoteStore
     @remove( @hoodie.my.store.findAll(@_isMySharedObject) )
     .then =>
       @hoodie.my.store.destroy("$share", @id)
-
-      if @anonymous
-        @hoodie.my.remote.disconnect()
-        @hoodie.my.account.destroy()
-  
-  
-  # hasAccount
-  # ------------
-
-  # returns true if either user or the share has a CouchDB account
-  hasAccount: ->
-    not @anonymous or @_userRev?
     
     
   # Private

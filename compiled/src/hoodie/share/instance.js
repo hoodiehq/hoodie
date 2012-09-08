@@ -9,7 +9,7 @@ Hoodie.Share.Instance = (function(_super) {
   __extends(Instance, _super);
 
   function Instance(options) {
-    var access, continuous, id, password, _userRev;
+    var access, continuous, id, password;
     if (options == null) {
       options = {};
     }
@@ -32,13 +32,12 @@ Hoodie.Share.Instance = (function(_super) {
     this.set = __bind(this.set, this);
 
     this.hoodie = this.constructor.hoodie;
-    id = options.id, access = options.access, continuous = options.continuous, password = options.password, _userRev = options._userRev;
+    id = options.id, access = options.access, continuous = options.continuous, password = options.password;
     this.set({
       id: id,
       access: access,
       continuous: continuous,
-      password: password,
-      _userRev: _userRev
+      password: password
     });
     this.id || (this.id = this.hoodie.my.store.uuid());
   }
@@ -119,16 +118,8 @@ Hoodie.Share.Instance = (function(_super) {
   Instance.prototype.destroy = function() {
     var _this = this;
     return this.remove(this.hoodie.my.store.findAll(this._isMySharedObject)).then(function() {
-      _this.hoodie.my.store.destroy("$share", _this.id);
-      if (_this.anonymous) {
-        _this.hoodie.my.remote.disconnect();
-        return _this.hoodie.my.account.destroy();
-      }
+      return _this.hoodie.my.store.destroy("$share", _this.id);
     });
-  };
-
-  Instance.prototype.hasAccount = function() {
-    return !this.anonymous || (this._userRev != null);
   };
 
   Instance.prototype._add = function(obj) {
