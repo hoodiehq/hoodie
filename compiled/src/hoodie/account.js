@@ -9,9 +9,9 @@ Hoodie.Account = (function() {
     this.hoodie = hoodie;
     this._checkPasswordResetStatus = __bind(this._checkPasswordResetStatus, this);
 
-    this._handleSignOut = __bind(this._handleSignOut, this);
+    this._handleSignOutSuccess = __bind(this._handleSignOutSuccess, this);
 
-    this._handleSignIn = __bind(this._handleSignIn, this);
+    this._handleSignInSuccess = __bind(this._handleSignInSuccess, this);
 
     this.fetch = __bind(this.fetch, this);
 
@@ -129,47 +129,26 @@ Hoodie.Account = (function() {
   };
 
   Account.prototype.signIn = function(username, password) {
-    var defer, handleSucces, requestPromise,
-      _this = this;
+    var defer, options;
     if (password == null) {
       password = '';
     }
     defer = this.hoodie.defer();
-    handleSucces = function(response) {
-      if (!~response.roles.indexOf("confirmed")) {
-        return defer.reject({
-          error: "unconfirmed",
-          reason: "account has not been confirmed yet"
-        });
-      }
-      if (!_this.owner) {
-        _this.owner = response.roles.shift();
-        _this.hoodie.my.config.set('_account.owner', _this.owner);
-      }
-      _this.hoodie.trigger('account:signin', username);
-      _this.fetch();
-      return defer.resolve(username, response);
-    };
-    requestPromise = this.hoodie.request('POST', '/_session', {
+    options = {
       data: {
         name: username,
         password: password
       }
-    });
-    requestPromise.then(handleSucces, defer.reject);
+    };
+    this.hoodie.request('POST', '/_session', options).pipe(this._handleSignInSuccess).then(defer.resolve, defer.reject);
     return defer.promise();
   };
 
   Account.prototype.login = Account.prototype.signIn;
 
   Account.prototype.signOut = function() {
-    var _this = this;
     this.hoodie.my.remote.disconnect();
-    return this.hoodie.request('DELETE', '/_session', {
-      success: function() {
-        return _this.hoodie.trigger('account:signout');
-      }
-    });
+    return this.hoodie.request('DELETE', '/_session').pipe(this._handleSignOutSuccess);
   };
 
   Account.prototype.logout = Account.prototype.signOut;
@@ -182,18 +161,21 @@ Hoodie.Account = (function() {
     return "user/" + this.owner;
   };
 
-  Account.prototype.fetch = function() {
+  Account.prototype.fetch = function(username) {
     var defer, key,
       _this = this;
+    if (username == null) {
+      username = this.username;
+    }
     defer = this.hoodie.defer();
-    if (!this.username) {
+    if (!username) {
       defer.reject({
         error: "unauthenticated",
         reason: "not logged in"
       });
       return defer.promise();
     }
-    key = "" + this._prefix + ":" + this.username;
+    key = "" + this._prefix + ":" + username;
     this.hoodie.request('GET', "/_users/" + (encodeURIComponent(key)), {
       success: function(response) {
         _this._doc = response;
@@ -315,16 +297,40 @@ Hoodie.Account = (function() {
 
   Account.prototype._doc = {};
 
-  Account.prototype._handleSignIn = function(username) {
-    this.username = username;
+  Account.prototype._handleSignInSuccess = function(response) {
+    var defer,
+      _this = this;
+    defer = this.hoodie.defer();
+    if (~response.roles.indexOf("error")) {
+      this.fetch(response.name).fail(defer.reject).done(function() {
+        return defer.reject({
+          error: "error",
+          reason: _this._doc.$error
+        });
+      });
+      return defer.promise();
+    }
+    if (!~response.roles.indexOf("confirmed")) {
+      return defer.reject({
+        error: "unconfirmed",
+        reason: "account has not been confirmed yet"
+      });
+    }
+    this.username = response.name;
+    this._authenticated = true;
+    this.owner = response.roles[0];
     this.hoodie.my.config.set('_account.username', this.username);
-    return this._authenticated = true;
+    this.hoodie.my.config.set('_account.owner', this.owner);
+    this.hoodie.trigger('account:signin', this.username);
+    this.fetch();
+    return defer.resolve(this.username, response);
   };
 
-  Account.prototype._handleSignOut = function() {
+  Account.prototype._handleSignOutSuccess = function() {
     delete this.username;
     this.hoodie.my.config.clear();
-    return this._authenticated = false;
+    this._authenticated = false;
+    return this.hoodie.trigger('account:signout');
   };
 
   Account.prototype._checkPasswordResetStatus = function() {

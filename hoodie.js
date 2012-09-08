@@ -174,7 +174,7 @@ Hoodie.Account = (function() {
 
     this._handleSignOut = __bind(this._handleSignOut, this);
 
-    this._handleSignIn = __bind(this._handleSignIn, this);
+    this._handleSignInSuccess = __bind(this._handleSignInSuccess, this);
 
     this.fetch = __bind(this.fetch, this);
 
@@ -186,8 +186,6 @@ Hoodie.Account = (function() {
       this.owner = this.hoodie.my.store.uuid();
       this.hoodie.my.config.set('_account.owner', this.owner);
     }
-    this.on('signin', this._handleSignIn);
-    this.on('signout', this._handleSignOut);
     this._checkPasswordResetStatus();
   }
 
@@ -294,34 +292,18 @@ Hoodie.Account = (function() {
   };
 
   Account.prototype.signIn = function(username, password) {
-    var defer, handleSucces, requestPromise,
-      _this = this;
+    var defer, options;
     if (password == null) {
       password = '';
     }
     defer = this.hoodie.defer();
-    handleSucces = function(response) {
-      if (!~response.roles.indexOf("confirmed")) {
-        return defer.reject({
-          error: "unconfirmed",
-          reason: "account has not been confirmed yet"
-        });
-      }
-      if (!_this.owner) {
-        _this.owner = response.roles.shift();
-        _this.hoodie.my.config.set('_account.owner', _this.owner);
-      }
-      _this.hoodie.trigger('account:signin', username);
-      _this.fetch();
-      return defer.resolve(username, response);
-    };
-    requestPromise = this.hoodie.request('POST', '/_session', {
+    options = {
       data: {
         name: username,
         password: password
       }
-    });
-    requestPromise.then(handleSucces, defer.reject);
+    };
+    this.hoodie.request('POST', '/_session', options).pipe(this._handleSignInSuccess).then(defer.resolve, defer.reject);
     return defer.promise();
   };
 
@@ -480,10 +462,28 @@ Hoodie.Account = (function() {
 
   Account.prototype._doc = {};
 
-  Account.prototype._handleSignIn = function(username) {
-    this.username = username;
+  Account.prototype._handleSignInSuccess = function(response) {
+    var defer;
+    defer = this.hoodie.defer();
+    if (!~response.roles.indexOf("confirmed")) {
+      return defer.reject({
+        error: "unconfirmed",
+        reason: "account has not been confirmed yet"
+      });
+    }
+    this.username = response.name;
+    this._authenticated = true;
     this.hoodie.my.config.set('_account.username', this.username);
-    return this._authenticated = true;
+    if (!this.owner) {
+      this.owner = response.roles.shift();
+      this.hoodie.my.config.set('_account.owner', this.owner);
+    }
+    this.hoodie.trigger('account:signin', this.username);
+    this.fetch();
+    console.log("resolving @username = " + this.username);
+    console.log("and response: " + (JSON.stringify(response)));
+    defer.resolve(this.username, response);
+    return defer;
   };
 
   Account.prototype._handleSignOut = function() {

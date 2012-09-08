@@ -164,35 +164,14 @@ class Hoodie.Account
   # (roles include "confirmed" role).
   #
   signIn : (username, password = '') ->
-    defer = @hoodie.defer()
-        
-    handleSucces = (response) =>
+    defer   = @hoodie.defer()
+    options = data: 
+                name      : username
+                password  : password
 
-      # TODO:
-      # handle errors. If an error occurs, the workers stores it in
-      # the _users doc's $error attribute. We have to fetch the _users
-      # doc and check if it has an error at this point. Otherwise
-      # it will keep trying to sign in, which doesn't make any sense.
-      #
-      # IDEA: we add a role "error", so that we don't need to fetch
-      #       the _users doc to find out if there is an error
-      unless ~response.roles.indexOf("confirmed")
-        return defer.reject error: "unconfirmed", reason: "account has not been confirmed yet"
-
-      unless @owner
-        @owner = response.roles.shift()
-        @hoodie.my.config.set '_account.owner', @owner
-
-      @hoodie.trigger 'account:signin', username
-      @fetch()
-      defer.resolve username, response
-
-    requestPromise = @hoodie.request 'POST', '/_session', 
-      data: 
-        name      : username
-        password  : password
-
-    requestPromise.then handleSucces, defer.reject
+    @hoodie.request('POST', '/_session', options)
+    .pipe(@_handleSignInSuccess)
+    .then defer.resolve, defer.reject
 
     return defer.promise()
 
@@ -208,8 +187,7 @@ class Hoodie.Account
   # TODO: handle errors
   signOut: ->
     @hoodie.my.remote.disconnect()
-    @hoodie.request 'DELETE', '/_session', 
-      success : => @hoodie.trigger 'account:signout'
+    @hoodie.request('DELETE', '/_session').pipe(@_handleSignOutSuccess)
 
   # alias
   logout: @::signOut
@@ -245,14 +223,14 @@ class Hoodie.Account
   # -------
 
   # fetches _users doc from CouchDB and caches it in _doc
-  fetch : =>
+  fetch : (username = @username) =>
     defer = @hoodie.defer()
     
-    unless @username
+    unless username
       defer.reject error: "unauthenticated", reason: "not logged in"
       return defer.promise()
     
-    key = "#{@_prefix}:#{@username}"
+    key = "#{@_prefix}:#{username}"
     @hoodie.request 'GET', "/_users/#{encodeURIComponent key}",
     
       success     : (response) => 
@@ -388,15 +366,58 @@ class Hoodie.Account
   _doc : {}
   
   #
-  _handleSignIn: (@username) =>
-    @hoodie.my.config.set '_account.username', @username
+  # handle a successful sign in to couchDB.
+  # Response looks like:
+  #
+  #     {
+  #         "ok": true,
+  #         "name": "test1",
+  #         "roles": [
+  #             "mvu85hy",
+  #             "confirmed"
+  #         ]
+  #     }
+  #
+  _handleSignInSuccess: (response) =>
+    defer = @hoodie.defer()
+
+    # if an error occured, the userDB worker stores it to the $error attribute
+    # and adds the "error" role to the users doc object. If the user has the
+    # "error" role, we need to fetch his _users doc to find out what the error
+    # is, before we can reject the promise.
+    #
+    if ~response.roles.indexOf("error")
+      @fetch(response.name)
+      .fail(defer.reject)
+      .done =>
+        defer.reject error: "error", reason: @_doc.$error
+      return defer.promise()
+
+    # When the userDB worker created the database for the user and everthing
+    # worked out, it adds the role "confirmed" to the user. If the role is
+    # not present yet, it might be that the worker didn't pick up the the 
+    # user doc yet, or there was an error. In this cases, we reject the promise
+    # with an "uncofirmed error"
+    unless ~response.roles.indexOf("confirmed")
+      return defer.reject error: "unconfirmed", reason: "account has not been confirmed yet"
+    
+    @username       = response.name
     @_authenticated = true
+    @owner          = response.roles[0]
+    @hoodie.my.config.set '_account.username', @username
+    @hoodie.my.config.set '_account.owner',    @owner
+    @hoodie.trigger 'account:signin', @username
+
+    @fetch()
+    defer.resolve(@username, response)
+    
   
   #
-  _handleSignOut: =>
+  _handleSignOutSuccess: =>
     delete @username
     @hoodie.my.config.clear()
     @_authenticated = false
+    @hoodie.trigger 'account:signout'
 
   #
   # check for the status of a password reset. It might take

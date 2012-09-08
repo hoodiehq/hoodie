@@ -56,57 +56,12 @@ describe "Hoodie.Account", ->
       it "should set account.owner", ->
          account = new Hoodie.Account @hoodie
          expect(account.hoodie.my.config.set).wasCalledWith '_account.owner', 'new_generated_owner_hash'
-      
-    # it "should bind to signIn event", ->
-    #   account = new Hoodie.Account @hoodie
-    #   expect(@account.on).wasCalledWith 'signin', account._handleSignIn
-    
-    # it "should bind to signOut event", ->
-    #   account = new Hoodie.Account @hoodie
-    #   expect(@account.on).wasCalledWith 'signout', account._handleSignOut
 
     it "should check for a pending password request", ->
       spyOn(Hoodie.Account.prototype, "_checkPasswordResetStatus")
       account = new Hoodie.Account @hoodie
       expect(Hoodie.Account.prototype._checkPasswordResetStatus).wasCalled()
   # /.constructor()
-
-  describe "event handlers", ->
-    describe "._handleSignIn(@username)", ->
-      beforeEach ->
-        expect(@account.username).toBeUndefined()
-        spyOn(@hoodie.my.config, "set")
-        @account._handleSignIn 'joe@example.com'
-      
-      it "should set @username", ->
-        expect(@account.username).toBe 'joe@example.com'
-        
-      it "should store @username to config", ->
-        expect(@hoodie.my.config.set).wasCalledWith '_account.username', 'joe@example.com'
-        
-      it "should set _authenticated to true", ->
-        @account._authenticated = false
-        @account._handleSignIn "joe@example.com"
-        expect(@account._authenticated).toBe true
-    # /._handleSignIn(@username)
-    
-    describe "._handleSignOut()", ->
-      it "should unset @username", ->
-        @account.username = 'joe@example.com'
-        @account._handleSignOut {"ok":true}
-        do expect(@account.username).toBeUndefined
-        
-      it "should clear config", ->
-        spyOn(@hoodie.my.config, "clear")
-        @account._handleSignOut {"ok":true}
-        expect(@hoodie.my.config.clear).wasCalled()
-        
-      it "should set _authenticated to false", ->
-        @account._authenticated = true
-        @account._handleSignOut {"ok":true}
-        expect(@account._authenticated).toBe false
-    # /._handleSignOut()
-  # /event handlers
   
   
   describe ".authenticate()", ->
@@ -307,8 +262,6 @@ describe "Hoodie.Account", ->
 
   describe ".signIn(username, password)", ->
     beforeEach ->
-      @defer = @hoodie.defer()
-      @hoodie.request.andReturn @defer.promise()
       @account.signIn('joe@example.com', 'secret')
       [@type, @path, @options] = @hoodie.request.mostRecentCall.args
   
@@ -332,24 +285,58 @@ describe "Hoodie.Account", ->
     _when "signIn successful", ->
       _and "account is confirmed", ->
         beforeEach ->
-          @defer.resolve {"ok":true,"name":"joe@example.com","roles":["user_has","confirmed"]}
+          @response = {"ok":true,"name":"joe@example.com","roles":["user_hash","confirmed"]}
+          @requestDefer.resolve @response
+          spyOn(@hoodie.my.config, "set")
         
         it "should trigger `account:signin` event", ->
           @account.signIn('joe@example.com', 'secret')
           expect(@hoodie.trigger).wasCalledWith 'account:signin', 'joe@example.com'
         
+        it "should set @username", ->
+           @account.signIn('joe@example.com', 'secret')
+           expect(@account.username).toBe 'joe@example.com'
+           expect(@hoodie.my.config.set).wasCalledWith '_account.username', 'joe@example.com'
+
+        it "should set @owner", ->
+           @account.signIn('joe@example.com', 'secret')
+           expect(@account.owner).toBe 'user_hash'
+           expect(@hoodie.my.config.set).wasCalledWith '_account.owner', 'user_hash'
+
         it "should fetch the _users doc", ->
           spyOn(@account, "fetch")
           @account.signIn('joe@example.com', 'secret')
           expect(@account.fetch).wasCalled()
 
-      _and "account not approved", ->
+        it "should resolve with username and response", ->
+          expect(@account.signIn('joe@example.com', 'secret')).toBeResolvedWith 'joe@example.com', @response
+
+      _and "account not (yet) confirmed", ->
         beforeEach ->
-          @defer.resolve {"ok":true,"name":"joe@example.com","roles":[]}
+          @response = {"ok":true,"name":"joe@example.com","roles":[]}
+          @requestDefer.resolve @response
 
         it "should reject with unconfirmed error.", ->
           promise = @account.signIn('joe@example.com', 'secret')
           expect(promise).toBeRejectedWith error: "unconfirmed", reason: "account has not been confirmed yet"
+
+      _and "account has an error", ->
+        beforeEach ->
+          @response = {"ok":true,"name":"joe@example.com","roles":['error']}
+          @requestDefer.resolve @response 
+          spyOn(@account, "fetch").andCallFake =>
+            @account._doc.$error = 'because you stink!'
+            return @hoodie.defer().resolve()
+
+        it "should fetch user doc without setting @username", ->
+          @account.signIn('joe@example.com', 'secret')
+          expect(@account.fetch).wasCalledWith 'joe@example.com'
+          expect(@account.username).toBeUndefined()
+
+        it "should reject with the reason", ->
+          expect(@account.signIn('joe@example.com', 'secret')).toBeRejectedWith 
+            error: 'error'
+            reason: 'because you stink!'
   # /.signIn(username, password)
 
 
@@ -458,7 +445,7 @@ describe "Hoodie.Account", ->
       
     _when "signUp successful", ->
       beforeEach ->
-        @hoodie.request.andCallFake (type, path, options) -> options.success()
+        @requestDefer.resolve()
         
       it "should trigger `account:signout` event", ->
         @account.signOut('joe@example.com', 'secret')
