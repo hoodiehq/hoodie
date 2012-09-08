@@ -96,12 +96,12 @@ task 'build', 'build hoodie-client.min.js', ->
   
 task 'docs', 'create docs from code', ->
   
-  groc = spawn 'groc', ['src/**/*.coffee']
+  groc = spawn 'groc', ['-t src/', 'src/**/*.coffee']
   groc.stdout.on 'data', (data) -> print data.toString()
   groc.on 'exit', (status) -> callback?() if status is 0
 
 task 'wishlist', 'create docs from code', ->
-  groc = spawn 'groc', ['-o whishlist/doc', 'wishlist/**/*.js']
+  groc = spawn 'groc', ['-t wishlist/', '-o whishlist/doc', 'wishlist/**/*.js']
   groc.stdout.on 'data', (data) -> print data.toString()
   groc.on 'exit', (status) -> callback?() if status is 0
     

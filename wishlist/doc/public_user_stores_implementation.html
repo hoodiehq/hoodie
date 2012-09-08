@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><title>public_user_stores_implementation</title></head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0"><meta name="groc-relative-root" content=""><meta name="groc-document-path" content="public_user_stores_implementation"><meta name="groc-project-path" content="public_user_stores_implementation.js"><link rel="stylesheet" type="text/css" media="all" href="assets/style.css"><script type="text/javascript" src="assets/behavior.js"></script><body><div id="meta"><div class="file-path">public_user_stores_implementation.js</div></div><div id="document"><div class="segment"><div class="comments"><div class="wrapper"><h1 id="public-user-stores-implementation">Public User Stores (Implementation)</h1>
+<!DOCTYPE html><html lang="en"><head><title>public_user_stores_implementation</title></head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0"><meta name="groc-relative-root" content=""><meta name="groc-document-path" content="public_user_stores_implementation"><meta name="groc-project-path" content="wishlist/public_user_stores_implementation.js"><link rel="stylesheet" type="text/css" media="all" href="assets/style.css"><script type="text/javascript" src="assets/behavior.js"></script><body><div id="meta"><div class="file-path">wishlist/public_user_stores_implementation.js</div></div><div id="document"><div class="segment"><div class="comments"><div class="wrapper"><h1 id="public-user-stores-implementation">Public User Stores (Implementation)</h1>
 
 <p>From hoodie's frontend API perspective, every user has a store which
 is private by default. Nobody but the user himself is able to access
@@ -113,10 +113,15 @@ before creating or updating it in B.</p>
 document coming from the users private store <code>_changes</code> feed. If the 
 function returns an object, the object will be PUT to users public store.</p></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>The function might look like this:</p></div></div><div class="code"><div class="wrapper"><span class="kd">function</span> <span class="nx">parseObjectForPublicStore</span><span class="p">(</span><span class="nx">object</span><span class="p">)</span> <span class="p">{</span>
 
-  <span class="k">switch</span><span class="p">(</span><span class="kc">true</span><span class="p">)</span> <span class="p">{</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>make objectect entirely public</p></div></div><div class="code"><div class="wrapper">    <span class="k">case</span> <span class="nx">object</span><span class="p">.</span><span class="nx">$public</span> <span class="o">===</span> <span class="kc">true</span><span class="o">:</span>
+  <span class="k">switch</span><span class="p">(</span><span class="kc">true</span><span class="p">)</span> <span class="p">{</span>
+    <span class="c1">// make objectect entirely public</span>
+    <span class="k">case</span> <span class="nx">object</span><span class="p">.</span><span class="nx">$public</span> <span class="o">===</span> <span class="kc">true</span><span class="o">:</span>
       <span class="k">delete</span> <span class="nx">object</span><span class="p">.</span><span class="nx">$public</span>
       <span class="nx">object</span><span class="p">.</span><span class="nx">_id</span> <span class="o">=</span> <span class="s2">&quot;$public/&quot;</span> <span class="o">+</span> <span class="nx">object</span><span class="p">.</span><span class="nx">_id</span>
-      <span class="k">return</span> <span class="nx">object</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>make certain attributes public</p></div></div><div class="code"><div class="wrapper">    <span class="k">case</span> <span class="nb">Array</span><span class="p">.</span><span class="nx">isArray</span><span class="p">(</span><span class="nx">object</span><span class="p">.</span><span class="nx">$public</span><span class="p">)</span><span class="o">:</span>
+      <span class="k">return</span> <span class="nx">object</span>
+
+    <span class="c1">// make certain attributes public</span>
+    <span class="k">case</span> <span class="nb">Array</span><span class="p">.</span><span class="nx">isArray</span><span class="p">(</span><span class="nx">object</span><span class="p">.</span><span class="nx">$public</span><span class="p">)</span><span class="o">:</span>
       <span class="kd">var</span> <span class="nx">newobject</span> <span class="o">=</span> <span class="p">{},</span>
           <span class="nx">defaultPublicAtts</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;_ref&#39;</span><span class="p">,</span> <span class="s1">&#39;type&#39;</span><span class="p">]</span>
 
@@ -126,7 +131,10 @@ function returns an object, the object will be PUT to users public store.</p></d
         <span class="nx">newobject</span><span class="p">[</span><span class="nx">attr</span><span class="p">]</span> <span class="o">=</span> <span class="nx">object</span><span class="p">[</span><span class="nx">attr</span><span class="p">]</span>
       <span class="p">};</span>
       <span class="nx">object</span><span class="p">.</span><span class="nx">_id</span> <span class="o">=</span> <span class="s2">&quot;$public/&quot;</span> <span class="o">+</span> <span class="nx">object</span><span class="p">.</span><span class="nx">_id</span>
-      <span class="k">return</span> <span class="nx">object</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>make public objectect private again, remove it from public store</p></div></div><div class="code"><div class="wrapper">    <span class="k">case</span> <span class="nx">object</span><span class="p">.</span><span class="nx">$public</span> <span class="o">===</span> <span class="kc">false</span><span class="o">:</span>
+      <span class="k">return</span> <span class="nx">object</span>
+
+    <span class="c1">// make public objectect private again, remove it from public store</span>
+    <span class="k">case</span> <span class="nx">object</span><span class="p">.</span><span class="nx">$public</span> <span class="o">===</span> <span class="kc">false</span><span class="o">:</span>
       <span class="k">return</span> <span class="p">{</span>
         <span class="nx">_id</span>     <span class="o">:</span> <span class="s2">&quot;$public/&quot;</span> <span class="o">+</span> <span class="nx">object</span><span class="p">.</span><span class="nx">_id</span><span class="p">,</span>
         <span class="nx">_rev</span>    <span class="o">:</span> <span class="nx">object</span><span class="p">.</span><span class="nx">_rev</span><span class="p">,</span>

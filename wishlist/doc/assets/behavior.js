@@ -15,7 +15,7 @@ f.event={add:function(a,c,d,e,g){var h,i,j,k,l,m,n,o,p,q,r,s;if(!(a.nodeType===3
           "name": "JavaScript"
         },
         "sourcePath": "/Users/gregor/JavaScripts/hood.ie/hoodie.js/wishlist/open.js",
-        "projectPath": "open.js",
+        "projectPath": "wishlist/open.js",
         "targetPath": "open",
         "title": "open"
       },
@@ -60,7 +60,7 @@ f.event={add:function(a,c,d,e,g){var h,i,j,k,l,m,n,o,p,q,r,s;if(!(a.nodeType===3
           "name": "JavaScript"
         },
         "sourcePath": "/Users/gregor/JavaScripts/hood.ie/hoodie.js/wishlist/public_user_stores.js",
-        "projectPath": "public_user_stores.js",
+        "projectPath": "wishlist/public_user_stores.js",
         "targetPath": "public_user_stores",
         "firstHeader": {
           "type": "heading",
@@ -295,7 +295,7 @@ f.event={add:function(a,c,d,e,g){var h,i,j,k,l,m,n,o,p,q,r,s;if(!(a.nodeType===3
           "name": "JavaScript"
         },
         "sourcePath": "/Users/gregor/JavaScripts/hood.ie/hoodie.js/wishlist/public_user_stores_implementation.js",
-        "projectPath": "public_user_stores_implementation.js",
+        "projectPath": "wishlist/public_user_stores_implementation.js",
         "targetPath": "public_user_stores_implementation",
         "firstHeader": {
           "type": "heading",
@@ -374,7 +374,7 @@ f.event={add:function(a,c,d,e,g){var h,i,j,k,l,m,n,o,p,q,r,s;if(!(a.nodeType===3
           "name": "JavaScript"
         },
         "sourcePath": "/Users/gregor/JavaScripts/hood.ie/hoodie.js/wishlist/share.js",
-        "projectPath": "share.js",
+        "projectPath": "wishlist/share.js",
         "targetPath": "share",
         "firstHeader": {
           "type": "heading",
@@ -625,7 +625,7 @@ f.event={add:function(a,c,d,e,g){var h,i,j,k,l,m,n,o,p,q,r,s;if(!(a.nodeType===3
           "name": "JavaScript"
         },
         "sourcePath": "/Users/gregor/JavaScripts/hood.ie/hoodie.js/wishlist/subscription.js",
-        "projectPath": "subscription.js",
+        "projectPath": "wishlist/subscription.js",
         "targetPath": "subscription",
         "title": "subscription"
       },
@@ -670,7 +670,9 @@ f.event={add:function(a,c,d,e,g){var h,i,j,k,l,m,n,o,p,q,r,s;if(!(a.nodeType===3
     var currentNodeBottom, currentNodeTop;
     currentNodeTop = currentNode$.offset().top - toc$.children(':visible').first().offset().top;
     currentNodeBottom = currentNodeTop + currentNode$.children('.label').height();
-    if (currentNodeTop < toc$.scrollTop()) toc$.scrollTop(currentNodeTop);
+    if (currentNodeTop < toc$.scrollTop()) {
+      toc$.scrollTop(currentNodeTop);
+    }
     if (currentNodeBottom > toc$.scrollTop() + toc$.height()) {
       return toc$.scrollTop(currentNodeBottom - toc$.height());
     }
@@ -685,7 +687,9 @@ f.event={add:function(a,c,d,e,g){var h,i,j,k,l,m,n,o,p,q,r,s;if(!(a.nodeType===3
         currentNode$.removeClass('expanded');
       } else {
         parents$ = currentNode$.parents('li');
-        if (parents$.length > 0) selectNode(parents$.first());
+        if (parents$.length > 0) {
+          selectNode(parents$.first());
+        }
       }
     }
     return focusCurrentNode();
@@ -700,7 +704,9 @@ f.event={add:function(a,c,d,e,g){var h,i,j,k,l,m,n,o,p,q,r,s;if(!(a.nodeType===3
 
   selectNodeByDocumentPath = function(documentPath, headerSlug) {
     var link, urlChunks, _i, _len, _ref;
-    if (headerSlug == null) headerSlug = null;
+    if (headerSlug == null) {
+      headerSlug = null;
+    }
     currentNode$ = fileMap[documentPath];
     if (headerSlug) {
       _ref = currentNode$.find('.outline a');
@@ -719,14 +725,16 @@ f.event={add:function(a,c,d,e,g){var h,i,j,k,l,m,n,o,p,q,r,s;if(!(a.nodeType===3
   };
 
   moveCurrentNode = function(up) {
-    var i, newIndex, node, visibleNodes$, _len;
+    var i, newIndex, node, visibleNodes$, _i, _len;
     visibleNodes$ = toc$.find('li:visible:not(.filtered)');
     newIndex = 0;
-    for (i = 0, _len = visibleNodes$.length; i < _len; i++) {
+    for (i = _i = 0, _len = visibleNodes$.length; _i < _len; i = ++_i) {
       node = visibleNodes$[i];
       if (node === currentNode$[0]) {
         newIndex = up ? i - 1 : i + 1;
-        if (newIndex < 0) newIndex = 0;
+        if (newIndex < 0) {
+          newIndex = 0;
+        }
         if (newIndex > visibleNodes$.length - 1) {
           newIndex = visibleNodes$.length - 1;
         }
@@ -739,7 +747,9 @@ f.event={add:function(a,c,d,e,g){var h,i,j,k,l,m,n,o,p,q,r,s;if(!(a.nodeType===3
   visitCurrentNode = function() {
     var labelLink$;
     labelLink$ = currentNode$.children('a.label');
-    if (labelLink$.length > 0) return window.location = labelLink$.attr('href');
+    if (labelLink$.length > 0) {
+      return window.location = labelLink$.attr('href');
+    }
   };
 
   MAX_FILTER_SIZE = 10;
@@ -755,11 +765,15 @@ f.event={add:function(a,c,d,e,g){var h,i,j,k,l,m,n,o,p,q,r,s;if(!(a.nodeType===3
   currentQuery = '';
 
   searchNodes = function(queryString) {
-    var c, filtered, matched, matcher, nodeInfo, p, _i, _j, _k, _len, _len2, _len3, _results;
+    var c, filtered, matched, matcher, nodeInfo, p, _i, _j, _k, _len, _len1, _len2, _results;
     queryString = queryString.toLowerCase().replace(/\s+/, '');
-    if (queryString === currentQuery) return;
+    if (queryString === currentQuery) {
+      return;
+    }
     currentQuery = queryString;
-    if (queryString === '') return clearFilter();
+    if (queryString === '') {
+      return clearFilter();
+    }
     matcher = new RegExp(((function() {
       var _i, _len, _results;
       _results = [];
@@ -779,29 +793,31 @@ f.event={add:function(a,c,d,e,g){var h,i,j,k,l,m,n,o,p,q,r,s;if(!(a.nodeType===3
         filtered.push(nodeInfo);
       }
     }
-    if (matched.length > MAX_FILTER_SIZE) return clearFilter();
+    if (matched.length > MAX_FILTER_SIZE) {
+      return clearFilter();
+    }
     nav$.addClass('searching');
-    for (_j = 0, _len2 = filtered.length; _j < _len2; _j++) {
+    for (_j = 0, _len1 = filtered.length; _j < _len1; _j++) {
       nodeInfo = filtered[_j];
       nodeInfo[1].removeClass('matched-child');
       nodeInfo[1].addClass('filtered');
       clearHighlight(nodeInfo[2]);
     }
     _results = [];
-    for (_k = 0, _len3 = matched.length; _k < _len3; _k++) {
+    for (_k = 0, _len2 = matched.length; _k < _len2; _k++) {
       nodeInfo = matched[_k];
       nodeInfo[1].removeClass('filtered matched-child');
       nodeInfo[1].addClass('matched');
       highlightMatch(nodeInfo[2], queryString);
       _results.push((function() {
-        var _l, _len4, _ref, _results2;
+        var _l, _len3, _ref, _results1;
         _ref = nodeInfo[1].parents('li');
-        _results2 = [];
-        for (_l = 0, _len4 = _ref.length; _l < _len4; _l++) {
+        _results1 = [];
+        for (_l = 0, _len3 = _ref.length; _l < _len3; _l++) {
           p = _ref[_l];
-          _results2.push($(p).addClass('matched-child'));
+          _results1.push($(p).addClass('matched-child'));
         }
-        return _results2;
+        return _results1;
       })());
     }
     return _results;
@@ -861,7 +877,7 @@ f.event={add:function(a,c,d,e,g){var h,i,j,k,l,m,n,o,p,q,r,s;if(!(a.nodeType===3
   };
 
   buildTOCNode = function(node, metaInfo) {
-    var c, children$, discloser$, label$, node$, _i, _len, _ref, _ref2, _ref3;
+    var c, children$, discloser$, label$, node$, _i, _len, _ref, _ref1, _ref2;
     node$ = $("<li class=\"" + node.type + "\"/>");
     switch (node.type) {
       case 'file':
@@ -872,9 +888,9 @@ f.event={add:function(a,c,d,e,g){var h,i,j,k,l,m,n,o,p,q,r,s;if(!(a.nodeType===3
     }
     if (((_ref = node.children) != null ? _ref.length : void 0) > 0) {
       children$ = $('<ol class="children"/>');
-      _ref2 = node.children;
-      for (_i = 0, _len = _ref2.length; _i < _len; _i++) {
-        c = _ref2[_i];
+      _ref1 = node.children;
+      for (_i = 0, _len = _ref1.length; _i < _len; _i++) {
+        c = _ref1[_i];
         children$.append(buildTOCNode(c, metaInfo));
       }
       node$.append(children$);
@@ -884,14 +900,16 @@ f.event={add:function(a,c,d,e,g){var h,i,j,k,l,m,n,o,p,q,r,s;if(!(a.nodeType===3
       return selectNode(node$);
     });
     discloser$ = $('<span class="discloser"/>').prependTo(label$);
-    if (!(((_ref3 = node.children) != null ? _ref3.length : void 0) > 0)) {
+    if (!(((_ref2 = node.children) != null ? _ref2.length : void 0) > 0)) {
       discloser$.addClass('placeholder');
     }
     discloser$.click(function(evt) {
       node$.toggleClass('expanded');
       return evt.preventDefault();
     });
-    if (node.type === 'file') fileMap[node.data.targetPath] = node$;
+    if (node.type === 'file') {
+      fileMap[node.data.targetPath] = node$;
+    }
     appendSearchNode(node$);
     return node$;
   };
@@ -913,7 +931,9 @@ f.event={add:function(a,c,d,e,g){var h,i,j,k,l,m,n,o,p,q,r,s;if(!(a.nodeType===3
     });
     lastMousedownTimestamp = null;
     nav$.mousedown(function(evt) {
-      if (evt.target !== toggle$[0]) return lastMousedownTimestamp = evt.timeStamp;
+      if (evt.target !== toggle$[0]) {
+        return lastMousedownTimestamp = evt.timeStamp;
+      }
     });
     search$.blur(function(evt) {
       if (evt.timeStamp - lastMousedownTimestamp < 10) {
