@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><title>hoodie/account</title></head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0"><meta name="groc-relative-root" content="../"><meta name="groc-document-path" content="hoodie/account"><meta name="groc-project-path" content="src/hoodie/account.coffee"><link rel="stylesheet" type="text/css" media="all" href="../assets/style.css"><script type="text/javascript" src="../assets/behavior.js"></script><body><div id="meta"><div class="file-path">src/hoodie/account.coffee</div></div><div id="document"><div class="segment"><div class="comments"><div class="wrapper"><h1 id="hoodieaccount">Hoodie.Account</h1></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>tell something smart in here.</p></div></div><div class="code"><div class="wrapper"><span class="k">class</span> <span class="nx">Hoodie</span><span class="p">.</span><span class="nx">Account</span>
+<!DOCTYPE html><html lang="en"><head><title>src/hoodie/account</title></head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0"><meta name="groc-relative-root" content="../../"><meta name="groc-document-path" content="src/hoodie/account"><meta name="groc-project-path" content="src/hoodie/account.coffee"><link rel="stylesheet" type="text/css" media="all" href="../../assets/style.css"><script type="text/javascript" src="../../assets/behavior.js"></script><body><div id="meta"><div class="file-path">src/hoodie/account.coffee</div></div><div id="document"><div class="segment"><div class="comments"><div class="wrapper"><h1 id="hoodieaccount">Hoodie.Account</h1></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>tell something smart in here.</p></div></div><div class="code"><div class="wrapper"><span class="k">class</span> <span class="nx">Hoodie</span><span class="p">.</span><span class="nx">Account</span>
   
   <span class="c1"># Properties</span>
   <span class="c1"># ------------</span>
@@ -59,12 +59,10 @@
     <span class="k">if</span> <span class="nx">@hasAnonymousAccount</span><span class="p">()</span>
       <span class="k">return</span> <span class="nx">@_upgradeAnonymousAccount</span> <span class="nx">username</span><span class="p">,</span> <span class="nx">password</span>
 
-    <span class="nv">key  = </span><span class="s2">&quot;#{@_prefix}:#{username}&quot;</span>
-
     <span class="nv">options =</span>
       <span class="nv">data        : </span><span class="nx">JSON</span><span class="p">.</span><span class="nx">stringify</span>
-        <span class="nv">_id        : </span><span class="nx">key</span>
-        <span class="nv">name       : </span><span class="nx">username</span>
+        <span class="nv">_id        : </span><span class="nx">@_key</span><span class="p">(</span><span class="nx">username</span><span class="p">)</span>
+        <span class="nv">name       : </span><span class="s2">&quot;#{@_userKeyPrefix()}/#{username}&quot;</span>
         <span class="nv">type       : </span><span class="s1">&#39;user&#39;</span>
         <span class="nv">roles      : </span><span class="p">[]</span>
         <span class="nv">password   : </span><span class="nx">password</span>
@@ -72,7 +70,7 @@
         <span class="nv">database   : </span><span class="nx">@db</span><span class="p">()</span>
       <span class="nv">contentType : </span><span class="s1">&#39;application/json&#39;</span>
 
-    <span class="nx">@hoodie</span><span class="p">.</span><span class="nx">request</span><span class="p">(</span><span class="s1">&#39;PUT&#39;</span><span class="p">,</span> <span class="s2">&quot;/_users/#{encodeURIComponent key}&quot;</span><span class="p">,</span> <span class="nx">options</span><span class="p">)</span>
+    <span class="nx">@hoodie</span><span class="p">.</span><span class="nx">request</span><span class="p">(</span><span class="s1">&#39;PUT&#39;</span><span class="p">,</span> <span class="nx">@_url</span><span class="p">(</span><span class="nx">username</span><span class="p">),</span> <span class="nx">options</span><span class="p">)</span>
     <span class="p">.</span><span class="nx">pipe</span> <span class="nx">@_handleSignUpSucces</span><span class="p">(</span><span class="nx">username</span><span class="p">,</span> <span class="nx">password</span><span class="p">),</span> <span class="nx">@_handleRequestError</span>
 
   
@@ -89,7 +87,7 @@
   <span class="c1">#</span>
   <span class="nv">anonymousSignUp: </span><span class="o">-&gt;</span>
     <span class="nv">password = </span><span class="nx">@hoodie</span><span class="p">.</span><span class="nx">my</span><span class="p">.</span><span class="nx">store</span><span class="p">.</span><span class="nx">uuid</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span>
-    <span class="nv">username = </span><span class="s2">&quot;anonymous/#{@owner}&quot;</span>
+    <span class="nv">username = </span><span class="nx">@owner</span>
 
     <span class="nx">@signUp</span><span class="p">(</span><span class="nx">username</span><span class="p">,</span> <span class="nx">password</span><span class="p">)</span>
     <span class="p">.</span><span class="nx">fail</span><span class="p">(</span><span class="nx">@_handleRequestError</span><span class="p">)</span>
@@ -114,7 +112,7 @@
   <span class="c1">#</span>
   <span class="nv">signIn : </span><span class="nf">(username, password = &#39;&#39;) -&gt;</span>
     <span class="nv">options = data: </span>
-                <span class="nv">name      : </span><span class="nx">username</span>
+                <span class="nv">name      : </span><span class="s2">&quot;#{@_userKeyPrefix()}/#{username}&quot;</span>
                 <span class="nv">password  : </span><span class="nx">password</span>
 
     <span class="nx">@hoodie</span><span class="p">.</span><span class="nx">request</span><span class="p">(</span><span class="s1">&#39;POST&#39;</span><span class="p">,</span> <span class="s1">&#39;/_session&#39;</span><span class="p">,</span> <span class="nx">options</span><span class="p">)</span>
@@ -160,8 +158,7 @@
     <span class="nx">unless</span> <span class="nx">username</span>
       <span class="k">return</span> <span class="nx">@hoodie</span><span class="p">.</span><span class="nx">defer</span><span class="p">().</span><span class="nx">reject</span><span class="p">(</span><span class="nv">error: </span><span class="s2">&quot;unauthenticated&quot;</span><span class="p">,</span> <span class="nv">reason: </span><span class="s2">&quot;not logged in&quot;</span><span class="p">).</span><span class="nx">promise</span><span class="p">()</span>
     
-    <span class="nv">key = </span><span class="s2">&quot;#{@_prefix}:#{username}&quot;</span>
-    <span class="nx">@hoodie</span><span class="p">.</span><span class="nx">request</span><span class="p">(</span><span class="s1">&#39;GET&#39;</span><span class="p">,</span> <span class="s2">&quot;/_users/#{encodeURIComponent key}&quot;</span><span class="p">)</span>
+    <span class="nx">@hoodie</span><span class="p">.</span><span class="nx">request</span><span class="p">(</span><span class="s1">&#39;GET&#39;</span><span class="p">,</span> <span class="nx">@_url</span><span class="p">(</span><span class="nx">username</span><span class="p">))</span>
     <span class="p">.</span><span class="nx">pipe</span><span class="p">(</span><span class="kc">null</span><span class="p">,</span> <span class="nx">@_handleRequestError</span><span class="p">)</span>
     <span class="p">.</span><span class="nx">done</span> <span class="nf">(response) -&gt;</span> <span class="nv">response = </span><span class="nx">@_doc</span>
     
@@ -177,7 +174,6 @@
     <span class="nx">unless</span> <span class="nx">@username</span>
       <span class="k">return</span> <span class="nx">@hoodie</span><span class="p">.</span><span class="nx">defer</span><span class="p">().</span><span class="nx">reject</span><span class="p">(</span><span class="nv">error: </span><span class="s2">&quot;unauthenticated&quot;</span><span class="p">,</span> <span class="nv">reason: </span><span class="s2">&quot;not logged in&quot;</span><span class="p">).</span><span class="nx">promise</span><span class="p">()</span>
     
-    <span class="nv">key  = </span><span class="s2">&quot;#{@_prefix}:#{@username}&quot;</span>
     <span class="nv">data = </span><span class="nx">$</span><span class="p">.</span><span class="nx">extend</span> <span class="p">{},</span> <span class="nx">@_doc</span>
     <span class="nv">data.password = </span><span class="nx">newPassword</span>
     <span class="k">delete</span> <span class="nx">data</span><span class="p">.</span><span class="nx">salt</span>
@@ -187,7 +183,7 @@
       <span class="nv">contentType : </span><span class="s2">&quot;application/json&quot;</span>
 
     <span class="nx">@hoodie</span><span class="p">.</span><span class="nx">my</span><span class="p">.</span><span class="nx">remote</span><span class="p">.</span><span class="nx">disconnect</span><span class="p">()</span>
-    <span class="nx">@hoodie</span><span class="p">.</span><span class="nx">request</span><span class="p">(</span><span class="s1">&#39;PUT&#39;</span><span class="p">,</span>  <span class="s2">&quot;/_users/#{encodeURIComponent key}&quot;</span><span class="p">,</span> <span class="nx">options</span><span class="p">)</span>
+    <span class="nx">@hoodie</span><span class="p">.</span><span class="nx">request</span><span class="p">(</span><span class="s1">&#39;PUT&#39;</span><span class="p">,</span>  <span class="nx">@_url</span><span class="p">(),</span> <span class="nx">options</span><span class="p">)</span>
     <span class="p">.</span><span class="nx">pipe</span><span class="p">(</span> <span class="nx">@_handleChangePasswordSuccess</span><span class="p">(</span><span class="nx">newPassword</span><span class="p">),</span> <span class="nx">@_handleRequestError</span> <span class="p">)</span>
 
 
@@ -244,7 +240,9 @@
 
   <span class="c1"># destroys a user&#39; account  </span>
   <span class="nv">destroy : </span><span class="o">-&gt;</span>
-    <span class="nx">@fetch</span><span class="p">().</span><span class="nx">pipe</span> <span class="nx">@_handleDestroySucces</span><span class="p">,</span> <span class="nx">@_handleRequestError</span>
+    <span class="nx">@fetch</span><span class="p">()</span>
+    <span class="p">.</span><span class="nx">pipe</span><span class="p">(</span><span class="nx">@_handleFetchBeforeDestroySucces</span><span class="p">,</span> <span class="nx">@_handleRequestError</span><span class="p">)</span>
+    <span class="p">.</span><span class="nx">pipe</span><span class="p">(</span><span class="nx">@_handleDestroySucces</span><span class="p">)</span>
 
 
   <span class="c1"># PRIVATE</span>
@@ -268,7 +266,7 @@
 
     <span class="k">if</span> <span class="nx">response</span><span class="p">.</span><span class="nx">userCtx</span><span class="p">.</span><span class="nx">name</span>
       <span class="vi">@_authenticated = </span><span class="kc">true</span>
-      <span class="nx">@_setUsername</span> <span class="nx">response</span><span class="p">.</span><span class="nx">userCtx</span><span class="p">.</span><span class="nx">name</span>
+      <span class="nx">@_setUsername</span> <span class="nx">response</span><span class="p">.</span><span class="nx">userCtx</span><span class="p">.</span><span class="nx">name</span><span class="p">.</span><span class="nx">replace</span><span class="p">(</span><span class="sr">/^(anonymous_)?user\//</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span>
       <span class="nx">@_setOwner</span>    <span class="nx">response</span><span class="p">.</span><span class="nx">userCtx</span><span class="p">.</span><span class="nx">roles</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
       <span class="nx">defer</span><span class="p">.</span><span class="nx">resolve</span> <span class="nx">@username</span>
 
@@ -337,7 +335,8 @@
   <span class="c1">#     }</span>
   <span class="c1">#</span>
   <span class="nv">_handleSignInSuccess : </span><span class="p">(</span><span class="nx">response</span><span class="p">)</span> <span class="o">=&gt;</span>
-    <span class="nv">defer = </span><span class="nx">@hoodie</span><span class="p">.</span><span class="nx">defer</span><span class="p">()</span>
+    <span class="nv">defer    = </span><span class="nx">@hoodie</span><span class="p">.</span><span class="nx">defer</span><span class="p">()</span>
+    <span class="nv">username = </span><span class="nx">response</span><span class="p">.</span><span class="nx">name</span><span class="p">.</span><span class="nx">replace</span><span class="p">(</span><span class="sr">/^(anonymous_)?user\//</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span>
 
     <span class="c1"># if an error occured, the userDB worker stores it to the $error attribute</span>
     <span class="c1"># and adds the &quot;error&quot; role to the users doc object. If the user has the</span>
@@ -345,7 +344,7 @@
     <span class="c1"># is, before we can reject the promise.</span>
     <span class="c1">#</span>
     <span class="k">if</span> <span class="o">~</span><span class="nx">response</span><span class="p">.</span><span class="nx">roles</span><span class="p">.</span><span class="nx">indexOf</span><span class="p">(</span><span class="s2">&quot;error&quot;</span><span class="p">)</span>
-      <span class="nx">@fetch</span><span class="p">(</span><span class="nx">response</span><span class="p">.</span><span class="nx">name</span><span class="p">)</span>
+      <span class="nx">@fetch</span><span class="p">(</span><span class="nx">username</span><span class="p">)</span>
       <span class="p">.</span><span class="nx">fail</span><span class="p">(</span><span class="nx">defer</span><span class="p">.</span><span class="nx">reject</span><span class="p">)</span>
       <span class="p">.</span><span class="nx">done</span> <span class="o">=&gt;</span>
         <span class="nx">defer</span><span class="p">.</span><span class="nx">reject</span> <span class="nv">error: </span><span class="s2">&quot;error&quot;</span><span class="p">,</span> <span class="nv">reason: </span><span class="nx">@_doc</span><span class="p">.</span><span class="nx">$error</span>
@@ -360,7 +359,7 @@
       <span class="k">return</span> <span class="nx">defer</span><span class="p">.</span><span class="nx">reject</span> <span class="nv">error: </span><span class="s2">&quot;unconfirmed&quot;</span><span class="p">,</span> <span class="nv">reason: </span><span class="s2">&quot;account has not been confirmed yet&quot;</span>
     
     <span class="vi">@_authenticated = </span><span class="kc">true</span>
-    <span class="nx">@_setUsername</span> <span class="nx">response</span><span class="p">.</span><span class="nx">name</span>
+    <span class="nx">@_setUsername</span> <span class="nx">username</span>
     <span class="nx">@_setOwner</span>    <span class="nx">response</span><span class="p">.</span><span class="nx">roles</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
     <span class="nx">@hoodie</span><span class="p">.</span><span class="nx">trigger</span> <span class="s1">&#39;account:signin&#39;</span><span class="p">,</span> <span class="nx">@username</span>
 
@@ -452,7 +451,6 @@
     <span class="nx">@authenticate</span><span class="p">().</span><span class="nx">pipe</span> <span class="o">=&gt;</span>
 
       <span class="c1"># prepare updated _users doc</span>
-      <span class="nv">key = </span><span class="s2">&quot;#{@_prefix}:#{@username}&quot;</span>
       <span class="nv">data = </span><span class="nx">$</span><span class="p">.</span><span class="nx">extend</span> <span class="p">{},</span> <span class="nx">@_doc</span>
       <span class="nx">data</span><span class="p">.</span><span class="nv">$newUsername = </span><span class="nx">newUsername</span>
 
@@ -466,7 +464,7 @@
         <span class="nv">data        : </span><span class="nx">JSON</span><span class="p">.</span><span class="nx">stringify</span> <span class="nx">data</span>
         <span class="nv">contentType : </span><span class="s1">&#39;application/json&#39;</span>
 
-      <span class="nx">@hoodie</span><span class="p">.</span><span class="nx">request</span><span class="p">(</span><span class="s1">&#39;PUT&#39;</span><span class="p">,</span> <span class="s2">&quot;/_users/#{encodeURIComponent key}&quot;</span><span class="p">,</span> <span class="nx">options</span><span class="p">)</span>
+      <span class="nx">@hoodie</span><span class="p">.</span><span class="nx">request</span><span class="p">(</span><span class="s1">&#39;PUT&#39;</span><span class="p">,</span> <span class="nx">@_url</span><span class="p">(),</span> <span class="nx">options</span><span class="p">)</span>
       <span class="p">.</span><span class="nx">pipe</span> <span class="o">=&gt;</span>
         <span class="nx">@hoodie</span><span class="p">.</span><span class="nx">my</span><span class="p">.</span><span class="nx">remote</span><span class="p">.</span><span class="nx">disconnect</span><span class="p">()</span>
         <span class="nx">@_delayedSignIn</span> <span class="nx">newUsername</span><span class="p">,</span> <span class="nx">newPassword</span> <span class="o">or</span> <span class="nx">currentPassword</span>
@@ -483,10 +481,34 @@
   <span class="c1">#</span>
   <span class="c1">#</span>
   <span class="c1">#</span>
-  <span class="nv">_handleDestroySucces : </span><span class="o">=&gt;</span>
+  <span class="nv">_handleFetchBeforeDestroySucces : </span><span class="o">=&gt;</span>
     <span class="nx">@hoodie</span><span class="p">.</span><span class="nx">my</span><span class="p">.</span><span class="nx">remote</span><span class="p">.</span><span class="nx">disconnect</span><span class="p">()</span>
-    <span class="nv">key = </span><span class="s2">&quot;#{@_prefix}:#{@username}&quot;</span>
     <span class="vi">@_doc._deleted = </span><span class="kc">true</span>
-    <span class="nx">@hoodie</span><span class="p">.</span><span class="nx">request</span> <span class="s1">&#39;PUT&#39;</span><span class="p">,</span> <span class="s2">&quot;/_users/#{encodeURIComponent key}&quot;</span><span class="p">,</span>
+    <span class="nx">@hoodie</span><span class="p">.</span><span class="nx">request</span> <span class="s1">&#39;PUT&#39;</span><span class="p">,</span> <span class="nx">@_url</span><span class="p">(),</span>
       <span class="nv">data        : </span><span class="nx">JSON</span><span class="p">.</span><span class="nx">stringify</span> <span class="nx">@_doc</span>
-      <span class="nv">contentType : </span><span class="s1">&#39;application/json&#39;</span></div></div></div></div></body></html>
+      <span class="nv">contentType : </span><span class="s1">&#39;application/json&#39;</span>
+
+  <span class="c1">#</span>
+  <span class="c1">#</span>
+  <span class="c1">#</span>
+  <span class="nv">_handleDestroySucces : </span><span class="o">=&gt;</span>
+    <span class="k">delete</span> <span class="nx">@username</span>
+    <span class="k">delete</span> <span class="nx">@owner</span>
+    <span class="k">delete</span> <span class="nx">@_authenticated</span>
+
+  <span class="c1">#</span>
+  <span class="c1">#</span>
+  <span class="c1">#</span>
+  <span class="nv">_userKeyPrefix : </span><span class="o">-&gt;</span>
+    <span class="k">if</span> <span class="nx">@hasAnonymousAccount</span><span class="p">()</span> 
+      <span class="s1">&#39;anonymous_user&#39;</span>
+    <span class="k">else</span>
+      <span class="s1">&#39;user&#39;</span>
+
+  <span class="c1">#</span>
+  <span class="nv">_key : </span><span class="nf">(username = @username) -&gt;</span>
+    <span class="s2">&quot;#{@_prefix}:#{@_userKeyPrefix()}/#{username}&quot;</span>
+
+  <span class="c1">#</span>
+  <span class="nv">_url : </span><span class="nf">(username = @username) -&gt;</span>
+    <span class="s2">&quot;/_users/#{encodeURIComponent @_key(username)}&quot;</span></div></div></div></div></body></html>

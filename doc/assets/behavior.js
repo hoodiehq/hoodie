@@ -8,18 +8,63 @@ f.event={add:function(a,c,d,e,g){var h,i,j,k,l,m,n,o,p,q,r,s;if(!(a.nodeType===3
     {
       "type": "folder",
       "data": {
-        "path": "hoodie",
-        "title": "hoodie"
+        "path": "src",
+        "title": "src"
       },
       "depth": 1,
       "children": [
         {
-          "type": "folder",
+          "type": "file",
           "data": {
-            "path": "hoodie/account",
-            "title": "account"
+            "language": {
+              "nameMatchers": [".coffee"],
+              "pygmentsLexer": "coffee-script",
+              "singleLineComment": ["#"],
+              "name": "CoffeeScript"
+            },
+            "sourcePath": "/Users/gregor/JavaScripts/hood.ie/hoodie.js/src/events.coffee",
+            "projectPath": "src/events.coffee",
+            "targetPath": "src/events",
+            "title": "events"
           },
           "depth": 2,
+          "outline": [
+            {
+              "type": "heading",
+              "data": {
+                "level": 2,
+                "title": "Events",
+                "slug": "events"
+              },
+              "depth": 2
+            }
+          ]
+        }, {
+          "type": "file",
+          "data": {
+            "language": {
+              "nameMatchers": [".coffee"],
+              "pygmentsLexer": "coffee-script",
+              "singleLineComment": ["#"],
+              "name": "CoffeeScript"
+            },
+            "sourcePath": "/Users/gregor/JavaScripts/hood.ie/hoodie.js/src/hoodie.coffee",
+            "projectPath": "src/hoodie.coffee",
+            "targetPath": "src/hoodie",
+            "title": "hoodie"
+          },
+          "depth": 2,
+          "outline": [
+            {
+              "type": "heading",
+              "data": {
+                "level": 2,
+                "title": "Hoodie",
+                "slug": "hoodie"
+              },
+              "depth": 2
+            }
+          ],
           "children": [
             {
               "type": "file",
@@ -30,9 +75,164 @@ f.event={add:function(a,c,d,e,g){var h,i,j,k,l,m,n,o,p,q,r,s;if(!(a.nodeType===3
                   "singleLineComment": ["#"],
                   "name": "CoffeeScript"
                 },
-                "sourcePath": "/Users/gregor/JavaScripts/hood.ie/hoodie.js/src/hoodie/account/remote_store.coffee",
-                "projectPath": "src/hoodie/account/remote_store.coffee",
-                "targetPath": "hoodie/account/remote_store",
+                "sourcePath": "/Users/gregor/JavaScripts/hood.ie/hoodie.js/src/hoodie/account.coffee",
+                "projectPath": "src/hoodie/account.coffee",
+                "targetPath": "src/hoodie/account",
+                "firstHeader": {
+                  "type": "heading",
+                  "data": {
+                    "level": 1,
+                    "title": "Hoodie.Account",
+                    "slug": "hoodieaccount",
+                    "isFileHeader": true
+                  },
+                  "depth": 1
+                },
+                "title": "Hoodie.Account"
+              },
+              "depth": 3,
+              "outline": [],
+              "children": [
+                {
+                  "type": "file",
+                  "data": {
+                    "language": {
+                      "nameMatchers": [".coffee"],
+                      "pygmentsLexer": "coffee-script",
+                      "singleLineComment": ["#"],
+                      "name": "CoffeeScript"
+                    },
+                    "sourcePath": "/Users/gregor/JavaScripts/hood.ie/hoodie.js/src/hoodie/account/remote_store.coffee",
+                    "projectPath": "src/hoodie/account/remote_store.coffee",
+                    "targetPath": "src/hoodie/account/remote_store",
+                    "firstHeader": {
+                      "type": "heading",
+                      "data": {
+                        "level": 1,
+                        "title": "RemoteStore",
+                        "slug": "remotestore",
+                        "isFileHeader": true
+                      },
+                      "depth": 1
+                    },
+                    "title": "RemoteStore"
+                  },
+                  "depth": 4,
+                  "outline": []
+                }
+              ]
+            }, {
+              "type": "file",
+              "data": {
+                "language": {
+                  "nameMatchers": [".coffee"],
+                  "pygmentsLexer": "coffee-script",
+                  "singleLineComment": ["#"],
+                  "name": "CoffeeScript"
+                },
+                "sourcePath": "/Users/gregor/JavaScripts/hood.ie/hoodie.js/src/hoodie/config.coffee",
+                "projectPath": "src/hoodie/config.coffee",
+                "targetPath": "src/hoodie/config",
+                "title": "config"
+              },
+              "depth": 3,
+              "outline": []
+            }, {
+              "type": "file",
+              "data": {
+                "language": {
+                  "nameMatchers": [".coffee"],
+                  "pygmentsLexer": "coffee-script",
+                  "singleLineComment": ["#"],
+                  "name": "CoffeeScript"
+                },
+                "sourcePath": "/Users/gregor/JavaScripts/hood.ie/hoodie.js/src/hoodie/email.coffee",
+                "projectPath": "src/hoodie/email.coffee",
+                "targetPath": "src/hoodie/email",
+                "title": "email"
+              },
+              "depth": 3,
+              "outline": []
+            }, {
+              "type": "file",
+              "data": {
+                "language": {
+                  "nameMatchers": [".coffee"],
+                  "pygmentsLexer": "coffee-script",
+                  "singleLineComment": ["#"],
+                  "name": "CoffeeScript"
+                },
+                "sourcePath": "/Users/gregor/JavaScripts/hood.ie/hoodie.js/src/hoodie/errors.coffee",
+                "projectPath": "src/hoodie/errors.coffee",
+                "targetPath": "src/hoodie/errors",
+                "title": "errors"
+              },
+              "depth": 3,
+              "outline": []
+            }, {
+              "type": "file",
+              "data": {
+                "language": {
+                  "nameMatchers": [".coffee"],
+                  "pygmentsLexer": "coffee-script",
+                  "singleLineComment": ["#"],
+                  "name": "CoffeeScript"
+                },
+                "sourcePath": "/Users/gregor/JavaScripts/hood.ie/hoodie.js/src/hoodie/global.coffee",
+                "projectPath": "src/hoodie/global.coffee",
+                "targetPath": "src/hoodie/global",
+                "firstHeader": {
+                  "type": "heading",
+                  "data": {
+                    "level": 1,
+                    "title": "Public",
+                    "slug": "public",
+                    "isFileHeader": true
+                  },
+                  "depth": 1
+                },
+                "title": "Public"
+              },
+              "depth": 3,
+              "outline": []
+            }, {
+              "type": "file",
+              "data": {
+                "language": {
+                  "nameMatchers": [".coffee"],
+                  "pygmentsLexer": "coffee-script",
+                  "singleLineComment": ["#"],
+                  "name": "CoffeeScript"
+                },
+                "sourcePath": "/Users/gregor/JavaScripts/hood.ie/hoodie.js/src/hoodie/local_store.coffee",
+                "projectPath": "src/hoodie/local_store.coffee",
+                "targetPath": "src/hoodie/local_store",
+                "firstHeader": {
+                  "type": "heading",
+                  "data": {
+                    "level": 1,
+                    "title": "LocalStore",
+                    "slug": "localstore",
+                    "isFileHeader": true
+                  },
+                  "depth": 1
+                },
+                "title": "LocalStore"
+              },
+              "depth": 3,
+              "outline": []
+            }, {
+              "type": "file",
+              "data": {
+                "language": {
+                  "nameMatchers": [".coffee"],
+                  "pygmentsLexer": "coffee-script",
+                  "singleLineComment": ["#"],
+                  "name": "CoffeeScript"
+                },
+                "sourcePath": "/Users/gregor/JavaScripts/hood.ie/hoodie.js/src/hoodie/remote_store.coffee",
+                "projectPath": "src/hoodie/remote_store.coffee",
+                "targetPath": "src/hoodie/remote_store",
                 "firstHeader": {
                   "type": "heading",
                   "data": {
@@ -41,23 +241,34 @@ f.event={add:function(a,c,d,e,g){var h,i,j,k,l,m,n,o,p,q,r,s;if(!(a.nodeType===3
                     "slug": "remotestore",
                     "isFileHeader": true
                   },
-                  "depth": 1
+                  "depth": 1,
+                  "children": [
+                    {
+                      "type": "heading",
+                      "data": {
+                        "level": 2,
+                        "title": "API",
+                        "slug": "api"
+                      },
+                      "depth": 2
+                    }
+                  ]
                 },
                 "title": "RemoteStore"
               },
               "depth": 3,
-              "outline": []
-            }
-          ]
-        }, {
-          "type": "folder",
-          "data": {
-            "path": "hoodie/share",
-            "title": "share"
-          },
-          "depth": 2,
-          "children": [
-            {
+              "outline": [
+                {
+                  "type": "heading",
+                  "data": {
+                    "level": 2,
+                    "title": "API",
+                    "slug": "api"
+                  },
+                  "depth": 2
+                }
+              ]
+            }, {
               "type": "file",
               "data": {
                 "language": {
@@ -66,10 +277,112 @@ f.event={add:function(a,c,d,e,g){var h,i,j,k,l,m,n,o,p,q,r,s;if(!(a.nodeType===3
                   "singleLineComment": ["#"],
                   "name": "CoffeeScript"
                 },
-                "sourcePath": "/Users/gregor/JavaScripts/hood.ie/hoodie.js/src/hoodie/share/instance.coffee",
-                "projectPath": "src/hoodie/share/instance.coffee",
-                "targetPath": "hoodie/share/instance",
-                "title": "instance"
+                "sourcePath": "/Users/gregor/JavaScripts/hood.ie/hoodie.js/src/hoodie/share.coffee",
+                "projectPath": "src/hoodie/share.coffee",
+                "targetPath": "src/hoodie/share",
+                "firstHeader": {
+                  "type": "heading",
+                  "data": {
+                    "level": 1,
+                    "title": "Share Module",
+                    "slug": "share-module",
+                    "isFileHeader": true
+                  },
+                  "depth": 1,
+                  "children": [
+                    {
+                      "type": "heading",
+                      "data": {
+                        "level": 2,
+                        "title": "API",
+                        "slug": "api"
+                      },
+                      "depth": 2
+                    }
+                  ]
+                },
+                "title": "Share Module"
+              },
+              "depth": 3,
+              "outline": [
+                {
+                  "type": "heading",
+                  "data": {
+                    "level": 2,
+                    "title": "API",
+                    "slug": "api"
+                  },
+                  "depth": 2
+                }
+              ],
+              "children": [
+                {
+                  "type": "file",
+                  "data": {
+                    "language": {
+                      "nameMatchers": [".coffee"],
+                      "pygmentsLexer": "coffee-script",
+                      "singleLineComment": ["#"],
+                      "name": "CoffeeScript"
+                    },
+                    "sourcePath": "/Users/gregor/JavaScripts/hood.ie/hoodie.js/src/hoodie/share/instance.coffee",
+                    "projectPath": "src/hoodie/share/instance.coffee",
+                    "targetPath": "src/hoodie/share/instance",
+                    "title": "instance"
+                  },
+                  "depth": 4,
+                  "outline": []
+                }
+              ]
+            }, {
+              "type": "file",
+              "data": {
+                "language": {
+                  "nameMatchers": [".coffee"],
+                  "pygmentsLexer": "coffee-script",
+                  "singleLineComment": ["#"],
+                  "name": "CoffeeScript"
+                },
+                "sourcePath": "/Users/gregor/JavaScripts/hood.ie/hoodie.js/src/hoodie/store.coffee",
+                "projectPath": "src/hoodie/store.coffee",
+                "targetPath": "src/hoodie/store",
+                "firstHeader": {
+                  "type": "heading",
+                  "data": {
+                    "level": 1,
+                    "title": "Store",
+                    "slug": "store",
+                    "isFileHeader": true
+                  },
+                  "depth": 1
+                },
+                "title": "Store"
+              },
+              "depth": 3,
+              "outline": []
+            }, {
+              "type": "file",
+              "data": {
+                "language": {
+                  "nameMatchers": [".coffee"],
+                  "pygmentsLexer": "coffee-script",
+                  "singleLineComment": ["#"],
+                  "name": "CoffeeScript"
+                },
+                "sourcePath": "/Users/gregor/JavaScripts/hood.ie/hoodie.js/src/hoodie/user.coffee",
+                "projectPath": "src/hoodie/user.coffee",
+                "targetPath": "src/hoodie/user",
+                "firstHeader": {
+                  "type": "heading",
+                  "data": {
+                    "level": 1,
+                    "title": "User",
+                    "slug": "user",
+                    "isFileHeader": true
+                  },
+                  "depth": 1
+                },
+                "title": "User"
               },
               "depth": 3,
               "outline": []
