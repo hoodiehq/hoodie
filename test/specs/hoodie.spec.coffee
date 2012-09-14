@@ -4,7 +4,7 @@ describe "Hoodie", ->
     spyOn($, "ajax").andReturn $.Deferred()
   
   
-  describe "new", ->
+  describe "constructor", ->
     it "should store the CouchDB URL", ->
       hoodie = new Hoodie 'http://couch.example.com'
       expect(hoodie.baseUrl).toBe 'http://couch.example.com'
@@ -16,8 +16,7 @@ describe "Hoodie", ->
     it "should default the CouchDB URL to ''", ->
       hoodie = new Hoodie
       expect(hoodie.baseUrl).toBe ''
-    
-  # /new
+  # /constructor
   
   describe "request(type, path, options)", ->
     _when "request('GET', '/')", ->
@@ -59,4 +58,17 @@ describe "Hoodie", ->
       @hoodie.open "store_name", option: "value"
       expect(Hoodie.RemoteStore).wasCalledWith @hoodie, basePath: "/store_name", option: "value"
   # /open(store, options)
+
+  describe "#isPromise(object)", ->
+    it "should return true if object is a promise", ->
+      object = $.Deferred().promise()
+      expect( @hoodie.isPromise(object) ).toBe true
+
+    it "should return false for deferred objects", ->
+      object = $.Deferred()
+      expect( @hoodie.isPromise(object) ).toBe false
+
+    it "should return false when object is undefined", ->
+      expect( @hoodie.isPromise(undefined) ).toBe false
+  # /#isPromise()
 # /Hoodie

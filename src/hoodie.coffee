@@ -70,7 +70,7 @@ class Hoodie extends Events
   # ## Utils
   
   isPromise: (obj) ->
-    typeof obj.done is 'function' and typeof obj.resolve is 'undefined'
+    typeof obj?.done is 'function' and typeof obj.resolve is 'undefined'
   
 
   # ## Private

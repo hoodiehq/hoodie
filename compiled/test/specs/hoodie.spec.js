@@ -5,7 +5,7 @@ describe("Hoodie", function() {
     this.hoodie = new Hoodie('http://couch.example.com');
     return spyOn($, "ajax").andReturn($.Deferred());
   });
-  describe("new", function() {
+  describe("constructor", function() {
     it("should store the CouchDB URL", function() {
       var hoodie;
       hoodie = new Hoodie('http://couch.example.com');
@@ -65,7 +65,7 @@ describe("Hoodie", function() {
       });
     });
   });
-  return describe("open(store, options)", function() {
+  describe("open(store, options)", function() {
     return it("should instantiate a RemoteStore instance", function() {
       spyOn(Hoodie, "RemoteStore");
       this.hoodie.open("store_name", {
@@ -75,6 +75,21 @@ describe("Hoodie", function() {
         basePath: "/store_name",
         option: "value"
       });
+    });
+  });
+  return describe("#isPromise(object)", function() {
+    it("should return true if object is a promise", function() {
+      var object;
+      object = $.Deferred().promise();
+      return expect(this.hoodie.isPromise(object)).toBe(true);
+    });
+    it("should return false for deferred objects", function() {
+      var object;
+      object = $.Deferred();
+      return expect(this.hoodie.isPromise(object)).toBe(false);
+    });
+    return it("should return false when object is undefined", function() {
+      return expect(this.hoodie.isPromise(void 0)).toBe(false);
     });
   });
 });
