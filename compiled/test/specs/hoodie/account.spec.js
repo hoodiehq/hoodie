@@ -132,7 +132,7 @@ describe("Hoodie.Account", function() {
             spyOn(this.hoodie.my.config, "set");
             this.response = {
               userCtx: {
-                name: "joe@example.com",
+                name: "user/joe@example.com",
                 roles: ["user_hash", "confirmed"]
               }
             };
@@ -202,10 +202,10 @@ describe("Hoodie.Account", function() {
       _ref = this.hoodie.request.mostRecentCall.args, this.type = _ref[0], this.path = _ref[1], this.options = _ref[2];
       return this.data = JSON.parse(this.options.data);
     });
-    it("should send a PUT request to http://my.cou.ch/_users/org.couchdb.user%3Ajoe%40example.com", function() {
+    it("should send a PUT request to http://my.cou.ch/_users/org.couchdb.user%3Auser%2Fjoe%40example.com", function() {
       expect(this.hoodie.request).wasCalled();
       expect(this.type).toBe('PUT');
-      return expect(this.path).toBe('/_users/org.couchdb.user%3Ajoe%40example.com');
+      return expect(this.path).toBe('/_users/org.couchdb.user%3Auser%2Fjoe%40example.com');
     });
     it("should set contentType to 'application/json'", function() {
       return expect(this.options.contentType).toBe('application/json');
@@ -214,10 +214,10 @@ describe("Hoodie.Account", function() {
       return expect(typeof this.options.data).toBe('string');
     });
     it("should have set _id to 'org.couchdb.user:joe@example.com'", function() {
-      return expect(this.data._id).toBe('org.couchdb.user:joe@example.com');
+      return expect(this.data._id).toBe('org.couchdb.user:user/joe@example.com');
     });
     it("should have set name to 'joe@example.com", function() {
-      return expect(this.data.name).toBe('joe@example.com');
+      return expect(this.data.name).toBe('user/joe@example.com');
     });
     it("should have set type to 'user", function() {
       return expect(this.data.type).toBe('user');
@@ -280,15 +280,15 @@ describe("Hoodie.Account", function() {
     return _when("signUp has an error", function() {
       beforeEach(function() {
         return this.requestDefer.reject({
-          responseText: '{"error":"forbidden","reason":"Username may not start with underscore."}'
+          responseText: '{"error":"forbidden","reason":"You stink."}'
         });
       });
       return it("should reject its promise", function() {
         var promise;
-        promise = this.account.signUp('_joe@example.com', 'secret');
+        promise = this.account.signUp('notmyfault@example.com', 'secret');
         return expect(promise).toBeRejectedWith({
           error: 'forbidden',
-          reason: 'Username may not start with underscore.'
+          reason: 'You stink.'
         });
       });
     });
@@ -301,9 +301,9 @@ describe("Hoodie.Account", function() {
       spyOn(this.hoodie.my.config, "set");
       return this.account.owner = "owner_hash123";
     });
-    it("should sign up with username = 'anonymous/ownerHash' and the random password", function() {
+    it("should sign up with username = 'anonymous_user/ownerHash' and the random password", function() {
       this.account.anonymousSignUp();
-      return expect(this.account.signUp).wasCalledWith('anonymous/owner_hash123', 'crazyuuid123');
+      return expect(this.account.signUp).wasCalledWith('owner_hash123', 'crazyuuid123');
     });
     return _when("signUp successful", function() {
       beforeEach(function() {
@@ -328,7 +328,7 @@ describe("Hoodie.Account", function() {
       return expect(this.path).toBe('/_session');
     });
     it("should send username as name parameter", function() {
-      return expect(this.options.data.name).toBe('joe@example.com');
+      return expect(this.options.data.name).toBe('user/joe@example.com');
     });
     it("should send password", function() {
       return expect(this.options.data.password).toBe('secret');
@@ -345,7 +345,7 @@ describe("Hoodie.Account", function() {
         beforeEach(function() {
           this.response = {
             "ok": true,
-            "name": "joe@example.com",
+            "name": "user/joe@example.com",
             "roles": ["user_hash", "confirmed"]
           };
           this.requestDefer.resolve(this.response);
@@ -378,7 +378,7 @@ describe("Hoodie.Account", function() {
         beforeEach(function() {
           this.response = {
             "ok": true,
-            "name": "joe@example.com",
+            "name": "user/joe@example.com",
             "roles": []
           };
           return this.requestDefer.resolve(this.response);
@@ -397,7 +397,7 @@ describe("Hoodie.Account", function() {
           var _this = this;
           this.response = {
             "ok": true,
-            "name": "joe@example.com",
+            "name": "user/joe@example.com",
             "roles": ['error']
           };
           this.requestDefer.resolve(this.response);
@@ -425,8 +425,8 @@ describe("Hoodie.Account", function() {
       var _ref;
       this.account.username = 'joe@example.com';
       this.account._doc = {
-        _id: 'org.couchdb.user:joe@example.com',
-        name: 'joe@example.com',
+        _id: 'org.couchdb.user:user/joe@example.com',
+        name: 'user/joe@example.com',
         type: 'user',
         roles: [],
         salt: 'absalt',
@@ -436,10 +436,10 @@ describe("Hoodie.Account", function() {
       _ref = this.hoodie.request.mostRecentCall.args, this.type = _ref[0], this.path = _ref[1], this.options = _ref[2];
       return this.data = JSON.parse(this.options.data);
     });
-    it("should send a PUT request to http://my.cou.ch/_users/org.couchdb.user%3Ajoe%40example.com", function() {
+    it("should send a PUT request to http://my.cou.ch/_users/org.couchdb.user%3Auser%2Fjoe%40example.com", function() {
       expect(this.hoodie.request).wasCalled();
       expect(this.type).toBe('PUT');
-      return expect(this.path).toBe('/_users/org.couchdb.user%3Ajoe%40example.com');
+      return expect(this.path).toBe('/_users/org.couchdb.user%3Auser%2Fjoe%40example.com');
     });
     it("should set contentType to 'application/json'", function() {
       return expect(this.options.contentType).toBe('application/json');
@@ -447,11 +447,11 @@ describe("Hoodie.Account", function() {
     it("should stringify the data", function() {
       return expect(typeof this.options.data).toBe('string');
     });
-    it("should have set _id to 'org.couchdb.user:joe@example.com'", function() {
-      return expect(this.data._id).toBe('org.couchdb.user:joe@example.com');
+    it("should have set _id to 'org.couchdb.user:user/joe@example.com'", function() {
+      return expect(this.data._id).toBe('org.couchdb.user:user/joe@example.com');
     });
-    it("should have set name to 'joe@example.com", function() {
-      return expect(this.data.name).toBe('joe@example.com');
+    it("should have set name to 'user/joe@example.com", function() {
+      return expect(this.data.name).toBe('user/joe@example.com');
     });
     it("should have set type to 'user", function() {
       return expect(this.data.type).toBe('user');
@@ -478,7 +478,7 @@ describe("Hoodie.Account", function() {
         spyOn(this.account, "signIn").andReturn(this.signInDefer.promise());
         return this.requestDefer.resolve({
           "ok": true,
-          "id": "org.couchdb.user:bizbiz",
+          "id": "org.couchdb.user:user/bizbiz",
           "rev": "2-345"
         });
       });
@@ -539,7 +539,7 @@ describe("Hoodie.Account", function() {
       beforeEach(function() {
         this.requestDefer.resolve();
         spyOn(this.hoodie.my.config, "clear");
-        return this.account.signOut('joe@example.com', 'secret');
+        return this.account.signOut();
       });
       it("should trigger `account:signout` event", function() {
         return expect(this.hoodie.trigger).wasCalledWith('account:signout');
@@ -619,10 +619,10 @@ describe("Hoodie.Account", function() {
         this.account.fetch();
         return _ref = this.hoodie.request.mostRecentCall.args, this.type = _ref[0], this.path = _ref[1], this.options = _ref[2], _ref;
       });
-      it("should send a GET request to http://my.cou.ch/_users/org.couchdb.user%3Ajoe%40example.com", function() {
+      it("should send a GET request to http://my.cou.ch/_users/org.couchdb.user%3Auser%2Fjoe%40example.com", function() {
         expect(this.hoodie.request).wasCalled();
         expect(this.type).toBe('GET');
-        return expect(this.path).toBe('/_users/org.couchdb.user%3Ajoe%40example.com');
+        return expect(this.path).toBe('/_users/org.couchdb.user%3Auser%2Fjoe%40example.com');
       });
       return _when("successful", function() {
         beforeEach(function() {
@@ -662,9 +662,9 @@ describe("Hoodie.Account", function() {
       this.account.destroy();
       return expect(this.account.fetch).wasCalled();
     });
-    return it("should send a PUT request to /_users/org.couchdb.user%3Ajoe%40example.com", function() {
+    return it("should send a PUT request to /_users/org.couchdb.user%3Auser%2Fjoe%40example.com", function() {
       this.account.destroy();
-      return expect(this.hoodie.request).wasCalledWith('PUT', '/_users/org.couchdb.user%3Ajoe%40example.com', {
+      return expect(this.hoodie.request).wasCalledWith('PUT', '/_users/org.couchdb.user%3Auser%2Fjoe%40example.com', {
         data: JSON.stringify({
           _rev: '1-234',
           _deleted: true

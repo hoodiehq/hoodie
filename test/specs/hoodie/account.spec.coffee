@@ -119,7 +119,7 @@ describe "Hoodie.Account", ->
           beforeEach ->
             spyOn(@hoodie.my.config, "set")
             @response = userCtx:
-                          name: "joe@example.com",
+                          name: "user/joe@example.com",
                           roles: [ "user_hash", "confirmed" ]
             @requestDefer.resolve @response
             @promise = @account.authenticate()
@@ -173,10 +173,10 @@ describe "Hoodie.Account", ->
       [@type, @path, @options] = @hoodie.request.mostRecentCall.args
       @data = JSON.parse @options.data
   
-    it "should send a PUT request to http://my.cou.ch/_users/org.couchdb.user%3Ajoe%40example.com", ->
+    it "should send a PUT request to http://my.cou.ch/_users/org.couchdb.user%3Auser%2Fjoe%40example.com", ->
       expect(@hoodie.request).wasCalled()
       expect(@type).toBe 'PUT'
-      expect(@path).toBe  '/_users/org.couchdb.user%3Ajoe%40example.com'
+      expect(@path).toBe  '/_users/org.couchdb.user%3Auser%2Fjoe%40example.com'
       
     it "should set contentType to 'application/json'", ->
       expect(@options.contentType).toBe 'application/json'
@@ -185,10 +185,10 @@ describe "Hoodie.Account", ->
       expect(typeof @options.data).toBe 'string'
   
     it "should have set _id to 'org.couchdb.user:joe@example.com'", ->
-      expect(@data._id).toBe 'org.couchdb.user:joe@example.com'
+      expect(@data._id).toBe 'org.couchdb.user:user/joe@example.com'
     
     it "should have set name to 'joe@example.com", ->
-      expect(@data.name).toBe 'joe@example.com'
+      expect(@data.name).toBe 'user/joe@example.com'
       
     it "should have set type to 'user", ->
       expect(@data.type).toBe 'user'
@@ -239,13 +239,13 @@ describe "Hoodie.Account", ->
         
     _when "signUp has an error", ->
       beforeEach ->
-        @requestDefer.reject responseText: '{"error":"forbidden","reason":"Username may not start with underscore."}'
+        @requestDefer.reject responseText: '{"error":"forbidden","reason":"You stink."}'
       
       it "should reject its promise", ->
-        promise = @account.signUp('_joe@example.com', 'secret')
+        promise = @account.signUp('notmyfault@example.com', 'secret')
         expect(promise).toBeRejectedWith 
           error  : 'forbidden'
-          reason : 'Username may not start with underscore.'
+          reason : 'You stink.'
   # /.signUp(username, password)
 
   
@@ -257,9 +257,9 @@ describe "Hoodie.Account", ->
       spyOn(@hoodie.my.config, "set")
       @account.owner = "owner_hash123"
        
-    it "should sign up with username = 'anonymous/ownerHash' and the random password", ->
+    it "should sign up with username = 'anonymous_user/ownerHash' and the random password", ->
       @account.anonymousSignUp()
-      expect(@account.signUp).wasCalledWith 'anonymous/owner_hash123', 'crazyuuid123'
+      expect(@account.signUp).wasCalledWith 'owner_hash123', 'crazyuuid123'
 
     _when "signUp successful", ->
       beforeEach ->
@@ -284,7 +284,7 @@ describe "Hoodie.Account", ->
       expect(@path).toBe  '/_session'
     
     it "should send username as name parameter", ->
-      expect(@options.data.name).toBe 'joe@example.com'
+      expect(@options.data.name).toBe 'user/joe@example.com'
   
     it "should send password", ->
       expect(@options.data.password).toBe 'secret'
@@ -298,7 +298,7 @@ describe "Hoodie.Account", ->
     _when "signIn successful", ->
       _and "account is confirmed", ->
         beforeEach ->
-          @response = {"ok":true,"name":"joe@example.com","roles":["user_hash","confirmed"]}
+          @response = {"ok":true,"name":"user/joe@example.com","roles":["user_hash","confirmed"]}
           @requestDefer.resolve @response
           spyOn(@hoodie.my.config, "set")
         
@@ -326,7 +326,7 @@ describe "Hoodie.Account", ->
 
       _and "account not (yet) confirmed", ->
         beforeEach ->
-          @response = {"ok":true,"name":"joe@example.com","roles":[]}
+          @response = {"ok":true,"name":"user/joe@example.com","roles":[]}
           @requestDefer.resolve @response
 
         it "should reject with unconfirmed error.", ->
@@ -335,7 +335,7 @@ describe "Hoodie.Account", ->
 
       _and "account has an error", ->
         beforeEach ->
-          @response = {"ok":true,"name":"joe@example.com","roles":['error']}
+          @response = {"ok":true,"name":"user/joe@example.com","roles":['error']}
           @requestDefer.resolve @response 
           spyOn(@account, "fetch").andCallFake =>
             @account._doc.$error = 'because you stink!'
@@ -357,8 +357,8 @@ describe "Hoodie.Account", ->
     beforeEach ->
       @account.username = 'joe@example.com'
       @account._doc  = 
-        _id          : 'org.couchdb.user:joe@example.com'
-        name         : 'joe@example.com'
+        _id          : 'org.couchdb.user:user/joe@example.com'
+        name         : 'user/joe@example.com'
         type         : 'user'
         roles        : []
         salt         : 'absalt'
@@ -369,10 +369,10 @@ describe "Hoodie.Account", ->
       [@type, @path, @options] = @hoodie.request.mostRecentCall.args
       @data = JSON.parse @options.data
   
-    it "should send a PUT request to http://my.cou.ch/_users/org.couchdb.user%3Ajoe%40example.com", ->
+    it "should send a PUT request to http://my.cou.ch/_users/org.couchdb.user%3Auser%2Fjoe%40example.com", ->
       expect(@hoodie.request).wasCalled()
       expect(@type).toBe 'PUT'
-      expect(@path).toBe  '/_users/org.couchdb.user%3Ajoe%40example.com'
+      expect(@path).toBe  '/_users/org.couchdb.user%3Auser%2Fjoe%40example.com'
       
     it "should set contentType to 'application/json'", ->
       expect(@options.contentType).toBe 'application/json'
@@ -380,11 +380,11 @@ describe "Hoodie.Account", ->
     it "should stringify the data", ->
       expect(typeof @options.data).toBe 'string'
   
-    it "should have set _id to 'org.couchdb.user:joe@example.com'", ->
-      expect(@data._id).toBe 'org.couchdb.user:joe@example.com'
+    it "should have set _id to 'org.couchdb.user:user/joe@example.com'", ->
+      expect(@data._id).toBe 'org.couchdb.user:user/joe@example.com'
     
-    it "should have set name to 'joe@example.com", ->
-      expect(@data.name).toBe 'joe@example.com'
+    it "should have set name to 'user/joe@example.com", ->
+      expect(@data.name).toBe 'user/joe@example.com'
       
     it "should have set type to 'user", ->
       expect(@data.type).toBe 'user'
@@ -408,7 +408,7 @@ describe "Hoodie.Account", ->
       beforeEach ->
         @signInDefer = @hoodie.defer()
         spyOn(@account, "signIn").andReturn @signInDefer.promise()
-        @requestDefer.resolve {"ok":true,"id":"org.couchdb.user:bizbiz","rev":"2-345"}
+        @requestDefer.resolve {"ok":true,"id":"org.couchdb.user:user/bizbiz","rev":"2-345"}
 
       it "should sign in", ->
         @account.changePassword('currentSecret', 'newSecret')
@@ -458,7 +458,7 @@ describe "Hoodie.Account", ->
       beforeEach ->
         @requestDefer.resolve()
         spyOn(@hoodie.my.config, "clear")
-        @account.signOut('joe@example.com', 'secret')
+        @account.signOut()
         
       it "should trigger `account:signout` event", ->
         expect(@hoodie.trigger).wasCalledWith 'account:signout'
@@ -531,10 +531,10 @@ describe "Hoodie.Account", ->
         @account.fetch()
         [@type, @path, @options] = @hoodie.request.mostRecentCall.args
       
-      it "should send a GET request to http://my.cou.ch/_users/org.couchdb.user%3Ajoe%40example.com", ->
+      it "should send a GET request to http://my.cou.ch/_users/org.couchdb.user%3Auser%2Fjoe%40example.com", ->
         expect(@hoodie.request).wasCalled()
         expect(@type).toBe 'GET'
-        expect(@path).toBe  '/_users/org.couchdb.user%3Ajoe%40example.com'
+        expect(@path).toBe  '/_users/org.couchdb.user%3Auser%2Fjoe%40example.com'
       
       _when "successful", ->
         beforeEach ->
@@ -561,9 +561,9 @@ describe "Hoodie.Account", ->
       @account.destroy()
       expect(@account.fetch).wasCalled()
     
-    it "should send a PUT request to /_users/org.couchdb.user%3Ajoe%40example.com", ->
+    it "should send a PUT request to /_users/org.couchdb.user%3Auser%2Fjoe%40example.com", ->
       @account.destroy()
-      expect(@hoodie.request).wasCalledWith 'PUT', '/_users/org.couchdb.user%3Ajoe%40example.com'
+      expect(@hoodie.request).wasCalledWith 'PUT', '/_users/org.couchdb.user%3Auser%2Fjoe%40example.com'
         data : JSON.stringify
           _rev     : '1-234'
           _deleted : true

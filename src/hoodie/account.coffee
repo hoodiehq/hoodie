@@ -64,12 +64,12 @@ class Hoodie.Account
     if @hasAnonymousAccount()
       return @_upgradeAnonymousAccount username, password
 
-    key  = "#{@_prefix}:#{username}"
+    key  = "#{@_prefix}:#{@_userKeyPrefix()}/#{username}"
 
     options =
       data        : JSON.stringify
         _id        : key
-        name       : username
+        name       : "#{@_userKeyPrefix()}/#{username}"
         type       : 'user'
         roles      : []
         password   : password
@@ -94,7 +94,7 @@ class Hoodie.Account
   #
   anonymousSignUp: ->
     password = @hoodie.my.store.uuid(10)
-    username = "anonymous/#{@owner}"
+    username = @owner
 
     @signUp(username, password)
     .fail(@_handleRequestError)
@@ -119,7 +119,7 @@ class Hoodie.Account
   #
   signIn : (username, password = '') ->
     options = data: 
-                name      : username
+                name      : "#{@_userKeyPrefix()}/#{username}"
                 password  : password
 
     @hoodie.request('POST', '/_session', options)
@@ -165,7 +165,7 @@ class Hoodie.Account
     unless username
       return @hoodie.defer().reject(error: "unauthenticated", reason: "not logged in").promise()
     
-    key = "#{@_prefix}:#{username}"
+    key = "#{@_prefix}:#{@_userKeyPrefix()}/#{username}"
     @hoodie.request('GET', "/_users/#{encodeURIComponent key}")
     .pipe(null, @_handleRequestError)
     .done (response) -> response = @_doc
@@ -182,7 +182,7 @@ class Hoodie.Account
     unless @username
       return @hoodie.defer().reject(error: "unauthenticated", reason: "not logged in").promise()
     
-    key  = "#{@_prefix}:#{@username}"
+    key  = "#{@_prefix}:#{@_userKeyPrefix()}/#{@username}"
     data = $.extend {}, @_doc
     data.password = newPassword
     delete data.salt
@@ -273,7 +273,7 @@ class Hoodie.Account
 
     if response.userCtx.name
       @_authenticated = true
-      @_setUsername response.userCtx.name
+      @_setUsername response.userCtx.name.replace(/^(anonymous_)?user\//, '')
       @_setOwner    response.userCtx.roles[0]
       defer.resolve @username
 
@@ -342,7 +342,8 @@ class Hoodie.Account
   #     }
   #
   _handleSignInSuccess : (response) =>
-    defer = @hoodie.defer()
+    defer    = @hoodie.defer()
+    username = response.name.replace(/^(anonymous_)?user\//, '')
 
     # if an error occured, the userDB worker stores it to the $error attribute
     # and adds the "error" role to the users doc object. If the user has the
@@ -350,7 +351,7 @@ class Hoodie.Account
     # is, before we can reject the promise.
     #
     if ~response.roles.indexOf("error")
-      @fetch(response.name)
+      @fetch(username)
       .fail(defer.reject)
       .done =>
         defer.reject error: "error", reason: @_doc.$error
@@ -365,7 +366,7 @@ class Hoodie.Account
       return defer.reject error: "unconfirmed", reason: "account has not been confirmed yet"
     
     @_authenticated = true
-    @_setUsername response.name
+    @_setUsername username
     @_setOwner    response.roles[0]
     @hoodie.trigger 'account:signin', @username
 
@@ -490,8 +491,17 @@ class Hoodie.Account
   #
   _handleDestroySucces : =>
     @hoodie.my.remote.disconnect()
-    key = "#{@_prefix}:#{@username}"
+    key = "#{@_prefix}:#{@_userKeyPrefix()}/#{@username}"
     @_doc._deleted = true
     @hoodie.request 'PUT', "/_users/#{encodeURIComponent key}",
       data        : JSON.stringify @_doc
       contentType : 'application/json'
+
+  #
+  #
+  #
+  _userKeyPrefix : ->
+    if @hasAnonymousAccount() 
+      'anonymous_user'
+    else
+      'user'
