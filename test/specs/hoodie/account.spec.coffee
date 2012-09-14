@@ -568,6 +568,18 @@ describe "Hoodie.Account", ->
           _rev     : '1-234'
           _deleted : true
         contentType : 'application/json' 
+
+    _when "destroy request succesful", ->
+      beforeEach ->
+        @hoodie.request.andReturn @hoodie.defer().resolve().promise()
+
+      it "should unset @username", ->
+        @account.destroy()
+        expect(@account.username).toBeUndefined() 
+
+      it "should unset @owner", ->
+        @account.destroy()
+        expect(@account.owner).toBeUndefined()
   # /destroy()
 
   describe ".resetPassword(username)", ->

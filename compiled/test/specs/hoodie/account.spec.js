@@ -662,7 +662,7 @@ describe("Hoodie.Account", function() {
       this.account.destroy();
       return expect(this.account.fetch).wasCalled();
     });
-    return it("should send a PUT request to /_users/org.couchdb.user%3Auser%2Fjoe%40example.com", function() {
+    it("should send a PUT request to /_users/org.couchdb.user%3Auser%2Fjoe%40example.com", function() {
       this.account.destroy();
       return expect(this.hoodie.request).wasCalledWith('PUT', '/_users/org.couchdb.user%3Auser%2Fjoe%40example.com', {
         data: JSON.stringify({
@@ -670,6 +670,19 @@ describe("Hoodie.Account", function() {
           _deleted: true
         }),
         contentType: 'application/json'
+      });
+    });
+    return _when("destroy request succesful", function() {
+      beforeEach(function() {
+        return this.hoodie.request.andReturn(this.hoodie.defer().resolve().promise());
+      });
+      it("should unset @username", function() {
+        this.account.destroy();
+        return expect(this.account.username).toBeUndefined();
+      });
+      return it("should unset @owner", function() {
+        this.account.destroy();
+        return expect(this.account.owner).toBeUndefined();
       });
     });
   });

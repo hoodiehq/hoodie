@@ -64,11 +64,9 @@ class Hoodie.Account
     if @hasAnonymousAccount()
       return @_upgradeAnonymousAccount username, password
 
-    key  = "#{@_prefix}:#{@_userKeyPrefix()}/#{username}"
-
     options =
       data        : JSON.stringify
-        _id        : key
+        _id        : @_key(username)
         name       : "#{@_userKeyPrefix()}/#{username}"
         type       : 'user'
         roles      : []
@@ -77,7 +75,7 @@ class Hoodie.Account
         database   : @db()
       contentType : 'application/json'
 
-    @hoodie.request('PUT', "/_users/#{encodeURIComponent key}", options)
+    @hoodie.request('PUT', @_url(username), options)
     .pipe @_handleSignUpSucces(username, password), @_handleRequestError
 
   
@@ -165,8 +163,7 @@ class Hoodie.Account
     unless username
       return @hoodie.defer().reject(error: "unauthenticated", reason: "not logged in").promise()
     
-    key = "#{@_prefix}:#{@_userKeyPrefix()}/#{username}"
-    @hoodie.request('GET', "/_users/#{encodeURIComponent key}")
+    @hoodie.request('GET', @_url(username))
     .pipe(null, @_handleRequestError)
     .done (response) -> response = @_doc
     
@@ -182,7 +179,6 @@ class Hoodie.Account
     unless @username
       return @hoodie.defer().reject(error: "unauthenticated", reason: "not logged in").promise()
     
-    key  = "#{@_prefix}:#{@_userKeyPrefix()}/#{@username}"
     data = $.extend {}, @_doc
     data.password = newPassword
     delete data.salt
@@ -192,7 +188,7 @@ class Hoodie.Account
       contentType : "application/json"
 
     @hoodie.my.remote.disconnect()
-    @hoodie.request('PUT',  "/_users/#{encodeURIComponent key}", options)
+    @hoodie.request('PUT',  @_url(), options)
     .pipe( @_handleChangePasswordSuccess(newPassword), @_handleRequestError )
 
 
@@ -249,7 +245,9 @@ class Hoodie.Account
 
   # destroys a user' account  
   destroy : ->
-    @fetch().pipe @_handleDestroySucces, @_handleRequestError
+    @fetch()
+    .pipe(@_handleFetchBeforeDestroySucces, @_handleRequestError)
+    .pipe(@_handleDestroySucces)
 
 
   # PRIVATE
@@ -458,7 +456,6 @@ class Hoodie.Account
     @authenticate().pipe =>
 
       # prepare updated _users doc
-      key = "#{@_prefix}:#{@username}"
       data = $.extend {}, @_doc
       data.$newUsername = newUsername
 
@@ -472,7 +469,7 @@ class Hoodie.Account
         data        : JSON.stringify data
         contentType : 'application/json'
 
-      @hoodie.request('PUT', "/_users/#{encodeURIComponent key}", options)
+      @hoodie.request('PUT', @_url(), options)
       .pipe =>
         @hoodie.my.remote.disconnect()
         @_delayedSignIn newUsername, newPassword or currentPassword
@@ -489,13 +486,20 @@ class Hoodie.Account
   #
   #
   #
-  _handleDestroySucces : =>
+  _handleFetchBeforeDestroySucces : =>
     @hoodie.my.remote.disconnect()
-    key = "#{@_prefix}:#{@_userKeyPrefix()}/#{@username}"
     @_doc._deleted = true
-    @hoodie.request 'PUT', "/_users/#{encodeURIComponent key}",
+    @hoodie.request 'PUT', @_url(),
       data        : JSON.stringify @_doc
       contentType : 'application/json'
+
+  #
+  #
+  #
+  _handleDestroySucces : =>
+    delete @username
+    delete @owner
+    delete @_authenticated
 
   #
   #
@@ -505,3 +509,11 @@ class Hoodie.Account
       'anonymous_user'
     else
       'user'
+
+  #
+  _key : (username = @username) ->
+    "#{@_prefix}:#{@_userKeyPrefix()}/#{username}"
+
+  #
+  _url : (username = @username) ->
+    "/_users/#{encodeURIComponent @_key(username)}"
