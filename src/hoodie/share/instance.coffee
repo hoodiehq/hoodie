@@ -117,7 +117,7 @@ class Hoodie.Share.Instance extends Hoodie.RemoteStore
   # share.add(todoObject)
   # share.add([todoObject1, todoObject2, todoObject3])
   # share.add( hoodie.my.store.findAll (obj) -> obj.isShared )
-  add: (objects) ->
+  add : (objects) ->
     @toggle objects, true
     
       
@@ -132,7 +132,7 @@ class Hoodie.Share.Instance extends Hoodie.RemoteStore
   # share.remove(todoObject)
   # share.remove([todoObject1, todoObject2, todoObject3])
   # share.remove( hoodie.my.store.findAll (obj) -> obj.isShared )
-  remove: (objects) -> 
+  remove : (objects) -> 
     @toggle objects, false
   
   
@@ -140,7 +140,7 @@ class Hoodie.Share.Instance extends Hoodie.RemoteStore
   # --------
 
   # add or remove, depending on passed flag or current state
-  toggle: (objects, doAdd) ->
+  toggle : (objects, doAdd) ->
     
     # normalize input
     unless @hoodie.isPromise(objects) or $.isArray(objects)
@@ -163,7 +163,7 @@ class Hoodie.Share.Instance extends Hoodie.RemoteStore
   # 2. combine these with the docs that have been removed from the share
   # 3. sync all these with share's remote
   #
-  sync: =>
+  sync : =>
     @save()
     .pipe @hoodie.my.store.findAll(@_isMySharedObjectAndChanged)
     .pipe (sharedObjectsThatChanged) =>
@@ -188,7 +188,7 @@ class Hoodie.Share.Instance extends Hoodie.RemoteStore
   #
   # returns a hash update to update the passed object
   # so that it gets added to the share
-  _add: (obj) => 
+  _add : (obj) => 
     obj.$shares or= {}
     obj.$shares[@id] = true
 
@@ -222,15 +222,15 @@ class Hoodie.Share.Instance extends Hoodie.RemoteStore
       @_remove(obj)
 
   # all objects which $shares hash has share.id as key
-  _isMySharedObject: (obj) =>
+  _isMySharedObject : (obj) =>
     obj.$shares?[@id]?
   
   # an object belongs to Share if it has the same id (its the actual share object)
   # or its $shares hash has share.id as key
-  _isMySharedObjectAndChanged: (obj) =>
+  _isMySharedObjectAndChanged : (obj) =>
     belongsToMe = obj.id is @id or obj.$shares?[@id]?
     return belongsToMe and @hoodie.my.store.isDirty(obj.type, obj.id)
 
   #
-  _handleRemoteChanges: ->
+  _handleRemoteChanges : ->
     console.log '_handleRemoteChanges', arguments...
