@@ -271,8 +271,8 @@ describe "Hoodie.Store", ->
 
 
   describe ".destroyAll(type)", ->
-    it "should return a defer", ->
-      expect(@store.destroyAll()).toBeDefer()
+    it "should return a promise", ->
+      expect(@store.destroyAll()).toBePromise()
   
     describe "aliases", ->
       it "should allow to use .destroyAll", ->

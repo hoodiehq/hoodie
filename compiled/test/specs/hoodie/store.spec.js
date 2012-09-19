@@ -401,8 +401,8 @@ describe("Hoodie.Store", function() {
     });
   });
   describe(".destroyAll(type)", function() {
-    it("should return a defer", function() {
-      return expect(this.store.destroyAll()).toBeDefer();
+    it("should return a promise", function() {
+      return expect(this.store.destroyAll()).toBePromise();
     });
     return describe("aliases", function() {
       return it("should allow to use .destroyAll", function() {
