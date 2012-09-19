@@ -2035,20 +2035,6 @@ Hoodie.Share.Instance = (function(_super) {
 
   Instance.prototype.add = function(objects, sharedAttributes) {
     return this.toggle(objects, sharedAttributes || true);
-    /*
-        filter = sharedAttributes or true
-    
-        # normalize input
-        unless @hoodie.isPromise(objects) or $.isArray(objects)
-          objects = [objects]
-    
-        @hoodie.my.store.updateAll objects, (obj) => 
-          obj.$shares or= {}
-          obj.$shares[@id] = filter
-    
-          $shares: obj.$shares
-    */
-
   };
 
   Instance.prototype.remove = function(objects) {
@@ -2062,12 +2048,12 @@ Hoodie.Share.Instance = (function(_super) {
     }
     updateMethod = (function() {
       switch (filter) {
-        case true:
-          return this._add(filter);
+        case void 0:
+          return this._toggle;
         case false:
           return this._remove;
         default:
-          return this._toggle;
+          return this._add(filter);
       }
     }).call(this);
     return this.hoodie.my.store.updateAll(objects, updateMethod);
