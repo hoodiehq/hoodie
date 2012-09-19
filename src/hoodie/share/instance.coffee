@@ -193,7 +193,7 @@ class Hoodie.Share.Instance extends Hoodie.RemoteStore
     obj.$shares or= {}
     obj.$shares[@id] = true
 
-    $shares: obj.$shares[@id]
+    $shares: obj.$shares
 
   
   # _remove
