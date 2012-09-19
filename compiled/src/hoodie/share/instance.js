@@ -21,6 +21,8 @@ Hoodie.Share.Instance = (function(_super) {
 
     this._remove = __bind(this._remove, this);
 
+    this._add = __bind(this._add, this);
+
     this.destroy = __bind(this.destroy, this);
 
     this.sync = __bind(this.sync, this);
@@ -82,32 +84,36 @@ Hoodie.Share.Instance = (function(_super) {
   };
 
   Instance.prototype.add = function(objects, sharedAttributes) {
-    var filter,
-      _this = this;
-    filter = sharedAttributes || true;
-    if (!(this.hoodie.isPromise(objects) || $.isArray(objects))) {
-      objects = [objects];
-    }
-    return this.hoodie.my.store.updateAll(objects, function(obj) {
-      obj.$shares || (obj.$shares = {});
-      obj.$shares[_this.id] = filter;
-      return {
-        $shares: obj.$shares
-      };
-    });
+    return this.toggle(objects, sharedAttributes || true);
+    /*
+        filter = sharedAttributes or true
+    
+        # normalize input
+        unless @hoodie.isPromise(objects) or $.isArray(objects)
+          objects = [objects]
+    
+        @hoodie.my.store.updateAll objects, (obj) => 
+          obj.$shares or= {}
+          obj.$shares[@id] = filter
+    
+          $shares: obj.$shares
+    */
+
   };
 
   Instance.prototype.remove = function(objects) {
     return this.toggle(objects, false);
   };
 
-  Instance.prototype.toggle = function(objects, doAdd) {
+  Instance.prototype.toggle = function(objects, filter) {
     var updateMethod;
     if (!(this.hoodie.isPromise(objects) || $.isArray(objects))) {
       objects = [objects];
     }
     updateMethod = (function() {
-      switch (doAdd) {
+      switch (filter) {
+        case true:
+          return this._add(filter);
         case false:
           return this._remove;
         default:
@@ -129,6 +135,17 @@ Hoodie.Share.Instance = (function(_super) {
     return this.remove(this.hoodie.my.store.findAll(this._isMySharedObject)).then(function() {
       return _this.hoodie.my.store.destroy("$share", _this.id);
     });
+  };
+
+  Instance.prototype._add = function(filter) {
+    var _this = this;
+    return function(obj) {
+      obj.$shares || (obj.$shares = {});
+      obj.$shares[_this.id] = filter;
+      return {
+        $shares: obj.$shares
+      };
+    };
   };
 
   Instance.prototype._remove = function(obj) {
