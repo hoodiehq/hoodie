@@ -285,7 +285,7 @@ Hoodie.RemoteStore = (function(_super) {
     try {
       _ref = attributes._rev.split(/-/), currentRevNr = _ref[0], currentRevId = _ref[1];
     } catch (_error) {}
-    currentRevNr = parseInt(currentRevNr) || 0;
+    currentRevNr = parseInt(currentRevNr, 10) || 0;
     newRevisionId = this._generateNewRevisionId();
     attributes._rev = "" + (currentRevNr + 1) + "-" + newRevisionId;
     attributes._revisions = {

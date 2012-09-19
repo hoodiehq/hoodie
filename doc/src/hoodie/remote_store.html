@@ -390,7 +390,8 @@
 
     <span class="nv">timestamp   = </span><span class="nb">Date</span><span class="p">.</span><span class="nx">now</span><span class="p">()</span> <span class="o">+</span> <span class="nx">@_timezoneOffset</span>
     <span class="nv">uuid        = </span><span class="nx">@hoodie</span><span class="p">.</span><span class="nx">my</span><span class="p">.</span><span class="nx">store</span><span class="p">.</span><span class="nx">uuid</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span>
-    <span class="s2">&quot;#{uuid}##{timestamp}&quot;</span>
+
+    <span class="k">return</span> <span class="s2">&quot;#{uuid}##{timestamp}&quot;</span>
   
 
   <span class="c1"># ### and new revion to objecet</span>
@@ -400,9 +401,9 @@
   <span class="nv">_addRevisionTo : </span><span class="nf">(attributes) -&gt;</span>
 
     <span class="k">try</span> <span class="p">[</span><span class="nx">currentRevNr</span><span class="p">,</span> <span class="nx">currentRevId</span><span class="p">]</span> <span class="o">=</span> <span class="nx">attributes</span><span class="p">.</span><span class="nx">_rev</span><span class="p">.</span><span class="nx">split</span> <span class="sr">/-/</span>
-    <span class="nv">currentRevNr = </span><span class="nb">parseInt</span><span class="p">(</span><span class="nx">currentRevNr</span><span class="p">)</span> <span class="o">or</span> <span class="mi">0</span>
+    <span class="nv">currentRevNr = </span><span class="nb">parseInt</span><span class="p">(</span><span class="nx">currentRevNr</span><span class="p">,</span> <span class="mi">10</span><span class="p">)</span> <span class="o">or</span> <span class="mi">0</span>
 
-    <span class="nv">newRevisionId       = </span><span class="nx">@_generateNewRevisionId</span><span class="p">()</span>
+    <span class="nv">newRevisionId         = </span><span class="nx">@_generateNewRevisionId</span><span class="p">()</span>
     <span class="nv">attributes._rev       = </span><span class="s2">&quot;#{currentRevNr + 1}-#{newRevisionId}&quot;</span>
     <span class="nv">attributes._revisions = </span>
       <span class="nv">start : </span><span class="mi">1</span>
@@ -411,7 +412,6 @@
     <span class="k">if</span> <span class="nx">currentRevId</span>
       <span class="nx">attributes</span><span class="p">.</span><span class="nx">_revisions</span><span class="p">.</span><span class="nx">start</span> <span class="o">+=</span> <span class="nx">currentRevNr</span>
       <span class="nx">attributes</span><span class="p">.</span><span class="nx">_revisions</span><span class="p">.</span><span class="nx">ids</span><span class="p">.</span><span class="nx">push</span> <span class="nx">currentRevId</span>
-    
   
 
   <span class="c1"># ### parse object coming from pull for local storage. </span>

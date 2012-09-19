@@ -117,7 +117,7 @@
   <span class="c1"># share.add(todoObject)</span>
   <span class="c1"># share.add([todoObject1, todoObject2, todoObject3])</span>
   <span class="c1"># share.add( hoodie.my.store.findAll (obj) -&gt; obj.isShared )</span>
-  <span class="nv">add: </span><span class="nf">(objects) -&gt;</span>
+  <span class="nv">add : </span><span class="nf">(objects) -&gt;</span>
     <span class="nx">@toggle</span> <span class="nx">objects</span><span class="p">,</span> <span class="kc">true</span>
     
       
@@ -132,7 +132,7 @@
   <span class="c1"># share.remove(todoObject)</span>
   <span class="c1"># share.remove([todoObject1, todoObject2, todoObject3])</span>
   <span class="c1"># share.remove( hoodie.my.store.findAll (obj) -&gt; obj.isShared )</span>
-  <span class="nv">remove: </span><span class="nf">(objects) -&gt;</span> 
+  <span class="nv">remove : </span><span class="nf">(objects) -&gt;</span> 
     <span class="nx">@toggle</span> <span class="nx">objects</span><span class="p">,</span> <span class="kc">false</span>
   
   
@@ -140,7 +140,7 @@
   <span class="c1"># --------</span>
 
   <span class="c1"># add or remove, depending on passed flag or current state</span>
-  <span class="nv">toggle: </span><span class="nf">(objects, doAdd) -&gt;</span>
+  <span class="nv">toggle : </span><span class="nf">(objects, doAdd) -&gt;</span>
     
     <span class="c1"># normalize input</span>
     <span class="nx">unless</span> <span class="nx">@hoodie</span><span class="p">.</span><span class="nx">isPromise</span><span class="p">(</span><span class="nx">objects</span><span class="p">)</span> <span class="o">or</span> <span class="nx">$</span><span class="p">.</span><span class="nx">isArray</span><span class="p">(</span><span class="nx">objects</span><span class="p">)</span>
@@ -163,7 +163,7 @@
   <span class="c1"># 2. combine these with the docs that have been removed from the share</span>
   <span class="c1"># 3. sync all these with share&#39;s remote</span>
   <span class="c1">#</span>
-  <span class="nv">sync: </span><span class="o">=&gt;</span>
+  <span class="nv">sync : </span><span class="o">=&gt;</span>
     <span class="nx">@save</span><span class="p">()</span>
     <span class="p">.</span><span class="nx">pipe</span> <span class="nx">@hoodie</span><span class="p">.</span><span class="nx">my</span><span class="p">.</span><span class="nx">store</span><span class="p">.</span><span class="nx">findAll</span><span class="p">(</span><span class="nx">@_isMySharedObjectAndChanged</span><span class="p">)</span>
     <span class="p">.</span><span class="nx">pipe</span> <span class="p">(</span><span class="nx">sharedObjectsThatChanged</span><span class="p">)</span> <span class="o">=&gt;</span>
@@ -188,7 +188,7 @@
   <span class="c1">#</span>
   <span class="c1"># returns a hash update to update the passed object</span>
   <span class="c1"># so that it gets added to the share</span>
-  <span class="nv">_add: </span><span class="p">(</span><span class="nx">obj</span><span class="p">)</span> <span class="o">=&gt;</span> 
+  <span class="nv">_add : </span><span class="p">(</span><span class="nx">obj</span><span class="p">)</span> <span class="o">=&gt;</span> 
     <span class="nx">obj</span><span class="p">.</span><span class="nx">$shares</span> <span class="o">or=</span> <span class="p">{}</span>
     <span class="nx">obj</span><span class="p">.</span><span class="nx">$shares</span><span class="p">[</span><span class="nx">@id</span><span class="p">]</span> <span class="o">=</span> <span class="kc">true</span>
 
@@ -222,15 +222,15 @@
       <span class="nx">@_remove</span><span class="p">(</span><span class="nx">obj</span><span class="p">)</span>
 
   <span class="c1"># all objects which $shares hash has share.id as key</span>
-  <span class="nv">_isMySharedObject: </span><span class="p">(</span><span class="nx">obj</span><span class="p">)</span> <span class="o">=&gt;</span>
+  <span class="nv">_isMySharedObject : </span><span class="p">(</span><span class="nx">obj</span><span class="p">)</span> <span class="o">=&gt;</span>
     <span class="nx">obj</span><span class="p">.</span><span class="nx">$shares</span><span class="o">?</span><span class="p">[</span><span class="nx">@id</span><span class="p">]</span><span class="o">?</span>
   
   <span class="c1"># an object belongs to Share if it has the same id (its the actual share object)</span>
   <span class="c1"># or its $shares hash has share.id as key</span>
-  <span class="nv">_isMySharedObjectAndChanged: </span><span class="p">(</span><span class="nx">obj</span><span class="p">)</span> <span class="o">=&gt;</span>
+  <span class="nv">_isMySharedObjectAndChanged : </span><span class="p">(</span><span class="nx">obj</span><span class="p">)</span> <span class="o">=&gt;</span>
     <span class="nv">belongsToMe = </span><span class="nx">obj</span><span class="p">.</span><span class="nx">id</span> <span class="o">is</span> <span class="nx">@id</span> <span class="o">or</span> <span class="nx">obj</span><span class="p">.</span><span class="nx">$shares</span><span class="o">?</span><span class="p">[</span><span class="nx">@id</span><span class="p">]</span><span class="o">?</span>
     <span class="k">return</span> <span class="nx">belongsToMe</span> <span class="o">and</span> <span class="nx">@hoodie</span><span class="p">.</span><span class="nx">my</span><span class="p">.</span><span class="nx">store</span><span class="p">.</span><span class="nx">isDirty</span><span class="p">(</span><span class="nx">obj</span><span class="p">.</span><span class="nx">type</span><span class="p">,</span> <span class="nx">obj</span><span class="p">.</span><span class="nx">id</span><span class="p">)</span>
 
   <span class="c1">#</span>
-  <span class="nv">_handleRemoteChanges: </span><span class="o">-&gt;</span>
+  <span class="nv">_handleRemoteChanges : </span><span class="o">-&gt;</span>
     <span class="nx">console</span><span class="p">.</span><span class="nx">log</span> <span class="s1">&#39;_handleRemoteChanges&#39;</span><span class="p">,</span> <span class="nx">arguments</span><span class="p">...</span></div></div></div></div></body></html>
