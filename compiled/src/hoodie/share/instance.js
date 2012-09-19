@@ -21,8 +21,6 @@ Hoodie.Share.Instance = (function(_super) {
 
     this._remove = __bind(this._remove, this);
 
-    this._add = __bind(this._add, this);
-
     this.destroy = __bind(this.destroy, this);
 
     this.sync = __bind(this.sync, this);
@@ -83,8 +81,20 @@ Hoodie.Share.Instance = (function(_super) {
     return this.hoodie.my.store.update("$share", this.id, this._memory, options).pipe(_handleUpdate);
   };
 
-  Instance.prototype.add = function(objects) {
-    return this.toggle(objects, true);
+  Instance.prototype.add = function(objects, sharedAttributes) {
+    var filter,
+      _this = this;
+    filter = sharedAttributes || true;
+    if (!(this.hoodie.isPromise(objects) || $.isArray(objects))) {
+      objects = [objects];
+    }
+    return this.hoodie.my.store.updateAll(objects, function(obj) {
+      obj.$shares || (obj.$shares = {});
+      obj.$shares[_this.id] = filter;
+      return {
+        $shares: obj.$shares
+      };
+    });
   };
 
   Instance.prototype.remove = function(objects) {
@@ -98,8 +108,6 @@ Hoodie.Share.Instance = (function(_super) {
     }
     updateMethod = (function() {
       switch (doAdd) {
-        case true:
-          return this._add;
         case false:
           return this._remove;
         default:
@@ -121,14 +129,6 @@ Hoodie.Share.Instance = (function(_super) {
     return this.remove(this.hoodie.my.store.findAll(this._isMySharedObject)).then(function() {
       return _this.hoodie.my.store.destroy("$share", _this.id);
     });
-  };
-
-  Instance.prototype._add = function(obj) {
-    obj.$shares || (obj.$shares = {});
-    obj.$shares[this.id] = true;
-    return {
-      $shares: obj.$shares
-    };
   };
 
   Instance.prototype._remove = function(obj) {

@@ -117,9 +117,20 @@ class Hoodie.Share.Instance extends Hoodie.RemoteStore
   #
   # share.add(todoObject)
   # share.add([todoObject1, todoObject2, todoObject3])
+  # share.add([todoObject1, todoObject2, todoObject3], ["name", "city"])
   # share.add( hoodie.my.store.findAll (obj) -> obj.isShared )
-  add : (objects) ->
-    @toggle objects, true
+  add : (objects, sharedAttributes) ->
+    filter = sharedAttributes or true
+
+    # normalize input
+    unless @hoodie.isPromise(objects) or $.isArray(objects)
+      objects = [objects]
+
+    @hoodie.my.store.updateAll objects, (obj) => 
+      obj.$shares or= {}
+      obj.$shares[@id] = filter
+
+      $shares: obj.$shares
     
       
   # remove
@@ -149,7 +160,7 @@ class Hoodie.Share.Instance extends Hoodie.RemoteStore
     
     # get the update method to add/remove an object to/from share
     updateMethod = switch doAdd
-      when true  then @_add
+      # when true  then @_add
       when false then @_remove
       else @_toggle
     
@@ -184,16 +195,6 @@ class Hoodie.Share.Instance extends Hoodie.RemoteStore
     
   # Private
   # ---------
-
-  # _add
-  #
-  # returns a hash update to update the passed object
-  # so that it gets added to the share
-  _add : (obj) => 
-    obj.$shares or= {}
-    obj.$shares[@id] = true
-
-    $shares: obj.$shares
 
   
   # _remove
