@@ -49,6 +49,7 @@ class Hoodie.Share.Instance extends Hoodie.RemoteStore
 
     # setting attributes
     {id, access, continuous, password} = options
+    access or= false
     @set {id, access, continuous, password}
 
     # generate an id unless one has been provided
