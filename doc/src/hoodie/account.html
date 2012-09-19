@@ -266,7 +266,7 @@
 
     <span class="k">if</span> <span class="nx">response</span><span class="p">.</span><span class="nx">userCtx</span><span class="p">.</span><span class="nx">name</span>
       <span class="vi">@_authenticated = </span><span class="kc">true</span>
-      <span class="nx">@_setUsername</span> <span class="nx">response</span><span class="p">.</span><span class="nx">userCtx</span><span class="p">.</span><span class="nx">name</span><span class="p">.</span><span class="nx">replace</span><span class="p">(</span><span class="sr">/^(anonymous_)?user\//</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span>
+      <span class="nx">@_setUsername</span> <span class="nx">response</span><span class="p">.</span><span class="nx">userCtx</span><span class="p">.</span><span class="nx">name</span><span class="p">.</span><span class="nx">replace</span><span class="p">(</span><span class="sr">/^user(_anonymous)?\//</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span>
       <span class="nx">@_setOwner</span>    <span class="nx">response</span><span class="p">.</span><span class="nx">userCtx</span><span class="p">.</span><span class="nx">roles</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
       <span class="nx">defer</span><span class="p">.</span><span class="nx">resolve</span> <span class="nx">@username</span>
 
@@ -336,7 +336,7 @@
   <span class="c1">#</span>
   <span class="nv">_handleSignInSuccess : </span><span class="p">(</span><span class="nx">response</span><span class="p">)</span> <span class="o">=&gt;</span>
     <span class="nv">defer    = </span><span class="nx">@hoodie</span><span class="p">.</span><span class="nx">defer</span><span class="p">()</span>
-    <span class="nv">username = </span><span class="nx">response</span><span class="p">.</span><span class="nx">name</span><span class="p">.</span><span class="nx">replace</span><span class="p">(</span><span class="sr">/^(anonymous_)?user\//</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span>
+    <span class="nv">username = </span><span class="nx">response</span><span class="p">.</span><span class="nx">name</span><span class="p">.</span><span class="nx">replace</span><span class="p">(</span><span class="sr">/^user(_anonymous)?\//</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span>
 
     <span class="c1"># if an error occured, the userDB worker stores it to the $error attribute</span>
     <span class="c1"># and adds the &quot;error&quot; role to the users doc object. If the user has the</span>

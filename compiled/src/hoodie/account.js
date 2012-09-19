@@ -208,7 +208,7 @@ Hoodie.Account = (function() {
     defer = this.hoodie.defer();
     if (response.userCtx.name) {
       this._authenticated = true;
-      this._setUsername(response.userCtx.name.replace(/^(anonymous_)?user\//, ''));
+      this._setUsername(response.userCtx.name.replace(/^user(_anonymous)?\//, ''));
       this._setOwner(response.userCtx.roles[0]);
       defer.resolve(this.username);
     } else {
@@ -268,7 +268,7 @@ Hoodie.Account = (function() {
     var defer, username,
       _this = this;
     defer = this.hoodie.defer();
-    username = response.name.replace(/^(anonymous_)?user\//, '');
+    username = response.name.replace(/^user(_anonymous)?\//, '');
     if (~response.roles.indexOf("error")) {
       this.fetch(username).fail(defer.reject).done(function() {
         return defer.reject({

@@ -271,7 +271,7 @@ class Hoodie.Account
 
     if response.userCtx.name
       @_authenticated = true
-      @_setUsername response.userCtx.name.replace(/^(anonymous_)?user\//, '')
+      @_setUsername response.userCtx.name.replace(/^user(_anonymous)?\//, '')
       @_setOwner    response.userCtx.roles[0]
       defer.resolve @username
 
@@ -341,7 +341,7 @@ class Hoodie.Account
   #
   _handleSignInSuccess : (response) =>
     defer    = @hoodie.defer()
-    username = response.name.replace(/^(anonymous_)?user\//, '')
+    username = response.name.replace(/^user(_anonymous)?\//, '')
 
     # if an error occured, the userDB worker stores it to the $error attribute
     # and adds the "error" role to the users doc object. If the user has the
