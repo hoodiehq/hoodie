@@ -159,8 +159,8 @@
       <span class="k">return</span> <span class="nx">@hoodie</span><span class="p">.</span><span class="nx">defer</span><span class="p">().</span><span class="nx">reject</span><span class="p">(</span><span class="nv">error: </span><span class="s2">&quot;unauthenticated&quot;</span><span class="p">,</span> <span class="nv">reason: </span><span class="s2">&quot;not logged in&quot;</span><span class="p">).</span><span class="nx">promise</span><span class="p">()</span>
     
     <span class="nx">@hoodie</span><span class="p">.</span><span class="nx">request</span><span class="p">(</span><span class="s1">&#39;GET&#39;</span><span class="p">,</span> <span class="nx">@_url</span><span class="p">(</span><span class="nx">username</span><span class="p">))</span>
-    <span class="p">.</span><span class="nx">pipe</span><span class="p">(</span><span class="kc">null</span><span class="p">,</span> <span class="nx">@_handleRequestError</span><span class="p">)</span>
-    <span class="p">.</span><span class="nx">done</span> <span class="nf">(response) -&gt;</span> <span class="nv">response = </span><span class="nx">@_doc</span>
+    <span class="p">.</span><span class="nx">fail</span><span class="p">(</span><span class="nx">@_handleRequestError</span><span class="p">)</span>
+    <span class="p">.</span><span class="nx">done</span> <span class="p">(</span><span class="nx">response</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="vi">@_doc = </span><span class="nx">response</span>
     
 
   <span class="c1"># change password</span>
@@ -218,7 +218,7 @@
       <span class="nv">contentType : </span><span class="s2">&quot;application/json&quot;</span>
     
     <span class="nx">@hoodie</span><span class="p">.</span><span class="nx">request</span><span class="p">(</span><span class="s1">&#39;PUT&#39;</span><span class="p">,</span>  <span class="s2">&quot;/_users/#{encodeURIComponent key}&quot;</span><span class="p">,</span> <span class="nx">options</span><span class="p">)</span>
-    <span class="p">.</span><span class="nx">pipe</span><span class="p">(</span><span class="kc">null</span><span class="p">,</span> <span class="nx">@_handleRequestError</span><span class="p">)</span>
+    <span class="p">.</span><span class="nx">fail</span><span class="p">(</span><span class="nx">@_handleRequestError</span><span class="p">)</span>
     <span class="p">.</span><span class="nx">done</span> <span class="nx">@_checkPasswordResetStatus</span>
 
 

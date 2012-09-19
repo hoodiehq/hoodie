@@ -117,9 +117,10 @@
   <span class="c1">#</span>
   <span class="c1"># share.add(todoObject)</span>
   <span class="c1"># share.add([todoObject1, todoObject2, todoObject3])</span>
+  <span class="c1"># share.add([todoObject1, todoObject2, todoObject3], [&quot;name&quot;, &quot;city&quot;])</span>
   <span class="c1"># share.add( hoodie.my.store.findAll (obj) -&gt; obj.isShared )</span>
-  <span class="nv">add : </span><span class="nf">(objects) -&gt;</span>
-    <span class="nx">@toggle</span> <span class="nx">objects</span><span class="p">,</span> <span class="kc">true</span>
+  <span class="nv">add : </span><span class="nf">(objects, sharedAttributes) -&gt;</span>
+    <span class="nx">@toggle</span> <span class="nx">objects</span><span class="p">,</span> <span class="nx">sharedAttributes</span> <span class="o">or</span> <span class="kc">true</span>
     
       
   <span class="c1"># remove</span>
@@ -141,17 +142,17 @@
   <span class="c1"># --------</span>
 
   <span class="c1"># add or remove, depending on passed flag or current state</span>
-  <span class="nv">toggle : </span><span class="nf">(objects, doAdd) -&gt;</span>
+  <span class="nv">toggle : </span><span class="nf">(objects, filter) -&gt;</span>
     
     <span class="c1"># normalize input</span>
     <span class="nx">unless</span> <span class="nx">@hoodie</span><span class="p">.</span><span class="nx">isPromise</span><span class="p">(</span><span class="nx">objects</span><span class="p">)</span> <span class="o">or</span> <span class="nx">$</span><span class="p">.</span><span class="nx">isArray</span><span class="p">(</span><span class="nx">objects</span><span class="p">)</span>
       <span class="nv">objects = </span><span class="p">[</span><span class="nx">objects</span><span class="p">]</span>
     
     <span class="c1"># get the update method to add/remove an object to/from share</span>
-    <span class="nv">updateMethod = </span><span class="k">switch</span> <span class="nx">doAdd</span>
-      <span class="k">when</span> <span class="kc">true</span>  <span class="k">then</span> <span class="nx">@_add</span>
-      <span class="k">when</span> <span class="kc">false</span> <span class="k">then</span> <span class="nx">@_remove</span>
-      <span class="k">else</span> <span class="nx">@_toggle</span>
+    <span class="nv">updateMethod = </span><span class="k">switch</span> <span class="nx">filter</span>
+      <span class="k">when</span> <span class="kc">undefined</span>  <span class="k">then</span> <span class="nx">@_toggle</span>
+      <span class="k">when</span> <span class="kc">false</span>      <span class="k">then</span> <span class="nx">@_remove</span>
+      <span class="k">else</span> <span class="nx">@_add</span><span class="p">(</span><span class="nx">filter</span><span class="p">)</span>
     
     <span class="nx">@hoodie</span><span class="p">.</span><span class="nx">my</span><span class="p">.</span><span class="nx">store</span><span class="p">.</span><span class="nx">updateAll</span><span class="p">(</span><span class="nx">objects</span><span class="p">,</span> <span class="nx">updateMethod</span><span class="p">)</span>
     
@@ -185,17 +186,18 @@
   <span class="c1"># Private</span>
   <span class="c1"># ---------</span>
 
+  
   <span class="c1"># _add</span>
   <span class="c1">#</span>
-  <span class="c1"># returns a hash update to update the passed object</span>
-  <span class="c1"># so that it gets added to the share</span>
-  <span class="nv">_add : </span><span class="p">(</span><span class="nx">obj</span><span class="p">)</span> <span class="o">=&gt;</span> 
-    <span class="nx">obj</span><span class="p">.</span><span class="nx">$shares</span> <span class="o">or=</span> <span class="p">{}</span>
-    <span class="nx">obj</span><span class="p">.</span><span class="nx">$shares</span><span class="p">[</span><span class="nx">@id</span><span class="p">]</span> <span class="o">=</span> <span class="kc">true</span>
+  <span class="c1"># returns another function that will update a object</span>
+  <span class="c1"># to be shared based on the passed filter</span>
+  <span class="nv">_add : </span><span class="p">(</span><span class="nx">filter</span><span class="p">)</span> <span class="o">=&gt;</span>
+    <span class="k">return</span> <span class="p">(</span><span class="nx">obj</span><span class="p">)</span> <span class="o">=&gt;</span> 
+      <span class="nx">obj</span><span class="p">.</span><span class="nx">$shares</span> <span class="o">or=</span> <span class="p">{}</span>
+      <span class="nx">obj</span><span class="p">.</span><span class="nx">$shares</span><span class="p">[</span><span class="nx">@id</span><span class="p">]</span> <span class="o">=</span> <span class="nx">filter</span>
 
-    <span class="nv">$shares: </span><span class="nx">obj</span><span class="p">.</span><span class="nx">$shares</span>
+      <span class="nv">$shares: </span><span class="nx">obj</span><span class="p">.</span><span class="nx">$shares</span>
 
-  
   <span class="c1"># _remove</span>
   <span class="c1">#</span>
   <span class="c1"># returns a hash update to update the passed object</span>
