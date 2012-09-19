@@ -388,7 +388,8 @@ class Hoodie.RemoteStore extends Hoodie.Store
 
     timestamp   = Date.now() + @_timezoneOffset
     uuid        = @hoodie.my.store.uuid(5)
-    "#{uuid}##{timestamp}"
+
+    return "#{uuid}##{timestamp}"
   
 
   # ### and new revion to objecet
@@ -398,9 +399,9 @@ class Hoodie.RemoteStore extends Hoodie.Store
   _addRevisionTo : (attributes) ->
 
     try [currentRevNr, currentRevId] = attributes._rev.split /-/
-    currentRevNr = parseInt(currentRevNr) or 0
+    currentRevNr = parseInt(currentRevNr, 10) or 0
 
-    newRevisionId       = @_generateNewRevisionId()
+    newRevisionId         = @_generateNewRevisionId()
     attributes._rev       = "#{currentRevNr + 1}-#{newRevisionId}"
     attributes._revisions = 
       start : 1
@@ -409,7 +410,6 @@ class Hoodie.RemoteStore extends Hoodie.Store
     if currentRevId
       attributes._revisions.start += currentRevNr
       attributes._revisions.ids.push currentRevId
-    
   
 
   # ### parse object coming from pull for local storage. 
