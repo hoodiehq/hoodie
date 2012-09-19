@@ -229,7 +229,7 @@ Hoodie.Account = (function() {
     options = {
       data: JSON.stringify({
         _id: this._key(username),
-        name: "" + (this._userKeyPrefix()) + "/" + username,
+        name: this._userKey(username),
         type: 'user',
         roles: [],
         password: password,
@@ -262,7 +262,7 @@ Hoodie.Account = (function() {
     }
     options = {
       data: {
-        name: "" + (this._userKeyPrefix()) + "/" + username,
+        name: this._userKey(username),
         password: password
       }
     };
@@ -567,11 +567,11 @@ Hoodie.Account = (function() {
     return delete this._authenticated;
   };
 
-  Account.prototype._userKeyPrefix = function() {
-    if (this.hasAnonymousAccount()) {
-      return 'anonymous_user';
+  Account.prototype._userKey = function(username) {
+    if (username === this.owner) {
+      return "user_anonymous/" + username;
     } else {
-      return 'user';
+      return "user/" + username;
     }
   };
 
@@ -579,7 +579,7 @@ Hoodie.Account = (function() {
     if (username == null) {
       username = this.username;
     }
-    return "" + this._prefix + ":" + (this._userKeyPrefix()) + "/" + username;
+    return "" + this._prefix + ":" + (this._userKey(username));
   };
 
   Account.prototype._url = function(username) {

@@ -49,6 +49,7 @@
 
     <span class="c1"># setting attributes</span>
     <span class="p">{</span><span class="nx">id</span><span class="p">,</span> <span class="nx">access</span><span class="p">,</span> <span class="nx">continuous</span><span class="p">,</span> <span class="nx">password</span><span class="p">}</span> <span class="o">=</span> <span class="nx">options</span>
+    <span class="nx">access</span> <span class="o">or=</span> <span class="kc">false</span>
     <span class="nx">@set</span> <span class="p">{</span><span class="nx">id</span><span class="p">,</span> <span class="nx">access</span><span class="p">,</span> <span class="nx">continuous</span><span class="p">,</span> <span class="nx">password</span><span class="p">}</span>
 
     <span class="c1"># generate an id unless one has been provided</span>
@@ -192,7 +193,7 @@
     <span class="nx">obj</span><span class="p">.</span><span class="nx">$shares</span> <span class="o">or=</span> <span class="p">{}</span>
     <span class="nx">obj</span><span class="p">.</span><span class="nx">$shares</span><span class="p">[</span><span class="nx">@id</span><span class="p">]</span> <span class="o">=</span> <span class="kc">true</span>
 
-    <span class="nv">$shares: </span><span class="nx">obj</span><span class="p">.</span><span class="nx">$shares</span><span class="p">[</span><span class="nx">@id</span><span class="p">]</span>
+    <span class="nv">$shares: </span><span class="nx">obj</span><span class="p">.</span><span class="nx">$shares</span>
 
   
   <span class="c1"># _remove</span>

@@ -301,7 +301,7 @@ describe("Hoodie.Account", function() {
       spyOn(this.hoodie.my.config, "set");
       return this.account.owner = "owner_hash123";
     });
-    it("should sign up with username = 'anonymous_user/ownerHash' and the random password", function() {
+    it("should sign up with username = 'user_anonymous/ownerHash' and the random password", function() {
       this.account.anonymousSignUp();
       return expect(this.account.signUp).wasCalledWith('owner_hash123', 'crazyuuid123');
     });

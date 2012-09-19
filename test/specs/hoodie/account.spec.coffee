@@ -257,7 +257,7 @@ describe "Hoodie.Account", ->
       spyOn(@hoodie.my.config, "set")
       @account.owner = "owner_hash123"
        
-    it "should sign up with username = 'anonymous_user/ownerHash' and the random password", ->
+    it "should sign up with username = 'user_anonymous/ownerHash' and the random password", ->
       @account.anonymousSignUp()
       expect(@account.signUp).wasCalledWith 'owner_hash123', 'crazyuuid123'
 

@@ -67,7 +67,7 @@ class Hoodie.Account
     options =
       data        : JSON.stringify
         _id        : @_key(username)
-        name       : "#{@_userKeyPrefix()}/#{username}"
+        name       : @_userKey(username)
         type       : 'user'
         roles      : []
         password   : password
@@ -117,7 +117,7 @@ class Hoodie.Account
   #
   signIn : (username, password = '') ->
     options = data: 
-                name      : "#{@_userKeyPrefix()}/#{username}"
+                name      : @_userKey(username)
                 password  : password
 
     @hoodie.request('POST', '/_session', options)
@@ -504,15 +504,15 @@ class Hoodie.Account
   #
   #
   #
-  _userKeyPrefix : ->
-    if @hasAnonymousAccount() 
-      'anonymous_user'
+  _userKey : (username) ->
+    if username is @owner
+      "user_anonymous/#{username}"
     else
-      'user'
+      "user/#{username}"
 
   #
   _key : (username = @username) ->
-    "#{@_prefix}:#{@_userKeyPrefix()}/#{username}"
+    "#{@_prefix}:#{@_userKey(username)}"
 
   #
   _url : (username = @username) ->

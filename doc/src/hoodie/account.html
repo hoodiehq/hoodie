@@ -62,7 +62,7 @@
     <span class="nv">options =</span>
       <span class="nv">data        : </span><span class="nx">JSON</span><span class="p">.</span><span class="nx">stringify</span>
         <span class="nv">_id        : </span><span class="nx">@_key</span><span class="p">(</span><span class="nx">username</span><span class="p">)</span>
-        <span class="nv">name       : </span><span class="s2">&quot;#{@_userKeyPrefix()}/#{username}&quot;</span>
+        <span class="nv">name       : </span><span class="nx">@_userKey</span><span class="p">(</span><span class="nx">username</span><span class="p">)</span>
         <span class="nv">type       : </span><span class="s1">&#39;user&#39;</span>
         <span class="nv">roles      : </span><span class="p">[]</span>
         <span class="nv">password   : </span><span class="nx">password</span>
@@ -112,7 +112,7 @@
   <span class="c1">#</span>
   <span class="nv">signIn : </span><span class="nf">(username, password = &#39;&#39;) -&gt;</span>
     <span class="nv">options = data: </span>
-                <span class="nv">name      : </span><span class="s2">&quot;#{@_userKeyPrefix()}/#{username}&quot;</span>
+                <span class="nv">name      : </span><span class="nx">@_userKey</span><span class="p">(</span><span class="nx">username</span><span class="p">)</span>
                 <span class="nv">password  : </span><span class="nx">password</span>
 
     <span class="nx">@hoodie</span><span class="p">.</span><span class="nx">request</span><span class="p">(</span><span class="s1">&#39;POST&#39;</span><span class="p">,</span> <span class="s1">&#39;/_session&#39;</span><span class="p">,</span> <span class="nx">options</span><span class="p">)</span>
@@ -499,15 +499,15 @@
   <span class="c1">#</span>
   <span class="c1">#</span>
   <span class="c1">#</span>
-  <span class="nv">_userKeyPrefix : </span><span class="o">-&gt;</span>
-    <span class="k">if</span> <span class="nx">@hasAnonymousAccount</span><span class="p">()</span> 
-      <span class="s1">&#39;anonymous_user&#39;</span>
+  <span class="nv">_userKey : </span><span class="nf">(username) -&gt;</span>
+    <span class="k">if</span> <span class="nx">username</span> <span class="o">is</span> <span class="nx">@owner</span>
+      <span class="s2">&quot;user_anonymous/#{username}&quot;</span>
     <span class="k">else</span>
-      <span class="s1">&#39;user&#39;</span>
+      <span class="s2">&quot;user/#{username}&quot;</span>
 
   <span class="c1">#</span>
   <span class="nv">_key : </span><span class="nf">(username = @username) -&gt;</span>
-    <span class="s2">&quot;#{@_prefix}:#{@_userKeyPrefix()}/#{username}&quot;</span>
+    <span class="s2">&quot;#{@_prefix}:#{@_userKey(username)}&quot;</span>
 
   <span class="c1">#</span>
   <span class="nv">_url : </span><span class="nf">(username = @username) -&gt;</span>
