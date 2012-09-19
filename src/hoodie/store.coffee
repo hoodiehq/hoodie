@@ -189,7 +189,8 @@ class Hoodie.Store
 
   # Destroyes all objects. Can be filtered by a type
   destroyAll : (type, options = {}) -> 
-    @hoodie.defer()
+    @findAll(type).pipe (objects) =>
+      @destroy(object.type, object.id, options) for object in objects
 
   # ## UUID
 

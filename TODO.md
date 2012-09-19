@@ -38,7 +38,7 @@
 ### Store
 
 * spec `update`: make sure that options get passed to save
-
+* spec `destroyAll`
 
 
 ### Dev shortcuts

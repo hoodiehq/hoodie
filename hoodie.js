@@ -759,10 +759,19 @@ Hoodie.Store = (function() {
   };
 
   Store.prototype.destroyAll = function(type, options) {
+    var _this = this;
     if (options == null) {
       options = {};
     }
-    return this.hoodie.defer();
+    return this.findAll(type).pipe(function(objects) {
+      var object, _i, _len, _results;
+      _results = [];
+      for (_i = 0, _len = objects.length; _i < _len; _i++) {
+        object = objects[_i];
+        _results.push(_this.destroy(object.type, object.id, options));
+      }
+      return _results;
+    });
   };
 
   Store.prototype.uuid = function(len) {
