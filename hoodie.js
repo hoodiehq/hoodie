@@ -287,6 +287,7 @@ Hoodie.Account = (function() {
   };
 
   Account.prototype.fetch = function(username) {
+    var _this = this;
     if (username == null) {
       username = this.username;
     }
@@ -296,8 +297,8 @@ Hoodie.Account = (function() {
         reason: "not logged in"
       }).promise();
     }
-    return this.hoodie.request('GET', this._url(username)).pipe(null, this._handleRequestError).done(function(response) {
-      return response = this._doc;
+    return this.hoodie.request('GET', this._url(username)).fail(this._handleRequestError).done(function(response) {
+      return _this._doc = response;
     });
   };
 
@@ -341,7 +342,7 @@ Hoodie.Account = (function() {
       data: JSON.stringify(data),
       contentType: "application/json"
     };
-    return this.hoodie.request('PUT', "/_users/" + (encodeURIComponent(key)), options).pipe(null, this._handleRequestError).done(this._checkPasswordResetStatus);
+    return this.hoodie.request('PUT', "/_users/" + (encodeURIComponent(key)), options).fail(this._handleRequestError).done(this._checkPasswordResetStatus);
   };
 
   Account.prototype.changeUsername = function(currentPassword, newUsername) {

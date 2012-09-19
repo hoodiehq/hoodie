@@ -164,8 +164,8 @@ class Hoodie.Account
       return @hoodie.defer().reject(error: "unauthenticated", reason: "not logged in").promise()
     
     @hoodie.request('GET', @_url(username))
-    .pipe(null, @_handleRequestError)
-    .done (response) -> response = @_doc
+    .fail(@_handleRequestError)
+    .done (response) => @_doc = response
     
 
   # change password
@@ -223,7 +223,7 @@ class Hoodie.Account
       contentType : "application/json"
     
     @hoodie.request('PUT',  "/_users/#{encodeURIComponent key}", options)
-    .pipe(null, @_handleRequestError)
+    .fail(@_handleRequestError)
     .done @_checkPasswordResetStatus
 
 
