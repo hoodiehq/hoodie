@@ -44,8 +44,6 @@ class Hoodie.Share.Instance extends Hoodie.RemoteStore
   #       ]
   #
   constructor: (options = {}) ->
-    
-    @hoodie = @constructor.hoodie
 
     # setting attributes
     {id, access, continuous, password} = options

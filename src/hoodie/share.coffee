@@ -42,10 +42,9 @@ class Hoodie.Share
   # the constructor returns a function, so it can be called
   # like this: hoodie.share('share_id')
   #
-  # The rest of the API is still available though.
+  # The rest of the API is available as usual.
   constructor : (@hoodie) ->
     
-    api = @open
 
     # set pointer to Hoodie.Share.Instance
     @instance = Hoodie.Share.Instance
@@ -54,14 +53,17 @@ class Hoodie.Share
     # That's need if the user has no account yet, as shares
     # use custom hoodie instances then to create shares on
     # the server
-    @instance.hoodie = @hoodie
+    Hoodie.Share.Instance.prototype.hoodie = @hoodie
 
+    # return custom api which allows direct call
+    api = @open
     $.extend api, this
 
     return api
   
   
-  # ## open
+  # open
+  # ------
   
   # 
   # open a sharing
@@ -70,7 +72,8 @@ class Hoodie.Share
     new @instance id: share_id, options
 
 
-  # ## create
+  # create
+  # --------
 
   # creates a new share & returns a promise.
   #
@@ -79,7 +82,8 @@ class Hoodie.Share
     share.save()
     
   
-  # ## find
+  # find
+  # ------
 
   # find an existing share
   #
@@ -88,7 +92,8 @@ class Hoodie.Share
       new @instance object
 
 
-  # ## findAll
+  # findAll
+  # ---------
 
   # find all my existing shares
   #
@@ -97,7 +102,8 @@ class Hoodie.Share
       new @instance obj for obj in objects
 
 
-  # ## findOrCreate
+  # findOrCreate
+  # --------------
 
   # find or create a new share
   #
@@ -106,7 +112,8 @@ class Hoodie.Share
       new @instance object
 
 
-  # ## save
+  # save
+  # ------
 
   # create or overwrite a share
   #
@@ -115,7 +122,8 @@ class Hoodie.Share
       new @instance object
 
 
-  # ## update
+  # update
+  # --------
 
   # create or overwrite a share
   #
@@ -124,7 +132,8 @@ class Hoodie.Share
       new @instance object
 
 
-  # ## updateAll
+  # updateAll
+  # -----------
 
   # update all my existing shares
   #
@@ -133,7 +142,8 @@ class Hoodie.Share
       new @instance obj for obj in objects
 
 
-  # ## destroy
+  # destroy
+  # ---------
 
   # deletes an existing share
   #
@@ -142,12 +152,20 @@ class Hoodie.Share
       share = new @instance obj
       share.destroy()
 
+  # alias
   delete: -> @destroy arguments...
+  
+  
+  # destroyAll
+  # ------------
 
+  # delete all existing shares
+  #
   destroyAll : () ->
     @findAll().pipe (objects) =>
       for obj in objects
         share = new @instance obj
         share.destroy()
 
+  # alias
   deleteAll: -> @destroyAll arguments...

@@ -8,9 +8,9 @@ Hoodie.Share = (function() {
     this.hoodie = hoodie;
     this.open = __bind(this.open, this);
 
-    api = this.open;
     this.instance = Hoodie.Share.Instance;
-    this.instance.hoodie = this.hoodie;
+    Hoodie.Share.Instance.prototype.hoodie = this.hoodie;
+    api = this.open;
     $.extend(api, this);
     return api;
   }

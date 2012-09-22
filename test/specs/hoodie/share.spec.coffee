@@ -5,10 +5,10 @@ describe "Hoodie.Share", ->
     spyOn(@share, "instance")
 
   describe ".constructor", ->
-    it "should set Hoodie.Share.Instance.hoodie", ->
-      hoodie = 'check 1,2'
-      new Hoodie.Share hoodie
-      expect(Hoodie.Share.Instance.hoodie).toBe 'check 1,2'
+    it "should set Hoodie.Share.Instance.prototype.hoodie", ->
+      new Hoodie.Share @hoodie
+      instance = new Hoodie.Share.Instance
+      expect(instance.hoodie).toBe @hoodie
 
     it "should return the @open method as api", ->
       spyOn(Hoodie.Share::, "open")
@@ -17,7 +17,7 @@ describe "Hoodie.Share", ->
       expect(Hoodie.Share::open).wasCalledWith 'funk'
   # /.constructor
 
-  describe "('share_id', options) // called directly", ->
+  describe "direct call", ->
     beforeEach ->
       spyOn(Hoodie.Share::, "open")
     

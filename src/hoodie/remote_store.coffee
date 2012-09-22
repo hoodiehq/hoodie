@@ -80,7 +80,7 @@ class Hoodie.RemoteStore extends Hoodie.Store
 
     path = "/_all_docs"
     if type
-      path = "#{path}?startkey=\"#{type}\"&endkey=\"#{type}0\""
+      path = "#{path}?startkey=\"#{type}\/\"&endkey=\"#{type}0\""
 
     promise = @request "GET", path
     promise.fail defer.reject

@@ -60,9 +60,9 @@ describe "Hoodie.RemoteStore", ->
         expect(@remote.request).wasCalledWith "GET", "/_all_docs"
 
     _when "type is todo", ->
-      it 'should send a GET to /_all_docs?startkey="todo"&endkey="todo0"', ->
+      it 'should send a GET to /_all_docs?startkey="todo/"&endkey="todo0"', ->
         @remote.findAll('todo')
-        expect(@remote.request).wasCalledWith "GET", '/_all_docs?startkey="todo"&endkey="todo0"'
+        expect(@remote.request).wasCalledWith "GET", '/_all_docs?startkey="todo/"&endkey="todo0"'
 
     _when "request success", ->
       beforeEach ->

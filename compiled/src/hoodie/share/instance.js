@@ -31,7 +31,6 @@ Hoodie.Share.Instance = (function(_super) {
 
     this.set = __bind(this.set, this);
 
-    this.hoodie = this.constructor.hoodie;
     id = options.id, access = options.access, continuous = options.continuous, password = options.password;
     access || (access = false);
     this.set({

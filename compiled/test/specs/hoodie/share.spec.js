@@ -7,11 +7,11 @@ describe("Hoodie.Share", function() {
     return spyOn(this.share, "instance");
   });
   describe(".constructor", function() {
-    it("should set Hoodie.Share.Instance.hoodie", function() {
-      var hoodie;
-      hoodie = 'check 1,2';
-      new Hoodie.Share(hoodie);
-      return expect(Hoodie.Share.Instance.hoodie).toBe('check 1,2');
+    it("should set Hoodie.Share.Instance.prototype.hoodie", function() {
+      var instance;
+      new Hoodie.Share(this.hoodie);
+      instance = new Hoodie.Share.Instance;
+      return expect(instance.hoodie).toBe(this.hoodie);
     });
     return it("should return the @open method as api", function() {
       var share;
@@ -21,7 +21,7 @@ describe("Hoodie.Share", function() {
       return expect(Hoodie.Share.prototype.open).wasCalledWith('funk');
     });
   });
-  describe("('share_id', options) // called directly", function() {
+  describe("direct call", function() {
     beforeEach(function() {
       return spyOn(Hoodie.Share.prototype, "open");
     });

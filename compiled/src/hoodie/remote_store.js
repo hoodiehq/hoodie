@@ -59,7 +59,7 @@ Hoodie.RemoteStore = (function(_super) {
     }
     path = "/_all_docs";
     if (type) {
-      path = "" + path + "?startkey=\"" + type + "\"&endkey=\"" + type + "0\"";
+      path = "" + path + "?startkey=\"" + type + "\/\"&endkey=\"" + type + "0\"";
     }
     promise = this.request("GET", path);
     promise.fail(defer.reject);

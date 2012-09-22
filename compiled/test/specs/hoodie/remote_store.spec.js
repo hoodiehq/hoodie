@@ -70,9 +70,9 @@ describe("Hoodie.RemoteStore", function() {
       });
     });
     _when("type is todo", function() {
-      return it('should send a GET to /_all_docs?startkey="todo"&endkey="todo0"', function() {
+      return it('should send a GET to /_all_docs?startkey="todo/"&endkey="todo0"', function() {
         this.remote.findAll('todo');
-        return expect(this.remote.request).wasCalledWith("GET", '/_all_docs?startkey="todo"&endkey="todo0"');
+        return expect(this.remote.request).wasCalledWith("GET", '/_all_docs?startkey="todo/"&endkey="todo0"');
       });
     });
     _when("request success", function() {
