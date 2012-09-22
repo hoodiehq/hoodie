@@ -34,10 +34,10 @@ Hoodie.Account = (function() {
     this.authenticate = __bind(this.authenticate, this);
 
     this.username = this.hoodie.my.config.get('_account.username');
-    this.owner = this.hoodie.my.config.get('_account.owner');
-    if (!this.owner) {
-      this.owner = this.hoodie.my.store.uuid();
-      this.hoodie.my.config.set('_account.owner', this.owner);
+    this.ownerHash = this.hoodie.my.config.get('_account.ownerHash');
+    if (!this.ownerHash) {
+      this.ownerHash = this.hoodie.my.store.uuid();
+      this.hoodie.my.config.set('_account.ownerHash', this.ownerHash);
     }
     window.setTimeout(this.authenticate);
     this._checkPasswordResetStatus();
@@ -71,7 +71,7 @@ Hoodie.Account = (function() {
         type: 'user',
         roles: [],
         password: password,
-        $owner: this.owner,
+        $createdBy: this.ownerHash,
         database: this.db()
       }),
       contentType: 'application/json'
@@ -83,7 +83,7 @@ Hoodie.Account = (function() {
     var password, username,
       _this = this;
     password = this.hoodie.my.store.uuid(10);
-    username = this.owner;
+    username = this.ownerHash;
     return this.signUp(username, password).pipe(null, this._handleRequestError).done(function() {
       return _this.hoodie.my.config.set('_account.anonymousPassword', password);
     });
@@ -121,7 +121,7 @@ Hoodie.Account = (function() {
   };
 
   Account.prototype.db = function() {
-    return "user/" + this.owner;
+    return "user/" + this.ownerHash;
   };
 
   Account.prototype.fetch = function(username) {
@@ -200,9 +200,9 @@ Hoodie.Account = (function() {
     return this.hoodie.my.config.set('_account.username', this.username);
   };
 
-  Account.prototype._setOwner = function(owner) {
-    this.owner = owner;
-    return this.hoodie.my.config.set('_account.owner', this.owner);
+  Account.prototype._setOwner = function(ownerHash) {
+    this.ownerHash = ownerHash;
+    return this.hoodie.my.config.set('_account.ownerHash', this.ownerHash);
   };
 
   Account.prototype._handleAuthenticateSuccess = function(response) {
@@ -303,7 +303,7 @@ Hoodie.Account = (function() {
 
   Account.prototype._handleSignOutSuccess = function() {
     delete this.username;
-    delete this.owner;
+    delete this.ownerHash;
     this.hoodie.my.config.clear();
     this._authenticated = false;
     return this.hoodie.trigger('account:signout');
@@ -402,12 +402,12 @@ Hoodie.Account = (function() {
 
   Account.prototype._handleDestroySucces = function() {
     delete this.username;
-    delete this.owner;
+    delete this.ownerHash;
     return delete this._authenticated;
   };
 
   Account.prototype._userKey = function(username) {
-    if (username === this.owner) {
+    if (username === this.ownerHash) {
       return "user_anonymous/" + username;
     } else {
       return "user/" + username;

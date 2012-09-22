@@ -45,7 +45,7 @@ Mocks.Hoodie = ->
           fail : ->
       db            : ->
       on            : ->
-      owner         : 'owner_hash'
+      ownerHash     : 'owner_hash'
       
     config :
       set : ->

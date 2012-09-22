@@ -138,10 +138,10 @@ describe("Hoodie.LocalStore", function() {
           it("should pass true (= new created) as the second param to the done callback", function() {
             return expect(this.promise).toBeResolvedWith('doc', true);
           });
-          return it("should set the $owner attribute", function() {
+          return it("should set the $createdBy attribute", function() {
             var object;
             object = this.store.cache.mostRecentCall.args[2];
-            return expect(object.$owner).toBe('owner_hash');
+            return expect(object.$createdBy).toBe('owner_hash');
           });
         });
       });
@@ -236,8 +236,8 @@ describe("Hoodie.LocalStore", function() {
       it("should generate an id", function() {
         return expect(this.key).toMatch(/^[a-z0-9]{7}$/);
       });
-      it("should set $owner", function() {
-        return expect(this.object.$owner).toBe('owner_hash');
+      it("should set $createdBy", function() {
+        return expect(this.object.$createdBy).toBe('owner_hash');
       });
       it("should pass options", function() {
         var options;

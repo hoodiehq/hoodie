@@ -31,10 +31,10 @@ describe("Hoodie.Account", function() {
         return expect(account.username).toBe('joe@example.com');
       });
     });
-    _when("account.owner is set", function() {
+    _when("account.ownerHash is set", function() {
       beforeEach(function() {
         return spyOn(this.hoodie.my.config, "get").andCallFake(function(key) {
-          if (key === '_account.owner') {
+          if (key === '_account.ownerHash') {
             return 'owner_hash123';
           }
         });
@@ -42,13 +42,13 @@ describe("Hoodie.Account", function() {
       return it("should set @owner", function() {
         var account;
         account = new Hoodie.Account(this.hoodie);
-        return expect(account.owner).toBe('owner_hash123');
+        return expect(account.ownerHash).toBe('owner_hash123');
       });
     });
-    _when("account.owner isn't set", function() {
+    _when("account.ownerHash isn't set", function() {
       beforeEach(function() {
         spyOn(this.hoodie.my.config, "get").andCallFake(function(key) {
-          if (key === '_account.owner') {
+          if (key === '_account.ownerHash') {
             return void 0;
           }
         });
@@ -58,12 +58,12 @@ describe("Hoodie.Account", function() {
       it("should set @owner", function() {
         var account;
         account = new Hoodie.Account(this.hoodie);
-        return expect(account.owner).toBe('new_generated_owner_hash');
+        return expect(account.ownerHash).toBe('new_generated_owner_hash');
       });
-      return it("should set account.owner", function() {
+      return it("should set account.ownerHash", function() {
         var account;
         account = new Hoodie.Account(this.hoodie);
-        return expect(account.hoodie.my.config.set).wasCalledWith('_account.owner', 'new_generated_owner_hash');
+        return expect(account.hoodie.my.config.set).wasCalledWith('_account.ownerHash', 'new_generated_owner_hash');
       });
     });
     it("should authenticate on next tick", function() {
@@ -154,9 +154,9 @@ describe("Hoodie.Account", function() {
             expect(this.account.username).toBe('joe@example.com');
             return expect(this.hoodie.my.config.set).wasCalledWith('_account.username', 'joe@example.com');
           });
-          return it("should set account.owner", function() {
-            expect(this.account.owner).toBe('user_hash');
-            return expect(this.hoodie.my.config.set).wasCalledWith('_account.owner', 'user_hash');
+          return it("should set account.ownerHash", function() {
+            expect(this.account.ownerHash).toBe('user_hash');
+            return expect(this.hoodie.my.config.set).wasCalledWith('_account.ownerHash', 'user_hash');
           });
         });
         _when("authentication request is successful and returns `name: null`", function() {
@@ -200,7 +200,7 @@ describe("Hoodie.Account", function() {
       var _ref;
       this.signInDefer = this.hoodie.defer();
       spyOn(this.account, "signIn").andReturn(this.signInDefer.promise());
-      this.account.owner = "owner_hash123";
+      this.account.ownerHash = "owner_hash123";
       this.account.signUp('joe@example.com', 'secret', {
         name: "Joe Doe"
       });
@@ -230,8 +230,8 @@ describe("Hoodie.Account", function() {
     it("should have set password to 'secret'", function() {
       return expect(this.data.password).toBe('secret');
     });
-    it("should have set $owner to 'owner_hash123'", function() {
-      return expect(this.data.$owner).toBe('owner_hash123');
+    it("should have set $createdBy to 'owner_hash123'", function() {
+      return expect(this.data.$createdBy).toBe('owner_hash123');
     });
     it("should have set database to 'user/owner_hash123'", function() {
       return expect(this.data.database).toBe('user/owner_hash123');
@@ -304,7 +304,7 @@ describe("Hoodie.Account", function() {
       spyOn(this.account, "signUp").andReturn(this.signUpDefer.promise());
       spyOn(this.hoodie.my.store, "uuid").andReturn("crazyuuid123");
       spyOn(this.hoodie.my.config, "set");
-      return this.account.owner = "owner_hash123";
+      return this.account.ownerHash = "owner_hash123";
     });
     it("should sign up with username = 'user_anonymous/ownerHash' and the random password", function() {
       this.account.anonymousSignUp();
@@ -367,8 +367,8 @@ describe("Hoodie.Account", function() {
         });
         it("should set @owner", function() {
           this.account.signIn('joe@example.com', 'secret');
-          expect(this.account.owner).toBe('user_hash');
-          return expect(this.hoodie.my.config.set).wasCalledWith('_account.owner', 'user_hash');
+          expect(this.account.ownerHash).toBe('user_hash');
+          return expect(this.hoodie.my.config.set).wasCalledWith('_account.ownerHash', 'user_hash');
         });
         it("should fetch the _users doc", function() {
           spyOn(this.account, "fetch");
@@ -550,7 +550,7 @@ describe("Hoodie.Account", function() {
         return expect(this.hoodie.trigger).wasCalledWith('account:signout');
       });
       it("should unset @owner", function() {
-        return expect(this.account.owner).toBeUndefined();
+        return expect(this.account.ownerHash).toBeUndefined();
       });
       it("should unset @username", function() {
         return expect(this.account.username).toBeUndefined();
@@ -598,9 +598,9 @@ describe("Hoodie.Account", function() {
     });
   });
   describe(".db()", function() {
-    return _when("account.owner is 'owner_hash123'", function() {
+    return _when("account.ownerHash is 'owner_hash123'", function() {
       beforeEach(function() {
-        return this.account.owner = 'owner_hash123';
+        return this.account.ownerHash = 'owner_hash123';
       });
       return it("should return 'joe$example.com", function() {
         return (expect(this.account.db())).toEqual('user/owner_hash123');
@@ -687,7 +687,7 @@ describe("Hoodie.Account", function() {
       });
       return it("should unset @owner", function() {
         this.account.destroy();
-        return expect(this.account.owner).toBeUndefined();
+        return expect(this.account.ownerHash).toBeUndefined();
       });
     });
   });

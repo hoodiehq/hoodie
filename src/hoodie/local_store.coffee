@@ -66,9 +66,9 @@ class Hoodie.LocalStore extends Hoodie.Store
       isNew = true
       id    = @uuid()
 
-    # add owner hash to new objects
+    # add createdBy hash to new objects
     if isNew and @hoodie.my.account
-      object.$owner or= @hoodie.my.account.owner
+      object.$createdBy or= @hoodie.my.account.ownerHash
    
     # handle public option
     object.$public = options.public if options.public? 

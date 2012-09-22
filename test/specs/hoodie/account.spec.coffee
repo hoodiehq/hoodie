@@ -30,20 +30,20 @@ describe "Hoodie.Account", ->
         account = new Hoodie.Account @hoodie
         expect(account.username).toBe 'joe@example.com'
 
-    _when "account.owner is set", ->
+    _when "account.ownerHash is set", ->
       beforeEach ->
         spyOn(@hoodie.my.config, "get").andCallFake (key) ->
-          if key is '_account.owner'
+          if key is '_account.ownerHash'
             return 'owner_hash123'
             
       it "should set @owner", ->
         account = new Hoodie.Account @hoodie
-        expect(account.owner).toBe 'owner_hash123'
+        expect(account.ownerHash).toBe 'owner_hash123'
 
-    _when "account.owner isn't set", ->
+    _when "account.ownerHash isn't set", ->
       beforeEach ->
         spyOn(@hoodie.my.config, "get").andCallFake (key) ->
-          if key is '_account.owner'
+          if key is '_account.ownerHash'
             return undefined
 
         spyOn(@hoodie.my.store, "uuid").andReturn 'new_generated_owner_hash'
@@ -51,11 +51,11 @@ describe "Hoodie.Account", ->
             
       it "should set @owner", ->
         account = new Hoodie.Account @hoodie
-        expect(account.owner).toBe 'new_generated_owner_hash'
+        expect(account.ownerHash).toBe 'new_generated_owner_hash'
 
-      it "should set account.owner", ->
+      it "should set account.ownerHash", ->
          account = new Hoodie.Account @hoodie
-         expect(account.hoodie.my.config.set).wasCalledWith '_account.owner', 'new_generated_owner_hash'
+         expect(account.hoodie.my.config.set).wasCalledWith '_account.ownerHash', 'new_generated_owner_hash'
 
     it "should authenticate on next tick", ->
       account = new Hoodie.Account @hoodie
@@ -138,9 +138,9 @@ describe "Hoodie.Account", ->
             expect(@account.username).toBe 'joe@example.com'
             expect(@hoodie.my.config.set).wasCalledWith '_account.username', 'joe@example.com'
 
-          it "should set account.owner", ->
-             expect(@account.owner).toBe 'user_hash'
-             expect(@hoodie.my.config.set).wasCalledWith '_account.owner', 'user_hash'
+          it "should set account.ownerHash", ->
+             expect(@account.ownerHash).toBe 'user_hash'
+             expect(@hoodie.my.config.set).wasCalledWith '_account.ownerHash', 'user_hash'
         
         # {"ok":true,"userCtx":{"name":null,"roles":[]},"info":{"authenticationDb":"_users","authenticationHandlers":["oauth","cookie","default"]}}
         _when "authentication request is successful and returns `name: null`", ->
@@ -172,7 +172,7 @@ describe "Hoodie.Account", ->
     beforeEach ->
       @signInDefer = @hoodie.defer()
       spyOn(@account, "signIn").andReturn @signInDefer.promise()
-      @account.owner = "owner_hash123"
+      @account.ownerHash = "owner_hash123"
       @account.signUp('joe@example.com', 'secret', name: "Joe Doe")
       [@type, @path, @options] = @hoodie.request.mostRecentCall.args
       @data = JSON.parse @options.data
@@ -200,8 +200,8 @@ describe "Hoodie.Account", ->
     it "should have set password to 'secret'", ->
       expect(@data.password).toBe 'secret'
 
-    it "should have set $owner to 'owner_hash123'", ->
-      expect(@data.$owner).toBe 'owner_hash123'
+    it "should have set $createdBy to 'owner_hash123'", ->
+      expect(@data.$createdBy).toBe 'owner_hash123'
 
     it "should have set database to 'user/owner_hash123'", ->
       expect(@data.database).toBe 'user/owner_hash123'
@@ -259,7 +259,7 @@ describe "Hoodie.Account", ->
       spyOn(@account, "signUp").andReturn @signUpDefer.promise()
       spyOn(@hoodie.my.store, "uuid").andReturn "crazyuuid123"
       spyOn(@hoodie.my.config, "set")
-      @account.owner = "owner_hash123"
+      @account.ownerHash = "owner_hash123"
        
     it "should sign up with username = 'user_anonymous/ownerHash' and the random password", ->
       @account.anonymousSignUp()
@@ -317,8 +317,8 @@ describe "Hoodie.Account", ->
 
         it "should set @owner", ->
            @account.signIn('joe@example.com', 'secret')
-           expect(@account.owner).toBe 'user_hash'
-           expect(@hoodie.my.config.set).wasCalledWith '_account.owner', 'user_hash'
+           expect(@account.ownerHash).toBe 'user_hash'
+           expect(@hoodie.my.config.set).wasCalledWith '_account.ownerHash', 'user_hash'
 
         it "should fetch the _users doc", ->
           spyOn(@account, "fetch")
@@ -468,7 +468,7 @@ describe "Hoodie.Account", ->
         expect(@hoodie.trigger).wasCalledWith 'account:signout'
 
       it "should unset @owner", ->
-         expect(@account.owner).toBeUndefined()
+         expect(@account.ownerHash).toBeUndefined()
 
       it "should unset @username", ->
          expect(@account.username).toBeUndefined()
@@ -511,9 +511,9 @@ describe "Hoodie.Account", ->
   
   
   describe ".db()", ->
-    _when "account.owner is 'owner_hash123'", ->
+    _when "account.ownerHash is 'owner_hash123'", ->
       beforeEach ->
-        @account.owner = 'owner_hash123'
+        @account.ownerHash = 'owner_hash123'
       
       it "should return 'joe$example.com", ->
         (expect @account.db()).toEqual('user/owner_hash123')
@@ -583,7 +583,7 @@ describe "Hoodie.Account", ->
 
       it "should unset @owner", ->
         @account.destroy()
-        expect(@account.owner).toBeUndefined()
+        expect(@account.ownerHash).toBeUndefined()
   # /destroy()
 
   describe ".resetPassword(username)", ->

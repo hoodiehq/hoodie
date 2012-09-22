@@ -98,9 +98,9 @@ describe "Hoodie.LocalStore", ->
           it "should pass true (= new created) as the second param to the done callback", ->
             expect(@promise).toBeResolvedWith 'doc', true
 
-          it "should set the $owner attribute", ->
+          it "should set the $createdBy attribute", ->
             object = @store.cache.mostRecentCall.args[2]
-            expect(object.$owner).toBe 'owner_hash'
+            expect(object.$createdBy).toBe 'owner_hash'
     
       _when "failed", ->
         beforeEach ->
@@ -164,8 +164,8 @@ describe "Hoodie.LocalStore", ->
       it "should generate an id", ->
         expect(@key).toMatch /^[a-z0-9]{7}$/
 
-      it "should set $owner", ->
-        expect(@object.$owner).toBe 'owner_hash'
+      it "should set $createdBy", ->
+        expect(@object.$createdBy).toBe 'owner_hash'
         
       it "should pass options", ->
         options = @store.cache.mostRecentCall.args[3]

@@ -15,14 +15,14 @@ class Hoodie.Account
   constructor : (@hoodie) ->
     
     # handle session
-    @username = @hoodie.my.config.get '_account.username'
-    @owner    = @hoodie.my.config.get '_account.owner'
+    @username   = @hoodie.my.config.get '_account.username'
+    @ownerHash  = @hoodie.my.config.get '_account.ownerHash'
 
-    # the owner hash gets stored in every object created by the user.
+    # the ownerHash gets stored in every object created by the user.
     # Make sure we have one.
-    unless @owner
-      @owner = @hoodie.my.store.uuid()
-      @hoodie.my.config.set '_account.owner', @owner
+    unless @ownerHash
+      @ownerHash = @hoodie.my.store.uuid()
+      @hoodie.my.config.set '_account.ownerHash', @ownerHash
     
     # authenticate on next tick
     window.setTimeout @authenticate
@@ -65,13 +65,13 @@ class Hoodie.Account
       return @_upgradeAnonymousAccount username, password
 
     options =
-      data        : JSON.stringify
+      data         : JSON.stringify
         _id        : @_key(username)
         name       : @_userKey(username)
         type       : 'user'
         roles      : []
         password   : password
-        $owner     : @owner
+        $createdBy : @ownerHash
         database   : @db()
       contentType : 'application/json'
 
@@ -92,7 +92,7 @@ class Hoodie.Account
   #
   anonymousSignUp: ->
     password = @hoodie.my.store.uuid(10)
-    username = @owner
+    username = @ownerHash
 
     @signUp(username, password)
     .pipe(null, @_handleRequestError)
@@ -152,7 +152,7 @@ class Hoodie.Account
   # ----
 
   # return name of db
-  db : -> "user/#{@owner}"
+  db : -> "user/#{@ownerHash}"
   
   
   # fetch
@@ -260,8 +260,8 @@ class Hoodie.Account
   _doc : {}
 
   # setters
-  _setUsername : (@username) -> @hoodie.my.config.set '_account.username', @username
-  _setOwner    : (@owner)    -> @hoodie.my.config.set '_account.owner',    @owner
+  _setUsername : (@username)  -> @hoodie.my.config.set '_account.username',  @username
+  _setOwner    : (@ownerHash) -> @hoodie.my.config.set '_account.ownerHash', @ownerHash
 
   #
   # handle a successful authentication request.
@@ -383,7 +383,7 @@ class Hoodie.Account
   #
   _handleSignOutSuccess : =>
     delete @username
-    delete @owner
+    delete @ownerHash
     @hoodie.my.config.clear()
     @_authenticated = false
     @hoodie.trigger 'account:signout'
@@ -498,14 +498,14 @@ class Hoodie.Account
   #
   _handleDestroySucces : =>
     delete @username
-    delete @owner
+    delete @ownerHash
     delete @_authenticated
 
   #
   #
   #
   _userKey : (username) ->
-    if username is @owner
+    if username is @ownerHash
       "user_anonymous/#{username}"
     else
       "user/#{username}"
