@@ -39,6 +39,7 @@ Hoodie.Account = (function() {
       this.owner = this.hoodie.my.store.uuid();
       this.hoodie.my.config.set('_account.owner', this.owner);
     }
+    window.setTimeout(this.authenticate);
     this._checkPasswordResetStatus();
   }
 
@@ -83,7 +84,7 @@ Hoodie.Account = (function() {
       _this = this;
     password = this.hoodie.my.store.uuid(10);
     username = this.owner;
-    return this.signUp(username, password).fail(this._handleRequestError).done(function() {
+    return this.signUp(username, password).pipe(null, this._handleRequestError).done(function() {
       return _this.hoodie.my.config.set('_account.anonymousPassword', password);
     });
   };
@@ -134,7 +135,7 @@ Hoodie.Account = (function() {
         reason: "not logged in"
       }).promise();
     }
-    return this.hoodie.request('GET', this._url(username)).fail(this._handleRequestError).done(function(response) {
+    return this.hoodie.request('GET', this._url(username)).pipe(null, this._handleRequestError).done(function(response) {
       return _this._doc = response;
     });
   };
@@ -179,7 +180,7 @@ Hoodie.Account = (function() {
       data: JSON.stringify(data),
       contentType: "application/json"
     };
-    return this.hoodie.request('PUT', "/_users/" + (encodeURIComponent(key)), options).fail(this._handleRequestError).done(this._checkPasswordResetStatus);
+    return this.hoodie.request('PUT', "/_users/" + (encodeURIComponent(key)), options).pipe(null, this._handleRequestError).done(this._checkPasswordResetStatus);
   };
 
   Account.prototype.changeUsername = function(currentPassword, newUsername) {

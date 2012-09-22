@@ -66,6 +66,11 @@ describe("Hoodie.Account", function() {
         return expect(account.hoodie.my.config.set).wasCalledWith('_account.owner', 'new_generated_owner_hash');
       });
     });
+    it("should authenticate on next tick", function() {
+      var account;
+      account = new Hoodie.Account(this.hoodie);
+      return expect(window.setTimeout).wasCalledWith(account.authenticate);
+    });
     return it("should check for a pending password request", function() {
       var account;
       spyOn(Hoodie.Account.prototype, "_checkPasswordResetStatus");

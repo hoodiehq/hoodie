@@ -57,6 +57,10 @@ describe "Hoodie.Account", ->
          account = new Hoodie.Account @hoodie
          expect(account.hoodie.my.config.set).wasCalledWith '_account.owner', 'new_generated_owner_hash'
 
+    it "should authenticate on next tick", ->
+      account = new Hoodie.Account @hoodie
+      expect(window.setTimeout).wasCalledWith account.authenticate
+      
     it "should check for a pending password request", ->
       spyOn(Hoodie.Account.prototype, "_checkPasswordResetStatus")
       account = new Hoodie.Account @hoodie

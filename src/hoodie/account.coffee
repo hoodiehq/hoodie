@@ -25,7 +25,7 @@ class Hoodie.Account
       @hoodie.my.config.set '_account.owner', @owner
     
     # authenticate on next tick
-    # window.setTimeout @authenticate
+    window.setTimeout @authenticate
 
     # is there a pending password reset?
     @_checkPasswordResetStatus()
@@ -95,7 +95,7 @@ class Hoodie.Account
     username = @owner
 
     @signUp(username, password)
-    .fail(@_handleRequestError)
+    .pipe(null, @_handleRequestError)
     .done =>
       @hoodie.my.config.set '_account.anonymousPassword', password
 
@@ -164,7 +164,7 @@ class Hoodie.Account
       return @hoodie.defer().reject(error: "unauthenticated", reason: "not logged in").promise()
     
     @hoodie.request('GET', @_url(username))
-    .fail(@_handleRequestError)
+    .pipe(null, @_handleRequestError)
     .done (response) => @_doc = response
     
 
@@ -223,7 +223,7 @@ class Hoodie.Account
       contentType : "application/json"
     
     @hoodie.request('PUT',  "/_users/#{encodeURIComponent key}", options)
-    .fail(@_handleRequestError)
+    .pipe(null, @_handleRequestError)
     .done @_checkPasswordResetStatus
 
 
