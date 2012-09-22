@@ -424,8 +424,8 @@ class Hoodie.RemoteStore extends Hoodie.Store
     [obj.type, obj.id] = id.split(/\//)
     
     # handle timestameps
-    obj.createdAt = new Date(Date.parse obj.createdAt) if obj.createdAt
-    obj.updatedAt = new Date(Date.parse obj.updatedAt) if obj.updatedAt
+    obj.$createdAt = new Date(Date.parse obj.$createdAt) if obj.$createdAt
+    obj.$updatedAt = new Date(Date.parse obj.$updatedAt) if obj.$updatedAt
     
     # handle rev
     if obj.rev

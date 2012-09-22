@@ -59,8 +59,8 @@ describe("Hoodie.LocalStore", function() {
       it("should add timestamps", function() {
         var object;
         object = this.store.cache.mostRecentCall.args[2];
-        expect(object.createdAt).toBe('now');
-        return expect(object.updatedAt).toBe('now');
+        expect(object.$createdAt).toBe('now');
+        return expect(object.$updatedAt).toBe('now');
       });
       it("should pass options", function() {
         var options;
@@ -76,10 +76,10 @@ describe("Hoodie.LocalStore", function() {
             remote: true
           });
           object = this.store.cache.mostRecentCall.args[2];
-          expect(object.createdAt).toBeUndefined();
-          return expect(object.updatedAt).toBeUndefined();
+          expect(object.$createdAt).toBeUndefined();
+          return expect(object.$updatedAt).toBeUndefined();
         });
-        return it("should add a _syncedAt timestamp", function() {
+        return it("should add a _$syncedAt timestamp", function() {
           var object;
           this.store.save('document', '123', {
             name: 'test'
@@ -87,7 +87,7 @@ describe("Hoodie.LocalStore", function() {
             remote: true
           });
           object = this.store.cache.mostRecentCall.args[2];
-          return expect(object._syncedAt).toBe('now');
+          return expect(object._$syncedAt).toBe('now');
         });
       });
       _and("options.silent is true", function() {
@@ -99,8 +99,8 @@ describe("Hoodie.LocalStore", function() {
             silent: true
           });
           object = this.store.cache.mostRecentCall.args[2];
-          expect(object.createdAt).toBeUndefined();
-          return expect(object.updatedAt).toBeUndefined();
+          expect(object.$createdAt).toBeUndefined();
+          return expect(object.$updatedAt).toBeUndefined();
         });
       });
       _when("successful", function() {
@@ -184,10 +184,10 @@ describe("Hoodie.LocalStore", function() {
     it("should not overwrite createdAt attribute", function() {
       var id, object, type, _ref;
       this.store.save('document', '123', {
-        createdAt: 'check12'
+        $createdAt: 'check12'
       });
       _ref = this.store.cache.mostRecentCall.args, type = _ref[0], id = _ref[1], object = _ref[2];
-      return expect(object.createdAt).toBe('check12');
+      return expect(object.$createdAt).toBe('check12');
     });
     it("should allow numbers and lowercase letters for type only. And must start with a letter or $", function() {
       var invalid, key, promise, valid, _i, _j, _len, _len1, _results;
@@ -630,7 +630,7 @@ describe("Hoodie.LocalStore", function() {
     _when("object can be found and destroy comes from remote", function() {
       beforeEach(function() {
         return spyOn(this.store, "cache").andReturn({
-          _syncedAt: 'now'
+          _$syncedAt: 'now'
         });
       });
       return it("should remove the object", function() {
@@ -643,14 +643,14 @@ describe("Hoodie.LocalStore", function() {
     return _when("object can be found and was synched before", function() {
       beforeEach(function() {
         return spyOn(this.store, "cache").andReturn({
-          _syncedAt: 'now'
+          _$syncedAt: 'now'
         });
       });
       it("should mark the object as deleted and cache it", function() {
         var promise;
         promise = this.store.destroy('document', '123');
         return expect(this.store.cache).wasCalledWith('document', '123', {
-          _syncedAt: 'now',
+          _$syncedAt: 'now',
           _deleted: true
         });
       });
@@ -829,7 +829,7 @@ describe("Hoodie.LocalStore", function() {
       _and("object was not yet synced", function() {
         beforeEach(function() {
           return spyOn(this.store, "cache").andReturn({
-            _syncedAt: void 0
+            _$syncedAt: void 0
           });
         });
         return it("should return true", function() {
@@ -840,8 +840,8 @@ describe("Hoodie.LocalStore", function() {
         _and("object was not updated yet", function() {
           beforeEach(function() {
             return spyOn(this.store, "cache").andReturn({
-              _syncedAt: new Date(0),
-              updatedAt: void 0
+              _$syncedAt: new Date(0),
+              $updatedAt: void 0
             });
           });
           return it("should return false", function() {
@@ -851,8 +851,8 @@ describe("Hoodie.LocalStore", function() {
         _and("object was updated at the same time", function() {
           beforeEach(function() {
             return spyOn(this.store, "cache").andReturn({
-              _syncedAt: new Date(0),
-              updatedAt: new Date(0)
+              _$syncedAt: new Date(0),
+              $updatedAt: new Date(0)
             });
           });
           return it("should return false", function() {
@@ -862,8 +862,8 @@ describe("Hoodie.LocalStore", function() {
         return _and("object was updated later", function() {
           beforeEach(function() {
             return spyOn(this.store, "cache").andReturn({
-              _syncedAt: new Date(0),
-              updatedAt: new Date(1)
+              _$syncedAt: new Date(0),
+              $updatedAt: new Date(1)
             });
           });
           return it("should return true", function() {

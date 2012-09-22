@@ -303,11 +303,11 @@ Hoodie.RemoteStore = (function(_super) {
     id = obj._id || obj.id;
     delete obj._id;
     _ref = id.split(/\//), obj.type = _ref[0], obj.id = _ref[1];
-    if (obj.createdAt) {
-      obj.createdAt = new Date(Date.parse(obj.createdAt));
+    if (obj.$createdAt) {
+      obj.$createdAt = new Date(Date.parse(obj.$createdAt));
     }
-    if (obj.updatedAt) {
-      obj.updatedAt = new Date(Date.parse(obj.updatedAt));
+    if (obj.$updatedAt) {
+      obj.$updatedAt = new Date(Date.parse(obj.$updatedAt));
     }
     if (obj.rev) {
       obj._rev = obj.rev;

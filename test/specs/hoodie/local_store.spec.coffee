@@ -46,8 +46,8 @@ describe "Hoodie.LocalStore", ->
     
       it "should add timestamps", ->
         object = @store.cache.mostRecentCall.args[2]
-        expect(object.createdAt).toBe 'now'
-        expect(object.updatedAt).toBe 'now'
+        expect(object.$createdAt).toBe 'now'
+        expect(object.$updatedAt).toBe 'now'
         
       it "should pass options", ->
         options = @store.cache.mostRecentCall.args[3]
@@ -57,20 +57,20 @@ describe "Hoodie.LocalStore", ->
         it "should not touch createdAt / updatedAt timestamps", ->
           @store.save 'document', '123', { name: 'test' }, { remote: true }
           object = @store.cache.mostRecentCall.args[2]
-          expect(object.createdAt).toBeUndefined()
-          expect(object.updatedAt).toBeUndefined()
+          expect(object.$createdAt).toBeUndefined()
+          expect(object.$updatedAt).toBeUndefined()
           
-        it "should add a _syncedAt timestamp", ->
+        it "should add a _$syncedAt timestamp", ->
           @store.save 'document', '123', { name: 'test' }, { remote: true }
           object = @store.cache.mostRecentCall.args[2]
-          expect(object._syncedAt).toBe 'now'
+          expect(object._$syncedAt).toBe 'now'
       
       _and "options.silent is true", ->
         it "should not touch createdAt / updatedAt timestamps", ->
           @store.save 'document', '123', { name: 'test' }, { silent: true }
           object = @store.cache.mostRecentCall.args[2]
-          expect(object.createdAt).toBeUndefined()
-          expect(object.updatedAt).toBeUndefined()
+          expect(object.$createdAt).toBeUndefined()
+          expect(object.$updatedAt).toBeUndefined()
     
       _when "successful", ->
         beforeEach ->
@@ -127,9 +127,9 @@ describe "Hoodie.LocalStore", ->
       
     
     it "should not overwrite createdAt attribute", ->
-      @store.save 'document', '123', { createdAt: 'check12'  }
+      @store.save 'document', '123', { $createdAt: 'check12'  }
       [type, id, object] = @store.cache.mostRecentCall.args
-      expect(object.createdAt).toBe 'check12'
+      expect(object.$createdAt).toBe 'check12'
   
     it "should allow numbers and lowercase letters for type only. And must start with a letter or $", ->
       invalid = ['UPPERCASE', 'underLines', '-?&$', '12345', 'a']
@@ -437,7 +437,7 @@ describe "Hoodie.LocalStore", ->
     
     _when "object can be found and destroy comes from remote", ->
       beforeEach ->
-        spyOn(@store, "cache").andReturn {_syncedAt: 'now'}
+        spyOn(@store, "cache").andReturn {_$syncedAt: 'now'}
       
       it "should remove the object", ->
         @store.destroy 'document', '123', remote: true
@@ -445,11 +445,11 @@ describe "Hoodie.LocalStore", ->
         
     _when "object can be found and was synched before", ->
       beforeEach ->
-        spyOn(@store, "cache").andReturn {_syncedAt: 'now'}
+        spyOn(@store, "cache").andReturn {_$syncedAt: 'now'}
         
       it "should mark the object as deleted and cache it", ->
         promise = @store.destroy 'document', '123'
-        expect(@store.cache).wasCalledWith 'document', '123', {_syncedAt: 'now', _deleted: true}
+        expect(@store.cache).wasCalledWith 'document', '123', {_$syncedAt: 'now', _deleted: true}
         
       it "should not remove the object from store", ->
         @store.destroy 'document', '123'
@@ -585,7 +585,7 @@ describe "Hoodie.LocalStore", ->
     _when "type & id passed", ->
       _and "object was not yet synced", ->
         beforeEach ->
-          spyOn(@store, "cache").andReturn _syncedAt: undefined
+          spyOn(@store, "cache").andReturn _$syncedAt: undefined
         
         it "should return true", ->
           do expect(@store.isDirty 'couch', '123').toBeTruthy
@@ -594,8 +594,8 @@ describe "Hoodie.LocalStore", ->
         _and "object was not updated yet", ->
           beforeEach ->
             spyOn(@store, "cache").andReturn 
-              _syncedAt : new Date(0)
-              updatedAt: undefined
+              _$syncedAt : new Date(0)
+              $updatedAt: undefined
           
           it "should return false", ->
             do expect(@store.isDirty 'couch', '123').toBeFalsy
@@ -603,8 +603,8 @@ describe "Hoodie.LocalStore", ->
         _and "object was updated at the same time", ->
           beforeEach ->
             spyOn(@store, "cache").andReturn 
-              _syncedAt : new Date(0)
-              updatedAt: new Date(0)
+              _$syncedAt : new Date(0)
+              $updatedAt: new Date(0)
               
           it "should return false", ->
             do expect(@store.isDirty 'couch', '123').toBeFalsy
@@ -612,8 +612,8 @@ describe "Hoodie.LocalStore", ->
         _and "object was updated later", ->
           beforeEach ->
             spyOn(@store, "cache").andReturn 
-              _syncedAt : new Date(0)
-              updatedAt: new Date(1)
+              _$syncedAt : new Date(0)
+              $updatedAt: new Date(1)
               
           it "should return true", ->
             do expect(@store.isDirty 'couch', '123').toBeTruthy

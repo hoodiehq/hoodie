@@ -173,8 +173,8 @@ Hoodie.Account = (function() {
       name: "$passwordReset/" + resetPasswordId,
       type: 'user',
       password: resetPasswordId,
-      createdAt: new Date,
-      updatedAt: new Date
+      $createdAt: new Date,
+      $updatedAt: new Date
     };
     options = {
       data: JSON.stringify(data),

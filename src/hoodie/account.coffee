@@ -211,12 +211,12 @@ class Hoodie.Account
     
     key = "#{@_prefix}:$passwordReset/#{resetPasswordId}"
     data = 
-      _id       : key
-      name      : "$passwordReset/#{resetPasswordId}"
-      type      : 'user'
-      password  : resetPasswordId
-      createdAt : new Date
-      updatedAt : new Date
+      _id        : key
+      name       : "$passwordReset/#{resetPasswordId}"
+      type       : 'user'
+      password   : resetPasswordId
+      $createdAt : new Date
+      $updatedAt : new Date
 
     options =
       data        : JSON.stringify data

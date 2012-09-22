@@ -735,8 +735,8 @@ describe("Hoodie.Account", function() {
         expect(this.data.name).toBe("$passwordReset/joe@example.com/uuid567");
         expect(this.data.type).toBe('user');
         expect(this.data.password).toBe('joe@example.com/uuid567');
-        expect(this.data.createdAt).toBeDefined();
-        return expect(this.data.updatedAt).toBeDefined();
+        expect(this.data.$createdAt).toBeDefined();
+        return expect(this.data.$updatedAt).toBeDefined();
       });
       it("should return a promise", function() {
         return expect(this.account.resetPassword("joe@example.com")).toBePromise();

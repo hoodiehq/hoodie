@@ -80,10 +80,10 @@ Hoodie.LocalStore = (function(_super) {
       object.$public = options["public"];
     }
     if (options.remote) {
-      object._syncedAt = this._now();
+      object._$syncedAt = this._now();
     } else if (!options.silent) {
-      object.updatedAt = this._now();
-      object.createdAt || (object.createdAt = object.updatedAt);
+      object.$updatedAt = this._now();
+      object.$createdAt || (object.$createdAt = object.$updatedAt);
     }
     try {
       object = this.cache(type, id, object, options);
@@ -169,7 +169,7 @@ Hoodie.LocalStore = (function(_super) {
     if (!object) {
       return defer.reject(Hoodie.Errors.NOT_FOUND(type, id)).promise();
     }
-    if (object._syncedAt && !options.remote) {
+    if (object._$syncedAt && !options.remote) {
       object._deleted = true;
       this.cache(type, id, object);
     } else {
@@ -330,14 +330,14 @@ Hoodie.LocalStore = (function(_super) {
       obj = JSON.parse(json);
       obj.type = type;
       obj.id = id;
-      if (obj.createdAt) {
-        obj.createdAt = new Date(Date.parse(obj.createdAt));
+      if (obj.$createdAt) {
+        obj.$createdAt = new Date(Date.parse(obj.$createdAt));
       }
-      if (obj.updatedAt) {
-        obj.updatedAt = new Date(Date.parse(obj.updatedAt));
+      if (obj.$updatedAt) {
+        obj.$updatedAt = new Date(Date.parse(obj.$updatedAt));
       }
-      if (obj._syncedAt) {
-        obj._syncedAt = new Date(Date.parse(obj._syncedAt));
+      if (obj._$syncedAt) {
+        obj._$syncedAt = new Date(Date.parse(obj._$syncedAt));
       }
       return obj;
     } else {
@@ -366,13 +366,13 @@ Hoodie.LocalStore = (function(_super) {
   LocalStore.prototype._dirty = {};
 
   LocalStore.prototype._isDirty = function(object) {
-    if (!object._syncedAt) {
+    if (!object._$syncedAt) {
       return true;
     }
-    if (!object.updatedAt) {
+    if (!object.$updatedAt) {
       return false;
     }
-    return object._syncedAt.getTime() < object.updatedAt.getTime();
+    return object._$syncedAt.getTime() < object.$updatedAt.getTime();
   };
 
   LocalStore.prototype._isMarkedAsDeleted = function(object) {
