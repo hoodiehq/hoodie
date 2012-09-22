@@ -20,7 +20,7 @@ Mocks.Hoodie = ->
     
   my :
     store         :
-      uuid          : -> 'mock567'
+      uuid          : -> 'uuid'
       create        : -> promiseMock 
       destroy       : -> promiseMock 
       save          : -> promiseMock 
@@ -32,6 +32,7 @@ Mocks.Hoodie = ->
       delete        : -> promiseMock 
       destroyAll    : -> promiseMock 
       changedDocs   : ->
+      isDirty       : ->
         
       db :
         getItem       : ->
@@ -39,13 +40,12 @@ Mocks.Hoodie = ->
         removeItem    : ->
                   
     account       : 
-      authenticate  : -> 
-        then : ->   
-        pipe : ->   
-          fail : ->
-      db            : ->
-      on            : ->
-      ownerHash     : 'owner_hash'
+      authenticate    : -> promiseMock
+      db              : ->
+      on              : ->
+      ownerHash       : 'owner_hash'
+      hasAccount      : ->
+      anonymousSignUp : ->
       
     config :
       set : ->
@@ -54,5 +54,6 @@ Mocks.Hoodie = ->
       clear : ->
 
     remote :
-      connect : ->
-      disconnect : ->
+      connect     : ->
+      disconnect  : ->
+      sync        : ->

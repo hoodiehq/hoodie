@@ -478,20 +478,37 @@ describe "Hoodie.Account", ->
   # /.signIn(username, password)
 
 
+  describe ".hasAccount()", ->
+    _when "#username is undefined", ->
+      beforeEach ->
+        delete @account.username
+
+      it "should return false", ->
+         expect(@account.hasAccount()).toBe false
+
+    _when "#username is set", ->
+      beforeEach ->
+        @account.username = 'somebody'
+
+      it "should return false", ->
+         expect(@account.hasAccount()).toBe true      
+  # /.hasAccount
+
+
   describe ".hasAnonymousAccount()", ->
     _when "_account.anonymousPassword is set", ->
       beforeEach ->
         spyOn(@hoodie.my.config, "get").andCallFake (key) ->
-          if key is '_account.username'
+          if key is '_account.anonymousPassword'
             return 'password'
 
-        it "should return true", ->
-           expect(@account.hasAnonymousAccount()).toBe true
+      it "should return true", ->
+         expect(@account.hasAnonymousAccount()).toBe true
 
     _when "_account.anonymousPassword is not set", ->
       beforeEach ->
         spyOn(@hoodie.my.config, "get").andCallFake (key) ->
-          if key is '_account.username'
+          if key is '_account.anonymousPassword'
             return undefined
 
       it "should return false", ->

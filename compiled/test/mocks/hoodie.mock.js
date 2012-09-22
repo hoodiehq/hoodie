@@ -23,7 +23,7 @@ Mocks.Hoodie = function() {
     my: {
       store: {
         uuid: function() {
-          return 'mock567';
+          return 'uuid';
         },
         create: function() {
           return promiseMock;
@@ -56,6 +56,7 @@ Mocks.Hoodie = function() {
           return promiseMock;
         },
         changedDocs: function() {},
+        isDirty: function() {},
         db: {
           getItem: function() {},
           setItem: function() {},
@@ -64,18 +65,13 @@ Mocks.Hoodie = function() {
       },
       account: {
         authenticate: function() {
-          return {
-            then: function() {},
-            pipe: function() {
-              return {
-                fail: function() {}
-              };
-            }
-          };
+          return promiseMock;
         },
         db: function() {},
         on: function() {},
-        ownerHash: 'owner_hash'
+        ownerHash: 'owner_hash',
+        hasAccount: function() {},
+        anonymousSignUp: function() {}
       },
       config: {
         set: function() {},
@@ -85,7 +81,8 @@ Mocks.Hoodie = function() {
       },
       remote: {
         connect: function() {},
-        disconnect: function() {}
+        disconnect: function() {},
+        sync: function() {}
       }
     }
   };

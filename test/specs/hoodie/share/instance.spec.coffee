@@ -2,73 +2,214 @@ describe "Hoodie.Share.Instance", ->
   beforeEach ->
     @hoodie = new Mocks.Hoodie 
     Hoodie.Share.Instance.prototype.hoodie = @hoodie
-    @share = new Hoodie.Share.Instance
+    @share = new Hoodie.Share.Instance id: 'share1'
   
   describe "constructor", ->
     beforeEach ->
-      spyOn(@hoodie.my.store, "uuid").andReturn 'newId'
-      spyOn(Hoodie.Share.Instance::, "set")
+      spyOn(Hoodie.Share.Instance::, "set").andCallThrough()
       
-    it "should set the attributes", ->
-      share = new Hoodie.Share.Instance {funky: 'options'}
-      expect(Hoodie.Share.Instance::set).wasCalledWith {funky: 'options'}
-      expect('funky').toBe 'fresh'
+    it "should set passed options", ->
+      share = new Hoodie.Share.Instance {option1: "value1", option2: "value2"}
+      expect(Hoodie.Share.Instance::set).wasCalledWith {option1: "value1", option2: "value2"}
     
-    _when "called without options", ->
-      it "should have some specs"
+    it "should set id from options.id", ->
+      share = new Hoodie.Share.Instance id: 'id123'
+      expect(share.id).toBe 'id123'
 
-    _when "called with id: 'uuid567'", ->
-      it "should have some specs"
+    it "should generate an id if options.id wasn't passed", ->
+      share = new Hoodie.Share.Instance
+      expect(share.id).toBe 'uuid'
+       
+    it "should default access to false", ->
+      share = new Hoodie.Share.Instance
+      expect(share.access).toBe false
+  # /constructor
 
-    _when "called with access: true", ->
-      it "should have some specs"
+  describe "#set(key, value)", ->
+    _when "key is a string", ->
+      it "should set key as instance variable", ->
+        @share.set("access", true)
+        expect(@share.access).toBe true
 
-    _when "called with access: [user1, user2]", ->
-      it "should have some specs"
+      it "shouldn't allow to set unknown options", ->
+        @share.set("unknownOption", "funky")
+        expect(@share.unknownOption).toBe undefined
 
-    _when "called with access: { read: true }", ->
-      it "should have some specs"
+    _when "key is a hash", ->
+      it "should set all options from passed hash", ->
+        @options =
+          access     : true
+          continuous : true
+          password   : 'secret'
+        @share.set(@options)
+        for key, value of @options
+          expect(@share[key]).toBe value
 
-    _when "called with access: { write: [user1, user2] }", ->
-      it "should have some specs"
+      it "shouldn't set unnown options", ->
+        @options =
+          unknown   : 1
+          malicious : 2
+        @share.set(@options)
+        for key of @options
+          expect(@share[key]).toBe undefined
+  # /#set(key,value)
 
-    _when "called with access: { read: [user1], write: [user2, user3] }", ->
-      it "should have some specs"
 
-    _when "called with continuous: true", ->
-      it "should have some specs"
+  describe "#get(key)", ->
+    it "should return value of passed property", ->
+      @share.funky = 'fresh'
+      expect(@share.funky).toBe 'fresh'
+  # /#get(key)
 
-    _when "called with password: 'secret'", ->
-      it "should have some specs"
 
-    _when "called with objects: [obj1, obj2]", ->
-      it "should have some specs"
+  describe "#save(update, options)", ->
+    beforeEach ->
+      @updatePromise = @hoodie.defer()
+      spyOn(@hoodie.my.store, "update").andReturn @updatePromise.promise()
+      spyOn(@share, "set").andCallThrough()
+      
     
-
-    ###
-    _when "user is anonymous", ->
+    _when "user has no account yet", ->
       beforeEach ->
-        @hoodie.my.account.username = undefined
-      
-      it "should use the ShareHoodie", ->
-        share = new Hoodie.Share.Instance
-        expect(share.hoodie.constructor).toBe ShareHoodie
-        
-      it "should set anonymous to true", ->
-        share = new Hoodie.Share.Instance
-        expect(share.anonymous).toBeTruthy()
-      
-        
+        spyOn(@hoodie.my.account, "hasAccount").andReturn false
+        spyOn(@hoodie.my.account, "anonymousSignUp")
+
+      it "should sign up anonymously", ->
+        @share.save()
+        expect(@hoodie.my.account.anonymousSignUp).wasCalled()
+
     _when "user has an account", ->
       beforeEach ->
-        @hoodie.my.account.username = 'joe@example.com'
+        spyOn(@hoodie.my.account, "hasAccount").andReturn true
+        spyOn(@hoodie.my.account, "anonymousSignUp")
+
+      it "should not sign up anonymously", ->
+        @share.save()
+        expect(@hoodie.my.account.anonymousSignUp).wasNotCalled() 
+
+    _when "update passed", ->
+      it "should set the passed properties", ->
+        @share.save {funky: 'fresh'}
+        expect(@share.set).wasCalledWith {funky: 'fresh'}
+
+      it "should update $share with properties updated using #set() before", ->
+        @share._memory = {}
+        @share.set 'access', true
+        @share.set 'password', 'secret'
+        @share.save()
+        expect(@hoodie.my.store.update).wasCalledWith '$share', 'share1', {
+          access   : true
+          password : 'secret'
+        }, undefined
+
+    it "should return a promise", ->
+      expect(@share.save()).toBePromise() 
+
+    it "should update its properties with attributes returned from store.update", ->
+      @updatePromise.resolve({funky: 'fresh'})
+      @share.save()
+      expect(@share.funky).toBe 'fresh'
+  # /#save(update, options)
+
+
+  describe "#add(objects, sharedAttributes)", ->
+    beforeEach ->
+      spyOn(@share, "toggle")
+    
+    it "should call #toggle with passed objects and sharedAttributes", ->
+      @share.add ['object1', 'object2'], ['attribute1', 'attribute2']
+      expect(@share.toggle).wasCalledWith ['object1', 'object2'], ['attribute1', 'attribute2']
+
+    it "should default sharedAttributes to true", ->
+      @share.add ['object1', 'object2']
+      expect(@share.toggle).wasCalledWith ['object1', 'object2'], true
+  # /#add(objects, sharedAttributes)
+
+
+  describe "#remove(objects)", ->
+    it "should call #toggle with passed objects and false", ->
+      spyOn(@share, "toggle")
+      @share.remove ['object1', 'object2']
+      expect(@share.toggle).wasCalledWith ['object1', 'object2'], false
+  # /#remove(objects)
+
+
+  describe "#toggle(objects, filter)", ->
+    beforeEach ->
+      spyOn(@hoodie.my.store, "updateAll").andCallFake (objects, updateFunction) ->
+        for object in objects
+          $.extend object, updateFunction(object)
+      @objects = [
+        {$type: 'todo', id: '1', title: 'milk'}
+        {$type: 'todo', id: '2', title: 'flakes', $shares: {'share1': true}}
+        {$type: 'todo', id: '2', title: 'flakes', private: 'note', $shares: {'share1': ['title']}}
+      ]
+    
+    _when "called without filter", ->
+      beforeEach ->
+        @updatedObjects = @share.toggle @objects
+
+      it "should add unshared objects to the share", ->
+        expect(@updatedObjects[0].$shares.share1).toBe true 
       
-      it "should use the ShareHoodie", ->
-        share = new Hoodie.Share.Instance
-        expect(share.hoodie.constructor).toBe HoodieMock
-        
-      it "should set anonymous to false", ->
-        share = new Hoodie.Share.Instance
-        expect(share.anonymous).toBeFalsy()
-    ###
-  # /constructor
+      it "should remove objects belonging to share", ->
+        expect(@updatedObjects[1].$shares).toBe undefined
+        expect(@updatedObjects[2].$shares).toBe undefined
+  # /#toggle(objects, filter)
+
+
+  describe "#sync()", ->
+    beforeEach ->
+      spyOn(@share, "save").andReturn @hoodie.defer().resolve().promise()
+      spyOn(@share, "findAllObjects").andReturn ['object1', 'object2']
+      spyOn(@hoodie.my.remote, "sync")
+      @share.sync()
+    
+    it "should save the share", ->
+      expect(@share.save).wasCalled()
+
+    it "should sync all objects belonging to share", ->
+      expect(@hoodie.my.remote.sync).wasCalledWith ['object1', 'object2']
+  # /#sync()
+
+
+  describe "#destroy()", ->
+    beforeEach ->
+      spyOn(@share, "remove").andReturn @hoodie.defer().resolve().promise()
+      spyOn(@share, "findAllObjects").andReturn ['object1', 'object2']
+      spyOn(@hoodie.my.store, "destroy")
+      @share.destroy()
+    
+    it "should remove all objects from share", ->
+      expect(@share.remove).wasCalledWith ['object1', 'object2']
+
+    it "should remove $share object from store", ->
+      expect(@hoodie.my.store.destroy).wasCalledWith '$share', 'share1'
+  # /#destroy()
+
+
+  describe "#findAllObjects()", ->
+    beforeEach ->
+      spyOn(@hoodie.my.store, "findAll").andReturn 'findAllPromise'
+      @share.findAllObjects()
+      @filter = @hoodie.my.store.findAll.mostRecentCall.args[0]
+      @objects = [
+        {$type: 'todo', id: '1', title: 'milk'}
+        {$type: 'todo', id: '2', title: 'flakes', $shares: {'share1': true}}
+        {$type: 'todo', id: '2', title: 'flakes', private: 'note', $shares: {'share1': ['title']}}
+      ]
+
+    it "should return promise by store.findAll", ->
+      expect(@share.findAllObjects()).toBe 'findAllPromise'
+    
+    it "should call findAllObjects with a filter that returns only objects that changed and that belong to share", ->
+      expect(@filter @objects[0]).toBe false
+
+      spyOn(@hoodie.my.store, "isDirty").andReturn true
+      expect(@filter @objects[1]).toBe true
+      expect(@filter @objects[2]).toBe true
+
+      @hoodie.my.store.isDirty.andReturn false
+      expect(@filter @objects[1]).toBe false
+      expect(@filter @objects[2]).toBe false
+  # /#findAllObjects()

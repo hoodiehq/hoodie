@@ -100,6 +100,14 @@ class Hoodie.Account
       @hoodie.my.config.set '_account.anonymousPassword', password
 
 
+  # hasAccount
+  # ---------------------
+  
+  #
+  hasAccount: ->
+    @username?
+
+
   # hasAnonymousAccount
   # ---------------------
   

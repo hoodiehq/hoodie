@@ -1,4 +1,11 @@
 class Hoodie.Share.Instance extends Hoodie.RemoteStore
+  
+  # default values
+  # ----------------
+
+  # shares are not accessible to others by default.
+  access: false
+
 
   # constructor
   # -------------
@@ -9,8 +16,6 @@ class Hoodie.Share.Instance extends Hoodie.RemoteStore
   #
   #     id:            (optional, defaults to random uuid)
   #                    name of share.
-  #     objects:       (optional)
-  #                    array of objects that should be shared
   #     access:        (default: false)
   #                    **false**
   #                    only the creator has access.
@@ -45,13 +50,8 @@ class Hoodie.Share.Instance extends Hoodie.RemoteStore
   #
   constructor: (options = {}) ->
 
-    # setting attributes
-    {id, access, continuous, password} = options
-    access or= false
-    @set {id, access, continuous, password}
-
-    # generate an id unless one has been provided
-    @id or= @hoodie.my.store.uuid()
+    @set options
+    @id = options.id or @hoodie.my.store.uuid()
   
   
   # set
@@ -60,14 +60,13 @@ class Hoodie.Share.Instance extends Hoodie.RemoteStore
   # set an attribute, without making the change persistent yet.
   # alternatively, a hash of key/value pairs can be passed
   _memory: {}
+  _allowed_options: ["access", "continuous", "password"]
   set : (key, value) =>
     if typeof key is 'object'
-      @[_key] = @_memory[_key] = value for _key, value of key 
+      for _key, value of key when _key in @_allowed_options
+        @[_key] = @_memory[_key] = value 
     else 
-      @[key]  = @_memory[key]  = value
-
-    # make sure share is private if invitees are set
-    @private = @_memory.private = true if @invitees?.length
+      @[key]  = @_memory[key]  = value if key in @_allowed_options
 
     return undefined
     
@@ -91,7 +90,8 @@ class Hoodie.Share.Instance extends Hoodie.RemoteStore
   # an account, we do an anonymous signUp.
   save : (update = {}, options) ->
     
-    @hoodie.my.account.anonymousSignUp()
+    unless @hoodie.my.account.hasAccount()
+      @hoodie.my.account.anonymousSignUp()
 
     @set(update) if update
     _handleUpdate = (properties, wasCreated) => 
@@ -117,8 +117,8 @@ class Hoodie.Share.Instance extends Hoodie.RemoteStore
   # share.add([todoObject1, todoObject2, todoObject3])
   # share.add([todoObject1, todoObject2, todoObject3], ["name", "city"])
   # share.add( hoodie.my.store.findAll (obj) -> obj.isShared )
-  add : (objects, sharedAttributes) ->
-    @toggle objects, sharedAttributes or true
+  add : (objects, sharedAttributes = true) ->
+    @toggle objects, sharedAttributes
     
       
   # remove
@@ -165,10 +165,8 @@ class Hoodie.Share.Instance extends Hoodie.RemoteStore
   #
   sync : =>
     @save()
-    .pipe @hoodie.my.store.findAll(@_isMySharedObjectAndChanged)
-    .pipe (sharedObjectsThatChanged) =>
-      @hoodie.my.remote.sync(sharedObjectsThatChanged)
-      .then @_handleRemoteChanges
+    .pipe(@findAllObjects)
+    .pipe(@hoodie.my.remote.sync)
 
 
   # destroy
@@ -176,11 +174,19 @@ class Hoodie.Share.Instance extends Hoodie.RemoteStore
 
   # remove all objects from share, then destroy share itself
   destroy : =>
-    @remove( @hoodie.my.store.findAll(@_isMySharedObject) )
+    @remove( @findAllObjects() )
     .then =>
       @hoodie.my.store.destroy("$share", @id)
     
-    
+  
+  # findAllObjects
+  # ----------------
+
+  #
+  findAllObjects : =>
+    @hoodie.my.store.findAll(@_isMySharedObjectAndChanged)
+
+
   # Private
   # ---------
 
@@ -213,19 +219,19 @@ class Hoodie.Share.Instance extends Hoodie.RemoteStore
   # it to/from share
   _toggle : (obj) => 
     try
-      doAdd = ~obj.$shares.indexOf @id
+      doAdd = obj.$shares[@id] is undefined or obj.$shares[@id] is false
     catch e
       doAdd = true
 
     if doAdd
-      @_add(obj)
+      @_add(true)(obj)
     else
       @_remove(obj)
 
   # all objects which $shares hash has share.id as key
   _isMySharedObject : (obj) =>
     obj.$shares?[@id]?
-  
+
   # an object belongs to Share if it has the same id (its the actual share object)
   # or its $shares hash has share.id as key
   _isMySharedObjectAndChanged : (obj) =>

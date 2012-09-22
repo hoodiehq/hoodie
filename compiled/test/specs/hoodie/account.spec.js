@@ -560,23 +560,41 @@ describe("Hoodie.Account", function() {
       });
     });
   });
+  describe(".hasAccount()", function() {
+    _when("#username is undefined", function() {
+      beforeEach(function() {
+        return delete this.account.username;
+      });
+      return it("should return false", function() {
+        return expect(this.account.hasAccount()).toBe(false);
+      });
+    });
+    return _when("#username is set", function() {
+      beforeEach(function() {
+        return this.account.username = 'somebody';
+      });
+      return it("should return false", function() {
+        return expect(this.account.hasAccount()).toBe(true);
+      });
+    });
+  });
   describe(".hasAnonymousAccount()", function() {
     _when("_account.anonymousPassword is set", function() {
-      return beforeEach(function() {
-        spyOn(this.hoodie.my.config, "get").andCallFake(function(key) {
-          if (key === '_account.username') {
+      beforeEach(function() {
+        return spyOn(this.hoodie.my.config, "get").andCallFake(function(key) {
+          if (key === '_account.anonymousPassword') {
             return 'password';
           }
         });
-        return it("should return true", function() {
-          return expect(this.account.hasAnonymousAccount()).toBe(true);
-        });
+      });
+      return it("should return true", function() {
+        return expect(this.account.hasAnonymousAccount()).toBe(true);
       });
     });
     return _when("_account.anonymousPassword is not set", function() {
       beforeEach(function() {
         return spyOn(this.hoodie.my.config, "get").andCallFake(function(key) {
-          if (key === '_account.username') {
+          if (key === '_account.anonymousPassword') {
             return void 0;
           }
         });

@@ -89,6 +89,10 @@ Hoodie.Account = (function() {
     });
   };
 
+  Account.prototype.hasAccount = function() {
+    return this.username != null;
+  };
+
   Account.prototype.hasAnonymousAccount = function() {
     return this.hoodie.my.config.get('_account.anonymousPassword') != null;
   };
