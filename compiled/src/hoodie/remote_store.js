@@ -79,7 +79,7 @@ Hoodie.RemoteStore = (function(_super) {
       id = this.uuid();
     }
     object = $.extend({
-      type: type,
+      $type: type,
       id: id
     }, object);
     doc = this._parseForRemote(object);
@@ -267,7 +267,7 @@ Hoodie.RemoteStore = (function(_super) {
       }
       delete attributes[attr];
     }
-    attributes._id = "" + attributes.type + "/" + attributes.id;
+    attributes._id = "" + attributes.$type + "/" + attributes.id;
     delete attributes.id;
     return attributes;
   };
@@ -302,7 +302,7 @@ Hoodie.RemoteStore = (function(_super) {
     var id, _ref;
     id = obj._id || obj.id;
     delete obj._id;
-    _ref = id.split(/\//), obj.type = _ref[0], obj.id = _ref[1];
+    _ref = id.split(/\//), obj.$type = _ref[0], obj.id = _ref[1];
     if (obj.$createdAt) {
       obj.$createdAt = new Date(Date.parse(obj.$createdAt));
     }
@@ -319,7 +319,7 @@ Hoodie.RemoteStore = (function(_super) {
   RemoteStore.prototype._parseFromPush = function(obj) {
     var id, _ref;
     id = obj._id || delete obj._id;
-    _ref = obj.id.split(/\//), obj.type = _ref[0], obj.id = _ref[1];
+    _ref = obj.id.split(/\//), obj.$type = _ref[0], obj.id = _ref[1];
     obj._rev = obj.rev;
     delete obj.rev;
     delete obj.ok;
@@ -336,13 +336,13 @@ Hoodie.RemoteStore = (function(_super) {
       doc = this._parseFromPull(doc);
       if (doc._deleted) {
         _destroyedDocs.push([
-          doc, this.hoodie.my.store.destroy(doc.type, doc.id, {
+          doc, this.hoodie.my.store.destroy(doc.$type, doc.id, {
             remote: true
           })
         ]);
       } else {
         _changedDocs.push([
-          doc, this.hoodie.my.store.update(doc.type, doc.id, doc, {
+          doc, this.hoodie.my.store.update(doc.$type, doc.id, doc, {
             remote: true
           })
         ]);
@@ -352,11 +352,11 @@ Hoodie.RemoteStore = (function(_super) {
       _ref = _destroyedDocs[_j], doc = _ref[0], promise = _ref[1];
       promise.then(function(object) {
         _this.hoodie.trigger('remote:destroy', object);
-        _this.hoodie.trigger("remote:destroy:" + doc.type, object);
-        _this.hoodie.trigger("remote:destroy:" + doc.type + ":" + doc.id, object);
+        _this.hoodie.trigger("remote:destroy:" + doc.$type, object);
+        _this.hoodie.trigger("remote:destroy:" + doc.$type + ":" + doc.id, object);
         _this.hoodie.trigger('remote:change', 'destroy', object);
-        _this.hoodie.trigger("remote:change:" + doc.type, 'destroy', object);
-        return _this.hoodie.trigger("remote:change:" + doc.type + ":" + doc.id, 'destroy', object);
+        _this.hoodie.trigger("remote:change:" + doc.$type, 'destroy', object);
+        return _this.hoodie.trigger("remote:change:" + doc.$type + ":" + doc.id, 'destroy', object);
       });
     }
     _results = [];
@@ -366,11 +366,11 @@ Hoodie.RemoteStore = (function(_super) {
         var event;
         event = objectWasCreated ? 'create' : 'update';
         _this.hoodie.trigger("remote:" + event, object);
-        _this.hoodie.trigger("remote:" + event + ":" + doc.type, object);
-        _this.hoodie.trigger("remote:" + event + ":" + doc.type + ":" + doc.id, object);
+        _this.hoodie.trigger("remote:" + event + ":" + doc.$type, object);
+        _this.hoodie.trigger("remote:" + event + ":" + doc.$type + ":" + doc.id, object);
         _this.hoodie.trigger("remote:change", event, object);
-        _this.hoodie.trigger("remote:change:" + doc.type, event, object);
-        return _this.hoodie.trigger("remote:change:" + doc.type + ":" + doc.id, event, object);
+        _this.hoodie.trigger("remote:change:" + doc.$type, event, object);
+        return _this.hoodie.trigger("remote:change:" + doc.$type + ":" + doc.id, event, object);
       }));
     }
     return _results;
@@ -389,7 +389,7 @@ Hoodie.RemoteStore = (function(_super) {
         options = {
           remote: true
         };
-        _results.push(_this.hoodie.my.store.update(doc.type, doc.id, update, options));
+        _results.push(_this.hoodie.my.store.update(doc.$type, doc.id, update, options));
       }
       return _results;
     };

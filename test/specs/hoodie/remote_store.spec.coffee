@@ -110,7 +110,7 @@ describe "Hoodie.RemoteStore", ->
         expect(@path).toBe '/car%2F123'
 
       it "should add type to saved object", -> 
-        expect(@data.type).toBe 'car'
+        expect(@data.$type).toBe 'car'
 
       it "should set _id to `car/123`", ->
         expect(@data._id).toBe 'car/123'
@@ -349,7 +349,7 @@ describe "Hoodie.RemoteStore", ->
 
       it "should save `todo/abc2` in store", ->
         @remote.pull()
-        expect(@hoodie.my.store.update).wasCalledWith 'todo', 'abc2', { _rev : '1-123', content : 'remember the milk', done : false, order : 1, type : 'todo', id : 'abc2' }, { remote : true }
+        expect(@hoodie.my.store.update).wasCalledWith 'todo', 'abc2', { _rev : '1-123', content : 'remember the milk', done : false, order : 1, $type : 'todo', id : 'abc2' }, { remote : true }
       
       it "should trigger remote events", ->
         @remote.pull()

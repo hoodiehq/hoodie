@@ -132,7 +132,7 @@ class Hoodie.LocalStore extends Hoodie.Store
     # normalize filter
     if typeof filter is 'string'
       type   = filter
-      filter = (obj) -> obj.type is type
+      filter = (obj) -> obj.$type is type
   
     try
       # coffeescript gathers the result of the respective for key in keys loops
@@ -194,7 +194,7 @@ class Hoodie.LocalStore extends Hoodie.Store
     key = "#{type}/#{id}"
   
     if object
-      @_cached[key] = $.extend object, { type: type, id: id }
+      @_cached[key] = $.extend object, { $type: type, id: id }
       @_setObject type, id, object
       
       if options.remote
@@ -346,7 +346,7 @@ class Hoodie.LocalStore extends Hoodie.Store
   _setObject : (type, id, object) ->
     key = "#{type}/#{id}"
     store = $.extend {}, object
-    delete store.type
+    delete store.$type
     delete store.id
     @db.setItem key, JSON.stringify store
     
@@ -355,7 +355,7 @@ class Hoodie.LocalStore extends Hoodie.Store
     json = @db.getItem(key)
     if json
       obj = JSON.parse(json)
-      obj.type  = type
+      obj.$type = type
       obj.id    = id
       
       obj.$createdAt = new Date(Date.parse obj.$createdAt) if obj.$createdAt

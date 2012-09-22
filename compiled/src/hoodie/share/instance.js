@@ -169,7 +169,7 @@ Hoodie.Share.Instance = (function(_super) {
   Instance.prototype._isMySharedObjectAndChanged = function(obj) {
     var belongsToMe, _ref;
     belongsToMe = obj.id === this.id || (((_ref = obj.$shares) != null ? _ref[this.id] : void 0) != null);
-    return belongsToMe && this.hoodie.my.store.isDirty(obj.type, obj.id);
+    return belongsToMe && this.hoodie.my.store.isDirty(obj.$type, obj.id);
   };
 
   Instance.prototype._handleRemoteChanges = function() {

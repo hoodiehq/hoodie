@@ -738,7 +738,7 @@ describe("Hoodie.LocalStore", function() {
         this.store.cache('couch', '123');
         return expect(this.store.markAsChanged).wasCalledWith('couch', '123', {
           color: 'red',
-          type: 'couch',
+          $type: 'couch',
           id: '123'
         });
       });
@@ -764,7 +764,7 @@ describe("Hoodie.LocalStore", function() {
           this.store.cache('couch', '123');
           return expect(this.store.markAsChanged).wasCalledWith('couch', '123', {
             color: 'red',
-            type: 'couch',
+            $type: 'couch',
             id: '123'
           });
         });
@@ -776,7 +776,7 @@ describe("Hoodie.LocalStore", function() {
         color: 'red'
       });
       expect(obj.color).toBe('red');
-      expect(obj.type).toBe('couch');
+      expect(obj.$type).toBe('couch');
       return expect(obj.id).toBe('123');
     });
   });

@@ -5,8 +5,8 @@
 class Hoodie.Config
   
   # used as attribute name in localStorage
-  type : '$config'
-  id   : 'hoodie'
+  $type : '$config'
+  id    : 'hoodie'
   
   # memory cache
   cache : {}
@@ -14,10 +14,10 @@ class Hoodie.Config
   # ## Constructor
   #
   constructor : (@hoodie, options = {}) ->
-    @type       = options.type       if options.type
+    @$type      = options.$type      if options.$type
     @id         = options.id         if options.id
     
-    @hoodie.my.store.find(@type, @id).done (obj) => @cache = obj
+    @hoodie.my.store.find(@$type, @id).done (obj) => @cache = obj
 
     @hoodie.on 'account:signedOut', @clear
   
@@ -35,7 +35,7 @@ class Hoodie.Config
     update[key] = value
     
     isSilent = key.charAt(0) is '_'
-    @hoodie.my.store.update @type, @id, update, silent: isSilent
+    @hoodie.my.store.update @$type, @id, update, silent: isSilent
     
   
   # ## get
@@ -51,7 +51,7 @@ class Hoodie.Config
   # clears cache and removes object from store
   clear : =>
     @cache = {}
-    @hoodie.my.store.destroy @type, @id
+    @hoodie.my.store.destroy @$type, @id
   
   
   # ## remove

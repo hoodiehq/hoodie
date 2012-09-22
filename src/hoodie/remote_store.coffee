@@ -100,8 +100,8 @@ class Hoodie.RemoteStore extends Hoodie.Store
 
     id = @uuid() unless id 
     object = $.extend {
-      type: type
-      id  : id
+      $type : type
+      id    : id
     }, object
 
     doc   = @_parseForRemote object
@@ -147,14 +147,14 @@ class Hoodie.RemoteStore extends Hoodie.Store
   # ## get
   
   # send a GET request to the named view
-  get: (view_name, params) ->
+  get : (view_name, params) ->
     console.log ".get() not yet implemented", arguments...
   
   
   # ## post
   
   # sends a POST request to the specified updated_function
-  post: (update_function_name, params) ->
+  post : (update_function_name, params) ->
     console.log ".post() not yet implemented", arguments...
 
 
@@ -186,33 +186,33 @@ class Hoodie.RemoteStore extends Hoodie.Store
   # ## isContinuouslyPulling
 
   # returns true if pulling is set to be continous
-  isContinuouslyPulling: ->
+  isContinuouslyPulling : ->
     @_sync is true or @_sync?.pull is true
 
   # ## isContinuouslyPushing
 
   # returns true if pulling is set to be continous
-  isContinuouslyPushing: ->
+  isContinuouslyPushing : ->
     @_sync is true or @_sync?.push is true
 
   # ## isContinuouslySyncing
 
   # returns true if pulling is set to be continous
-  isContinuouslySyncing: ->
+  isContinuouslySyncing : ->
     @_sync is true
 
   # ## getSinceNr
 
   # returns the sequence number from wich to start to find changes in pull
   #
-  getSinceNr: ->
+  getSinceNr : ->
     @_since or 0
 
   # ## setSinceNr
 
   # sets the sequence number from wich to start to find changes in pull
   #
-  setSinceNr: (seq) ->
+  setSinceNr : (seq) ->
     @_since = seq
 
 
@@ -372,7 +372,7 @@ class Hoodie.RemoteStore extends Hoodie.Store
       delete attributes[attr]
    
     # prepare CouchDB id
-    attributes._id = "#{attributes.type}/#{attributes.id}"
+    attributes._id = "#{attributes.$type}/#{attributes.id}"
     delete attributes.id
     
     return attributes
@@ -421,7 +421,7 @@ class Hoodie.RemoteStore extends Hoodie.Store
     # handle id and type
     id = obj._id or obj.id
     delete obj._id
-    [obj.type, obj.id] = id.split(/\//)
+    [obj.$type, obj.id] = id.split(/\//)
     
     # handle timestameps
     obj.$createdAt = new Date(Date.parse obj.$createdAt) if obj.$createdAt
@@ -444,7 +444,7 @@ class Hoodie.RemoteStore extends Hoodie.Store
     # handle id and type
     id = obj._id or 
     delete obj._id
-    [obj.type, obj.id] = obj.id.split(/\//)
+    [obj.$type, obj.id] = obj.id.split(/\//)
     
     # handle rev
     obj._rev = obj.rev
@@ -472,31 +472,31 @@ class Hoodie.RemoteStore extends Hoodie.Store
     for {doc} in changes
       doc = @_parseFromPull(doc)
       if doc._deleted
-        _destroyedDocs.push [doc, @hoodie.my.store.destroy(  doc.type, doc.id,      remote: true)]
+        _destroyedDocs.push [doc, @hoodie.my.store.destroy(  doc.$type, doc.id,      remote: true)]
       else                                                
-        _changedDocs.push   [doc, @hoodie.my.store.update(   doc.type, doc.id, doc, remote: true)]
+        _changedDocs.push   [doc, @hoodie.my.store.update(   doc.$type, doc.id, doc, remote: true)]
     
     # 2. trigger events
     for [doc, promise] in _destroyedDocs
       promise.then (object) => 
-        @hoodie.trigger 'remote:destroy',                       object
-        @hoodie.trigger "remote:destroy:#{doc.type}",           object
-        @hoodie.trigger "remote:destroy:#{doc.type}:#{doc.id}", object
+        @hoodie.trigger 'remote:destroy',                        object
+        @hoodie.trigger "remote:destroy:#{doc.$type}",           object
+        @hoodie.trigger "remote:destroy:#{doc.$type}:#{doc.id}", object
         
-        @hoodie.trigger 'remote:change',                        'destroy', object
-        @hoodie.trigger "remote:change:#{doc.type}",            'destroy', object
-        @hoodie.trigger "remote:change:#{doc.type}:#{doc.id}",  'destroy', object
+        @hoodie.trigger 'remote:change',                         'destroy', object
+        @hoodie.trigger "remote:change:#{doc.$type}",            'destroy', object
+        @hoodie.trigger "remote:change:#{doc.$type}:#{doc.id}",  'destroy', object
     
     for [doc, promise] in _changedDocs
       promise.then (object, objectWasCreated) => 
         event = if objectWasCreated then 'create' else 'update'
-        @hoodie.trigger "remote:#{event}",                       object
-        @hoodie.trigger "remote:#{event}:#{doc.type}",           object
-        @hoodie.trigger "remote:#{event}:#{doc.type}:#{doc.id}", object
+        @hoodie.trigger "remote:#{event}",                        object
+        @hoodie.trigger "remote:#{event}:#{doc.$type}",           object
+        @hoodie.trigger "remote:#{event}:#{doc.$type}:#{doc.id}", object
       
-        @hoodie.trigger "remote:change",                         event, object
-        @hoodie.trigger "remote:change:#{doc.type}",             event, object
-        @hoodie.trigger "remote:change:#{doc.type}:#{doc.id}",   event, object
+        @hoodie.trigger "remote:change",                          event, object
+        @hoodie.trigger "remote:change:#{doc.$type}",             event, object
+        @hoodie.trigger "remote:change:#{doc.$type}:#{doc.id}",   event, object
 
 
 
@@ -508,4 +508,4 @@ class Hoodie.RemoteStore extends Hoodie.Store
       for doc, i in docs
         update  = {_rev: pushedDocs[i]._rev}
         options = remote : true
-        @hoodie.my.store.update(doc.type, doc.id, update, options) 
+        @hoodie.my.store.update(doc.$type, doc.id, update, options) 

@@ -7,7 +7,7 @@ Mocks.changedDocs = function() {
     {
       content: "this is done",
       done: true,
-      type: "todo",
+      $type: "todo",
       id: "abc3",
       _rev: '2-123',
       _deleted: true,
@@ -17,7 +17,7 @@ Mocks.changedDocs = function() {
     }, {
       content: "remember the milk",
       done: false,
-      type: "todo",
+      $type: "todo",
       id: "abc2",
       $updatedAt: "2012-20-12T12:00:00.000Z",
       $createdAt: "2012-20-12T12:00:00.000Z"

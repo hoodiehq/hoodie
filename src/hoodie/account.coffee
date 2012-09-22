@@ -71,7 +71,7 @@ class Hoodie.Account
         type       : 'user'
         roles      : []
         password   : password
-        $createdBy : @ownerHash
+        ownerHash  : @ownerHash
         database   : @db()
       contentType : 'application/json'
 

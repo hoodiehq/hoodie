@@ -127,7 +127,7 @@ describe("Hoodie.RemoteStore", function() {
         return expect(this.path).toBe('/car%2F123');
       });
       it("should add type to saved object", function() {
-        return expect(this.data.type).toBe('car');
+        return expect(this.data.$type).toBe('car');
       });
       return it("should set _id to `car/123`", function() {
         return expect(this.data._id).toBe('car/123');
@@ -406,7 +406,7 @@ describe("Hoodie.RemoteStore", function() {
           content: 'remember the milk',
           done: false,
           order: 1,
-          type: 'todo',
+          $type: 'todo',
           id: 'abc2'
         }, {
           remote: true

@@ -232,7 +232,7 @@ class Hoodie.Share.Instance extends Hoodie.RemoteStore
   # or its $shares hash has share.id as key
   _isMySharedObjectAndChanged : (obj) =>
     belongsToMe = obj.id is @id or obj.$shares?[@id]?
-    return belongsToMe and @hoodie.my.store.isDirty(obj.type, obj.id)
+    return belongsToMe and @hoodie.my.store.isDirty(obj.$type, obj.id)
 
   #
   _handleRemoteChanges : ->

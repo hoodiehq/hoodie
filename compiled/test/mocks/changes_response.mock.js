@@ -17,7 +17,7 @@ Mocks.changesResponse = function() {
         "seq"     :3,
         "id"      :"todo/abc2",
         "changes" :[{"rev":"1-123"}],
-        "doc"     :{"_id":"todo/abc2","_rev":"1-123","content":"remember the milk","done":false,"order":1, "type":"todo"}
+        "doc"     :{"_id":"todo/abc2","_rev":"1-123","content":"remember the milk","done":false,"order":1, "$type":"todo"}
       }
     ],
     "last_seq":20

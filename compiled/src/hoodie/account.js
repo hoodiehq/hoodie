@@ -71,7 +71,7 @@ Hoodie.Account = (function() {
         type: 'user',
         roles: [],
         password: password,
-        $createdBy: this.ownerHash,
+        ownerHash: this.ownerHash,
         database: this.db()
       }),
       contentType: 'application/json'

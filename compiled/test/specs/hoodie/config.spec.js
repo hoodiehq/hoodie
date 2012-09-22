@@ -6,10 +6,10 @@ describe("Hoodie.Config", function() {
     return this.config = new Hoodie.Config(this.hoodie);
   });
   describe(".constructor(@hoodie, options)", function() {
-    it("should default @type to '$config'", function() {
+    it("should default @$type to '$config'", function() {
       var config;
       config = new Hoodie.Config(this.hoodie);
-      return expect(config.type).toBe('$config');
+      return expect(config.$type).toBe('$config');
     });
     return it("should default @id to 'hoodie'", function() {
       var config;

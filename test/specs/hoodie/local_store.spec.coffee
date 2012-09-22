@@ -516,7 +516,7 @@ describe "Hoodie.LocalStore", ->
       
       it "should mark it as changed", ->
         @store.cache 'couch', '123'
-        expect(@store.markAsChanged).wasCalledWith 'couch', '123', color: 'red', type: 'couch', id: '123'
+        expect(@store.markAsChanged).wasCalledWith 'couch', '123', color: 'red', $type: 'couch', id: '123'
     
     _when "object is not dirty", ->
       beforeEach -> @store._isDirty.andReturn false
@@ -533,13 +533,13 @@ describe "Hoodie.LocalStore", ->
       
         it "should mark it as changed", ->
           @store.cache 'couch', '123'
-          expect(@store.markAsChanged).wasCalledWith 'couch', '123', color: 'red', type: 'couch', id: '123'
+          expect(@store.markAsChanged).wasCalledWith 'couch', '123', color: 'red', $type: 'couch', id: '123'
     
     it "should return the object including type & id attributes", ->
       obj = @store.cache 'couch', '123', color: 'red'
-      expect(obj.color).toBe  'red'
-      expect(obj.type).toBe   'couch'
-      expect(obj.id).toBe     '123'
+      expect(obj.color).toBe 'red'
+      expect(obj.$type).toBe 'couch'
+      expect(obj.id).toBe    '123'
     
   # /.cache(type, id, object)
 

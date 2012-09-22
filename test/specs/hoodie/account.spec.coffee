@@ -200,8 +200,8 @@ describe "Hoodie.Account", ->
     it "should have set password to 'secret'", ->
       expect(@data.password).toBe 'secret'
 
-    it "should have set $createdBy to 'owner_hash123'", ->
-      expect(@data.$createdBy).toBe 'owner_hash123'
+    it "should have set ownerHash to 'owner_hash123'", ->
+      expect(@data.ownerHash).toBe 'owner_hash123'
 
     it "should have set database to 'user/owner_hash123'", ->
       expect(@data.database).toBe 'user/owner_hash123'

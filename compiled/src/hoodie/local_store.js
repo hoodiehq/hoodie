@@ -127,7 +127,7 @@ Hoodie.LocalStore = (function(_super) {
     if (typeof filter === 'string') {
       type = filter;
       filter = function(obj) {
-        return obj.type === type;
+        return obj.$type === type;
       };
     }
     try {
@@ -192,7 +192,7 @@ Hoodie.LocalStore = (function(_super) {
     key = "" + type + "/" + id;
     if (object) {
       this._cached[key] = $.extend(object, {
-        type: type,
+        $type: type,
         id: id
       });
       this._setObject(type, id, object);
@@ -317,7 +317,7 @@ Hoodie.LocalStore = (function(_super) {
     var key, store;
     key = "" + type + "/" + id;
     store = $.extend({}, object);
-    delete store.type;
+    delete store.$type;
     delete store.id;
     return this.db.setItem(key, JSON.stringify(store));
   };
@@ -328,7 +328,7 @@ Hoodie.LocalStore = (function(_super) {
     json = this.db.getItem(key);
     if (json) {
       obj = JSON.parse(json);
-      obj.type = type;
+      obj.$type = type;
       obj.id = id;
       if (obj.$createdAt) {
         obj.$createdAt = new Date(Date.parse(obj.$createdAt));

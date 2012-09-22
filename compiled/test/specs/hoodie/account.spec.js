@@ -230,8 +230,8 @@ describe("Hoodie.Account", function() {
     it("should have set password to 'secret'", function() {
       return expect(this.data.password).toBe('secret');
     });
-    it("should have set $createdBy to 'owner_hash123'", function() {
-      return expect(this.data.$createdBy).toBe('owner_hash123');
+    it("should have set ownerHash to 'owner_hash123'", function() {
+      return expect(this.data.ownerHash).toBe('owner_hash123');
     });
     it("should have set database to 'user/owner_hash123'", function() {
       return expect(this.data.database).toBe('user/owner_hash123');
