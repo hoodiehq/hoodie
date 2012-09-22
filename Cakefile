@@ -79,9 +79,6 @@ task 'build', 'build hoodie-client.min.js', ->
     'compiled/src/hoodie/user.js'
     'compiled/src/hoodie/global.js'
     'compiled/src/hoodie/share.js'
-    'compiled/src/hoodie/share/hoodie.js'
-    'compiled/src/hoodie/share/account.js'
-    'compiled/src/hoodie/share/remote.js'
     'compiled/src/hoodie/share/instance.js'
   ]
 

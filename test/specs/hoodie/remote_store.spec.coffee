@@ -95,7 +95,6 @@ describe "Hoodie.RemoteStore", ->
       @remote.save("car", 123, {})
       expect(@remote.uuid).wasNotCalled()
 
-
     it "should return promise by @request", ->
       expect(@remote.save("car", 123, {})).toBe 'request_promise'
     
