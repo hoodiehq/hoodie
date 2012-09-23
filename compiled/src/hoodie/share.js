@@ -27,7 +27,8 @@ Hoodie.Share = (function() {
       attributes = {};
     }
     share = new this.instance(attributes);
-    return share.save();
+    share.save();
+    return share;
   };
 
   Share.prototype.find = function(id) {
