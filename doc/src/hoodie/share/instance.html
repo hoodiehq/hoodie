@@ -1,4 +1,11 @@
 <!DOCTYPE html><html lang="en"><head><title>src/hoodie/share/instance</title></head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0"><meta name="groc-relative-root" content="../../../"><meta name="groc-document-path" content="src/hoodie/share/instance"><meta name="groc-project-path" content="src/hoodie/share/instance.coffee"><link rel="stylesheet" type="text/css" media="all" href="../../../assets/style.css"><script type="text/javascript" src="../../../assets/behavior.js"></script><body><div id="meta"><div class="file-path">src/hoodie/share/instance.coffee</div></div><div id="document"><div class="segment"><div class="code"><div class="wrapper"><span class="k">class</span> <span class="nx">Hoodie</span><span class="p">.</span><span class="nx">Share</span><span class="p">.</span><span class="nx">Instance</span> <span class="k">extends</span> <span class="nx">Hoodie</span><span class="p">.</span><span class="nx">RemoteStore</span>
+  
+  <span class="c1"># default values</span>
+  <span class="c1"># ----------------</span>
+
+  <span class="c1"># shares are not accessible to others by default.</span>
+  <span class="nv">access: </span><span class="kc">false</span>
+
 
   <span class="c1"># constructor</span>
   <span class="c1"># -------------</span>
@@ -9,8 +16,6 @@
   <span class="c1">#</span>
   <span class="c1">#     id:            (optional, defaults to random uuid)</span>
   <span class="c1">#                    name of share.</span>
-  <span class="c1">#     objects:       (optional)</span>
-  <span class="c1">#                    array of objects that should be shared</span>
   <span class="c1">#     access:        (default: false)</span>
   <span class="c1">#                    **false**</span>
   <span class="c1">#                    only the creator has access.</span>
@@ -24,9 +29,6 @@
   <span class="c1">#                    only user1 &amp; user2 have access (read only)</span>
   <span class="c1">#                    **{ read: true, write: [user1, user2] }**</span>
   <span class="c1">#                    public sharing, but only user1 &amp; user 2 can edit</span>
-  <span class="c1">#     continuous:    (default: false)</span>
-  <span class="c1">#                    if set to true, the shared objects will be</span>
-  <span class="c1">#                    continuously updated.</span>
   <span class="c1">#     password:      (optional)</span>
   <span class="c1">#                    a sharing can be optionally protected with a password.</span>
   <span class="c1">#</span>
@@ -44,16 +46,9 @@
   <span class="c1">#       ]</span>
   <span class="c1">#</span>
   <span class="nv">constructor: </span><span class="nf">(options = {}) -&gt;</span>
-    
-    <span class="vi">@hoodie = </span><span class="nx">@constructor</span><span class="p">.</span><span class="nx">hoodie</span>
 
-    <span class="c1"># setting attributes</span>
-    <span class="p">{</span><span class="nx">id</span><span class="p">,</span> <span class="nx">access</span><span class="p">,</span> <span class="nx">continuous</span><span class="p">,</span> <span class="nx">password</span><span class="p">}</span> <span class="o">=</span> <span class="nx">options</span>
-    <span class="nx">access</span> <span class="o">or=</span> <span class="kc">false</span>
-    <span class="nx">@set</span> <span class="p">{</span><span class="nx">id</span><span class="p">,</span> <span class="nx">access</span><span class="p">,</span> <span class="nx">continuous</span><span class="p">,</span> <span class="nx">password</span><span class="p">}</span>
-
-    <span class="c1"># generate an id unless one has been provided</span>
-    <span class="nx">@id</span> <span class="o">or=</span> <span class="nx">@hoodie</span><span class="p">.</span><span class="nx">my</span><span class="p">.</span><span class="nx">store</span><span class="p">.</span><span class="nx">uuid</span><span class="p">()</span>
+    <span class="nx">@set</span> <span class="nx">options</span>
+    <span class="vi">@id = </span><span class="nx">options</span><span class="p">.</span><span class="nx">id</span> <span class="o">or</span> <span class="nx">@hoodie</span><span class="p">.</span><span class="nx">my</span><span class="p">.</span><span class="nx">store</span><span class="p">.</span><span class="nx">uuid</span><span class="p">()</span>
   
   
   <span class="c1"># set</span>
@@ -62,14 +57,13 @@
   <span class="c1"># set an attribute, without making the change persistent yet.</span>
   <span class="c1"># alternatively, a hash of key/value pairs can be passed</span>
   <span class="nv">_memory: </span><span class="p">{}</span>
+  <span class="nv">_allowed_options: </span><span class="p">[</span><span class="s2">&quot;access&quot;</span><span class="p">,</span> <span class="s2">&quot;password&quot;</span><span class="p">]</span>
   <span class="nv">set : </span><span class="p">(</span><span class="nx">key</span><span class="p">,</span> <span class="nx">value</span><span class="p">)</span> <span class="o">=&gt;</span>
     <span class="k">if</span> <span class="k">typeof</span> <span class="nx">key</span> <span class="o">is</span> <span class="s1">&#39;object&#39;</span>
-      <span class="err">@</span><span class="p">[</span><span class="nx">_key</span><span class="p">]</span> <span class="o">=</span> <span class="nx">@_memory</span><span class="p">[</span><span class="nx">_key</span><span class="p">]</span> <span class="o">=</span> <span class="nx">value</span> <span class="k">for</span> <span class="nx">_key</span><span class="p">,</span> <span class="nx">value</span> <span class="k">of</span> <span class="nx">key</span> 
+      <span class="k">for</span> <span class="nx">_key</span><span class="p">,</span> <span class="nx">value</span> <span class="k">of</span> <span class="nx">key</span> <span class="k">when</span> <span class="nx">_key</span> <span class="k">in</span> <span class="nx">@_allowed_options</span>
+        <span class="err">@</span><span class="p">[</span><span class="nx">_key</span><span class="p">]</span> <span class="o">=</span> <span class="nx">@_memory</span><span class="p">[</span><span class="nx">_key</span><span class="p">]</span> <span class="o">=</span> <span class="nx">value</span> 
     <span class="k">else</span> 
-      <span class="err">@</span><span class="p">[</span><span class="nx">key</span><span class="p">]</span>  <span class="o">=</span> <span class="nx">@_memory</span><span class="p">[</span><span class="nx">key</span><span class="p">]</span>  <span class="o">=</span> <span class="nx">value</span>
-
-    <span class="c1"># make sure share is private if invitees are set</span>
-    <span class="vi">@private = @_memory.private = </span><span class="kc">true</span> <span class="k">if</span> <span class="nx">@invitees</span><span class="o">?</span><span class="p">.</span><span class="nx">length</span>
+      <span class="err">@</span><span class="p">[</span><span class="nx">key</span><span class="p">]</span>  <span class="o">=</span> <span class="nx">@_memory</span><span class="p">[</span><span class="nx">key</span><span class="p">]</span>  <span class="o">=</span> <span class="nx">value</span> <span class="k">if</span> <span class="nx">key</span> <span class="k">in</span> <span class="nx">@_allowed_options</span>
 
     <span class="k">return</span> <span class="kc">undefined</span>
     
@@ -93,7 +87,8 @@
   <span class="c1"># an account, we do an anonymous signUp.</span>
   <span class="nv">save : </span><span class="nf">(update = {}, options) -&gt;</span>
     
-    <span class="nx">@hoodie</span><span class="p">.</span><span class="nx">my</span><span class="p">.</span><span class="nx">account</span><span class="p">.</span><span class="nx">anonymousSignUp</span><span class="p">()</span>
+    <span class="nx">unless</span> <span class="nx">@hoodie</span><span class="p">.</span><span class="nx">my</span><span class="p">.</span><span class="nx">account</span><span class="p">.</span><span class="nx">hasAccount</span><span class="p">()</span>
+      <span class="nx">@hoodie</span><span class="p">.</span><span class="nx">my</span><span class="p">.</span><span class="nx">account</span><span class="p">.</span><span class="nx">anonymousSignUp</span><span class="p">()</span>
 
     <span class="nx">@set</span><span class="p">(</span><span class="nx">update</span><span class="p">)</span> <span class="k">if</span> <span class="nx">update</span>
     <span class="nv">_handleUpdate = </span><span class="p">(</span><span class="nx">properties</span><span class="p">,</span> <span class="nx">wasCreated</span><span class="p">)</span> <span class="o">=&gt;</span> 
@@ -119,8 +114,8 @@
   <span class="c1"># share.add([todoObject1, todoObject2, todoObject3])</span>
   <span class="c1"># share.add([todoObject1, todoObject2, todoObject3], [&quot;name&quot;, &quot;city&quot;])</span>
   <span class="c1"># share.add( hoodie.my.store.findAll (obj) -&gt; obj.isShared )</span>
-  <span class="nv">add : </span><span class="nf">(objects, sharedAttributes) -&gt;</span>
-    <span class="nx">@toggle</span> <span class="nx">objects</span><span class="p">,</span> <span class="nx">sharedAttributes</span> <span class="o">or</span> <span class="kc">true</span>
+  <span class="nv">add : </span><span class="nf">(objects, sharedAttributes = true) -&gt;</span>
+    <span class="nx">@toggle</span> <span class="nx">objects</span><span class="p">,</span> <span class="nx">sharedAttributes</span>
     
       
   <span class="c1"># remove</span>
@@ -167,10 +162,8 @@
   <span class="c1">#</span>
   <span class="nv">sync : </span><span class="o">=&gt;</span>
     <span class="nx">@save</span><span class="p">()</span>
-    <span class="p">.</span><span class="nx">pipe</span> <span class="nx">@hoodie</span><span class="p">.</span><span class="nx">my</span><span class="p">.</span><span class="nx">store</span><span class="p">.</span><span class="nx">findAll</span><span class="p">(</span><span class="nx">@_isMySharedObjectAndChanged</span><span class="p">)</span>
-    <span class="p">.</span><span class="nx">pipe</span> <span class="p">(</span><span class="nx">sharedObjectsThatChanged</span><span class="p">)</span> <span class="o">=&gt;</span>
-      <span class="nx">@hoodie</span><span class="p">.</span><span class="nx">my</span><span class="p">.</span><span class="nx">remote</span><span class="p">.</span><span class="nx">sync</span><span class="p">(</span><span class="nx">sharedObjectsThatChanged</span><span class="p">)</span>
-      <span class="p">.</span><span class="k">then</span> <span class="nx">@_handleRemoteChanges</span>
+    <span class="p">.</span><span class="nx">pipe</span><span class="p">(</span><span class="nx">@findAllObjects</span><span class="p">)</span>
+    <span class="p">.</span><span class="nx">pipe</span><span class="p">(</span><span class="nx">@hoodie</span><span class="p">.</span><span class="nx">my</span><span class="p">.</span><span class="nx">remote</span><span class="p">.</span><span class="nx">sync</span><span class="p">)</span>
 
 
   <span class="c1"># destroy</span>
@@ -178,11 +171,19 @@
 
   <span class="c1"># remove all objects from share, then destroy share itself</span>
   <span class="nv">destroy : </span><span class="o">=&gt;</span>
-    <span class="nx">@remove</span><span class="p">(</span> <span class="nx">@hoodie</span><span class="p">.</span><span class="nx">my</span><span class="p">.</span><span class="nx">store</span><span class="p">.</span><span class="nx">findAll</span><span class="p">(</span><span class="nx">@_isMySharedObject</span><span class="p">)</span> <span class="p">)</span>
+    <span class="nx">@remove</span><span class="p">(</span> <span class="nx">@findAllObjects</span><span class="p">()</span> <span class="p">)</span>
     <span class="p">.</span><span class="k">then</span> <span class="o">=&gt;</span>
       <span class="nx">@hoodie</span><span class="p">.</span><span class="nx">my</span><span class="p">.</span><span class="nx">store</span><span class="p">.</span><span class="nx">destroy</span><span class="p">(</span><span class="s2">&quot;$share&quot;</span><span class="p">,</span> <span class="nx">@id</span><span class="p">)</span>
     
-    
+  
+  <span class="c1"># findAllObjects</span>
+  <span class="c1"># ----------------</span>
+
+  <span class="c1">#</span>
+  <span class="nv">findAllObjects : </span><span class="o">=&gt;</span>
+    <span class="nx">@hoodie</span><span class="p">.</span><span class="nx">my</span><span class="p">.</span><span class="nx">store</span><span class="p">.</span><span class="nx">findAll</span><span class="p">(</span><span class="nx">@_isMySharedObjectAndChanged</span><span class="p">)</span>
+
+
   <span class="c1"># Private</span>
   <span class="c1"># ---------</span>
 
@@ -215,24 +216,24 @@
   <span class="c1"># it to/from share</span>
   <span class="nv">_toggle : </span><span class="p">(</span><span class="nx">obj</span><span class="p">)</span> <span class="o">=&gt;</span> 
     <span class="k">try</span>
-      <span class="nv">doAdd = </span><span class="o">~</span><span class="nx">obj</span><span class="p">.</span><span class="nx">$shares</span><span class="p">.</span><span class="nx">indexOf</span> <span class="nx">@id</span>
+      <span class="nv">doAdd = </span><span class="nx">obj</span><span class="p">.</span><span class="nx">$shares</span><span class="p">[</span><span class="nx">@id</span><span class="p">]</span> <span class="o">is</span> <span class="kc">undefined</span> <span class="o">or</span> <span class="nx">obj</span><span class="p">.</span><span class="nx">$shares</span><span class="p">[</span><span class="nx">@id</span><span class="p">]</span> <span class="o">is</span> <span class="kc">false</span>
     <span class="k">catch</span> <span class="nx">e</span>
       <span class="nv">doAdd = </span><span class="kc">true</span>
 
     <span class="k">if</span> <span class="nx">doAdd</span>
-      <span class="nx">@_add</span><span class="p">(</span><span class="nx">obj</span><span class="p">)</span>
+      <span class="nx">@_add</span><span class="p">(</span><span class="kc">true</span><span class="p">)(</span><span class="nx">obj</span><span class="p">)</span>
     <span class="k">else</span>
       <span class="nx">@_remove</span><span class="p">(</span><span class="nx">obj</span><span class="p">)</span>
 
   <span class="c1"># all objects which $shares hash has share.id as key</span>
   <span class="nv">_isMySharedObject : </span><span class="p">(</span><span class="nx">obj</span><span class="p">)</span> <span class="o">=&gt;</span>
     <span class="nx">obj</span><span class="p">.</span><span class="nx">$shares</span><span class="o">?</span><span class="p">[</span><span class="nx">@id</span><span class="p">]</span><span class="o">?</span>
-  
+
   <span class="c1"># an object belongs to Share if it has the same id (its the actual share object)</span>
   <span class="c1"># or its $shares hash has share.id as key</span>
   <span class="nv">_isMySharedObjectAndChanged : </span><span class="p">(</span><span class="nx">obj</span><span class="p">)</span> <span class="o">=&gt;</span>
     <span class="nv">belongsToMe = </span><span class="nx">obj</span><span class="p">.</span><span class="nx">id</span> <span class="o">is</span> <span class="nx">@id</span> <span class="o">or</span> <span class="nx">obj</span><span class="p">.</span><span class="nx">$shares</span><span class="o">?</span><span class="p">[</span><span class="nx">@id</span><span class="p">]</span><span class="o">?</span>
-    <span class="k">return</span> <span class="nx">belongsToMe</span> <span class="o">and</span> <span class="nx">@hoodie</span><span class="p">.</span><span class="nx">my</span><span class="p">.</span><span class="nx">store</span><span class="p">.</span><span class="nx">isDirty</span><span class="p">(</span><span class="nx">obj</span><span class="p">.</span><span class="nx">type</span><span class="p">,</span> <span class="nx">obj</span><span class="p">.</span><span class="nx">id</span><span class="p">)</span>
+    <span class="k">return</span> <span class="nx">belongsToMe</span> <span class="o">and</span> <span class="nx">@hoodie</span><span class="p">.</span><span class="nx">my</span><span class="p">.</span><span class="nx">store</span><span class="p">.</span><span class="nx">isDirty</span><span class="p">(</span><span class="nx">obj</span><span class="p">.</span><span class="nx">$type</span><span class="p">,</span> <span class="nx">obj</span><span class="p">.</span><span class="nx">id</span><span class="p">)</span>
 
   <span class="c1">#</span>
   <span class="nv">_handleRemoteChanges : </span><span class="o">-&gt;</span>

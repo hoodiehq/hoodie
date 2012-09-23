@@ -37,10 +37,9 @@ hoodie.share.updateAll(changed_attributes)
   <span class="c1"># the constructor returns a function, so it can be called</span>
   <span class="c1"># like this: hoodie.share(&#39;share_id&#39;)</span>
   <span class="c1">#</span>
-  <span class="c1"># The rest of the API is still available though.</span>
+  <span class="c1"># The rest of the API is available as usual.</span>
   <span class="nv">constructor : </span><span class="nf">(@hoodie) -&gt;</span>
     
-    <span class="nv">api = </span><span class="nx">@open</span>
 
     <span class="c1"># set pointer to Hoodie.Share.Instance</span>
     <span class="vi">@instance = </span><span class="nx">Hoodie</span><span class="p">.</span><span class="nx">Share</span><span class="p">.</span><span class="nx">Instance</span>
@@ -49,14 +48,17 @@ hoodie.share.updateAll(changed_attributes)
     <span class="c1"># That&#39;s need if the user has no account yet, as shares</span>
     <span class="c1"># use custom hoodie instances then to create shares on</span>
     <span class="c1"># the server</span>
-    <span class="vi">@instance.hoodie = </span><span class="nx">@hoodie</span>
+    <span class="nv">Hoodie.Share.Instance.prototype.hoodie = </span><span class="nx">@hoodie</span>
 
+    <span class="c1"># return custom api which allows direct call</span>
+    <span class="nv">api = </span><span class="nx">@open</span>
     <span class="nx">$</span><span class="p">.</span><span class="nx">extend</span> <span class="nx">api</span><span class="p">,</span> <span class="k">this</span>
 
     <span class="k">return</span> <span class="nx">api</span>
   
   
-  <span class="c1"># ## open</span>
+  <span class="c1"># open</span>
+  <span class="c1"># ------</span>
   
   <span class="c1"># </span>
   <span class="c1"># open a sharing</span>
@@ -65,16 +67,19 @@ hoodie.share.updateAll(changed_attributes)
     <span class="k">new</span> <span class="nx">@instance</span> <span class="nv">id: </span><span class="nx">share_id</span><span class="p">,</span> <span class="nx">options</span>
 
 
-  <span class="c1"># ## create</span>
+  <span class="c1"># create</span>
+  <span class="c1"># --------</span>
 
-  <span class="c1"># creates a new share &amp; returns a promise.</span>
+  <span class="c1"># creates a new share and returns it</span>
   <span class="c1">#</span>
   <span class="nv">create : </span><span class="nf">(attributes = {}) -&gt;</span>
     <span class="nv">share = </span><span class="k">new</span> <span class="nx">@instance</span> <span class="nx">attributes</span>
     <span class="nx">share</span><span class="p">.</span><span class="nx">save</span><span class="p">()</span>
+    <span class="nx">share</span>
     
   
-  <span class="c1"># ## find</span>
+  <span class="c1"># find</span>
+  <span class="c1"># ------</span>
 
   <span class="c1"># find an existing share</span>
   <span class="c1">#</span>
@@ -83,7 +88,8 @@ hoodie.share.updateAll(changed_attributes)
       <span class="k">new</span> <span class="nx">@instance</span> <span class="nx">object</span>
 
 
-  <span class="c1"># ## findAll</span>
+  <span class="c1"># findAll</span>
+  <span class="c1"># ---------</span>
 
   <span class="c1"># find all my existing shares</span>
   <span class="c1">#</span>
@@ -92,7 +98,8 @@ hoodie.share.updateAll(changed_attributes)
       <span class="k">new</span> <span class="nx">@instance</span> <span class="nx">obj</span> <span class="k">for</span> <span class="nx">obj</span> <span class="k">in</span> <span class="nx">objects</span>
 
 
-  <span class="c1"># ## findOrCreate</span>
+  <span class="c1"># findOrCreate</span>
+  <span class="c1"># --------------</span>
 
   <span class="c1"># find or create a new share</span>
   <span class="c1">#</span>
@@ -101,7 +108,8 @@ hoodie.share.updateAll(changed_attributes)
       <span class="k">new</span> <span class="nx">@instance</span> <span class="nx">object</span>
 
 
-  <span class="c1"># ## save</span>
+  <span class="c1"># save</span>
+  <span class="c1"># ------</span>
 
   <span class="c1"># create or overwrite a share</span>
   <span class="c1">#</span>
@@ -110,7 +118,8 @@ hoodie.share.updateAll(changed_attributes)
       <span class="k">new</span> <span class="nx">@instance</span> <span class="nx">object</span>
 
 
-  <span class="c1"># ## update</span>
+  <span class="c1"># update</span>
+  <span class="c1"># --------</span>
 
   <span class="c1"># create or overwrite a share</span>
   <span class="c1">#</span>
@@ -119,7 +128,8 @@ hoodie.share.updateAll(changed_attributes)
       <span class="k">new</span> <span class="nx">@instance</span> <span class="nx">object</span>
 
 
-  <span class="c1"># ## updateAll</span>
+  <span class="c1"># updateAll</span>
+  <span class="c1"># -----------</span>
 
   <span class="c1"># update all my existing shares</span>
   <span class="c1">#</span>
@@ -128,7 +138,8 @@ hoodie.share.updateAll(changed_attributes)
       <span class="k">new</span> <span class="nx">@instance</span> <span class="nx">obj</span> <span class="k">for</span> <span class="nx">obj</span> <span class="k">in</span> <span class="nx">objects</span>
 
 
-  <span class="c1"># ## destroy</span>
+  <span class="c1"># destroy</span>
+  <span class="c1"># ---------</span>
 
   <span class="c1"># deletes an existing share</span>
   <span class="c1">#</span>
@@ -137,12 +148,20 @@ hoodie.share.updateAll(changed_attributes)
       <span class="nv">share = </span><span class="k">new</span> <span class="nx">@instance</span> <span class="nx">obj</span>
       <span class="nx">share</span><span class="p">.</span><span class="nx">destroy</span><span class="p">()</span>
 
+  <span class="c1"># alias</span>
   <span class="k">delete</span><span class="o">:</span> <span class="o">-&gt;</span> <span class="nx">@destroy</span> <span class="nx">arguments</span><span class="p">...</span>
+  
+  
+  <span class="c1"># destroyAll</span>
+  <span class="c1"># ------------</span>
 
+  <span class="c1"># delete all existing shares</span>
+  <span class="c1">#</span>
   <span class="nv">destroyAll : </span><span class="nf">() -&gt;</span>
     <span class="nx">@findAll</span><span class="p">().</span><span class="nx">pipe</span> <span class="p">(</span><span class="nx">objects</span><span class="p">)</span> <span class="o">=&gt;</span>
       <span class="k">for</span> <span class="nx">obj</span> <span class="k">in</span> <span class="nx">objects</span>
         <span class="nv">share = </span><span class="k">new</span> <span class="nx">@instance</span> <span class="nx">obj</span>
         <span class="nx">share</span><span class="p">.</span><span class="nx">destroy</span><span class="p">()</span>
 
+  <span class="c1"># alias</span>
   <span class="nv">deleteAll: </span><span class="o">-&gt;</span> <span class="nx">@destroyAll</span> <span class="nx">arguments</span><span class="p">...</span></div></div></div></div></body></html>

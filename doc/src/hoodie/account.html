@@ -10,17 +10,17 @@
   <span class="nv">constructor : </span><span class="nf">(@hoodie) -&gt;</span>
     
     <span class="c1"># handle session</span>
-    <span class="vi">@username = </span><span class="nx">@hoodie</span><span class="p">.</span><span class="nx">my</span><span class="p">.</span><span class="nx">config</span><span class="p">.</span><span class="nx">get</span> <span class="s1">&#39;_account.username&#39;</span>
-    <span class="vi">@owner    = </span><span class="nx">@hoodie</span><span class="p">.</span><span class="nx">my</span><span class="p">.</span><span class="nx">config</span><span class="p">.</span><span class="nx">get</span> <span class="s1">&#39;_account.owner&#39;</span>
+    <span class="vi">@username   = </span><span class="nx">@hoodie</span><span class="p">.</span><span class="nx">my</span><span class="p">.</span><span class="nx">config</span><span class="p">.</span><span class="nx">get</span> <span class="s1">&#39;_account.username&#39;</span>
+    <span class="vi">@ownerHash  = </span><span class="nx">@hoodie</span><span class="p">.</span><span class="nx">my</span><span class="p">.</span><span class="nx">config</span><span class="p">.</span><span class="nx">get</span> <span class="s1">&#39;_account.ownerHash&#39;</span>
 
-    <span class="c1"># the owner hash gets stored in every object created by the user.</span>
+    <span class="c1"># the ownerHash gets stored in every object created by the user.</span>
     <span class="c1"># Make sure we have one.</span>
-    <span class="nx">unless</span> <span class="nx">@owner</span>
-      <span class="vi">@owner = </span><span class="nx">@hoodie</span><span class="p">.</span><span class="nx">my</span><span class="p">.</span><span class="nx">store</span><span class="p">.</span><span class="nx">uuid</span><span class="p">()</span>
-      <span class="nx">@hoodie</span><span class="p">.</span><span class="nx">my</span><span class="p">.</span><span class="nx">config</span><span class="p">.</span><span class="nx">set</span> <span class="s1">&#39;_account.owner&#39;</span><span class="p">,</span> <span class="nx">@owner</span>
+    <span class="nx">unless</span> <span class="nx">@ownerHash</span>
+      <span class="vi">@ownerHash = </span><span class="nx">@hoodie</span><span class="p">.</span><span class="nx">my</span><span class="p">.</span><span class="nx">store</span><span class="p">.</span><span class="nx">uuid</span><span class="p">()</span>
+      <span class="nx">@hoodie</span><span class="p">.</span><span class="nx">my</span><span class="p">.</span><span class="nx">config</span><span class="p">.</span><span class="nx">set</span> <span class="s1">&#39;_account.ownerHash&#39;</span><span class="p">,</span> <span class="nx">@ownerHash</span>
     
     <span class="c1"># authenticate on next tick</span>
-    <span class="c1"># window.setTimeout @authenticate</span>
+    <span class="nb">window</span><span class="p">.</span><span class="nx">setTimeout</span> <span class="nx">@authenticate</span>
 
     <span class="c1"># is there a pending password reset?</span>
     <span class="nx">@_checkPasswordResetStatus</span><span class="p">()</span>
@@ -60,13 +60,13 @@
       <span class="k">return</span> <span class="nx">@_upgradeAnonymousAccount</span> <span class="nx">username</span><span class="p">,</span> <span class="nx">password</span>
 
     <span class="nv">options =</span>
-      <span class="nv">data        : </span><span class="nx">JSON</span><span class="p">.</span><span class="nx">stringify</span>
+      <span class="nv">data         : </span><span class="nx">JSON</span><span class="p">.</span><span class="nx">stringify</span>
         <span class="nv">_id        : </span><span class="nx">@_key</span><span class="p">(</span><span class="nx">username</span><span class="p">)</span>
         <span class="nv">name       : </span><span class="nx">@_userKey</span><span class="p">(</span><span class="nx">username</span><span class="p">)</span>
         <span class="nv">type       : </span><span class="s1">&#39;user&#39;</span>
         <span class="nv">roles      : </span><span class="p">[]</span>
         <span class="nv">password   : </span><span class="nx">password</span>
-        <span class="nv">$owner     : </span><span class="nx">@owner</span>
+        <span class="nv">ownerHash  : </span><span class="nx">@ownerHash</span>
         <span class="nv">database   : </span><span class="nx">@db</span><span class="p">()</span>
       <span class="nv">contentType : </span><span class="s1">&#39;application/json&#39;</span>
 
@@ -87,12 +87,20 @@
   <span class="c1">#</span>
   <span class="nv">anonymousSignUp: </span><span class="o">-&gt;</span>
     <span class="nv">password = </span><span class="nx">@hoodie</span><span class="p">.</span><span class="nx">my</span><span class="p">.</span><span class="nx">store</span><span class="p">.</span><span class="nx">uuid</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span>
-    <span class="nv">username = </span><span class="nx">@owner</span>
+    <span class="nv">username = </span><span class="nx">@ownerHash</span>
 
     <span class="nx">@signUp</span><span class="p">(</span><span class="nx">username</span><span class="p">,</span> <span class="nx">password</span><span class="p">)</span>
-    <span class="p">.</span><span class="nx">fail</span><span class="p">(</span><span class="nx">@_handleRequestError</span><span class="p">)</span>
+    <span class="p">.</span><span class="nx">pipe</span><span class="p">(</span><span class="kc">null</span><span class="p">,</span> <span class="nx">@_handleRequestError</span><span class="p">)</span>
     <span class="p">.</span><span class="nx">done</span> <span class="o">=&gt;</span>
       <span class="nx">@hoodie</span><span class="p">.</span><span class="nx">my</span><span class="p">.</span><span class="nx">config</span><span class="p">.</span><span class="nx">set</span> <span class="s1">&#39;_account.anonymousPassword&#39;</span><span class="p">,</span> <span class="nx">password</span>
+
+
+  <span class="c1"># hasAccount</span>
+  <span class="c1"># ---------------------</span>
+  
+  <span class="c1">#</span>
+  <span class="nv">hasAccount: </span><span class="o">-&gt;</span>
+    <span class="nx">@username</span><span class="o">?</span>
 
 
   <span class="c1"># hasAnonymousAccount</span>
@@ -147,7 +155,7 @@
   <span class="c1"># ----</span>
 
   <span class="c1"># return name of db</span>
-  <span class="nv">db : </span><span class="o">-&gt;</span> <span class="s2">&quot;user/#{@owner}&quot;</span>
+  <span class="nv">db : </span><span class="o">-&gt;</span> <span class="s2">&quot;user/#{@ownerHash}&quot;</span>
   
   
   <span class="c1"># fetch</span>
@@ -159,7 +167,7 @@
       <span class="k">return</span> <span class="nx">@hoodie</span><span class="p">.</span><span class="nx">defer</span><span class="p">().</span><span class="nx">reject</span><span class="p">(</span><span class="nv">error: </span><span class="s2">&quot;unauthenticated&quot;</span><span class="p">,</span> <span class="nv">reason: </span><span class="s2">&quot;not logged in&quot;</span><span class="p">).</span><span class="nx">promise</span><span class="p">()</span>
     
     <span class="nx">@hoodie</span><span class="p">.</span><span class="nx">request</span><span class="p">(</span><span class="s1">&#39;GET&#39;</span><span class="p">,</span> <span class="nx">@_url</span><span class="p">(</span><span class="nx">username</span><span class="p">))</span>
-    <span class="p">.</span><span class="nx">fail</span><span class="p">(</span><span class="nx">@_handleRequestError</span><span class="p">)</span>
+    <span class="p">.</span><span class="nx">pipe</span><span class="p">(</span><span class="kc">null</span><span class="p">,</span> <span class="nx">@_handleRequestError</span><span class="p">)</span>
     <span class="p">.</span><span class="nx">done</span> <span class="p">(</span><span class="nx">response</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="vi">@_doc = </span><span class="nx">response</span>
     
 
@@ -206,19 +214,19 @@
     
     <span class="nv">key = </span><span class="s2">&quot;#{@_prefix}:$passwordReset/#{resetPasswordId}&quot;</span>
     <span class="nv">data = </span>
-      <span class="nv">_id       : </span><span class="nx">key</span>
-      <span class="nv">name      : </span><span class="s2">&quot;$passwordReset/#{resetPasswordId}&quot;</span>
-      <span class="nv">type      : </span><span class="s1">&#39;user&#39;</span>
-      <span class="nv">password  : </span><span class="nx">resetPasswordId</span>
-      <span class="nv">createdAt : </span><span class="k">new</span> <span class="nb">Date</span>
-      <span class="nv">updatedAt : </span><span class="k">new</span> <span class="nb">Date</span>
+      <span class="nv">_id        : </span><span class="nx">key</span>
+      <span class="nv">name       : </span><span class="s2">&quot;$passwordReset/#{resetPasswordId}&quot;</span>
+      <span class="nv">type       : </span><span class="s1">&#39;user&#39;</span>
+      <span class="nv">password   : </span><span class="nx">resetPasswordId</span>
+      <span class="nv">$createdAt : </span><span class="k">new</span> <span class="nb">Date</span>
+      <span class="nv">$updatedAt : </span><span class="k">new</span> <span class="nb">Date</span>
 
     <span class="nv">options =</span>
       <span class="nv">data        : </span><span class="nx">JSON</span><span class="p">.</span><span class="nx">stringify</span> <span class="nx">data</span>
       <span class="nv">contentType : </span><span class="s2">&quot;application/json&quot;</span>
     
     <span class="nx">@hoodie</span><span class="p">.</span><span class="nx">request</span><span class="p">(</span><span class="s1">&#39;PUT&#39;</span><span class="p">,</span>  <span class="s2">&quot;/_users/#{encodeURIComponent key}&quot;</span><span class="p">,</span> <span class="nx">options</span><span class="p">)</span>
-    <span class="p">.</span><span class="nx">fail</span><span class="p">(</span><span class="nx">@_handleRequestError</span><span class="p">)</span>
+    <span class="p">.</span><span class="nx">pipe</span><span class="p">(</span><span class="kc">null</span><span class="p">,</span> <span class="nx">@_handleRequestError</span><span class="p">)</span>
     <span class="p">.</span><span class="nx">done</span> <span class="nx">@_checkPasswordResetStatus</span>
 
 
@@ -255,8 +263,8 @@
   <span class="nv">_doc : </span><span class="p">{}</span>
 
   <span class="c1"># setters</span>
-  <span class="nv">_setUsername : </span><span class="nf">(@username) -&gt;</span> <span class="nx">@hoodie</span><span class="p">.</span><span class="nx">my</span><span class="p">.</span><span class="nx">config</span><span class="p">.</span><span class="nx">set</span> <span class="s1">&#39;_account.username&#39;</span><span class="p">,</span> <span class="nx">@username</span>
-  <span class="nv">_setOwner    : </span><span class="nf">(@owner)    -&gt;</span> <span class="nx">@hoodie</span><span class="p">.</span><span class="nx">my</span><span class="p">.</span><span class="nx">config</span><span class="p">.</span><span class="nx">set</span> <span class="s1">&#39;_account.owner&#39;</span><span class="p">,</span>    <span class="nx">@owner</span>
+  <span class="nv">_setUsername : </span><span class="nf">(@username)  -&gt;</span> <span class="nx">@hoodie</span><span class="p">.</span><span class="nx">my</span><span class="p">.</span><span class="nx">config</span><span class="p">.</span><span class="nx">set</span> <span class="s1">&#39;_account.username&#39;</span><span class="p">,</span>  <span class="nx">@username</span>
+  <span class="nv">_setOwner    : </span><span class="nf">(@ownerHash) -&gt;</span> <span class="nx">@hoodie</span><span class="p">.</span><span class="nx">my</span><span class="p">.</span><span class="nx">config</span><span class="p">.</span><span class="nx">set</span> <span class="s1">&#39;_account.ownerHash&#39;</span><span class="p">,</span> <span class="nx">@ownerHash</span>
 
   <span class="c1">#</span>
   <span class="c1"># handle a successful authentication request.</span>
@@ -378,7 +386,7 @@
   <span class="c1">#</span>
   <span class="nv">_handleSignOutSuccess : </span><span class="o">=&gt;</span>
     <span class="k">delete</span> <span class="nx">@username</span>
-    <span class="k">delete</span> <span class="nx">@owner</span>
+    <span class="k">delete</span> <span class="nx">@ownerHash</span>
     <span class="nx">@hoodie</span><span class="p">.</span><span class="nx">my</span><span class="p">.</span><span class="nx">config</span><span class="p">.</span><span class="nx">clear</span><span class="p">()</span>
     <span class="vi">@_authenticated = </span><span class="kc">false</span>
     <span class="nx">@hoodie</span><span class="p">.</span><span class="nx">trigger</span> <span class="s1">&#39;account:signout&#39;</span>
@@ -493,14 +501,14 @@
   <span class="c1">#</span>
   <span class="nv">_handleDestroySucces : </span><span class="o">=&gt;</span>
     <span class="k">delete</span> <span class="nx">@username</span>
-    <span class="k">delete</span> <span class="nx">@owner</span>
+    <span class="k">delete</span> <span class="nx">@ownerHash</span>
     <span class="k">delete</span> <span class="nx">@_authenticated</span>
 
   <span class="c1">#</span>
   <span class="c1">#</span>
   <span class="c1">#</span>
   <span class="nv">_userKey : </span><span class="nf">(username) -&gt;</span>
-    <span class="k">if</span> <span class="nx">username</span> <span class="o">is</span> <span class="nx">@owner</span>
+    <span class="k">if</span> <span class="nx">username</span> <span class="o">is</span> <span class="nx">@ownerHash</span>
       <span class="s2">&quot;user_anonymous/#{username}&quot;</span>
     <span class="k">else</span>
       <span class="s2">&quot;user/#{username}&quot;</span>

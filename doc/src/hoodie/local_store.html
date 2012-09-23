@@ -37,9 +37,9 @@
   <span class="c1">#</span>
   <span class="c1"># It also adds timestamps along the way:</span>
   <span class="c1"># </span>
-  <span class="c1"># * `createdAt` unless it already exists</span>
-  <span class="c1"># * `updatedAt` every time</span>
-  <span class="c1"># * `syncedAt`  if changes comes from remote</span>
+  <span class="c1"># * `$createdAt` unless it already exists</span>
+  <span class="c1"># * `$updatedAt` every time</span>
+  <span class="c1"># * `_$syncedAt`  if changes comes from remote</span>
   <span class="c1">#</span>
   <span class="c1">#</span>
   <span class="c1"># example usage:</span>
@@ -60,19 +60,19 @@
       <span class="nv">isNew = </span><span class="kc">true</span>
       <span class="nv">id    = </span><span class="nx">@uuid</span><span class="p">()</span>
 
-    <span class="c1"># add owner hash to new objects</span>
+    <span class="c1"># add createdBy hash to new objects</span>
     <span class="k">if</span> <span class="nx">isNew</span> <span class="o">and</span> <span class="nx">@hoodie</span><span class="p">.</span><span class="nx">my</span><span class="p">.</span><span class="nx">account</span>
-      <span class="nx">object</span><span class="p">.</span><span class="nx">$owner</span> <span class="o">or=</span> <span class="nx">@hoodie</span><span class="p">.</span><span class="nx">my</span><span class="p">.</span><span class="nx">account</span><span class="p">.</span><span class="nx">owner</span>
+      <span class="nx">object</span><span class="p">.</span><span class="nx">$createdBy</span> <span class="o">or=</span> <span class="nx">@hoodie</span><span class="p">.</span><span class="nx">my</span><span class="p">.</span><span class="nx">account</span><span class="p">.</span><span class="nx">ownerHash</span>
    
     <span class="c1"># handle public option</span>
     <span class="nx">object</span><span class="p">.</span><span class="nv">$public = </span><span class="nx">options</span><span class="p">.</span><span class="nx">public</span> <span class="k">if</span> <span class="nx">options</span><span class="p">.</span><span class="nx">public</span><span class="o">?</span> 
   
     <span class="c1"># add timestamps</span>
     <span class="k">if</span> <span class="nx">options</span><span class="p">.</span><span class="nx">remote</span>
-      <span class="nv">object._syncedAt = </span><span class="nx">@_now</span><span class="p">()</span>
+      <span class="nx">object</span><span class="p">.</span><span class="nx">_</span><span class="nv">$syncedAt = </span><span class="nx">@_now</span><span class="p">()</span>
     <span class="k">else</span> <span class="nx">unless</span> <span class="nx">options</span><span class="p">.</span><span class="nx">silent</span>
-      <span class="nv">object.updatedAt = </span><span class="nx">@_now</span><span class="p">()</span>
-      <span class="nx">object</span><span class="p">.</span><span class="nx">createdAt</span> <span class="o">or=</span> <span class="nx">object</span><span class="p">.</span><span class="nx">updatedAt</span>
+      <span class="nx">object</span><span class="p">.</span><span class="nv">$updatedAt = </span><span class="nx">@_now</span><span class="p">()</span>
+      <span class="nx">object</span><span class="p">.</span><span class="nx">$createdAt</span> <span class="o">or=</span> <span class="nx">object</span><span class="p">.</span><span class="nx">$updatedAt</span>
   
     <span class="k">try</span> 
       <span class="nv">object = </span><span class="nx">@cache</span> <span class="nx">type</span><span class="p">,</span> <span class="nx">id</span><span class="p">,</span> <span class="nx">object</span><span class="p">,</span> <span class="nx">options</span>
@@ -126,7 +126,7 @@
     <span class="c1"># normalize filter</span>
     <span class="k">if</span> <span class="k">typeof</span> <span class="nx">filter</span> <span class="o">is</span> <span class="s1">&#39;string&#39;</span>
       <span class="nv">type   = </span><span class="nx">filter</span>
-      <span class="nv">filter = </span><span class="nf">(obj) -&gt;</span> <span class="nx">obj</span><span class="p">.</span><span class="nx">type</span> <span class="o">is</span> <span class="nx">type</span>
+      <span class="nv">filter = </span><span class="nf">(obj) -&gt;</span> <span class="nx">obj</span><span class="p">.</span><span class="nx">$type</span> <span class="o">is</span> <span class="nx">type</span>
   
     <span class="k">try</span>
       <span class="c1"># coffeescript gathers the result of the respective for key in keys loops</span>
@@ -162,7 +162,7 @@
     <span class="nx">unless</span> <span class="nx">object</span>
       <span class="k">return</span> <span class="nx">defer</span><span class="p">.</span><span class="nx">reject</span><span class="p">(</span><span class="nx">Hoodie</span><span class="p">.</span><span class="nx">Errors</span><span class="p">.</span><span class="nx">NOT_FOUND</span> <span class="nx">type</span><span class="p">,</span> <span class="nx">id</span><span class="p">).</span><span class="nx">promise</span><span class="p">()</span>
     
-    <span class="k">if</span> <span class="nx">object</span><span class="p">.</span><span class="nx">_syncedAt</span> <span class="o">and</span> <span class="o">not</span> <span class="nx">options</span><span class="p">.</span><span class="nx">remote</span>
+    <span class="k">if</span> <span class="nx">object</span><span class="p">.</span><span class="nx">_$syncedAt</span> <span class="o">and</span> <span class="o">not</span> <span class="nx">options</span><span class="p">.</span><span class="nx">remote</span>
       <span class="nv">object._deleted = </span><span class="kc">true</span>
       <span class="nx">@cache</span> <span class="nx">type</span><span class="p">,</span> <span class="nx">id</span><span class="p">,</span> <span class="nx">object</span>
     
@@ -188,7 +188,7 @@
     <span class="nv">key = </span><span class="s2">&quot;#{type}/#{id}&quot;</span>
   
     <span class="k">if</span> <span class="nx">object</span>
-      <span class="nx">@_cached</span><span class="p">[</span><span class="nx">key</span><span class="p">]</span> <span class="o">=</span> <span class="nx">$</span><span class="p">.</span><span class="nx">extend</span> <span class="nx">object</span><span class="p">,</span> <span class="p">{</span> <span class="nv">type: </span><span class="nx">type</span><span class="p">,</span> <span class="nv">id: </span><span class="nx">id</span> <span class="p">}</span>
+      <span class="nx">@_cached</span><span class="p">[</span><span class="nx">key</span><span class="p">]</span> <span class="o">=</span> <span class="nx">$</span><span class="p">.</span><span class="nx">extend</span> <span class="nx">object</span><span class="p">,</span> <span class="p">{</span> <span class="nv">$type: </span><span class="nx">type</span><span class="p">,</span> <span class="nv">id: </span><span class="nx">id</span> <span class="p">}</span>
       <span class="nx">@_setObject</span> <span class="nx">type</span><span class="p">,</span> <span class="nx">id</span><span class="p">,</span> <span class="nx">object</span>
       
       <span class="k">if</span> <span class="nx">options</span><span class="p">.</span><span class="nx">remote</span>
@@ -263,7 +263,7 @@
   <span class="c1"># dirty objects in the store.</span>
   <span class="c1">#</span>
   <span class="c1"># Otherwise it returns `true` or `false` for the passed object. An object is dirty</span>
-  <span class="c1"># if it has no `_syncedAt` attribute or if `updatedAt` is more recent than `_syncedAt`</span>
+  <span class="c1"># if it has no `_$syncedAt` attribute or if `updatedAt` is more recent than `_$syncedAt`</span>
   <span class="nv">isDirty : </span><span class="nf">(type, id) -&gt;</span>
     <span class="nx">unless</span> <span class="nx">type</span>
       <span class="k">return</span> <span class="nx">$</span><span class="p">.</span><span class="nx">isEmptyObject</span> <span class="nx">@_dirty</span>
@@ -340,7 +340,7 @@
   <span class="nv">_setObject : </span><span class="nf">(type, id, object) -&gt;</span>
     <span class="nv">key = </span><span class="s2">&quot;#{type}/#{id}&quot;</span>
     <span class="nv">store = </span><span class="nx">$</span><span class="p">.</span><span class="nx">extend</span> <span class="p">{},</span> <span class="nx">object</span>
-    <span class="k">delete</span> <span class="nx">store</span><span class="p">.</span><span class="nx">type</span>
+    <span class="k">delete</span> <span class="nx">store</span><span class="p">.</span><span class="nx">$type</span>
     <span class="k">delete</span> <span class="nx">store</span><span class="p">.</span><span class="nx">id</span>
     <span class="nx">@db</span><span class="p">.</span><span class="nx">setItem</span> <span class="nx">key</span><span class="p">,</span> <span class="nx">JSON</span><span class="p">.</span><span class="nx">stringify</span> <span class="nx">store</span>
     
@@ -349,12 +349,12 @@
     <span class="nv">json = </span><span class="nx">@db</span><span class="p">.</span><span class="nx">getItem</span><span class="p">(</span><span class="nx">key</span><span class="p">)</span>
     <span class="k">if</span> <span class="nx">json</span>
       <span class="nv">obj = </span><span class="nx">JSON</span><span class="p">.</span><span class="nx">parse</span><span class="p">(</span><span class="nx">json</span><span class="p">)</span>
-      <span class="nv">obj.type  = </span><span class="nx">type</span>
+      <span class="nx">obj</span><span class="p">.</span><span class="nv">$type = </span><span class="nx">type</span>
       <span class="nv">obj.id    = </span><span class="nx">id</span>
       
-      <span class="nv">obj.createdAt = </span><span class="k">new</span> <span class="nb">Date</span><span class="p">(</span><span class="nb">Date</span><span class="p">.</span><span class="nx">parse</span> <span class="nx">obj</span><span class="p">.</span><span class="nx">createdAt</span><span class="p">)</span> <span class="k">if</span> <span class="nx">obj</span><span class="p">.</span><span class="nx">createdAt</span>
-      <span class="nv">obj.updatedAt = </span><span class="k">new</span> <span class="nb">Date</span><span class="p">(</span><span class="nb">Date</span><span class="p">.</span><span class="nx">parse</span> <span class="nx">obj</span><span class="p">.</span><span class="nx">updatedAt</span><span class="p">)</span> <span class="k">if</span> <span class="nx">obj</span><span class="p">.</span><span class="nx">updatedAt</span>
-      <span class="nv">obj._syncedAt = </span><span class="k">new</span> <span class="nb">Date</span><span class="p">(</span><span class="nb">Date</span><span class="p">.</span><span class="nx">parse</span> <span class="nx">obj</span><span class="p">.</span><span class="nx">_syncedAt</span><span class="p">)</span> <span class="k">if</span> <span class="nx">obj</span><span class="p">.</span><span class="nx">_syncedAt</span>
+      <span class="nx">obj</span><span class="p">.</span><span class="nv">$createdAt = </span><span class="k">new</span> <span class="nb">Date</span><span class="p">(</span><span class="nb">Date</span><span class="p">.</span><span class="nx">parse</span> <span class="nx">obj</span><span class="p">.</span><span class="nx">$createdAt</span><span class="p">)</span> <span class="k">if</span> <span class="nx">obj</span><span class="p">.</span><span class="nx">$createdAt</span>
+      <span class="nx">obj</span><span class="p">.</span><span class="nv">$updatedAt = </span><span class="k">new</span> <span class="nb">Date</span><span class="p">(</span><span class="nb">Date</span><span class="p">.</span><span class="nx">parse</span> <span class="nx">obj</span><span class="p">.</span><span class="nx">$updatedAt</span><span class="p">)</span> <span class="k">if</span> <span class="nx">obj</span><span class="p">.</span><span class="nx">$updatedAt</span>
+      <span class="nx">obj</span><span class="p">.</span><span class="nx">_</span><span class="nv">$syncedAt = </span><span class="k">new</span> <span class="nb">Date</span><span class="p">(</span><span class="nb">Date</span><span class="p">.</span><span class="nx">parse</span> <span class="nx">obj</span><span class="p">.</span><span class="nx">_$syncedAt</span><span class="p">)</span> <span class="k">if</span> <span class="nx">obj</span><span class="p">.</span><span class="nx">_$syncedAt</span>
       
       <span class="nx">obj</span>
     <span class="k">else</span>
@@ -383,10 +383,10 @@
   <span class="c1"># is dirty?</span>
   <span class="nv">_isDirty : </span><span class="nf">(object) -&gt;</span>
     
-    <span class="k">return</span> <span class="kc">true</span>  <span class="nx">unless</span> <span class="nx">object</span><span class="p">.</span><span class="nx">_syncedAt</span>  <span class="c1"># no syncedAt? uuhh, that&#39;s dirty.</span>
-    <span class="k">return</span> <span class="kc">false</span> <span class="nx">unless</span> <span class="nx">object</span><span class="p">.</span><span class="nx">updatedAt</span> <span class="c1"># no updatedAt? no dirt then</span>
+    <span class="k">return</span> <span class="kc">true</span>  <span class="nx">unless</span> <span class="nx">object</span><span class="p">.</span><span class="nx">_$syncedAt</span>  <span class="c1"># no syncedAt? uuhh, that&#39;s dirty.</span>
+    <span class="k">return</span> <span class="kc">false</span> <span class="nx">unless</span> <span class="nx">object</span><span class="p">.</span><span class="nx">$updatedAt</span> <span class="c1"># no updatedAt? no dirt then</span>
   
-    <span class="nx">object</span><span class="p">.</span><span class="nx">_syncedAt</span><span class="p">.</span><span class="nx">getTime</span><span class="p">()</span> <span class="o">&lt;</span> <span class="nx">object</span><span class="p">.</span><span class="nx">updatedAt</span><span class="p">.</span><span class="nx">getTime</span><span class="p">()</span>
+    <span class="nx">object</span><span class="p">.</span><span class="nx">_$syncedAt</span><span class="p">.</span><span class="nx">getTime</span><span class="p">()</span> <span class="o">&lt;</span> <span class="nx">object</span><span class="p">.</span><span class="nx">$updatedAt</span><span class="p">.</span><span class="nx">getTime</span><span class="p">()</span>
 
   <span class="c1"># marked as deleted?</span>
   <span class="nv">_isMarkedAsDeleted : </span><span class="nf">(object) -&gt;</span>
