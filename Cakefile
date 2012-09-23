@@ -83,7 +83,6 @@ task 'build', 'build hoodie-client.min.js', ->
   ]
 
   build.stdout.on 'data', (data) -> 
-    console.log 'data!'
     js_code += data
 
   # build.stderr.on 'data', (data) -> print data.toString()
