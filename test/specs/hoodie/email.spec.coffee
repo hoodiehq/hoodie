@@ -39,10 +39,10 @@ describe "Hoodie.Email", ->
       (expect @hoodie.my.store.create).wasCalledWith('$email', @emailAttributes)
       
     it "should listen to server response", ->
-      (spyOn @hoodie, "one")
+      spyOn @hoodie.my.remote, "one"
       @email.send(@emailAttributes)
-      (expect @hoodie.one).wasCalled()
-      (expect @hoodie.one.mostRecentCall.args[0]).toEqual "remote:updated:$email:abc4567"
+      expect(@hoodie.my.remote.one).wasCalled()
+      expect(@hoodie.my.remote.one.mostRecentCall.args[0]).toEqual "updated:$email:abc4567"
     
     _when "email.to is not provided", ->
       beforeEach ->
@@ -65,7 +65,7 @@ describe "Hoodie.Email", ->
     _when "sending email was successful", ->
       beforeEach ->
         @emailResponseAttributes = $.extend {}, @emailAttributes, id: 'abc4567', deliveredAt: "2012-05-05 15:00 UTC"
-        (spyOn @hoodie, "one").andCallFake (event, cb) =>
+        (spyOn @hoodie.my.remote, "one").andCallFake (event, cb) =>
           cb @emailResponseAttributes
         @promise = @email.send(@emailAttributes)
         
@@ -76,7 +76,7 @@ describe "Hoodie.Email", ->
     _when "sending email had an error", ->
       beforeEach ->
         @emailResponseAttributes = $.extend {}, @emailAttributes, id: 'abc4567', error: "U SPAM!"
-        (spyOn @hoodie, "one").andCallFake (event, cb) =>
+        (spyOn @hoodie.my.remote, "one").andCallFake (event, cb) =>
           cb @emailResponseAttributes
         @promise = @email.send(@emailAttributes)
         

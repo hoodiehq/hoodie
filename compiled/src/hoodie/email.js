@@ -44,7 +44,7 @@ Hoodie.Email = (function() {
     } else if (attributes.deliveredAt) {
       return defer.resolve(attributes);
     } else {
-      return this.hoodie.one("remote:updated:$email:" + attributes.id, function(attributes) {
+      return this.hoodie.my.remote.one("updated:$email:" + attributes.id, function(attributes) {
         return _this._handleEmailUpdate(defer, attributes);
       });
     }

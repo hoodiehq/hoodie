@@ -83,7 +83,10 @@ Mocks.Hoodie = function() {
       remote: {
         connect: function() {},
         disconnect: function() {},
-        sync: function() {}
+        sync: function() {},
+        on: function() {},
+        one: function() {},
+        trigger: function() {}
       }
     }
   };

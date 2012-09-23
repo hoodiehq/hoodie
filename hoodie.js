@@ -1016,7 +1016,13 @@ Hoodie.RemoteStore = (function(_super) {
   };
 
   RemoteStore.prototype.on = function(event, cb) {
-    return this.hoodie.on("remote:" + event, cb);
+    return this.hoodie.on("" + this.basePath + ":" + event, cb);
+  };
+
+  RemoteStore.prototype.trigger = function() {
+    var event, parameters, _ref;
+    event = arguments[0], parameters = 2 <= arguments.length ? __slice.call(arguments, 1) : [];
+    return (_ref = this.hoodie).on.apply(_ref, ["" + this.basePath + ":" + event].concat(__slice.call(parameters)));
   };
 
   RemoteStore.prototype._pullUrl = function() {
@@ -1048,12 +1054,12 @@ Hoodie.RemoteStore = (function(_super) {
     }
     switch (xhr.status) {
       case 403:
-        this.hoodie.trigger('remote:error:unauthenticated', error);
+        this.trigger('error:unauthenticated', error);
         return this.disconnect();
       case 404:
         return window.setTimeout(this.pull, 3000);
       case 500:
-        this.hoodie.trigger('remote:error:server', error);
+        this.trigger('error:server', error);
         return window.setTimeout(this.pull, 3000);
       default:
         if (!this.isContinuouslyPulling()) {
@@ -1165,12 +1171,12 @@ Hoodie.RemoteStore = (function(_super) {
     for (_j = 0, _len1 = _destroyedDocs.length; _j < _len1; _j++) {
       _ref = _destroyedDocs[_j], doc = _ref[0], promise = _ref[1];
       promise.then(function(object) {
-        _this.hoodie.trigger('remote:destroy', object);
-        _this.hoodie.trigger("remote:destroy:" + doc.$type, object);
-        _this.hoodie.trigger("remote:destroy:" + doc.$type + ":" + doc.id, object);
-        _this.hoodie.trigger('remote:change', 'destroy', object);
-        _this.hoodie.trigger("remote:change:" + doc.$type, 'destroy', object);
-        return _this.hoodie.trigger("remote:change:" + doc.$type + ":" + doc.id, 'destroy', object);
+        _this.trigger('destroy', object);
+        _this.trigger("destroy:" + doc.$type, object);
+        _this.trigger("destroy:" + doc.$type + ":" + doc.id, object);
+        _this.trigger('change', 'destroy', object);
+        _this.trigger("change:" + doc.$type, 'destroy', object);
+        return _this.trigger("change:" + doc.$type + ":" + doc.id, 'destroy', object);
       });
     }
     _results = [];
@@ -1179,12 +1185,12 @@ Hoodie.RemoteStore = (function(_super) {
       _results.push(promise.then(function(object, objectWasCreated) {
         var event;
         event = objectWasCreated ? 'create' : 'update';
-        _this.hoodie.trigger("remote:" + event, object);
-        _this.hoodie.trigger("remote:" + event + ":" + doc.$type, object);
-        _this.hoodie.trigger("remote:" + event + ":" + doc.$type + ":" + doc.id, object);
-        _this.hoodie.trigger("remote:change", event, object);
-        _this.hoodie.trigger("remote:change:" + doc.$type, event, object);
-        return _this.hoodie.trigger("remote:change:" + doc.$type + ":" + doc.id, event, object);
+        _this.trigger(event, object);
+        _this.trigger("" + event + ":" + doc.$type, object);
+        _this.trigger("" + event + ":" + doc.$type + ":" + doc.id, object);
+        _this.trigger("change", event, object);
+        _this.trigger("change:" + doc.$type, event, object);
+        return _this.trigger("change:" + doc.$type + ":" + doc.id, event, object);
       }));
     }
     return _results;
@@ -1845,10 +1851,8 @@ Hoodie.Share = (function() {
     return api;
   }
 
-  Share.prototype.open = function(share_id, options) {
-    return new this.instance({
-      id: share_id
-    }, options);
+  Share.prototype.open = function(shareId, options) {
+    return this.hoodie.open("share/" + shareId, options);
   };
 
   Share.prototype.create = function(attributes) {

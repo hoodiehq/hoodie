@@ -58,3 +58,6 @@ Mocks.Hoodie = ->
       connect     : ->
       disconnect  : ->
       sync        : ->
+      on          : ->
+      one         : ->
+      trigger     : ->

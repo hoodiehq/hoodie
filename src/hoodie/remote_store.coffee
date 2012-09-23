@@ -37,7 +37,9 @@
 #
 class Hoodie.RemoteStore extends Hoodie.Store
 
-  # ## properties
+
+  # properties
+  # ------------
   
   # sync  
 
@@ -47,23 +49,21 @@ class Hoodie.RemoteStore extends Hoodie.Store
   _sync: false
 
 
-  # ## Constructor 
+  # Constructor 
+  # -------------
   
-  # sets basePath (think: namespace) and some other options
+  # sets storeName (think: namespace) and some other options
   constructor : (@hoodie, options = {}) ->
-    @basePath = options.basePath or ''
-    @_sync    = options.sync     if options.sync
+    @storeName = options.storeName or ''
+    @_sync     = options.sync      if options.sync
 
 
 
-  # object loading / updating / deleting
-  # --------------------------------------
-
-  
-  # ## find
+  # find
+  # ------
   
   # find one object
-  find: (type, id) ->
+  find : (type, id) ->
     defer = super
     return defer if @hoodie.isPromise(defer)
 
@@ -71,7 +71,8 @@ class Hoodie.RemoteStore extends Hoodie.Store
     @request "GET", path
 
   
-  # ## findAll
+  # findAll
+  # ---------
   
   # find all objects, can be filetered by a type
   findAll : (type) ->
@@ -90,7 +91,8 @@ class Hoodie.RemoteStore extends Hoodie.Store
     return defer.promise()
   
 
-  # ## save
+  # save
+  # ------
   
   # save a new object. If it existed before, all properties
   # will be overwritten 
@@ -110,31 +112,29 @@ class Hoodie.RemoteStore extends Hoodie.Store
     @request "PUT", path, data: doc
 
   
-  # ## destroy
+  # destroy
+  # ---------
   
   # destroy one object
   destroy : (type, id) ->
     @update type, id, _deleted: true
 
   
-  # ## destroyAll
+  # destroyAll
+  # ------------
   
   # destroy all objects, can be filtered by type
   destroyAll : (type) ->
     @updateAll type, _deleted: true
 
-
-
-  # custom requests
-  # -----------------
-
   
-  # ## request
+  # request
+  # ---------
   
   # wrapper for hoodie.request, with some store specific defaults
   # and a prefixed path
   request : (type, path, options = {}) ->
-    path = @basePath + path
+    path = "/#{@storeName}#{path}" if @storeName
 
     options.contentType or= 'application/json'
     if type is 'POST' or type is 'PUT'
@@ -145,14 +145,16 @@ class Hoodie.RemoteStore extends Hoodie.Store
     @hoodie.request type, path, options
 
 
-  # ## get
+  # get
+  # -----
   
   # send a GET request to the named view
   get : (view_name, params) ->
     console.log ".get() not yet implemented", arguments...
   
   
-  # ## post
+  # post
+  # ------
   
   # sends a POST request to the specified updated_function
   post : (update_function_name, params) ->
@@ -163,7 +165,8 @@ class Hoodie.RemoteStore extends Hoodie.Store
   # synchronization
   # -----------------
 
-  # ## Connect
+  # Connect
+  # ---------
 
   # start syncing
   connect : =>
@@ -171,7 +174,8 @@ class Hoodie.RemoteStore extends Hoodie.Store
     @sync()
   
     
-  # ## Disconnect
+  # Disconnect
+  # ------------
 
   # stop syncing changes from the userDB
   disconnect : =>
@@ -184,32 +188,37 @@ class Hoodie.RemoteStore extends Hoodie.Store
     @_pushRequest?.abort()
 
 
-  # ## isContinuouslyPulling
+  # isContinuouslyPulling
+  # -----------------------
 
   # returns true if pulling is set to be continous
   isContinuouslyPulling : ->
     @_sync is true or @_sync?.pull is true
 
-  # ## isContinuouslyPushing
+  # isContinuouslyPushing
+  # -----------------------
 
   # returns true if pulling is set to be continous
   isContinuouslyPushing : ->
     @_sync is true or @_sync?.push is true
 
-  # ## isContinuouslySyncing
+  # isContinuouslySyncing
+  # -----------------------
 
   # returns true if pulling is set to be continous
   isContinuouslySyncing : ->
     @_sync is true
 
-  # ## getSinceNr
+  # getSinceNr
+  # ------------
 
   # returns the sequence number from wich to start to find changes in pull
   #
   getSinceNr : ->
     @_since or 0
 
-  # ## setSinceNr
+  # setSinceNr
+  # ------------
 
   # sets the sequence number from wich to start to find changes in pull
   #
@@ -217,7 +226,8 @@ class Hoodie.RemoteStore extends Hoodie.Store
     @_since = seq
 
 
-  # ## pull changes
+  # pull changes
+  # --------------
 
   # a.k.a. make a GET request to CouchDB's `_changes` feed.
   #
@@ -231,7 +241,8 @@ class Hoodie.RemoteStore extends Hoodie.Store
     @_pullRequest.then @_handlePullSuccess, @_handlePullError
     
     
-  # ## push changes
+  # push changes
+  # --------------
 
   # Push objects to userDB using the `_bulk_docs` API.
   # If no objects passed, push all changed documents
@@ -239,9 +250,9 @@ class Hoodie.RemoteStore extends Hoodie.Store
     
     return @hoodie.defer().resolve([]).promise() unless docs?.length
       
-    docsForRemote = for doc in docs
-      @_addRevisionTo doc
-      @_parseForRemote doc 
+    docsForRemote = []
+    for doc in docs
+      docsForRemote.push @_parseForRemote doc 
     
     @_pushRequest = @request 'POST', "/_bulk_docs"
       data :
@@ -249,10 +260,11 @@ class Hoodie.RemoteStore extends Hoodie.Store
         new_edits : false
 
     # when push is successful, update the local store with the generated _rev numbers
-    @_pushRequest.done @_handlePushSuccess docs, docsForRemote
+    @_pushRequest.done @_handlePushSuccess(docs, docsForRemote)
 
 
-  # ## sync changes
+  # sync changes
+  # --------------
 
   # pull ... and push ;-)
   sync : (docs) =>
@@ -263,14 +275,22 @@ class Hoodie.RemoteStore extends Hoodie.Store
     @push(docs).pipe @pull
 
   
-  # ## On
+  # Events
+  # ----
 
-  # alias for `hoodie.on`
-  on : (event, cb) -> @hoodie.on "remote:#{event}", cb
+  # namespaced alias for `hoodie.on`
+  on  : (event, cb) -> @hoodie.on  "#{@storeName}:#{event}", cb
+  one : (event, cb) -> @hoodie.one "#{@storeName}:#{event}", cb
   
+  # namespaced alias for `hoodie.trigger`
+  trigger : (event, parameters...) -> 
+    @hoodie.on "#{@storeName}:#{event}", parameters...
+
+
   
 
-  # ## Private
+  # Private
+  # --------------
   
   
   # ### pull url
@@ -315,7 +335,7 @@ class Hoodie.RemoteStore extends Hoodie.Store
       # Session is invalid. User is still login, but needs to reauthenticate
       # before sync can be continued
       when 403
-        @hoodie.trigger 'remote:error:unauthenticated', error
+        @trigger 'error:unauthenticated', error
         @disconnect()
       
       # the 404 comes, when the requested DB has been removed
@@ -331,7 +351,7 @@ class Hoodie.RemoteStore extends Hoodie.Store
       
       # Please server, don't give us these. At least not persistently 
       when 500
-        @hoodie.trigger 'remote:error:server', error
+        @trigger 'error:server', error
         window.setTimeout @pull, 3000
       
       # usually a 0, which stands for timeout or server not reachable.
@@ -376,6 +396,8 @@ class Hoodie.RemoteStore extends Hoodie.Store
     attributes._id = "#{attributes.$type}/#{attributes.id}"
     delete attributes.id
     
+    @_addRevisionTo attributes
+
     return attributes
   
 
@@ -463,7 +485,7 @@ class Hoodie.RemoteStore extends Hoodie.Store
   # note: we don't trigger any events until all changes have been taken care of.
   #       Reason is, that on object could depend on a different object that has
   #       not been stored yet, but is within the same bulk of changes. This 
-  #       is especially the case during initial bootstraps after a user logins.
+  #       is especially the case during initial bootstraps after a user signs in.
   #
   _handlePullResults : (changes) =>
     _destroyedDocs = []
@@ -480,24 +502,24 @@ class Hoodie.RemoteStore extends Hoodie.Store
     # 2. trigger events
     for [doc, promise] in _destroyedDocs
       promise.then (object) => 
-        @hoodie.trigger 'remote:destroy',                        object
-        @hoodie.trigger "remote:destroy:#{doc.$type}",           object
-        @hoodie.trigger "remote:destroy:#{doc.$type}:#{doc.id}", object
+        @trigger 'destroy',                        object
+        @trigger "destroy:#{doc.$type}",           object
+        @trigger "destroy:#{doc.$type}:#{doc.id}", object
         
-        @hoodie.trigger 'remote:change',                         'destroy', object
-        @hoodie.trigger "remote:change:#{doc.$type}",            'destroy', object
-        @hoodie.trigger "remote:change:#{doc.$type}:#{doc.id}",  'destroy', object
+        @trigger 'change',                         'destroy', object
+        @trigger "change:#{doc.$type}",            'destroy', object
+        @trigger "change:#{doc.$type}:#{doc.id}",  'destroy', object
     
     for [doc, promise] in _changedDocs
       promise.then (object, objectWasCreated) => 
         event = if objectWasCreated then 'create' else 'update'
-        @hoodie.trigger "remote:#{event}",                        object
-        @hoodie.trigger "remote:#{event}:#{doc.$type}",           object
-        @hoodie.trigger "remote:#{event}:#{doc.$type}:#{doc.id}", object
+        @trigger event,                             object
+        @trigger "#{event}:#{doc.$type}",           object
+        @trigger "#{event}:#{doc.$type}:#{doc.id}", object unless event is 'create'
       
-        @hoodie.trigger "remote:change",                          event, object
-        @hoodie.trigger "remote:change:#{doc.$type}",             event, object
-        @hoodie.trigger "remote:change:#{doc.$type}:#{doc.id}",   event, object
+        @trigger "change",                          event, object
+        @trigger "change:#{doc.$type}",             event, object
+        @trigger "change:#{doc.$type}:#{doc.id}",   event, object unless event is 'create'
 
 
 

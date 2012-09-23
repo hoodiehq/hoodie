@@ -9,7 +9,6 @@ describe("Hoodie.RemoteStore", function() {
     this.requestDefer = this.hoodie.defer();
     spyOn(window, "setTimeout");
     spyOn(this.hoodie.my.account, "db").andReturn('joe$example.com');
-    spyOn(this.hoodie, "trigger");
     spyOn(this.hoodie.my.store, "destroy").andReturn({
       then: function(cb) {
         return cb('objectFromStore');
@@ -22,18 +21,18 @@ describe("Hoodie.RemoteStore", function() {
     });
     return this.remote = new Hoodie.RemoteStore(this.hoodie);
   });
-  describe(".constructor(@hoodie, options = {})", function() {
-    it("should set @basePath", function() {
+  describe("constructor(@hoodie, options = {})", function() {
+    it("should set @storeName", function() {
       var remote;
       remote = new Hoodie.RemoteStore(this.hoodie, {
-        basePath: '/base/path'
+        storeName: 'base/path'
       });
-      return expect(remote.basePath).toBe('/base/path');
+      return expect(remote.storeName).toBe('base/path');
     });
-    it("should default @basePath to ''", function() {
+    it("should default @storeName to ''", function() {
       var remote;
       remote = new Hoodie.RemoteStore(this.hoodie);
-      return expect(remote.basePath).toBe('');
+      return expect(remote.storeName).toBe('');
     });
     it("should set _sync to false by default", function() {
       var remote;
@@ -48,7 +47,7 @@ describe("Hoodie.RemoteStore", function() {
       return expect(remote._sync).toBe(true);
     });
   });
-  describe("find(type, id)", function() {
+  describe("#find(type, id)", function() {
     beforeEach(function() {
       return spyOn(this.remote, "request").andReturn("request_promise");
     });
@@ -56,7 +55,7 @@ describe("Hoodie.RemoteStore", function() {
       return expect(this.remote.find("todo", "1")).toBe('request_promise');
     });
   });
-  describe("findAll(type)", function() {
+  describe("#findAll(type)", function() {
     beforeEach(function() {
       return spyOn(this.remote, "request").andReturn(this.requestDefer.promise());
     });
@@ -98,7 +97,7 @@ describe("Hoodie.RemoteStore", function() {
       });
     });
   });
-  describe("save(type, id, object)", function() {
+  describe("#save(type, id, object)", function() {
     beforeEach(function() {
       spyOn(this.remote, "uuid").andReturn("uuid567");
       return spyOn(this.remote, "request").andReturn("request_promise");
@@ -134,7 +133,7 @@ describe("Hoodie.RemoteStore", function() {
       });
     });
   });
-  describe("destroy(type, id)", function() {
+  describe("#destroy(type, id)", function() {
     beforeEach(function() {
       return spyOn(this.remote, "update").andReturn("update_promise");
     });
@@ -148,7 +147,7 @@ describe("Hoodie.RemoteStore", function() {
       return expect(this.remote.destroy('car', 123)).toBe('update_promise');
     });
   });
-  describe("destroyAll(type)", function() {
+  describe("#destroyAll(type)", function() {
     beforeEach(function() {
       return spyOn(this.remote, "updateAll").andReturn("updateAll_promise");
     });
@@ -162,7 +161,7 @@ describe("Hoodie.RemoteStore", function() {
       return expect(this.remote.destroyAll('car')).toBe('updateAll_promise');
     });
   });
-  describe("request(type, path, options)", function() {
+  describe("#request(type, path, options)", function() {
     beforeEach(function() {
       return spyOn(this.hoodie, "request");
     });
@@ -176,9 +175,9 @@ describe("Hoodie.RemoteStore", function() {
         contentType: 'application/json'
       });
     });
-    it("should prefix path with @basePath", function() {
+    it("should prefix path with @storeName", function() {
       var path, type, _ref;
-      this.remote.basePath = "/my/store";
+      this.remote.storeName = "my/store";
       this.remote.request("GET", "/something");
       _ref = this.hoodie.request.mostRecentCall.args, type = _ref[0], path = _ref[1];
       return expect(path).toBe('/my/store/something');
@@ -199,7 +198,7 @@ describe("Hoodie.RemoteStore", function() {
   });
   describe("get(view, params)", function() {});
   describe("post(view, params)", function() {});
-  describe(".connect()", function() {
+  describe("#connect()", function() {
     beforeEach(function() {
       return spyOn(this.remote, "sync");
     });
@@ -213,7 +212,7 @@ describe("Hoodie.RemoteStore", function() {
       return expect(this.remote.sync).wasCalled();
     });
   });
-  describe(".disconnect()", function() {
+  describe("#disconnect()", function() {
     it("should abort the pull request", function() {
       this.remote._pullRequest = {
         abort: jasmine.createSpy('pull')
@@ -233,7 +232,7 @@ describe("Hoodie.RemoteStore", function() {
       return expect(this.hoodie.unbind).wasCalledWith('store:dirty:idle', this.remote.push);
     });
   });
-  describe(".isContinuouslyPulling()", function() {
+  describe("#isContinuouslyPulling()", function() {
     _when("remote._sync is false", function() {
       return it("should return false", function() {
         this.remote._sync = false;
@@ -263,7 +262,7 @@ describe("Hoodie.RemoteStore", function() {
       });
     });
   });
-  describe(".isContinuouslyPushing()", function() {
+  describe("#isContinuouslyPushing()", function() {
     _when("remote._sync is false", function() {
       return it("should return false", function() {
         this.remote._sync = false;
@@ -293,7 +292,7 @@ describe("Hoodie.RemoteStore", function() {
       });
     });
   });
-  describe(".isContinuouslySyncing()", function() {
+  describe("#isContinuouslySyncing()", function() {
     _when("remote._sync is false", function() {
       return it("should return false", function() {
         this.remote._sync = false;
@@ -323,7 +322,7 @@ describe("Hoodie.RemoteStore", function() {
       });
     });
   });
-  describe(".getSinceNr()", function() {
+  describe("#getSinceNr()", function() {
     _when("since not set before", function() {
       return it("should return 0", function() {
         expect(this.remote._since).toBe(void 0);
@@ -339,14 +338,14 @@ describe("Hoodie.RemoteStore", function() {
       });
     });
   });
-  describe(".setSinceNr(since)", function() {
+  describe("#setSinceNr(since)", function() {
     return it("should set _since property", function() {
       expect(this.remote._since).toBe(void 0);
       this.remote.setSinceNr(100);
       return expect(this.remote._since).toBe(100);
     });
   });
-  describe(".pull()", function() {
+  describe("#pull()", function() {
     beforeEach(function() {
       this.remote.connected = true;
       return spyOn(this.remote, "request").andReturn(this.requestDefer.promise());
@@ -413,19 +412,20 @@ describe("Hoodie.RemoteStore", function() {
         });
       });
       it("should trigger remote events", function() {
+        spyOn(this.remote, "trigger");
         this.remote.pull();
-        expect(this.hoodie.trigger).wasCalledWith('remote:destroy', 'objectFromStore');
-        expect(this.hoodie.trigger).wasCalledWith('remote:destroy:todo', 'objectFromStore');
-        expect(this.hoodie.trigger).wasCalledWith('remote:destroy:todo:abc3', 'objectFromStore');
-        expect(this.hoodie.trigger).wasCalledWith('remote:change', 'destroy', 'objectFromStore');
-        expect(this.hoodie.trigger).wasCalledWith('remote:change:todo', 'destroy', 'objectFromStore');
-        expect(this.hoodie.trigger).wasCalledWith('remote:change:todo:abc3', 'destroy', 'objectFromStore');
-        expect(this.hoodie.trigger).wasCalledWith('remote:update', 'objectFromStore');
-        expect(this.hoodie.trigger).wasCalledWith('remote:update:todo', 'objectFromStore');
-        expect(this.hoodie.trigger).wasCalledWith('remote:update:todo:abc2', 'objectFromStore');
-        expect(this.hoodie.trigger).wasCalledWith('remote:change', 'update', 'objectFromStore');
-        expect(this.hoodie.trigger).wasCalledWith('remote:change:todo', 'update', 'objectFromStore');
-        return expect(this.hoodie.trigger).wasCalledWith('remote:change:todo:abc2', 'update', 'objectFromStore');
+        expect(this.remote.trigger).wasCalledWith('destroy', 'objectFromStore');
+        expect(this.remote.trigger).wasCalledWith('destroy:todo', 'objectFromStore');
+        expect(this.remote.trigger).wasCalledWith('destroy:todo:abc3', 'objectFromStore');
+        expect(this.remote.trigger).wasCalledWith('change', 'destroy', 'objectFromStore');
+        expect(this.remote.trigger).wasCalledWith('change:todo', 'destroy', 'objectFromStore');
+        expect(this.remote.trigger).wasCalledWith('change:todo:abc3', 'destroy', 'objectFromStore');
+        expect(this.remote.trigger).wasCalledWith('update', 'objectFromStore');
+        expect(this.remote.trigger).wasCalledWith('update:todo', 'objectFromStore');
+        expect(this.remote.trigger).wasCalledWith('update:todo:abc2', 'objectFromStore');
+        expect(this.remote.trigger).wasCalledWith('change', 'update', 'objectFromStore');
+        expect(this.remote.trigger).wasCalledWith('change:todo', 'update', 'objectFromStore');
+        return expect(this.remote.trigger).wasCalledWith('change:todo:abc2', 'update', 'objectFromStore');
       });
       return _and(".isContinuouslyPulling() returns true", function() {
         beforeEach(function() {
@@ -458,8 +458,9 @@ describe("Hoodie.RemoteStore", function() {
         return expect(this.remote.disconnect).wasCalled();
       });
       it("should trigger an unauthenticated error", function() {
+        spyOn(this.remote, "trigger");
         this.remote.pull();
-        return expect(this.hoodie.trigger).wasCalledWith('remote:error:unauthenticated', 'error object');
+        return expect(this.remote.trigger).wasCalledWith('error:unauthenticated', 'error object');
       });
       _and("remote is pullContinuously", function() {
         return beforeEach(function() {
@@ -510,8 +511,9 @@ describe("Hoodie.RemoteStore", function() {
         return expect(window.setTimeout).wasCalledWith(this.remote.pull, 3000);
       });
       return it("should trigger a server error event", function() {
+        spyOn(this.remote, "trigger");
         this.remote.pull();
-        return expect(this.hoodie.trigger).wasCalledWith('remote:error:server', 'error object');
+        return expect(this.remote.trigger).wasCalledWith('error:server', 'error object');
       });
     });
     _when("request was aborted manually", function() {
@@ -562,7 +564,7 @@ describe("Hoodie.RemoteStore", function() {
       });
     });
   });
-  describe(".push(docs)", function() {
+  describe("#push(docs)", function() {
     beforeEach(function() {
       spyOn(Date, "now").andReturn(10);
       this.remote._timezoneOffset = 1;
@@ -636,7 +638,7 @@ describe("Hoodie.RemoteStore", function() {
       });
     });
   });
-  describe(".sync(docs)", function() {
+  describe("#sync(docs)", function() {
     beforeEach(function() {
       spyOn(this.remote, "push").andCallFake(function(docs) {
         return {
@@ -678,12 +680,22 @@ describe("Hoodie.RemoteStore", function() {
       });
     });
   });
-  return describe(".on(event, callback)", function() {
-    return it("should namespace events with `remote`", function() {
+  describe("#on(event, callback)", function() {
+    return it("should namespace events with `storeName`", function() {
       var cb;
       cb = jasmine.createSpy('test');
+      this.remote.storeName = 'databaseName';
       this.remote.on('funky', cb);
-      return expect(this.hoodie.on).wasCalledWith('remote:funky', cb);
+      return expect(this.hoodie.on).wasCalledWith('databaseName:funky', cb);
+    });
+  });
+  return describe("#trigger(event, parameters...)", function() {
+    return it("should namespace events with `storeName`", function() {
+      var cb;
+      cb = jasmine.createSpy('test');
+      this.remote.storeName = 'databaseName';
+      this.remote.on('funky', cb);
+      return expect(this.hoodie.on).wasCalledWith('databaseName:funky', cb);
     });
   });
 });

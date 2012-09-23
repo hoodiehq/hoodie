@@ -42,4 +42,4 @@ class Hoodie.Email
     else if attributes.deliveredAt
       defer.resolve attributes
     else
-      @hoodie.one "remote:updated:$email:#{attributes.id}", (attributes) => @_handleEmailUpdate(defer, attributes)
+      @hoodie.my.remote.one "updated:$email:#{attributes.id}", (attributes) => @_handleEmailUpdate(defer, attributes)

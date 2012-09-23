@@ -8,22 +8,20 @@ describe "Hoodie.RemoteStore", ->
     spyOn(window, "setTimeout")
     spyOn(@hoodie.my.account, "db").andReturn 'joe$example.com'
     
-    spyOn(@hoodie, "trigger")
     spyOn(@hoodie.my.store, "destroy").andReturn then: (cb) -> cb('objectFromStore')
     spyOn(@hoodie.my.store, "update").andReturn  then: (cb) -> cb('objectFromStore', false)
 
     @remote = new Hoodie.RemoteStore @hoodie
   
-  
-  describe ".constructor(@hoodie, options = {})", ->
+  describe "constructor(@hoodie, options = {})", ->
 
-    it "should set @basePath", ->
-      remote = new Hoodie.RemoteStore @hoodie, basePath: '/base/path'
-      expect(remote.basePath).toBe '/base/path'
+    it "should set @storeName", ->
+      remote = new Hoodie.RemoteStore @hoodie, storeName: 'base/path'
+      expect(remote.storeName).toBe 'base/path'
 
-    it "should default @basePath to ''", ->
+    it "should default @storeName to ''", ->
       remote = new Hoodie.RemoteStore @hoodie
-      expect(remote.basePath).toBe ''
+      expect(remote.storeName).toBe ''
 
     it "should set _sync to false by default", ->
       remote = new Hoodie.RemoteStore @hoodie
@@ -32,22 +30,22 @@ describe "Hoodie.RemoteStore", ->
     it "should set _sync to false from pased sync option", ->
       remote = new Hoodie.RemoteStore @hoodie, sync: true
       expect(remote._sync).toBe true
-  # /.constructor
+  # /constructor
 
 
   # object loading / updating / deleting
   # -------------------------------------
 
-  describe "find(type, id)", ->
+  describe "#find(type, id)", ->
     beforeEach ->
       spyOn(@remote, "request").andReturn "request_promise"
 
     it "should return the request promise", ->
       expect(@remote.find("todo", "1")).toBe 'request_promise'
     
-  # /find(type, id)
+  # /#find(type, id)
 
-  describe "findAll(type)", ->
+  describe "#findAll(type)", ->
     beforeEach ->
       spyOn(@remote, "request").andReturn @requestDefer.promise()
     
@@ -80,9 +78,9 @@ describe "Hoodie.RemoteStore", ->
       it "should be rejected with the response error", ->
         promise = @remote.findAll()
         expect(promise).toBeRejectedWith "error"
-  # /findAll(type )
+  # /#findAll(type )
 
-  describe "save(type, id, object)", ->
+  describe "#save(type, id, object)", ->
     beforeEach ->
       spyOn(@remote, "uuid").andReturn "uuid567"
       spyOn(@remote, "request").andReturn "request_promise"
@@ -113,10 +111,10 @@ describe "Hoodie.RemoteStore", ->
 
       it "should set _id to `car/123`", ->
         expect(@data._id).toBe 'car/123'
-  # /save(type, id, object)
+  # /#save(type, id, object)
 
 
-  describe "destroy(type, id)", ->
+  describe "#destroy(type, id)", ->
     beforeEach ->
       spyOn(@remote, "update").andReturn "update_promise"
     
@@ -126,10 +124,10 @@ describe "Hoodie.RemoteStore", ->
     
     it "should return promise of update", ->
        expect(@remote.destroy 'car', 123).toBe 'update_promise'    
-  # /destroy(type, id)
+  # /#destroy(type, id)
 
 
-  describe "destroyAll(type)", ->
+  describe "#destroyAll(type)", ->
     beforeEach ->
       spyOn(@remote, "updateAll").andReturn "updateAll_promise"
     
@@ -139,13 +137,13 @@ describe "Hoodie.RemoteStore", ->
     
     it "should return promise of updateAll", ->
        expect(@remote.destroyAll 'car').toBe 'updateAll_promise'
-  # /destroyAll(type)
+  # /#destroyAll(type)
 
 
   # custom requests
   # -----------------
 
-  describe "request(type, path, options)", ->
+  describe "#request(type, path, options)", ->
     beforeEach ->
       spyOn(@hoodie, "request")
     
@@ -157,8 +155,8 @@ describe "Hoodie.RemoteStore", ->
       @remote.request("GET", "/something")
       expect(@hoodie.request).wasCalledWith "GET", "/something", contentType: 'application/json'
 
-    it "should prefix path with @basePath", ->
-      @remote.basePath = "/my/store"
+    it "should prefix path with @storeName", ->
+      @remote.storeName = "my/store"
       @remote.request("GET", "/something")
       [type, path] = @hoodie.request.mostRecentCall.args
       expect(path).toBe '/my/store/something'
@@ -173,9 +171,7 @@ describe "Hoodie.RemoteStore", ->
       
       it "should default options.dataType to 'json'", ->
         expect(@options.processData).toBe false
-    
-    
-  # /get(view, params)
+  # /#request(type, path, options)
 
   describe "get(view, params)", ->
   # /get(view, params)
@@ -187,7 +183,7 @@ describe "Hoodie.RemoteStore", ->
   # synchronization
   # -----------------
 
-  describe ".connect()", ->
+  describe "#connect()", ->
     beforeEach ->
       spyOn(@remote, "sync")
     
@@ -200,8 +196,9 @@ describe "Hoodie.RemoteStore", ->
     it "should sync", ->
       @remote.connect()
       expect(@remote.sync).wasCalled()
+  # /#connect()
 
-  describe ".disconnect()", ->  
+  describe "#disconnect()", ->  
     it "should abort the pull request", ->
       @remote._pullRequest = abort: jasmine.createSpy 'pull'
       @remote.disconnect()
@@ -215,9 +212,9 @@ describe "Hoodie.RemoteStore", ->
     it "should unsubscribe from stores's dirty idle event", ->
       @remote.disconnect()
       expect(@hoodie.unbind).wasCalledWith 'store:dirty:idle', @remote.push
-  # /.disconnect()
+  # /#disconnect()
 
-  describe ".isContinuouslyPulling()", ->
+  describe "#isContinuouslyPulling()", ->
     _when "remote._sync is false", ->
       it "should return false", ->
         @remote._sync = false
@@ -237,9 +234,9 @@ describe "Hoodie.RemoteStore", ->
       it "should return false", ->
         @remote._sync = push: true
         expect(@remote.isContinuouslyPulling()).toBe false
-  # /.isContinuouslySyncing()
+  # /#isContinuouslySyncing()
 
-  describe ".isContinuouslyPushing()", ->
+  describe "#isContinuouslyPushing()", ->
     _when "remote._sync is false", ->
       it "should return false", ->
         @remote._sync = false
@@ -259,9 +256,9 @@ describe "Hoodie.RemoteStore", ->
       it "should return true", ->
         @remote._sync = push: true
         expect(@remote.isContinuouslyPushing()).toBe true
-  # /.isContinuouslySyncing()
+  # /#isContinuouslySyncing()
 
-  describe ".isContinuouslySyncing()", ->
+  describe "#isContinuouslySyncing()", ->
     _when "remote._sync is false", ->
       it "should return false", ->
         @remote._sync = false
@@ -281,9 +278,9 @@ describe "Hoodie.RemoteStore", ->
       it "should return false", ->
         @remote._sync = push: true
         expect(@remote.isContinuouslySyncing()).toBe false
-  # /.isContinuouslySyncing()
+  # /#isContinuouslySyncing()
 
-  describe ".getSinceNr()", ->
+  describe "#getSinceNr()", ->
     _when "since not set before", ->
       it "should return 0", ->
         expect(@remote._since).toBe undefined
@@ -295,16 +292,16 @@ describe "Hoodie.RemoteStore", ->
 
       it "should return 100", ->
         expect(@remote.getSinceNr()).toBe 100
-  # /.getSinceNr()
+  # /#getSinceNr()
 
-  describe ".setSinceNr(since)", ->
+  describe "#setSinceNr(since)", ->
     it "should set _since property", ->
       expect(@remote._since).toBe undefined
       @remote.setSinceNr(100)
       expect(@remote._since).toBe 100
-  # /.setSinceNr()
+  # /#setSinceNr()
 
-  describe ".pull()", ->        
+  describe "#pull()", ->        
     beforeEach ->
       @remote.connected = true
       spyOn(@remote, "request").andReturn @requestDefer.promise()
@@ -351,25 +348,26 @@ describe "Hoodie.RemoteStore", ->
         expect(@hoodie.my.store.update).wasCalledWith 'todo', 'abc2', { _rev : '1-123', content : 'remember the milk', done : false, order : 1, $type : 'todo', id : 'abc2' }, { remote : true }
       
       it "should trigger remote events", ->
+        spyOn(@remote, "trigger")
         @remote.pull()
 
         # {"_id":"todo/abc3","_rev":"2-123","_deleted":true}
-        expect(@hoodie.trigger).wasCalledWith 'remote:destroy',           'objectFromStore'
-        expect(@hoodie.trigger).wasCalledWith 'remote:destroy:todo',      'objectFromStore'
-        expect(@hoodie.trigger).wasCalledWith 'remote:destroy:todo:abc3', 'objectFromStore'
+        expect(@remote.trigger).wasCalledWith 'destroy',           'objectFromStore'
+        expect(@remote.trigger).wasCalledWith 'destroy:todo',      'objectFromStore'
+        expect(@remote.trigger).wasCalledWith 'destroy:todo:abc3', 'objectFromStore'
 
-        expect(@hoodie.trigger).wasCalledWith 'remote:change',            'destroy', 'objectFromStore'
-        expect(@hoodie.trigger).wasCalledWith 'remote:change:todo',       'destroy', 'objectFromStore'
-        expect(@hoodie.trigger).wasCalledWith 'remote:change:todo:abc3',  'destroy', 'objectFromStore'        
+        expect(@remote.trigger).wasCalledWith 'change',            'destroy', 'objectFromStore'
+        expect(@remote.trigger).wasCalledWith 'change:todo',       'destroy', 'objectFromStore'
+        expect(@remote.trigger).wasCalledWith 'change:todo:abc3',  'destroy', 'objectFromStore'        
         
         # {"_id":"todo/abc2","_rev":"1-123","content":"remember the milk","done":false,"order":1, "type":"todo"}
-        expect(@hoodie.trigger).wasCalledWith 'remote:update',            'objectFromStore'
-        expect(@hoodie.trigger).wasCalledWith 'remote:update:todo',       'objectFromStore'
-        expect(@hoodie.trigger).wasCalledWith 'remote:update:todo:abc2',  'objectFromStore'
+        expect(@remote.trigger).wasCalledWith 'update',            'objectFromStore'
+        expect(@remote.trigger).wasCalledWith 'update:todo',       'objectFromStore'
+        expect(@remote.trigger).wasCalledWith 'update:todo:abc2',  'objectFromStore'
 
-        expect(@hoodie.trigger).wasCalledWith 'remote:change',            'update', 'objectFromStore'
-        expect(@hoodie.trigger).wasCalledWith 'remote:change:todo',       'update', 'objectFromStore'
-        expect(@hoodie.trigger).wasCalledWith 'remote:change:todo:abc2',  'update', 'objectFromStore'
+        expect(@remote.trigger).wasCalledWith 'change',            'update', 'objectFromStore'
+        expect(@remote.trigger).wasCalledWith 'change:todo',       'update', 'objectFromStore'
+        expect(@remote.trigger).wasCalledWith 'change:todo:abc2',  'update', 'objectFromStore'
         
       _and ".isContinuouslyPulling() returns true", ->
         beforeEach ->
@@ -394,8 +392,9 @@ describe "Hoodie.RemoteStore", ->
         expect(@remote.disconnect).wasCalled()
         
       it "should trigger an unauthenticated error", ->
+        spyOn(@remote, "trigger")
         @remote.pull()
-        expect(@hoodie.trigger).wasCalledWith 'remote:error:unauthenticated', 'error object'
+        expect(@remote.trigger).wasCalledWith 'error:unauthenticated', 'error object'
       
       _and "remote is pullContinuously", ->
         beforeEach ->
@@ -428,8 +427,9 @@ describe "Hoodie.RemoteStore", ->
         expect(window.setTimeout).wasCalledWith @remote.pull, 3000
         
       it "should trigger a server error event", ->
+        spyOn(@remote, "trigger")
         @remote.pull()
-        expect(@hoodie.trigger).wasCalledWith 'remote:error:server', 'error object'
+        expect(@remote.trigger).wasCalledWith 'error:server', 'error object'
         
     _when "request was aborted manually", ->
       beforeEach ->
@@ -465,9 +465,9 @@ describe "Hoodie.RemoteStore", ->
         @remote.isContinuouslyPulling.andReturn false
         @remote.pull()
         expect(window.setTimeout).wasNotCalledWith @remote.pull, 3000
-  # /.pull()
+  # /#pull()
 
-  describe ".push(docs)", -> 
+  describe "#push(docs)", -> 
     beforeEach ->
       spyOn(Date, "now").andReturn 10
       @remote._timezoneOffset = 1
@@ -526,9 +526,9 @@ describe "Hoodie.RemoteStore", ->
 
         expect(newDoc._revisions.start).toBe 1
         expect(newDoc._revisions.ids[0]).toBe 'uuid#11'
-  # /.push(docs)
+  # /#push(docs)
 
-  describe ".sync(docs)", ->
+  describe "#sync(docs)", ->
     beforeEach ->
       spyOn(@remote, "push").andCallFake (docs) -> pipe: (cb) -> cb(docs)
       spyOn(@remote, "pull")
@@ -556,16 +556,25 @@ describe "Hoodie.RemoteStore", ->
         @remote.sync()
         expect(order[0]).toBe 'unbind store:dirty:idle'
         expect(order[1]).toBe 'bind store:dirty:idle'
-  # /.sync(docs)
+  # /#sync(docs)
 
 
-  # event binding
-  # ---------------
+  # events
+  # --------
   
-  describe ".on(event, callback)", ->  
-    it "should namespace events with `remote`", ->
+  describe "#on(event, callback)", ->  
+    it "should namespace events with `storeName`", ->
       cb = jasmine.createSpy 'test'
+      @remote.storeName = 'databaseName'
       @remote.on 'funky', cb
-      expect(@hoodie.on).wasCalledWith 'remote:funky', cb
-  # /.on(event, callback)
+      expect(@hoodie.on).wasCalledWith 'databaseName:funky', cb
+  # /#on(event, callback)
+
+  describe "#trigger(event, parameters...)", ->  
+    it "should namespace events with `storeName`", ->
+      cb = jasmine.createSpy 'test'
+      @remote.storeName = 'databaseName'
+      @remote.on 'funky', cb
+      expect(@hoodie.on).wasCalledWith 'databaseName:funky', cb
+  # /#trigger(event, parameters...)
 # /Hoodie.RemoteStore

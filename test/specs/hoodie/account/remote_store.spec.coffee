@@ -7,7 +7,7 @@ describe "Hoodie.Account.RemoteStore", ->
     @requestDefer = @hoodie.defer()
     spyOn(@hoodie, "request").andReturn @requestDefer.promise()
     spyOn(window, "setTimeout")
-    spyOn(@hoodie.my.account, "db").andReturn 'joe$example.com'
+    spyOn(@hoodie.my.account, "db").andReturn 'userhash123'
     
     spyOn(@hoodie, "trigger")
     spyOn(@hoodie.my.store, "destroy").andReturn then: (cb) -> cb('objectFromStore')
@@ -20,8 +20,8 @@ describe "Hoodie.Account.RemoteStore", ->
     beforeEach ->
       @remote = new Hoodie.Account.RemoteStore @hoodie
     
-    it "should set basePath to users database name", ->
-      expect(@remote.basePath).toBe "/joe%24example.com"
+    it "should set storeName to users database name", ->
+      expect(@remote.storeName).toBe "userhash123"
 
     it "should sync continously by default", ->
       expect(@remote.isContinuouslySyncing()).toBeTruthy()

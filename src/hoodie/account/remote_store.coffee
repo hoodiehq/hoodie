@@ -21,8 +21,8 @@ class Hoodie.Account.RemoteStore extends Hoodie.RemoteStore
   constructor : ->
     super
 
-    # set basePath to user's DB name
-    @basePath = "/#{encodeURIComponent @hoodie.my.account.db()}"
+    # set storeName to user's DB name
+    @storeName = @hoodie.my.account.db()
     
     # overwrite default with _remote.sync config, if set
     @_sync = @hoodie.my.config.get('_remote.sync') if @hoodie.my.config.get('_remote.sync')?
@@ -67,9 +67,9 @@ class Hoodie.Account.RemoteStore extends Hoodie.RemoteStore
 
   # we store the last since number from the current user's store
   # in his config
-  getSinceNr: (since) ->
+  getSinceNr : (since) ->
     @hoodie.my.config.get('_remote.since') or 0
-  setSinceNr: (since) ->
+  setSinceNr : (since) ->
     @hoodie.my.config.set '_remote.since', since
 
 
@@ -77,6 +77,6 @@ class Hoodie.Account.RemoteStore extends Hoodie.RemoteStore
 
   # if no docs passed to be pushed, we default to users changed objects
   # in his store
-  push: (docs) =>
+  push : (docs) =>
     docs = @hoodie.my.store.changedDocs() unless $.isArray docs
     super(docs)

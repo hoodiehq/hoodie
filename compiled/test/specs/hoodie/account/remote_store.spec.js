@@ -9,7 +9,7 @@ describe("Hoodie.Account.RemoteStore", function() {
     this.requestDefer = this.hoodie.defer();
     spyOn(this.hoodie, "request").andReturn(this.requestDefer.promise());
     spyOn(window, "setTimeout");
-    spyOn(this.hoodie.my.account, "db").andReturn('joe$example.com');
+    spyOn(this.hoodie.my.account, "db").andReturn('userhash123');
     spyOn(this.hoodie, "trigger");
     spyOn(this.hoodie.my.store, "destroy").andReturn({
       then: function(cb) {
@@ -27,8 +27,8 @@ describe("Hoodie.Account.RemoteStore", function() {
     beforeEach(function() {
       return this.remote = new Hoodie.Account.RemoteStore(this.hoodie);
     });
-    it("should set basePath to users database name", function() {
-      return expect(this.remote.basePath).toBe("/joe%24example.com");
+    it("should set storeName to users database name", function() {
+      return expect(this.remote.storeName).toBe("userhash123");
     });
     it("should sync continously by default", function() {
       return expect(this.remote.isContinuouslySyncing()).toBeTruthy();

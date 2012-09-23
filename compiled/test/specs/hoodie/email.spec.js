@@ -30,10 +30,10 @@ describe("Hoodie.Email", function() {
       return (expect(this.hoodie.my.store.create)).wasCalledWith('$email', this.emailAttributes);
     });
     it("should listen to server response", function() {
-      spyOn(this.hoodie, "one");
+      spyOn(this.hoodie.my.remote, "one");
       this.email.send(this.emailAttributes);
-      (expect(this.hoodie.one)).wasCalled();
-      return (expect(this.hoodie.one.mostRecentCall.args[0])).toEqual("remote:updated:$email:abc4567");
+      expect(this.hoodie.my.remote.one).wasCalled();
+      return expect(this.hoodie.my.remote.one.mostRecentCall.args[0]).toEqual("updated:$email:abc4567");
     });
     _when("email.to is not provided", function() {
       beforeEach(function() {
@@ -68,7 +68,7 @@ describe("Hoodie.Email", function() {
           id: 'abc4567',
           deliveredAt: "2012-05-05 15:00 UTC"
         });
-        (spyOn(this.hoodie, "one")).andCallFake(function(event, cb) {
+        (spyOn(this.hoodie.my.remote, "one")).andCallFake(function(event, cb) {
           return cb(_this.emailResponseAttributes);
         });
         return this.promise = this.email.send(this.emailAttributes);
@@ -85,7 +85,7 @@ describe("Hoodie.Email", function() {
           id: 'abc4567',
           error: "U SPAM!"
         });
-        (spyOn(this.hoodie, "one")).andCallFake(function(event, cb) {
+        (spyOn(this.hoodie.my.remote, "one")).andCallFake(function(event, cb) {
           return cb(_this.emailResponseAttributes);
         });
         return this.promise = this.email.send(this.emailAttributes);
