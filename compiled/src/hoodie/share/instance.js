@@ -41,7 +41,7 @@ Hoodie.Share.Instance = (function(_super) {
 
   Instance.prototype._memory = {};
 
-  Instance.prototype._allowed_options = ["access", "password"];
+  Instance.prototype._allowed_options = ["access", "continuous", "password"];
 
   Instance.prototype.set = function(key, value) {
     var _key;

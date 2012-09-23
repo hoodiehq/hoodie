@@ -202,6 +202,10 @@
     // destroy share
     share.destroy()
     
+    // open a share and load all its objects
+    hoodie.share('shareIdHere').loadAll()
+      .done( function(user) { } ) 
+      .fail( function(err)  { } )
     
     //
     // Send emails
