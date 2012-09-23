@@ -91,7 +91,12 @@ task 'build', 'build hoodie-client.min.js', ->
     callback?() if status is 0
   
 task 'docs', 'create docs from code', ->
-  groc = spawn 'groc', ['-t src/', 'src/**/*.coffee']
+  console.log ""
+  console.log "doesn't work correctly (ignores -t parameter). Please run manually:"
+  console.log 'groc -t src/ "src/**/*.coffee"'
+  console.log ""
+  return
+  groc = spawn 'groc', ['-t "src/"', 'src/**/*.coffee']
   groc.stdout.on 'data', (data) -> print data.toString()
   groc.on 'exit', (status) -> callback?() if status is 0
 
