@@ -22,17 +22,17 @@ describe("Hoodie.RemoteStore", function() {
     return this.remote = new Hoodie.RemoteStore(this.hoodie);
   });
   describe("constructor(@hoodie, options = {})", function() {
-    it("should set @storeName", function() {
+    it("should set @name", function() {
       var remote;
       remote = new Hoodie.RemoteStore(this.hoodie, {
-        storeName: 'base/path'
+        name: 'base/path'
       });
-      return expect(remote.storeName).toBe('base/path');
+      return expect(remote.name).toBe('base/path');
     });
-    it("should default @storeName to ''", function() {
+    it("should default @name to ''", function() {
       var remote;
       remote = new Hoodie.RemoteStore(this.hoodie);
-      return expect(remote.storeName).toBe('');
+      return expect(remote.name).toBe('');
     });
     it("should set _sync to false by default", function() {
       var remote;
@@ -175,9 +175,9 @@ describe("Hoodie.RemoteStore", function() {
         contentType: 'application/json'
       });
     });
-    it("should prefix path with @storeName", function() {
+    it("should prefix path with @name", function() {
       var path, type, _ref;
-      this.remote.storeName = "my/store";
+      this.remote.name = "my/store";
       this.remote.request("GET", "/something");
       _ref = this.hoodie.request.mostRecentCall.args, type = _ref[0], path = _ref[1];
       return expect(path).toBe('/my/store/something');
@@ -681,19 +681,19 @@ describe("Hoodie.RemoteStore", function() {
     });
   });
   describe("#on(event, callback)", function() {
-    return it("should namespace events with `storeName`", function() {
+    return it("should namespace events with `name`", function() {
       var cb;
       cb = jasmine.createSpy('test');
-      this.remote.storeName = 'databaseName';
+      this.remote.name = 'databaseName';
       this.remote.on('funky', cb);
       return expect(this.hoodie.on).wasCalledWith('databaseName:funky', cb);
     });
   });
   return describe("#trigger(event, parameters...)", function() {
-    return it("should namespace events with `storeName`", function() {
+    return it("should namespace events with `name`", function() {
       var cb;
       cb = jasmine.createSpy('test');
-      this.remote.storeName = 'databaseName';
+      this.remote.name = 'databaseName';
       this.remote.on('funky', cb);
       return expect(this.hoodie.on).wasCalledWith('databaseName:funky', cb);
     });

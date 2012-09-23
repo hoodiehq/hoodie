@@ -27,8 +27,8 @@ describe("Hoodie.Account.RemoteStore", function() {
     beforeEach(function() {
       return this.remote = new Hoodie.Account.RemoteStore(this.hoodie);
     });
-    it("should set storeName to users database name", function() {
-      return expect(this.remote.storeName).toBe("userhash123");
+    it("should set name to users database name", function() {
+      return expect(this.remote.name).toBe("userhash123");
     });
     it("should sync continously by default", function() {
       return expect(this.remote.isContinuouslySyncing()).toBeTruthy();

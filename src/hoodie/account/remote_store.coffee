@@ -21,8 +21,8 @@ class Hoodie.Account.RemoteStore extends Hoodie.RemoteStore
   constructor : ->
     super
 
-    # set storeName to user's DB name
-    @storeName = @hoodie.my.account.db()
+    # set name to user's DB name
+    @name = @hoodie.my.account.db()
     
     # overwrite default with _remote.sync config, if set
     @_sync = @hoodie.my.config.get('_remote.sync') if @hoodie.my.config.get('_remote.sync')?

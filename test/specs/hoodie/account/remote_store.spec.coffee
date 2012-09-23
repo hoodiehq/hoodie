@@ -20,8 +20,8 @@ describe "Hoodie.Account.RemoteStore", ->
     beforeEach ->
       @remote = new Hoodie.Account.RemoteStore @hoodie
     
-    it "should set storeName to users database name", ->
-      expect(@remote.storeName).toBe "userhash123"
+    it "should set name to users database name", ->
+      expect(@remote.name).toBe "userhash123"
 
     it "should sync continously by default", ->
       expect(@remote.isContinuouslySyncing()).toBeTruthy()

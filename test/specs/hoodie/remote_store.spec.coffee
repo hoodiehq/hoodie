@@ -15,13 +15,13 @@ describe "Hoodie.RemoteStore", ->
   
   describe "constructor(@hoodie, options = {})", ->
 
-    it "should set @storeName", ->
-      remote = new Hoodie.RemoteStore @hoodie, storeName: 'base/path'
-      expect(remote.storeName).toBe 'base/path'
+    it "should set @name", ->
+      remote = new Hoodie.RemoteStore @hoodie, name: 'base/path'
+      expect(remote.name).toBe 'base/path'
 
-    it "should default @storeName to ''", ->
+    it "should default @name to ''", ->
       remote = new Hoodie.RemoteStore @hoodie
-      expect(remote.storeName).toBe ''
+      expect(remote.name).toBe ''
 
     it "should set _sync to false by default", ->
       remote = new Hoodie.RemoteStore @hoodie
@@ -155,8 +155,8 @@ describe "Hoodie.RemoteStore", ->
       @remote.request("GET", "/something")
       expect(@hoodie.request).wasCalledWith "GET", "/something", contentType: 'application/json'
 
-    it "should prefix path with @storeName", ->
-      @remote.storeName = "my/store"
+    it "should prefix path with @name", ->
+      @remote.name = "my/store"
       @remote.request("GET", "/something")
       [type, path] = @hoodie.request.mostRecentCall.args
       expect(path).toBe '/my/store/something'
@@ -563,17 +563,17 @@ describe "Hoodie.RemoteStore", ->
   # --------
   
   describe "#on(event, callback)", ->  
-    it "should namespace events with `storeName`", ->
+    it "should namespace events with `name`", ->
       cb = jasmine.createSpy 'test'
-      @remote.storeName = 'databaseName'
+      @remote.name = 'databaseName'
       @remote.on 'funky', cb
       expect(@hoodie.on).wasCalledWith 'databaseName:funky', cb
   # /#on(event, callback)
 
   describe "#trigger(event, parameters...)", ->  
-    it "should namespace events with `storeName`", ->
+    it "should namespace events with `name`", ->
       cb = jasmine.createSpy 'test'
-      @remote.storeName = 'databaseName'
+      @remote.name = 'databaseName'
       @remote.on 'funky', cb
       expect(@hoodie.on).wasCalledWith 'databaseName:funky', cb
   # /#trigger(event, parameters...)

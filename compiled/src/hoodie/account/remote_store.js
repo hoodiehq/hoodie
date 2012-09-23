@@ -18,7 +18,7 @@ Hoodie.Account.RemoteStore = (function(_super) {
 
     this.startSyncing = __bind(this.startSyncing, this);
     RemoteStore.__super__.constructor.apply(this, arguments);
-    this.storeName = this.hoodie.my.account.db();
+    this.name = this.hoodie.my.account.db();
     if (this.hoodie.my.config.get('_remote.sync') != null) {
       this._sync = this.hoodie.my.config.get('_remote.sync');
     }

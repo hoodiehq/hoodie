@@ -35,7 +35,7 @@ Hoodie.RemoteStore = (function(_super) {
 
     this.connect = __bind(this.connect, this);
 
-    this.storeName = options.storeName || '';
+    this.name = options.name || '';
     if (options.sync) {
       this._sync = options.sync;
     }
@@ -105,8 +105,8 @@ Hoodie.RemoteStore = (function(_super) {
     if (options == null) {
       options = {};
     }
-    if (this.storeName) {
-      path = "/" + this.storeName + path;
+    if (this.name) {
+      path = "/" + this.name + path;
     }
     options.contentType || (options.contentType = 'application/json');
     if (type === 'POST' || type === 'PUT') {
@@ -199,17 +199,17 @@ Hoodie.RemoteStore = (function(_super) {
   };
 
   RemoteStore.prototype.on = function(event, cb) {
-    return this.hoodie.on("" + this.storeName + ":" + event, cb);
+    return this.hoodie.on("" + this.name + ":" + event, cb);
   };
 
   RemoteStore.prototype.one = function(event, cb) {
-    return this.hoodie.one("" + this.storeName + ":" + event, cb);
+    return this.hoodie.one("" + this.name + ":" + event, cb);
   };
 
   RemoteStore.prototype.trigger = function() {
     var event, parameters, _ref;
     event = arguments[0], parameters = 2 <= arguments.length ? __slice.call(arguments, 1) : [];
-    return (_ref = this.hoodie).on.apply(_ref, ["" + this.storeName + ":" + event].concat(__slice.call(parameters)));
+    return (_ref = this.hoodie).on.apply(_ref, ["" + this.name + ":" + event].concat(__slice.call(parameters)));
   };
 
   RemoteStore.prototype._pullUrl = function() {

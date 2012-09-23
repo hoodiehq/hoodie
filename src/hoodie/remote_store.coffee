@@ -52,9 +52,9 @@ class Hoodie.RemoteStore extends Hoodie.Store
   # Constructor 
   # -------------
   
-  # sets storeName (think: namespace) and some other options
+  # sets name (think: namespace) and some other options
   constructor : (@hoodie, options = {}) ->
-    @storeName = options.storeName or ''
+    @name = options.name or ''
     @_sync     = options.sync      if options.sync
 
 
@@ -134,7 +134,7 @@ class Hoodie.RemoteStore extends Hoodie.Store
   # wrapper for hoodie.request, with some store specific defaults
   # and a prefixed path
   request : (type, path, options = {}) ->
-    path = "/#{@storeName}#{path}" if @storeName
+    path = "/#{@name}#{path}" if @name
 
     options.contentType or= 'application/json'
     if type is 'POST' or type is 'PUT'
@@ -279,12 +279,12 @@ class Hoodie.RemoteStore extends Hoodie.Store
   # ----
 
   # namespaced alias for `hoodie.on`
-  on  : (event, cb) -> @hoodie.on  "#{@storeName}:#{event}", cb
-  one : (event, cb) -> @hoodie.one "#{@storeName}:#{event}", cb
+  on  : (event, cb) -> @hoodie.on  "#{@name}:#{event}", cb
+  one : (event, cb) -> @hoodie.one "#{@name}:#{event}", cb
   
   # namespaced alias for `hoodie.trigger`
   trigger : (event, parameters...) -> 
-    @hoodie.on "#{@storeName}:#{event}", parameters...
+    @hoodie.on "#{@name}:#{event}", parameters...
 
 
   
