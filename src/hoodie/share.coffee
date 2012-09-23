@@ -68,8 +68,8 @@ class Hoodie.Share
   # 
   # open a sharing
   # 
-  open : (share_id, options) =>
-    new @instance id: share_id, options
+  open : (shareId, options) =>
+    @hoodie.open "share/#{shareId}", options
 
 
   # create

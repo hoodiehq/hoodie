@@ -15,10 +15,8 @@ Hoodie.Share = (function() {
     return api;
   }
 
-  Share.prototype.open = function(share_id, options) {
-    return new this.instance({
-      id: share_id
-    }, options);
+  Share.prototype.open = function(shareId, options) {
+    return this.hoodie.open("share/" + shareId, options);
   };
 
   Share.prototype.create = function(attributes) {

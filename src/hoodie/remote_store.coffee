@@ -144,6 +144,7 @@ class Hoodie.RemoteStore extends Hoodie.Store
 
     @hoodie.request type, path, options
 
+
   # ## get
   
   # send a GET request to the named view

@@ -9,7 +9,6 @@
 // ---------------
 //
 // * access     (default: false)
-// * continuous (default: false)
 // * password   (default: _no password_)
 
 
@@ -26,81 +25,54 @@
 // Nobody but me can access the todolist, until I make
 // the share public or invite readers / writers to it.
 //
-hoodie.share.create().done( function(share) {
-  share.add(todolist).push();
-});
+share = hoodie.share.create();
+share.add(todolist);
 
 //
 // access: true
 // Everybody will be able to acces and edit the todo list
 //
-hoodie.share.create( {access: true} ).done( function(share) {
-  share.add(todolist).push();
-});
+share = hoodie.share.create( {access: true} );
+share.add(todolist);
 
 //
 // access: [user1, user2]
 // Besides me, only user1 and user2 will have access to the todolist
 //
-hoodie.share.create( {access: ['aj@foo.com', 'bj@foo.com']} )
-.done( function(share) {
-  share.add(todolist).push();
-});
+share = hoodie.share.create( {access: ['aj@foo.com', 'bj@foo.com']} );
+share.add(todolist);
 
 //
 // access: {read: true}
 // Everybody will be able to acces the todo list, but only I can edit it
 //
-hoodie.share.create({access: {read: true}}).done( function(share) {
-  share.add(todolist).push();
-});
+share = hoodie.share.create({access: {read: true}});
+share.add(todolist);
 
 //
 // access: {read: true, write: [user1, user2]}
 // Everybody will be able to acces the todo list,
 // but only user1, user2 and me can edit it
 //
-hoodie.share.create({
+share = hoodie.share.create({
   access: {
     write: ['aj@foo.com', 'bj@foo.com']
-    }
-}).done( function(share) {
-  share.add(todolist).push();
+  }
 });
+share.add(todolist).push();
 
 //
 // access: {read: [user1, user2], write: [user3]}
 // Besides me, only user1, user and user3 will have access to the
 // todolist and only CJ and me can edit it
 //
-hoodie.share.create({
+share = hoodie.share.create({
   access: {
     read:  ['aj@foo.com', 'bj@foo.com'],
     write: ['cj@foo.com']
   }
-}).done( function(share) {
-  share.add(todolist).push();
 });
-
-
-
-// ### the `continuous` setting
-
-//
-// continuous: false (default)
-// I need push my changes manually
-//
-hoodie.share.create().done( function(share) {
-  share.add(todolist).push();
-});
-
-//
-// continuous: true
-// changes get synchronized continuously, no need to push / pull them
-//
-hoodie.share.create({continuous: true}).done( function(share) {
-  share.add(todolist);
-})
+share.add(todolist).push();
 
 // ### the `password` setting
 
