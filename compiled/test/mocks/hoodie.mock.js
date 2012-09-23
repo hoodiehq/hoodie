@@ -15,6 +15,7 @@ Mocks.Hoodie = function() {
     baseUrl: 'http://my.cou.ch',
     trigger: function() {},
     request: function() {},
+    open: function() {},
     on: function() {},
     one: function() {},
     unbind: function() {},

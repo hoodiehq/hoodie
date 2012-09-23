@@ -81,8 +81,8 @@ hoodie.my.store.update("profile", "uuid567", {}, { public: false })
 // ## Step 2: Synchronization with public store
 
 // In hoodie's internal implementation with CouchDB, each user will have two
-// CouchDB database when public stores are enabled. The first is the standard
-// one and is private, only accessible by by the user after authentication.
+// CouchDB databases when public stores are enabled. The first is the standard
+// one and is private, only accessible by the user after authentication.
 // The second one is the "public user store" and contains only the objects
 // that have been set to be public as described above.
 
@@ -146,39 +146,6 @@ hoodie.my.store.update("profile", "uuid567", {}, { public: false })
 // The code for the worker will have a function wich will be called for every
 // document coming from the users private store `_changes` feed. If the 
 // function returns an object, the object will be PUT to users public store.
-
-// The function might look like this:
-function parseObjectForPublicStore(object) {
-
-  switch(true) {
-    // make objectect entirely public
-    case object.$public === true:
-      delete object.$public
-      object._id = "$public/" + object._id
-      return object
-
-    // make certain attributes public
-    case Array.isArray(object.$public):
-      var newobject = {},
-          defaultPublicAtts = ['_ref', 'type']
-
-      object.$public = object.$public.concat(defaultPublicAtts)
-      for (var i = 0, attr; i < object.$public.length; i++) {
-        attr = object.$public[i]
-        newobject[attr] = object[attr]
-      };
-      object._id = "$public/" + object._id
-      return object
-
-    // make public objectect private again, remove it from public store
-    case object.$public === false:
-      return {
-        _id     : "$public/" + object._id,
-        _rev    : object._rev,
-        _deleted: true
-      }
-  }
-}
 
 // idea: besides creating the new object for the public store, we could
 // update the source objects with an publishedAt timestamp and remove

@@ -6,17 +6,13 @@
 #
 # For example, the syntax to find all objects from user "Joe" looks like this:
 #
-#     hoodie.user("Joe").findAll().done( handleObjects)
+#     hoodie.user("Joe").findAll().done( handleObjects )
 #
 class Hoodie.User
 
-  constructor: (hoodie) ->
+  constructor: (@hoodie) ->
 
     # vanilla API syntax:
-    # hoodie.user('joe').findAll()
-    return (username) => 
-      hoodie.open @_userPublicStoreName(username)
-
-  _userPublicStoreName: (username) ->
-    dbName = username.toLowerCase().replace(/@/, "$").replace(/\./g, "_");
-    "#{dbName}/public"
+    # hoodie.user('uuid1234').findAll()
+    return (userHash) => 
+      @hoodie.open "user/#{userHash}/public"

@@ -12,6 +12,7 @@ Mocks.Hoodie = ->
   
   trigger       : ->
   request       : ->
+  open          : ->
   on            : ->
   one           : ->
   unbind        : ->

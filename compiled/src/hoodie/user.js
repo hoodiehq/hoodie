@@ -4,16 +4,11 @@ Hoodie.User = (function() {
 
   function User(hoodie) {
     var _this = this;
-    return function(username) {
-      return hoodie.open(_this._userPublicStoreName(username));
+    this.hoodie = hoodie;
+    return function(userHash) {
+      return _this.hoodie.open("user/" + userHash + "/public");
     };
   }
-
-  User.prototype._userPublicStoreName = function(username) {
-    var dbName;
-    dbName = username.toLowerCase().replace(/@/, "$").replace(/\./g, "_");
-    return "" + dbName + "/public";
-  };
 
   return User;
 
