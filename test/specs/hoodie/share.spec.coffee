@@ -36,14 +36,15 @@ describe "Hoodie.Share", ->
 
   describe ".create(attributes)", ->
     beforeEach ->
-      @saveSpy = jasmine.createSpy("save").andReturn 'saveReturn'
-      @share.instance.andReturn save: @saveSpy
+      @instance      = jasmine.createSpy("instance")
+      @instance.save = jasmine.createSpy("save")
+      @share.instance.andReturn @instance
     
     it "should initiate a new Hoodie.Share.Instance and save it", ->
       returnValue = @share.create funky: 'fresh'
       expect(@share.instance).wasCalledWith funky: 'fresh'
-      expect(@saveSpy).wasCalled()
-      expect(returnValue).toBe 'saveReturn'
+      expect(@instance.save).wasCalled()
+      expect(returnValue).toBe @instance
   # /.create(attributes)
 
   describe ".find(share_id)", ->

@@ -41,10 +41,9 @@ describe("Hoodie.Share", function() {
   });
   describe(".create(attributes)", function() {
     beforeEach(function() {
-      this.saveSpy = jasmine.createSpy("save").andReturn('saveReturn');
-      return this.share.instance.andReturn({
-        save: this.saveSpy
-      });
+      this.instance = jasmine.createSpy("instance");
+      this.instance.save = jasmine.createSpy("save");
+      return this.share.instance.andReturn(this.instance);
     });
     return it("should initiate a new Hoodie.Share.Instance and save it", function() {
       var returnValue;
@@ -54,8 +53,8 @@ describe("Hoodie.Share", function() {
       expect(this.share.instance).wasCalledWith({
         funky: 'fresh'
       });
-      expect(this.saveSpy).wasCalled();
-      return expect(returnValue).toBe('saveReturn');
+      expect(this.instance.save).wasCalled();
+      return expect(returnValue).toBe(this.instance);
     });
   });
   describe(".find(share_id)", function() {

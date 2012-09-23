@@ -49,8 +49,13 @@
       .done( function(user) { } ) 
       .fail( function(err)  { } )
       
-    // forgot password
+    // reset password
     hoodie.my.account.resetPassword('joe@example.com')
+      .done( function(user) { } ) 
+      .fail( function(err)  { } )
+
+    // destroy account and all its data
+    hoodie.my.account.destroy()
       .done( function(user) { } ) 
       .fail( function(err)  { } )
       
@@ -117,22 +122,28 @@
     // 
     
     // new doc created
-    hoodie.my.remote.on( 'create', function( type, id, createdObject) { } )
+    hoodie.my.remote.on( 'create', function( createdObject) { } )
 
     // existing doc updated
-    hoodie.my.remote.on( 'update', function( type, id, updatedObject) { } )
+    hoodie.my.remote.on( 'update', function( updatedObject) { } )
 
     // doc destroyed
-    hoodie.my.remote.on( 'destroy', function( type, id, destroyedObject) { } )
+    hoodie.my.remote.on( 'destroy', function( destroyedObject) { } )
 
     // any of above events
-    hoodie.my.remote.on( 'change', function( type, id, changedObject) { } )
+    hoodie.my.remote.on( 'change', function( event, changedObject) { } )
 
     // all listeners can be filtered by type
-    hoodie.my.remote.on( "create:couch", function( id, createdObject) { } )
-    hoodie.my.remote.on( "update:couch", function( id, updatedObject)  { } )
-    hoodie.my.remote.on( "destroy:couch", function( id, destroyedObject) { } )
-    hoodie.my.remote.on( "change:couch", function( id, changedObject) { } )
+    hoodie.my.remote.on( "create:couch",  function( createdObject) { } )
+    hoodie.my.remote.on( "update:couch",  function( updatedObject)  { } )
+    hoodie.my.remote.on( "destroy:couch", function( destroyedObject) { } )
+    hoodie.my.remote.on( "change:couch",  function( event, changedObject) { } )
+
+    // ... and by type and id
+    hoodie.my.remote.on( "create:couch:uuid123",  function( createdObject) { } )
+    hoodie.my.remote.on( "update:couch:uuid123",  function( updatedObject)  { } )
+    hoodie.my.remote.on( "destroy:couch:uuid123", function( destroyedObject) { } )
+    hoodie.my.remote.on( "change:couch:uuid123",  function( event, changedObject) { } )
 
 
     //
@@ -142,7 +153,7 @@
     // be shared
     //
 
-    // make couch with id "abc4567" public
+    // make couch object with id "abc4567" public
     hoodie.my.store.update("couch","abc4567", {}, {public: true})
 
     // make couch with id "abc4567" public, but do only show the color, hide
@@ -152,7 +163,7 @@
     // make couch with id "abc4567" private again
     hoodie.my.store.update("couch","abc4567", {}, {public: false})
 
-    // find all couches from user "joe"
+    // find all couch objects from user "joe"
     hoodie.user("joe").findAll("couch").done( function(couches) { ... })
 
 
@@ -167,9 +178,33 @@
     hoodie.global.findAll("song").done( function(songs) { ... })
 
     
+    //
+    // Sharing
+    //
+    // The hoodie.share module allows to share objects with other users. A share
+    // can be public, which means everybody knowing its id can access it. Or the 
+    // access can be limited to specific users. Optionally, a password can be set
+    // for additional security. Access can be differenciated between read and write.
+    //
+
+    // create a new share
+    share = hoodie.share.create()
+
+    // update access settings and set a password
+    share.update({access: {read: true}}, password: 'secret')
+
+    // add all todo objects to the share
+    share.add( hoodie.my.store.loadAll('todo') )
+
+    // remove a specific todo from the share
+    share.remove( todoObject );
+
+    // destroy share
+    share.destroy()
+    
     
     //
-    // Send emails (coming soon)
+    // Send emails
     // 
     email = {
       to      : ['you@roundthewor.ld'],

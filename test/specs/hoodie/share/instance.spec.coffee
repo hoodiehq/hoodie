@@ -39,7 +39,6 @@ describe "Hoodie.Share.Instance", ->
       it "should set all options from passed hash", ->
         @options =
           access     : true
-          continuous : true
           password   : 'secret'
         @share.set(@options)
         for key, value of @options

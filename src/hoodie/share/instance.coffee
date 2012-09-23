@@ -29,9 +29,6 @@ class Hoodie.Share.Instance extends Hoodie.RemoteStore
   #                    only user1 & user2 have access (read only)
   #                    **{ read: true, write: [user1, user2] }**
   #                    public sharing, but only user1 & user 2 can edit
-  #     continuous:    (default: false)
-  #                    if set to true, the shared objects will be
-  #                    continuously updated.
   #     password:      (optional)
   #                    a sharing can be optionally protected with a password.
   #
@@ -60,7 +57,7 @@ class Hoodie.Share.Instance extends Hoodie.RemoteStore
   # set an attribute, without making the change persistent yet.
   # alternatively, a hash of key/value pairs can be passed
   _memory: {}
-  _allowed_options: ["access", "continuous", "password"]
+  _allowed_options: ["access", "password"]
   set : (key, value) =>
     if typeof key is 'object'
       for _key, value of key when _key in @_allowed_options

@@ -57,7 +57,6 @@ describe("Hoodie.Share.Instance", function() {
         var key, value, _ref, _results;
         this.options = {
           access: true,
-          continuous: true,
           password: 'secret'
         };
         this.share.set(this.options);

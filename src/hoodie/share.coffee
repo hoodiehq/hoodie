@@ -75,11 +75,12 @@ class Hoodie.Share
   # create
   # --------
 
-  # creates a new share & returns a promise.
+  # creates a new share and returns it
   #
   create : (attributes = {}) ->
     share = new @instance attributes
     share.save()
+    share
     
   
   # find
