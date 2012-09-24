@@ -54,8 +54,8 @@ class Hoodie.RemoteStore extends Hoodie.Store
   
   # sets name (think: namespace) and some other options
   constructor : (@hoodie, options = {}) ->
-    @name = options.name or ''
-    @_sync     = options.sync      if options.sync
+    @name  = options.name or ''
+    @_sync = options.sync if options.sync
 
 
 
