@@ -849,7 +849,7 @@ Hoodie.RemoteStore = (function(_super) {
 
     this.connect = __bind(this.connect, this);
 
-    this.basePath = options.basePath || '';
+    this.name = options.name || '';
     if (options.sync) {
       this._sync = options.sync;
     }
@@ -919,7 +919,9 @@ Hoodie.RemoteStore = (function(_super) {
     if (options == null) {
       options = {};
     }
-    path = this.basePath + path;
+    if (this.name) {
+      path = "/" + this.name + path;
+    }
     options.contentType || (options.contentType = 'application/json');
     if (type === 'POST' || type === 'PUT') {
       options.dataType || (options.dataType = 'json');
@@ -984,20 +986,15 @@ Hoodie.RemoteStore = (function(_super) {
   };
 
   RemoteStore.prototype.push = function(docs) {
-    var doc, docsForRemote;
+    var doc, docsForRemote, _i, _len;
     if (!(docs != null ? docs.length : void 0)) {
       return this.hoodie.defer().resolve([]).promise();
     }
-    docsForRemote = (function() {
-      var _i, _len, _results;
-      _results = [];
-      for (_i = 0, _len = docs.length; _i < _len; _i++) {
-        doc = docs[_i];
-        this._addRevisionTo(doc);
-        _results.push(this._parseForRemote(doc));
-      }
-      return _results;
-    }).call(this);
+    docsForRemote = [];
+    for (_i = 0, _len = docs.length; _i < _len; _i++) {
+      doc = docs[_i];
+      docsForRemote.push(this._parseForRemote(doc));
+    }
     this._pushRequest = this.request('POST', "/_bulk_docs", {
       data: {
         docs: docsForRemote,
@@ -1016,13 +1013,17 @@ Hoodie.RemoteStore = (function(_super) {
   };
 
   RemoteStore.prototype.on = function(event, cb) {
-    return this.hoodie.on("" + this.basePath + ":" + event, cb);
+    return this.hoodie.on("" + this.name + ":" + event, cb);
+  };
+
+  RemoteStore.prototype.one = function(event, cb) {
+    return this.hoodie.one("" + this.name + ":" + event, cb);
   };
 
   RemoteStore.prototype.trigger = function() {
     var event, parameters, _ref;
     event = arguments[0], parameters = 2 <= arguments.length ? __slice.call(arguments, 1) : [];
-    return (_ref = this.hoodie).on.apply(_ref, ["" + this.basePath + ":" + event].concat(__slice.call(parameters)));
+    return (_ref = this.hoodie).on.apply(_ref, ["" + this.name + ":" + event].concat(__slice.call(parameters)));
   };
 
   RemoteStore.prototype._pullUrl = function() {
@@ -1089,6 +1090,7 @@ Hoodie.RemoteStore = (function(_super) {
     }
     attributes._id = "" + attributes.$type + "/" + attributes.id;
     delete attributes.id;
+    this._addRevisionTo(attributes);
     return attributes;
   };
 
@@ -1187,10 +1189,14 @@ Hoodie.RemoteStore = (function(_super) {
         event = objectWasCreated ? 'create' : 'update';
         _this.trigger(event, object);
         _this.trigger("" + event + ":" + doc.$type, object);
-        _this.trigger("" + event + ":" + doc.$type + ":" + doc.id, object);
+        if (event !== 'create') {
+          _this.trigger("" + event + ":" + doc.$type + ":" + doc.id, object);
+        }
         _this.trigger("change", event, object);
         _this.trigger("change:" + doc.$type, event, object);
-        return _this.trigger("change:" + doc.$type + ":" + doc.id, event, object);
+        if (event !== 'create') {
+          return _this.trigger("change:" + doc.$type + ":" + doc.id, event, object);
+        }
       }));
     }
     return _results;
@@ -1238,7 +1244,7 @@ Hoodie.Account.RemoteStore = (function(_super) {
 
     this.startSyncing = __bind(this.startSyncing, this);
     RemoteStore.__super__.constructor.apply(this, arguments);
-    this.basePath = "/" + (encodeURIComponent(this.hoodie.my.account.db()));
+    this.name = this.hoodie.my.account.db();
     if (this.hoodie.my.config.get('_remote.sync') != null) {
       this._sync = this.hoodie.my.config.get('_remote.sync');
     }
@@ -1391,7 +1397,7 @@ Hoodie.Email = (function() {
     } else if (attributes.deliveredAt) {
       return defer.resolve(attributes);
     } else {
-      return this.hoodie.one("remote:updated:$email:" + attributes.id, function(attributes) {
+      return this.hoodie.my.remote.one("updated:$email:" + attributes.id, function(attributes) {
         return _this._handleEmailUpdate(defer, attributes);
       });
     }

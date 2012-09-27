@@ -27,6 +27,7 @@
 //
 share = hoodie.share.create();
 share.add(todolist);
+share.add(todolist, ['title', 'owner']);
 
 //
 // access: true
