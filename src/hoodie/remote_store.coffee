@@ -54,7 +54,7 @@ class Hoodie.RemoteStore extends Hoodie.Store
   
   # sets name (think: namespace) and some other options
   constructor : (@hoodie, options = {}) ->
-    @name  = options.name or ''
+    @name  = options.name if options.name
     @_sync = options.sync if options.sync
 
 
@@ -134,7 +134,7 @@ class Hoodie.RemoteStore extends Hoodie.Store
   # wrapper for hoodie.request, with some store specific defaults
   # and a prefixed path
   request : (type, path, options = {}) ->
-    path = "/#{@name}#{path}" if @name
+    path = "/#{encodeURIComponent @name}#{path}" if @name
 
     options.contentType or= 'application/json'
     if type is 'POST' or type is 'PUT'

@@ -35,7 +35,9 @@ Hoodie.RemoteStore = (function(_super) {
 
     this.connect = __bind(this.connect, this);
 
-    this.name = options.name || '';
+    if (options.name) {
+      this.name = options.name;
+    }
     if (options.sync) {
       this._sync = options.sync;
     }
@@ -106,7 +108,7 @@ Hoodie.RemoteStore = (function(_super) {
       options = {};
     }
     if (this.name) {
-      path = "/" + this.name + path;
+      path = "/" + (encodeURIComponent(this.name)) + path;
     }
     options.contentType || (options.contentType = 'application/json');
     if (type === 'POST' || type === 'PUT') {

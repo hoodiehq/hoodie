@@ -244,7 +244,7 @@ Hoodie.Account = (function() {
 
   Account.prototype.anonymousSignUp = function() {
     var password, username,
-      _this = this;
+        _this = this;
     password = this.hoodie.my.store.uuid(10);
     username = this.ownerHash;
     return this.signUp(username, password).pipe(null, this._handleRequestError).done(function() {

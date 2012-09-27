@@ -22,17 +22,12 @@ describe("Hoodie.RemoteStore", function() {
     return this.remote = new Hoodie.RemoteStore(this.hoodie);
   });
   describe("constructor(@hoodie, options = {})", function() {
-    it("should set @name", function() {
+    it("should set @name from options", function() {
       var remote;
       remote = new Hoodie.RemoteStore(this.hoodie, {
         name: 'base/path'
       });
       return expect(remote.name).toBe('base/path');
-    });
-    it("should default @name to ''", function() {
-      var remote;
-      remote = new Hoodie.RemoteStore(this.hoodie);
-      return expect(remote.name).toBe('');
     });
     it("should set _sync to false by default", function() {
       var remote;
@@ -175,12 +170,12 @@ describe("Hoodie.RemoteStore", function() {
         contentType: 'application/json'
       });
     });
-    it("should prefix path with @name", function() {
+    it("should prefix path with @name (encoded)", function() {
       var path, type, _ref;
       this.remote.name = "my/store";
       this.remote.request("GET", "/something");
       _ref = this.hoodie.request.mostRecentCall.args, type = _ref[0], path = _ref[1];
-      return expect(path).toBe('/my/store/something');
+      return expect(path).toBe('/my%2Fstore/something');
     });
     return _when("type is POST", function() {
       beforeEach(function() {

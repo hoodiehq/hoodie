@@ -13,15 +13,11 @@ describe "Hoodie.RemoteStore", ->
 
     @remote = new Hoodie.RemoteStore @hoodie
   
+  
   describe "constructor(@hoodie, options = {})", ->
-
-    it "should set @name", ->
+    it "should set @name from options", ->
       remote = new Hoodie.RemoteStore @hoodie, name: 'base/path'
       expect(remote.name).toBe 'base/path'
-
-    it "should default @name to ''", ->
-      remote = new Hoodie.RemoteStore @hoodie
-      expect(remote.name).toBe ''
 
     it "should set _sync to false by default", ->
       remote = new Hoodie.RemoteStore @hoodie
@@ -155,11 +151,11 @@ describe "Hoodie.RemoteStore", ->
       @remote.request("GET", "/something")
       expect(@hoodie.request).wasCalledWith "GET", "/something", contentType: 'application/json'
 
-    it "should prefix path with @name", ->
+    it "should prefix path with @name (encoded)", ->
       @remote.name = "my/store"
       @remote.request("GET", "/something")
       [type, path] = @hoodie.request.mostRecentCall.args
-      expect(path).toBe '/my/store/something'
+      expect(path).toBe '/my%2Fstore/something'
 
     _when "type is POST", ->
       beforeEach ->
