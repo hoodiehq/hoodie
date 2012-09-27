@@ -78,7 +78,7 @@ describe("Hoodie.Account", function() {
       return expect(Hoodie.Account.prototype._checkPasswordResetStatus).wasCalled();
     });
   });
-  describe(".authenticate()", function() {
+  describe("#authenticate()", function() {
     _when("@username is undefined", function() {
       beforeEach(function() {
         delete this.account.username;
@@ -195,7 +195,7 @@ describe("Hoodie.Account", function() {
       });
     });
   });
-  describe(".signUp(username, password)", function() {
+  describe("#signUp(username, password)", function() {
     beforeEach(function() {
       var _ref;
       this.signInDefer = this.hoodie.defer();
@@ -298,7 +298,7 @@ describe("Hoodie.Account", function() {
       });
     });
   });
-  describe(".anonymousSignUp()", function() {
+  describe("#anonymousSignUp()", function() {
     beforeEach(function() {
       this.signUpDefer = this.hoodie.defer();
       spyOn(this.account, "signUp").andReturn(this.signUpDefer.promise());
@@ -321,7 +321,7 @@ describe("Hoodie.Account", function() {
       });
     });
   });
-  describe(".signIn(username, password)", function() {
+  describe("#signIn(username, password)", function() {
     beforeEach(function() {
       var _ref;
       this.account.signIn('joe@example.com', 'secret');
@@ -345,7 +345,7 @@ describe("Hoodie.Account", function() {
       data = this.options.data;
       return expect(data.password).toBe('');
     });
-    return _when("signIn successful", function() {
+    _when("signIn successful", function() {
       _and("account is confirmed", function() {
         beforeEach(function() {
           this.response = {
@@ -424,8 +424,22 @@ describe("Hoodie.Account", function() {
         });
       });
     });
+    return _when("signIn not succesful because unauthorized", function() {
+      beforeEach(function() {
+        this.response = {
+          responseText: "{\"error\":\"unauthorized\",\"reason\":\"Name or password is incorrect.\"}"
+        };
+        return this.requestDefer.reject(this.response);
+      });
+      return it("should be rejected with unauthorized error", function() {
+        return expect(this.account.signIn('joe@example.com', 'secret')).toBeRejectedWith({
+          error: "unauthorized",
+          reason: "Name or password is incorrect."
+        });
+      });
+    });
   });
-  describe(".changePassword(currentPassword, newPassword)", function() {
+  describe("#changePassword(currentPassword, newPassword)", function() {
     beforeEach(function() {
       var _ref;
       this.account.username = 'joe@example.com';
@@ -525,7 +539,7 @@ describe("Hoodie.Account", function() {
       });
     });
   });
-  describe(".signOut()", function() {
+  describe("#signOut()", function() {
     beforeEach(function() {
       var _ref;
       spyOn(this.hoodie.my.remote, "disconnect");
@@ -560,7 +574,7 @@ describe("Hoodie.Account", function() {
       });
     });
   });
-  describe(".hasAccount()", function() {
+  describe("#hasAccount()", function() {
     _when("#username is undefined", function() {
       beforeEach(function() {
         return delete this.account.username;
@@ -578,7 +592,7 @@ describe("Hoodie.Account", function() {
       });
     });
   });
-  describe(".hasAnonymousAccount()", function() {
+  describe("#hasAnonymousAccount()", function() {
     _when("_account.anonymousPassword is set", function() {
       beforeEach(function() {
         return spyOn(this.hoodie.my.config, "get").andCallFake(function(key) {
@@ -604,7 +618,7 @@ describe("Hoodie.Account", function() {
       });
     });
   });
-  describe(".on(event, callback)", function() {
+  describe("#on(event, callback)", function() {
     beforeEach(function() {
       return spyOn(this.hoodie, "on");
     });
@@ -615,7 +629,7 @@ describe("Hoodie.Account", function() {
       return (expect(this.hoodie.on)).wasCalledWith('account:funky', party);
     });
   });
-  describe(".db()", function() {
+  describe("#db()", function() {
     return _when("account.ownerHash is 'owner_hash123'", function() {
       beforeEach(function() {
         return this.account.ownerHash = 'owner_hash123';
@@ -625,7 +639,7 @@ describe("Hoodie.Account", function() {
       });
     });
   });
-  describe(".fetch()", function() {
+  describe("#fetch()", function() {
     _when("username is not set", function() {
       beforeEach(function() {
         this.account.username = null;
@@ -668,7 +682,7 @@ describe("Hoodie.Account", function() {
       });
     });
   });
-  describe(".destroy()", function() {
+  describe("#destroy()", function() {
     beforeEach(function() {
       spyOn(this.hoodie.my.remote, "disconnect");
       spyOn(this.account, "fetch").andReturn(this.hoodie.defer().resolve().promise());
@@ -709,7 +723,7 @@ describe("Hoodie.Account", function() {
       });
     });
   });
-  describe(".resetPassword(username)", function() {
+  describe("#resetPassword(username)", function() {
     beforeEach(function() {
       return spyOn(this.account, "_checkPasswordResetStatus").andReturn("checkPasswordResetPromise");
     });
@@ -789,7 +803,7 @@ describe("Hoodie.Account", function() {
       });
     });
   });
-  return describe(".changeUsername(currentPassword, newUsername)", function() {
+  return describe("#changeUsername(currentPassword, newUsername)", function() {
     beforeEach(function() {
       this.authenticateDefer = this.hoodie.defer();
       spyOn(this.account, "authenticate").andReturn(this.authenticateDefer.promise());

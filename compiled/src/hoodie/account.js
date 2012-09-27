@@ -108,7 +108,7 @@ Hoodie.Account = (function() {
         password: password
       }
     };
-    return this.hoodie.request('POST', '/_session', options).pipe(this._handleSignInSuccess);
+    return this.hoodie.request('POST', '/_session', options).pipe(this._handleSignInSuccess, this._handleRequestError);
   };
 
   Account.prototype.login = Account.prototype.signIn;

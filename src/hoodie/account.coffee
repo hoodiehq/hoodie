@@ -129,7 +129,7 @@ class Hoodie.Account
                 password  : password
 
     @hoodie.request('POST', '/_session', options)
-    .pipe(@_handleSignInSuccess)
+    .pipe(@_handleSignInSuccess, @_handleRequestError)
 
   # alias
   login: @::signIn

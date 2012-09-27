@@ -8,7 +8,7 @@ describe "Hoodie.Account", ->
     @requestDefer = @hoodie.defer()
     spyOn(@hoodie, "request").andReturn @requestDefer.promise()
   
-    # requests
+    # spy requests
     spyOn(@hoodie, "trigger")
 
     # skip timeouts
@@ -68,7 +68,7 @@ describe "Hoodie.Account", ->
   # /.constructor()
   
   
-  describe ".authenticate()", ->
+  describe "#authenticate()", ->
     _when "@username is undefined", ->
       beforeEach ->
         delete @account.username
@@ -168,7 +168,7 @@ describe "Hoodie.Account", ->
   # /.authenticate()
 
 
-  describe ".signUp(username, password)", ->
+  describe "#signUp(username, password)", ->
     beforeEach ->
       @signInDefer = @hoodie.defer()
       spyOn(@account, "signIn").andReturn @signInDefer.promise()
@@ -253,7 +253,7 @@ describe "Hoodie.Account", ->
   # /.signUp(username, password)
 
   
-  describe ".anonymousSignUp()", ->
+  describe "#anonymousSignUp()", ->
     beforeEach ->
       @signUpDefer = @hoodie.defer()
       spyOn(@account, "signUp").andReturn @signUpDefer.promise()
@@ -277,7 +277,7 @@ describe "Hoodie.Account", ->
   # /.anonymousSignUp()
 
 
-  describe ".signIn(username, password)", ->
+  describe "#signIn(username, password)", ->
     beforeEach ->
       @account.signIn('joe@example.com', 'secret')
       [@type, @path, @options] = @hoodie.request.mostRecentCall.args
@@ -354,10 +354,20 @@ describe "Hoodie.Account", ->
           expect(@account.signIn('joe@example.com', 'secret')).toBeRejectedWith 
             error: 'error'
             reason: 'because you stink!'
+
+    _when "signIn not succesful because unauthorized", ->
+      beforeEach ->
+        @response = responseText: """{"error":"unauthorized","reason":"Name or password is incorrect."}"""
+        @requestDefer.reject @response
+
+      it "should be rejected with unauthorized error", ->
+        expect(@account.signIn('joe@example.com', 'secret')).toBeRejectedWith
+          error:"unauthorized"
+          reason:"Name or password is incorrect."
   # /.signIn(username, password)
 
 
-  describe ".changePassword(currentPassword, newPassword)", ->
+  describe "#changePassword(currentPassword, newPassword)", ->
     beforeEach ->
       @account.username = 'joe@example.com'
       @account._doc  = 
@@ -444,7 +454,7 @@ describe "Hoodie.Account", ->
   # /.changePassword(username, password)
 
 
-  describe ".signOut()", ->
+  describe "#signOut()", ->
     beforeEach ->
       spyOn(@hoodie.my.remote, "disconnect")
       @account.signOut()
@@ -478,7 +488,7 @@ describe "Hoodie.Account", ->
   # /.signIn(username, password)
 
 
-  describe ".hasAccount()", ->
+  describe "#hasAccount()", ->
     _when "#username is undefined", ->
       beforeEach ->
         delete @account.username
@@ -495,7 +505,7 @@ describe "Hoodie.Account", ->
   # /.hasAccount
 
 
-  describe ".hasAnonymousAccount()", ->
+  describe "#hasAnonymousAccount()", ->
     _when "_account.anonymousPassword is set", ->
       beforeEach ->
         spyOn(@hoodie.my.config, "get").andCallFake (key) ->
@@ -516,7 +526,7 @@ describe "Hoodie.Account", ->
   # /.hasAnonymousAccount
   
   
-  describe ".on(event, callback)", ->
+  describe "#on(event, callback)", ->
     beforeEach ->
       spyOn(@hoodie, "on")
       
@@ -527,7 +537,7 @@ describe "Hoodie.Account", ->
   # /.on(event, callback)
   
   
-  describe ".db()", ->
+  describe "#db()", ->
     _when "account.ownerHash is 'owner_hash123'", ->
       beforeEach ->
         @account.ownerHash = 'owner_hash123'
@@ -536,7 +546,7 @@ describe "Hoodie.Account", ->
         (expect @account.db()).toEqual('user/owner_hash123')
   # /.db()
   
-  describe ".fetch()", ->
+  describe "#fetch()", ->
     _when "username is not set", ->
       beforeEach ->
         @account.username = null
@@ -567,7 +577,7 @@ describe "Hoodie.Account", ->
           expect(promise).toBeResolvedWith @response
   # /.fetch()
   
-  describe ".destroy()", ->
+  describe "#destroy()", ->
     beforeEach ->
       spyOn(@hoodie.my.remote, "disconnect")
       spyOn(@account, "fetch").andReturn @hoodie.defer().resolve().promise()
@@ -603,7 +613,7 @@ describe "Hoodie.Account", ->
         expect(@account.ownerHash).toBeUndefined()
   # /destroy()
 
-  describe ".resetPassword(username)", ->
+  describe "#resetPassword(username)", ->
     beforeEach ->
       spyOn(@account, "_checkPasswordResetStatus").andReturn "checkPasswordResetPromise"
 
@@ -672,7 +682,7 @@ describe "Hoodie.Account", ->
           expect(@account.resetPassword('joe@example.com')).toBeRejectedWith error: 'ooops'
   # /.resetPassword(username)
 
-  describe ".changeUsername(currentPassword, newUsername)", ->
+  describe "#changeUsername(currentPassword, newUsername)", ->
     beforeEach ->
       @authenticateDefer = @hoodie.defer()
       spyOn(@account, "authenticate").andReturn @authenticateDefer.promise()
