@@ -1682,11 +1682,14 @@ Hoodie.LocalStore = (function(_super) {
   };
 
   LocalStore.prototype.changedDocs = function() {
-    var key, object, _ref, _results;
+    var id, key, object, type, _ref, _ref1, _results;
     _ref = this._dirty;
     _results = [];
     for (key in _ref) {
       object = _ref[key];
+      _ref1 = key.split('/'), type = _ref1[0], id = _ref1[1];
+      object.$type = type;
+      object.id = id;
       _results.push(object);
     }
     return _results;

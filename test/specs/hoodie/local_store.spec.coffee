@@ -656,13 +656,18 @@ describe "Hoodie.LocalStore", ->
         
     _when "there are 2 dirty docs", ->
       beforeEach ->
-        @store._dirty = [
-          { type: 'couch', id: '123', color: 'red'}
-          { type: 'couch', id: '456', color: 'green'}
-        ]
+        @store._dirty = {
+          'couch/123': { color: 'red' }
+          'couch/456': { color: 'green' }
+        }
         
       it "should return the two docs", ->
         expect(@store.changedDocs().length).toBe 2
+
+      it "should add $type and id", ->
+        [doc1, doc2] = @store.changedDocs()
+        expect(doc1.$type).toBe 'couch'
+        expect(doc1.id).toBe '123'
   # /.changedDocs()
 
   describe ".isMarkedAsDeleted(type, id)", ->

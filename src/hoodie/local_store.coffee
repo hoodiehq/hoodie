@@ -256,12 +256,17 @@ class Hoodie.LocalStore extends Hoodie.Store
       @hoodie.trigger 'store:dirty:idle'
     ), timeout
     
+
   # ## changed docs
   #
   # returns an Array of all dirty documents
   changedDocs : -> 
-    object for key, object of @_dirty
-    
+    for key, object of @_dirty
+      [type, id]   = key.split '/'
+      object.$type = type
+      object.id    = id
+      object
+       
        
   # ## Is dirty?
   #

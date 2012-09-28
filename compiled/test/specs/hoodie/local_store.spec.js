@@ -915,20 +915,23 @@ describe("Hoodie.LocalStore", function() {
     });
     return _when("there are 2 dirty docs", function() {
       beforeEach(function() {
-        return this.store._dirty = [
-          {
-            type: 'couch',
-            id: '123',
+        return this.store._dirty = {
+          'couch/123': {
             color: 'red'
-          }, {
-            type: 'couch',
-            id: '456',
+          },
+          'couch/456': {
             color: 'green'
           }
-        ];
+        };
       });
-      return it("should return the two docs", function() {
+      it("should return the two docs", function() {
         return expect(this.store.changedDocs().length).toBe(2);
+      });
+      return it("should add $type and id", function() {
+        var doc1, doc2, _ref;
+        _ref = this.store.changedDocs(), doc1 = _ref[0], doc2 = _ref[1];
+        expect(doc1.$type).toBe('couch');
+        return expect(doc1.id).toBe('123');
       });
     });
   });
