@@ -267,7 +267,7 @@ class Hoodie.LocalStore extends Hoodie.Store
       object.id    = id
       object
        
-       
+
   # ## Is dirty?
   #
   # When no arguments passed, returns `true` or `false` depending on if there are
