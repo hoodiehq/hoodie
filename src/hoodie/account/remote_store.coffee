@@ -85,6 +85,6 @@ class Hoodie.Account.RemoteStore extends Hoodie.RemoteStore
   # Private
   # ---------
 
-  _handleSignIn: ->
+  _handleSignIn: =>
     @name = @hoodie.my.account.db()
     @connect()

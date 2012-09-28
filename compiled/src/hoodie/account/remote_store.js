@@ -10,6 +10,8 @@ Hoodie.Account.RemoteStore = (function(_super) {
   RemoteStore.prototype._sync = true;
 
   function RemoteStore() {
+    this._handleSignIn = __bind(this._handleSignIn, this);
+
     this.push = __bind(this.push, this);
 
     this.connect = __bind(this.connect, this);
