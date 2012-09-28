@@ -717,9 +717,13 @@ describe("Hoodie.Account", function() {
         this.account.destroy();
         return expect(this.account.username).toBeUndefined();
       });
-      return it("should unset @owner", function() {
+      it("should unset @owner", function() {
         this.account.destroy();
         return expect(this.account.ownerHash).toBeUndefined();
+      });
+      return it("should trigger signout event", function() {
+        this.account.destroy();
+        return expect(this.hoodie.trigger).wasCalledWith('account:signout');
       });
     });
   });

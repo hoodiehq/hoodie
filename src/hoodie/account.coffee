@@ -508,6 +508,7 @@ class Hoodie.Account
     delete @username
     delete @ownerHash
     delete @_authenticated
+    @hoodie.trigger 'account:signout'
 
   #
   #

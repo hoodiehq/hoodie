@@ -611,6 +611,10 @@ describe "Hoodie.Account", ->
       it "should unset @owner", ->
         @account.destroy()
         expect(@account.ownerHash).toBeUndefined()
+
+      it "should trigger signout event", ->
+        @account.destroy()
+        expect(@hoodie.trigger).wasCalledWith 'account:signout'
   # /destroy()
 
   describe "#resetPassword(username)", ->
