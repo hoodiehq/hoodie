@@ -30,13 +30,13 @@ Hoodie.Account.RemoteStore = (function(_super) {
   RemoteStore.prototype.startSyncing = function() {
     this.hoodie.my.config.set('_remote.sync', this._sync = true);
     this.hoodie.on('account:signout', this.disconnect);
-    this.hoodie.on('account:signin', this.connect);
+    this.hoodie.on('account:signin', this._handleSignIn);
     return this.connect();
   };
 
   RemoteStore.prototype.stopSyncing = function() {
     this.hoodie.my.config.set('_remote.sync', this._sync = false);
-    this.hoodie.unbind('account:signin', this.connect);
+    this.hoodie.unbind('account:signin', this._handleSignIn);
     this.hoodie.unbind('account:signout', this.disconnect);
     return this.disconnect();
   };
@@ -61,6 +61,11 @@ Hoodie.Account.RemoteStore = (function(_super) {
       docs = this.hoodie.my.store.changedDocs();
     }
     return RemoteStore.__super__.push.call(this, docs);
+  };
+
+  RemoteStore.prototype._handleSignIn = function() {
+    this.name = this.hoodie.my.account.db();
+    return this.connect();
   };
 
   return RemoteStore;

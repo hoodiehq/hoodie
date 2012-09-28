@@ -16,7 +16,7 @@ describe "Hoodie.Account.RemoteStore", ->
     @remote = new Hoodie.Account.RemoteStore @hoodie
   
   
-  describe ".constructor(@hoodie, options = {})", ->
+  describe "constructor(@hoodie, options = {})", ->
     beforeEach ->
       @remote = new Hoodie.Account.RemoteStore @hoodie
     
@@ -43,10 +43,9 @@ describe "Hoodie.Account.RemoteStore", ->
         spyOn(Hoodie.Account.RemoteStore::, "startSyncing")
         new Hoodie.Account.RemoteStore @hoodie
         expect(Hoodie.Account.RemoteStore::startSyncing).wasNotCalled()
-      
      
 
-  describe ".startSyncing", ->
+  describe "#startSyncing", ->
     it "should make isContinuouslySyncing() to return true", ->
       @remote._sync = false
       @remote.startSyncing()
@@ -63,9 +62,10 @@ describe "Hoodie.Account.RemoteStore", ->
 
     it "should subscribe to account:signin with sync", ->
       @remote.startSyncing()
-      expect(@hoodie.on).wasCalledWith 'account:signin', @remote.connect
+      expect(@hoodie.on).wasCalledWith 'account:signin', @remote._handleSignIn
       
-  describe ".stopSyncing", ->
+
+  describe "#stopSyncing", ->
     it "should set _remote.sync to false", ->
       @remote._sync = true
       @remote.stopSyncing()
@@ -78,13 +78,14 @@ describe "Hoodie.Account.RemoteStore", ->
 
     it "should unsubscribe from account's signin idle event", ->
       @remote.stopSyncing()
-      expect(@hoodie.unbind).wasCalledWith 'account:signin', @remote.connect
+      expect(@hoodie.unbind).wasCalledWith 'account:signin', @remote._handleSignIn
       
     it "should unsubscribe from account's signout idle event", ->
       @remote.stopSyncing()
       expect(@hoodie.unbind).wasCalledWith 'account:signout', @remote.disconnect
 
-  describe ".connect()", ->
+
+  describe "#connect()", ->
     beforeEach ->
       spyOn(@remote, "sync")
       
@@ -105,7 +106,8 @@ describe "Hoodie.Account.RemoteStore", ->
         expect(Hoodie.RemoteStore::connect).wasCalled()
   # /.connect()
 
-  describe ".getSinceNr()", ->
+
+  describe "#getSinceNr()", ->
     beforeEach ->
       spyOn(@hoodie.my.config, "get")
     
@@ -121,7 +123,8 @@ describe "Hoodie.Account.RemoteStore", ->
         expect(@remote.getSinceNr()).toBe 0
   # /.getSinceNr()
 
-  describe ".setSinceNr(nr)", ->
+
+  describe "#setSinceNr(nr)", ->
     beforeEach ->
       spyOn(@hoodie.my.config, "set")
 
@@ -130,7 +133,8 @@ describe "Hoodie.Account.RemoteStore", ->
       expect(@hoodie.my.config.set).wasCalledWith '_remote.since', 100
   # /.setSinceNr()
 
-  describe ".push(docs)", -> 
+
+  describe "#push(docs)", -> 
     beforeEach ->
       spyOn(Hoodie.RemoteStore::, "push")
 

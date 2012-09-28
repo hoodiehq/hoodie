@@ -23,7 +23,7 @@ describe("Hoodie.Account.RemoteStore", function() {
     });
     return this.remote = new Hoodie.Account.RemoteStore(this.hoodie);
   });
-  describe(".constructor(@hoodie, options = {})", function() {
+  describe("constructor(@hoodie, options = {})", function() {
     beforeEach(function() {
       return this.remote = new Hoodie.Account.RemoteStore(this.hoodie);
     });
@@ -53,7 +53,7 @@ describe("Hoodie.Account.RemoteStore", function() {
       });
     });
   });
-  describe(".startSyncing", function() {
+  describe("#startSyncing", function() {
     it("should make isContinuouslySyncing() to return true", function() {
       this.remote._sync = false;
       this.remote.startSyncing();
@@ -70,10 +70,10 @@ describe("Hoodie.Account.RemoteStore", function() {
     });
     return it("should subscribe to account:signin with sync", function() {
       this.remote.startSyncing();
-      return expect(this.hoodie.on).wasCalledWith('account:signin', this.remote.connect);
+      return expect(this.hoodie.on).wasCalledWith('account:signin', this.remote._handleSignIn);
     });
   });
-  describe(".stopSyncing", function() {
+  describe("#stopSyncing", function() {
     it("should set _remote.sync to false", function() {
       this.remote._sync = true;
       this.remote.stopSyncing();
@@ -86,14 +86,14 @@ describe("Hoodie.Account.RemoteStore", function() {
     });
     it("should unsubscribe from account's signin idle event", function() {
       this.remote.stopSyncing();
-      return expect(this.hoodie.unbind).wasCalledWith('account:signin', this.remote.connect);
+      return expect(this.hoodie.unbind).wasCalledWith('account:signin', this.remote._handleSignIn);
     });
     return it("should unsubscribe from account's signout idle event", function() {
       this.remote.stopSyncing();
       return expect(this.hoodie.unbind).wasCalledWith('account:signout', this.remote.disconnect);
     });
   });
-  describe(".connect()", function() {
+  describe("#connect()", function() {
     beforeEach(function() {
       return spyOn(this.remote, "sync");
     });
@@ -120,7 +120,7 @@ describe("Hoodie.Account.RemoteStore", function() {
       });
     });
   });
-  describe(".getSinceNr()", function() {
+  describe("#getSinceNr()", function() {
     beforeEach(function() {
       return spyOn(this.hoodie.my.config, "get");
     });
@@ -137,7 +137,7 @@ describe("Hoodie.Account.RemoteStore", function() {
       });
     });
   });
-  describe(".setSinceNr(nr)", function() {
+  describe("#setSinceNr(nr)", function() {
     beforeEach(function() {
       return spyOn(this.hoodie.my.config, "set");
     });
@@ -146,7 +146,7 @@ describe("Hoodie.Account.RemoteStore", function() {
       return expect(this.hoodie.my.config.set).wasCalledWith('_remote.since', 100);
     });
   });
-  return describe(".push(docs)", function() {
+  return describe("#push(docs)", function() {
     beforeEach(function() {
       return spyOn(Hoodie.RemoteStore.prototype, "push");
     });

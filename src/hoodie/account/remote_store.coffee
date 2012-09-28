@@ -38,7 +38,7 @@ class Hoodie.Account.RemoteStore extends Hoodie.RemoteStore
     @hoodie.my.config.set '_remote.sync', @_sync = true
 
     @hoodie.on 'account:signout',    @disconnect
-    @hoodie.on 'account:signin',     @connect
+    @hoodie.on 'account:signin',     @_handleSignIn
 
     @connect()
 
@@ -49,7 +49,7 @@ class Hoodie.Account.RemoteStore extends Hoodie.RemoteStore
   stopSyncing : =>
     @hoodie.my.config.set '_remote.sync', @_sync = false
 
-    @hoodie.unbind 'account:signin',  @connect
+    @hoodie.unbind 'account:signin',  @_handleSignIn
     @hoodie.unbind 'account:signout', @disconnect
 
     @disconnect()
@@ -80,3 +80,11 @@ class Hoodie.Account.RemoteStore extends Hoodie.RemoteStore
   push : (docs) =>
     docs = @hoodie.my.store.changedDocs() unless $.isArray docs
     super(docs)
+
+
+  # Private
+  # ---------
+
+  _handleSignIn: ->
+    @name = @hoodie.my.account.db()
+    @connect()
