@@ -570,7 +570,8 @@ Hoodie.Account = (function() {
   Account.prototype._handleDestroySucces = function() {
     delete this.username;
     delete this.ownerHash;
-    return delete this._authenticated;
+    delete this._authenticated;
+    return this.hoodie.trigger('account:signout');
   };
 
   Account.prototype._userKey = function(username) {
