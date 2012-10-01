@@ -1,27 +1,27 @@
-describe "Hoodie.Share.Instance", ->  
+describe "Hoodie.ShareInstance", ->  
   beforeEach ->
     @hoodie = new Mocks.Hoodie 
-    Hoodie.Share.Instance.prototype.hoodie = @hoodie
-    @share = new Hoodie.Share.Instance id: 'share1'
+    Hoodie.ShareInstance.prototype.hoodie = @hoodie
+    @share = new Hoodie.ShareInstance id: 'share1'
   
   describe "constructor", ->
     beforeEach ->
-      spyOn(Hoodie.Share.Instance::, "set").andCallThrough()
+      spyOn(Hoodie.ShareInstance::, "set").andCallThrough()
       
     it "should set passed options", ->
-      share = new Hoodie.Share.Instance {option1: "value1", option2: "value2"}
-      expect(Hoodie.Share.Instance::set).wasCalledWith {option1: "value1", option2: "value2"}
+      share = new Hoodie.ShareInstance {option1: "value1", option2: "value2"}
+      expect(Hoodie.ShareInstance::set).wasCalledWith {option1: "value1", option2: "value2"}
     
     it "should set id from options.id", ->
-      share = new Hoodie.Share.Instance id: 'id123'
+      share = new Hoodie.ShareInstance id: 'id123'
       expect(share.id).toBe 'id123'
 
     it "should generate an id if options.id wasn't passed", ->
-      share = new Hoodie.Share.Instance
+      share = new Hoodie.ShareInstance
       expect(share.id).toBe 'uuid'
        
     it "should default access to false", ->
-      share = new Hoodie.Share.Instance
+      share = new Hoodie.ShareInstance
       expect(share.access).toBe false
   # /constructor
 

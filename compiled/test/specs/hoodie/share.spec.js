@@ -7,10 +7,10 @@ describe("Hoodie.Share", function() {
     return spyOn(this.share, "instance");
   });
   describe(".constructor", function() {
-    it("should set Hoodie.Share.Instance.prototype.hoodie", function() {
+    it("should set Hoodie.ShareInstance.prototype.hoodie", function() {
       var instance;
       new Hoodie.Share(this.hoodie);
-      instance = new Hoodie.Share.Instance;
+      instance = new Hoodie.ShareInstance;
       return expect(instance.hoodie).toBe(this.hoodie);
     });
     return it("should return the @open method as api", function() {
@@ -33,10 +33,10 @@ describe("Hoodie.Share", function() {
     });
   });
   describe(".instance", function() {
-    return it("should point to Hoodie.Share.Instance", function() {
+    return it("should point to Hoodie.ShareInstance", function() {
       var share;
       share = new Hoodie.Share(this.hoodie);
-      return expect(share.instance).toBe(Hoodie.Share.Instance);
+      return expect(share.instance).toBe(Hoodie.ShareInstance);
     });
   });
   describe(".create(attributes)", function() {
@@ -45,7 +45,7 @@ describe("Hoodie.Share", function() {
       this.instance.save = jasmine.createSpy("save");
       return this.share.instance.andReturn(this.instance);
     });
-    return it("should initiate a new Hoodie.Share.Instance and save it", function() {
+    return it("should initiate a new Hoodie.ShareInstance and save it", function() {
       var returnValue;
       returnValue = this.share.create({
         funky: 'fresh'

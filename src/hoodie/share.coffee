@@ -46,14 +46,14 @@ class Hoodie.Share
   constructor : (@hoodie) ->
     
 
-    # set pointer to Hoodie.Share.Instance
-    @instance = Hoodie.Share.Instance
+    # set pointer to Hoodie.ShareInstance
+    @instance = Hoodie.ShareInstance
 
     # give all Share instances access to our core hoodie.
     # That's need if the user has no account yet, as shares
     # use custom hoodie instances then to create shares on
     # the server
-    Hoodie.Share.Instance.prototype.hoodie = @hoodie
+    Hoodie.ShareInstance.prototype.hoodie = @hoodie
 
     # return custom api which allows direct call
     api = @open

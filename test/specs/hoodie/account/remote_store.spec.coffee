@@ -1,4 +1,4 @@
-describe "Hoodie.Account.RemoteStore", ->  
+describe "Hoodie.AccountRemoteStore", ->  
   beforeEach ->
     @hoodie = new Mocks.Hoodie 
     spyOn(@hoodie, "on")
@@ -13,12 +13,12 @@ describe "Hoodie.Account.RemoteStore", ->
     spyOn(@hoodie.my.store, "destroy").andReturn then: (cb) -> cb('objectFromStore')
     spyOn(@hoodie.my.store, "update").andReturn  then: (cb) -> cb('objectFromStore', false)
 
-    @remote = new Hoodie.Account.RemoteStore @hoodie
+    @remote = new Hoodie.AccountRemoteStore @hoodie
   
   
   describe "constructor(@hoodie, options = {})", ->
     beforeEach ->
-      @remote = new Hoodie.Account.RemoteStore @hoodie
+      @remote = new Hoodie.AccountRemoteStore @hoodie
     
     it "should set name to users database name", ->
       expect(@remote.name).toBe "userhash123"
@@ -27,22 +27,22 @@ describe "Hoodie.Account.RemoteStore", ->
       expect(@remote.isContinuouslySyncing()).toBeTruthy()
     
     it "should start syncing", ->
-      spyOn(Hoodie.Account.RemoteStore::, "startSyncing")
-      new Hoodie.Account.RemoteStore @hoodie
-      expect(Hoodie.Account.RemoteStore::startSyncing).wasCalled()
+      spyOn(Hoodie.AccountRemoteStore::, "startSyncing")
+      new Hoodie.AccountRemoteStore @hoodie
+      expect(Hoodie.AccountRemoteStore::startSyncing).wasCalled()
         
     _when "config remote.sync is false", ->
       beforeEach ->
         spyOn(@hoodie.my.config, "get").andReturn false
-        @remote = new Hoodie.Account.RemoteStore @hoodie
+        @remote = new Hoodie.AccountRemoteStore @hoodie
         
       it "should set syncContinuously to false", ->
         expect(@remote.isContinuouslySyncing()).toBe false
 
       it "should not start syncing", ->
-        spyOn(Hoodie.Account.RemoteStore::, "startSyncing")
-        new Hoodie.Account.RemoteStore @hoodie
-        expect(Hoodie.Account.RemoteStore::startSyncing).wasNotCalled()
+        spyOn(Hoodie.AccountRemoteStore::, "startSyncing")
+        new Hoodie.AccountRemoteStore @hoodie
+        expect(Hoodie.AccountRemoteStore::startSyncing).wasNotCalled()
      
 
   describe "#startSyncing", ->
@@ -144,4 +144,4 @@ describe "Hoodie.Account.RemoteStore", ->
         @remote.push()
         expect(Hoodie.RemoteStore::push).wasCalledWith "changed_docs"
   # /.push(docs)
-# /Hoodie.Account.RemoteStore
+# /Hoodie.AccountRemoteStore

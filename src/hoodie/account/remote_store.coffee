@@ -9,7 +9,7 @@
 # When hoodie.my.remote is continuously syncing (default), it will continuously 
 # synchronize, otherwise sync, pull or push can be called manually
 #
-class Hoodie.Account.RemoteStore extends Hoodie.RemoteStore
+class Hoodie.AccountRemoteStore extends Hoodie.RemoteStore
 
   # ## properties
 

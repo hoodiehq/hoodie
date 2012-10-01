@@ -33,10 +33,10 @@ hoodie.share.updateAll(changed_attributes)
 like this: hoodie.share('share_id')</p>
 
 <p>The rest of the API is available as usual.</p></div></div><div class="code"><div class="wrapper">  <span class="nv">constructor : </span><span class="nf">(@hoodie) -&gt;</span>
-    </div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>set pointer to Hoodie.Share.Instance</p></div></div><div class="code"><div class="wrapper">    <span class="vi">@instance = </span><span class="nx">Hoodie</span><span class="p">.</span><span class="nx">Share</span><span class="p">.</span><span class="nx">Instance</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>give all Share instances access to our core hoodie.
+    </div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>set pointer to Hoodie.ShareInstance</p></div></div><div class="code"><div class="wrapper">    <span class="vi">@instance = </span><span class="nx">Hoodie</span><span class="p">.</span><span class="nx">Share</span><span class="p">.</span><span class="nx">Instance</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>give all Share instances access to our core hoodie.
 That's need if the user has no account yet, as shares
 use custom hoodie instances then to create shares on
-the server</p></div></div><div class="code"><div class="wrapper">    <span class="nv">Hoodie.Share.Instance.prototype.hoodie = </span><span class="nx">@hoodie</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>return custom api which allows direct call</p></div></div><div class="code"><div class="wrapper">    <span class="nv">api = </span><span class="nx">@open</span>
+the server</p></div></div><div class="code"><div class="wrapper">    <span class="nv">Hoodie.ShareInstance.prototype.hoodie = </span><span class="nx">@hoodie</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>return custom api which allows direct call</p></div></div><div class="code"><div class="wrapper">    <span class="nv">api = </span><span class="nx">@open</span>
     <span class="nx">$</span><span class="p">.</span><span class="nx">extend</span> <span class="nx">api</span><span class="p">,</span> <span class="k">this</span>
 
     <span class="k">return</span> <span class="nx">api</span>

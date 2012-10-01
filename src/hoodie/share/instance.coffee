@@ -1,4 +1,4 @@
-class Hoodie.Share.Instance extends Hoodie.RemoteStore
+class Hoodie.ShareInstance extends Hoodie.RemoteStore
   
   # default values
   # ----------------

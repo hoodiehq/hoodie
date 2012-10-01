@@ -5,13 +5,13 @@ var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments)
   __indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; i < l; i++) { if (i in this && this[i] === item) return i; } return -1; },
   __slice = [].slice;
 
-Hoodie.Share.Instance = (function(_super) {
+Hoodie.ShareInstance = (function(_super) {
 
-  __extends(Instance, _super);
+  __extends(ShareInstance, _super);
 
-  Instance.prototype.access = false;
+  ShareInstance.prototype.access = false;
 
-  function Instance(options) {
+  function ShareInstance(options) {
     if (options == null) {
       options = {};
     }
@@ -39,11 +39,11 @@ Hoodie.Share.Instance = (function(_super) {
     this.id = options.id || this.hoodie.my.store.uuid();
   }
 
-  Instance.prototype._memory = {};
+  ShareInstance.prototype._memory = {};
 
-  Instance.prototype._allowed_options = ["access", "password"];
+  ShareInstance.prototype._allowed_options = ["access", "password"];
 
-  Instance.prototype.set = function(key, value) {
+  ShareInstance.prototype.set = function(key, value) {
     var _key;
     if (typeof key === 'object') {
       for (_key in key) {
@@ -60,11 +60,11 @@ Hoodie.Share.Instance = (function(_super) {
     return void 0;
   };
 
-  Instance.prototype.get = function(key) {
+  ShareInstance.prototype.get = function(key) {
     return this[key];
   };
 
-  Instance.prototype.save = function(update, options) {
+  ShareInstance.prototype.save = function(update, options) {
     var _handleUpdate,
       _this = this;
     if (update == null) {
@@ -84,18 +84,18 @@ Hoodie.Share.Instance = (function(_super) {
     return this.hoodie.my.store.update("$share", this.id, this._memory, options).pipe(_handleUpdate);
   };
 
-  Instance.prototype.add = function(objects, sharedAttributes) {
+  ShareInstance.prototype.add = function(objects, sharedAttributes) {
     if (sharedAttributes == null) {
       sharedAttributes = true;
     }
     return this.toggle(objects, sharedAttributes);
   };
 
-  Instance.prototype.remove = function(objects) {
+  ShareInstance.prototype.remove = function(objects) {
     return this.toggle(objects, false);
   };
 
-  Instance.prototype.toggle = function(objects, filter) {
+  ShareInstance.prototype.toggle = function(objects, filter) {
     var updateMethod;
     if (!(this.hoodie.isPromise(objects) || $.isArray(objects))) {
       objects = [objects];
@@ -113,22 +113,22 @@ Hoodie.Share.Instance = (function(_super) {
     return this.hoodie.my.store.updateAll(objects, updateMethod);
   };
 
-  Instance.prototype.sync = function() {
+  ShareInstance.prototype.sync = function() {
     return this.save().pipe(this.findAllObjects).pipe(this.hoodie.my.remote.sync);
   };
 
-  Instance.prototype.destroy = function() {
+  ShareInstance.prototype.destroy = function() {
     var _this = this;
     return this.remove(this.findAllObjects()).then(function() {
       return _this.hoodie.my.store.destroy("$share", _this.id);
     });
   };
 
-  Instance.prototype.findAllObjects = function() {
+  ShareInstance.prototype.findAllObjects = function() {
     return this.hoodie.my.store.findAll(this._isMySharedObjectAndChanged);
   };
 
-  Instance.prototype._add = function(filter) {
+  ShareInstance.prototype._add = function(filter) {
     var _this = this;
     return function(obj) {
       obj.$shares || (obj.$shares = {});
@@ -139,7 +139,7 @@ Hoodie.Share.Instance = (function(_super) {
     };
   };
 
-  Instance.prototype._remove = function(obj) {
+  ShareInstance.prototype._remove = function(obj) {
     if (!obj.$shares) {
       return {};
     }
@@ -152,7 +152,7 @@ Hoodie.Share.Instance = (function(_super) {
     };
   };
 
-  Instance.prototype._toggle = function(obj) {
+  ShareInstance.prototype._toggle = function(obj) {
     var doAdd;
     try {
       doAdd = obj.$shares[this.id] === void 0 || obj.$shares[this.id] === false;
@@ -166,21 +166,21 @@ Hoodie.Share.Instance = (function(_super) {
     }
   };
 
-  Instance.prototype._isMySharedObject = function(obj) {
+  ShareInstance.prototype._isMySharedObject = function(obj) {
     var _ref;
     return ((_ref = obj.$shares) != null ? _ref[this.id] : void 0) != null;
   };
 
-  Instance.prototype._isMySharedObjectAndChanged = function(obj) {
+  ShareInstance.prototype._isMySharedObjectAndChanged = function(obj) {
     var belongsToMe, _ref;
     belongsToMe = obj.id === this.id || (((_ref = obj.$shares) != null ? _ref[this.id] : void 0) != null);
     return belongsToMe && this.hoodie.my.store.isDirty(obj.$type, obj.id);
   };
 
-  Instance.prototype._handleRemoteChanges = function() {
+  ShareInstance.prototype._handleRemoteChanges = function() {
     return console.log.apply(console, ['_handleRemoteChanges'].concat(__slice.call(arguments)));
   };
 
-  return Instance;
+  return ShareInstance;
 
 })(Hoodie.RemoteStore);

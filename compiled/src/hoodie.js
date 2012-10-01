@@ -7,25 +7,31 @@ Hoodie = (function(_super) {
 
   __extends(Hoodie, _super);
 
-  Hoodie.prototype.modules = function() {
-    return {
-      my: {
-        store: Hoodie.LocalStore,
-        config: Hoodie.Config,
-        account: Hoodie.Account,
-        remote: Hoodie.Account.RemoteStore
-      },
-      user: Hoodie.User,
-      global: Hoodie.Global,
-      email: Hoodie.Email,
-      share: Hoodie.Share
-    };
+  Hoodie.modules = {
+    my: {
+      store: 'LocalStore',
+      config: 'Config',
+      account: 'Account',
+      remote: 'AccountRemoteStore'
+    },
+    user: 'User'
+  };
+
+  Hoodie.extensions = {
+    global: 'Global',
+    email: 'Email',
+    share: 'Share'
+  };
+
+  Hoodie.extend = function(name, Module) {
+    return this.extensions[name] = Module;
   };
 
   function Hoodie(baseUrl) {
     this.baseUrl = baseUrl != null ? baseUrl : '';
     this.baseUrl = this.baseUrl.replace(/\/+$/, '');
-    this._loadModules();
+    this._loadModules(this.constructor.modules);
+    this._loadModules(this.constructor.extensions);
   }
 
   Hoodie.prototype.request = function(type, path, options) {
@@ -61,23 +67,28 @@ Hoodie = (function(_super) {
     return typeof (obj != null ? obj.done : void 0) === 'function' && typeof obj.resolve === 'undefined';
   };
 
-  Hoodie.prototype._loadModules = function(context, modules) {
-    var Module, instanceName, namespace, _results;
+  Hoodie.prototype._loadModules = function(modules, context) {
+    var instanceName, moduleName, namespace, _results;
+    if (modules == null) {
+      modules = this.constructor.modules;
+    }
     if (context == null) {
       context = this;
     }
-    if (modules == null) {
-      modules = this.modules();
-    }
     _results = [];
     for (instanceName in modules) {
-      Module = modules[instanceName];
-      if (typeof Module === 'function') {
-        _results.push(context[instanceName] = new Module(this));
-      } else {
-        namespace = instanceName;
-        context[namespace] || (context[namespace] = {});
-        _results.push(this._loadModules(context[namespace], modules[namespace]));
+      moduleName = modules[instanceName];
+      switch (typeof moduleName) {
+        case 'string':
+          _results.push(context[instanceName] = new Hoodie[moduleName](this));
+          break;
+        case 'function':
+          _results.push(context[instanceName] = new moduleName(this));
+          break;
+        default:
+          namespace = instanceName;
+          context[namespace] || (context[namespace] = {});
+          _results.push(this._loadModules(modules[namespace], context[namespace]));
       }
     }
     return _results;

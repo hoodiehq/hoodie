@@ -7,18 +7,24 @@
 class Hoodie extends Events
 
   # modules to be loaded
-  modules: ->
+  @modules: 
     my :
-      store   : Hoodie.LocalStore
-      config  : Hoodie.Config
-      account : Hoodie.Account
-      remote  : Hoodie.Account.RemoteStore
+      store   : 'LocalStore'
+      config  : 'Config'
+      account : 'Account'
+      remote  : 'AccountRemoteStore'
 
-    user    : Hoodie.User
-    global  : Hoodie.Global
-    email   : Hoodie.Email
-    share   : Hoodie.Share
+    user    : 'User'
 
+  # extensions, get loaded after the core modules
+  @extensions : 
+    global  : 'Global'
+    email   : 'Email'
+    share   : 'Share'
+
+  # extend Hoodie with a custom module. Supports both named and anonymous modules
+  @extend: (name, Module) ->
+    @extensions[name] = Module
 
   # ## initialization
 
@@ -27,7 +33,8 @@ class Hoodie extends Events
 
     # remove trailing slash(es)
     @baseUrl = @baseUrl.replace /\/+$/, ''
-    @_loadModules()
+    @_loadModules @constructor.modules
+    @_loadModules @constructor.extensions
   
 
   # ## Request
@@ -53,7 +60,7 @@ class Hoodie extends Events
   # * hoodie.user("joe")
   # * hoodie.global
   # * ... and more
-  #
+  # 
   # usage: `hoodie.open("some_store_name").findAll()`
   #
   open : (store_name, options = {}) ->
@@ -76,15 +83,16 @@ class Hoodie extends Events
   # ## Private
   
   #
-  _loadModules: (context = this, modules = @modules()) ->
+  _loadModules: (modules = @constructor.modules, context = this) ->
 
-    for instanceName, Module of modules
-      
-      if typeof Module is 'function'
-        context[instanceName] = new Module this
+    for instanceName, moduleName of modules
         
-      else
-        namespace = instanceName
-        context[namespace] or= {}
-        @_loadModules context[namespace], modules[namespace]
-      ###
+      switch typeof moduleName
+        when 'string'
+          context[instanceName] = new Hoodie[moduleName] this
+        when 'function'  
+          context[instanceName] = new moduleName this
+        else
+          namespace = instanceName
+          context[namespace] or= {}
+          @_loadModules modules[namespace], context[namespace]

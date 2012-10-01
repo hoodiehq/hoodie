@@ -5,9 +5,9 @@ describe "Hoodie.Share", ->
     spyOn(@share, "instance")
 
   describe ".constructor", ->
-    it "should set Hoodie.Share.Instance.prototype.hoodie", ->
+    it "should set Hoodie.ShareInstance.prototype.hoodie", ->
       new Hoodie.Share @hoodie
-      instance = new Hoodie.Share.Instance
+      instance = new Hoodie.ShareInstance
       expect(instance.hoodie).toBe @hoodie
 
     it "should return the @open method as api", ->
@@ -29,9 +29,9 @@ describe "Hoodie.Share", ->
   # /('share_id', options)
 
   describe ".instance", ->
-    it "should point to Hoodie.Share.Instance", ->
+    it "should point to Hoodie.ShareInstance", ->
       share  = new Hoodie.Share @hoodie
-      expect(share.instance).toBe Hoodie.Share.Instance
+      expect(share.instance).toBe Hoodie.ShareInstance
   # /.instance
 
   describe ".create(attributes)", ->
@@ -40,7 +40,7 @@ describe "Hoodie.Share", ->
       @instance.save = jasmine.createSpy("save")
       @share.instance.andReturn @instance
     
-    it "should initiate a new Hoodie.Share.Instance and save it", ->
+    it "should initiate a new Hoodie.ShareInstance and save it", ->
       returnValue = @share.create funky: 'fresh'
       expect(@share.instance).wasCalledWith funky: 'fresh'
       expect(@instance.save).wasCalled()
