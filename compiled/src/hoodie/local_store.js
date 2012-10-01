@@ -86,6 +86,19 @@ Hoodie.LocalStore = (function(_super) {
     try {
       object = this.cache(type, id, object, options);
       defer.resolve(object, isNew).promise();
+      if (isNew) {
+        this.trigger("create", object, options);
+        this.trigger("create:" + object.type, object, options);
+        this.trigger("change", 'create', object, options);
+        this.trigger("change:" + object.type, 'create', object, options);
+      } else {
+        this.trigger("update", object, options);
+        this.trigger("update:" + object.type, object, options);
+        this.trigger("update:" + object.type + ":{object.id}", object, options);
+        this.trigger("change", 'update', object, options);
+        this.trigger("change:" + object.type, 'update', object, options);
+        this.trigger("change:" + object.type + ":{object.id}", 'update', object, options);
+      }
     } catch (error) {
       defer.reject(error).promise();
     }
@@ -176,6 +189,12 @@ Hoodie.LocalStore = (function(_super) {
       this._cached[key] = false;
       this.clearChanged(type, id);
     }
+    this.trigger("destroy", object, options);
+    this.trigger("destroy:" + type, object, options);
+    this.trigger("destroy:" + type + ":" + id, object, options);
+    this.trigger("change", 'destroy', object, options);
+    this.trigger("change:" + type, 'destroy', object, options);
+    this.trigger("change:" + type + ":" + id, 'destroy', object, options);
     return defer.resolve($.extend({}, object)).promise();
   };
 

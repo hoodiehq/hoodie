@@ -51,7 +51,6 @@ class Hoodie.LocalStore extends Hoodie.Store
   # * `$updatedAt` every time
   # * `_$syncedAt`  if changes comes from remote
   #
-  #
   # example usage:
   #
   #     store.save('car', undefined, {color: 'red'})
@@ -87,6 +86,19 @@ class Hoodie.LocalStore extends Hoodie.Store
     try 
       object = @cache type, id, object, options
       defer.resolve( object, isNew ).promise()
+
+      if isNew
+        @trigger "create",                          object, options
+        @trigger "create:#{object.type}",           object, options
+        @trigger "change",                'create', object, options
+        @trigger "change:#{object.type}", 'create', object, options
+      else
+        @trigger "update",                                      object, options
+        @trigger "update:#{object.type}",                       object, options
+        @trigger "update:#{object.type}:{object.id}",           object, options
+        @trigger "change",                            'update', object, options
+        @trigger "change:#{object.type}",             'update', object, options
+        @trigger "change:#{object.type}:{object.id}", 'update', object, options
     catch error
       defer.reject(error).promise()
   
@@ -185,6 +197,14 @@ class Hoodie.LocalStore extends Hoodie.Store
   
       @_cached[key] = false
       @clearChanged type, id
+
+    # trigger events
+    @trigger "destroy",                          object, options
+    @trigger "destroy:#{type}",                  object, options
+    @trigger "destroy:#{type}:#{id}",            object, options
+    @trigger "change",                'destroy', object, options
+    @trigger "change:#{type}",        'destroy', object, options
+    @trigger "change:#{type}:#{id}",  'destroy', object, options
   
     defer.resolve($.extend {}, object).promise()
   

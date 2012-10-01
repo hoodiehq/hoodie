@@ -55,6 +55,8 @@ describe "Hoodie.LocalStore", ->
       
       _and "options.remote is true", ->
         beforeEach ->
+          spyOn(@store, "trigger")
+          @store.cache.andReturn { id: '123', type: 'document', name: 'test'}
           @store.save 'document', '123', { name: 'test' }, { remote: true }
         
         it "should not touch createdAt / updatedAt timestamps", ->
@@ -66,13 +68,11 @@ describe "Hoodie.LocalStore", ->
           object = @store.cache.mostRecentCall.args[2]
           expect(object._$syncedAt).toBe 'now'
 
-        xit "should trigger trigger events", ->
-          spyOn(@trigger, "trigger")
-          @trigger.pull()
-          
-          expect(@trigger.trigger).wasCalledWith 'update',                { name: 'test' }, { remote: true }
-          expect(@trigger.trigger).wasCalledWith 'update:document',       { name: 'test' }, { remote: true }
-          expect(@trigger.trigger).wasCalledWith 'update:document:abc2',  { name: 'test' }, { remote: true }
+        it "should trigger trigger events", ->
+          expect(@store.trigger).wasCalledWith 'create',                    { id: '123', type: 'document', name: 'test'}, { remote: true }
+          expect(@store.trigger).wasCalledWith 'create:document',           { id: '123', type: 'document', name: 'test'}, { remote: true }
+          expect(@store.trigger).wasCalledWith 'change',          'create', { id: '123', type: 'document', name: 'test'}, { remote: true }
+          expect(@store.trigger).wasCalledWith 'change:document', 'create', { id: '123', type: 'document', name: 'test'}, { remote: true }
       
       _and "options.silent is true", ->
         beforeEach ->
@@ -210,9 +210,9 @@ describe "Hoodie.LocalStore", ->
         @store.save 'document', 'abc4567', { name: 'test' }, { public: ['aj@example.com', 'bj@example.com'] }
         [type, key, object] = @store.cache.mostRecentCall.args
         expect(object.$public.join()).toBe ['aj@example.com', 'bj@example.com'].join()
-      
   # /.save(type, id, object, options)
   
+
   describe "#create(type, object, options)", ->
     beforeEach ->
       spyOn(@store, "save").andReturn 'promise'
@@ -223,6 +223,7 @@ describe "Hoodie.LocalStore", ->
       expect(promise).toBe 'promise'
   # /.create(type, object, options)
   
+
   describe "#update(type, id, update, options)", ->
     beforeEach ->
       spyOn(@store, "find")
@@ -271,9 +272,9 @@ describe "Hoodie.LocalStore", ->
 
         it "should return a resolved promise", ->
           expect(@promise).toBeResolvedWith {style: 'baws'}
-        
   # /.update(type, id, update, options)
   
+
   describe "#updateAll(objects)", ->
     beforeEach ->
       spyOn(@hoodie, "isPromise").andReturn false
@@ -302,7 +303,6 @@ describe "Hoodie.LocalStore", ->
       spyOn(@store, "update").andReturn promise
       expect(@store.updateAll(@todoObjects, {})).notToBeResolved()
     
-     
     _when "passed objects is a promise", ->
       beforeEach ->
         @hoodie.isPromise.andReturn true
@@ -314,6 +314,7 @@ describe "Hoodie.LocalStore", ->
         for obj in @todoObjects
           expect(@store.update).wasCalledWith obj.type, obj.id, {funky: 'update'}, {}
   # /.updateAll(objects)
+
 
   describe "#find(type, id)", ->
     beforeEach ->
@@ -354,7 +355,8 @@ describe "Hoodie.LocalStore", ->
       @store.find 'document', 'abc4567'
 
       expect(@store.db.getItem.callCount).toBe 1
-  # /.get(type, id)
+  # /.find(type, id)
+
 
   describe "#findAll(filter)", ->
     with_2CatsAnd_3Dogs = (specs) ->
@@ -410,6 +412,7 @@ describe "Hoodie.LocalStore", ->
           expect(results.length).toBe 2   
   # /.findAll(type)
 
+
   describe "#destroy(type, id)", ->
     _when "objecet cannot be found", ->
       beforeEach ->
@@ -448,22 +451,30 @@ describe "Hoodie.LocalStore", ->
     
     _when "object can be found and destroy comes from remote", ->
       beforeEach ->
-        spyOn(@store, "cache").andReturn {_$syncedAt: 'now'}
+        spyOn(@store, "cache").andReturn { id: '123', type: 'document', name: 'test'}
+        spyOn(@store, "trigger")
+        @store.destroy 'document', '123', remote: true
       
       it "should remove the object", ->
-        @store.destroy 'document', '123', remote: true
         expect(@store.db.removeItem).wasCalledWith 'document/123'
+
+      it "should trigger trigger events", ->
+        expect(@store.trigger).wasCalledWith 'destroy',                         { id: '123', type: 'document', name: 'test'}, { remote: true }
+        expect(@store.trigger).wasCalledWith 'destroy:document',                { id: '123', type: 'document', name: 'test'}, { remote: true }
+        expect(@store.trigger).wasCalledWith 'destroy:document:123',            { id: '123', type: 'document', name: 'test'}, { remote: true }
+        expect(@store.trigger).wasCalledWith 'change',               'destroy', { id: '123', type: 'document', name: 'test'}, { remote: true }
+        expect(@store.trigger).wasCalledWith 'change:document',      'destroy', { id: '123', type: 'document', name: 'test'}, { remote: true } 
+        expect(@store.trigger).wasCalledWith 'change:document:123',  'destroy', { id: '123', type: 'document', name: 'test'}, { remote: true } 
         
     _when "object can be found and was synched before", ->
       beforeEach ->
         spyOn(@store, "cache").andReturn {_$syncedAt: 'now'}
+        @store.destroy 'document', '123'
         
       it "should mark the object as deleted and cache it", ->
-        promise = @store.destroy 'document', '123'
         expect(@store.cache).wasCalledWith 'document', '123', {_$syncedAt: 'now', _deleted: true}
         
       it "should not remove the object from store", ->
-        @store.destroy 'document', '123'
         expect(@store.db.removeItem).wasNotCalled()
   # /.destroy(type, id)
 

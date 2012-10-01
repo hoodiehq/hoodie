@@ -69,6 +69,12 @@ describe("Hoodie.LocalStore", function() {
       });
       _and("options.remote is true", function() {
         beforeEach(function() {
+          spyOn(this.store, "trigger");
+          this.store.cache.andReturn({
+            id: '123',
+            type: 'document',
+            name: 'test'
+          });
           return this.store.save('document', '123', {
             name: 'test'
           }, {
@@ -86,20 +92,31 @@ describe("Hoodie.LocalStore", function() {
           object = this.store.cache.mostRecentCall.args[2];
           return expect(object._$syncedAt).toBe('now');
         });
-        return xit("should trigger trigger events", function() {
-          spyOn(this.trigger, "trigger");
-          this.trigger.pull();
-          expect(this.trigger.trigger).wasCalledWith('update', {
+        return it("should trigger trigger events", function() {
+          expect(this.store.trigger).wasCalledWith('create', {
+            id: '123',
+            type: 'document',
             name: 'test'
           }, {
             remote: true
           });
-          expect(this.trigger.trigger).wasCalledWith('update:document', {
+          expect(this.store.trigger).wasCalledWith('create:document', {
+            id: '123',
+            type: 'document',
             name: 'test'
           }, {
             remote: true
           });
-          return expect(this.trigger.trigger).wasCalledWith('update:document:abc2', {
+          expect(this.store.trigger).wasCalledWith('change', 'create', {
+            id: '123',
+            type: 'document',
+            name: 'test'
+          }, {
+            remote: true
+          });
+          return expect(this.store.trigger).wasCalledWith('change:document', 'create', {
+            id: '123',
+            type: 'document',
             name: 'test'
           }, {
             remote: true
@@ -647,33 +664,78 @@ describe("Hoodie.LocalStore", function() {
     });
     _when("object can be found and destroy comes from remote", function() {
       beforeEach(function() {
-        return spyOn(this.store, "cache").andReturn({
-          _$syncedAt: 'now'
+        spyOn(this.store, "cache").andReturn({
+          id: '123',
+          type: 'document',
+          name: 'test'
         });
-      });
-      return it("should remove the object", function() {
-        this.store.destroy('document', '123', {
+        spyOn(this.store, "trigger");
+        return this.store.destroy('document', '123', {
           remote: true
         });
+      });
+      it("should remove the object", function() {
         return expect(this.store.db.removeItem).wasCalledWith('document/123');
+      });
+      return it("should trigger trigger events", function() {
+        expect(this.store.trigger).wasCalledWith('destroy', {
+          id: '123',
+          type: 'document',
+          name: 'test'
+        }, {
+          remote: true
+        });
+        expect(this.store.trigger).wasCalledWith('destroy:document', {
+          id: '123',
+          type: 'document',
+          name: 'test'
+        }, {
+          remote: true
+        });
+        expect(this.store.trigger).wasCalledWith('destroy:document:123', {
+          id: '123',
+          type: 'document',
+          name: 'test'
+        }, {
+          remote: true
+        });
+        expect(this.store.trigger).wasCalledWith('change', 'destroy', {
+          id: '123',
+          type: 'document',
+          name: 'test'
+        }, {
+          remote: true
+        });
+        expect(this.store.trigger).wasCalledWith('change:document', 'destroy', {
+          id: '123',
+          type: 'document',
+          name: 'test'
+        }, {
+          remote: true
+        });
+        return expect(this.store.trigger).wasCalledWith('change:document:123', 'destroy', {
+          id: '123',
+          type: 'document',
+          name: 'test'
+        }, {
+          remote: true
+        });
       });
     });
     return _when("object can be found and was synched before", function() {
       beforeEach(function() {
-        return spyOn(this.store, "cache").andReturn({
+        spyOn(this.store, "cache").andReturn({
           _$syncedAt: 'now'
         });
+        return this.store.destroy('document', '123');
       });
       it("should mark the object as deleted and cache it", function() {
-        var promise;
-        promise = this.store.destroy('document', '123');
         return expect(this.store.cache).wasCalledWith('document', '123', {
           _$syncedAt: 'now',
           _deleted: true
         });
       });
       return it("should not remove the object from store", function() {
-        this.store.destroy('document', '123');
         return expect(this.store.db.removeItem).wasNotCalled();
       });
     });
