@@ -86,7 +86,7 @@ describe("Hoodie.AccountRemoteStore", function() {
     });
     it("should unsubscribe from account's signin idle event", function() {
       this.remote.stopSyncing();
-      return expect(this.hoodie.unbind).wasCalledWith('account:signin', this.remote._handleSignIn);
+      return expect(this.hoodie.unbind).wasCalledWith('account:signin', this.remote.connect);
     });
     return it("should unsubscribe from account's signout idle event", function() {
       this.remote.stopSyncing();
@@ -146,7 +146,7 @@ describe("Hoodie.AccountRemoteStore", function() {
       return expect(this.hoodie.my.config.set).wasCalledWith('_remote.since', 100);
     });
   });
-  return describe("#push(docs)", function() {
+  describe("#push(docs)", function() {
     beforeEach(function() {
       return spyOn(Hoodie.RemoteStore.prototype, "push");
     });
@@ -156,6 +156,24 @@ describe("Hoodie.AccountRemoteStore", function() {
         this.remote.push();
         return expect(Hoodie.RemoteStore.prototype.push).wasCalledWith("changed_docs");
       });
+    });
+  });
+  describe("#on", function() {
+    return it("should namespace bindings with 'remote'", function() {
+      this.remote.on('funk', 'check');
+      return expect(this.hoodie.on).wasCalledWith('remote:funk', 'check');
+    });
+  });
+  describe("#one", function() {
+    return it("should namespace bindings with 'remote'", function() {
+      this.remote.one('funk', 'check');
+      return expect(this.hoodie.one).wasCalledWith('remote:funk', 'check');
+    });
+  });
+  return describe("#trigger", function() {
+    return it("should namespace bindings with 'remote'", function() {
+      this.remote.trigger('funk', 'check');
+      return expect(this.hoodie.trigger).wasCalledWith('remote:funk', 'check');
     });
   });
 });

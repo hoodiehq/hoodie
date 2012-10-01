@@ -49,7 +49,7 @@ class Hoodie.AccountRemoteStore extends Hoodie.RemoteStore
   stopSyncing : =>
     @hoodie.my.config.set '_remote.sync', @_sync = false
 
-    @hoodie.unbind 'account:signin',  @_handleSignIn
+    @hoodie.unbind 'account:signin',  @connect
     @hoodie.unbind 'account:signout', @disconnect
 
     @disconnect()
@@ -82,9 +82,13 @@ class Hoodie.AccountRemoteStore extends Hoodie.RemoteStore
     super(docs)
 
 
-  # Private
-  # ---------
+  # Events
+  # --------
 
-  _handleSignIn: =>
-    @name = @hoodie.my.account.db()
-    @connect()
+  # namespaced alias for `hoodie.on`
+  on  : (event, cb) -> @hoodie.on  "remote:#{event}", cb
+  one : (event, cb) -> @hoodie.one "remote:#{event}", cb
+  
+  # namespaced alias for `hoodie.trigger`
+  trigger : (event, parameters...) -> 
+    @hoodie.trigger "remote:#{event}", parameters...

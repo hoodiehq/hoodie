@@ -63,6 +63,7 @@ describe "Hoodie.AccountRemoteStore", ->
     it "should subscribe to account:signin with sync", ->
       @remote.startSyncing()
       expect(@hoodie.on).wasCalledWith 'account:signin', @remote._handleSignIn
+  # /#startSyncing()
       
 
   describe "#stopSyncing", ->
@@ -78,11 +79,12 @@ describe "Hoodie.AccountRemoteStore", ->
 
     it "should unsubscribe from account's signin idle event", ->
       @remote.stopSyncing()
-      expect(@hoodie.unbind).wasCalledWith 'account:signin', @remote._handleSignIn
+      expect(@hoodie.unbind).wasCalledWith 'account:signin', @remote.connect
       
     it "should unsubscribe from account's signout idle event", ->
       @remote.stopSyncing()
       expect(@hoodie.unbind).wasCalledWith 'account:signout', @remote.disconnect
+  # /#stopSyncing()
 
 
   describe "#connect()", ->
@@ -104,7 +106,7 @@ describe "Hoodie.AccountRemoteStore", ->
         spyOn(Hoodie.RemoteStore::, "connect")
         @remote.connect()
         expect(Hoodie.RemoteStore::connect).wasCalled()
-  # /.connect()
+  # /#connect()
 
 
   describe "#getSinceNr()", ->
@@ -121,7 +123,7 @@ describe "Hoodie.AccountRemoteStore", ->
 
       it "should return 0", ->
         expect(@remote.getSinceNr()).toBe 0
-  # /.getSinceNr()
+  # /#getSinceNr()
 
 
   describe "#setSinceNr(nr)", ->
@@ -131,7 +133,7 @@ describe "Hoodie.AccountRemoteStore", ->
     it "should use user's config to store since nr persistantly", ->
       @remote.setSinceNr(100)
       expect(@hoodie.my.config.set).wasCalledWith '_remote.since', 100
-  # /.setSinceNr()
+  # /#setSinceNr()
 
 
   describe "#push(docs)", -> 
@@ -143,5 +145,26 @@ describe "Hoodie.AccountRemoteStore", ->
         spyOn(@hoodie.my.store, "changedDocs").andReturn "changed_docs"
         @remote.push()
         expect(Hoodie.RemoteStore::push).wasCalledWith "changed_docs"
-  # /.push(docs)
+  # /#push(docs)
+
+
+  describe "#on", ->
+    it "should namespace bindings with 'remote'", ->
+      @remote.on 'funk', 'check'
+      expect(@hoodie.on).wasCalledWith 'remote:funk', 'check'
+  # /#on
+
+
+  describe "#one", ->
+    it "should namespace bindings with 'remote'", ->
+      @remote.one 'funk', 'check'
+      expect(@hoodie.one).wasCalledWith 'remote:funk', 'check'
+  # /#one
+
+
+  describe "#trigger", ->
+    it "should namespace bindings with 'remote'", ->
+      @remote.trigger 'funk', 'check'
+      expect(@hoodie.trigger).wasCalledWith 'remote:funk', 'check'
+  # /#trigger
 # /Hoodie.AccountRemoteStore

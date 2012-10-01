@@ -276,7 +276,7 @@ class Hoodie.RemoteStore extends Hoodie.Store
 
   
   # Events
-  # ----
+  # --------
 
   # namespaced alias for `hoodie.on`
   on  : (event, cb) -> @hoodie.on  "#{@name}:#{event}", cb
