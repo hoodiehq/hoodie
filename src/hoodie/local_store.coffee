@@ -88,17 +88,17 @@ class Hoodie.LocalStore extends Hoodie.Store
       defer.resolve( object, isNew ).promise()
 
       if isNew
-        @trigger "create",                          object, options
-        @trigger "create:#{object.type}",           object, options
-        @trigger "change",                'create', object, options
-        @trigger "change:#{object.type}", 'create', object, options
+        @trigger "create",                           object, options
+        @trigger "create:#{object.$type}",           object, options
+        @trigger "change",                 'create', object, options
+        @trigger "change:#{object.$type}", 'create', object, options
       else
-        @trigger "update",                                      object, options
-        @trigger "update:#{object.type}",                       object, options
-        @trigger "update:#{object.type}:{object.id}",           object, options
-        @trigger "change",                            'update', object, options
-        @trigger "change:#{object.type}",             'update', object, options
-        @trigger "change:#{object.type}:{object.id}", 'update', object, options
+        @trigger "update",                                        object, options
+        @trigger "update:#{object.$type}",                        object, options
+        @trigger "update:#{object.$type}:#{object.id}",           object, options
+        @trigger "change",                              'update', object, options
+        @trigger "change:#{object.$type}",              'update', object, options
+        @trigger "change:#{object.$type}:#{object.id}", 'update', object, options
     catch error
       defer.reject(error).promise()
   

@@ -72,7 +72,7 @@ describe("Hoodie.LocalStore", function() {
           spyOn(this.store, "trigger");
           this.store.cache.andReturn({
             id: '123',
-            type: 'document',
+            $type: 'document',
             name: 'test'
           });
           return this.store.save('document', '123', {
@@ -95,28 +95,28 @@ describe("Hoodie.LocalStore", function() {
         return it("should trigger trigger events", function() {
           expect(this.store.trigger).wasCalledWith('create', {
             id: '123',
-            type: 'document',
+            $type: 'document',
             name: 'test'
           }, {
             remote: true
           });
           expect(this.store.trigger).wasCalledWith('create:document', {
             id: '123',
-            type: 'document',
+            $type: 'document',
             name: 'test'
           }, {
             remote: true
           });
           expect(this.store.trigger).wasCalledWith('change', 'create', {
             id: '123',
-            type: 'document',
+            $type: 'document',
             name: 'test'
           }, {
             remote: true
           });
           return expect(this.store.trigger).wasCalledWith('change:document', 'create', {
             id: '123',
-            type: 'document',
+            $type: 'document',
             name: 'test'
           }, {
             remote: true
@@ -666,7 +666,7 @@ describe("Hoodie.LocalStore", function() {
       beforeEach(function() {
         spyOn(this.store, "cache").andReturn({
           id: '123',
-          type: 'document',
+          $type: 'document',
           name: 'test'
         });
         spyOn(this.store, "trigger");
@@ -680,42 +680,42 @@ describe("Hoodie.LocalStore", function() {
       return it("should trigger trigger events", function() {
         expect(this.store.trigger).wasCalledWith('destroy', {
           id: '123',
-          type: 'document',
+          $type: 'document',
           name: 'test'
         }, {
           remote: true
         });
         expect(this.store.trigger).wasCalledWith('destroy:document', {
           id: '123',
-          type: 'document',
+          $type: 'document',
           name: 'test'
         }, {
           remote: true
         });
         expect(this.store.trigger).wasCalledWith('destroy:document:123', {
           id: '123',
-          type: 'document',
+          $type: 'document',
           name: 'test'
         }, {
           remote: true
         });
         expect(this.store.trigger).wasCalledWith('change', 'destroy', {
           id: '123',
-          type: 'document',
+          $type: 'document',
           name: 'test'
         }, {
           remote: true
         });
         expect(this.store.trigger).wasCalledWith('change:document', 'destroy', {
           id: '123',
-          type: 'document',
+          $type: 'document',
           name: 'test'
         }, {
           remote: true
         });
         return expect(this.store.trigger).wasCalledWith('change:document:123', 'destroy', {
           id: '123',
-          type: 'document',
+          $type: 'document',
           name: 'test'
         }, {
           remote: true

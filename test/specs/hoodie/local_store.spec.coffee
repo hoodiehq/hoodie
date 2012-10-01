@@ -56,7 +56,7 @@ describe "Hoodie.LocalStore", ->
       _and "options.remote is true", ->
         beforeEach ->
           spyOn(@store, "trigger")
-          @store.cache.andReturn { id: '123', type: 'document', name: 'test'}
+          @store.cache.andReturn { id: '123', $type: 'document', name: 'test'}
           @store.save 'document', '123', { name: 'test' }, { remote: true }
         
         it "should not touch createdAt / updatedAt timestamps", ->
@@ -69,10 +69,10 @@ describe "Hoodie.LocalStore", ->
           expect(object._$syncedAt).toBe 'now'
 
         it "should trigger trigger events", ->
-          expect(@store.trigger).wasCalledWith 'create',                    { id: '123', type: 'document', name: 'test'}, { remote: true }
-          expect(@store.trigger).wasCalledWith 'create:document',           { id: '123', type: 'document', name: 'test'}, { remote: true }
-          expect(@store.trigger).wasCalledWith 'change',          'create', { id: '123', type: 'document', name: 'test'}, { remote: true }
-          expect(@store.trigger).wasCalledWith 'change:document', 'create', { id: '123', type: 'document', name: 'test'}, { remote: true }
+          expect(@store.trigger).wasCalledWith 'create',                    { id: '123', $type: 'document', name: 'test'}, { remote: true }
+          expect(@store.trigger).wasCalledWith 'create:document',           { id: '123', $type: 'document', name: 'test'}, { remote: true }
+          expect(@store.trigger).wasCalledWith 'change',          'create', { id: '123', $type: 'document', name: 'test'}, { remote: true }
+          expect(@store.trigger).wasCalledWith 'change:document', 'create', { id: '123', $type: 'document', name: 'test'}, { remote: true }
       
       _and "options.silent is true", ->
         beforeEach ->
@@ -451,7 +451,7 @@ describe "Hoodie.LocalStore", ->
     
     _when "object can be found and destroy comes from remote", ->
       beforeEach ->
-        spyOn(@store, "cache").andReturn { id: '123', type: 'document', name: 'test'}
+        spyOn(@store, "cache").andReturn { id: '123', $type: 'document', name: 'test'}
         spyOn(@store, "trigger")
         @store.destroy 'document', '123', remote: true
       
@@ -459,12 +459,12 @@ describe "Hoodie.LocalStore", ->
         expect(@store.db.removeItem).wasCalledWith 'document/123'
 
       it "should trigger trigger events", ->
-        expect(@store.trigger).wasCalledWith 'destroy',                         { id: '123', type: 'document', name: 'test'}, { remote: true }
-        expect(@store.trigger).wasCalledWith 'destroy:document',                { id: '123', type: 'document', name: 'test'}, { remote: true }
-        expect(@store.trigger).wasCalledWith 'destroy:document:123',            { id: '123', type: 'document', name: 'test'}, { remote: true }
-        expect(@store.trigger).wasCalledWith 'change',               'destroy', { id: '123', type: 'document', name: 'test'}, { remote: true }
-        expect(@store.trigger).wasCalledWith 'change:document',      'destroy', { id: '123', type: 'document', name: 'test'}, { remote: true } 
-        expect(@store.trigger).wasCalledWith 'change:document:123',  'destroy', { id: '123', type: 'document', name: 'test'}, { remote: true } 
+        expect(@store.trigger).wasCalledWith 'destroy',                         { id: '123', $type: 'document', name: 'test'}, { remote: true }
+        expect(@store.trigger).wasCalledWith 'destroy:document',                { id: '123', $type: 'document', name: 'test'}, { remote: true }
+        expect(@store.trigger).wasCalledWith 'destroy:document:123',            { id: '123', $type: 'document', name: 'test'}, { remote: true }
+        expect(@store.trigger).wasCalledWith 'change',               'destroy', { id: '123', $type: 'document', name: 'test'}, { remote: true }
+        expect(@store.trigger).wasCalledWith 'change:document',      'destroy', { id: '123', $type: 'document', name: 'test'}, { remote: true } 
+        expect(@store.trigger).wasCalledWith 'change:document:123',  'destroy', { id: '123', $type: 'document', name: 'test'}, { remote: true } 
         
     _when "object can be found and was synched before", ->
       beforeEach ->
