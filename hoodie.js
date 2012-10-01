@@ -1037,7 +1037,7 @@ Hoodie.RemoteStore = (function(_super) {
   RemoteStore.prototype.trigger = function() {
     var event, parameters, _ref;
     event = arguments[0], parameters = 2 <= arguments.length ? __slice.call(arguments, 1) : [];
-    return (_ref = this.hoodie).on.apply(_ref, ["" + this.name + ":" + event].concat(__slice.call(parameters)));
+    return (_ref = this.hoodie).trigger.apply(_ref, ["" + this.name + ":" + event].concat(__slice.call(parameters)));
   };
 
   RemoteStore.prototype._pullUrl = function() {

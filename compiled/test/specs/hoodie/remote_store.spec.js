@@ -4,6 +4,7 @@ describe("Hoodie.RemoteStore", function() {
   beforeEach(function() {
     this.hoodie = new Mocks.Hoodie;
     spyOn(this.hoodie, "on");
+    spyOn(this.hoodie, "trigger");
     spyOn(this.hoodie, "one");
     spyOn(this.hoodie, "unbind");
     this.requestDefer = this.hoodie.defer();
@@ -689,8 +690,8 @@ describe("Hoodie.RemoteStore", function() {
       var cb;
       cb = jasmine.createSpy('test');
       this.remote.name = 'databaseName';
-      this.remote.on('funky', cb);
-      return expect(this.hoodie.on).wasCalledWith('databaseName:funky', cb);
+      this.remote.trigger('funky', cb);
+      return expect(this.hoodie.trigger).wasCalledWith('databaseName:funky', cb);
     });
   });
 });

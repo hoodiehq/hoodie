@@ -2,6 +2,7 @@ describe "Hoodie.RemoteStore", ->
   beforeEach ->
     @hoodie = new Mocks.Hoodie 
     spyOn(@hoodie, "on")
+    spyOn(@hoodie, "trigger")
     spyOn(@hoodie, "one")
     spyOn(@hoodie, "unbind")
     @requestDefer = @hoodie.defer()
@@ -570,7 +571,7 @@ describe "Hoodie.RemoteStore", ->
     it "should namespace events with `name`", ->
       cb = jasmine.createSpy 'test'
       @remote.name = 'databaseName'
-      @remote.on 'funky', cb
-      expect(@hoodie.on).wasCalledWith 'databaseName:funky', cb
+      @remote.trigger 'funky', cb
+      expect(@hoodie.trigger).wasCalledWith 'databaseName:funky', cb
   # /#trigger(event, parameters...)
 # /Hoodie.RemoteStore

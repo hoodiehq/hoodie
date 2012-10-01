@@ -70,7 +70,7 @@ class Hoodie.AccountRemoteStore extends Hoodie.RemoteStore
   getSinceNr : (since) ->
     @hoodie.my.config.get('_remote.since') or 0
   setSinceNr : (since) ->
-    @hoodie.my.config.set '_remote.since', since
+    @hoodie.my.config.set('_remote.since', since)
 
 
   # ## push
