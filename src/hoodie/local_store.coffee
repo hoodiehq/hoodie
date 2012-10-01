@@ -3,10 +3,12 @@
 
 # window.localStrage wrapper and more
 #
-
 class Hoodie.LocalStore extends Hoodie.Store
 
-  # ## Constructor
+
+  # Constructor
+  # ---------
+
   #
   constructor : (@hoodie) ->
   
@@ -18,7 +20,7 @@ class Hoodie.LocalStore extends Hoodie.Store
         setItem    : -> null
         removeItem : -> null
         key        : -> null
-        length     : -> 0
+        length     : 0
         clear      : -> null
     
     # handle sign outs
@@ -34,8 +36,10 @@ class Hoodie.LocalStore extends Hoodie.Store
     length     : ()            -> window.localStorage.length
     clear      : ()            -> window.localStorage.clear()
 
-  # ## Save
-  #
+
+  # Save
+  # ------
+
   # saves the passed object into the store and replaces an eventually existing 
   # document with same type & id.
   #
@@ -89,8 +93,9 @@ class Hoodie.LocalStore extends Hoodie.Store
     return defer.promise()
   
   
-  # ## find
-  #
+  # find
+  # ------
+
   # loads one object from Store, specified by `type` and `id`
   #
   # example usage:
@@ -113,8 +118,9 @@ class Hoodie.LocalStore extends Hoodie.Store
     return defer.promise()
   
   
-  # ## findAll
-  #
+  # findAll
+  # ---------
+
   # returns all objects from store. 
   # Can be optionally filtered by a type or a function
   #
@@ -153,8 +159,9 @@ class Hoodie.LocalStore extends Hoodie.Store
     return defer.promise()
   
   
-  # ## Destroy
-  #
+  # Destroy
+  # ---------
+
   # Destroys one object specified by `type` and `id`. 
   # 
   # when object has been synced before, mark it as deleted. 
@@ -182,8 +189,9 @@ class Hoodie.LocalStore extends Hoodie.Store
     defer.resolve($.extend {}, object).promise()
   
   
-  # ## Cache
-  #
+  # Cache
+  # -------
+  
   # loads an object specified by `type` and `id` only once from localStorage 
   # and caches it for faster future access. Updates cache when `value` is passed.
   #
@@ -217,8 +225,9 @@ class Hoodie.LocalStore extends Hoodie.Store
       @_cached[key]
 
 
-  # ## Clear changed 
-  #
+  # Clear changed 
+  # ---------------
+
   # removes an object from the list of objects that are flagged to by synched (dirty)
   # and triggers a `store:dirty` event
   clearChanged : (type, id) ->
@@ -232,8 +241,9 @@ class Hoodie.LocalStore extends Hoodie.Store
     @hoodie.trigger 'store:dirty'
   
   
-  # ## Marked as deleted?
-  #
+  # Marked as deleted?
+  # --------------------
+
   # when an object gets deleted that has been synched before (`_rev` attribute),
   # it cannot be removed from store but gets a `_deleted: true` attribute
   isMarkedAsDeleted : (type, id) ->
@@ -241,7 +251,8 @@ class Hoodie.LocalStore extends Hoodie.Store
       
   
   # ## Mark as changed
-  #
+  # --------------------
+
   # Marks object as changed (dirty). Triggers a `store:dirty` event immediately and a 
   # `store:dirty:idle` event once there is no change within 2 seconds
   markAsChanged : (type, id, object) ->
@@ -257,8 +268,9 @@ class Hoodie.LocalStore extends Hoodie.Store
     ), timeout
     
 
-  # ## changed docs
-  #
+  # changed docs
+  # --------------
+
   # returns an Array of all dirty documents
   changedDocs : -> 
     for key, object of @_dirty
@@ -268,8 +280,9 @@ class Hoodie.LocalStore extends Hoodie.Store
       object
        
 
-  # ## Is dirty?
-  #
+  # Is dirty?
+  # ----------
+
   # When no arguments passed, returns `true` or `false` depending on if there are
   # dirty objects in the store.
   #
@@ -282,8 +295,9 @@ class Hoodie.LocalStore extends Hoodie.Store
     @_isDirty @cache(type, id)
 
 
-  # ## Clear
-  #
+  # Clear
+  # ------
+
   # clears localStorage and cache
   # TODO: do not clear entire localStorage, clear only item that have been stored before
   clear : =>
@@ -301,8 +315,9 @@ class Hoodie.LocalStore extends Hoodie.Store
     return defer.promise()
   
 
-  # ## Is persistant?
-  #
+  # Is persistant?
+  # ----------------
+
   # returns `true` or `false` depending on whether localStorage is supported or not.
   # Beware that some browsers like Safari do not support localStorage in private mode.
   #
@@ -335,8 +350,9 @@ class Hoodie.LocalStore extends Hoodie.Store
     return true
   
   
-  # ## UUID
-  #
+  # UUID
+  # ---------
+
   # helper to generate uuids.
   uuid : (len = 7) ->
     chars = '0123456789abcdefghijklmnopqrstuvwxyz'.split('')
@@ -344,8 +360,18 @@ class Hoodie.LocalStore extends Hoodie.Store
     (
       chars[ 0 | Math.random()*radix ] for i in [0...len]
     ).join('')
+
+
+  # trigger
+  # ---------
+
+  # proxies to hoodie.trigger
+  trigger : (event, data) ->
+    @hoodie.trigger "store:#{event}", data
+
   
-  # ## Private
+  # Private
+  # ---------
   
   # more advanced localStorage wrappers to find/store objects
   _setObject : (type, id, object) ->

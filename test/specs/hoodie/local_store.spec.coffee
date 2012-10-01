@@ -11,14 +11,14 @@ describe "Hoodie.LocalStore", ->
     spyOn(@store.db, "removeItem").andCallThrough()
     spyOn(@store.db, "clear").andCallThrough()
   
-  describe "new", ->
+  describe "constructor", ->
     it "should subscribe to account:signout event", ->
       spyOn(@hoodie, "on")
       store = new Hoodie.LocalStore @hoodie
       expect(@hoodie.on).wasCalledWith 'account:signout', store.clear
-  # /new
+  # /constructor
   
-  describe ".save(type, id, object, options)", ->
+  describe "#save(type, id, object, options)", ->
     beforeEach ->
       spyOn(@store, "_now").andReturn 'now'
       spyOn(@store, "cache").andReturn 'cachedObject'
@@ -54,20 +54,31 @@ describe "Hoodie.LocalStore", ->
         expect(options.option).toBe 'value'
       
       _and "options.remote is true", ->
-        it "should not touch createdAt / updatedAt timestamps", ->
+        beforeEach ->
           @store.save 'document', '123', { name: 'test' }, { remote: true }
+        
+        it "should not touch createdAt / updatedAt timestamps", ->
           object = @store.cache.mostRecentCall.args[2]
           expect(object.$createdAt).toBeUndefined()
           expect(object.$updatedAt).toBeUndefined()
           
         it "should add a _$syncedAt timestamp", ->
-          @store.save 'document', '123', { name: 'test' }, { remote: true }
           object = @store.cache.mostRecentCall.args[2]
           expect(object._$syncedAt).toBe 'now'
+
+        xit "should trigger trigger events", ->
+          spyOn(@trigger, "trigger")
+          @trigger.pull()
+          
+          expect(@trigger.trigger).wasCalledWith 'update',                { name: 'test' }, { remote: true }
+          expect(@trigger.trigger).wasCalledWith 'update:document',       { name: 'test' }, { remote: true }
+          expect(@trigger.trigger).wasCalledWith 'update:document:abc2',  { name: 'test' }, { remote: true }
       
       _and "options.silent is true", ->
-        it "should not touch createdAt / updatedAt timestamps", ->
+        beforeEach ->
           @store.save 'document', '123', { name: 'test' }, { silent: true }
+        
+        it "should not touch createdAt / updatedAt timestamps", ->
           object = @store.cache.mostRecentCall.args[2]
           expect(object.$createdAt).toBeUndefined()
           expect(object.$updatedAt).toBeUndefined()
@@ -202,7 +213,7 @@ describe "Hoodie.LocalStore", ->
       
   # /.save(type, id, object, options)
   
-  describe ".create(type, object, options)", ->
+  describe "#create(type, object, options)", ->
     beforeEach ->
       spyOn(@store, "save").andReturn 'promise'
     
@@ -212,7 +223,7 @@ describe "Hoodie.LocalStore", ->
       expect(promise).toBe 'promise'
   # /.create(type, object, options)
   
-  describe ".update(type, id, update, options)", ->
+  describe "#update(type, id, update, options)", ->
     beforeEach ->
       spyOn(@store, "find")
       spyOn(@store, "save").andReturn then: ->
@@ -263,7 +274,7 @@ describe "Hoodie.LocalStore", ->
         
   # /.update(type, id, update, options)
   
-  describe ".updateAll(objects)", ->
+  describe "#updateAll(objects)", ->
     beforeEach ->
       spyOn(@hoodie, "isPromise").andReturn false
       @todoObjects = [
@@ -304,7 +315,7 @@ describe "Hoodie.LocalStore", ->
           expect(@store.update).wasCalledWith obj.type, obj.id, {funky: 'update'}, {}
   # /.updateAll(objects)
 
-  describe ".find(type, id)", ->
+  describe "#find(type, id)", ->
     beforeEach ->
       spyOn(@store, "cache").andCallThrough()
     
@@ -345,7 +356,7 @@ describe "Hoodie.LocalStore", ->
       expect(@store.db.getItem.callCount).toBe 1
   # /.get(type, id)
 
-  describe ".findAll(filter)", ->
+  describe "#findAll(filter)", ->
     with_2CatsAnd_3Dogs = (specs) ->
       _and "two cat and three dog objects exist in the store", ->
         beforeEach ->
@@ -399,7 +410,7 @@ describe "Hoodie.LocalStore", ->
           expect(results.length).toBe 2   
   # /.findAll(type)
 
-  describe ".destroy(type, id)", ->
+  describe "#destroy(type, id)", ->
     _when "objecet cannot be found", ->
       beforeEach ->
         spyOn(@store, "cache").andReturn false
@@ -456,7 +467,7 @@ describe "Hoodie.LocalStore", ->
         expect(@store.db.removeItem).wasNotCalled()
   # /.destroy(type, id)
 
-  describe ".cache(type, id, object)", ->
+  describe "#cache(type, id, object)", ->
     beforeEach ->
       spyOn(@store, "markAsChanged")
       spyOn(@store, "clearChanged")
@@ -543,7 +554,7 @@ describe "Hoodie.LocalStore", ->
     
   # /.cache(type, id, object)
 
-  describe ".clear()", ->
+  describe "#clear()", ->
     
     it "should return a promise", ->
       promise = @store.clear()
@@ -576,7 +587,7 @@ describe "Hoodie.LocalStore", ->
         expect(promise).toBeRejected()
   # /.clear()
 
-  describe ".isDirty(type, id)", ->
+  describe "#isDirty(type, id)", ->
     _when "no arguments passed", ->
       it "returns true when there are no dirty documents", ->
         @store._dirty ={}
@@ -619,7 +630,7 @@ describe "Hoodie.LocalStore", ->
             do expect(@store.isDirty 'couch', '123').toBeTruthy
   # /.isDirty(type, id)
   
-  describe ".markAsChanged(type, id, object)", ->
+  describe "#markAsChanged(type, id, object)", ->
     beforeEach ->
       @store._dirty = {}
       
@@ -645,7 +656,7 @@ describe "Hoodie.LocalStore", ->
       expect(window.clearTimeout).wasCalledWith 'timeout'
   # /.markAsChanged(type, id, object)
   
-  describe ".changedDocs()", ->
+  describe "#changedDocs()", ->
     _when "there are no changed docs", ->
       beforeEach ->
         @store._dirty = {}
@@ -670,7 +681,7 @@ describe "Hoodie.LocalStore", ->
         expect(doc1.id).toBe '123'
   # /.changedDocs()
 
-  describe ".isMarkedAsDeleted(type, id)", ->
+  describe "#isMarkedAsDeleted(type, id)", ->
     _when "object 'couch/123' is marked as deleted", ->
       beforeEach ->
         spyOn(@store, "cache").andReturn _deleted: true
@@ -686,7 +697,7 @@ describe "Hoodie.LocalStore", ->
         expect(@store.isMarkedAsDeleted('couch', '123')).toBeFalsy()
   # /.isMarkedAsDeleted(type, id)
 
-  describe ".clearChanged(type, id)", ->
+  describe "#clearChanged(type, id)", ->
     _when "type & id passed", ->
       it "should remove the respective object from the dirty list", ->
         @store._dirty['couch/123'] = {color: 'red'}
@@ -706,4 +717,13 @@ describe "Hoodie.LocalStore", ->
       @store.clearChanged()
       expect(@hoodie.trigger).wasCalledWith 'store:dirty'
   # /.clearChanged()
+
+  describe "#trigger", ->
+    beforeEach ->
+      spyOn(@hoodie, "trigger")
+    
+    it "should proxy to hoodie.trigger with 'store' namespace", ->
+       @store.trigger 'event', funky: 'fresh'
+       expect(@hoodie.trigger).wasCalledWith 'store:event', funky: 'fresh'
+  # /#trigger
 # /Hoodie.LocalStore

@@ -11,7 +11,7 @@ describe("Hoodie.LocalStore", function() {
     spyOn(this.store.db, "removeItem").andCallThrough();
     return spyOn(this.store.db, "clear").andCallThrough();
   });
-  describe("new", function() {
+  describe("constructor", function() {
     return it("should subscribe to account:signout event", function() {
       var store;
       spyOn(this.hoodie, "on");
@@ -19,7 +19,7 @@ describe("Hoodie.LocalStore", function() {
       return expect(this.hoodie.on).wasCalledWith('account:signout', store.clear);
     });
   });
-  describe(".save(type, id, object, options)", function() {
+  describe("#save(type, id, object, options)", function() {
     beforeEach(function() {
       spyOn(this.store, "_now").andReturn('now');
       return spyOn(this.store, "cache").andReturn('cachedObject');
@@ -68,36 +68,54 @@ describe("Hoodie.LocalStore", function() {
         return expect(options.option).toBe('value');
       });
       _and("options.remote is true", function() {
-        it("should not touch createdAt / updatedAt timestamps", function() {
-          var object;
-          this.store.save('document', '123', {
+        beforeEach(function() {
+          return this.store.save('document', '123', {
             name: 'test'
           }, {
             remote: true
           });
+        });
+        it("should not touch createdAt / updatedAt timestamps", function() {
+          var object;
           object = this.store.cache.mostRecentCall.args[2];
           expect(object.$createdAt).toBeUndefined();
           return expect(object.$updatedAt).toBeUndefined();
         });
-        return it("should add a _$syncedAt timestamp", function() {
+        it("should add a _$syncedAt timestamp", function() {
           var object;
-          this.store.save('document', '123', {
+          object = this.store.cache.mostRecentCall.args[2];
+          return expect(object._$syncedAt).toBe('now');
+        });
+        return xit("should trigger trigger events", function() {
+          spyOn(this.trigger, "trigger");
+          this.trigger.pull();
+          expect(this.trigger.trigger).wasCalledWith('update', {
             name: 'test'
           }, {
             remote: true
           });
-          object = this.store.cache.mostRecentCall.args[2];
-          return expect(object._$syncedAt).toBe('now');
+          expect(this.trigger.trigger).wasCalledWith('update:document', {
+            name: 'test'
+          }, {
+            remote: true
+          });
+          return expect(this.trigger.trigger).wasCalledWith('update:document:abc2', {
+            name: 'test'
+          }, {
+            remote: true
+          });
         });
       });
       _and("options.silent is true", function() {
-        return it("should not touch createdAt / updatedAt timestamps", function() {
-          var object;
-          this.store.save('document', '123', {
+        beforeEach(function() {
+          return this.store.save('document', '123', {
             name: 'test'
           }, {
             silent: true
           });
+        });
+        return it("should not touch createdAt / updatedAt timestamps", function() {
+          var object;
           object = this.store.cache.mostRecentCall.args[2];
           expect(object.$createdAt).toBeUndefined();
           return expect(object.$updatedAt).toBeUndefined();
@@ -293,7 +311,7 @@ describe("Hoodie.LocalStore", function() {
       });
     });
   });
-  describe(".create(type, object, options)", function() {
+  describe("#create(type, object, options)", function() {
     beforeEach(function() {
       return spyOn(this.store, "save").andReturn('promise');
     });
@@ -308,7 +326,7 @@ describe("Hoodie.LocalStore", function() {
       return expect(promise).toBe('promise');
     });
   });
-  describe(".update(type, id, update, options)", function() {
+  describe("#update(type, id, update, options)", function() {
     beforeEach(function() {
       spyOn(this.store, "find");
       return spyOn(this.store, "save").andReturn({
@@ -388,7 +406,7 @@ describe("Hoodie.LocalStore", function() {
       });
     });
   });
-  describe(".updateAll(objects)", function() {
+  describe("#updateAll(objects)", function() {
     beforeEach(function() {
       spyOn(this.hoodie, "isPromise").andReturn(false);
       return this.todoObjects = [
@@ -463,7 +481,7 @@ describe("Hoodie.LocalStore", function() {
       });
     });
   });
-  describe(".find(type, id)", function() {
+  describe("#find(type, id)", function() {
     beforeEach(function() {
       return spyOn(this.store, "cache").andCallThrough();
     });
@@ -512,7 +530,7 @@ describe("Hoodie.LocalStore", function() {
       return expect(this.store.db.getItem.callCount).toBe(1);
     });
   });
-  describe(".findAll(filter)", function() {
+  describe("#findAll(filter)", function() {
     var with_2CatsAnd_3Dogs;
     with_2CatsAnd_3Dogs = function(specs) {
       return _and("two cat and three dog objects exist in the store", function() {
@@ -584,7 +602,7 @@ describe("Hoodie.LocalStore", function() {
       });
     });
   });
-  describe(".destroy(type, id)", function() {
+  describe("#destroy(type, id)", function() {
     _when("objecet cannot be found", function() {
       beforeEach(function() {
         return spyOn(this.store, "cache").andReturn(false);
@@ -660,7 +678,7 @@ describe("Hoodie.LocalStore", function() {
       });
     });
   });
-  describe(".cache(type, id, object)", function() {
+  describe("#cache(type, id, object)", function() {
     beforeEach(function() {
       spyOn(this.store, "markAsChanged");
       spyOn(this.store, "clearChanged");
@@ -780,7 +798,7 @@ describe("Hoodie.LocalStore", function() {
       return expect(obj.id).toBe('123');
     });
   });
-  describe(".clear()", function() {
+  describe("#clear()", function() {
     it("should return a promise", function() {
       var promise;
       promise = this.store.clear();
@@ -818,7 +836,7 @@ describe("Hoodie.LocalStore", function() {
       });
     });
   });
-  describe(".isDirty(type, id)", function() {
+  describe("#isDirty(type, id)", function() {
     _when("no arguments passed", function() {
       return it("returns true when there are no dirty documents", function() {
         this.store._dirty = {};
@@ -873,7 +891,7 @@ describe("Hoodie.LocalStore", function() {
       });
     });
   });
-  describe(".markAsChanged(type, id, object)", function() {
+  describe("#markAsChanged(type, id, object)", function() {
     beforeEach(function() {
       this.store._dirty = {};
       spyOn(window, "setTimeout").andReturn('newTimeout');
@@ -903,7 +921,7 @@ describe("Hoodie.LocalStore", function() {
       return expect(window.clearTimeout).wasCalledWith('timeout');
     });
   });
-  describe(".changedDocs()", function() {
+  describe("#changedDocs()", function() {
     _when("there are no changed docs", function() {
       beforeEach(function() {
         return this.store._dirty = {};
@@ -935,7 +953,7 @@ describe("Hoodie.LocalStore", function() {
       });
     });
   });
-  describe(".isMarkedAsDeleted(type, id)", function() {
+  describe("#isMarkedAsDeleted(type, id)", function() {
     _when("object 'couch/123' is marked as deleted", function() {
       beforeEach(function() {
         return spyOn(this.store, "cache").andReturn({
@@ -955,7 +973,7 @@ describe("Hoodie.LocalStore", function() {
       });
     });
   });
-  return describe(".clearChanged(type, id)", function() {
+  describe("#clearChanged(type, id)", function() {
     _when("type & id passed", function() {
       return it("should remove the respective object from the dirty list", function() {
         this.store._dirty['couch/123'] = {
@@ -983,6 +1001,19 @@ describe("Hoodie.LocalStore", function() {
       spyOn(this.hoodie, "trigger");
       this.store.clearChanged();
       return expect(this.hoodie.trigger).wasCalledWith('store:dirty');
+    });
+  });
+  return describe("#trigger", function() {
+    beforeEach(function() {
+      return spyOn(this.hoodie, "trigger");
+    });
+    return it("should proxy to hoodie.trigger with 'store' namespace", function() {
+      this.store.trigger('event', {
+        funky: 'fresh'
+      });
+      return expect(this.hoodie.trigger).wasCalledWith('store:event', {
+        funky: 'fresh'
+      });
     });
   });
 });

@@ -25,9 +25,7 @@ Hoodie.LocalStore = (function(_super) {
         key: function() {
           return null;
         },
-        length: function() {
-          return 0;
-        },
+        length: 0,
         clear: function() {
           return null;
         }
@@ -314,6 +312,10 @@ Hoodie.LocalStore = (function(_super) {
       }
       return _results;
     })()).join('');
+  };
+
+  LocalStore.prototype.trigger = function(event, data) {
+    return this.hoodie.trigger("store:" + event, data);
   };
 
   LocalStore.prototype._setObject = function(type, id, object) {
