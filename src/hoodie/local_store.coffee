@@ -449,8 +449,8 @@ class Hoodie.LocalStore extends Hoodie.Store
   # is dirty?
   _isDirty : (object) ->
     
-    return true  unless object._$syncedAt # no syncedAt? uuhh, that's dirty.
     return false unless object.$updatedAt # no updatedAt? no dirt then
+    return true  unless object._$syncedAt # no syncedAt? uuhh, that's dirty.
   
     object._$syncedAt.getTime() < object.$updatedAt.getTime()
 

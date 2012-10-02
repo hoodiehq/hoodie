@@ -606,11 +606,19 @@ describe "Hoodie.LocalStore", ->
         
     _when "type & id passed", ->
       _and "object was not yet synced", ->
-        beforeEach ->
-          spyOn(@store, "cache").andReturn _$syncedAt: undefined
-        
-        it "should return true", ->
-          do expect(@store.isDirty 'couch', '123').toBeTruthy
+        _and "object has saved with silent:true option", ->
+          beforeEach ->
+            spyOn(@store, "cache").andReturn _$syncedAt: undefined, $updatedAt: undefined
+                
+          it "should return false", ->
+            expect(@store.isDirty 'couch', '123').toBe false
+
+        _and "object has been saved without silent:true option", ->
+          beforeEach ->
+            spyOn(@store, "cache").andReturn _$syncedAt: undefined, $updatedAt: new Date(0)
+                
+          it "should return true", ->
+            expect(@store.isDirty 'couch', '123').toBe true
       
       _and "object was synced", ->
         _and "object was not updated yet", ->

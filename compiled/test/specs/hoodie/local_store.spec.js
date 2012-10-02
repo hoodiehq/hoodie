@@ -907,13 +907,27 @@ describe("Hoodie.LocalStore", function() {
     });
     return _when("type & id passed", function() {
       _and("object was not yet synced", function() {
-        beforeEach(function() {
-          return spyOn(this.store, "cache").andReturn({
-            _$syncedAt: void 0
+        _and("object has saved with silent:true option", function() {
+          beforeEach(function() {
+            return spyOn(this.store, "cache").andReturn({
+              _$syncedAt: void 0,
+              $updatedAt: void 0
+            });
+          });
+          return it("should return false", function() {
+            return expect(this.store.isDirty('couch', '123')).toBe(false);
           });
         });
-        return it("should return true", function() {
-          return expect(this.store.isDirty('couch', '123')).toBeTruthy();
+        return _and("object has been saved without silent:true option", function() {
+          beforeEach(function() {
+            return spyOn(this.store, "cache").andReturn({
+              _$syncedAt: void 0,
+              $updatedAt: new Date(0)
+            });
+          });
+          return it("should return true", function() {
+            return expect(this.store.isDirty('couch', '123')).toBe(true);
+          });
         });
       });
       return _and("object was synced", function() {
