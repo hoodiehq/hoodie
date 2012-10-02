@@ -274,17 +274,16 @@ class Hoodie.LocalStore extends Hoodie.Store
   # --------------------
 
   # Marks object as changed (dirty). Triggers a `store:dirty` event immediately and a 
-  # `store:dirty:idle` event once there is no change within 2 seconds
+  # `store:idle` event once there is no change within 2 seconds
   markAsChanged : (type, id, object) ->
     key = "#{type}/#{id}"
     
     @_dirty[key] = object
-    @hoodie.trigger 'store:dirty'
 
-    timeout = 2000 # 2 seconds timout before triggering the `store:dirty:idle` event
+    timeout = 2000 # 2 seconds timout before triggering the `store:idle` event
     window.clearTimeout @_dirtyTimeout
     @_dirtyTimeout = window.setTimeout ( =>
-      @hoodie.trigger 'store:dirty:idle'
+      @hoodie.trigger 'store:idle'
     ), timeout
     
 

@@ -258,11 +258,10 @@ Hoodie.LocalStore = (function(_super) {
       _this = this;
     key = "" + type + "/" + id;
     this._dirty[key] = object;
-    this.hoodie.trigger('store:dirty');
     timeout = 2000;
     window.clearTimeout(this._dirtyTimeout);
     return this._dirtyTimeout = window.setTimeout((function() {
-      return _this.hoodie.trigger('store:dirty:idle');
+      return _this.hoodie.trigger('store:idle');
     }), timeout);
   };
 

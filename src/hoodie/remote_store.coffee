@@ -182,7 +182,7 @@ class Hoodie.RemoteStore extends Hoodie.Store
     @connected = false
     
     # binding comes from @sync
-    @hoodie.unbind 'store:dirty:idle',   @push
+    @hoodie.unbind 'store:idle',   @push
     
     @_pullRequest?.abort()
     @_pushRequest?.abort()
@@ -273,8 +273,8 @@ class Hoodie.RemoteStore extends Hoodie.Store
   # pull ... and push ;-)
   sync : (docs) =>
     if @isContinuouslyPushing()
-      @hoodie.unbind 'store:dirty:idle', @push
-      @hoodie.on     'store:dirty:idle', @push
+      @hoodie.unbind 'store:idle', @push
+      @hoodie.on     'store:idle', @push
     
     @push(docs).pipe @pull
 

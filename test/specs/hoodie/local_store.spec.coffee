@@ -653,9 +653,6 @@ describe "Hoodie.LocalStore", ->
     it "should add it to the dirty list", ->
       expect(@store._dirty['couch/123'].color).toBe 'red'
       
-    it "should should trigger an `store:dirty` event", ->
-      expect(@hoodie.trigger).wasCalledWith 'store:dirty'
-      
     it "should start dirty timeout for 2 seconds", ->
       args = window.setTimeout.mostRecentCall.args
       expect(args[1]).toBe 2000
@@ -722,11 +719,6 @@ describe "Hoodie.LocalStore", ->
           'couch/456': color: 'green'
         @store.clearChanged()
         do expect($.isEmptyObject @store._dirty).toBeTruthy
-      
-    it "should trigger a `store:dirty` event", ->
-      spyOn(@hoodie, "trigger")
-      @store.clearChanged()
-      expect(@hoodie.trigger).wasCalledWith 'store:dirty'
   # /.clearChanged()
 
   describe "#trigger", ->

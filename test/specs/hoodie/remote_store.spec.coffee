@@ -208,7 +208,7 @@ describe "Hoodie.RemoteStore", ->
       
     it "should unsubscribe from stores's dirty idle event", ->
       @remote.disconnect()
-      expect(@hoodie.unbind).wasCalledWith 'store:dirty:idle', @remote.push
+      expect(@hoodie.unbind).wasCalledWith 'store:idle', @remote.push
   # /#disconnect()
 
   describe "#isContinuouslyPulling()", ->
@@ -542,17 +542,17 @@ describe "Hoodie.RemoteStore", ->
       beforeEach ->
         spyOn(@remote, "isContinuouslyPushing").andReturn true
         
-      it "should bind to store:dirty:idle event", ->
+      it "should bind to store:idle event", ->
         @remote.sync()
-        expect(@hoodie.on).wasCalledWith 'store:dirty:idle', @remote.push
+        expect(@hoodie.on).wasCalledWith 'store:idle', @remote.push
         
-      it "should unbind from store:dirty:idle event before it binds to it", ->
+      it "should unbind from store:idle event before it binds to it", ->
         order = []
         @hoodie.unbind.andCallFake (event) -> order.push "unbind #{event}"
         @hoodie.on.andCallFake (event) -> order.push "bind #{event}"
         @remote.sync()
-        expect(order[0]).toBe 'unbind store:dirty:idle'
-        expect(order[1]).toBe 'bind store:dirty:idle'
+        expect(order[0]).toBe 'unbind store:idle'
+        expect(order[1]).toBe 'bind store:idle'
   # /#sync(docs)
 
 

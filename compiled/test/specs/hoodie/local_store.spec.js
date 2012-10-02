@@ -966,9 +966,6 @@ describe("Hoodie.LocalStore", function() {
     it("should add it to the dirty list", function() {
       return expect(this.store._dirty['couch/123'].color).toBe('red');
     });
-    it("should should trigger an `store:dirty` event", function() {
-      return expect(this.hoodie.trigger).wasCalledWith('store:dirty');
-    });
     it("should start dirty timeout for 2 seconds", function() {
       var args;
       args = window.setTimeout.mostRecentCall.args;
@@ -1045,7 +1042,7 @@ describe("Hoodie.LocalStore", function() {
         return expect(this.store._dirty['couch/123']).toBeUndefined();
       });
     });
-    _when("no arguments passed", function() {
+    return _when("no arguments passed", function() {
       return it("should remove all objects from the dirty list", function() {
         this.store._dirty = {
           'couch/123': {
@@ -1058,11 +1055,6 @@ describe("Hoodie.LocalStore", function() {
         this.store.clearChanged();
         return expect($.isEmptyObject(this.store._dirty)).toBeTruthy();
       });
-    });
-    return it("should trigger a `store:dirty` event", function() {
-      spyOn(this.hoodie, "trigger");
-      this.store.clearChanged();
-      return expect(this.hoodie.trigger).wasCalledWith('store:dirty');
     });
   });
   describe("#trigger", function() {

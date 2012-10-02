@@ -196,16 +196,16 @@ it cannot be removed from store but gets a <code>_deleted: true</code> attribute
   </div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h2 id="mark-as-changed">Mark as changed</h2>
 
 <p>Marks object as changed (dirty). Triggers a <code>store:dirty</code> event immediately and a 
-<code>store:dirty:idle</code> event once there is no change within 2 seconds</p></div></div><div class="code"><div class="wrapper">  <span class="nv">markAsChanged : </span><span class="nf">(type, id, object) -&gt;</span>
+<code>store:idle</code> event once there is no change within 2 seconds</p></div></div><div class="code"><div class="wrapper">  <span class="nv">markAsChanged : </span><span class="nf">(type, id, object) -&gt;</span>
     <span class="nv">key = </span><span class="s2">&quot;#{type}/#{id}&quot;</span>
     
     <span class="nx">@_dirty</span><span class="p">[</span><span class="nx">key</span><span class="p">]</span> <span class="o">=</span> <span class="nx">object</span>
     <span class="nx">@hoodie</span><span class="p">.</span><span class="nx">trigger</span> <span class="s1">&#39;store:dirty&#39;</span>
 
-    <span class="nv">timeout = </span><span class="mi">2000</span> <span class="c1"># 2 seconds timout before triggering the `store:dirty:idle` event</span>
+    <span class="nv">timeout = </span><span class="mi">2000</span> <span class="c1"># 2 seconds timout before triggering the `store:idle` event</span>
     <span class="nb">window</span><span class="p">.</span><span class="nx">clearTimeout</span> <span class="nx">@_dirtyTimeout</span>
     <span class="vi">@_dirtyTimeout = </span><span class="nb">window</span><span class="p">.</span><span class="nx">setTimeout</span> <span class="p">(</span> <span class="o">=&gt;</span>
-      <span class="nx">@hoodie</span><span class="p">.</span><span class="nx">trigger</span> <span class="s1">&#39;store:dirty:idle&#39;</span>
+      <span class="nx">@hoodie</span><span class="p">.</span><span class="nx">trigger</span> <span class="s1">&#39;store:idle&#39;</span>
     <span class="p">),</span> <span class="nx">timeout</span>
     </div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h2 id="changed-docs">changed docs</h2>
 

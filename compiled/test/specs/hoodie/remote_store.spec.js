@@ -225,7 +225,7 @@ describe("Hoodie.RemoteStore", function() {
     });
     return it("should unsubscribe from stores's dirty idle event", function() {
       this.remote.disconnect();
-      return expect(this.hoodie.unbind).wasCalledWith('store:dirty:idle', this.remote.push);
+      return expect(this.hoodie.unbind).wasCalledWith('store:idle', this.remote.push);
     });
   });
   describe("#isContinuouslyPulling()", function() {
@@ -657,11 +657,11 @@ describe("Hoodie.RemoteStore", function() {
       beforeEach(function() {
         return spyOn(this.remote, "isContinuouslyPushing").andReturn(true);
       });
-      it("should bind to store:dirty:idle event", function() {
+      it("should bind to store:idle event", function() {
         this.remote.sync();
-        return expect(this.hoodie.on).wasCalledWith('store:dirty:idle', this.remote.push);
+        return expect(this.hoodie.on).wasCalledWith('store:idle', this.remote.push);
       });
-      return it("should unbind from store:dirty:idle event before it binds to it", function() {
+      return it("should unbind from store:idle event before it binds to it", function() {
         var order;
         order = [];
         this.hoodie.unbind.andCallFake(function(event) {
@@ -671,8 +671,8 @@ describe("Hoodie.RemoteStore", function() {
           return order.push("bind " + event);
         });
         this.remote.sync();
-        expect(order[0]).toBe('unbind store:dirty:idle');
-        return expect(order[1]).toBe('bind store:dirty:idle');
+        expect(order[0]).toBe('unbind store:idle');
+        return expect(order[1]).toBe('bind store:idle');
       });
     });
   });
