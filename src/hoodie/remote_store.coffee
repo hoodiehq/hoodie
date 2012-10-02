@@ -284,7 +284,8 @@ class Hoodie.RemoteStore extends Hoodie.Store
   
   # namespaced alias for `hoodie.trigger`
   trigger : (event, parameters...) -> 
-    @hoodie.trigger "#{@name}:#{event}", parameters...
+    event = event.replace /(^| )([^ ]+)/g, "$1#{@name}:$2"
+    @hoodie.trigger event, parameters...
 
 
   

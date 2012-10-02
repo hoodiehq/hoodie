@@ -388,8 +388,9 @@ class Hoodie.LocalStore extends Hoodie.Store
   # ---------
 
   # proxies to hoodie.trigger
-  trigger : (event, data) ->
-    @hoodie.trigger "store:#{event}", data
+  trigger : (event, parameters...) ->
+    event = event.replace /(^| )([^ ]+)/g, "$1store:$2"
+    @hoodie.trigger event, parameters...
 
   # on
   # ---------

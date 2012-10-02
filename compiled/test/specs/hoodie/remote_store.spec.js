@@ -686,12 +686,19 @@ describe("Hoodie.RemoteStore", function() {
     });
   });
   return describe("#trigger(event, parameters...)", function() {
-    return it("should namespace events with `name`", function() {
+    it("should namespace events with `name`", function() {
       var cb;
       cb = jasmine.createSpy('test');
       this.remote.name = 'databaseName';
       this.remote.trigger('funky', cb);
       return expect(this.hoodie.trigger).wasCalledWith('databaseName:funky', cb);
+    });
+    return it("should namespace multiple events correctly", function() {
+      var cb;
+      cb = jasmine.createSpy('test');
+      this.remote.name = 'databaseName';
+      this.remote.trigger('super funky fresh', cb);
+      return expect(this.hoodie.trigger).wasCalledWith('databaseName:super databaseName:funky databaseName:fresh', cb);
     });
   });
 });
