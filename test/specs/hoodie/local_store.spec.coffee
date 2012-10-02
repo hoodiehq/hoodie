@@ -737,4 +737,13 @@ describe "Hoodie.LocalStore", ->
        @store.trigger 'event', funky: 'fresh'
        expect(@hoodie.trigger).wasCalledWith 'store:event', funky: 'fresh'
   # /#trigger
+
+  describe "#on", ->
+    beforeEach ->
+      spyOn(@hoodie, "on")
+    
+    it "should proxy to hoodie.on with 'store' namespace", ->
+       @store.on 'event', funky: 'fresh'
+       expect(@hoodie.on).wasCalledWith 'store:event', funky: 'fresh'
+  # /#trigger
 # /Hoodie.LocalStore

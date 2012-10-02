@@ -337,6 +337,10 @@ Hoodie.LocalStore = (function(_super) {
     return this.hoodie.trigger("store:" + event, data);
   };
 
+  LocalStore.prototype.on = function(event, data) {
+    return this.hoodie.on("store:" + event, data);
+  };
+
   LocalStore.prototype._setObject = function(type, id, object) {
     var key, store;
     key = "" + type + "/" + id;

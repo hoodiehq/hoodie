@@ -389,6 +389,13 @@ class Hoodie.LocalStore extends Hoodie.Store
   trigger : (event, data) ->
     @hoodie.trigger "store:#{event}", data
 
+  # on
+  # ---------
+
+  # proxies to hoodie.on
+  on : (event, data) ->
+    @hoodie.on "store:#{event}", data
+
   
   # Private
   # ---------

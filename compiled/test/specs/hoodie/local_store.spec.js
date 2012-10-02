@@ -1065,7 +1065,7 @@ describe("Hoodie.LocalStore", function() {
       return expect(this.hoodie.trigger).wasCalledWith('store:dirty');
     });
   });
-  return describe("#trigger", function() {
+  describe("#trigger", function() {
     beforeEach(function() {
       return spyOn(this.hoodie, "trigger");
     });
@@ -1074,6 +1074,19 @@ describe("Hoodie.LocalStore", function() {
         funky: 'fresh'
       });
       return expect(this.hoodie.trigger).wasCalledWith('store:event', {
+        funky: 'fresh'
+      });
+    });
+  });
+  return describe("#on", function() {
+    beforeEach(function() {
+      return spyOn(this.hoodie, "on");
+    });
+    return it("should proxy to hoodie.on with 'store' namespace", function() {
+      this.store.on('event', {
+        funky: 'fresh'
+      });
+      return expect(this.hoodie.on).wasCalledWith('store:event', {
         funky: 'fresh'
       });
     });
