@@ -67,18 +67,19 @@ Hoodie.AccountRemoteStore = (function(_super) {
   };
 
   AccountRemoteStore.prototype.on = function(event, cb) {
-    return this.hoodie.on("remote:" + event, cb);
+    event = event.replace(/(^| )([^ ]+)/g, "$1remote:$2");
+    return this.hoodie.on(event, cb);
   };
 
   AccountRemoteStore.prototype.one = function(event, cb) {
-    return this.hoodie.one("remote:" + event, cb);
+    event = event.replace(/(^| )([^ ]+)/g, "$1remote:$2");
+    return this.hoodie.one(event, cb);
   };
 
   AccountRemoteStore.prototype.trigger = function() {
     var event, parameters, _ref;
     event = arguments[0], parameters = 2 <= arguments.length ? __slice.call(arguments, 1) : [];
-    event = event.replace(/(^| )([^ ]+)/g, "$1remote:$2");
-    return (_ref = this.hoodie).trigger.apply(_ref, [event].concat(__slice.call(parameters)));
+    return (_ref = this.hoodie).trigger.apply(_ref, ["remote:" + event].concat(__slice.call(parameters)));
   };
 
   AccountRemoteStore.prototype._handleSignIn = function() {

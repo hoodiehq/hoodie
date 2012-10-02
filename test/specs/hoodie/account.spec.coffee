@@ -534,6 +534,11 @@ describe "Hoodie.Account", ->
       party = jasmine.createSpy 'party'
       @account.on('funky', party)
       (expect @hoodie.on).wasCalledWith('account:funky', party)
+
+    it "should namespace multiple events correctly", ->
+      cb = jasmine.createSpy 'test'
+      @account.on 'super funky fresh', cb
+      expect(@hoodie.on).wasCalledWith 'account:super account:funky account:fresh', cb
   # /.on(event, callback)
   
   

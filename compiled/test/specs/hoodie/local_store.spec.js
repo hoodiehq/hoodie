@@ -1088,13 +1088,19 @@ describe("Hoodie.LocalStore", function() {
     beforeEach(function() {
       return spyOn(this.hoodie, "on");
     });
-    return it("should proxy to hoodie.on with 'store' namespace", function() {
+    it("should proxy to hoodie.on with 'store' namespace", function() {
       this.store.on('event', {
         funky: 'fresh'
       });
       return expect(this.hoodie.on).wasCalledWith('store:event', {
         funky: 'fresh'
       });
+    });
+    return it("should namespace multiple events correctly", function() {
+      var cb;
+      cb = jasmine.createSpy('test');
+      this.store.on('super funky fresh', cb);
+      return expect(this.hoodie.on).wasCalledWith('store:super store:funky store:fresh', cb);
     });
   });
 });

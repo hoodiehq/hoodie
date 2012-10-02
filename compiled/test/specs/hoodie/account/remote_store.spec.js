@@ -169,15 +169,27 @@ describe("Hoodie.AccountRemoteStore", function() {
     });
   });
   describe("#on", function() {
-    return it("should namespace bindings with 'remote'", function() {
+    it("should namespace bindings with 'remote'", function() {
       this.remote.on('funk', 'check');
       return expect(this.hoodie.on).wasCalledWith('remote:funk', 'check');
     });
+    return it("should namespace multiple events correctly", function() {
+      var cb;
+      cb = jasmine.createSpy('test');
+      this.remote.on('super funky fresh', cb);
+      return expect(this.hoodie.on).wasCalledWith('remote:super remote:funky remote:fresh', cb);
+    });
   });
   describe("#one", function() {
-    return it("should namespace bindings with 'remote'", function() {
+    it("should namespace bindings with 'remote'", function() {
       this.remote.one('funk', 'check');
       return expect(this.hoodie.one).wasCalledWith('remote:funk', 'check');
+    });
+    return it("should namespace multiple events correctly", function() {
+      var cb;
+      cb = jasmine.createSpy('test');
+      this.remote.one('super funky fresh', cb);
+      return expect(this.hoodie.one).wasCalledWith('remote:super remote:funky remote:fresh', cb);
     });
   });
   return describe("#trigger", function() {

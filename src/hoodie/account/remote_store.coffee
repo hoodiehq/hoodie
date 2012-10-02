@@ -98,14 +98,17 @@ class Hoodie.AccountRemoteStore extends Hoodie.RemoteStore
 
   # namespaced alias for `hoodie.on`
   # 
-  on  : (event, cb) -> @hoodie.on  "remote:#{event}", cb
-  one : (event, cb) -> @hoodie.one "remote:#{event}", cb
+  on  : (event, cb) -> 
+    event = event.replace /(^| )([^ ]+)/g, "$1remote:$2"
+    @hoodie.on  event, cb
+  one : (event, cb) -> 
+    event = event.replace /(^| )([^ ]+)/g, "$1remote:$2"
+    @hoodie.one event, cb
   
   # namespaced alias for `hoodie.trigger`
   # 
   trigger : (event, parameters...) -> 
-    event = event.replace /(^| )([^ ]+)/g, "$1remote:$2"
-    @hoodie.trigger event, parameters...
+    @hoodie.trigger "remote:#{event}", parameters...
 
 
   # Private

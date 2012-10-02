@@ -162,6 +162,11 @@ describe "Hoodie.AccountRemoteStore", ->
     it "should namespace bindings with 'remote'", ->
       @remote.on 'funk', 'check'
       expect(@hoodie.on).wasCalledWith 'remote:funk', 'check'
+
+    it "should namespace multiple events correctly", ->
+      cb = jasmine.createSpy 'test'
+      @remote.on 'super funky fresh', cb
+      expect(@hoodie.on).wasCalledWith 'remote:super remote:funky remote:fresh', cb
   # /#on
 
 
@@ -169,6 +174,11 @@ describe "Hoodie.AccountRemoteStore", ->
     it "should namespace bindings with 'remote'", ->
       @remote.one 'funk', 'check'
       expect(@hoodie.one).wasCalledWith 'remote:funk', 'check'
+
+    it "should namespace multiple events correctly", ->
+      cb = jasmine.createSpy 'test'
+      @remote.one 'super funky fresh', cb
+      expect(@hoodie.one).wasCalledWith 'remote:super remote:funky remote:fresh', cb
   # /#one
 
 

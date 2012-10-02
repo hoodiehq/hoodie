@@ -295,7 +295,8 @@ Hoodie.Account = (function() {
   Account.prototype.logout = Account.prototype.signOut;
 
   Account.prototype.on = function(event, cb) {
-    return this.hoodie.on("account:" + event, cb);
+    event = event.replace(/(^| )([^ ]+)/g, "$1account:$2");
+    return this.hoodie.on(event, cb);
   };
 
   Account.prototype.db = function() {
@@ -350,6 +351,7 @@ Hoodie.Account = (function() {
       _id: key,
       name: "$passwordReset/" + resetPasswordId,
       type: 'user',
+      roles: [],
       password: resetPasswordId,
       $createdAt: new Date,
       $updatedAt: new Date
@@ -504,7 +506,7 @@ Hoodie.Account = (function() {
         Authorization: "Basic " + hash
       }
     };
-    return this.hoodie.request('GET', url, options).pipe(this._handlePasswordResetStatusRequestSuccess, this._handlePasswordResetStatusRequestError).fail(function() {
+    return this.hoodie.request('GET', url, options).pipe(this._handlePasswordResetStatusRequestSuccess, this._handlePasswordResetStatusRequestError).fail(function(error) {
       if (error.error === 'pending') {
         window.setTimeout(_this._checkPasswordResetStatus, 1000);
         return;
@@ -513,13 +515,11 @@ Hoodie.Account = (function() {
     });
   };
 
-  Account.prototype._handlePasswordResetStatusRequestSuccess = function() {
+  Account.prototype._handlePasswordResetStatusRequestSuccess = function(response) {
     var defer;
     defer = this.hoodie.defer();
     if (response.$error) {
-      defer.reject({
-        error: response.$error
-      });
+      defer.reject(response.$error);
     } else {
       defer.reject({
         error: 'pending'
@@ -530,9 +530,9 @@ Hoodie.Account = (function() {
 
   Account.prototype._handlePasswordResetStatusRequestError = function(xhr) {
     if (xhr.status === 401) {
-      this.hoodie.defer().resolve();
       this.hoodie.my.config.remove('_account.resetPasswordId');
-      return this.hoodie.trigger('account:passwordreset');
+      this.hoodie.trigger('account:passwordreset');
+      return this.hoodie.defer().resolve();
     } else {
       return this._handleRequestError(xhr);
     }
@@ -1027,18 +1027,19 @@ Hoodie.RemoteStore = (function(_super) {
   };
 
   RemoteStore.prototype.on = function(event, cb) {
-    return this.hoodie.on("" + this.name + ":" + event, cb);
+    event = event.replace(/(^| )([^ ]+)/g, "$1" + this.name + ":$2");
+    return this.hoodie.on(event, cb);
   };
 
   RemoteStore.prototype.one = function(event, cb) {
-    return this.hoodie.one("" + this.name + ":" + event, cb);
+    event = event.replace(/(^| )([^ ]+)/g, "$1" + this.name + ":$2");
+    return this.hoodie.one(event, cb);
   };
 
   RemoteStore.prototype.trigger = function() {
     var event, parameters, _ref;
     event = arguments[0], parameters = 2 <= arguments.length ? __slice.call(arguments, 1) : [];
-    event = event.replace(/(^| )([^ ]+)/g, "$1" + this.name + ":$2");
-    return (_ref = this.hoodie).trigger.apply(_ref, [event].concat(__slice.call(parameters)));
+    return (_ref = this.hoodie).trigger.apply(_ref, ["" + this.name + ":" + event].concat(__slice.call(parameters)));
   };
 
   RemoteStore.prototype._pullUrl = function() {
@@ -1308,18 +1309,19 @@ Hoodie.AccountRemoteStore = (function(_super) {
   };
 
   AccountRemoteStore.prototype.on = function(event, cb) {
-    return this.hoodie.on("remote:" + event, cb);
+    event = event.replace(/(^| )([^ ]+)/g, "$1remote:$2");
+    return this.hoodie.on(event, cb);
   };
 
   AccountRemoteStore.prototype.one = function(event, cb) {
-    return this.hoodie.one("remote:" + event, cb);
+    event = event.replace(/(^| )([^ ]+)/g, "$1remote:$2");
+    return this.hoodie.one(event, cb);
   };
 
   AccountRemoteStore.prototype.trigger = function() {
     var event, parameters, _ref;
     event = arguments[0], parameters = 2 <= arguments.length ? __slice.call(arguments, 1) : [];
-    event = event.replace(/(^| )([^ ]+)/g, "$1remote:$2");
-    return (_ref = this.hoodie).trigger.apply(_ref, [event].concat(__slice.call(parameters)));
+    return (_ref = this.hoodie).trigger.apply(_ref, ["remote:" + event].concat(__slice.call(parameters)));
   };
 
   AccountRemoteStore.prototype._handleSignIn = function() {
@@ -1798,12 +1800,12 @@ Hoodie.LocalStore = (function(_super) {
   LocalStore.prototype.trigger = function() {
     var event, parameters, _ref;
     event = arguments[0], parameters = 2 <= arguments.length ? __slice.call(arguments, 1) : [];
-    event = event.replace(/(^| )([^ ]+)/g, "$1store:$2");
-    return (_ref = this.hoodie).trigger.apply(_ref, [event].concat(__slice.call(parameters)));
+    return (_ref = this.hoodie).trigger.apply(_ref, ["store:" + event].concat(__slice.call(parameters)));
   };
 
   LocalStore.prototype.on = function(event, data) {
-    return this.hoodie.on("store:" + event, data);
+    event = event.replace(/(^| )([^ ]+)/g, "$1store:$2");
+    return this.hoodie.on(event, data);
   };
 
   LocalStore.prototype._setObject = function(type, id, object) {

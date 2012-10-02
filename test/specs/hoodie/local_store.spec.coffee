@@ -745,5 +745,10 @@ describe "Hoodie.LocalStore", ->
     it "should proxy to hoodie.on with 'store' namespace", ->
        @store.on 'event', funky: 'fresh'
        expect(@hoodie.on).wasCalledWith 'store:event', funky: 'fresh'
+
+    it "should namespace multiple events correctly", ->
+      cb = jasmine.createSpy 'test'
+      @store.on 'super funky fresh', cb
+      expect(@hoodie.on).wasCalledWith 'store:super store:funky store:fresh', cb
   # /#trigger
 # /Hoodie.LocalStore

@@ -388,15 +388,15 @@ class Hoodie.LocalStore extends Hoodie.Store
 
   # proxies to hoodie.trigger
   trigger : (event, parameters...) ->
-    event = event.replace /(^| )([^ ]+)/g, "$1store:$2"
-    @hoodie.trigger event, parameters...
+    @hoodie.trigger "store:#{event}", parameters...
 
   # on
   # ---------
 
   # proxies to hoodie.on
   on : (event, data) ->
-    @hoodie.on "store:#{event}", data
+    event = event.replace /(^| )([^ ]+)/g, "$1store:$2"
+    @hoodie.on event, data
 
   
   # Private

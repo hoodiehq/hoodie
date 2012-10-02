@@ -337,12 +337,12 @@ Hoodie.LocalStore = (function(_super) {
   LocalStore.prototype.trigger = function() {
     var event, parameters, _ref;
     event = arguments[0], parameters = 2 <= arguments.length ? __slice.call(arguments, 1) : [];
-    event = event.replace(/(^| )([^ ]+)/g, "$1store:$2");
-    return (_ref = this.hoodie).trigger.apply(_ref, [event].concat(__slice.call(parameters)));
+    return (_ref = this.hoodie).trigger.apply(_ref, ["store:" + event].concat(__slice.call(parameters)));
   };
 
   LocalStore.prototype.on = function(event, data) {
-    return this.hoodie.on("store:" + event, data);
+    event = event.replace(/(^| )([^ ]+)/g, "$1store:$2");
+    return this.hoodie.on(event, data);
   };
 
   LocalStore.prototype._setObject = function(type, id, object) {

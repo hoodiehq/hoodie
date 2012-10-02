@@ -201,18 +201,19 @@ Hoodie.RemoteStore = (function(_super) {
   };
 
   RemoteStore.prototype.on = function(event, cb) {
-    return this.hoodie.on("" + this.name + ":" + event, cb);
+    event = event.replace(/(^| )([^ ]+)/g, "$1" + this.name + ":$2");
+    return this.hoodie.on(event, cb);
   };
 
   RemoteStore.prototype.one = function(event, cb) {
-    return this.hoodie.one("" + this.name + ":" + event, cb);
+    event = event.replace(/(^| )([^ ]+)/g, "$1" + this.name + ":$2");
+    return this.hoodie.one(event, cb);
   };
 
   RemoteStore.prototype.trigger = function() {
     var event, parameters, _ref;
     event = arguments[0], parameters = 2 <= arguments.length ? __slice.call(arguments, 1) : [];
-    event = event.replace(/(^| )([^ ]+)/g, "$1" + this.name + ":$2");
-    return (_ref = this.hoodie).trigger.apply(_ref, [event].concat(__slice.call(parameters)));
+    return (_ref = this.hoodie).trigger.apply(_ref, ["" + this.name + ":" + event].concat(__slice.call(parameters)));
   };
 
   RemoteStore.prototype._pullUrl = function() {

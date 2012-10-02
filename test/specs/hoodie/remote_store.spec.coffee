@@ -565,6 +565,12 @@ describe "Hoodie.RemoteStore", ->
       @remote.name = 'databaseName'
       @remote.on 'funky', cb
       expect(@hoodie.on).wasCalledWith 'databaseName:funky', cb
+
+    it "should namespace multiple events correctly", ->
+      cb = jasmine.createSpy 'test'
+      @remote.name = 'databaseName'
+      @remote.on 'super funky fresh', cb
+      expect(@hoodie.on).wasCalledWith 'databaseName:super databaseName:funky databaseName:fresh', cb
   # /#on(event, callback)
 
   describe "#trigger(event, parameters...)", ->  
@@ -573,11 +579,4 @@ describe "Hoodie.RemoteStore", ->
       @remote.name = 'databaseName'
       @remote.trigger 'funky', cb
       expect(@hoodie.trigger).wasCalledWith 'databaseName:funky', cb
-
-    it "should namespace multiple events correctly", ->
-      cb = jasmine.createSpy 'test'
-      @remote.name = 'databaseName'
-      @remote.trigger 'super funky fresh', cb
-      expect(@hoodie.trigger).wasCalledWith 'databaseName:super databaseName:funky databaseName:fresh', cb
-  # /#trigger(event, parameters...)
 # /Hoodie.RemoteStore

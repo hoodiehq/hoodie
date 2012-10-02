@@ -153,7 +153,9 @@ class Hoodie.Account
   # ---
 
   # alias for `hoodie.on`
-  on : (event, cb) -> @hoodie.on "account:#{event}", cb
+  on : (event, cb) -> 
+    event = event.replace /(^| )([^ ]+)/g, "$1account:$2"
+    @hoodie.on event, cb
   
   
   # db
@@ -222,6 +224,7 @@ class Hoodie.Account
       _id        : key
       name       : "$passwordReset/#{resetPasswordId}"
       type       : 'user'
+      roles      : []
       password   : resetPasswordId
       $createdAt : new Date
       $updatedAt : new Date
@@ -425,18 +428,18 @@ class Hoodie.Account
 
     @hoodie.request('GET', url, options)
     .pipe(@_handlePasswordResetStatusRequestSuccess, @_handlePasswordResetStatusRequestError)
-    .fail =>
+    .fail (error) =>
       if error.error is 'pending'
         window.setTimeout @_checkPasswordResetStatus, 1000
         return
 
       @hoodie.trigger 'account:password_reset:error'
 
-  _handlePasswordResetStatusRequestSuccess : =>
+  _handlePasswordResetStatusRequestSuccess : (response) =>
     defer = @hoodie.defer()
 
     if response.$error
-      defer.reject error: response.$error
+      defer.reject response.$error
     else
       defer.reject error: 'pending'
 
@@ -445,12 +448,13 @@ class Hoodie.Account
 
   _handlePasswordResetStatusRequestError : (xhr) =>
     if xhr.status is 401
-      @hoodie.defer().resolve()
-
       @hoodie.my.config.remove '_account.resetPasswordId'
       @hoodie.trigger 'account:passwordreset'
-    else
-      @_handleRequestError(xhr)
+
+      return @hoodie.defer().resolve()
+
+    else 
+      return @_handleRequestError(xhr)
 
 
   #

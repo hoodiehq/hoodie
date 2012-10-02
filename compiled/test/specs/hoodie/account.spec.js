@@ -622,11 +622,17 @@ describe("Hoodie.Account", function() {
     beforeEach(function() {
       return spyOn(this.hoodie, "on");
     });
-    return it("should proxy to @hoodie.on() and namespace with account", function() {
+    it("should proxy to @hoodie.on() and namespace with account", function() {
       var party;
       party = jasmine.createSpy('party');
       this.account.on('funky', party);
       return (expect(this.hoodie.on)).wasCalledWith('account:funky', party);
+    });
+    return it("should namespace multiple events correctly", function() {
+      var cb;
+      cb = jasmine.createSpy('test');
+      this.account.on('super funky fresh', cb);
+      return expect(this.hoodie.on).wasCalledWith('account:super account:funky account:fresh', cb);
     });
   });
   describe("#db()", function() {
