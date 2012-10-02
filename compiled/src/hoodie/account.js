@@ -358,7 +358,7 @@ Hoodie.Account = (function() {
     if (xhr.status === 401) {
       this.hoodie.defer().resolve();
       this.hoodie.my.config.remove('_account.resetPasswordId');
-      return this.hoodie.trigger('account:password_reset:success');
+      return this.hoodie.trigger('account:passwordreset:success');
     } else {
       return this._handleRequestError(xhr);
     }
