@@ -1271,7 +1271,7 @@ Hoodie.AccountRemoteStore = (function(_super) {
   AccountRemoteStore.prototype.startSyncing = function() {
     this.hoodie.my.config.set('_remote.sync', this._sync = true);
     this.hoodie.on('account:signout', this.disconnect);
-    this.hoodie.on('account:signin', this._handleSignIn);
+    this.hoodie.on('account:signin', this.connect);
     return this.connect();
   };
 
