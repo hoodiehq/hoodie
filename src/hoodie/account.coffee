@@ -448,7 +448,7 @@ class Hoodie.Account
       @hoodie.defer().resolve()
 
       @hoodie.my.config.remove '_account.resetPasswordId'
-      @hoodie.trigger 'account:passwordreset:success'
+      @hoodie.trigger 'account:passwordreset'
     else
       @_handleRequestError(xhr)
 

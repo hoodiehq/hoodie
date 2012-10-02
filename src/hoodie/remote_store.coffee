@@ -286,13 +286,12 @@ class Hoodie.RemoteStore extends Hoodie.Store
   trigger : (event, parameters...) -> 
     event = event.replace /(^| )([^ ]+)/g, "$1#{@name}:$2"
     @hoodie.trigger event, parameters...
-
-
   
+
+
 
   # Private
   # --------------
-  
   
   # ### pull url
 
