@@ -38,7 +38,7 @@ class Hoodie.AccountRemoteStore extends Hoodie.RemoteStore
     @hoodie.my.config.set '_remote.sync', @_sync = true
 
     @hoodie.on 'account:signout',    @disconnect
-    @hoodie.on 'account:signin',     @_handleSignIn
+    @hoodie.on 'account:signin',     @connect
 
     @connect()
 

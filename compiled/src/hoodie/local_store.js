@@ -294,6 +294,7 @@ Hoodie.LocalStore = (function(_super) {
       this._cached = {};
       this.clearChanged();
       defer.resolve();
+      this.trigger("clear");
     } catch (error) {
       defer.reject(error);
     }

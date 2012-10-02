@@ -62,7 +62,7 @@ describe "Hoodie.AccountRemoteStore", ->
 
     it "should subscribe to account:signin with sync", ->
       @remote.startSyncing()
-      expect(@hoodie.on).wasCalledWith 'account:signin', @remote._handleSignIn
+      expect(@hoodie.on).wasCalledWith 'account:signin', @remote.connect
   # /#startSyncing()
       
 

@@ -70,7 +70,7 @@ describe("Hoodie.AccountRemoteStore", function() {
     });
     return it("should subscribe to account:signin with sync", function() {
       this.remote.startSyncing();
-      return expect(this.hoodie.on).wasCalledWith('account:signin', this.remote._handleSignIn);
+      return expect(this.hoodie.on).wasCalledWith('account:signin', this.remote.connect);
     });
   });
   describe("#stopSyncing", function() {

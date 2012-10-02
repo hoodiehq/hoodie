@@ -329,6 +329,8 @@ class Hoodie.LocalStore extends Hoodie.Store
       @clearChanged()
     
       defer.resolve()
+
+      @trigger "clear"
     catch error
       defer.reject(error)
     
