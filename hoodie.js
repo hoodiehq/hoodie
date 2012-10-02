@@ -1859,11 +1859,11 @@ Hoodie.LocalStore = (function(_super) {
   LocalStore.prototype._dirty = {};
 
   LocalStore.prototype._isDirty = function(object) {
-    if (!object._$syncedAt) {
-      return true;
-    }
     if (!object.$updatedAt) {
       return false;
+    }
+    if (!object._$syncedAt) {
+      return true;
     }
     return object._$syncedAt.getTime() < object.$updatedAt.getTime();
   };
