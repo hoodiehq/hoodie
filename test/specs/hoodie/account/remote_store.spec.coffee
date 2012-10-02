@@ -26,11 +26,21 @@ describe "Hoodie.AccountRemoteStore", ->
     it "should sync continously by default", ->
       expect(@remote.isContinuouslySyncing()).toBeTruthy()
     
+    ### 
+    _when "user has an account", ->
+      beforeEach ->
+        spyOn(@hoodie.my.account, "hasAccount").andReturn false
+
+    _when "user has an account", ->
+      beforeEach ->
+        spyOn(@hoodie.my.account, "hasAccount").andReturn true
+    ### 
+        
     it "should start syncing", ->
       spyOn(Hoodie.AccountRemoteStore::, "startSyncing")
       new Hoodie.AccountRemoteStore @hoodie
       expect(Hoodie.AccountRemoteStore::startSyncing).wasCalled()
-        
+      
     _when "config remote.sync is false", ->
       beforeEach ->
         spyOn(@hoodie.my.config, "get").andReturn false

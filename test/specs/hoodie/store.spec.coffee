@@ -3,8 +3,7 @@ describe "Hoodie.Store", ->
     @hoodie = new Mocks.Hoodie 
     @store  = new Hoodie.Store @hoodie
 
-
-  describe ".save(type, id, object, options)", ->
+  describe "#save(type, id, object, options)", ->
     beforeEach ->
       spyOn(@store, "_now").andReturn 'now'
     
@@ -59,8 +58,7 @@ describe "Hoodie.Store", ->
       expect(@store.create()).toBe 'save_promise'
   # /create(type, object)
 
-  
-  describe ".update(type, id, update, options)", ->
+  describe "#update(type, id, update, options)", ->
     beforeEach ->
       spyOn(@store, "find")
       spyOn(@store, "save").andReturn then: ->
@@ -108,15 +106,14 @@ describe "Hoodie.Store", ->
 
         it "should return a resolved promise", ->
           expect(@promise).toBeResolvedWith {style: 'baws'}
-  # /.update(type, id, update, options)
-  
-  describe ".updateAll(objects)", ->
+  # /#update(
+  describe "#updateAll(objects)", ->
     beforeEach ->
       spyOn(@hoodie, "isPromise").andReturn false
       @todoObjects = [
-        {type: 'todo', id: '1'}
-        {type: 'todo', id: '2'}
-        {type: 'todo', id: '3'}
+        {$type: 'todo', id: '1'}
+        {$type: 'todo', id: '2'}
+        {$type: 'todo', id: '3'}
       ]
     
     it "should return a promise", ->
@@ -126,7 +123,7 @@ describe "Hoodie.Store", ->
       spyOn(@store, "update")
       @store.updateAll @todoObjects, {funky: 'update'}
       for obj in @todoObjects
-        expect(@store.update).wasCalledWith obj.type, obj.id, {funky: 'update'}, {}
+        expect(@store.update).wasCalledWith obj.$type, obj.id, {funky: 'update'}, {}
     
     it "should resolve the returned promise once all objects have been updated", ->
       promise = @hoodie.defer().resolve().promise()
@@ -144,11 +141,11 @@ describe "Hoodie.Store", ->
         @hoodie.isPromise.andReturn true
         
       it "should update objects returned by promise", ->
-        promise = pipe : (cb) => cb(@todoObjects)
+        promise = @hoodie.defer().resolve(@todoObjects).promise()
         spyOn(@store, "update")
         @store.updateAll promise, {funky: 'update'}
         for obj in @todoObjects
-          expect(@store.update).wasCalledWith obj.type, obj.id, {funky: 'update'}, {}
+          expect(@store.update).wasCalledWith obj.$type, obj.id, {funky: 'update'}, {}
 
     _when "passed objects is a type (string)", ->
       beforeEach ->
@@ -168,10 +165,9 @@ describe "Hoodie.Store", ->
         @store.updateAll null, {funky: 'update'}
         expect(@store.findAll).wasCalled()
         expect(@store.findAll.mostRecentCall.args.length).toBe 0
-  # /.updateAll(objects)
+  # /#updateAll(objects)
 
-
-  describe ".find(type, id)", ->
+  describe "#find(type, id)", ->
     it "should return a defer", ->
       defer = @store.find 'document', '123'
       expect(defer).toBeDefer()
@@ -194,10 +190,9 @@ describe "Hoodie.Store", ->
       it "should allow to use .find", ->
         @store.find 'test', '123'
         expect(@store.find).wasCalledWith 'test', '123'
-  # /.find(type, id)
+  # /#find(type, id)
 
-
-  describe ".findAll(type)", ->
+  describe "#findAll(type)", ->
     it "should return a defer", ->
       expect(@store.findAll()).toBeDefer()
 
@@ -208,10 +203,9 @@ describe "Hoodie.Store", ->
       it "should allow to use .loadAll", ->
         @store.loadAll 'test'
         expect(@store.findAll).wasCalledWith 'test'
-  # /.findAll(type)
+  # /#findAll(type)
 
-
-  describe ".findOrCreate(type, id, attributes)", ->
+  describe "#findOrCreate(type, id, attributes)", ->
     _when "object exists", ->
       beforeEach ->
         promise = @hoodie.defer().resolve('existing_object').promise()
@@ -240,10 +234,9 @@ describe "Hoodie.Store", ->
         spyOn(@store, "create").andReturn promise
         promise = @store.findOrCreate id: '123', attribute: 'value'
         expect(promise).toBeResolvedWith 'new_object'
-  # /.findOrCreate(attributes)
+  # /#findOrCreate(attributes)
 
-  
-  describe ".destroy(type, id)", ->
+  describe "#destroy(type, id)", ->
     it "should return a defer", ->
       defer = @store.destroy 'document', '123'
       expect(defer).toBeDefer()
@@ -267,26 +260,24 @@ describe "Hoodie.Store", ->
         @store.destroy "test", 12, {option: "value"}
         expect(@store.destroy).wasCalledWith "test", 12, {option: "value"}
     # /aliases
-  # /.destroy(type, id)
+  # /#destroy(type, id)
 
-
-  describe ".destroyAll(type)", ->
+  describe "#destroyAll(type)", ->
     it "should return a promise", ->
       expect(@store.destroyAll()).toBePromise()
   
     describe "aliases", ->
       it "should allow to use .destroyAll", ->
         expect(@store.destroyAll).toBe @store.destroyAll
-  # /.destroyAll(type)
+  # /#destroyAll(type)
 
-
-  describe ".uuid(num = 7)", ->
+  describe "#uuid(num = 7)", ->
     it "should default to a length of 7", ->
       expect(@store.uuid().length).toBe 7
     
     _when "called with num = 5", ->
       it "should generate an id with length = 5", ->
         expect(@store.uuid(5).length).toBe 5
-  # /.uuid(num)
+  # /#uuid(num)
 # /Hoodie.Store
 ###

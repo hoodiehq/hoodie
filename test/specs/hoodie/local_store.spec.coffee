@@ -125,7 +125,7 @@ describe "Hoodie.LocalStore", ->
     _when "id is '123', type is 'document', object is {id: '123', type: 'document', name: 'test'}", ->
       beforeEach ->
         # keep promise, key, and stored object for assertions
-        @store.save 'document', '123', {id: '123', type: 'document', name: 'test'}
+        @store.save 'document', '123', {id: '123', $type: 'document', name: 'test'}
         [type, key, @object] = @store.cache.mostRecentCall.args
     
     _when "id is '123', type is '$internal', object is {action: 'do some background magic'}}", ->
@@ -279,9 +279,9 @@ describe "Hoodie.LocalStore", ->
     beforeEach ->
       spyOn(@hoodie, "isPromise").andReturn false
       @todoObjects = [
-        {type: 'todo', id: '1'}
-        {type: 'todo', id: '2'}
-        {type: 'todo', id: '3'}
+        {$type: 'todo', id: '1'}
+        {$type: 'todo', id: '2'}
+        {$type: 'todo', id: '3'}
       ]
     
     it "should return a promise", ->
@@ -291,7 +291,7 @@ describe "Hoodie.LocalStore", ->
       spyOn(@store, "update")
       @store.updateAll @todoObjects, {funky: 'update'}
       for obj in @todoObjects
-        expect(@store.update).wasCalledWith obj.type, obj.id, {funky: 'update'}, {}
+        expect(@store.update).wasCalledWith obj.$type, obj.id, {funky: 'update'}, {}
     
     it "should resolve the returned promise once all objects have been updated", ->
       promise = @hoodie.defer().resolve().promise()
@@ -312,7 +312,7 @@ describe "Hoodie.LocalStore", ->
         spyOn(@store, "update")
         @store.updateAll promise, {funky: 'update'}
         for obj in @todoObjects
-          expect(@store.update).wasCalledWith obj.type, obj.id, {funky: 'update'}, {}
+          expect(@store.update).wasCalledWith obj.$type, obj.id, {funky: 'update'}, {}
   # /.updateAll(objects)
 
 

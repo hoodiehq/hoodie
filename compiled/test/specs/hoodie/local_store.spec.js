@@ -200,7 +200,7 @@ describe("Hoodie.LocalStore", function() {
         var key, type, _ref;
         this.store.save('document', '123', {
           id: '123',
-          type: 'document',
+          $type: 'document',
           name: 'test'
         });
         return _ref = this.store.cache.mostRecentCall.args, type = _ref[0], key = _ref[1], this.object = _ref[2], _ref;
@@ -428,13 +428,13 @@ describe("Hoodie.LocalStore", function() {
       spyOn(this.hoodie, "isPromise").andReturn(false);
       return this.todoObjects = [
         {
-          type: 'todo',
+          $type: 'todo',
           id: '1'
         }, {
-          type: 'todo',
+          $type: 'todo',
           id: '2'
         }, {
-          type: 'todo',
+          $type: 'todo',
           id: '3'
         }
       ];
@@ -452,7 +452,7 @@ describe("Hoodie.LocalStore", function() {
       _results = [];
       for (_i = 0, _len = _ref.length; _i < _len; _i++) {
         obj = _ref[_i];
-        _results.push(expect(this.store.update).wasCalledWith(obj.type, obj.id, {
+        _results.push(expect(this.store.update).wasCalledWith(obj.$type, obj.id, {
           funky: 'update'
         }, {}));
       }
@@ -490,7 +490,7 @@ describe("Hoodie.LocalStore", function() {
         _results = [];
         for (_i = 0, _len = _ref.length; _i < _len; _i++) {
           obj = _ref[_i];
-          _results.push(expect(this.store.update).wasCalledWith(obj.type, obj.id, {
+          _results.push(expect(this.store.update).wasCalledWith(obj.$type, obj.id, {
             funky: 'update'
           }, {}));
         }

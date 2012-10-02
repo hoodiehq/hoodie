@@ -5,7 +5,7 @@ describe("Hoodie.Store", function() {
     this.hoodie = new Mocks.Hoodie;
     return this.store = new Hoodie.Store(this.hoodie);
   });
-  describe(".save(type, id, object, options)", function() {
+  describe("#save(type, id, object, options)", function() {
     beforeEach(function() {
       return spyOn(this.store, "_now").andReturn('now');
     });
@@ -81,7 +81,7 @@ describe("Hoodie.Store", function() {
       return expect(this.store.create()).toBe('save_promise');
     });
   });
-  describe(".update(type, id, update, options)", function() {
+  describe("#update(type, id, update, options)", function() {
     beforeEach(function() {
       spyOn(this.store, "find");
       return spyOn(this.store, "save").andReturn({
@@ -161,18 +161,18 @@ describe("Hoodie.Store", function() {
       });
     });
   });
-  describe(".updateAll(objects)", function() {
+  describe("#updateAll(objects)", function() {
     beforeEach(function() {
       spyOn(this.hoodie, "isPromise").andReturn(false);
       return this.todoObjects = [
         {
-          type: 'todo',
+          $type: 'todo',
           id: '1'
         }, {
-          type: 'todo',
+          $type: 'todo',
           id: '2'
         }, {
-          type: 'todo',
+          $type: 'todo',
           id: '3'
         }
       ];
@@ -190,7 +190,7 @@ describe("Hoodie.Store", function() {
       _results = [];
       for (_i = 0, _len = _ref.length; _i < _len; _i++) {
         obj = _ref[_i];
-        _results.push(expect(this.store.update).wasCalledWith(obj.type, obj.id, {
+        _results.push(expect(this.store.update).wasCalledWith(obj.$type, obj.id, {
           funky: 'update'
         }, {}));
       }
@@ -213,13 +213,8 @@ describe("Hoodie.Store", function() {
         return this.hoodie.isPromise.andReturn(true);
       });
       return it("should update objects returned by promise", function() {
-        var obj, promise, _i, _len, _ref, _results,
-          _this = this;
-        promise = {
-          pipe: function(cb) {
-            return cb(_this.todoObjects);
-          }
-        };
+        var obj, promise, _i, _len, _ref, _results;
+        promise = this.hoodie.defer().resolve(this.todoObjects).promise();
         spyOn(this.store, "update");
         this.store.updateAll(promise, {
           funky: 'update'
@@ -228,7 +223,7 @@ describe("Hoodie.Store", function() {
         _results = [];
         for (_i = 0, _len = _ref.length; _i < _len; _i++) {
           obj = _ref[_i];
-          _results.push(expect(this.store.update).wasCalledWith(obj.type, obj.id, {
+          _results.push(expect(this.store.update).wasCalledWith(obj.$type, obj.id, {
             funky: 'update'
           }, {}));
         }
@@ -267,7 +262,7 @@ describe("Hoodie.Store", function() {
       });
     });
   });
-  describe(".find(type, id)", function() {
+  describe("#find(type, id)", function() {
     it("should return a defer", function() {
       var defer;
       defer = this.store.find('document', '123');
@@ -299,7 +294,7 @@ describe("Hoodie.Store", function() {
       });
     });
   });
-  describe(".findAll(type)", function() {
+  describe("#findAll(type)", function() {
     it("should return a defer", function() {
       return expect(this.store.findAll()).toBeDefer();
     });
@@ -313,7 +308,7 @@ describe("Hoodie.Store", function() {
       });
     });
   });
-  describe(".findOrCreate(type, id, attributes)", function() {
+  describe("#findOrCreate(type, id, attributes)", function() {
     _when("object exists", function() {
       beforeEach(function() {
         var promise;
@@ -364,7 +359,7 @@ describe("Hoodie.Store", function() {
       });
     });
   });
-  describe(".destroy(type, id)", function() {
+  describe("#destroy(type, id)", function() {
     it("should return a defer", function() {
       var defer;
       defer = this.store.destroy('document', '123');
@@ -400,7 +395,7 @@ describe("Hoodie.Store", function() {
       });
     });
   });
-  describe(".destroyAll(type)", function() {
+  describe("#destroyAll(type)", function() {
     it("should return a promise", function() {
       return expect(this.store.destroyAll()).toBePromise();
     });
@@ -410,7 +405,7 @@ describe("Hoodie.Store", function() {
       });
     });
   });
-  return describe(".uuid(num = 7)", function() {
+  return describe("#uuid(num = 7)", function() {
     it("should default to a length of 7", function() {
       return expect(this.store.uuid().length).toBe(7);
     });

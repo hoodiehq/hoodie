@@ -104,23 +104,22 @@ class Hoodie.Store
       when typeof filterOrObjects is 'string'
         promise = @findAll filterOrObjects
       when @hoodie.isPromise(filterOrObjects)
-        promise = filterOrObjects  
+        promise = filterOrObjects
       when $.isArray filterOrObjects
-        promise = @hoodie.defer().resolve( filterOrObjects ).resolve()
+        promise = @hoodie.defer().resolve( filterOrObjects ).promise()
       else # e.g. null, update all
         promise = @findAll()
     
     promise.pipe (objects) =>
-      
       # now we update all objects one by one and return a promise
       # that will be resolved once all updates have been finished
       defer = @hoodie.defer()
       _updatePromises = for object in objects
-        @update(object.type, object.id, objectUpdate, options) 
+        @update(object.$type, object.id, objectUpdate, options)
       $.when.apply(null, _updatePromises).then defer.resolve
       
       return defer.promise()
-  
+
 
   # ## find
 
@@ -136,9 +135,6 @@ class Hoodie.Store
       return defer.reject( Hoodie.Errors.INVALID_ARGUMENTS "type & id are required" ).promise()
   
     return defer
-
-  # alias
-  # find: -> @find arguments...
   
 
   # ## find or create
@@ -190,7 +186,7 @@ class Hoodie.Store
   # Destroyes all objects. Can be filtered by a type
   destroyAll : (type, options = {}) -> 
     @findAll(type).pipe (objects) =>
-      @destroy(object.type, object.id, options) for object in objects
+      @destroy(object.$type, object.id, options) for object in objects
 
   # ## UUID
 

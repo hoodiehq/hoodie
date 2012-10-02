@@ -195,12 +195,14 @@ class Hoodie.RemoteStore extends Hoodie.Store
   isContinuouslyPulling : ->
     @_sync is true or @_sync?.pull is true
 
+
   # isContinuouslyPushing
   # -----------------------
 
   # returns true if pulling is set to be continous
   isContinuouslyPushing : ->
     @_sync is true or @_sync?.push is true
+
 
   # isContinuouslySyncing
   # -----------------------
@@ -209,6 +211,7 @@ class Hoodie.RemoteStore extends Hoodie.Store
   isContinuouslySyncing : ->
     @_sync is true
 
+
   # getSinceNr
   # ------------
 
@@ -216,6 +219,7 @@ class Hoodie.RemoteStore extends Hoodie.Store
   #
   getSinceNr : ->
     @_since or 0
+
 
   # setSinceNr
   # ------------

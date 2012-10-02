@@ -33,6 +33,16 @@ describe("Hoodie.AccountRemoteStore", function() {
     it("should sync continously by default", function() {
       return expect(this.remote.isContinuouslySyncing()).toBeTruthy();
     });
+    /* 
+    _when "user has an account", ->
+      beforeEach ->
+        spyOn(@hoodie.my.account, "hasAccount").andReturn false
+    
+    _when "user has an account", ->
+      beforeEach ->
+        spyOn(@hoodie.my.account, "hasAccount").andReturn true
+    */
+
     it("should start syncing", function() {
       spyOn(Hoodie.AccountRemoteStore.prototype, "startSyncing");
       new Hoodie.AccountRemoteStore(this.hoodie);

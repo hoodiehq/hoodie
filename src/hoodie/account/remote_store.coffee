@@ -11,12 +11,16 @@
 #
 class Hoodie.AccountRemoteStore extends Hoodie.RemoteStore
 
-  # ## properties
+  # properties
+  # ------------
 
   # sync by default
   _sync: true
 
-  # ## Constructor
+
+  # Constructor
+  # -------------
+
   #
   constructor : ->
     super
@@ -30,7 +34,8 @@ class Hoodie.AccountRemoteStore extends Hoodie.RemoteStore
     @startSyncing() if @isContinuouslySyncing()
   
 
-  # ## startSyncing
+  # startSyncing
+  # --------------
 
   # start continuous syncing with current users store
   # 
@@ -42,7 +47,9 @@ class Hoodie.AccountRemoteStore extends Hoodie.RemoteStore
 
     @connect()
 
-  # ## stopSyncing
+
+  # stopSyncing
+  # -------------
 
   # stop continuous syncing with current users store
   # 
@@ -55,25 +62,29 @@ class Hoodie.AccountRemoteStore extends Hoodie.RemoteStore
     @disconnect()
     
 
-  # ## Connect
+  # Connect
+  # ---------
 
   # do not start to sync immediately, but authenticate beforehand
+  # 
   connect : =>
-    @hoodie.my.account.authenticate().pipe =>  
-      super
+    @hoodie.my.account.authenticate().pipe => super
     
 
-  # ## get and set since nr
+  # get and set since nr
+  # ----------------------
 
   # we store the last since number from the current user's store
   # in his config
+  # 
   getSinceNr : (since) ->
     @hoodie.my.config.get('_remote.since') or 0
   setSinceNr : (since) ->
     @hoodie.my.config.set('_remote.since', since)
 
 
-  # ## push
+  # push
+  # ------
 
   # if no docs passed to be pushed, we default to users changed objects
   # in his store
@@ -86,10 +97,12 @@ class Hoodie.AccountRemoteStore extends Hoodie.RemoteStore
   # --------
 
   # namespaced alias for `hoodie.on`
+  # 
   on  : (event, cb) -> @hoodie.on  "remote:#{event}", cb
   one : (event, cb) -> @hoodie.one "remote:#{event}", cb
   
   # namespaced alias for `hoodie.trigger`
+  # 
   trigger : (event, parameters...) -> 
     event = event.replace /(^| )([^ ]+)/g, "$1remote:$2"
     @hoodie.trigger event, parameters...
@@ -98,6 +111,7 @@ class Hoodie.AccountRemoteStore extends Hoodie.RemoteStore
   # Private
   # ---------
 
+  # 
   _handleSignIn: =>
     @name = @hoodie.my.account.db()
     @connect()
