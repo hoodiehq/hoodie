@@ -1251,6 +1251,8 @@ Hoodie.AccountRemoteStore = (function(_super) {
   AccountRemoteStore.prototype._sync = true;
 
   function AccountRemoteStore() {
+    this._handleSignIn = __bind(this._handleSignIn, this);
+
     this.push = __bind(this.push, this);
 
     this.connect = __bind(this.connect, this);
@@ -1270,14 +1272,14 @@ Hoodie.AccountRemoteStore = (function(_super) {
 
   AccountRemoteStore.prototype.startSyncing = function() {
     this.hoodie.my.config.set('_remote.sync', this._sync = true);
+    this.hoodie.on('account:signin', this._handleSignIn);
     this.hoodie.on('account:signout', this.disconnect);
-    this.hoodie.on('account:signin', this.connect);
     return this.connect();
   };
 
   AccountRemoteStore.prototype.stopSyncing = function() {
     this.hoodie.my.config.set('_remote.sync', this._sync = false);
-    this.hoodie.unbind('account:signin', this.connect);
+    this.hoodie.unbind('account:signin', this._handleSignIn);
     this.hoodie.unbind('account:signout', this.disconnect);
     return this.disconnect();
   };
@@ -1316,6 +1318,11 @@ Hoodie.AccountRemoteStore = (function(_super) {
     var event, parameters, _ref;
     event = arguments[0], parameters = 2 <= arguments.length ? __slice.call(arguments, 1) : [];
     return (_ref = this.hoodie).trigger.apply(_ref, ["remote:" + event].concat(__slice.call(parameters)));
+  };
+
+  AccountRemoteStore.prototype._handleSignIn = function() {
+    this.name = this.hoodie.my.account.db();
+    return this.connect();
   };
 
   return AccountRemoteStore;

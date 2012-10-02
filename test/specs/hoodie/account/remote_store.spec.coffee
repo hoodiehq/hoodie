@@ -62,7 +62,7 @@ describe "Hoodie.AccountRemoteStore", ->
 
     it "should subscribe to account:signin with sync", ->
       @remote.startSyncing()
-      expect(@hoodie.on).wasCalledWith 'account:signin', @remote.connect
+      expect(@hoodie.on).wasCalledWith 'account:signin', @remote._handleSignIn
   # /#startSyncing()
       
 
@@ -79,7 +79,7 @@ describe "Hoodie.AccountRemoteStore", ->
 
     it "should unsubscribe from account's signin idle event", ->
       @remote.stopSyncing()
-      expect(@hoodie.unbind).wasCalledWith 'account:signin', @remote.connect
+      expect(@hoodie.unbind).wasCalledWith 'account:signin', @remote._handleSignIn
       
     it "should unsubscribe from account's signout idle event", ->
       @remote.stopSyncing()

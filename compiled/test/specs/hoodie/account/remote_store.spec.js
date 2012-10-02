@@ -70,7 +70,7 @@ describe("Hoodie.AccountRemoteStore", function() {
     });
     return it("should subscribe to account:signin with sync", function() {
       this.remote.startSyncing();
-      return expect(this.hoodie.on).wasCalledWith('account:signin', this.remote.connect);
+      return expect(this.hoodie.on).wasCalledWith('account:signin', this.remote._handleSignIn);
     });
   });
   describe("#stopSyncing", function() {
@@ -86,7 +86,7 @@ describe("Hoodie.AccountRemoteStore", function() {
     });
     it("should unsubscribe from account's signin idle event", function() {
       this.remote.stopSyncing();
-      return expect(this.hoodie.unbind).wasCalledWith('account:signin', this.remote.connect);
+      return expect(this.hoodie.unbind).wasCalledWith('account:signin', this.remote._handleSignIn);
     });
     return it("should unsubscribe from account's signout idle event", function() {
       this.remote.stopSyncing();
