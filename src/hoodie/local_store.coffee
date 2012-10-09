@@ -70,7 +70,9 @@ class Hoodie.LocalStore extends Hoodie.Store
       id    = @uuid()
 
     # add createdBy hash to new objects
-    if isNew and @hoodie.my.account # .hasAccount()
+    # note: we check for `hoodie.my.account` as in some cases, the code
+    #       might get executed before the account models is initiated.
+    if isNew and @hoodie.my.account
       object.$createdBy or= @hoodie.my.account.ownerHash
    
     # handle public option
@@ -79,6 +81,13 @@ class Hoodie.LocalStore extends Hoodie.Store
     # add timestamps
     if options.remote
       object._$syncedAt = @_now()
+
+      if isNew
+        currentObject = @cache type, id
+        for key of currentObject
+          if key.charAt(0) is '_'
+            object[key] = currentObject[key]
+
     else unless options.silent
       object.$updatedAt = @_now()
       object.$createdAt or= object.$updatedAt
@@ -87,18 +96,8 @@ class Hoodie.LocalStore extends Hoodie.Store
       object = @cache type, id, object, options
       defer.resolve( object, isNew ).promise()
 
-      if isNew
-        @trigger "create",                           object, options
-        @trigger "create:#{object.$type}",           object, options
-        @trigger "change",                 'create', object, options
-        @trigger "change:#{object.$type}", 'create', object, options
-      else
-        @trigger "update",                                        object, options
-        @trigger "update:#{object.$type}",                        object, options
-        @trigger "update:#{object.$type}:#{object.id}",           object, options
-        @trigger "change",                              'update', object, options
-        @trigger "change:#{object.$type}",              'update', object, options
-        @trigger "change:#{object.$type}:#{object.id}", 'update', object, options
+      @_trigger_change_events(object, options, isNew)
+
     catch error
       defer.reject(error).promise()
   
@@ -463,3 +462,18 @@ class Hoodie.LocalStore extends Hoodie.Store
   # TODO: make this cachy
   _index : ->
     @db.key(i) for i in [0...@db.length()]
+
+  # 
+  _trigger_change_events: (object, options, isNew) ->
+    if isNew
+      @trigger "create",                           object, options
+      @trigger "create:#{object.$type}",           object, options
+      @trigger "change",                 'create', object, options
+      @trigger "change:#{object.$type}", 'create', object, options
+    else
+      @trigger "update",                                        object, options
+      @trigger "update:#{object.$type}",                        object, options
+      @trigger "update:#{object.$type}:#{object.id}",           object, options
+      @trigger "change",                              'update', object, options
+      @trigger "change:#{object.$type}",              'update', object, options
+      @trigger "change:#{object.$type}:#{object.id}", 'update', object, options

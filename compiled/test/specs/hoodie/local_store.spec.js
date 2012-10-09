@@ -73,7 +73,9 @@ describe("Hoodie.LocalStore", function() {
           this.store.cache.andReturn({
             id: '123',
             $type: 'document',
-            name: 'test'
+            name: 'test',
+            _local: 'something',
+            old_attribute: 'what ever'
           });
           return this.store.save('document', '123', {
             name: 'test'
@@ -92,35 +94,27 @@ describe("Hoodie.LocalStore", function() {
           object = this.store.cache.mostRecentCall.args[2];
           return expect(object._$syncedAt).toBe('now');
         });
-        return it("should trigger trigger events", function() {
-          expect(this.store.trigger).wasCalledWith('create', {
+        it("should trigger trigger events", function() {
+          var object, options;
+          object = {
             id: '123',
             $type: 'document',
-            name: 'test'
-          }, {
+            name: 'test',
+            _local: 'something',
+            old_attribute: 'what ever'
+          };
+          options = {
             remote: true
-          });
-          expect(this.store.trigger).wasCalledWith('create:document', {
-            id: '123',
-            $type: 'document',
-            name: 'test'
-          }, {
-            remote: true
-          });
-          expect(this.store.trigger).wasCalledWith('change', 'create', {
-            id: '123',
-            $type: 'document',
-            name: 'test'
-          }, {
-            remote: true
-          });
-          return expect(this.store.trigger).wasCalledWith('change:document', 'create', {
-            id: '123',
-            $type: 'document',
-            name: 'test'
-          }, {
-            remote: true
-          });
+          };
+          expect(this.store.trigger).wasCalledWith('create', object, options);
+          expect(this.store.trigger).wasCalledWith('create:document', object, options);
+          expect(this.store.trigger).wasCalledWith('change', 'create', object, options);
+          return expect(this.store.trigger).wasCalledWith('change:document', 'create', object, options);
+        });
+        return it("should keep local attributes", function() {
+          var object;
+          object = this.store.cache.mostRecentCall.args[2];
+          return expect(object._local).toBe('something');
         });
       });
       _and("options.silent is true", function() {
@@ -341,86 +335,6 @@ describe("Hoodie.LocalStore", function() {
         funky: 'fresh'
       });
       return expect(promise).toBe('promise');
-    });
-  });
-  describe("#update(type, id, update, options)", function() {
-    beforeEach(function() {
-      spyOn(this.store, "find");
-      return spyOn(this.store, "save").andReturn({
-        then: function() {}
-      });
-    });
-    _when("object cannot be found", function() {
-      beforeEach(function() {
-        this.store.find.andReturn($.Deferred().reject());
-        return this.promise = this.store.update('couch', '123', {
-          funky: 'fresh'
-        });
-      });
-      return it("should create it", function() {
-        return expect(this.store.save).wasCalledWith('couch', '123', {
-          funky: 'fresh'
-        }, {});
-      });
-    });
-    return _when("object can be found", function() {
-      beforeEach(function() {
-        this.store.find.andReturn($.Deferred().resolve({
-          style: 'baws'
-        }));
-        return this.store.save.andReturn($.Deferred().resolve('resolved by save'));
-      });
-      _and("update is an object", function() {
-        beforeEach(function() {
-          return this.promise = this.store.update('couch', '123', {
-            funky: 'fresh'
-          });
-        });
-        it("should save the updated object", function() {
-          return expect(this.store.save).wasCalledWith('couch', '123', {
-            style: 'baws',
-            funky: 'fresh'
-          }, {});
-        });
-        return it("should return a resolved promise", function() {
-          return expect(this.promise).toBeResolvedWith('resolved by save');
-        });
-      });
-      _and("update is a function", function() {
-        beforeEach(function() {
-          return this.promise = this.store.update('couch', '123', function(obj) {
-            return {
-              funky: 'fresh'
-            };
-          });
-        });
-        it("should save the updated object", function() {
-          return expect(this.store.save).wasCalledWith('couch', '123', {
-            style: 'baws',
-            funky: 'fresh'
-          }, {});
-        });
-        return it("should return a resolved promise", function() {
-          return expect(this.promise).toBeResolvedWith('resolved by save');
-        });
-      });
-      return _and("update wouldn't make a change", function() {
-        beforeEach(function() {
-          return this.promise = this.store.update('couch', '123', function(obj) {
-            return {
-              style: 'baws'
-            };
-          });
-        });
-        it("should save the object", function() {
-          return expect(this.store.save).wasNotCalled();
-        });
-        return it("should return a resolved promise", function() {
-          return expect(this.promise).toBeResolvedWith({
-            style: 'baws'
-          });
-        });
-      });
     });
   });
   describe("#updateAll(objects)", function() {

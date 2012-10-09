@@ -20,7 +20,7 @@ describe "Hoodie.LocalStore", ->
   
   describe "#save(type, id, object, options)", ->
     beforeEach ->
-      spyOn(@store, "_now").andReturn 'now'
+      spyOn(@store, "_now" ).andReturn 'now'
       spyOn(@store, "cache").andReturn 'cachedObject'
     
     it "should return a promise", ->
@@ -56,7 +56,7 @@ describe "Hoodie.LocalStore", ->
       _and "options.remote is true", ->
         beforeEach ->
           spyOn(@store, "trigger")
-          @store.cache.andReturn { id: '123', $type: 'document', name: 'test'}
+          @store.cache.andReturn { id: '123', $type: 'document', name: 'test', _local: 'something', old_attribute: 'what ever'}
           @store.save 'document', '123', { name: 'test' }, { remote: true }
         
         it "should not touch createdAt / updatedAt timestamps", ->
@@ -69,10 +69,16 @@ describe "Hoodie.LocalStore", ->
           expect(object._$syncedAt).toBe 'now'
 
         it "should trigger trigger events", ->
-          expect(@store.trigger).wasCalledWith 'create',                    { id: '123', $type: 'document', name: 'test'}, { remote: true }
-          expect(@store.trigger).wasCalledWith 'create:document',           { id: '123', $type: 'document', name: 'test'}, { remote: true }
-          expect(@store.trigger).wasCalledWith 'change',          'create', { id: '123', $type: 'document', name: 'test'}, { remote: true }
-          expect(@store.trigger).wasCalledWith 'change:document', 'create', { id: '123', $type: 'document', name: 'test'}, { remote: true }
+          object  = id: '123', $type: 'document', name: 'test', _local: 'something', old_attribute: 'what ever'
+          options = remote: true
+          expect(@store.trigger).wasCalledWith 'create',                    object, options
+          expect(@store.trigger).wasCalledWith 'create:document',           object, options
+          expect(@store.trigger).wasCalledWith 'change',          'create', object, options
+          expect(@store.trigger).wasCalledWith 'change:document', 'create', object, options
+
+        it "should keep local attributes", ->
+          object = @store.cache.mostRecentCall.args[2]
+          expect(object._local).toBe 'something'
       
       _and "options.silent is true", ->
         beforeEach ->
@@ -222,57 +228,6 @@ describe "Hoodie.LocalStore", ->
       expect(@store.save).wasCalledWith 'couch', undefined, {funky: 'fresh'}
       expect(promise).toBe 'promise'
   # /.create(type, object, options)
-  
-
-  describe "#update(type, id, update, options)", ->
-    beforeEach ->
-      spyOn(@store, "find")
-      spyOn(@store, "save").andReturn then: ->
-    
-    _when "object cannot be found", ->
-      beforeEach ->
-        @store.find.andReturn $.Deferred().reject()
-        @promise = @store.update 'couch', '123', funky: 'fresh'
-      
-      it "should create it", ->
-        expect(@store.save).wasCalledWith 'couch', '123', funky: 'fresh', {}
-        # expect(@promise).toBeRejected()
-    
-    _when "object can be found", ->
-      beforeEach ->
-        @store.find.andReturn $.Deferred().resolve { style: 'baws' }
-        @store.save.andReturn $.Deferred().resolve 'resolved by save'
-        
-      _and "update is an object", ->
-        beforeEach ->
-          @promise = @store.update 'couch', '123', { funky: 'fresh' }
-      
-        it "should save the updated object", ->
-          expect(@store.save).wasCalledWith 'couch', '123', { style: 'baws', funky: 'fresh' }, {}
-      
-        it "should return a resolved promise", ->
-          expect(@promise).toBeResolvedWith 'resolved by save'
-        
-      _and "update is a function", ->
-        beforeEach ->
-          @promise = @store.update 'couch', '123', (obj) -> funky: 'fresh'
-
-        it "should save the updated object", ->
-          expect(@store.save).wasCalledWith 'couch', '123', { style: 'baws', funky: 'fresh' }, {}
-
-        it "should return a resolved promise", ->
-          expect(@promise).toBeResolvedWith 'resolved by save'
-          
-      _and "update wouldn't make a change", ->
-        beforeEach ->
-          @promise = @store.update 'couch', '123', (obj) -> style: 'baws'
-          
-        it "should save the object", ->
-          expect(@store.save).wasNotCalled()
-
-        it "should return a resolved promise", ->
-          expect(@promise).toBeResolvedWith {style: 'baws'}
-  # /.update(type, id, update, options)
   
 
   describe "#updateAll(objects)", ->
@@ -750,5 +705,5 @@ describe "Hoodie.LocalStore", ->
       cb = jasmine.createSpy 'test'
       @store.on 'super funky fresh', cb
       expect(@hoodie.on).wasCalledWith 'store:super store:funky store:fresh', cb
-  # /#trigger
+  # /#on
 # /Hoodie.LocalStore

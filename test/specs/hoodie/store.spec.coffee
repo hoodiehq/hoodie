@@ -70,7 +70,6 @@ describe "Hoodie.Store", ->
       
       it "should create it", ->
         expect(@store.save).wasCalledWith 'couch', '123', funky: 'fresh', {}
-        # expect(@promise).toBeRejected()
     
     _when "object can be found", ->
       beforeEach ->
@@ -106,7 +105,8 @@ describe "Hoodie.Store", ->
 
         it "should return a resolved promise", ->
           expect(@promise).toBeResolvedWith {style: 'baws'}
-  # /#update(
+  # /#update(type, id, update, options)
+
   describe "#updateAll(objects)", ->
     beforeEach ->
       spyOn(@hoodie, "isPromise").andReturn false
