@@ -64,7 +64,8 @@ class Hoodie.LocalStore extends Hoodie.Store
     
     # generate an id if necessary
     if id
-      isNew = typeof @_cached["#{type}/#{id}"] isnt 'object'
+      currentObject = @cache type, id
+      isNew = typeof currentObject isnt 'object'
     else
       isNew = true
       id    = @uuid()
@@ -82,7 +83,7 @@ class Hoodie.LocalStore extends Hoodie.Store
     if options.remote
       object._$syncedAt = @_now()
 
-      if isNew
+      unless isNew
         currentObject = @cache type, id
         for key of currentObject
           if key.charAt(0) is '_'

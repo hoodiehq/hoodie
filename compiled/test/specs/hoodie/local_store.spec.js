@@ -70,12 +70,23 @@ describe("Hoodie.LocalStore", function() {
       _and("options.remote is true", function() {
         beforeEach(function() {
           spyOn(this.store, "trigger");
-          this.store.cache.andReturn({
-            id: '123',
-            $type: 'document',
-            name: 'test',
-            _local: 'something',
-            old_attribute: 'what ever'
+          this.store.cache.andCallFake(function(type, id, object) {
+            if (object) {
+              return {
+                id: '123',
+                $type: 'document',
+                name: 'test',
+                _local: 'something'
+              };
+            } else {
+              return {
+                id: '123',
+                $type: 'document',
+                name: 'test',
+                _local: 'something',
+                old_attribute: 'what ever'
+              };
+            }
           });
           return this.store.save('document', '123', {
             name: 'test'
@@ -100,16 +111,15 @@ describe("Hoodie.LocalStore", function() {
             id: '123',
             $type: 'document',
             name: 'test',
-            _local: 'something',
-            old_attribute: 'what ever'
+            _local: 'something'
           };
           options = {
             remote: true
           };
-          expect(this.store.trigger).wasCalledWith('create', object, options);
-          expect(this.store.trigger).wasCalledWith('create:document', object, options);
-          expect(this.store.trigger).wasCalledWith('change', 'create', object, options);
-          return expect(this.store.trigger).wasCalledWith('change:document', 'create', object, options);
+          expect(this.store.trigger).wasCalledWith('update', object, options);
+          expect(this.store.trigger).wasCalledWith('update:document', object, options);
+          expect(this.store.trigger).wasCalledWith('change', 'update', object, options);
+          return expect(this.store.trigger).wasCalledWith('change:document', 'update', object, options);
         });
         return it("should keep local attributes", function() {
           var object;
@@ -144,7 +154,13 @@ describe("Hoodie.LocalStore", function() {
         });
         _and("object did exist before", function() {
           beforeEach(function() {
-            this.store._cached['document/123'] = {};
+            this.store.cache.andCallFake(function(type, id, object) {
+              if (object) {
+                return 'doc';
+              } else {
+                return {};
+              }
+            });
             return this.promise = this.store.save('document', '123', {
               name: 'test'
             }, {
@@ -157,7 +173,13 @@ describe("Hoodie.LocalStore", function() {
         });
         return _and("object did not exist before", function() {
           beforeEach(function() {
-            delete this.store._cached['document/123'];
+            this.store.cache.andCallFake(function(type, id, object) {
+              if (object) {
+                return 'doc';
+              } else {
+                return void 0;
+              }
+            });
             return this.promise = this.store.save('document', '123', {
               name: 'test'
             }, {
@@ -176,8 +198,10 @@ describe("Hoodie.LocalStore", function() {
       });
       return _when("failed", function() {
         beforeEach(function() {
-          return this.store.cache.andCallFake(function() {
-            throw new Error("i/o error");
+          return this.store.cache.andCallFake(function(type, id, object, options) {
+            if (object) {
+              throw new Error("i/o error");
+            }
           });
         });
         return it("should return a rejected promise", function() {

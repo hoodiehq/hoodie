@@ -67,7 +67,8 @@ Hoodie.LocalStore = (function(_super) {
     }
     object = $.extend({}, object);
     if (id) {
-      isNew = typeof this._cached["" + type + "/" + id] !== 'object';
+      currentObject = this.cache(type, id);
+      isNew = typeof currentObject !== 'object';
     } else {
       isNew = true;
       id = this.uuid();
@@ -80,7 +81,7 @@ Hoodie.LocalStore = (function(_super) {
     }
     if (options.remote) {
       object._$syncedAt = this._now();
-      if (isNew) {
+      if (!isNew) {
         currentObject = this.cache(type, id);
         for (key in currentObject) {
           if (key.charAt(0) === '_') {

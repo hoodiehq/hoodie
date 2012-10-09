@@ -354,7 +354,7 @@ Hoodie.RemoteStore = (function(_super) {
         ]);
       } else {
         _changedDocs.push([
-          doc, this.hoodie.my.store.update(doc.$type, doc.id, doc, {
+          doc, this.hoodie.my.store.save(doc.$type, doc.id, doc, {
             remote: true
           })
         ]);

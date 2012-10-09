@@ -10,7 +10,7 @@ describe "Hoodie.RemoteStore", ->
     spyOn(@hoodie.my.account, "db").andReturn 'joe$example.com'
     
     spyOn(@hoodie.my.store, "destroy").andReturn then: (cb) -> cb('objectFromStore')
-    spyOn(@hoodie.my.store, "update").andReturn  then: (cb) -> cb('objectFromStore', false)
+    spyOn(@hoodie.my.store, "save").andReturn    then: (cb) -> cb('objectFromStore', false)
 
     @remote = new Hoodie.RemoteStore @hoodie
   
@@ -342,7 +342,7 @@ describe "Hoodie.RemoteStore", ->
 
       it "should save `todo/abc2` in store", ->
         @remote.pull()
-        expect(@hoodie.my.store.update).wasCalledWith 'todo', 'abc2', { _rev : '1-123', content : 'remember the milk', done : false, order : 1, $type : 'todo', id : 'abc2' }, { remote : true }
+        expect(@hoodie.my.store.save).wasCalledWith 'todo', 'abc2', { _rev : '1-123', content : 'remember the milk', done : false, order : 1, $type : 'todo', id : 'abc2' }, { remote : true }
       
       it "should trigger remote events", ->
         spyOn(@remote, "trigger")

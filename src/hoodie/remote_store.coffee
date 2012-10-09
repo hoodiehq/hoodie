@@ -504,7 +504,7 @@ class Hoodie.RemoteStore extends Hoodie.Store
       if doc._deleted
         _destroyedDocs.push [doc, @hoodie.my.store.destroy( doc.$type, doc.id,      remote: true)]
       else                                                
-        _changedDocs.push   [doc, @hoodie.my.store.update(  doc.$type, doc.id, doc, remote: true)]
+        _changedDocs.push   [doc, @hoodie.my.store.save(    doc.$type, doc.id, doc, remote: true)]
     
     # 2. trigger events
     for [doc, promise] in _destroyedDocs

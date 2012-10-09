@@ -15,7 +15,7 @@ describe("Hoodie.RemoteStore", function() {
         return cb('objectFromStore');
       }
     });
-    spyOn(this.hoodie.my.store, "update").andReturn({
+    spyOn(this.hoodie.my.store, "save").andReturn({
       then: function(cb) {
         return cb('objectFromStore', false);
       }
@@ -396,7 +396,7 @@ describe("Hoodie.RemoteStore", function() {
       });
       it("should save `todo/abc2` in store", function() {
         this.remote.pull();
-        return expect(this.hoodie.my.store.update).wasCalledWith('todo', 'abc2', {
+        return expect(this.hoodie.my.store.save).wasCalledWith('todo', 'abc2', {
           _rev: '1-123',
           content: 'remember the milk',
           done: false,

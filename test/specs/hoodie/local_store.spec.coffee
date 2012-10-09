@@ -56,7 +56,12 @@ describe "Hoodie.LocalStore", ->
       _and "options.remote is true", ->
         beforeEach ->
           spyOn(@store, "trigger")
-          @store.cache.andReturn { id: '123', $type: 'document', name: 'test', _local: 'something', old_attribute: 'what ever'}
+          @store.cache.andCallFake (type, id, object) ->
+            if object
+              { id: '123', $type: 'document', name: 'test', _local: 'something' }
+            else
+              { id: '123', $type: 'document', name: 'test', _local: 'something', old_attribute: 'what ever' }
+
           @store.save 'document', '123', { name: 'test' }, { remote: true }
         
         it "should not touch createdAt / updatedAt timestamps", ->
@@ -69,12 +74,12 @@ describe "Hoodie.LocalStore", ->
           expect(object._$syncedAt).toBe 'now'
 
         it "should trigger trigger events", ->
-          object  = id: '123', $type: 'document', name: 'test', _local: 'something', old_attribute: 'what ever'
+          object  = id: '123', $type: 'document', name: 'test', _local: 'something'
           options = remote: true
-          expect(@store.trigger).wasCalledWith 'create',                    object, options
-          expect(@store.trigger).wasCalledWith 'create:document',           object, options
-          expect(@store.trigger).wasCalledWith 'change',          'create', object, options
-          expect(@store.trigger).wasCalledWith 'change:document', 'create', object, options
+          expect(@store.trigger).wasCalledWith 'update',                    object, options
+          expect(@store.trigger).wasCalledWith 'update:document',           object, options
+          expect(@store.trigger).wasCalledWith 'change',          'update', object, options
+          expect(@store.trigger).wasCalledWith 'change:document', 'update', object, options
 
         it "should keep local attributes", ->
           object = @store.cache.mostRecentCall.args[2]
@@ -101,7 +106,12 @@ describe "Hoodie.LocalStore", ->
           
         _and "object did exist before", ->
           beforeEach ->
-            @store._cached['document/123'] = {}
+            @store.cache.andCallFake (type, id, object) ->
+              if object
+                'doc'
+              else
+                {}
+
             @promise = @store.save 'document', '123', { name: 'test' }, { option: 'value' }
             
           it "should pass false (= not created) as the second param to the done callback", ->
@@ -109,7 +119,12 @@ describe "Hoodie.LocalStore", ->
 
         _and "object did not exist before", ->            
           beforeEach ->
-            delete @store._cached['document/123']
+            @store.cache.andCallFake (type, id, object) ->
+              if object
+                'doc'
+              else
+                undefined
+
             @promise = @store.save 'document', '123', { name: 'test' }, { option: 'value' }
           
           it "should pass true (= new created) as the second param to the done callback", ->
@@ -121,7 +136,8 @@ describe "Hoodie.LocalStore", ->
     
       _when "failed", ->
         beforeEach ->
-          @store.cache.andCallFake -> throw new Error "i/o error"
+          @store.cache.andCallFake (type, id, object, options) -> 
+            throw new Error "i/o error" if object
     
         it "should return a rejected promise", ->
           promise = @store.save 'document', '123', { name: 'test' }
