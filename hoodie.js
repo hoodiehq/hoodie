@@ -1180,7 +1180,7 @@ Hoodie.RemoteStore = (function(_super) {
         ]);
       } else {
         _changedDocs.push([
-          doc, this.hoodie.my.store.update(doc.$type, doc.id, doc, {
+          doc, this.hoodie.my.store.save(doc.$type, doc.id, doc, {
             remote: true
           })
         ]);
@@ -1520,7 +1520,7 @@ Hoodie.LocalStore = (function(_super) {
   };
 
   LocalStore.prototype.save = function(type, id, object, options) {
-    var defer, isNew;
+    var currentObject, defer, isNew, key;
     if (options == null) {
       options = {};
     }
@@ -1530,7 +1530,8 @@ Hoodie.LocalStore = (function(_super) {
     }
     object = $.extend({}, object);
     if (id) {
-      isNew = typeof this._cached["" + type + "/" + id] !== 'object';
+      currentObject = this.cache(type, id);
+      isNew = typeof currentObject !== 'object';
     } else {
       isNew = true;
       id = this.uuid();
@@ -1543,6 +1544,14 @@ Hoodie.LocalStore = (function(_super) {
     }
     if (options.remote) {
       object._$syncedAt = this._now();
+      if (!isNew) {
+        currentObject = this.cache(type, id);
+        for (key in currentObject) {
+          if (key.charAt(0) === '_') {
+            object[key] = currentObject[key];
+          }
+        }
+      }
     } else if (!options.silent) {
       object.$updatedAt = this._now();
       object.$createdAt || (object.$createdAt = object.$updatedAt);
@@ -1550,19 +1559,7 @@ Hoodie.LocalStore = (function(_super) {
     try {
       object = this.cache(type, id, object, options);
       defer.resolve(object, isNew).promise();
-      if (isNew) {
-        this.trigger("create", object, options);
-        this.trigger("create:" + object.$type, object, options);
-        this.trigger("change", 'create', object, options);
-        this.trigger("change:" + object.$type, 'create', object, options);
-      } else {
-        this.trigger("update", object, options);
-        this.trigger("update:" + object.$type, object, options);
-        this.trigger("update:" + object.$type + ":" + object.id, object, options);
-        this.trigger("change", 'update', object, options);
-        this.trigger("change:" + object.$type, 'update', object, options);
-        this.trigger("change:" + object.$type + ":" + object.id, 'update', object, options);
-      }
+      this._trigger_change_events(object, options, isNew);
     } catch (error) {
       defer.reject(error).promise();
     }
@@ -1881,6 +1878,22 @@ Hoodie.LocalStore = (function(_super) {
       _results.push(this.db.key(i));
     }
     return _results;
+  };
+
+  LocalStore.prototype._trigger_change_events = function(object, options, isNew) {
+    if (isNew) {
+      this.trigger("create", object, options);
+      this.trigger("create:" + object.$type, object, options);
+      this.trigger("change", 'create', object, options);
+      return this.trigger("change:" + object.$type, 'create', object, options);
+    } else {
+      this.trigger("update", object, options);
+      this.trigger("update:" + object.$type, object, options);
+      this.trigger("update:" + object.$type + ":" + object.id, object, options);
+      this.trigger("change", 'update', object, options);
+      this.trigger("change:" + object.$type, 'update', object, options);
+      return this.trigger("change:" + object.$type + ":" + object.id, 'update', object, options);
+    }
   };
 
   return LocalStore;
