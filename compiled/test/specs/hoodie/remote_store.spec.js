@@ -624,13 +624,13 @@ describe("Hoodie.RemoteStore", function() {
         var deletedDoc, docs, newDoc;
         docs = this.options.data.docs;
         deletedDoc = docs[0], newDoc = docs[1];
-        expect(deletedDoc._rev).toBe('3-uuid#11');
-        expect(newDoc._rev).toMatch('1-uuid#11');
+        expect(deletedDoc._rev).toBe('3-uuid');
+        expect(newDoc._rev).toMatch('1-uuid');
         expect(deletedDoc._revisions.start).toBe(3);
-        expect(deletedDoc._revisions.ids[0]).toBe('uuid#11');
+        expect(deletedDoc._revisions.ids[0]).toBe('uuid');
         expect(deletedDoc._revisions.ids[1]).toBe('123');
         expect(newDoc._revisions.start).toBe(1);
-        return expect(newDoc._revisions.ids[0]).toBe('uuid#11');
+        return expect(newDoc._revisions.ids[0]).toBe('uuid');
       });
     });
   });

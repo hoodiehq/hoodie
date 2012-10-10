@@ -514,15 +514,15 @@ describe "Hoodie.RemoteStore", ->
       it "should set new _revision ids", ->
         {docs} = @options.data
         [deletedDoc, newDoc] = docs
-        expect(deletedDoc._rev).toBe '3-uuid#11'
-        expect(newDoc._rev).toMatch '1-uuid#11'
+        expect(deletedDoc._rev).toBe '3-uuid'
+        expect(newDoc._rev).toMatch '1-uuid'
 
         expect(deletedDoc._revisions.start).toBe 3
-        expect(deletedDoc._revisions.ids[0]).toBe 'uuid#11'
+        expect(deletedDoc._revisions.ids[0]).toBe 'uuid'
         expect(deletedDoc._revisions.ids[1]).toBe '123'
 
         expect(newDoc._revisions.start).toBe 1
-        expect(newDoc._revisions.ids[0]).toBe 'uuid#11'
+        expect(newDoc._revisions.ids[0]).toBe 'uuid'
   # /#push(docs)
 
   describe "#sync(docs)", ->

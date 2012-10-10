@@ -285,11 +285,9 @@ Hoodie.RemoteStore = (function(_super) {
   };
 
   RemoteStore.prototype._generateNewRevisionId = function() {
-    var timestamp, uuid;
-    this._timezoneOffset || (this._timezoneOffset = new Date().getTimezoneOffset() * 60);
-    timestamp = Date.now() + this._timezoneOffset;
-    uuid = this.hoodie.my.store.uuid(5);
-    return "" + uuid + "#" + timestamp;
+    var uuid;
+    uuid = this.hoodie.my.store.uuid(9);
+    return uuid;
   };
 
   RemoteStore.prototype._addRevisionTo = function(attributes) {

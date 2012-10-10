@@ -410,16 +410,10 @@ class Hoodie.RemoteStore extends Hoodie.Store
 
   # ### generate new revision id
 
-  # generates a revision id in the for of {uuid}#{UTC timestamp}
-  # Beware that it does not include a leading revision number
+  # 
   _generateNewRevisionId:  ->
-    # get timezone offset
-    @_timezoneOffset or= new Date().getTimezoneOffset() * 60
-
-    timestamp   = Date.now() + @_timezoneOffset
-    uuid        = @hoodie.my.store.uuid(5)
-
-    return "#{uuid}##{timestamp}"
+    uuid        = @hoodie.my.store.uuid(9)
+    return uuid
   
 
   # ### and new revion to objecet
