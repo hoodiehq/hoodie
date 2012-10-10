@@ -434,7 +434,7 @@ describe("Hoodie.RemoteStore", function() {
         });
       });
     });
-    _when("request errors with 403 unauthorzied", function() {
+    _when("request errors with 401 unauthorzied", function() {
       beforeEach(function() {
         var _this = this;
         this.remote.request.andReturn({
@@ -443,7 +443,42 @@ describe("Hoodie.RemoteStore", function() {
               then: function() {}
             });
             return error({
-              status: 403
+              status: 401
+            }, 'error object');
+          }
+        });
+        return spyOn(this.remote, "disconnect");
+      });
+      it("should disconnect", function() {
+        this.remote.pull();
+        return expect(this.remote.disconnect).wasCalled();
+      });
+      it("should trigger an unauthenticated error", function() {
+        spyOn(this.remote, "trigger");
+        this.remote.pull();
+        return expect(this.remote.trigger).wasCalledWith('error:unauthenticated', 'error object');
+      });
+      _and("remote is pullContinuously", function() {
+        return beforeEach(function() {
+          return this.remote.pullContinuously = true;
+        });
+      });
+      return _and("remote isn't pullContinuously", function() {
+        return beforeEach(function() {
+          return this.remote.pullContinuously = false;
+        });
+      });
+    });
+    _when("request errors with 401 unauthorzied", function() {
+      beforeEach(function() {
+        var _this = this;
+        this.remote.request.andReturn({
+          then: function(success, error) {
+            _this.remote.request.andReturn({
+              then: function() {}
+            });
+            return error({
+              status: 401
             }, 'error object');
           }
         });

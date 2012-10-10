@@ -375,12 +375,12 @@ describe "Hoodie.RemoteStore", ->
           @remote.pull()
           expect(@remote.pull.callCount).toBe 2
         
-    _when "request errors with 403 unauthorzied", ->
+    _when "request errors with 401 unauthorzied", ->
       beforeEach ->
         @remote.request.andReturn then: (success, error) =>
           # avoid recursion
           @remote.request.andReturn then: ->
-          error status: 403, 'error object'
+          error status: 401, 'error object'
           
         spyOn(@remote, "disconnect")
       
@@ -400,6 +400,34 @@ describe "Hoodie.RemoteStore", ->
       _and "remote isn't pullContinuously", ->
         beforeEach ->
           @remote.pullContinuously = false
+
+
+    _when "request errors with 401 unauthorzied", ->
+      beforeEach ->
+        @remote.request.andReturn then: (success, error) =>
+          # avoid recursion
+          @remote.request.andReturn then: ->
+          error status: 401, 'error object'
+          
+        spyOn(@remote, "disconnect")
+      
+      it "should disconnect", ->
+        @remote.pull()
+        expect(@remote.disconnect).wasCalled()
+        
+      it "should trigger an unauthenticated error", ->
+        spyOn(@remote, "trigger")
+        @remote.pull()
+        expect(@remote.trigger).wasCalledWith 'error:unauthenticated', 'error object'
+      
+      _and "remote is pullContinuously", ->
+        beforeEach ->
+          @remote.pullContinuously = true
+      
+      _and "remote isn't pullContinuously", ->
+        beforeEach ->
+          @remote.pullContinuously = false
+
 
     _when "request errors with 404 not found", ->
       beforeEach ->

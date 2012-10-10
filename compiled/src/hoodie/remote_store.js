@@ -244,7 +244,7 @@ Hoodie.RemoteStore = (function(_super) {
       return;
     }
     switch (xhr.status) {
-      case 403:
+      case 401:
         this.trigger('error:unauthenticated', error);
         return this.disconnect();
       case 404:

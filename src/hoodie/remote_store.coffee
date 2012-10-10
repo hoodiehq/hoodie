@@ -341,7 +341,7 @@ class Hoodie.RemoteStore extends Hoodie.Store
   
       # Session is invalid. User is still login, but needs to reauthenticate
       # before sync can be continued
-      when 403
+      when 401
         @trigger 'error:unauthenticated', error
         @disconnect()
       
@@ -371,7 +371,7 @@ class Hoodie.RemoteStore extends Hoodie.Store
         else    
             
           # oops. This might be caused by an unreachable server.
-          # Or the server canceld it for what ever reason, e.g.
+          # Or the server canceled it for what ever reason, e.g.
           # heroku kills the request after ~30s.
           # we'll try again after a 3s timeout
           window.setTimeout @pull, 3000
