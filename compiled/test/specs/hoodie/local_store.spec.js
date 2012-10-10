@@ -76,7 +76,8 @@ describe("Hoodie.LocalStore", function() {
                 id: '123',
                 $type: 'document',
                 name: 'test',
-                _local: 'something'
+                _local: 'something',
+                _rev: '2-345'
               };
             } else {
               return {
@@ -84,12 +85,14 @@ describe("Hoodie.LocalStore", function() {
                 $type: 'document',
                 name: 'test',
                 _local: 'something',
-                old_attribute: 'what ever'
+                old_attribute: 'what ever',
+                _rev: '1-234'
               };
             }
           });
           return this.store.save('document', '123', {
-            name: 'test'
+            name: 'test',
+            _rev: '2-345'
           }, {
             remote: true
           });
@@ -111,7 +114,8 @@ describe("Hoodie.LocalStore", function() {
             id: '123',
             $type: 'document',
             name: 'test',
-            _local: 'something'
+            _local: 'something',
+            _rev: '2-345'
           };
           options = {
             remote: true
@@ -121,10 +125,15 @@ describe("Hoodie.LocalStore", function() {
           expect(this.store.trigger).wasCalledWith('change', 'update', object, options);
           return expect(this.store.trigger).wasCalledWith('change:document', 'update', object, options);
         });
-        return it("should keep local attributes", function() {
+        it("should keep local attributes", function() {
           var object;
           object = this.store.cache.mostRecentCall.args[2];
           return expect(object._local).toBe('something');
+        });
+        return it("should update _rev", function() {
+          var object;
+          object = this.store.cache.mostRecentCall.args[2];
+          return expect(object._rev).toBe('2-345');
         });
       });
       _and("options.silent is true", function() {

@@ -84,9 +84,8 @@ class Hoodie.LocalStore extends Hoodie.Store
       object._$syncedAt = @_now()
 
       unless isNew
-        currentObject = @cache type, id
         for key of currentObject
-          if key.charAt(0) is '_'
+          if key.charAt(0) is '_' and object[key] is undefined
             object[key] = currentObject[key]
 
     else unless options.silent

@@ -58,11 +58,11 @@ describe "Hoodie.LocalStore", ->
           spyOn(@store, "trigger")
           @store.cache.andCallFake (type, id, object) ->
             if object
-              { id: '123', $type: 'document', name: 'test', _local: 'something' }
+              { id: '123', $type: 'document', name: 'test', _local: 'something', _rev: '2-345' }
             else
-              { id: '123', $type: 'document', name: 'test', _local: 'something', old_attribute: 'what ever' }
+              { id: '123', $type: 'document', name: 'test', _local: 'something', old_attribute: 'what ever', _rev: '1-234' }
 
-          @store.save 'document', '123', { name: 'test' }, { remote: true }
+          @store.save 'document', '123', { name: 'test', _rev: '2-345' }, { remote: true }
         
         it "should not touch createdAt / updatedAt timestamps", ->
           object = @store.cache.mostRecentCall.args[2]
@@ -74,7 +74,7 @@ describe "Hoodie.LocalStore", ->
           expect(object._$syncedAt).toBe 'now'
 
         it "should trigger trigger events", ->
-          object  = id: '123', $type: 'document', name: 'test', _local: 'something'
+          object  = id: '123', $type: 'document', name: 'test', _local: 'something', _rev: '2-345'
           options = remote: true
           expect(@store.trigger).wasCalledWith 'update',                    object, options
           expect(@store.trigger).wasCalledWith 'update:document',           object, options
@@ -84,6 +84,10 @@ describe "Hoodie.LocalStore", ->
         it "should keep local attributes", ->
           object = @store.cache.mostRecentCall.args[2]
           expect(object._local).toBe 'something'
+
+        it "should update _rev", ->
+          object = @store.cache.mostRecentCall.args[2]
+          expect(object._rev).toBe '2-345'
       
       _and "options.silent is true", ->
         beforeEach ->

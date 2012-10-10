@@ -82,9 +82,8 @@ Hoodie.LocalStore = (function(_super) {
     if (options.remote) {
       object._$syncedAt = this._now();
       if (!isNew) {
-        currentObject = this.cache(type, id);
         for (key in currentObject) {
-          if (key.charAt(0) === '_') {
+          if (key.charAt(0) === '_' && object[key] === void 0) {
             object[key] = currentObject[key];
           }
         }

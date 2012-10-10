@@ -61,7 +61,7 @@ class Hoodie.Store
   #
   # hoodie.my.store.update('car', 'abc4567', {sold: true})
   # hoodie.my.store.update('car', 'abc4567', function(obj) { obj.sold = true })
-  update : (type, id, objectUpdate, options = {}) ->
+  update : (type, id, objectUpdate, options) ->
     defer = @hoodie.defer()
     
     _loadPromise = @find(type, id).pipe (currentObj) => 
@@ -71,13 +71,14 @@ class Hoodie.Store
       
       return defer.resolve currentObj unless objectUpdate
       
-      # check if something changed
-      changedProperties = for key, value of objectUpdate when currentObj[key] isnt value
-        # workaround for undefined values, as $.extend ignores these
-        currentObj[key] = value
-        key
-        
-      return defer.resolve currentObj unless changedProperties.length
+      unless  options
+        # check if something changed
+        changedProperties = for key, value of objectUpdate when currentObj[key] isnt value
+          # workaround for undefined values, as $.extend ignores these
+          currentObj[key] = value
+          key
+          
+        return defer.resolve currentObj unless changedProperties.length
       
       # apply update 
       @save(type, id, currentObj, options).then defer.resolve, defer.reject

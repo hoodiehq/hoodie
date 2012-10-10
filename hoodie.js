@@ -654,9 +654,6 @@ Hoodie.Store = (function() {
   Store.prototype.update = function(type, id, objectUpdate, options) {
     var defer, _loadPromise,
       _this = this;
-    if (options == null) {
-      options = {};
-    }
     defer = this.hoodie.defer();
     _loadPromise = this.find(type, id).pipe(function(currentObj) {
       var changedProperties, key, value;
@@ -666,21 +663,23 @@ Hoodie.Store = (function() {
       if (!objectUpdate) {
         return defer.resolve(currentObj);
       }
-      changedProperties = (function() {
-        var _results;
-        _results = [];
-        for (key in objectUpdate) {
-          value = objectUpdate[key];
-          if (!(currentObj[key] !== value)) {
-            continue;
+      if (!options) {
+        changedProperties = (function() {
+          var _results;
+          _results = [];
+          for (key in objectUpdate) {
+            value = objectUpdate[key];
+            if (!(currentObj[key] !== value)) {
+              continue;
+            }
+            currentObj[key] = value;
+            _results.push(key);
           }
-          currentObj[key] = value;
-          _results.push(key);
+          return _results;
+        })();
+        if (!changedProperties.length) {
+          return defer.resolve(currentObj);
         }
-        return _results;
-      })();
-      if (!changedProperties.length) {
-        return defer.resolve(currentObj);
       }
       return _this.save(type, id, currentObj, options).then(defer.resolve, defer.reject);
     });
@@ -1545,9 +1544,8 @@ Hoodie.LocalStore = (function(_super) {
     if (options.remote) {
       object._$syncedAt = this._now();
       if (!isNew) {
-        currentObject = this.cache(type, id);
         for (key in currentObject) {
-          if (key.charAt(0) === '_') {
+          if (key.charAt(0) === '_' && object[key] === void 0) {
             object[key] = currentObject[key];
           }
         }

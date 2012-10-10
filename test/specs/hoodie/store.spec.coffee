@@ -69,7 +69,7 @@ describe "Hoodie.Store", ->
         @promise = @store.update 'couch', '123', funky: 'fresh'
       
       it "should create it", ->
-        expect(@store.save).wasCalledWith 'couch', '123', funky: 'fresh', {}
+        expect(@store.save).wasCalledWith 'couch', '123', funky: 'fresh', undefined
     
     _when "object can be found", ->
       beforeEach ->
@@ -81,7 +81,7 @@ describe "Hoodie.Store", ->
           @promise = @store.update 'couch', '123', { funky: 'fresh' }
       
         it "should save the updated object", ->
-          expect(@store.save).wasCalledWith 'couch', '123', { style: 'baws', funky: 'fresh' }, {}
+          expect(@store.save).wasCalledWith 'couch', '123', { style: 'baws', funky: 'fresh' }, undefined
       
         it "should return a resolved promise", ->
           expect(@promise).toBeResolvedWith 'resolved by save'
@@ -91,7 +91,7 @@ describe "Hoodie.Store", ->
           @promise = @store.update 'couch', '123', (obj) -> funky: 'fresh'
 
         it "should save the updated object", ->
-          expect(@store.save).wasCalledWith 'couch', '123', { style: 'baws', funky: 'fresh' }, {}
+          expect(@store.save).wasCalledWith 'couch', '123', { style: 'baws', funky: 'fresh' }, undefined
 
         it "should return a resolved promise", ->
           expect(@promise).toBeResolvedWith 'resolved by save'
@@ -100,11 +100,20 @@ describe "Hoodie.Store", ->
         beforeEach ->
           @promise = @store.update 'couch', '123', (obj) -> style: 'baws'
           
-        it "should save the object", ->
+        it "should not save the object", ->
           expect(@store.save).wasNotCalled()
 
         it "should return a resolved promise", ->
           expect(@promise).toBeResolvedWith {style: 'baws'}
+
+      _but "update wouldn't make a change, but options have been passed", ->
+        beforeEach ->
+          @promise = @store.update 'couch', '123', {}, public: true
+
+        it "should not save the object", ->
+          expect(@store.save).wasCalledWith 'couch', '123', style: 'baws', {public: true}
+        
+          
   # /#update(type, id, update, options)
 
   describe "#updateAll(objects)", ->

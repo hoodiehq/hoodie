@@ -98,7 +98,7 @@ describe("Hoodie.Store", function() {
       return it("should create it", function() {
         return expect(this.store.save).wasCalledWith('couch', '123', {
           funky: 'fresh'
-        }, {});
+        }, void 0);
       });
     });
     return _when("object can be found", function() {
@@ -118,7 +118,7 @@ describe("Hoodie.Store", function() {
           return expect(this.store.save).wasCalledWith('couch', '123', {
             style: 'baws',
             funky: 'fresh'
-          }, {});
+          }, void 0);
         });
         return it("should return a resolved promise", function() {
           return expect(this.promise).toBeResolvedWith('resolved by save');
@@ -136,13 +136,13 @@ describe("Hoodie.Store", function() {
           return expect(this.store.save).wasCalledWith('couch', '123', {
             style: 'baws',
             funky: 'fresh'
-          }, {});
+          }, void 0);
         });
         return it("should return a resolved promise", function() {
           return expect(this.promise).toBeResolvedWith('resolved by save');
         });
       });
-      return _and("update wouldn't make a change", function() {
+      _and("update wouldn't make a change", function() {
         beforeEach(function() {
           return this.promise = this.store.update('couch', '123', function(obj) {
             return {
@@ -150,12 +150,26 @@ describe("Hoodie.Store", function() {
             };
           });
         });
-        it("should save the object", function() {
+        it("should not save the object", function() {
           return expect(this.store.save).wasNotCalled();
         });
         return it("should return a resolved promise", function() {
           return expect(this.promise).toBeResolvedWith({
             style: 'baws'
+          });
+        });
+      });
+      return _but("update wouldn't make a change, but options have been passed", function() {
+        beforeEach(function() {
+          return this.promise = this.store.update('couch', '123', {}, {
+            "public": true
+          });
+        });
+        return it("should not save the object", function() {
+          return expect(this.store.save).wasCalledWith('couch', '123', {
+            style: 'baws'
+          }, {
+            "public": true
           });
         });
       });
