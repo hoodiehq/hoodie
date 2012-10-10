@@ -378,79 +378,98 @@ describe "Hoodie.Account", ->
         salt         : 'absalt'
         password_sha : 'pwcdef'
         
-        
+      @fetchPromise = @hoodie.defer()
+      spyOn(@account, "fetch").andReturn @fetchPromise
+
+    it "should fetch the _users doc", ->
       @account.changePassword('currentSecret', 'newSecret')
-      [@type, @path, @options] = @hoodie.request.mostRecentCall.args
-      @data = JSON.parse @options.data
-  
-    it "should send a PUT request to http://my.cou.ch/_users/org.couchdb.user%3Auser%2Fjoe%40example.com", ->
-      expect(@hoodie.request).wasCalled()
-      expect(@type).toBe 'PUT'
-      expect(@path).toBe  '/_users/org.couchdb.user%3Auser%2Fjoe%40example.com'
-      
-    it "should set contentType to 'application/json'", ->
-      expect(@options.contentType).toBe 'application/json'
-    
-    it "should stringify the data", ->
-      expect(typeof @options.data).toBe 'string'
-  
-    it "should have set _id to 'org.couchdb.user:user/joe@example.com'", ->
-      expect(@data._id).toBe 'org.couchdb.user:user/joe@example.com'
-    
-    it "should have set name to 'user/joe@example.com", ->
-      expect(@data.name).toBe 'user/joe@example.com'
-      
-    it "should have set type to 'user", ->
-      expect(@data.type).toBe 'user'
+      expect(@account.fetch).wasCalled()
 
-    it "should pass password", ->
-      expect(@data.password).toBe 'newSecret'
-      
-    it "should allow to set empty password", ->
-      @account.changePassword('currentSecret','')
-      [@type, @path, @options] = @hoodie.request.mostRecentCall.args
-      @data = JSON.parse @options.data
-      expect(@data.password).toBe ''
-      
-    it "should not send salt", ->
-      expect(@data.salt).toBeUndefined()
-      
-    it "should not send password_sha", ->
-      expect(@data.password_sha).toBeUndefined()
-      
-    _when "change password successful", ->
+    _when "fetching _users doc successful", ->
       beforeEach ->
-        @signInDefer = @hoodie.defer()
-        spyOn(@account, "signIn").andReturn @signInDefer.promise()
-        @requestDefer.resolve {"ok":true,"id":"org.couchdb.user:user/bizbiz","rev":"2-345"}
-
-      it "should sign in", ->
+        @fetchPromise.resolve()
         @account.changePassword('currentSecret', 'newSecret')
-        expect(@account.signIn).wasCalledWith 'joe@example.com', 'newSecret'
-        
-      _when "sign in successful", ->
-        beforeEach ->
-          @signInDefer.resolve()
+        [@type, @path, @options] = @hoodie.request.mostRecentCall.args
+        @data = JSON.parse @options.data
 
-        it "should resolve its promise", ->
-          promise = @account.changePassword('currentSecret', 'newSecret')
-          expect(promise).toBeResolved()
+  
+      it "should send a PUT request to http://my.cou.ch/_users/org.couchdb.user%3Auser%2Fjoe%40example.com", ->
+        expect(@hoodie.request).wasCalled()
+        expect(@type).toBe 'PUT'
+        expect(@path).toBe  '/_users/org.couchdb.user%3Auser%2Fjoe%40example.com'
       
-      _when "sign in not successful", ->
-        beforeEach ->
-          @signInDefer.reject()
+      it "should set contentType to 'application/json'", ->
+        expect(@options.contentType).toBe 'application/json'
+      
+      it "should stringify the data", ->
+        expect(typeof @options.data).toBe 'string'
+    
+      it "should have set _id to 'org.couchdb.user:user/joe@example.com'", ->
+        expect(@data._id).toBe 'org.couchdb.user:user/joe@example.com'
+      
+      it "should have set name to 'user/joe@example.com", ->
+        expect(@data.name).toBe 'user/joe@example.com'
+        
+      it "should have set type to 'user", ->
+        expect(@data.type).toBe 'user'
 
+      it "should pass password", ->
+        expect(@data.password).toBe 'newSecret'
+        
+      it "should allow to set empty password", ->
+        @account.changePassword('currentSecret','')
+        [@type, @path, @options] = @hoodie.request.mostRecentCall.args
+        @data = JSON.parse @options.data
+        expect(@data.password).toBe ''
+        
+      it "should not send salt", ->
+        expect(@data.salt).toBeUndefined()
+        
+      it "should not send password_sha", ->
+        expect(@data.password_sha).toBeUndefined()
+        
+      _when "change password successful", ->
+        beforeEach ->
+          @signInDefer = @hoodie.defer()
+          spyOn(@account, "signIn").andReturn @signInDefer.promise()
+          @requestDefer.resolve {"ok":true,"id":"org.couchdb.user:user/bizbiz","rev":"2-345"}
+
+        it "should sign in", ->
+          @account.changePassword('currentSecret', 'newSecret')
+          expect(@account.signIn).wasCalledWith 'joe@example.com', 'newSecret'
+          
+        _when "sign in successful", ->
+          beforeEach ->
+            @signInDefer.resolve()
+
+          it "should resolve its promise", ->
+            promise = @account.changePassword('currentSecret', 'newSecret')
+            expect(promise).toBeResolved()
+        
+        _when "sign in not successful", ->
+          beforeEach ->
+            @signInDefer.reject()
+
+          it "should reject its promise", ->
+            promise = @account.changePassword('currentSecret', 'newSecret')
+            expect(promise).toBeRejected()
+          
+      _when "change password has an error", ->
+        beforeEach ->
+          @requestDefer.reject()
+        
         it "should reject its promise", ->
           promise = @account.changePassword('currentSecret', 'newSecret')
-          expect(promise).toBeRejected()
-        
-    _when "signUp has an error", ->
+          expect(promise).toBeRejectedWith error:"unknown"
+
+    _when "fetching _users has an error", ->
       beforeEach ->
-        @requestDefer.reject()
+        @fetchPromise.reject()
       
       it "should reject its promise", ->
         promise = @account.changePassword('currentSecret', 'newSecret')
         expect(promise).toBeRejectedWith error:"unknown"
+
   # /.changePassword(username, password)
 
 
@@ -694,13 +713,105 @@ describe "Hoodie.Account", ->
   describe "#changeUsername(currentPassword, newUsername)", ->
     beforeEach ->
       @authenticateDefer = @hoodie.defer()
+      @fetchDefer = @hoodie.defer()
       spyOn(@account, "authenticate").andReturn @authenticateDefer.promise()
-      @account.changeUsername('secret', 'new.joe@example.com')
+      spyOn(@account, "fetch").andReturn @fetchDefer
+
+      @account._doc  = 
+        _id          : 'org.couchdb.user:user/joe@example.com'
+        name         : 'user/joe@example.com'
+        type         : 'user'
+        roles        : []
+        salt         : 'absalt'
+        password_sha : 'pwcdef'
     
     it "should authenticate", ->
-       expect(@account.authenticate).wasCalled()
+      @account.changeUsername('secret', 'new.joe@example.com')
+      expect(@account.authenticate).wasCalled()
 
     it "should return a promise", ->
-       expect(@account.changeUsername()).toBePromise()
+      @account.changeUsername('secret', 'new.joe@example.com')
+      expect(@account.changeUsername()).toBePromise()
+
+    _when "authenticated", ->
+      beforeEach ->
+        @authenticateDefer.resolve()
+      
+      it "should fetch the _users doc", ->
+        @account.changeUsername('secret', 'new.joe@example.com')
+        expect(@account.fetch).wasCalled()
+
+      _and "_users doc can be fetched", ->
+        beforeEach ->
+          @fetchDefer.resolve()
+          @account.username = 'joe@example.com'
+          @promise = @account.changeUsername('secret', 'new.joe@example.com')
+          [@type, @path, @options] = @hoodie.request.mostRecentCall.args
+          @data = JSON.parse @options.data
+
+        it "should send a PUT request to http://my.cou.ch/_users/org.couchdb.user%3Auser%2Fjoe%40example.com", ->
+          expect(@hoodie.request).wasCalled()
+          expect(@type).toBe 'PUT'
+          expect(@path).toBe  '/_users/org.couchdb.user%3Auser%2Fjoe%40example.com'
+        
+        it "should set contentType to 'application/json'", ->
+          expect(@options.contentType).toBe 'application/json'
+        
+        it "should stringify the data", ->
+          expect(typeof @options.data).toBe 'string'
+
+        it "should have set name to 'user/joe@example.com", ->
+          expect(@data.$newUsername).toBe 'new.joe@example.com'
+
+        _when "_users doc could be updated", ->
+          beforeEach ->
+            @signInDefer = @hoodie.defer()
+            spyOn(@account, "signIn").andReturn @signInDefer.promise()
+            spyOn(@hoodie.my.remote, "disconnect")
+            @requestDefer.resolve()
+
+          it "should disconnect", ->
+            expect(@hoodie.my.remote.disconnect).wasCalled() 
+
+          it "should sign in with new username", ->
+            expect(@account.signIn).wasCalledWith 'new.joe@example.com', 'secret'
+
+          _and "signIn is successful", ->
+            beforeEach ->
+              @signInDefer.resolve('fuckyeah')
+
+            it "should be resolved", ->
+              expect(@promise).toBeResolvedWith 'fuckyeah'
+
+          _but "signIn has an error", ->
+            beforeEach ->
+              @signInDefer.reject('oooops')
+
+            it "should be resolved", ->
+              expect(@promise).toBeRejectedWith 'oooops'
+        
+        _when "_users doc could not be updated", ->
+          beforeEach ->
+            @requestDefer.reject()
+
+          it "should be rejected", ->
+            expect(@promise).toBeRejectedWith error: 'unknown'
+
+      _but "_users doc cannot be fetched", ->
+        beforeEach ->
+          @fetchDefer.reject()
+
+        it "should be rejected", ->
+          promise = @account.changeUsername('secret', 'new.joe@example.com')
+          expect(promise).toBeRejectedWith error: 'unknown'
+
+    _when "unuathenticated", ->
+      beforeEach ->
+        @authenticateDefer.reject('autherror')
+
+      it "should be rejected", ->
+        promise = @account.changeUsername('secret', 'new.joe@example.com')
+        expect(promise).toBeRejectedWith 'autherror'
+      
   # /.changeUsername(currentPassword, newUsername)
 # /Hoodie.Account

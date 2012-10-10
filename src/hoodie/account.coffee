@@ -188,18 +188,10 @@ class Hoodie.Account
 
     unless @username
       return @hoodie.defer().reject(error: "unauthenticated", reason: "not logged in").promise()
-    
-    data = $.extend {}, @_doc
-    data.password = newPassword
-    delete data.salt
-    delete data.password_sha
-    options = 
-      data        : JSON.stringify data
-      contentType : "application/json"
 
     @hoodie.my.remote.disconnect()
-    @hoodie.request('PUT',  @_url(), options)
-    .pipe( @_handleChangePasswordSuccess(newPassword), @_handleRequestError )
+    @fetch().pipe @_sendChangePasswordRequest(currentPassword, newPassword), @_handleRequestError
+      
 
 
   # reset password
@@ -254,7 +246,7 @@ class Hoodie.Account
   # destroy
   # ---------
 
-  # destroys a user' account  
+  # destroys a user's account  
   destroy : ->
     @fetch()
     .pipe(@_handleFetchBeforeDestroySucces, @_handleRequestError)
@@ -466,25 +458,7 @@ class Hoodie.Account
   #
   _changeUsernameAndPassword : (currentPassword, newUsername, newPassword) ->
     @authenticate().pipe =>
-
-      # prepare updated _users doc
-      data = $.extend {}, @_doc
-      data.$newUsername = newUsername
-
-      # trigger password update when newPassword set
-      if newPassword
-        delete data.salt
-        delete data.password_sha
-        data.password = newPassword
-
-      options =
-        data        : JSON.stringify data
-        contentType : 'application/json'
-
-      @hoodie.request('PUT', @_url(), options)
-      .pipe =>
-        @hoodie.my.remote.disconnect()
-        @_delayedSignIn newUsername, newPassword or currentPassword
+      @fetch().pipe @_sendChangeUsernameAndPasswordRequest(currentPassword, newUsername, newPassword), @_handleRequestError
   
   #
   # turn an anonymous account into a real account
@@ -530,3 +504,44 @@ class Hoodie.Account
   #
   _url : (username = @username) ->
     "/_users/#{encodeURIComponent @_key(username)}"
+
+  # 
+  _sendChangePasswordRequest: (currentPassword, newPassword) =>
+
+    data = $.extend {}, @_doc
+    data.password = newPassword
+    delete data.salt
+    delete data.password_sha
+    options = 
+      data        : JSON.stringify data
+      contentType : "application/json"
+
+    => 
+      @hoodie.request('PUT',  @_url(), options)
+      .pipe( @_handleChangePasswordSuccess(newPassword), @_handleRequestError )
+
+  # 
+  _sendChangeUsernameAndPasswordRequest: (currentPassword, newUsername, newPassword) =>
+    # prepare updated _users doc
+    data = $.extend {}, @_doc
+    data.$newUsername = newUsername
+
+    # trigger password update when newPassword set
+    if newPassword
+      delete data.salt
+      delete data.password_sha
+      data.password = newPassword
+
+    options =
+      data        : JSON.stringify data
+      contentType : 'application/json'
+    
+    =>
+      @hoodie.request('PUT', @_url(), options)
+      .pipe @_handleChangeUsernameAndPasswordRequest(newUsername, newPassword or currentPassword), @_handleRequestError
+
+  # 
+  _handleChangeUsernameAndPasswordRequest: (username, password) =>
+    =>
+      @hoodie.my.remote.disconnect()
+      @_delayedSignIn username, password

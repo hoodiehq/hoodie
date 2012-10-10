@@ -181,6 +181,12 @@ Hoodie.Account = (function() {
 
   function Account(hoodie) {
     this.hoodie = hoodie;
+    this._handleChangeUsernameAndPasswordRequest = __bind(this._handleChangeUsernameAndPasswordRequest, this);
+
+    this._sendChangeUsernameAndPasswordRequest = __bind(this._sendChangeUsernameAndPasswordRequest, this);
+
+    this._sendChangePasswordRequest = __bind(this._sendChangePasswordRequest, this);
+
     this._handleDestroySucces = __bind(this._handleDestroySucces, this);
 
     this._handleFetchBeforeDestroySucces = __bind(this._handleFetchBeforeDestroySucces, this);
@@ -320,23 +326,14 @@ Hoodie.Account = (function() {
   };
 
   Account.prototype.changePassword = function(currentPassword, newPassword) {
-    var data, options;
     if (!this.username) {
       return this.hoodie.defer().reject({
         error: "unauthenticated",
         reason: "not logged in"
       }).promise();
     }
-    data = $.extend({}, this._doc);
-    data.password = newPassword;
-    delete data.salt;
-    delete data.password_sha;
-    options = {
-      data: JSON.stringify(data),
-      contentType: "application/json"
-    };
     this.hoodie.my.remote.disconnect();
-    return this.hoodie.request('PUT', this._url(), options).pipe(this._handleChangePasswordSuccess(newPassword), this._handleRequestError);
+    return this.fetch().pipe(this._sendChangePasswordRequest(currentPassword, newPassword), this._handleRequestError);
   };
 
   Account.prototype.resetPassword = function(username) {
@@ -541,22 +538,7 @@ Hoodie.Account = (function() {
   Account.prototype._changeUsernameAndPassword = function(currentPassword, newUsername, newPassword) {
     var _this = this;
     return this.authenticate().pipe(function() {
-      var data, options;
-      data = $.extend({}, _this._doc);
-      data.$newUsername = newUsername;
-      if (newPassword) {
-        delete data.salt;
-        delete data.password_sha;
-        data.password = newPassword;
-      }
-      options = {
-        data: JSON.stringify(data),
-        contentType: 'application/json'
-      };
-      return _this.hoodie.request('PUT', _this._url(), options).pipe(function() {
-        _this.hoodie.my.remote.disconnect();
-        return _this._delayedSignIn(newUsername, newPassword || currentPassword);
-      });
+      return _this.fetch().pipe(_this._sendChangeUsernameAndPasswordRequest(currentPassword, newUsername, newPassword), _this._handleRequestError);
     });
   };
 
@@ -605,6 +587,49 @@ Hoodie.Account = (function() {
       username = this.username;
     }
     return "/_users/" + (encodeURIComponent(this._key(username)));
+  };
+
+  Account.prototype._sendChangePasswordRequest = function(currentPassword, newPassword) {
+    var data, options,
+      _this = this;
+    data = $.extend({}, this._doc);
+    data.password = newPassword;
+    delete data.salt;
+    delete data.password_sha;
+    options = {
+      data: JSON.stringify(data),
+      contentType: "application/json"
+    };
+    return function() {
+      return _this.hoodie.request('PUT', _this._url(), options).pipe(_this._handleChangePasswordSuccess(newPassword), _this._handleRequestError);
+    };
+  };
+
+  Account.prototype._sendChangeUsernameAndPasswordRequest = function(currentPassword, newUsername, newPassword) {
+    var data, options,
+      _this = this;
+    data = $.extend({}, this._doc);
+    data.$newUsername = newUsername;
+    if (newPassword) {
+      delete data.salt;
+      delete data.password_sha;
+      data.password = newPassword;
+    }
+    options = {
+      data: JSON.stringify(data),
+      contentType: 'application/json'
+    };
+    return function() {
+      return _this.hoodie.request('PUT', _this._url(), options).pipe(_this._handleChangeUsernameAndPasswordRequest(newUsername, newPassword || currentPassword), _this._handleRequestError);
+    };
+  };
+
+  Account.prototype._handleChangeUsernameAndPasswordRequest = function(username, password) {
+    var _this = this;
+    return function() {
+      _this.hoodie.my.remote.disconnect();
+      return _this._delayedSignIn(username, password);
+    };
   };
 
   return Account;
