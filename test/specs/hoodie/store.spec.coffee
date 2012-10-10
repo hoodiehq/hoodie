@@ -73,8 +73,8 @@ describe "Hoodie.Store", ->
     
     _when "object can be found", ->
       beforeEach ->
-        @store.find.andReturn $.Deferred().resolve { style: 'baws' }
-        @store.save.andReturn $.Deferred().resolve 'resolved by save'
+        @store.find.andReturn @hoodie.defer().resolve { style: 'baws' }
+        @store.save.andReturn @hoodie.defer().resolve 'resolved by save'
         
       _and "update is an object", ->
         beforeEach ->
@@ -85,6 +85,13 @@ describe "Hoodie.Store", ->
       
         it "should return a resolved promise", ->
           expect(@promise).toBeResolvedWith 'resolved by save'
+
+      _and "update is an object and options passed", ->
+        beforeEach ->
+          @promise = @store.update 'couch', '123', { funky: 'fresh' }, silent: true
+
+        it "should not save the object", ->
+          expect(@store.save).wasCalledWith 'couch', '123', {style: 'baws', funky: 'fresh'}, {silent: true}
         
       _and "update is a function", ->
         beforeEach ->

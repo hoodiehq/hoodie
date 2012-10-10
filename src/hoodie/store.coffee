@@ -71,14 +71,13 @@ class Hoodie.Store
       
       return defer.resolve currentObj unless objectUpdate
       
-      unless  options
-        # check if something changed
-        changedProperties = for key, value of objectUpdate when currentObj[key] isnt value
-          # workaround for undefined values, as $.extend ignores these
-          currentObj[key] = value
-          key
-          
-        return defer.resolve currentObj unless changedProperties.length
+      # check if something changed
+      changedProperties = for key, value of objectUpdate when currentObj[key] isnt value
+        # workaround for undefined values, as $.extend ignores these
+        currentObj[key] = value
+        key
+        
+      return defer.resolve currentObj unless changedProperties.length or options
       
       # apply update 
       @save(type, id, currentObj, options).then defer.resolve, defer.reject

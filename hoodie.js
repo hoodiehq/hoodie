@@ -663,23 +663,21 @@ Hoodie.Store = (function() {
       if (!objectUpdate) {
         return defer.resolve(currentObj);
       }
-      if (!options) {
-        changedProperties = (function() {
-          var _results;
-          _results = [];
-          for (key in objectUpdate) {
-            value = objectUpdate[key];
-            if (!(currentObj[key] !== value)) {
-              continue;
-            }
-            currentObj[key] = value;
-            _results.push(key);
+      changedProperties = (function() {
+        var _results;
+        _results = [];
+        for (key in objectUpdate) {
+          value = objectUpdate[key];
+          if (!(currentObj[key] !== value)) {
+            continue;
           }
-          return _results;
-        })();
-        if (!changedProperties.length) {
-          return defer.resolve(currentObj);
+          currentObj[key] = value;
+          _results.push(key);
         }
+        return _results;
+      })();
+      if (!(changedProperties.length || options)) {
+        return defer.resolve(currentObj);
       }
       return _this.save(type, id, currentObj, options).then(defer.resolve, defer.reject);
     });

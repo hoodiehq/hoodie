@@ -103,10 +103,10 @@ describe("Hoodie.Store", function() {
     });
     return _when("object can be found", function() {
       beforeEach(function() {
-        this.store.find.andReturn($.Deferred().resolve({
+        this.store.find.andReturn(this.hoodie.defer().resolve({
           style: 'baws'
         }));
-        return this.store.save.andReturn($.Deferred().resolve('resolved by save'));
+        return this.store.save.andReturn(this.hoodie.defer().resolve('resolved by save'));
       });
       _and("update is an object", function() {
         beforeEach(function() {
@@ -122,6 +122,23 @@ describe("Hoodie.Store", function() {
         });
         return it("should return a resolved promise", function() {
           return expect(this.promise).toBeResolvedWith('resolved by save');
+        });
+      });
+      _and("update is an object and options passed", function() {
+        beforeEach(function() {
+          return this.promise = this.store.update('couch', '123', {
+            funky: 'fresh'
+          }, {
+            silent: true
+          });
+        });
+        return it("should not save the object", function() {
+          return expect(this.store.save).wasCalledWith('couch', '123', {
+            style: 'baws',
+            funky: 'fresh'
+          }, {
+            silent: true
+          });
         });
       });
       _and("update is a function", function() {
