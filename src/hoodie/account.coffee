@@ -507,36 +507,35 @@ class Hoodie.Account
 
   # 
   _sendChangePasswordRequest: (currentPassword, newPassword) =>
-
-    data = $.extend {}, @_doc
-    data.password = newPassword
-    delete data.salt
-    delete data.password_sha
-    options = 
-      data        : JSON.stringify data
-      contentType : "application/json"
-
     => 
+      data = $.extend {}, @_doc
+      data.password = newPassword
+      delete data.salt
+      delete data.password_sha
+      options = 
+        data        : JSON.stringify data
+        contentType : "application/json"
+
       @hoodie.request('PUT',  @_url(), options)
       .pipe( @_handleChangePasswordSuccess(newPassword), @_handleRequestError )
 
   # 
   _sendChangeUsernameAndPasswordRequest: (currentPassword, newUsername, newPassword) =>
-    # prepare updated _users doc
-    data = $.extend {}, @_doc
-    data.$newUsername = newUsername
-
-    # trigger password update when newPassword set
-    if newPassword
-      delete data.salt
-      delete data.password_sha
-      data.password = newPassword
-
-    options =
-      data        : JSON.stringify data
-      contentType : 'application/json'
-    
     =>
+      # prepare updated _users doc
+      data = $.extend {}, @_doc
+      data.$newUsername = newUsername
+
+      # trigger password update when newPassword set
+      if newPassword
+        delete data.salt
+        delete data.password_sha
+        data.password = newPassword
+
+      options =
+        data        : JSON.stringify data
+        contentType : 'application/json'
+
       @hoodie.request('PUT', @_url(), options)
       .pipe @_handleChangeUsernameAndPasswordRequest(newUsername, newPassword or currentPassword), @_handleRequestError
 

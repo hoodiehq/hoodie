@@ -590,36 +590,36 @@ Hoodie.Account = (function() {
   };
 
   Account.prototype._sendChangePasswordRequest = function(currentPassword, newPassword) {
-    var data, options,
-      _this = this;
-    data = $.extend({}, this._doc);
-    data.password = newPassword;
-    delete data.salt;
-    delete data.password_sha;
-    options = {
-      data: JSON.stringify(data),
-      contentType: "application/json"
-    };
+    var _this = this;
     return function() {
+      var data, options;
+      data = $.extend({}, _this._doc);
+      data.password = newPassword;
+      delete data.salt;
+      delete data.password_sha;
+      options = {
+        data: JSON.stringify(data),
+        contentType: "application/json"
+      };
       return _this.hoodie.request('PUT', _this._url(), options).pipe(_this._handleChangePasswordSuccess(newPassword), _this._handleRequestError);
     };
   };
 
   Account.prototype._sendChangeUsernameAndPasswordRequest = function(currentPassword, newUsername, newPassword) {
-    var data, options,
-      _this = this;
-    data = $.extend({}, this._doc);
-    data.$newUsername = newUsername;
-    if (newPassword) {
-      delete data.salt;
-      delete data.password_sha;
-      data.password = newPassword;
-    }
-    options = {
-      data: JSON.stringify(data),
-      contentType: 'application/json'
-    };
+    var _this = this;
     return function() {
+      var data, options;
+      data = $.extend({}, _this._doc);
+      data.$newUsername = newUsername;
+      if (newPassword) {
+        delete data.salt;
+        delete data.password_sha;
+        data.password = newPassword;
+      }
+      options = {
+        data: JSON.stringify(data),
+        contentType: 'application/json'
+      };
       return _this.hoodie.request('PUT', _this._url(), options).pipe(_this._handleChangeUsernameAndPasswordRequest(newUsername, newPassword || currentPassword), _this._handleRequestError);
     };
   };
