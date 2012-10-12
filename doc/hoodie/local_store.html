@@ -6,7 +6,7 @@ e.g. Safari in private mode, overite the respective methods. </p></div></div><di
         <span class="nv">setItem    : </span><span class="o">-&gt;</span> <span class="kc">null</span>
         <span class="nv">removeItem : </span><span class="o">-&gt;</span> <span class="kc">null</span>
         <span class="nv">key        : </span><span class="o">-&gt;</span> <span class="kc">null</span>
-        <span class="nv">length     : </span><span class="o">-&gt;</span> <span class="mi">0</span>
+        <span class="nv">length     : </span><span class="mi">0</span>
         <span class="nv">clear      : </span><span class="o">-&gt;</span> <span class="kc">null</span>
     </div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>handle sign outs</p></div></div><div class="code"><div class="wrapper">    <span class="nx">@hoodie</span><span class="p">.</span><span class="kc">on</span> <span class="s1">&#39;account:signout&#39;</span><span class="p">,</span> <span class="nx">@clear</span>
     
@@ -16,9 +16,7 @@ e.g. Safari in private mode, overite the respective methods. </p></div></div><di
     <span class="nv">removeItem : </span><span class="nf">(key)         -&gt;</span> <span class="nb">window</span><span class="p">.</span><span class="nx">localStorage</span><span class="p">.</span><span class="nx">removeItem</span><span class="p">(</span><span class="nx">key</span><span class="p">)</span>
     <span class="nv">key        : </span><span class="nf">(nr)          -&gt;</span> <span class="nb">window</span><span class="p">.</span><span class="nx">localStorage</span><span class="p">.</span><span class="nx">key</span><span class="p">(</span><span class="nx">nr</span><span class="p">)</span>    
     <span class="nv">length     : </span><span class="nf">()            -&gt;</span> <span class="nb">window</span><span class="p">.</span><span class="nx">localStorage</span><span class="p">.</span><span class="nx">length</span>
-    <span class="nv">clear      : </span><span class="nf">()            -&gt;</span> <span class="nb">window</span><span class="p">.</span><span class="nx">localStorage</span><span class="p">.</span><span class="nx">clear</span><span class="p">()</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h2 id="save">Save</h2>
-
-<p>saves the passed object into the store and replaces an eventually existing 
+    <span class="nv">clear      : </span><span class="nf">()            -&gt;</span> <span class="nb">window</span><span class="p">.</span><span class="nx">localStorage</span><span class="p">.</span><span class="nx">clear</span><span class="p">()</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h2 id="save">Save</h2></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>saves the passed object into the store and replaces an eventually existing 
 document with same type &amp; id.</p>
 
 <p>When id is undefined, it gets generated an new object gets saved </p>
@@ -39,14 +37,23 @@ store.save('car', 'abc4567', {color: 'red'})
     <span class="nv">defer = </span><span class="k">super</span>
     <span class="k">return</span> <span class="nx">defer</span> <span class="k">if</span> <span class="nx">@hoodie</span><span class="p">.</span><span class="nx">isPromise</span><span class="p">(</span><span class="nx">defer</span><span class="p">)</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>make sure we don't mess with the passed object directly</p></div></div><div class="code"><div class="wrapper">    <span class="nv">object = </span><span class="nx">$</span><span class="p">.</span><span class="nx">extend</span> <span class="p">{},</span> <span class="nx">object</span>
     </div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>generate an id if necessary</p></div></div><div class="code"><div class="wrapper">    <span class="k">if</span> <span class="nx">id</span>
-      <span class="nv">isNew = </span><span class="k">typeof</span> <span class="nx">@_cached</span><span class="p">[</span><span class="s2">&quot;#{type}/#{id}&quot;</span><span class="p">]</span> <span class="o">isnt</span> <span class="s1">&#39;object&#39;</span>
+      <span class="nv">currentObject = </span><span class="nx">@cache</span> <span class="nx">type</span><span class="p">,</span> <span class="nx">id</span>
+      <span class="nv">isNew = </span><span class="k">typeof</span> <span class="nx">currentObject</span> <span class="o">isnt</span> <span class="s1">&#39;object&#39;</span>
     <span class="k">else</span>
       <span class="nv">isNew = </span><span class="kc">true</span>
-      <span class="nv">id    = </span><span class="nx">@uuid</span><span class="p">()</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>add createdBy hash to new objects</p></div></div><div class="code"><div class="wrapper">    <span class="k">if</span> <span class="nx">isNew</span> <span class="o">and</span> <span class="nx">@hoodie</span><span class="p">.</span><span class="nx">my</span><span class="p">.</span><span class="nx">account</span>
+      <span class="nv">id    = </span><span class="nx">@uuid</span><span class="p">()</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>add createdBy hash to new objects
+note: we check for <code>hoodie.my.account</code> as in some cases, the code
+      might get executed before the account models is initiated.</p></div></div><div class="code"><div class="wrapper">    <span class="k">if</span> <span class="nx">isNew</span> <span class="o">and</span> <span class="nx">@hoodie</span><span class="p">.</span><span class="nx">my</span><span class="p">.</span><span class="nx">account</span>
       <span class="nx">object</span><span class="p">.</span><span class="nx">$createdBy</span> <span class="o">or=</span> <span class="nx">@hoodie</span><span class="p">.</span><span class="nx">my</span><span class="p">.</span><span class="nx">account</span><span class="p">.</span><span class="nx">ownerHash</span>
    </div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>handle public option</p></div></div><div class="code"><div class="wrapper">    <span class="nx">object</span><span class="p">.</span><span class="nv">$public = </span><span class="nx">options</span><span class="p">.</span><span class="nx">public</span> <span class="k">if</span> <span class="nx">options</span><span class="p">.</span><span class="nx">public</span><span class="o">?</span> 
   </div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>add timestamps</p></div></div><div class="code"><div class="wrapper">    <span class="k">if</span> <span class="nx">options</span><span class="p">.</span><span class="nx">remote</span>
       <span class="nx">object</span><span class="p">.</span><span class="nx">_</span><span class="nv">$syncedAt = </span><span class="nx">@_now</span><span class="p">()</span>
+
+      <span class="nx">unless</span> <span class="nx">isNew</span>
+        <span class="k">for</span> <span class="nx">key</span> <span class="k">of</span> <span class="nx">currentObject</span>
+          <span class="k">if</span> <span class="nx">key</span><span class="p">.</span><span class="nx">charAt</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span> <span class="o">is</span> <span class="s1">&#39;_&#39;</span> <span class="o">and</span> <span class="nx">object</span><span class="p">[</span><span class="nx">key</span><span class="p">]</span> <span class="o">is</span> <span class="kc">undefined</span>
+            <span class="nx">object</span><span class="p">[</span><span class="nx">key</span><span class="p">]</span> <span class="o">=</span> <span class="nx">currentObject</span><span class="p">[</span><span class="nx">key</span><span class="p">]</span>
+
     <span class="k">else</span> <span class="nx">unless</span> <span class="nx">options</span><span class="p">.</span><span class="nx">silent</span>
       <span class="nx">object</span><span class="p">.</span><span class="nv">$updatedAt = </span><span class="nx">@_now</span><span class="p">()</span>
       <span class="nx">object</span><span class="p">.</span><span class="nx">$createdAt</span> <span class="o">or=</span> <span class="nx">object</span><span class="p">.</span><span class="nx">$updatedAt</span>
@@ -54,14 +61,15 @@ store.save('car', 'abc4567', {color: 'red'})
     <span class="k">try</span> 
       <span class="nv">object = </span><span class="nx">@cache</span> <span class="nx">type</span><span class="p">,</span> <span class="nx">id</span><span class="p">,</span> <span class="nx">object</span><span class="p">,</span> <span class="nx">options</span>
       <span class="nx">defer</span><span class="p">.</span><span class="nx">resolve</span><span class="p">(</span> <span class="nx">object</span><span class="p">,</span> <span class="nx">isNew</span> <span class="p">).</span><span class="nx">promise</span><span class="p">()</span>
+
+      <span class="nx">@_trigger_change_events</span><span class="p">(</span><span class="nx">object</span><span class="p">,</span> <span class="nx">options</span><span class="p">,</span> <span class="nx">isNew</span><span class="p">)</span>
+
     <span class="k">catch</span> <span class="nx">error</span>
       <span class="nx">defer</span><span class="p">.</span><span class="nx">reject</span><span class="p">(</span><span class="nx">error</span><span class="p">).</span><span class="nx">promise</span><span class="p">()</span>
   
     <span class="k">return</span> <span class="nx">defer</span><span class="p">.</span><span class="nx">promise</span><span class="p">()</span>
   
-  </div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h2 id="find">find</h2>
-
-<p>loads one object from Store, specified by <code>type</code> and <code>id</code></p>
+  </div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h2 id="find">find</h2></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>loads one object from Store, specified by <code>type</code> and <code>id</code></p>
 
 <p>example usage:</p>
 
@@ -82,9 +90,7 @@ store.save('car', 'abc4567', {color: 'red'})
     
     <span class="k">return</span> <span class="nx">defer</span><span class="p">.</span><span class="nx">promise</span><span class="p">()</span>
   
-  </div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h2 id="findall">findAll</h2>
-
-<p>returns all objects from store. 
+  </div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h2 id="findall">findAll</h2></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>returns all objects from store. 
 Can be optionally filtered by a type or a function</p>
 
 <p>example usage:</p>
@@ -116,9 +122,7 @@ and returns it as array, which will be stored in the results variable</p></div><
   
     <span class="k">return</span> <span class="nx">defer</span><span class="p">.</span><span class="nx">promise</span><span class="p">()</span>
   
-  </div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h2 id="destroy">Destroy</h2>
-
-<p>Destroys one object specified by <code>type</code> and <code>id</code>. </p>
+  </div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h2 id="destroy">Destroy</h2></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>Destroys one object specified by <code>type</code> and <code>id</code>. </p>
 
 <p>when object has been synced before, mark it as deleted. 
 Otherwise remove it from Store.</p></div></div><div class="code"><div class="wrapper">  <span class="nv">destroy : </span><span class="nf">(type, id, options = {}) -&gt;</span>
@@ -139,13 +143,16 @@ Otherwise remove it from Store.</p></div></div><div class="code"><div class="wra
       <span class="nx">@db</span><span class="p">.</span><span class="nx">removeItem</span> <span class="nx">key</span>
   
       <span class="nx">@_cached</span><span class="p">[</span><span class="nx">key</span><span class="p">]</span> <span class="o">=</span> <span class="kc">false</span>
-      <span class="nx">@clearChanged</span> <span class="nx">type</span><span class="p">,</span> <span class="nx">id</span>
+      <span class="nx">@clearChanged</span> <span class="nx">type</span><span class="p">,</span> <span class="nx">id</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>trigger events</p></div></div><div class="code"><div class="wrapper">    <span class="nx">@trigger</span> <span class="s2">&quot;destroy&quot;</span><span class="p">,</span>                          <span class="nx">object</span><span class="p">,</span> <span class="nx">options</span>
+    <span class="nx">@trigger</span> <span class="s2">&quot;destroy:#{type}&quot;</span><span class="p">,</span>                  <span class="nx">object</span><span class="p">,</span> <span class="nx">options</span>
+    <span class="nx">@trigger</span> <span class="s2">&quot;destroy:#{type}:#{id}&quot;</span><span class="p">,</span>            <span class="nx">object</span><span class="p">,</span> <span class="nx">options</span>
+    <span class="nx">@trigger</span> <span class="s2">&quot;change&quot;</span><span class="p">,</span>                <span class="s1">&#39;destroy&#39;</span><span class="p">,</span> <span class="nx">object</span><span class="p">,</span> <span class="nx">options</span>
+    <span class="nx">@trigger</span> <span class="s2">&quot;change:#{type}&quot;</span><span class="p">,</span>        <span class="s1">&#39;destroy&#39;</span><span class="p">,</span> <span class="nx">object</span><span class="p">,</span> <span class="nx">options</span>
+    <span class="nx">@trigger</span> <span class="s2">&quot;change:#{type}:#{id}&quot;</span><span class="p">,</span>  <span class="s1">&#39;destroy&#39;</span><span class="p">,</span> <span class="nx">object</span><span class="p">,</span> <span class="nx">options</span>
   
     <span class="nx">defer</span><span class="p">.</span><span class="nx">resolve</span><span class="p">(</span><span class="nx">$</span><span class="p">.</span><span class="nx">extend</span> <span class="p">{},</span> <span class="nx">object</span><span class="p">).</span><span class="nx">promise</span><span class="p">()</span>
   
-  </div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h2 id="cache">Cache</h2>
-
-<p>loads an object specified by <code>type</code> and <code>id</code> only once from localStorage 
+  </div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h2 id="cache">Cache</h2></div></div><div class="code"><div class="wrapper">  </div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>loads an object specified by <code>type</code> and <code>id</code> only once from localStorage 
 and caches it for faster future access. Updates cache when <code>value</code> is passed.</p>
 
 <p>Also checks if object needs to be synched (dirty) or not </p>
@@ -174,9 +181,7 @@ and caches it for faster future access. Updates cache when <code>value</code> is
     <span class="k">if</span> <span class="nx">@_cached</span><span class="p">[</span><span class="nx">key</span><span class="p">]</span>
       <span class="nx">$</span><span class="p">.</span><span class="nx">extend</span> <span class="p">{},</span> <span class="nx">@_cached</span><span class="p">[</span><span class="nx">key</span><span class="p">]</span>
     <span class="k">else</span>
-      <span class="nx">@_cached</span><span class="p">[</span><span class="nx">key</span><span class="p">]</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h2 id="clear-changed">Clear changed</h2>
-
-<p>removes an object from the list of objects that are flagged to by synched (dirty)
+      <span class="nx">@_cached</span><span class="p">[</span><span class="nx">key</span><span class="p">]</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h2 id="clear-changed-">Clear changed </h2></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>removes an object from the list of objects that are flagged to by synched (dirty)
 and triggers a <code>store:dirty</code> event</p></div></div><div class="code"><div class="wrapper">  <span class="nv">clearChanged : </span><span class="nf">(type, id) -&gt;</span>
   
     <span class="k">if</span> <span class="nx">type</span> <span class="o">and</span> <span class="nx">id</span>
@@ -187,34 +192,28 @@ and triggers a <code>store:dirty</code> event</p></div></div><div class="code"><
   
     <span class="nx">@hoodie</span><span class="p">.</span><span class="nx">trigger</span> <span class="s1">&#39;store:dirty&#39;</span>
   
-  </div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h2 id="marked-as-deleted">Marked as deleted?</h2>
-
-<p>when an object gets deleted that has been synched before (<code>_rev</code> attribute),
+  </div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h2 id="marked-as-deleted">Marked as deleted?</h2></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>when an object gets deleted that has been synched before (<code>_rev</code> attribute),
 it cannot be removed from store but gets a <code>_deleted: true</code> attribute</p></div></div><div class="code"><div class="wrapper">  <span class="nv">isMarkedAsDeleted : </span><span class="nf">(type, id) -&gt;</span>
     <span class="nx">@_isMarkedAsDeleted</span> <span class="nx">@cache</span><span class="p">(</span><span class="nx">type</span><span class="p">,</span> <span class="nx">id</span><span class="p">)</span>
       
-  </div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h2 id="mark-as-changed">Mark as changed</h2>
-
-<p>Marks object as changed (dirty). Triggers a <code>store:dirty</code> event immediately and a 
+  </div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h2 id="-mark-as-changed">## Mark as changed</h2></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>Marks object as changed (dirty). Triggers a <code>store:dirty</code> event immediately and a 
 <code>store:idle</code> event once there is no change within 2 seconds</p></div></div><div class="code"><div class="wrapper">  <span class="nv">markAsChanged : </span><span class="nf">(type, id, object) -&gt;</span>
     <span class="nv">key = </span><span class="s2">&quot;#{type}/#{id}&quot;</span>
     
     <span class="nx">@_dirty</span><span class="p">[</span><span class="nx">key</span><span class="p">]</span> <span class="o">=</span> <span class="nx">object</span>
-    <span class="nx">@hoodie</span><span class="p">.</span><span class="nx">trigger</span> <span class="s1">&#39;store:dirty&#39;</span>
 
     <span class="nv">timeout = </span><span class="mi">2000</span> <span class="c1"># 2 seconds timout before triggering the `store:idle` event</span>
     <span class="nb">window</span><span class="p">.</span><span class="nx">clearTimeout</span> <span class="nx">@_dirtyTimeout</span>
     <span class="vi">@_dirtyTimeout = </span><span class="nb">window</span><span class="p">.</span><span class="nx">setTimeout</span> <span class="p">(</span> <span class="o">=&gt;</span>
       <span class="nx">@hoodie</span><span class="p">.</span><span class="nx">trigger</span> <span class="s1">&#39;store:idle&#39;</span>
     <span class="p">),</span> <span class="nx">timeout</span>
-    </div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h2 id="changed-docs">changed docs</h2>
-
-<p>returns an Array of all dirty documents</p></div></div><div class="code"><div class="wrapper">  <span class="nv">changedDocs : </span><span class="o">-&gt;</span> 
-    <span class="nx">object</span> <span class="k">for</span> <span class="nx">key</span><span class="p">,</span> <span class="nx">object</span> <span class="k">of</span> <span class="nx">@_dirty</span>
-    
-       </div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h2 id="is-dirty">Is dirty?</h2>
-
-<p>When no arguments passed, returns <code>true</code> or <code>false</code> depending on if there are
+    </div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h2 id="changed-docs">changed docs</h2></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>returns an Array of all dirty documents</p></div></div><div class="code"><div class="wrapper">  <span class="nv">changedDocs : </span><span class="o">-&gt;</span> 
+    <span class="k">for</span> <span class="nx">key</span><span class="p">,</span> <span class="nx">object</span> <span class="k">of</span> <span class="nx">@_dirty</span>
+      <span class="p">[</span><span class="nx">type</span><span class="p">,</span> <span class="nx">id</span><span class="p">]</span>   <span class="o">=</span> <span class="nx">key</span><span class="p">.</span><span class="nx">split</span> <span class="s1">&#39;/&#39;</span>
+      <span class="nx">object</span><span class="p">.</span><span class="nv">$type = </span><span class="nx">type</span>
+      <span class="nv">object.id    = </span><span class="nx">id</span>
+      <span class="nx">object</span>
+       </div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h2 id="is-dirty">Is dirty?</h2></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>When no arguments passed, returns <code>true</code> or <code>false</code> depending on if there are
 dirty objects in the store.</p>
 
 <p>Otherwise it returns <code>true</code> or <code>false</code> for the passed object. An object is dirty
@@ -222,9 +221,7 @@ if it has no <code>_$syncedAt</code> attribute or if <code>updatedAt</code> is m
     <span class="nx">unless</span> <span class="nx">type</span>
       <span class="k">return</span> <span class="nx">$</span><span class="p">.</span><span class="nx">isEmptyObject</span> <span class="nx">@_dirty</span>
       
-    <span class="nx">@_isDirty</span> <span class="nx">@cache</span><span class="p">(</span><span class="nx">type</span><span class="p">,</span> <span class="nx">id</span><span class="p">)</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h2 id="clear">Clear</h2>
-
-<p>clears localStorage and cache
+    <span class="nx">@_isDirty</span> <span class="nx">@cache</span><span class="p">(</span><span class="nx">type</span><span class="p">,</span> <span class="nx">id</span><span class="p">)</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h2 id="clear">Clear</h2></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>clears localStorage and cache
 TODO: do not clear entire localStorage, clear only item that have been stored before</p></div></div><div class="code"><div class="wrapper">  <span class="nv">clear : </span><span class="o">=&gt;</span>
     <span class="nv">defer = </span><span class="nx">@hoodie</span><span class="p">.</span><span class="nx">defer</span><span class="p">()</span>
   
@@ -234,13 +231,13 @@ TODO: do not clear entire localStorage, clear only item that have been stored be
       <span class="nx">@clearChanged</span><span class="p">()</span>
     
       <span class="nx">defer</span><span class="p">.</span><span class="nx">resolve</span><span class="p">()</span>
+
+      <span class="nx">@trigger</span> <span class="s2">&quot;clear&quot;</span>
     <span class="k">catch</span> <span class="nx">error</span>
       <span class="nx">defer</span><span class="p">.</span><span class="nx">reject</span><span class="p">(</span><span class="nx">error</span><span class="p">)</span>
     
     <span class="k">return</span> <span class="nx">defer</span><span class="p">.</span><span class="nx">promise</span><span class="p">()</span>
-  </div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h2 id="is-persistant">Is persistant?</h2>
-
-<p>returns <code>true</code> or <code>false</code> depending on whether localStorage is supported or not.
+  </div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h2 id="is-persistant">Is persistant?</h2></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>returns <code>true</code> or <code>false</code> depending on whether localStorage is supported or not.
 Beware that some browsers like Safari do not support localStorage in private mode.</p>
 
 <p>inspired by this cappuccino commit
@@ -257,14 +254,16 @@ as it is when Safari's private browsing mode is active.</p></div></div><div clas
     </div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>in case of an error, like Safari's Private Pussy, return false</p></div></div><div class="code"><div class="wrapper">      <span class="k">return</span> <span class="kc">false</span>
     </div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>good, good</p></div></div><div class="code"><div class="wrapper">    <span class="k">return</span> <span class="kc">true</span>
   
-  </div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h2 id="uuid">UUID</h2>
-
-<p>helper to generate uuids.</p></div></div><div class="code"><div class="wrapper">  <span class="nv">uuid : </span><span class="nf">(len = 7) -&gt;</span>
+  </div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h2 id="uuid">UUID</h2></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>helper to generate uuids.</p></div></div><div class="code"><div class="wrapper">  <span class="nv">uuid : </span><span class="nf">(len = 7) -&gt;</span>
     <span class="nv">chars = </span><span class="s1">&#39;0123456789abcdefghijklmnopqrstuvwxyz&#39;</span><span class="p">.</span><span class="nx">split</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
     <span class="nv">radix = </span><span class="nx">chars</span><span class="p">.</span><span class="nx">length</span>
     <span class="p">(</span>
       <span class="nx">chars</span><span class="p">[</span> <span class="mi">0</span> <span class="o">|</span> <span class="nb">Math</span><span class="p">.</span><span class="nx">random</span><span class="p">()</span><span class="o">*</span><span class="nx">radix</span> <span class="p">]</span> <span class="k">for</span> <span class="nx">i</span> <span class="k">in</span> <span class="p">[</span><span class="mi">0</span><span class="p">...</span><span class="nx">len</span><span class="p">]</span>
-    <span class="p">).</span><span class="nx">join</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
+    <span class="p">).</span><span class="nx">join</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="p">)</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h2 id="trigger">trigger</h2></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>proxies to hoodie.trigger</p></div></div><div class="code"><div class="wrapper">  <span class="nv">trigger : </span><span class="nf">(event, parameters...) -&gt;</span>
+    <span class="nx">@hoodie</span><span class="p">.</span><span class="nx">trigger</span> <span class="s2">&quot;store:#{event}&quot;</span><span class="p">,</span> <span class="nx">parameters</span><span class="p">...</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h2 id="on">on</h2></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>proxies to hoodie.on</p></div></div><div class="code"><div class="wrapper">  <span class="kc">on</span> <span class="o">:</span> <span class="nf">(event, data) -&gt;</span>
+    <span class="nv">event = </span><span class="nx">event</span><span class="p">.</span><span class="nx">replace</span> <span class="sr">/(^| )([^ ]+)/g</span><span class="p">,</span> <span class="s2">&quot;$1store:$2&quot;</span>
+    <span class="nx">@hoodie</span><span class="p">.</span><span class="kc">on</span> <span class="nx">event</span><span class="p">,</span> <span class="nx">data</span>
+
   </div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h2 id="private">Private</h2></div></div><div class="code"><div class="wrapper">  </div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>more advanced localStorage wrappers to find/store objects</p></div></div><div class="code"><div class="wrapper">  <span class="nv">_setObject : </span><span class="nf">(type, id, object) -&gt;</span>
     <span class="nv">key = </span><span class="s2">&quot;#{type}/#{id}&quot;</span>
     <span class="nv">store = </span><span class="nx">$</span><span class="p">.</span><span class="nx">extend</span> <span class="p">{},</span> <span class="nx">object</span>
@@ -295,11 +294,23 @@ as it is when Safari's private browsing mode is active.</p></div></div><div clas
     <span class="o">/^</span><span class="p">[</span><span class="nx">a</span><span class="o">-</span><span class="nx">z$</span><span class="p">][</span><span class="nx">a</span><span class="o">-</span><span class="nx">z0</span><span class="o">-</span><span class="mi">9</span><span class="p">]</span><span class="o">+</span><span class="err">\</span><span class="o">/</span><span class="p">[</span><span class="nx">a</span><span class="o">-</span><span class="nx">z0</span><span class="o">-</span><span class="mi">9</span><span class="p">]</span><span class="o">+</span><span class="nx">$</span><span class="err">/.test key</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>cache of localStorage for quicker access</p></div></div><div class="code"><div class="wrapper">  <span class="nv">_cached : </span><span class="p">{}</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>map of dirty objects by their ids</p></div></div><div class="code"><div class="wrapper">  <span class="nv">_dirty : </span><span class="p">{}</span>
   </div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>is dirty?</p></div></div><div class="code"><div class="wrapper">  <span class="nv">_isDirty : </span><span class="nf">(object) -&gt;</span>
     
-    <span class="k">return</span> <span class="kc">true</span>  <span class="nx">unless</span> <span class="nx">object</span><span class="p">.</span><span class="nx">_$syncedAt</span>  <span class="c1"># no syncedAt? uuhh, that&#39;s dirty.</span>
     <span class="k">return</span> <span class="kc">false</span> <span class="nx">unless</span> <span class="nx">object</span><span class="p">.</span><span class="nx">$updatedAt</span> <span class="c1"># no updatedAt? no dirt then</span>
+    <span class="k">return</span> <span class="kc">true</span>  <span class="nx">unless</span> <span class="nx">object</span><span class="p">.</span><span class="nx">_$syncedAt</span> <span class="c1"># no syncedAt? uuhh, that&#39;s dirty.</span>
   
     <span class="nx">object</span><span class="p">.</span><span class="nx">_$syncedAt</span><span class="p">.</span><span class="nx">getTime</span><span class="p">()</span> <span class="o">&lt;</span> <span class="nx">object</span><span class="p">.</span><span class="nx">$updatedAt</span><span class="p">.</span><span class="nx">getTime</span><span class="p">()</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>marked as deleted?</p></div></div><div class="code"><div class="wrapper">  <span class="nv">_isMarkedAsDeleted : </span><span class="nf">(object) -&gt;</span>
     <span class="nx">object</span><span class="p">.</span><span class="nx">_deleted</span> <span class="o">is</span> <span class="kc">true</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>document key index</p>
 
 <p>TODO: make this cachy</p></div></div><div class="code"><div class="wrapper">  <span class="nv">_index : </span><span class="o">-&gt;</span>
-    <span class="nx">@db</span><span class="p">.</span><span class="nx">key</span><span class="p">(</span><span class="nx">i</span><span class="p">)</span> <span class="k">for</span> <span class="nx">i</span> <span class="k">in</span> <span class="p">[</span><span class="mi">0</span><span class="p">...</span><span class="nx">@db</span><span class="p">.</span><span class="nx">length</span><span class="p">()]</span></div></div></div></div></body></html>
+    <span class="nx">@db</span><span class="p">.</span><span class="nx">key</span><span class="p">(</span><span class="nx">i</span><span class="p">)</span> <span class="k">for</span> <span class="nx">i</span> <span class="k">in</span> <span class="p">[</span><span class="mi">0</span><span class="p">...</span><span class="nx">@db</span><span class="p">.</span><span class="nx">length</span><span class="p">()]</span></div></div></div><div class="segment"><div class="code"><div class="wrapper">  <span class="nv">_trigger_change_events: </span><span class="nf">(object, options, isNew) -&gt;</span>
+    <span class="k">if</span> <span class="nx">isNew</span>
+      <span class="nx">@trigger</span> <span class="s2">&quot;create&quot;</span><span class="p">,</span>                           <span class="nx">object</span><span class="p">,</span> <span class="nx">options</span>
+      <span class="nx">@trigger</span> <span class="s2">&quot;create:#{object.$type}&quot;</span><span class="p">,</span>           <span class="nx">object</span><span class="p">,</span> <span class="nx">options</span>
+      <span class="nx">@trigger</span> <span class="s2">&quot;change&quot;</span><span class="p">,</span>                 <span class="s1">&#39;create&#39;</span><span class="p">,</span> <span class="nx">object</span><span class="p">,</span> <span class="nx">options</span>
+      <span class="nx">@trigger</span> <span class="s2">&quot;change:#{object.$type}&quot;</span><span class="p">,</span> <span class="s1">&#39;create&#39;</span><span class="p">,</span> <span class="nx">object</span><span class="p">,</span> <span class="nx">options</span>
+    <span class="k">else</span>
+      <span class="nx">@trigger</span> <span class="s2">&quot;update&quot;</span><span class="p">,</span>                                        <span class="nx">object</span><span class="p">,</span> <span class="nx">options</span>
+      <span class="nx">@trigger</span> <span class="s2">&quot;update:#{object.$type}&quot;</span><span class="p">,</span>                        <span class="nx">object</span><span class="p">,</span> <span class="nx">options</span>
+      <span class="nx">@trigger</span> <span class="s2">&quot;update:#{object.$type}:#{object.id}&quot;</span><span class="p">,</span>           <span class="nx">object</span><span class="p">,</span> <span class="nx">options</span>
+      <span class="nx">@trigger</span> <span class="s2">&quot;change&quot;</span><span class="p">,</span>                              <span class="s1">&#39;update&#39;</span><span class="p">,</span> <span class="nx">object</span><span class="p">,</span> <span class="nx">options</span>
+      <span class="nx">@trigger</span> <span class="s2">&quot;change:#{object.$type}&quot;</span><span class="p">,</span>              <span class="s1">&#39;update&#39;</span><span class="p">,</span> <span class="nx">object</span><span class="p">,</span> <span class="nx">options</span>
+      <span class="nx">@trigger</span> <span class="s2">&quot;change:#{object.$type}:#{object.id}&quot;</span><span class="p">,</span> <span class="s1">&#39;update&#39;</span><span class="p">,</span> <span class="nx">object</span><span class="p">,</span> <span class="nx">options</span></div></div></div></div></body></html>

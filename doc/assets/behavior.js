@@ -520,6 +520,22 @@ f.event={add:function(a,c,d,e,g){var h,i,j,k,l,m,n,o,p,q,r,s;if(!(a.nodeType===3
                         "slug": "push"
                       },
                       "depth": 2
+                    }, {
+                      "type": "heading",
+                      "data": {
+                        "level": 2,
+                        "title": "Events",
+                        "slug": "events"
+                      },
+                      "depth": 2
+                    }, {
+                      "type": "heading",
+                      "data": {
+                        "level": 2,
+                        "title": "Private",
+                        "slug": "private"
+                      },
+                      "depth": 2
                     }
                   ]
                 },
@@ -581,6 +597,22 @@ f.event={add:function(a,c,d,e,g){var h,i,j,k,l,m,n,o,p,q,r,s;if(!(a.nodeType===3
                     "level": 2,
                     "title": "push",
                     "slug": "push"
+                  },
+                  "depth": 2
+                }, {
+                  "type": "heading",
+                  "data": {
+                    "level": 2,
+                    "title": "Events",
+                    "slug": "events"
+                  },
+                  "depth": 2
+                }, {
+                  "type": "heading",
+                  "data": {
+                    "level": 2,
+                    "title": "Private",
+                    "slug": "private"
                   },
                   "depth": 2
                 }
@@ -829,8 +861,8 @@ f.event={add:function(a,c,d,e,g){var h,i,j,k,l,m,n,o,p,q,r,s;if(!(a.nodeType===3
                   "type": "heading",
                   "data": {
                     "level": 2,
-                    "title": "Clear changed",
-                    "slug": "clear-changed"
+                    "title": "Clear changed ",
+                    "slug": "clear-changed-"
                   },
                   "depth": 2
                 }, {
@@ -845,8 +877,8 @@ f.event={add:function(a,c,d,e,g){var h,i,j,k,l,m,n,o,p,q,r,s;if(!(a.nodeType===3
                   "type": "heading",
                   "data": {
                     "level": 2,
-                    "title": "Mark as changed",
-                    "slug": "mark-as-changed"
+                    "title": "## Mark as changed",
+                    "slug": "-mark-as-changed"
                   },
                   "depth": 2
                 }, {
@@ -887,6 +919,22 @@ f.event={add:function(a,c,d,e,g){var h,i,j,k,l,m,n,o,p,q,r,s;if(!(a.nodeType===3
                     "level": 2,
                     "title": "UUID",
                     "slug": "uuid"
+                  },
+                  "depth": 2
+                }, {
+                  "type": "heading",
+                  "data": {
+                    "level": 2,
+                    "title": "trigger",
+                    "slug": "trigger"
+                  },
+                  "depth": 2
+                }, {
+                  "type": "heading",
+                  "data": {
+                    "level": 2,
+                    "title": "on",
+                    "slug": "on"
                   },
                   "depth": 2
                 }, {
@@ -956,8 +1004,8 @@ f.event={add:function(a,c,d,e,g){var h,i,j,k,l,m,n,o,p,q,r,s;if(!(a.nodeType===3
               "type": "heading",
               "data": {
                 "level": 2,
-                "title": "Clear changed",
-                "slug": "clear-changed"
+                "title": "Clear changed ",
+                "slug": "clear-changed-"
               },
               "depth": 2
             }, {
@@ -972,8 +1020,8 @@ f.event={add:function(a,c,d,e,g){var h,i,j,k,l,m,n,o,p,q,r,s;if(!(a.nodeType===3
               "type": "heading",
               "data": {
                 "level": 2,
-                "title": "Mark as changed",
-                "slug": "mark-as-changed"
+                "title": "## Mark as changed",
+                "slug": "-mark-as-changed"
               },
               "depth": 2
             }, {
@@ -1014,6 +1062,22 @@ f.event={add:function(a,c,d,e,g){var h,i,j,k,l,m,n,o,p,q,r,s;if(!(a.nodeType===3
                 "level": 2,
                 "title": "UUID",
                 "slug": "uuid"
+              },
+              "depth": 2
+            }, {
+              "type": "heading",
+              "data": {
+                "level": 2,
+                "title": "trigger",
+                "slug": "trigger"
+              },
+              "depth": 2
+            }, {
+              "type": "heading",
+              "data": {
+                "level": 2,
+                "title": "on",
+                "slug": "on"
               },
               "depth": 2
             }, {
@@ -1068,16 +1132,8 @@ f.event={add:function(a,c,d,e,g){var h,i,j,k,l,m,n,o,p,q,r,s;if(!(a.nodeType===3
                   "type": "heading",
                   "data": {
                     "level": 2,
-                    "title": "Constructor",
-                    "slug": "constructor"
-                  },
-                  "depth": 2
-                }, {
-                  "type": "heading",
-                  "data": {
-                    "level": 2,
-                    "title": "object loading / updating / deleting",
-                    "slug": "object-loading--updating--deleting"
+                    "title": "Constructor ",
+                    "slug": "constructor-"
                   },
                   "depth": 2
                 }, {
@@ -1118,14 +1174,6 @@ f.event={add:function(a,c,d,e,g){var h,i,j,k,l,m,n,o,p,q,r,s;if(!(a.nodeType===3
                     "level": 2,
                     "title": "destroyAll",
                     "slug": "destroyall"
-                  },
-                  "depth": 2
-                }, {
-                  "type": "heading",
-                  "data": {
-                    "level": 2,
-                    "title": "custom requests",
-                    "slug": "custom-requests"
                   },
                   "depth": 2
                 }, {
@@ -1244,8 +1292,8 @@ f.event={add:function(a,c,d,e,g){var h,i,j,k,l,m,n,o,p,q,r,s;if(!(a.nodeType===3
                   "type": "heading",
                   "data": {
                     "level": 2,
-                    "title": "On",
-                    "slug": "on"
+                    "title": "Events",
+                    "slug": "events"
                   },
                   "depth": 2
                 }, {
@@ -1366,16 +1414,8 @@ f.event={add:function(a,c,d,e,g){var h,i,j,k,l,m,n,o,p,q,r,s;if(!(a.nodeType===3
               "type": "heading",
               "data": {
                 "level": 2,
-                "title": "Constructor",
-                "slug": "constructor"
-              },
-              "depth": 2
-            }, {
-              "type": "heading",
-              "data": {
-                "level": 2,
-                "title": "object loading / updating / deleting",
-                "slug": "object-loading--updating--deleting"
+                "title": "Constructor ",
+                "slug": "constructor-"
               },
               "depth": 2
             }, {
@@ -1416,14 +1456,6 @@ f.event={add:function(a,c,d,e,g){var h,i,j,k,l,m,n,o,p,q,r,s;if(!(a.nodeType===3
                 "level": 2,
                 "title": "destroyAll",
                 "slug": "destroyall"
-              },
-              "depth": 2
-            }, {
-              "type": "heading",
-              "data": {
-                "level": 2,
-                "title": "custom requests",
-                "slug": "custom-requests"
               },
               "depth": 2
             }, {
@@ -1542,8 +1574,8 @@ f.event={add:function(a,c,d,e,g){var h,i,j,k,l,m,n,o,p,q,r,s;if(!(a.nodeType===3
               "type": "heading",
               "data": {
                 "level": 2,
-                "title": "On",
-                "slug": "on"
+                "title": "Events",
+                "slug": "events"
               },
               "depth": 2
             }, {

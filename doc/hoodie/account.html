@@ -67,13 +67,15 @@ Besides the standard sign in we also check if the account has been confirmed
                 <span class="nv">password  : </span><span class="nx">password</span>
 
     <span class="nx">@hoodie</span><span class="p">.</span><span class="nx">request</span><span class="p">(</span><span class="s1">&#39;POST&#39;</span><span class="p">,</span> <span class="s1">&#39;/_session&#39;</span><span class="p">,</span> <span class="nx">options</span><span class="p">)</span>
-    <span class="p">.</span><span class="nx">pipe</span><span class="p">(</span><span class="nx">@_handleSignInSuccess</span><span class="p">)</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>alias</p></div></div><div class="code"><div class="wrapper">  <span class="nv">login: </span><span class="err">@</span><span class="o">::</span><span class="nx">signIn</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h2 id="sign-out-">sign out </h2></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>uses standard CouchDB API to destroy a user session (DELETE /_session)</p>
+    <span class="p">.</span><span class="nx">pipe</span><span class="p">(</span><span class="nx">@_handleSignInSuccess</span><span class="p">,</span> <span class="nx">@_handleRequestError</span><span class="p">)</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>alias</p></div></div><div class="code"><div class="wrapper">  <span class="nv">login: </span><span class="err">@</span><span class="o">::</span><span class="nx">signIn</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h2 id="sign-out-">sign out </h2></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>uses standard CouchDB API to destroy a user session (DELETE /_session)</p>
 
 <p>TODO: handle errors</p></div></div><div class="code"><div class="wrapper">  <span class="nv">signOut: </span><span class="o">-&gt;</span>
     <span class="nx">@hoodie</span><span class="p">.</span><span class="nx">my</span><span class="p">.</span><span class="nx">remote</span><span class="p">.</span><span class="nx">disconnect</span><span class="p">()</span>
     <span class="nx">@hoodie</span><span class="p">.</span><span class="nx">request</span><span class="p">(</span><span class="s1">&#39;DELETE&#39;</span><span class="p">,</span> <span class="s1">&#39;/_session&#39;</span><span class="p">).</span><span class="nx">pipe</span><span class="p">(</span><span class="nx">@_handleSignOutSuccess</span><span class="p">)</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>alias</p></div></div><div class="code"><div class="wrapper">  <span class="nv">logout: </span><span class="err">@</span><span class="o">::</span><span class="nx">signOut</span>
   
-  </div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h2 id="on">On</h2></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>alias for <code>hoodie.on</code></p></div></div><div class="code"><div class="wrapper">  <span class="kc">on</span> <span class="o">:</span> <span class="nf">(event, cb) -&gt;</span> <span class="nx">@hoodie</span><span class="p">.</span><span class="kc">on</span> <span class="s2">&quot;account:#{event}&quot;</span><span class="p">,</span> <span class="nx">cb</span>
+  </div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h2 id="on">On</h2></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>alias for <code>hoodie.on</code></p></div></div><div class="code"><div class="wrapper">  <span class="kc">on</span> <span class="o">:</span> <span class="nf">(event, cb) -&gt;</span> 
+    <span class="nv">event = </span><span class="nx">event</span><span class="p">.</span><span class="nx">replace</span> <span class="sr">/(^| )([^ ]+)/g</span><span class="p">,</span> <span class="s2">&quot;$1account:$2&quot;</span>
+    <span class="nx">@hoodie</span><span class="p">.</span><span class="kc">on</span> <span class="nx">event</span><span class="p">,</span> <span class="nx">cb</span>
   
   </div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h2 id="db">db</h2></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>return name of db</p></div></div><div class="code"><div class="wrapper">  <span class="nv">db : </span><span class="o">-&gt;</span> <span class="s2">&quot;user/#{@ownerHash}&quot;</span>
   
@@ -90,18 +92,10 @@ in this implementation of the hoodie API.</p></div></div><div class="code"><div 
 
     <span class="nx">unless</span> <span class="nx">@username</span>
       <span class="k">return</span> <span class="nx">@hoodie</span><span class="p">.</span><span class="nx">defer</span><span class="p">().</span><span class="nx">reject</span><span class="p">(</span><span class="nv">error: </span><span class="s2">&quot;unauthenticated&quot;</span><span class="p">,</span> <span class="nv">reason: </span><span class="s2">&quot;not logged in&quot;</span><span class="p">).</span><span class="nx">promise</span><span class="p">()</span>
-    
-    <span class="nv">data = </span><span class="nx">$</span><span class="p">.</span><span class="nx">extend</span> <span class="p">{},</span> <span class="nx">@_doc</span>
-    <span class="nv">data.password = </span><span class="nx">newPassword</span>
-    <span class="k">delete</span> <span class="nx">data</span><span class="p">.</span><span class="nx">salt</span>
-    <span class="k">delete</span> <span class="nx">data</span><span class="p">.</span><span class="nx">password_sha</span>
-    <span class="nv">options = </span>
-      <span class="nv">data        : </span><span class="nx">JSON</span><span class="p">.</span><span class="nx">stringify</span> <span class="nx">data</span>
-      <span class="nv">contentType : </span><span class="s2">&quot;application/json&quot;</span>
 
     <span class="nx">@hoodie</span><span class="p">.</span><span class="nx">my</span><span class="p">.</span><span class="nx">remote</span><span class="p">.</span><span class="nx">disconnect</span><span class="p">()</span>
-    <span class="nx">@hoodie</span><span class="p">.</span><span class="nx">request</span><span class="p">(</span><span class="s1">&#39;PUT&#39;</span><span class="p">,</span>  <span class="nx">@_url</span><span class="p">(),</span> <span class="nx">options</span><span class="p">)</span>
-    <span class="p">.</span><span class="nx">pipe</span><span class="p">(</span> <span class="nx">@_handleChangePasswordSuccess</span><span class="p">(</span><span class="nx">newPassword</span><span class="p">),</span> <span class="nx">@_handleRequestError</span> <span class="p">)</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h2 id="reset-password">reset password</h2></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>This is kind of a hack. We need to create an object anonymously
+    <span class="nx">@fetch</span><span class="p">().</span><span class="nx">pipe</span> <span class="nx">@_sendChangePasswordRequest</span><span class="p">(</span><span class="nx">currentPassword</span><span class="p">,</span> <span class="nx">newPassword</span><span class="p">),</span> <span class="nx">@_handleRequestError</span>
+      </div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h2 id="reset-password">reset password</h2></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>This is kind of a hack. We need to create an object anonymously
 that is not exposed to others. The only CouchDB API othering such 
 functionality is the _users database.</p>
 
@@ -119,6 +113,7 @@ once the password was resetted.</p></div></div><div class="code"><div class="wra
       <span class="nv">_id        : </span><span class="nx">key</span>
       <span class="nv">name       : </span><span class="s2">&quot;$passwordReset/#{resetPasswordId}&quot;</span>
       <span class="nv">type       : </span><span class="s1">&#39;user&#39;</span>
+      <span class="nv">roles      : </span><span class="p">[]</span>
       <span class="nv">password   : </span><span class="nx">resetPasswordId</span>
       <span class="nv">$createdAt : </span><span class="k">new</span> <span class="nb">Date</span>
       <span class="nv">$updatedAt : </span><span class="k">new</span> <span class="nb">Date</span>
@@ -135,7 +130,7 @@ without knowing the current password, so it's not impulemented in the current
 implementation of the hoodie API.</p>
 
 <p>But the current password is needed to login with the new username.</p></div></div><div class="code"><div class="wrapper">  <span class="nv">changeUsername : </span><span class="nf">(currentPassword, newUsername) -&gt;</span>
-    <span class="nx">@_changeUsernameAndPassword</span><span class="p">(</span><span class="nx">currentPassword</span><span class="p">,</span> <span class="nx">newUsername</span><span class="p">)</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h2 id="destroy">destroy</h2></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>destroys a user' account  </p></div></div><div class="code"><div class="wrapper">  <span class="nv">destroy : </span><span class="o">-&gt;</span>
+    <span class="nx">@_changeUsernameAndPassword</span><span class="p">(</span><span class="nx">currentPassword</span><span class="p">,</span> <span class="nx">newUsername</span><span class="p">)</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h2 id="destroy">destroy</h2></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>destroys a user's account  </p></div></div><div class="code"><div class="wrapper">  <span class="nv">destroy : </span><span class="o">-&gt;</span>
     <span class="nx">@fetch</span><span class="p">()</span>
     <span class="p">.</span><span class="nx">pipe</span><span class="p">(</span><span class="nx">@_handleFetchBeforeDestroySucces</span><span class="p">,</span> <span class="nx">@_handleRequestError</span><span class="p">)</span>
     <span class="p">.</span><span class="nx">pipe</span><span class="p">(</span><span class="nx">@_handleDestroySucces</span><span class="p">)</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h2 id="private">PRIVATE</h2></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>default couchDB user doc prefix</p></div></div><div class="code"><div class="wrapper">  <span class="nv">_prefix : </span><span class="s1">&#39;org.couchdb.user&#39;</span>
@@ -250,18 +245,18 @@ what we are waiting for.</p>
 
     <span class="nx">@hoodie</span><span class="p">.</span><span class="nx">request</span><span class="p">(</span><span class="s1">&#39;GET&#39;</span><span class="p">,</span> <span class="nx">url</span><span class="p">,</span> <span class="nx">options</span><span class="p">)</span>
     <span class="p">.</span><span class="nx">pipe</span><span class="p">(</span><span class="nx">@_handlePasswordResetStatusRequestSuccess</span><span class="p">,</span> <span class="nx">@_handlePasswordResetStatusRequestError</span><span class="p">)</span>
-    <span class="p">.</span><span class="nx">fail</span> <span class="o">=&gt;</span>
+    <span class="p">.</span><span class="nx">fail</span> <span class="p">(</span><span class="nx">error</span><span class="p">)</span> <span class="o">=&gt;</span>
       <span class="k">if</span> <span class="nx">error</span><span class="p">.</span><span class="nx">error</span> <span class="o">is</span> <span class="s1">&#39;pending&#39;</span>
         <span class="nb">window</span><span class="p">.</span><span class="nx">setTimeout</span> <span class="nx">@_checkPasswordResetStatus</span><span class="p">,</span> <span class="mi">1000</span>
         <span class="k">return</span>
 
       <span class="nx">@hoodie</span><span class="p">.</span><span class="nx">trigger</span> <span class="s1">&#39;account:password_reset:error&#39;</span>
 
-  <span class="nv">_handlePasswordResetStatusRequestSuccess : </span><span class="o">=&gt;</span>
+  <span class="nv">_handlePasswordResetStatusRequestSuccess : </span><span class="p">(</span><span class="nx">response</span><span class="p">)</span> <span class="o">=&gt;</span>
     <span class="nv">defer = </span><span class="nx">@hoodie</span><span class="p">.</span><span class="nx">defer</span><span class="p">()</span>
 
     <span class="k">if</span> <span class="nx">response</span><span class="p">.</span><span class="nx">$error</span>
-      <span class="nx">defer</span><span class="p">.</span><span class="nx">reject</span> <span class="nv">error: </span><span class="nx">response</span><span class="p">.</span><span class="nx">$error</span>
+      <span class="nx">defer</span><span class="p">.</span><span class="nx">reject</span> <span class="nx">response</span><span class="p">.</span><span class="nx">$error</span>
     <span class="k">else</span>
       <span class="nx">defer</span><span class="p">.</span><span class="nx">reject</span> <span class="nv">error: </span><span class="s1">&#39;pending&#39;</span>
 
@@ -270,32 +265,21 @@ what we are waiting for.</p>
 
   <span class="nv">_handlePasswordResetStatusRequestError : </span><span class="p">(</span><span class="nx">xhr</span><span class="p">)</span> <span class="o">=&gt;</span>
     <span class="k">if</span> <span class="nx">xhr</span><span class="p">.</span><span class="nx">status</span> <span class="o">is</span> <span class="mi">401</span>
-      <span class="nx">@hoodie</span><span class="p">.</span><span class="nx">defer</span><span class="p">().</span><span class="nx">resolve</span><span class="p">()</span>
-
       <span class="nx">@hoodie</span><span class="p">.</span><span class="nx">my</span><span class="p">.</span><span class="nx">config</span><span class="p">.</span><span class="nx">remove</span> <span class="s1">&#39;_account.resetPasswordId&#39;</span>
       <span class="nx">@hoodie</span><span class="p">.</span><span class="nx">trigger</span> <span class="s1">&#39;account:passwordreset&#39;</span>
-    <span class="k">else</span>
-      <span class="nx">@_handleRequestError</span><span class="p">(</span><span class="nx">xhr</span><span class="p">)</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>change username and password in 3 steps</p>
+
+      <span class="k">return</span> <span class="nx">@hoodie</span><span class="p">.</span><span class="nx">defer</span><span class="p">().</span><span class="nx">resolve</span><span class="p">()</span>
+
+    <span class="k">else</span> 
+      <span class="k">return</span> <span class="nx">@_handleRequestError</span><span class="p">(</span><span class="nx">xhr</span><span class="p">)</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>change username and password in 3 steps</p>
 
 <ol>
 <li>assure we have a valid session</li>
 <li>update _users doc with new username and new password (if provided)</li>
 <li>sign in with new credentials to create new sesion.</li>
 </ol></div></div><div class="code"><div class="wrapper">  <span class="nv">_changeUsernameAndPassword : </span><span class="nf">(currentPassword, newUsername, newPassword) -&gt;</span>
-    <span class="nx">@authenticate</span><span class="p">().</span><span class="nx">pipe</span> <span class="o">=&gt;</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>prepare updated _users doc</p></div></div><div class="code"><div class="wrapper">      <span class="nv">data = </span><span class="nx">$</span><span class="p">.</span><span class="nx">extend</span> <span class="p">{},</span> <span class="nx">@_doc</span>
-      <span class="nx">data</span><span class="p">.</span><span class="nv">$newUsername = </span><span class="nx">newUsername</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>trigger password update when newPassword set</p></div></div><div class="code"><div class="wrapper">      <span class="k">if</span> <span class="nx">newPassword</span>
-        <span class="k">delete</span> <span class="nx">data</span><span class="p">.</span><span class="nx">salt</span>
-        <span class="k">delete</span> <span class="nx">data</span><span class="p">.</span><span class="nx">password_sha</span>
-        <span class="nv">data.password = </span><span class="nx">newPassword</span>
-
-      <span class="nv">options =</span>
-        <span class="nv">data        : </span><span class="nx">JSON</span><span class="p">.</span><span class="nx">stringify</span> <span class="nx">data</span>
-        <span class="nv">contentType : </span><span class="s1">&#39;application/json&#39;</span>
-
-      <span class="nx">@hoodie</span><span class="p">.</span><span class="nx">request</span><span class="p">(</span><span class="s1">&#39;PUT&#39;</span><span class="p">,</span> <span class="nx">@_url</span><span class="p">(),</span> <span class="nx">options</span><span class="p">)</span>
-      <span class="p">.</span><span class="nx">pipe</span> <span class="o">=&gt;</span>
-        <span class="nx">@hoodie</span><span class="p">.</span><span class="nx">my</span><span class="p">.</span><span class="nx">remote</span><span class="p">.</span><span class="nx">disconnect</span><span class="p">()</span>
-        <span class="nx">@_delayedSignIn</span> <span class="nx">newUsername</span><span class="p">,</span> <span class="nx">newPassword</span> <span class="o">or</span> <span class="nx">currentPassword</span>
+    <span class="nx">@authenticate</span><span class="p">().</span><span class="nx">pipe</span> <span class="o">=&gt;</span>
+      <span class="nx">@fetch</span><span class="p">().</span><span class="nx">pipe</span> <span class="nx">@_sendChangeUsernameAndPasswordRequest</span><span class="p">(</span><span class="nx">currentPassword</span><span class="p">,</span> <span class="nx">newUsername</span><span class="p">,</span> <span class="nx">newPassword</span><span class="p">),</span> <span class="nx">@_handleRequestError</span>
   </div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>turn an anonymous account into a real account</p></div></div><div class="code"><div class="wrapper">  <span class="nv">_upgradeAnonymousAccount : </span><span class="nf">(username, password) -&gt;</span>
     <span class="nv">currentPassword = </span><span class="nx">@hoodie</span><span class="p">.</span><span class="nx">my</span><span class="p">.</span><span class="nx">config</span><span class="p">.</span><span class="nx">get</span> <span class="s1">&#39;_account.anonymousPassword&#39;</span>
     <span class="nx">@_changeUsernameAndPassword</span><span class="p">(</span><span class="nx">currentPassword</span><span class="p">,</span> <span class="nx">username</span><span class="p">,</span> <span class="nx">password</span><span class="p">)</span>
@@ -308,10 +292,37 @@ what we are waiting for.</p>
       <span class="nv">contentType : </span><span class="s1">&#39;application/json&#39;</span></div></div></div><div class="segment"><div class="code"><div class="wrapper">  <span class="nv">_handleDestroySucces : </span><span class="o">=&gt;</span>
     <span class="k">delete</span> <span class="nx">@username</span>
     <span class="k">delete</span> <span class="nx">@ownerHash</span>
-    <span class="k">delete</span> <span class="nx">@_authenticated</span></div></div></div><div class="segment"><div class="code"><div class="wrapper">  <span class="nv">_userKey : </span><span class="nf">(username) -&gt;</span>
+    <span class="k">delete</span> <span class="nx">@_authenticated</span>
+    <span class="nx">@hoodie</span><span class="p">.</span><span class="nx">trigger</span> <span class="s1">&#39;account:signout&#39;</span></div></div></div><div class="segment"><div class="code"><div class="wrapper">  <span class="nv">_userKey : </span><span class="nf">(username) -&gt;</span>
     <span class="k">if</span> <span class="nx">username</span> <span class="o">is</span> <span class="nx">@ownerHash</span>
       <span class="s2">&quot;user_anonymous/#{username}&quot;</span>
     <span class="k">else</span>
       <span class="s2">&quot;user/#{username}&quot;</span></div></div></div><div class="segment"><div class="code"><div class="wrapper">  <span class="nv">_key : </span><span class="nf">(username = @username) -&gt;</span>
     <span class="s2">&quot;#{@_prefix}:#{@_userKey(username)}&quot;</span></div></div></div><div class="segment"><div class="code"><div class="wrapper">  <span class="nv">_url : </span><span class="nf">(username = @username) -&gt;</span>
-    <span class="s2">&quot;/_users/#{encodeURIComponent @_key(username)}&quot;</span></div></div></div></div></body></html>
+    <span class="s2">&quot;/_users/#{encodeURIComponent @_key(username)}&quot;</span></div></div></div><div class="segment"><div class="code"><div class="wrapper">  <span class="nv">_sendChangePasswordRequest: </span><span class="p">(</span><span class="nx">currentPassword</span><span class="p">,</span> <span class="nx">newPassword</span><span class="p">)</span> <span class="o">=&gt;</span>
+    <span class="o">=&gt;</span> 
+      <span class="nv">data = </span><span class="nx">$</span><span class="p">.</span><span class="nx">extend</span> <span class="p">{},</span> <span class="nx">@_doc</span>
+      <span class="nv">data.password = </span><span class="nx">newPassword</span>
+      <span class="k">delete</span> <span class="nx">data</span><span class="p">.</span><span class="nx">salt</span>
+      <span class="k">delete</span> <span class="nx">data</span><span class="p">.</span><span class="nx">password_sha</span>
+      <span class="nv">options = </span>
+        <span class="nv">data        : </span><span class="nx">JSON</span><span class="p">.</span><span class="nx">stringify</span> <span class="nx">data</span>
+        <span class="nv">contentType : </span><span class="s2">&quot;application/json&quot;</span>
+
+      <span class="nx">@hoodie</span><span class="p">.</span><span class="nx">request</span><span class="p">(</span><span class="s1">&#39;PUT&#39;</span><span class="p">,</span>  <span class="nx">@_url</span><span class="p">(),</span> <span class="nx">options</span><span class="p">)</span>
+      <span class="p">.</span><span class="nx">pipe</span><span class="p">(</span> <span class="nx">@_handleChangePasswordSuccess</span><span class="p">(</span><span class="nx">newPassword</span><span class="p">),</span> <span class="nx">@_handleRequestError</span> <span class="p">)</span></div></div></div><div class="segment"><div class="code"><div class="wrapper">  <span class="nv">_sendChangeUsernameAndPasswordRequest: </span><span class="p">(</span><span class="nx">currentPassword</span><span class="p">,</span> <span class="nx">newUsername</span><span class="p">,</span> <span class="nx">newPassword</span><span class="p">)</span> <span class="o">=&gt;</span>
+    <span class="o">=&gt;</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>prepare updated _users doc</p></div></div><div class="code"><div class="wrapper">      <span class="nv">data = </span><span class="nx">$</span><span class="p">.</span><span class="nx">extend</span> <span class="p">{},</span> <span class="nx">@_doc</span>
+      <span class="nx">data</span><span class="p">.</span><span class="nv">$newUsername = </span><span class="nx">newUsername</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>trigger password update when newPassword set</p></div></div><div class="code"><div class="wrapper">      <span class="k">if</span> <span class="nx">newPassword</span>
+        <span class="k">delete</span> <span class="nx">data</span><span class="p">.</span><span class="nx">salt</span>
+        <span class="k">delete</span> <span class="nx">data</span><span class="p">.</span><span class="nx">password_sha</span>
+        <span class="nv">data.password = </span><span class="nx">newPassword</span>
+
+      <span class="nv">options =</span>
+        <span class="nv">data        : </span><span class="nx">JSON</span><span class="p">.</span><span class="nx">stringify</span> <span class="nx">data</span>
+        <span class="nv">contentType : </span><span class="s1">&#39;application/json&#39;</span>
+
+      <span class="nx">@hoodie</span><span class="p">.</span><span class="nx">request</span><span class="p">(</span><span class="s1">&#39;PUT&#39;</span><span class="p">,</span> <span class="nx">@_url</span><span class="p">(),</span> <span class="nx">options</span><span class="p">)</span>
+      <span class="p">.</span><span class="nx">pipe</span> <span class="nx">@_handleChangeUsernameAndPasswordRequest</span><span class="p">(</span><span class="nx">newUsername</span><span class="p">,</span> <span class="nx">newPassword</span> <span class="o">or</span> <span class="nx">currentPassword</span><span class="p">),</span> <span class="nx">@_handleRequestError</span></div></div></div><div class="segment"><div class="code"><div class="wrapper">  <span class="nv">_handleChangeUsernameAndPasswordRequest: </span><span class="p">(</span><span class="nx">username</span><span class="p">,</span> <span class="nx">password</span><span class="p">)</span> <span class="o">=&gt;</span>
+    <span class="o">=&gt;</span>
+      <span class="nx">@hoodie</span><span class="p">.</span><span class="nx">my</span><span class="p">.</span><span class="nx">remote</span><span class="p">.</span><span class="nx">disconnect</span><span class="p">()</span>
+      <span class="nx">@_delayedSignIn</span> <span class="nx">username</span><span class="p">,</span> <span class="nx">password</span></div></div></div></div></body></html>
