@@ -22,7 +22,7 @@ describe("Hoodie", function() {
       return expect(hoodie.baseUrl).toBe('');
     });
   });
-  describe("request(type, path, options)", function() {
+  describe("#request(type, path, options)", function() {
     _when("request('GET', '/')", function() {
       beforeEach(function() {
         var args;
@@ -65,14 +65,14 @@ describe("Hoodie", function() {
       });
     });
   });
-  describe("open(store, options)", function() {
+  describe("#open(store, options)", function() {
     return it("should instantiate a RemoteStore instance", function() {
       spyOn(Hoodie, "RemoteStore");
       this.hoodie.open("store_name", {
         option: "value"
       });
       return expect(Hoodie.RemoteStore).wasCalledWith(this.hoodie, {
-        basePath: "/store_name",
+        name: "store_name",
         option: "value"
       });
     });

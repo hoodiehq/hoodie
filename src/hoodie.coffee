@@ -64,7 +64,7 @@ class Hoodie extends Events
   # usage: `hoodie.open("some_store_name").findAll()`
   #
   open : (store_name, options = {}) ->
-    $.extend options, basePath: "/#{encodeURIComponent store_name}"
+    $.extend options, name: store_name
     new Hoodie.RemoteStore this, options
 
 

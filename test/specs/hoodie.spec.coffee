@@ -18,7 +18,7 @@ describe "Hoodie", ->
       expect(hoodie.baseUrl).toBe ''
   # /constructor
   
-  describe "request(type, path, options)", ->
+  describe "#request(type, path, options)", ->
     _when "request('GET', '/')", ->
       beforeEach ->
         @hoodie.request('GET', '/')
@@ -52,11 +52,11 @@ describe "Hoodie", ->
         expect(@args.url).toBe 'http://couch.example.com/test'
   # /request(type, path, options)
 
-  describe "open(store, options)", ->
+  describe "#open(store, options)", ->
     it "should instantiate a RemoteStore instance", ->
       spyOn(Hoodie, "RemoteStore")
       @hoodie.open "store_name", option: "value"
-      expect(Hoodie.RemoteStore).wasCalledWith @hoodie, basePath: "/store_name", option: "value"
+      expect(Hoodie.RemoteStore).wasCalledWith @hoodie, name: "store_name", option: "value"
   # /open(store, options)
 
   describe "#isPromise(object)", ->

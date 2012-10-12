@@ -56,7 +56,7 @@ Hoodie = (function(_super) {
       options = {};
     }
     $.extend(options, {
-      basePath: "/" + (encodeURIComponent(store_name))
+      name: store_name
     });
     return new Hoodie.RemoteStore(this, options);
   };
