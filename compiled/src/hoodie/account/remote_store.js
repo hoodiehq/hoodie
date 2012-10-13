@@ -10,45 +10,62 @@ Hoodie.AccountRemoteStore = (function(_super) {
 
   AccountRemoteStore.prototype._sync = true;
 
-  function AccountRemoteStore() {
+  function AccountRemoteStore(hoodie, options) {
+    this.hoodie = hoodie;
+    if (options == null) {
+      options = {};
+    }
     this._handleSignIn = __bind(this._handleSignIn, this);
 
     this.push = __bind(this.push, this);
 
-    this.connect = __bind(this.connect, this);
+    this.sync = __bind(this.sync, this);
 
     this.stopSyncing = __bind(this.stopSyncing, this);
 
     this.startSyncing = __bind(this.startSyncing, this);
-    AccountRemoteStore.__super__.constructor.apply(this, arguments);
+
+    this.connect = __bind(this.connect, this);
+
     this.name = this.hoodie.my.account.db();
     if (this.hoodie.my.config.get('_remote.sync') != null) {
       this._sync = this.hoodie.my.config.get('_remote.sync');
     }
-    if (this.isContinuouslySyncing()) {
-      this.startSyncing();
-    }
+    AccountRemoteStore.__super__.constructor.apply(this, arguments);
   }
-
-  AccountRemoteStore.prototype.startSyncing = function() {
-    this.hoodie.my.config.set('_remote.sync', this._sync = true);
-    this.hoodie.on('account:signin', this._handleSignIn);
-    this.hoodie.on('account:signout', this.disconnect);
-    return this.connect();
-  };
-
-  AccountRemoteStore.prototype.stopSyncing = function() {
-    this.hoodie.my.config.set('_remote.sync', this._sync = false);
-    this.hoodie.unbind('account:signin', this._handleSignIn);
-    this.hoodie.unbind('account:signout', this.disconnect);
-    return this.disconnect();
-  };
 
   AccountRemoteStore.prototype.connect = function() {
     var _this = this;
     return this.hoodie.my.account.authenticate().pipe(function() {
       return AccountRemoteStore.__super__.connect.apply(_this, arguments);
     });
+  };
+
+  AccountRemoteStore.prototype.disconnect = function() {
+    this.hoodie.unbind('store:idle', this.push);
+    return AccountRemoteStore.__super__.disconnect.apply(this, arguments);
+  };
+
+  AccountRemoteStore.prototype.startSyncing = function() {
+    this.hoodie.my.config.set('_remote.sync', true);
+    this.hoodie.on('account:signin', this._handleSignIn);
+    this.hoodie.on('account:signout', this.disconnect);
+    return AccountRemoteStore.__super__.startSyncing.apply(this, arguments);
+  };
+
+  AccountRemoteStore.prototype.stopSyncing = function() {
+    this.hoodie.my.config.set('_remote.sync', false);
+    this.hoodie.unbind('account:signin', this._handleSignIn);
+    this.hoodie.unbind('account:signout', this.disconnect);
+    return AccountRemoteStore.__super__.stopSyncing.apply(this, arguments);
+  };
+
+  AccountRemoteStore.prototype.sync = function(docs) {
+    if (this.isContinuouslyPushing()) {
+      this.hoodie.unbind('store:idle', this.push);
+      this.hoodie.on('store:idle', this.push);
+    }
+    return AccountRemoteStore.__super__.sync.apply(this, arguments);
   };
 
   AccountRemoteStore.prototype.getSinceNr = function(since) {

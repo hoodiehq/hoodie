@@ -25,16 +25,6 @@ describe "Hoodie.AccountRemoteStore", ->
 
     it "should sync continously by default", ->
       expect(@remote.isContinuouslySyncing()).toBeTruthy()
-    
-    ### 
-    _when "user has an account", ->
-      beforeEach ->
-        spyOn(@hoodie.my.account, "hasAccount").andReturn false
-
-    _when "user has an account", ->
-      beforeEach ->
-        spyOn(@hoodie.my.account, "hasAccount").andReturn true
-    ### 
         
     it "should start syncing", ->
       spyOn(Hoodie.AccountRemoteStore::, "startSyncing")
@@ -73,6 +63,11 @@ describe "Hoodie.AccountRemoteStore", ->
     it "should subscribe to account:signin with sync", ->
       @remote.startSyncing()
       expect(@hoodie.on).wasCalledWith 'account:signin', @remote._handleSignIn
+
+    it "should connect", ->
+      spyOn(@remote, "connect")
+      @remote.startSyncing()
+      expect(@remote.connect).wasCalled()
   # /#startSyncing()
       
 
@@ -96,7 +91,6 @@ describe "Hoodie.AccountRemoteStore", ->
       expect(@hoodie.unbind).wasCalledWith 'account:signout', @remote.disconnect
   # /#stopSyncing()
 
-
   describe "#connect()", ->
     beforeEach ->
       spyOn(@remote, "sync")
@@ -118,6 +112,11 @@ describe "Hoodie.AccountRemoteStore", ->
         expect(Hoodie.RemoteStore::connect).wasCalled()
   # /#connect()
 
+  describe "#disconnect()", ->
+    it "should unsubscribe from stores's dirty idle event", ->
+      @remote.disconnect()
+      expect(@hoodie.unbind).wasCalledWith 'store:idle', @remote.push
+  # /#disconnect()
 
   describe "#getSinceNr()", ->
     beforeEach ->
@@ -144,6 +143,28 @@ describe "Hoodie.AccountRemoteStore", ->
       @remote.setSinceNr(100)
       expect(@hoodie.my.config.set).wasCalledWith '_remote.since', 100
   # /#setSinceNr()
+
+  describe "#sync(docs)", ->
+    beforeEach ->
+      spyOn(@remote, "push").andCallFake (docs) -> pipe: (cb) -> cb(docs)
+      spyOn(@remote, "pull")
+      
+    _when ".isContinuouslyPushing() returns true", ->
+      beforeEach ->
+        spyOn(@remote, "isContinuouslyPushing").andReturn true
+        
+      it "should bind to store:idle event", ->
+        @remote.sync()
+        expect(@hoodie.on).wasCalledWith 'store:idle', @remote.push
+        
+      it "should unbind from store:idle event before it binds to it", ->
+        order = []
+        @hoodie.unbind.andCallFake (event) -> order.push "unbind #{event}"
+        @hoodie.on.andCallFake (event) -> order.push "bind #{event}"
+        @remote.sync()
+        expect(order[0]).toBe 'unbind store:idle'
+        expect(order[1]).toBe 'bind store:idle'
+  # /#sync(docs)
 
 
   describe "#push(docs)", -> 

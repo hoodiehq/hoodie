@@ -23,6 +23,9 @@ describe("Hoodie.RemoteStore", function() {
     return this.remote = new Hoodie.RemoteStore(this.hoodie);
   });
   describe("constructor(@hoodie, options = {})", function() {
+    beforeEach(function() {
+      return spyOn(Hoodie.RemoteStore.prototype, "startSyncing");
+    });
     it("should set @name from options", function() {
       var remote;
       remote = new Hoodie.RemoteStore(this.hoodie, {
@@ -35,12 +38,18 @@ describe("Hoodie.RemoteStore", function() {
       remote = new Hoodie.RemoteStore(this.hoodie);
       return expect(remote._sync).toBe(false);
     });
-    return it("should set _sync to false from pased sync option", function() {
-      var remote;
-      remote = new Hoodie.RemoteStore(this.hoodie, {
-        sync: true
+    return _when("sync: true passed", function() {
+      beforeEach(function() {
+        return this.remote = new Hoodie.RemoteStore(this.hoodie, {
+          sync: true
+        });
       });
-      return expect(remote._sync).toBe(true);
+      it("should to be true @isContinuouslySyncing()", function() {
+        return expect(this.remote.isContinuouslySyncing()).toBe(true);
+      });
+      return it("should start syncing", function() {
+        return expect(Hoodie.RemoteStore.prototype.startSyncing).wasCalled();
+      });
     });
   });
   describe("#find(type, id)", function() {
@@ -216,16 +225,12 @@ describe("Hoodie.RemoteStore", function() {
       this.remote.disconnect();
       return expect(this.remote._pullRequest.abort).wasCalled();
     });
-    it("should abort the push request", function() {
+    return it("should abort the push request", function() {
       this.remote._pushRequest = {
         abort: jasmine.createSpy('push')
       };
       this.remote.disconnect();
       return expect(this.remote._pushRequest.abort).wasCalled();
-    });
-    return it("should unsubscribe from stores's dirty idle event", function() {
-      this.remote.disconnect();
-      return expect(this.hoodie.unbind).wasCalledWith('store:idle', this.remote.push);
     });
   });
   describe("#isContinuouslyPulling()", function() {
@@ -256,6 +261,27 @@ describe("Hoodie.RemoteStore", function() {
         };
         return expect(this.remote.isContinuouslyPulling()).toBe(false);
       });
+    });
+  });
+  describe("#startSyncing()", function() {
+    beforeEach(function() {
+      return spyOn(this.remote, "connect");
+    });
+    it("should make isContinuouslySyncing() to return true", function() {
+      this.remote._sync = false;
+      this.remote.startSyncing();
+      return expect(this.remote.isContinuouslySyncing()).toBe;
+    });
+    return it("should connect", function() {
+      this.remote.startSyncing();
+      return expect(this.remote.connect).wasCalled();
+    });
+  });
+  describe("#stopSyncing", function() {
+    return it("should set _remote.sync to false", function() {
+      this.remote._sync = true;
+      this.remote.stopSyncing();
+      return expect(this.remote.isContinuouslySyncing()).toBe(false);
     });
   });
   describe("#isContinuouslyPushing()", function() {
@@ -684,31 +710,9 @@ describe("Hoodie.RemoteStore", function() {
       this.remote.sync([1, 2, 3]);
       return expect(this.remote.push).wasCalledWith([1, 2, 3]);
     });
-    it("should pull changes and pass arguments", function() {
+    return it("should pull changes and pass arguments", function() {
       this.remote.sync([1, 2, 3]);
       return expect(this.remote.pull).wasCalledWith([1, 2, 3]);
-    });
-    return _when(".isContinuouslyPushing() returns true", function() {
-      beforeEach(function() {
-        return spyOn(this.remote, "isContinuouslyPushing").andReturn(true);
-      });
-      it("should bind to store:idle event", function() {
-        this.remote.sync();
-        return expect(this.hoodie.on).wasCalledWith('store:idle', this.remote.push);
-      });
-      return it("should unbind from store:idle event before it binds to it", function() {
-        var order;
-        order = [];
-        this.hoodie.unbind.andCallFake(function(event) {
-          return order.push("unbind " + event);
-        });
-        this.hoodie.on.andCallFake(function(event) {
-          return order.push("bind " + event);
-        });
-        this.remote.sync();
-        expect(order[0]).toBe('unbind store:idle');
-        return expect(order[1]).toBe('bind store:idle');
-      });
     });
   });
   describe("#on(event, callback)", function() {

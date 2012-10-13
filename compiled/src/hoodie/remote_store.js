@@ -31,6 +31,10 @@ Hoodie.RemoteStore = (function(_super) {
 
     this.pull = __bind(this.pull, this);
 
+    this.stopSyncing = __bind(this.stopSyncing, this);
+
+    this.startSyncing = __bind(this.startSyncing, this);
+
     this.disconnect = __bind(this.disconnect, this);
 
     this.connect = __bind(this.connect, this);
@@ -40,6 +44,9 @@ Hoodie.RemoteStore = (function(_super) {
     }
     if (options.sync) {
       this._sync = options.sync;
+    }
+    if (this.isContinuouslySyncing()) {
+      this.startSyncing();
     }
   }
 
@@ -127,7 +134,7 @@ Hoodie.RemoteStore = (function(_super) {
     return console.log.apply(console, [".post() not yet implemented"].concat(__slice.call(arguments)));
   };
 
-  RemoteStore.prototype.connect = function() {
+  RemoteStore.prototype.connect = function(options) {
     this.connected = true;
     return this.sync();
   };
@@ -135,11 +142,19 @@ Hoodie.RemoteStore = (function(_super) {
   RemoteStore.prototype.disconnect = function() {
     var _ref, _ref1;
     this.connected = false;
-    this.hoodie.unbind('store:idle', this.push);
     if ((_ref = this._pullRequest) != null) {
       _ref.abort();
     }
     return (_ref1 = this._pushRequest) != null ? _ref1.abort() : void 0;
+  };
+
+  RemoteStore.prototype.startSyncing = function() {
+    this._sync = true;
+    return this.connect();
+  };
+
+  RemoteStore.prototype.stopSyncing = function() {
+    return this._sync = false;
   };
 
   RemoteStore.prototype.isContinuouslyPulling = function() {
@@ -193,10 +208,6 @@ Hoodie.RemoteStore = (function(_super) {
   };
 
   RemoteStore.prototype.sync = function(docs) {
-    if (this.isContinuouslyPushing()) {
-      this.hoodie.unbind('store:idle', this.push);
-      this.hoodie.on('store:idle', this.push);
-    }
     return this.push(docs).pipe(this.pull);
   };
 

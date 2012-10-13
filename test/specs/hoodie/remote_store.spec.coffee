@@ -16,6 +16,9 @@ describe "Hoodie.RemoteStore", ->
   
   
   describe "constructor(@hoodie, options = {})", ->
+    beforeEach ->
+      spyOn(Hoodie.RemoteStore::, "startSyncing")
+    
     it "should set @name from options", ->
       remote = new Hoodie.RemoteStore @hoodie, name: 'base/path'
       expect(remote.name).toBe 'base/path'
@@ -24,9 +27,15 @@ describe "Hoodie.RemoteStore", ->
       remote = new Hoodie.RemoteStore @hoodie
       expect(remote._sync).toBe false
 
-    it "should set _sync to false from pased sync option", ->
-      remote = new Hoodie.RemoteStore @hoodie, sync: true
-      expect(remote._sync).toBe true
+    _when "sync: true passed", ->
+      beforeEach ->
+        @remote = new Hoodie.RemoteStore @hoodie, sync: true
+      
+      it "should to be true @isContinuouslySyncing()", ->
+        expect(@remote.isContinuouslySyncing()).toBe true
+
+      it "should start syncing", ->
+        expect(Hoodie.RemoteStore::startSyncing).wasCalled()
   # /constructor
 
 
@@ -205,10 +214,6 @@ describe "Hoodie.RemoteStore", ->
       @remote._pushRequest = abort: jasmine.createSpy 'push'
       @remote.disconnect()
       expect(@remote._pushRequest.abort).wasCalled()
-      
-    it "should unsubscribe from stores's dirty idle event", ->
-      @remote.disconnect()
-      expect(@hoodie.unbind).wasCalledWith 'store:idle', @remote.push
   # /#disconnect()
 
   describe "#isContinuouslyPulling()", ->
@@ -232,6 +237,27 @@ describe "Hoodie.RemoteStore", ->
         @remote._sync = push: true
         expect(@remote.isContinuouslyPulling()).toBe false
   # /#isContinuouslySyncing()
+
+  describe "#startSyncing()", ->
+    beforeEach ->
+      spyOn(@remote, "connect")
+    
+    it "should make isContinuouslySyncing() to return true", ->
+      @remote._sync = false
+      @remote.startSyncing()
+      expect(@remote.isContinuouslySyncing()).toBe
+
+    it "should connect", ->
+      @remote.startSyncing()
+      expect(@remote.connect).wasCalled()
+  # /#startSyncing()
+
+  describe "#stopSyncing", ->
+    it "should set _remote.sync to false", ->
+      @remote._sync = true
+      @remote.stopSyncing()
+      expect(@remote.isContinuouslySyncing()).toBe false
+  # /#stopSyncing()
 
   describe "#isContinuouslyPushing()", ->
     _when "remote._sync is false", ->
@@ -565,22 +591,6 @@ describe "Hoodie.RemoteStore", ->
     it "should pull changes and pass arguments", ->
       @remote.sync [1,2,3]
       expect(@remote.pull).wasCalledWith [1,2,3]
-      
-    _when ".isContinuouslyPushing() returns true", ->
-      beforeEach ->
-        spyOn(@remote, "isContinuouslyPushing").andReturn true
-        
-      it "should bind to store:idle event", ->
-        @remote.sync()
-        expect(@hoodie.on).wasCalledWith 'store:idle', @remote.push
-        
-      it "should unbind from store:idle event before it binds to it", ->
-        order = []
-        @hoodie.unbind.andCallFake (event) -> order.push "unbind #{event}"
-        @hoodie.on.andCallFake (event) -> order.push "bind #{event}"
-        @remote.sync()
-        expect(order[0]).toBe 'unbind store:idle'
-        expect(order[1]).toBe 'bind store:idle'
   # /#sync(docs)
 
 

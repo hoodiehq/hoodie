@@ -56,7 +56,7 @@ class Hoodie.RemoteStore extends Hoodie.Store
   constructor : (@hoodie, options = {}) ->
     @name  = options.name if options.name
     @_sync = options.sync if options.sync
-
+    @startSyncing() if @isContinuouslySyncing()
 
 
   # find
@@ -169,7 +169,7 @@ class Hoodie.RemoteStore extends Hoodie.Store
   # ---------
 
   # start syncing
-  connect : =>
+  connect : (options) =>
     @connected = true
     @sync()
   
@@ -181,11 +181,27 @@ class Hoodie.RemoteStore extends Hoodie.Store
   disconnect : =>
     @connected = false
     
-    # binding comes from @sync
-    @hoodie.unbind 'store:idle',   @push
-    
     @_pullRequest?.abort()
     @_pushRequest?.abort()
+  
+
+  # startSyncing
+  # --------------
+
+  # start continuous syncing with current users store
+  # 
+  startSyncing : =>
+    @_sync = true
+    @connect()
+
+
+  # stopSyncing
+  # -------------
+
+  # stop continuous syncing with current users store
+  # 
+  stopSyncing : =>
+    @_sync = false
 
 
   # isContinuouslyPulling
@@ -272,10 +288,6 @@ class Hoodie.RemoteStore extends Hoodie.Store
 
   # pull ... and push ;-)
   sync : (docs) =>
-    if @isContinuouslyPushing()
-      @hoodie.unbind 'store:idle', @push
-      @hoodie.on     'store:idle', @push
-    
     @push(docs).pipe @pull
 
   

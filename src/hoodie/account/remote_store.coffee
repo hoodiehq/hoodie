@@ -22,44 +22,14 @@ class Hoodie.AccountRemoteStore extends Hoodie.RemoteStore
   # -------------
 
   #
-  constructor : ->
-    super
-
+  constructor : (@hoodie, options = {}) ->
     # set name to user's DB name
     @name = @hoodie.my.account.db()
     
     # overwrite default with _remote.sync config, if set
     @_sync = @hoodie.my.config.get('_remote.sync') if @hoodie.my.config.get('_remote.sync')?
-    
-    @startSyncing() if @isContinuouslySyncing()
-  
 
-  # startSyncing
-  # --------------
-
-  # start continuous syncing with current users store
-  # 
-  startSyncing : =>
-    @hoodie.my.config.set '_remote.sync', @_sync = true
-
-    @hoodie.on 'account:signin',     @_handleSignIn
-    @hoodie.on 'account:signout',    @disconnect
-
-    @connect()
-
-
-  # stopSyncing
-  # -------------
-
-  # stop continuous syncing with current users store
-  # 
-  stopSyncing : =>
-    @hoodie.my.config.set '_remote.sync', @_sync = false
-
-    @hoodie.unbind 'account:signin',  @_handleSignIn
-    @hoodie.unbind 'account:signout', @disconnect
-
-    @disconnect()
+    super
     
 
   # Connect
@@ -69,6 +39,57 @@ class Hoodie.AccountRemoteStore extends Hoodie.RemoteStore
   # 
   connect : =>
     @hoodie.my.account.authenticate().pipe => super
+
+
+  # disconnect
+  # ------------
+
+  # 
+  disconnect: ->
+    # binding comes from @sync
+    @hoodie.unbind 'store:idle',   @push
+
+    super
+  
+
+  # startSyncing
+  # --------------
+
+  # start continuous syncing with current users store
+  # 
+  startSyncing : =>
+    @hoodie.my.config.set '_remote.sync', true
+
+    @hoodie.on 'account:signin',     @_handleSignIn
+    @hoodie.on 'account:signout',    @disconnect
+
+    super
+
+
+  # stopSyncing
+  # -------------
+
+  # stop continuous syncing with current users store
+  # 
+  stopSyncing : =>
+    @hoodie.my.config.set '_remote.sync', false
+
+    @hoodie.unbind 'account:signin',  @_handleSignIn
+    @hoodie.unbind 'account:signout', @disconnect
+
+    super
+
+
+  # sync
+  # ------
+
+  # 
+  sync : (docs) =>
+    if @isContinuouslyPushing()
+      @hoodie.unbind 'store:idle', @push
+      @hoodie.on     'store:idle', @push
+
+    super
     
 
   # get and set since nr

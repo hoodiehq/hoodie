@@ -33,16 +33,6 @@ describe("Hoodie.AccountRemoteStore", function() {
     it("should sync continously by default", function() {
       return expect(this.remote.isContinuouslySyncing()).toBeTruthy();
     });
-    /* 
-    _when "user has an account", ->
-      beforeEach ->
-        spyOn(@hoodie.my.account, "hasAccount").andReturn false
-    
-    _when "user has an account", ->
-      beforeEach ->
-        spyOn(@hoodie.my.account, "hasAccount").andReturn true
-    */
-
     it("should start syncing", function() {
       spyOn(Hoodie.AccountRemoteStore.prototype, "startSyncing");
       new Hoodie.AccountRemoteStore(this.hoodie);
@@ -78,9 +68,14 @@ describe("Hoodie.AccountRemoteStore", function() {
       this.remote.startSyncing();
       return expect(this.hoodie.on).wasCalledWith('account:signout', this.remote.disconnect);
     });
-    return it("should subscribe to account:signin with sync", function() {
+    it("should subscribe to account:signin with sync", function() {
       this.remote.startSyncing();
       return expect(this.hoodie.on).wasCalledWith('account:signin', this.remote._handleSignIn);
+    });
+    return it("should connect", function() {
+      spyOn(this.remote, "connect");
+      this.remote.startSyncing();
+      return expect(this.remote.connect).wasCalled();
     });
   });
   describe("#stopSyncing", function() {
@@ -130,6 +125,12 @@ describe("Hoodie.AccountRemoteStore", function() {
       });
     });
   });
+  describe("#disconnect()", function() {
+    return it("should unsubscribe from stores's dirty idle event", function() {
+      this.remote.disconnect();
+      return expect(this.hoodie.unbind).wasCalledWith('store:idle', this.remote.push);
+    });
+  });
   describe("#getSinceNr()", function() {
     beforeEach(function() {
       return spyOn(this.hoodie.my.config, "get");
@@ -154,6 +155,40 @@ describe("Hoodie.AccountRemoteStore", function() {
     return it("should use user's config to store since nr persistantly", function() {
       this.remote.setSinceNr(100);
       return expect(this.hoodie.my.config.set).wasCalledWith('_remote.since', 100);
+    });
+  });
+  describe("#sync(docs)", function() {
+    beforeEach(function() {
+      spyOn(this.remote, "push").andCallFake(function(docs) {
+        return {
+          pipe: function(cb) {
+            return cb(docs);
+          }
+        };
+      });
+      return spyOn(this.remote, "pull");
+    });
+    return _when(".isContinuouslyPushing() returns true", function() {
+      beforeEach(function() {
+        return spyOn(this.remote, "isContinuouslyPushing").andReturn(true);
+      });
+      it("should bind to store:idle event", function() {
+        this.remote.sync();
+        return expect(this.hoodie.on).wasCalledWith('store:idle', this.remote.push);
+      });
+      return it("should unbind from store:idle event before it binds to it", function() {
+        var order;
+        order = [];
+        this.hoodie.unbind.andCallFake(function(event) {
+          return order.push("unbind " + event);
+        });
+        this.hoodie.on.andCallFake(function(event) {
+          return order.push("bind " + event);
+        });
+        this.remote.sync();
+        expect(order[0]).toBe('unbind store:idle');
+        return expect(order[1]).toBe('bind store:idle');
+      });
     });
   });
   describe("#push(docs)", function() {
