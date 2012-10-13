@@ -68,14 +68,27 @@ Hoodie.RemoteStore = (function(_super) {
   };
 
   RemoteStore.prototype.findAll = function(type) {
-    var defer, path, promise;
+    var defer, path, prefix, promise;
     defer = RemoteStore.__super__.findAll.apply(this, arguments);
     if (this.hoodie.isPromise(defer)) {
       return defer;
     }
     path = "/_all_docs";
-    if (type) {
-      path = "" + path + "?startkey=\"" + type + "\/\"&endkey=\"" + type + "0\"";
+    switch (true) {
+      case (type != null) && this._prefix !== '':
+        prefix = "" + this._prefix + "/" + type;
+        break;
+      case type != null:
+        prefix = type;
+        break;
+      case this._prefix !== '':
+        prefix = this._prefix;
+        break;
+      default:
+        prefix = '';
+    }
+    if (prefix) {
+      path = "" + path + "?startkey=\"" + prefix + "\/\"&endkey=\"" + prefix + "0\"";
     }
     promise = this.request("GET", path);
     promise.fail(defer.reject);

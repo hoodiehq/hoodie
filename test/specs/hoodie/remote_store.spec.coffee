@@ -70,9 +70,21 @@ describe "Hoodie.RemoteStore", ->
       expect(@remote.findAll()).toBePromise()
 
     _when "type is not set", ->
-      it "should send a GET to /_all_docs", ->
-        @remote.findAll()
-        expect(@remote.request).wasCalledWith "GET", "/_all_docs"
+      _and "prefix is empty", ->
+        beforeEach ->
+          @remote._prefix = ''
+        
+        it "should send a GET to /_all_docs", ->
+          @remote.findAll()
+          expect(@remote.request).wasCalledWith "GET", "/_all_docs"
+
+      _and "prefix is '$public'", ->
+        beforeEach ->
+          @remote._prefix = '$public'
+        
+        it "should send a GET to /_all_docs", ->
+          @remote.findAll()
+          expect(@remote.request).wasCalledWith "GET", '/_all_docs?startkey="$public/"&endkey="$public0"'
 
     _when "type is todo", ->
       it 'should send a GET to /_all_docs?startkey="todo/"&endkey="todo0"', ->

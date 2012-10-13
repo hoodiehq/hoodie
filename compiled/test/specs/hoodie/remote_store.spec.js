@@ -83,9 +83,23 @@ describe("Hoodie.RemoteStore", function() {
       return expect(this.remote.findAll()).toBePromise();
     });
     _when("type is not set", function() {
-      return it("should send a GET to /_all_docs", function() {
-        this.remote.findAll();
-        return expect(this.remote.request).wasCalledWith("GET", "/_all_docs");
+      _and("prefix is empty", function() {
+        beforeEach(function() {
+          return this.remote._prefix = '';
+        });
+        return it("should send a GET to /_all_docs", function() {
+          this.remote.findAll();
+          return expect(this.remote.request).wasCalledWith("GET", "/_all_docs");
+        });
+      });
+      return _and("prefix is '$public'", function() {
+        beforeEach(function() {
+          return this.remote._prefix = '$public';
+        });
+        return it("should send a GET to /_all_docs", function() {
+          this.remote.findAll();
+          return expect(this.remote.request).wasCalledWith("GET", '/_all_docs?startkey="$public/"&endkey="$public0"');
+        });
       });
     });
     _when("type is todo", function() {

@@ -94,8 +94,18 @@ class Hoodie.RemoteStore extends Hoodie.Store
     return defer if @hoodie.isPromise(defer)
 
     path = "/_all_docs"
-    if type
-      path = "#{path}?startkey=\"#{type}\/\"&endkey=\"#{type}0\""
+    switch true
+      when type? and @_prefix isnt ''
+        prefix = "#{@_prefix}/#{type}"
+      when type?
+        prefix = type
+      when @_prefix isnt ''
+        prefix = @_prefix
+      else
+        prefix = ''
+
+    if prefix
+      path = "#{path}?startkey=\"#{prefix}\/\"&endkey=\"#{prefix}0\""
 
     promise = @request "GET", path
     promise.fail defer.reject
