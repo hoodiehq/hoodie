@@ -8,7 +8,11 @@ Hoodie.RemoteStore = (function(_super) {
 
   __extends(RemoteStore, _super);
 
+  RemoteStore.prototype.name = void 0;
+
   RemoteStore.prototype._sync = false;
+
+  RemoteStore.prototype._prefix = '';
 
   function RemoteStore(hoodie, options) {
     this.hoodie = hoodie;
@@ -44,6 +48,9 @@ Hoodie.RemoteStore = (function(_super) {
     }
     if (options.sync) {
       this._sync = options.sync;
+    }
+    if (options.prefix) {
+      this._prefix = options.prefix;
     }
     if (this.isContinuouslySyncing()) {
       this.startSyncing();
@@ -290,6 +297,9 @@ Hoodie.RemoteStore = (function(_super) {
       delete attributes[attr];
     }
     attributes._id = "" + attributes.$type + "/" + attributes.id;
+    if (this._prefix) {
+      attributes._id = "" + this._prefix + "/" + attributes._id;
+    }
     delete attributes.id;
     this._addRevisionTo(attributes);
     return attributes;

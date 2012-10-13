@@ -38,7 +38,12 @@ describe("Hoodie.RemoteStore", function() {
       remote = new Hoodie.RemoteStore(this.hoodie);
       return expect(remote._sync).toBe(false);
     });
-    return _when("sync: true passed", function() {
+    it("should set _prefix to '' by default", function() {
+      var remote;
+      remote = new Hoodie.RemoteStore(this.hoodie);
+      return expect(remote._prefix).toBe('');
+    });
+    _when("sync: true passed", function() {
       beforeEach(function() {
         return this.remote = new Hoodie.RemoteStore(this.hoodie, {
           sync: true
@@ -49,6 +54,16 @@ describe("Hoodie.RemoteStore", function() {
       });
       return it("should start syncing", function() {
         return expect(Hoodie.RemoteStore.prototype.startSyncing).wasCalled();
+      });
+    });
+    return _when("prefix: $public passed", function() {
+      beforeEach(function() {
+        return this.remote = new Hoodie.RemoteStore(this.hoodie, {
+          prefix: '$public'
+        });
+      });
+      return it("should set _prefix accordingly", function() {
+        return expect(this.remote._prefix).toBe('$public');
       });
     });
   });
@@ -638,13 +653,13 @@ describe("Hoodie.RemoteStore", function() {
       beforeEach(function() {
         this.todoObjects = [
           {
-            type: 'todo',
+            $type: 'todo',
             id: '1'
           }, {
-            type: 'todo',
+            $type: 'todo',
             id: '2'
           }, {
-            type: 'todo',
+            $type: 'todo',
             id: '3'
           }
         ];
@@ -657,7 +672,7 @@ describe("Hoodie.RemoteStore", function() {
         return expect(data.docs.length).toBe(3);
       });
     });
-    return _and("one deleted and one new doc passed", function() {
+    _and("one deleted and one new doc passed", function() {
       beforeEach(function() {
         var _ref;
         this.remote.push(Mocks.changedDocs());
@@ -692,6 +707,30 @@ describe("Hoodie.RemoteStore", function() {
         expect(deletedDoc._revisions.ids[1]).toBe('123');
         expect(newDoc._revisions.start).toBe(1);
         return expect(newDoc._revisions.ids[0]).toBe('uuid');
+      });
+    });
+    return _when("prefix set to $public", function() {
+      beforeEach(function() {
+        this.remote._prefix = '$public';
+        this.todoObjects = [
+          {
+            $type: 'todo',
+            id: '1'
+          }, {
+            $type: 'todo',
+            id: '2'
+          }, {
+            $type: 'todo',
+            id: '3'
+          }
+        ];
+        return this.remote.push(this.todoObjects);
+      });
+      return it("should prefix all document IDs with '$public/'", function() {
+        var data;
+        expect(this.remote.request).wasCalled();
+        data = this.remote.request.mostRecentCall.args[2].data;
+        return expect(data.docs[0]._id).toBe('$public/todo/1');
       });
     });
   });

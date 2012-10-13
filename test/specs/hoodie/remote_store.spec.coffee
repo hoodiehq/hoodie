@@ -27,6 +27,10 @@ describe "Hoodie.RemoteStore", ->
       remote = new Hoodie.RemoteStore @hoodie
       expect(remote._sync).toBe false
 
+    it "should set _prefix to '' by default", ->
+      remote = new Hoodie.RemoteStore @hoodie
+      expect(remote._prefix).toBe ''
+
     _when "sync: true passed", ->
       beforeEach ->
         @remote = new Hoodie.RemoteStore @hoodie, sync: true
@@ -36,6 +40,13 @@ describe "Hoodie.RemoteStore", ->
 
       it "should start syncing", ->
         expect(Hoodie.RemoteStore::startSyncing).wasCalled()
+
+    _when "prefix: $public passed", ->
+      beforeEach ->
+        @remote = new Hoodie.RemoteStore @hoodie, prefix: '$public'
+      
+      it "should set _prefix accordingly", ->
+        expect(@remote._prefix).toBe '$public'
   # /constructor
 
 
@@ -533,9 +544,9 @@ describe "Hoodie.RemoteStore", ->
     _when "Array of docs passed", ->
       beforeEach ->
         @todoObjects = [
-          {type: 'todo', id: '1'}
-          {type: 'todo', id: '2'}
-          {type: 'todo', id: '3'}
+          {$type: 'todo', id: '1'}
+          {$type: 'todo', id: '2'}
+          {$type: 'todo', id: '3'}
         ]
         @remote.push @todoObjects
       
@@ -577,6 +588,21 @@ describe "Hoodie.RemoteStore", ->
 
         expect(newDoc._revisions.start).toBe 1
         expect(newDoc._revisions.ids[0]).toBe 'uuid'
+
+    _when "prefix set to $public", ->
+      beforeEach ->
+        @remote._prefix = '$public'
+        @todoObjects = [
+          {$type: 'todo', id: '1'}
+          {$type: 'todo', id: '2'}
+          {$type: 'todo', id: '3'}
+        ]
+        @remote.push @todoObjects
+      
+      it "should prefix all document IDs with '$public/'", ->
+        expect(@remote.request).wasCalled()
+        data = @remote.request.mostRecentCall.args[2].data
+        expect(data.docs[0]._id).toBe '$public/todo/1'
   # /#push(docs)
 
   describe "#sync(docs)", ->

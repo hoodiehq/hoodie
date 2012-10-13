@@ -41,12 +41,25 @@ class Hoodie.RemoteStore extends Hoodie.Store
   # properties
   # ------------
   
+  # name  
+
+  # the name of the RemoteStore is the name of the
+  # CouchDB database and is also used to prefix 
+  # triggered events
+  name : undefined
+  
   # sync  
 
   # if set to true, updates will be continuously pulled
-  # and pushed. Alternatively, `_sync` can be set to
+  # and pushed. Alternatively, `sync` can be set to
   # `pull: true` or `push: true`.
-  _sync: false
+  _sync : false
+
+  # docPrefix
+
+  # prefix of docs in CouchDB Database, e.g. all docs
+  # in public user stores are prefixed by '$public'
+  _prefix : ''
 
 
   # Constructor 
@@ -54,8 +67,9 @@ class Hoodie.RemoteStore extends Hoodie.Store
   
   # sets name (think: namespace) and some other options
   constructor : (@hoodie, options = {}) ->
-    @name  = options.name if options.name
-    @_sync = options.sync if options.sync
+    @name    = options.name   if options.name
+    @_sync   = options.sync   if options.sync
+    @_prefix = options.prefix if options.prefix
     @startSyncing() if @isContinuouslySyncing()
 
 
@@ -413,6 +427,9 @@ class Hoodie.RemoteStore extends Hoodie.Store
    
     # prepare CouchDB id
     attributes._id = "#{attributes.$type}/#{attributes.id}"
+    if @_prefix
+      attributes._id = "#{@_prefix}/#{attributes._id}"
+    
     delete attributes.id
     
     @_addRevisionTo attributes
