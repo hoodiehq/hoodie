@@ -87,25 +87,25 @@ describe("Hoodie.RemoteStore", function() {
         beforeEach(function() {
           return this.remote._prefix = '';
         });
-        return it("should send a GET to /_all_docs", function() {
+        return it("should send a GET to /_all_docs?include_docs=true", function() {
           this.remote.findAll();
-          return expect(this.remote.request).wasCalledWith("GET", "/_all_docs");
+          return expect(this.remote.request).wasCalledWith("GET", "/_all_docs?include_docs=true");
         });
       });
       return _and("prefix is '$public'", function() {
         beforeEach(function() {
           return this.remote._prefix = '$public';
         });
-        return it("should send a GET to /_all_docs", function() {
+        return it("should send a GET to /_all_docs?include_docs=true", function() {
           this.remote.findAll();
-          return expect(this.remote.request).wasCalledWith("GET", '/_all_docs?startkey="$public/"&endkey="$public0"');
+          return expect(this.remote.request).wasCalledWith("GET", '/_all_docs?include_docs=true&startkey="$public/"&endkey="$public0"');
         });
       });
     });
     _when("type is todo", function() {
-      return it('should send a GET to /_all_docs?startkey="todo/"&endkey="todo0"', function() {
+      return it('should send a GET to /_all_docs?include_docs=true&startkey="todo/"&endkey="todo0"', function() {
         this.remote.findAll('todo');
-        return expect(this.remote.request).wasCalledWith("GET", '/_all_docs?startkey="todo/"&endkey="todo0"');
+        return expect(this.remote.request).wasCalledWith("GET", '/_all_docs?include_docs=true&startkey="todo/"&endkey="todo0"');
       });
     });
     _when("request success", function() {

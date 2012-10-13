@@ -74,22 +74,22 @@ describe "Hoodie.RemoteStore", ->
         beforeEach ->
           @remote._prefix = ''
         
-        it "should send a GET to /_all_docs", ->
+        it "should send a GET to /_all_docs?include_docs=true", ->
           @remote.findAll()
-          expect(@remote.request).wasCalledWith "GET", "/_all_docs"
+          expect(@remote.request).wasCalledWith "GET", "/_all_docs?include_docs=true"
 
       _and "prefix is '$public'", ->
         beforeEach ->
           @remote._prefix = '$public'
         
-        it "should send a GET to /_all_docs", ->
+        it "should send a GET to /_all_docs?include_docs=true", ->
           @remote.findAll()
-          expect(@remote.request).wasCalledWith "GET", '/_all_docs?startkey="$public/"&endkey="$public0"'
+          expect(@remote.request).wasCalledWith "GET", '/_all_docs?include_docs=true&startkey="$public/"&endkey="$public0"'
 
     _when "type is todo", ->
-      it 'should send a GET to /_all_docs?startkey="todo/"&endkey="todo0"', ->
+      it 'should send a GET to /_all_docs?include_docs=true&startkey="todo/"&endkey="todo0"', ->
         @remote.findAll('todo')
-        expect(@remote.request).wasCalledWith "GET", '/_all_docs?startkey="todo/"&endkey="todo0"'
+        expect(@remote.request).wasCalledWith "GET", '/_all_docs?include_docs=true&startkey="todo/"&endkey="todo0"'
 
     _when "request success", ->
       beforeEach ->

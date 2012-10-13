@@ -73,7 +73,7 @@ Hoodie.RemoteStore = (function(_super) {
     if (this.hoodie.isPromise(defer)) {
       return defer;
     }
-    path = "/_all_docs";
+    path = "/_all_docs?include_docs=true";
     switch (true) {
       case (type != null) && this._prefix !== '':
         prefix = "" + this._prefix + "/" + type;
@@ -88,7 +88,7 @@ Hoodie.RemoteStore = (function(_super) {
         prefix = '';
     }
     if (prefix) {
-      path = "" + path + "?startkey=\"" + prefix + "\/\"&endkey=\"" + prefix + "0\"";
+      path = "" + path + "&startkey=\"" + prefix + "\/\"&endkey=\"" + prefix + "0\"";
     }
     promise = this.request("GET", path);
     promise.fail(defer.reject);
