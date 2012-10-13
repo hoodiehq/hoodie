@@ -15,4 +15,4 @@ class Hoodie.User
     # vanilla API syntax:
     # hoodie.user('uuid1234').findAll()
     return (userHash) => 
-      @hoodie.open "user/#{userHash}/public"
+      @hoodie.open "user/#{userHash}/public", prefix: '$public'

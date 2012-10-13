@@ -12,7 +12,9 @@ describe("Hoodie.User", function() {
       var user;
       user = new Hoodie.User(this.hoodie);
       expect(user('uuid123')).toBe('storeApi');
-      return expect(this.hoodie.open).wasCalledWith('user/uuid123/public');
+      return expect(this.hoodie.open).wasCalledWith('user/uuid123/public', {
+        prefix: '$public'
+      });
     });
   });
 });

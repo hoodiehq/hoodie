@@ -6,7 +6,9 @@ Hoodie.User = (function() {
     var _this = this;
     this.hoodie = hoodie;
     return function(userHash) {
-      return _this.hoodie.open("user/" + userHash + "/public");
+      return _this.hoodie.open("user/" + userHash + "/public", {
+        prefix: '$public'
+      });
     };
   }
 

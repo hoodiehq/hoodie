@@ -9,5 +9,5 @@ describe "Hoodie.User", ->
     it "should return a shortcut for hoodie.open", ->
       user = new Hoodie.User @hoodie
       expect(user('uuid123')).toBe 'storeApi'
-      expect(@hoodie.open).wasCalledWith 'user/uuid123/public'
+      expect(@hoodie.open).wasCalledWith 'user/uuid123/public', prefix: '$public'
   # /constructor
