@@ -187,7 +187,7 @@ Hoodie.Account = (function() {
 
     this._sendChangePasswordRequest = __bind(this._sendChangePasswordRequest, this);
 
-    this._handleDestroySucces = __bind(this._handleDestroySucces, this);
+    this._cleanup = __bind(this._cleanup, this);
 
     this._handleFetchBeforeDestroySucces = __bind(this._handleFetchBeforeDestroySucces, this);
 
@@ -196,8 +196,6 @@ Hoodie.Account = (function() {
     this._handlePasswordResetStatusRequestSuccess = __bind(this._handlePasswordResetStatusRequestSuccess, this);
 
     this._checkPasswordResetStatus = __bind(this._checkPasswordResetStatus, this);
-
-    this._handleSignOutSuccess = __bind(this._handleSignOutSuccess, this);
 
     this._handleSignInSuccess = __bind(this._handleSignInSuccess, this);
 
@@ -294,8 +292,12 @@ Hoodie.Account = (function() {
   Account.prototype.login = Account.prototype.signIn;
 
   Account.prototype.signOut = function() {
+    if (!this.hasAccount()) {
+      this._cleanup();
+      return;
+    }
     this.hoodie.my.remote.disconnect();
-    return this.hoodie.request('DELETE', '/_session').pipe(this._handleSignOutSuccess);
+    return this.hoodie.request('DELETE', '/_session').pipe(this._cleanup);
   };
 
   Account.prototype.logout = Account.prototype.signOut;
@@ -365,7 +367,11 @@ Hoodie.Account = (function() {
   };
 
   Account.prototype.destroy = function() {
-    return this.fetch().pipe(this._handleFetchBeforeDestroySucces, this._handleRequestError).pipe(this._handleDestroySucces);
+    if (!this.hasAccount()) {
+      this._cleanup();
+      return;
+    }
+    return this.fetch().pipe(this._handleFetchBeforeDestroySucces, this._handleRequestError).pipe(this._cleanup);
   };
 
   Account.prototype._prefix = 'org.couchdb.user';
@@ -478,14 +484,6 @@ Hoodie.Account = (function() {
     };
   };
 
-  Account.prototype._handleSignOutSuccess = function() {
-    delete this.username;
-    this.hoodie.my.config.clear();
-    this._authenticated = false;
-    this.ownerHash = this.hoodie.my.store.uuid();
-    return this.hoodie.trigger('account:signout');
-  };
-
   Account.prototype._checkPasswordResetStatus = function() {
     var hash, options, resetPasswordId, url, username,
       _this = this;
@@ -560,10 +558,12 @@ Hoodie.Account = (function() {
     });
   };
 
-  Account.prototype._handleDestroySucces = function() {
+  Account.prototype._cleanup = function() {
     delete this.username;
     delete this._authenticated;
+    this.hoodie.my.config.clear();
     this.ownerHash = this.hoodie.my.store.uuid();
+    this.hoodie.my.config.set('_account.ownerHash', this.ownerHash);
     return this.hoodie.trigger('account:signout');
   };
 

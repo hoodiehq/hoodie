@@ -475,25 +475,17 @@ describe "Hoodie.Account", ->
 
   describe "#signOut()", ->
     beforeEach ->
-      spyOn(@hoodie.my.remote, "disconnect")
-      @account.signOut()
-      [@type, @path, @options] = @hoodie.request.mostRecentCall.args
+      spyOn(@hoodie.my.store, "uuid").andReturn 'newHash'
+      spyOn(@hoodie.my.config, "clear")
     
-    it "should disconnect", ->
-      expect(@hoodie.my.remote.disconnect).wasCalled() 
-
-    it "should send a DELETE request to http://my.cou.ch/_session", ->
-      expect(@hoodie.request).wasCalled()
-      expect(@type).toBe 'DELETE'
-      expect(@path).toBe  '/_session'
-      
-    _when "signUp successful", ->
+    _when "user has no account", ->
       beforeEach ->
-        @requestDefer.resolve()
-        spyOn(@hoodie.my.config, "clear")
-        spyOn(@hoodie.my.store, "uuid").andReturn 'newHash'
+        spyOn(@account, "hasAccount").andReturn false
         @account.signOut()
-        
+
+      it "should not send any request", ->
+        expect(@hoodie.request).wasNotCalled() 
+
       it "should trigger `account:signout` event", ->
         expect(@hoodie.trigger).wasCalledWith 'account:signout'
 
@@ -505,6 +497,38 @@ describe "Hoodie.Account", ->
 
       it "should clear config", ->
         expect(@hoodie.my.config.clear).wasCalled() 
+      
+    _when "user has account", ->
+      beforeEach ->
+        spyOn(@hoodie.my.remote, "disconnect")
+        spyOn(@account, "hasAccount").andReturn true
+        @account.signOut()
+        [@type, @path, @options] = @hoodie.request.mostRecentCall.args
+      
+      it "should disconnect", ->
+        expect(@hoodie.my.remote.disconnect).wasCalled() 
+
+      it "should send a DELETE request to http://my.cou.ch/_session", ->
+        expect(@hoodie.request).wasCalled()
+        expect(@type).toBe 'DELETE'
+        expect(@path).toBe  '/_session'
+        
+      _when "signOut request successful", ->
+        beforeEach ->
+          @requestDefer.resolve()
+          @account.signOut()
+          
+        it "should trigger `account:signout` event", ->
+          expect(@hoodie.trigger).wasCalledWith 'account:signout'
+
+        it "should generate new @ownerHash hash", ->
+           expect(@account.ownerHash).toBe 'newHash'
+
+        it "should unset @username", ->
+           expect(@account.username).toBeUndefined()
+
+        it "should clear config", ->
+          expect(@hoodie.my.config.clear).wasCalled() 
   # /.signIn(username, password)
 
 
@@ -605,7 +629,10 @@ describe "Hoodie.Account", ->
   describe "#destroy()", ->
     beforeEach ->
       spyOn(@hoodie.my.remote, "disconnect")
+      spyOn(@hoodie.my.config, "clear")
+      spyOn(@hoodie.my.config, "set")
       spyOn(@account, "fetch").andReturn @hoodie.defer().resolve().promise()
+      spyOn(@hoodie.my.store, "uuid").andReturn 'newHash'
       @account.username = 'joe@example.com'
       @account._doc = _rev : '1-234'
     
@@ -625,22 +652,52 @@ describe "Hoodie.Account", ->
           _deleted : true
         contentType : 'application/json' 
 
-    _when "destroy request succesful", ->
+    _when "user has account", ->
       beforeEach ->
-        @hoodie.request.andReturn @hoodie.defer().resolve().promise()
+        spyOn(@account, "hasAccount").andReturn true
+
+      _and "destroy request succesful", ->
+        beforeEach ->
+          @hoodie.request.andReturn @hoodie.defer().resolve().promise()
+          @account.destroy()
+
+        it "should unset @username", ->
+          expect(@account.username).toBeUndefined() 
+
+        it "should regenerate @ownerHash", ->
+          expect(@account.ownerHash).toBe 'newHash'
+
+        it "should trigger signout event", ->
+          expect(@hoodie.trigger).wasCalledWith 'account:signout'
+
+        it "should clear config", ->
+          expect(@hoodie.my.config.clear).wasCalled() 
+
+        it "should set config._account.ownerHash to new @ownerHash", ->
+          expect(@hoodie.my.config.set).wasCalledWith '_account.ownerHash', 'newHash'
+
+    _when "user has no account", ->
+      beforeEach ->
+        spyOn(@account, "hasAccount").andReturn false
+        @account.destroy()
+
+      it "should not try to fetch", ->
+        expect(@account.fetch).wasNotCalled() 
 
       it "should unset @username", ->
-        @account.destroy()
         expect(@account.username).toBeUndefined() 
 
       it "should regenerate @ownerHash", ->
-        spyOn(@hoodie.my.store, "uuid").andReturn 'newHash'
-        @account.destroy()
         expect(@account.ownerHash).toBe 'newHash'
 
       it "should trigger signout event", ->
-        @account.destroy()
         expect(@hoodie.trigger).wasCalledWith 'account:signout'
+
+      it "should clear config", ->
+        expect(@hoodie.my.config.clear).wasCalled() 
+
+      it "should set config._account.ownerHash to new @ownerHash", ->
+        expect(@hoodie.my.config.set).wasCalledWith '_account.ownerHash', 'newHash'
   # /destroy()
 
   describe "#resetPassword(username)", ->

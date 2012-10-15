@@ -90,7 +90,7 @@ class Hoodie.Account
   # If the user signes up for real later, we change his username and password
   # internally instead of creating another user. 
   #
-  anonymousSignUp: ->
+  anonymousSignUp : ->
     password = @hoodie.my.store.uuid(10)
     username = @ownerHash
 
@@ -104,7 +104,7 @@ class Hoodie.Account
   # ---------------------
   
   #
-  hasAccount: ->
+  hasAccount : ->
     @username?
 
 
@@ -112,7 +112,7 @@ class Hoodie.Account
   # ---------------------
   
   #
-  hasAnonymousAccount: ->
+  hasAnonymousAccount : ->
     @hoodie.my.config.get('_account.anonymousPassword')?
 
 
@@ -141,9 +141,14 @@ class Hoodie.Account
   # uses standard CouchDB API to destroy a user session (DELETE /_session)
   #
   # TODO: handle errors
-  signOut: ->
+  signOut : ->
+    
+    unless @hasAccount()
+      @_cleanup()
+      return
+
     @hoodie.my.remote.disconnect()
-    @hoodie.request('DELETE', '/_session').pipe(@_handleSignOutSuccess)
+    @hoodie.request('DELETE', '/_session').pipe(@_cleanup)
 
   # alias
   logout: @::signOut
@@ -248,9 +253,14 @@ class Hoodie.Account
 
   # destroys a user's account  
   destroy : ->
+
+    unless @hasAccount()
+      @_cleanup()
+      return
+
     @fetch()
     .pipe(@_handleFetchBeforeDestroySucces, @_handleRequestError)
-    .pipe(@_handleDestroySucces)
+    .pipe(@_cleanup)
 
 
   # PRIVATE
@@ -382,17 +392,6 @@ class Hoodie.Account
     => @signIn(@username, newPassword)
 
   #
-  #
-  #
-  _handleSignOutSuccess : =>
-    delete @username
-    @hoodie.my.config.clear()
-    @_authenticated = false
-
-    @ownerHash = @hoodie.my.store.uuid()
-    @hoodie.trigger 'account:signout'
-
-  #
   # check for the status of a password reset. It might take
   # a while until the password reset worker picks up the job
   # and updates it
@@ -483,11 +482,13 @@ class Hoodie.Account
   #
   # 
   #
-  _handleDestroySucces : =>
+  _cleanup : =>
     delete @username
     delete @_authenticated
 
+    @hoodie.my.config.clear()
     @ownerHash = @hoodie.my.store.uuid()
+    @hoodie.my.config.set '_account.ownerHash', @ownerHash
     @hoodie.trigger 'account:signout'
 
   #

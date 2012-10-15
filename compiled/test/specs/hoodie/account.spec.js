@@ -564,25 +564,16 @@ describe("Hoodie.Account", function() {
   });
   describe("#signOut()", function() {
     beforeEach(function() {
-      var _ref;
-      spyOn(this.hoodie.my.remote, "disconnect");
-      this.account.signOut();
-      return _ref = this.hoodie.request.mostRecentCall.args, this.type = _ref[0], this.path = _ref[1], this.options = _ref[2], _ref;
+      spyOn(this.hoodie.my.store, "uuid").andReturn('newHash');
+      return spyOn(this.hoodie.my.config, "clear");
     });
-    it("should disconnect", function() {
-      return expect(this.hoodie.my.remote.disconnect).wasCalled();
-    });
-    it("should send a DELETE request to http://my.cou.ch/_session", function() {
-      expect(this.hoodie.request).wasCalled();
-      expect(this.type).toBe('DELETE');
-      return expect(this.path).toBe('/_session');
-    });
-    return _when("signUp successful", function() {
+    _when("user has no account", function() {
       beforeEach(function() {
-        this.requestDefer.resolve();
-        spyOn(this.hoodie.my.config, "clear");
-        spyOn(this.hoodie.my.store, "uuid").andReturn('newHash');
+        spyOn(this.account, "hasAccount").andReturn(false);
         return this.account.signOut();
+      });
+      it("should not send any request", function() {
+        return expect(this.hoodie.request).wasNotCalled();
       });
       it("should trigger `account:signout` event", function() {
         return expect(this.hoodie.trigger).wasCalledWith('account:signout');
@@ -595,6 +586,41 @@ describe("Hoodie.Account", function() {
       });
       return it("should clear config", function() {
         return expect(this.hoodie.my.config.clear).wasCalled();
+      });
+    });
+    return _when("user has account", function() {
+      beforeEach(function() {
+        var _ref;
+        spyOn(this.hoodie.my.remote, "disconnect");
+        spyOn(this.account, "hasAccount").andReturn(true);
+        this.account.signOut();
+        return _ref = this.hoodie.request.mostRecentCall.args, this.type = _ref[0], this.path = _ref[1], this.options = _ref[2], _ref;
+      });
+      it("should disconnect", function() {
+        return expect(this.hoodie.my.remote.disconnect).wasCalled();
+      });
+      it("should send a DELETE request to http://my.cou.ch/_session", function() {
+        expect(this.hoodie.request).wasCalled();
+        expect(this.type).toBe('DELETE');
+        return expect(this.path).toBe('/_session');
+      });
+      return _when("signOut request successful", function() {
+        beforeEach(function() {
+          this.requestDefer.resolve();
+          return this.account.signOut();
+        });
+        it("should trigger `account:signout` event", function() {
+          return expect(this.hoodie.trigger).wasCalledWith('account:signout');
+        });
+        it("should generate new @ownerHash hash", function() {
+          return expect(this.account.ownerHash).toBe('newHash');
+        });
+        it("should unset @username", function() {
+          return expect(this.account.username).toBeUndefined();
+        });
+        return it("should clear config", function() {
+          return expect(this.hoodie.my.config.clear).wasCalled();
+        });
       });
     });
   });
@@ -715,7 +741,10 @@ describe("Hoodie.Account", function() {
   describe("#destroy()", function() {
     beforeEach(function() {
       spyOn(this.hoodie.my.remote, "disconnect");
+      spyOn(this.hoodie.my.config, "clear");
+      spyOn(this.hoodie.my.config, "set");
       spyOn(this.account, "fetch").andReturn(this.hoodie.defer().resolve().promise());
+      spyOn(this.hoodie.my.store, "uuid").andReturn('newHash');
       this.account.username = 'joe@example.com';
       return this.account._doc = {
         _rev: '1-234'
@@ -739,22 +768,54 @@ describe("Hoodie.Account", function() {
         contentType: 'application/json'
       });
     });
-    return _when("destroy request succesful", function() {
+    _when("user has account", function() {
       beforeEach(function() {
-        return this.hoodie.request.andReturn(this.hoodie.defer().resolve().promise());
+        return spyOn(this.account, "hasAccount").andReturn(true);
+      });
+      return _and("destroy request succesful", function() {
+        beforeEach(function() {
+          this.hoodie.request.andReturn(this.hoodie.defer().resolve().promise());
+          return this.account.destroy();
+        });
+        it("should unset @username", function() {
+          return expect(this.account.username).toBeUndefined();
+        });
+        it("should regenerate @ownerHash", function() {
+          return expect(this.account.ownerHash).toBe('newHash');
+        });
+        it("should trigger signout event", function() {
+          return expect(this.hoodie.trigger).wasCalledWith('account:signout');
+        });
+        it("should clear config", function() {
+          return expect(this.hoodie.my.config.clear).wasCalled();
+        });
+        return it("should set config._account.ownerHash to new @ownerHash", function() {
+          return expect(this.hoodie.my.config.set).wasCalledWith('_account.ownerHash', 'newHash');
+        });
+      });
+    });
+    return _when("user has no account", function() {
+      beforeEach(function() {
+        spyOn(this.account, "hasAccount").andReturn(false);
+        return this.account.destroy();
+      });
+      it("should not try to fetch", function() {
+        return expect(this.account.fetch).wasNotCalled();
       });
       it("should unset @username", function() {
-        this.account.destroy();
         return expect(this.account.username).toBeUndefined();
       });
       it("should regenerate @ownerHash", function() {
-        spyOn(this.hoodie.my.store, "uuid").andReturn('newHash');
-        this.account.destroy();
         return expect(this.account.ownerHash).toBe('newHash');
       });
-      return it("should trigger signout event", function() {
-        this.account.destroy();
+      it("should trigger signout event", function() {
         return expect(this.hoodie.trigger).wasCalledWith('account:signout');
+      });
+      it("should clear config", function() {
+        return expect(this.hoodie.my.config.clear).wasCalled();
+      });
+      return it("should set config._account.ownerHash to new @ownerHash", function() {
+        return expect(this.hoodie.my.config.set).wasCalledWith('_account.ownerHash', 'newHash');
       });
     });
   });
