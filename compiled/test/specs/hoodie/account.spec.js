@@ -39,7 +39,7 @@ describe("Hoodie.Account", function() {
           }
         });
       });
-      return it("should set @owner", function() {
+      return it("should set @ownerHash", function() {
         var account;
         account = new Hoodie.Account(this.hoodie);
         return expect(account.ownerHash).toBe('owner_hash123');
@@ -55,7 +55,7 @@ describe("Hoodie.Account", function() {
         spyOn(this.hoodie.my.store, "uuid").andReturn('new_generated_owner_hash');
         return spyOn(this.hoodie.my.config, "set");
       });
-      it("should set @owner", function() {
+      it("should set @ownerHash", function() {
         var account;
         account = new Hoodie.Account(this.hoodie);
         return expect(account.ownerHash).toBe('new_generated_owner_hash');
@@ -365,7 +365,7 @@ describe("Hoodie.Account", function() {
           expect(this.account.username).toBe('joe@example.com');
           return expect(this.hoodie.my.config.set).wasCalledWith('_account.username', 'joe@example.com');
         });
-        it("should set @owner", function() {
+        it("should set @ownerHash", function() {
           this.account.signIn('joe@example.com', 'secret');
           expect(this.account.ownerHash).toBe('user_hash');
           return expect(this.hoodie.my.config.set).wasCalledWith('_account.ownerHash', 'user_hash');
@@ -581,13 +581,14 @@ describe("Hoodie.Account", function() {
       beforeEach(function() {
         this.requestDefer.resolve();
         spyOn(this.hoodie.my.config, "clear");
+        spyOn(this.hoodie.my.store, "uuid").andReturn('newHash');
         return this.account.signOut();
       });
       it("should trigger `account:signout` event", function() {
         return expect(this.hoodie.trigger).wasCalledWith('account:signout');
       });
-      it("should unset @owner", function() {
-        return expect(this.account.ownerHash).toBeUndefined();
+      it("should generate new @ownerHash hash", function() {
+        return expect(this.account.ownerHash).toBe('newHash');
       });
       it("should unset @username", function() {
         return expect(this.account.username).toBeUndefined();
@@ -746,9 +747,10 @@ describe("Hoodie.Account", function() {
         this.account.destroy();
         return expect(this.account.username).toBeUndefined();
       });
-      it("should unset @owner", function() {
+      it("should regenerate @ownerHash", function() {
+        spyOn(this.hoodie.my.store, "uuid").andReturn('newHash');
         this.account.destroy();
-        return expect(this.account.ownerHash).toBeUndefined();
+        return expect(this.account.ownerHash).toBe('newHash');
       });
       return it("should trigger signout event", function() {
         this.account.destroy();

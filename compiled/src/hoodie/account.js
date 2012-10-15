@@ -306,9 +306,9 @@ Hoodie.Account = (function() {
 
   Account.prototype._handleSignOutSuccess = function() {
     delete this.username;
-    delete this.ownerHash;
     this.hoodie.my.config.clear();
     this._authenticated = false;
+    this.ownerHash = this.hoodie.my.store.uuid();
     return this.hoodie.trigger('account:signout');
   };
 
@@ -388,8 +388,8 @@ Hoodie.Account = (function() {
 
   Account.prototype._handleDestroySucces = function() {
     delete this.username;
-    delete this.ownerHash;
     delete this._authenticated;
+    this.ownerHash = this.hoodie.my.store.uuid();
     return this.hoodie.trigger('account:signout');
   };
 

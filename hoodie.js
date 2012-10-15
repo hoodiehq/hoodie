@@ -480,9 +480,9 @@ Hoodie.Account = (function() {
 
   Account.prototype._handleSignOutSuccess = function() {
     delete this.username;
-    delete this.ownerHash;
     this.hoodie.my.config.clear();
     this._authenticated = false;
+    this.ownerHash = this.hoodie.my.store.uuid();
     return this.hoodie.trigger('account:signout');
   };
 
@@ -562,8 +562,8 @@ Hoodie.Account = (function() {
 
   Account.prototype._handleDestroySucces = function() {
     delete this.username;
-    delete this.ownerHash;
     delete this._authenticated;
+    this.ownerHash = this.hoodie.my.store.uuid();
     return this.hoodie.trigger('account:signout');
   };
 
@@ -916,7 +916,7 @@ Hoodie.RemoteStore = (function(_super) {
   };
 
   RemoteStore.prototype.findAll = function(type) {
-    var defer, path, prefix, promise;
+    var defer, keyPrefix, path, promise;
     defer = RemoteStore.__super__.findAll.apply(this, arguments);
     if (this.hoodie.isPromise(defer)) {
       return defer;
@@ -924,19 +924,19 @@ Hoodie.RemoteStore = (function(_super) {
     path = "/_all_docs?include_docs=true";
     switch (true) {
       case (type != null) && this._prefix !== '':
-        prefix = "" + this._prefix + "/" + type;
+        keyPrefix = "" + this._prefix + "/" + type;
         break;
       case type != null:
-        prefix = type;
+        keyPrefix = type;
         break;
       case this._prefix !== '':
-        prefix = this._prefix;
+        keyPrefix = this._prefix;
         break;
       default:
-        prefix = '';
+        keyPrefix = '';
     }
-    if (prefix) {
-      path = "" + path + "&startkey=\"" + prefix + "\/\"&endkey=\"" + prefix + "0\"";
+    if (keyPrefix) {
+      path = "" + path + "&startkey=\"" + keyPrefix + "\/\"&endkey=\"" + keyPrefix + "0\"";
     }
     promise = this.request("GET", path);
     promise.fail(defer.reject);

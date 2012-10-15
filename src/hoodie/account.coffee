@@ -386,9 +386,10 @@ class Hoodie.Account
   #
   _handleSignOutSuccess : =>
     delete @username
-    delete @ownerHash
     @hoodie.my.config.clear()
     @_authenticated = false
+
+    @ownerHash = @hoodie.my.store.uuid()
     @hoodie.trigger 'account:signout'
 
   #
@@ -480,12 +481,13 @@ class Hoodie.Account
       contentType : 'application/json'
 
   #
-  #
+  # 
   #
   _handleDestroySucces : =>
     delete @username
-    delete @ownerHash
     delete @_authenticated
+
+    @ownerHash = @hoodie.my.store.uuid()
     @hoodie.trigger 'account:signout'
 
   #

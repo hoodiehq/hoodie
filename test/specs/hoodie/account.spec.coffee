@@ -36,7 +36,7 @@ describe "Hoodie.Account", ->
           if key is '_account.ownerHash'
             return 'owner_hash123'
             
-      it "should set @owner", ->
+      it "should set @ownerHash", ->
         account = new Hoodie.Account @hoodie
         expect(account.ownerHash).toBe 'owner_hash123'
 
@@ -49,7 +49,7 @@ describe "Hoodie.Account", ->
         spyOn(@hoodie.my.store, "uuid").andReturn 'new_generated_owner_hash'
         spyOn(@hoodie.my.config, "set")
             
-      it "should set @owner", ->
+      it "should set @ownerHash", ->
         account = new Hoodie.Account @hoodie
         expect(account.ownerHash).toBe 'new_generated_owner_hash'
 
@@ -315,7 +315,7 @@ describe "Hoodie.Account", ->
            expect(@account.username).toBe 'joe@example.com'
            expect(@hoodie.my.config.set).wasCalledWith '_account.username', 'joe@example.com'
 
-        it "should set @owner", ->
+        it "should set @ownerHash", ->
            @account.signIn('joe@example.com', 'secret')
            expect(@account.ownerHash).toBe 'user_hash'
            expect(@hoodie.my.config.set).wasCalledWith '_account.ownerHash', 'user_hash'
@@ -491,13 +491,14 @@ describe "Hoodie.Account", ->
       beforeEach ->
         @requestDefer.resolve()
         spyOn(@hoodie.my.config, "clear")
+        spyOn(@hoodie.my.store, "uuid").andReturn 'newHash'
         @account.signOut()
         
       it "should trigger `account:signout` event", ->
         expect(@hoodie.trigger).wasCalledWith 'account:signout'
 
-      it "should unset @owner", ->
-         expect(@account.ownerHash).toBeUndefined()
+      it "should generate new @ownerHash hash", ->
+         expect(@account.ownerHash).toBe 'newHash'
 
       it "should unset @username", ->
          expect(@account.username).toBeUndefined()
@@ -632,9 +633,10 @@ describe "Hoodie.Account", ->
         @account.destroy()
         expect(@account.username).toBeUndefined() 
 
-      it "should unset @owner", ->
+      it "should regenerate @ownerHash", ->
+        spyOn(@hoodie.my.store, "uuid").andReturn 'newHash'
         @account.destroy()
-        expect(@account.ownerHash).toBeUndefined()
+        expect(@account.ownerHash).toBe 'newHash'
 
       it "should trigger signout event", ->
         @account.destroy()
