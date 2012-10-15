@@ -96,16 +96,16 @@ class Hoodie.RemoteStore extends Hoodie.Store
     path = "/_all_docs?include_docs=true"
     switch true
       when type? and @_prefix isnt ''
-        prefix = "#{@_prefix}/#{type}"
+        keyPrefix = "#{@_prefix}/#{type}"
       when type?
-        prefix = type
+        keyPrefix = type
       when @_prefix isnt ''
-        prefix = @_prefix
+        keyPrefix = @_prefix
       else
-        prefix = ''
+        keyPrefix = ''
 
-    if prefix
-      path = "#{path}&startkey=\"#{prefix}\/\"&endkey=\"#{prefix}0\""
+    if keyPrefix
+      path = "#{path}&startkey=\"#{keyPrefix}\/\"&endkey=\"#{keyPrefix}0\""
 
     promise = @request "GET", path
     promise.fail defer.reject
