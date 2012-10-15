@@ -562,9 +562,9 @@ Hoodie.Account = (function() {
     delete this.username;
     delete this._authenticated;
     this.hoodie.my.config.clear();
+    this.hoodie.trigger('account:signout');
     this.ownerHash = this.hoodie.my.store.uuid();
-    this.hoodie.my.config.set('_account.ownerHash', this.ownerHash);
-    return this.hoodie.trigger('account:signout');
+    return this.hoodie.my.config.set('_account.ownerHash', this.ownerHash);
   };
 
   Account.prototype._userKey = function(username) {

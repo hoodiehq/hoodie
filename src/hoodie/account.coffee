@@ -142,7 +142,7 @@ class Hoodie.Account
   #
   # TODO: handle errors
   signOut : ->
-    
+
     unless @hasAccount()
       @_cleanup()
       return
@@ -487,9 +487,11 @@ class Hoodie.Account
     delete @_authenticated
 
     @hoodie.my.config.clear()
+    @hoodie.trigger 'account:signout'
+    
     @ownerHash = @hoodie.my.store.uuid()
     @hoodie.my.config.set '_account.ownerHash', @ownerHash
-    @hoodie.trigger 'account:signout'
+    
 
   #
   #
