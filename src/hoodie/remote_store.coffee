@@ -483,6 +483,7 @@ class Hoodie.RemoteStore extends Hoodie.Store
     # handle id and type
     id = obj._id or obj.id
     delete obj._id
+    id = id.replace(RegExp('^'+@_prefix+'/'), '') if @_prefix
     [obj.$type, obj.id] = id.split(/\//)
     
     # handle timestameps

@@ -60,8 +60,9 @@ describe "Hoodie.RemoteStore", ->
 
     _when "request successful", ->
       beforeEach ->
+        @remote._prefix = 'store_prefix'
         @requestDefer.resolve
-          _id: 'car/fresh'
+          _id: 'store_prefix/car/fresh'
           $createdAt: '2012-12-12T22:00:00.000Z'
           $updatedAt: '2012-12-21T22:00:00.000Z'
       

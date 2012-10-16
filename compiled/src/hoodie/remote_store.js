@@ -350,6 +350,9 @@ Hoodie.RemoteStore = (function(_super) {
     var id, _ref;
     id = obj._id || obj.id;
     delete obj._id;
+    if (this._prefix) {
+      id = id.replace(RegExp('^' + this._prefix + '/'), '');
+    }
     _ref = id.split(/\//), obj.$type = _ref[0], obj.id = _ref[1];
     if (obj.$createdAt) {
       obj.$createdAt = new Date(Date.parse(obj.$createdAt));
