@@ -61,6 +61,9 @@ class Hoodie.Account
   # to sign in with a 300ms timeout.
   #
   signUp : (username, password = '') ->
+    unless username
+      return @hoodie.defer().reject().promise()
+      
     if @hasAnonymousAccount()
       return @_upgradeAnonymousAccount username, password
 
@@ -488,7 +491,7 @@ class Hoodie.Account
 
     @hoodie.my.config.clear()
     @hoodie.trigger 'account:signout'
-    
+
     @ownerHash = @hoodie.my.store.uuid()
     @hoodie.my.config.set '_account.ownerHash', @ownerHash
     

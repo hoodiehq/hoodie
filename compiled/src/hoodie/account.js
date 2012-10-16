@@ -65,6 +65,9 @@ Hoodie.Account = (function() {
     if (password == null) {
       password = '';
     }
+    if (!username) {
+      return this.hoodie.defer().reject().promise();
+    }
     if (this.hasAnonymousAccount()) {
       return this._upgradeAnonymousAccount(username, password);
     }

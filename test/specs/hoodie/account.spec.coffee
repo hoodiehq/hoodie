@@ -173,83 +173,93 @@ describe "Hoodie.Account", ->
       @signInDefer = @hoodie.defer()
       spyOn(@account, "signIn").andReturn @signInDefer.promise()
       @account.ownerHash = "owner_hash123"
-      @account.signUp('joe@example.com', 'secret', name: "Joe Doe")
-      [@type, @path, @options] = @hoodie.request.mostRecentCall.args
-      @data = JSON.parse @options.data
   
-    it "should send a PUT request to http://my.cou.ch/_users/org.couchdb.user%3Auser%2Fjoe%40example.com", ->
-      expect(@hoodie.request).wasCalled()
-      expect(@type).toBe 'PUT'
-      expect(@path).toBe  '/_users/org.couchdb.user%3Auser%2Fjoe%40example.com'
-      
-    it "should set contentType to 'application/json'", ->
-      expect(@options.contentType).toBe 'application/json'
-    
-    it "should stringify the data", ->
-      expect(typeof @options.data).toBe 'string'
-  
-    it "should have set _id to 'org.couchdb.user:joe@example.com'", ->
-      expect(@data._id).toBe 'org.couchdb.user:user/joe@example.com'
-    
-    it "should have set name to 'joe@example.com", ->
-      expect(@data.name).toBe 'user/joe@example.com'
-      
-    it "should have set type to 'user", ->
-      expect(@data.type).toBe 'user'
-
-    it "should have set password to 'secret'", ->
-      expect(@data.password).toBe 'secret'
-
-    it "should have set ownerHash to 'owner_hash123'", ->
-      expect(@data.ownerHash).toBe 'owner_hash123'
-
-    it "should have set database to 'user/owner_hash123'", ->
-      expect(@data.database).toBe 'user/owner_hash123'
-      
-    it "should allow to signup without password", ->
-      @account.signUp('joe@example.com')
-      [@type, @path, @options] = @hoodie.request.mostRecentCall.args
-      @data = JSON.parse @options.data
-      expect(@data.password).toBe ''
-            
-    _when "signUp successful", ->
+    _when "username not set", ->
       beforeEach ->
-        response = {"ok":true,"id":"org.couchdb.user:bizbiz","rev":"1-a0134f4a9909d3b20533285c839ed830"}
-        @requestDefer.resolve response
-      
-      it "should trigger `account:signup` event", ->
-        @account.signUp('joe@example.com', 'secret')
-        expect(@hoodie.trigger).wasCalledWith 'account:signup', 'joe@example.com'
-        
-      it "should sign in", ->
-        @account.signUp 'joe@example.com', 'secret'
-        expect(@account.signIn).wasCalledWith 'joe@example.com', 'secret'
-      
-      _and "signIn successful", ->
-        beforeEach ->
-          @signInDefer.resolve("joe@example.com", 'response')
+        @promise = @account.signUp('', 'secret', name: "Joe Doe")
 
-        it "should resolve its promise", ->
-          promise = @account.signUp('joe@example.com', 'secret')
-          expect(promise).toBeResolvedWith 'joe@example.com', 'response'
+      it "should be rejected", ->
+        expect(@promise).toBeRejected()
 
-      _and "signIn not successful", ->
-        beforeEach ->
-          @signInDefer.reject 'error'
-
-        it "should resolve its promise", ->
-          promise = @account.signUp('joe@example.com', 'secret')
-          expect(promise).toBeRejectedWith 'error'
-        
-    _when "signUp has an error", ->
+    _when "username set", ->
       beforeEach ->
-        @requestDefer.reject responseText: '{"error":"forbidden","reason":"You stink."}'
+        @account.signUp('joe@example.com', 'secret', name: "Joe Doe")
+        [@type, @path, @options] = @hoodie.request.mostRecentCall.args
+        @data = JSON.parse @options.data
+
+      it "should send a PUT request to http://my.cou.ch/_users/org.couchdb.user%3Auser%2Fjoe%40example.com", ->
+        expect(@hoodie.request).wasCalled()
+        expect(@type).toBe 'PUT'
+        expect(@path).toBe  '/_users/org.couchdb.user%3Auser%2Fjoe%40example.com'
+        
+      it "should set contentType to 'application/json'", ->
+        expect(@options.contentType).toBe 'application/json'
       
-      it "should reject its promise", ->
-        promise = @account.signUp('notmyfault@example.com', 'secret')
-        expect(promise).toBeRejectedWith 
-          error  : 'forbidden'
-          reason : 'You stink.'
+      it "should stringify the data", ->
+        expect(typeof @options.data).toBe 'string'
+    
+      it "should have set _id to 'org.couchdb.user:joe@example.com'", ->
+        expect(@data._id).toBe 'org.couchdb.user:user/joe@example.com'
+      
+      it "should have set name to 'joe@example.com", ->
+        expect(@data.name).toBe 'user/joe@example.com'
+        
+      it "should have set type to 'user", ->
+        expect(@data.type).toBe 'user'
+
+      it "should have set password to 'secret'", ->
+        expect(@data.password).toBe 'secret'
+
+      it "should have set ownerHash to 'owner_hash123'", ->
+        expect(@data.ownerHash).toBe 'owner_hash123'
+
+      it "should have set database to 'user/owner_hash123'", ->
+        expect(@data.database).toBe 'user/owner_hash123'
+        
+      it "should allow to signup without password", ->
+        @account.signUp('joe@example.com')
+        [@type, @path, @options] = @hoodie.request.mostRecentCall.args
+        @data = JSON.parse @options.data
+        expect(@data.password).toBe ''
+              
+      _when "signUp successful", ->
+        beforeEach ->
+          response = {"ok":true,"id":"org.couchdb.user:bizbiz","rev":"1-a0134f4a9909d3b20533285c839ed830"}
+          @requestDefer.resolve response
+        
+        it "should trigger `account:signup` event", ->
+          @account.signUp('joe@example.com', 'secret')
+          expect(@hoodie.trigger).wasCalledWith 'account:signup', 'joe@example.com'
+          
+        it "should sign in", ->
+          @account.signUp 'joe@example.com', 'secret'
+          expect(@account.signIn).wasCalledWith 'joe@example.com', 'secret'
+        
+        _and "signIn successful", ->
+          beforeEach ->
+            @signInDefer.resolve("joe@example.com", 'response')
+
+          it "should resolve its promise", ->
+            promise = @account.signUp('joe@example.com', 'secret')
+            expect(promise).toBeResolvedWith 'joe@example.com', 'response'
+
+        _and "signIn not successful", ->
+          beforeEach ->
+            @signInDefer.reject 'error'
+
+          it "should resolve its promise", ->
+            promise = @account.signUp('joe@example.com', 'secret')
+            expect(promise).toBeRejectedWith 'error'
+          
+      _when "signUp has an error", ->
+        beforeEach ->
+          @requestDefer.reject responseText: '{"error":"forbidden","reason":"You stink."}'
+        
+        it "should reject its promise", ->
+          promise = @account.signUp('notmyfault@example.com', 'secret')
+          expect(promise).toBeRejectedWith 
+            error  : 'forbidden'
+            reason : 'You stink.'
   # /.signUp(username, password)
 
   

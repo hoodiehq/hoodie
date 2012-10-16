@@ -197,103 +197,117 @@ describe("Hoodie.Account", function() {
   });
   describe("#signUp(username, password)", function() {
     beforeEach(function() {
-      var _ref;
       this.signInDefer = this.hoodie.defer();
       spyOn(this.account, "signIn").andReturn(this.signInDefer.promise());
-      this.account.ownerHash = "owner_hash123";
-      this.account.signUp('joe@example.com', 'secret', {
-        name: "Joe Doe"
-      });
-      _ref = this.hoodie.request.mostRecentCall.args, this.type = _ref[0], this.path = _ref[1], this.options = _ref[2];
-      return this.data = JSON.parse(this.options.data);
+      return this.account.ownerHash = "owner_hash123";
     });
-    it("should send a PUT request to http://my.cou.ch/_users/org.couchdb.user%3Auser%2Fjoe%40example.com", function() {
-      expect(this.hoodie.request).wasCalled();
-      expect(this.type).toBe('PUT');
-      return expect(this.path).toBe('/_users/org.couchdb.user%3Auser%2Fjoe%40example.com');
-    });
-    it("should set contentType to 'application/json'", function() {
-      return expect(this.options.contentType).toBe('application/json');
-    });
-    it("should stringify the data", function() {
-      return expect(typeof this.options.data).toBe('string');
-    });
-    it("should have set _id to 'org.couchdb.user:joe@example.com'", function() {
-      return expect(this.data._id).toBe('org.couchdb.user:user/joe@example.com');
-    });
-    it("should have set name to 'joe@example.com", function() {
-      return expect(this.data.name).toBe('user/joe@example.com');
-    });
-    it("should have set type to 'user", function() {
-      return expect(this.data.type).toBe('user');
-    });
-    it("should have set password to 'secret'", function() {
-      return expect(this.data.password).toBe('secret');
-    });
-    it("should have set ownerHash to 'owner_hash123'", function() {
-      return expect(this.data.ownerHash).toBe('owner_hash123');
-    });
-    it("should have set database to 'user/owner_hash123'", function() {
-      return expect(this.data.database).toBe('user/owner_hash123');
-    });
-    it("should allow to signup without password", function() {
-      var _ref;
-      this.account.signUp('joe@example.com');
-      _ref = this.hoodie.request.mostRecentCall.args, this.type = _ref[0], this.path = _ref[1], this.options = _ref[2];
-      this.data = JSON.parse(this.options.data);
-      return expect(this.data.password).toBe('');
-    });
-    _when("signUp successful", function() {
+    _when("username not set", function() {
       beforeEach(function() {
-        var response;
-        response = {
-          "ok": true,
-          "id": "org.couchdb.user:bizbiz",
-          "rev": "1-a0134f4a9909d3b20533285c839ed830"
-        };
-        return this.requestDefer.resolve(response);
-      });
-      it("should trigger `account:signup` event", function() {
-        this.account.signUp('joe@example.com', 'secret');
-        return expect(this.hoodie.trigger).wasCalledWith('account:signup', 'joe@example.com');
-      });
-      it("should sign in", function() {
-        this.account.signUp('joe@example.com', 'secret');
-        return expect(this.account.signIn).wasCalledWith('joe@example.com', 'secret');
-      });
-      _and("signIn successful", function() {
-        beforeEach(function() {
-          return this.signInDefer.resolve("joe@example.com", 'response');
-        });
-        return it("should resolve its promise", function() {
-          var promise;
-          promise = this.account.signUp('joe@example.com', 'secret');
-          return expect(promise).toBeResolvedWith('joe@example.com', 'response');
+        return this.promise = this.account.signUp('', 'secret', {
+          name: "Joe Doe"
         });
       });
-      return _and("signIn not successful", function() {
-        beforeEach(function() {
-          return this.signInDefer.reject('error');
-        });
-        return it("should resolve its promise", function() {
-          var promise;
-          promise = this.account.signUp('joe@example.com', 'secret');
-          return expect(promise).toBeRejectedWith('error');
-        });
+      return it("should be rejected", function() {
+        return expect(this.promise).toBeRejected();
       });
     });
-    return _when("signUp has an error", function() {
+    return _when("username set", function() {
       beforeEach(function() {
-        return this.requestDefer.reject({
-          responseText: '{"error":"forbidden","reason":"You stink."}'
+        var _ref;
+        this.account.signUp('joe@example.com', 'secret', {
+          name: "Joe Doe"
+        });
+        _ref = this.hoodie.request.mostRecentCall.args, this.type = _ref[0], this.path = _ref[1], this.options = _ref[2];
+        return this.data = JSON.parse(this.options.data);
+      });
+      it("should send a PUT request to http://my.cou.ch/_users/org.couchdb.user%3Auser%2Fjoe%40example.com", function() {
+        expect(this.hoodie.request).wasCalled();
+        expect(this.type).toBe('PUT');
+        return expect(this.path).toBe('/_users/org.couchdb.user%3Auser%2Fjoe%40example.com');
+      });
+      it("should set contentType to 'application/json'", function() {
+        return expect(this.options.contentType).toBe('application/json');
+      });
+      it("should stringify the data", function() {
+        return expect(typeof this.options.data).toBe('string');
+      });
+      it("should have set _id to 'org.couchdb.user:joe@example.com'", function() {
+        return expect(this.data._id).toBe('org.couchdb.user:user/joe@example.com');
+      });
+      it("should have set name to 'joe@example.com", function() {
+        return expect(this.data.name).toBe('user/joe@example.com');
+      });
+      it("should have set type to 'user", function() {
+        return expect(this.data.type).toBe('user');
+      });
+      it("should have set password to 'secret'", function() {
+        return expect(this.data.password).toBe('secret');
+      });
+      it("should have set ownerHash to 'owner_hash123'", function() {
+        return expect(this.data.ownerHash).toBe('owner_hash123');
+      });
+      it("should have set database to 'user/owner_hash123'", function() {
+        return expect(this.data.database).toBe('user/owner_hash123');
+      });
+      it("should allow to signup without password", function() {
+        var _ref;
+        this.account.signUp('joe@example.com');
+        _ref = this.hoodie.request.mostRecentCall.args, this.type = _ref[0], this.path = _ref[1], this.options = _ref[2];
+        this.data = JSON.parse(this.options.data);
+        return expect(this.data.password).toBe('');
+      });
+      _when("signUp successful", function() {
+        beforeEach(function() {
+          var response;
+          response = {
+            "ok": true,
+            "id": "org.couchdb.user:bizbiz",
+            "rev": "1-a0134f4a9909d3b20533285c839ed830"
+          };
+          return this.requestDefer.resolve(response);
+        });
+        it("should trigger `account:signup` event", function() {
+          this.account.signUp('joe@example.com', 'secret');
+          return expect(this.hoodie.trigger).wasCalledWith('account:signup', 'joe@example.com');
+        });
+        it("should sign in", function() {
+          this.account.signUp('joe@example.com', 'secret');
+          return expect(this.account.signIn).wasCalledWith('joe@example.com', 'secret');
+        });
+        _and("signIn successful", function() {
+          beforeEach(function() {
+            return this.signInDefer.resolve("joe@example.com", 'response');
+          });
+          return it("should resolve its promise", function() {
+            var promise;
+            promise = this.account.signUp('joe@example.com', 'secret');
+            return expect(promise).toBeResolvedWith('joe@example.com', 'response');
+          });
+        });
+        return _and("signIn not successful", function() {
+          beforeEach(function() {
+            return this.signInDefer.reject('error');
+          });
+          return it("should resolve its promise", function() {
+            var promise;
+            promise = this.account.signUp('joe@example.com', 'secret');
+            return expect(promise).toBeRejectedWith('error');
+          });
         });
       });
-      return it("should reject its promise", function() {
-        var promise;
-        promise = this.account.signUp('notmyfault@example.com', 'secret');
-        return expect(promise).toBeRejectedWith({
-          error: 'forbidden',
-          reason: 'You stink.'
+      return _when("signUp has an error", function() {
+        beforeEach(function() {
+          return this.requestDefer.reject({
+            responseText: '{"error":"forbidden","reason":"You stink."}'
+          });
+        });
+        return it("should reject its promise", function() {
+          var promise;
+          promise = this.account.signUp('notmyfault@example.com', 'secret');
+          return expect(promise).toBeRejectedWith({
+            error: 'forbidden',
+            reason: 'You stink.'
+          });
         });
       });
     });
