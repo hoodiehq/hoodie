@@ -10,4 +10,9 @@ describe "Hoodie.User", ->
       user = new Hoodie.User @hoodie
       expect(user('uuid123')).toBe 'storeApi'
       expect(@hoodie.open).wasCalledWith 'user/uuid123/public', prefix: '$public'
+
+    it "should pass options", ->
+      user = new Hoodie.User @hoodie
+      user 'uuid123', sync: true
+      expect(@hoodie.open).wasCalledWith 'user/uuid123/public', prefix: '$public', sync: true
   # /constructor

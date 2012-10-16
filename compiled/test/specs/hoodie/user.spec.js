@@ -8,12 +8,23 @@ describe("Hoodie.User", function() {
     beforeEach(function() {
       return spyOn(this.hoodie, "open").andReturn('storeApi');
     });
-    return it("should return a shortcut for hoodie.open", function() {
+    it("should return a shortcut for hoodie.open", function() {
       var user;
       user = new Hoodie.User(this.hoodie);
       expect(user('uuid123')).toBe('storeApi');
       return expect(this.hoodie.open).wasCalledWith('user/uuid123/public', {
         prefix: '$public'
+      });
+    });
+    return it("should pass options", function() {
+      var user;
+      user = new Hoodie.User(this.hoodie);
+      user('uuid123', {
+        sync: true
+      });
+      return expect(this.hoodie.open).wasCalledWith('user/uuid123/public', {
+        prefix: '$public',
+        sync: true
       });
     });
   });

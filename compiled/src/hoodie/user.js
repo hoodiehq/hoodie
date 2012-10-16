@@ -5,10 +5,14 @@ Hoodie.User = (function() {
   function User(hoodie) {
     var _this = this;
     this.hoodie = hoodie;
-    return function(userHash) {
-      return _this.hoodie.open("user/" + userHash + "/public", {
+    return function(userHash, options) {
+      if (options == null) {
+        options = {};
+      }
+      $.extend(options, {
         prefix: '$public'
       });
+      return _this.hoodie.open("user/" + userHash + "/public", options);
     };
   }
 
