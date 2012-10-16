@@ -75,14 +75,15 @@ describe("Hoodie.RemoteStore", function() {
     return _when("request successful", function() {
       beforeEach(function() {
         return this.requestDefer.resolve({
-          funky: 'fresh',
+          _id: 'car/fresh',
           $createdAt: '2012-12-12T22:00:00.000Z',
           $updatedAt: '2012-12-21T22:00:00.000Z'
         });
       });
       return it("should resolve with the doc", function() {
         return expect(this.remote.find("todo", "1")).toBeResolvedWith({
-          funky: 'fresh',
+          id: 'fresh',
+          $type: 'car',
           $createdAt: new Date(Date.parse('2012-12-12T22:00:00.000Z')),
           $updatedAt: new Date(Date.parse('2012-12-21T22:00:00.000Z'))
         });
@@ -125,7 +126,7 @@ describe("Hoodie.RemoteStore", function() {
     _when("request success", function() {
       beforeEach(function() {
         this.doc = {
-          funky: 'fresh',
+          _id: 'car/fresh',
           $createdAt: '2012-12-12T22:00:00.000Z',
           $updatedAt: '2012-12-21T22:00:00.000Z'
         };
@@ -140,15 +141,14 @@ describe("Hoodie.RemoteStore", function() {
         });
       });
       return it("should be resolved with array of objects", function() {
-        var promise;
-        promise = this.remote.findAll();
-        return promise.done(function(objects) {
-          expect(objects[0].funky).toBe('fresh');
-          expect(objects[0].$createdAt instanceof Date).toBe(true);
-          expect(objects[0].$updatedAt instanceof Date).toBe(true);
-          expect(objects[0].$createdAt.toISOString()).toBe('2012-12-12T22:00:00.000Z');
-          return expect(objects[0].$updatedAt.toISOString()).toBe('2012-12-21T22:00:00.000Z');
-        });
+        var object;
+        object = {
+          id: 'fresh',
+          $type: 'car',
+          $createdAt: new Date(Date.parse('2012-12-12T22:00:00.000Z')),
+          $updatedAt: new Date(Date.parse('2012-12-21T22:00:00.000Z'))
+        };
+        return expect(this.remote.findAll()).toBeResolvedWith([object]);
       });
     });
     return _when("request has an error", function() {

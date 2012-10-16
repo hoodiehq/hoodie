@@ -61,13 +61,14 @@ describe "Hoodie.RemoteStore", ->
     _when "request successful", ->
       beforeEach ->
         @requestDefer.resolve
-          funky: 'fresh'
+          _id: 'car/fresh'
           $createdAt: '2012-12-12T22:00:00.000Z'
           $updatedAt: '2012-12-21T22:00:00.000Z'
       
       it "should resolve with the doc", ->
         expect(@remote.find("todo", "1")).toBeResolvedWith
-          funky: 'fresh'
+          id: 'fresh'
+          $type: 'car'
           $createdAt: new Date(Date.parse '2012-12-12T22:00:00.000Z')
           $updatedAt: new Date(Date.parse '2012-12-21T22:00:00.000Z')
   # /#find(type, id)
@@ -104,7 +105,7 @@ describe "Hoodie.RemoteStore", ->
     _when "request success", ->
       beforeEach ->
         @doc = 
-          funky: 'fresh'
+          _id: 'car/fresh'
           $createdAt: '2012-12-12T22:00:00.000Z'
           $updatedAt: '2012-12-21T22:00:00.000Z'
 
@@ -116,13 +117,12 @@ describe "Hoodie.RemoteStore", ->
           ]
 
       it "should be resolved with array of objects", ->
-        promise = @remote.findAll()
-        promise.done (objects) ->
-          expect(objects[0].funky).toBe 'fresh'
-          expect(objects[0].$createdAt instanceof Date).toBe true
-          expect(objects[0].$updatedAt instanceof Date).toBe true
-          expect(objects[0].$createdAt.toISOString()).toBe '2012-12-12T22:00:00.000Z'
-          expect(objects[0].$updatedAt.toISOString()).toBe '2012-12-21T22:00:00.000Z'
+        object = 
+          id: 'fresh'
+          $type: 'car'
+          $createdAt: new Date (Date.parse '2012-12-12T22:00:00.000Z')
+          $updatedAt: new Date (Date.parse '2012-12-21T22:00:00.000Z')
+        expect(@remote.findAll()).toBeResolvedWith [object]
 
     _when "request has an error", ->
       beforeEach ->

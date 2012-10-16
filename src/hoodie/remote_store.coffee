@@ -82,7 +82,7 @@ class Hoodie.RemoteStore extends Hoodie.Store
     return defer if @hoodie.isPromise(defer)
 
     path = "/" + encodeURIComponent "#{type}/#{id}"
-    @request("GET", path).pipe(@_parseTimeStamps)
+    @request("GET", path).pipe(@_parseFromRemote)
 
   
   # findAll
@@ -109,7 +109,7 @@ class Hoodie.RemoteStore extends Hoodie.Store
 
     promise = @request "GET", path
     promise.fail defer.reject
-    promise.pipe(@_mapDocsFromFindAll).pipe(@_parseTimeStamps).done defer.resolve
+    promise.pipe(@_mapDocsFromFindAll).pipe(@_parseAllFromRemote).done defer.resolve
 
     return defer.promise()
   
@@ -478,8 +478,8 @@ class Hoodie.RemoteStore extends Hoodie.Store
 
   # renames `_id` attribute to `id` and removes the type from the id,
   # e.g. `document/123` -> `123`
-  _parseFromPull : (obj) ->
-    
+  _parseFromRemote : (obj) =>
+
     # handle id and type
     id = obj._id or obj.id
     delete obj._id
@@ -496,27 +496,8 @@ class Hoodie.RemoteStore extends Hoodie.Store
     
     return obj
   
-  
-  # ### parse object response coming from push for local storage. 
-
-  # removes the type from the id, e.g. `document/123` -> `123`
-  # also removes attribute ok
-  _parseFromPush : (obj) ->
-    
-    # handle id and type
-    id = obj._id or 
-    delete obj._id
-    [obj.$type, obj.id] = obj.id.split(/\//)
-    
-    # handle rev
-    obj._rev = obj.rev
-    delete obj.rev
-    
-    # remove ok attribute
-    delete obj.ok
-    
-    return obj
-  
+  _parseAllFromRemote : (objects) =>
+    @_parseFromRemote(object) for object in objects
 
 
   # ### handle changes from remote
@@ -532,7 +513,7 @@ class Hoodie.RemoteStore extends Hoodie.Store
     
     # 1. update or remove objects from local store
     for {doc} in changes
-      doc = @_parseFromPull(doc)
+      doc = @_parseFromRemote(doc)
       if doc._deleted
         _destroyedDocs.push [doc, @hoodie.my.store.destroy( doc.$type, doc.id,      remote: true)]
       else                                                
@@ -574,20 +555,6 @@ class Hoodie.RemoteStore extends Hoodie.Store
 
   # ### map docs from findAll
 
-  # findAll returns something like this:
-  # 
-  #     tbd
+  #
   _mapDocsFromFindAll: (response) =>
     response.rows.map (row) -> row.doc
-
-
-  # ### parse timestamps
-
-  #
-  _parseTimeStamps: (obj) =>
-    if $.isArray obj
-      @_parseTimeStamps(_obj) for _obj in obj
-    else
-      obj.$createdAt = new Date(Date.parse obj.$createdAt) if obj.$createdAt
-      obj.$updatedAt = new Date(Date.parse obj.$updatedAt) if obj.$updatedAt
-      return obj
