@@ -82,7 +82,7 @@ class Hoodie.RemoteStore extends Hoodie.Store
     return defer if @hoodie.isPromise(defer)
 
     path = "/" + encodeURIComponent "#{type}/#{id}"
-    @request "GET", path
+    @request("GET", path).pipe(@_parseTimeStamps)
 
   
   # findAll
@@ -109,7 +109,7 @@ class Hoodie.RemoteStore extends Hoodie.Store
 
     promise = @request "GET", path
     promise.fail defer.reject
-    promise.pipe(@_mapDocsFromFindAll).done defer.resolve
+    promise.pipe(@_mapDocsFromFindAll).pipe(@_parseTimeStamps).done defer.resolve
 
     return defer.promise()
   
@@ -560,6 +560,7 @@ class Hoodie.RemoteStore extends Hoodie.Store
         @trigger "change:#{doc.$type}",             event, object
         @trigger "change:#{doc.$type}:#{doc.id}",   event, object unless event is 'create'
 
+
   # ### handle push success
 
   # update local _rev attributes after changes pushed
@@ -570,6 +571,7 @@ class Hoodie.RemoteStore extends Hoodie.Store
         options = remote : true
         @hoodie.my.store.update(doc.$type, doc.id, update, options) 
 
+
   # ### map docs from findAll
 
   # findAll returns something like this:
@@ -577,3 +579,15 @@ class Hoodie.RemoteStore extends Hoodie.Store
   #     tbd
   _mapDocsFromFindAll: (response) =>
     response.rows.map (row) -> row.doc
+
+
+  # ### parse timestamps
+
+  #
+  _parseTimeStamps: (obj) =>
+    if $.isArray obj
+      @_parseTimeStamps(_obj) for _obj in obj
+    else
+      obj.$createdAt = new Date(Date.parse obj.$createdAt) if obj.$createdAt
+      obj.$updatedAt = new Date(Date.parse obj.$updatedAt) if obj.$updatedAt
+      return obj

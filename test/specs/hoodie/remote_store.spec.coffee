@@ -55,11 +55,21 @@ describe "Hoodie.RemoteStore", ->
 
   describe "#find(type, id)", ->
     beforeEach ->
-      spyOn(@remote, "request").andReturn "request_promise"
+      @requestDefer = @hoodie.defer()
+      spyOn(@remote, "request").andReturn @requestDefer.promise()
 
-    it "should return the request promise", ->
-      expect(@remote.find("todo", "1")).toBe 'request_promise'
-    
+    _when "request successful", ->
+      beforeEach ->
+        @requestDefer.resolve
+          funky: 'fresh'
+          $createdAt: '2012-12-12T22:00:00.000Z'
+          $updatedAt: '2012-12-21T22:00:00.000Z'
+      
+      it "should resolve with the doc", ->
+        expect(@remote.find("todo", "1")).toBeResolvedWith
+          funky: 'fresh'
+          $createdAt: new Date(Date.parse '2012-12-12T22:00:00.000Z')
+          $updatedAt: new Date(Date.parse '2012-12-21T22:00:00.000Z')
   # /#find(type, id)
 
   describe "#findAll(type)", ->
@@ -93,17 +103,26 @@ describe "Hoodie.RemoteStore", ->
 
     _when "request success", ->
       beforeEach ->
+        @doc = 
+          funky: 'fresh'
+          $createdAt: '2012-12-12T22:00:00.000Z'
+          $updatedAt: '2012-12-21T22:00:00.000Z'
 
         @requestDefer.resolve 
           total_rows:3
           offset:0
           rows: [
-            doc: 'doc'
+            doc: @doc
           ]
 
       it "should be resolved with array of objects", ->
         promise = @remote.findAll()
-        expect(promise).toBeResolvedWith ['doc']
+        promise.done (objects) ->
+          expect(objects[0].funky).toBe 'fresh'
+          expect(objects[0].$createdAt instanceof Date).toBe true
+          expect(objects[0].$updatedAt instanceof Date).toBe true
+          expect(objects[0].$createdAt.toISOString()).toBe '2012-12-12T22:00:00.000Z'
+          expect(objects[0].$updatedAt.toISOString()).toBe '2012-12-21T22:00:00.000Z'
 
     _when "request has an error", ->
       beforeEach ->

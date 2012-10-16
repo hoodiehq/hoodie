@@ -870,6 +870,8 @@ Hoodie.RemoteStore = (function(_super) {
     if (options == null) {
       options = {};
     }
+    this._parseTimeStamps = __bind(this._parseTimeStamps, this);
+
     this._mapDocsFromFindAll = __bind(this._mapDocsFromFindAll, this);
 
     this._handlePushSuccess = __bind(this._handlePushSuccess, this);
@@ -917,7 +919,7 @@ Hoodie.RemoteStore = (function(_super) {
       return defer;
     }
     path = "/" + encodeURIComponent("" + type + "/" + id);
-    return this.request("GET", path);
+    return this.request("GET", path).pipe(this._parseTimeStamps);
   };
 
   RemoteStore.prototype.findAll = function(type) {
@@ -945,7 +947,7 @@ Hoodie.RemoteStore = (function(_super) {
     }
     promise = this.request("GET", path);
     promise.fail(defer.reject);
-    promise.pipe(this._mapDocsFromFindAll).done(defer.resolve);
+    promise.pipe(this._mapDocsFromFindAll).pipe(this._parseTimeStamps).done(defer.resolve);
     return defer.promise();
   };
 
@@ -1298,6 +1300,26 @@ Hoodie.RemoteStore = (function(_super) {
     return response.rows.map(function(row) {
       return row.doc;
     });
+  };
+
+  RemoteStore.prototype._parseTimeStamps = function(obj) {
+    var _i, _len, _obj, _results;
+    if ($.isArray(obj)) {
+      _results = [];
+      for (_i = 0, _len = obj.length; _i < _len; _i++) {
+        _obj = obj[_i];
+        _results.push(this._parseTimeStamps(_obj));
+      }
+      return _results;
+    } else {
+      if (obj.$createdAt) {
+        obj.$createdAt = new Date(Date.parse(obj.$createdAt));
+      }
+      if (obj.$updatedAt) {
+        obj.$updatedAt = new Date(Date.parse(obj.$updatedAt));
+      }
+      return obj;
+    }
   };
 
   return RemoteStore;

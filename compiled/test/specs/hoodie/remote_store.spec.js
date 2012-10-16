@@ -69,10 +69,24 @@ describe("Hoodie.RemoteStore", function() {
   });
   describe("#find(type, id)", function() {
     beforeEach(function() {
-      return spyOn(this.remote, "request").andReturn("request_promise");
+      this.requestDefer = this.hoodie.defer();
+      return spyOn(this.remote, "request").andReturn(this.requestDefer.promise());
     });
-    return it("should return the request promise", function() {
-      return expect(this.remote.find("todo", "1")).toBe('request_promise');
+    return _when("request successful", function() {
+      beforeEach(function() {
+        return this.requestDefer.resolve({
+          funky: 'fresh',
+          $createdAt: '2012-12-12T22:00:00.000Z',
+          $updatedAt: '2012-12-21T22:00:00.000Z'
+        });
+      });
+      return it("should resolve with the doc", function() {
+        return expect(this.remote.find("todo", "1")).toBeResolvedWith({
+          funky: 'fresh',
+          $createdAt: new Date(Date.parse('2012-12-12T22:00:00.000Z')),
+          $updatedAt: new Date(Date.parse('2012-12-21T22:00:00.000Z'))
+        });
+      });
     });
   });
   describe("#findAll(type)", function() {
@@ -110,12 +124,17 @@ describe("Hoodie.RemoteStore", function() {
     });
     _when("request success", function() {
       beforeEach(function() {
+        this.doc = {
+          funky: 'fresh',
+          $createdAt: '2012-12-12T22:00:00.000Z',
+          $updatedAt: '2012-12-21T22:00:00.000Z'
+        };
         return this.requestDefer.resolve({
           total_rows: 3,
           offset: 0,
           rows: [
             {
-              doc: 'doc'
+              doc: this.doc
             }
           ]
         });
@@ -123,7 +142,13 @@ describe("Hoodie.RemoteStore", function() {
       return it("should be resolved with array of objects", function() {
         var promise;
         promise = this.remote.findAll();
-        return expect(promise).toBeResolvedWith(['doc']);
+        return promise.done(function(objects) {
+          expect(objects[0].funky).toBe('fresh');
+          expect(objects[0].$createdAt instanceof Date).toBe(true);
+          expect(objects[0].$updatedAt instanceof Date).toBe(true);
+          expect(objects[0].$createdAt.toISOString()).toBe('2012-12-12T22:00:00.000Z');
+          return expect(objects[0].$updatedAt.toISOString()).toBe('2012-12-21T22:00:00.000Z');
+        });
       });
     });
     return _when("request has an error", function() {
