@@ -93,12 +93,17 @@ describe "Hoodie.RemoteStore", ->
 
     _when "request success", ->
       beforeEach ->
+
         @requestDefer.resolve 
-          rows: "rows_array"
+          total_rows:3
+          offset:0
+          rows: [
+            doc: 'doc'
+          ]
 
       it "should be resolved with array of objects", ->
         promise = @remote.findAll()
-        expect(promise).toBeResolvedWith "rows_array"
+        expect(promise).toBeResolvedWith ['doc']
 
     _when "request has an error", ->
       beforeEach ->

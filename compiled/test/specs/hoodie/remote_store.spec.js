@@ -111,13 +111,19 @@ describe("Hoodie.RemoteStore", function() {
     _when("request success", function() {
       beforeEach(function() {
         return this.requestDefer.resolve({
-          rows: "rows_array"
+          total_rows: 3,
+          offset: 0,
+          rows: [
+            {
+              doc: 'doc'
+            }
+          ]
         });
       });
       return it("should be resolved with array of objects", function() {
         var promise;
         promise = this.remote.findAll();
-        return expect(promise).toBeResolvedWith("rows_array");
+        return expect(promise).toBeResolvedWith(['doc']);
       });
     });
     return _when("request has an error", function() {

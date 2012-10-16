@@ -870,6 +870,8 @@ Hoodie.RemoteStore = (function(_super) {
     if (options == null) {
       options = {};
     }
+    this._mapDocsFromFindAll = __bind(this._mapDocsFromFindAll, this);
+
     this._handlePushSuccess = __bind(this._handlePushSuccess, this);
 
     this._handlePullResults = __bind(this._handlePullResults, this);
@@ -943,9 +945,7 @@ Hoodie.RemoteStore = (function(_super) {
     }
     promise = this.request("GET", path);
     promise.fail(defer.reject);
-    promise.done(function(response) {
-      return defer.resolve(response.rows);
-    });
+    promise.pipe(this._mapDocsFromFindAll).done(defer.resolve);
     return defer.promise();
   };
 
@@ -1292,6 +1292,12 @@ Hoodie.RemoteStore = (function(_super) {
       }
       return _results;
     };
+  };
+
+  RemoteStore.prototype._mapDocsFromFindAll = function(response) {
+    return response.rows.map(function(row) {
+      return row.doc;
+    });
   };
 
   return RemoteStore;

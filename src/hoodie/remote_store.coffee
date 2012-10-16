@@ -109,8 +109,7 @@ class Hoodie.RemoteStore extends Hoodie.Store
 
     promise = @request "GET", path
     promise.fail defer.reject
-    promise.done (response) ->
-      defer.resolve response.rows
+    promise.pipe(@_mapDocsFromFindAll).done defer.resolve
 
     return defer.promise()
   
@@ -561,8 +560,6 @@ class Hoodie.RemoteStore extends Hoodie.Store
         @trigger "change:#{doc.$type}",             event, object
         @trigger "change:#{doc.$type}:#{doc.id}",   event, object unless event is 'create'
 
-
-
   # ### handle push success
 
   # update local _rev attributes after changes pushed
@@ -572,3 +569,11 @@ class Hoodie.RemoteStore extends Hoodie.Store
         update  = {_rev: pushedDocs[i]._rev}
         options = remote : true
         @hoodie.my.store.update(doc.$type, doc.id, update, options) 
+
+  # ### map docs from findAll
+
+  # findAll returns something like this:
+  # 
+  #     tbd
+  _mapDocsFromFindAll: (response) =>
+    response.rows.map (row) -> row.doc
