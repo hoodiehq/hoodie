@@ -327,8 +327,15 @@ describe("Hoodie.Account", function() {
         });
       });
       _but("user is already logged in", function() {
-        return beforeEach(function() {
+        beforeEach(function() {
           return spyOn(this.account, "hasAccount").andReturn(true);
+        });
+        return it("should be rejected", function() {
+          var promise;
+          promise = this.account.signUp('joe@example.com', 'secret');
+          return expect(promise).toBeRejectedWith({
+            error: 'you have to sign out first'
+          });
         });
       });
       return _and("user is logged out", function() {

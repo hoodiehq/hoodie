@@ -277,6 +277,10 @@ describe "Hoodie.Account", ->
         beforeEach ->
           spyOn(@account, "hasAccount").andReturn true
 
+        it "should be rejected", ->
+          promise = @account.signUp 'joe@example.com', 'secret' 
+          expect(promise).toBeRejectedWith error: 'you have to sign out first'
+
       _and "user is logged out", ->
         beforeEach ->
           spyOn(@account, "hasAccount").andReturn false
@@ -896,8 +900,6 @@ describe "Hoodie.Account", ->
         roles        : []
         salt         : 'absalt'
         password_sha : 'pwcdef'
-    
-
     
     it "should return a promise", ->
       @account.changeUsername('secret', 'new.joe@example.com')
