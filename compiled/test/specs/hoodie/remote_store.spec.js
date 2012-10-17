@@ -10,16 +10,6 @@ describe("Hoodie.RemoteStore", function() {
     this.requestDefer = this.hoodie.defer();
     spyOn(window, "setTimeout");
     spyOn(this.hoodie.my.account, "db").andReturn('joe$example.com');
-    spyOn(this.hoodie.my.store, "destroy").andReturn({
-      then: function(cb) {
-        return cb('objectFromStore');
-      }
-    });
-    spyOn(this.hoodie.my.store, "save").andReturn({
-      then: function(cb) {
-        return cb('objectFromStore', false);
-      }
-    });
     return this.remote = new Hoodie.RemoteStore(this.hoodie);
   });
   describe("constructor(@hoodie, options = {})", function() {
@@ -475,40 +465,36 @@ describe("Hoodie.RemoteStore", function() {
           }
         });
       });
-      it("should remove `todo/abc3` from store", function() {
+      it("should trigger remote events", function() {
+        var object;
+        spyOn(this.remote, "trigger");
         this.remote.pull();
-        return expect(this.hoodie.my.store.destroy).wasCalledWith('todo', 'abc3', {
-          remote: true
-        });
-      });
-      it("should save `todo/abc2` in store", function() {
-        this.remote.pull();
-        return expect(this.hoodie.my.store.save).wasCalledWith('todo', 'abc2', {
+        object = {
+          '$type': 'todo',
+          id: 'abc3',
+          _rev: '2-123',
+          _deleted: true
+        };
+        expect(this.remote.trigger).wasCalledWith('destroy', object);
+        expect(this.remote.trigger).wasCalledWith('destroy:todo', object);
+        expect(this.remote.trigger).wasCalledWith('destroy:todo:abc3', object);
+        expect(this.remote.trigger).wasCalledWith('change', 'destroy', object);
+        expect(this.remote.trigger).wasCalledWith('change:todo', 'destroy', object);
+        expect(this.remote.trigger).wasCalledWith('change:todo:abc3', 'destroy', object);
+        object = {
+          '$type': 'todo',
+          id: 'abc2',
           _rev: '1-123',
           content: 'remember the milk',
           done: false,
-          order: 1,
-          $type: 'todo',
-          id: 'abc2'
-        }, {
-          remote: true
-        });
-      });
-      it("should trigger remote events", function() {
-        spyOn(this.remote, "trigger");
-        this.remote.pull();
-        expect(this.remote.trigger).wasCalledWith('destroy', 'objectFromStore');
-        expect(this.remote.trigger).wasCalledWith('destroy:todo', 'objectFromStore');
-        expect(this.remote.trigger).wasCalledWith('destroy:todo:abc3', 'objectFromStore');
-        expect(this.remote.trigger).wasCalledWith('change', 'destroy', 'objectFromStore');
-        expect(this.remote.trigger).wasCalledWith('change:todo', 'destroy', 'objectFromStore');
-        expect(this.remote.trigger).wasCalledWith('change:todo:abc3', 'destroy', 'objectFromStore');
-        expect(this.remote.trigger).wasCalledWith('update', 'objectFromStore');
-        expect(this.remote.trigger).wasCalledWith('update:todo', 'objectFromStore');
-        expect(this.remote.trigger).wasCalledWith('update:todo:abc2', 'objectFromStore');
-        expect(this.remote.trigger).wasCalledWith('change', 'update', 'objectFromStore');
-        expect(this.remote.trigger).wasCalledWith('change:todo', 'update', 'objectFromStore');
-        return expect(this.remote.trigger).wasCalledWith('change:todo:abc2', 'update', 'objectFromStore');
+          order: 1
+        };
+        expect(this.remote.trigger).wasCalledWith('create', object);
+        expect(this.remote.trigger).wasCalledWith('create:todo', object);
+        expect(this.remote.trigger).wasCalledWith('create:todo:abc2', object);
+        expect(this.remote.trigger).wasCalledWith('change', 'create', object);
+        expect(this.remote.trigger).wasCalledWith('change:todo', 'create', object);
+        return expect(this.remote.trigger).wasCalledWith('change:todo:abc2', 'create', object);
       });
       return _and(".isContinuouslyPulling() returns true", function() {
         beforeEach(function() {

@@ -15,6 +15,10 @@ Hoodie.AccountRemoteStore = (function(_super) {
     if (options == null) {
       options = {};
     }
+    this._handlePullResults = __bind(this._handlePullResults, this);
+
+    this._handlePushSuccess = __bind(this._handlePushSuccess, this);
+
     this._handleSignIn = __bind(this._handleSignIn, this);
 
     this.push = __bind(this.push, this);
@@ -77,10 +81,11 @@ Hoodie.AccountRemoteStore = (function(_super) {
   };
 
   AccountRemoteStore.prototype.push = function(docs) {
+    var promise;
     if (!$.isArray(docs)) {
       docs = this.hoodie.my.store.changedDocs();
     }
-    return AccountRemoteStore.__super__.push.call(this, docs);
+    return promise = AccountRemoteStore.__super__.push.call(this, docs);
   };
 
   AccountRemoteStore.prototype.on = function(event, cb) {
@@ -102,6 +107,79 @@ Hoodie.AccountRemoteStore = (function(_super) {
   AccountRemoteStore.prototype._handleSignIn = function() {
     this.name = this.hoodie.my.account.db();
     return this.connect();
+  };
+
+  AccountRemoteStore.prototype._handlePushSuccess = function(docs, pushedDocs) {
+    var _this = this;
+    return function() {
+      var doc, i, options, update, _i, _len, _results;
+      _results = [];
+      for (i = _i = 0, _len = docs.length; _i < _len; i = ++_i) {
+        doc = docs[i];
+        update = {
+          _rev: pushedDocs[i]._rev
+        };
+        options = {
+          remote: true
+        };
+        _results.push(_this.hoodie.my.store.update(doc.$type, doc.id, update, options));
+      }
+      return _results;
+    };
+  };
+
+  AccountRemoteStore.prototype._handlePullResults = function(changes) {
+    var doc, promise, _changedDocs, _destroyedDocs, _i, _j, _k, _len, _len1, _len2, _ref, _ref1, _results,
+      _this = this;
+    _destroyedDocs = [];
+    _changedDocs = [];
+    for (_i = 0, _len = changes.length; _i < _len; _i++) {
+      doc = changes[_i].doc;
+      doc = this._parseFromRemote(doc);
+      if (doc._deleted) {
+        _destroyedDocs.push([
+          doc, this.hoodie.my.store.destroy(doc.$type, doc.id, {
+            remote: true
+          })
+        ]);
+      } else {
+        _changedDocs.push([
+          doc, this.hoodie.my.store.save(doc.$type, doc.id, doc, {
+            remote: true
+          })
+        ]);
+      }
+    }
+    for (_j = 0, _len1 = _destroyedDocs.length; _j < _len1; _j++) {
+      _ref = _destroyedDocs[_j], doc = _ref[0], promise = _ref[1];
+      promise.then(function(object) {
+        _this.trigger('destroy', object);
+        _this.trigger("destroy:" + doc.$type, object);
+        _this.trigger("destroy:" + doc.$type + ":" + doc.id, object);
+        _this.trigger('change', 'destroy', object);
+        _this.trigger("change:" + doc.$type, 'destroy', object);
+        return _this.trigger("change:" + doc.$type + ":" + doc.id, 'destroy', object);
+      });
+    }
+    _results = [];
+    for (_k = 0, _len2 = _changedDocs.length; _k < _len2; _k++) {
+      _ref1 = _changedDocs[_k], doc = _ref1[0], promise = _ref1[1];
+      _results.push(promise.then(function(object, objectWasCreated) {
+        var event;
+        event = objectWasCreated ? 'create' : 'update';
+        _this.trigger(event, object);
+        _this.trigger("" + event + ":" + doc.$type, object);
+        if (event !== 'create') {
+          _this.trigger("" + event + ":" + doc.$type + ":" + doc.id, object);
+        }
+        _this.trigger("change", event, object);
+        _this.trigger("change:" + doc.$type, event, object);
+        if (event !== 'create') {
+          return _this.trigger("change:" + doc.$type + ":" + doc.id, event, object);
+        }
+      }));
+    }
+    return _results;
   };
 
   return AccountRemoteStore;

@@ -8,9 +8,6 @@ describe "Hoodie.RemoteStore", ->
     @requestDefer = @hoodie.defer()
     spyOn(window, "setTimeout")
     spyOn(@hoodie.my.account, "db").andReturn 'joe$example.com'
-    
-    spyOn(@hoodie.my.store, "destroy").andReturn then: (cb) -> cb('objectFromStore')
-    spyOn(@hoodie.my.store, "save").andReturn    then: (cb) -> cb('objectFromStore', false)
 
     @remote = new Hoodie.RemoteStore @hoodie
   
@@ -410,35 +407,39 @@ describe "Hoodie.RemoteStore", ->
           @remote.request.andReturn then: ->
           success Mocks.changesResponse()
       
-      it "should remove `todo/abc3` from store", ->
-        @remote.pull()
-        expect(@hoodie.my.store.destroy).wasCalledWith 'todo', 'abc3', remote: true
-
-      it "should save `todo/abc2` in store", ->
-        @remote.pull()
-        expect(@hoodie.my.store.save).wasCalledWith 'todo', 'abc2', { _rev : '1-123', content : 'remember the milk', done : false, order : 1, $type : 'todo', id : 'abc2' }, { remote : true }
-      
       it "should trigger remote events", ->
         spyOn(@remote, "trigger")
         @remote.pull()
 
         # {"_id":"todo/abc3","_rev":"2-123","_deleted":true}
-        expect(@remote.trigger).wasCalledWith 'destroy',           'objectFromStore'
-        expect(@remote.trigger).wasCalledWith 'destroy:todo',      'objectFromStore'
-        expect(@remote.trigger).wasCalledWith 'destroy:todo:abc3', 'objectFromStore'
+        object =
+          '$type'  : 'todo'
+          id       : 'abc3'
+          _rev     : '2-123'
+          _deleted : true
+        expect(@remote.trigger).wasCalledWith 'destroy',           object
+        expect(@remote.trigger).wasCalledWith 'destroy:todo',      object
+        expect(@remote.trigger).wasCalledWith 'destroy:todo:abc3', object
 
-        expect(@remote.trigger).wasCalledWith 'change',            'destroy', 'objectFromStore'
-        expect(@remote.trigger).wasCalledWith 'change:todo',       'destroy', 'objectFromStore'
-        expect(@remote.trigger).wasCalledWith 'change:todo:abc3',  'destroy', 'objectFromStore'        
+        expect(@remote.trigger).wasCalledWith 'change',            'destroy', object
+        expect(@remote.trigger).wasCalledWith 'change:todo',       'destroy', object
+        expect(@remote.trigger).wasCalledWith 'change:todo:abc3',  'destroy', object        
         
         # {"_id":"todo/abc2","_rev":"1-123","content":"remember the milk","done":false,"order":1, "type":"todo"}
-        expect(@remote.trigger).wasCalledWith 'update',            'objectFromStore'
-        expect(@remote.trigger).wasCalledWith 'update:todo',       'objectFromStore'
-        expect(@remote.trigger).wasCalledWith 'update:todo:abc2',  'objectFromStore'
+        object =
+          '$type'  : 'todo'
+          id       : 'abc2'
+          _rev     : '1-123'
+          content  : 'remember the milk'
+          done     :false
+          order    :1
+        expect(@remote.trigger).wasCalledWith 'create',            object
+        expect(@remote.trigger).wasCalledWith 'create:todo',       object
+        expect(@remote.trigger).wasCalledWith 'create:todo:abc2',  object
 
-        expect(@remote.trigger).wasCalledWith 'change',            'update', 'objectFromStore'
-        expect(@remote.trigger).wasCalledWith 'change:todo',       'update', 'objectFromStore'
-        expect(@remote.trigger).wasCalledWith 'change:todo:abc2',  'update', 'objectFromStore'
+        expect(@remote.trigger).wasCalledWith 'change',            'create', object
+        expect(@remote.trigger).wasCalledWith 'change:todo',       'create', object
+        expect(@remote.trigger).wasCalledWith 'change:todo:abc2',  'create', object
         
       _and ".isContinuouslyPulling() returns true", ->
         beforeEach ->

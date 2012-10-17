@@ -21,6 +21,11 @@ describe("Hoodie.AccountRemoteStore", function() {
         return cb('objectFromStore', false);
       }
     });
+    spyOn(this.hoodie.my.store, "save").andReturn({
+      then: function(cb) {
+        return cb('objectFromStore', false);
+      }
+    });
     return this.remote = new Hoodie.AccountRemoteStore(this.hoodie);
   });
   describe("constructor(@hoodie, options = {})", function() {
@@ -157,6 +162,260 @@ describe("Hoodie.AccountRemoteStore", function() {
       return expect(this.hoodie.my.config.set).wasCalledWith('_remote.since', 100);
     });
   });
+  describe("#pull()", function() {
+    beforeEach(function() {
+      this.remote.connected = true;
+      return spyOn(this.remote, "request").andReturn(this.requestDefer.promise());
+    });
+    _when(".isContinuouslyPulling() is true", function() {
+      beforeEach(function() {
+        return spyOn(this.remote, "isContinuouslyPulling").andReturn(true);
+      });
+      it("should send a longpoll GET request to the _changes feed", function() {
+        var method, path, _ref;
+        this.remote.pull();
+        expect(this.remote.request).wasCalled();
+        _ref = this.remote.request.mostRecentCall.args, method = _ref[0], path = _ref[1];
+        expect(method).toBe('GET');
+        return expect(path).toBe('/_changes?include_docs=true&since=0&heartbeat=10000&feed=longpoll');
+      });
+      return it("should set a timeout to restart the pull request", function() {
+        this.remote.pull();
+        return expect(window.setTimeout).wasCalledWith(this.remote._restartPullRequest, 25000);
+      });
+    });
+    _when(".isContinuouslyPulling() is false", function() {
+      beforeEach(function() {
+        return spyOn(this.remote, "isContinuouslyPulling").andReturn(false);
+      });
+      return it("should send a normal GET request to the _changes feed", function() {
+        var method, path, _ref;
+        this.remote.pull();
+        expect(this.remote.request).wasCalled();
+        _ref = this.remote.request.mostRecentCall.args, method = _ref[0], path = _ref[1];
+        expect(method).toBe('GET');
+        return expect(path).toBe('/_changes?include_docs=true&since=0');
+      });
+    });
+    _when("request is successful / returns changes", function() {
+      beforeEach(function() {
+        var _this = this;
+        return this.remote.request.andReturn({
+          then: function(success) {
+            _this.remote.request.andReturn({
+              then: function() {}
+            });
+            return success(Mocks.changesResponse());
+          }
+        });
+      });
+      it("should remove `todo/abc3` from store", function() {
+        this.remote.pull();
+        return expect(this.hoodie.my.store.destroy).wasCalledWith('todo', 'abc3', {
+          remote: true
+        });
+      });
+      it("should save `todo/abc2` in store", function() {
+        this.remote.pull();
+        return expect(this.hoodie.my.store.save).wasCalledWith('todo', 'abc2', {
+          _rev: '1-123',
+          content: 'remember the milk',
+          done: false,
+          order: 1,
+          $type: 'todo',
+          id: 'abc2'
+        }, {
+          remote: true
+        });
+      });
+      it("should trigger remote events", function() {
+        spyOn(this.remote, "trigger");
+        this.remote.pull();
+        expect(this.remote.trigger).wasCalledWith('destroy', 'objectFromStore');
+        expect(this.remote.trigger).wasCalledWith('destroy:todo', 'objectFromStore');
+        expect(this.remote.trigger).wasCalledWith('destroy:todo:abc3', 'objectFromStore');
+        expect(this.remote.trigger).wasCalledWith('change', 'destroy', 'objectFromStore');
+        expect(this.remote.trigger).wasCalledWith('change:todo', 'destroy', 'objectFromStore');
+        expect(this.remote.trigger).wasCalledWith('change:todo:abc3', 'destroy', 'objectFromStore');
+        expect(this.remote.trigger).wasCalledWith('update', 'objectFromStore');
+        expect(this.remote.trigger).wasCalledWith('update:todo', 'objectFromStore');
+        expect(this.remote.trigger).wasCalledWith('update:todo:abc2', 'objectFromStore');
+        expect(this.remote.trigger).wasCalledWith('change', 'update', 'objectFromStore');
+        expect(this.remote.trigger).wasCalledWith('change:todo', 'update', 'objectFromStore');
+        return expect(this.remote.trigger).wasCalledWith('change:todo:abc2', 'update', 'objectFromStore');
+      });
+      return _and(".isContinuouslyPulling() returns true", function() {
+        beforeEach(function() {
+          spyOn(this.remote, "isContinuouslyPulling").andReturn(true);
+          return spyOn(this.remote, "pull").andCallThrough();
+        });
+        return it("should pull again", function() {
+          this.remote.pull();
+          return expect(this.remote.pull.callCount).toBe(2);
+        });
+      });
+    });
+    _when("request errors with 401 unauthorzied", function() {
+      beforeEach(function() {
+        var _this = this;
+        this.remote.request.andReturn({
+          then: function(success, error) {
+            _this.remote.request.andReturn({
+              then: function() {}
+            });
+            return error({
+              status: 401
+            }, 'error object');
+          }
+        });
+        return spyOn(this.remote, "disconnect");
+      });
+      it("should disconnect", function() {
+        this.remote.pull();
+        return expect(this.remote.disconnect).wasCalled();
+      });
+      it("should trigger an unauthenticated error", function() {
+        spyOn(this.remote, "trigger");
+        this.remote.pull();
+        return expect(this.remote.trigger).wasCalledWith('error:unauthenticated', 'error object');
+      });
+      _and("remote is pullContinuously", function() {
+        return beforeEach(function() {
+          return this.remote.pullContinuously = true;
+        });
+      });
+      return _and("remote isn't pullContinuously", function() {
+        return beforeEach(function() {
+          return this.remote.pullContinuously = false;
+        });
+      });
+    });
+    _when("request errors with 401 unauthorzied", function() {
+      beforeEach(function() {
+        var _this = this;
+        this.remote.request.andReturn({
+          then: function(success, error) {
+            _this.remote.request.andReturn({
+              then: function() {}
+            });
+            return error({
+              status: 401
+            }, 'error object');
+          }
+        });
+        return spyOn(this.remote, "disconnect");
+      });
+      it("should disconnect", function() {
+        this.remote.pull();
+        return expect(this.remote.disconnect).wasCalled();
+      });
+      it("should trigger an unauthenticated error", function() {
+        spyOn(this.remote, "trigger");
+        this.remote.pull();
+        return expect(this.remote.trigger).wasCalledWith('error:unauthenticated', 'error object');
+      });
+      _and("remote is pullContinuously", function() {
+        return beforeEach(function() {
+          return this.remote.pullContinuously = true;
+        });
+      });
+      return _and("remote isn't pullContinuously", function() {
+        return beforeEach(function() {
+          return this.remote.pullContinuously = false;
+        });
+      });
+    });
+    _when("request errors with 404 not found", function() {
+      beforeEach(function() {
+        var _this = this;
+        return this.remote.request.andReturn({
+          then: function(success, error) {
+            _this.remote.request.andReturn({
+              then: function() {}
+            });
+            return error({
+              status: 404
+            }, 'error object');
+          }
+        });
+      });
+      return it("should try again in 3 seconds (it migh be due to a sign up, the userDB might be created yet)", function() {
+        this.remote.pull();
+        return expect(window.setTimeout).wasCalledWith(this.remote.pull, 3000);
+      });
+    });
+    _when("request errors with 500 oooops", function() {
+      beforeEach(function() {
+        var _this = this;
+        return this.remote.request.andReturn({
+          then: function(success, error) {
+            _this.remote.request.andReturn({
+              then: function() {}
+            });
+            return error({
+              status: 500
+            }, 'error object');
+          }
+        });
+      });
+      it("should try again in 3 seconds (and hope it was only a hiccup ...)", function() {
+        this.remote.pull();
+        return expect(window.setTimeout).wasCalledWith(this.remote.pull, 3000);
+      });
+      return it("should trigger a server error event", function() {
+        spyOn(this.remote, "trigger");
+        this.remote.pull();
+        return expect(this.remote.trigger).wasCalledWith('error:server', 'error object');
+      });
+    });
+    _when("request was aborted manually", function() {
+      beforeEach(function() {
+        var _this = this;
+        return this.remote.request.andReturn({
+          then: function(success, error) {
+            _this.remote.request.andReturn({
+              then: function() {}
+            });
+            return error({
+              statusText: 'abort'
+            }, 'error object');
+          }
+        });
+      });
+      return it("should try again when .isContinuouslyPulling() returns true", function() {
+        spyOn(this.remote, "pull").andCallThrough();
+        spyOn(this.remote, "isContinuouslyPulling").andReturn(true);
+        this.remote.pull();
+        expect(this.remote.pull.callCount).toBe(2);
+        this.remote.pull.reset();
+        this.remote.isContinuouslyPulling.andReturn(false);
+        this.remote.pull();
+        return expect(this.remote.pull.callCount).toBe(1);
+      });
+    });
+    return _when("there is a different error", function() {
+      beforeEach(function() {
+        var _this = this;
+        return this.remote.request.andReturn({
+          then: function(success, error) {
+            _this.remote.request.andReturn({
+              then: function() {}
+            });
+            return error({}, 'error object');
+          }
+        });
+      });
+      return it("should try again in 3 seconds if .isContinuouslyPulling() returns false", function() {
+        spyOn(this.remote, "isContinuouslyPulling").andReturn(true);
+        this.remote.pull();
+        expect(window.setTimeout).wasCalledWith(this.remote.pull, 3000);
+        window.setTimeout.reset();
+        this.remote.isContinuouslyPulling.andReturn(false);
+        this.remote.pull();
+        return expect(window.setTimeout).wasNotCalledWith(this.remote.pull, 3000);
+      });
+    });
+  });
   describe("#sync(docs)", function() {
     beforeEach(function() {
       spyOn(this.remote, "push").andCallFake(function(docs) {
@@ -193,7 +452,8 @@ describe("Hoodie.AccountRemoteStore", function() {
   });
   describe("#push(docs)", function() {
     beforeEach(function() {
-      return spyOn(Hoodie.RemoteStore.prototype, "push");
+      this.pushDefer = this.hoodie.defer();
+      return spyOn(Hoodie.RemoteStore.prototype, "push").andReturn(this.pushDefer.promise());
     });
     return _when("no docs passed", function() {
       return it("should push changed documents from store", function() {

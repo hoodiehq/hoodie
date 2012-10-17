@@ -12,6 +12,7 @@ describe "Hoodie.AccountRemoteStore", ->
     spyOn(@hoodie, "trigger")
     spyOn(@hoodie.my.store, "destroy").andReturn then: (cb) -> cb('objectFromStore')
     spyOn(@hoodie.my.store, "update").andReturn  then: (cb) -> cb('objectFromStore', false)
+    spyOn(@hoodie.my.store, "save").andReturn    then: (cb) -> cb('objectFromStore', false)
 
     @remote = new Hoodie.AccountRemoteStore @hoodie
   
@@ -144,6 +145,202 @@ describe "Hoodie.AccountRemoteStore", ->
       expect(@hoodie.my.config.set).wasCalledWith '_remote.since', 100
   # /#setSinceNr()
 
+
+  describe "#pull()", ->        
+    beforeEach ->
+      @remote.connected = true
+      spyOn(@remote, "request").andReturn @requestDefer.promise()
+    
+    _when ".isContinuouslyPulling() is true", ->
+      beforeEach ->
+        spyOn(@remote, "isContinuouslyPulling").andReturn true
+      
+      it "should send a longpoll GET request to the _changes feed", ->
+        @remote.pull()
+        expect(@remote.request).wasCalled()
+        [method, path] = @remote.request.mostRecentCall.args
+        expect(method).toBe 'GET'
+        expect(path).toBe '/_changes?include_docs=true&since=0&heartbeat=10000&feed=longpoll'
+        
+      it "should set a timeout to restart the pull request", ->
+        @remote.pull()
+        expect(window.setTimeout).wasCalledWith @remote._restartPullRequest, 25000
+        
+    _when ".isContinuouslyPulling() is false", ->
+      beforeEach ->
+        spyOn(@remote, "isContinuouslyPulling").andReturn false
+      
+      it "should send a normal GET request to the _changes feed", ->
+        @remote.pull()
+        expect(@remote.request).wasCalled()
+        [method, path] = @remote.request.mostRecentCall.args
+        expect(method).toBe 'GET'
+        expect(path).toBe '/_changes?include_docs=true&since=0'
+
+    _when "request is successful / returns changes", ->
+      beforeEach ->
+        @remote.request.andReturn then: (success) =>
+          # avoid recursion
+          @remote.request.andReturn then: ->
+          success Mocks.changesResponse()
+      
+      it "should remove `todo/abc3` from store", ->
+        @remote.pull()
+        expect(@hoodie.my.store.destroy).wasCalledWith 'todo', 'abc3', remote: true
+
+      it "should save `todo/abc2` in store", ->
+        @remote.pull()
+        expect(@hoodie.my.store.save).wasCalledWith 'todo', 'abc2', { _rev : '1-123', content : 'remember the milk', done : false, order : 1, $type : 'todo', id : 'abc2' }, { remote : true }
+      
+      it "should trigger remote events", ->
+        spyOn(@remote, "trigger")
+        @remote.pull()
+
+        # {"_id":"todo/abc3","_rev":"2-123","_deleted":true}
+        expect(@remote.trigger).wasCalledWith 'destroy',           'objectFromStore'
+        expect(@remote.trigger).wasCalledWith 'destroy:todo',      'objectFromStore'
+        expect(@remote.trigger).wasCalledWith 'destroy:todo:abc3', 'objectFromStore'
+
+        expect(@remote.trigger).wasCalledWith 'change',            'destroy', 'objectFromStore'
+        expect(@remote.trigger).wasCalledWith 'change:todo',       'destroy', 'objectFromStore'
+        expect(@remote.trigger).wasCalledWith 'change:todo:abc3',  'destroy', 'objectFromStore'        
+        
+        # {"_id":"todo/abc2","_rev":"1-123","content":"remember the milk","done":false,"order":1, "type":"todo"}
+        expect(@remote.trigger).wasCalledWith 'update',            'objectFromStore'
+        expect(@remote.trigger).wasCalledWith 'update:todo',       'objectFromStore'
+        expect(@remote.trigger).wasCalledWith 'update:todo:abc2',  'objectFromStore'
+
+        expect(@remote.trigger).wasCalledWith 'change',            'update', 'objectFromStore'
+        expect(@remote.trigger).wasCalledWith 'change:todo',       'update', 'objectFromStore'
+        expect(@remote.trigger).wasCalledWith 'change:todo:abc2',  'update', 'objectFromStore'
+        
+      _and ".isContinuouslyPulling() returns true", ->
+        beforeEach ->
+          spyOn(@remote, "isContinuouslyPulling").andReturn true
+          spyOn(@remote, "pull").andCallThrough()
+        
+        it "should pull again", ->
+          @remote.pull()
+          expect(@remote.pull.callCount).toBe 2
+        
+    _when "request errors with 401 unauthorzied", ->
+      beforeEach ->
+        @remote.request.andReturn then: (success, error) =>
+          # avoid recursion
+          @remote.request.andReturn then: ->
+          error status: 401, 'error object'
+          
+        spyOn(@remote, "disconnect")
+      
+      it "should disconnect", ->
+        @remote.pull()
+        expect(@remote.disconnect).wasCalled()
+        
+      it "should trigger an unauthenticated error", ->
+        spyOn(@remote, "trigger")
+        @remote.pull()
+        expect(@remote.trigger).wasCalledWith 'error:unauthenticated', 'error object'
+      
+      _and "remote is pullContinuously", ->
+        beforeEach ->
+          @remote.pullContinuously = true
+      
+      _and "remote isn't pullContinuously", ->
+        beforeEach ->
+          @remote.pullContinuously = false
+
+
+    _when "request errors with 401 unauthorzied", ->
+      beforeEach ->
+        @remote.request.andReturn then: (success, error) =>
+          # avoid recursion
+          @remote.request.andReturn then: ->
+          error status: 401, 'error object'
+          
+        spyOn(@remote, "disconnect")
+      
+      it "should disconnect", ->
+        @remote.pull()
+        expect(@remote.disconnect).wasCalled()
+        
+      it "should trigger an unauthenticated error", ->
+        spyOn(@remote, "trigger")
+        @remote.pull()
+        expect(@remote.trigger).wasCalledWith 'error:unauthenticated', 'error object'
+      
+      _and "remote is pullContinuously", ->
+        beforeEach ->
+          @remote.pullContinuously = true
+      
+      _and "remote isn't pullContinuously", ->
+        beforeEach ->
+          @remote.pullContinuously = false
+
+
+    _when "request errors with 404 not found", ->
+      beforeEach ->
+        @remote.request.andReturn then: (success, error) =>
+          # avoid recursion
+          @remote.request.andReturn then: ->
+          error status: 404, 'error object'
+        
+      it "should try again in 3 seconds (it migh be due to a sign up, the userDB might be created yet)", ->
+        @remote.pull()
+        expect(window.setTimeout).wasCalledWith @remote.pull, 3000
+
+    _when "request errors with 500 oooops", ->
+      beforeEach ->
+        @remote.request.andReturn then: (success, error) =>
+          # avoid recursion
+          @remote.request.andReturn then: ->
+          error status: 500, 'error object'
+      
+      it "should try again in 3 seconds (and hope it was only a hiccup ...)", ->
+        @remote.pull()
+        expect(window.setTimeout).wasCalledWith @remote.pull, 3000
+        
+      it "should trigger a server error event", ->
+        spyOn(@remote, "trigger")
+        @remote.pull()
+        expect(@remote.trigger).wasCalledWith 'error:server', 'error object'
+        
+    _when "request was aborted manually", ->
+      beforeEach ->
+        @remote.request.andReturn then: (success, error) =>
+          # avoid recursion
+          @remote.request.andReturn then: ->
+          error statusText: 'abort', 'error object'
+      
+      it "should try again when .isContinuouslyPulling() returns true", ->
+        spyOn(@remote, "pull").andCallThrough()
+        spyOn(@remote, "isContinuouslyPulling").andReturn true
+        @remote.pull()
+        expect(@remote.pull.callCount).toBe 2
+        
+        @remote.pull.reset()
+        @remote.isContinuouslyPulling.andReturn false
+        @remote.pull()
+        expect(@remote.pull.callCount).toBe 1
+
+    _when "there is a different error", ->
+      beforeEach ->
+        @remote.request.andReturn then: (success, error) =>
+          # avoid recursion
+          @remote.request.andReturn then: ->
+          error {}, 'error object'
+          
+      it "should try again in 3 seconds if .isContinuouslyPulling() returns false", ->
+        spyOn(@remote, "isContinuouslyPulling").andReturn true
+        @remote.pull()
+        expect(window.setTimeout).wasCalledWith @remote.pull, 3000
+        
+        window.setTimeout.reset()
+        @remote.isContinuouslyPulling.andReturn false
+        @remote.pull()
+        expect(window.setTimeout).wasNotCalledWith @remote.pull, 3000
+  # /#pull()
+
+
   describe "#sync(docs)", ->
     beforeEach ->
       spyOn(@remote, "push").andCallFake (docs) -> pipe: (cb) -> cb(docs)
@@ -169,7 +366,8 @@ describe "Hoodie.AccountRemoteStore", ->
 
   describe "#push(docs)", -> 
     beforeEach ->
-      spyOn(Hoodie.RemoteStore::, "push")
+      @pushDefer = @hoodie.defer()
+      spyOn(Hoodie.RemoteStore::, "push").andReturn @pushDefer.promise()
 
     _when "no docs passed", ->        
       it "should push changed documents from store", ->

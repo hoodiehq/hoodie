@@ -502,56 +502,35 @@ class Hoodie.RemoteStore extends Hoodie.Store
 
 
   # ### handle changes from remote
-  
-  # note: we don't trigger any events until all changes have been taken care of.
-  #       Reason is, that on object could depend on a different object that has
-  #       not been stored yet, but is within the same bulk of changes. This 
-  #       is especially the case during initial bootstraps after a user signs in.
-  #
+
+  # in order to differentiate whether an object from remote should trigger a 'create'
+  # or an 'update' event, we store a hash of known objects
+  _knownObjects : {}
   _handlePullResults : (changes) =>
-    _destroyedDocs = []
-    _changedDocs   = []
-    
-    # 1. update or remove objects from local store
     for {doc} in changes
-      doc = @_parseFromRemote(doc)
-      if doc._deleted
-        _destroyedDocs.push [doc, @hoodie.my.store.destroy( doc.$type, doc.id,      remote: true)]
-      else                                                
-        _changedDocs.push   [doc, @hoodie.my.store.save(    doc.$type, doc.id, doc, remote: true)]
-    
-    # 2. trigger events
-    for [doc, promise] in _destroyedDocs
-      promise.then (object) => 
-        @trigger 'destroy',                        object
-        @trigger "destroy:#{doc.$type}",           object
-        @trigger "destroy:#{doc.$type}:#{doc.id}", object
-        
-        @trigger 'change',                         'destroy', object
-        @trigger "change:#{doc.$type}",            'destroy', object
-        @trigger "change:#{doc.$type}:#{doc.id}",  'destroy', object
-    
-    for [doc, promise] in _changedDocs
-      promise.then (object, objectWasCreated) => 
-        event = if objectWasCreated then 'create' else 'update'
-        @trigger event,                             object
-        @trigger "#{event}:#{doc.$type}",           object
-        @trigger "#{event}:#{doc.$type}:#{doc.id}", object unless event is 'create'
-      
-        @trigger "change",                          event, object
-        @trigger "change:#{doc.$type}",             event, object
-        @trigger "change:#{doc.$type}:#{doc.id}",   event, object unless event is 'create'
+      parsedDoc = @_parseFromRemote(doc)
+      if parsedDoc._deleted
+        event = 'destroy'
+        delete @_knownObjects[doc._id]
+      else
+        if @_knownObjects[doc._id]
+          event = 'update'
+        else
+          event = 'create'
+          @_knownObjects[doc._id] = 1
+
+      @trigger event,                                         parsedDoc
+      @trigger "#{event}:#{parsedDoc.$type}",                 parsedDoc
+      @trigger "#{event}:#{parsedDoc.$type}:#{parsedDoc.id}", parsedDoc      
+      @trigger "change",                                      event, parsedDoc
+      @trigger "change:#{parsedDoc.$type}",                   event, parsedDoc
+      @trigger "change:#{parsedDoc.$type}:#{parsedDoc.id}",   event, parsedDoc
 
 
   # ### handle push success
 
-  # update local _rev attributes after changes pushed
-  _handlePushSuccess: (docs, pushedDocs) =>
-    =>
-      for doc, i in docs
-        update  = {_rev: pushedDocs[i]._rev}
-        options = remote : true
-        @hoodie.my.store.update(doc.$type, doc.id, update, options) 
+  # do nothing by default
+  _handlePushSuccess: (docs, pushedDocs) => 
 
 
   # ### map docs from findAll

@@ -111,7 +111,7 @@ class Hoodie.AccountRemoteStore extends Hoodie.RemoteStore
   # in his store
   push : (docs) =>
     docs = @hoodie.my.store.changedDocs() unless $.isArray docs
-    super(docs)
+    promise = super(docs)
 
 
   # Events
@@ -139,3 +139,46 @@ class Hoodie.AccountRemoteStore extends Hoodie.RemoteStore
   _handleSignIn: =>
     @name = @hoodie.my.account.db()
     @connect()
+
+  # update local _rev attributes after changes pushed
+  _handlePushSuccess: (docs, pushedDocs) =>
+    =>
+      for doc, i in docs
+        update  = {_rev: pushedDocs[i]._rev}
+        options = remote : true
+        @hoodie.my.store.update(doc.$type, doc.id, update, options) 
+
+  # 
+  _handlePullResults : (changes) =>
+    _destroyedDocs = []
+    _changedDocs   = []
+    
+    # 1. update or remove objects from local store
+    for {doc} in changes
+      doc = @_parseFromRemote(doc)
+      if doc._deleted
+        _destroyedDocs.push [doc, @hoodie.my.store.destroy( doc.$type, doc.id,      remote: true)]
+      else                                                
+        _changedDocs.push   [doc, @hoodie.my.store.save(    doc.$type, doc.id, doc, remote: true)]
+    
+    # 2. trigger events
+    for [doc, promise] in _destroyedDocs
+      promise.then (object) => 
+        @trigger 'destroy',                        object
+        @trigger "destroy:#{doc.$type}",           object
+        @trigger "destroy:#{doc.$type}:#{doc.id}", object
+        
+        @trigger 'change',                         'destroy', object
+        @trigger "change:#{doc.$type}",            'destroy', object
+        @trigger "change:#{doc.$type}:#{doc.id}",  'destroy', object
+    
+    for [doc, promise] in _changedDocs
+      promise.then (object, objectWasCreated) => 
+        event = if objectWasCreated then 'create' else 'update'
+        @trigger event,                             object
+        @trigger "#{event}:#{doc.$type}",           object
+        @trigger "#{event}:#{doc.$type}:#{doc.id}", object unless event is 'create'
+      
+        @trigger "change",                          event, object
+        @trigger "change:#{doc.$type}",             event, object
+        @trigger "change:#{doc.$type}:#{doc.id}",   event, object unless event is 'create'
