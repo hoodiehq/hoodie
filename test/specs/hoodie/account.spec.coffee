@@ -3,8 +3,6 @@ describe "Hoodie.Account", ->
     localStorage.clear()
     
     @hoodie  = new Mocks.Hoodie
-    @account = new Hoodie.Account @hoodie
-
     @requestDefer = @hoodie.defer()
     spyOn(@hoodie, "request").andReturn @requestDefer.promise()
   
@@ -13,6 +11,8 @@ describe "Hoodie.Account", ->
 
     # skip timeouts
     spyOn(window, "setTimeout").andCallFake (cb) -> cb()
+
+    @account = new Hoodie.Account @hoodie
 
 
   describe "constructor", ->
@@ -170,8 +170,6 @@ describe "Hoodie.Account", ->
 
   describe "#signUp(username, password)", ->
     beforeEach ->
-      @signInDefer = @hoodie.defer()
-      spyOn(@account, "signIn").andReturn @signInDefer.promise()
       @account.ownerHash = "owner_hash123"
   
     _when "username not set", ->
@@ -179,87 +177,188 @@ describe "Hoodie.Account", ->
         @promise = @account.signUp('', 'secret', name: "Joe Doe")
 
       it "should be rejected", ->
-        expect(@promise).toBeRejected()
+        expect(@promise).toBeRejectedWith error: 'username must be set'
 
     _when "username set", ->
-      beforeEach ->
-        @account.signUp('joe@example.com', 'secret', name: "Joe Doe")
-        [@type, @path, @options] = @hoodie.request.mostRecentCall.args
-        @data = JSON.parse @options.data
-
-      it "should send a PUT request to http://my.cou.ch/_users/org.couchdb.user%3Auser%2Fjoe%40example.com", ->
-        expect(@hoodie.request).wasCalled()
-        expect(@type).toBe 'PUT'
-        expect(@path).toBe  '/_users/org.couchdb.user%3Auser%2Fjoe%40example.com'
-        
-      it "should set contentType to 'application/json'", ->
-        expect(@options.contentType).toBe 'application/json'
-      
-      it "should stringify the data", ->
-        expect(typeof @options.data).toBe 'string'
-    
-      it "should have set _id to 'org.couchdb.user:joe@example.com'", ->
-        expect(@data._id).toBe 'org.couchdb.user:user/joe@example.com'
-      
-      it "should have set name to 'joe@example.com", ->
-        expect(@data.name).toBe 'user/joe@example.com'
-        
-      it "should have set type to 'user", ->
-        expect(@data.type).toBe 'user'
-
-      it "should have set password to 'secret'", ->
-        expect(@data.password).toBe 'secret'
-
-      it "should have set ownerHash to 'owner_hash123'", ->
-        expect(@data.ownerHash).toBe 'owner_hash123'
-
-      it "should have set database to 'user/owner_hash123'", ->
-        expect(@data.database).toBe 'user/owner_hash123'
-        
-      it "should allow to signup without password", ->
-        @account.signUp('joe@example.com')
-        [@type, @path, @options] = @hoodie.request.mostRecentCall.args
-        @data = JSON.parse @options.data
-        expect(@data.password).toBe ''
-              
-      _when "signUp successful", ->
+      _and "user has an anonmyous account", ->
         beforeEach ->
-          response = {"ok":true,"id":"org.couchdb.user:bizbiz","rev":"1-a0134f4a9909d3b20533285c839ed830"}
-          @requestDefer.resolve response
-        
-        it "should trigger `account:signup` event", ->
-          @account.signUp('joe@example.com', 'secret')
-          expect(@hoodie.trigger).wasCalledWith 'account:signup', 'joe@example.com'
-          
+          spyOn(@account, "hasAnonymousAccount").andReturn true
+
+          @fetchDefer = @hoodie.defer()
+          spyOn(@account, "fetch").andReturn @fetchDefer.promise()
+
+          spyOn(@hoodie.my.config, "get").andReturn 'randomPassword'
+          @account.username = 'randomUsername'
+
+          @signInDefer1 = @hoodie.defer()
+          @signInDefer2 = @hoodie.defer()
+          signInDefers = [@signInDefer1.promise(), @signInDefer2.promise()]
+          spyOn(@account, "signIn").andCallFake -> signInDefers.shift()
+
+          @promise = @account.signUp('joe@example.com', 'secret', name: "Joe Doe")
+
         it "should sign in", ->
-          @account.signUp 'joe@example.com', 'secret'
-          expect(@account.signIn).wasCalledWith 'joe@example.com', 'secret'
-        
-        _and "signIn successful", ->
+          expect(@account.signIn).wasCalledWith 'randomUsername', 'randomPassword'
+
+        _when "sign in successful", ->
           beforeEach ->
-            @signInDefer.resolve("joe@example.com", 'response')
+            @signInDefer1.resolve('randomUsername')
 
-          it "should resolve its promise", ->
-            promise = @account.signUp('joe@example.com', 'secret')
-            expect(promise).toBeResolvedWith 'joe@example.com', 'response'
-
-        _and "signIn not successful", ->
-          beforeEach ->
-            @signInDefer.reject 'error'
-
-          it "should resolve its promise", ->
-            promise = @account.signUp('joe@example.com', 'secret')
-            expect(promise).toBeRejectedWith 'error'
+          it "should fetch the _users doc", ->
+            expect(@account.fetch).wasCalled()
           
-      _when "signUp has an error", ->
+          _when "fetching user doc successful", ->
+            beforeEach ->
+              @account._doc = 
+                _id          : 'org.couchdb.user:user/joe@example.com'
+                name         : 'user/joe@example.com'
+                type         : 'user'
+                roles        : []
+                salt         : 'absalt'
+                password_sha : 'pwcdef'
+              @fetchDefer.resolve()
+              [@type, @path, @options] = @hoodie.request.mostRecentCall.args
+              @data = JSON.parse @options.data
+
+            it "should send a PUT request to http://my.cou.ch/_users/org.couchdb.user%3Auser%2Fjoe%40example.com", ->
+              expect(@hoodie.request).wasCalled()
+              expect(@type).toBe 'PUT'
+              expect(@path).toBe  '/_users/org.couchdb.user%3Auser%2FrandomUsername'
+            
+            it "should set contentType to 'application/json'", ->
+              expect(@options.contentType).toBe 'application/json'
+            
+            it "should stringify the data", ->
+              expect(typeof @options.data).toBe 'string'
+
+            it "should have set name to 'user/joe@example.com", ->
+              expect(@data.$newUsername).toBe 'joe@example.com'
+
+            _when "_users doc could be updated", ->
+              beforeEach ->
+                spyOn(@hoodie.my.remote, "disconnect")
+                @requestDefer.resolve()
+
+              it "should disconnect", ->
+                expect(@hoodie.my.remote.disconnect).wasCalled() 
+
+              it "should sign in with new username", ->
+                expect(@account.signIn).wasCalledWith 'joe@example.com', 'secret'
+
+              _and "signIn is successful", ->
+                beforeEach ->
+                  @signInDefer2.resolve('joe@example.com')
+
+                it "should be resolved", ->
+                  expect(@promise).toBeResolvedWith 'joe@example.com'
+
+              _but "signIn has an error", ->
+                beforeEach ->
+                  @signInDefer2.reject error: 'oops'
+
+                it "should be resolved", ->
+                  expect(@promise).toBeRejectedWith error: 'oops'
+            
+            _when "_users doc could not be updated", ->
+              beforeEach ->
+                @requestDefer.reject()
+
+              it "should be rejected", ->
+                expect(@promise).toBeRejectedWith error: 'unknown'
+
+          _when "fetching user doc not successful", ->
+            beforeEach ->
+              @fetchDefer.reject(error: 'whatever')
+
+            it "should be rejected", ->
+              expect(@promise).toBeRejectedWith error: 'whatever'
+
+      _but "user is already logged in", ->
         beforeEach ->
-          @requestDefer.reject responseText: '{"error":"forbidden","reason":"You stink."}'
+          spyOn(@account, "hasAccount").andReturn true
+
+      _and "user is logged out", ->
+        beforeEach ->
+          spyOn(@account, "hasAccount").andReturn false
+          @signInDefer = @hoodie.defer()
+          spyOn(@account, "signIn").andReturn @signInDefer.promise()
+          @account.signUp('joe@example.com', 'secret', name: "Joe Doe")
+          [@type, @path, @options] = @hoodie.request.mostRecentCall.args
+          @data = JSON.parse @options.data
+
+        it "should send a PUT request to http://my.cou.ch/_users/org.couchdb.user%3Auser%2Fjoe%40example.com", ->
+          expect(@hoodie.request).wasCalled()
+          expect(@type).toBe 'PUT'
+          expect(@path).toBe  '/_users/org.couchdb.user%3Auser%2Fjoe%40example.com'
+          
+        it "should set contentType to 'application/json'", ->
+          expect(@options.contentType).toBe 'application/json'
         
-        it "should reject its promise", ->
-          promise = @account.signUp('notmyfault@example.com', 'secret')
-          expect(promise).toBeRejectedWith 
-            error  : 'forbidden'
-            reason : 'You stink.'
+        it "should stringify the data", ->
+          expect(typeof @options.data).toBe 'string'
+      
+        it "should have set _id to 'org.couchdb.user:joe@example.com'", ->
+          expect(@data._id).toBe 'org.couchdb.user:user/joe@example.com'
+        
+        it "should have set name to 'joe@example.com", ->
+          expect(@data.name).toBe 'user/joe@example.com'
+          
+        it "should have set type to 'user", ->
+          expect(@data.type).toBe 'user'
+
+        it "should have set password to 'secret'", ->
+          expect(@data.password).toBe 'secret'
+
+        it "should have set ownerHash to 'owner_hash123'", ->
+          expect(@data.ownerHash).toBe 'owner_hash123'
+
+        it "should have set database to 'user/owner_hash123'", ->
+          expect(@data.database).toBe 'user/owner_hash123'
+          
+        it "should allow to signup without password", ->
+          @account.signUp('joe@example.com')
+          [@type, @path, @options] = @hoodie.request.mostRecentCall.args
+          @data = JSON.parse @options.data
+          expect(@data.password).toBe ''
+                
+        _when "signUp successful", ->
+          beforeEach ->
+            response = {"ok":true,"id":"org.couchdb.user:bizbiz","rev":"1-a0134f4a9909d3b20533285c839ed830"}
+            @requestDefer.resolve response
+          
+          it "should trigger `account:signup` event", ->
+            @account.signUp('joe@example.com', 'secret')
+            expect(@hoodie.trigger).wasCalledWith 'account:signup', 'joe@example.com'
+            
+          it "should sign in", ->
+            @account.signUp 'joe@example.com', 'secret'
+            expect(@account.signIn).wasCalledWith 'joe@example.com', 'secret'
+          
+          _and "signIn successful", ->
+            beforeEach ->
+              @signInDefer.resolve("joe@example.com", 'response')
+
+            it "should resolve its promise", ->
+              promise = @account.signUp('joe@example.com', 'secret')
+              expect(promise).toBeResolvedWith 'joe@example.com', 'response'
+
+          _and "signIn not successful", ->
+            beforeEach ->
+              @signInDefer.reject 'error'
+
+            it "should resolve its promise", ->
+              promise = @account.signUp('joe@example.com', 'secret')
+              expect(promise).toBeRejectedWith 'error'
+            
+        _when "signUp has an error", ->
+          beforeEach ->
+            @requestDefer.reject responseText: '{"error":"forbidden","reason":"You stink."}'
+          
+          it "should reject its promise", ->
+            promise = @account.signUp('notmyfault@example.com', 'secret')
+            expect(promise).toBeRejectedWith 
+              error  : 'forbidden'
+              reason : 'You stink.'
   # /.signUp(username, password)
 
   
@@ -781,11 +880,15 @@ describe "Hoodie.Account", ->
 
   describe "#changeUsername(currentPassword, newUsername)", ->
     beforeEach ->
-      @authenticateDefer = @hoodie.defer()
+      @signInDefer1 = @hoodie.defer()
+      @signInDefer2 = @hoodie.defer()
+      signInDefers = [@signInDefer1, @signInDefer2]
+      spyOn(@account, "signIn").andCallFake -> signInDefers.shift()
+
       @fetchDefer = @hoodie.defer()
-      spyOn(@account, "authenticate").andReturn @authenticateDefer.promise()
       spyOn(@account, "fetch").andReturn @fetchDefer
 
+      @account.username = 'joe@example.com'
       @account._doc  = 
         _id          : 'org.couchdb.user:user/joe@example.com'
         name         : 'user/joe@example.com'
@@ -794,17 +897,15 @@ describe "Hoodie.Account", ->
         salt         : 'absalt'
         password_sha : 'pwcdef'
     
-    it "should authenticate", ->
-      @account.changeUsername('secret', 'new.joe@example.com')
-      expect(@account.authenticate).wasCalled()
 
+    
     it "should return a promise", ->
       @account.changeUsername('secret', 'new.joe@example.com')
       expect(@account.changeUsername()).toBePromise()
 
-    _when "authenticated", ->
+    _when "sign in successful", ->
       beforeEach ->
-        @authenticateDefer.resolve()
+        @signInDefer1.resolve('joe@example.com')
       
       it "should fetch the _users doc", ->
         @account.changeUsername('secret', 'new.joe@example.com')
@@ -834,8 +935,6 @@ describe "Hoodie.Account", ->
 
         _when "_users doc could be updated", ->
           beforeEach ->
-            @signInDefer = @hoodie.defer()
-            spyOn(@account, "signIn").andReturn @signInDefer.promise()
             spyOn(@hoodie.my.remote, "disconnect")
             @requestDefer.resolve()
 
@@ -847,17 +946,17 @@ describe "Hoodie.Account", ->
 
           _and "signIn is successful", ->
             beforeEach ->
-              @signInDefer.resolve('fuckyeah')
+              @signInDefer2.resolve('fuckyeah')
 
             it "should be resolved", ->
               expect(@promise).toBeResolvedWith 'fuckyeah'
 
           _but "signIn has an error", ->
             beforeEach ->
-              @signInDefer.reject('oooops')
+              @signInDefer2.reject error: 'oops'
 
             it "should be resolved", ->
-              expect(@promise).toBeRejectedWith 'oooops'
+              expect(@promise).toBeRejectedWith error: 'oops'
         
         _when "_users doc could not be updated", ->
           beforeEach ->
@@ -868,19 +967,18 @@ describe "Hoodie.Account", ->
 
       _but "_users doc cannot be fetched", ->
         beforeEach ->
-          @fetchDefer.reject()
+          @fetchDefer.reject error: 'something'
 
         it "should be rejected", ->
           promise = @account.changeUsername('secret', 'new.joe@example.com')
-          expect(promise).toBeRejectedWith error: 'unknown'
+          expect(promise).toBeRejectedWith error: 'something'
 
-    _when "unuathenticated", ->
+    _when "signIn not successful", ->
       beforeEach ->
-        @authenticateDefer.reject('autherror')
+        @signInDefer1.reject(error: 'autherror')
 
       it "should be rejected", ->
         promise = @account.changeUsername('secret', 'new.joe@example.com')
-        expect(promise).toBeRejectedWith 'autherror'
-      
+        expect(promise).toBeRejectedWith error: 'autherror'
   # /.changeUsername(currentPassword, newUsername)
 # /Hoodie.Account

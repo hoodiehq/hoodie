@@ -62,10 +62,13 @@ class Hoodie.Account
   #
   signUp : (username, password = '') ->
     unless username
-      return @hoodie.defer().reject().promise()
+      return @hoodie.defer().reject(error: 'username must be set').promise()
       
     if @hasAnonymousAccount()
       return @_upgradeAnonymousAccount username, password
+
+    if @hasAccount()
+      return @hoodie.defer().reject(error: 'you have to sign out first').promise()
 
     options =
       data         : JSON.stringify
@@ -142,8 +145,6 @@ class Hoodie.Account
   # ---------
 
   # uses standard CouchDB API to destroy a user session (DELETE /_session)
-  #
-  # TODO: handle errors
   signOut : ->
 
     unless @hasAccount()
@@ -151,7 +152,7 @@ class Hoodie.Account
       return
 
     @hoodie.my.remote.disconnect()
-    @hoodie.request('DELETE', '/_session').pipe(@_cleanup)
+    @hoodie.request('DELETE', '/_session').pipe(@_cleanup, @_handleRequestError)
 
   # alias
   logout: @::signOut
@@ -460,8 +461,8 @@ class Hoodie.Account
   # 3. sign in with new credentials to create new sesion.
   #
   _changeUsernameAndPassword : (currentPassword, newUsername, newPassword) ->
-    @authenticate().pipe =>
-      @fetch().pipe @_sendChangeUsernameAndPasswordRequest(currentPassword, newUsername, newPassword), @_handleRequestError
+    @signIn(@username, currentPassword).pipe =>
+      @fetch().pipe @_sendChangeUsernameAndPasswordRequest(currentPassword, newUsername, newPassword)
   
   #
   # turn an anonymous account into a real account

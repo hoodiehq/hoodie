@@ -66,10 +66,17 @@ Hoodie.Account = (function() {
       password = '';
     }
     if (!username) {
-      return this.hoodie.defer().reject().promise();
+      return this.hoodie.defer().reject({
+        error: 'username must be set'
+      }).promise();
     }
     if (this.hasAnonymousAccount()) {
       return this._upgradeAnonymousAccount(username, password);
+    }
+    if (this.hasAccount()) {
+      return this.hoodie.defer().reject({
+        error: 'you have to sign out first'
+      }).promise();
     }
     options = {
       data: JSON.stringify({
@@ -126,7 +133,7 @@ Hoodie.Account = (function() {
       return;
     }
     this.hoodie.my.remote.disconnect();
-    return this.hoodie.request('DELETE', '/_session').pipe(this._cleanup);
+    return this.hoodie.request('DELETE', '/_session').pipe(this._cleanup, this._handleRequestError);
   };
 
   Account.prototype.logout = Account.prototype.signOut;
@@ -364,8 +371,8 @@ Hoodie.Account = (function() {
 
   Account.prototype._changeUsernameAndPassword = function(currentPassword, newUsername, newPassword) {
     var _this = this;
-    return this.authenticate().pipe(function() {
-      return _this.fetch().pipe(_this._sendChangeUsernameAndPasswordRequest(currentPassword, newUsername, newPassword), _this._handleRequestError);
+    return this.signIn(this.username, currentPassword).pipe(function() {
+      return _this.fetch().pipe(_this._sendChangeUsernameAndPasswordRequest(currentPassword, newUsername, newPassword));
     });
   };
 

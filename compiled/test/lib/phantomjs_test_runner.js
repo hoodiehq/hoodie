@@ -40,18 +40,28 @@ page.onConsoleMessage = function(msg, line, file) {
 };
 
 page.onError = function(msg, trace) {
-  var item, trace_parts;
-  trace_parts = (function() {
-    var _i, _len, _results;
-    _results = [];
-    for (_i = 0, _len = trace.length; _i < _len; _i++) {
-      item = trace[_i];
-      _results.push("" + item.file + ":" + item.line);
-    }
-    return _results;
-  })();
-  eval("getScriptPosition = function() {\n  var line = " + trace[0].line + ",\n      before = 10,\n      after  = 10;\n  $.get('" + trace[0].file + "', function(data) { \n    lines = data.split(/\\n/)\n    \n    console.log(\"\")\n    console.log(\"ERROR\")\n    console.log(\"" + msg + "\")\n    console.log(\"\")\n    console.log(\"" + (trace_parts.shift()) + "\")\n    for(var i = line - before; i <= line + after; i++) {\n      console.log(i, (i == line) ? ': => ' : ':    ', lines[i - 1])\n    }\n    console.log(\"\")\n    console.log(\"TRACE\")\n    console.log(\"" + (trace_parts.join("\\n")) + "\")\n  })\n}");
-  return page.evaluate(getScriptPosition);
+  var code, item, trace_parts;
+  console.log("MSG?!");
+  try {
+    trace_parts = (function() {
+      var _i, _len, _results;
+      _results = [];
+      for (_i = 0, _len = trace.length; _i < _len; _i++) {
+        item = trace[_i];
+        _results.push("" + item.file + ":" + item.line);
+      }
+      return _results;
+    })();
+    code = "getScriptPosition = function() {\n  var line = " + trace[0].line + ",\n      before = 10,\n      after  = 10;\n  $.get('" + trace[0].file + "', function(data) { \n    lines = data.split(/\\n/)\n    \n    console.log(\"\")\n    console.log(\"ERROR\")\n    console.log(\"" + (msg.replace(/"/g, "\\\"")) + "\")\n    console.log(\"\")\n    console.log(\"" + (trace_parts.shift()) + "\")\n    for(var i = line - before; i <= line + after; i++) {\n      console.log(i, (i == line) ? ': => ' : ':    ', lines[i - 1])\n    }\n    console.log(\"\")\n    console.log(\"TRACE\")\n    console.log(\"" + (trace_parts.join("\\n")) + "\")\n  })\n}";
+    eval(code);
+    return page.evaluate(getScriptPosition);
+  } catch (e) {
+    console.log("");
+    console.log("!!! phantomJS error !!!");
+    console.log(e);
+    console.log(code);
+    return console.log("");
+  }
 };
 
 page.open(phantom.args[0], function(status) {
