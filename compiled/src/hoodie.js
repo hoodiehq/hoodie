@@ -13,11 +13,11 @@ Hoodie = (function(_super) {
       config: 'Config',
       account: 'Account',
       remote: 'AccountRemoteStore'
-    },
-    user: 'User'
+    }
   };
 
   Hoodie.extensions = {
+    user: 'User',
     global: 'Global',
     email: 'Email',
     share: 'Share'

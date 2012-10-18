@@ -1,11 +1,6 @@
+# TODO
+
 * remove dependency on jQuery / zepto.js, then uncomment `use strict` statements
-* do some kind of modularization: add a moduleLoader for the built in modules 
-  like email, store and remote but also use it for custom modules.
-  
-
-### Hoodie
-
-* spec Hoodie.isPromise
 
 ### Share
 
@@ -21,9 +16,17 @@
 
 ### Account
 
+* `authenticate` should not return false if `username` is not set. There are 
+  circumstances when the username is not set, but the CouchDB session is still
+  valid.
+* make sure that same requests do not get sent multiple times, e.g. 
+  GET /_session should be only sent once. Instead of sending another request,
+  the promise of the pending one should be returned. If that doesn't make sense,
+  e.g. password reset, than we have to make sure that a running request gets 
+  aborted.
 * spec `window.setTimeout @authenticate` in constructor
-* what if @email is different from what GET /_session returns? Can there be a case like that?
-* before sign in / sign out: sign out if `hoodie.my.config.get('account.email')` is a different email address
+* what if @username is different from what GET /_session returns? Can there be a case like that?
+* before sign in / sign up: sign out if `hoodie.my.config.get('account.username')` is a different email address
 
 
 ### Remote

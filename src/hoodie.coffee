@@ -14,10 +14,9 @@ class Hoodie extends Events
       account : 'Account'
       remote  : 'AccountRemoteStore'
 
-    user    : 'User'
-
   # extensions, get loaded after the core modules
   @extensions : 
+    user    : 'User'
     global  : 'Global'
     email   : 'Email'
     share   : 'Share'
