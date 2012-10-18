@@ -23,6 +23,15 @@ describe "Hoodie.ShareInstance", ->
     it "should default access to false", ->
       share = new Hoodie.ShareInstance
       expect(share.access).toBe false
+
+    allowedProperties = 'id,_rev,$createdAt,$updatedAt,_$syncedAt'.split(',')
+    for property in allowedProperties
+      it "should allow to set #{property}", ->
+        options = {}
+        options[property] = 'fresh'
+        share = new Hoodie.ShareInstance options
+        expect(share[property]).toBe 'fresh'
+       
   # /constructor
 
   describe "#set(key, value)", ->

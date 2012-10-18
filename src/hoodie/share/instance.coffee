@@ -47,8 +47,15 @@ class Hoodie.ShareInstance extends Hoodie.RemoteStore
   #
   constructor: (options = {}) ->
 
+    # extend share instance with passed properties
+    $.extend this, options
+
+    # additionaly, use set so that the attributes 
+    # get stored persistantly with next save
     @set options
-    @id = options.id or @hoodie.my.store.uuid()
+
+    # make sure that we have an id
+    @id or=  @hoodie.my.store.uuid()
   
   
   # set

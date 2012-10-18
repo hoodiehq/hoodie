@@ -9,6 +9,7 @@ describe("Hoodie.ShareInstance", function() {
     });
   });
   describe("constructor", function() {
+    var allowedProperties, property, _i, _len, _results;
     beforeEach(function() {
       return spyOn(Hoodie.ShareInstance.prototype, "set").andCallThrough();
     });
@@ -35,11 +36,24 @@ describe("Hoodie.ShareInstance", function() {
       share = new Hoodie.ShareInstance;
       return expect(share.id).toBe('uuid');
     });
-    return it("should default access to false", function() {
+    it("should default access to false", function() {
       var share;
       share = new Hoodie.ShareInstance;
       return expect(share.access).toBe(false);
     });
+    allowedProperties = 'id,_rev,$createdAt,$updatedAt,_$syncedAt'.split(',');
+    _results = [];
+    for (_i = 0, _len = allowedProperties.length; _i < _len; _i++) {
+      property = allowedProperties[_i];
+      _results.push(it("should allow to set " + property, function() {
+        var options, share;
+        options = {};
+        options[property] = 'fresh';
+        share = new Hoodie.ShareInstance(options);
+        return expect(share[property]).toBe('fresh');
+      }));
+    }
+    return _results;
   });
   describe("#set(key, value)", function() {
     _when("key is a string", function() {
