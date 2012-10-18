@@ -1808,7 +1808,10 @@ Hoodie.LocalStore = (function(_super) {
         return $.extend({}, this._cached[key]);
       }
     } else {
-      if (this._cached[key] != null) {
+      if (this._cached[key] === false) {
+        return false;
+      }
+      if (this._cached[key]) {
         return $.extend({}, this._cached[key]);
       }
       this._cached[key] = this._getObject(type, id);

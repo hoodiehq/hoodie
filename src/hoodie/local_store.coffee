@@ -229,7 +229,8 @@ class Hoodie.LocalStore extends Hoodie.Store
         return $.extend {}, @_cached[key]
     
     else
-      return $.extend {}, @_cached[key] if @_cached[key]?
+      return false                      if @_cached[key] is false
+      return $.extend {}, @_cached[key] if @_cached[key]
       @_cached[key] = @_getObject type, id
     
     unless options.silent
