@@ -25,7 +25,7 @@ class Hoodie.Account
       @hoodie.my.config.set '_account.ownerHash', @ownerHash
     
     # authenticate on next tick
-    window.setTimeout @authenticate
+    # window.setTimeout @authenticate
 
     # is there a pending password reset?
     @_checkPasswordResetStatus()
@@ -37,8 +37,9 @@ class Hoodie.Account
   # Use this method to assure that the user is authenticated:
   # `hoodie.my.account.authenticate().done( doSomething ).fail( handleError )`
   authenticate : =>
-    # unless @username
-    #   return @hoodie.defer().reject().promise()
+    unless @username
+      @_sendSignOutRequest()
+      return @hoodie.defer().reject().promise()
       
     if @_authenticated is true
       return @hoodie.defer().resolve(@username).promise()
@@ -134,8 +135,9 @@ class Hoodie.Account
                 name      : @_userKey(username)
                 password  : password
 
-    @hoodie.request('POST', '/_session', options)
-    .pipe(@_handleSignInSuccess, @_handleRequestError)
+    @_withPreviousRequestsAborted 'signIn', =>
+      @hoodie.request('POST', '/_session', options)
+      .pipe(@_handleSignInSuccess, @_handleRequestError)
 
   # alias
   login: @::signIn
@@ -152,7 +154,7 @@ class Hoodie.Account
       return
 
     @hoodie.my.remote.disconnect()
-    @hoodie.request('DELETE', '/_session').pipe(@_cleanup, @_handleRequestError)
+    @_sendSignOutRequest().pipe(@_cleanup)
 
   # alias
   logout: @::signOut
@@ -182,9 +184,10 @@ class Hoodie.Account
     unless username
       return @hoodie.defer().reject(error: "unauthenticated", reason: "not logged in").promise()
     
-    @hoodie.request('GET', @_url(username))
-    .pipe(null, @_handleRequestError)
-    .done (response) => @_doc = response
+    @_withSingleRequest 'fetch', =>
+      @hoodie.request('GET', @_url(username))
+      .pipe(null, @_handleRequestError)
+      .done (response) => @_doc = response
     
 
   # change password
@@ -199,7 +202,7 @@ class Hoodie.Account
       return @hoodie.defer().reject(error: "unauthenticated", reason: "not logged in").promise()
 
     @hoodie.my.remote.disconnect()
-    @fetch().pipe @_sendChangePasswordRequest(currentPassword, newPassword), @_handleRequestError
+    @fetch().pipe @_sendChangeUsernameAndPasswordRequest(currentPassword, null, newPassword), @_handleRequestError
 
 
   # reset password
@@ -233,9 +236,10 @@ class Hoodie.Account
       data        : JSON.stringify data
       contentType : "application/json"
     
-    @hoodie.request('PUT',  "/_users/#{encodeURIComponent key}", options)
-    .pipe(null, @_handleRequestError)
-    .done @_checkPasswordResetStatus
+    @_withPreviousRequestsAborted 'resetPassword', =>
+      @hoodie.request('PUT',  "/_users/#{encodeURIComponent key}", options)
+      .pipe(null, @_handleRequestError)
+      .done @_checkPasswordResetStatus
 
 
   # change username
@@ -274,6 +278,10 @@ class Hoodie.Account
   
   # CouchDB _users doc
   _doc : {}
+
+  # map of requestPromises. We maintain this list to avoid sending
+  # the same requests several times.
+  _requests : {}
 
   # setters
   _setUsername : (@username)  -> @hoodie.my.config.set '_account.username',  @username
@@ -343,7 +351,7 @@ class Hoodie.Account
     return defer.promise()
 
   #
-  # handle a successful sign in to couchDB.
+  # parse a successful sign in response from couchDB.
   # Response looks like:
   #
   #     {
@@ -355,6 +363,8 @@ class Hoodie.Account
   #         ]
   #     }
   #
+  # we want to turn it into "test1", "mvu85hy" or reject the promise
+  # in case an error occured ("roles" array contains "error")
   _handleSignInSuccess : (response) =>
     defer    = @hoodie.defer()
     username = response.name.replace(/^user(_anonymous)?\//, '')
@@ -385,14 +395,7 @@ class Hoodie.Account
     @hoodie.trigger 'account:signin', @username
 
     @fetch()
-    defer.resolve(@username, response)
-    
-
-  #
-  #
-  #
-  _handleChangePasswordSuccess : (newPassword) ->
-    => @signIn(@username, newPassword)
+    defer.resolve(@username, response.roles[0])
 
   #
   # check for the status of a password reset. It might take
@@ -421,15 +424,24 @@ class Hoodie.Account
       headers:
         Authorization : "Basic #{hash}"
 
-    @hoodie.request('GET', url, options)
-    .pipe(@_handlePasswordResetStatusRequestSuccess, @_handlePasswordResetStatusRequestError)
-    .fail (error) =>
-      if error.error is 'pending'
-        window.setTimeout @_checkPasswordResetStatus, 1000
-        return
+    @_withPreviousRequestsAborted 'passwordResetStatus', =>
+      @hoodie.request('GET', url, options)
+      .pipe(@_handlePasswordResetStatusRequestSuccess, @_handlePasswordResetStatusRequestError)
+      .fail (error) =>
+        if error.error is 'pending'
+          window.setTimeout @_checkPasswordResetStatus, 1000
+          return
 
-      @hoodie.trigger 'account:password_reset:error'
+        @hoodie.trigger 'account:password_reset:error'
 
+  # 
+  # If the request was successful there might have occured an
+  # error, which the worker stored in the special $error attribute. 
+  # If that happens, we return a rejected promise with the $error,
+  # error. Otherwise reject the promise with a 'pending' error,
+  # as we are not waiting for a success full response, but a 401 
+  # error, indicating that our password was changed and our
+  # curren session has been invalidated
   _handlePasswordResetStatusRequestSuccess : (response) =>
     defer = @hoodie.defer()
 
@@ -440,7 +452,9 @@ class Hoodie.Account
 
     return defer.promise()
 
-
+  # 
+  # If the error is a 401, it's exactly what we've been waiting for.
+  # In this case we resolve the promise.
   _handlePasswordResetStatusRequestError : (xhr) =>
     if xhr.status is 401
       @hoodie.my.config.remove '_account.resetPasswordId'
@@ -473,18 +487,19 @@ class Hoodie.Account
       @hoodie.my.config.remove '_account.anonymousPassword'
 
   #
-  #
-  #
+  # we now can be sure that we fetched the latest _users doc, so we can update it
+  # without a potential conflict error.
   _handleFetchBeforeDestroySucces : =>
     @hoodie.my.remote.disconnect()
     @_doc._deleted = true
-    @hoodie.request 'PUT', @_url(),
-      data        : JSON.stringify @_doc
-      contentType : 'application/json'
+
+    @_withPreviousRequestsAborted 'updateUsersDoc', =>
+      @hoodie.request 'PUT', @_url(),
+        data        : JSON.stringify @_doc
+        contentType : 'application/json'
 
   #
-  # 
-  #
+  # remove everythng form the current account, so a new account can be initiated.
   _cleanup : =>
     delete @username
     delete @_authenticated
@@ -497,8 +512,8 @@ class Hoodie.Account
     
 
   #
-  #
-  #
+  # depending on wether the user signedUp manually or has been signed up anonymously
+  # the prefix in the CouchDB _users doc differentiates. 
   _userKey : (username) ->
     if username is @ownerHash
       "user_anonymous/#{username}"
@@ -506,36 +521,33 @@ class Hoodie.Account
       "user/#{username}"
 
   #
+  # turn a username into a valid _users doc._id
   _key : (username = @username) ->
     "#{@_prefix}:#{@_userKey(username)}"
 
   #
-  _url : (username = @username) ->
+  # get URL of my _users doc
+  _url : (username) ->
     "/_users/#{encodeURIComponent @_key(username)}"
 
   # 
-  _sendChangePasswordRequest: (currentPassword, newPassword) =>
-    => 
-      data = $.extend {}, @_doc
-      data.password = newPassword
-      delete data.salt
-      delete data.password_sha
-      options = 
-        data        : JSON.stringify data
-        contentType : "application/json"
-
-      @hoodie.request('PUT',  @_url(), options)
-      .pipe( @_handleChangePasswordSuccess(newPassword), @_handleRequestError )
-
+  # update my _users doc.
   # 
+  # If a new username has been passed, we set the special attribut $newUsername.
+  # This will let the username change worker create create a new _users doc for 
+  # the new username and destroy the current one
+  # 
+  # If a new password has been passed, salt and password_sha get removed
+  # from _users doc and add the password in clear text. CouchDB will replace it with
+  # according password_sha and a new salt server side
   _sendChangeUsernameAndPasswordRequest: (currentPassword, newUsername, newPassword) =>
     =>
       # prepare updated _users doc
       data = $.extend {}, @_doc
-      data.$newUsername = newUsername
+      data.$newUsername = newUsername if newUsername
 
       # trigger password update when newPassword set
-      if newPassword
+      if newPassword?
         delete data.salt
         delete data.password_sha
         data.password = newPassword
@@ -544,11 +556,31 @@ class Hoodie.Account
         data        : JSON.stringify data
         contentType : 'application/json'
 
-      @hoodie.request('PUT', @_url(), options)
-      .pipe @_handleChangeUsernameAndPasswordRequest(newUsername, newPassword or currentPassword), @_handleRequestError
+      @_withPreviousRequestsAborted 'updateUsersDoc', =>
+        @hoodie.request('PUT', @_url(), options)
+        .pipe @_handleChangeUsernameAndPasswordRequest(newUsername, newPassword or currentPassword), @_handleRequestError
 
   # 
-  _handleChangeUsernameAndPasswordRequest: (username, password) =>
+  # depending on whether a newUsername has been passed, we can sign in right away
+  # or have to use the delayed sign in to give the username change worker some time
+  _handleChangeUsernameAndPasswordRequest: (newUsername, newPassword) =>
     =>
       @hoodie.my.remote.disconnect()
-      @_delayedSignIn username, password
+      if newUsername
+        @_delayedSignIn newUsername, newPassword
+      else
+        @signIn(@username, newPassword)
+
+
+  # 
+  _withPreviousRequestsAborted: (name, requestFunction) ->
+    @_requests[name]?.abort?()
+    @_requests[name] = requestFunction()
+
+  _withSingleRequest: (name, requestFunction) ->
+    return @_requests[name] if @_requests[name]?.state?() is 'pending'
+    @_requests[name] = requestFunction()
+  # 
+  _sendSignOutRequest: ->
+    @_withSingleRequest 'signOut', =>
+      @hoodie.request('DELETE', '/_session').pipe(null, @_handleRequestError)
