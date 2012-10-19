@@ -48,9 +48,6 @@ Hoodie.Account = (function() {
   }
 
   Account.prototype.authenticate = function() {
-    if (!this.username) {
-      return this.hoodie.defer().reject().promise();
-    }
     if (this._authenticated === true) {
       return this.hoodie.defer().resolve(this.username).promise();
     }

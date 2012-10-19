@@ -10,11 +10,13 @@ describe("Hoodie.Account", function() {
     spyOn(window, "setTimeout").andCallFake(function(cb) {
       return cb();
     });
-    return this.account = new Hoodie.Account(this.hoodie);
+    spyOn(Hoodie.Account.prototype, "authenticate");
+    this.account = new Hoodie.Account(this.hoodie);
+    return Hoodie.Account.prototype.authenticate.andCallThrough();
   });
   describe("constructor", function() {
     beforeEach(function() {
-      spyOn(Hoodie.Account.prototype, "authenticate");
+      Hoodie.Account.prototype.authenticate.reset();
       return spyOn(Hoodie.Account.prototype, "on");
     });
     _when("account.username is set", function() {
@@ -79,117 +81,103 @@ describe("Hoodie.Account", function() {
     });
   });
   describe("#authenticate()", function() {
-    _when("@username is undefined", function() {
+    _when("account is already authenticated", function() {
       beforeEach(function() {
-        delete this.account.username;
+        this.account._authenticated = true;
+        this.account.username = 'joe@example.com';
         return this.promise = this.account.authenticate();
       });
-      return it("should return a rejected promise", function() {
-        expect(this.promise).toBePromise();
+      it("should return a promise", function() {
+        return expect(this.promise).toBePromise();
+      });
+      return it("should resolve the promise", function() {
+        return expect(this.promise).toBeResolvedWith('joe@example.com');
+      });
+    });
+    _when("account is unauthenticated", function() {
+      beforeEach(function() {
+        this.account._authenticated = false;
+        return this.promise = this.account.authenticate();
+      });
+      it("should return a promise", function() {
+        return expect(this.promise).toBePromise();
+      });
+      return it("should reject the promise", function() {
         return expect(this.promise).toBeRejected();
       });
     });
-    return _when("@username is 'joe@example.com'", function() {
+    return _when("account has not been authenticated yet", function() {
       beforeEach(function() {
-        return this.account.username = 'joe@example.com';
+        return delete this.account._authenticated;
       });
-      _and("account is already authenticated", function() {
+      it("should return a promise", function() {
+        return expect(this.account.authenticate()).toBePromise();
+      });
+      it("should send a GET /_session", function() {
+        var args;
+        this.account.authenticate();
+        expect(this.hoodie.request).wasCalled();
+        args = this.hoodie.request.mostRecentCall.args;
+        expect(args[0]).toBe('GET');
+        return expect(args[1]).toBe('/_session');
+      });
+      _when("authentication request is successful and returns session info for joe@example.com", function() {
         beforeEach(function() {
-          this.account._authenticated = true;
+          spyOn(this.hoodie.my.config, "set");
+          this.response = {
+            userCtx: {
+              name: "user/joe@example.com",
+              roles: ["user_hash", "confirmed"]
+            }
+          };
+          this.requestDefer.resolve(this.response);
           return this.promise = this.account.authenticate();
         });
-        it("should return a promise", function() {
-          return expect(this.promise).toBePromise();
+        it("should set account as authenticated", function() {
+          return expect(this.account._authenticated).toBe(true);
         });
-        return it("should resolve the promise", function() {
+        it("should resolve the promise with 'joe@example.com'", function() {
           return expect(this.promise).toBeResolvedWith('joe@example.com');
         });
+        it("should set account.username", function() {
+          expect(this.account.username).toBe('joe@example.com');
+          return expect(this.hoodie.my.config.set).wasCalledWith('_account.username', 'joe@example.com');
+        });
+        return it("should set account.ownerHash", function() {
+          expect(this.account.ownerHash).toBe('user_hash');
+          return expect(this.hoodie.my.config.set).wasCalledWith('_account.ownerHash', 'user_hash');
+        });
       });
-      _and("account is unauthenticated", function() {
+      _when("authentication request is successful and returns `name: null`", function() {
         beforeEach(function() {
-          this.account._authenticated = false;
+          this.requestDefer.resolve({
+            userCtx: {
+              name: null
+            }
+          });
+          this.account.username = 'joe@example.com';
           return this.promise = this.account.authenticate();
         });
-        it("should return a promise", function() {
-          return expect(this.promise).toBePromise();
+        it("should set account as unauthenticated", function() {
+          return expect(this.account._authenticated).toBe(false);
         });
-        return it("should reject the promise", function() {
+        it("should reject the promise", function() {
           return expect(this.promise).toBeRejected();
         });
+        return it("should trigger an `account:error:unauthenticated` event", function() {
+          return expect(this.hoodie.trigger).wasCalledWith('account:error:unauthenticated');
+        });
       });
-      return _and("account has not been authenticated yet", function() {
+      return _when("authentication request has an error", function() {
         beforeEach(function() {
-          return delete this.account._authenticated;
+          this.requestDefer.reject({
+            responseText: 'error data'
+          });
+          return this.promise = this.account.authenticate();
         });
-        it("should return a promise", function() {
-          return expect(this.account.authenticate()).toBePromise();
-        });
-        it("should send a GET /_session", function() {
-          var args;
-          this.account.authenticate();
-          expect(this.hoodie.request).wasCalled();
-          args = this.hoodie.request.mostRecentCall.args;
-          expect(args[0]).toBe('GET');
-          return expect(args[1]).toBe('/_session');
-        });
-        _when("authentication request is successful and returns session info for joe@example.com", function() {
-          beforeEach(function() {
-            spyOn(this.hoodie.my.config, "set");
-            this.response = {
-              userCtx: {
-                name: "user/joe@example.com",
-                roles: ["user_hash", "confirmed"]
-              }
-            };
-            this.requestDefer.resolve(this.response);
-            return this.promise = this.account.authenticate();
-          });
-          it("should set account as authenticated", function() {
-            return expect(this.account._authenticated).toBe(true);
-          });
-          it("should resolve the promise with 'joe@example.com'", function() {
-            return expect(this.promise).toBeResolvedWith('joe@example.com');
-          });
-          it("should set account.username", function() {
-            expect(this.account.username).toBe('joe@example.com');
-            return expect(this.hoodie.my.config.set).wasCalledWith('_account.username', 'joe@example.com');
-          });
-          return it("should set account.ownerHash", function() {
-            expect(this.account.ownerHash).toBe('user_hash');
-            return expect(this.hoodie.my.config.set).wasCalledWith('_account.ownerHash', 'user_hash');
-          });
-        });
-        _when("authentication request is successful and returns `name: null`", function() {
-          beforeEach(function() {
-            this.requestDefer.resolve({
-              userCtx: {
-                name: null
-              }
-            });
-            this.account.username = 'joe@example.com';
-            return this.promise = this.account.authenticate();
-          });
-          it("should set account as unauthenticated", function() {
-            return expect(this.account._authenticated).toBe(false);
-          });
-          it("should reject the promise", function() {
-            return expect(this.promise).toBeRejected();
-          });
-          return it("should trigger an `account:error:unauthenticated` event", function() {
-            return expect(this.hoodie.trigger).wasCalledWith('account:error:unauthenticated');
-          });
-        });
-        return _when("authentication request has an error", function() {
-          beforeEach(function() {
-            this.requestDefer.reject({
-              responseText: 'error data'
-            });
-            return this.promise = this.account.authenticate();
-          });
-          return it("should reject the promise", function() {
-            return expect(this.promise).toBeRejectedWith({
-              error: 'error data'
-            });
+        return it("should reject the promise", function() {
+          return expect(this.promise).toBeRejectedWith({
+            error: 'error data'
           });
         });
       });

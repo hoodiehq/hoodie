@@ -12,12 +12,14 @@ describe "Hoodie.Account", ->
     # skip timeouts
     spyOn(window, "setTimeout").andCallFake (cb) -> cb()
 
+    spyOn(Hoodie.Account::, "authenticate")
     @account = new Hoodie.Account @hoodie
+    Hoodie.Account::authenticate.andCallThrough()
 
 
   describe "constructor", ->
     beforeEach ->
-      spyOn(Hoodie.Account.prototype, "authenticate")
+      Hoodie.Account::authenticate.reset()
       spyOn(Hoodie.Account.prototype, "on")
     
     _when "account.username is set", ->
@@ -69,102 +71,89 @@ describe "Hoodie.Account", ->
   
   
   describe "#authenticate()", ->
-    _when "@username is undefined", ->
+    _when "account is already authenticated", ->
       beforeEach ->
-        delete @account.username
-        @promise = @account.authenticate()
-            
-      it "should return a rejected promise", ->
-        expect(@promise).toBePromise()
-        expect(@promise).toBeRejected()
-        
-    _when "@username is 'joe@example.com'", ->
-      beforeEach ->
+        @account._authenticated = true
         @account.username = 'joe@example.com'
+        @promise = @account.authenticate()
+        
+      it "should return a promise", ->
+        expect(@promise).toBePromise()
+
+      it "should resolve the promise", ->
+        expect(@promise).toBeResolvedWith 'joe@example.com'
+
+    _when "account is unauthenticated", ->
+      beforeEach ->
+        @account._authenticated = false
+        @promise = @account.authenticate()
+        
+      it "should return a promise", ->
+        expect(@promise).toBePromise()
+
+      it "should reject the promise", ->
+        expect(@promise).toBeRejected()
+
+    _when "account has not been authenticated yet", ->
+      beforeEach ->
+        delete @account._authenticated
       
-      _and "account is already authenticated", ->
+      it "should return a promise", ->
+        expect( @account.authenticate() ).toBePromise()
+        
+      it "should send a GET /_session", ->
+        @account.authenticate()
+        expect(@hoodie.request).wasCalled()
+        args = @hoodie.request.mostRecentCall.args
+        expect(args[0]).toBe 'GET'
+        expect(args[1]).toBe '/_session'
+
+      _when "authentication request is successful and returns session info for joe@example.com", ->
         beforeEach ->
-          @account._authenticated = true
+          spyOn(@hoodie.my.config, "set")
+          @response = userCtx:
+                        name: "user/joe@example.com",
+                        roles: [ "user_hash", "confirmed" ]
+          @requestDefer.resolve @response
           @promise = @account.authenticate()
           
-        it "should return a promise", ->
-          expect(@promise).toBePromise()
-
-        it "should resolve the promise", ->
+        it "should set account as authenticated", ->
+          expect(@account._authenticated).toBe true
+          
+        it "should resolve the promise with 'joe@example.com'", ->
           expect(@promise).toBeResolvedWith 'joe@example.com'
+
+        it "should set account.username", ->
+          expect(@account.username).toBe 'joe@example.com'
+          expect(@hoodie.my.config.set).wasCalledWith '_account.username', 'joe@example.com'
+
+        it "should set account.ownerHash", ->
+           expect(@account.ownerHash).toBe 'user_hash'
+           expect(@hoodie.my.config.set).wasCalledWith '_account.ownerHash', 'user_hash'
       
-      _and "account is unauthenticated", ->
+      # {"ok":true,"userCtx":{"name":null,"roles":[]},"info":{"authenticationDb":"_users","authenticationHandlers":["oauth","cookie","default"]}}
+      _when "authentication request is successful and returns `name: null`", ->
         beforeEach ->
-          @account._authenticated = false
+          @requestDefer.resolve userCtx: name: null
+          @account.username = 'joe@example.com'
           @promise = @account.authenticate()
           
-        it "should return a promise", ->
-          expect(@promise).toBePromise()
-
+        it "should set account as unauthenticated", ->
+          expect(@account._authenticated).toBe false
+          
         it "should reject the promise", ->
           expect(@promise).toBeRejected()
           
-      _and "account has not been authenticated yet", ->
+        it "should trigger an `account:error:unauthenticated` event", ->
+          expect(@hoodie.trigger).wasCalledWith 'account:error:unauthenticated'
+          
+      _when "authentication request has an error", ->
         beforeEach ->
-          delete @account._authenticated
+          @requestDefer.reject responseText: 'error data'
+          @promise = @account.authenticate()
         
-        it "should return a promise", ->
-          expect( @account.authenticate() ).toBePromise()
-          
-        it "should send a GET /_session", ->
-          @account.authenticate()
-          expect(@hoodie.request).wasCalled()
-          args = @hoodie.request.mostRecentCall.args
-          expect(args[0]).toBe 'GET'
-          expect(args[1]).toBe '/_session'
-        
-
-        _when "authentication request is successful and returns session info for joe@example.com", ->
-          beforeEach ->
-            spyOn(@hoodie.my.config, "set")
-            @response = userCtx:
-                          name: "user/joe@example.com",
-                          roles: [ "user_hash", "confirmed" ]
-            @requestDefer.resolve @response
-            @promise = @account.authenticate()
-            
-          it "should set account as authenticated", ->
-            expect(@account._authenticated).toBe true
-            
-          it "should resolve the promise with 'joe@example.com'", ->
-            expect(@promise).toBeResolvedWith 'joe@example.com'
-
-          it "should set account.username", ->
-            expect(@account.username).toBe 'joe@example.com'
-            expect(@hoodie.my.config.set).wasCalledWith '_account.username', 'joe@example.com'
-
-          it "should set account.ownerHash", ->
-             expect(@account.ownerHash).toBe 'user_hash'
-             expect(@hoodie.my.config.set).wasCalledWith '_account.ownerHash', 'user_hash'
-        
-        # {"ok":true,"userCtx":{"name":null,"roles":[]},"info":{"authenticationDb":"_users","authenticationHandlers":["oauth","cookie","default"]}}
-        _when "authentication request is successful and returns `name: null`", ->
-          beforeEach ->
-            @requestDefer.resolve userCtx: name: null
-            @account.username = 'joe@example.com'
-            @promise = @account.authenticate()
-            
-          it "should set account as unauthenticated", ->
-            expect(@account._authenticated).toBe false
-            
-          it "should reject the promise", ->
-            expect(@promise).toBeRejected()
-            
-          it "should trigger an `account:error:unauthenticated` event", ->
-            expect(@hoodie.trigger).wasCalledWith 'account:error:unauthenticated'
-            
-        _when "authentication request has an error", ->
-          beforeEach ->
-            @requestDefer.reject responseText: 'error data'
-            @promise = @account.authenticate()
-          
-          it "should reject the promise", ->
-            expect(@promise).toBeRejectedWith error: 'error data'
+        it "should reject the promise", ->
+          expect(@promise).toBeRejectedWith error: 'error data'
   # /.authenticate()
 
 
@@ -258,7 +247,7 @@ describe "Hoodie.Account", ->
 
                 it "should be resolved", ->
                   expect(@promise).toBeRejectedWith error: 'oops'
-            
+
             _when "_users doc could not be updated", ->
               beforeEach ->
                 @requestDefer.reject()
@@ -365,7 +354,6 @@ describe "Hoodie.Account", ->
               reason : 'You stink.'
   # /.signUp(username, password)
 
-  
   describe "#anonymousSignUp()", ->
     beforeEach ->
       @signUpDefer = @hoodie.defer()

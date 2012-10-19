@@ -37,8 +37,8 @@ class Hoodie.Account
   # Use this method to assure that the user is authenticated:
   # `hoodie.my.account.authenticate().done( doSomething ).fail( handleError )`
   authenticate : =>
-    unless @username
-      return @hoodie.defer().reject().promise()
+    # unless @username
+    #   return @hoodie.defer().reject().promise()
       
     if @_authenticated is true
       return @hoodie.defer().resolve(@username).promise()
@@ -200,7 +200,6 @@ class Hoodie.Account
 
     @hoodie.my.remote.disconnect()
     @fetch().pipe @_sendChangePasswordRequest(currentPassword, newPassword), @_handleRequestError
-      
 
 
   # reset password

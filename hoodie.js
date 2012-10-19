@@ -88,11 +88,11 @@ Hoodie = (function(_super) {
       config: 'Config',
       account: 'Account',
       remote: 'AccountRemoteStore'
-    },
-    user: 'User'
+    }
   };
 
   Hoodie.extensions = {
+    user: 'User',
     global: 'Global',
     email: 'Email',
     share: 'Share'
@@ -222,9 +222,6 @@ Hoodie.Account = (function() {
   }
 
   Account.prototype.authenticate = function() {
-    if (!this.username) {
-      return this.hoodie.defer().reject().promise();
-    }
     if (this._authenticated === true) {
       return this.hoodie.defer().resolve(this.username).promise();
     }
