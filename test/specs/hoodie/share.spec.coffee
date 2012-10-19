@@ -4,7 +4,7 @@ describe "Hoodie.Share", ->
     @share  = new Hoodie.Share @hoodie
     spyOn(@share, "instance")
 
-  describe ".constructor", ->
+  describe "constructor", ->
     it "should set Hoodie.ShareInstance.prototype.hoodie", ->
       new Hoodie.Share @hoodie
       instance = new Hoodie.ShareInstance
@@ -15,7 +15,7 @@ describe "Hoodie.Share", ->
       share = new Hoodie.Share @hoodie
       share('funk')
       expect(Hoodie.Share::open).wasCalledWith 'funk'
-  # /.constructor
+  # /constructor
 
   describe "direct call", ->
     beforeEach ->
@@ -28,13 +28,13 @@ describe "Hoodie.Share", ->
        
   # /('share_id', options)
 
-  describe ".instance", ->
+  describe "#instance", ->
     it "should point to Hoodie.ShareInstance", ->
       share  = new Hoodie.Share @hoodie
       expect(share.instance).toBe Hoodie.ShareInstance
-  # /.instance
+  # /#instance
 
-  describe ".create(attributes)", ->
+  describe "#create(attributes)", ->
     beforeEach ->
       @instance      = jasmine.createSpy("instance")
       @instance.save = jasmine.createSpy("save")
@@ -45,9 +45,9 @@ describe "Hoodie.Share", ->
       expect(@share.instance).wasCalledWith funky: 'fresh'
       expect(@instance.save).wasCalled()
       expect(returnValue).toBe @instance
-  # /.create(attributes)
+  # /#create(attributes)
 
-  describe ".find(share_id)", ->
+  describe "#find(share_id)", ->
     beforeEach ->
       promise = @hoodie.defer().resolve(funky: 'fresh').promise()
       spyOn(@hoodie.my.store, "find").andReturn promise
@@ -62,9 +62,9 @@ describe "Hoodie.Share", ->
       @share.instance.andCallFake -> this.foo = 'bar'
       promise = @share.find '123'
       expect(promise).toBeResolvedWith foo: 'bar'
-  # /.find(share_id)
+  # /#find(share_id)
 
-  describe ".findOrCreate(id, share_attributes)", ->
+  describe "#findOrCreate(id, share_attributes)", ->
     beforeEach ->
       spyOn(@hoodie.my.store, "findOrCreate").andCallThrough()
     
@@ -77,9 +77,9 @@ describe "Hoodie.Share", ->
       @share.instance.andCallFake -> this.foo = 'bar'
       promise = @share.findOrCreate 'id123', {}
       expect(promise).toBeResolvedWith foo: 'bar'
-  # /.findOrCreate(share_attributes)
+  # /#findOrCreate(share_attributes)
 
-  describe ".findAll()", ->
+  describe "#findAll()", ->
     beforeEach ->
       spyOn(@hoodie.my.store, "findAll").andCallThrough()
     
@@ -93,9 +93,9 @@ describe "Hoodie.Share", ->
       @share.instance.andCallFake -> this.foo = 'bar'
       promise = @share.findAll()
       expect(promise).toBeResolvedWith [{foo: 'bar'}, {foo: 'bar'}]
-  # /.findAll()
+  # /#findAll()
 
-  describe ".save('share_id', attributes)", ->
+  describe "#save('share_id', attributes)", ->
     beforeEach ->
       spyOn(@hoodie.my.store, "save").andCallThrough()
     
@@ -108,9 +108,9 @@ describe "Hoodie.Share", ->
       @share.instance.andCallFake -> this.foo = 'bar'
       promise = @share.save {}
       expect(promise).toBeResolvedWith foo: 'bar'
-  # /.save('share_id', attributes)
+  # /#save('share_id', attributes)
 
-  describe ".update('share_id', changed_attributes)", ->
+  describe "#update('share_id', changed_attributes)", ->
     beforeEach ->
       spyOn(@hoodie.my.store, "update").andCallThrough()
     
@@ -123,10 +123,10 @@ describe "Hoodie.Share", ->
       @share.instance.andCallFake -> this.foo = 'bar'
       promise = @share.update {}
       expect(promise).toBeResolvedWith foo: 'bar'
-  # /.update('share_id', changed_attributes)
+  # /#update('share_id', changed_attributes)
 
 
-  describe ".updateAll(changed_attributes)", ->
+  describe "#updateAll(changed_attributes)", ->
     beforeEach ->
       spyOn(@hoodie.my.store, "updateAll").andCallThrough()
     
@@ -140,10 +140,10 @@ describe "Hoodie.Share", ->
       @share.instance.andCallFake -> this.foo = 'bar'
       promise = @share.updateAll funky: 'fresh'
       expect(promise).toBeResolvedWith [{foo: 'bar'}, {foo: 'bar'}]
-  # /.findAll()
+  # /#findAll()
 
 
-  describe ".destroy(share_id)", ->
+  describe "#destroy(share_id)", ->
     beforeEach ->
       promise = @hoodie.defer().resolve(funky: 'fresh').promise()
       spyOn(@hoodie.my.store, "find").andReturn promise
@@ -159,10 +159,10 @@ describe "Hoodie.Share", ->
       @hoodie.my.store.find.andReturn @hoodie.defer().resolve({}).promise()
       promise = @share.destroy '123'
       expect(promise).toBeResolvedWith 'delete_promise'
-  # /.destroy(share_id)
+  # /#destroy(share_id)
 
 
-  describe ".destroyAll()", ->
+  describe "#destroyAll()", ->
     beforeEach ->
       promise = @hoodie.defer().resolve([{funky: 'fresh'}, {funky: 'fresh'}]).promise()
       spyOn(@hoodie.my.store, "findAll").andReturn promise
@@ -178,4 +178,4 @@ describe "Hoodie.Share", ->
       @hoodie.my.store.findAll.andReturn @hoodie.defer().resolve([{}, {}]).promise()
       promise = @share.destroyAll()
       expect(promise).toBeResolvedWith ['destroyAll_promise', 'destroyAll_promise']
-  # /.destroyAll()
+  # /#destroyAll()

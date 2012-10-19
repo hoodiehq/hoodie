@@ -6,7 +6,7 @@ describe("Hoodie.Share", function() {
     this.share = new Hoodie.Share(this.hoodie);
     return spyOn(this.share, "instance");
   });
-  describe(".constructor", function() {
+  describe("constructor", function() {
     it("should set Hoodie.ShareInstance.prototype.hoodie", function() {
       var instance;
       new Hoodie.Share(this.hoodie);
@@ -32,14 +32,14 @@ describe("Hoodie.Share", function() {
       return expect(Hoodie.Share.prototype.open).wasCalledWith('funk');
     });
   });
-  describe(".instance", function() {
+  describe("#instance", function() {
     return it("should point to Hoodie.ShareInstance", function() {
       var share;
       share = new Hoodie.Share(this.hoodie);
       return expect(share.instance).toBe(Hoodie.ShareInstance);
     });
   });
-  describe(".create(attributes)", function() {
+  describe("#create(attributes)", function() {
     beforeEach(function() {
       this.instance = jasmine.createSpy("instance");
       this.instance.save = jasmine.createSpy("save");
@@ -57,7 +57,7 @@ describe("Hoodie.Share", function() {
       return expect(returnValue).toBe(this.instance);
     });
   });
-  describe(".find(share_id)", function() {
+  describe("#find(share_id)", function() {
     beforeEach(function() {
       var promise;
       promise = this.hoodie.defer().resolve({
@@ -85,7 +85,7 @@ describe("Hoodie.Share", function() {
       });
     });
   });
-  describe(".findOrCreate(id, share_attributes)", function() {
+  describe("#findOrCreate(id, share_attributes)", function() {
     beforeEach(function() {
       return spyOn(this.hoodie.my.store, "findOrCreate").andCallThrough();
     });
@@ -105,7 +105,7 @@ describe("Hoodie.Share", function() {
       });
     });
   });
-  describe(".findAll()", function() {
+  describe("#findAll()", function() {
     beforeEach(function() {
       return spyOn(this.hoodie.my.store, "findAll").andCallThrough();
     });
@@ -130,7 +130,7 @@ describe("Hoodie.Share", function() {
       ]);
     });
   });
-  describe(".save('share_id', attributes)", function() {
+  describe("#save('share_id', attributes)", function() {
     beforeEach(function() {
       return spyOn(this.hoodie.my.store, "save").andCallThrough();
     });
@@ -154,7 +154,7 @@ describe("Hoodie.Share", function() {
       });
     });
   });
-  describe(".update('share_id', changed_attributes)", function() {
+  describe("#update('share_id', changed_attributes)", function() {
     beforeEach(function() {
       return spyOn(this.hoodie.my.store, "update").andCallThrough();
     });
@@ -178,7 +178,7 @@ describe("Hoodie.Share", function() {
       });
     });
   });
-  describe(".updateAll(changed_attributes)", function() {
+  describe("#updateAll(changed_attributes)", function() {
     beforeEach(function() {
       return spyOn(this.hoodie.my.store, "updateAll").andCallThrough();
     });
@@ -209,7 +209,7 @@ describe("Hoodie.Share", function() {
       ]);
     });
   });
-  describe(".destroy(share_id)", function() {
+  describe("#destroy(share_id)", function() {
     beforeEach(function() {
       var promise;
       promise = this.hoodie.defer().resolve({
@@ -240,7 +240,7 @@ describe("Hoodie.Share", function() {
       return expect(promise).toBeResolvedWith('delete_promise');
     });
   });
-  return describe(".destroyAll()", function() {
+  return describe("#destroyAll()", function() {
     beforeEach(function() {
       var promise;
       promise = this.hoodie.defer().resolve([
