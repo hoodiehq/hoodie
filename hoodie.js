@@ -114,8 +114,6 @@ Hoodie = (function(_super) {
     if (options == null) {
       options = {};
     }
-    console.log("WTF?");
-    console.log("" + type + ", " + path);
     defaults = {
       type: type,
       url: "" + this.baseUrl + path,

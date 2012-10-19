@@ -41,8 +41,6 @@ class Hoodie extends Events
   # use this method to send AJAX request to the Couch.
   #
   request : (type, path, options = {}) ->
-    console.log "WTF?"
-    console.log "#{type}, #{path}"
     defaults =
       type        : type
       url         : "#{@baseUrl}#{path}"
