@@ -114,6 +114,7 @@ class Hoodie.Store
       # now we update all objects one by one and return a promise
       # that will be resolved once all updates have been finished
       defer = @hoodie.defer()
+      objects = [objects] unless $.isArray objects
       _updatePromises = for object in objects
         @update(object.$type, object.id, objectUpdate, options)
       $.when.apply(null, _updatePromises).then defer.resolve

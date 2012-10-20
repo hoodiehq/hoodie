@@ -780,6 +780,9 @@ Hoodie.Store = (function() {
     return promise.pipe(function(objects) {
       var defer, object, _updatePromises;
       defer = _this.hoodie.defer();
+      if (!$.isArray(objects)) {
+        objects = [objects];
+      }
       _updatePromises = (function() {
         var _i, _len, _results;
         _results = [];
