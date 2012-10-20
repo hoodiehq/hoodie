@@ -243,7 +243,7 @@ describe("Hoodie.Store", function() {
       beforeEach(function() {
         return this.hoodie.isPromise.andReturn(true);
       });
-      return it("should update objects returned by promise", function() {
+      it("should update objects returned by promise", function() {
         var obj, promise, _i, _len, _ref, _results;
         promise = this.hoodie.defer().resolve(this.todoObjects).promise();
         spyOn(this.store, "update");
@@ -259,6 +259,18 @@ describe("Hoodie.Store", function() {
           }, {}));
         }
         return _results;
+      });
+      return it("should update object single object returned by promise", function() {
+        var obj, promise;
+        obj = this.todoObjects[0];
+        promise = this.hoodie.defer().resolve(obj).promise();
+        spyOn(this.store, "update");
+        this.store.updateAll(promise, {
+          funky: 'update'
+        });
+        return expect(this.store.update).wasCalledWith(obj.$type, obj.id, {
+          funky: 'update'
+        }, {});
       });
     });
     _when("passed objects is a type (string)", function() {

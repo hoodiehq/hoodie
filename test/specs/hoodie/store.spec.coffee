@@ -163,6 +163,13 @@ describe "Hoodie.Store", ->
         for obj in @todoObjects
           expect(@store.update).wasCalledWith obj.$type, obj.id, {funky: 'update'}, {}
 
+      it "should update object single object returned by promise", ->
+        obj = @todoObjects[0]
+        promise = @hoodie.defer().resolve(obj).promise()
+        spyOn(@store, "update")
+        @store.updateAll promise, {funky: 'update'}
+        expect(@store.update).wasCalledWith obj.$type, obj.id, {funky: 'update'}, {}
+
     _when "passed objects is a type (string)", ->
       beforeEach ->
         findAll_promise = jasmine.createSpy "findAll_promise"
