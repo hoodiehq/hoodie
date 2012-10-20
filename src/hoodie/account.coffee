@@ -25,7 +25,7 @@ class Hoodie.Account
       @hoodie.my.config.set '_account.ownerHash', @ownerHash
     
     # authenticate on next tick
-    # window.setTimeout @authenticate
+    window.setTimeout @authenticate
 
     # is there a pending password reset?
     @_checkPasswordResetStatus()
@@ -105,6 +105,7 @@ class Hoodie.Account
     .pipe(null, @_handleRequestError)
     .done =>
       @hoodie.my.config.set '_account.anonymousPassword', password
+      @trigger 'signup:anonymous', username
 
 
   # hasAccount
@@ -136,8 +137,8 @@ class Hoodie.Account
                 password  : password
 
     @_withPreviousRequestsAborted 'signIn', =>
-      @hoodie.request('POST', '/_session', options)
-      .pipe(@_handleSignInSuccess, @_handleRequestError)
+      promise = @hoodie.request('POST', '/_session', options)
+      promise.pipe(@_handleSignInSuccess, @_handleRequestError)
 
   # alias
   login: @::signIn
@@ -167,6 +168,13 @@ class Hoodie.Account
   on : (event, cb) -> 
     event = event.replace /(^| )([^ ]+)/g, "$1account:$2"
     @hoodie.on event, cb
+
+  # Trigger
+  # ---
+
+  # alias for `hoodie.trigger`
+  trigger : (event, parameters...) -> 
+    @hoodie.trigger "account:#{event}", parameters...
   
   
   # db
@@ -301,7 +309,7 @@ class Hoodie.Account
 
     else
       @_authenticated = false
-      @hoodie.trigger 'account:error:unauthenticated'
+      @trigger 'error:unauthenticated'
       defer.reject()
 
     return defer.promise()
@@ -331,7 +339,7 @@ class Hoodie.Account
     defer = @hoodie.defer()
 
     (response) =>
-      @hoodie.trigger 'account:signup', username
+      @trigger 'signup', username
       @_doc._rev = response.rev
       @_delayedSignIn(username, password)
 
@@ -392,7 +400,11 @@ class Hoodie.Account
     @_authenticated = true
     @_setUsername username
     @_setOwner    response.roles[0]
-    @hoodie.trigger 'account:signin', @username
+
+    if @hasAnonymousAccount()
+      @trigger 'signin:anonymous', username
+    else
+      @trigger 'signin', username
 
     @fetch()
     defer.resolve(@username, response.roles[0])
@@ -432,7 +444,7 @@ class Hoodie.Account
           window.setTimeout @_checkPasswordResetStatus, 1000
           return
 
-        @hoodie.trigger 'account:password_reset:error'
+        @trigger 'password_reset:error'
 
   # 
   # If the request was successful there might have occured an
@@ -458,7 +470,7 @@ class Hoodie.Account
   _handlePasswordResetStatusRequestError : (xhr) =>
     if xhr.status is 401
       @hoodie.my.config.remove '_account.resetPasswordId'
-      @hoodie.trigger 'account:passwordreset'
+      @trigger 'passwordreset'
 
       return @hoodie.defer().resolve()
 
@@ -484,6 +496,7 @@ class Hoodie.Account
     currentPassword = @hoodie.my.config.get '_account.anonymousPassword'
     @_changeUsernameAndPassword(currentPassword, username, password)
     .done => 
+      @trigger 'signup', username
       @hoodie.my.config.remove '_account.anonymousPassword'
 
   #
@@ -505,7 +518,7 @@ class Hoodie.Account
     delete @_authenticated
 
     @hoodie.my.config.clear()
-    @hoodie.trigger 'account:signout'
+    @trigger 'signout'
 
     @ownerHash = @hoodie.my.store.uuid()
     @hoodie.my.config.set '_account.ownerHash', @ownerHash

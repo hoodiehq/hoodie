@@ -57,7 +57,7 @@ describe "Hoodie.Account", ->
          account = new Hoodie.Account @hoodie
          expect(account.hoodie.my.config.set).wasCalledWith '_account.ownerHash', 'new_generated_owner_hash'
 
-    xit "should authenticate on next tick", ->
+    it "should authenticate on next tick", ->
       account = new Hoodie.Account @hoodie
       expect(window.setTimeout).wasCalledWith account.authenticate
       
@@ -390,92 +390,109 @@ describe "Hoodie.Account", ->
 
   describe "#signIn(username, password)", ->
     beforeEach ->
-      @account.signIn('joe@example.com', 'secret')
-      [@type, @path, @options] = @hoodie.request.mostRecentCall.args
-  
-    it "should send a POST request to http://my.cou.ch/_session", ->
-      expect(@hoodie.request).wasCalled()
-      expect(@type).toBe 'POST'
-      expect(@path).toBe  '/_session'
-    
-    it "should send username as name parameter", ->
-      expect(@options.data.name).toBe 'user/joe@example.com'
-  
-    it "should send password", ->
-      expect(@options.data.password).toBe 'secret'
 
-    it "should allow to sign in without password", ->
-      @account._requests = {}
-      @account.signIn('joe@example.com')
-      [@type, @path, @options] = @hoodie.request.mostRecentCall.args
-      data = @options.data
-      expect(data.password).toBe ''
-      
-    _when "signIn successful", ->
-      _and "account is confirmed", ->
-        beforeEach ->
-          @response = {"ok":true,"name":"user/joe@example.com","roles":["user_hash","confirmed"]}
-          @requestDefer.resolve @response
-          spyOn(@hoodie.my.config, "set")
-        
-        it "should trigger `account:signin` event", ->
-          @account.signIn('joe@example.com', 'secret')
-          expect(@hoodie.trigger).wasCalledWith 'account:signin', 'joe@example.com'
-        
-        it "should set @username", ->
-           @account.signIn('joe@example.com', 'secret')
-           expect(@account.username).toBe 'joe@example.com'
-           expect(@hoodie.my.config.set).wasCalledWith '_account.username', 'joe@example.com'
-
-        it "should set @ownerHash", ->
-           @account.signIn('joe@example.com', 'secret')
-           expect(@account.ownerHash).toBe 'user_hash'
-           expect(@hoodie.my.config.set).wasCalledWith '_account.ownerHash', 'user_hash'
-
-        it "should fetch the _users doc", ->
-          spyOn(@account, "fetch")
-          @account.signIn('joe@example.com', 'secret')
-          expect(@account.fetch).wasCalled()
-
-        it "should resolve with username and response", ->
-          expect(@account.signIn('joe@example.com', 'secret')).toBeResolvedWith 'joe@example.com', 'user_hash'
-
-      _and "account not (yet) confirmed", ->
-        beforeEach ->
-          @response = {"ok":true,"name":"user/joe@example.com","roles":[]}
-          @requestDefer.resolve @response
-
-        it "should reject with unconfirmed error.", ->
-          promise = @account.signIn('joe@example.com', 'secret')
-          expect(promise).toBeRejectedWith error: "unconfirmed", reason: "account has not been confirmed yet"
-
-      _and "account has an error", ->
-        beforeEach ->
-          @response = {"ok":true,"name":"user/joe@example.com","roles":['error']}
-          @requestDefer.resolve @response 
-          spyOn(@account, "fetch").andCallFake =>
-            @account._doc.$error = 'because you stink!'
-            return @hoodie.defer().resolve()
-
-        it "should fetch user doc without setting @username", ->
-          @account.signIn('joe@example.com', 'secret')
-          expect(@account.fetch).wasCalledWith 'joe@example.com'
-          expect(@account.username).toBeUndefined()
-
-        it "should reject with the reason", ->
-          expect(@account.signIn('joe@example.com', 'secret')).toBeRejectedWith 
-            error: 'error'
-            reason: 'because you stink!'
-
-    _when "signIn not succesful because unauthorized", ->
+    _when "sign in with password", ->
       beforeEach ->
-        @response = responseText: """{"error":"unauthorized","reason":"Name or password is incorrect."}"""
-        @requestDefer.reject @response
+        @account.signIn('joe@example.com', 'secret')
+        [@type, @path, @options] = @hoodie.request.mostRecentCall.args
+      
+      it "should send a POST request to http://my.cou.ch/_session", ->
+        expect(@hoodie.request).wasCalled()
+        expect(@type).toBe 'POST'
+        expect(@path).toBe  '/_session'
+      
+      it "should send username as name parameter", ->
+        expect(@options.data.name).toBe 'user/joe@example.com'
+      
+      it "should send password", ->
+        expect(@options.data.password).toBe 'secret'
 
-      it "should be rejected with unauthorized error", ->
-        expect(@account.signIn('joe@example.com', 'secret')).toBeRejectedWith
-          error:"unauthorized"
-          reason:"Name or password is incorrect."
+      _and "signIn successful", ->
+        _and "account is confirmed", ->
+          beforeEach ->
+            @response = {"ok":true,"name":"user/joe@example.com","roles":["user_hash","confirmed"]}
+            @requestDefer.resolve @response
+            spyOn(@hoodie.my.config, "set")
+          
+          _and "user has an anonyomous account", ->
+            beforeEach ->
+              spyOn(@account, "hasAnonymousAccount").andReturn true
+            
+            it "should trigger `account:signin:anonymous` event", ->
+              @account.signIn('joe@example.com', 'secret')
+              expect(@hoodie.trigger).wasCalledWith 'account:signin:anonymous', 'joe@example.com'
+
+          _and "user has a manual account", ->
+            beforeEach ->
+              spyOn(@account, "hasAnonymousAccount").andReturn false
+            
+            it "should trigger `account:signin` event", ->
+              @account.signIn('joe@example.com', 'secret')
+              expect(@hoodie.trigger).wasCalledWith 'account:signin', 'joe@example.com'
+          
+          it "should set @username", ->
+             @account.signIn('joe@example.com', 'secret')
+             expect(@account.username).toBe 'joe@example.com'
+             expect(@hoodie.my.config.set).wasCalledWith '_account.username', 'joe@example.com'
+
+          it "should set @ownerHash", ->
+             @account.signIn('joe@example.com', 'secret')
+             expect(@account.ownerHash).toBe 'user_hash'
+             expect(@hoodie.my.config.set).wasCalledWith '_account.ownerHash', 'user_hash'
+
+          it "should fetch the _users doc", ->
+            spyOn(@account, "fetch")
+            @account.signIn('joe@example.com', 'secret')
+            expect(@account.fetch).wasCalled()
+
+          it "should resolve with username and response", ->
+            expect(@account.signIn('joe@example.com', 'secret')).toBeResolvedWith 'joe@example.com', 'user_hash'
+
+        _and "account not (yet) confirmed", ->
+          beforeEach ->
+            @response = {"ok":true,"name":"user/joe@example.com","roles":[]}
+            @requestDefer.resolve @response
+
+          it "should reject with unconfirmed error.", ->
+            promise = @account.signIn('joe@example.com', 'secret')
+            expect(promise).toBeRejectedWith error: "unconfirmed", reason: "account has not been confirmed yet"
+
+        _and "account has an error", ->
+          beforeEach ->
+            @response = {"ok":true,"name":"user/joe@example.com","roles":['error']}
+            @requestDefer.resolve @response 
+            spyOn(@account, "fetch").andCallFake =>
+              @account._doc.$error = 'because you stink!'
+              return @hoodie.defer().resolve()
+
+          it "should fetch user doc without setting @username", ->
+            @account.signIn('joe@example.com', 'secret')
+            expect(@account.fetch).wasCalledWith 'joe@example.com'
+            expect(@account.username).toBeUndefined()
+
+          it "should reject with the reason", ->
+            expect(@account.signIn('joe@example.com', 'secret')).toBeRejectedWith 
+              error: 'error'
+              reason: 'because you stink!'
+
+      _and "signIn not succesful because unauthorized", ->
+        beforeEach ->
+          @response = responseText: """{"error":"unauthorized","reason":"Name or password is incorrect."}"""
+          @requestDefer.reject @response
+
+        it "should be rejected with unauthorized error", ->
+          expect(@account.signIn('joe@example.com', 'secret')).toBeRejectedWith
+            error:"unauthorized"
+            reason:"Name or password is incorrect."
+    # /sign in request
+
+    _when "sign in without password", ->
+      it "should set password to empty string", ->
+        @account._requests = {}
+        @account.signIn('joe@example.com')
+        [type, path, options] = @hoodie.request.mostRecentCall.args
+        data = options.data
+        expect(data.password).toBe ''
   # /.signIn(username, password)
 
 
