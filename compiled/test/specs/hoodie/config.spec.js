@@ -19,11 +19,11 @@ describe("Hoodie.Config", function() {
   });
   describe(".set(key, value)", function() {
     beforeEach(function() {
-      return spyOn(this.hoodie.my.store, "update");
+      return spyOn(this.hoodie.store, "update");
     });
     it("should save a $config with key: value", function() {
       this.config.set('funky', 'fresh');
-      return expect(this.hoodie.my.store.update).wasCalledWith('$config', 'hoodie', {
+      return expect(this.hoodie.store.update).wasCalledWith('$config', 'hoodie', {
         funky: 'fresh'
       }, {
         silent: false
@@ -31,7 +31,7 @@ describe("Hoodie.Config", function() {
     });
     return it("should make the save silent for local settings starting with _", function() {
       this.config.set('_local', 'fresh');
-      return expect(this.hoodie.my.store.update).wasCalledWith('$config', 'hoodie', {
+      return expect(this.hoodie.store.update).wasCalledWith('$config', 'hoodie', {
         _local: 'fresh'
       }, {
         silent: true
@@ -40,7 +40,7 @@ describe("Hoodie.Config", function() {
   });
   describe(".get(key)", function() {
     beforeEach(function() {
-      spyOn(this.hoodie.my.store, "find").andReturn(this.hoodie.defer().resolve({
+      spyOn(this.hoodie.store, "find").andReturn(this.hoodie.defer().resolve({
         funky: 'fresh'
       }));
       return this.config = new Hoodie.Config(this.hoodie);
@@ -51,11 +51,11 @@ describe("Hoodie.Config", function() {
   });
   return describe(".remove(key)", function() {
     beforeEach(function() {
-      return spyOn(this.hoodie.my.store, "update").andReturn('promise');
+      return spyOn(this.hoodie.store, "update").andReturn('promise');
     });
     return it("should remove the config using store", function() {
       this.config.remove('funky');
-      return expect(this.hoodie.my.store.update).wasCalledWith('$config', 'hoodie', {
+      return expect(this.hoodie.store.update).wasCalledWith('$config', 'hoodie', {
         funky: void 0
       }, {
         silent: false

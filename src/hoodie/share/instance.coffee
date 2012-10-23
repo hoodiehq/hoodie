@@ -94,8 +94,8 @@ class Hoodie.ShareInstance extends Hoodie.RemoteStore
   # an account, we do an anonymous signUp.
   save : (update = {}, options) ->
     
-    unless @hoodie.my.account.hasAccount()
-      @hoodie.my.account.anonymousSignUp()
+    unless @hoodie.account.hasAccount()
+      @hoodie.account.anonymousSignUp()
 
     @set(update) if update
     _handleUpdate = (properties, wasCreated) => 
@@ -105,7 +105,7 @@ class Hoodie.ShareInstance extends Hoodie.RemoteStore
       return this
 
     # persist memory to store
-    @hoodie.my.store.update("$share", @id, @_memory, options)
+    @hoodie.store.update("$share", @id, @_memory, options)
     .pipe(_handleUpdate)
     
   
@@ -120,7 +120,7 @@ class Hoodie.ShareInstance extends Hoodie.RemoteStore
   # share.add(todoObject)
   # share.add([todoObject1, todoObject2, todoObject3])
   # share.add([todoObject1, todoObject2, todoObject3], ["name", "city"])
-  # share.add( hoodie.my.store.findAll (obj) -> obj.isShared )
+  # share.add( hoodie.store.findAll (obj) -> obj.isShared )
   add : (objects, sharedAttributes = true) ->
     @toggle objects, sharedAttributes
     
@@ -135,7 +135,7 @@ class Hoodie.ShareInstance extends Hoodie.RemoteStore
   #
   # share.remove(todoObject)
   # share.remove([todoObject1, todoObject2, todoObject3])
-  # share.remove( hoodie.my.store.findAll (obj) -> obj.isShared )
+  # share.remove( hoodie.store.findAll (obj) -> obj.isShared )
   remove : (objects) -> 
     @toggle objects, false
   
@@ -156,7 +156,7 @@ class Hoodie.ShareInstance extends Hoodie.RemoteStore
       when false      then @_remove
       else @_add(filter)
     
-    @hoodie.my.store.updateAll(objects, updateMethod)
+    @hoodie.store.updateAll(objects, updateMethod)
     
   
   # sync
@@ -170,7 +170,7 @@ class Hoodie.ShareInstance extends Hoodie.RemoteStore
   sync : =>
     @save()
     .pipe(@findAllObjects)
-    .pipe(@hoodie.my.remote.sync)
+    .pipe(@hoodie.remote.sync)
 
 
   # destroy
@@ -180,7 +180,7 @@ class Hoodie.ShareInstance extends Hoodie.RemoteStore
   destroy : =>
     @remove( @findAllObjects() )
     .then =>
-      @hoodie.my.store.destroy("$share", @id)
+      @hoodie.store.destroy("$share", @id)
     
   
   # findAllObjects
@@ -188,7 +188,7 @@ class Hoodie.ShareInstance extends Hoodie.RemoteStore
 
   #
   findAllObjects : =>
-    @hoodie.my.store.findAll(@_isMySharedObjectAndChanged)
+    @hoodie.store.findAll(@_isMySharedObjectAndChanged)
 
 
   # Private
@@ -240,7 +240,7 @@ class Hoodie.ShareInstance extends Hoodie.RemoteStore
   # or its $shares hash has share.id as key
   _isMySharedObjectAndChanged : (obj) =>
     belongsToMe = obj.id is @id or obj.$shares?[@id]?
-    return belongsToMe and @hoodie.my.store.isDirty(obj.$type, obj.id)
+    return belongsToMe and @hoodie.store.isDirty(obj.$type, obj.id)
 
   #
   _handleRemoteChanges : ->

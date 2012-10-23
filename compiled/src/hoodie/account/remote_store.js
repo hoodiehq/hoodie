@@ -31,16 +31,16 @@ Hoodie.AccountRemoteStore = (function(_super) {
 
     this.connect = __bind(this.connect, this);
 
-    this.name = this.hoodie.my.account.db();
-    if (this.hoodie.my.config.get('_remote.sync') != null) {
-      this._sync = this.hoodie.my.config.get('_remote.sync');
+    this.name = this.hoodie.account.db();
+    if (this.hoodie.config.get('_remote.sync') != null) {
+      this._sync = this.hoodie.config.get('_remote.sync');
     }
     AccountRemoteStore.__super__.constructor.apply(this, arguments);
   }
 
   AccountRemoteStore.prototype.connect = function() {
     var _this = this;
-    return this.hoodie.my.account.authenticate().pipe(function() {
+    return this.hoodie.account.authenticate().pipe(function() {
       return AccountRemoteStore.__super__.connect.apply(_this, arguments);
     });
   };
@@ -51,14 +51,14 @@ Hoodie.AccountRemoteStore = (function(_super) {
   };
 
   AccountRemoteStore.prototype.startSyncing = function() {
-    this.hoodie.my.config.set('_remote.sync', true);
+    this.hoodie.config.set('_remote.sync', true);
     this.hoodie.on('account:signin', this._handleSignIn);
     this.hoodie.on('account:signout', this.disconnect);
     return AccountRemoteStore.__super__.startSyncing.apply(this, arguments);
   };
 
   AccountRemoteStore.prototype.stopSyncing = function() {
-    this.hoodie.my.config.set('_remote.sync', false);
+    this.hoodie.config.set('_remote.sync', false);
     this.hoodie.unbind('account:signin', this._handleSignIn);
     this.hoodie.unbind('account:signout', this.disconnect);
     return AccountRemoteStore.__super__.stopSyncing.apply(this, arguments);
@@ -73,17 +73,17 @@ Hoodie.AccountRemoteStore = (function(_super) {
   };
 
   AccountRemoteStore.prototype.getSinceNr = function(since) {
-    return this.hoodie.my.config.get('_remote.since') || 0;
+    return this.hoodie.config.get('_remote.since') || 0;
   };
 
   AccountRemoteStore.prototype.setSinceNr = function(since) {
-    return this.hoodie.my.config.set('_remote.since', since);
+    return this.hoodie.config.set('_remote.since', since);
   };
 
   AccountRemoteStore.prototype.push = function(docs) {
     var promise;
     if (!$.isArray(docs)) {
-      docs = this.hoodie.my.store.changedDocs();
+      docs = this.hoodie.store.changedDocs();
     }
     return promise = AccountRemoteStore.__super__.push.call(this, docs);
   };
@@ -105,7 +105,7 @@ Hoodie.AccountRemoteStore = (function(_super) {
   };
 
   AccountRemoteStore.prototype._handleSignIn = function() {
-    this.name = this.hoodie.my.account.db();
+    this.name = this.hoodie.account.db();
     return this.connect();
   };
 
@@ -122,7 +122,7 @@ Hoodie.AccountRemoteStore = (function(_super) {
         options = {
           remote: true
         };
-        _results.push(_this.hoodie.my.store.update(doc.$type, doc.id, update, options));
+        _results.push(_this.hoodie.store.update(doc.$type, doc.id, update, options));
       }
       return _results;
     };
@@ -138,13 +138,13 @@ Hoodie.AccountRemoteStore = (function(_super) {
       doc = this._parseFromRemote(doc);
       if (doc._deleted) {
         _destroyedDocs.push([
-          doc, this.hoodie.my.store.destroy(doc.$type, doc.id, {
+          doc, this.hoodie.store.destroy(doc.$type, doc.id, {
             remote: true
           })
         ]);
       } else {
         _changedDocs.push([
-          doc, this.hoodie.my.store.save(doc.$type, doc.id, doc, {
+          doc, this.hoodie.store.save(doc.$type, doc.id, doc, {
             remote: true
           })
         ]);

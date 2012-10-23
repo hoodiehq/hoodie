@@ -59,8 +59,8 @@ class Hoodie.Store
   #
   # example usage
   #
-  # hoodie.my.store.update('car', 'abc4567', {sold: true})
-  # hoodie.my.store.update('car', 'abc4567', function(obj) { obj.sold = true })
+  # hoodie.store.update('car', 'abc4567', {sold: true})
+  # hoodie.store.update('car', 'abc4567', function(obj) { obj.sold = true })
   update : (type, id, objectUpdate, options) ->
     defer = @hoodie.defer()
     
@@ -96,7 +96,7 @@ class Hoodie.Store
   #
   # example usage
   #
-  # hoodie.my.store.updateAll()
+  # hoodie.store.updateAll()
   updateAll : (filterOrObjects, objectUpdate, options = {}) ->
     
     # normalize the input: make sure we have all objects

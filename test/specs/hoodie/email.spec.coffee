@@ -28,7 +28,7 @@ describe "Hoodie.Email", ->
         to      : 'jim@be.am'
         subject : 'subject'
         body    : 'body'
-      (spyOn @hoodie.my.store, "create").andReturn
+      (spyOn @hoodie.store, "create").andReturn
         then: (cb) -> cb $.extend {}, @emailAttributes, id: 'abc4567'
     
     it "should reject the promise", ->
@@ -36,13 +36,13 @@ describe "Hoodie.Email", ->
       
     it "should save the email as object with type: $email", ->
       @email.send(@emailAttributes)
-      (expect @hoodie.my.store.create).wasCalledWith('$email', @emailAttributes)
+      (expect @hoodie.store.create).wasCalledWith('$email', @emailAttributes)
       
     it "should listen to server response", ->
-      spyOn @hoodie.my.remote, "one"
+      spyOn @hoodie.remote, "one"
       @email.send(@emailAttributes)
-      expect(@hoodie.my.remote.one).wasCalled()
-      expect(@hoodie.my.remote.one.mostRecentCall.args[0]).toEqual "updated:$email:abc4567"
+      expect(@hoodie.remote.one).wasCalled()
+      expect(@hoodie.remote.one.mostRecentCall.args[0]).toEqual "updated:$email:abc4567"
     
     _when "email.to is not provided", ->
       beforeEach ->
@@ -65,7 +65,7 @@ describe "Hoodie.Email", ->
     _when "sending email was successful", ->
       beforeEach ->
         @emailResponseAttributes = $.extend {}, @emailAttributes, id: 'abc4567', deliveredAt: "2012-05-05 15:00 UTC"
-        (spyOn @hoodie.my.remote, "one").andCallFake (event, cb) =>
+        (spyOn @hoodie.remote, "one").andCallFake (event, cb) =>
           cb @emailResponseAttributes
         @promise = @email.send(@emailAttributes)
         
@@ -76,7 +76,7 @@ describe "Hoodie.Email", ->
     _when "sending email had an error", ->
       beforeEach ->
         @emailResponseAttributes = $.extend {}, @emailAttributes, id: 'abc4567', error: "U SPAM!"
-        (spyOn @hoodie.my.remote, "one").andCallFake (event, cb) =>
+        (spyOn @hoodie.remote, "one").andCallFake (event, cb) =>
           cb @emailResponseAttributes
         @promise = @email.send(@emailAttributes)
         

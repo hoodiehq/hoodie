@@ -36,11 +36,11 @@ Hoodie.Account = (function() {
 
     this.authenticate = __bind(this.authenticate, this);
 
-    this.username = this.hoodie.my.config.get('_account.username');
-    this.ownerHash = this.hoodie.my.config.get('_account.ownerHash');
+    this.username = this.hoodie.config.get('_account.username');
+    this.ownerHash = this.hoodie.config.get('_account.ownerHash');
     if (!this.ownerHash) {
       this.ownerHash = this.hoodie.uuid();
-      this.hoodie.my.config.set('_account.ownerHash', this.ownerHash);
+      this.hoodie.config.set('_account.ownerHash', this.ownerHash);
     }
     window.setTimeout(this.authenticate);
     this._checkPasswordResetStatus();
@@ -99,7 +99,7 @@ Hoodie.Account = (function() {
     password = this.hoodie.uuid(10);
     username = this.ownerHash;
     return this.signUp(username, password).pipe(null, this._handleRequestError).done(function() {
-      _this.hoodie.my.config.set('_account.anonymousPassword', password);
+      _this.hoodie.config.set('_account.anonymousPassword', password);
       return _this.trigger('signup:anonymous', username);
     });
   };
@@ -109,7 +109,7 @@ Hoodie.Account = (function() {
   };
 
   Account.prototype.hasAnonymousAccount = function() {
-    return this.hoodie.my.config.get('_account.anonymousPassword') != null;
+    return this.hoodie.config.get('_account.anonymousPassword') != null;
   };
 
   Account.prototype.signIn = function(username, password) {
@@ -143,7 +143,7 @@ Hoodie.Account = (function() {
       this._cleanup();
       return;
     }
-    this.hoodie.my.remote.disconnect();
+    this.hoodie.remote.disconnect();
     return this._sendSignOutRequest().pipe(this._cleanup);
   };
 
@@ -189,18 +189,18 @@ Hoodie.Account = (function() {
         reason: "not logged in"
       }).promise();
     }
-    this.hoodie.my.remote.disconnect();
+    this.hoodie.remote.disconnect();
     return this.fetch().pipe(this._sendChangeUsernameAndPasswordRequest(currentPassword, null, newPassword), this._handleRequestError);
   };
 
   Account.prototype.resetPassword = function(username) {
     var data, key, options, resetPasswordId,
       _this = this;
-    if (resetPasswordId = this.hoodie.my.config.get('_account.resetPasswordId')) {
+    if (resetPasswordId = this.hoodie.config.get('_account.resetPasswordId')) {
       return this._checkPasswordResetStatus();
     }
     resetPasswordId = "" + username + "/" + (this.hoodie.uuid());
-    this.hoodie.my.config.set('_account.resetPasswordId', resetPasswordId);
+    this.hoodie.config.set('_account.resetPasswordId', resetPasswordId);
     key = "" + this._prefix + ":$passwordReset/" + resetPasswordId;
     data = {
       _id: key,
@@ -240,12 +240,12 @@ Hoodie.Account = (function() {
 
   Account.prototype._setUsername = function(username) {
     this.username = username;
-    return this.hoodie.my.config.set('_account.username', this.username);
+    return this.hoodie.config.set('_account.username', this.username);
   };
 
   Account.prototype._setOwner = function(ownerHash) {
     this.ownerHash = ownerHash;
-    return this.hoodie.my.config.set('_account.ownerHash', this.ownerHash);
+    return this.hoodie.config.set('_account.ownerHash', this.ownerHash);
   };
 
   Account.prototype._handleAuthenticateSuccess = function(response) {
@@ -344,7 +344,7 @@ Hoodie.Account = (function() {
   Account.prototype._checkPasswordResetStatus = function() {
     var hash, options, resetPasswordId, url, username,
       _this = this;
-    resetPasswordId = this.hoodie.my.config.get('_account.resetPasswordId');
+    resetPasswordId = this.hoodie.config.get('_account.resetPasswordId');
     if (!resetPasswordId) {
       return this.hoodie.defer().reject({
         error: "missing"
@@ -384,7 +384,7 @@ Hoodie.Account = (function() {
 
   Account.prototype._handlePasswordResetStatusRequestError = function(xhr) {
     if (xhr.status === 401) {
-      this.hoodie.my.config.remove('_account.resetPasswordId');
+      this.hoodie.config.remove('_account.resetPasswordId');
       this.trigger('passwordreset');
       return this.hoodie.defer().resolve();
     } else {
@@ -402,16 +402,16 @@ Hoodie.Account = (function() {
   Account.prototype._upgradeAnonymousAccount = function(username, password) {
     var currentPassword,
       _this = this;
-    currentPassword = this.hoodie.my.config.get('_account.anonymousPassword');
+    currentPassword = this.hoodie.config.get('_account.anonymousPassword');
     return this._changeUsernameAndPassword(currentPassword, username, password).done(function() {
       _this.trigger('signup', username);
-      return _this.hoodie.my.config.remove('_account.anonymousPassword');
+      return _this.hoodie.config.remove('_account.anonymousPassword');
     });
   };
 
   Account.prototype._handleFetchBeforeDestroySucces = function() {
     var _this = this;
-    this.hoodie.my.remote.disconnect();
+    this.hoodie.remote.disconnect();
     this._doc._deleted = true;
     return this._withPreviousRequestsAborted('updateUsersDoc', function() {
       return _this.hoodie.request('PUT', _this._url(), {
@@ -424,10 +424,10 @@ Hoodie.Account = (function() {
   Account.prototype._cleanup = function() {
     delete this.username;
     delete this._authenticated;
-    this.hoodie.my.config.clear();
+    this.hoodie.config.clear();
     this.trigger('signout');
     this.ownerHash = this.hoodie.uuid();
-    return this.hoodie.my.config.set('_account.ownerHash', this.ownerHash);
+    return this.hoodie.config.set('_account.ownerHash', this.ownerHash);
   };
 
   Account.prototype._userKey = function(username) {
@@ -475,7 +475,7 @@ Hoodie.Account = (function() {
   Account.prototype._handleChangeUsernameAndPasswordRequest = function(newUsername, newPassword) {
     var _this = this;
     return function() {
-      _this.hoodie.my.remote.disconnect();
+      _this.hoodie.remote.disconnect();
       if (newUsername) {
         return _this._delayedSignIn(newUsername, newPassword);
       } else {

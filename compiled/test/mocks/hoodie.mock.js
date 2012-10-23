@@ -24,70 +24,68 @@ Mocks.Hoodie = function() {
     uuid: function() {
       return 'uuid';
     },
-    my: {
-      store: {
-        create: function() {
-          return promiseMock;
-        },
-        destroy: function() {
-          return promiseMock;
-        },
-        save: function() {
-          return promiseMock;
-        },
-        update: function() {
-          return promiseMock;
-        },
-        updateAll: function() {
-          return promiseMock;
-        },
-        find: function() {
-          return promiseMock;
-        },
-        findAll: function() {
-          return promiseMock;
-        },
-        findOrCreate: function() {
-          return promiseMock;
-        },
-        "delete": function() {
-          return promiseMock;
-        },
-        destroyAll: function() {
-          return promiseMock;
-        },
-        changedDocs: function() {},
-        isDirty: function() {},
-        db: {
-          getItem: function() {},
-          setItem: function() {},
-          removeItem: function() {}
-        }
+    store: {
+      create: function() {
+        return promiseMock;
       },
-      account: {
-        authenticate: function() {
-          return promiseMock;
-        },
-        db: function() {},
-        on: function() {},
-        ownerHash: 'owner_hash',
-        hasAccount: function() {},
-        anonymousSignUp: function() {}
+      destroy: function() {
+        return promiseMock;
       },
-      config: {
-        set: function() {},
-        get: function() {},
-        remove: function() {},
-        clear: function() {}
+      save: function() {
+        return promiseMock;
       },
-      remote: {
-        connect: function() {},
-        disconnect: function() {},
-        sync: function() {},
-        on: function() {},
-        one: function() {},
-        trigger: function() {}
+      update: function() {
+        return promiseMock;
+      },
+      updateAll: function() {
+        return promiseMock;
+      },
+      find: function() {
+        return promiseMock;
+      },
+      findAll: function() {
+        return promiseMock;
+      },
+      findOrCreate: function() {
+        return promiseMock;
+      },
+      "delete": function() {
+        return promiseMock;
+      },
+      destroyAll: function() {
+        return promiseMock;
+      },
+      changedDocs: function() {},
+      isDirty: function() {},
+      db: {
+        getItem: function() {},
+        setItem: function() {},
+        removeItem: function() {}
       }
+    },
+    account: {
+      authenticate: function() {
+        return promiseMock;
+      },
+      db: function() {},
+      on: function() {},
+      ownerHash: 'owner_hash',
+      hasAccount: function() {},
+      anonymousSignUp: function() {}
+    },
+    config: {
+      set: function() {},
+      get: function() {},
+      remove: function() {},
+      clear: function() {}
+    },
+    remote: {
+      connect: function() {},
+      disconnect: function() {},
+      sync: function() {},
+      on: function() {},
+      one: function() {},
+      trigger: function() {}
     }
   };
 };

@@ -7,5 +7,6 @@ stores</p>
 </code></pre></div></div><div class="code"><div class="wrapper"><span class="k">class</span> <span class="nx">Hoodie</span><span class="p">.</span><span class="nx">User</span>
 
   <span class="nv">constructor: </span><span class="nf">(@hoodie) -&gt;</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>vanilla API syntax:
-hoodie.user('uuid1234').findAll()</p></div></div><div class="code"><div class="wrapper">    <span class="k">return</span> <span class="p">(</span><span class="nx">userHash</span><span class="p">)</span> <span class="o">=&gt;</span> 
-      <span class="nx">@hoodie</span><span class="p">.</span><span class="nx">open</span> <span class="s2">&quot;user/#{userHash}/public&quot;</span></div></div></div></div></body></html>
+hoodie.user('uuid1234').findAll()</p></div></div><div class="code"><div class="wrapper">    <span class="k">return</span> <span class="p">(</span><span class="nx">userHash</span><span class="p">,</span> <span class="nv">options = </span><span class="p">{})</span> <span class="o">=&gt;</span> 
+      <span class="nx">$</span><span class="p">.</span><span class="nx">extend</span> <span class="nx">options</span><span class="p">,</span> <span class="nv">prefix: </span><span class="s1">&#39;$public&#39;</span>
+      <span class="nx">@hoodie</span><span class="p">.</span><span class="nx">open</span> <span class="s2">&quot;user/#{userHash}/public&quot;</span><span class="p">,</span> <span class="nx">options</span></div></div></div></div></body></html>

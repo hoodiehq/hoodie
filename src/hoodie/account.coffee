@@ -15,14 +15,14 @@ class Hoodie.Account
   constructor : (@hoodie) ->
     
     # handle session
-    @username   = @hoodie.my.config.get '_account.username'
-    @ownerHash  = @hoodie.my.config.get '_account.ownerHash'
+    @username   = @hoodie.config.get '_account.username'
+    @ownerHash  = @hoodie.config.get '_account.ownerHash'
 
     # the ownerHash gets stored in every object created by the user.
     # Make sure we have one.
     unless @ownerHash
       @ownerHash = @hoodie.uuid()
-      @hoodie.my.config.set '_account.ownerHash', @ownerHash
+      @hoodie.config.set '_account.ownerHash', @ownerHash
     
     # authenticate on next tick
     window.setTimeout @authenticate
@@ -35,7 +35,7 @@ class Hoodie.Account
   # --------------
 
   # Use this method to assure that the user is authenticated:
-  # `hoodie.my.account.authenticate().done( doSomething ).fail( handleError )`
+  # `hoodie.account.authenticate().done( doSomething ).fail( handleError )`
   authenticate : =>
     unless @username
       @_sendSignOutRequest()
@@ -104,7 +104,7 @@ class Hoodie.Account
     @signUp(username, password)
     .pipe(null, @_handleRequestError)
     .done =>
-      @hoodie.my.config.set '_account.anonymousPassword', password
+      @hoodie.config.set '_account.anonymousPassword', password
       @trigger 'signup:anonymous', username
 
 
@@ -121,7 +121,7 @@ class Hoodie.Account
   
   #
   hasAnonymousAccount : ->
-    @hoodie.my.config.get('_account.anonymousPassword')?
+    @hoodie.config.get('_account.anonymousPassword')?
 
 
   # sign in with username & password
@@ -156,7 +156,7 @@ class Hoodie.Account
       @_cleanup()
       return
 
-    @hoodie.my.remote.disconnect()
+    @hoodie.remote.disconnect()
     @_sendSignOutRequest().pipe(@_cleanup)
 
   # alias
@@ -211,7 +211,7 @@ class Hoodie.Account
     unless @username
       return @hoodie.defer().reject(error: "unauthenticated", reason: "not logged in").promise()
 
-    @hoodie.my.remote.disconnect()
+    @hoodie.remote.disconnect()
     @fetch().pipe @_sendChangeUsernameAndPasswordRequest(currentPassword, null, newPassword), @_handleRequestError
 
 
@@ -226,11 +226,11 @@ class Hoodie.Account
   # It will be picked up by the password reset worker and destroyed
   # once the password was resetted.
   resetPassword : (username) ->
-    if resetPasswordId = @hoodie.my.config.get '_account.resetPasswordId'
+    if resetPasswordId = @hoodie.config.get '_account.resetPasswordId'
       return @_checkPasswordResetStatus()
       
     resetPasswordId = "#{username}/#{@hoodie.uuid()}"
-    @hoodie.my.config.set '_account.resetPasswordId', resetPasswordId
+    @hoodie.config.set '_account.resetPasswordId', resetPasswordId
     
     key = "#{@_prefix}:$passwordReset/#{resetPasswordId}"
     data = 
@@ -294,8 +294,8 @@ class Hoodie.Account
   _requests : {}
 
   # setters
-  _setUsername : (@username)  -> @hoodie.my.config.set '_account.username',  @username
-  _setOwner    : (@ownerHash) -> @hoodie.my.config.set '_account.ownerHash', @ownerHash
+  _setUsername : (@username)  -> @hoodie.config.set '_account.username',  @username
+  _setOwner    : (@ownerHash) -> @hoodie.config.set '_account.ownerHash', @ownerHash
 
   #
   # handle a successful authentication request.
@@ -426,7 +426,7 @@ class Hoodie.Account
   _checkPasswordResetStatus : =>
 
     # reject if there is no pending password reset request
-    resetPasswordId = @hoodie.my.config.get '_account.resetPasswordId'
+    resetPasswordId = @hoodie.config.get '_account.resetPasswordId'
     unless resetPasswordId
       return @hoodie.defer().reject(error: "missing").promise()
       
@@ -471,7 +471,7 @@ class Hoodie.Account
   # In this case we resolve the promise.
   _handlePasswordResetStatusRequestError : (xhr) =>
     if xhr.status is 401
-      @hoodie.my.config.remove '_account.resetPasswordId'
+      @hoodie.config.remove '_account.resetPasswordId'
       @trigger 'passwordreset'
 
       return @hoodie.defer().resolve()
@@ -495,17 +495,17 @@ class Hoodie.Account
   # turn an anonymous account into a real account
   #
   _upgradeAnonymousAccount : (username, password) ->
-    currentPassword = @hoodie.my.config.get '_account.anonymousPassword'
+    currentPassword = @hoodie.config.get '_account.anonymousPassword'
     @_changeUsernameAndPassword(currentPassword, username, password)
     .done => 
       @trigger 'signup', username
-      @hoodie.my.config.remove '_account.anonymousPassword'
+      @hoodie.config.remove '_account.anonymousPassword'
 
   #
   # we now can be sure that we fetched the latest _users doc, so we can update it
   # without a potential conflict error.
   _handleFetchBeforeDestroySucces : =>
-    @hoodie.my.remote.disconnect()
+    @hoodie.remote.disconnect()
     @_doc._deleted = true
 
     @_withPreviousRequestsAborted 'updateUsersDoc', =>
@@ -519,11 +519,11 @@ class Hoodie.Account
     delete @username
     delete @_authenticated
 
-    @hoodie.my.config.clear()
+    @hoodie.config.clear()
     @trigger 'signout'
 
     @ownerHash = @hoodie.uuid()
-    @hoodie.my.config.set '_account.ownerHash', @ownerHash
+    @hoodie.config.set '_account.ownerHash', @ownerHash
     
 
   #
@@ -580,7 +580,7 @@ class Hoodie.Account
   # or have to use the delayed sign in to give the username change worker some time
   _handleChangeUsernameAndPasswordRequest: (newUsername, newPassword) =>
     =>
-      @hoodie.my.remote.disconnect()
+      @hoodie.remote.disconnect()
       if newUsername
         @_delayedSignIn newUsername, newPassword
       else

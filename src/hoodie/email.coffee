@@ -26,7 +26,7 @@ class Hoodie.Email
       attributes.error = "Invalid email address (#{attributes.to or 'empty'})"
       return defer.reject(attributes).promise()
     
-    @hoodie.my.store.create('$email', attributes).then (obj) =>
+    @hoodie.store.create('$email', attributes).then (obj) =>
       @_handleEmailUpdate(defer, obj)
       
     defer.promise()
@@ -42,4 +42,4 @@ class Hoodie.Email
     else if attributes.deliveredAt
       defer.resolve attributes
     else
-      @hoodie.my.remote.one "updated:$email:#{attributes.id}", (attributes) => @_handleEmailUpdate(defer, attributes)
+      @hoodie.remote.one "updated:$email:#{attributes.id}", (attributes) => @_handleEmailUpdate(defer, attributes)

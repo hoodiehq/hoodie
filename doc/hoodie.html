@@ -1,13 +1,11 @@
 <!DOCTYPE html><html lang="en"><head><title>hoodie</title></head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0"><meta name="groc-relative-root" content=""><meta name="groc-document-path" content="hoodie"><meta name="groc-project-path" content="src/hoodie.coffee"><link rel="stylesheet" type="text/css" media="all" href="assets/style.css"><script type="text/javascript" src="assets/behavior.js"></script><body><div id="meta"><div class="file-path">src/hoodie.coffee</div></div><div id="document"><div class="segment"><div class="comments"><div class="wrapper"><h2 id="hoodie">Hoodie</h2>
 
 <p>the door to world domination (apps)</p></div></div><div class="code"><div class="wrapper"><span class="k">class</span> <span class="nx">Hoodie</span> <span class="k">extends</span> <span class="nx">Events</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>modules to be loaded</p></div></div><div class="code"><div class="wrapper">  <span class="vi">@modules: </span>
-    <span class="nv">my :</span>
-      <span class="nv">store   : </span><span class="s1">&#39;LocalStore&#39;</span>
-      <span class="nv">config  : </span><span class="s1">&#39;Config&#39;</span>
-      <span class="nv">account : </span><span class="s1">&#39;Account&#39;</span>
-      <span class="nv">remote  : </span><span class="s1">&#39;AccountRemoteStore&#39;</span>
-
-    <span class="nv">user    : </span><span class="s1">&#39;User&#39;</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>extensions, get loaded after the core modules</p></div></div><div class="code"><div class="wrapper">  <span class="vi">@extensions : </span>
+    <span class="nv">store   : </span><span class="s1">&#39;LocalStore&#39;</span>
+    <span class="nv">config  : </span><span class="s1">&#39;Config&#39;</span>
+    <span class="nv">account : </span><span class="s1">&#39;Account&#39;</span>
+    <span class="nv">remote  : </span><span class="s1">&#39;AccountRemoteStore&#39;</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>extensions, get loaded after the core modules</p></div></div><div class="code"><div class="wrapper">  <span class="vi">@extensions : </span>
+    <span class="nv">user    : </span><span class="s1">&#39;User&#39;</span>
     <span class="nv">global  : </span><span class="s1">&#39;Global&#39;</span>
     <span class="nv">email   : </span><span class="s1">&#39;Email&#39;</span>
     <span class="nv">share   : </span><span class="s1">&#39;Share&#39;</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>extend Hoodie with a custom module. Supports both named and anonymous modules</p></div></div><div class="code"><div class="wrapper">  <span class="vi">@extend: </span><span class="nf">(name, Module) -&gt;</span>
@@ -25,7 +23,7 @@
     <span class="nx">$</span><span class="p">.</span><span class="nx">ajax</span> <span class="nx">$</span><span class="p">.</span><span class="nx">extend</span> <span class="nx">defaults</span><span class="p">,</span> <span class="nx">options</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h2 id="open">open</h2></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>generic method to open a store. Used by</p>
 
 <ul>
-<li>hoodie.my.remote</li>
+<li>hoodie.remote</li>
 <li>hoodie.user("joe")</li>
 <li>hoodie.global</li>
 <li>... and more</li>
@@ -34,8 +32,13 @@
 <p>usage: <code>hoodie.open("some_store_name").findAll()</code></p></div></div><div class="code"><div class="wrapper">  <span class="nv">open : </span><span class="nf">(store_name, options = {}) -&gt;</span>
     <span class="nx">$</span><span class="p">.</span><span class="nx">extend</span> <span class="nx">options</span><span class="p">,</span> <span class="nv">name: </span><span class="nx">store_name</span>
     <span class="k">new</span> <span class="nx">Hoodie</span><span class="p">.</span><span class="nx">RemoteStore</span> <span class="k">this</span><span class="p">,</span> <span class="nx">options</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h2 id="defer">Defer</h2></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>returns a defer object for custom promise handlings</p></div></div><div class="code"><div class="wrapper">  <span class="nv">defer: </span><span class="nx">$</span><span class="p">.</span><span class="nx">Deferred</span>
-  </div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h2 id="utils">Utils</h2></div></div></div><div class="segment"><div class="code"><div class="wrapper">  
-  <span class="nv">isPromise: </span><span class="nf">(obj) -&gt;</span>
+  </div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h2 id="utils">Utils</h2></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>helper to generate uuids.</p></div></div><div class="code"><div class="wrapper">  <span class="nv">uuid : </span><span class="nf">(len = 7) -&gt;</span>
+    <span class="nv">chars = </span><span class="s1">&#39;0123456789abcdefghijklmnopqrstuvwxyz&#39;</span><span class="p">.</span><span class="nx">split</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
+    <span class="nv">radix = </span><span class="nx">chars</span><span class="p">.</span><span class="nx">length</span>
+    <span class="p">(</span>
+      <span class="nx">chars</span><span class="p">[</span> <span class="mi">0</span> <span class="o">|</span> <span class="nb">Math</span><span class="p">.</span><span class="nx">random</span><span class="p">()</span><span class="o">*</span><span class="nx">radix</span> <span class="p">]</span> <span class="k">for</span> <span class="nx">i</span> <span class="k">in</span> <span class="p">[</span><span class="mi">0</span><span class="p">...</span><span class="nx">len</span><span class="p">]</span>
+    <span class="p">).</span><span class="nx">join</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
+  </div></div></div><div class="segment"><div class="code"><div class="wrapper">  <span class="nv">isPromise: </span><span class="nf">(obj) -&gt;</span>
     <span class="k">typeof</span> <span class="nx">obj</span><span class="o">?</span><span class="p">.</span><span class="nx">done</span> <span class="o">is</span> <span class="s1">&#39;function&#39;</span> <span class="o">and</span> <span class="k">typeof</span> <span class="nx">obj</span><span class="p">.</span><span class="nx">resolve</span> <span class="o">is</span> <span class="s1">&#39;undefined&#39;</span>
   </div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h2 id="private">Private</h2></div></div><div class="code"><div class="wrapper">  </div></div></div><div class="segment"><div class="code"><div class="wrapper">  <span class="nv">_loadModules: </span><span class="nf">(modules = @constructor.modules, context = this) -&gt;</span>
 

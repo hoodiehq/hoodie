@@ -106,27 +106,27 @@ describe("Hoodie.ShareInstance", function() {
   describe("#save(update, options)", function() {
     beforeEach(function() {
       this.updatePromise = this.hoodie.defer();
-      spyOn(this.hoodie.my.store, "update").andReturn(this.updatePromise.promise());
+      spyOn(this.hoodie.store, "update").andReturn(this.updatePromise.promise());
       return spyOn(this.share, "set").andCallThrough();
     });
     _when("user has no account yet", function() {
       beforeEach(function() {
-        spyOn(this.hoodie.my.account, "hasAccount").andReturn(false);
-        return spyOn(this.hoodie.my.account, "anonymousSignUp");
+        spyOn(this.hoodie.account, "hasAccount").andReturn(false);
+        return spyOn(this.hoodie.account, "anonymousSignUp");
       });
       return it("should sign up anonymously", function() {
         this.share.save();
-        return expect(this.hoodie.my.account.anonymousSignUp).wasCalled();
+        return expect(this.hoodie.account.anonymousSignUp).wasCalled();
       });
     });
     _when("user has an account", function() {
       beforeEach(function() {
-        spyOn(this.hoodie.my.account, "hasAccount").andReturn(true);
-        return spyOn(this.hoodie.my.account, "anonymousSignUp");
+        spyOn(this.hoodie.account, "hasAccount").andReturn(true);
+        return spyOn(this.hoodie.account, "anonymousSignUp");
       });
       return it("should not sign up anonymously", function() {
         this.share.save();
-        return expect(this.hoodie.my.account.anonymousSignUp).wasNotCalled();
+        return expect(this.hoodie.account.anonymousSignUp).wasNotCalled();
       });
     });
     _when("update passed", function() {
@@ -143,7 +143,7 @@ describe("Hoodie.ShareInstance", function() {
         this.share.set('access', true);
         this.share.set('password', 'secret');
         this.share.save();
-        return expect(this.hoodie.my.store.update).wasCalledWith('$share', 'share1', {
+        return expect(this.hoodie.store.update).wasCalledWith('$share', 'share1', {
           access: true,
           password: 'secret'
         }, void 0);
@@ -182,7 +182,7 @@ describe("Hoodie.ShareInstance", function() {
   });
   describe("#toggle(objects, filter)", function() {
     beforeEach(function() {
-      spyOn(this.hoodie.my.store, "updateAll").andCallFake(function(objects, updateFunction) {
+      spyOn(this.hoodie.store, "updateAll").andCallFake(function(objects, updateFunction) {
         var object, _i, _len, _results;
         _results = [];
         for (_i = 0, _len = objects.length; _i < _len; _i++) {
@@ -231,35 +231,35 @@ describe("Hoodie.ShareInstance", function() {
     beforeEach(function() {
       spyOn(this.share, "save").andReturn(this.hoodie.defer().resolve().promise());
       spyOn(this.share, "findAllObjects").andReturn(['object1', 'object2']);
-      spyOn(this.hoodie.my.remote, "sync");
+      spyOn(this.hoodie.remote, "sync");
       return this.share.sync();
     });
     it("should save the share", function() {
       return expect(this.share.save).wasCalled();
     });
     return it("should sync all objects belonging to share", function() {
-      return expect(this.hoodie.my.remote.sync).wasCalledWith(['object1', 'object2']);
+      return expect(this.hoodie.remote.sync).wasCalledWith(['object1', 'object2']);
     });
   });
   describe("#destroy()", function() {
     beforeEach(function() {
       spyOn(this.share, "remove").andReturn(this.hoodie.defer().resolve().promise());
       spyOn(this.share, "findAllObjects").andReturn(['object1', 'object2']);
-      spyOn(this.hoodie.my.store, "destroy");
+      spyOn(this.hoodie.store, "destroy");
       return this.share.destroy();
     });
     it("should remove all objects from share", function() {
       return expect(this.share.remove).wasCalledWith(['object1', 'object2']);
     });
     return it("should remove $share object from store", function() {
-      return expect(this.hoodie.my.store.destroy).wasCalledWith('$share', 'share1');
+      return expect(this.hoodie.store.destroy).wasCalledWith('$share', 'share1');
     });
   });
   return describe("#findAllObjects()", function() {
     beforeEach(function() {
-      spyOn(this.hoodie.my.store, "findAll").andReturn('findAllPromise');
+      spyOn(this.hoodie.store, "findAll").andReturn('findAllPromise');
       this.share.findAllObjects();
-      this.filter = this.hoodie.my.store.findAll.mostRecentCall.args[0];
+      this.filter = this.hoodie.store.findAll.mostRecentCall.args[0];
       return this.objects = [
         {
           $type: 'todo',
@@ -288,10 +288,10 @@ describe("Hoodie.ShareInstance", function() {
     });
     return it("should call findAllObjects with a filter that returns only objects that changed and that belong to share", function() {
       expect(this.filter(this.objects[0])).toBe(false);
-      spyOn(this.hoodie.my.store, "isDirty").andReturn(true);
+      spyOn(this.hoodie.store, "isDirty").andReturn(true);
       expect(this.filter(this.objects[1])).toBe(true);
       expect(this.filter(this.objects[2])).toBe(true);
-      this.hoodie.my.store.isDirty.andReturn(false);
+      this.hoodie.store.isDirty.andReturn(false);
       expect(this.filter(this.objects[1])).toBe(false);
       return expect(this.filter(this.objects[2])).toBe(false);
     });

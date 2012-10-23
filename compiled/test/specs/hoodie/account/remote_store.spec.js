@@ -9,19 +9,19 @@ describe("Hoodie.AccountRemoteStore", function() {
     this.requestDefer = this.hoodie.defer();
     spyOn(this.hoodie, "request").andReturn(this.requestDefer.promise());
     spyOn(window, "setTimeout");
-    spyOn(this.hoodie.my.account, "db").andReturn('userhash123');
+    spyOn(this.hoodie.account, "db").andReturn('userhash123');
     spyOn(this.hoodie, "trigger");
-    spyOn(this.hoodie.my.store, "destroy").andReturn({
+    spyOn(this.hoodie.store, "destroy").andReturn({
       then: function(cb) {
         return cb('objectFromStore');
       }
     });
-    spyOn(this.hoodie.my.store, "update").andReturn({
+    spyOn(this.hoodie.store, "update").andReturn({
       then: function(cb) {
         return cb('objectFromStore', false);
       }
     });
-    spyOn(this.hoodie.my.store, "save").andReturn({
+    spyOn(this.hoodie.store, "save").andReturn({
       then: function(cb) {
         return cb('objectFromStore', false);
       }
@@ -45,7 +45,7 @@ describe("Hoodie.AccountRemoteStore", function() {
     });
     return _when("config remote.sync is false", function() {
       beforeEach(function() {
-        spyOn(this.hoodie.my.config, "get").andReturn(false);
+        spyOn(this.hoodie.config, "get").andReturn(false);
         return this.remote = new Hoodie.AccountRemoteStore(this.hoodie);
       });
       it("should set syncContinuously to false", function() {
@@ -65,9 +65,9 @@ describe("Hoodie.AccountRemoteStore", function() {
       return expect(this.remote.isContinuouslySyncing()).toBeTruthy();
     });
     it("should set config _remote.sync to true", function() {
-      spyOn(this.hoodie.my.config, "set");
+      spyOn(this.hoodie.config, "set");
       this.remote.startSyncing();
-      return expect(this.hoodie.my.config.set).wasCalledWith('_remote.sync', true);
+      return expect(this.hoodie.config.set).wasCalledWith('_remote.sync', true);
     });
     it("should subscribe to `signout` event", function() {
       this.remote.startSyncing();
@@ -90,9 +90,9 @@ describe("Hoodie.AccountRemoteStore", function() {
       return expect(this.remote.isContinuouslySyncing()).toBeFalsy();
     });
     it("should set config remote.syncContinuously to false", function() {
-      spyOn(this.hoodie.my.config, "set");
+      spyOn(this.hoodie.config, "set");
       this.remote.stopSyncing();
-      return expect(this.hoodie.my.config.set).wasCalledWith('_remote.sync', false);
+      return expect(this.hoodie.config.set).wasCalledWith('_remote.sync', false);
     });
     it("should unsubscribe from account's signin idle event", function() {
       this.remote.stopSyncing();
@@ -108,13 +108,13 @@ describe("Hoodie.AccountRemoteStore", function() {
       return spyOn(this.remote, "sync");
     });
     it("should authenticate", function() {
-      spyOn(this.hoodie.my.account, "authenticate").andCallThrough();
+      spyOn(this.hoodie.account, "authenticate").andCallThrough();
       this.remote.connect();
-      return expect(this.hoodie.my.account.authenticate).wasCalled();
+      return expect(this.hoodie.account.authenticate).wasCalled();
     });
     return _when("successful", function() {
       beforeEach(function() {
-        return spyOn(this.hoodie.my.account, "authenticate").andReturn({
+        return spyOn(this.hoodie.account, "authenticate").andReturn({
           pipe: function(cb) {
             cb();
             return {
@@ -138,15 +138,15 @@ describe("Hoodie.AccountRemoteStore", function() {
   });
   describe("#getSinceNr()", function() {
     beforeEach(function() {
-      return spyOn(this.hoodie.my.config, "get");
+      return spyOn(this.hoodie.config, "get");
     });
     it("should use user's config to get since nr", function() {
       this.remote.getSinceNr();
-      return expect(this.hoodie.my.config.get).wasCalledWith('_remote.since');
+      return expect(this.hoodie.config.get).wasCalledWith('_remote.since');
     });
     return _when("config _remote.since is not defined", function() {
       beforeEach(function() {
-        return this.hoodie.my.config.get.andReturn(void 0);
+        return this.hoodie.config.get.andReturn(void 0);
       });
       return it("should return 0", function() {
         return expect(this.remote.getSinceNr()).toBe(0);
@@ -155,11 +155,11 @@ describe("Hoodie.AccountRemoteStore", function() {
   });
   describe("#setSinceNr(nr)", function() {
     beforeEach(function() {
-      return spyOn(this.hoodie.my.config, "set");
+      return spyOn(this.hoodie.config, "set");
     });
     return it("should use user's config to store since nr persistantly", function() {
       this.remote.setSinceNr(100);
-      return expect(this.hoodie.my.config.set).wasCalledWith('_remote.since', 100);
+      return expect(this.hoodie.config.set).wasCalledWith('_remote.since', 100);
     });
   });
   describe("#pull()", function() {
@@ -211,13 +211,13 @@ describe("Hoodie.AccountRemoteStore", function() {
       });
       it("should remove `todo/abc3` from store", function() {
         this.remote.pull();
-        return expect(this.hoodie.my.store.destroy).wasCalledWith('todo', 'abc3', {
+        return expect(this.hoodie.store.destroy).wasCalledWith('todo', 'abc3', {
           remote: true
         });
       });
       it("should save `todo/abc2` in store", function() {
         this.remote.pull();
-        return expect(this.hoodie.my.store.save).wasCalledWith('todo', 'abc2', {
+        return expect(this.hoodie.store.save).wasCalledWith('todo', 'abc2', {
           _rev: '1-123',
           content: 'remember the milk',
           done: false,
@@ -457,7 +457,7 @@ describe("Hoodie.AccountRemoteStore", function() {
     });
     return _when("no docs passed", function() {
       return it("should push changed documents from store", function() {
-        spyOn(this.hoodie.my.store, "changedDocs").andReturn("changed_docs");
+        spyOn(this.hoodie.store, "changedDocs").andReturn("changed_docs");
         this.remote.push();
         return expect(Hoodie.RemoteStore.prototype.push).wasCalledWith("changed_docs");
       });

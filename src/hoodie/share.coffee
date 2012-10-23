@@ -91,7 +91,7 @@ class Hoodie.Share
   # find an existing share
   #
   find : (id) ->
-    @hoodie.my.store.find('$share', id).pipe (object) =>
+    @hoodie.store.find('$share', id).pipe (object) =>
       new @instance object
 
 
@@ -101,7 +101,7 @@ class Hoodie.Share
   # find all my existing shares
   #
   findAll : ->
-    @hoodie.my.store.findAll('$share').pipe (objects) =>
+    @hoodie.store.findAll('$share').pipe (objects) =>
       new @instance obj for obj in objects
 
 
@@ -111,7 +111,7 @@ class Hoodie.Share
   # find or create a new share
   #
   findOrCreate : (id, attributes) ->
-    @hoodie.my.store.findOrCreate('$share', id, attributes).pipe (object) =>
+    @hoodie.store.findOrCreate('$share', id, attributes).pipe (object) =>
       new @instance object
 
 
@@ -121,7 +121,7 @@ class Hoodie.Share
   # create or overwrite a share
   #
   save : (id, attributes) ->
-    @hoodie.my.store.save('$share', id, attributes).pipe (object) =>
+    @hoodie.store.save('$share', id, attributes).pipe (object) =>
       new @instance object
 
 
@@ -131,7 +131,7 @@ class Hoodie.Share
   # create or overwrite a share
   #
   update : (id, changed_attributes) ->
-    @hoodie.my.store.update('$share', id, changed_attributes).pipe (object) =>
+    @hoodie.store.update('$share', id, changed_attributes).pipe (object) =>
       new @instance object
 
 
@@ -141,7 +141,7 @@ class Hoodie.Share
   # update all my existing shares
   #
   updateAll : ( changed_attributes ) ->
-    @hoodie.my.store.updateAll('$share', changed_attributes).pipe (objects) =>
+    @hoodie.store.updateAll('$share', changed_attributes).pipe (objects) =>
       new @instance obj for obj in objects
 
 

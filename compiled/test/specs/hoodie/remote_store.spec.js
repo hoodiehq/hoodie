@@ -9,7 +9,7 @@ describe("Hoodie.RemoteStore", function() {
     spyOn(this.hoodie, "unbind");
     this.requestDefer = this.hoodie.defer();
     spyOn(window, "setTimeout");
-    spyOn(this.hoodie.my.account, "db").andReturn('joe$example.com');
+    spyOn(this.hoodie.account, "db").andReturn('joe$example.com');
     return this.remote = new Hoodie.RemoteStore(this.hoodie);
   });
   describe("constructor(@hoodie, options = {})", function() {

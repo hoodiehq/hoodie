@@ -71,8 +71,8 @@ Hoodie.ShareInstance = (function(_super) {
     if (update == null) {
       update = {};
     }
-    if (!this.hoodie.my.account.hasAccount()) {
-      this.hoodie.my.account.anonymousSignUp();
+    if (!this.hoodie.account.hasAccount()) {
+      this.hoodie.account.anonymousSignUp();
     }
     if (update) {
       this.set(update);
@@ -82,7 +82,7 @@ Hoodie.ShareInstance = (function(_super) {
       $.extend(_this, properties);
       return _this;
     };
-    return this.hoodie.my.store.update("$share", this.id, this._memory, options).pipe(_handleUpdate);
+    return this.hoodie.store.update("$share", this.id, this._memory, options).pipe(_handleUpdate);
   };
 
   ShareInstance.prototype.add = function(objects, sharedAttributes) {
@@ -111,22 +111,22 @@ Hoodie.ShareInstance = (function(_super) {
           return this._add(filter);
       }
     }).call(this);
-    return this.hoodie.my.store.updateAll(objects, updateMethod);
+    return this.hoodie.store.updateAll(objects, updateMethod);
   };
 
   ShareInstance.prototype.sync = function() {
-    return this.save().pipe(this.findAllObjects).pipe(this.hoodie.my.remote.sync);
+    return this.save().pipe(this.findAllObjects).pipe(this.hoodie.remote.sync);
   };
 
   ShareInstance.prototype.destroy = function() {
     var _this = this;
     return this.remove(this.findAllObjects()).then(function() {
-      return _this.hoodie.my.store.destroy("$share", _this.id);
+      return _this.hoodie.store.destroy("$share", _this.id);
     });
   };
 
   ShareInstance.prototype.findAllObjects = function() {
-    return this.hoodie.my.store.findAll(this._isMySharedObjectAndChanged);
+    return this.hoodie.store.findAll(this._isMySharedObjectAndChanged);
   };
 
   ShareInstance.prototype._add = function(filter) {
@@ -175,7 +175,7 @@ Hoodie.ShareInstance = (function(_super) {
   ShareInstance.prototype._isMySharedObjectAndChanged = function(obj) {
     var belongsToMe, _ref;
     belongsToMe = obj.id === this.id || (((_ref = obj.$shares) != null ? _ref[this.id] : void 0) != null);
-    return belongsToMe && this.hoodie.my.store.isDirty(obj.$type, obj.id);
+    return belongsToMe && this.hoodie.store.isDirty(obj.$type, obj.id);
   };
 
   ShareInstance.prototype._handleRemoteChanges = function() {

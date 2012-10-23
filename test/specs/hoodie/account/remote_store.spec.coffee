@@ -7,12 +7,12 @@ describe "Hoodie.AccountRemoteStore", ->
     @requestDefer = @hoodie.defer()
     spyOn(@hoodie, "request").andReturn @requestDefer.promise()
     spyOn(window, "setTimeout")
-    spyOn(@hoodie.my.account, "db").andReturn 'userhash123'
+    spyOn(@hoodie.account, "db").andReturn 'userhash123'
     
     spyOn(@hoodie, "trigger")
-    spyOn(@hoodie.my.store, "destroy").andReturn then: (cb) -> cb('objectFromStore')
-    spyOn(@hoodie.my.store, "update").andReturn  then: (cb) -> cb('objectFromStore', false)
-    spyOn(@hoodie.my.store, "save").andReturn    then: (cb) -> cb('objectFromStore', false)
+    spyOn(@hoodie.store, "destroy").andReturn then: (cb) -> cb('objectFromStore')
+    spyOn(@hoodie.store, "update").andReturn  then: (cb) -> cb('objectFromStore', false)
+    spyOn(@hoodie.store, "save").andReturn    then: (cb) -> cb('objectFromStore', false)
 
     @remote = new Hoodie.AccountRemoteStore @hoodie
   
@@ -34,7 +34,7 @@ describe "Hoodie.AccountRemoteStore", ->
       
     _when "config remote.sync is false", ->
       beforeEach ->
-        spyOn(@hoodie.my.config, "get").andReturn false
+        spyOn(@hoodie.config, "get").andReturn false
         @remote = new Hoodie.AccountRemoteStore @hoodie
         
       it "should set syncContinuously to false", ->
@@ -53,9 +53,9 @@ describe "Hoodie.AccountRemoteStore", ->
       expect(@remote.isContinuouslySyncing()).toBeTruthy()
     
     it "should set config _remote.sync to true", ->
-      spyOn(@hoodie.my.config, "set")
+      spyOn(@hoodie.config, "set")
       @remote.startSyncing()
-      expect(@hoodie.my.config.set).wasCalledWith '_remote.sync', true
+      expect(@hoodie.config.set).wasCalledWith '_remote.sync', true
 
     it "should subscribe to `signout` event", ->
       @remote.startSyncing()
@@ -79,9 +79,9 @@ describe "Hoodie.AccountRemoteStore", ->
       expect(@remote.isContinuouslySyncing()).toBeFalsy()
     
     it "should set config remote.syncContinuously to false", ->
-      spyOn(@hoodie.my.config, "set")
+      spyOn(@hoodie.config, "set")
       @remote.stopSyncing()
-      expect(@hoodie.my.config.set).wasCalledWith '_remote.sync', false
+      expect(@hoodie.config.set).wasCalledWith '_remote.sync', false
 
     it "should unsubscribe from account's signin idle event", ->
       @remote.stopSyncing()
@@ -97,13 +97,13 @@ describe "Hoodie.AccountRemoteStore", ->
       spyOn(@remote, "sync")
       
     it "should authenticate", ->
-      spyOn(@hoodie.my.account, "authenticate").andCallThrough()
+      spyOn(@hoodie.account, "authenticate").andCallThrough()
       @remote.connect()
-      expect(@hoodie.my.account.authenticate).wasCalled()
+      expect(@hoodie.account.authenticate).wasCalled()
       
     _when "successful", ->
       beforeEach ->
-        spyOn(@hoodie.my.account, "authenticate").andReturn pipe: (cb) -> 
+        spyOn(@hoodie.account, "authenticate").andReturn pipe: (cb) -> 
           cb()
           fail: ->
         
@@ -121,15 +121,15 @@ describe "Hoodie.AccountRemoteStore", ->
 
   describe "#getSinceNr()", ->
     beforeEach ->
-      spyOn(@hoodie.my.config, "get")
+      spyOn(@hoodie.config, "get")
     
     it "should use user's config to get since nr", ->
       @remote.getSinceNr()
-      expect(@hoodie.my.config.get).wasCalledWith '_remote.since'
+      expect(@hoodie.config.get).wasCalledWith '_remote.since'
 
     _when "config _remote.since is not defined", ->
       beforeEach ->
-        @hoodie.my.config.get.andReturn undefined
+        @hoodie.config.get.andReturn undefined
 
       it "should return 0", ->
         expect(@remote.getSinceNr()).toBe 0
@@ -138,11 +138,11 @@ describe "Hoodie.AccountRemoteStore", ->
 
   describe "#setSinceNr(nr)", ->
     beforeEach ->
-      spyOn(@hoodie.my.config, "set")
+      spyOn(@hoodie.config, "set")
 
     it "should use user's config to store since nr persistantly", ->
       @remote.setSinceNr(100)
-      expect(@hoodie.my.config.set).wasCalledWith '_remote.since', 100
+      expect(@hoodie.config.set).wasCalledWith '_remote.since', 100
   # /#setSinceNr()
 
 
@@ -186,11 +186,11 @@ describe "Hoodie.AccountRemoteStore", ->
       
       it "should remove `todo/abc3` from store", ->
         @remote.pull()
-        expect(@hoodie.my.store.destroy).wasCalledWith 'todo', 'abc3', remote: true
+        expect(@hoodie.store.destroy).wasCalledWith 'todo', 'abc3', remote: true
 
       it "should save `todo/abc2` in store", ->
         @remote.pull()
-        expect(@hoodie.my.store.save).wasCalledWith 'todo', 'abc2', { _rev : '1-123', content : 'remember the milk', done : false, order : 1, $type : 'todo', id : 'abc2' }, { remote : true }
+        expect(@hoodie.store.save).wasCalledWith 'todo', 'abc2', { _rev : '1-123', content : 'remember the milk', done : false, order : 1, $type : 'todo', id : 'abc2' }, { remote : true }
       
       it "should trigger remote events", ->
         spyOn(@remote, "trigger")
@@ -371,7 +371,7 @@ describe "Hoodie.AccountRemoteStore", ->
 
     _when "no docs passed", ->        
       it "should push changed documents from store", ->
-        spyOn(@hoodie.my.store, "changedDocs").andReturn "changed_docs"
+        spyOn(@hoodie.store, "changedDocs").andReturn "changed_docs"
         @remote.push()
         expect(Hoodie.RemoteStore::push).wasCalledWith "changed_docs"
   # /#push(docs)

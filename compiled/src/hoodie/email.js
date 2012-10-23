@@ -21,7 +21,7 @@ Hoodie.Email = (function() {
       attributes.error = "Invalid email address (" + (attributes.to || 'empty') + ")";
       return defer.reject(attributes).promise();
     }
-    this.hoodie.my.store.create('$email', attributes).then(function(obj) {
+    this.hoodie.store.create('$email', attributes).then(function(obj) {
       return _this._handleEmailUpdate(defer, obj);
     });
     return defer.promise();
@@ -44,7 +44,7 @@ Hoodie.Email = (function() {
     } else if (attributes.deliveredAt) {
       return defer.resolve(attributes);
     } else {
-      return this.hoodie.my.remote.one("updated:$email:" + attributes.id, function(attributes) {
+      return this.hoodie.remote.one("updated:$email:" + attributes.id, function(attributes) {
         return _this._handleEmailUpdate(defer, attributes);
       });
     }

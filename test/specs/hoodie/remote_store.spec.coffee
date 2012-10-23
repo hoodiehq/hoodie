@@ -7,7 +7,7 @@ describe "Hoodie.RemoteStore", ->
     spyOn(@hoodie, "unbind")
     @requestDefer = @hoodie.defer()
     spyOn(window, "setTimeout")
-    spyOn(@hoodie.my.account, "db").andReturn 'joe$example.com'
+    spyOn(@hoodie.account, "db").andReturn 'joe$example.com'
 
     @remote = new Hoodie.RemoteStore @hoodie
   

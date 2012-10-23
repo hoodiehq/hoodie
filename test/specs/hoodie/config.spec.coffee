@@ -15,21 +15,21 @@ describe "Hoodie.Config", ->
    
   describe ".set(key, value)", ->
     beforeEach ->
-      spyOn(@hoodie.my.store, "update")
+      spyOn(@hoodie.store, "update")
     
     it "should save a $config with key: value", ->
       @config.set('funky', 'fresh')
-      expect(@hoodie.my.store.update).wasCalledWith '$config', 'hoodie', {funky: 'fresh'}, silent: false
+      expect(@hoodie.store.update).wasCalledWith '$config', 'hoodie', {funky: 'fresh'}, silent: false
 
     it "should make the save silent for local settings starting with _", ->
       @config.set('_local', 'fresh')
-      expect(@hoodie.my.store.update).wasCalledWith '$config', 'hoodie', {_local: 'fresh'}, silent: true
+      expect(@hoodie.store.update).wasCalledWith '$config', 'hoodie', {_local: 'fresh'}, silent: true
     
   # /.set(key, value)
   
   describe ".get(key)", ->
     beforeEach ->
-      spyOn(@hoodie.my.store, "find").andReturn @hoodie.defer().resolve funky: 'fresh'
+      spyOn(@hoodie.store, "find").andReturn @hoodie.defer().resolve funky: 'fresh'
       @config = new Hoodie.Config @hoodie
     
     it "should get the config using store", ->
@@ -38,9 +38,9 @@ describe "Hoodie.Config", ->
   
   describe ".remove(key)", ->
     beforeEach ->
-      spyOn(@hoodie.my.store, "update").andReturn 'promise'
+      spyOn(@hoodie.store, "update").andReturn 'promise'
       
     it "should remove the config using store", ->
       @config.remove('funky')
-      expect(@hoodie.my.store.update).wasCalledWith '$config', 'hoodie', {funky: undefined}, silent: false
+      expect(@hoodie.store.update).wasCalledWith '$config', 'hoodie', {funky: undefined}, silent: false
   # /.remove(key)

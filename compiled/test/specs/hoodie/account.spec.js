@@ -19,7 +19,7 @@ describe("Hoodie.Account", function() {
     });
     _when("account.username is set", function() {
       beforeEach(function() {
-        return spyOn(this.hoodie.my.config, "get").andCallFake(function(key) {
+        return spyOn(this.hoodie.config, "get").andCallFake(function(key) {
           if (key === '_account.username') {
             return 'joe@example.com';
           }
@@ -33,7 +33,7 @@ describe("Hoodie.Account", function() {
     });
     _when("account.ownerHash is set", function() {
       beforeEach(function() {
-        return spyOn(this.hoodie.my.config, "get").andCallFake(function(key) {
+        return spyOn(this.hoodie.config, "get").andCallFake(function(key) {
           if (key === '_account.ownerHash') {
             return 'owner_hash123';
           }
@@ -47,13 +47,13 @@ describe("Hoodie.Account", function() {
     });
     _when("account.ownerHash isn't set", function() {
       beforeEach(function() {
-        spyOn(this.hoodie.my.config, "get").andCallFake(function(key) {
+        spyOn(this.hoodie.config, "get").andCallFake(function(key) {
           if (key === '_account.ownerHash') {
             return void 0;
           }
         });
         spyOn(this.hoodie, "uuid").andReturn('new_generated_owner_hash');
-        return spyOn(this.hoodie.my.config, "set");
+        return spyOn(this.hoodie.config, "set");
       });
       it("should set @ownerHash", function() {
         var account;
@@ -63,7 +63,7 @@ describe("Hoodie.Account", function() {
       return it("should set account.ownerHash", function() {
         var account;
         account = new Hoodie.Account(this.hoodie);
-        return expect(account.hoodie.my.config.set).wasCalledWith('_account.ownerHash', 'new_generated_owner_hash');
+        return expect(account.hoodie.config.set).wasCalledWith('_account.ownerHash', 'new_generated_owner_hash');
       });
     });
     it("should authenticate on next tick", function() {
@@ -133,7 +133,7 @@ describe("Hoodie.Account", function() {
       });
       _when("authentication request is successful and returns session info for joe@example.com", function() {
         beforeEach(function() {
-          spyOn(this.hoodie.my.config, "set");
+          spyOn(this.hoodie.config, "set");
           this.response = {
             userCtx: {
               name: "user/joe@example.com",
@@ -151,11 +151,11 @@ describe("Hoodie.Account", function() {
         });
         it("should set account.username", function() {
           expect(this.account.username).toBe('joe@example.com');
-          return expect(this.hoodie.my.config.set).wasCalledWith('_account.username', 'joe@example.com');
+          return expect(this.hoodie.config.set).wasCalledWith('_account.username', 'joe@example.com');
         });
         return it("should set account.ownerHash", function() {
           expect(this.account.ownerHash).toBe('user_hash');
-          return expect(this.hoodie.my.config.set).wasCalledWith('_account.ownerHash', 'user_hash');
+          return expect(this.hoodie.config.set).wasCalledWith('_account.ownerHash', 'user_hash');
         });
       });
       _when("authentication request is successful and returns `name: null`", function() {
@@ -216,7 +216,7 @@ describe("Hoodie.Account", function() {
           spyOn(this.account, "hasAnonymousAccount").andReturn(true);
           this.fetchDefer = this.hoodie.defer();
           spyOn(this.account, "fetch").andReturn(this.fetchDefer.promise());
-          spyOn(this.hoodie.my.config, "get").andReturn('randomPassword');
+          spyOn(this.hoodie.config, "get").andReturn('randomPassword');
           this.account.username = 'randomUsername';
           this.signInDefer1 = this.hoodie.defer();
           this.signInDefer2 = this.hoodie.defer();
@@ -253,7 +253,7 @@ describe("Hoodie.Account", function() {
               _ref = this.hoodie.request.mostRecentCall.args, this.type = _ref[0], this.path = _ref[1], this.options = _ref[2];
               return this.data = JSON.parse(this.options.data);
             });
-            it("should send a PUT request to http://my.cou.ch/_users/org.couchdb.user%3Auser%2Fjoe%40example.com", function() {
+            it("should send a PUT request to http://cou.ch/_users/org.couchdb.user%3Auser%2Fjoe%40example.com", function() {
               expect(this.hoodie.request).wasCalled();
               expect(this.type).toBe('PUT');
               return expect(this.path).toBe('/_users/org.couchdb.user%3Auser%2FrandomUsername');
@@ -269,11 +269,11 @@ describe("Hoodie.Account", function() {
             });
             _when("_users doc could be updated", function() {
               beforeEach(function() {
-                spyOn(this.hoodie.my.remote, "disconnect");
+                spyOn(this.hoodie.remote, "disconnect");
                 return this.requestDefer.resolve();
               });
               it("should disconnect", function() {
-                return expect(this.hoodie.my.remote.disconnect).wasCalled();
+                return expect(this.hoodie.remote.disconnect).wasCalled();
               });
               it("should sign in with new username", function() {
                 return expect(this.account.signIn).wasCalledWith('joe@example.com', 'secret');
@@ -348,7 +348,7 @@ describe("Hoodie.Account", function() {
           _ref = this.hoodie.request.mostRecentCall.args, this.type = _ref[0], this.path = _ref[1], this.options = _ref[2];
           return this.data = JSON.parse(this.options.data);
         });
-        it("should send a PUT request to http://my.cou.ch/_users/org.couchdb.user%3Auser%2Fjoe%40example.com", function() {
+        it("should send a PUT request to http://cou.ch/_users/org.couchdb.user%3Auser%2Fjoe%40example.com", function() {
           expect(this.hoodie.request).wasCalled();
           expect(this.type).toBe('PUT');
           return expect(this.path).toBe('/_users/org.couchdb.user%3Auser%2Fjoe%40example.com');
@@ -446,7 +446,7 @@ describe("Hoodie.Account", function() {
       this.signUpDefer = this.hoodie.defer();
       spyOn(this.account, "signUp").andReturn(this.signUpDefer.promise());
       spyOn(this.hoodie, "uuid").andReturn("crazyuuid123");
-      spyOn(this.hoodie.my.config, "set");
+      spyOn(this.hoodie.config, "set");
       return this.account.ownerHash = "owner_hash123";
     });
     it("should sign up with username = 'user_anonymous/ownerHash' and the random password", function() {
@@ -460,7 +460,7 @@ describe("Hoodie.Account", function() {
       return it("should generate a password and store it locally in _account.anonymousPassword", function() {
         this.account.anonymousSignUp();
         expect(this.hoodie.uuid).wasCalledWith(10);
-        return expect(this.hoodie.my.config.set).wasCalledWith('_account.anonymousPassword', 'crazyuuid123');
+        return expect(this.hoodie.config.set).wasCalledWith('_account.anonymousPassword', 'crazyuuid123');
       });
     });
   });
@@ -488,7 +488,7 @@ describe("Hoodie.Account", function() {
           this.account.signIn('joe@example.com', 'secret');
           return _ref = this.hoodie.request.mostRecentCall.args, this.type = _ref[0], this.path = _ref[1], this.options = _ref[2], _ref;
         });
-        it("should send a POST request to http://my.cou.ch/_session", function() {
+        it("should send a POST request to http://cou.ch/_session", function() {
           expect(this.hoodie.request).wasCalled();
           expect(this.type).toBe('POST');
           return expect(this.path).toBe('/_session');
@@ -508,7 +508,7 @@ describe("Hoodie.Account", function() {
                 "roles": ["user_hash", "confirmed"]
               };
               this.requestDefer.resolve(this.response);
-              return spyOn(this.hoodie.my.config, "set");
+              return spyOn(this.hoodie.config, "set");
             });
             _and("user has an anonyomous account", function() {
               beforeEach(function() {
@@ -531,12 +531,12 @@ describe("Hoodie.Account", function() {
             it("should set @username", function() {
               this.account.signIn('joe@example.com', 'secret');
               expect(this.account.username).toBe('joe@example.com');
-              return expect(this.hoodie.my.config.set).wasCalledWith('_account.username', 'joe@example.com');
+              return expect(this.hoodie.config.set).wasCalledWith('_account.username', 'joe@example.com');
             });
             it("should set @ownerHash", function() {
               this.account.signIn('joe@example.com', 'secret');
               expect(this.account.ownerHash).toBe('user_hash');
-              return expect(this.hoodie.my.config.set).wasCalledWith('_account.ownerHash', 'user_hash');
+              return expect(this.hoodie.config.set).wasCalledWith('_account.ownerHash', 'user_hash');
             });
             it("should fetch the _users doc", function() {
               spyOn(this.account, "fetch");
@@ -645,7 +645,7 @@ describe("Hoodie.Account", function() {
         _ref = this.hoodie.request.mostRecentCall.args, this.type = _ref[0], this.path = _ref[1], this.options = _ref[2];
         return this.data = JSON.parse(this.options.data);
       });
-      it("should send a PUT request to http://my.cou.ch/_users/org.couchdb.user%3Auser%2Fjoe%40example.com", function() {
+      it("should send a PUT request to http://cou.ch/_users/org.couchdb.user%3Auser%2Fjoe%40example.com", function() {
         expect(this.hoodie.request).wasCalled();
         expect(this.type).toBe('PUT');
         return expect(this.path).toBe('/_users/org.couchdb.user%3Auser%2Fjoe%40example.com');
@@ -745,7 +745,7 @@ describe("Hoodie.Account", function() {
   describe("#signOut()", function() {
     beforeEach(function() {
       spyOn(this.hoodie, "uuid").andReturn('newHash');
-      return spyOn(this.hoodie.my.config, "clear");
+      return spyOn(this.hoodie.config, "clear");
     });
     _when("user has no account", function() {
       beforeEach(function() {
@@ -765,21 +765,21 @@ describe("Hoodie.Account", function() {
         return expect(this.account.username).toBeUndefined();
       });
       return it("should clear config", function() {
-        return expect(this.hoodie.my.config.clear).wasCalled();
+        return expect(this.hoodie.config.clear).wasCalled();
       });
     });
     return _when("user has account", function() {
       beforeEach(function() {
         var _ref;
-        spyOn(this.hoodie.my.remote, "disconnect");
+        spyOn(this.hoodie.remote, "disconnect");
         spyOn(this.account, "hasAccount").andReturn(true);
         this.account.signOut();
         return _ref = this.hoodie.request.mostRecentCall.args, this.type = _ref[0], this.path = _ref[1], this.options = _ref[2], _ref;
       });
       it("should disconnect", function() {
-        return expect(this.hoodie.my.remote.disconnect).wasCalled();
+        return expect(this.hoodie.remote.disconnect).wasCalled();
       });
-      it("should send a DELETE request to http://my.cou.ch/_session", function() {
+      it("should send a DELETE request to http://cou.ch/_session", function() {
         expect(this.hoodie.request).wasCalled();
         expect(this.type).toBe('DELETE');
         return expect(this.path).toBe('/_session');
@@ -799,7 +799,7 @@ describe("Hoodie.Account", function() {
           return expect(this.account.username).toBeUndefined();
         });
         return it("should clear config", function() {
-          return expect(this.hoodie.my.config.clear).wasCalled();
+          return expect(this.hoodie.config.clear).wasCalled();
         });
       });
     });
@@ -825,7 +825,7 @@ describe("Hoodie.Account", function() {
   describe("#hasAnonymousAccount()", function() {
     _when("_account.anonymousPassword is set", function() {
       beforeEach(function() {
-        return spyOn(this.hoodie.my.config, "get").andCallFake(function(key) {
+        return spyOn(this.hoodie.config, "get").andCallFake(function(key) {
           if (key === '_account.anonymousPassword') {
             return 'password';
           }
@@ -837,7 +837,7 @@ describe("Hoodie.Account", function() {
     });
     return _when("_account.anonymousPassword is not set", function() {
       beforeEach(function() {
-        return spyOn(this.hoodie.my.config, "get").andCallFake(function(key) {
+        return spyOn(this.hoodie.config, "get").andCallFake(function(key) {
           if (key === '_account.anonymousPassword') {
             return void 0;
           }
@@ -892,7 +892,7 @@ describe("Hoodie.Account", function() {
         this.account.fetch();
         return _ref = this.hoodie.request.mostRecentCall.args, this.type = _ref[0], this.path = _ref[1], this.options = _ref[2], _ref;
       });
-      it("should send a GET request to http://my.cou.ch/_users/org.couchdb.user%3Auser%2Fjoe%40example.com", function() {
+      it("should send a GET request to http://cou.ch/_users/org.couchdb.user%3Auser%2Fjoe%40example.com", function() {
         expect(this.hoodie.request).wasCalled();
         expect(this.type).toBe('GET');
         return expect(this.path).toBe('/_users/org.couchdb.user%3Auser%2Fjoe%40example.com');
@@ -920,9 +920,9 @@ describe("Hoodie.Account", function() {
   });
   describe("#destroy()", function() {
     beforeEach(function() {
-      spyOn(this.hoodie.my.remote, "disconnect");
-      spyOn(this.hoodie.my.config, "clear");
-      spyOn(this.hoodie.my.config, "set");
+      spyOn(this.hoodie.remote, "disconnect");
+      spyOn(this.hoodie.config, "clear");
+      spyOn(this.hoodie.config, "set");
       spyOn(this.account, "fetch").andReturn(this.hoodie.defer().resolve().promise());
       spyOn(this.hoodie, "uuid").andReturn('newHash');
       this.account.username = 'joe@example.com';
@@ -932,7 +932,7 @@ describe("Hoodie.Account", function() {
     });
     it("should disconnect", function() {
       this.account.destroy();
-      return expect(this.hoodie.my.remote.disconnect).wasCalled();
+      return expect(this.hoodie.remote.disconnect).wasCalled();
     });
     it("should fetch the account", function() {
       this.account.destroy();
@@ -967,10 +967,10 @@ describe("Hoodie.Account", function() {
           return expect(this.hoodie.trigger).wasCalledWith('account:signout');
         });
         it("should clear config", function() {
-          return expect(this.hoodie.my.config.clear).wasCalled();
+          return expect(this.hoodie.config.clear).wasCalled();
         });
         return it("should set config._account.ownerHash to new @ownerHash", function() {
-          return expect(this.hoodie.my.config.set).wasCalledWith('_account.ownerHash', 'newHash');
+          return expect(this.hoodie.config.set).wasCalledWith('_account.ownerHash', 'newHash');
         });
       });
     });
@@ -992,10 +992,10 @@ describe("Hoodie.Account", function() {
         return expect(this.hoodie.trigger).wasCalledWith('account:signout');
       });
       it("should clear config", function() {
-        return expect(this.hoodie.my.config.clear).wasCalled();
+        return expect(this.hoodie.config.clear).wasCalled();
       });
       return it("should set config._account.ownerHash to new @ownerHash", function() {
-        return expect(this.hoodie.my.config.set).wasCalledWith('_account.ownerHash', 'newHash');
+        return expect(this.hoodie.config.set).wasCalledWith('_account.ownerHash', 'newHash');
       });
     });
   });
@@ -1005,7 +1005,7 @@ describe("Hoodie.Account", function() {
     });
     _when("there is a pending password reset request", function() {
       beforeEach(function() {
-        spyOn(this.hoodie.my.config, "get").andReturn("joe/uuid567");
+        spyOn(this.hoodie.config, "get").andReturn("joe/uuid567");
         return this.account.resetPassword();
       });
       it("should not send another request", function() {
@@ -1021,15 +1021,15 @@ describe("Hoodie.Account", function() {
     return _when("there is no pending password reset request", function() {
       beforeEach(function() {
         var _ref;
-        spyOn(this.hoodie.my.config, "get").andReturn(void 0);
-        spyOn(this.hoodie.my.config, "set");
+        spyOn(this.hoodie.config, "get").andReturn(void 0);
+        spyOn(this.hoodie.config, "set");
         spyOn(this.hoodie, "uuid").andReturn('uuid567');
         this.account.resetPassword("joe@example.com");
         _ref = this.hoodie.request.mostRecentCall.args, this.method = _ref[0], this.path = _ref[1], this.options = _ref[2];
         return this.data = JSON.parse(this.options.data);
       });
       it("should generate a reset Password Id and store it locally", function() {
-        return expect(this.hoodie.my.config.set).wasCalledWith("_account.resetPasswordId", "joe@example.com/uuid567");
+        return expect(this.hoodie.config.set).wasCalledWith("_account.resetPasswordId", "joe@example.com/uuid567");
       });
       it("should send a PUT request to /_users/org.couchdb.user%3A%24passwordReset%2Fjoe%40example.com%2Fuuid567", function() {
         expect(this.method).toBe('PUT');
@@ -1121,7 +1121,7 @@ describe("Hoodie.Account", function() {
           _ref = this.hoodie.request.mostRecentCall.args, this.type = _ref[0], this.path = _ref[1], this.options = _ref[2];
           return this.data = JSON.parse(this.options.data);
         });
-        it("should send a PUT request to http://my.cou.ch/_users/org.couchdb.user%3Auser%2Fjoe%40example.com", function() {
+        it("should send a PUT request to http://cou.ch/_users/org.couchdb.user%3Auser%2Fjoe%40example.com", function() {
           expect(this.hoodie.request).wasCalled();
           expect(this.type).toBe('PUT');
           return expect(this.path).toBe('/_users/org.couchdb.user%3Auser%2Fjoe%40example.com');
@@ -1137,11 +1137,11 @@ describe("Hoodie.Account", function() {
         });
         _when("_users doc could be updated", function() {
           beforeEach(function() {
-            spyOn(this.hoodie.my.remote, "disconnect");
+            spyOn(this.hoodie.remote, "disconnect");
             return this.requestDefer.resolve();
           });
           it("should disconnect", function() {
-            return expect(this.hoodie.my.remote.disconnect).wasCalled();
+            return expect(this.hoodie.remote.disconnect).wasCalled();
           });
           it("should sign in with new username", function() {
             return expect(this.account.signIn).wasCalledWith('new.joe@example.com', 'secret');

@@ -73,27 +73,27 @@ describe "Hoodie.ShareInstance", ->
   describe "#save(update, options)", ->
     beforeEach ->
       @updatePromise = @hoodie.defer()
-      spyOn(@hoodie.my.store, "update").andReturn @updatePromise.promise()
+      spyOn(@hoodie.store, "update").andReturn @updatePromise.promise()
       spyOn(@share, "set").andCallThrough()
       
     
     _when "user has no account yet", ->
       beforeEach ->
-        spyOn(@hoodie.my.account, "hasAccount").andReturn false
-        spyOn(@hoodie.my.account, "anonymousSignUp")
+        spyOn(@hoodie.account, "hasAccount").andReturn false
+        spyOn(@hoodie.account, "anonymousSignUp")
 
       it "should sign up anonymously", ->
         @share.save()
-        expect(@hoodie.my.account.anonymousSignUp).wasCalled()
+        expect(@hoodie.account.anonymousSignUp).wasCalled()
 
     _when "user has an account", ->
       beforeEach ->
-        spyOn(@hoodie.my.account, "hasAccount").andReturn true
-        spyOn(@hoodie.my.account, "anonymousSignUp")
+        spyOn(@hoodie.account, "hasAccount").andReturn true
+        spyOn(@hoodie.account, "anonymousSignUp")
 
       it "should not sign up anonymously", ->
         @share.save()
-        expect(@hoodie.my.account.anonymousSignUp).wasNotCalled() 
+        expect(@hoodie.account.anonymousSignUp).wasNotCalled() 
 
     _when "update passed", ->
       it "should set the passed properties", ->
@@ -105,7 +105,7 @@ describe "Hoodie.ShareInstance", ->
         @share.set 'access', true
         @share.set 'password', 'secret'
         @share.save()
-        expect(@hoodie.my.store.update).wasCalledWith '$share', 'share1', {
+        expect(@hoodie.store.update).wasCalledWith '$share', 'share1', {
           access   : true
           password : 'secret'
         }, undefined
@@ -144,7 +144,7 @@ describe "Hoodie.ShareInstance", ->
 
   describe "#toggle(objects, filter)", ->
     beforeEach ->
-      spyOn(@hoodie.my.store, "updateAll").andCallFake (objects, updateFunction) ->
+      spyOn(@hoodie.store, "updateAll").andCallFake (objects, updateFunction) ->
         for object in objects
           $.extend object, updateFunction(object)
       @objects = [
@@ -170,14 +170,14 @@ describe "Hoodie.ShareInstance", ->
     beforeEach ->
       spyOn(@share, "save").andReturn @hoodie.defer().resolve().promise()
       spyOn(@share, "findAllObjects").andReturn ['object1', 'object2']
-      spyOn(@hoodie.my.remote, "sync")
+      spyOn(@hoodie.remote, "sync")
       @share.sync()
     
     it "should save the share", ->
       expect(@share.save).wasCalled()
 
     it "should sync all objects belonging to share", ->
-      expect(@hoodie.my.remote.sync).wasCalledWith ['object1', 'object2']
+      expect(@hoodie.remote.sync).wasCalledWith ['object1', 'object2']
   # /#sync()
 
 
@@ -185,22 +185,22 @@ describe "Hoodie.ShareInstance", ->
     beforeEach ->
       spyOn(@share, "remove").andReturn @hoodie.defer().resolve().promise()
       spyOn(@share, "findAllObjects").andReturn ['object1', 'object2']
-      spyOn(@hoodie.my.store, "destroy")
+      spyOn(@hoodie.store, "destroy")
       @share.destroy()
     
     it "should remove all objects from share", ->
       expect(@share.remove).wasCalledWith ['object1', 'object2']
 
     it "should remove $share object from store", ->
-      expect(@hoodie.my.store.destroy).wasCalledWith '$share', 'share1'
+      expect(@hoodie.store.destroy).wasCalledWith '$share', 'share1'
   # /#destroy()
 
 
   describe "#findAllObjects()", ->
     beforeEach ->
-      spyOn(@hoodie.my.store, "findAll").andReturn 'findAllPromise'
+      spyOn(@hoodie.store, "findAll").andReturn 'findAllPromise'
       @share.findAllObjects()
-      @filter = @hoodie.my.store.findAll.mostRecentCall.args[0]
+      @filter = @hoodie.store.findAll.mostRecentCall.args[0]
       @objects = [
         {$type: 'todo', id: '1', title: 'milk'}
         {$type: 'todo', id: '2', title: 'flakes', $shares: {'share1': true}}
@@ -213,11 +213,11 @@ describe "Hoodie.ShareInstance", ->
     it "should call findAllObjects with a filter that returns only objects that changed and that belong to share", ->
       expect(@filter @objects[0]).toBe false
 
-      spyOn(@hoodie.my.store, "isDirty").andReturn true
+      spyOn(@hoodie.store, "isDirty").andReturn true
       expect(@filter @objects[1]).toBe true
       expect(@filter @objects[2]).toBe true
 
-      @hoodie.my.store.isDirty.andReturn false
+      @hoodie.store.isDirty.andReturn false
       expect(@filter @objects[1]).toBe false
       expect(@filter @objects[2]).toBe false
   # /#findAllObjects()

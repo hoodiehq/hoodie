@@ -23,7 +23,7 @@ describe "Hoodie.Account", ->
     
     _when "account.username is set", ->
       beforeEach ->
-        spyOn(@hoodie.my.config, "get").andCallFake (key) ->
+        spyOn(@hoodie.config, "get").andCallFake (key) ->
           if key is '_account.username'
             return 'joe@example.com'
             
@@ -33,7 +33,7 @@ describe "Hoodie.Account", ->
 
     _when "account.ownerHash is set", ->
       beforeEach ->
-        spyOn(@hoodie.my.config, "get").andCallFake (key) ->
+        spyOn(@hoodie.config, "get").andCallFake (key) ->
           if key is '_account.ownerHash'
             return 'owner_hash123'
             
@@ -42,12 +42,12 @@ describe "Hoodie.Account", ->
         expect(account.ownerHash).toBe 'owner_hash123'
     _when "account.ownerHash isn't set", ->
       beforeEach ->
-        spyOn(@hoodie.my.config, "get").andCallFake (key) ->
+        spyOn(@hoodie.config, "get").andCallFake (key) ->
           if key is '_account.ownerHash'
             return undefined
 
         spyOn(@hoodie, "uuid").andReturn 'new_generated_owner_hash'
-        spyOn(@hoodie.my.config, "set")
+        spyOn(@hoodie.config, "set")
             
       it "should set @ownerHash", ->
         account = new Hoodie.Account @hoodie
@@ -55,7 +55,7 @@ describe "Hoodie.Account", ->
 
       it "should set account.ownerHash", ->
          account = new Hoodie.Account @hoodie
-         expect(account.hoodie.my.config.set).wasCalledWith '_account.ownerHash', 'new_generated_owner_hash'
+         expect(account.hoodie.config.set).wasCalledWith '_account.ownerHash', 'new_generated_owner_hash'
 
     it "should authenticate on next tick", ->
       account = new Hoodie.Account @hoodie
@@ -120,7 +120,7 @@ describe "Hoodie.Account", ->
 
       _when "authentication request is successful and returns session info for joe@example.com", ->
         beforeEach ->
-          spyOn(@hoodie.my.config, "set")
+          spyOn(@hoodie.config, "set")
           @response = userCtx:
                         name: "user/joe@example.com",
                         roles: [ "user_hash", "confirmed" ]
@@ -135,11 +135,11 @@ describe "Hoodie.Account", ->
 
         it "should set account.username", ->
           expect(@account.username).toBe 'joe@example.com'
-          expect(@hoodie.my.config.set).wasCalledWith '_account.username', 'joe@example.com'
+          expect(@hoodie.config.set).wasCalledWith '_account.username', 'joe@example.com'
 
         it "should set account.ownerHash", ->
            expect(@account.ownerHash).toBe 'user_hash'
-           expect(@hoodie.my.config.set).wasCalledWith '_account.ownerHash', 'user_hash'
+           expect(@hoodie.config.set).wasCalledWith '_account.ownerHash', 'user_hash'
       
       # {"ok":true,"userCtx":{"name":null,"roles":[]},"info":{"authenticationDb":"_users","authenticationHandlers":["oauth","cookie","default"]}}
       _when "authentication request is successful and returns `name: null`", ->
@@ -186,7 +186,7 @@ describe "Hoodie.Account", ->
           @fetchDefer = @hoodie.defer()
           spyOn(@account, "fetch").andReturn @fetchDefer.promise()
 
-          spyOn(@hoodie.my.config, "get").andReturn 'randomPassword'
+          spyOn(@hoodie.config, "get").andReturn 'randomPassword'
           @account.username = 'randomUsername'
 
           @signInDefer1 = @hoodie.defer()
@@ -219,7 +219,7 @@ describe "Hoodie.Account", ->
               [@type, @path, @options] = @hoodie.request.mostRecentCall.args
               @data = JSON.parse @options.data
 
-            it "should send a PUT request to http://my.cou.ch/_users/org.couchdb.user%3Auser%2Fjoe%40example.com", ->
+            it "should send a PUT request to http://cou.ch/_users/org.couchdb.user%3Auser%2Fjoe%40example.com", ->
               expect(@hoodie.request).wasCalled()
               expect(@type).toBe 'PUT'
               expect(@path).toBe  '/_users/org.couchdb.user%3Auser%2FrandomUsername'
@@ -235,11 +235,11 @@ describe "Hoodie.Account", ->
 
             _when "_users doc could be updated", ->
               beforeEach ->
-                spyOn(@hoodie.my.remote, "disconnect")
+                spyOn(@hoodie.remote, "disconnect")
                 @requestDefer.resolve()
 
               it "should disconnect", ->
-                expect(@hoodie.my.remote.disconnect).wasCalled() 
+                expect(@hoodie.remote.disconnect).wasCalled() 
 
               it "should sign in with new username", ->
                 expect(@account.signIn).wasCalledWith 'joe@example.com', 'secret'
@@ -289,7 +289,7 @@ describe "Hoodie.Account", ->
           [@type, @path, @options] = @hoodie.request.mostRecentCall.args
           @data = JSON.parse @options.data
 
-        it "should send a PUT request to http://my.cou.ch/_users/org.couchdb.user%3Auser%2Fjoe%40example.com", ->
+        it "should send a PUT request to http://cou.ch/_users/org.couchdb.user%3Auser%2Fjoe%40example.com", ->
           expect(@hoodie.request).wasCalled()
           expect(@type).toBe 'PUT'
           expect(@path).toBe  '/_users/org.couchdb.user%3Auser%2Fjoe%40example.com'
@@ -369,7 +369,7 @@ describe "Hoodie.Account", ->
       @signUpDefer = @hoodie.defer()
       spyOn(@account, "signUp").andReturn @signUpDefer.promise()
       spyOn(@hoodie, "uuid").andReturn "crazyuuid123"
-      spyOn(@hoodie.my.config, "set")
+      spyOn(@hoodie.config, "set")
       @account.ownerHash = "owner_hash123"
        
     it "should sign up with username = 'user_anonymous/ownerHash' and the random password", ->
@@ -383,7 +383,7 @@ describe "Hoodie.Account", ->
       it "should generate a password and store it locally in _account.anonymousPassword", ->
         @account.anonymousSignUp()
         expect(@hoodie.uuid).wasCalledWith 10
-        expect(@hoodie.my.config.set).wasCalledWith '_account.anonymousPassword', 'crazyuuid123'
+        expect(@hoodie.config.set).wasCalledWith '_account.anonymousPassword', 'crazyuuid123'
       
   # /.anonymousSignUp()
 
@@ -409,7 +409,7 @@ describe "Hoodie.Account", ->
           @account.signIn('joe@example.com', 'secret')
           [@type, @path, @options] = @hoodie.request.mostRecentCall.args
         
-        it "should send a POST request to http://my.cou.ch/_session", ->
+        it "should send a POST request to http://cou.ch/_session", ->
           expect(@hoodie.request).wasCalled()
           expect(@type).toBe 'POST'
           expect(@path).toBe  '/_session'
@@ -425,7 +425,7 @@ describe "Hoodie.Account", ->
             beforeEach ->
               @response = {"ok":true,"name":"user/joe@example.com","roles":["user_hash","confirmed"]}
               @requestDefer.resolve @response
-              spyOn(@hoodie.my.config, "set")
+              spyOn(@hoodie.config, "set")
             
             _and "user has an anonyomous account", ->
               beforeEach ->
@@ -446,12 +446,12 @@ describe "Hoodie.Account", ->
             it "should set @username", ->
                @account.signIn('joe@example.com', 'secret')
                expect(@account.username).toBe 'joe@example.com'
-               expect(@hoodie.my.config.set).wasCalledWith '_account.username', 'joe@example.com'
+               expect(@hoodie.config.set).wasCalledWith '_account.username', 'joe@example.com'
 
             it "should set @ownerHash", ->
                @account.signIn('joe@example.com', 'secret')
                expect(@account.ownerHash).toBe 'user_hash'
-               expect(@hoodie.my.config.set).wasCalledWith '_account.ownerHash', 'user_hash'
+               expect(@hoodie.config.set).wasCalledWith '_account.ownerHash', 'user_hash'
 
             it "should fetch the _users doc", ->
               spyOn(@account, "fetch")
@@ -535,7 +535,7 @@ describe "Hoodie.Account", ->
         @data = JSON.parse @options.data
 
   
-      it "should send a PUT request to http://my.cou.ch/_users/org.couchdb.user%3Auser%2Fjoe%40example.com", ->
+      it "should send a PUT request to http://cou.ch/_users/org.couchdb.user%3Auser%2Fjoe%40example.com", ->
         expect(@hoodie.request).wasCalled()
         expect(@type).toBe 'PUT'
         expect(@path).toBe  '/_users/org.couchdb.user%3Auser%2Fjoe%40example.com'
@@ -618,7 +618,7 @@ describe "Hoodie.Account", ->
   describe "#signOut()", ->
     beforeEach ->
       spyOn(@hoodie, "uuid").andReturn 'newHash'
-      spyOn(@hoodie.my.config, "clear")
+      spyOn(@hoodie.config, "clear")
     
     _when "user has no account", ->
       beforeEach ->
@@ -638,19 +638,19 @@ describe "Hoodie.Account", ->
          expect(@account.username).toBeUndefined()
 
       it "should clear config", ->
-        expect(@hoodie.my.config.clear).wasCalled() 
+        expect(@hoodie.config.clear).wasCalled() 
       
     _when "user has account", ->
       beforeEach ->
-        spyOn(@hoodie.my.remote, "disconnect")
+        spyOn(@hoodie.remote, "disconnect")
         spyOn(@account, "hasAccount").andReturn true
         @account.signOut()
         [@type, @path, @options] = @hoodie.request.mostRecentCall.args
       
       it "should disconnect", ->
-        expect(@hoodie.my.remote.disconnect).wasCalled() 
+        expect(@hoodie.remote.disconnect).wasCalled() 
 
-      it "should send a DELETE request to http://my.cou.ch/_session", ->
+      it "should send a DELETE request to http://cou.ch/_session", ->
         expect(@hoodie.request).wasCalled()
         expect(@type).toBe 'DELETE'
         expect(@path).toBe  '/_session'
@@ -670,7 +670,7 @@ describe "Hoodie.Account", ->
            expect(@account.username).toBeUndefined()
 
         it "should clear config", ->
-          expect(@hoodie.my.config.clear).wasCalled() 
+          expect(@hoodie.config.clear).wasCalled() 
   # /.signIn(username, password)
 
 
@@ -694,7 +694,7 @@ describe "Hoodie.Account", ->
   describe "#hasAnonymousAccount()", ->
     _when "_account.anonymousPassword is set", ->
       beforeEach ->
-        spyOn(@hoodie.my.config, "get").andCallFake (key) ->
+        spyOn(@hoodie.config, "get").andCallFake (key) ->
           if key is '_account.anonymousPassword'
             return 'password'
 
@@ -703,7 +703,7 @@ describe "Hoodie.Account", ->
 
     _when "_account.anonymousPassword is not set", ->
       beforeEach ->
-        spyOn(@hoodie.my.config, "get").andCallFake (key) ->
+        spyOn(@hoodie.config, "get").andCallFake (key) ->
           if key is '_account.anonymousPassword'
             return undefined
 
@@ -753,7 +753,7 @@ describe "Hoodie.Account", ->
         @account.fetch()
         [@type, @path, @options] = @hoodie.request.mostRecentCall.args
       
-      it "should send a GET request to http://my.cou.ch/_users/org.couchdb.user%3Auser%2Fjoe%40example.com", ->
+      it "should send a GET request to http://cou.ch/_users/org.couchdb.user%3Auser%2Fjoe%40example.com", ->
         expect(@hoodie.request).wasCalled()
         expect(@type).toBe 'GET'
         expect(@path).toBe  '/_users/org.couchdb.user%3Auser%2Fjoe%40example.com'
@@ -770,9 +770,9 @@ describe "Hoodie.Account", ->
   
   describe "#destroy()", ->
     beforeEach ->
-      spyOn(@hoodie.my.remote, "disconnect")
-      spyOn(@hoodie.my.config, "clear")
-      spyOn(@hoodie.my.config, "set")
+      spyOn(@hoodie.remote, "disconnect")
+      spyOn(@hoodie.config, "clear")
+      spyOn(@hoodie.config, "set")
       spyOn(@account, "fetch").andReturn @hoodie.defer().resolve().promise()
       spyOn(@hoodie, "uuid").andReturn 'newHash'
       @account.username = 'joe@example.com'
@@ -780,7 +780,7 @@ describe "Hoodie.Account", ->
     
     it "should disconnect", ->
       @account.destroy()
-      expect(@hoodie.my.remote.disconnect).wasCalled()
+      expect(@hoodie.remote.disconnect).wasCalled()
     
     it "should fetch the account", ->
       @account.destroy()
@@ -813,10 +813,10 @@ describe "Hoodie.Account", ->
           expect(@hoodie.trigger).wasCalledWith 'account:signout'
 
         it "should clear config", ->
-          expect(@hoodie.my.config.clear).wasCalled() 
+          expect(@hoodie.config.clear).wasCalled() 
 
         it "should set config._account.ownerHash to new @ownerHash", ->
-          expect(@hoodie.my.config.set).wasCalledWith '_account.ownerHash', 'newHash'
+          expect(@hoodie.config.set).wasCalledWith '_account.ownerHash', 'newHash'
 
     _when "user has no account", ->
       beforeEach ->
@@ -836,10 +836,10 @@ describe "Hoodie.Account", ->
         expect(@hoodie.trigger).wasCalledWith 'account:signout'
 
       it "should clear config", ->
-        expect(@hoodie.my.config.clear).wasCalled() 
+        expect(@hoodie.config.clear).wasCalled() 
 
       it "should set config._account.ownerHash to new @ownerHash", ->
-        expect(@hoodie.my.config.set).wasCalledWith '_account.ownerHash', 'newHash'
+        expect(@hoodie.config.set).wasCalledWith '_account.ownerHash', 'newHash'
   # /destroy()
 
   describe "#resetPassword(username)", ->
@@ -848,7 +848,7 @@ describe "Hoodie.Account", ->
 
     _when "there is a pending password reset request", ->
       beforeEach ->
-        spyOn(@hoodie.my.config, "get").andReturn "joe/uuid567"
+        spyOn(@hoodie.config, "get").andReturn "joe/uuid567"
         @account.resetPassword()
 
       it "should not send another request", ->
@@ -862,15 +862,15 @@ describe "Hoodie.Account", ->
 
     _when "there is no pending password reset request", ->
       beforeEach ->
-        spyOn(@hoodie.my.config, "get").andReturn undefined
-        spyOn(@hoodie.my.config, "set")
+        spyOn(@hoodie.config, "get").andReturn undefined
+        spyOn(@hoodie.config, "set")
         spyOn(@hoodie, "uuid").andReturn 'uuid567'
         @account.resetPassword("joe@example.com")
         [@method, @path, @options] = @hoodie.request.mostRecentCall.args
         @data = JSON.parse @options.data
 
       it "should generate a reset Password Id and store it locally", ->
-        expect(@hoodie.my.config.set).wasCalledWith "_account.resetPasswordId", "joe@example.com/uuid567"
+        expect(@hoodie.config.set).wasCalledWith "_account.resetPasswordId", "joe@example.com/uuid567"
 
       it "should send a PUT request to /_users/org.couchdb.user%3A%24passwordReset%2Fjoe%40example.com%2Fuuid567", ->
         expect(@method).toBe 'PUT'
@@ -950,7 +950,7 @@ describe "Hoodie.Account", ->
           [@type, @path, @options] = @hoodie.request.mostRecentCall.args
           @data = JSON.parse @options.data
 
-        it "should send a PUT request to http://my.cou.ch/_users/org.couchdb.user%3Auser%2Fjoe%40example.com", ->
+        it "should send a PUT request to http://cou.ch/_users/org.couchdb.user%3Auser%2Fjoe%40example.com", ->
           expect(@hoodie.request).wasCalled()
           expect(@type).toBe 'PUT'
           expect(@path).toBe  '/_users/org.couchdb.user%3Auser%2Fjoe%40example.com'
@@ -966,11 +966,11 @@ describe "Hoodie.Account", ->
 
         _when "_users doc could be updated", ->
           beforeEach ->
-            spyOn(@hoodie.my.remote, "disconnect")
+            spyOn(@hoodie.remote, "disconnect")
             @requestDefer.resolve()
 
           it "should disconnect", ->
-            expect(@hoodie.my.remote.disconnect).wasCalled() 
+            expect(@hoodie.remote.disconnect).wasCalled() 
 
           it "should sign in with new username", ->
             expect(@account.signIn).wasCalledWith 'new.joe@example.com', 'secret'

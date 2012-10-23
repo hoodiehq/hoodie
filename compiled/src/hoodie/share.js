@@ -37,14 +37,14 @@ Hoodie.Share = (function() {
 
   Share.prototype.find = function(id) {
     var _this = this;
-    return this.hoodie.my.store.find('$share', id).pipe(function(object) {
+    return this.hoodie.store.find('$share', id).pipe(function(object) {
       return new _this.instance(object);
     });
   };
 
   Share.prototype.findAll = function() {
     var _this = this;
-    return this.hoodie.my.store.findAll('$share').pipe(function(objects) {
+    return this.hoodie.store.findAll('$share').pipe(function(objects) {
       var obj, _i, _len, _results;
       _results = [];
       for (_i = 0, _len = objects.length; _i < _len; _i++) {
@@ -57,28 +57,28 @@ Hoodie.Share = (function() {
 
   Share.prototype.findOrCreate = function(id, attributes) {
     var _this = this;
-    return this.hoodie.my.store.findOrCreate('$share', id, attributes).pipe(function(object) {
+    return this.hoodie.store.findOrCreate('$share', id, attributes).pipe(function(object) {
       return new _this.instance(object);
     });
   };
 
   Share.prototype.save = function(id, attributes) {
     var _this = this;
-    return this.hoodie.my.store.save('$share', id, attributes).pipe(function(object) {
+    return this.hoodie.store.save('$share', id, attributes).pipe(function(object) {
       return new _this.instance(object);
     });
   };
 
   Share.prototype.update = function(id, changed_attributes) {
     var _this = this;
-    return this.hoodie.my.store.update('$share', id, changed_attributes).pipe(function(object) {
+    return this.hoodie.store.update('$share', id, changed_attributes).pipe(function(object) {
       return new _this.instance(object);
     });
   };
 
   Share.prototype.updateAll = function(changed_attributes) {
     var _this = this;
-    return this.hoodie.my.store.updateAll('$share', changed_attributes).pipe(function(objects) {
+    return this.hoodie.store.updateAll('$share', changed_attributes).pipe(function(objects) {
       var obj, _i, _len, _results;
       _results = [];
       for (_i = 0, _len = objects.length; _i < _len; _i++) {

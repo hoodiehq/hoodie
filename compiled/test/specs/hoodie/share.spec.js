@@ -77,7 +77,7 @@ describe("Hoodie.Share", function() {
       promise = this.hoodie.defer().resolve({
         funky: 'fresh'
       }).promise();
-      spyOn(this.hoodie.my.store, "find").andReturn(promise);
+      spyOn(this.hoodie.store, "find").andReturn(promise);
       return this.share.instance.andCallFake(function() {
         return this.foo = 'bar';
       });
@@ -85,11 +85,11 @@ describe("Hoodie.Share", function() {
     it("should proxy to store.find('$share', share_id)", function() {
       var promise;
       promise = this.share.find('123');
-      return expect(this.hoodie.my.store.find).wasCalledWith('$share', '123');
+      return expect(this.hoodie.store.find).wasCalledWith('$share', '123');
     });
     return it("should resolve with a Share Instance", function() {
       var promise;
-      this.hoodie.my.store.find.andReturn(this.hoodie.defer().resolve({}).promise());
+      this.hoodie.store.find.andReturn(this.hoodie.defer().resolve({}).promise());
       this.share.instance.andCallFake(function() {
         return this.foo = 'bar';
       });
@@ -101,15 +101,15 @@ describe("Hoodie.Share", function() {
   });
   describe("#findOrCreate(id, share_attributes)", function() {
     beforeEach(function() {
-      return spyOn(this.hoodie.my.store, "findOrCreate").andCallThrough();
+      return spyOn(this.hoodie.store, "findOrCreate").andCallThrough();
     });
-    it("should proxy to hoodie.my.store.findOrCreate with type set to '$share'", function() {
+    it("should proxy to hoodie.store.findOrCreate with type set to '$share'", function() {
       this.share.findOrCreate('id123', {});
-      return expect(this.hoodie.my.store.findOrCreate).wasCalledWith('$share', 'id123', {});
+      return expect(this.hoodie.store.findOrCreate).wasCalledWith('$share', 'id123', {});
     });
     return it("should resolve with a Share Instance", function() {
       var promise;
-      this.hoodie.my.store.findOrCreate.andReturn(this.hoodie.defer().resolve({}).promise());
+      this.hoodie.store.findOrCreate.andReturn(this.hoodie.defer().resolve({}).promise());
       this.share.instance.andCallFake(function() {
         return this.foo = 'bar';
       });
@@ -121,16 +121,16 @@ describe("Hoodie.Share", function() {
   });
   describe("#findAll()", function() {
     beforeEach(function() {
-      return spyOn(this.hoodie.my.store, "findAll").andCallThrough();
+      return spyOn(this.hoodie.store, "findAll").andCallThrough();
     });
-    it("should proxy to hoodie.my.store.findAll('$share')", function() {
-      this.hoodie.my.store.findAll.andCallThrough();
+    it("should proxy to hoodie.store.findAll('$share')", function() {
+      this.hoodie.store.findAll.andCallThrough();
       this.share.findAll();
-      return expect(this.hoodie.my.store.findAll).wasCalledWith('$share');
+      return expect(this.hoodie.store.findAll).wasCalledWith('$share');
     });
     return it("should resolve with an array of Share instances", function() {
       var promise;
-      this.hoodie.my.store.findAll.andReturn(this.hoodie.defer().resolve([{}, {}]).promise());
+      this.hoodie.store.findAll.andReturn(this.hoodie.defer().resolve([{}, {}]).promise());
       this.share.instance.andCallFake(function() {
         return this.foo = 'bar';
       });
@@ -146,19 +146,19 @@ describe("Hoodie.Share", function() {
   });
   describe("#save('share_id', attributes)", function() {
     beforeEach(function() {
-      return spyOn(this.hoodie.my.store, "save").andCallThrough();
+      return spyOn(this.hoodie.store, "save").andCallThrough();
     });
-    it("should proxy to hoodie.my.store.save('$share', 'share_id', attributes)", function() {
+    it("should proxy to hoodie.store.save('$share', 'share_id', attributes)", function() {
       this.share.save('abc4567', {
         funky: 'fresh'
       });
-      return expect(this.hoodie.my.store.save).wasCalledWith('$share', 'abc4567', {
+      return expect(this.hoodie.store.save).wasCalledWith('$share', 'abc4567', {
         funky: 'fresh'
       });
     });
     return it("should resolve with a Share Instance", function() {
       var promise;
-      this.hoodie.my.store.save.andReturn(this.hoodie.defer().resolve({}).promise());
+      this.hoodie.store.save.andReturn(this.hoodie.defer().resolve({}).promise());
       this.share.instance.andCallFake(function() {
         return this.foo = 'bar';
       });
@@ -170,19 +170,19 @@ describe("Hoodie.Share", function() {
   });
   describe("#update('share_id', changed_attributes)", function() {
     beforeEach(function() {
-      return spyOn(this.hoodie.my.store, "update").andCallThrough();
+      return spyOn(this.hoodie.store, "update").andCallThrough();
     });
-    it("should proxy to hoodie.my.store.update('$share', 'share_id', attributes)", function() {
+    it("should proxy to hoodie.store.update('$share', 'share_id', attributes)", function() {
       this.share.update('abc4567', {
         funky: 'fresh'
       });
-      return expect(this.hoodie.my.store.update).wasCalledWith('$share', 'abc4567', {
+      return expect(this.hoodie.store.update).wasCalledWith('$share', 'abc4567', {
         funky: 'fresh'
       });
     });
     return it("should resolve with a Share Instance", function() {
       var promise;
-      this.hoodie.my.store.update.andReturn(this.hoodie.defer().resolve({}).promise());
+      this.hoodie.store.update.andReturn(this.hoodie.defer().resolve({}).promise());
       this.share.instance.andCallFake(function() {
         return this.foo = 'bar';
       });
@@ -194,20 +194,20 @@ describe("Hoodie.Share", function() {
   });
   describe("#updateAll(changed_attributes)", function() {
     beforeEach(function() {
-      return spyOn(this.hoodie.my.store, "updateAll").andCallThrough();
+      return spyOn(this.hoodie.store, "updateAll").andCallThrough();
     });
-    it("should proxy to hoodie.my.store.updateAll('$share', changed_attributes)", function() {
-      this.hoodie.my.store.updateAll.andCallThrough();
+    it("should proxy to hoodie.store.updateAll('$share', changed_attributes)", function() {
+      this.hoodie.store.updateAll.andCallThrough();
       this.share.updateAll({
         funky: 'fresh'
       });
-      return expect(this.hoodie.my.store.updateAll).wasCalledWith('$share', {
+      return expect(this.hoodie.store.updateAll).wasCalledWith('$share', {
         funky: 'fresh'
       });
     });
     return it("should resolve with an array of Share instances", function() {
       var promise;
-      this.hoodie.my.store.updateAll.andReturn(this.hoodie.defer().resolve([{}, {}]).promise());
+      this.hoodie.store.updateAll.andReturn(this.hoodie.defer().resolve([{}, {}]).promise());
       this.share.instance.andCallFake(function() {
         return this.foo = 'bar';
       });
@@ -229,7 +229,7 @@ describe("Hoodie.Share", function() {
       promise = this.hoodie.defer().resolve({
         funky: 'fresh'
       }).promise();
-      spyOn(this.hoodie.my.store, "find").andReturn(promise);
+      spyOn(this.hoodie.store, "find").andReturn(promise);
       return this.share.instance = (function() {
 
         function instance() {}
@@ -245,11 +245,11 @@ describe("Hoodie.Share", function() {
     it("should try to find the object with store.find('$share', share_id)", function() {
       var promise;
       promise = this.share.destroy('123');
-      return expect(this.hoodie.my.store.find).wasCalledWith('$share', '123');
+      return expect(this.hoodie.store.find).wasCalledWith('$share', '123');
     });
     return it("should init the share instance and destroy it", function() {
       var promise;
-      this.hoodie.my.store.find.andReturn(this.hoodie.defer().resolve({}).promise());
+      this.hoodie.store.find.andReturn(this.hoodie.defer().resolve({}).promise());
       promise = this.share.destroy('123');
       return expect(promise).toBeResolvedWith('delete_promise');
     });
@@ -264,7 +264,7 @@ describe("Hoodie.Share", function() {
           funky: 'fresh'
         }
       ]).promise();
-      spyOn(this.hoodie.my.store, "findAll").andReturn(promise);
+      spyOn(this.hoodie.store, "findAll").andReturn(promise);
       return this.share.instance = (function() {
 
         function instance() {}
@@ -280,11 +280,11 @@ describe("Hoodie.Share", function() {
     it("should try to find the object with store.findAll('$share')", function() {
       var promise;
       promise = this.share.destroyAll();
-      return expect(this.hoodie.my.store.findAll).wasCalled();
+      return expect(this.hoodie.store.findAll).wasCalled();
     });
     return it("should init the share instance and destroy it", function() {
       var promise;
-      this.hoodie.my.store.findAll.andReturn(this.hoodie.defer().resolve([{}, {}]).promise());
+      this.hoodie.store.findAll.andReturn(this.hoodie.defer().resolve([{}, {}]).promise());
       promise = this.share.destroyAll();
       return expect(promise).toBeResolvedWith(['destroyAll_promise', 'destroyAll_promise']);
     });

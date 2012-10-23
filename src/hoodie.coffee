@@ -8,11 +8,10 @@ class Hoodie extends Events
 
   # modules to be loaded
   @modules: 
-    my :
-      store   : 'LocalStore'
-      config  : 'Config'
-      account : 'Account'
-      remote  : 'AccountRemoteStore'
+    store   : 'LocalStore'
+    config  : 'Config'
+    account : 'Account'
+    remote  : 'AccountRemoteStore'
 
   # extensions, get loaded after the core modules
   @extensions : 
@@ -55,7 +54,7 @@ class Hoodie extends Events
 
   # generic method to open a store. Used by
   #
-  # * hoodie.my.remote
+  # * hoodie.remote
   # * hoodie.user("joe")
   # * hoodie.global
   # * ... and more

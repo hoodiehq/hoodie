@@ -244,6 +244,14 @@ f.event={add:function(a,c,d,e,g){var h,i,j,k,l,m,n,o,p,q,r,s;if(!(a.nodeType===3
                   "type": "heading",
                   "data": {
                     "level": 2,
+                    "title": "Trigger",
+                    "slug": "trigger"
+                  },
+                  "depth": 2
+                }, {
+                  "type": "heading",
+                  "data": {
+                    "level": 2,
                     "title": "db",
                     "slug": "db"
                   },
@@ -381,6 +389,14 @@ f.event={add:function(a,c,d,e,g){var h,i,j,k,l,m,n,o,p,q,r,s;if(!(a.nodeType===3
                 "level": 2,
                 "title": "On",
                 "slug": "on"
+              },
+              "depth": 2
+            }, {
+              "type": "heading",
+              "data": {
+                "level": 2,
+                "title": "Trigger",
+                "slug": "trigger"
               },
               "depth": 2
             }, {
@@ -949,14 +965,6 @@ f.event={add:function(a,c,d,e,g){var h,i,j,k,l,m,n,o,p,q,r,s;if(!(a.nodeType===3
                   "type": "heading",
                   "data": {
                     "level": 2,
-                    "title": "UUID",
-                    "slug": "uuid"
-                  },
-                  "depth": 2
-                }, {
-                  "type": "heading",
-                  "data": {
-                    "level": 2,
                     "title": "trigger",
                     "slug": "trigger"
                   },
@@ -1086,14 +1094,6 @@ f.event={add:function(a,c,d,e,g){var h,i,j,k,l,m,n,o,p,q,r,s;if(!(a.nodeType===3
                 "level": 2,
                 "title": "Is persistant?",
                 "slug": "is-persistant"
-              },
-              "depth": 2
-            }, {
-              "type": "heading",
-              "data": {
-                "level": 2,
-                "title": "UUID",
-                "slug": "uuid"
               },
               "depth": 2
             }, {
@@ -1413,14 +1413,6 @@ f.event={add:function(a,c,d,e,g){var h,i,j,k,l,m,n,o,p,q,r,s;if(!(a.nodeType===3
                       "type": "heading",
                       "data": {
                         "level": 3,
-                        "title": "parse object response coming from push for local storage.",
-                        "slug": "parse-object-response-coming-from-push-for-local-storage"
-                      },
-                      "depth": 3
-                    }, {
-                      "type": "heading",
-                      "data": {
-                        "level": 3,
                         "title": "handle changes from remote",
                         "slug": "handle-changes-from-remote"
                       },
@@ -1431,6 +1423,14 @@ f.event={add:function(a,c,d,e,g){var h,i,j,k,l,m,n,o,p,q,r,s;if(!(a.nodeType===3
                         "level": 3,
                         "title": "handle push success",
                         "slug": "handle-push-success"
+                      },
+                      "depth": 3
+                    }, {
+                      "type": "heading",
+                      "data": {
+                        "level": 3,
+                        "title": "map docs from findAll",
+                        "slug": "map-docs-from-findall"
                       },
                       "depth": 3
                     }
@@ -1711,14 +1711,6 @@ f.event={add:function(a,c,d,e,g){var h,i,j,k,l,m,n,o,p,q,r,s;if(!(a.nodeType===3
                   "type": "heading",
                   "data": {
                     "level": 3,
-                    "title": "parse object response coming from push for local storage.",
-                    "slug": "parse-object-response-coming-from-push-for-local-storage"
-                  },
-                  "depth": 3
-                }, {
-                  "type": "heading",
-                  "data": {
-                    "level": 3,
                     "title": "handle changes from remote",
                     "slug": "handle-changes-from-remote"
                   },
@@ -1729,6 +1721,14 @@ f.event={add:function(a,c,d,e,g){var h,i,j,k,l,m,n,o,p,q,r,s;if(!(a.nodeType===3
                     "level": 3,
                     "title": "handle push success",
                     "slug": "handle-push-success"
+                  },
+                  "depth": 3
+                }, {
+                  "type": "heading",
+                  "data": {
+                    "level": 3,
+                    "title": "map docs from findAll",
+                    "slug": "map-docs-from-findall"
                   },
                   "depth": 3
                 }
@@ -2192,14 +2192,6 @@ f.event={add:function(a,c,d,e,g){var h,i,j,k,l,m,n,o,p,q,r,s;if(!(a.nodeType===3
                   "type": "heading",
                   "data": {
                     "level": 2,
-                    "title": "UUID",
-                    "slug": "uuid"
-                  },
-                  "depth": 2
-                }, {
-                  "type": "heading",
-                  "data": {
-                    "level": 2,
                     "title": "Private",
                     "slug": "private"
                   },
@@ -2289,14 +2281,6 @@ f.event={add:function(a,c,d,e,g){var h,i,j,k,l,m,n,o,p,q,r,s;if(!(a.nodeType===3
                 "level": 2,
                 "title": "destroyAll",
                 "slug": "destroyall"
-              },
-              "depth": 2
-            }, {
-              "type": "heading",
-              "data": {
-                "level": 2,
-                "title": "UUID",
-                "slug": "uuid"
               },
               "depth": 2
             }, {

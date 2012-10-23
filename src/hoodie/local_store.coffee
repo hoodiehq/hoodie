@@ -71,10 +71,10 @@ class Hoodie.LocalStore extends Hoodie.Store
       id    = @hoodie.uuid()
 
     # add createdBy hash to new objects
-    # note: we check for `hoodie.my.account` as in some cases, the code
+    # note: we check for `hoodie.account` as in some cases, the code
     #       might get executed before the account models is initiated.
-    if isNew and @hoodie.my.account
-      object.$createdBy or= @hoodie.my.account.ownerHash
+    if isNew and @hoodie.account
+      object.$createdBy or= @hoodie.account.ownerHash
    
     # handle public option
     object.$public = options.public if options.public? 

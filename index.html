@@ -25,37 +25,37 @@
     //
     
     // sign up
-    hoodie.my.account.signUp('joe@example.com', 'secret')
+    hoodie.account.signUp('joe@example.com', 'secret')
       .done( function(user) { } ) 
       .fail( function(err)  { } )
       
     // sign in
-    hoodie.my.account.signIn('joe@example.com', 'secret')
+    hoodie.account.signIn('joe@example.com', 'secret')
       .done( function(user) { } ) 
       .fail( function(err)  { } )
       
     // sign out
-    hoodie.my.account.signOut()
+    hoodie.account.signOut()
       .done( function(user) { } ) 
       .fail( function(err)  { } )
     
     // change password
-    hoodie.my.account.changePassword('currentpassword', 'newpassword')
+    hoodie.account.changePassword('currentpassword', 'newpassword')
       .done( function(user) { } ) 
       .fail( function(err)  { } )
 
     // change username
-    hoodie.my.account.changeUsername('currentpassword', 'newusername')
+    hoodie.account.changeUsername('currentpassword', 'newusername')
       .done( function(user) { } ) 
       .fail( function(err)  { } )
       
     // reset password
-    hoodie.my.account.resetPassword('joe@example.com')
+    hoodie.account.resetPassword('joe@example.com')
       .done( function(user) { } ) 
       .fail( function(err)  { } )
 
     // destroy account and all its data
-    hoodie.my.account.destroy()
+    hoodie.account.destroy()
       .done( function(user) { } ) 
       .fail( function(err)  { } )
       
@@ -64,12 +64,12 @@
     //
     
     // helper to generate uuids
-    uuid = hoodie.my.store.uuid(length)
+    uuid = hoodie.store.uuid(length)
     
     // create a new object
     type = 'couch'
     attributes = {color: "red"}
-    hoodie.my.store.create(type, attributes )
+    hoodie.store.create(type, attributes )
       .done ( function(newObject) { } )
       .fail ( function(err)        { } )
       
@@ -77,7 +77,7 @@
     type = 'couch'
     id   = 'abc4567'
     attributes  = {color: "red", name: "relax"}
-    hoodie.my.store.save( type, id, attributes )
+    hoodie.store.save( type, id, attributes )
       .done ( function(object) { } )
       .fail ( function(err)        { } )
       
@@ -85,32 +85,32 @@
     type = 'couch'
     id   = 'abc4567'
     update = {size: 2}
-    hoodie.my.store.update( type, id, update )
+    hoodie.store.update( type, id, update )
       .done ( function(updatedObject) { } )
       .fail ( function(err)            { } )
     
     // find one object
     type = 'couch'
     id   = 'abc4567'
-    hoodie.my.store.find( type, id )
+    hoodie.store.find( type, id )
       .done ( function(object) { } )
       .fail ( function(err)    { } )
       
     // Load all objects
-    hoodie.my.store.findAll()
+    hoodie.store.findAll()
       .done ( function(objects) { } )
       .fail ( function(err)     { } )
       
     // Load all objects from one type
     type = 'couch'
-    hoodie.my.store.findAll( type )
+    hoodie.store.findAll( type )
       .done ( function(objects) { } )
       .fail ( function(err)     { } )
       
     // destroy an existing object
     type = 'couch'
     id   = 'abc4567'
-    hoodie.my.store.destroy( type, id )
+    hoodie.store.destroy( type, id )
       .done ( function(destroyedObject) { } )
       .fail ( function(err)             { } )
       
@@ -122,28 +122,28 @@
     // 
     
     // new doc created
-    hoodie.my.remote.on( 'create', function( createdObject) { } )
+    hoodie.remote.on( 'create', function( createdObject) { } )
 
     // existing doc updated
-    hoodie.my.remote.on( 'update', function( updatedObject) { } )
+    hoodie.remote.on( 'update', function( updatedObject) { } )
 
     // doc destroyed
-    hoodie.my.remote.on( 'destroy', function( destroyedObject) { } )
+    hoodie.remote.on( 'destroy', function( destroyedObject) { } )
 
     // any of above events
-    hoodie.my.remote.on( 'change', function( event, changedObject) { } )
+    hoodie.remote.on( 'change', function( event, changedObject) { } )
 
     // all listeners can be filtered by type
-    hoodie.my.remote.on( "create:couch",  function( createdObject) { } )
-    hoodie.my.remote.on( "update:couch",  function( updatedObject)  { } )
-    hoodie.my.remote.on( "destroy:couch", function( destroyedObject) { } )
-    hoodie.my.remote.on( "change:couch",  function( event, changedObject) { } )
+    hoodie.remote.on( "create:couch",  function( createdObject) { } )
+    hoodie.remote.on( "update:couch",  function( updatedObject)  { } )
+    hoodie.remote.on( "destroy:couch", function( destroyedObject) { } )
+    hoodie.remote.on( "change:couch",  function( event, changedObject) { } )
 
     // ... and by type and id
-    hoodie.my.remote.on( "create:couch:uuid123",  function( createdObject) { } )
-    hoodie.my.remote.on( "update:couch:uuid123",  function( updatedObject)  { } )
-    hoodie.my.remote.on( "destroy:couch:uuid123", function( destroyedObject) { } )
-    hoodie.my.remote.on( "change:couch:uuid123",  function( event, changedObject) { } )
+    hoodie.remote.on( "create:couch:uuid123",  function( createdObject) { } )
+    hoodie.remote.on( "update:couch:uuid123",  function( updatedObject)  { } )
+    hoodie.remote.on( "destroy:couch:uuid123", function( destroyedObject) { } )
+    hoodie.remote.on( "change:couch:uuid123",  function( event, changedObject) { } )
 
 
     //
@@ -154,14 +154,14 @@
     //
 
     // make couch object with id "abc4567" public
-    hoodie.my.store.update("couch","abc4567", {}, {public: true})
+    hoodie.store.update("couch","abc4567", {}, {public: true})
 
     // make couch with id "abc4567" public, but do only show the color, hide
     // all other attributes
-    hoodie.my.store.update("couch","abc4567", {}, {public: ["color"]})
+    hoodie.store.update("couch","abc4567", {}, {public: ["color"]})
 
     // make couch with id "abc4567" private again
-    hoodie.my.store.update("couch","abc4567", {}, {public: false})
+    hoodie.store.update("couch","abc4567", {}, {public: false})
 
     // find all couch objects from user "joe"
     hoodie.user("joe").findAll("couch").done( function(couches) { ... })
@@ -194,7 +194,7 @@
     share.update({access: {read: true}}, password: 'secret')
 
     // add all todo objects to the share
-    share.add( hoodie.my.store.loadAll('todo') )
+    share.add( hoodie.store.loadAll('todo') )
 
     // remove a specific todo from the share
     share.remove( todoObject );

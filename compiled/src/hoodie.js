@@ -8,12 +8,10 @@ Hoodie = (function(_super) {
   __extends(Hoodie, _super);
 
   Hoodie.modules = {
-    my: {
-      store: 'LocalStore',
-      config: 'Config',
-      account: 'Account',
-      remote: 'AccountRemoteStore'
-    }
+    store: 'LocalStore',
+    config: 'Config',
+    account: 'Account',
+    remote: 'AccountRemoteStore'
   };
 
   Hoodie.extensions = {

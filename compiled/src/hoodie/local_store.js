@@ -73,8 +73,8 @@ Hoodie.LocalStore = (function(_super) {
       isNew = true;
       id = this.hoodie.uuid();
     }
-    if (isNew && this.hoodie.my.account) {
-      object.$createdBy || (object.$createdBy = this.hoodie.my.account.ownerHash);
+    if (isNew && this.hoodie.account) {
+      object.$createdBy || (object.$createdBy = this.hoodie.account.ownerHash);
     }
     if (options["public"] != null) {
       object.$public = options["public"];

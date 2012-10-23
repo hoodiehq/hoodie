@@ -37,30 +37,44 @@
 
 <ul>
 <li>on(event, callback)</li>
-</ul></div></div><div class="code"><div class="wrapper"><span class="k">class</span> <span class="nx">Hoodie</span><span class="p">.</span><span class="nx">RemoteStore</span> <span class="k">extends</span> <span class="nx">Hoodie</span><span class="p">.</span><span class="nx">Store</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h2 id="properties">properties</h2></div></div><div class="code"><div class="wrapper">  </div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>sync  </p></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>if set to true, updates will be continuously pulled
-and pushed. Alternatively, <code>_sync</code> can be set to
-<code>pull: true</code> or <code>push: true</code>.</p></div></div><div class="code"><div class="wrapper">  <span class="nv">_sync: </span><span class="kc">false</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h2 id="constructor-">Constructor </h2></div></div><div class="code"><div class="wrapper">  </div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>sets name (think: namespace) and some other options</p></div></div><div class="code"><div class="wrapper">  <span class="nv">constructor : </span><span class="nf">(@hoodie, options = {}) -&gt;</span>
-    <span class="vi">@name  = </span><span class="nx">options</span><span class="p">.</span><span class="nx">name</span> <span class="k">if</span> <span class="nx">options</span><span class="p">.</span><span class="nx">name</span>
-    <span class="vi">@_sync = </span><span class="nx">options</span><span class="p">.</span><span class="nx">sync</span> <span class="k">if</span> <span class="nx">options</span><span class="p">.</span><span class="nx">sync</span>
+</ul></div></div><div class="code"><div class="wrapper"><span class="k">class</span> <span class="nx">Hoodie</span><span class="p">.</span><span class="nx">RemoteStore</span> <span class="k">extends</span> <span class="nx">Hoodie</span><span class="p">.</span><span class="nx">Store</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h2 id="properties">properties</h2></div></div><div class="code"><div class="wrapper">  </div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>name  </p></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>the name of the RemoteStore is the name of the
+CouchDB database and is also used to prefix 
+triggered events</p></div></div><div class="code"><div class="wrapper">  <span class="nv">name : </span><span class="kc">undefined</span>
+  </div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>sync  </p></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>if set to true, updates will be continuously pulled
+and pushed. Alternatively, <code>sync</code> can be set to
+<code>pull: true</code> or <code>push: true</code>.</p></div></div><div class="code"><div class="wrapper">  <span class="nv">_sync : </span><span class="kc">false</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>docPrefix</p></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>prefix of docs in CouchDB Database, e.g. all docs
+in public user stores are prefixed by '$public'</p></div></div><div class="code"><div class="wrapper">  <span class="nv">_prefix : </span><span class="s1">&#39;&#39;</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h2 id="constructor-">Constructor </h2></div></div><div class="code"><div class="wrapper">  </div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>sets name (think: namespace) and some other options</p></div></div><div class="code"><div class="wrapper">  <span class="nv">constructor : </span><span class="nf">(@hoodie, options = {}) -&gt;</span>
+    <span class="vi">@name    = </span><span class="nx">options</span><span class="p">.</span><span class="nx">name</span>   <span class="k">if</span> <span class="nx">options</span><span class="p">.</span><span class="nx">name</span>
+    <span class="vi">@_sync   = </span><span class="nx">options</span><span class="p">.</span><span class="nx">sync</span>   <span class="k">if</span> <span class="nx">options</span><span class="p">.</span><span class="nx">sync</span>
+    <span class="vi">@_prefix = </span><span class="nx">options</span><span class="p">.</span><span class="nx">prefix</span> <span class="k">if</span> <span class="nx">options</span><span class="p">.</span><span class="nx">prefix</span>
     <span class="nx">@startSyncing</span><span class="p">()</span> <span class="k">if</span> <span class="nx">@isContinuouslySyncing</span><span class="p">()</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h2 id="find">find</h2></div></div><div class="code"><div class="wrapper">  </div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>find one object</p></div></div><div class="code"><div class="wrapper">  <span class="nv">find : </span><span class="nf">(type, id) -&gt;</span>
     <span class="nv">defer = </span><span class="k">super</span>
     <span class="k">return</span> <span class="nx">defer</span> <span class="k">if</span> <span class="nx">@hoodie</span><span class="p">.</span><span class="nx">isPromise</span><span class="p">(</span><span class="nx">defer</span><span class="p">)</span>
 
     <span class="nv">path = </span><span class="s2">&quot;/&quot;</span> <span class="o">+</span> <span class="nb">encodeURIComponent</span> <span class="s2">&quot;#{type}/#{id}&quot;</span>
-    <span class="nx">@request</span> <span class="s2">&quot;GET&quot;</span><span class="p">,</span> <span class="nx">path</span>
+    <span class="nx">@request</span><span class="p">(</span><span class="s2">&quot;GET&quot;</span><span class="p">,</span> <span class="nx">path</span><span class="p">).</span><span class="nx">pipe</span><span class="p">(</span><span class="nx">@_parseFromRemote</span><span class="p">)</span>
 
   </div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h2 id="findall">findAll</h2></div></div><div class="code"><div class="wrapper">  </div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>find all objects, can be filetered by a type</p></div></div><div class="code"><div class="wrapper">  <span class="nv">findAll : </span><span class="nf">(type) -&gt;</span>
     <span class="nv">defer = </span><span class="k">super</span>
     <span class="k">return</span> <span class="nx">defer</span> <span class="k">if</span> <span class="nx">@hoodie</span><span class="p">.</span><span class="nx">isPromise</span><span class="p">(</span><span class="nx">defer</span><span class="p">)</span>
 
-    <span class="nv">path = </span><span class="s2">&quot;/_all_docs&quot;</span>
-    <span class="k">if</span> <span class="nx">type</span>
-      <span class="nv">path = </span><span class="s2">&quot;#{path}?startkey=\&quot;#{type}\/\&quot;&amp;endkey=\&quot;#{type}0\&quot;&quot;</span>
+    <span class="nv">path = </span><span class="s2">&quot;/_all_docs?include_docs=true&quot;</span>
+    <span class="k">switch</span> <span class="kc">true</span>
+      <span class="k">when</span> <span class="nx">type</span><span class="o">?</span> <span class="o">and</span> <span class="nx">@_prefix</span> <span class="o">isnt</span> <span class="s1">&#39;&#39;</span>
+        <span class="nv">keyPrefix = </span><span class="s2">&quot;#{@_prefix}/#{type}&quot;</span>
+      <span class="k">when</span> <span class="nx">type</span><span class="o">?</span>
+        <span class="nv">keyPrefix = </span><span class="nx">type</span>
+      <span class="k">when</span> <span class="nx">@_prefix</span> <span class="o">isnt</span> <span class="s1">&#39;&#39;</span>
+        <span class="nv">keyPrefix = </span><span class="nx">@_prefix</span>
+      <span class="k">else</span>
+        <span class="nv">keyPrefix = </span><span class="s1">&#39;&#39;</span>
+
+    <span class="k">if</span> <span class="nx">keyPrefix</span>
+      <span class="nv">path = </span><span class="s2">&quot;#{path}&amp;startkey=\&quot;#{keyPrefix}\/\&quot;&amp;endkey=\&quot;#{keyPrefix}0\&quot;&quot;</span>
 
     <span class="nv">promise = </span><span class="nx">@request</span> <span class="s2">&quot;GET&quot;</span><span class="p">,</span> <span class="nx">path</span>
     <span class="nx">promise</span><span class="p">.</span><span class="nx">fail</span> <span class="nx">defer</span><span class="p">.</span><span class="nx">reject</span>
-    <span class="nx">promise</span><span class="p">.</span><span class="nx">done</span> <span class="nf">(response) -&gt;</span>
-      <span class="nx">defer</span><span class="p">.</span><span class="nx">resolve</span> <span class="nx">response</span><span class="p">.</span><span class="nx">rows</span>
+    <span class="nx">promise</span><span class="p">.</span><span class="nx">pipe</span><span class="p">(</span><span class="nx">@_mapDocsFromFindAll</span><span class="p">).</span><span class="nx">pipe</span><span class="p">(</span><span class="nx">@_parseAllFromRemote</span><span class="p">).</span><span class="nx">done</span> <span class="nx">defer</span><span class="p">.</span><span class="nx">resolve</span>
 
     <span class="k">return</span> <span class="nx">defer</span><span class="p">.</span><span class="nx">promise</span><span class="p">()</span>
   </div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h2 id="save">save</h2></div></div><div class="code"><div class="wrapper">  </div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>save a new object. If it existed before, all properties
@@ -68,7 +82,7 @@ will be overwritten </p></div></div><div class="code"><div class="wrapper">  <sp
     <span class="nv">defer = </span><span class="k">super</span>
     <span class="k">return</span> <span class="nx">defer</span> <span class="k">if</span> <span class="nx">@hoodie</span><span class="p">.</span><span class="nx">isPromise</span><span class="p">(</span><span class="nx">defer</span><span class="p">)</span>
 
-    <span class="nv">id = </span><span class="nx">@uuid</span><span class="p">()</span> <span class="nx">unless</span> <span class="nx">id</span> 
+    <span class="nv">id = </span><span class="nx">@hoodie</span><span class="p">.</span><span class="nx">uuid</span><span class="p">()</span> <span class="nx">unless</span> <span class="nx">id</span> 
     <span class="nv">object = </span><span class="nx">$</span><span class="p">.</span><span class="nx">extend</span> <span class="p">{</span>
       <span class="nv">$type : </span><span class="nx">type</span>
       <span class="nv">id    : </span><span class="nx">id</span>
@@ -206,14 +220,15 @@ we'll try again after a 3s timeout</p></div></div><div class="code"><div class="
       <span class="k">continue</span> <span class="nx">unless</span> <span class="sr">/^_/</span><span class="p">.</span><span class="nx">test</span> <span class="nx">attr</span>
       <span class="k">delete</span> <span class="nx">attributes</span><span class="p">[</span><span class="nx">attr</span><span class="p">]</span>
    </div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>prepare CouchDB id</p></div></div><div class="code"><div class="wrapper">    <span class="nv">attributes._id = </span><span class="s2">&quot;#{attributes.$type}/#{attributes.id}&quot;</span>
+    <span class="k">if</span> <span class="nx">@_prefix</span>
+      <span class="nv">attributes._id = </span><span class="s2">&quot;#{@_prefix}/#{attributes._id}&quot;</span>
+    
     <span class="k">delete</span> <span class="nx">attributes</span><span class="p">.</span><span class="nx">id</span>
     
     <span class="nx">@_addRevisionTo</span> <span class="nx">attributes</span>
 
     <span class="k">return</span> <span class="nx">attributes</span>
-  </div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h3 id="generate-new-revision-id">generate new revision id</h3></div></div></div><div class="segment"><div class="code"><div class="wrapper">  <span class="nv">_generateNewRevisionId: </span> <span class="o">-&gt;</span>
-    <span class="nv">uuid        = </span><span class="nx">@hoodie</span><span class="p">.</span><span class="nx">my</span><span class="p">.</span><span class="nx">store</span><span class="p">.</span><span class="nx">uuid</span><span class="p">(</span><span class="mi">9</span><span class="p">)</span>
-    <span class="k">return</span> <span class="nx">uuid</span>
+  </div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h3 id="generate-new-revision-id">generate new revision id</h3></div></div></div><div class="segment"><div class="code"><div class="wrapper">  <span class="nv">_generateNewRevisionId: </span> <span class="o">-&gt;</span> <span class="nx">@hoodie</span><span class="p">.</span><span class="nx">uuid</span><span class="p">(</span><span class="mi">9</span><span class="p">)</span>
   </div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h3 id="and-new-revion-to-objecet">and new revion to objecet</h3></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>get new revision number</p></div></div><div class="code"><div class="wrapper">  <span class="nv">_addRevisionTo : </span><span class="nf">(attributes) -&gt;</span>
 
     <span class="k">try</span> <span class="p">[</span><span class="nx">currentRevNr</span><span class="p">,</span> <span class="nx">currentRevId</span><span class="p">]</span> <span class="o">=</span> <span class="nx">attributes</span><span class="p">.</span><span class="nx">_rev</span><span class="p">.</span><span class="nx">split</span> <span class="sr">/-/</span>
@@ -229,9 +244,9 @@ we'll try again after a 3s timeout</p></div></div><div class="code"><div class="
       <span class="nx">attributes</span><span class="p">.</span><span class="nx">_revisions</span><span class="p">.</span><span class="nx">start</span> <span class="o">+=</span> <span class="nx">currentRevNr</span>
       <span class="nx">attributes</span><span class="p">.</span><span class="nx">_revisions</span><span class="p">.</span><span class="nx">ids</span><span class="p">.</span><span class="nx">push</span> <span class="nx">currentRevId</span>
   </div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h3 id="parse-object-coming-from-pull-for-local-storage">parse object coming from pull for local storage.</h3></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>renames <code>_id</code> attribute to <code>id</code> and removes the type from the id,
-e.g. <code>document/123</code> -> <code>123</code></p></div></div><div class="code"><div class="wrapper">  <span class="nv">_parseFromPull : </span><span class="nf">(obj) -&gt;</span>
-    </div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>handle id and type</p></div></div><div class="code"><div class="wrapper">    <span class="nv">id = </span><span class="nx">obj</span><span class="p">.</span><span class="nx">_id</span> <span class="o">or</span> <span class="nx">obj</span><span class="p">.</span><span class="nx">id</span>
+e.g. <code>document/123</code> -> <code>123</code></p></div></div><div class="code"><div class="wrapper">  <span class="nv">_parseFromRemote : </span><span class="p">(</span><span class="nx">obj</span><span class="p">)</span> <span class="o">=&gt;</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>handle id and type</p></div></div><div class="code"><div class="wrapper">    <span class="nv">id = </span><span class="nx">obj</span><span class="p">.</span><span class="nx">_id</span> <span class="o">or</span> <span class="nx">obj</span><span class="p">.</span><span class="nx">id</span>
     <span class="k">delete</span> <span class="nx">obj</span><span class="p">.</span><span class="nx">_id</span>
+    <span class="nv">id = </span><span class="nx">id</span><span class="p">.</span><span class="nx">replace</span><span class="p">(</span><span class="nb">RegExp</span><span class="p">(</span><span class="s1">&#39;^&#39;</span><span class="o">+</span><span class="nx">@_prefix</span><span class="o">+</span><span class="s1">&#39;/&#39;</span><span class="p">),</span> <span class="s1">&#39;&#39;</span><span class="p">)</span> <span class="k">if</span> <span class="nx">@_prefix</span>
     <span class="p">[</span><span class="nx">obj</span><span class="p">.</span><span class="nx">$type</span><span class="p">,</span> <span class="nx">obj</span><span class="p">.</span><span class="nx">id</span><span class="p">]</span> <span class="o">=</span> <span class="nx">id</span><span class="p">.</span><span class="nx">split</span><span class="p">(</span><span class="sr">/\//</span><span class="p">)</span>
     </div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>handle timestameps</p></div></div><div class="code"><div class="wrapper">    <span class="nx">obj</span><span class="p">.</span><span class="nv">$createdAt = </span><span class="k">new</span> <span class="nb">Date</span><span class="p">(</span><span class="nb">Date</span><span class="p">.</span><span class="nx">parse</span> <span class="nx">obj</span><span class="p">.</span><span class="nx">$createdAt</span><span class="p">)</span> <span class="k">if</span> <span class="nx">obj</span><span class="p">.</span><span class="nx">$createdAt</span>
     <span class="nx">obj</span><span class="p">.</span><span class="nv">$updatedAt = </span><span class="k">new</span> <span class="nb">Date</span><span class="p">(</span><span class="nb">Date</span><span class="p">.</span><span class="nx">parse</span> <span class="nx">obj</span><span class="p">.</span><span class="nx">$updatedAt</span><span class="p">)</span> <span class="k">if</span> <span class="nx">obj</span><span class="p">.</span><span class="nx">$updatedAt</span>
@@ -241,54 +256,26 @@ e.g. <code>document/123</code> -> <code>123</code></p></div></div><div class="co
     
     <span class="k">return</span> <span class="nx">obj</span>
   
-  </div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h3 id="parse-object-response-coming-from-push-for-local-storage">parse object response coming from push for local storage.</h3></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>removes the type from the id, e.g. <code>document/123</code> -> <code>123</code>
-also removes attribute ok</p></div></div><div class="code"><div class="wrapper">  <span class="nv">_parseFromPush : </span><span class="nf">(obj) -&gt;</span>
-    </div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>handle id and type</p></div></div><div class="code"><div class="wrapper">    <span class="nv">id = </span><span class="nx">obj</span><span class="p">.</span><span class="nx">_id</span> <span class="o">or</span> 
-    <span class="k">delete</span> <span class="nx">obj</span><span class="p">.</span><span class="nx">_id</span>
-    <span class="p">[</span><span class="nx">obj</span><span class="p">.</span><span class="nx">$type</span><span class="p">,</span> <span class="nx">obj</span><span class="p">.</span><span class="nx">id</span><span class="p">]</span> <span class="o">=</span> <span class="nx">obj</span><span class="p">.</span><span class="nx">id</span><span class="p">.</span><span class="nx">split</span><span class="p">(</span><span class="sr">/\//</span><span class="p">)</span>
-    </div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>handle rev</p></div></div><div class="code"><div class="wrapper">    <span class="nv">obj._rev = </span><span class="nx">obj</span><span class="p">.</span><span class="nx">rev</span>
-    <span class="k">delete</span> <span class="nx">obj</span><span class="p">.</span><span class="nx">rev</span>
-    </div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>remove ok attribute</p></div></div><div class="code"><div class="wrapper">    <span class="k">delete</span> <span class="nx">obj</span><span class="p">.</span><span class="nx">ok</span>
-    
-    <span class="k">return</span> <span class="nx">obj</span>
-  </div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h3 id="handle-changes-from-remote">handle changes from remote</h3></div></div><div class="code"><div class="wrapper">  </div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>note: we don't trigger any events until all changes have been taken care of.
-      Reason is, that on object could depend on a different object that has
-      not been stored yet, but is within the same bulk of changes. This 
-      is especially the case during initial bootstraps after a user signs in.</p></div></div><div class="code"><div class="wrapper">  <span class="nv">_handlePullResults : </span><span class="p">(</span><span class="nx">changes</span><span class="p">)</span> <span class="o">=&gt;</span>
-    <span class="nv">_destroyedDocs = </span><span class="p">[]</span>
-    <span class="nv">_changedDocs   = </span><span class="p">[]</span>
-    </div></div></div><div class="segment"><div class="comments"><div class="wrapper"><ol>
-<li>update or remove objects from local store</li>
-</ol></div></div><div class="code"><div class="wrapper">    <span class="k">for</span> <span class="p">{</span><span class="nx">doc</span><span class="p">}</span> <span class="k">in</span> <span class="nx">changes</span>
-      <span class="nv">doc = </span><span class="nx">@_parseFromPull</span><span class="p">(</span><span class="nx">doc</span><span class="p">)</span>
-      <span class="k">if</span> <span class="nx">doc</span><span class="p">.</span><span class="nx">_deleted</span>
-        <span class="nx">_destroyedDocs</span><span class="p">.</span><span class="nx">push</span> <span class="p">[</span><span class="nx">doc</span><span class="p">,</span> <span class="nx">@hoodie</span><span class="p">.</span><span class="nx">my</span><span class="p">.</span><span class="nx">store</span><span class="p">.</span><span class="nx">destroy</span><span class="p">(</span> <span class="nx">doc</span><span class="p">.</span><span class="nx">$type</span><span class="p">,</span> <span class="nx">doc</span><span class="p">.</span><span class="nx">id</span><span class="p">,</span>      <span class="nv">remote: </span><span class="kc">true</span><span class="p">)]</span>
-      <span class="k">else</span>                                                
-        <span class="nx">_changedDocs</span><span class="p">.</span><span class="nx">push</span>   <span class="p">[</span><span class="nx">doc</span><span class="p">,</span> <span class="nx">@hoodie</span><span class="p">.</span><span class="nx">my</span><span class="p">.</span><span class="nx">store</span><span class="p">.</span><span class="nx">save</span><span class="p">(</span>    <span class="nx">doc</span><span class="p">.</span><span class="nx">$type</span><span class="p">,</span> <span class="nx">doc</span><span class="p">.</span><span class="nx">id</span><span class="p">,</span> <span class="nx">doc</span><span class="p">,</span> <span class="nv">remote: </span><span class="kc">true</span><span class="p">)]</span>
-    </div></div></div><div class="segment"><div class="comments"><div class="wrapper"><ol>
-<li>trigger events</li>
-</ol></div></div><div class="code"><div class="wrapper">    <span class="k">for</span> <span class="p">[</span><span class="nx">doc</span><span class="p">,</span> <span class="nx">promise</span><span class="p">]</span> <span class="k">in</span> <span class="nx">_destroyedDocs</span>
-      <span class="nx">promise</span><span class="p">.</span><span class="k">then</span> <span class="p">(</span><span class="nx">object</span><span class="p">)</span> <span class="o">=&gt;</span> 
-        <span class="nx">@trigger</span> <span class="s1">&#39;destroy&#39;</span><span class="p">,</span>                        <span class="nx">object</span>
-        <span class="nx">@trigger</span> <span class="s2">&quot;destroy:#{doc.$type}&quot;</span><span class="p">,</span>           <span class="nx">object</span>
-        <span class="nx">@trigger</span> <span class="s2">&quot;destroy:#{doc.$type}:#{doc.id}&quot;</span><span class="p">,</span> <span class="nx">object</span>
-        
-        <span class="nx">@trigger</span> <span class="s1">&#39;change&#39;</span><span class="p">,</span>                         <span class="s1">&#39;destroy&#39;</span><span class="p">,</span> <span class="nx">object</span>
-        <span class="nx">@trigger</span> <span class="s2">&quot;change:#{doc.$type}&quot;</span><span class="p">,</span>            <span class="s1">&#39;destroy&#39;</span><span class="p">,</span> <span class="nx">object</span>
-        <span class="nx">@trigger</span> <span class="s2">&quot;change:#{doc.$type}:#{doc.id}&quot;</span><span class="p">,</span>  <span class="s1">&#39;destroy&#39;</span><span class="p">,</span> <span class="nx">object</span>
-    
-    <span class="k">for</span> <span class="p">[</span><span class="nx">doc</span><span class="p">,</span> <span class="nx">promise</span><span class="p">]</span> <span class="k">in</span> <span class="nx">_changedDocs</span>
-      <span class="nx">promise</span><span class="p">.</span><span class="k">then</span> <span class="p">(</span><span class="nx">object</span><span class="p">,</span> <span class="nx">objectWasCreated</span><span class="p">)</span> <span class="o">=&gt;</span> 
-        <span class="nv">event = </span><span class="k">if</span> <span class="nx">objectWasCreated</span> <span class="k">then</span> <span class="s1">&#39;create&#39;</span> <span class="k">else</span> <span class="s1">&#39;update&#39;</span>
-        <span class="nx">@trigger</span> <span class="nx">event</span><span class="p">,</span>                             <span class="nx">object</span>
-        <span class="nx">@trigger</span> <span class="s2">&quot;#{event}:#{doc.$type}&quot;</span><span class="p">,</span>           <span class="nx">object</span>
-        <span class="nx">@trigger</span> <span class="s2">&quot;#{event}:#{doc.$type}:#{doc.id}&quot;</span><span class="p">,</span> <span class="nx">object</span> <span class="nx">unless</span> <span class="nx">event</span> <span class="o">is</span> <span class="s1">&#39;create&#39;</span>
-      
-        <span class="nx">@trigger</span> <span class="s2">&quot;change&quot;</span><span class="p">,</span>                          <span class="nx">event</span><span class="p">,</span> <span class="nx">object</span>
-        <span class="nx">@trigger</span> <span class="s2">&quot;change:#{doc.$type}&quot;</span><span class="p">,</span>             <span class="nx">event</span><span class="p">,</span> <span class="nx">object</span>
-        <span class="nx">@trigger</span> <span class="s2">&quot;change:#{doc.$type}:#{doc.id}&quot;</span><span class="p">,</span>   <span class="nx">event</span><span class="p">,</span> <span class="nx">object</span> <span class="nx">unless</span> <span class="nx">event</span> <span class="o">is</span> <span class="s1">&#39;create&#39;</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h3 id="handle-push-success">handle push success</h3></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>update local _rev attributes after changes pushed</p></div></div><div class="code"><div class="wrapper">  <span class="nv">_handlePushSuccess: </span><span class="p">(</span><span class="nx">docs</span><span class="p">,</span> <span class="nx">pushedDocs</span><span class="p">)</span> <span class="o">=&gt;</span>
-    <span class="o">=&gt;</span>
-      <span class="k">for</span> <span class="nx">doc</span><span class="p">,</span> <span class="nx">i</span> <span class="k">in</span> <span class="nx">docs</span>
-        <span class="nv">update  = </span><span class="p">{</span><span class="nv">_rev: </span><span class="nx">pushedDocs</span><span class="p">[</span><span class="nx">i</span><span class="p">].</span><span class="nx">_rev</span><span class="p">}</span>
-        <span class="nv">options = remote : </span><span class="kc">true</span>
-        <span class="nx">@hoodie</span><span class="p">.</span><span class="nx">my</span><span class="p">.</span><span class="nx">store</span><span class="p">.</span><span class="nx">update</span><span class="p">(</span><span class="nx">doc</span><span class="p">.</span><span class="nx">$type</span><span class="p">,</span> <span class="nx">doc</span><span class="p">.</span><span class="nx">id</span><span class="p">,</span> <span class="nx">update</span><span class="p">,</span> <span class="nx">options</span><span class="p">)</span> </div></div></div></div></body></html>
+  <span class="nv">_parseAllFromRemote : </span><span class="p">(</span><span class="nx">objects</span><span class="p">)</span> <span class="o">=&gt;</span>
+    <span class="nx">@_parseFromRemote</span><span class="p">(</span><span class="nx">object</span><span class="p">)</span> <span class="k">for</span> <span class="nx">object</span> <span class="k">in</span> <span class="nx">objects</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h3 id="handle-changes-from-remote">handle changes from remote</h3></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>in order to differentiate whether an object from remote should trigger a 'create'
+or an 'update' event, we store a hash of known objects</p></div></div><div class="code"><div class="wrapper">  <span class="nv">_knownObjects : </span><span class="p">{}</span>
+  <span class="nv">_handlePullResults : </span><span class="p">(</span><span class="nx">changes</span><span class="p">)</span> <span class="o">=&gt;</span>
+    <span class="k">for</span> <span class="p">{</span><span class="nx">doc</span><span class="p">}</span> <span class="k">in</span> <span class="nx">changes</span>
+      <span class="nv">parsedDoc = </span><span class="nx">@_parseFromRemote</span><span class="p">(</span><span class="nx">doc</span><span class="p">)</span>
+      <span class="k">if</span> <span class="nx">parsedDoc</span><span class="p">.</span><span class="nx">_deleted</span>
+        <span class="nv">event = </span><span class="s1">&#39;destroy&#39;</span>
+        <span class="k">delete</span> <span class="nx">@_knownObjects</span><span class="p">[</span><span class="nx">doc</span><span class="p">.</span><span class="nx">_id</span><span class="p">]</span>
+      <span class="k">else</span>
+        <span class="k">if</span> <span class="nx">@_knownObjects</span><span class="p">[</span><span class="nx">doc</span><span class="p">.</span><span class="nx">_id</span><span class="p">]</span>
+          <span class="nv">event = </span><span class="s1">&#39;update&#39;</span>
+        <span class="k">else</span>
+          <span class="nv">event = </span><span class="s1">&#39;create&#39;</span>
+          <span class="nx">@_knownObjects</span><span class="p">[</span><span class="nx">doc</span><span class="p">.</span><span class="nx">_id</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
+
+      <span class="nx">@trigger</span> <span class="nx">event</span><span class="p">,</span>                                         <span class="nx">parsedDoc</span>
+      <span class="nx">@trigger</span> <span class="s2">&quot;#{event}:#{parsedDoc.$type}&quot;</span><span class="p">,</span>                 <span class="nx">parsedDoc</span>
+      <span class="nx">@trigger</span> <span class="s2">&quot;#{event}:#{parsedDoc.$type}:#{parsedDoc.id}&quot;</span><span class="p">,</span> <span class="nx">parsedDoc</span>      
+      <span class="nx">@trigger</span> <span class="s2">&quot;change&quot;</span><span class="p">,</span>                                      <span class="nx">event</span><span class="p">,</span> <span class="nx">parsedDoc</span>
+      <span class="nx">@trigger</span> <span class="s2">&quot;change:#{parsedDoc.$type}&quot;</span><span class="p">,</span>                   <span class="nx">event</span><span class="p">,</span> <span class="nx">parsedDoc</span>
+      <span class="nx">@trigger</span> <span class="s2">&quot;change:#{parsedDoc.$type}:#{parsedDoc.id}&quot;</span><span class="p">,</span>   <span class="nx">event</span><span class="p">,</span> <span class="nx">parsedDoc</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h3 id="handle-push-success">handle push success</h3></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>do nothing by default</p></div></div><div class="code"><div class="wrapper">  <span class="nv">_handlePushSuccess: </span><span class="p">(</span><span class="nx">docs</span><span class="p">,</span> <span class="nx">pushedDocs</span><span class="p">)</span> <span class="o">=&gt;</span> </div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h3 id="map-docs-from-findall">map docs from findAll</h3></div></div></div><div class="segment"><div class="code"><div class="wrapper">  <span class="nv">_mapDocsFromFindAll: </span><span class="p">(</span><span class="nx">response</span><span class="p">)</span> <span class="o">=&gt;</span>
+    <span class="nx">response</span><span class="p">.</span><span class="nx">rows</span><span class="p">.</span><span class="nx">map</span> <span class="nf">(row) -&gt;</span> <span class="nx">row</span><span class="p">.</span><span class="nx">doc</span></div></div></div></div></body></html>

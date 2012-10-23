@@ -14,7 +14,7 @@ describe("Hoodie.Email", function() {
         subject: 'subject',
         body: 'body'
       };
-      return (spyOn(this.hoodie.my.store, "create")).andReturn({
+      return (spyOn(this.hoodie.store, "create")).andReturn({
         then: function(cb) {
           return cb($.extend({}, this.emailAttributes, {
             id: 'abc4567'
@@ -27,13 +27,13 @@ describe("Hoodie.Email", function() {
     });
     it("should save the email as object with type: $email", function() {
       this.email.send(this.emailAttributes);
-      return (expect(this.hoodie.my.store.create)).wasCalledWith('$email', this.emailAttributes);
+      return (expect(this.hoodie.store.create)).wasCalledWith('$email', this.emailAttributes);
     });
     it("should listen to server response", function() {
-      spyOn(this.hoodie.my.remote, "one");
+      spyOn(this.hoodie.remote, "one");
       this.email.send(this.emailAttributes);
-      expect(this.hoodie.my.remote.one).wasCalled();
-      return expect(this.hoodie.my.remote.one.mostRecentCall.args[0]).toEqual("updated:$email:abc4567");
+      expect(this.hoodie.remote.one).wasCalled();
+      return expect(this.hoodie.remote.one.mostRecentCall.args[0]).toEqual("updated:$email:abc4567");
     });
     _when("email.to is not provided", function() {
       beforeEach(function() {
@@ -68,7 +68,7 @@ describe("Hoodie.Email", function() {
           id: 'abc4567',
           deliveredAt: "2012-05-05 15:00 UTC"
         });
-        (spyOn(this.hoodie.my.remote, "one")).andCallFake(function(event, cb) {
+        (spyOn(this.hoodie.remote, "one")).andCallFake(function(event, cb) {
           return cb(_this.emailResponseAttributes);
         });
         return this.promise = this.email.send(this.emailAttributes);
@@ -85,7 +85,7 @@ describe("Hoodie.Email", function() {
           id: 'abc4567',
           error: "U SPAM!"
         });
-        (spyOn(this.hoodie.my.remote, "one")).andCallFake(function(event, cb) {
+        (spyOn(this.hoodie.remote, "one")).andCallFake(function(event, cb) {
           return cb(_this.emailResponseAttributes);
         });
         return this.promise = this.email.send(this.emailAttributes);
