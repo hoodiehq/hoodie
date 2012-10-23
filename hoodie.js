@@ -292,6 +292,11 @@ Hoodie.Account = (function() {
     if (password == null) {
       password = '';
     }
+    if (this.username && this.username !== username) {
+      return this.hoodie.defer().reject({
+        error: 'You have to sign out first'
+      }).promise();
+    }
     options = {
       data: {
         name: this._userKey(username),

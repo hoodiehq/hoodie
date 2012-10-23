@@ -467,111 +467,128 @@ describe("Hoodie.Account", function() {
   describe("#signIn(username, password)", function() {
     beforeEach(function() {});
     _when("sign in with password", function() {
-      beforeEach(function() {
-        var _ref;
-        this.account.signIn('joe@example.com', 'secret');
-        return _ref = this.hoodie.request.mostRecentCall.args, this.type = _ref[0], this.path = _ref[1], this.options = _ref[2], _ref;
-      });
-      it("should send a POST request to http://my.cou.ch/_session", function() {
-        expect(this.hoodie.request).wasCalled();
-        expect(this.type).toBe('POST');
-        return expect(this.path).toBe('/_session');
-      });
-      it("should send username as name parameter", function() {
-        return expect(this.options.data.name).toBe('user/joe@example.com');
-      });
-      it("should send password", function() {
-        return expect(this.options.data.password).toBe('secret');
-      });
-      _and("signIn successful", function() {
-        _and("account is confirmed", function() {
-          beforeEach(function() {
-            this.response = {
-              "ok": true,
-              "name": "user/joe@example.com",
-              "roles": ["user_hash", "confirmed"]
-            };
-            this.requestDefer.resolve(this.response);
-            return spyOn(this.hoodie.my.config, "set");
-          });
-          _and("user has an anonyomous account", function() {
-            beforeEach(function() {
-              return spyOn(this.account, "hasAnonymousAccount").andReturn(true);
-            });
-            return it("should trigger `account:signin:anonymous` event", function() {
-              this.account.signIn('joe@example.com', 'secret');
-              return expect(this.hoodie.trigger).wasCalledWith('account:signin:anonymous', 'joe@example.com');
-            });
-          });
-          _and("user has a manual account", function() {
-            beforeEach(function() {
-              return spyOn(this.account, "hasAnonymousAccount").andReturn(false);
-            });
-            return it("should trigger `account:signin` event", function() {
-              this.account.signIn('joe@example.com', 'secret');
-              return expect(this.hoodie.trigger).wasCalledWith('account:signin', 'joe@example.com');
-            });
-          });
-          it("should set @username", function() {
-            this.account.signIn('joe@example.com', 'secret');
-            expect(this.account.username).toBe('joe@example.com');
-            return expect(this.hoodie.my.config.set).wasCalledWith('_account.username', 'joe@example.com');
-          });
-          it("should set @ownerHash", function() {
-            this.account.signIn('joe@example.com', 'secret');
-            expect(this.account.ownerHash).toBe('user_hash');
-            return expect(this.hoodie.my.config.set).wasCalledWith('_account.ownerHash', 'user_hash');
-          });
-          it("should fetch the _users doc", function() {
-            spyOn(this.account, "fetch");
-            this.account.signIn('joe@example.com', 'secret');
-            return expect(this.account.fetch).wasCalled();
-          });
-          return it("should resolve with username and response", function() {
-            return expect(this.account.signIn('joe@example.com', 'secret')).toBeResolvedWith('joe@example.com', 'user_hash');
-          });
+      _but("user is logged in", function() {
+        it("should be rejected when logged in as different user", function() {
+          var promise;
+          this.account.username = 'other@example.com';
+          promise = this.account.signIn('joe@example.com', 'secret');
+          return expect(promise).toBeRejected();
         });
-        _and("account not (yet) confirmed", function() {
-          beforeEach(function() {
-            this.response = {
-              "ok": true,
-              "name": "user/joe@example.com",
-              "roles": []
-            };
-            return this.requestDefer.resolve(this.response);
-          });
-          return it("should reject with unconfirmed error.", function() {
-            var promise;
-            promise = this.account.signIn('joe@example.com', 'secret');
-            return expect(promise).toBeRejectedWith({
-              error: "unconfirmed",
-              reason: "account has not been confirmed yet"
-            });
-          });
+        return it("should not be rejected when logged in as same user", function() {
+          var promise;
+          this.account.username = 'joe@example.com';
+          promise = this.account.signIn('joe@example.com', 'secret');
+          return expect(promise.state()).toBe('pending');
         });
-        return _and("account has an error", function() {
-          beforeEach(function() {
-            var _this = this;
-            this.response = {
-              "ok": true,
-              "name": "user/joe@example.com",
-              "roles": ['error']
-            };
-            this.requestDefer.resolve(this.response);
-            return spyOn(this.account, "fetch").andCallFake(function() {
-              _this.account._doc.$error = 'because you stink!';
-              return _this.hoodie.defer().resolve();
+      });
+      _and("user is not logged in", function() {
+        beforeEach(function() {
+          var _ref;
+          delete this.account.username;
+          this.account.signIn('joe@example.com', 'secret');
+          return _ref = this.hoodie.request.mostRecentCall.args, this.type = _ref[0], this.path = _ref[1], this.options = _ref[2], _ref;
+        });
+        it("should send a POST request to http://my.cou.ch/_session", function() {
+          expect(this.hoodie.request).wasCalled();
+          expect(this.type).toBe('POST');
+          return expect(this.path).toBe('/_session');
+        });
+        it("should send username as name parameter", function() {
+          return expect(this.options.data.name).toBe('user/joe@example.com');
+        });
+        it("should send password", function() {
+          return expect(this.options.data.password).toBe('secret');
+        });
+        return _and("signIn successful", function() {
+          _and("account is confirmed", function() {
+            beforeEach(function() {
+              this.response = {
+                "ok": true,
+                "name": "user/joe@example.com",
+                "roles": ["user_hash", "confirmed"]
+              };
+              this.requestDefer.resolve(this.response);
+              return spyOn(this.hoodie.my.config, "set");
+            });
+            _and("user has an anonyomous account", function() {
+              beforeEach(function() {
+                return spyOn(this.account, "hasAnonymousAccount").andReturn(true);
+              });
+              return it("should trigger `account:signin:anonymous` event", function() {
+                this.account.signIn('joe@example.com', 'secret');
+                return expect(this.hoodie.trigger).wasCalledWith('account:signin:anonymous', 'joe@example.com');
+              });
+            });
+            _and("user has a manual account", function() {
+              beforeEach(function() {
+                return spyOn(this.account, "hasAnonymousAccount").andReturn(false);
+              });
+              return it("should trigger `account:signin` event", function() {
+                this.account.signIn('joe@example.com', 'secret');
+                return expect(this.hoodie.trigger).wasCalledWith('account:signin', 'joe@example.com');
+              });
+            });
+            it("should set @username", function() {
+              this.account.signIn('joe@example.com', 'secret');
+              expect(this.account.username).toBe('joe@example.com');
+              return expect(this.hoodie.my.config.set).wasCalledWith('_account.username', 'joe@example.com');
+            });
+            it("should set @ownerHash", function() {
+              this.account.signIn('joe@example.com', 'secret');
+              expect(this.account.ownerHash).toBe('user_hash');
+              return expect(this.hoodie.my.config.set).wasCalledWith('_account.ownerHash', 'user_hash');
+            });
+            it("should fetch the _users doc", function() {
+              spyOn(this.account, "fetch");
+              this.account.signIn('joe@example.com', 'secret');
+              return expect(this.account.fetch).wasCalled();
+            });
+            return it("should resolve with username and response", function() {
+              return expect(this.account.signIn('joe@example.com', 'secret')).toBeResolvedWith('joe@example.com', 'user_hash');
             });
           });
-          it("should fetch user doc without setting @username", function() {
-            this.account.signIn('joe@example.com', 'secret');
-            expect(this.account.fetch).wasCalledWith('joe@example.com');
-            return expect(this.account.username).toBeUndefined();
+          _and("account not (yet) confirmed", function() {
+            beforeEach(function() {
+              this.response = {
+                "ok": true,
+                "name": "user/joe@example.com",
+                "roles": []
+              };
+              return this.requestDefer.resolve(this.response);
+            });
+            return it("should reject with unconfirmed error.", function() {
+              var promise;
+              promise = this.account.signIn('joe@example.com', 'secret');
+              return expect(promise).toBeRejectedWith({
+                error: "unconfirmed",
+                reason: "account has not been confirmed yet"
+              });
+            });
           });
-          return it("should reject with the reason", function() {
-            return expect(this.account.signIn('joe@example.com', 'secret')).toBeRejectedWith({
-              error: 'error',
-              reason: 'because you stink!'
+          return _and("account has an error", function() {
+            beforeEach(function() {
+              var _this = this;
+              this.response = {
+                "ok": true,
+                "name": "user/joe@example.com",
+                "roles": ['error']
+              };
+              this.requestDefer.resolve(this.response);
+              return spyOn(this.account, "fetch").andCallFake(function() {
+                _this.account._doc.$error = 'because you stink!';
+                return _this.hoodie.defer().resolve();
+              });
+            });
+            it("should fetch user doc without setting @username", function() {
+              this.account.signIn('joe@example.com', 'secret');
+              expect(this.account.fetch).wasCalledWith('joe@example.com');
+              return expect(this.account.username).toBeUndefined();
+            });
+            return it("should reject with the reason", function() {
+              return expect(this.account.signIn('joe@example.com', 'secret')).toBeRejectedWith({
+                error: 'error',
+                reason: 'because you stink!'
+              });
             });
           });
         });

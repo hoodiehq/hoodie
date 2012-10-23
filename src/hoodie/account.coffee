@@ -130,8 +130,10 @@ class Hoodie.Account
   # uses standard CouchDB API to create a new user session (POST /_session).
   # Besides the standard sign in we also check if the account has been confirmed
   # (roles include "confirmed" role).
-  #
   signIn : (username, password = '') ->
+    if @username and @username isnt username
+      return @hoodie.defer().reject(error: 'You have to sign out first').promise()
+
     options = data: 
                 name      : @_userKey(username)
                 password  : password
@@ -586,10 +588,15 @@ class Hoodie.Account
 
 
   # 
+  # make sure that the same request doesn't get sent twice
+  # by cancelling the previous one.
   _withPreviousRequestsAborted: (name, requestFunction) ->
     @_requests[name]?.abort?()
     @_requests[name] = requestFunction()
 
+  # 
+  # if there is a pending request, return its promise instead
+  # of sending another request
   _withSingleRequest: (name, requestFunction) ->
     return @_requests[name] if @_requests[name]?.state?() is 'pending'
     @_requests[name] = requestFunction()
