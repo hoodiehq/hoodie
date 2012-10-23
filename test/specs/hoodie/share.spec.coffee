@@ -25,7 +25,6 @@ describe "Hoodie.Share", ->
       share = new Hoodie.Share @hoodie
       share('funk')
       expect(Hoodie.Share::open).wasCalledWith 'funk'
-       
   # /('share_id', options)
 
   describe "#instance", ->
@@ -33,6 +32,15 @@ describe "Hoodie.Share", ->
       share  = new Hoodie.Share @hoodie
       expect(share.instance).toBe Hoodie.ShareInstance
   # /#instance
+
+  describe "#open(shareId, options)", ->
+    beforeEach ->
+      spyOn(@hoodie, "open")
+    
+    it "should proxy to hoodie.open('share/' + shareId, {prefix: 'share/shareId'}) and pass options", ->
+      @share('funk123', option: 'value')
+      expect(@hoodie.open).wasCalledWith 'share/funk123', prefix: 'share/funk123', option: 'value'
+  # /#open(shareId, options)
 
   describe "#create(attributes)", ->
     beforeEach ->

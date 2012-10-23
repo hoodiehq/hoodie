@@ -16,7 +16,13 @@ Hoodie.Share = (function() {
   }
 
   Share.prototype.open = function(shareId, options) {
-    return this.hoodie.open("share/" + shareId, options);
+    var dbName;
+    if (options == null) {
+      options = {};
+    }
+    dbName = "share/" + shareId;
+    options.prefix = dbName;
+    return this.hoodie.open(dbName, options);
   };
 
   Share.prototype.create = function(attributes) {

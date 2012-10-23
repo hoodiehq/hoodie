@@ -68,8 +68,10 @@ class Hoodie.Share
   # 
   # open a sharing
   # 
-  open : (shareId, options) =>
-    @hoodie.open "share/#{shareId}", options
+  open : (shareId, options = {}) =>
+    dbName = "share/#{shareId}"
+    options.prefix = dbName
+    @hoodie.open dbName, options
 
 
   # create

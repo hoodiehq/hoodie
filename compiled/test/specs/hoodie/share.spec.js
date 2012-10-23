@@ -39,6 +39,20 @@ describe("Hoodie.Share", function() {
       return expect(share.instance).toBe(Hoodie.ShareInstance);
     });
   });
+  describe("#open(shareId, options)", function() {
+    beforeEach(function() {
+      return spyOn(this.hoodie, "open");
+    });
+    return it("should proxy to hoodie.open('share/' + shareId, {prefix: 'share/shareId'}) and pass options", function() {
+      this.share('funk123', {
+        option: 'value'
+      });
+      return expect(this.hoodie.open).wasCalledWith('share/funk123', {
+        prefix: 'share/funk123',
+        option: 'value'
+      });
+    });
+  });
   describe("#create(attributes)", function() {
     beforeEach(function() {
       this.instance = jasmine.createSpy("instance");
