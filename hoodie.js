@@ -138,6 +138,23 @@ Hoodie = (function(_super) {
 
   Hoodie.prototype.defer = $.Deferred;
 
+  Hoodie.prototype.uuid = function(len) {
+    var chars, i, radix;
+    if (len == null) {
+      len = 7;
+    }
+    chars = '0123456789abcdefghijklmnopqrstuvwxyz'.split('');
+    radix = chars.length;
+    return ((function() {
+      var _i, _results;
+      _results = [];
+      for (i = _i = 0; 0 <= len ? _i < len : _i > len; i = 0 <= len ? ++_i : --_i) {
+        _results.push(chars[0 | Math.random() * radix]);
+      }
+      return _results;
+    })()).join('');
+  };
+
   Hoodie.prototype.isPromise = function(obj) {
     return typeof (obj != null ? obj.done : void 0) === 'function' && typeof obj.resolve === 'undefined';
   };
@@ -213,7 +230,7 @@ Hoodie.Account = (function() {
     this.username = this.hoodie.my.config.get('_account.username');
     this.ownerHash = this.hoodie.my.config.get('_account.ownerHash');
     if (!this.ownerHash) {
-      this.ownerHash = this.hoodie.my.store.uuid();
+      this.ownerHash = this.hoodie.uuid();
       this.hoodie.my.config.set('_account.ownerHash', this.ownerHash);
     }
     window.setTimeout(this.authenticate);
@@ -270,7 +287,7 @@ Hoodie.Account = (function() {
   Account.prototype.anonymousSignUp = function() {
     var password, username,
       _this = this;
-    password = this.hoodie.my.store.uuid(10);
+    password = this.hoodie.uuid(10);
     username = this.ownerHash;
     return this.signUp(username, password).pipe(null, this._handleRequestError).done(function() {
       _this.hoodie.my.config.set('_account.anonymousPassword', password);
@@ -373,7 +390,7 @@ Hoodie.Account = (function() {
     if (resetPasswordId = this.hoodie.my.config.get('_account.resetPasswordId')) {
       return this._checkPasswordResetStatus();
     }
-    resetPasswordId = "" + username + "/" + (this.hoodie.my.store.uuid());
+    resetPasswordId = "" + username + "/" + (this.hoodie.uuid());
     this.hoodie.my.config.set('_account.resetPasswordId', resetPasswordId);
     key = "" + this._prefix + ":$passwordReset/" + resetPasswordId;
     data = {
@@ -600,7 +617,7 @@ Hoodie.Account = (function() {
     delete this._authenticated;
     this.hoodie.my.config.clear();
     this.trigger('signout');
-    this.ownerHash = this.hoodie.my.store.uuid();
+    this.ownerHash = this.hoodie.uuid();
     return this.hoodie.my.config.set('_account.ownerHash', this.ownerHash);
   };
 
@@ -860,23 +877,6 @@ Hoodie.Store = (function() {
     });
   };
 
-  Store.prototype.uuid = function(len) {
-    var chars, i, radix;
-    if (len == null) {
-      len = 7;
-    }
-    chars = '0123456789abcdefghijklmnopqrstuvwxyz'.split('');
-    radix = chars.length;
-    return ((function() {
-      var _i, _results;
-      _results = [];
-      for (i = _i = 0; 0 <= len ? _i < len : _i > len; i = 0 <= len ? ++_i : --_i) {
-        _results.push(chars[0 | Math.random() * radix]);
-      }
-      return _results;
-    })()).join('');
-  };
-
   Store.prototype._now = function() {
     return new Date;
   };
@@ -1003,7 +1003,7 @@ Hoodie.RemoteStore = (function(_super) {
       return defer;
     }
     if (!id) {
-      id = this.uuid();
+      id = this.hoodie.uuid();
     }
     object = $.extend({
       $type: type,
@@ -1217,9 +1217,7 @@ Hoodie.RemoteStore = (function(_super) {
   };
 
   RemoteStore.prototype._generateNewRevisionId = function() {
-    var uuid;
-    uuid = this.hoodie.my.store.uuid(9);
-    return uuid;
+    return this.hoodie.uuid(9);
   };
 
   RemoteStore.prototype._addRevisionTo = function(attributes) {
@@ -1700,7 +1698,7 @@ Hoodie.LocalStore = (function(_super) {
       isNew = typeof currentObject !== 'object';
     } else {
       isNew = true;
-      id = this.uuid();
+      id = this.hoodie.uuid();
     }
     if (isNew && this.hoodie.my.account) {
       object.$createdBy || (object.$createdBy = this.hoodie.my.account.ownerHash);
@@ -1943,23 +1941,6 @@ Hoodie.LocalStore = (function(_super) {
       return false;
     }
     return true;
-  };
-
-  LocalStore.prototype.uuid = function(len) {
-    var chars, i, radix;
-    if (len == null) {
-      len = 7;
-    }
-    chars = '0123456789abcdefghijklmnopqrstuvwxyz'.split('');
-    radix = chars.length;
-    return ((function() {
-      var _i, _results;
-      _results = [];
-      for (i = _i = 0; 0 <= len ? _i < len : _i > len; i = 0 <= len ? ++_i : --_i) {
-        _results.push(chars[0 | Math.random() * radix]);
-      }
-      return _results;
-    })()).join('');
   };
 
   LocalStore.prototype.trigger = function() {
@@ -2263,7 +2244,7 @@ Hoodie.ShareInstance = (function(_super) {
 
     $.extend(this, options);
     this.set(options);
-    this.id || (this.id = this.hoodie.my.store.uuid());
+    this.id || (this.id = this.hoodie.uuid());
   }
 
   ShareInstance.prototype._memory = {};

@@ -21,11 +21,11 @@ Mocks.Hoodie = function() {
     unbind: function() {},
     defer: $.Deferred,
     isPromise: Hoodie.prototype.isPromise,
+    uuid: function() {
+      return 'uuid';
+    },
     my: {
       store: {
-        uuid: function() {
-          return 'uuid';
-        },
         create: function() {
           return promiseMock;
         },

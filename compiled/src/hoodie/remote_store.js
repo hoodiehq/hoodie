@@ -109,7 +109,7 @@ Hoodie.RemoteStore = (function(_super) {
       return defer;
     }
     if (!id) {
-      id = this.uuid();
+      id = this.hoodie.uuid();
     }
     object = $.extend({
       $type: type,
@@ -323,9 +323,7 @@ Hoodie.RemoteStore = (function(_super) {
   };
 
   RemoteStore.prototype._generateNewRevisionId = function() {
-    var uuid;
-    uuid = this.hoodie.my.store.uuid(9);
-    return uuid;
+    return this.hoodie.uuid(9);
   };
 
   RemoteStore.prototype._addRevisionTo = function(attributes) {

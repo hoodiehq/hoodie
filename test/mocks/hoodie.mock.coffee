@@ -18,10 +18,10 @@ Mocks.Hoodie = ->
   unbind        : ->
   defer         : $.Deferred
   isPromise     : Hoodie::isPromise
+  uuid          : -> 'uuid'
     
   my :
     store         :
-      uuid          : -> 'uuid'
       create        : -> promiseMock 
       destroy       : -> promiseMock 
       save          : -> promiseMock 

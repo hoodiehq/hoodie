@@ -199,7 +199,7 @@ describe "Hoodie.LocalStore", ->
         [@type, @key, @object] = @store.cache.mostRecentCall.args
   
       it "should generate an id", ->
-        expect(@key).toMatch /^[a-z0-9]{7}$/
+        expect(@key).toBe 'uuid'
 
       it "should set $createdBy", ->
         expect(@object.$createdBy).toBe 'owner_hash'

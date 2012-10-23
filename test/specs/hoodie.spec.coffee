@@ -71,4 +71,15 @@ describe "Hoodie", ->
     it "should return false when object is undefined", ->
       expect( @hoodie.isPromise(undefined) ).toBe false
   # /#isPromise()
+
+
+
+  describe "#uuid(num = 7)", ->
+    it "should default to a length of 7", ->
+      expect(@hoodie.uuid().length).toBe 7
+    
+    _when "called with num = 5", ->
+      it "should generate an id with length = 5", ->
+        expect(@hoodie.uuid(5).length).toBe 5
+  # /#uuid(num)
 # /Hoodie

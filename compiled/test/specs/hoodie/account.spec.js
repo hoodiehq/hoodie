@@ -52,7 +52,7 @@ describe("Hoodie.Account", function() {
             return void 0;
           }
         });
-        spyOn(this.hoodie.my.store, "uuid").andReturn('new_generated_owner_hash');
+        spyOn(this.hoodie, "uuid").andReturn('new_generated_owner_hash');
         return spyOn(this.hoodie.my.config, "set");
       });
       it("should set @ownerHash", function() {
@@ -445,7 +445,7 @@ describe("Hoodie.Account", function() {
     beforeEach(function() {
       this.signUpDefer = this.hoodie.defer();
       spyOn(this.account, "signUp").andReturn(this.signUpDefer.promise());
-      spyOn(this.hoodie.my.store, "uuid").andReturn("crazyuuid123");
+      spyOn(this.hoodie, "uuid").andReturn("crazyuuid123");
       spyOn(this.hoodie.my.config, "set");
       return this.account.ownerHash = "owner_hash123";
     });
@@ -459,7 +459,7 @@ describe("Hoodie.Account", function() {
       });
       return it("should generate a password and store it locally in _account.anonymousPassword", function() {
         this.account.anonymousSignUp();
-        expect(this.hoodie.my.store.uuid).wasCalledWith(10);
+        expect(this.hoodie.uuid).wasCalledWith(10);
         return expect(this.hoodie.my.config.set).wasCalledWith('_account.anonymousPassword', 'crazyuuid123');
       });
     });
@@ -744,7 +744,7 @@ describe("Hoodie.Account", function() {
   });
   describe("#signOut()", function() {
     beforeEach(function() {
-      spyOn(this.hoodie.my.store, "uuid").andReturn('newHash');
+      spyOn(this.hoodie, "uuid").andReturn('newHash');
       return spyOn(this.hoodie.my.config, "clear");
     });
     _when("user has no account", function() {
@@ -924,7 +924,7 @@ describe("Hoodie.Account", function() {
       spyOn(this.hoodie.my.config, "clear");
       spyOn(this.hoodie.my.config, "set");
       spyOn(this.account, "fetch").andReturn(this.hoodie.defer().resolve().promise());
-      spyOn(this.hoodie.my.store, "uuid").andReturn('newHash');
+      spyOn(this.hoodie, "uuid").andReturn('newHash');
       this.account.username = 'joe@example.com';
       return this.account._doc = {
         _rev: '1-234'
@@ -1023,7 +1023,7 @@ describe("Hoodie.Account", function() {
         var _ref;
         spyOn(this.hoodie.my.config, "get").andReturn(void 0);
         spyOn(this.hoodie.my.config, "set");
-        spyOn(this.hoodie.my.store, "uuid").andReturn('uuid567');
+        spyOn(this.hoodie, "uuid").andReturn('uuid567');
         this.account.resetPassword("joe@example.com");
         _ref = this.hoodie.request.mostRecentCall.args, this.method = _ref[0], this.path = _ref[1], this.options = _ref[2];
         return this.data = JSON.parse(this.options.data);

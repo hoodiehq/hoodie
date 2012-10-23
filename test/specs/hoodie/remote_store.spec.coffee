@@ -133,16 +133,17 @@ describe "Hoodie.RemoteStore", ->
 
   describe "#save(type, id, object)", ->
     beforeEach ->
-      spyOn(@remote, "uuid").andReturn "uuid567"
+      spyOn(@hoodie, "uuid").andReturn "uuid567"
       spyOn(@remote, "request").andReturn "request_promise"
     
     it "should generate an id if it is undefined", ->
       @remote.save("car", undefined, {})
-      expect(@remote.uuid).wasCalled()
+      expect(@hoodie.uuid).wasCalled()
 
     it "should not generate an id if id is set", ->
+      spyOn(@remote, "_generateNewRevisionId").andReturn 'newRevId'
       @remote.save("car", 123, {})
-      expect(@remote.uuid).wasNotCalled()
+      expect(@hoodie.uuid).wasNotCalled()
 
     it "should return promise by @request", ->
       expect(@remote.save("car", 123, {})).toBe 'request_promise'

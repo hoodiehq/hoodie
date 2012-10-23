@@ -421,7 +421,7 @@ describe("Hoodie.Store", function() {
       });
     });
   });
-  describe("#destroyAll(type)", function() {
+  return describe("#destroyAll(type)", function() {
     beforeEach(function() {
       this.findAllDefer = this.hoodie.defer();
       return spyOn(this.store, "findAll").andReturn(this.findAllDefer.promise());
@@ -486,16 +486,6 @@ describe("Hoodie.Store", function() {
         return expect(this.store.destroy).wasCalledWith('task', '3', {
           something: 'optional'
         });
-      });
-    });
-  });
-  return describe("#uuid(num = 7)", function() {
-    it("should default to a length of 7", function() {
-      return expect(this.store.uuid().length).toBe(7);
-    });
-    return _when("called with num = 5", function() {
-      return it("should generate an id with length = 5", function() {
-        return expect(this.store.uuid(5).length).toBe(5);
       });
     });
   });

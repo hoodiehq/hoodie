@@ -37,7 +37,7 @@ Hoodie.ShareInstance = (function(_super) {
 
     $.extend(this, options);
     this.set(options);
-    this.id || (this.id = this.hoodie.my.store.uuid());
+    this.id || (this.id = this.hoodie.uuid());
   }
 
   ShareInstance.prototype._memory = {};

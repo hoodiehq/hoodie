@@ -155,16 +155,17 @@ describe("Hoodie.RemoteStore", function() {
   });
   describe("#save(type, id, object)", function() {
     beforeEach(function() {
-      spyOn(this.remote, "uuid").andReturn("uuid567");
+      spyOn(this.hoodie, "uuid").andReturn("uuid567");
       return spyOn(this.remote, "request").andReturn("request_promise");
     });
     it("should generate an id if it is undefined", function() {
       this.remote.save("car", void 0, {});
-      return expect(this.remote.uuid).wasCalled();
+      return expect(this.hoodie.uuid).wasCalled();
     });
     it("should not generate an id if id is set", function() {
+      spyOn(this.remote, "_generateNewRevisionId").andReturn('newRevId');
       this.remote.save("car", 123, {});
-      return expect(this.remote.uuid).wasNotCalled();
+      return expect(this.hoodie.uuid).wasNotCalled();
     });
     it("should return promise by @request", function() {
       return expect(this.remote.save("car", 123, {})).toBe('request_promise');

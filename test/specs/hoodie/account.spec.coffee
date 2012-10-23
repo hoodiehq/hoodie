@@ -46,7 +46,7 @@ describe "Hoodie.Account", ->
           if key is '_account.ownerHash'
             return undefined
 
-        spyOn(@hoodie.my.store, "uuid").andReturn 'new_generated_owner_hash'
+        spyOn(@hoodie, "uuid").andReturn 'new_generated_owner_hash'
         spyOn(@hoodie.my.config, "set")
             
       it "should set @ownerHash", ->
@@ -368,7 +368,7 @@ describe "Hoodie.Account", ->
     beforeEach ->
       @signUpDefer = @hoodie.defer()
       spyOn(@account, "signUp").andReturn @signUpDefer.promise()
-      spyOn(@hoodie.my.store, "uuid").andReturn "crazyuuid123"
+      spyOn(@hoodie, "uuid").andReturn "crazyuuid123"
       spyOn(@hoodie.my.config, "set")
       @account.ownerHash = "owner_hash123"
        
@@ -382,7 +382,7 @@ describe "Hoodie.Account", ->
 
       it "should generate a password and store it locally in _account.anonymousPassword", ->
         @account.anonymousSignUp()
-        expect(@hoodie.my.store.uuid).wasCalledWith 10
+        expect(@hoodie.uuid).wasCalledWith 10
         expect(@hoodie.my.config.set).wasCalledWith '_account.anonymousPassword', 'crazyuuid123'
       
   # /.anonymousSignUp()
@@ -617,7 +617,7 @@ describe "Hoodie.Account", ->
 
   describe "#signOut()", ->
     beforeEach ->
-      spyOn(@hoodie.my.store, "uuid").andReturn 'newHash'
+      spyOn(@hoodie, "uuid").andReturn 'newHash'
       spyOn(@hoodie.my.config, "clear")
     
     _when "user has no account", ->
@@ -774,7 +774,7 @@ describe "Hoodie.Account", ->
       spyOn(@hoodie.my.config, "clear")
       spyOn(@hoodie.my.config, "set")
       spyOn(@account, "fetch").andReturn @hoodie.defer().resolve().promise()
-      spyOn(@hoodie.my.store, "uuid").andReturn 'newHash'
+      spyOn(@hoodie, "uuid").andReturn 'newHash'
       @account.username = 'joe@example.com'
       @account._doc = _rev : '1-234'
     
@@ -864,7 +864,7 @@ describe "Hoodie.Account", ->
       beforeEach ->
         spyOn(@hoodie.my.config, "get").andReturn undefined
         spyOn(@hoodie.my.config, "set")
-        spyOn(@hoodie.my.store, "uuid").andReturn 'uuid567'
+        spyOn(@hoodie, "uuid").andReturn 'uuid567'
         @account.resetPassword("joe@example.com")
         [@method, @path, @options] = @hoodie.request.mostRecentCall.args
         @data = JSON.parse @options.data

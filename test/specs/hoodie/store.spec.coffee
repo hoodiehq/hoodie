@@ -313,14 +313,5 @@ describe "Hoodie.Store", ->
         expect(@store.destroy).wasCalledWith 'task', '2', something: 'optional'
         expect(@store.destroy).wasCalledWith 'task', '3', something: 'optional'
   # /#destroyAll(type)
-
-  describe "#uuid(num = 7)", ->
-    it "should default to a length of 7", ->
-      expect(@store.uuid().length).toBe 7
-    
-    _when "called with num = 5", ->
-      it "should generate an id with length = 5", ->
-        expect(@store.uuid(5).length).toBe 5
-  # /#uuid(num)
 # /Hoodie.Store
 ###

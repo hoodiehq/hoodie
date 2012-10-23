@@ -172,23 +172,6 @@ Hoodie.Store = (function() {
     });
   };
 
-  Store.prototype.uuid = function(len) {
-    var chars, i, radix;
-    if (len == null) {
-      len = 7;
-    }
-    chars = '0123456789abcdefghijklmnopqrstuvwxyz'.split('');
-    radix = chars.length;
-    return ((function() {
-      var _i, _results;
-      _results = [];
-      for (i = _i = 0; 0 <= len ? _i < len : _i > len; i = 0 <= len ? ++_i : --_i) {
-        _results.push(chars[0 | Math.random() * radix]);
-      }
-      return _results;
-    })()).join('');
-  };
-
   Store.prototype._now = function() {
     return new Date;
   };

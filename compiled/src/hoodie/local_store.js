@@ -71,7 +71,7 @@ Hoodie.LocalStore = (function(_super) {
       isNew = typeof currentObject !== 'object';
     } else {
       isNew = true;
-      id = this.uuid();
+      id = this.hoodie.uuid();
     }
     if (isNew && this.hoodie.my.account) {
       object.$createdBy || (object.$createdBy = this.hoodie.my.account.ownerHash);
@@ -314,23 +314,6 @@ Hoodie.LocalStore = (function(_super) {
       return false;
     }
     return true;
-  };
-
-  LocalStore.prototype.uuid = function(len) {
-    var chars, i, radix;
-    if (len == null) {
-      len = 7;
-    }
-    chars = '0123456789abcdefghijklmnopqrstuvwxyz'.split('');
-    radix = chars.length;
-    return ((function() {
-      var _i, _results;
-      _results = [];
-      for (i = _i = 0; 0 <= len ? _i < len : _i > len; i = 0 <= len ? ++_i : --_i) {
-        _results.push(chars[0 | Math.random() * radix]);
-      }
-      return _results;
-    })()).join('');
   };
 
   LocalStore.prototype.trigger = function() {

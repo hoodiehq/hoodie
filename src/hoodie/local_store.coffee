@@ -68,7 +68,7 @@ class Hoodie.LocalStore extends Hoodie.Store
       isNew = typeof currentObject isnt 'object'
     else
       isNew = true
-      id    = @uuid()
+      id    = @hoodie.uuid()
 
     # add createdBy hash to new objects
     # note: we check for `hoodie.my.account` as in some cases, the code
@@ -369,18 +369,6 @@ class Hoodie.LocalStore extends Hoodie.Store
     
     # good, good
     return true
-  
-  
-  # UUID
-  # ---------
-
-  # helper to generate uuids.
-  uuid : (len = 7) ->
-    chars = '0123456789abcdefghijklmnopqrstuvwxyz'.split('')
-    radix = chars.length
-    (
-      chars[ 0 | Math.random()*radix ] for i in [0...len]
-    ).join('')
 
 
   # trigger

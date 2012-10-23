@@ -55,7 +55,7 @@ class Hoodie.ShareInstance extends Hoodie.RemoteStore
     @set options
 
     # make sure that we have an id
-    @id or=  @hoodie.my.store.uuid()
+    @id or=  @hoodie.uuid()
   
   
   # set

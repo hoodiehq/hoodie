@@ -182,17 +182,6 @@ class Hoodie.Store
   destroyAll : (type, options = {}) -> 
     @findAll(type).pipe (objects) =>
       @destroy(object.$type, object.id, options) for object in objects
-
-
-  # ## UUID
-
-  # helper to generate uuids.
-  uuid : (len = 7) ->
-    chars = '0123456789abcdefghijklmnopqrstuvwxyz'.split('')
-    radix = chars.length
-    (
-      chars[ 0 | Math.random()*radix ] for i in [0...len]
-    ).join('')
   
 
   # ## Private

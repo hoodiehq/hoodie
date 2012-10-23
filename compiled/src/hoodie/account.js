@@ -39,7 +39,7 @@ Hoodie.Account = (function() {
     this.username = this.hoodie.my.config.get('_account.username');
     this.ownerHash = this.hoodie.my.config.get('_account.ownerHash');
     if (!this.ownerHash) {
-      this.ownerHash = this.hoodie.my.store.uuid();
+      this.ownerHash = this.hoodie.uuid();
       this.hoodie.my.config.set('_account.ownerHash', this.ownerHash);
     }
     window.setTimeout(this.authenticate);
@@ -96,7 +96,7 @@ Hoodie.Account = (function() {
   Account.prototype.anonymousSignUp = function() {
     var password, username,
       _this = this;
-    password = this.hoodie.my.store.uuid(10);
+    password = this.hoodie.uuid(10);
     username = this.ownerHash;
     return this.signUp(username, password).pipe(null, this._handleRequestError).done(function() {
       _this.hoodie.my.config.set('_account.anonymousPassword', password);
@@ -199,7 +199,7 @@ Hoodie.Account = (function() {
     if (resetPasswordId = this.hoodie.my.config.get('_account.resetPasswordId')) {
       return this._checkPasswordResetStatus();
     }
-    resetPasswordId = "" + username + "/" + (this.hoodie.my.store.uuid());
+    resetPasswordId = "" + username + "/" + (this.hoodie.uuid());
     this.hoodie.my.config.set('_account.resetPasswordId', resetPasswordId);
     key = "" + this._prefix + ":$passwordReset/" + resetPasswordId;
     data = {
@@ -426,7 +426,7 @@ Hoodie.Account = (function() {
     delete this._authenticated;
     this.hoodie.my.config.clear();
     this.trigger('signout');
-    this.ownerHash = this.hoodie.my.store.uuid();
+    this.ownerHash = this.hoodie.uuid();
     return this.hoodie.my.config.set('_account.ownerHash', this.ownerHash);
   };
 

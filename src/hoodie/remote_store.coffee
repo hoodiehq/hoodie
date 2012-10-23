@@ -123,7 +123,7 @@ class Hoodie.RemoteStore extends Hoodie.Store
     defer = super
     return defer if @hoodie.isPromise(defer)
 
-    id = @uuid() unless id 
+    id = @hoodie.uuid() unless id 
     object = $.extend {
       $type : type
       id    : id
@@ -449,9 +449,7 @@ class Hoodie.RemoteStore extends Hoodie.Store
   # ### generate new revision id
 
   # 
-  _generateNewRevisionId:  ->
-    uuid        = @hoodie.my.store.uuid(9)
-    return uuid
+  _generateNewRevisionId:  -> @hoodie.uuid(9)
   
 
   # ### and new revion to objecet

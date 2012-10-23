@@ -77,7 +77,7 @@ describe("Hoodie", function() {
       });
     });
   });
-  return describe("#isPromise(object)", function() {
+  describe("#isPromise(object)", function() {
     it("should return true if object is a promise", function() {
       var object;
       object = $.Deferred().promise();
@@ -90,6 +90,16 @@ describe("Hoodie", function() {
     });
     return it("should return false when object is undefined", function() {
       return expect(this.hoodie.isPromise(void 0)).toBe(false);
+    });
+  });
+  return describe("#uuid(num = 7)", function() {
+    it("should default to a length of 7", function() {
+      return expect(this.hoodie.uuid().length).toBe(7);
+    });
+    return _when("called with num = 5", function() {
+      return it("should generate an id with length = 5", function() {
+        return expect(this.hoodie.uuid(5).length).toBe(5);
+      });
     });
   });
 });

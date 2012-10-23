@@ -21,7 +21,7 @@ class Hoodie.Account
     # the ownerHash gets stored in every object created by the user.
     # Make sure we have one.
     unless @ownerHash
-      @ownerHash = @hoodie.my.store.uuid()
+      @ownerHash = @hoodie.uuid()
       @hoodie.my.config.set '_account.ownerHash', @ownerHash
     
     # authenticate on next tick
@@ -98,7 +98,7 @@ class Hoodie.Account
   # internally instead of creating another user. 
   #
   anonymousSignUp : ->
-    password = @hoodie.my.store.uuid(10)
+    password = @hoodie.uuid(10)
     username = @ownerHash
 
     @signUp(username, password)
@@ -229,7 +229,7 @@ class Hoodie.Account
     if resetPasswordId = @hoodie.my.config.get '_account.resetPasswordId'
       return @_checkPasswordResetStatus()
       
-    resetPasswordId = "#{username}/#{@hoodie.my.store.uuid()}"
+    resetPasswordId = "#{username}/#{@hoodie.uuid()}"
     @hoodie.my.config.set '_account.resetPasswordId', resetPasswordId
     
     key = "#{@_prefix}:$passwordReset/#{resetPasswordId}"
@@ -522,7 +522,7 @@ class Hoodie.Account
     @hoodie.my.config.clear()
     @trigger 'signout'
 
-    @ownerHash = @hoodie.my.store.uuid()
+    @ownerHash = @hoodie.uuid()
     @hoodie.my.config.set '_account.ownerHash', @ownerHash
     
 

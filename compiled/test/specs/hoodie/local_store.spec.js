@@ -296,7 +296,7 @@ describe("Hoodie.LocalStore", function() {
         return _ref = this.store.cache.mostRecentCall.args, this.type = _ref[0], this.key = _ref[1], this.object = _ref[2], _ref;
       });
       it("should generate an id", function() {
-        return expect(this.key).toMatch(/^[a-z0-9]{7}$/);
+        return expect(this.key).toBe('uuid');
       });
       it("should set $createdBy", function() {
         return expect(this.object.$createdBy).toBe('owner_hash');
