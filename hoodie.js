@@ -832,10 +832,6 @@ Hoodie.Store = (function() {
     return this.hoodie.defer();
   };
 
-  Store.prototype.loadAll = function() {
-    return this.findAll.apply(this, arguments);
-  };
-
   Store.prototype.destroy = function(type, id, options) {
     var defer;
     if (options == null) {
@@ -846,10 +842,6 @@ Hoodie.Store = (function() {
       return defer.reject(Hoodie.Errors.INVALID_ARGUMENTS("type & id are required")).promise();
     }
     return defer;
-  };
-
-  Store.prototype["delete"] = function() {
-    return this.destroy.apply(this, arguments);
   };
 
   Store.prototype.destroyAll = function(type, options) {

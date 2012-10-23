@@ -41,7 +41,6 @@ page.onConsoleMessage = function(msg, line, file) {
 
 page.onError = function(msg, trace) {
   var code, item, trace_parts;
-  console.log("MSG?!");
   try {
     trace_parts = (function() {
       var _i, _len, _results;

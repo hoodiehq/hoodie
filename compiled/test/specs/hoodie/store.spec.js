@@ -342,12 +342,8 @@ describe("Hoodie.Store", function() {
       return expect(this.store.findAll()).toBeDefer();
     });
     return describe("aliases", function() {
-      beforeEach(function() {
+      return beforeEach(function() {
         return spyOn(this.store, "findAll");
-      });
-      return it("should allow to use .loadAll", function() {
-        this.store.loadAll('test');
-        return expect(this.store.findAll).wasCalledWith('test');
       });
     });
   });
@@ -408,7 +404,7 @@ describe("Hoodie.Store", function() {
       defer = this.store.destroy('document', '123');
       return expect(defer).toBeDefer();
     });
-    describe("invalid arguments", function() {
+    return describe("invalid arguments", function() {
       _when("no arguments passed", function() {
         return it("should be rejected", function() {
           var promise;
@@ -424,27 +420,72 @@ describe("Hoodie.Store", function() {
         });
       });
     });
-    return describe("aliases", function() {
-      beforeEach(function() {
-        return spyOn(this.store, "destroy");
-      });
-      return it("should allow to use .destroy", function() {
-        this.store.destroy("test", 12, {
-          option: "value"
-        });
-        return expect(this.store.destroy).wasCalledWith("test", 12, {
-          option: "value"
-        });
-      });
-    });
   });
   describe("#destroyAll(type)", function() {
+    beforeEach(function() {
+      this.findAllDefer = this.hoodie.defer();
+      return spyOn(this.store, "findAll").andReturn(this.findAllDefer.promise());
+    });
     it("should return a promise", function() {
       return expect(this.store.destroyAll()).toBePromise();
     });
-    return describe("aliases", function() {
-      return it("should allow to use .destroyAll", function() {
-        return expect(this.store.destroyAll).toBe(this.store.destroyAll);
+    it("should call store.findAll", function() {
+      this.store.destroyAll('filter');
+      return expect(this.store.findAll).wasCalledWith('filter');
+    });
+    _when("store.findAll fails", function() {
+      beforeEach(function() {
+        return this.findAllDefer.reject({
+          error: 'because'
+        });
+      });
+      return it("should return a rejected promise", function() {
+        var promise;
+        promise = this.store.destroyAll();
+        return expect(promise).toBeRejectedWith({
+          error: 'because'
+        });
+      });
+    });
+    return _when("store.findAll returns 3 objects", function() {
+      beforeEach(function() {
+        spyOn(this.store, "destroy");
+        this.object1 = {
+          $type: 'task',
+          id: '1',
+          title: 'some'
+        };
+        this.object2 = {
+          $type: 'task',
+          id: '2',
+          title: 'thing'
+        };
+        this.object3 = {
+          $type: 'task',
+          id: '3',
+          title: 'funny'
+        };
+        return this.findAllDefer.resolve([this.object1, this.object2, this.object3]);
+      });
+      it("should call destroy for each object", function() {
+        this.store.destroyAll();
+        expect(this.store.destroy).wasCalledWith('task', '1', {});
+        expect(this.store.destroy).wasCalledWith('task', '2', {});
+        return expect(this.store.destroy).wasCalledWith('task', '3', {});
+      });
+      return it("should pass options", function() {
+        this.store.destroyAll(null, {
+          something: 'optional'
+        });
+        expect(this.store.destroy).wasCalledWith('task', '1', {
+          something: 'optional'
+        });
+        expect(this.store.destroy).wasCalledWith('task', '2', {
+          something: 'optional'
+        });
+        return expect(this.store.destroy).wasCalledWith('task', '3', {
+          something: 'optional'
+        });
       });
     });
   });

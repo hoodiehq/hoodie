@@ -159,9 +159,6 @@ class Hoodie.Store
   # returns all objects from store. 
   # Can be optionally filtered by a type or a function
   findAll : -> @hoodie.defer()
-
-  # alias
-  loadAll : -> @findAll arguments...
   
   
   # ## Destroy
@@ -177,9 +174,6 @@ class Hoodie.Store
       return defer.reject( Hoodie.Errors.INVALID_ARGUMENTS "type & id are required" ).promise()
 
     return defer
-  
-  # alias
-  delete: -> @destroy arguments...
 
 
   # ## destroyAll
@@ -188,6 +182,7 @@ class Hoodie.Store
   destroyAll : (type, options = {}) -> 
     @findAll(type).pipe (objects) =>
       @destroy(object.$type, object.id, options) for object in objects
+
 
   # ## UUID
 
@@ -199,6 +194,7 @@ class Hoodie.Store
       chars[ 0 | Math.random()*radix ] for i in [0...len]
     ).join('')
   
+
   # ## Private
 
   #

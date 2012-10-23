@@ -222,10 +222,6 @@ describe "Hoodie.Store", ->
     describe "aliases", ->
       beforeEach ->
         spyOn(@store, "findAll")
-      
-      it "should allow to use .loadAll", ->
-        @store.loadAll 'test'
-        expect(@store.findAll).wasCalledWith 'test'
   # /#findAll(type)
 
   describe "#findOrCreate(type, id, attributes)", ->
@@ -274,24 +270,48 @@ describe "Hoodie.Store", ->
         it "should be rejected", ->
           promise = @store.destroy 'document'
           expect(promise).toBeRejected()
-
-    describe "aliases", ->
-      beforeEach ->
-        spyOn(@store, "destroy")
-      
-      it "should allow to use .destroy", ->
-        @store.destroy "test", 12, {option: "value"}
-        expect(@store.destroy).wasCalledWith "test", 12, {option: "value"}
     # /aliases
   # /#destroy(type, id)
 
   describe "#destroyAll(type)", ->
+    beforeEach ->
+      @findAllDefer = @hoodie.defer()
+      spyOn(@store, "findAll").andReturn @findAllDefer.promise()
+    
     it "should return a promise", ->
       expect(@store.destroyAll()).toBePromise()
   
-    describe "aliases", ->
-      it "should allow to use .destroyAll", ->
-        expect(@store.destroyAll).toBe @store.destroyAll
+    it "should call store.findAll", ->
+      @store.destroyAll('filter')
+      expect(@store.findAll).wasCalledWith 'filter'
+
+    _when "store.findAll fails", ->
+      beforeEach ->
+        @findAllDefer.reject error: 'because'
+      
+      it "should return a rejected promise", ->
+        promise = @store.destroyAll()
+        expect(promise).toBeRejectedWith error: 'because'
+
+    _when "store.findAll returns 3 objects", ->
+      beforeEach ->
+        spyOn(@store, "destroy")
+        @object1 = { $type: 'task', id: '1', title: 'some'} 
+        @object2 = { $type: 'task', id: '2', title: 'thing'}
+        @object3 = { $type: 'task', id: '3', title: 'funny'}
+        @findAllDefer.resolve [@object1, @object2, @object3]
+
+      it "should call destroy for each object", ->
+        @store.destroyAll()
+        expect(@store.destroy).wasCalledWith 'task', '1', {}
+        expect(@store.destroy).wasCalledWith 'task', '2', {}
+        expect(@store.destroy).wasCalledWith 'task', '3', {}
+
+      it "should pass options", ->
+        @store.destroyAll(null, something: 'optional')
+        expect(@store.destroy).wasCalledWith 'task', '1', something: 'optional'
+        expect(@store.destroy).wasCalledWith 'task', '2', something: 'optional'
+        expect(@store.destroy).wasCalledWith 'task', '3', something: 'optional'
   # /#destroyAll(type)
 
   describe "#uuid(num = 7)", ->

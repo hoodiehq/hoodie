@@ -40,8 +40,6 @@ page.onConsoleMessage = (msg, line, file)->
   console.log msg
   
 page.onError = (msg, trace) ->
-    console.log "MSG?!"
-
     try
 
       trace_parts =  for item in trace
