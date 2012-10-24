@@ -19,8 +19,9 @@ describe "Hoodie.LocalStore", ->
       expect(@hoodie.on).wasCalledWith 'account:signout', store.clear
 
     it "should trigger idle event if there are dirty objects in localStorage", ->
-      spyOn(Hoodie.LocalStore::db, "length").andReturn 1
-      spyOn(Hoodie.LocalStore::db, "key").andReturn 'task/1'
+      Hoodie.LocalStore::db.getItem.andCallFake (key) ->
+        return 'task/1' if key is '_dirty'
+        
       spyOn(Hoodie.LocalStore::, "_getObject").andReturn {$type: 'task', id: '1', title: 'remember the milk'}
       spyOn(Hoodie.LocalStore::, "_isDirty").andReturn true
       spyOn(Hoodie.LocalStore::, "trigger")
@@ -31,7 +32,7 @@ describe "Hoodie.LocalStore", ->
       expect(store.trigger).wasCalledWith 'idle'
   # /constructor
   
-  
+
   describe "#save(type, id, object, options)", ->
     beforeEach ->
       spyOn(@store, "_now" ).andReturn 'now'
@@ -650,7 +651,7 @@ describe "Hoodie.LocalStore", ->
       
       spyOn(window, "setTimeout").andReturn 'newTimeout'
       spyOn(window, "clearTimeout")
-      spyOn(@hoodie, "trigger")
+      spyOn(@store, "trigger")
       @store.markAsChanged 'couch', '123', color: 'red'
     
     it "should add it to the dirty list", ->
@@ -665,6 +666,9 @@ describe "Hoodie.LocalStore", ->
       @store._dirtyTimeout = 'timeout'
       @store.markAsChanged 'couch', '123', color: 'red'
       expect(window.clearTimeout).wasCalledWith 'timeout'
+
+    it "should trigger 'dirty' event", ->
+       expect(@store.trigger).wasCalledWith 'dirty'
   # /.markAsChanged(type, id, object)
   
 
@@ -712,11 +716,25 @@ describe "Hoodie.LocalStore", ->
 
 
   describe "#clearChanged(type, id)", ->
+    it "should clear _dirtyTimeout", ->
+      spyOn(window, "clearTimeout")
+      @store._dirtyTimeout = 1
+      @store.clearChanged 'couch', 123
+      expect(window.clearTimeout).wasCalledWith 1
+
     _when "type & id passed", ->
       it "should remove the respective object from the dirty list", ->
         @store._dirty['couch/123'] = {color: 'red'}
         @store.clearChanged 'couch', 123
         expect(@store._dirty['couch/123']).toBeUndefined()
+
+      it "should update array of _dirty IDs in localStorage", ->
+        @store._dirty = {}
+        @store._dirty['couch/123'] = {color: 'red'}
+        @store._dirty['couch/456'] = {color: 'green'}
+        @store._dirty['couch/789'] = {color: 'black'}
+        @store.clearChanged 'couch', 123
+        expect(@store.db.setItem).wasCalledWith '_dirty', 'couch/456,couch/789'
     
     _when "no arguments passed", ->
       it "should remove all objects from the dirty list", ->
@@ -725,6 +743,11 @@ describe "Hoodie.LocalStore", ->
           'couch/456': color: 'green'
         @store.clearChanged()
         do expect($.isEmptyObject @store._dirty).toBeTruthy
+
+      it "should remove _dirty IDs from localStorage", ->
+        @store.clearChanged()
+        expect(@store.db.removeItem).wasCalledWith '_dirty'
+         
   # /.clearChanged()
 
 

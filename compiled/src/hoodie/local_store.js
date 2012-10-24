@@ -8,6 +8,8 @@ Hoodie.LocalStore = (function(_super) {
 
   __extends(LocalStore, _super);
 
+  LocalStore.prototype.idleTimeout = 2000;
+
   function LocalStore(hoodie) {
     this.hoodie = hoodie;
     this.clear = __bind(this.clear, this);
@@ -246,7 +248,8 @@ Hoodie.LocalStore = (function(_super) {
     } else {
       this._dirty = {};
     }
-    return this.hoodie.trigger('store:dirty');
+    this._saveDirtyIds();
+    return window.clearTimeout(this._dirtyTimeout);
   };
 
   LocalStore.prototype.isMarkedAsDeleted = function(type, id) {
@@ -254,15 +257,16 @@ Hoodie.LocalStore = (function(_super) {
   };
 
   LocalStore.prototype.markAsChanged = function(type, id, object) {
-    var key, timeout,
+    var key,
       _this = this;
     key = "" + type + "/" + id;
     this._dirty[key] = object;
-    timeout = 2000;
+    this._saveDirtyIds();
+    this.trigger('dirty');
     window.clearTimeout(this._dirtyTimeout);
     return this._dirtyTimeout = window.setTimeout((function() {
       return _this.trigger('idle');
-    }), timeout);
+    }), this.idleTimeout);
   };
 
   LocalStore.prototype.changedDocs = function() {
@@ -330,13 +334,13 @@ Hoodie.LocalStore = (function(_super) {
 
   LocalStore.prototype._bootstrap = function() {
     var id, key, keys, obj, type, _i, _len, _ref, _results;
-    keys = this._index();
+    keys = this.db.getItem('_dirty');
+    if (!keys) {
+      return;
+    }
     _results = [];
     for (_i = 0, _len = keys.length; _i < _len; _i++) {
       key = keys[_i];
-      if (!(this._isSemanticId(key))) {
-        continue;
-      }
       _ref = key.split('/'), type = _ref[0], id = _ref[1];
       _results.push(obj = this.cache(type, id));
     }
@@ -372,6 +376,16 @@ Hoodie.LocalStore = (function(_super) {
       return obj;
     } else {
       return false;
+    }
+  };
+
+  LocalStore.prototype._saveDirtyIds = function() {
+    var ids;
+    if ($.isEmptyObject(this._dirty)) {
+      return this.db.removeItem('_dirty');
+    } else {
+      ids = Object.keys(this._dirty);
+      return this.db.setItem('_dirty', ids.join(','));
     }
   };
 

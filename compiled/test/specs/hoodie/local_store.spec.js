@@ -20,8 +20,11 @@ describe("Hoodie.LocalStore", function() {
     });
     return it("should trigger idle event if there are dirty objects in localStorage", function() {
       var store;
-      spyOn(Hoodie.LocalStore.prototype.db, "length").andReturn(1);
-      spyOn(Hoodie.LocalStore.prototype.db, "key").andReturn('task/1');
+      Hoodie.LocalStore.prototype.db.getItem.andCallFake(function(key) {
+        if (key === '_dirty') {
+          return 'task/1';
+        }
+      });
       spyOn(Hoodie.LocalStore.prototype, "_getObject").andReturn({
         $type: 'task',
         id: '1',
@@ -937,7 +940,7 @@ describe("Hoodie.LocalStore", function() {
       this.store._dirty = {};
       spyOn(window, "setTimeout").andReturn('newTimeout');
       spyOn(window, "clearTimeout");
-      spyOn(this.hoodie, "trigger");
+      spyOn(this.store, "trigger");
       return this.store.markAsChanged('couch', '123', {
         color: 'red'
       });
@@ -951,12 +954,15 @@ describe("Hoodie.LocalStore", function() {
       expect(args[1]).toBe(2000);
       return expect(this.store._dirtyTimeout).toBe('newTimeout');
     });
-    return it("should clear dirty timeout", function() {
+    it("should clear dirty timeout", function() {
       this.store._dirtyTimeout = 'timeout';
       this.store.markAsChanged('couch', '123', {
         color: 'red'
       });
       return expect(window.clearTimeout).wasCalledWith('timeout');
+    });
+    return it("should trigger 'dirty' event", function() {
+      return expect(this.store.trigger).wasCalledWith('dirty');
     });
   });
   describe("#changedDocs()", function() {
@@ -1012,17 +1018,37 @@ describe("Hoodie.LocalStore", function() {
     });
   });
   describe("#clearChanged(type, id)", function() {
+    it("should clear _dirtyTimeout", function() {
+      spyOn(window, "clearTimeout");
+      this.store._dirtyTimeout = 1;
+      this.store.clearChanged('couch', 123);
+      return expect(window.clearTimeout).wasCalledWith(1);
+    });
     _when("type & id passed", function() {
-      return it("should remove the respective object from the dirty list", function() {
+      it("should remove the respective object from the dirty list", function() {
         this.store._dirty['couch/123'] = {
           color: 'red'
         };
         this.store.clearChanged('couch', 123);
         return expect(this.store._dirty['couch/123']).toBeUndefined();
       });
+      return it("should update array of _dirty IDs in localStorage", function() {
+        this.store._dirty = {};
+        this.store._dirty['couch/123'] = {
+          color: 'red'
+        };
+        this.store._dirty['couch/456'] = {
+          color: 'green'
+        };
+        this.store._dirty['couch/789'] = {
+          color: 'black'
+        };
+        this.store.clearChanged('couch', 123);
+        return expect(this.store.db.setItem).wasCalledWith('_dirty', 'couch/456,couch/789');
+      });
     });
     return _when("no arguments passed", function() {
-      return it("should remove all objects from the dirty list", function() {
+      it("should remove all objects from the dirty list", function() {
         this.store._dirty = {
           'couch/123': {
             color: 'red'
@@ -1033,6 +1059,10 @@ describe("Hoodie.LocalStore", function() {
         };
         this.store.clearChanged();
         return expect($.isEmptyObject(this.store._dirty)).toBeTruthy();
+      });
+      return it("should remove _dirty IDs from localStorage", function() {
+        this.store.clearChanged();
+        return expect(this.store.db.removeItem).wasCalledWith('_dirty');
       });
     });
   });

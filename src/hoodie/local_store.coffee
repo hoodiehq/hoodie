@@ -6,6 +6,13 @@
 class Hoodie.LocalStore extends Hoodie.Store
 
 
+  # Properties
+  # ---------
+
+  # 2 seconds timout before triggering the `store:idle` event
+  idleTimeout : 2000
+
+
   # Constructor
   # ---------
 
@@ -259,8 +266,9 @@ class Hoodie.LocalStore extends Hoodie.Store
       delete @_dirty[key]
     else
       @_dirty = {}
-  
-    @hoodie.trigger 'store:dirty'
+
+    @_saveDirtyIds()
+    window.clearTimeout @_dirtyTimeout
   
   
   # Marked as deleted?
@@ -281,12 +289,13 @@ class Hoodie.LocalStore extends Hoodie.Store
     key = "#{type}/#{id}"
     
     @_dirty[key] = object
+    @_saveDirtyIds()
 
-    timeout = 2000 # 2 seconds timout before triggering the `store:idle` event
+    @trigger 'dirty'
     window.clearTimeout @_dirtyTimeout
     @_dirtyTimeout = window.setTimeout ( =>
       @trigger 'idle'
-    ), timeout
+    ), @idleTimeout
     
 
   # changed docs
@@ -392,10 +401,11 @@ class Hoodie.LocalStore extends Hoodie.Store
   # Private
   # ---------
 
-  # initial bootstrap of all objects stored in localStorage
+  # initial bootstrap of all dirty objects stored in localStorage
   _bootstrap : ->
-    keys = @_index()
-    for key in keys when @_isSemanticId key
+    keys = @db.getItem '_dirty'
+    return unless keys
+    for key in keys
       [type, id] = key.split '/'
       obj = @cache type, id
 
@@ -423,6 +433,14 @@ class Hoodie.LocalStore extends Hoodie.Store
       obj
     else
       false
+
+  # store IDs of dirty objects
+  _saveDirtyIds : ->
+    if $.isEmptyObject @_dirty
+      @db.removeItem '_dirty'
+    else
+      ids = Object.keys(@_dirty)
+      @db.setItem '_dirty', ids.join(',')
 
   #
   _now : -> new Date
