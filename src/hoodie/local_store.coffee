@@ -105,7 +105,8 @@ class Hoodie.LocalStore extends Hoodie.Store
       object = @cache type, id, object, options
       defer.resolve( object, isNew ).promise()
 
-      @_trigger_change_events(object, options, isNew)
+      event = if isNew then 'create' else 'update'
+      @_triggerEvents(event, object, options)
 
     catch error
       defer.reject(error).promise()
@@ -167,7 +168,7 @@ class Hoodie.LocalStore extends Hoodie.Store
         [currentType, id] = key.split '/'
         
         obj = @cache currentType, id
-        if filter(obj)
+        if obj and filter(obj)
           obj
         else
           continue
@@ -206,14 +207,7 @@ class Hoodie.LocalStore extends Hoodie.Store
       @_cached[key] = false
       @clearChanged type, id
 
-    # trigger events
-    @trigger "destroy",                          object, options
-    @trigger "destroy:#{type}",                  object, options
-    @trigger "destroy:#{type}:#{id}",            object, options
-    @trigger "change",                'destroy', object, options
-    @trigger "change:#{type}",        'destroy', object, options
-    @trigger "change:#{type}:#{id}",  'destroy', object, options
-  
+    @_triggerEvents "destroy", object, options
     defer.resolve($.extend {}, object).promise()
   
   
@@ -226,32 +220,43 @@ class Hoodie.LocalStore extends Hoodie.Store
   # Also checks if object needs to be synched (dirty) or not 
   #
   # Pass `options.remote = true` when object comes from remote
+  # Pass 'options.silent = true' to avoid events from being triggered.
   cache : (type, id, object = false, options = {}) ->
     key = "#{type}/#{id}"
   
     if object
-      @_cached[key] = $.extend object, { $type: type, id: id }
+      $.extend object, { $type: type, id: id }
       @_setObject type, id, object
       
       if options.remote
         @clearChanged type, id 
+        @_cached[key] = object
         return $.extend {}, @_cached[key]
     
     else
       return false                      if @_cached[key] is false
       return $.extend {}, @_cached[key] if @_cached[key]
-      @_cached[key] = @_getObject type, id
+      object = @_getObject type, id
     
-    unless options.silent
-      if @_cached[key] and (@_isDirty(@_cached[key]) or @_isMarkedAsDeleted(@_cached[key]))
-        @markAsChanged type, id, @_cached[key]
-      else
-        @clearChanged type, id
+    return if object is undefined
+
+    if object is false
+      @clearChanged type, id
+      @_cached[key] = false
+      return false
     
-    if @_cached[key]
-      $.extend {}, @_cached[key]
+    if @_isMarkedAsDeleted object
+      @markAsChanged type, id, object, options
+      @_cached[key] = false
+      return false
+
+    @_cached[key] = object
+    if @_isDirty(object)
+      @markAsChanged type, id, object, options
     else
-      @_cached[key]
+      @clearChanged type, id
+    
+    $.extend {}, @_cached[key]
 
 
   # Clear changed 
@@ -285,11 +290,13 @@ class Hoodie.LocalStore extends Hoodie.Store
 
   # Marks object as changed (dirty). Triggers a `store:dirty` event immediately and a 
   # `store:idle` event once there is no change within 2 seconds
-  markAsChanged : (type, id, object) ->
+  markAsChanged : (type, id, object, options = {}) ->
     key = "#{type}/#{id}"
     
     @_dirty[key] = object
     @_saveDirtyIds()
+
+    return if options.silent
 
     @trigger 'dirty'
     window.clearTimeout @_dirtyTimeout
@@ -481,16 +488,11 @@ class Hoodie.LocalStore extends Hoodie.Store
     @db.key(i) for i in [0...@db.length()]
 
   # 
-  _trigger_change_events: (object, options, isNew) ->
-    if isNew
-      @trigger "create",                           object, options
-      @trigger "create:#{object.$type}",           object, options
-      @trigger "change",                 'create', object, options
-      @trigger "change:#{object.$type}", 'create', object, options
-    else
-      @trigger "update",                                        object, options
-      @trigger "update:#{object.$type}",                        object, options
-      @trigger "update:#{object.$type}:#{object.id}",           object, options
-      @trigger "change",                              'update', object, options
-      @trigger "change:#{object.$type}",              'update', object, options
-      @trigger "change:#{object.$type}:#{object.id}", 'update', object, options
+  _triggerEvents: (event, object, options) ->
+    
+    @trigger event,                                           object, options
+    @trigger "#{event}:#{object.$type}",                      object, options
+    @trigger "#{event}:#{object.$type}:#{object.id}",         object, options unless event is 'create'
+    @trigger "change",                                 event, object, options
+    @trigger "change:#{object.$type}",                 event, object, options
+    @trigger "change:#{object.$type}:#{object.id}",    event, object, options unless event is 'create'

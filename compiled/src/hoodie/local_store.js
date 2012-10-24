@@ -60,7 +60,7 @@ Hoodie.LocalStore = (function(_super) {
   };
 
   LocalStore.prototype.save = function(type, id, object, options) {
-    var currentObject, defer, isNew, key;
+    var currentObject, defer, event, isNew, key;
     if (options == null) {
       options = {};
     }
@@ -98,7 +98,8 @@ Hoodie.LocalStore = (function(_super) {
     try {
       object = this.cache(type, id, object, options);
       defer.resolve(object, isNew).promise();
-      this._trigger_change_events(object, options, isNew);
+      event = isNew ? 'create' : 'update';
+      this._triggerEvents(event, object, options);
     } catch (error) {
       defer.reject(error).promise();
     }
@@ -152,7 +153,7 @@ Hoodie.LocalStore = (function(_super) {
           }
           _ref = key.split('/'), currentType = _ref[0], id = _ref[1];
           obj = this.cache(currentType, id);
-          if (filter(obj)) {
+          if (obj && filter(obj)) {
             _results.push(obj);
           } else {
             continue;
@@ -189,12 +190,7 @@ Hoodie.LocalStore = (function(_super) {
       this._cached[key] = false;
       this.clearChanged(type, id);
     }
-    this.trigger("destroy", object, options);
-    this.trigger("destroy:" + type, object, options);
-    this.trigger("destroy:" + type + ":" + id, object, options);
-    this.trigger("change", 'destroy', object, options);
-    this.trigger("change:" + type, 'destroy', object, options);
-    this.trigger("change:" + type + ":" + id, 'destroy', object, options);
+    this._triggerEvents("destroy", object, options);
     return defer.resolve($.extend({}, object)).promise();
   };
 
@@ -208,13 +204,14 @@ Hoodie.LocalStore = (function(_super) {
     }
     key = "" + type + "/" + id;
     if (object) {
-      this._cached[key] = $.extend(object, {
+      $.extend(object, {
         $type: type,
         id: id
       });
       this._setObject(type, id, object);
       if (options.remote) {
         this.clearChanged(type, id);
+        this._cached[key] = object;
         return $.extend({}, this._cached[key]);
       }
     } else {
@@ -224,20 +221,28 @@ Hoodie.LocalStore = (function(_super) {
       if (this._cached[key]) {
         return $.extend({}, this._cached[key]);
       }
-      this._cached[key] = this._getObject(type, id);
+      object = this._getObject(type, id);
     }
-    if (!options.silent) {
-      if (this._cached[key] && (this._isDirty(this._cached[key]) || this._isMarkedAsDeleted(this._cached[key]))) {
-        this.markAsChanged(type, id, this._cached[key]);
-      } else {
-        this.clearChanged(type, id);
-      }
+    if (object === void 0) {
+      return;
     }
-    if (this._cached[key]) {
-      return $.extend({}, this._cached[key]);
+    if (object === false) {
+      this.clearChanged(type, id);
+      this._cached[key] = false;
+      return false;
+    }
+    if (this._isMarkedAsDeleted(object)) {
+      this.markAsChanged(type, id, object, options);
+      this._cached[key] = false;
+      return false;
+    }
+    this._cached[key] = object;
+    if (this._isDirty(object)) {
+      this.markAsChanged(type, id, object, options);
     } else {
-      return this._cached[key];
+      this.clearChanged(type, id);
     }
+    return $.extend({}, this._cached[key]);
   };
 
   LocalStore.prototype.clearChanged = function(type, id) {
@@ -256,12 +261,18 @@ Hoodie.LocalStore = (function(_super) {
     return this._isMarkedAsDeleted(this.cache(type, id));
   };
 
-  LocalStore.prototype.markAsChanged = function(type, id, object) {
+  LocalStore.prototype.markAsChanged = function(type, id, object, options) {
     var key,
       _this = this;
+    if (options == null) {
+      options = {};
+    }
     key = "" + type + "/" + id;
     this._dirty[key] = object;
     this._saveDirtyIds();
+    if (options.silent) {
+      return;
+    }
     this.trigger('dirty');
     window.clearTimeout(this._dirtyTimeout);
     return this._dirtyTimeout = window.setTimeout((function() {
@@ -432,19 +443,16 @@ Hoodie.LocalStore = (function(_super) {
     return _results;
   };
 
-  LocalStore.prototype._trigger_change_events = function(object, options, isNew) {
-    if (isNew) {
-      this.trigger("create", object, options);
-      this.trigger("create:" + object.$type, object, options);
-      this.trigger("change", 'create', object, options);
-      return this.trigger("change:" + object.$type, 'create', object, options);
-    } else {
-      this.trigger("update", object, options);
-      this.trigger("update:" + object.$type, object, options);
-      this.trigger("update:" + object.$type + ":" + object.id, object, options);
-      this.trigger("change", 'update', object, options);
-      this.trigger("change:" + object.$type, 'update', object, options);
-      return this.trigger("change:" + object.$type + ":" + object.id, 'update', object, options);
+  LocalStore.prototype._triggerEvents = function(event, object, options) {
+    this.trigger(event, object, options);
+    this.trigger("" + event + ":" + object.$type, object, options);
+    if (event !== 'create') {
+      this.trigger("" + event + ":" + object.$type + ":" + object.id, object, options);
+    }
+    this.trigger("change", event, object, options);
+    this.trigger("change:" + object.$type, event, object, options);
+    if (event !== 'create') {
+      return this.trigger("change:" + object.$type + ":" + object.id, event, object, options);
     }
   };
 

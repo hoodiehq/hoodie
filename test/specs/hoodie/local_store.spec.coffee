@@ -21,7 +21,7 @@ describe "Hoodie.LocalStore", ->
     it "should trigger idle event if there are dirty objects in localStorage", ->
       Hoodie.LocalStore::db.getItem.andCallFake (key) ->
         return 'task/1' if key is '_dirty'
-        
+
       spyOn(Hoodie.LocalStore::, "_getObject").andReturn {$type: 'task', id: '1', title: 'remember the milk'}
       spyOn(Hoodie.LocalStore::, "_isDirty").andReturn true
       spyOn(Hoodie.LocalStore::, "trigger")
@@ -484,12 +484,18 @@ describe "Hoodie.LocalStore", ->
       
       _and "`options.remote = true` passed", ->
         it "should clear changed object", ->
-          @store.cache('couch', '123', {color: 'red'}, remote: true)
+          @store.cache 'couch', '123', {color: 'red'}, remote: true
           expect(@store.clearChanged).wasCalledWith 'couch', '123'
 
       _and "object is marked as deleted", ->
+        it "should set cache to false store object in _dirty hash", ->
+          @store._isMarkedAsDeleted.andReturn true
+          @store._cached = {} 
+          @store._dirty  = {} 
+          @store._cached['couch/123'] = {color: 'red'}
+          @store.cache 'couch', '123', {color: 'red', _deleted: true}
+          expect(@store._cached['couch/123']).toBe false
         
-    
     _when "no object passed", ->
       _and "object is already cached", ->
         beforeEach ->
@@ -505,15 +511,42 @@ describe "Hoodie.LocalStore", ->
         
         _and "object does exist in localStorage", ->
           beforeEach ->
-            @store._getObject.andReturn 
+            @object = 
+              $type: 'couch'
+              id: '123'
               color: 'red'
+            @store._getObject.andReturn @object
           
           it "should cache it for future", ->
-            @store._getObject.andReturn 
-              color: 'red'
             @store.cache 'couch', '123'
             expect(@store._cached['couch/123'].color).toBe 'red'
+
+          _and "object is dirty", ->
+            beforeEach -> 
+              @store._isDirty.andReturn true
+            
+            it "should mark it as changed", ->
+              @store.cache 'couch', '123'
+              expect(@store.markAsChanged).wasCalledWith 'couch', '123', @object, {}
           
+          _and "object is not dirty", ->
+            beforeEach -> @store._isDirty.andReturn false
+            
+            _and "not marked as deleted", ->
+              beforeEach -> @store._isMarkedAsDeleted.andReturn false
+              
+              it "should clean it", ->
+                @store.cache 'couch', '123'
+                expect(@store.clearChanged).wasCalledWith 'couch', '123'
+                
+            _but "marked as deleted", ->
+              beforeEach -> @store._isMarkedAsDeleted.andReturn true
+            
+              it "should mark it as changed", ->
+                @store.cache 'couch', '123'
+                object  = { color: 'red', $type: 'couch', id: '123' }
+                options = {}
+                expect(@store.markAsChanged).wasCalledWith 'couch', '123', object, options
           
         _and "object does not exist in localStorage", ->
           beforeEach ->
@@ -525,38 +558,12 @@ describe "Hoodie.LocalStore", ->
             
           it "should return false", ->
             expect(@store.cache 'couch', '123').toBe false
-          
-    
-    _when "object is dirty", ->
-      beforeEach -> @store._isDirty.andReturn true
-      
-      it "should mark it as changed", ->
-        @store.cache 'couch', '123'
-        expect(@store.markAsChanged).wasCalledWith 'couch', '123', color: 'red', $type: 'couch', id: '123'
-    
-    _when "object is not dirty", ->
-      beforeEach -> @store._isDirty.andReturn false
-      
-      _and "not marked as deleted", ->
-        beforeEach -> @store._isMarkedAsDeleted.andReturn false
-        
-        it "should clean it", ->
-          @store.cache 'couch', '123'
-          expect(@store.clearChanged).wasCalledWith 'couch', '123'
-          
-      _but "marked as deleted", ->
-        beforeEach -> @store._isMarkedAsDeleted.andReturn true
-      
-        it "should mark it as changed", ->
-          @store.cache 'couch', '123'
-          expect(@store.markAsChanged).wasCalledWith 'couch', '123', color: 'red', $type: 'couch', id: '123'
     
     it "should return the object including type & id attributes", ->
       obj = @store.cache 'couch', '123', color: 'red'
       expect(obj.color).toBe 'red'
       expect(obj.$type).toBe 'couch'
       expect(obj.id).toBe    '123'
-    
   # /.cache(type, id, object)
 
 

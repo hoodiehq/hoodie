@@ -732,7 +732,21 @@ describe("Hoodie.LocalStore", function() {
           return expect(this.store.clearChanged).wasCalledWith('couch', '123');
         });
       });
-      return _and("object is marked as deleted", function() {});
+      return _and("object is marked as deleted", function() {
+        return it("should set cache to false store object in _dirty hash", function() {
+          this.store._isMarkedAsDeleted.andReturn(true);
+          this.store._cached = {};
+          this.store._dirty = {};
+          this.store._cached['couch/123'] = {
+            color: 'red'
+          };
+          this.store.cache('couch', '123', {
+            color: 'red',
+            _deleted: true
+          });
+          return expect(this.store._cached['couch/123']).toBe(false);
+        });
+      });
     });
     _when("no object passed", function() {
       _and("object is already cached", function() {
@@ -752,16 +766,55 @@ describe("Hoodie.LocalStore", function() {
         });
         _and("object does exist in localStorage", function() {
           beforeEach(function() {
-            return this.store._getObject.andReturn({
+            this.object = {
+              $type: 'couch',
+              id: '123',
               color: 'red'
-            });
+            };
+            return this.store._getObject.andReturn(this.object);
           });
-          return it("should cache it for future", function() {
-            this.store._getObject.andReturn({
-              color: 'red'
-            });
+          it("should cache it for future", function() {
             this.store.cache('couch', '123');
             return expect(this.store._cached['couch/123'].color).toBe('red');
+          });
+          _and("object is dirty", function() {
+            beforeEach(function() {
+              return this.store._isDirty.andReturn(true);
+            });
+            return it("should mark it as changed", function() {
+              this.store.cache('couch', '123');
+              return expect(this.store.markAsChanged).wasCalledWith('couch', '123', this.object, {});
+            });
+          });
+          return _and("object is not dirty", function() {
+            beforeEach(function() {
+              return this.store._isDirty.andReturn(false);
+            });
+            _and("not marked as deleted", function() {
+              beforeEach(function() {
+                return this.store._isMarkedAsDeleted.andReturn(false);
+              });
+              return it("should clean it", function() {
+                this.store.cache('couch', '123');
+                return expect(this.store.clearChanged).wasCalledWith('couch', '123');
+              });
+            });
+            return _but("marked as deleted", function() {
+              beforeEach(function() {
+                return this.store._isMarkedAsDeleted.andReturn(true);
+              });
+              return it("should mark it as changed", function() {
+                var object, options;
+                this.store.cache('couch', '123');
+                object = {
+                  color: 'red',
+                  $type: 'couch',
+                  id: '123'
+                };
+                options = {};
+                return expect(this.store.markAsChanged).wasCalledWith('couch', '123', object, options);
+              });
+            });
           });
         });
         return _and("object does not exist in localStorage", function() {
@@ -774,46 +827,6 @@ describe("Hoodie.LocalStore", function() {
           });
           return it("should return false", function() {
             return expect(this.store.cache('couch', '123')).toBe(false);
-          });
-        });
-      });
-    });
-    _when("object is dirty", function() {
-      beforeEach(function() {
-        return this.store._isDirty.andReturn(true);
-      });
-      return it("should mark it as changed", function() {
-        this.store.cache('couch', '123');
-        return expect(this.store.markAsChanged).wasCalledWith('couch', '123', {
-          color: 'red',
-          $type: 'couch',
-          id: '123'
-        });
-      });
-    });
-    _when("object is not dirty", function() {
-      beforeEach(function() {
-        return this.store._isDirty.andReturn(false);
-      });
-      _and("not marked as deleted", function() {
-        beforeEach(function() {
-          return this.store._isMarkedAsDeleted.andReturn(false);
-        });
-        return it("should clean it", function() {
-          this.store.cache('couch', '123');
-          return expect(this.store.clearChanged).wasCalledWith('couch', '123');
-        });
-      });
-      return _but("marked as deleted", function() {
-        beforeEach(function() {
-          return this.store._isMarkedAsDeleted.andReturn(true);
-        });
-        return it("should mark it as changed", function() {
-          this.store.cache('couch', '123');
-          return expect(this.store.markAsChanged).wasCalledWith('couch', '123', {
-            color: 'red',
-            $type: 'couch',
-            id: '123'
           });
         });
       });
