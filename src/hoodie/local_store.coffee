@@ -25,6 +25,8 @@ class Hoodie.LocalStore extends Hoodie.Store
     
     # handle sign outs
     @hoodie.on 'account:signout', @clear
+
+    @_bootstrap()
     
   
   # localStorage proxy
@@ -283,7 +285,7 @@ class Hoodie.LocalStore extends Hoodie.Store
     timeout = 2000 # 2 seconds timout before triggering the `store:idle` event
     window.clearTimeout @_dirtyTimeout
     @_dirtyTimeout = window.setTimeout ( =>
-      @hoodie.trigger 'store:idle'
+      @trigger 'idle'
     ), timeout
     
 
@@ -389,6 +391,14 @@ class Hoodie.LocalStore extends Hoodie.Store
   
   # Private
   # ---------
+
+  # initial bootstrap of all objects stored in localStorage
+  _bootstrap : ->
+    keys = @_index()
+    for key in keys when @_isSemanticId key
+      [type, id] = key.split '/'
+      obj = @cache type, id
+
   
   # more advanced localStorage wrappers to find/store objects
   _setObject : (type, id, object) ->

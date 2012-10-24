@@ -12,11 +12,28 @@ describe("Hoodie.LocalStore", function() {
     return spyOn(this.store.db, "clear").andCallThrough();
   });
   describe("constructor", function() {
-    return it("should subscribe to account:signout event", function() {
+    xit("should subscribe to account:signout event", function() {
       var store;
       spyOn(this.hoodie, "on");
       store = new Hoodie.LocalStore(this.hoodie);
       return expect(this.hoodie.on).wasCalledWith('account:signout', store.clear);
+    });
+    return it("should trigger idle event if there are dirty objects in localStorage", function() {
+      var store;
+      spyOn(Hoodie.LocalStore.prototype.db, "length").andReturn(1);
+      spyOn(Hoodie.LocalStore.prototype.db, "key").andReturn('task/1');
+      spyOn(Hoodie.LocalStore.prototype, "_getObject").andReturn({
+        $type: 'task',
+        id: '1',
+        title: 'remember the milk'
+      });
+      spyOn(Hoodie.LocalStore.prototype, "_isDirty").andReturn(true);
+      spyOn(Hoodie.LocalStore.prototype, "trigger");
+      spyOn(window, "setTimeout").andCallFake(function(cb) {
+        return cb();
+      });
+      store = new Hoodie.LocalStore(this.hoodie);
+      return expect(store.trigger).wasCalledWith('idle');
     });
   });
   describe("#save(type, id, object, options)", function() {
@@ -702,7 +719,7 @@ describe("Hoodie.LocalStore", function() {
         });
         return expect(this.store.db.setItem).wasCalledWith('couch/123', '{"color":"red"}');
       });
-      return _when("`options.remote = true` passed", function() {
+      _and("`options.remote = true` passed", function() {
         return it("should clear changed object", function() {
           this.store.cache('couch', '123', {
             color: 'red'
@@ -712,6 +729,7 @@ describe("Hoodie.LocalStore", function() {
           return expect(this.store.clearChanged).wasCalledWith('couch', '123');
         });
       });
+      return _and("object is marked as deleted", function() {});
     });
     _when("no object passed", function() {
       _and("object is already cached", function() {

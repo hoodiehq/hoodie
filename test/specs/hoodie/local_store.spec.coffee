@@ -11,12 +11,26 @@ describe "Hoodie.LocalStore", ->
     spyOn(@store.db, "removeItem").andCallThrough()
     spyOn(@store.db, "clear").andCallThrough()
   
+
   describe "constructor", ->
-    it "should subscribe to account:signout event", ->
+    xit "should subscribe to account:signout event", ->
       spyOn(@hoodie, "on")
       store = new Hoodie.LocalStore @hoodie
       expect(@hoodie.on).wasCalledWith 'account:signout', store.clear
+
+    it "should trigger idle event if there are dirty objects in localStorage", ->
+      spyOn(Hoodie.LocalStore::db, "length").andReturn 1
+      spyOn(Hoodie.LocalStore::db, "key").andReturn 'task/1'
+      spyOn(Hoodie.LocalStore::, "_getObject").andReturn {$type: 'task', id: '1', title: 'remember the milk'}
+      spyOn(Hoodie.LocalStore::, "_isDirty").andReturn true
+      spyOn(Hoodie.LocalStore::, "trigger")
+      # make timeout immediate
+      spyOn(window, "setTimeout").andCallFake (cb) -> cb()
+
+      store = new Hoodie.LocalStore @hoodie
+      expect(store.trigger).wasCalledWith 'idle'
   # /constructor
+  
   
   describe "#save(type, id, object, options)", ->
     beforeEach ->
@@ -453,6 +467,7 @@ describe "Hoodie.LocalStore", ->
         expect(@store.db.removeItem).wasNotCalled()
   # /.destroy(type, id)
 
+
   describe "#cache(type, id, object)", ->
     beforeEach ->
       spyOn(@store, "markAsChanged")
@@ -466,10 +481,13 @@ describe "Hoodie.LocalStore", ->
         @store.cache('couch', '123', color: 'red')
         expect(@store.db.setItem).wasCalledWith 'couch/123', '{"color":"red"}'
       
-      _when "`options.remote = true` passed", ->
+      _and "`options.remote = true` passed", ->
         it "should clear changed object", ->
           @store.cache('couch', '123', {color: 'red'}, remote: true)
           expect(@store.clearChanged).wasCalledWith 'couch', '123'
+
+      _and "object is marked as deleted", ->
+        
     
     _when "no object passed", ->
       _and "object is already cached", ->
@@ -539,6 +557,7 @@ describe "Hoodie.LocalStore", ->
       expect(obj.id).toBe    '123'
     
   # /.cache(type, id, object)
+
 
   describe "#clear()", ->
     
@@ -624,6 +643,7 @@ describe "Hoodie.LocalStore", ->
             do expect(@store.isDirty 'couch', '123').toBeTruthy
   # /.isDirty(type, id)
   
+
   describe "#markAsChanged(type, id, object)", ->
     beforeEach ->
       @store._dirty = {}
@@ -647,6 +667,7 @@ describe "Hoodie.LocalStore", ->
       expect(window.clearTimeout).wasCalledWith 'timeout'
   # /.markAsChanged(type, id, object)
   
+
   describe "#changedDocs()", ->
     _when "there are no changed docs", ->
       beforeEach ->
@@ -672,6 +693,7 @@ describe "Hoodie.LocalStore", ->
         expect(doc1.id).toBe '123'
   # /.changedDocs()
 
+
   describe "#isMarkedAsDeleted(type, id)", ->
     _when "object 'couch/123' is marked as deleted", ->
       beforeEach ->
@@ -687,6 +709,7 @@ describe "Hoodie.LocalStore", ->
       it "should return false", ->
         expect(@store.isMarkedAsDeleted('couch', '123')).toBeFalsy()
   # /.isMarkedAsDeleted(type, id)
+
 
   describe "#clearChanged(type, id)", ->
     _when "type & id passed", ->
@@ -704,6 +727,7 @@ describe "Hoodie.LocalStore", ->
         do expect($.isEmptyObject @store._dirty).toBeTruthy
   # /.clearChanged()
 
+
   describe "#trigger", ->
     beforeEach ->
       spyOn(@hoodie, "trigger")
@@ -712,6 +736,7 @@ describe "Hoodie.LocalStore", ->
        @store.trigger 'event', funky: 'fresh'
        expect(@hoodie.trigger).wasCalledWith 'store:event', funky: 'fresh'
   # /#trigger
+
 
   describe "#on", ->
     beforeEach ->

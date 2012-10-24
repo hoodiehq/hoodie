@@ -33,6 +33,7 @@ Hoodie.LocalStore = (function(_super) {
       };
     }
     this.hoodie.on('account:signout', this.clear);
+    this._bootstrap();
   }
 
   LocalStore.prototype.db = {
@@ -260,7 +261,7 @@ Hoodie.LocalStore = (function(_super) {
     timeout = 2000;
     window.clearTimeout(this._dirtyTimeout);
     return this._dirtyTimeout = window.setTimeout((function() {
-      return _this.hoodie.trigger('store:idle');
+      return _this.trigger('idle');
     }), timeout);
   };
 
@@ -325,6 +326,21 @@ Hoodie.LocalStore = (function(_super) {
   LocalStore.prototype.on = function(event, data) {
     event = event.replace(/(^| )([^ ]+)/g, "$1store:$2");
     return this.hoodie.on(event, data);
+  };
+
+  LocalStore.prototype._bootstrap = function() {
+    var id, key, keys, obj, type, _i, _len, _ref, _results;
+    keys = this._index();
+    _results = [];
+    for (_i = 0, _len = keys.length; _i < _len; _i++) {
+      key = keys[_i];
+      if (!(this._isSemanticId(key))) {
+        continue;
+      }
+      _ref = key.split('/'), type = _ref[0], id = _ref[1];
+      _results.push(obj = this.cache(type, id));
+    }
+    return _results;
   };
 
   LocalStore.prototype._setObject = function(type, id, object) {
