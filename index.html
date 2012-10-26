@@ -2,13 +2,7 @@
 <html>
 <head>
   <title>Hoodie Test page</title>
-
-  <!-- deplendencies for hoodie -->
-  <script src="vendor/jquery-1.7.2.min.js"></script>
-  <script src="hoodie.js"></script>
-  
-  <link href="http://google-code-prettify.googlecode.com/svn/trunk/styles/sunburst.css" type="text/css" rel="stylesheet" />
-  
+  <link href="vendor/prettify-theme.css" type="text/css" rel="stylesheet" />
   
 </head>
 <body>
@@ -62,9 +56,6 @@
     //
     // Store
     //
-    
-    // helper to generate uuids
-    uuid = hoodie.store.uuid(length)
     
     // create a new object
     type = 'couch'
@@ -194,7 +185,7 @@
     share.update({access: {read: true}}, password: 'secret')
 
     // add all todo objects to the share
-    share.add( hoodie.store.loadAll('todo') )
+    share.add( hoodie.store.findAll('todo') )
 
     // remove a specific todo from the share
     share.remove( todoObject );
@@ -203,7 +194,7 @@
     share.destroy()
     
     // open a share and load all its objects
-    hoodie.share('shareIdHere').loadAll()
+    hoodie.share('shareIdHere').findAll()
       .done( function(user) { } ) 
       .fail( function(err)  { } )
       
@@ -231,8 +222,10 @@
     </code></pre>
   </div>
   
-  <!-- <link href="http://google-code-prettify.googlecode.com/svn/trunk/src/prettify.css" type="text/css" rel="stylesheet" /> -->
-  <script src="http://google-code-prettify.googlecode.com/svn/trunk/src/prettify.js"></script>
+  <!-- deplendencies for hoodie -->
+  <script src="vendor/jquery-1.8.2.min.js"></script>
+  <script src="hoodie.js"></script>
+  <script src="vendor/prettify.js"></script>
   <script>
     if (typeof prettyPrint == 'function') {
       prettyPrint()
