@@ -15,7 +15,7 @@ f.event={add:function(a,c,d,e,g){var h,i,j,k,l,m,n,o,p,q,r,s;if(!(a.nodeType===3
           "name": "JavaScript"
         },
         "sourcePath": "/Users/gregor/JavaScripts/hood.ie/hoodie.js/wishlist/open.js",
-        "projectPath": "wishlist/open.js",
+        "projectPath": "open.js",
         "targetPath": "open",
         "title": "open"
       },
@@ -60,7 +60,7 @@ f.event={add:function(a,c,d,e,g){var h,i,j,k,l,m,n,o,p,q,r,s;if(!(a.nodeType===3
           "name": "JavaScript"
         },
         "sourcePath": "/Users/gregor/JavaScripts/hood.ie/hoodie.js/wishlist/public_user_stores.js",
-        "projectPath": "wishlist/public_user_stores.js",
+        "projectPath": "public_user_stores.js",
         "targetPath": "public_user_stores",
         "firstHeader": {
           "type": "heading",
@@ -294,87 +294,8 @@ f.event={add:function(a,c,d,e,g){var h,i,j,k,l,m,n,o,p,q,r,s;if(!(a.nodeType===3
           "singleLineComment": ["//"],
           "name": "JavaScript"
         },
-        "sourcePath": "/Users/gregor/JavaScripts/hood.ie/hoodie.js/wishlist/public_user_stores_implementation.js",
-        "projectPath": "wishlist/public_user_stores_implementation.js",
-        "targetPath": "public_user_stores_implementation",
-        "firstHeader": {
-          "type": "heading",
-          "data": {
-            "level": 1,
-            "title": "Public User Stores (Implementation)",
-            "slug": "public-user-stores-implementation",
-            "isFileHeader": true
-          },
-          "depth": 1,
-          "children": [
-            {
-              "type": "heading",
-              "data": {
-                "level": 2,
-                "title": "Step one: create or make an object public",
-                "slug": "step-one-create-or-make-an-object-public"
-              },
-              "depth": 2
-            }, {
-              "type": "heading",
-              "data": {
-                "level": 2,
-                "title": "Step 2: Synchronization with public store",
-                "slug": "step-2-synchronization-with-public-store"
-              },
-              "depth": 2
-            }, {
-              "type": "heading",
-              "data": {
-                "level": 2,
-                "title": "the worker",
-                "slug": "the-worker"
-              },
-              "depth": 2
-            }
-          ]
-        },
-        "title": "Public User Stores (Implementation)"
-      },
-      "depth": 1,
-      "outline": [
-        {
-          "type": "heading",
-          "data": {
-            "level": 2,
-            "title": "Step one: create or make an object public",
-            "slug": "step-one-create-or-make-an-object-public"
-          },
-          "depth": 2
-        }, {
-          "type": "heading",
-          "data": {
-            "level": 2,
-            "title": "Step 2: Synchronization with public store",
-            "slug": "step-2-synchronization-with-public-store"
-          },
-          "depth": 2
-        }, {
-          "type": "heading",
-          "data": {
-            "level": 2,
-            "title": "the worker",
-            "slug": "the-worker"
-          },
-          "depth": 2
-        }
-      ]
-    }, {
-      "type": "file",
-      "data": {
-        "language": {
-          "nameMatchers": [".js"],
-          "pygmentsLexer": "javascript",
-          "singleLineComment": ["//"],
-          "name": "JavaScript"
-        },
         "sourcePath": "/Users/gregor/JavaScripts/hood.ie/hoodie.js/wishlist/share.js",
-        "projectPath": "wishlist/share.js",
+        "projectPath": "share.js",
         "targetPath": "share",
         "firstHeader": {
           "type": "heading",
@@ -624,8 +545,34 @@ f.event={add:function(a,c,d,e,g){var h,i,j,k,l,m,n,o,p,q,r,s;if(!(a.nodeType===3
           "singleLineComment": ["//"],
           "name": "JavaScript"
         },
+        "sourcePath": "/Users/gregor/JavaScripts/hood.ie/hoodie.js/wishlist/shareApiThoughts.js",
+        "projectPath": "shareApiThoughts.js",
+        "targetPath": "shareApiThoughts",
+        "title": "shareApiThoughts"
+      },
+      "depth": 1,
+      "outline": [
+        {
+          "type": "heading",
+          "data": {
+            "level": 2,
+            "title": "hoodie.share API",
+            "slug": "hoodieshare-api"
+          },
+          "depth": 2
+        }
+      ]
+    }, {
+      "type": "file",
+      "data": {
+        "language": {
+          "nameMatchers": [".js"],
+          "pygmentsLexer": "javascript",
+          "singleLineComment": ["//"],
+          "name": "JavaScript"
+        },
         "sourcePath": "/Users/gregor/JavaScripts/hood.ie/hoodie.js/wishlist/subscription.js",
-        "projectPath": "wishlist/subscription.js",
+        "projectPath": "subscription.js",
         "targetPath": "subscription",
         "title": "subscription"
       },

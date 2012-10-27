@@ -7,13 +7,13 @@
 
 // Share options
 // ---------------
-//
+// 
 // * access     (default: false)
 // * password   (default: _no password_)
 
 
 // ### the `access` setting (default: false)
-//
+// 
 // the access setting defines which user (group) has read or write access.
 // When set to true, the sharing is public and everybody who knows the share
 // id can access and edit it. To limit to read only, set access to read: true.
