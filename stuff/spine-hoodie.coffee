@@ -26,19 +26,19 @@ Spine.Model.Hoodie =
     @change (object, event, data) =>
       switch event
         when 'create'
-          Spine.hoodie.my.store.create type, object.toJSON()
+          Spine.hoodie.store.create type, object.toJSON()
         when 'update'
-          Spine.hoodie.my.store.update type, object.id, object.toJSON()
+          Spine.hoodie.store.update type, object.id, object.toJSON()
         when 'destroy'
-          Spine.hoodie.my.store.destroy type, object.id
+          Spine.hoodie.store.destroy type, object.id
 
-    # fetch records from hoodie.my.store
+    # fetch records from hoodie.store
     @fetch =>
-      Spine.hoodie.my.store.findAll(type)
+      Spine.hoodie.store.findAll(type)
       .done (records) => @refresh(records)
 
     # listen to remote events on records
-    Spine.hoodie.my.remote.on "change:#{type}", (event, remoteObject) => 
+    Spine.hoodie.remote.on "change:#{type}", (event, remoteObject) => 
       switch event
         when 'create'
           @refresh remoteObject

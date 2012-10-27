@@ -26,22 +26,18 @@
 // the share public or invite readers / writers to it.
 //
 share = hoodie.share.create();
-share.add(todolist);
-share.add(todolist, ['title', 'owner']);
 
 //
 // access: true
 // Everybody will be able to acces and edit the todo list
 //
 share = hoodie.share.create( {access: true} );
-share.add(todolist);
 
 //
 // access: [user1, user2]
 // Besides me, only user1 and user2 will have access to the todolist
 //
 share = hoodie.share.create( {access: ['aj@foo.com', 'bj@foo.com']} );
-share.add(todolist);
 
 //
 // access: {read: true}
@@ -64,7 +60,7 @@ share.add(todolist).push();
 
 //
 // access: {read: [user1, user2], write: [user3]}
-// Besides me, only user1, user and user3 will have access to the
+// Besides me, only user1, user2 and user3 will have access to the
 // todolist and only CJ and me can edit it
 //
 share = hoodie.share.create({
@@ -243,7 +239,7 @@ hoodie.share.create( {continuous: true} )
   share.add(todolist);
 
   // * changes to added todolists will be synched right away
-  hoodie.my.store.update(todolist, {name: "new name"});
+  hoodie.store.update(todolist, {name: "new name"});
 
   // * removed docs will be removed from the share right away
   share.remove(todolist);

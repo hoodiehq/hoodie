@@ -1,5 +1,5 @@
-// Public User Stores
-// ====================
+// Public User Stores (2nd thought)
+// ==================================
 
 // Every user has a store which is private by default. Nobody but the user
 // himself is able to access this data, authenticated by a username and a 
@@ -15,19 +15,24 @@
 // the an object. To make an object public, pass the `public: true` option
 // as demonstrated in the code examples:
 
-/* make objects entirely public */
-options = { "public": true}
+// make object entirely public
+hoodie.store.find('task', '123').publish()
+hoodie.store.publish('task', '123')
 
-/* or: make seleceted attributes of objects public */
-options = { "public": ["name"] }
+// or: make seleceted attributes of objects public
+hoodie.store.find('task', '123').publish(['title', 'description'])
+hoodie.store.publish('task', '123', ['title', 'description'])
 
-profilAttributes = { name: "Joe", email: "joe@example.com"}
-hoodie.store.insert("profile", profilAttributes, options)
-hoodie.store.update("profile", "uuid567", {}, options)
+// make a public object private again
+hoodie.store.find('task', '123').conceal()
+hoodie.store.conceal('task', '123')
 
-// to make a public object private again, pass the `public: false` option
-options = { "public": false }
-hoodie.store.update("profile", "uuid567", {}, options)
+// or: make certain attributes of a published object private again
+hoodie.store.find('task', '123').conceal(['description'])
+hoodie.store.conceal('task', '123', ['description'])
+
+// insert a new object and make it public
+hoodie.store.insert('task', '456').publish()
 
 
 // ## Open public objects
@@ -56,14 +61,14 @@ hoodie.user("joey").pull()
 
 // I want to make a photo public
 // 
-hoodie.store.update("photo", "abc4567", {}, {public: true})
+hoodie.store.publish("photo", "abc4567")
 
 
 // ### Scenario 2
 
 // I want to make a public photo private again
 // 
-hoodie.store.update("photo", "abc4567", {}, {public: false})
+hoodie.store.conceal("photo", "abc4567")
 
 
 // ### Scenario 3
@@ -112,8 +117,8 @@ hoodie.global.get("most_recent_photos", {page: 2})
 // 
 function playTrack( track ) {
 
-  hoodie.store.findOrCreate( "track", track.id, track, {"public": true})
-  hoodie.store.insert("play", {trackId: trackAtts.id}, {"public": true})
+  hoodie.store.findOrInsert( "track", track.id, track).publish()
+  hoodie.store.insert("play", {trackId: track.id}).publish()
 }
 
 tumblrTrack = {
@@ -131,15 +136,11 @@ playTrack( tumblrTrack )
 // I want to favorite or unfavorite a track
 // 
 function favoriteTrack( track ) {
-  hoodie.store.insert( "favorite", { trackId = track.id })
+  hoodie.store.insert( "favorite", track.id)
 }
 
 function unfavoriteTrack( track ) {
-  hoodie.store.findAll( function(trackAtts) {
-    return trackAtts.type === "track" && trackAtts.trackId === track.id
-  }).done( function( arrTrackAtts ) {
-    hoodie.store.remove( "favorite", arrTrackAtts[0].trackId )
-  })
+  hoodie.store.remove( "favorite", track.id)
 }
 
 // ### Scenario 3
@@ -147,9 +148,7 @@ function unfavoriteTrack( track ) {
 // Show favorites from a user http://whiskie.net/user/espy
 // 
 hoodie.user('espy').store.findAll("favorite")
-.done( function( favorites ) {
-  renderFavorites( favorites )
-} ) 
+.done( renderFavorites ) 
 
 function renderFavorites (favorites) {
   /* get global playcounts */

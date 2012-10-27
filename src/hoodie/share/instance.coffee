@@ -41,9 +41,6 @@ class Hoodie.ShareInstance extends Hoodie.RemoteStore
   #         "joey@example.com"
   #         "frank@example.com"
   #       ]
-  #       objects : [
-  #         todoList, todo1, todo2, todo3
-  #       ]
   #
   constructor: (options = {}) ->
 

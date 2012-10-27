@@ -1,10 +1,11 @@
+// hoodie Subscription module
+// ============================
 
 
-// # Subscriptions
 
 // I can subscribe to a store. It can be used just like `hoodie.open`, 
-// with the difference that an internal $shareAccess object will be 
-// added to my store. This allows me to get a list of all shares 
+// with the difference that an internal $subscription object will be 
+// added to my store. This allows me to get a list of all 
 // I've access to.
 hoodie.subscription.create("store")
 
@@ -15,17 +16,15 @@ hoodie.share("share_id").subscribe()
 hoodie.user("janl").subscribe()
 
 // I can pass options when creating a subscription, like a password for 
-// protected shares or continuous if I want to continuously synchronize with // the share 
+// protected shares
 hoodie.subscription.create("share_id", {
-  continuous: true,
   password: "secret"
 })
 
 {
-  id: "share_id",
+  id: "store_name",
   type: "$subscription",
-  password: secret,
-  writeAccess: true
+  password: secret
 }
 
 {
@@ -36,4 +35,4 @@ hoodie.subscription.create("share_id", {
   }
 }
 
-hoodie.my.store.update("car", "123", {price: "12,34"})
+hoodie.store.update("car", "123", {price: "12,34"})

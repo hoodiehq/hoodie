@@ -18,7 +18,7 @@ Accounts / Sessions
 ### Sign Up
 
 ```javascript
-hoodie.my.account.signUp('joe@example.com', 'secret')
+hoodie.account.signUp('joe@example.com', 'secret')
 
   .done( function() {  
     // data sync kicks in
@@ -34,7 +34,7 @@ hoodie.my.account.signUp('joe@example.com', 'secret')
 ### Sign In
 
 ```javascript
-hoodie.my.account.signIn('joe@example.com', 'secret')
+hoodie.account.signIn('joe@example.com', 'secret')
 
   .done( function() {
     // data sync kicks in
@@ -48,7 +48,7 @@ hoodie.my.account.signIn('joe@example.com', 'secret')
 ### Change password
 
 ```javascript
-hoodie.my.account.changePassword('current_secret', 'new_secret')
+hoodie.account.changePassword('current_secret', 'new_secret')
 
   .done( function() { } ) 
   .fail( function(err)  { } )
@@ -61,7 +61,7 @@ If you want to make sure that a user is authenticated with a valid
 session, you can use the `authenticate` method.
 
 ```javascript
-hoodie.my.account.authenticate()
+hoodie.account.authenticate()
 
   .done( function() {
     // you are authenticated, your session is valid
@@ -75,7 +75,7 @@ hoodie.my.account.authenticate()
 ### Sign Out
 
 ```javascript
-hoodie.my.account.signOut()
+hoodie.account.signOut()
 
   .done( function() {
     // session ends, local data gets cleaned up
@@ -89,7 +89,7 @@ hoodie.my.account.signOut()
 ### Change Password
 
 ```javascript
-hoodie.my.account.changePassword('currentpassword', 'newpassword')
+hoodie.account.changePassword('currentpassword', 'newpassword')
 
   .done( function() {
     alert( "Password updated")
@@ -103,7 +103,7 @@ hoodie.my.account.changePassword('currentpassword', 'newpassword')
 ### reset Password
 
 ```javascript
-hoodie.my.account.resetPassword('joe@example.com')
+hoodie.account.resetPassword('joe@example.com')
 
   .done( function() {
     alert( "Link has been sent to joe@example.com")
@@ -117,7 +117,7 @@ hoodie.my.account.resetPassword('joe@example.com')
 ### Change Username
 
 ```javascript
-hoodie.my.account.changeUsername('currentpassword', 'newusername')
+hoodie.account.changeUsername('currentpassword', 'newusername')
 
   .done( function() {
     alert( "Username updated")
@@ -139,7 +139,7 @@ create or update an object.
 ```javascript
 // create a new object
 type = 'rule'
-hoodie.my.store.create( type, {name: "rule the world"} )
+hoodie.store.create( type, {name: "rule the world"} )
   
   .done ( function(newObject)  { } )
   .fail ( function(err)        { } )
@@ -148,7 +148,7 @@ hoodie.my.store.create( type, {name: "rule the world"} )
 // save an object
 id   = 'abc4567'
 type = 'rule'
-hoodie.my.store.save( type, id, {name: "rule the world"} )
+hoodie.store.save( type, id, {name: "rule the world"} )
   
   .done ( function(object) { } )
   .fail ( function(err)    { } )
@@ -158,7 +158,7 @@ hoodie.my.store.save( type, id, {name: "rule the world"} )
 // Note: this changes only the passed attributes of the object
 id   = 'abc4567'
 type = 'rule'
-hoodie.my.store.update( type, id, {nr: 1} )
+hoodie.store.update( type, id, {nr: 1} )
   
   .done ( function(updatedObject) { } )
   .fail ( function(err)        { } )
@@ -170,7 +170,7 @@ hoodie.my.store.update( type, id, {nr: 1} )
 find an existing object
 
 ```javascript
-hoodie.my.store.find( type, id )
+hoodie.store.find( type, id )
 
   .done ( function(object) { } )
   .fail ( function(err)    { } )
@@ -182,7 +182,7 @@ hoodie.my.store.find( type, id )
 find all objects available or from a specific type
 
 ```javascript
-hoodie.my.store.findAll( type )
+hoodie.store.findAll( type )
 
   .done ( function(objects) { } )
   .fail ( function(err)     { } )
@@ -194,7 +194,7 @@ hoodie.my.store.findAll( type )
 destroy an existing object
 
 ```javascript
-hoodie.my.store.destroy( type, id )
+hoodie.store.destroy( type, id )
 
   .done ( function(destroyedObject) { } )
   .fail ( function(err)            { } )
@@ -206,44 +206,44 @@ hoodie.my.store.destroy( type, id )
 Remote module does synchronize a users data continuously by default, as soon as he signes up. To enable / disable continuous synchronization, use the following methods:
 
 ```javascript
-hoodie.my.remote.startSyncing()
-hoodie.my.remote.stopSyncing()
+hoodie.remote.startSyncing()
+hoodie.remote.stopSyncing()
 ```
 
 When you want to manually trigger syncing, use:
 
 ```javascript
-hoodie.my.remote.push()
-hoodie.my.remote.pull()
-hoodie.my.remote.sync()
+hoodie.remote.push()
+hoodie.remote.pull()
+hoodie.remote.sync()
 ```
 
 Subscribe to changes from remote
 
 ```javascript
 // new doc created
-hoodie.my.remote.on( 'created', function( createdObject) { } )
+hoodie.remote.on( 'created', function( createdObject) { } )
 
 // existing doc updated
-hoodie.my.remote.on( 'updated', function( updatedObject) { } )
+hoodie.remote.on( 'updated', function( updatedObject) { } )
 
 // doc destroyed
-hoodie.my.remote.on( 'destroyed', function( destroyedObject) { } )
+hoodie.remote.on( 'destroyed', function( destroyedObject) { } )
 
 // any of above events
-hoodie.my.remote.on( 'changed', function( changedObject) { } )
+hoodie.remote.on( 'changed', function( changedObject) { } )
 
 // all listeners can be filtered by type
-hoodie.my.remote.on( "created:couch", function( createdObject) { } )
-hoodie.my.remote.on( "updated:couch", function( updatedObject) { } )
-hoodie.my.remote.on( "destroyed:couch", function( destroyedObject) { } )
-hoodie.my.remote.on( "changed:couch", function( changedObject) { } )
+hoodie.remote.on( "created:couch", function( createdObject) { } )
+hoodie.remote.on( "updated:couch", function( updatedObject) { } )
+hoodie.remote.on( "destroyed:couch", function( destroyedObject) { } )
+hoodie.remote.on( "changed:couch", function( changedObject) { } )
 
 // and even by id
-hoodie.my.remote.on( "created:couch:abc4567", function( createdObject) { } )
-hoodie.my.remote.on( "updated:couch:abc4567", function( updatedObject) { } )
-hoodie.my.remote.on( "destroyed:couch:abc4567", function( destroyedObject) { } )
-hoodie.my.remote.on( "changed:couch:abc4567", function( changedObject) { } )
+hoodie.remote.on( "created:couch:abc4567", function( createdObject) { } )
+hoodie.remote.on( "updated:couch:abc4567", function( updatedObject) { } )
+hoodie.remote.on( "destroyed:couch:abc4567", function( destroyedObject) { } )
+hoodie.remote.on( "changed:couch:abc4567", function( changedObject) { } )
 ```
 
 
@@ -254,14 +254,14 @@ be shared.
 
 ```javascript
 // make couch with id "abc4567" public
-hoodie.my.store.update("couch","abc4567", {}, {public: true})
+hoodie.store.update("couch","abc4567", {}, {public: true})
 
 // make couch with id "abc4567" public, but do only show the color, hide
 // all other attributes
-hoodie.my.store.update("couch","abc4567", {}, {public: ["color"]})
+hoodie.store.update("couch","abc4567", {}, {public: ["color"]})
 
 // make couch with id "abc4567" private again
-hoodie.my.store.update("couch","abc4567", {}, {public: false})
+hoodie.store.update("couch","abc4567", {}, {public: false})
 
 // find all couches from user "joe"
 hoodie.user("joe").findAll("couch").done( function(couches) { ... })
