@@ -118,7 +118,9 @@ hoodie.global.get("most_recent_photos", {page: 2})
 function playTrack( track ) {
 
   hoodie.store.findOrInsert( "track", track.id, track).publish()
+  // or: hoodie.store.publish( "track", track.id, track).publish()
   hoodie.store.insert("play", {trackId: track.id}).publish()
+  // or: hoodie.store.publish("play", {trackId: track.id})
 }
 
 tumblrTrack = {
