@@ -47,8 +47,8 @@ hoodie.share.findOrInsert()
 hoodie.share.insert()
 hoodie.share.update()
 hoodie.share.updateAll()
-hoodie.share.destroy()
-hoodie.share.destroyAll()
+hoodie.share.remove()
+hoodie.share.removeAll()
 
 // on top, there two extra methods.
 // The first opens a remote store
