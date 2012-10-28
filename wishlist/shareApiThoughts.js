@@ -27,7 +27,7 @@ hoodie.share.store.removeAll()
 // on top, it allows a direct call:  
 // that opens a share from remote and exposes a store API
 // to directly interact with the store.
-hoodie.share('shareId')
+share = hoodie.share('shareId')
 
 // you can also initiate a new share instance,
 // the id gets auto generated if not passed
@@ -38,6 +38,9 @@ share = new hoodie.share
 // --------------------
 
 // a share provides a store for its objects
+// all these methods make direct calls to the
+// remote share store. If share is a new instance,
+// it gets published automtically
 share.store.find()
 share.store.findAll()
 share.store.findOrAdd()
@@ -64,10 +67,10 @@ share.revokeAccess("lisa@example.com")
 // Sharing objects from my store
 // -------------------------------
 
-// the hoodie.share module also extends the hoodie.share
+// the hoodie.share module also extends the hoodie.store
 // api with two methods: share and unshare
-hoodie.store.find('task', '123').share('shareId')
-hoodie.store.find('task', '123').unshare('shareId')
+hoodie.store.find('task', '123').share( share.id )
+hoodie.store.find('task', '123').unshare( share.id )
 
 // compare to [store.publish / store.conceal](public_user_stores2.html)
 
