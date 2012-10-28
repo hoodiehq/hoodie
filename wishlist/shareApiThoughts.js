@@ -10,6 +10,7 @@
 // initiate a new share
 share = new hoodie.share({access: true})
 
+
 // open an existing share (local or remote)
 share = hoodie.share('shareId')
 
