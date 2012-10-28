@@ -1,12 +1,10 @@
 # RemoteStore
 # ============
 
-# Connection to Couch Database
+# find / insert / update / remove objects in a Couch Database
 #
 # API
 # -----
-#
-# object loading / updating / deleting
 #
 # * find(type, id)
 # * findAll(type )
@@ -17,61 +15,20 @@
 # * destroy(type, id)
 # * destroyAll(type)
 #
-# custom requests
 #
-# * request(view, params)
-# * get(view, params)
-# * post(view, params)
-#
-# synchronization
-#
-# * connect()
-# * disconnect()
-# * pull()
-# * push()
-# * sync()
-#
-# event binding
+# Event binding
+# ---------------
 #
 # * on(event, callback)
 #
 class Hoodie.RemoteStore extends Hoodie.Store
 
 
-  # properties
-  # ------------
-  
-  # name  
-
-  # the name of the RemoteStore is the name of the
-  # CouchDB database and is also used to prefix 
-  # triggered events
-  name : undefined
-  
-  # sync  
-
-  # if set to true, updates will be continuously pulled
-  # and pushed. Alternatively, `sync` can be set to
-  # `pull: true` or `push: true`.
-  _sync : false
-
-  # docPrefix
-
-  # prefix of docs in CouchDB Database, e.g. all docs
-  # in public user stores are prefixed by '$public'
-  _prefix : ''
-
-
   # Constructor 
   # -------------
   
   # sets name (think: namespace) and some other options
-  constructor : (@hoodie, options = {}) ->
-    @name    = options.name   if options.name
-    @_sync   = options.sync   if options.sync
-    @_prefix = options.prefix if options.prefix
-    @startSyncing() if @isContinuouslySyncing()
-
+  constructor : (@hoodie, @remote) ->
 
   # find
   # ------
@@ -82,7 +39,7 @@ class Hoodie.RemoteStore extends Hoodie.Store
     return defer if @hoodie.isPromise(defer)
 
     path = "/" + encodeURIComponent "#{type}/#{id}"
-    @request("GET", path).pipe(@_parseFromRemote)
+    @remote.request("GET", path).pipe(@parseFromRemote)
 
   
   # findAll
@@ -95,21 +52,21 @@ class Hoodie.RemoteStore extends Hoodie.Store
 
     path = "/_all_docs?include_docs=true"
     switch true
-      when type? and @_prefix isnt ''
-        keyPrefix = "#{@_prefix}/#{type}"
+      when type? and @remote.prefix isnt ''
+        keyPrefix = "#{@remote.prefix}/#{type}"
       when type?
         keyPrefix = type
-      when @_prefix isnt ''
-        keyPrefix = @_prefix
+      when @remote.prefix isnt ''
+        keyPrefix = @remote.prefix
       else
         keyPrefix = ''
 
     if keyPrefix
       path = "#{path}&startkey=\"#{keyPrefix}\/\"&endkey=\"#{keyPrefix}0\""
 
-    promise = @request "GET", path
+    promise = @remote.request "GET", path
     promise.fail defer.reject
-    promise.pipe(@_mapDocsFromFindAll).pipe(@_parseAllFromRemote).done defer.resolve
+    promise.pipe(@_mapDocsFromFindAll).pipe(@parseAllFromRemote).done defer.resolve
 
     return defer.promise()
   
@@ -129,10 +86,10 @@ class Hoodie.RemoteStore extends Hoodie.Store
       id    : id
     }, object
 
-    doc   = @_parseForRemote object
+    doc   = @parseForRemote object
     path  = "/" + encodeURIComponent doc._id
 
-    @request "PUT", path, data: doc
+    @remote.request "PUT", path, data: doc
 
   
   # destroy
@@ -150,275 +107,9 @@ class Hoodie.RemoteStore extends Hoodie.Store
   destroyAll : (type) ->
     @updateAll type, _deleted: true
 
-  
-  # request
-  # ---------
-  
-  # wrapper for hoodie.request, with some store specific defaults
-  # and a prefixed path
-  request : (type, path, options = {}) ->
-    path = "/#{encodeURIComponent @name}#{path}" if @name
 
-    options.contentType or= 'application/json'
-    if type is 'POST' or type is 'PUT'
-      options.dataType    or= 'json'
-      options.processData or= false
-      options.data = JSON.stringify options.data
-
-    @hoodie.request type, path, options
-
-
-  # get
-  # -----
-  
-  # send a GET request to the named view
-  get : (view_name, params) ->
-    console.log ".get() not yet implemented", arguments...
-  
-  
-  # post
-  # ------
-  
-  # sends a POST request to the specified updated_function
-  post : (update_function_name, params) ->
-    console.log ".post() not yet implemented", arguments...
-
-
-
-  # synchronization
-  # -----------------
-
-  # Connect
-  # ---------
-
-  # start syncing
-  connect : (options) =>
-    @connected = true
-    @sync()
-  
-    
-  # Disconnect
-  # ------------
-
-  # stop syncing changes from the userDB
-  disconnect : =>
-    @connected = false
-    
-    @_pullRequest?.abort()
-    @_pushRequest?.abort()
-  
-
-  # startSyncing
-  # --------------
-
-  # start continuous syncing with current users store
-  # 
-  startSyncing : =>
-    @_sync = true
-    @connect()
-
-
-  # stopSyncing
-  # -------------
-
-  # stop continuous syncing with current users store
-  # 
-  stopSyncing : =>
-    @_sync = false
-
-
-  # isContinuouslyPulling
-  # -----------------------
-
-  # returns true if pulling is set to be continous
-  isContinuouslyPulling : ->
-    @_sync is true or @_sync?.pull is true
-
-
-  # isContinuouslyPushing
-  # -----------------------
-
-  # returns true if pulling is set to be continous
-  isContinuouslyPushing : ->
-    @_sync is true or @_sync?.push is true
-
-
-  # isContinuouslySyncing
-  # -----------------------
-
-  # returns true if pulling is set to be continous
-  isContinuouslySyncing : ->
-    @_sync is true
-
-
-  # getSinceNr
-  # ------------
-
-  # returns the sequence number from wich to start to find changes in pull
-  #
-  getSinceNr : ->
-    @_since or 0
-
-
-  # setSinceNr
-  # ------------
-
-  # sets the sequence number from wich to start to find changes in pull
-  #
-  setSinceNr : (seq) ->
-    @_since = seq
-
-
-  # pull changes
-  # --------------
-
-  # a.k.a. make a GET request to CouchDB's `_changes` feed.
-  #
-  pull : =>
-    @_pullRequest = @request 'GET', @_pullUrl()
-
-    if @connected and @isContinuouslyPulling()
-      window.clearTimeout @_pullRequestTimeout
-      @_pullRequestTimeout = window.setTimeout @_restartPullRequest, 25000 # 25 sec
-    
-    @_pullRequest.then @_handlePullSuccess, @_handlePullError
-    
-    
-  # push changes
-  # --------------
-
-  # Push objects to userDB using the `_bulk_docs` API.
-  # If no objects passed, push all changed documents
-  push : (docs) =>
-    
-    return @hoodie.defer().resolve([]).promise() unless docs?.length
-      
-    docsForRemote = []
-    for doc in docs
-      docsForRemote.push @_parseForRemote doc 
-    
-    @_pushRequest = @request 'POST', "/_bulk_docs"
-      data :
-        docs      : docsForRemote
-        new_edits : false
-
-    # when push is successful, update the local store with the generated _rev numbers
-    @_pushRequest.done @_handlePushSuccess(docs, docsForRemote)
-
-
-  # sync changes
-  # --------------
-
-  # pull ... and push ;-)
-  sync : (docs) =>
-    @push(docs).pipe @pull
-
-  
-  # Events
-  # --------
-
-  # namespaced alias for `hoodie.on`
-  on  : (event, cb) -> 
-    event = event.replace /(^| )([^ ]+)/g, "$1#{@name}:$2"
-    @hoodie.on  event, cb
-  one : (event, cb) -> 
-    event = event.replace /(^| )([^ ]+)/g, "$1#{@name}:$2"
-    @hoodie.one event, cb
-  
-  # namespaced alias for `hoodie.trigger`
-  trigger : (event, parameters...) -> 
-    @hoodie.trigger "#{@name}:#{event}", parameters...
-  
-
-
-
-  # Private
-  # --------------
-  
-  # ### pull url
-
-  # Depending on whether isContinuouslyPulling() is true, return a longpoll URL or not
-  #
-  _pullUrl : ->
-    since = @getSinceNr()
-    if @isContinuouslyPulling() # make a long poll request
-      "/_changes?include_docs=true&since=#{since}&heartbeat=10000&feed=longpoll"
-    else
-      "/_changes?include_docs=true&since=#{since}"
-  
-  # request gets restarted automaticcally in @_handlePullError
-  _restartPullRequest : => @_pullRequest?.abort()
-  
-  
-
-  # ### pull success handler 
-
-  # handle the incoming changes, then send the next request
-  #
-  _handlePullSuccess : (response) =>
-    @setSinceNr response.last_seq
-    @_handlePullResults response.results
-    
-    @pull() if @connected and @isContinuouslyPulling()
-  
-  
-
-  # ### pull error handler 
-
-  # when there is a change, trigger event, 
-  # then check for another change
-  #
-  _handlePullError : (xhr, error, resp) =>
-    
-    return unless @connected
-
-    switch xhr.status
-  
-      # Session is invalid. User is still login, but needs to reauthenticate
-      # before sync can be continued
-      when 401
-        @trigger 'error:unauthenticated', error
-        @disconnect()
-      
-      # the 404 comes, when the requested DB has been removed
-      # or does not exist yet.
-      # 
-      # BUT: it might also happen that the background workers did
-      #      not create a pending database yet. Therefore,
-      #      we try it again in 3 seconds
-      #
-      # TODO: review / rethink that.
-      when 404
-        window.setTimeout @pull, 3000
-      
-      # Please server, don't give us these. At least not persistently 
-      when 500
-        @trigger 'error:server', error
-        window.setTimeout @pull, 3000
-      
-      # usually a 0, which stands for timeout or server not reachable.
-      else
-        return unless @isContinuouslyPulling()
-
-        if xhr.statusText is 'abort'
-          # manual abort after 25sec. restart pulling changes directly when isContinuouslyPulling() is true
-          @pull()
-        else    
-            
-          # oops. This might be caused by an unreachable server.
-          # Or the server canceled it for what ever reason, e.g.
-          # heroku kills the request after ~30s.
-          # we'll try again after a 3s timeout
-          window.setTimeout @pull, 3000
-
-
-  # valid CouchDB doc attributes starting with an underscore
-  _validSpecialAttributes : [
-    '_id', '_rev', '_deleted', '_revisions', '_attachments'
-  ]
-
-
-  # ### parse for remote
+  # Parse for remote
+  # ------------------
 
   # parse object for remote storage. All attributes starting with an 
   # `underscore` do not get synchronized despite the special attributes
@@ -426,7 +117,7 @@ class Hoodie.RemoteStore extends Hoodie.Store
   # 
   # Also `id` gets replaced with `_id` which consists of type & id
   #
-  _parseForRemote : (obj) ->
+  parseForRemote : (obj) ->
     attributes = $.extend {}, obj
   
     for attr of attributes
@@ -436,14 +127,70 @@ class Hoodie.RemoteStore extends Hoodie.Store
    
     # prepare CouchDB id
     attributes._id = "#{attributes.$type}/#{attributes.id}"
-    if @_prefix
-      attributes._id = "#{@_prefix}/#{attributes._id}"
+    if @remote.prefix
+      attributes._id = "#{@remote.prefix}/#{attributes._id}"
     
     delete attributes.id
     
     @_addRevisionTo attributes
 
     return attributes
+
+
+  # parseFromRemote
+  # -----------------
+  #
+  # normalize objects coming from remote
+
+  # renames `_id` attribute to `id` and removes the type from the id,
+  # e.g. `document/123` -> `123`
+  parseFromRemote : (obj) =>
+
+    # handle id and type
+    id = obj._id or obj.id
+    delete obj._id
+    id = id.replace(RegExp('^'+@remote.prefix+'/'), '') if @remote.prefix
+    [obj.$type, obj.id] = id.split(/\//)
+    
+    # handle timestameps
+    obj.$createdAt = new Date(Date.parse obj.$createdAt) if obj.$createdAt
+    obj.$updatedAt = new Date(Date.parse obj.$updatedAt) if obj.$updatedAt
+    
+    # handle rev
+    if obj.rev
+      obj._rev = obj.rev
+      delete obj.rev
+    
+    return obj
+  
+  parseAllFromRemote : (objects) =>
+    @parseFromRemote(object) for object in objects
+
+  
+  # Events
+  # --------
+
+  # namespaced alias for `hoodie.on`
+  on  : (event, cb) -> 
+    event = event.replace /(^| )([^ ]+)/g, "$1#{@remote.name}:store:$2"
+    @hoodie.on  event, cb
+  one : (event, cb) -> 
+    event = event.replace /(^| )([^ ]+)/g, "$1#{@remote.name}:store:$2"
+    @hoodie.one  event, cb
+
+  # namespaced alias for `hoodie.trigger`
+  trigger : (event, parameters...) -> 
+    @hoodie.trigger "#{@remote.name}:store:#{event}", parameters...
+
+
+  # Private
+  # --------------
+
+
+  # valid CouchDB doc attributes starting with an underscore
+  _validSpecialAttributes : [
+    '_id', '_rev', '_deleted', '_revisions', '_attachments'
+  ]
   
 
   # ### generate new revision id
@@ -470,65 +217,6 @@ class Hoodie.RemoteStore extends Hoodie.Store
     if currentRevId
       attributes._revisions.start += currentRevNr
       attributes._revisions.ids.push currentRevId
-  
-
-  # ### parse object coming from pull for local storage. 
-
-  # renames `_id` attribute to `id` and removes the type from the id,
-  # e.g. `document/123` -> `123`
-  _parseFromRemote : (obj) =>
-
-    # handle id and type
-    id = obj._id or obj.id
-    delete obj._id
-    id = id.replace(RegExp('^'+@_prefix+'/'), '') if @_prefix
-    [obj.$type, obj.id] = id.split(/\//)
-    
-    # handle timestameps
-    obj.$createdAt = new Date(Date.parse obj.$createdAt) if obj.$createdAt
-    obj.$updatedAt = new Date(Date.parse obj.$updatedAt) if obj.$updatedAt
-    
-    # handle rev
-    if obj.rev
-      obj._rev = obj.rev
-      delete obj.rev
-    
-    return obj
-  
-  _parseAllFromRemote : (objects) =>
-    @_parseFromRemote(object) for object in objects
-
-
-  # ### handle changes from remote
-
-  # in order to differentiate whether an object from remote should trigger a 'create'
-  # or an 'update' event, we store a hash of known objects
-  _knownObjects : {}
-  _handlePullResults : (changes) =>
-    for {doc} in changes
-      parsedDoc = @_parseFromRemote(doc)
-      if parsedDoc._deleted
-        event = 'destroy'
-        delete @_knownObjects[doc._id]
-      else
-        if @_knownObjects[doc._id]
-          event = 'update'
-        else
-          event = 'create'
-          @_knownObjects[doc._id] = 1
-
-      @trigger event,                                         parsedDoc
-      @trigger "#{event}:#{parsedDoc.$type}",                 parsedDoc
-      @trigger "#{event}:#{parsedDoc.$type}:#{parsedDoc.id}", parsedDoc      
-      @trigger "change",                                      event, parsedDoc
-      @trigger "change:#{parsedDoc.$type}",                   event, parsedDoc
-      @trigger "change:#{parsedDoc.$type}:#{parsedDoc.id}",   event, parsedDoc
-
-
-  # ### handle push success
-
-  # do nothing by default
-  _handlePushSuccess: (docs, pushedDocs) => 
 
 
   # ### map docs from findAll
