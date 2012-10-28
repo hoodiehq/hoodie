@@ -17,19 +17,15 @@
 
 // make object entirely public
 hoodie.store.find('task', '123').publish()
-hoodie.store.publish('task', '123')
 
 // or: make seleceted attributes of objects public
 hoodie.store.find('task', '123').publish(['title', 'description'])
-hoodie.store.publish('task', '123', ['title', 'description'])
 
 // make a public object private again
 hoodie.store.find('task', '123').conceal()
-hoodie.store.conceal('task', '123')
 
 // or: make certain attributes of a published object private again
 hoodie.store.find('task', '123').conceal(['description'])
-hoodie.store.conceal('task', '123', ['description'])
 
 // add a new object and make it public
 hoodie.store.add('task', object).publish()
@@ -61,14 +57,14 @@ hoodie.user("joey").pull()
 
 // I want to make a photo public
 // 
-hoodie.store.publish("photo", "abc4567")
+hoodie.store.find("photo", "abc4567").publish()
 
 
 // ### Scenario 2
 
 // I want to make a public photo private again
 // 
-hoodie.store.conceal("photo", "abc4567")
+hoodie.store.find("photo", "abc4567").conceal()
 
 
 // ### Scenario 3
@@ -118,9 +114,7 @@ hoodie.global.get("most_recent_photos", {page: 2})
 function playTrack( track ) {
 
   hoodie.store.findOrAdd( "track", track.id, track).publish()
-  // or: hoodie.store.publish( "track", track.id, track)
   hoodie.store.add("play", {trackId: track.id}).publish()
-  // or: hoodie.store.publish("play", {trackId: track.id})
 }
 
 tumblrTrack = {

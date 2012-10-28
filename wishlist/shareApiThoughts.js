@@ -67,10 +67,6 @@ share.revokeAccess("lisa@example.com")
 
 // the hoodie.share module also extends the hoodie.share
 // api with two methods: share and unshare
-hoodie.store.share('task', '123', 'shareID')
-hoodie.store.unshare('task', '123', 'shareID')
-
-// or
 hoodie.store.find('task', '123').share('shareId')
 hoodie.store.find('task', '123').unshare('shareId')
 
