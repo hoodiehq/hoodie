@@ -15,14 +15,14 @@
 // 2. returned objects are not objects, but share instances
 
 // hoodie.share Module API:
-hoodie.share.store.find()
-hoodie.share.store.findAll()
-hoodie.share.store.findOrAdd()
-hoodie.share.store.add()
-hoodie.share.store.update()
-hoodie.share.store.updateAll()
-hoodie.share.store.remove()
-hoodie.share.store.removeAll()
+hoodie.share.find()
+hoodie.share.findAll()
+hoodie.share.findOrAdd()
+hoodie.share.add()
+hoodie.share.update()
+hoodie.share.updateAll()
+hoodie.share.remove()
+hoodie.share.removeAll()
 
 // on top, it allows a direct call:  
 // that opens a share from remote and exposes a store API
