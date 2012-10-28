@@ -1,7 +1,7 @@
 # RemoteStore
 # ============
 
-# find / insert / update / remove objects in a Couch Database
+# add / find / update / remove objects in a Couch Database
 #
 # API
 # -----
