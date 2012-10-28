@@ -163,7 +163,7 @@ function renderFavorites (favorites) {
     for (var i = 0; i < tracks.length; i++) {
       var track = tracks[i]
       $("<li>"+track.name+" ("+track.playCount+")</li>").appendTo("#tracks")
-    };
+    }
   })
 }
 
@@ -173,3 +173,31 @@ function renderFavorites (favorites) {
 // 
 hoodie.global.get("trending_tracks")
 .done( renderTrendingTracks )
+
+
+// 
+// ### random thoughts
+// 
+// dunno if it makes any sense yet
+// 
+
+// pull all objects of type 'favorite' from epsy's public store
+hoodie.user('espy').pull("favorite")
+
+// a pull from a remote store (public user store / a share)
+// adds a special attribute `$store` to the objects, so that
+// they can be distinced from my own objects:
+favoriteObject = {
+  "$type"  : 'favorite',
+  id       : "trackXYZ",
+  "$store" : 'user/espy/public'
+}
+
+// hmm ... or maybe with a hash map?
+favoriteObject = {
+  "$type"   : 'favorite',
+  id        : "trackXYZ",
+  "$stores" : {
+    'user/espy/public': 1
+  }
+}

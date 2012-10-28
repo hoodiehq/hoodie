@@ -23,7 +23,7 @@ hoodie.global.on("store:created:track", function(track) {})
 // some might require special privileges. They all return a promise
 
 // instantiate
-share = hoodie.open("share/abc8320")
+share = hoodie("share/abc8320")
 
 // store / find objects
 share.store.find("todolist","xy20ad9")
