@@ -9,7 +9,7 @@
 # When hoodie.remote is continuously syncing (default), it will continuously 
 # synchronize, otherwise sync, pull or push can be called manually
 #
-class Hoodie.AccountRemoteStore extends Hoodie.RemoteStore
+class Hoodie.AccountRemote extends Hoodie.Remote
 
   # properties
   # ------------
@@ -155,7 +155,7 @@ class Hoodie.AccountRemoteStore extends Hoodie.RemoteStore
     
     # 1. update or remove objects from local store
     for {doc} in changes
-      doc = @_parseFromRemote(doc)
+      doc = @store.parseFromRemote(doc)
       if doc._deleted
         _destroyedDocs.push [doc, @hoodie.store.destroy( doc.$type, doc.id,      remote: true)]
       else                                                

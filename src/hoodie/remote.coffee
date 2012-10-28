@@ -35,7 +35,7 @@
 #
 # * on(event, callback)
 #
-class Hoodie.Remote extends Hoodie.Store
+class Hoodie.Remote
 
 
   # properties

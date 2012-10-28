@@ -166,7 +166,7 @@ describe "Hoodie.Account", ->
           expect(@promise).toBeRejectedWith error: 'error data'
   # /.authenticate()
 
-
+###
   describe "#signUp(username, password)", ->
     beforeEach ->
       @account.ownerHash = "owner_hash123"
@@ -1013,3 +1013,4 @@ describe "Hoodie.Account", ->
         expect(promise).toBeRejectedWith error: 'autherror'
   # /.changeUsername(currentPassword, newUsername)
 # /Hoodie.Account
+###

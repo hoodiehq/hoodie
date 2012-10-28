@@ -11,7 +11,7 @@ Hoodie = (function(_super) {
     store: 'LocalStore',
     config: 'Config',
     account: 'Account',
-    remote: 'AccountRemoteStore'
+    remote: 'AccountRemote'
   };
 
   Hoodie.extensions = {

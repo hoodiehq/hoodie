@@ -11,7 +11,7 @@ class Hoodie extends Events
     store   : 'LocalStore'
     config  : 'Config'
     account : 'Account'
-    remote  : 'AccountRemoteStore'
+    remote  : 'AccountRemote'
 
   # extensions, get loaded after the core modules
   @extensions : 

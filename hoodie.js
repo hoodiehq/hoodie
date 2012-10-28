@@ -86,7 +86,7 @@ Hoodie = (function(_super) {
     store: 'LocalStore',
     config: 'Config',
     account: 'Account',
-    remote: 'AccountRemoteStore'
+    remote: 'AccountRemote'
   };
 
   Hoodie.extensions = {
@@ -1313,13 +1313,13 @@ var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments)
   __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; },
   __slice = [].slice;
 
-Hoodie.AccountRemoteStore = (function(_super) {
+Hoodie.AccountRemote = (function(_super) {
 
-  __extends(AccountRemoteStore, _super);
+  __extends(AccountRemote, _super);
 
-  AccountRemoteStore.prototype._sync = true;
+  AccountRemote.prototype._sync = true;
 
-  function AccountRemoteStore(hoodie, options) {
+  function AccountRemote(hoodie, options) {
     this.hoodie = hoodie;
     if (options == null) {
       options = {};
@@ -1344,81 +1344,81 @@ Hoodie.AccountRemoteStore = (function(_super) {
     if (this.hoodie.config.get('_remote.sync') != null) {
       this._sync = this.hoodie.config.get('_remote.sync');
     }
-    AccountRemoteStore.__super__.constructor.apply(this, arguments);
+    AccountRemote.__super__.constructor.apply(this, arguments);
   }
 
-  AccountRemoteStore.prototype.connect = function() {
+  AccountRemote.prototype.connect = function() {
     var _this = this;
     return this.hoodie.account.authenticate().pipe(function() {
-      return AccountRemoteStore.__super__.connect.apply(_this, arguments);
+      return AccountRemote.__super__.connect.apply(_this, arguments);
     });
   };
 
-  AccountRemoteStore.prototype.disconnect = function() {
+  AccountRemote.prototype.disconnect = function() {
     this.hoodie.unbind('store:idle', this.push);
-    return AccountRemoteStore.__super__.disconnect.apply(this, arguments);
+    return AccountRemote.__super__.disconnect.apply(this, arguments);
   };
 
-  AccountRemoteStore.prototype.startSyncing = function() {
+  AccountRemote.prototype.startSyncing = function() {
     this.hoodie.config.set('_remote.sync', true);
     this.hoodie.on('account:signin', this._handleSignIn);
     this.hoodie.on('account:signout', this.disconnect);
-    return AccountRemoteStore.__super__.startSyncing.apply(this, arguments);
+    return AccountRemote.__super__.startSyncing.apply(this, arguments);
   };
 
-  AccountRemoteStore.prototype.stopSyncing = function() {
+  AccountRemote.prototype.stopSyncing = function() {
     this.hoodie.config.set('_remote.sync', false);
     this.hoodie.unbind('account:signin', this._handleSignIn);
     this.hoodie.unbind('account:signout', this.disconnect);
-    return AccountRemoteStore.__super__.stopSyncing.apply(this, arguments);
+    return AccountRemote.__super__.stopSyncing.apply(this, arguments);
   };
 
-  AccountRemoteStore.prototype.sync = function(docs) {
+  AccountRemote.prototype.sync = function(docs) {
     if (this.isContinuouslyPushing()) {
       this.hoodie.unbind('store:idle', this.push);
       this.hoodie.on('store:idle', this.push);
     }
-    return AccountRemoteStore.__super__.sync.apply(this, arguments);
+    return AccountRemote.__super__.sync.apply(this, arguments);
   };
 
-  AccountRemoteStore.prototype.getSinceNr = function(since) {
+  AccountRemote.prototype.getSinceNr = function(since) {
     return this.hoodie.config.get('_remote.since') || 0;
   };
 
-  AccountRemoteStore.prototype.setSinceNr = function(since) {
+  AccountRemote.prototype.setSinceNr = function(since) {
     return this.hoodie.config.set('_remote.since', since);
   };
 
-  AccountRemoteStore.prototype.push = function(docs) {
+  AccountRemote.prototype.push = function(docs) {
     var promise;
     if (!$.isArray(docs)) {
       docs = this.hoodie.store.changedDocs();
     }
-    return promise = AccountRemoteStore.__super__.push.call(this, docs);
+    return promise = AccountRemote.__super__.push.call(this, docs);
   };
 
-  AccountRemoteStore.prototype.on = function(event, cb) {
+  AccountRemote.prototype.on = function(event, cb) {
     event = event.replace(/(^| )([^ ]+)/g, "$1remote:$2");
     return this.hoodie.on(event, cb);
   };
 
-  AccountRemoteStore.prototype.one = function(event, cb) {
+  AccountRemote.prototype.one = function(event, cb) {
     event = event.replace(/(^| )([^ ]+)/g, "$1remote:$2");
     return this.hoodie.one(event, cb);
   };
 
-  AccountRemoteStore.prototype.trigger = function() {
+  AccountRemote.prototype.trigger = function() {
     var event, parameters, _ref;
     event = arguments[0], parameters = 2 <= arguments.length ? __slice.call(arguments, 1) : [];
     return (_ref = this.hoodie).trigger.apply(_ref, ["remote:" + event].concat(__slice.call(parameters)));
   };
 
-  AccountRemoteStore.prototype._handleSignIn = function() {
+  AccountRemote.prototype._handleSignIn = function() {
     this.name = this.hoodie.account.db();
     return this.connect();
   };
 
-  AccountRemoteStore.prototype._handlePushSuccess = function(docs, pushedDocs) {
+  AccountRemote.prototype._handlePushSuccess = function(docs, pushedDocs) {
     var _this = this;
     return function() {
       var doc, i, options, update, _i, _len, _results;
@@ -1437,7 +1437,7 @@ Hoodie.AccountRemoteStore = (function(_super) {
     };
   };
 
-  AccountRemoteStore.prototype._handlePullResults = function(changes) {
+  AccountRemote.prototype._handlePullResults = function(changes) {
     var doc, promise, _changedDocs, _destroyedDocs, _i, _j, _k, _len, _len1, _len2, _ref, _ref1, _results,
       _this = this;
     _destroyedDocs = [];
@@ -1491,7 +1491,7 @@ Hoodie.AccountRemoteStore = (function(_super) {
     return _results;
   };
 
-  return AccountRemoteStore;
+  return AccountRemote;
 
 })(Hoodie.RemoteStore);
 // Generated by CoffeeScript 1.3.3
