@@ -413,7 +413,7 @@ Hoodie.Account = (function() {
     return this._changeUsernameAndPassword(currentPassword, newUsername);
   };
 
-  Account.prototype.destroy = function() {
+  Account.prototype.remove = function() {
     if (!this.hasAccount()) {
       this._cleanup();
       return;
@@ -732,7 +732,7 @@ Hoodie.Store = (function() {
     return defer;
   };
 
-  Store.prototype.create = function(type, object, options) {
+  Store.prototype.add = function(type, object, options) {
     if (object == null) {
       object = {};
     }
@@ -826,7 +826,7 @@ Hoodie.Store = (function() {
     return defer;
   };
 
-  Store.prototype.findOrCreate = function(type, id, attributes) {
+  Store.prototype.findOrAdd = function(type, id, attributes) {
     var defer,
       _this = this;
     if (attributes == null) {
@@ -838,7 +838,7 @@ Hoodie.Store = (function() {
       newAttributes = $.extend({
         id: id
       }, attributes);
-      return _this.create(type, newAttributes).then(defer.resolve, defer.reject);
+      return _this.add(type, newAttributes).then(defer.resolve, defer.reject);
     });
     return defer.promise();
   };
@@ -847,7 +847,7 @@ Hoodie.Store = (function() {
     return this.hoodie.defer();
   };
 
-  Store.prototype.destroy = function(type, id, options) {
+  Store.prototype.remove = function(type, id, options) {
     var defer;
     if (options == null) {
       options = {};
@@ -859,7 +859,7 @@ Hoodie.Store = (function() {
     return defer;
   };
 
-  Store.prototype.destroyAll = function(type, options) {
+  Store.prototype.removeAll = function(type, options) {
     var _this = this;
     if (options == null) {
       options = {};
@@ -869,7 +869,7 @@ Hoodie.Store = (function() {
       _results = [];
       for (_i = 0, _len = objects.length; _i < _len; _i++) {
         object = objects[_i];
-        _results.push(_this.destroy(object.$type, object.id, options));
+        _results.push(_this.remove(object.$type, object.id, options));
       }
       return _results;
     });
@@ -900,59 +900,15 @@ Hoodie.RemoteStore = (function(_super) {
 
   __extends(RemoteStore, _super);
 
-  RemoteStore.prototype.name = void 0;
-
-  RemoteStore.prototype._sync = false;
-
-  RemoteStore.prototype._prefix = '';
-
-  function RemoteStore(hoodie, options) {
+  function RemoteStore(hoodie, remote) {
     this.hoodie = hoodie;
-    if (options == null) {
-      options = {};
-    }
+    this.remote = remote;
     this._mapDocsFromFindAll = __bind(this._mapDocsFromFindAll, this);
 
-    this._handlePushSuccess = __bind(this._handlePushSuccess, this);
+    this.parseAllFromRemote = __bind(this.parseAllFromRemote, this);
 
-    this._handlePullResults = __bind(this._handlePullResults, this);
+    this.parseFromRemote = __bind(this.parseFromRemote, this);
 
-    this._parseAllFromRemote = __bind(this._parseAllFromRemote, this);
-
-    this._parseFromRemote = __bind(this._parseFromRemote, this);
-
-    this._handlePullError = __bind(this._handlePullError, this);
-
-    this._handlePullSuccess = __bind(this._handlePullSuccess, this);
-
-    this._restartPullRequest = __bind(this._restartPullRequest, this);
-
-    this.sync = __bind(this.sync, this);
-
-    this.push = __bind(this.push, this);
-
-    this.pull = __bind(this.pull, this);
-
-    this.stopSyncing = __bind(this.stopSyncing, this);
-
-    this.startSyncing = __bind(this.startSyncing, this);
-
-    this.disconnect = __bind(this.disconnect, this);
-
-    this.connect = __bind(this.connect, this);
-
-    if (options.name) {
-      this.name = options.name;
-    }
-    if (options.sync) {
-      this._sync = options.sync;
-    }
-    if (options.prefix) {
-      this._prefix = options.prefix;
-    }
-    if (this.isContinuouslySyncing()) {
-      this.startSyncing();
-    }
   }
 
   RemoteStore.prototype.find = function(type, id) {
@@ -962,7 +918,7 @@ Hoodie.RemoteStore = (function(_super) {
       return defer;
     }
     path = "/" + encodeURIComponent("" + type + "/" + id);
-    return this.request("GET", path).pipe(this._parseFromRemote);
+    return this.remote.request("GET", path).pipe(this.parseFromRemote);
   };
 
   RemoteStore.prototype.findAll = function(type) {
@@ -973,14 +929,14 @@ Hoodie.RemoteStore = (function(_super) {
     }
     path = "/_all_docs?include_docs=true";
     switch (true) {
-      case (type != null) && this._prefix !== '':
-        keyPrefix = "" + this._prefix + "/" + type;
+      case (type != null) && this.remote.prefix !== '':
+        keyPrefix = "" + this.remote.prefix + "/" + type;
         break;
       case type != null:
         keyPrefix = type;
         break;
-      case this._prefix !== '':
-        keyPrefix = this._prefix;
+      case this.remote.prefix !== '':
+        keyPrefix = this.remote.prefix;
         break;
       default:
         keyPrefix = '';
@@ -988,9 +944,9 @@ Hoodie.RemoteStore = (function(_super) {
     if (keyPrefix) {
       path = "" + path + "&startkey=\"" + keyPrefix + "\/\"&endkey=\"" + keyPrefix + "0\"";
     }
-    promise = this.request("GET", path);
+    promise = this.remote.request("GET", path);
     promise.fail(defer.reject);
-    promise.pipe(this._mapDocsFromFindAll).pipe(this._parseAllFromRemote).done(defer.resolve);
+    promise.pipe(this._mapDocsFromFindAll).pipe(this.parseAllFromRemote).done(defer.resolve);
     return defer.promise();
   };
 
@@ -1007,193 +963,26 @@ Hoodie.RemoteStore = (function(_super) {
       $type: type,
       id: id
     }, object);
-    doc = this._parseForRemote(object);
+    doc = this.parseForRemote(object);
     path = "/" + encodeURIComponent(doc._id);
-    return this.request("PUT", path, {
+    return this.remote.request("PUT", path, {
       data: doc
     });
   };
 
-  RemoteStore.prototype.destroy = function(type, id) {
+  RemoteStore.prototype.remove = function(type, id) {
     return this.update(type, id, {
       _deleted: true
     });
   };
 
-  RemoteStore.prototype.destroyAll = function(type) {
+  RemoteStore.prototype.removeAll = function(type) {
     return this.updateAll(type, {
       _deleted: true
     });
   };
 
-  RemoteStore.prototype.request = function(type, path, options) {
-    if (options == null) {
-      options = {};
-    }
-    if (this.name) {
-      path = "/" + (encodeURIComponent(this.name)) + path;
-    }
-    options.contentType || (options.contentType = 'application/json');
-    if (type === 'POST' || type === 'PUT') {
-      options.dataType || (options.dataType = 'json');
-      options.processData || (options.processData = false);
-      options.data = JSON.stringify(options.data);
-    }
-    return this.hoodie.request(type, path, options);
-  };
-
-  RemoteStore.prototype.get = function(view_name, params) {
-    return console.log.apply(console, [".get() not yet implemented"].concat(__slice.call(arguments)));
-  };
-
-  RemoteStore.prototype.post = function(update_function_name, params) {
-    return console.log.apply(console, [".post() not yet implemented"].concat(__slice.call(arguments)));
-  };
-
-  RemoteStore.prototype.connect = function(options) {
-    this.connected = true;
-    return this.sync();
-  };
-
-  RemoteStore.prototype.disconnect = function() {
-    var _ref, _ref1;
-    this.connected = false;
-    if ((_ref = this._pullRequest) != null) {
-      _ref.abort();
-    }
-    return (_ref1 = this._pushRequest) != null ? _ref1.abort() : void 0;
-  };
-
-  RemoteStore.prototype.startSyncing = function() {
-    this._sync = true;
-    return this.connect();
-  };
-
-  RemoteStore.prototype.stopSyncing = function() {
-    return this._sync = false;
-  };
-
-  RemoteStore.prototype.isContinuouslyPulling = function() {
-    var _ref;
-    return this._sync === true || ((_ref = this._sync) != null ? _ref.pull : void 0) === true;
-  };
-
-  RemoteStore.prototype.isContinuouslyPushing = function() {
-    var _ref;
-    return this._sync === true || ((_ref = this._sync) != null ? _ref.push : void 0) === true;
-  };
-
-  RemoteStore.prototype.isContinuouslySyncing = function() {
-    return this._sync === true;
-  };
-
-  RemoteStore.prototype.getSinceNr = function() {
-    return this._since || 0;
-  };
-
-  RemoteStore.prototype.setSinceNr = function(seq) {
-    return this._since = seq;
-  };
-
-  RemoteStore.prototype.pull = function() {
-    this._pullRequest = this.request('GET', this._pullUrl());
-    if (this.connected && this.isContinuouslyPulling()) {
-      window.clearTimeout(this._pullRequestTimeout);
-      this._pullRequestTimeout = window.setTimeout(this._restartPullRequest, 25000);
-    }
-    return this._pullRequest.then(this._handlePullSuccess, this._handlePullError);
-  };
-
-  RemoteStore.prototype.push = function(docs) {
-    var doc, docsForRemote, _i, _len;
-    if (!(docs != null ? docs.length : void 0)) {
-      return this.hoodie.defer().resolve([]).promise();
-    }
-    docsForRemote = [];
-    for (_i = 0, _len = docs.length; _i < _len; _i++) {
-      doc = docs[_i];
-      docsForRemote.push(this._parseForRemote(doc));
-    }
-    this._pushRequest = this.request('POST', "/_bulk_docs", {
-      data: {
-        docs: docsForRemote,
-        new_edits: false
-      }
-    });
-    return this._pushRequest.done(this._handlePushSuccess(docs, docsForRemote));
-  };
-
-  RemoteStore.prototype.sync = function(docs) {
-    return this.push(docs).pipe(this.pull);
-  };
-
-  RemoteStore.prototype.on = function(event, cb) {
-    event = event.replace(/(^| )([^ ]+)/g, "$1" + this.name + ":$2");
-    return this.hoodie.on(event, cb);
-  };
-
-  RemoteStore.prototype.one = function(event, cb) {
-    event = event.replace(/(^| )([^ ]+)/g, "$1" + this.name + ":$2");
-    return this.hoodie.one(event, cb);
-  };
-
-  RemoteStore.prototype.trigger = function() {
-    var event, parameters, _ref;
-    event = arguments[0], parameters = 2 <= arguments.length ? __slice.call(arguments, 1) : [];
-    return (_ref = this.hoodie).trigger.apply(_ref, ["" + this.name + ":" + event].concat(__slice.call(parameters)));
-  };
-
-  RemoteStore.prototype._pullUrl = function() {
-    var since;
-    since = this.getSinceNr();
-    if (this.isContinuouslyPulling()) {
-      return "/_changes?include_docs=true&since=" + since + "&heartbeat=10000&feed=longpoll";
-    } else {
-      return "/_changes?include_docs=true&since=" + since;
-    }
-  };
-
-  RemoteStore.prototype._restartPullRequest = function() {
-    var _ref;
-    return (_ref = this._pullRequest) != null ? _ref.abort() : void 0;
-  };
-
-  RemoteStore.prototype._handlePullSuccess = function(response) {
-    this.setSinceNr(response.last_seq);
-    this._handlePullResults(response.results);
-    if (this.connected && this.isContinuouslyPulling()) {
-      return this.pull();
-    }
-  };
-
-  RemoteStore.prototype._handlePullError = function(xhr, error, resp) {
-    if (!this.connected) {
-      return;
-    }
-    switch (xhr.status) {
-      case 401:
-        this.trigger('error:unauthenticated', error);
-        return this.disconnect();
-      case 404:
-        return window.setTimeout(this.pull, 3000);
-      case 500:
-        this.trigger('error:server', error);
-        return window.setTimeout(this.pull, 3000);
-      default:
-        if (!this.isContinuouslyPulling()) {
-          return;
-        }
-        if (xhr.statusText === 'abort') {
-          return this.pull();
-        } else {
-          return window.setTimeout(this.pull, 3000);
-        }
-    }
-  };
-
-  RemoteStore.prototype._validSpecialAttributes = ['_id', '_rev', '_deleted', '_revisions', '_attachments'];
-
-  RemoteStore.prototype._parseForRemote = function(obj) {
+  RemoteStore.prototype.parseForRemote = function(obj) {
     var attr, attributes;
     attributes = $.extend({}, obj);
     for (attr in attributes) {
@@ -1206,13 +995,62 @@ Hoodie.RemoteStore = (function(_super) {
       delete attributes[attr];
     }
     attributes._id = "" + attributes.$type + "/" + attributes.id;
-    if (this._prefix) {
-      attributes._id = "" + this._prefix + "/" + attributes._id;
+    if (this.remote.prefix) {
+      attributes._id = "" + this.remote.prefix + "/" + attributes._id;
     }
     delete attributes.id;
     this._addRevisionTo(attributes);
     return attributes;
   };
+
+  RemoteStore.prototype.parseFromRemote = function(obj) {
+    var id, _ref;
+    id = obj._id || obj.id;
+    delete obj._id;
+    if (this.remote.prefix) {
+      id = id.replace(RegExp('^' + this.remote.prefix + '/'), '');
+    }
+    _ref = id.split(/\//), obj.$type = _ref[0], obj.id = _ref[1];
+    if (obj.$createdAt) {
+      obj.$createdAt = new Date(Date.parse(obj.$createdAt));
+    }
+    if (obj.$updatedAt) {
+      obj.$updatedAt = new Date(Date.parse(obj.$updatedAt));
+    }
+    if (obj.rev) {
+      obj._rev = obj.rev;
+      delete obj.rev;
+    }
+    return obj;
+  };
+
+  RemoteStore.prototype.parseAllFromRemote = function(objects) {
+    var object, _i, _len, _results;
+    _results = [];
+    for (_i = 0, _len = objects.length; _i < _len; _i++) {
+      object = objects[_i];
+      _results.push(this.parseFromRemote(object));
+    }
+    return _results;
+  };
+
+  RemoteStore.prototype.on = function(event, cb) {
+    event = event.replace(/(^| )([^ ]+)/g, "$1" + this.remote.name + ":store:$2");
+    return this.hoodie.on(event, cb);
+  };
+
+  RemoteStore.prototype.one = function(event, cb) {
+    event = event.replace(/(^| )([^ ]+)/g, "$1" + this.remote.name + ":store:$2");
+    return this.hoodie.one(event, cb);
+  };
+
+  RemoteStore.prototype.trigger = function() {
+    var event, parameters, _ref;
+    event = arguments[0], parameters = 2 <= arguments.length ? __slice.call(arguments, 1) : [];
+    return (_ref = this.hoodie).trigger.apply(_ref, ["" + this.remote.name + ":store:" + event].concat(__slice.call(parameters)));
+  };
+
+  RemoteStore.prototype._validSpecialAttributes = ['_id', '_rev', '_deleted', '_revisions', '_attachments'];
 
   RemoteStore.prototype._generateNewRevisionId = function() {
     return this.hoodie.uuid(9);
@@ -1236,68 +1074,6 @@ Hoodie.RemoteStore = (function(_super) {
     }
   };
 
-  RemoteStore.prototype._parseFromRemote = function(obj) {
-    var id, _ref;
-    id = obj._id || obj.id;
-    delete obj._id;
-    if (this._prefix) {
-      id = id.replace(RegExp('^' + this._prefix + '/'), '');
-    }
-    _ref = id.split(/\//), obj.$type = _ref[0], obj.id = _ref[1];
-    if (obj.$createdAt) {
-      obj.$createdAt = new Date(Date.parse(obj.$createdAt));
-    }
-    if (obj.$updatedAt) {
-      obj.$updatedAt = new Date(Date.parse(obj.$updatedAt));
-    }
-    if (obj.rev) {
-      obj._rev = obj.rev;
-      delete obj.rev;
-    }
-    return obj;
-  };
-
-  RemoteStore.prototype._parseAllFromRemote = function(objects) {
-    var object, _i, _len, _results;
-    _results = [];
-    for (_i = 0, _len = objects.length; _i < _len; _i++) {
-      object = objects[_i];
-      _results.push(this._parseFromRemote(object));
-    }
-    return _results;
-  };
-
-  RemoteStore.prototype._knownObjects = {};
-
-  RemoteStore.prototype._handlePullResults = function(changes) {
-    var doc, event, parsedDoc, _i, _len, _results;
-    _results = [];
-    for (_i = 0, _len = changes.length; _i < _len; _i++) {
-      doc = changes[_i].doc;
-      parsedDoc = this._parseFromRemote(doc);
-      if (parsedDoc._deleted) {
-        event = 'destroy';
-        delete this._knownObjects[doc._id];
-      } else {
-        if (this._knownObjects[doc._id]) {
-          event = 'update';
-        } else {
-          event = 'create';
-          this._knownObjects[doc._id] = 1;
-        }
-      }
-      this.trigger(event, parsedDoc);
-      this.trigger("" + event + ":" + parsedDoc.$type, parsedDoc);
-      this.trigger("" + event + ":" + parsedDoc.$type + ":" + parsedDoc.id, parsedDoc);
-      this.trigger("change", event, parsedDoc);
-      this.trigger("change:" + parsedDoc.$type, event, parsedDoc);
-      _results.push(this.trigger("change:" + parsedDoc.$type + ":" + parsedDoc.id, event, parsedDoc));
-    }
-    return _results;
-  };
-
-  RemoteStore.prototype._handlePushSuccess = function(docs, pushedDocs) {};
-
   RemoteStore.prototype._mapDocsFromFindAll = function(response) {
     return response.rows.map(function(row) {
       return row.doc;
@@ -1307,193 +1083,6 @@ Hoodie.RemoteStore = (function(_super) {
   return RemoteStore;
 
 })(Hoodie.Store);
-// Generated by CoffeeScript 1.3.3
-var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
-  __hasProp = {}.hasOwnProperty,
-  __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; },
-  __slice = [].slice;
-
-Hoodie.AccountRemote = (function(_super) {
-
-  __extends(AccountRemote, _super);
-
-  AccountRemote.prototype._sync = true;
-
-  function AccountRemote(hoodie, options) {
-    this.hoodie = hoodie;
-    if (options == null) {
-      options = {};
-    }
-    this._handlePullResults = __bind(this._handlePullResults, this);
-
-    this._handlePushSuccess = __bind(this._handlePushSuccess, this);
-
-    this._handleSignIn = __bind(this._handleSignIn, this);
-
-    this.push = __bind(this.push, this);
-
-    this.sync = __bind(this.sync, this);
-
-    this.stopSyncing = __bind(this.stopSyncing, this);
-
-    this.startSyncing = __bind(this.startSyncing, this);
-
-    this.connect = __bind(this.connect, this);
-
-    this.name = this.hoodie.account.db();
-    if (this.hoodie.config.get('_remote.sync') != null) {
-      this._sync = this.hoodie.config.get('_remote.sync');
-    }
-    AccountRemote.__super__.constructor.apply(this, arguments);
-  }
-
-  AccountRemote.prototype.connect = function() {
-    var _this = this;
-    return this.hoodie.account.authenticate().pipe(function() {
-      return AccountRemote.__super__.connect.apply(_this, arguments);
-    });
-  };
-
-  AccountRemote.prototype.disconnect = function() {
-    this.hoodie.unbind('store:idle', this.push);
-    return AccountRemote.__super__.disconnect.apply(this, arguments);
-  };
-
-  AccountRemote.prototype.startSyncing = function() {
-    this.hoodie.config.set('_remote.sync', true);
-    this.hoodie.on('account:signin', this._handleSignIn);
-    this.hoodie.on('account:signout', this.disconnect);
-    return AccountRemote.__super__.startSyncing.apply(this, arguments);
-  };
-
-  AccountRemote.prototype.stopSyncing = function() {
-    this.hoodie.config.set('_remote.sync', false);
-    this.hoodie.unbind('account:signin', this._handleSignIn);
-    this.hoodie.unbind('account:signout', this.disconnect);
-    return AccountRemote.__super__.stopSyncing.apply(this, arguments);
-  };
-
-  AccountRemote.prototype.sync = function(docs) {
-    if (this.isContinuouslyPushing()) {
-      this.hoodie.unbind('store:idle', this.push);
-      this.hoodie.on('store:idle', this.push);
-    }
-    return AccountRemote.__super__.sync.apply(this, arguments);
-  };
-
-  AccountRemote.prototype.getSinceNr = function(since) {
-    return this.hoodie.config.get('_remote.since') || 0;
-  };
-
-  AccountRemote.prototype.setSinceNr = function(since) {
-    return this.hoodie.config.set('_remote.since', since);
-  };
-
-  AccountRemote.prototype.push = function(docs) {
-    var promise;
-    if (!$.isArray(docs)) {
-      docs = this.hoodie.store.changedDocs();
-    }
-    return promise = AccountRemote.__super__.push.call(this, docs);
-  };
-
-  AccountRemote.prototype.on = function(event, cb) {
-    event = event.replace(/(^| )([^ ]+)/g, "$1remote:$2");
-    return this.hoodie.on(event, cb);
-  };
-
-  AccountRemote.prototype.one = function(event, cb) {
-    event = event.replace(/(^| )([^ ]+)/g, "$1remote:$2");
-    return this.hoodie.one(event, cb);
-  };
-
-  AccountRemote.prototype.trigger = function() {
-    var event, parameters, _ref;
-    event = arguments[0], parameters = 2 <= arguments.length ? __slice.call(arguments, 1) : [];
-    return (_ref = this.hoodie).trigger.apply(_ref, ["remote:" + event].concat(__slice.call(parameters)));
-  };
-
-  AccountRemote.prototype._handleSignIn = function() {
-    this.name = this.hoodie.account.db();
-    return this.connect();
-  };
-
-  AccountRemote.prototype._handlePushSuccess = function(docs, pushedDocs) {
-    var _this = this;
-    return function() {
-      var doc, i, options, update, _i, _len, _results;
-      _results = [];
-      for (i = _i = 0, _len = docs.length; _i < _len; i = ++_i) {
-        doc = docs[i];
-        update = {
-          _rev: pushedDocs[i]._rev
-        };
-        options = {
-          remote: true
-        };
-        _results.push(_this.hoodie.store.update(doc.$type, doc.id, update, options));
-      }
-      return _results;
-    };
-  };
-
-  AccountRemote.prototype._handlePullResults = function(changes) {
-    var doc, promise, _changedDocs, _destroyedDocs, _i, _j, _k, _len, _len1, _len2, _ref, _ref1, _results,
-      _this = this;
-    _destroyedDocs = [];
-    _changedDocs = [];
-    for (_i = 0, _len = changes.length; _i < _len; _i++) {
-      doc = changes[_i].doc;
-      doc = this._parseFromRemote(doc);
-      if (doc._deleted) {
-        _destroyedDocs.push([
-          doc, this.hoodie.store.destroy(doc.$type, doc.id, {
-            remote: true
-          })
-        ]);
-      } else {
-        _changedDocs.push([
-          doc, this.hoodie.store.save(doc.$type, doc.id, doc, {
-            remote: true
-          })
-        ]);
-      }
-    }
-    for (_j = 0, _len1 = _destroyedDocs.length; _j < _len1; _j++) {
-      _ref = _destroyedDocs[_j], doc = _ref[0], promise = _ref[1];
-      promise.then(function(object) {
-        _this.trigger('destroy', object);
-        _this.trigger("destroy:" + doc.$type, object);
-        _this.trigger("destroy:" + doc.$type + ":" + doc.id, object);
-        _this.trigger('change', 'destroy', object);
-        _this.trigger("change:" + doc.$type, 'destroy', object);
-        return _this.trigger("change:" + doc.$type + ":" + doc.id, 'destroy', object);
-      });
-    }
-    _results = [];
-    for (_k = 0, _len2 = _changedDocs.length; _k < _len2; _k++) {
-      _ref1 = _changedDocs[_k], doc = _ref1[0], promise = _ref1[1];
-      _results.push(promise.then(function(object, objectWasCreated) {
-        var event;
-        event = objectWasCreated ? 'create' : 'update';
-        _this.trigger(event, object);
-        _this.trigger("" + event + ":" + doc.$type, object);
-        if (event !== 'create') {
-          _this.trigger("" + event + ":" + doc.$type + ":" + doc.id, object);
-        }
-        _this.trigger("change", event, object);
-        _this.trigger("change:" + doc.$type, event, object);
-        if (event !== 'create') {
-          return _this.trigger("change:" + doc.$type + ":" + doc.id, event, object);
-        }
-      }));
-    }
-    return _results;
-  };
-
-  return AccountRemote;
-
-})(Hoodie.RemoteStore);
 // Generated by CoffeeScript 1.3.3
 var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
 
@@ -1545,7 +1134,7 @@ Hoodie.Config = (function() {
 
   Config.prototype.clear = function() {
     this.cache = {};
-    return this.hoodie.store.destroy(this.$type, this.id);
+    return this.hoodie.store.remove(this.$type, this.id);
   };
 
   Config.prototype.remove = Config.prototype.set;
@@ -1576,7 +1165,7 @@ Hoodie.Email = (function() {
       attributes.error = "Invalid email address (" + (attributes.to || 'empty') + ")";
       return defer.reject(attributes).promise();
     }
-    this.hoodie.store.create('$email', attributes).then(function(obj) {
+    this.hoodie.store.add('$email', attributes).then(function(obj) {
       return _this._handleEmailUpdate(defer, obj);
     });
     return defer.promise();
@@ -1723,7 +1312,7 @@ Hoodie.LocalStore = (function(_super) {
     try {
       object = this.cache(type, id, object, options);
       defer.resolve(object, isNew).promise();
-      event = isNew ? 'create' : 'update';
+      event = isNew ? 'new' : 'update';
       this._triggerEvents(event, object, options);
     } catch (error) {
       defer.reject(error).promise();
@@ -1793,12 +1382,12 @@ Hoodie.LocalStore = (function(_super) {
     return defer.promise();
   };
 
-  LocalStore.prototype.destroy = function(type, id, options) {
+  LocalStore.prototype.remove = function(type, id, options) {
     var defer, key, object;
     if (options == null) {
       options = {};
     }
-    defer = LocalStore.__super__.destroy.apply(this, arguments);
+    defer = LocalStore.__super__.remove.apply(this, arguments);
     if (this.hoodie.isPromise(defer)) {
       return defer;
     }
@@ -1815,7 +1404,7 @@ Hoodie.LocalStore = (function(_super) {
       this._cached[key] = false;
       this.clearChanged(type, id);
     }
-    this._triggerEvents("destroy", object, options);
+    this._triggerEvents("remove", object, options);
     return defer.resolve($.extend({}, object)).promise();
   };
 
@@ -2071,12 +1660,12 @@ Hoodie.LocalStore = (function(_super) {
   LocalStore.prototype._triggerEvents = function(event, object, options) {
     this.trigger(event, object, options);
     this.trigger("" + event + ":" + object.$type, object, options);
-    if (event !== 'create') {
+    if (event !== 'new') {
       this.trigger("" + event + ":" + object.$type + ":" + object.id, object, options);
     }
     this.trigger("change", event, object, options);
     this.trigger("change:" + object.$type, event, object, options);
-    if (event !== 'create') {
+    if (event !== 'new') {
       return this.trigger("change:" + object.$type + ":" + object.id, event, object, options);
     }
   };
@@ -2143,7 +1732,7 @@ Hoodie.Share = (function() {
     return this.hoodie.open(dbName, options);
   };
 
-  Share.prototype.create = function(attributes) {
+  Share.prototype.add = function(attributes) {
     var share;
     if (attributes == null) {
       attributes = {};
@@ -2173,9 +1762,9 @@ Hoodie.Share = (function() {
     });
   };
 
-  Share.prototype.findOrCreate = function(id, attributes) {
+  Share.prototype.findOrAdd = function(id, attributes) {
     var _this = this;
-    return this.hoodie.store.findOrCreate('$share', id, attributes).pipe(function(object) {
+    return this.hoodie.store.findOrAdd('$share', id, attributes).pipe(function(object) {
       return new _this.instance(object);
     });
   };
@@ -2207,20 +1796,20 @@ Hoodie.Share = (function() {
     });
   };
 
-  Share.prototype.destroy = function(id) {
+  Share.prototype.remove = function(id) {
     var _this = this;
     return this.find(id).pipe(function(obj) {
       var share;
       share = new _this.instance(obj);
-      return share.destroy();
+      return share.remove();
     });
   };
 
   Share.prototype["delete"] = function() {
-    return this.destroy.apply(this, arguments);
+    return this.remove.apply(this, arguments);
   };
 
-  Share.prototype.destroyAll = function() {
+  Share.prototype.removeAll = function() {
     var _this = this;
     return this.findAll().pipe(function(objects) {
       var obj, share, _i, _len, _results;
@@ -2228,14 +1817,14 @@ Hoodie.Share = (function() {
       for (_i = 0, _len = objects.length; _i < _len; _i++) {
         obj = objects[_i];
         share = new _this.instance(obj);
-        _results.push(share.destroy());
+        _results.push(share.remove());
       }
       return _results;
     });
   };
 
   Share.prototype.deleteAll = function() {
-    return this.destroyAll.apply(this, arguments);
+    return this.removeAll.apply(this, arguments);
   };
 
   return Share;
@@ -2364,7 +1953,7 @@ Hoodie.ShareInstance = (function(_super) {
   ShareInstance.prototype.destroy = function() {
     var _this = this;
     return this.remove(this.findAllObjects()).then(function() {
-      return _this.hoodie.store.destroy("$share", _this.id);
+      return _this.hoodie.store.remove("$share", _this.id);
     });
   };
 
@@ -2427,4 +2016,4 @@ Hoodie.ShareInstance = (function(_super) {
 
   return ShareInstance;
 
-})(Hoodie.RemoteStore);
+})(Hoodie.Remote);

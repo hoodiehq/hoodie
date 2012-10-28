@@ -234,7 +234,7 @@ Hoodie.Remote = (function() {
         if (this._knownObjects[doc._id]) {
           event = 'update';
         } else {
-          event = 'create';
+          event = 'new';
           this._knownObjects[doc._id] = 1;
         }
       }

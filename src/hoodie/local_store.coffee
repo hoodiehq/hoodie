@@ -105,7 +105,7 @@ class Hoodie.LocalStore extends Hoodie.Store
       object = @cache type, id, object, options
       defer.resolve( object, isNew ).promise()
 
-      event = if isNew then 'create' else 'update'
+      event = if isNew then 'new' else 'update'
       @_triggerEvents(event, object, options)
 
     catch error
@@ -492,7 +492,7 @@ class Hoodie.LocalStore extends Hoodie.Store
     
     @trigger event,                                           object, options
     @trigger "#{event}:#{object.$type}",                      object, options
-    @trigger "#{event}:#{object.$type}:#{object.id}",         object, options unless event is 'create'
+    @trigger "#{event}:#{object.$type}:#{object.id}",         object, options unless event is 'new'
     @trigger "change",                                 event, object, options
     @trigger "change:#{object.$type}",                 event, object, options
-    @trigger "change:#{object.$type}:#{object.id}",    event, object, options unless event is 'create'
+    @trigger "change:#{object.$type}:#{object.id}",    event, object, options unless event is 'new'

@@ -25,7 +25,7 @@ Hoodie.Share = (function() {
     return this.hoodie.open(dbName, options);
   };
 
-  Share.prototype.create = function(attributes) {
+  Share.prototype.add = function(attributes) {
     var share;
     if (attributes == null) {
       attributes = {};
@@ -55,9 +55,9 @@ Hoodie.Share = (function() {
     });
   };
 
-  Share.prototype.findOrCreate = function(id, attributes) {
+  Share.prototype.findOrAdd = function(id, attributes) {
     var _this = this;
-    return this.hoodie.store.findOrCreate('$share', id, attributes).pipe(function(object) {
+    return this.hoodie.store.findOrAdd('$share', id, attributes).pipe(function(object) {
       return new _this.instance(object);
     });
   };

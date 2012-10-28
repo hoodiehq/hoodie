@@ -294,13 +294,13 @@ describe "Hoodie.Remote", ->
           content  : 'remember the milk'
           done     :false
           order    :1
-        expect(@remote.trigger).wasCalledWith 'create',            object
-        expect(@remote.trigger).wasCalledWith 'create:todo',       object
-        expect(@remote.trigger).wasCalledWith 'create:todo:abc2',  object
+        expect(@remote.trigger).wasCalledWith 'new',            object
+        expect(@remote.trigger).wasCalledWith 'new:todo',       object
+        expect(@remote.trigger).wasCalledWith 'new:todo:abc2',  object
 
-        expect(@remote.trigger).wasCalledWith 'change',            'create', object
-        expect(@remote.trigger).wasCalledWith 'change:todo',       'create', object
-        expect(@remote.trigger).wasCalledWith 'change:todo:abc2',  'create', object
+        expect(@remote.trigger).wasCalledWith 'change',            'new', object
+        expect(@remote.trigger).wasCalledWith 'change:todo',       'new', object
+        expect(@remote.trigger).wasCalledWith 'change:todo:abc2',  'new', object
         
       _and ".isContinuouslyPulling() returns true", ->
         beforeEach ->

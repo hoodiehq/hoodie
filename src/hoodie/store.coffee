@@ -41,11 +41,11 @@ class Hoodie.Store
     return defer
   
   
-  # ## Create
+  # ## Add
 
-  # `.create` is an alias for `.save`, with the difference that there is no id argument.
+  # `.add` is an alias for `.save`, with the difference that there is no id argument.
   # Internally it simply calls `.save(type, undefined, object).
-  create : (type, object = {}, options = {}) ->
+  add : (type, object = {}, options = {}) ->
     @save type, object.id, object
   
   
@@ -82,7 +82,7 @@ class Hoodie.Store
       # apply update 
       @save(type, id, currentObj, options).then defer.resolve, defer.reject
       
-    # if not found, create it
+    # if not found, add it
     _loadPromise.fail => 
       @save(type, id, objectUpdate, options).then defer.resolve, defer.reject
     
@@ -138,18 +138,18 @@ class Hoodie.Store
     return defer
   
 
-  # ## find or create
+  # ## find or add
   
   # 1. Try to find a share by given id
   # 2. If share could be found, return it
-  # 3. If not, create one and return it.
-  findOrCreate : (type, id, attributes = {}) ->
+  # 3. If not, add one and return it.
+  findOrAdd : (type, id, attributes = {}) ->
     defer = @hoodie.defer()
     @find(type, id)
     .done( defer.resolve )
     .fail => 
       newAttributes = $.extend id: id, attributes
-      @create(type, newAttributes).then defer.resolve, defer.reject 
+      @add(type, newAttributes).then defer.resolve, defer.reject 
   
     return defer.promise()
   

@@ -10,7 +10,7 @@
 #
 # * store.find(type, id)
 # * store.findAll(type )
-# * store.create(type, object)
+# * store.add(type, object)
 # * store.save(type, id, object)
 # * store.update(new_properties )
 # * store.updateAll( type, new_properties)
@@ -338,7 +338,7 @@ class Hoodie.Remote
 
   # ### handle changes from remote
 
-  # in order to differentiate whether an object from remote should trigger a 'create'
+  # in order to differentiate whether an object from remote should trigger a 'new'
   # or an 'update' event, we store a hash of known objects
   _knownObjects : {}
   _handlePullResults : (changes) =>
@@ -351,7 +351,7 @@ class Hoodie.Remote
         if @_knownObjects[doc._id]
           event = 'update'
         else
-          event = 'create'
+          event = 'new'
           @_knownObjects[doc._id] = 1
 
       @trigger event,                                         parsedDoc

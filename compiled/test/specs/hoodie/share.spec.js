@@ -53,7 +53,7 @@ describe("Hoodie.Share", function() {
       });
     });
   });
-  describe("#create(attributes)", function() {
+  describe("#add(attributes)", function() {
     beforeEach(function() {
       this.instance = jasmine.createSpy("instance");
       this.instance.save = jasmine.createSpy("save");
@@ -61,7 +61,7 @@ describe("Hoodie.Share", function() {
     });
     return it("should initiate a new Hoodie.ShareInstance and save it", function() {
       var returnValue;
-      returnValue = this.share.create({
+      returnValue = this.share.add({
         funky: 'fresh'
       });
       expect(this.share.instance).wasCalledWith({
@@ -99,21 +99,21 @@ describe("Hoodie.Share", function() {
       });
     });
   });
-  describe("#findOrCreate(id, share_attributes)", function() {
+  describe("#findOrAdd(id, share_attributes)", function() {
     beforeEach(function() {
-      return spyOn(this.hoodie.store, "findOrCreate").andCallThrough();
+      return spyOn(this.hoodie.store, "findOrAdd").andCallThrough();
     });
-    it("should proxy to hoodie.store.findOrCreate with type set to '$share'", function() {
-      this.share.findOrCreate('id123', {});
-      return expect(this.hoodie.store.findOrCreate).wasCalledWith('$share', 'id123', {});
+    it("should proxy to hoodie.store.findOrAdd with type set to '$share'", function() {
+      this.share.findOrAdd('id123', {});
+      return expect(this.hoodie.store.findOrAdd).wasCalledWith('$share', 'id123', {});
     });
     return it("should resolve with a Share Instance", function() {
       var promise;
-      this.hoodie.store.findOrCreate.andReturn(this.hoodie.defer().resolve({}).promise());
+      this.hoodie.store.findOrAdd.andReturn(this.hoodie.defer().resolve({}).promise());
       this.share.instance.andCallFake(function() {
         return this.foo = 'bar';
       });
-      promise = this.share.findOrCreate('id123', {});
+      promise = this.share.findOrAdd('id123', {});
       return expect(promise).toBeResolvedWith({
         foo: 'bar'
       });

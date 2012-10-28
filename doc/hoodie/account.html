@@ -79,7 +79,7 @@ Besides the standard sign in we also check if the account has been confirmed
 
     <span class="nx">@_withPreviousRequestsAborted</span> <span class="s1">&#39;signIn&#39;</span><span class="p">,</span> <span class="o">=&gt;</span>
       <span class="nv">promise = </span><span class="nx">@hoodie</span><span class="p">.</span><span class="nx">request</span><span class="p">(</span><span class="s1">&#39;POST&#39;</span><span class="p">,</span> <span class="s1">&#39;/_session&#39;</span><span class="p">,</span> <span class="nx">options</span><span class="p">)</span>
-      <span class="nx">promise</span><span class="p">.</span><span class="nx">pipe</span><span class="p">(</span><span class="nx">@_handleSignInSuccess</span><span class="p">,</span> <span class="nx">@_handleRequestError</span><span class="p">)</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>alias</p></div></div><div class="code"><div class="wrapper">  <span class="nv">login: </span><span class="err">@</span><span class="o">::</span><span class="nx">signIn</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h2 id="sign-out-">sign out </h2></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>uses standard CouchDB API to destroy a user session (DELETE /_session)</p></div></div><div class="code"><div class="wrapper">  <span class="nv">signOut : </span><span class="o">-&gt;</span>
+      <span class="nx">promise</span><span class="p">.</span><span class="nx">pipe</span><span class="p">(</span><span class="nx">@_handleSignInSuccess</span><span class="p">,</span> <span class="nx">@_handleRequestError</span><span class="p">)</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>alias</p></div></div><div class="code"><div class="wrapper">  <span class="nv">login: </span><span class="err">@</span><span class="o">::</span><span class="nx">signIn</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h2 id="sign-out-">sign out </h2></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>uses standard CouchDB API to remove a user session (DELETE /_session)</p></div></div><div class="code"><div class="wrapper">  <span class="nv">signOut : </span><span class="o">-&gt;</span>
 
     <span class="nx">unless</span> <span class="nx">@hasAccount</span><span class="p">()</span>
       <span class="nx">@_cleanup</span><span class="p">()</span>
@@ -116,7 +116,7 @@ that is not exposed to others. The only CouchDB API othering such
 functionality is the _users database.</p>
 
 <p>So we actualy sign up a new couchDB user with some special attributes.
-It will be picked up by the password reset worker and destroyed
+It will be picked up by the password reset worker and removeed
 once the password was resetted.</p></div></div><div class="code"><div class="wrapper">  <span class="nv">resetPassword : </span><span class="nf">(username) -&gt;</span>
     <span class="k">if</span> <span class="nv">resetPasswordId = </span><span class="nx">@hoodie</span><span class="p">.</span><span class="nx">config</span><span class="p">.</span><span class="nx">get</span> <span class="s1">&#39;_account.resetPasswordId&#39;</span>
       <span class="k">return</span> <span class="nx">@_checkPasswordResetStatus</span><span class="p">()</span>
@@ -147,7 +147,7 @@ without knowing the current password, so it's not impulemented in the current
 implementation of the hoodie API.</p>
 
 <p>But the current password is needed to login with the new username.</p></div></div><div class="code"><div class="wrapper">  <span class="nv">changeUsername : </span><span class="nf">(currentPassword, newUsername) -&gt;</span>
-    <span class="nx">@_changeUsernameAndPassword</span><span class="p">(</span><span class="nx">currentPassword</span><span class="p">,</span> <span class="nx">newUsername</span><span class="p">)</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h2 id="destroy">destroy</h2></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>destroys a user's account  </p></div></div><div class="code"><div class="wrapper">  <span class="nv">destroy : </span><span class="o">-&gt;</span>
+    <span class="nx">@_changeUsernameAndPassword</span><span class="p">(</span><span class="nx">currentPassword</span><span class="p">,</span> <span class="nx">newUsername</span><span class="p">)</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h2 id="remove">remove</h2></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>removes a user's account  </p></div></div><div class="code"><div class="wrapper">  <span class="nv">remove : </span><span class="o">-&gt;</span>
 
     <span class="nx">unless</span> <span class="nx">@hasAccount</span><span class="p">()</span>
       <span class="nx">@_cleanup</span><span class="p">()</span>
@@ -339,7 +339,7 @@ the prefix in the CouchDB _users doc differentiates. </p></div></div><div class=
 
 <p>If a new username has been passed, we set the special attribut $newUsername.
 This will let the username change worker create create a new _users doc for 
-the new username and destroy the current one</p>
+the new username and remove the current one</p>
 
 <p>If a new password has been passed, salt and password<em>sha get removed
 from _users doc and add the password in clear text. CouchDB will replace it with

@@ -29,7 +29,7 @@ Hoodie.Store = (function() {
     return defer;
   };
 
-  Store.prototype.create = function(type, object, options) {
+  Store.prototype.add = function(type, object, options) {
     if (object == null) {
       object = {};
     }
@@ -123,7 +123,7 @@ Hoodie.Store = (function() {
     return defer;
   };
 
-  Store.prototype.findOrCreate = function(type, id, attributes) {
+  Store.prototype.findOrAdd = function(type, id, attributes) {
     var defer,
       _this = this;
     if (attributes == null) {
@@ -135,7 +135,7 @@ Hoodie.Store = (function() {
       newAttributes = $.extend({
         id: id
       }, attributes);
-      return _this.create(type, newAttributes).then(defer.resolve, defer.reject);
+      return _this.add(type, newAttributes).then(defer.resolve, defer.reject);
     });
     return defer.promise();
   };

@@ -292,8 +292,8 @@ f.event={add:function(a,c,d,e,g){var h,i,j,k,l,m,n,o,p,q,r,s;if(!(a.nodeType===3
                   "type": "heading",
                   "data": {
                     "level": 2,
-                    "title": "destroy",
-                    "slug": "destroy"
+                    "title": "remove",
+                    "slug": "remove"
                   },
                   "depth": 2
                 }, {
@@ -443,8 +443,8 @@ f.event={add:function(a,c,d,e,g){var h,i,j,k,l,m,n,o,p,q,r,s;if(!(a.nodeType===3
               "type": "heading",
               "data": {
                 "level": 2,
-                "title": "destroy",
-                "slug": "destroy"
+                "title": "remove",
+                "slug": "remove"
               },
               "depth": 2
             }, {
@@ -467,9 +467,9 @@ f.event={add:function(a,c,d,e,g){var h,i,j,k,l,m,n,o,p,q,r,s;if(!(a.nodeType===3
                   "singleLineComment": ["#"],
                   "name": "CoffeeScript"
                 },
-                "sourcePath": "/Users/gregor/JavaScripts/hood.ie/hoodie.js/src/hoodie/account/remote_store.coffee",
-                "projectPath": "src/hoodie/account/remote_store.coffee",
-                "targetPath": "hoodie/account/remote_store",
+                "sourcePath": "/Users/gregor/JavaScripts/hood.ie/hoodie.js/src/hoodie/account/remote.coffee",
+                "projectPath": "src/hoodie/account/remote.coffee",
+                "targetPath": "hoodie/account/remote",
                 "firstHeader": {
                   "type": "heading",
                   "data": {
@@ -1147,9 +1147,9 @@ f.event={add:function(a,c,d,e,g){var h,i,j,k,l,m,n,o,p,q,r,s;if(!(a.nodeType===3
               "singleLineComment": ["#"],
               "name": "CoffeeScript"
             },
-            "sourcePath": "/Users/gregor/JavaScripts/hood.ie/hoodie.js/src/hoodie/remote_store.coffee",
-            "projectPath": "src/hoodie/remote_store.coffee",
-            "targetPath": "hoodie/remote_store",
+            "sourcePath": "/Users/gregor/JavaScripts/hood.ie/hoodie.js/src/hoodie/remote.coffee",
+            "projectPath": "src/hoodie/remote.coffee",
+            "targetPath": "hoodie/remote",
             "firstHeader": {
               "type": "heading",
               "data": {
@@ -1164,8 +1164,8 @@ f.event={add:function(a,c,d,e,g){var h,i,j,k,l,m,n,o,p,q,r,s;if(!(a.nodeType===3
                   "type": "heading",
                   "data": {
                     "level": 2,
-                    "title": "API",
-                    "slug": "api"
+                    "title": "this.store API",
+                    "slug": "thisstore-api"
                   },
                   "depth": 2
                 }, {
@@ -1182,46 +1182,6 @@ f.event={add:function(a,c,d,e,g){var h,i,j,k,l,m,n,o,p,q,r,s;if(!(a.nodeType===3
                     "level": 2,
                     "title": "Constructor ",
                     "slug": "constructor-"
-                  },
-                  "depth": 2
-                }, {
-                  "type": "heading",
-                  "data": {
-                    "level": 2,
-                    "title": "find",
-                    "slug": "find"
-                  },
-                  "depth": 2
-                }, {
-                  "type": "heading",
-                  "data": {
-                    "level": 2,
-                    "title": "findAll",
-                    "slug": "findall"
-                  },
-                  "depth": 2
-                }, {
-                  "type": "heading",
-                  "data": {
-                    "level": 2,
-                    "title": "save",
-                    "slug": "save"
-                  },
-                  "depth": 2
-                }, {
-                  "type": "heading",
-                  "data": {
-                    "level": 2,
-                    "title": "destroy",
-                    "slug": "destroy"
-                  },
-                  "depth": 2
-                }, {
-                  "type": "heading",
-                  "data": {
-                    "level": 2,
-                    "title": "destroyAll",
-                    "slug": "destroyall"
                   },
                   "depth": 2
                 }, {
@@ -1397,38 +1357,6 @@ f.event={add:function(a,c,d,e,g){var h,i,j,k,l,m,n,o,p,q,r,s;if(!(a.nodeType===3
                       "type": "heading",
                       "data": {
                         "level": 3,
-                        "title": "parse for remote",
-                        "slug": "parse-for-remote"
-                      },
-                      "depth": 3
-                    }, {
-                      "type": "heading",
-                      "data": {
-                        "level": 3,
-                        "title": "generate new revision id",
-                        "slug": "generate-new-revision-id"
-                      },
-                      "depth": 3
-                    }, {
-                      "type": "heading",
-                      "data": {
-                        "level": 3,
-                        "title": "and new revion to objecet",
-                        "slug": "and-new-revion-to-objecet"
-                      },
-                      "depth": 3
-                    }, {
-                      "type": "heading",
-                      "data": {
-                        "level": 3,
-                        "title": "parse object coming from pull for local storage.",
-                        "slug": "parse-object-coming-from-pull-for-local-storage"
-                      },
-                      "depth": 3
-                    }, {
-                      "type": "heading",
-                      "data": {
-                        "level": 3,
                         "title": "handle changes from remote",
                         "slug": "handle-changes-from-remote"
                       },
@@ -1439,14 +1367,6 @@ f.event={add:function(a,c,d,e,g){var h,i,j,k,l,m,n,o,p,q,r,s;if(!(a.nodeType===3
                         "level": 3,
                         "title": "handle push success",
                         "slug": "handle-push-success"
-                      },
-                      "depth": 3
-                    }, {
-                      "type": "heading",
-                      "data": {
-                        "level": 3,
-                        "title": "map docs from findAll",
-                        "slug": "map-docs-from-findall"
                       },
                       "depth": 3
                     }
@@ -1462,8 +1382,8 @@ f.event={add:function(a,c,d,e,g){var h,i,j,k,l,m,n,o,p,q,r,s;if(!(a.nodeType===3
               "type": "heading",
               "data": {
                 "level": 2,
-                "title": "API",
-                "slug": "api"
+                "title": "this.store API",
+                "slug": "thisstore-api"
               },
               "depth": 2
             }, {
@@ -1480,46 +1400,6 @@ f.event={add:function(a,c,d,e,g){var h,i,j,k,l,m,n,o,p,q,r,s;if(!(a.nodeType===3
                 "level": 2,
                 "title": "Constructor ",
                 "slug": "constructor-"
-              },
-              "depth": 2
-            }, {
-              "type": "heading",
-              "data": {
-                "level": 2,
-                "title": "find",
-                "slug": "find"
-              },
-              "depth": 2
-            }, {
-              "type": "heading",
-              "data": {
-                "level": 2,
-                "title": "findAll",
-                "slug": "findall"
-              },
-              "depth": 2
-            }, {
-              "type": "heading",
-              "data": {
-                "level": 2,
-                "title": "save",
-                "slug": "save"
-              },
-              "depth": 2
-            }, {
-              "type": "heading",
-              "data": {
-                "level": 2,
-                "title": "destroy",
-                "slug": "destroy"
-              },
-              "depth": 2
-            }, {
-              "type": "heading",
-              "data": {
-                "level": 2,
-                "title": "destroyAll",
-                "slug": "destroyall"
               },
               "depth": 2
             }, {
@@ -1695,11 +1575,272 @@ f.event={add:function(a,c,d,e,g){var h,i,j,k,l,m,n,o,p,q,r,s;if(!(a.nodeType===3
                   "type": "heading",
                   "data": {
                     "level": 3,
-                    "title": "parse for remote",
-                    "slug": "parse-for-remote"
+                    "title": "handle changes from remote",
+                    "slug": "handle-changes-from-remote"
                   },
                   "depth": 3
                 }, {
+                  "type": "heading",
+                  "data": {
+                    "level": 3,
+                    "title": "handle push success",
+                    "slug": "handle-push-success"
+                  },
+                  "depth": 3
+                }
+              ]
+            }
+          ]
+        }, {
+          "type": "file",
+          "data": {
+            "language": {
+              "nameMatchers": [".coffee"],
+              "pygmentsLexer": "coffee-script",
+              "singleLineComment": ["#"],
+              "name": "CoffeeScript"
+            },
+            "sourcePath": "/Users/gregor/JavaScripts/hood.ie/hoodie.js/src/hoodie/remote_store.coffee",
+            "projectPath": "src/hoodie/remote_store.coffee",
+            "targetPath": "hoodie/remote_store",
+            "firstHeader": {
+              "type": "heading",
+              "data": {
+                "level": 1,
+                "title": "RemoteStore",
+                "slug": "remotestore",
+                "isFileHeader": true
+              },
+              "depth": 1,
+              "children": [
+                {
+                  "type": "heading",
+                  "data": {
+                    "level": 2,
+                    "title": "API",
+                    "slug": "api"
+                  },
+                  "depth": 2
+                }, {
+                  "type": "heading",
+                  "data": {
+                    "level": 2,
+                    "title": "Event binding",
+                    "slug": "event-binding"
+                  },
+                  "depth": 2
+                }, {
+                  "type": "heading",
+                  "data": {
+                    "level": 2,
+                    "title": "Constructor ",
+                    "slug": "constructor-"
+                  },
+                  "depth": 2
+                }, {
+                  "type": "heading",
+                  "data": {
+                    "level": 2,
+                    "title": "find",
+                    "slug": "find"
+                  },
+                  "depth": 2
+                }, {
+                  "type": "heading",
+                  "data": {
+                    "level": 2,
+                    "title": "findAll",
+                    "slug": "findall"
+                  },
+                  "depth": 2
+                }, {
+                  "type": "heading",
+                  "data": {
+                    "level": 2,
+                    "title": "save",
+                    "slug": "save"
+                  },
+                  "depth": 2
+                }, {
+                  "type": "heading",
+                  "data": {
+                    "level": 2,
+                    "title": "remove",
+                    "slug": "remove"
+                  },
+                  "depth": 2
+                }, {
+                  "type": "heading",
+                  "data": {
+                    "level": 2,
+                    "title": "removeAll",
+                    "slug": "removeall"
+                  },
+                  "depth": 2
+                }, {
+                  "type": "heading",
+                  "data": {
+                    "level": 2,
+                    "title": "Parse for remote",
+                    "slug": "parse-for-remote"
+                  },
+                  "depth": 2
+                }, {
+                  "type": "heading",
+                  "data": {
+                    "level": 2,
+                    "title": "parseFromRemote",
+                    "slug": "parsefromremote"
+                  },
+                  "depth": 2
+                }, {
+                  "type": "heading",
+                  "data": {
+                    "level": 2,
+                    "title": "Events",
+                    "slug": "events"
+                  },
+                  "depth": 2
+                }, {
+                  "type": "heading",
+                  "data": {
+                    "level": 2,
+                    "title": "Private",
+                    "slug": "private"
+                  },
+                  "depth": 2,
+                  "children": [
+                    {
+                      "type": "heading",
+                      "data": {
+                        "level": 3,
+                        "title": "generate new revision id",
+                        "slug": "generate-new-revision-id"
+                      },
+                      "depth": 3
+                    }, {
+                      "type": "heading",
+                      "data": {
+                        "level": 3,
+                        "title": "and new revion to objecet",
+                        "slug": "and-new-revion-to-objecet"
+                      },
+                      "depth": 3
+                    }, {
+                      "type": "heading",
+                      "data": {
+                        "level": 3,
+                        "title": "map docs from findAll",
+                        "slug": "map-docs-from-findall"
+                      },
+                      "depth": 3
+                    }
+                  ]
+                }
+              ]
+            },
+            "title": "RemoteStore"
+          },
+          "depth": 2,
+          "outline": [
+            {
+              "type": "heading",
+              "data": {
+                "level": 2,
+                "title": "API",
+                "slug": "api"
+              },
+              "depth": 2
+            }, {
+              "type": "heading",
+              "data": {
+                "level": 2,
+                "title": "Event binding",
+                "slug": "event-binding"
+              },
+              "depth": 2
+            }, {
+              "type": "heading",
+              "data": {
+                "level": 2,
+                "title": "Constructor ",
+                "slug": "constructor-"
+              },
+              "depth": 2
+            }, {
+              "type": "heading",
+              "data": {
+                "level": 2,
+                "title": "find",
+                "slug": "find"
+              },
+              "depth": 2
+            }, {
+              "type": "heading",
+              "data": {
+                "level": 2,
+                "title": "findAll",
+                "slug": "findall"
+              },
+              "depth": 2
+            }, {
+              "type": "heading",
+              "data": {
+                "level": 2,
+                "title": "save",
+                "slug": "save"
+              },
+              "depth": 2
+            }, {
+              "type": "heading",
+              "data": {
+                "level": 2,
+                "title": "remove",
+                "slug": "remove"
+              },
+              "depth": 2
+            }, {
+              "type": "heading",
+              "data": {
+                "level": 2,
+                "title": "removeAll",
+                "slug": "removeall"
+              },
+              "depth": 2
+            }, {
+              "type": "heading",
+              "data": {
+                "level": 2,
+                "title": "Parse for remote",
+                "slug": "parse-for-remote"
+              },
+              "depth": 2
+            }, {
+              "type": "heading",
+              "data": {
+                "level": 2,
+                "title": "parseFromRemote",
+                "slug": "parsefromremote"
+              },
+              "depth": 2
+            }, {
+              "type": "heading",
+              "data": {
+                "level": 2,
+                "title": "Events",
+                "slug": "events"
+              },
+              "depth": 2
+            }, {
+              "type": "heading",
+              "data": {
+                "level": 2,
+                "title": "Private",
+                "slug": "private"
+              },
+              "depth": 2,
+              "children": [
+                {
                   "type": "heading",
                   "data": {
                     "level": 3,
@@ -1713,30 +1854,6 @@ f.event={add:function(a,c,d,e,g){var h,i,j,k,l,m,n,o,p,q,r,s;if(!(a.nodeType===3
                     "level": 3,
                     "title": "and new revion to objecet",
                     "slug": "and-new-revion-to-objecet"
-                  },
-                  "depth": 3
-                }, {
-                  "type": "heading",
-                  "data": {
-                    "level": 3,
-                    "title": "parse object coming from pull for local storage.",
-                    "slug": "parse-object-coming-from-pull-for-local-storage"
-                  },
-                  "depth": 3
-                }, {
-                  "type": "heading",
-                  "data": {
-                    "level": 3,
-                    "title": "handle changes from remote",
-                    "slug": "handle-changes-from-remote"
-                  },
-                  "depth": 3
-                }, {
-                  "type": "heading",
-                  "data": {
-                    "level": 3,
-                    "title": "handle push success",
-                    "slug": "handle-push-success"
                   },
                   "depth": 3
                 }, {
@@ -1801,8 +1918,8 @@ f.event={add:function(a,c,d,e,g){var h,i,j,k,l,m,n,o,p,q,r,s;if(!(a.nodeType===3
                   "type": "heading",
                   "data": {
                     "level": 2,
-                    "title": "create",
-                    "slug": "create"
+                    "title": "add",
+                    "slug": "add"
                   },
                   "depth": 2
                 }, {
@@ -1825,8 +1942,8 @@ f.event={add:function(a,c,d,e,g){var h,i,j,k,l,m,n,o,p,q,r,s;if(!(a.nodeType===3
                   "type": "heading",
                   "data": {
                     "level": 2,
-                    "title": "findOrCreate",
-                    "slug": "findorcreate"
+                    "title": "findOrAdd",
+                    "slug": "findoradd"
                   },
                   "depth": 2
                 }, {
@@ -1857,16 +1974,16 @@ f.event={add:function(a,c,d,e,g){var h,i,j,k,l,m,n,o,p,q,r,s;if(!(a.nodeType===3
                   "type": "heading",
                   "data": {
                     "level": 2,
-                    "title": "destroy",
-                    "slug": "destroy"
+                    "title": "remove",
+                    "slug": "remove"
                   },
                   "depth": 2
                 }, {
                   "type": "heading",
                   "data": {
                     "level": 2,
-                    "title": "destroyAll",
-                    "slug": "destroyall"
+                    "title": "removeAll",
+                    "slug": "removeall"
                   },
                   "depth": 2
                 }
@@ -1904,8 +2021,8 @@ f.event={add:function(a,c,d,e,g){var h,i,j,k,l,m,n,o,p,q,r,s;if(!(a.nodeType===3
               "type": "heading",
               "data": {
                 "level": 2,
-                "title": "create",
-                "slug": "create"
+                "title": "add",
+                "slug": "add"
               },
               "depth": 2
             }, {
@@ -1928,8 +2045,8 @@ f.event={add:function(a,c,d,e,g){var h,i,j,k,l,m,n,o,p,q,r,s;if(!(a.nodeType===3
               "type": "heading",
               "data": {
                 "level": 2,
-                "title": "findOrCreate",
-                "slug": "findorcreate"
+                "title": "findOrAdd",
+                "slug": "findoradd"
               },
               "depth": 2
             }, {
@@ -1960,16 +2077,16 @@ f.event={add:function(a,c,d,e,g){var h,i,j,k,l,m,n,o,p,q,r,s;if(!(a.nodeType===3
               "type": "heading",
               "data": {
                 "level": 2,
-                "title": "destroy",
-                "slug": "destroy"
+                "title": "remove",
+                "slug": "remove"
               },
               "depth": 2
             }, {
               "type": "heading",
               "data": {
                 "level": 2,
-                "title": "destroyAll",
-                "slug": "destroyall"
+                "title": "removeAll",
+                "slug": "removeall"
               },
               "depth": 2
             }
@@ -2144,8 +2261,8 @@ f.event={add:function(a,c,d,e,g){var h,i,j,k,l,m,n,o,p,q,r,s;if(!(a.nodeType===3
                   "type": "heading",
                   "data": {
                     "level": 2,
-                    "title": "Create",
-                    "slug": "create"
+                    "title": "Add",
+                    "slug": "add"
                   },
                   "depth": 2
                 }, {
@@ -2176,8 +2293,8 @@ f.event={add:function(a,c,d,e,g){var h,i,j,k,l,m,n,o,p,q,r,s;if(!(a.nodeType===3
                   "type": "heading",
                   "data": {
                     "level": 2,
-                    "title": "find or create",
-                    "slug": "find-or-create"
+                    "title": "find or add",
+                    "slug": "find-or-add"
                   },
                   "depth": 2
                 }, {
@@ -2200,8 +2317,8 @@ f.event={add:function(a,c,d,e,g){var h,i,j,k,l,m,n,o,p,q,r,s;if(!(a.nodeType===3
                   "type": "heading",
                   "data": {
                     "level": 2,
-                    "title": "destroyAll",
-                    "slug": "destroyall"
+                    "title": "removeAll",
+                    "slug": "removeall"
                   },
                   "depth": 2
                 }, {
@@ -2239,8 +2356,8 @@ f.event={add:function(a,c,d,e,g){var h,i,j,k,l,m,n,o,p,q,r,s;if(!(a.nodeType===3
               "type": "heading",
               "data": {
                 "level": 2,
-                "title": "Create",
-                "slug": "create"
+                "title": "Add",
+                "slug": "add"
               },
               "depth": 2
             }, {
@@ -2271,8 +2388,8 @@ f.event={add:function(a,c,d,e,g){var h,i,j,k,l,m,n,o,p,q,r,s;if(!(a.nodeType===3
               "type": "heading",
               "data": {
                 "level": 2,
-                "title": "find or create",
-                "slug": "find-or-create"
+                "title": "find or add",
+                "slug": "find-or-add"
               },
               "depth": 2
             }, {
@@ -2295,8 +2412,8 @@ f.event={add:function(a,c,d,e,g){var h,i,j,k,l,m,n,o,p,q,r,s;if(!(a.nodeType===3
               "type": "heading",
               "data": {
                 "level": 2,
-                "title": "destroyAll",
-                "slug": "destroyall"
+                "title": "removeAll",
+                "slug": "removeall"
               },
               "depth": 2
             }, {

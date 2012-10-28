@@ -98,7 +98,7 @@ Hoodie.LocalStore = (function(_super) {
     try {
       object = this.cache(type, id, object, options);
       defer.resolve(object, isNew).promise();
-      event = isNew ? 'create' : 'update';
+      event = isNew ? 'new' : 'update';
       this._triggerEvents(event, object, options);
     } catch (error) {
       defer.reject(error).promise();
@@ -446,12 +446,12 @@ Hoodie.LocalStore = (function(_super) {
   LocalStore.prototype._triggerEvents = function(event, object, options) {
     this.trigger(event, object, options);
     this.trigger("" + event + ":" + object.$type, object, options);
-    if (event !== 'create') {
+    if (event !== 'new') {
       this.trigger("" + event + ":" + object.$type + ":" + object.id, object, options);
     }
     this.trigger("change", event, object, options);
     this.trigger("change:" + object.$type, event, object, options);
-    if (event !== 'create') {
+    if (event !== 'new') {
       return this.trigger("change:" + object.$type + ":" + object.id, event, object, options);
     }
   };

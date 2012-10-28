@@ -46,17 +46,17 @@ describe "Hoodie.Store", ->
         expect(promise).toBeDefer()
 
   
-  describe "create(type, object)", ->
+  describe "add(type, object)", ->
     beforeEach ->
       spyOn(@store, "save").andReturn "save_promise"
 
     it "should proxy to save method", ->
-      @store.create("test", {funky: "value"})
+      @store.add("test", {funky: "value"})
       expect(@store.save).wasCalledWith "test", undefined, funky: "value"
 
     it "should return promise of save method", ->
-      expect(@store.create()).toBe 'save_promise'
-  # /create(type, object)
+      expect(@store.add()).toBe 'save_promise'
+  # /add(type, object)
 
   describe "#update(type, id, update, options)", ->
     beforeEach ->
@@ -68,7 +68,7 @@ describe "Hoodie.Store", ->
         @store.find.andReturn $.Deferred().reject()
         @promise = @store.update 'couch', '123', funky: 'fresh'
       
-      it "should create it", ->
+      it "should add it", ->
         expect(@store.save).wasCalledWith 'couch', '123', funky: 'fresh', undefined
     
     _when "object can be found", ->
@@ -224,36 +224,36 @@ describe "Hoodie.Store", ->
         spyOn(@store, "findAll")
   # /#findAll(type)
 
-  describe "#findOrCreate(type, id, attributes)", ->
+  describe "#findOrAdd(type, id, attributes)", ->
     _when "object exists", ->
       beforeEach ->
         promise = @hoodie.defer().resolve('existing_object').promise()
         spyOn(@store, "find").andReturn promise
 
       it "should resolve with existing object", ->
-        promise = @store.findOrCreate 'type', '123', attribute: 'value'
+        promise = @store.findOrAdd 'type', '123', attribute: 'value'
         expect(promise).toBeResolvedWith 'existing_object'
 
     _when "object does not exist", ->
       beforeEach ->
         spyOn(@store, "find").andReturn @hoodie.defer().reject().promise()
       
-      it "should call `.create` with passed attributes", ->
-        spyOn(@store, "create").andReturn @hoodie.defer().promise()
-        promise = @store.findOrCreate 'type', 'id123', attribute: 'value'
-        expect(@store.create).wasCalledWith 'type', id: 'id123', attribute: 'value'
+      it "should call `.add` with passed attributes", ->
+        spyOn(@store, "add").andReturn @hoodie.defer().promise()
+        promise = @store.findOrAdd 'type', 'id123', attribute: 'value'
+        expect(@store.add).wasCalledWith 'type', id: 'id123', attribute: 'value'
 
-      it "should reject when `.create` was rejected", ->
-        spyOn(@store, "create").andReturn @hoodie.defer().reject().promise()
-        promise = @store.findOrCreate id: '123', attribute: 'value'
+      it "should reject when `.add` was rejected", ->
+        spyOn(@store, "add").andReturn @hoodie.defer().reject().promise()
+        promise = @store.findOrAdd id: '123', attribute: 'value'
         expect(promise).toBeRejected()
 
-      it "should resolve when `.create` was resolved", ->
+      it "should resolve when `.add` was resolved", ->
         promise = @hoodie.defer().resolve('new_object').promise()
-        spyOn(@store, "create").andReturn promise
-        promise = @store.findOrCreate id: '123', attribute: 'value'
+        spyOn(@store, "add").andReturn promise
+        promise = @store.findOrAdd id: '123', attribute: 'value'
         expect(promise).toBeResolvedWith 'new_object'
-  # /#findOrCreate(attributes)
+  # /#findOrAdd(attributes)
 
   describe "#remove(type, id)", ->
     it "should return a defer", ->

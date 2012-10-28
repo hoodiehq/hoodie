@@ -42,18 +42,18 @@ describe "Hoodie.Share", ->
       expect(@hoodie.open).wasCalledWith 'share/funk123', prefix: 'share/funk123', option: 'value'
   # /#open(shareId, options)
 
-  describe "#create(attributes)", ->
+  describe "#add(attributes)", ->
     beforeEach ->
       @instance      = jasmine.createSpy("instance")
       @instance.save = jasmine.createSpy("save")
       @share.instance.andReturn @instance
     
     it "should initiate a new Hoodie.ShareInstance and save it", ->
-      returnValue = @share.create funky: 'fresh'
+      returnValue = @share.add funky: 'fresh'
       expect(@share.instance).wasCalledWith funky: 'fresh'
       expect(@instance.save).wasCalled()
       expect(returnValue).toBe @instance
-  # /#create(attributes)
+  # /#add(attributes)
 
   describe "#find(share_id)", ->
     beforeEach ->
@@ -72,20 +72,20 @@ describe "Hoodie.Share", ->
       expect(promise).toBeResolvedWith foo: 'bar'
   # /#find(share_id)
 
-  describe "#findOrCreate(id, share_attributes)", ->
+  describe "#findOrAdd(id, share_attributes)", ->
     beforeEach ->
-      spyOn(@hoodie.store, "findOrCreate").andCallThrough()
+      spyOn(@hoodie.store, "findOrAdd").andCallThrough()
     
-    it "should proxy to hoodie.store.findOrCreate with type set to '$share'", ->
-      @share.findOrCreate 'id123', {}
-      expect(@hoodie.store.findOrCreate).wasCalledWith '$share', 'id123', {}
+    it "should proxy to hoodie.store.findOrAdd with type set to '$share'", ->
+      @share.findOrAdd 'id123', {}
+      expect(@hoodie.store.findOrAdd).wasCalledWith '$share', 'id123', {}
 
     it "should resolve with a Share Instance", ->
-      @hoodie.store.findOrCreate.andReturn @hoodie.defer().resolve({}).promise()
+      @hoodie.store.findOrAdd.andReturn @hoodie.defer().resolve({}).promise()
       @share.instance.andCallFake -> this.foo = 'bar'
-      promise = @share.findOrCreate 'id123', {}
+      promise = @share.findOrAdd 'id123', {}
       expect(promise).toBeResolvedWith foo: 'bar'
-  # /#findOrCreate(share_attributes)
+  # /#findOrAdd(share_attributes)
 
   describe "#findAll()", ->
     beforeEach ->

@@ -254,15 +254,15 @@ describe "Hoodie.LocalStore", ->
   # /.save(type, id, object, options)
   
 
-  describe "#create(type, object, options)", ->
+  describe "#add(type, object, options)", ->
     beforeEach ->
       spyOn(@store, "save").andReturn 'promise'
     
     it "should call .save(type, undefined, options) and return its promise", ->
-      promise = @store.create('couch', {funky: 'fresh'})
+      promise = @store.add('couch', {funky: 'fresh'})
       expect(@store.save).wasCalledWith 'couch', undefined, {funky: 'fresh'}
       expect(promise).toBe 'promise'
-  # /.create(type, object, options)
+  # /.add(type, object, options)
   
 
   describe "#updateAll(objects)", ->

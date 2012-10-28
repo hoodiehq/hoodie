@@ -8,7 +8,7 @@
 #
 # * find(type, id)
 # * findAll(type )
-# * create(type, object)
+# * add(type, object)
 # * save(type, id, object)
 # * update(new_properties )
 # * updateAll( type, new_properties)

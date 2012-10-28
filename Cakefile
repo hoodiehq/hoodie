@@ -70,8 +70,9 @@ task 'build', 'build hoodie-client.min.js', ->
     'compiled/src/hoodie.js'
     'compiled/src/hoodie/account.js'
     'compiled/src/hoodie/store.js'
+    'compiled/src/hoodie/remote.js'
     'compiled/src/hoodie/remote_store.js'
-    'compiled/src/hoodie/account/remote_store.js'
+    'compiled/src/hoodie/account_remote.js'
     'compiled/src/hoodie/config.js'
     'compiled/src/hoodie/email.js'
     'compiled/src/hoodie/errors.js'
@@ -79,7 +80,7 @@ task 'build', 'build hoodie-client.min.js', ->
     'compiled/src/hoodie/user.js'
     'compiled/src/hoodie/global.js'
     'compiled/src/hoodie/share.js'
-    'compiled/src/hoodie/share/instance.js'
+    'compiled/src/hoodie/share_instance.js'
   ]
 
   build.stdout.on 'data', (data) -> 

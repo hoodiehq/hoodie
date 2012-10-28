@@ -375,13 +375,13 @@ describe("Hoodie.LocalStore", function() {
       });
     });
   });
-  describe("#create(type, object, options)", function() {
+  describe("#add(type, object, options)", function() {
     beforeEach(function() {
       return spyOn(this.store, "save").andReturn('promise');
     });
     return it("should call .save(type, undefined, options) and return its promise", function() {
       var promise;
-      promise = this.store.create('couch', {
+      promise = this.store.add('couch', {
         funky: 'fresh'
       });
       expect(this.store.save).wasCalledWith('couch', void 0, {

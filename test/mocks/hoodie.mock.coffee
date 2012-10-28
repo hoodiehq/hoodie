@@ -21,14 +21,14 @@ Mocks.Hoodie = ->
   uuid          : -> 'uuid'
     
   store         :
-    create        : -> promiseMock 
+    add           : -> promiseMock 
     remove        : -> promiseMock 
     save          : -> promiseMock 
     update        : -> promiseMock 
     updateAll     : -> promiseMock 
     find          : -> promiseMock 
     findAll       : -> promiseMock
-    findOrCreate  : -> promiseMock 
+    findOrAdd     : -> promiseMock 
     removeAll     : -> promiseMock 
     changedDocs   : ->
     isDirty       : ->

@@ -25,7 +25,7 @@ Mocks.Hoodie = function() {
       return 'uuid';
     },
     store: {
-      create: function() {
+      add: function() {
         return promiseMock;
       },
       remove: function() {
@@ -46,7 +46,7 @@ Mocks.Hoodie = function() {
       findAll: function() {
         return promiseMock;
       },
-      findOrCreate: function() {
+      findOrAdd: function() {
         return promiseMock;
       },
       removeAll: function() {

@@ -65,12 +65,12 @@ describe("Hoodie.Store", function() {
       return _results;
     });
   });
-  describe("create(type, object)", function() {
+  describe("add(type, object)", function() {
     beforeEach(function() {
       return spyOn(this.store, "save").andReturn("save_promise");
     });
     it("should proxy to save method", function() {
-      this.store.create("test", {
+      this.store.add("test", {
         funky: "value"
       });
       return expect(this.store.save).wasCalledWith("test", void 0, {
@@ -78,7 +78,7 @@ describe("Hoodie.Store", function() {
       });
     });
     return it("should return promise of save method", function() {
-      return expect(this.store.create()).toBe('save_promise');
+      return expect(this.store.add()).toBe('save_promise');
     });
   });
   describe("#update(type, id, update, options)", function() {
@@ -95,7 +95,7 @@ describe("Hoodie.Store", function() {
           funky: 'fresh'
         });
       });
-      return it("should create it", function() {
+      return it("should add it", function() {
         return expect(this.store.save).wasCalledWith('couch', '123', {
           funky: 'fresh'
         }, void 0);
@@ -347,7 +347,7 @@ describe("Hoodie.Store", function() {
       });
     });
   });
-  describe("#findOrCreate(type, id, attributes)", function() {
+  describe("#findOrAdd(type, id, attributes)", function() {
     _when("object exists", function() {
       beforeEach(function() {
         var promise;
@@ -356,7 +356,7 @@ describe("Hoodie.Store", function() {
       });
       return it("should resolve with existing object", function() {
         var promise;
-        promise = this.store.findOrCreate('type', '123', {
+        promise = this.store.findOrAdd('type', '123', {
           attribute: 'value'
         });
         return expect(promise).toBeResolvedWith('existing_object');
@@ -366,31 +366,31 @@ describe("Hoodie.Store", function() {
       beforeEach(function() {
         return spyOn(this.store, "find").andReturn(this.hoodie.defer().reject().promise());
       });
-      it("should call `.create` with passed attributes", function() {
+      it("should call `.add` with passed attributes", function() {
         var promise;
-        spyOn(this.store, "create").andReturn(this.hoodie.defer().promise());
-        promise = this.store.findOrCreate('type', 'id123', {
+        spyOn(this.store, "add").andReturn(this.hoodie.defer().promise());
+        promise = this.store.findOrAdd('type', 'id123', {
           attribute: 'value'
         });
-        return expect(this.store.create).wasCalledWith('type', {
+        return expect(this.store.add).wasCalledWith('type', {
           id: 'id123',
           attribute: 'value'
         });
       });
-      it("should reject when `.create` was rejected", function() {
+      it("should reject when `.add` was rejected", function() {
         var promise;
-        spyOn(this.store, "create").andReturn(this.hoodie.defer().reject().promise());
-        promise = this.store.findOrCreate({
+        spyOn(this.store, "add").andReturn(this.hoodie.defer().reject().promise());
+        promise = this.store.findOrAdd({
           id: '123',
           attribute: 'value'
         });
         return expect(promise).toBeRejected();
       });
-      return it("should resolve when `.create` was resolved", function() {
+      return it("should resolve when `.add` was resolved", function() {
         var promise;
         promise = this.hoodie.defer().resolve('new_object').promise();
-        spyOn(this.store, "create").andReturn(promise);
-        promise = this.store.findOrCreate({
+        spyOn(this.store, "add").andReturn(promise);
+        promise = this.store.findOrAdd({
           id: '123',
           attribute: 'value'
         });

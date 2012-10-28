@@ -25,10 +25,10 @@
 #     // difference that no type has to be set and the returned
 #     // promises are resolved with share instances instead of
 #     // simple objects
-#     hoodie.share.create(attributes)
+#     hoodie.share.add(attributes)
 #     hoodie.share.find('share_id')
 #     hoodie.share.findAll()
-#     hoodie.share.findOrCreate(id, attributes)
+#     hoodie.share.findOrAdd(id, attributes)
 #     hoodie.share.save(id, attributes)
 #     hoodie.share.update(id, changed_attributes)
 #     hoodie.share.updateAll(changed_attributes)
@@ -51,7 +51,7 @@ class Hoodie.Share
 
     # give all Share instances access to our core hoodie.
     # That's need if the user has no account yet, as shares
-    # use custom hoodie instances then to create shares on
+    # use custom hoodie instances then to add shares on
     # the server
     Hoodie.ShareInstance.prototype.hoodie = @hoodie
 
@@ -74,12 +74,12 @@ class Hoodie.Share
     @hoodie.open dbName, options
 
 
-  # create
+  # add
   # --------
 
   # creates a new share and returns it
   #
-  create : (attributes = {}) ->
+  add : (attributes = {}) ->
     share = new @instance attributes
     share.save()
     share
@@ -105,20 +105,20 @@ class Hoodie.Share
       new @instance obj for obj in objects
 
 
-  # findOrCreate
+  # findOrAdd
   # --------------
 
-  # find or create a new share
+  # find or add a new share
   #
-  findOrCreate : (id, attributes) ->
-    @hoodie.store.findOrCreate('$share', id, attributes).pipe (object) =>
+  findOrAdd : (id, attributes) ->
+    @hoodie.store.findOrAdd('$share', id, attributes).pipe (object) =>
       new @instance object
 
 
   # save
   # ------
 
-  # create or overwrite a share
+  # add or overwrite a share
   #
   save : (id, attributes) ->
     @hoodie.store.save('$share', id, attributes).pipe (object) =>
@@ -128,7 +128,7 @@ class Hoodie.Share
   # update
   # --------
 
-  # create or overwrite a share
+  # add or overwrite a share
   #
   update : (id, changed_attributes) ->
     @hoodie.store.update('$share', id, changed_attributes).pipe (object) =>
