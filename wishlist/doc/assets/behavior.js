@@ -821,8 +821,8 @@ f.event={add:function(a,c,d,e,g){var h,i,j,k,l,m,n,o,p,q,r,s;if(!(a.nodeType===3
           "type": "heading",
           "data": {
             "level": 1,
-            "title": "hoodie.share API",
-            "slug": "hoodieshare-api",
+            "title": "hoodie.share API (2nd thought)",
+            "slug": "hoodieshare-api-2nd-thought",
             "isFileHeader": true
           },
           "depth": 1,
@@ -846,7 +846,7 @@ f.event={add:function(a,c,d,e,g){var h,i,j,k,l,m,n,o,p,q,r,s;if(!(a.nodeType===3
             }
           ]
         },
-        "title": "hoodie.share API"
+        "title": "hoodie.share API (2nd thought)"
       },
       "depth": 1,
       "outline": [
