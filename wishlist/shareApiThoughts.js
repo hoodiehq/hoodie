@@ -74,7 +74,7 @@ hoodie.store.unshare('task', '123', 'shareID')
 hoodie.store.find('task', '123').share('shareId')
 hoodie.store.find('task', '123').unshare('shareId')
 
-// compare to (store.publish / store.conceal)[public_user_stores2.html]
+// compare to [store.publish / store.conceal](public_user_stores2.html)
 
 // random thoughts
 // -----------------
