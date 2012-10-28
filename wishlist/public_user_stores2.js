@@ -31,8 +31,8 @@ hoodie.store.conceal('task', '123')
 hoodie.store.find('task', '123').conceal(['description'])
 hoodie.store.conceal('task', '123', ['description'])
 
-// insert a new object and make it public
-hoodie.store.insert('task', '456').publish()
+// add a new object and make it public
+hoodie.store.add('task', object).publish()
 
 
 // ## Open public objects
@@ -117,9 +117,9 @@ hoodie.global.get("most_recent_photos", {page: 2})
 // 
 function playTrack( track ) {
 
-  hoodie.store.findOrInsert( "track", track.id, track).publish()
-  // or: hoodie.store.publish( "track", track.id, track).publish()
-  hoodie.store.insert("play", {trackId: track.id}).publish()
+  hoodie.store.findOrAdd( "track", track.id, track).publish()
+  // or: hoodie.store.publish( "track", track.id, track)
+  hoodie.store.add("play", {trackId: track.id}).publish()
   // or: hoodie.store.publish("play", {trackId: track.id})
 }
 
@@ -138,7 +138,7 @@ playTrack( tumblrTrack )
 // I want to favorite or unfavorite a track
 // 
 function favoriteTrack( track ) {
-  hoodie.store.insert( "favorite", track.id)
+  hoodie.store.add( "favorite", track.id)
 }
 
 function unfavoriteTrack( track ) {

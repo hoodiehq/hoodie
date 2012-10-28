@@ -831,6 +831,14 @@ f.event={add:function(a,c,d,e,g){var h,i,j,k,l,m,n,o,p,q,r,s;if(!(a.nodeType===3
               "type": "heading",
               "data": {
                 "level": 2,
+                "title": "Share Module API",
+                "slug": "share-module-api"
+              },
+              "depth": 2
+            }, {
+              "type": "heading",
+              "data": {
+                "level": 2,
                 "title": "Share Instance API",
                 "slug": "share-instance-api"
               },
@@ -839,8 +847,16 @@ f.event={add:function(a,c,d,e,g){var h,i,j,k,l,m,n,o,p,q,r,s;if(!(a.nodeType===3
               "type": "heading",
               "data": {
                 "level": 2,
-                "title": "Share Module API",
-                "slug": "share-module-api"
+                "title": "Sharing objects from my store",
+                "slug": "sharing-objects-from-my-store"
+              },
+              "depth": 2
+            }, {
+              "type": "heading",
+              "data": {
+                "level": 2,
+                "title": "random thoughts",
+                "slug": "random-thoughts"
               },
               "depth": 2
             }
@@ -854,6 +870,14 @@ f.event={add:function(a,c,d,e,g){var h,i,j,k,l,m,n,o,p,q,r,s;if(!(a.nodeType===3
           "type": "heading",
           "data": {
             "level": 2,
+            "title": "Share Module API",
+            "slug": "share-module-api"
+          },
+          "depth": 2
+        }, {
+          "type": "heading",
+          "data": {
+            "level": 2,
             "title": "Share Instance API",
             "slug": "share-instance-api"
           },
@@ -862,8 +886,16 @@ f.event={add:function(a,c,d,e,g){var h,i,j,k,l,m,n,o,p,q,r,s;if(!(a.nodeType===3
           "type": "heading",
           "data": {
             "level": 2,
-            "title": "Share Module API",
-            "slug": "share-module-api"
+            "title": "Sharing objects from my store",
+            "slug": "sharing-objects-from-my-store"
+          },
+          "depth": 2
+        }, {
+          "type": "heading",
+          "data": {
+            "level": 2,
+            "title": "random thoughts",
+            "slug": "random-thoughts"
           },
           "depth": 2
         }
