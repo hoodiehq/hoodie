@@ -19,6 +19,7 @@ hoodie.store.destroyAll('task')
 // --------------
 hoodie.store.add('task', {title: 'call ma'})
 hoodie.store.find('task', 'id345')
+hoodie.store.findAll('task')
 hoodie.store.update('task', 'id345', {title: 'visit ma'})
 hoodie.store.updateAll('task', {done: true})
 hoodie.store.remove('task', 'id345')
