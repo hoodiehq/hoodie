@@ -24,10 +24,10 @@ hoodie.share.store.updateAll()
 hoodie.share.store.remove()
 hoodie.share.store.removeAll()
 
-// on top, it allows a direct call:
-hoodie.share('shareId')
+// on top, it allows a direct call:  
 // that opens a share from remote and exposes a store API
 // to directly interact with the store.
+hoodie.share('shareId')
 
 // you can also initiate a new share instance,
 // the id gets auto generated if not passed
