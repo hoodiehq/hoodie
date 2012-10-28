@@ -66,12 +66,12 @@ describe("Hoodie", function() {
     });
   });
   describe("#open(store, options)", function() {
-    return it("should instantiate a RemoteStore instance", function() {
-      spyOn(Hoodie, "RemoteStore");
+    return it("should instantiate a Remote instance", function() {
+      spyOn(Hoodie, "Remote");
       this.hoodie.open("store_name", {
         option: "value"
       });
-      return expect(Hoodie.RemoteStore).wasCalledWith(this.hoodie, {
+      return expect(Hoodie.Remote).wasCalledWith(this.hoodie, {
         name: "store_name",
         option: "value"
       });

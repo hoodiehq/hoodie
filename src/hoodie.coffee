@@ -63,7 +63,7 @@ class Hoodie extends Events
   #
   open : (store_name, options = {}) ->
     $.extend options, name: store_name
-    new Hoodie.RemoteStore this, options
+    new Hoodie.Remote this, options
 
 
   # ## Defer

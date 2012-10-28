@@ -53,10 +53,10 @@ describe "Hoodie", ->
   # /request(type, path, options)
 
   describe "#open(store, options)", ->
-    it "should instantiate a RemoteStore instance", ->
-      spyOn(Hoodie, "RemoteStore")
+    it "should instantiate a Remote instance", ->
+      spyOn(Hoodie, "Remote")
       @hoodie.open "store_name", option: "value"
-      expect(Hoodie.RemoteStore).wasCalledWith @hoodie, name: "store_name", option: "value"
+      expect(Hoodie.Remote).wasCalledWith @hoodie, name: "store_name", option: "value"
   # /open(store, options)
 
   describe "#isPromise(object)", ->

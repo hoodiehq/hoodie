@@ -56,7 +56,7 @@ Hoodie = (function(_super) {
     $.extend(options, {
       name: store_name
     });
-    return new Hoodie.RemoteStore(this, options);
+    return new Hoodie.Remote(this, options);
   };
 
   Hoodie.prototype.defer = $.Deferred;
