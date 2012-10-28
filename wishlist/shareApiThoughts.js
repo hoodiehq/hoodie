@@ -2,7 +2,7 @@
 // ==================
 // 
 // a share is like a store, give I'm permitted to access / modify the share
-// I can insert / find / update / remove objects
+// I can add / find / update / remove objects
 
 // Share Instance API
 // --------------------
@@ -17,8 +17,8 @@ share = hoodie.share('shareId')
 // a share provides a store for its objects
 share.store.find()
 share.store.findAll()
-share.store.findOrInsert()
-share.store.insert()
+share.store.findOrAdd()
+share.store.add()
 share.store.update()
 share.store.updateAll()
 share.store.remove()
@@ -49,8 +49,8 @@ share.revokeAccess("lisa@example.com")
 // hoodie.share Module API:
 hoodie.share.store.find()
 hoodie.share.store.findAll()
-hoodie.share.store.findOrInsert()
-hoodie.share.store.insert()
+hoodie.share.store.findOrAdd()
+hoodie.share.store.add()
 hoodie.share.store.update()
 hoodie.share.store.updateAll()
 hoodie.share.store.remove()
