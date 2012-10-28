@@ -28,7 +28,7 @@ Mocks.Hoodie = function() {
       create: function() {
         return promiseMock;
       },
-      destroy: function() {
+      remove: function() {
         return promiseMock;
       },
       save: function() {
@@ -49,10 +49,7 @@ Mocks.Hoodie = function() {
       findOrCreate: function() {
         return promiseMock;
       },
-      "delete": function() {
-        return promiseMock;
-      },
-      destroyAll: function() {
+      removeAll: function() {
         return promiseMock;
       },
       changedDocs: function() {},

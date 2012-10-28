@@ -12,8 +12,8 @@
 # * save(type, id, object)
 # * update(new_properties )
 # * updateAll( type, new_properties)
-# * destroy(type, id)
-# * destroyAll(type)
+# * remove(type, id)
+# * removeAll(type)
 #
 #
 # Event binding
@@ -92,19 +92,19 @@ class Hoodie.RemoteStore extends Hoodie.Store
     @remote.request "PUT", path, data: doc
 
   
-  # destroy
+  # remove
   # ---------
   
-  # destroy one object
-  destroy : (type, id) ->
+  # remove one object
+  remove : (type, id) ->
     @update type, id, _deleted: true
 
   
-  # destroyAll
+  # removeAll
   # ------------
   
-  # destroy all objects, can be filtered by type
-  destroyAll : (type) ->
+  # remove all objects, can be filtered by type
+  removeAll : (type) ->
     @updateAll type, _deleted: true
 
 

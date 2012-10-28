@@ -51,7 +51,7 @@ class Hoodie.Config
   # clears cache and removes object from store
   clear : =>
     @cache = {}
-    @hoodie.store.destroy @$type, @id
+    @hoodie.store.remove @$type, @id
   
   
   # ## remove

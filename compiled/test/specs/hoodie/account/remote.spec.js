@@ -11,7 +11,7 @@ describe("Hoodie.AccountRemote", function() {
     spyOn(window, "setTimeout");
     spyOn(this.hoodie.account, "db").andReturn('userhash123');
     spyOn(this.hoodie, "trigger");
-    spyOn(this.hoodie.store, "destroy").andReturn({
+    spyOn(this.hoodie.store, "remove").andReturn({
       then: function(cb) {
         return cb('objectFromStore');
       }
@@ -211,7 +211,7 @@ describe("Hoodie.AccountRemote", function() {
       });
       it("should remove `todo/abc3` from store", function() {
         this.remote.pull();
-        return expect(this.hoodie.store.destroy).wasCalledWith('todo', 'abc3', {
+        return expect(this.hoodie.store.remove).wasCalledWith('todo', 'abc3', {
           remote: true
         });
       });
@@ -231,12 +231,12 @@ describe("Hoodie.AccountRemote", function() {
       it("should trigger remote events", function() {
         spyOn(this.remote, "trigger");
         this.remote.pull();
-        expect(this.remote.trigger).wasCalledWith('destroy', 'objectFromStore');
-        expect(this.remote.trigger).wasCalledWith('destroy:todo', 'objectFromStore');
-        expect(this.remote.trigger).wasCalledWith('destroy:todo:abc3', 'objectFromStore');
-        expect(this.remote.trigger).wasCalledWith('change', 'destroy', 'objectFromStore');
-        expect(this.remote.trigger).wasCalledWith('change:todo', 'destroy', 'objectFromStore');
-        expect(this.remote.trigger).wasCalledWith('change:todo:abc3', 'destroy', 'objectFromStore');
+        expect(this.remote.trigger).wasCalledWith('remove', 'objectFromStore');
+        expect(this.remote.trigger).wasCalledWith('remove:todo', 'objectFromStore');
+        expect(this.remote.trigger).wasCalledWith('remove:todo:abc3', 'objectFromStore');
+        expect(this.remote.trigger).wasCalledWith('change', 'remove', 'objectFromStore');
+        expect(this.remote.trigger).wasCalledWith('change:todo', 'remove', 'objectFromStore');
+        expect(this.remote.trigger).wasCalledWith('change:todo:abc3', 'remove', 'objectFromStore');
         expect(this.remote.trigger).wasCalledWith('update', 'objectFromStore');
         expect(this.remote.trigger).wasCalledWith('update:todo', 'objectFromStore');
         expect(this.remote.trigger).wasCalledWith('update:todo:abc2', 'objectFromStore');

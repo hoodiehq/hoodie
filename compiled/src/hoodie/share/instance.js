@@ -121,7 +121,7 @@ Hoodie.ShareInstance = (function(_super) {
   ShareInstance.prototype.destroy = function() {
     var _this = this;
     return this.remove(this.findAllObjects()).then(function() {
-      return _this.hoodie.store.destroy("$share", _this.id);
+      return _this.hoodie.store.remove("$share", _this.id);
     });
   };
 
@@ -184,4 +184,4 @@ Hoodie.ShareInstance = (function(_super) {
 
   return ShareInstance;
 
-})(Hoodie.RemoteStore);
+})(Hoodie.Remote);

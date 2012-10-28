@@ -403,70 +403,69 @@ describe "Hoodie.LocalStore", ->
   # /.findAll(type)
 
 
-  describe "#destroy(type, id)", ->
+  describe "#remove(type, id)", ->
     _when "objecet cannot be found", ->
       beforeEach ->
         spyOn(@store, "cache").andReturn false
         
       it "should return a rejected the promise", ->
-        promise = @store.destroy 'document', '123'
+        promise = @store.remove 'document', '123'
         expect(promise).toBeRejected()
         
     _when "object can be found and has not been synched before", ->
       beforeEach ->
-        spyOn(@store, "cache").andReturn {}
+        spyOn(@store, "cache").andReturn {funky: 'fresh'}
         
       it "should remove the object", ->
-        @store.destroy 'document', '123'
+        @store.remove 'document', '123'
         expect(@store.db.removeItem).wasCalledWith 'document/123'
         
       it "should set the _cached object to false", ->
         delete @store._cached['document/123']
-        @store.destroy 'document', '123'
+        @store.remove 'document', '123'
         expect(@store._cached['document/123']).toBe false
         
       it "should clear document from changed", ->
         spyOn(@store, "clearChanged")
-        @store.destroy 'document', '123'
+        @store.remove 'document', '123'
         expect(@store.clearChanged).wasCalledWith 'document', '123'
       
       it "should return a resolved promise", ->
-        promise = @store.destroy 'document', '123'
+        promise = @store.remove 'document', '123'
         expect(promise).toBeResolved()
       
       it "should return a clone of the cached object (before it was deleted)", ->
-        spyOn($, "extend")
-        promise = @store.destroy 'document', '123', remote: true
-        expect($.extend).wasCalled()
+        promise = @store.remove 'document', '123', remote: true
+        expect(promise).toBeResolvedWith funky: 'fresh'
     
-    _when "object can be found and destroy comes from remote", ->
+    _when "object can be found and remove comes from remote", ->
       beforeEach ->
         spyOn(@store, "cache").andReturn { id: '123', $type: 'document', name: 'test'}
         spyOn(@store, "trigger")
-        @store.destroy 'document', '123', remote: true
+        @store.remove 'document', '123', remote: true
       
       it "should remove the object", ->
         expect(@store.db.removeItem).wasCalledWith 'document/123'
 
       it "should trigger trigger events", ->
-        expect(@store.trigger).wasCalledWith 'destroy',                         { id: '123', $type: 'document', name: 'test'}, { remote: true }
-        expect(@store.trigger).wasCalledWith 'destroy:document',                { id: '123', $type: 'document', name: 'test'}, { remote: true }
-        expect(@store.trigger).wasCalledWith 'destroy:document:123',            { id: '123', $type: 'document', name: 'test'}, { remote: true }
-        expect(@store.trigger).wasCalledWith 'change',               'destroy', { id: '123', $type: 'document', name: 'test'}, { remote: true }
-        expect(@store.trigger).wasCalledWith 'change:document',      'destroy', { id: '123', $type: 'document', name: 'test'}, { remote: true } 
-        expect(@store.trigger).wasCalledWith 'change:document:123',  'destroy', { id: '123', $type: 'document', name: 'test'}, { remote: true } 
+        expect(@store.trigger).wasCalledWith 'remove',                         { id: '123', $type: 'document', name: 'test'}, { remote: true }
+        expect(@store.trigger).wasCalledWith 'remove:document',                { id: '123', $type: 'document', name: 'test'}, { remote: true }
+        expect(@store.trigger).wasCalledWith 'remove:document:123',            { id: '123', $type: 'document', name: 'test'}, { remote: true }
+        expect(@store.trigger).wasCalledWith 'change',               'remove', { id: '123', $type: 'document', name: 'test'}, { remote: true }
+        expect(@store.trigger).wasCalledWith 'change:document',      'remove', { id: '123', $type: 'document', name: 'test'}, { remote: true } 
+        expect(@store.trigger).wasCalledWith 'change:document:123',  'remove', { id: '123', $type: 'document', name: 'test'}, { remote: true } 
         
     _when "object can be found and was synched before", ->
       beforeEach ->
         spyOn(@store, "cache").andReturn {_$syncedAt: 'now'}
-        @store.destroy 'document', '123'
+        @store.remove 'document', '123'
         
       it "should mark the object as deleted and cache it", ->
         expect(@store.cache).wasCalledWith 'document', '123', {_$syncedAt: 'now', _deleted: true}
         
       it "should not remove the object from store", ->
         expect(@store.db.removeItem).wasNotCalled()
-  # /.destroy(type, id)
+  # /.remove(type, id)
 
 
   describe "#cache(type, id, object)", ->

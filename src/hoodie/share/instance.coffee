@@ -1,4 +1,4 @@
-class Hoodie.ShareInstance extends Hoodie.RemoteStore
+class Hoodie.ShareInstance extends Hoodie.Remote
   
   # default values
   # ----------------
@@ -173,11 +173,11 @@ class Hoodie.ShareInstance extends Hoodie.RemoteStore
   # destroy
   # ---------
 
-  # remove all objects from share, then destroy share itself
+  # remove all objects from share, then remove share itself
   destroy : =>
     @remove( @findAllObjects() )
     .then =>
-      @hoodie.store.destroy("$share", @id)
+      @hoodie.store.remove("$share", @id)
     
   
   # findAllObjects

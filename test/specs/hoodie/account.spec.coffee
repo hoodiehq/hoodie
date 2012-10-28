@@ -166,7 +166,7 @@ describe "Hoodie.Account", ->
           expect(@promise).toBeRejectedWith error: 'error data'
   # /.authenticate()
 
-###
+
   describe "#signUp(username, password)", ->
     beforeEach ->
       @account.ownerHash = "owner_hash123"
@@ -768,7 +768,7 @@ describe "Hoodie.Account", ->
           expect(promise).toBeResolvedWith @response
   # /.fetch()
   
-  describe "#destroy()", ->
+  describe "#remove()", ->
     beforeEach ->
       spyOn(@hoodie.remote, "disconnect")
       spyOn(@hoodie.config, "clear")
@@ -779,15 +779,15 @@ describe "Hoodie.Account", ->
       @account._doc = _rev : '1-234'
     
     it "should disconnect", ->
-      @account.destroy()
+      @account.remove()
       expect(@hoodie.remote.disconnect).wasCalled()
     
     it "should fetch the account", ->
-      @account.destroy()
+      @account.remove()
       expect(@account.fetch).wasCalled()
     
     it "should send a PUT request to /_users/org.couchdb.user%3Auser%2Fjoe%40example.com", ->
-      @account.destroy()
+      @account.remove()
       expect(@hoodie.request).wasCalledWith 'PUT', '/_users/org.couchdb.user%3Auser%2Fjoe%40example.com'
         data : JSON.stringify
           _rev     : '1-234'
@@ -798,10 +798,10 @@ describe "Hoodie.Account", ->
       beforeEach ->
         spyOn(@account, "hasAccount").andReturn true
 
-      _and "destroy request succesful", ->
+      _and "remove request succesful", ->
         beforeEach ->
           @hoodie.request.andReturn @hoodie.defer().resolve().promise()
-          @account.destroy()
+          @account.remove()
 
         it "should unset @username", ->
           expect(@account.username).toBeUndefined() 
@@ -821,7 +821,7 @@ describe "Hoodie.Account", ->
     _when "user has no account", ->
       beforeEach ->
         spyOn(@account, "hasAccount").andReturn false
-        @account.destroy()
+        @account.remove()
 
       it "should not try to fetch", ->
         expect(@account.fetch).wasNotCalled() 
@@ -840,7 +840,7 @@ describe "Hoodie.Account", ->
 
       it "should set config._account.ownerHash to new @ownerHash", ->
         expect(@hoodie.config.set).wasCalledWith '_account.ownerHash', 'newHash'
-  # /destroy()
+  # /remove()
 
   describe "#resetPassword(username)", ->
     beforeEach ->
@@ -1013,4 +1013,3 @@ describe "Hoodie.Account", ->
         expect(promise).toBeRejectedWith error: 'autherror'
   # /.changeUsername(currentPassword, newUsername)
 # /Hoodie.Account
-###

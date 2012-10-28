@@ -149,32 +149,32 @@ describe("Hoodie.RemoteStore", function() {
       });
     });
   });
-  describe("#destroy(type, id)", function() {
+  describe("#remove(type, id)", function() {
     beforeEach(function() {
       return spyOn(this.remoteStore, "update").andReturn("update_promise");
     });
     it("should proxy to update with _deleted: true", function() {
-      this.remoteStore.destroy('car', 123);
+      this.remoteStore.remove('car', 123);
       return expect(this.remoteStore.update).wasCalledWith('car', 123, {
         _deleted: true
       });
     });
     return it("should return promise of update", function() {
-      return expect(this.remoteStore.destroy('car', 123)).toBe('update_promise');
+      return expect(this.remoteStore.remove('car', 123)).toBe('update_promise');
     });
   });
-  describe("#destroyAll(type)", function() {
+  describe("#removeAll(type)", function() {
     beforeEach(function() {
       return spyOn(this.remoteStore, "updateAll").andReturn("updateAll_promise");
     });
     it("should proxy to updateAll with _deleted: true", function() {
-      this.remoteStore.destroyAll('car');
+      this.remoteStore.removeAll('car');
       return expect(this.remoteStore.updateAll).wasCalledWith('car', {
         _deleted: true
       });
     });
     return it("should return promise of updateAll", function() {
-      return expect(this.remoteStore.destroyAll('car')).toBe('updateAll_promise');
+      return expect(this.remoteStore.removeAll('car')).toBe('updateAll_promise');
     });
   });
   describe("#on(event, callback)", function() {

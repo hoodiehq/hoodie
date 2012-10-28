@@ -224,7 +224,7 @@ Hoodie.Account = (function() {
     return this._changeUsernameAndPassword(currentPassword, newUsername);
   };
 
-  Account.prototype.destroy = function() {
+  Account.prototype.remove = function() {
     if (!this.hasAccount()) {
       this._cleanup();
       return;

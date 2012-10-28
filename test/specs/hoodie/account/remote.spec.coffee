@@ -10,7 +10,7 @@ describe "Hoodie.AccountRemote", ->
     spyOn(@hoodie.account, "db").andReturn 'userhash123'
     
     spyOn(@hoodie, "trigger")
-    spyOn(@hoodie.store, "destroy").andReturn then: (cb) -> cb('objectFromStore')
+    spyOn(@hoodie.store, "remove").andReturn then: (cb) -> cb('objectFromStore')
     spyOn(@hoodie.store, "update").andReturn  then: (cb) -> cb('objectFromStore', false)
     spyOn(@hoodie.store, "save").andReturn    then: (cb) -> cb('objectFromStore', false)
 
@@ -186,7 +186,7 @@ describe "Hoodie.AccountRemote", ->
       
       it "should remove `todo/abc3` from store", ->
         @remote.pull()
-        expect(@hoodie.store.destroy).wasCalledWith 'todo', 'abc3', remote: true
+        expect(@hoodie.store.remove).wasCalledWith 'todo', 'abc3', remote: true
 
       it "should save `todo/abc2` in store", ->
         @remote.pull()
@@ -197,13 +197,13 @@ describe "Hoodie.AccountRemote", ->
         @remote.pull()
 
         # {"_id":"todo/abc3","_rev":"2-123","_deleted":true}
-        expect(@remote.trigger).wasCalledWith 'destroy',           'objectFromStore'
-        expect(@remote.trigger).wasCalledWith 'destroy:todo',      'objectFromStore'
-        expect(@remote.trigger).wasCalledWith 'destroy:todo:abc3', 'objectFromStore'
+        expect(@remote.trigger).wasCalledWith 'remove',           'objectFromStore'
+        expect(@remote.trigger).wasCalledWith 'remove:todo',      'objectFromStore'
+        expect(@remote.trigger).wasCalledWith 'remove:todo:abc3', 'objectFromStore'
 
-        expect(@remote.trigger).wasCalledWith 'change',            'destroy', 'objectFromStore'
-        expect(@remote.trigger).wasCalledWith 'change:todo',       'destroy', 'objectFromStore'
-        expect(@remote.trigger).wasCalledWith 'change:todo:abc3',  'destroy', 'objectFromStore'        
+        expect(@remote.trigger).wasCalledWith 'change',            'remove', 'objectFromStore'
+        expect(@remote.trigger).wasCalledWith 'change:todo',       'remove', 'objectFromStore'
+        expect(@remote.trigger).wasCalledWith 'change:todo:abc3',  'remove', 'objectFromStore'        
         
         # {"_id":"todo/abc2","_rev":"1-123","content":"remember the milk","done":false,"order":1, "type":"todo"}
         expect(@remote.trigger).wasCalledWith 'update',            'objectFromStore'

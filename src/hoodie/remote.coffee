@@ -14,8 +14,8 @@
 # * store.save(type, id, object)
 # * store.update(new_properties )
 # * store.updateAll( type, new_properties)
-# * store.destroy(type, id)
-# * store.destroyAll(type)
+# * store.remove(type, id)
+# * store.removeAll(type)
 #
 # custom requests
 #
@@ -345,7 +345,7 @@ class Hoodie.Remote
     for {doc} in changes
       parsedDoc = @store.parseFromRemote(doc)
       if parsedDoc._deleted
-        event = 'destroy'
+        event = 'remove'
         delete @_knownObjects[doc._id]
       else
         if @_knownObjects[doc._id]

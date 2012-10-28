@@ -10,10 +10,10 @@ jasmine.Matchers.prototype.toBeDefer = ->
 
 
   
-jasmine.Matchers.prototype.toBeRejected = -> this.actual.isRejected()
-jasmine.Matchers.prototype.toBeResolved = -> this.actual.isResolved()
-jasmine.Matchers.prototype.notToBeRejected = -> not this.actual.isRejected()
-jasmine.Matchers.prototype.notToBeResolved = -> not this.actual.isResolved()
+jasmine.Matchers.prototype.toBeRejected    = -> this.actual.state() is 'rejected'
+jasmine.Matchers.prototype.toBeResolved    = -> this.actual.state() is 'resolved'
+jasmine.Matchers.prototype.notToBeRejected = -> this.actual.state() isnt 'rejected'
+jasmine.Matchers.prototype.notToBeResolved = -> this.actual.state() isnt 'resolved'
 
 jasmine.Matchers.prototype.toBeResolvedWith = -> 
   expectedArgs = jasmine.util.argsToArray(arguments);

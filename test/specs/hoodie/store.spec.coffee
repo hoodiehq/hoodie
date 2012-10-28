@@ -255,34 +255,34 @@ describe "Hoodie.Store", ->
         expect(promise).toBeResolvedWith 'new_object'
   # /#findOrCreate(attributes)
 
-  describe "#destroy(type, id)", ->
+  describe "#remove(type, id)", ->
     it "should return a defer", ->
-      defer = @store.destroy 'document', '123'
+      defer = @store.remove 'document', '123'
       expect(defer).toBeDefer()
 
     describe "invalid arguments", ->
       _when "no arguments passed", ->          
         it "should be rejected", ->
-          promise = @store.destroy()
+          promise = @store.remove()
           expect(promise).toBeRejected()
 
       _when "no id passed", ->
         it "should be rejected", ->
-          promise = @store.destroy 'document'
+          promise = @store.remove 'document'
           expect(promise).toBeRejected()
     # /aliases
-  # /#destroy(type, id)
+  # /#remove(type, id)
 
-  describe "#destroyAll(type)", ->
+  describe "#removeAll(type)", ->
     beforeEach ->
       @findAllDefer = @hoodie.defer()
       spyOn(@store, "findAll").andReturn @findAllDefer.promise()
     
     it "should return a promise", ->
-      expect(@store.destroyAll()).toBePromise()
+      expect(@store.removeAll()).toBePromise()
   
     it "should call store.findAll", ->
-      @store.destroyAll('filter')
+      @store.removeAll('filter')
       expect(@store.findAll).wasCalledWith 'filter'
 
     _when "store.findAll fails", ->
@@ -290,28 +290,28 @@ describe "Hoodie.Store", ->
         @findAllDefer.reject error: 'because'
       
       it "should return a rejected promise", ->
-        promise = @store.destroyAll()
+        promise = @store.removeAll()
         expect(promise).toBeRejectedWith error: 'because'
 
     _when "store.findAll returns 3 objects", ->
       beforeEach ->
-        spyOn(@store, "destroy")
+        spyOn(@store, "remove")
         @object1 = { $type: 'task', id: '1', title: 'some'} 
         @object2 = { $type: 'task', id: '2', title: 'thing'}
         @object3 = { $type: 'task', id: '3', title: 'funny'}
         @findAllDefer.resolve [@object1, @object2, @object3]
 
-      it "should call destroy for each object", ->
-        @store.destroyAll()
-        expect(@store.destroy).wasCalledWith 'task', '1', {}
-        expect(@store.destroy).wasCalledWith 'task', '2', {}
-        expect(@store.destroy).wasCalledWith 'task', '3', {}
+      it "should call remove for each object", ->
+        @store.removeAll()
+        expect(@store.remove).wasCalledWith 'task', '1', {}
+        expect(@store.remove).wasCalledWith 'task', '2', {}
+        expect(@store.remove).wasCalledWith 'task', '3', {}
 
       it "should pass options", ->
-        @store.destroyAll(null, something: 'optional')
-        expect(@store.destroy).wasCalledWith 'task', '1', something: 'optional'
-        expect(@store.destroy).wasCalledWith 'task', '2', something: 'optional'
-        expect(@store.destroy).wasCalledWith 'task', '3', something: 'optional'
-  # /#destroyAll(type)
+        @store.removeAll(null, something: 'optional')
+        expect(@store.remove).wasCalledWith 'task', '1', something: 'optional'
+        expect(@store.remove).wasCalledWith 'task', '2', something: 'optional'
+        expect(@store.remove).wasCalledWith 'task', '3', something: 'optional'
+  # /#removeAll(type)
 # /Hoodie.Store
 ###

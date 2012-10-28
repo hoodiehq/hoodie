@@ -320,12 +320,12 @@ describe("Hoodie.Remote", function() {
           _rev: '2-123',
           _deleted: true
         };
-        expect(this.remote.trigger).wasCalledWith('destroy', object);
-        expect(this.remote.trigger).wasCalledWith('destroy:todo', object);
-        expect(this.remote.trigger).wasCalledWith('destroy:todo:abc3', object);
-        expect(this.remote.trigger).wasCalledWith('change', 'destroy', object);
-        expect(this.remote.trigger).wasCalledWith('change:todo', 'destroy', object);
-        expect(this.remote.trigger).wasCalledWith('change:todo:abc3', 'destroy', object);
+        expect(this.remote.trigger).wasCalledWith('remove', object);
+        expect(this.remote.trigger).wasCalledWith('remove:todo', object);
+        expect(this.remote.trigger).wasCalledWith('remove:todo:abc3', object);
+        expect(this.remote.trigger).wasCalledWith('change', 'remove', object);
+        expect(this.remote.trigger).wasCalledWith('change:todo', 'remove', object);
+        expect(this.remote.trigger).wasCalledWith('change:todo:abc3', 'remove', object);
         object = {
           '$type': 'todo',
           id: 'abc2',

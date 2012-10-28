@@ -278,13 +278,13 @@ describe "Hoodie.Remote", ->
           id       : 'abc3'
           _rev     : '2-123'
           _deleted : true
-        expect(@remote.trigger).wasCalledWith 'destroy',           object
-        expect(@remote.trigger).wasCalledWith 'destroy:todo',      object
-        expect(@remote.trigger).wasCalledWith 'destroy:todo:abc3', object
+        expect(@remote.trigger).wasCalledWith 'remove',           object
+        expect(@remote.trigger).wasCalledWith 'remove:todo',      object
+        expect(@remote.trigger).wasCalledWith 'remove:todo:abc3', object
 
-        expect(@remote.trigger).wasCalledWith 'change',            'destroy', object
-        expect(@remote.trigger).wasCalledWith 'change:todo',       'destroy', object
-        expect(@remote.trigger).wasCalledWith 'change:todo:abc3',  'destroy', object        
+        expect(@remote.trigger).wasCalledWith 'change',            'remove', object
+        expect(@remote.trigger).wasCalledWith 'change:todo',       'remove', object
+        expect(@remote.trigger).wasCalledWith 'change:todo:abc3',  'remove', object        
         
         # {"_id":"todo/abc2","_rev":"1-123","content":"remember the milk","done":false,"order":1, "type":"todo"}
         object =

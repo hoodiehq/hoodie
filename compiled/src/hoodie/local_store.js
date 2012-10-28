@@ -168,12 +168,12 @@ Hoodie.LocalStore = (function(_super) {
     return defer.promise();
   };
 
-  LocalStore.prototype.destroy = function(type, id, options) {
+  LocalStore.prototype.remove = function(type, id, options) {
     var defer, key, object;
     if (options == null) {
       options = {};
     }
-    defer = LocalStore.__super__.destroy.apply(this, arguments);
+    defer = LocalStore.__super__.remove.apply(this, arguments);
     if (this.hoodie.isPromise(defer)) {
       return defer;
     }
@@ -190,7 +190,7 @@ Hoodie.LocalStore = (function(_super) {
       this._cached[key] = false;
       this.clearChanged(type, id);
     }
-    this._triggerEvents("destroy", object, options);
+    this._triggerEvents("remove", object, options);
     return defer.resolve($.extend({}, object)).promise();
   };
 

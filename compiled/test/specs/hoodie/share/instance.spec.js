@@ -245,14 +245,14 @@ describe("Hoodie.ShareInstance", function() {
     beforeEach(function() {
       spyOn(this.share, "remove").andReturn(this.hoodie.defer().resolve().promise());
       spyOn(this.share, "findAllObjects").andReturn(['object1', 'object2']);
-      spyOn(this.hoodie.store, "destroy");
+      spyOn(this.hoodie.store, "remove");
       return this.share.destroy();
     });
     it("should remove all objects from share", function() {
       return expect(this.share.remove).wasCalledWith(['object1', 'object2']);
     });
     return it("should remove $share object from store", function() {
-      return expect(this.hoodie.store.destroy).wasCalledWith('$share', 'share1');
+      return expect(this.hoodie.store.remove).wasCalledWith('$share', 'share1');
     });
   });
   return describe("#findAllObjects()", function() {

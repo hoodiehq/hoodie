@@ -129,16 +129,16 @@ Hoodie.AccountRemote = (function(_super) {
   };
 
   AccountRemote.prototype._handlePullResults = function(changes) {
-    var doc, promise, _changedDocs, _destroyedDocs, _i, _j, _k, _len, _len1, _len2, _ref, _ref1, _results,
+    var doc, promise, _changedDocs, _i, _j, _k, _len, _len1, _len2, _ref, _ref1, _removeedDocs, _results,
       _this = this;
-    _destroyedDocs = [];
+    _removeedDocs = [];
     _changedDocs = [];
     for (_i = 0, _len = changes.length; _i < _len; _i++) {
       doc = changes[_i].doc;
       doc = this.store.parseFromRemote(doc);
       if (doc._deleted) {
-        _destroyedDocs.push([
-          doc, this.hoodie.store.destroy(doc.$type, doc.id, {
+        _removeedDocs.push([
+          doc, this.hoodie.store.remove(doc.$type, doc.id, {
             remote: true
           })
         ]);
@@ -150,15 +150,15 @@ Hoodie.AccountRemote = (function(_super) {
         ]);
       }
     }
-    for (_j = 0, _len1 = _destroyedDocs.length; _j < _len1; _j++) {
-      _ref = _destroyedDocs[_j], doc = _ref[0], promise = _ref[1];
+    for (_j = 0, _len1 = _removeedDocs.length; _j < _len1; _j++) {
+      _ref = _removeedDocs[_j], doc = _ref[0], promise = _ref[1];
       promise.then(function(object) {
-        _this.trigger('destroy', object);
-        _this.trigger("destroy:" + doc.$type, object);
-        _this.trigger("destroy:" + doc.$type + ":" + doc.id, object);
-        _this.trigger('change', 'destroy', object);
-        _this.trigger("change:" + doc.$type, 'destroy', object);
-        return _this.trigger("change:" + doc.$type + ":" + doc.id, 'destroy', object);
+        _this.trigger('remove', object);
+        _this.trigger("remove:" + doc.$type, object);
+        _this.trigger("remove:" + doc.$type + ":" + doc.id, object);
+        _this.trigger('change', 'remove', object);
+        _this.trigger("change:" + doc.$type, 'remove', object);
+        return _this.trigger("change:" + doc.$type + ":" + doc.id, 'remove', object);
       });
     }
     _results = [];

@@ -151,39 +151,39 @@ describe "Hoodie.Share", ->
   # /#findAll()
 
 
-  describe "#destroy(share_id)", ->
+  describe "#remove(share_id)", ->
     beforeEach ->
       promise = @hoodie.defer().resolve(funky: 'fresh').promise()
       spyOn(@hoodie.store, "find").andReturn promise
 
       class @share.instance
-        destroy: -> 'delete_promise'
+        remove: -> 'delete_promise'
     
     it "should try to find the object with store.find('$share', share_id)", ->
-      promise = @share.destroy '123'
+      promise = @share.remove '123'
       expect(@hoodie.store.find).wasCalledWith '$share', '123'
 
-    it "should init the share instance and destroy it", ->
+    it "should init the share instance and remove it", ->
       @hoodie.store.find.andReturn @hoodie.defer().resolve({}).promise()
-      promise = @share.destroy '123'
+      promise = @share.remove '123'
       expect(promise).toBeResolvedWith 'delete_promise'
-  # /#destroy(share_id)
+  # /#remove(share_id)
 
 
-  describe "#destroyAll()", ->
+  describe "#removeAll()", ->
     beforeEach ->
       promise = @hoodie.defer().resolve([{funky: 'fresh'}, {funky: 'fresh'}]).promise()
       spyOn(@hoodie.store, "findAll").andReturn promise
 
       class @share.instance
-        destroy: -> 'destroyAll_promise'
+        remove: -> 'removeAll_promise'
     
     it "should try to find the object with store.findAll('$share')", ->
-      promise = @share.destroyAll()
+      promise = @share.removeAll()
       expect(@hoodie.store.findAll).wasCalled()
 
-    it "should init the share instance and destroy it", ->
+    it "should init the share instance and remove it", ->
       @hoodie.store.findAll.andReturn @hoodie.defer().resolve([{}, {}]).promise()
-      promise = @share.destroyAll()
-      expect(promise).toBeResolvedWith ['destroyAll_promise', 'destroyAll_promise']
-  # /#destroyAll()
+      promise = @share.removeAll()
+      expect(promise).toBeResolvedWith ['removeAll_promise', 'removeAll_promise']
+  # /#removeAll()

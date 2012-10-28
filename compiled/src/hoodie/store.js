@@ -144,7 +144,7 @@ Hoodie.Store = (function() {
     return this.hoodie.defer();
   };
 
-  Store.prototype.destroy = function(type, id, options) {
+  Store.prototype.remove = function(type, id, options) {
     var defer;
     if (options == null) {
       options = {};
@@ -156,7 +156,7 @@ Hoodie.Store = (function() {
     return defer;
   };
 
-  Store.prototype.destroyAll = function(type, options) {
+  Store.prototype.removeAll = function(type, options) {
     var _this = this;
     if (options == null) {
       options = {};
@@ -166,7 +166,7 @@ Hoodie.Store = (function() {
       _results = [];
       for (_i = 0, _len = objects.length; _i < _len; _i++) {
         object = objects[_i];
-        _results.push(_this.destroy(object.$type, object.id, options));
+        _results.push(_this.remove(object.$type, object.id, options));
       }
       return _results;
     });

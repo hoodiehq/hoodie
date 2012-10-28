@@ -149,7 +149,7 @@ class Hoodie.Account
   # sign out 
   # ---------
 
-  # uses standard CouchDB API to destroy a user session (DELETE /_session)
+  # uses standard CouchDB API to remove a user session (DELETE /_session)
   signOut : ->
 
     unless @hasAccount()
@@ -223,7 +223,7 @@ class Hoodie.Account
   # functionality is the _users database.
   # 
   # So we actualy sign up a new couchDB user with some special attributes.
-  # It will be picked up by the password reset worker and destroyed
+  # It will be picked up by the password reset worker and removeed
   # once the password was resetted.
   resetPassword : (username) ->
     if resetPasswordId = @hoodie.config.get '_account.resetPasswordId'
@@ -265,11 +265,11 @@ class Hoodie.Account
     @_changeUsernameAndPassword(currentPassword, newUsername)
 
 
-  # destroy
+  # remove
   # ---------
 
-  # destroys a user's account  
-  destroy : ->
+  # removes a user's account  
+  remove : ->
 
     unless @hasAccount()
       @_cleanup()
@@ -550,7 +550,7 @@ class Hoodie.Account
   # 
   # If a new username has been passed, we set the special attribut $newUsername.
   # This will let the username change worker create create a new _users doc for 
-  # the new username and destroy the current one
+  # the new username and remove the current one
   # 
   # If a new password has been passed, salt and password_sha get removed
   # from _users doc and add the password in clear text. CouchDB will replace it with

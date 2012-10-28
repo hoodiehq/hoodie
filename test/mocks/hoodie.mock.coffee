@@ -22,15 +22,14 @@ Mocks.Hoodie = ->
     
   store         :
     create        : -> promiseMock 
-    destroy       : -> promiseMock 
+    remove        : -> promiseMock 
     save          : -> promiseMock 
     update        : -> promiseMock 
     updateAll     : -> promiseMock 
     find          : -> promiseMock 
     findAll       : -> promiseMock
     findOrCreate  : -> promiseMock 
-    delete        : -> promiseMock 
-    destroyAll    : -> promiseMock 
+    removeAll     : -> promiseMock 
     changedDocs   : ->
     isDirty       : ->
       

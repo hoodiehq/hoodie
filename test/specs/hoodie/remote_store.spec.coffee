@@ -136,30 +136,30 @@ describe "Hoodie.RemoteStore", ->
   # /#save(type, id, object)
 
 
-  describe "#destroy(type, id)", ->
+  describe "#remove(type, id)", ->
     beforeEach ->
       spyOn(@remoteStore, "update").andReturn "update_promise"
     
     it "should proxy to update with _deleted: true", ->
-      @remoteStore.destroy 'car', 123
+      @remoteStore.remove 'car', 123
       expect(@remoteStore.update).wasCalledWith 'car', 123, _deleted: true
     
     it "should return promise of update", ->
-       expect(@remoteStore.destroy 'car', 123).toBe 'update_promise'    
-  # /#destroy(type, id)
+       expect(@remoteStore.remove 'car', 123).toBe 'update_promise'    
+  # /#remove(type, id)
 
 
-  describe "#destroyAll(type)", ->
+  describe "#removeAll(type)", ->
     beforeEach ->
       spyOn(@remoteStore, "updateAll").andReturn "updateAll_promise"
     
     it "should proxy to updateAll with _deleted: true", ->
-      @remoteStore.destroyAll 'car'
+      @remoteStore.removeAll 'car'
       expect(@remoteStore.updateAll).wasCalledWith 'car', _deleted: true
     
     it "should return promise of updateAll", ->
-       expect(@remoteStore.destroyAll 'car').toBe 'updateAll_promise'
-  # /#destroyAll(type)
+       expect(@remoteStore.removeAll 'car').toBe 'updateAll_promise'
+  # /#removeAll(type)
 
   
   describe "#on(event, callback)", ->  

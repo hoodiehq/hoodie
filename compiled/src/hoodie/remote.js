@@ -228,7 +228,7 @@ Hoodie.Remote = (function() {
       doc = changes[_i].doc;
       parsedDoc = this.store.parseFromRemote(doc);
       if (parsedDoc._deleted) {
-        event = 'destroy';
+        event = 'remove';
         delete this._knownObjects[doc._id];
       } else {
         if (this._knownObjects[doc._id]) {

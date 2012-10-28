@@ -167,7 +167,7 @@ class Hoodie.Store
   # 
   # when object has been synced before, mark it as deleted. 
   # Otherwise remove it from Store.
-  destroy : (type, id, options = {}) ->
+  remove : (type, id, options = {}) ->
     defer = @hoodie.defer()
   
     unless typeof type is 'string' and typeof id is 'string'
@@ -176,12 +176,12 @@ class Hoodie.Store
     return defer
 
 
-  # ## destroyAll
+  # ## removeAll
 
   # Destroyes all objects. Can be filtered by a type
-  destroyAll : (type, options = {}) -> 
+  removeAll : (type, options = {}) -> 
     @findAll(type).pipe (objects) =>
-      @destroy(object.$type, object.id, options) for object in objects
+      @remove(object.$type, object.id, options) for object in objects
   
 
   # ## Private

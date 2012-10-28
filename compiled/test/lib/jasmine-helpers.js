@@ -22,19 +22,19 @@ jasmine.Matchers.prototype.toBeDefer = function() {
 };
 
 jasmine.Matchers.prototype.toBeRejected = function() {
-  return this.actual.isRejected();
+  return this.actual.state() === 'rejected';
 };
 
 jasmine.Matchers.prototype.toBeResolved = function() {
-  return this.actual.isResolved();
+  return this.actual.state() === 'resolved';
 };
 
 jasmine.Matchers.prototype.notToBeRejected = function() {
-  return !this.actual.isRejected();
+  return this.actual.state() !== 'rejected';
 };
 
 jasmine.Matchers.prototype.notToBeResolved = function() {
-  return !this.actual.isResolved();
+  return this.actual.state() !== 'resolved';
 };
 
 jasmine.Matchers.prototype.toBeResolvedWith = function() {

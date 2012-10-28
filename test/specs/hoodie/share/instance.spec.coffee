@@ -185,15 +185,15 @@ describe "Hoodie.ShareInstance", ->
     beforeEach ->
       spyOn(@share, "remove").andReturn @hoodie.defer().resolve().promise()
       spyOn(@share, "findAllObjects").andReturn ['object1', 'object2']
-      spyOn(@hoodie.store, "destroy")
+      spyOn(@hoodie.store, "remove")
       @share.destroy()
     
     it "should remove all objects from share", ->
       expect(@share.remove).wasCalledWith ['object1', 'object2']
 
     it "should remove $share object from store", ->
-      expect(@hoodie.store.destroy).wasCalledWith '$share', 'share1'
-  # /#destroy()
+      expect(@hoodie.store.remove).wasCalledWith '$share', 'share1'
+  # /#remove()
 
 
   describe "#findAllObjects()", ->

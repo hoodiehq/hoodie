@@ -49,7 +49,7 @@ Hoodie.Config = (function() {
 
   Config.prototype.clear = function() {
     this.cache = {};
-    return this.hoodie.store.destroy(this.$type, this.id);
+    return this.hoodie.store.remove(this.$type, this.id);
   };
 
   Config.prototype.remove = Config.prototype.set;

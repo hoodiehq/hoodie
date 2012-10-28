@@ -150,27 +150,27 @@ class Hoodie.AccountRemote extends Hoodie.Remote
 
   # 
   _handlePullResults : (changes) =>
-    _destroyedDocs = []
+    _removeedDocs = []
     _changedDocs   = []
     
     # 1. update or remove objects from local store
     for {doc} in changes
       doc = @store.parseFromRemote(doc)
       if doc._deleted
-        _destroyedDocs.push [doc, @hoodie.store.destroy( doc.$type, doc.id,      remote: true)]
+        _removeedDocs.push [doc, @hoodie.store.remove( doc.$type, doc.id,      remote: true)]
       else                                                
         _changedDocs.push   [doc, @hoodie.store.save(    doc.$type, doc.id, doc, remote: true)]
     
     # 2. trigger events
-    for [doc, promise] in _destroyedDocs
+    for [doc, promise] in _removeedDocs
       promise.then (object) => 
-        @trigger 'destroy',                        object
-        @trigger "destroy:#{doc.$type}",           object
-        @trigger "destroy:#{doc.$type}:#{doc.id}", object
+        @trigger 'remove',                        object
+        @trigger "remove:#{doc.$type}",           object
+        @trigger "remove:#{doc.$type}:#{doc.id}", object
         
-        @trigger 'change',                         'destroy', object
-        @trigger "change:#{doc.$type}",            'destroy', object
-        @trigger "change:#{doc.$type}:#{doc.id}",  'destroy', object
+        @trigger 'change',                         'remove', object
+        @trigger "change:#{doc.$type}",            'remove', object
+        @trigger "change:#{doc.$type}:#{doc.id}",  'remove', object
     
     for [doc, promise] in _changedDocs
       promise.then (object, objectWasCreated) => 

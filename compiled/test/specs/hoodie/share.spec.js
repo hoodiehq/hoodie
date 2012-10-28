@@ -223,7 +223,7 @@ describe("Hoodie.Share", function() {
       ]);
     });
   });
-  describe("#destroy(share_id)", function() {
+  describe("#remove(share_id)", function() {
     beforeEach(function() {
       var promise;
       promise = this.hoodie.defer().resolve({
@@ -234,7 +234,7 @@ describe("Hoodie.Share", function() {
 
         function instance() {}
 
-        instance.prototype.destroy = function() {
+        instance.prototype.remove = function() {
           return 'delete_promise';
         };
 
@@ -244,17 +244,17 @@ describe("Hoodie.Share", function() {
     });
     it("should try to find the object with store.find('$share', share_id)", function() {
       var promise;
-      promise = this.share.destroy('123');
+      promise = this.share.remove('123');
       return expect(this.hoodie.store.find).wasCalledWith('$share', '123');
     });
-    return it("should init the share instance and destroy it", function() {
+    return it("should init the share instance and remove it", function() {
       var promise;
       this.hoodie.store.find.andReturn(this.hoodie.defer().resolve({}).promise());
-      promise = this.share.destroy('123');
+      promise = this.share.remove('123');
       return expect(promise).toBeResolvedWith('delete_promise');
     });
   });
-  return describe("#destroyAll()", function() {
+  return describe("#removeAll()", function() {
     beforeEach(function() {
       var promise;
       promise = this.hoodie.defer().resolve([
@@ -269,8 +269,8 @@ describe("Hoodie.Share", function() {
 
         function instance() {}
 
-        instance.prototype.destroy = function() {
-          return 'destroyAll_promise';
+        instance.prototype.remove = function() {
+          return 'removeAll_promise';
         };
 
         return instance;
@@ -279,14 +279,14 @@ describe("Hoodie.Share", function() {
     });
     it("should try to find the object with store.findAll('$share')", function() {
       var promise;
-      promise = this.share.destroyAll();
+      promise = this.share.removeAll();
       return expect(this.hoodie.store.findAll).wasCalled();
     });
-    return it("should init the share instance and destroy it", function() {
+    return it("should init the share instance and remove it", function() {
       var promise;
       this.hoodie.store.findAll.andReturn(this.hoodie.defer().resolve([{}, {}]).promise());
-      promise = this.share.destroyAll();
-      return expect(promise).toBeResolvedWith(['destroyAll_promise', 'destroyAll_promise']);
+      promise = this.share.removeAll();
+      return expect(promise).toBeResolvedWith(['removeAll_promise', 'removeAll_promise']);
     });
   });
 });
