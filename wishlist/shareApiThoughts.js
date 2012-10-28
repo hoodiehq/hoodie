@@ -1,5 +1,5 @@
-// hoodie.share API (2nd thought)
-// ================================
+// Share (2nd thought)
+// =====================
 // 
 // a share is like a store, give I'm permitted to access / modify the share
 // I can add / find / update / remove objects
