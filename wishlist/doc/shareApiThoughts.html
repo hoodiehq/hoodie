@@ -42,5 +42,7 @@ api with two methods: share and unshare</p></div></div><div class="code"><div cl
   <span class="p">]</span>
 <span class="p">}</span>
 <span class="nx">hoodie</span><span class="p">.</span><span class="nx">store</span><span class="p">.</span><span class="nx">add</span><span class="p">(</span><span class="s1">&#39;todolist&#39;</span><span class="p">,</span> <span class="nx">todolist</span><span class="p">).</span><span class="nx">share</span><span class="p">({</span><span class="nx">write</span><span class="o">:</span> <span class="kc">true</span><span class="p">,</span> <span class="nx">password</span><span class="o">:</span> <span class="s1">&#39;secret&#39;</span><span class="p">})</span>
-<span class="p">.</span><span class="nx">done</span><span class="p">(</span> <span class="kd">function</span><span class="p">(</span><span class="nx">share</span><span class="p">)</span> <span class="p">{</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>now others can access the shared obect with
-hoodie.share( share.id ).store.findAll()</p></div></div><div class="code"><div class="wrapper"><span class="p">})</span></div></div></div></div></body></html>
+<span class="p">.</span><span class="nx">done</span><span class="p">(</span> <span class="kd">function</span><span class="p">(</span><span class="nx">share</span><span class="p">)</span> <span class="p">{</span>
+  <span class="cm">/* now others can access the shared directly with</span>
+<span class="cm">     hoodie.share( share.id ).store.findAll() */</span>
+<span class="p">})</span></div></div></div></div></body></html>

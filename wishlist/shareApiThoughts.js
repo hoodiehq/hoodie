@@ -85,6 +85,6 @@ var todolist = {
 }
 hoodie.store.add('todolist', todolist).share({write: true, password: 'secret'})
 .done( function(share) {
-  // now others can access the shared obect with
-  // hoodie.share( share.id ).store.findAll()
+  /* now others can access the shared directly with
+     hoodie.share( share.id ).store.findAll() */
 })
