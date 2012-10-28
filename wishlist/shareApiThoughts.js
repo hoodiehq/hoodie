@@ -8,7 +8,7 @@
 // --------------------
 
 // initiate a new share
-share = new hoodie.share({access: true})
+share = new hoodie.share()
 
 
 // open an existing share (local or remote)
