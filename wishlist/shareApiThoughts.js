@@ -26,9 +26,8 @@ hoodie.share.store.removeAll()
 
 // on top, it allows a direct call:
 hoodie.share('shareId')
-// that tries to find the share in the local
-// store and in case it cannot be found, opens the share
-// from remote
+// that opens a share from remote and exposes a store API
+// to directly interact with the store.
 
 // you can also initiate a new share instance,
 // the id gets auto generated if not passed
