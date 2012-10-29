@@ -49,29 +49,14 @@ class Hoodie.Share
     # set pointer to Hoodie.ShareInstance
     @instance = Hoodie.ShareInstance
 
-    # give all Share instances access to our core hoodie.
-    # That's need if the user has no account yet, as shares
-    # use custom hoodie instances then to add shares on
-    # the server
-    Hoodie.ShareInstance.prototype.hoodie = @hoodie
+    # give all Share instances access to our hoodie
+    @instance.prototype.hoodie = @hoodie
 
     # return custom api which allows direct call
-    api = @open
+    api = @_open
     $.extend api, this
 
     return api
-  
-  
-  # open
-  # ------
-  
-  # 
-  # open a sharing
-  # 
-  open : (shareId, options = {}) =>
-    dbName = "share/#{shareId}"
-    options.prefix = dbName
-    @hoodie.open dbName, options
 
 
   # add
@@ -166,3 +151,15 @@ class Hoodie.Share
       for obj in objects
         share = new @instance obj
         share.remove()
+
+
+  # Private
+  # ---------
+
+  # #### open
+  
+  # opens a a remote share store, returns a Hoodie.Remote instance
+  _open : (shareId, options = {}) =>
+    dbName = "share/#{shareId}"
+    options.prefix = dbName
+    @hoodie.open dbName, options

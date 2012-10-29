@@ -7,39 +7,14 @@ describe("Hoodie.Share", function() {
     return spyOn(this.share, "instance");
   });
   describe("constructor", function() {
-    it("should set Hoodie.ShareInstance.prototype.hoodie", function() {
+    return it("should set Hoodie.ShareInstance.prototype.hoodie", function() {
       var instance;
       new Hoodie.Share(this.hoodie);
       instance = new Hoodie.ShareInstance;
       return expect(instance.hoodie).toBe(this.hoodie);
     });
-    return it("should return the @open method as api", function() {
-      var share;
-      spyOn(Hoodie.Share.prototype, "open");
-      share = new Hoodie.Share(this.hoodie);
-      share('funk');
-      return expect(Hoodie.Share.prototype.open).wasCalledWith('funk');
-    });
   });
   describe("direct call", function() {
-    beforeEach(function() {
-      return spyOn(Hoodie.Share.prototype, "open");
-    });
-    return it("should initiate a new Share Instance and pass options", function() {
-      var share;
-      share = new Hoodie.Share(this.hoodie);
-      share('funk');
-      return expect(Hoodie.Share.prototype.open).wasCalledWith('funk');
-    });
-  });
-  describe("#instance", function() {
-    return it("should point to Hoodie.ShareInstance", function() {
-      var share;
-      share = new Hoodie.Share(this.hoodie);
-      return expect(share.instance).toBe(Hoodie.ShareInstance);
-    });
-  });
-  describe("#open(shareId, options)", function() {
     beforeEach(function() {
       return spyOn(this.hoodie, "open");
     });
@@ -51,6 +26,13 @@ describe("Hoodie.Share", function() {
         prefix: 'share/funk123',
         option: 'value'
       });
+    });
+  });
+  describe("#instance", function() {
+    return it("should point to Hoodie.ShareInstance", function() {
+      var share;
+      share = new Hoodie.Share(this.hoodie);
+      return expect(share.instance).toBe(Hoodie.ShareInstance);
     });
   });
   describe("#add(attributes)", function() {

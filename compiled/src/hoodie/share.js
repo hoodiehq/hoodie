@@ -6,24 +6,14 @@ Hoodie.Share = (function() {
   function Share(hoodie) {
     var api;
     this.hoodie = hoodie;
-    this.open = __bind(this.open, this);
+    this._open = __bind(this._open, this);
 
     this.instance = Hoodie.ShareInstance;
-    Hoodie.ShareInstance.prototype.hoodie = this.hoodie;
-    api = this.open;
+    this.instance.prototype.hoodie = this.hoodie;
+    api = this._open;
     $.extend(api, this);
     return api;
   }
-
-  Share.prototype.open = function(shareId, options) {
-    var dbName;
-    if (options == null) {
-      options = {};
-    }
-    dbName = "share/" + shareId;
-    options.prefix = dbName;
-    return this.hoodie.open(dbName, options);
-  };
 
   Share.prototype.add = function(attributes) {
     var share;
@@ -110,6 +100,16 @@ Hoodie.Share = (function() {
       }
       return _results;
     });
+  };
+
+  Share.prototype._open = function(shareId, options) {
+    var dbName;
+    if (options == null) {
+      options = {};
+    }
+    dbName = "share/" + shareId;
+    options.prefix = dbName;
+    return this.hoodie.open(dbName, options);
   };
 
   return Share;
