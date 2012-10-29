@@ -22,10 +22,10 @@ hoodie.store.find('task', '123').publish()
 hoodie.store.find('task', '123').publish(['title', 'description'])
 
 // make a public object private again
-hoodie.store.find('task', '123').conceal()
+hoodie.store.find('task', '123').unpublish()
 
 // or: make certain attributes of a published object private again
-hoodie.store.find('task', '123').conceal(['description'])
+hoodie.store.find('task', '123').unpublish(['description'])
 
 // add a new object and make it public
 hoodie.store.add('task', object).publish()
@@ -64,7 +64,7 @@ hoodie.store.find("photo", "abc4567").publish()
 
 // I want to make a public photo private again
 // 
-hoodie.store.find("photo", "abc4567").conceal()
+hoodie.store.find("photo", "abc4567").unpublish()
 
 
 // ### Scenario 3

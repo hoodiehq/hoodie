@@ -14,15 +14,15 @@ f.event={add:function(a,c,d,e,g){var h,i,j,k,l,m,n,o,p,q,r,s;if(!(a.nodeType===3
           "singleLineComment": ["//"],
           "name": "JavaScript"
         },
-        "sourcePath": "/Users/gregor/JavaScripts/hood.ie/hoodie.js/wishlist/shareApiThoughts.js",
-        "projectPath": "shareApiThoughts.js",
-        "targetPath": "shareApiThoughts",
+        "sourcePath": "/Users/gregor/JavaScripts/hood.ie/hoodie.js/wishlist/public_user_stores2.js",
+        "projectPath": "public_user_stores2.js",
+        "targetPath": "public_user_stores2",
         "firstHeader": {
           "type": "heading",
           "data": {
             "level": 1,
-            "title": "Share (2nd thought)",
-            "slug": "share-2nd-thought",
+            "title": "Public User Stores (2nd thought)",
+            "slug": "public-user-stores-2nd-thought",
             "isFileHeader": true
           },
           "depth": 1,
@@ -31,38 +31,116 @@ f.event={add:function(a,c,d,e,g){var h,i,j,k,l,m,n,o,p,q,r,s;if(!(a.nodeType===3
               "type": "heading",
               "data": {
                 "level": 2,
-                "title": "Share Module API",
-                "slug": "share-module-api"
+                "title": "Make objects public",
+                "slug": "make-objects-public"
               },
               "depth": 2
             }, {
               "type": "heading",
               "data": {
                 "level": 2,
-                "title": "Share Instance API",
-                "slug": "share-instance-api"
+                "title": "Open public objects",
+                "slug": "open-public-objects"
               },
               "depth": 2
             }, {
               "type": "heading",
               "data": {
                 "level": 2,
-                "title": "Sharing objects from my store",
-                "slug": "sharing-objects-from-my-store"
+                "title": "use case1: private instagram-ish app",
+                "slug": "use-case1-private-instagram-ish-app"
               },
-              "depth": 2
+              "depth": 2,
+              "children": [
+                {
+                  "type": "heading",
+                  "data": {
+                    "level": 3,
+                    "title": "Scenario 1",
+                    "slug": "scenario-1"
+                  },
+                  "depth": 3
+                }, {
+                  "type": "heading",
+                  "data": {
+                    "level": 3,
+                    "title": "Scenario 2",
+                    "slug": "scenario-2"
+                  },
+                  "depth": 3
+                }, {
+                  "type": "heading",
+                  "data": {
+                    "level": 3,
+                    "title": "Scenario 3",
+                    "slug": "scenario-3"
+                  },
+                  "depth": 3
+                }, {
+                  "type": "heading",
+                  "data": {
+                    "level": 3,
+                    "title": "Scenario 4",
+                    "slug": "scenario-4"
+                  },
+                  "depth": 3
+                }
+              ]
             }, {
               "type": "heading",
               "data": {
                 "level": 2,
-                "title": "random thoughts",
-                "slug": "random-thoughts"
+                "title": "usecase 2: whiskie.net",
+                "slug": "usecase-2-whiskienet"
               },
-              "depth": 2
+              "depth": 2,
+              "children": [
+                {
+                  "type": "heading",
+                  "data": {
+                    "level": 3,
+                    "title": "Scenario 1",
+                    "slug": "scenario-1"
+                  },
+                  "depth": 3
+                }, {
+                  "type": "heading",
+                  "data": {
+                    "level": 3,
+                    "title": "Scenario 2",
+                    "slug": "scenario-2"
+                  },
+                  "depth": 3
+                }, {
+                  "type": "heading",
+                  "data": {
+                    "level": 3,
+                    "title": "Scenario 3",
+                    "slug": "scenario-3"
+                  },
+                  "depth": 3
+                }, {
+                  "type": "heading",
+                  "data": {
+                    "level": 3,
+                    "title": "Scenario 4",
+                    "slug": "scenario-4"
+                  },
+                  "depth": 3
+                }, {
+                  "type": "heading",
+                  "data": {
+                    "level": 3,
+                    "title": "random thoughts",
+                    "slug": "random-thoughts"
+                  },
+                  "depth": 3
+                }
+              ]
             }
           ]
         },
-        "title": "Share (2nd thought)"
+        "title": "Public User Stores (2nd thought)"
       },
       "depth": 1,
       "outline": [
@@ -70,34 +148,112 @@ f.event={add:function(a,c,d,e,g){var h,i,j,k,l,m,n,o,p,q,r,s;if(!(a.nodeType===3
           "type": "heading",
           "data": {
             "level": 2,
-            "title": "Share Module API",
-            "slug": "share-module-api"
+            "title": "Make objects public",
+            "slug": "make-objects-public"
           },
           "depth": 2
         }, {
           "type": "heading",
           "data": {
             "level": 2,
-            "title": "Share Instance API",
-            "slug": "share-instance-api"
+            "title": "Open public objects",
+            "slug": "open-public-objects"
           },
           "depth": 2
         }, {
           "type": "heading",
           "data": {
             "level": 2,
-            "title": "Sharing objects from my store",
-            "slug": "sharing-objects-from-my-store"
+            "title": "use case1: private instagram-ish app",
+            "slug": "use-case1-private-instagram-ish-app"
           },
-          "depth": 2
+          "depth": 2,
+          "children": [
+            {
+              "type": "heading",
+              "data": {
+                "level": 3,
+                "title": "Scenario 1",
+                "slug": "scenario-1"
+              },
+              "depth": 3
+            }, {
+              "type": "heading",
+              "data": {
+                "level": 3,
+                "title": "Scenario 2",
+                "slug": "scenario-2"
+              },
+              "depth": 3
+            }, {
+              "type": "heading",
+              "data": {
+                "level": 3,
+                "title": "Scenario 3",
+                "slug": "scenario-3"
+              },
+              "depth": 3
+            }, {
+              "type": "heading",
+              "data": {
+                "level": 3,
+                "title": "Scenario 4",
+                "slug": "scenario-4"
+              },
+              "depth": 3
+            }
+          ]
         }, {
           "type": "heading",
           "data": {
             "level": 2,
-            "title": "random thoughts",
-            "slug": "random-thoughts"
+            "title": "usecase 2: whiskie.net",
+            "slug": "usecase-2-whiskienet"
           },
-          "depth": 2
+          "depth": 2,
+          "children": [
+            {
+              "type": "heading",
+              "data": {
+                "level": 3,
+                "title": "Scenario 1",
+                "slug": "scenario-1"
+              },
+              "depth": 3
+            }, {
+              "type": "heading",
+              "data": {
+                "level": 3,
+                "title": "Scenario 2",
+                "slug": "scenario-2"
+              },
+              "depth": 3
+            }, {
+              "type": "heading",
+              "data": {
+                "level": 3,
+                "title": "Scenario 3",
+                "slug": "scenario-3"
+              },
+              "depth": 3
+            }, {
+              "type": "heading",
+              "data": {
+                "level": 3,
+                "title": "Scenario 4",
+                "slug": "scenario-4"
+              },
+              "depth": 3
+            }, {
+              "type": "heading",
+              "data": {
+                "level": 3,
+                "title": "random thoughts",
+                "slug": "random-thoughts"
+              },
+              "depth": 3
+            }
+          ]
         }
       ]
     }
