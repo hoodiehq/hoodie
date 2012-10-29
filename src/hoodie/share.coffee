@@ -154,9 +154,6 @@ class Hoodie.Share
     @find(id).pipe (obj) =>
       share = new @instance obj
       share.remove()
-
-  # alias
-  delete: -> @remove arguments...
   
   
   # removeAll
@@ -169,6 +166,3 @@ class Hoodie.Share
       for obj in objects
         share = new @instance obj
         share.remove()
-
-  # alias
-  deleteAll: -> @removeAll arguments...

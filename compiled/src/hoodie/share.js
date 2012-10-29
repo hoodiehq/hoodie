@@ -98,10 +98,6 @@ Hoodie.Share = (function() {
     });
   };
 
-  Share.prototype["delete"] = function() {
-    return this.remove.apply(this, arguments);
-  };
-
   Share.prototype.removeAll = function() {
     var _this = this;
     return this.findAll().pipe(function(objects) {
@@ -114,10 +110,6 @@ Hoodie.Share = (function() {
       }
       return _results;
     });
-  };
-
-  Share.prototype.deleteAll = function() {
-    return this.removeAll.apply(this, arguments);
   };
 
   return Share;
