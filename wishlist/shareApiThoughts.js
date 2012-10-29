@@ -72,7 +72,7 @@ share.revokeAccess("lisa@example.com")
 hoodie.store.find('task', '123').share( share.id )
 hoodie.store.find('task', '123').unshare( share.id )
 
-// compare to [store.publish / store.conceal](public_user_stores2.html)
+// compare to [store.publish / store.unpublish](public_user_stores2.html)
 
 // random thoughts
 // -----------------
