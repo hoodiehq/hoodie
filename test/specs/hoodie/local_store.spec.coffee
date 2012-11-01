@@ -13,7 +13,7 @@ describe "Hoodie.LocalStore", ->
   
 
   describe "constructor", ->
-    xit "should subscribe to account:signout event", ->
+    it "should subscribe to account:signout event", ->
       spyOn(@hoodie, "on")
       store = new Hoodie.LocalStore @hoodie
       expect(@hoodie.on).wasCalledWith 'account:signout', store.clear
@@ -177,7 +177,20 @@ describe "Hoodie.LocalStore", ->
       it "should work", ->
         expect(@promise).toBeResolved()
       
-    
+    _when "id is '123', type is 'document', object is {name: 'test', $hidden: 'fresh'}}", ->
+      beforeEach ->
+        @store.cache.andReturn {name: 'test', $hidden: 'fresh'}
+      
+      it "should not overwrite $hidden property when not passed", ->
+        @store.save 'document', '123', {name: 'new test'}
+        [type, key, @object] = @store.cache.mostRecentCall.args 
+        expect(@object.$hidden).toBe 'fresh'
+
+      it "should overwrite $hidden property when passed", ->
+        @store.save 'document', '123', {name: 'new test', $hidden: 'wicked'}
+        [type, key, @object] = @store.cache.mostRecentCall.args 
+        expect(@object.$hidden).toBe 'wicked'
+
     it "should not overwrite createdAt attribute", ->
       @store.save 'document', '123', { $createdAt: 'check12'  }
       [type, id, object] = @store.cache.mostRecentCall.args

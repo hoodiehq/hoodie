@@ -82,15 +82,25 @@ Hoodie.LocalStore = (function(_super) {
     if (options["public"] != null) {
       object.$public = options["public"];
     }
-    if (options.remote) {
-      object._$syncedAt = this._now();
-      if (!isNew) {
-        for (key in currentObject) {
-          if (key.charAt(0) === '_' && object[key] === void 0) {
-            object[key] = currentObject[key];
+    if (!isNew) {
+      for (key in currentObject) {
+        if (!object.hasOwnProperty(key)) {
+          switch (key.charAt(0)) {
+            case '_':
+              if (options.remote) {
+                object[key] = currentObject[key];
+              }
+              break;
+            case '$':
+              if (!options.remote) {
+                object[key] = currentObject[key];
+              }
           }
         }
       }
+    }
+    if (options.remote) {
+      object._$syncedAt = this._now();
     } else if (!options.silent) {
       object.$updatedAt = this._now();
       object.$createdAt || (object.$createdAt = object.$updatedAt);

@@ -12,7 +12,7 @@ describe("Hoodie.LocalStore", function() {
     return spyOn(this.store.db, "clear").andCallThrough();
   });
   describe("constructor", function() {
-    xit("should subscribe to account:signout event", function() {
+    it("should subscribe to account:signout event", function() {
       var store;
       spyOn(this.hoodie, "on");
       store = new Hoodie.LocalStore(this.hoodie);
@@ -261,6 +261,31 @@ describe("Hoodie.LocalStore", function() {
       });
       return it("should work", function() {
         return expect(this.promise).toBeResolved();
+      });
+    });
+    _when("id is '123', type is 'document', object is {name: 'test', $hidden: 'fresh'}}", function() {
+      beforeEach(function() {
+        return this.store.cache.andReturn({
+          name: 'test',
+          $hidden: 'fresh'
+        });
+      });
+      it("should not overwrite $hidden property when not passed", function() {
+        var key, type, _ref;
+        this.store.save('document', '123', {
+          name: 'new test'
+        });
+        _ref = this.store.cache.mostRecentCall.args, type = _ref[0], key = _ref[1], this.object = _ref[2];
+        return expect(this.object.$hidden).toBe('fresh');
+      });
+      return it("should overwrite $hidden property when passed", function() {
+        var key, type, _ref;
+        this.store.save('document', '123', {
+          name: 'new test',
+          $hidden: 'wicked'
+        });
+        _ref = this.store.cache.mostRecentCall.args, type = _ref[0], key = _ref[1], this.object = _ref[2];
+        return expect(this.object.$hidden).toBe('wicked');
       });
     });
     it("should not overwrite createdAt attribute", function() {

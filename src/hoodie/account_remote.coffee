@@ -157,9 +157,9 @@ class Hoodie.AccountRemote extends Hoodie.Remote
     for {doc} in changes
       doc = @store.parseFromRemote(doc)
       if doc._deleted
-        _removeedDocs.push [doc, @hoodie.store.remove( doc.$type, doc.id,      remote: true)]
+        _removeedDocs.push [doc, @hoodie.store.remove( doc.$type, doc.id,       remote: true)]
       else                                                
-        _changedDocs.push   [doc, @hoodie.store.save(    doc.$type, doc.id, doc, remote: true)]
+        _changedDocs.push  [doc, @hoodie.store.save(    doc.$type, doc.id, doc, remote: true)]
     
     # 2. trigger events
     for [doc, promise] in _removeedDocs

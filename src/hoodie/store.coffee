@@ -9,14 +9,17 @@
 
 class Hoodie.Store
 
+
   # ## Constructor
 
+  # set store.hoodie instance variable
   constructor : (@hoodie) ->
+
 
   # ## Save
 
-  # saves the passed object into the store and replaces an eventually existing 
-  # document with same type & id.
+  # creates or replaces an an eventually existing object in the store
+  # with same type & id.
   #
   # When id is undefined, it gets generated and a new object gets saved
   #

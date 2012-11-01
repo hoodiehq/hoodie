@@ -82,20 +82,28 @@ class Hoodie.LocalStore extends Hoodie.Store
     # add createdBy hash to new objects
     # note: we check for `hoodie.account` as in some cases, the code
     #       might get executed before the account models is initiated.
+    # todo: move ownerHash into a method on the core hoodie module
     if isNew and @hoodie.account
       object.$createdBy or= @hoodie.account.ownerHash
    
     # handle public option
     object.$public = options.public if options.public? 
+
+    # handle local properties and hidden properties with $ prefix
+    # keep local properties for remote updates
+    unless isNew
+
+      # for remote updates, keep local properties
+      for key of currentObject when not object.hasOwnProperty key
+        switch key.charAt(0)
+          when '_'
+            object[key] = currentObject[key] if options.remote
+          when '$'
+            object[key] = currentObject[key] unless options.remote
   
     # add timestamps
     if options.remote
       object._$syncedAt = @_now()
-
-      unless isNew
-        for key of currentObject
-          if key.charAt(0) is '_' and object[key] is undefined
-            object[key] = currentObject[key]
 
     else unless options.silent
       object.$updatedAt = @_now()
