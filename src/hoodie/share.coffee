@@ -32,6 +32,8 @@
 #     hoodie.share.save(id, attributes)
 #     hoodie.share.update(id, changed_attributes)
 #     hoodie.share.updateAll(changed_attributes)
+#     hoodie.share.remove(id)
+#     hoodie.share.removeAll()
 
 #
 class Hoodie.Share
@@ -136,9 +138,8 @@ class Hoodie.Share
   # deletes an existing share
   #
   remove : (id) ->
-    @find(id).pipe (obj) =>
-      share = new @instance obj
-      share.remove()
+    @hoodie.store.findAll( (obj) -> obj.$shares[id] ).unshareAt( id )
+    @hoodie.store.remove('$share', id)
   
   
   # removeAll
@@ -147,10 +148,8 @@ class Hoodie.Share
   # delete all existing shares
   #
   removeAll : () ->
-    @findAll().pipe (objects) =>
-      for obj in objects
-        share = new @instance obj
-        share.remove()
+    @hoodie.store.findAll( (obj) -> obj.$shares ).unshare()
+    @hoodie.store.removeAll('$share')
 
 
   # Private

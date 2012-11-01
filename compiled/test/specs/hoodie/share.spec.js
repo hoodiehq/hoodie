@@ -207,68 +207,28 @@ describe("Hoodie.Share", function() {
   });
   describe("#remove(share_id)", function() {
     beforeEach(function() {
-      var promise;
-      promise = this.hoodie.defer().resolve({
-        funky: 'fresh'
-      }).promise();
-      spyOn(this.hoodie.store, "find").andReturn(promise);
-      return this.share.instance = (function() {
-
-        function instance() {}
-
-        instance.prototype.remove = function() {
-          return 'delete_promise';
-        };
-
-        return instance;
-
-      })();
-    });
-    it("should try to find the object with store.find('$share', share_id)", function() {
-      var promise;
-      promise = this.share.remove('123');
-      return expect(this.hoodie.store.find).wasCalledWith('$share', '123');
+      spyOn(this.hoodie.store, "findAll").andReturn({
+        unshareAt: function() {}
+      });
+      return spyOn(this.hoodie.store, "remove").andReturn('remove_promise');
     });
     return it("should init the share instance and remove it", function() {
       var promise;
-      this.hoodie.store.find.andReturn(this.hoodie.defer().resolve({}).promise());
       promise = this.share.remove('123');
-      return expect(promise).toBeResolvedWith('delete_promise');
+      return expect(promise).toBe('remove_promise');
     });
   });
   return describe("#removeAll()", function() {
     beforeEach(function() {
-      var promise;
-      promise = this.hoodie.defer().resolve([
-        {
-          funky: 'fresh'
-        }, {
-          funky: 'fresh'
-        }
-      ]).promise();
-      spyOn(this.hoodie.store, "findAll").andReturn(promise);
-      return this.share.instance = (function() {
-
-        function instance() {}
-
-        instance.prototype.remove = function() {
-          return 'removeAll_promise';
-        };
-
-        return instance;
-
-      })();
-    });
-    it("should try to find the object with store.findAll('$share')", function() {
-      var promise;
-      promise = this.share.removeAll();
-      return expect(this.hoodie.store.findAll).wasCalled();
+      spyOn(this.hoodie.store, "findAll").andReturn({
+        unshare: function() {}
+      });
+      return spyOn(this.hoodie.store, "removeAll").andReturn('remove_promise');
     });
     return it("should init the share instance and remove it", function() {
       var promise;
-      this.hoodie.store.findAll.andReturn(this.hoodie.defer().resolve([{}, {}]).promise());
       promise = this.share.removeAll();
-      return expect(promise).toBeResolvedWith(['removeAll_promise', 'removeAll_promise']);
+      return expect(promise).toBe('remove_promise');
     });
   });
 });

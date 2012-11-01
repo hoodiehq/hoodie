@@ -29,10 +29,6 @@ hoodie.share.removeAll()
 // to directly interact with the store.
 share = hoodie.share('shareId')
 
-// you can also initiate a new share instance,
-// the id gets auto generated if not passed
-share = new hoodie.share
-
 
 // Share Instance API
 // --------------------
@@ -50,10 +46,6 @@ share.store.updateAll()
 share.store.remove()
 share.store.removeAll()
 
-// publish / destroy the share
-share.publish()
-share.destroy()
-
 // grant / revoke access
 share.grantAccess()  // everybody can read
 share.revokeAccess() // nobody but me has access
@@ -69,10 +61,12 @@ share.revokeAccess("lisa@example.com")
 
 // the hoodie.share module also extends the hoodie.store
 // api with two methods: share and unshare
-hoodie.store.find('task', '123').share( share.id )
-hoodie.store.find('task', '123').unshare( share.id )
-
+// 
 // compare to [store.publish / store.unpublish](public_user_stores2.html)
+hoodie.store.find('task', '123').share()
+hoodie.store.find('task', '123').shareAt( share.id)
+hoodie.store.find('task', '123').unshare()
+hoodie.store.find('task', '123').unshareAt( share.id )
 
 // random thoughts
 // -----------------

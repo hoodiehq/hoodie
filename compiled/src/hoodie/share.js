@@ -80,26 +80,17 @@ Hoodie.Share = (function() {
   };
 
   Share.prototype.remove = function(id) {
-    var _this = this;
-    return this.find(id).pipe(function(obj) {
-      var share;
-      share = new _this.instance(obj);
-      return share.remove();
-    });
+    this.hoodie.store.findAll(function(obj) {
+      return obj.$shares[id];
+    }).unshareAt(id);
+    return this.hoodie.store.remove('$share', id);
   };
 
   Share.prototype.removeAll = function() {
-    var _this = this;
-    return this.findAll().pipe(function(objects) {
-      var obj, share, _i, _len, _results;
-      _results = [];
-      for (_i = 0, _len = objects.length; _i < _len; _i++) {
-        obj = objects[_i];
-        share = new _this.instance(obj);
-        _results.push(share.remove());
-      }
-      return _results;
-    });
+    this.hoodie.store.findAll(function(obj) {
+      return obj.$shares;
+    }).unshare();
+    return this.hoodie.store.removeAll('$share');
   };
 
   Share.prototype._open = function(shareId, options) {
