@@ -14,10 +14,12 @@ describe "Hoodie.Share", ->
     beforeEach ->
       spyOn(@hoodie, "open")
     
-    it "should proxy to hoodie.open('share/' + shareId, {prefix: 'share/shareId'}) and pass options", ->
-      @share('funk123', option: 'value')
-      expect(@hoodie.open).wasCalledWith 'share/funk123', prefix: 'share/funk123', option: 'value'
-  # /('share_id', options)
+    it "should init a new share instance", ->
+      spyOn(Hoodie, "ShareInstance")
+      share = new Hoodie.Share @hoodie
+      instance = share('funk123', option: 'value')
+      expect(share.instance).wasCalled()
+  # /direct call
 
   describe "#instance", ->
     it "should point to Hoodie.ShareInstance", ->

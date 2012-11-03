@@ -54,6 +54,9 @@ class Hoodie.ShareInstance extends Hoodie.Remote
     # make sure that we have an id
     @id or=  @hoodie.uuid()
 
+    # set name from id
+    @name = "share/{@id}"
+
   
   # set
   # -----

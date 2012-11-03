@@ -18,14 +18,14 @@ describe("Hoodie.Share", function() {
     beforeEach(function() {
       return spyOn(this.hoodie, "open");
     });
-    return it("should proxy to hoodie.open('share/' + shareId, {prefix: 'share/shareId'}) and pass options", function() {
-      this.share('funk123', {
+    return it("should init a new share instance", function() {
+      var instance, share;
+      spyOn(Hoodie, "ShareInstance");
+      share = new Hoodie.Share(this.hoodie);
+      instance = share('funk123', {
         option: 'value'
       });
-      return expect(this.hoodie.open).wasCalledWith('share/funk123', {
-        prefix: 'share/funk123',
-        option: 'value'
-      });
+      return expect(share.instance).wasCalled();
     });
   });
   describe("#instance", function() {

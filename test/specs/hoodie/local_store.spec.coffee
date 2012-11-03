@@ -765,8 +765,7 @@ describe "Hoodie.LocalStore", ->
 
       it "should remove _dirty IDs from localStorage", ->
         @store.clearChanged()
-        expect(@store.db.removeItem).wasCalledWith '_dirty'
-         
+        expect(@store.db.removeItem).wasCalledWith '_dirty'         
   # /.clearChanged()
 
 

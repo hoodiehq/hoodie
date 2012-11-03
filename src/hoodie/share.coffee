@@ -159,6 +159,5 @@ class Hoodie.Share
   
   # opens a a remote share store, returns a Hoodie.Remote instance
   _open : (shareId, options = {}) =>
-    dbName = "share/#{shareId}"
-    options.prefix = dbName
-    @hoodie.open dbName, options
+    $.extend options, {id: shareId}
+    new @instance options

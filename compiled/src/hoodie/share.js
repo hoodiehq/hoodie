@@ -94,13 +94,13 @@ Hoodie.Share = (function() {
   };
 
   Share.prototype._open = function(shareId, options) {
-    var dbName;
     if (options == null) {
       options = {};
     }
-    dbName = "share/" + shareId;
-    options.prefix = dbName;
-    return this.hoodie.open(dbName, options);
+    $.extend(options, {
+      id: shareId
+    });
+    return new this.instance(options);
   };
 
   return Share;

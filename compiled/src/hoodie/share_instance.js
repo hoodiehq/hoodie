@@ -38,6 +38,7 @@ Hoodie.ShareInstance = (function(_super) {
     $.extend(this, options);
     this.set(options);
     this.id || (this.id = this.hoodie.uuid());
+    this.name = "share/{@id}";
   }
 
   ShareInstance.prototype._memory = {};
