@@ -45,15 +45,16 @@ describe("Hoodie.User", function() {
     describe("#publish(properties)", function() {
       _when("promise returns one object", function() {
         beforeEach(function() {
-          return this.storeDefer.resolve({
+          this.promise = this.storeDefer.resolve({
             $type: 'task',
             id: '123',
             title: 'milk'
           });
+          return this.promise.hoodie = this.hoodie;
         });
         _and("no properties passed", function() {
           return it("should update object returned by promise with $public: true", function() {
-            Hoodie.User.prototype._storePublish(this.hoodie).apply(this.storeDefer.promise(), []);
+            Hoodie.User.prototype._storePublish.apply(this.promise, []);
             return expect(this.hoodie.store.update).wasCalledWith('task', '123', {
               $public: true
             });
@@ -63,7 +64,7 @@ describe("Hoodie.User", function() {
           return it("should update object returned by promise with $public: ['title', 'owner']", function() {
             var properties;
             properties = ['title', 'owner'];
-            Hoodie.User.prototype._storePublish(this.hoodie).apply(this.storeDefer.promise(), [properties]);
+            Hoodie.User.prototype._storePublish.apply(this.promise, [properties]);
             return expect(this.hoodie.store.update).wasCalledWith('task', '123', {
               $public: ['title', 'owner']
             });
@@ -72,7 +73,7 @@ describe("Hoodie.User", function() {
       });
       return _when("promise returns multiple objects", function() {
         beforeEach(function() {
-          return this.storeDefer.resolve([
+          this.promise = this.storeDefer.resolve([
             {
               $type: 'task',
               id: '123',
@@ -83,10 +84,11 @@ describe("Hoodie.User", function() {
               title: 'milk'
             }
           ]);
+          return this.promise.hoodie = this.hoodie;
         });
         _and("no properties passed", function() {
           return it("should update object returned by promise with $public: true", function() {
-            Hoodie.User.prototype._storePublish(this.hoodie).apply(this.storeDefer.promise(), []);
+            Hoodie.User.prototype._storePublish.apply(this.promise, []);
             expect(this.hoodie.store.update).wasCalledWith('task', '123', {
               $public: true
             });
@@ -99,7 +101,7 @@ describe("Hoodie.User", function() {
           return it("should update object returned by promise with $public: ['title', 'owner']", function() {
             var properties;
             properties = ['title', 'owner'];
-            Hoodie.User.prototype._storePublish(this.hoodie).apply(this.storeDefer.promise(), [properties]);
+            Hoodie.User.prototype._storePublish.apply(this.promise, [properties]);
             expect(this.hoodie.store.update).wasCalledWith('task', '123', {
               $public: ['title', 'owner']
             });
@@ -113,15 +115,16 @@ describe("Hoodie.User", function() {
     return describe("#unpublish()", function() {
       _when("promise returns one object that is public", function() {
         beforeEach(function() {
-          return this.storeDefer.resolve({
+          this.promise = this.storeDefer.resolve({
             $type: 'task',
             id: '123',
             title: 'milk',
             $public: true
           });
+          return this.promise.hoodie = this.hoodie;
         });
         return it("should update object returned by promise with $public: false", function() {
-          Hoodie.User.prototype._storeUnpublish(this.hoodie).apply(this.storeDefer.promise(), []);
+          Hoodie.User.prototype._storeUnpublish.apply(this.promise, []);
           return expect(this.hoodie.store.update).wasCalledWith('task', '123', {
             $public: false
           });
@@ -129,20 +132,21 @@ describe("Hoodie.User", function() {
       });
       _when("promise returns one object that is not public", function() {
         beforeEach(function() {
-          return this.storeDefer.resolve({
+          this.promise = this.storeDefer.resolve({
             $type: 'task',
             id: '123',
             title: 'milk'
           });
+          return this.promise.hoodie = this.hoodie;
         });
         return it("should not update object returned by promise", function() {
-          Hoodie.User.prototype._storeUnpublish(this.hoodie).apply(this.storeDefer.promise(), []);
+          Hoodie.User.prototype._storeUnpublish.apply(this.promise, []);
           return expect(this.hoodie.store.update).wasNotCalled();
         });
       });
       return _when("promise returns multiple objects, of which some are public", function() {
         beforeEach(function() {
-          return this.storeDefer.resolve([
+          this.promise = this.storeDefer.resolve([
             {
               $type: 'task',
               id: '123',
@@ -159,9 +163,10 @@ describe("Hoodie.User", function() {
               $public: ['title', 'owner']
             }
           ]);
+          return this.promise.hoodie = this.hoodie;
         });
         return it("should update object returned by promise with $public: true", function() {
-          Hoodie.User.prototype._storeUnpublish(this.hoodie).apply(this.storeDefer.promise(), []);
+          Hoodie.User.prototype._storeUnpublish.apply(this.promise, []);
           expect(this.hoodie.store.update).wasNotCalledWith('task', '123', {
             $public: false
           });

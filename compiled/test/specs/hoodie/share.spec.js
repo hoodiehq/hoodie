@@ -14,13 +14,14 @@ describe("Hoodie.Share", function() {
       return expect(instance.hoodie).toBe(this.hoodie);
     });
     return it("should extend hoodie.store API with shareAt / unshareAt methods", function() {
-      var shareAt, unshareAt, _ref;
+      var shareAt, unshare, unshareAt, _ref;
       spyOn(this.hoodie.store, "decoratePromises");
       new Hoodie.Share(this.hoodie);
       expect(this.hoodie.store.decoratePromises).wasCalled();
-      _ref = this.hoodie.store.decoratePromises.mostRecentCall.args[0], shareAt = _ref.shareAt, unshareAt = _ref.unshareAt;
+      _ref = this.hoodie.store.decoratePromises.mostRecentCall.args[0], shareAt = _ref.shareAt, unshareAt = _ref.unshareAt, unshare = _ref.unshare;
       expect(typeof shareAt).toBe('function');
-      return expect(typeof unshareAt).toBe('function');
+      expect(typeof unshareAt).toBe('function');
+      return expect(typeof unshare).toBe('function');
     });
   });
   describe("direct call", function() {
@@ -248,15 +249,16 @@ describe("Hoodie.Share", function() {
     describe("#shareAt(shareId, properties)", function() {
       _when("promise returns one object", function() {
         beforeEach(function() {
-          return this.storeDefer.resolve({
+          this.promise = this.storeDefer.resolve({
             $type: 'task',
             id: '123',
             title: 'milk'
           });
+          return this.promise.hoodie = this.hoodie;
         });
         _and("no properties passed", function() {
           return it("should save object returned by promise with {$shares: {shareId: true}}", function() {
-            Hoodie.Share.prototype._storeShareAt(this.hoodie).apply(this.storeDefer.promise(), ['shareId']);
+            Hoodie.Share.prototype._storeShareAt.apply(this.promise, ['shareId']);
             return expect(this.hoodie.store.update).wasCalledWith('task', '123', {
               $shares: {
                 shareId: true
@@ -273,7 +275,7 @@ describe("Hoodie.Share", function() {
               title: 'milk'
             });
             properties = ['title', 'owner'];
-            Hoodie.Share.prototype._storeShareAt(this.hoodie).apply(this.storeDefer.promise(), ['shareId', properties]);
+            Hoodie.Share.prototype._storeShareAt.apply(this.promise, ['shareId', properties]);
             return expect(this.hoodie.store.update).wasCalledWith('task', '123', {
               $shares: {
                 shareId: ['title', 'owner']
@@ -284,7 +286,7 @@ describe("Hoodie.Share", function() {
       });
       return _when("promise returns multiple objects", function() {
         beforeEach(function() {
-          return this.storeDefer.resolve([
+          this.promise = this.storeDefer.resolve([
             {
               $type: 'task',
               id: '123',
@@ -295,10 +297,11 @@ describe("Hoodie.Share", function() {
               title: 'milk'
             }
           ]);
+          return this.promise.hoodie = this.hoodie;
         });
         _and("no properties passed", function() {
           return it("should update object returned by promise with $public: true", function() {
-            Hoodie.Share.prototype._storeShareAt(this.hoodie).apply(this.storeDefer.promise(), ['shareId']);
+            Hoodie.Share.prototype._storeShareAt.apply(this.promise, ['shareId']);
             expect(this.hoodie.store.update).wasCalledWith('task', '123', {
               $shares: {
                 shareId: true
@@ -315,7 +318,7 @@ describe("Hoodie.Share", function() {
           return it("should update object returned by promise with $public: ['title', 'owner']", function() {
             var properties;
             properties = ['title', 'owner'];
-            Hoodie.Share.prototype._storeShareAt(this.hoodie).apply(this.storeDefer.promise(), ['shareId', properties]);
+            Hoodie.Share.prototype._storeShareAt.apply(this.promise, ['shareId', properties]);
             expect(this.hoodie.store.update).wasCalledWith('task', '123', {
               $shares: {
                 shareId: ['title', 'owner']
@@ -333,7 +336,7 @@ describe("Hoodie.Share", function() {
     describe("#unshareAt(shareId)", function() {
       _when("object is currently shared at 'shareId'", function() {
         beforeEach(function() {
-          return this.storeDefer.resolve({
+          this.promise = this.storeDefer.resolve({
             $type: 'task',
             id: '123',
             title: 'milk',
@@ -341,9 +344,10 @@ describe("Hoodie.Share", function() {
               shareId: true
             }
           });
+          return this.promise.hoodie = this.hoodie;
         });
         return it("should save object returned by promise with {$shares: {shareId: false}}", function() {
-          Hoodie.Share.prototype._storeUnshareAt(this.hoodie).apply(this.storeDefer.promise(), ['shareId']);
+          Hoodie.Share.prototype._storeUnshareAt.apply(this.promise, ['shareId']);
           return expect(this.hoodie.store.update).wasCalledWith('task', '123', {
             $shares: {
               shareId: false
@@ -353,7 +357,7 @@ describe("Hoodie.Share", function() {
       });
       return _when("promise returns multiple objects, of which some are shared at 'shareId'", function() {
         beforeEach(function() {
-          return this.storeDefer.resolve([
+          this.promise = this.storeDefer.resolve([
             {
               $type: 'task',
               id: '123',
@@ -374,9 +378,10 @@ describe("Hoodie.Share", function() {
               }
             }
           ]);
+          return this.promise.hoodie = this.hoodie;
         });
         return it("should update objects returned by promise with {$shares: {shareId: false}}", function() {
-          Hoodie.Share.prototype._storeUnshareAt(this.hoodie).apply(this.storeDefer.promise(), ['shareId']);
+          Hoodie.Share.prototype._storeUnshareAt.apply(this.promise, ['shareId']);
           expect(this.hoodie.store.update).wasNotCalledWith('task', '123', {
             $shares: {
               shareId: false
@@ -398,7 +403,7 @@ describe("Hoodie.Share", function() {
     return describe("#unshare()", function() {
       _when("promise returns one object", function() {
         beforeEach(function() {
-          return this.storeDefer.resolve({
+          this.promise = this.storeDefer.resolve({
             $type: 'task',
             id: '123',
             title: 'milk',
@@ -406,9 +411,10 @@ describe("Hoodie.Share", function() {
               shareId: true
             }
           });
+          return this.promise.hoodie = this.hoodie;
         });
         return it("should save object returned by promise with {$shares: {shareId: false}}", function() {
-          Hoodie.Share.prototype._storeUnshare(this.hoodie).apply(this.storeDefer.promise(), []);
+          Hoodie.Share.prototype._storeUnshare.apply(this.promise, []);
           return expect(this.hoodie.store.update).wasCalledWith('task', '123', {
             $shares: {
               shareId: false
@@ -418,7 +424,7 @@ describe("Hoodie.Share", function() {
       });
       return _when("promise returns multiple objects, of which some are shared at 'shareId'", function() {
         beforeEach(function() {
-          return this.storeDefer.resolve([
+          this.promise = this.storeDefer.resolve([
             {
               $type: 'task',
               id: '123',
@@ -439,9 +445,10 @@ describe("Hoodie.Share", function() {
               }
             }
           ]);
+          return this.promise.hoodie = this.hoodie;
         });
         return it("should update objects returned by promise with {$shares: {shareId: false}}", function() {
-          Hoodie.Share.prototype._storeUnshare(this.hoodie).apply(this.storeDefer.promise(), []);
+          Hoodie.Share.prototype._storeUnshare.apply(this.promise, []);
           expect(this.hoodie.store.update).wasNotCalledWith('task', '123', {
             $shares: {
               shareId: false

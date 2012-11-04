@@ -14,8 +14,8 @@ class Hoodie.User
 
     # extend hodie.store promise API
     @hoodie.store.decoratePromises
-      publish   : @_storePublish(@hoodie)
-      unpublish : @_storeUnpublish(@hoodie)
+      publish   : @_storePublish
+      unpublish : @_storeUnpublish
 
     # vanilla API syntax:
     # hoodie.user('uuid1234').findAll()
@@ -37,17 +37,17 @@ class Hoodie.User
   # publish an object. If an array of properties passed, publish only these
   # attributes and hide the remaining ones. If no properties passed, publish
   # the entire object.
-  _storePublish : (hoodie) -> (properties) ->
+  _storePublish : (properties) ->
     @pipe (objects) =>
       objects = [objects] unless $.isArray objects
       for object in objects
-        hoodie.store.update object.$type, object.id, $public: properties or true
+        @hoodie.store.update object.$type, object.id, $public: properties or true
   
   # `unpublish`
   # 
   # unpublish
-  _storeUnpublish : (hoodie) -> () ->
+  _storeUnpublish : ->
     @pipe (objects) =>
       objects = [objects] unless $.isArray objects
       for object in objects when object.$public
-        hoodie.store.update object.$type, object.id, $public: false
+        @hoodie.store.update object.$type, object.id, $public: false

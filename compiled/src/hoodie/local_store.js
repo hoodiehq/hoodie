@@ -35,6 +35,7 @@ Hoodie.LocalStore = (function(_super) {
       };
     }
     this.hoodie.on('account:signout', this.clear);
+    this._promiseApi.hoodie = this.hoodie;
     this._bootstrap();
   }
 

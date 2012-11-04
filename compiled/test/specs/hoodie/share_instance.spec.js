@@ -31,6 +31,13 @@ describe("Hoodie.ShareInstance", function() {
       });
       return expect(share.id).toBe('id123');
     });
+    it("shoudl set name from id", function() {
+      var share;
+      share = new Hoodie.ShareInstance({
+        id: 'id123'
+      });
+      return expect(share.name).toBe('share/id123');
+    });
     it("should generate an id if options.id wasn't passed", function() {
       var share;
       share = new Hoodie.ShareInstance;

@@ -60,8 +60,10 @@ class Hoodie.Share
 
     # extend hodie.store promise API
     @hoodie.store.decoratePromises
-      shareAt   : @_storeShareAt(@hoodie)
-      unshareAt : @_storeUnshareAt(@hoodie)
+      shareAt   : @_storeShareAt
+      unshareAt : @_storeUnshareAt
+      unshare   : @_storeUnshare
+      share     : @_storeShare
 
     return api
 
@@ -178,29 +180,67 @@ class Hoodie.Share
 
   # shareAt
   # 
-  _storeShareAt : (hoodie) -> (shareId, properties) ->
+  _storeShareAt : (shareId, properties) ->
+    updateObject = (object) =>
+      object.$shares or= {}
+      object.$shares[shareId] = properties or true
+      @hoodie.store.update object.$type, object.id, $shares: object.$shares
+      return object
+
     @pipe (objects) =>
-      objects = [objects] unless $.isArray objects
-      for object in objects      
-        object.$shares or= {}
-        object.$shares[shareId] = properties or true
-        hoodie.store.update object.$type, object.id, $shares: object.$shares
+      if $.isArray objects
+        updateObject(object) for object in objects
+      else 
+        updateObject(objects)
+
   
   # unshareAt
   #
-  _storeUnshareAt : (hoodie) -> (shareId) ->
+  _storeUnshareAt : (shareId) ->
+    updateObject = (object) =>
+      return object unless object.$shares and object.$shares[shareId]
+      object.$shares[shareId] = false
+      @hoodie.store.update object.$type, object.id, $shares: object.$shares
+      return object
+
     @pipe (objects) =>
-      objects = [objects] unless $.isArray objects
-      for object in objects when object.$shares and object.$shares[shareId]
-        object.$shares[shareId] = false
-        hoodie.store.update object.$type, object.id, $shares: object.$shares
+      if $.isArray objects
+        updateObject(object) for object in objects
+      else 
+        updateObject(objects)
 
   # unshare
   #
-  _storeUnshare : (hoodie) -> () ->
+  _storeUnshare : () ->
+    updateObject = (object) =>
+      return object unless object.$shares
+      for shareId of object.$shares
+        object.$shares[shareId] = false
+      @hoodie.store.update object.$type, object.id, $shares: object.$shares
+      return object
+
     @pipe (objects) =>
-      objects = [objects] unless $.isArray objects
-      for object in objects when object.$shares
-        for shareId of object.$shares when object.$shares[shareId]
-          object.$shares[shareId] = false
-          hoodie.store.update object.$type, object.id, $shares: object.$shares
+      if $.isArray objects
+        updateObject(object) for object in objects
+      else 
+        updateObject(objects)
+
+  # share
+  #
+  _storeShare : (properties) -> 
+    newShare = new @hoodie.share.instance
+    
+    updateObject = (object) =>
+      object.$shares or= {}
+      object.$shares[newShare.id] = properties or true
+      @hoodie.store.update object.$type, object.id, $shares: object.$shares
+      return object
+
+    @pipe (objects) =>
+      
+      value = if $.isArray objects
+        updateObject(object) for object in objects
+      else 
+        updateObject(objects)
+
+      return @hoodie.defer().resolve(value, newShare)

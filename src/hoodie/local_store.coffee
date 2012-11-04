@@ -32,6 +32,9 @@ class Hoodie.LocalStore extends Hoodie.Store
     # handle sign outs
     @hoodie.on 'account:signout', @clear
 
+    # provide reference to hoodie in all promises
+    @_promiseApi.hoodie = @hoodie
+
     @_bootstrap()
     
   
