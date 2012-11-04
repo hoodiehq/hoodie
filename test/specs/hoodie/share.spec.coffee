@@ -125,8 +125,8 @@ describe "Hoodie.Share", ->
       spyOn(@hoodie.store, "save").andCallThrough()
     
     it "should proxy to hoodie.store.save('$share', 'share_id', attributes)", ->
-      @share.save('abc4567', password: 'fresh')
-      expect(@hoodie.store.save).wasCalledWith '$share', 'abc4567', password: 'fresh'
+      @share.save('abc4567', access: true)
+      expect(@hoodie.store.save).wasCalledWith '$share', 'abc4567', access: true
 
     it "should resolve with a Share Instance", ->
       @hoodie.store.save.andReturn @hoodie.defer().resolve({}).promise()
@@ -140,8 +140,8 @@ describe "Hoodie.Share", ->
       spyOn(@hoodie.store, "update").andCallThrough()
     
     it "should proxy to hoodie.store.update('$share', 'share_id', attributes)", ->
-      @share.update('abc4567', password: 'fresh')
-      expect(@hoodie.store.update).wasCalledWith '$share', 'abc4567', password: 'fresh'
+      @share.update('abc4567', access: true)
+      expect(@hoodie.store.update).wasCalledWith '$share', 'abc4567', access: true
 
     it "should resolve with a Share Instance", ->
       @hoodie.store.update.andReturn @hoodie.defer().resolve({}).promise()
@@ -157,13 +157,13 @@ describe "Hoodie.Share", ->
     
     it "should proxy to hoodie.store.updateAll('$share', changed_attributes)", ->
       @hoodie.store.updateAll.andCallThrough()
-      @share.updateAll( password: 'fresh' )
-      expect(@hoodie.store.updateAll).wasCalledWith '$share', password: 'fresh'
+      @share.updateAll( access: true )
+      expect(@hoodie.store.updateAll).wasCalledWith '$share', access: true
 
     it "should resolve with an array of Share instances", ->
       @hoodie.store.updateAll.andReturn @hoodie.defer().resolve([{}, {}]).promise()
       @share.instance.andCallFake -> this.foo = 'bar'
-      promise = @share.updateAll password: 'fresh'
+      promise = @share.updateAll access: true
       expect(promise).toBeResolvedWith [{foo: 'bar'}, {foo: 'bar'}]
   # /#findAll()
 

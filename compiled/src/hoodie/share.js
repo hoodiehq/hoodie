@@ -104,7 +104,7 @@ Hoodie.Share = (function() {
     return this.hoodie.store.removeAll('$share');
   };
 
-  Share.prototype._allowedOptions = ["id", "access", "password"];
+  Share.prototype._allowedOptions = ["id", "access"];
 
   Share.prototype._filterShareOptions = function(options) {
     var filteredOptions, option, _i, _len, _ref;

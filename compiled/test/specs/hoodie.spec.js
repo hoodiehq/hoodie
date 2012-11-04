@@ -92,7 +92,7 @@ describe("Hoodie", function() {
       return expect(this.hoodie.isPromise(void 0)).toBe(false);
     });
   });
-  return describe("#uuid(num = 7)", function() {
+  describe("#uuid(num = 7)", function() {
     it("should default to a length of 7", function() {
       return expect(this.hoodie.uuid().length).toBe(7);
     });
@@ -100,6 +100,13 @@ describe("Hoodie", function() {
       return it("should generate an id with length = 5", function() {
         return expect(this.hoodie.uuid(5).length).toBe(5);
       });
+    });
+  });
+  return describe("#promisify(something)", function() {
+    return it("wraps passad arguments into a promise and returns it", function() {
+      var promise;
+      promise = this.hoodie.promisify('funky');
+      return expect(promise).toBeResolvedWith('funky');
     });
   });
 });

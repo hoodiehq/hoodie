@@ -177,10 +177,10 @@ describe("Hoodie.Share", function() {
     });
     it("should proxy to hoodie.store.save('$share', 'share_id', attributes)", function() {
       this.share.save('abc4567', {
-        password: 'fresh'
+        access: true
       });
       return expect(this.hoodie.store.save).wasCalledWith('$share', 'abc4567', {
-        password: 'fresh'
+        access: true
       });
     });
     return it("should resolve with a Share Instance", function() {
@@ -201,10 +201,10 @@ describe("Hoodie.Share", function() {
     });
     it("should proxy to hoodie.store.update('$share', 'share_id', attributes)", function() {
       this.share.update('abc4567', {
-        password: 'fresh'
+        access: true
       });
       return expect(this.hoodie.store.update).wasCalledWith('$share', 'abc4567', {
-        password: 'fresh'
+        access: true
       });
     });
     return it("should resolve with a Share Instance", function() {
@@ -226,10 +226,10 @@ describe("Hoodie.Share", function() {
     it("should proxy to hoodie.store.updateAll('$share', changed_attributes)", function() {
       this.hoodie.store.updateAll.andCallThrough();
       this.share.updateAll({
-        password: 'fresh'
+        access: true
       });
       return expect(this.hoodie.store.updateAll).wasCalledWith('$share', {
-        password: 'fresh'
+        access: true
       });
     });
     return it("should resolve with an array of Share instances", function() {
@@ -239,7 +239,7 @@ describe("Hoodie.Share", function() {
         return this.foo = 'bar';
       });
       promise = this.share.updateAll({
-        password: 'fresh'
+        access: true
       });
       return expect(promise).toBeResolvedWith([
         {

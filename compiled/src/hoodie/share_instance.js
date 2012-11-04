@@ -19,6 +19,92 @@ Hoodie.ShareInstance = (function(_super) {
     ShareInstance.__super__.constructor.apply(this, arguments);
   }
 
+  ShareInstance.prototype.grantReadAccess = function(users) {
+    if (typeof users === 'string') {
+      users = [users];
+    }
+    if (this.access.read != null) {
+      this.access.read = users || true;
+    } else {
+      this.access = users || true;
+    }
+    return this.hoodie.share.update(this.id, {
+      access: this.access
+    });
+  };
+
+  ShareInstance.prototype.revokeReadAccess = function(users) {
+    var currentUsers, idx, user, _i, _len;
+    if (users) {
+      if (typeof this.access === 'boolean' || typeof this.access.read === 'boolean') {
+        return this;
+      }
+      if (typeof users === 'string') {
+        users = [users];
+      }
+      currentUsers = this.access.read || this.access;
+      for (_i = 0, _len = users.length; _i < _len; _i++) {
+        user = users[_i];
+        idx = currentUsers.indexOf(user);
+        if (idx !== -1) {
+          currentUsers.splice(idx, 1);
+        }
+      }
+      if (this.access.read != null) {
+        this.access.read = currentUsers;
+      } else {
+        this.access = currentUsers;
+      }
+    } else {
+      this.access = false;
+    }
+    return this.hoodie.share.update(this.id, {
+      access: this.access
+    });
+  };
+
+  ShareInstance.prototype.grantWriteAccess = function(users) {
+    if (this.access === 'boolean') {
+      this.access = {
+        read: true
+      };
+    }
+    if (typeof users === 'string') {
+      users = [users];
+    }
+    this.access.write = users || true;
+    return this.hoodie.share.update(this.id, {
+      access: this.access
+    });
+  };
+
+  ShareInstance.prototype.revokeWriteAccess = function(users) {
+    var idx, user, _i, _len;
+    if (this.access.write == null) {
+      return this;
+    }
+    if (users) {
+      if (typeof this.access.write === 'boolean') {
+        return this;
+      }
+      if (typeof users === 'string') {
+        users = [users];
+      }
+      for (_i = 0, _len = users.length; _i < _len; _i++) {
+        user = users[_i];
+        idx = this.access.write.indexOf(user);
+        if (idx !== -1) {
+          this.access.write.splice(idx, 1);
+        }
+      }
+    } else {
+      this.access.write = false;
+    }
+    return this.hoodie.share.update(this.id, {
+      access: this.access
+    });
+  };
+
   return ShareInstance;
 
 })(Hoodie.Remote);

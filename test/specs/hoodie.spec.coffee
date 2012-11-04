@@ -72,8 +72,6 @@ describe "Hoodie", ->
       expect( @hoodie.isPromise(undefined) ).toBe false
   # /#isPromise()
 
-
-
   describe "#uuid(num = 7)", ->
     it "should default to a length of 7", ->
       expect(@hoodie.uuid().length).toBe 7
@@ -82,4 +80,10 @@ describe "Hoodie", ->
       it "should generate an id with length = 5", ->
         expect(@hoodie.uuid(5).length).toBe 5
   # /#uuid(num)
+
+  describe "#promisify(something)", ->
+    it "wraps passad arguments into a promise and returns it", ->
+       promise = @hoodie.promisify('funky')
+       expect(promise).toBeResolvedWith 'funky'
+  # /#promisify(something)
 # /Hoodie

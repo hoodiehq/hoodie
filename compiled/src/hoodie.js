@@ -82,6 +82,10 @@ Hoodie = (function(_super) {
     return typeof (obj != null ? obj.done : void 0) === 'function' && typeof obj.resolve === 'undefined';
   };
 
+  Hoodie.prototype.promisify = function(something) {
+    return this.defer().resolve(something).promise();
+  };
+
   Hoodie.prototype._loadModules = function(modules, context) {
     var instanceName, moduleName, namespace, _results;
     if (modules == null) {
