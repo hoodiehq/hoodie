@@ -330,7 +330,7 @@ describe("Hoodie.Share", function() {
         });
       });
     });
-    return describe("#unshareAt(shareId)", function() {
+    describe("#unshareAt(shareId)", function() {
       _when("object is currently shared at 'shareId'", function() {
         beforeEach(function() {
           return this.storeDefer.resolve({
@@ -377,6 +377,71 @@ describe("Hoodie.Share", function() {
         });
         return it("should update objects returned by promise with {$shares: {shareId: false}}", function() {
           Hoodie.Share.prototype._storeUnshareAt(this.hoodie).apply(this.storeDefer.promise(), ['shareId']);
+          expect(this.hoodie.store.update).wasNotCalledWith('task', '123', {
+            $shares: {
+              shareId: false
+            }
+          });
+          expect(this.hoodie.store.update).wasCalledWith('task', '456', {
+            $shares: {
+              shareId: false
+            }
+          });
+          return expect(this.hoodie.store.update).wasCalledWith('task', '789', {
+            $shares: {
+              shareId: false
+            }
+          });
+        });
+      });
+    });
+    return describe("#unshare()", function() {
+      _when("promise returns one object", function() {
+        beforeEach(function() {
+          return this.storeDefer.resolve({
+            $type: 'task',
+            id: '123',
+            title: 'milk',
+            $shares: {
+              shareId: true
+            }
+          });
+        });
+        return it("should save object returned by promise with {$shares: {shareId: false}}", function() {
+          Hoodie.Share.prototype._storeUnshare(this.hoodie).apply(this.storeDefer.promise(), []);
+          return expect(this.hoodie.store.update).wasCalledWith('task', '123', {
+            $shares: {
+              shareId: false
+            }
+          });
+        });
+      });
+      return _when("promise returns multiple objects, of which some are shared at 'shareId'", function() {
+        beforeEach(function() {
+          return this.storeDefer.resolve([
+            {
+              $type: 'task',
+              id: '123',
+              title: 'milk'
+            }, {
+              $type: 'task',
+              id: '456',
+              title: 'milk',
+              $shares: {
+                shareId: true
+              }
+            }, {
+              $type: 'task',
+              id: '789',
+              title: 'milk',
+              $shares: {
+                shareId: ['title', 'owner']
+              }
+            }
+          ]);
+        });
+        return it("should update objects returned by promise with {$shares: {shareId: false}}", function() {
+          Hoodie.Share.prototype._storeUnshare(this.hoodie).apply(this.storeDefer.promise(), []);
           expect(this.hoodie.store.update).wasNotCalledWith('task', '123', {
             $shares: {
               shareId: false

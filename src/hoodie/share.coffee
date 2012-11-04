@@ -194,3 +194,13 @@ class Hoodie.Share
       for object in objects when object.$shares and object.$shares[shareId]
         object.$shares[shareId] = false
         hoodie.store.update object.$type, object.id, $shares: object.$shares
+
+  # unshare
+  #
+  _storeUnshare : (hoodie) -> () ->
+    @pipe (objects) =>
+      objects = [objects] unless $.isArray objects
+      for object in objects when object.$shares
+        for shareId of object.$shares when object.$shares[shareId]
+          object.$shares[shareId] = false
+          hoodie.store.update object.$type, object.id, $shares: object.$shares

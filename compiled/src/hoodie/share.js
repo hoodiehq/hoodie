@@ -153,6 +153,39 @@ Hoodie.Share = (function() {
     };
   };
 
+  Share.prototype._storeUnshare = function(hoodie) {
+    return function() {
+      var _this = this;
+      return this.pipe(function(objects) {
+        var object, shareId, _i, _len, _results;
+        if (!$.isArray(objects)) {
+          objects = [objects];
+        }
+        _results = [];
+        for (_i = 0, _len = objects.length; _i < _len; _i++) {
+          object = objects[_i];
+          if (object.$shares) {
+            _results.push((function() {
+              var _results1;
+              _results1 = [];
+              for (shareId in object.$shares) {
+                if (!object.$shares[shareId]) {
+                  continue;
+                }
+                object.$shares[shareId] = false;
+                _results1.push(hoodie.store.update(object.$type, object.id, {
+                  $shares: object.$shares
+                }));
+              }
+              return _results1;
+            })());
+          }
+        }
+        return _results;
+      });
+    };
+  };
+
   return Share;
 
 })();

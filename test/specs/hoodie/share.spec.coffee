@@ -239,4 +239,32 @@ describe "Hoodie.Share", ->
           expect(@hoodie.store.update).wasCalledWith 'task', '456', {$shares: {shareId: false}}
           expect(@hoodie.store.update).wasCalledWith 'task', '789', {$shares: {shareId: false}}
     # /#unshareAt()
+
+    describe "#unshare()", ->
+      _when "promise returns one object", ->
+        beforeEach ->
+          @storeDefer.resolve 
+            $type: 'task'
+            id: '123'
+            title: 'milk'
+            $shares: {shareId: true}
+        
+        it "should save object returned by promise with {$shares: {shareId: false}}", ->
+          Hoodie.Share::_storeUnshare(@hoodie).apply(@storeDefer.promise(), [])
+          expect(@hoodie.store.update).wasCalledWith 'task', '123', {$shares: {shareId: false}}
+
+      _when "promise returns multiple objects, of which some are shared at 'shareId'", ->
+        beforeEach ->
+          @storeDefer.resolve [
+            {$type: 'task', id: '123', title: 'milk'}
+            {$type: 'task', id: '456', title: 'milk', $shares: {shareId: true}}
+            {$type: 'task', id: '789', title: 'milk', $shares: {shareId: ['title', 'owner']}}
+          ]
+
+        it "should update objects returned by promise with {$shares: {shareId: false}}", ->
+          Hoodie.Share::_storeUnshare(@hoodie).apply(@storeDefer.promise(), [])
+          expect(@hoodie.store.update).wasNotCalledWith 'task', '123', {$shares: {shareId: false}}
+          expect(@hoodie.store.update).wasCalledWith 'task', '456', {$shares: {shareId: false}}
+          expect(@hoodie.store.update).wasCalledWith 'task', '789', {$shares: {shareId: false}}
+    # /#unshare()
   # /hoodie.store promise decorations
