@@ -145,14 +145,14 @@
     //
 
     // make couch object with id "abc4567" public
-    hoodie.store.update("couch","abc4567", {}, {public: true})
+    hoodie.store.find("couch","abc4567").publish()
 
     // make couch with id "abc4567" public, but do only show the color, hide
     // all other attributes
-    hoodie.store.update("couch","abc4567", {}, {public: ["color"]})
+    hoodie.store.find("couch","abc4567").publish(['color'])
 
     // make couch with id "abc4567" private again
-    hoodie.store.update("couch","abc4567", {}, {public: false})
+    hoodie.store.find("couch","abc4567").unpublish()
 
     // find all couch objects from user "joe"
     hoodie.user("joe").findAll("couch").done( function(couches) { ... })
@@ -179,19 +179,24 @@
     //
 
     // create a new share
-    share = hoodie.share.create()
+    hoodie.share.add().done( function(share) {} )
 
-    // update access settings and set a password
-    share.update({access: {read: true}}, password: 'secret')
+    // grant / revoke access
+    share.grantReadAccess()
+    share.grantWriteAccess()
+    share.revokeReadAccess()
+    share.revokeWriteAccess()
+    share.grantReadAccess('joe@example.com')
+    share.revomeWriteAccess(['joe@example.com','lisa@example.com'])
 
     // add all todo objects to the share
-    share.add( hoodie.store.findAll('todo') )
+    hoodie.store.findAll('todo').shareAt(share.id)
 
     // remove a specific todo from the share
-    share.remove( todoObject );
+    hoodie.store.find('todo', '123').unshareAt(share.id)
 
     // destroy share
-    share.destroy()
+    hoodie.share.remove(share.id)
     
     // open a share and load all its objects
     hoodie.share('shareIdHere').findAll()
