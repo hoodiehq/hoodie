@@ -26,29 +26,74 @@ class Hoodie.ShareInstance extends Hoodie.Remote
     super
   
 
-  # grant / revoke access
-  # -----------------------
+  # grant read access
+  # -------------------
+  #
+  # grant read access to the share. If no users passed,
+  # everybody can read the share objects. If one or multiple
+  # users passed, only these users get read access.
+  # 
+  # examples:
+  # 
+  #     share.grantReadAccess()
+  #     share.grantReadAccess('joe@example.com')
+  #     share.grantReadAccess(['joe@example.com', 'lisa@example.com'])
   grantReadAccess: (users) ->
-    users = [users] if typeof users is 'string'
+    if @access is true or @access.read is true
+      return @hoodie.resolveWith this
 
-    if @access.read?
-      @access.read = users or true
-    else 
-      @access = users or true
+    users = [users] if typeof users is 'string'
+    if @access is false or @access.read is false
+      if @access.read?
+        @access.read = users or true
+      else 
+        @access = users or true
+
+    if users
+      currentUsers = @access.read or @access
+      for user in users
+        currentUsers.push(user) if currentUsers.indexOf(user) is -1
+
+      if @access.read?
+        @access.read = currentUsers
+      else 
+        @access = currentUsers
+
+    else
+      if @access.read?
+        @access.read = true
+      else 
+        @access = true
 
     @hoodie.share.update(@id, access: @access)
 
   revokeReadAccess: (users) ->
+    @revokeWriteAccess(users)
+
+    if @access is false or @access.read is false
+      return @hoodie.resolveWith this
+
     if users
-      if typeof @access is 'boolean' or typeof @access.read is 'boolean'
-        return this
+      if @access is true  or @access.read is true
+        return @hoodie.rejectWith this
 
       users = [users] if typeof users is 'string'
+
       currentUsers = @access.read or @access
+      changed = false
+
       for user in users
         idx = currentUsers.indexOf(user)
         if idx != -1
           currentUsers.splice(idx, 1)
+          changed = true
+
+      unless changed
+        return @hoodie.resolveWith this
+
+      currentUsers = false if currentUsers.length is 0
+
+
 
       if @access.read?
         @access.read = currentUsers
@@ -61,19 +106,28 @@ class Hoodie.ShareInstance extends Hoodie.Remote
     @hoodie.share.update(@id, access: @access)
 
   grantWriteAccess: (users) ->
-    @access = read: true if @access is 'boolean'
+    @grantReadAccess(users)
+    unless @access.read?
+      @access = read: @access
 
-    users = [users] if typeof users is 'string'
-    @access.write = users or true
+    if @access.write is true
+      return @hoodie.resolveWith this
+
+    if users
+      users = [users] if typeof users is 'string'
+      @access.write = users
+    else
+      @access.write = true
 
     @hoodie.share.update(@id, access: @access)
 
   revokeWriteAccess: (users) ->
-    return this unless @access.write?
+    unless @access.write?
+      return @hoodie.resolveWith this
 
     if users
       if typeof @access.write is 'boolean'
-        return this
+        return @hoodie.rejectWith this
 
       users = [users] if typeof users is 'string'
       for user in users
@@ -81,10 +135,13 @@ class Hoodie.ShareInstance extends Hoodie.Remote
         if idx != -1
           @access.write.splice(idx, 1)
 
-    else
-      @access.write = false
+      if @access.write.length is 0
+        @access = @access.read
 
+    else
+      @access = @access.read
+      
     @hoodie.share.update(@id, access: @access)
-    
+
   # PRIVATE
   # --------

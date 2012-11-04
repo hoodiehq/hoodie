@@ -157,6 +157,14 @@ Hoodie = (function(_super) {
     return typeof (obj != null ? obj.done : void 0) === 'function' && typeof obj.resolve === 'undefined';
   };
 
+  Hoodie.prototype.resolveWith = function(something) {
+    return this.defer().resolve(something).promise();
+  };
+
+  Hoodie.prototype.rejectWith = function(something) {
+    return this.defer().reject(something).promise();
+  };
+
   Hoodie.prototype._loadModules = function(modules, context) {
     var instanceName, moduleName, namespace, _results;
     if (modules == null) {
@@ -2233,7 +2241,6 @@ Hoodie.Share = (function() {
     this._open = __bind(this._open, this);
 
     this.instance = Hoodie.ShareInstance;
-    this.instance.prototype.hoodie = this.hoodie;
     api = this._open;
     $.extend(api, this);
     this.hoodie.store.decoratePromises({
@@ -2245,20 +2252,23 @@ Hoodie.Share = (function() {
     return api;
   }
 
-  Share.prototype.add = function(attributes) {
-    var share;
-    if (attributes == null) {
-      attributes = {};
+  Share.prototype.add = function(options) {
+    var _this = this;
+    if (options == null) {
+      options = {};
     }
-    share = new this.instance(attributes);
-    share.save();
-    return share;
+    return this.hoodie.store.add('$share', this._filterShareOptions(options)).pipe(function(object) {
+      if (!_this.hoodie.account.hasAccount()) {
+        _this.hoodie.account.anonymousSignUp();
+      }
+      return new _this.instance(_this.hoodie, object);
+    });
   };
 
   Share.prototype.find = function(id) {
     var _this = this;
     return this.hoodie.store.find('$share', id).pipe(function(object) {
-      return new _this.instance(object);
+      return new _this.instance(_this.hoodie, object);
     });
   };
 
@@ -2269,41 +2279,44 @@ Hoodie.Share = (function() {
       _results = [];
       for (_i = 0, _len = objects.length; _i < _len; _i++) {
         obj = objects[_i];
-        _results.push(new _this.instance(obj));
+        _results.push(new _this.instance(_this.hoodie, obj));
       }
       return _results;
     });
   };
 
-  Share.prototype.findOrAdd = function(id, attributes) {
+  Share.prototype.findOrAdd = function(id, options) {
     var _this = this;
-    return this.hoodie.store.findOrAdd('$share', id, attributes).pipe(function(object) {
-      return new _this.instance(object);
+    return this.hoodie.store.findOrAdd('$share', id, this._filterShareOptions(options)).pipe(function(object) {
+      if (!_this.hoodie.account.hasAccount()) {
+        _this.hoodie.account.anonymousSignUp();
+      }
+      return new _this.instance(_this.hoodie, object);
     });
   };
 
-  Share.prototype.save = function(id, attributes) {
+  Share.prototype.save = function(id, options) {
     var _this = this;
-    return this.hoodie.store.save('$share', id, attributes).pipe(function(object) {
-      return new _this.instance(object);
+    return this.hoodie.store.save('$share', id, this._filterShareOptions(options)).pipe(function(object) {
+      return new _this.instance(_this.hoodie, object);
     });
   };
 
-  Share.prototype.update = function(id, changed_attributes) {
+  Share.prototype.update = function(id, changed_options) {
     var _this = this;
-    return this.hoodie.store.update('$share', id, changed_attributes).pipe(function(object) {
-      return new _this.instance(object);
+    return this.hoodie.store.update('$share', id, this._filterShareOptions(changed_options)).pipe(function(object) {
+      return new _this.instance(_this.hoodie, object);
     });
   };
 
-  Share.prototype.updateAll = function(changed_attributes) {
+  Share.prototype.updateAll = function(changed_options) {
     var _this = this;
-    return this.hoodie.store.updateAll('$share', changed_attributes).pipe(function(objects) {
+    return this.hoodie.store.updateAll('$share', this._filterShareOptions(changed_options)).pipe(function(objects) {
       var obj, _i, _len, _results;
       _results = [];
       for (_i = 0, _len = objects.length; _i < _len; _i++) {
         obj = objects[_i];
-        _results.push(new _this.instance(obj));
+        _results.push(new _this.instance(_this.hoodie, obj));
       }
       return _results;
     });
@@ -2323,6 +2336,24 @@ Hoodie.Share = (function() {
     return this.hoodie.store.removeAll('$share');
   };
 
+  Share.prototype._allowedOptions = ["id", "access"];
+
+  Share.prototype._filterShareOptions = function(options) {
+    var filteredOptions, option, _i, _len, _ref;
+    if (options == null) {
+      options = {};
+    }
+    filteredOptions = {};
+    _ref = this._allowedOptions;
+    for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+      option = _ref[_i];
+      if (options.hasOwnProperty(option)) {
+        filteredOptions[option] = options[option];
+      }
+    }
+    return filteredOptions;
+  };
+
   Share.prototype._open = function(shareId, options) {
     if (options == null) {
       options = {};
@@ -2330,7 +2361,7 @@ Hoodie.Share = (function() {
     $.extend(options, {
       id: shareId
     });
-    return new this.instance(options);
+    return new this.instance(this.hoodie, options);
   };
 
   Share.prototype._storeShareAt = function(shareId, properties) {
@@ -2419,33 +2450,34 @@ Hoodie.Share = (function() {
   };
 
   Share.prototype._storeShare = function(properties) {
-    var newShare, updateObject,
-      _this = this;
-    newShare = new this.hoodie.share.instance;
-    updateObject = function(object) {
-      object.$shares || (object.$shares = {});
-      object.$shares[newShare.id] = properties || true;
-      _this.hoodie.store.update(object.$type, object.id, {
-        $shares: object.$shares
-      });
-      return object;
-    };
-    return this.pipe(function(objects) {
-      var object, value;
-      value = (function() {
-        var _i, _len, _results;
-        if ($.isArray(objects)) {
-          _results = [];
-          for (_i = 0, _len = objects.length; _i < _len; _i++) {
-            object = objects[_i];
-            _results.push(updateObject(object));
+    var _this = this;
+    return this.hoodie.share.add().done(function(newShare) {
+      var updateObject;
+      updateObject = function(object) {
+        object.$shares || (object.$shares = {});
+        object.$shares[newShare.id] = properties || true;
+        _this.hoodie.store.update(object.$type, object.id, {
+          $shares: object.$shares
+        });
+        return object;
+      };
+      _this.pipe(function(objects) {
+        var object, value;
+        return value = (function() {
+          var _i, _len, _results;
+          if ($.isArray(objects)) {
+            _results = [];
+            for (_i = 0, _len = objects.length; _i < _len; _i++) {
+              object = objects[_i];
+              _results.push(updateObject(object));
+            }
+            return _results;
+          } else {
+            return updateObject(objects);
           }
-          return _results;
-        } else {
-          return updateObject(objects);
-        }
-      })();
-      return _this.hoodie.defer().resolve(value, newShare);
+        })();
+      });
+      return _this.hoodie.defer().resolve(value, newShare).promise();
     });
   };
 
@@ -2453,11 +2485,8 @@ Hoodie.Share = (function() {
 
 })();
 // Generated by CoffeeScript 1.3.3
-var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
-  __hasProp = {}.hasOwnProperty,
-  __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; },
-  __indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; i < l; i++) { if (i in this && this[i] === item) return i; } return -1; },
-  __slice = [].slice;
+var __hasProp = {}.hasOwnProperty,
+  __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
 
 Hoodie.ShareInstance = (function(_super) {
 
@@ -2465,176 +2494,150 @@ Hoodie.ShareInstance = (function(_super) {
 
   ShareInstance.prototype.access = false;
 
-  function ShareInstance(options) {
+  function ShareInstance(hoodie, options) {
+    this.hoodie = hoodie;
     if (options == null) {
       options = {};
     }
-    this._isMySharedObjectAndChanged = __bind(this._isMySharedObjectAndChanged, this);
-
-    this._isMySharedObject = __bind(this._isMySharedObject, this);
-
-    this._toggle = __bind(this._toggle, this);
-
-    this._remove = __bind(this._remove, this);
-
-    this._add = __bind(this._add, this);
-
-    this.findAllObjects = __bind(this.findAllObjects, this);
-
-    this.destroy = __bind(this.destroy, this);
-
-    this.sync = __bind(this.sync, this);
-
-    this.get = __bind(this.get, this);
-
-    this.set = __bind(this.set, this);
-
-    $.extend(this, options);
-    this.set(options);
-    this.id || (this.id = this.hoodie.uuid());
+    this.id = options.id || this.hoodie.uuid();
     this.name = "share/" + this.id;
+    $.extend(this, options);
+    ShareInstance.__super__.constructor.apply(this, arguments);
   }
 
-  ShareInstance.prototype._memory = {};
-
-  ShareInstance.prototype._allowed_options = ["access", "password"];
-
-  ShareInstance.prototype.set = function(key, value) {
-    var _key;
-    if (typeof key === 'object') {
-      for (_key in key) {
-        value = key[_key];
-        if (__indexOf.call(this._allowed_options, _key) >= 0) {
-          this[_key] = this._memory[_key] = value;
+  ShareInstance.prototype.grantReadAccess = function(users) {
+    var currentUsers, user, _i, _len;
+    if (this.access === true || this.access.read === true) {
+      return this.hoodie.resolveWith(this);
+    }
+    if (typeof users === 'string') {
+      users = [users];
+    }
+    if (this.access === false || this.access.read === false) {
+      if (this.access.read != null) {
+        this.access.read = users || true;
+      } else {
+        this.access = users || true;
+      }
+    }
+    if (users) {
+      currentUsers = this.access.read || this.access;
+      for (_i = 0, _len = users.length; _i < _len; _i++) {
+        user = users[_i];
+        if (currentUsers.indexOf(user) === -1) {
+          currentUsers.push(user);
         }
       }
+      if (this.access.read != null) {
+        this.access.read = currentUsers;
+      } else {
+        this.access = currentUsers;
+      }
     } else {
-      if (__indexOf.call(this._allowed_options, key) >= 0) {
-        this[key] = this._memory[key] = value;
+      if (this.access.read != null) {
+        this.access.read = true;
+      } else {
+        this.access = true;
       }
     }
-    return void 0;
-  };
-
-  ShareInstance.prototype.get = function(key) {
-    return this[key];
-  };
-
-  ShareInstance.prototype.save = function(update, options) {
-    var _handleUpdate,
-      _this = this;
-    if (update == null) {
-      update = {};
-    }
-    if (!this.hoodie.account.hasAccount()) {
-      this.hoodie.account.anonymousSignUp();
-    }
-    if (update) {
-      this.set(update);
-    }
-    _handleUpdate = function(properties, wasCreated) {
-      _this._memory = {};
-      $.extend(_this, properties);
-      return _this;
-    };
-    return this.hoodie.store.update("$share", this.id, this._memory, options).pipe(_handleUpdate);
-  };
-
-  ShareInstance.prototype.add = function(objects, sharedAttributes) {
-    if (sharedAttributes == null) {
-      sharedAttributes = true;
-    }
-    return this.toggle(objects, sharedAttributes);
-  };
-
-  ShareInstance.prototype.remove = function(objects) {
-    return this.toggle(objects, false);
-  };
-
-  ShareInstance.prototype.toggle = function(objects, filter) {
-    var updateMethod;
-    if (!(this.hoodie.isPromise(objects) || $.isArray(objects))) {
-      objects = [objects];
-    }
-    updateMethod = (function() {
-      switch (filter) {
-        case void 0:
-          return this._toggle;
-        case false:
-          return this._remove;
-        default:
-          return this._add(filter);
-      }
-    }).call(this);
-    return this.hoodie.store.updateAll(objects, updateMethod);
-  };
-
-  ShareInstance.prototype.sync = function() {
-    return this.save().pipe(this.findAllObjects).pipe(this.hoodie.remote.sync);
-  };
-
-  ShareInstance.prototype.destroy = function() {
-    var _this = this;
-    return this.remove(this.findAllObjects()).then(function() {
-      return _this.hoodie.store.remove("$share", _this.id);
+    return this.hoodie.share.update(this.id, {
+      access: this.access
     });
   };
 
-  ShareInstance.prototype.findAllObjects = function() {
-    return this.hoodie.store.findAll(this._isMySharedObjectAndChanged);
-  };
-
-  ShareInstance.prototype._add = function(filter) {
-    var _this = this;
-    return function(obj) {
-      obj.$shares || (obj.$shares = {});
-      obj.$shares[_this.id] = filter;
-      return {
-        $shares: obj.$shares
-      };
-    };
-  };
-
-  ShareInstance.prototype._remove = function(obj) {
-    if (!obj.$shares) {
-      return {};
+  ShareInstance.prototype.revokeReadAccess = function(users) {
+    var changed, currentUsers, idx, user, _i, _len;
+    this.revokeWriteAccess(users);
+    if (this.access === false || this.access.read === false) {
+      return this.hoodie.resolveWith(this);
     }
-    delete obj.$shares[this.id];
-    if ($.isEmptyObject(obj.$shares)) {
-      obj.$shares = void 0;
-    }
-    return {
-      $shares: obj.$shares
-    };
-  };
-
-  ShareInstance.prototype._toggle = function(obj) {
-    var doAdd;
-    try {
-      doAdd = obj.$shares[this.id] === void 0 || obj.$shares[this.id] === false;
-    } catch (e) {
-      doAdd = true;
-    }
-    if (doAdd) {
-      return this._add(true)(obj);
+    if (users) {
+      if (this.access === true || this.access.read === true) {
+        return this.hoodie.rejectWith(this);
+      }
+      if (typeof users === 'string') {
+        users = [users];
+      }
+      currentUsers = this.access.read || this.access;
+      changed = false;
+      for (_i = 0, _len = users.length; _i < _len; _i++) {
+        user = users[_i];
+        idx = currentUsers.indexOf(user);
+        if (idx !== -1) {
+          currentUsers.splice(idx, 1);
+          changed = true;
+        }
+      }
+      if (!changed) {
+        return this.hoodie.resolveWith(this);
+      }
+      if (currentUsers.length === 0) {
+        currentUsers = false;
+      }
+      if (this.access.read != null) {
+        this.access.read = currentUsers;
+      } else {
+        this.access = currentUsers;
+      }
     } else {
-      return this._remove(obj);
+      this.access = false;
     }
+    return this.hoodie.share.update(this.id, {
+      access: this.access
+    });
   };
 
-  ShareInstance.prototype._isMySharedObject = function(obj) {
-    var _ref;
-    return ((_ref = obj.$shares) != null ? _ref[this.id] : void 0) != null;
+  ShareInstance.prototype.grantWriteAccess = function(users) {
+    this.grantReadAccess(users);
+    if (this.access.read == null) {
+      this.access = {
+        read: this.access
+      };
+    }
+    if (this.access.write === true) {
+      return this.hoodie.resolveWith(this);
+    }
+    if (users) {
+      if (typeof users === 'string') {
+        users = [users];
+      }
+      this.access.write = users;
+    } else {
+      this.access.write = true;
+    }
+    return this.hoodie.share.update(this.id, {
+      access: this.access
+    });
   };
 
-  ShareInstance.prototype._isMySharedObjectAndChanged = function(obj) {
-    var belongsToMe, _ref;
-    belongsToMe = obj.id === this.id || (((_ref = obj.$shares) != null ? _ref[this.id] : void 0) != null);
-    return belongsToMe && this.hoodie.store.isDirty(obj.$type, obj.id);
-  };
-
-  ShareInstance.prototype._handleRemoteChanges = function() {
-    return console.log.apply(console, ['_handleRemoteChanges'].concat(__slice.call(arguments)));
+  ShareInstance.prototype.revokeWriteAccess = function(users) {
+    var idx, user, _i, _len;
+    if (this.access.write == null) {
+      return this.hoodie.resolveWith(this);
+    }
+    if (users) {
+      if (typeof this.access.write === 'boolean') {
+        return this.hoodie.rejectWith(this);
+      }
+      if (typeof users === 'string') {
+        users = [users];
+      }
+      for (_i = 0, _len = users.length; _i < _len; _i++) {
+        user = users[_i];
+        idx = this.access.write.indexOf(user);
+        if (idx !== -1) {
+          this.access.write.splice(idx, 1);
+        }
+      }
+      if (this.access.write.length === 0) {
+        this.access = this.access.read;
+      }
+    } else {
+      this.access = this.access.read;
+    }
+    return this.hoodie.share.update(this.id, {
+      access: this.access
+    });
   };
 
   return ShareInstance;

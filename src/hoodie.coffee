@@ -87,8 +87,12 @@ class Hoodie extends Events
     typeof obj?.done is 'function' and typeof obj.resolve is 'undefined'
 
   #
-  promisify: (something) ->
+  resolveWith: (something) ->
     @defer().resolve(something).promise()
+
+  # 
+  rejectWith: (something) ->
+    @defer().reject(something).promise()
   
 
   # ## Private

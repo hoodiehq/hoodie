@@ -19,6 +19,8 @@ Mocks.Hoodie = ->
   defer         : $.Deferred
   isPromise     : Hoodie::isPromise
   uuid          : -> 'uuid'
+  resolveWith   : -> 'resolved'
+  rejectWith    : -> 'rejected'
     
   store         :
     add           : -> promiseMock 
@@ -60,3 +62,14 @@ Mocks.Hoodie = ->
     on          : ->
     one         : ->
     trigger     : ->
+
+  share :
+    add         : -> promiseMock 
+    remove      : -> promiseMock 
+    save        : -> promiseMock 
+    update      : -> promiseMock 
+    updateAll   : -> promiseMock 
+    find        : -> promiseMock 
+    findAll     : -> promiseMock
+    findOrAdd   : -> promiseMock 
+    removeAll   : -> promiseMock 

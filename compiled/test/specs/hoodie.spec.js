@@ -102,11 +102,18 @@ describe("Hoodie", function() {
       });
     });
   });
-  return describe("#promisify(something)", function() {
+  describe("#resolveWith(something)", function() {
     return it("wraps passad arguments into a promise and returns it", function() {
       var promise;
-      promise = this.hoodie.promisify('funky');
+      promise = this.hoodie.resolveWith('funky');
       return expect(promise).toBeResolvedWith('funky');
+    });
+  });
+  return describe("#rejectWith(something)", function() {
+    return it("wraps passad arguments into a promise and returns it", function() {
+      var promise;
+      promise = this.hoodie.rejectWith('funky');
+      return expect(promise).toBeRejectedWith('funky');
     });
   });
 });

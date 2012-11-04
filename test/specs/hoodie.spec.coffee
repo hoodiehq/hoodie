@@ -3,7 +3,7 @@ describe "Hoodie", ->
     @hoodie = new Hoodie 'http://couch.example.com'
     spyOn($, "ajax").andReturn $.Deferred()
   
-  
+
   describe "constructor", ->
     it "should store the CouchDB URL", ->
       hoodie = new Hoodie 'http://couch.example.com'
@@ -81,9 +81,15 @@ describe "Hoodie", ->
         expect(@hoodie.uuid(5).length).toBe 5
   # /#uuid(num)
 
-  describe "#promisify(something)", ->
+  describe "#resolveWith(something)", ->
     it "wraps passad arguments into a promise and returns it", ->
-       promise = @hoodie.promisify('funky')
+       promise = @hoodie.resolveWith('funky')
        expect(promise).toBeResolvedWith 'funky'
-  # /#promisify(something)
+  # /#resolveWith(something)
+
+  describe "#rejectWith(something)", ->
+    it "wraps passad arguments into a promise and returns it", ->
+       promise = @hoodie.rejectWith('funky')
+       expect(promise).toBeRejectedWith 'funky'
+  # /#rejectWith(something)
 # /Hoodie

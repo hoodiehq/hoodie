@@ -24,6 +24,12 @@ Mocks.Hoodie = function() {
     uuid: function() {
       return 'uuid';
     },
+    resolveWith: function() {
+      return 'resolved';
+    },
+    rejectWith: function() {
+      return 'rejected';
+    },
     store: {
       add: function() {
         return promiseMock;
@@ -84,6 +90,35 @@ Mocks.Hoodie = function() {
       on: function() {},
       one: function() {},
       trigger: function() {}
+    },
+    share: {
+      add: function() {
+        return promiseMock;
+      },
+      remove: function() {
+        return promiseMock;
+      },
+      save: function() {
+        return promiseMock;
+      },
+      update: function() {
+        return promiseMock;
+      },
+      updateAll: function() {
+        return promiseMock;
+      },
+      find: function() {
+        return promiseMock;
+      },
+      findAll: function() {
+        return promiseMock;
+      },
+      findOrAdd: function() {
+        return promiseMock;
+      },
+      removeAll: function() {
+        return promiseMock;
+      }
     }
   };
 };
