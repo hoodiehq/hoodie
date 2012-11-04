@@ -9,7 +9,6 @@ Hoodie.Share = (function() {
     this._open = __bind(this._open, this);
 
     this.instance = Hoodie.ShareInstance;
-    this.instance.prototype.hoodie = this.hoodie;
     api = this._open;
     $.extend(api, this);
     this.hoodie.store.decoratePromises({
@@ -22,19 +21,19 @@ Hoodie.Share = (function() {
   }
 
   Share.prototype.add = function(attributes) {
-    var share;
+    var _this = this;
     if (attributes == null) {
       attributes = {};
     }
-    share = new this.instance(attributes);
-    share.save();
-    return share;
+    return this.hoodie.store.add('$share', attributes).pipe(function(object) {
+      return new _this.instance(_this.hoodie, object);
+    });
   };
 
   Share.prototype.find = function(id) {
     var _this = this;
     return this.hoodie.store.find('$share', id).pipe(function(object) {
-      return new _this.instance(object);
+      return new _this.instance(_this.hoodie, object);
     });
   };
 
@@ -45,7 +44,7 @@ Hoodie.Share = (function() {
       _results = [];
       for (_i = 0, _len = objects.length; _i < _len; _i++) {
         obj = objects[_i];
-        _results.push(new _this.instance(obj));
+        _results.push(new _this.instance(_this.hoodie, obj));
       }
       return _results;
     });
@@ -54,21 +53,21 @@ Hoodie.Share = (function() {
   Share.prototype.findOrAdd = function(id, attributes) {
     var _this = this;
     return this.hoodie.store.findOrAdd('$share', id, attributes).pipe(function(object) {
-      return new _this.instance(object);
+      return new _this.instance(_this.hoodie, object);
     });
   };
 
   Share.prototype.save = function(id, attributes) {
     var _this = this;
     return this.hoodie.store.save('$share', id, attributes).pipe(function(object) {
-      return new _this.instance(object);
+      return new _this.instance(_this.hoodie, object);
     });
   };
 
   Share.prototype.update = function(id, changed_attributes) {
     var _this = this;
     return this.hoodie.store.update('$share', id, changed_attributes).pipe(function(object) {
-      return new _this.instance(object);
+      return new _this.instance(_this.hoodie, object);
     });
   };
 
@@ -79,7 +78,7 @@ Hoodie.Share = (function() {
       _results = [];
       for (_i = 0, _len = objects.length; _i < _len; _i++) {
         obj = objects[_i];
-        _results.push(new _this.instance(obj));
+        _results.push(new _this.instance(_this.hoodie, obj));
       }
       return _results;
     });
@@ -106,7 +105,7 @@ Hoodie.Share = (function() {
     $.extend(options, {
       id: shareId
     });
-    return new this.instance(options);
+    return new this.instance(this.hoodie, options);
   };
 
   Share.prototype._storeShareAt = function(shareId, properties) {

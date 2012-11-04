@@ -5,10 +5,6 @@ describe "Hoodie.Share", ->
     spyOn(@share, "instance")
 
   describe "constructor", ->
-    it "should set Hoodie.ShareInstance.prototype.hoodie", ->
-      new Hoodie.Share @hoodie
-      instance = new Hoodie.ShareInstance
-      expect(instance.hoodie).toBe @hoodie
 
     it "should extend hoodie.store API with shareAt / unshareAt methods", ->
       spyOn(@hoodie.store, "decoratePromises")
@@ -39,14 +35,20 @@ describe "Hoodie.Share", ->
   describe "#add(attributes)", ->
     beforeEach ->
       @instance      = jasmine.createSpy("instance")
-      @instance.save = jasmine.createSpy("save")
       @share.instance.andReturn @instance
+      @addDefer = @hoodie.defer()
+      spyOn(@hoodie.store, "add").andReturn @addDefer.promise()
     
-    it "should initiate a new Hoodie.ShareInstance and save it", ->
-      returnValue = @share.add funky: 'fresh'
-      expect(@share.instance).wasCalledWith funky: 'fresh'
-      expect(@instance.save).wasCalled()
-      expect(returnValue).toBe @instance
+    it "should add new object in hoodie.store", ->
+      @share.add(funky: 'fresh')
+      expect(@hoodie.store.add).wasCalledWith '$share', funky: 'fresh'
+    
+    _when "store.add successful", ->
+      beforeEach ->
+        @addDefer.resolve hell: 'yeah'
+      
+      it "should resolve with a share instance", ->
+        expect(@share.add(funky: 'fresh')).toBeResolvedWith @instance
   # /#add(attributes)
 
   describe "#find(share_id)", ->

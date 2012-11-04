@@ -7,12 +7,6 @@ describe("Hoodie.Share", function() {
     return spyOn(this.share, "instance");
   });
   describe("constructor", function() {
-    it("should set Hoodie.ShareInstance.prototype.hoodie", function() {
-      var instance;
-      new Hoodie.Share(this.hoodie);
-      instance = new Hoodie.ShareInstance;
-      return expect(instance.hoodie).toBe(this.hoodie);
-    });
     return it("should extend hoodie.store API with shareAt / unshareAt methods", function() {
       var shareAt, unshare, unshareAt, _ref;
       spyOn(this.hoodie.store, "decoratePromises");
@@ -48,19 +42,29 @@ describe("Hoodie.Share", function() {
   describe("#add(attributes)", function() {
     beforeEach(function() {
       this.instance = jasmine.createSpy("instance");
-      this.instance.save = jasmine.createSpy("save");
-      return this.share.instance.andReturn(this.instance);
+      this.share.instance.andReturn(this.instance);
+      this.addDefer = this.hoodie.defer();
+      return spyOn(this.hoodie.store, "add").andReturn(this.addDefer.promise());
     });
-    return it("should initiate a new Hoodie.ShareInstance and save it", function() {
-      var returnValue;
-      returnValue = this.share.add({
+    it("should add new object in hoodie.store", function() {
+      this.share.add({
         funky: 'fresh'
       });
-      expect(this.share.instance).wasCalledWith({
+      return expect(this.hoodie.store.add).wasCalledWith('$share', {
         funky: 'fresh'
       });
-      expect(this.instance.save).wasCalled();
-      return expect(returnValue).toBe(this.instance);
+    });
+    return _when("store.add successful", function() {
+      beforeEach(function() {
+        return this.addDefer.resolve({
+          hell: 'yeah'
+        });
+      });
+      return it("should resolve with a share instance", function() {
+        return expect(this.share.add({
+          funky: 'fresh'
+        })).toBeResolvedWith(this.instance);
+      });
     });
   });
   describe("#find(share_id)", function() {

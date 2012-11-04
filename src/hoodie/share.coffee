@@ -51,9 +51,6 @@ class Hoodie.Share
     # set pointer to Hoodie.ShareInstance
     @instance = Hoodie.ShareInstance
 
-    # give all Share instances access to our hoodie
-    @instance.prototype.hoodie = @hoodie
-
     # return custom api which allows direct call
     api = @_open
     $.extend api, this
@@ -74,9 +71,8 @@ class Hoodie.Share
   # creates a new share and returns it
   #
   add : (attributes = {}) ->
-    share = new @instance attributes
-    share.save()
-    share
+    @hoodie.store.add('$share', attributes).pipe (object) =>
+      new @instance @hoodie, object
     
   
   # find
@@ -86,7 +82,7 @@ class Hoodie.Share
   #
   find : (id) ->
     @hoodie.store.find('$share', id).pipe (object) =>
-      new @instance object
+      new @instance @hoodie, object
 
 
   # findAll
@@ -96,7 +92,7 @@ class Hoodie.Share
   #
   findAll : ->
     @hoodie.store.findAll('$share').pipe (objects) =>
-      new @instance obj for obj in objects
+      new @instance @hoodie, obj for obj in objects
 
 
   # findOrAdd
@@ -106,7 +102,7 @@ class Hoodie.Share
   #
   findOrAdd : (id, attributes) ->
     @hoodie.store.findOrAdd('$share', id, attributes).pipe (object) =>
-      new @instance object
+      new @instance @hoodie, object
 
 
   # save
@@ -116,7 +112,7 @@ class Hoodie.Share
   #
   save : (id, attributes) ->
     @hoodie.store.save('$share', id, attributes).pipe (object) =>
-      new @instance object
+      new @instance @hoodie, object
 
 
   # update
@@ -126,7 +122,7 @@ class Hoodie.Share
   #
   update : (id, changed_attributes) ->
     @hoodie.store.update('$share', id, changed_attributes).pipe (object) =>
-      new @instance object
+      new @instance @hoodie, object
 
 
   # updateAll
@@ -136,7 +132,7 @@ class Hoodie.Share
   #
   updateAll : ( changed_attributes ) ->
     @hoodie.store.updateAll('$share', changed_attributes).pipe (objects) =>
-      new @instance obj for obj in objects
+      new @instance @hoodie, obj for obj in objects
 
 
   # remove
@@ -167,7 +163,7 @@ class Hoodie.Share
   # opens a a remote share store, returns a Hoodie.Remote instance
   _open : (shareId, options = {}) =>
     $.extend options, {id: shareId}
-    new @instance options
+    new @instance @hoodie, options
 
 
   # hoodie.store decorations
