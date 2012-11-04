@@ -247,21 +247,20 @@ hoodie.remote.on( "changed:couch:abc4567", function( changedObject) { } )
 ```
 
 
-### Public Shares (Public User Stores)
+### Public User Stores
 
-Users can share their data with, controlling exactly what will
-be shared.
+Users can publish their data, controlling exactly what will be made public.
 
 ```javascript
 // make couch with id "abc4567" public
-hoodie.store.update("couch","abc4567", {}, {public: true})
+hoodie.store.update("couch","abc4567").publish()
 
 // make couch with id "abc4567" public, but do only show the color, hide
 // all other attributes
-hoodie.store.update("couch","abc4567", {}, {public: ["color"]})
+hoodie.store.update("couch","abc4567").publish(['color'])
 
 // make couch with id "abc4567" private again
-hoodie.store.update("couch","abc4567", {}, {public: false})
+hoodie.store.update("couch","abc4567").unpublish()
 
 // find all couches from user "joe"
 hoodie.user("joe").findAll("couch").done( function(couches) { ... })
@@ -277,6 +276,17 @@ available through the hoodie.global API
 // find all public songs from all users
 hoodie.global.findAll("song").done( function(songs) { ... })
 ```
+
+
+### Public Shares
+
+Users can share their data with others, controlling exactly what will
+be shared.
+
+```javascript
+// see http://hoodiehq.github.com/hoodie.js/
+```
+
 
 
 Send E-Mails
