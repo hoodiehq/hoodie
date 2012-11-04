@@ -19,10 +19,17 @@ describe("Hoodie.ShareInstance", function() {
       });
       return expect(share.name).toBe('share/id123');
     });
-    return it("should generate an id if options.id wasn't passed", function() {
+    it("should generate an id if options.id wasn't passed", function() {
       var share;
       share = new Hoodie.ShareInstance(this.hoodie);
       return expect(share.id).toBe('uuid');
+    });
+    return it("should set options", function() {
+      var share;
+      share = new Hoodie.ShareInstance(this.hoodie, {
+        funky: 'fresh'
+      });
+      return expect(share.funky).toBe('fresh');
     });
   });
 });

@@ -40,8 +40,8 @@ describe "Hoodie.Share", ->
       spyOn(@hoodie.store, "add").andReturn @addDefer.promise()
     
     it "should add new object in hoodie.store", ->
-      @share.add(funky: 'fresh')
-      expect(@hoodie.store.add).wasCalledWith '$share', funky: 'fresh'
+      @share.add(id: '123')
+      expect(@hoodie.store.add).wasCalledWith '$share', id: '123'
     
     _when "store.add successful", ->
       beforeEach ->
@@ -104,8 +104,8 @@ describe "Hoodie.Share", ->
       spyOn(@hoodie.store, "save").andCallThrough()
     
     it "should proxy to hoodie.store.save('$share', 'share_id', attributes)", ->
-      @share.save('abc4567', funky: 'fresh')
-      expect(@hoodie.store.save).wasCalledWith '$share', 'abc4567', funky: 'fresh'
+      @share.save('abc4567', password: 'fresh')
+      expect(@hoodie.store.save).wasCalledWith '$share', 'abc4567', password: 'fresh'
 
     it "should resolve with a Share Instance", ->
       @hoodie.store.save.andReturn @hoodie.defer().resolve({}).promise()
@@ -119,8 +119,8 @@ describe "Hoodie.Share", ->
       spyOn(@hoodie.store, "update").andCallThrough()
     
     it "should proxy to hoodie.store.update('$share', 'share_id', attributes)", ->
-      @share.update('abc4567', funky: 'fresh')
-      expect(@hoodie.store.update).wasCalledWith '$share', 'abc4567', funky: 'fresh'
+      @share.update('abc4567', password: 'fresh')
+      expect(@hoodie.store.update).wasCalledWith '$share', 'abc4567', password: 'fresh'
 
     it "should resolve with a Share Instance", ->
       @hoodie.store.update.andReturn @hoodie.defer().resolve({}).promise()
@@ -136,13 +136,13 @@ describe "Hoodie.Share", ->
     
     it "should proxy to hoodie.store.updateAll('$share', changed_attributes)", ->
       @hoodie.store.updateAll.andCallThrough()
-      @share.updateAll( funky: 'fresh' )
-      expect(@hoodie.store.updateAll).wasCalledWith '$share', funky: 'fresh'
+      @share.updateAll( password: 'fresh' )
+      expect(@hoodie.store.updateAll).wasCalledWith '$share', password: 'fresh'
 
     it "should resolve with an array of Share instances", ->
       @hoodie.store.updateAll.andReturn @hoodie.defer().resolve([{}, {}]).promise()
       @share.instance.andCallFake -> this.foo = 'bar'
-      promise = @share.updateAll funky: 'fresh'
+      promise = @share.updateAll password: 'fresh'
       expect(promise).toBeResolvedWith [{foo: 'bar'}, {foo: 'bar'}]
   # /#findAll()
 

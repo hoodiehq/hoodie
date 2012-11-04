@@ -20,4 +20,11 @@ class Hoodie.ShareInstance extends Hoodie.Remote
     # set name from id
     @name = "share/#{@id}"
 
+    # set options
+    $.extend this, options
+
     super
+
+
+  # PRIVATE
+  # --------

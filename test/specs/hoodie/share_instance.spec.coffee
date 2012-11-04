@@ -14,4 +14,8 @@ describe "Hoodie.ShareInstance", ->
     it "should generate an id if options.id wasn't passed", ->
       share = new Hoodie.ShareInstance @hoodie
       expect(share.id).toBe 'uuid'
+
+    it "should set options", ->
+      share = new Hoodie.ShareInstance @hoodie, funky: 'fresh'
+      expect(share.funky).toBe 'fresh'
   # /constructor

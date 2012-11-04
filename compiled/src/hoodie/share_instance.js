@@ -15,6 +15,7 @@ Hoodie.ShareInstance = (function(_super) {
     }
     this.id = options.id || this.hoodie.uuid();
     this.name = "share/" + this.id;
+    $.extend(this, options);
     ShareInstance.__super__.constructor.apply(this, arguments);
   }
 

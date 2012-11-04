@@ -70,8 +70,8 @@ class Hoodie.Share
 
   # creates a new share and returns it
   #
-  add : (attributes = {}) ->
-    @hoodie.store.add('$share', attributes).pipe (object) =>
+  add : (options = {}) ->
+    @hoodie.store.add('$share', @_filterShareOptions(options)).pipe (object) =>
       new @instance @hoodie, object
     
   
@@ -100,8 +100,8 @@ class Hoodie.Share
 
   # find or add a new share
   #
-  findOrAdd : (id, attributes) ->
-    @hoodie.store.findOrAdd('$share', id, attributes).pipe (object) =>
+  findOrAdd : (id, options) ->
+    @hoodie.store.findOrAdd('$share', id, @_filterShareOptions options).pipe (object) =>
       new @instance @hoodie, object
 
 
@@ -110,8 +110,8 @@ class Hoodie.Share
 
   # add or overwrite a share
   #
-  save : (id, attributes) ->
-    @hoodie.store.save('$share', id, attributes).pipe (object) =>
+  save : (id, options) ->
+    @hoodie.store.save('$share', id, @_filterShareOptions options).pipe (object) =>
       new @instance @hoodie, object
 
 
@@ -120,8 +120,8 @@ class Hoodie.Share
 
   # add or overwrite a share
   #
-  update : (id, changed_attributes) ->
-    @hoodie.store.update('$share', id, changed_attributes).pipe (object) =>
+  update : (id, changed_options) ->
+    @hoodie.store.update('$share', id, @_filterShareOptions changed_options).pipe (object) =>
       new @instance @hoodie, object
 
 
@@ -130,8 +130,8 @@ class Hoodie.Share
 
   # update all my existing shares
   #
-  updateAll : ( changed_attributes ) ->
-    @hoodie.store.updateAll('$share', changed_attributes).pipe (objects) =>
+  updateAll : ( changed_options ) ->
+    @hoodie.store.updateAll('$share', @_filterShareOptions changed_options).pipe (objects) =>
       new @instance @hoodie, obj for obj in objects
 
 
@@ -158,8 +158,18 @@ class Hoodie.Share
   # Private
   # ---------
 
+  _allowedOptions: ["id", "access", "password"]
+
+  # ### filter share options
+  #
+  _filterShareOptions: (options = {}) ->
+    filteredOptions = {}
+    for option in @_allowedOptions when options.hasOwnProperty option
+      filteredOptions[option] = options[option]
+    filteredOptions
+
   # ### open
-  
+  #
   # opens a a remote share store, returns a Hoodie.Remote instance
   _open : (shareId, options = {}) =>
     $.extend options, {id: shareId}
@@ -224,19 +234,19 @@ class Hoodie.Share
   # share
   #
   _storeShare : (properties) -> 
-    newShare = new @hoodie.share.instance
-    
-    updateObject = (object) =>
-      object.$shares or= {}
-      object.$shares[newShare.id] = properties or true
-      @hoodie.store.update object.$type, object.id, $shares: object.$shares
-      return object
+    @hoodie.share.add().done (newShare) => 
 
-    @pipe (objects) =>
-      
-      value = if $.isArray objects
-        updateObject(object) for object in objects
-      else 
-        updateObject(objects)
+      updateObject = (object) =>
+        object.$shares or= {}
+        object.$shares[newShare.id] = properties or true
+        @hoodie.store.update object.$type, object.id, $shares: object.$shares
+        return object
 
-      return @hoodie.defer().resolve(value, newShare)
+      @pipe (objects) =>
+        
+        value = if $.isArray objects
+          updateObject(object) for object in objects
+        else 
+          updateObject(objects)
+
+      return @hoodie.defer().resolve(value, newShare).promise()
