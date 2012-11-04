@@ -10,6 +10,14 @@ describe "Hoodie.Share", ->
       instance = new Hoodie.ShareInstance
       expect(instance.hoodie).toBe @hoodie
 
+    it "should extend hoodie.store API with shareAt / unshareAt methods", ->
+      spyOn(@hoodie.store, "decoratePromises")
+      new Hoodie.Share @hoodie
+      expect(@hoodie.store.decoratePromises).wasCalled()
+      {shareAt, unshareAt} = @hoodie.store.decoratePromises.mostRecentCall.args[0]
+      expect(typeof shareAt).toBe 'function'
+      expect(typeof unshareAt).toBe 'function'
+
   describe "direct call", ->
     beforeEach ->
       spyOn(@hoodie, "open")

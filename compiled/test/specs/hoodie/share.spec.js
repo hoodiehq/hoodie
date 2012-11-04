@@ -7,11 +7,20 @@ describe("Hoodie.Share", function() {
     return spyOn(this.share, "instance");
   });
   describe("constructor", function() {
-    return it("should set Hoodie.ShareInstance.prototype.hoodie", function() {
+    it("should set Hoodie.ShareInstance.prototype.hoodie", function() {
       var instance;
       new Hoodie.Share(this.hoodie);
       instance = new Hoodie.ShareInstance;
       return expect(instance.hoodie).toBe(this.hoodie);
+    });
+    return it("should extend hoodie.store API with shareAt / unshareAt methods", function() {
+      var shareAt, unshareAt, _ref;
+      spyOn(this.hoodie.store, "decoratePromises");
+      new Hoodie.Share(this.hoodie);
+      expect(this.hoodie.store.decoratePromises).wasCalled();
+      _ref = this.hoodie.store.decoratePromises.mostRecentCall.args[0], shareAt = _ref.shareAt, unshareAt = _ref.unshareAt;
+      expect(typeof shareAt).toBe('function');
+      return expect(typeof unshareAt).toBe('function');
     });
   });
   describe("direct call", function() {
