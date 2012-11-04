@@ -44,11 +44,20 @@ describe "Hoodie.Share", ->
       expect(@hoodie.store.add).wasCalledWith '$share', id: '123'
     
     _when "store.add successful", ->
-      beforeEach ->
-        @addDefer.resolve hell: 'yeah'
-      
       it "should resolve with a share instance", ->
-        expect(@share.add(funky: 'fresh')).toBeResolvedWith @instance
+        @addDefer.resolve hell: 'yeah'
+        promise = @share.add(funky: 'fresh')
+        expect(promise).toBeResolvedWith @instance
+
+      _and "user has no account yet", ->
+        beforeEach ->
+          spyOn(@hoodie.account, "hasAccount").andReturn false
+          spyOn(@hoodie.account, "anonymousSignUp")
+
+        it "should sign up anonymously", ->
+          @share.add(id: '123')
+          @addDefer.resolve hell: 'yeah'
+          expect(@hoodie.account.anonymousSignUp).wasCalled()
   # /#add(attributes)
 
   describe "#find(share_id)", ->
@@ -70,17 +79,29 @@ describe "Hoodie.Share", ->
 
   describe "#findOrAdd(id, share_attributes)", ->
     beforeEach ->
-      spyOn(@hoodie.store, "findOrAdd").andCallThrough()
+      @findOrAddDefer = @hoodie.defer()
+      spyOn(@hoodie.store, "findOrAdd").andReturn @findOrAddDefer.promise()
     
     it "should proxy to hoodie.store.findOrAdd with type set to '$share'", ->
       @share.findOrAdd 'id123', {}
       expect(@hoodie.store.findOrAdd).wasCalledWith '$share', 'id123', {}
 
-    it "should resolve with a Share Instance", ->
-      @hoodie.store.findOrAdd.andReturn @hoodie.defer().resolve({}).promise()
-      @share.instance.andCallFake -> this.foo = 'bar'
-      promise = @share.findOrAdd 'id123', {}
-      expect(promise).toBeResolvedWith foo: 'bar'
+    _when "store.findOrAdd successful", ->
+      it "should resolve with a Share Instance", ->
+        @findOrAddDefer.resolve {}
+        @share.instance.andCallFake -> this.foo = 'bar'
+        promise = @share.findOrAdd 'id123', {}
+        expect(promise).toBeResolvedWith foo: 'bar'
+
+      _and "user has no account yet", ->
+        beforeEach ->
+          spyOn(@hoodie.account, "hasAccount").andReturn false
+          spyOn(@hoodie.account, "anonymousSignUp")
+
+        it "should sign up anonymously", ->
+          @share.findOrAdd(id: '123', {})
+          @findOrAddDefer.resolve {}
+          expect(@hoodie.account.anonymousSignUp).wasCalled()
   # /#findOrAdd(share_attributes)
 
   describe "#findAll()", ->

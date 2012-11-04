@@ -55,15 +55,30 @@ describe("Hoodie.Share", function() {
       });
     });
     return _when("store.add successful", function() {
-      beforeEach(function() {
-        return this.addDefer.resolve({
+      it("should resolve with a share instance", function() {
+        var promise;
+        this.addDefer.resolve({
           hell: 'yeah'
         });
-      });
-      return it("should resolve with a share instance", function() {
-        return expect(this.share.add({
+        promise = this.share.add({
           funky: 'fresh'
-        })).toBeResolvedWith(this.instance);
+        });
+        return expect(promise).toBeResolvedWith(this.instance);
+      });
+      return _and("user has no account yet", function() {
+        beforeEach(function() {
+          spyOn(this.hoodie.account, "hasAccount").andReturn(false);
+          return spyOn(this.hoodie.account, "anonymousSignUp");
+        });
+        return it("should sign up anonymously", function() {
+          this.share.add({
+            id: '123'
+          });
+          this.addDefer.resolve({
+            hell: 'yeah'
+          });
+          return expect(this.hoodie.account.anonymousSignUp).wasCalled();
+        });
       });
     });
   });
@@ -97,21 +112,37 @@ describe("Hoodie.Share", function() {
   });
   describe("#findOrAdd(id, share_attributes)", function() {
     beforeEach(function() {
-      return spyOn(this.hoodie.store, "findOrAdd").andCallThrough();
+      this.findOrAddDefer = this.hoodie.defer();
+      return spyOn(this.hoodie.store, "findOrAdd").andReturn(this.findOrAddDefer.promise());
     });
     it("should proxy to hoodie.store.findOrAdd with type set to '$share'", function() {
       this.share.findOrAdd('id123', {});
       return expect(this.hoodie.store.findOrAdd).wasCalledWith('$share', 'id123', {});
     });
-    return it("should resolve with a Share Instance", function() {
-      var promise;
-      this.hoodie.store.findOrAdd.andReturn(this.hoodie.defer().resolve({}).promise());
-      this.share.instance.andCallFake(function() {
-        return this.foo = 'bar';
+    return _when("store.findOrAdd successful", function() {
+      it("should resolve with a Share Instance", function() {
+        var promise;
+        this.findOrAddDefer.resolve({});
+        this.share.instance.andCallFake(function() {
+          return this.foo = 'bar';
+        });
+        promise = this.share.findOrAdd('id123', {});
+        return expect(promise).toBeResolvedWith({
+          foo: 'bar'
+        });
       });
-      promise = this.share.findOrAdd('id123', {});
-      return expect(promise).toBeResolvedWith({
-        foo: 'bar'
+      return _and("user has no account yet", function() {
+        beforeEach(function() {
+          spyOn(this.hoodie.account, "hasAccount").andReturn(false);
+          return spyOn(this.hoodie.account, "anonymousSignUp");
+        });
+        return it("should sign up anonymously", function() {
+          this.share.findOrAdd({
+            id: '123'
+          }, {});
+          this.findOrAddDefer.resolve({});
+          return expect(this.hoodie.account.anonymousSignUp).wasCalled();
+        });
       });
     });
   });

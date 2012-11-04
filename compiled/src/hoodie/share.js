@@ -26,6 +26,9 @@ Hoodie.Share = (function() {
       options = {};
     }
     return this.hoodie.store.add('$share', this._filterShareOptions(options)).pipe(function(object) {
+      if (!_this.hoodie.account.hasAccount()) {
+        _this.hoodie.account.anonymousSignUp();
+      }
       return new _this.instance(_this.hoodie, object);
     });
   };
@@ -53,6 +56,9 @@ Hoodie.Share = (function() {
   Share.prototype.findOrAdd = function(id, options) {
     var _this = this;
     return this.hoodie.store.findOrAdd('$share', id, this._filterShareOptions(options)).pipe(function(object) {
+      if (!_this.hoodie.account.hasAccount()) {
+        _this.hoodie.account.anonymousSignUp();
+      }
       return new _this.instance(_this.hoodie, object);
     });
   };

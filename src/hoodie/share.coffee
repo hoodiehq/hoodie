@@ -72,6 +72,9 @@ class Hoodie.Share
   #
   add : (options = {}) ->
     @hoodie.store.add('$share', @_filterShareOptions(options)).pipe (object) =>
+      unless @hoodie.account.hasAccount()
+        @hoodie.account.anonymousSignUp()
+
       new @instance @hoodie, object
     
   
@@ -102,6 +105,9 @@ class Hoodie.Share
   #
   findOrAdd : (id, options) ->
     @hoodie.store.findOrAdd('$share', id, @_filterShareOptions options).pipe (object) =>
+      unless @hoodie.account.hasAccount()
+        @hoodie.account.anonymousSignUp()
+        
       new @instance @hoodie, object
 
 
