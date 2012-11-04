@@ -156,3 +156,79 @@ describe "Hoodie.Share", ->
       promise = @share.removeAll()
       expect(promise).toBe 'remove_promise'
   # /#removeAll()
+
+  describe "hoodie.store promise decorations", ->
+    beforeEach ->
+      @storeDefer = @hoodie.defer()
+      spyOn(@hoodie.store, "update")
+    
+    describe "#shareAt(shareId, properties)", ->
+      _when "promise returns one object", ->
+        beforeEach ->
+          @storeDefer.resolve
+            $type: 'task'
+            id: '123'
+            title: 'milk'
+
+        _and "no properties passed", ->
+          it "should save object returned by promise with {$shares: {shareId: true}}", ->
+            Hoodie.Share::_storeShareAt(@hoodie).apply(@storeDefer.promise(), ['shareId'])
+            expect(@hoodie.store.update).wasCalledWith 'task', '123', {$shares: {shareId: true}}
+
+        _and "properties passed as array", ->
+          it "should save object returned by promise with {$shares: {shareId: ['title', 'owner']}}", ->
+            @storeDefer.resolve({$type: 'task', id: '123', title: 'milk'})
+
+            properties = ['title', 'owner']
+            Hoodie.Share::_storeShareAt(@hoodie).apply(@storeDefer.promise(), ['shareId', properties])
+            expect(@hoodie.store.update).wasCalledWith 'task', '123', {$shares: {shareId: ['title', 'owner']}}
+
+      _when "promise returns multiple objects", ->
+        beforeEach ->
+          @storeDefer.resolve [
+            {$type: 'task', id: '123', title: 'milk'}
+            {$type: 'task', id: '456', title: 'milk'}
+          ]
+
+        _and "no properties passed", ->
+          it "should update object returned by promise with $public: true", ->
+            Hoodie.Share::_storeShareAt(@hoodie).apply(@storeDefer.promise(), ['shareId'])
+            expect(@hoodie.store.update).wasCalledWith 'task', '123', {$shares: {shareId: true}}
+            expect(@hoodie.store.update).wasCalledWith 'task', '456', {$shares: {shareId: true}}
+
+        _and "properties passed as array", ->
+          it "should update object returned by promise with $public: ['title', 'owner']", ->
+            properties = ['title', 'owner']
+            Hoodie.Share::_storeShareAt(@hoodie).apply(@storeDefer.promise(), ['shareId', properties])
+            expect(@hoodie.store.update).wasCalledWith 'task', '123', {$shares: {shareId: ['title', 'owner']}}
+            expect(@hoodie.store.update).wasCalledWith 'task', '456', {$shares: {shareId: ['title', 'owner']}}
+    # /shareAt()
+
+    describe "#unshareAt(shareId)", ->
+      _when "object is currently shared at 'shareId'", ->
+        beforeEach ->
+          @storeDefer.resolve 
+            $type: 'task'
+            id: '123'
+            title: 'milk'
+            $shares: {shareId: true}
+        
+        it "should save object returned by promise with {$shares: {shareId: false}}", ->
+          Hoodie.Share::_storeUnshareAt(@hoodie).apply(@storeDefer.promise(), ['shareId'])
+          expect(@hoodie.store.update).wasCalledWith 'task', '123', {$shares: {shareId: false}}
+
+      _when "promise returns multiple objects, of which some are shared at 'shareId'", ->
+        beforeEach ->
+          @storeDefer.resolve [
+            {$type: 'task', id: '123', title: 'milk'}
+            {$type: 'task', id: '456', title: 'milk', $shares: {shareId: true}}
+            {$type: 'task', id: '789', title: 'milk', $shares: {shareId: ['title', 'owner']}}
+          ]
+
+        it "should update objects returned by promise with {$shares: {shareId: false}}", ->
+          Hoodie.Share::_storeUnshareAt(@hoodie).apply(@storeDefer.promise(), ['shareId'])
+          expect(@hoodie.store.update).wasNotCalledWith 'task', '123', {$shares: {shareId: false}}
+          expect(@hoodie.store.update).wasCalledWith 'task', '456', {$shares: {shareId: false}}
+          expect(@hoodie.store.update).wasCalledWith 'task', '789', {$shares: {shareId: false}}
+    # /#unshareAt()
+  # /hoodie.store promise decorations

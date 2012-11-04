@@ -28,7 +28,14 @@ describe("Hoodie.Remote", function() {
       remote = new Hoodie.Remote(this.hoodie);
       return expect(remote._sync).toBe(false);
     });
-    it("should set prefix to '' by default", function() {
+    it("should set prefix to name by default", function() {
+      var remote;
+      remote = new Hoodie.Remote(this.hoodie, {
+        name: 'wicked'
+      });
+      return expect(remote.prefix).toBe('wicked');
+    });
+    it("should fallback prefix to ''", function() {
       var remote;
       remote = new Hoodie.Remote(this.hoodie);
       return expect(remote.prefix).toBe('');

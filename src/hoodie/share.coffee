@@ -38,6 +38,7 @@
 #
 class Hoodie.Share
 
+
   # Constructor
   # -------------
 
@@ -46,7 +47,6 @@ class Hoodie.Share
   #
   # The rest of the API is available as usual.
   constructor : (@hoodie) ->
-    
 
     # set pointer to Hoodie.ShareInstance
     @instance = Hoodie.ShareInstance
@@ -57,6 +57,11 @@ class Hoodie.Share
     # return custom api which allows direct call
     api = @_open
     $.extend api, this
+
+    # extend hodie.store promise API
+    @hoodie.store.decoratePromises
+      shareAt   : @_storeShareAt(@hoodie)
+      unshareAt : @_storeUnshareAt(@hoodie)
 
     return api
 
@@ -155,9 +160,37 @@ class Hoodie.Share
   # Private
   # ---------
 
-  # #### open
+  # ### open
   
   # opens a a remote share store, returns a Hoodie.Remote instance
   _open : (shareId, options = {}) =>
     $.extend options, {id: shareId}
     new @instance options
+
+
+  # hoodie.store decorations
+  # --------------------------
+  # 
+  # hoodie.store decorations add custom methods to promises returned
+  # by hoodie.store methods like find, add or update. All methods return
+  # methods again that will be executed in the scope of the promise, but
+  # with access to the current hoodie instance
+
+  # shareAt
+  # 
+  _storeShareAt : (hoodie) -> (shareId, properties) ->
+    @pipe (objects) =>
+      objects = [objects] unless $.isArray objects
+      for object in objects      
+        object.$shares or= {}
+        object.$shares[shareId] = properties or true
+        hoodie.store.update object.$type, object.id, $shares: object.$shares
+  
+  # unshareAt
+  #
+  _storeUnshareAt : (hoodie) -> (shareId) ->
+    @pipe (objects) =>
+      objects = [objects] unless $.isArray objects
+      for object in objects when object.$shares and object.$shares[shareId]
+        object.$shares[shareId] = false
+        hoodie.store.update object.$type, object.id, $shares: object.$shares

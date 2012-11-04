@@ -68,7 +68,10 @@ class Hoodie.Remote
   # sets name (think: namespace) and some other options
   constructor : (@hoodie, options = {}) ->
     @name    = options.name   if options.name
-    @prefix  = options.prefix if options.prefix
+    if options.prefix?
+      @prefix = options.prefix 
+    else 
+      @prefix = @name or ''
 
     @_sync   = options.sync   if options.sync
     @store   = new Hoodie.RemoteStore @hoodie, this

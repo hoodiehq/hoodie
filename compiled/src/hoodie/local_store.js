@@ -66,7 +66,7 @@ Hoodie.LocalStore = (function(_super) {
     }
     defer = LocalStore.__super__.save.apply(this, arguments);
     if (this.hoodie.isPromise(defer)) {
-      return defer;
+      return this._decoratePromise(defer);
     }
     object = $.extend({}, object);
     if (id) {
@@ -78,9 +78,6 @@ Hoodie.LocalStore = (function(_super) {
     }
     if (isNew && this.hoodie.account) {
       object.$createdBy || (object.$createdBy = this.hoodie.account.ownerHash);
-    }
-    if (options["public"] != null) {
-      object.$public = options["public"];
     }
     if (!isNew) {
       for (key in currentObject) {
@@ -113,25 +110,25 @@ Hoodie.LocalStore = (function(_super) {
     } catch (error) {
       defer.reject(error).promise();
     }
-    return defer.promise();
+    return this._decoratePromise(defer.promise());
   };
 
   LocalStore.prototype.find = function(type, id) {
     var defer, object;
     defer = LocalStore.__super__.find.apply(this, arguments);
     if (this.hoodie.isPromise(defer)) {
-      return defer;
+      return this._decoratePromise(defer);
     }
     try {
       object = this.cache(type, id);
       if (!object) {
-        return defer.reject(Hoodie.Errors.NOT_FOUND(type, id)).promise();
+        defer.reject(Hoodie.Errors.NOT_FOUND(type, id)).promise();
       }
       defer.resolve(object);
     } catch (error) {
       defer.reject(error);
     }
-    return defer.promise();
+    return this._decoratePromise(defer.promise());
   };
 
   LocalStore.prototype.findAll = function(filter) {
@@ -143,7 +140,7 @@ Hoodie.LocalStore = (function(_super) {
     }
     defer = LocalStore.__super__.findAll.apply(this, arguments);
     if (this.hoodie.isPromise(defer)) {
-      return defer;
+      return this._decoratePromise(defer);
     }
     keys = this._index();
     if (typeof filter === 'string') {
@@ -175,21 +172,21 @@ Hoodie.LocalStore = (function(_super) {
     } catch (error) {
       defer.reject(error).promise();
     }
-    return defer.promise();
+    return this._decoratePromise(defer.promise());
   };
 
   LocalStore.prototype.remove = function(type, id, options) {
-    var defer, key, object;
+    var defer, key, object, promise;
     if (options == null) {
       options = {};
     }
     defer = LocalStore.__super__.remove.apply(this, arguments);
     if (this.hoodie.isPromise(defer)) {
-      return defer;
+      return this._decoratePromise(defer);
     }
     object = this.cache(type, id);
     if (!object) {
-      return defer.reject(Hoodie.Errors.NOT_FOUND(type, id)).promise();
+      return this._decoratePromise(defer.reject(Hoodie.Errors.NOT_FOUND(type, id)).promise());
     }
     if (object._$syncedAt && !options.remote) {
       object._deleted = true;
@@ -201,7 +198,20 @@ Hoodie.LocalStore = (function(_super) {
       this.clearChanged(type, id);
     }
     this._triggerEvents("remove", object, options);
-    return defer.resolve($.extend({}, object)).promise();
+    promise = defer.resolve($.extend({}, object)).promise();
+    return this._decoratePromise(promise);
+  };
+
+  LocalStore.prototype.update = function() {
+    return this._decoratePromise(LocalStore.__super__.update.apply(this, arguments));
+  };
+
+  LocalStore.prototype.updateAll = function() {
+    return this._decoratePromise(LocalStore.__super__.updateAll.apply(this, arguments));
+  };
+
+  LocalStore.prototype.removeAll = function() {
+    return this._decoratePromise(LocalStore.__super__.removeAll.apply(this, arguments));
   };
 
   LocalStore.prototype.cache = function(type, id, object, options) {
@@ -353,6 +363,10 @@ Hoodie.LocalStore = (function(_super) {
     return this.hoodie.on(event, data);
   };
 
+  LocalStore.prototype.decoratePromises = function(methods) {
+    return $.extend(this._promiseApi, methods);
+  };
+
   LocalStore.prototype._bootstrap = function() {
     var id, key, keys, obj, type, _i, _len, _ref, _results;
     keys = this.db.getItem('_dirty');
@@ -464,6 +478,12 @@ Hoodie.LocalStore = (function(_super) {
     if (event !== 'new') {
       return this.trigger("change:" + object.$type + ":" + object.id, event, object, options);
     }
+  };
+
+  LocalStore.prototype._promiseApi = {};
+
+  LocalStore.prototype._decoratePromise = function(promise) {
+    return $.extend(promise, this._promiseApi);
   };
 
   return LocalStore;

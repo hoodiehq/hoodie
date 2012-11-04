@@ -218,7 +218,7 @@ describe("Hoodie.Share", function() {
       return expect(promise).toBe('remove_promise');
     });
   });
-  return describe("#removeAll()", function() {
+  describe("#removeAll()", function() {
     beforeEach(function() {
       spyOn(this.hoodie.store, "findAll").andReturn({
         unshare: function() {}
@@ -229,6 +229,162 @@ describe("Hoodie.Share", function() {
       var promise;
       promise = this.share.removeAll();
       return expect(promise).toBe('remove_promise');
+    });
+  });
+  return describe("hoodie.store promise decorations", function() {
+    beforeEach(function() {
+      this.storeDefer = this.hoodie.defer();
+      return spyOn(this.hoodie.store, "update");
+    });
+    describe("#shareAt(shareId, properties)", function() {
+      _when("promise returns one object", function() {
+        beforeEach(function() {
+          return this.storeDefer.resolve({
+            $type: 'task',
+            id: '123',
+            title: 'milk'
+          });
+        });
+        _and("no properties passed", function() {
+          return it("should save object returned by promise with {$shares: {shareId: true}}", function() {
+            Hoodie.Share.prototype._storeShareAt(this.hoodie).apply(this.storeDefer.promise(), ['shareId']);
+            return expect(this.hoodie.store.update).wasCalledWith('task', '123', {
+              $shares: {
+                shareId: true
+              }
+            });
+          });
+        });
+        return _and("properties passed as array", function() {
+          return it("should save object returned by promise with {$shares: {shareId: ['title', 'owner']}}", function() {
+            var properties;
+            this.storeDefer.resolve({
+              $type: 'task',
+              id: '123',
+              title: 'milk'
+            });
+            properties = ['title', 'owner'];
+            Hoodie.Share.prototype._storeShareAt(this.hoodie).apply(this.storeDefer.promise(), ['shareId', properties]);
+            return expect(this.hoodie.store.update).wasCalledWith('task', '123', {
+              $shares: {
+                shareId: ['title', 'owner']
+              }
+            });
+          });
+        });
+      });
+      return _when("promise returns multiple objects", function() {
+        beforeEach(function() {
+          return this.storeDefer.resolve([
+            {
+              $type: 'task',
+              id: '123',
+              title: 'milk'
+            }, {
+              $type: 'task',
+              id: '456',
+              title: 'milk'
+            }
+          ]);
+        });
+        _and("no properties passed", function() {
+          return it("should update object returned by promise with $public: true", function() {
+            Hoodie.Share.prototype._storeShareAt(this.hoodie).apply(this.storeDefer.promise(), ['shareId']);
+            expect(this.hoodie.store.update).wasCalledWith('task', '123', {
+              $shares: {
+                shareId: true
+              }
+            });
+            return expect(this.hoodie.store.update).wasCalledWith('task', '456', {
+              $shares: {
+                shareId: true
+              }
+            });
+          });
+        });
+        return _and("properties passed as array", function() {
+          return it("should update object returned by promise with $public: ['title', 'owner']", function() {
+            var properties;
+            properties = ['title', 'owner'];
+            Hoodie.Share.prototype._storeShareAt(this.hoodie).apply(this.storeDefer.promise(), ['shareId', properties]);
+            expect(this.hoodie.store.update).wasCalledWith('task', '123', {
+              $shares: {
+                shareId: ['title', 'owner']
+              }
+            });
+            return expect(this.hoodie.store.update).wasCalledWith('task', '456', {
+              $shares: {
+                shareId: ['title', 'owner']
+              }
+            });
+          });
+        });
+      });
+    });
+    return describe("#unshareAt(shareId)", function() {
+      _when("object is currently shared at 'shareId'", function() {
+        beforeEach(function() {
+          return this.storeDefer.resolve({
+            $type: 'task',
+            id: '123',
+            title: 'milk',
+            $shares: {
+              shareId: true
+            }
+          });
+        });
+        return it("should save object returned by promise with {$shares: {shareId: false}}", function() {
+          Hoodie.Share.prototype._storeUnshareAt(this.hoodie).apply(this.storeDefer.promise(), ['shareId']);
+          return expect(this.hoodie.store.update).wasCalledWith('task', '123', {
+            $shares: {
+              shareId: false
+            }
+          });
+        });
+      });
+      return _when("promise returns multiple objects, of which some are shared at 'shareId'", function() {
+        beforeEach(function() {
+          return this.storeDefer.resolve([
+            {
+              $type: 'task',
+              id: '123',
+              title: 'milk'
+            }, {
+              $type: 'task',
+              id: '456',
+              title: 'milk',
+              $shares: {
+                shareId: true
+              }
+            }, {
+              $type: 'task',
+              id: '789',
+              title: 'milk',
+              $shares: {
+                shareId: ['title', 'owner']
+              }
+            }
+          ]);
+        });
+        return it("should update objects returned by promise with {$shares: {shareId: false}}", function() {
+          Hoodie.Share.prototype._storeUnshareAt(this.hoodie).apply(this.storeDefer.promise(), ['shareId']);
+          expect(this.hoodie.store.update).wasNotCalledWith('task', '123', {
+            $shares: {
+              shareId: false
+            }
+          });
+          expect(this.hoodie.store.update).wasCalledWith('task', '456', {
+            $shares: {
+              shareId: false
+            }
+          });
+          return expect(this.hoodie.store.update).wasCalledWith('task', '789', {
+            $shares: {
+              shareId: false
+            }
+          });
+        });
+      });
     });
   });
 });

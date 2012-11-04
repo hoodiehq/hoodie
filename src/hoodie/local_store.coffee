@@ -5,7 +5,6 @@
 #
 class Hoodie.LocalStore extends Hoodie.Store
 
-
   # Properties
   # ---------
 
@@ -66,7 +65,7 @@ class Hoodie.LocalStore extends Hoodie.Store
   #     store.save('car', 'abc4567', {color: 'red'})
   save : (type, id, object, options = {}) ->
     defer = super
-    return defer if @hoodie.isPromise(defer)
+    return @_decoratePromise(defer) if @hoodie.isPromise(defer)
 
     # make sure we don't mess with the passed object directly
     object = $.extend {}, object
@@ -85,9 +84,6 @@ class Hoodie.LocalStore extends Hoodie.Store
     # todo: move ownerHash into a method on the core hoodie module
     if isNew and @hoodie.account
       object.$createdBy or= @hoodie.account.ownerHash
-   
-    # handle public option
-    object.$public = options.public if options.public? 
 
     # handle local properties and hidden properties with $ prefix
     # keep local properties for remote updates
@@ -119,7 +115,7 @@ class Hoodie.LocalStore extends Hoodie.Store
     catch error
       defer.reject(error).promise()
   
-    return defer.promise()
+    return @_decoratePromise defer.promise()
   
   
   # find
@@ -132,19 +128,19 @@ class Hoodie.LocalStore extends Hoodie.Store
   #     store.find('car', 'abc4567')
   find : (type, id) ->
     defer = super
-    return defer if @hoodie.isPromise(defer)
+    return @_decoratePromise(defer) if @hoodie.isPromise(defer)
   
     try
       object = @cache type, id
     
       unless object
-        return defer.reject( Hoodie.Errors.NOT_FOUND type, id ).promise()
+        defer.reject( Hoodie.Errors.NOT_FOUND type, id ).promise()
 
       defer.resolve object
     catch error
       defer.reject error
     
-    return defer.promise()
+    return @_decoratePromise defer.promise()
   
   
   # findAll
@@ -160,7 +156,7 @@ class Hoodie.LocalStore extends Hoodie.Store
   #     store.findAll(function(obj) { return obj.brand == 'Tesla' })
   findAll : (filter = -> true) ->
     defer = super
-    return defer if @hoodie.isPromise(defer)
+    return @_decoratePromise(defer) if @hoodie.isPromise(defer)
 
     keys = @_index()
 
@@ -185,7 +181,7 @@ class Hoodie.LocalStore extends Hoodie.Store
     catch error
       defer.reject(error).promise()
   
-    return defer.promise()
+    return @_decoratePromise defer.promise()
   
   
   # Destroy
@@ -197,12 +193,12 @@ class Hoodie.LocalStore extends Hoodie.Store
   # Otherwise remove it from Store.
   remove : (type, id, options = {}) ->
     defer = super
-    return defer if @hoodie.isPromise(defer)
+    return @_decoratePromise(defer) if @hoodie.isPromise(defer)
 
     object  = @cache type, id
     
     unless object
-      return defer.reject(Hoodie.Errors.NOT_FOUND type, id).promise()
+      return @_decoratePromise defer.reject(Hoodie.Errors.NOT_FOUND type, id).promise()
     
     if object._$syncedAt and not options.remote
       object._deleted = true
@@ -216,7 +212,18 @@ class Hoodie.LocalStore extends Hoodie.Store
       @clearChanged type, id
 
     @_triggerEvents "remove", object, options
-    defer.resolve($.extend {}, object).promise()
+    promise = defer.resolve($.extend {}, object).promise()
+    @_decoratePromise promise
+    
+
+  # update / updateAll / removeAll
+  # --------------------------------
+
+  # just decorating returned promises
+  update : -> @_decoratePromise super
+  updateAll : -> @_decoratePromise super
+  removeAll : -> @_decoratePromise super
+
   
   
   # Cache
@@ -412,6 +419,14 @@ class Hoodie.LocalStore extends Hoodie.Store
     event = event.replace /(^| )([^ ]+)/g, "$1store:$2"
     @hoodie.on event, data
 
+
+  # extend
+  # --------
+
+  # extend promises returned by store.api
+  decoratePromises : ( methods ) ->
+    $.extend @_promiseApi, methods
+
   
   # Private
   # ---------
@@ -504,3 +519,11 @@ class Hoodie.LocalStore extends Hoodie.Store
     @trigger "change",                                 event, object, options
     @trigger "change:#{object.$type}",                 event, object, options
     @trigger "change:#{object.$type}:#{object.id}",    event, object, options unless event is 'new'
+  
+  # extend this property with extra functions that will be available
+  # on all promises returned by hoodie.store API
+  _promiseApi : {}
+
+  #
+  _decoratePromise : (promise) ->
+    $.extend promise, @_promiseApi

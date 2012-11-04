@@ -24,7 +24,11 @@ describe "Hoodie.Remote", ->
       remote = new Hoodie.Remote @hoodie
       expect(remote._sync).toBe false
 
-    it "should set prefix to '' by default", ->
+    it "should set prefix to name by default", ->
+      remote = new Hoodie.Remote @hoodie, name: 'wicked'
+      expect(remote.prefix).toBe 'wicked'
+
+    it "should fallback prefix to ''", ->
       remote = new Hoodie.Remote @hoodie
       expect(remote.prefix).toBe ''
 

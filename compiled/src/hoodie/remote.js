@@ -42,8 +42,10 @@ Hoodie.Remote = (function() {
     if (options.name) {
       this.name = options.name;
     }
-    if (options.prefix) {
+    if (options.prefix != null) {
       this.prefix = options.prefix;
+    } else {
+      this.prefix = this.name || '';
     }
     if (options.sync) {
       this._sync = options.sync;

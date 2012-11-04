@@ -32,6 +32,7 @@ Mocks.Hoodie = ->
     removeAll     : -> promiseMock 
     changedDocs   : ->
     isDirty       : ->
+    decoratePromises: -> 
       
     db :
       getItem       : ->

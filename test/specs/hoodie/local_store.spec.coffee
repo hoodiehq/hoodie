@@ -246,24 +246,6 @@ describe "Hoodie.LocalStore", ->
           
         it "should pass true (= created) as the second param to the done callback", ->
           expect(@promise).toBeResolvedWith 'cachedObject', true
-
-    _when "passed public: true option", ->
-      it "should save object with $public attribute set to true", ->
-        @store.save 'document', 'abc4567', { name: 'test' }, { public: true }
-        [type, key, object] = @store.cache.mostRecentCall.args
-        expect(object.$public).toBe true
-
-    _when "passed public: false option", ->
-      it "should save object with $public attribute set to false", ->
-        @store.save 'document', 'abc4567', { name: 'test' }, { public: false }
-        [type, key, object] = @store.cache.mostRecentCall.args
-        expect(object.$public).toBe false
-
-    _when "passed public: ['aj@example.com', 'bj@example.com'] option", ->
-      it "should save object with $public attribute set to ['aj@example.com', 'bj@example.com']", ->
-        @store.save 'document', 'abc4567', { name: 'test' }, { public: ['aj@example.com', 'bj@example.com'] }
-        [type, key, object] = @store.cache.mostRecentCall.args
-        expect(object.$public.join()).toBe ['aj@example.com', 'bj@example.com'].join()
   # /.save(type, id, object, options)
   
 
@@ -792,4 +774,25 @@ describe "Hoodie.LocalStore", ->
       @store.on 'super funky fresh', cb
       expect(@hoodie.on).wasCalledWith 'store:super store:funky store:fresh', cb
   # /#on
+
+
+  describe "#decoratePromises", ->
+    it "should decorate promises returned by the store", ->
+      funk = jasmine.createSpy('funk')
+      @store.decoratePromises 
+        funk: funk
+
+      promise = @store.save('task', {title: 'save the world'})
+      promise.funk()
+      expect(funk).wasCalled()
+    
+    for method in "add find findAll findOrAdd update updateAll remove removeAll".split " "
+      it "should scope passed methods to returned promise by #{method}", ->
+         @store.decoratePromises 
+           funk: ->
+              return this
+
+          promise = @store[method]('task', '12')
+          expect(promise.funk()).toBePromise()
+  # /#decoratePromises
 # /Hoodie.LocalStore

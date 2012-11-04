@@ -54,6 +54,7 @@ Mocks.Hoodie = function() {
       },
       changedDocs: function() {},
       isDirty: function() {},
+      decoratePromises: function() {},
       db: {
         getItem: function() {},
         setItem: function() {},

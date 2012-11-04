@@ -12,6 +12,10 @@ Hoodie.Share = (function() {
     this.instance.prototype.hoodie = this.hoodie;
     api = this._open;
     $.extend(api, this);
+    this.hoodie.store.decoratePromises({
+      shareAt: this._storeShareAt(this.hoodie),
+      unshareAt: this._storeUnshareAt(this.hoodie)
+    });
     return api;
   }
 
@@ -101,6 +105,52 @@ Hoodie.Share = (function() {
       id: shareId
     });
     return new this.instance(options);
+  };
+
+  Share.prototype._storeShareAt = function(hoodie) {
+    return function(shareId, properties) {
+      var _this = this;
+      return this.pipe(function(objects) {
+        var object, _i, _len, _results;
+        if (!$.isArray(objects)) {
+          objects = [objects];
+        }
+        _results = [];
+        for (_i = 0, _len = objects.length; _i < _len; _i++) {
+          object = objects[_i];
+          object.$shares || (object.$shares = {});
+          object.$shares[shareId] = properties || true;
+          _results.push(hoodie.store.update(object.$type, object.id, {
+            $shares: object.$shares
+          }));
+        }
+        return _results;
+      });
+    };
+  };
+
+  Share.prototype._storeUnshareAt = function(hoodie) {
+    return function(shareId) {
+      var _this = this;
+      return this.pipe(function(objects) {
+        var object, _i, _len, _results;
+        if (!$.isArray(objects)) {
+          objects = [objects];
+        }
+        _results = [];
+        for (_i = 0, _len = objects.length; _i < _len; _i++) {
+          object = objects[_i];
+          if (!(object.$shares && object.$shares[shareId])) {
+            continue;
+          }
+          object.$shares[shareId] = false;
+          _results.push(hoodie.store.update(object.$type, object.id, {
+            $shares: object.$shares
+          }));
+        }
+        return _results;
+      });
+    };
   };
 
   return Share;

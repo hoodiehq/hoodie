@@ -330,7 +330,7 @@ describe("Hoodie.LocalStore", function() {
       }
       return _results;
     });
-    _when("called without id", function() {
+    return _when("called without id", function() {
       beforeEach(function() {
         var _ref;
         this.promise = this.store.save('document', void 0, {
@@ -361,42 +361,6 @@ describe("Hoodie.LocalStore", function() {
         return it("should pass true (= created) as the second param to the done callback", function() {
           return expect(this.promise).toBeResolvedWith('cachedObject', true);
         });
-      });
-    });
-    _when("passed public: true option", function() {
-      return it("should save object with $public attribute set to true", function() {
-        var key, object, type, _ref;
-        this.store.save('document', 'abc4567', {
-          name: 'test'
-        }, {
-          "public": true
-        });
-        _ref = this.store.cache.mostRecentCall.args, type = _ref[0], key = _ref[1], object = _ref[2];
-        return expect(object.$public).toBe(true);
-      });
-    });
-    _when("passed public: false option", function() {
-      return it("should save object with $public attribute set to false", function() {
-        var key, object, type, _ref;
-        this.store.save('document', 'abc4567', {
-          name: 'test'
-        }, {
-          "public": false
-        });
-        _ref = this.store.cache.mostRecentCall.args, type = _ref[0], key = _ref[1], object = _ref[2];
-        return expect(object.$public).toBe(false);
-      });
-    });
-    return _when("passed public: ['aj@example.com', 'bj@example.com'] option", function() {
-      return it("should save object with $public attribute set to ['aj@example.com', 'bj@example.com']", function() {
-        var key, object, type, _ref;
-        this.store.save('document', 'abc4567', {
-          name: 'test'
-        }, {
-          "public": ['aj@example.com', 'bj@example.com']
-        });
-        _ref = this.store.cache.mostRecentCall.args, type = _ref[0], key = _ref[1], object = _ref[2];
-        return expect(object.$public.join()).toBe(['aj@example.com', 'bj@example.com'].join());
       });
     });
   });
@@ -1120,7 +1084,7 @@ describe("Hoodie.LocalStore", function() {
       });
     });
   });
-  return describe("#on", function() {
+  describe("#on", function() {
     beforeEach(function() {
       return spyOn(this.hoodie, "on");
     });
@@ -1138,5 +1102,36 @@ describe("Hoodie.LocalStore", function() {
       this.store.on('super funky fresh', cb);
       return expect(this.hoodie.on).wasCalledWith('store:super store:funky store:fresh', cb);
     });
+  });
+  return describe("#decoratePromises", function() {
+    var method, _i, _len, _ref, _results;
+    it("should decorate promises returned by the store", function() {
+      var funk, promise;
+      funk = jasmine.createSpy('funk');
+      this.store.decoratePromises({
+        funk: funk
+      });
+      promise = this.store.save('task', {
+        title: 'save the world'
+      });
+      promise.funk();
+      return expect(funk).wasCalled();
+    });
+    _ref = "add find findAll findOrAdd update updateAll remove removeAll".split(" ");
+    _results = [];
+    for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+      method = _ref[_i];
+      _results.push(it("should scope passed methods to returned promise by " + method, function() {
+        var promise;
+        this.store.decoratePromises({
+          funk: function() {
+            return this;
+          }
+        });
+        promise = this.store[method]('task', '12');
+        return expect(promise.funk()).toBePromise();
+      }));
+    }
+    return _results;
   });
 });
