@@ -278,13 +278,36 @@ hoodie.global.findAll("song").done( function(songs) { ... })
 ```
 
 
-### Public Shares
+### Shares
 
 Users can share their data with others, controlling exactly what will
 be shared.
 
 ```javascript
-// see http://hoodiehq.github.com/hoodie.js/
+// create a new share
+hoodie.share.add().done( function(share) {} )
+
+// grant / revoke access
+share.grantReadAccess()
+share.grantWriteAccess()
+share.revokeReadAccess()
+share.revokeWriteAccess()
+share.grantReadAccess('joe@example.com')
+share.revomeWriteAccess(['joe@example.com','lisa@example.com'])
+
+// add all todo objects to the share
+hoodie.store.findAll('todo').shareAt(share.id)
+
+// remove a specific todo from the share
+hoodie.store.find('todo', '123').unshareAt(share.id)
+
+// destroy share
+hoodie.share.remove(share.id)
+
+// open a share and load all its objects
+hoodie.share('shareIdHere').findAll()
+  .done( function(user) { } ) 
+  .fail( function(err)  { } )
 ```
 
 
