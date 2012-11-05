@@ -1,186 +1,99 @@
 // Share
-// ==========
-
-// To showcase the share module, its settings and API, we'll take an todo app
-// as example. I can create multiple todo lists with it and can share these.
-
-
-// Share options
-// ---------------
+// =======
 // 
-// * access     (default: false)
-// * password   (default: _no password_)
+// a share is like a store, give I'm permitted to access / modify the share
+// I can add / find / update / remove objects
 
 
-// ### the `access` setting (default: false)
+// Share Module API
+// ------------------
+
+// the hoodie.share module provides a store,
+// which is special in two ways: 
 // 
-// the access setting defines which user (group) has read or write access.
-// When set to true, the sharing is public and everybody who knows the share
-// id can access and edit it. To limit to read only, set access to read: true.
-// You can also define specific user names to give them access. Write access
-// does always include read access as well.
+// 1. no type can be passed
+// 2. returned objects are not objects, but share instances
 
-//
-// *access: false* (default)
-// Nobody but me can access the todolist, until I make
-// the share public or invite readers / writers to it.
-//
-share = hoodie.share.create();
+// hoodie.share Module API:
+hoodie.share.find()
+hoodie.share.findAll()
+hoodie.share.findOrAdd()
+hoodie.share.add()
+hoodie.share.update()
+hoodie.share.updateAll()
+hoodie.share.remove()
+hoodie.share.removeAll()
 
-//
-// access: true
-// Everybody will be able to acces and edit the todo list
-//
-share = hoodie.share.create( {access: true} );
-
-//
-// access: [user1, user2]
-// Besides me, only user1 and user2 will have access to the todolist
-//
-share = hoodie.share.create( {access: ['aj@foo.com', 'bj@foo.com']} );
-
-//
-// access: {read: true}
-// Everybody will be able to acces the todo list, but only I can edit it
-//
-share = hoodie.share.create({access: {read: true}});
-share.add(todolist);
-
-//
-// access: {read: true, write: [user1, user2]}
-// Everybody will be able to acces the todo list,
-// but only user1, user2 and me can edit it
-//
-share = hoodie.share.create({
-  access: {
-    write: ['aj@foo.com', 'bj@foo.com']
-  }
-});
-share.add(todolist).push();
-
-//
-// access: {read: [user1, user2], write: [user3]}
-// Besides me, only user1, user2 and user3 will have access to the
-// todolist and only CJ and me can edit it
-//
-share = hoodie.share.create({
-  access: {
-    read:  ['aj@foo.com', 'bj@foo.com'],
-    write: ['cj@foo.com']
-  }
-});
-share.add(todolist).push();
-
-// ### the `password` setting
-
-//
-// password not set (default)
-// everybody can access the share with the share.id
-//
-hoodie.share.create({access: true});
-
-//
-// password set to "secret"
-// Others will need both the share.id and
-// the password in order to access the share
-//
-hoodie.share.create({access: true, password: "secret"});
+// on top, it allows a direct call:  
+// that opens a share from remote and exposes a store API
+// to directly interact with the store.
+share = hoodie.share('shareId')
 
 
+// Share Instance API
+// --------------------
 
-// Share API
+// a share provides a store for its objects
+// all these methods make direct calls to the
+// remote share store. If share is a new instance,
+// it gets published automtically
+share.store.find()
+share.store.findAll()
+share.store.findOrAdd()
+share.store.add()
+share.store.update()
+share.store.updateAll()
+share.store.remove()
+share.store.removeAll()
+
+// grant / revoke access
+share.grantAccess()  // everybody can read
+share.revokeAccess() // nobody but me has access
+share.grantWriteAccess()  // everybody can write
+share.revokeWriteAccess() // nobody but me can wirte
+share.grantAccess("joe@example.com")
+share.grantWriteAccess(["lisa@example.com", "judy@example.com"])
+share.revokeAccess("lisa@example.com")
+
+
+// Sharing objects from my store
+// -------------------------------
+
+// the hoodie.share module also extends the hoodie.store
+// api with two methods: share and unshare
+// 
+// compare to [store.publish / store.unpublish](public_user_stores2.html)
+hoodie.store.find('task', '123').share()
+hoodie.store.find('task', '123').shareAt( share.id)
+hoodie.store.find('task', '123').unshare()
+hoodie.store.find('task', '123').unshareAt( share.id )
+
+
+// example
+// ---------
+
+// You can share one ore multiple objects right away with this
+// piece of coude
+var todolist = {
+  title: 'shopping list',
+  tasks: [
+    {title: 'nutella'},
+    {title: 'bread'},
+    {title: 'milk'}
+  ]
+}
+hoodie.store.add('todolist', todolist).share({write: true, password: 'secret'})
+.done( function(todolist, share) {
+  /* now others can access the shared directly with
+     hoodie.share( share.id ).store.findAll() */
+})
+
+
+// Use cases
 // -----------
-
-
-// ### Share Module methods
-
-// * direct call
-//   opens a share, gives access to its api
-hoodie.share("share_id");
-
-// * open
-//   same as direct call
-hoodie.share.open("share_id");
-
-// * create
-//   create a new share
-hoodie.share.create({});
-
-// * find
-//   find an existing sharings
-hoodie.share.find(share_id);
-
-// * findOrCreate
-//   finds an existing sharing, otherwise creates it
-hoodie.share.findOrCreate(share_attributes);
-
-// * findAll
-//   find all my sharings
-hoodie.share.findAll();
-
-// * save
-//   overwrites or creates a new share
-hoodie.share.save('share_id', {});
-
-// * update
-//   updates an existing share
-hoodie.share.update('share_id', changed_attributes);
-
-// * updateAll
-//   update all my sharings
-hoodie.share.updateAll({access: false});
-hoodie.share.updateAll( function(share) {
-  share.access = false;
-});
-
-// * destroy
-//   deletes a share
-hoodie.share.destroy('share_id');
-
-// * destroyAll
-//   delete all my shares
-hoodie.share.destroyAll();
-
-
-
-// ### Share Instance methods
-// 
-// A Share inherits from the RemoteStore Module and gets namespaced by
-// its id. It adds additional methods to add and remove objects and alters
-// methods save, update and delete so when these are called withoud type
-// and id, they get applied on the share object directly.
-//
-
-// * save
-//   save a share, overwrites all settings if share existed before
-hoodie.share("share_id").save({});
-
-// * update    
-//   update an existing setting, only passed attributes get changed
-hoodie.share("share_id").update({});
-
-// * destroy    
-//   deletes a share, unshares all its objects
-hoodie.share("share_id").destroy();
-
-// * add
-//   add object(s) to the share
-hoodie.share("share_id").add(object);
-hoodie.share("share_id").add([object1, object2]);
-
-// * remove  
-//   remove object(s) from the share
-hoodie.share("share_id").remove(object);
-hoodie.share("share_id").remove([object1, object2]);
-
-
-
-// ## Use cases
 //
 // 1.  Public Share
 // 2.  Private Share
-// 3.  Continuous Share
-// 4.  Manual Share
 // 5.  Read only Share
 // 6.  Collaborative Shares
 // 7.  Public, password protected shares
@@ -188,11 +101,7 @@ hoodie.share("share_id").remove([object1, object2]);
 //
 // To be done:
 //
-// *   Loading other users' shares
 // *   Subscribe to other users' shares
-// *   Change settings (e.g. collaborators) after the share has been created
-// *   Differentiate between anonymous users and users with accounts?
-// *   user group access?
 
 
 // ### Usecase 1: Public Share
@@ -202,15 +111,12 @@ hoodie.share("share_id").remove([object1, object2]);
 // (by passing an object with the respective type & id) and then
 // the todolist will be available to others at the secret URL
 //
-hoodie.share.create({access: true})
-.done( function(share) {
-  
-  share.add(todolist).push()
-  .done( function() {
-    share_url = "http://mytodoapp.com/shared/" + share.id;
-    alert("Share your todolist at " + share_url);
-  });
-});
+hoodie.store.add('todolist', todolist).share()
+.done( function(todolist, share) {
+  share.grantReadAccess()
+  share_url = "http://mytodoapp.com/shared/" + share.id;
+  alert("Share your todolist at " + share_url);
+})
 
 
 // ### Usecase 2: Private Share
@@ -219,79 +125,54 @@ hoodie.share.create({access: true})
 // with my collegues aj@example.com and bj@example.com. I want the todolist to
 // to be accessible for AJ, BJ and myself only.
 //
-hoodie.share.create({access: ["aj@example.com", "bj@example.com"]})
-.done( function(share) {
-  share.add(todolist);
-
+hoodie.store.add('todolist', todolist).share()
+.done( function(todolist, share) {
+  share.grantReadAccess(["aj@example.com", "bj@example.com"])
   share_url = "http://mytodoapp.com/shared/" + share.id;
-  alert("AJ and BJ can access the todolist at " + share_url);
-});
+  alert("Share your todolist at " + share_url);
+})
 
-
-// ### Usecase 3: Continuous Share
-
-// If you don't want to manually pull and push changes of shared objects, you
-// can set the share to be continuous. 
-hoodie.share.create( {continuous: true} )
-.done( function(share){
-
-  // * added todolists will be synched right away
-  share.add(todolist);
-
-  // * changes to added todolists will be synched right away
-  hoodie.store.update(todolist, {name: "new name"});
-
-  // * removed docs will be removed from the share right away
-  share.remove(todolist);
-});
-
-
-// ### Usecase 4: Manual Share
-
-// Manual share means you have to manually push and pull changes of shared
-// objects, it's the default behavior. Each of the following methods returns
-// a promise
-//
-hoodie.share("share_id").push();
-hoodie.share("share_id").pull();
-hoodie.share("share_id").sync();
 
 
 // ### Usecase 5: Read only Share
 
 // If you want to prevent other users to make changes to your shared objects,
-// setz `access` to `{ read: true }`. If another user will try to push to
+// grant read access. If another user will try to push to
 // `hoodie.share("share_id")`, it will be rejected.
 // 
-hoodie.share.create( {access: {read: true}} );
+hoodie.share.add()
+.done( function(share) { 
+  share.grantReadAccess()
+})
 hoodie.share( "share_id" ).push();
 
 
 // ### Usecase 6: Collaborative Shares
 
 // If you want to invite others to collaborate on your objects, you need
-// to set the collaborative setting to true. Then all users knowing the 
+// to grant write access. Then all users knowing the 
 // share.id will be able to push changes.
 //
-hoodie.share.create( {access: true} )
-.done( function(share){
-  share.add([todolist, todo1, todo2, todo3]).push() ;
-});
+hoodie.share.add()
+.done( function(share) { 
+  share.grantWriteAccess()
+})
+hoodie.share( "share_id" ).push();
 
 
 // ### Usecase 7: Public, password protected shares
 
 // I can optionally assign a password to a share that needs to be provided by
 // others when trying to accessing it:
-hoodie.share.create( { 
-  acess    : true, 
+hoodie.share.add( {  
+  id : "mytodolist123"
   password : "secret"
-}).push();
+}).done( function(share) {} )
 
 // If other users want to access your share, they need to passt the password
 // as option
 hoodie.share( "mytodolist123", {password: "secret"} )
-.findAll( function(objects) {
+.store.findAll( function(objects) {
   alert("welcome to my todolist!");
 });
 
@@ -300,11 +181,11 @@ hoodie.share( "mytodolist123", {password: "secret"} )
 
 // I can open a share and listen to changes of its containing objects
 //
-hoodie.share('shared_id').on('changed',        function(object) { /*...*/ });
-hoodie.share('shared_id').on('changed:type',   function(object) { /*...*/ });
-hoodie.share('shared_id').on('created',        function(object) { /*...*/ });
-hoodie.share('shared_id').on('created:type',   function(object) { /*...*/ });
-hoodie.share('shared_id').on('updated',        function(object) { /*...*/ });
-hoodie.share('shared_id').on('updated:type',   function(object) { /*...*/ });
-hoodie.share('shared_id').on('destroyed',      function(object) { /*...*/ });
-hoodie.share('shared_id').on('destroyed:type', function(object) { /*...*/ });
+hoodie.share('shared_id').on('store:changed',        function(object) { /*...*/ });
+hoodie.share('shared_id').on('store:changed:type',   function(object) { /*...*/ });
+hoodie.share('shared_id').on('store:created',        function(object) { /*...*/ });
+hoodie.share('shared_id').on('store:created:type',   function(object) { /*...*/ });
+hoodie.share('shared_id').on('store:updated',        function(object) { /*...*/ });
+hoodie.share('shared_id').on('store:updated:type',   function(object) { /*...*/ });
+hoodie.share('shared_id').on('store:destroyed',      function(object) { /*...*/ });
+hoodie.share('shared_id').on('store:destroyed:type', function(object) { /*...*/ });

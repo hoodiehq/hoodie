@@ -15,19 +15,20 @@
 // the an object. To make an object public, pass the `public: true` option
 // as demonstrated in the code examples:
 
-/* make objects entirely public */
-options = { "public": true}
+// make object entirely public
+hoodie.store.find('task', '123').publish()
 
-/* or: make seleceted attributes of objects public */
-options = { "public": ["name"] }
+// or: make seleceted attributes of objects public
+hoodie.store.find('task', '123').publish(['title', 'description'])
 
-profilAttributes = { name: "Joe", email: "joe@example.com"}
-hoodie.store.insert("profile", profilAttributes, options)
-hoodie.store.update("profile", "uuid567", {}, options)
+// make a public object private again
+hoodie.store.find('task', '123').unpublish()
 
-// to make a public object private again, pass the `public: false` option
-options = { "public": false }
-hoodie.store.update("profile", "uuid567", {}, options)
+// or: make certain attributes of a published object private again
+hoodie.store.find('task', '123').unpublish(['description'])
+
+// add a new object and make it public
+hoodie.store.add('task', object).publish()
 
 
 // ## Open public objects
@@ -56,14 +57,14 @@ hoodie.user("joey").pull()
 
 // I want to make a photo public
 // 
-hoodie.store.update("photo", "abc4567", {}, {public: true})
+hoodie.store.find("photo", "abc4567").publish()
 
 
 // ### Scenario 2
 
 // I want to make a public photo private again
 // 
-hoodie.store.update("photo", "abc4567", {}, {public: false})
+hoodie.store.find("photo", "abc4567").unpublish()
 
 
 // ### Scenario 3
@@ -112,8 +113,8 @@ hoodie.global.get("most_recent_photos", {page: 2})
 // 
 function playTrack( track ) {
 
-  hoodie.store.findOrCreate( "track", track.id, track, {"public": true})
-  hoodie.store.insert("play", {trackId: trackAtts.id}, {"public": true})
+  hoodie.store.findOrAdd( "track", track.id, track).publish()
+  hoodie.store.add("play", {trackId: track.id}).publish()
 }
 
 tumblrTrack = {
@@ -131,15 +132,11 @@ playTrack( tumblrTrack )
 // I want to favorite or unfavorite a track
 // 
 function favoriteTrack( track ) {
-  hoodie.store.insert( "favorite", { trackId = track.id })
+  hoodie.store.add( "favorite", track.id)
 }
 
 function unfavoriteTrack( track ) {
-  hoodie.store.findAll( function(trackAtts) {
-    return trackAtts.type === "track" && trackAtts.trackId === track.id
-  }).done( function( arrTrackAtts ) {
-    hoodie.store.remove( "favorite", arrTrackAtts[0].trackId )
-  })
+  hoodie.store.remove( "favorite", track.id)
 }
 
 // ### Scenario 3
@@ -147,9 +144,7 @@ function unfavoriteTrack( track ) {
 // Show favorites from a user http://whiskie.net/user/espy
 // 
 hoodie.user('espy').store.findAll("favorite")
-.done( function( favorites ) {
-  renderFavorites( favorites )
-} ) 
+.done( renderFavorites ) 
 
 function renderFavorites (favorites) {
   /* get global playcounts */
@@ -162,7 +157,7 @@ function renderFavorites (favorites) {
     for (var i = 0; i < tracks.length; i++) {
       var track = tracks[i]
       $("<li>"+track.name+" ("+track.playCount+")</li>").appendTo("#tracks")
-    };
+    }
   })
 }
 
@@ -172,3 +167,31 @@ function renderFavorites (favorites) {
 // 
 hoodie.global.get("trending_tracks")
 .done( renderTrendingTracks )
+
+
+// 
+// ### random thoughts
+// 
+// dunno if it makes any sense yet
+// 
+
+// pull all objects of type 'favorite' from epsy's public store
+hoodie.user('espy').pull("favorite")
+
+// a pull from a remote store (public user store / a share)
+// adds a special attribute `$store` to the objects, so that
+// they can be distinced from my own objects:
+favoriteObject = {
+  "$type"  : 'favorite',
+  id       : "trackXYZ",
+  "$store" : 'user/espy/public'
+}
+
+// hmm ... or maybe with a hash map?
+favoriteObject = {
+  "$type"   : 'favorite',
+  id        : "trackXYZ",
+  "$stores" : {
+    'user/espy/public': 1
+  }
+}
