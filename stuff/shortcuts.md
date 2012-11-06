@@ -1,3 +1,9 @@
+Shortcuts
+===========
+
+just some helpers.
+
+
 Delete all user accounts
 --------------------------
 

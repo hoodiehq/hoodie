@@ -263,7 +263,7 @@ hoodie.store.update("couch","abc4567").publish(['color'])
 hoodie.store.update("couch","abc4567").unpublish()
 
 // find all couches from user "joe"
-hoodie.user("joe").findAll("couch").done( function(couches) { ... })
+hoodie.user("joe").store.findAll("couch").done( function(couches) { ... })
 ```
 
 
@@ -274,7 +274,8 @@ available through the hoodie.global API
 
 ```javascript
 // find all public songs from all users
-hoodie.global.findAll("song").done( function(songs) { ... })
+hoodie.global.store.findAll("song")
+.done( function(songs) { ... })
 ```
 
 
@@ -285,7 +286,8 @@ be shared.
 
 ```javascript
 // create a new share
-hoodie.share.add().done( function(share) {} )
+hoodie.share.add()
+.done( function(share) {} )
 
 // grant / revoke access
 share.grantReadAccess()
@@ -305,17 +307,15 @@ hoodie.store.find('todo', '123').unshareAt(share.id)
 hoodie.share.remove(share.id)
 
 // open a share and load all its objects
-hoodie.share('shareIdHere').findAll()
-  .done( function(user) { } ) 
-  .fail( function(err)  { } )
+hoodie.share('shareIdHere').store.findAll()
+  .done( function(objects) { } ) 
+  .fail( function(err)     { } )
 ```
 
 
 
 Send E-Mails
 ------------
-
-hell, yeah!
 
 ```javascript
 email = {
@@ -325,7 +325,7 @@ email = {
   body    : "we can do it!\nSigned, Joe"
 }
 
-app.email.send( email )
+hoodie.email.send( email )
 
   // synched to server
   .progress ( function(email) { } )
@@ -351,7 +351,7 @@ Future Ideas
 Dependencies
 ------------
 
-Hoodie depends on on jQuery/[zepto](http://zeptojs.com/), but we will remove the dependance at some point.
+Hoodie depends on on jQuery, but we will remove the dependance at some point.
 
 
 Contribute
@@ -359,11 +359,11 @@ Contribute
 
 When you feel like contributing, I highly recommend to install [PhantomJS](http://www.phantomjs.org/) for automated, headless testing. Run `$ cake autotest` to have test running in the background while hacking.
 
-When you're done with changes, make sure to run `$ cake build` to update the concatenated for testing.
+When you're done with changes, make sure to run `$ cake build` to update hoodie.js and hoodie.min.js.
 
 
 License & Copyright
 ===================
 
-(c) 2012 Gregor Martynus <g@minutes.io>
+(c) 2012 Gregor Martynus <gregor@minutes.io>
 Licensed under the Apache License 2.0.
