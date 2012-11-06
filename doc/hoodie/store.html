@@ -2,8 +2,8 @@
 coherent API.</p>
 
 <p>It also implements some validations and functionality that is the same across
-store impnementations</p></div></div><div class="code"><div class="wrapper"><span class="k">class</span> <span class="nx">Hoodie</span><span class="p">.</span><span class="nx">Store</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h2 id="constructor">Constructor</h2></div></div></div><div class="segment"><div class="code"><div class="wrapper">  <span class="nv">constructor : </span><span class="nf">(@hoodie) -&gt;</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h2 id="save">Save</h2></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>saves the passed object into the store and replaces an eventually existing 
-document with same type &amp; id.</p>
+store impnementations</p></div></div><div class="code"><div class="wrapper"><span class="k">class</span> <span class="nx">Hoodie</span><span class="p">.</span><span class="nx">Store</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h2 id="constructor">Constructor</h2></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>set store.hoodie instance variable</p></div></div><div class="code"><div class="wrapper">  <span class="nv">constructor : </span><span class="nf">(@hoodie) -&gt;</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h2 id="save">Save</h2></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>creates or replaces an an eventually existing object in the store
+with same type &amp; id.</p>
 
 <p>When id is undefined, it gets generated and a new object gets saved</p>
 

@@ -456,125 +456,29 @@ f.event={add:function(a,c,d,e,g){var h,i,j,k,l,m,n,o,p,q,r,s;if(!(a.nodeType===3
               },
               "depth": 2
             }
-          ],
-          "children": [
-            {
-              "type": "file",
+          ]
+        }, {
+          "type": "file",
+          "data": {
+            "language": {
+              "nameMatchers": [".coffee"],
+              "pygmentsLexer": "coffee-script",
+              "singleLineComment": ["#"],
+              "name": "CoffeeScript"
+            },
+            "sourcePath": "/Users/gregor/JavaScripts/hood.ie/hoodie.js/src/hoodie/account_remote.coffee",
+            "projectPath": "src/hoodie/account_remote.coffee",
+            "targetPath": "hoodie/account_remote",
+            "firstHeader": {
+              "type": "heading",
               "data": {
-                "language": {
-                  "nameMatchers": [".coffee"],
-                  "pygmentsLexer": "coffee-script",
-                  "singleLineComment": ["#"],
-                  "name": "CoffeeScript"
-                },
-                "sourcePath": "/Users/gregor/JavaScripts/hood.ie/hoodie.js/src/hoodie/account/remote.coffee",
-                "projectPath": "src/hoodie/account/remote.coffee",
-                "targetPath": "hoodie/account/remote",
-                "firstHeader": {
-                  "type": "heading",
-                  "data": {
-                    "level": 1,
-                    "title": "RemoteStore",
-                    "slug": "remotestore",
-                    "isFileHeader": true
-                  },
-                  "depth": 1,
-                  "children": [
-                    {
-                      "type": "heading",
-                      "data": {
-                        "level": 2,
-                        "title": "properties",
-                        "slug": "properties"
-                      },
-                      "depth": 2
-                    }, {
-                      "type": "heading",
-                      "data": {
-                        "level": 2,
-                        "title": "Constructor",
-                        "slug": "constructor"
-                      },
-                      "depth": 2
-                    }, {
-                      "type": "heading",
-                      "data": {
-                        "level": 2,
-                        "title": "Connect",
-                        "slug": "connect"
-                      },
-                      "depth": 2
-                    }, {
-                      "type": "heading",
-                      "data": {
-                        "level": 2,
-                        "title": "disconnect",
-                        "slug": "disconnect"
-                      },
-                      "depth": 2
-                    }, {
-                      "type": "heading",
-                      "data": {
-                        "level": 2,
-                        "title": "startSyncing",
-                        "slug": "startsyncing"
-                      },
-                      "depth": 2
-                    }, {
-                      "type": "heading",
-                      "data": {
-                        "level": 2,
-                        "title": "stopSyncing",
-                        "slug": "stopsyncing"
-                      },
-                      "depth": 2
-                    }, {
-                      "type": "heading",
-                      "data": {
-                        "level": 2,
-                        "title": "sync",
-                        "slug": "sync"
-                      },
-                      "depth": 2
-                    }, {
-                      "type": "heading",
-                      "data": {
-                        "level": 2,
-                        "title": "get and set since nr",
-                        "slug": "get-and-set-since-nr"
-                      },
-                      "depth": 2
-                    }, {
-                      "type": "heading",
-                      "data": {
-                        "level": 2,
-                        "title": "push",
-                        "slug": "push"
-                      },
-                      "depth": 2
-                    }, {
-                      "type": "heading",
-                      "data": {
-                        "level": 2,
-                        "title": "Events",
-                        "slug": "events"
-                      },
-                      "depth": 2
-                    }, {
-                      "type": "heading",
-                      "data": {
-                        "level": 2,
-                        "title": "Private",
-                        "slug": "private"
-                      },
-                      "depth": 2
-                    }
-                  ]
-                },
-                "title": "RemoteStore"
+                "level": 1,
+                "title": "RemoteStore",
+                "slug": "remotestore",
+                "isFileHeader": true
               },
-              "depth": 3,
-              "outline": [
+              "depth": 1,
+              "children": [
                 {
                   "type": "heading",
                   "data": {
@@ -665,6 +569,99 @@ f.event={add:function(a,c,d,e,g){var h,i,j,k,l,m,n,o,p,q,r,s;if(!(a.nodeType===3
                   "depth": 2
                 }
               ]
+            },
+            "title": "RemoteStore"
+          },
+          "depth": 2,
+          "outline": [
+            {
+              "type": "heading",
+              "data": {
+                "level": 2,
+                "title": "properties",
+                "slug": "properties"
+              },
+              "depth": 2
+            }, {
+              "type": "heading",
+              "data": {
+                "level": 2,
+                "title": "Constructor",
+                "slug": "constructor"
+              },
+              "depth": 2
+            }, {
+              "type": "heading",
+              "data": {
+                "level": 2,
+                "title": "Connect",
+                "slug": "connect"
+              },
+              "depth": 2
+            }, {
+              "type": "heading",
+              "data": {
+                "level": 2,
+                "title": "disconnect",
+                "slug": "disconnect"
+              },
+              "depth": 2
+            }, {
+              "type": "heading",
+              "data": {
+                "level": 2,
+                "title": "startSyncing",
+                "slug": "startsyncing"
+              },
+              "depth": 2
+            }, {
+              "type": "heading",
+              "data": {
+                "level": 2,
+                "title": "stopSyncing",
+                "slug": "stopsyncing"
+              },
+              "depth": 2
+            }, {
+              "type": "heading",
+              "data": {
+                "level": 2,
+                "title": "sync",
+                "slug": "sync"
+              },
+              "depth": 2
+            }, {
+              "type": "heading",
+              "data": {
+                "level": 2,
+                "title": "get and set since nr",
+                "slug": "get-and-set-since-nr"
+              },
+              "depth": 2
+            }, {
+              "type": "heading",
+              "data": {
+                "level": 2,
+                "title": "push",
+                "slug": "push"
+              },
+              "depth": 2
+            }, {
+              "type": "heading",
+              "data": {
+                "level": 2,
+                "title": "Events",
+                "slug": "events"
+              },
+              "depth": 2
+            }, {
+              "type": "heading",
+              "data": {
+                "level": 2,
+                "title": "Private",
+                "slug": "private"
+              },
+              "depth": 2
             }
           ]
         }, {
@@ -909,6 +906,14 @@ f.event={add:function(a,c,d,e,g){var h,i,j,k,l,m,n,o,p,q,r,s;if(!(a.nodeType===3
                   "type": "heading",
                   "data": {
                     "level": 2,
+                    "title": "update / updateAll / removeAll",
+                    "slug": "update--updateall--removeall"
+                  },
+                  "depth": 2
+                }, {
+                  "type": "heading",
+                  "data": {
+                    "level": 2,
                     "title": "Cache",
                     "slug": "cache"
                   },
@@ -989,6 +994,14 @@ f.event={add:function(a,c,d,e,g){var h,i,j,k,l,m,n,o,p,q,r,s;if(!(a.nodeType===3
                   "type": "heading",
                   "data": {
                     "level": 2,
+                    "title": "extend",
+                    "slug": "extend"
+                  },
+                  "depth": 2
+                }, {
+                  "type": "heading",
+                  "data": {
+                    "level": 2,
                     "title": "Private",
                     "slug": "private"
                   },
@@ -1046,6 +1059,14 @@ f.event={add:function(a,c,d,e,g){var h,i,j,k,l,m,n,o,p,q,r,s;if(!(a.nodeType===3
                 "level": 2,
                 "title": "Destroy",
                 "slug": "destroy"
+              },
+              "depth": 2
+            }, {
+              "type": "heading",
+              "data": {
+                "level": 2,
+                "title": "update / updateAll / removeAll",
+                "slug": "update--updateall--removeall"
               },
               "depth": 2
             }, {
@@ -1126,6 +1147,14 @@ f.event={add:function(a,c,d,e,g){var h,i,j,k,l,m,n,o,p,q,r,s;if(!(a.nodeType===3
                 "level": 2,
                 "title": "on",
                 "slug": "on"
+              },
+              "depth": 2
+            }, {
+              "type": "heading",
+              "data": {
+                "level": 2,
+                "title": "extend",
+                "slug": "extend"
               },
               "depth": 2
             }, {
@@ -1910,14 +1939,6 @@ f.event={add:function(a,c,d,e,g){var h,i,j,k,l,m,n,o,p,q,r,s;if(!(a.nodeType===3
                   "type": "heading",
                   "data": {
                     "level": 2,
-                    "title": "open",
-                    "slug": "open"
-                  },
-                  "depth": 2
-                }, {
-                  "type": "heading",
-                  "data": {
-                    "level": 2,
                     "title": "add",
                     "slug": "add"
                   },
@@ -1986,6 +2007,41 @@ f.event={add:function(a,c,d,e,g){var h,i,j,k,l,m,n,o,p,q,r,s;if(!(a.nodeType===3
                     "slug": "removeall"
                   },
                   "depth": 2
+                }, {
+                  "type": "heading",
+                  "data": {
+                    "level": 2,
+                    "title": "Private",
+                    "slug": "private"
+                  },
+                  "depth": 2,
+                  "children": [
+                    {
+                      "type": "heading",
+                      "data": {
+                        "level": 3,
+                        "title": "filter share options",
+                        "slug": "filter-share-options"
+                      },
+                      "depth": 3
+                    }, {
+                      "type": "heading",
+                      "data": {
+                        "level": 3,
+                        "title": "open",
+                        "slug": "open"
+                      },
+                      "depth": 3
+                    }
+                  ]
+                }, {
+                  "type": "heading",
+                  "data": {
+                    "level": 2,
+                    "title": "hoodie.store decorations",
+                    "slug": "hoodiestore-decorations"
+                  },
+                  "depth": 2
                 }
               ]
             },
@@ -2007,14 +2063,6 @@ f.event={add:function(a,c,d,e,g){var h,i,j,k,l,m,n,o,p,q,r,s;if(!(a.nodeType===3
                 "level": 2,
                 "title": "Constructor",
                 "slug": "constructor"
-              },
-              "depth": 2
-            }, {
-              "type": "heading",
-              "data": {
-                "level": 2,
-                "title": "open",
-                "slug": "open"
               },
               "depth": 2
             }, {
@@ -2089,134 +2137,91 @@ f.event={add:function(a,c,d,e,g){var h,i,j,k,l,m,n,o,p,q,r,s;if(!(a.nodeType===3
                 "slug": "removeall"
               },
               "depth": 2
-            }
-          ],
-          "children": [
-            {
-              "type": "file",
+            }, {
+              "type": "heading",
               "data": {
-                "language": {
-                  "nameMatchers": [".coffee"],
-                  "pygmentsLexer": "coffee-script",
-                  "singleLineComment": ["#"],
-                  "name": "CoffeeScript"
-                },
-                "sourcePath": "/Users/gregor/JavaScripts/hood.ie/hoodie.js/src/hoodie/share/instance.coffee",
-                "projectPath": "src/hoodie/share/instance.coffee",
-                "targetPath": "hoodie/share/instance",
-                "title": "instance"
+                "level": 2,
+                "title": "Private",
+                "slug": "private"
               },
-              "depth": 3,
-              "outline": [
+              "depth": 2,
+              "children": [
                 {
                   "type": "heading",
                   "data": {
-                    "level": 2,
-                    "title": "default values",
-                    "slug": "default-values"
+                    "level": 3,
+                    "title": "filter share options",
+                    "slug": "filter-share-options"
                   },
-                  "depth": 2
+                  "depth": 3
                 }, {
                   "type": "heading",
                   "data": {
-                    "level": 2,
-                    "title": "constructor",
-                    "slug": "constructor"
+                    "level": 3,
+                    "title": "open",
+                    "slug": "open"
                   },
-                  "depth": 2,
-                  "children": [
-                    {
-                      "type": "heading",
-                      "data": {
-                        "level": 3,
-                        "title": "Options",
-                        "slug": "options"
-                      },
-                      "depth": 3
-                    }
-                  ]
-                }, {
-                  "type": "heading",
-                  "data": {
-                    "level": 2,
-                    "title": "set",
-                    "slug": "set"
-                  },
-                  "depth": 2
-                }, {
-                  "type": "heading",
-                  "data": {
-                    "level": 2,
-                    "title": "get",
-                    "slug": "get"
-                  },
-                  "depth": 2
-                }, {
-                  "type": "heading",
-                  "data": {
-                    "level": 2,
-                    "title": "save",
-                    "slug": "save"
-                  },
-                  "depth": 2
-                }, {
-                  "type": "heading",
-                  "data": {
-                    "level": 2,
-                    "title": "add",
-                    "slug": "add"
-                  },
-                  "depth": 2
-                }, {
-                  "type": "heading",
-                  "data": {
-                    "level": 2,
-                    "title": "remove",
-                    "slug": "remove"
-                  },
-                  "depth": 2
-                }, {
-                  "type": "heading",
-                  "data": {
-                    "level": 2,
-                    "title": "toggle",
-                    "slug": "toggle"
-                  },
-                  "depth": 2
-                }, {
-                  "type": "heading",
-                  "data": {
-                    "level": 2,
-                    "title": "sync",
-                    "slug": "sync"
-                  },
-                  "depth": 2
-                }, {
-                  "type": "heading",
-                  "data": {
-                    "level": 2,
-                    "title": "destroy",
-                    "slug": "destroy"
-                  },
-                  "depth": 2
-                }, {
-                  "type": "heading",
-                  "data": {
-                    "level": 2,
-                    "title": "findAllObjects",
-                    "slug": "findallobjects"
-                  },
-                  "depth": 2
-                }, {
-                  "type": "heading",
-                  "data": {
-                    "level": 2,
-                    "title": "Private",
-                    "slug": "private"
-                  },
-                  "depth": 2
+                  "depth": 3
                 }
               ]
+            }, {
+              "type": "heading",
+              "data": {
+                "level": 2,
+                "title": "hoodie.store decorations",
+                "slug": "hoodiestore-decorations"
+              },
+              "depth": 2
+            }
+          ]
+        }, {
+          "type": "file",
+          "data": {
+            "language": {
+              "nameMatchers": [".coffee"],
+              "pygmentsLexer": "coffee-script",
+              "singleLineComment": ["#"],
+              "name": "CoffeeScript"
+            },
+            "sourcePath": "/Users/gregor/JavaScripts/hood.ie/hoodie.js/src/hoodie/share_instance.coffee",
+            "projectPath": "src/hoodie/share_instance.coffee",
+            "targetPath": "hoodie/share_instance",
+            "title": "share_instance"
+          },
+          "depth": 2,
+          "outline": [
+            {
+              "type": "heading",
+              "data": {
+                "level": 2,
+                "title": "default values",
+                "slug": "default-values"
+              },
+              "depth": 2
+            }, {
+              "type": "heading",
+              "data": {
+                "level": 2,
+                "title": "constructor",
+                "slug": "constructor"
+              },
+              "depth": 2
+            }, {
+              "type": "heading",
+              "data": {
+                "level": 2,
+                "title": "grant read access",
+                "slug": "grant-read-access"
+              },
+              "depth": 2
+            }, {
+              "type": "heading",
+              "data": {
+                "level": 2,
+                "title": "PRIVATE",
+                "slug": "private"
+              },
+              "depth": 2
             }
           ]
         }, {
@@ -2435,6 +2440,32 @@ f.event={add:function(a,c,d,e,g){var h,i,j,k,l,m,n,o,p,q,r,s;if(!(a.nodeType===3
               "singleLineComment": ["#"],
               "name": "CoffeeScript"
             },
+            "sourcePath": "/Users/gregor/JavaScripts/hood.ie/hoodie.js/src/hoodie/subscription.coffee",
+            "projectPath": "src/hoodie/subscription.coffee",
+            "targetPath": "hoodie/subscription",
+            "firstHeader": {
+              "type": "heading",
+              "data": {
+                "level": 1,
+                "title": "Subscription",
+                "slug": "subscription",
+                "isFileHeader": true
+              },
+              "depth": 1
+            },
+            "title": "Subscription"
+          },
+          "depth": 2,
+          "outline": []
+        }, {
+          "type": "file",
+          "data": {
+            "language": {
+              "nameMatchers": [".coffee"],
+              "pygmentsLexer": "coffee-script",
+              "singleLineComment": ["#"],
+              "name": "CoffeeScript"
+            },
             "sourcePath": "/Users/gregor/JavaScripts/hood.ie/hoodie.js/src/hoodie/user.coffee",
             "projectPath": "src/hoodie/user.coffee",
             "targetPath": "hoodie/user",
@@ -2446,12 +2477,33 @@ f.event={add:function(a,c,d,e,g){var h,i,j,k,l,m,n,o,p,q,r,s;if(!(a.nodeType===3
                 "slug": "user",
                 "isFileHeader": true
               },
-              "depth": 1
+              "depth": 1,
+              "children": [
+                {
+                  "type": "heading",
+                  "data": {
+                    "level": 2,
+                    "title": "hoodie.store decorations",
+                    "slug": "hoodiestore-decorations"
+                  },
+                  "depth": 2
+                }
+              ]
             },
             "title": "User"
           },
           "depth": 2,
-          "outline": []
+          "outline": [
+            {
+              "type": "heading",
+              "data": {
+                "level": 2,
+                "title": "hoodie.store decorations",
+                "slug": "hoodiestore-decorations"
+              },
+              "depth": 2
+            }
+          ]
         }
       ]
     }

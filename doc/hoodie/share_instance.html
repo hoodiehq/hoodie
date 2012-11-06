@@ -1,0 +1,119 @@
+<!DOCTYPE html><html lang="en"><head><title>hoodie/share_instance</title></head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0"><meta name="groc-relative-root" content="../"><meta name="groc-document-path" content="hoodie/share_instance"><meta name="groc-project-path" content="src/hoodie/share_instance.coffee"><link rel="stylesheet" type="text/css" media="all" href="../assets/style.css"><script type="text/javascript" src="../assets/behavior.js"></script><body><div id="meta"><div class="file-path">src/hoodie/share_instance.coffee</div></div><div id="document"><div class="segment"><div class="code"><div class="wrapper"><span class="k">class</span> <span class="nx">Hoodie</span><span class="p">.</span><span class="nx">ShareInstance</span> <span class="k">extends</span> <span class="nx">Hoodie</span><span class="p">.</span><span class="nx">Remote</span>
+  </div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h2 id="default-values">default values</h2></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>shares are not accessible to others by default.</p></div></div><div class="code"><div class="wrapper">  <span class="nv">access: </span><span class="kc">false</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h2 id="constructor">constructor</h2></div></div><div class="code"><div class="wrapper">  </div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>initializes a new share</p></div></div><div class="code"><div class="wrapper">  <span class="nv">constructor: </span><span class="nf">(@hoodie, options = {}) -&gt;</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>make sure that we have an id</p></div></div><div class="code"><div class="wrapper">    <span class="vi">@id = </span><span class="nx">options</span><span class="p">.</span><span class="nx">id</span> <span class="o">or</span> <span class="nx">@hoodie</span><span class="p">.</span><span class="nx">uuid</span><span class="p">()</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>set name from id</p></div></div><div class="code"><div class="wrapper">    <span class="vi">@name = </span><span class="s2">&quot;share/#{@id}&quot;</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>set options</p></div></div><div class="code"><div class="wrapper">    <span class="nx">$</span><span class="p">.</span><span class="nx">extend</span> <span class="k">this</span><span class="p">,</span> <span class="nx">options</span>
+
+    <span class="k">super</span>
+  </div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h2 id="grant-read-access">grant read access</h2>
+
+<p>grant read access to the share. If no users passed,
+everybody can read the share objects. If one or multiple
+users passed, only these users get read access.</p>
+
+<p>examples:</p>
+
+<pre><code>share.grantReadAccess()
+share.grantReadAccess('joe@example.com')
+share.grantReadAccess(['joe@example.com', 'lisa@example.com'])
+</code></pre></div></div><div class="code"><div class="wrapper">  <span class="nv">grantReadAccess: </span><span class="nf">(users) -&gt;</span>
+    <span class="k">if</span> <span class="nx">@access</span> <span class="o">is</span> <span class="kc">true</span> <span class="o">or</span> <span class="nx">@access</span><span class="p">.</span><span class="nx">read</span> <span class="o">is</span> <span class="kc">true</span>
+      <span class="k">return</span> <span class="nx">@hoodie</span><span class="p">.</span><span class="nx">resolveWith</span> <span class="k">this</span>
+
+    <span class="nv">users = </span><span class="p">[</span><span class="nx">users</span><span class="p">]</span> <span class="k">if</span> <span class="k">typeof</span> <span class="nx">users</span> <span class="o">is</span> <span class="s1">&#39;string&#39;</span>
+    <span class="k">if</span> <span class="nx">@access</span> <span class="o">is</span> <span class="kc">false</span> <span class="o">or</span> <span class="nx">@access</span><span class="p">.</span><span class="nx">read</span> <span class="o">is</span> <span class="kc">false</span>
+      <span class="k">if</span> <span class="nx">@access</span><span class="p">.</span><span class="nx">read</span><span class="o">?</span>
+        <span class="vi">@access.read = </span><span class="nx">users</span> <span class="o">or</span> <span class="kc">true</span>
+      <span class="k">else</span> 
+        <span class="vi">@access = </span><span class="nx">users</span> <span class="o">or</span> <span class="kc">true</span>
+
+    <span class="k">if</span> <span class="nx">users</span>
+      <span class="nv">currentUsers = </span><span class="nx">@access</span><span class="p">.</span><span class="nx">read</span> <span class="o">or</span> <span class="nx">@access</span>
+      <span class="k">for</span> <span class="nx">user</span> <span class="k">in</span> <span class="nx">users</span>
+        <span class="nx">currentUsers</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="nx">user</span><span class="p">)</span> <span class="k">if</span> <span class="nx">currentUsers</span><span class="p">.</span><span class="nx">indexOf</span><span class="p">(</span><span class="nx">user</span><span class="p">)</span> <span class="o">is</span> <span class="o">-</span><span class="mi">1</span>
+
+      <span class="k">if</span> <span class="nx">@access</span><span class="p">.</span><span class="nx">read</span><span class="o">?</span>
+        <span class="vi">@access.read = </span><span class="nx">currentUsers</span>
+      <span class="k">else</span> 
+        <span class="vi">@access = </span><span class="nx">currentUsers</span>
+
+    <span class="k">else</span>
+      <span class="k">if</span> <span class="nx">@access</span><span class="p">.</span><span class="nx">read</span><span class="o">?</span>
+        <span class="vi">@access.read = </span><span class="kc">true</span>
+      <span class="k">else</span> 
+        <span class="vi">@access = </span><span class="kc">true</span>
+
+    <span class="nx">@hoodie</span><span class="p">.</span><span class="nx">share</span><span class="p">.</span><span class="nx">update</span><span class="p">(</span><span class="nx">@id</span><span class="p">,</span> <span class="nv">access: </span><span class="nx">@access</span><span class="p">)</span>
+
+  <span class="nv">revokeReadAccess: </span><span class="nf">(users) -&gt;</span>
+    <span class="nx">@revokeWriteAccess</span><span class="p">(</span><span class="nx">users</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="nx">@access</span> <span class="o">is</span> <span class="kc">false</span> <span class="o">or</span> <span class="nx">@access</span><span class="p">.</span><span class="nx">read</span> <span class="o">is</span> <span class="kc">false</span>
+      <span class="k">return</span> <span class="nx">@hoodie</span><span class="p">.</span><span class="nx">resolveWith</span> <span class="k">this</span>
+
+    <span class="k">if</span> <span class="nx">users</span>
+      <span class="k">if</span> <span class="nx">@access</span> <span class="o">is</span> <span class="kc">true</span>  <span class="o">or</span> <span class="nx">@access</span><span class="p">.</span><span class="nx">read</span> <span class="o">is</span> <span class="kc">true</span>
+        <span class="k">return</span> <span class="nx">@hoodie</span><span class="p">.</span><span class="nx">rejectWith</span> <span class="k">this</span>
+
+      <span class="nv">users = </span><span class="p">[</span><span class="nx">users</span><span class="p">]</span> <span class="k">if</span> <span class="k">typeof</span> <span class="nx">users</span> <span class="o">is</span> <span class="s1">&#39;string&#39;</span>
+
+      <span class="nv">currentUsers = </span><span class="nx">@access</span><span class="p">.</span><span class="nx">read</span> <span class="o">or</span> <span class="nx">@access</span>
+      <span class="nv">changed = </span><span class="kc">false</span>
+
+      <span class="k">for</span> <span class="nx">user</span> <span class="k">in</span> <span class="nx">users</span>
+        <span class="nv">idx = </span><span class="nx">currentUsers</span><span class="p">.</span><span class="nx">indexOf</span><span class="p">(</span><span class="nx">user</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nx">idx</span> <span class="o">!=</span> <span class="o">-</span><span class="mi">1</span>
+          <span class="nx">currentUsers</span><span class="p">.</span><span class="nx">splice</span><span class="p">(</span><span class="nx">idx</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+          <span class="nv">changed = </span><span class="kc">true</span>
+
+      <span class="nx">unless</span> <span class="nx">changed</span>
+        <span class="k">return</span> <span class="nx">@hoodie</span><span class="p">.</span><span class="nx">resolveWith</span> <span class="k">this</span>
+
+      <span class="nv">currentUsers = </span><span class="kc">false</span> <span class="k">if</span> <span class="nx">currentUsers</span><span class="p">.</span><span class="nx">length</span> <span class="o">is</span> <span class="mi">0</span>
+
+
+
+      <span class="k">if</span> <span class="nx">@access</span><span class="p">.</span><span class="nx">read</span><span class="o">?</span>
+        <span class="vi">@access.read = </span><span class="nx">currentUsers</span>
+      <span class="k">else</span> 
+        <span class="vi">@access = </span><span class="nx">currentUsers</span>
+
+    <span class="k">else</span>
+      <span class="vi">@access = </span><span class="kc">false</span>
+    
+    <span class="nx">@hoodie</span><span class="p">.</span><span class="nx">share</span><span class="p">.</span><span class="nx">update</span><span class="p">(</span><span class="nx">@id</span><span class="p">,</span> <span class="nv">access: </span><span class="nx">@access</span><span class="p">)</span>
+
+  <span class="nv">grantWriteAccess: </span><span class="nf">(users) -&gt;</span>
+    <span class="nx">@grantReadAccess</span><span class="p">(</span><span class="nx">users</span><span class="p">)</span>
+    <span class="nx">unless</span> <span class="nx">@access</span><span class="p">.</span><span class="nx">read</span><span class="o">?</span>
+      <span class="vi">@access = </span><span class="nv">read: </span><span class="nx">@access</span>
+
+    <span class="k">if</span> <span class="nx">@access</span><span class="p">.</span><span class="nx">write</span> <span class="o">is</span> <span class="kc">true</span>
+      <span class="k">return</span> <span class="nx">@hoodie</span><span class="p">.</span><span class="nx">resolveWith</span> <span class="k">this</span>
+
+    <span class="k">if</span> <span class="nx">users</span>
+      <span class="nv">users = </span><span class="p">[</span><span class="nx">users</span><span class="p">]</span> <span class="k">if</span> <span class="k">typeof</span> <span class="nx">users</span> <span class="o">is</span> <span class="s1">&#39;string&#39;</span>
+      <span class="vi">@access.write = </span><span class="nx">users</span>
+    <span class="k">else</span>
+      <span class="vi">@access.write = </span><span class="kc">true</span>
+
+    <span class="nx">@hoodie</span><span class="p">.</span><span class="nx">share</span><span class="p">.</span><span class="nx">update</span><span class="p">(</span><span class="nx">@id</span><span class="p">,</span> <span class="nv">access: </span><span class="nx">@access</span><span class="p">)</span>
+
+  <span class="nv">revokeWriteAccess: </span><span class="nf">(users) -&gt;</span>
+    <span class="nx">unless</span> <span class="nx">@access</span><span class="p">.</span><span class="nx">write</span><span class="o">?</span>
+      <span class="k">return</span> <span class="nx">@hoodie</span><span class="p">.</span><span class="nx">resolveWith</span> <span class="k">this</span>
+
+    <span class="k">if</span> <span class="nx">users</span>
+      <span class="k">if</span> <span class="k">typeof</span> <span class="nx">@access</span><span class="p">.</span><span class="nx">write</span> <span class="o">is</span> <span class="s1">&#39;boolean&#39;</span>
+        <span class="k">return</span> <span class="nx">@hoodie</span><span class="p">.</span><span class="nx">rejectWith</span> <span class="k">this</span>
+
+      <span class="nv">users = </span><span class="p">[</span><span class="nx">users</span><span class="p">]</span> <span class="k">if</span> <span class="k">typeof</span> <span class="nx">users</span> <span class="o">is</span> <span class="s1">&#39;string&#39;</span>
+      <span class="k">for</span> <span class="nx">user</span> <span class="k">in</span> <span class="nx">users</span>
+        <span class="nv">idx = </span><span class="nx">@access</span><span class="p">.</span><span class="nx">write</span><span class="p">.</span><span class="nx">indexOf</span><span class="p">(</span><span class="nx">user</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nx">idx</span> <span class="o">!=</span> <span class="o">-</span><span class="mi">1</span>
+          <span class="nx">@access</span><span class="p">.</span><span class="nx">write</span><span class="p">.</span><span class="nx">splice</span><span class="p">(</span><span class="nx">idx</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+
+      <span class="k">if</span> <span class="nx">@access</span><span class="p">.</span><span class="nx">write</span><span class="p">.</span><span class="nx">length</span> <span class="o">is</span> <span class="mi">0</span>
+        <span class="vi">@access = </span><span class="nx">@access</span><span class="p">.</span><span class="nx">read</span>
+
+    <span class="k">else</span>
+      <span class="vi">@access = </span><span class="nx">@access</span><span class="p">.</span><span class="nx">read</span>
+      
+    <span class="nx">@hoodie</span><span class="p">.</span><span class="nx">share</span><span class="p">.</span><span class="nx">update</span><span class="p">(</span><span class="nx">@id</span><span class="p">,</span> <span class="nv">access: </span><span class="nx">@access</span><span class="p">)</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h2 id="private">PRIVATE</h2></div></div></div></div></body></html>
