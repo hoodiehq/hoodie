@@ -62,34 +62,33 @@ task 'console', 'run a browser console, from command line, hell yeah', ->
    
   
 task 'build', 'build hoodie-client.min.js', -> 
-  try fs.unlinkSync 'hoodie.js'
+  
+  # the files need to be in a specific order, 
+  # as some modules depend on others (e.g.
+  # AccountRemote > Remote)
+  files = """
+  src/events.coffee
+  src/hoodie.coffee
+  src/hoodie/account.coffee
+  src/hoodie/config.coffee
+  src/hoodie/email.coffee
+  src/hoodie/remote.coffee
+  src/hoodie/share.coffee
+  src/hoodie/store.coffee
+  src/hoodie/subscription.coffee
+  src/hoodie/user.coffee
+  src/hoodie/account_remote.coffee
+  src/hoodie/local_store.coffee
+  src/hoodie/remote_store.coffee
+  src/hoodie/share_instance.coffee
+  """.split("\n")
+  
+  console.log ['-j', 'hoodie.js', '-c', '-b'].concat(files)
+  coffee = spawn 'coffee', ['-j', 'hoodie.js', '-c', '-b'].concat(files)
+  coffee.on 'exit', (code) ->
+    spawn 'uglifyjs', ['-o', 'hoodie.min.js', 'hoodie.js']
 
-  js_code = ''
-  build = spawn 'cat', [
-    'compiled/src/events.js'
-    'compiled/src/hoodie.js'
-    'compiled/src/hoodie/account.js'
-    'compiled/src/hoodie/store.js'
-    'compiled/src/hoodie/remote.js'
-    'compiled/src/hoodie/remote_store.js'
-    'compiled/src/hoodie/account_remote.js'
-    'compiled/src/hoodie/config.js'
-    'compiled/src/hoodie/email.js'
-    'compiled/src/hoodie/errors.js'
-    'compiled/src/hoodie/local_store.js'
-    'compiled/src/hoodie/user.js'
-    'compiled/src/hoodie/global.js'
-    'compiled/src/hoodie/share.js'
-    'compiled/src/hoodie/share_instance.js'
-  ]
 
-  build.stdout.on 'data', (data) -> 
-    js_code += data
-
-  # build.stderr.on 'data', (data) -> print data.toString()
-  build.on 'exit', (status) -> 
-    fs.writeFileSync 'hoodie.js', js_code
-    callback?() if status is 0
   
 task 'docs', 'create docs from code', ->
   console.log ""
