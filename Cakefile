@@ -83,9 +83,10 @@ task 'build', 'build hoodie-client.min.js', ->
   src/hoodie/share_instance.coffee
   """.split("\n")
   
-  console.log ['-j', 'hoodie.js', '-c', '-b'].concat(files)
+  console.log "concatinating files ..."
   coffee = spawn 'coffee', ['-j', 'hoodie.js', '-c', '-b'].concat(files)
   coffee.on 'exit', (code) ->
+    console.log "minifying ..."
     spawn 'uglifyjs', ['-o', 'hoodie.min.js', 'hoodie.js']
 
 
