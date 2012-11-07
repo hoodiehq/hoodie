@@ -62,11 +62,28 @@ share.revokeAccess("lisa@example.com")
 // the hoodie.share module also extends the hoodie.store
 // api with two methods: share and unshare
 // 
-// compare to [store.publish / store.unpublish](public_user_stores2.html)
+// compare to [store.publish / store.unpublish](public_user_stores.html)
 hoodie.store.find('task', '123').share()
 hoodie.store.find('task', '123').shareAt( share.id)
 hoodie.store.find('task', '123').unshare()
 hoodie.store.find('task', '123').unshareAt( share.id )
+
+// When executing `shareAt`, internally we execute
+// `hoodie.share.findOrAdd(id, options)`. That means 
+// 
+// 1. I can directly share objects at a self defined id without
+//    manually creating the share upfront.
+// 2. I can share objects at an existing share (mine or somebody
+//    else's)
+// 
+// So the following code shares all my car objects at "favoritecars"
+// wich is a shared stor that might or might not exist yet
+hoodie.store.findAll('car').shareAt( "favoritecars" )
+
+// In case something goes wrong, for example the "favoritecars" share
+// exists but I don't have write permissions on it, an error will
+// be triggered, but asynchroniously. 
+hoodie.share.on('error:favoritecars', handleShareError)
 
 
 // example
@@ -82,26 +99,37 @@ var todolist = {
     {title: 'milk'}
   ]
 }
-hoodie.store.add('todolist', todolist).share({write: true, password: 'secret'})
+hoodie.store.add('todolist', todolist).share()
 .done( function(todolist, share) {
   /* now others can access the shared directly with
      hoodie.share( share.id ).store.findAll() */
 })
 
 
+// subsribing to shares by others
+// --------------------------------
+
+// to subscribe to a share, use the following code:
+hoodie.store.share('secretShareId').subscribe()
+
+// a subscription creates internally also a $share object,
+// so I can treat it in the same way. When subscribing to 
+// a share, the workers will setup continuous replications
+// to pull and — if I have write access — to push changes.
+// Objects that get pulled from other users' shares will
+// get be set with a {$shares: {secretShareId: true} }
+
+
 // Use cases
 // -----------
 //
-// 1.  Public Share
-// 2.  Private Share
-// 5.  Read only Share
-// 6.  Collaborative Shares
-// 7.  Public, password protected shares
-// 8.  Listen to events in Shares
-//
-// To be done:
-//
-// *   Subscribe to other users' shares
+// 1. Public Share
+// 2. Private Share
+// 5. Read only Share
+// 6. Collaborative Shares
+// 7. Public, password protected shares
+// 8. Listen to events in Shares
+// 9. Subscribe to other users' shares
 
 
 // ### Usecase 1: Public Share
@@ -144,7 +172,6 @@ hoodie.share.add()
 .done( function(share) { 
   share.grantReadAccess()
 })
-hoodie.share( "share_id" ).push();
 
 
 // ### Usecase 6: Collaborative Shares
@@ -157,7 +184,6 @@ hoodie.share.add()
 .done( function(share) { 
   share.grantWriteAccess()
 })
-hoodie.share( "share_id" ).push();
 
 
 // ### Usecase 7: Public, password protected shares
@@ -165,7 +191,7 @@ hoodie.share( "share_id" ).push();
 // I can optionally assign a password to a share that needs to be provided by
 // others when trying to accessing it:
 hoodie.share.add( {  
-  id : "mytodolist123"
+  id : "mytodolist123",
   password : "secret"
 }).done( function(share) {} )
 
@@ -177,7 +203,7 @@ hoodie.share( "mytodolist123", {password: "secret"} )
 });
 
 
-// ### Usecase 8: Subscribing to events in Shares
+// ### Usecase 8: Listen to events in Shares
 
 // I can open a share and listen to changes of its containing objects
 //
@@ -189,3 +215,9 @@ hoodie.share('shared_id').on('store:updated',        function(object) { /*...*/ 
 hoodie.share('shared_id').on('store:updated:type',   function(object) { /*...*/ });
 hoodie.share('shared_id').on('store:destroyed',      function(object) { /*...*/ });
 hoodie.share('shared_id').on('store:destroyed:type', function(object) { /*...*/ });
+
+// I can also listen to errors happening to my own shares, e.g. if I
+// try to push updates to a share without having write permissions
+hoodie.share.on('error', function(error, share) {
+
+})

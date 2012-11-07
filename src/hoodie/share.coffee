@@ -16,10 +16,9 @@
 # API
 # -----
 #     
-#     // these are equivalent. They return a share instance 
+#     // returns a share instance
 #     // with share.id set to 'share_id'
 #     hoodie.share('share_id')
-#     hoodie.share.open('share_id')
 #     
 #     // the rest of the API is a standard store API, with the 
 #     // difference that no type has to be set and the returned

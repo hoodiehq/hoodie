@@ -34,8 +34,8 @@ hoodie.subscription.add("share_id", {
 // ----------
 
 // First of all, I'm not sure if subscribtion is the right word,
-// as it's not only about receiving objects, but also pushing objects
-// to the remote store I've subscribed to.
+// as it's not only about subscribing to changes in a remote store, 
+// but also pushing updates back.
 // 
 // Next thing are shares: When I create a share, I automatically
 // subscribe to it as well. Does that mean two objects get created

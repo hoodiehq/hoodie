@@ -1,3 +1,7 @@
+# Share Instance
+# ================
+
+# 
 class Hoodie.ShareInstance extends Hoodie.Remote
   
   # default values

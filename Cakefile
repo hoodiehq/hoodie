@@ -75,7 +75,6 @@ task 'build', 'build hoodie-client.min.js', ->
   src/hoodie/remote.coffee
   src/hoodie/share.coffee
   src/hoodie/store.coffee
-  src/hoodie/subscription.coffee
   src/hoodie/user.coffee
   src/hoodie/account_remote.coffee
   src/hoodie/local_store.coffee
