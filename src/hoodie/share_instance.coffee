@@ -1,7 +1,21 @@
 # Share Instance
 # ================
 
+# A share instance provides an API to interact with a
+# share. It's extending the default Remote Store by methods
+# to grant or revoke read / write access.
 # 
+# By default, a share is only accessible to be. If I want
+# it to share publicaly, I explicatly need to grant access
+# by calling `share.grantReadAccess()`. I can also grant
+# access to only specific users by passing an array: 
+# `share.grantReadAccess(['joe','lisa'])`
+# 
+# It's plannend to secure a public share with a password,
+# but this feature is not implemented yet.
+# 
+# To subscribe to a share created by somebody else, run
+# this code: `hoodie.share('shareId').subscribe()`.
 class Hoodie.ShareInstance extends Hoodie.Remote
   
   # default values
@@ -71,6 +85,20 @@ class Hoodie.ShareInstance extends Hoodie.Remote
 
     @hoodie.share.update(@id, access: @access)
 
+
+  # revoke read access
+  # --------------------
+  #
+  # revoke read access to the share. If one or multiple
+  # users passed, only these users' access gets revoked.
+  # Revoking reading access always includes revoking write
+  # access as well.
+  # 
+  # examples:
+  # 
+  #     share.revokeReadAccess()
+  #     share.revokeReadAccess('joe@example.com')
+  #     share.revokeReadAccess(['joe@example.com', 'lisa@example.com'])
   revokeReadAccess: (users) ->
     @revokeWriteAccess(users)
 
@@ -109,6 +137,19 @@ class Hoodie.ShareInstance extends Hoodie.Remote
     
     @hoodie.share.update(@id, access: @access)
 
+  # grant write access
+  # --------------------
+  #
+  # grant write access to the share. If no users passed,
+  # everybody can edit the share objects. If one or multiple
+  # users passed, only these users get write access. Granting
+  # writing reads always also includes reading rights.
+  # 
+  # examples:
+  # 
+  #     share.grantWriteAccess()
+  #     share.grantWriteAccess('joe@example.com')
+  #     share.grantWriteAccess(['joe@example.com', 'lisa@example.com'])
   grantWriteAccess: (users) ->
     @grantReadAccess(users)
     unless @access.read?
@@ -125,6 +166,17 @@ class Hoodie.ShareInstance extends Hoodie.Remote
 
     @hoodie.share.update(@id, access: @access)
 
+  # revoke write access
+  # --------------------
+  #
+  # revoke write access to the share. If one or multiple
+  # users passed, only these users' write access gets revoked.
+  # 
+  # examples:
+  # 
+  #     share.revokeWriteAccess()
+  #     share.revokeWriteAccess('joe@example.com')
+  #     share.revokeWriteAccess(['joe@example.com', 'lisa@example.com'])
   revokeWriteAccess: (users) ->
     unless @access.write?
       return @hoodie.resolveWith this
@@ -146,6 +198,3 @@ class Hoodie.ShareInstance extends Hoodie.Remote
       @access = @access.read
       
     @hoodie.share.update(@id, access: @access)
-
-  # PRIVATE
-  # --------
