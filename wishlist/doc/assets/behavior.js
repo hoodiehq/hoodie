@@ -377,6 +377,14 @@ f.event={add:function(a,c,d,e,g){var h,i,j,k,l,m,n,o,p,q,r,s;if(!(a.nodeType===3
               "type": "heading",
               "data": {
                 "level": 2,
+                "title": "subsribing to shares by others",
+                "slug": "subsribing-to-shares-by-others"
+              },
+              "depth": 2
+            }, {
+              "type": "heading",
+              "data": {
+                "level": 2,
                 "title": "Use cases",
                 "slug": "use-cases"
               },
@@ -426,8 +434,8 @@ f.event={add:function(a,c,d,e,g){var h,i,j,k,l,m,n,o,p,q,r,s;if(!(a.nodeType===3
                   "type": "heading",
                   "data": {
                     "level": 3,
-                    "title": "Usecase 8: Subscribing to events in Shares",
-                    "slug": "usecase-8-subscribing-to-events-in-shares"
+                    "title": "Usecase 8: Listen to events in Shares",
+                    "slug": "usecase-8-listen-to-events-in-shares"
                   },
                   "depth": 3
                 }
@@ -469,6 +477,14 @@ f.event={add:function(a,c,d,e,g){var h,i,j,k,l,m,n,o,p,q,r,s;if(!(a.nodeType===3
             "level": 2,
             "title": "example",
             "slug": "example"
+          },
+          "depth": 2
+        }, {
+          "type": "heading",
+          "data": {
+            "level": 2,
+            "title": "subsribing to shares by others",
+            "slug": "subsribing-to-shares-by-others"
           },
           "depth": 2
         }, {
@@ -524,59 +540,12 @@ f.event={add:function(a,c,d,e,g){var h,i,j,k,l,m,n,o,p,q,r,s;if(!(a.nodeType===3
               "type": "heading",
               "data": {
                 "level": 3,
-                "title": "Usecase 8: Subscribing to events in Shares",
-                "slug": "usecase-8-subscribing-to-events-in-shares"
+                "title": "Usecase 8: Listen to events in Shares",
+                "slug": "usecase-8-listen-to-events-in-shares"
               },
               "depth": 3
             }
           ]
-        }
-      ]
-    }, {
-      "type": "file",
-      "data": {
-        "language": {
-          "nameMatchers": [".js"],
-          "pygmentsLexer": "javascript",
-          "singleLineComment": ["//"],
-          "name": "JavaScript"
-        },
-        "sourcePath": "/Users/gregor/JavaScripts/hood.ie/hoodie.js/wishlist/subscription.js",
-        "projectPath": "subscription.js",
-        "targetPath": "subscription",
-        "firstHeader": {
-          "type": "heading",
-          "data": {
-            "level": 1,
-            "title": "hoodie Subscription module",
-            "slug": "hoodie-subscription-module",
-            "isFileHeader": true
-          },
-          "depth": 1,
-          "children": [
-            {
-              "type": "heading",
-              "data": {
-                "level": 2,
-                "title": "Thoughts",
-                "slug": "thoughts"
-              },
-              "depth": 2
-            }
-          ]
-        },
-        "title": "hoodie Subscription module"
-      },
-      "depth": 1,
-      "outline": [
-        {
-          "type": "heading",
-          "data": {
-            "level": 2,
-            "title": "Thoughts",
-            "slug": "thoughts"
-          },
-          "depth": 2
         }
       ]
     }
