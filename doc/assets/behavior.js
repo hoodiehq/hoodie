@@ -2186,7 +2186,92 @@ f.event={add:function(a,c,d,e,g){var h,i,j,k,l,m,n,o,p,q,r,s;if(!(a.nodeType===3
             "sourcePath": "/Users/gregor/JavaScripts/hood.ie/hoodie.js/src/hoodie/share_instance.coffee",
             "projectPath": "src/hoodie/share_instance.coffee",
             "targetPath": "hoodie/share_instance",
-            "title": "share_instance"
+            "firstHeader": {
+              "type": "heading",
+              "data": {
+                "level": 1,
+                "title": "Share Instance",
+                "slug": "share-instance",
+                "isFileHeader": true
+              },
+              "depth": 1,
+              "children": [
+                {
+                  "type": "heading",
+                  "data": {
+                    "level": 2,
+                    "title": "default values",
+                    "slug": "default-values"
+                  },
+                  "depth": 2
+                }, {
+                  "type": "heading",
+                  "data": {
+                    "level": 2,
+                    "title": "constructor",
+                    "slug": "constructor"
+                  },
+                  "depth": 2
+                }, {
+                  "type": "heading",
+                  "data": {
+                    "level": 2,
+                    "title": "subscribe",
+                    "slug": "subscribe"
+                  },
+                  "depth": 2
+                }, {
+                  "type": "heading",
+                  "data": {
+                    "level": 2,
+                    "title": "unsubscribe",
+                    "slug": "unsubscribe"
+                  },
+                  "depth": 2
+                }, {
+                  "type": "heading",
+                  "data": {
+                    "level": 2,
+                    "title": "grant read access",
+                    "slug": "grant-read-access"
+                  },
+                  "depth": 2
+                }, {
+                  "type": "heading",
+                  "data": {
+                    "level": 2,
+                    "title": "revoke read access",
+                    "slug": "revoke-read-access"
+                  },
+                  "depth": 2
+                }, {
+                  "type": "heading",
+                  "data": {
+                    "level": 2,
+                    "title": "grant write access",
+                    "slug": "grant-write-access"
+                  },
+                  "depth": 2
+                }, {
+                  "type": "heading",
+                  "data": {
+                    "level": 2,
+                    "title": "revoke write access",
+                    "slug": "revoke-write-access"
+                  },
+                  "depth": 2
+                }, {
+                  "type": "heading",
+                  "data": {
+                    "level": 2,
+                    "title": "PRIVATE",
+                    "slug": "private"
+                  },
+                  "depth": 2
+                }
+              ]
+            },
+            "title": "Share Instance"
           },
           "depth": 2,
           "outline": [
@@ -2210,8 +2295,48 @@ f.event={add:function(a,c,d,e,g){var h,i,j,k,l,m,n,o,p,q,r,s;if(!(a.nodeType===3
               "type": "heading",
               "data": {
                 "level": 2,
+                "title": "subscribe",
+                "slug": "subscribe"
+              },
+              "depth": 2
+            }, {
+              "type": "heading",
+              "data": {
+                "level": 2,
+                "title": "unsubscribe",
+                "slug": "unsubscribe"
+              },
+              "depth": 2
+            }, {
+              "type": "heading",
+              "data": {
+                "level": 2,
                 "title": "grant read access",
                 "slug": "grant-read-access"
+              },
+              "depth": 2
+            }, {
+              "type": "heading",
+              "data": {
+                "level": 2,
+                "title": "revoke read access",
+                "slug": "revoke-read-access"
+              },
+              "depth": 2
+            }, {
+              "type": "heading",
+              "data": {
+                "level": 2,
+                "title": "grant write access",
+                "slug": "grant-write-access"
+              },
+              "depth": 2
+            }, {
+              "type": "heading",
+              "data": {
+                "level": 2,
+                "title": "revoke write access",
+                "slug": "revoke-write-access"
               },
               "depth": 2
             }, {
@@ -2431,32 +2556,6 @@ f.event={add:function(a,c,d,e,g){var h,i,j,k,l,m,n,o,p,q,r,s;if(!(a.nodeType===3
               "depth": 2
             }
           ]
-        }, {
-          "type": "file",
-          "data": {
-            "language": {
-              "nameMatchers": [".coffee"],
-              "pygmentsLexer": "coffee-script",
-              "singleLineComment": ["#"],
-              "name": "CoffeeScript"
-            },
-            "sourcePath": "/Users/gregor/JavaScripts/hood.ie/hoodie.js/src/hoodie/subscription.coffee",
-            "projectPath": "src/hoodie/subscription.coffee",
-            "targetPath": "hoodie/subscription",
-            "firstHeader": {
-              "type": "heading",
-              "data": {
-                "level": 1,
-                "title": "Subscription",
-                "slug": "subscription",
-                "isFileHeader": true
-              },
-              "depth": 1
-            },
-            "title": "Subscription"
-          },
-          "depth": 2,
-          "outline": []
         }, {
           "type": "file",
           "data": {
