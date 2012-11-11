@@ -273,10 +273,10 @@ class Hoodie.Remote
     else
       "/_changes?include_docs=true&since=#{since}"
   
-  # request gets restarted automaticcally in @_handlePullError
+  # request gets restarted automaticcally 
+  # when aborted (see @_handlePullError)
   _restartPullRequest : => @_pullRequest?.abort()
-  
-  
+
 
   # ### pull success handler 
 
@@ -289,7 +289,6 @@ class Hoodie.Remote
     @pull() if @connected and @isContinuouslyPulling()
   
   
-
   # ### pull error handler 
 
   # when there is a change, trigger event, 
@@ -368,4 +367,4 @@ class Hoodie.Remote
   # ### handle push success
 
   # do nothing by default
-  _handlePushSuccess: (docs, pushedDocs) => 
+  _handlePushSuccess : (docs, pushedDocs) => 

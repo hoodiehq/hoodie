@@ -3,12 +3,14 @@
 describe("Hoodie.ShareInstance", function() {
   beforeEach(function() {
     this.hoodie = new Mocks.Hoodie;
+    spyOn(this.hoodie, "resolveWith").andCallThrough();
+    this.updateDefer = this.hoodie.defer();
+    spyOn(this.hoodie.share, "update").andReturn(this.updateDefer.promise());
     this.share = new Hoodie.ShareInstance(this.hoodie, {
       id: 'id123'
     });
-    spyOn(this.hoodie, "resolveWith").andCallThrough();
-    this.updateDefer = this.hoodie.defer();
-    return spyOn(this.hoodie.share, "update").andReturn(this.updateDefer.promise());
+    this.requestDefer = this.hoodie.defer();
+    return spyOn(this.share, "request").andReturn(this.requestDefer.promise());
   });
   describe("constructor", function() {
     it("should set id from options.id", function() {
@@ -41,6 +43,81 @@ describe("Hoodie.ShareInstance", function() {
       var share;
       share = new Hoodie.ShareInstance(this.hoodie);
       return expect(share.access).toBe(false);
+    });
+  });
+  describe("subscribe(options)", function() {
+    it("should request _security object", function() {
+      this.share.subscribe();
+      return expect(this.share.request).wasCalledWith('GET', '/_security');
+    });
+    it("should return promise", function() {
+      var share;
+      share = this.share.subscribe();
+      return expect(share).toBePromise();
+    });
+    _when("security has no readers and writers", function() {
+      beforeEach(function() {
+        spyOn(this.hoodie.share, "findOrAdd");
+        return this.requestDefer.resolve({
+          readers: {
+            names: [],
+            roles: []
+          },
+          writers: {
+            names: [],
+            roles: []
+          }
+        });
+      });
+      return it("should find or add new share", function() {
+        this.share.subscribe();
+        return expect(this.hoodie.share.findOrAdd).wasCalledWith('id123', {
+          access: {
+            read: true,
+            write: true
+          },
+          $createdBy: 'share/id123'
+        });
+      });
+    });
+    return _when("security has one reader and one writer", function() {
+      beforeEach(function() {
+        spyOn(this.hoodie.share, "findOrAdd");
+        return this.requestDefer.resolve({
+          readers: {
+            names: [],
+            roles: ["1ihhzfy"]
+          },
+          writers: {
+            names: [],
+            roles: ["1ihhzfy"]
+          }
+        });
+      });
+      return it("should find or add new share", function() {
+        this.share.subscribe();
+        return expect(this.hoodie.share.findOrAdd).wasCalledWith('id123', {
+          access: {
+            read: ["1ihhzfy"],
+            write: ["1ihhzfy"]
+          },
+          $createdBy: 'share/id123'
+        });
+      });
+    });
+  });
+  describe("unsubscribe(options)", function() {
+    beforeEach(function() {
+      return spyOn(this.hoodie.share, "remove").andCallThrough();
+    });
+    it("should remove share from store", function() {
+      this.share.unsubscribe();
+      return expect(this.hoodie.share.remove).wasCalledWith('id123');
+    });
+    return it("should return itself", function() {
+      var share;
+      share = this.share.unsubscribe();
+      return expect(share).toBe(this.share);
     });
   });
   describe("#grantReadAccess(users)", function() {

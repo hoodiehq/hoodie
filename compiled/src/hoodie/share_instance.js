@@ -19,6 +19,24 @@ Hoodie.ShareInstance = (function(_super) {
     ShareInstance.__super__.constructor.apply(this, arguments);
   }
 
+  ShareInstance.prototype.subscribe = function() {
+    var _this = this;
+    return this.request('GET', '/_security').pipe(function(security) {
+      var $createdBy, access;
+      access = _this._parseSecurity(security);
+      $createdBy = _this.name;
+      return _this.hoodie.share.findOrAdd(_this.id, {
+        access: access,
+        $createdBy: $createdBy
+      });
+    });
+  };
+
+  ShareInstance.prototype.unsubscribe = function() {
+    this.hoodie.share.remove(this.id);
+    return this;
+  };
+
   ShareInstance.prototype.grantReadAccess = function(users) {
     var currentUsers, user, _i, _len;
     if (this.access === true || this.access.read === true) {
@@ -152,6 +170,21 @@ Hoodie.ShareInstance = (function(_super) {
     return this.hoodie.share.update(this.id, {
       access: this.access
     });
+  };
+
+  ShareInstance.prototype._parseSecurity = function(security) {
+    var access, _ref, _ref1;
+    access = {
+      read: ((_ref = security.readers) != null ? _ref.roles : void 0) || [],
+      write: ((_ref1 = security.writers) != null ? _ref1.roles : void 0) || []
+    };
+    if (access.read.length === 0) {
+      access.read = true;
+    }
+    if (access.write.length === 0) {
+      access.write = true;
+    }
+    return access;
   };
 
   return ShareInstance;

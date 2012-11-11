@@ -18,6 +18,7 @@
 # this code: `hoodie.share('shareId').subscribe()`.
 class Hoodie.ShareInstance extends Hoodie.Remote
   
+  
   # default values
   # ----------------
 
@@ -30,7 +31,7 @@ class Hoodie.ShareInstance extends Hoodie.Remote
   
   # initializes a new share
   #
-  constructor: (@hoodie, options = {}) ->
+  constructor : (@hoodie, options = {}) ->
 
     # make sure that we have an id
     @id = options.id or @hoodie.uuid()
@@ -42,7 +43,28 @@ class Hoodie.ShareInstance extends Hoodie.Remote
     $.extend this, options
 
     super
-  
+
+
+  # subscribe
+  # ---------
+
+  # 
+  subscribe : ->
+    @request('GET', '/_security')
+    .pipe (security) =>
+      access     = @_parseSecurity security
+      $createdBy = @name
+      @hoodie.share.findOrAdd( @id, {access, $createdBy} )
+
+
+  # unsubscribe
+  # ---------
+
+  # 
+  unsubscribe : ->
+    @hoodie.share.remove( @id )
+    return this
+
 
   # grant read access
   # -------------------
@@ -56,7 +78,7 @@ class Hoodie.ShareInstance extends Hoodie.Remote
   #     share.grantReadAccess()
   #     share.grantReadAccess('joe@example.com')
   #     share.grantReadAccess(['joe@example.com', 'lisa@example.com'])
-  grantReadAccess: (users) ->
+  grantReadAccess : (users) ->
     if @access is true or @access.read is true
       return @hoodie.resolveWith this
 
@@ -99,7 +121,7 @@ class Hoodie.ShareInstance extends Hoodie.Remote
   #     share.revokeReadAccess()
   #     share.revokeReadAccess('joe@example.com')
   #     share.revokeReadAccess(['joe@example.com', 'lisa@example.com'])
-  revokeReadAccess: (users) ->
+  revokeReadAccess : (users) ->
     @revokeWriteAccess(users)
 
     if @access is false or @access.read is false
@@ -137,6 +159,7 @@ class Hoodie.ShareInstance extends Hoodie.Remote
     
     @hoodie.share.update(@id, access: @access)
 
+
   # grant write access
   # --------------------
   #
@@ -150,7 +173,7 @@ class Hoodie.ShareInstance extends Hoodie.Remote
   #     share.grantWriteAccess()
   #     share.grantWriteAccess('joe@example.com')
   #     share.grantWriteAccess(['joe@example.com', 'lisa@example.com'])
-  grantWriteAccess: (users) ->
+  grantWriteAccess : (users) ->
     @grantReadAccess(users)
     unless @access.read?
       @access = read: @access
@@ -166,6 +189,7 @@ class Hoodie.ShareInstance extends Hoodie.Remote
 
     @hoodie.share.update(@id, access: @access)
 
+
   # revoke write access
   # --------------------
   #
@@ -177,7 +201,7 @@ class Hoodie.ShareInstance extends Hoodie.Remote
   #     share.revokeWriteAccess()
   #     share.revokeWriteAccess('joe@example.com')
   #     share.revokeWriteAccess(['joe@example.com', 'lisa@example.com'])
-  revokeWriteAccess: (users) ->
+  revokeWriteAccess : (users) ->
     unless @access.write?
       return @hoodie.resolveWith this
 
@@ -198,3 +222,33 @@ class Hoodie.ShareInstance extends Hoodie.Remote
       @access = @access.read
       
     @hoodie.share.update(@id, access: @access)
+
+
+  # PRIVATE
+  # ---------
+
+  # a db _security response looks like this:
+  # 
+  #     {
+  #       readers: {
+  #           names: [],
+  #           roles: ["1ihhzfy"]
+  #       },
+  #       writers: {
+  #           names: [],
+  #           roles: ["1ihhzfy"]
+  #       }
+  #     }
+  # 
+  # we want to turn it into
+  # 
+  #     {read: ["1ihhzfy"], write: ["1ihhzfy"]}
+  _parseSecurity : (security) ->
+    access = 
+      read  : security.readers?.roles or []
+      write : security.writers?.roles or []
+
+    access.read  = true if access.read.length is 0
+    access.write = true if access.write.length is 0
+
+    access

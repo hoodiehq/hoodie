@@ -1,10 +1,15 @@
 describe "Hoodie.ShareInstance", ->  
   beforeEach ->
     @hoodie = new Mocks.Hoodie 
-    @share = new Hoodie.ShareInstance @hoodie, id: 'id123'
     spyOn(@hoodie, "resolveWith").andCallThrough()
     @updateDefer = @hoodie.defer()
     spyOn(@hoodie.share, "update").andReturn @updateDefer.promise()
+
+    @share = new Hoodie.ShareInstance @hoodie, id: 'id123'
+    @requestDefer = @hoodie.defer()
+    # spyOn(@share, "request").andReturn @requestDefer.promise()
+    spyOn(@share, "request").andReturn @requestDefer.promise()
+      
   
   describe "constructor", ->
     it "should set id from options.id", ->
@@ -27,6 +32,68 @@ describe "Hoodie.ShareInstance", ->
       share = new Hoodie.ShareInstance @hoodie
       expect(share.access).toBe false
   # /constructor
+
+  describe "subscribe(options)", ->
+
+    it "should request _security object", ->
+      @share.subscribe()
+      expect(@share.request).wasCalledWith 'GET', '/_security' 
+
+    it "should return promise", ->
+      share = @share.subscribe()
+      expect(share).toBePromise()
+
+    _when "security has no readers and writers", ->
+      beforeEach ->
+        spyOn(@hoodie.share, "findOrAdd")
+        @requestDefer.resolve
+          readers: 
+            names: []
+            roles: []
+          writers: 
+            names: []
+            roles: []
+
+      it "should find or add new share", ->
+        @share.subscribe()
+        expect(@hoodie.share.findOrAdd).wasCalledWith 'id123', 
+          access: 
+            read:  true
+            write: true
+          $createdBy: 'share/id123'
+
+    _when "security has one reader and one writer", ->
+      beforeEach ->
+        spyOn(@hoodie.share, "findOrAdd")
+        @requestDefer.resolve
+          readers: 
+            names: []
+            roles: ["1ihhzfy"]
+          writers: 
+            names: []
+            roles: ["1ihhzfy"]
+
+      it "should find or add new share", ->
+        @share.subscribe()
+        expect(@hoodie.share.findOrAdd).wasCalledWith 'id123', 
+          access: 
+            read:  ["1ihhzfy"]
+            write: ["1ihhzfy"]
+          $createdBy: 'share/id123'
+  # /subscribe(options)
+
+  describe "unsubscribe(options)", ->
+    beforeEach ->
+      spyOn(@hoodie.share, "remove").andCallThrough()
+
+    it "should remove share from store", ->
+      @share.unsubscribe()
+      expect(@hoodie.share.remove).wasCalledWith 'id123'
+
+    it "should return itself", ->
+      share = @share.unsubscribe()
+      expect(share).toBe @share 
+  # /subscribe(options)
 
   describe "#grantReadAccess(users)", ->
     _when "share.access is false", ->

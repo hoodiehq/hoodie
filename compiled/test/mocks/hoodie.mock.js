@@ -118,6 +118,9 @@ Mocks.Hoodie = function() {
       },
       removeAll: function() {
         return promiseMock;
+      },
+      request: function() {
+        return promiseMock;
       }
     }
   };

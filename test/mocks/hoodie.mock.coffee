@@ -73,3 +73,4 @@ Mocks.Hoodie = ->
     findAll     : -> promiseMock
     findOrAdd   : -> promiseMock 
     removeAll   : -> promiseMock 
+    request     : -> promiseMock 
