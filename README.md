@@ -287,7 +287,9 @@ be shared.
 ```javascript
 // create a new share
 hoodie.share.add()
-.done( function(share) {} )
+.done( function(share) {
+  /* share is ready */
+} )
 
 // grant / revoke access
 share.grantReadAccess()
@@ -303,6 +305,13 @@ hoodie.store.findAll('todo').shareAt(share.id)
 // remove a specific todo from the share
 hoodie.store.find('todo', '123').unshareAt(share.id)
 
+// create a new share and add some of my objects to it in one step
+hoodie.store.find('todo').share()
+.done( function(todos, share) { alert('shared at ' + share.id) } )
+
+// remove objects from all shares
+hoodi.store.find('todo').unshare()
+
 // destroy share
 hoodie.share.remove(share.id)
 
@@ -310,6 +319,10 @@ hoodie.share.remove(share.id)
 hoodie.share('shareIdHere').store.findAll()
   .done( function(objects) { } ) 
   .fail( function(err)     { } )
+
+// subscribe / unsubscribe
+hoodie.share('shareId').subscribe()
+hoodie.share('shareId').unsubscribe()
 ```
 
 

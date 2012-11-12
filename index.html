@@ -195,13 +195,24 @@
     // remove a specific todo from the share
     hoodie.store.find('todo', '123').unshareAt(share.id)
 
+    // create a new share and add some of my objects to it in one step
+    hoodie.store.find('todo').share()
+    .done( function(todos, share) { alert('shared at ' + share.id) } )
+
+    // remove objects from all shares
+    hoodi.store.find('todo').unshare()
+
     // destroy share
     hoodie.share.remove(share.id)
-    
+
     // open a share and load all its objects
-    hoodie.share('shareIdHere').findAll()
-      .done( function(user) { } ) 
-      .fail( function(err)  { } )
+    hoodie.share('shareIdHere').store.findAll()
+      .done( function(objects) { } ) 
+      .fail( function(err)     { } )
+
+    // subscribe / unsubscribe
+    hoodie.share('shareId').subscribe()
+    hoodie.share('shareId').unsubscribe()
       
     
     //
