@@ -918,7 +918,7 @@ describe("Hoodie.Account", function() {
       });
     });
   });
-  describe("#remove()", function() {
+  describe("#destroy()", function() {
     beforeEach(function() {
       spyOn(this.hoodie.remote, "disconnect");
       spyOn(this.hoodie.config, "clear");
@@ -931,15 +931,15 @@ describe("Hoodie.Account", function() {
       };
     });
     it("should disconnect", function() {
-      this.account.remove();
+      this.account.destroy();
       return expect(this.hoodie.remote.disconnect).wasCalled();
     });
     it("should fetch the account", function() {
-      this.account.remove();
+      this.account.destroy();
       return expect(this.account.fetch).wasCalled();
     });
     it("should send a PUT request to /_users/org.couchdb.user%3Auser%2Fjoe%40example.com", function() {
-      this.account.remove();
+      this.account.destroy();
       return expect(this.hoodie.request).wasCalledWith('PUT', '/_users/org.couchdb.user%3Auser%2Fjoe%40example.com', {
         data: JSON.stringify({
           _rev: '1-234',
@@ -952,10 +952,10 @@ describe("Hoodie.Account", function() {
       beforeEach(function() {
         return spyOn(this.account, "hasAccount").andReturn(true);
       });
-      return _and("remove request succesful", function() {
+      return _and("destroy request succesful", function() {
         beforeEach(function() {
           this.hoodie.request.andReturn(this.hoodie.defer().resolve().promise());
-          return this.account.remove();
+          return this.account.destroy();
         });
         it("should unset @username", function() {
           return expect(this.account.username).toBeUndefined();
@@ -977,7 +977,7 @@ describe("Hoodie.Account", function() {
     return _when("user has no account", function() {
       beforeEach(function() {
         spyOn(this.account, "hasAccount").andReturn(false);
-        return this.account.remove();
+        return this.account.destroy();
       });
       it("should not try to fetch", function() {
         return expect(this.account.fetch).wasNotCalled();

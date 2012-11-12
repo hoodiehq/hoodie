@@ -55,11 +55,11 @@ describe("Hoodie.ShareInstance", function() {
       share = this.share.subscribe();
       return expect(share).toBePromise();
     });
-    _when("security has no readers and writers", function() {
+    _when("security has no members and writers", function() {
       beforeEach(function() {
         spyOn(this.hoodie.share, "findOrAdd");
         return this.requestDefer.resolve({
-          readers: {
+          members: {
             names: [],
             roles: []
           },
@@ -76,21 +76,21 @@ describe("Hoodie.ShareInstance", function() {
             read: true,
             write: true
           },
-          $createdBy: 'share/id123'
+          $createdBy: '$subscription'
         });
       });
     });
-    return _when("security has one reader and one writer", function() {
+    _when("security members and writers include my ownerHash", function() {
       beforeEach(function() {
         spyOn(this.hoodie.share, "findOrAdd");
         return this.requestDefer.resolve({
-          readers: {
+          members: {
             names: [],
-            roles: ["1ihhzfy"]
+            roles: ["owner_hash"]
           },
           writers: {
             names: [],
-            roles: ["1ihhzfy"]
+            roles: ["owner_hash"]
           }
         });
       });
@@ -98,10 +98,35 @@ describe("Hoodie.ShareInstance", function() {
         this.share.subscribe();
         return expect(this.hoodie.share.findOrAdd).wasCalledWith('id123', {
           access: {
-            read: ["1ihhzfy"],
-            write: ["1ihhzfy"]
+            read: true,
+            write: true
           },
-          $createdBy: 'share/id123'
+          $createdBy: '$subscription'
+        });
+      });
+    });
+    return _when("security members include my ownerHash, but not writers", function() {
+      beforeEach(function() {
+        spyOn(this.hoodie.share, "findOrAdd");
+        return this.requestDefer.resolve({
+          members: {
+            names: [],
+            roles: ["whatever", "owner_hash"]
+          },
+          writers: {
+            names: [],
+            roles: ["whatever"]
+          }
+        });
+      });
+      return it("should find or add new share", function() {
+        this.share.subscribe();
+        return expect(this.hoodie.share.findOrAdd).wasCalledWith('id123', {
+          access: {
+            read: true,
+            write: false
+          },
+          $createdBy: '$subscription'
         });
       });
     });

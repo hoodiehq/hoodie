@@ -106,7 +106,7 @@ Hoodie.LocalStore = (function(_super) {
     try {
       object = this.cache(type, id, object, options);
       defer.resolve(object, isNew).promise();
-      event = isNew ? 'new' : 'update';
+      event = isNew ? 'add' : 'update';
       this._triggerEvents(event, object, options);
     } catch (error) {
       defer.reject(error).promise();

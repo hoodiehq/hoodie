@@ -417,7 +417,7 @@ Hoodie.Account = (function() {
     return this._changeUsernameAndPassword(currentPassword, newUsername);
   };
 
-  Account.prototype.remove = function() {
+  Account.prototype.destroy = function() {
     if (!this.hasAccount()) {
       this._cleanup();
       return;
@@ -816,6 +816,20 @@ Hoodie.Email = (function() {
 
 })();
 
+Hoodie.Errors = {
+  INVALID_KEY: function(idOrType) {
+    var key;
+    key = idOrType.id ? 'id' : 'type';
+    return new Error("invalid " + key + " '" + idOrType[key] + "': numbers and lowercase letters allowed only");
+  },
+  INVALID_ARGUMENTS: function(msg) {
+    return new Error(msg);
+  },
+  NOT_FOUND: function(type, id) {
+    return new Error("" + type + " with " + id + " could not be found");
+  }
+};
+
 Hoodie.Remote = (function() {
 
   Remote.prototype.name = void 0;
@@ -853,13 +867,12 @@ Hoodie.Remote = (function() {
 
     this.connect = __bind(this.connect, this);
 
-    if (options.name) {
+    if (options.name != null) {
       this.name = options.name;
+      this.prefix = this.name;
     }
     if (options.prefix != null) {
       this.prefix = options.prefix;
-    } else {
-      this.prefix = this.name || '';
     }
     if (options.sync) {
       this._sync = options.sync;
@@ -1050,7 +1063,7 @@ Hoodie.Remote = (function() {
         if (this._knownObjects[doc._id]) {
           event = 'update';
         } else {
-          event = 'new';
+          event = 'add';
           this._knownObjects[doc._id] = 1;
         }
       }
@@ -1173,7 +1186,7 @@ Hoodie.Share = (function() {
     return this.hoodie.store.removeAll('$share');
   };
 
-  Share.prototype._allowedOptions = ["id", "access"];
+  Share.prototype._allowedOptions = ["id", "access", "$createdBy"];
 
   Share.prototype._filterShareOptions = function(options) {
     var filteredOptions, option, _i, _len, _ref;
@@ -1572,6 +1585,16 @@ Hoodie.User = (function() {
 
 })();
 
+Hoodie.Global = (function() {
+
+  function Global(hoodie) {
+    return hoodie.open("global");
+  }
+
+  return Global;
+
+})();
+
 Hoodie.AccountRemote = (function(_super) {
 
   __extends(AccountRemote, _super);
@@ -1603,7 +1626,8 @@ Hoodie.AccountRemote = (function(_super) {
     if (this.hoodie.config.get('_remote.sync') != null) {
       this._sync = this.hoodie.config.get('_remote.sync');
     }
-    AccountRemote.__super__.constructor.apply(this, arguments);
+    options.prefix = '';
+    AccountRemote.__super__.constructor.call(this, this.hoodie, options);
   }
 
   AccountRemote.prototype.connect = function() {
@@ -1856,7 +1880,7 @@ Hoodie.LocalStore = (function(_super) {
     try {
       object = this.cache(type, id, object, options);
       defer.resolve(object, isNew).promise();
-      event = isNew ? 'new' : 'update';
+      event = isNew ? 'add' : 'update';
       this._triggerEvents(event, object, options);
     } catch (error) {
       defer.reject(error).promise();
@@ -2440,23 +2464,21 @@ Hoodie.ShareInstance = (function(_super) {
     if (options == null) {
       options = {};
     }
+    this._handleSecurityResponse = __bind(this._handleSecurityResponse, this);
+
     this.id = options.id || this.hoodie.uuid();
     this.name = "share/" + this.id;
+    this.prefix = this.name;
+    if (options.sync != null) {
+      options._sync = options.sync;
+      delete options.sync;
+    }
     $.extend(this, options);
     ShareInstance.__super__.constructor.apply(this, arguments);
   }
 
   ShareInstance.prototype.subscribe = function() {
-    var _this = this;
-    return this.request('GET', '/_security').pipe(function(security) {
-      var $createdBy, access;
-      access = _this._parseSecurity(security);
-      $createdBy = _this.name;
-      return _this.hoodie.share.findOrAdd(_this.id, {
-        access: access,
-        $createdBy: $createdBy
-      });
-    });
+    return this.request('GET', '/_security').pipe(this._handleSecurityResponse);
   };
 
   ShareInstance.prototype.unsubscribe = function() {
@@ -2599,17 +2621,32 @@ Hoodie.ShareInstance = (function(_super) {
     });
   };
 
+  ShareInstance.prototype._handleSecurityResponse = function(security) {
+    var $createdBy, access;
+    access = this._parseSecurity(security);
+    $createdBy = this.name;
+    return this.hoodie.share.findOrAdd(this.id, {
+      access: access,
+      $createdBy: $createdBy
+    });
+  };
+
   ShareInstance.prototype._parseSecurity = function(security) {
-    var access, _ref, _ref1;
-    access = {
-      read: ((_ref = security.readers) != null ? _ref.roles : void 0) || [],
-      write: ((_ref1 = security.writers) != null ? _ref1.roles : void 0) || []
-    };
-    if (access.read.length === 0) {
-      access.read = true;
+    var access, read, write, _ref, _ref1;
+    read = (_ref = security.members) != null ? _ref.roles : void 0;
+    write = (_ref1 = security.writers) != null ? _ref1.roles : void 0;
+    access = {};
+    if (read != null) {
+      access.read = read === true || read.length === 0;
+      if (read.length) {
+        access.read = -1 !== read.indexOf(this.hoodie.account.ownerHash);
+      }
     }
-    if (access.write.length === 0) {
-      access.write = true;
+    if (write != null) {
+      access.write = write === true || write.length === 0;
+      if (write.length) {
+        access.write = -1 !== write.indexOf(this.hoodie.account.ownerHash);
+      }
     }
     return access;
   };

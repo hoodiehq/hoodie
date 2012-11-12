@@ -35,7 +35,8 @@ Hoodie.AccountRemote = (function(_super) {
     if (this.hoodie.config.get('_remote.sync') != null) {
       this._sync = this.hoodie.config.get('_remote.sync');
     }
-    AccountRemote.__super__.constructor.apply(this, arguments);
+    options.prefix = '';
+    AccountRemote.__super__.constructor.call(this, this.hoodie, options);
   }
 
   AccountRemote.prototype.connect = function() {

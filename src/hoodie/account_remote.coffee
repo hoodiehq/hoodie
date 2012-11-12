@@ -29,7 +29,10 @@ class Hoodie.AccountRemote extends Hoodie.Remote
     # overwrite default with _remote.sync config, if set
     @_sync = @hoodie.config.get('_remote.sync') if @hoodie.config.get('_remote.sync')?
 
-    super
+    # do not prefix files for my own remote
+    options.prefix = ''
+    
+    super(@hoodie, options)
     
 
   # Connect

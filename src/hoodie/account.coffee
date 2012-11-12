@@ -265,11 +265,11 @@ class Hoodie.Account
     @_changeUsernameAndPassword(currentPassword, newUsername)
 
 
-  # remove
+  # destroy
   # ---------
 
-  # removes a user's account  
-  remove : ->
+  # destroys a user's account  
+  destroy : ->
 
     unless @hasAccount()
       @_cleanup()

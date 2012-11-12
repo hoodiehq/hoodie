@@ -768,7 +768,7 @@ describe "Hoodie.Account", ->
           expect(promise).toBeResolvedWith @response
   # /.fetch()
   
-  describe "#remove()", ->
+  describe "#destroy()", ->
     beforeEach ->
       spyOn(@hoodie.remote, "disconnect")
       spyOn(@hoodie.config, "clear")
@@ -779,15 +779,15 @@ describe "Hoodie.Account", ->
       @account._doc = _rev : '1-234'
     
     it "should disconnect", ->
-      @account.remove()
+      @account.destroy()
       expect(@hoodie.remote.disconnect).wasCalled()
     
     it "should fetch the account", ->
-      @account.remove()
+      @account.destroy()
       expect(@account.fetch).wasCalled()
     
     it "should send a PUT request to /_users/org.couchdb.user%3Auser%2Fjoe%40example.com", ->
-      @account.remove()
+      @account.destroy()
       expect(@hoodie.request).wasCalledWith 'PUT', '/_users/org.couchdb.user%3Auser%2Fjoe%40example.com'
         data : JSON.stringify
           _rev     : '1-234'
@@ -798,10 +798,10 @@ describe "Hoodie.Account", ->
       beforeEach ->
         spyOn(@account, "hasAccount").andReturn true
 
-      _and "remove request succesful", ->
+      _and "destroy request succesful", ->
         beforeEach ->
           @hoodie.request.andReturn @hoodie.defer().resolve().promise()
-          @account.remove()
+          @account.destroy()
 
         it "should unset @username", ->
           expect(@account.username).toBeUndefined() 
@@ -821,7 +821,7 @@ describe "Hoodie.Account", ->
     _when "user has no account", ->
       beforeEach ->
         spyOn(@account, "hasAccount").andReturn false
-        @account.remove()
+        @account.destroy()
 
       it "should not try to fetch", ->
         expect(@account.fetch).wasNotCalled() 
@@ -840,7 +840,7 @@ describe "Hoodie.Account", ->
 
       it "should set config._account.ownerHash to new @ownerHash", ->
         expect(@hoodie.config.set).wasCalledWith '_account.ownerHash', 'newHash'
-  # /remove()
+  # /destroy()
 
   describe "#resetPassword(username)", ->
     beforeEach ->

@@ -341,12 +341,12 @@ describe("Hoodie.Remote", function() {
           done: false,
           order: 1
         };
-        expect(this.remote.trigger).wasCalledWith('new', object);
-        expect(this.remote.trigger).wasCalledWith('new:todo', object);
-        expect(this.remote.trigger).wasCalledWith('new:todo:abc2', object);
-        expect(this.remote.trigger).wasCalledWith('change', 'new', object);
-        expect(this.remote.trigger).wasCalledWith('change:todo', 'new', object);
-        return expect(this.remote.trigger).wasCalledWith('change:todo:abc2', 'new', object);
+        expect(this.remote.trigger).wasCalledWith('add', object);
+        expect(this.remote.trigger).wasCalledWith('add:todo', object);
+        expect(this.remote.trigger).wasCalledWith('add:todo:abc2', object);
+        expect(this.remote.trigger).wasCalledWith('change', 'add', object);
+        expect(this.remote.trigger).wasCalledWith('change:todo', 'add', object);
+        return expect(this.remote.trigger).wasCalledWith('change:todo:abc2', 'add', object);
       });
       return _and(".isContinuouslyPulling() returns true", function() {
         beforeEach(function() {

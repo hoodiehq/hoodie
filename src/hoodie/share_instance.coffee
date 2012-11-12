@@ -39,6 +39,14 @@ class Hoodie.ShareInstance extends Hoodie.Remote
     # set name from id
     @name = "share/#{@id}"
 
+    # set prefix from name
+    @prefix = @name
+
+    # fix `sync` option
+    if options.sync?
+      options._sync = options.sync
+      delete options.sync
+
     # set options
     $.extend this, options
 
@@ -51,10 +59,7 @@ class Hoodie.ShareInstance extends Hoodie.Remote
   # 
   subscribe : ->
     @request('GET', '/_security')
-    .pipe (security) =>
-      access     = @_parseSecurity security
-      $createdBy = @name
-      @hoodie.share.findOrAdd( @id, {access, $createdBy} )
+    .pipe @_handleSecurityResponse
 
 
   # unsubscribe
@@ -226,11 +231,17 @@ class Hoodie.ShareInstance extends Hoodie.Remote
 
   # PRIVATE
   # ---------
+  
+  # 
+  _handleSecurityResponse : (security) =>
+    access     = @_parseSecurity security
+    $createdBy = '$subscription'
+    @hoodie.share.findOrAdd( @id, {access, $createdBy} )
 
   # a db _security response looks like this:
   # 
   #     {
-  #       readers: {
+  #       members: {
   #           names: [],
   #           roles: ["1ihhzfy"]
   #       },
@@ -242,13 +253,19 @@ class Hoodie.ShareInstance extends Hoodie.Remote
   # 
   # we want to turn it into
   # 
-  #     {read: ["1ihhzfy"], write: ["1ihhzfy"]}
+  #     {read: true, write: true}
+  # 
+  # given that users ownerHash is "1ihhzfy"
   _parseSecurity : (security) ->
-    access = 
-      read  : security.readers?.roles or []
-      write : security.writers?.roles or []
+    read  = security.members?.roles
+    write = security.writers?.roles
 
-    access.read  = true if access.read.length is 0
-    access.write = true if access.write.length is 0
+    access = {}
+    if read?
+      access.read = read is true or read.length is 0
+      access.read = -1 isnt read.indexOf(@hoodie.account.ownerHash) if read.length
+    if write?
+      access.write = write is true or write.length is 0
+      access.write = -1 isnt write.indexOf(@hoodie.account.ownerHash) if write.length
 
     access

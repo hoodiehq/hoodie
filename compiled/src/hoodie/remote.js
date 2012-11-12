@@ -39,13 +39,12 @@ Hoodie.Remote = (function() {
 
     this.connect = __bind(this.connect, this);
 
-    if (options.name) {
+    if (options.name != null) {
       this.name = options.name;
+      this.prefix = this.name;
     }
     if (options.prefix != null) {
       this.prefix = options.prefix;
-    } else {
-      this.prefix = this.name || '';
     }
     if (options.sync) {
       this._sync = options.sync;
@@ -236,7 +235,7 @@ Hoodie.Remote = (function() {
         if (this._knownObjects[doc._id]) {
           event = 'update';
         } else {
-          event = 'new';
+          event = 'add';
           this._knownObjects[doc._id] = 1;
         }
       }

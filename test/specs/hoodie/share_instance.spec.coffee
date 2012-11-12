@@ -43,11 +43,11 @@ describe "Hoodie.ShareInstance", ->
       share = @share.subscribe()
       expect(share).toBePromise()
 
-    _when "security has no readers and writers", ->
+    _when "security has no members and writers", ->
       beforeEach ->
         spyOn(@hoodie.share, "findOrAdd")
         @requestDefer.resolve
-          readers: 
+          members: 
             names: []
             roles: []
           writers: 
@@ -60,26 +60,45 @@ describe "Hoodie.ShareInstance", ->
           access: 
             read:  true
             write: true
-          $createdBy: 'share/id123'
+          $createdBy: '$subscription'
 
-    _when "security has one reader and one writer", ->
+    _when "security members and writers include my ownerHash", ->
       beforeEach ->
         spyOn(@hoodie.share, "findOrAdd")
         @requestDefer.resolve
-          readers: 
+          members: 
             names: []
-            roles: ["1ihhzfy"]
+            roles: ["owner_hash"]
           writers: 
             names: []
-            roles: ["1ihhzfy"]
+            roles: ["owner_hash"]
 
       it "should find or add new share", ->
         @share.subscribe()
         expect(@hoodie.share.findOrAdd).wasCalledWith 'id123', 
           access: 
-            read:  ["1ihhzfy"]
-            write: ["1ihhzfy"]
-          $createdBy: 'share/id123'
+            read:  true
+            write: true
+          $createdBy: '$subscription'
+
+    _when "security members include my ownerHash, but not writers", ->
+      beforeEach ->
+        spyOn(@hoodie.share, "findOrAdd")
+        @requestDefer.resolve
+          members: 
+            names: []
+            roles: ["whatever", "owner_hash"]
+          writers: 
+            names: []
+            roles: ["whatever"]
+
+      it "should find or add new share", ->
+        @share.subscribe()
+        expect(@hoodie.share.findOrAdd).wasCalledWith 'id123', 
+          access: 
+            read:  true
+            write: false
+          $createdBy: '$subscription'
   # /subscribe(options)
 
   describe "unsubscribe(options)", ->

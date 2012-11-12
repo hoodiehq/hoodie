@@ -67,11 +67,14 @@ class Hoodie.Remote
   
   # sets name (think: namespace) and some other options
   constructor : (@hoodie, options = {}) ->
-    @name    = options.name   if options.name
-    if options.prefix?
-      @prefix = options.prefix 
-    else 
-      @prefix = @name or ''
+    if options.name?
+      @name = options.name     
+      @prefix = @name
+      
+    @prefix = options.prefix if options.prefix?
+    
+     
+      
 
     @_sync   = options.sync   if options.sync
     @store   = new Hoodie.RemoteStore @hoodie, this
@@ -353,7 +356,7 @@ class Hoodie.Remote
         if @_knownObjects[doc._id]
           event = 'update'
         else
-          event = 'new'
+          event = 'add'
           @_knownObjects[doc._id] = 1
 
       @trigger event,                                         parsedDoc

@@ -163,7 +163,7 @@ class Hoodie.Share
   # Private
   # ---------
 
-  _allowedOptions: ["id", "access"]
+  _allowedOptions: ["id", "access", "$createdBy"]
 
   # ### filter share options
   #

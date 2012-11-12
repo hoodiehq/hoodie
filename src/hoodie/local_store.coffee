@@ -112,7 +112,7 @@ class Hoodie.LocalStore extends Hoodie.Store
       object = @cache type, id, object, options
       defer.resolve( object, isNew ).promise()
 
-      event = if isNew then 'new' else 'update'
+      event = if isNew then 'add' else 'update'
       @_triggerEvents(event, object, options)
 
     catch error
