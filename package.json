@@ -1,0 +1,15 @@
+{
+  "name": "hoodie-app",
+  "version": "0.0.1",
+  "dependencies": {
+    "http-proxy": "*",
+    "connect": "*",
+    "corsproxy": "git://github.com/janl/CORS-Proxy.git"
+  },
+  "scripts": {
+    "start": "node lib/hoodie-app.js"
+  },
+  "engines": {
+    "node": "0.8.x"
+  }
+}
