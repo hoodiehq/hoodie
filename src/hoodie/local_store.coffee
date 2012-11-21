@@ -71,7 +71,7 @@ class Hoodie.LocalStore extends Hoodie.Store
     return @_decoratePromise(defer) if @hoodie.isPromise(defer)
 
     # make sure we don't mess with the passed object directly
-    object = $.extend {}, object
+    object = $.extend true, {}, object
     
     # generate an id if necessary
     if id
@@ -91,6 +91,10 @@ class Hoodie.LocalStore extends Hoodie.Store
     # handle local properties and hidden properties with $ prefix
     # keep local properties for remote updates
     unless isNew
+
+      # when object.$updatedBy is set, remove it.
+      # that means last update is by me.
+      delete object.$updatedBy
 
       # for remote updates, keep local properties
       for key of currentObject when not object.hasOwnProperty key
@@ -215,7 +219,7 @@ class Hoodie.LocalStore extends Hoodie.Store
       @clearChanged type, id
 
     @_triggerEvents "remove", object, options
-    promise = defer.resolve($.extend {}, object).promise()
+    promise = defer.resolve($.extend true, {}, object).promise()
     @_decoratePromise promise
     
 
@@ -243,17 +247,17 @@ class Hoodie.LocalStore extends Hoodie.Store
     key = "#{type}/#{id}"
   
     if object
-      $.extend object, { $type: type, id: id }
+      $.extend true, object, { $type: type, id: id }
       @_setObject type, id, object
       
       if options.remote
         @clearChanged type, id 
         @_cached[key] = object
-        return $.extend {}, @_cached[key]
+        return $.extend true, {}, @_cached[key]
     
     else
       return false                      if @_cached[key] is false
-      return $.extend {}, @_cached[key] if @_cached[key]
+      return $.extend true, {}, @_cached[key] if @_cached[key]
       object = @_getObject type, id
     
     return if object is undefined
@@ -274,7 +278,7 @@ class Hoodie.LocalStore extends Hoodie.Store
     else
       @clearChanged type, id
     
-    $.extend {}, @_cached[key]
+    $.extend true, {}, @_cached[key]
 
 
   # Clear changed 
