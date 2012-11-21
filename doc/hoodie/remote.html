@@ -44,11 +44,14 @@ triggered events</p></div></div><div class="code"><div class="wrapper">  <span c
 and pushed. Alternatively, <code>sync</code> can be set to
 <code>pull: true</code> or <code>push: true</code>.</p></div></div><div class="code"><div class="wrapper">  <span class="nv">_sync : </span><span class="kc">false</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>docPrefix</p></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>prefix of docs in CouchDB Database, e.g. all docs
 in public user stores are prefixed by '$public'</p></div></div><div class="code"><div class="wrapper">  <span class="nv">prefix : </span><span class="s1">&#39;&#39;</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h2 id="constructor-">Constructor </h2></div></div><div class="code"><div class="wrapper">  </div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>sets name (think: namespace) and some other options</p></div></div><div class="code"><div class="wrapper">  <span class="nv">constructor : </span><span class="nf">(@hoodie, options = {}) -&gt;</span>
-    <span class="vi">@name    = </span><span class="nx">options</span><span class="p">.</span><span class="nx">name</span>   <span class="k">if</span> <span class="nx">options</span><span class="p">.</span><span class="nx">name</span>
-    <span class="k">if</span> <span class="nx">options</span><span class="p">.</span><span class="nx">prefix</span><span class="o">?</span>
-      <span class="vi">@prefix = </span><span class="nx">options</span><span class="p">.</span><span class="nx">prefix</span> 
-    <span class="k">else</span> 
-      <span class="vi">@prefix = </span><span class="nx">@name</span> <span class="o">or</span> <span class="s1">&#39;&#39;</span>
+    <span class="k">if</span> <span class="nx">options</span><span class="p">.</span><span class="nx">name</span><span class="o">?</span>
+      <span class="vi">@name = </span><span class="nx">options</span><span class="p">.</span><span class="nx">name</span>     
+      <span class="vi">@prefix = </span><span class="nx">@name</span>
+      
+    <span class="vi">@prefix = </span><span class="nx">options</span><span class="p">.</span><span class="nx">prefix</span> <span class="k">if</span> <span class="nx">options</span><span class="p">.</span><span class="nx">prefix</span><span class="o">?</span>
+    
+     
+      
 
     <span class="vi">@_sync   = </span><span class="nx">options</span><span class="p">.</span><span class="nx">sync</span>   <span class="k">if</span> <span class="nx">options</span><span class="p">.</span><span class="nx">sync</span>
     <span class="vi">@store   = </span><span class="k">new</span> <span class="nx">Hoodie</span><span class="p">.</span><span class="nx">RemoteStore</span> <span class="nx">@hoodie</span><span class="p">,</span> <span class="k">this</span>
@@ -172,7 +175,7 @@ or an 'update' event, we store a hash of known objects</p></div></div><div class
         <span class="k">if</span> <span class="nx">@_knownObjects</span><span class="p">[</span><span class="nx">doc</span><span class="p">.</span><span class="nx">_id</span><span class="p">]</span>
           <span class="nv">event = </span><span class="s1">&#39;update&#39;</span>
         <span class="k">else</span>
-          <span class="nv">event = </span><span class="s1">&#39;new&#39;</span>
+          <span class="nv">event = </span><span class="s1">&#39;add&#39;</span>
           <span class="nx">@_knownObjects</span><span class="p">[</span><span class="nx">doc</span><span class="p">.</span><span class="nx">_id</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
 
       <span class="nx">@trigger</span> <span class="nx">event</span><span class="p">,</span>                                         <span class="nx">parsedDoc</span>

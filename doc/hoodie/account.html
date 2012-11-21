@@ -147,7 +147,7 @@ without knowing the current password, so it's not impulemented in the current
 implementation of the hoodie API.</p>
 
 <p>But the current password is needed to login with the new username.</p></div></div><div class="code"><div class="wrapper">  <span class="nv">changeUsername : </span><span class="nf">(currentPassword, newUsername) -&gt;</span>
-    <span class="nx">@_changeUsernameAndPassword</span><span class="p">(</span><span class="nx">currentPassword</span><span class="p">,</span> <span class="nx">newUsername</span><span class="p">)</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h2 id="remove">remove</h2></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>removes a user's account  </p></div></div><div class="code"><div class="wrapper">  <span class="nv">remove : </span><span class="o">-&gt;</span>
+    <span class="nx">@_changeUsernameAndPassword</span><span class="p">(</span><span class="nx">currentPassword</span><span class="p">,</span> <span class="nx">newUsername</span><span class="p">)</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h2 id="destroy">destroy</h2></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>destroys a user's account  </p></div></div><div class="code"><div class="wrapper">  <span class="nv">destroy : </span><span class="o">-&gt;</span>
 
     <span class="nx">unless</span> <span class="nx">@hasAccount</span><span class="p">()</span>
       <span class="nx">@_cleanup</span><span class="p">()</span>

@@ -69,7 +69,7 @@ Hoodie.LocalStore = (function(_super) {
     if (this.hoodie.isPromise(defer)) {
       return this._decoratePromise(defer);
     }
-    object = $.extend({}, object);
+    object = $.extend(true, {}, object);
     if (id) {
       currentObject = this.cache(type, id);
       isNew = typeof currentObject !== 'object';
@@ -81,6 +81,7 @@ Hoodie.LocalStore = (function(_super) {
       object.$createdBy || (object.$createdBy = this.hoodie.account.ownerHash);
     }
     if (!isNew) {
+      delete object.$updatedBy;
       for (key in currentObject) {
         if (!object.hasOwnProperty(key)) {
           switch (key.charAt(0)) {
@@ -199,7 +200,7 @@ Hoodie.LocalStore = (function(_super) {
       this.clearChanged(type, id);
     }
     this._triggerEvents("remove", object, options);
-    promise = defer.resolve($.extend({}, object)).promise();
+    promise = defer.resolve($.extend(true, {}, object)).promise();
     return this._decoratePromise(promise);
   };
 
@@ -225,7 +226,7 @@ Hoodie.LocalStore = (function(_super) {
     }
     key = "" + type + "/" + id;
     if (object) {
-      $.extend(object, {
+      $.extend(true, object, {
         $type: type,
         id: id
       });
@@ -233,14 +234,14 @@ Hoodie.LocalStore = (function(_super) {
       if (options.remote) {
         this.clearChanged(type, id);
         this._cached[key] = object;
-        return $.extend({}, this._cached[key]);
+        return $.extend(true, {}, this._cached[key]);
       }
     } else {
       if (this._cached[key] === false) {
         return false;
       }
       if (this._cached[key]) {
-        return $.extend({}, this._cached[key]);
+        return $.extend(true, {}, this._cached[key]);
       }
       object = this._getObject(type, id);
     }
@@ -263,7 +264,7 @@ Hoodie.LocalStore = (function(_super) {
     } else {
       this.clearChanged(type, id);
     }
-    return $.extend({}, this._cached[key]);
+    return $.extend(true, {}, this._cached[key]);
   };
 
   LocalStore.prototype.clearChanged = function(type, id) {
