@@ -1,0 +1,7 @@
+{
+  "name"        : "hoodie",
+  "version"     : "0.0.1",
+  "main"        : "./hoodie.js",
+  "dependencies": {
+  }
+}
