@@ -282,13 +282,13 @@ describe "Hoodie.Remote", ->
           id       : 'abc3'
           _rev     : '2-123'
           _deleted : true
-        expect(@remote.trigger).wasCalledWith 'remove',           object
-        expect(@remote.trigger).wasCalledWith 'remove:todo',      object
-        expect(@remote.trigger).wasCalledWith 'remove:todo:abc3', object
+        expect(@remote.trigger).wasCalledWith 'store:remove',           object
+        expect(@remote.trigger).wasCalledWith 'store:remove:todo',      object
+        expect(@remote.trigger).wasCalledWith 'store:remove:todo:abc3', object
 
-        expect(@remote.trigger).wasCalledWith 'change',            'remove', object
-        expect(@remote.trigger).wasCalledWith 'change:todo',       'remove', object
-        expect(@remote.trigger).wasCalledWith 'change:todo:abc3',  'remove', object        
+        expect(@remote.trigger).wasCalledWith 'store:change',            'remove', object
+        expect(@remote.trigger).wasCalledWith 'store:change:todo',       'remove', object
+        expect(@remote.trigger).wasCalledWith 'store:change:todo:abc3',  'remove', object        
         
         # {"_id":"todo/abc2","_rev":"1-123","content":"remember the milk","done":false,"order":1, "type":"todo"}
         object =
@@ -298,13 +298,13 @@ describe "Hoodie.Remote", ->
           content  : 'remember the milk'
           done     :false
           order    :1
-        expect(@remote.trigger).wasCalledWith 'add',            object
-        expect(@remote.trigger).wasCalledWith 'add:todo',       object
-        expect(@remote.trigger).wasCalledWith 'add:todo:abc2',  object
+        expect(@remote.trigger).wasCalledWith 'store:add',            object
+        expect(@remote.trigger).wasCalledWith 'store:add:todo',       object
+        expect(@remote.trigger).wasCalledWith 'store:add:todo:abc2',  object
 
-        expect(@remote.trigger).wasCalledWith 'change',            'add', object
-        expect(@remote.trigger).wasCalledWith 'change:todo',       'add', object
-        expect(@remote.trigger).wasCalledWith 'change:todo:abc2',  'add', object
+        expect(@remote.trigger).wasCalledWith 'store:change',            'add', object
+        expect(@remote.trigger).wasCalledWith 'store:change:todo',       'add', object
+        expect(@remote.trigger).wasCalledWith 'store:change:todo:abc2',  'add', object
         
       _and ".isContinuouslyPulling() returns true", ->
         beforeEach ->
