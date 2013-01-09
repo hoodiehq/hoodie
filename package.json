@@ -4,7 +4,8 @@
   "dependencies": {
     "http-proxy": "*",
     "connect": "*",
-    "corsproxy": "git://github.com/janl/CORS-Proxy.git"
+    "corsproxy": "git://github.com/janl/CORS-Proxy.git",
+    "multicouch": ">=2.1.0"
   },
   "scripts": {
     "start": "node lib/hoodie-app.js"
