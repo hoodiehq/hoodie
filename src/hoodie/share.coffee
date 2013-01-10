@@ -254,4 +254,4 @@ class Hoodie.Share
         else 
           updateObject(objects)
 
-      return @hoodie.defer().resolve(value, newShare).promise()
+        return @hoodie.defer().resolve(value, newShare).promise()

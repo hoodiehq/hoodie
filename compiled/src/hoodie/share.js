@@ -229,9 +229,9 @@ Hoodie.Share = (function() {
         });
         return object;
       };
-      _this.pipe(function(objects) {
+      return _this.pipe(function(objects) {
         var object, value;
-        return value = (function() {
+        value = (function() {
           var _i, _len, _results;
           if ($.isArray(objects)) {
             _results = [];
@@ -244,8 +244,8 @@ Hoodie.Share = (function() {
             return updateObject(objects);
           }
         })();
+        return _this.hoodie.defer().resolve(value, newShare).promise();
       });
-      return _this.hoodie.defer().resolve(value, newShare).promise();
     });
   };
 
