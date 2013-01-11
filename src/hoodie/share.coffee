@@ -244,14 +244,14 @@ class Hoodie.Share
   _storeShare : (properties) -> 
 
     @pipe (objects) =>
-
-      updateObject = (object) =>
-        object.$shares or= {}
-        object.$shares[newShare.id] = properties or true
-        @hoodie.store.update object.$type, object.id, $shares: object.$shares
-        return object
       
       @hoodie.share.add().pipe (newShare) => 
+
+        updateObject = (object) =>
+          object.$shares or= {}
+          object.$shares[newShare.id] = properties or true
+          @hoodie.store.update object.$type, object.id, $shares: object.$shares
+          return object
 
         value = if $.isArray objects
           updateObject(object) for object in objects
