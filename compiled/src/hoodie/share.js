@@ -133,18 +133,17 @@ Hoodie.Share = (function() {
   };
 
   Share.prototype._storeShareAt = function(shareId, properties) {
-    var updateObject,
-      _this = this;
-    updateObject = function(object) {
-      object.$shares || (object.$shares = {});
-      object.$shares[shareId] = properties || true;
-      _this.hoodie.store.update(object.$type, object.id, {
-        $shares: object.$shares
-      });
-      return object;
-    };
+    var _this = this;
     return this.pipe(function(objects) {
-      var object, _i, _len, _results;
+      var object, updateObject, _i, _len, _results;
+      updateObject = function(object) {
+        object.$shares || (object.$shares = {});
+        object.$shares[shareId] = properties || true;
+        _this.hoodie.store.update(object.$type, object.id, {
+          $shares: object.$shares
+        });
+        return object;
+      };
       if ($.isArray(objects)) {
         _results = [];
         for (_i = 0, _len = objects.length; _i < _len; _i++) {
@@ -159,20 +158,19 @@ Hoodie.Share = (function() {
   };
 
   Share.prototype._storeUnshareAt = function(shareId) {
-    var updateObject,
-      _this = this;
-    updateObject = function(object) {
-      if (!(object.$shares && object.$shares[shareId])) {
-        return object;
-      }
-      object.$shares[shareId] = false;
-      _this.hoodie.store.update(object.$type, object.id, {
-        $shares: object.$shares
-      });
-      return object;
-    };
+    var _this = this;
     return this.pipe(function(objects) {
-      var object, _i, _len, _results;
+      var object, updateObject, _i, _len, _results;
+      updateObject = function(object) {
+        if (!(object.$shares && object.$shares[shareId])) {
+          return object;
+        }
+        object.$shares[shareId] = false;
+        _this.hoodie.store.update(object.$type, object.id, {
+          $shares: object.$shares
+        });
+        return object;
+      };
       if ($.isArray(objects)) {
         _results = [];
         for (_i = 0, _len = objects.length; _i < _len; _i++) {
@@ -187,23 +185,22 @@ Hoodie.Share = (function() {
   };
 
   Share.prototype._storeUnshare = function() {
-    var updateObject,
-      _this = this;
-    updateObject = function(object) {
-      var shareId;
-      if (!object.$shares) {
-        return object;
-      }
-      for (shareId in object.$shares) {
-        object.$shares[shareId] = false;
-      }
-      _this.hoodie.store.update(object.$type, object.id, {
-        $shares: object.$shares
-      });
-      return object;
-    };
+    var _this = this;
     return this.pipe(function(objects) {
-      var object, _i, _len, _results;
+      var object, updateObject, _i, _len, _results;
+      updateObject = function(object) {
+        var shareId;
+        if (!object.$shares) {
+          return object;
+        }
+        for (shareId in object.$shares) {
+          object.$shares[shareId] = false;
+        }
+        _this.hoodie.store.update(object.$type, object.id, {
+          $shares: object.$shares
+        });
+        return object;
+      };
       if ($.isArray(objects)) {
         _results = [];
         for (_i = 0, _len = objects.length; _i < _len; _i++) {
@@ -218,32 +215,31 @@ Hoodie.Share = (function() {
   };
 
   Share.prototype._storeShare = function(properties) {
-    var updateObject,
-      _this = this;
-    updateObject = function(object) {
-      object.$shares || (object.$shares = {});
-      object.$shares[newShare.id] = properties || true;
-      _this.hoodie.store.update(object.$type, object.id, {
-        $shares: object.$shares
-      });
-      return object;
-    };
+    var _this = this;
     return this.pipe(function(objects) {
-      var object, value;
-      value = (function() {
-        var _i, _len, _results;
-        if ($.isArray(objects)) {
-          _results = [];
-          for (_i = 0, _len = objects.length; _i < _len; _i++) {
-            object = objects[_i];
-            _results.push(updateObject(object));
-          }
-          return _results;
-        } else {
-          return updateObject(objects);
-        }
-      })();
       return _this.hoodie.share.add().pipe(function(newShare) {
+        var object, updateObject, value;
+        updateObject = function(object) {
+          object.$shares || (object.$shares = {});
+          object.$shares[newShare.id] = properties || true;
+          _this.hoodie.store.update(object.$type, object.id, {
+            $shares: object.$shares
+          });
+          return object;
+        };
+        value = (function() {
+          var _i, _len, _results;
+          if ($.isArray(objects)) {
+            _results = [];
+            for (_i = 0, _len = objects.length; _i < _len; _i++) {
+              object = objects[_i];
+              _results.push(updateObject(object));
+            }
+            return _results;
+          } else {
+            return updateObject(objects);
+          }
+        })();
         return _this.hoodie.defer().resolve(value, newShare).promise();
       });
     });
