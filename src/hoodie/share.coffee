@@ -192,13 +192,14 @@ class Hoodie.Share
   # shareAt
   # 
   _storeShareAt : (shareId, properties) ->
-    updateObject = (object) =>
-      object.$shares or= {}
-      object.$shares[shareId] = properties or true
-      @hoodie.store.update object.$type, object.id, $shares: object.$shares
-      return object
-
     @pipe (objects) =>
+
+      updateObject = (object) =>
+        object.$shares or= {}
+        object.$shares[shareId] = properties or true
+        @hoodie.store.update object.$type, object.id, $shares: object.$shares
+        return object
+    
       if $.isArray objects
         updateObject(object) for object in objects
       else 
@@ -208,13 +209,14 @@ class Hoodie.Share
   # unshareAt
   #
   _storeUnshareAt : (shareId) ->
-    updateObject = (object) =>
-      return object unless object.$shares and object.$shares[shareId]
-      object.$shares[shareId] = false
-      @hoodie.store.update object.$type, object.id, $shares: object.$shares
-      return object
-
     @pipe (objects) =>
+
+      updateObject = (object) =>
+        return object unless object.$shares and object.$shares[shareId]
+        object.$shares[shareId] = false
+        @hoodie.store.update object.$type, object.id, $shares: object.$shares
+        return object
+    
       if $.isArray objects
         updateObject(object) for object in objects
       else 
@@ -223,14 +225,15 @@ class Hoodie.Share
   # unshare
   #
   _storeUnshare : () ->
-    updateObject = (object) =>
-      return object unless object.$shares
-      for shareId of object.$shares
-        object.$shares[shareId] = false
-      @hoodie.store.update object.$type, object.id, $shares: object.$shares
-      return object
-
     @pipe (objects) =>
+
+      updateObject = (object) =>
+        return object unless object.$shares
+        for shareId of object.$shares
+          object.$shares[shareId] = false
+        @hoodie.store.update object.$type, object.id, $shares: object.$shares
+        return object
+
       if $.isArray objects
         updateObject(object) for object in objects
       else 
@@ -240,18 +243,19 @@ class Hoodie.Share
   #
   _storeShare : (properties) -> 
 
-    updateObject = (object) =>
-      object.$shares or= {}
-      object.$shares[newShare.id] = properties or true
-      @hoodie.store.update object.$type, object.id, $shares: object.$shares
-      return object
-
     @pipe (objects) =>
-      
-      value = if $.isArray objects
-        updateObject(object) for object in objects
-      else 
-        updateObject(objects)
 
+      updateObject = (object) =>
+        object.$shares or= {}
+        object.$shares[newShare.id] = properties or true
+        @hoodie.store.update object.$type, object.id, $shares: object.$shares
+        return object
+      
       @hoodie.share.add().pipe (newShare) => 
+
+        value = if $.isArray objects
+          updateObject(object) for object in objects
+        else 
+          updateObject(objects)
+      
         return @hoodie.defer().resolve(value, newShare).promise()
