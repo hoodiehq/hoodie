@@ -334,7 +334,7 @@ Hoodie.Account = (function() {
   Account.prototype.signOut = function() {
     if (!this.hasAccount()) {
       this._cleanup();
-      return;
+      return this.hoodie.defer().resolve().promise();
     }
     this.hoodie.remote.disconnect();
     return this._sendSignOutRequest().pipe(this._cleanup);

@@ -154,7 +154,8 @@ class Hoodie.Account
 
     unless @hasAccount()
       @_cleanup()
-      return
+      return @hoodie.defer().resolve().promise()
+      
 
     @hoodie.remote.disconnect()
     @_sendSignOutRequest().pipe(@_cleanup)

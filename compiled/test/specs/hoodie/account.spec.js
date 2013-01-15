@@ -750,7 +750,7 @@ describe("Hoodie.Account", function() {
     _when("user has no account", function() {
       beforeEach(function() {
         spyOn(this.account, "hasAccount").andReturn(false);
-        return this.account.signOut();
+        return this.promise = this.account.signOut();
       });
       it("should not send any request", function() {
         return expect(this.hoodie.request).wasNotCalled();
@@ -764,8 +764,12 @@ describe("Hoodie.Account", function() {
       it("should unset @username", function() {
         return expect(this.account.username).toBeUndefined();
       });
-      return it("should clear config", function() {
+      it("should clear config", function() {
         return expect(this.hoodie.config.clear).wasCalled();
+      });
+      return it("should return a resolved promise", function() {
+        expect(this.promise).toBePromise();
+        return expect(this.promise).toBeResolved();
       });
     });
     return _when("user has account", function() {

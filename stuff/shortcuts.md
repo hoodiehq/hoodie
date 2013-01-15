@@ -9,10 +9,27 @@ Delete all user accounts
 
 ```js
 $.couch.db('_users').allDocs( {success: function(response) {
-  var user_docs = []
+  var docs = []
   $.each(response.rows, function() {
-    if (/org.couchdb.user/.test(this.id)) user_docs.push({_id: this.id, _rev: this.value.rev})
+    if (/org.couchdb.user/.test(this.id)) docs.push({_id: this.id, _rev: this.value.rev})
   })
-  $.couch.db('_users').bulkRemove({docs: user_docs})
+  $.couch.db('_users').bulkRemove({docs: docs})
 }})
 ```
+
+Delete all replications
+--------------------------
+
+```js
+$.couch.db('_replicator').allDocs( {success: function(response) {
+  var docs = []
+  $.each(response.rows, function() {
+    if (/^[^_]/.test(this.id)) docs.push({_id: this.id, _rev: this.value.rev})
+  })
+  $.couch.db('_replicator').bulkRemove({docs: docs})
+  console.log(docs)
+}})
+```
+
+Delete all databases
+----------------------

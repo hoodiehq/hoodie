@@ -623,7 +623,7 @@ describe "Hoodie.Account", ->
     _when "user has no account", ->
       beforeEach ->
         spyOn(@account, "hasAccount").andReturn false
-        @account.signOut()
+        @promise = @account.signOut()
 
       it "should not send any request", ->
         expect(@hoodie.request).wasNotCalled() 
@@ -639,6 +639,11 @@ describe "Hoodie.Account", ->
 
       it "should clear config", ->
         expect(@hoodie.config.clear).wasCalled() 
+
+      it "should return a resolved promise", ->
+        expect(@promise).toBePromise()
+        expect(@promise).toBeResolved()
+         
       
     _when "user has account", ->
       beforeEach ->
