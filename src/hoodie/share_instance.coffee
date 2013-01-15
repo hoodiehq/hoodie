@@ -5,14 +5,14 @@
 # share. It's extending the default Remote Store by methods
 # to grant or revoke read / write access.
 # 
-# By default, a share is only accessible to be. If I want
-# it to share publicaly, I explicatly need to grant access
+# By default, a share is only accessible to me. If I want
+# it to share it, I explicatly need to grant access
 # by calling `share.grantReadAccess()`. I can also grant
 # access to only specific users by passing an array: 
 # `share.grantReadAccess(['joe','lisa'])`
 # 
 # It's plannend to secure a public share with a password,
-# but this feature is not implemented yet.
+# but this feature is not yet implemented.
 # 
 # To subscribe to a share created by somebody else, run
 # this code: `hoodie.share('shareId').subscribe()`.

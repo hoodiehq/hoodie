@@ -1,11 +1,11 @@
 # Share Module
 # ==============
 
-# When a share gets created, a $share doc gets stored and synched to users 
+# When a share gets created, a $share doc gets stored and synched to the user's 
 # database. From there the $share worker handles the rest:
 # 
 # * creating a share database
-# * creating a share user if a password is used
+# * creating a share user if a password is used (to be done)
 # * handling the replications
 #
 # The worker updates the $share doc status, which gets synched back to the 
