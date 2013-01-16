@@ -27,6 +27,8 @@ class Hoodie.Config
   # adds a configuration
   #
   set : (key, value) ->
+    if key is 'funky'
+      debugger
     return if @cache[key] is value
     
     @cache[key] = value

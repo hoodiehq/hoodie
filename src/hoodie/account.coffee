@@ -130,6 +130,11 @@ class Hoodie.Account
   # uses standard CouchDB API to create a new user session (POST /_session).
   # Besides the standard sign in we also check if the account has been confirmed
   # (roles include "confirmed" role).
+  # 
+  # NOTE: When signing in, all local data gets cleared beforehand. Otherwise
+  #       data that has been created beforehand (authenticated with another
+  #       user account or anonymously) would be merged into the user account
+  #       that signs in.
   signIn : (username, password = '') ->
     if @username and @username isnt username
       return @hoodie.defer().reject(error: 'You have to sign out first').promise()
@@ -139,8 +144,9 @@ class Hoodie.Account
                 password  : password
 
     @_withPreviousRequestsAborted 'signIn', =>
-      promise = @hoodie.request('POST', '/_session', options)
-      promise.pipe(@_handleSignInSuccess, @_handleRequestError)
+      @signOut().pipe =>
+        promise = @hoodie.request('POST', '/_session', options)
+        promise.pipe(@_handleSignInSuccess, @_handleRequestError)
 
   # alias
   login: @::signIn

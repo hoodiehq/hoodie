@@ -323,9 +323,11 @@ Hoodie.Account = (function() {
       }
     };
     return this._withPreviousRequestsAborted('signIn', function() {
-      var promise;
-      promise = _this.hoodie.request('POST', '/_session', options);
-      return promise.pipe(_this._handleSignInSuccess, _this._handleRequestError);
+      return _this.signOut().pipe(function() {
+        var promise;
+        promise = _this.hoodie.request('POST', '/_session', options);
+        return promise.pipe(_this._handleSignInSuccess, _this._handleRequestError);
+      });
     });
   };
 
@@ -736,6 +738,9 @@ Hoodie.Config = (function() {
 
   Config.prototype.set = function(key, value) {
     var isSilent, update;
+    if (key === 'funky') {
+      debugger;
+    }
     if (this.cache[key] === value) {
       return;
     }

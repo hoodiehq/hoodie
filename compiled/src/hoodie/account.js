@@ -130,9 +130,11 @@ Hoodie.Account = (function() {
       }
     };
     return this._withPreviousRequestsAborted('signIn', function() {
-      var promise;
-      promise = _this.hoodie.request('POST', '/_session', options);
-      return promise.pipe(_this._handleSignInSuccess, _this._handleRequestError);
+      return _this.signOut().pipe(function() {
+        var promise;
+        promise = _this.hoodie.request('POST', '/_session', options);
+        return promise.pipe(_this._handleSignInSuccess, _this._handleRequestError);
+      });
     });
   };
 

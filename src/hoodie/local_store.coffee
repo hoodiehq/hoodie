@@ -358,7 +358,8 @@ class Hoodie.LocalStore extends Hoodie.Store
   # ------
 
   # clears localStorage and cache
-  # TODO: do not clear entire localStorage, clear only item that have been stored before
+  # TODO: do not clear entire localStorage, clear only the items that have been stored
+  #       using `hoodie.store` before.
   clear : =>
     defer = @hoodie.defer()
   
