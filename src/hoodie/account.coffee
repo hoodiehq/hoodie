@@ -21,8 +21,7 @@ class Hoodie.Account
     # the ownerHash gets stored in every object created by the user.
     # Make sure we have one.
     unless @ownerHash
-      @ownerHash = @hoodie.uuid()
-      @hoodie.config.set '_account.ownerHash', @ownerHash
+      @_setOwner @hoodie.uuid()
     
     # authenticate on next tick
     window.setTimeout @authenticate
@@ -301,8 +300,15 @@ class Hoodie.Account
   _requests : {}
 
   # setters
-  _setUsername : (@username)  -> @hoodie.config.set '_account.username',  @username
-  _setOwner    : (@ownerHash) -> @hoodie.config.set '_account.ownerHash', @ownerHash
+  _setUsername : (@username)  -> 
+    @hoodie.config.set '_account.username',  @username
+
+  _setOwner    : (@ownerHash) -> 
+    # `ownerHash` is stored with every new object in the $createdBy
+    # attribute. It does not get changed once it's set. That's why
+    # we have to force it to be change for the `$config/hoodie` object.
+    @hoodie.config.set '$createdBy', @ownerHash
+    @hoodie.config.set '_account.ownerHash', @ownerHash
 
   #
   # handle a successful authentication request.
@@ -407,8 +413,8 @@ class Hoodie.Account
       return defer.reject error: "unconfirmed", reason: "account has not been confirmed yet"
     
     @_authenticated = true
-    @_setUsername username
     @_setOwner    response.roles[0]
+    @_setUsername username
 
     if @hasAnonymousAccount()
       @trigger 'signin:anonymous', username
@@ -529,8 +535,7 @@ class Hoodie.Account
     @hoodie.config.clear()
     @trigger 'signout'
 
-    @ownerHash = @hoodie.uuid()
-    @hoodie.config.set '_account.ownerHash', @ownerHash
+    @_setOwner @hoodie.uuid()
     
 
   #

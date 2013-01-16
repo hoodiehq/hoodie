@@ -453,6 +453,7 @@ describe "Hoodie.Account", ->
              @account.signIn('joe@example.com', 'secret')
              expect(@account.ownerHash).toBe 'user_hash'
              expect(@hoodie.config.set).wasCalledWith '_account.ownerHash', 'user_hash'
+             expect(@hoodie.config.set).wasCalledWith '$createdBy', 'user_hash'
 
           it "should fetch the _users doc", ->
             spyOn(@account, "fetch")

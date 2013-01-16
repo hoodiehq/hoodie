@@ -39,8 +39,7 @@ Hoodie.Account = (function() {
     this.username = this.hoodie.config.get('_account.username');
     this.ownerHash = this.hoodie.config.get('_account.ownerHash');
     if (!this.ownerHash) {
-      this.ownerHash = this.hoodie.uuid();
-      this.hoodie.config.set('_account.ownerHash', this.ownerHash);
+      this._setOwner(this.hoodie.uuid());
     }
     window.setTimeout(this.authenticate);
     this._checkPasswordResetStatus();
@@ -247,6 +246,7 @@ Hoodie.Account = (function() {
 
   Account.prototype._setOwner = function(ownerHash) {
     this.ownerHash = ownerHash;
+    this.hoodie.config.set('$createdBy', this.ownerHash);
     return this.hoodie.config.set('_account.ownerHash', this.ownerHash);
   };
 
@@ -332,8 +332,8 @@ Hoodie.Account = (function() {
       });
     }
     this._authenticated = true;
-    this._setUsername(username);
     this._setOwner(response.roles[0]);
+    this._setUsername(username);
     if (this.hasAnonymousAccount()) {
       this.trigger('signin:anonymous', username);
     } else {
@@ -428,8 +428,7 @@ Hoodie.Account = (function() {
     delete this._authenticated;
     this.hoodie.config.clear();
     this.trigger('signout');
-    this.ownerHash = this.hoodie.uuid();
-    return this.hoodie.config.set('_account.ownerHash', this.ownerHash);
+    return this._setOwner(this.hoodie.uuid());
   };
 
   Account.prototype._userKey = function(username) {

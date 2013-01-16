@@ -542,7 +542,8 @@ describe("Hoodie.Account", function() {
           it("should set @ownerHash", function() {
             this.account.signIn('joe@example.com', 'secret');
             expect(this.account.ownerHash).toBe('user_hash');
-            return expect(this.hoodie.config.set).wasCalledWith('_account.ownerHash', 'user_hash');
+            expect(this.hoodie.config.set).wasCalledWith('_account.ownerHash', 'user_hash');
+            return expect(this.hoodie.config.set).wasCalledWith('$createdBy', 'user_hash');
           });
           it("should fetch the _users doc", function() {
             spyOn(this.account, "fetch");
