@@ -738,9 +738,6 @@ Hoodie.Config = (function() {
 
   Config.prototype.set = function(key, value) {
     var isSilent, update;
-    if (key === 'funky') {
-      debugger;
-    }
     if (this.cache[key] === value) {
       return;
     }
