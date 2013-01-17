@@ -31,6 +31,7 @@ class Hoodie.LocalStore extends Hoodie.Store
     
     # handle sign outs
     @hoodie.on 'account:signout', @clear
+    @hoodie.on 'account:signup', @markAllAsChanged
 
     # provide reference to hoodie in all promises
     @_promiseApi.hoodie = @hoodie
@@ -320,12 +321,24 @@ class Hoodie.LocalStore extends Hoodie.Store
 
     return if options.silent
 
-    @trigger 'dirty'
-    window.clearTimeout @_dirtyTimeout
-    @_dirtyTimeout = window.setTimeout ( =>
-      @trigger 'idle'
-    ), @idleTimeout
-    
+    @_trigger_dirty_and_idle_events()
+
+
+  # ## Mark all as changed
+  # ------------------------
+
+  # Marks all local object as changed (dirty) to make them sync
+  # with remote
+  markAllAsChanged : =>
+    @findAll().pipe (objects) =>
+
+      for object in objects
+        key = "#{object.$type}/#{object.id}"
+        @_dirty[key] = object
+
+      @_saveDirtyIds()
+      @_trigger_dirty_and_idle_events()
+
 
   # changed docs
   # --------------
@@ -527,6 +540,14 @@ class Hoodie.LocalStore extends Hoodie.Store
     @trigger "change",                                 event, object, options
     @trigger "change:#{object.$type}",                 event, object, options
     @trigger "change:#{object.$type}:#{object.id}",    event, object, options unless event is 'new'
+
+  #
+  _trigger_dirty_and_idle_events: ->
+    @trigger 'dirty'
+    window.clearTimeout @_dirtyTimeout
+    @_dirtyTimeout = window.setTimeout ( =>
+      @trigger 'idle'
+    ), @idleTimeout
   
   # extend this property with extra functions that will be available
   # on all promises returned by hoodie.store API

@@ -18,6 +18,12 @@ describe("Hoodie.LocalStore", function() {
       store = new Hoodie.LocalStore(this.hoodie);
       return expect(this.hoodie.on).wasCalledWith('account:signout', store.clear);
     });
+    it("should subscribe to account:signup event", function() {
+      var store;
+      spyOn(this.hoodie, "on");
+      store = new Hoodie.LocalStore(this.hoodie);
+      return expect(this.hoodie.on).wasCalledWith('account:signup', store.markAllAsChanged);
+    });
     return it("should trigger idle event if there are dirty objects in localStorage", function() {
       var store;
       Hoodie.LocalStore.prototype.db.getItem.andCallFake(function(key) {
@@ -968,6 +974,77 @@ describe("Hoodie.LocalStore", function() {
     });
     return it("should trigger 'dirty' event", function() {
       return expect(this.store.trigger).wasCalledWith('dirty');
+    });
+  });
+  describe("#markAllAsChanged(type, id, object)", function() {
+    beforeEach(function() {
+      this.findAllDefer = this.hoodie.defer();
+      spyOn(this.store, "markAsChanged").andCallThrough();
+      return spyOn(this.store, "findAll").andReturn(this.findAllDefer.promise());
+    });
+    it("should find all local objects", function() {
+      this.store.markAllAsChanged();
+      return expect(this.store.findAll).wasCalled();
+    });
+    _when("findAll fails", function() {
+      beforeEach(function() {
+        return this.findAllDefer.reject({
+          reason: 'because'
+        });
+      });
+      return it("should return its rejected promise", function() {
+        var promise;
+        promise = this.store.markAllAsChanged();
+        return expect(promise).toBeRejectedWith({
+          reason: 'because'
+        });
+      });
+    });
+    return _when("findAll succeeds", function() {
+      beforeEach(function() {
+        this.store._dirty = {};
+        this.objects = [
+          {
+            id: '1',
+            $type: 'document',
+            name: 'test1'
+          }, {
+            id: '2',
+            $type: 'document',
+            name: 'test2'
+          }, {
+            id: '3',
+            $type: 'document',
+            name: 'test3'
+          }
+        ];
+        this.findAllDefer.resolve(this.objects);
+        spyOn(window, "setTimeout").andReturn('newTimeout');
+        spyOn(window, "clearTimeout");
+        spyOn(this.store, "trigger");
+        this.store._dirtyTimeout = 'timeout';
+        return this.store.markAllAsChanged();
+      });
+      it("should add returned obejcts to the dirty list", function() {
+        expect(this.store._dirty['document/1'].name).toBe('test1');
+        expect(this.store._dirty['document/2'].name).toBe('test2');
+        return expect(this.store._dirty['document/3'].name).toBe('test3');
+      });
+      it("should start dirty timeout for 2 seconds", function() {
+        var args;
+        args = window.setTimeout.mostRecentCall.args;
+        expect(args[1]).toBe(2000);
+        expect(this.store._dirtyTimeout).toBe('newTimeout');
+        return expect(window.setTimeout.callCount).toBe(1);
+      });
+      it("should clear dirty timeout", function() {
+        expect(window.clearTimeout).wasCalledWith('timeout');
+        return expect(window.clearTimeout.callCount).toBe(1);
+      });
+      return it("should trigger 'dirty' event", function() {
+        expect(this.store.trigger).wasCalledWith('dirty');
+        return expect(this.store.trigger.callCount).toBe(1);
+      });
     });
   });
   describe("#changedDocs()", function() {

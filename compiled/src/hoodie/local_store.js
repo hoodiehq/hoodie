@@ -14,6 +14,8 @@ Hoodie.LocalStore = (function(_super) {
     this.hoodie = hoodie;
     this.clear = __bind(this.clear, this);
 
+    this.markAllAsChanged = __bind(this.markAllAsChanged, this);
+
     if (!this.isPersistent()) {
       this.db = {
         getItem: function() {
@@ -35,6 +37,7 @@ Hoodie.LocalStore = (function(_super) {
       };
     }
     this.hoodie.on('account:signout', this.clear);
+    this.hoodie.on('account:signup', this.markAllAsChanged);
     this._promiseApi.hoodie = this.hoodie;
     this._bootstrap();
   }
@@ -284,8 +287,7 @@ Hoodie.LocalStore = (function(_super) {
   };
 
   LocalStore.prototype.markAsChanged = function(type, id, object, options) {
-    var key,
-      _this = this;
+    var key;
     if (options == null) {
       options = {};
     }
@@ -295,11 +297,21 @@ Hoodie.LocalStore = (function(_super) {
     if (options.silent) {
       return;
     }
-    this.trigger('dirty');
-    window.clearTimeout(this._dirtyTimeout);
-    return this._dirtyTimeout = window.setTimeout((function() {
-      return _this.trigger('idle');
-    }), this.idleTimeout);
+    return this._trigger_dirty_and_idle_events();
+  };
+
+  LocalStore.prototype.markAllAsChanged = function() {
+    var _this = this;
+    return this.findAll().pipe(function(objects) {
+      var key, object, _i, _len;
+      for (_i = 0, _len = objects.length; _i < _len; _i++) {
+        object = objects[_i];
+        key = "" + object.$type + "/" + object.id;
+        _this._dirty[key] = object;
+      }
+      _this._saveDirtyIds();
+      return _this._trigger_dirty_and_idle_events();
+    });
   };
 
   LocalStore.prototype.changedDocs = function() {
@@ -480,6 +492,15 @@ Hoodie.LocalStore = (function(_super) {
     if (event !== 'new') {
       return this.trigger("change:" + object.$type + ":" + object.id, event, object, options);
     }
+  };
+
+  LocalStore.prototype._trigger_dirty_and_idle_events = function() {
+    var _this = this;
+    this.trigger('dirty');
+    window.clearTimeout(this._dirtyTimeout);
+    return this._dirtyTimeout = window.setTimeout((function() {
+      return _this.trigger('idle');
+    }), this.idleTimeout);
   };
 
   LocalStore.prototype._promiseApi = {};

@@ -18,6 +18,11 @@ describe "Hoodie.LocalStore", ->
       store = new Hoodie.LocalStore @hoodie
       expect(@hoodie.on).wasCalledWith 'account:signout', store.clear
 
+    it "should subscribe to account:signup event", ->
+      spyOn(@hoodie, "on")
+      store = new Hoodie.LocalStore @hoodie
+      expect(@hoodie.on).wasCalledWith 'account:signup', store.markAllAsChanged
+
     it "should trigger idle event if there are dirty objects in localStorage", ->
       Hoodie.LocalStore::db.getItem.andCallFake (key) ->
         return 'task/1' if key is '_dirty'
@@ -671,6 +676,60 @@ describe "Hoodie.LocalStore", ->
     it "should trigger 'dirty' event", ->
        expect(@store.trigger).wasCalledWith 'dirty'
   # /.markAsChanged(type, id, object)
+  
+
+  describe "#markAllAsChanged(type, id, object)", ->
+    beforeEach ->
+      @findAllDefer = @hoodie.defer()
+      spyOn(@store, "markAsChanged").andCallThrough()
+      spyOn(@store, "findAll").andReturn @findAllDefer.promise()
+
+    it "should find all local objects", ->
+      @store.markAllAsChanged()
+      expect(@store.findAll).wasCalled()
+
+    _when "findAll fails", ->
+      beforeEach ->
+        @findAllDefer.reject reason: 'because'
+      
+      it "should return its rejected promise", ->
+         promise = @store.markAllAsChanged()
+         expect(promise).toBeRejectedWith reason: 'because'
+
+    _when "findAll succeeds", ->
+      beforeEach ->
+        @store._dirty = {}
+        @objects = [
+          { id: '1', $type: 'document', name: 'test1'}
+          { id: '2', $type: 'document', name: 'test2'}
+          { id: '3', $type: 'document', name: 'test3'}
+        ]
+        @findAllDefer.resolve @objects
+        spyOn(window, "setTimeout").andReturn 'newTimeout'
+        spyOn(window, "clearTimeout")
+        spyOn(@store, "trigger")
+        @store._dirtyTimeout = 'timeout'
+        @store.markAllAsChanged()
+      
+      it "should add returned obejcts to the dirty list", ->
+        expect(@store._dirty['document/1'].name).toBe 'test1'
+        expect(@store._dirty['document/2'].name).toBe 'test2'
+        expect(@store._dirty['document/3'].name).toBe 'test3'
+        
+      it "should start dirty timeout for 2 seconds", ->
+        args = window.setTimeout.mostRecentCall.args
+        expect(args[1]).toBe 2000
+        expect(@store._dirtyTimeout).toBe 'newTimeout'
+        expect(window.setTimeout.callCount).toBe 1
+        
+      it "should clear dirty timeout", ->
+        expect(window.clearTimeout).wasCalledWith 'timeout'
+        expect(window.clearTimeout.callCount).toBe 1
+
+      it "should trigger 'dirty' event", ->
+        expect(@store.trigger).wasCalledWith 'dirty'
+        expect(@store.trigger.callCount).toBe 1
+  # /.markAllAsChanged(type, id, object)
   
 
   describe "#changedDocs()", ->
