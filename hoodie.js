@@ -305,32 +305,14 @@ Hoodie.Account = (function() {
   };
 
   Account.prototype.signIn = function(username, password) {
-    var options,
-      _this = this;
+    var _this = this;
     if (password == null) {
       password = '';
     }
-    if (this.username && this.username !== username) {
-      return this.hoodie.defer().reject({
-        error: 'You have to sign out first'
-      }).promise();
-    }
-    options = {
-      data: {
-        name: this._userKey(username),
-        password: password
-      }
-    };
-    return this._withPreviousRequestsAborted('signIn', function() {
-      return _this.signOut().pipe(function() {
-        var promise;
-        promise = _this.hoodie.request('POST', '/_session', options);
-        return promise.pipe(_this._handleSignInSuccess, _this._handleRequestError);
-      });
+    return this.signOut().pipe(function() {
+      return _this._sendSignInRequest(username, password);
     });
   };
-
-  Account.prototype.login = Account.prototype.signIn;
 
   Account.prototype.signOut = function() {
     if (!this.hasAccount()) {
@@ -340,8 +322,6 @@ Hoodie.Account = (function() {
     this.hoodie.remote.disconnect();
     return this._sendSignOutRequest().pipe(this._cleanup);
   };
-
-  Account.prototype.logout = Account.prototype.signOut;
 
   Account.prototype.on = function(event, cb) {
     event = event.replace(/(^| )([^ ]+)/g, "$1account:$2");
@@ -491,7 +471,7 @@ Hoodie.Account = (function() {
     defer = this.hoodie.defer();
     window.setTimeout((function() {
       var promise;
-      promise = _this.signIn(username, password);
+      promise = _this._sendSignInRequest(username, password);
       promise.done(defer.resolve);
       return promise.fail(function(error) {
         if (error.error === 'unconfirmed') {
@@ -589,7 +569,7 @@ Hoodie.Account = (function() {
 
   Account.prototype._changeUsernameAndPassword = function(currentPassword, newUsername, newPassword) {
     var _this = this;
-    return this.signIn(this.username, currentPassword).pipe(function() {
+    return this._sendSignInRequest(this.username, currentPassword).pipe(function() {
       return _this.fetch().pipe(_this._sendChangeUsernameAndPasswordRequest(currentPassword, newUsername, newPassword));
     });
   };
@@ -700,6 +680,22 @@ Hoodie.Account = (function() {
     var _this = this;
     return this._withSingleRequest('signOut', function() {
       return _this.hoodie.request('DELETE', '/_session').pipe(null, _this._handleRequestError);
+    });
+  };
+
+  Account.prototype._sendSignInRequest = function(username, password) {
+    var options,
+      _this = this;
+    options = {
+      data: {
+        name: this._userKey(username),
+        password: password
+      }
+    };
+    return this._withPreviousRequestsAborted('signIn', function() {
+      var promise;
+      promise = _this.hoodie.request('POST', '/_session', options);
+      return promise.pipe(_this._handleSignInSuccess, _this._handleRequestError);
     });
   };
 

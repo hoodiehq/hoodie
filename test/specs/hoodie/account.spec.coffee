@@ -192,12 +192,12 @@ describe "Hoodie.Account", ->
           @signInDefer1 = @hoodie.defer()
           @signInDefer2 = @hoodie.defer()
           signInDefers = [@signInDefer1.promise(), @signInDefer2.promise()]
-          spyOn(@account, "signIn").andCallFake -> signInDefers.shift()
+          spyOn(@account, "_sendSignInRequest").andCallFake -> signInDefers.shift()
 
           @promise = @account.signUp('joe@example.com', 'secret', name: "Joe Doe")
 
         it "should sign in", ->
-          expect(@account.signIn).wasCalledWith 'randomUsername', 'randomPassword'
+          expect(@account._sendSignInRequest).wasCalledWith 'randomUsername', 'randomPassword'
 
         _when "sign in successful", ->
           beforeEach ->
@@ -242,7 +242,7 @@ describe "Hoodie.Account", ->
                 expect(@hoodie.remote.disconnect).wasCalled() 
 
               it "should sign in with new username", ->
-                expect(@account.signIn).wasCalledWith 'joe@example.com', 'secret'
+                expect(@account._sendSignInRequest).wasCalledWith 'joe@example.com', 'secret'
 
               _and "signIn is successful", ->
                 beforeEach ->
@@ -284,7 +284,7 @@ describe "Hoodie.Account", ->
         beforeEach ->
           spyOn(@account, "hasAccount").andReturn false
           @signInDefer = @hoodie.defer()
-          spyOn(@account, "signIn").andReturn @signInDefer.promise()
+          spyOn(@account, "_sendSignInRequest").andReturn @signInDefer.promise()
           @account.signUp('joe@example.com', 'secret', name: "Joe Doe")
           [@type, @path, @options] = @hoodie.request.mostRecentCall.args
           @data = JSON.parse @options.data
@@ -335,7 +335,7 @@ describe "Hoodie.Account", ->
             
           it "should sign in", ->
             @account.signUp 'joe@example.com', 'secret'
-            expect(@account.signIn).wasCalledWith 'joe@example.com', 'secret'
+            expect(@account._sendSignInRequest).wasCalledWith 'joe@example.com', 'secret'
           
           _and "signIn successful", ->
             beforeEach ->
@@ -922,7 +922,7 @@ describe "Hoodie.Account", ->
       @signInDefer1 = @hoodie.defer()
       @signInDefer2 = @hoodie.defer()
       signInDefers = [@signInDefer1, @signInDefer2]
-      spyOn(@account, "signIn").andCallFake -> signInDefers.shift()
+      spyOn(@account, "_sendSignInRequest").andCallFake -> signInDefers.shift()
 
       @fetchDefer = @hoodie.defer()
       spyOn(@account, "fetch").andReturn @fetchDefer
@@ -979,7 +979,7 @@ describe "Hoodie.Account", ->
             expect(@hoodie.remote.disconnect).wasCalled() 
 
           it "should sign in with new username", ->
-            expect(@account.signIn).wasCalledWith 'new.joe@example.com', 'secret'
+            expect(@account._sendSignInRequest).wasCalledWith 'new.joe@example.com', 'secret'
 
           _and "signIn is successful", ->
             beforeEach ->

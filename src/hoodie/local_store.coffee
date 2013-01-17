@@ -84,7 +84,7 @@ class Hoodie.LocalStore extends Hoodie.Store
 
     # add createdBy hash to new objects
     # note: we check for `hoodie.account` as in some cases, the code
-    #       might get executed before the account models is initiated.
+    #       might get executed before the account module is initiated.
     # todo: move ownerHash into a method on the core hoodie module
     if isNew and @hoodie.account
       object.$createdBy or= @hoodie.account.ownerHash

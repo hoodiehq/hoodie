@@ -221,7 +221,7 @@ describe("Hoodie.Account", function() {
           this.signInDefer1 = this.hoodie.defer();
           this.signInDefer2 = this.hoodie.defer();
           signInDefers = [this.signInDefer1.promise(), this.signInDefer2.promise()];
-          spyOn(this.account, "signIn").andCallFake(function() {
+          spyOn(this.account, "_sendSignInRequest").andCallFake(function() {
             return signInDefers.shift();
           });
           return this.promise = this.account.signUp('joe@example.com', 'secret', {
@@ -229,7 +229,7 @@ describe("Hoodie.Account", function() {
           });
         });
         it("should sign in", function() {
-          return expect(this.account.signIn).wasCalledWith('randomUsername', 'randomPassword');
+          return expect(this.account._sendSignInRequest).wasCalledWith('randomUsername', 'randomPassword');
         });
         return _when("sign in successful", function() {
           beforeEach(function() {
@@ -276,7 +276,7 @@ describe("Hoodie.Account", function() {
                 return expect(this.hoodie.remote.disconnect).wasCalled();
               });
               it("should sign in with new username", function() {
-                return expect(this.account.signIn).wasCalledWith('joe@example.com', 'secret');
+                return expect(this.account._sendSignInRequest).wasCalledWith('joe@example.com', 'secret');
               });
               _and("signIn is successful", function() {
                 beforeEach(function() {
@@ -341,7 +341,7 @@ describe("Hoodie.Account", function() {
           var _ref;
           spyOn(this.account, "hasAccount").andReturn(false);
           this.signInDefer = this.hoodie.defer();
-          spyOn(this.account, "signIn").andReturn(this.signInDefer.promise());
+          spyOn(this.account, "_sendSignInRequest").andReturn(this.signInDefer.promise());
           this.account.signUp('joe@example.com', 'secret', {
             name: "Joe Doe"
           });
@@ -400,7 +400,7 @@ describe("Hoodie.Account", function() {
           });
           it("should sign in", function() {
             this.account.signUp('joe@example.com', 'secret');
-            return expect(this.account.signIn).wasCalledWith('joe@example.com', 'secret');
+            return expect(this.account._sendSignInRequest).wasCalledWith('joe@example.com', 'secret');
           });
           _and("signIn successful", function() {
             beforeEach(function() {
@@ -1095,7 +1095,7 @@ describe("Hoodie.Account", function() {
       this.signInDefer1 = this.hoodie.defer();
       this.signInDefer2 = this.hoodie.defer();
       signInDefers = [this.signInDefer1, this.signInDefer2];
-      spyOn(this.account, "signIn").andCallFake(function() {
+      spyOn(this.account, "_sendSignInRequest").andCallFake(function() {
         return signInDefers.shift();
       });
       this.fetchDefer = this.hoodie.defer();
@@ -1154,7 +1154,7 @@ describe("Hoodie.Account", function() {
             return expect(this.hoodie.remote.disconnect).wasCalled();
           });
           it("should sign in with new username", function() {
-            return expect(this.account.signIn).wasCalledWith('new.joe@example.com', 'secret');
+            return expect(this.account._sendSignInRequest).wasCalledWith('new.joe@example.com', 'secret');
           });
           _and("signIn is successful", function() {
             beforeEach(function() {

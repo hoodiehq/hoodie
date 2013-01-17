@@ -130,25 +130,12 @@ class Hoodie.Account
   # Besides the standard sign in we also check if the account has been confirmed
   # (roles include "confirmed" role).
   # 
-  # NOTE: When signing in, all local data gets cleared beforehand. Otherwise
-  #       data that has been created beforehand (authenticated with another
-  #       user account or anonymously) would be merged into the user account
-  #       that signs in.
+  # NOTE: When signing in, all local data gets cleared beforehand (with a signOut). 
+  #       Otherwise data that has been created beforehand (authenticated with 
+  #       another user account or anonymously) would be merged into the user 
+  #       account that signs in.
   signIn : (username, password = '') ->
-    if @username and @username isnt username
-      return @hoodie.defer().reject(error: 'You have to sign out first').promise()
-
-    options = data: 
-                name      : @_userKey(username)
-                password  : password
-
-    @_withPreviousRequestsAborted 'signIn', =>
-      @signOut().pipe =>
-        promise = @hoodie.request('POST', '/_session', options)
-        promise.pipe(@_handleSignInSuccess, @_handleRequestError)
-
-  # alias
-  login: @::signIn
+    @signOut().pipe => @_sendSignInRequest(username, password)
 
 
   # sign out 
@@ -164,9 +151,6 @@ class Hoodie.Account
 
     @hoodie.remote.disconnect()
     @_sendSignOutRequest().pipe(@_cleanup)
-
-  # alias
-  logout: @::signOut
   
   
   # On
@@ -361,7 +345,7 @@ class Hoodie.Account
   _delayedSignIn : (username, password) =>
     defer = @hoodie.defer()
     window.setTimeout ( =>
-      promise = @signIn(username, password)
+      promise = @_sendSignInRequest(username, password)
       promise.done(defer.resolve)
       promise.fail (error) =>
         if error.error is 'unconfirmed'
@@ -501,7 +485,7 @@ class Hoodie.Account
   # 3. sign in with new credentials to create new sesion.
   #
   _changeUsernameAndPassword : (currentPassword, newUsername, newPassword) ->
-    @signIn(@username, currentPassword).pipe =>
+    @_sendSignInRequest(@username, currentPassword).pipe =>
       @fetch().pipe @_sendChangeUsernameAndPasswordRequest(currentPassword, newUsername, newPassword)
   
   #
@@ -612,7 +596,18 @@ class Hoodie.Account
   _withSingleRequest: (name, requestFunction) ->
     return @_requests[name] if @_requests[name]?.state?() is 'pending'
     @_requests[name] = requestFunction()
+  
   # 
   _sendSignOutRequest: ->
     @_withSingleRequest 'signOut', =>
       @hoodie.request('DELETE', '/_session').pipe(null, @_handleRequestError)
+
+  # 
+  _sendSignInRequest: (username, password) ->
+    options = data: 
+                name      : @_userKey(username)
+                password  : password
+
+    @_withPreviousRequestsAborted 'signIn', =>
+      promise = @hoodie.request('POST', '/_session', options)
+      promise.pipe(@_handleSignInSuccess, @_handleRequestError)
