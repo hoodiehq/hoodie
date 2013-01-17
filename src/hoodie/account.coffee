@@ -603,6 +603,14 @@ class Hoodie.Account
       @hoodie.request('DELETE', '/_session').pipe(null, @_handleRequestError)
 
   # 
+  # the sign in request that starts a CouchDB session if
+  # it succeeds. We separated the actual sign in request from
+  # the signIn method, as the latter also runs signOut intenrtally
+  # to clean up local data before starting a new session. But as
+  # other methods like signUp or changePassword do also need to
+  # sign in the user (again), these need to send the sign in 
+  # request but without a signOut beforehand, as the user remains
+  # the same.
   _sendSignInRequest: (username, password) ->
     options = data: 
                 name      : @_userKey(username)
