@@ -123,8 +123,7 @@ Hoodie.Account = (function() {
 
   Account.prototype.signOut = function() {
     if (!this.hasAccount()) {
-      this._cleanup();
-      return this.hoodie.defer().resolve().promise();
+      return this._cleanup();
     }
     this.hoodie.remote.disconnect();
     return this._sendSignOutRequest().pipe(this._cleanup);
@@ -207,8 +206,7 @@ Hoodie.Account = (function() {
 
   Account.prototype.destroy = function() {
     if (!this.hasAccount()) {
-      this._cleanup();
-      return;
+      return this._cleanup();
     }
     return this.fetch().pipe(this._handleFetchBeforeDestroySucces, this._handleRequestError).pipe(this._cleanup);
   };
@@ -408,7 +406,8 @@ Hoodie.Account = (function() {
     delete this._authenticated;
     this.hoodie.config.clear();
     this.trigger('signout');
-    return this._setOwner(this.hoodie.uuid());
+    this._setOwner(this.hoodie.uuid());
+    return this.hoodie.defer().resolve().promise();
   };
 
   Account.prototype._userKey = function(username) {

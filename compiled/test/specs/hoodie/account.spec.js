@@ -962,6 +962,9 @@ describe("Hoodie.Account", function() {
       beforeEach(function() {
         return spyOn(this.account, "hasAccount").andReturn(true);
       });
+      it("should return a promise", function() {
+        return expect(this.account.destroy()).toBePromise();
+      });
       return _and("destroy request succesful", function() {
         beforeEach(function() {
           this.hoodie.request.andReturn(this.hoodie.defer().resolve().promise());
@@ -987,7 +990,10 @@ describe("Hoodie.Account", function() {
     return _when("user has no account", function() {
       beforeEach(function() {
         spyOn(this.account, "hasAccount").andReturn(false);
-        return this.account.destroy();
+        return this.promise = this.account.destroy();
+      });
+      it("should return a promise", function() {
+        return expect(this.promise).toBePromise();
       });
       it("should not try to fetch", function() {
         return expect(this.account.fetch).wasNotCalled();

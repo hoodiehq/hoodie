@@ -141,13 +141,10 @@ class Hoodie.Account
   # sign out 
   # ---------
 
-  # uses standard CouchDB API to remove a user session (DELETE /_session)
+  # uses standard CouchDB API to invalidate a user session (DELETE /_session)
   signOut : ->
 
-    unless @hasAccount()
-      @_cleanup()
-      return @hoodie.defer().resolve().promise()
-      
+    return @_cleanup() unless @hasAccount()
 
     @hoodie.remote.disconnect()
     @_sendSignOutRequest().pipe(@_cleanup)
@@ -156,15 +153,16 @@ class Hoodie.Account
   # On
   # ---
 
-  # alias for `hoodie.on`
+  # shortcut for `hoodie.on`
   on : (event, cb) -> 
     event = event.replace /(^| )([^ ]+)/g, "$1account:$2"
     @hoodie.on event, cb
 
+
   # Trigger
   # ---
 
-  # alias for `hoodie.trigger`
+  # shortcut for `hoodie.trigger`
   trigger : (event, parameters...) -> 
     @hoodie.trigger "account:#{event}", parameters...
   
@@ -262,8 +260,7 @@ class Hoodie.Account
   destroy : ->
 
     unless @hasAccount()
-      @_cleanup()
-      return
+      return @_cleanup()
 
     @fetch()
     .pipe(@_handleFetchBeforeDestroySucces, @_handleRequestError)
@@ -330,7 +327,7 @@ class Hoodie.Account
   #
   #     {
   #         "ok": true,
-  #         "id": "org.couchdb.user:furz",
+  #         "id": "org.couchdb.user:joe",
   #         "rev": "1-e8747d9ae9776706da92810b1baa4248"
   #     }
   #
@@ -520,6 +517,8 @@ class Hoodie.Account
     @trigger 'signout'
 
     @_setOwner @hoodie.uuid()
+
+    @hoodie.defer().resolve().promise()
     
 
   #

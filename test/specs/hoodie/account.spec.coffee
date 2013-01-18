@@ -804,6 +804,9 @@ describe "Hoodie.Account", ->
       beforeEach ->
         spyOn(@account, "hasAccount").andReturn true
 
+      it "should return a promise", ->
+        expect(@account.destroy()).toBePromise() 
+
       _and "destroy request succesful", ->
         beforeEach ->
           @hoodie.request.andReturn @hoodie.defer().resolve().promise()
@@ -827,7 +830,10 @@ describe "Hoodie.Account", ->
     _when "user has no account", ->
       beforeEach ->
         spyOn(@account, "hasAccount").andReturn false
-        @account.destroy()
+        @promise = @account.destroy()
+
+      it "should return a promise", ->
+        expect(@promise).toBePromise()
 
       it "should not try to fetch", ->
         expect(@account.fetch).wasNotCalled() 
