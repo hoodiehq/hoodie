@@ -72,12 +72,21 @@ class Hoodie.Remote
       @prefix = @name
       
     @prefix = options.prefix if options.prefix?
-    
-     
-      
 
     @_sync   = options.sync   if options.sync
     @store   = new Hoodie.RemoteStore @hoodie, this
+
+    # NOTE: 
+    # Due to a bug in Chrome (I guess), the loader won't disappear
+    # when the page is loaded, when we start a long poll request
+    # before the page loaded.
+    # On the other side, we do not want to wait for to the page
+    # and all its assets to be loaded before we start loading
+    # our data. 
+    # A good way to fix it would be a special `bootstrap` method,
+    # that would all docs with a normal GET /_all_docs request,
+    # after that it would start with the GET /_changes requests,
+    # starting with the current seq number of the database.
     @startSyncing() if @isContinuouslySyncing()
 
   

@@ -8,10 +8,10 @@ Delete all user accounts
 --------------------------
 
 ```js
-$.couch.db('_users').allDocs( {success: function(response) {
+$.couch.db('_users').allDocs( {include_docs: true, success: function(response) {
   var docs = []
   $.each(response.rows, function() {
-    if (/org.couchdb.user/.test(this.id)) docs.push({_id: this.id, _rev: this.value.rev})
+    if (/org.couchdb.user/.test(this.id)) docs.push(this.doc)
   })
   $.couch.db('_users').bulkRemove({docs: docs})
 }})
