@@ -31,12 +31,19 @@ hoodie.share( shareId ).store.findAll()
 hoodie.share( shareId ).subscribe()
 
 // sending emails … yep.
-hoodie.email.send( {
+var magic = hoodie.email.send( {
   to      : ['susan@example.com'],
   cc      : ['bill@example.com'],
   subject : 'rule the world',
   body    : "we can do it!\nSigned, Joe"
 } )
+magic.done( function(mail) { 
+  alert("Mail has been sent to " + mail.to)
+})
+magic.fail( function(eror) { 
+  alert("Sory, but something went wrong: " + error.reason)
+})
+
 ```
 
 Like what you see? Good. Because we got more: http://hoodiehq.github.com/hoodie.js
