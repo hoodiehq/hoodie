@@ -36,12 +36,12 @@ Q & A
    
 ### 2. I don't really like CoffeeScript
    
-Oh, that's actually great! What we care most about is [hoodie's API](hoodiehq.github.com/hoodie.js).
+Oh, that's actually great! What we care most about is [hoodie's API](http://hoodiehq.github.com/hoodie.js).
 If you feel the implemantion could be better, please go ahead, we're happy to assist. Take [underscore](http://underscorejs.org/) /
 [lodash](http://lodash.com/) for a great outcome of the same approach.  
    
 ### 3. I don't like nodeJS / couchDB / ponys?
    
 Oh my, even better! We think every backend deserve a nicely tailored hoodie, wouldn't you agree?
-So why not make one for your beloved one, we are happy to help. Just stick to [hoodie's API](hoodiehq.github.com/hoodie.js)
+So why not make one for your beloved one, we are happy to help. Just stick to [hoodie's API](http://hoodiehq.github.com/hoodie.js)
 and the frotend-ers out there won't even tell the difference ;-)  
