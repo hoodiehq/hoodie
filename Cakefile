@@ -39,10 +39,10 @@ task 'compile', 'Build lib/', ->
 task 'watch', 'Build lib/ and watch for changes', ->
   build(null, true)
   
-task 'test', 'test', ->
+task 'test', 'Run all test', ->
   test()
     
-task 'autotest', 'autotest', ->
+task 'autotest', 'Run all tests & rerun on file changes', ->
   build ( -> 
     clear();
     test() 
@@ -102,7 +102,7 @@ task 'docs', 'create docs from code', ->
   groc.stdout.on 'data', (data) -> print data.toString()
   groc.on 'exit', (status) -> callback?() if status is 0
 
-task 'wishlist', 'create docs from code', ->
+task 'wishlist', 'create docs from dream code', ->
   groc = spawn 'groc', ['-t wishlist/', '-o whishlist/doc', 'wishlist/**/*.js']
   groc.stdout.on 'data', (data) -> print data.toString()
   groc.on 'exit', (status) -> callback?() if status is 0
