@@ -61,7 +61,7 @@ task 'console', 'run a browser console, from command line, hell yeah', ->
     print data.toString()
    
   
-task 'build', 'build hoodie-client.min.js', -> 
+task 'build', 'build hoodie.min.js', -> 
   
   # the files need to be in a specific order, 
   # as some modules depend on others (e.g.

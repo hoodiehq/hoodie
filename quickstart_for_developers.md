@@ -20,11 +20,17 @@ cake watch                # Build lib/ and watch for changes
 cake test                 # Run all test
 cake autotest             # Run all tests & rerun on file changes
 cake console              # run a browser console, from command line, hell yeah
-cake build                # build hoodie-client.min.js
+cake build                # build hoodie.min.js
 cake docs                 # create docs from code
 cake wishlist             # create docs from dream code
 cake all                  # one cake to rule them all
 ```
+
+
+hoodie backend (server)
+-----------------------
+
+If you want to run a hoodie server locally, you need [hoodie app](https://github.com/hoodiehq/hoodie-app).
 
 
 Q & A
