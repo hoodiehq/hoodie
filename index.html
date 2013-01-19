@@ -11,8 +11,8 @@
     
     // initialize your Hoodie App
     
-    hoodieAppUrl = 'http://myapp.hood.ie';
-    hoodie = new Hoodie(hoodieAppUrl)
+    whereTheMagicHappens = 'https://yourapp.hood.ie';
+    hoodie = new Hoodie(whereTheMagicHappens);
     
     // 
     // Account 
@@ -57,10 +57,10 @@
     // Store
     //
     
-    // create a new object
+    // add a new object
     type = 'couch'
     attributes = {color: "red"}
-    hoodie.store.create(type, attributes )
+    hoodie.store.add(type, attributes )
       .done ( function(newObject) { } )
       .fail ( function(err)        { } )
       
@@ -98,12 +98,40 @@
       .done ( function(objects) { } )
       .fail ( function(err)     { } )
       
-    // destroy an existing object
+    // remove an existing object
     type = 'couch'
     id   = 'abc4567'
-    hoodie.store.destroy( type, id )
-      .done ( function(destroyedObject) { } )
-      .fail ( function(err)             { } )
+    hoodie.store.remove( type, id )
+      .done ( function(removedObject) { } )
+      .fail ( function(err)           { } )
+
+    // listen to store events
+    hoodie.store.on( 'add',    function( newObject) { } )
+
+    // new doc created
+    hoodie.store.on( 'add',    function( newObject) { } )
+
+    // existing doc updated
+    hoodie.store.on( 'update', function( updatedObject) { } )
+
+    // doc destroyed
+    hoodie.store.on( 'remove', function( removedObject) { } )
+
+    // any of the events above
+    hoodie.store.on( 'change', function( event, changedObject) { } )
+
+    // all listeners can be filtered by type
+    hoodie.store.on( "add:couch",    function( newObject) { } )
+    hoodie.store.on( "update:couch", function( updatedObject)  { } )
+    hoodie.store.on( "remove:couch", function( removedObject) { } )
+    hoodie.store.on( "change:couch", function( event, changedObject) { } )
+
+    // ... and by type and id
+    hoodie.store.on( "add:couch:uuid123",    function( newObject) { } )
+    hoodie.store.on( "update:couch:uuid123", function( updatedObject)  { } )
+    hoodie.store.on( "remove:couch:uuid123", function( removedObject) { } )
+    hoodie.store.on( "change:couch:uuid123", function( event, changedObject) { } )
+
       
     //
     // Synchronization
@@ -113,27 +141,27 @@
     // 
     
     // new doc created
-    hoodie.remote.on( 'create', function( createdObject) { } )
+    hoodie.remote.on( 'add', function( newObject) { } )
 
     // existing doc updated
     hoodie.remote.on( 'update', function( updatedObject) { } )
 
     // doc destroyed
-    hoodie.remote.on( 'destroy', function( destroyedObject) { } )
+    hoodie.remote.on( 'remove', function( removedObject) { } )
 
-    // any of above events
+    // any of the events above
     hoodie.remote.on( 'change', function( event, changedObject) { } )
 
     // all listeners can be filtered by type
-    hoodie.remote.on( "create:couch",  function( createdObject) { } )
+    hoodie.remote.on( "add:couch",  function( newObject) { } )
     hoodie.remote.on( "update:couch",  function( updatedObject)  { } )
-    hoodie.remote.on( "destroy:couch", function( destroyedObject) { } )
+    hoodie.remote.on( "remove:couch", function( removedObject) { } )
     hoodie.remote.on( "change:couch",  function( event, changedObject) { } )
 
     // ... and by type and id
-    hoodie.remote.on( "create:couch:uuid123",  function( createdObject) { } )
+    hoodie.remote.on( "add:couch:uuid123",  function( newObject) { } )
     hoodie.remote.on( "update:couch:uuid123",  function( updatedObject)  { } )
-    hoodie.remote.on( "destroy:couch:uuid123", function( destroyedObject) { } )
+    hoodie.remote.on( "remove:couch:uuid123", function( removedObject) { } )
     hoodie.remote.on( "change:couch:uuid123",  function( event, changedObject) { } )
 
 
@@ -178,7 +206,7 @@
     // for additional security. Access can be differenciated between read and write.
     //
 
-    // create a new share
+    // add a new share
     hoodie.share.add().done( function(share) {} )
 
     // grant / revoke access
@@ -195,14 +223,14 @@
     // remove a specific todo from the share
     hoodie.store.find('todo', '123').unshareAt(share.id)
 
-    // create a new share and add some of my objects to it in one step
-    hoodie.store.find('todo').share()
+    // add a new share and add some of my objects to it in one step
+    hoodie.store.findAll('todo').share()
     .done( function(todos, share) { alert('shared at ' + share.id) } )
 
     // remove objects from all shares
-    hoodi.store.find('todo').unshare()
+    hoodi.store.findAll('todo').unshare()
 
-    // destroy share
+    // remove share
     hoodie.share.remove(share.id)
 
     // open a share and load all its objects
