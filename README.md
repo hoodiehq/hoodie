@@ -55,7 +55,7 @@ It's magic, stupid!™
 </script>
 ```
 
-The only thing you need is the URL of your app's hoodie, that's `whereTheMagicHappens`.
+Every app gets its own hoodie. You need to know the URL of yours, that's `whereTheMagicHappens`.
 Get it on [hood.ie](http://hood.ie). Or you [do it yourself](https://github.com/hoodiehq/hoodie-app)
 
 
