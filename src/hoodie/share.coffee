@@ -259,3 +259,8 @@ class Hoodie.Share
           updateObject(objects)
       
         return @hoodie.defer().resolve(value, newShare).promise()
+
+
+
+# extend Hoodie
+Hoodie.extend 'share', Hoodie.Share

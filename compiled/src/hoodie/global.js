@@ -9,3 +9,5 @@ Hoodie.Global = (function() {
   return Global;
 
 })();
+
+Hoodie.extend('global', Hoodie.Global);

@@ -53,3 +53,5 @@ Hoodie.Email = (function() {
   return Email;
 
 })();
+
+Hoodie.extend('email', Hoodie.Email);

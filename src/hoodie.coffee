@@ -1,4 +1,3 @@
-#
 # Hoodie
 # --------
 #
@@ -6,35 +5,6 @@
 #
 
 class Hoodie extends Events
-
-  # these modules hold the core functionality
-  # for hoodie to run. They depend on each other.
-  @modules : 
-    store   : 'LocalStore'
-    config  : 'Config'
-    account : 'Account'
-    remote  : 'AccountRemote'
-
-
-  # Besides the core modules, extensions can be loaded.
-  # The following extensions are availabale but default,
-  # but more can be added.
-  @extensions : 
-    user    : 'User'
-    global  : 'Global'
-    email   : 'Email'
-    share   : 'Share'
-
-
-  # extend Hoodie with custom module. Supports both named and anonymous modules
-  #
-  #     class myHoodieModule
-  #       // do some magic
-  #
-  #     Hoodie.extend('magic', MyHoodieModule)
-  #
-  @extend : (name, Module) ->
-    @extensions[name] = Module
   
 
   # ## Constructor
@@ -54,11 +24,16 @@ class Hoodie extends Events
       @baseUrl = @baseUrl.replace /\/+$/, ''
 
     else 
-
       @baseUrl = location.protocol + "//api." + location.hostname
 
-    @_loadModules @constructor.modules
-    @_loadModules @constructor.extensions
+    # init core modules 
+    @store   = new @constructor.LocalStore this
+    @config  = new @constructor.Config this
+    @account = new @constructor.Account this
+    @remote  = new @constructor.AccountRemote this
+
+    # init extensions
+    @_loadExtensions()
   
 
   # ## Requests
@@ -133,17 +108,27 @@ class Hoodie extends Events
   # 
   rejectWith : ->
     @defer().reject( arguments... ).promise()
+
   
+  # ## Extending hoodie
+
+  # You can either extend the Hoodie class, or a hoodie
+  # instance dooring runtime
+  #
+  #     Hoodie.extend('magic1', funcion(hoodie) { /* ... */ })
+  #     hoodie = new Hoodie
+  #     hoodie.extend('magic2', function(hoodie) { /* ... */ })
+  #     hoodie.magic1.doSomething()
+  #     hoodie.magic2.doSomethingElse()
+  @extend : (name, Module) -> 
+    @_extensions ||= {}
+    @_extensions[name] = Module
+  extend : (name, Module) -> 
+    @[name] = new Module this
 
   # ## Private
   
   #
-  _loadModules: (modules = @constructor.modules, context = this) ->
-
-    for instanceName, moduleName of modules
-        
-      switch typeof moduleName
-        when 'string'
-          context[instanceName] = new Hoodie[moduleName] this
-        when 'function'  
-          context[instanceName] = new moduleName this
+  _loadExtensions: ->
+    for instanceName, Module of @_extensions
+      @[instanceName] = new Module this

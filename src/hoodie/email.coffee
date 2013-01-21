@@ -43,3 +43,8 @@ class Hoodie.Email
       defer.resolve attributes
     else
       @hoodie.remote.one "updated:$email:#{attributes.id}", (attributes) => @_handleEmailUpdate(defer, attributes)
+
+
+
+# extend Hoodie
+Hoodie.extend 'email', Hoodie.Email

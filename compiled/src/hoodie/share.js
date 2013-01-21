@@ -248,3 +248,5 @@ Hoodie.Share = (function() {
   return Share;
 
 })();
+
+Hoodie.extend('share', Hoodie.Share);

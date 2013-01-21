@@ -51,3 +51,7 @@ class Hoodie.User
       objects = [objects] unless $.isArray objects
       for object in objects when object.$public
         @hoodie.store.update object.$type, object.id, $public: false
+
+
+# extend Hoodie
+Hoodie.extend 'user', Hoodie.User

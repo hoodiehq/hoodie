@@ -61,3 +61,5 @@ Hoodie.User = (function() {
   return User;
 
 })();
+
+Hoodie.extend('user', Hoodie.User);
