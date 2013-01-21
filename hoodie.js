@@ -81,24 +81,6 @@ Hoodie = (function(_super) {
 
   __extends(Hoodie, _super);
 
-  Hoodie.modules = {
-    store: 'LocalStore',
-    config: 'Config',
-    account: 'Account',
-    remote: 'AccountRemote'
-  };
-
-  Hoodie.extensions = {
-    user: 'User',
-    global: 'Global',
-    email: 'Email',
-    share: 'Share'
-  };
-
-  Hoodie.extend = function(name, Module) {
-    return this.extensions[name] = Module;
-  };
-
   function Hoodie(baseUrl) {
     this.baseUrl = baseUrl;
     if (this.baseUrl) {
@@ -106,8 +88,11 @@ Hoodie = (function(_super) {
     } else {
       this.baseUrl = location.protocol + "//api." + location.hostname;
     }
-    this._loadModules(this.constructor.modules);
-    this._loadModules(this.constructor.extensions);
+    this.store = new this.constructor.LocalStore(this);
+    this.config = new this.constructor.Config(this);
+    this.account = new this.constructor.Account(this);
+    this.remote = new this.constructor.AccountRemote(this);
+    this._loadExtensions();
   }
 
   Hoodie.prototype.request = function(type, path, options) {
@@ -170,27 +155,22 @@ Hoodie = (function(_super) {
     return (_ref = this.defer()).reject.apply(_ref, arguments).promise();
   };
 
-  Hoodie.prototype._loadModules = function(modules, context) {
-    var instanceName, moduleName, _results;
-    if (modules == null) {
-      modules = this.constructor.modules;
-    }
-    if (context == null) {
-      context = this;
-    }
+  Hoodie.extend = function(name, Module) {
+    this._extensions || (this._extensions = {});
+    return this._extensions[name] = Module;
+  };
+
+  Hoodie.prototype.extend = function(name, Module) {
+    return this[name] = new Module(this);
+  };
+
+  Hoodie.prototype._loadExtensions = function() {
+    var Module, instanceName, _ref, _results;
+    _ref = this._extensions;
     _results = [];
-    for (instanceName in modules) {
-      moduleName = modules[instanceName];
-      switch (typeof moduleName) {
-        case 'string':
-          _results.push(context[instanceName] = new Hoodie[moduleName](this));
-          break;
-        case 'function':
-          _results.push(context[instanceName] = new moduleName(this));
-          break;
-        default:
-          _results.push(void 0);
-      }
+    for (instanceName in _ref) {
+      Module = _ref[instanceName];
+      _results.push(this[instanceName] = new Module(this));
     }
     return _results;
   };
@@ -816,6 +796,8 @@ Hoodie.Email = (function() {
 
 })();
 
+Hoodie.extend('email', Hoodie.Email);
+
 Hoodie.Errors = {
   INVALID_KEY: function(idOrType) {
     var key;
@@ -1331,6 +1313,8 @@ Hoodie.Share = (function() {
 
 })();
 
+Hoodie.extend('share', Hoodie.Share);
+
 Hoodie.Store = (function() {
 
   function Store(hoodie) {
@@ -1581,6 +1565,8 @@ Hoodie.User = (function() {
 
 })();
 
+Hoodie.extend('user', Hoodie.User);
+
 Hoodie.Global = (function() {
 
   function Global(hoodie) {
@@ -1590,6 +1576,8 @@ Hoodie.Global = (function() {
   return Global;
 
 })();
+
+Hoodie.extend('global', Hoodie.Global);
 
 Hoodie.AccountRemote = (function(_super) {
 

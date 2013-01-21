@@ -44,9 +44,9 @@ magic.fail( function(eror) {
   alert("Sory, but something went wrong: " + error.reason)
 })
 
+// Like what you see? Good. Because we got more:
+// http://hoodiehq.github.com/hoodie.js
 ```
-
-Like what you see? Good. Because we got more: http://hoodiehq.github.com/hoodie.js
 
 
 But … how does it work?
