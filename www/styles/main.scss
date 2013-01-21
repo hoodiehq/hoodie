@@ -1,0 +1,331 @@
+@import "compass_twitter_bootstrap";
+
+/* apply a natural box layout model to all elements */
+* { -moz-box-sizing: border-box; -webkit-box-sizing: border-box; box-sizing: border-box; }
+
+// Image replacement / Hide text
+.ir {
+    text-indent: 100%;
+    white-space: nowrap;
+    overflow: hidden;
+}
+
+// Self-clearing container
+
+@mixin group(){
+  &:after{
+    content: "";
+    display: table;
+    clear: both;
+  }
+}
+
+.group {
+  @include group();
+}
+
+
+// Colors
+
+$sidebarBG: #f4e8d1;
+$mainBG:    tint($sidebarBG, 75);
+
+$brown:     #693c10;
+$orange:    #e94e1b;
+$yellow:    #f9b233;
+$green:     #0b8e36;
+$red:       #be1522;
+$blue:      #312783;
+$black:     #121212;
+
+$bgBlue:    #DAEDF7;
+$bgGreen:   tint($green, 50);
+$bgYellow:  tint($yellow, 30);
+$bgRed:     tint($red, 50);
+$bgBrown:   tint($brown, 65);
+
+// Type
+
+body{
+  color: $brown;
+  background: $mainBG;
+}
+
+h2{
+  font-size: 20px;
+}
+
+a {
+  text-decoration: none;
+  color: $brown;
+  //@include single-transition(color, 0.3s, ease-out, 0s);
+  position: relative;
+  padding: .5em;
+  margin: -.5em;
+}
+
+a:hover {
+  color: $brown;
+  font-weight: 800;
+  text-decoration: none;
+}
+
+// Notification badges, panels and alerts
+
+@mixin notificationsColors($bgColor) {
+  background: $bgColor;
+  color: shade($bgColor, 50);
+  border-color: shade($bgColor, 50);
+}
+
+.badge{
+  letter-spacing: 1px;
+  padding: 1px 8px 2px;
+  border: 1px solid white;
+  @include notificationsColors($bgBrown);
+}
+
+.panel{
+  letter-spacing: 1px;
+  border: 4px solid tint($yellow, 20);
+  @include notificationsColors($bgBrown);
+  @include border-radius(10px);
+  padding:6px 10px;
+  span{
+    font-size: 12px;
+  }
+  h1{
+    text-align: center;
+    margin: 0 0 20px 0;
+  }
+}
+
+.alert{
+  padding: 15px 35px 8px 14px;
+  border: 4px solid white;
+  @include border-radius(10px);
+  @include notificationsColors($bgBrown);
+}
+
+.badge-success,
+.alert-success,
+.panel.success{
+  @include notificationsColors($bgGreen);
+}
+.badge-warning,
+.alert-warning,
+.panel.warning{
+  @include notificationsColors($bgYellow);
+}
+.badge-error,
+.alert-error,
+.panel.error {
+ @include notificationsColors($bgRed);
+}
+.badge-info,
+.alert-info,
+.panel.info{
+  @include notificationsColors($bgBlue);
+}
+.badge-inverse,
+.alert-inverse,
+.panel.inverse{
+  background: $black;
+}
+
+// Forms
+
+.form-search input{
+  height: 30px;
+  @include border-radius(10px);
+  padding-top: 5px;
+}
+
+.pagination a{
+  margin: 0;
+  &:hover{
+    font-weight: normal;
+  }
+}
+.pagination span{
+  margin: 0;
+}
+// Lists
+
+
+// Sidebar
+
+.sidebar{
+  background: $sidebarBG;
+  width: 220px;
+  overflow: hidden;
+  height:4000px;
+  float:left;
+  border-right: 4px solid shade($sidebarBG, 10);
+  header{
+    margin: 0 20px;
+    .logo{
+      background: url('../images/hoodie_pocket_logo_176.png') no-repeat;
+      height: 53px;
+      margin-top: 20px;
+    }
+    h1{
+      margin-top: 5px;
+    }
+  }
+}
+
+// Navigation
+
+nav{
+  ul{
+    border-top: 1px solid $brown;
+    margin: 10px 20px 0;
+    padding-top: 10px;
+    li{
+      line-height: 30px;
+      list-style: none;
+      a{
+        display: block;
+      }
+      .badge{
+        float:right;
+        padding-top: 2px;
+        margin-top: 6px;
+        min-height: 1.5em;
+      }
+      &.active{
+        a{
+          font-weight: 800;
+        }
+      }
+    }
+  }
+}
+
+// Main
+
+h2.top{
+  border-bottom: 1px solid $brown;
+  padding-bottom: 5px;
+  margin-bottom: 20px;
+}
+
+h3.top{
+  margin-top: -16px;
+  padding-top: 0;
+}
+
+.main{
+  width:100%;
+  padding: 73px 20px 72px 240px;
+  .content{
+    max-width: 52em;
+    margin: 0;
+    &.centered{
+      margin: 0 auto;
+    }
+  }
+}
+
+.row-fluid.statistics{
+  max-height: 98px;
+  margin-bottom: 15px;
+}
+
+.userSearch{
+  .form-search{
+    display: block;
+    float:left;
+  }
+  .pagination{
+    height:30px;
+    a, span {
+      line-height: 28px;
+    }
+  }
+}
+.tableStatus{
+  display: block;
+  position: relative;
+  height: 20px;
+  .currentSearchTerm{
+    display: block;
+    float:left;
+  }
+  .currentSearchMetrics{
+    display: block;
+    float:right;
+  }
+}
+
+// Modules
+
+.module{
+  legend{
+    margin-bottom: 10px;
+    line-height: 40px;
+    border-bottom: 1px solid $brown;
+    color: $brown;
+  }
+  .description{
+    margin-bottom: 10px;
+    display: block;
+  }
+  section{
+    border-top: 1px solid tint($brown, 75);
+    padding-top: 10px;
+    @include clearfix();
+    overflow: hidden;
+    .formLabel{
+      width: 30%;
+      float:left;
+      margin-top: 10px;
+      padding-right: 10px;
+      padding-bottom: 10px;
+    }
+    .form{
+      width: 70%;
+      float:left;
+      margin-top: 5px;
+      padding-bottom: 6px;
+      .note{
+        font-size: 12px;
+        color: tint($brown, 50);
+      }
+      label.checkbox,
+      label.radio{
+        margin-top: 5px;
+      }
+      input[type="radio"], input[type="checkbox"] {
+        margin-top: 3px;
+      }
+    }
+  }
+
+  select,
+  textarea,
+  input[type="text"],
+  input[type="password"],
+  input[type="datetime"],
+  input[type="datetime-local"],
+  input[type="date"],
+  input[type="month"],
+  input[type="time"],
+  input[type="week"],
+  input[type="number"],
+  input[type="email"],
+  input[type="url"],
+  input[type="search"],
+  input[type="tel"],
+  input[type="color"],
+  .uneditable-input {
+    height: 30px;
+    display: block;
+    width: 75%;
+  }
+
+  textarea{
+    height: auto;
+  }
+}
