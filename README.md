@@ -63,7 +63,7 @@ But … how does it work?
 
 It's magic, stupid!™ 
 
-Every app gets its own hoodie. You need to setup one for you, because that's `whereTheMagicHappens`:
+Every app gets its own hoodie. You need to set one up, because that's `whereTheMagicHappens`:
 
 ```html
 <script src="hoodie.js"></script>
