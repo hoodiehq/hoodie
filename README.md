@@ -99,5 +99,5 @@ Want to join the revolution? Here's a [quickstart for developers](https://github
 License & Copyright
 -------------------
 
-(c) 2012 Gregor Martynus
+(c) 2012 Gregor Martynus  
 Licensed under the Apache License 2.0.
