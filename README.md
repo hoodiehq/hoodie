@@ -10,7 +10,7 @@ This is what you get:
 * emails
 * and so much more
 
-And that's what it looks like.
+And that's what it looks like:
 
 ```javascript
 // user authentication & more
