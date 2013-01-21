@@ -1,8 +1,8 @@
 hoodie ✪ power to the frontend!
 ===============================
 
-hoodie is a JavaScript library that runs in a browsers.  
-This is what you get:
+hoodie is a JavaScript library that runs in your browser.  
+It gives you
 
 * user authentication
 * data storage and sync
@@ -10,7 +10,7 @@ This is what you get:
 * emails
 * and so much more
 
-And that's what it looks like:
+And this is what it looks like:
 
 ```javascript
 // user authentication & more
