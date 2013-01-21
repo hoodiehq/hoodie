@@ -24,7 +24,7 @@ class Hoodie extends Events
       @baseUrl = @baseUrl.replace /\/+$/, ''
 
     else 
-      @baseUrl = location.protocol + "//api." + location.hostname
+      @baseUrl = location.protocol + "//api." + location.hostname.replace(/^www\./, '')
 
     # init core modules 
     @store   = new @constructor.LocalStore this
