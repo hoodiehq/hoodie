@@ -1,10 +1,8 @@
+# Hello from Backbone! Woop (undefined, #undefined)
 # XMLHttpRequest cannot load http://localhost/_session. Origin http://localhost:3501 is not allowed by Access-Control-Allow-Origin. (undefined, #undefined)
-# XMLHttpRequest cannot load http://localhost/. Origin http://localhost:3501 is not allowed by Access-Control-Allow-Origin. (undefined, #undefined)
-# hoodie has an error. (undefined, #undefined)
-# [object Object] (undefined, #undefined)
 CACHE MANIFEST
 
-# Time: Mon Jan 21 2013 13:35:29 GMT+0100 (CET)
+# Time: Mon Jan 21 2013 21:12:56 GMT+0100 (CET)
 # This manifest was created by confess.js, http://github.com/jamesgpearce/confess
 #
 # Retrieved URL: http://localhost:3501/
@@ -26,10 +24,13 @@ CACHE MANIFEST
 
 CACHE:
 http://ajax.googleapis.com/ajax/libs/jquery/1.8.0/jquery.min.js
-scripts/08a8d2c9.app.js
-scripts/bff95fee.plugins.js
+http://localhost:3501/app/images/glyphicons-halflings-white.png?1358768137
+http://localhost:3501/app/images/glyphicons-halflings.png?1358768137
+http://localhost:3501/images/hoodie_pocket_logo_176.png
+scripts/9eecb7db.app.js
+scripts/d8d246fe.plugins.js
 scripts/vendor/cf69c6f2.modernizr.min.js
-styles/051c0509.main.css
+styles/40fd5dc2.main.css
 
 NETWORK:
 *

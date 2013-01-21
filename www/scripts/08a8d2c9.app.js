@@ -1,1 +1,0 @@
-whereTheMagicHappens=location.protocol+"//"+location.hostname.replace(/^admin/,"api");var hoodie=new Hoodie(whereTheMagicHappens);hoodie.request("GET","/").done(function(a){console.log("hoodie is a go."),console.log(a)}).fail(function(a){console.log("hoodie has an error."),console.log(a)});
