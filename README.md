@@ -1,7 +1,16 @@
 hoodie ✪ power to the frontend!
 ===============================
 
-hoodie is a nice way to dress a backend, so you actually enjoy talking to it. Who cares, anyway? All we want is to allow users to sign up and to access their data from all their devices, right? Well, now you can. And we made it pretty for you:
+hoodie is a JavaScript library that runs in a browsers.  
+This is what you get:
+
+* user authentication
+* data storage and sync
+* sharing
+* emails
+* and so much more
+
+And that's what it looks like.
 
 ```javascript
 // user authentication & more
