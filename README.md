@@ -63,6 +63,8 @@ But … how does it work?
 
 It's magic, stupid!™ 
 
+Every app gets its own hoodie. You need to setup one for you, because that's `whereTheMagicHappens`:
+
 ```html
 <script src="hoodie.js"></script>
 <script>
@@ -71,14 +73,15 @@ It's magic, stupid!™
 </script>
 ```
 
-Every app gets its own hoodie. You need to know the URL of yours, that's `whereTheMagicHappens`.
-Get it on [hood.ie](http://hood.ie). Or you [do it yourself](https://github.com/hoodiehq/hoodie-app)
+You can get a hoodie for your app with only a few clicks over on [hood.ie](http://hood.ie).
+
+If you like to host the magic yourselves, [there you go](https://github.com/hoodiehq/hoodie-app).
 
 
 Dependencies
 ------------
 
-hoodie currently depends on on [jQuery](http://jquery.com), but that's only temporary. 
+hoodie borrows some functionality from [jQuery](http://jquery.com), but we plan to remove this dependency soon.
 
 
 Feedback
