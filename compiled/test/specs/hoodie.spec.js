@@ -16,10 +16,10 @@ describe("Hoodie", function() {
       hoodie = new Hoodie('http://couch.example.com/');
       return expect(hoodie.baseUrl).toBe('http://couch.example.com');
     });
-    return it("should default the CouchDB URL to ''", function() {
+    return it("should default the CouchDB URL to current domain with a api subdomain", function() {
       var hoodie;
       hoodie = new Hoodie;
-      return expect(hoodie.baseUrl).toBe('');
+      return expect(hoodie.baseUrl).toBe(location.protocol + "//api." + location.hostname);
     });
   });
   describe("#request(type, path, options)", function() {
@@ -105,15 +105,15 @@ describe("Hoodie", function() {
   describe("#resolveWith(something)", function() {
     return it("wraps passad arguments into a promise and returns it", function() {
       var promise;
-      promise = this.hoodie.resolveWith('funky');
-      return expect(promise).toBeResolvedWith('funky');
+      promise = this.hoodie.resolveWith('funky', 'fresh');
+      return expect(promise).toBeResolvedWith('funky', 'fresh');
     });
   });
   return describe("#rejectWith(something)", function() {
     return it("wraps passad arguments into a promise and returns it", function() {
       var promise;
-      promise = this.hoodie.rejectWith('funky');
-      return expect(promise).toBeRejectedWith('funky');
+      promise = this.hoodie.rejectWith('funky', 'fresh');
+      return expect(promise).toBeRejectedWith('funky', 'fresh');
     });
   });
 });

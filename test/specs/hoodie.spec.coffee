@@ -13,9 +13,10 @@ describe "Hoodie", ->
       hoodie = new Hoodie 'http://couch.example.com/'
       expect(hoodie.baseUrl).toBe 'http://couch.example.com'
       
-    it "should default the CouchDB URL to ''", ->
+    it "should default the CouchDB URL to current domain with a api subdomain", ->
+      # that's kind of hard to test.
       hoodie = new Hoodie
-      expect(hoodie.baseUrl).toBe ''
+      expect(hoodie.baseUrl).toBe location.protocol + "//api." + location.hostname
   # /constructor
   
   describe "#request(type, path, options)", ->
@@ -83,13 +84,13 @@ describe "Hoodie", ->
 
   describe "#resolveWith(something)", ->
     it "wraps passad arguments into a promise and returns it", ->
-       promise = @hoodie.resolveWith('funky')
-       expect(promise).toBeResolvedWith 'funky'
+       promise = @hoodie.resolveWith('funky', 'fresh')
+       expect(promise).toBeResolvedWith 'funky', 'fresh'
   # /#resolveWith(something)
 
   describe "#rejectWith(something)", ->
     it "wraps passad arguments into a promise and returns it", ->
-       promise = @hoodie.rejectWith('funky')
-       expect(promise).toBeRejectedWith 'funky'
+       promise = @hoodie.rejectWith('funky', 'fresh')
+       expect(promise).toBeRejectedWith 'funky', 'fresh'
   # /#rejectWith(something)
 # /Hoodie

@@ -100,8 +100,12 @@ Hoodie = (function(_super) {
   };
 
   function Hoodie(baseUrl) {
-    this.baseUrl = baseUrl != null ? baseUrl : '';
-    this.baseUrl = this.baseUrl.replace(/\/+$/, '');
+    this.baseUrl = baseUrl;
+    if (this.baseUrl) {
+      this.baseUrl = this.baseUrl.replace(/\/+$/, '');
+    } else {
+      this.baseUrl = location.protocol + "//api." + location.hostname;
+    }
     this._loadModules(this.constructor.modules);
     this._loadModules(this.constructor.extensions);
   }
@@ -133,8 +137,6 @@ Hoodie = (function(_super) {
     return new Hoodie.Remote(this, options);
   };
 
-  Hoodie.prototype.defer = $.Deferred;
-
   Hoodie.prototype.uuid = function(len) {
     var chars, i, radix;
     if (len == null) {
@@ -152,20 +154,24 @@ Hoodie = (function(_super) {
     })()).join('');
   };
 
+  Hoodie.prototype.defer = $.Deferred;
+
   Hoodie.prototype.isPromise = function(obj) {
     return typeof (obj != null ? obj.done : void 0) === 'function' && typeof obj.resolve === 'undefined';
   };
 
-  Hoodie.prototype.resolveWith = function(something) {
-    return this.defer().resolve(something).promise();
+  Hoodie.prototype.resolveWith = function() {
+    var _ref;
+    return (_ref = this.defer()).resolve.apply(_ref, arguments).promise();
   };
 
-  Hoodie.prototype.rejectWith = function(something) {
-    return this.defer().reject(something).promise();
+  Hoodie.prototype.rejectWith = function() {
+    var _ref;
+    return (_ref = this.defer()).reject.apply(_ref, arguments).promise();
   };
 
   Hoodie.prototype._loadModules = function(modules, context) {
-    var instanceName, moduleName, namespace, _results;
+    var instanceName, moduleName, _results;
     if (modules == null) {
       modules = this.constructor.modules;
     }
@@ -183,9 +189,7 @@ Hoodie = (function(_super) {
           _results.push(context[instanceName] = new moduleName(this));
           break;
         default:
-          namespace = instanceName;
-          context[namespace] || (context[namespace] = {});
-          _results.push(this._loadModules(modules[namespace], context[namespace]));
+          _results.push(void 0);
       }
     }
     return _results;

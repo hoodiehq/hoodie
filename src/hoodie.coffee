@@ -4,40 +4,68 @@
 #
 # the door to world domination (apps)
 #
+
 class Hoodie extends Events
 
-  # modules to be loaded
-  @modules: 
+  # these modules hold the core functionality
+  # for hoodie to run. They depend on each other.
+  @modules : 
     store   : 'LocalStore'
     config  : 'Config'
     account : 'Account'
     remote  : 'AccountRemote'
 
-  # extensions, get loaded after the core modules
+
+  # Besides the core modules, extensions can be loaded.
+  # The following extensions are availabale but default,
+  # but more can be added.
   @extensions : 
     user    : 'User'
     global  : 'Global'
     email   : 'Email'
     share   : 'Share'
 
-  # extend Hoodie with a custom module. Supports both named and anonymous modules
-  @extend: (name, Module) ->
+
+  # extend Hoodie with custom module. Supports both named and anonymous modules
+  #
+  #     class myHoodieModule
+  #       // do some magic
+  #
+  #     Hoodie.extend('magic', MyHoodieModule)
+  #
+  @extend : (name, Module) ->
     @extensions[name] = Module
+  
 
-  # ## initialization
+  # ## Constructor
 
-  # Inits the Hoodie, an optional CouchDB URL can be passed
-  constructor : (@baseUrl = '') ->
+  # When initializing a hoodie instance, an optional URL
+  # can be passed. That's the URL of a hoodie backend.
+  # If no URL passed it defaults to the current domain
+  # with an `api` subdomain.
+  #
+  #     // init a new hoodie instance
+  #     hoodie = new Hoodie
+  #
+  constructor : (@baseUrl) ->
 
-    # remove trailing slash(es)
-    @baseUrl = @baseUrl.replace /\/+$/, ''
+    if @baseUrl
+      # remove trailing slash(es)
+      @baseUrl = @baseUrl.replace /\/+$/, ''
+
+    else 
+
+      @baseUrl = location.protocol + "//api." + location.hostname
+
     @_loadModules @constructor.modules
     @_loadModules @constructor.extensions
   
 
-  # ## Request
+  # ## Requests
 
-  # use this method to send AJAX request to the Couch.
+  # use this method to send requests to the hoodie backend.
+  # 
+  #     promise = hoodie.request('GET', '/user_database/doc_id')
   #
   request : (type, path, options = {}) ->
     defaults =
@@ -50,7 +78,7 @@ class Hoodie extends Events
     $.ajax $.extend defaults, options
 
 
-  # ## open
+  # ## Open stores
 
   # generic method to open a store. Used by
   #
@@ -59,40 +87,52 @@ class Hoodie extends Events
   # * hoodie.global
   # * ... and more
   # 
-  # usage: `hoodie.open("some_store_name").findAll()`
+  #     hoodie.open("some_store_name").findAll()
   #
   open : (store_name, options = {}) ->
     $.extend options, name: store_name
     new Hoodie.Remote this, options
-
-
-  # ## Defer
-
-  # returns a defer object for custom promise handlings
-  defer: $.Deferred
   
 
-  # ## Utils
+  # ## uuid
 
-  # helper to generate uuids.
+  # helper to generate unique ids.
   uuid : (len = 7) ->
     chars = '0123456789abcdefghijklmnopqrstuvwxyz'.split('')
     radix = chars.length
     (
       chars[ 0 | Math.random()*radix ] for i in [0...len]
     ).join('')
+
+
+  # ## Defers / Promises
+
+  # returns a defer object for custom promise handlings.
+  # Promises are heavely used throughout the code of hoodie.
+  # We currently borrow jQuery's implementation:
+  # http://api.jquery.com/category/deferred-object/
+  # 
+  #     defer = hoodie.defer()
+  #     if (good) {
+  #       defer.resolve('good.')
+  #     } else {
+  #       defer.reject('not good.')
+  #     }
+  #     return defer.promise()
+  # 
+  defer: $.Deferred
   
   # 
-  isPromise: (obj) ->
+  isPromise : (obj) ->
     typeof obj?.done is 'function' and typeof obj.resolve is 'undefined'
 
   #
-  resolveWith: (something) ->
-    @defer().resolve(something).promise()
+  resolveWith : ->
+    @defer().resolve( arguments... ).promise()
 
   # 
-  rejectWith: (something) ->
-    @defer().reject(something).promise()
+  rejectWith : ->
+    @defer().reject( arguments... ).promise()
   
 
   # ## Private
@@ -107,7 +147,3 @@ class Hoodie extends Events
           context[instanceName] = new Hoodie[moduleName] this
         when 'function'  
           context[instanceName] = new moduleName this
-        else
-          namespace = instanceName
-          context[namespace] or= {}
-          @_loadModules modules[namespace], context[namespace]
