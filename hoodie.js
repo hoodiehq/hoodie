@@ -166,7 +166,7 @@ Hoodie = (function(_super) {
 
   Hoodie.prototype._loadExtensions = function() {
     var Module, instanceName, _ref, _results;
-    _ref = this._extensions;
+    _ref = this.constructor._extensions;
     _results = [];
     for (instanceName in _ref) {
       Module = _ref[instanceName];

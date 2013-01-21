@@ -130,5 +130,5 @@ class Hoodie extends Events
   
   #
   _loadExtensions: ->
-    for instanceName, Module of @_extensions
+    for instanceName, Module of @constructor._extensions
       @[instanceName] = new Module this
