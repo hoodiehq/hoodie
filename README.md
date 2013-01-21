@@ -87,7 +87,7 @@ hoodie borrows some functionality from [jQuery](http://jquery.com), but we plan 
 Feedback
 --------
 
-If you have anykind of feedback, especially regarding hoodie's API, please [let us know](https://github.com/hoodiehq/hoodie.js/issues). You can also find us on Twitter: [@hoodiehq](https://twitter.com/hoodiehq)
+If you have any kind of feedback, especially regarding hoodie's API, please [let us know](https://github.com/hoodiehq/hoodie.js/issues). You can also find us on Twitter: [@hoodiehq](https://twitter.com/hoodiehq)
 
 
 Contribute
