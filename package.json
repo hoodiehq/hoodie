@@ -5,7 +5,8 @@
     "http-proxy": "*",
     "connect": "*",
     "corsproxy": "git://github.com/janl/CORS-Proxy.git",
-    "multicouch": ">=0.2.1"
+    "multicouch": ">=0.2.5",
+    "request": "*"
   },
   "scripts": {
     "start": "node lib/hoodie-app.js"
