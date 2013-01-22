@@ -336,10 +336,21 @@ Hoodie.LocalStore = (function(_super) {
   };
 
   LocalStore.prototype.clear = function() {
-    var defer;
+    var defer, key, keys, results;
     defer = this.hoodie.defer();
     try {
-      this.db.clear();
+      keys = this._index();
+      results = (function() {
+        var _i, _len, _results;
+        _results = [];
+        for (_i = 0, _len = keys.length; _i < _len; _i++) {
+          key = keys[_i];
+          if (this._isSemanticId(key)) {
+            _results.push(this.db.removeItem(key));
+          }
+        }
+        return _results;
+      }).call(this);
       this._cached = {};
       this.clearChanged();
       defer.resolve();

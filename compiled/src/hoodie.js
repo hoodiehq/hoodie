@@ -12,7 +12,7 @@ Hoodie = (function(_super) {
     if (this.baseUrl) {
       this.baseUrl = this.baseUrl.replace(/\/+$/, '');
     } else {
-      this.baseUrl = location.protocol + "//api." + location.hostname;
+      this.baseUrl = location.protocol + "//api." + location.hostname.replace(/^www\./, '');
     }
     this.store = new this.constructor.LocalStore(this);
     this.config = new this.constructor.Config(this);
@@ -92,7 +92,7 @@ Hoodie = (function(_super) {
 
   Hoodie.prototype._loadExtensions = function() {
     var Module, instanceName, _ref, _results;
-    _ref = this._extensions;
+    _ref = this.constructor._extensions;
     _results = [];
     for (instanceName in _ref) {
       Module = _ref[instanceName];

@@ -573,8 +573,11 @@ describe "Hoodie.LocalStore", ->
       expect(promise).toBePromise()
       
     it "should clear localStorage", ->
+      spyOn(@store, "_index").andReturn ['$config/hoodie', 'car/123', '_notOurBusiness']
       @store.clear()
-      do expect(@store.db.clear).wasCalled
+      expect(@store.db.removeItem).wasCalledWith '$config/hoodie'
+      expect(@store.db.removeItem).wasCalledWith 'car/123'
+      expect(@store.db.removeItem).wasNotCalledWith '_notOurBusiness'
     
     it "should clear chache", ->
       @store._cached = 'funky'
@@ -584,7 +587,7 @@ describe "Hoodie.LocalStore", ->
     it "should clear dirty docs", ->
       spyOn(@store, "clearChanged")
       @store.clear()      
-      do expect(@store.clearChanged).wasCalled
+      expect(@store.clearChanged).wasCalled()
       
     it "should resolve promise", ->
       promise = @store.clear()

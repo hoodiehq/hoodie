@@ -377,7 +377,10 @@ class Hoodie.LocalStore extends Hoodie.Store
     defer = @hoodie.defer()
   
     try
-      @db.clear()
+      keys = @_index()
+      results = for key in keys when @_isSemanticId key
+        @db.removeItem key
+
       @_cached = {}
       @clearChanged()
     

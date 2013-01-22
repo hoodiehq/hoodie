@@ -846,8 +846,11 @@ describe("Hoodie.LocalStore", function() {
       return expect(promise).toBePromise();
     });
     it("should clear localStorage", function() {
+      spyOn(this.store, "_index").andReturn(['$config/hoodie', 'car/123', '_notOurBusiness']);
       this.store.clear();
-      return expect(this.store.db.clear).wasCalled();
+      expect(this.store.db.removeItem).wasCalledWith('$config/hoodie');
+      expect(this.store.db.removeItem).wasCalledWith('car/123');
+      return expect(this.store.db.removeItem).wasNotCalledWith('_notOurBusiness');
     });
     it("should clear chache", function() {
       this.store._cached = 'funky';
