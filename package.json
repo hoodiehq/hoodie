@@ -1,13 +1,14 @@
 {
   "name": "hoodie-app",
-  "version": "0.3.14",
+  "version": "0.3.15",
   "dependencies": {
     "http-proxy": "*",
     "connect": "*",
     "corsproxy": "git://github.com/janl/CORS-Proxy.git",
     "multicouch": ">=0.2.5",
     "request": "*",
-    "npm": "*"
+    "npm": "*",
+    "hoodie-pocket": "git://github.com/hoodiehq/pocket.git"
   },
   "scripts": {
     "start": "node lib/hoodie-app.js"
