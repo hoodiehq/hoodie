@@ -1,8 +1,0 @@
-// TODO: make this for real ;-)
-console.log("cd ../pocket")
-console.log("yeoman build")
-console.log("cp -r ./temp/ ../hoodie-app/www/")
-console.log("cd ../hoodie-app")
-console.log("git commit -am \"pocket updated.\"")
-console.log("git pull")
-console.log("git push")
