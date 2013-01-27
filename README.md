@@ -55,6 +55,7 @@ magic.fail( function(eror) {
 
 // Like what you see? Good. Because we got more:
 // http://hoodiehq.github.com/hoodie.js
+// API DOCS: http://hoodiehq.github.com/hoodie.js/doc/hoodie.html
 ```
 
 
