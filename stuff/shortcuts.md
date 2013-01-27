@@ -37,7 +37,7 @@ Delete all databases
 ```js
 $.couch.allDbs( {success: function(dbs) {
   while( db = dbs.shift() ) {
-    if ( /^_/.test(db) || /^skeleton/.test(db) ) continue;
+    if ( /^_/.test(db) ) continue;
     $.couch.db(db).drop()
   }
 }} )
