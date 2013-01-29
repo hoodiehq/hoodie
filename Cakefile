@@ -73,10 +73,10 @@ task 'build', 'build hoodie.min.js', ->
   src/hoodie/config.coffee
   src/hoodie/email.coffee
   src/hoodie/errors.coffee
+  src/hoodie/store.coffee
   src/hoodie/remote_store.coffee
   src/hoodie/remote.coffee
   src/hoodie/share.coffee
-  src/hoodie/store.coffee
   src/hoodie/user.coffee
   src/hoodie/global.coffee
   src/hoodie/account_remote.coffee
