@@ -37,10 +37,16 @@
 #
 class Hoodie.Remote
 
-
   # properties
   # ------------
   
+  # Store  
+
+  # Store class that the remote will use to connect to.
+  # We make it a property so that classes can easily inherit
+  # from Hoodie.Remote and overWrite its Store
+  Store : Hoodie.RemoteStore
+
   # name  
 
   # the name of the RemoteStore is the name of the
@@ -74,7 +80,7 @@ class Hoodie.Remote
     @prefix = options.prefix if options.prefix?
 
     @_sync   = options.sync   if options.sync
-    @store   = new Hoodie.RemoteStore @hoodie, this
+    @store   = new @Store @hoodie, this
 
     # NOTE: 
     # Due to a bug in Chrome (I guess), the loader won't disappear

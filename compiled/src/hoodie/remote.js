@@ -4,6 +4,8 @@ var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments)
 
 Hoodie.Remote = (function() {
 
+  Remote.prototype.Store = Hoodie.RemoteStore;
+
   Remote.prototype.name = void 0;
 
   Remote.prototype._sync = false;
@@ -49,7 +51,7 @@ Hoodie.Remote = (function() {
     if (options.sync) {
       this._sync = options.sync;
     }
-    this.store = new Hoodie.RemoteStore(this.hoodie, this);
+    this.store = new this.Store(this.hoodie, this);
     if (this.isContinuouslySyncing()) {
       this.startSyncing();
     }
