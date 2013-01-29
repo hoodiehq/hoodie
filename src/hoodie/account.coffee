@@ -135,16 +135,16 @@ class Hoodie.Account
   #       another user account or anonymously) would be merged into the user 
   #       account that signs in.
   signIn : (username, password = '') ->
-    @signOut().pipe => @_sendSignInRequest(username, password)
+    @signOut(silent: true).pipe => @_sendSignInRequest(username, password)
 
 
   # sign out 
   # ---------
 
   # uses standard CouchDB API to invalidate a user session (DELETE /_session)
-  signOut : ->
+  signOut : (options = {})->
 
-    return @_cleanup() unless @hasAccount()
+    return @_cleanup(options) unless @hasAccount()
 
     @hoodie.remote.disconnect()
     @_sendSignOutRequest().pipe(@_cleanup)
@@ -509,12 +509,12 @@ class Hoodie.Account
 
   #
   # remove everythng form the current account, so a new account can be initiated.
-  _cleanup : =>
+  _cleanup : (options = {}) =>
     delete @username
     delete @_authenticated
 
     @hoodie.config.clear()
-    @trigger 'signout'
+    @trigger 'signout' unless options.silent
 
     @_setOwner @hoodie.uuid()
 

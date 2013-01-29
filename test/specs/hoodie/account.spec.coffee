@@ -392,9 +392,15 @@ describe "Hoodie.Account", ->
       @signOutDefer = @hoodie.defer()
       spyOn(@account, "signOut").andReturn @signOutDefer.promise()
 
-    it "should sign out", ->
+    # when a user signs in, it's a transition from an anonymous
+    # user to a signed in user, so we need to clear up some stuff.
+    # That's why we call signOut before signing the user in.
+    # At the same time, when I call `hoodie.account.signIn`, I
+    # don't want a 'signout' event to be triggerd, that's why
+    # `signOut` needs to be called silently from within `signIn`
+    it "should sign out silently", ->
       @account.signIn('joe@example.com', 'secret')
-      expect(@account.signOut).wasCalled()
+      expect(@account.signOut).wasCalledWith silent: true
 
     _when "signout errors", ->
       beforeEach ->
@@ -616,11 +622,16 @@ describe "Hoodie.Account", ->
   # /.changePassword(username, password)
 
 
-  describe "#signOut()", ->
+  describe "#signOut(options)", ->
     beforeEach ->
       spyOn(@hoodie, "uuid").andReturn 'newHash'
       spyOn(@hoodie.config, "clear")
     
+    _when "called with silent: true", ->
+      it "should not trigger `account:signout` event", ->
+        @account.signOut silent: true
+        expect(@hoodie.trigger).wasNotCalledWith 'account:signout'
+      
     _when "user has no account", ->
       beforeEach ->
         spyOn(@account, "hasAccount").andReturn false
@@ -677,7 +688,7 @@ describe "Hoodie.Account", ->
 
         it "should clear config", ->
           expect(@hoodie.config.clear).wasCalled() 
-  # /.signOut(username, password)
+  # /.signOut(options)
 
 
   describe "#hasAccount()", ->
