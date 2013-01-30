@@ -105,7 +105,6 @@ describe "Hoodie.Store", ->
 
         it "should make a deep copy and save", ->
           @store.save.reset()
-          expect(@store.save).wasNotCalled()
           originalObject = { config: {} }
           @store.find.andReturn @hoodie.defer().resolve originalObject
           @store.update 'couch', '123', (obj) -> 

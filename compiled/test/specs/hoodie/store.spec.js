@@ -161,7 +161,6 @@ describe("Hoodie.Store", function() {
         return it("should make a deep copy and save", function() {
           var originalObject;
           this.store.save.reset();
-          expect(this.store.save).wasNotCalled();
           originalObject = {
             config: {}
           };
