@@ -854,7 +854,7 @@ describe "Hoodie.Account", ->
           it "should set config._account.ownerHash to new @ownerHash", ->
             expect(@hoodie.config.set).wasCalledWith '_account.ownerHash', 'newHash'
 
-      _and "fetch fails with 404", ->
+      _and "fetch fails with not_found", ->
         beforeEach ->
           @error = 
             error: "not_found"
@@ -863,8 +863,35 @@ describe "Hoodie.Account", ->
           @fetchDefer.reject @error
           @promise = @account.destroy()
 
-        it "should reject with error & reason", ->
+        # ... we just skip the deletion of the _users doc,
+        # but want to finish the local cleanup
+        it "should resolve anyway", ->
+          expect(@promise).toBeResolved()
+
+      _and "fetch fails with unknown error", ->
+        beforeEach ->
+          @error = 
+            error: "unknown"
+
+          @fetchDefer.reject @error
+          @promise = @account.destroy()
+
+        # 
+        it "should reject", ->
           expect(@promise).toBeRejectedWith @error
+
+        it "should not unset @username", ->
+          expect(@account.username).toBe 'joe@example.com'
+
+        it "should not regenerate @ownerHash", ->
+          expect(@account.ownerHash).toBe 'uuid'
+
+        it "should not trigger signout event", ->
+          expect(@hoodie.trigger).wasNotCalledWith 'account:signout'
+
+        it "should not clear config", ->
+          expect(@hoodie.config.clear).wasNotCalled() 
+           
 
     _when "user has no account", ->
       beforeEach ->

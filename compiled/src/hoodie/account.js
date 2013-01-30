@@ -14,6 +14,8 @@ Hoodie.Account = (function() {
 
     this._cleanup = __bind(this._cleanup, this);
 
+    this._handleFetchBeforeDestroyError = __bind(this._handleFetchBeforeDestroyError, this);
+
     this._handleFetchBeforeDestroySucces = __bind(this._handleFetchBeforeDestroySucces, this);
 
     this._handlePasswordResetStatusRequestError = __bind(this._handlePasswordResetStatusRequestError, this);
@@ -213,7 +215,7 @@ Hoodie.Account = (function() {
     if (!this.hasAccount()) {
       return this._cleanup();
     }
-    return this.fetch().pipe(this._handleFetchBeforeDestroySucces).pipe(this._cleanup);
+    return this.fetch().pipe(this._handleFetchBeforeDestroySucces, this._handleFetchBeforeDestroyError).pipe(this._cleanup);
   };
 
   Account.prototype._prefix = 'org.couchdb.user';
@@ -254,7 +256,7 @@ Hoodie.Account = (function() {
     if (error == null) {
       error = {};
     }
-    if (error.error) {
+    if (error.reason) {
       return this.hoodie.defer().reject(error).promise();
     }
     xhr = error;
@@ -410,6 +412,14 @@ Hoodie.Account = (function() {
     });
   };
 
+  Account.prototype._handleFetchBeforeDestroyError = function(error) {
+    if (error.error === 'not_found') {
+      return this.hoodie.defer().resolve().promise();
+    } else {
+      return this.hoodie.defer().reject(error).promise();
+    }
+  };
+
   Account.prototype._cleanup = function(options) {
     if (options == null) {
       options = {};
@@ -417,10 +427,10 @@ Hoodie.Account = (function() {
     delete this.username;
     delete this._authenticated;
     this.hoodie.config.clear();
+    this._setOwner(this.hoodie.uuid());
     if (!options.silent) {
       this.trigger('signout');
     }
-    this._setOwner(this.hoodie.uuid());
     return this.hoodie.defer().resolve().promise();
   };
 

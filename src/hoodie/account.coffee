@@ -263,7 +263,7 @@ class Hoodie.Account
       return @_cleanup()
 
     @fetch()
-    .pipe(@_handleFetchBeforeDestroySucces)
+    .pipe(@_handleFetchBeforeDestroySucces, @_handleFetchBeforeDestroyError)
     .pipe(@_cleanup)
 
 
@@ -319,7 +319,7 @@ class Hoodie.Account
   # each case
   #
   _handleRequestError : (error = {}) =>
-    if error.error 
+    if error.reason
       return @hoodie.defer().reject(error).promise()
 
     xhr = error
@@ -518,16 +518,28 @@ class Hoodie.Account
         contentType : 'application/json'
 
   #
+  # dependend on what kind of error we get, we want to ignore
+  # it or not. 
+  # When we get a "not_found" it means that the _users doc habe
+  # been removed already, so we don't need to do it anymore, but
+  # still want to finish the destroy locally, so we return a 
+  # resolved promise
+  _handleFetchBeforeDestroyError : (error) =>
+    if error.error is 'not_found'
+      @hoodie.defer().resolve().promise()
+    else
+      @hoodie.defer().reject(error).promise()
+
+  #
   # remove everythng form the current account, so a new account can be initiated.
   _cleanup : (options = {}) =>
     delete @username
     delete @_authenticated
 
     @hoodie.config.clear()
-    @trigger 'signout' unless options.silent
-
     @_setOwner @hoodie.uuid()
 
+    @trigger 'signout' unless options.silent
     @hoodie.defer().resolve().promise()
     
 

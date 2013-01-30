@@ -1016,7 +1016,7 @@ describe("Hoodie.Account", function() {
           });
         });
       });
-      return _and("fetch fails with 404", function() {
+      _and("fetch fails with not_found", function() {
         beforeEach(function() {
           this.error = {
             error: "not_found",
@@ -1025,8 +1025,32 @@ describe("Hoodie.Account", function() {
           this.fetchDefer.reject(this.error);
           return this.promise = this.account.destroy();
         });
-        return it("should reject with error & reason", function() {
+        return it("should resolve anyway", function() {
+          return expect(this.promise).toBeResolved();
+        });
+      });
+      return _and("fetch fails with unknown error", function() {
+        beforeEach(function() {
+          this.error = {
+            error: "unknown"
+          };
+          this.fetchDefer.reject(this.error);
+          return this.promise = this.account.destroy();
+        });
+        it("should reject", function() {
           return expect(this.promise).toBeRejectedWith(this.error);
+        });
+        it("should not unset @username", function() {
+          return expect(this.account.username).toBe('joe@example.com');
+        });
+        it("should not regenerate @ownerHash", function() {
+          return expect(this.account.ownerHash).toBe('uuid');
+        });
+        it("should not trigger signout event", function() {
+          return expect(this.hoodie.trigger).wasNotCalledWith('account:signout');
+        });
+        return it("should not clear config", function() {
+          return expect(this.hoodie.config.clear).wasNotCalled();
         });
       });
     });
