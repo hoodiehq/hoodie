@@ -1,6 +1,6 @@
 {
   "name": "hoodie-app",
-  "version": "0.4.4",
+  "version": "0.4.5",
   "dependencies": {
     "http-proxy": "*",
     "connect": "*",
@@ -8,7 +8,8 @@
     "multicouch": ">=0.2.5",
     "request": "*",
     "npm": "*",
-    "hoodie-pocket": "git://github.com/hoodiehq/pocket.git"
+    "hoodie-pocket": "git://github.com/hoodiehq/pocket.git",
+    "local-tld-lib": "*"
   },
   "scripts": {
     "start": "node lib/hoodie-app.js"
