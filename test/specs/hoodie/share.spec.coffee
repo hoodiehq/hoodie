@@ -86,6 +86,10 @@ describe "Hoodie.Share", ->
       @share.findOrAdd 'id123', {}
       expect(@hoodie.store.findOrAdd).wasCalledWith '$share', 'id123', {}
 
+    it "should not filter out $createdBy property", ->
+      @share.findOrAdd 'id123', $createdBy : 'me'
+      expect(@hoodie.store.findOrAdd).wasCalledWith '$share', 'id123', $createdBy : 'me'
+
     _when "store.findOrAdd successful", ->
       it "should resolve with a Share Instance", ->
         @findOrAddDefer.resolve {}

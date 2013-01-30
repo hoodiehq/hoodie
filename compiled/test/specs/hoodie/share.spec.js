@@ -119,6 +119,14 @@ describe("Hoodie.Share", function() {
       this.share.findOrAdd('id123', {});
       return expect(this.hoodie.store.findOrAdd).wasCalledWith('$share', 'id123', {});
     });
+    it("should not filter out $createdBy property", function() {
+      this.share.findOrAdd('id123', {
+        $createdBy: 'me'
+      });
+      return expect(this.hoodie.store.findOrAdd).wasCalledWith('$share', 'id123', {
+        $createdBy: 'me'
+      });
+    });
     return _when("store.findOrAdd successful", function() {
       it("should resolve with a Share Instance", function() {
         var promise;
