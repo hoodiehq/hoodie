@@ -866,9 +866,10 @@ Hoodie.Store = (function() {
       _this = this;
     defer = this.hoodie.defer();
     _loadPromise = this.find(type, id).pipe(function(currentObj) {
-      var changedProperties, key, value;
+      var changedProperties, key, newObj, value;
+      newObj = $.extend(true, {}, currentObj);
       if (typeof objectUpdate === 'function') {
-        objectUpdate = objectUpdate($.extend({}, currentObj));
+        objectUpdate = objectUpdate(newObj);
       }
       if (!objectUpdate) {
         return defer.resolve(currentObj);
@@ -878,18 +879,18 @@ Hoodie.Store = (function() {
         _results = [];
         for (key in objectUpdate) {
           value = objectUpdate[key];
-          if (!(currentObj[key] !== value)) {
+          if (!(newObj[key] !== value)) {
             continue;
           }
-          currentObj[key] = value;
+          newObj[key] = value;
           _results.push(key);
         }
         return _results;
       })();
       if (!(changedProperties.length || options)) {
-        return defer.resolve(currentObj);
+        return defer.resolve(newObj);
       }
-      return _this.save(type, id, currentObj, options).then(defer.resolve, defer.reject);
+      return _this.save(type, id, newObj, options).then(defer.resolve, defer.reject);
     });
     _loadPromise.fail(function() {
       return _this.save(type, id, objectUpdate, options).then(defer.resolve, defer.reject);
@@ -954,7 +955,7 @@ Hoodie.Store = (function() {
     defer = this.hoodie.defer();
     this.find(type, id).done(defer.resolve).fail(function() {
       var newAttributes;
-      newAttributes = $.extend({
+      newAttributes = $.extend(true, {
         id: id
       }, attributes);
       return _this.add(type, newAttributes).then(defer.resolve, defer.reject);

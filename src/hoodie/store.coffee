@@ -70,20 +70,21 @@ class Hoodie.Store
     _loadPromise = @find(type, id).pipe (currentObj) => 
       
       # normalize input
-      objectUpdate = objectUpdate( $.extend {}, currentObj ) if typeof objectUpdate is 'function'
+      newObj = $.extend(true, {}, currentObj)
+      objectUpdate = objectUpdate( newObj ) if typeof objectUpdate is 'function'
       
       return defer.resolve currentObj unless objectUpdate
       
       # check if something changed
-      changedProperties = for key, value of objectUpdate when currentObj[key] isnt value
+      changedProperties = for key, value of objectUpdate when newObj[key] isnt value
         # workaround for undefined values, as $.extend ignores these
-        currentObj[key] = value
+        newObj[key] = value
         key
         
-      return defer.resolve currentObj unless changedProperties.length or options
+      return defer.resolve newObj unless changedProperties.length or options
       
       # apply update 
-      @save(type, id, currentObj, options).then defer.resolve, defer.reject
+      @save(type, id, newObj, options).then defer.resolve, defer.reject
       
     # if not found, add it
     _loadPromise.fail => 
@@ -151,7 +152,7 @@ class Hoodie.Store
     @find(type, id)
     .done( defer.resolve )
     .fail => 
-      newAttributes = $.extend id: id, attributes
+      newAttributes = $.extend true, id: id, attributes
       @add(type, newAttributes).then defer.resolve, defer.reject 
   
     return defer.promise()

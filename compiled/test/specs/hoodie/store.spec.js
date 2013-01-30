@@ -155,8 +155,20 @@ describe("Hoodie.Store", function() {
             funky: 'fresh'
           }, void 0);
         });
-        return it("should return a resolved promise", function() {
+        it("should return a resolved promise", function() {
           return expect(this.promise).toBeResolvedWith('resolved by save');
+        });
+        return it("should make a deep copy", function() {
+          var originalObject;
+          originalObject = {
+            config: {}
+          };
+          this.store.find.andReturn(this.hoodie.defer().resolve(originalObject));
+          this.store.update('couch', '123', function(obj) {
+            obj.config.funky = 'fresh';
+            return obj;
+          });
+          return expect(originalObject.config.funky).toBeUndefined();
         });
       });
       _and("update wouldn't make a change", function() {
