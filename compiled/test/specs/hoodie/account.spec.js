@@ -917,7 +917,7 @@ describe("Hoodie.Account", function() {
         expect(this.type).toBe('GET');
         return expect(this.path).toBe('/_users/org.couchdb.user%3Auser%2Fjoe%40example.com');
       });
-      return _when("successful", function() {
+      _when("successful", function() {
         beforeEach(function() {
           this.response = {
             "_id": "org.couchdb.user:baz",
@@ -936,64 +936,97 @@ describe("Hoodie.Account", function() {
           return expect(promise).toBeResolvedWith(this.response);
         });
       });
+      return _when("fails", function() {
+        beforeEach(function() {
+          this.error = {
+            error: 'ErrorName',
+            reason: 'ErrorReason'
+          };
+          return this.requestDefer.reject(this.error);
+        });
+        return it("should resolve its promise", function() {
+          var promise;
+          promise = this.account.fetch();
+          return expect(promise).toBeRejectedWith(this.error);
+        });
+      });
     });
   });
   describe("#destroy()", function() {
     beforeEach(function() {
+      this.fetchDefer = this.hoodie.defer();
       spyOn(this.hoodie.remote, "disconnect");
       spyOn(this.hoodie.config, "clear");
       spyOn(this.hoodie.config, "set");
-      spyOn(this.account, "fetch").andReturn(this.hoodie.defer().resolve().promise());
+      spyOn(this.account, "fetch").andReturn(this.fetchDefer.promise());
       spyOn(this.hoodie, "uuid").andReturn('newHash');
       this.account.username = 'joe@example.com';
       return this.account._doc = {
         _rev: '1-234'
       };
     });
-    it("should disconnect", function() {
-      this.account.destroy();
-      return expect(this.hoodie.remote.disconnect).wasCalled();
-    });
-    it("should fetch the account", function() {
-      this.account.destroy();
-      return expect(this.account.fetch).wasCalled();
-    });
-    it("should send a PUT request to /_users/org.couchdb.user%3Auser%2Fjoe%40example.com", function() {
-      this.account.destroy();
-      return expect(this.hoodie.request).wasCalledWith('PUT', '/_users/org.couchdb.user%3Auser%2Fjoe%40example.com', {
-        data: JSON.stringify({
-          _rev: '1-234',
-          _deleted: true
-        }),
-        contentType: 'application/json'
-      });
-    });
     _when("user has account", function() {
       beforeEach(function() {
         return spyOn(this.account, "hasAccount").andReturn(true);
       });
-      it("should return a promise", function() {
-        return expect(this.account.destroy()).toBePromise();
-      });
-      return _and("destroy request succesful", function() {
+      _and("fetch is successful", function() {
         beforeEach(function() {
-          this.hoodie.request.andReturn(this.hoodie.defer().resolve().promise());
-          return this.account.destroy();
+          return this.fetchDefer.resolve();
         });
-        it("should unset @username", function() {
-          return expect(this.account.username).toBeUndefined();
+        it("should return a promise", function() {
+          return expect(this.account.destroy()).toBePromise();
         });
-        it("should regenerate @ownerHash", function() {
-          return expect(this.account.ownerHash).toBe('newHash');
+        it("should disconnect", function() {
+          this.account.destroy();
+          return expect(this.hoodie.remote.disconnect).wasCalled();
         });
-        it("should trigger signout event", function() {
-          return expect(this.hoodie.trigger).wasCalledWith('account:signout');
+        it("should fetch the account", function() {
+          this.account.destroy();
+          return expect(this.account.fetch).wasCalled();
         });
-        it("should clear config", function() {
-          return expect(this.hoodie.config.clear).wasCalled();
+        it("should send a PUT request to /_users/org.couchdb.user%3Auser%2Fjoe%40example.com", function() {
+          this.account.destroy();
+          return expect(this.hoodie.request).wasCalledWith('PUT', '/_users/org.couchdb.user%3Auser%2Fjoe%40example.com', {
+            data: JSON.stringify({
+              _rev: '1-234',
+              _deleted: true
+            }),
+            contentType: 'application/json'
+          });
         });
-        return it("should set config._account.ownerHash to new @ownerHash", function() {
-          return expect(this.hoodie.config.set).wasCalledWith('_account.ownerHash', 'newHash');
+        return _and("destroy request succesful", function() {
+          beforeEach(function() {
+            this.requestDefer.resolve();
+            return this.account.destroy();
+          });
+          it("should unset @username", function() {
+            return expect(this.account.username).toBeUndefined();
+          });
+          it("should regenerate @ownerHash", function() {
+            return expect(this.account.ownerHash).toBe('newHash');
+          });
+          it("should trigger signout event", function() {
+            return expect(this.hoodie.trigger).wasCalledWith('account:signout');
+          });
+          it("should clear config", function() {
+            return expect(this.hoodie.config.clear).wasCalled();
+          });
+          return it("should set config._account.ownerHash to new @ownerHash", function() {
+            return expect(this.hoodie.config.set).wasCalledWith('_account.ownerHash', 'newHash');
+          });
+        });
+      });
+      return _and("fetch fails with 404", function() {
+        beforeEach(function() {
+          this.error = {
+            error: "not_found",
+            reason: "missing"
+          };
+          this.fetchDefer.reject(this.error);
+          return this.promise = this.account.destroy();
+        });
+        return it("should reject with error & reason", function() {
+          return expect(this.promise).toBeRejectedWith(this.error);
         });
       });
     });

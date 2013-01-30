@@ -213,7 +213,7 @@ Hoodie.Account = (function() {
     if (!this.hasAccount()) {
       return this._cleanup();
     }
-    return this.fetch().pipe(this._handleFetchBeforeDestroySucces, this._handleRequestError).pipe(this._cleanup);
+    return this.fetch().pipe(this._handleFetchBeforeDestroySucces).pipe(this._cleanup);
   };
 
   Account.prototype._prefix = 'org.couchdb.user';
@@ -249,11 +249,15 @@ Hoodie.Account = (function() {
     return defer.promise();
   };
 
-  Account.prototype._handleRequestError = function(xhr) {
-    var error;
-    if (xhr == null) {
-      xhr = {};
+  Account.prototype._handleRequestError = function(error) {
+    var xhr;
+    if (error == null) {
+      error = {};
     }
+    if (error.error) {
+      return this.hoodie.defer().reject(error).promise();
+    }
+    xhr = error;
     try {
       error = JSON.parse(xhr.responseText);
     } catch (e) {

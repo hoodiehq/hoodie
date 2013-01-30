@@ -263,7 +263,7 @@ class Hoodie.Account
       return @_cleanup()
 
     @fetch()
-    .pipe(@_handleFetchBeforeDestroySucces, @_handleRequestError)
+    .pipe(@_handleFetchBeforeDestroySucces)
     .pipe(@_cleanup)
 
 
@@ -313,7 +313,17 @@ class Hoodie.Account
   #
   # standard error handling for AJAX requests
   #
-  _handleRequestError : (xhr = {}) =>
+  # in some case we get the object error directly, 
+  # in others we get an xhr or even just a string back
+  # when the couch died entirely. Whe have to handle
+  # each case
+  #
+  _handleRequestError : (error = {}) =>
+    if error.error 
+      return @hoodie.defer().reject(error).promise()
+
+    xhr = error
+
     try
       error = JSON.parse(xhr.responseText)
     catch e

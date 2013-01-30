@@ -783,60 +783,88 @@ describe "Hoodie.Account", ->
         it "should resolve its promise", ->
           promise = @account.fetch()
           expect(promise).toBeResolvedWith @response
+
+      _when "fails", ->
+        beforeEach ->
+          @error = 
+            error  : 'ErrorName'
+            reason : 'ErrorReason'
+          @requestDefer.reject(@error)
+        
+        it "should resolve its promise", ->
+          promise = @account.fetch()
+          expect(promise).toBeRejectedWith @error
   # /.fetch()
   
   describe "#destroy()", ->
     beforeEach ->
+      @fetchDefer = @hoodie.defer()
       spyOn(@hoodie.remote, "disconnect")
       spyOn(@hoodie.config, "clear")
       spyOn(@hoodie.config, "set")
-      spyOn(@account, "fetch").andReturn @hoodie.defer().resolve().promise()
+      spyOn(@account, "fetch").andReturn @fetchDefer.promise()
       spyOn(@hoodie, "uuid").andReturn 'newHash'
       @account.username = 'joe@example.com'
       @account._doc = _rev : '1-234'
-    
-    it "should disconnect", ->
-      @account.destroy()
-      expect(@hoodie.remote.disconnect).wasCalled()
-    
-    it "should fetch the account", ->
-      @account.destroy()
-      expect(@account.fetch).wasCalled()
-    
-    it "should send a PUT request to /_users/org.couchdb.user%3Auser%2Fjoe%40example.com", ->
-      @account.destroy()
-      expect(@hoodie.request).wasCalledWith 'PUT', '/_users/org.couchdb.user%3Auser%2Fjoe%40example.com'
-        data : JSON.stringify
-          _rev     : '1-234'
-          _deleted : true
-        contentType : 'application/json' 
 
     _when "user has account", ->
       beforeEach ->
         spyOn(@account, "hasAccount").andReturn true
 
-      it "should return a promise", ->
-        expect(@account.destroy()).toBePromise() 
-
-      _and "destroy request succesful", ->
+      _and "fetch is successful", ->
         beforeEach ->
-          @hoodie.request.andReturn @hoodie.defer().resolve().promise()
+          @fetchDefer.resolve()
+
+        it "should return a promise", ->
+          expect(@account.destroy()).toBePromise()
+
+        it "should disconnect", ->
           @account.destroy()
+          expect(@hoodie.remote.disconnect).wasCalled()
+        
+        it "should fetch the account", ->
+          @account.destroy()
+          expect(@account.fetch).wasCalled()
+      
+        it "should send a PUT request to /_users/org.couchdb.user%3Auser%2Fjoe%40example.com", ->
+          @account.destroy()
+          expect(@hoodie.request).wasCalledWith 'PUT', '/_users/org.couchdb.user%3Auser%2Fjoe%40example.com'
+            data : JSON.stringify
+              _rev     : '1-234'
+              _deleted : true
+            contentType : 'application/json'  
 
-        it "should unset @username", ->
-          expect(@account.username).toBeUndefined() 
+        _and "destroy request succesful", ->
+          beforeEach ->
+            @requestDefer.resolve()
+            @account.destroy()
 
-        it "should regenerate @ownerHash", ->
-          expect(@account.ownerHash).toBe 'newHash'
+          it "should unset @username", ->
+            expect(@account.username).toBeUndefined() 
 
-        it "should trigger signout event", ->
-          expect(@hoodie.trigger).wasCalledWith 'account:signout'
+          it "should regenerate @ownerHash", ->
+            expect(@account.ownerHash).toBe 'newHash'
 
-        it "should clear config", ->
-          expect(@hoodie.config.clear).wasCalled() 
+          it "should trigger signout event", ->
+            expect(@hoodie.trigger).wasCalledWith 'account:signout'
 
-        it "should set config._account.ownerHash to new @ownerHash", ->
-          expect(@hoodie.config.set).wasCalledWith '_account.ownerHash', 'newHash'
+          it "should clear config", ->
+            expect(@hoodie.config.clear).wasCalled() 
+
+          it "should set config._account.ownerHash to new @ownerHash", ->
+            expect(@hoodie.config.set).wasCalledWith '_account.ownerHash', 'newHash'
+
+      _and "fetch fails with 404", ->
+        beforeEach ->
+          @error = 
+            error: "not_found"
+            reason: "missing"
+
+          @fetchDefer.reject @error
+          @promise = @account.destroy()
+
+        it "should reject with error & reason", ->
+          expect(@promise).toBeRejectedWith @error
 
     _when "user has no account", ->
       beforeEach ->
