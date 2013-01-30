@@ -103,13 +103,16 @@ describe "Hoodie.Store", ->
         it "should return a resolved promise", ->
           expect(@promise).toBeResolvedWith 'resolved by save'
 
-        it "should make a deep copy", ->
+        it "should make a deep copy and save", ->
+          @store.save.reset()
+          expect(@store.save).wasNotCalled()
           originalObject = { config: {} }
           @store.find.andReturn @hoodie.defer().resolve originalObject
           @store.update 'couch', '123', (obj) -> 
             obj.config.funky = 'fresh'
             return obj
           expect(originalObject.config.funky).toBeUndefined()
+          expect(@store.save).wasCalled()
           
       _and "update wouldn't make a change", ->
         beforeEach ->

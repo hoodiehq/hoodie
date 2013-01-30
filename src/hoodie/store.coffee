@@ -76,7 +76,7 @@ class Hoodie.Store
       return defer.resolve currentObj unless objectUpdate
       
       # check if something changed
-      changedProperties = for key, value of objectUpdate when newObj[key] isnt value
+      changedProperties = for key, value of objectUpdate when currentObj[key] isnt value
         # workaround for undefined values, as $.extend ignores these
         newObj[key] = value
         key

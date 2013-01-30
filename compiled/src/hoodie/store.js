@@ -57,7 +57,7 @@ Hoodie.Store = (function() {
         _results = [];
         for (key in objectUpdate) {
           value = objectUpdate[key];
-          if (!(newObj[key] !== value)) {
+          if (!(currentObj[key] !== value)) {
             continue;
           }
           newObj[key] = value;

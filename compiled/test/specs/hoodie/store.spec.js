@@ -158,8 +158,10 @@ describe("Hoodie.Store", function() {
         it("should return a resolved promise", function() {
           return expect(this.promise).toBeResolvedWith('resolved by save');
         });
-        return it("should make a deep copy", function() {
+        return it("should make a deep copy and save", function() {
           var originalObject;
+          this.store.save.reset();
+          expect(this.store.save).wasNotCalled();
           originalObject = {
             config: {}
           };
@@ -168,7 +170,8 @@ describe("Hoodie.Store", function() {
             obj.config.funky = 'fresh';
             return obj;
           });
-          return expect(originalObject.config.funky).toBeUndefined();
+          expect(originalObject.config.funky).toBeUndefined();
+          return expect(this.store.save).wasCalled();
         });
       });
       _and("update wouldn't make a change", function() {
