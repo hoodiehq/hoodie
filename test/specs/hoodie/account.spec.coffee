@@ -118,6 +118,11 @@ describe "Hoodie.Account", ->
         expect(args[0]).toBe 'GET'
         expect(args[1]).toBe '/_session'
 
+      it "should not send multiple GET /_session requests", ->
+        @account.authenticate()
+        @account.authenticate()
+        expect(@hoodie.request.callCount).toBe 1
+
       _when "authentication request is successful and returns session info for joe@example.com", ->
         beforeEach ->
           spyOn(@hoodie.config, "set")
@@ -145,17 +150,32 @@ describe "Hoodie.Account", ->
       _when "authentication request is successful and returns `name: null`", ->
         beforeEach ->
           @requestDefer.resolve userCtx: name: null
-          @account.username = 'joe@example.com'
-          @promise = @account.authenticate()
-          
-        it "should set account as unauthenticated", ->
-          expect(@account._authenticated).toBe false
-          
-        it "should reject the promise", ->
-          expect(@promise).toBeRejected()
-          
-        it "should trigger an `account:error:unauthenticated` event", ->
-          expect(@hoodie.trigger).wasCalledWith 'account:error:unauthenticated'
+
+        _and "the user signed up", ->
+          beforeEach ->        
+            @account.username = 'joe@example.com'
+            @promise = @account.authenticate()
+            
+          it "should set account as unauthenticated", ->
+            expect(@account._authenticated).toBe false
+            
+          it "should reject the promise", ->
+            expect(@promise).toBeRejected()
+            
+          it "should trigger an `account:error:unauthenticated` event", ->
+            expect(@hoodie.trigger).wasCalledWith 'account:error:unauthenticated'
+
+        _and "and the user has an anonymous acount", ->
+          beforeEach ->
+            @account.username  = 'randomhash'
+            @account.ownerHash = 'randomhash'
+            spyOn(@account, "getAnonymousPassword").andReturn 'randompass'
+            spyOn(@account, "signIn")
+            @promise = @account.authenticate()
+
+          it "should sign in in the background, as we know the password anyway", ->
+            expect(@account.signIn).wasCalledWith 'randomhash', 'randompass'
+              
           
       _when "authentication request has an error", ->
         beforeEach ->
@@ -202,6 +222,7 @@ describe "Hoodie.Account", ->
         _when "sign in successful", ->
           beforeEach ->
             @signInDefer1.resolve('randomUsername')
+            @account.hasAnonymousAccount.andReturn false
 
           it "should fetch the _users doc", ->
             expect(@account.fetch).wasCalled()
@@ -401,6 +422,23 @@ describe "Hoodie.Account", ->
     it "should sign out silently", ->
       @account.signIn('joe@example.com', 'secret')
       expect(@account.signOut).wasCalledWith silent: true
+
+    # But if the user tries to sign in with the same username
+    # that is curretly signed in (e.g. because his session is
+    # not valid anymore), we do not want to sign out beforehand
+    _when "signing in with current username", ->
+      beforeEach ->
+        @account.username = 'joe@example.com'
+        @account.signIn('joe@example.com', 'secret')
+        [@type, @path, @options] = @hoodie.request.mostRecentCall.args
+
+      it "should not sign out", ->
+        expect(@account.signOut).wasNotCalled()
+      
+      it "should send a POST request to http://cou.ch/_session", ->
+        expect(@hoodie.request).wasCalled()
+        expect(@type).toBe 'POST'
+        expect(@path).toBe  '/_session'
 
     _when "signout errors", ->
       beforeEach ->

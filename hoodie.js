@@ -209,7 +209,7 @@ Hoodie.Account = (function() {
 
     this._handleRequestError = __bind(this._handleRequestError, this);
 
-    this._handleAuthenticateSuccess = __bind(this._handleAuthenticateSuccess, this);
+    this._handleAuthenticateRequestSuccess = __bind(this._handleAuthenticateRequestSuccess, this);
 
     this.fetch = __bind(this.fetch, this);
 
@@ -225,6 +225,8 @@ Hoodie.Account = (function() {
   }
 
   Account.prototype.authenticate = function() {
+    var promise,
+      _this = this;
     if (!this.username) {
       this._sendSignOutRequest();
       return this.hoodie.defer().reject().promise();
@@ -235,7 +237,10 @@ Hoodie.Account = (function() {
     if (this._authenticated === false) {
       return this.hoodie.defer().reject().promise();
     }
-    return this.hoodie.request('GET', "/_session").pipe(this._handleAuthenticateSuccess, this._handleRequestError);
+    promise = this._withSingleRequest('authenticate', function() {
+      return _this.hoodie.request('GET', "/_session");
+    });
+    return promise.pipe(this._handleAuthenticateRequestSuccess, this._handleRequestError);
   };
 
   Account.prototype.signUp = function(username, password) {
@@ -277,7 +282,7 @@ Hoodie.Account = (function() {
     password = this.hoodie.uuid(10);
     username = this.ownerHash;
     return this.signUp(username, password).pipe(null, this._handleRequestError).done(function() {
-      _this.hoodie.config.set('_account.anonymousPassword', password);
+      _this.setAnonymousPassword(password);
       return _this.trigger('signup:anonymous', username);
     });
   };
@@ -287,7 +292,21 @@ Hoodie.Account = (function() {
   };
 
   Account.prototype.hasAnonymousAccount = function() {
-    return this.hoodie.config.get('_account.anonymousPassword') != null;
+    return this.getAnonymousPassword() != null;
+  };
+
+  Account.prototype._anonymousPasswordKey = '_account.anonymousPassword';
+
+  Account.prototype.setAnonymousPassword = function(password) {
+    return this.hoodie.config.set(this._anonymousPasswordKey, password);
+  };
+
+  Account.prototype.getAnonymousPassword = function(password) {
+    return this.hoodie.config.get(this._anonymousPasswordKey);
+  };
+
+  Account.prototype.removeAnonymousPassword = function(password) {
+    return this.hoodie.config.remove(this._anonymousPasswordKey);
   };
 
   Account.prototype.signIn = function(username, password) {
@@ -295,11 +314,15 @@ Hoodie.Account = (function() {
     if (password == null) {
       password = '';
     }
-    return this.signOut({
-      silent: true
-    }).pipe(function() {
-      return _this._sendSignInRequest(username, password);
-    });
+    if (this.username !== username) {
+      return this.signOut({
+        silent: true
+      }).pipe(function() {
+        return _this._sendSignInRequest(username, password);
+      });
+    } else {
+      return this._sendSignInRequest(username, password);
+    }
   };
 
   Account.prototype.signOut = function(options) {
@@ -412,20 +435,20 @@ Hoodie.Account = (function() {
     return this.hoodie.config.set('_account.ownerHash', this.ownerHash);
   };
 
-  Account.prototype._handleAuthenticateSuccess = function(response) {
-    var defer;
-    defer = this.hoodie.defer();
+  Account.prototype._handleAuthenticateRequestSuccess = function(response) {
     if (response.userCtx.name) {
       this._authenticated = true;
       this._setUsername(response.userCtx.name.replace(/^user(_anonymous)?\//, ''));
       this._setOwner(response.userCtx.roles[0]);
-      defer.resolve(this.username);
-    } else {
-      this._authenticated = false;
-      this.trigger('error:unauthenticated');
-      defer.reject();
+      return this.hoodie.defer().resolve(this.username).promise();
     }
-    return defer.promise();
+    if (this.hasAnonymousAccount()) {
+      this.signIn(this.username, this.getAnonymousPassword());
+      return;
+    }
+    this._authenticated = false;
+    this.trigger('error:unauthenticated');
+    return this.hoodie.defer().reject().promise();
   };
 
   Account.prototype._handleRequestError = function(error) {
@@ -570,10 +593,10 @@ Hoodie.Account = (function() {
   Account.prototype._upgradeAnonymousAccount = function(username, password) {
     var currentPassword,
       _this = this;
-    currentPassword = this.hoodie.config.get('_account.anonymousPassword');
+    currentPassword = this.getAnonymousPassword();
     return this._changeUsernameAndPassword(currentPassword, username, password).done(function() {
       _this.trigger('signup', username);
-      return _this.hoodie.config.remove('_account.anonymousPassword');
+      return _this.removeAnonymousPassword();
     });
   };
 
@@ -612,11 +635,13 @@ Hoodie.Account = (function() {
   };
 
   Account.prototype._userKey = function(username) {
-    if (username === this.ownerHash) {
-      return "user_anonymous/" + username;
+    var prefix;
+    if (this.hasAnonymousAccount()) {
+      prefix = 'user_anonymous';
     } else {
-      return "user/" + username;
+      prefix = 'user';
     }
+    return "" + prefix + "/" + username;
   };
 
   Account.prototype._key = function(username) {

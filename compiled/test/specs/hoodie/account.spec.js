@@ -131,6 +131,11 @@ describe("Hoodie.Account", function() {
         expect(args[0]).toBe('GET');
         return expect(args[1]).toBe('/_session');
       });
+      it("should not send multiple GET /_session requests", function() {
+        this.account.authenticate();
+        this.account.authenticate();
+        return expect(this.hoodie.request.callCount).toBe(1);
+      });
       _when("authentication request is successful and returns session info for joe@example.com", function() {
         beforeEach(function() {
           spyOn(this.hoodie.config, "set");
@@ -160,22 +165,38 @@ describe("Hoodie.Account", function() {
       });
       _when("authentication request is successful and returns `name: null`", function() {
         beforeEach(function() {
-          this.requestDefer.resolve({
+          return this.requestDefer.resolve({
             userCtx: {
               name: null
             }
           });
-          this.account.username = 'joe@example.com';
-          return this.promise = this.account.authenticate();
         });
-        it("should set account as unauthenticated", function() {
-          return expect(this.account._authenticated).toBe(false);
+        _and("the user signed up", function() {
+          beforeEach(function() {
+            this.account.username = 'joe@example.com';
+            return this.promise = this.account.authenticate();
+          });
+          it("should set account as unauthenticated", function() {
+            return expect(this.account._authenticated).toBe(false);
+          });
+          it("should reject the promise", function() {
+            return expect(this.promise).toBeRejected();
+          });
+          return it("should trigger an `account:error:unauthenticated` event", function() {
+            return expect(this.hoodie.trigger).wasCalledWith('account:error:unauthenticated');
+          });
         });
-        it("should reject the promise", function() {
-          return expect(this.promise).toBeRejected();
-        });
-        return it("should trigger an `account:error:unauthenticated` event", function() {
-          return expect(this.hoodie.trigger).wasCalledWith('account:error:unauthenticated');
+        return _and("and the user has an anonymous acount", function() {
+          beforeEach(function() {
+            this.account.username = 'randomhash';
+            this.account.ownerHash = 'randomhash';
+            spyOn(this.account, "getAnonymousPassword").andReturn('randompass');
+            spyOn(this.account, "signIn");
+            return this.promise = this.account.authenticate();
+          });
+          return it("should sign in in the background, as we know the password anyway", function() {
+            return expect(this.account.signIn).wasCalledWith('randomhash', 'randompass');
+          });
         });
       });
       return _when("authentication request has an error", function() {
@@ -233,7 +254,8 @@ describe("Hoodie.Account", function() {
         });
         return _when("sign in successful", function() {
           beforeEach(function() {
-            return this.signInDefer1.resolve('randomUsername');
+            this.signInDefer1.resolve('randomUsername');
+            return this.account.hasAnonymousAccount.andReturn(false);
           });
           it("should fetch the _users doc", function() {
             return expect(this.account.fetch).wasCalled();
@@ -473,6 +495,22 @@ describe("Hoodie.Account", function() {
       this.account.signIn('joe@example.com', 'secret');
       return expect(this.account.signOut).wasCalledWith({
         silent: true
+      });
+    });
+    _when("signing in with current username", function() {
+      beforeEach(function() {
+        var _ref;
+        this.account.username = 'joe@example.com';
+        this.account.signIn('joe@example.com', 'secret');
+        return _ref = this.hoodie.request.mostRecentCall.args, this.type = _ref[0], this.path = _ref[1], this.options = _ref[2], _ref;
+      });
+      it("should not sign out", function() {
+        return expect(this.account.signOut).wasNotCalled();
+      });
+      return it("should send a POST request to http://cou.ch/_session", function() {
+        expect(this.hoodie.request).wasCalled();
+        expect(this.type).toBe('POST');
+        return expect(this.path).toBe('/_session');
       });
     });
     _when("signout errors", function() {

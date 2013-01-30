@@ -47,8 +47,10 @@ class Hoodie.Account
       return @hoodie.defer().reject().promise()
     
     # @_authenticated is undefined
-    @hoodie.request('GET', "/_session")
-    .pipe @_handleAuthenticateSuccess, @_handleRequestError
+    promise = @_withSingleRequest 'authenticate', =>
+      @hoodie.request('GET', "/_session")
+
+    promise.pipe @_handleAuthenticateRequestSuccess, @_handleRequestError
     
     
   # sign up with username & password
@@ -93,8 +95,8 @@ class Hoodie.Account
   # method can be used. It generates a random password and stores it locally
   # in the browser.
   #
-  # If the user signes up for real later, we change his username and password
-  # internally instead of creating another user. 
+  # If the user signes up for real later, we "upgrade" his account, meaning we 
+  # change his username and password internally instead of creating another user. 
   #
   anonymousSignUp : ->
     password = @hoodie.uuid(10)
@@ -103,7 +105,7 @@ class Hoodie.Account
     @signUp(username, password)
     .pipe(null, @_handleRequestError)
     .done =>
-      @hoodie.config.set '_account.anonymousPassword', password
+      @setAnonymousPassword(password)
       @trigger 'signup:anonymous', username
 
 
@@ -120,7 +122,18 @@ class Hoodie.Account
   
   #
   hasAnonymousAccount : ->
-    @hoodie.config.get('_account.anonymousPassword')?
+    @getAnonymousPassword()?
+
+
+  # set / get / remove anonymous password
+  # ---------------------------------------
+
+  # 
+  _anonymousPasswordKey : '_account.anonymousPassword'
+  setAnonymousPassword    : (password) -> @hoodie.config.set    @_anonymousPasswordKey, password
+  getAnonymousPassword    : (password) -> @hoodie.config.get    @_anonymousPasswordKey
+  removeAnonymousPassword : (password) -> @hoodie.config.remove @_anonymousPasswordKey
+
 
 
   # sign in with username & password
@@ -133,10 +146,13 @@ class Hoodie.Account
   # NOTE: When signing in, all local data gets cleared beforehand (with a signOut). 
   #       Otherwise data that has been created beforehand (authenticated with 
   #       another user account or anonymously) would be merged into the user 
-  #       account that signs in.
+  #       account that signs in. That applies only if username isn't the same as
+  #       current username.
   signIn : (username, password = '') ->
-    @signOut(silent: true).pipe => @_sendSignInRequest(username, password)
-
+    if @username isnt username
+      @signOut(silent: true).pipe => @_sendSignInRequest(username, password)
+    else 
+      @_sendSignInRequest(username, password)
 
   # sign out 
   # ---------
@@ -294,21 +310,31 @@ class Hoodie.Account
   #
   # handle a successful authentication request.
   # 
-  _handleAuthenticateSuccess : (response) =>
-    defer = @hoodie.defer()
-
+  # As long as there is no server error or internet connection issue,
+  # the authenticate request (GET /_session) does always return
+  # a 200 status. To differentiate whether the user is signed in or
+  # not, we check `userCtx.name` in the response. If the user is not
+  # signed in, it's null, otherwise the name the user signed in with
+  # 
+  # If the user is not signed in, we difeerentiate between users that
+  # signed in with a username / password or anonymously. For anonymous
+  # users, the password is stored in local store, so we don't need
+  # to trigger an 'unauthenticated' error, but instead try to sign in.
+  # 
+  _handleAuthenticateRequestSuccess : (response) =>
     if response.userCtx.name
       @_authenticated = true
       @_setUsername response.userCtx.name.replace(/^user(_anonymous)?\//, '')
       @_setOwner    response.userCtx.roles[0]
-      defer.resolve @username
+      return @hoodie.defer().resolve(@username).promise()
 
-    else
-      @_authenticated = false
-      @trigger 'error:unauthenticated'
-      defer.reject()
+    if @hasAnonymousAccount()
+      @signIn @username, @getAnonymousPassword()
+      return
 
-    return defer.promise()
+    @_authenticated = false
+    @trigger 'error:unauthenticated'
+    return @hoodie.defer().reject().promise()
 
   #
   # standard error handling for AJAX requests
@@ -425,7 +451,7 @@ class Hoodie.Account
   # what we are waiting for.
   #
   # Once called, it continues to request the status update with a
-  # 1s timeout.
+  # one second timeout.
   #
   _checkPasswordResetStatus : =>
 
@@ -499,11 +525,11 @@ class Hoodie.Account
   # turn an anonymous account into a real account
   #
   _upgradeAnonymousAccount : (username, password) ->
-    currentPassword = @hoodie.config.get '_account.anonymousPassword'
+    currentPassword = @getAnonymousPassword()
     @_changeUsernameAndPassword(currentPassword, username, password)
     .done => 
       @trigger 'signup', username
-      @hoodie.config.remove '_account.anonymousPassword'
+      @removeAnonymousPassword()
 
   #
   # we now can be sure that we fetched the latest _users doc, so we can update it
@@ -547,10 +573,12 @@ class Hoodie.Account
   # depending on wether the user signedUp manually or has been signed up anonymously
   # the prefix in the CouchDB _users doc differentiates. 
   _userKey : (username) ->
-    if username is @ownerHash
-      "user_anonymous/#{username}"
+    if @hasAnonymousAccount()
+      prefix = 'user_anonymous'
     else
-      "user/#{username}"
+      prefix = 'user'
+
+    return "#{prefix}/#{username}"
 
   #
   # turn a username into a valid _users doc._id
