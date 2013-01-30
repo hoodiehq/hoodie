@@ -144,8 +144,11 @@ describe("Hoodie.RemoteStore", function() {
       it("should add type to saved object", function() {
         return expect(this.data.$type).toBe('car');
       });
-      return it("should set _id to `car/123`", function() {
+      it("should set _id to `car/123`", function() {
         return expect(this.data._id).toBe('remote_prefix/car/123');
+      });
+      return it("should not generate a _rev", function() {
+        return expect(this.data._rev).toBeUndefined();
       });
     });
   });

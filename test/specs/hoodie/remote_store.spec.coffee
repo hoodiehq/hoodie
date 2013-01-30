@@ -133,6 +133,9 @@ describe "Hoodie.RemoteStore", ->
 
       it "should set _id to `car/123`", ->
         expect(@data._id).toBe 'remote_prefix/car/123'
+
+      it "should not generate a _rev", ->
+        expect(@data._rev).toBeUndefined()
   # /#save(type, id, object)
 
 

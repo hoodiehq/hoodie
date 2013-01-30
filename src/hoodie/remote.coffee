@@ -240,7 +240,9 @@ class Hoodie.Remote
       
     docsForRemote = []
     for doc in docs
-      docsForRemote.push @store.parseForRemote doc 
+      doc = @store.parseForRemote doc 
+      @store.addRevisionTo doc
+      docsForRemote.push doc
     
     @_pushRequest = @request 'POST', "/_bulk_docs"
       data :

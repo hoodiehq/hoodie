@@ -143,7 +143,9 @@ Hoodie.Remote = (function() {
     docsForRemote = [];
     for (_i = 0, _len = docs.length; _i < _len; _i++) {
       doc = docs[_i];
-      docsForRemote.push(this.store.parseForRemote(doc));
+      doc = this.store.parseForRemote(doc);
+      this.store.addRevisionTo(doc);
+      docsForRemote.push(doc);
     }
     this._pushRequest = this.request('POST', "/_bulk_docs", {
       data: {

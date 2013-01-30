@@ -131,8 +131,6 @@ class Hoodie.RemoteStore extends Hoodie.Store
       attributes._id = "#{@remote.prefix}/#{attributes._id}"
     
     delete attributes.id
-    
-    @_addRevisionTo attributes
 
     return attributes
 
@@ -166,6 +164,26 @@ class Hoodie.RemoteStore extends Hoodie.Store
   parseAllFromRemote : (objects) =>
     @parseFromRemote(object) for object in objects
 
+
+  # ### addRevisionTo
+
+  # extends passed object with a _rev property
+  #
+  addRevisionTo : (attributes) ->
+
+    try [currentRevNr, currentRevId] = attributes._rev.split /-/
+    currentRevNr = parseInt(currentRevNr, 10) or 0
+
+    newRevisionId         = @_generateNewRevisionId()
+    attributes._rev       = "#{currentRevNr + 1}-#{newRevisionId}"
+    attributes._revisions = 
+      start : 1
+      ids   : [newRevisionId]
+
+    if currentRevId
+      attributes._revisions.start += currentRevNr
+      attributes._revisions.ids.push currentRevId
+
   
   # Events
   # --------
@@ -197,26 +215,6 @@ class Hoodie.RemoteStore extends Hoodie.Store
 
   # 
   _generateNewRevisionId:  -> @hoodie.uuid(9)
-  
-
-  # ### and new revion to objecet
-
-  # get new revision number
-  #
-  _addRevisionTo : (attributes) ->
-
-    try [currentRevNr, currentRevId] = attributes._rev.split /-/
-    currentRevNr = parseInt(currentRevNr, 10) or 0
-
-    newRevisionId         = @_generateNewRevisionId()
-    attributes._rev       = "#{currentRevNr + 1}-#{newRevisionId}"
-    attributes._revisions = 
-      start : 1
-      ids   : [newRevisionId]
-
-    if currentRevId
-      attributes._revisions.start += currentRevNr
-      attributes._revisions.ids.push currentRevId
 
 
   # ### map docs from findAll

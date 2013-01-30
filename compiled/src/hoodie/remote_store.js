@@ -107,7 +107,6 @@ Hoodie.RemoteStore = (function(_super) {
       attributes._id = "" + this.remote.prefix + "/" + attributes._id;
     }
     delete attributes.id;
-    this._addRevisionTo(attributes);
     return attributes;
   };
 
@@ -142,6 +141,24 @@ Hoodie.RemoteStore = (function(_super) {
     return _results;
   };
 
+  RemoteStore.prototype.addRevisionTo = function(attributes) {
+    var currentRevId, currentRevNr, newRevisionId, _ref;
+    try {
+      _ref = attributes._rev.split(/-/), currentRevNr = _ref[0], currentRevId = _ref[1];
+    } catch (_error) {}
+    currentRevNr = parseInt(currentRevNr, 10) || 0;
+    newRevisionId = this._generateNewRevisionId();
+    attributes._rev = "" + (currentRevNr + 1) + "-" + newRevisionId;
+    attributes._revisions = {
+      start: 1,
+      ids: [newRevisionId]
+    };
+    if (currentRevId) {
+      attributes._revisions.start += currentRevNr;
+      return attributes._revisions.ids.push(currentRevId);
+    }
+  };
+
   RemoteStore.prototype.on = function(event, cb) {
     event = event.replace(/(^| )([^ ]+)/g, "$1" + this.remote.name + ":store:$2");
     return this.hoodie.on(event, cb);
@@ -162,24 +179,6 @@ Hoodie.RemoteStore = (function(_super) {
 
   RemoteStore.prototype._generateNewRevisionId = function() {
     return this.hoodie.uuid(9);
-  };
-
-  RemoteStore.prototype._addRevisionTo = function(attributes) {
-    var currentRevId, currentRevNr, newRevisionId, _ref;
-    try {
-      _ref = attributes._rev.split(/-/), currentRevNr = _ref[0], currentRevId = _ref[1];
-    } catch (_error) {}
-    currentRevNr = parseInt(currentRevNr, 10) || 0;
-    newRevisionId = this._generateNewRevisionId();
-    attributes._rev = "" + (currentRevNr + 1) + "-" + newRevisionId;
-    attributes._revisions = {
-      start: 1,
-      ids: [newRevisionId]
-    };
-    if (currentRevId) {
-      attributes._revisions.start += currentRevNr;
-      return attributes._revisions.ids.push(currentRevId);
-    }
   };
 
   RemoteStore.prototype._mapDocsFromFindAll = function(response) {
