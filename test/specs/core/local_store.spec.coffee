@@ -93,7 +93,7 @@ describe "Hoodie.LocalStore", ->
           object = @store.cache.mostRecentCall.args[2]
           expect(object._syncedAt).toBe 'now'
 
-        it "should trigger trigger events", ->
+        it "should trigger update & change events", ->
           object  = id: '123', type: 'document', name: 'test', _local: 'something', _rev: '2-345'
           options = remote: true
           expect(@store.trigger).wasCalledWith 'update',                    object, options
@@ -117,6 +117,24 @@ describe "Hoodie.LocalStore", ->
           object = @store.cache.mostRecentCall.args[2]
           expect(object.createdAt).toBeUndefined()
           expect(object.updatedAt).toBeUndefined()
+
+      _and "object is new (not cached yet)", ->
+        beforeEach ->
+          spyOn(@store, "trigger")
+          @store.cache.andCallFake (type, id, object) ->
+            if object
+              { id: '123', type: 'document', name: 'test', _rev: '1-345' }
+            else
+              undefined
+
+          @store.save 'document', '123', { name: 'test' }
+
+        it "should trigger add & change events", ->
+          object  = id: '123', type: 'document', name: 'test', _rev: '1-345'
+          expect(@store.trigger).wasCalledWith 'add',                    object, {}
+          expect(@store.trigger).wasCalledWith 'add:document',           object, {}
+          expect(@store.trigger).wasCalledWith 'change',          'add', object, {}
+          expect(@store.trigger).wasCalledWith 'change:document', 'add', object, {}
     
       _when "successful", ->
         beforeEach ->
@@ -447,7 +465,7 @@ describe "Hoodie.LocalStore", ->
       it "should remove the object", ->
         expect(@store.db.removeItem).wasCalledWith 'document/123'
 
-      it "should trigger trigger events", ->
+      it "should trigger remove & change trigger events", ->
         expect(@store.trigger).wasCalledWith 'remove',                         { id: '123', type: 'document', name: 'test'}, { remote: true }
         expect(@store.trigger).wasCalledWith 'remove:document',                { id: '123', type: 'document', name: 'test'}, { remote: true }
         expect(@store.trigger).wasCalledWith 'remove:document:123',            { id: '123', type: 'document', name: 'test'}, { remote: true }
