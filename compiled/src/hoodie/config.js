@@ -3,7 +3,7 @@ var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments)
 
 Hoodie.Config = (function() {
 
-  Config.prototype.$type = '$config';
+  Config.prototype.type = '$config';
 
   Config.prototype.id = 'hoodie';
 
@@ -17,13 +17,13 @@ Hoodie.Config = (function() {
     }
     this.clear = __bind(this.clear, this);
 
-    if (options.$type) {
-      this.$type = options.$type;
+    if (options.type) {
+      this.type = options.type;
     }
     if (options.id) {
       this.id = options.id;
     }
-    this.hoodie.store.find(this.$type, this.id).done(function(obj) {
+    this.hoodie.store.find(this.type, this.id).done(function(obj) {
       return _this.cache = obj;
     });
     this.hoodie.on('account:signedOut', this.clear);
@@ -38,7 +38,7 @@ Hoodie.Config = (function() {
     update = {};
     update[key] = value;
     isSilent = key.charAt(0) === '_';
-    return this.hoodie.store.update(this.$type, this.id, update, {
+    return this.hoodie.store.update(this.type, this.id, update, {
       silent: isSilent
     });
   };
@@ -49,7 +49,7 @@ Hoodie.Config = (function() {
 
   Config.prototype.clear = function() {
     this.cache = {};
-    return this.hoodie.store.remove(this.$type, this.id);
+    return this.hoodie.store.remove(this.type, this.id);
   };
 
   Config.prototype.remove = Config.prototype.set;

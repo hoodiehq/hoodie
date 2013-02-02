@@ -244,11 +244,11 @@ Hoodie.Remote = (function() {
         }
       }
       this.trigger("store:" + event, parsedDoc);
-      this.trigger("store:" + event + ":" + parsedDoc.$type, parsedDoc);
-      this.trigger("store:" + event + ":" + parsedDoc.$type + ":" + parsedDoc.id, parsedDoc);
+      this.trigger("store:" + event + ":" + parsedDoc.type, parsedDoc);
+      this.trigger("store:" + event + ":" + parsedDoc.type + ":" + parsedDoc.id, parsedDoc);
       this.trigger("store:change", event, parsedDoc);
-      this.trigger("store:change:" + parsedDoc.$type, event, parsedDoc);
-      _results.push(this.trigger("store:change:" + parsedDoc.$type + ":" + parsedDoc.id, event, parsedDoc));
+      this.trigger("store:change:" + parsedDoc.type, event, parsedDoc);
+      _results.push(this.trigger("store:change:" + parsedDoc.type + ":" + parsedDoc.id, event, parsedDoc));
     }
     return _results;
   };

@@ -30,15 +30,15 @@ describe "Hoodie.RemoteStore", ->
         @remoteStore.remote.prefix = 'store_prefix'
         @requestDefer.resolve
           _id: 'store_prefix/car/fresh'
-          $createdAt: '2012-12-12T22:00:00.000Z'
-          $updatedAt: '2012-12-21T22:00:00.000Z'
+          createdAt: '2012-12-12T22:00:00.000Z'
+          updatedAt: '2012-12-21T22:00:00.000Z'
       
       it "should resolve with the doc", ->
         expect(@remoteStore.find("todo", "1")).toBeResolvedWith
           id: 'fresh'
-          $type: 'car'
-          $createdAt: new Date(Date.parse '2012-12-12T22:00:00.000Z')
-          $updatedAt: new Date(Date.parse '2012-12-21T22:00:00.000Z')
+          type: 'car'
+          createdAt: new Date(Date.parse '2012-12-12T22:00:00.000Z')
+          updatedAt: new Date(Date.parse '2012-12-21T22:00:00.000Z')
   # /#find(type, id)
 
 
@@ -73,8 +73,8 @@ describe "Hoodie.RemoteStore", ->
       beforeEach ->
         @doc = 
           _id: 'car/fresh'
-          $createdAt: '2012-12-12T22:00:00.000Z'
-          $updatedAt: '2012-12-21T22:00:00.000Z'
+          createdAt: '2012-12-12T22:00:00.000Z'
+          updatedAt: '2012-12-21T22:00:00.000Z'
 
         @requestDefer.resolve 
           total_rows:3
@@ -86,9 +86,9 @@ describe "Hoodie.RemoteStore", ->
       it "should be resolved with array of objects", ->
         object = 
           id: 'fresh'
-          $type: 'car'
-          $createdAt: new Date (Date.parse '2012-12-12T22:00:00.000Z')
-          $updatedAt: new Date (Date.parse '2012-12-21T22:00:00.000Z')
+          type: 'car'
+          createdAt: new Date (Date.parse '2012-12-12T22:00:00.000Z')
+          updatedAt: new Date (Date.parse '2012-12-21T22:00:00.000Z')
         expect(@remoteStore.findAll()).toBeResolvedWith [object]
 
     _when "request has an error", ->
@@ -129,7 +129,7 @@ describe "Hoodie.RemoteStore", ->
         expect(@path).toBe '/remote_prefix%2Fcar%2F123'
 
       it "should add type to saved object", -> 
-        expect(@data.$type).toBe 'car'
+        expect(@data.type).toBe 'car'
 
       it "should set _id to `car/123`", ->
         expect(@data._id).toBe 'remote_prefix/car/123'

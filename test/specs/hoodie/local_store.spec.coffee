@@ -27,7 +27,7 @@ describe "Hoodie.LocalStore", ->
       Hoodie.LocalStore::db.getItem.andCallFake (key) ->
         return 'task/1' if key is '_dirty'
 
-      spyOn(Hoodie.LocalStore::, "_getObject").andReturn {$type: 'task', id: '1', title: 'remember the milk'}
+      spyOn(Hoodie.LocalStore::, "_getObject").andReturn {type: 'task', id: '1', title: 'remember the milk'}
       spyOn(Hoodie.LocalStore::, "_isDirty").andReturn true
       spyOn(Hoodie.LocalStore::, "trigger")
       # make timeout immediate
@@ -66,8 +66,8 @@ describe "Hoodie.LocalStore", ->
     
       it "should add timestamps", ->
         object = @store.cache.mostRecentCall.args[2]
-        expect(object.$createdAt).toBe 'now'
-        expect(object.$updatedAt).toBe 'now'
+        expect(object.createdAt).toBe 'now'
+        expect(object.updatedAt).toBe 'now'
         
       it "should pass options", ->
         options = @store.cache.mostRecentCall.args[3]
@@ -78,23 +78,23 @@ describe "Hoodie.LocalStore", ->
           spyOn(@store, "trigger")
           @store.cache.andCallFake (type, id, object) ->
             if object
-              { id: '123', $type: 'document', name: 'test', _local: 'something', _rev: '2-345' }
+              { id: '123', type: 'document', name: 'test', _local: 'something', _rev: '2-345' }
             else
-              { id: '123', $type: 'document', name: 'test', _local: 'something', old_attribute: 'what ever', _rev: '1-234' }
+              { id: '123', type: 'document', name: 'test', _local: 'something', old_attribute: 'what ever', _rev: '1-234' }
 
           @store.save 'document', '123', { name: 'test', _rev: '2-345' }, { remote: true }
         
         it "should not touch createdAt / updatedAt timestamps", ->
           object = @store.cache.mostRecentCall.args[2]
-          expect(object.$createdAt).toBeUndefined()
-          expect(object.$updatedAt).toBeUndefined()
+          expect(object.createdAt).toBeUndefined()
+          expect(object.updatedAt).toBeUndefined()
           
-        it "should add a _$syncedAt timestamp", ->
+        it "should add a _syncedAt timestamp", ->
           object = @store.cache.mostRecentCall.args[2]
-          expect(object._$syncedAt).toBe 'now'
+          expect(object._syncedAt).toBe 'now'
 
         it "should trigger trigger events", ->
-          object  = id: '123', $type: 'document', name: 'test', _local: 'something', _rev: '2-345'
+          object  = id: '123', type: 'document', name: 'test', _local: 'something', _rev: '2-345'
           options = remote: true
           expect(@store.trigger).wasCalledWith 'update',                    object, options
           expect(@store.trigger).wasCalledWith 'update:document',           object, options
@@ -115,8 +115,8 @@ describe "Hoodie.LocalStore", ->
         
         it "should not touch createdAt / updatedAt timestamps", ->
           object = @store.cache.mostRecentCall.args[2]
-          expect(object.$createdAt).toBeUndefined()
-          expect(object.$updatedAt).toBeUndefined()
+          expect(object.createdAt).toBeUndefined()
+          expect(object.updatedAt).toBeUndefined()
     
       _when "successful", ->
         beforeEach ->
@@ -154,9 +154,9 @@ describe "Hoodie.LocalStore", ->
           it "should pass true (= new created) as the second param to the done callback", ->
             expect(@promise).toBeResolvedWith 'doc', true
 
-          it "should set the $createdBy attribute", ->
+          it "should set the createdBy attribute", ->
             object = @store.cache.mostRecentCall.args[2]
-            expect(object.$createdBy).toBe 'owner_hash'
+            expect(object.createdBy).toBe 'owner_hash'
     
       _when "failed", ->
         beforeEach ->
@@ -171,7 +171,7 @@ describe "Hoodie.LocalStore", ->
     _when "id is '123', type is 'document', object is {id: '123', type: 'document', name: 'test'}", ->
       beforeEach ->
         # keep promise, key, and stored object for assertions
-        @store.save 'document', '123', {id: '123', $type: 'document', name: 'test'}
+        @store.save 'document', '123', {id: '123', type: 'document', name: 'test'}
         [type, key, @object] = @store.cache.mostRecentCall.args
     
     _when "id is '123', type is '$internal', object is {action: 'do some background magic'}}", ->
@@ -197,9 +197,9 @@ describe "Hoodie.LocalStore", ->
         expect(@object.$hidden).toBe 'wicked'
 
     it "should not overwrite createdAt attribute", ->
-      @store.save 'document', '123', { $createdAt: 'check12'  }
+      @store.save 'document', '123', { createdAt: 'check12'  }
       [type, id, object] = @store.cache.mostRecentCall.args
-      expect(object.$createdAt).toBe 'check12'
+      expect(object.createdAt).toBe 'check12'
   
     it "should allow numbers and lowercase letters for type only. And must start with a letter or $", ->
       invalid = ['UPPERCASE', 'underLines', '-?&$', '12345', 'a']
@@ -234,8 +234,8 @@ describe "Hoodie.LocalStore", ->
       it "should generate an id", ->
         expect(@key).toBe 'uuid'
 
-      it "should set $createdBy", ->
-        expect(@object.$createdBy).toBe 'owner_hash'
+      it "should set createdBy", ->
+        expect(@object.createdBy).toBe 'owner_hash'
         
       it "should pass options", ->
         options = @store.cache.mostRecentCall.args[3]
@@ -269,9 +269,9 @@ describe "Hoodie.LocalStore", ->
     beforeEach ->
       spyOn(@hoodie, "isPromise").andReturn false
       @todoObjects = [
-        {$type: 'todo', id: '1'}
-        {$type: 'todo', id: '2'}
-        {$type: 'todo', id: '3'}
+        {type: 'todo', id: '1'}
+        {type: 'todo', id: '2'}
+        {type: 'todo', id: '3'}
       ]
     
     it "should return a promise", ->
@@ -281,7 +281,7 @@ describe "Hoodie.LocalStore", ->
       spyOn(@store, "update")
       @store.updateAll @todoObjects, {funky: 'update'}
       for obj in @todoObjects
-        expect(@store.update).wasCalledWith obj.$type, obj.id, {funky: 'update'}, {}
+        expect(@store.update).wasCalledWith obj.type, obj.id, {funky: 'update'}, {}
     
     it "should resolve the returned promise once all objects have been updated", ->
       promise = @hoodie.defer().resolve().promise()
@@ -302,7 +302,7 @@ describe "Hoodie.LocalStore", ->
         spyOn(@store, "update")
         @store.updateAll promise, {funky: 'update'}
         for obj in @todoObjects
-          expect(@store.update).wasCalledWith obj.$type, obj.id, {funky: 'update'}, {}
+          expect(@store.update).wasCalledWith obj.type, obj.id, {funky: 'update'}, {}
   # /.updateAll(objects)
 
 
@@ -440,7 +440,7 @@ describe "Hoodie.LocalStore", ->
     
     _when "object can be found and remove comes from remote", ->
       beforeEach ->
-        spyOn(@store, "cache").andReturn { id: '123', $type: 'document', name: 'test'}
+        spyOn(@store, "cache").andReturn { id: '123', type: 'document', name: 'test'}
         spyOn(@store, "trigger")
         @store.remove 'document', '123', remote: true
       
@@ -448,20 +448,20 @@ describe "Hoodie.LocalStore", ->
         expect(@store.db.removeItem).wasCalledWith 'document/123'
 
       it "should trigger trigger events", ->
-        expect(@store.trigger).wasCalledWith 'remove',                         { id: '123', $type: 'document', name: 'test'}, { remote: true }
-        expect(@store.trigger).wasCalledWith 'remove:document',                { id: '123', $type: 'document', name: 'test'}, { remote: true }
-        expect(@store.trigger).wasCalledWith 'remove:document:123',            { id: '123', $type: 'document', name: 'test'}, { remote: true }
-        expect(@store.trigger).wasCalledWith 'change',               'remove', { id: '123', $type: 'document', name: 'test'}, { remote: true }
-        expect(@store.trigger).wasCalledWith 'change:document',      'remove', { id: '123', $type: 'document', name: 'test'}, { remote: true } 
-        expect(@store.trigger).wasCalledWith 'change:document:123',  'remove', { id: '123', $type: 'document', name: 'test'}, { remote: true } 
+        expect(@store.trigger).wasCalledWith 'remove',                         { id: '123', type: 'document', name: 'test'}, { remote: true }
+        expect(@store.trigger).wasCalledWith 'remove:document',                { id: '123', type: 'document', name: 'test'}, { remote: true }
+        expect(@store.trigger).wasCalledWith 'remove:document:123',            { id: '123', type: 'document', name: 'test'}, { remote: true }
+        expect(@store.trigger).wasCalledWith 'change',               'remove', { id: '123', type: 'document', name: 'test'}, { remote: true }
+        expect(@store.trigger).wasCalledWith 'change:document',      'remove', { id: '123', type: 'document', name: 'test'}, { remote: true } 
+        expect(@store.trigger).wasCalledWith 'change:document:123',  'remove', { id: '123', type: 'document', name: 'test'}, { remote: true } 
         
     _when "object can be found and was synched before", ->
       beforeEach ->
-        spyOn(@store, "cache").andReturn {_$syncedAt: 'now'}
+        spyOn(@store, "cache").andReturn {_syncedAt: 'now'}
         @store.remove 'document', '123'
         
       it "should mark the object as deleted and cache it", ->
-        expect(@store.cache).wasCalledWith 'document', '123', {_$syncedAt: 'now', _deleted: true}
+        expect(@store.cache).wasCalledWith 'document', '123', {_syncedAt: 'now', _deleted: true}
         
       it "should not remove the object from store", ->
         expect(@store.db.removeItem).wasNotCalled()
@@ -511,7 +511,7 @@ describe "Hoodie.LocalStore", ->
         _and "object does exist in localStorage", ->
           beforeEach ->
             @object = 
-              $type: 'couch'
+              type: 'couch'
               id: '123'
               color: 'red'
             @store._getObject.andReturn @object
@@ -543,7 +543,7 @@ describe "Hoodie.LocalStore", ->
             
               it "should mark it as changed", ->
                 @store.cache 'couch', '123'
-                object  = { color: 'red', $type: 'couch', id: '123' }
+                object  = { color: 'red', type: 'couch', id: '123' }
                 options = {}
                 expect(@store.markAsChanged).wasCalledWith 'couch', '123', object, options
           
@@ -561,7 +561,7 @@ describe "Hoodie.LocalStore", ->
     it "should return the object including type & id attributes", ->
       obj = @store.cache 'couch', '123', color: 'red'
       expect(obj.color).toBe 'red'
-      expect(obj.$type).toBe 'couch'
+      expect(obj.type).toBe 'couch'
       expect(obj.id).toBe    '123'
   # /.cache(type, id, object)
 
@@ -612,14 +612,14 @@ describe "Hoodie.LocalStore", ->
       _and "object was not yet synced", ->
         _and "object has saved with silent:true option", ->
           beforeEach ->
-            spyOn(@store, "cache").andReturn _$syncedAt: undefined, $updatedAt: undefined
+            spyOn(@store, "cache").andReturn _syncedAt: undefined, updatedAt: undefined
                 
           it "should return false", ->
             expect(@store.isDirty 'couch', '123').toBe false
 
         _and "object has been saved without silent:true option", ->
           beforeEach ->
-            spyOn(@store, "cache").andReturn _$syncedAt: undefined, $updatedAt: new Date(0)
+            spyOn(@store, "cache").andReturn _syncedAt: undefined, updatedAt: new Date(0)
                 
           it "should return true", ->
             expect(@store.isDirty 'couch', '123').toBe true
@@ -628,8 +628,8 @@ describe "Hoodie.LocalStore", ->
         _and "object was not updated yet", ->
           beforeEach ->
             spyOn(@store, "cache").andReturn 
-              _$syncedAt : new Date(0)
-              $updatedAt: undefined
+              _syncedAt : new Date(0)
+              updatedAt: undefined
           
           it "should return false", ->
             do expect(@store.isDirty 'couch', '123').toBeFalsy
@@ -637,8 +637,8 @@ describe "Hoodie.LocalStore", ->
         _and "object was updated at the same time", ->
           beforeEach ->
             spyOn(@store, "cache").andReturn 
-              _$syncedAt : new Date(0)
-              $updatedAt: new Date(0)
+              _syncedAt : new Date(0)
+              updatedAt: new Date(0)
               
           it "should return false", ->
             do expect(@store.isDirty 'couch', '123').toBeFalsy
@@ -646,8 +646,8 @@ describe "Hoodie.LocalStore", ->
         _and "object was updated later", ->
           beforeEach ->
             spyOn(@store, "cache").andReturn 
-              _$syncedAt : new Date(0)
-              $updatedAt: new Date(1)
+              _syncedAt : new Date(0)
+              updatedAt: new Date(1)
               
           it "should return true", ->
             do expect(@store.isDirty 'couch', '123').toBeTruthy
@@ -703,9 +703,9 @@ describe "Hoodie.LocalStore", ->
       beforeEach ->
         @store._dirty = {}
         @objects = [
-          { id: '1', $type: 'document', name: 'test1'}
-          { id: '2', $type: 'document', name: 'test2'}
-          { id: '3', $type: 'document', name: 'test3'}
+          { id: '1', type: 'document', name: 'test1'}
+          { id: '2', type: 'document', name: 'test2'}
+          { id: '3', type: 'document', name: 'test3'}
         ]
         @findAllDefer.resolve @objects
         spyOn(window, "setTimeout").andReturn 'newTimeout'
@@ -754,9 +754,9 @@ describe "Hoodie.LocalStore", ->
       it "should return the two docs", ->
         expect(@store.changedDocs().length).toBe 2
 
-      it "should add $type and id", ->
+      it "should add type and id", ->
         [doc1, doc2] = @store.changedDocs()
-        expect(doc1.$type).toBe 'couch'
+        expect(doc1.type).toBe 'couch'
         expect(doc1.id).toBe '123'
   # /.changedDocs()
 

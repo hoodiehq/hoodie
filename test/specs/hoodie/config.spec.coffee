@@ -4,9 +4,9 @@ describe "Hoodie.Config", ->
     @config = new Hoodie.Config @hoodie
   
   describe ".constructor(@hoodie, options)", ->
-    it "should default @$type to '$config'", ->
+    it "should default @type to '$config'", ->
       config = new Hoodie.Config @hoodie 
-      expect(config.$type).toBe '$config'
+      expect(config.type).toBe '$config'
       
     it "should default @id to 'hoodie'", ->
       config = new Hoodie.Config @hoodie 

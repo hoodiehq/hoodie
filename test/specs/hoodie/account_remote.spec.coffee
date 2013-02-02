@@ -190,7 +190,7 @@ describe "Hoodie.AccountRemote", ->
 
       it "should save `todo/abc2` in store", ->
         @remote.pull()
-        expect(@hoodie.store.save).wasCalledWith 'todo', 'abc2', { _rev : '1-123', content : 'remember the milk', done : false, order : 1, $type : 'todo', id : 'abc2' }, { remote : true }
+        expect(@hoodie.store.save).wasCalledWith 'todo', 'abc2', { _rev : '1-123', content : 'remember the milk', done : false, order : 1, type : 'todo', id : 'abc2' }, { remote : true }
       
       it "should trigger remote events", ->
         spyOn(@remote, "trigger")

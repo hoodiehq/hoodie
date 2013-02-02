@@ -104,7 +104,7 @@ Hoodie.Share = (function() {
     return this.hoodie.store.removeAll('$share');
   };
 
-  Share.prototype._allowedOptions = ["id", "access", "$createdBy"];
+  Share.prototype._allowedOptions = ["id", "access", "createdBy"];
 
   Share.prototype._filterShareOptions = function(options) {
     var filteredOptions, option, _i, _len, _ref;
@@ -139,7 +139,7 @@ Hoodie.Share = (function() {
       updateObject = function(object) {
         object.$shares || (object.$shares = {});
         object.$shares[shareId] = properties || true;
-        _this.hoodie.store.update(object.$type, object.id, {
+        _this.hoodie.store.update(object.type, object.id, {
           $shares: object.$shares
         });
         return object;
@@ -166,7 +166,7 @@ Hoodie.Share = (function() {
           return object;
         }
         object.$shares[shareId] = false;
-        _this.hoodie.store.update(object.$type, object.id, {
+        _this.hoodie.store.update(object.type, object.id, {
           $shares: object.$shares
         });
         return object;
@@ -196,7 +196,7 @@ Hoodie.Share = (function() {
         for (shareId in object.$shares) {
           object.$shares[shareId] = false;
         }
-        _this.hoodie.store.update(object.$type, object.id, {
+        _this.hoodie.store.update(object.type, object.id, {
           $shares: object.$shares
         });
         return object;
@@ -222,7 +222,7 @@ Hoodie.Share = (function() {
         updateObject = function(object) {
           object.$shares || (object.$shares = {});
           object.$shares[newShare.id] = properties || true;
-          _this.hoodie.store.update(object.$type, object.id, {
+          _this.hoodie.store.update(object.type, object.id, {
             $shares: object.$shares
           });
           return object;

@@ -60,7 +60,7 @@ describe "Hoodie.ShareInstance", ->
           access: 
             read:  true
             write: true
-          $createdBy: '$subscription'
+          createdBy: '$subscription'
 
     _when "security members and writers include my ownerHash", ->
       beforeEach ->
@@ -79,7 +79,7 @@ describe "Hoodie.ShareInstance", ->
           access: 
             read:  true
             write: true
-          $createdBy: '$subscription'
+          createdBy: '$subscription'
 
     _when "security members include my ownerHash, but not writers", ->
       beforeEach ->
@@ -98,7 +98,7 @@ describe "Hoodie.ShareInstance", ->
           access: 
             read:  true
             write: false
-          $createdBy: '$subscription'
+          createdBy: '$subscription'
   # /subscribe(options)
 
   describe "unsubscribe(options)", ->

@@ -76,7 +76,7 @@ describe("Hoodie.ShareInstance", function() {
             read: true,
             write: true
           },
-          $createdBy: '$subscription'
+          createdBy: '$subscription'
         });
       });
     });
@@ -101,7 +101,7 @@ describe("Hoodie.ShareInstance", function() {
             read: true,
             write: true
           },
-          $createdBy: '$subscription'
+          createdBy: '$subscription'
         });
       });
     });
@@ -126,7 +126,7 @@ describe("Hoodie.ShareInstance", function() {
             read: true,
             write: false
           },
-          $createdBy: '$subscription'
+          createdBy: '$subscription'
         });
       });
     });

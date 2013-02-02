@@ -32,7 +32,7 @@ describe("Hoodie.LocalStore", function() {
         }
       });
       spyOn(Hoodie.LocalStore.prototype, "_getObject").andReturn({
-        $type: 'task',
+        type: 'task',
         id: '1',
         title: 'remember the milk'
       });
@@ -85,8 +85,8 @@ describe("Hoodie.LocalStore", function() {
       it("should add timestamps", function() {
         var object;
         object = this.store.cache.mostRecentCall.args[2];
-        expect(object.$createdAt).toBe('now');
-        return expect(object.$updatedAt).toBe('now');
+        expect(object.createdAt).toBe('now');
+        return expect(object.updatedAt).toBe('now');
       });
       it("should pass options", function() {
         var options;
@@ -100,7 +100,7 @@ describe("Hoodie.LocalStore", function() {
             if (object) {
               return {
                 id: '123',
-                $type: 'document',
+                type: 'document',
                 name: 'test',
                 _local: 'something',
                 _rev: '2-345'
@@ -108,7 +108,7 @@ describe("Hoodie.LocalStore", function() {
             } else {
               return {
                 id: '123',
-                $type: 'document',
+                type: 'document',
                 name: 'test',
                 _local: 'something',
                 old_attribute: 'what ever',
@@ -126,19 +126,19 @@ describe("Hoodie.LocalStore", function() {
         it("should not touch createdAt / updatedAt timestamps", function() {
           var object;
           object = this.store.cache.mostRecentCall.args[2];
-          expect(object.$createdAt).toBeUndefined();
-          return expect(object.$updatedAt).toBeUndefined();
+          expect(object.createdAt).toBeUndefined();
+          return expect(object.updatedAt).toBeUndefined();
         });
-        it("should add a _$syncedAt timestamp", function() {
+        it("should add a _syncedAt timestamp", function() {
           var object;
           object = this.store.cache.mostRecentCall.args[2];
-          return expect(object._$syncedAt).toBe('now');
+          return expect(object._syncedAt).toBe('now');
         });
         it("should trigger trigger events", function() {
           var object, options;
           object = {
             id: '123',
-            $type: 'document',
+            type: 'document',
             name: 'test',
             _local: 'something',
             _rev: '2-345'
@@ -173,8 +173,8 @@ describe("Hoodie.LocalStore", function() {
         return it("should not touch createdAt / updatedAt timestamps", function() {
           var object;
           object = this.store.cache.mostRecentCall.args[2];
-          expect(object.$createdAt).toBeUndefined();
-          return expect(object.$updatedAt).toBeUndefined();
+          expect(object.createdAt).toBeUndefined();
+          return expect(object.updatedAt).toBeUndefined();
         });
       });
       _when("successful", function() {
@@ -224,10 +224,10 @@ describe("Hoodie.LocalStore", function() {
           it("should pass true (= new created) as the second param to the done callback", function() {
             return expect(this.promise).toBeResolvedWith('doc', true);
           });
-          return it("should set the $createdBy attribute", function() {
+          return it("should set the createdBy attribute", function() {
             var object;
             object = this.store.cache.mostRecentCall.args[2];
-            return expect(object.$createdBy).toBe('owner_hash');
+            return expect(object.createdBy).toBe('owner_hash');
           });
         });
       });
@@ -253,7 +253,7 @@ describe("Hoodie.LocalStore", function() {
         var key, type, _ref;
         this.store.save('document', '123', {
           id: '123',
-          $type: 'document',
+          type: 'document',
           name: 'test'
         });
         return _ref = this.store.cache.mostRecentCall.args, type = _ref[0], key = _ref[1], this.object = _ref[2], _ref;
@@ -297,10 +297,10 @@ describe("Hoodie.LocalStore", function() {
     it("should not overwrite createdAt attribute", function() {
       var id, object, type, _ref;
       this.store.save('document', '123', {
-        $createdAt: 'check12'
+        createdAt: 'check12'
       });
       _ref = this.store.cache.mostRecentCall.args, type = _ref[0], id = _ref[1], object = _ref[2];
-      return expect(object.$createdAt).toBe('check12');
+      return expect(object.createdAt).toBe('check12');
     });
     it("should allow numbers and lowercase letters for type only. And must start with a letter or $", function() {
       var invalid, key, promise, valid, _i, _j, _len, _len1, _results;
@@ -349,8 +349,8 @@ describe("Hoodie.LocalStore", function() {
       it("should generate an id", function() {
         return expect(this.key).toBe('uuid');
       });
-      it("should set $createdBy", function() {
-        return expect(this.object.$createdBy).toBe('owner_hash');
+      it("should set createdBy", function() {
+        return expect(this.object.createdBy).toBe('owner_hash');
       });
       it("should pass options", function() {
         var options;
@@ -390,13 +390,13 @@ describe("Hoodie.LocalStore", function() {
       spyOn(this.hoodie, "isPromise").andReturn(false);
       return this.todoObjects = [
         {
-          $type: 'todo',
+          type: 'todo',
           id: '1'
         }, {
-          $type: 'todo',
+          type: 'todo',
           id: '2'
         }, {
-          $type: 'todo',
+          type: 'todo',
           id: '3'
         }
       ];
@@ -414,7 +414,7 @@ describe("Hoodie.LocalStore", function() {
       _results = [];
       for (_i = 0, _len = _ref.length; _i < _len; _i++) {
         obj = _ref[_i];
-        _results.push(expect(this.store.update).wasCalledWith(obj.$type, obj.id, {
+        _results.push(expect(this.store.update).wasCalledWith(obj.type, obj.id, {
           funky: 'update'
         }, {}));
       }
@@ -452,7 +452,7 @@ describe("Hoodie.LocalStore", function() {
         _results = [];
         for (_i = 0, _len = _ref.length; _i < _len; _i++) {
           obj = _ref[_i];
-          _results.push(expect(this.store.update).wasCalledWith(obj.$type, obj.id, {
+          _results.push(expect(this.store.update).wasCalledWith(obj.type, obj.id, {
             funky: 'update'
           }, {}));
         }
@@ -631,7 +631,7 @@ describe("Hoodie.LocalStore", function() {
       beforeEach(function() {
         spyOn(this.store, "cache").andReturn({
           id: '123',
-          $type: 'document',
+          type: 'document',
           name: 'test'
         });
         spyOn(this.store, "trigger");
@@ -645,42 +645,42 @@ describe("Hoodie.LocalStore", function() {
       return it("should trigger trigger events", function() {
         expect(this.store.trigger).wasCalledWith('remove', {
           id: '123',
-          $type: 'document',
+          type: 'document',
           name: 'test'
         }, {
           remote: true
         });
         expect(this.store.trigger).wasCalledWith('remove:document', {
           id: '123',
-          $type: 'document',
+          type: 'document',
           name: 'test'
         }, {
           remote: true
         });
         expect(this.store.trigger).wasCalledWith('remove:document:123', {
           id: '123',
-          $type: 'document',
+          type: 'document',
           name: 'test'
         }, {
           remote: true
         });
         expect(this.store.trigger).wasCalledWith('change', 'remove', {
           id: '123',
-          $type: 'document',
+          type: 'document',
           name: 'test'
         }, {
           remote: true
         });
         expect(this.store.trigger).wasCalledWith('change:document', 'remove', {
           id: '123',
-          $type: 'document',
+          type: 'document',
           name: 'test'
         }, {
           remote: true
         });
         return expect(this.store.trigger).wasCalledWith('change:document:123', 'remove', {
           id: '123',
-          $type: 'document',
+          type: 'document',
           name: 'test'
         }, {
           remote: true
@@ -690,13 +690,13 @@ describe("Hoodie.LocalStore", function() {
     return _when("object can be found and was synched before", function() {
       beforeEach(function() {
         spyOn(this.store, "cache").andReturn({
-          _$syncedAt: 'now'
+          _syncedAt: 'now'
         });
         return this.store.remove('document', '123');
       });
       it("should mark the object as deleted and cache it", function() {
         return expect(this.store.cache).wasCalledWith('document', '123', {
-          _$syncedAt: 'now',
+          _syncedAt: 'now',
           _deleted: true
         });
       });
@@ -765,7 +765,7 @@ describe("Hoodie.LocalStore", function() {
         _and("object does exist in localStorage", function() {
           beforeEach(function() {
             this.object = {
-              $type: 'couch',
+              type: 'couch',
               id: '123',
               color: 'red'
             };
@@ -806,7 +806,7 @@ describe("Hoodie.LocalStore", function() {
                 this.store.cache('couch', '123');
                 object = {
                   color: 'red',
-                  $type: 'couch',
+                  type: 'couch',
                   id: '123'
                 };
                 options = {};
@@ -835,7 +835,7 @@ describe("Hoodie.LocalStore", function() {
         color: 'red'
       });
       expect(obj.color).toBe('red');
-      expect(obj.$type).toBe('couch');
+      expect(obj.type).toBe('couch');
       return expect(obj.id).toBe('123');
     });
   });
@@ -892,8 +892,8 @@ describe("Hoodie.LocalStore", function() {
         _and("object has saved with silent:true option", function() {
           beforeEach(function() {
             return spyOn(this.store, "cache").andReturn({
-              _$syncedAt: void 0,
-              $updatedAt: void 0
+              _syncedAt: void 0,
+              updatedAt: void 0
             });
           });
           return it("should return false", function() {
@@ -903,8 +903,8 @@ describe("Hoodie.LocalStore", function() {
         return _and("object has been saved without silent:true option", function() {
           beforeEach(function() {
             return spyOn(this.store, "cache").andReturn({
-              _$syncedAt: void 0,
-              $updatedAt: new Date(0)
+              _syncedAt: void 0,
+              updatedAt: new Date(0)
             });
           });
           return it("should return true", function() {
@@ -916,8 +916,8 @@ describe("Hoodie.LocalStore", function() {
         _and("object was not updated yet", function() {
           beforeEach(function() {
             return spyOn(this.store, "cache").andReturn({
-              _$syncedAt: new Date(0),
-              $updatedAt: void 0
+              _syncedAt: new Date(0),
+              updatedAt: void 0
             });
           });
           return it("should return false", function() {
@@ -927,8 +927,8 @@ describe("Hoodie.LocalStore", function() {
         _and("object was updated at the same time", function() {
           beforeEach(function() {
             return spyOn(this.store, "cache").andReturn({
-              _$syncedAt: new Date(0),
-              $updatedAt: new Date(0)
+              _syncedAt: new Date(0),
+              updatedAt: new Date(0)
             });
           });
           return it("should return false", function() {
@@ -938,8 +938,8 @@ describe("Hoodie.LocalStore", function() {
         return _and("object was updated later", function() {
           beforeEach(function() {
             return spyOn(this.store, "cache").andReturn({
-              _$syncedAt: new Date(0),
-              $updatedAt: new Date(1)
+              _syncedAt: new Date(0),
+              updatedAt: new Date(1)
             });
           });
           return it("should return true", function() {
@@ -1009,15 +1009,15 @@ describe("Hoodie.LocalStore", function() {
         this.objects = [
           {
             id: '1',
-            $type: 'document',
+            type: 'document',
             name: 'test1'
           }, {
             id: '2',
-            $type: 'document',
+            type: 'document',
             name: 'test2'
           }, {
             id: '3',
-            $type: 'document',
+            type: 'document',
             name: 'test3'
           }
         ];
@@ -1074,10 +1074,10 @@ describe("Hoodie.LocalStore", function() {
       it("should return the two docs", function() {
         return expect(this.store.changedDocs().length).toBe(2);
       });
-      return it("should add $type and id", function() {
+      return it("should add type and id", function() {
         var doc1, doc2, _ref;
         _ref = this.store.changedDocs(), doc1 = _ref[0], doc2 = _ref[1];
-        expect(doc1.$type).toBe('couch');
+        expect(doc1.type).toBe('couch');
         return expect(doc1.id).toBe('123');
       });
     });

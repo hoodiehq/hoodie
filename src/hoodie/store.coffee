@@ -120,7 +120,7 @@ class Hoodie.Store
       defer = @hoodie.defer()
       objects = [objects] unless $.isArray objects
       _updatePromises = for object in objects
-        @update(object.$type, object.id, objectUpdate, options)
+        @update(object.type, object.id, objectUpdate, options)
       $.when.apply(null, _updatePromises).then defer.resolve
       
       return defer.promise()
@@ -185,7 +185,7 @@ class Hoodie.Store
   # Destroyes all objects. Can be filtered by a type
   removeAll : (type, options = {}) -> 
     @findAll(type).pipe (objects) =>
-      @remove(object.$type, object.id, options) for object in objects
+      @remove(object.type, object.id, options) for object in objects
   
 
   # ## Private

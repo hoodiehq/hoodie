@@ -222,7 +222,7 @@ describe("Hoodie.AccountRemote", function() {
           content: 'remember the milk',
           done: false,
           order: 1,
-          $type: 'todo',
+          type: 'todo',
           id: 'abc2'
         }, {
           remote: true

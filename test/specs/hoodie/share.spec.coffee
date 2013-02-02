@@ -86,9 +86,9 @@ describe "Hoodie.Share", ->
       @share.findOrAdd 'id123', {}
       expect(@hoodie.store.findOrAdd).wasCalledWith '$share', 'id123', {}
 
-    it "should not filter out $createdBy property", ->
-      @share.findOrAdd 'id123', $createdBy : 'me'
-      expect(@hoodie.store.findOrAdd).wasCalledWith '$share', 'id123', $createdBy : 'me'
+    it "should not filter out createdBy property", ->
+      @share.findOrAdd 'id123', createdBy : 'me'
+      expect(@hoodie.store.findOrAdd).wasCalledWith '$share', 'id123', createdBy : 'me'
 
     _when "store.findOrAdd successful", ->
       it "should resolve with a Share Instance", ->
@@ -202,7 +202,7 @@ describe "Hoodie.Share", ->
       _when "promise returns one object", ->
         beforeEach ->
           @promise = @storeDefer.resolve
-            $type: 'task'
+            type: 'task'
             id: '123'
             title: 'milk'
           @promise.hoodie = @hoodie
@@ -214,7 +214,7 @@ describe "Hoodie.Share", ->
 
         _and "properties passed as array", ->
           it "should save object returned by promise with {$shares: {shareId: ['title', 'owner']}}", ->
-            @storeDefer.resolve({$type: 'task', id: '123', title: 'milk'})
+            @storeDefer.resolve({type: 'task', id: '123', title: 'milk'})
 
             properties = ['title', 'owner']
             Hoodie.Share::_storeShareAt.apply(@promise, ['shareId', properties])
@@ -223,8 +223,8 @@ describe "Hoodie.Share", ->
       _when "promise returns multiple objects", ->
         beforeEach ->
           @promise = @storeDefer.resolve [
-            {$type: 'task', id: '123', title: 'milk'}
-            {$type: 'task', id: '456', title: 'milk'}
+            {type: 'task', id: '123', title: 'milk'}
+            {type: 'task', id: '456', title: 'milk'}
           ]
           @promise.hoodie = @hoodie
 
@@ -246,7 +246,7 @@ describe "Hoodie.Share", ->
       _when "object is currently shared at 'shareId'", ->
         beforeEach ->
           @promise = @storeDefer.resolve 
-            $type: 'task'
+            type: 'task'
             id: '123'
             title: 'milk'
             $shares: {shareId: true}
@@ -259,9 +259,9 @@ describe "Hoodie.Share", ->
       _when "promise returns multiple objects, of which some are shared at 'shareId'", ->
         beforeEach ->
           @promise = @storeDefer.resolve [
-            {$type: 'task', id: '123', title: 'milk'}
-            {$type: 'task', id: '456', title: 'milk', $shares: {shareId: true}}
-            {$type: 'task', id: '789', title: 'milk', $shares: {shareId: ['title', 'owner']}}
+            {type: 'task', id: '123', title: 'milk'}
+            {type: 'task', id: '456', title: 'milk', $shares: {shareId: true}}
+            {type: 'task', id: '789', title: 'milk', $shares: {shareId: ['title', 'owner']}}
           ]
           @promise.hoodie = @hoodie
 
@@ -276,7 +276,7 @@ describe "Hoodie.Share", ->
       _when "promise returns one object", ->
         beforeEach ->
           @promise = @storeDefer.resolve 
-            $type: 'task'
+            type: 'task'
             id: '123'
             title: 'milk'
             $shares: {shareId: true}
@@ -289,9 +289,9 @@ describe "Hoodie.Share", ->
       _when "promise returns multiple objects, of which some are shared at 'shareId'", ->
         beforeEach ->
           @promise = @storeDefer.resolve [
-            {$type: 'task', id: '123', title: 'milk'}
-            {$type: 'task', id: '456', title: 'milk', $shares: {shareId: true}}
-            {$type: 'task', id: '789', title: 'milk', $shares: {shareId: ['title', 'owner']}}
+            {type: 'task', id: '123', title: 'milk'}
+            {type: 'task', id: '456', title: 'milk', $shares: {shareId: true}}
+            {type: 'task', id: '789', title: 'milk', $shares: {shareId: ['title', 'owner']}}
           ]
           @promise.hoodie = @hoodie
 

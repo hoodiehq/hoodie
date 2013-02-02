@@ -30,7 +30,7 @@ Hoodie.User = (function() {
       _results = [];
       for (_i = 0, _len = objects.length; _i < _len; _i++) {
         object = objects[_i];
-        _results.push(_this.hoodie.store.update(object.$type, object.id, {
+        _results.push(_this.hoodie.store.update(object.type, object.id, {
           $public: properties || true
         }));
       }
@@ -49,7 +49,7 @@ Hoodie.User = (function() {
       for (_i = 0, _len = objects.length; _i < _len; _i++) {
         object = objects[_i];
         if (object.$public) {
-          _results.push(_this.hoodie.store.update(object.$type, object.id, {
+          _results.push(_this.hoodie.store.update(object.type, object.id, {
             $public: false
           }));
         }

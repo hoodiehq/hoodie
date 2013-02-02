@@ -119,12 +119,12 @@ describe("Hoodie.Share", function() {
       this.share.findOrAdd('id123', {});
       return expect(this.hoodie.store.findOrAdd).wasCalledWith('$share', 'id123', {});
     });
-    it("should not filter out $createdBy property", function() {
+    it("should not filter out createdBy property", function() {
       this.share.findOrAdd('id123', {
-        $createdBy: 'me'
+        createdBy: 'me'
       });
       return expect(this.hoodie.store.findOrAdd).wasCalledWith('$share', 'id123', {
-        $createdBy: 'me'
+        createdBy: 'me'
       });
     });
     return _when("store.findOrAdd successful", function() {
@@ -293,7 +293,7 @@ describe("Hoodie.Share", function() {
       _when("promise returns one object", function() {
         beforeEach(function() {
           this.promise = this.storeDefer.resolve({
-            $type: 'task',
+            type: 'task',
             id: '123',
             title: 'milk'
           });
@@ -313,7 +313,7 @@ describe("Hoodie.Share", function() {
           return it("should save object returned by promise with {$shares: {shareId: ['title', 'owner']}}", function() {
             var properties;
             this.storeDefer.resolve({
-              $type: 'task',
+              type: 'task',
               id: '123',
               title: 'milk'
             });
@@ -331,11 +331,11 @@ describe("Hoodie.Share", function() {
         beforeEach(function() {
           this.promise = this.storeDefer.resolve([
             {
-              $type: 'task',
+              type: 'task',
               id: '123',
               title: 'milk'
             }, {
-              $type: 'task',
+              type: 'task',
               id: '456',
               title: 'milk'
             }
@@ -380,7 +380,7 @@ describe("Hoodie.Share", function() {
       _when("object is currently shared at 'shareId'", function() {
         beforeEach(function() {
           this.promise = this.storeDefer.resolve({
-            $type: 'task',
+            type: 'task',
             id: '123',
             title: 'milk',
             $shares: {
@@ -402,18 +402,18 @@ describe("Hoodie.Share", function() {
         beforeEach(function() {
           this.promise = this.storeDefer.resolve([
             {
-              $type: 'task',
+              type: 'task',
               id: '123',
               title: 'milk'
             }, {
-              $type: 'task',
+              type: 'task',
               id: '456',
               title: 'milk',
               $shares: {
                 shareId: true
               }
             }, {
-              $type: 'task',
+              type: 'task',
               id: '789',
               title: 'milk',
               $shares: {
@@ -447,7 +447,7 @@ describe("Hoodie.Share", function() {
       _when("promise returns one object", function() {
         beforeEach(function() {
           this.promise = this.storeDefer.resolve({
-            $type: 'task',
+            type: 'task',
             id: '123',
             title: 'milk',
             $shares: {
@@ -469,18 +469,18 @@ describe("Hoodie.Share", function() {
         beforeEach(function() {
           this.promise = this.storeDefer.resolve([
             {
-              $type: 'task',
+              type: 'task',
               id: '123',
               title: 'milk'
             }, {
-              $type: 'task',
+              type: 'task',
               id: '456',
               title: 'milk',
               $shares: {
                 shareId: true
               }
             }, {
-              $type: 'task',
+              type: 'task',
               id: '789',
               title: 'milk',
               $shares: {

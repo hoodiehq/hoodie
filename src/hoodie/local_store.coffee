@@ -59,9 +59,9 @@ class Hoodie.LocalStore extends Hoodie.Store
   #
   # It also adds timestamps along the way:
   # 
-  # * `$createdAt` unless it already exists
-  # * `$updatedAt` every time
-  # * `_$syncedAt`  if changes comes from remote
+  # * `createdAt` unless it already exists
+  # * `updatedAt` every time
+  # * `_syncedAt`  if changes comes from remote
   #
   # example usage:
   #
@@ -87,15 +87,15 @@ class Hoodie.LocalStore extends Hoodie.Store
     #       might get executed before the account module is initiated.
     # todo: move ownerHash into a method on the core hoodie module
     if isNew and @hoodie.account
-      object.$createdBy or= @hoodie.account.ownerHash
+      object.createdBy or= @hoodie.account.ownerHash
 
     # handle local properties and hidden properties with $ prefix
     # keep local properties for remote updates
     unless isNew
 
-      # when object.$updatedBy is set, remove it.
+      # when object.updatedBy is set, remove it.
       # that means last update is by me.
-      delete object.$updatedBy
+      delete object.updatedBy
 
       # for remote updates, keep local properties
       for key of currentObject when not object.hasOwnProperty key
@@ -107,11 +107,11 @@ class Hoodie.LocalStore extends Hoodie.Store
   
     # add timestamps
     if options.remote
-      object._$syncedAt = @_now()
+      object._syncedAt = @_now()
 
     else unless options.silent
-      object.$updatedAt = @_now()
-      object.$createdAt or= object.$updatedAt
+      object.updatedAt = @_now()
+      object.createdAt or= object.updatedAt
   
     try 
       object = @cache type, id, object, options
@@ -171,7 +171,7 @@ class Hoodie.LocalStore extends Hoodie.Store
     # normalize filter
     if typeof filter is 'string'
       type   = filter
-      filter = (obj) -> obj.$type is type
+      filter = (obj) -> obj.type is type
   
     try
       # coffeescript gathers the result of the respective for key in keys loops
@@ -208,7 +208,7 @@ class Hoodie.LocalStore extends Hoodie.Store
     unless object
       return @_decoratePromise defer.reject(Hoodie.Errors.NOT_FOUND type, id).promise()
     
-    if object._$syncedAt and not options.remote
+    if object._syncedAt and not options.remote
       object._deleted = true
       @cache type, id, object
     
@@ -248,7 +248,7 @@ class Hoodie.LocalStore extends Hoodie.Store
     key = "#{type}/#{id}"
   
     if object
-      $.extend true, object, { $type: type, id: id }
+      $.extend true, object, { type: type, id: id }
       @_setObject type, id, object
       
       if options.remote
@@ -333,7 +333,7 @@ class Hoodie.LocalStore extends Hoodie.Store
     @findAll().pipe (objects) =>
 
       for object in objects
-        key = "#{object.$type}/#{object.id}"
+        key = "#{object.type}/#{object.id}"
         @_dirty[key] = object
 
       @_saveDirtyIds()
@@ -347,7 +347,7 @@ class Hoodie.LocalStore extends Hoodie.Store
   changedDocs : -> 
     for key, object of @_dirty
       [type, id]   = key.split '/'
-      object.$type = type
+      object.type = type
       object.id    = id
       object
        
@@ -359,7 +359,7 @@ class Hoodie.LocalStore extends Hoodie.Store
   # dirty objects in the store.
   #
   # Otherwise it returns `true` or `false` for the passed object. An object is dirty
-  # if it has no `_$syncedAt` attribute or if `updatedAt` is more recent than `_$syncedAt`
+  # if it has no `_syncedAt` attribute or if `updatedAt` is more recent than `_syncedAt`
   isDirty : (type, id) ->
     unless type
       return $.isEmptyObject @_dirty
@@ -468,7 +468,7 @@ class Hoodie.LocalStore extends Hoodie.Store
   _setObject : (type, id, object) ->
     key = "#{type}/#{id}"
     store = $.extend {}, object
-    delete store.$type
+    delete store.type
     delete store.id
     @db.setItem key, JSON.stringify store
     
@@ -477,12 +477,12 @@ class Hoodie.LocalStore extends Hoodie.Store
     json = @db.getItem(key)
     if json
       obj = JSON.parse(json)
-      obj.$type = type
+      obj.type = type
       obj.id    = id
       
-      obj.$createdAt = new Date(Date.parse obj.$createdAt) if obj.$createdAt
-      obj.$updatedAt = new Date(Date.parse obj.$updatedAt) if obj.$updatedAt
-      obj._$syncedAt = new Date(Date.parse obj._$syncedAt) if obj._$syncedAt
+      obj.createdAt = new Date(Date.parse obj.createdAt) if obj.createdAt
+      obj.updatedAt = new Date(Date.parse obj.updatedAt) if obj.updatedAt
+      obj._syncedAt = new Date(Date.parse obj._syncedAt) if obj._syncedAt
       
       obj
     else
@@ -519,10 +519,10 @@ class Hoodie.LocalStore extends Hoodie.Store
   # is dirty?
   _isDirty : (object) ->
     
-    return false unless object.$updatedAt # no updatedAt? no dirt then
-    return true  unless object._$syncedAt # no syncedAt? uuhh, that's dirty.
+    return false unless object.updatedAt # no updatedAt? no dirt then
+    return true  unless object._syncedAt # no syncedAt? uuhh, that's dirty.
   
-    object._$syncedAt.getTime() < object.$updatedAt.getTime()
+    object._syncedAt.getTime() < object.updatedAt.getTime()
 
   # marked as deleted?
   _isMarkedAsDeleted : (object) ->
@@ -538,11 +538,11 @@ class Hoodie.LocalStore extends Hoodie.Store
   _triggerEvents: (event, object, options) ->
     
     @trigger event,                                           object, options
-    @trigger "#{event}:#{object.$type}",                      object, options
-    @trigger "#{event}:#{object.$type}:#{object.id}",         object, options unless event is 'new'
+    @trigger "#{event}:#{object.type}",                      object, options
+    @trigger "#{event}:#{object.type}:#{object.id}",         object, options unless event is 'new'
     @trigger "change",                                 event, object, options
-    @trigger "change:#{object.$type}",                 event, object, options
-    @trigger "change:#{object.$type}:#{object.id}",    event, object, options unless event is 'new'
+    @trigger "change:#{object.type}",                 event, object, options
+    @trigger "change:#{object.type}:#{object.id}",    event, object, options unless event is 'new'
 
   #
   _trigger_dirty_and_idle_events: ->

@@ -218,8 +218,8 @@ Hoodie.Account = (function() {
       type: 'user',
       roles: [],
       password: resetPasswordId,
-      $createdAt: new Date,
-      $updatedAt: new Date
+      createdAt: new Date,
+      updatedAt: new Date
     };
     options = {
       data: JSON.stringify(data),
@@ -254,7 +254,7 @@ Hoodie.Account = (function() {
 
   Account.prototype._setOwner = function(ownerHash) {
     this.ownerHash = ownerHash;
-    this.hoodie.config.set('$createdBy', this.ownerHash);
+    this.hoodie.config.set('createdBy', this.ownerHash);
     return this.hoodie.config.set('_account.ownerHash', this.ownerHash);
   };
 

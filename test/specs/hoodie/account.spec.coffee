@@ -497,7 +497,7 @@ describe "Hoodie.Account", ->
              @account.signIn('joe@example.com', 'secret')
              expect(@account.ownerHash).toBe 'user_hash'
              expect(@hoodie.config.set).wasCalledWith '_account.ownerHash', 'user_hash'
-             expect(@hoodie.config.set).wasCalledWith '$createdBy', 'user_hash'
+             expect(@hoodie.config.set).wasCalledWith 'createdBy', 'user_hash'
 
           it "should fetch the _users doc", ->
             spyOn(@account, "fetch")
@@ -1000,8 +1000,8 @@ describe "Hoodie.Account", ->
         expect(@data.name).toBe     "$passwordReset/joe@example.com/uuid567"
         expect(@data.type).toBe     'user'
         expect(@data.password).toBe 'joe@example.com/uuid567'
-        expect(@data.$createdAt).toBeDefined()
-        expect(@data.$updatedAt).toBeDefined()
+        expect(@data.createdAt).toBeDefined()
+        expect(@data.updatedAt).toBeDefined()
 
       it "should return a promise", ->
          expect(@account.resetPassword("joe@example.com")).toBePromise()

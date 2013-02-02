@@ -33,7 +33,7 @@ describe "Hoodie.User", ->
     describe "#publish(properties)", ->
       _when "promise returns one object", ->
         beforeEach ->
-           @promise = @storeDefer.resolve({$type: 'task', id: '123', title: 'milk'})
+           @promise = @storeDefer.resolve({type: 'task', id: '123', title: 'milk'})
            @promise.hoodie = @hoodie
           
         _and "no properties passed", ->
@@ -50,8 +50,8 @@ describe "Hoodie.User", ->
       _when "promise returns multiple objects", ->
         beforeEach ->
           @promise = @storeDefer.resolve [
-            {$type: 'task', id: '123', title: 'milk'}
-            {$type: 'task', id: '456', title: 'milk'}
+            {type: 'task', id: '123', title: 'milk'}
+            {type: 'task', id: '456', title: 'milk'}
           ]
           @promise.hoodie = @hoodie
 
@@ -73,7 +73,7 @@ describe "Hoodie.User", ->
       _when "promise returns one object that is public", ->
         beforeEach ->
           @promise = @storeDefer.resolve
-            $type: 'task'
+            type: 'task'
             id: '123'
             title: 'milk'
             $public: true
@@ -86,7 +86,7 @@ describe "Hoodie.User", ->
       _when "promise returns one object that is not public", ->
         beforeEach ->
           @promise = @storeDefer.resolve
-            $type: 'task'
+            type: 'task'
             id: '123'
             title: 'milk'
           @promise.hoodie = @hoodie
@@ -98,9 +98,9 @@ describe "Hoodie.User", ->
       _when "promise returns multiple objects, of which some are public", ->
         beforeEach ->
           @promise = @storeDefer.resolve [
-            {$type: 'task', id: '123', title: 'milk'}
-            {$type: 'task', id: '456', title: 'milk', $public: true}
-            {$type: 'task', id: '789', title: 'milk', $public: ['title', 'owner']}
+            {type: 'task', id: '123', title: 'milk'}
+            {type: 'task', id: '456', title: 'milk', $public: true}
+            {type: 'task', id: '789', title: 'milk', $public: ['title', 'owner']}
           ]
           @promise.hoodie = @hoodie
 

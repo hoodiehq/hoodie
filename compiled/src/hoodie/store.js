@@ -106,7 +106,7 @@ Hoodie.Store = (function() {
         _results = [];
         for (_i = 0, _len = objects.length; _i < _len; _i++) {
           object = objects[_i];
-          _results.push(this.update(object.$type, object.id, objectUpdate, options));
+          _results.push(this.update(object.type, object.id, objectUpdate, options));
         }
         return _results;
       }).call(_this);
@@ -167,7 +167,7 @@ Hoodie.Store = (function() {
       _results = [];
       for (_i = 0, _len = objects.length; _i < _len; _i++) {
         object = objects[_i];
-        _results.push(_this.remove(object.$type, object.id, options));
+        _results.push(_this.remove(object.type, object.id, options));
       }
       return _results;
     });

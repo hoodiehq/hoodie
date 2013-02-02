@@ -278,7 +278,7 @@ describe "Hoodie.Remote", ->
 
         # {"_id":"todo/abc3","_rev":"2-123","_deleted":true}
         object =
-          '$type'  : 'todo'
+          'type'  : 'todo'
           id       : 'abc3'
           _rev     : '2-123'
           _deleted : true
@@ -292,7 +292,7 @@ describe "Hoodie.Remote", ->
         
         # {"_id":"todo/abc2","_rev":"1-123","content":"remember the milk","done":false,"order":1, "type":"todo"}
         object =
-          '$type'  : 'todo'
+          'type'  : 'todo'
           id       : 'abc2'
           _rev     : '1-123'
           content  : 'remember the milk'
@@ -447,9 +447,9 @@ describe "Hoodie.Remote", ->
     _when "Array of docs passed", ->
       beforeEach ->
         @todoObjects = [
-          {$type: 'todo', id: '1'}
-          {$type: 'todo', id: '2'}
-          {$type: 'todo', id: '3'}
+          {type: 'todo', id: '1'}
+          {type: 'todo', id: '2'}
+          {type: 'todo', id: '3'}
         ]
         @remote.push @todoObjects
       
@@ -496,9 +496,9 @@ describe "Hoodie.Remote", ->
       beforeEach ->
         @remote.prefix = '$public'
         @todoObjects = [
-          {$type: 'todo', id: '1'}
-          {$type: 'todo', id: '2'}
-          {$type: 'todo', id: '3'}
+          {type: 'todo', id: '1'}
+          {type: 'todo', id: '2'}
+          {type: 'todo', id: '3'}
         ]
         @remote.push @todoObjects
       

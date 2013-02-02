@@ -377,11 +377,11 @@ class Hoodie.Remote
           @_knownObjects[doc._id] = 1
 
       @trigger "store:#{event}",                                    parsedDoc
-      @trigger "store:#{event}:#{parsedDoc.$type}",                 parsedDoc
-      @trigger "store:#{event}:#{parsedDoc.$type}:#{parsedDoc.id}", parsedDoc      
+      @trigger "store:#{event}:#{parsedDoc.type}",                 parsedDoc
+      @trigger "store:#{event}:#{parsedDoc.type}:#{parsedDoc.id}", parsedDoc      
       @trigger "store:change",                                      event, parsedDoc
-      @trigger "store:change:#{parsedDoc.$type}",                   event, parsedDoc
-      @trigger "store:change:#{parsedDoc.$type}:#{parsedDoc.id}",   event, parsedDoc
+      @trigger "store:change:#{parsedDoc.type}",                   event, parsedDoc
+      @trigger "store:change:#{parsedDoc.type}:#{parsedDoc.id}",   event, parsedDoc
 
 
   # ### handle push success

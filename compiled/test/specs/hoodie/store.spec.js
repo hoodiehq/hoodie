@@ -211,13 +211,13 @@ describe("Hoodie.Store", function() {
       spyOn(this.hoodie, "isPromise").andReturn(false);
       return this.todoObjects = [
         {
-          $type: 'todo',
+          type: 'todo',
           id: '1'
         }, {
-          $type: 'todo',
+          type: 'todo',
           id: '2'
         }, {
-          $type: 'todo',
+          type: 'todo',
           id: '3'
         }
       ];
@@ -235,7 +235,7 @@ describe("Hoodie.Store", function() {
       _results = [];
       for (_i = 0, _len = _ref.length; _i < _len; _i++) {
         obj = _ref[_i];
-        _results.push(expect(this.store.update).wasCalledWith(obj.$type, obj.id, {
+        _results.push(expect(this.store.update).wasCalledWith(obj.type, obj.id, {
           funky: 'update'
         }, {}));
       }
@@ -268,7 +268,7 @@ describe("Hoodie.Store", function() {
         _results = [];
         for (_i = 0, _len = _ref.length; _i < _len; _i++) {
           obj = _ref[_i];
-          _results.push(expect(this.store.update).wasCalledWith(obj.$type, obj.id, {
+          _results.push(expect(this.store.update).wasCalledWith(obj.type, obj.id, {
             funky: 'update'
           }, {}));
         }
@@ -282,7 +282,7 @@ describe("Hoodie.Store", function() {
         this.store.updateAll(promise, {
           funky: 'update'
         });
-        return expect(this.store.update).wasCalledWith(obj.$type, obj.id, {
+        return expect(this.store.update).wasCalledWith(obj.type, obj.id, {
           funky: 'update'
         }, {});
       });
@@ -465,17 +465,17 @@ describe("Hoodie.Store", function() {
       beforeEach(function() {
         spyOn(this.store, "remove");
         this.object1 = {
-          $type: 'task',
+          type: 'task',
           id: '1',
           title: 'some'
         };
         this.object2 = {
-          $type: 'task',
+          type: 'task',
           id: '2',
           title: 'thing'
         };
         this.object3 = {
-          $type: 'task',
+          type: 'task',
           id: '3',
           title: 'funny'
         };

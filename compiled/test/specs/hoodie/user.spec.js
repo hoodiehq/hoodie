@@ -46,7 +46,7 @@ describe("Hoodie.User", function() {
       _when("promise returns one object", function() {
         beforeEach(function() {
           this.promise = this.storeDefer.resolve({
-            $type: 'task',
+            type: 'task',
             id: '123',
             title: 'milk'
           });
@@ -75,11 +75,11 @@ describe("Hoodie.User", function() {
         beforeEach(function() {
           this.promise = this.storeDefer.resolve([
             {
-              $type: 'task',
+              type: 'task',
               id: '123',
               title: 'milk'
             }, {
-              $type: 'task',
+              type: 'task',
               id: '456',
               title: 'milk'
             }
@@ -116,7 +116,7 @@ describe("Hoodie.User", function() {
       _when("promise returns one object that is public", function() {
         beforeEach(function() {
           this.promise = this.storeDefer.resolve({
-            $type: 'task',
+            type: 'task',
             id: '123',
             title: 'milk',
             $public: true
@@ -133,7 +133,7 @@ describe("Hoodie.User", function() {
       _when("promise returns one object that is not public", function() {
         beforeEach(function() {
           this.promise = this.storeDefer.resolve({
-            $type: 'task',
+            type: 'task',
             id: '123',
             title: 'milk'
           });
@@ -148,16 +148,16 @@ describe("Hoodie.User", function() {
         beforeEach(function() {
           this.promise = this.storeDefer.resolve([
             {
-              $type: 'task',
+              type: 'task',
               id: '123',
               title: 'milk'
             }, {
-              $type: 'task',
+              type: 'task',
               id: '456',
               title: 'milk',
               $public: true
             }, {
-              $type: 'task',
+              type: 'task',
               id: '789',
               title: 'milk',
               $public: ['title', 'owner']

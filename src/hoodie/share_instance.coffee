@@ -235,8 +235,8 @@ class Hoodie.ShareInstance extends Hoodie.Remote
   # 
   _handleSecurityResponse : (security) =>
     access     = @_parseSecurity security
-    $createdBy = '$subscription'
-    @hoodie.share.findOrAdd( @id, {access, $createdBy} )
+    createdBy = '$subscription'
+    @hoodie.share.findOrAdd( @id, {access, createdBy} )
 
   # a db _security response looks like this:
   # 

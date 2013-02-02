@@ -123,7 +123,7 @@ Hoodie.AccountRemote = (function(_super) {
         options = {
           remote: true
         };
-        _results.push(_this.hoodie.store.update(doc.$type, doc.id, update, options));
+        _results.push(_this.hoodie.store.update(doc.type, doc.id, update, options));
       }
       return _results;
     };
@@ -139,13 +139,13 @@ Hoodie.AccountRemote = (function(_super) {
       doc = this.store.parseFromRemote(doc);
       if (doc._deleted) {
         _removeedDocs.push([
-          doc, this.hoodie.store.remove(doc.$type, doc.id, {
+          doc, this.hoodie.store.remove(doc.type, doc.id, {
             remote: true
           })
         ]);
       } else {
         _changedDocs.push([
-          doc, this.hoodie.store.save(doc.$type, doc.id, doc, {
+          doc, this.hoodie.store.save(doc.type, doc.id, doc, {
             remote: true
           })
         ]);
@@ -155,11 +155,11 @@ Hoodie.AccountRemote = (function(_super) {
       _ref = _removeedDocs[_j], doc = _ref[0], promise = _ref[1];
       promise.then(function(object) {
         _this.trigger('remove', object);
-        _this.trigger("remove:" + doc.$type, object);
-        _this.trigger("remove:" + doc.$type + ":" + doc.id, object);
+        _this.trigger("remove:" + doc.type, object);
+        _this.trigger("remove:" + doc.type + ":" + doc.id, object);
         _this.trigger('change', 'remove', object);
-        _this.trigger("change:" + doc.$type, 'remove', object);
-        return _this.trigger("change:" + doc.$type + ":" + doc.id, 'remove', object);
+        _this.trigger("change:" + doc.type, 'remove', object);
+        return _this.trigger("change:" + doc.type + ":" + doc.id, 'remove', object);
       });
     }
     _results = [];
@@ -169,14 +169,14 @@ Hoodie.AccountRemote = (function(_super) {
         var event;
         event = objectWasCreated ? 'create' : 'update';
         _this.trigger(event, object);
-        _this.trigger("" + event + ":" + doc.$type, object);
+        _this.trigger("" + event + ":" + doc.type, object);
         if (event !== 'create') {
-          _this.trigger("" + event + ":" + doc.$type + ":" + doc.id, object);
+          _this.trigger("" + event + ":" + doc.type + ":" + doc.id, object);
         }
         _this.trigger("change", event, object);
-        _this.trigger("change:" + doc.$type, event, object);
+        _this.trigger("change:" + doc.type, event, object);
         if (event !== 'create') {
-          return _this.trigger("change:" + doc.$type + ":" + doc.id, event, object);
+          return _this.trigger("change:" + doc.type + ":" + doc.id, event, object);
         }
       }));
     }

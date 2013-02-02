@@ -29,16 +29,16 @@ describe("Hoodie.RemoteStore", function() {
         this.remoteStore.remote.prefix = 'store_prefix';
         return this.requestDefer.resolve({
           _id: 'store_prefix/car/fresh',
-          $createdAt: '2012-12-12T22:00:00.000Z',
-          $updatedAt: '2012-12-21T22:00:00.000Z'
+          createdAt: '2012-12-12T22:00:00.000Z',
+          updatedAt: '2012-12-21T22:00:00.000Z'
         });
       });
       return it("should resolve with the doc", function() {
         return expect(this.remoteStore.find("todo", "1")).toBeResolvedWith({
           id: 'fresh',
-          $type: 'car',
-          $createdAt: new Date(Date.parse('2012-12-12T22:00:00.000Z')),
-          $updatedAt: new Date(Date.parse('2012-12-21T22:00:00.000Z'))
+          type: 'car',
+          createdAt: new Date(Date.parse('2012-12-12T22:00:00.000Z')),
+          updatedAt: new Date(Date.parse('2012-12-21T22:00:00.000Z'))
         });
       });
     });
@@ -77,8 +77,8 @@ describe("Hoodie.RemoteStore", function() {
       beforeEach(function() {
         this.doc = {
           _id: 'car/fresh',
-          $createdAt: '2012-12-12T22:00:00.000Z',
-          $updatedAt: '2012-12-21T22:00:00.000Z'
+          createdAt: '2012-12-12T22:00:00.000Z',
+          updatedAt: '2012-12-21T22:00:00.000Z'
         };
         return this.requestDefer.resolve({
           total_rows: 3,
@@ -94,9 +94,9 @@ describe("Hoodie.RemoteStore", function() {
         var object;
         object = {
           id: 'fresh',
-          $type: 'car',
-          $createdAt: new Date(Date.parse('2012-12-12T22:00:00.000Z')),
-          $updatedAt: new Date(Date.parse('2012-12-21T22:00:00.000Z'))
+          type: 'car',
+          createdAt: new Date(Date.parse('2012-12-12T22:00:00.000Z')),
+          updatedAt: new Date(Date.parse('2012-12-21T22:00:00.000Z'))
         };
         return expect(this.remoteStore.findAll()).toBeResolvedWith([object]);
       });
@@ -142,7 +142,7 @@ describe("Hoodie.RemoteStore", function() {
         return expect(this.path).toBe('/remote_prefix%2Fcar%2F123');
       });
       it("should add type to saved object", function() {
-        return expect(this.data.$type).toBe('car');
+        return expect(this.data.type).toBe('car');
       });
       it("should set _id to `car/123`", function() {
         return expect(this.data._id).toBe('remote_prefix/car/123');

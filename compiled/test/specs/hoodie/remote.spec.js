@@ -322,7 +322,7 @@ describe("Hoodie.Remote", function() {
         spyOn(this.remote, "trigger");
         this.remote.pull();
         object = {
-          '$type': 'todo',
+          'type': 'todo',
           id: 'abc3',
           _rev: '2-123',
           _deleted: true
@@ -334,7 +334,7 @@ describe("Hoodie.Remote", function() {
         expect(this.remote.trigger).wasCalledWith('store:change:todo', 'remove', object);
         expect(this.remote.trigger).wasCalledWith('store:change:todo:abc3', 'remove', object);
         object = {
-          '$type': 'todo',
+          'type': 'todo',
           id: 'abc2',
           _rev: '1-123',
           content: 'remember the milk',
@@ -537,13 +537,13 @@ describe("Hoodie.Remote", function() {
       beforeEach(function() {
         this.todoObjects = [
           {
-            $type: 'todo',
+            type: 'todo',
             id: '1'
           }, {
-            $type: 'todo',
+            type: 'todo',
             id: '2'
           }, {
-            $type: 'todo',
+            type: 'todo',
             id: '3'
           }
         ];
@@ -598,13 +598,13 @@ describe("Hoodie.Remote", function() {
         this.remote.prefix = '$public';
         this.todoObjects = [
           {
-            $type: 'todo',
+            type: 'todo',
             id: '1'
           }, {
-            $type: 'todo',
+            type: 'todo',
             id: '2'
           }, {
-            $type: 'todo',
+            type: 'todo',
             id: '3'
           }
         ];

@@ -583,7 +583,7 @@ describe("Hoodie.Account", function() {
             this.account.signIn('joe@example.com', 'secret');
             expect(this.account.ownerHash).toBe('user_hash');
             expect(this.hoodie.config.set).wasCalledWith('_account.ownerHash', 'user_hash');
-            return expect(this.hoodie.config.set).wasCalledWith('$createdBy', 'user_hash');
+            return expect(this.hoodie.config.set).wasCalledWith('createdBy', 'user_hash');
           });
           it("should fetch the _users doc", function() {
             spyOn(this.account, "fetch");
@@ -1164,8 +1164,8 @@ describe("Hoodie.Account", function() {
         expect(this.data.name).toBe("$passwordReset/joe@example.com/uuid567");
         expect(this.data.type).toBe('user');
         expect(this.data.password).toBe('joe@example.com/uuid567');
-        expect(this.data.$createdAt).toBeDefined();
-        return expect(this.data.$updatedAt).toBeDefined();
+        expect(this.data.createdAt).toBeDefined();
+        return expect(this.data.updatedAt).toBeDefined();
       });
       it("should return a promise", function() {
         return expect(this.account.resetPassword("joe@example.com")).toBePromise();

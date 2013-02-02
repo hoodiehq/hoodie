@@ -172,12 +172,12 @@ Hoodie.ShareInstance = (function(_super) {
   };
 
   ShareInstance.prototype._handleSecurityResponse = function(security) {
-    var $createdBy, access;
+    var access, createdBy;
     access = this._parseSecurity(security);
-    $createdBy = '$subscription';
+    createdBy = '$subscription';
     return this.hoodie.share.findOrAdd(this.id, {
       access: access,
-      $createdBy: $createdBy
+      createdBy: createdBy
     });
   };
 

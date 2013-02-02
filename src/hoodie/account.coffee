@@ -243,8 +243,8 @@ class Hoodie.Account
       type       : 'user'
       roles      : []
       password   : resetPasswordId
-      $createdAt : new Date
-      $updatedAt : new Date
+      createdAt : new Date
+      updatedAt : new Date
 
     options =
       data        : JSON.stringify data
@@ -301,10 +301,10 @@ class Hoodie.Account
     @hoodie.config.set '_account.username',  @username
 
   _setOwner    : (@ownerHash) -> 
-    # `ownerHash` is stored with every new object in the $createdBy
+    # `ownerHash` is stored with every new object in the createdBy
     # attribute. It does not get changed once it's set. That's why
     # we have to force it to be change for the `$config/hoodie` object.
-    @hoodie.config.set '$createdBy', @ownerHash
+    @hoodie.config.set 'createdBy', @ownerHash
     @hoodie.config.set '_account.ownerHash', @ownerHash
 
   #

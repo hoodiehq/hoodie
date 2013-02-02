@@ -68,7 +68,7 @@ Hoodie.RemoteStore = (function(_super) {
       id = this.hoodie.uuid();
     }
     object = $.extend({
-      $type: type,
+      type: type,
       id: id
     }, object);
     doc = this.parseForRemote(object);
@@ -102,7 +102,7 @@ Hoodie.RemoteStore = (function(_super) {
       }
       delete attributes[attr];
     }
-    attributes._id = "" + attributes.$type + "/" + attributes.id;
+    attributes._id = "" + attributes.type + "/" + attributes.id;
     if (this.remote.prefix) {
       attributes._id = "" + this.remote.prefix + "/" + attributes._id;
     }
@@ -117,12 +117,12 @@ Hoodie.RemoteStore = (function(_super) {
     if (this.remote.prefix) {
       id = id.replace(RegExp('^' + this.remote.prefix + '/'), '');
     }
-    _ref = id.split(/\//), obj.$type = _ref[0], obj.id = _ref[1];
-    if (obj.$createdAt) {
-      obj.$createdAt = new Date(Date.parse(obj.$createdAt));
+    _ref = id.split(/\//), obj.type = _ref[0], obj.id = _ref[1];
+    if (obj.createdAt) {
+      obj.createdAt = new Date(Date.parse(obj.createdAt));
     }
-    if (obj.$updatedAt) {
-      obj.$updatedAt = new Date(Date.parse(obj.$updatedAt));
+    if (obj.updatedAt) {
+      obj.updatedAt = new Date(Date.parse(obj.updatedAt));
     }
     if (obj.rev) {
       obj._rev = obj.rev;

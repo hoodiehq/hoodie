@@ -138,9 +138,9 @@ describe "Hoodie.Store", ->
     beforeEach ->
       spyOn(@hoodie, "isPromise").andReturn false
       @todoObjects = [
-        {$type: 'todo', id: '1'}
-        {$type: 'todo', id: '2'}
-        {$type: 'todo', id: '3'}
+        {type: 'todo', id: '1'}
+        {type: 'todo', id: '2'}
+        {type: 'todo', id: '3'}
       ]
     
     it "should return a promise", ->
@@ -150,7 +150,7 @@ describe "Hoodie.Store", ->
       spyOn(@store, "update")
       @store.updateAll @todoObjects, {funky: 'update'}
       for obj in @todoObjects
-        expect(@store.update).wasCalledWith obj.$type, obj.id, {funky: 'update'}, {}
+        expect(@store.update).wasCalledWith obj.type, obj.id, {funky: 'update'}, {}
     
     it "should resolve the returned promise once all objects have been updated", ->
       promise = @hoodie.defer().resolve().promise()
@@ -172,14 +172,14 @@ describe "Hoodie.Store", ->
         spyOn(@store, "update")
         @store.updateAll promise, {funky: 'update'}
         for obj in @todoObjects
-          expect(@store.update).wasCalledWith obj.$type, obj.id, {funky: 'update'}, {}
+          expect(@store.update).wasCalledWith obj.type, obj.id, {funky: 'update'}, {}
 
       it "should update object single object returned by promise", ->
         obj = @todoObjects[0]
         promise = @hoodie.defer().resolve(obj).promise()
         spyOn(@store, "update")
         @store.updateAll promise, {funky: 'update'}
-        expect(@store.update).wasCalledWith obj.$type, obj.id, {funky: 'update'}, {}
+        expect(@store.update).wasCalledWith obj.type, obj.id, {funky: 'update'}, {}
 
     _when "passed objects is a type (string)", ->
       beforeEach ->
@@ -307,9 +307,9 @@ describe "Hoodie.Store", ->
     _when "store.findAll returns 3 objects", ->
       beforeEach ->
         spyOn(@store, "remove")
-        @object1 = { $type: 'task', id: '1', title: 'some'} 
-        @object2 = { $type: 'task', id: '2', title: 'thing'}
-        @object3 = { $type: 'task', id: '3', title: 'funny'}
+        @object1 = { type: 'task', id: '1', title: 'some'} 
+        @object2 = { type: 'task', id: '2', title: 'thing'}
+        @object3 = { type: 'task', id: '3', title: 'funny'}
         @findAllDefer.resolve [@object1, @object2, @object3]
 
       it "should call remove for each object", ->

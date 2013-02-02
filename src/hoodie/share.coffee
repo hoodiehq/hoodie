@@ -163,7 +163,7 @@ class Hoodie.Share
   # Private
   # ---------
 
-  _allowedOptions: ["id", "access", "$createdBy"]
+  _allowedOptions: ["id", "access", "createdBy"]
 
   # ### filter share options
   #
@@ -197,7 +197,7 @@ class Hoodie.Share
       updateObject = (object) =>
         object.$shares or= {}
         object.$shares[shareId] = properties or true
-        @hoodie.store.update object.$type, object.id, $shares: object.$shares
+        @hoodie.store.update object.type, object.id, $shares: object.$shares
         return object
     
       if $.isArray objects
@@ -214,7 +214,7 @@ class Hoodie.Share
       updateObject = (object) =>
         return object unless object.$shares and object.$shares[shareId]
         object.$shares[shareId] = false
-        @hoodie.store.update object.$type, object.id, $shares: object.$shares
+        @hoodie.store.update object.type, object.id, $shares: object.$shares
         return object
     
       if $.isArray objects
@@ -231,7 +231,7 @@ class Hoodie.Share
         return object unless object.$shares
         for shareId of object.$shares
           object.$shares[shareId] = false
-        @hoodie.store.update object.$type, object.id, $shares: object.$shares
+        @hoodie.store.update object.type, object.id, $shares: object.$shares
         return object
 
       if $.isArray objects
@@ -250,7 +250,7 @@ class Hoodie.Share
         updateObject = (object) =>
           object.$shares or= {}
           object.$shares[newShare.id] = properties or true
-          @hoodie.store.update object.$type, object.id, $shares: object.$shares
+          @hoodie.store.update object.type, object.id, $shares: object.$shares
           return object
 
         value = if $.isArray objects

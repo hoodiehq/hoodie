@@ -41,7 +41,7 @@ class Hoodie.User
     @pipe (objects) =>
       objects = [objects] unless $.isArray objects
       for object in objects
-        @hoodie.store.update object.$type, object.id, $public: properties or true
+        @hoodie.store.update object.type, object.id, $public: properties or true
   
   # `unpublish`
   # 
@@ -50,7 +50,7 @@ class Hoodie.User
     @pipe (objects) =>
       objects = [objects] unless $.isArray objects
       for object in objects when object.$public
-        @hoodie.store.update object.$type, object.id, $public: false
+        @hoodie.store.update object.type, object.id, $public: false
 
 
 # extend Hoodie

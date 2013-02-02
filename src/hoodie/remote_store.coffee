@@ -82,7 +82,7 @@ class Hoodie.RemoteStore extends Hoodie.Store
 
     id = @hoodie.uuid() unless id 
     object = $.extend {
-      $type : type
+      type : type
       id    : id
     }, object
 
@@ -126,7 +126,7 @@ class Hoodie.RemoteStore extends Hoodie.Store
       delete attributes[attr]
    
     # prepare CouchDB id
-    attributes._id = "#{attributes.$type}/#{attributes.id}"
+    attributes._id = "#{attributes.type}/#{attributes.id}"
     if @remote.prefix
       attributes._id = "#{@remote.prefix}/#{attributes._id}"
     
@@ -148,11 +148,11 @@ class Hoodie.RemoteStore extends Hoodie.Store
     id = obj._id or obj.id
     delete obj._id
     id = id.replace(RegExp('^'+@remote.prefix+'/'), '') if @remote.prefix
-    [obj.$type, obj.id] = id.split(/\//)
+    [obj.type, obj.id] = id.split(/\//)
     
     # handle timestameps
-    obj.$createdAt = new Date(Date.parse obj.$createdAt) if obj.$createdAt
-    obj.$updatedAt = new Date(Date.parse obj.$updatedAt) if obj.$updatedAt
+    obj.createdAt = new Date(Date.parse obj.createdAt) if obj.createdAt
+    obj.updatedAt = new Date(Date.parse obj.updatedAt) if obj.updatedAt
     
     # handle rev
     if obj.rev

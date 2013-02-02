@@ -149,7 +149,7 @@ class Hoodie.AccountRemote extends Hoodie.Remote
       for doc, i in docs
         update  = {_rev: pushedDocs[i]._rev}
         options = remote : true
-        @hoodie.store.update(doc.$type, doc.id, update, options) 
+        @hoodie.store.update(doc.type, doc.id, update, options) 
 
   # 
   _handlePullResults : (changes) =>
@@ -160,28 +160,28 @@ class Hoodie.AccountRemote extends Hoodie.Remote
     for {doc} in changes
       doc = @store.parseFromRemote(doc)
       if doc._deleted
-        _removeedDocs.push [doc, @hoodie.store.remove( doc.$type, doc.id,       remote: true)]
+        _removeedDocs.push [doc, @hoodie.store.remove( doc.type, doc.id,       remote: true)]
       else                                                
-        _changedDocs.push  [doc, @hoodie.store.save(    doc.$type, doc.id, doc, remote: true)]
+        _changedDocs.push  [doc, @hoodie.store.save(    doc.type, doc.id, doc, remote: true)]
     
     # 2. trigger events
     for [doc, promise] in _removeedDocs
       promise.then (object) => 
         @trigger 'remove',                        object
-        @trigger "remove:#{doc.$type}",           object
-        @trigger "remove:#{doc.$type}:#{doc.id}", object
+        @trigger "remove:#{doc.type}",           object
+        @trigger "remove:#{doc.type}:#{doc.id}", object
         
         @trigger 'change',                         'remove', object
-        @trigger "change:#{doc.$type}",            'remove', object
-        @trigger "change:#{doc.$type}:#{doc.id}",  'remove', object
+        @trigger "change:#{doc.type}",            'remove', object
+        @trigger "change:#{doc.type}:#{doc.id}",  'remove', object
     
     for [doc, promise] in _changedDocs
       promise.then (object, objectWasCreated) => 
         event = if objectWasCreated then 'create' else 'update'
         @trigger event,                             object
-        @trigger "#{event}:#{doc.$type}",           object
-        @trigger "#{event}:#{doc.$type}:#{doc.id}", object unless event is 'create'
+        @trigger "#{event}:#{doc.type}",           object
+        @trigger "#{event}:#{doc.type}:#{doc.id}", object unless event is 'create'
       
         @trigger "change",                          event, object
-        @trigger "change:#{doc.$type}",             event, object
-        @trigger "change:#{doc.$type}:#{doc.id}",   event, object unless event is 'create'
+        @trigger "change:#{doc.type}",             event, object
+        @trigger "change:#{doc.type}:#{doc.id}",   event, object unless event is 'create'
