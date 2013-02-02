@@ -20,6 +20,10 @@ describe "Hoodie.ShareInstance", ->
       share = new Hoodie.ShareInstance @hoodie, id: 'id123'
       expect(share.name).toBe 'share/id123'
 
+    it "shoudl set prefix from id", ->
+      share = new Hoodie.ShareInstance @hoodie, id: 'id123'
+      expect(share.prefix).toBe 'share/id123'
+
     it "should generate an id if options.id wasn't passed", ->
       share = new Hoodie.ShareInstance @hoodie
       expect(share.id).toBe 'uuid'
