@@ -1,7 +1,7 @@
-# Public
+# Global
 # ========
 
-# the Public Module provides a simple API to find objects from the global 
+# the Global Module provides a simple API to find objects from the global 
 # stores
 #
 # For example, the syntax to find all objects from the global store
