@@ -67,12 +67,12 @@ class Hoodie.LocalStore extends Hoodie.Store
   #
   #     store.save('car', undefined, {color: 'red'})
   #     store.save('car', 'abc4567', {color: 'red'})
-  save : (type, id, object, options = {}) ->
+  save : (type, id, properties, options = {}) ->
     defer = super
     return @_decoratePromise(defer) if @hoodie.isPromise(defer)
 
     # make sure we don't mess with the passed object directly
-    object = $.extend true, {}, object
+    object = $.extend true, {}, properties
     
     # generate an id if necessary
     if id
@@ -93,11 +93,8 @@ class Hoodie.LocalStore extends Hoodie.Store
     # keep local properties for remote updates
     unless isNew
 
-      # when object.updatedBy is set, remove it.
-      # that means last update is by me.
-      delete object.updatedBy
-
-      # for remote updates, keep local properties
+      # for remote updates, keep local properties (starting with '_')
+      # for local updates, keep hidden properties (starting with '$')
       for key of currentObject when not object.hasOwnProperty key
         switch key.charAt(0)
           when '_'
@@ -220,7 +217,7 @@ class Hoodie.LocalStore extends Hoodie.Store
       @clearChanged type, id
 
     @_triggerEvents "remove", object, options
-    promise = defer.resolve($.extend true, {}, object).promise()
+    promise = defer.resolve(object).promise()
     @_decoratePromise promise
     
 
@@ -248,38 +245,54 @@ class Hoodie.LocalStore extends Hoodie.Store
     key = "#{type}/#{id}"
   
     if object
-      $.extend true, object, { type: type, id: id }
+      $.extend object, { type: type, id: id }
       @_setObject type, id, object
       
       if options.remote
         @clearChanged type, id 
-        @_cached[key] = object
-        return $.extend true, {}, @_cached[key]
-    
-    else
-      return false                      if @_cached[key] is false
-      return $.extend true, {}, @_cached[key] if @_cached[key]
+
+        @_cached[key] = $.extend true, {}, object
+        return @_cached[key]
+
+    else 
+
+      # if the cached key returns false, it means
+      # that we have removed that key. We just 
+      # set it to false for performance reasons, so
+      # that we don't need to look it up again in localStorage
+      if @_cached[key] is false
+        return false 
+
+      # if key is cached, return it. But make sure
+      # to make a deep copy beforehand (=> true)
+      if @_cached[key]
+        return $.extend true, {}, @_cached[key] 
+
+      # if object is not yet cached, load it from localStore
       object = @_getObject type, id
     
-    return if object is undefined
+      # stop here if object did not exist in localStore
+      # and cache it so we don't need to look it up again
+      if object is false
+        @clearChanged type, id
+        @_cached[key] = false
+        return false
 
-    if object is false
-      @clearChanged type, id
-      @_cached[key] = false
-      return false
-    
     if @_isMarkedAsDeleted object
       @markAsChanged type, id, object, options
       @_cached[key] = false
       return false
 
-    @_cached[key] = object
+    # here is where we cache the object for
+    # future quick access
+    @_cached[key] = $.extend true, {}, object
+
     if @_isDirty(object)
-      @markAsChanged type, id, object, options
+      @markAsChanged type, id, @_cached[key], options
     else
       @clearChanged type, id
     
-    $.extend true, {}, @_cached[key]
+    return $.extend true, {}, object
 
 
   # Clear changed 

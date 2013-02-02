@@ -41,7 +41,6 @@ describe "Hoodie.LocalStore", ->
   describe "#save(type, id, object, options)", ->
     beforeEach ->
       spyOn(@store, "_now" ).andReturn 'now'
-      spyOn(@store, "cache").andReturn 'cachedObject'
     
     it "should return a promise", ->
       promise = @store.save 'document', '123', name: 'test'
@@ -59,6 +58,7 @@ describe "Hoodie.LocalStore", ->
   
     _when "id is '123', type is 'document', object is {name: 'test'}", ->
       beforeEach ->
+        spyOn(@store, "cache").andReturn 'cachedObject'
         @promise = @store.save 'document', '123', { name: 'test' }, { option: 'value' }
 
       it "should cache document", ->
@@ -202,6 +202,7 @@ describe "Hoodie.LocalStore", ->
       
     _when "id is '123', type is 'document', object is {name: 'test', $hidden: 'fresh'}}", ->
       beforeEach ->
+        spyOn(@store, "cache").andReturn 'cachedObject'
         @store.cache.andReturn {name: 'test', $hidden: 'fresh'}
       
       it "should not overwrite $hidden property when not passed", ->
@@ -215,6 +216,7 @@ describe "Hoodie.LocalStore", ->
         expect(@object.$hidden).toBe 'wicked'
 
     it "should not overwrite createdAt attribute", ->
+      spyOn(@store, "cache").andReturn 'cachedObject'
       @store.save 'document', '123', { createdAt: 'check12'  }
       [type, id, object] = @store.cache.mostRecentCall.args
       expect(object.createdAt).toBe 'check12'
@@ -246,6 +248,7 @@ describe "Hoodie.LocalStore", ->
     _when "called without id", ->
       beforeEach ->
         # keep promise, key, and stored object for assertions
+        spyOn(@store, "cache").andReturn 'cachedObject'
         @promise = @store.save 'document', undefined, { name: 'test' }, { option: 'value' }
         [@type, @key, @object] = @store.cache.mostRecentCall.args
   
@@ -498,11 +501,30 @@ describe "Hoodie.LocalStore", ->
       it "should write the object to localStorage, but without type & id attributes", ->
         @store.cache('couch', '123', color: 'red')
         expect(@store.db.setItem).wasCalledWith 'couch/123', '{"color":"red"}'
+
+      it "should make a deep copy of passed object", ->
+        originalObject =
+          nested:
+            property: 'funky'
+
+        @store.cache 'couch', '123', originalObject
+        newObject = @store.cache('couch', '123')
+        newObject.nested.property = 'fresh'
+        expect(originalObject.nested.property).toBe 'funky'
       
       _and "`options.remote = true` passed", ->
         it "should clear changed object", ->
           @store.cache 'couch', '123', {color: 'red'}, remote: true
           expect(@store.clearChanged).wasCalledWith 'couch', '123'
+
+        it "should make a deep copy of passed object", ->
+          originalObject =
+            nested:
+              property: 'funky'
+
+          newObject = @store.cache 'couch', '123', originalObject, remote: true
+          newObject.nested.property = 'fresh'
+          expect(originalObject.nested.property).toBe 'funky'
 
       _and "object is marked as deleted", ->
         it "should set cache to false store object in _dirty hash", ->
@@ -537,6 +559,16 @@ describe "Hoodie.LocalStore", ->
           it "should cache it for future", ->
             @store.cache 'couch', '123'
             expect(@store._cached['couch/123'].color).toBe 'red'
+
+          it "should make a deep copy", ->
+            originalObject =
+              nested:
+                property: 'funky'
+            @store._getObject.andReturn originalObject
+            obj1 = @store.cache 'couch', '123'
+            obj1.nested.property = 'fresh'
+            obj2 = @store.cache 'couch', '123'
+            expect(obj2.nested.property).toBe 'funky'
 
           _and "object is dirty", ->
             beforeEach -> 
