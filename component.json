@@ -3,5 +3,16 @@
   "version"     : "0.1.3",
   "main"        : ["./hoodie.js"],
   "dependencies": {
-  }
+    "jquery": "~1.9"
+  },
+  "ignore": [
+    "test/",
+    "wishlist/",
+    "stuff/",
+    "src/",
+    "compiled/",
+    ".gitignore",
+    "Cakefile",
+    "TODO.md"
+  ]
 }
