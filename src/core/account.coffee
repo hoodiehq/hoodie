@@ -13,6 +13,13 @@ class Hoodie.Account
   # Constructor
   # ------------
   constructor : (@hoodie) ->
+
+    # cache for CouchDB _users doc
+    @_doc = {}
+
+    # map of requestPromises. We maintain this list to avoid sending
+    # the same requests several times.
+    @_requests = {}
     
     # handle session
     @username   = @hoodie.config.get '_account.username'
@@ -288,13 +295,6 @@ class Hoodie.Account
 
   # default couchDB user doc prefix
   _prefix : 'org.couchdb.user'
-  
-  # CouchDB _users doc
-  _doc : {}
-
-  # map of requestPromises. We maintain this list to avoid sending
-  # the same requests several times.
-  _requests : {}
 
   # setters
   _setUsername : (@username)  -> 

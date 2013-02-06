@@ -6,14 +6,15 @@ class Hoodie.Config
   
   # used as attribute name in localStorage
   type : '$config'
-  id    : 'hoodie'
-  
-  # memory cache
-  cache : {}
-  
+  id   : 'hoodie'
+
   # ## Constructor
   #
   constructor : (@hoodie, options = {}) ->
+
+    # memory cache
+    @cache = {}
+
     @type      = options.type      if options.type
     @id         = options.id         if options.id
     
@@ -58,4 +59,5 @@ class Hoodie.Config
   # 
   # removes a configuration, is a simple alias for config.set(key, undefined)
   #
-  remove : @::set
+  remove : (key) ->
+    @set(key, undefined)

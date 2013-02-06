@@ -17,6 +17,16 @@ class Hoodie.LocalStore extends Hoodie.Store
 
   #
   constructor : (@hoodie) ->
+    
+    # cache of localStorage for quicker access
+    @_cached = {}
+
+    # map of dirty objects by their ids
+    @_dirty = {}
+
+    # extend this property with extra functions that will be available
+    # on all promises returned by hoodie.store API
+    @_promiseApi = {}
   
     # if browser does not support local storage persistence,
     # e.g. Safari in private mode, overite the respective methods. 
@@ -470,6 +480,7 @@ class Hoodie.LocalStore extends Hoodie.Store
 
   # initial bootstrap of all dirty objects stored in localStorage
   _bootstrap : ->
+
     keys = @db.getItem '_dirty'
     return unless keys
     keys = keys.split ','
@@ -523,12 +534,6 @@ class Hoodie.LocalStore extends Hoodie.Store
     
   _isSemanticId : (key) ->
     /^[a-z$][a-z0-9]+\/[a-z0-9]+$/.test key
-
-  # cache of localStorage for quicker access
-  _cached : {}
-
-  # map of dirty objects by their ids
-  _dirty : {}
   
   # is dirty?
   _isDirty : (object) ->
@@ -565,10 +570,6 @@ class Hoodie.LocalStore extends Hoodie.Store
     @_dirtyTimeout = window.setTimeout ( =>
       @trigger 'idle'
     ), @idleTimeout
-  
-  # extend this property with extra functions that will be available
-  # on all promises returned by hoodie.store API
-  _promiseApi : {}
 
   #
   _decoratePromise : (promise) ->

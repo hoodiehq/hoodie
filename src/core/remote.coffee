@@ -82,6 +82,10 @@ class Hoodie.Remote
     @_sync   = options.sync   if options.sync
     @store   = new @Store @hoodie, this
 
+    # in order to differentiate whether an object from remote should trigger a 'new'
+    # or an 'update' event, we store a hash of known objects
+    @_knownObjects = {}
+
     # NOTE: 
     # Due to a bug in Chrome (I guess), the loader won't disappear
     # when the page is loaded, when we start a long poll request
@@ -360,9 +364,7 @@ class Hoodie.Remote
 
   # ### handle changes from remote
 
-  # in order to differentiate whether an object from remote should trigger a 'new'
-  # or an 'update' event, we store a hash of known objects
-  _knownObjects : {}
+  #
   _handlePullResults : (changes) =>
     for {doc} in changes
       parsedDoc = @store.parseFromRemote(doc)
