@@ -3,7 +3,7 @@ describe "Hoodie.Config", ->
     @hoodie = new Mocks.Hoodie 
     @config = new Hoodie.Config @hoodie
   
-  describe ".constructor(@hoodie, options)", ->
+  describe "constructor(@hoodie, options)", ->
     it "should default @type to '$config'", ->
       config = new Hoodie.Config @hoodie 
       expect(config.type).toBe '$config'
@@ -13,7 +13,7 @@ describe "Hoodie.Config", ->
       expect(config.id).toBe 'hoodie'
   # /.constructor(@hoodie, options)
    
-  describe ".set(key, value)", ->
+  describe "#set(key, value)", ->
     beforeEach ->
       spyOn(@hoodie.store, "update")
     
@@ -27,7 +27,7 @@ describe "Hoodie.Config", ->
     
   # /.set(key, value)
   
-  describe ".get(key)", ->
+  describe "#get(key)", ->
     beforeEach ->
       spyOn(@hoodie.store, "find").andReturn @hoodie.defer().resolve funky: 'fresh'
       @config = new Hoodie.Config @hoodie
@@ -36,11 +36,12 @@ describe "Hoodie.Config", ->
       expect(@config.get('funky')).toBe 'fresh'
   # /.get(key)
   
-  describe ".remove(key)", ->
+  describe "#remove(key)", ->
     beforeEach ->
       spyOn(@hoodie.store, "update").andReturn 'promise'
       
     it "should remove the config using store", ->
+      @config.set('funky', 'fresh')
       @config.remove('funky')
       expect(@hoodie.store.update).wasCalledWith '$config', 'hoodie', {funky: undefined}, silent: false
   # /.remove(key)

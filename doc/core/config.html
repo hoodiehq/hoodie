@@ -2,10 +2,9 @@
 
 <span class="k">class</span> <span class="nx">Hoodie</span><span class="p">.</span><span class="nx">Config</span>
   </div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>used as attribute name in localStorage</p></div></div><div class="code"><div class="wrapper">  <span class="nv">type : </span><span class="s">&#39;$config&#39;</span>
-  <span class="nv">id    : </span><span class="s">&#39;hoodie&#39;</span>
-  </div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>memory cache</p></div></div><div class="code"><div class="wrapper">  <span class="nv">cache : </span><span class="p">{}</span>
-  </div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h2 id="constructor">Constructor</h2></div></div></div><div class="segment"><div class="code"><div class="wrapper">  <span class="c1">#</span>
-  <span class="nv">constructor : </span><span class="nf">(@hoodie, options = {}) -&gt;</span>
+  <span class="nv">id   : </span><span class="s">&#39;hoodie&#39;</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h2 id="constructor">Constructor</h2></div></div></div><div class="segment"><div class="code"><div class="wrapper">  <span class="c1">#</span>
+  <span class="nv">constructor : </span><span class="nf">(@hoodie, options = {}) -&gt;</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>memory cache</p></div></div><div class="code"><div class="wrapper">    <span class="vi">@cache = </span><span class="p">{}</span>
+
     <span class="vi">@type      = </span><span class="nx">options</span><span class="p">.</span><span class="nx">type</span>      <span class="k">if</span> <span class="nx">options</span><span class="p">.</span><span class="nx">type</span>
     <span class="vi">@id         = </span><span class="nx">options</span><span class="p">.</span><span class="nx">id</span>         <span class="k">if</span> <span class="nx">options</span><span class="p">.</span><span class="nx">id</span>
     
@@ -34,4 +33,5 @@
   </div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h2 id="remove">remove</h2>
 
 <p>removes a configuration, is a simple alias for config.set(key, undefined)</p></div></div><div class="code"><div class="wrapper">  <span class="c1">#</span>
-  <span class="nv">remove : </span><span class="nx">@</span><span class="o">::</span><span class="nx">set</span></div></div></div></div></body></html>
+  <span class="nv">remove : </span><span class="nf">(key) -&gt;</span>
+    <span class="nx">@set</span><span class="p">(</span><span class="nx">key</span><span class="p">,</span> <span class="kc">undefined</span><span class="p">)</span></div></div></div></div></body></html>

@@ -215,6 +215,8 @@ Hoodie.Account = (function() {
 
     this.authenticate = __bind(this.authenticate, this);
 
+    this._doc = {};
+    this._requests = {};
     this.username = this.hoodie.config.get('_account.username');
     this.ownerHash = this.hoodie.config.get('_account.ownerHash');
     if (!this.ownerHash) {
@@ -419,10 +421,6 @@ Hoodie.Account = (function() {
   };
 
   Account.prototype._prefix = 'org.couchdb.user';
-
-  Account.prototype._doc = {};
-
-  Account.prototype._requests = {};
 
   Account.prototype._setUsername = function(username) {
     this.username = username;
@@ -741,8 +739,6 @@ Hoodie.Config = (function() {
 
   Config.prototype.id = 'hoodie';
 
-  Config.prototype.cache = {};
-
   function Config(hoodie, options) {
     var _this = this;
     this.hoodie = hoodie;
@@ -751,6 +747,7 @@ Hoodie.Config = (function() {
     }
     this.clear = __bind(this.clear, this);
 
+    this.cache = {};
     if (options.type) {
       this.type = options.type;
     }
@@ -786,7 +783,9 @@ Hoodie.Config = (function() {
     return this.hoodie.store.remove(this.type, this.id);
   };
 
-  Config.prototype.remove = Config.prototype.set;
+  Config.prototype.remove = function(key) {
+    return this.set(key, void 0);
+  };
 
   return Config;
 
@@ -1287,6 +1286,7 @@ Hoodie.Remote = (function() {
       this._sync = options.sync;
     }
     this.store = new this.Store(this.hoodie, this);
+    this._knownObjects = {};
     if (this.isContinuouslySyncing()) {
       this.startSyncing();
     }
@@ -1458,8 +1458,6 @@ Hoodie.Remote = (function() {
         }
     }
   };
-
-  Remote.prototype._knownObjects = {};
 
   Remote.prototype._handlePullResults = function(changes) {
     var doc, event, parsedDoc, _i, _len, _results;
@@ -1689,6 +1687,9 @@ Hoodie.LocalStore = (function(_super) {
 
     this.markAllAsChanged = __bind(this.markAllAsChanged, this);
 
+    this._cached = {};
+    this._dirty = {};
+    this._promiseApi = {};
     if (!this.isPersistent()) {
       this.db = {
         getItem: function() {
@@ -2135,10 +2136,6 @@ Hoodie.LocalStore = (function(_super) {
     return /^[a-z$][a-z0-9]+\/[a-z0-9]+$/.test(key);
   };
 
-  LocalStore.prototype._cached = {};
-
-  LocalStore.prototype._dirty = {};
-
   LocalStore.prototype._isDirty = function(object) {
     if (!object.updatedAt) {
       return false;
@@ -2183,8 +2180,6 @@ Hoodie.LocalStore = (function(_super) {
       return _this.trigger('idle');
     }), this.idleTimeout);
   };
-
-  LocalStore.prototype._promiseApi = {};
 
   LocalStore.prototype._decoratePromise = function(promise) {
     return $.extend(promise, this._promiseApi);

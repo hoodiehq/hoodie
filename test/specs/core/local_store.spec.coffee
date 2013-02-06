@@ -44,6 +44,20 @@ describe "Hoodie.LocalStore", ->
         spyOn(Hoodie.LocalStore::, "cache")
         store = new Hoodie.LocalStore @hoodie
         expect(store.cache).wasCalledWith 'task', '1'
+
+    it "should not mess with LocalStore.prototype", ->
+      spyOn(Hoodie.LocalStore::, "isPersistent").andReturn false
+
+      store1 = new Hoodie.LocalStore @hoodie
+      store1.save('car', '123', {color: 'blue'})
+
+      store2 = new Hoodie.LocalStore @hoodie
+      expect(store2._cached['car/123']).toBeUndefined()
+
+      promise = store2.find('car', '123')
+      # expect(promise).toBeRejected()
+      promise.then (wtf) ->
+        console.log(JSON.stringify wtf, '','  ')
   # /constructor
   
 

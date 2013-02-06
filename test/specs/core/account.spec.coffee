@@ -12,9 +12,10 @@ describe "Hoodie.Account", ->
 
     @account = new Hoodie.Account @hoodie
 
-    # I don't get why, but somehow Hoodie.Account::_requests gets overwritten
-    # once it was set in a @account instance. I couldn't figure out where that
-    # comes from, so I just reset it here:
+    # @account calls authenticate when initialized,
+    # so we need to manually reset requests for
+    # farther testing
+    @hoodie.request.reset()
     @account._requests = {}
 
   describe "constructor", ->
