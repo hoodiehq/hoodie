@@ -1704,7 +1704,9 @@ Hoodie.LocalStore = (function(_super) {
         key: function() {
           return null;
         },
-        length: 0,
+        length: function() {
+          return 0;
+        },
         clear: function() {
           return null;
         }

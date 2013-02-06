@@ -10,7 +10,7 @@ e.g. Safari in private mode, overite the respective methods. </p></div></div><di
         <span class="nv">setItem    : </span><span class="nf">-&gt;</span> <span class="kc">null</span>
         <span class="nv">removeItem : </span><span class="nf">-&gt;</span> <span class="kc">null</span>
         <span class="nv">key        : </span><span class="nf">-&gt;</span> <span class="kc">null</span>
-        <span class="nv">length     : </span><span class="mi">0</span>
+        <span class="nv">length     : </span><span class="nf">-&gt;</span> <span class="mi">0</span>
         <span class="nv">clear      : </span><span class="nf">-&gt;</span> <span class="kc">null</span>
     </div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>handle sign outs</p></div></div><div class="code"><div class="wrapper">    <span class="nx">@hoodie</span><span class="p">.</span><span class="nx">on</span> <span class="s">&#39;account:signout&#39;</span><span class="p">,</span> <span class="nx">@clear</span>
     <span class="nx">@hoodie</span><span class="p">.</span><span class="nx">on</span> <span class="s">&#39;account:signup&#39;</span><span class="p">,</span> <span class="nx">@markAllAsChanged</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>provide reference to hoodie in all promises</p></div></div><div class="code"><div class="wrapper">    <span class="vi">@_promiseApi.hoodie = </span><span class="nx">@hoodie</span>

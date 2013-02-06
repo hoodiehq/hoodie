@@ -36,7 +36,7 @@ class Hoodie.LocalStore extends Hoodie.Store
         setItem    : -> null
         removeItem : -> null
         key        : -> null
-        length     : 0
+        length     : -> 0
         clear      : -> null
     
     # handle sign outs
