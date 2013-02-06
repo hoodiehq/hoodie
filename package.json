@@ -12,7 +12,8 @@
     "local-tld-lib": "*"
   },
   "scripts": {
-    "start": "node lib/hoodie-app.js"
+    "start": "node lib/hoodie-app.js",
+    "test": "mocha"
   },
   "engines": {
     "node": "0.8.x"
