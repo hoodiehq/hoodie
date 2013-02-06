@@ -472,6 +472,7 @@ class Hoodie.LocalStore extends Hoodie.Store
   _bootstrap : ->
     keys = @db.getItem '_dirty'
     return unless keys
+    keys = keys.split ','
     for key in keys
       [type, id] = key.split '/'
       obj = @cache type, id

@@ -23,18 +23,27 @@ describe "Hoodie.LocalStore", ->
       store = new Hoodie.LocalStore @hoodie
       expect(@hoodie.on).wasCalledWith 'account:signup', store.markAllAsChanged
 
-    it "should trigger idle event if there are dirty objects in localStorage", ->
-      Hoodie.LocalStore::db.getItem.andCallFake (key) ->
-        return 'task/1' if key is '_dirty'
+    _when "there are dirty objects in localStorage", ->
+      beforeEach ->
+        Hoodie.LocalStore::db.getItem.andCallFake (key) ->
+          return 'task/1' if key is '_dirty'
 
-      spyOn(Hoodie.LocalStore::, "_getObject").andReturn {type: 'task', id: '1', title: 'remember the milk'}
-      spyOn(Hoodie.LocalStore::, "_isDirty").andReturn true
-      spyOn(Hoodie.LocalStore::, "trigger")
-      # make timeout immediate
-      spyOn(window, "setTimeout").andCallFake (cb) -> cb()
+        @object = {type: 'task', id: '1', title: 'remember the milk'}
+        spyOn(Hoodie.LocalStore::, "_getObject").andReturn @object
+        spyOn(Hoodie.LocalStore::, "_isDirty").andReturn true
+        spyOn(Hoodie.LocalStore::, "trigger")
 
-      store = new Hoodie.LocalStore @hoodie
-      expect(store.trigger).wasCalledWith 'idle'
+        # make timeout immediate
+        spyOn(window, "setTimeout").andCallFake (cb) -> cb()
+      
+      it "should trigger idle event if there are dirty objects in localStorage", ->
+        store = new Hoodie.LocalStore @hoodie
+        expect(Hoodie.LocalStore::trigger).wasCalledWith 'idle'
+        
+      it "should cache dirty objects", ->
+        spyOn(Hoodie.LocalStore::, "cache")
+        store = new Hoodie.LocalStore @hoodie
+        expect(store.cache).wasCalledWith 'task', '1'
   # /constructor
   
 

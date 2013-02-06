@@ -273,6 +273,7 @@ as it is when Safari's private browsing mode is active.</p></div></div><div clas
   </div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h2 id="private">Private</h2></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>initial bootstrap of all dirty objects stored in localStorage</p></div></div><div class="code"><div class="wrapper">  <span class="nv">_bootstrap : </span><span class="nf">-&gt;</span>
     <span class="nv">keys = </span><span class="nx">@db</span><span class="p">.</span><span class="nx">getItem</span> <span class="s">&#39;_dirty&#39;</span>
     <span class="k">return</span> <span class="k">unless</span> <span class="nx">keys</span>
+    <span class="nv">keys = </span><span class="nx">keys</span><span class="p">.</span><span class="nx">split</span> <span class="s">&#39;,&#39;</span>
     <span class="k">for</span> <span class="nx">key</span> <span class="k">in</span> <span class="nx">keys</span>
       <span class="p">[</span><span class="nx">type</span><span class="p">,</span> <span class="nx">id</span><span class="p">]</span> <span class="o">=</span> <span class="nx">key</span><span class="p">.</span><span class="nx">split</span> <span class="s">&#39;/&#39;</span>
       <span class="nv">obj = </span><span class="nx">@cache</span> <span class="nx">type</span><span class="p">,</span> <span class="nx">id</span>

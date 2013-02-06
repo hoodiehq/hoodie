@@ -2067,6 +2067,7 @@ Hoodie.LocalStore = (function(_super) {
     if (!keys) {
       return;
     }
+    keys = keys.split(',');
     _results = [];
     for (_i = 0, _len = keys.length; _i < _len; _i++) {
       key = keys[_i];
