@@ -13,6 +13,10 @@ describe("hoodie-server", function() {
       assert(hs.serve_cors("api.a.jit.su", "a"));
     });
 
+    it("should serve cors wildcard", function() {
+      assert(hs.serve_cors("foo.api.a.jit.su", "a"));
+    });
+
     it("should serve admin", function() {
       assert(hs.serve_admin("admin.a.jit.su", "a"));
     });
