@@ -286,7 +286,7 @@ Hoodie.Account = (function() {
       _this = this;
     password = this.hoodie.uuid(10);
     username = this.ownerHash;
-    return this.signUp(username, password).pipe(null, this._handleRequestError).done(function() {
+    return this.signUp(username, password).done(function() {
       _this.setAnonymousPassword(password);
       return _this.trigger('signup:anonymous', username);
     });
@@ -637,7 +637,7 @@ Hoodie.Account = (function() {
 
   Account.prototype._userKey = function(username) {
     var prefix;
-    if (this.hasAnonymousAccount()) {
+    if (username === this.ownerHash) {
       prefix = 'user_anonymous';
     } else {
       prefix = 'user';

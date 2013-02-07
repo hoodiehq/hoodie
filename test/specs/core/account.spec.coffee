@@ -335,7 +335,7 @@ describe "Hoodie.Account", ->
         it "should have set _id to 'org.couchdb.user:joe@example.com'", ->
           expect(@data._id).toBe 'org.couchdb.user:user/joe@example.com'
         
-        it "should have set name to 'joe@example.com", ->
+        it "should have set name to 'user/joe@example.com", ->
           expect(@data.name).toBe 'user/joe@example.com'
           
         it "should have set type to 'user", ->
@@ -356,19 +356,28 @@ describe "Hoodie.Account", ->
 
         it "should have set signedUpAt to now", ->
           expect(@data.signedUpAt).toBe 'now'
-
-        it "should not set signedUpAt if signed up anonymously", ->
-          @account.ownerHash = "owner_hash123"
-          promise = @account.signUp("owner_hash123", 'secret')
-          [type, path, options] = @hoodie.request.mostRecentCall.args
-          data = JSON.parse options.data
-          expect(data.signedUpAt).toBe undefined
           
         it "should allow to signup without password", ->
           @account.signUp('joe@example.com')
           [@type, @path, @options] = @hoodie.request.mostRecentCall.args
           @data = JSON.parse @options.data
           expect(@data.password).toBe ''
+
+        _when "signUp is anonymous", ->
+          # signUp is called internally in in anonymousSignUp.
+          # it's characterized by the passed username that
+          # equals the user's ownerHash
+          beforeEach ->
+            @account.ownerHash = "owner_hash123"
+            promise = @account.signUp("owner_hash123", 'secret')
+            [type, path, options] = @hoodie.request.mostRecentCall.args
+            @data = JSON.parse options.data
+          
+          it "should not set signedUpAt if signed up anonymously", ->
+            expect(@data.signedUpAt).toBe undefined
+
+          it "should have set name to 'user_anonymous/owner_hash123", ->
+            expect(@data.name).toBe 'user_anonymous/owner_hash123'
                 
         _when "signUp successful", ->
           beforeEach ->
@@ -418,7 +427,7 @@ describe "Hoodie.Account", ->
       spyOn(@hoodie.config, "set")
       @account.ownerHash = "owner_hash123"
        
-    it "should sign up with username = 'user_anonymous/ownerHash' and the random password", ->
+    it "should sign up with username = account.ownerHash and the random password", ->
       @account.anonymousSignUp()
       expect(@account.signUp).wasCalledWith 'owner_hash123', 'crazyuuid123'
 

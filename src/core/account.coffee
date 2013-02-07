@@ -113,7 +113,6 @@ class Hoodie.Account
     username = @ownerHash
 
     @signUp(username, password)
-    .pipe(null, @_handleRequestError)
     .done =>
       @setAnonymousPassword(password)
       @trigger 'signup:anonymous', username
@@ -576,7 +575,7 @@ class Hoodie.Account
   # depending on wether the user signedUp manually or has been signed up anonymously
   # the prefix in the CouchDB _users doc differentiates. 
   _userKey : (username) ->
-    if @hasAnonymousAccount()
+    if username is @ownerHash
       prefix = 'user_anonymous'
     else
       prefix = 'user'

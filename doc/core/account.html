@@ -67,7 +67,6 @@ change his username and password internally instead of creating another user. </
     <span class="nv">username = </span><span class="nx">@ownerHash</span>
 
     <span class="nx">@signUp</span><span class="p">(</span><span class="nx">username</span><span class="p">,</span> <span class="nx">password</span><span class="p">)</span>
-    <span class="p">.</span><span class="nx">pipe</span><span class="p">(</span><span class="kc">null</span><span class="p">,</span> <span class="nx">@_handleRequestError</span><span class="p">)</span>
     <span class="p">.</span><span class="nx">done</span> <span class="o">=&gt;</span>
       <span class="nx">@setAnonymousPassword</span><span class="p">(</span><span class="nx">password</span><span class="p">)</span>
       <span class="nx">@trigger</span> <span class="s">&#39;signup:anonymous&#39;</span><span class="p">,</span> <span class="nx">username</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h2 id="hasaccount">hasAccount</h2></div></div></div><div class="segment"><div class="code"><div class="wrapper">  
@@ -383,7 +382,7 @@ resolved promise</p></div></div><div class="code"><div class="wrapper">  <span c
 
   <span class="c1">#</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>depending on wether the user signedUp manually or has been signed up anonymously
 the prefix in the CouchDB _users doc differentiates. </p></div></div><div class="code"><div class="wrapper">  <span class="nv">_userKey : </span><span class="nf">(username) -&gt;</span>
-    <span class="k">if</span> <span class="nx">@hasAnonymousAccount</span><span class="p">()</span>
+    <span class="k">if</span> <span class="nx">username</span> <span class="o">is</span> <span class="nx">@ownerHash</span>
       <span class="nv">prefix = </span><span class="s">&#39;user_anonymous&#39;</span>
     <span class="k">else</span>
       <span class="nv">prefix = </span><span class="s">&#39;user&#39;</span>
