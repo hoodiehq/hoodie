@@ -556,10 +556,10 @@ class Hoodie.LocalStore extends Hoodie.Store
   # 
   _triggerEvents: (event, object, options) ->
     
-    @trigger event,                                           object, options
+    @trigger event,                                          object, options
     @trigger "#{event}:#{object.type}",                      object, options
     @trigger "#{event}:#{object.type}:#{object.id}",         object, options unless event is 'new'
-    @trigger "change",                                 event, object, options
+    @trigger "change",                                event, object, options
     @trigger "change:#{object.type}",                 event, object, options
     @trigger "change:#{object.type}:#{object.id}",    event, object, options unless event is 'new'
 

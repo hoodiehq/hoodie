@@ -1,5 +1,5 @@
-# RemoteStore
-# ============
+# Remote
+# ========
 
 # Connection to a remote Couch Database.
 #
@@ -44,12 +44,12 @@ class Hoodie.Remote
 
   # Store class that the remote will use to connect to.
   # We make it a property so that classes can easily inherit
-  # from Hoodie.Remote and overWrite its Store
+  # from Hoodie.Remote and overwrite its Store
   Store : Hoodie.RemoteStore
 
   # name  
 
-  # the name of the RemoteStore is the name of the
+  # the name of the Remote is the name of the
   # CouchDB database and is also used to prefix 
   # triggered events
   name : undefined
@@ -94,7 +94,7 @@ class Hoodie.Remote
     # and all its assets to be loaded before we start loading
     # our data. 
     # A good way to fix it would be a special `bootstrap` method,
-    # that would all docs with a normal GET /_all_docs request,
+    # that would load all docs with a normal GET /_all_docs request,
     # after that it would start with the GET /_changes requests,
     # starting with the current seq number of the database.
     @startSyncing() if @isContinuouslySyncing()
@@ -131,7 +131,6 @@ class Hoodie.Remote
   # sends a POST request to the specified updated_function
   post : (update_function_name, params) ->
     console.log ".post() not yet implemented", arguments...
-
 
 
   # synchronization
@@ -187,7 +186,7 @@ class Hoodie.Remote
   # isContinuouslyPushing
   # -----------------------
 
-  # returns true if pulling is set to be continous
+  # returns true if pushing is set to be continous
   isContinuouslyPushing : ->
     @_sync is true or @_sync?.push is true
 
@@ -195,7 +194,7 @@ class Hoodie.Remote
   # isContinuouslySyncing
   # -----------------------
 
-  # returns true if pulling is set to be continous
+  # returns true if sync is set to be continous
   isContinuouslySyncing : ->
     @_sync is true
 

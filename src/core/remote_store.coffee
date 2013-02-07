@@ -29,6 +29,7 @@ class Hoodie.RemoteStore extends Hoodie.Store
   
   # sets name (think: namespace) and some other options
   constructor : (@hoodie, @remote) ->
+    
 
   # find
   # ------
