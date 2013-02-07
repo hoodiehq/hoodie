@@ -574,6 +574,12 @@ class Hoodie.Account
   #
   # depending on wether the user signedUp manually or has been signed up anonymously
   # the prefix in the CouchDB _users doc differentiates. 
+  # An anonymous user is characterized by its username, that equals
+  # its ownerHash (see `anonymousSignUp`)
+  # 
+  # We differentiate with `hasAnonymousAccount()`, because `_userKey`
+  # is used within `signUp` method, so we need to be able to differentiate
+  # between anonyomus and normal users before an account has been created.
   _userKey : (username) ->
     if username is @ownerHash
       prefix = 'user_anonymous'
