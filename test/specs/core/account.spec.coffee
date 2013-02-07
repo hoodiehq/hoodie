@@ -230,6 +230,7 @@ describe "Hoodie.Account", ->
           
           _when "fetching user doc successful", ->
             beforeEach ->
+              spyOn(@account, "_now").andReturn 'now'
               @account._doc = 
                 _id          : 'org.couchdb.user:user/joe@example.com'
                 name         : 'user/joe@example.com'
@@ -237,6 +238,8 @@ describe "Hoodie.Account", ->
                 roles        : []
                 salt         : 'absalt'
                 password_sha : 'pwcdef'
+                createdAt    : 'someday'
+                updatedAt    : 'someday'
               @fetchDefer.resolve()
               [@type, @path, @options] = @hoodie.request.mostRecentCall.args
               @data = JSON.parse @options.data
@@ -254,6 +257,12 @@ describe "Hoodie.Account", ->
 
             it "should have set name to 'user/joe@example.com", ->
               expect(@data.$newUsername).toBe 'joe@example.com'
+
+            it "should have set updatedAt to now", ->
+              expect(@data.updatedAt).toBe 'now'
+
+            it "should have set signedUpAt to now", ->
+              expect(@data.signedUpAt).toBe 'now'
 
             _when "_users doc could be updated", ->
               beforeEach ->
@@ -304,10 +313,11 @@ describe "Hoodie.Account", ->
 
       _and "user is logged out", ->
         beforeEach ->
-          spyOn(@account, "hasAccount").andReturn false
           @signInDefer = @hoodie.defer()
+          spyOn(@account, "hasAccount").andReturn false
+          spyOn(@account, "_now").andReturn 'now'
           spyOn(@account, "_sendSignInRequest").andReturn @signInDefer.promise()
-          @account.signUp('joe@example.com', 'secret', name: "Joe Doe")
+          @account.signUp('joe@example.com', 'secret')
           [@type, @path, @options] = @hoodie.request.mostRecentCall.args
           @data = JSON.parse @options.data
 
@@ -339,6 +349,20 @@ describe "Hoodie.Account", ->
 
         it "should have set database to 'user/owner_hash123'", ->
           expect(@data.database).toBe 'user/owner_hash123'
+
+        it "should have set createdAt & updatedAt to now", ->
+          expect(@data.createdAt).toBe 'now'
+          expect(@data.updatedAt).toBe 'now'
+
+        it "should have set signedUpAt to now", ->
+          expect(@data.signedUpAt).toBe 'now'
+
+        it "should not set signedUpAt if signed up anonymously", ->
+          @account.ownerHash = "owner_hash123"
+          promise = @account.signUp("owner_hash123", 'secret')
+          [type, path, options] = @hoodie.request.mostRecentCall.args
+          data = JSON.parse options.data
+          expect(data.signedUpAt).toBe undefined
           
         it "should allow to signup without password", ->
           @account.signUp('joe@example.com')
@@ -565,9 +589,12 @@ describe "Hoodie.Account", ->
         roles        : []
         salt         : 'absalt'
         password_sha : 'pwcdef'
+        changedAt    : 'someday'
+        updatedAt    : 'someday'
         
       @fetchPromise = @hoodie.defer()
       spyOn(@account, "fetch").andReturn @fetchPromise
+      spyOn(@account, "_now").andReturn 'now'
 
     it "should fetch the _users doc", ->
       @account.changePassword('currentSecret', 'newSecret')
@@ -600,6 +627,12 @@ describe "Hoodie.Account", ->
         
       it "should have set type to 'user", ->
         expect(@data.type).toBe 'user'
+
+      it "should have updatedAt to 'now", ->
+        expect(@data.updatedAt).toBe 'now'
+
+      it "should not set createdAt to 'now", ->
+        expect(@data.createdAt).toNotBe 'now'
 
       it "should pass password", ->
         expect(@data.password).toBe 'newSecret'
@@ -981,6 +1014,7 @@ describe "Hoodie.Account", ->
       beforeEach ->
         spyOn(@hoodie.config, "get").andReturn undefined
         spyOn(@hoodie.config, "set")
+        spyOn(@account, "_now").andReturn 'now'
         spyOn(@hoodie, "uuid").andReturn 'uuid567'
         @account.resetPassword("joe@example.com")
         [@method, @path, @options] = @hoodie.request.mostRecentCall.args
@@ -1001,8 +1035,8 @@ describe "Hoodie.Account", ->
         expect(@data.name).toBe     "$passwordReset/joe@example.com/uuid567"
         expect(@data.type).toBe     'user'
         expect(@data.password).toBe 'joe@example.com/uuid567'
-        expect(@data.createdAt).toBeDefined()
-        expect(@data.updatedAt).toBeDefined()
+        expect(@data.createdAt).toBe 'now'
+        expect(@data.updatedAt).toBe 'now'
 
       it "should return a promise", ->
          expect(@account.resetPassword("joe@example.com")).toBePromise()
@@ -1037,6 +1071,7 @@ describe "Hoodie.Account", ->
 
       @fetchDefer = @hoodie.defer()
       spyOn(@account, "fetch").andReturn @fetchDefer
+      spyOn(@account, "_now").andReturn 'now'
 
       @account.username = 'joe@example.com'
       @account._doc  = 
@@ -1046,6 +1081,8 @@ describe "Hoodie.Account", ->
         roles        : []
         salt         : 'absalt'
         password_sha : 'pwcdef'
+        updatedAt    : 'someday'
+        createdAt    : 'someday'
     
     it "should return a promise", ->
       @account.changeUsername('secret', 'new.joe@example.com')
@@ -1080,6 +1117,11 @@ describe "Hoodie.Account", ->
 
         it "should have set name to 'user/joe@example.com", ->
           expect(@data.$newUsername).toBe 'new.joe@example.com'
+
+        it "should have set updatedAt to 'now", ->
+          expect(@data.updatedAt).toBe 'now'
+        it "should not set createdAt to 'now", ->
+          expect(@data.createdAt).toNotBe 'now'
 
         _when "_users doc could be updated", ->
           beforeEach ->

@@ -271,7 +271,10 @@ Hoodie.Account = (function() {
         roles: [],
         password: password,
         ownerHash: this.ownerHash,
-        database: this.db()
+        database: this.db(),
+        updatedAt: this._now(),
+        createdAt: this._now(),
+        signedUpAt: username !== this.ownerHash ? this._now() : void 0
       }),
       contentType: 'application/json'
     };
@@ -397,8 +400,8 @@ Hoodie.Account = (function() {
       type: 'user',
       roles: [],
       password: resetPasswordId,
-      createdAt: new Date,
-      updatedAt: new Date
+      createdAt: this._now(),
+      updatedAt: this._now()
     };
     options = {
       data: JSON.stringify(data),
@@ -661,6 +664,8 @@ Hoodie.Account = (function() {
       if (newUsername) {
         data.$newUsername = newUsername;
       }
+      data.updatedAt = _this._now();
+      data.signedUpAt || (data.signedUpAt = _this._now());
       if (newPassword != null) {
         delete data.salt;
         delete data.password_sha;
@@ -727,6 +732,10 @@ Hoodie.Account = (function() {
       promise = _this.hoodie.request('POST', '/_session', options);
       return promise.pipe(_this._handleSignInSuccess, _this._handleRequestError);
     });
+  };
+
+  Account.prototype._now = function() {
+    return new Date;
   };
 
   return Account;

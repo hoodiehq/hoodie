@@ -88,6 +88,9 @@ class Hoodie.Account
         password   : password
         ownerHash  : @ownerHash
         database   : @db()
+        updatedAt  : @_now()
+        createdAt  : @_now()
+        signedUpAt : @_now() unless username is @ownerHash
       contentType : 'application/json'
 
     @hoodie.request('PUT', @_url(username), options)
@@ -250,8 +253,8 @@ class Hoodie.Account
       type       : 'user'
       roles      : []
       password   : resetPasswordId
-      createdAt : new Date
-      updatedAt : new Date
+      createdAt  : @_now()
+      updatedAt  : @_now()
 
     options =
       data        : JSON.stringify data
@@ -600,11 +603,13 @@ class Hoodie.Account
   # If a new password has been passed, salt and password_sha get removed
   # from _users doc and add the password in clear text. CouchDB will replace it with
   # according password_sha and a new salt server side
-  _sendChangeUsernameAndPasswordRequest: (currentPassword, newUsername, newPassword) =>
+  _sendChangeUsernameAndPasswordRequest : (currentPassword, newUsername, newPassword) =>
     =>
       # prepare updated _users doc
       data = $.extend {}, @_doc
       data.$newUsername = newUsername if newUsername
+      data.updatedAt    = @_now()
+      data.signedUpAt ||= @_now()
 
       # trigger password update when newPassword set
       if newPassword?
@@ -668,3 +673,6 @@ class Hoodie.Account
     @_withPreviousRequestsAborted 'signIn', =>
       promise = @hoodie.request('POST', '/_session', options)
       promise.pipe(@_handleSignInSuccess, @_handleRequestError)
+
+  #
+  _now : -> new Date

@@ -49,6 +49,9 @@ to sign in with a 300ms timeout.</p></div></div><div class="code"><div class="wr
         <span class="nv">password   : </span><span class="nx">password</span>
         <span class="nv">ownerHash  : </span><span class="nx">@ownerHash</span>
         <span class="nv">database   : </span><span class="nx">@db</span><span class="p">()</span>
+        <span class="nv">updatedAt  : </span><span class="nx">@_now</span><span class="p">()</span>
+        <span class="nv">createdAt  : </span><span class="nx">@_now</span><span class="p">()</span>
+        <span class="nv">signedUpAt : </span><span class="nx">@_now</span><span class="p">()</span> <span class="k">unless</span> <span class="nx">username</span> <span class="o">is</span> <span class="nx">@ownerHash</span>
       <span class="nv">contentType : </span><span class="s">&#39;application/json&#39;</span>
 
     <span class="nx">@hoodie</span><span class="p">.</span><span class="nx">request</span><span class="p">(</span><span class="s">&#39;PUT&#39;</span><span class="p">,</span> <span class="nx">@_url</span><span class="p">(</span><span class="nx">username</span><span class="p">),</span> <span class="nx">options</span><span class="p">)</span>
@@ -138,8 +141,8 @@ once the password was resetted.</p></div></div><div class="code"><div class="wra
       <span class="nv">type       : </span><span class="s">&#39;user&#39;</span>
       <span class="nv">roles      : </span><span class="p">[]</span>
       <span class="nv">password   : </span><span class="nx">resetPasswordId</span>
-      <span class="nv">createdAt : </span><span class="k">new</span> <span class="nb">Date</span>
-      <span class="nv">updatedAt : </span><span class="k">new</span> <span class="nb">Date</span>
+      <span class="nv">createdAt  : </span><span class="nx">@_now</span><span class="p">()</span>
+      <span class="nv">updatedAt  : </span><span class="nx">@_now</span><span class="p">()</span>
 
     <span class="nv">options =</span>
       <span class="nv">data        : </span><span class="nx">JSON</span><span class="p">.</span><span class="nx">stringify</span> <span class="nx">data</span>
@@ -399,9 +402,11 @@ the new username and remove the current one</p>
 
 <p>If a new password has been passed, salt and password<em>sha get removed
 from _users doc and add the password in clear text. CouchDB will replace it with
-according password</em>sha and a new salt server side</p></div></div><div class="code"><div class="wrapper">  <span class="nv">_sendChangeUsernameAndPasswordRequest: </span><span class="nf">(currentPassword, newUsername, newPassword) =&gt;</span>
+according password</em>sha and a new salt server side</p></div></div><div class="code"><div class="wrapper">  <span class="nv">_sendChangeUsernameAndPasswordRequest : </span><span class="nf">(currentPassword, newUsername, newPassword) =&gt;</span>
     <span class="o">=&gt;</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>prepare updated _users doc</p></div></div><div class="code"><div class="wrapper">      <span class="nv">data = </span><span class="nx">$</span><span class="p">.</span><span class="nx">extend</span> <span class="p">{},</span> <span class="nx">@_doc</span>
-      <span class="nv">data.$newUsername = </span><span class="nx">newUsername</span> <span class="k">if</span> <span class="nx">newUsername</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>trigger password update when newPassword set</p></div></div><div class="code"><div class="wrapper">      <span class="k">if</span> <span class="nx">newPassword</span><span class="o">?</span>
+      <span class="nv">data.$newUsername = </span><span class="nx">newUsername</span> <span class="k">if</span> <span class="nx">newUsername</span>
+      <span class="nv">data.updatedAt    = </span><span class="nx">@_now</span><span class="p">()</span>
+      <span class="nx">data</span><span class="p">.</span><span class="nx">signedUpAt</span> <span class="o">||=</span> <span class="nx">@_now</span><span class="p">()</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>trigger password update when newPassword set</p></div></div><div class="code"><div class="wrapper">      <span class="k">if</span> <span class="nx">newPassword</span><span class="o">?</span>
         <span class="k">delete</span> <span class="nx">data</span><span class="p">.</span><span class="nx">salt</span>
         <span class="k">delete</span> <span class="nx">data</span><span class="p">.</span><span class="nx">password_sha</span>
         <span class="nv">data.password = </span><span class="nx">newPassword</span>
@@ -442,4 +447,7 @@ the same.</p></div></div><div class="code"><div class="wrapper">  <span class="n
 
     <span class="nx">@_withPreviousRequestsAborted</span> <span class="s">&#39;signIn&#39;</span><span class="p">,</span> <span class="o">=&gt;</span>
       <span class="nv">promise = </span><span class="nx">@hoodie</span><span class="p">.</span><span class="nx">request</span><span class="p">(</span><span class="s">&#39;POST&#39;</span><span class="p">,</span> <span class="s">&#39;/_session&#39;</span><span class="p">,</span> <span class="nx">options</span><span class="p">)</span>
-      <span class="nx">promise</span><span class="p">.</span><span class="nx">pipe</span><span class="p">(</span><span class="nx">@_handleSignInSuccess</span><span class="p">,</span> <span class="nx">@_handleRequestError</span><span class="p">)</span></div></div></div></div></body></html>
+      <span class="nx">promise</span><span class="p">.</span><span class="nx">pipe</span><span class="p">(</span><span class="nx">@_handleSignInSuccess</span><span class="p">,</span> <span class="nx">@_handleRequestError</span><span class="p">)</span>
+
+  <span class="c1">#</span>
+  <span class="nv">_now : </span><span class="nf">-&gt;</span> <span class="k">new</span> <span class="nb">Date</span></div></div></div></div></body></html>
