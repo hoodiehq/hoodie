@@ -2,14 +2,16 @@
 <html>
 <head>
   <title>Hoodie Test page</title>
-  <link href="vendor/prettify-theme.css" type="text/css" rel="stylesheet" />
+  <link href="vendor/prism/prism.css" type="text/css" rel="stylesheet" />
 </head>
 <body>
   
   <div class="container" style="margin: 50px auto; max-width: 920px;">
-    <pre class="prettyprint lang-js">
+    <pre><code class="language-javascript">
     
+    // 
     // initialize your Hoodie App
+    //
     
     whereTheMagicHappens = 'https://yourapp.hood.ie';
     hoodie = new Hoodie(whereTheMagicHappens);
@@ -20,38 +22,24 @@
     
     // sign up
     hoodie.account.signUp('joe@example.com', 'secret')
-      .done( function(user) { } ) 
-      .fail( function(err)  { } )
       
     // sign in
     hoodie.account.signIn('joe@example.com', 'secret')
-      .done( function(user) { } ) 
-      .fail( function(err)  { } )
       
     // sign out
     hoodie.account.signOut()
-      .done( function(user) { } ) 
-      .fail( function(err)  { } )
     
     // change password
     hoodie.account.changePassword('currentpassword', 'newpassword')
-      .done( function(user) { } ) 
-      .fail( function(err)  { } )
 
     // change username
     hoodie.account.changeUsername('currentpassword', 'newusername')
-      .done( function(user) { } ) 
-      .fail( function(err)  { } )
       
     // reset password
     hoodie.account.resetPassword('joe@example.com')
-      .done( function(user) { } ) 
-      .fail( function(err)  { } )
 
     // destroy account and all its data
     hoodie.account.destroy()
-      .done( function(user) { } ) 
-      .fail( function(err)  { } )
       
     //
     // Store
@@ -62,7 +50,6 @@
     attributes = {color: "red"}
     hoodie.store.add(type, attributes )
       .done ( function(newObject) { } )
-      .fail ( function(err)        { } )
       
     // save an object
     type = 'couch'
@@ -70,7 +57,6 @@
     attributes  = {color: "red", name: "relax"}
     hoodie.store.save( type, id, attributes )
       .done ( function(object) { } )
-      .fail ( function(err)        { } )
       
     // update an existing object
     type = 'couch'
@@ -78,32 +64,27 @@
     update = {size: 2}
     hoodie.store.update( type, id, update )
       .done ( function(updatedObject) { } )
-      .fail ( function(err)            { } )
     
     // find one object
     type = 'couch'
     id   = 'abc4567'
     hoodie.store.find( type, id )
       .done ( function(object) { } )
-      .fail ( function(err)    { } )
       
     // Load all objects
     hoodie.store.findAll()
       .done ( function(objects) { } )
-      .fail ( function(err)     { } )
       
     // Load all objects from one type
     type = 'couch'
     hoodie.store.findAll( type )
       .done ( function(objects) { } )
-      .fail ( function(err)     { } )
       
     // remove an existing object
     type = 'couch'
     id   = 'abc4567'
     hoodie.store.remove( type, id )
       .done ( function(removedObject) { } )
-      .fail ( function(err)           { } )
 
     // listen to store events
     hoodie.store.on( 'add',    function( newObject) { } )
@@ -235,8 +216,7 @@
 
     // open a share and load all its objects
     hoodie.share('shareIdHere').store.findAll()
-      .done( function(objects) { } ) 
-      .fail( function(err)     { } )
+      .done( function(objects) { } )
 
     // subscribe / unsubscribe
     hoodie.share('shareId').subscribe()
@@ -264,21 +244,17 @@
       // something went wrong
       .fail     ( function(err)   { } )
 
+    //
     // hoodie.js API docs
     // http://hoodiehq.github.com/hoodie.js/doc/hoodie.html
-    </pre>
+    //
+    </code></pre>
   </div>
   
   <!-- deplendencies for hoodie -->
   <script src="vendor/jquery/jquery.min.js"></script>
   <script src="hoodie.js"></script>
-  <script src="vendor/prettify.js"></script>
-  <script>
-    if (typeof prettyPrint == 'function') {
-      prettyPrint()
-    };
-  </script>
-  
+  <script src="vendor/prism/prism.js"></script>
   
 </body>
 </html>
