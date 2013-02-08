@@ -37,8 +37,9 @@ describe "Hoodie.LocalStore", ->
         spyOn(window, "setTimeout").andCallFake (cb) -> cb()
       
       it "should trigger idle event if there are dirty objects in localStorage", ->
+        spyOn(Hoodie.LocalStore::, "changedDocs").andReturn [1, 2, 3]
         store = new Hoodie.LocalStore @hoodie
-        expect(Hoodie.LocalStore::trigger).wasCalledWith 'idle'
+        expect(Hoodie.LocalStore::trigger).wasCalledWith 'idle', [1, 2, 3]
         
       it "should cache dirty objects", ->
         spyOn(Hoodie.LocalStore::, "cache")

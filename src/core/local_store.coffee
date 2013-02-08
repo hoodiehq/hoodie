@@ -344,7 +344,7 @@ class Hoodie.LocalStore extends Hoodie.Store
 
     return if options.silent
 
-    @_trigger_dirty_and_idle_events()
+    @_triggerDirtyAndIdleEvents()
 
 
   # ## Mark all as changed
@@ -360,7 +360,7 @@ class Hoodie.LocalStore extends Hoodie.Store
         @_dirty[key] = object
 
       @_saveDirtyIds()
-      @_trigger_dirty_and_idle_events()
+      @_triggerDirtyAndIdleEvents()
 
 
   # changed docs
@@ -564,11 +564,11 @@ class Hoodie.LocalStore extends Hoodie.Store
     @trigger "change:#{object.type}:#{object.id}",    event, object, options unless event is 'new'
 
   #
-  _trigger_dirty_and_idle_events: ->
+  _triggerDirtyAndIdleEvents: ->
     @trigger 'dirty'
     window.clearTimeout @_dirtyTimeout
     @_dirtyTimeout = window.setTimeout ( =>
-      @trigger 'idle'
+      @trigger 'idle', @changedDocs()
     ), @idleTimeout
 
   #

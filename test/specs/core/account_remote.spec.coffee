@@ -11,8 +11,8 @@ describe "Hoodie.AccountRemote", ->
     
     spyOn(@hoodie, "trigger")
     spyOn(@hoodie.store, "remove").andReturn then: (cb) -> cb('objectFromStore')
-    spyOn(@hoodie.store, "update").andReturn  then: (cb) -> cb('objectFromStore', false)
-    spyOn(@hoodie.store, "save").andReturn    then: (cb) -> cb('objectFromStore', false)
+    spyOn(@hoodie.store, "update").andReturn then: (cb) -> cb('objectFromStore', false)
+    spyOn(@hoodie.store, "save").andReturn   then: (cb) -> cb('objectFromStore', false)
 
     @remote = new Hoodie.AccountRemote @hoodie
   
@@ -83,11 +83,11 @@ describe "Hoodie.AccountRemote", ->
       @remote.stopSyncing()
       expect(@hoodie.config.set).wasCalledWith '_remote.sync', false
 
-    it "should unsubscribe from account's signin idle event", ->
+    it "should unsubscribe from account's signin event", ->
       @remote.stopSyncing()
       expect(@hoodie.unbind).wasCalledWith 'account:signin', @remote._handleSignIn
       
-    it "should unsubscribe from account's signout idle event", ->
+    it "should unsubscribe from account's signout event", ->
       @remote.stopSyncing()
       expect(@hoodie.unbind).wasCalledWith 'account:signout', @remote.disconnect
   # /#stopSyncing()

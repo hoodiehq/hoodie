@@ -71,8 +71,7 @@ class Hoodie.Remote extends Hoodie.Store
       @prefix = @name
       
     @prefix = options.prefix if options.prefix?
-
-    @_sync   = options.sync   if options.sync
+    @_sync  = options.sync   if options.sync
 
     # in order to differentiate whether an object from remote should trigger a 'new'
     # or an 'update' event, we store a hash of known objects
@@ -224,7 +223,7 @@ class Hoodie.Remote extends Hoodie.Store
   # Disconnect
   # ------------
 
-  # stop syncing changes from the userDB
+  # stop syncing changes from remote store
   disconnect : =>
     @connected = false
     
@@ -311,8 +310,7 @@ class Hoodie.Remote extends Hoodie.Store
   # push changes
   # --------------
 
-  # Push objects to userDB using the `_bulk_docs` API.
-  # If no objects passed, push all changed documents
+  # Push objects to remote store using the `_bulk_docs` API.
   push : (docs) =>
     
     return @hoodie.defer().resolve([]).promise() unless docs?.length
@@ -545,9 +543,9 @@ class Hoodie.Remote extends Hoodie.Store
           event = 'add'
           @_knownObjects[doc._id] = 1
 
-      @trigger "store:#{event}",                                    parsedDoc
-      @trigger "store:#{event}:#{parsedDoc.type}",                 parsedDoc
-      @trigger "store:#{event}:#{parsedDoc.type}:#{parsedDoc.id}", parsedDoc      
-      @trigger "store:change",                                      event, parsedDoc
-      @trigger "store:change:#{parsedDoc.type}",                   event, parsedDoc
-      @trigger "store:change:#{parsedDoc.type}:#{parsedDoc.id}",   event, parsedDoc
+      @trigger "#{event}",                                   parsedDoc
+      @trigger "#{event}:#{parsedDoc.type}",                 parsedDoc
+      @trigger "#{event}:#{parsedDoc.type}:#{parsedDoc.id}", parsedDoc      
+      @trigger "change",                                     event, parsedDoc
+      @trigger "change:#{parsedDoc.type}",                   event, parsedDoc
+      @trigger "change:#{parsedDoc.type}:#{parsedDoc.id}",   event, parsedDoc
