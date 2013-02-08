@@ -50,7 +50,7 @@ describe "Hoodie.LocalStore", ->
         spyOn(window, "setTimeout").andCallFake (cb) -> cb()
       
       it "should trigger idle event if there are dirty objects in localStorage", ->
-        spyOn(Hoodie.LocalStore::, "changedDocs").andReturn [1, 2, 3]
+        spyOn(Hoodie.LocalStore::, "changedObjects").andReturn [1, 2, 3]
         store = new Hoodie.LocalStore @hoodie
         expect(Hoodie.LocalStore::trigger).wasCalledWith 'idle', [1, 2, 3]
         
@@ -822,14 +822,14 @@ describe "Hoodie.LocalStore", ->
   # /.markAllAsChanged(type, id, object)
   
 
-  describe "#changedDocs()", ->
+  describe "#changedObjects()", ->
     _when "there are no changed docs", ->
       beforeEach ->
         @store._dirty = {}
         
       it "should return an empty array", ->
-        expect($.isArray @store.changedDocs()).toBeTruthy()
-        expect(@store.changedDocs().length).toBe 0
+        expect($.isArray @store.changedObjects()).toBeTruthy()
+        expect(@store.changedObjects().length).toBe 0
         
     _when "there are 2 dirty docs", ->
       beforeEach ->
@@ -839,13 +839,13 @@ describe "Hoodie.LocalStore", ->
         }
         
       it "should return the two docs", ->
-        expect(@store.changedDocs().length).toBe 2
+        expect(@store.changedObjects().length).toBe 2
 
       it "should add type and id", ->
-        [doc1, doc2] = @store.changedDocs()
+        [doc1, doc2] = @store.changedObjects()
         expect(doc1.type).toBe 'couch'
         expect(doc1.id).toBe '123'
-  # /.changedDocs()
+  # /.changedObjects()
 
 
   describe "#isMarkedAsDeleted(type, id)", ->

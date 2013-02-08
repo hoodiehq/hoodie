@@ -1542,7 +1542,7 @@ Hoodie.AccountRemote = (function(_super) {
   AccountRemote.prototype.push = function(docs) {
     var promise;
     if (!$.isArray(docs)) {
-      docs = this.hoodie.store.changedDocs();
+      docs = this.hoodie.store.changedObjects();
     }
     return promise = AccountRemote.__super__.push.call(this, docs);
   };
@@ -1885,7 +1885,7 @@ Hoodie.LocalStore = (function(_super) {
     });
   };
 
-  LocalStore.prototype.changedDocs = function() {
+  LocalStore.prototype.changedObjects = function() {
     var id, key, object, type, _ref, _ref1, _results;
     _ref = this._dirty;
     _results = [];
@@ -2096,7 +2096,7 @@ Hoodie.LocalStore = (function(_super) {
     this.trigger('dirty');
     window.clearTimeout(this._dirtyTimeout);
     return this._dirtyTimeout = window.setTimeout((function() {
-      return _this.trigger('idle', _this.changedDocs());
+      return _this.trigger('idle', _this.changedObjects());
     }), this.idleTimeout);
   };
 

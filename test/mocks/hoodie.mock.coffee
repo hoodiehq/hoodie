@@ -32,7 +32,7 @@ Mocks.Hoodie = ->
     findAll       : -> promiseMock
     findOrAdd     : -> promiseMock 
     removeAll     : -> promiseMock 
-    changedDocs   : ->
+    changedObjects   : ->
     isDirty       : ->
     decoratePromises: -> 
       

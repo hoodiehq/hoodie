@@ -1,5 +1,5 @@
 window.Mocks or= {}
-Mocks.changedDocs = ->
+Mocks.changedObjects = ->
   [
     {
       content   : "this is done"

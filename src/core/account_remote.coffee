@@ -113,7 +113,7 @@ class Hoodie.AccountRemote extends Hoodie.Remote
   # if no docs passed to be pushed, we default to users changed objects
   # in his store
   push : (docs) =>
-    docs = @hoodie.store.changedDocs() unless $.isArray docs
+    docs = @hoodie.store.changedObjects() unless $.isArray docs
     promise = super(docs)
 
 
@@ -146,7 +146,7 @@ class Hoodie.AccountRemote extends Hoodie.Remote
   # # 
   # _handlePullResults : (changes) =>
   #   _removedDocs = []
-  #   _changedDocs   = []
+  #   _changedObjects   = []
     
   #   # 1. update or remove objects from local store
   #   for {doc} in changes
@@ -154,7 +154,7 @@ class Hoodie.AccountRemote extends Hoodie.Remote
   #     if doc._deleted
   #       _removedDocs.push [doc, @hoodie.store.remove( doc.type, doc.id,      remote: true)]
   #     else                                                
-  #       _changedDocs.push [doc, @hoodie.store.save(   doc.type, doc.id, doc, remote: true)]
+  #       _changedObjects.push [doc, @hoodie.store.save(   doc.type, doc.id, doc, remote: true)]
     
   #   # 2. trigger events
   #   for [doc, promise] in _removedDocs
@@ -167,7 +167,7 @@ class Hoodie.AccountRemote extends Hoodie.Remote
   #       @trigger "change:#{doc.type}",            'remove', object
   #       @trigger "change:#{doc.type}:#{doc.id}",  'remove', object
     
-  #   for [doc, promise] in _changedDocs
+  #   for [doc, promise] in _changedObjects
   #     promise.then (object, objectWasCreated) => 
   #       event = if objectWasCreated then 'create' else 'update'
   #       @trigger event,                            object

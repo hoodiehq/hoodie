@@ -362,7 +362,7 @@ class Hoodie.LocalStore extends Hoodie.Store
   # --------------
 
   # returns an Array of all dirty documents
-  changedDocs : -> 
+  changedObjects : -> 
     for key, object of @_dirty
       [type, id]   = key.split '/'
       object.type = type
@@ -582,7 +582,7 @@ class Hoodie.LocalStore extends Hoodie.Store
     @trigger 'dirty'
     window.clearTimeout @_dirtyTimeout
     @_dirtyTimeout = window.setTimeout ( =>
-      @trigger 'idle', @changedDocs()
+      @trigger 'idle', @changedObjects()
     ), @idleTimeout
 
   #

@@ -341,7 +341,7 @@ describe "Hoodie.AccountRemote", ->
 
     _when "no docs passed", ->        
       it "should push changed documents from store", ->
-        spyOn(@hoodie.store, "changedDocs").andReturn "changed_docs"
+        spyOn(@hoodie.store, "changedObjects").andReturn "changed_docs"
         @remote.push()
         expect(Hoodie.Remote::push).wasCalledWith "changed_docs"
   # /#push(docs)

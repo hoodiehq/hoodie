@@ -34,7 +34,7 @@ in his config</p></div></div><div class="code"><div class="wrapper">  <span clas
   <span class="nv">setSinceNr : </span><span class="nf">(since) -&gt;</span>
     <span class="nx">@hoodie</span><span class="p">.</span><span class="nx">config</span><span class="p">.</span><span class="nx">set</span><span class="p">(</span><span class="s">&#39;_remote.since&#39;</span><span class="p">,</span> <span class="nx">since</span><span class="p">)</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h2 id="push">push</h2></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>if no docs passed to be pushed, we default to users changed objects
 in his store</p></div></div><div class="code"><div class="wrapper">  <span class="nv">push : </span><span class="nf">(docs) =&gt;</span>
-    <span class="nv">docs = </span><span class="nx">@hoodie</span><span class="p">.</span><span class="nx">store</span><span class="p">.</span><span class="nx">changedDocs</span><span class="p">()</span> <span class="k">unless</span> <span class="nx">$</span><span class="p">.</span><span class="nx">isArray</span> <span class="nx">docs</span>
+    <span class="nv">docs = </span><span class="nx">@hoodie</span><span class="p">.</span><span class="nx">store</span><span class="p">.</span><span class="nx">changedObjects</span><span class="p">()</span> <span class="k">unless</span> <span class="nx">$</span><span class="p">.</span><span class="nx">isArray</span> <span class="nx">docs</span>
     <span class="nv">promise = </span><span class="k">super</span><span class="p">(</span><span class="nx">docs</span><span class="p">)</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h2 id="events">Events</h2></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>namespaced alias for <code>hoodie.on</code></p></div></div><div class="code"><div class="wrapper">  <span class="kc">on</span>  <span class="o">:</span> <span class="nf">(event, cb) -&gt;</span> 
     <span class="nv">event = </span><span class="nx">event</span><span class="p">.</span><span class="nx">replace</span> <span class="sr">/(^| )([^ ]+)/g</span><span class="p">,</span> <span class="s">&quot;$1remote:$2&quot;</span>
     <span class="nx">@hoodie</span><span class="p">.</span><span class="nx">on</span>  <span class="nx">event</span><span class="p">,</span> <span class="nx">cb</span>
@@ -48,13 +48,13 @@ in his store</p></div></div><div class="code"><div class="wrapper">  <span class
 
 <p>_handlePullResults : (changes) =>
   _removedDocs = []
-  _changedDocs   = []</p></div></div><div class="code"><div class="wrapper">    </div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p># 1. update or remove objects from local store
+  _changedObjects   = []</p></div></div><div class="code"><div class="wrapper">    </div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p># 1. update or remove objects from local store
   for {doc} in changes
     doc = @<em>parseFromRemote(doc)
     if doc.</em>deleted
       _removedDocs.push [doc, @hoodie.store.remove( doc.type, doc.id,      remote: true)]
     else <br />
-      _changedDocs.push [doc, @hoodie.store.save(   doc.type, doc.id, doc, remote: true)]</p></div></div><div class="code"><div class="wrapper">    </div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p># 2. trigger events
+      _changedObjects.push [doc, @hoodie.store.save(   doc.type, doc.id, doc, remote: true)]</p></div></div><div class="code"><div class="wrapper">    </div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p># 2. trigger events
   for [doc, promise] in _removedDocs
     promise.then (object) => 
       @trigger 'remove',                       object
@@ -62,7 +62,7 @@ in his store</p></div></div><div class="code"><div class="wrapper">  <span class
       @trigger "remove:#{doc.type}:#{doc.id}", object</p></div></div><div class="code"><div class="wrapper">        </div></div></div><div class="segment"><div class="comments"><div class="wrapper"><pre><code>  @trigger 'change',                        'remove', object
   @trigger "change:#{doc.type}",            'remove', object
   @trigger "change:#{doc.type}:#{doc.id}",  'remove', object
-</code></pre></div></div><div class="code"><div class="wrapper">    </div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>for [doc, promise] in _changedDocs
+</code></pre></div></div><div class="code"><div class="wrapper">    </div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>for [doc, promise] in _changedObjects
     promise.then (object, objectWasCreated) => 
       event = if objectWasCreated then 'create' else 'update'
       @trigger event,                            object

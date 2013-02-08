@@ -621,7 +621,7 @@ describe "Hoodie.Remote", ->
 
     _and "one deleted and one new doc passed", ->
       beforeEach ->
-        @remote.push Mocks.changedDocs()
+        @remote.push Mocks.changedObjects()
         expect(@remote.request).wasCalled()
         [@method, @path, @options] = @remote.request.mostRecentCall.args
   
