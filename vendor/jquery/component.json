@@ -1,10 +1,10 @@
 {
   "name": "jquery",
-  "version": "1.8.3",
+  "version": "1.9.1",
   "main": "./jquery.js",
   "dependencies": {},
-  "gitHead": "7d6149dea8a6cdd0d1fbeca8a189f4d464d6f0cd",
-  "_id": "jquery@1.8.3",
+  "gitHead": "975556d5d0e4ae21e67a97c0344d5dd89b49ea04",
+  "_id": "jquery@1.9.1",
   "readme": "ERROR: No README.md file found!",
   "description": "ERROR: No README.md file found!",
   "repository": {
