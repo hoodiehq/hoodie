@@ -54,9 +54,9 @@ class Hoodie.Remote extends Hoodie.Store
   # `pull: true` or `push: true`.
   _sync : false
 
-  # docPrefix
+  # prefix
 
-  # prefix of docs in CouchDB Database, e.g. all docs
+  # prefix for docs in a CouchDB database, e.g. all docs
   # in public user stores are prefixed by '$public'
   prefix : ''
 
@@ -85,7 +85,7 @@ class Hoodie.Remote extends Hoodie.Store
     # and all its assets to be loaded before we start loading
     # our data. 
     # A good way to fix it would be a special `bootstrap` method,
-    # that would load all docs with a normal GET /_all_docs request,
+    # that would load all objects with a normal GET /_all_docs request,
     # after that it would start with the GET /_changes requests,
     # starting with the current seq number of the database.
     @startSyncing() if @isContinuouslySyncing()
@@ -185,10 +185,10 @@ class Hoodie.Remote extends Hoodie.Store
       id    : id
     }, object
 
-    doc   = @_parseForRemote object
-    path  = "/" + encodeURIComponent doc._id
+    object = @_parseForRemote object
+    path   = "/" + encodeURIComponent object._id
 
-    @request "PUT", path, data: doc
+    @request "PUT", path, data: object
 
   
   # remove
@@ -311,19 +311,19 @@ class Hoodie.Remote extends Hoodie.Store
   # --------------
 
   # Push objects to remote store using the `_bulk_docs` API.
-  push : (docs) =>
+  push : (objects) =>
     
-    return @hoodie.defer().resolve([]).promise() unless docs?.length
+    return @hoodie.defer().resolve([]).promise() unless objects?.length
       
-    docsForRemote = []
-    for doc in docs
-      doc = @_parseForRemote doc 
-      @_addRevisionTo doc
-      docsForRemote.push doc
+    objectsForRemote = []
+    for object in objects
+      object = @_parseForRemote object 
+      @_addRevisionTo object
+      objectsForRemote.push object
     
     @_pushRequest = @request 'POST', "/_bulk_docs"
       data :
-        docs      : docsForRemote
+        docs      : objectsForRemote
         new_edits : false
 
 
@@ -331,8 +331,8 @@ class Hoodie.Remote extends Hoodie.Store
   # --------------
 
   # pull ... and push ;-)
-  sync : (docs) =>
-    @push(docs).pipe @pull
+  sync : (objects) =>
+    @push(objects).pipe @pull
 
   
   # Events
@@ -395,7 +395,7 @@ class Hoodie.Remote extends Hoodie.Store
   # normalize objects coming from remote
 
   # renames `_id` attribute to `id` and removes the type from the id,
-  # e.g. `document/123` -> `123`
+  # e.g. `type/123` -> `123`
   _parseFromRemote : (obj) =>
 
     # handle id and type
@@ -532,8 +532,8 @@ class Hoodie.Remote extends Hoodie.Store
   #
   _handlePullResults : (changes) =>
     for {doc} in changes
-      parsedDoc = @_parseFromRemote(doc)
-      if parsedDoc._deleted
+      object = @_parseFromRemote(doc)
+      if object._deleted
         event = 'remove'
         delete @_knownObjects[doc._id]
       else
@@ -543,9 +543,9 @@ class Hoodie.Remote extends Hoodie.Store
           event = 'add'
           @_knownObjects[doc._id] = 1
 
-      @trigger "#{event}",                                   parsedDoc
-      @trigger "#{event}:#{parsedDoc.type}",                 parsedDoc
-      @trigger "#{event}:#{parsedDoc.type}:#{parsedDoc.id}", parsedDoc      
-      @trigger "change",                                     event, parsedDoc
-      @trigger "change:#{parsedDoc.type}",                   event, parsedDoc
-      @trigger "change:#{parsedDoc.type}:#{parsedDoc.id}",   event, parsedDoc
+      @trigger "#{event}",                             object
+      @trigger "#{event}:#{object.type}",              object
+      @trigger "#{event}:#{object.type}:#{object.id}", object      
+      @trigger "change",                               event, object
+      @trigger "change:#{object.type}",                event, object
+      @trigger "change:#{object.type}:#{object.id}",   event, object
