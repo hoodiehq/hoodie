@@ -143,14 +143,6 @@ class Hoodie.AccountRemote extends Hoodie.Remote
     @name = @hoodie.account.db()
     @connect()
 
-  # update local _rev attributes after changes pushed
-  _handlePushSuccess: (docs, pushedDocs) =>
-    =>
-      for doc, i in docs
-        update  = {_rev: pushedDocs[i]._rev}
-        options = remote : true
-        @hoodie.store.update(doc.type, doc.id, update, options) 
-
   # 
   _handlePullResults : (changes) =>
     _removeedDocs = []

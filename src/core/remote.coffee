@@ -328,9 +328,6 @@ class Hoodie.Remote extends Hoodie.Store
         docs      : docsForRemote
         new_edits : false
 
-    # when push is successful, update the local store with the generated _rev numbers
-    @_pushRequest.done @_handlePushSuccess(docs, docsForRemote)
-
 
   # sync changes
   # --------------
@@ -554,9 +551,3 @@ class Hoodie.Remote extends Hoodie.Store
       @trigger "store:change",                                      event, parsedDoc
       @trigger "store:change:#{parsedDoc.type}",                   event, parsedDoc
       @trigger "store:change:#{parsedDoc.type}:#{parsedDoc.id}",   event, parsedDoc
-
-
-  # ### handle push success
-
-  # do nothing by default
-  _handlePushSuccess : (docs, pushedDocs) => 
