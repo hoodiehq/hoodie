@@ -33,10 +33,10 @@ hoodie.store.on('add:task', function(object) {
 
 // publish & share data
 hoodie.store.findAll("task").publish()
-hoodie.user( username ).store.findAll()
+hoodie.user( username ).findAll()
 
 hoodie.store.find("task", "456").share()
-hoodie.share( shareId ).store.findAll()
+hoodie.share( shareId ).findAll()
 hoodie.share( shareId ).subscribe()
 
 // sending emails … yep.

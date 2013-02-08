@@ -381,7 +381,13 @@ resolved promise</p></div></div><div class="code"><div class="wrapper">  <span c
     
 
   <span class="c1">#</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>depending on wether the user signedUp manually or has been signed up anonymously
-the prefix in the CouchDB _users doc differentiates. </p></div></div><div class="code"><div class="wrapper">  <span class="nv">_userKey : </span><span class="nf">(username) -&gt;</span>
+the prefix in the CouchDB _users doc differentiates. 
+An anonymous user is characterized by its username, that equals
+its ownerHash (see <code>anonymousSignUp</code>)</p>
+
+<p>We differentiate with <code>hasAnonymousAccount()</code>, because <code>_userKey</code>
+is used within <code>signUp</code> method, so we need to be able to differentiate
+between anonyomus and normal users before an account has been created.</p></div></div><div class="code"><div class="wrapper">  <span class="nv">_userKey : </span><span class="nf">(username) -&gt;</span>
     <span class="k">if</span> <span class="nx">username</span> <span class="o">is</span> <span class="nx">@ownerHash</span>
       <span class="nv">prefix = </span><span class="s">&#39;user_anonymous&#39;</span>
     <span class="k">else</span>

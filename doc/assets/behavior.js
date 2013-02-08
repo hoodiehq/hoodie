@@ -364,8 +364,8 @@ f.event={add:function(a,c,d,e,g){var h,i,j,k,l,m,n,o,p,q,r,s;if(!(a.nodeType===3
               "type": "heading",
               "data": {
                 "level": 1,
-                "title": "RemoteStore",
-                "slug": "remotestore",
+                "title": "AccountRemote",
+                "slug": "accountremote",
                 "isFileHeader": true
               },
               "depth": 1,
@@ -461,7 +461,7 @@ f.event={add:function(a,c,d,e,g){var h,i,j,k,l,m,n,o,p,q,r,s;if(!(a.nodeType===3
                 }
               ]
             },
-            "title": "RemoteStore"
+            "title": "AccountRemote"
           },
           "depth": 2,
           "outline": [
@@ -1064,8 +1064,8 @@ f.event={add:function(a,c,d,e,g){var h,i,j,k,l,m,n,o,p,q,r,s;if(!(a.nodeType===3
               "type": "heading",
               "data": {
                 "level": 1,
-                "title": "RemoteStore",
-                "slug": "remotestore",
+                "title": "Remote",
+                "slug": "remote",
                 "isFileHeader": true
               },
               "depth": 1,
@@ -1116,6 +1116,54 @@ f.event={add:function(a,c,d,e,g){var h,i,j,k,l,m,n,o,p,q,r,s;if(!(a.nodeType===3
                     "level": 2,
                     "title": "post",
                     "slug": "post"
+                  },
+                  "depth": 2
+                }, {
+                  "type": "heading",
+                  "data": {
+                    "level": 2,
+                    "title": "Store Operations overides",
+                    "slug": "store-operations-overides"
+                  },
+                  "depth": 2
+                }, {
+                  "type": "heading",
+                  "data": {
+                    "level": 2,
+                    "title": "find",
+                    "slug": "find"
+                  },
+                  "depth": 2
+                }, {
+                  "type": "heading",
+                  "data": {
+                    "level": 2,
+                    "title": "findAll",
+                    "slug": "findall"
+                  },
+                  "depth": 2
+                }, {
+                  "type": "heading",
+                  "data": {
+                    "level": 2,
+                    "title": "save",
+                    "slug": "save"
+                  },
+                  "depth": 2
+                }, {
+                  "type": "heading",
+                  "data": {
+                    "level": 2,
+                    "title": "remove",
+                    "slug": "remove"
+                  },
+                  "depth": 2
+                }, {
+                  "type": "heading",
+                  "data": {
+                    "level": 2,
+                    "title": "removeAll",
+                    "slug": "removeall"
                   },
                   "depth": 2
                 }, {
@@ -1237,9 +1285,49 @@ f.event={add:function(a,c,d,e,g){var h,i,j,k,l,m,n,o,p,q,r,s;if(!(a.nodeType===3
                     "title": "Private",
                     "slug": "private"
                   },
+                  "depth": 2
+                }, {
+                  "type": "heading",
+                  "data": {
+                    "level": 2,
+                    "title": "Parse for remote",
+                    "slug": "parse-for-remote"
+                  },
+                  "depth": 2
+                }, {
+                  "type": "heading",
+                  "data": {
+                    "level": 2,
+                    "title": "_parseFromRemote",
+                    "slug": "-parsefromremote"
+                  },
                   "depth": 2,
                   "children": [
                     {
+                      "type": "heading",
+                      "data": {
+                        "level": 3,
+                        "title": "_addRevisionTo",
+                        "slug": "-addrevisionto"
+                      },
+                      "depth": 3
+                    }, {
+                      "type": "heading",
+                      "data": {
+                        "level": 3,
+                        "title": "generate new revision id",
+                        "slug": "generate-new-revision-id"
+                      },
+                      "depth": 3
+                    }, {
+                      "type": "heading",
+                      "data": {
+                        "level": 3,
+                        "title": "map docs from findAll",
+                        "slug": "map-docs-from-findall"
+                      },
+                      "depth": 3
+                    }, {
                       "type": "heading",
                       "data": {
                         "level": 3,
@@ -1284,7 +1372,7 @@ f.event={add:function(a,c,d,e,g){var h,i,j,k,l,m,n,o,p,q,r,s;if(!(a.nodeType===3
                 }
               ]
             },
-            "title": "RemoteStore"
+            "title": "Remote"
           },
           "depth": 2,
           "outline": [
@@ -1334,6 +1422,54 @@ f.event={add:function(a,c,d,e,g){var h,i,j,k,l,m,n,o,p,q,r,s;if(!(a.nodeType===3
                 "level": 2,
                 "title": "post",
                 "slug": "post"
+              },
+              "depth": 2
+            }, {
+              "type": "heading",
+              "data": {
+                "level": 2,
+                "title": "Store Operations overides",
+                "slug": "store-operations-overides"
+              },
+              "depth": 2
+            }, {
+              "type": "heading",
+              "data": {
+                "level": 2,
+                "title": "find",
+                "slug": "find"
+              },
+              "depth": 2
+            }, {
+              "type": "heading",
+              "data": {
+                "level": 2,
+                "title": "findAll",
+                "slug": "findall"
+              },
+              "depth": 2
+            }, {
+              "type": "heading",
+              "data": {
+                "level": 2,
+                "title": "save",
+                "slug": "save"
+              },
+              "depth": 2
+            }, {
+              "type": "heading",
+              "data": {
+                "level": 2,
+                "title": "remove",
+                "slug": "remove"
+              },
+              "depth": 2
+            }, {
+              "type": "heading",
+              "data": {
+                "level": 2,
+                "title": "removeAll",
+                "slug": "removeall"
               },
               "depth": 2
             }, {
@@ -1455,9 +1591,49 @@ f.event={add:function(a,c,d,e,g){var h,i,j,k,l,m,n,o,p,q,r,s;if(!(a.nodeType===3
                 "title": "Private",
                 "slug": "private"
               },
+              "depth": 2
+            }, {
+              "type": "heading",
+              "data": {
+                "level": 2,
+                "title": "Parse for remote",
+                "slug": "parse-for-remote"
+              },
+              "depth": 2
+            }, {
+              "type": "heading",
+              "data": {
+                "level": 2,
+                "title": "_parseFromRemote",
+                "slug": "-parsefromremote"
+              },
               "depth": 2,
               "children": [
                 {
+                  "type": "heading",
+                  "data": {
+                    "level": 3,
+                    "title": "_addRevisionTo",
+                    "slug": "-addrevisionto"
+                  },
+                  "depth": 3
+                }, {
+                  "type": "heading",
+                  "data": {
+                    "level": 3,
+                    "title": "generate new revision id",
+                    "slug": "generate-new-revision-id"
+                  },
+                  "depth": 3
+                }, {
+                  "type": "heading",
+                  "data": {
+                    "level": 3,
+                    "title": "map docs from findAll",
+                    "slug": "map-docs-from-findall"
+                  },
+                  "depth": 3
+                }, {
                   "type": "heading",
                   "data": {
                     "level": 3,
@@ -1495,289 +1671,6 @@ f.event={add:function(a,c,d,e,g){var h,i,j,k,l,m,n,o,p,q,r,s;if(!(a.nodeType===3
                     "level": 3,
                     "title": "handle push success",
                     "slug": "handle-push-success"
-                  },
-                  "depth": 3
-                }
-              ]
-            }
-          ]
-        }, {
-          "type": "file",
-          "data": {
-            "language": {
-              "nameMatchers": [".coffee", "Cakefile"],
-              "pygmentsLexer": "coffee-script",
-              "singleLineComment": ["#"],
-              "name": "CoffeeScript"
-            },
-            "sourcePath": "/Users/gregor/JavaScripts/hood.ie/hoodie.js/src/core/remote_store.coffee",
-            "projectPath": "src/core/remote_store.coffee",
-            "targetPath": "core/remote_store",
-            "firstHeader": {
-              "type": "heading",
-              "data": {
-                "level": 1,
-                "title": "RemoteStore",
-                "slug": "remotestore",
-                "isFileHeader": true
-              },
-              "depth": 1,
-              "children": [
-                {
-                  "type": "heading",
-                  "data": {
-                    "level": 2,
-                    "title": "API",
-                    "slug": "api"
-                  },
-                  "depth": 2
-                }, {
-                  "type": "heading",
-                  "data": {
-                    "level": 2,
-                    "title": "Event binding",
-                    "slug": "event-binding"
-                  },
-                  "depth": 2
-                }, {
-                  "type": "heading",
-                  "data": {
-                    "level": 2,
-                    "title": "Constructor ",
-                    "slug": "constructor-"
-                  },
-                  "depth": 2
-                }, {
-                  "type": "heading",
-                  "data": {
-                    "level": 2,
-                    "title": "find",
-                    "slug": "find"
-                  },
-                  "depth": 2
-                }, {
-                  "type": "heading",
-                  "data": {
-                    "level": 2,
-                    "title": "findAll",
-                    "slug": "findall"
-                  },
-                  "depth": 2
-                }, {
-                  "type": "heading",
-                  "data": {
-                    "level": 2,
-                    "title": "save",
-                    "slug": "save"
-                  },
-                  "depth": 2
-                }, {
-                  "type": "heading",
-                  "data": {
-                    "level": 2,
-                    "title": "remove",
-                    "slug": "remove"
-                  },
-                  "depth": 2
-                }, {
-                  "type": "heading",
-                  "data": {
-                    "level": 2,
-                    "title": "removeAll",
-                    "slug": "removeall"
-                  },
-                  "depth": 2
-                }, {
-                  "type": "heading",
-                  "data": {
-                    "level": 2,
-                    "title": "Parse for remote",
-                    "slug": "parse-for-remote"
-                  },
-                  "depth": 2
-                }, {
-                  "type": "heading",
-                  "data": {
-                    "level": 2,
-                    "title": "parseFromRemote",
-                    "slug": "parsefromremote"
-                  },
-                  "depth": 2,
-                  "children": [
-                    {
-                      "type": "heading",
-                      "data": {
-                        "level": 3,
-                        "title": "addRevisionTo",
-                        "slug": "addrevisionto"
-                      },
-                      "depth": 3
-                    }
-                  ]
-                }, {
-                  "type": "heading",
-                  "data": {
-                    "level": 2,
-                    "title": "Events",
-                    "slug": "events"
-                  },
-                  "depth": 2
-                }, {
-                  "type": "heading",
-                  "data": {
-                    "level": 2,
-                    "title": "Private",
-                    "slug": "private"
-                  },
-                  "depth": 2,
-                  "children": [
-                    {
-                      "type": "heading",
-                      "data": {
-                        "level": 3,
-                        "title": "generate new revision id",
-                        "slug": "generate-new-revision-id"
-                      },
-                      "depth": 3
-                    }, {
-                      "type": "heading",
-                      "data": {
-                        "level": 3,
-                        "title": "map docs from findAll",
-                        "slug": "map-docs-from-findall"
-                      },
-                      "depth": 3
-                    }
-                  ]
-                }
-              ]
-            },
-            "title": "RemoteStore"
-          },
-          "depth": 2,
-          "outline": [
-            {
-              "type": "heading",
-              "data": {
-                "level": 2,
-                "title": "API",
-                "slug": "api"
-              },
-              "depth": 2
-            }, {
-              "type": "heading",
-              "data": {
-                "level": 2,
-                "title": "Event binding",
-                "slug": "event-binding"
-              },
-              "depth": 2
-            }, {
-              "type": "heading",
-              "data": {
-                "level": 2,
-                "title": "Constructor ",
-                "slug": "constructor-"
-              },
-              "depth": 2
-            }, {
-              "type": "heading",
-              "data": {
-                "level": 2,
-                "title": "find",
-                "slug": "find"
-              },
-              "depth": 2
-            }, {
-              "type": "heading",
-              "data": {
-                "level": 2,
-                "title": "findAll",
-                "slug": "findall"
-              },
-              "depth": 2
-            }, {
-              "type": "heading",
-              "data": {
-                "level": 2,
-                "title": "save",
-                "slug": "save"
-              },
-              "depth": 2
-            }, {
-              "type": "heading",
-              "data": {
-                "level": 2,
-                "title": "remove",
-                "slug": "remove"
-              },
-              "depth": 2
-            }, {
-              "type": "heading",
-              "data": {
-                "level": 2,
-                "title": "removeAll",
-                "slug": "removeall"
-              },
-              "depth": 2
-            }, {
-              "type": "heading",
-              "data": {
-                "level": 2,
-                "title": "Parse for remote",
-                "slug": "parse-for-remote"
-              },
-              "depth": 2
-            }, {
-              "type": "heading",
-              "data": {
-                "level": 2,
-                "title": "parseFromRemote",
-                "slug": "parsefromremote"
-              },
-              "depth": 2,
-              "children": [
-                {
-                  "type": "heading",
-                  "data": {
-                    "level": 3,
-                    "title": "addRevisionTo",
-                    "slug": "addrevisionto"
-                  },
-                  "depth": 3
-                }
-              ]
-            }, {
-              "type": "heading",
-              "data": {
-                "level": 2,
-                "title": "Events",
-                "slug": "events"
-              },
-              "depth": 2
-            }, {
-              "type": "heading",
-              "data": {
-                "level": 2,
-                "title": "Private",
-                "slug": "private"
-              },
-              "depth": 2,
-              "children": [
-                {
-                  "type": "heading",
-                  "data": {
-                    "level": 3,
-                    "title": "generate new revision id",
-                    "slug": "generate-new-revision-id"
-                  },
-                  "depth": 3
-                }, {
-                  "type": "heading",
-                  "data": {
-                    "level": 3,
-                    "title": "map docs from findAll",
-                    "slug": "map-docs-from-findall"
                   },
                   "depth": 3
                 }

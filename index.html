@@ -209,13 +209,13 @@
     .done( function(todos, share) { alert('shared at ' + share.id) } )
 
     // remove objects from all shares
-    hoodi.store.findAll('todo').unshare()
+    hoodie.store.findAll('todo').unshare()
 
     // remove share
     hoodie.share.remove(share.id)
 
     // open a share and load all its objects
-    hoodie.share('shareIdHere').store.findAll()
+    hoodie.share('shareIdHere').findAll()
       .done( function(objects) { } )
 
     // subscribe / unsubscribe

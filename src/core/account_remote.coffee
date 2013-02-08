@@ -158,7 +158,7 @@ class Hoodie.AccountRemote extends Hoodie.Remote
     
     # 1. update or remove objects from local store
     for {doc} in changes
-      doc = @store.parseFromRemote(doc)
+      doc = @_parseFromRemote(doc)
       if doc._deleted
         _removeedDocs.push [doc, @hoodie.store.remove( doc.type, doc.id,       remote: true)]
       else                                                

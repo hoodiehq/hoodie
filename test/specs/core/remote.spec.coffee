@@ -10,6 +10,7 @@ describe "Hoodie.Remote", ->
     spyOn(@hoodie.account, "db").andReturn 'joe$example.com'
 
     @remote = new Hoodie.Remote @hoodie
+    spyOn(@remote, "request").andReturn @requestDefer.promise()
   
   
   describe "constructor(@hoodie, options = {})", ->
@@ -31,11 +32,6 @@ describe "Hoodie.Remote", ->
     it "should fallback prefix to ''", ->
       remote = new Hoodie.Remote @hoodie
       expect(remote.prefix).toBe ''
-
-    it "should init a remote store", ->
-      remote = new Hoodie.Remote @hoodie
-      expect(remote.store instanceof Hoodie.RemoteStore).toBe true
-       
 
     _when "sync: true passed", ->
       beforeEach ->
@@ -61,6 +57,7 @@ describe "Hoodie.Remote", ->
 
   describe "#request(type, path, options)", ->
     beforeEach ->
+      @remote.request.andCallThrough()
       spyOn(@hoodie, "request")
     
     it "should proxy to hoodie.request", ->
@@ -94,6 +91,172 @@ describe "Hoodie.Remote", ->
   
   describe "post(view, params)", ->
   # /post(view, params)
+
+
+  # Store operations
+  # ------------------
+
+  describe "#find(type, id)", ->
+
+    _when "request successful", ->
+      beforeEach ->
+        @remote.prefix = 'store_prefix'
+        @requestDefer.resolve
+          _id: 'store_prefix/car/fresh'
+          createdAt: '2012-12-12T22:00:00.000Z'
+          updatedAt: '2012-12-21T22:00:00.000Z'
+      
+      it "should resolve with the doc", ->
+        expect(@remote.find("todo", "1")).toBeResolvedWith
+          id: 'fresh'
+          type: 'car'
+          createdAt: new Date(Date.parse '2012-12-12T22:00:00.000Z')
+          updatedAt: new Date(Date.parse '2012-12-21T22:00:00.000Z')
+  # /#find(type, id)
+
+
+  describe "#findAll(type)", ->
+    
+    it "should return a promise", ->
+      expect(@remote.findAll()).toBePromise()
+
+    _when "type is not set", ->
+      _and "prefix is empty", ->
+        beforeEach ->
+          @remote.prefix = ''
+        
+        it "should send a GET to /_all_docs?include_docs=true", ->
+          @remote.findAll()
+          expect(@remote.request).wasCalledWith "GET", "/_all_docs?include_docs=true"
+
+      _and "prefix is '$public'", ->
+        beforeEach ->
+          @remote.prefix = '$public'
+        
+        it "should send a GET to /_all_docs?include_docs=true", ->
+          @remote.findAll()
+          expect(@remote.request).wasCalledWith "GET", '/_all_docs?include_docs=true&startkey="$public/"&endkey="$public0"'
+
+    _when "type is todo", ->
+      it 'should send a GET to /_all_docs?include_docs=true&startkey="todo/"&endkey="todo0"', ->
+        @remote.findAll('todo')
+        expect(@remote.request).wasCalledWith "GET", '/_all_docs?include_docs=true&startkey="todo/"&endkey="todo0"'
+
+      _and "prefix is 'remote_prefix'", ->
+        beforeEach ->
+          @remote.prefix = 'remote_prefix'
+        
+        it 'should send a GET to /_all_docs?include_docs=true&startkey="todo/"&endkey="todo0"', ->
+          @remote.findAll('todo')
+          expect(@remote.request).wasCalledWith "GET", '/_all_docs?include_docs=true&startkey="remote_prefix/todo/"&endkey="remote_prefix/todo0"'        
+
+    _when "request success", ->
+      beforeEach ->
+        @doc = 
+          _id: 'car/fresh'
+          createdAt: '2012-12-12T22:00:00.000Z'
+          updatedAt: '2012-12-21T22:00:00.000Z'
+
+        @requestDefer.resolve 
+          total_rows:3
+          offset:0
+          rows: [
+            doc: @doc
+          ]
+
+      it "should be resolved with array of objects", ->
+        object = 
+          id: 'fresh'
+          type: 'car'
+          createdAt: new Date (Date.parse '2012-12-12T22:00:00.000Z')
+          updatedAt: new Date (Date.parse '2012-12-21T22:00:00.000Z')
+        expect(@remote.findAll()).toBeResolvedWith [object]
+
+    _when "request has an error", ->
+      beforeEach ->
+        @requestDefer.reject "error"
+
+      it "should be rejected with the response error", ->
+        promise = @remote.findAll()
+        expect(promise).toBeRejectedWith "error"
+  # /#findAll(type )
+
+
+  describe "#save(type, id, object)", ->
+    beforeEach ->
+      spyOn(@hoodie, "uuid").andReturn "uuid567"
+    
+    it "should generate an id if it is undefined", ->
+      @remote.save("car", undefined, {})
+      expect(@hoodie.uuid).wasCalled()
+
+    it "should not generate an id if id is set", ->
+      spyOn(@remote, "_generateNewRevisionId").andReturn 'newRevId'
+      @remote.save("car", 123, {})
+      expect(@hoodie.uuid).wasNotCalled()
+
+    it "should return promise by @request", ->
+      @remote.request.andReturn 'request_promise'
+      expect(@remote.save("car", 123, {})).toBe 'request_promise'
+    
+    _when "saving car/123 with color: red", ->
+      beforeEach ->        
+        @remote.save "car", 123, color: "red"
+        [@type, @path, {@data}] = @remote.request.mostRecentCall.args
+
+      it "should send a PUT request to `/car%2F123`", ->
+        expect(@type).toBe 'PUT'
+        expect(@path).toBe '/car%2F123'
+
+      it "should add type to saved object", -> 
+        expect(@data.type).toBe 'car'
+
+      it "should set _id to `car/123`", ->
+        expect(@data._id).toBe 'car/123'
+
+      it "should not generate a _rev", ->
+        expect(@data._rev).toBeUndefined()
+
+    _when "saving car/123 with color: red and prefix is 'remote_prefix'", ->
+      beforeEach ->        
+        @remote.prefix = 'remote_prefix'
+        @remote.save "car", 123, color: "red"
+        [@type, @path, {@data}] = @remote.request.mostRecentCall.args
+
+      it "should send a PUT request to `/remote_prefix%2Fcar%2F123`", ->
+        expect(@type).toBe 'PUT'
+        expect(@path).toBe '/remote_prefix%2Fcar%2F123'
+
+      it "should set _id to `car/123`", ->
+        expect(@data._id).toBe 'remote_prefix/car/123'
+  # /#save(type, id, object)
+
+
+  describe "#remove(type, id)", ->
+    beforeEach ->
+      spyOn(@remote, "update").andReturn "update_promise"
+    
+    it "should proxy to update with _deleted: true", ->
+      @remote.remove 'car', 123
+      expect(@remote.update).wasCalledWith 'car', 123, _deleted: true
+    
+    it "should return promise of update", ->
+       expect(@remote.remove 'car', 123).toBe 'update_promise'    
+  # /#remove(type, id)
+
+
+  describe "#removeAll(type)", ->
+    beforeEach ->
+      spyOn(@remote, "updateAll").andReturn "updateAll_promise"
+    
+    it "should proxy to updateAll with _deleted: true", ->
+      @remote.removeAll 'car'
+      expect(@remote.updateAll).wasCalledWith 'car', _deleted: true
+    
+    it "should return promise of updateAll", ->
+       expect(@remote.removeAll 'car').toBe 'updateAll_promise'
+  # /#removeAll(type)
+
 
 
   # synchronization
@@ -237,7 +400,6 @@ describe "Hoodie.Remote", ->
   describe "#pull()", ->        
     beforeEach ->
       @remote.connected = true
-      spyOn(@remote, "request").andReturn @requestDefer.promise()
     
     _when ".isContinuouslyPulling() is true", ->
       beforeEach ->
@@ -436,7 +598,6 @@ describe "Hoodie.Remote", ->
     beforeEach ->
       spyOn(Date, "now").andReturn 10
       @remote._timezoneOffset = 1
-      spyOn(@remote, "request").andReturn @requestDefer.promise()
       
     _when "no docs passed", ->        
       it "shouldn't do anything", ->
