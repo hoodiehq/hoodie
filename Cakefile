@@ -74,7 +74,6 @@ task 'build', 'build hoodie.min.js', ->
   src/core/email.coffee
   src/core/errors.coffee
   src/core/store.coffee
-  src/core/remote_store.coffee
   src/core/remote.coffee
   src/core/account_remote.coffee
   src/core/local_store.coffee
