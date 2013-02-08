@@ -1074,8 +1074,8 @@ f.event={add:function(a,c,d,e,g){var h,i,j,k,l,m,n,o,p,q,r,s;if(!(a.nodeType===3
                   "type": "heading",
                   "data": {
                     "level": 2,
-                    "title": "this.store API",
-                    "slug": "thisstore-api"
+                    "title": "store API",
+                    "slug": "store-api"
                   },
                   "depth": 2
                 }, {
@@ -1359,14 +1359,6 @@ f.event={add:function(a,c,d,e,g){var h,i,j,k,l,m,n,o,p,q,r,s;if(!(a.nodeType===3
                         "slug": "handle-changes-from-remote"
                       },
                       "depth": 3
-                    }, {
-                      "type": "heading",
-                      "data": {
-                        "level": 3,
-                        "title": "handle push success",
-                        "slug": "handle-push-success"
-                      },
-                      "depth": 3
                     }
                   ]
                 }
@@ -1380,8 +1372,8 @@ f.event={add:function(a,c,d,e,g){var h,i,j,k,l,m,n,o,p,q,r,s;if(!(a.nodeType===3
               "type": "heading",
               "data": {
                 "level": 2,
-                "title": "this.store API",
-                "slug": "thisstore-api"
+                "title": "store API",
+                "slug": "store-api"
               },
               "depth": 2
             }, {
@@ -1663,14 +1655,6 @@ f.event={add:function(a,c,d,e,g){var h,i,j,k,l,m,n,o,p,q,r,s;if(!(a.nodeType===3
                     "level": 3,
                     "title": "handle changes from remote",
                     "slug": "handle-changes-from-remote"
-                  },
-                  "depth": 3
-                }, {
-                  "type": "heading",
-                  "data": {
-                    "level": 3,
-                    "title": "handle push success",
-                    "slug": "handle-push-success"
                   },
                   "depth": 3
                 }

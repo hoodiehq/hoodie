@@ -44,41 +44,30 @@ in his store</p></div></div><div class="code"><div class="wrapper">  <span class
   </div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>namespaced alias for <code>hoodie.trigger</code></p></div></div><div class="code"><div class="wrapper">  <span class="nv">trigger : </span><span class="nf">(event, parameters...) -&gt;</span> 
     <span class="nx">@hoodie</span><span class="p">.</span><span class="nx">trigger</span> <span class="s">&quot;remote:</span><span class="si">#{</span><span class="nx">event</span><span class="si">}</span><span class="s">&quot;</span><span class="p">,</span> <span class="nx">parameters</span><span class="p">...</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h2 id="private">Private</h2></div></div></div><div class="segment"><div class="code"><div class="wrapper">  <span class="nv">_handleSignIn: </span><span class="o">=&gt;</span>
     <span class="vi">@name = </span><span class="nx">@hoodie</span><span class="p">.</span><span class="nx">account</span><span class="p">.</span><span class="nx">db</span><span class="p">()</span>
-    <span class="nx">@connect</span><span class="p">()</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>update local _rev attributes after changes pushed</p></div></div><div class="code"><div class="wrapper">  <span class="nv">_handlePushSuccess: </span><span class="nf">(docs, pushedDocs) =&gt;</span>
-    <span class="o">=&gt;</span>
-      <span class="k">for</span> <span class="nx">doc</span><span class="p">,</span> <span class="nx">i</span> <span class="k">in</span> <span class="nx">docs</span>
-        <span class="nv">update  = </span><span class="p">{</span><span class="nv">_rev: </span><span class="nx">pushedDocs</span><span class="p">[</span><span class="nx">i</span><span class="p">].</span><span class="nx">_rev</span><span class="p">}</span>
-        <span class="nv">options = remote : </span><span class="kc">true</span>
-        <span class="nx">@hoodie</span><span class="p">.</span><span class="nx">store</span><span class="p">.</span><span class="nx">update</span><span class="p">(</span><span class="nx">doc</span><span class="p">.</span><span class="nx">type</span><span class="p">,</span> <span class="nx">doc</span><span class="p">.</span><span class="nx">id</span><span class="p">,</span> <span class="nx">update</span><span class="p">,</span> <span class="nx">options</span><span class="p">)</span> </div></div></div><div class="segment"><div class="code"><div class="wrapper">  <span class="nv">_handlePullResults : </span><span class="nf">(changes) =&gt;</span>
-    <span class="nv">_removeedDocs = </span><span class="p">[]</span>
-    <span class="nv">_changedDocs   = </span><span class="p">[]</span>
-    </div></div></div><div class="segment"><div class="comments"><div class="wrapper"><ol>
-<li>update or remove objects from local store</li>
-</ol></div></div><div class="code"><div class="wrapper">    <span class="k">for</span> <span class="p">{</span><span class="nx">doc</span><span class="p">}</span> <span class="k">in</span> <span class="nx">changes</span>
-      <span class="nv">doc = </span><span class="nx">@_parseFromRemote</span><span class="p">(</span><span class="nx">doc</span><span class="p">)</span>
-      <span class="k">if</span> <span class="nx">doc</span><span class="p">.</span><span class="nx">_deleted</span>
-        <span class="nx">_removeedDocs</span><span class="p">.</span><span class="nx">push</span> <span class="p">[</span><span class="nx">doc</span><span class="p">,</span> <span class="nx">@hoodie</span><span class="p">.</span><span class="nx">store</span><span class="p">.</span><span class="nx">remove</span><span class="p">(</span> <span class="nx">doc</span><span class="p">.</span><span class="nx">type</span><span class="p">,</span> <span class="nx">doc</span><span class="p">.</span><span class="nx">id</span><span class="p">,</span>       <span class="nv">remote: </span><span class="kc">true</span><span class="p">)]</span>
-      <span class="k">else</span>                                                
-        <span class="nx">_changedDocs</span><span class="p">.</span><span class="nx">push</span>  <span class="p">[</span><span class="nx">doc</span><span class="p">,</span> <span class="nx">@hoodie</span><span class="p">.</span><span class="nx">store</span><span class="p">.</span><span class="nx">save</span><span class="p">(</span>    <span class="nx">doc</span><span class="p">.</span><span class="nx">type</span><span class="p">,</span> <span class="nx">doc</span><span class="p">.</span><span class="nx">id</span><span class="p">,</span> <span class="nx">doc</span><span class="p">,</span> <span class="nv">remote: </span><span class="kc">true</span><span class="p">)]</span>
-    </div></div></div><div class="segment"><div class="comments"><div class="wrapper"><ol>
-<li>trigger events</li>
-</ol></div></div><div class="code"><div class="wrapper">    <span class="k">for</span> <span class="p">[</span><span class="nx">doc</span><span class="p">,</span> <span class="nx">promise</span><span class="p">]</span> <span class="k">in</span> <span class="nx">_removeedDocs</span>
-      <span class="nx">promise</span><span class="p">.</span><span class="nx">then</span> <span class="nf">(object) =&gt;</span> 
-        <span class="nx">@trigger</span> <span class="s">&#39;remove&#39;</span><span class="p">,</span>                        <span class="nx">object</span>
-        <span class="nx">@trigger</span> <span class="s">&quot;remove:</span><span class="si">#{</span><span class="nx">doc</span><span class="p">.</span><span class="nx">type</span><span class="si">}</span><span class="s">&quot;</span><span class="p">,</span>           <span class="nx">object</span>
-        <span class="nx">@trigger</span> <span class="s">&quot;remove:</span><span class="si">#{</span><span class="nx">doc</span><span class="p">.</span><span class="nx">type</span><span class="si">}</span><span class="s">:</span><span class="si">#{</span><span class="nx">doc</span><span class="p">.</span><span class="nx">id</span><span class="si">}</span><span class="s">&quot;</span><span class="p">,</span> <span class="nx">object</span>
-        
-        <span class="nx">@trigger</span> <span class="s">&#39;change&#39;</span><span class="p">,</span>                         <span class="s">&#39;remove&#39;</span><span class="p">,</span> <span class="nx">object</span>
-        <span class="nx">@trigger</span> <span class="s">&quot;change:</span><span class="si">#{</span><span class="nx">doc</span><span class="p">.</span><span class="nx">type</span><span class="si">}</span><span class="s">&quot;</span><span class="p">,</span>            <span class="s">&#39;remove&#39;</span><span class="p">,</span> <span class="nx">object</span>
-        <span class="nx">@trigger</span> <span class="s">&quot;change:</span><span class="si">#{</span><span class="nx">doc</span><span class="p">.</span><span class="nx">type</span><span class="si">}</span><span class="s">:</span><span class="si">#{</span><span class="nx">doc</span><span class="p">.</span><span class="nx">id</span><span class="si">}</span><span class="s">&quot;</span><span class="p">,</span>  <span class="s">&#39;remove&#39;</span><span class="p">,</span> <span class="nx">object</span>
-    
-    <span class="k">for</span> <span class="p">[</span><span class="nx">doc</span><span class="p">,</span> <span class="nx">promise</span><span class="p">]</span> <span class="k">in</span> <span class="nx">_changedDocs</span>
-      <span class="nx">promise</span><span class="p">.</span><span class="nx">then</span> <span class="nf">(object, objectWasCreated) =&gt;</span> 
-        <span class="nv">event = </span><span class="k">if</span> <span class="nx">objectWasCreated</span> <span class="k">then</span> <span class="s">&#39;create&#39;</span> <span class="k">else</span> <span class="s">&#39;update&#39;</span>
-        <span class="nx">@trigger</span> <span class="nx">event</span><span class="p">,</span>                             <span class="nx">object</span>
-        <span class="nx">@trigger</span> <span class="s">&quot;</span><span class="si">#{</span><span class="nx">event</span><span class="si">}</span><span class="s">:</span><span class="si">#{</span><span class="nx">doc</span><span class="p">.</span><span class="nx">type</span><span class="si">}</span><span class="s">&quot;</span><span class="p">,</span>           <span class="nx">object</span>
-        <span class="nx">@trigger</span> <span class="s">&quot;</span><span class="si">#{</span><span class="nx">event</span><span class="si">}</span><span class="s">:</span><span class="si">#{</span><span class="nx">doc</span><span class="p">.</span><span class="nx">type</span><span class="si">}</span><span class="s">:</span><span class="si">#{</span><span class="nx">doc</span><span class="p">.</span><span class="nx">id</span><span class="si">}</span><span class="s">&quot;</span><span class="p">,</span> <span class="nx">object</span> <span class="k">unless</span> <span class="nx">event</span> <span class="o">is</span> <span class="s">&#39;create&#39;</span>
-      
-        <span class="nx">@trigger</span> <span class="s">&quot;change&quot;</span><span class="p">,</span>                          <span class="nx">event</span><span class="p">,</span> <span class="nx">object</span>
-        <span class="nx">@trigger</span> <span class="s">&quot;change:</span><span class="si">#{</span><span class="nx">doc</span><span class="p">.</span><span class="nx">type</span><span class="si">}</span><span class="s">&quot;</span><span class="p">,</span>             <span class="nx">event</span><span class="p">,</span> <span class="nx">object</span>
-        <span class="nx">@trigger</span> <span class="s">&quot;change:</span><span class="si">#{</span><span class="nx">doc</span><span class="p">.</span><span class="nx">type</span><span class="si">}</span><span class="s">:</span><span class="si">#{</span><span class="nx">doc</span><span class="p">.</span><span class="nx">id</span><span class="si">}</span><span class="s">&quot;</span><span class="p">,</span>   <span class="nx">event</span><span class="p">,</span> <span class="nx">object</span> <span class="k">unless</span> <span class="nx">event</span> <span class="o">is</span> <span class="s">&#39;create&#39;</span></div></div></div></div></body></html>
+    <span class="nx">@connect</span><span class="p">()</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h1 id=""> </h1>
+
+<p>_handlePullResults : (changes) =>
+  _removedDocs = []
+  _changedDocs   = []</p></div></div><div class="code"><div class="wrapper">    </div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p># 1. update or remove objects from local store
+  for {doc} in changes
+    doc = @<em>parseFromRemote(doc)
+    if doc.</em>deleted
+      _removedDocs.push [doc, @hoodie.store.remove( doc.type, doc.id,      remote: true)]
+    else <br />
+      _changedDocs.push [doc, @hoodie.store.save(   doc.type, doc.id, doc, remote: true)]</p></div></div><div class="code"><div class="wrapper">    </div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p># 2. trigger events
+  for [doc, promise] in _removedDocs
+    promise.then (object) => 
+      @trigger 'remove',                       object
+      @trigger "remove:#{doc.type}",           object
+      @trigger "remove:#{doc.type}:#{doc.id}", object</p></div></div><div class="code"><div class="wrapper">        </div></div></div><div class="segment"><div class="comments"><div class="wrapper"><pre><code>  @trigger 'change',                        'remove', object
+  @trigger "change:#{doc.type}",            'remove', object
+  @trigger "change:#{doc.type}:#{doc.id}",  'remove', object
+</code></pre></div></div><div class="code"><div class="wrapper">    </div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>for [doc, promise] in _changedDocs
+    promise.then (object, objectWasCreated) => 
+      event = if objectWasCreated then 'create' else 'update'
+      @trigger event,                            object
+      @trigger "#{event}:#{doc.type}",           object
+      @trigger "#{event}:#{doc.type}:#{doc.id}", object unless event is 'create'</p></div></div><div class="code"><div class="wrapper">      </div></div></div><div class="segment"><div class="comments"><div class="wrapper"><pre><code>  @trigger "change",                         event, object
+  @trigger "change:#{doc.type}",             event, object
+  @trigger "change:#{doc.type}:#{doc.id}",   event, object unless event is 'create'
+</code></pre></div></div></div></div></body></html>
