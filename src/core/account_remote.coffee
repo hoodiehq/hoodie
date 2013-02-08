@@ -87,7 +87,7 @@ class Hoodie.AccountRemote extends Hoodie.Remote
   # ------
 
   # 
-  sync : (docs) =>
+  sync : (objects) =>
     if @isContinuouslyPushing()
       @hoodie.unbind 'store:idle', @push
       @hoodie.on     'store:idle', @push
@@ -110,11 +110,11 @@ class Hoodie.AccountRemote extends Hoodie.Remote
   # push
   # ------
 
-  # if no docs passed to be pushed, we default to users changed objects
+  # if no objects passed to be pushed, we default to users changed objects
   # in his store
-  push : (docs) =>
-    docs = @hoodie.store.changedObjects() unless $.isArray docs
-    promise = super(docs)
+  push : (objects) =>
+    objects = @hoodie.store.changedObjects() unless $.isArray objects
+    promise = super(objects)
 
 
   # Events
@@ -142,38 +142,3 @@ class Hoodie.AccountRemote extends Hoodie.Remote
   _handleSignIn: =>
     @name = @hoodie.account.db()
     @connect()
-
-  # # 
-  # _handlePullResults : (changes) =>
-  #   _removedDocs = []
-  #   _changedObjects   = []
-    
-  #   # 1. update or remove objects from local store
-  #   for {doc} in changes
-  #     doc = @_parseFromRemote(doc)
-  #     if doc._deleted
-  #       _removedDocs.push [doc, @hoodie.store.remove( doc.type, doc.id,      remote: true)]
-  #     else                                                
-  #       _changedObjects.push [doc, @hoodie.store.save(   doc.type, doc.id, doc, remote: true)]
-    
-  #   # 2. trigger events
-  #   for [doc, promise] in _removedDocs
-  #     promise.then (object) => 
-  #       @trigger 'remove',                       object
-  #       @trigger "remove:#{doc.type}",           object
-  #       @trigger "remove:#{doc.type}:#{doc.id}", object
-        
-  #       @trigger 'change',                        'remove', object
-  #       @trigger "change:#{doc.type}",            'remove', object
-  #       @trigger "change:#{doc.type}:#{doc.id}",  'remove', object
-    
-  #   for [doc, promise] in _changedObjects
-  #     promise.then (object, objectWasCreated) => 
-  #       event = if objectWasCreated then 'create' else 'update'
-  #       @trigger event,                            object
-  #       @trigger "#{event}:#{doc.type}",           object
-  #       @trigger "#{event}:#{doc.type}:#{doc.id}", object unless event is 'create'
-      
-  #       @trigger "change",                         event, object
-  #       @trigger "change:#{doc.type}",             event, object
-  #       @trigger "change:#{doc.type}:#{doc.id}",   event, object unless event is 'create'
