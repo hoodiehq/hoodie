@@ -10,12 +10,12 @@ Mocks.Hoodie = ->
   
   baseUrl : 'http://my.cou.ch'
   
-  trigger       : ->
+  trigger       : Hoodie::trigger
   request       : ->
   open          : ->
-  on            : ->
-  one           : ->
-  unbind        : ->
+  on            : Hoodie::on
+  one           : Hoodie::one
+  unbind        : Hoodie::unbind
   defer         : $.Deferred
   isPromise     : Hoodie::isPromise
   uuid          : -> 'uuid'

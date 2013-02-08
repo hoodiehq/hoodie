@@ -10,18 +10,31 @@ describe "Hoodie.LocalStore", ->
     spyOn(@store.db, "setItem").andCallThrough()
     spyOn(@store.db, "removeItem").andCallThrough()
     spyOn(@store.db, "clear").andCallThrough()
+
+    spyOn(@hoodie, "on")
   
 
   describe "constructor", ->
+    
     it "should subscribe to account:signout event", ->
-      spyOn(@hoodie, "on")
       store = new Hoodie.LocalStore @hoodie
       expect(@hoodie.on).wasCalledWith 'account:signout', store.clear
 
     it "should subscribe to account:signup event", ->
-      spyOn(@hoodie, "on")
       store = new Hoodie.LocalStore @hoodie
       expect(@hoodie.on).wasCalledWith 'account:signup', store.markAllAsChanged
+
+    it "should subscribe to remote:change event", ->
+      spyOn(Hoodie.LocalStore::, "save")
+      spyOn(Hoodie.LocalStore::, "remove")
+      store = new Hoodie.LocalStore @hoodie
+      @object = type : 'car', id : '123', color : 'red'
+
+      @hoodie.trigger 'remote:change', 'remove', @object
+      @hoodie.trigger 'remote:change', 'update', @object
+
+      expect(store.remove).wasCalledWith 'car', '123', remote : true
+      expect(store.save).wasCalledWith 'car', '123', @object, remote : true
 
     _when "there are dirty objects in localStorage", ->
       beforeEach ->
@@ -898,9 +911,6 @@ describe "Hoodie.LocalStore", ->
 
 
   describe "#on", ->
-    beforeEach ->
-      spyOn(@hoodie, "on")
-    
     it "should proxy to hoodie.on with 'store' namespace", ->
        @store.on 'event', funky: 'fresh'
        expect(@hoodie.on).wasCalledWith 'store:event', funky: 'fresh'

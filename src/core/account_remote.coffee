@@ -143,37 +143,37 @@ class Hoodie.AccountRemote extends Hoodie.Remote
     @name = @hoodie.account.db()
     @connect()
 
-  # 
-  _handlePullResults : (changes) =>
-    _removedDocs = []
-    _changedDocs   = []
+  # # 
+  # _handlePullResults : (changes) =>
+  #   _removedDocs = []
+  #   _changedDocs   = []
     
-    # 1. update or remove objects from local store
-    for {doc} in changes
-      doc = @_parseFromRemote(doc)
-      if doc._deleted
-        _removedDocs.push [doc, @hoodie.store.remove( doc.type, doc.id,      remote: true)]
-      else                                                
-        _changedDocs.push [doc, @hoodie.store.save(   doc.type, doc.id, doc, remote: true)]
+  #   # 1. update or remove objects from local store
+  #   for {doc} in changes
+  #     doc = @_parseFromRemote(doc)
+  #     if doc._deleted
+  #       _removedDocs.push [doc, @hoodie.store.remove( doc.type, doc.id,      remote: true)]
+  #     else                                                
+  #       _changedDocs.push [doc, @hoodie.store.save(   doc.type, doc.id, doc, remote: true)]
     
-    # 2. trigger events
-    for [doc, promise] in _removedDocs
-      promise.then (object) => 
-        @trigger 'remove',                       object
-        @trigger "remove:#{doc.type}",           object
-        @trigger "remove:#{doc.type}:#{doc.id}", object
+  #   # 2. trigger events
+  #   for [doc, promise] in _removedDocs
+  #     promise.then (object) => 
+  #       @trigger 'remove',                       object
+  #       @trigger "remove:#{doc.type}",           object
+  #       @trigger "remove:#{doc.type}:#{doc.id}", object
         
-        @trigger 'change',                        'remove', object
-        @trigger "change:#{doc.type}",            'remove', object
-        @trigger "change:#{doc.type}:#{doc.id}",  'remove', object
+  #       @trigger 'change',                        'remove', object
+  #       @trigger "change:#{doc.type}",            'remove', object
+  #       @trigger "change:#{doc.type}:#{doc.id}",  'remove', object
     
-    for [doc, promise] in _changedDocs
-      promise.then (object, objectWasCreated) => 
-        event = if objectWasCreated then 'create' else 'update'
-        @trigger event,                            object
-        @trigger "#{event}:#{doc.type}",           object
-        @trigger "#{event}:#{doc.type}:#{doc.id}", object unless event is 'create'
+  #   for [doc, promise] in _changedDocs
+  #     promise.then (object, objectWasCreated) => 
+  #       event = if objectWasCreated then 'create' else 'update'
+  #       @trigger event,                            object
+  #       @trigger "#{event}:#{doc.type}",           object
+  #       @trigger "#{event}:#{doc.type}:#{doc.id}", object unless event is 'create'
       
-        @trigger "change",                         event, object
-        @trigger "change:#{doc.type}",             event, object
-        @trigger "change:#{doc.type}:#{doc.id}",   event, object unless event is 'create'
+  #       @trigger "change",                         event, object
+  #       @trigger "change:#{doc.type}",             event, object
+  #       @trigger "change:#{doc.type}:#{doc.id}",   event, object unless event is 'create'

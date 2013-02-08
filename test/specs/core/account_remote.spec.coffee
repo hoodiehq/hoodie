@@ -183,36 +183,6 @@ describe "Hoodie.AccountRemote", ->
           # avoid recursion
           @remote.request.andReturn then: ->
           success Mocks.changesResponse()
-      
-      it "should remove `todo/abc3` from store", ->
-        @remote.pull()
-        expect(@hoodie.store.remove).wasCalledWith 'todo', 'abc3', remote: true
-
-      it "should save `todo/abc2` in store", ->
-        @remote.pull()
-        expect(@hoodie.store.save).wasCalledWith 'todo', 'abc2', { _rev : '1-123', content : 'remember the milk', done : false, order : 1, type : 'todo', id : 'abc2' }, { remote : true }
-      
-      it "should trigger remote events", ->
-        spyOn(@remote, "trigger")
-        @remote.pull()
-
-        # {"_id":"todo/abc3","_rev":"2-123","_deleted":true}
-        expect(@remote.trigger).wasCalledWith 'remove',           'objectFromStore'
-        expect(@remote.trigger).wasCalledWith 'remove:todo',      'objectFromStore'
-        expect(@remote.trigger).wasCalledWith 'remove:todo:abc3', 'objectFromStore'
-
-        expect(@remote.trigger).wasCalledWith 'change',            'remove', 'objectFromStore'
-        expect(@remote.trigger).wasCalledWith 'change:todo',       'remove', 'objectFromStore'
-        expect(@remote.trigger).wasCalledWith 'change:todo:abc3',  'remove', 'objectFromStore'        
-        
-        # {"_id":"todo/abc2","_rev":"1-123","content":"remember the milk","done":false,"order":1, "type":"todo"}
-        expect(@remote.trigger).wasCalledWith 'update',            'objectFromStore'
-        expect(@remote.trigger).wasCalledWith 'update:todo',       'objectFromStore'
-        expect(@remote.trigger).wasCalledWith 'update:todo:abc2',  'objectFromStore'
-
-        expect(@remote.trigger).wasCalledWith 'change',            'update', 'objectFromStore'
-        expect(@remote.trigger).wasCalledWith 'change:todo',       'update', 'objectFromStore'
-        expect(@remote.trigger).wasCalledWith 'change:todo:abc2',  'update', 'objectFromStore'
         
       _and ".isContinuouslyPulling() returns true", ->
         beforeEach ->

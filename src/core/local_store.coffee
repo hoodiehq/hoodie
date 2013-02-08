@@ -25,8 +25,9 @@ class Hoodie.LocalStore extends Hoodie.Store
     @_dirty = {}
 
     # extend this property with extra functions that will be available
-    # on all promises returned by hoodie.store API
-    @_promiseApi = {}
+    # on all promises returned by hoodie.store API. Set a reference
+    # to current hoodie instance
+    @_promiseApi = { @hoodie }    
   
     # if browser does not support local storage persistence,
     # e.g. Safari in private mode, overite the respective methods. 
@@ -39,13 +40,7 @@ class Hoodie.LocalStore extends Hoodie.Store
         length     : -> 0
         clear      : -> null
     
-    # handle sign outs
-    @hoodie.on 'account:signout', @clear
-    @hoodie.on 'account:signup', @markAllAsChanged
-
-    # provide reference to hoodie in all promises
-    @_promiseApi.hoodie = @hoodie
-
+    @_subscribeToOutsideEvents()
     @_bootstrap()
     
   
@@ -62,8 +57,8 @@ class Hoodie.LocalStore extends Hoodie.Store
   # Save
   # ------
 
-  # saves the passed object into the store and replaces an eventually existing 
-  # document with same type & id.
+  # saves the passed object into the store and replaces 
+  # an eventually existing object with same type & id.
   #
   # When id is undefined, it gets generated an new object gets saved 
   #
@@ -488,6 +483,25 @@ class Hoodie.LocalStore extends Hoodie.Store
       [type, id] = key.split '/'
       obj = @cache type, id
 
+  # subscribe to events coming from account & our remote store.
+  _subscribeToOutsideEvents : ->
+
+    # handle sign outs
+    @hoodie.on 'account:signout', @clear
+    @hoodie.on 'account:signup',  @markAllAsChanged
+
+    # handle remote events
+    @hoodie.on 'remote:change',   @_handleRemoteChange
+
+  # when a change come's from our remote store, we differentiate
+  # whether an object has been removed or added / updated and
+  # reflect the change in our local store.
+  _handleRemoteChange : (typeOfChange, object) =>
+    if typeOfChange is 'remove'
+      @remove object.type, object.id, remote: true
+    else
+      @save   object.type, object.id, object, remote: true
+
   
   # more advanced localStorage wrappers to find/store objects
   _setObject : (type, id, object) ->
@@ -535,7 +549,8 @@ class Hoodie.LocalStore extends Hoodie.Store
   _isSemanticId : (key) ->
     /^[a-z$][a-z0-9]+\/[a-z0-9]+$/.test key
   
-  # is dirty?
+  # `_isDirty` returns true if there is a local change that
+  # has not been sync'd yet.
   _isDirty : (object) ->
     
     return false unless object.updatedAt # no updatedAt? no dirt then
@@ -543,12 +558,11 @@ class Hoodie.LocalStore extends Hoodie.Store
   
     object._syncedAt.getTime() < object.updatedAt.getTime()
 
-  # marked as deleted?
+  # 
   _isMarkedAsDeleted : (object) ->
     object._deleted is true
 
-  # document key index
-  #
+  # object key index
   # TODO: make this cachy
   _index : ->
     @db.key(i) for i in [0...@db.length()]
