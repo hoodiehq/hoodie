@@ -22,7 +22,7 @@ synchronize, otherwise sync, pull or push can be called manually</p></div></div>
     <span class="nx">@hoodie</span><span class="p">.</span><span class="nx">unbind</span> <span class="s">&#39;account:signin&#39;</span><span class="p">,</span>  <span class="nx">@_handleSignIn</span>
     <span class="nx">@hoodie</span><span class="p">.</span><span class="nx">unbind</span> <span class="s">&#39;account:signout&#39;</span><span class="p">,</span> <span class="nx">@disconnect</span>
 
-    <span class="k">super</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h2 id="sync">sync</h2></div></div></div><div class="segment"><div class="code"><div class="wrapper">  <span class="nv">sync : </span><span class="nf">(docs) =&gt;</span>
+    <span class="k">super</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h2 id="sync">sync</h2></div></div></div><div class="segment"><div class="code"><div class="wrapper">  <span class="nv">sync : </span><span class="nf">(objects) =&gt;</span>
     <span class="k">if</span> <span class="nx">@isContinuouslyPushing</span><span class="p">()</span>
       <span class="nx">@hoodie</span><span class="p">.</span><span class="nx">unbind</span> <span class="s">&#39;store:idle&#39;</span><span class="p">,</span> <span class="nx">@push</span>
       <span class="nx">@hoodie</span><span class="p">.</span><span class="nx">on</span>     <span class="s">&#39;store:idle&#39;</span><span class="p">,</span> <span class="nx">@push</span>
@@ -32,10 +32,10 @@ synchronize, otherwise sync, pull or push can be called manually</p></div></div>
 in his config</p></div></div><div class="code"><div class="wrapper">  <span class="nv">getSinceNr : </span><span class="nf">(since) -&gt;</span>
     <span class="nx">@hoodie</span><span class="p">.</span><span class="nx">config</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="s">&#39;_remote.since&#39;</span><span class="p">)</span> <span class="o">or</span> <span class="mi">0</span>
   <span class="nv">setSinceNr : </span><span class="nf">(since) -&gt;</span>
-    <span class="nx">@hoodie</span><span class="p">.</span><span class="nx">config</span><span class="p">.</span><span class="nx">set</span><span class="p">(</span><span class="s">&#39;_remote.since&#39;</span><span class="p">,</span> <span class="nx">since</span><span class="p">)</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h2 id="push">push</h2></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>if no docs passed to be pushed, we default to users changed objects
-in his store</p></div></div><div class="code"><div class="wrapper">  <span class="nv">push : </span><span class="nf">(docs) =&gt;</span>
-    <span class="nv">docs = </span><span class="nx">@hoodie</span><span class="p">.</span><span class="nx">store</span><span class="p">.</span><span class="nx">changedObjects</span><span class="p">()</span> <span class="k">unless</span> <span class="nx">$</span><span class="p">.</span><span class="nx">isArray</span> <span class="nx">docs</span>
-    <span class="nv">promise = </span><span class="k">super</span><span class="p">(</span><span class="nx">docs</span><span class="p">)</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h2 id="events">Events</h2></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>namespaced alias for <code>hoodie.on</code></p></div></div><div class="code"><div class="wrapper">  <span class="kc">on</span>  <span class="o">:</span> <span class="nf">(event, cb) -&gt;</span> 
+    <span class="nx">@hoodie</span><span class="p">.</span><span class="nx">config</span><span class="p">.</span><span class="nx">set</span><span class="p">(</span><span class="s">&#39;_remote.since&#39;</span><span class="p">,</span> <span class="nx">since</span><span class="p">)</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h2 id="push">push</h2></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>if no objects passed to be pushed, we default to users changed objects
+in his store</p></div></div><div class="code"><div class="wrapper">  <span class="nv">push : </span><span class="nf">(objects) =&gt;</span>
+    <span class="nv">objects = </span><span class="nx">@hoodie</span><span class="p">.</span><span class="nx">store</span><span class="p">.</span><span class="nx">changedObjects</span><span class="p">()</span> <span class="k">unless</span> <span class="nx">$</span><span class="p">.</span><span class="nx">isArray</span> <span class="nx">objects</span>
+    <span class="nv">promise = </span><span class="k">super</span><span class="p">(</span><span class="nx">objects</span><span class="p">)</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h2 id="events">Events</h2></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>namespaced alias for <code>hoodie.on</code></p></div></div><div class="code"><div class="wrapper">  <span class="kc">on</span>  <span class="o">:</span> <span class="nf">(event, cb) -&gt;</span> 
     <span class="nv">event = </span><span class="nx">event</span><span class="p">.</span><span class="nx">replace</span> <span class="sr">/(^| )([^ ]+)/g</span><span class="p">,</span> <span class="s">&quot;$1remote:$2&quot;</span>
     <span class="nx">@hoodie</span><span class="p">.</span><span class="nx">on</span>  <span class="nx">event</span><span class="p">,</span> <span class="nx">cb</span>
   <span class="nv">one : </span><span class="nf">(event, cb) -&gt;</span> 
@@ -44,30 +44,4 @@ in his store</p></div></div><div class="code"><div class="wrapper">  <span class
   </div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>namespaced alias for <code>hoodie.trigger</code></p></div></div><div class="code"><div class="wrapper">  <span class="nv">trigger : </span><span class="nf">(event, parameters...) -&gt;</span> 
     <span class="nx">@hoodie</span><span class="p">.</span><span class="nx">trigger</span> <span class="s">&quot;remote:</span><span class="si">#{</span><span class="nx">event</span><span class="si">}</span><span class="s">&quot;</span><span class="p">,</span> <span class="nx">parameters</span><span class="p">...</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h2 id="private">Private</h2></div></div></div><div class="segment"><div class="code"><div class="wrapper">  <span class="nv">_handleSignIn: </span><span class="o">=&gt;</span>
     <span class="vi">@name = </span><span class="nx">@hoodie</span><span class="p">.</span><span class="nx">account</span><span class="p">.</span><span class="nx">db</span><span class="p">()</span>
-    <span class="nx">@connect</span><span class="p">()</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h1 id=""> </h1>
-
-<p>_handlePullResults : (changes) =>
-  _removedDocs = []
-  _changedObjects   = []</p></div></div><div class="code"><div class="wrapper">    </div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p># 1. update or remove objects from local store
-  for {doc} in changes
-    doc = @<em>parseFromRemote(doc)
-    if doc.</em>deleted
-      _removedDocs.push [doc, @hoodie.store.remove( doc.type, doc.id,      remote: true)]
-    else <br />
-      _changedObjects.push [doc, @hoodie.store.save(   doc.type, doc.id, doc, remote: true)]</p></div></div><div class="code"><div class="wrapper">    </div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p># 2. trigger events
-  for [doc, promise] in _removedDocs
-    promise.then (object) => 
-      @trigger 'remove',                       object
-      @trigger "remove:#{doc.type}",           object
-      @trigger "remove:#{doc.type}:#{doc.id}", object</p></div></div><div class="code"><div class="wrapper">        </div></div></div><div class="segment"><div class="comments"><div class="wrapper"><pre><code>  @trigger 'change',                        'remove', object
-  @trigger "change:#{doc.type}",            'remove', object
-  @trigger "change:#{doc.type}:#{doc.id}",  'remove', object
-</code></pre></div></div><div class="code"><div class="wrapper">    </div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>for [doc, promise] in _changedObjects
-    promise.then (object, objectWasCreated) => 
-      event = if objectWasCreated then 'create' else 'update'
-      @trigger event,                            object
-      @trigger "#{event}:#{doc.type}",           object
-      @trigger "#{event}:#{doc.type}:#{doc.id}", object unless event is 'create'</p></div></div><div class="code"><div class="wrapper">      </div></div></div><div class="segment"><div class="comments"><div class="wrapper"><pre><code>  @trigger "change",                         event, object
-  @trigger "change:#{doc.type}",             event, object
-  @trigger "change:#{doc.type}:#{doc.id}",   event, object unless event is 'create'
-</code></pre></div></div></div></div></body></html>
+    <span class="nx">@connect</span><span class="p">()</span></div></div></div></div></body></html>

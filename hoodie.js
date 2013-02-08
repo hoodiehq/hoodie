@@ -1181,7 +1181,7 @@ Hoodie.Remote = (function(_super) {
   };
 
   Remote.prototype.save = function(type, id, object) {
-    var defer, doc, path;
+    var defer, path;
     defer = Remote.__super__.save.apply(this, arguments);
     if (this.hoodie.isPromise(defer)) {
       return defer;
@@ -1193,10 +1193,10 @@ Hoodie.Remote = (function(_super) {
       type: type,
       id: id
     }, object);
-    doc = this._parseForRemote(object);
-    path = "/" + encodeURIComponent(doc._id);
+    object = this._parseForRemote(object);
+    path = "/" + encodeURIComponent(object._id);
     return this.request("PUT", path, {
-      data: doc
+      data: object
     });
   };
 
@@ -1266,28 +1266,28 @@ Hoodie.Remote = (function(_super) {
     return this._pullRequest.then(this._handlePullSuccess, this._handlePullError);
   };
 
-  Remote.prototype.push = function(docs) {
-    var doc, docsForRemote, _i, _len;
-    if (!(docs != null ? docs.length : void 0)) {
+  Remote.prototype.push = function(objects) {
+    var object, objectsForRemote, _i, _len;
+    if (!(objects != null ? objects.length : void 0)) {
       return this.hoodie.defer().resolve([]).promise();
     }
-    docsForRemote = [];
-    for (_i = 0, _len = docs.length; _i < _len; _i++) {
-      doc = docs[_i];
-      doc = this._parseForRemote(doc);
-      this._addRevisionTo(doc);
-      docsForRemote.push(doc);
+    objectsForRemote = [];
+    for (_i = 0, _len = objects.length; _i < _len; _i++) {
+      object = objects[_i];
+      object = this._parseForRemote(object);
+      this._addRevisionTo(object);
+      objectsForRemote.push(object);
     }
     return this._pushRequest = this.request('POST', "/_bulk_docs", {
       data: {
-        docs: docsForRemote,
+        docs: objectsForRemote,
         new_edits: false
       }
     });
   };
 
-  Remote.prototype.sync = function(docs) {
-    return this.push(docs).pipe(this.pull);
+  Remote.prototype.sync = function(objects) {
+    return this.push(objects).pipe(this.pull);
   };
 
   Remote.prototype.on = function(event, cb) {
@@ -1436,12 +1436,12 @@ Hoodie.Remote = (function(_super) {
   };
 
   Remote.prototype._handlePullResults = function(changes) {
-    var doc, event, parsedDoc, _i, _len, _results;
+    var doc, event, object, _i, _len, _results;
     _results = [];
     for (_i = 0, _len = changes.length; _i < _len; _i++) {
       doc = changes[_i].doc;
-      parsedDoc = this._parseFromRemote(doc);
-      if (parsedDoc._deleted) {
+      object = this._parseFromRemote(doc);
+      if (object._deleted) {
         event = 'remove';
         delete this._knownObjects[doc._id];
       } else {
@@ -1452,12 +1452,12 @@ Hoodie.Remote = (function(_super) {
           this._knownObjects[doc._id] = 1;
         }
       }
-      this.trigger("" + event, parsedDoc);
-      this.trigger("" + event + ":" + parsedDoc.type, parsedDoc);
-      this.trigger("" + event + ":" + parsedDoc.type + ":" + parsedDoc.id, parsedDoc);
-      this.trigger("change", event, parsedDoc);
-      this.trigger("change:" + parsedDoc.type, event, parsedDoc);
-      _results.push(this.trigger("change:" + parsedDoc.type + ":" + parsedDoc.id, event, parsedDoc));
+      this.trigger("" + event, object);
+      this.trigger("" + event + ":" + object.type, object);
+      this.trigger("" + event + ":" + object.type + ":" + object.id, object);
+      this.trigger("change", event, object);
+      this.trigger("change:" + object.type, event, object);
+      _results.push(this.trigger("change:" + object.type + ":" + object.id, event, object));
     }
     return _results;
   };
@@ -1523,7 +1523,7 @@ Hoodie.AccountRemote = (function(_super) {
     return AccountRemote.__super__.stopSyncing.apply(this, arguments);
   };
 
-  AccountRemote.prototype.sync = function(docs) {
+  AccountRemote.prototype.sync = function(objects) {
     if (this.isContinuouslyPushing()) {
       this.hoodie.unbind('store:idle', this.push);
       this.hoodie.on('store:idle', this.push);
@@ -1539,12 +1539,12 @@ Hoodie.AccountRemote = (function(_super) {
     return this.hoodie.config.set('_remote.since', since);
   };
 
-  AccountRemote.prototype.push = function(docs) {
+  AccountRemote.prototype.push = function(objects) {
     var promise;
-    if (!$.isArray(docs)) {
-      docs = this.hoodie.store.changedObjects();
+    if (!$.isArray(objects)) {
+      objects = this.hoodie.store.changedObjects();
     }
-    return promise = AccountRemote.__super__.push.call(this, docs);
+    return promise = AccountRemote.__super__.push.call(this, objects);
   };
 
   AccountRemote.prototype.on = function(event, cb) {
