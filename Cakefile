@@ -33,10 +33,6 @@ test = ->
   phantom.stdout.on 'data', (data) ->
     print data.toString()
 
-clearAndTest = -> 
-  clear()
-  test() 
-
 task 'compile', 'Build lib/', ->
   build()
 
@@ -44,9 +40,13 @@ task 'watch', 'Build lib/ and watch for changes', ->
   build(null, true)
   
 task 'test', 'Run all test', ->
-  build clearAndTest
+  build test
     
 task 'autotest', 'Run all tests & rerun on file changes', ->
+  clearAndTest = -> 
+    clear()
+    test() 
+  
   build clearAndTest, true
 
 task 'console', 'run a browser console, from command line, hell yeah', ->
