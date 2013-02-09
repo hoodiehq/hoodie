@@ -45,7 +45,10 @@ class Hoodie.AccountRemote extends Hoodie.Remote
     @hoodie.account.authenticate().pipe => 
       @hoodie.config.set '_remote.connected', true
 
-      @hoodie.on 'account:signin',  @_handleSignIn
+      # subscribe to signin event, but only once
+      @hoodie.unbind 'account:signin',  @_handleSignIn
+      @hoodie.on     'account:signin',  @_handleSignIn
+      
       @hoodie.on 'account:signout', @disconnect
       @hoodie.on 'store:idle',      @push
 
@@ -59,7 +62,6 @@ class Hoodie.AccountRemote extends Hoodie.Remote
   disconnect: ->
     @hoodie.config.set '_remote.connected', false
 
-    @hoodie.unbind 'account:signin',  @_handleSignIn
     @hoodie.unbind 'account:signout', @disconnect
     @hoodie.unbind 'store:idle',      @push
 

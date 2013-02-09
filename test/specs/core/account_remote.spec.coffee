@@ -73,6 +73,19 @@ describe "Hoodie.AccountRemote", ->
         @remote.connect()
         expect(@hoodie.on).wasCalledWith 'account:signout', @remote.disconnect
 
+      it "should unsubscribe from, then subscribe again to account's signin event", ->
+        order = []
+        @hoodie.unbind.andCallFake -> order.push('unbind')
+        @hoodie.on.andCallFake (eventName) -> 
+          if eventName is 'account:signin'
+            order.push('on')
+
+        @remote.connect()
+
+        expect(@hoodie.unbind).wasCalledWith 'account:signin', @remote._handleSignIn
+        expect(@hoodie.on).wasCalledWith 'account:signin', @remote._handleSignIn
+        expect(order.join()).toBe 'unbind,on'
+
       it "should subscribe to account:signin with sync", ->
         @remote.connect()
         expect(@hoodie.on).wasCalledWith 'account:signin', @remote._handleSignIn
@@ -102,10 +115,6 @@ describe "Hoodie.AccountRemote", ->
       spyOn(@hoodie.config, "set")
       @remote.disconnect()
       expect(@hoodie.config.set).wasCalledWith '_remote.connected', false
-
-    it "should unsubscribe from account's signin event", ->
-      @remote.disconnect()
-      expect(@hoodie.unbind).wasCalledWith 'account:signin', @remote._handleSignIn
       
     it "should unsubscribe from account's signout event", ->
       @remote.disconnect()

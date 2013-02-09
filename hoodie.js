@@ -1064,7 +1064,7 @@ Hoodie.Remote = (function(_super) {
 
   Remote.prototype.name = void 0;
 
-  Remote.prototype._sync = false;
+  Remote.prototype.connected = false;
 
   Remote.prototype.prefix = '';
 
@@ -1093,10 +1093,6 @@ Hoodie.Remote = (function(_super) {
 
     this.pull = __bind(this.pull, this);
 
-    this.stopSyncing = __bind(this.stopSyncing, this);
-
-    this.startSyncing = __bind(this.startSyncing, this);
-
     this.disconnect = __bind(this.disconnect, this);
 
     this.connect = __bind(this.connect, this);
@@ -1108,12 +1104,12 @@ Hoodie.Remote = (function(_super) {
     if (options.prefix != null) {
       this.prefix = options.prefix;
     }
-    if (options.sync) {
-      this._sync = options.sync;
+    if (options.connected != null) {
+      this.connected = options.connected;
     }
     this._knownObjects = {};
-    if (this.isContinuouslySyncing()) {
-      this.startSyncing();
+    if (this.isConnected()) {
+      this.connect();
     }
   }
 
@@ -1214,7 +1210,7 @@ Hoodie.Remote = (function(_super) {
 
   Remote.prototype.connect = function(options) {
     this.connected = true;
-    return this.sync();
+    return this.pull();
   };
 
   Remote.prototype.disconnect = function() {
@@ -1226,27 +1222,8 @@ Hoodie.Remote = (function(_super) {
     return (_ref1 = this._pushRequest) != null ? _ref1.abort() : void 0;
   };
 
-  Remote.prototype.startSyncing = function() {
-    this._sync = true;
-    return this.connect();
-  };
-
-  Remote.prototype.stopSyncing = function() {
-    return this._sync = false;
-  };
-
-  Remote.prototype.isContinuouslyPulling = function() {
-    var _ref;
-    return this._sync === true || ((_ref = this._sync) != null ? _ref.pull : void 0) === true;
-  };
-
-  Remote.prototype.isContinuouslyPushing = function() {
-    var _ref;
-    return this._sync === true || ((_ref = this._sync) != null ? _ref.push : void 0) === true;
-  };
-
-  Remote.prototype.isContinuouslySyncing = function() {
-    return this._sync === true;
+  Remote.prototype.isConnected = function() {
+    return this.connected;
   };
 
   Remote.prototype.getSinceNr = function() {
@@ -1259,7 +1236,7 @@ Hoodie.Remote = (function(_super) {
 
   Remote.prototype.pull = function() {
     this._pullRequest = this.request('GET', this._pullUrl());
-    if (this.connected && this.isContinuouslyPulling()) {
+    if (this.isConnected()) {
       window.clearTimeout(this._pullRequestTimeout);
       this._pullRequestTimeout = window.setTimeout(this._restartPullRequest, 25000);
     }
@@ -1390,7 +1367,7 @@ Hoodie.Remote = (function(_super) {
   Remote.prototype._pullUrl = function() {
     var since;
     since = this.getSinceNr();
-    if (this.isContinuouslyPulling()) {
+    if (this.isConnected()) {
       return "/_changes?include_docs=true&since=" + since + "&heartbeat=10000&feed=longpoll";
     } else {
       return "/_changes?include_docs=true&since=" + since;
@@ -1405,13 +1382,13 @@ Hoodie.Remote = (function(_super) {
   Remote.prototype._handlePullSuccess = function(response) {
     this.setSinceNr(response.last_seq);
     this._handlePullResults(response.results);
-    if (this.connected && this.isContinuouslyPulling()) {
+    if (this.isConnected()) {
       return this.pull();
     }
   };
 
   Remote.prototype._handlePullError = function(xhr, error, resp) {
-    if (!this.connected) {
+    if (!this.isConnected()) {
       return;
     }
     switch (xhr.status) {
@@ -1424,7 +1401,7 @@ Hoodie.Remote = (function(_super) {
         this.trigger('error:server', error);
         return window.setTimeout(this.pull, 3000);
       default:
-        if (!this.isContinuouslyPulling()) {
+        if (!this.isConnected()) {
           return;
         }
         if (xhr.statusText === 'abort') {
@@ -1470,7 +1447,7 @@ Hoodie.AccountRemote = (function(_super) {
 
   __extends(AccountRemote, _super);
 
-  AccountRemote.prototype._sync = true;
+  AccountRemote.prototype.connected = true;
 
   function AccountRemote(hoodie, options) {
     this.hoodie = hoodie;
@@ -1481,17 +1458,11 @@ Hoodie.AccountRemote = (function(_super) {
 
     this.push = __bind(this.push, this);
 
-    this.sync = __bind(this.sync, this);
-
-    this.stopSyncing = __bind(this.stopSyncing, this);
-
-    this.startSyncing = __bind(this.startSyncing, this);
-
     this.connect = __bind(this.connect, this);
 
     this.name = this.hoodie.account.db();
-    if (this.hoodie.config.get('_remote.sync') != null) {
-      this._sync = this.hoodie.config.get('_remote.sync');
+    if (this.hoodie.config.get('_remote.connected') != null) {
+      this.connected = this.hoodie.config.get('_remote.connected');
     }
     options.prefix = '';
     AccountRemote.__super__.constructor.call(this, this.hoodie, options);
@@ -1500,35 +1471,20 @@ Hoodie.AccountRemote = (function(_super) {
   AccountRemote.prototype.connect = function() {
     var _this = this;
     return this.hoodie.account.authenticate().pipe(function() {
+      _this.hoodie.config.set('_remote.connected', true);
+      _this.hoodie.unbind('account:signin', _this._handleSignIn);
+      _this.hoodie.on('account:signin', _this._handleSignIn);
+      _this.hoodie.on('account:signout', _this.disconnect);
+      _this.hoodie.on('store:idle', _this.push);
       return AccountRemote.__super__.connect.apply(_this, arguments);
     });
   };
 
   AccountRemote.prototype.disconnect = function() {
+    this.hoodie.config.set('_remote.connected', false);
+    this.hoodie.unbind('account:signout', this.disconnect);
     this.hoodie.unbind('store:idle', this.push);
     return AccountRemote.__super__.disconnect.apply(this, arguments);
-  };
-
-  AccountRemote.prototype.startSyncing = function() {
-    this.hoodie.config.set('_remote.sync', true);
-    this.hoodie.on('account:signin', this._handleSignIn);
-    this.hoodie.on('account:signout', this.disconnect);
-    return AccountRemote.__super__.startSyncing.apply(this, arguments);
-  };
-
-  AccountRemote.prototype.stopSyncing = function() {
-    this.hoodie.config.set('_remote.sync', false);
-    this.hoodie.unbind('account:signin', this._handleSignIn);
-    this.hoodie.unbind('account:signout', this.disconnect);
-    return AccountRemote.__super__.stopSyncing.apply(this, arguments);
-  };
-
-  AccountRemote.prototype.sync = function(objects) {
-    if (this.isContinuouslyPushing()) {
-      this.hoodie.unbind('store:idle', this.push);
-      this.hoodie.on('store:idle', this.push);
-    }
-    return AccountRemote.__super__.sync.apply(this, arguments);
   };
 
   AccountRemote.prototype.getSinceNr = function(since) {

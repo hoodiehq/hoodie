@@ -406,30 +406,6 @@ f.event={add:function(a,c,d,e,g){var h,i,j,k,l,m,n,o,p,q,r,s;if(!(a.nodeType===3
                   "type": "heading",
                   "data": {
                     "level": 2,
-                    "title": "startSyncing",
-                    "slug": "startsyncing"
-                  },
-                  "depth": 2
-                }, {
-                  "type": "heading",
-                  "data": {
-                    "level": 2,
-                    "title": "stopSyncing",
-                    "slug": "stopsyncing"
-                  },
-                  "depth": 2
-                }, {
-                  "type": "heading",
-                  "data": {
-                    "level": 2,
-                    "title": "sync",
-                    "slug": "sync"
-                  },
-                  "depth": 2
-                }, {
-                  "type": "heading",
-                  "data": {
-                    "level": 2,
                     "title": "get and set since nr",
                     "slug": "get-and-set-since-nr"
                   },
@@ -495,30 +471,6 @@ f.event={add:function(a,c,d,e,g){var h,i,j,k,l,m,n,o,p,q,r,s;if(!(a.nodeType===3
                 "level": 2,
                 "title": "disconnect",
                 "slug": "disconnect"
-              },
-              "depth": 2
-            }, {
-              "type": "heading",
-              "data": {
-                "level": 2,
-                "title": "startSyncing",
-                "slug": "startsyncing"
-              },
-              "depth": 2
-            }, {
-              "type": "heading",
-              "data": {
-                "level": 2,
-                "title": "stopSyncing",
-                "slug": "stopsyncing"
-              },
-              "depth": 2
-            }, {
-              "type": "heading",
-              "data": {
-                "level": 2,
-                "title": "sync",
-                "slug": "sync"
               },
               "depth": 2
             }, {
@@ -1194,40 +1146,8 @@ f.event={add:function(a,c,d,e,g){var h,i,j,k,l,m,n,o,p,q,r,s;if(!(a.nodeType===3
                   "type": "heading",
                   "data": {
                     "level": 2,
-                    "title": "startSyncing",
-                    "slug": "startsyncing"
-                  },
-                  "depth": 2
-                }, {
-                  "type": "heading",
-                  "data": {
-                    "level": 2,
-                    "title": "stopSyncing",
-                    "slug": "stopsyncing"
-                  },
-                  "depth": 2
-                }, {
-                  "type": "heading",
-                  "data": {
-                    "level": 2,
-                    "title": "isContinuouslyPulling",
-                    "slug": "iscontinuouslypulling"
-                  },
-                  "depth": 2
-                }, {
-                  "type": "heading",
-                  "data": {
-                    "level": 2,
-                    "title": "isContinuouslyPushing",
-                    "slug": "iscontinuouslypushing"
-                  },
-                  "depth": 2
-                }, {
-                  "type": "heading",
-                  "data": {
-                    "level": 2,
-                    "title": "isContinuouslySyncing",
-                    "slug": "iscontinuouslysyncing"
+                    "title": "isConnected",
+                    "slug": "isconnected"
                   },
                   "depth": 2
                 }, {
@@ -1492,40 +1412,8 @@ f.event={add:function(a,c,d,e,g){var h,i,j,k,l,m,n,o,p,q,r,s;if(!(a.nodeType===3
               "type": "heading",
               "data": {
                 "level": 2,
-                "title": "startSyncing",
-                "slug": "startsyncing"
-              },
-              "depth": 2
-            }, {
-              "type": "heading",
-              "data": {
-                "level": 2,
-                "title": "stopSyncing",
-                "slug": "stopsyncing"
-              },
-              "depth": 2
-            }, {
-              "type": "heading",
-              "data": {
-                "level": 2,
-                "title": "isContinuouslyPulling",
-                "slug": "iscontinuouslypulling"
-              },
-              "depth": 2
-            }, {
-              "type": "heading",
-              "data": {
-                "level": 2,
-                "title": "isContinuouslyPushing",
-                "slug": "iscontinuouslypushing"
-              },
-              "depth": 2
-            }, {
-              "type": "heading",
-              "data": {
-                "level": 2,
-                "title": "isContinuouslySyncing",
-                "slug": "iscontinuouslysyncing"
+                "title": "isConnected",
+                "slug": "isconnected"
               },
               "depth": 2
             }, {
