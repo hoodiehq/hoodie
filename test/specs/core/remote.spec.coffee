@@ -15,15 +15,15 @@ describe "Hoodie.Remote", ->
   
   describe "constructor(@hoodie, options = {})", ->
     beforeEach ->
-      spyOn(Hoodie.Remote::, "startSyncing")
+      spyOn(Hoodie.Remote::, "connect")
     
     it "should set @name from options", ->
       remote = new Hoodie.Remote @hoodie, name: 'base/path'
       expect(remote.name).toBe 'base/path'
 
-    it "should set _sync to false by default", ->
+    it "should default connected to false", ->
       remote = new Hoodie.Remote @hoodie
-      expect(remote._sync).toBe false
+      expect(remote.connected).toBe false
 
     it "should set prefix to name by default", ->
       remote = new Hoodie.Remote @hoodie, name: 'wicked'
@@ -33,15 +33,15 @@ describe "Hoodie.Remote", ->
       remote = new Hoodie.Remote @hoodie
       expect(remote.prefix).toBe ''
 
-    _when "sync: true passed", ->
+    _when "connected: true passed", ->
       beforeEach ->
-        @remote = new Hoodie.Remote @hoodie, sync: true
+        @remote = new Hoodie.Remote @hoodie, connected: true
       
-      it "should to be true @isContinuouslySyncing()", ->
-        expect(@remote.isContinuouslySyncing()).toBe true
+      it "should set @connected to true", ->
+        expect(@remote.connected).toBe true
 
       it "should start syncing", ->
-        expect(Hoodie.Remote::startSyncing).wasCalled()
+        expect(Hoodie.Remote::connect).wasCalled()
 
     _when "prefix: $public passed", ->
       beforeEach ->
@@ -264,17 +264,16 @@ describe "Hoodie.Remote", ->
 
   describe "#connect()", ->
     beforeEach ->
-      spyOn(@remote, "sync")
+      spyOn(@remote, "pull")
     
     it "should set connected to true", ->
       @remote.connected = false
       @remote.connect()
       expect(@remote.connected).toBe true
-            
 
-    it "should sync", ->
+    it "should pull", ->
       @remote.connect()
-      expect(@remote.sync).wasCalled()
+      expect(@remote.pull).wasCalled()
   # /#connect()
 
   describe "#disconnect()", ->  
@@ -288,93 +287,6 @@ describe "Hoodie.Remote", ->
       @remote.disconnect()
       expect(@remote._pushRequest.abort).wasCalled()
   # /#disconnect()
-
-  describe "#isContinuouslyPulling()", ->
-    _when "remote._sync is false", ->
-      it "should return false", ->
-        @remote._sync = false
-        expect(@remote.isContinuouslyPulling()).toBe false
-
-    _when "remote._sync is true", ->
-      it "should return true", ->
-        @remote._sync = true
-        expect(@remote.isContinuouslyPulling()).toBe true
-
-    _when "remote._sync is pull: true", ->
-      it "should return true", ->
-        @remote._sync = pull: true
-        expect(@remote.isContinuouslyPulling()).toBe true
-
-    _when "remote._sync is push: true", ->
-      it "should return false", ->
-        @remote._sync = push: true
-        expect(@remote.isContinuouslyPulling()).toBe false
-  # /#isContinuouslySyncing()
-
-  describe "#startSyncing()", ->
-    beforeEach ->
-      spyOn(@remote, "connect")
-    
-    it "should make isContinuouslySyncing() to return true", ->
-      @remote._sync = false
-      @remote.startSyncing()
-      expect(@remote.isContinuouslySyncing()).toBe
-
-    it "should connect", ->
-      @remote.startSyncing()
-      expect(@remote.connect).wasCalled()
-  # /#startSyncing()
-
-  describe "#stopSyncing", ->
-    it "should set _remote.sync to false", ->
-      @remote._sync = true
-      @remote.stopSyncing()
-      expect(@remote.isContinuouslySyncing()).toBe false
-  # /#stopSyncing()
-
-  describe "#isContinuouslyPushing()", ->
-    _when "remote._sync is false", ->
-      it "should return false", ->
-        @remote._sync = false
-        expect(@remote.isContinuouslyPushing()).toBe false
-
-    _when "remote._sync is true", ->
-      it "should return true", ->
-        @remote._sync = true
-        expect(@remote.isContinuouslyPushing()).toBe true
-
-    _when "remote._sync is pull: true", ->
-      it "should return false", ->
-        @remote._sync = pull: true
-        expect(@remote.isContinuouslyPushing()).toBe false
-
-    _when "remote._sync is push: true", ->
-      it "should return true", ->
-        @remote._sync = push: true
-        expect(@remote.isContinuouslyPushing()).toBe true
-  # /#isContinuouslySyncing()
-
-  describe "#isContinuouslySyncing()", ->
-    _when "remote._sync is false", ->
-      it "should return false", ->
-        @remote._sync = false
-        expect(@remote.isContinuouslySyncing()).toBe false
-
-    _when "remote._sync is true", ->
-      it "should return true", ->
-        @remote._sync = true
-        expect(@remote.isContinuouslySyncing()).toBe true
-
-    _when "remote._sync is pull: true", ->
-      it "should return false", ->
-        @remote._sync = pull: true
-        expect(@remote.isContinuouslySyncing()).toBe false
-
-    _when "remote._sync is push: true", ->
-      it "should return false", ->
-        @remote._sync = push: true
-        expect(@remote.isContinuouslySyncing()).toBe false
-  # /#isContinuouslySyncing()
 
   describe "#getSinceNr()", ->
     _when "since not set before", ->
@@ -401,9 +313,9 @@ describe "Hoodie.Remote", ->
     beforeEach ->
       @remote.connected = true
     
-    _when ".isContinuouslyPulling() is true", ->
+    _when ".isConnected() is true", ->
       beforeEach ->
-        spyOn(@remote, "isContinuouslyPulling").andReturn true
+        spyOn(@remote, "isConnected").andReturn true
       
       it "should send a longpoll GET request to the _changes feed", ->
         @remote.pull()
@@ -416,9 +328,9 @@ describe "Hoodie.Remote", ->
         @remote.pull()
         expect(window.setTimeout).wasCalledWith @remote._restartPullRequest, 25000
         
-    _when ".isContinuouslyPulling() is false", ->
+    _when ".isConnected() is false", ->
       beforeEach ->
-        spyOn(@remote, "isContinuouslyPulling").andReturn false
+        spyOn(@remote, "isConnected").andReturn false
       
       it "should send a normal GET request to the _changes feed", ->
         @remote.pull()
@@ -468,9 +380,9 @@ describe "Hoodie.Remote", ->
         expect(@remote.trigger).wasCalledWith 'change:todo',       'add', object
         expect(@remote.trigger).wasCalledWith 'change:todo:abc2',  'add', object
         
-      _and ".isContinuouslyPulling() returns true", ->
+      _and ".isConnected() returns true", ->
         beforeEach ->
-          spyOn(@remote, "isContinuouslyPulling").andReturn true
+          spyOn(@remote, "isConnected").andReturn true
           spyOn(@remote, "pull").andCallThrough()
         
         it "should pull again", ->
@@ -494,42 +406,6 @@ describe "Hoodie.Remote", ->
         spyOn(@remote, "trigger")
         @remote.pull()
         expect(@remote.trigger).wasCalledWith 'error:unauthenticated', 'error object'
-      
-      _and "remote is pullContinuously", ->
-        beforeEach ->
-          @remote.pullContinuously = true
-      
-      _and "remote isn't pullContinuously", ->
-        beforeEach ->
-          @remote.pullContinuously = false
-
-
-    _when "request errors with 401 unauthorzied", ->
-      beforeEach ->
-        @remote.request.andReturn then: (success, error) =>
-          # avoid recursion
-          @remote.request.andReturn then: ->
-          error status: 401, 'error object'
-          
-        spyOn(@remote, "disconnect")
-      
-      it "should disconnect", ->
-        @remote.pull()
-        expect(@remote.disconnect).wasCalled()
-        
-      it "should trigger an unauthenticated error", ->
-        spyOn(@remote, "trigger")
-        @remote.pull()
-        expect(@remote.trigger).wasCalledWith 'error:unauthenticated', 'error object'
-      
-      _and "remote is pullContinuously", ->
-        beforeEach ->
-          @remote.pullContinuously = true
-      
-      _and "remote isn't pullContinuously", ->
-        beforeEach ->
-          @remote.pullContinuously = false
-
 
     _when "request errors with 404 not found", ->
       beforeEach ->
@@ -564,17 +440,24 @@ describe "Hoodie.Remote", ->
           # avoid recursion
           @remote.request.andReturn then: ->
           error statusText: 'abort', 'error object'
-      
-      it "should try again when .isContinuouslyPulling() returns true", ->
+
         spyOn(@remote, "pull").andCallThrough()
-        spyOn(@remote, "isContinuouslyPulling").andReturn true
-        @remote.pull()
-        expect(@remote.pull.callCount).toBe 2
+      
+      _and "is connected", ->
+        beforeEach ->
+          spyOn(@remote, "isConnected").andReturn true
+
+        it "should pull again", ->
+          @remote.pull()
+          expect(@remote.pull.callCount).toBe 2
         
-        @remote.pull.reset()
-        @remote.isContinuouslyPulling.andReturn false
-        @remote.pull()
-        expect(@remote.pull.callCount).toBe 1
+      _and "is not connected", ->
+        beforeEach ->
+          spyOn(@remote, "isConnected").andReturn false
+
+        it "should not pull again", ->
+          @remote.pull()
+          expect(@remote.pull.callCount).toBe 1
 
     _when "there is a different error", ->
       beforeEach ->
@@ -583,13 +466,13 @@ describe "Hoodie.Remote", ->
           @remote.request.andReturn then: ->
           error {}, 'error object'
           
-      it "should try again in 3 seconds if .isContinuouslyPulling() returns false", ->
-        spyOn(@remote, "isContinuouslyPulling").andReturn true
+      it "should try again in 3 seconds if .isConnected() returns false", ->
+        spyOn(@remote, "isConnected").andReturn true
         @remote.pull()
         expect(window.setTimeout).wasCalledWith @remote.pull, 3000
         
         window.setTimeout.reset()
-        @remote.isContinuouslyPulling.andReturn false
+        @remote.isConnected.andReturn false
         @remote.pull()
         expect(window.setTimeout).wasNotCalledWith @remote.pull, 3000
   # /#pull()

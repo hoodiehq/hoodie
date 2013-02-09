@@ -24,99 +24,92 @@ describe "Hoodie.AccountRemote", ->
     it "should set name to users database name", ->
       expect(@remote.name).toBe "userhash123"
 
-    it "should sync continously by default", ->
-      expect(@remote.isContinuouslySyncing()).toBeTruthy()
+    it "should be connected by default", ->
+      expect(@remote.isConnected()).toBeTruthy()
         
-    it "should start syncing", ->
-      spyOn(Hoodie.AccountRemote::, "startSyncing")
+    it "should connect", ->
+      spyOn(Hoodie.AccountRemote::, "connect")
       new Hoodie.AccountRemote @hoodie
-      expect(Hoodie.AccountRemote::startSyncing).wasCalled()
+      expect(Hoodie.AccountRemote::connect).wasCalled()
       
     _when "config remote.sync is false", ->
       beforeEach ->
         spyOn(@hoodie.config, "get").andReturn false
         @remote = new Hoodie.AccountRemote @hoodie
         
-      it "should set syncContinuously to false", ->
-        expect(@remote.isContinuouslySyncing()).toBe false
+      it "should set connected to false", ->
+        expect(@remote.isConnected()).toBe false
 
       it "should not start syncing", ->
-        spyOn(Hoodie.AccountRemote::, "startSyncing")
+        spyOn(Hoodie.AccountRemote::, "connect")
         new Hoodie.AccountRemote @hoodie
-        expect(Hoodie.AccountRemote::startSyncing).wasNotCalled()
-     
+        expect(Hoodie.AccountRemote::connect).wasNotCalled()
 
-  describe "#startSyncing", ->
-    it "should make isContinuouslySyncing() to return true", ->
-      @remote._sync = false
-      @remote.startSyncing()
-      expect(@remote.isContinuouslySyncing()).toBeTruthy()
-    
-    it "should set config _remote.sync to true", ->
-      spyOn(@hoodie.config, "set")
-      @remote.startSyncing()
-      expect(@hoodie.config.set).wasCalledWith '_remote.sync', true
-
-    it "should subscribe to `signout` event", ->
-      @remote.startSyncing()
-      expect(@hoodie.on).wasCalledWith 'account:signout', @remote.disconnect
-
-    it "should subscribe to account:signin with sync", ->
-      @remote.startSyncing()
-      expect(@hoodie.on).wasCalledWith 'account:signin', @remote._handleSignIn
-
-    it "should connect", ->
-      spyOn(@remote, "connect")
-      @remote.startSyncing()
-      expect(@remote.connect).wasCalled()
-  # /#startSyncing()
-      
-
-  describe "#stopSyncing", ->
-    it "should set _remote.sync to false", ->
-      @remote._sync = true
-      @remote.stopSyncing()
-      expect(@remote.isContinuouslySyncing()).toBeFalsy()
-    
-    it "should set config remote.syncContinuously to false", ->
-      spyOn(@hoodie.config, "set")
-      @remote.stopSyncing()
-      expect(@hoodie.config.set).wasCalledWith '_remote.sync', false
-
-    it "should unsubscribe from account's signin event", ->
-      @remote.stopSyncing()
-      expect(@hoodie.unbind).wasCalledWith 'account:signin', @remote._handleSignIn
-      
-    it "should unsubscribe from account's signout event", ->
-      @remote.stopSyncing()
-      expect(@hoodie.unbind).wasCalledWith 'account:signout', @remote.disconnect
-  # /#stopSyncing()
 
   describe "#connect()", ->
     beforeEach ->
-      spyOn(@remote, "sync")
+      @authenticateDefer = @hoodie.defer()
+      spyOn(@hoodie.account, "authenticate").andReturn @authenticateDefer.promise()
       
     it "should authenticate", ->
-      spyOn(@hoodie.account, "authenticate").andCallThrough()
       @remote.connect()
       expect(@hoodie.account.authenticate).wasCalled()
       
-    _when "successful", ->
+    _when "successfully authenticated", ->
       beforeEach ->
-        spyOn(@hoodie.account, "authenticate").andReturn pipe: (cb) -> 
-          cb()
-          fail: ->
-        
+        @authenticateDefer.resolve()
+      
+      it "should set connected to true", ->
+        @remote.connected = false
+        @remote.connect()
+        expect(@remote.connected).toBe true
+      
+      it "should set config _remote.connected to true", ->
+        spyOn(@hoodie.config, "set")
+        @remote.connect()
+        expect(@hoodie.config.set).wasCalledWith '_remote.connected', true
+
+      it "should subscribe to `signout` event", ->
+        @remote.connect()
+        expect(@hoodie.on).wasCalledWith 'account:signout', @remote.disconnect
+
+      it "should subscribe to account:signin with sync", ->
+        @remote.connect()
+        expect(@hoodie.on).wasCalledWith 'account:signin', @remote._handleSignIn
+
+      it "should bind to store:idle event", ->
+        @remote.connect()
+        expect(@hoodie.on).wasCalledWith 'store:idle', @remote.push
+
       it "should call super", ->
         spyOn(Hoodie.Remote::, "connect")
         @remote.connect()
         expect(Hoodie.Remote::connect).wasCalled()
   # /#connect()
 
+
   describe "#disconnect()", ->
     it "should unsubscribe from stores's dirty idle event", ->
       @remote.disconnect()
       expect(@hoodie.unbind).wasCalledWith 'store:idle', @remote.push
+
+    it "should set _remote.connected to false", ->
+      @remote._sync = true
+      @remote.disconnect()
+      expect(@remote.isConnected()).toBeFalsy()
+    
+    it "should set config remote.connected to false", ->
+      spyOn(@hoodie.config, "set")
+      @remote.disconnect()
+      expect(@hoodie.config.set).wasCalledWith '_remote.connected', false
+
+    it "should unsubscribe from account's signin event", ->
+      @remote.disconnect()
+      expect(@hoodie.unbind).wasCalledWith 'account:signin', @remote._handleSignIn
+      
+    it "should unsubscribe from account's signout event", ->
+      @remote.disconnect()
+      expect(@hoodie.unbind).wasCalledWith 'account:signout', @remote.disconnect
   # /#disconnect()
 
   describe "#getSinceNr()", ->
@@ -151,9 +144,9 @@ describe "Hoodie.AccountRemote", ->
       @remote.connected = true
       spyOn(@remote, "request").andReturn @requestDefer.promise()
     
-    _when ".isContinuouslyPulling() is true", ->
+    _when ".isConnected() is true", ->
       beforeEach ->
-        spyOn(@remote, "isContinuouslyPulling").andReturn true
+        spyOn(@remote, "isConnected").andReturn true
       
       it "should send a longpoll GET request to the _changes feed", ->
         @remote.pull()
@@ -166,9 +159,9 @@ describe "Hoodie.AccountRemote", ->
         @remote.pull()
         expect(window.setTimeout).wasCalledWith @remote._restartPullRequest, 25000
         
-    _when ".isContinuouslyPulling() is false", ->
+    _when ".isConnected() is false", ->
       beforeEach ->
-        spyOn(@remote, "isContinuouslyPulling").andReturn false
+        spyOn(@remote, "isConnected").andReturn false
       
       it "should send a normal GET request to the _changes feed", ->
         @remote.pull()
@@ -184,9 +177,9 @@ describe "Hoodie.AccountRemote", ->
           @remote.request.andReturn then: ->
           success Mocks.changesResponse()
         
-      _and ".isContinuouslyPulling() returns true", ->
+      _and ".isConnected() returns true", ->
         beforeEach ->
-          spyOn(@remote, "isContinuouslyPulling").andReturn true
+          spyOn(@remote, "isConnected").andReturn true
           spyOn(@remote, "pull").andCallThrough()
         
         it "should pull again", ->
@@ -281,14 +274,14 @@ describe "Hoodie.AccountRemote", ->
           @remote.request.andReturn then: ->
           error statusText: 'abort', 'error object'
       
-      it "should try again when .isContinuouslyPulling() returns true", ->
+      it "should try again when .isConnected() returns true", ->
         spyOn(@remote, "pull").andCallThrough()
-        spyOn(@remote, "isContinuouslyPulling").andReturn true
+        spyOn(@remote, "isConnected").andReturn true
         @remote.pull()
         expect(@remote.pull.callCount).toBe 2
         
         @remote.pull.reset()
-        @remote.isContinuouslyPulling.andReturn false
+        @remote.isConnected.andReturn false
         @remote.pull()
         expect(@remote.pull.callCount).toBe 1
 
@@ -299,39 +292,16 @@ describe "Hoodie.AccountRemote", ->
           @remote.request.andReturn then: ->
           error {}, 'error object'
           
-      it "should try again in 3 seconds if .isContinuouslyPulling() returns false", ->
-        spyOn(@remote, "isContinuouslyPulling").andReturn true
+      it "should try again in 3 seconds if .isConnected() returns false", ->
+        spyOn(@remote, "isConnected").andReturn true
         @remote.pull()
         expect(window.setTimeout).wasCalledWith @remote.pull, 3000
         
         window.setTimeout.reset()
-        @remote.isContinuouslyPulling.andReturn false
+        @remote.isConnected.andReturn false
         @remote.pull()
         expect(window.setTimeout).wasNotCalledWith @remote.pull, 3000
   # /#pull()
-
-
-  describe "#sync(docs)", ->
-    beforeEach ->
-      spyOn(@remote, "push").andCallFake (docs) -> pipe: (cb) -> cb(docs)
-      spyOn(@remote, "pull")
-      
-    _when ".isContinuouslyPushing() returns true", ->
-      beforeEach ->
-        spyOn(@remote, "isContinuouslyPushing").andReturn true
-        
-      it "should bind to store:idle event", ->
-        @remote.sync()
-        expect(@hoodie.on).wasCalledWith 'store:idle', @remote.push
-        
-      it "should unbind from store:idle event before it binds to it", ->
-        order = []
-        @hoodie.unbind.andCallFake (event) -> order.push "unbind #{event}"
-        @hoodie.on.andCallFake (event) -> order.push "bind #{event}"
-        @remote.sync()
-        expect(order[0]).toBe 'unbind store:idle'
-        expect(order[1]).toBe 'bind store:idle'
-  # /#sync(docs)
 
 
   describe "#push(docs)", -> 

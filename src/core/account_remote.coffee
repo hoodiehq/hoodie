@@ -3,19 +3,20 @@
 
 # Connection / Socket to our couch
 #
-# AccountRemote is using CouchDB's `_changes` feed to listen to changes
-# and `_bulk_docs` to push local changes
+# AccountRemote is using CouchDB's `_changes` feed to 
+# listen to changes and `_bulk_docs` to push local changes
 #
-# When hoodie.remote is continuously syncing (default), it will continuously 
-# synchronize, otherwise sync, pull or push can be called manually
+# When hoodie.remote is continuously syncing (default), 
+# it will continuously  synchronize with local store, 
+# otherwise sync, pull or push can be called manually
 #
 class Hoodie.AccountRemote extends Hoodie.Remote
 
   # properties
   # ------------
 
-  # sync by default
-  _sync: true
+  # connect by default
+  connected: true
 
 
   # Constructor
@@ -26,8 +27,8 @@ class Hoodie.AccountRemote extends Hoodie.Remote
     # set name to user's DB name
     @name = @hoodie.account.db()
     
-    # overwrite default with _remote.sync config, if set
-    @_sync = @hoodie.config.get('_remote.sync') if @hoodie.config.get('_remote.sync')?
+    # overwrite default with _remote.connected config, if set
+    @connected = @hoodie.config.get('_remote.connected') if @hoodie.config.get('_remote.connected')?
 
     # do not prefix files for my own remote
     options.prefix = ''
@@ -38,10 +39,17 @@ class Hoodie.AccountRemote extends Hoodie.Remote
   # Connect
   # ---------
 
-  # do not start to sync immediately, but authenticate beforehand
+  # do not start to connect immediately, but authenticate beforehand
   # 
   connect : =>
-    @hoodie.account.authenticate().pipe => super
+    @hoodie.account.authenticate().pipe => 
+      @hoodie.config.set '_remote.connected', true
+
+      @hoodie.on 'account:signin',  @_handleSignIn
+      @hoodie.on 'account:signout', @disconnect
+      @hoodie.on 'store:idle',      @push
+
+      super
 
 
   # disconnect
@@ -49,48 +57,11 @@ class Hoodie.AccountRemote extends Hoodie.Remote
 
   # 
   disconnect: ->
-    # binding comes from @sync
-    @hoodie.unbind 'store:idle',   @push
-
-    super
-  
-
-  # startSyncing
-  # --------------
-
-  # start continuous syncing with current users store
-  # 
-  startSyncing : =>
-    @hoodie.config.set '_remote.sync', true
-
-    @hoodie.on 'account:signin',     @_handleSignIn
-    @hoodie.on 'account:signout',    @disconnect
-
-    super
-
-
-  # stopSyncing
-  # -------------
-
-  # stop continuous syncing with current users store
-  # 
-  stopSyncing : =>
-    @hoodie.config.set '_remote.sync', false
+    @hoodie.config.set '_remote.connected', false
 
     @hoodie.unbind 'account:signin',  @_handleSignIn
     @hoodie.unbind 'account:signout', @disconnect
-
-    super
-
-
-  # sync
-  # ------
-
-  # 
-  sync : (objects) =>
-    if @isContinuouslyPushing()
-      @hoodie.unbind 'store:idle', @push
-      @hoodie.on     'store:idle', @push
+    @hoodie.unbind 'store:idle',      @push
 
     super
     
@@ -110,8 +81,8 @@ class Hoodie.AccountRemote extends Hoodie.Remote
   # push
   # ------
 
-  # if no objects passed to be pushed, we default to users changed objects
-  # in his store
+  # if no objects passed to be pushed, we default to 
+  # changed objects in user's local store
   push : (objects) =>
     objects = @hoodie.store.changedObjects() unless $.isArray objects
     promise = super(objects)
@@ -139,6 +110,6 @@ class Hoodie.AccountRemote extends Hoodie.Remote
   # ---------
 
   # 
-  _handleSignIn: =>
+  _handleSignIn : =>
     @name = @hoodie.account.db()
     @connect()

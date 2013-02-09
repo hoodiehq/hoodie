@@ -52,7 +52,7 @@ class Hoodie.Remote extends Hoodie.Store
   # if set to true, updates will be continuously pulled
   # and pushed. Alternatively, `sync` can be set to
   # `pull: true` or `push: true`.
-  _sync : false
+  connected : false
 
   # prefix
 
@@ -70,8 +70,8 @@ class Hoodie.Remote extends Hoodie.Store
       @name = options.name     
       @prefix = @name
       
-    @prefix = options.prefix if options.prefix?
-    @_sync  = options.sync   if options.sync
+    @prefix    = options.prefix    if options.prefix?
+    @connected = options.connected if options.connected?
 
     # in order to differentiate whether an object from remote should trigger a 'new'
     # or an 'update' event, we store a hash of known objects
@@ -88,7 +88,7 @@ class Hoodie.Remote extends Hoodie.Store
     # that would load all objects with a normal GET /_all_docs request,
     # after that it would start with the GET /_changes requests,
     # starting with the current seq number of the database.
-    @startSyncing() if @isContinuouslySyncing()
+    @connect() if @isConnected()
 
 
   # request
@@ -217,7 +217,7 @@ class Hoodie.Remote extends Hoodie.Store
   # start syncing
   connect : (options) =>
     @connected = true
-    @sync()
+    @pull()
   
     
   # Disconnect
@@ -230,48 +230,13 @@ class Hoodie.Remote extends Hoodie.Store
     @_pullRequest?.abort()
     @_pushRequest?.abort()
   
-
-  # startSyncing
-  # --------------
-
-  # start continuous syncing with store
-  # 
-  startSyncing : =>
-    @_sync = true
-    @connect()
-
-
-  # stopSyncing
+    
+  # isConnected
   # -------------
 
-  # stop continuous syncing with store
   # 
-  stopSyncing : =>
-    @_sync = false
-
-
-  # isContinuouslyPulling
-  # -----------------------
-
-  # returns true if pulling is set to be continous
-  isContinuouslyPulling : ->
-    @_sync is true or @_sync?.pull is true
-
-
-  # isContinuouslyPushing
-  # -----------------------
-
-  # returns true if pushing is set to be continous
-  isContinuouslyPushing : ->
-    @_sync is true or @_sync?.push is true
-
-
-  # isContinuouslySyncing
-  # -----------------------
-
-  # returns true if sync is set to be continous
-  isContinuouslySyncing : ->
-    @_sync is true
+  isConnected : ->
+    @connected
 
 
   # getSinceNr
@@ -300,7 +265,7 @@ class Hoodie.Remote extends Hoodie.Store
   pull : =>
     @_pullRequest = @request 'GET', @_pullUrl()
 
-    if @connected and @isContinuouslyPulling()
+    if @isConnected()
       window.clearTimeout @_pullRequestTimeout
       @_pullRequestTimeout = window.setTimeout @_restartPullRequest, 25000 # 25 sec
     
@@ -330,7 +295,7 @@ class Hoodie.Remote extends Hoodie.Store
   # sync changes
   # --------------
 
-  # pull ... and push ;-)
+  # push objects, then pull updates.
   sync : (objects) =>
     @push(objects).pipe @pull
 
@@ -453,11 +418,11 @@ class Hoodie.Remote extends Hoodie.Store
   
   # ### pull url
 
-  # Depending on whether isContinuouslyPulling() is true, return a longpoll URL or not
+  # Depending on whether remote is connected, return a longpoll URL or not
   #
   _pullUrl : ->
     since = @getSinceNr()
-    if @isContinuouslyPulling() # make a long poll request
+    if @isConnected() # make a long poll request
       "/_changes?include_docs=true&since=#{since}&heartbeat=10000&feed=longpoll"
     else
       "/_changes?include_docs=true&since=#{since}"
@@ -469,13 +434,13 @@ class Hoodie.Remote extends Hoodie.Store
 
   # ### pull success handler 
 
-  # handle the incoming changes, then send the next request
+  # handle incoming changes, then restart the pull if connected
   #
   _handlePullSuccess : (response) =>
     @setSinceNr response.last_seq
     @_handlePullResults response.results
     
-    @pull() if @connected and @isContinuouslyPulling()
+    @pull() if @isConnected()
   
   
   # ### pull error handler 
@@ -485,7 +450,7 @@ class Hoodie.Remote extends Hoodie.Store
   #
   _handlePullError : (xhr, error, resp) =>
     
-    return unless @connected
+    return unless @isConnected()
 
     switch xhr.status
   
@@ -513,10 +478,10 @@ class Hoodie.Remote extends Hoodie.Store
       
       # usually a 0, which stands for timeout or server not reachable.
       else
-        return unless @isContinuouslyPulling()
+        return unless @isConnected()
 
         if xhr.statusText is 'abort'
-          # manual abort after 25sec. restart pulling changes directly when isContinuouslyPulling() is true
+          # manual abort after 25sec. restart pulling changes directly when connected
           @pull()
         else    
             
