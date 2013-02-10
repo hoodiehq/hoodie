@@ -1521,7 +1521,7 @@ Hoodie.AccountRemote = (function(_super) {
 
   AccountRemote.prototype._handleSignIn = function() {
     this.name = this.hoodie.account.db();
-    return this.connect();
+    return this.sync();
   };
 
   return AccountRemote;

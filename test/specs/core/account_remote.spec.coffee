@@ -44,6 +44,7 @@ describe "Hoodie.AccountRemote", ->
         spyOn(Hoodie.AccountRemote::, "connect")
         new Hoodie.AccountRemote @hoodie
         expect(Hoodie.AccountRemote::connect).wasNotCalled()
+      
 
 
   describe "#connect()", ->
@@ -98,6 +99,14 @@ describe "Hoodie.AccountRemote", ->
         spyOn(Hoodie.Remote::, "connect")
         @remote.connect()
         expect(Hoodie.Remote::connect).wasCalled()
+
+      _and "user signs in, it should sync", ->
+        beforeEach ->
+          spyOn(@remote, "sync")
+          @remote._handleSignIn()
+
+        it "should sync", ->
+          expect(@remote.sync).wasCalled()
   # /#connect()
 
 

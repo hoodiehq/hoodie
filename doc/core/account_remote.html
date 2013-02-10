@@ -11,7 +11,7 @@ otherwise sync, pull or push can be called manually</p></div></div><div class="c
     <span class="nx">@hoodie</span><span class="p">.</span><span class="nx">account</span><span class="p">.</span><span class="nx">authenticate</span><span class="p">().</span><span class="nx">pipe</span> <span class="o">=&gt;</span> 
       <span class="nx">@hoodie</span><span class="p">.</span><span class="nx">config</span><span class="p">.</span><span class="nx">set</span> <span class="s">&#39;_remote.connected&#39;</span><span class="p">,</span> <span class="kc">true</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>subscribe to signin event, but only once</p></div></div><div class="code"><div class="wrapper">      <span class="nx">@hoodie</span><span class="p">.</span><span class="nx">unbind</span> <span class="s">&#39;account:signin&#39;</span><span class="p">,</span>  <span class="nx">@_handleSignIn</span>
       <span class="nx">@hoodie</span><span class="p">.</span><span class="nx">on</span>     <span class="s">&#39;account:signin&#39;</span><span class="p">,</span>  <span class="nx">@_handleSignIn</span>
-      
+
       <span class="nx">@hoodie</span><span class="p">.</span><span class="nx">on</span> <span class="s">&#39;account:signout&#39;</span><span class="p">,</span> <span class="nx">@disconnect</span>
       <span class="nx">@hoodie</span><span class="p">.</span><span class="nx">on</span> <span class="s">&#39;store:idle&#39;</span><span class="p">,</span>      <span class="nx">@push</span>
 
@@ -38,4 +38,4 @@ changed objects in user's local store</p></div></div><div class="code"><div clas
   </div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>namespaced alias for <code>hoodie.trigger</code></p></div></div><div class="code"><div class="wrapper">  <span class="nv">trigger : </span><span class="nf">(event, parameters...) -&gt;</span> 
     <span class="nx">@hoodie</span><span class="p">.</span><span class="nx">trigger</span> <span class="s">&quot;remote:</span><span class="si">#{</span><span class="nx">event</span><span class="si">}</span><span class="s">&quot;</span><span class="p">,</span> <span class="nx">parameters</span><span class="p">...</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h2 id="private">Private</h2></div></div></div><div class="segment"><div class="code"><div class="wrapper">  <span class="nv">_handleSignIn : </span><span class="o">=&gt;</span>
     <span class="vi">@name = </span><span class="nx">@hoodie</span><span class="p">.</span><span class="nx">account</span><span class="p">.</span><span class="nx">db</span><span class="p">()</span>
-    <span class="nx">@connect</span><span class="p">()</span></div></div></div></div></body></html>
+    <span class="nx">@sync</span><span class="p">()</span></div></div></div></div></body></html>

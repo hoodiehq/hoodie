@@ -48,7 +48,7 @@ class Hoodie.AccountRemote extends Hoodie.Remote
       # subscribe to signin event, but only once
       @hoodie.unbind 'account:signin',  @_handleSignIn
       @hoodie.on     'account:signin',  @_handleSignIn
-      
+
       @hoodie.on 'account:signout', @disconnect
       @hoodie.on 'store:idle',      @push
 
@@ -114,4 +114,4 @@ class Hoodie.AccountRemote extends Hoodie.Remote
   # 
   _handleSignIn : =>
     @name = @hoodie.account.db()
-    @connect()
+    @sync()
