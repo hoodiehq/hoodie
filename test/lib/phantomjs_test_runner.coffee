@@ -89,7 +89,7 @@ page.open phantom.args[0], (status) ->
           page.evaluate ->
             return not window.jas.currentRunner_.queue.running
         , ->
-            page.evaluate ->
+            hasErrors = page.evaluate ->
               
                 
                 
@@ -101,7 +101,7 @@ page.open phantom.args[0], (status) ->
                 
                 list = document.body.querySelectorAll('.failed > .description, .failed > .messages > .resultMessage')
                 
-                
+                hasErrors = list.length
                 for el in list 
                   i = ''
                   e = el
@@ -112,5 +112,10 @@ page.open phantom.args[0], (status) ->
                   i += '=> ' if el.className == 'resultMessage fail'
                   console.log i + el.innerText
                   console.log '' if el.className == 'resultMessage fail'
-        
-            phantom.exit()
+
+                return hasErrors
+            
+            if hasErrors
+              phantom.exit(1)
+            else
+              phantom.exit()
