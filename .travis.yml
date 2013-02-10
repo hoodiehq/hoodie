@@ -1,1 +1,1 @@
-script: phantomjs testrunner.js
+script: phantomjs test/lib/phantomjs_test_runner.coffee test/index.html
