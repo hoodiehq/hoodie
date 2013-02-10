@@ -2,7 +2,9 @@ describe "Hoodie", ->
   beforeEach ->
     @hoodie = new Hoodie 'http://couch.example.com'
     spyOn($, "ajax").andReturn $.Deferred()
-  
+
+  it "should fail for testing travis", ->
+    expect('funky').toBe 'fresh' 
 
   describe "constructor", ->
     it "should store the CouchDB URL", ->
