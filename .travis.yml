@@ -1,3 +1,4 @@
 before_script:
+  - npm install coffee-script
   - coffee -c -b -o compiled .
 script: phantomjs test/lib/phantomjs_test_runner.coffee test/index.html
