@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/hoodiehq/hoodie.js.png?branch=master)](https://travis-ci.org/hoodiehq/hoodie.js)
+
 hoodie ✪ power to the frontend!
 ===============================
 
