@@ -163,11 +163,9 @@ class Hoodie.Remote extends Hoodie.Store
     if keyPrefix
       path = "#{path}&startkey=\"#{keyPrefix}\/\"&endkey=\"#{keyPrefix}0\""
 
-    promise = @request "GET", path
-    promise.fail defer.reject
-    promise.pipe(@_mapDocsFromFindAll).pipe(@_parseAllFromRemote).done defer.resolve
-
-    return defer.promise()
+    @request("GET", path)
+    .pipe(@_mapDocsFromFindAll)
+    .pipe(@_parseAllFromRemote)
   
 
   # save
