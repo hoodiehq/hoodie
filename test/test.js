@@ -21,6 +21,18 @@ describe("hoodie-server", function() {
       assert(hs.serve_admin("admin.a.jit.su", "a"));
     });
 
+    it("should serve /_api IE <= 9 fallback", function() {
+      assert(hs.serve_api({
+        url: "/_api"
+      }));
+    });
+
+    it("should serve /_api IE <= 9 fallback", function() {
+      assert(hs.serve_api({
+        url: "/_api/db?param=true"
+      }));
+    });
+
     it("should fail with app name mismatch", function() {
       assert.equal(false, hs.serve_cors("a.jit.su", "b"));
     });
