@@ -4,7 +4,7 @@
   "dependencies": {
     "http-proxy": "*",
     "connect": "*",
-    "corsproxy": "git://github.com/janl/CORS-Proxy.git",
+    "corsproxy": "git://github.com/gr2m/CORS-Proxy.git",
     "multicouch": ">=0.2.5",
     "request": "*",
     "npm": "*",
