@@ -6,7 +6,7 @@
     "connect": "*",
     "corsproxy": "git://github.com/gr2m/CORS-Proxy.git",
     "multicouch": ">=0.2.5",
-    "request": "*",
+    "request": ">2.0.0",
     "npm": "*",
     "hoodie-pocket": "git://github.com/hoodiehq/pocket.git",
     "local-tld-lib": "*"
