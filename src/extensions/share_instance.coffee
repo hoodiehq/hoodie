@@ -42,11 +42,6 @@ class Hoodie.ShareInstance extends Hoodie.Remote
     # set prefix from name
     @prefix = @name
 
-    # fix `sync` option
-    if options.sync?
-      options._sync = options.sync
-      delete options.sync
-
     # set options
     $.extend this, options
 

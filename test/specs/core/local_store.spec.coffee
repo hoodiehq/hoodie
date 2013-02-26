@@ -11,6 +11,12 @@ describe "Hoodie.LocalStore", ->
     spyOn(@store.db, "removeItem").andCallThrough()
     spyOn(@store.db, "clear").andCallThrough()
 
+    # make timeout immediate
+    spyOn(window, "clearTimeout")
+    spyOn(window, "setTimeout").andCallFake (cb) -> 
+      cb()
+      return 'newTimeout'
+
     spyOn(@hoodie, "on")
   
 
@@ -45,9 +51,6 @@ describe "Hoodie.LocalStore", ->
         spyOn(Hoodie.LocalStore::, "_getObject").andReturn @object
         spyOn(Hoodie.LocalStore::, "_isDirty").andReturn true
         spyOn(Hoodie.LocalStore::, "trigger")
-
-        # make timeout immediate
-        spyOn(window, "setTimeout").andCallFake (cb) -> cb()
       
       it "should trigger idle event if there are dirty objects in localStorage", ->
         spyOn(Hoodie.LocalStore::, "changedObjects").andReturn [1, 2, 3]
@@ -745,8 +748,6 @@ describe "Hoodie.LocalStore", ->
     beforeEach ->
       @store._dirty = {}
       
-      spyOn(window, "setTimeout").andReturn 'newTimeout'
-      spyOn(window, "clearTimeout")
       spyOn(@store, "trigger")
       @store.markAsChanged 'couch', '123', color: 'red'
     
@@ -773,6 +774,7 @@ describe "Hoodie.LocalStore", ->
       @findAllDefer = @hoodie.defer()
       spyOn(@store, "markAsChanged").andCallThrough()
       spyOn(@store, "findAll").andReturn @findAllDefer.promise()
+      spyOn(@store, "changedObjects").andReturn 'changedObjects'
 
     it "should find all local objects", ->
       @store.markAllAsChanged()
@@ -795,8 +797,6 @@ describe "Hoodie.LocalStore", ->
           { id: '3', type: 'document', name: 'test3'}
         ]
         @findAllDefer.resolve @objects
-        spyOn(window, "setTimeout").andReturn 'newTimeout'
-        spyOn(window, "clearTimeout")
         spyOn(@store, "trigger")
         @store._dirtyTimeout = 'timeout'
         @store.markAllAsChanged()
@@ -816,9 +816,10 @@ describe "Hoodie.LocalStore", ->
         expect(window.clearTimeout).wasCalledWith 'timeout'
         expect(window.clearTimeout.callCount).toBe 1
 
-      it "should trigger 'dirty' event", ->
+      it "should trigger 'dirty' & 'idle' event", ->
         expect(@store.trigger).wasCalledWith 'dirty'
-        expect(@store.trigger.callCount).toBe 1
+        expect(@store.trigger).wasCalledWith 'idle', 'changedObjects'
+        expect(@store.trigger.callCount).toBe 2
   # /.markAllAsChanged(type, id, object)
   
 
@@ -867,7 +868,6 @@ describe "Hoodie.LocalStore", ->
 
   describe "#clearChanged(type, id)", ->
     it "should clear _dirtyTimeout", ->
-      spyOn(window, "clearTimeout")
       @store._dirtyTimeout = 1
       @store.clearChanged 'couch', 123
       expect(window.clearTimeout).wasCalledWith 1

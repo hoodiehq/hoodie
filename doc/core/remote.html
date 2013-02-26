@@ -82,11 +82,9 @@ and a prefixed path</p></div></div><div class="code"><div class="wrapper">  <spa
     <span class="k">if</span> <span class="nx">keyPrefix</span>
       <span class="nv">path = </span><span class="s">&quot;</span><span class="si">#{</span><span class="nx">path</span><span class="si">}</span><span class="s">&amp;startkey=\&quot;</span><span class="si">#{</span><span class="nx">keyPrefix</span><span class="si">}</span><span class="s">\/\&quot;&amp;endkey=\&quot;</span><span class="si">#{</span><span class="nx">keyPrefix</span><span class="si">}</span><span class="s">0\&quot;&quot;</span>
 
-    <span class="nv">promise = </span><span class="nx">@request</span> <span class="s">&quot;GET&quot;</span><span class="p">,</span> <span class="nx">path</span>
-    <span class="nx">promise</span><span class="p">.</span><span class="nx">fail</span> <span class="nx">defer</span><span class="p">.</span><span class="nx">reject</span>
-    <span class="nx">promise</span><span class="p">.</span><span class="nx">pipe</span><span class="p">(</span><span class="nx">@_mapDocsFromFindAll</span><span class="p">).</span><span class="nx">pipe</span><span class="p">(</span><span class="nx">@_parseAllFromRemote</span><span class="p">).</span><span class="nx">done</span> <span class="nx">defer</span><span class="p">.</span><span class="nx">resolve</span>
-
-    <span class="k">return</span> <span class="nx">defer</span><span class="p">.</span><span class="nx">promise</span><span class="p">()</span>
+    <span class="nx">@request</span><span class="p">(</span><span class="s">&quot;GET&quot;</span><span class="p">,</span> <span class="nx">path</span><span class="p">)</span>
+    <span class="p">.</span><span class="nx">pipe</span><span class="p">(</span><span class="nx">@_mapDocsFromFindAll</span><span class="p">)</span>
+    <span class="p">.</span><span class="nx">pipe</span><span class="p">(</span><span class="nx">@_parseAllFromRemote</span><span class="p">)</span>
   </div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h2 id="save">save</h2></div></div><div class="code"><div class="wrapper">  </div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>save a new object. If it existed before, all properties
 will be overwritten </p></div></div><div class="code"><div class="wrapper">  <span class="nv">save : </span><span class="nf">(type, id, object) -&gt;</span>
     <span class="nv">defer = </span><span class="k">super</span>

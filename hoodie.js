@@ -1148,7 +1148,7 @@ Hoodie.Remote = (function(_super) {
   };
 
   Remote.prototype.findAll = function(type) {
-    var defer, keyPrefix, path, promise;
+    var defer, keyPrefix, path;
     defer = Remote.__super__.findAll.apply(this, arguments);
     if (this.hoodie.isPromise(defer)) {
       return defer;
@@ -1170,10 +1170,7 @@ Hoodie.Remote = (function(_super) {
     if (keyPrefix) {
       path = "" + path + "&startkey=\"" + keyPrefix + "\/\"&endkey=\"" + keyPrefix + "0\"";
     }
-    promise = this.request("GET", path);
-    promise.fail(defer.reject);
-    promise.pipe(this._mapDocsFromFindAll).pipe(this._parseAllFromRemote).done(defer.resolve);
-    return defer.promise();
+    return this.request("GET", path).pipe(this._mapDocsFromFindAll).pipe(this._parseAllFromRemote);
   };
 
   Remote.prototype.save = function(type, id, object) {
@@ -1458,6 +1455,8 @@ Hoodie.AccountRemote = (function(_super) {
 
     this.push = __bind(this.push, this);
 
+    this.disconnect = __bind(this.disconnect, this);
+
     this.connect = __bind(this.connect, this);
 
     this.name = this.hoodie.account.db();
@@ -1465,6 +1464,8 @@ Hoodie.AccountRemote = (function(_super) {
       this.connected = this.hoodie.config.get('_remote.connected');
     }
     options.prefix = '';
+    this.hoodie.on('account:signin', this._handleSignIn);
+    this.hoodie.on('account:signout', this.disconnect);
     AccountRemote.__super__.constructor.call(this, this.hoodie, options);
   }
 
@@ -1472,17 +1473,14 @@ Hoodie.AccountRemote = (function(_super) {
     var _this = this;
     return this.hoodie.account.authenticate().pipe(function() {
       _this.hoodie.config.set('_remote.connected', true);
-      _this.hoodie.unbind('account:signin', _this._handleSignIn);
-      _this.hoodie.on('account:signin', _this._handleSignIn);
-      _this.hoodie.on('account:signout', _this.disconnect);
       _this.hoodie.on('store:idle', _this.push);
+      _this.push();
       return AccountRemote.__super__.connect.apply(_this, arguments);
     });
   };
 
   AccountRemote.prototype.disconnect = function() {
     this.hoodie.config.set('_remote.connected', false);
-    this.hoodie.unbind('account:signout', this.disconnect);
     this.hoodie.unbind('store:idle', this.push);
     return AccountRemote.__super__.disconnect.apply(this, arguments);
   };
@@ -1521,7 +1519,7 @@ Hoodie.AccountRemote = (function(_super) {
 
   AccountRemote.prototype._handleSignIn = function() {
     this.name = this.hoodie.account.db();
-    return this.sync();
+    return this.connect();
   };
 
   return AccountRemote;
@@ -1536,6 +1534,8 @@ Hoodie.LocalStore = (function(_super) {
 
   function LocalStore(hoodie) {
     this.hoodie = hoodie;
+    this._triggerDirtyAndIdleEvents = __bind(this._triggerDirtyAndIdleEvents, this);
+
     this._handleRemoteChange = __bind(this._handleRemoteChange, this);
 
     this.clear = __bind(this.clear, this);
@@ -2406,10 +2406,6 @@ Hoodie.ShareInstance = (function(_super) {
     this.id = options.id || this.hoodie.uuid();
     this.name = "share/" + this.id;
     this.prefix = this.name;
-    if (options.sync != null) {
-      options._sync = options.sync;
-      delete options.sync;
-    }
     $.extend(this, options);
     ShareInstance.__super__.constructor.apply(this, arguments);
   }

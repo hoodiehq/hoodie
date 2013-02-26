@@ -578,7 +578,7 @@ class Hoodie.LocalStore extends Hoodie.Store
     @trigger "change:#{object.type}:#{object.id}",    event, object, options unless event is 'new'
 
   #
-  _triggerDirtyAndIdleEvents: ->
+  _triggerDirtyAndIdleEvents: =>
     @trigger 'dirty'
     window.clearTimeout @_dirtyTimeout
     @_dirtyTimeout = window.setTimeout ( =>

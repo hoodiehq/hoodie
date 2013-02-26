@@ -343,7 +343,7 @@ TODO: make this cachy</p></div></div><div class="code"><div class="wrapper">  <s
     <span class="nx">@trigger</span> <span class="s">&quot;change:</span><span class="si">#{</span><span class="nx">object</span><span class="p">.</span><span class="nx">type</span><span class="si">}</span><span class="s">:</span><span class="si">#{</span><span class="nx">object</span><span class="p">.</span><span class="nx">id</span><span class="si">}</span><span class="s">&quot;</span><span class="p">,</span>    <span class="nx">event</span><span class="p">,</span> <span class="nx">object</span><span class="p">,</span> <span class="nx">options</span> <span class="k">unless</span> <span class="nx">event</span> <span class="o">is</span> <span class="s">&#39;new&#39;</span>
 
   <span class="c1">#</span>
-  <span class="nv">_triggerDirtyAndIdleEvents: </span><span class="nf">-&gt;</span>
+  <span class="nv">_triggerDirtyAndIdleEvents: </span><span class="o">=&gt;</span>
     <span class="nx">@trigger</span> <span class="s">&#39;dirty&#39;</span>
     <span class="nb">window</span><span class="p">.</span><span class="nx">clearTimeout</span> <span class="nx">@_dirtyTimeout</span>
     <span class="vi">@_dirtyTimeout = </span><span class="nb">window</span><span class="p">.</span><span class="nx">setTimeout</span> <span class="p">(</span> <span class="o">=&gt;</span>

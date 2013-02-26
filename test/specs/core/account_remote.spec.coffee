@@ -31,6 +31,17 @@ describe "Hoodie.AccountRemote", ->
       spyOn(Hoodie.AccountRemote::, "connect")
       new Hoodie.AccountRemote @hoodie
       expect(Hoodie.AccountRemote::connect).wasCalled()
+
+    it "should subscribe to `signin` event", ->
+      expect(@hoodie.on).wasCalledWith 'account:signin', @remote._handleSignIn
+
+    it "should subscribe to `signout` event", ->
+      spyOn(Hoodie.AccountRemote::, "disconnect")
+      new Hoodie.AccountRemote @hoodie
+      [event, callback] = @hoodie.on.mostRecentCall.args
+      expect(event).toBe 'account:signout'
+      callback()
+      expect(Hoodie.AccountRemote::disconnect).wasCalled()
       
     _when "config remote.sync is false", ->
       beforeEach ->
@@ -70,28 +81,7 @@ describe "Hoodie.AccountRemote", ->
         @remote.connect()
         expect(@hoodie.config.set).wasCalledWith '_remote.connected', true
 
-      it "should subscribe to `signout` event", ->
-        @remote.connect()
-        expect(@hoodie.on).wasCalledWith 'account:signout', @remote.disconnect
-
-      it "should unsubscribe from, then subscribe again to account's signin event", ->
-        order = []
-        @hoodie.unbind.andCallFake -> order.push('unbind')
-        @hoodie.on.andCallFake (eventName) -> 
-          if eventName is 'account:signin'
-            order.push('on')
-
-        @remote.connect()
-
-        expect(@hoodie.unbind).wasCalledWith 'account:signin', @remote._handleSignIn
-        expect(@hoodie.on).wasCalledWith 'account:signin', @remote._handleSignIn
-        expect(order.join()).toBe 'unbind,on'
-
-      it "should subscribe to account:signin with sync", ->
-        @remote.connect()
-        expect(@hoodie.on).wasCalledWith 'account:signin', @remote._handleSignIn
-
-      it "should bind to store:idle event", ->
+      it "should subscribe to store:idle event", ->
         @remote.connect()
         expect(@hoodie.on).wasCalledWith 'store:idle', @remote.push
 
@@ -100,13 +90,13 @@ describe "Hoodie.AccountRemote", ->
         @remote.connect()
         expect(Hoodie.Remote::connect).wasCalled()
 
-      _and "user signs in, it should sync", ->
+      _and "user signs in, it should connect", ->
         beforeEach ->
-          spyOn(@remote, "sync")
+          spyOn(@remote, "connect")
           @remote._handleSignIn()
 
-        it "should sync", ->
-          expect(@remote.sync).wasCalled()
+        it "should connect", ->
+          expect(@remote.connect).wasCalled()
   # /#connect()
 
 
@@ -124,10 +114,6 @@ describe "Hoodie.AccountRemote", ->
       spyOn(@hoodie.config, "set")
       @remote.disconnect()
       expect(@hoodie.config.set).wasCalledWith '_remote.connected', false
-      
-    it "should unsubscribe from account's signout event", ->
-      @remote.disconnect()
-      expect(@hoodie.unbind).wasCalledWith 'account:signout', @remote.disconnect
   # /#disconnect()
 
   describe "#getSinceNr()", ->
