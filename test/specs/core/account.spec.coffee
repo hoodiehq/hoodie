@@ -909,7 +909,7 @@ describe "Hoodie.Account", ->
       
         it "should send a PUT request to /_users/org.couchdb.user%3Auser%2Fjoe%40example.com", ->
           @account.destroy()
-          expect(@hoodie.request).wasCalledWith 'PUT', '/_users/org.couchdb.user%3Auser%2Fjoe%40example.com'
+          expect(@hoodie.request).wasCalledWith 'PUT', '/_users/org.couchdb.user%3Auser%2Fjoe%40example.com', 
             data : JSON.stringify
               _rev     : '1-234'
               _deleted : true

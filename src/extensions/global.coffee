@@ -18,7 +18,7 @@ class Hoodie.Global
 
     # vanilla API syntax:
     # hoodie.global.findAll()
-    return hoodie.open "global"
+    `return hoodie.open("global")`
 
 
 # extend Hoodie

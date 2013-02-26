@@ -61,7 +61,7 @@ class Hoodie.Share
       unshare   : @_storeUnshare
       share     : @_storeShare
 
-    return api
+    `return api`
 
 
   # add

@@ -15,16 +15,16 @@ describe "Hoodie.Share", ->
       expect(typeof unshareAt).toBe 'function'
       expect(typeof unshare).toBe 'function'
 
-  describe "direct call", ->
-    beforeEach ->
-      spyOn(@hoodie, "open")
-    
-    it "should init a new share instance", ->
-      spyOn(Hoodie, "ShareInstance")
-      share = new Hoodie.Share @hoodie
-      instance = share('funk123', option: 'value')
-      expect(share.instance).wasCalled()
-  # /direct call
+  # describe "direct call", ->
+  #   beforeEach ->
+  #     spyOn(@hoodie, "open")
+  # 
+  #   it "should init a new share instance", ->
+  #     spyOn(Hoodie, "ShareInstance")
+  #     share = new Hoodie.Share @hoodie
+  #     instance = share('funk123', option: 'value')
+  #     expect(share.instance).wasCalled()
+  # # /direct call
 
   describe "#instance", ->
     it "should point to Hoodie.ShareInstance", ->

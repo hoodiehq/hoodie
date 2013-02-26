@@ -29,9 +29,9 @@ waitFor = (testFx, onReady, timeOutMillis=3000) ->
                 clearInterval interval #< Stop this interval
     interval = setInterval f, 100 #< repeat check every 100ms
 
-if phantom.args.length isnt 1
-    console.log 'Usage: run-jasmine.coffee URL'
-    phantom.exit()
+# if phantom.args.length isnt 1
+#     console.log 'Usage: run-jasmine.coffee URL'
+#     phantom.exit()
 
 page = new WebPage()
 

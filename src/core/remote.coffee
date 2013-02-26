@@ -284,7 +284,7 @@ class Hoodie.Remote extends Hoodie.Store
       @_addRevisionTo object
       objectsForRemote.push object
     
-    @_pushRequest = @request 'POST', "/_bulk_docs"
+    @_pushRequest = @request 'POST', "/_bulk_docs",
       data :
         docs      : objectsForRemote
         new_edits : false

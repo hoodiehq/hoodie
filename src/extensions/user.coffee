@@ -19,9 +19,13 @@ class Hoodie.User
 
     # vanilla API syntax:
     # hoodie.user('uuid1234').findAll()
-    return (userHash, options = {}) => 
-      $.extend options, prefix: '$public'
-      @hoodie.open "user/#{userHash}/public", options
+    `return this.api`
+
+  #
+  api : (userHash, options = {}) => 
+    $.extend options, prefix: '$public'
+    @hoodie.open "user/#{userHash}/public", options
+
 
 
   # hoodie.store decorations
