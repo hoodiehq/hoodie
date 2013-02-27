@@ -269,14 +269,17 @@ worked out, it adds the role "confirmed" to the user. If the role is
 not present yet, it might be that the worker didn't pick up the the 
 user doc yet, or there was an error. In this cases, we reject the promise
 with an "uncofirmed error"</p></div></div><div class="code"><div class="wrapper">      <span class="k">unless</span> <span class="o">~</span><span class="nx">response</span><span class="p">.</span><span class="nx">roles</span><span class="p">.</span><span class="nx">indexOf</span><span class="p">(</span><span class="s">&quot;confirmed&quot;</span><span class="p">)</span>
-        <span class="k">return</span> <span class="nx">defer</span><span class="p">.</span><span class="nx">reject</span> <span class="nv">error: </span><span class="s">&quot;unconfirmed&quot;</span><span class="p">,</span> <span class="nv">reason: </span><span class="s">&quot;account has not been confirmed yet&quot;</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>before a new user can sign in, things need to be cleaned up.
-That's what this event is triggerd for, so other modules can
-do their cleanups as well.</p></div></div><div class="code"><div class="wrapper">      <span class="nx">@_cleanup</span> 
-        <span class="nv">authenticated : </span><span class="kc">true</span>
-        <span class="nv">ownerHash     : </span><span class="nx">response</span><span class="p">.</span><span class="nx">roles</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-        <span class="nv">username      : </span><span class="nx">username</span>
+        <span class="k">return</span> <span class="nx">defer</span><span class="p">.</span><span class="nx">reject</span> <span class="nv">error: </span><span class="s">&quot;unconfirmed&quot;</span><span class="p">,</span> <span class="nv">reason: </span><span class="s">&quot;account has not been confirmed yet&quot;</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>options.silent is true, when a user signed in
+with the current username of his account, for
+example after his session timed out</p></div></div><div class="code"><div class="wrapper">      <span class="k">if</span> <span class="nx">options</span><span class="p">.</span><span class="nx">silent</span>
+        <span class="vi">@authenticated = </span><span class="kc">true</span>
 
-      <span class="k">unless</span> <span class="nx">options</span><span class="p">.</span><span class="nx">silent</span>
+      <span class="k">else</span>
+        <span class="nx">@_cleanup</span> 
+          <span class="nv">authenticated : </span><span class="kc">true</span>
+          <span class="nv">ownerHash     : </span><span class="nx">response</span><span class="p">.</span><span class="nx">roles</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+          <span class="nv">username      : </span><span class="nx">username</span>
+
         <span class="k">if</span> <span class="nx">@hasAnonymousAccount</span><span class="p">()</span>
           <span class="nx">@trigger</span> <span class="s">&#39;signin:anonymous&#39;</span><span class="p">,</span> <span class="nx">username</span>
         <span class="k">else</span>

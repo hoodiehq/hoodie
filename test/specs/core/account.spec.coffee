@@ -484,7 +484,7 @@ describe "Hoodie.Account", ->
 
         it "should trigger `account:cleanup` event", ->
           @account.signIn('joe@example.com', 'secret')
-          expect(@hoodie.trigger).wasCalledWith 'account:cleanup'
+          expect(@hoodie.trigger).wasNotCalledWith 'account:cleanup'
 
         it "should not trigger signin events", ->
           expect(@hoodie.trigger).wasNotCalledWith 'account:signin', 'joe@example.com'

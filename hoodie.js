@@ -519,12 +519,14 @@ Hoodie.Account = (function() {
           reason: "account has not been confirmed yet"
         });
       }
-      _this._cleanup({
-        authenticated: true,
-        ownerHash: response.roles[0],
-        username: username
-      });
-      if (!options.silent) {
+      if (options.silent) {
+        _this.authenticated = true;
+      } else {
+        _this._cleanup({
+          authenticated: true,
+          ownerHash: response.roles[0],
+          username: username
+        });
         if (_this.hasAnonymousAccount()) {
           _this.trigger('signin:anonymous', username);
         } else {

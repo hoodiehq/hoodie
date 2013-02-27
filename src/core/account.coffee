@@ -435,15 +435,18 @@ class Hoodie.Account
         return defer.reject error: "unconfirmed", reason: "account has not been confirmed yet"
 
 
-      # before a new user can sign in, things need to be cleaned up.
-      # That's what this event is triggerd for, so other modules can
-      # do their cleanups as well.
-      @_cleanup 
-        authenticated : true
-        ownerHash     : response.roles[0]
-        username      : username
+      # options.silent is true, when a user signed in
+      # with the current username of his account, for
+      # example after his session timed out
+      if options.silent
+        @authenticated = true
 
-      unless options.silent
+      else
+        @_cleanup 
+          authenticated : true
+          ownerHash     : response.roles[0]
+          username      : username
+
         if @hasAnonymousAccount()
           @trigger 'signin:anonymous', username
         else
