@@ -159,9 +159,9 @@ class Hoodie.Account
   #       current username.
   signIn : (username, password = '') ->
     if @username isnt username
-      @signOut(silent: true).pipe => @_sendSignInRequest(username, password)
+      @signOut(silent: true).pipe => @_sendSignInRequest(username, password, verbose: true)
     else 
-      @_sendSignInRequest(username, password, silent: true)
+      @_sendSignInRequest(username, password)
 
   # sign out 
   # ---------
@@ -300,10 +300,16 @@ class Hoodie.Account
   _prefix : 'org.couchdb.user'
 
   # setters
-  _setUsername : (@username)  -> 
+  _setUsername : (username)  -> 
+    return if username is @username
+
+    @username = username
     @hoodie.config.set '_account.username',  @username
 
   _setOwner    : (@ownerHash) -> 
+    return if ownerHash is @ownerHash
+    
+    @ownerHash = ownerHash
     # `ownerHash` is stored with every new object in the createdBy
     # attribute. It does not get changed once it's set. That's why
     # we have to force it to be change for the `$config/hoodie` object.
@@ -372,9 +378,7 @@ class Hoodie.Account
   #     }
   #
   _handleSignUpSucces : (username, password) =>
-    defer = @hoodie.defer()
-
-    (response) =>
+    return (response) =>
       @trigger 'signup', username
       @_doc._rev = response.rev
       @_delayedSignIn(username, password)
@@ -435,13 +439,9 @@ class Hoodie.Account
         return defer.reject error: "unconfirmed", reason: "account has not been confirmed yet"
 
 
-      # options.silent is true, when a user signed in
-      # with the current username of his account, for
-      # example after his session timed out
-      if options.silent
-        @authenticated = true
-
-      else
+      # options.verbose is true, when a user signed via hoodie.account.signIn()
+      # with a username that is not the current one.
+      if options.verbose
         @_cleanup 
           authenticated : true
           ownerHash     : response.roles[0]
@@ -451,6 +451,11 @@ class Hoodie.Account
           @trigger 'signin:anonymous', username
         else
           @trigger 'signin', username
+
+      else
+        @_setUsername username
+        @_setOwner response.roles[0]
+        @authenticated = true
 
       @trigger 'authenticated', username
 

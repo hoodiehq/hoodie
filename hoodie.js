@@ -309,12 +309,12 @@ Hoodie.Account = (function() {
       return this.signOut({
         silent: true
       }).pipe(function() {
-        return _this._sendSignInRequest(username, password);
+        return _this._sendSignInRequest(username, password, {
+          verbose: true
+        });
       });
     } else {
-      return this._sendSignInRequest(username, password, {
-        silent: true
-      });
+      return this._sendSignInRequest(username, password);
     }
   };
 
@@ -419,11 +419,18 @@ Hoodie.Account = (function() {
   Account.prototype._prefix = 'org.couchdb.user';
 
   Account.prototype._setUsername = function(username) {
+    if (username === this.username) {
+      return;
+    }
     this.username = username;
     return this.hoodie.config.set('_account.username', this.username);
   };
 
   Account.prototype._setOwner = function(ownerHash) {
+    this.ownerHash = ownerHash;
+    if (ownerHash === this.ownerHash) {
+      return;
+    }
     this.ownerHash = ownerHash;
     this.hoodie.config.set('createdBy', this.ownerHash);
     return this.hoodie.config.set('_account.ownerHash', this.ownerHash);
@@ -466,9 +473,7 @@ Hoodie.Account = (function() {
   };
 
   Account.prototype._handleSignUpSucces = function(username, password) {
-    var defer,
-      _this = this;
-    defer = this.hoodie.defer();
+    var _this = this;
     return function(response) {
       _this.trigger('signup', username);
       _this._doc._rev = response.rev;
@@ -519,9 +524,7 @@ Hoodie.Account = (function() {
           reason: "account has not been confirmed yet"
         });
       }
-      if (options.silent) {
-        _this.authenticated = true;
-      } else {
+      if (options.verbose) {
         _this._cleanup({
           authenticated: true,
           ownerHash: response.roles[0],
@@ -532,6 +535,10 @@ Hoodie.Account = (function() {
         } else {
           _this.trigger('signin', username);
         }
+      } else {
+        _this._setUsername(username);
+        _this._setOwner(response.roles[0]);
+        _this.authenticated = true;
       }
       _this.trigger('authenticated', username);
       _this.fetch();

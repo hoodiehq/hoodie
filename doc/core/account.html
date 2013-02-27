@@ -88,9 +88,9 @@ Besides the standard sign in we also check if the account has been confirmed
       account that signs in. That applies only if username isn't the same as
       current username.</p></div></div><div class="code"><div class="wrapper">  <span class="nv">signIn : </span><span class="nf">(username, password = &#39;&#39;) -&gt;</span>
     <span class="k">if</span> <span class="nx">@username</span> <span class="o">isnt</span> <span class="nx">username</span>
-      <span class="nx">@signOut</span><span class="p">(</span><span class="nv">silent: </span><span class="kc">true</span><span class="p">).</span><span class="nx">pipe</span> <span class="o">=&gt;</span> <span class="nx">@_sendSignInRequest</span><span class="p">(</span><span class="nx">username</span><span class="p">,</span> <span class="nx">password</span><span class="p">)</span>
+      <span class="nx">@signOut</span><span class="p">(</span><span class="nv">silent: </span><span class="kc">true</span><span class="p">).</span><span class="nx">pipe</span> <span class="o">=&gt;</span> <span class="nx">@_sendSignInRequest</span><span class="p">(</span><span class="nx">username</span><span class="p">,</span> <span class="nx">password</span><span class="p">,</span> <span class="nv">verbose: </span><span class="kc">true</span><span class="p">)</span>
     <span class="k">else</span> 
-      <span class="nx">@_sendSignInRequest</span><span class="p">(</span><span class="nx">username</span><span class="p">,</span> <span class="nx">password</span><span class="p">,</span> <span class="nv">silent: </span><span class="kc">true</span><span class="p">)</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h2 id="sign-out-">sign out </h2></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>uses standard CouchDB API to invalidate a user session (DELETE /_session)</p></div></div><div class="code"><div class="wrapper">  <span class="nv">signOut : </span><span class="nf">(options = {})-&gt;</span>
+      <span class="nx">@_sendSignInRequest</span><span class="p">(</span><span class="nx">username</span><span class="p">,</span> <span class="nx">password</span><span class="p">)</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h2 id="sign-out-">sign out </h2></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>uses standard CouchDB API to invalidate a user session (DELETE /_session)</p></div></div><div class="code"><div class="wrapper">  <span class="nv">signOut : </span><span class="nf">(options = {})-&gt;</span>
 
     <span class="k">unless</span> <span class="nx">@hasAccount</span><span class="p">()</span>
       <span class="k">return</span> <span class="nx">@_cleanup</span><span class="p">().</span><span class="nx">then</span> <span class="o">=&gt;</span>
@@ -163,10 +163,16 @@ implementation of the hoodie API.</p></div></div><div class="code"><div class="w
 
     <span class="nx">@fetch</span><span class="p">()</span>
     <span class="p">.</span><span class="nx">pipe</span><span class="p">(</span><span class="nx">@_handleFetchBeforeDestroySucces</span><span class="p">,</span> <span class="nx">@_handleFetchBeforeDestroyError</span><span class="p">)</span>
-    <span class="p">.</span><span class="nx">pipe</span><span class="p">(</span><span class="nx">@_cleanupAndTriggerSignOut</span><span class="p">)</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h2 id="private">PRIVATE</h2></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>default couchDB user doc prefix</p></div></div><div class="code"><div class="wrapper">  <span class="nv">_prefix : </span><span class="s">&#39;org.couchdb.user&#39;</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>setters</p></div></div><div class="code"><div class="wrapper">  <span class="nv">_setUsername : </span><span class="nf">(@username)  -&gt;</span> 
+    <span class="p">.</span><span class="nx">pipe</span><span class="p">(</span><span class="nx">@_cleanupAndTriggerSignOut</span><span class="p">)</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h2 id="private">PRIVATE</h2></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>default couchDB user doc prefix</p></div></div><div class="code"><div class="wrapper">  <span class="nv">_prefix : </span><span class="s">&#39;org.couchdb.user&#39;</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>setters</p></div></div><div class="code"><div class="wrapper">  <span class="nv">_setUsername : </span><span class="nf">(username)  -&gt;</span> 
+    <span class="k">return</span> <span class="k">if</span> <span class="nx">username</span> <span class="o">is</span> <span class="nx">@username</span>
+
+    <span class="vi">@username = </span><span class="nx">username</span>
     <span class="nx">@hoodie</span><span class="p">.</span><span class="nx">config</span><span class="p">.</span><span class="nx">set</span> <span class="s">&#39;_account.username&#39;</span><span class="p">,</span>  <span class="nx">@username</span>
 
-  <span class="nv">_setOwner    : </span><span class="nf">(@ownerHash) -&gt;</span> </div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p><code>ownerHash</code> is stored with every new object in the createdBy
+  <span class="nv">_setOwner    : </span><span class="nf">(@ownerHash) -&gt;</span> 
+    <span class="k">return</span> <span class="k">if</span> <span class="nx">ownerHash</span> <span class="o">is</span> <span class="nx">@ownerHash</span>
+    
+    <span class="vi">@ownerHash = </span><span class="nx">ownerHash</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p><code>ownerHash</code> is stored with every new object in the createdBy
 attribute. It does not get changed once it's set. That's why
 we have to force it to be change for the <code>$config/hoodie</code> object.</p></div></div><div class="code"><div class="wrapper">    <span class="nx">@hoodie</span><span class="p">.</span><span class="nx">config</span><span class="p">.</span><span class="nx">set</span> <span class="s">&#39;createdBy&#39;</span><span class="p">,</span> <span class="nx">@ownerHash</span>
     <span class="nx">@hoodie</span><span class="p">.</span><span class="nx">config</span><span class="p">.</span><span class="nx">set</span> <span class="s">&#39;_account.ownerHash&#39;</span><span class="p">,</span> <span class="nx">@ownerHash</span>
@@ -222,9 +228,7 @@ Response looks like:</p></div></div><div class="code"><div class="wrapper">  <sp
 }
 </code></pre></div></div><div class="code"><div class="wrapper">  <span class="c1">#</span>
   <span class="nv">_handleSignUpSucces : </span><span class="nf">(username, password) =&gt;</span>
-    <span class="nv">defer = </span><span class="nx">@hoodie</span><span class="p">.</span><span class="nx">defer</span><span class="p">()</span>
-
-    <span class="nf">(response) =&gt;</span>
+    <span class="k">return</span> <span class="nf">(response) =&gt;</span>
       <span class="nx">@trigger</span> <span class="s">&#39;signup&#39;</span><span class="p">,</span> <span class="nx">username</span>
       <span class="vi">@_doc._rev = </span><span class="nx">response</span><span class="p">.</span><span class="nx">rev</span>
       <span class="nx">@_delayedSignIn</span><span class="p">(</span><span class="nx">username</span><span class="p">,</span> <span class="nx">password</span><span class="p">)</span>
@@ -269,12 +273,8 @@ worked out, it adds the role "confirmed" to the user. If the role is
 not present yet, it might be that the worker didn't pick up the the 
 user doc yet, or there was an error. In this cases, we reject the promise
 with an "uncofirmed error"</p></div></div><div class="code"><div class="wrapper">      <span class="k">unless</span> <span class="o">~</span><span class="nx">response</span><span class="p">.</span><span class="nx">roles</span><span class="p">.</span><span class="nx">indexOf</span><span class="p">(</span><span class="s">&quot;confirmed&quot;</span><span class="p">)</span>
-        <span class="k">return</span> <span class="nx">defer</span><span class="p">.</span><span class="nx">reject</span> <span class="nv">error: </span><span class="s">&quot;unconfirmed&quot;</span><span class="p">,</span> <span class="nv">reason: </span><span class="s">&quot;account has not been confirmed yet&quot;</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>options.silent is true, when a user signed in
-with the current username of his account, for
-example after his session timed out</p></div></div><div class="code"><div class="wrapper">      <span class="k">if</span> <span class="nx">options</span><span class="p">.</span><span class="nx">silent</span>
-        <span class="vi">@authenticated = </span><span class="kc">true</span>
-
-      <span class="k">else</span>
+        <span class="k">return</span> <span class="nx">defer</span><span class="p">.</span><span class="nx">reject</span> <span class="nv">error: </span><span class="s">&quot;unconfirmed&quot;</span><span class="p">,</span> <span class="nv">reason: </span><span class="s">&quot;account has not been confirmed yet&quot;</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>options.verbose is true, when a user signed via hoodie.account.signIn()
+with a username that is not the current one.</p></div></div><div class="code"><div class="wrapper">      <span class="k">if</span> <span class="nx">options</span><span class="p">.</span><span class="nx">verbose</span>
         <span class="nx">@_cleanup</span> 
           <span class="nv">authenticated : </span><span class="kc">true</span>
           <span class="nv">ownerHash     : </span><span class="nx">response</span><span class="p">.</span><span class="nx">roles</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
@@ -284,6 +284,11 @@ example after his session timed out</p></div></div><div class="code"><div class=
           <span class="nx">@trigger</span> <span class="s">&#39;signin:anonymous&#39;</span><span class="p">,</span> <span class="nx">username</span>
         <span class="k">else</span>
           <span class="nx">@trigger</span> <span class="s">&#39;signin&#39;</span><span class="p">,</span> <span class="nx">username</span>
+
+      <span class="k">else</span>
+        <span class="nx">@_setUsername</span> <span class="nx">username</span>
+        <span class="nx">@_setOwner</span> <span class="nx">response</span><span class="p">.</span><span class="nx">roles</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="vi">@authenticated = </span><span class="kc">true</span>
 
       <span class="nx">@trigger</span> <span class="s">&#39;authenticated&#39;</span><span class="p">,</span> <span class="nx">username</span>
 
