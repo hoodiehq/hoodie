@@ -90,7 +90,7 @@ Besides the standard sign in we also check if the account has been confirmed
     <span class="k">if</span> <span class="nx">@username</span> <span class="o">isnt</span> <span class="nx">username</span>
       <span class="nx">@signOut</span><span class="p">(</span><span class="nv">silent: </span><span class="kc">true</span><span class="p">).</span><span class="nx">pipe</span> <span class="o">=&gt;</span> <span class="nx">@_sendSignInRequest</span><span class="p">(</span><span class="nx">username</span><span class="p">,</span> <span class="nx">password</span><span class="p">)</span>
     <span class="k">else</span> 
-      <span class="nx">@_sendSignInRequest</span><span class="p">(</span><span class="nx">username</span><span class="p">,</span> <span class="nx">password</span><span class="p">)</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h2 id="sign-out-">sign out </h2></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>uses standard CouchDB API to invalidate a user session (DELETE /_session)</p></div></div><div class="code"><div class="wrapper">  <span class="nv">signOut : </span><span class="nf">(options = {})-&gt;</span>
+      <span class="nx">@_sendSignInRequest</span><span class="p">(</span><span class="nx">username</span><span class="p">,</span> <span class="nx">password</span><span class="p">,</span> <span class="nv">silent: </span><span class="kc">true</span><span class="p">)</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h2 id="sign-out-">sign out </h2></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>uses standard CouchDB API to invalidate a user session (DELETE /_session)</p></div></div><div class="code"><div class="wrapper">  <span class="nv">signOut : </span><span class="nf">(options = {})-&gt;</span>
 
     <span class="k">return</span> <span class="nx">@_cleanup</span><span class="p">(</span><span class="nx">options</span><span class="p">)</span> <span class="k">unless</span> <span class="nx">@hasAccount</span><span class="p">()</span>
 
@@ -249,35 +249,37 @@ Response looks like:</p></div></div><div class="code"><div class="wrapper">  <sp
     ]
 }
 </code></pre></div></div><div class="code"><div class="wrapper">  <span class="c1">#</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>we want to turn it into "test1", "mvu85hy" or reject the promise
-in case an error occured ("roles" array contains "error")</p></div></div><div class="code"><div class="wrapper">  <span class="nv">_handleSignInSuccess : </span><span class="nf">(response) =&gt;</span>
-    <span class="nv">defer    = </span><span class="nx">@hoodie</span><span class="p">.</span><span class="nx">defer</span><span class="p">()</span>
-    <span class="nv">username = </span><span class="nx">response</span><span class="p">.</span><span class="nx">name</span><span class="p">.</span><span class="nx">replace</span><span class="p">(</span><span class="sr">/^user(_anonymous)?\//</span><span class="p">,</span> <span class="s">&#39;&#39;</span><span class="p">)</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>if an error occured, the userDB worker stores it to the $error attribute
+in case an error occured ("roles" array contains "error")</p></div></div><div class="code"><div class="wrapper">  <span class="nv">_handleSignInSuccess : </span><span class="nf">(options = {}) =&gt;</span>
+    <span class="k">return</span> <span class="nf">(response) =&gt;</span>
+      <span class="nv">defer    = </span><span class="nx">@hoodie</span><span class="p">.</span><span class="nx">defer</span><span class="p">()</span>
+      <span class="nv">username = </span><span class="nx">response</span><span class="p">.</span><span class="nx">name</span><span class="p">.</span><span class="nx">replace</span><span class="p">(</span><span class="sr">/^user(_anonymous)?\//</span><span class="p">,</span> <span class="s">&#39;&#39;</span><span class="p">)</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>if an error occured, the userDB worker stores it to the $error attribute
 and adds the "error" role to the users doc object. If the user has the
 "error" role, we need to fetch his _users doc to find out what the error
-is, before we can reject the promise.</p></div></div><div class="code"><div class="wrapper">    <span class="c1">#</span>
-    <span class="k">if</span> <span class="o">~</span><span class="nx">response</span><span class="p">.</span><span class="nx">roles</span><span class="p">.</span><span class="nx">indexOf</span><span class="p">(</span><span class="s">&quot;error&quot;</span><span class="p">)</span>
-      <span class="nx">@fetch</span><span class="p">(</span><span class="nx">username</span><span class="p">)</span>
-      <span class="p">.</span><span class="nx">fail</span><span class="p">(</span><span class="nx">defer</span><span class="p">.</span><span class="nx">reject</span><span class="p">)</span>
-      <span class="p">.</span><span class="nx">done</span> <span class="o">=&gt;</span>
-        <span class="nx">defer</span><span class="p">.</span><span class="nx">reject</span> <span class="nv">error: </span><span class="s">&quot;error&quot;</span><span class="p">,</span> <span class="nv">reason: </span><span class="nx">@_doc</span><span class="p">.</span><span class="nx">$error</span>
-      <span class="k">return</span> <span class="nx">defer</span><span class="p">.</span><span class="nx">promise</span><span class="p">()</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>When the userDB worker created the database for the user and everthing
+is, before we can reject the promise.</p></div></div><div class="code"><div class="wrapper">      <span class="c1">#</span>
+      <span class="k">if</span> <span class="o">~</span><span class="nx">response</span><span class="p">.</span><span class="nx">roles</span><span class="p">.</span><span class="nx">indexOf</span><span class="p">(</span><span class="s">&quot;error&quot;</span><span class="p">)</span>
+        <span class="nx">@fetch</span><span class="p">(</span><span class="nx">username</span><span class="p">)</span>
+        <span class="p">.</span><span class="nx">fail</span><span class="p">(</span><span class="nx">defer</span><span class="p">.</span><span class="nx">reject</span><span class="p">)</span>
+        <span class="p">.</span><span class="nx">done</span> <span class="o">=&gt;</span>
+          <span class="nx">defer</span><span class="p">.</span><span class="nx">reject</span> <span class="nv">error: </span><span class="s">&quot;error&quot;</span><span class="p">,</span> <span class="nv">reason: </span><span class="nx">@_doc</span><span class="p">.</span><span class="nx">$error</span>
+        <span class="k">return</span> <span class="nx">defer</span><span class="p">.</span><span class="nx">promise</span><span class="p">()</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>When the userDB worker created the database for the user and everthing
 worked out, it adds the role "confirmed" to the user. If the role is
 not present yet, it might be that the worker didn't pick up the the 
 user doc yet, or there was an error. In this cases, we reject the promise
-with an "uncofirmed error"</p></div></div><div class="code"><div class="wrapper">    <span class="k">unless</span> <span class="o">~</span><span class="nx">response</span><span class="p">.</span><span class="nx">roles</span><span class="p">.</span><span class="nx">indexOf</span><span class="p">(</span><span class="s">&quot;confirmed&quot;</span><span class="p">)</span>
-      <span class="k">return</span> <span class="nx">defer</span><span class="p">.</span><span class="nx">reject</span> <span class="nv">error: </span><span class="s">&quot;unconfirmed&quot;</span><span class="p">,</span> <span class="nv">reason: </span><span class="s">&quot;account has not been confirmed yet&quot;</span>
-    
-    <span class="vi">@_authenticated = </span><span class="kc">true</span>
-    <span class="nx">@_setOwner</span>    <span class="nx">response</span><span class="p">.</span><span class="nx">roles</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-    <span class="nx">@_setUsername</span> <span class="nx">username</span>
+with an "uncofirmed error"</p></div></div><div class="code"><div class="wrapper">      <span class="k">unless</span> <span class="o">~</span><span class="nx">response</span><span class="p">.</span><span class="nx">roles</span><span class="p">.</span><span class="nx">indexOf</span><span class="p">(</span><span class="s">&quot;confirmed&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="nx">defer</span><span class="p">.</span><span class="nx">reject</span> <span class="nv">error: </span><span class="s">&quot;unconfirmed&quot;</span><span class="p">,</span> <span class="nv">reason: </span><span class="s">&quot;account has not been confirmed yet&quot;</span>
+      
+      <span class="vi">@_authenticated = </span><span class="kc">true</span>
+      <span class="nx">@_setOwner</span>    <span class="nx">response</span><span class="p">.</span><span class="nx">roles</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+      <span class="nx">@_setUsername</span> <span class="nx">username</span>
 
-    <span class="k">if</span> <span class="nx">@hasAnonymousAccount</span><span class="p">()</span>
-      <span class="nx">@trigger</span> <span class="s">&#39;signin:anonymous&#39;</span><span class="p">,</span> <span class="nx">username</span>
-    <span class="k">else</span>
-      <span class="nx">@trigger</span> <span class="s">&#39;signin&#39;</span><span class="p">,</span> <span class="nx">username</span>
+      <span class="k">unless</span> <span class="nx">options</span><span class="p">.</span><span class="nx">silent</span>
+        <span class="k">if</span> <span class="nx">@hasAnonymousAccount</span><span class="p">()</span>
+          <span class="nx">@trigger</span> <span class="s">&#39;signin:anonymous&#39;</span><span class="p">,</span> <span class="nx">username</span>
+        <span class="k">else</span>
+          <span class="nx">@trigger</span> <span class="s">&#39;signin&#39;</span><span class="p">,</span> <span class="nx">username</span>
 
-    <span class="nx">@fetch</span><span class="p">()</span>
-    <span class="nx">defer</span><span class="p">.</span><span class="nx">resolve</span><span class="p">(</span><span class="nx">@username</span><span class="p">,</span> <span class="nx">response</span><span class="p">.</span><span class="nx">roles</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+      <span class="nx">@fetch</span><span class="p">()</span>
+      <span class="nx">defer</span><span class="p">.</span><span class="nx">resolve</span><span class="p">(</span><span class="nx">@username</span><span class="p">,</span> <span class="nx">response</span><span class="p">.</span><span class="nx">roles</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
 
   <span class="c1">#</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>check for the status of a password reset. It might take
 a while until the password reset worker picks up the job
@@ -445,14 +447,14 @@ to clean up local data before starting a new session. But as
 other methods like signUp or changePassword do also need to
 sign in the user (again), these need to send the sign in 
 request but without a signOut beforehand, as the user remains
-the same.</p></div></div><div class="code"><div class="wrapper">  <span class="nv">_sendSignInRequest: </span><span class="nf">(username, password) -&gt;</span>
-    <span class="nv">options = data: </span>
-                <span class="nv">name      : </span><span class="nx">@_userKey</span><span class="p">(</span><span class="nx">username</span><span class="p">)</span>
-                <span class="nv">password  : </span><span class="nx">password</span>
+the same.</p></div></div><div class="code"><div class="wrapper">  <span class="nv">_sendSignInRequest: </span><span class="nf">(username, password, options) -&gt;</span>
+    <span class="nv">requestOptions = data: </span>
+                       <span class="nv">name      : </span><span class="nx">@_userKey</span><span class="p">(</span><span class="nx">username</span><span class="p">)</span>
+                       <span class="nv">password  : </span><span class="nx">password</span>
 
     <span class="nx">@_withPreviousRequestsAborted</span> <span class="s">&#39;signIn&#39;</span><span class="p">,</span> <span class="o">=&gt;</span>
-      <span class="nv">promise = </span><span class="nx">@hoodie</span><span class="p">.</span><span class="nx">request</span><span class="p">(</span><span class="s">&#39;POST&#39;</span><span class="p">,</span> <span class="s">&#39;/_session&#39;</span><span class="p">,</span> <span class="nx">options</span><span class="p">)</span>
-      <span class="nx">promise</span><span class="p">.</span><span class="nx">pipe</span><span class="p">(</span><span class="nx">@_handleSignInSuccess</span><span class="p">,</span> <span class="nx">@_handleRequestError</span><span class="p">)</span>
+      <span class="nv">promise = </span><span class="nx">@hoodie</span><span class="p">.</span><span class="nx">request</span><span class="p">(</span><span class="s">&#39;POST&#39;</span><span class="p">,</span> <span class="s">&#39;/_session&#39;</span><span class="p">,</span> <span class="nx">requestOptions</span><span class="p">)</span>
+      <span class="nx">promise</span><span class="p">.</span><span class="nx">pipe</span><span class="p">(</span><span class="nx">@_handleSignInSuccess</span><span class="p">(</span><span class="nx">options</span><span class="p">),</span> <span class="nx">@_handleRequestError</span><span class="p">)</span>
 
   <span class="c1">#</span>
   <span class="nv">_now : </span><span class="nf">-&gt;</span> <span class="k">new</span> <span class="nb">Date</span></div></div></div></div></body></html>

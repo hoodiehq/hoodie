@@ -140,7 +140,7 @@ will be overwritten </p></div></div><div class="code"><div class="wrapper">  <sp
       <span class="nx">@_addRevisionTo</span> <span class="nx">object</span>
       <span class="nx">objectsForRemote</span><span class="p">.</span><span class="nx">push</span> <span class="nx">object</span>
     
-    <span class="vi">@_pushRequest = </span><span class="nx">@request</span> <span class="s">&#39;POST&#39;</span><span class="p">,</span> <span class="s">&quot;/_bulk_docs&quot;</span>
+    <span class="vi">@_pushRequest = </span><span class="nx">@request</span> <span class="s">&#39;POST&#39;</span><span class="p">,</span> <span class="s">&quot;/_bulk_docs&quot;</span><span class="p">,</span>
       <span class="nv">data :</span>
         <span class="nv">docs      : </span><span class="nx">objectsForRemote</span>
         <span class="nv">new_edits : </span><span class="kc">false</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h2 id="sync-changes">sync changes</h2></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>push objects, then pull updates.</p></div></div><div class="code"><div class="wrapper">  <span class="nv">sync : </span><span class="nf">(objects) =&gt;</span>

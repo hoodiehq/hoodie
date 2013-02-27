@@ -161,7 +161,7 @@ class Hoodie.Account
     if @username isnt username
       @signOut(silent: true).pipe => @_sendSignInRequest(username, password)
     else 
-      @_sendSignInRequest(username, password)
+      @_sendSignInRequest(username, password, silent: true)
 
   # sign out 
   # ---------
@@ -407,41 +407,43 @@ class Hoodie.Account
   #
   # we want to turn it into "test1", "mvu85hy" or reject the promise
   # in case an error occured ("roles" array contains "error")
-  _handleSignInSuccess : (response) =>
-    defer    = @hoodie.defer()
-    username = response.name.replace(/^user(_anonymous)?\//, '')
+  _handleSignInSuccess : (options = {}) =>
+    return (response) =>
+      defer    = @hoodie.defer()
+      username = response.name.replace(/^user(_anonymous)?\//, '')
 
-    # if an error occured, the userDB worker stores it to the $error attribute
-    # and adds the "error" role to the users doc object. If the user has the
-    # "error" role, we need to fetch his _users doc to find out what the error
-    # is, before we can reject the promise.
-    #
-    if ~response.roles.indexOf("error")
-      @fetch(username)
-      .fail(defer.reject)
-      .done =>
-        defer.reject error: "error", reason: @_doc.$error
-      return defer.promise()
+      # if an error occured, the userDB worker stores it to the $error attribute
+      # and adds the "error" role to the users doc object. If the user has the
+      # "error" role, we need to fetch his _users doc to find out what the error
+      # is, before we can reject the promise.
+      #
+      if ~response.roles.indexOf("error")
+        @fetch(username)
+        .fail(defer.reject)
+        .done =>
+          defer.reject error: "error", reason: @_doc.$error
+        return defer.promise()
 
-    # When the userDB worker created the database for the user and everthing
-    # worked out, it adds the role "confirmed" to the user. If the role is
-    # not present yet, it might be that the worker didn't pick up the the 
-    # user doc yet, or there was an error. In this cases, we reject the promise
-    # with an "uncofirmed error"
-    unless ~response.roles.indexOf("confirmed")
-      return defer.reject error: "unconfirmed", reason: "account has not been confirmed yet"
-    
-    @_authenticated = true
-    @_setOwner    response.roles[0]
-    @_setUsername username
+      # When the userDB worker created the database for the user and everthing
+      # worked out, it adds the role "confirmed" to the user. If the role is
+      # not present yet, it might be that the worker didn't pick up the the 
+      # user doc yet, or there was an error. In this cases, we reject the promise
+      # with an "uncofirmed error"
+      unless ~response.roles.indexOf("confirmed")
+        return defer.reject error: "unconfirmed", reason: "account has not been confirmed yet"
+      
+      @_authenticated = true
+      @_setOwner    response.roles[0]
+      @_setUsername username
 
-    if @hasAnonymousAccount()
-      @trigger 'signin:anonymous', username
-    else
-      @trigger 'signin', username
+      unless options.silent
+        if @hasAnonymousAccount()
+          @trigger 'signin:anonymous', username
+        else
+          @trigger 'signin', username
 
-    @fetch()
-    defer.resolve(@username, response.roles[0])
+      @fetch()
+      defer.resolve(@username, response.roles[0])
 
   #
   # check for the status of a password reset. It might take
@@ -670,14 +672,14 @@ class Hoodie.Account
   # sign in the user (again), these need to send the sign in 
   # request but without a signOut beforehand, as the user remains
   # the same.
-  _sendSignInRequest: (username, password) ->
-    options = data: 
-                name      : @_userKey(username)
-                password  : password
+  _sendSignInRequest: (username, password, options) ->
+    requestOptions = data: 
+                       name      : @_userKey(username)
+                       password  : password
 
     @_withPreviousRequestsAborted 'signIn', =>
-      promise = @hoodie.request('POST', '/_session', options)
-      promise.pipe(@_handleSignInSuccess, @_handleRequestError)
+      promise = @hoodie.request('POST', '/_session', requestOptions)
+      promise.pipe(@_handleSignInSuccess(options), @_handleRequestError)
 
   #
   _now : -> new Date

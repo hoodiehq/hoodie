@@ -474,6 +474,11 @@ describe "Hoodie.Account", ->
         expect(@type).toBe 'POST'
         expect(@path).toBe  '/_session'
 
+      it "should not trigger signin events", ->
+        expect(@hoodie.trigger).wasNotCalledWith 'account:signin', 'joe@example.com'
+        expect(@hoodie.trigger).wasNotCalledWith 'account:signin:anonymous', 'joe@example.com'
+         
+
     _when "signout errors", ->
       beforeEach ->
         @signOutDefer.reject reason: 'a unicorn just cried'
@@ -505,6 +510,8 @@ describe "Hoodie.Account", ->
             @response = {"ok":true,"name":"user/joe@example.com","roles":["user_hash","confirmed"]}
             @requestDefer.resolve @response
             spyOn(@hoodie.config, "set")
+            delete @account.username
+            @hoodie.trigger.reset()
           
           _and "user has an anonyomous account", ->
             beforeEach ->
