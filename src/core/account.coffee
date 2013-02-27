@@ -169,10 +169,12 @@ class Hoodie.Account
   # uses standard CouchDB API to invalidate a user session (DELETE /_session)
   signOut : (options = {})->
 
-    return @_cleanup(options) unless @hasAccount()
+    unless @hasAccount()
+      return @_cleanup().then =>
+        @trigger 'signout' unless options.silent
 
     @hoodie.remote.disconnect()
-    @_sendSignOutRequest().pipe(@_cleanup)
+    @_sendSignOutRequest().pipe(@_cleanupAndTriggerSignOut)
   
   
   # On
@@ -285,12 +287,11 @@ class Hoodie.Account
   destroy : ->
 
     unless @hasAccount()
-      return @_cleanup()
+      return @_cleanupAndTriggerSignOut()
 
     @fetch()
     .pipe(@_handleFetchBeforeDestroySucces, @_handleFetchBeforeDestroyError)
-    .pipe(@_cleanup)
-
+    .pipe(@_cleanupAndTriggerSignOut)
 
   # PRIVATE
   # ---------
@@ -328,6 +329,7 @@ class Hoodie.Account
       @_authenticated = true
       @_setUsername response.userCtx.name.replace(/^user(_anonymous)?\//, '')
       @_setOwner    response.userCtx.roles[0]
+      @trigger 'authenticated', @username
       return @hoodie.defer().resolve(@username).promise()
 
     if @hasAnonymousAccount()
@@ -431,16 +433,23 @@ class Hoodie.Account
       # with an "uncofirmed error"
       unless ~response.roles.indexOf("confirmed")
         return defer.reject error: "unconfirmed", reason: "account has not been confirmed yet"
-      
-      @_authenticated = true
-      @_setOwner    response.roles[0]
-      @_setUsername username
+
+
+      # before a new user can sign in, things need to be cleaned up.
+      # That's what this event is triggerd for, so other modules can
+      # do their cleanups as well.
+      @_cleanup 
+        authenticated : true
+        ownerHash     : response.roles[0]
+        username      : username
 
       unless options.silent
         if @hasAnonymousAccount()
           @trigger 'signin:anonymous', username
         else
           @trigger 'signin', username
+
+      @trigger 'authenticated', username
 
       @fetch()
       defer.resolve(@username, response.roles[0])
@@ -561,16 +570,21 @@ class Hoodie.Account
       @hoodie.defer().reject(error).promise()
 
   #
-  # remove everythng form the current account, so a new account can be initiated.
+  # remove everything form the current account, so a new account can be initiated.
   _cleanup : (options = {}) =>
-    delete @username
-    delete @_authenticated
+    @trigger 'cleanup'
+    @_authenticated = options.authenticated
 
     @hoodie.config.clear()
-    @_setOwner @hoodie.uuid()
+    @_setUsername options.username
+    @_setOwner    options.ownerHash or @hoodie.uuid()
 
-    @trigger 'signout' unless options.silent
     @hoodie.defer().resolve().promise()
+
+  #
+  _cleanupAndTriggerSignOut : =>
+    @_cleanup().then =>
+      @trigger 'signout'
     
 
   #

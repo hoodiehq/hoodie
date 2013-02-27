@@ -27,13 +27,13 @@ class Hoodie.AccountRemote extends Hoodie.Remote
     # set name to user's DB name
     @name = @hoodie.account.db()
     
-    # overwrite default with _remote.connected config, if set
-    @connected = @hoodie.config.get('_remote.connected') if @hoodie.config.get('_remote.connected')?
+    # we're always connected to our own db
+    @connected = true
 
     # do not prefix files for my own remote
     options.prefix = ''
 
-    @hoodie.on 'account:signin',  @_handleSignIn
+    @hoodie.on 'account:authenticated',  @_handleAuthenticate
     @hoodie.on 'account:signout', @disconnect
     
     super(@hoodie, options)
@@ -46,11 +46,8 @@ class Hoodie.AccountRemote extends Hoodie.Remote
   # 
   connect : =>
     @hoodie.account.authenticate().pipe => 
-      @hoodie.config.set '_remote.connected', true
       @hoodie.on 'store:idle', @push
-
       @push()
-
       super
 
 
@@ -59,9 +56,7 @@ class Hoodie.AccountRemote extends Hoodie.Remote
 
   # 
   disconnect: =>
-    @hoodie.config.set '_remote.connected', false
     @hoodie.unbind 'store:idle', @push
-
     super
     
 
@@ -109,6 +104,6 @@ class Hoodie.AccountRemote extends Hoodie.Remote
   # ---------
 
   # 
-  _handleSignIn : =>
+  _handleAuthenticate : =>
     @name = @hoodie.account.db()
     @connect()

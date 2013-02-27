@@ -32,8 +32,8 @@ describe "Hoodie.AccountRemote", ->
       new Hoodie.AccountRemote @hoodie
       expect(Hoodie.AccountRemote::connect).wasCalled()
 
-    it "should subscribe to `signin` event", ->
-      expect(@hoodie.on).wasCalledWith 'account:signin', @remote._handleSignIn
+    it "should subscribe to `authenticated` event", ->
+      expect(@hoodie.on).wasCalledWith 'account:authenticated', @remote._handleAuthenticate
 
     it "should subscribe to `signout` event", ->
       spyOn(Hoodie.AccountRemote::, "disconnect")
@@ -43,20 +43,8 @@ describe "Hoodie.AccountRemote", ->
       callback()
       expect(Hoodie.AccountRemote::disconnect).wasCalled()
       
-    _when "config remote.sync is false", ->
-      beforeEach ->
-        spyOn(@hoodie.config, "get").andReturn false
-        @remote = new Hoodie.AccountRemote @hoodie
-        
-      it "should set connected to false", ->
-        expect(@remote.isConnected()).toBe false
-
-      it "should not start syncing", ->
-        spyOn(Hoodie.AccountRemote::, "connect")
-        new Hoodie.AccountRemote @hoodie
-        expect(Hoodie.AccountRemote::connect).wasNotCalled()
-      
-
+    it "should set connected to true", ->
+      expect(@remote.isConnected()).toBe true
 
   describe "#connect()", ->
     beforeEach ->
@@ -75,11 +63,6 @@ describe "Hoodie.AccountRemote", ->
         @remote.connected = false
         @remote.connect()
         expect(@remote.connected).toBe true
-      
-      it "should set config _remote.connected to true", ->
-        spyOn(@hoodie.config, "set")
-        @remote.connect()
-        expect(@hoodie.config.set).wasCalledWith '_remote.connected', true
 
       it "should subscribe to store:idle event", ->
         @remote.connect()
@@ -93,7 +76,7 @@ describe "Hoodie.AccountRemote", ->
       _and "user signs in, it should connect", ->
         beforeEach ->
           spyOn(@remote, "connect")
-          @remote._handleSignIn()
+          @remote._handleAuthenticate()
 
         it "should connect", ->
           expect(@remote.connect).wasCalled()
@@ -105,15 +88,9 @@ describe "Hoodie.AccountRemote", ->
       @remote.disconnect()
       expect(@hoodie.unbind).wasCalledWith 'store:idle', @remote.push
 
-    it "should set _remote.connected to false", ->
-      @remote._sync = true
+    it "should set connected to false", ->
       @remote.disconnect()
       expect(@remote.isConnected()).toBeFalsy()
-    
-    it "should set config remote.connected to false", ->
-      spyOn(@hoodie.config, "set")
-      @remote.disconnect()
-      expect(@hoodie.config.set).wasCalledWith '_remote.connected', false
   # /#disconnect()
 
   describe "#getSinceNr()", ->

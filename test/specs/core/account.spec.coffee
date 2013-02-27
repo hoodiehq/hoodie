@@ -146,6 +146,9 @@ describe "Hoodie.Account", ->
         it "should set account.ownerHash", ->
            expect(@account.ownerHash).toBe 'user_hash'
            expect(@hoodie.config.set).wasCalledWith '_account.ownerHash', 'user_hash'
+
+        it "should trigger authenticated event", ->
+           expect(@hoodie.trigger).wasCalledWith 'account:authenticated', 'joe@example.com'
       
       # {"ok":true,"userCtx":{"name":null,"roles":[]},"info":{"authenticationDb":"_users","authenticationHandlers":["oauth","cookie","default"]}}
       _when "authentication request is successful and returns `name: null`", ->
@@ -474,10 +477,21 @@ describe "Hoodie.Account", ->
         expect(@type).toBe 'POST'
         expect(@path).toBe  '/_session'
 
-      it "should not trigger signin events", ->
-        expect(@hoodie.trigger).wasNotCalledWith 'account:signin', 'joe@example.com'
-        expect(@hoodie.trigger).wasNotCalledWith 'account:signin:anonymous', 'joe@example.com'
-         
+      _and "signIn successful", ->
+        beforeEach ->
+          @response = {"ok":true,"name":"user/joe@example.com","roles":["user_hash","confirmed"]}
+          @requestDefer.resolve @response
+
+        it "should trigger `account:cleanup` event", ->
+          @account.signIn('joe@example.com', 'secret')
+          expect(@hoodie.trigger).wasCalledWith 'account:cleanup'
+
+        it "should not trigger signin events", ->
+          expect(@hoodie.trigger).wasNotCalledWith 'account:signin', 'joe@example.com'
+          expect(@hoodie.trigger).wasNotCalledWith 'account:signin:anonymous', 'joe@example.com'
+
+        it "should trigger authenticated event", ->
+          expect(@hoodie.trigger).wasCalledWith 'account:authenticated', 'joe@example.com'
 
     _when "signout errors", ->
       beforeEach ->
@@ -516,18 +530,34 @@ describe "Hoodie.Account", ->
           _and "user has an anonyomous account", ->
             beforeEach ->
               spyOn(@account, "hasAnonymousAccount").andReturn true
+
+            it "should trigger `account:cleanup` event", ->
+              @account.signIn('joe@example.com', 'secret')
+              expect(@hoodie.trigger).wasCalledWith 'account:cleanup'
             
             it "should trigger `account:signin:anonymous` event", ->
               @account.signIn('joe@example.com', 'secret')
               expect(@hoodie.trigger).wasCalledWith 'account:signin:anonymous', 'joe@example.com'
 
+            it "should trigger `account:authenticated` event", ->
+              @account.signIn('joe@example.com', 'secret')
+              expect(@hoodie.trigger).wasCalledWith 'account:authenticated', 'joe@example.com'
+
           _and "user has a manual account", ->
             beforeEach ->
               spyOn(@account, "hasAnonymousAccount").andReturn false
+
+            it "should trigger `account:cleanup` event", ->
+              @account.signIn('joe@example.com', 'secret')
+              expect(@hoodie.trigger).wasCalledWith 'account:cleanup'
             
             it "should trigger `account:signin` event", ->
               @account.signIn('joe@example.com', 'secret')
               expect(@hoodie.trigger).wasCalledWith 'account:signin', 'joe@example.com'
+
+            it "should trigger `account:authenticated` event", ->
+              @account.signIn('joe@example.com', 'secret')
+              expect(@hoodie.trigger).wasCalledWith 'account:authenticated', 'joe@example.com'
           
           it "should set @username", ->
              @account.signIn('joe@example.com', 'secret')

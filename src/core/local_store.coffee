@@ -487,8 +487,7 @@ class Hoodie.LocalStore extends Hoodie.Store
   _subscribeToOutsideEvents : ->
 
     # handle sign ups / outs
-    @hoodie.on 'account:signin', @clear
-    @hoodie.on 'account:signout', @clear
+    @hoodie.on 'account:cleanup', @clear
     @hoodie.on 'account:signup',  @markAllAsChanged
 
     # handle remote events

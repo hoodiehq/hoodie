@@ -187,6 +187,7 @@ Hoodie.Account = (function() {
     this.hoodie = hoodie;
     this._handleChangeUsernameAndPasswordRequest = __bind(this._handleChangeUsernameAndPasswordRequest, this);
     this._sendChangeUsernameAndPasswordRequest = __bind(this._sendChangeUsernameAndPasswordRequest, this);
+    this._cleanupAndTriggerSignOut = __bind(this._cleanupAndTriggerSignOut, this);
     this._cleanup = __bind(this._cleanup, this);
     this._handleFetchBeforeDestroyError = __bind(this._handleFetchBeforeDestroyError, this);
     this._handleFetchBeforeDestroySucces = __bind(this._handleFetchBeforeDestroySucces, this);
@@ -318,14 +319,19 @@ Hoodie.Account = (function() {
   };
 
   Account.prototype.signOut = function(options) {
+    var _this = this;
     if (options == null) {
       options = {};
     }
     if (!this.hasAccount()) {
-      return this._cleanup(options);
+      return this._cleanup().then(function() {
+        if (!options.silent) {
+          return _this.trigger('signout');
+        }
+      });
     }
     this.hoodie.remote.disconnect();
-    return this._sendSignOutRequest().pipe(this._cleanup);
+    return this._sendSignOutRequest().pipe(this._cleanupAndTriggerSignOut);
   };
 
   Account.prototype.on = function(event, cb) {
@@ -405,9 +411,9 @@ Hoodie.Account = (function() {
 
   Account.prototype.destroy = function() {
     if (!this.hasAccount()) {
-      return this._cleanup();
+      return this._cleanupAndTriggerSignOut();
     }
-    return this.fetch().pipe(this._handleFetchBeforeDestroySucces, this._handleFetchBeforeDestroyError).pipe(this._cleanup);
+    return this.fetch().pipe(this._handleFetchBeforeDestroySucces, this._handleFetchBeforeDestroyError).pipe(this._cleanupAndTriggerSignOut);
   };
 
   Account.prototype._prefix = 'org.couchdb.user';
@@ -428,6 +434,7 @@ Hoodie.Account = (function() {
       this._authenticated = true;
       this._setUsername(response.userCtx.name.replace(/^user(_anonymous)?\//, ''));
       this._setOwner(response.userCtx.roles[0]);
+      this.trigger('authenticated', this.username);
       return this.hoodie.defer().resolve(this.username).promise();
     }
     if (this.hasAnonymousAccount()) {
@@ -512,9 +519,11 @@ Hoodie.Account = (function() {
           reason: "account has not been confirmed yet"
         });
       }
-      _this._authenticated = true;
-      _this._setOwner(response.roles[0]);
-      _this._setUsername(username);
+      _this._cleanup({
+        authenticated: true,
+        ownerHash: response.roles[0],
+        username: username
+      });
       if (!options.silent) {
         if (_this.hasAnonymousAccount()) {
           _this.trigger('signin:anonymous', username);
@@ -522,6 +531,7 @@ Hoodie.Account = (function() {
           _this.trigger('signin', username);
         }
       }
+      _this.trigger('authenticated', username);
       _this.fetch();
       return defer.resolve(_this.username, response.roles[0]);
     };
@@ -619,14 +629,19 @@ Hoodie.Account = (function() {
     if (options == null) {
       options = {};
     }
-    delete this.username;
-    delete this._authenticated;
+    this.trigger('cleanup');
+    this._authenticated = options.authenticated;
     this.hoodie.config.clear();
-    this._setOwner(this.hoodie.uuid());
-    if (!options.silent) {
-      this.trigger('signout');
-    }
+    this._setUsername(options.username);
+    this._setOwner(options.ownerHash || this.hoodie.uuid());
     return this.hoodie.defer().resolve().promise();
+  };
+
+  Account.prototype._cleanupAndTriggerSignOut = function() {
+    var _this = this;
+    return this._cleanup().then(function() {
+      return _this.trigger('signout');
+    });
   };
 
   Account.prototype._userKey = function(username) {
@@ -1431,16 +1446,14 @@ Hoodie.AccountRemote = (function(_super) {
     if (options == null) {
       options = {};
     }
-    this._handleSignIn = __bind(this._handleSignIn, this);
+    this._handleAuthenticate = __bind(this._handleAuthenticate, this);
     this.push = __bind(this.push, this);
     this.disconnect = __bind(this.disconnect, this);
     this.connect = __bind(this.connect, this);
     this.name = this.hoodie.account.db();
-    if (this.hoodie.config.get('_remote.connected') != null) {
-      this.connected = this.hoodie.config.get('_remote.connected');
-    }
+    this.connected = true;
     options.prefix = '';
-    this.hoodie.on('account:signin', this._handleSignIn);
+    this.hoodie.on('account:authenticated', this._handleAuthenticate);
     this.hoodie.on('account:signout', this.disconnect);
     AccountRemote.__super__.constructor.call(this, this.hoodie, options);
   }
@@ -1448,7 +1461,6 @@ Hoodie.AccountRemote = (function(_super) {
   AccountRemote.prototype.connect = function() {
     var _this = this;
     return this.hoodie.account.authenticate().pipe(function() {
-      _this.hoodie.config.set('_remote.connected', true);
       _this.hoodie.on('store:idle', _this.push);
       _this.push();
       return AccountRemote.__super__.connect.apply(_this, arguments);
@@ -1456,7 +1468,6 @@ Hoodie.AccountRemote = (function(_super) {
   };
 
   AccountRemote.prototype.disconnect = function() {
-    this.hoodie.config.set('_remote.connected', false);
     this.hoodie.unbind('store:idle', this.push);
     return AccountRemote.__super__.disconnect.apply(this, arguments);
   };
@@ -1493,7 +1504,7 @@ Hoodie.AccountRemote = (function(_super) {
     return (_ref = this.hoodie).trigger.apply(_ref, ["remote:" + event].concat(__slice.call(parameters)));
   };
 
-  AccountRemote.prototype._handleSignIn = function() {
+  AccountRemote.prototype._handleAuthenticate = function() {
     this.name = this.hoodie.account.db();
     return this.connect();
   };
@@ -1908,8 +1919,7 @@ Hoodie.LocalStore = (function(_super) {
   };
 
   LocalStore.prototype._subscribeToOutsideEvents = function() {
-    this.hoodie.on('account:signin', this.clear);
-    this.hoodie.on('account:signout', this.clear);
+    this.hoodie.on('account:cleanup', this.clear);
     this.hoodie.on('account:signup', this.markAllAsChanged);
     return this.hoodie.on('remote:change', this._handleRemoteChange);
   };

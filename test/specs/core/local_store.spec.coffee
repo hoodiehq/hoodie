@@ -24,12 +24,7 @@ describe "Hoodie.LocalStore", ->
     
     it "should subscribe to account:signout event", ->
       store = new Hoodie.LocalStore @hoodie
-      expect(@hoodie.on).wasCalledWith 'account:signout', store.clear
-
-    # we have to clear store on both, signin and signout events.
-    it "should subscribe to account:signin event", ->
-      store = new Hoodie.LocalStore @hoodie
-      expect(@hoodie.on).wasCalledWith 'account:signin', store.clear
+      expect(@hoodie.on).wasCalledWith 'account:cleanup', store.clear
 
     it "should subscribe to account:signup event", ->
       store = new Hoodie.LocalStore @hoodie

@@ -92,10 +92,12 @@ Besides the standard sign in we also check if the account has been confirmed
     <span class="k">else</span> 
       <span class="nx">@_sendSignInRequest</span><span class="p">(</span><span class="nx">username</span><span class="p">,</span> <span class="nx">password</span><span class="p">,</span> <span class="nv">silent: </span><span class="kc">true</span><span class="p">)</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h2 id="sign-out-">sign out </h2></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>uses standard CouchDB API to invalidate a user session (DELETE /_session)</p></div></div><div class="code"><div class="wrapper">  <span class="nv">signOut : </span><span class="nf">(options = {})-&gt;</span>
 
-    <span class="k">return</span> <span class="nx">@_cleanup</span><span class="p">(</span><span class="nx">options</span><span class="p">)</span> <span class="k">unless</span> <span class="nx">@hasAccount</span><span class="p">()</span>
+    <span class="k">unless</span> <span class="nx">@hasAccount</span><span class="p">()</span>
+      <span class="k">return</span> <span class="nx">@_cleanup</span><span class="p">().</span><span class="nx">then</span> <span class="o">=&gt;</span>
+        <span class="nx">@trigger</span> <span class="s">&#39;signout&#39;</span> <span class="k">unless</span> <span class="nx">options</span><span class="p">.</span><span class="nx">silent</span>
 
     <span class="nx">@hoodie</span><span class="p">.</span><span class="nx">remote</span><span class="p">.</span><span class="nx">disconnect</span><span class="p">()</span>
-    <span class="nx">@_sendSignOutRequest</span><span class="p">().</span><span class="nx">pipe</span><span class="p">(</span><span class="nx">@_cleanup</span><span class="p">)</span>
+    <span class="nx">@_sendSignOutRequest</span><span class="p">().</span><span class="nx">pipe</span><span class="p">(</span><span class="nx">@_cleanupAndTriggerSignOut</span><span class="p">)</span>
   
   </div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h2 id="on">On</h2></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>shortcut for <code>hoodie.on</code></p></div></div><div class="code"><div class="wrapper">  <span class="kc">on</span> <span class="o">:</span> <span class="nf">(event, cb) -&gt;</span> 
     <span class="nv">event = </span><span class="nx">event</span><span class="p">.</span><span class="nx">replace</span> <span class="sr">/(^| )([^ ]+)/g</span><span class="p">,</span> <span class="s">&quot;$1account:$2&quot;</span>
@@ -157,11 +159,11 @@ implementation of the hoodie API.</p></div></div><div class="code"><div class="w
     <span class="nx">@_changeUsernameAndPassword</span><span class="p">(</span><span class="nx">currentPassword</span><span class="p">,</span> <span class="nx">newUsername</span><span class="p">)</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h2 id="destroy">destroy</h2></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>destroys a user's account  </p></div></div><div class="code"><div class="wrapper">  <span class="nv">destroy : </span><span class="nf">-&gt;</span>
 
     <span class="k">unless</span> <span class="nx">@hasAccount</span><span class="p">()</span>
-      <span class="k">return</span> <span class="nx">@_cleanup</span><span class="p">()</span>
+      <span class="k">return</span> <span class="nx">@_cleanupAndTriggerSignOut</span><span class="p">()</span>
 
     <span class="nx">@fetch</span><span class="p">()</span>
     <span class="p">.</span><span class="nx">pipe</span><span class="p">(</span><span class="nx">@_handleFetchBeforeDestroySucces</span><span class="p">,</span> <span class="nx">@_handleFetchBeforeDestroyError</span><span class="p">)</span>
-    <span class="p">.</span><span class="nx">pipe</span><span class="p">(</span><span class="nx">@_cleanup</span><span class="p">)</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h2 id="private">PRIVATE</h2></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>default couchDB user doc prefix</p></div></div><div class="code"><div class="wrapper">  <span class="nv">_prefix : </span><span class="s">&#39;org.couchdb.user&#39;</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>setters</p></div></div><div class="code"><div class="wrapper">  <span class="nv">_setUsername : </span><span class="nf">(@username)  -&gt;</span> 
+    <span class="p">.</span><span class="nx">pipe</span><span class="p">(</span><span class="nx">@_cleanupAndTriggerSignOut</span><span class="p">)</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h2 id="private">PRIVATE</h2></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>default couchDB user doc prefix</p></div></div><div class="code"><div class="wrapper">  <span class="nv">_prefix : </span><span class="s">&#39;org.couchdb.user&#39;</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>setters</p></div></div><div class="code"><div class="wrapper">  <span class="nv">_setUsername : </span><span class="nf">(@username)  -&gt;</span> 
     <span class="nx">@hoodie</span><span class="p">.</span><span class="nx">config</span><span class="p">.</span><span class="nx">set</span> <span class="s">&#39;_account.username&#39;</span><span class="p">,</span>  <span class="nx">@username</span>
 
   <span class="nv">_setOwner    : </span><span class="nf">(@ownerHash) -&gt;</span> </div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p><code>ownerHash</code> is stored with every new object in the createdBy
@@ -185,6 +187,7 @@ to trigger an 'unauthenticated' error, but instead try to sign in.</p></div></di
       <span class="vi">@_authenticated = </span><span class="kc">true</span>
       <span class="nx">@_setUsername</span> <span class="nx">response</span><span class="p">.</span><span class="nx">userCtx</span><span class="p">.</span><span class="nx">name</span><span class="p">.</span><span class="nx">replace</span><span class="p">(</span><span class="sr">/^user(_anonymous)?\//</span><span class="p">,</span> <span class="s">&#39;&#39;</span><span class="p">)</span>
       <span class="nx">@_setOwner</span>    <span class="nx">response</span><span class="p">.</span><span class="nx">userCtx</span><span class="p">.</span><span class="nx">roles</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+      <span class="nx">@trigger</span> <span class="s">&#39;authenticated&#39;</span><span class="p">,</span> <span class="nx">@username</span>
       <span class="k">return</span> <span class="nx">@hoodie</span><span class="p">.</span><span class="nx">defer</span><span class="p">().</span><span class="nx">resolve</span><span class="p">(</span><span class="nx">@username</span><span class="p">).</span><span class="nx">promise</span><span class="p">()</span>
 
     <span class="k">if</span> <span class="nx">@hasAnonymousAccount</span><span class="p">()</span>
@@ -266,17 +269,20 @@ worked out, it adds the role "confirmed" to the user. If the role is
 not present yet, it might be that the worker didn't pick up the the 
 user doc yet, or there was an error. In this cases, we reject the promise
 with an "uncofirmed error"</p></div></div><div class="code"><div class="wrapper">      <span class="k">unless</span> <span class="o">~</span><span class="nx">response</span><span class="p">.</span><span class="nx">roles</span><span class="p">.</span><span class="nx">indexOf</span><span class="p">(</span><span class="s">&quot;confirmed&quot;</span><span class="p">)</span>
-        <span class="k">return</span> <span class="nx">defer</span><span class="p">.</span><span class="nx">reject</span> <span class="nv">error: </span><span class="s">&quot;unconfirmed&quot;</span><span class="p">,</span> <span class="nv">reason: </span><span class="s">&quot;account has not been confirmed yet&quot;</span>
-      
-      <span class="vi">@_authenticated = </span><span class="kc">true</span>
-      <span class="nx">@_setOwner</span>    <span class="nx">response</span><span class="p">.</span><span class="nx">roles</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-      <span class="nx">@_setUsername</span> <span class="nx">username</span>
+        <span class="k">return</span> <span class="nx">defer</span><span class="p">.</span><span class="nx">reject</span> <span class="nv">error: </span><span class="s">&quot;unconfirmed&quot;</span><span class="p">,</span> <span class="nv">reason: </span><span class="s">&quot;account has not been confirmed yet&quot;</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>before a new user can sign in, things need to be cleaned up.
+That's what this event is triggerd for, so other modules can
+do their cleanups as well.</p></div></div><div class="code"><div class="wrapper">      <span class="nx">@_cleanup</span> 
+        <span class="nv">authenticated : </span><span class="kc">true</span>
+        <span class="nv">ownerHash     : </span><span class="nx">response</span><span class="p">.</span><span class="nx">roles</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="nv">username      : </span><span class="nx">username</span>
 
       <span class="k">unless</span> <span class="nx">options</span><span class="p">.</span><span class="nx">silent</span>
         <span class="k">if</span> <span class="nx">@hasAnonymousAccount</span><span class="p">()</span>
           <span class="nx">@trigger</span> <span class="s">&#39;signin:anonymous&#39;</span><span class="p">,</span> <span class="nx">username</span>
         <span class="k">else</span>
           <span class="nx">@trigger</span> <span class="s">&#39;signin&#39;</span><span class="p">,</span> <span class="nx">username</span>
+
+      <span class="nx">@trigger</span> <span class="s">&#39;authenticated&#39;</span><span class="p">,</span> <span class="nx">username</span>
 
       <span class="nx">@fetch</span><span class="p">()</span>
       <span class="nx">defer</span><span class="p">.</span><span class="nx">resolve</span><span class="p">(</span><span class="nx">@username</span><span class="p">,</span> <span class="nx">response</span><span class="p">.</span><span class="nx">roles</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
@@ -371,15 +377,20 @@ resolved promise</p></div></div><div class="code"><div class="wrapper">  <span c
     <span class="k">else</span>
       <span class="nx">@hoodie</span><span class="p">.</span><span class="nx">defer</span><span class="p">().</span><span class="nx">reject</span><span class="p">(</span><span class="nx">error</span><span class="p">).</span><span class="nx">promise</span><span class="p">()</span>
 
-  <span class="c1">#</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>remove everythng form the current account, so a new account can be initiated.</p></div></div><div class="code"><div class="wrapper">  <span class="nv">_cleanup : </span><span class="nf">(options = {}) =&gt;</span>
-    <span class="k">delete</span> <span class="nx">@username</span>
-    <span class="k">delete</span> <span class="nx">@_authenticated</span>
+  <span class="c1">#</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>remove everything form the current account, so a new account can be initiated.</p></div></div><div class="code"><div class="wrapper">  <span class="nv">_cleanup : </span><span class="nf">(options = {}) =&gt;</span>
+    <span class="nx">@trigger</span> <span class="s">&#39;cleanup&#39;</span>
+    <span class="vi">@_authenticated = </span><span class="nx">options</span><span class="p">.</span><span class="nx">authenticated</span>
 
     <span class="nx">@hoodie</span><span class="p">.</span><span class="nx">config</span><span class="p">.</span><span class="nx">clear</span><span class="p">()</span>
-    <span class="nx">@_setOwner</span> <span class="nx">@hoodie</span><span class="p">.</span><span class="nx">uuid</span><span class="p">()</span>
+    <span class="nx">@_setUsername</span> <span class="nx">options</span><span class="p">.</span><span class="nx">username</span>
+    <span class="nx">@_setOwner</span>    <span class="nx">options</span><span class="p">.</span><span class="nx">ownerHash</span> <span class="o">or</span> <span class="nx">@hoodie</span><span class="p">.</span><span class="nx">uuid</span><span class="p">()</span>
 
-    <span class="nx">@trigger</span> <span class="s">&#39;signout&#39;</span> <span class="k">unless</span> <span class="nx">options</span><span class="p">.</span><span class="nx">silent</span>
     <span class="nx">@hoodie</span><span class="p">.</span><span class="nx">defer</span><span class="p">().</span><span class="nx">resolve</span><span class="p">().</span><span class="nx">promise</span><span class="p">()</span>
+
+  <span class="c1">#</span>
+  <span class="nv">_cleanupAndTriggerSignOut : </span><span class="o">=&gt;</span>
+    <span class="nx">@_cleanup</span><span class="p">().</span><span class="nx">then</span> <span class="o">=&gt;</span>
+      <span class="nx">@trigger</span> <span class="s">&#39;signout&#39;</span>
     
 
   <span class="c1">#</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>depending on wether the user signedUp manually or has been signed up anonymously
