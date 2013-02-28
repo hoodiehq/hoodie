@@ -187,6 +187,16 @@ class Hoodie.LocalStore extends Hoodie.Store
         else
           continue
 
+      # sort
+      results = results.sort (a,b) -> 
+        if a.createdAt < b.createdAt
+          -1
+        else if a.createdAt < b.createdAt
+          1
+        else
+          0
+          
+        
       defer.resolve(results).promise()
     catch error
       defer.reject(error).promise()

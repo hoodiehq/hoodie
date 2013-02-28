@@ -169,9 +169,9 @@ implementation of the hoodie API.</p></div></div><div class="code"><div class="w
     <span class="vi">@username = </span><span class="nx">username</span>
     <span class="nx">@hoodie</span><span class="p">.</span><span class="nx">config</span><span class="p">.</span><span class="nx">set</span> <span class="s">&#39;_account.username&#39;</span><span class="p">,</span>  <span class="nx">@username</span>
 
-  <span class="nv">_setOwner    : </span><span class="nf">(@ownerHash) -&gt;</span> 
+  <span class="nv">_setOwner    : </span><span class="nf">(ownerHash) -&gt;</span> 
     <span class="k">return</span> <span class="k">if</span> <span class="nx">ownerHash</span> <span class="o">is</span> <span class="nx">@ownerHash</span>
-    
+
     <span class="vi">@ownerHash = </span><span class="nx">ownerHash</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p><code>ownerHash</code> is stored with every new object in the createdBy
 attribute. It does not get changed once it's set. That's why
 we have to force it to be change for the <code>$config/hoodie</code> object.</p></div></div><div class="code"><div class="wrapper">    <span class="nx">@hoodie</span><span class="p">.</span><span class="nx">config</span><span class="p">.</span><span class="nx">set</span> <span class="s">&#39;createdBy&#39;</span><span class="p">,</span> <span class="nx">@ownerHash</span>

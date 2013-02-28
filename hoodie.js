@@ -1694,6 +1694,15 @@ Hoodie.LocalStore = (function(_super) {
         }
         return _results;
       }).call(this);
+      results = results.sort(function(a, b) {
+        if (a.createdAt < b.createdAt) {
+          return -1;
+        } else if (a.createdAt < b.createdAt) {
+          return 1;
+        } else {
+          return 0;
+        }
+      });
       defer.resolve(results).promise();
     } catch (error) {
       defer.reject(error).promise();

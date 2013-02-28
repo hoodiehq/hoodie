@@ -414,12 +414,31 @@ describe "Hoodie.LocalStore", ->
       _and "two cat and three dog objects exist in the store", ->
         beforeEach ->
           spyOn(@store, "_index").andReturn ["cat/1", "cat/2", "dog/1", "dog/2", "dog/3"]
-          spyOn(@store, "cache").andCallFake (type, id) -> name: "#{type}#{id}", age: parseInt(id)
+          spyOn(@store, "cache").andCallFake (type, id) -> 
+            id = parseInt(id)
+            if type is 'dog' 
+              createdAt = id + 10
+            else
+              createdAt = id + 20
+
+            name: "#{type}#{id}"
+            age: id
+            createdAt: createdAt
         specs()
 
     it "should return a promise", ->
       promise = @store.findAll()
       expect(promise).toBePromise()
+
+    with_2CatsAnd_3Dogs ->
+      it "should sort by createdAt", ->
+        expect(@store.findAll()).toBeResolvedWith [ 
+          { name : 'dog1', age : 1, createdAt : 11 }, 
+          { name : 'dog2', age : 2, createdAt : 12 }, 
+          { name : 'dog3', age : 3, createdAt : 13 },
+          { name : 'cat1', age : 1, createdAt : 21 }, 
+          { name : 'cat2', age : 2, createdAt : 22 } 
+        ] 
   
     _when "called without a type", ->
       with_2CatsAnd_3Dogs ->
