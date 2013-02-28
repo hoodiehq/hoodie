@@ -1694,10 +1694,13 @@ Hoodie.LocalStore = (function(_super) {
         }
         return _results;
       }).call(this);
-      results = results.sort(function(a, b) {
-        if (a.createdAt < b.createdAt) {
+      results.sort(function(a, b) {
+        var aNum, bNum;
+        aNum = +a.createdAt;
+        bNum = +b.createdAt;
+        if (aNum < bNum) {
           return -1;
-        } else if (a.createdAt < b.createdAt) {
+        } else if (aNum > bNum) {
           return 1;
         } else {
           return 0;

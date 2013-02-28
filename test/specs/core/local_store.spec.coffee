@@ -423,7 +423,7 @@ describe "Hoodie.LocalStore", ->
 
             name: "#{type}#{id}"
             age: id
-            createdAt: createdAt
+            createdAt: new Date(createdAt)
         specs()
 
     it "should return a promise", ->
@@ -433,11 +433,11 @@ describe "Hoodie.LocalStore", ->
     with_2CatsAnd_3Dogs ->
       it "should sort by createdAt", ->
         expect(@store.findAll()).toBeResolvedWith [ 
-          { name : 'dog1', age : 1, createdAt : 11 }, 
-          { name : 'dog2', age : 2, createdAt : 12 }, 
-          { name : 'dog3', age : 3, createdAt : 13 },
-          { name : 'cat1', age : 1, createdAt : 21 }, 
-          { name : 'cat2', age : 2, createdAt : 22 } 
+          { name : 'dog1', age : 1, createdAt : new Date(11) }, 
+          { name : 'dog2', age : 2, createdAt : new Date(12) }, 
+          { name : 'dog3', age : 3, createdAt : new Date(13) },
+          { name : 'cat1', age : 1, createdAt : new Date(21) }, 
+          { name : 'cat2', age : 2, createdAt : new Date(22) } 
         ] 
   
     _when "called without a type", ->

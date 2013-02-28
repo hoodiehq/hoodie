@@ -108,10 +108,13 @@ and returns it as array, which will be stored in the results variable</p></div><
         <span class="k">if</span> <span class="nx">obj</span> <span class="o">and</span> <span class="nx">filter</span><span class="p">(</span><span class="nx">obj</span><span class="p">)</span>
           <span class="nx">obj</span>
         <span class="k">else</span>
-          <span class="k">continue</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>sort</p></div></div><div class="code"><div class="wrapper">      <span class="nv">results = </span><span class="nx">results</span><span class="p">.</span><span class="nx">sort</span> <span class="nf">(a,b) -&gt;</span> 
-        <span class="k">if</span> <span class="nx">a</span><span class="p">.</span><span class="nx">createdAt</span> <span class="o">&lt;</span> <span class="nx">b</span><span class="p">.</span><span class="nx">createdAt</span>
+          <span class="k">continue</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>sort</p></div></div><div class="code"><div class="wrapper">      <span class="nx">results</span><span class="p">.</span><span class="nx">sort</span> <span class="nf">(a,b) -&gt;</span> 
+        <span class="nv">aNum = </span><span class="o">+</span><span class="nx">a</span><span class="p">.</span><span class="nx">createdAt</span>
+        <span class="nv">bNum = </span><span class="o">+</span><span class="nx">b</span><span class="p">.</span><span class="nx">createdAt</span>
+
+        <span class="k">if</span> <span class="nx">aNum</span> <span class="o">&lt;</span> <span class="nx">bNum</span>
           <span class="o">-</span><span class="mi">1</span>
-        <span class="k">else</span> <span class="k">if</span> <span class="nx">a</span><span class="p">.</span><span class="nx">createdAt</span> <span class="o">&lt;</span> <span class="nx">b</span><span class="p">.</span><span class="nx">createdAt</span>
+        <span class="k">else</span> <span class="k">if</span> <span class="nx">aNum</span> <span class="o">&gt;</span> <span class="nx">bNum</span>
           <span class="mi">1</span>
         <span class="k">else</span>
           <span class="mi">0</span>

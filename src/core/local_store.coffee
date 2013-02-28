@@ -188,10 +188,13 @@ class Hoodie.LocalStore extends Hoodie.Store
           continue
 
       # sort
-      results = results.sort (a,b) -> 
-        if a.createdAt < b.createdAt
+      results.sort (a,b) -> 
+        aNum = +a.createdAt
+        bNum = +b.createdAt
+
+        if aNum < bNum
           -1
-        else if a.createdAt < b.createdAt
+        else if aNum > bNum
           1
         else
           0
