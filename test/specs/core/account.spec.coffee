@@ -43,10 +43,7 @@ describe "Hoodie.Account", ->
         expect(account.ownerHash).toBe 'owner_hash123'
     _when "account.ownerHash isn't set", ->
       beforeEach ->
-        spyOn(@hoodie.config, "get").andCallFake (key) ->
-          if key is '_account.ownerHash'
-            return undefined
-
+        spyOn(@hoodie.config, "get").andReturn false
         spyOn(@hoodie, "uuid").andReturn 'new_generated_owner_hash'
         spyOn(@hoodie.config, "set")
             
@@ -55,8 +52,8 @@ describe "Hoodie.Account", ->
         expect(account.ownerHash).toBe 'new_generated_owner_hash'
 
       it "should set account.ownerHash", ->
-         account = new Hoodie.Account @hoodie
-         expect(account.hoodie.config.set).wasCalledWith '_account.ownerHash', 'new_generated_owner_hash'
+        account = new Hoodie.Account @hoodie
+        expect(account.hoodie.config.set).wasCalledWith '_account.ownerHash', 'new_generated_owner_hash'
 
     it "should authenticate on next tick", ->
       account = new Hoodie.Account @hoodie
@@ -141,7 +138,11 @@ describe "Hoodie.Account", ->
 
         it "should set account.username", ->
           expect(@account.username).toBe 'joe@example.com'
-          expect(@hoodie.config.set).wasCalledWith '_account.username', 'joe@example.com'
+
+        # no need to trigger a config update, altough
+        # username did not change.
+        it "should not set _account.username config", ->
+          expect(@hoodie.config.set).wasNotCalledWith '_account.username', 'joe@example.com'
 
         it "should set account.ownerHash", ->
            expect(@account.ownerHash).toBe 'user_hash'
@@ -565,10 +566,11 @@ describe "Hoodie.Account", ->
              expect(@hoodie.config.set).wasCalledWith '_account.username', 'joe@example.com'
 
           it "should set @ownerHash", ->
-             @account.signIn('joe@example.com', 'secret')
-             expect(@account.ownerHash).toBe 'user_hash'
-             expect(@hoodie.config.set).wasCalledWith '_account.ownerHash', 'user_hash'
-             expect(@hoodie.config.set).wasCalledWith 'createdBy', 'user_hash'
+            delete @account.ownerHash
+            @account.signIn('joe@example.com', 'secret')
+            expect(@account.ownerHash).toBe 'user_hash'
+            expect(@hoodie.config.set).wasCalledWith '_account.ownerHash', 'user_hash'
+            expect(@hoodie.config.set).wasCalledWith 'createdBy', 'user_hash'
 
           it "should fetch the _users doc", ->
             spyOn(@account, "fetch")

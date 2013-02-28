@@ -427,7 +427,6 @@ Hoodie.Account = (function() {
   };
 
   Account.prototype._setOwner = function(ownerHash) {
-    this.ownerHash = ownerHash;
     if (ownerHash === this.ownerHash) {
       return;
     }

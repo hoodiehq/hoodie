@@ -306,9 +306,9 @@ class Hoodie.Account
     @username = username
     @hoodie.config.set '_account.username',  @username
 
-  _setOwner    : (@ownerHash) -> 
+  _setOwner    : (ownerHash) -> 
     return if ownerHash is @ownerHash
-    
+
     @ownerHash = ownerHash
     # `ownerHash` is stored with every new object in the createdBy
     # attribute. It does not get changed once it's set. That's why
