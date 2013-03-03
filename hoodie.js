@@ -345,6 +345,14 @@ Hoodie.Account = (function() {
     return (_ref = this.hoodie).trigger.apply(_ref, ["account:" + event].concat(__slice.call(parameters)));
   };
 
+  Account.prototype.request = function(type, path, options) {
+    var _ref;
+    if (options == null) {
+      options = {};
+    }
+    return (_ref = this.hoodie).request.apply(_ref, arguments);
+  };
+
   Account.prototype.db = function() {
     return "user/" + this.ownerHash;
   };

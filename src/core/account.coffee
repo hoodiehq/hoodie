@@ -192,6 +192,14 @@ class Hoodie.Account
   # shortcut for `hoodie.trigger`
   trigger : (event, parameters...) -> 
     @hoodie.trigger "account:#{event}", parameters...
+
+
+  # Request
+  # ---
+
+  # shortcut for `hoodie.request`
+  request : (type, path, options = {}) ->
+    @hoodie.request arguments...
   
   
   # db
