@@ -226,7 +226,7 @@ Hoodie.Account = (function() {
       return this.hoodie.defer().reject().promise();
     }
     promise = this._withSingleRequest('authenticate', function() {
-      return _this.hoodie.request('GET', "/_session");
+      return _this.request('GET', "/_session");
     });
     return promise.pipe(this._handleAuthenticateRequestSuccess, this._handleRequestError);
   };
@@ -264,7 +264,7 @@ Hoodie.Account = (function() {
       }),
       contentType: 'application/json'
     };
-    return this.hoodie.request('PUT', this._url(username), options).pipe(this._handleSignUpSucces(username, password), this._handleRequestError);
+    return this.request('PUT', this._url(username), options).pipe(this._handleSignUpSucces(username, password), this._handleRequestError);
   };
 
   Account.prototype.anonymousSignUp = function() {
@@ -369,7 +369,7 @@ Hoodie.Account = (function() {
       }).promise();
     }
     return this._withSingleRequest('fetch', function() {
-      return _this.hoodie.request('GET', _this._url(username)).pipe(null, _this._handleRequestError).done(function(response) {
+      return _this.request('GET', _this._url(username)).pipe(null, _this._handleRequestError).done(function(response) {
         return _this._doc = response;
       });
     });
@@ -409,7 +409,7 @@ Hoodie.Account = (function() {
       contentType: "application/json"
     };
     return this._withPreviousRequestsAborted('resetPassword', function() {
-      return _this.hoodie.request('PUT', "/_users/" + (encodeURIComponent(key)), options).pipe(null, _this._handleRequestError).done(_this._checkPasswordResetStatus);
+      return _this.request('PUT', "/_users/" + (encodeURIComponent(key)), options).pipe(null, _this._handleRequestError).done(_this._checkPasswordResetStatus);
     });
   };
 
@@ -571,7 +571,7 @@ Hoodie.Account = (function() {
       }
     };
     return this._withPreviousRequestsAborted('passwordResetStatus', function() {
-      return _this.hoodie.request('GET', url, options).pipe(_this._handlePasswordResetStatusRequestSuccess, _this._handlePasswordResetStatusRequestError).fail(function(error) {
+      return _this.request('GET', url, options).pipe(_this._handlePasswordResetStatusRequestSuccess, _this._handlePasswordResetStatusRequestError).fail(function(error) {
         if (error.error === 'pending') {
           window.setTimeout(_this._checkPasswordResetStatus, 1000);
           return;
@@ -626,7 +626,7 @@ Hoodie.Account = (function() {
     this.hoodie.remote.disconnect();
     this._doc._deleted = true;
     return this._withPreviousRequestsAborted('updateUsersDoc', function() {
-      return _this.hoodie.request('PUT', _this._url(), {
+      return _this.request('PUT', _this._url(), {
         data: JSON.stringify(_this._doc),
         contentType: 'application/json'
       });
@@ -701,7 +701,7 @@ Hoodie.Account = (function() {
         contentType: 'application/json'
       };
       return _this._withPreviousRequestsAborted('updateUsersDoc', function() {
-        return _this.hoodie.request('PUT', _this._url(), options).pipe(_this._handleChangeUsernameAndPasswordRequest(newUsername, newPassword || currentPassword), _this._handleRequestError);
+        return _this.request('PUT', _this._url(), options).pipe(_this._handleChangeUsernameAndPasswordRequest(newUsername, newPassword || currentPassword), _this._handleRequestError);
       });
     };
   };
@@ -739,7 +739,7 @@ Hoodie.Account = (function() {
   Account.prototype._sendSignOutRequest = function() {
     var _this = this;
     return this._withSingleRequest('signOut', function() {
-      return _this.hoodie.request('DELETE', '/_session').pipe(null, _this._handleRequestError);
+      return _this.request('DELETE', '/_session').pipe(null, _this._handleRequestError);
     });
   };
 
@@ -754,7 +754,7 @@ Hoodie.Account = (function() {
     };
     return this._withPreviousRequestsAborted('signIn', function() {
       var promise;
-      promise = _this.hoodie.request('POST', '/_session', requestOptions);
+      promise = _this.request('POST', '/_session', requestOptions);
       return promise.pipe(_this._handleSignInSuccess(options), _this._handleRequestError);
     });
   };

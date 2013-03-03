@@ -21,7 +21,7 @@ Make sure we have one.</p></div></div><div class="code"><div class="wrapper">   
     <span class="k">if</span> <span class="nx">@_authenticated</span> <span class="o">is</span> <span class="kc">false</span>
       <span class="k">return</span> <span class="nx">@hoodie</span><span class="p">.</span><span class="nx">defer</span><span class="p">().</span><span class="nx">reject</span><span class="p">().</span><span class="nx">promise</span><span class="p">()</span>
     </div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>@_authenticated is undefined</p></div></div><div class="code"><div class="wrapper">    <span class="nv">promise = </span><span class="nx">@_withSingleRequest</span> <span class="s">&#39;authenticate&#39;</span><span class="p">,</span> <span class="o">=&gt;</span>
-      <span class="nx">@hoodie</span><span class="p">.</span><span class="nx">request</span><span class="p">(</span><span class="s">&#39;GET&#39;</span><span class="p">,</span> <span class="s">&quot;/_session&quot;</span><span class="p">)</span>
+      <span class="nx">@request</span><span class="p">(</span><span class="s">&#39;GET&#39;</span><span class="p">,</span> <span class="s">&quot;/_session&quot;</span><span class="p">)</span>
 
     <span class="nx">promise</span><span class="p">.</span><span class="nx">pipe</span> <span class="nx">@_handleAuthenticateRequestSuccess</span><span class="p">,</span> <span class="nx">@_handleRequestError</span>
     
@@ -54,7 +54,7 @@ to sign in with a 300ms timeout.</p></div></div><div class="code"><div class="wr
         <span class="nv">signedUpAt : </span><span class="nx">@_now</span><span class="p">()</span> <span class="k">unless</span> <span class="nx">username</span> <span class="o">is</span> <span class="nx">@ownerHash</span>
       <span class="nv">contentType : </span><span class="s">&#39;application/json&#39;</span>
 
-    <span class="nx">@hoodie</span><span class="p">.</span><span class="nx">request</span><span class="p">(</span><span class="s">&#39;PUT&#39;</span><span class="p">,</span> <span class="nx">@_url</span><span class="p">(</span><span class="nx">username</span><span class="p">),</span> <span class="nx">options</span><span class="p">)</span>
+    <span class="nx">@request</span><span class="p">(</span><span class="s">&#39;PUT&#39;</span><span class="p">,</span> <span class="nx">@_url</span><span class="p">(</span><span class="nx">username</span><span class="p">),</span> <span class="nx">options</span><span class="p">)</span>
     <span class="p">.</span><span class="nx">pipe</span> <span class="nx">@_handleSignUpSucces</span><span class="p">(</span><span class="nx">username</span><span class="p">,</span> <span class="nx">password</span><span class="p">),</span> <span class="nx">@_handleRequestError</span>
 
   </div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h2 id="anonymous-sign-up">anonymous sign up</h2></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>If the user did not sign up himself yet, but data needs to be transfered
@@ -112,7 +112,7 @@ Besides the standard sign in we also check if the account has been confirmed
       <span class="k">return</span> <span class="nx">@hoodie</span><span class="p">.</span><span class="nx">defer</span><span class="p">().</span><span class="nx">reject</span><span class="p">(</span><span class="nv">error: </span><span class="s">&quot;unauthenticated&quot;</span><span class="p">,</span> <span class="nv">reason: </span><span class="s">&quot;not logged in&quot;</span><span class="p">).</span><span class="nx">promise</span><span class="p">()</span>
     
     <span class="nx">@_withSingleRequest</span> <span class="s">&#39;fetch&#39;</span><span class="p">,</span> <span class="o">=&gt;</span>
-      <span class="nx">@hoodie</span><span class="p">.</span><span class="nx">request</span><span class="p">(</span><span class="s">&#39;GET&#39;</span><span class="p">,</span> <span class="nx">@_url</span><span class="p">(</span><span class="nx">username</span><span class="p">))</span>
+      <span class="nx">@request</span><span class="p">(</span><span class="s">&#39;GET&#39;</span><span class="p">,</span> <span class="nx">@_url</span><span class="p">(</span><span class="nx">username</span><span class="p">))</span>
       <span class="p">.</span><span class="nx">pipe</span><span class="p">(</span><span class="kc">null</span><span class="p">,</span> <span class="nx">@_handleRequestError</span><span class="p">)</span>
       <span class="p">.</span><span class="nx">done</span> <span class="nf">(response) =&gt;</span> <span class="vi">@_doc = </span><span class="nx">response</span>
     </div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h2 id="change-password">change password</h2></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>Note: the hoodie API requires the currentPassword for security reasons,
@@ -151,7 +151,7 @@ once the password was resetted.</p></div></div><div class="code"><div class="wra
       <span class="nv">contentType : </span><span class="s">&quot;application/json&quot;</span>
     
     <span class="nx">@_withPreviousRequestsAborted</span> <span class="s">&#39;resetPassword&#39;</span><span class="p">,</span> <span class="o">=&gt;</span>
-      <span class="nx">@hoodie</span><span class="p">.</span><span class="nx">request</span><span class="p">(</span><span class="s">&#39;PUT&#39;</span><span class="p">,</span>  <span class="s">&quot;/_users/</span><span class="si">#{</span><span class="nb">encodeURIComponent</span> <span class="nx">key</span><span class="si">}</span><span class="s">&quot;</span><span class="p">,</span> <span class="nx">options</span><span class="p">)</span>
+      <span class="nx">@request</span><span class="p">(</span><span class="s">&#39;PUT&#39;</span><span class="p">,</span>  <span class="s">&quot;/_users/</span><span class="si">#{</span><span class="nb">encodeURIComponent</span> <span class="nx">key</span><span class="si">}</span><span class="s">&quot;</span><span class="p">,</span> <span class="nx">options</span><span class="p">)</span>
       <span class="p">.</span><span class="nx">pipe</span><span class="p">(</span><span class="kc">null</span><span class="p">,</span> <span class="nx">@_handleRequestError</span><span class="p">)</span>
       <span class="p">.</span><span class="nx">done</span> <span class="nx">@_checkPasswordResetStatus</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h2 id="change-username">change username</h2></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>Note: the hoodie API requires the current password for security reasons,
 but technically we cannot (yet) prevent the user to change the username 
@@ -313,7 +313,7 @@ one second timeout.</p></div></div><div class="code"><div class="wrapper">  <spa
         <span class="nv">Authorization : </span><span class="s">&quot;Basic </span><span class="si">#{</span><span class="nx">hash</span><span class="si">}</span><span class="s">&quot;</span>
 
     <span class="nx">@_withPreviousRequestsAborted</span> <span class="s">&#39;passwordResetStatus&#39;</span><span class="p">,</span> <span class="o">=&gt;</span>
-      <span class="nx">@hoodie</span><span class="p">.</span><span class="nx">request</span><span class="p">(</span><span class="s">&#39;GET&#39;</span><span class="p">,</span> <span class="nx">url</span><span class="p">,</span> <span class="nx">options</span><span class="p">)</span>
+      <span class="nx">@request</span><span class="p">(</span><span class="s">&#39;GET&#39;</span><span class="p">,</span> <span class="nx">url</span><span class="p">,</span> <span class="nx">options</span><span class="p">)</span>
       <span class="p">.</span><span class="nx">pipe</span><span class="p">(</span><span class="nx">@_handlePasswordResetStatusRequestSuccess</span><span class="p">,</span> <span class="nx">@_handlePasswordResetStatusRequestError</span><span class="p">)</span>
       <span class="p">.</span><span class="nx">fail</span> <span class="nf">(error) =&gt;</span>
         <span class="k">if</span> <span class="nx">error</span><span class="p">.</span><span class="nx">error</span> <span class="o">is</span> <span class="s">&#39;pending&#39;</span>
@@ -371,7 +371,7 @@ without a potential conflict error.</p></div></div><div class="code"><div class=
     <span class="vi">@_doc._deleted = </span><span class="kc">true</span>
 
     <span class="nx">@_withPreviousRequestsAborted</span> <span class="s">&#39;updateUsersDoc&#39;</span><span class="p">,</span> <span class="o">=&gt;</span>
-      <span class="nx">@hoodie</span><span class="p">.</span><span class="nx">request</span> <span class="s">&#39;PUT&#39;</span><span class="p">,</span> <span class="nx">@_url</span><span class="p">(),</span>
+      <span class="nx">@request</span> <span class="s">&#39;PUT&#39;</span><span class="p">,</span> <span class="nx">@_url</span><span class="p">(),</span>
         <span class="nv">data        : </span><span class="nx">JSON</span><span class="p">.</span><span class="nx">stringify</span> <span class="nx">@_doc</span>
         <span class="nv">contentType : </span><span class="s">&#39;application/json&#39;</span>
 
@@ -443,7 +443,7 @@ according password</em>sha and a new salt server side</p></div></div><div class=
         <span class="nv">contentType : </span><span class="s">&#39;application/json&#39;</span>
 
       <span class="nx">@_withPreviousRequestsAborted</span> <span class="s">&#39;updateUsersDoc&#39;</span><span class="p">,</span> <span class="o">=&gt;</span>
-        <span class="nx">@hoodie</span><span class="p">.</span><span class="nx">request</span><span class="p">(</span><span class="s">&#39;PUT&#39;</span><span class="p">,</span> <span class="nx">@_url</span><span class="p">(),</span> <span class="nx">options</span><span class="p">)</span>
+        <span class="nx">@request</span><span class="p">(</span><span class="s">&#39;PUT&#39;</span><span class="p">,</span> <span class="nx">@_url</span><span class="p">(),</span> <span class="nx">options</span><span class="p">)</span>
         <span class="p">.</span><span class="nx">pipe</span> <span class="nx">@_handleChangeUsernameAndPasswordRequest</span><span class="p">(</span><span class="nx">newUsername</span><span class="p">,</span> <span class="nx">newPassword</span> <span class="o">or</span> <span class="nx">currentPassword</span><span class="p">),</span> <span class="nx">@_handleRequestError</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>depending on whether a newUsername has been passed, we can sign in right away
 or have to use the delayed sign in to give the username change worker some time</p></div></div><div class="code"><div class="wrapper">  <span class="nv">_handleChangeUsernameAndPasswordRequest: </span><span class="nf">(newUsername, newPassword) =&gt;</span>
     <span class="o">=&gt;</span>
@@ -460,7 +460,7 @@ of sending another request</p></div></div><div class="code"><div class="wrapper"
     <span class="nx">@_requests</span><span class="p">[</span><span class="nx">name</span><span class="p">]</span> <span class="o">=</span> <span class="nx">requestFunction</span><span class="p">()</span>
   </div></div></div><div class="segment"><div class="code"><div class="wrapper">  <span class="nv">_sendSignOutRequest: </span><span class="nf">-&gt;</span>
     <span class="nx">@_withSingleRequest</span> <span class="s">&#39;signOut&#39;</span><span class="p">,</span> <span class="o">=&gt;</span>
-      <span class="nx">@hoodie</span><span class="p">.</span><span class="nx">request</span><span class="p">(</span><span class="s">&#39;DELETE&#39;</span><span class="p">,</span> <span class="s">&#39;/_session&#39;</span><span class="p">).</span><span class="nx">pipe</span><span class="p">(</span><span class="kc">null</span><span class="p">,</span> <span class="nx">@_handleRequestError</span><span class="p">)</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>the sign in request that starts a CouchDB session if
+      <span class="nx">@request</span><span class="p">(</span><span class="s">&#39;DELETE&#39;</span><span class="p">,</span> <span class="s">&#39;/_session&#39;</span><span class="p">).</span><span class="nx">pipe</span><span class="p">(</span><span class="kc">null</span><span class="p">,</span> <span class="nx">@_handleRequestError</span><span class="p">)</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>the sign in request that starts a CouchDB session if
 it succeeds. We separated the actual sign in request from
 the signIn method, as the latter also runs signOut intenrtally
 to clean up local data before starting a new session. But as
@@ -473,7 +473,7 @@ the same.</p></div></div><div class="code"><div class="wrapper">  <span class="n
                        <span class="nv">password  : </span><span class="nx">password</span>
 
     <span class="nx">@_withPreviousRequestsAborted</span> <span class="s">&#39;signIn&#39;</span><span class="p">,</span> <span class="o">=&gt;</span>
-      <span class="nv">promise = </span><span class="nx">@hoodie</span><span class="p">.</span><span class="nx">request</span><span class="p">(</span><span class="s">&#39;POST&#39;</span><span class="p">,</span> <span class="s">&#39;/_session&#39;</span><span class="p">,</span> <span class="nx">requestOptions</span><span class="p">)</span>
+      <span class="nv">promise = </span><span class="nx">@request</span><span class="p">(</span><span class="s">&#39;POST&#39;</span><span class="p">,</span> <span class="s">&#39;/_session&#39;</span><span class="p">,</span> <span class="nx">requestOptions</span><span class="p">)</span>
       <span class="nx">promise</span><span class="p">.</span><span class="nx">pipe</span><span class="p">(</span><span class="nx">@_handleSignInSuccess</span><span class="p">(</span><span class="nx">options</span><span class="p">),</span> <span class="nx">@_handleRequestError</span><span class="p">)</span>
 
   <span class="c1">#</span>
