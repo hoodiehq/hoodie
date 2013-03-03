@@ -501,6 +501,8 @@ class Hoodie.Remote extends Hoodie.Store
   #
   _handlePullResults : (changes) =>
     for {doc} in changes
+      continue if @prefix and doc._id.indexOf(@prefix) isnt 0
+
       object = @_parseFromRemote(doc)
       if object._deleted
         event = 'remove'

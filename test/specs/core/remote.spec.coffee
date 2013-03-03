@@ -322,6 +322,47 @@ describe "Hoodie.Remote", ->
   describe "#pull()", ->        
     beforeEach ->
       @remote.connected = true
+
+      # {
+      #   "seq"     :2,
+      #   "id"      :"todo/abc3",
+      #   "changes" :[{"rev":"2-123"}],
+      #   "doc"     :{"_id":"todo/abc3","_rev":"2-123","_deleted":true},
+      #   "deleted" :true
+      # }
+      @object1  =
+        type     : 'todo'
+        id       : 'abc3'
+        _rev     : '2-123'
+        _deleted : true
+
+      # {
+      #   "seq"     :3,
+      #   "id"      :"todo/abc2",
+      #   "changes" :[{"rev":"1-123"}],
+      #   "doc"     :{"_id":"todo/abc2","_rev":"1-123","content":"remember the milk","done":false,"order":1, "type":"todo"}
+      # }
+      @object2 =
+        type     : 'todo'
+        id       : 'abc2'
+        _rev     : '1-123'
+        content  : 'remember the milk'
+        done     : false
+        order    : 1
+
+      # {
+      #   "seq"     :4,
+      #   "id"      :"prefix/todo/abc4",
+      #   "changes" :[{"rev":"4-123"}],
+      #   "doc"     :{"_id":"prefix/todo/abc4","_rev":"4-123","content":"I am prefixed yo.","done":false,"order":2, "type":"todo"}
+      # }
+      @object3 =
+        type     : 'todo'
+        id       : 'abc4'
+        _rev     : '4-123'
+        content  : 'I am prefixed yo.'
+        done     : false
+        order    : 2
     
     _when ".isConnected() is true", ->
       beforeEach ->
@@ -360,35 +401,22 @@ describe "Hoodie.Remote", ->
         spyOn(@remote, "trigger")
         @remote.pull()
 
-        # {"_id":"todo/abc3","_rev":"2-123","_deleted":true}
-        object =
-          'type'  : 'todo'
-          id       : 'abc3'
-          _rev     : '2-123'
-          _deleted : true
-        expect(@remote.trigger).wasCalledWith 'remove',           object
-        expect(@remote.trigger).wasCalledWith 'remove:todo',      object
-        expect(@remote.trigger).wasCalledWith 'remove:todo:abc3', object
+        expect(@remote.trigger).wasCalledWith 'remove',           @object1
+        expect(@remote.trigger).wasCalledWith 'remove:todo',      @object1
+        expect(@remote.trigger).wasCalledWith 'remove:todo:abc3', @object1
 
-        expect(@remote.trigger).wasCalledWith 'change',            'remove', object
-        expect(@remote.trigger).wasCalledWith 'change:todo',       'remove', object
-        expect(@remote.trigger).wasCalledWith 'change:todo:abc3',  'remove', object        
+        expect(@remote.trigger).wasCalledWith 'change',            'remove', @object1
+        expect(@remote.trigger).wasCalledWith 'change:todo',       'remove', @object1
+        expect(@remote.trigger).wasCalledWith 'change:todo:abc3',  'remove', @object1
         
-        # {"_id":"todo/abc2","_rev":"1-123","content":"remember the milk","done":false,"order":1, "type":"todo"}
-        object =
-          'type'  : 'todo'
-          id       : 'abc2'
-          _rev     : '1-123'
-          content  : 'remember the milk'
-          done     :false
-          order    :1
-        expect(@remote.trigger).wasCalledWith 'add',            object
-        expect(@remote.trigger).wasCalledWith 'add:todo',       object
-        expect(@remote.trigger).wasCalledWith 'add:todo:abc2',  object
+        
+        expect(@remote.trigger).wasCalledWith 'add',            @object2
+        expect(@remote.trigger).wasCalledWith 'add:todo',       @object2
+        expect(@remote.trigger).wasCalledWith 'add:todo:abc2',  @object2
 
-        expect(@remote.trigger).wasCalledWith 'change',            'add', object
-        expect(@remote.trigger).wasCalledWith 'change:todo',       'add', object
-        expect(@remote.trigger).wasCalledWith 'change:todo:abc2',  'add', object
+        expect(@remote.trigger).wasCalledWith 'change',            'add', @object2
+        expect(@remote.trigger).wasCalledWith 'change:todo',       'add', @object2
+        expect(@remote.trigger).wasCalledWith 'change:todo:abc2',  'add', @object2
         
       _and ".isConnected() returns true", ->
         beforeEach ->
@@ -399,14 +427,24 @@ describe "Hoodie.Remote", ->
           @remote.pull()
           expect(@remote.pull.callCount).toBe 2
 
+      _and "prefix is set", ->
+        beforeEach ->
+          @remote.prefix = 'prefix/'
+
+        it "should trigger events only for objects with prefix", ->
+          spyOn(@remote, "trigger")
+          @remote.pull()
+
+          expect(@remote.trigger).wasCalledWith 'add', @object3
+          expect(@remote.trigger).wasNotCalledWith 'add', @object2
+
       _and "object has been returned before", ->
         beforeEach ->
           @remote._knownObjects['abc2'] = 1
           spyOn(@remote, "trigger")
           @remote.pull()
         
-        it "should trigger update events", ->
-           
+        it "should trigger update events", -> 
           # {"_id":"todo/abc2","_rev":"1-123","content":"remember the milk","done":false,"order":1, "type":"todo"}
           object =
             'type'  : 'todo'
@@ -416,13 +454,7 @@ describe "Hoodie.Remote", ->
             done     :false
             order    :1
 
-          expect(@remote.trigger).wasCalledWith 'update',            object
-          # expect(@remote.trigger).wasCalledWith 'update:todo',       object
-          # expect(@remote.trigger).wasCalledWith 'update:todo:abc2',  object
-
-          # expect(@remote.trigger).wasCalledWith 'change',            'update', object
-          # expect(@remote.trigger).wasCalledWith 'change:todo',       'update', object
-          # expect(@remote.trigger).wasCalledWith 'change:todo:abc2',  'update', object
+          expect(@remote.trigger).wasCalledWith 'update', object
         
     _when "request errors with 401 unauthorzied", ->
       beforeEach ->

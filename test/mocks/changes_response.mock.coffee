@@ -15,6 +15,12 @@ Mocks.changesResponse = ->
         "id"      :"todo/abc2",
         "changes" :[{"rev":"1-123"}],
         "doc"     :{"_id":"todo/abc2","_rev":"1-123","content":"remember the milk","done":false,"order":1, "type":"todo"}
+      },
+      {
+        "seq"     :4,
+        "id"      :"prefix/todo/abc4",
+        "changes" :[{"rev":"4-123"}],
+        "doc"     :{"_id":"prefix/todo/abc4","_rev":"4-123","content":"I am prefixed yo.","done":false,"order":2, "type":"todo"}
       }
     ],
     "last_seq":20
