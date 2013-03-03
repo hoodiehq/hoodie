@@ -55,7 +55,7 @@ class Hoodie.Account
     
     # @_authenticated is undefined
     promise = @_withSingleRequest 'authenticate', =>
-      @hoodie.request('GET', "/_session")
+      @request('GET', "/_session")
 
     promise.pipe @_handleAuthenticateRequestSuccess, @_handleRequestError
     
@@ -93,7 +93,7 @@ class Hoodie.Account
         signedUpAt : @_now() unless username is @ownerHash
       contentType : 'application/json'
 
-    @hoodie.request('PUT', @_url(username), options)
+    @request('PUT', @_url(username), options)
     .pipe @_handleSignUpSucces(username, password), @_handleRequestError
 
   
@@ -218,7 +218,7 @@ class Hoodie.Account
       return @hoodie.defer().reject(error: "unauthenticated", reason: "not logged in").promise()
     
     @_withSingleRequest 'fetch', =>
-      @hoodie.request('GET', @_url(username))
+      @request('GET', @_url(username))
       .pipe(null, @_handleRequestError)
       .done (response) => @_doc = response
     
@@ -270,7 +270,7 @@ class Hoodie.Account
       contentType : "application/json"
     
     @_withPreviousRequestsAborted 'resetPassword', =>
-      @hoodie.request('PUT',  "/_users/#{encodeURIComponent key}", options)
+      @request('PUT',  "/_users/#{encodeURIComponent key}", options)
       .pipe(null, @_handleRequestError)
       .done @_checkPasswordResetStatus
 
@@ -498,7 +498,7 @@ class Hoodie.Account
         Authorization : "Basic #{hash}"
 
     @_withPreviousRequestsAborted 'passwordResetStatus', =>
-      @hoodie.request('GET', url, options)
+      @request('GET', url, options)
       .pipe(@_handlePasswordResetStatusRequestSuccess, @_handlePasswordResetStatusRequestError)
       .fail (error) =>
         if error.error is 'pending'
@@ -568,7 +568,7 @@ class Hoodie.Account
     @_doc._deleted = true
 
     @_withPreviousRequestsAborted 'updateUsersDoc', =>
-      @hoodie.request 'PUT', @_url(),
+      @request 'PUT', @_url(),
         data        : JSON.stringify @_doc
         contentType : 'application/json'
 
@@ -659,7 +659,7 @@ class Hoodie.Account
         contentType : 'application/json'
 
       @_withPreviousRequestsAborted 'updateUsersDoc', =>
-        @hoodie.request('PUT', @_url(), options)
+        @request('PUT', @_url(), options)
         .pipe @_handleChangeUsernameAndPasswordRequest(newUsername, newPassword or currentPassword), @_handleRequestError
 
   # 
@@ -691,7 +691,7 @@ class Hoodie.Account
   # 
   _sendSignOutRequest: ->
     @_withSingleRequest 'signOut', =>
-      @hoodie.request('DELETE', '/_session').pipe(null, @_handleRequestError)
+      @request('DELETE', '/_session').pipe(null, @_handleRequestError)
 
   # 
   # the sign in request that starts a CouchDB session if
@@ -708,7 +708,7 @@ class Hoodie.Account
                        password  : password
 
     @_withPreviousRequestsAborted 'signIn', =>
-      promise = @hoodie.request('POST', '/_session', requestOptions)
+      promise = @request('POST', '/_session', requestOptions)
       promise.pipe(@_handleSignInSuccess(options), @_handleRequestError)
 
   #
