@@ -145,20 +145,20 @@ describe "Hoodie.Remote", ->
         
         it "should send a GET to /_all_docs?include_docs=true&startkey=\"$public/\"&endkey=\"$public0\"", ->
           @remote.findAll()
-          expect(@remote.request).wasCalledWith "GET", '/_all_docs?include_docs=true&startkey="$public/"&endkey="$public0"'
+          expect(@remote.request).wasCalledWith "GET", '/_all_docs?include_docs=true&startkey="%24public%2F"&endkey="%24public0"'
 
     _when "type is todo", ->
       it 'should send a GET to /_all_docs?include_docs=true&startkey="todo/"&endkey="todo0"', ->
         @remote.findAll('todo')
-        expect(@remote.request).wasCalledWith "GET", '/_all_docs?include_docs=true&startkey="todo/"&endkey="todo0"'
+        expect(@remote.request).wasCalledWith "GET", '/_all_docs?include_docs=true&startkey="todo%2F"&endkey="todo0"'
 
       _and "prefix is 'remote_prefix'", ->
         beforeEach ->
           @remote.prefix = 'remote_prefix/'
         
-        it 'should send a GET to /_all_docs?include_docs=true&startkey="remote_prefix/todo/"&endkey="remote_prefix/todo0"', ->
+        it 'should send a GET to /_all_docs?include_docs=true&startkey="remote_prefix%2Ftodo%2F"&endkey="remote_prefix%2Ftodo0"', ->
           @remote.findAll('todo')
-          expect(@remote.request).wasCalledWith "GET", '/_all_docs?include_docs=true&startkey="remote_prefix/todo/"&endkey="remote_prefix/todo0"'
+          expect(@remote.request).wasCalledWith "GET", '/_all_docs?include_docs=true&startkey="remote_prefix%2Ftodo%2F"&endkey="remote_prefix%2Ftodo0"'
 
     _when "request success", ->
       beforeEach ->

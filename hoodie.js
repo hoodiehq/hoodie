@@ -1187,7 +1187,7 @@ Hoodie.Remote = (function(_super) {
         charCode = char.charCodeAt(0);
         return String.fromCharCode(charCode + 1);
       });
-      path = "" + path + "&startkey=\"" + startkey + "\"&endkey=\"" + endkey + "\"";
+      path = "" + path + "&startkey=\"" + (encodeURIComponent(startkey)) + "\"&endkey=\"" + (encodeURIComponent(endkey)) + "\"";
     }
     return this.request("GET", path).pipe(this._mapDocsFromFindAll).pipe(this._parseAllFromRemote);
   };

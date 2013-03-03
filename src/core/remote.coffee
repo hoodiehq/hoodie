@@ -167,7 +167,7 @@ class Hoodie.Remote extends Hoodie.Store
       endkey = startkey.replace /.$/, (char) ->
         charCode = char.charCodeAt(0)
         String.fromCharCode( charCode + 1 )
-      path = "#{path}&startkey=\"#{startkey}\"&endkey=\"#{endkey}\""
+      path = "#{path}&startkey=\"#{encodeURIComponent startkey}\"&endkey=\"#{encodeURIComponent endkey}\""
 
     @request("GET", path)
     .pipe(@_mapDocsFromFindAll)
