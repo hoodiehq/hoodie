@@ -1433,16 +1433,19 @@ Hoodie.Remote = (function(_super) {
     _results = [];
     for (_i = 0, _len = changes.length; _i < _len; _i++) {
       doc = changes[_i].doc;
+      if (this.prefix && doc._id.indexOf(this.prefix) !== 0) {
+        continue;
+      }
       object = this._parseFromRemote(doc);
       if (object._deleted) {
         event = 'remove';
-        delete this._knownObjects[doc._id];
+        delete this._knownObjects[object.id];
       } else {
-        if (this._knownObjects[doc._id]) {
+        if (this._knownObjects[object.id]) {
           event = 'update';
         } else {
           event = 'add';
-          this._knownObjects[doc._id] = 1;
+          this._knownObjects[object.id] = 1;
         }
       }
       this.trigger("" + event, object);
