@@ -57,7 +57,7 @@ class Hoodie.Remote extends Hoodie.Store
   # prefix
 
   # prefix for docs in a CouchDB database, e.g. all docs
-  # in public user stores are prefixed by '$public'
+  # in public user stores are prefixed by '$public/'
   prefix : ''
 
 
@@ -66,10 +66,9 @@ class Hoodie.Remote extends Hoodie.Store
   
   # sets name (think: namespace) and some other options
   constructor : (@hoodie, options = {}) ->
-    if options.name?
-      @name = options.name     
-      @prefix = @name
-      
+    
+    #
+    @name      = options.name      if options.name?  
     @prefix    = options.prefix    if options.prefix?
     @connected = options.connected if options.connected?
 
@@ -137,7 +136,9 @@ class Hoodie.Remote extends Hoodie.Store
     defer = super
     return defer if @hoodie.isPromise(defer)
 
-    path = "/" + encodeURIComponent "#{type}/#{id}"
+    path = "#{type}/#{id}"
+    path = @prefix + path if @prefix
+    path = "/" + encodeURIComponent path
     @request("GET", path).pipe(@_parseFromRemote)
 
   
@@ -152,16 +153,21 @@ class Hoodie.Remote extends Hoodie.Store
     path = "/_all_docs?include_docs=true"
     switch true
       when type? and @prefix isnt ''
-        keyPrefix = "#{@prefix}/#{type}"
+        startkey = "#{@prefix}#{type}/"
       when type?
-        keyPrefix = type
+        startkey = "#{type}/"
       when @prefix isnt ''
-        keyPrefix = @prefix
+        startkey = @prefix
       else
-        keyPrefix = ''
+        startkey = ''
 
-    if keyPrefix
-      path = "#{path}&startkey=\"#{keyPrefix}\/\"&endkey=\"#{keyPrefix}0\""
+    if startkey
+      # make sure that only objects starting with
+      # `startkey` will be returned
+      endkey = startkey.replace /.$/, (char) ->
+        charCode = char.charCodeAt(0)
+        String.fromCharCode( charCode + 1 )
+      path = "#{path}&startkey=\"#{startkey}\"&endkey=\"#{endkey}\""
 
     @request("GET", path)
     .pipe(@_mapDocsFromFindAll)
@@ -180,7 +186,7 @@ class Hoodie.Remote extends Hoodie.Store
     id = @hoodie.uuid() unless id 
     object = $.extend {
       type : type
-      id    : id
+      id   : id
     }, object
 
     object = @_parseForRemote object
@@ -328,28 +334,28 @@ class Hoodie.Remote extends Hoodie.Store
   # Parse for remote
   # ------------------
 
-  # parse object for remote storage. All attributes starting with an 
-  # `underscore` do not get synchronized despite the special attributes
+  # parse object for remote storage. All properties starting with an 
+  # `underscore` do not get synchronized despite the special properties
   # `_id`, `_rev` and `_deleted` (see above)
   # 
   # Also `id` gets replaced with `_id` which consists of type & id
   #
-  _parseForRemote : (obj) ->
-    attributes = $.extend {}, obj
+  _parseForRemote : (object) ->
+    properties = $.extend {}, object
   
-    for attr of attributes
+    for attr of properties
       continue if ~@_validSpecialAttributes.indexOf(attr)
       continue unless /^_/.test attr
-      delete attributes[attr]
+      delete properties[attr]
    
     # prepare CouchDB id
-    attributes._id = "#{attributes.type}/#{attributes.id}"
+    properties._id = "#{properties.type}/#{properties.id}"
     if @prefix
-      attributes._id = "#{@prefix}/#{attributes._id}"
+      properties._id = "#{@prefix}#{properties._id}"
     
-    delete attributes.id
+    delete properties.id
 
-    return attributes
+    return properties
 
 
   # _parseFromRemote
@@ -359,24 +365,24 @@ class Hoodie.Remote extends Hoodie.Store
 
   # renames `_id` attribute to `id` and removes the type from the id,
   # e.g. `type/123` -> `123`
-  _parseFromRemote : (obj) =>
+  _parseFromRemote : (object) =>
 
     # handle id and type
-    id = obj._id or obj.id
-    delete obj._id
-    id = id.replace(RegExp('^'+@prefix+'/'), '') if @prefix
-    [obj.type, obj.id] = id.split(/\//)
+    id = object._id or object.id
+    delete object._id
+    id = id.replace(RegExp('^'+@prefix), '') if @prefix
+    [object.type, object.id] = id.split(/\//)
     
     # handle timestameps
-    obj.createdAt = new Date(Date.parse obj.createdAt) if obj.createdAt
-    obj.updatedAt = new Date(Date.parse obj.updatedAt) if obj.updatedAt
+    object.createdAt = new Date(Date.parse object.createdAt) if object.createdAt
+    object.updatedAt = new Date(Date.parse object.updatedAt) if object.updatedAt
     
     # handle rev
-    if obj.rev
-      obj._rev = obj.rev
-      delete obj.rev
+    if object.rev
+      object._rev = object.rev
+      delete object.rev
     
-    return obj
+    return object
   
   _parseAllFromRemote : (objects) =>
     @_parseFromRemote(object) for object in objects

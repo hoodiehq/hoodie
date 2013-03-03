@@ -12,7 +12,6 @@ describe "Hoodie.Remote", ->
     @remote = new Hoodie.Remote @hoodie
     spyOn(@remote, "request").andReturn @requestDefer.promise()
   
-  
   describe "constructor(@hoodie, options = {})", ->
     beforeEach ->
       spyOn(Hoodie.Remote::, "connect")
@@ -24,10 +23,6 @@ describe "Hoodie.Remote", ->
     it "should default connected to false", ->
       remote = new Hoodie.Remote @hoodie
       expect(remote.connected).toBe false
-
-    it "should set prefix to name by default", ->
-      remote = new Hoodie.Remote @hoodie, name: 'wicked'
-      expect(remote.prefix).toBe 'wicked'
 
     it "should fallback prefix to ''", ->
       remote = new Hoodie.Remote @hoodie
@@ -98,20 +93,35 @@ describe "Hoodie.Remote", ->
 
   describe "#find(type, id)", ->
 
-    _when "request successful", ->
+    it "should send a GET request to `/type%2Fid`", ->
+      @remote.find('car', '123')
+      [type, path] = @remote.request.mostRecentCall.args
+      expect(type).toBe 'GET'
+      expect(path).toBe '/car%2F123'
+
+    _when "prefix is store_prefix/", ->
       beforeEach ->
-        @remote.prefix = 'store_prefix'
-        @requestDefer.resolve
-          _id: 'store_prefix/car/fresh'
-          createdAt: '2012-12-12T22:00:00.000Z'
-          updatedAt: '2012-12-21T22:00:00.000Z'
+        @remote.prefix = 'store_prefix/'
       
-      it "should resolve with the doc", ->
-        expect(@remote.find("todo", "1")).toBeResolvedWith
-          id: 'fresh'
-          type: 'car'
-          createdAt: new Date(Date.parse '2012-12-12T22:00:00.000Z')
-          updatedAt: new Date(Date.parse '2012-12-21T22:00:00.000Z')
+      it "should send request to `store_prefix%2Ftype%2Fid`", ->
+        @remote.find('car', '123')
+        [type, path] = @remote.request.mostRecentCall.args
+        expect(type).toBe 'GET'
+        expect(path).toBe '/store_prefix%2Fcar%2F123'
+
+      _and "request successful", ->
+        beforeEach ->
+          @requestDefer.resolve
+            _id: 'store_prefix/car/fresh'
+            createdAt: '2012-12-12T22:00:00.000Z'
+            updatedAt: '2012-12-21T22:00:00.000Z'
+        
+        it "should resolve with the doc", ->
+          expect(@remote.find("todo", "1")).toBeResolvedWith
+            id: 'fresh'
+            type: 'car'
+            createdAt: new Date(Date.parse '2012-12-12T22:00:00.000Z')
+            updatedAt: new Date(Date.parse '2012-12-21T22:00:00.000Z')
   # /#find(type, id)
 
 
@@ -131,9 +141,9 @@ describe "Hoodie.Remote", ->
 
       _and "prefix is '$public'", ->
         beforeEach ->
-          @remote.prefix = '$public'
+          @remote.prefix = '$public/'
         
-        it "should send a GET to /_all_docs?include_docs=true", ->
+        it "should send a GET to /_all_docs?include_docs=true&startkey=\"$public/\"&endkey=\"$public0\"", ->
           @remote.findAll()
           expect(@remote.request).wasCalledWith "GET", '/_all_docs?include_docs=true&startkey="$public/"&endkey="$public0"'
 
@@ -144,11 +154,11 @@ describe "Hoodie.Remote", ->
 
       _and "prefix is 'remote_prefix'", ->
         beforeEach ->
-          @remote.prefix = 'remote_prefix'
+          @remote.prefix = 'remote_prefix/'
         
-        it 'should send a GET to /_all_docs?include_docs=true&startkey="todo/"&endkey="todo0"', ->
+        it 'should send a GET to /_all_docs?include_docs=true&startkey="remote_prefix/todo/"&endkey="remote_prefix/todo0"', ->
           @remote.findAll('todo')
-          expect(@remote.request).wasCalledWith "GET", '/_all_docs?include_docs=true&startkey="remote_prefix/todo/"&endkey="remote_prefix/todo0"'        
+          expect(@remote.request).wasCalledWith "GET", '/_all_docs?include_docs=true&startkey="remote_prefix/todo/"&endkey="remote_prefix/todo0"'
 
     _when "request success", ->
       beforeEach ->
@@ -219,7 +229,7 @@ describe "Hoodie.Remote", ->
 
     _when "saving car/123 with color: red and prefix is 'remote_prefix'", ->
       beforeEach ->        
-        @remote.prefix = 'remote_prefix'
+        @remote.prefix = 'remote_prefix/'
         @remote.save "car", 123, color: "red"
         [@type, @path, {@data}] = @remote.request.mostRecentCall.args
 
@@ -227,7 +237,7 @@ describe "Hoodie.Remote", ->
         expect(@type).toBe 'PUT'
         expect(@path).toBe '/remote_prefix%2Fcar%2F123'
 
-      it "should set _id to `car/123`", ->
+      it "should set _id to `remote_prefix/car/123`", ->
         expect(@data._id).toBe 'remote_prefix/car/123'
   # /#save(type, id, object)
 
@@ -538,7 +548,7 @@ describe "Hoodie.Remote", ->
 
     _when "prefix set to $public", ->
       beforeEach ->
-        @remote.prefix = '$public'
+        @remote.prefix = '$public/'
         @todoObjects = [
           {type: 'todo', id: '1'}
           {type: 'todo', id: '2'}
