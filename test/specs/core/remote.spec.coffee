@@ -398,6 +398,31 @@ describe "Hoodie.Remote", ->
         it "should pull again", ->
           @remote.pull()
           expect(@remote.pull.callCount).toBe 2
+
+      _and "object has been returned before", ->
+        beforeEach ->
+          @remote._knownObjects['abc2'] = 1
+          spyOn(@remote, "trigger")
+          @remote.pull()
+        
+        it "should trigger update events", ->
+           
+          # {"_id":"todo/abc2","_rev":"1-123","content":"remember the milk","done":false,"order":1, "type":"todo"}
+          object =
+            'type'  : 'todo'
+            id       : 'abc2'
+            _rev     : '1-123'
+            content  : 'remember the milk'
+            done     :false
+            order    :1
+
+          expect(@remote.trigger).wasCalledWith 'update',            object
+          # expect(@remote.trigger).wasCalledWith 'update:todo',       object
+          # expect(@remote.trigger).wasCalledWith 'update:todo:abc2',  object
+
+          # expect(@remote.trigger).wasCalledWith 'change',            'update', object
+          # expect(@remote.trigger).wasCalledWith 'change:todo',       'update', object
+          # expect(@remote.trigger).wasCalledWith 'change:todo:abc2',  'update', object
         
     _when "request errors with 401 unauthorzied", ->
       beforeEach ->

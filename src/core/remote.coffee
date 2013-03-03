@@ -504,13 +504,13 @@ class Hoodie.Remote extends Hoodie.Store
       object = @_parseFromRemote(doc)
       if object._deleted
         event = 'remove'
-        delete @_knownObjects[doc._id]
+        delete @_knownObjects[object.id]
       else
-        if @_knownObjects[doc._id]
+        if @_knownObjects[object.id]
           event = 'update'
         else
           event = 'add'
-          @_knownObjects[doc._id] = 1
+          @_knownObjects[object.id] = 1
 
       @trigger "#{event}",                             object
       @trigger "#{event}:#{object.type}",              object
