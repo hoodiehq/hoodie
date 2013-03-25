@@ -1,6 +1,11 @@
 var assert = require("assert");
 var hs = require("../lib/hoodie-server").prototype;
+
+// fake dat constructor
 hs.host = "jit.su";
+hs.dns_alias_host = "xip.io";
+hs.local_ips = hs.get_local_ips();
+
 
 describe("hoodie-server", function() {
   describe("request routing", function() {
@@ -39,6 +44,33 @@ describe("hoodie-server", function() {
 
     it("should fail cors with api name mismatch", function() {
       assert.equal(false, hs.serve_cors("api.a.jit.su", "b"));
+    });
+
+
+    // xip.io
+    it("static should handle xip.io domains", function() {
+      var host = "a." + hs.local_ips[0] + "." + hs.dns_alias_host;
+      assert.equal(true, hs.serve_static(host, "a"));
+    });
+
+    it("static www should handle xip.io domains", function() {
+      var host = "www.a." + hs.local_ips[0] + "." + hs.dns_alias_host;
+      assert.equal(true, hs.serve_static(host, "a"));
+    });
+
+    it("api should handle xip.io domains", function() {
+      var host = "api.a." + hs.local_ips[0] + "." + hs.dns_alias_host;
+      assert.equal(true, hs.serve_cors(host, "a"));
+    });
+
+    it("api should handle wildcard xip.io domains", function() {
+      var host = "foo.api.a." + hs.local_ips[0] + "." + hs.dns_alias_host;
+      assert.equal(true, hs.serve_cors(host, "a"));
+    });
+
+    it("admin should handle xip.io domains", function() {
+      var host = "admin.a." + hs.local_ips[0] + "." + hs.dns_alias_host;
+      assert.equal(true, hs.serve_admin(host, "a"));
     });
 
   });
