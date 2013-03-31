@@ -25,8 +25,8 @@ class Hoodie.LocalStore extends Hoodie.Store
     @_dirty = {}
 
     # extend this property with extra functions that will be available
-    # on all promises returned by hoodie.store API. Set a reference
-    # to current hoodie instance
+    # on all promises returned by hoodie.store API. It has a reference
+    # to current hoodie instance by default
     @_promiseApi = { @hoodie }    
   
     # if browser does not support local storage persistence,
