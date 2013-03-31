@@ -3,7 +3,7 @@ fs      = require 'fs'
 {spawn, exec} = require 'child_process'
 
 timeout = null
-build = (callback, watch = false) ->
+compile = (callback, watch = false) ->
   if watch
     coffee = spawn 'coffee', ['-c', '-b', '-o', 'compiled', '-w', '.']
   else
@@ -33,37 +33,7 @@ test = ->
   phantom.stdout.on 'data', (data) ->
     print data.toString()
 
-task 'compile', 'Build lib/', ->
-  build()
-
-task 'watch', 'Build lib/ and watch for changes', ->
-  build(null, true)
-  
-task 'test', 'Run all test', ->
-  build test
-    
-task 'autotest', 'Run all tests & rerun on file changes', ->
-  clearAndTest = -> 
-    clear()
-    test() 
-  
-  build clearAndTest, true
-
-task 'console', 'run a browser console, from command line, hell yeah', ->
-  spawn process.env["EDITOR"], ['/tmp/phantom_command.coffee']
-
-  spawn 'touch', ['/tmp/phantom_command.coffee']
-  spawn 'coffee', ['-b', '-c', '-w', '/tmp/phantom_command.coffee']
-  
-  phantom = spawn 'phantomjs', ['test/lib/phantomjs_console.coffee', 'index.html']
-  phantom.stderr.on 'data', (data) ->
-    process.stderr.write data.toString()
-  phantom.stdout.on 'data', (data) ->
-    print data.toString()
-   
-  
-task 'build', 'build hoodie.min.js', -> 
-  
+build = (doMinify = false) ->
   # the files need to be in a specific order, 
   # as some modules depend on others (e.g.
   # AccountRemote > Remote)
@@ -87,9 +57,45 @@ task 'build', 'build hoodie.min.js', ->
   console.log "concatinating files ..."
   coffee = spawn 'coffee', ['-j', 'hoodie.js', '-c', '-b'].concat(files)
   coffee.on 'exit', (code) ->
+    return unless doMinify
     console.log "minifying ..."
     spawn 'uglifyjs', ['-o', 'hoodie.min.js', 'hoodie.js']
 
+task 'compile', 'Build lib/', ->
+  compile()
+
+task 'watch', 'Build lib/ and watch for changes', ->
+  compile(null, true)
+  
+task 'test', 'Run all test', ->
+  compile test
+    
+task 'autotest', 'Run all tests & rerun on file changes', ->
+  clearAndTest = -> 
+    clear()
+    test() 
+  
+  compile clearAndTest, true
+
+task 'console', 'run a browser console, from command line, hell yeah', ->
+  spawn process.env["EDITOR"], ['/tmp/phantom_command.coffee']
+
+  spawn 'touch', ['/tmp/phantom_command.coffee']
+  spawn 'coffee', ['-b', '-c', '-w', '/tmp/phantom_command.coffee']
+  
+  phantom = spawn 'phantomjs', ['test/lib/phantomjs_console.coffee', 'index.html']
+  phantom.stderr.on 'data', (data) ->
+    process.stderr.write data.toString()
+  phantom.stdout.on 'data', (data) ->
+    print data.toString()
+   
+  
+task 'build', 'build hoodie.min.js', -> 
+  build true # true = minify
+
+task 'autobuild', 'build hoodie.min.js', -> 
+
+  compile build, true
 
   
 task 'docs', 'create docs from code', ->
