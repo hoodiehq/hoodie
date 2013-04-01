@@ -3,6 +3,7 @@ describe "Hoodie", ->
     @hoodie = new Hoodie 'http://couch.example.com'
     spyOn($, "ajax").andReturn $.Deferred()
 
+
   describe "constructor", ->
     it "should store the CouchDB URL", ->
       hoodie = new Hoodie 'http://couch.example.com'
@@ -16,8 +17,14 @@ describe "Hoodie", ->
       # that's kind of hard to test.
       hoodie = new Hoodie
       expect(hoodie.baseUrl).toBe location.protocol + "//api." + location.hostname
+
+    it "should check connection", ->
+      spyOn(Hoodie::, "checkConnection")
+      hoodie = new Hoodie
+      expect(hoodie.checkConnection).wasCalled()
   # /constructor
   
+
   describe "#request(type, path, options)", ->
     _when "request('GET', '/')", ->
       beforeEach ->
@@ -52,12 +59,24 @@ describe "Hoodie", ->
         expect(@args.url).toBe 'http://couch.example.com/test'
   # /request(type, path, options)
 
+
+  describe "#checkConnection()", ->
+    beforeEach ->
+      spyOn(@hoodie, "request")
+    
+    it "should send GET / request", ->
+      @hoodie.checkConnection()
+      expect(@hoodie.request).wasCalledWith 'GET', '/'
+  # /#checkConnection()
+
+
   describe "#open(store, options)", ->
     it "should instantiate a Remote instance", ->
       spyOn(Hoodie, "Remote")
       @hoodie.open "store_name", option: "value"
       expect(Hoodie.Remote).wasCalledWith @hoodie, name: "store_name", option: "value"
   # /open(store, options)
+
 
   describe "#isPromise(object)", ->
     it "should return true if object is a promise", ->
@@ -72,6 +91,7 @@ describe "Hoodie", ->
       expect( @hoodie.isPromise(undefined) ).toBe false
   # /#isPromise()
 
+
   describe "#uuid(num = 7)", ->
     it "should default to a length of 7", ->
       expect(@hoodie.uuid().length).toBe 7
@@ -81,11 +101,13 @@ describe "Hoodie", ->
         expect(@hoodie.uuid(5).length).toBe 5
   # /#uuid(num)
 
+
   describe "#resolveWith(something)", ->
     it "wraps passad arguments into a promise and returns it", ->
        promise = @hoodie.resolveWith('funky', 'fresh')
        expect(promise).toBeResolvedWith 'funky', 'fresh'
   # /#resolveWith(something)
+
 
   describe "#rejectWith(something)", ->
     it "wraps passad arguments into a promise and returns it", ->

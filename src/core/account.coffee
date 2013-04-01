@@ -662,6 +662,7 @@ class Hoodie.Account
         @request('PUT', @_url(), options)
         .pipe @_handleChangeUsernameAndPasswordRequest(newUsername, newPassword or currentPassword), @_handleRequestError
 
+
   # 
   # depending on whether a newUsername has been passed, we can sign in right away
   # or have to use the delayed sign in to give the username change worker some time
@@ -681,17 +682,20 @@ class Hoodie.Account
     @_requests[name]?.abort?()
     @_requests[name] = requestFunction()
 
+
   # 
   # if there is a pending request, return its promise instead
   # of sending another request
   _withSingleRequest: (name, requestFunction) ->
     return @_requests[name] if @_requests[name]?.state?() is 'pending'
     @_requests[name] = requestFunction()
+
   
   # 
   _sendSignOutRequest: ->
     @_withSingleRequest 'signOut', =>
       @request('DELETE', '/_session').pipe(null, @_handleRequestError)
+
 
   # 
   # the sign in request that starts a CouchDB session if

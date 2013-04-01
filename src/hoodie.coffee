@@ -6,6 +6,13 @@
 
 class Hoodie extends Events
   
+  # ## Settings
+
+  # `online` (read-only)
+  online : true
+
+  # `checkConnectionInterval`
+  checkConnectionInterval : 30000 # 30 seconds
 
   # ## Constructor
 
@@ -34,6 +41,9 @@ class Hoodie extends Events
 
     # init extensions
     @_loadExtensions()
+
+    # check connection
+    @checkConnection()
   
 
   # ## Requests
@@ -51,6 +61,26 @@ class Hoodie extends Events
       dataType    : 'json'
 
     $.ajax $.extend defaults, options
+
+
+  # ## Check Connection
+
+  # the `checkConnection` method is used, well, to check if
+  # the hoodie backend is reachable at `baseUrl` or not. 
+  # Check Connection is automatically called on startup
+  # and then each 30 seconds. If it fails, it 
+  # 
+  # - sets `hoodie.online = false`
+  # - triggers `offline` event
+  # - sets `checkConnectionInterval = 3000`
+  # 
+  # when connection can be reestablished, it
+  # 
+  # - sets `hoodie.online = true`
+  # - triggers `online` event
+  # - sets `checkConnectionInterval = 30000`
+  checkConnection : ->
+    @request 'GET', '/'
 
 
   # ## Open stores
