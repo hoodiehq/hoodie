@@ -35,6 +35,7 @@ class Hoodie.AccountRemote extends Hoodie.Remote
 
     @hoodie.on 'account:authenticated',  @_handleAuthenticate
     @hoodie.on 'account:signout', @disconnect
+    @hoodie.on 'online', @connect
     
     super(@hoodie, options)
     
@@ -80,6 +81,8 @@ class Hoodie.AccountRemote extends Hoodie.Remote
   push : (objects) =>
     objects = @hoodie.store.changedObjects() unless $.isArray objects
     promise = super(objects)
+    promise.fail @hoodie.checkConnection
+    return promise 
 
 
   # Events

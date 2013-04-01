@@ -479,6 +479,7 @@ class Hoodie.Remote extends Hoodie.Store
       when 500
         @trigger 'error:server', error
         window.setTimeout @pull, 3000
+        @hoodie.checkConnection()
       
       # usually a 0, which stands for timeout or server not reachable.
       else
@@ -494,6 +495,8 @@ class Hoodie.Remote extends Hoodie.Store
           # heroku kills the request after ~30s.
           # we'll try again after a 3s timeout
           window.setTimeout @pull, 3000
+
+          @hoodie.checkConnection()
 
 
   # ### handle changes from remote

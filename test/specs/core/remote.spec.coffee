@@ -5,6 +5,7 @@ describe "Hoodie.Remote", ->
     spyOn(@hoodie, "trigger")
     spyOn(@hoodie, "one")
     spyOn(@hoodie, "unbind")
+    spyOn(@hoodie, "checkConnection")
     @requestDefer = @hoodie.defer()
     spyOn(window, "setTimeout")
     spyOn(@hoodie.account, "db").andReturn 'joe$example.com'
@@ -501,6 +502,11 @@ describe "Hoodie.Remote", ->
         @remote.pull()
         expect(@remote.trigger).wasCalledWith 'error:server', 'error object'
         
+      it "should check connection", ->
+        @remote.pull()
+        expect(@hoodie.checkConnection).wasCalled()
+
+        
     _when "request was aborted manually", ->
       beforeEach ->
         @remote.request.andReturn then: (success, error) =>
@@ -542,6 +548,10 @@ describe "Hoodie.Remote", ->
         @remote.isConnected.andReturn false
         @remote.pull()
         expect(window.setTimeout).wasNotCalledWith @remote.pull, 3000
+
+      it "should check connection", ->
+        @remote.pull()
+        expect(@hoodie.checkConnection).wasCalled() 
   # /#pull()
 
   describe "#push(docs)", -> 

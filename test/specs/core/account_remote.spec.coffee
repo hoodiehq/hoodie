@@ -10,6 +10,7 @@ describe "Hoodie.AccountRemote", ->
     spyOn(@hoodie.account, "db").andReturn 'userhash123'
     
     spyOn(@hoodie, "trigger")
+    spyOn(@hoodie, "checkConnection")
     spyOn(@hoodie.store, "remove").andReturn then: (cb) -> cb('objectFromStore')
     spyOn(@hoodie.store, "update").andReturn then: (cb) -> cb('objectFromStore', false)
     spyOn(@hoodie.store, "save").andReturn   then: (cb) -> cb('objectFromStore', false)
@@ -19,6 +20,8 @@ describe "Hoodie.AccountRemote", ->
   
   describe "constructor(@hoodie, options = {})", ->
     beforeEach ->
+      spyOn(Hoodie.AccountRemote::, "disconnect")
+      spyOn(Hoodie.AccountRemote::, "connect")
       @remote = new Hoodie.AccountRemote @hoodie
     
     it "should set name to users database name", ->
@@ -28,23 +31,29 @@ describe "Hoodie.AccountRemote", ->
       expect(@remote.isConnected()).toBeTruthy()
         
     it "should connect", ->
-      spyOn(Hoodie.AccountRemote::, "connect")
-      new Hoodie.AccountRemote @hoodie
       expect(Hoodie.AccountRemote::connect).wasCalled()
 
     it "should subscribe to `authenticated` event", ->
       expect(@hoodie.on).wasCalledWith 'account:authenticated', @remote._handleAuthenticate
 
     it "should subscribe to `signout` event", ->
-      spyOn(Hoodie.AccountRemote::, "disconnect")
-      new Hoodie.AccountRemote @hoodie
-      [event, callback] = @hoodie.on.mostRecentCall.args
-      expect(event).toBe 'account:signout'
-      callback()
+      # that does not work for what ever reason, therefore the workaround
+      # expect(@hoodie.on).wasCalledWith 'account:signout', @remote.disconnect
+      for call in @hoodie.on.calls when call.args[0] is 'account:signout'
+        call.args[1]()
+
       expect(Hoodie.AccountRemote::disconnect).wasCalled()
       
     it "should set connected to true", ->
       expect(@remote.isConnected()).toBe true
+
+    it "should subscribe to `online` event", ->
+      # that does not work for what ever reason, therefore the workaround
+      # expect(@hoodie.on).wasCalledWith 'online', @remote.connect
+      for call in @hoodie.on.calls when call.args[0] is 'online'
+        call.args[1]()
+
+      expect(Hoodie.AccountRemote::connect).wasCalled()
 
   describe "#connect()", ->
     beforeEach ->
@@ -295,6 +304,14 @@ describe "Hoodie.AccountRemote", ->
         spyOn(@hoodie.store, "changedObjects").andReturn "changed_docs"
         @remote.push()
         expect(Hoodie.Remote::push).wasCalledWith "changed_docs"
+
+    _when "push fails", ->
+      beforeEach ->
+        @pushDefer.reject()
+
+      it "should check connection", -> 
+        @remote.push()
+        expect(@hoodie.checkConnection).wasCalled()
   # /#push(docs)
 
 

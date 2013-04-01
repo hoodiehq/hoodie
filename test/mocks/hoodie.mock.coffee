@@ -12,6 +12,7 @@ Mocks.Hoodie = ->
   
   trigger       : Hoodie::trigger
   request       : ->
+  checkConnection : ->
   open          : ->
   on            : Hoodie::on
   one           : Hoodie::one
