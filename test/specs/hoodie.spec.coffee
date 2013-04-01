@@ -2,6 +2,7 @@ describe "Hoodie", ->
   beforeEach ->
     @hoodie = new Hoodie 'http://couch.example.com'
     spyOn($, "ajax").andReturn $.Deferred()
+    spyOn(window, "setTimeout").andCallFake (cb) -> cb
 
 
   describe "constructor", ->
@@ -21,7 +22,7 @@ describe "Hoodie", ->
     it "should check connection", ->
       spyOn(Hoodie::, "checkConnection")
       hoodie = new Hoodie
-      expect(hoodie.checkConnection).wasCalled()
+      expect(Hoodie::checkConnection).wasCalled()
   # /constructor
   
 
@@ -62,13 +63,73 @@ describe "Hoodie", ->
 
   describe "#checkConnection()", ->
     beforeEach ->
-      spyOn(@hoodie, "request")
+      @requestDefer = @hoodie.defer() 
+      @hoodie._checkConnectionRequest = null
+      spyOn(@hoodie, "request").andReturn @requestDefer.promise()
+      spyOn(@hoodie, "trigger")
+      window.setTimeout.andReturn null # prevent recursion
     
     it "should send GET / request", ->
       @hoodie.checkConnection()
       expect(@hoodie.request).wasCalledWith 'GET', '/'
-  # /#checkConnection()
 
+    it "should only send one request at a time", ->
+      @hoodie.checkConnection()
+      @hoodie.checkConnection()
+      expect(@hoodie.request.callCount).toBe 1
+
+    _when "hoodie is online", ->
+      beforeEach ->
+        @hoodie.online = true
+
+      _and "request succeeds", ->
+        beforeEach ->
+          @requestDefer.resolve {"couchdb":"Welcome","version":"1.2.1"}
+          @hoodie.checkConnection()
+
+        it "should check again in 30 seconds", ->
+          expect(window.setTimeout).wasCalledWith @hoodie.checkConnection, 30000
+
+        it "should not trigger `online` event", ->
+          expect(@hoodie.trigger).wasNotCalledWith 'online'
+
+      _and "request fails", ->
+        beforeEach ->
+          @requestDefer.reject {"status": 0,"statusText":"Error"}
+          @hoodie.checkConnection()
+
+        it "should check again in 3 seconds", ->
+          expect(window.setTimeout).wasCalledWith @hoodie.checkConnection, 3000
+
+        it "should trigger `offline` event", ->
+          expect(@hoodie.trigger).wasCalledWith 'offline'
+
+    _when "hoodie is offline", ->
+      beforeEach ->
+        @hoodie.online = false
+
+      _and "request succeeds", ->
+        beforeEach ->
+          @requestDefer.resolve {"couchdb":"Welcome","version":"1.2.1"}
+          @hoodie.checkConnection()
+
+        it "should check again in 30 seconds", ->
+          expect(window.setTimeout).wasCalledWith @hoodie.checkConnection, 30000
+
+        it "should trigger `online` event", ->
+          expect(@hoodie.trigger).wasCalledWith 'online'
+
+      _and "request fails", ->
+        beforeEach ->
+          @requestDefer.reject {"status": 0,"statusText":"Error"}
+          @hoodie.checkConnection()
+
+        it "should check again in 3 seconds", ->
+          expect(window.setTimeout).wasCalledWith @hoodie.checkConnection, 3000
+
+        it "should not trigger `offline` event", ->
+          expect(@hoodie.trigger).wasNotCalledWith 'offline'
+  # /#checkConnection()
 
   describe "#open(store, options)", ->
     it "should instantiate a Remote instance", ->

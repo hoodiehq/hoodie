@@ -11,7 +11,7 @@ class Hoodie extends Events
   # `online` (read-only)
   online : true
 
-  # `checkConnectionInterval`
+  # `checkConnectionInterval` (read-only)
   checkConnectionInterval : 30000 # 30 seconds
 
   # ## Constructor
@@ -79,8 +79,12 @@ class Hoodie extends Events
   # - sets `hoodie.online = true`
   # - triggers `online` event
   # - sets `checkConnectionInterval = 30000`
-  checkConnection : ->
-    @request 'GET', '/'
+  _checkConnectionRequest : null
+  checkConnection : =>
+    return @_checkConnectionRequest if @_checkConnectionRequest?.state?() is 'pending'
+    
+    @_checkConnectionRequest = @request('GET', '/')
+    .pipe( @_handleCheckConnectionSuccess, @_handleCheckConnectionError )
 
 
   # ## Open stores
@@ -162,3 +166,22 @@ class Hoodie extends Events
   _loadExtensions: ->
     for instanceName, Module of @constructor._extensions
       @[instanceName] = new Module this
+
+  #
+  _handleCheckConnectionSuccess : (response) =>
+    @checkConnectionInterval = 30000
+    window.setTimeout @checkConnection, @checkConnectionInterval
+
+    unless @online
+      @trigger 'online'
+      @online = true
+    return @defer().resolve()
+
+  #
+  _handleCheckConnectionError : (response) =>
+    @checkConnectionInterval = 3000
+    window.setTimeout @checkConnection, @checkConnectionInterval
+    if @online
+      @trigger 'offline'
+      @online = false
+    return @defer().reject()
