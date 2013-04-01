@@ -35,7 +35,7 @@ class Hoodie.AccountRemote extends Hoodie.Remote
 
     @hoodie.on 'account:authenticated',  @_handleAuthenticate
     @hoodie.on 'account:signout', @disconnect
-    @hoodie.on 'online', @connect
+    @hoodie.on 'reconnected', @connect
     
     super(@hoodie, options)
     

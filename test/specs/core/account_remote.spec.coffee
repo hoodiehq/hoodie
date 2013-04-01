@@ -47,10 +47,10 @@ describe "Hoodie.AccountRemote", ->
     it "should set connected to true", ->
       expect(@remote.isConnected()).toBe true
 
-    it "should subscribe to `online` event", ->
+    it "should subscribe to `reconnected` event", ->
       # that does not work for what ever reason, therefore the workaround
-      # expect(@hoodie.on).wasCalledWith 'online', @remote.connect
-      for call in @hoodie.on.calls when call.args[0] is 'online'
+      # expect(@hoodie.on).wasCalledWith 'reconnected', @remote.connect
+      for call in @hoodie.on.calls when call.args[0] is 'reconnected'
         call.args[1]()
 
       expect(Hoodie.AccountRemote::connect).wasCalled()

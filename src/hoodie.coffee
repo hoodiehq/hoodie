@@ -82,7 +82,7 @@ class Hoodie extends Events
   _checkConnectionRequest : null
   checkConnection : =>
     return @_checkConnectionRequest if @_checkConnectionRequest?.state?() is 'pending'
-    
+
     @_checkConnectionRequest = @request('GET', '/')
     .pipe( @_handleCheckConnectionSuccess, @_handleCheckConnectionError )
 
@@ -173,7 +173,7 @@ class Hoodie extends Events
     window.setTimeout @checkConnection, @checkConnectionInterval
 
     unless @online
-      @trigger 'online'
+      @trigger 'reconnected'
       @online = true
     return @defer().resolve()
 
@@ -182,6 +182,6 @@ class Hoodie extends Events
     @checkConnectionInterval = 3000
     window.setTimeout @checkConnection, @checkConnectionInterval
     if @online
-      @trigger 'offline'
+      @trigger 'disconnected'
       @online = false
     return @defer().reject()

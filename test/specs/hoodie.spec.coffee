@@ -90,8 +90,8 @@ describe "Hoodie", ->
         it "should check again in 30 seconds", ->
           expect(window.setTimeout).wasCalledWith @hoodie.checkConnection, 30000
 
-        it "should not trigger `online` event", ->
-          expect(@hoodie.trigger).wasNotCalledWith 'online'
+        it "should not trigger `reconnected` event", ->
+          expect(@hoodie.trigger).wasNotCalledWith 'reconnected'
 
       _and "request fails", ->
         beforeEach ->
@@ -101,8 +101,8 @@ describe "Hoodie", ->
         it "should check again in 3 seconds", ->
           expect(window.setTimeout).wasCalledWith @hoodie.checkConnection, 3000
 
-        it "should trigger `offline` event", ->
-          expect(@hoodie.trigger).wasCalledWith 'offline'
+        it "should trigger `disconnected` event", ->
+          expect(@hoodie.trigger).wasCalledWith 'disconnected'
 
     _when "hoodie is offline", ->
       beforeEach ->
@@ -116,8 +116,8 @@ describe "Hoodie", ->
         it "should check again in 30 seconds", ->
           expect(window.setTimeout).wasCalledWith @hoodie.checkConnection, 30000
 
-        it "should trigger `online` event", ->
-          expect(@hoodie.trigger).wasCalledWith 'online'
+        it "should trigger `reconnected` event", ->
+          expect(@hoodie.trigger).wasCalledWith 'reconnected'
 
       _and "request fails", ->
         beforeEach ->
@@ -127,8 +127,8 @@ describe "Hoodie", ->
         it "should check again in 3 seconds", ->
           expect(window.setTimeout).wasCalledWith @hoodie.checkConnection, 3000
 
-        it "should not trigger `offline` event", ->
-          expect(@hoodie.trigger).wasNotCalledWith 'offline'
+        it "should not trigger `disconnected` event", ->
+          expect(@hoodie.trigger).wasNotCalledWith 'disconnected'
   # /#checkConnection()
 
   describe "#open(store, options)", ->
