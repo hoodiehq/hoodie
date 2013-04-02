@@ -108,6 +108,7 @@ describe "Hoodie.ShareInstance", ->
   describe "unsubscribe(options)", ->
     beforeEach ->
       spyOn(@hoodie.share, "remove").andCallThrough()
+      spyOn(@hoodie.store, "removeAll").andCallThrough()
 
     it "should remove share from store", ->
       @share.unsubscribe()
@@ -116,6 +117,14 @@ describe "Hoodie.ShareInstance", ->
     it "should return itself", ->
       share = @share.unsubscribe()
       expect(share).toBe @share 
+
+    it "should remove all objects belonging to share, locally", ->
+      @share.unsubscribe()
+      [filter, options] = @hoodie.store.removeAll.mostRecentCall.args
+
+      expect(filter( $sharedAt : @share.id )).toBe true
+      expect(filter( $sharedAt : 'bazinga' )).toBe false
+      expect(options.local).toBe true
   # /subscribe(options)
 
   describe "#grantReadAccess(users)", ->

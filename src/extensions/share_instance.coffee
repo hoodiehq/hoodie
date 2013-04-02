@@ -58,11 +58,12 @@ class Hoodie.ShareInstance extends Hoodie.Remote
 
 
   # unsubscribe
-  # ---------
+  # -----------
 
   # 
   unsubscribe : ->
     @hoodie.share.remove( @id )
+    @hoodie.store.removeAll( @_objectBelongsToMe, local : true )
     return this
 
 
@@ -226,6 +227,10 @@ class Hoodie.ShareInstance extends Hoodie.Remote
 
   # PRIVATE
   # ---------
+
+  #
+  _objectBelongsToMe : (object) =>
+    object.$sharedAt is @id
   
   # 
   _handleSecurityResponse : (security) =>
