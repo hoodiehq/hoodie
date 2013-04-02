@@ -191,13 +191,11 @@ class Hoodie.Share
 
   # shareAt
   # 
-  _storeShareAt : (shareId, properties) ->
+  _storeShareAt : (shareId) ->
     @pipe (objects) =>
 
       updateObject = (object) =>
-        object.$shares or= {}
-        object.$shares[shareId] = properties or true
-        @hoodie.store.update object.type, object.id, $shares: object.$shares
+        @hoodie.store.update object.type, object.id, $sharedAt: shareId
         return object
     
       if $.isArray objects
@@ -212,9 +210,9 @@ class Hoodie.Share
     @pipe (objects) =>
 
       updateObject = (object) =>
-        return object unless object.$shares and object.$shares[shareId]
-        object.$shares[shareId] = false
-        @hoodie.store.update object.type, object.id, $shares: object.$shares
+        return object unless object.$sharedAt is shareId
+
+        @hoodie.store.update object.type, object.id, $unshared: true
         return object
     
       if $.isArray objects
@@ -228,10 +226,9 @@ class Hoodie.Share
     @pipe (objects) =>
 
       updateObject = (object) =>
-        return object unless object.$shares
-        for shareId of object.$shares
-          object.$shares[shareId] = false
-        @hoodie.store.update object.type, object.id, $shares: object.$shares
+        return object unless object.$sharedAt
+
+        @hoodie.store.update object.type, object.id, $unshared: true
         return object
 
       if $.isArray objects
@@ -248,9 +245,7 @@ class Hoodie.Share
       @hoodie.share.add().pipe (newShare) => 
 
         updateObject = (object) =>
-          object.$shares or= {}
-          object.$shares[newShare.id] = properties or true
-          @hoodie.store.update object.type, object.id, $shares: object.$shares
+          @hoodie.store.update object.type, object.id, $sharedAt: newShare.id
           return object
 
         value = if $.isArray objects
