@@ -680,6 +680,21 @@ describe "Hoodie.Remote", ->
           expect(@remote.request).wasCalled()
           data = @remote.request.mostRecentCall.args[2].data
           expect(data.docs[0]._id).toBe '$public/todo/1'
+
+      _and "_$local flags set", ->
+        beforeEach ->
+          @remote.prefix = '$public/'
+          @todoObjects = [
+            {type: 'todo', id: '1'}
+            {type: 'todo', id: '2', _$local: true}
+          ]
+          @remote.push @todoObjects
+        
+        it "should add `-local` suffix to rev number", ->
+          expect(@remote.request).wasCalled()
+          data = @remote.request.mostRecentCall.args[2].data
+          expect(data.docs[0]._rev).toBe '1-uuid'
+          expect(data.docs[1]._rev).toBe '1-uuid-local'
   # /#push(docs)
 
   describe "#sync(docs)", ->

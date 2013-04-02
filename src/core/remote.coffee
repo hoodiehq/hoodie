@@ -403,6 +403,12 @@ class Hoodie.Remote extends Hoodie.Store
     currentRevNr = parseInt(currentRevNr, 10) or 0
 
     newRevisionId         = @_generateNewRevisionId()
+
+    # local changes are not meant to be replicated outside of the
+    # users database, therefore the `-local` suffix.
+    if attributes._$local
+      newRevisionId += "-local"
+
     attributes._rev       = "#{currentRevNr + 1}-#{newRevisionId}"
     attributes._revisions = 
       start : 1
@@ -411,6 +417,9 @@ class Hoodie.Remote extends Hoodie.Store
     if currentRevId
       attributes._revisions.start += currentRevNr
       attributes._revisions.ids.push currentRevId
+
+    
+
   
 
   # ### generate new revision id

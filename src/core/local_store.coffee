@@ -116,10 +116,17 @@ class Hoodie.LocalStore extends Hoodie.Store
       object.createdAt or= object.updatedAt
 
     # handle local changes
+    # 
+    # A local change is meant to be replicated to the
+    # users database, but not beyond. For example when
+    # I subscribed to a share but then decide to unsubscribe,
+    # all objects get removed with local: true flag, so that
+    # they get removed from my database, but won't anywhere else.
     if options.local
       object._$local = true
     else
       delete object._$local 
+
     try 
       object = @cache type, id, object, options
       defer.resolve( object, isNew ).promise()
