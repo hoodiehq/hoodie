@@ -120,8 +120,14 @@ Hoodie = (function(_super) {
     return $.ajax($.extend(defaults, options));
   };
 
+  Hoodie.prototype._checkConnectionRequest = null;
+
   Hoodie.prototype.checkConnection = function() {
-    return this.request('GET', '/').pipe(this._handleCheckConnectionSuccess, this._handleCheckConnectionError);
+    var _ref;
+    if (((_ref = this._checkConnectionRequest) != null ? typeof _ref.state === "function" ? _ref.state() : void 0 : void 0) === 'pending') {
+      return this._checkConnectionRequest;
+    }
+    return this._checkConnectionRequest = this.request('GET', '/').pipe(this._handleCheckConnectionSuccess, this._handleCheckConnectionError);
   };
 
   Hoodie.prototype.open = function(store_name, options) {
@@ -191,7 +197,7 @@ Hoodie = (function(_super) {
     this.checkConnectionInterval = 30000;
     window.setTimeout(this.checkConnection, this.checkConnectionInterval);
     if (!this.online) {
-      this.trigger('online');
+      this.trigger('reconnected');
       this.online = true;
     }
     return this.defer().resolve();
@@ -201,7 +207,7 @@ Hoodie = (function(_super) {
     this.checkConnectionInterval = 3000;
     window.setTimeout(this.checkConnection, this.checkConnectionInterval);
     if (this.online) {
-      this.trigger('offline');
+      this.trigger('disconnected');
       this.online = false;
     }
     return this.defer().reject();
@@ -1102,11 +1108,11 @@ Hoodie.Store = (function() {
   };
 
   Store.prototype._isValidId = function(key) {
-    return /^[a-z0-9\-]+$/.test(key);
+    return /^[^\/]+$/.test(key);
   };
 
   Store.prototype._isValidType = function(key) {
-    return /^[a-z$][a-z0-9]+$/.test(key);
+    return /^[^\/]+$/.test(key);
   };
 
   return Store;
@@ -1447,7 +1453,8 @@ Hoodie.Remote = (function(_super) {
         return window.setTimeout(this.pull, 3000);
       case 500:
         this.trigger('error:server', error);
-        return window.setTimeout(this.pull, 3000);
+        window.setTimeout(this.pull, 3000);
+        return this.hoodie.checkConnection();
       default:
         if (!this.isConnected()) {
           return;
@@ -1455,7 +1462,8 @@ Hoodie.Remote = (function(_super) {
         if (xhr.statusText === 'abort') {
           return this.pull();
         } else {
-          return window.setTimeout(this.pull, 3000);
+          window.setTimeout(this.pull, 3000);
+          return this.hoodie.checkConnection();
         }
     }
   };
@@ -1514,6 +1522,7 @@ Hoodie.AccountRemote = (function(_super) {
     options.prefix = '';
     this.hoodie.on('account:authenticated', this._handleAuthenticate);
     this.hoodie.on('account:signout', this.disconnect);
+    this.hoodie.on('reconnected', this.connect);
     AccountRemote.__super__.constructor.call(this, this.hoodie, options);
   }
 
@@ -1544,7 +1553,9 @@ Hoodie.AccountRemote = (function(_super) {
     if (!$.isArray(objects)) {
       objects = this.hoodie.store.changedObjects();
     }
-    return promise = AccountRemote.__super__.push.call(this, objects);
+    promise = AccountRemote.__super__.push.call(this, objects);
+    promise.fail(this.hoodie.checkConnection);
+    return promise;
   };
 
   AccountRemote.prototype.on = function(event, cb) {
