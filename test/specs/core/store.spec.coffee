@@ -21,8 +21,8 @@ describe "Hoodie.Store", ->
           promise = @store.save 'document', 'abc4567'
           expect(promise).toBeRejected()
   
-    it "should allow numbers and lowercase letters for type only. And must start with a letter or $", ->
-      invalid = ['UPPERCASE', 'underLines', '-?&$', '12345', 'a']
+    it "should not allow type containing /", ->
+      invalid = ['a/b']
       valid   = ['car', '$email']
       
       for key in invalid
@@ -33,8 +33,8 @@ describe "Hoodie.Store", ->
         promise = @store.save key, 'valid', {}
         expect(promise).toBeDefer()
     
-    it "should allow numbers, lowercase letters and dashes for for id only", ->
-      invalid = ['UPPERCASE', 'underLines', '-?&$']
+    it "should not allow id containing /", ->
+      invalid = ['/']
       valid   = ['abc4567', '1', 123, 'abc-567']
   
       for key in invalid

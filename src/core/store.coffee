@@ -194,10 +194,12 @@ class Hoodie.Store
   #
   _now : -> new Date
 
-  # only lowercase letters, numbers and dashes are allowed for ids
+  # / not allowed for id
   _isValidId : (key) ->
-    /^[a-z0-9\-]+$/.test key
+    # /^[a-z0-9\-]+$/.test key
+    /^[^\/]+$/.test key
     
-  # just like ids, but must start with a letter or a $ (internal types)
+  # / not allowed for type
   _isValidType : (key) ->
-    /^[a-z$][a-z0-9]+$/.test key
+    # /^[a-z$][a-z0-9]+$/.test key
+    /^[^\/]+$/.test key
