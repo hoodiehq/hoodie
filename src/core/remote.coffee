@@ -291,8 +291,8 @@ class Hoodie.Remote extends Hoodie.Store
       
     objectsForRemote = []
     for object in objects
-      object = @_parseForRemote object 
       @_addRevisionTo object
+      object = @_parseForRemote object 
       objectsForRemote.push object
     
     @_pushRequest = @request 'POST', "/_bulk_docs",

@@ -157,6 +157,22 @@ describe "Hoodie.LocalStore", ->
           object = @store.cache.mostRecentCall.args[2]
           expect(object.createdAt).toBeUndefined()
           expect(object.updatedAt).toBeUndefined()
+      
+      _and "options.local is true", ->
+        beforeEach ->
+          @store.save 'document', '123', { name: 'test' }, { local: true }
+        
+        it "should set _$local = true", ->
+          object = @store.cache.mostRecentCall.args[2]
+          expect(object._$local).toBe true
+
+      _and "options.local is not set", ->
+        beforeEach ->
+          @store.save 'document', '123', { name: 'test', _$local: true }, { local: undefined }
+        
+        it "should remove _$local attribute", ->
+          object = @store.cache.mostRecentCall.args[2]
+          expect(object._$local).toBeUndefined()
 
       _and "object is new (not cached yet)", ->
         beforeEach ->

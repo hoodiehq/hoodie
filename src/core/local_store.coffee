@@ -114,7 +114,12 @@ class Hoodie.LocalStore extends Hoodie.Store
     else unless options.silent
       object.updatedAt = @_now()
       object.createdAt or= object.updatedAt
-  
+
+    # handle local changes
+    if options.local
+      object._$local = true
+    else
+      delete object._$local 
     try 
       object = @cache type, id, object, options
       defer.resolve( object, isNew ).promise()
