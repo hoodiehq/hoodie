@@ -1922,7 +1922,7 @@ Hoodie.LocalStore = (function(_super) {
 
   LocalStore.prototype.isDirty = function(type, id) {
     if (!type) {
-      return $.isEmptyObject(this._dirty);
+      return !$.isEmptyObject(this._dirty);
     }
     return this._isDirty(this.cache(type, id));
   };
