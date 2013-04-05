@@ -393,7 +393,7 @@ class Hoodie.LocalStore extends Hoodie.Store
   # if it has no `_syncedAt` attribute or if `updatedAt` is more recent than `_syncedAt`
   isDirty : (type, id) ->
     unless type
-      return $.isEmptyObject @_dirty
+      return ! $.isEmptyObject @_dirty
       
     @_isDirty @cache(type, id)
 

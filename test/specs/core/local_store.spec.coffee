@@ -713,9 +713,15 @@ describe "Hoodie.LocalStore", ->
 
   describe "#isDirty(type, id)", ->
     _when "no arguments passed", ->
-      it "returns true when there are no dirty documents", ->
-        @store._dirty ={}
-        expect(@store.isDirty()).toBeTruthy()
+      it "returns true when there are dirty documents", ->
+        @store._dirty = 
+          "doc/1" : {}
+          "doc/2" : {}
+        expect( @store.isDirty() ).toBe true
+
+      it "returns false when there are no dirty documents", ->
+        @store._dirty = {}
+        expect( @store.isDirty() ).toBe false
         
     _when "type & id passed", ->
       _and "object was not yet synced", ->
