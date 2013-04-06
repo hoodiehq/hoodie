@@ -1482,6 +1482,9 @@ Hoodie.Remote = (function(_super) {
       }
       object = this._parseFromRemote(doc);
       if (object._deleted) {
+        if (!this._knownObjects[object.id]) {
+          continue;
+        }
         event = 'remove';
         delete this._knownObjects[object.id];
       } else {
