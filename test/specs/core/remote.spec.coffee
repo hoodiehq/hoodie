@@ -366,6 +366,19 @@ describe "Hoodie.Remote", ->
         content  : 'I am prefixed yo.'
         done     : false
         order    : 2
+
+      # {
+      #   "seq"     :5,
+      #   "id"      :"prefix/todo/abc5",
+      #   "changes" :[{"rev":"5-123"}],
+      #   "doc"     :{"_id":"todo/abc5","_rev":"5-123","content":"I deleted, but unknown", "type":"todo"}
+      # }
+      @object4 =
+        id: "abc5"
+        type: "todo"
+        _rev: "5-123"
+        content: "deleted, but unknown"
+        _deleted: true
     
     _when ".isConnected() is true", ->
       beforeEach ->
@@ -402,6 +415,8 @@ describe "Hoodie.Remote", ->
       
       it "should trigger remote events", ->
         spyOn(@remote, "trigger")
+        @remote._knownObjects = 
+          'abc3' : 1
         @remote.pull()
 
         expect(@remote.trigger).wasCalledWith 'remove',           @object1
@@ -420,6 +435,8 @@ describe "Hoodie.Remote", ->
         expect(@remote.trigger).wasCalledWith 'change',            'add', @object2
         expect(@remote.trigger).wasCalledWith 'change:todo',       'add', @object2
         expect(@remote.trigger).wasCalledWith 'change:todo:abc2',  'add', @object2
+
+        expect(@remote.trigger).wasNotCalledWith 'remove:todo:abc5', @object4
         
       _and ".isConnected() returns true", ->
         beforeEach ->

@@ -21,6 +21,13 @@ Mocks.changesResponse = ->
         "id"      :"prefix/todo/abc4",
         "changes" :[{"rev":"4-123"}],
         "doc"     :{"_id":"prefix/todo/abc4","_rev":"4-123","content":"I am prefixed yo.","done":false,"order":2, "type":"todo"}
+      },
+      {
+        "seq"     :5,
+        "id"      :"prefix/todo/abc5",
+        "changes" :[{"rev":"5-123"}],
+        "doc"     :{"_id":"todo/abc5","_rev":"5-123","content":"deleted, but unknown", "type":"todo","_deleted":true},
+        "deleted" :true
       }
     ],
     "last_seq":20
