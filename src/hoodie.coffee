@@ -57,8 +57,6 @@ class Hoodie extends Events
     # if a relative path passed, prefix with @baseUrl
     url = "#{@baseUrl}#{url}" unless /^http/.test url
 
-      
-
     defaults =
       type        : type
       url         : url
