@@ -31,7 +31,8 @@ in public user stores are prefixed by '$public/'</p></div></div><div class="code
     <span class="c1">#</span>
     <span class="vi">@name      = </span><span class="nx">options</span><span class="p">.</span><span class="nx">name</span>      <span class="k">if</span> <span class="nx">options</span><span class="p">.</span><span class="nx">name</span><span class="o">?</span>  
     <span class="vi">@prefix    = </span><span class="nx">options</span><span class="p">.</span><span class="nx">prefix</span>    <span class="k">if</span> <span class="nx">options</span><span class="p">.</span><span class="nx">prefix</span><span class="o">?</span>
-    <span class="vi">@connected = </span><span class="nx">options</span><span class="p">.</span><span class="nx">connected</span> <span class="k">if</span> <span class="nx">options</span><span class="p">.</span><span class="nx">connected</span><span class="o">?</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>in order to differentiate whether an object from remote should trigger a 'new'
+    <span class="vi">@connected = </span><span class="nx">options</span><span class="p">.</span><span class="nx">connected</span> <span class="k">if</span> <span class="nx">options</span><span class="p">.</span><span class="nx">connected</span><span class="o">?</span>
+    <span class="vi">@baseUrl   = </span><span class="nx">options</span><span class="p">.</span><span class="nx">baseUrl</span>   <span class="k">if</span> <span class="nx">options</span><span class="p">.</span><span class="nx">baseUrl</span><span class="o">?</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>in order to differentiate whether an object from remote should trigger a 'new'
 or an 'update' event, we store a hash of known objects</p></div></div><div class="code"><div class="wrapper">    <span class="vi">@_knownObjects = </span><span class="p">{}</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>NOTE: 
 Due to a bug in Chrome (I guess), the loader won't disappear
 when the page is loaded, when we start a long poll request
@@ -45,6 +46,7 @@ after that it would start with the GET /_changes requests,
 starting with the current seq number of the database.</p></div></div><div class="code"><div class="wrapper">    <span class="nx">@connect</span><span class="p">()</span> <span class="k">if</span> <span class="nx">@isConnected</span><span class="p">()</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h2 id="request">request</h2></div></div><div class="code"><div class="wrapper">  </div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>wrapper for hoodie.request, with some store specific defaults
 and a prefixed path</p></div></div><div class="code"><div class="wrapper">  <span class="nv">request : </span><span class="nf">(type, path, options = {}) -&gt;</span>
     <span class="nv">path = </span><span class="s">&quot;/</span><span class="si">#{</span><span class="nb">encodeURIComponent</span> <span class="nx">@name</span><span class="si">}#{</span><span class="nx">path</span><span class="si">}</span><span class="s">&quot;</span> <span class="k">if</span> <span class="nx">@name</span>
+    <span class="nv">path = </span><span class="s">&quot;</span><span class="si">#{</span><span class="nx">@baseUrl</span><span class="si">}#{</span><span class="nx">path</span><span class="si">}</span><span class="s">&quot;</span> <span class="k">if</span> <span class="nx">@baseUrl</span>
 
     <span class="nx">options</span><span class="p">.</span><span class="nx">contentType</span> <span class="o">or=</span> <span class="s">&#39;application/json&#39;</span>
     <span class="k">if</span> <span class="nx">type</span> <span class="o">is</span> <span class="s">&#39;POST&#39;</span> <span class="o">or</span> <span class="nx">type</span> <span class="o">is</span> <span class="s">&#39;PUT&#39;</span>
@@ -136,7 +138,10 @@ will be overwritten </p></div></div><div class="code"><div class="wrapper">  <sp
     
     </div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h2 id="push-changes">push changes</h2></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>Push objects to remote store using the <code>_bulk_docs</code> API.</p></div></div><div class="code"><div class="wrapper">  <span class="nv">push : </span><span class="nf">(objects) =&gt;</span>
     
-    <span class="k">return</span> <span class="nx">@hoodie</span><span class="p">.</span><span class="nx">defer</span><span class="p">().</span><span class="nx">resolve</span><span class="p">([]).</span><span class="nx">promise</span><span class="p">()</span> <span class="k">unless</span> <span class="nx">objects</span><span class="o">?</span><span class="p">.</span><span class="nx">length</span>
+    <span class="k">return</span> <span class="nx">@hoodie</span><span class="p">.</span><span class="nx">resolveWith</span><span class="p">([])</span> <span class="k">unless</span> <span class="nx">objects</span><span class="o">?</span><span class="p">.</span><span class="nx">length</span>
+    <span class="k">unless</span> <span class="nx">@isConnected</span><span class="p">()</span>
+      <span class="nv">error = </span><span class="k">new</span> <span class="nx">ConnectionError</span><span class="p">(</span><span class="s">&quot;Connection is disconnected: </span><span class="si">#{</span><span class="nx">objects</span><span class="p">.</span><span class="nx">length</span><span class="si">}</span><span class="s"> change(s) could not be pushed to </span><span class="si">#{</span><span class="nx">@name</span><span class="si">}</span><span class="s">&quot;</span><span class="p">,</span> <span class="nx">objects</span><span class="p">)</span>
+      <span class="k">return</span> <span class="nx">@hoodie</span><span class="p">.</span><span class="nx">rejectWith</span> <span class="nx">error</span>
       
     <span class="nv">objectsForRemote = </span><span class="p">[]</span>
     <span class="k">for</span> <span class="nx">object</span> <span class="k">in</span> <span class="nx">objects</span>
@@ -246,6 +251,7 @@ or does not exist yet.</p>
       </div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>Please server, don't give us these. At least not persistently </p></div></div><div class="code"><div class="wrapper">      <span class="k">when</span> <span class="mi">500</span>
         <span class="nx">@trigger</span> <span class="s">&#39;error:server&#39;</span><span class="p">,</span> <span class="nx">error</span>
         <span class="nb">window</span><span class="p">.</span><span class="nx">setTimeout</span> <span class="nx">@pull</span><span class="p">,</span> <span class="mi">3000</span>
+        <span class="nx">@hoodie</span><span class="p">.</span><span class="nx">checkConnection</span><span class="p">()</span>
       </div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>usually a 0, which stands for timeout or server not reachable.</p></div></div><div class="code"><div class="wrapper">      <span class="k">else</span>
         <span class="k">return</span> <span class="k">unless</span> <span class="nx">@isConnected</span><span class="p">()</span>
 
@@ -254,15 +260,20 @@ or does not exist yet.</p>
             </div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>oops. This might be caused by an unreachable server.
 Or the server canceled it for what ever reason, e.g.
 heroku kills the request after ~30s.
-we'll try again after a 3s timeout</p></div></div><div class="code"><div class="wrapper">          <span class="nb">window</span><span class="p">.</span><span class="nx">setTimeout</span> <span class="nx">@pull</span><span class="p">,</span> <span class="mi">3000</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h3 id="handle-changes-from-remote">handle changes from remote</h3></div></div></div><div class="segment"><div class="code"><div class="wrapper">  <span class="c1">#</span>
+we'll try again after a 3s timeout</p></div></div><div class="code"><div class="wrapper">          <span class="nb">window</span><span class="p">.</span><span class="nx">setTimeout</span> <span class="nx">@pull</span><span class="p">,</span> <span class="mi">3000</span>
+
+          <span class="nx">@hoodie</span><span class="p">.</span><span class="nx">checkConnection</span><span class="p">()</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h3 id="handle-changes-from-remote">handle changes from remote</h3></div></div></div><div class="segment"><div class="code"><div class="wrapper">  <span class="c1">#</span>
   <span class="nv">_handlePullResults : </span><span class="nf">(changes) =&gt;</span>
     <span class="k">for</span> <span class="p">{</span><span class="nx">doc</span><span class="p">}</span> <span class="k">in</span> <span class="nx">changes</span>
       <span class="k">continue</span> <span class="k">if</span> <span class="nx">@prefix</span> <span class="o">and</span> <span class="nx">doc</span><span class="p">.</span><span class="nx">_id</span><span class="p">.</span><span class="nx">indexOf</span><span class="p">(</span><span class="nx">@prefix</span><span class="p">)</span> <span class="o">isnt</span> <span class="mi">0</span>
 
       <span class="nv">object = </span><span class="nx">@_parseFromRemote</span><span class="p">(</span><span class="nx">doc</span><span class="p">)</span>
       <span class="k">if</span> <span class="nx">object</span><span class="p">.</span><span class="nx">_deleted</span>
+        <span class="k">continue</span> <span class="k">unless</span> <span class="nx">@_knownObjects</span><span class="p">[</span><span class="nx">object</span><span class="p">.</span><span class="nx">id</span><span class="p">]</span>
+
         <span class="nv">event = </span><span class="s">&#39;remove&#39;</span>
         <span class="k">delete</span> <span class="nx">@_knownObjects</span><span class="p">[</span><span class="nx">object</span><span class="p">.</span><span class="nx">id</span><span class="p">]</span>
+
       <span class="k">else</span>
         <span class="k">if</span> <span class="nx">@_knownObjects</span><span class="p">[</span><span class="nx">object</span><span class="p">.</span><span class="nx">id</span><span class="p">]</span>
           <span class="nv">event = </span><span class="s">&#39;update&#39;</span>
@@ -275,4 +286,11 @@ we'll try again after a 3s timeout</p></div></div><div class="code"><div class="
       <span class="nx">@trigger</span> <span class="s">&quot;</span><span class="si">#{</span><span class="nx">event</span><span class="si">}</span><span class="s">:</span><span class="si">#{</span><span class="nx">object</span><span class="p">.</span><span class="nx">type</span><span class="si">}</span><span class="s">:</span><span class="si">#{</span><span class="nx">object</span><span class="p">.</span><span class="nx">id</span><span class="si">}</span><span class="s">&quot;</span><span class="p">,</span> <span class="nx">object</span>      
       <span class="nx">@trigger</span> <span class="s">&quot;change&quot;</span><span class="p">,</span>                               <span class="nx">event</span><span class="p">,</span> <span class="nx">object</span>
       <span class="nx">@trigger</span> <span class="s">&quot;change:</span><span class="si">#{</span><span class="nx">object</span><span class="p">.</span><span class="nx">type</span><span class="si">}</span><span class="s">&quot;</span><span class="p">,</span>                <span class="nx">event</span><span class="p">,</span> <span class="nx">object</span>
-      <span class="nx">@trigger</span> <span class="s">&quot;change:</span><span class="si">#{</span><span class="nx">object</span><span class="p">.</span><span class="nx">type</span><span class="si">}</span><span class="s">:</span><span class="si">#{</span><span class="nx">object</span><span class="p">.</span><span class="nx">id</span><span class="si">}</span><span class="s">&quot;</span><span class="p">,</span>   <span class="nx">event</span><span class="p">,</span> <span class="nx">object</span></div></div></div></div></body></html>
+      <span class="nx">@trigger</span> <span class="s">&quot;change:</span><span class="si">#{</span><span class="nx">object</span><span class="p">.</span><span class="nx">type</span><span class="si">}</span><span class="s">:</span><span class="si">#{</span><span class="nx">object</span><span class="p">.</span><span class="nx">id</span><span class="si">}</span><span class="s">&quot;</span><span class="p">,</span>   <span class="nx">event</span><span class="p">,</span> <span class="nx">object</span>
+
+
+
+<span class="k">class</span> <span class="nx">ConnectionError</span> <span class="k">extends</span> <span class="nb">Error</span>
+  <span class="nv">name: </span><span class="s">&quot;ConnectionError&quot;</span>
+
+  <span class="nv">constructor : </span><span class="nf">(@message, @data) -&gt;</span> <span class="k">super</span></div></div></div></div></body></html>

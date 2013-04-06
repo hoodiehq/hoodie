@@ -52,11 +52,16 @@ class Hoodie extends Events
   # 
   #     promise = hoodie.request('GET', '/user_database/doc_id')
   #
-  request : (type, path, options = {}) ->
+  request : (type, url, options = {}) ->
+
+    # if a relative path passed, prefix with @baseUrl
+    url = "#{@baseUrl}#{url}" unless /^http/.test url
+
+      
 
     defaults =
       type        : type
-      url         : "#{@baseUrl}#{path}"
+      url         : url
       xhrFields   : withCredentials: true
       crossDomain : true
       dataType    : 'json'
@@ -99,8 +104,8 @@ class Hoodie extends Events
   # 
   #     hoodie.open("some_store_name").findAll()
   #
-  open : (store_name, options = {}) ->
-    $.extend options, name: store_name
+  open : (storeName, options = {}) ->
+    $.extend options, name: storeName
     new Hoodie.Remote this, options
   
 

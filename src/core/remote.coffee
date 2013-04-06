@@ -71,6 +71,7 @@ class Hoodie.Remote extends Hoodie.Store
     @name      = options.name      if options.name?  
     @prefix    = options.prefix    if options.prefix?
     @connected = options.connected if options.connected?
+    @baseUrl   = options.baseUrl   if options.baseUrl?
 
     # in order to differentiate whether an object from remote should trigger a 'new'
     # or an 'update' event, we store a hash of known objects
@@ -97,6 +98,7 @@ class Hoodie.Remote extends Hoodie.Store
   # and a prefixed path
   request : (type, path, options = {}) ->
     path = "/#{encodeURIComponent @name}#{path}" if @name
+    path = "#{@baseUrl}#{path}" if @baseUrl
 
     options.contentType or= 'application/json'
     if type is 'POST' or type is 'PUT'

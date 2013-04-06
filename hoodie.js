@@ -103,14 +103,17 @@ Hoodie = (function(_super) {
     this.checkConnection();
   }
 
-  Hoodie.prototype.request = function(type, path, options) {
+  Hoodie.prototype.request = function(type, url, options) {
     var defaults;
     if (options == null) {
       options = {};
     }
+    if (!/^http/.test(url)) {
+      url = "" + this.baseUrl + url;
+    }
     defaults = {
       type: type,
-      url: "" + this.baseUrl + path,
+      url: url,
       xhrFields: {
         withCredentials: true
       },
@@ -130,12 +133,12 @@ Hoodie = (function(_super) {
     return this._checkConnectionRequest = this.request('GET', '/').pipe(this._handleCheckConnectionSuccess, this._handleCheckConnectionError);
   };
 
-  Hoodie.prototype.open = function(store_name, options) {
+  Hoodie.prototype.open = function(storeName, options) {
     if (options == null) {
       options = {};
     }
     $.extend(options, {
-      name: store_name
+      name: storeName
     });
     return new Hoodie.Remote(this, options);
   };
@@ -1155,6 +1158,9 @@ Hoodie.Remote = (function(_super) {
     if (options.connected != null) {
       this.connected = options.connected;
     }
+    if (options.baseUrl != null) {
+      this.baseUrl = options.baseUrl;
+    }
     this._knownObjects = {};
     if (this.isConnected()) {
       this.connect();
@@ -1167,6 +1173,9 @@ Hoodie.Remote = (function(_super) {
     }
     if (this.name) {
       path = "/" + (encodeURIComponent(this.name)) + path;
+    }
+    if (this.baseUrl) {
+      path = "" + this.baseUrl + path;
     }
     options.contentType || (options.contentType = 'application/json');
     if (type === 'POST' || type === 'PUT') {

@@ -49,6 +49,7 @@ describe "Hoodie", ->
         promise = $.Deferred()
         $.ajax.andReturn promise
         expect(@hoodie.request('GET', '/')).toBe promise
+         
     
     _when "request 'POST', '/test', data: funky: 'fresh'", ->
       beforeEach ->
@@ -58,6 +59,15 @@ describe "Hoodie", ->
       it "should send a POST request to http://couch.example.com/test", ->
         expect(@args.type).toBe 'POST'
         expect(@args.url).toBe 'http://couch.example.com/test'
+
+    _when "request('GET', 'http://api.otherapp.com/')", ->
+      beforeEach ->
+        @hoodie.request('GET', 'http://api.otherapp.com/')
+        @args = args = $.ajax.mostRecentCall.args[0]
+
+      it "should send a GET request to http://api.otherapp.com/", ->
+        expect(@args.type).toBe 'GET'
+        expect(@args.url).toBe 'http://api.otherapp.com/'
   # /request(type, path, options)
 
 

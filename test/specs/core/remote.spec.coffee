@@ -46,6 +46,13 @@ describe "Hoodie.Remote", ->
       
       it "should set prefix accordingly", ->
         expect(@remote.prefix).toBe '$public'
+
+    _when "baseUrl: http://api.otherapp.com passed", ->
+      beforeEach ->
+        @remote = new Hoodie.Remote @hoodie, baseUrl: 'http://api.otherapp.com'
+      
+      it "should set baseUrl accordingly", ->
+        expect(@remote.baseUrl).toBe 'http://api.otherapp.com'
   # /constructor
 
 
@@ -71,6 +78,12 @@ describe "Hoodie.Remote", ->
       @remote.request("GET", "/something")
       [type, path] = @hoodie.request.mostRecentCall.args
       expect(path).toBe '/my%2Fstore/something'
+
+    it "should prefix path with @baseUrl", ->
+      @remote.baseUrl = 'http://api.otherapp.com'
+      @remote.request("GET", "/something")
+      [type, path] = @hoodie.request.mostRecentCall.args
+      expect(path).toBe 'http://api.otherapp.com/something'
 
     _when "type is POST", ->
       beforeEach ->
