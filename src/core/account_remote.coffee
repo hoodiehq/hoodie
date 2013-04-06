@@ -82,7 +82,7 @@ class Hoodie.AccountRemote extends Hoodie.Remote
     objects = @hoodie.store.changedObjects() unless $.isArray objects
     promise = super(objects)
     promise.fail @hoodie.checkConnection
-    return promise 
+    return promise
 
 
   # Events

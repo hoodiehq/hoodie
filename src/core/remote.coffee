@@ -376,7 +376,12 @@ class Hoodie.Remote extends Hoodie.Store
     id = object._id or object.id
     delete object._id
     id = id.replace(RegExp('^'+@prefix), '') if @prefix
-    [object.type, object.id] = id.split(/\//)
+
+    # turn doc/123 into type = doc & id = 123
+    [ignore, object.type, object.id] = id.match(/([^\/]+)\/(.*)/)
+    # NOTE:
+    # we don't use a simple id.split(/\//) here, as in some cases
+    # IDs might contain "/", too
     
     # handle timestameps
     object.createdAt = new Date(Date.parse object.createdAt) if object.createdAt

@@ -241,6 +241,7 @@ Hoodie.Account = (function() {
     this._handleRequestError = __bind(this._handleRequestError, this);
     this._handleAuthenticateRequestSuccess = __bind(this._handleAuthenticateRequestSuccess, this);
     this.fetch = __bind(this.fetch, this);
+    this.signOut = __bind(this.signOut, this);
     this.authenticate = __bind(this.authenticate, this);
     this._doc = {};
     this._requests = {};
@@ -1373,13 +1374,13 @@ Hoodie.Remote = (function(_super) {
   };
 
   Remote.prototype._parseFromRemote = function(object) {
-    var id, _ref;
+    var id, ignore, _ref;
     id = object._id || object.id;
     delete object._id;
     if (this.prefix) {
       id = id.replace(RegExp('^' + this.prefix), '');
     }
-    _ref = id.split(/\//), object.type = _ref[0], object.id = _ref[1];
+    _ref = id.match(/([^\/]+)\/(.*)/), ignore = _ref[0], object.type = _ref[1], object.id = _ref[2];
     if (object.createdAt) {
       object.createdAt = new Date(Date.parse(object.createdAt));
     }

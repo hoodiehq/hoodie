@@ -167,7 +167,7 @@ class Hoodie.Account
   # ---------
 
   # uses standard CouchDB API to invalidate a user session (DELETE /_session)
-  signOut : (options = {})->
+  signOut : (options = {}) =>
 
     unless @hasAccount()
       return @_cleanup().then =>
