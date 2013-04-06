@@ -255,22 +255,26 @@ Hoodie.Account = (function() {
   }
 
   Account.prototype.authenticate = function() {
-    var promise,
+    var _ref, _ref1,
       _this = this;
-    if (!this.username) {
-      this._sendSignOutRequest();
+    if (this._authenticated === false) {
       return this.hoodie.defer().reject().promise();
     }
     if (this._authenticated === true) {
       return this.hoodie.defer().resolve(this.username).promise();
     }
-    if (this._authenticated === false) {
-      return this.hoodie.defer().reject().promise();
+    if (((_ref = this._requests.signOut) != null ? _ref.state() : void 0) === 'pending' || ((_ref1 = this._requests.signIn) != null ? _ref1.state() : void 0) === 'pending') {
+      return this.hoodie.rejectWith();
     }
-    promise = this._withSingleRequest('authenticate', function() {
+    if (this.username === void 0) {
+      return this._sendSignOutRequest().then(function() {
+        _this._authenticated = false;
+        return _this.hoodie.rejectWith();
+      });
+    }
+    return this._withSingleRequest('authenticate', function() {
       return _this.request('GET', "/_session");
-    });
-    return promise.pipe(this._handleAuthenticateRequestSuccess, this._handleRequestError);
+    }).pipe(this._handleAuthenticateRequestSuccess, this._handleRequestError);
   };
 
   Account.prototype.signUp = function(username, password) {

@@ -43,21 +43,29 @@ class Hoodie.Account
   # Use this method to assure that the user is authenticated:
   # `hoodie.account.authenticate().done( doSomething ).fail( handleError )`
   authenticate : =>
-    unless @username
-      @_sendSignOutRequest()
+      
+    if @_authenticated is false
       return @hoodie.defer().reject().promise()
       
     if @_authenticated is true
       return @hoodie.defer().resolve(@username).promise()
-      
-    if @_authenticated is false
-      return @hoodie.defer().reject().promise()
-    
-    # @_authenticated is undefined
-    promise = @_withSingleRequest 'authenticate', =>
-      @request('GET', "/_session")
 
-    promise.pipe @_handleAuthenticateRequestSuccess, @_handleRequestError
+    # if there is a pending signOut request, return its promise,
+    # but pipe it so that it always ends up rejected
+    if @_requests.signOut?.state() is 'pending' or @_requests.signIn?.state() is 'pending'
+      return @hoodie.rejectWith()
+
+    # if username is not set, make sure to end the session
+    if @username is undefined
+
+      return @_sendSignOutRequest().then => 
+        @_authenticated = false
+        @hoodie.rejectWith()
+    
+    # send request to check for session status. If there is a
+    # pending request already, return its promise.
+    @_withSingleRequest('authenticate', => @request('GET', "/_session"))
+    .pipe @_handleAuthenticateRequestSuccess, @_handleRequestError
     
     
   # sign up with username & password

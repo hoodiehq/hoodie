@@ -67,16 +67,11 @@ describe "Hoodie.Account", ->
   
   
   describe "#authenticate()", ->
+    beforeEach ->
+      # prevent authenticate from running on initialization
+      window.setTimeout.andCallFake ->
+      @account = new Hoodie.Account @hoodie
     
-    _when "account.username is not set", ->
-      beforeEach ->
-        @promise = @account.authenticate()
-      
-      it "should return a rejected promise", ->
-        expect(@promise).toBeRejected()
-
-      it "should send a sign out request, but not cleanup", ->
-        expect(@hoodie.request).wasCalledWith 'DELETE', '/_session' 
 
     _when "account is already authenticated", ->
       beforeEach ->
@@ -100,6 +95,63 @@ describe "Hoodie.Account", ->
 
       it "should reject the promise", ->
         expect(@promise).toBeRejected()
+
+    _when "there is a pending singIn request", ->
+      beforeEach ->
+        @signInDefer = @hoodie.defer()
+        @account._requests.signIn = @signInDefer.promise()
+
+      it "it should be rejected", ->
+        expect(@account.authenticate()).toBeRejected()
+
+    _when "there is a pending singOut request", ->
+      beforeEach ->
+        @signInDefer = @hoodie.defer()
+        @account._requests.signOut = @signInDefer.promise()
+
+      it "it should be rejected", ->
+        expect(@account.authenticate()).toBeRejected()
+      
+    
+    _when "account.username is not yet set", ->
+      it "should send a sign out request, but not cleanup", ->
+        @account.authenticate()
+        expect(@hoodie.request).wasCalledWith 'DELETE', '/_session' 
+
+      _and "signOut succeeds", ->
+        beforeEach ->
+          @requestDefer.resolve()
+        
+        it "should return a rejected promise", ->
+          expect(@account.authenticate()).toBeRejected()
+
+      _and "signOut fails", ->
+        beforeEach ->
+          @requestDefer.reject()
+        
+        it "should return a rejected promise", ->
+          expect(@account.authenticate()).toBeRejected()
+
+    _when "username is set not set", ->
+      beforeEach ->
+        delete @account.username
+        @signOutDefer = @hoodie.defer()
+        @account._requests.signOut = @signOutDefer.promise()
+        @promise = @account.authenticate()
+
+      _and "signOut succeeds", ->
+        beforeEach ->
+          @signOutDefer.resolve()
+        
+        it "should return a rejected promise", ->
+          expect(@promise).toBeRejected()
+
+      _and "signOut fails", ->
+        beforeEach ->
+          @signOutDefer.reject()
+        
+        it "should return a rejected promise", ->
+          expect(@promise).toBeRejected()
 
     _when "account has not been authenticated yet", ->
       beforeEach ->
