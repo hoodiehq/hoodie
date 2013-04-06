@@ -53,6 +53,7 @@ class Hoodie extends Events
   #     promise = hoodie.request('GET', '/user_database/doc_id')
   #
   request : (type, path, options = {}) ->
+
     defaults =
       type        : type
       url         : "#{@baseUrl}#{path}"

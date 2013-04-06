@@ -282,7 +282,10 @@ class Hoodie.Remote extends Hoodie.Store
   # Push objects to remote store using the `_bulk_docs` API.
   push : (objects) =>
     
-    return @hoodie.defer().resolve([]).promise() unless objects?.length
+    return @hoodie.resolveWith([]) unless objects?.length
+    unless @isConnected()
+      error = new ConnectionError("Connection is disconnected: #{objects.length} change(s) could not be pushed to #{@name}", objects)
+      return @hoodie.rejectWith error
       
     objectsForRemote = []
     for object in objects
@@ -523,3 +526,10 @@ class Hoodie.Remote extends Hoodie.Store
       @trigger "change",                               event, object
       @trigger "change:#{object.type}",                event, object
       @trigger "change:#{object.type}:#{object.id}",   event, object
+
+
+
+class ConnectionError extends Error
+  name: "ConnectionError"
+
+  constructor : (@message, @data) -> super

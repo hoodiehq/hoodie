@@ -11,6 +11,7 @@ describe "Hoodie.Remote", ->
     spyOn(@hoodie.account, "db").andReturn 'joe$example.com'
 
     @remote = new Hoodie.Remote @hoodie
+    @remote.name = 'remotetest'
     spyOn(@remote, "request").andReturn @requestDefer.promise()
   
   describe "constructor(@hoodie, options = {})", ->
@@ -54,6 +55,7 @@ describe "Hoodie.Remote", ->
   describe "#request(type, path, options)", ->
     beforeEach ->
       @remote.request.andCallThrough()
+      delete @remote.name
       spyOn(@hoodie, "request")
     
     it "should proxy to hoodie.request", ->
@@ -565,68 +567,89 @@ describe "Hoodie.Remote", ->
         @remote.push([])
         expect(@remote.request).wasNotCalled()
 
-    _when "Array of docs passed", ->
+    _when "disconnected", ->
       beforeEach ->
-        @todoObjects = [
-          {type: 'todo', id: '1'}
-          {type: 'todo', id: '2'}
-          {type: 'todo', id: '3'}
-        ]
-        @remote.push @todoObjects
-      
-      it "should POST the passed objects", ->
-        expect(@remote.request).wasCalled()
-        data = @remote.request.mostRecentCall.args[2].data
-        expect(data.docs.length).toBe 3
+        spyOn(@remote, "isConnected").andReturn false
 
-    _and "one deleted and one new doc passed", ->
+      it "should reject with pushError", ->
+        promise = @remote.push [{type: 'todo', id: '1'}]
+        errorCalled = false
+        promise.fail (error) ->
+          errorCalled = true
+          {name, message, data} = error
+
+          expect(name).toBe 'ConnectionError'
+          expect(message).toBe 'Connection is disconnected: 1 change(s) could not be pushed to remotetest'
+
+        expect(errorCalled).toBeTruthy()
+         
+
+    _when "connected", ->
       beforeEach ->
-        @remote.push Mocks.changedObjects()
-        expect(@remote.request).wasCalled()
-        [@method, @path, @options] = @remote.request.mostRecentCall.args
-  
-      it "should post the changes to the user's db _bulk_docs API", ->
-        expect(@method).toBe 'POST'
-        expect(@path).toBe '/_bulk_docs'
+        spyOn(@remote, "isConnected").andReturn true
+      
+      _and "Array of docs passed", ->
+        beforeEach ->
+          @todoObjects = [
+            {type: 'todo', id: '1'}
+            {type: 'todo', id: '2'}
+            {type: 'todo', id: '3'}
+          ]
+          @remote.push @todoObjects
+        
+        it "should POST the passed objects", ->
+          expect(@remote.request).wasCalled()
+          data = @remote.request.mostRecentCall.args[2].data
+          expect(data.docs.length).toBe 3
+
+      _and "one deleted and one new doc passed", ->
+        beforeEach ->
+          @remote.push Mocks.changedObjects()
+          expect(@remote.request).wasCalled()
+          [@method, @path, @options] = @remote.request.mostRecentCall.args
     
-      it "should send the docs in appropriate format", ->
-        {docs} = @options.data
-        doc = docs[0]
-        expect(doc.id).toBeUndefined()
-        expect(doc._id).toBe 'todo/abc3'
-        expect(doc._localInfo).toBeUndefined()
-
-      it "should set data.new_edits to false", ->
-        {new_edits} = @options.data
-        expect(new_edits).toBe false
-
-      it "should set new _revision ids", ->
-        {docs} = @options.data
-        [deletedDoc, newDoc] = docs
-        expect(deletedDoc._rev).toBe '3-uuid'
-        expect(newDoc._rev).toMatch '1-uuid'
-
-        expect(deletedDoc._revisions.start).toBe 3
-        expect(deletedDoc._revisions.ids[0]).toBe 'uuid'
-        expect(deletedDoc._revisions.ids[1]).toBe '123'
-
-        expect(newDoc._revisions.start).toBe 1
-        expect(newDoc._revisions.ids[0]).toBe 'uuid'
-
-    _when "prefix set to $public", ->
-      beforeEach ->
-        @remote.prefix = '$public/'
-        @todoObjects = [
-          {type: 'todo', id: '1'}
-          {type: 'todo', id: '2'}
-          {type: 'todo', id: '3'}
-        ]
-        @remote.push @todoObjects
+        it "should post the changes to the user's db _bulk_docs API", ->
+          expect(@method).toBe 'POST'
+          expect(@path).toBe '/_bulk_docs'
       
-      it "should prefix all document IDs with '$public/'", ->
-        expect(@remote.request).wasCalled()
-        data = @remote.request.mostRecentCall.args[2].data
-        expect(data.docs[0]._id).toBe '$public/todo/1'
+        it "should send the docs in appropriate format", ->
+          {docs} = @options.data
+          doc = docs[0]
+          expect(doc.id).toBeUndefined()
+          expect(doc._id).toBe 'todo/abc3'
+          expect(doc._localInfo).toBeUndefined()
+
+        it "should set data.new_edits to false", ->
+          {new_edits} = @options.data
+          expect(new_edits).toBe false
+
+        it "should set new _revision ids", ->
+          {docs} = @options.data
+          [deletedDoc, newDoc] = docs
+          expect(deletedDoc._rev).toBe '3-uuid'
+          expect(newDoc._rev).toMatch '1-uuid'
+
+          expect(deletedDoc._revisions.start).toBe 3
+          expect(deletedDoc._revisions.ids[0]).toBe 'uuid'
+          expect(deletedDoc._revisions.ids[1]).toBe '123'
+
+          expect(newDoc._revisions.start).toBe 1
+          expect(newDoc._revisions.ids[0]).toBe 'uuid'
+
+      _and "prefix set to $public", ->
+        beforeEach ->
+          @remote.prefix = '$public/'
+          @todoObjects = [
+            {type: 'todo', id: '1'}
+            {type: 'todo', id: '2'}
+            {type: 'todo', id: '3'}
+          ]
+          @remote.push @todoObjects
+        
+        it "should prefix all document IDs with '$public/'", ->
+          expect(@remote.request).wasCalled()
+          data = @remote.request.mostRecentCall.args[2].data
+          expect(data.docs[0]._id).toBe '$public/todo/1'
   # /#push(docs)
 
   describe "#sync(docs)", ->

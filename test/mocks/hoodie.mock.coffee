@@ -20,8 +20,8 @@ Mocks.Hoodie = ->
   defer         : $.Deferred
   isPromise     : Hoodie::isPromise
   uuid          : -> 'uuid'
-  resolveWith   : -> 'resolved'
-  rejectWith    : -> 'rejected'
+  resolveWith   : -> $.Deferred().resolve(arguments...).promise()
+  rejectWith    : -> $.Deferred().reject(arguments...).promise()
     
   store         :
     add           : -> promiseMock 

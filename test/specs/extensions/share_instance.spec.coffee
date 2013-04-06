@@ -182,7 +182,7 @@ describe "Hoodie.ShareInstance", ->
 
         it "should return a resolved promise", ->
           expect(@hoodie.resolveWith).wasCalledWith @share
-          expect(@promise).toBe 'resolved'
+          expect(@promise).toBeResolved()
 
     _when "share.access is ['joe@example.com']", ->
       beforeEach ->
@@ -237,7 +237,7 @@ describe "Hoodie.ShareInstance", ->
           expect(@hoodie.share.update).wasNotCalled()
 
         it "should return a rejected promise", ->
-          expect(@promise).toBe 'rejected'
+          expect(@promise).toBeRejected()
 
     _when "share.access is {read: true, write: ['joe@example.com']}", ->
       beforeEach ->
@@ -256,7 +256,7 @@ describe "Hoodie.ShareInstance", ->
           expect(@hoodie.share.update).wasCalledWith 'id123', access: true
 
         it "should return a rejected promise", ->
-          expect(@promise).toBe 'rejected'
+          expect(@promise).toBeRejected()
 
     _when "share.access is false", ->
       beforeEach ->
@@ -268,7 +268,7 @@ describe "Hoodie.ShareInstance", ->
 
       it "should return a resolved promise", ->
         expect(@hoodie.resolveWith).wasCalledWith @share
-        expect(@promise).toBe 'resolved'
+        expect(@promise).toBeResolved()
 
     _when "share.access is ['joe@example.com']", ->
       beforeEach ->
@@ -337,7 +337,7 @@ describe "Hoodie.ShareInstance", ->
 
       it "should return a resolved promise", ->
         expect(@hoodie.resolveWith).wasCalledWith @share
-        expect(@promise).toBe 'resolved'
+        expect(@promise).toBeResolved()
 
     _when "share.access is ['joe@example.com']", ->
       beforeEach ->
@@ -410,7 +410,7 @@ describe "Hoodie.ShareInstance", ->
           expect(@hoodie.share.update).wasNotCalled()
 
         it "should return a rejected promise", ->
-          expect(@promise).toBe 'rejected'
+          expect(@promise).toBeRejected()
 
     _when "share.access is {read: true, write: ['joe@example.com']}", ->
       beforeEach ->
@@ -438,7 +438,7 @@ describe "Hoodie.ShareInstance", ->
 
       it "should return a resolved promise", ->
         expect(@hoodie.resolveWith).wasCalledWith @share
-        expect(@promise).toBe 'resolved'
+        expect(@promise).toBeResolved()
 
     _when "share.access is ['joe@example.com']", ->
       beforeEach ->
