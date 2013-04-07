@@ -22,8 +22,6 @@ hoodie = new Hoodie
 </code></pre></div></div><div class="code"><div class="wrapper">  <span class="c1">#</span>
   <span class="nv">request : </span><span class="nf">(type, url, options = {}) -&gt;</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>if a relative path passed, prefix with @baseUrl</p></div></div><div class="code"><div class="wrapper">    <span class="nv">url = </span><span class="s">&quot;</span><span class="si">#{</span><span class="nx">@baseUrl</span><span class="si">}#{</span><span class="nx">url</span><span class="si">}</span><span class="s">&quot;</span> <span class="k">unless</span> <span class="sr">/^http/</span><span class="p">.</span><span class="nx">test</span> <span class="nx">url</span>
 
-      
-
     <span class="nv">defaults =</span>
       <span class="nv">type        : </span><span class="nx">type</span>
       <span class="nv">url         : </span><span class="nx">url</span>
@@ -84,6 +82,14 @@ return defer.promise()
 </code></pre></div></div><div class="code"><div class="wrapper">  <span class="nv">defer: </span><span class="nx">$</span><span class="p">.</span><span class="nx">Deferred</span>
   </div></div></div><div class="segment"><div class="code"><div class="wrapper">  <span class="nv">isPromise : </span><span class="nf">(obj) -&gt;</span>
     <span class="k">typeof</span> <span class="nx">obj</span><span class="o">?</span><span class="p">.</span><span class="nx">done</span> <span class="o">is</span> <span class="s">&#39;function&#39;</span> <span class="o">and</span> <span class="k">typeof</span> <span class="nx">obj</span><span class="p">.</span><span class="nx">resolve</span> <span class="o">is</span> <span class="s">&#39;undefined&#39;</span>
+
+  <span class="c1">#</span>
+  <span class="nv">resolve : </span><span class="nf">-&gt;</span>
+    <span class="nx">@defer</span><span class="p">().</span><span class="nx">resolve</span><span class="p">().</span><span class="nx">promise</span><span class="p">()</span>
+
+  <span class="c1">#</span>
+  <span class="nv">reject : </span><span class="nf">-&gt;</span>
+    <span class="nx">@defer</span><span class="p">().</span><span class="nx">reject</span><span class="p">().</span><span class="nx">promise</span><span class="p">()</span>
 
   <span class="c1">#</span>
   <span class="nv">resolveWith : </span><span class="nf">-&gt;</span>

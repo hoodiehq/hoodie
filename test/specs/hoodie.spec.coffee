@@ -172,13 +172,21 @@ describe "Hoodie", ->
         expect(@hoodie.uuid(5).length).toBe 5
   # /#uuid(num)
 
+  describe "#resolve()", ->
+    it "simply returns resolved promise", ->
+       expect(@hoodie.resolve()).toBeResolved()
+  # /#resolveWith(something)
+
+  describe "#reject()", ->
+    it "simply returns rejected promise", ->
+       expect(@hoodie.reject()).toBeRejected()
+  # /#resolveWith(something)
 
   describe "#resolveWith(something)", ->
     it "wraps passad arguments into a promise and returns it", ->
        promise = @hoodie.resolveWith('funky', 'fresh')
        expect(promise).toBeResolvedWith 'funky', 'fresh'
   # /#resolveWith(something)
-
 
   describe "#rejectWith(something)", ->
     it "wraps passad arguments into a promise and returns it", ->

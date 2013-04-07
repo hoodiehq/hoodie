@@ -166,6 +166,14 @@ Hoodie = (function(_super) {
     return typeof (obj != null ? obj.done : void 0) === 'function' && typeof obj.resolve === 'undefined';
   };
 
+  Hoodie.prototype.resolve = function() {
+    return this.defer().resolve().promise();
+  };
+
+  Hoodie.prototype.reject = function() {
+    return this.defer().reject().promise();
+  };
+
   Hoodie.prototype.resolveWith = function() {
     var _ref;
     return (_ref = this.defer()).resolve.apply(_ref, arguments).promise();
@@ -263,7 +271,10 @@ Hoodie.Account = (function() {
     if (this._authenticated === true) {
       return this.hoodie.defer().resolve(this.username).promise();
     }
-    if (((_ref = this._requests.signOut) != null ? _ref.state() : void 0) === 'pending' || ((_ref1 = this._requests.signIn) != null ? _ref1.state() : void 0) === 'pending') {
+    if (((_ref = this._requests.signIn) != null ? _ref.state() : void 0) === 'pending') {
+      return this.hoodie.rejectWith();
+    }
+    if (((_ref1 = this._requests.signOut) != null ? _ref1.state() : void 0) === 'pending') {
       return this.hoodie.rejectWith();
     }
     if (this.username === void 0) {

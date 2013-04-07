@@ -57,8 +57,17 @@ for local updates, keep hidden properties (starting with '$')</p></div></div><di
 
     <span class="k">else</span> <span class="k">unless</span> <span class="nx">options</span><span class="p">.</span><span class="nx">silent</span>
       <span class="nv">object.updatedAt = </span><span class="nx">@_now</span><span class="p">()</span>
-      <span class="nx">object</span><span class="p">.</span><span class="nx">createdAt</span> <span class="o">or=</span> <span class="nx">object</span><span class="p">.</span><span class="nx">updatedAt</span>
-  
+      <span class="nx">object</span><span class="p">.</span><span class="nx">createdAt</span> <span class="o">or=</span> <span class="nx">object</span><span class="p">.</span><span class="nx">updatedAt</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>handle local changes</p>
+
+<p>A local change is meant to be replicated to the
+users database, but not beyond. For example when
+I subscribed to a share but then decide to unsubscribe,
+all objects get removed with local: true flag, so that
+they get removed from my database, but won't anywhere else.</p></div></div><div class="code"><div class="wrapper">    <span class="k">if</span> <span class="nx">options</span><span class="p">.</span><span class="nx">local</span>
+      <span class="nv">object._$local = </span><span class="kc">true</span>
+    <span class="k">else</span>
+      <span class="k">delete</span> <span class="nx">object</span><span class="p">.</span><span class="nx">_$local</span> 
+
     <span class="k">try</span> 
       <span class="nv">object = </span><span class="nx">@cache</span> <span class="nx">type</span><span class="p">,</span> <span class="nx">id</span><span class="p">,</span> <span class="nx">object</span><span class="p">,</span> <span class="nx">options</span>
       <span class="nx">defer</span><span class="p">.</span><span class="nx">resolve</span><span class="p">(</span> <span class="nx">object</span><span class="p">,</span> <span class="nx">isNew</span> <span class="p">).</span><span class="nx">promise</span><span class="p">()</span>
