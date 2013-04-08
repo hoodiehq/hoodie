@@ -149,6 +149,16 @@ describe "Hoodie", ->
   # /open(store, options)
 
 
+  describe "#uuid(num = 7)", ->
+    it "should default to a length of 7", ->
+      expect(@hoodie.uuid().length).toBe 7
+    
+    _when "called with num = 5", ->
+      it "should generate an id with length = 5", ->
+        expect(@hoodie.uuid(5).length).toBe 5
+  # /#uuid(num)
+
+
   describe "#isPromise(object)", ->
     it "should return true if object is a promise", ->
       object = $.Deferred().promise()
@@ -162,35 +172,50 @@ describe "Hoodie", ->
       expect( @hoodie.isPromise(undefined) ).toBe false
   # /#isPromise()
 
-
-  describe "#uuid(num = 7)", ->
-    it "should default to a length of 7", ->
-      expect(@hoodie.uuid().length).toBe 7
-    
-    _when "called with num = 5", ->
-      it "should generate an id with length = 5", ->
-        expect(@hoodie.uuid(5).length).toBe 5
-  # /#uuid(num)
-
   describe "#resolve()", ->
     it "simply returns resolved promise", ->
        expect(@hoodie.resolve()).toBeResolved()
+
+    it "should be applyable", ->
+      promise = @hoodie.reject().then( null, @hoodie.resolve )
+      expect(promise).toBeResolved()
   # /#resolveWith(something)
 
   describe "#reject()", ->
     it "simply returns rejected promise", ->
-       expect(@hoodie.reject()).toBeRejected()
+      expect(@hoodie.reject()).toBeRejected()
+
+    it "should be applyable", ->
+      promise = @hoodie.resolve().then( @hoodie.reject )
+      expect(promise).toBeRejected()
   # /#resolveWith(something)
 
   describe "#resolveWith(something)", ->
     it "wraps passad arguments into a promise and returns it", ->
        promise = @hoodie.resolveWith('funky', 'fresh')
        expect(promise).toBeResolvedWith 'funky', 'fresh'
+
+    it "should be applyable", ->
+      promise = @hoodie.rejectWith(1, 2).then( null, @hoodie.resolveWith )
+      expect(promise).toBeResolvedWith 1, 2
   # /#resolveWith(something)
 
   describe "#rejectWith(something)", ->
     it "wraps passad arguments into a promise and returns it", ->
        promise = @hoodie.rejectWith('funky', 'fresh')
        expect(promise).toBeRejectedWith 'funky', 'fresh'
+
+    it "should be applyable", ->
+      promise = @hoodie.resolveWith(1, 2).then( @hoodie.rejectWith )
+      expect(promise).toBeRejectedWith 1, 2
   # /#rejectWith(something)
+
+  describe "#dispose()", ->
+    beforeEach ->
+      spyOn(@hoodie, "trigger")
+    
+    it "should trigger `dispose` event", ->
+      @hoodie.dispose() 
+      expect(@hoodie.trigger).wasCalledWith 'dispose'
+  # /#dispose()
 # /Hoodie

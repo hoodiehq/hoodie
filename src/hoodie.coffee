@@ -140,21 +140,31 @@ class Hoodie extends Events
     typeof obj?.done is 'function' and typeof obj.resolve is 'undefined'
 
   #
-  resolve : ->
+  resolve : =>
     @defer().resolve().promise()
 
   #
-  reject : ->
+  reject : =>
     @defer().reject().promise()
 
   #
-  resolveWith : ->
+  resolveWith : =>
     @defer().resolve( arguments... ).promise()
 
   # 
-  rejectWith : ->
+  rejectWith : =>
     @defer().reject( arguments... ).promise()
 
+
+  # dispose
+  # ---------
+
+  # if a hoodie instance is not needed anymore, it can
+  # be disposed using this method. A `dispose` event
+  # gets triggered that the modules react on.
+  dispose : ->
+    @trigger 'dispose'
+    
   
   # ## Extending hoodie
 

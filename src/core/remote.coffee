@@ -285,9 +285,6 @@ class Hoodie.Remote extends Hoodie.Store
   push : (objects) =>
     
     return @hoodie.resolveWith([]) unless objects?.length
-    unless @isConnected()
-      error = new ConnectionError("Connection is disconnected: #{objects.length} change(s) could not be pushed to #{@name}", objects)
-      return @hoodie.rejectWith error
       
     objectsForRemote = []
     for object in objects

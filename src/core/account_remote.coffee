@@ -79,7 +79,11 @@ class Hoodie.AccountRemote extends Hoodie.Remote
   # if no objects passed to be pushed, we default to 
   # changed objects in user's local store
   push : (objects) =>
+    unless @isConnected()
+      error = new ConnectionError("Not connected: could not push local changes to remote")
+      return @hoodie.rejectWith error
     objects = @hoodie.store.changedObjects() unless $.isArray objects
+
     promise = super(objects)
     promise.fail @hoodie.checkConnection
     return promise

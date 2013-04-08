@@ -89,6 +89,10 @@ Hoodie = (function(_super) {
     this.baseUrl = baseUrl;
     this._handleCheckConnectionError = __bind(this._handleCheckConnectionError, this);
     this._handleCheckConnectionSuccess = __bind(this._handleCheckConnectionSuccess, this);
+    this.rejectWith = __bind(this.rejectWith, this);
+    this.resolveWith = __bind(this.resolveWith, this);
+    this.reject = __bind(this.reject, this);
+    this.resolve = __bind(this.resolve, this);
     this.checkConnection = __bind(this.checkConnection, this);
     if (this.baseUrl) {
       this.baseUrl = this.baseUrl.replace(/\/+$/, '');
@@ -182,6 +186,10 @@ Hoodie = (function(_super) {
   Hoodie.prototype.rejectWith = function() {
     var _ref;
     return (_ref = this.defer()).reject.apply(_ref, arguments).promise();
+  };
+
+  Hoodie.prototype.dispose = function() {
+    return this.trigger('dispose');
   };
 
   Hoodie.extend = function(name, Module) {
@@ -1323,13 +1331,9 @@ Hoodie.Remote = (function(_super) {
   };
 
   Remote.prototype.push = function(objects) {
-    var error, object, objectsForRemote, _i, _len;
+    var object, objectsForRemote, _i, _len;
     if (!(objects != null ? objects.length : void 0)) {
       return this.hoodie.resolveWith([]);
-    }
-    if (!this.isConnected()) {
-      error = new ConnectionError("Connection is disconnected: " + objects.length + " change(s) could not be pushed to " + this.name, objects);
-      return this.hoodie.rejectWith(error);
     }
     objectsForRemote = [];
     for (_i = 0, _len = objects.length; _i < _len; _i++) {
@@ -1600,7 +1604,11 @@ Hoodie.AccountRemote = (function(_super) {
   };
 
   AccountRemote.prototype.push = function(objects) {
-    var promise;
+    var error, promise;
+    if (!this.isConnected()) {
+      error = new ConnectionError("Not connected: could not push local changes to remote");
+      return this.hoodie.rejectWith(error);
+    }
     if (!$.isArray(objects)) {
       objects = this.hoodie.store.changedObjects();
     }

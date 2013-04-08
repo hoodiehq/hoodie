@@ -299,19 +299,39 @@ describe "Hoodie.AccountRemote", ->
       @pushDefer = @hoodie.defer()
       spyOn(Hoodie.Remote::, "push").andReturn @pushDefer.promise()
 
-    _when "no docs passed", ->        
-      it "should push changed documents from store", ->
-        spyOn(@hoodie.store, "changedObjects").andReturn "changed_docs"
-        @remote.push()
-        expect(Hoodie.Remote::push).wasCalledWith "changed_docs"
-
-    _when "push fails", ->
+    _when "disconnected", ->
       beforeEach ->
-        @pushDefer.reject()
+        spyOn(@remote, "isConnected").andReturn false
 
-      it "should check connection", -> 
-        @remote.push()
-        expect(@hoodie.checkConnection).wasCalled()
+      it "should reject with pushError", ->
+        promise = @remote.push [{type: 'todo', id: '1'}]
+        errorCalled = false
+        promise.fail (error) ->
+          errorCalled = true
+          {name, message, data} = error
+
+          expect(name).toBe 'ConnectionError'
+          expect(message).toBe 'Not connected: could not push local changes to remote'
+
+        expect(errorCalled).toBeTruthy()
+         
+    _when "connected", ->
+      beforeEach ->
+        spyOn(@remote, "isConnected").andReturn true
+
+      _and "no docs passed", ->        
+        it "should push changed documents from store", ->
+          spyOn(@hoodie.store, "changedObjects").andReturn "changed_docs"
+          @remote.push()
+          expect(Hoodie.Remote::push).wasCalledWith "changed_docs"
+
+      _and "push fails", ->
+        beforeEach ->
+          @pushDefer.reject()
+
+        it "should check connection", -> 
+          @remote.push()
+          expect(@hoodie.checkConnection).wasCalled()
   # /#push(docs)
 
 

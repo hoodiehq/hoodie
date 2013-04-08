@@ -596,105 +596,84 @@ describe "Hoodie.Remote", ->
         @remote.push()
         @remote.push([])
         expect(@remote.request).wasNotCalled()
-
-    _when "disconnected", ->
-      beforeEach ->
-        spyOn(@remote, "isConnected").andReturn false
-
-      it "should reject with pushError", ->
-        promise = @remote.push [{type: 'todo', id: '1'}]
-        errorCalled = false
-        promise.fail (error) ->
-          errorCalled = true
-          {name, message, data} = error
-
-          expect(name).toBe 'ConnectionError'
-          expect(message).toBe 'Connection is disconnected: 1 change(s) could not be pushed to remotetest'
-
-        expect(errorCalled).toBeTruthy()
-         
-
-    _when "connected", ->
-      beforeEach ->
-        spyOn(@remote, "isConnected").andReturn true
       
-      _and "Array of docs passed", ->
-        beforeEach ->
-          @todoObjects = [
-            {type: 'todo', id: '1'}
-            {type: 'todo', id: '2'}
-            {type: 'todo', id: '3'}
-          ]
-          @remote.push @todoObjects
-        
-        it "should POST the passed objects", ->
-          expect(@remote.request).wasCalled()
-          data = @remote.request.mostRecentCall.args[2].data
-          expect(data.docs.length).toBe 3
+    _and "Array of docs passed", ->
+      beforeEach ->
+        @todoObjects = [
+          {type: 'todo', id: '1'}
+          {type: 'todo', id: '2'}
+          {type: 'todo', id: '3'}
+        ]
+        @remote.push @todoObjects
+      
+      it "should POST the passed objects", ->
+        expect(@remote.request).wasCalled()
+        data = @remote.request.mostRecentCall.args[2].data
+        expect(data.docs.length).toBe 3
 
-      _and "one deleted and one new doc passed", ->
-        beforeEach ->
-          @remote.push Mocks.changedObjects()
-          expect(@remote.request).wasCalled()
-          [@method, @path, @options] = @remote.request.mostRecentCall.args
+    _and "one deleted and one new doc passed", ->
+      beforeEach ->
+        @remote.push Mocks.changedObjects()
+        expect(@remote.request).wasCalled()
+        [@method, @path, @options] = @remote.request.mostRecentCall.args
+  
+      it "should post the changes to the user's db _bulk_docs API", ->
+        expect(@method).toBe 'POST'
+        expect(@path).toBe '/_bulk_docs'
     
-        it "should post the changes to the user's db _bulk_docs API", ->
-          expect(@method).toBe 'POST'
-          expect(@path).toBe '/_bulk_docs'
+      it "should send the docs in appropriate format", ->
+        {docs} = @options.data
+        doc = docs[0]
+        expect(doc.id).toBeUndefined()
+        expect(doc._id).toBe 'todo/abc3'
+        expect(doc._localInfo).toBeUndefined()
+
+      it "should set data.new_edits to false", ->
+        {new_edits} = @options.data
+        expect(new_edits).toBe false
+
+      it "should set new _revision ids", ->
+        {docs} = @options.data
+        [deletedDoc, newDoc] = docs
+        expect(deletedDoc._rev).toBe '3-uuid'
+        expect(newDoc._rev).toMatch '1-uuid'
+
+        expect(deletedDoc._revisions.start).toBe 3
+        expect(deletedDoc._revisions.ids[0]).toBe 'uuid'
+        expect(deletedDoc._revisions.ids[1]).toBe '123'
+
+        expect(newDoc._revisions.start).toBe 1
+        expect(newDoc._revisions.ids[0]).toBe 'uuid'
+
+    _and "prefix set to $public", ->
+      beforeEach ->
+        @remote.prefix = '$public/'
+        @todoObjects = [
+          {type: 'todo', id: '1'}
+          {type: 'todo', id: '2'}
+          {type: 'todo', id: '3'}
+        ]
+        @remote.push @todoObjects
       
-        it "should send the docs in appropriate format", ->
-          {docs} = @options.data
-          doc = docs[0]
-          expect(doc.id).toBeUndefined()
-          expect(doc._id).toBe 'todo/abc3'
-          expect(doc._localInfo).toBeUndefined()
+      it "should prefix all document IDs with '$public/'", ->
+        expect(@remote.request).wasCalled()
+        data = @remote.request.mostRecentCall.args[2].data
+        expect(data.docs[0]._id).toBe '$public/todo/1'
 
-        it "should set data.new_edits to false", ->
-          {new_edits} = @options.data
-          expect(new_edits).toBe false
-
-        it "should set new _revision ids", ->
-          {docs} = @options.data
-          [deletedDoc, newDoc] = docs
-          expect(deletedDoc._rev).toBe '3-uuid'
-          expect(newDoc._rev).toMatch '1-uuid'
-
-          expect(deletedDoc._revisions.start).toBe 3
-          expect(deletedDoc._revisions.ids[0]).toBe 'uuid'
-          expect(deletedDoc._revisions.ids[1]).toBe '123'
-
-          expect(newDoc._revisions.start).toBe 1
-          expect(newDoc._revisions.ids[0]).toBe 'uuid'
-
-      _and "prefix set to $public", ->
-        beforeEach ->
-          @remote.prefix = '$public/'
-          @todoObjects = [
-            {type: 'todo', id: '1'}
-            {type: 'todo', id: '2'}
-            {type: 'todo', id: '3'}
-          ]
-          @remote.push @todoObjects
-        
-        it "should prefix all document IDs with '$public/'", ->
-          expect(@remote.request).wasCalled()
-          data = @remote.request.mostRecentCall.args[2].data
-          expect(data.docs[0]._id).toBe '$public/todo/1'
-
-      _and "_$local flags set", ->
-        beforeEach ->
-          @remote.prefix = '$public/'
-          @todoObjects = [
-            {type: 'todo', id: '1'}
-            {type: 'todo', id: '2', _$local: true}
-          ]
-          @remote.push @todoObjects
-        
-        it "should add `-local` suffix to rev number", ->
-          expect(@remote.request).wasCalled()
-          data = @remote.request.mostRecentCall.args[2].data
-          expect(data.docs[0]._rev).toBe '1-uuid'
-          expect(data.docs[1]._rev).toBe '1-uuid-local'
+    _and "_$local flags set", ->
+      beforeEach ->
+        @remote.prefix = '$public/'
+        @todoObjects = [
+          {type: 'todo', id: '1'}
+          {type: 'todo', id: '2', _$local: true}
+        ]
+        @remote.push @todoObjects
+      
+      it "should add `-local` suffix to rev number", ->
+        expect(@remote.request).wasCalled()
+        data = @remote.request.mostRecentCall.args[2].data
+        expect(data.docs[0]._rev).toBe '1-uuid'
+        expect(data.docs[1]._rev).toBe '1-uuid-local'
   # /#push(docs)
 
   describe "#sync(docs)", ->
