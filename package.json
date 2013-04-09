@@ -1,24 +1,26 @@
 {
-  "name": "hoodie-app",
-  "version": "0.4.15",
-  "dependencies": {
-    "http-proxy": "*",
-    "ecstatic": "0.4.2",
-    "corsproxy": "git://github.com/gr2m/CORS-Proxy.git",
-    "multicouch": ">=0.2.8",
-    "request": ">2.0.0",
-    "npm": "*",
-    "hoodie-pocket": "git://github.com/hoodiehq/pocket.git",
-    "local-tld-lib": "*"
-  },
-  "scripts": {
-    "start": "node lib/hoodie-app.js",
-    "test": "mocha"
-  },
-  "engines": {
-    "node": "0.8.x"
-  },
-  "devDependencies": {
-    "mocha": "*"
-  }
+    "name": "hoodie-app",
+    "version": "0.4.15",
+    "dependencies": {
+        "http-proxy": "*",
+        "connect": "2.7.4",
+        "corsproxy": "git://github.com/gr2m/CORS-Proxy.git",
+        "multicouch": ">=0.2.8",
+        "hoodie-pocket": "git://github.com/hoodiehq/pocket.git",
+        "local-tld-lib": "*",
+        "underscore": "1.4.4",
+        "async": "0.2.6",
+        "bytes": "0.2.1",
+        "npm": "*"
+    },
+    "scripts": {
+        "start": "bin/start",
+        "test": "mocha"
+    },
+    "engines": {
+        "node": "0.8.x"
+    },
+    "devDependencies": {
+        "mocha": "*"
+    }
 }
