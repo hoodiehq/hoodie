@@ -30,29 +30,29 @@ hoodie.store.update('task', '123', {done: true})
 hoodie.store.remove('task', '123')
 
 hoodie.store.on('add:task', function(object) {
-  alert("new Task added: " + object.task)
+  alert('new Task added: ' + object.task)
 })
 
 // publish & share data
-hoodie.store.findAll("task").publish()
+hoodie.store.findAll('task').publish()
 hoodie.user( username ).findAll()
 
-hoodie.store.find("task", "456").share()
-hoodie.share( shareId ).findAll()
-hoodie.share( shareId ).subscribe()
+hoodie.store.find('task', '456').share()
+hoodie.share(shareId).findAll()
+hoodie.share(shareId).subscribe()
 
 // sending emails … yep.
-var magic = hoodie.email.send( {
+var magic = hoodie.email.send({
   to      : ['susan@example.com'],
   cc      : ['bill@example.com'],
   subject : 'rule the world',
-  body    : "we can do it!\nSigned, Joe"
-} )
+  body    : 'we can do it!\nSigned, Joe'
+})
 magic.done( function(mail) { 
-  alert("Mail has been sent to " + mail.to)
+  alert('Mail has been sent to ' + mail.to)
 })
 magic.fail( function(eror) { 
-  alert("Sory, but something went wrong: " + error.reason)
+  alert('Sory, but something went wrong: ' + error.reason)
 })
 
 // Like what you see? Good. Because we got more:
