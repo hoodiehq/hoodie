@@ -9,7 +9,7 @@
         "hoodie-pocket": "git://github.com/hoodiehq/pocket.git",
         "local-tld-lib": "*",
         "underscore": "1.4.4",
-        "async": "0.2.6",
+        "async": "0.2.7",
         "bytes": "0.2.1",
         "npm": "*"
     },
