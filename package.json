@@ -5,7 +5,7 @@
         "http-proxy": "*",
         "connect": "2.7.4",
         "corsproxy": "git://github.com/gr2m/CORS-Proxy.git",
-        "multicouch": ">=0.2.5",
+        "multicouch": "git://github.com/caolan/node-multicouch.git",
         "hoodie-pocket": "git://github.com/hoodiehq/pocket.git",
         "local-tld-lib": "*",
         "underscore": "1.4.4",
