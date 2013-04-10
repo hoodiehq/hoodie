@@ -11,6 +11,7 @@
         "underscore": "1.4.4",
         "async": "0.2.7",
         "bytes": "0.2.1",
+        "prompt": "0.2.9",
         "npm": "*"
     },
     "scripts": {
