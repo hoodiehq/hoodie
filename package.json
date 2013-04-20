@@ -1,0 +1,28 @@
+{
+  "name"        : "hoodie",
+  "title"       : "Hoodie",
+  "description" : "Hoodie library for the browser",
+  "version"     : "0.1.19",
+  "main"        : ["./hoodie.js"],
+  "homepage"    : "http://hood.id",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/hoodiehq/hoodie.js.git"
+  },
+  "bugs": {
+    "url": "https://github.com/hoodiehq/hoodie.js/issues"
+  },
+  "licenses": [
+    {
+      "type": "Apache License 2.0",
+      "url": "https://github.com/hoodiehq/hoodie.js/blob/master/LICENSE"
+    }
+  ],
+  "dependencies": {
+    "jquery": "~1.9.1"
+  },
+  "keywords": [
+    "nobackend",
+    "frontend-only"
+  ]
+}
