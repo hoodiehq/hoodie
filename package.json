@@ -1,6 +1,6 @@
 {
   "name": "hoodie-app",
-  "version": "0.4.14",
+  "version": "0.4.15",
   "dependencies": {
     "http-proxy": "*",
     "connect": "*",
