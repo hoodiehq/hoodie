@@ -97,7 +97,7 @@ Hoodie = (function(_super) {
     if (this.baseUrl) {
       this.baseUrl = this.baseUrl.replace(/\/+$/, '');
     } else {
-      this.baseUrl = location.protocol + "//api." + location.hostname.replace(/^www\./, '');
+      this.baseUrl = location.protocol + "//" + location.host + "/_api";
     }
     this.store = new this.constructor.LocalStore(this);
     this.config = new this.constructor.Config(this);

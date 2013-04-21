@@ -17,7 +17,7 @@ describe "Hoodie", ->
     it "should default the CouchDB URL to current domain with a api subdomain", ->
       # that's kind of hard to test.
       hoodie = new Hoodie
-      expect(hoodie.baseUrl).toBe location.protocol + "//api." + location.hostname
+      expect(hoodie.baseUrl).toBe "/_api"
 
     it "should check connection", ->
       spyOn(Hoodie::, "checkConnection")
