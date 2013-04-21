@@ -3,7 +3,7 @@
   "version": "0.4.15",
   "dependencies": {
     "http-proxy": "*",
-    "connect": "*",
+    "ecstatic": "0.4.2",
     "corsproxy": "git://github.com/gr2m/CORS-Proxy.git",
     "multicouch": ">=0.2.8",
     "request": ">2.0.0",
