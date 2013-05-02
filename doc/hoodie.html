@@ -12,7 +12,7 @@ hoodie = new Hoodie
     <span class="k">if</span> <span class="nx">@baseUrl</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>remove trailing slash(es)</p></div></div><div class="code"><div class="wrapper">      <span class="vi">@baseUrl = </span><span class="nx">@baseUrl</span><span class="p">.</span><span class="nx">replace</span> <span class="sr">/\/+$/</span><span class="p">,</span> <span class="s">&#39;&#39;</span>
 
     <span class="k">else</span> 
-      <span class="vi">@baseUrl = </span><span class="nx">location</span><span class="p">.</span><span class="nx">protocol</span> <span class="o">+</span> <span class="s">&quot;//api.&quot;</span> <span class="o">+</span> <span class="nx">location</span><span class="p">.</span><span class="nx">hostname</span><span class="p">.</span><span class="nx">replace</span><span class="p">(</span><span class="sr">/^www\./</span><span class="p">,</span> <span class="s">&#39;&#39;</span><span class="p">)</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>init core modules </p></div></div><div class="code"><div class="wrapper">    <span class="vi">@store   = </span><span class="k">new</span> <span class="nx">@constructor</span><span class="p">.</span><span class="nx">LocalStore</span> <span class="k">this</span>
+      <span class="vi">@baseUrl = </span><span class="s">&quot;/_api&quot;</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>init core modules </p></div></div><div class="code"><div class="wrapper">    <span class="vi">@store   = </span><span class="k">new</span> <span class="nx">@constructor</span><span class="p">.</span><span class="nx">LocalStore</span> <span class="k">this</span>
     <span class="vi">@config  = </span><span class="k">new</span> <span class="nx">@constructor</span><span class="p">.</span><span class="nx">Config</span> <span class="k">this</span>
     <span class="vi">@account = </span><span class="k">new</span> <span class="nx">@constructor</span><span class="p">.</span><span class="nx">Account</span> <span class="k">this</span>
     <span class="vi">@remote  = </span><span class="k">new</span> <span class="nx">@constructor</span><span class="p">.</span><span class="nx">AccountRemote</span> <span class="k">this</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>init extensions</p></div></div><div class="code"><div class="wrapper">    <span class="nx">@_loadExtensions</span><span class="p">()</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>check connection</p></div></div><div class="code"><div class="wrapper">    <span class="nx">@checkConnection</span><span class="p">()</span>
@@ -84,18 +84,21 @@ return defer.promise()
     <span class="k">typeof</span> <span class="nx">obj</span><span class="o">?</span><span class="p">.</span><span class="nx">done</span> <span class="o">is</span> <span class="s">&#39;function&#39;</span> <span class="o">and</span> <span class="k">typeof</span> <span class="nx">obj</span><span class="p">.</span><span class="nx">resolve</span> <span class="o">is</span> <span class="s">&#39;undefined&#39;</span>
 
   <span class="c1">#</span>
-  <span class="nv">resolve : </span><span class="nf">-&gt;</span>
+  <span class="nv">resolve : </span><span class="o">=&gt;</span>
     <span class="nx">@defer</span><span class="p">().</span><span class="nx">resolve</span><span class="p">().</span><span class="nx">promise</span><span class="p">()</span>
 
   <span class="c1">#</span>
-  <span class="nv">reject : </span><span class="nf">-&gt;</span>
+  <span class="nv">reject : </span><span class="o">=&gt;</span>
     <span class="nx">@defer</span><span class="p">().</span><span class="nx">reject</span><span class="p">().</span><span class="nx">promise</span><span class="p">()</span>
 
   <span class="c1">#</span>
-  <span class="nv">resolveWith : </span><span class="nf">-&gt;</span>
-    <span class="nx">@defer</span><span class="p">().</span><span class="nx">resolve</span><span class="p">(</span> <span class="nx">arguments</span><span class="p">...</span> <span class="p">).</span><span class="nx">promise</span><span class="p">()</span></div></div></div><div class="segment"><div class="code"><div class="wrapper">  <span class="nv">rejectWith : </span><span class="nf">-&gt;</span>
-    <span class="nx">@defer</span><span class="p">().</span><span class="nx">reject</span><span class="p">(</span> <span class="nx">arguments</span><span class="p">...</span> <span class="p">).</span><span class="nx">promise</span><span class="p">()</span>
-
+  <span class="nv">resolveWith : </span><span class="o">=&gt;</span>
+    <span class="nx">@defer</span><span class="p">().</span><span class="nx">resolve</span><span class="p">(</span> <span class="nx">arguments</span><span class="p">...</span> <span class="p">).</span><span class="nx">promise</span><span class="p">()</span></div></div></div><div class="segment"><div class="code"><div class="wrapper">  <span class="nv">rejectWith : </span><span class="o">=&gt;</span>
+    <span class="nx">@defer</span><span class="p">().</span><span class="nx">reject</span><span class="p">(</span> <span class="nx">arguments</span><span class="p">...</span> <span class="p">).</span><span class="nx">promise</span><span class="p">()</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h2 id="dispose">dispose</h2></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>if a hoodie instance is not needed anymore, it can
+be disposed using this method. A <code>dispose</code> event
+gets triggered that the modules react on.</p></div></div><div class="code"><div class="wrapper">  <span class="nv">dispose : </span><span class="nf">-&gt;</span>
+    <span class="nx">@trigger</span> <span class="s">&#39;dispose&#39;</span>
+    
   </div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h2 id="extending-hoodie">Extending hoodie</h2></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>You can either extend the Hoodie class, or a hoodie
 instance dooring runtime</p></div></div><div class="code"><div class="wrapper">  <span class="c1">#</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><pre><code>Hoodie.extend('magic1', funcion(hoodie) { /* ... */ })
 hoodie = new Hoodie

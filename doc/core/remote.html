@@ -139,9 +139,6 @@ will be overwritten </p></div></div><div class="code"><div class="wrapper">  <sp
     </div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h2 id="push-changes">push changes</h2></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>Push objects to remote store using the <code>_bulk_docs</code> API.</p></div></div><div class="code"><div class="wrapper">  <span class="nv">push : </span><span class="nf">(objects) =&gt;</span>
     
     <span class="k">return</span> <span class="nx">@hoodie</span><span class="p">.</span><span class="nx">resolveWith</span><span class="p">([])</span> <span class="k">unless</span> <span class="nx">objects</span><span class="o">?</span><span class="p">.</span><span class="nx">length</span>
-    <span class="k">unless</span> <span class="nx">@isConnected</span><span class="p">()</span>
-      <span class="nv">error = </span><span class="k">new</span> <span class="nx">ConnectionError</span><span class="p">(</span><span class="s">&quot;Connection is disconnected: </span><span class="si">#{</span><span class="nx">objects</span><span class="p">.</span><span class="nx">length</span><span class="si">}</span><span class="s"> change(s) could not be pushed to </span><span class="si">#{</span><span class="nx">@name</span><span class="si">}</span><span class="s">&quot;</span><span class="p">,</span> <span class="nx">objects</span><span class="p">)</span>
-      <span class="k">return</span> <span class="nx">@hoodie</span><span class="p">.</span><span class="nx">rejectWith</span> <span class="nx">error</span>
       
     <span class="nv">objectsForRemote = </span><span class="p">[]</span>
     <span class="k">for</span> <span class="nx">object</span> <span class="k">in</span> <span class="nx">objects</span>
