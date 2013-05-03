@@ -21,6 +21,15 @@ class Hoodie.Account
     # the same requests several times.
     @_requests = {}
     
+    # init account
+    # we've put this into its own method so it's easier to
+    # inherit from Hoodie.Account with custom logic
+    @init()
+
+  
+  # Authenticate
+  # --------------
+  init : ->
     # handle session
     @username   = @hoodie.config.get '_account.username'
     @ownerHash  = @hoodie.config.get '_account.ownerHash'
@@ -35,8 +44,8 @@ class Hoodie.Account
 
     # is there a pending password reset?
     @_checkPasswordResetStatus()
-  
-  
+
+
   # Authenticate
   # --------------
 
