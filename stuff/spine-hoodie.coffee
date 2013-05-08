@@ -25,12 +25,12 @@ Spine.Model.Hoodie =
     # hook into record events
     @change (object, event, data) =>
       switch event
-        when 'create'
-          Spine.hoodie.store.create type, object.toJSON()
+        when 'add'
+          Spine.hoodie.store.add type, object.toJSON()
         when 'update'
           Spine.hoodie.store.update type, object.id, object.toJSON()
-        when 'destroy'
-          Spine.hoodie.store.destroy type, object.id
+        when 'remove'
+          Spine.hoodie.store.remove type, object.id
 
     # fetch records from hoodie.store
     @fetch =>
@@ -40,10 +40,10 @@ Spine.Model.Hoodie =
     # listen to remote events on records
     Spine.hoodie.remote.on "change:#{type}", (event, remoteObject) => 
       switch event
-        when 'create'
+        when 'add'
           @refresh remoteObject
-        when 'destroye'
-          @destroy remoteObject.id
+        when 'remove'
+          @remove remoteObject.id
         when 'update'
           localObject = @find(remoteObject.id)
           for attr, value of remoteObject
