@@ -3,38 +3,52 @@ Backbone.connect = (url) ->
 
 Backbone.sync = (method, modelOrCollection, options) ->
   {id, attributes, type} = modelOrCollection
-  type                 or= modelOrCollection.model::type
+  type                 or= modelOrCollection.model.type
 
   promise = switch method
     when "read"
       if id
         Backbone.hoodie.store.find(type, id)
       else
-        Backbone.hoodie.store.findAll()
+        if options.filter
+          Backbone.hoodie.store.findAll(options.filter)
+        else
+          Backbone.hoodie.store.findAll(type)
 
     when "create"
-      Backbone.hoodie.store.create(type, attributes)
-      
-    when "update"
-      Backbone.hoodie.store.update(type, id, attributes)
-      
-    when "delete"
-      Backbone.hoodie.store.delete(type, id)
+      Backbone.hoodie.store.add(type, attributes, options)
 
-  promise.done options.success if options.success
-  promise.fail options.error   if options.error
+    when "update"
+      Backbone.hoodie.store.update(type, id, attributes, options)
+
+    when "delete"
+      Backbone.hoodie.store.remove(type, id, options)
+
+  if options.success
+    promise.done (resp) ->
+      options.success(modelOrCollection, resp, options)
+
+  if options.error
+    promise.fail (error) ->
+      options.error(modelOrCollection, error, options)
 
 # simple merge strategy: remote always wins.
 # Feel free to overwrite.
-Backbone.Model::merge           = (attributes) -> 
+Backbone.Model::merge           = (attributes) ->
   @set attributes, remote: true
-  
-# Make Collections listen to remote events.
+
+# Make Collections listen to events.
 Backbone.Collection::initialize = ->
-  type = @model::type
-  opts = remote: true
-  
-  if @model::type
-    Backbone.hoodie.remote.on   "create:#{@model::type}", (id, attributes) => @add attributes, opts
-    Backbone.hoodie.remote.on "destroye:#{@model::type}", (id, attributes) => @get(id)?.destroy opts
-    Backbone.hoodie.remote.on   "update:#{@model::type}", (id, attributes) => @get(id)?.merge attributes, opts
+  type = @model.type
+  # @fetch()
+
+  if type
+    Backbone.hoodie.store.on    "add:#{type}", (id, attributes, options) =>
+      @add attributes
+
+    Backbone.hoodie.store.on "remove:#{type}", (id, attributes, options) =>
+      @get(id)?.destroy options
+
+    Backbone.hoodie.store.on "update:#{type}", (id, attributes, options) =>
+      if options.remote
+        @get(id)?.merge attributes
