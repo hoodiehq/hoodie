@@ -43,12 +43,12 @@ Backbone.Collection::initialize = ->
   # @fetch()
 
   if type
-    Backbone.hoodie.store.on    "add:#{type}", (id, attributes, options) =>
+    Backbone.hoodie.store.on    "add:#{type}", (attributes) =>
       @add attributes
 
-    Backbone.hoodie.store.on "remove:#{type}", (id, attributes, options) =>
+    Backbone.hoodie.store.on "remove:#{type}", (attributes) =>
       @get(id)?.destroy options
 
-    Backbone.hoodie.store.on "update:#{type}", (id, attributes, options) =>
+    Backbone.hoodie.store.on "update:#{type}", (attributes) =>
       if options.remote
         @get(id)?.merge attributes
