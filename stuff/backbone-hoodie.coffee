@@ -52,3 +52,7 @@ Backbone.Collection::initialize = ->
     Backbone.hoodie.store.on "update:#{type}", (attributes) =>
       if options.remote
         @get(id)?.merge attributes
+
+    @findAll = =>
+      Backbone.hoodie.store.findAll("#{type}").then (objects) =>
+        @add objects
