@@ -7,6 +7,7 @@
  */
 
 var config = require('../lib/config'),
+    utils = require('../lib/utils'),
     app = require('../lib/app');
 
 
@@ -26,7 +27,7 @@ if (require.main === module) {
 
     app.init(cfg, function (err) {
         if (err) {
-            console.error(err);
+            utils.displayError(err);
             process.exit(1);
         }
         // line break before logs
