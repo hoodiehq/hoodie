@@ -13,7 +13,6 @@
         "bytes": "0.2.1",
         "prompt": "0.2.9",
         "request": "2.16.6",
-        "npm": "*",
         "follow": "0.9.0",
         "couchr": "0.0.13",
         "cli-color": "0.2.2",
