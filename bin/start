@@ -6,7 +6,7 @@
  * Dependencies
  */
 
-var config = require('../lib/config'),
+var environment = require('../lib/environment'),
     hconsole = require('../lib/hconsole'),
     app = require('../lib/app');
 
@@ -19,7 +19,7 @@ var config = require('../lib/config'),
 if (require.main === module) {
     var project_dir = process.cwd();
 
-    var cfg = config.getConfig(
+    var cfg = environment.getConfig(
         process.platform,   // platform
         process.env,        // environment vars
         project_dir         // project directory
