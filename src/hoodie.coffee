@@ -207,3 +207,5 @@ class Hoodie extends Events
       @trigger 'disconnected'
       @online = false
     return @defer().reject()
+
+module.exports = Hoodie if module?.exports
