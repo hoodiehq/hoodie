@@ -16,7 +16,8 @@
         "npm": "*",
         "follow": "0.9.0",
         "couchr": "0.0.13",
-        "colors": "~0.6.0"
+        "colors": "~0.6.0",
+        "cli-color": "0.2.2"
     },
     "scripts": {
         "start": "bin/start",
