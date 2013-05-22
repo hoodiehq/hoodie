@@ -61,8 +61,10 @@ class Hoodie.Account
 
     # if there is a pending signOut request, return its promise,
     # but pipe it so that it always ends up rejected
-    return @hoodie.rejectWith() if @_requests.signIn?.state() is 'pending'
-    return @hoodie.rejectWith() if @_requests.signOut?.state() is 'pending'
+    return @_requests.signOut.then( @hoodie.rejectWith ) if @_requests.signOut?.state() is 'pending'
+
+    #  if there is apending signIn request, return its promise
+    return @_requests.signIn if @_requests.signIn?.state() is 'pending'
       
 
     # if username is not set, make sure to end the session

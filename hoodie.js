@@ -295,11 +295,11 @@ Hoodie.Account = (function() {
     if (this._authenticated === true) {
       return this.hoodie.defer().resolve(this.username).promise();
     }
-    if (((_ref = this._requests.signIn) != null ? _ref.state() : void 0) === 'pending') {
-      return this.hoodie.rejectWith();
+    if (((_ref = this._requests.signOut) != null ? _ref.state() : void 0) === 'pending') {
+      return this._requests.signOut.then(this.hoodie.rejectWith);
     }
-    if (((_ref1 = this._requests.signOut) != null ? _ref1.state() : void 0) === 'pending') {
-      return this.hoodie.rejectWith();
+    if (((_ref1 = this._requests.signIn) != null ? _ref1.state() : void 0) === 'pending') {
+      return this._requests.signIn;
     }
     if (this.username === void 0) {
       return this._sendSignOutRequest().then(function() {

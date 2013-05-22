@@ -101,16 +101,30 @@ describe "Hoodie.Account", ->
         @signInDefer = @hoodie.defer()
         @account._requests.signIn = @signInDefer.promise()
 
-      it "it should be rejected", ->
-        expect(@account.authenticate()).toBeRejected()
+      it "it should be rejected when it is pending and then fails", ->
+        promise = @account.authenticate()
+        @signInDefer.reject "nope"
+        expect(promise).toBeRejectedWith "nope"
 
+      it "it should be resolved when it is pending and then succeeds", ->
+        promise = @account.authenticate()
+        @signInDefer.resolve "funky"
+        expect(promise).toBeResolvedWith "funky"
+        
     _when "there is a pending singOut request", ->
       beforeEach ->
-        @signInDefer = @hoodie.defer()
-        @account._requests.signOut = @signInDefer.promise()
+        @signOutDefer = @hoodie.defer()
+        @account._requests.signOut = @signOutDefer.promise()
 
-      it "it should be rejected", ->
-        expect(@account.authenticate()).toBeRejected()
+      it "it should be rejected when it is pending and then fails", ->
+        promise = @account.authenticate()
+        @signOutDefer.reject "nope"
+        expect(promise).toBeRejectedWith "nope"
+
+      it "it should be rejected anyway, even if the pending request succeeds", ->
+        promise = @account.authenticate()
+        @signOutDefer.resolve "funky"
+        expect(promise).toBeRejectedWith "funky"
       
     
     _when "account.username is not yet set", ->
