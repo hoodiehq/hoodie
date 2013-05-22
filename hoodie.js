@@ -630,7 +630,7 @@ Hoodie.Account = (function() {
       }
       if (options.verbose) {
         _this._cleanup({
-          authenticated: true,
+          _authenticated: true,
           ownerHash: response.roles[0],
           username: username
         });
@@ -642,7 +642,7 @@ Hoodie.Account = (function() {
       } else {
         _this._setUsername(username);
         _this._setOwner(response.roles[0]);
-        _this.authenticated = true;
+        _this._authenticated = true;
       }
       _this.trigger('authenticated', username);
       _this.fetch();

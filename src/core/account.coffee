@@ -476,7 +476,7 @@ class Hoodie.Account
       # with a username that is not the current one.
       if options.verbose
         @_cleanup 
-          authenticated : true
+          _authenticated : true
           ownerHash     : response.roles[0]
           username      : username
 
@@ -488,7 +488,7 @@ class Hoodie.Account
       else
         @_setUsername username
         @_setOwner response.roles[0]
-        @authenticated = true
+        @_authenticated = true
 
       @trigger 'authenticated', username
 
