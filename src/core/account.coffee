@@ -409,15 +409,20 @@ class Hoodie.Account
       @_doc._rev = response.rev
       @_delayedSignIn(username, password)
 
-  _delayedSignIn : (username, password) =>
-    defer = @hoodie.defer()
+  _delayedSignIn : (username, password, defer) =>
+
+    # _delayedSignIn might call itself, when the user account
+    # is pending. In this case it passes the original defer,
+    # to keep a reference and finally resolve / reject it 
+    # at some point
+    defer = @hoodie.defer() unless defer
     window.setTimeout ( =>
       promise = @_sendSignInRequest(username, password)
       promise.done(defer.resolve)
       promise.fail (error) =>
         if error.error is 'unconfirmed'
           # It might take a bit until the account has been confirmed
-          @_delayedSignIn(username, password)
+          @_delayedSignIn(username, password, defer)
         else
           defer.reject arguments...
     ), 300

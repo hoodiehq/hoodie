@@ -580,11 +580,12 @@ Hoodie.Account = (function() {
     };
   };
 
-  Account.prototype._delayedSignIn = function(username, password) {
-    var defer,
-      _this = this;
+  Account.prototype._delayedSignIn = function(username, password, defer) {
+    var _this = this;
 
-    defer = this.hoodie.defer();
+    if (!defer) {
+      defer = this.hoodie.defer();
+    }
     window.setTimeout((function() {
       var promise;
 
@@ -592,7 +593,7 @@ Hoodie.Account = (function() {
       promise.done(defer.resolve);
       return promise.fail(function(error) {
         if (error.error === 'unconfirmed') {
-          return _this._delayedSignIn(username, password);
+          return _this._delayedSignIn(username, password, defer);
         } else {
           return defer.reject.apply(defer, arguments);
         }
