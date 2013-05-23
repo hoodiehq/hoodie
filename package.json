@@ -18,9 +18,6 @@
       "url": "https://github.com/hoodiehq/hoodie.js/blob/master/LICENSE"
     }
   ],
-  "dependencies": {
-    "jquery": "~1.9.1"
-  },
   "keywords": [
     "nobackend",
     "frontend-only"
