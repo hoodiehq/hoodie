@@ -33,7 +33,7 @@ class Hoodie.AccountRemote extends Hoodie.Remote
     # do not prefix files for my own remote
     options.prefix = ''
 
-    @hoodie.on 'account:authenticated',  @_handleAuthenticate
+    @hoodie.on 'account:reauthenticated',  @_handleReauthenticate
     @hoodie.on 'account:signout', @disconnect
     @hoodie.on 'reconnected', @connect
     
@@ -112,6 +112,6 @@ class Hoodie.AccountRemote extends Hoodie.Remote
   # ---------
 
   # 
-  _handleAuthenticate : =>
+  _handleReauthenticate : =>
     @name = @hoodie.account.db()
     @connect()

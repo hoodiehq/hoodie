@@ -213,9 +213,6 @@ describe "Hoodie.Account", ->
         it "should set account.ownerHash", ->
            expect(@account.ownerHash).toBe 'user_hash'
            expect(@hoodie.config.set).wasCalledWith '_account.ownerHash', 'user_hash'
-
-        it "should trigger authenticated event", ->
-           expect(@hoodie.trigger).wasCalledWith 'account:authenticated', 'joe@example.com'
       
       # {"ok":true,"userCtx":{"name":null,"roles":[]},"info":{"authenticationDb":"_users","authenticationHandlers":["oauth","cookie","default"]}}
       _when "authentication request is successful and returns `name: null`", ->
@@ -557,8 +554,8 @@ describe "Hoodie.Account", ->
           expect(@hoodie.trigger).wasNotCalledWith 'account:signin', 'joe@example.com'
           expect(@hoodie.trigger).wasNotCalledWith 'account:signin:anonymous', 'joe@example.com'
 
-        it "should trigger authenticated event", ->
-          expect(@hoodie.trigger).wasCalledWith 'account:authenticated', 'joe@example.com'
+        it "should trigger reauthenticated event", ->
+          expect(@hoodie.trigger).wasCalledWith 'account:reauthenticated', 'joe@example.com'
 
     _when "signout errors", ->
       beforeEach ->
@@ -606,10 +603,6 @@ describe "Hoodie.Account", ->
               @account.signIn('joe@example.com', 'secret')
               expect(@hoodie.trigger).wasCalledWith 'account:signin:anonymous', 'joe@example.com'
 
-            it "should trigger `account:authenticated` event", ->
-              @account.signIn('joe@example.com', 'secret')
-              expect(@hoodie.trigger).wasCalledWith 'account:authenticated', 'joe@example.com'
-
           _and "user has a manual account", ->
             beforeEach ->
               spyOn(@account, "hasAnonymousAccount").andReturn false
@@ -621,10 +614,6 @@ describe "Hoodie.Account", ->
             it "should trigger `account:signin` event", ->
               @account.signIn('joe@example.com', 'secret')
               expect(@hoodie.trigger).wasCalledWith 'account:signin', 'joe@example.com'
-
-            it "should trigger `account:authenticated` event", ->
-              @account.signIn('joe@example.com', 'secret')
-              expect(@hoodie.trigger).wasCalledWith 'account:authenticated', 'joe@example.com'
           
           it "should set @username", ->
              @account.signIn('joe@example.com', 'secret')

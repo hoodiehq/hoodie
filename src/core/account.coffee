@@ -182,9 +182,9 @@ class Hoodie.Account
   #       current username.
   signIn : (username, password = '') ->
     if @username isnt username
-      @signOut(silent: true).pipe => @_sendSignInRequest(username, password, verbose: true)
+      @signOut(silent: true).pipe => @_sendSignInRequest(username, password)
     else 
-      @_sendSignInRequest(username, password)
+      @_sendSignInRequest(username, password, reauthenticate: true)
 
   # sign out 
   # ---------
@@ -366,7 +366,6 @@ class Hoodie.Account
       @_authenticated = true
       @_setUsername response.userCtx.name.replace(/^user(_anonymous)?\//, '')
       @_setOwner    response.userCtx.roles[0]
-      @trigger 'authenticated', @username
       return @hoodie.defer().resolve(@username).promise()
 
     if @hasAnonymousAccount()
@@ -475,9 +474,17 @@ class Hoodie.Account
         return defer.reject error: "unconfirmed", reason: "account has not been confirmed yet"
 
 
-      # options.verbose is true, when a user signed via hoodie.account.signIn()
-      # with a username that is not the current one.
-      if options.verbose
+      # options.reauthenticate is true, when a user signed via hoodie.account.signIn()
+      # but with the same username he's already signed in with. That becomes necessery
+      # when the user's session to the server timed out.
+      if options.reauthenticate
+        @_setUsername username
+        @_setOwner response.roles[0]
+        @_authenticated = true
+        @trigger 'reauthenticated', username
+
+      # user reauthenticated, meaning 
+      else
         @_cleanup 
           _authenticated : true
           ownerHash     : response.roles[0]
@@ -487,13 +494,6 @@ class Hoodie.Account
           @trigger 'signin:anonymous', username
         else
           @trigger 'signin', username
-
-      else
-        @_setUsername username
-        @_setOwner response.roles[0]
-        @_authenticated = true
-
-      @trigger 'authenticated', username
 
       @fetch()
       defer.resolve(@username, response.roles[0])

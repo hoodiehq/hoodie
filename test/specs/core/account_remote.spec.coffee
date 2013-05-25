@@ -33,8 +33,8 @@ describe "Hoodie.AccountRemote", ->
     it "should connect", ->
       expect(Hoodie.AccountRemote::connect).wasCalled()
 
-    it "should subscribe to `authenticated` event", ->
-      expect(@hoodie.on).wasCalledWith 'account:authenticated', @remote._handleAuthenticate
+    it "should subscribe to `reauthenticated` event", ->
+      expect(@hoodie.on).wasCalledWith 'account:reauthenticated', @remote._handleReauthenticate
 
     it "should subscribe to `signout` event", ->
       # that does not work for what ever reason, therefore the workaround
@@ -85,7 +85,7 @@ describe "Hoodie.AccountRemote", ->
       _and "user signs in, it should connect", ->
         beforeEach ->
           spyOn(@remote, "connect")
-          @remote._handleAuthenticate()
+          @remote._handleReauthenticate()
 
         it "should connect", ->
           expect(@remote.connect).wasCalled()
