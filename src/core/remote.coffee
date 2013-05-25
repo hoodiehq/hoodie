@@ -384,11 +384,6 @@ class Hoodie.Remote extends Hoodie.Store
     object.createdAt = new Date(Date.parse object.createdAt) if object.createdAt
     object.updatedAt = new Date(Date.parse object.updatedAt) if object.updatedAt
     
-    # handle rev
-    if object.rev
-      object._rev = object.rev
-      delete object.rev
-    
     return object
   
   _parseAllFromRemote : (objects) =>

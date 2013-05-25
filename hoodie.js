@@ -1476,10 +1476,6 @@ Hoodie.Remote = (function(_super) {
     if (object.updatedAt) {
       object.updatedAt = new Date(Date.parse(object.updatedAt));
     }
-    if (object.rev) {
-      object._rev = object.rev;
-      delete object.rev;
-    }
     return object;
   };
 
