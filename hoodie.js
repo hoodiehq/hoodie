@@ -286,7 +286,7 @@ Hoodie.Account = (function() {
   };
 
   Account.prototype.authenticate = function() {
-    var _ref, _ref1,
+    var sendAndHandleAuthRequest, _ref, _ref1,
       _this = this;
 
     if (this._authenticated === false) {
@@ -307,9 +307,10 @@ Hoodie.Account = (function() {
         return _this.hoodie.rejectWith();
       });
     }
-    return this._withSingleRequest('authenticate', function() {
-      return _this.request('GET', "/_session");
-    }).pipe(this._handleAuthenticateRequestSuccess, this._handleRequestError);
+    sendAndHandleAuthRequest = function() {
+      return _this.request('GET', "/_session").pipe(_this._handleAuthenticateRequestSuccess, _this._handleRequestError);
+    };
+    return this._withSingleRequest('authenticate', sendAndHandleAuthRequest);
   };
 
   Account.prototype.signUp = function(username, password) {

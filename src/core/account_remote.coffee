@@ -82,6 +82,7 @@ class Hoodie.AccountRemote extends Hoodie.Remote
     unless @isConnected()
       error = new ConnectionError("Not connected: could not push local changes to remote")
       return @hoodie.rejectWith error
+      
     objects = @hoodie.store.changedObjects() unless $.isArray objects
 
     promise = super(objects)

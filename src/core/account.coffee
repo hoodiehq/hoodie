@@ -76,8 +76,11 @@ class Hoodie.Account
     
     # send request to check for session status. If there is a
     # pending request already, return its promise.
-    @_withSingleRequest('authenticate', => @request('GET', "/_session"))
-    .pipe @_handleAuthenticateRequestSuccess, @_handleRequestError
+    sendAndHandleAuthRequest = =>
+      @request('GET', "/_session")      
+      .pipe @_handleAuthenticateRequestSuccess, @_handleRequestError
+    @_withSingleRequest('authenticate', sendAndHandleAuthRequest)
+    
     
     
   # sign up with username & password
