@@ -34,11 +34,17 @@ describe "Hoodie.AccountRemote", ->
       expect(Hoodie.AccountRemote::connect).wasCalled()
 
     it "should subscribe to `reauthenticated` event", ->
-      expect(@hoodie.on).wasCalledWith 'account:reauthenticated', @remote._handleReauthenticate
+      # that does not work because the callback has been spied on, therefore the workaround
+      # expect(@hoodie.on).wasCalledWith 'account:signout', @remote.disconnect
+      for call in @hoodie.on.calls when call.args[0] is 'account:reauthenticated'
+        call.args[1]()
+
+      expect(Hoodie.AccountRemote::connect).wasCalled()
 
     it "should subscribe to `signout` event", ->
-      # that does not work for what ever reason, therefore the workaround
-      # expect(@hoodie.on).wasCalledWith 'account:signout', @remote.disconnect
+      # that does not work because the callback has been spied on I guess,
+      # therefore the workaround expect(@hoodie.on).wasCalledWith 'account:signout',
+      # @remote.disconnect
       for call in @hoodie.on.calls when call.args[0] is 'account:signout'
         call.args[1]()
 
@@ -77,18 +83,14 @@ describe "Hoodie.AccountRemote", ->
         @remote.connect()
         expect(@hoodie.on).wasCalledWith 'store:idle', @remote.push
 
-      it "should call super", ->
-        spyOn(Hoodie.Remote::, "connect")
-        @remote.connect()
-        expect(Hoodie.Remote::connect).wasCalled()
-
       _and "user signs in, it should connect", ->
         beforeEach ->
+          @remote.connected = false
           spyOn(@remote, "connect")
-          @remote._handleReauthenticate()
+          @remote._handleSignIn()
 
         it "should connect", ->
-          expect(@remote.connect).wasCalled()
+          expect(@remote.connected).toBe true
   # /#connect()
 
 

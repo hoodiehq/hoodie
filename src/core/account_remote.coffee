@@ -33,7 +33,8 @@ class Hoodie.AccountRemote extends Hoodie.Remote
     # do not prefix files for my own remote
     options.prefix = ''
 
-    @hoodie.on 'account:reauthenticated',  @_handleReauthenticate
+    @hoodie.on 'account:signin',  @_handleSignIn
+    @hoodie.on 'account:reauthenticated',  @_connect
     @hoodie.on 'account:signout', @disconnect
     @hoodie.on 'reconnected', @connect
     
@@ -46,10 +47,8 @@ class Hoodie.AccountRemote extends Hoodie.Remote
   # do not start to connect immediately, but authenticate beforehand
   # 
   connect : =>
-    @hoodie.account.authenticate().pipe => 
-      @hoodie.on 'store:idle', @push
-      @push()
-      super
+    @hoodie.account.authenticate().pipe @_connect 
+      
 
 
   # disconnect
@@ -111,7 +110,13 @@ class Hoodie.AccountRemote extends Hoodie.Remote
   # Private
   # ---------
 
+  #
+  _connect : =>
+    @connected = true
+    @hoodie.on 'store:idle', @push
+    @sync()
+
   # 
-  _handleReauthenticate : =>
+  _handleSignIn : =>
     @name = @hoodie.account.db()
-    @connect()
+    @_connect()

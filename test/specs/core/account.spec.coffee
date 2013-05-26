@@ -285,7 +285,7 @@ describe "Hoodie.Account", ->
           @promise = @account.signUp('joe@example.com', 'secret', name: "Joe Doe")
 
         it "should sign in", ->
-          expect(@account._sendSignInRequest).wasCalledWith 'randomUsername', 'randomPassword'
+          expect(@account._sendSignInRequest).wasCalledWith 'randomUsername', 'randomPassword', silent: true
 
         _when "sign in successful", ->
           beforeEach ->
@@ -546,7 +546,7 @@ describe "Hoodie.Account", ->
           @response = {"ok":true,"name":"user/joe@example.com","roles":["user_hash","confirmed"]}
           @requestDefer.resolve @response
 
-        it "should trigger `account:cleanup` event", ->
+        it "should not trigger `account:cleanup` event", ->
           @account.signIn('joe@example.com', 'secret')
           expect(@hoodie.trigger).wasNotCalledWith 'account:cleanup'
 
@@ -594,10 +594,6 @@ describe "Hoodie.Account", ->
           _and "user has an anonyomous account", ->
             beforeEach ->
               spyOn(@account, "hasAnonymousAccount").andReturn true
-
-            it "should trigger `account:cleanup` event", ->
-              @account.signIn('joe@example.com', 'secret')
-              expect(@hoodie.trigger).wasCalledWith 'account:cleanup'
             
             it "should trigger `account:signin:anonymous` event", ->
               @account.signIn('joe@example.com', 'secret')
@@ -606,10 +602,6 @@ describe "Hoodie.Account", ->
           _and "user has a manual account", ->
             beforeEach ->
               spyOn(@account, "hasAnonymousAccount").andReturn false
-
-            it "should trigger `account:cleanup` event", ->
-              @account.signIn('joe@example.com', 'secret')
-              expect(@hoodie.trigger).wasCalledWith 'account:cleanup'
             
             it "should trigger `account:signin` event", ->
               @account.signIn('joe@example.com', 'secret')

@@ -398,7 +398,7 @@ Hoodie.Account = (function() {
       });
     } else {
       return this._sendSignInRequest(username, password, {
-        reauthenticate: true
+        reauthenticated: true
       });
     }
   };
@@ -580,7 +580,7 @@ Hoodie.Account = (function() {
     };
   };
 
-  Account.prototype._delayedSignIn = function(username, password, defer) {
+  Account.prototype._delayedSignIn = function(username, password, options, defer) {
     var _this = this;
 
     if (!defer) {
@@ -593,7 +593,7 @@ Hoodie.Account = (function() {
       promise.done(defer.resolve);
       return promise.fail(function(error) {
         if (error.error === 'unconfirmed') {
-          return _this._delayedSignIn(username, password, defer);
+          return _this._delayedSignIn(username, password, options, defer);
         } else {
           return defer.reject.apply(defer, arguments);
         }
@@ -628,22 +628,18 @@ Hoodie.Account = (function() {
           reason: "account has not been confirmed yet"
         });
       }
-      if (options.reauthenticate) {
-        _this._setUsername(username);
-        _this._setOwner(response.roles[0]);
-        _this._authenticated = true;
-        _this.trigger('reauthenticated', username);
-      } else {
-        _this._cleanup({
-          _authenticated: true,
-          ownerHash: response.roles[0],
-          username: username
-        });
+      _this._setUsername(username);
+      _this._setOwner(response.roles[0]);
+      _this._authenticated = true;
+      if (!(options.silent || options.reauthenticated)) {
         if (_this.hasAnonymousAccount()) {
           _this.trigger('signin:anonymous', username);
         } else {
           _this.trigger('signin', username);
         }
+      }
+      if (options.reauthenticated) {
+        _this.trigger('reauthenticated', username);
       }
       _this.fetch();
       return defer.resolve(_this.username, response.roles[0]);
@@ -706,7 +702,9 @@ Hoodie.Account = (function() {
   Account.prototype._changeUsernameAndPassword = function(currentPassword, newUsername, newPassword) {
     var _this = this;
 
-    return this._sendSignInRequest(this.username, currentPassword).pipe(function() {
+    return this._sendSignInRequest(this.username, currentPassword, {
+      silent: true
+    }).pipe(function() {
       return _this.fetch().pipe(_this._sendChangeUsernameAndPasswordRequest(currentPassword, newUsername, newPassword));
     });
   };
@@ -818,7 +816,9 @@ Hoodie.Account = (function() {
     return function() {
       _this.hoodie.remote.disconnect();
       if (newUsername) {
-        return _this._delayedSignIn(newUsername, newPassword);
+        return _this._delayedSignIn(newUsername, newPassword, {
+          silent: true
+        });
       } else {
         return _this.signIn(_this.username, newPassword);
       }
@@ -1637,27 +1637,23 @@ Hoodie.AccountRemote = (function(_super) {
     if (options == null) {
       options = {};
     }
-    this._handleReauthenticate = __bind(this._handleReauthenticate, this);
+    this._handleSignIn = __bind(this._handleSignIn, this);
+    this._connect = __bind(this._connect, this);
     this.push = __bind(this.push, this);
     this.disconnect = __bind(this.disconnect, this);
     this.connect = __bind(this.connect, this);
     this.name = this.hoodie.account.db();
     this.connected = true;
     options.prefix = '';
-    this.hoodie.on('account:reauthenticated', this._handleReauthenticate);
+    this.hoodie.on('account:signin', this._handleSignIn);
+    this.hoodie.on('account:reauthenticated', this._connect);
     this.hoodie.on('account:signout', this.disconnect);
     this.hoodie.on('reconnected', this.connect);
     AccountRemote.__super__.constructor.call(this, this.hoodie, options);
   }
 
   AccountRemote.prototype.connect = function() {
-    var _this = this;
-
-    return this.hoodie.account.authenticate().pipe(function() {
-      _this.hoodie.on('store:idle', _this.push);
-      _this.push();
-      return AccountRemote.__super__.connect.apply(_this, arguments);
-    });
+    return this.hoodie.account.authenticate().pipe(this._connect);
   };
 
   AccountRemote.prototype.disconnect = function() {
@@ -1705,9 +1701,15 @@ Hoodie.AccountRemote = (function(_super) {
     return (_ref = this.hoodie).trigger.apply(_ref, ["remote:" + event].concat(__slice.call(parameters)));
   };
 
-  AccountRemote.prototype._handleReauthenticate = function() {
+  AccountRemote.prototype._connect = function() {
+    this.connected = true;
+    this.hoodie.on('store:idle', this.push);
+    return this.sync();
+  };
+
+  AccountRemote.prototype._handleSignIn = function() {
     this.name = this.hoodie.account.db();
-    return this.connect();
+    return this._connect();
   };
 
   return AccountRemote;

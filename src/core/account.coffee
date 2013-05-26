@@ -184,7 +184,7 @@ class Hoodie.Account
     if @username isnt username
       @signOut(silent: true).pipe => @_sendSignInRequest(username, password)
     else 
-      @_sendSignInRequest(username, password, reauthenticate: true)
+      @_sendSignInRequest(username, password, reauthenticated: true)
 
   # sign out 
   # ---------
@@ -413,7 +413,11 @@ class Hoodie.Account
       @_doc._rev = response.rev
       @_delayedSignIn(username, password)
 
-  _delayedSignIn : (username, password, defer) =>
+  #
+  # a delayed sign in is used after sign up and after a
+  # username change.
+  # 
+  _delayedSignIn : (username, password, options, defer) =>
 
     # _delayedSignIn might call itself, when the user account
     # is pending. In this case it passes the original defer,
@@ -426,7 +430,7 @@ class Hoodie.Account
       promise.fail (error) =>
         if error.error is 'unconfirmed'
           # It might take a bit until the account has been confirmed
-          @_delayedSignIn(username, password, defer)
+          @_delayedSignIn(username, password, options, defer)
         else
           defer.reject arguments...
     ), 300
@@ -474,26 +478,22 @@ class Hoodie.Account
         return defer.reject error: "unconfirmed", reason: "account has not been confirmed yet"
 
 
-      # options.reauthenticate is true, when a user signed via hoodie.account.signIn()
-      # but with the same username he's already signed in with. That becomes necessery
-      # when the user's session to the server timed out.
-      if options.reauthenticate
-        @_setUsername username
-        @_setOwner response.roles[0]
-        @_authenticated = true
-        @trigger 'reauthenticated', username
+      @_setUsername username
+      @_setOwner response.roles[0]
+      @_authenticated = true
 
-      # user reauthenticated, meaning 
-      else
-        @_cleanup 
-          _authenticated : true
-          ownerHash     : response.roles[0]
-          username      : username
-
+      # options.verbose is true, when a user manually signed via hoodie.account.signIn().
+      # We need to differentiate to other signIn requests, for example right after
+      # the signup or after a session timed out.
+      unless options.silent or options.reauthenticated
         if @hasAnonymousAccount()
           @trigger 'signin:anonymous', username
         else
           @trigger 'signin', username
+
+      # user reauthenticated, meaning 
+      if options.reauthenticated
+        @trigger 'reauthenticated', username
 
       @fetch()
       defer.resolve(@username, response.roles[0])
@@ -575,7 +575,7 @@ class Hoodie.Account
   # 3. sign in with new credentials to create new sesion.
   #
   _changeUsernameAndPassword : (currentPassword, newUsername, newPassword) ->
-    @_sendSignInRequest(@username, currentPassword).pipe =>
+    @_sendSignInRequest(@username, currentPassword, silent: true).pipe =>
       @fetch().pipe @_sendChangeUsernameAndPasswordRequest(currentPassword, newUsername, newPassword)
   
   #
@@ -698,7 +698,7 @@ class Hoodie.Account
     =>
       @hoodie.remote.disconnect()
       if newUsername
-        @_delayedSignIn newUsername, newPassword
+        @_delayedSignIn newUsername, newPassword, silent: true
       else
         @signIn(@username, newPassword)
 
