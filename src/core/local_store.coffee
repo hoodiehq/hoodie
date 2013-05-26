@@ -229,13 +229,22 @@ class Hoodie.LocalStore extends Hoodie.Store
   remove : (type, id, options = {}) ->
     defer = super
     return @_decoratePromise(defer) if @hoodie.isPromise(defer)
+    key = "#{type}/#{id}"
+
+    # if change comes from remote, just clean up locally
+    if options.remote
+      @db.removeItem key
+      objectWasMarkedAsDeleted = @_cached[key] and @_isMarkedAsDeleted(@_cached[key])
+      @_cached[key] = false
+      @clearChanged type, id
+      return if objectWasMarkedAsDeleted
 
     object  = @cache type, id
     
     unless object
       return @_decoratePromise defer.reject(Hoodie.Errors.NOT_FOUND type, id).promise()
     
-    if object._syncedAt and not options.remote
+    if object._syncedAt
       object._deleted = true
       @cache type, id, object
     

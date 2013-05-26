@@ -1921,7 +1921,7 @@ Hoodie.LocalStore = (function(_super) {
   };
 
   LocalStore.prototype.remove = function(type, id, options) {
-    var defer, key, object, promise;
+    var defer, key, object, objectWasMarkedAsDeleted, promise;
 
     if (options == null) {
       options = {};
@@ -1930,11 +1930,21 @@ Hoodie.LocalStore = (function(_super) {
     if (this.hoodie.isPromise(defer)) {
       return this._decoratePromise(defer);
     }
+    key = "" + type + "/" + id;
+    if (options.remote) {
+      this.db.removeItem(key);
+      objectWasMarkedAsDeleted = this._cached[key] && this._isMarkedAsDeleted(this._cached[key]);
+      this._cached[key] = false;
+      this.clearChanged(type, id);
+      if (objectWasMarkedAsDeleted) {
+        return;
+      }
+    }
     object = this.cache(type, id);
     if (!object) {
       return this._decoratePromise(defer.reject(Hoodie.Errors.NOT_FOUND(type, id)).promise());
     }
-    if (object._syncedAt && !options.remote) {
+    if (object._syncedAt) {
       object._deleted = true;
       this.cache(type, id, object);
     } else {
