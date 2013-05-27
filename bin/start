@@ -11,6 +11,15 @@ var environment = require('../lib/environment'),
     app = require('../lib/app');
 
 
+// parse command-line arguments
+var argv = require('optimist')
+    .alias('h', 'help')
+    .describe('help', 'Show usage information')
+    .describe('local-tld', 'Turn on local-tld on supported platforms')
+    .describe('no-local-tld', 'Turn off local-tld on supported platforms')
+    .usage('Usage: start [options]')
+    .argv;
+
 /**
  * Start a Hoodie server configured for the current
  * platform and environment
@@ -22,8 +31,14 @@ if (require.main === module) {
     var cfg = environment.getConfig(
         process.platform,   // platform
         process.env,        // environment vars
-        project_dir         // project directory
+        project_dir,        // project directory
+        argv                // command-line arguments
     );
+
+    if (argv['help']) {
+        // show usage information
+        return require('optimist').showHelp();
+    }
 
     app.init(cfg, function (err) {
         if (err) {
