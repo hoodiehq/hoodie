@@ -18,7 +18,8 @@
         "cli-color": "0.2.2",
         "lock": "0.0.3",
         "semver": ">=1.1.4",
-        "send": "0.1.0"
+        "send": "0.1.0",
+        "optimist": "0.5.0"
     },
     "scripts": {
         "start": "bin/start",
