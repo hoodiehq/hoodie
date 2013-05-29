@@ -1,7 +1,8 @@
 describe "Hoodie", ->
   beforeEach ->
     @hoodie = new Hoodie 'http://couch.example.com'
-    spyOn($, "ajax").andReturn $.Deferred()
+    @ajaxDefer = $.Deferred()
+    spyOn($, "ajax").andReturn @ajaxDefer.promise()
     spyOn(window, "setTimeout").andCallFake (cb) -> cb
 
 
@@ -60,9 +61,7 @@ describe "Hoodie", ->
         expect(@args.crossDomain).toBe true
       
       it "should return a promise", ->
-        promise = $.Deferred()
-        $.ajax.andReturn promise
-        expect(@hoodie.request('GET', '/')).toBe promise
+        expect(@hoodie.request('GET', '/')).toBePromise()
          
     
     _when "request 'POST', '/test', data: funky: 'fresh'", ->
@@ -82,6 +81,15 @@ describe "Hoodie", ->
       it "should send a GET request to http://api.otherapp.com/", ->
         expect(@args.type).toBe 'GET'
         expect(@args.url).toBe 'http://api.otherapp.com/'
+
+    _when "request fails with empty response", ->
+      beforeEach ->
+        @ajaxDefer.reject({ xhr: {responseText: ''}})
+      
+      it "should return a rejected promis with Cannot reach backend error", ->
+        expect(@hoodie.request('GET', '/')).toBeRejectedWith error: 'Cannot connect to backend at http://couch.example.com'
+         
+      
   # /request(type, path, options)
 
 

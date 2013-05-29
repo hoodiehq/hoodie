@@ -64,7 +64,7 @@ class Hoodie extends Events
       crossDomain : true
       dataType    : 'json'
 
-    $.ajax $.extend defaults, options
+    $.ajax($.extend defaults, options).then( null, @_pipeRequestError )
 
 
   # ## Check Connection
@@ -207,5 +207,15 @@ class Hoodie extends Events
       @trigger 'disconnected'
       @online = false
     return @defer().reject()
+
+  # pipeRequestError
+  _pipeRequestError : (xhr) =>
+
+    try
+      error = JSON.parse(xhr.responseText)
+    catch e
+      error = error: xhr.responseText or "Cannot connect to backend at #{@baseUrl}"
+
+    @rejectWith(error).promise()
 
 module.exports = Hoodie if module?.exports
