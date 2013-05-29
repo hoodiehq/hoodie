@@ -40,6 +40,9 @@ class Hoodie.AccountRemote extends Hoodie.Remote
     
     super(@hoodie, options)
     
+    # preset known objects with localstore.
+    @bootstrapKnownObjects()
+    
 
   # Connect
   # ---------
@@ -58,6 +61,16 @@ class Hoodie.AccountRemote extends Hoodie.Remote
   disconnect: =>
     @hoodie.unbind 'store:idle', @push
     super
+
+
+  # bootstrapKnownObjects
+  # -----------------------
+
+  # 
+  bootstrapKnownObjects : ->
+    for key in @hoodie.store.index()
+      [type, id] = key.split(/\//)
+      @markAsKnownObject({type, id}) 
     
 
   # get and set since nr

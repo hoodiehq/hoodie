@@ -180,7 +180,7 @@ class Hoodie.LocalStore extends Hoodie.Store
     defer = super
     return @_decoratePromise(defer) if @hoodie.isPromise(defer)
 
-    keys = @_index()
+    keys = @index()
 
     # normalize filter
     if typeof filter is 'string'
@@ -199,14 +199,11 @@ class Hoodie.LocalStore extends Hoodie.Store
         else
           continue
 
-      # sort
+      # sort from newest to oldest
       results.sort (a,b) -> 
-        aNum = +a.createdAt
-        bNum = +b.createdAt
-
-        if aNum < bNum
+        if a.createdAt > b.createdAt
           -1
-        else if aNum > bNum
+        else if a.createdAt < b.createdAt
           1
         else
           0
@@ -269,7 +266,19 @@ class Hoodie.LocalStore extends Hoodie.Store
   removeAll : -> @_decoratePromise super
 
   
-  
+  # index
+  # -------
+
+  # returns an array of all keys in the hoodie.store
+  # TODO: make this cache-y
+  index : ->
+    keys = []
+    for i in [0...@db.length()]
+      key = @db.key(i)
+      keys.push(key) if @_isSemanticId(key)
+    keys
+
+
   # Cache
   # -------
   
@@ -429,7 +438,7 @@ class Hoodie.LocalStore extends Hoodie.Store
     defer = @hoodie.defer()
   
     try
-      keys = @_index()
+      keys = @index()
       results = for key in keys when @_isSemanticId key
         @db.removeItem key
 
@@ -553,10 +562,6 @@ class Hoodie.LocalStore extends Hoodie.Store
       obj.type = type
       obj.id    = id
       
-      obj.createdAt = new Date(Date.parse obj.createdAt) if obj.createdAt
-      obj.updatedAt = new Date(Date.parse obj.updatedAt) if obj.updatedAt
-      obj._syncedAt = new Date(Date.parse obj._syncedAt) if obj._syncedAt
-      
       obj
     else
       false
@@ -570,7 +575,7 @@ class Hoodie.LocalStore extends Hoodie.Store
       @db.setItem '_dirty', ids.join(',')
 
   #
-  _now : -> new Date
+  _now : -> JSON.stringify( new Date ).replace(/"/g, '')
 
   # only lowercase letters, numbers and dashes are allowed for ids
   _isValidId : (key) ->
@@ -590,16 +595,11 @@ class Hoodie.LocalStore extends Hoodie.Store
     return false unless object.updatedAt # no updatedAt? no dirt then
     return true  unless object._syncedAt # no syncedAt? uuhh, that's dirty.
   
-    object._syncedAt.getTime() < object.updatedAt.getTime()
+    object._syncedAt < object.updatedAt
 
   # 
   _isMarkedAsDeleted : (object) ->
     object._deleted is true
-
-  # object key index
-  # TODO: make this cachy
-  _index : ->
-    @db.key(i) for i in [0...@db.length()]
 
   # 
   _triggerEvents: (event, object, options) ->
