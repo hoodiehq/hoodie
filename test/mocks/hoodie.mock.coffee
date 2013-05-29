@@ -33,6 +33,7 @@ Mocks.Hoodie = ->
     findAll       : -> promiseMock
     findOrAdd     : -> promiseMock 
     removeAll     : -> promiseMock 
+    index         : -> []
     changedObjects   : ->
     isDirty       : ->
     decoratePromises: -> 

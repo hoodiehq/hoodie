@@ -136,8 +136,8 @@ describe "Hoodie.Remote", ->
           expect(@remote.find("todo", "1")).toBeResolvedWith
             id: 'fresh'
             type: 'car'
-            createdAt: new Date(Date.parse '2012-12-12T22:00:00.000Z')
-            updatedAt: new Date(Date.parse '2012-12-21T22:00:00.000Z')
+            createdAt: '2012-12-12T22:00:00.000Z'
+            updatedAt: '2012-12-21T22:00:00.000Z'
   # /#find(type, id)
 
 
@@ -194,8 +194,8 @@ describe "Hoodie.Remote", ->
         object = 
           id: 'fresh'
           type: 'car'
-          createdAt: new Date (Date.parse '2012-12-12T22:00:00.000Z')
-          updatedAt: new Date (Date.parse '2012-12-21T22:00:00.000Z')
+          createdAt: '2012-12-12T22:00:00.000Z'
+          updatedAt: '2012-12-21T22:00:00.000Z'
         expect(@remote.findAll()).toBeResolvedWith [object]
 
     _when "request has an error", ->
@@ -428,8 +428,8 @@ describe "Hoodie.Remote", ->
       
       it "should trigger remote events", ->
         spyOn(@remote, "trigger")
-        @remote._knownObjects = 
-          'abc3' : 1
+        spyOn(@remote, "isKnownObject").andCallFake (object) ->
+          return object.id is 'abc3'
         @remote.pull()
 
         expect(@remote.trigger).wasCalledWith 'remove',           @object1
@@ -473,7 +473,7 @@ describe "Hoodie.Remote", ->
 
       _and "object has been returned before", ->
         beforeEach ->
-          @remote._knownObjects['abc2'] = 1
+          spyOn(@remote, "isKnownObject").andReturn true
           spyOn(@remote, "trigger")
           @remote.pull()
         
@@ -481,11 +481,11 @@ describe "Hoodie.Remote", ->
           # {"_id":"todo/abc2","_rev":"1-123","content":"remember the milk","done":false,"order":1, "type":"todo"}
           object =
             'type'  : 'todo'
-            id       : 'abc2'
-            _rev     : '1-123'
-            content  : 'remember the milk'
-            done     :false
-            order    :1
+            id      : 'abc2'
+            _rev    : '1-123'
+            content : 'remember the milk'
+            done    : false
+            order   : 1
 
           expect(@remote.trigger).wasCalledWith 'update', object
         

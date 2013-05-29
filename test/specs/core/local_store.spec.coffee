@@ -429,7 +429,7 @@ describe "Hoodie.LocalStore", ->
     with_2CatsAnd_3Dogs = (specs) ->
       _and "two cat and three dog objects exist in the store", ->
         beforeEach ->
-          spyOn(@store, "_index").andReturn ["cat/1", "cat/2", "dog/1", "dog/2", "dog/3"]
+          spyOn(@store, "index").andReturn ["cat/1", "cat/2", "dog/1", "dog/2", "dog/3"]
           spyOn(@store, "cache").andCallFake (type, id) -> 
             id = parseInt(id)
             if type is 'dog' 
@@ -448,12 +448,12 @@ describe "Hoodie.LocalStore", ->
 
     with_2CatsAnd_3Dogs ->
       it "should sort by createdAt", ->
-        expect(@store.findAll()).toBeResolvedWith [ 
-          { name : 'dog1', age : 1, createdAt : new Date(11) }, 
-          { name : 'dog2', age : 2, createdAt : new Date(12) }, 
-          { name : 'dog3', age : 3, createdAt : new Date(13) },
+        expect(@store.findAll()).toBeResolvedWith [  
+          { name : 'cat2', age : 2, createdAt : new Date(22) },
           { name : 'cat1', age : 1, createdAt : new Date(21) }, 
-          { name : 'cat2', age : 2, createdAt : new Date(22) } 
+          { name : 'dog3', age : 3, createdAt : new Date(13) }, 
+          { name : 'dog2', age : 2, createdAt : new Date(12) },
+          { name : 'dog1', age : 1, createdAt : new Date(11) }
         ] 
   
     _when "called without a type", ->
@@ -468,7 +468,7 @@ describe "Hoodie.LocalStore", ->
       
       _and "no documents exist in the store", ->          
         beforeEach ->
-          spyOn(@store, "_index").andReturn []
+          spyOn(@store, "index").andReturn []
     
         it "should return an empty array", ->
           promise = @store.findAll()
@@ -476,7 +476,7 @@ describe "Hoodie.LocalStore", ->
   
       _and "there are other documents in localStorage not stored with store", ->
         beforeEach ->
-          spyOn(@store, "_index").andReturn ["_someConfig", "someOtherShizzle", "whatever", "valid/123"]
+          spyOn(@store, "index").andReturn ["_someConfig", "someOtherShizzle", "whatever", "valid/123"]
           spyOn(@store, "cache").andReturn {}
     
         it "should not return them", ->
@@ -698,7 +698,7 @@ describe "Hoodie.LocalStore", ->
       expect(promise).toBePromise()
       
     it "should clear localStorage", ->
-      spyOn(@store, "_index").andReturn ['$config/hoodie', 'car/123', '_notOurBusiness']
+      spyOn(@store, "index").andReturn ['$config/hoodie', 'car/123', '_notOurBusiness']
       @store.clear()
       expect(@store.db.removeItem).wasCalledWith '$config/hoodie'
       expect(@store.db.removeItem).wasCalledWith 'car/123'

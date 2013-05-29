@@ -23,6 +23,20 @@ describe "Hoodie", ->
       spyOn(Hoodie::, "checkConnection")
       hoodie = new Hoodie
       expect(Hoodie::checkConnection).wasCalled()
+
+    it "store has to be initialized before remote", ->
+      # because RemoteAccount bootstraps known objects using
+      # hoodie.store.index() in its constructor
+      order = []
+      spyOn(Hoodie, "LocalStore").andCallFake ->
+        order.push('store')
+        return new Mocks.Hoodie().store
+      spyOn(Hoodie, "AccountRemote").andCallFake ->
+        order.push('remote')
+        return new Mocks.Hoodie().remote
+
+      hoodie = new Hoodie
+      expect(order.join(',')).toBe 'store,remote'
   # /constructor
   
 

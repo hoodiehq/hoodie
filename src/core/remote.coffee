@@ -203,6 +203,22 @@ class Hoodie.Remote extends Hoodie.Store
     @updateAll type, _deleted: true
 
 
+  # isKnownObject
+  # ---------------
+
+  # determine between a known and a new object
+  isKnownObject : (object) ->
+    key = "#{object.type}/#{object.id}"
+    @_knownObjects[ key ]?
+
+  # markAsKnownObject
+  # -------------
+
+  # determine between a known and a new object
+  markAsKnownObject : (object) ->
+    key = "#{object.type}/#{object.id}"
+    @_knownObjects[key] = 1
+    
 
   # synchronization
   # -----------------
@@ -369,11 +385,6 @@ class Hoodie.Remote extends Hoodie.Store
     # as in some cases IDs might contain "/", too
     [ignore, object.type, object.id] = id.match(/([^\/]+)\/(.*)/)
     
-    
-    # handle timestameps
-    object.createdAt = new Date(Date.parse object.createdAt) if object.createdAt
-    object.updatedAt = new Date(Date.parse object.updatedAt) if object.updatedAt
-    
     return object
   
   _parseAllFromRemote : (objects) =>
@@ -509,17 +520,17 @@ class Hoodie.Remote extends Hoodie.Store
 
       object = @_parseFromRemote(doc)
       if object._deleted
-        continue unless @_knownObjects[object.id]
+        continue unless @isKnownObject(object)
 
         event = 'remove'
-        delete @_knownObjects[object.id]
+        delete @isKnownObject(object)
 
       else
-        if @_knownObjects[object.id]
+        if @isKnownObject(object)
           event = 'update'
         else
           event = 'add'
-          @_knownObjects[object.id] = 1
+          @markAsKnownObject(object)
 
       @trigger "#{event}",                             object
       @trigger "#{event}:#{object.type}",              object
