@@ -332,6 +332,7 @@ Hoodie.Account = (function() {
         error: 'you have to sign out first'
       }).promise();
     }
+    username = username.toLowerCase();
     options = {
       data: JSON.stringify({
         _id: this._key(username),
@@ -387,9 +388,13 @@ Hoodie.Account = (function() {
   Account.prototype.signIn = function(username, password) {
     var _this = this;
 
+    if (username == null) {
+      username = '';
+    }
     if (password == null) {
       password = '';
     }
+    username = username.toLowerCase();
     if (this.username !== username) {
       return this.signOut({
         silent: true
@@ -504,7 +509,10 @@ Hoodie.Account = (function() {
   };
 
   Account.prototype.changeUsername = function(currentPassword, newUsername) {
-    return this._changeUsernameAndPassword(currentPassword, newUsername);
+    if (newUsername == null) {
+      newUsername = '';
+    }
+    return this._changeUsernameAndPassword(currentPassword, newUsername.toLowerCase());
   };
 
   Account.prototype.destroy = function() {

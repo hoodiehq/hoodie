@@ -102,6 +102,9 @@ class Hoodie.Account
     if @hasAccount()
       return @hoodie.defer().reject(error: 'you have to sign out first').promise()
 
+    # downcase username
+    username = username.toLowerCase()
+
     options =
       data         : JSON.stringify
         _id        : @_key(username)
@@ -180,7 +183,11 @@ class Hoodie.Account
   #       another user account or anonymously) would be merged into the user 
   #       account that signs in. That applies only if username isn't the same as
   #       current username.
-  signIn : (username, password = '') ->
+  signIn : (username = '', password = '') ->
+
+    # downcase
+    username = username.toLowerCase()
+
     if @username isnt username
       @signOut(silent: true).pipe => @_sendSignInRequest(username, password)
     else 
@@ -307,8 +314,8 @@ class Hoodie.Account
   # implementation of the hoodie API.
   #
   # But the current password is needed to login with the new username.
-  changeUsername : (currentPassword, newUsername) ->
-    @_changeUsernameAndPassword(currentPassword, newUsername)
+  changeUsername : (currentPassword, newUsername = '') ->
+    @_changeUsernameAndPassword(currentPassword, newUsername.toLowerCase())
 
 
   # destroy

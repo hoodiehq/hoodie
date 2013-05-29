@@ -267,6 +267,12 @@ describe "Hoodie.Account", ->
         expect(@promise).toBeRejectedWith error: 'username must be set'
 
     _when "username set", ->
+      it "should downcase it", ->
+        spyOn(@account, "request").andCallThrough()
+        @account.signUp('Joe', 'secret')
+        [@type, @path, @options] = @account.request.mostRecentCall.args
+        expect(@path).toBe '/_users/org.couchdb.user%3Auser%2Fjoe'
+
       _and "user has an anonmyous account", ->
         beforeEach ->
           spyOn(@account, "hasAnonymousAccount").andReturn true
@@ -523,6 +529,13 @@ describe "Hoodie.Account", ->
     it "should sign out silently", ->
       @account.signIn('joe@example.com', 'secret')
       expect(@account.signOut).wasCalledWith silent: true
+
+
+    it "should downcase username", ->
+      @signOutDefer.resolve()
+      @account.signIn('Joe', 'secret')
+      [type, path, options] = @hoodie.request.mostRecentCall.args
+      expect(options.data.name).toBe 'user/joe'
 
     # But if the user tries to sign in with the same username
     # that is curretly signed in (e.g. because his session is
@@ -1182,6 +1195,12 @@ describe "Hoodie.Account", ->
     it "should return a promise", ->
       @account.changeUsername('secret', 'new.joe@example.com')
       expect(@account.changeUsername()).toBePromise()
+
+    it "should downcase new username", ->
+      spyOn(@account, "_changeUsernameAndPassword")
+      @account.changeUsername('secret', 'Joe')
+      expect(@account._changeUsernameAndPassword).wasCalledWith 'secret', 'joe'
+       
 
     _when "sign in successful", ->
       beforeEach ->
