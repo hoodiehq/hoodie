@@ -88,7 +88,6 @@ Hoodie = (function(_super) {
 
   function Hoodie(baseUrl) {
     this.baseUrl = baseUrl;
-    this._pipeRequestError = __bind(this._pipeRequestError, this);
     this._handleCheckConnectionError = __bind(this._handleCheckConnectionError, this);
     this._handleCheckConnectionSuccess = __bind(this._handleCheckConnectionSuccess, this);
     this.rejectWith = __bind(this.rejectWith, this);
@@ -127,7 +126,7 @@ Hoodie = (function(_super) {
       crossDomain: true,
       dataType: 'json'
     };
-    return $.ajax($.extend(defaults, options)).then(null, this._pipeRequestError);
+    return $.ajax($.extend(defaults, options));
   };
 
   Hoodie.prototype._checkConnectionRequest = null;
@@ -239,20 +238,6 @@ Hoodie = (function(_super) {
       this.online = false;
     }
     return this.defer().reject();
-  };
-
-  Hoodie.prototype._pipeRequestError = function(xhr) {
-    var e, error;
-
-    try {
-      error = JSON.parse(xhr.responseText);
-    } catch (_error) {
-      e = _error;
-      error = {
-        error: xhr.responseText || ("Cannot connect to backend at " + this.baseUrl)
-      };
-    }
-    return this.rejectWith(error).promise();
   };
 
   return Hoodie;
