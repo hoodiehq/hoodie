@@ -4,7 +4,7 @@
   "description" : "Hoodie library for the browser",
   "version"     : "0.1.27",
   "main"        : "./hoodie.js",
-  "homepage"    : "http://hood.id",
+  "homepage"    : "http://hood.ie",
   "repository": {
     "type": "git",
     "url": "https://github.com/hoodiehq/hoodie.js.git"
