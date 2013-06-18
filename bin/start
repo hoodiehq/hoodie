@@ -17,6 +17,8 @@ var argv = require('optimist')
     .describe('help', 'Show usage information')
     .describe('local-tld', 'Turn on local-tld on supported platforms')
     .describe('no-local-tld', 'Turn off local-tld on supported platforms')
+    .describe('open-browser', 'Turn on opening a browser on supported platforms')
+    .describe('no-open-browser', 'Turn off opening a browser on supported platforms')
     .usage('Usage: start [options]')
     .argv;
 
