@@ -1,3 +1,4 @@
 .DS_Store
 TODO.md
 compiled
+node_modules/
