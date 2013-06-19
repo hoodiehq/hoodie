@@ -2,14 +2,14 @@
 # ================
 
 # tell something smart in here.
-# 
+#
 class Hoodie.Account
-  
+
   # Properties
   # ------------
   username    : undefined
 
-  
+
   # Constructor
   # ------------
   constructor : (@hoodie) ->
@@ -20,13 +20,13 @@ class Hoodie.Account
     # map of requestPromises. We maintain this list to avoid sending
     # the same requests several times.
     @_requests = {}
-    
+
     # init account
     # we've put this into its own method so it's easier to
     # inherit from Hoodie.Account with custom logic
     @init()
 
-  
+
   # Authenticate
   # --------------
   init : ->
@@ -38,7 +38,7 @@ class Hoodie.Account
     # Make sure we have one.
     unless @ownerHash
       @_setOwner @hoodie.uuid()
-    
+
     # authenticate on next tick
     window.setTimeout @authenticate
 
@@ -52,10 +52,10 @@ class Hoodie.Account
   # Use this method to assure that the user is authenticated:
   # `hoodie.account.authenticate().done( doSomething ).fail( handleError )`
   authenticate : =>
-      
+
     if @_authenticated is false
       return @hoodie.defer().reject().promise()
-      
+
     if @_authenticated is true
       return @hoodie.defer().resolve(@username).promise()
 
@@ -65,24 +65,24 @@ class Hoodie.Account
 
     #  if there is apending signIn request, return its promise
     return @_requests.signIn if @_requests.signIn?.state() is 'pending'
-      
+
 
     # if username is not set, make sure to end the session
     if @username is undefined
 
-      return @_sendSignOutRequest().then => 
+      return @_sendSignOutRequest().then =>
         @_authenticated = false
         @hoodie.rejectWith()
-    
+
     # send request to check for session status. If there is a
     # pending request already, return its promise.
     sendAndHandleAuthRequest = =>
-      @request('GET', "/_session")      
+      @request('GET', "/_session")
       .pipe @_handleAuthenticateRequestSuccess, @_handleRequestError
     @_withSingleRequest('authenticate', sendAndHandleAuthRequest)
-    
-    
-    
+
+
+
   # sign up with username & password
   # ----------------------------------
 
@@ -95,7 +95,7 @@ class Hoodie.Account
   signUp : (username, password = '') ->
     unless username
       return @hoodie.defer().reject(error: 'username must be set').promise()
-      
+
     if @hasAnonymousAccount()
       return @_upgradeAnonymousAccount username, password
 
@@ -122,7 +122,7 @@ class Hoodie.Account
     @request('PUT', @_url(username), options)
     .pipe @_handleSignUpSucces(username, password), @_handleRequestError
 
-  
+
   # anonymous sign up
   # -------------------
 
@@ -131,8 +131,8 @@ class Hoodie.Account
   # method can be used. It generates a random password and stores it locally
   # in the browser.
   #
-  # If the user signes up for real later, we "upgrade" his account, meaning we 
-  # change his username and password internally instead of creating another user. 
+  # If the user signes up for real later, we "upgrade" his account, meaning we
+  # change his username and password internally instead of creating another user.
   #
   anonymousSignUp : ->
     password = @hoodie.uuid(10)
@@ -146,7 +146,7 @@ class Hoodie.Account
 
   # hasAccount
   # ---------------------
-  
+
   #
   hasAccount : ->
     @username?
@@ -154,7 +154,7 @@ class Hoodie.Account
 
   # hasAnonymousAccount
   # ---------------------
-  
+
   #
   hasAnonymousAccount : ->
     @getAnonymousPassword()?
@@ -163,7 +163,7 @@ class Hoodie.Account
   # set / get / remove anonymous password
   # ---------------------------------------
 
-  # 
+  #
   _anonymousPasswordKey : '_account.anonymousPassword'
   setAnonymousPassword    : (password) -> @hoodie.config.set    @_anonymousPasswordKey, password
   getAnonymousPassword    : (password) -> @hoodie.config.get    @_anonymousPasswordKey
@@ -177,10 +177,10 @@ class Hoodie.Account
   # uses standard CouchDB API to create a new user session (POST /_session).
   # Besides the standard sign in we also check if the account has been confirmed
   # (roles include "confirmed" role).
-  # 
-  # NOTE: When signing in, all local data gets cleared beforehand (with a signOut). 
-  #       Otherwise data that has been created beforehand (authenticated with 
-  #       another user account or anonymously) would be merged into the user 
+  #
+  # NOTE: When signing in, all local data gets cleared beforehand (with a signOut).
+  #       Otherwise data that has been created beforehand (authenticated with
+  #       another user account or anonymously) would be merged into the user
   #       account that signs in. That applies only if username isn't the same as
   #       current username.
   signIn : (username = '', password = '') ->
@@ -190,10 +190,10 @@ class Hoodie.Account
 
     if @username isnt username
       @signOut(silent: true).pipe => @_sendSignInRequest(username, password)
-    else 
+    else
       @_sendSignInRequest(username, password, reauthenticated: true)
 
-  # sign out 
+  # sign out
   # ---------
 
   # uses standard CouchDB API to invalidate a user session (DELETE /_session)
@@ -205,13 +205,13 @@ class Hoodie.Account
 
     @hoodie.remote.disconnect()
     @_sendSignOutRequest().pipe(@_cleanupAndTriggerSignOut)
-  
-  
+
+
   # On
   # ---
 
   # shortcut for `hoodie.on`
-  on : (event, cb) -> 
+  on : (event, cb) ->
     event = event.replace /(^| )([^ ]+)/g, "$1account:$2"
     @hoodie.on event, cb
 
@@ -220,7 +220,7 @@ class Hoodie.Account
   # ---
 
   # shortcut for `hoodie.trigger`
-  trigger : (event, parameters...) -> 
+  trigger : (event, parameters...) ->
     @hoodie.trigger "account:#{event}", parameters...
 
 
@@ -230,15 +230,15 @@ class Hoodie.Account
   # shortcut for `hoodie.request`
   request : (type, path, options = {}) ->
     @hoodie.request arguments...
-  
-  
+
+
   # db
   # ----
 
   # return name of db
   db : -> "user/#{@ownerHash}"
-  
-  
+
+
   # fetch
   # -------
 
@@ -246,12 +246,12 @@ class Hoodie.Account
   fetch : (username = @username) =>
     unless username
       return @hoodie.defer().reject(error: "unauthenticated", reason: "not logged in").promise()
-    
+
     @_withSingleRequest 'fetch', =>
       @request('GET', @_url(username))
       .pipe(null, @_handleRequestError)
       .done (response) => @_doc = response
-    
+
 
   # change password
   # -----------------
@@ -272,21 +272,21 @@ class Hoodie.Account
   # ----------------
 
   # This is kind of a hack. We need to create an object anonymously
-  # that is not exposed to others. The only CouchDB API othering such 
+  # that is not exposed to others. The only CouchDB API othering such
   # functionality is the _users database.
-  # 
+  #
   # So we actualy sign up a new couchDB user with some special attributes.
   # It will be picked up by the password reset worker and removeed
   # once the password was resetted.
   resetPassword : (username) ->
     if resetPasswordId = @hoodie.config.get '_account.resetPasswordId'
       return @_checkPasswordResetStatus()
-      
+
     resetPasswordId = "#{username}/#{@hoodie.uuid()}"
     @hoodie.config.set '_account.resetPasswordId', resetPasswordId
-    
+
     key = "#{@_prefix}:$passwordReset/#{resetPasswordId}"
-    data = 
+    data =
       _id        : key
       name       : "$passwordReset/#{resetPasswordId}"
       type       : 'user'
@@ -298,7 +298,7 @@ class Hoodie.Account
     options =
       data        : JSON.stringify data
       contentType : "application/json"
-    
+
     @_withPreviousRequestsAborted 'resetPassword', =>
       @request('PUT',  "/_users/#{encodeURIComponent key}", options)
       .pipe(null, @_handleRequestError)
@@ -309,7 +309,7 @@ class Hoodie.Account
   # -----------------
 
   # Note: the hoodie API requires the current password for security reasons,
-  # but technically we cannot (yet) prevent the user to change the username 
+  # but technically we cannot (yet) prevent the user to change the username
   # without knowing the current password, so it's not impulemented in the current
   # implementation of the hoodie API.
   #
@@ -321,7 +321,7 @@ class Hoodie.Account
   # destroy
   # ---------
 
-  # destroys a user's account  
+  # destroys a user's account
   destroy : ->
 
     unless @hasAccount()
@@ -338,13 +338,13 @@ class Hoodie.Account
   _prefix : 'org.couchdb.user'
 
   # setters
-  _setUsername : (username)  -> 
+  _setUsername : (username)  ->
     return if username is @username
 
     @username = username
     @hoodie.config.set '_account.username',  @username
 
-  _setOwner    : (ownerHash) -> 
+  _setOwner    : (ownerHash) ->
     return if ownerHash is @ownerHash
 
     @ownerHash = ownerHash
@@ -356,18 +356,18 @@ class Hoodie.Account
 
   #
   # handle a successful authentication request.
-  # 
+  #
   # As long as there is no server error or internet connection issue,
   # the authenticate request (GET /_session) does always return
   # a 200 status. To differentiate whether the user is signed in or
   # not, we check `userCtx.name` in the response. If the user is not
   # signed in, it's null, otherwise the name the user signed in with
-  # 
+  #
   # If the user is not signed in, we difeerentiate between users that
   # signed in with a username / password or anonymously. For anonymous
   # users, the password is stored in local store, so we don't need
   # to trigger an 'unauthenticated' error, but instead try to sign in.
-  # 
+  #
   _handleAuthenticateRequestSuccess : (response) =>
     if response.userCtx.name
       @_authenticated = true
@@ -386,7 +386,7 @@ class Hoodie.Account
   #
   # standard error handling for AJAX requests
   #
-  # in some case we get the object error directly, 
+  # in some case we get the object error directly,
   # in others we get an xhr or even just a string back
   # when the couch died entirely. Whe have to handle
   # each case
@@ -401,11 +401,11 @@ class Hoodie.Account
       error = JSON.parse(xhr.responseText)
     catch e
       error = error: xhr.responseText or "unknown"
-      
+
     @hoodie.defer().reject(error).promise()
-  
-  # 
-  # handle response of a successful signUp request. 
+
+  #
+  # handle response of a successful signUp request.
   # Response looks like:
   #
   #     {
@@ -423,12 +423,12 @@ class Hoodie.Account
   #
   # a delayed sign in is used after sign up and after a
   # username change.
-  # 
+  #
   _delayedSignIn : (username, password, options, defer) =>
 
     # _delayedSignIn might call itself, when the user account
     # is pending. In this case it passes the original defer,
-    # to keep a reference and finally resolve / reject it 
+    # to keep a reference and finally resolve / reject it
     # at some point
     defer = @hoodie.defer() unless defer
     window.setTimeout ( =>
@@ -478,7 +478,7 @@ class Hoodie.Account
 
       # When the userDB worker created the database for the user and everthing
       # worked out, it adds the role "confirmed" to the user. If the role is
-      # not present yet, it might be that the worker didn't pick up the the 
+      # not present yet, it might be that the worker didn't pick up the the
       # user doc yet, or there was an error. In this cases, we reject the promise
       # with an "uncofirmed error"
       unless ~response.roles.indexOf("confirmed")
@@ -498,7 +498,7 @@ class Hoodie.Account
         else
           @trigger 'signin', username
 
-      # user reauthenticated, meaning 
+      # user reauthenticated, meaning
       if options.reauthenticated
         @trigger 'reauthenticated', username
 
@@ -523,7 +523,7 @@ class Hoodie.Account
     resetPasswordId = @hoodie.config.get '_account.resetPasswordId'
     unless resetPasswordId
       return @hoodie.defer().reject(error: "missing").promise()
-      
+
     # send request to check status of password reset
     username  = "$passwordReset/#{resetPasswordId}"
     url       = "/_users/#{encodeURIComponent "#{@_prefix}:#{username}"}"
@@ -542,12 +542,12 @@ class Hoodie.Account
 
         @trigger 'password_reset:error'
 
-  # 
+  #
   # If the request was successful there might have occured an
-  # error, which the worker stored in the special $error attribute. 
+  # error, which the worker stored in the special $error attribute.
   # If that happens, we return a rejected promise with the $error,
   # error. Otherwise reject the promise with a 'pending' error,
-  # as we are not waiting for a success full response, but a 401 
+  # as we are not waiting for a success full response, but a 401
   # error, indicating that our password was changed and our
   # curren session has been invalidated
   _handlePasswordResetStatusRequestSuccess : (response) =>
@@ -560,7 +560,7 @@ class Hoodie.Account
 
     return defer.promise()
 
-  # 
+  #
   # If the error is a 401, it's exactly what we've been waiting for.
   # In this case we resolve the promise.
   _handlePasswordResetStatusRequestError : (xhr) =>
@@ -570,13 +570,13 @@ class Hoodie.Account
 
       return @hoodie.defer().resolve()
 
-    else 
+    else
       return @_handleRequestError(xhr)
 
 
   #
   # change username and password in 3 steps
-  # 
+  #
   # 1. assure we have a valid session
   # 2. update _users doc with new username and new password (if provided)
   # 3. sign in with new credentials to create new sesion.
@@ -584,14 +584,14 @@ class Hoodie.Account
   _changeUsernameAndPassword : (currentPassword, newUsername, newPassword) ->
     @_sendSignInRequest(@username, currentPassword, silent: true).pipe =>
       @fetch().pipe @_sendChangeUsernameAndPasswordRequest(currentPassword, newUsername, newPassword)
-  
+
   #
   # turn an anonymous account into a real account
   #
   _upgradeAnonymousAccount : (username, password) ->
     currentPassword = @getAnonymousPassword()
     @_changeUsernameAndPassword(currentPassword, username, password)
-    .done => 
+    .done =>
       @trigger 'signup', username
       @removeAnonymousPassword()
 
@@ -609,10 +609,10 @@ class Hoodie.Account
 
   #
   # dependend on what kind of error we get, we want to ignore
-  # it or not. 
+  # it or not.
   # When we get a "not_found" it means that the _users doc habe
   # been removed already, so we don't need to do it anymore, but
-  # still want to finish the destroy locally, so we return a 
+  # still want to finish the destroy locally, so we return a
   # resolved promise
   _handleFetchBeforeDestroyError : (error) =>
     if error.error is 'not_found'
@@ -636,14 +636,14 @@ class Hoodie.Account
   _cleanupAndTriggerSignOut : =>
     @_cleanup().then =>
       @trigger 'signout'
-    
+
 
   #
   # depending on wether the user signedUp manually or has been signed up anonymously
-  # the prefix in the CouchDB _users doc differentiates. 
+  # the prefix in the CouchDB _users doc differentiates.
   # An anonymous user is characterized by its username, that equals
   # its ownerHash (see `anonymousSignUp`)
-  # 
+  #
   # We differentiate with `hasAnonymousAccount()`, because `_userKey`
   # is used within `signUp` method, so we need to be able to differentiate
   # between anonyomus and normal users before an account has been created.
@@ -665,13 +665,13 @@ class Hoodie.Account
   _url : (username) ->
     "/_users/#{encodeURIComponent @_key(username)}"
 
-  # 
+  #
   # update my _users doc.
-  # 
+  #
   # If a new username has been passed, we set the special attribut $newUsername.
-  # This will let the username change worker create create a new _users doc for 
+  # This will let the username change worker create create a new _users doc for
   # the new username and remove the current one
-  # 
+  #
   # If a new password has been passed, salt and password_sha get removed
   # from _users doc and add the password in clear text. CouchDB will replace it with
   # according password_sha and a new salt server side
@@ -698,7 +698,7 @@ class Hoodie.Account
         .pipe @_handleChangeUsernameAndPasswordRequest(newUsername, newPassword or currentPassword), @_handleRequestError
 
 
-  # 
+  #
   # depending on whether a newUsername has been passed, we can sign in right away
   # or have to use the delayed sign in to give the username change worker some time
   _handleChangeUsernameAndPasswordRequest: (newUsername, newPassword) =>
@@ -710,7 +710,7 @@ class Hoodie.Account
         @signIn(@username, newPassword)
 
 
-  # 
+  #
   # make sure that the same request doesn't get sent twice
   # by cancelling the previous one.
   _withPreviousRequestsAborted: (name, requestFunction) ->
@@ -718,31 +718,31 @@ class Hoodie.Account
     @_requests[name] = requestFunction()
 
 
-  # 
+  #
   # if there is a pending request, return its promise instead
   # of sending another request
   _withSingleRequest: (name, requestFunction) ->
     return @_requests[name] if @_requests[name]?.state?() is 'pending'
     @_requests[name] = requestFunction()
 
-  
-  # 
+
+  #
   _sendSignOutRequest: ->
     @_withSingleRequest 'signOut', =>
       @request('DELETE', '/_session').pipe(null, @_handleRequestError)
 
 
-  # 
+  #
   # the sign in request that starts a CouchDB session if
   # it succeeds. We separated the actual sign in request from
   # the signIn method, as the latter also runs signOut intenrtally
   # to clean up local data before starting a new session. But as
   # other methods like signUp or changePassword do also need to
-  # sign in the user (again), these need to send the sign in 
+  # sign in the user (again), these need to send the sign in
   # request but without a signOut beforehand, as the user remains
   # the same.
   _sendSignInRequest: (username, password, options) ->
-    requestOptions = data: 
+    requestOptions = data:
                        name      : @_userKey(username)
                        password  : password
 
