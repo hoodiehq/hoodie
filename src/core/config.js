@@ -1,63 +1,93 @@
-#
-# Central Config API
-#
+//
+// Central Config API
+//
 
-class Hoodie.Config
-  
-  # used as attribute name in localStorage
-  type : '$config'
-  id   : 'hoodie'
+var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
 
-  # ## Constructor
-  #
-  constructor : (@hoodie, options = {}) ->
+Hoodie.Config = (function() {
 
-    # memory cache
-    @cache = {}
+  'use strict';
 
-    @type      = options.type      if options.type
-    @id         = options.id         if options.id
-    
-    @hoodie.store.find(@type, @id).done (obj) => @cache = obj
+  function Config (hoodie, options) {
+    var self = this;
 
-    @hoodie.on 'account:signedOut', @clear
-  
-    
-  # ## set
-  #
-  # adds a configuration
-  #
-  set : (key, value) ->
-    return if @cache[key] is value
-    
-    @cache[key] = value
-    
-    update = {}
-    update[key] = value
-    
-    isSilent = key.charAt(0) is '_'
-    @hoodie.store.update @type, @id, update, silent: isSilent
-    
-  
-  # ## get
-  #
-  # receives a configuration
-  #
-  get : (key) -> 
-    @cache[key]
+    this.hoodie = hoodie;
 
+    if (options === null) {
+      options = {};
+    }
 
-  # ## clear
-  #
-  # clears cache and removes object from store
-  clear : =>
-    @cache = {}
-    @hoodie.store.remove @type, @id
-  
-  
-  # ## remove
-  # 
-  # removes a configuration, is a simple alias for config.set(key, undefined)
-  #
-  remove : (key) ->
-    @set(key, undefined)
+    this.clear = __bind(this.clear, this);
+    this.cache = {};
+
+    if (options.type) {
+      this.type = options.type;
+    }
+
+    if (options.id) {
+      this.id = options.id;
+    }
+
+    this.hoodie.store.find(this.type, this.id).done(function(obj) {
+      return self.cache = obj;
+    });
+
+    this.hoodie.on('account:signedOut', this.clear);
+  }
+
+  Config.prototype.type = '$config';
+
+  Config.prototype.id = 'hoodie';
+
+  // ## set
+  //
+  // adds a configuration
+  //
+  Config.prototype.set = function(key, value) {
+    var isSilent, update;
+
+    if (this.cache[key] === value) {
+      return;
+    }
+
+    this.cache[key] = value;
+
+    update = {};
+    update[key] = value;
+    isSilent = key.charAt(0) === '_';
+
+    return this.hoodie.store.update(this.type, this.id, update, {
+      silent: isSilent
+    });
+
+  };
+
+  // ## get
+  //
+  // receives a configuration
+  //
+  Config.prototype.get = function(key) {
+    return this.cache[key];
+  };
+
+  // ## clear
+  //
+  // clears cache and removes object from store
+  //
+  Config.prototype.clear = function() {
+    this.cache = {};
+
+    return this.hoodie.store.remove(this.type, this.id);
+  };
+
+  // ## remove
+  //
+  // removes a configuration, is a simple alias for config.set(key, undefined)
+  //
+  Config.prototype.remove = function(key) {
+    return this.set(key, void 0);
+  };
+
+  return Config;
+
+})();
