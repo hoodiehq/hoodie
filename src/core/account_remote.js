@@ -1,26 +1,15 @@
-// AccountRemote
-// ===============
-
-// Connection / Socket to our couch
-//
-// AccountRemote is using CouchDB's `_changes` feed to
-// listen to changes and `_bulk_docs` to push local changes
-//
-// When hoodie.remote is continuously syncing (default),
-// it will continuously  synchronize with local store,
-// otherwise sync, pull or push can be called manually
-//
-
-var __bind = function (fn, me) { return function(){ return fn.apply(me, arguments); }; },
+var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
+  __hasProp = {}.hasOwnProperty,
+  __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; },
   __slice = [].slice;
 
-Hoodie.AccountRemote = (function (_super) {
+Hoodie.AccountRemote = (function(_super) {
 
   'use strict';
 
   function AccountRemote(hoodie, options) {
     this.hoodie = hoodie;
-    if (options === null) {
+    if (options == null) {
       options = {};
     }
     this._handleSignIn = __bind(this._handleSignIn, this);
@@ -39,20 +28,20 @@ Hoodie.AccountRemote = (function (_super) {
     this.bootstrapKnownObjects();
   }
 
-  $.extend(AccountRemote, _super);
+  __extends(AccountRemote, _super);
 
   AccountRemote.prototype.connected = true;
 
-  AccountRemote.prototype.connect = function () {
+  AccountRemote.prototype.connect = function() {
     return this.hoodie.account.authenticate().pipe(this._connect);
   };
 
-  AccountRemote.prototype.disconnect = function () {
+  AccountRemote.prototype.disconnect = function() {
     this.hoodie.unbind('store:idle', this.push);
     return AccountRemote.__super__.disconnect.apply(this, arguments);
   };
 
-  AccountRemote.prototype.bootstrapKnownObjects = function () {
+  AccountRemote.prototype.bootstrapKnownObjects = function() {
     var id, key, type, _i, _len, _ref, _ref1, _results;
     _ref = this.hoodie.store.index();
     _results = [];
@@ -67,58 +56,51 @@ Hoodie.AccountRemote = (function (_super) {
     return _results;
   };
 
-  AccountRemote.prototype.getSinceNr = function () {
+  AccountRemote.prototype.getSinceNr = function(since) {
     return this.hoodie.config.get('_remote.since') || 0;
   };
 
-  AccountRemote.prototype.setSinceNr = function (since) {
+  AccountRemote.prototype.setSinceNr = function(since) {
     return this.hoodie.config.set('_remote.since', since);
   };
 
-  AccountRemote.prototype.push = function (objects) {
+  AccountRemote.prototype.push = function(objects) {
     var error, promise;
-
     if (!this.isConnected()) {
       error = new ConnectionError("Not connected: could not push local changes to remote");
       return this.hoodie.rejectWith(error);
     }
-
     if (!$.isArray(objects)) {
       objects = this.hoodie.store.changedObjects();
     }
-
     promise = AccountRemote.__super__.push.call(this, objects);
     promise.fail(this.hoodie.checkConnection);
-
     return promise;
   };
 
-  AccountRemote.prototype.on = function (event, cb) {
+  AccountRemote.prototype.on = function(event, cb) {
     event = event.replace(/(^| )([^ ]+)/g, "$1remote:$2");
     return this.hoodie.on(event, cb);
   };
 
-  AccountRemote.prototype.one = function (event, cb) {
+  AccountRemote.prototype.one = function(event, cb) {
     event = event.replace(/(^| )([^ ]+)/g, "$1remote:$2");
     return this.hoodie.one(event, cb);
   };
 
-  AccountRemote.prototype.trigger = function () {
+  AccountRemote.prototype.trigger = function() {
     var event, parameters, _ref;
-
-    event = arguments[0],
-    parameters = 2 <= arguments.length ? __slice.call(arguments, 1) : [];
-
+    event = arguments[0], parameters = 2 <= arguments.length ? __slice.call(arguments, 1) : [];
     return (_ref = this.hoodie).trigger.apply(_ref, ["remote:" + event].concat(__slice.call(parameters)));
   };
 
-  AccountRemote.prototype._connect = function () {
+  AccountRemote.prototype._connect = function() {
     this.connected = true;
     this.hoodie.on('store:idle', this.push);
     return this.sync();
   };
 
-  AccountRemote.prototype._handleSignIn = function () {
+  AccountRemote.prototype._handleSignIn = function() {
     this.name = this.hoodie.account.db();
     return this._connect();
   };

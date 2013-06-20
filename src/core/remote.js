@@ -35,21 +35,22 @@
 //
 // * on(event, callback)
 //
+
 var ConnectionError,
   __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
+  __hasProp = {}.hasOwnProperty,
+  __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; },
   __slice = [].slice;
 
 Hoodie.Remote = (function(_super) {
 
   'use strict';
 
-  function Remote (hoodie, options) {
+  function Remote(hoodie, options) {
     this.hoodie = hoodie;
-
-    if (options === null) {
+    if (options == null) {
       options = {};
     }
-
     this._handlePullResults = __bind(this._handlePullResults, this);
     this._handlePullError = __bind(this._handlePullError, this);
     this._handlePullSuccess = __bind(this._handlePullSuccess, this);
@@ -62,17 +63,16 @@ Hoodie.Remote = (function(_super) {
     this.pull = __bind(this.pull, this);
     this.disconnect = __bind(this.disconnect, this);
     this.connect = __bind(this.connect, this);
-
-    if (options.name !== null) {
+    if (options.name != null) {
       this.name = options.name;
     }
-    if (options.prefix !== null) {
+    if (options.prefix != null) {
       this.prefix = options.prefix;
     }
-    if (options.connected !== null) {
+    if (options.connected != null) {
       this.connected = options.connected;
     }
-    if (options.baseUrl !== null) {
+    if (options.baseUrl != null) {
       this.baseUrl = options.baseUrl;
     }
     this._knownObjects = {};
@@ -81,7 +81,7 @@ Hoodie.Remote = (function(_super) {
     }
   }
 
-  $.extend(Remote, _super);
+  __extends(Remote, _super);
 
   Remote.prototype.name = void 0;
 
@@ -90,27 +90,21 @@ Hoodie.Remote = (function(_super) {
   Remote.prototype.prefix = '';
 
   Remote.prototype.request = function(type, path, options) {
-
-    if (options === null) {
+    if (options == null) {
       options = {};
     }
-
     if (this.name) {
       path = "/" + (encodeURIComponent(this.name)) + path;
     }
-
     if (this.baseUrl) {
       path = "" + this.baseUrl + path;
     }
-
     options.contentType || (options.contentType = 'application/json');
-
     if (type === 'POST' || type === 'PUT') {
       options.dataType || (options.dataType = 'json');
       options.processData || (options.processData = false);
       options.data = JSON.stringify(options.data);
     }
-
     return this.hoodie.request(type, path, options);
   };
 
@@ -138,20 +132,16 @@ Hoodie.Remote = (function(_super) {
 
   Remote.prototype.findAll = function(type) {
     var defer, endkey, path, startkey;
-
     defer = Remote.__super__.findAll.apply(this, arguments);
-
     if (this.hoodie.isPromise(defer)) {
       return defer;
     }
-
     path = "/_all_docs?include_docs=true";
-
     switch (true) {
-      case (type !== null) && this.prefix !== '':
+      case (type != null) && this.prefix !== '':
         startkey = "" + this.prefix + type + "/";
         break;
-      case type !== null:
+      case type != null:
         startkey = "" + type + "/";
         break;
       case this.prefix !== '':
@@ -160,7 +150,6 @@ Hoodie.Remote = (function(_super) {
       default:
         startkey = '';
     }
-
     if (startkey) {
       endkey = startkey.replace(/.$/, function(char) {
         var charCode;
@@ -207,7 +196,7 @@ Hoodie.Remote = (function(_super) {
   Remote.prototype.isKnownObject = function(object) {
     var key;
     key = "" + object.type + "/" + object.id;
-    return this._knownObjects[key] !== null;
+    return this._knownObjects[key] != null;
   };
 
   Remote.prototype.markAsKnownObject = function(object) {
@@ -224,10 +213,10 @@ Hoodie.Remote = (function(_super) {
   Remote.prototype.disconnect = function() {
     var _ref, _ref1;
     this.connected = false;
-    if ((_ref = this._pullRequest) !== null) {
+    if ((_ref = this._pullRequest) != null) {
       _ref.abort();
     }
-    return (_ref1 = this._pushRequest) !== null ? _ref1.abort() : void 0;
+    return (_ref1 = this._pushRequest) != null ? _ref1.abort() : void 0;
   };
 
   Remote.prototype.isConnected = function() {
@@ -253,27 +242,22 @@ Hoodie.Remote = (function(_super) {
 
   Remote.prototype.push = function(objects) {
     var object, objectsForRemote, _i, _len;
-
-    if (!(objects !== null ? objects.length : void 0)) {
+    if (!(objects != null ? objects.length : void 0)) {
       return this.hoodie.resolveWith([]);
     }
-
     objectsForRemote = [];
-
     for (_i = 0, _len = objects.length; _i < _len; _i++) {
       object = objects[_i];
       this._addRevisionTo(object);
       object = this._parseForRemote(object);
       objectsForRemote.push(object);
     }
-
     return this._pushRequest = this.request('POST', "/_bulk_docs", {
       data: {
         docs: objectsForRemote,
         new_edits: false
       }
     });
-
   };
 
   Remote.prototype.sync = function(objects) {
@@ -300,9 +284,7 @@ Hoodie.Remote = (function(_super) {
 
   Remote.prototype._parseForRemote = function(object) {
     var attr, properties;
-
     properties = $.extend({}, object);
-
     for (attr in properties) {
       if (~this._validSpecialAttributes.indexOf(attr)) {
         continue;
@@ -322,57 +304,44 @@ Hoodie.Remote = (function(_super) {
 
   Remote.prototype._parseFromRemote = function(object) {
     var id, ignore, _ref;
-
     id = object._id || object.id;
-
     delete object._id;
-
     if (this.prefix) {
-      id = id.replace(new RegExp('^' + this.prefix), '');
+      id = id.replace(RegExp('^' + this.prefix), '');
     }
-
     _ref = id.match(/([^\/]+)\/(.*)/), ignore = _ref[0], object.type = _ref[1], object.id = _ref[2];
     return object;
   };
 
   Remote.prototype._parseAllFromRemote = function(objects) {
     var object, _i, _len, _results;
-
     _results = [];
-
     for (_i = 0, _len = objects.length; _i < _len; _i++) {
       object = objects[_i];
       _results.push(this._parseFromRemote(object));
     }
-
     return _results;
   };
 
   Remote.prototype._addRevisionTo = function(attributes) {
     var currentRevId, currentRevNr, newRevisionId, _ref;
-
     try {
       _ref = attributes._rev.split(/-/), currentRevNr = _ref[0], currentRevId = _ref[1];
     } catch (_error) {}
-
     currentRevNr = parseInt(currentRevNr, 10) || 0;
     newRevisionId = this._generateNewRevisionId();
-
     if (attributes._$local) {
       newRevisionId += "-local";
     }
-
     attributes._rev = "" + (currentRevNr + 1) + "-" + newRevisionId;
     attributes._revisions = {
       start: 1,
       ids: [newRevisionId]
     };
-
     if (currentRevId) {
       attributes._revisions.start += currentRevNr;
       return attributes._revisions.ids.push(currentRevId);
     }
-
   };
 
   Remote.prototype._generateNewRevisionId = function() {
@@ -397,13 +366,12 @@ Hoodie.Remote = (function(_super) {
 
   Remote.prototype._restartPullRequest = function() {
     var _ref;
-    return (_ref = this._pullRequest) !== null ? _ref.abort() : void 0;
+    return (_ref = this._pullRequest) != null ? _ref.abort() : void 0;
   };
 
   Remote.prototype._handlePullSuccess = function(response) {
     this.setSinceNr(response.last_seq);
     this._handlePullResults(response.results);
-
     if (this.isConnected()) {
       return this.pull();
     }
@@ -413,54 +381,44 @@ Hoodie.Remote = (function(_super) {
     if (!this.isConnected()) {
       return;
     }
-
     switch (xhr.status) {
-      case 401:
-        this.trigger('error:unauthenticated', error);
-        return this.disconnect();
-      case 404:
-        return window.setTimeout(this.pull, 3000);
-      case 500:
-        this.trigger('error:server', error);
+    case 401:
+      this.trigger('error:unauthenticated', error);
+      return this.disconnect();
+    case 404:
+      return window.setTimeout(this.pull, 3000);
+    case 500:
+      this.trigger('error:server', error);
+      window.setTimeout(this.pull, 3000);
+      return this.hoodie.checkConnection();
+    default:
+      if (!this.isConnected()) {
+        return;
+      }
+      if (xhr.statusText === 'abort') {
+        return this.pull();
+      } else {
         window.setTimeout(this.pull, 3000);
         return this.hoodie.checkConnection();
-      default:
-
-        if (!this.isConnected()) {
-          return;
-        }
-
-        if (xhr.statusText === 'abort') {
-          return this.pull();
-        } else {
-          window.setTimeout(this.pull, 3000);
-          return this.hoodie.checkConnection();
-        }
+      }
     }
   };
 
   Remote.prototype._handlePullResults = function(changes) {
     var doc, event, object, _i, _len, _results;
     _results = [];
-
     for (_i = 0, _len = changes.length; _i < _len; _i++) {
       doc = changes[_i].doc;
-
       if (this.prefix && doc._id.indexOf(this.prefix) !== 0) {
         continue;
       }
-
       object = this._parseFromRemote(doc);
-
       if (object._deleted) {
-
         if (!this.isKnownObject(object)) {
           continue;
         }
         event = 'remove';
-
         delete this.isKnownObject(object);
-
       } else {
         if (this.isKnownObject(object)) {
           event = 'update';
@@ -469,16 +427,13 @@ Hoodie.Remote = (function(_super) {
           this.markAsKnownObject(object);
         }
       }
-
       this.trigger("" + event, object);
       this.trigger("" + event + ":" + object.type, object);
       this.trigger("" + event + ":" + object.type + ":" + object.id, object);
       this.trigger("change", event, object);
       this.trigger("change:" + object.type, event, object);
-
       _results.push(this.trigger("change:" + object.type + ":" + object.id, event, object));
     }
-
     return _results;
   };
 
@@ -487,14 +442,11 @@ Hoodie.Remote = (function(_super) {
 })(Hoodie.Store);
 
 ConnectionError = (function(_super) {
-
-  'use strict';
-
-  $.extend(ConnectionError, _super);
+  __extends(ConnectionError, _super);
 
   ConnectionError.prototype.name = "ConnectionError";
 
-  function ConnectionError (message, data) {
+  function ConnectionError(message, data) {
     this.message = message;
     this.data = data;
     ConnectionError.__super__.constructor.apply(this, arguments);
@@ -503,3 +455,4 @@ ConnectionError = (function(_super) {
   return ConnectionError;
 
 })(Error);
+

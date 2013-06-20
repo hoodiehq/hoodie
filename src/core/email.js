@@ -41,7 +41,7 @@ Hoodie.Email = (function () {
       email = '';
     }
 
-    return "/@/".test(email);
+    return /@/.test(email);
   };
 
   Email.prototype._handleEmailUpdate = function (defer, attributes) {
