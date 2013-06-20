@@ -1,6 +1,9 @@
-window.Mocks || (window.Mocks = {});
+var Mocks = window.Mocks || {};
 
 Mocks.bulkUpdateResponse = function() {
+
+  'use strict';
+
   return function() {
     return [
       {

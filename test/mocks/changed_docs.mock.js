@@ -1,6 +1,9 @@
-window.Mocks || (window.Mocks = {});
+var Mocks = window.Mocks || {};
 
 Mocks.changedObjects = function() {
+
+  'use strict';
+
   return [
     {
       content: "this is done",

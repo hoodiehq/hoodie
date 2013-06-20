@@ -5,7 +5,8 @@ describe("Hoodie.Account", function () {
   beforeEach(function () {
 
     localStorage.clear();
-    this.hoodie = new Mocks.Hoodie;
+
+    this.hoodie = new Mocks.Hoodie();
     this.requestDefer = this.hoodie.defer();
     spyOn(this.hoodie, "request").andReturn(this.requestDefer.promise());
     spyOn(this.hoodie, "trigger");

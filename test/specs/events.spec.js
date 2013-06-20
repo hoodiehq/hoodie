@@ -1,7 +1,9 @@
 describe("Events", function() {
 
+  'use strict';
+
   beforeEach(function() {
-    this.obj = new Events;
+    this.obj = new Events();
   });
 
   describe(".bind(event, callback)", function() {
