@@ -8,7 +8,7 @@
 var Hoodie,
 __bind = function (fn, me) { return function(){ return fn.apply(me, arguments); }; };
 
-Hoodie = (function (_super) {
+Hoodie = (function (Events) {
 
   'use strict';
 
@@ -35,7 +35,7 @@ Hoodie = (function (_super) {
     this.checkConnection();
   }
 
-  $.extend(Hoodie, _super);
+  $.extend(Hoodie, Events);
 
   Hoodie.prototype.online = true;
 
@@ -171,7 +171,3 @@ Hoodie = (function (_super) {
   return Hoodie;
 
 })(Events);
-
-if (typeof module !== "undefined" && module !== null ? module.exports : void 0) {
-  module.exports = Hoodie;
-}
