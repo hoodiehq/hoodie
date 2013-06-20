@@ -3,7 +3,7 @@
 
 # This class defines the API that other Stores have to implement to assure a
 # coherent API.
-# 
+#
 # It also implements some validations and functionality that is the same across
 # store impnementations
 
@@ -29,29 +29,29 @@ class Hoodie.Store
   #     store.save('car', 'abc4567', {color: 'red'})
   save : (type, id, object, options = {}) ->
     defer = @hoodie.defer()
-  
+
     unless typeof object is 'object'
       defer.reject Hoodie.Errors.INVALID_ARGUMENTS "object is #{typeof object}"
       return defer.promise()
-    
+
     # validations
     if id and not @_isValidId id
       return defer.reject( Hoodie.Errors.INVALID_KEY id: id ).promise()
-      
+
     unless @_isValidType type
       return defer.reject( Hoodie.Errors.INVALID_KEY type: type ).promise()
 
     return defer
-  
-  
+
+
   # ## Add
 
   # `.add` is an alias for `.save`, with the difference that there is no id argument.
   # Internally it simply calls `.save(type, undefined, object).
   add : (type, object = {}, options = {}) ->
     @save type, object.id, object
-  
-  
+
+
   # ## Update
 
   # In contrast to `.save`, the `.update` method does not replace the stored object,
@@ -66,33 +66,33 @@ class Hoodie.Store
   # hoodie.store.update('car', 'abc4567', function(obj) { obj.sold = true })
   update : (type, id, objectUpdate, options) ->
     defer = @hoodie.defer()
-    
-    _loadPromise = @find(type, id).pipe (currentObj) => 
-      
+
+    _loadPromise = @find(type, id).pipe (currentObj) =>
+
       # normalize input
       newObj = $.extend(true, {}, currentObj)
       objectUpdate = objectUpdate( newObj ) if typeof objectUpdate is 'function'
-      
+
       return defer.resolve currentObj unless objectUpdate
-      
+
       # check if something changed
       changedProperties = for key, value of objectUpdate when currentObj[key] isnt value
         # workaround for undefined values, as $.extend ignores these
         newObj[key] = value
         key
-        
+
       return defer.resolve newObj unless changedProperties.length or options
-      
-      # apply update 
+
+      # apply update
       @save(type, id, newObj, options).then defer.resolve, defer.reject
-      
+
     # if not found, add it
-    _loadPromise.fail => 
+    _loadPromise.fail =>
       @save(type, id, objectUpdate, options).then defer.resolve, defer.reject
-    
+
     defer.promise()
-  
-  
+
+
   # ## updateAll
 
   # update all objects in the store, can be optionally filtered by a function
@@ -102,7 +102,7 @@ class Hoodie.Store
   #
   # hoodie.store.updateAll()
   updateAll : (filterOrObjects, objectUpdate, options = {}) ->
-    
+
     # normalize the input: make sure we have all objects
     switch true
       when typeof filterOrObjects is 'string'
@@ -113,17 +113,17 @@ class Hoodie.Store
         promise = @hoodie.defer().resolve( filterOrObjects ).promise()
       else # e.g. null, update all
         promise = @findAll()
-    
+
     promise.pipe (objects) =>
       # now we update all objects one by one and return a promise
       # that will be resolved once all updates have been finished
       defer = @hoodie.defer()
-      
+
       objects = [objects] unless $.isArray objects
       _updatePromises = for object in objects
         @update(object.type, object.id, objectUpdate, options)
       $.when.apply(null, _updatePromises).then defer.resolve
-      
+
       return defer.promise()
 
 
@@ -136,15 +136,15 @@ class Hoodie.Store
   #     store.find('car', 'abc4567')
   find : (type, id) ->
     defer = @hoodie.defer()
-  
+
     unless typeof type is 'string' and typeof id is 'string'
       return defer.reject( Hoodie.Errors.INVALID_ARGUMENTS "type & id are required" ).promise()
-  
+
     return defer
-  
+
 
   # ## find or add
-  
+
   # 1. Try to find a share by given id
   # 2. If share could be found, return it
   # 3. If not, add one and return it.
@@ -152,29 +152,29 @@ class Hoodie.Store
     defer = @hoodie.defer()
     @find(type, id)
     .done( defer.resolve )
-    .fail => 
+    .fail =>
       newAttributes = $.extend true, id: id, attributes
-      @add(type, newAttributes).then defer.resolve, defer.reject 
-  
+      @add(type, newAttributes).then defer.resolve, defer.reject
+
     return defer.promise()
-  
-  
+
+
   # ## findAll
 
-  # returns all objects from store. 
+  # returns all objects from store.
   # Can be optionally filtered by a type or a function
   findAll : -> @hoodie.defer()
-  
-  
+
+
   # ## Destroy
 
-  # Destroyes one object specified by `type` and `id`. 
-  # 
-  # when object has been synced before, mark it as deleted. 
+  # Destroyes one object specified by `type` and `id`.
+  #
+  # when object has been synced before, mark it as deleted.
   # Otherwise remove it from Store.
   remove : (type, id, options = {}) ->
     defer = @hoodie.defer()
-  
+
     unless typeof type is 'string' and typeof id is 'string'
       return defer.reject( Hoodie.Errors.INVALID_ARGUMENTS "type & id are required" ).promise()
 
@@ -184,10 +184,10 @@ class Hoodie.Store
   # ## removeAll
 
   # Destroyes all objects. Can be filtered by a type
-  removeAll : (type, options = {}) -> 
+  removeAll : (type, options = {}) ->
     @findAll(type).pipe (objects) =>
       @remove(object.type, object.id, options) for object in objects
-  
+
 
   # ## Private
 
@@ -198,7 +198,7 @@ class Hoodie.Store
   _isValidId : (key) ->
     # /^[a-z0-9\-]+$/.test key
     /^[^\/]+$/.test key
-    
+
   # / not allowed for type
   _isValidType : (key) ->
     # /^[a-z$][a-z0-9]+$/.test key
