@@ -1,13 +1,27 @@
 module.exports = function(grunt) {
 
+  'use strict';
+
   grunt.initConfig({
     pkg: grunt.file.readJSON('package.json'),
     concat: {
-      options: {
-        separator: ';'
-      },
       dist: {
-        src: ['src/**/*.js'],
+        src: [
+          'src/events.js',
+          'src/hoodie.js',
+          'src/core/account.js',
+          'src/core/config.js',
+          'src/core/email.js',
+          'src/core/errors.js',
+          'src/core/store.js',
+          'src/core/remote.js',
+          'src/core/account_remote.js',
+          'src/core/local_store.js',
+          'src/extensions/share.js',
+          'src/extensions/user.js',
+          'src/extensions/global.js',
+          'src/extensions/share_instance.js'
+        ],
         dest: 'dist/<%= pkg.name %>.js'
       }
     },
