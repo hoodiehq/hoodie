@@ -1,18 +1,24 @@
 describe("Hoodie", function() {
+
   beforeEach(function() {
     this.hoodie = new Hoodie('http://couch.example.com');
     this.ajaxDefer = $.Deferred();
+
     spyOn($, "ajax").andReturn(this.ajaxDefer.promise());
-    return spyOn(window, "setTimeout").andCallFake(function(cb) {
+
+    spyOn(window, "setTimeout").andCallFake(function(cb) {
       return cb;
     });
+
   });
+
   describe("constructor", function() {
+
     it("should store the CouchDB URL", function() {
-      var hoodie;
-      hoodie = new Hoodie('http://couch.example.com');
+      var hoodie = new Hoodie('http://couch.example.com');
       return expect(hoodie.baseUrl).toBe('http://couch.example.com');
     });
+
     it("should remove trailing slash from passed URL", function() {
       var hoodie;
       hoodie = new Hoodie('http://couch.example.com/');

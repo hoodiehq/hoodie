@@ -13,7 +13,7 @@ Events = (function () {
     _results = [];
     for (_i = 0, _len = evs.length; _i < _len; _i++) {
       name = evs[_i];
-      calls[name] || (calls[name] = []);
+      calls[name] = calls[name] || [];
       _results.push(calls[name].push(callback));
     }
     return _results;
@@ -23,7 +23,7 @@ Events = (function () {
 
   Events.prototype.one = function (ev, callback) {
     return this.bind(ev, function () {
-      this.unbind(ev, arguments.callee);
+      this.unbind(ev, this.bind());
       return callback.apply(this, arguments);
     });
   };

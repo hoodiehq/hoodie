@@ -14,23 +14,24 @@ Hoodie.Account = (function () {
   function Account(hoodie) {
 
     this.hoodie = hoodie;
-    this._handleChangeUsernameAndPasswordRequest = __bind(this._handleChangeUsernameAndPasswordRequest, this);
-    this._sendChangeUsernameAndPasswordRequest = __bind(this._sendChangeUsernameAndPasswordRequest, this);
-    this._cleanupAndTriggerSignOut = __bind(this._cleanupAndTriggerSignOut, this);
-    this._cleanup = __bind(this._cleanup, this);
-    this._handleFetchBeforeDestroyError = __bind(this._handleFetchBeforeDestroyError, this);
-    this._handleFetchBeforeDestroySucces = __bind(this._handleFetchBeforeDestroySucces, this);
-    this._handlePasswordResetStatusRequestError = __bind(this._handlePasswordResetStatusRequestError, this);
-    this._handlePasswordResetStatusRequestSuccess = __bind(this._handlePasswordResetStatusRequestSuccess, this);
-    this._checkPasswordResetStatus = __bind(this._checkPasswordResetStatus, this);
-    this._handleSignInSuccess = __bind(this._handleSignInSuccess, this);
-    this._delayedSignIn = __bind(this._delayedSignIn, this);
-    this._handleSignUpSucces = __bind(this._handleSignUpSucces, this);
-    this._handleRequestError = __bind(this._handleRequestError, this);
-    this._handleAuthenticateRequestSuccess = __bind(this._handleAuthenticateRequestSuccess, this);
-    this.fetch = __bind(this.fetch, this);
-    this.signOut = __bind(this.signOut, this);
-    this.authenticate = __bind(this.authenticate, this);
+
+    this._handleChangeUsernameAndPasswordRequest = this._handleChangeUsernameAndPasswordRequest.apply(this);
+    this._sendChangeUsernameAndPasswordRequest = this._sendChangeUsernameAndPasswordRequest.apply(this);
+    this._cleanupAndTriggerSignOut = this._cleanupAndTriggerSignOut.apply(this);
+    this._cleanup = this._cleanup.apply(this);
+    this._handleFetchBeforeDestroyError = this._handleFetchBeforeDestroyError.apply(this);
+    this._handleFetchBeforeDestroySucces = this._handleFetchBeforeDestroySucces.apply(this);
+    this._handlePasswordResetStatusRequestError = this._handlePasswordResetStatusRequestError.apply(this);
+    this._handlePasswordResetStatusRequestSuccess = this._handlePasswordResetStatusRequestSuccess.apply(this);
+    this._checkPasswordResetStatus = this._checkPasswordResetStatus.apply(this);
+    this._handleSignInSuccess = this._handleSignInSuccess.apply(this);
+    this._delayedSignIn = this._delayedSignIn.apply(this);
+    this._handleSignUpSucces = this._handleSignUpSucces.apply(this);
+    this._handleRequestError = this._handleRequestError.apply(this);
+    this._handleAuthenticateRequestSuccess = this._handleAuthenticateRequestSuccess.apply(this);
+    this.fetch = this.fetch.apply(this);
+    this.signOut = this.signOut.apply(this);
+    this.authenticate = this.authenticate.apply(this);
     this._doc = {};
     this._requests = {};
     this.init();
