@@ -80,10 +80,7 @@ Hoodie.LocalStore = (function (_super) {
   LocalStore.prototype.save = function(type, id, properties, options) {
     var currentObject, defer, error, event, isNew, key, object;
 
-    if (options == null) {
-      options = {};
-    }
-
+    options = options || {};
     defer = LocalStore.__super__.save.apply(this, arguments);
 
     if (this.hoodie.isPromise(defer)) {
@@ -305,38 +302,48 @@ Hoodie.LocalStore = (function (_super) {
 
   LocalStore.prototype.cache = function(type, id, object, options) {
     var key;
+
     if (object == null) {
       object = false;
     }
-    if (options == null) {
-      options = {};
-    }
+
+    options = options || {};
     key = "" + type + "/" + id;
+
     if (object) {
       $.extend(object, {
         type: type,
         id: id
       });
+
       this._setObject(type, id, object);
+
       if (options.remote) {
         this.clearChanged(type, id);
         this._cached[key] = $.extend(true, {}, object);
         return this._cached[key];
       }
+
     } else {
+
       if (this._cached[key] === false) {
         return false;
       }
+
       if (this._cached[key]) {
         return $.extend(true, {}, this._cached[key]);
       }
+
       object = this._getObject(type, id);
+
       if (object === false) {
         this.clearChanged(type, id);
         this._cached[key] = false;
         return false;
       }
+
     }
+
     if (this._isMarkedAsDeleted(object)) {
       this.markAsChanged(type, id, object, options);
       this._cached[key] = false;
@@ -369,29 +376,35 @@ Hoodie.LocalStore = (function (_super) {
 
   LocalStore.prototype.markAsChanged = function(type, id, object, options) {
     var key;
-    if (options == null) {
-      options = {};
-    }
+
+    options = options || {};
     key = "" + type + "/" + id;
+
     this._dirty[key] = object;
     this._saveDirtyIds();
+
     if (options.silent) {
       return;
     }
+
     return this._triggerDirtyAndIdleEvents();
   };
 
   LocalStore.prototype.markAllAsChanged = function() {
-    var _this = this;
+    var self = this;
+
     return this.findAll().pipe(function(objects) {
       var key, object, _i, _len;
+
       for (_i = 0, _len = objects.length; _i < _len; _i++) {
         object = objects[_i];
         key = "" + object.type + "/" + object.id;
-        _this._dirty[key] = object;
+        self._dirty[key] = object;
       }
-      _this._saveDirtyIds();
-      return _this._triggerDirtyAndIdleEvents();
+
+      self._saveDirtyIds();
+
+      return self._triggerDirtyAndIdleEvents();
     });
   };
 
@@ -544,19 +557,19 @@ Hoodie.LocalStore = (function (_super) {
   };
 
   LocalStore.prototype._now = function() {
-    return JSON.stringify(new Date).replace(/"/g, '');
+    return JSON.stringify(new Date()).replace(/"/g, '');
   };
 
   LocalStore.prototype._isValidId = function(key) {
-    return /^[a-z0-9\-]+$/.test(key);
+    return new RegExp(/^[a-z0-9\-]+$/).test(key);
   };
 
   LocalStore.prototype._isValidType = function(key) {
-    return /^[a-z$][a-z0-9]+$/.test(key);
+    return new RegExp(/^[a-z$][a-z0-9]+$/).test(key);
   };
 
   LocalStore.prototype._isSemanticId = function(key) {
-    return /^[a-z$][a-z0-9]+\/[a-z0-9]+$/.test(key);
+    return new RegExp(/^[a-z$][a-z0-9]+\/[a-z0-9]+$/).test(key);
   };
 
   LocalStore.prototype._isDirty = function(object) {
@@ -582,17 +595,17 @@ Hoodie.LocalStore = (function (_super) {
     this.trigger("change", event, object, options);
     this.trigger("change:" + object.type, event, object, options);
     if (event !== 'new') {
-      return this.trigger("change:" + object.type + ":" + object.id, event, object, options);
+      this.trigger("change:" + object.type + ":" + object.id, event, object, options);
     }
   };
 
   LocalStore.prototype._triggerDirtyAndIdleEvents = function() {
-    var _this = this;
+    var self = this;
     this.trigger('dirty');
     window.clearTimeout(this._dirtyTimeout);
-    return this._dirtyTimeout = window.setTimeout((function() {
-      return _this.trigger('idle', _this.changedObjects());
-    }), this.idleTimeout);
+    this._dirtyTimeout = window.setTimeout(function() {
+      self.trigger('idle', self.changedObjects());
+    }, this.idleTimeout);
   };
 
   LocalStore.prototype._decoratePromise = function(promise) {

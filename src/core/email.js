@@ -2,20 +2,17 @@
 // Sending emails. Not unicorns
 //
 
-var __bind = function (fn, me) { return function(){ return fn.apply(me, arguments); }; };
-
 Hoodie.Email = (function () {
 
   'use strict';
 
   function Email(hoodie) {
     this.hoodie = hoodie;
-    this._handleEmailUpdate = __bind(this._handleEmailUpdate, this);
+    this._handleEmailUpdate = this._handleEmailUpdate;
   }
 
   Email.prototype.send = function (emailAttributes) {
-    var attributes, defer,
-      self = this;
+    var attributes, defer, self = this;
 
     if (emailAttributes === null) {
       emailAttributes = {};
@@ -41,7 +38,7 @@ Hoodie.Email = (function () {
       email = '';
     }
 
-    return /@/.test(email);
+    return new RegExp(/@/).test(email);
   };
 
   Email.prototype._handleEmailUpdate = function (defer, attributes) {
