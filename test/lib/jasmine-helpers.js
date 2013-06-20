@@ -1,4 +1,6 @@
+'use strict';
 var _and, _but, _when;
+
 
 _when = function(description, specs) {
   return describe("when " + description, specs);
