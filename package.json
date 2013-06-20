@@ -3,7 +3,7 @@
   "title": "Hoodie",
   "description": "Hoodie library for the browser",
   "version": "0.1.27",
-  "main": "./hoodie.js",
+  "main": "./dist/hoodie.js",
   "homepage": "http://hood.ie",
   "repository": {
     "type": "git",
