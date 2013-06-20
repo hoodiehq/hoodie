@@ -2,9 +2,15 @@ module.exports = function(grunt) {
 
   'use strict';
 
+  var banner  = '//  <%= pkg.name %> <%= pkg.version%>\n';
+  banner += '';
+
   grunt.initConfig({
     pkg: grunt.file.readJSON('package.json'),
     concat: {
+      options: {
+        banner: banner
+      },
       dist: {
         src: [
           'src/events.js',
@@ -28,7 +34,7 @@ module.exports = function(grunt) {
 
     uglify: {
       options: {
-        banner: '/*! <%= pkg.name %> <%= grunt.template.today("dd-mm-yyyy") %> */\n'
+        banner: banner
       },
       dist: {
         files: {
