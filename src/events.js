@@ -13,7 +13,7 @@ Events = (function () {
     _results = [];
     for (_i = 0, _len = evs.length; _i < _len; _i++) {
       name = evs[_i];
-      calls[name] || (calls[name] = []);
+      calls[name] = calls[name] || [];
       _results.push(calls[name].push(callback));
     }
     return _results;

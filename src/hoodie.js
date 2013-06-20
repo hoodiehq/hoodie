@@ -5,8 +5,7 @@
 // the door to world domination (apps)
 
 
-var Hoodie,
-__bind = function (fn, me) { return function(){ return fn.apply(me, arguments); }; };
+var Hoodie;
 
 Hoodie = (function (Events) {
 
@@ -15,22 +14,25 @@ Hoodie = (function (Events) {
   function Hoodie(baseUrl) {
 
     this.baseUrl = baseUrl;
-    this._handleCheckConnectionError = __bind(this._handleCheckConnectionError, this);
-    this._handleCheckConnectionSuccess = __bind(this._handleCheckConnectionSuccess, this);
-    this.rejectWith = __bind(this.rejectWith, this);
-    this.resolveWith = __bind(this.resolveWith, this);
-    this.reject = __bind(this.reject, this);
-    this.resolve = __bind(this.resolve, this);
-    this.checkConnection = __bind(this.checkConnection, this);
+    this._handleCheckConnectionError = this._handleCheckConnectionError.apply(this);
+    this._handleCheckConnectionSuccess = this._handleCheckConnectionSuccess.apply(this);
+    this.rejectWith = this.rejectWith.apply(this);
+    this.resolveWith = this.resolveWith.apply(this);
+    this.reject = this.reject.apply(this);
+    this.resolve = this.resolve.apply(this);
+    this.checkConnection = this.checkConnection.apply(this);
+
     if (this.baseUrl) {
       this.baseUrl = this.baseUrl.replace(/\/+$/, '');
     } else {
       this.baseUrl = "/_api";
     }
+
     this.store = new this.constructor.LocalStore(this);
     this.config = new this.constructor.Config(this);
     this.account = new this.constructor.Account(this);
     this.remote = new this.constructor.AccountRemote(this);
+
     this._loadExtensions();
     this.checkConnection();
   }
@@ -65,6 +67,7 @@ Hoodie = (function (Events) {
 
   Hoodie.prototype.checkConnection = function () {
     var _ref;
+
     if (((_ref = this._checkConnectionRequest) !== null ? typeof _ref.state === "function" ? _ref.state() : void 0 : void 0) === 'pending') {
       return this._checkConnectionRequest;
     }
@@ -83,16 +86,19 @@ Hoodie = (function (Events) {
 
   Hoodie.prototype.uuid = function (len) {
     var chars, i, radix;
+
     if (len === null) {
       len = 7;
     }
+
     chars = '0123456789abcdefghijklmnopqrstuvwxyz'.split('');
     radix = chars.length;
+
     return ((function () {
       var _i, _results;
       _results = [];
       for (i = _i = 0; 0 <= len ? _i < len : _i > len; i = 0 <= len ? ++_i : --_i) {
-        _results.push(chars[0 | Math.random() * radix]);
+        _results.push(chars[0 || Math.random() * radix]);
       }
       return _results;
     })()).join('');
@@ -127,7 +133,7 @@ Hoodie = (function (Events) {
   };
 
   Hoodie.extend = function (name, Module) {
-    this._extensions || (this._extensions = {});
+    this._extensions = this._extensions || {};
     return this._extensions[name] = Module;
   };
 
@@ -148,7 +154,7 @@ Hoodie = (function (Events) {
     return _results;
   };
 
-  Hoodie.prototype._handleCheckConnectionSuccess = function (response) {
+  Hoodie.prototype._handleCheckConnectionSuccess = function () {
     this.checkConnectionInterval = 30000;
     window.setTimeout(this.checkConnection, this.checkConnectionInterval);
     if (!this.online) {
@@ -158,7 +164,7 @@ Hoodie = (function (Events) {
     return this.defer().resolve();
   };
 
-  Hoodie.prototype._handleCheckConnectionError = function (response) {
+  Hoodie.prototype._handleCheckConnectionError = function () {
     this.checkConnectionInterval = 3000;
     window.setTimeout(this.checkConnection, this.checkConnectionInterval);
     if (this.online) {

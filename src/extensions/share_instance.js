@@ -17,23 +17,25 @@
 // To subscribe to a share created by somebody else, run
 // this code: `hoodie.share('shareId').subscribe()`.
 
-var __bind = function (fn, me) { return function(){ return fn.apply(me, arguments); }; };
-
 Hoodie.ShareInstance = (function (_super) {
 
   'use strict';
 
   function ShareInstance(hoodie, options) {
     this.hoodie = hoodie;
+
     if (options === null) {
       options = {};
     }
-    this._handleSecurityResponse = __bind(this._handleSecurityResponse, this);
-    this._objectBelongsToMe = __bind(this._objectBelongsToMe, this);
+
+    this._handleSecurityResponse = this._handleSecurityResponse.apply(this);
+    this._objectBelongsToMe = this._objectBelongsToMe.apply(this);
     this.id = options.id || this.hoodie.uuid();
     this.name = "share/" + this.id;
     this.prefix = this.name;
+
     $.extend(this, options);
+
     ShareInstance.__super__.constructor.apply(this, arguments);
   }
 
@@ -55,12 +57,15 @@ Hoodie.ShareInstance = (function (_super) {
 
   ShareInstance.prototype.grantReadAccess = function (users) {
     var currentUsers, user, _i, _len;
+
     if (this.access === true || this.access.read === true) {
       return this.hoodie.resolveWith(this);
     }
+
     if (typeof users === 'string') {
       users = [users];
     }
+
     if (this.access === false || this.access.read === false) {
       if (this.access.read !== null) {
         this.access.read = users || true;
@@ -68,19 +73,23 @@ Hoodie.ShareInstance = (function (_super) {
         this.access = users || true;
       }
     }
+
     if (users) {
       currentUsers = this.access.read || this.access;
+
       for (_i = 0, _len = users.length; _i < _len; _i++) {
         user = users[_i];
         if (currentUsers.indexOf(user) === -1) {
           currentUsers.push(user);
         }
       }
+
       if (this.access.read !== null) {
         this.access.read = currentUsers;
       } else {
         this.access = currentUsers;
       }
+
     } else {
       if (this.access.read !== null) {
         this.access.read = true;
@@ -88,6 +97,7 @@ Hoodie.ShareInstance = (function (_super) {
         this.access = true;
       }
     }
+
     return this.hoodie.share.update(this.id, {
       access: this.access
     });
@@ -95,19 +105,25 @@ Hoodie.ShareInstance = (function (_super) {
 
   ShareInstance.prototype.revokeReadAccess = function (users) {
     var changed, currentUsers, idx, user, _i, _len;
+
     this.revokeWriteAccess(users);
+
     if (this.access === false || this.access.read === false) {
       return this.hoodie.resolveWith(this);
     }
+
     if (users) {
       if (this.access === true || this.access.read === true) {
         return this.hoodie.rejectWith(this);
       }
+
       if (typeof users === 'string') {
         users = [users];
       }
+
       currentUsers = this.access.read || this.access;
       changed = false;
+
       for (_i = 0, _len = users.length; _i < _len; _i++) {
         user = users[_i];
         idx = currentUsers.indexOf(user);
@@ -116,12 +132,15 @@ Hoodie.ShareInstance = (function (_super) {
           changed = true;
         }
       }
+
       if (!changed) {
         return this.hoodie.resolveWith(this);
       }
+
       if (currentUsers.length === 0) {
         currentUsers = false;
       }
+
       if (this.access.read !== null) {
         this.access.read = currentUsers;
       } else {
@@ -130,21 +149,26 @@ Hoodie.ShareInstance = (function (_super) {
     } else {
       this.access = false;
     }
+
     return this.hoodie.share.update(this.id, {
       access: this.access
     });
+
   };
 
   ShareInstance.prototype.grantWriteAccess = function (users) {
     this.grantReadAccess(users);
+
     if (this.access.read === null) {
       this.access = {
         read: this.access
       };
     }
+
     if (this.access.write === true) {
       return this.hoodie.resolveWith(this);
     }
+
     if (users) {
       if (typeof users === 'string') {
         users = [users];
@@ -153,39 +177,52 @@ Hoodie.ShareInstance = (function (_super) {
     } else {
       this.access.write = true;
     }
+
     return this.hoodie.share.update(this.id, {
       access: this.access
     });
+
   };
 
   ShareInstance.prototype.revokeWriteAccess = function (users) {
     var idx, user, _i, _len;
+
     if (this.access.write === null) {
       return this.hoodie.resolveWith(this);
     }
+
     if (users) {
+
       if (typeof this.access.write === 'boolean') {
         return this.hoodie.rejectWith(this);
       }
+
       if (typeof users === 'string') {
         users = [users];
       }
+
       for (_i = 0, _len = users.length; _i < _len; _i++) {
         user = users[_i];
         idx = this.access.write.indexOf(user);
+
         if (idx !== -1) {
           this.access.write.splice(idx, 1);
         }
+
       }
+
       if (this.access.write.length === 0) {
         this.access = this.access.read;
       }
+
     } else {
       this.access = this.access.read;
     }
+
     return this.hoodie.share.update(this.id, {
       access: this.access
     });
+
   };
 
   ShareInstance.prototype._objectBelongsToMe = function (object) {
@@ -194,8 +231,10 @@ Hoodie.ShareInstance = (function (_super) {
 
   ShareInstance.prototype._handleSecurityResponse = function (security) {
     var access, createdBy;
+
     access = this._parseSecurity(security);
     createdBy = '$subscription';
+
     return this.hoodie.share.findOrAdd(this.id, {
       access: access,
       createdBy: createdBy
@@ -204,21 +243,27 @@ Hoodie.ShareInstance = (function (_super) {
 
   ShareInstance.prototype._parseSecurity = function (security) {
     var access, read, write, _ref, _ref1;
+
     read = (_ref = security.members) !== null ? _ref.roles : void 0;
     write = (_ref1 = security.writers) !== null ? _ref1.roles : void 0;
     access = {};
+
     if (read !== null) {
       access.read = read === true || read.length === 0;
+
       if (read.length) {
         access.read = -1 !== read.indexOf(this.hoodie.account.ownerHash);
       }
     }
+
     if (write !== null) {
       access.write = write === true || write.length === 0;
+
       if (write.length) {
         access.write = -1 !== write.indexOf(this.hoodie.account.ownerHash);
       }
     }
+
     return access;
   };
 
