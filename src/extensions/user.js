@@ -9,12 +9,7 @@
 //     hoodie.user("Joe").findAll().done( handleObjects )
 //
 
-var __bind = function (fn, me) { return function(){ return fn.apply(me, arguments); }; };
-
-Hoodie.User = (function () {
-
-  'use strict';
-
+Hoodie.User = (function() {
   function User(hoodie) {
     this.hoodie = hoodie;
     this.api = __bind(this.api, this);
@@ -25,8 +20,8 @@ Hoodie.User = (function () {
     return this.api;
   }
 
-  User.prototype.api = function (userHash, options) {
-    if (options === null) {
+  User.prototype.api = function(userHash, options) {
+    if (options == null) {
       options = {};
     }
     $.extend(options, {
@@ -35,9 +30,9 @@ Hoodie.User = (function () {
     return this.hoodie.open("user/" + userHash + "/public", options);
   };
 
-  User.prototype._storePublish = function (properties) {
-    var self = this;
-    return this.pipe(function (objects) {
+  User.prototype._storePublish = function(properties) {
+    var _this = this;
+    return this.pipe(function(objects) {
       var object, _i, _len, _results;
       if (!$.isArray(objects)) {
         objects = [objects];
@@ -45,7 +40,7 @@ Hoodie.User = (function () {
       _results = [];
       for (_i = 0, _len = objects.length; _i < _len; _i++) {
         object = objects[_i];
-        _results.push(self.hoodie.store.update(object.type, object.id, {
+        _results.push(_this.hoodie.store.update(object.type, object.id, {
           $public: properties || true
         }));
       }
@@ -53,9 +48,9 @@ Hoodie.User = (function () {
     });
   };
 
-  User.prototype._storeUnpublish = function () {
-    var self = this;
-    return this.pipe(function (objects) {
+  User.prototype._storeUnpublish = function() {
+    var _this = this;
+    return this.pipe(function(objects) {
       var object, _i, _len, _results;
       if (!$.isArray(objects)) {
         objects = [objects];
@@ -64,7 +59,7 @@ Hoodie.User = (function () {
       for (_i = 0, _len = objects.length; _i < _len; _i++) {
         object = objects[_i];
         if (object.$public) {
-          _results.push(self.hoodie.store.update(object.type, object.id, {
+          _results.push(_this.hoodie.store.update(object.type, object.id, {
             $public: false
           }));
         }
