@@ -1,754 +1,628 @@
-# Hoodie.Account
-# ================
-
-# tell something smart in here.
-#
-class Hoodie.Account
-
-  # Properties
-  # ------------
-  username    : undefined
-
-
-  # Constructor
-  # ------------
-  constructor : (@hoodie) ->
-
-    # cache for CouchDB _users doc
-    @_doc = {}
-
-    # map of requestPromises. We maintain this list to avoid sending
-    # the same requests several times.
-    @_requests = {}
-
-    # init account
-    # we've put this into its own method so it's easier to
-    # inherit from Hoodie.Account with custom logic
-    @init()
-
-
-  # Authenticate
-  # --------------
-  init : ->
-    # handle session
-    @username   = @hoodie.config.get '_account.username'
-    @ownerHash  = @hoodie.config.get '_account.ownerHash'
-
-    # the ownerHash gets stored in every object created by the user.
-    # Make sure we have one.
-    unless @ownerHash
-      @_setOwner @hoodie.uuid()
-
-    # authenticate on next tick
-    window.setTimeout @authenticate
-
-    # is there a pending password reset?
-    @_checkPasswordResetStatus()
-
-
-  # Authenticate
-  # --------------
-
-  # Use this method to assure that the user is authenticated:
-  # `hoodie.account.authenticate().done( doSomething ).fail( handleError )`
-  authenticate : =>
-
-    if @_authenticated is false
-      return @hoodie.defer().reject().promise()
-
-    if @_authenticated is true
-      return @hoodie.defer().resolve(@username).promise()
-
-    # if there is a pending signOut request, return its promise,
-    # but pipe it so that it always ends up rejected
-    return @_requests.signOut.then( @hoodie.rejectWith ) if @_requests.signOut?.state() is 'pending'
-
-    #  if there is apending signIn request, return its promise
-    return @_requests.signIn if @_requests.signIn?.state() is 'pending'
-
-
-    # if username is not set, make sure to end the session
-    if @username is undefined
-
-      return @_sendSignOutRequest().then =>
-        @_authenticated = false
-        @hoodie.rejectWith()
-
-    # send request to check for session status. If there is a
-    # pending request already, return its promise.
-    sendAndHandleAuthRequest = =>
-      @request('GET', "/_session")
-      .pipe @_handleAuthenticateRequestSuccess, @_handleRequestError
-    @_withSingleRequest('authenticate', sendAndHandleAuthRequest)
-
-
-
-  # sign up with username & password
-  # ----------------------------------
-
-  # uses standard CouchDB API to create a new document in _users db.
-  # The backend will automatically create a userDB based on the username
-  # address and approve the account by adding a "confirmed" role to the
-  # user doc. The account confirmation might take a while, so we keep trying
-  # to sign in with a 300ms timeout.
-  #
-  signUp : (username, password = '') ->
-    unless username
-      return @hoodie.defer().reject(error: 'username must be set').promise()
-
-    if @hasAnonymousAccount()
-      return @_upgradeAnonymousAccount username, password
-
-    if @hasAccount()
-      return @hoodie.defer().reject(error: 'you have to sign out first').promise()
-
-    # downcase username
-    username = username.toLowerCase()
-
-    options =
-      data         : JSON.stringify
-        _id        : @_key(username)
-        name       : @_userKey(username)
-        type       : 'user'
-        roles      : []
-        password   : password
-        ownerHash  : @ownerHash
-        database   : @db()
-        updatedAt  : @_now()
-        createdAt  : @_now()
-        signedUpAt : @_now() unless username is @ownerHash
-      contentType : 'application/json'
-
-    @request('PUT', @_url(username), options)
-    .pipe @_handleSignUpSucces(username, password), @_handleRequestError
-
-
-  # anonymous sign up
-  # -------------------
-
-  # If the user did not sign up himself yet, but data needs to be transfered
-  # to the couch, e.g. to send an email or to share data, the anonymousSignUp
-  # method can be used. It generates a random password and stores it locally
-  # in the browser.
-  #
-  # If the user signes up for real later, we "upgrade" his account, meaning we
-  # change his username and password internally instead of creating another user.
-  #
-  anonymousSignUp : ->
-    password = @hoodie.uuid(10)
-    username = @ownerHash
-
-    @signUp(username, password)
-    .done =>
-      @setAnonymousPassword(password)
-      @trigger 'signup:anonymous', username
-
-
-  # hasAccount
-  # ---------------------
-
-  #
-  hasAccount : ->
-    @username?
-
-
-  # hasAnonymousAccount
-  # ---------------------
-
-  #
-  hasAnonymousAccount : ->
-    @getAnonymousPassword()?
-
-
-  # set / get / remove anonymous password
-  # ---------------------------------------
-
-  #
-  _anonymousPasswordKey : '_account.anonymousPassword'
-  setAnonymousPassword    : (password) -> @hoodie.config.set    @_anonymousPasswordKey, password
-  getAnonymousPassword    : (password) -> @hoodie.config.get    @_anonymousPasswordKey
-  removeAnonymousPassword : (password) -> @hoodie.config.remove @_anonymousPasswordKey
-
-
-
-  # sign in with username & password
-  # ----------------------------------
-
-  # uses standard CouchDB API to create a new user session (POST /_session).
-  # Besides the standard sign in we also check if the account has been confirmed
-  # (roles include "confirmed" role).
-  #
-  # NOTE: When signing in, all local data gets cleared beforehand (with a signOut).
-  #       Otherwise data that has been created beforehand (authenticated with
-  #       another user account or anonymously) would be merged into the user
-  #       account that signs in. That applies only if username isn't the same as
-  #       current username.
-  signIn : (username = '', password = '') ->
-
-    # downcase
-    username = username.toLowerCase()
-
-    if @username isnt username
-      @signOut(silent: true).pipe => @_sendSignInRequest(username, password)
-    else
-      @_sendSignInRequest(username, password, reauthenticated: true)
-
-  # sign out
-  # ---------
-
-  # uses standard CouchDB API to invalidate a user session (DELETE /_session)
-  signOut : (options = {}) =>
-
-    unless @hasAccount()
-      return @_cleanup().then =>
-        @trigger 'signout' unless options.silent
-
-    @hoodie.remote.disconnect()
-    @_sendSignOutRequest().pipe(@_cleanupAndTriggerSignOut)
-
-
-  # On
-  # ---
-
-  # shortcut for `hoodie.on`
-  on : (event, cb) ->
-    event = event.replace /(^| )([^ ]+)/g, "$1account:$2"
-    @hoodie.on event, cb
-
-
-  # Trigger
-  # ---
-
-  # shortcut for `hoodie.trigger`
-  trigger : (event, parameters...) ->
-    @hoodie.trigger "account:#{event}", parameters...
-
-
-  # Request
-  # ---
-
-  # shortcut for `hoodie.request`
-  request : (type, path, options = {}) ->
-    @hoodie.request arguments...
-
-
-  # db
-  # ----
-
-  # return name of db
-  db : -> "user/#{@ownerHash}"
-
-
-  # fetch
-  # -------
-
-  # fetches _users doc from CouchDB and caches it in _doc
-  fetch : (username = @username) =>
-    unless username
-      return @hoodie.defer().reject(error: "unauthenticated", reason: "not logged in").promise()
-
-    @_withSingleRequest 'fetch', =>
-      @request('GET', @_url(username))
-      .pipe(null, @_handleRequestError)
-      .done (response) => @_doc = response
-
-
-  # change password
-  # -----------------
-
-  # Note: the hoodie API requires the currentPassword for security reasons,
-  # but couchDb doesn't require it for a password change, so it's ignored
-  # in this implementation of the hoodie API.
-  changePassword : (currentPassword, newPassword) ->
-
-    unless @username
-      return @hoodie.defer().reject(error: "unauthenticated", reason: "not logged in").promise()
-
-    @hoodie.remote.disconnect()
-    @fetch().pipe @_sendChangeUsernameAndPasswordRequest(currentPassword, null, newPassword), @_handleRequestError
-
-
-  # reset password
-  # ----------------
-
-  # This is kind of a hack. We need to create an object anonymously
-  # that is not exposed to others. The only CouchDB API othering such
-  # functionality is the _users database.
-  #
-  # So we actualy sign up a new couchDB user with some special attributes.
-  # It will be picked up by the password reset worker and removeed
-  # once the password was resetted.
-  resetPassword : (username) ->
-    if resetPasswordId = @hoodie.config.get '_account.resetPasswordId'
-      return @_checkPasswordResetStatus()
-
-    resetPasswordId = "#{username}/#{@hoodie.uuid()}"
-    @hoodie.config.set '_account.resetPasswordId', resetPasswordId
-
-    key = "#{@_prefix}:$passwordReset/#{resetPasswordId}"
-    data =
-      _id        : key
-      name       : "$passwordReset/#{resetPasswordId}"
-      type       : 'user'
-      roles      : []
-      password   : resetPasswordId
-      createdAt  : @_now()
-      updatedAt  : @_now()
-
-    options =
-      data        : JSON.stringify data
-      contentType : "application/json"
-
-    @_withPreviousRequestsAborted 'resetPassword', =>
-      @request('PUT',  "/_users/#{encodeURIComponent key}", options)
-      .pipe(null, @_handleRequestError)
-      .done @_checkPasswordResetStatus
-
-
-  # change username
-  # -----------------
-
-  # Note: the hoodie API requires the current password for security reasons,
-  # but technically we cannot (yet) prevent the user to change the username
-  # without knowing the current password, so it's not impulemented in the current
-  # implementation of the hoodie API.
-  #
-  # But the current password is needed to login with the new username.
-  changeUsername : (currentPassword, newUsername = '') ->
-    @_changeUsernameAndPassword(currentPassword, newUsername.toLowerCase())
-
-
-  # destroy
-  # ---------
-
-  # destroys a user's account
-  destroy : ->
-
-    unless @hasAccount()
-      return @_cleanupAndTriggerSignOut()
-
-    @fetch()
-    .pipe(@_handleFetchBeforeDestroySucces, @_handleFetchBeforeDestroyError)
-    .pipe(@_cleanupAndTriggerSignOut)
-
-  # PRIVATE
-  # ---------
-
-  # default couchDB user doc prefix
-  _prefix : 'org.couchdb.user'
-
-  # setters
-  _setUsername : (username)  ->
-    return if username is @username
-
-    @username = username
-    @hoodie.config.set '_account.username',  @username
-
-  _setOwner    : (ownerHash) ->
-    return if ownerHash is @ownerHash
-
-    @ownerHash = ownerHash
-    # `ownerHash` is stored with every new object in the createdBy
-    # attribute. It does not get changed once it's set. That's why
-    # we have to force it to be change for the `$config/hoodie` object.
-    @hoodie.config.set 'createdBy', @ownerHash
-    @hoodie.config.set '_account.ownerHash', @ownerHash
-
-  #
-  # handle a successful authentication request.
-  #
-  # As long as there is no server error or internet connection issue,
-  # the authenticate request (GET /_session) does always return
-  # a 200 status. To differentiate whether the user is signed in or
-  # not, we check `userCtx.name` in the response. If the user is not
-  # signed in, it's null, otherwise the name the user signed in with
-  #
-  # If the user is not signed in, we difeerentiate between users that
-  # signed in with a username / password or anonymously. For anonymous
-  # users, the password is stored in local store, so we don't need
-  # to trigger an 'unauthenticated' error, but instead try to sign in.
-  #
-  _handleAuthenticateRequestSuccess : (response) =>
-    if response.userCtx.name
-      @_authenticated = true
-      @_setUsername response.userCtx.name.replace(/^user(_anonymous)?\//, '')
-      @_setOwner    response.userCtx.roles[0]
-      return @hoodie.defer().resolve(@username).promise()
-
-    if @hasAnonymousAccount()
-      @signIn @username, @getAnonymousPassword()
-      return
-
-    @_authenticated = false
-    @trigger 'error:unauthenticated'
-    return @hoodie.defer().reject().promise()
-
-  #
-  # standard error handling for AJAX requests
-  #
-  # in some case we get the object error directly,
-  # in others we get an xhr or even just a string back
-  # when the couch died entirely. Whe have to handle
-  # each case
-  #
-  _handleRequestError : (error = {}) =>
-    if error.reason
-      return @hoodie.defer().reject(error).promise()
-
-    xhr = error
-
-    try
-      error = JSON.parse(xhr.responseText)
-    catch e
-      error = error: xhr.responseText or "unknown"
-
-    @hoodie.defer().reject(error).promise()
-
-  #
-  # handle response of a successful signUp request.
-  # Response looks like:
-  #
-  #     {
-  #         "ok": true,
-  #         "id": "org.couchdb.user:joe",
-  #         "rev": "1-e8747d9ae9776706da92810b1baa4248"
-  #     }
-  #
-  _handleSignUpSucces : (username, password) =>
-    return (response) =>
-      @trigger 'signup', username
-      @_doc._rev = response.rev
-      @_delayedSignIn(username, password)
-
-  #
-  # a delayed sign in is used after sign up and after a
-  # username change.
-  #
-  _delayedSignIn : (username, password, options, defer) =>
-
-    # _delayedSignIn might call itself, when the user account
-    # is pending. In this case it passes the original defer,
-    # to keep a reference and finally resolve / reject it
-    # at some point
-    defer = @hoodie.defer() unless defer
-    window.setTimeout ( =>
-      promise = @_sendSignInRequest(username, password)
-      promise.done(defer.resolve)
-      promise.fail (error) =>
-        if error.error is 'unconfirmed'
-          # It might take a bit until the account has been confirmed
-          @_delayedSignIn(username, password, options, defer)
-        else
-          defer.reject arguments...
-    ), 300
-
-    return defer.promise()
-
-  #
-  # parse a successful sign in response from couchDB.
-  # Response looks like:
-  #
-  #     {
-  #         "ok": true,
-  #         "name": "test1",
-  #         "roles": [
-  #             "mvu85hy",
-  #             "confirmed"
-  #         ]
-  #     }
-  #
-  # we want to turn it into "test1", "mvu85hy" or reject the promise
-  # in case an error occured ("roles" array contains "error")
-  _handleSignInSuccess : (options = {}) =>
-    return (response) =>
-      defer    = @hoodie.defer()
-      username = response.name.replace(/^user(_anonymous)?\//, '')
-
-      # if an error occured, the userDB worker stores it to the $error attribute
-      # and adds the "error" role to the users doc object. If the user has the
-      # "error" role, we need to fetch his _users doc to find out what the error
-      # is, before we can reject the promise.
-      #
-      if ~response.roles.indexOf("error")
-        @fetch(username)
-        .fail(defer.reject)
-        .done =>
-          defer.reject error: "error", reason: @_doc.$error
-        return defer.promise()
-
-      # When the userDB worker created the database for the user and everthing
-      # worked out, it adds the role "confirmed" to the user. If the role is
-      # not present yet, it might be that the worker didn't pick up the the
-      # user doc yet, or there was an error. In this cases, we reject the promise
-      # with an "uncofirmed error"
-      unless ~response.roles.indexOf("confirmed")
-        return defer.reject error: "unconfirmed", reason: "account has not been confirmed yet"
-
-
-      @_setUsername username
-      @_setOwner response.roles[0]
-      @_authenticated = true
-
-      # options.verbose is true, when a user manually signed via hoodie.account.signIn().
-      # We need to differentiate to other signIn requests, for example right after
-      # the signup or after a session timed out.
-      unless options.silent or options.reauthenticated
-        if @hasAnonymousAccount()
-          @trigger 'signin:anonymous', username
-        else
-          @trigger 'signin', username
-
-      # user reauthenticated, meaning
-      if options.reauthenticated
-        @trigger 'reauthenticated', username
-
-      @fetch()
-      defer.resolve(@username, response.roles[0])
-
-  #
-  # check for the status of a password reset. It might take
-  # a while until the password reset worker picks up the job
-  # and updates it
-  #
-  # If a password reset request was successful, the $passwordRequest
-  # doc gets removed from _users by the worker, therefore a 401 is
-  # what we are waiting for.
-  #
-  # Once called, it continues to request the status update with a
-  # one second timeout.
-  #
-  _checkPasswordResetStatus : =>
-
-    # reject if there is no pending password reset request
-    resetPasswordId = @hoodie.config.get '_account.resetPasswordId'
-    unless resetPasswordId
-      return @hoodie.defer().reject(error: "missing").promise()
-
-    # send request to check status of password reset
-    username  = "$passwordReset/#{resetPasswordId}"
-    url       = "/_users/#{encodeURIComponent "#{@_prefix}:#{username}"}"
-    hash      = btoa "#{username}:#{resetPasswordId}"
-    options   =
-      headers:
-        Authorization : "Basic #{hash}"
-
-    @_withPreviousRequestsAborted 'passwordResetStatus', =>
-      @request('GET', url, options)
-      .pipe(@_handlePasswordResetStatusRequestSuccess, @_handlePasswordResetStatusRequestError)
-      .fail (error) =>
-        if error.error is 'pending'
-          window.setTimeout @_checkPasswordResetStatus, 1000
-          return
-
-        @trigger 'password_reset:error'
-
-  #
-  # If the request was successful there might have occured an
-  # error, which the worker stored in the special $error attribute.
-  # If that happens, we return a rejected promise with the $error,
-  # error. Otherwise reject the promise with a 'pending' error,
-  # as we are not waiting for a success full response, but a 401
-  # error, indicating that our password was changed and our
-  # curren session has been invalidated
-  _handlePasswordResetStatusRequestSuccess : (response) =>
-    defer = @hoodie.defer()
-
-    if response.$error
-      defer.reject response.$error
-    else
-      defer.reject error: 'pending'
-
-    return defer.promise()
-
-  #
-  # If the error is a 401, it's exactly what we've been waiting for.
-  # In this case we resolve the promise.
-  _handlePasswordResetStatusRequestError : (xhr) =>
-    if xhr.status is 401
-      @hoodie.config.remove '_account.resetPasswordId'
-      @trigger 'passwordreset'
-
-      return @hoodie.defer().resolve()
-
-    else
-      return @_handleRequestError(xhr)
-
-
-  #
-  # change username and password in 3 steps
-  #
-  # 1. assure we have a valid session
-  # 2. update _users doc with new username and new password (if provided)
-  # 3. sign in with new credentials to create new sesion.
-  #
-  _changeUsernameAndPassword : (currentPassword, newUsername, newPassword) ->
-    @_sendSignInRequest(@username, currentPassword, silent: true).pipe =>
-      @fetch().pipe @_sendChangeUsernameAndPasswordRequest(currentPassword, newUsername, newPassword)
-
-  #
-  # turn an anonymous account into a real account
-  #
-  _upgradeAnonymousAccount : (username, password) ->
-    currentPassword = @getAnonymousPassword()
-    @_changeUsernameAndPassword(currentPassword, username, password)
-    .done =>
-      @trigger 'signup', username
-      @removeAnonymousPassword()
-
-  #
-  # we now can be sure that we fetched the latest _users doc, so we can update it
-  # without a potential conflict error.
-  _handleFetchBeforeDestroySucces : =>
-    @hoodie.remote.disconnect()
-    @_doc._deleted = true
-
-    @_withPreviousRequestsAborted 'updateUsersDoc', =>
-      @request 'PUT', @_url(),
-        data        : JSON.stringify @_doc
-        contentType : 'application/json'
-
-  #
-  # dependend on what kind of error we get, we want to ignore
-  # it or not.
-  # When we get a "not_found" it means that the _users doc habe
-  # been removed already, so we don't need to do it anymore, but
-  # still want to finish the destroy locally, so we return a
-  # resolved promise
-  _handleFetchBeforeDestroyError : (error) =>
-    if error.error is 'not_found'
-      @hoodie.defer().resolve().promise()
-    else
-      @hoodie.defer().reject(error).promise()
-
-  #
-  # remove everything form the current account, so a new account can be initiated.
-  _cleanup : (options = {}) =>
-    @trigger 'cleanup'
-    @_authenticated = options.authenticated
-
-    @hoodie.config.clear()
-    @_setUsername options.username
-    @_setOwner    options.ownerHash or @hoodie.uuid()
-
-    @hoodie.defer().resolve().promise()
-
-  #
-  _cleanupAndTriggerSignOut : =>
-    @_cleanup().then =>
-      @trigger 'signout'
-
-
-  #
-  # depending on wether the user signedUp manually or has been signed up anonymously
-  # the prefix in the CouchDB _users doc differentiates.
-  # An anonymous user is characterized by its username, that equals
-  # its ownerHash (see `anonymousSignUp`)
-  #
-  # We differentiate with `hasAnonymousAccount()`, because `_userKey`
-  # is used within `signUp` method, so we need to be able to differentiate
-  # between anonyomus and normal users before an account has been created.
-  _userKey : (username) ->
-    if username is @ownerHash
-      prefix = 'user_anonymous'
-    else
-      prefix = 'user'
-
-    return "#{prefix}/#{username}"
-
-  #
-  # turn a username into a valid _users doc._id
-  _key : (username = @username) ->
-    "#{@_prefix}:#{@_userKey(username)}"
-
-  #
-  # get URL of my _users doc
-  _url : (username) ->
-    "/_users/#{encodeURIComponent @_key(username)}"
-
-  #
-  # update my _users doc.
-  #
-  # If a new username has been passed, we set the special attribut $newUsername.
-  # This will let the username change worker create create a new _users doc for
-  # the new username and remove the current one
-  #
-  # If a new password has been passed, salt and password_sha get removed
-  # from _users doc and add the password in clear text. CouchDB will replace it with
-  # according password_sha and a new salt server side
-  _sendChangeUsernameAndPasswordRequest : (currentPassword, newUsername, newPassword) =>
-    =>
-      # prepare updated _users doc
-      data = $.extend {}, @_doc
-      data.$newUsername = newUsername if newUsername
-      data.updatedAt    = @_now()
-      data.signedUpAt ||= @_now()
-
-      # trigger password update when newPassword set
-      if newPassword?
-        delete data.salt
-        delete data.password_sha
-        data.password = newPassword
-
-      options =
-        data        : JSON.stringify data
-        contentType : 'application/json'
-
-      @_withPreviousRequestsAborted 'updateUsersDoc', =>
-        @request('PUT', @_url(), options)
-        .pipe @_handleChangeUsernameAndPasswordRequest(newUsername, newPassword or currentPassword), @_handleRequestError
-
-
-  #
-  # depending on whether a newUsername has been passed, we can sign in right away
-  # or have to use the delayed sign in to give the username change worker some time
-  _handleChangeUsernameAndPasswordRequest: (newUsername, newPassword) =>
-    =>
-      @hoodie.remote.disconnect()
-      if newUsername
-        @_delayedSignIn newUsername, newPassword, silent: true
-      else
-        @signIn(@username, newPassword)
-
-
-  #
-  # make sure that the same request doesn't get sent twice
-  # by cancelling the previous one.
-  _withPreviousRequestsAborted: (name, requestFunction) ->
-    @_requests[name]?.abort?()
-    @_requests[name] = requestFunction()
-
-
-  #
-  # if there is a pending request, return its promise instead
-  # of sending another request
-  _withSingleRequest: (name, requestFunction) ->
-    return @_requests[name] if @_requests[name]?.state?() is 'pending'
-    @_requests[name] = requestFunction()
-
-
-  #
-  _sendSignOutRequest: ->
-    @_withSingleRequest 'signOut', =>
-      @request('DELETE', '/_session').pipe(null, @_handleRequestError)
-
-
-  #
-  # the sign in request that starts a CouchDB session if
-  # it succeeds. We separated the actual sign in request from
-  # the signIn method, as the latter also runs signOut intenrtally
-  # to clean up local data before starting a new session. But as
-  # other methods like signUp or changePassword do also need to
-  # sign in the user (again), these need to send the sign in
-  # request but without a signOut beforehand, as the user remains
-  # the same.
-  _sendSignInRequest: (username, password, options) ->
-    requestOptions = data:
-                       name      : @_userKey(username)
-                       password  : password
-
-    @_withPreviousRequestsAborted 'signIn', =>
-      promise = @request('POST', '/_session', requestOptions)
-      promise.pipe(@_handleSignInSuccess(options), @_handleRequestError)
-
-  #
-  _now : -> new Date
+// Hoodie.Account
+// ================
+
+// tell something smart in here.
+//
+
+var __bind = function (fn, me) { return function(){ return fn.apply(me, arguments); }; },
+  __slice = [].slice;
+
+Hoodie.Account = (function () {
+
+  'use strict';
+
+  function Account(hoodie) {
+
+    this.hoodie = hoodie;
+    this._handleChangeUsernameAndPasswordRequest = __bind(this._handleChangeUsernameAndPasswordRequest, this);
+    this._sendChangeUsernameAndPasswordRequest = __bind(this._sendChangeUsernameAndPasswordRequest, this);
+    this._cleanupAndTriggerSignOut = __bind(this._cleanupAndTriggerSignOut, this);
+    this._cleanup = __bind(this._cleanup, this);
+    this._handleFetchBeforeDestroyError = __bind(this._handleFetchBeforeDestroyError, this);
+    this._handleFetchBeforeDestroySucces = __bind(this._handleFetchBeforeDestroySucces, this);
+    this._handlePasswordResetStatusRequestError = __bind(this._handlePasswordResetStatusRequestError, this);
+    this._handlePasswordResetStatusRequestSuccess = __bind(this._handlePasswordResetStatusRequestSuccess, this);
+    this._checkPasswordResetStatus = __bind(this._checkPasswordResetStatus, this);
+    this._handleSignInSuccess = __bind(this._handleSignInSuccess, this);
+    this._delayedSignIn = __bind(this._delayedSignIn, this);
+    this._handleSignUpSucces = __bind(this._handleSignUpSucces, this);
+    this._handleRequestError = __bind(this._handleRequestError, this);
+    this._handleAuthenticateRequestSuccess = __bind(this._handleAuthenticateRequestSuccess, this);
+    this.fetch = __bind(this.fetch, this);
+    this.signOut = __bind(this.signOut, this);
+    this.authenticate = __bind(this.authenticate, this);
+    this._doc = {};
+    this._requests = {};
+    this.init();
+  }
+
+  Account.prototype.username = void 0;
+
+  Account.prototype.init = function () {
+    this.username = this.hoodie.config.get('_account.username');
+    this.ownerHash = this.hoodie.config.get('_account.ownerHash');
+    if (!this.ownerHash) {
+      this._setOwner(this.hoodie.uuid());
+    }
+    window.setTimeout(this.authenticate);
+    return this._checkPasswordResetStatus();
+  };
+
+  Account.prototype.authenticate = function () {
+    var sendAndHandleAuthRequest, _ref, _ref1,
+      self = this;
+
+    if (this._authenticated === false) {
+      return this.hoodie.defer().reject().promise();
+    }
+
+    if (this._authenticated === true) {
+      return this.hoodie.defer().resolve(this.username).promise();
+    }
+
+    if (((_ref = this._requests.signOut) !== null ? _ref.state() : void 0) === 'pending') {
+      return this._requests.signOut.then(this.hoodie.rejectWith);
+    }
+
+    if (((_ref1 = this._requests.signIn) !== null ? _ref1.state() : void 0) === 'pending') {
+      return this._requests.signIn;
+    }
+
+    if (this.username === void 0) {
+      return this._sendSignOutRequest().then(function () {
+        self._authenticated = false;
+        return self.hoodie.rejectWith();
+      });
+    }
+
+    sendAndHandleAuthRequest = function () {
+      return self.request('GET', "/_session").pipe(_this._handleAuthenticateRequestSuccess, _this._handleRequestError);
+    };
+
+    return this._withSingleRequest('authenticate', sendAndHandleAuthRequest);
+  };
+
+  Account.prototype.signUp = function (username, password) {
+    var options;
+    if (password == null) {
+      password = '';
+    }
+    if (!username) {
+      return this.hoodie.defer().reject({
+        error: 'username must be set'
+      }).promise();
+    }
+    if (this.hasAnonymousAccount()) {
+      return this._upgradeAnonymousAccount(username, password);
+    }
+    if (this.hasAccount()) {
+      return this.hoodie.defer().reject({
+        error: 'you have to sign out first'
+      }).promise();
+    }
+    username = username.toLowerCase();
+    options = {
+      data: JSON.stringify({
+        _id: this._key(username),
+        name: this._userKey(username),
+        type: 'user',
+        roles: [],
+        password: password,
+        ownerHash: this.ownerHash,
+        database: this.db(),
+        updatedAt: this._now(),
+        createdAt: this._now(),
+        signedUpAt: username !=== this.ownerHash ? this._now() : void 0
+      }),
+      contentType: 'application/json'
+    };
+    return this.request('PUT', this._url(username), options).pipe(this._handleSignUpSucces(username, password), this._handleRequestError);
+  };
+
+  Account.prototype.anonymousSignUp = function () {
+    var password, username,
+      self = this;
+    password = this.hoodie.uuid(10);
+    username = this.ownerHash;
+    return this.signUp(username, password).done(function () {
+      self.setAnonymousPassword(password);
+      return self.trigger('signup:anonymous', username);
+    });
+  };
+
+  Account.prototype.hasAccount = function () {
+    return this.username !== null;
+  };
+
+  Account.prototype.hasAnonymousAccount = function () {
+    return this.getAnonymousPassword() !== null;
+  };
+
+  Account.prototype._anonymousPasswordKey = '_account.anonymousPassword';
+
+  Account.prototype.setAnonymousPassword = function (password) {
+    return this.hoodie.config.set(this._anonymousPasswordKey, password);
+  };
+
+  Account.prototype.getAnonymousPassword = function (password) {
+    return this.hoodie.config.get(this._anonymousPasswordKey);
+  };
+
+  Account.prototype.removeAnonymousPassword = function (password) {
+    return this.hoodie.config.remove(this._anonymousPasswordKey);
+  };
+
+  Account.prototype.signIn = function (username, password) {
+    var self = this;
+    if (username == null) {
+      username = '';
+    }
+    if (password == null) {
+      password = '';
+    }
+    username = username.toLowerCase();
+    if (this.username !=== username) {
+      return this.signOut({
+        silent: true
+      }).pipe(function () {
+        return self._sendSignInRequest(username, password);
+      });
+    } else {
+      return this._sendSignInRequest(username, password, {
+        reauthenticated: true
+      });
+    }
+  };
+
+  Account.prototype.signOut = function (options) {
+    var self = this;
+    if (options == null) {
+      options = {};
+    }
+    if (!this.hasAccount()) {
+      return this._cleanup().then(function () {
+        if (!options.silent) {
+          return self.trigger('signout');
+        }
+      });
+    }
+    this.hoodie.remote.disconnect();
+    return this._sendSignOutRequest().pipe(this._cleanupAndTriggerSignOut);
+  };
+
+  Account.prototype.on = function (event, cb) {
+    event = event.replace(/(^| )([^ ]+)/g, "$1account:$2");
+    return this.hoodie.on(event, cb);
+  };
+
+  Account.prototype.trigger = function () {
+    var event, parameters, _ref;
+    event = arguments[0], parameters = 2 <= arguments.length ? __slice.call(arguments, 1) : [];
+    return (_ref = this.hoodie).trigger.apply(_ref, ["account:" + event].concat(__slice.call(parameters)));
+  };
+
+  Account.prototype.request = function (type, path, options) {
+    var _ref;
+    if (options == null) {
+      options = {};
+    }
+    return (_ref = this.hoodie).request.apply(_ref, arguments);
+  };
+
+  Account.prototype.db = function () {
+    return "user/" + this.ownerHash;
+  };
+
+  Account.prototype.fetch = function (username) {
+    var self = this;
+    if (username == null) {
+      username = this.username;
+    }
+    if (!username) {
+      return this.hoodie.defer().reject({
+        error: "unauthenticated",
+        reason: "not logged in"
+      }).promise();
+    }
+    return this._withSingleRequest('fetch', function () {
+      return self.request('GET', _this._url(username)).pipe(null, _this._handleRequestError).done(function (response) {
+        return self._doc = response;
+      });
+    });
+  };
+
+  Account.prototype.changePassword = function (currentPassword, newPassword) {
+    if (!this.username) {
+      return this.hoodie.defer().reject({
+        error: "unauthenticated",
+        reason: "not logged in"
+      }).promise();
+    }
+    this.hoodie.remote.disconnect();
+    return this.fetch().pipe(this._sendChangeUsernameAndPasswordRequest(currentPassword, null, newPassword), this._handleRequestError);
+  };
+
+  Account.prototype.resetPassword = function (username) {
+    var data, key, options, resetPasswordId,
+      self = this;
+    if (resetPasswordId = this.hoodie.config.get('_account.resetPasswordId')) {
+      return this._checkPasswordResetStatus();
+    }
+    resetPasswordId = "" + username + "/" + (this.hoodie.uuid());
+    this.hoodie.config.set('_account.resetPasswordId', resetPasswordId);
+    key = "" + this._prefix + ":$passwordReset/" + resetPasswordId;
+    data = {
+      _id: key,
+      name: "$passwordReset/" + resetPasswordId,
+      type: 'user',
+      roles: [],
+      password: resetPasswordId,
+      createdAt: this._now(),
+      updatedAt: this._now()
+    };
+    options = {
+      data: JSON.stringify(data),
+      contentType: "application/json"
+    };
+    return this._withPreviousRequestsAborted('resetPassword', function () {
+      return self.request('PUT', "/_users/" + (encodeURIComponent(key)), options).pipe(null, _this._handleRequestError).done(_this._checkPasswordResetStatus);
+    });
+  };
+
+  Account.prototype.changeUsername = function (currentPassword, newUsername) {
+    if (newUsername == null) {
+      newUsername = '';
+    }
+    return this._changeUsernameAndPassword(currentPassword, newUsername.toLowerCase());
+  };
+
+  Account.prototype.destroy = function () {
+    if (!this.hasAccount()) {
+      return this._cleanupAndTriggerSignOut();
+    }
+    return this.fetch().pipe(this._handleFetchBeforeDestroySucces, this._handleFetchBeforeDestroyError).pipe(this._cleanupAndTriggerSignOut);
+  };
+
+  Account.prototype._prefix = 'org.couchdb.user';
+
+  Account.prototype._setUsername = function (username) {
+    if (username === this.username) {
+      return;
+    }
+    this.username = username;
+    return this.hoodie.config.set('_account.username', this.username);
+  };
+
+  Account.prototype._setOwner = function (ownerHash) {
+    if (ownerHash === this.ownerHash) {
+      return;
+    }
+    this.ownerHash = ownerHash;
+    this.hoodie.config.set('createdBy', this.ownerHash);
+    return this.hoodie.config.set('_account.ownerHash', this.ownerHash);
+  };
+
+  Account.prototype._handleAuthenticateRequestSuccess = function (response) {
+    if (response.userCtx.name) {
+      this._authenticated = true;
+      this._setUsername(response.userCtx.name.replace(/^user(_anonymous)?\//, ''));
+      this._setOwner(response.userCtx.roles[0]);
+      return this.hoodie.defer().resolve(this.username).promise();
+    }
+    if (this.hasAnonymousAccount()) {
+      this.signIn(this.username, this.getAnonymousPassword());
+      return;
+    }
+    this._authenticated = false;
+    this.trigger('error:unauthenticated');
+    return this.hoodie.defer().reject().promise();
+  };
+
+  Account.prototype._handleRequestError = function (error) {
+    var e, xhr;
+    if (error == null) {
+      error = {};
+    }
+    if (error.reason) {
+      return this.hoodie.defer().reject(error).promise();
+    }
+    xhr = error;
+    try {
+      error = JSON.parse(xhr.responseText);
+    } catch (_error) {
+      e = _error;
+      error = {
+        error: xhr.responseText || "unknown"
+      };
+    }
+    return this.hoodie.defer().reject(error).promise();
+  };
+
+  Account.prototype._handleSignUpSucces = function (username, password) {
+    var self = this;
+    return function (response) {
+      self.trigger('signup', username);
+      self._doc._rev = response.rev;
+      return self._delayedSignIn(username, password);
+    };
+  };
+
+  Account.prototype._delayedSignIn = function (username, password, options, defer) {
+    var self = this;
+    if (!defer) {
+      defer = this.hoodie.defer();
+    }
+    window.setTimeout((function () {
+      var promise;
+      promise = self._sendSignInRequest(username, password);
+      promise.done(defer.resolve);
+      return promise.fail(function (error) {
+        if (error.error === 'unconfirmed') {
+          return self._delayedSignIn(username, password, options, defer);
+        } else {
+          return defer.reject.apply(defer, arguments);
+        }
+      });
+    }), 300);
+    return defer.promise();
+  };
+
+  Account.prototype._handleSignInSuccess = function (options) {
+    var self = this;
+    if (options == null) {
+      options = {};
+    }
+    return function (response) {
+      var defer, username;
+      defer = self.hoodie.defer();
+      username = response.name.replace(/^user(_anonymous)?\//, '');
+      if (~response.roles.indexOf("error")) {
+        self.fetch(username).fail(defer.reject).done(function () {
+          return defer.reject({
+            error: "error",
+            reason: self._doc.$error
+          });
+        });
+        return defer.promise();
+      }
+      if (!~response.roles.indexOf("confirmed")) {
+        return defer.reject({
+          error: "unconfirmed",
+          reason: "account has not been confirmed yet"
+        });
+      }
+      self._setUsername(username);
+      self._setOwner(response.roles[0]);
+      self._authenticated = true;
+      if (!(options.silent || options.reauthenticated)) {
+        if (self.hasAnonymousAccount()) {
+          self.trigger('signin:anonymous', username);
+        } else {
+          self.trigger('signin', username);
+        }
+      }
+      if (options.reauthenticated) {
+        self.trigger('reauthenticated', username);
+      }
+      self.fetch();
+      return defer.resolve(self.username, response.roles[0]);
+    };
+  };
+
+  Account.prototype._checkPasswordResetStatus = function () {
+    var hash, options, resetPasswordId, url, username,
+      self = this;
+    resetPasswordId = this.hoodie.config.get('_account.resetPasswordId');
+    if (!resetPasswordId) {
+      return this.hoodie.defer().reject({
+        error: "missing"
+      }).promise();
+    }
+    username = "$passwordReset/" + resetPasswordId;
+    url = "/_users/" + (encodeURIComponent("" + this._prefix + ":" + username));
+    hash = btoa("" + username + ":" + resetPasswordId);
+    options = {
+      headers: {
+        Authorization: "Basic " + hash
+      }
+    };
+    return this._withPreviousRequestsAborted('passwordResetStatus', function () {
+      return self.request('GET', url, options).pipe(_this._handlePasswordResetStatusRequestSuccess, _this._handlePasswordResetStatusRequestError).fail(function (error) {
+        if (error.error === 'pending') {
+          window.setTimeout(self._checkPasswordResetStatus, 1000);
+          return;
+        }
+        return self.trigger('password_reset:error');
+      });
+    });
+  };
+
+  Account.prototype._handlePasswordResetStatusRequestSuccess = function (response) {
+    var defer;
+    defer = this.hoodie.defer();
+    if (response.$error) {
+      defer.reject(response.$error);
+    } else {
+      defer.reject({
+        error: 'pending'
+      });
+    }
+    return defer.promise();
+  };
+
+  Account.prototype._handlePasswordResetStatusRequestError = function (xhr) {
+    if (xhr.status === 401) {
+      this.hoodie.config.remove('_account.resetPasswordId');
+      this.trigger('passwordreset');
+      return this.hoodie.defer().resolve();
+    } else {
+      return this._handleRequestError(xhr);
+    }
+  };
+
+  Account.prototype._changeUsernameAndPassword = function (currentPassword, newUsername, newPassword) {
+    var self = this;
+    return this._sendSignInRequest(this.username, currentPassword, {
+      silent: true
+    }).pipe(function () {
+      return self.fetch().pipe(_this._sendChangeUsernameAndPasswordRequest(currentPassword, newUsername, newPassword));
+    });
+  };
+
+  Account.prototype._upgradeAnonymousAccount = function (username, password) {
+    var currentPassword,
+      self = this;
+    currentPassword = this.getAnonymousPassword();
+    return this._changeUsernameAndPassword(currentPassword, username, password).done(function () {
+      self.trigger('signup', username);
+      return self.removeAnonymousPassword();
+    });
+  };
+
+  Account.prototype._handleFetchBeforeDestroySucces = function () {
+    var self = this;
+    this.hoodie.remote.disconnect();
+    this._doc._deleted = true;
+    return this._withPreviousRequestsAborted('updateUsersDoc', function () {
+      return self.request('PUT', _this._url(), {
+        data: JSON.stringify(self._doc),
+        contentType: 'application/json'
+      });
+    });
+  };
+
+  Account.prototype._handleFetchBeforeDestroyError = function (error) {
+    if (error.error === 'not_found') {
+      return this.hoodie.defer().resolve().promise();
+    } else {
+      return this.hoodie.defer().reject(error).promise();
+    }
+  };
+
+  Account.prototype._cleanup = function (options) {
+    if (options == null) {
+      options = {};
+    }
+    this.trigger('cleanup');
+    this._authenticated = options.authenticated;
+    this.hoodie.config.clear();
+    this._setUsername(options.username);
+    this._setOwner(options.ownerHash || this.hoodie.uuid());
+    return this.hoodie.defer().resolve().promise();
+  };
+
+  Account.prototype._cleanupAndTriggerSignOut = function () {
+    var self = this;
+    return this._cleanup().then(function () {
+      return self.trigger('signout');
+    });
+  };
+
+  Account.prototype._userKey = function (username) {
+    var prefix;
+    if (username === this.ownerHash) {
+      prefix = 'user_anonymous';
+    } else {
+      prefix = 'user';
+    }
+    return "" + prefix + "/" + username;
+  };
+
+  Account.prototype._key = function (username) {
+    if (username == null) {
+      username = this.username;
+    }
+    return "" + this._prefix + ":" + (this._userKey(username));
+  };
+
+  Account.prototype._url = function (username) {
+    return "/_users/" + (encodeURIComponent(this._key(username)));
+  };
+
+  Account.prototype._sendChangeUsernameAndPasswordRequest = function (currentPassword, newUsername, newPassword) {
+    var self = this;
+    return function () {
+      var data, options;
+      data = $.extend({}, self._doc);
+      if (newUsername) {
+        data.$newUsername = newUsername;
+      }
+      data.updatedAt = self._now();
+      data.signedUpAt || (data.signedUpAt = self._now());
+      if (newPassword !== null) {
+        delete data.salt;
+        delete data.password_sha;
+        data.password = newPassword;
+      }
+      options = {
+        data: JSON.stringify(data),
+        contentType: 'application/json'
+      };
+      return self._withPreviousRequestsAborted('updateUsersDoc', function () {
+        return self.request('PUT', _this._url(), options).pipe(_this._handleChangeUsernameAndPasswordRequest(newUsername, newPassword || currentPassword), _this._handleRequestError);
+      });
+    };
+  };
+
+  Account.prototype._handleChangeUsernameAndPasswordRequest = function (newUsername, newPassword) {
+    var self = this;
+    return function () {
+      self.hoodie.remote.disconnect();
+      if (newUsername) {
+        return self._delayedSignIn(newUsername, newPassword, {
+          silent: true
+        });
+      } else {
+        return self.signIn(_this.username, newPassword);
+      }
+    };
+  };
+
+  Account.prototype._withPreviousRequestsAborted = function (name, requestFunction) {
+    var _ref;
+    if ((_ref = this._requests[name]) !== null) {
+      if (typeof _ref.abort === "function") {
+        _ref.abort();
+      }
+    }
+    return this._requests[name] = requestfunction ();
+  };
+
+  Account.prototype._withSingleRequest = function (name, requestFunction) {
+    var _ref;
+    if (((_ref = this._requests[name]) !== null ? typeof _ref.state === "function" ? _ref.state() : void 0 : void 0) === 'pending') {
+      return this._requests[name];
+    }
+    return this._requests[name] = requestfunction ();
+  };
+
+  Account.prototype._sendSignOutRequest = function () {
+    var self = this;
+    return this._withSingleRequest('signOut', function () {
+      return self.request('DELETE', '/_session').pipe(null, _this._handleRequestError);
+    });
+  };
+
+  Account.prototype._sendSignInRequest = function (username, password, options) {
+    var requestOptions,
+      self = this;
+    requestOptions = {
+      data: {
+        name: this._userKey(username),
+        password: password
+      }
+    };
+    return this._withPreviousRequestsAborted('signIn', function () {
+      var promise;
+      promise = self.request('POST', '/_session', requestOptions);
+      return promise.pipe(self._handleSignInSuccess(options), _this._handleRequestError);
+    });
+  };
+
+  Account.prototype._now = function () {
+    return new Date;
+  };
+
+  return Account;
+
+})();
