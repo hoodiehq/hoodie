@@ -34,8 +34,6 @@
 //     hoodie.share.remove(id)
 //     hoodie.share.removeAll()
 
-var __bind = function (fn, me){ return function(){ return fn.apply(me, arguments); }; };
-
 Hoodie.Share = (function () {
 
   'use strict';

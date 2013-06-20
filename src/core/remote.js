@@ -36,11 +36,7 @@
 // * on(event, callback)
 //
 
-var ConnectionError,
-  __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
-  __hasProp = {}.hasOwnProperty,
-  __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; },
-  __slice = [].slice;
+var ConnectionError;
 
 Hoodie.Remote = (function(_super) {
 
@@ -109,11 +105,11 @@ Hoodie.Remote = (function(_super) {
   };
 
   Remote.prototype.get = function(view_name, params) {
-    return console.log.apply(console, [".get() not yet implemented"].concat(__slice.call(arguments)));
+    return console.log.apply(console, [".get() not yet implemented"].concat(Array.prototype.slice.call(arguments)));
   };
 
   Remote.prototype.post = function(update_function_name, params) {
-    return console.log.apply(console, [".post() not yet implemented"].concat(__slice.call(arguments)));
+    return console.log.apply(console, [".post() not yet implemented"].concat(Array.prototype.slice.call(arguments)));
   };
 
   Remote.prototype.find = function(type, id) {
@@ -276,8 +272,8 @@ Hoodie.Remote = (function(_super) {
 
   Remote.prototype.trigger = function() {
     var event, parameters, _ref;
-    event = arguments[0], parameters = 2 <= arguments.length ? __slice.call(arguments, 1) : [];
-    return (_ref = this.hoodie).trigger.apply(_ref, ["" + this.name + ":" + event].concat(__slice.call(parameters)));
+    event = arguments[0], parameters = 2 <= arguments.length ? Array.prototype.slice.call(arguments, 1) : [];
+    return (_ref = this.hoodie).trigger.apply(_ref, ["" + this.name + ":" + event].concat(Array.prototype.slice.call(parameters)));
   };
 
   Remote.prototype._validSpecialAttributes = ['_id', '_rev', '_deleted', '_revisions', '_attachments'];

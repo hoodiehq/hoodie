@@ -5,13 +5,6 @@
 //
 //
 
-
-var __bind = function (fn, me) {
-  return function(){
-    return fn.apply(me, arguments);
-  };
-};
-
 Hoodie.Account = (function () {
 
   'use strict';

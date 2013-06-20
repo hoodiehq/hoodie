@@ -13,6 +13,7 @@ module.exports = function(grunt) {
       },
       dist: {
         src: [
+          'src/utils.js',
           'src/events.js',
           'src/hoodie.js',
           'src/core/account.js',
@@ -54,6 +55,7 @@ module.exports = function(grunt) {
       files: ['<%= jshint.files %>'],
       tasks: ['concat']
     },
+
     groc: {
       javascript: [
         "src/**/*.js"
