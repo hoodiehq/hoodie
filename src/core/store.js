@@ -16,6 +16,18 @@ Hoodie.Store = (function() {
     this.hoodie = hoodie;
   }
 
+  // ## Save
+
+  // creates or replaces an an eventually existing object in the store
+  // with same type & id.
+  //
+  // When id is undefined, it gets generated and a new object gets saved
+  //
+  // example usage:
+  //
+  //     store.save('car', undefined, {color: 'red'})
+  //     store.save('car', 'abc4567', {color: 'red'})
+  //
   Store.prototype.save = function(type, id, object, options) {
     var defer;
 
@@ -45,18 +57,35 @@ Hoodie.Store = (function() {
     return defer;
   };
 
+  // ## Add
+
+  // `.add` is an alias for `.save`, with the difference that there is no id argument.
+  // Internally it simply calls `.save(type, undefined, object).
+  //
   Store.prototype.add = function(type, object, options) {
 
     if (object == null) {
       object = {};
     }
 
-    if (options === null) {
-      options = {};
-    }
+    options = options || {};
 
     return this.save(type, object.id, object);
   };
+
+  // ## Update
+
+  // In contrast to `.save`, the `.update` method does not replace the stored object,
+  // but only changes the passed attributes of an exsting object, if it exists
+  //
+  // both a hash of key/values or a function that applies the update to the passed
+  // object can be passed.
+  //
+  // example usage
+  //
+  // hoodie.store.update('car', 'abc4567', {sold: true})
+  // hoodie.store.update('car', 'abc4567', function(obj) { obj.sold = true })
+  //
 
   Store.prototype.update = function(type, id, objectUpdate, options) {
     var defer, _loadPromise, self = this;
@@ -65,6 +94,8 @@ Hoodie.Store = (function() {
 
     _loadPromise = this.find(type, id).pipe(function(currentObj) {
       var changedProperties, key, newObj, value;
+
+      // normalize input
       newObj = $.extend(true, {}, currentObj);
       if (typeof objectUpdate === 'function') {
         objectUpdate = objectUpdate(newObj);
@@ -72,6 +103,8 @@ Hoodie.Store = (function() {
       if (!objectUpdate) {
         return defer.resolve(currentObj);
       }
+
+      // check if something changed
       changedProperties = (function() {
         var _results;
         _results = [];
@@ -88,19 +121,33 @@ Hoodie.Store = (function() {
       if (!(changedProperties.length || options)) {
         return defer.resolve(newObj);
       }
-      return self.save(type, id, newObj, options).then(defer.resolve, defer.reject);
+
+      //apply update
+      self.save(type, id, newObj, options).then(defer.resolve, defer.reject);
     });
+
+    // if not found, add it
     _loadPromise.fail(function() {
       return self.save(type, id, objectUpdate, options).then(defer.resolve, defer.reject);
     });
+
     return defer.promise();
   };
 
+  // ## updateAll
+
+  // update all objects in the store, can be optionally filtered by a function
+  // As an alternative, an array of objects can be passed
+  //
+  // example usage
+  //
+  // hoodie.store.updateAll()
+  //
   Store.prototype.updateAll = function(filterOrObjects, objectUpdate, options) {
     var promise, self = this;
-    if (options == null) {
-      options = {};
-    }
+    options = options || {};
+
+    // normalize the input: make sure we have all objects
     switch (true) {
     case typeof filterOrObjects === 'string':
       promise = this.findAll(filterOrObjects);
@@ -111,11 +158,13 @@ Hoodie.Store = (function() {
     case $.isArray(filterOrObjects):
       promise = this.hoodie.defer().resolve(filterOrObjects).promise();
       break;
-    default:
+    default: // e.g. null, update all
       promise = this.findAll();
     }
 
     return promise.pipe(function(objects) {
+      // now we update all objects one by one and return a promise
+      // that will be resolved once all updates have been finished
       var defer, object, _updatePromises;
       defer = self.hoodie.defer();
       if (!$.isArray(objects)) {
@@ -135,6 +184,14 @@ Hoodie.Store = (function() {
     });
   };
 
+  // ## find
+
+  // loads one object from Store, specified by `type` and `id`
+  //
+  // example usage:
+  //
+  //     store.find('car', 'abc4567')
+  //
   Store.prototype.find = function(type, id) {
     var defer;
     defer = this.hoodie.defer();
@@ -144,6 +201,12 @@ Hoodie.Store = (function() {
     return defer;
   };
 
+  // ## find or add
+
+  // 1. Try to find a share by given id
+  // 2. If share could be found, return it
+  // 3. If not, add one and return it.
+  //
   Store.prototype.findOrAdd = function(type, id, attributes) {
     var defer, self = this;
 
@@ -162,10 +225,22 @@ Hoodie.Store = (function() {
     return defer.promise();
   };
 
+  // ## findAll
+
+  // returns all objects from store.
+  // Can be optionally filtered by a type or a function
+  //
   Store.prototype.findAll = function() {
     return this.hoodie.defer();
   };
 
+  // ## Destroy
+
+  // Destroyes one object specified by `type` and `id`.
+  //
+  // when object has been synced before, mark it as deleted.
+  // Otherwise remove it from Store.
+  //
   Store.prototype.remove = function(type, id, options) {
     var defer;
 
@@ -182,12 +257,14 @@ Hoodie.Store = (function() {
     return defer;
   };
 
+  // ## removeAll
+
+  // Destroyes all objects. Can be filtered by a type
+  //
   Store.prototype.removeAll = function(type, options) {
     var self = this;
 
-    if (options == null) {
-      options = {};
-    }
+    options = options || {};
 
     return this.findAll(type).pipe(function(objects) {
       var object, _i, _len, _results;
@@ -204,16 +281,20 @@ Hoodie.Store = (function() {
 
   };
 
+  //
+  // ## Private
+  //
+
   Store.prototype._now = function() {
     return new Date();
   };
 
   Store.prototype._isValidId = function(key) {
-    return /^[^\/]+$/.test(key);
+    return new RegExp(/^[^\/]+$/).test(key);
   };
 
   Store.prototype._isValidType = function(key) {
-    return /^[^\/]+$/.test(key);
+    return new RegExp(/^[^\/]+$/).test(key);
   };
 
   return Store;
