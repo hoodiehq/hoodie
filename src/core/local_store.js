@@ -656,7 +656,7 @@ Hoodie.LocalStore = (function (_super) {
     this.trigger("change", event, object, options);
     this.trigger("change:" + object.type, event, object, options);
 
-    if (event !=== 'new') {
+    if (event !== 'new') {
       return this.trigger("change:" + object.type + ":" + object.id, event, object, options);
     }
   };
@@ -669,7 +669,7 @@ Hoodie.LocalStore = (function (_super) {
     window.clearTimeout(this._dirtyTimeout);
 
     return this._dirtyTimeout = window.setTimeout((function () {
-      return self.trigger('idle', _this.changedObjects());
+      return self.trigger('idle', self.changedObjects());
     }), this.idleTimeout);
   };
 

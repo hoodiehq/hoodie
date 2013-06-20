@@ -4,13 +4,15 @@
 //
 // the door to world domination (apps)
 
-__bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
 
-(function(_super) {
+var Hoodie,
+__bind = function (fn, me) { return function(){ return fn.apply(me, arguments); }; };
+
+Hoodie = (function (_super) {
 
   'use strict';
 
-  function Hoodie (baseUrl) {
+  function Hoodie(baseUrl) {
 
     this.baseUrl = baseUrl;
     this._handleCheckConnectionError = __bind(this._handleCheckConnectionError, this);
@@ -39,7 +41,7 @@ __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); };
 
   Hoodie.prototype.checkConnectionInterval = 30000;
 
-  Hoodie.prototype.request = function(type, url, options) {
+  Hoodie.prototype.request = function (type, url, options) {
     var defaults;
     if (options === null) {
       options = {};
@@ -61,7 +63,7 @@ __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); };
 
   Hoodie.prototype._checkConnectionRequest = null;
 
-  Hoodie.prototype.checkConnection = function() {
+  Hoodie.prototype.checkConnection = function () {
     var _ref;
     if (((_ref = this._checkConnectionRequest) !== null ? typeof _ref.state === "function" ? _ref.state() : void 0 : void 0) === 'pending') {
       return this._checkConnectionRequest;
@@ -69,7 +71,7 @@ __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); };
     return this._checkConnectionRequest = this.request('GET', '/').pipe(this._handleCheckConnectionSuccess, this._handleCheckConnectionError);
   };
 
-  Hoodie.prototype.open = function(storeName, options) {
+  Hoodie.prototype.open = function (storeName, options) {
     if (options === null) {
       options = {};
     }
@@ -79,14 +81,14 @@ __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); };
     return new Hoodie.Remote(this, options);
   };
 
-  Hoodie.prototype.uuid = function(len) {
+  Hoodie.prototype.uuid = function (len) {
     var chars, i, radix;
     if (len === null) {
       len = 7;
     }
     chars = '0123456789abcdefghijklmnopqrstuvwxyz'.split('');
     radix = chars.length;
-    return ((function() {
+    return ((function () {
       var _i, _results;
       _results = [];
       for (i = _i = 0; 0 <= len ? _i < len : _i > len; i = 0 <= len ? ++_i : --_i) {
@@ -98,42 +100,42 @@ __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); };
 
   Hoodie.prototype.defer = $.Deferred;
 
-  Hoodie.prototype.isPromise = function(obj) {
+  Hoodie.prototype.isPromise = function (obj) {
     return typeof (obj !== null ? obj.done : void 0) === 'function' && typeof obj.resolve === 'undefined';
   };
 
-  Hoodie.prototype.resolve = function() {
+  Hoodie.prototype.resolve = function () {
     return this.defer().resolve().promise();
   };
 
-  Hoodie.prototype.reject = function() {
+  Hoodie.prototype.reject = function () {
     return this.defer().reject().promise();
   };
 
-  Hoodie.prototype.resolveWith = function() {
+  Hoodie.prototype.resolveWith = function () {
     var _ref;
     return (_ref = this.defer()).resolve.apply(_ref, arguments).promise();
   };
 
-  Hoodie.prototype.rejectWith = function() {
+  Hoodie.prototype.rejectWith = function () {
     var _ref;
     return (_ref = this.defer()).reject.apply(_ref, arguments).promise();
   };
 
-  Hoodie.prototype.dispose = function() {
+  Hoodie.prototype.dispose = function () {
     return this.trigger('dispose');
   };
 
-  Hoodie.extend = function(name, Module) {
+  Hoodie.extend = function (name, Module) {
     this._extensions || (this._extensions = {});
     return this._extensions[name] = Module;
   };
 
-  Hoodie.prototype.extend = function(name, Module) {
+  Hoodie.prototype.extend = function (name, Module) {
     return this[name] = new Module(this);
   };
 
-  Hoodie.prototype._loadExtensions = function() {
+  Hoodie.prototype._loadExtensions = function () {
     var Module, instanceName, _ref, _results;
     _ref = this.constructor._extensions;
     _results = [];
@@ -146,7 +148,7 @@ __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); };
     return _results;
   };
 
-  Hoodie.prototype._handleCheckConnectionSuccess = function(response) {
+  Hoodie.prototype._handleCheckConnectionSuccess = function (response) {
     this.checkConnectionInterval = 30000;
     window.setTimeout(this.checkConnection, this.checkConnectionInterval);
     if (!this.online) {
@@ -156,7 +158,7 @@ __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); };
     return this.defer().resolve();
   };
 
-  Hoodie.prototype._handleCheckConnectionError = function(response) {
+  Hoodie.prototype._handleCheckConnectionError = function (response) {
     this.checkConnectionInterval = 3000;
     window.setTimeout(this.checkConnection, this.checkConnectionInterval);
     if (this.online) {

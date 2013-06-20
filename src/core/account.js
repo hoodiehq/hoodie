@@ -76,7 +76,7 @@ Hoodie.Account = (function () {
     }
 
     sendAndHandleAuthRequest = function () {
-      return self.request('GET', "/_session").pipe(_this._handleAuthenticateRequestSuccess, _this._handleRequestError);
+      return self.request('GET', "/_session").pipe(self._handleAuthenticateRequestSuccess, _this._handleRequestError);
     };
 
     return this._withSingleRequest('authenticate', sendAndHandleAuthRequest);
@@ -84,7 +84,7 @@ Hoodie.Account = (function () {
 
   Account.prototype.signUp = function (username, password) {
     var options;
-    if (password == null) {
+    if (password === null) {
       password = '';
     }
     if (!username) {
@@ -112,7 +112,7 @@ Hoodie.Account = (function () {
         database: this.db(),
         updatedAt: this._now(),
         createdAt: this._now(),
-        signedUpAt: username !=== this.ownerHash ? this._now() : void 0
+        signedUpAt: username !== this.ownerHash ? this._now() : void 0
       }),
       contentType: 'application/json'
     };
@@ -144,24 +144,24 @@ Hoodie.Account = (function () {
     return this.hoodie.config.set(this._anonymousPasswordKey, password);
   };
 
-  Account.prototype.getAnonymousPassword = function (password) {
+  Account.prototype.getAnonymousPassword = function () {
     return this.hoodie.config.get(this._anonymousPasswordKey);
   };
 
-  Account.prototype.removeAnonymousPassword = function (password) {
+  Account.prototype.removeAnonymousPassword = function () {
     return this.hoodie.config.remove(this._anonymousPasswordKey);
   };
 
   Account.prototype.signIn = function (username, password) {
     var self = this;
-    if (username == null) {
+    if (username === null) {
       username = '';
     }
-    if (password == null) {
+    if (password === null) {
       password = '';
     }
     username = username.toLowerCase();
-    if (this.username !=== username) {
+    if (this.username !== username) {
       return this.signOut({
         silent: true
       }).pipe(function () {
@@ -176,7 +176,7 @@ Hoodie.Account = (function () {
 
   Account.prototype.signOut = function (options) {
     var self = this;
-    if (options == null) {
+    if (options === null) {
       options = {};
     }
     if (!this.hasAccount()) {
@@ -197,13 +197,14 @@ Hoodie.Account = (function () {
 
   Account.prototype.trigger = function () {
     var event, parameters, _ref;
-    event = arguments[0], parameters = 2 <= arguments.length ? __slice.call(arguments, 1) : [];
+    event = arguments[0],
+    parameters = 2 <= arguments.length ? __slice.call(arguments, 1) : [];
     return (_ref = this.hoodie).trigger.apply(_ref, ["account:" + event].concat(__slice.call(parameters)));
   };
 
   Account.prototype.request = function (type, path, options) {
     var _ref;
-    if (options == null) {
+    if (options === null) {
       options = {};
     }
     return (_ref = this.hoodie).request.apply(_ref, arguments);
@@ -215,7 +216,7 @@ Hoodie.Account = (function () {
 
   Account.prototype.fetch = function (username) {
     var self = this;
-    if (username == null) {
+    if (username === null) {
       username = this.username;
     }
     if (!username) {
@@ -225,7 +226,7 @@ Hoodie.Account = (function () {
       }).promise();
     }
     return this._withSingleRequest('fetch', function () {
-      return self.request('GET', _this._url(username)).pipe(null, _this._handleRequestError).done(function (response) {
+      return self.request('GET', self._url(username)).pipe(null, self._handleRequestError).done(function (response) {
         return self._doc = response;
       });
     });
@@ -265,7 +266,7 @@ Hoodie.Account = (function () {
       contentType: "application/json"
     };
     return this._withPreviousRequestsAborted('resetPassword', function () {
-      return self.request('PUT', "/_users/" + (encodeURIComponent(key)), options).pipe(null, _this._handleRequestError).done(_this._checkPasswordResetStatus);
+      return self.request('PUT', "/_users/" + (encodeURIComponent(key)), options).pipe(null, self._handleRequestError).done(_this._checkPasswordResetStatus);
     });
   };
 
@@ -427,7 +428,7 @@ Hoodie.Account = (function () {
       }
     };
     return this._withPreviousRequestsAborted('passwordResetStatus', function () {
-      return self.request('GET', url, options).pipe(_this._handlePasswordResetStatusRequestSuccess, _this._handlePasswordResetStatusRequestError).fail(function (error) {
+      return self.request('GET', url, options).pipe(self._handlePasswordResetStatusRequestSuccess, _this._handlePasswordResetStatusRequestError).fail(function (error) {
         if (error.error === 'pending') {
           window.setTimeout(self._checkPasswordResetStatus, 1000);
           return;
@@ -465,7 +466,7 @@ Hoodie.Account = (function () {
     return this._sendSignInRequest(this.username, currentPassword, {
       silent: true
     }).pipe(function () {
-      return self.fetch().pipe(_this._sendChangeUsernameAndPasswordRequest(currentPassword, newUsername, newPassword));
+      return self.fetch().pipe(self._sendChangeUsernameAndPasswordRequest(currentPassword, newUsername, newPassword));
     });
   };
 
@@ -484,7 +485,7 @@ Hoodie.Account = (function () {
     this.hoodie.remote.disconnect();
     this._doc._deleted = true;
     return this._withPreviousRequestsAborted('updateUsersDoc', function () {
-      return self.request('PUT', _this._url(), {
+      return self.request('PUT', self._url(), {
         data: JSON.stringify(self._doc),
         contentType: 'application/json'
       });
@@ -559,7 +560,7 @@ Hoodie.Account = (function () {
         contentType: 'application/json'
       };
       return self._withPreviousRequestsAborted('updateUsersDoc', function () {
-        return self.request('PUT', _this._url(), options).pipe(_this._handleChangeUsernameAndPasswordRequest(newUsername, newPassword || currentPassword), _this._handleRequestError);
+        return self.request('PUT', self._url(), options).pipe(_this._handleChangeUsernameAndPasswordRequest(newUsername, newPassword || currentPassword), _this._handleRequestError);
       });
     };
   };
@@ -573,7 +574,7 @@ Hoodie.Account = (function () {
           silent: true
         });
       } else {
-        return self.signIn(_this.username, newPassword);
+        return self.signIn(self.username, newPassword);
       }
     };
   };
@@ -585,7 +586,7 @@ Hoodie.Account = (function () {
         _ref.abort();
       }
     }
-    return this._requests[name] = requestfunction ();
+    return this._requests[name] = requestFunction();
   };
 
   Account.prototype._withSingleRequest = function (name, requestFunction) {
@@ -593,13 +594,13 @@ Hoodie.Account = (function () {
     if (((_ref = this._requests[name]) !== null ? typeof _ref.state === "function" ? _ref.state() : void 0 : void 0) === 'pending') {
       return this._requests[name];
     }
-    return this._requests[name] = requestfunction ();
+    return this._requests[name] = requestFunction();
   };
 
   Account.prototype._sendSignOutRequest = function () {
     var self = this;
     return this._withSingleRequest('signOut', function () {
-      return self.request('DELETE', '/_session').pipe(null, _this._handleRequestError);
+      return self.request('DELETE', '/_session').pipe(null, self._handleRequestError);
     });
   };
 
@@ -615,12 +616,12 @@ Hoodie.Account = (function () {
     return this._withPreviousRequestsAborted('signIn', function () {
       var promise;
       promise = self.request('POST', '/_session', requestOptions);
-      return promise.pipe(self._handleSignInSuccess(options), _this._handleRequestError);
+      return promise.pipe(self._handleSignInSuccess(options), self._handleRequestError);
     });
   };
 
   Account.prototype._now = function () {
-    return new Date;
+    return new Date();
   };
 
   return Account;
