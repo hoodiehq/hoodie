@@ -24,22 +24,14 @@ Hoodie = (function (Events) {
   function Hoodie(baseUrl) {
 
     this.baseUrl = baseUrl;
-<<<<<<< HEAD
     this.rejectWith = this.rejectWith(this);
-=======
     this._handleCheckConnectionError = this._handleCheckConnectionError.apply(this);
     this._handleCheckConnectionSuccess = this._handleCheckConnectionSuccess.apply(this);
     this.rejectWith = this.rejectWith.apply(this);
->>>>>>> cc35648461214c5d64c9bfa66c934cd28640cf4d
     this.resolveWith = this.resolveWith.apply(this);
     this.reject = this.reject.apply(this);
     this.resolve = this.resolve.apply(this);
     this.checkConnection = this.checkConnection.apply(this);
-<<<<<<< HEAD
-    this._handleCheckConnectionError = this._handleCheckConnectionError.apply(this);
-    this._handleCheckConnectionSuccess = this._handleCheckConnectionSuccess.apply(this);
-=======
->>>>>>> cc35648461214c5d64c9bfa66c934cd28640cf4d
 
     if (this.baseUrl) {
       this.baseUrl = this.baseUrl.replace(/\/+$/, '');
