@@ -144,9 +144,8 @@ Hoodie.Share = (function () {
 
   Share.prototype._filterShareOptions = function (options) {
     var filteredOptions, option, _i, _len, _ref;
-    if (options == null) {
-      options = {};
-    }
+    options = options || {};
+
     filteredOptions = {};
     _ref = this._allowedOptions;
     for (_i = 0, _len = _ref.length; _i < _len; _i++) {
@@ -159,9 +158,7 @@ Hoodie.Share = (function () {
   };
 
   Share.prototype._open = function (shareId, options) {
-    if (options === null) {
-      options = {};
-    }
+    options = options || {};
     $.extend(options, {
       id: shareId
     });
@@ -195,6 +192,7 @@ Hoodie.Share = (function () {
     var self = this;
     return this.pipe(function (objects) {
       var object, updateObject, _i, _len, _results;
+
       updateObject = function (object) {
         if (object.$sharedAt !== shareId) {
           return object;
@@ -204,6 +202,7 @@ Hoodie.Share = (function () {
         });
         return object;
       };
+
       if ($.isArray(objects)) {
         _results = [];
         for (_i = 0, _len = objects.length; _i < _len; _i++) {

@@ -44,9 +44,8 @@ Hoodie.Remote = (function(_super) {
 
   function Remote(hoodie, options) {
     this.hoodie = hoodie;
-    if (options == null) {
-      options = {};
-    }
+    options = options || {};
+
     this._handlePullResults = __bind(this._handlePullResults, this);
     this._handlePullError = __bind(this._handlePullError, this);
     this._handlePullSuccess = __bind(this._handlePullSuccess, this);
@@ -59,19 +58,25 @@ Hoodie.Remote = (function(_super) {
     this.pull = __bind(this.pull, this);
     this.disconnect = __bind(this.disconnect, this);
     this.connect = __bind(this.connect, this);
+
     if (options.name != null) {
       this.name = options.name;
     }
+
     if (options.prefix != null) {
       this.prefix = options.prefix;
     }
+
     if (options.connected != null) {
       this.connected = options.connected;
     }
+
     if (options.baseUrl != null) {
       this.baseUrl = options.baseUrl;
     }
+
     this._knownObjects = {};
+
     if (this.isConnected()) {
       this.connect();
     }
@@ -86,15 +91,16 @@ Hoodie.Remote = (function(_super) {
   Remote.prototype.prefix = '';
 
   Remote.prototype.request = function(type, path, options) {
-    if (options == null) {
-      options = {};
-    }
+    options = options || {};
+
     if (this.name) {
       path = "/" + (encodeURIComponent(this.name)) + path;
     }
+
     if (this.baseUrl) {
       path = "" + this.baseUrl + path;
     }
+
     options.contentType || (options.contentType = 'application/json');
     if (type === 'POST' || type === 'PUT') {
       options.dataType || (options.dataType = 'json');
@@ -134,17 +140,17 @@ Hoodie.Remote = (function(_super) {
     }
     path = "/_all_docs?include_docs=true";
     switch (true) {
-      case (type != null) && this.prefix !== '':
-        startkey = "" + this.prefix + type + "/";
-        break;
-      case type != null:
-        startkey = "" + type + "/";
-        break;
-      case this.prefix !== '':
-        startkey = this.prefix;
-        break;
-      default:
-        startkey = '';
+    case (type != null) && this.prefix !== '':
+      startkey = "" + this.prefix + type + "/";
+      break;
+    case type != null:
+      startkey = "" + type + "/";
+      break;
+    case this.prefix !== '':
+      startkey = this.prefix;
+      break;
+    default:
+      startkey = '';
     }
     if (startkey) {
       endkey = startkey.replace(/.$/, function(char) {
@@ -190,18 +196,18 @@ Hoodie.Remote = (function(_super) {
   };
 
   Remote.prototype.isKnownObject = function(object) {
-    var key;
-    key = "" + object.type + "/" + object.id;
-    return this._knownObjects[key] != null;
+    var key = "" + object.type + "/" + object.id;
+    this._knownObjects[key] != null;
+    return this._knownObjects[key];
   };
 
   Remote.prototype.markAsKnownObject = function(object) {
-    var key;
-    key = "" + object.type + "/" + object.id;
-    return this._knownObjects[key] = 1;
+    var key = "" + object.type + "/" + object.id;
+    this._knownObjects[key] = 1;
+    return this._knownObjects[key];
   };
 
-  Remote.prototype.connect = function(options) {
+  Remote.prototype.connect = function() {
     this.connected = true;
     return this.pull();
   };
@@ -224,7 +230,8 @@ Hoodie.Remote = (function(_super) {
   };
 
   Remote.prototype.setSinceNr = function(seq) {
-    return this._since = seq;
+    this._since = seq;
+    return this._since;
   };
 
   Remote.prototype.pull = function() {
@@ -300,12 +307,19 @@ Hoodie.Remote = (function(_super) {
 
   Remote.prototype._parseFromRemote = function(object) {
     var id, ignore, _ref;
+
     id = object._id || object.id;
+
     delete object._id;
+
     if (this.prefix) {
-      id = id.replace(RegExp('^' + this.prefix), '');
+      id = id.replace(new RegExp('^' + this.prefix), '');
     }
-    _ref = id.match(/([^\/]+)\/(.*)/), ignore = _ref[0], object.type = _ref[1], object.id = _ref[2];
+    _ref = id.match(/([^\/]+)\/(.*)/),
+    ignore = _ref[0],
+    object.type = _ref[1],
+    object.id = _ref[2];
+
     return object;
   };
 
@@ -322,7 +336,9 @@ Hoodie.Remote = (function(_super) {
   Remote.prototype._addRevisionTo = function(attributes) {
     var currentRevId, currentRevNr, newRevisionId, _ref;
     try {
-      _ref = attributes._rev.split(/-/), currentRevNr = _ref[0], currentRevId = _ref[1];
+      _ref = attributes._rev.split(/-/),
+      currentRevNr = _ref[0],
+      currentRevId = _ref[1];
     } catch (_error) {}
     currentRevNr = parseInt(currentRevNr, 10) || 0;
     newRevisionId = this._generateNewRevisionId();
@@ -438,15 +454,18 @@ Hoodie.Remote = (function(_super) {
 })(Hoodie.Store);
 
 ConnectionError = (function(_super) {
-  __extends(ConnectionError, _super);
 
-  ConnectionError.prototype.name = "ConnectionError";
+  'use strict';
 
   function ConnectionError(message, data) {
     this.message = message;
     this.data = data;
     ConnectionError.__super__.constructor.apply(this, arguments);
   }
+
+  __extends(ConnectionError, _super);
+
+  ConnectionError.prototype.name = "ConnectionError";
 
   return ConnectionError;
 

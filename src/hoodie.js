@@ -2,6 +2,8 @@ var Hoodie;
 
 Hoodie = (function(_super) {
 
+  'use strict';
+
   function Hoodie(baseUrl) {
     this.baseUrl = baseUrl;
     this._handleCheckConnectionError = __bind(this._handleCheckConnectionError, this);
@@ -11,11 +13,9 @@ Hoodie = (function(_super) {
     this.reject = __bind(this.reject, this);
     this.resolve = __bind(this.resolve, this);
     this.checkConnection = __bind(this.checkConnection, this);
-    if (this.baseUrl) {
-      this.baseUrl = this.baseUrl.replace(/\/+$/, '');
-    } else {
-      this.baseUrl = "/_api";
-    }
+
+    this.baseUrl = this.baseUrl ? this.baseUrl.replace(/\/+$/, '') : "/_api";
+
     this.store = new this.constructor.LocalStore(this);
     this.config = new this.constructor.Config(this);
     this.account = new this.constructor.Account(this);
@@ -32,10 +32,7 @@ Hoodie = (function(_super) {
 
   Hoodie.prototype.request = function(type, url, options) {
     var defaults;
-
-    if (options === null) {
-      options = {};
-    }
+    options = options || {};
 
     if (!/^http/.test(url)) {
       url = "" + this.baseUrl + url;
@@ -67,9 +64,7 @@ Hoodie = (function(_super) {
   };
 
   Hoodie.prototype.open = function(storeName, options) {
-    if (options == null) {
-      options = {};
-    }
+    options = options || {};
     $.extend(options, {
       name: storeName
     });

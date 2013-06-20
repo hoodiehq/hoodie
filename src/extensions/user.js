@@ -10,6 +10,9 @@
 //
 
 Hoodie.User = (function() {
+
+  'use strict';
+
   function User(hoodie) {
     this.hoodie = hoodie;
     this.api = __bind(this.api, this);
@@ -21,9 +24,7 @@ Hoodie.User = (function() {
   }
 
   User.prototype.api = function(userHash, options) {
-    if (options == null) {
-      options = {};
-    }
+    options = options || {};
     $.extend(options, {
       prefix: '$public'
     });

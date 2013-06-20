@@ -4,9 +4,7 @@ Hoodie.AccountRemote = (function(_super) {
 
   function AccountRemote(hoodie, options) {
     this.hoodie = hoodie;
-    if (options == null) {
-      options = {};
-    }
+    options = options || {};
     this._handleSignIn = __bind(this._handleSignIn, this);
     this._connect = __bind(this._connect, this);
     this.push = __bind(this.push, this);
@@ -42,7 +40,10 @@ Hoodie.AccountRemote = (function(_super) {
     _results = [];
     for (_i = 0, _len = _ref.length; _i < _len; _i++) {
       key = _ref[_i];
-      _ref1 = key.split(/\//), type = _ref1[0], id = _ref1[1];
+      _ref1 = key.split(/\//),
+      type = _ref1[0],
+      id = _ref1[1];
+
       _results.push(this.markAsKnownObject({
         type: type,
         id: id
@@ -51,7 +52,7 @@ Hoodie.AccountRemote = (function(_super) {
     return _results;
   };
 
-  AccountRemote.prototype.getSinceNr = function(since) {
+  AccountRemote.prototype.getSinceNr = function() {
     return this.hoodie.config.get('_remote.since') || 0;
   };
 

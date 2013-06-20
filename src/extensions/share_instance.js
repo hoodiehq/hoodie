@@ -23,15 +23,17 @@ Hoodie.ShareInstance = (function(_super) {
 
   function ShareInstance(hoodie, options) {
     this.hoodie = hoodie;
-    if (options == null) {
-      options = {};
-    }
+
+    options = options || {};
+
     this._handleSecurityResponse = __bind(this._handleSecurityResponse, this);
     this._objectBelongsToMe = __bind(this._objectBelongsToMe, this);
     this.id = options.id || this.hoodie.uuid();
     this.name = "share/" + this.id;
     this.prefix = this.name;
+
     $.extend(this, options);
+
     ShareInstance.__super__.constructor.apply(this, arguments);
   }
 
@@ -53,12 +55,15 @@ Hoodie.ShareInstance = (function(_super) {
 
   ShareInstance.prototype.grantReadAccess = function(users) {
     var currentUsers, user, _i, _len;
+
     if (this.access === true || this.access.read === true) {
       return this.hoodie.resolveWith(this);
     }
+
     if (typeof users === 'string') {
       users = [users];
     }
+
     if (this.access === false || this.access.read === false) {
       if (this.access.read != null) {
         this.access.read = users || true;
@@ -66,6 +71,7 @@ Hoodie.ShareInstance = (function(_super) {
         this.access = users || true;
       }
     }
+
     if (users) {
       currentUsers = this.access.read || this.access;
       for (_i = 0, _len = users.length; _i < _len; _i++) {

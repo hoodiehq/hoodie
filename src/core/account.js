@@ -90,23 +90,29 @@ Hoodie.Account = (function () {
 
   Account.prototype.signUp = function(username, password) {
     var options;
+
     if (password == null) {
       password = '';
     }
+
     if (!username) {
       return this.hoodie.defer().reject({
         error: 'username must be set'
       }).promise();
     }
+
     if (this.hasAnonymousAccount()) {
       return this._upgradeAnonymousAccount(username, password);
     }
+
     if (this.hasAccount()) {
       return this.hoodie.defer().reject({
         error: 'you have to sign out first'
       }).promise();
     }
+
     username = username.toLowerCase();
+
     options = {
       data: JSON.stringify({
         _id: this._key(username),
@@ -126,10 +132,11 @@ Hoodie.Account = (function () {
   };
 
   Account.prototype.anonymousSignUp = function() {
-    var password, username,
-      self = this;
+    var password, username, self = this;
+
     password = this.hoodie.uuid(10);
     username = this.ownerHash;
+
     return this.signUp(username, password).done(function() {
       self.setAnonymousPassword(password);
       return self.trigger('signup:anonymous', username);
@@ -150,11 +157,11 @@ Hoodie.Account = (function () {
     return this.hoodie.config.set(this._anonymousPasswordKey, password);
   };
 
-  Account.prototype.getAnonymousPassword = function(password) {
+  Account.prototype.getAnonymousPassword = function() {
     return this.hoodie.config.get(this._anonymousPasswordKey);
   };
 
-  Account.prototype.removeAnonymousPassword = function(password) {
+  Account.prototype.removeAnonymousPassword = function() {
     return this.hoodie.config.remove(this._anonymousPasswordKey);
   };
 
@@ -164,10 +171,13 @@ Hoodie.Account = (function () {
     if (username === null) {
       username = '';
     }
+
     if (password == null) {
       password = '';
     }
+
     username = username.toLowerCase();
+
     if (this.username !== username) {
       return this.signOut({
         silent: true
@@ -183,9 +193,8 @@ Hoodie.Account = (function () {
 
   Account.prototype.signOut = function(options) {
     var self = this;
-    if (options == null) {
-      options = {};
-    }
+    options = options || {};
+
     if (!this.hasAccount()) {
       return this._cleanup().then(function() {
         if (!options.silent) {
@@ -205,17 +214,15 @@ Hoodie.Account = (function () {
   Account.prototype.trigger = function() {
     var event, parameters, _ref;
 
-    event = arguments[0], parameters = 2 <= arguments.length ? Array.prototype.slice.call(arguments, 1) : [];
+    event = arguments[0],
+    parameters = 2 <= arguments.length ? Array.prototype.slice.call(arguments, 1) : [];
 
     return this.hoodie.trigger.apply(_ref, ["account:" + event].concat(Array.prototype.slice.call(parameters)));
   };
 
   Account.prototype.request = function(type, path, options) {
-    var _ref;
-    if (options == null) {
-      options = {};
-    }
-    return (_ref = this.hoodie).request.apply(_ref, arguments);
+    options = options || {};
+    return this.hoodie.request.apply(this, arguments);
   };
 
   Account.prototype.db = function() {
@@ -224,9 +231,11 @@ Hoodie.Account = (function () {
 
   Account.prototype.fetch = function(username) {
     var self = this;
+
     if (username == null) {
       username = this.username;
     }
+
     if (!username) {
       return this.hoodie.defer().reject({
         error: "unauthenticated",
@@ -235,7 +244,8 @@ Hoodie.Account = (function () {
     }
     return this._withSingleRequest('fetch', function() {
       return self.request('GET', self._url(username)).pipe(null, self._handleRequestError).done(function(response) {
-        return self._doc = response;
+        self._doc = response;
+        return self._doc;
       });
     });
   };
@@ -252,11 +262,13 @@ Hoodie.Account = (function () {
   };
 
   Account.prototype.resetPassword = function(username) {
-    var data, key, options, resetPasswordId,
-      self = this;
-    if (resetPasswordId = this.hoodie.config.get('_account.resetPasswordId')) {
+    var data, key, options, resetPasswordId, self = this;
+    resetPasswordId = this.hoodie.config.get('_account.resetPasswordId');
+
+    if (resetPasswordId) {
       return this._checkPasswordResetStatus();
     }
+
     resetPasswordId = "" + username + "/" + (this.hoodie.uuid());
     this.hoodie.config.set('_account.resetPasswordId', resetPasswordId);
     key = "" + this._prefix + ":$passwordReset/" + resetPasswordId;
@@ -279,9 +291,7 @@ Hoodie.Account = (function () {
   };
 
   Account.prototype.changeUsername = function(currentPassword, newUsername) {
-    if (newUsername == null) {
-      newUsername = '';
-    }
+    newUsername = newUsername || '';
     return this._changeUsernameAndPassword(currentPassword, newUsername.toLowerCase());
   };
 
@@ -303,11 +313,14 @@ Hoodie.Account = (function () {
   };
 
   Account.prototype._setOwner = function(ownerHash) {
+
     if (ownerHash === this.ownerHash) {
       return;
     }
+
     this.ownerHash = ownerHash;
     this.hoodie.config.set('createdBy', this.ownerHash);
+
     return this.hoodie.config.set('_account.ownerHash', this.ownerHash);
   };
 
@@ -318,10 +331,12 @@ Hoodie.Account = (function () {
       this._setOwner(response.userCtx.roles[0]);
       return this.hoodie.defer().resolve(this.username).promise();
     }
+
     if (this.hasAnonymousAccount()) {
       this.signIn(this.username, this.getAnonymousPassword());
       return;
     }
+
     this._authenticated = false;
     this.trigger('error:unauthenticated');
     return this.hoodie.defer().reject().promise();
@@ -329,13 +344,15 @@ Hoodie.Account = (function () {
 
   Account.prototype._handleRequestError = function(error) {
     var e, xhr;
-    if (error == null) {
-      error = {};
-    }
+
+    error = error || {};
+
     if (error.reason) {
       return this.hoodie.defer().reject(error).promise();
     }
+
     xhr = error;
+
     try {
       error = JSON.parse(xhr.responseText);
     } catch (_error) {
@@ -361,7 +378,7 @@ Hoodie.Account = (function () {
     if (!defer) {
       defer = this.hoodie.defer();
     }
-    window.setTimeout((function() {
+    window.setTimeout(function() {
       var promise;
       promise = self._sendSignInRequest(username, password);
       promise.done(defer.resolve);
@@ -372,19 +389,20 @@ Hoodie.Account = (function () {
           return defer.reject.apply(defer, arguments);
         }
       });
-    }), 300);
+    }, 300);
     return defer.promise();
   };
 
   Account.prototype._handleSignInSuccess = function(options) {
     var self = this;
-    if (options == null) {
-      options = {};
-    }
+    options = options || {};
+
     return function(response) {
       var defer, username;
+
       defer = self.hoodie.defer();
       username = response.name.replace(/^user(_anonymous)?\//, '');
+
       if (~response.roles.indexOf("error")) {
         self.fetch(username).fail(defer.reject).done(function() {
           return defer.reject({
@@ -394,15 +412,18 @@ Hoodie.Account = (function () {
         });
         return defer.promise();
       }
+
       if (!~response.roles.indexOf("confirmed")) {
         return defer.reject({
           error: "unconfirmed",
           reason: "account has not been confirmed yet"
         });
       }
+
       self._setUsername(username);
       self._setOwner(response.roles[0]);
       self._authenticated = true;
+
       if (!(options.silent || options.reauthenticated)) {
         if (self.hasAnonymousAccount()) {
           self.trigger('signin:anonymous', username);
@@ -419,22 +440,26 @@ Hoodie.Account = (function () {
   };
 
   Account.prototype._checkPasswordResetStatus = function() {
-    var hash, options, resetPasswordId, url, username,
-      self = this;
+    var hash, options, resetPasswordId, url, username, self = this;
+
     resetPasswordId = this.hoodie.config.get('_account.resetPasswordId');
+
     if (!resetPasswordId) {
       return this.hoodie.defer().reject({
         error: "missing"
       }).promise();
     }
+
     username = "$passwordReset/" + resetPasswordId;
     url = "/_users/" + (encodeURIComponent("" + this._prefix + ":" + username));
     hash = btoa("" + username + ":" + resetPasswordId);
+
     options = {
       headers: {
         Authorization: "Basic " + hash
       }
     };
+
     return this._withPreviousRequestsAborted('passwordResetStatus', function() {
       return self.request('GET', url, options).pipe(self._handlePasswordResetStatusRequestSuccess, self._handlePasswordResetStatusRequestError).fail(function(error) {
         if (error.error === 'pending') {
@@ -448,7 +473,9 @@ Hoodie.Account = (function () {
 
   Account.prototype._handlePasswordResetStatusRequestSuccess = function(response) {
     var defer;
+
     defer = this.hoodie.defer();
+
     if (response.$error) {
       defer.reject(response.$error);
     } else {
@@ -463,6 +490,7 @@ Hoodie.Account = (function () {
     if (xhr.status === 401) {
       this.hoodie.config.remove('_account.resetPasswordId');
       this.trigger('passwordreset');
+
       return this.hoodie.defer().resolve();
     } else {
       return this._handleRequestError(xhr);
@@ -479,21 +507,23 @@ Hoodie.Account = (function () {
   };
 
   Account.prototype._upgradeAnonymousAccount = function(username, password) {
-    var currentPassword,
-      self = this;
+    var currentPassword, self = this;
     currentPassword = this.getAnonymousPassword();
+
     return this._changeUsernameAndPassword(currentPassword, username, password).done(function() {
       self.trigger('signup', username);
-      return self.removeAnonymousPassword();
+      self.removeAnonymousPassword();
     });
   };
 
   Account.prototype._handleFetchBeforeDestroySucces = function() {
     var self = this;
+
     this.hoodie.remote.disconnect();
     this._doc._deleted = true;
+
     return this._withPreviousRequestsAborted('updateUsersDoc', function() {
-      return self.request('PUT', self._url(), {
+      self.request('PUT', self._url(), {
         data: JSON.stringify(self._doc),
         contentType: 'application/json'
       });
@@ -509,14 +539,14 @@ Hoodie.Account = (function () {
   };
 
   Account.prototype._cleanup = function(options) {
-    if (options == null) {
-      options = {};
-    }
+    options = options || {};
+
     this.trigger('cleanup');
     this._authenticated = options.authenticated;
     this.hoodie.config.clear();
     this._setUsername(options.username);
     this._setOwner(options.ownerHash || this.hoodie.uuid());
+
     return this.hoodie.defer().resolve().promise();
   };
 
@@ -538,9 +568,7 @@ Hoodie.Account = (function () {
   };
 
   Account.prototype._key = function(username) {
-    if (username == null) {
-      username = this.username;
-    }
+    username = username || this.username
     return "" + this._prefix + ":" + (this._userKey(username));
   };
 
@@ -550,26 +578,34 @@ Hoodie.Account = (function () {
 
   Account.prototype._sendChangeUsernameAndPasswordRequest = function(currentPassword, newUsername, newPassword) {
     var self = this;
+
     return function() {
       var data, options;
+
       data = $.extend({}, self._doc);
+
       if (newUsername) {
         data.$newUsername = newUsername;
       }
+
       data.updatedAt = self._now();
       data.signedUpAt = data.signedUpAt || self._now();
-      if (newPassword != null) {
+
+      if (newPassword !== null) {
         delete data.salt;
         delete data.password_sha;
         data.password = newPassword;
       }
+
       options = {
         data: JSON.stringify(data),
         contentType: 'application/json'
       };
+
       return self._withPreviousRequestsAborted('updateUsersDoc', function() {
         return self.request('PUT', self._url(), options).pipe(self._handleChangeUsernameAndPasswordRequest(newUsername, newPassword || currentPassword), self._handleRequestError);
       });
+
     };
   };
 
