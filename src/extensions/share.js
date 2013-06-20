@@ -146,7 +146,7 @@ Hoodie.Share = (function () {
 
   Share.prototype._filterShareOptions = function (options) {
     var filteredOptions, option, _i, _len, _ref;
-    if (options === null) {
+    if (options == null) {
       options = {};
     }
     filteredOptions = {};
