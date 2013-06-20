@@ -25,6 +25,7 @@ module.exports = function(grunt) {
         dest: 'dist/<%= pkg.name %>.js'
       }
     },
+
     uglify: {
       options: {
         banner: '/*! <%= pkg.name %> <%= grunt.template.today("dd-mm-yyyy") %> */\n'
@@ -35,15 +36,17 @@ module.exports = function(grunt) {
         }
       }
     },
+
     jshint: {
       files: ['gruntfile.js', 'src/**/*.js', 'test/**/*.js'],
       options: {
         jshintrc: '.jshintrc'
       }
     },
+
     watch: {
       files: ['<%= jshint.files %>'],
-      tasks: ['jshint', 'qunit']
+      tasks: ['concat']
     },
     groc: {
       javascript: [
