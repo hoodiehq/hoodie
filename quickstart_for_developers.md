@@ -14,12 +14,8 @@ That's all you need. Make your changes, run the test, send a pull request, win k
   grunt concat               # Build lib/
   grunt watch                # Build lib/ and watch for changes
   grunt test                 # Run all test
-  grunt autotest             # Run all tests & rerun on file changes
-  grunt console              # run a browser console, from command line, hell yeah
   grunt build                # build hoodie.min.js
   grunt docs                 # create docs from code
-  grunt wishlist             # create docs from dream code
-  grunt all                  # one cake to rule them all
 ```
 
 

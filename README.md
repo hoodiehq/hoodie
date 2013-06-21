@@ -15,7 +15,9 @@ It gives you
 And this is what it looks like:
 
 ```javascript
+  //
   // user authentication & more
+  //
   hoodie.account.signUp('joe@example.com', 'secret')
   hoodie.account.signIn('joe@example.com', 'secret')
   hoodie.account.changePassword('secret', 'new_secret')
@@ -23,7 +25,9 @@ And this is what it looks like:
   hoodie.account.signOut()
   hoodie.account.resetPassword('joe@example.com')
 
+  //
   // store data (it will sync to whereever your users sign in)
+  //
   hoodie.store.add('task', {title: 'build sweetMasterApp tomorrow.'})
   hoodie.store.findAll('task')
   hoodie.store.update('task', '123', {done: true})
@@ -33,7 +37,9 @@ And this is what it looks like:
     alert('new Task added: ' + object.task)
   })
 
+  //
   // publish & share data
+  //
   hoodie.store.findAll('task').publish()
   hoodie.user( username ).findAll()
 
@@ -41,16 +47,20 @@ And this is what it looks like:
   hoodie.share(shareId).findAll()
   hoodie.share(shareId).subscribe()
 
+  //
   // sending emails … yep.
+  //
   var magic = hoodie.email.send({
     to      : ['susan@example.com'],
     cc      : ['bill@example.com'],
     subject : 'rule the world',
     body    : 'we can do it!\nSigned, Joe'
   })
+
   magic.done( function(mail) {
     alert('Mail has been sent to ' + mail.to)
   })
+
   magic.fail( function(eror) {
     alert('Sory, but something went wrong: ' + error.reason)
   })
@@ -69,11 +79,11 @@ It's magic, stupid!™
 Every app gets its own hoodie. You need to set one up, because that's `whereTheMagicHappens`:
 
 ```html
-<script src="hoodie.js"></script>
-<script>
-  whereTheMagicHappens = 'https://yourapp.hood.ie';
-  hoodie = new Hoodie(whereTheMagicHappens);
-</script>
+  <script src="hoodie.js"></script>
+  <script>
+    whereTheMagicHappens = 'https://yourapp.hood.ie';
+    hoodie = new Hoodie(whereTheMagicHappens);
+  </script>
 ```
 
 You can get a hoodie for your app with only a few clicks over on [hood.ie](http://hood.ie).
