@@ -80,7 +80,6 @@ window.Hoodie = window.Hoodie || (function(_super) {
     };
 
     return $.ajax($.extend(defaults, options));
-
   };
 
   // ## Check Connection
@@ -102,11 +101,10 @@ window.Hoodie = window.Hoodie || (function(_super) {
   //
   Hoodie.prototype._checkConnectionRequest = null;
   Hoodie.prototype.checkConnection = function() {
-    var _ref;
-
-    if (((_ref = this._checkConnectionRequest) !== null ? typeof _ref.state === "function" ? _ref.state() : null : null) === 'pending') {
+    if (this._checkConnectionRequest && this._checkConnectionRequest.state() === 'pending') {
       return this._checkConnectionRequest;
     }
+
     this._checkConnectionRequest = this.request('GET', '/').pipe(this._handleCheckConnectionSuccess, this._handleCheckConnectionError);
     return this._checkConnectionRequest;
   };
@@ -177,9 +175,12 @@ window.Hoodie = window.Hoodie || (function(_super) {
   //
   Hoodie.prototype.defer = $.Deferred;
 
-  //
-  Hoodie.prototype.isPromise = function(obj) {
-    return typeof (obj !== undefined ? obj.done : null) === 'function' && typeof obj.resolve === 'undefined';
+  // returns true if passed object is a promise (but not a deferred),
+  // otherwise false.
+  Hoodie.prototype.isPromise = function(object) {
+    return !! (object &&
+               typeof object.done === 'function' &&
+               typeof object.resolve !== 'undefined');
   };
 
   //
@@ -194,14 +195,14 @@ window.Hoodie = window.Hoodie || (function(_super) {
 
   //
   Hoodie.prototype.resolveWith = function() {
-    var _ref;
-    return (_ref = this.defer()).resolve.apply(_ref, arguments).promise();
+    var defer = this.defer();
+    return defer.resolve.apply(defer, arguments).promise();
   };
 
   //
   Hoodie.prototype.rejectWith = function() {
-    var _ref;
-    return (_ref = this.defer()).reject.apply(_ref, arguments).promise();
+    var defer = this.defer();
+    return defer.reject.apply(defer, arguments).promise();
   };
 
 
@@ -212,7 +213,7 @@ window.Hoodie = window.Hoodie || (function(_super) {
   // be disposed using this method. A `dispose` event
   // gets triggered that the modules react on.
   Hoodie.prototype.dispose = function() {
-    return this.trigger('dispose');
+    this.trigger('dispose');
   };
 
 
@@ -226,15 +227,13 @@ window.Hoodie = window.Hoodie || (function(_super) {
   //     hoodie.extend('magic2', function(hoodie) { /* ... */ })
   //     hoodie.magic1.doSomething()
   //     hoodie.magic2.doSomethingElse()
+  // 
   Hoodie.extend = function(name, Module) {
     this._extensions = this._extensions || {};
     this._extensions[name] = Module;
-
-    return this._extensions[name];
   };
   Hoodie.prototype.extend = function(name, Module) {
     this[name] = new Module(this);
-    return this[name];
   };
 
 
@@ -242,18 +241,16 @@ window.Hoodie = window.Hoodie || (function(_super) {
 
   //
   Hoodie.prototype._loadExtensions = function() {
-    var Module, instanceName, _ref, _results;
-    _ref = this.constructor._extensions;
-    _results = [];
+    var Module, instanceName, extensions;
 
-    for (instanceName in _ref) {
-      if (_ref.hasOwnProperty(instanceName)) {
-        Module = _ref[instanceName];
-        _results.push(this[instanceName] = new Module(this));
+    extensions = this.constructor._extensions;
+
+    for (instanceName in extensions) {
+      if (extensions.hasOwnProperty(instanceName)) {
+        Module = extensions[instanceName];
+        this[instanceName] = new Module(this);
       }
-
     }
-    return _results;
   };
 
   //
