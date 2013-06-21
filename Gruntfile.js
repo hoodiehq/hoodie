@@ -7,6 +7,19 @@ module.exports = function(grunt) {
 
   grunt.initConfig({
     pkg: grunt.file.readJSON('package.json'),
+
+    jshint: {
+      files: ['gruntfile.js', 'src/**/*.js'],
+      options: {
+        jshintrc: '.jshintrc'
+      }
+    },
+
+    watch: {
+      files: ['<%= jshint.files %>'],
+      tasks: ['concat']
+    },
+
     concat: {
       options: {
         banner: banner
@@ -44,18 +57,6 @@ module.exports = function(grunt) {
       }
     },
 
-    jshint: {
-      files: ['gruntfile.js', 'src/**/*.js', 'test/**/*.js'],
-      options: {
-        jshintrc: '.jshintrc'
-      }
-    },
-
-    watch: {
-      files: ['<%= jshint.files %>'],
-      tasks: ['concat']
-    },
-
     groc: {
       javascript: [
         "src/**/*.js"
@@ -63,7 +64,15 @@ module.exports = function(grunt) {
       options: {
         "out": "docs/"
       }
+    },
+
+    shell: {
+      test: {
+        command: 'node node_modules/testem/testem.js ci',
+        stdout: true
+      }
     }
+
   });
 
   grunt.loadNpmTasks('grunt-contrib-uglify');
@@ -71,7 +80,9 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-contrib-watch');
   grunt.loadNpmTasks('grunt-contrib-concat');
   grunt.loadNpmTasks('grunt-groc');
+  grunt.loadNpmTasks('grunt-shell');
 
   grunt.registerTask('default', ['jshint', 'concat', 'uglify']);
+  grunt.registerTask('build', ['jshint', 'concat', 'uglify']);
   grunt.registerTask('docs', ['groc']);
 };
