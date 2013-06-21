@@ -46,7 +46,7 @@ Hoodie.Account = (function () {
 
   // Properties
   // ------------
-  Account.prototype.username = null;
+  Account.prototype.username = undefined;
 
   Account.prototype.init = function() {
     this.username = this.hoodie.config.get('_account.username');
@@ -425,7 +425,7 @@ Hoodie.Account = (function () {
         return defer.promise();
       }
 
-      if (!~response.roles.indexOf("confirmed")) {
+      if (response.roles.indexOf("confirmed") === -1) {
         return defer.reject({
           error: "unconfirmed",
           reason: "account has not been confirmed yet"

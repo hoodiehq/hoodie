@@ -61,16 +61,18 @@ Hoodie.AccountRemote = (function(_super) {
   };
 
   AccountRemote.prototype.push = function(objects) {
-    var error, promise;
     if (!this.isConnected()) {
-      error = new ConnectionError("Not connected: could not push local changes to remote");
+      var error = new window.ConnectionError("Not connected: could not push local changes to remote");
       return this.hoodie.rejectWith(error);
     }
+
     if (!$.isArray(objects)) {
       objects = this.hoodie.store.changedObjects();
     }
-    promise = AccountRemote.__super__.push.call(this, objects);
+
+    var promise = AccountRemote.__super__.push.call(this, objects);
     promise.fail(this.hoodie.checkConnection);
+
     return promise;
   };
 

@@ -74,27 +74,23 @@ Hoodie.ShareInstance = (function(_super) {
 
     if (users) {
       currentUsers = this.access.read || this.access;
+
       for (_i = 0, _len = users.length; _i < _len; _i++) {
         user = users[_i];
         if (currentUsers.indexOf(user) === -1) {
           currentUsers.push(user);
         }
       }
-      if (this.access.read !== undefined) {
-        this.access.read = currentUsers;
-      } else {
-        this.access = currentUsers;
-      }
+
+      this.access.read !== undefined ? this.access.read = currentUsers : this.access = currentUsers;
     } else {
-      if (this.access.read !== undefined) {
-        this.access.read = true;
-      } else {
-        this.access = true;
-      }
+      this.access.read !== undefined ? this.access.read = true : this.access = true;
     }
+
     return this.hoodie.share.update(this.id, {
       access: this.access
     });
+
   };
 
   ShareInstance.prototype.revokeReadAccess = function(users) {
