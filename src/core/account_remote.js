@@ -2,14 +2,14 @@
 // ===============
 
 // Connection / Socket to our couch
-//
+// 
 // AccountRemote is using CouchDB's `_changes` feed to
 // listen to changes and `_bulk_docs` to push local changes
-//
+// 
 // When hoodie.remote is continuously syncing (default),
 // it will continuously  synchronize with local store,
 // otherwise sync, pull or push can be called manually
-//
+// 
 Hoodie.AccountRemote = (function(_super) {
 
   'use strict';
@@ -50,9 +50,9 @@ Hoodie.AccountRemote = (function(_super) {
 
   // Connect
   // ---------
-  //
+  // 
   // do not start to connect immediately, but authenticate beforehand
-  //
+  // 
   AccountRemote.prototype.connect = function() {
     return this.hoodie.account.authenticate().pipe(this._connect);
   };
@@ -60,8 +60,8 @@ Hoodie.AccountRemote = (function(_super) {
 
   // disconnect
   // ------------
-  //
-  //
+  // 
+  // 
   AccountRemote.prototype.disconnect = function() {
     this.hoodie.unbind('store:idle', this.push);
     return AccountRemote.__super__.disconnect.apply(this, arguments);
@@ -70,8 +70,8 @@ Hoodie.AccountRemote = (function(_super) {
 
   // bootstrapKnownObjects
   // -----------------------
-  //
-  //
+  // 
+  // 
   AccountRemote.prototype.bootstrapKnownObjects = function() {
     var id, key, type, _i, _len, _ref, _ref1, _results = [];
     _ref = this.hoodie.store.index();
@@ -95,7 +95,7 @@ Hoodie.AccountRemote = (function(_super) {
   // ----------------------
   // we store the last since number from the current user's store
   // in his config
-  //
+  // 
   AccountRemote.prototype.getSinceNr = function() {
     return this.hoodie.config.get('_remote.since') || 0;
   };
@@ -107,10 +107,10 @@ Hoodie.AccountRemote = (function(_super) {
 
   // push
   // ------
-  //
+  // 
   // if no objects passed to be pushed, we default to
   // changed objects in user's local store
-  //
+  // 
   AccountRemote.prototype.push = function(objects) {
     if (!this.isConnected()) {
       var error = new window.ConnectionError("Not connected: could not push local changes to remote");
@@ -130,9 +130,9 @@ Hoodie.AccountRemote = (function(_super) {
 
   // Events
   // --------
-  //
+  // 
   // namespaced alias for `hoodie.on`
-  //
+  // 
   AccountRemote.prototype.on = function(event, cb) {
     event = event.replace(/(^| )([^ ]+)/g, "$1remote:$2");
     return this.hoodie.on(event, cb);
@@ -144,9 +144,9 @@ Hoodie.AccountRemote = (function(_super) {
   };
 
 
-  //
+  // 
   // namespaced alias for `hoodie.trigger`
-  //
+  // 
   AccountRemote.prototype.trigger = function() {
     var event, parameters, _ref;
 
@@ -157,7 +157,7 @@ Hoodie.AccountRemote = (function(_super) {
   };
 
 
-  //
+  // 
   AccountRemote.prototype._connect = function() {
     this.connected = true;
     this.hoodie.on('store:idle', this.push);
@@ -165,7 +165,7 @@ Hoodie.AccountRemote = (function(_super) {
   };
 
 
-  //
+  // 
   AccountRemote.prototype._handleSignIn = function() {
     this.name = this.hoodie.account.db();
     return this._connect();

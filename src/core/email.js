@@ -1,6 +1,6 @@
-//
+// 
 // Sending emails. Not unicorns
-//
+// 
 
 Hoodie.Email = (function () {
 
@@ -11,18 +11,18 @@ Hoodie.Email = (function () {
     // TODO
     // let's subscribe to general `_email` changes and provide
     // an `on` interface, so devs can listen to events like:
-    //
+    // 
     // * hoodie.email.on 'sent',  -> ...
     // * hoodie.email.on 'error', -> ...
-    //
+    // 
     this.hoodie = hoodie;
     this._handleEmailUpdate = this._handleEmailUpdate;
   }
 
   // ## send
-  //
+  // 
   // sends an email and returns a promise
-  //
+  // 
   Email.prototype.send = function (emailAttributes) {
     var attributes, defer, self = this;
 
@@ -45,9 +45,9 @@ Hoodie.Email = (function () {
     return defer.promise();
   };
 
-  //
+  // 
   // ## PRIVATE
-  //
+  // 
 
   Email.prototype._isValidEmail = function (email) {
     if (email === null) {

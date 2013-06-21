@@ -1,8 +1,8 @@
 // Hoodie
 // --------
-//
+// 
 // the door to world domination (apps)
-//
+// 
 
 window.Hoodie = window.Hoodie || (function(_super) {
 
@@ -14,10 +14,10 @@ window.Hoodie = window.Hoodie || (function(_super) {
   // can be passed. That's the URL of a hoodie backend.
   // If no URL passed it defaults to the current domain
   // with an `api` subdomain.
-  //
+  // 
   //     // init a new hoodie instance
   //     hoodie = new Hoodie
-  //
+  // 
   function Hoodie(baseUrl) {
     this.baseUrl = baseUrl;
     this._handleCheckConnectionError = __bind(this._handleCheckConnectionError, this);
@@ -59,7 +59,7 @@ window.Hoodie = window.Hoodie || (function(_super) {
   // use this method to send requests to the hoodie backend.
   // 
   //     promise = hoodie.request('GET', '/user_database/doc_id')
-  //
+  // 
   Hoodie.prototype.request = function(type, url, options) {
     var defaults;
     options = options || {};
@@ -99,7 +99,7 @@ window.Hoodie = window.Hoodie || (function(_super) {
   // - sets `hoodie.online = true`
   // - triggers `online` event
   // - sets `checkConnectionInterval = 30000`
-  //
+  // 
   Hoodie.prototype._checkConnectionRequest = null;
   Hoodie.prototype.checkConnection = function() {
     var _ref;
@@ -114,14 +114,14 @@ window.Hoodie = window.Hoodie || (function(_super) {
   // ## Open stores
 
   // generic method to open a store. Used by
-  //
+  // 
   // * hoodie.remote
   // * hoodie.user("joe")
   // * hoodie.global
   // * ... and more
   // 
   //     hoodie.open("some_store_name").findAll()
-  //
+  // 
   Hoodie.prototype.open = function(storeName, options) {
     options = options || {};
     $.extend(options, {
@@ -212,7 +212,7 @@ window.Hoodie = window.Hoodie || (function(_super) {
 
   // You can either extend the Hoodie class, or a hoodie
   // instance dooring runtime
-  //
+  // 
   //     Hoodie.extend('magic1', funcion(hoodie) { /* ... */ })
   //     hoodie = new Hoodie
   //     hoodie.extend('magic2', function(hoodie) { /* ... */ })
