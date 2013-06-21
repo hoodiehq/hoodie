@@ -71,7 +71,7 @@ describe("Hoodie.Store", function() {
       this.store.add("test", {
         funky: "value"
       });
-      return expect(this.store.save).wasCalledWith("test", void 0, {
+      return expect(this.store.save).wasCalledWith("test", undefined, {
         funky: "value"
       });
     });
@@ -89,7 +89,7 @@ describe("Hoodie.Store", function() {
     _when("object cannot be found", function() {
       beforeEach(function() {
         this.store.find.andReturn($.Deferred().reject());
-        return this.promise = this.store.update('couch', '123', {
+        this.promise = this.store.update('couch', '123', {
           funky: 'fresh'
         });
       });
@@ -108,7 +108,7 @@ describe("Hoodie.Store", function() {
       });
       _and("update is an object", function() {
         beforeEach(function() {
-          return this.promise = this.store.update('couch', '123', {
+          this.promise = this.store.update('couch', '123', {
             funky: 'fresh'
           });
         });
@@ -124,7 +124,7 @@ describe("Hoodie.Store", function() {
       });
       _and("update is an object and options passed", function() {
         beforeEach(function() {
-          return this.promise = this.store.update('couch', '123', {
+          this.promise = this.store.update('couch', '123', {
             funky: 'fresh'
           }, {
             silent: true
@@ -141,7 +141,7 @@ describe("Hoodie.Store", function() {
       });
       _and("update is a function", function() {
         beforeEach(function() {
-          return this.promise = this.store.update('couch', '123', function(obj) {
+          this.promise = this.store.update('couch', '123', function() {
             return {
               funky: 'fresh'
             };
@@ -173,7 +173,7 @@ describe("Hoodie.Store", function() {
       });
       _and("update wouldn't make a change", function() {
         beforeEach(function() {
-          return this.promise = this.store.update('couch', '123', function(obj) {
+          this.promise = this.store.update('couch', '123', function() {
             return {
               style: 'baws'
             };
@@ -190,7 +190,7 @@ describe("Hoodie.Store", function() {
       });
       return _but("update wouldn't make a change, but options have been passed", function() {
         beforeEach(function() {
-          return this.promise = this.store.update('couch', '123', {}, {
+          this.promise = this.store.update('couch', '123', {}, {
             "public": true
           });
         });
@@ -207,7 +207,7 @@ describe("Hoodie.Store", function() {
   describe("#updateAll(objects)", function() {
     beforeEach(function() {
       spyOn(this.hoodie, "isPromise").andReturn(false);
-      return this.todoObjects = [
+      this.todoObjects = [
         {
           type: 'todo',
           id: '1'

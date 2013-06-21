@@ -1,6 +1,4 @@
-var Hoodie;
-
-Hoodie = (function(_super) {
+window.Hoodie = (function(_super) {
 
   'use strict';
 
@@ -73,7 +71,8 @@ Hoodie = (function(_super) {
 
   Hoodie.prototype.uuid = function(len) {
     var chars, i, radix;
-    if (len == null) {
+
+    if (len === undefined) {
       len = 7;
     }
     chars = '0123456789abcdefghijklmnopqrstuvwxyz'.split('');
@@ -171,5 +170,5 @@ Hoodie = (function(_super) {
 
   return Hoodie;
 
-})(Events);
+})(window.Events);
 

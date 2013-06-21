@@ -59,19 +59,19 @@ Hoodie.Remote = (function(_super) {
     this.disconnect = __bind(this.disconnect, this);
     this.connect = __bind(this.connect, this);
 
-    if (options.name != null) {
+    if (options.name !== undefined) {
       this.name = options.name;
     }
 
-    if (options.prefix != null) {
+    if (options.prefix !== undefined) {
       this.prefix = options.prefix;
     }
 
-    if (options.connected != null) {
+    if (options.connected !== undefined) {
       this.connected = options.connected;
     }
 
-    if (options.baseUrl != null) {
+    if (options.baseUrl !== null) {
       this.baseUrl = options.baseUrl;
     }
 
@@ -84,7 +84,7 @@ Hoodie.Remote = (function(_super) {
 
   __extends(Remote, _super);
 
-  Remote.prototype.name = void 0;
+  Remote.prototype.name = null;
 
   Remote.prototype.connected = false;
 
@@ -101,49 +101,66 @@ Hoodie.Remote = (function(_super) {
       path = "" + this.baseUrl + path;
     }
 
-    options.contentType || (options.contentType = 'application/json');
+    options.contentType = options.contentType || 'application/json';
+
     if (type === 'POST' || type === 'PUT') {
-      options.dataType || (options.dataType = 'json');
-      options.processData || (options.processData = false);
+      options.dataType = options.dataType || 'json';
+      options.processData = options.processData || false;
       options.data = JSON.stringify(options.data);
     }
     return this.hoodie.request(type, path, options);
   };
 
-  Remote.prototype.get = function(view_name, params) {
-    return console.log.apply(console, [".get() not yet implemented"].concat(Array.prototype.slice.call(arguments)));
+  Remote.prototype.get = function() {
+    return console.log.apply(
+      console, [".get() not yet implemented"]
+      .concat(Array.prototype.slice.call(arguments))
+    );
   };
 
-  Remote.prototype.post = function(update_function_name, params) {
-    return console.log.apply(console, [".post() not yet implemented"].concat(Array.prototype.slice.call(arguments)));
+  Remote.prototype.post = function() {
+    return console.log.apply(
+      console, [".post() not yet implemented"]
+      .concat(Array.prototype.slice.call(arguments))
+    );
   };
 
   Remote.prototype.find = function(type, id) {
     var defer, path;
+
     defer = Remote.__super__.find.apply(this, arguments);
+
     if (this.hoodie.isPromise(defer)) {
       return defer;
     }
+
     path = "" + type + "/" + id;
+
     if (this.prefix) {
       path = this.prefix + path;
     }
+
     path = "/" + encodeURIComponent(path);
+
     return this.request("GET", path).pipe(this._parseFromRemote);
   };
 
   Remote.prototype.findAll = function(type) {
     var defer, endkey, path, startkey;
+
     defer = Remote.__super__.findAll.apply(this, arguments);
+
     if (this.hoodie.isPromise(defer)) {
       return defer;
     }
+
     path = "/_all_docs?include_docs=true";
+
     switch (true) {
-    case (type != null) && this.prefix !== '':
+    case (type !== undefined) && this.prefix !== '':
       startkey = "" + this.prefix + type + "/";
       break;
-    case type != null:
+    case type !== undefined:
       startkey = "" + type + "/";
       break;
     case this.prefix !== '':
@@ -152,10 +169,11 @@ Hoodie.Remote = (function(_super) {
     default:
       startkey = '';
     }
+
     if (startkey) {
-      endkey = startkey.replace(/.$/, function(char) {
+      endkey = startkey.replace(/.$/, function(chars) {
         var charCode;
-        charCode = char.charCodeAt(0);
+        charCode = chars.charCodeAt(0);
         return String.fromCharCode(charCode + 1);
       });
       path = "" + path + "&startkey=\"" + (encodeURIComponent(startkey)) + "\"&endkey=\"" + (encodeURIComponent(endkey)) + "\"";
@@ -197,7 +215,8 @@ Hoodie.Remote = (function(_super) {
 
   Remote.prototype.isKnownObject = function(object) {
     var key = "" + object.type + "/" + object.id;
-    this._knownObjects[key] != null;
+
+    this._knownObjects[key] !== undefined;
     return this._knownObjects[key];
   };
 
@@ -213,12 +232,16 @@ Hoodie.Remote = (function(_super) {
   };
 
   Remote.prototype.disconnect = function() {
-    var _ref, _ref1;
     this.connected = false;
-    if ((_ref = this._pullRequest) != null) {
-      _ref.abort();
+
+    if (this._pullRequest !== undefined) {
+      this._pullRequest.abort();
     }
-    return (_ref1 = this._pushRequest) != null ? _ref1.abort() : void 0;
+
+    if (this._pushRequest !== undefined) {
+      this._pushRequest.abort();
+    }
+
   };
 
   Remote.prototype.isConnected = function() {
@@ -245,6 +268,7 @@ Hoodie.Remote = (function(_super) {
 
   Remote.prototype.push = function(objects) {
     var object, objectsForRemote, _i, _len;
+
     if (!(objects != null ? objects.length : void 0)) {
       return this.hoodie.resolveWith([]);
     }
@@ -255,7 +279,7 @@ Hoodie.Remote = (function(_super) {
       object = this._parseForRemote(object);
       objectsForRemote.push(object);
     }
-    return this._pushRequest = this.request('POST', "/_bulk_docs", {
+    this._pushRequest = this.request('POST', "/_bulk_docs", {
       data: {
         docs: objectsForRemote,
         new_edits: false
@@ -279,7 +303,8 @@ Hoodie.Remote = (function(_super) {
 
   Remote.prototype.trigger = function() {
     var event, parameters, _ref;
-    event = arguments[0], parameters = 2 <= arguments.length ? Array.prototype.slice.call(arguments, 1) : [];
+    event = arguments[0],
+    parameters = 2 <= arguments.length ? Array.prototype.slice.call(arguments, 1) : [];
     return (_ref = this.hoodie).trigger.apply(_ref, ["" + this.name + ":" + event].concat(Array.prototype.slice.call(parameters)));
   };
 
@@ -288,6 +313,7 @@ Hoodie.Remote = (function(_super) {
   Remote.prototype._parseForRemote = function(object) {
     var attr, properties;
     properties = $.extend({}, object);
+
     for (attr in properties) {
       if (~this._validSpecialAttributes.indexOf(attr)) {
         continue;
@@ -377,8 +403,9 @@ Hoodie.Remote = (function(_super) {
   };
 
   Remote.prototype._restartPullRequest = function() {
-    var _ref;
-    return (_ref = this._pullRequest) != null ? _ref.abort() : void 0;
+    if (this._pullRequest) {
+      this._pullRequest.abort();
+    }
   };
 
   Remote.prototype._handlePullSuccess = function(response) {
@@ -389,10 +416,11 @@ Hoodie.Remote = (function(_super) {
     }
   };
 
-  Remote.prototype._handlePullError = function(xhr, error, resp) {
+  Remote.prototype._handlePullError = function(xhr, error) {
     if (!this.isConnected()) {
       return;
     }
+
     switch (xhr.status) {
     case 401:
       this.trigger('error:unauthenticated', error);
@@ -404,9 +432,11 @@ Hoodie.Remote = (function(_super) {
       window.setTimeout(this.pull, 3000);
       return this.hoodie.checkConnection();
     default:
+
       if (!this.isConnected()) {
         return;
       }
+
       if (xhr.statusText === 'abort') {
         return this.pull();
       } else {

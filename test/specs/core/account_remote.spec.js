@@ -1,6 +1,9 @@
 describe("Hoodie.AccountRemote", function() {
+
+  'use strict';
+
   beforeEach(function() {
-    this.hoodie = new Mocks.Hoodie;
+    this.hoodie = new Mocks.Hoodie();
     spyOn(this.hoodie, "on");
     spyOn(this.hoodie, "one");
     spyOn(this.hoodie, "unbind");
@@ -25,13 +28,13 @@ describe("Hoodie.AccountRemote", function() {
         return cb('objectFromStore', false);
       }
     });
-    return this.remote = new Hoodie.AccountRemote(this.hoodie);
+    this.remote = new Hoodie.AccountRemote(this.hoodie);
   });
   describe("constructor(@hoodie, options = {})", function() {
     beforeEach(function() {
       spyOn(Hoodie.AccountRemote.prototype, "disconnect");
       spyOn(Hoodie.AccountRemote.prototype, "connect");
-      return this.remote = new Hoodie.AccountRemote(this.hoodie);
+      this.remote = new Hoodie.AccountRemote(this.hoodie);
     });
     it("should set name to users database name", function() {
       return expect(this.remote.name).toBe("userhash123");
@@ -162,7 +165,9 @@ describe("Hoodie.AccountRemote", function() {
         var method, path, _ref;
         this.remote.pull();
         expect(this.remote.request).wasCalled();
-        _ref = this.remote.request.mostRecentCall.args, method = _ref[0], path = _ref[1];
+        _ref = this.remote.request.mostRecentCall.args,
+        method = _ref[0],
+        path = _ref[1];
         expect(method).toBe('GET');
         return expect(path).toBe('/_changes?include_docs=true&since=0&heartbeat=10000&feed=longpoll');
       });
@@ -179,7 +184,9 @@ describe("Hoodie.AccountRemote", function() {
         var method, path, _ref;
         this.remote.pull();
         expect(this.remote.request).wasCalled();
-        _ref = this.remote.request.mostRecentCall.args, method = _ref[0], path = _ref[1];
+        _ref = this.remote.request.mostRecentCall.args,
+        method = _ref[0],
+        path = _ref[1];
         expect(method).toBe('GET');
         return expect(path).toBe('/_changes?include_docs=true&since=0');
       });
@@ -233,12 +240,14 @@ describe("Hoodie.AccountRemote", function() {
       });
       _and("remote is pullContinuously", function() {
         return beforeEach(function() {
-          return this.remote.pullContinuously = true;
+          this.remote.pullContinuously = true;
+          return this.remote.pullContinuously;
         });
       });
       return _and("remote isn't pullContinuously", function() {
         return beforeEach(function() {
-          return this.remote.pullContinuously = false;
+          this.remote.pullContinuously = false;
+          return this.remote.pullContinuously;
         });
       });
     });
@@ -268,12 +277,14 @@ describe("Hoodie.AccountRemote", function() {
       });
       _and("remote is pullContinuously", function() {
         return beforeEach(function() {
-          return this.remote.pullContinuously = true;
+          this.remote.pullContinuously = true;
+          return this.remote.pullContinuously;
         });
       });
       return _and("remote isn't pullContinuously", function() {
         return beforeEach(function() {
-          return this.remote.pullContinuously = false;
+          this.remote.pullContinuously = false;
+          return this.remote.pullContinuously;
         });
       });
     });
@@ -389,7 +400,9 @@ describe("Hoodie.AccountRemote", function() {
         promise.fail(function(error) {
           var data, message, name;
           errorCalled = true;
-          name = error.name, message = error.message, data = error.data;
+          name = error.name,
+          message = error.message,
+          data = error.data;
           expect(name).toBe('ConnectionError');
           return expect(message).toBe('Not connected: could not push local changes to remote');
         });

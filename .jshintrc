@@ -21,11 +21,14 @@
     "jasmine",
     "_and",
     "_but",
-    "_when"
+    "_when",
+    "__bind",
+    "__extends",
+    "spyOn",
+    "Mocks"
   ],
   "debug": false,
   "devel": false,
-  "es5": true,
   "strict": true,
   "globalstrict": false,
   "asi": false,
@@ -61,7 +64,6 @@
   "multistr": true,
   "maxcomplexity": 6,
   "maxdepth": 4,
-  "maxstatements": 25,
   "indent": 2
 }
 

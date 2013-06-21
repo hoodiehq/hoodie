@@ -64,7 +64,7 @@ Hoodie.Store = (function() {
   //
   Store.prototype.add = function(type, object, options) {
 
-    if (object == null) {
+    if (object === undefined) {
       object = {};
     }
 
@@ -97,9 +97,11 @@ Hoodie.Store = (function() {
 
       // normalize input
       newObj = $.extend(true, {}, currentObj);
+
       if (typeof objectUpdate === 'function') {
         objectUpdate = objectUpdate(newObj);
       }
+
       if (!objectUpdate) {
         return defer.resolve(currentObj);
       }
@@ -107,6 +109,7 @@ Hoodie.Store = (function() {
       // check if something changed
       changedProperties = (function() {
         var _results;
+
         _results = [];
         for (key in objectUpdate) {
           value = objectUpdate[key];
@@ -118,6 +121,7 @@ Hoodie.Store = (function() {
         }
         return _results;
       })();
+
       if (!(changedProperties.length || options)) {
         return defer.resolve(newObj);
       }
@@ -166,10 +170,13 @@ Hoodie.Store = (function() {
       // now we update all objects one by one and return a promise
       // that will be resolved once all updates have been finished
       var defer, object, _updatePromises;
+
       defer = self.hoodie.defer();
+
       if (!$.isArray(objects)) {
         objects = [objects];
       }
+
       _updatePromises = (function() {
         var _i, _len, _results;
         _results = [];
@@ -179,6 +186,7 @@ Hoodie.Store = (function() {
         }
         return _results;
       }).call(self);
+
       $.when.apply(null, _updatePromises).then(defer.resolve);
       return defer.promise();
     });

@@ -62,26 +62,31 @@ Hoodie.Account = (function () {
   };
 
   Account.prototype.authenticate = function() {
-    var sendAndHandleAuthRequest, _ref, _ref1,
-      self = this;
+    var sendAndHandleAuthRequest, _ref, _ref1, self = this;
+
     if (this._authenticated === false) {
       return this.hoodie.defer().reject().promise();
     }
+
     if (this._authenticated === true) {
       return this.hoodie.defer().resolve(this.username).promise();
     }
-    if (((_ref = this._requests.signOut) != null ? _ref.state() : void 0) === 'pending') {
+
+    if (((_ref = this._requests.signOut) != null ? _ref.state() : null) === 'pending') {
       return this._requests.signOut.then(this.hoodie.rejectWith);
     }
-    if (((_ref1 = this._requests.signIn) != null ? _ref1.state() : void 0) === 'pending') {
+
+    if (((_ref1 = this._requests.signIn) != null ? _ref1.state() : null) === 'pending') {
       return this._requests.signIn;
     }
+
     if (this.username === void 0) {
       return this._sendSignOutRequest().then(function() {
         self._authenticated = false;
         return self.hoodie.rejectWith();
       });
     }
+
     sendAndHandleAuthRequest = function() {
       return self.request('GET', "/_session").pipe(self._handleAuthenticateRequestSuccess, self._handleRequestError);
     };
@@ -91,7 +96,7 @@ Hoodie.Account = (function () {
   Account.prototype.signUp = function(username, password) {
     var options;
 
-    if (password == null) {
+    if (password === undefined) {
       password = '';
     }
 
@@ -172,7 +177,7 @@ Hoodie.Account = (function () {
       username = '';
     }
 
-    if (password == null) {
+    if (password === undefined) {
       password = '';
     }
 
@@ -232,7 +237,7 @@ Hoodie.Account = (function () {
   Account.prototype.fetch = function(username) {
     var self = this;
 
-    if (username == null) {
+    if (username === undefined) {
       username = this.username;
     }
 
@@ -568,7 +573,7 @@ Hoodie.Account = (function () {
   };
 
   Account.prototype._key = function(username) {
-    username = username || this.username
+    username = username || this.username;
     return "" + this._prefix + ":" + (this._userKey(username));
   };
 

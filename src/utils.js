@@ -1,16 +1,14 @@
 'use strict';
 
-var __bind = function(fn, me) {
+window.__bind = function(fn, me) {
   return function() {
     return fn.apply(me, arguments);
   };
 },
 
-__hasProp = {}.hasOwnProperty,
-
-__extends = function(child, parent) {
+window.__extends = function(child, parent) {
   for (var key in parent) {
-    if (__hasProp.call(parent, key)) {
+    if (parent.hasOwnProperty(key)) {
       child[key] = parent[key];
     }
   }
@@ -20,5 +18,6 @@ __extends = function(child, parent) {
   Ctor.prototype = parent.prototype;
   child.prototype = new Ctor();
   child.__super__ = parent.prototype;
+
   return child;
 };

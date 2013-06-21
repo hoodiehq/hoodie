@@ -15,7 +15,7 @@ describe("Hoodie.Account", function () {
     });
     this.account = new Hoodie.Account(this.hoodie);
     this.hoodie.request.reset();
-    return this.account._requests = {};
+    this.account._requests = {};
   });
   describe("constructor", function () {
     beforeEach(function () {
@@ -81,13 +81,13 @@ describe("Hoodie.Account", function () {
   describe("#authenticate()", function () {
     beforeEach(function () {
       window.setTimeout.andCallFake(function () {});
-      return this.account = new Hoodie.Account(this.hoodie);
+      this.account = new Hoodie.Account(this.hoodie);
     });
     _when("account is already authenticated", function () {
       beforeEach(function () {
         this.account._authenticated = true;
         this.account.username = 'joe@example.com';
-        return this.promise = this.account.authenticate();
+        this.promise = this.account.authenticate();
       });
       it("should return a promise", function () {
         return expect(this.promise).toBePromise();
@@ -99,7 +99,7 @@ describe("Hoodie.Account", function () {
     _when("account is unauthenticated", function () {
       beforeEach(function () {
         this.account._authenticated = false;
-        return this.promise = this.account.authenticate();
+        this.promise = this.account.authenticate();
       });
       it("should return a promise", function () {
         return expect(this.promise).toBePromise();
@@ -111,7 +111,7 @@ describe("Hoodie.Account", function () {
     _when("there is a pending singIn request", function () {
       beforeEach(function () {
         this.signInDefer = this.hoodie.defer();
-        return this.account._requests.signIn = this.signInDefer.promise();
+        this.account._requests.signIn = this.signInDefer.promise();
       });
       it("it should be rejected when it is pending and then fails", function () {
         var promise;
@@ -129,7 +129,7 @@ describe("Hoodie.Account", function () {
     _when("there is a pending singOut request", function () {
       beforeEach(function () {
         this.signOutDefer = this.hoodie.defer();
-        return this.account._requests.signOut = this.signOutDefer.promise();
+        this.account._requests.signOut = this.signOutDefer.promise();
       });
       it("it should be rejected when it is pending and then fails", function () {
         var promise;
@@ -171,7 +171,7 @@ describe("Hoodie.Account", function () {
         delete this.account.username;
         this.signOutDefer = this.hoodie.defer();
         this.account._requests.signOut = this.signOutDefer.promise();
-        return this.promise = this.account.authenticate();
+        this.promise = this.account.authenticate();
       });
       _and("signOut succeeds", function () {
         beforeEach(function () {
@@ -221,7 +221,7 @@ describe("Hoodie.Account", function () {
             }
           };
           this.requestDefer.resolve(this.response);
-          return this.promise = this.account.authenticate();
+          this.promise = this.account.authenticate();
         });
         it("should set account as authenticated", function () {
           return expect(this.account._authenticated).toBe(true);
@@ -251,7 +251,7 @@ describe("Hoodie.Account", function () {
         _and("the user signed up", function () {
           beforeEach(function () {
             this.account.username = 'joe@example.com';
-            return this.promise = this.account.authenticate();
+            this.promise = this.account.authenticate();
           });
           it("should set account as unauthenticated", function () {
             return expect(this.account._authenticated).toBe(false);
@@ -269,7 +269,7 @@ describe("Hoodie.Account", function () {
             this.account.ownerHash = 'randomhash';
             spyOn(this.account, "getAnonymousPassword").andReturn('randompass');
             spyOn(this.account, "signIn");
-            return this.promise = this.account.authenticate();
+            this.promise = this.account.authenticate();
           });
           return it("should sign in in the background, as we know the password anyway", function () {
             return expect(this.account.signIn).wasCalledWith('randomhash', 'randompass');
@@ -281,7 +281,7 @@ describe("Hoodie.Account", function () {
           this.requestDefer.reject({
             responseText: 'error data'
           });
-          return this.promise = this.account.authenticate();
+          this.promise = this.account.authenticate();
         });
         return it("should reject the promise", function () {
           return expect(this.promise).toBeRejectedWith({
@@ -293,11 +293,11 @@ describe("Hoodie.Account", function () {
   });
   describe("#signUp(username, password)", function () {
     beforeEach(function () {
-      return this.account.ownerHash = "owner_hash123";
+      this.account.ownerHash = "owner_hash123";
     });
     _when("username not set", function () {
       beforeEach(function () {
-        return this.promise = this.account.signUp('', 'secret', {
+        this.promise = this.account.signUp('', 'secret', {
           name: "Joe Doe"
         });
       });
@@ -312,7 +312,10 @@ describe("Hoodie.Account", function () {
         var _ref;
         spyOn(this.account, "request").andCallThrough();
         this.account.signUp('Joe', 'secret');
-        _ref = this.account.request.mostRecentCall.args, this.type = _ref[0], this.path = _ref[1], this.options = _ref[2];
+        _ref = this.account.request.mostRecentCall.args,
+        this.type = _ref[0],
+        this.path = _ref[1],
+        this.options = _ref[2];
         return expect(this.path).toBe('/_users/org.couchdb.user%3Auser%2Fjoe');
       });
       _and("user has an anonmyous account", function () {
@@ -329,7 +332,7 @@ describe("Hoodie.Account", function () {
           spyOn(this.account, "_sendSignInRequest").andCallFake(function () {
             return signInDefers.shift();
           });
-          return this.promise = this.account.signUp('joe@example.com', 'secret', {
+          this.promise = this.account.signUp('joe@example.com', 'secret', {
             name: "Joe Doe"
           });
         });
@@ -361,8 +364,9 @@ describe("Hoodie.Account", function () {
                 updatedAt: 'someday'
               };
               this.fetchDefer.resolve();
-              _ref = this.hoodie.request.mostRecentCall.args, this.type = _ref[0], this.path = _ref[1], this.options = _ref[2];
-              return this.data = JSON.parse(this.options.data);
+              _ref = this.hoodie.request.mostRecentCall.args,
+              this.type = _ref[0], this.path = _ref[1], this.options = _ref[2];
+              this.data = JSON.parse(this.options.data);
             });
             it("should send a PUT request to http://cou.ch/_users/org.couchdb.user%3Auser%2Fjoe%40example.com", function () {
               expect(this.hoodie.request).wasCalled();
@@ -461,8 +465,11 @@ describe("Hoodie.Account", function () {
           spyOn(this.account, "_now").andReturn('now');
           spyOn(this.account, "_sendSignInRequest").andReturn(this.signInDefer.promise());
           this.account.signUp('joe@example.com', 'secret');
-          _ref = this.hoodie.request.mostRecentCall.args, this.type = _ref[0], this.path = _ref[1], this.options = _ref[2];
-          return this.data = JSON.parse(this.options.data);
+          _ref = this.hoodie.request.mostRecentCall.args,
+          this.type = _ref[0],
+          this.path = _ref[1],
+          this.options = _ref[2];
+          this.data = JSON.parse(this.options.data);
         });
         it("should send a PUT request to http://cou.ch/_users/org.couchdb.user%3Auser%2Fjoe%40example.com", function () {
           expect(this.hoodie.request).wasCalled();
@@ -503,7 +510,10 @@ describe("Hoodie.Account", function () {
         it("should allow to signup without password", function () {
           var _ref;
           this.account.signUp('joe@example.com');
-          _ref = this.hoodie.request.mostRecentCall.args, this.type = _ref[0], this.path = _ref[1], this.options = _ref[2];
+          _ref = this.hoodie.request.mostRecentCall.args,
+          this.type = _ref[0],
+          this.path = _ref[1],
+          this.options = _ref[2];
           this.data = JSON.parse(this.options.data);
           return expect(this.data.password).toBe('');
         });
@@ -512,8 +522,11 @@ describe("Hoodie.Account", function () {
             var options, path, promise, type, _ref;
             this.account.ownerHash = "owner_hash123";
             promise = this.account.signUp("owner_hash123", 'secret');
-            _ref = this.hoodie.request.mostRecentCall.args, type = _ref[0], path = _ref[1], options = _ref[2];
-            return this.data = JSON.parse(options.data);
+            _ref = this.hoodie.request.mostRecentCall.args,
+            type = _ref[0],
+            path = _ref[1],
+            options = _ref[2];
+            this.data = JSON.parse(options.data);
           });
           it("should not set signedUpAt if signed up anonymously", function () {
             return expect(this.data.signedUpAt).toBe(void 0);
@@ -585,7 +598,7 @@ describe("Hoodie.Account", function () {
       spyOn(this.account, "signUp").andReturn(this.signUpDefer.promise());
       spyOn(this.hoodie, "uuid").andReturn("crazyuuid123");
       spyOn(this.hoodie.config, "set");
-      return this.account.ownerHash = "owner_hash123";
+      this.account.ownerHash = "owner_hash123";
     });
     it("should sign up with username = account.ownerHash and the random password", function () {
       this.account.anonymousSignUp();
@@ -618,14 +631,17 @@ describe("Hoodie.Account", function () {
       this.signOutDefer.resolve();
       this.account.signIn('Joe', 'secret');
       _ref = this.hoodie.request.mostRecentCall.args, type = _ref[0], path = _ref[1], options = _ref[2];
-      return expect(options.data.name).toBe('user/joe');
+      expect(options.data.name).toBe('user/joe');
     });
     _when("signing in with current username", function () {
       beforeEach(function () {
         var _ref;
         this.account.username = 'joe@example.com';
         this.account.signIn('joe@example.com', 'secret');
-        return _ref = this.hoodie.request.mostRecentCall.args, this.type = _ref[0], this.path = _ref[1], this.options = _ref[2], _ref;
+        _ref = this.hoodie.request.mostRecentCall.args,
+        this.type = _ref[0],
+        this.path = _ref[1],
+        this.options = _ref[2], _ref;
       });
       it("should not sign out", function () {
         return expect(this.account.signOut).wasNotCalled();
@@ -676,7 +692,10 @@ describe("Hoodie.Account", function () {
         var _ref;
         this.signOutDefer.resolve();
         this.account.signIn('joe@example.com', 'secret');
-        return _ref = this.hoodie.request.mostRecentCall.args, this.type = _ref[0], this.path = _ref[1], this.options = _ref[2], _ref;
+        _ref = this.hoodie.request.mostRecentCall.args,
+        this.type = _ref[0],
+        this.path = _ref[1],
+        this.options = _ref[2], _ref;
       });
       it("should send a POST request to http://cou.ch/_session", function () {
         expect(this.hoodie.request).wasCalled();
@@ -805,7 +824,10 @@ describe("Hoodie.Account", function () {
           var data, options, path, type, _ref;
           this.account._requests = {};
           this.account.signIn('joe@example.com');
-          _ref = this.hoodie.request.mostRecentCall.args, type = _ref[0], path = _ref[1], options = _ref[2];
+          _ref = this.hoodie.request.mostRecentCall.args,
+          type = _ref[0],
+          path = _ref[1],
+          options = _ref[2];
           data = options.data;
           return expect(data.password).toBe('');
         });
@@ -838,8 +860,11 @@ describe("Hoodie.Account", function () {
         var _ref;
         this.fetchPromise.resolve();
         this.account.changePassword('currentSecret', 'newSecret');
-        _ref = this.hoodie.request.mostRecentCall.args, this.type = _ref[0], this.path = _ref[1], this.options = _ref[2];
-        return this.data = JSON.parse(this.options.data);
+        _ref = this.hoodie.request.mostRecentCall.args,
+        this.type = _ref[0],
+        this.path = _ref[1],
+        this.options = _ref[2];
+        this.data = JSON.parse(this.options.data);
       });
       it("should send a PUT request to http://cou.ch/_users/org.couchdb.user%3Auser%2Fjoe%40example.com", function () {
         expect(this.hoodie.request).wasCalled();
@@ -873,7 +898,10 @@ describe("Hoodie.Account", function () {
       it("should allow to set empty password", function () {
         var _ref;
         this.account.changePassword('currentSecret', '');
-        _ref = this.hoodie.request.mostRecentCall.args, this.type = _ref[0], this.path = _ref[1], this.options = _ref[2];
+        _ref = this.hoodie.request.mostRecentCall.args,
+        this.type = _ref[0],
+        this.path = _ref[1],
+        this.options = _ref[2];
         this.data = JSON.parse(this.options.data);
         return expect(this.data.password).toBe('');
       });
@@ -960,7 +988,7 @@ describe("Hoodie.Account", function () {
     _when("user has no account", function () {
       beforeEach(function () {
         spyOn(this.account, "hasAccount").andReturn(false);
-        return this.promise = this.account.signOut();
+        this.promise = this.account.signOut();
       });
       it("should not send any request", function () {
         return expect(this.hoodie.request).wasNotCalled();
@@ -1029,7 +1057,8 @@ describe("Hoodie.Account", function () {
     });
     return _when("#username is set", function () {
       beforeEach(function () {
-        return this.account.username = 'somebody';
+        this.account.username = 'somebody';
+        return this.account.username;
       });
       return it("should return false", function () {
         return expect(this.account.hasAccount()).toBe(true);
@@ -1082,7 +1111,8 @@ describe("Hoodie.Account", function () {
   describe("#db()", function () {
     return _when("account.ownerHash is 'owner_hash123'", function () {
       beforeEach(function () {
-        return this.account.ownerHash = 'owner_hash123';
+        this.account.ownerHash = 'owner_hash123';
+        return this.account.ownerHash;
       });
       return it("should return 'joe$example.com", function () {
         return (expect(this.account.db())).toEqual('user/owner_hash123');
@@ -1155,7 +1185,7 @@ describe("Hoodie.Account", function () {
       spyOn(this.account, "fetch").andReturn(this.fetchDefer.promise());
       spyOn(this.hoodie, "uuid").andReturn('newHash');
       this.account.username = 'joe@example.com';
-      return this.account._doc = {
+      this.account._doc = {
         _rev: '1-234'
       };
     });
@@ -1217,7 +1247,8 @@ describe("Hoodie.Account", function () {
             reason: "missing"
           };
           this.fetchDefer.reject(this.error);
-          return this.promise = this.account.destroy();
+          this.promise = this.account.destroy();
+          return this.promise;
         });
         return it("should resolve anyway", function () {
           return expect(this.promise).toBeResolved();
@@ -1229,7 +1260,8 @@ describe("Hoodie.Account", function () {
             error: "unknown"
           };
           this.fetchDefer.reject(this.error);
-          return this.promise = this.account.destroy();
+          this.promise = this.account.destroy();
+          return this.promise;
         });
         it("should reject", function () {
           return expect(this.promise).toBeRejectedWith(this.error);
@@ -1251,7 +1283,7 @@ describe("Hoodie.Account", function () {
     return _when("user has no account", function () {
       beforeEach(function () {
         spyOn(this.account, "hasAccount").andReturn(false);
-        return this.promise = this.account.destroy();
+        this.promise = this.account.destroy();
       });
       it("should return a promise", function () {
         return expect(this.promise).toBePromise();
@@ -1303,8 +1335,11 @@ describe("Hoodie.Account", function () {
         spyOn(this.account, "_now").andReturn('now');
         spyOn(this.hoodie, "uuid").andReturn('uuid567');
         this.account.resetPassword("joe@example.com");
-        _ref = this.hoodie.request.mostRecentCall.args, this.method = _ref[0], this.path = _ref[1], this.options = _ref[2];
-        return this.data = JSON.parse(this.options.data);
+        _ref = this.hoodie.request.mostRecentCall.args,
+        this.method = _ref[0],
+        this.path = _ref[1],
+        this.options = _ref[2];
+        this.data = JSON.parse(this.options.data);
       });
       it("should generate a reset Password Id and store it locally", function () {
         return expect(this.hoodie.config.set).wasCalledWith("_account.resetPasswordId", "joe@example.com/uuid567");
@@ -1370,7 +1405,7 @@ describe("Hoodie.Account", function () {
       spyOn(this.account, "fetch").andReturn(this.fetchDefer);
       spyOn(this.account, "_now").andReturn('now');
       this.account.username = 'joe@example.com';
-      return this.account._doc = {
+      this.account._doc = {
         _id: 'org.couchdb.user:user/joe@example.com',
         name: 'user/joe@example.com',
         type: 'user',
@@ -1404,8 +1439,11 @@ describe("Hoodie.Account", function () {
           this.fetchDefer.resolve();
           this.account.username = 'joe@example.com';
           this.promise = this.account.changeUsername('secret', 'new.joe@example.com');
-          _ref = this.hoodie.request.mostRecentCall.args, this.type = _ref[0], this.path = _ref[1], this.options = _ref[2];
-          return this.data = JSON.parse(this.options.data);
+          _ref = this.hoodie.request.mostRecentCall.args,
+          this.type = _ref[0],
+          this.path = _ref[1],
+          this.options = _ref[2];
+          this.data = JSON.parse(this.options.data);
         });
         it("should send a PUT request to http://cou.ch/_users/org.couchdb.user%3Auser%2Fjoe%40example.com", function () {
           expect(this.hoodie.request).wasCalled();
