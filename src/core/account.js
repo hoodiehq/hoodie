@@ -360,7 +360,10 @@ Hoodie.Account = (function () {
       }).promise();
     }
     return this._withSingleRequest('fetch', function() {
-      return self.request('GET', self._url(username)).pipe(null, self._handleRequestError).done(function(response) {
+      return self.request('GET', self._url(username)).pipe(
+        null,
+        self._handleRequestError
+      ).done(function(response) {
         self._doc = response;
         return self._doc;
       });
@@ -382,8 +385,12 @@ Hoodie.Account = (function () {
         reason: "not logged in"
       }).promise();
     }
+
     this.hoodie.remote.disconnect();
-    return this.fetch().pipe(this._sendChangeUsernameAndPasswordRequest(currentPassword, null, newPassword), this._handleRequestError);
+    return this.fetch().pipe(
+      this._sendChangeUsernameAndPasswordRequest(currentPassword, null, newPassword),
+      this._handleRequestError
+    );
   };
 
 
@@ -423,7 +430,9 @@ Hoodie.Account = (function () {
       contentType: "application/json"
     };
     return this._withPreviousRequestsAborted('resetPassword', function() {
-      return self.request('PUT', "/_users/" + (encodeURIComponent(key)), options).pipe(null, self._handleRequestError).done(self._checkPasswordResetStatus);
+      return self.request('PUT', "/_users/" + (encodeURIComponent(key)), options).pipe(
+        null, self._handleRequestError
+      ).done(self._checkPasswordResetStatus);
     });
   };
 
@@ -721,7 +730,10 @@ Hoodie.Account = (function () {
     };
 
     return this._withPreviousRequestsAborted('passwordResetStatus', function() {
-      return self.request('GET', url, options).pipe(self._handlePasswordResetStatusRequestSuccess, self._handlePasswordResetStatusRequestError).fail(function(error) {
+      return self.request('GET', url, options).pipe(
+        self._handlePasswordResetStatusRequestSuccess,
+        self._handlePasswordResetStatusRequestError
+      ).fail(function(error) {
         if (error.error === 'pending') {
           window.setTimeout(self._checkPasswordResetStatus, 1000);
           return;
@@ -785,7 +797,9 @@ Hoodie.Account = (function () {
     return this._sendSignInRequest(this.username, currentPassword, {
       silent: true
     }).pipe(function() {
-      return self.fetch().pipe(self._sendChangeUsernameAndPasswordRequest(currentPassword, newUsername, newPassword));
+      return self.fetch().pipe(
+        self._sendChangeUsernameAndPasswordRequest(currentPassword, newUsername, newPassword)
+      );
     });
   };
 
@@ -941,7 +955,10 @@ Hoodie.Account = (function () {
       };
 
       return self._withPreviousRequestsAborted('updateUsersDoc', function() {
-        return self.request('PUT', self._url(), options).pipe(self._handleChangeUsernameAndPasswordRequest(newUsername, newPassword || currentPassword), self._handleRequestError);
+        return self.request('PUT', self._url(), options).pipe(
+          self._handleChangeUsernameAndPasswordRequest(newUsername, newPassword || currentPassword),
+          self._handleRequestError
+        );
       });
 
     };
