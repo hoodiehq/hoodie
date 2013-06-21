@@ -6,10 +6,6 @@
 //
 //
 
-var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
-  __hasProp = {}.hasOwnProperty,
-  __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; },
-  __slice = [].slice;
 
 Hoodie.LocalStore = (function (_super) {
 
@@ -476,8 +472,9 @@ Hoodie.LocalStore = (function (_super) {
 
   LocalStore.prototype.trigger = function() {
     var event, parameters, _ref;
-    event = arguments[0], parameters = 2 <= arguments.length ? __slice.call(arguments, 1) : [];
-    return (_ref = this.hoodie).trigger.apply(_ref, ["store:" + event].concat(__slice.call(parameters)));
+    event = arguments[0],
+    parameters = 2 <= arguments.length ? Array.prototype.slice.call(arguments, 1) : [];
+    return (_ref = this.hoodie).trigger.apply(_ref, ["store:" + event].concat(Array.prototype.slice.call(parameters)));
   };
 
   LocalStore.prototype.on = function(event, data) {
