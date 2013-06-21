@@ -3808,10 +3808,15 @@ Hoodie.User = (function() {
   function User(hoodie) {
     this.hoodie = hoodie;
     this.api = __bind(this.api, this);
+
+    // extend hodie.store promise API
     this.hoodie.store.decoratePromises({
       publish: this._storePublish,
       unpublish: this._storeUnpublish
     });
+
+    // vanilla API syntax:
+    // hoodie.user('uuid1234').findAll()
     return this.api;
   }
 
@@ -3823,6 +3828,21 @@ Hoodie.User = (function() {
     return this.hoodie.open("user/" + userHash + "/public", options);
   };
 
+
+  // hoodie.store decorations
+  // --------------------------
+  //
+  // hoodie.store decorations add custom methods to promises returned
+  // by hoodie.store methods like find, add or update. All methods return
+  // methods again that will be executed in the scope of the promise, but
+  // with access to the current hoodie instance
+
+  // publish
+  //
+  // publish an object. If an array of properties passed, publish only these
+  // attributes and hide the remaining ones. If no properties passed, publish
+  // the entire object.
+  //
   User.prototype._storePublish = function(properties) {
     var _this = this;
     return this.pipe(function(objects) {
@@ -3841,6 +3861,11 @@ Hoodie.User = (function() {
     });
   };
 
+
+  //`unpublish`
+  //
+  // unpublish
+  //
   User.prototype._storeUnpublish = function() {
     var _this = this;
     return this.pipe(function(objects) {
@@ -3865,6 +3890,7 @@ Hoodie.User = (function() {
 
 })();
 
+// extend Hoodie
 Hoodie.extend('user', Hoodie.User);
 
 // Global
@@ -3918,11 +3944,16 @@ Hoodie.extend('global', Hoodie.Global);
 //
 // To subscribe to a share created by somebody else, run
 // this code: `hoodie.share('shareId').subscribe()`.
-
+//
 Hoodie.ShareInstance = (function(_super) {
 
   'use strict';
 
+  // constructor
+  // -------------
+  //
+  // initializes a new share
+  //
   function ShareInstance(hoodie, options) {
     this.hoodie = hoodie;
 
@@ -3930,10 +3961,17 @@ Hoodie.ShareInstance = (function(_super) {
 
     this._handleSecurityResponse = __bind(this._handleSecurityResponse, this);
     this._objectBelongsToMe = __bind(this._objectBelongsToMe, this);
+
+    // make sure that we have an id
     this.id = options.id || this.hoodie.uuid();
+
+    // set name from id
     this.name = "share/" + this.id;
+
+    // set prefix from name
     this.prefix = this.name;
 
+    // set options
     $.extend(this, options);
 
     ShareInstance.__super__.constructor.apply(this, arguments);
@@ -3941,12 +3979,25 @@ Hoodie.ShareInstance = (function(_super) {
 
   __extends(ShareInstance, _super);
 
+  // default values
+  // ----------------
+  //
+  // shares are not accessible to others by default.
+  //
   ShareInstance.prototype.access = false;
 
+
+  // subscribe
+  // ---------
+  //
   ShareInstance.prototype.subscribe = function() {
     return this.request('GET', '/_security').pipe(this._handleSecurityResponse);
   };
 
+
+  // unsubscribe
+  // -----------
+  //
   ShareInstance.prototype.unsubscribe = function() {
     this.hoodie.share.remove(this.id);
     this.hoodie.store.removeAll(this._objectBelongsToMe, {
@@ -3955,6 +4006,20 @@ Hoodie.ShareInstance = (function(_super) {
     return this;
   };
 
+
+  // grant read access
+  // -------------------
+  //
+  // grant read access to the share. If no users passed,
+  // everybody can read the share objects. If one or multiple
+  // users passed, only these users get read access.
+  //
+  // examples:
+  //
+  //     share.grantReadAccess()
+  //     share.grantReadAccess('joe@example.com')
+  //     share.grantReadAccess(['joe@example.com', 'lisa@example.com'])
+  //
   ShareInstance.prototype.grantReadAccess = function(users) {
     var currentUsers, user, _i, _len;
 
@@ -3995,6 +4060,21 @@ Hoodie.ShareInstance = (function(_super) {
 
   };
 
+
+  // revoke read access
+  // --------------------
+  //
+  // revoke read access to the share. If one or multiple
+  // users passed, only these users' access gets revoked.
+  // Revoking reading access always includes revoking write
+  // access as well.
+  //
+  // examples:
+  //
+  //     share.revokeReadAccess()
+  //     share.revokeReadAccess('joe@example.com')
+  //     share.revokeReadAccess(['joe@example.com', 'lisa@example.com'])
+  //
   ShareInstance.prototype.revokeReadAccess = function(users) {
     var changed, currentUsers, idx, user, _i, _len;
     this.revokeWriteAccess(users);
@@ -4037,6 +4117,21 @@ Hoodie.ShareInstance = (function(_super) {
     });
   };
 
+
+  // grant write access
+  // --------------------
+  //
+  // grant write access to the share. If no users passed,
+  // everybody can edit the share objects. If one or multiple
+  // users passed, only these users get write access. Granting
+  // writing reads always also includes reading rights.
+  //
+  // examples:
+  //
+  //     share.grantWriteAccess()
+  //     share.grantWriteAccess('joe@example.com')
+  //     share.grantWriteAccess(['joe@example.com', 'lisa@example.com'])
+  //
   ShareInstance.prototype.grantWriteAccess = function(users) {
     this.grantReadAccess(users);
 
@@ -4061,6 +4156,19 @@ Hoodie.ShareInstance = (function(_super) {
     });
   };
 
+
+  // revoke write access
+  // --------------------
+  //
+  // revoke write access to the share. If one or multiple
+  // users passed, only these users' write access gets revoked.
+  //
+  // examples:
+  //
+  //     share.revokeWriteAccess()
+  //     share.revokeWriteAccess('joe@example.com')
+  //     share.revokeWriteAccess(['joe@example.com', 'lisa@example.com'])
+  //
   ShareInstance.prototype.revokeWriteAccess = function(users) {
     var idx, user, _i, _len;
 
@@ -4092,6 +4200,10 @@ Hoodie.ShareInstance = (function(_super) {
     });
   };
 
+
+  // PRIVATE
+  // ---------
+
   ShareInstance.prototype._objectBelongsToMe = function(object) {
     return object.$sharedAt === this.id;
   };
@@ -4106,6 +4218,26 @@ Hoodie.ShareInstance = (function(_super) {
     });
   };
 
+
+  // a db _security response looks like this:
+  //
+  //     {
+  //       members: {
+  //           names: [],
+  //           roles: ["1ihhzfy"]
+  //       },
+  //       writers: {
+  //           names: [],
+  //           roles: ["1ihhzfy"]
+  //       }
+  //     }
+  //
+  // we want to turn it into
+  //
+  //     {read: true, write: true}
+  //
+  // given that users ownerHash is "1ihhzfy"
+  //
   ShareInstance.prototype._parseSecurity = function(security) {
     var access, read, write, _ref, _ref1;
     read = (_ref = security.members) !== null ? _ref.roles : void 0;

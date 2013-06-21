@@ -16,10 +16,15 @@ Hoodie.User = (function() {
   function User(hoodie) {
     this.hoodie = hoodie;
     this.api = __bind(this.api, this);
+
+    // extend hodie.store promise API
     this.hoodie.store.decoratePromises({
       publish: this._storePublish,
       unpublish: this._storeUnpublish
     });
+
+    // vanilla API syntax:
+    // hoodie.user('uuid1234').findAll()
     return this.api;
   }
 
@@ -31,6 +36,21 @@ Hoodie.User = (function() {
     return this.hoodie.open("user/" + userHash + "/public", options);
   };
 
+
+  // hoodie.store decorations
+  // --------------------------
+  //
+  // hoodie.store decorations add custom methods to promises returned
+  // by hoodie.store methods like find, add or update. All methods return
+  // methods again that will be executed in the scope of the promise, but
+  // with access to the current hoodie instance
+
+  // publish
+  //
+  // publish an object. If an array of properties passed, publish only these
+  // attributes and hide the remaining ones. If no properties passed, publish
+  // the entire object.
+  //
   User.prototype._storePublish = function(properties) {
     var _this = this;
     return this.pipe(function(objects) {
@@ -49,6 +69,11 @@ Hoodie.User = (function() {
     });
   };
 
+
+  //`unpublish`
+  //
+  // unpublish
+  //
   User.prototype._storeUnpublish = function() {
     var _this = this;
     return this.pipe(function(objects) {
@@ -73,4 +98,5 @@ Hoodie.User = (function() {
 
 })();
 
+// extend Hoodie
 Hoodie.extend('user', Hoodie.User);
