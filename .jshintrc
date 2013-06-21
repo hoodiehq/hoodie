@@ -37,7 +37,7 @@
   "boss": false,
   "curly": true,
   "eqeqeq": true,
-  "eqnull": false,
+  "eqnull": true,
   "evil": false,
   "expr": true,
   "forin": true,
