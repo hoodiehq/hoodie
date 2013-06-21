@@ -1607,6 +1607,14 @@ f.event={add:function(a,c,d,e,g){var h,i,j,k,l,m,n,o,p,q,r,s;if(!(a.nodeType===3
                         "title": "removeAll",
                         "slug": "removeall"
                       },
+                      "depth": 2
+                    }, {
+                      "type": "heading",
+                      "data": {
+                        "level": 2,
+                        "title": "Private",
+                        "slug": "private"
+                      },
                       "depth": 2,
                       "children": [
                         {
@@ -1728,6 +1736,14 @@ f.event={add:function(a,c,d,e,g){var h,i,j,k,l,m,n,o,p,q,r,s;if(!(a.nodeType===3
                     "level": 2,
                     "title": "removeAll",
                     "slug": "removeall"
+                  },
+                  "depth": 2
+                }, {
+                  "type": "heading",
+                  "data": {
+                    "level": 2,
+                    "title": "Private",
+                    "slug": "private"
                   },
                   "depth": 2,
                   "children": [

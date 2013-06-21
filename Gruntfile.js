@@ -62,7 +62,8 @@ module.exports = function(grunt) {
         "src/**/*.js"
       ],
       options: {
-        "out": "doc/"
+        "out": "doc/",
+        "whitespace-after-token": false
       }
     },
 
