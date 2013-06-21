@@ -3545,17 +3545,28 @@ Hoodie.LocalStore = (function (_super) {
 //     hoodie.share.updateAll(changed_attributes)
 //     hoodie.share.remove(id)
 //     hoodie.share.removeAll()
-
+//
 Hoodie.Share = (function () {
 
   'use strict';
 
+  // Constructor
+  // -------------
+  //
+  // the constructor returns a function, so it can be called
+  // like this: hoodie.share('share_id')
+  //
+  // The rest of the API is available as usual.
+  //
   function Share(hoodie) {
     var api;
     this.hoodie = hoodie;
     this._open = __bind(this._open, this);
+
+    // set pointer to Hoodie.ShareInstance
     this.instance = Hoodie.ShareInstance;
 
+    // return custom api which allows direct call
     api = this._open;
     $.extend(api, this);
 
@@ -3568,6 +3579,12 @@ Hoodie.Share = (function () {
     return api;
   }
 
+
+  // add
+  // --------
+  //
+  // creates a new share and returns it
+  //
   Share.prototype.add = function (options) {
     var self = this;
     if (options === null) {
@@ -3581,6 +3598,12 @@ Hoodie.Share = (function () {
     });
   };
 
+
+  // find
+  // ------
+  //
+  // find an existing share
+  //
   Share.prototype.find = function (id) {
     var self = this;
     return this.hoodie.store.find('$share', id).pipe(function (object) {
@@ -3588,6 +3611,12 @@ Hoodie.Share = (function () {
     });
   };
 
+
+  // findAll
+  // ---------
+  //
+  // find all my existing shares
+  //
   Share.prototype.findAll = function () {
     var self = this;
     return this.hoodie.store.findAll('$share').pipe(function (objects) {
@@ -3601,6 +3630,12 @@ Hoodie.Share = (function () {
     });
   };
 
+
+  // findOrAdd
+  // --------------
+  //
+  // find or add a new share
+  //
   Share.prototype.findOrAdd = function (id, options) {
     var self = this;
     return this.hoodie.store.findOrAdd('$share', id, this._filterShareOptions(options)).pipe(function (object) {
@@ -3611,6 +3646,12 @@ Hoodie.Share = (function () {
     });
   };
 
+
+  // save
+  // ------
+  //
+  // add or overwrite a share
+  //
   Share.prototype.save = function (id, options) {
     var self = this;
     return this.hoodie.store.save('$share', id, this._filterShareOptions(options)).pipe(function (object) {
@@ -3618,6 +3659,12 @@ Hoodie.Share = (function () {
     });
   };
 
+
+  // update
+  // --------
+  //
+  // add or overwrite a share
+  //
   Share.prototype.update = function (id, changed_options) {
     var self = this;
     return this.hoodie.store.update('$share', id, this._filterShareOptions(changed_options)).pipe(function (object) {
@@ -3625,6 +3672,12 @@ Hoodie.Share = (function () {
     });
   };
 
+
+  // updateAll
+  // -----------
+  //
+  // update all my existing shares
+  //
   Share.prototype.updateAll = function (changed_options) {
     var self = this;
     return this.hoodie.store.updateAll('$share', this._filterShareOptions(changed_options)).pipe(function (objects) {
@@ -3638,6 +3691,12 @@ Hoodie.Share = (function () {
     });
   };
 
+
+  // remove
+  // ---------
+  //
+  // deletes an existing share
+  //
   Share.prototype.remove = function (id) {
     this.hoodie.store.findAll(function (obj) {
       return obj.$shares[id];
@@ -3645,6 +3704,12 @@ Hoodie.Share = (function () {
     return this.hoodie.store.remove('$share', id);
   };
 
+
+  // removeAll
+  // ------------
+  //
+  // delete all existing shares
+  //
   Share.prototype.removeAll = function () {
     this.hoodie.store.findAll(function (obj) {
       return obj.$shares;
@@ -3652,8 +3717,15 @@ Hoodie.Share = (function () {
     return this.hoodie.store.removeAll('$share');
   };
 
+
+  // Private
+  //---------
+
   Share.prototype._allowedOptions = ["id", "access", "createdBy"];
 
+
+  // ### filter share options
+  //
   Share.prototype._filterShareOptions = function (options) {
     var filteredOptions, option, _i, _len, _ref;
     options = options || {};
@@ -3669,6 +3741,11 @@ Hoodie.Share = (function () {
     return filteredOptions;
   };
 
+
+  // ### open
+  //
+  // opens a a remote share store, returns a Hoodie.Remote instance
+  //
   Share.prototype._open = function (shareId, options) {
     options = options || {};
     $.extend(options, {
@@ -3677,6 +3754,18 @@ Hoodie.Share = (function () {
     return new this.instance(this.hoodie, options);
   };
 
+
+  // hoodie.store decorations
+  // --------------------------
+  //
+  // hoodie.store decorations add custom methods to promises returned
+  // by hoodie.store methods like find, add or update. All methods return
+  // methods again that will be executed in the scope of the promise, but
+  // with access to the current hoodie instance
+  //
+
+  // shareAt
+  //
   Share.prototype._storeShareAt = function (shareId) {
     var self = this;
     return this.pipe(function (objects) {
@@ -3700,6 +3789,9 @@ Hoodie.Share = (function () {
     });
   };
 
+
+  // unshareAt
+  //
   Share.prototype._storeUnshareAt = function (shareId) {
     var self = this;
     return this.pipe(function (objects) {
@@ -3728,6 +3820,9 @@ Hoodie.Share = (function () {
     });
   };
 
+
+  // unshare
+  //
   Share.prototype._storeUnshare = function () {
     var self = this;
     return this.pipe(function (objects) {
@@ -3754,6 +3849,9 @@ Hoodie.Share = (function () {
     });
   };
 
+
+  // share
+  //
   Share.prototype._storeShare = function () {
     var self = this;
 
@@ -3788,6 +3886,7 @@ Hoodie.Share = (function () {
 
 })();
 
+// extend Hoodie
 Hoodie.extend('share', Hoodie.Share);
 
 // User
