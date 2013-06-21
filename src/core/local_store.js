@@ -57,7 +57,7 @@ Hoodie.LocalStore = (function (_super) {
     this._bootstrap();
   }
 
-  __extends(LocalStore, _super);
+  Object.deepExtend(LocalStore, _super);
 
 
   // 2 seconds timout before triggering the `store:idle` event

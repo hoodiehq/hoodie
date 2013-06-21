@@ -1,6 +1,6 @@
 'use strict';
 
-window.__extends = function(child, parent) {
+Object.deepExtend = function(child, parent) {
   for (var key in parent) {
     if (parent.hasOwnProperty(key)) {
       child[key] = parent[key];

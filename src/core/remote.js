@@ -85,7 +85,7 @@ Hoodie.Remote = (function(_super) {
     }
   }
 
-  __extends(Remote, _super);
+  Object.deepExtend(Remote, _super);
 
 
   // properties
@@ -744,7 +744,7 @@ ConnectionError = (function(_super) {
     ConnectionError.__super__.constructor.apply(this, arguments);
   }
 
-  __extends(ConnectionError, _super);
+  Object.deepExtend(ConnectionError, _super);
 
   ConnectionError.prototype.name = "ConnectionError";
 

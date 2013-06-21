@@ -44,7 +44,7 @@ window.Hoodie = window.Hoodie || (function(_super) {
     this.checkConnection();
   }
 
-  __extends(Hoodie, _super);
+  Object.deepExtend(Hoodie, _super);
 
   // ## Settings
 

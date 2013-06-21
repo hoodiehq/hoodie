@@ -49,7 +49,7 @@ Hoodie.ShareInstance = (function(_super) {
     ShareInstance.__super__.constructor.apply(this, arguments);
   }
 
-  __extends(ShareInstance, _super);
+  Object.deepExtend(ShareInstance, _super);
 
   // default values
   // ----------------

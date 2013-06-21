@@ -42,7 +42,7 @@ Hoodie.AccountRemote = (function(_super) {
     this.bootstrapKnownObjects();
   }
 
-  __extends(AccountRemote, _super);
+  Object.deepExtend(AccountRemote, _super);
 
   // connect by default
   AccountRemote.prototype.connected = true;
