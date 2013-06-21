@@ -1,12 +1,8 @@
 // LocalStore
 // ============
-
+//
 // window.localStrage wrapper and more
 //
-//
-//
-
-
 Hoodie.LocalStore = (function (_super) {
 
   'use strict';
@@ -17,11 +13,23 @@ Hoodie.LocalStore = (function (_super) {
     this._handleRemoteChange = __bind(this._handleRemoteChange, this);
     this.clear = __bind(this.clear, this);
     this.markAllAsChanged = __bind(this.markAllAsChanged, this);
+
+    // cache of localStorage for quicker access
     this._cached = {};
+
+    // map of dirty objects by their ids
     this._dirty = {};
+
+    // extend this property with extra functions that will be available
+    // on all promises returned by hoodie.store API. It has a reference
+    // to current hoodie instance by default
     this._promiseApi = {
       hoodie: this.hoodie
     };
+
+
+    // if browser does not support local storage persistence,
+    // e.g. Safari in private mode, overite the respective methods.
     if (!this.isPersistent()) {
       this.db = {
         getItem: function() {
@@ -44,14 +52,21 @@ Hoodie.LocalStore = (function (_super) {
         }
       };
     }
+
     this._subscribeToOutsideEvents();
     this._bootstrap();
   }
 
   __extends(LocalStore, _super);
 
+
+  // 2 seconds timout before triggering the `store:idle` event
   LocalStore.prototype.idleTimeout = 2000;
 
+
+  //
+  // localStorage proxy
+  //
   LocalStore.prototype.db = {
     getItem: function(key) {
       return window.localStorage.getItem(key);
@@ -73,6 +88,26 @@ Hoodie.LocalStore = (function (_super) {
     }
   };
 
+
+  // Save
+  // ------
+  //
+  // saves the passed object into the store and replaces
+  // an eventually existing object with same type & id.
+  //
+  // When id is undefined, it gets generated an new object gets saved
+  //
+  // It also adds timestamps along the way:
+  //
+  // * `createdAt` unless it already exists
+  // * `updatedAt` every time
+  // * `_syncedAt`  if changes comes from remote
+  //
+  // example usage:
+  //
+  //     store.save('car', undefined, {color: 'red'})
+  //     store.save('car', 'abc4567', {color: 'red'})
+  //
   LocalStore.prototype.save = function (type, id, properties, options) {
     var currentObject, defer, error, event, isNew, key, object;
 

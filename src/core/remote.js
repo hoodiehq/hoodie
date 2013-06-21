@@ -43,6 +43,7 @@ Hoodie.Remote = (function(_super) {
   'use strict';
 
   function Remote(hoodie, options) {
+    // sets name (think: namespace) and some other options
     this.hoodie = hoodie;
     options = options || {};
 
@@ -75,6 +76,8 @@ Hoodie.Remote = (function(_super) {
       this.baseUrl = options.baseUrl;
     }
 
+    // in order to differentiate whether an object from remote should trigger a 'new'
+    // or an 'update' event, we store a hash of known objects
     this._knownObjects = {};
 
     if (this.isConnected()) {
@@ -84,12 +87,42 @@ Hoodie.Remote = (function(_super) {
 
   __extends(Remote, _super);
 
+
+  // properties
+  // ------------
+  //
+  // name
+  //
+  // the name of the Remote is the name of the
+  // CouchDB database and is also used to prefix
+  // triggered events
+  //
   Remote.prototype.name = null;
 
+
+  // sync
+  //
+  // if set to true, updates will be continuously pulled
+  // and pushed. Alternatively, `sync` can be set to
+  // `pull: true` or `push: true`.
+  //
   Remote.prototype.connected = false;
 
+
+  // prefix
+  //
+  //prefix for docs in a CouchDB database, e.g. all docs
+  // in public user stores are prefixed by '$public/'
+  //
   Remote.prototype.prefix = '';
 
+
+  // request
+  // ---------
+  //
+  // wrapper for hoodie.request, with some store specific defaults
+  // and a prefixed path
+  //
   Remote.prototype.request = function(type, path, options) {
     options = options || {};
 
@@ -111,6 +144,12 @@ Hoodie.Remote = (function(_super) {
     return this.hoodie.request(type, path, options);
   };
 
+
+  // get
+  // -----
+  //
+  // send a GET request to the named view
+  //
   Remote.prototype.get = function() {
     return console.log.apply(
       console, [".get() not yet implemented"]
@@ -118,6 +157,12 @@ Hoodie.Remote = (function(_super) {
     );
   };
 
+
+  // post
+  // ------
+  //
+  // sends a POST request to the specified updated_function
+  //
   Remote.prototype.post = function() {
     return console.log.apply(
       console, [".post() not yet implemented"]
@@ -125,6 +170,15 @@ Hoodie.Remote = (function(_super) {
     );
   };
 
+  //
+  // Store Operations overides
+  // ---------------------------
+
+  // find
+  // ------
+  //
+  // find one object
+  //
   Remote.prototype.find = function(type, id) {
     var defer, path;
 
@@ -145,6 +199,12 @@ Hoodie.Remote = (function(_super) {
     return this.request("GET", path).pipe(this._parseFromRemote);
   };
 
+
+  // findAll
+  // ---------
+  //
+  // find all objects, can be filetered by a type
+  //
   Remote.prototype.findAll = function(type) {
     var defer, endkey, path, startkey;
 
@@ -171,6 +231,9 @@ Hoodie.Remote = (function(_super) {
     }
 
     if (startkey) {
+
+      // make sure that only objects starting with
+      // `startkey` will be returned
       endkey = startkey.replace(/.$/, function(chars) {
         var charCode;
         charCode = chars.charCodeAt(0);
@@ -181,6 +244,13 @@ Hoodie.Remote = (function(_super) {
     return this.request("GET", path).pipe(this._mapDocsFromFindAll).pipe(this._parseAllFromRemote);
   };
 
+
+  // save
+  // ------
+  //
+  // save a new object. If it existed before, all properties
+  // will be overwritten
+  //
   Remote.prototype.save = function(type, id, object) {
     var defer, path;
     defer = Remote.__super__.save.apply(this, arguments);
@@ -201,18 +271,36 @@ Hoodie.Remote = (function(_super) {
     });
   };
 
+
+  // remove
+  // ---------
+  //
+  // remove one object
+  //
   Remote.prototype.remove = function(type, id) {
     return this.update(type, id, {
       _deleted: true
     });
   };
 
+
+  // removeAll
+  // ------------
+  //
+  // remove all objects, can be filtered by type
+  //
   Remote.prototype.removeAll = function(type) {
     return this.updateAll(type, {
       _deleted: true
     });
   };
 
+
+  // isKnownObject
+  // ---------------
+  //
+  // determine between a known and a new object
+  //
   Remote.prototype.isKnownObject = function(object) {
     var key = "" + object.type + "/" + object.id;
 
@@ -221,17 +309,39 @@ Hoodie.Remote = (function(_super) {
     }
   };
 
+
+  // markAsKnownObject
+  // -------------
+  //
+  // determine between a known and a new object
+  //
   Remote.prototype.markAsKnownObject = function(object) {
     var key = "" + object.type + "/" + object.id;
     this._knownObjects[key] = 1;
     return this._knownObjects[key];
   };
 
+
+  //
+  // synchronization
+  // -----------------
+
+  // Connect
+  // ---------
+  //
+  // start syncing
+  //
   Remote.prototype.connect = function() {
     this.connected = true;
     return this.pull();
   };
 
+
+  // Disconnect
+  // ------------
+  //
+  // stop syncing changes from remote store
+  //
   Remote.prototype.disconnect = function() {
     this.connected = false;
 
@@ -245,19 +355,42 @@ Hoodie.Remote = (function(_super) {
 
   };
 
+
+  // isConnected
+  // -------------
+  //
+  //
   Remote.prototype.isConnected = function() {
     return this.connected;
   };
 
+
+  // getSinceNr
+  // ------------
+  //
+  // returns the sequence number from wich to start to find changes in pull
+  //
   Remote.prototype.getSinceNr = function() {
     return this._since || 0;
   };
 
+
+  // setSinceNr
+  // ------------
+  //
+  // sets the sequence number from wich to start to find changes in pull
+  //
   Remote.prototype.setSinceNr = function(seq) {
     this._since = seq;
     return this._since;
   };
 
+
+  // pull changes
+  // --------------
+  //
+  // a.k.a. make a GET request to CouchDB's `_changes` feed.
+  //
   Remote.prototype.pull = function() {
     this._pullRequest = this.request('GET', this._pullUrl());
 
@@ -269,6 +402,12 @@ Hoodie.Remote = (function(_super) {
     return this._pullRequest.then(this._handlePullSuccess, this._handlePullError);
   };
 
+
+  // push changes
+  // --------------
+  //
+  // Push objects to remote store using the `_bulk_docs` API.
+  //
   Remote.prototype.push = function(objects) {
     var object, objectsForRemote, _i, _len;
 
@@ -292,10 +431,21 @@ Hoodie.Remote = (function(_super) {
     });
   };
 
+  // sync changes
+  // --------------
+  //
+  // push objects, then pull updates.
+  //
   Remote.prototype.sync = function(objects) {
     return this.push(objects).pipe(this.pull);
   };
 
+
+  // Events
+  // --------
+  //
+  // namespaced alias for `hoodie.on`
+  //
   Remote.prototype.on = function(event, cb) {
     event = event.replace(/(^| )([^ ]+)/g, "$1" + this.name + ":$2");
     return this.hoodie.on(event, cb);
@@ -306,6 +456,9 @@ Hoodie.Remote = (function(_super) {
     return this.hoodie.one(event, cb);
   };
 
+
+  // namespaced alias for `hoodie.trigger`
+  //
   Remote.prototype.trigger = function() {
     var event, parameters, _ref;
     event = arguments[0],
@@ -313,8 +466,24 @@ Hoodie.Remote = (function(_super) {
     return (_ref = this.hoodie).trigger.apply(_ref, ["" + this.name + ":" + event].concat(Array.prototype.slice.call(parameters)));
   };
 
+
+  // Private
+  // --------------
+  //
+  // valid CouchDB doc attributes starting with an underscore
+  //
   Remote.prototype._validSpecialAttributes = ['_id', '_rev', '_deleted', '_revisions', '_attachments'];
 
+
+  // Parse for remote
+  // ------------------
+  //
+  // parse object for remote storage. All properties starting with an
+  // `underscore` do not get synchronized despite the special properties
+  // `_id`, `_rev` and `_deleted` (see above)
+  //
+  // Also `id` gets replaced with `_id` which consists of type & id
+  //
   Remote.prototype._parseForRemote = function(object) {
     var attr, properties;
     properties = $.extend({}, object);
@@ -330,6 +499,8 @@ Hoodie.Remote = (function(_super) {
         delete properties[attr];
       }
     }
+
+    // prepare CouchDB id
     properties._id = "" + properties.type + "/" + properties.id;
     if (this.prefix) {
       properties._id = "" + this.prefix + properties._id;
@@ -338,16 +509,29 @@ Hoodie.Remote = (function(_super) {
     return properties;
   };
 
+
+  // _parseFromRemote
+  // -----------------
+  //
+  // normalize objects coming from remote
+  //
+  // renames `_id` attribute to `id` and removes the type from the id,
+  // e.g. `type/123` -> `123`
+  //
   Remote.prototype._parseFromRemote = function(object) {
     var id, ignore, _ref;
 
     id = object._id || object.id;
-
     delete object._id;
 
     if (this.prefix) {
       id = id.replace(new RegExp('^' + this.prefix), '');
     }
+
+    // turn doc/123 into type = doc & id = 123
+    // NOTE: we don't use a simple id.split(/\//) here,
+    // as in some cases IDs might contain "/", too
+    //
     _ref = id.match(/([^\/]+)\/(.*)/),
     ignore = _ref[0],
     object.type = _ref[1],
@@ -366,6 +550,11 @@ Hoodie.Remote = (function(_super) {
     return _results;
   };
 
+
+  // ### _addRevisionTo
+  //
+  // extends passed object with a _rev property
+  //
   Remote.prototype._addRevisionTo = function(attributes) {
     var currentRevId, currentRevNr, newRevisionId, _ref;
     try {
@@ -375,30 +564,48 @@ Hoodie.Remote = (function(_super) {
     } catch (_error) {}
     currentRevNr = parseInt(currentRevNr, 10) || 0;
     newRevisionId = this._generateNewRevisionId();
+
+    // local changes are not meant to be replicated outside of the
+    // users database, therefore the `-local` suffix.
     if (attributes._$local) {
       newRevisionId += "-local";
     }
+
     attributes._rev = "" + (currentRevNr + 1) + "-" + newRevisionId;
     attributes._revisions = {
       start: 1,
       ids: [newRevisionId]
     };
+
     if (currentRevId) {
       attributes._revisions.start += currentRevNr;
       return attributes._revisions.ids.push(currentRevId);
     }
   };
 
+
+  // ### generate new revision id
+  //
+  //
   Remote.prototype._generateNewRevisionId = function() {
     return this.hoodie.uuid(9);
   };
 
+
+  // ### map docs from findAll
+  //
+  //
   Remote.prototype._mapDocsFromFindAll = function(response) {
     return response.rows.map(function(row) {
       return row.doc;
     });
   };
 
+
+  // ### pull url
+  //
+  // Depending on whether remote is connected, return a longpoll URL or not
+  //
   Remote.prototype._pullUrl = function() {
     var since;
     since = this.getSinceNr();
@@ -415,6 +622,10 @@ Hoodie.Remote = (function(_super) {
     }
   };
 
+
+  // request gets restarted automaticcally
+  // when aborted (see @_handlePullError)
+  //
   Remote.prototype._handlePullSuccess = function(response) {
     this.setSinceNr(response.last_seq);
     this._handlePullResults(response.results);
@@ -423,31 +634,64 @@ Hoodie.Remote = (function(_super) {
     }
   };
 
+
+  // ### pull error handler
+  //
+  // when there is a change, trigger event,
+  // then check for another change
+  //
   Remote.prototype._handlePullError = function(xhr, error) {
     if (!this.isConnected()) {
       return;
     }
 
     switch (xhr.status) {
+      // Session is invalid. User is still login, but needs to reauthenticate
+      // before sync can be continued
     case 401:
       this.trigger('error:unauthenticated', error);
       return this.disconnect();
+
+     // the 404 comes, when the requested DB has been removed
+     // or does not exist yet.
+     //
+     // BUT: it might also happen that the background workers did
+     //      not create a pending database yet. Therefore,
+     //      we try it again in 3 seconds
+     //
+     // TODO: review / rethink that.
+     //
+
     case 404:
       return window.setTimeout(this.pull, 3000);
     case 500:
+      //
+      // Please server, don't give us these. At least not persistently
+      //
       this.trigger('error:server', error);
       window.setTimeout(this.pull, 3000);
       return this.hoodie.checkConnection();
     default:
+      // usually a 0, which stands for timeout or server not reachable.
       if (xhr.statusText === 'abort') {
+        // manual abort after 25sec. restart pulling changes directly when connected
         return this.pull();
       } else {
+
+        // oops. This might be caused by an unreachable server.
+        // Or the server canceled it for what ever reason, e.g.
+        // heroku kills the request after ~30s.
+        // we'll try again after a 3s timeout
+        //
         window.setTimeout(this.pull, 3000);
         return this.hoodie.checkConnection();
       }
     }
   };
 
+
+  // ### handle changes from remote
+  //
   Remote.prototype._handlePullResults = function(changes) {
     var doc, event, object, _i, _len, _results = [];
 
