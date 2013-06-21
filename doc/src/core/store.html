@@ -1,18 +1,23 @@
 <!DOCTYPE html><html lang="en"><head><title>src/core/store</title></head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0"><meta name="groc-relative-root" content="../../"><meta name="groc-document-path" content="src/core/store"><meta name="groc-project-path" content="src/core/store.js"><link rel="stylesheet" type="text/css" media="all" href="../../assets/style.css"><script type="text/javascript" src="../../assets/behavior.js"></script><body><div id="meta"><div class="file-path">src/core/store.js</div></div><div id="document"><div class="segment"><div class="comments"><div class="wrapper"><h1 id="store">Store</h1></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>This class defines the API that other Stores have to implement to assure a
-coherent API.</p></div></div><div class="code"><div class="wrapper"><span class="c1">//</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>It also implements some validations and functionality that is the same across
-store impnementations</p></div></div><div class="code"><div class="wrapper"><span class="c1">//</span>
+coherent API.</p>
 
-<span class="nx">Hoodie</span><span class="p">.</span><span class="nx">Store</span> <span class="o">=</span> <span class="p">(</span><span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+<p>It also implements some validations and functionality that is the same across
+store impnementations</p></div></div><div class="code"><div class="wrapper"><span class="nx">Hoodie</span><span class="p">.</span><span class="nx">Store</span> <span class="o">=</span> <span class="p">(</span><span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
 
   <span class="s1">&#39;use strict&#39;</span><span class="p">;</span>
 
   <span class="kd">function</span> <span class="nx">Store</span><span class="p">(</span><span class="nx">hoodie</span><span class="p">)</span> <span class="p">{</span>
     <span class="k">this</span><span class="p">.</span><span class="nx">hoodie</span> <span class="o">=</span> <span class="nx">hoodie</span><span class="p">;</span>
   <span class="p">}</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h2 id="save">Save</h2></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>creates or replaces an an eventually existing object in the store
-with same type &amp; id.</p></div></div><div class="code"><div class="wrapper">  <span class="c1">//</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>When id is undefined, it gets generated and a new object gets saved</p></div></div><div class="code"><div class="wrapper">  <span class="c1">//</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>example usage:</p></div></div><div class="code"><div class="wrapper">  <span class="c1">//</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><pre><code>store.save('car', undefined, {color: 'red'})
+with same type &amp; id.</p>
+
+<p>When id is undefined, it gets generated and a new object gets saved</p>
+
+<p>example usage:</p>
+
+<pre><code>store.save('car', undefined, {color: 'red'})
 store.save('car', 'abc4567', {color: 'red'})
-</code></pre></div></div><div class="code"><div class="wrapper">  <span class="c1">//</span>
-  <span class="nx">Store</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">save</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">type</span><span class="p">,</span> <span class="nx">id</span><span class="p">,</span> <span class="nx">object</span><span class="p">,</span> <span class="nx">options</span><span class="p">)</span> <span class="p">{</span>
+</code></pre></div></div><div class="code"><div class="wrapper">  <span class="nx">Store</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">save</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">type</span><span class="p">,</span> <span class="nx">id</span><span class="p">,</span> <span class="nx">object</span><span class="p">,</span> <span class="nx">options</span><span class="p">)</span> <span class="p">{</span>
     <span class="kd">var</span> <span class="nx">defer</span><span class="p">;</span>
 
     <span class="k">if</span> <span class="p">(</span><span class="nx">options</span> <span class="o">===</span> <span class="kc">null</span><span class="p">)</span> <span class="p">{</span>
@@ -40,8 +45,7 @@ store.save('car', 'abc4567', {color: 'red'})
 
     <span class="k">return</span> <span class="nx">defer</span><span class="p">;</span>
   <span class="p">};</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h2 id="add">Add</h2></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p><code>.add</code> is an alias for <code>.save</code>, with the difference that there is no id argument.
-Internally it simply calls `.save(type, undefined, object).</p></div></div><div class="code"><div class="wrapper">  <span class="c1">//</span>
-  <span class="nx">Store</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">add</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">type</span><span class="p">,</span> <span class="nx">object</span><span class="p">,</span> <span class="nx">options</span><span class="p">)</span> <span class="p">{</span>
+Internally it simply calls `.save(type, undefined, object).</p></div></div><div class="code"><div class="wrapper">  <span class="nx">Store</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">add</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">type</span><span class="p">,</span> <span class="nx">object</span><span class="p">,</span> <span class="nx">options</span><span class="p">)</span> <span class="p">{</span>
 
     <span class="k">if</span> <span class="p">(</span><span class="nx">object</span> <span class="o">===</span> <span class="kc">undefined</span><span class="p">)</span> <span class="p">{</span>
       <span class="nx">object</span> <span class="o">=</span> <span class="p">{};</span>
@@ -51,11 +55,15 @@ Internally it simply calls `.save(type, undefined, object).</p></div></div><div 
 
     <span class="k">return</span> <span class="k">this</span><span class="p">.</span><span class="nx">save</span><span class="p">(</span><span class="nx">type</span><span class="p">,</span> <span class="nx">object</span><span class="p">.</span><span class="nx">id</span><span class="p">,</span> <span class="nx">object</span><span class="p">);</span>
   <span class="p">};</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h2 id="update">Update</h2></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>In contrast to <code>.save</code>, the <code>.update</code> method does not replace the stored object,
-but only changes the passed attributes of an exsting object, if it exists</p></div></div><div class="code"><div class="wrapper">  <span class="c1">//</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>both a hash of key/values or a function that applies the update to the passed
-object can be passed.</p></div></div><div class="code"><div class="wrapper">  <span class="c1">//</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>example usage</p></div></div><div class="code"><div class="wrapper">  <span class="c1">//</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>hoodie.store.update('car', 'abc4567', {sold: true})
-hoodie.store.update('car', 'abc4567', function(obj) { obj.sold = true })</p></div></div><div class="code"><div class="wrapper">  <span class="c1">//</span>
+but only changes the passed attributes of an exsting object, if it exists</p>
 
-  <span class="nx">Store</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">update</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">type</span><span class="p">,</span> <span class="nx">id</span><span class="p">,</span> <span class="nx">objectUpdate</span><span class="p">,</span> <span class="nx">options</span><span class="p">)</span> <span class="p">{</span>
+<p>both a hash of key/values or a function that applies the update to the passed
+object can be passed.</p>
+
+<p>example usage</p>
+
+<p>hoodie.store.update('car', 'abc4567', {sold: true})
+hoodie.store.update('car', 'abc4567', function(obj) { obj.sold = true })</p></div></div><div class="code"><div class="wrapper">  <span class="nx">Store</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">update</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">type</span><span class="p">,</span> <span class="nx">id</span><span class="p">,</span> <span class="nx">objectUpdate</span><span class="p">,</span> <span class="nx">options</span><span class="p">)</span> <span class="p">{</span>
     <span class="kd">var</span> <span class="nx">defer</span><span class="p">,</span> <span class="nx">_loadPromise</span><span class="p">,</span> <span class="nx">self</span> <span class="o">=</span> <span class="k">this</span><span class="p">;</span>
 
     <span class="nx">defer</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">hoodie</span><span class="p">.</span><span class="nx">defer</span><span class="p">();</span>
@@ -87,18 +95,18 @@ hoodie.store.update('car', 'abc4567', function(obj) { obj.sold = true })</p></di
 
       <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="p">(</span><span class="nx">changedProperties</span><span class="p">.</span><span class="nx">length</span> <span class="o">||</span> <span class="nx">options</span><span class="p">))</span> <span class="p">{</span>
         <span class="k">return</span> <span class="nx">defer</span><span class="p">.</span><span class="nx">resolve</span><span class="p">(</span><span class="nx">newObj</span><span class="p">);</span>
-      <span class="p">}</span>
-
-      <span class="c1">//apply update</span>
-      <span class="nx">self</span><span class="p">.</span><span class="nx">save</span><span class="p">(</span><span class="nx">type</span><span class="p">,</span> <span class="nx">id</span><span class="p">,</span> <span class="nx">newObj</span><span class="p">,</span> <span class="nx">options</span><span class="p">).</span><span class="nx">then</span><span class="p">(</span><span class="nx">defer</span><span class="p">.</span><span class="nx">resolve</span><span class="p">,</span> <span class="nx">defer</span><span class="p">.</span><span class="nx">reject</span><span class="p">);</span>
+      <span class="p">}</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>apply update</p></div></div><div class="code"><div class="wrapper">      <span class="nx">self</span><span class="p">.</span><span class="nx">save</span><span class="p">(</span><span class="nx">type</span><span class="p">,</span> <span class="nx">id</span><span class="p">,</span> <span class="nx">newObj</span><span class="p">,</span> <span class="nx">options</span><span class="p">).</span><span class="nx">then</span><span class="p">(</span><span class="nx">defer</span><span class="p">.</span><span class="nx">resolve</span><span class="p">,</span> <span class="nx">defer</span><span class="p">.</span><span class="nx">reject</span><span class="p">);</span>
     <span class="p">});</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>if not found, add it</p></div></div><div class="code"><div class="wrapper">    <span class="nx">_loadPromise</span><span class="p">.</span><span class="nx">fail</span><span class="p">(</span><span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
       <span class="k">return</span> <span class="nx">self</span><span class="p">.</span><span class="nx">save</span><span class="p">(</span><span class="nx">type</span><span class="p">,</span> <span class="nx">id</span><span class="p">,</span> <span class="nx">objectUpdate</span><span class="p">,</span> <span class="nx">options</span><span class="p">).</span><span class="nx">then</span><span class="p">(</span><span class="nx">defer</span><span class="p">.</span><span class="nx">resolve</span><span class="p">,</span> <span class="nx">defer</span><span class="p">.</span><span class="nx">reject</span><span class="p">);</span>
     <span class="p">});</span>
 
     <span class="k">return</span> <span class="nx">defer</span><span class="p">.</span><span class="nx">promise</span><span class="p">();</span>
   <span class="p">};</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h2 id="updateall">updateAll</h2></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>update all objects in the store, can be optionally filtered by a function
-As an alternative, an array of objects can be passed</p></div></div><div class="code"><div class="wrapper">  <span class="c1">//</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>example usage</p></div></div><div class="code"><div class="wrapper">  <span class="c1">//</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>hoodie.store.updateAll()</p></div></div><div class="code"><div class="wrapper">  <span class="c1">//</span>
-  <span class="nx">Store</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">updateAll</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">filterOrObjects</span><span class="p">,</span> <span class="nx">objectUpdate</span><span class="p">,</span> <span class="nx">options</span><span class="p">)</span> <span class="p">{</span>
+As an alternative, an array of objects can be passed</p>
+
+<p>example usage</p>
+
+<p>hoodie.store.updateAll()</p></div></div><div class="code"><div class="wrapper">  <span class="nx">Store</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">updateAll</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">filterOrObjects</span><span class="p">,</span> <span class="nx">objectUpdate</span><span class="p">,</span> <span class="nx">options</span><span class="p">)</span> <span class="p">{</span>
     <span class="kd">var</span> <span class="nx">promise</span><span class="p">,</span> <span class="nx">self</span> <span class="o">=</span> <span class="k">this</span><span class="p">;</span>
     <span class="nx">options</span> <span class="o">=</span> <span class="nx">options</span> <span class="o">||</span> <span class="p">{};</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>normalize the input: make sure we have all objects</p></div></div><div class="code"><div class="wrapper">    <span class="k">switch</span> <span class="p">(</span><span class="kc">true</span><span class="p">)</span> <span class="p">{</span>
     <span class="k">case</span> <span class="k">typeof</span> <span class="nx">filterOrObjects</span> <span class="o">===</span> <span class="s1">&#39;string&#39;</span><span class="o">:</span>
@@ -136,9 +144,12 @@ that will be resolved once all updates have been finished</p></div></div><div cl
       <span class="nx">$</span><span class="p">.</span><span class="nx">when</span><span class="p">.</span><span class="nx">apply</span><span class="p">(</span><span class="kc">null</span><span class="p">,</span> <span class="nx">_updatePromises</span><span class="p">).</span><span class="nx">then</span><span class="p">(</span><span class="nx">defer</span><span class="p">.</span><span class="nx">resolve</span><span class="p">);</span>
       <span class="k">return</span> <span class="nx">defer</span><span class="p">.</span><span class="nx">promise</span><span class="p">();</span>
     <span class="p">});</span>
-  <span class="p">};</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h2 id="find">find</h2></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>loads one object from Store, specified by <code>type</code> and <code>id</code></p></div></div><div class="code"><div class="wrapper">  <span class="c1">//</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>example usage:</p></div></div><div class="code"><div class="wrapper">  <span class="c1">//</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><pre><code>store.find('car', 'abc4567')
-</code></pre></div></div><div class="code"><div class="wrapper">  <span class="c1">//</span>
-  <span class="nx">Store</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">find</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">type</span><span class="p">,</span> <span class="nx">id</span><span class="p">)</span> <span class="p">{</span>
+  <span class="p">};</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h2 id="find">find</h2></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>loads one object from Store, specified by <code>type</code> and <code>id</code></p>
+
+<p>example usage:</p>
+
+<pre><code>store.find('car', 'abc4567')
+</code></pre></div></div><div class="code"><div class="wrapper">  <span class="nx">Store</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">find</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">type</span><span class="p">,</span> <span class="nx">id</span><span class="p">)</span> <span class="p">{</span>
     <span class="kd">var</span> <span class="nx">defer</span><span class="p">;</span>
     <span class="nx">defer</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">hoodie</span><span class="p">.</span><span class="nx">defer</span><span class="p">();</span>
     <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="p">(</span><span class="k">typeof</span> <span class="nx">type</span> <span class="o">===</span> <span class="s1">&#39;string&#39;</span> <span class="o">&amp;&amp;</span> <span class="k">typeof</span> <span class="nx">id</span> <span class="o">===</span> <span class="s1">&#39;string&#39;</span><span class="p">))</span> <span class="p">{</span>
@@ -149,8 +160,7 @@ that will be resolved once all updates have been finished</p></div></div><div cl
 <li>Try to find a share by given id</li>
 <li>If share could be found, return it</li>
 <li>If not, add one and return it.</li>
-</ol></div></div><div class="code"><div class="wrapper">  <span class="c1">//</span>
-  <span class="nx">Store</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">findOrAdd</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">type</span><span class="p">,</span> <span class="nx">id</span><span class="p">,</span> <span class="nx">attributes</span><span class="p">)</span> <span class="p">{</span>
+</ol></div></div><div class="code"><div class="wrapper">  <span class="nx">Store</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">findOrAdd</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">type</span><span class="p">,</span> <span class="nx">id</span><span class="p">,</span> <span class="nx">attributes</span><span class="p">)</span> <span class="p">{</span>
     <span class="kd">var</span> <span class="nx">defer</span><span class="p">,</span> <span class="nx">self</span> <span class="o">=</span> <span class="k">this</span><span class="p">;</span>
 
     <span class="k">if</span> <span class="p">(</span><span class="nx">attributes</span> <span class="o">===</span> <span class="kc">null</span><span class="p">)</span> <span class="p">{</span>
@@ -167,12 +177,12 @@ that will be resolved once all updates have been finished</p></div></div><div cl
     <span class="p">});</span>
     <span class="k">return</span> <span class="nx">defer</span><span class="p">.</span><span class="nx">promise</span><span class="p">();</span>
   <span class="p">};</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h2 id="findall">findAll</h2></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>returns all objects from store.
-Can be optionally filtered by a type or a function</p></div></div><div class="code"><div class="wrapper">  <span class="c1">//</span>
-  <span class="nx">Store</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">findAll</span> <span class="o">=</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+Can be optionally filtered by a type or a function</p></div></div><div class="code"><div class="wrapper">  <span class="nx">Store</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">findAll</span> <span class="o">=</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
     <span class="k">return</span> <span class="k">this</span><span class="p">.</span><span class="nx">hoodie</span><span class="p">.</span><span class="nx">defer</span><span class="p">();</span>
-  <span class="p">};</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h2 id="destroy">Destroy</h2></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>Destroyes one object specified by <code>type</code> and <code>id</code>.</p></div></div><div class="code"><div class="wrapper">  <span class="c1">//</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>when object has been synced before, mark it as deleted.
-Otherwise remove it from Store.</p></div></div><div class="code"><div class="wrapper">  <span class="c1">//</span>
-  <span class="nx">Store</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">remove</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">type</span><span class="p">,</span> <span class="nx">id</span><span class="p">,</span> <span class="nx">options</span><span class="p">)</span> <span class="p">{</span>
+  <span class="p">};</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h2 id="destroy">Destroy</h2></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>Destroyes one object specified by <code>type</code> and <code>id</code>.</p>
+
+<p>when object has been synced before, mark it as deleted.
+Otherwise remove it from Store.</p></div></div><div class="code"><div class="wrapper">  <span class="nx">Store</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">remove</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">type</span><span class="p">,</span> <span class="nx">id</span><span class="p">,</span> <span class="nx">options</span><span class="p">)</span> <span class="p">{</span>
     <span class="kd">var</span> <span class="nx">defer</span><span class="p">;</span>
 
     <span class="k">if</span> <span class="p">(</span><span class="nx">options</span> <span class="o">===</span> <span class="kc">null</span><span class="p">)</span> <span class="p">{</span>
@@ -186,8 +196,7 @@ Otherwise remove it from Store.</p></div></div><div class="code"><div class="wra
     <span class="p">}</span>
 
     <span class="k">return</span> <span class="nx">defer</span><span class="p">;</span>
-  <span class="p">};</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h2 id="removeall">removeAll</h2></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>Destroyes all objects. Can be filtered by a type</p></div></div><div class="code"><div class="wrapper">  <span class="c1">//</span>
-  <span class="nx">Store</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">removeAll</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">type</span><span class="p">,</span> <span class="nx">options</span><span class="p">)</span> <span class="p">{</span>
+  <span class="p">};</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h2 id="removeall">removeAll</h2></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>Destroyes all objects. Can be filtered by a type</p></div></div><div class="code"><div class="wrapper">  <span class="nx">Store</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">removeAll</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">type</span><span class="p">,</span> <span class="nx">options</span><span class="p">)</span> <span class="p">{</span>
     <span class="kd">var</span> <span class="nx">self</span> <span class="o">=</span> <span class="k">this</span><span class="p">;</span>
 
     <span class="nx">options</span> <span class="o">=</span> <span class="nx">options</span> <span class="o">||</span> <span class="p">{};</span>
@@ -205,11 +214,7 @@ Otherwise remove it from Store.</p></div></div><div class="code"><div class="wra
       <span class="k">return</span> <span class="nx">_results</span><span class="p">;</span>
     <span class="p">});</span>
 
-  <span class="p">};</span>
-
-  <span class="c1">//</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h2 id="private">Private</h2></div></div></div><div class="segment"><div class="code"><div class="wrapper">  <span class="c1">//</span>
-
-  <span class="nx">Store</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">_now</span> <span class="o">=</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+  <span class="p">};</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h2 id="private">Private</h2></div></div></div><div class="segment"><div class="code"><div class="wrapper">  <span class="nx">Store</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">_now</span> <span class="o">=</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
     <span class="k">return</span> <span class="k">new</span> <span class="nb">Date</span><span class="p">();</span>
   <span class="p">};</span>
 

@@ -1,6 +1,6 @@
-//
+// 
 // Central Config API
-//
+// 
 
 Hoodie.Config = (function() {
 
@@ -38,9 +38,9 @@ Hoodie.Config = (function() {
   Config.prototype.id = 'hoodie';
 
   // ## set
-  //
+  // 
   // adds a configuration
-  //
+  // 
   Config.prototype.set = function(key, value) {
     var isSilent, update;
 
@@ -61,26 +61,26 @@ Hoodie.Config = (function() {
   };
 
   // ## get
-  //
+  // 
   // receives a configuration
-  //
+  // 
   Config.prototype.get = function(key) {
     return this.cache[key];
   };
 
   // ## clear
-  //
+  // 
   // clears cache and removes object from store
-  //
+  // 
   Config.prototype.clear = function() {
     this.cache = {};
     return this.hoodie.store.remove(this.type, this.id);
   };
 
   // ## remove
-  //
+  // 
   // removes a configuration, is a simple alias for config.set(key, undefined)
-  //
+  // 
   Config.prototype.remove = function(key) {
     return this.set(key, void 0);
   };

@@ -137,10 +137,26 @@ window.Events = window.Events || (function() {
 
 })();
 
+// Hoodie
+// --------
+//
+// the door to world domination (apps)
+//
+
 window.Hoodie = window.Hoodie || (function(_super) {
 
   'use strict';
 
+  // ## Constructor
+
+  // When initializing a hoodie instance, an optional URL
+  // can be passed. That's the URL of a hoodie backend.
+  // If no URL passed it defaults to the current domain
+  // with an `api` subdomain.
+  //
+  //     // init a new hoodie instance
+  //     hoodie = new Hoodie
+  //
   function Hoodie(baseUrl) {
     this.baseUrl = baseUrl;
     this._handleCheckConnectionError = __bind(this._handleCheckConnectionError, this);
@@ -151,26 +167,43 @@ window.Hoodie = window.Hoodie || (function(_super) {
     this.resolve = __bind(this.resolve, this);
     this.checkConnection = __bind(this.checkConnection, this);
 
+    // remove trailing slash(es)
     this.baseUrl = this.baseUrl ? this.baseUrl.replace(/\/+$/, '') : "/_api";
 
+    // init core modules 
     this.store = new this.constructor.LocalStore(this);
     this.config = new this.constructor.Config(this);
     this.account = new this.constructor.Account(this);
     this.remote = new this.constructor.AccountRemote(this);
+
+    // init extensions
     this._loadExtensions();
+
+    // check connection
     this.checkConnection();
   }
 
   __extends(Hoodie, _super);
 
+  // ## Settings
+
+  // `online` (read-only)
   Hoodie.prototype.online = true;
 
+  // `checkConnectionInterval` (read-only)
   Hoodie.prototype.checkConnectionInterval = 30000;
 
+  // ## Requests
+
+  // use this method to send requests to the hoodie backend.
+  // 
+  //     promise = hoodie.request('GET', '/user_database/doc_id')
+  //
   Hoodie.prototype.request = function(type, url, options) {
     var defaults;
     options = options || {};
 
+    // if a relative path passed, prefix with @baseUrl
     if (!/^http/.test(url)) {
       url = "" + this.baseUrl + url;
     }
@@ -189,8 +222,24 @@ window.Hoodie = window.Hoodie || (function(_super) {
 
   };
 
-  Hoodie.prototype._checkConnectionRequest = null;
+  // ## Check Connection
 
+  // the `checkConnection` method is used, well, to check if
+  // the hoodie backend is reachable at `baseUrl` or not. 
+  // Check Connection is automatically called on startup
+  // and then each 30 seconds. If it fails, it 
+  // 
+  // - sets `hoodie.online = false`
+  // - triggers `offline` event
+  // - sets `checkConnectionInterval = 3000`
+  // 
+  // when connection can be reestablished, it
+  // 
+  // - sets `hoodie.online = true`
+  // - triggers `online` event
+  // - sets `checkConnectionInterval = 30000`
+  //
+  Hoodie.prototype._checkConnectionRequest = null;
   Hoodie.prototype.checkConnection = function() {
     var _ref;
 
@@ -201,6 +250,17 @@ window.Hoodie = window.Hoodie || (function(_super) {
     return this._checkConnectionRequest;
   };
 
+  // ## Open stores
+
+  // generic method to open a store. Used by
+  //
+  // * hoodie.remote
+  // * hoodie.user("joe")
+  // * hoodie.global
+  // * ... and more
+  // 
+  //     hoodie.open("some_store_name").findAll()
+  //
   Hoodie.prototype.open = function(storeName, options) {
     options = options || {};
     $.extend(options, {
@@ -209,6 +269,9 @@ window.Hoodie = window.Hoodie || (function(_super) {
     return new Hoodie.Remote(this, options);
   };
 
+  // ## uuid
+
+  // helper to generate unique ids.
   Hoodie.prototype.uuid = function(len) {
     var chars, i, radix;
 
@@ -228,46 +291,87 @@ window.Hoodie = window.Hoodie || (function(_super) {
     })()).join('');
   };
 
+  // ## Defers / Promises
+
+  // returns a defer object for custom promise handlings.
+  // Promises are heavely used throughout the code of hoodie.
+  // We currently borrow jQuery's implementation:
+  // http://api.jquery.com/category/deferred-object/
+  // 
+  //     defer = hoodie.defer()
+  //     if (good) {
+  //       defer.resolve('good.')
+  //     } else {
+  //       defer.reject('not good.')
+  //     }
+  //     return defer.promise()
+  // 
   Hoodie.prototype.defer = $.Deferred;
 
+  // 
   Hoodie.prototype.isPromise = function(obj) {
     return typeof (obj !== undefined ? obj.done : null) === 'function' && typeof obj.resolve === 'undefined';
   };
 
+  // 
   Hoodie.prototype.resolve = function() {
     return this.defer().resolve().promise();
   };
 
+  // 
   Hoodie.prototype.reject = function() {
     return this.defer().reject().promise();
   };
 
+  // 
   Hoodie.prototype.resolveWith = function() {
     var _ref;
     return (_ref = this.defer()).resolve.apply(_ref, arguments).promise();
   };
 
+  // 
   Hoodie.prototype.rejectWith = function() {
     var _ref;
     return (_ref = this.defer()).reject.apply(_ref, arguments).promise();
   };
 
+
+  // dispose
+  // ---------
+
+  // if a hoodie instance is not needed anymore, it can
+  // be disposed using this method. A `dispose` event
+  // gets triggered that the modules react on.
   Hoodie.prototype.dispose = function() {
     return this.trigger('dispose');
   };
 
+
+  // ## Extending hoodie
+
+  // You can either extend the Hoodie class, or a hoodie
+  // instance dooring runtime
+  //
+  //     Hoodie.extend('magic1', funcion(hoodie) { /* ... */ })
+  //     hoodie = new Hoodie
+  //     hoodie.extend('magic2', function(hoodie) { /* ... */ })
+  //     hoodie.magic1.doSomething()
+  //     hoodie.magic2.doSomethingElse()
   Hoodie.extend = function(name, Module) {
     this._extensions = this._extensions || {};
     this._extensions[name] = Module;
 
     return this._extensions[name];
   };
-
   Hoodie.prototype.extend = function(name, Module) {
     this[name] = new Module(this);
     return this[name];
   };
 
+
+  // ## Private
+
+  // 
   Hoodie.prototype._loadExtensions = function() {
     var Module, instanceName, _ref, _results;
     _ref = this.constructor._extensions;
@@ -283,6 +387,7 @@ window.Hoodie = window.Hoodie || (function(_super) {
     return _results;
   };
 
+  // 
   Hoodie.prototype._handleCheckConnectionSuccess = function() {
     this.checkConnectionInterval = 30000;
 
@@ -296,6 +401,7 @@ window.Hoodie = window.Hoodie || (function(_super) {
     return this.defer().resolve();
   };
 
+  // 
   Hoodie.prototype._handleCheckConnectionError = function() {
     this.checkConnectionInterval = 3000;
 
@@ -312,7 +418,6 @@ window.Hoodie = window.Hoodie || (function(_super) {
   return Hoodie;
 
 })(window.Events);
-
 
 // Hoodie.Account
 // ================

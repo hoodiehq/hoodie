@@ -3,11 +3,11 @@
 
 // the User Module provides a simple API to find objects from other users public
 // stores
-//
+// 
 // For example, the syntax to find all objects from user "Joe" looks like this:
-//
+// 
 //     hoodie.user("Joe").findAll().done( handleObjects )
-//
+// 
 
 Hoodie.User = (function() {
 
@@ -39,18 +39,18 @@ Hoodie.User = (function() {
 
   // hoodie.store decorations
   // --------------------------
-  //
+  // 
   // hoodie.store decorations add custom methods to promises returned
   // by hoodie.store methods like find, add or update. All methods return
   // methods again that will be executed in the scope of the promise, but
   // with access to the current hoodie instance
 
   // publish
-  //
+  // 
   // publish an object. If an array of properties passed, publish only these
   // attributes and hide the remaining ones. If no properties passed, publish
   // the entire object.
-  //
+  // 
   User.prototype._storePublish = function(properties) {
     var _this = this;
     return this.pipe(function(objects) {
@@ -71,9 +71,9 @@ Hoodie.User = (function() {
 
 
   //`unpublish`
-  //
+  // 
   // unpublish
-  //
+  // 
   User.prototype._storeUnpublish = function() {
     var _this = this;
     return this.pipe(function(objects) {

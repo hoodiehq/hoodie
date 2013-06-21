@@ -5,11 +5,11 @@ window.Events = window.Events || (function() {
   function Events() {}
 
   // ## Bind
-  //
+  // 
   // bind a callback to an event triggerd by the object
-  //
+  // 
   //     object.bind 'cheat', blame
-  //
+  // 
   Events.prototype.bind = function(ev, callback) {
     var calls, evs, name, _i, _len, _results = [];
 
@@ -28,11 +28,11 @@ window.Events = window.Events || (function() {
   Events.prototype.on = Events.prototype.bind;
 
   // ## one
-  //
+  // 
   // same as `bind`, but does get executed only once
-  //
+  // 
   //     object.one 'groundTouch', gameOver
-  //
+  // 
   Events.prototype.one = function(ev, callback) {
     this.bind(ev, function() {
       this.unbind(ev, callback);
@@ -41,10 +41,10 @@ window.Events = window.Events || (function() {
   };
 
   // ## trigger
-  //
+  // 
   // trigger an event and pass optional parameters for binding.
   //     object.trigger 'win', score: 1230
-  //
+  // 
   Events.prototype.trigger = function() {
     var args, callback, ev, list, _i, _len, _ref;
 
@@ -65,14 +65,14 @@ window.Events = window.Events || (function() {
   };
 
   // ## unbind
-  //
+  // 
   // unbind to from all bindings, from all bindings of a specific event
   // or from a specific binding.
-  //
+  // 
   //     object.unbind()
   //     object.unbind 'move'
   //     object.unbind 'move', follow
-  //
+  // 
   Events.prototype.unbind = function(ev, callback) {
     var cb, i, list, _i, _len, _ref;
 
