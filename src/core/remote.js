@@ -216,8 +216,9 @@ Hoodie.Remote = (function(_super) {
   Remote.prototype.isKnownObject = function(object) {
     var key = "" + object.type + "/" + object.id;
 
-    this._knownObjects[key] !== undefined;
-    return this._knownObjects[key];
+    if (this._knownObjects[key] !== undefined) {
+      return this._knownObjects[key];
+    }
   };
 
   Remote.prototype.markAsKnownObject = function(object) {
@@ -259,10 +260,12 @@ Hoodie.Remote = (function(_super) {
 
   Remote.prototype.pull = function() {
     this._pullRequest = this.request('GET', this._pullUrl());
+
     if (this.isConnected()) {
       window.clearTimeout(this._pullRequestTimeout);
       this._pullRequestTimeout = window.setTimeout(this._restartPullRequest, 25000);
     }
+
     return this._pullRequest.then(this._handlePullSuccess, this._handlePullError);
   };
 
@@ -436,11 +439,6 @@ Hoodie.Remote = (function(_super) {
       window.setTimeout(this.pull, 3000);
       return this.hoodie.checkConnection();
     default:
-
-      if (!this.isConnected()) {
-        return;
-      }
-
       if (xhr.statusText === 'abort') {
         return this.pull();
       } else {
@@ -451,20 +449,23 @@ Hoodie.Remote = (function(_super) {
   };
 
   Remote.prototype._handlePullResults = function(changes) {
-    var doc, event, object, _i, _len, _results;
-    _results = [];
+    var doc, event, object, _i, _len, _results = [];
+
     for (_i = 0, _len = changes.length; _i < _len; _i++) {
       doc = changes[_i].doc;
+
       if (this.prefix && doc._id.indexOf(this.prefix) !== 0) {
         continue;
       }
+
       object = this._parseFromRemote(doc);
+
       if (object._deleted) {
         if (!this.isKnownObject(object)) {
           continue;
         }
         event = 'remove';
-        delete this.isKnownObject(object);
+        this.isKnownObject(object);
       } else {
         if (this.isKnownObject(object)) {
           event = 'update';
@@ -473,12 +474,14 @@ Hoodie.Remote = (function(_super) {
           this.markAsKnownObject(object);
         }
       }
+
       this.trigger("" + event, object);
       this.trigger("" + event + ":" + object.type, object);
       this.trigger("" + event + ":" + object.type + ":" + object.id, object);
       this.trigger("change", event, object);
       this.trigger("change:" + object.type, event, object);
       _results.push(this.trigger("change:" + object.type + ":" + object.id, event, object));
+
     }
     return _results;
   };
