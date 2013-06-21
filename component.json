@@ -10,6 +10,7 @@
     "src/",
     ".gitignore",
     "Gruntfile.js",
-    "node_modules"
+    "node_modules",
+    "testem.yml"
   ]
 }
