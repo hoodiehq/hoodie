@@ -32,5 +32,9 @@
     "grunt-groc": "~0.3.0",
     "testem": "~0.3.6",
     "grunt-shell": "~0.2.2"
+  },
+  "scripts": {
+    "test": "grunt test --verbose",
+    "build": "grunt build --verbose"
   }
 }
