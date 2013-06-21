@@ -3,7 +3,7 @@ describe("Events", function() {
   'use strict';
 
   beforeEach(function() {
-    this.obj = new Events();
+    this.obj = new window.Events();
   });
 
   describe(".bind(event, callback)", function() {
@@ -33,7 +33,6 @@ describe("Events", function() {
       var cb;
       cb = jasmine.createSpy('test');
       this.obj.one('test', cb);
-      this.obj.trigger('test');
       this.obj.trigger('test');
       expect(cb.callCount).toBe(1);
     });
