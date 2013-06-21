@@ -136,11 +136,19 @@ window.Hoodie = window.Hoodie || (function(_super) {
   Hoodie.prototype.uuid = function(len) {
     var chars, i, radix;
 
+    // default uuid length to 7
     if (len === undefined) {
       len = 7;
     }
+
+    // uuids consist of numbers and lowercase letters only.
+    // We stick to lowercase letters to prevent confusion
+    // and to prevent issues with CouchDB, e.g. database 
+    // names do wonly allow for lowercase letters.
     chars = '0123456789abcdefghijklmnopqrstuvwxyz'.split('');
     radix = chars.length;
+
+    // eehmm, yeah.
     return ((function() {
       var _i, _results;
       _results = [];
