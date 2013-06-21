@@ -1,0 +1,9 @@
+testrunner: jasmine
+test_page: test/index.html
+launch_in_dev:
+    - PhantomJs
+    - Chrome
+
+launch_in_ci:
+    - PhantomJs
+

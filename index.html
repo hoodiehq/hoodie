@@ -2,84 +2,84 @@
 <html>
 <head>
   <title>Hoodie Test page</title>
-  <link href="vendor/prism/prism.css" type="text/css" rel="stylesheet" />
+  <link href="lib/prism/prism.css" type="text/css" rel="stylesheet" />
 </head>
 <body>
-  
+
   <div class="container" style="margin: 50px auto; max-width: 920px;">
     <pre><code class="language-javascript">
-    
-    // 
+
+    //
     // initialize your Hoodie App
     //
-    
+
     whereTheMagicHappens = 'https://yourapp.hood.ie';
     hoodie = new Hoodie(whereTheMagicHappens);
-    
-    // 
-    // Account 
+
     //
-    
+    // Account
+    //
+
     // sign up
     hoodie.account.signUp('joe@example.com', 'secret')
-      
+
     // sign in
     hoodie.account.signIn('joe@example.com', 'secret')
-      
+
     // sign out
     hoodie.account.signOut()
-    
+
     // change password
     hoodie.account.changePassword('currentpassword', 'newpassword')
 
     // change username
     hoodie.account.changeUsername('currentpassword', 'newusername')
-      
+
     // reset password
     hoodie.account.resetPassword('joe@example.com')
 
     // destroy account and all its data
     hoodie.account.destroy()
-      
+
     //
     // Store
     //
-    
+
     // add a new object
     type = 'couch'
     attributes = {color: "red"}
     hoodie.store.add(type, attributes )
       .done ( function(newObject) { } )
-      
+
     // save an object
     type = 'couch'
     id   = 'abc4567'
     attributes  = {color: "red", name: "relax"}
     hoodie.store.save( type, id, attributes )
       .done ( function(object) { } )
-      
+
     // update an existing object
     type = 'couch'
     id   = 'abc4567'
     update = {size: 2}
     hoodie.store.update( type, id, update )
       .done ( function(updatedObject) { } )
-    
+
     // find one object
     type = 'couch'
     id   = 'abc4567'
     hoodie.store.find( type, id )
       .done ( function(object) { } )
-      
+
     // Load all objects
     hoodie.store.findAll()
       .done ( function(objects) { } )
-      
+
     // Load all objects from one type
     type = 'couch'
     hoodie.store.findAll( type )
       .done ( function(objects) { } )
-      
+
     // remove an existing object
     type = 'couch'
     id   = 'abc4567'
@@ -113,14 +113,14 @@
     hoodie.store.on( "remove:couch:uuid123", function( removedObject) { } )
     hoodie.store.on( "change:couch:uuid123", function( event, changedObject) { } )
 
-      
+
     //
     // Synchronization
     //
     // When signed in, local changes do get synched automatically.
     // You can subscribe to remote updates
-    // 
-    
+    //
+
     // new doc created
     hoodie.remote.on( 'add', function( newObject) { } )
 
@@ -169,20 +169,20 @@
 
     //
     // Global Public Store
-    // 
-    // When enabled, all publicly shared objects by all users will be 
+    //
+    // When enabled, all publicly shared objects by all users will be
     // available through the hoodie.global API
     //
 
     // find all public songs from all users
     hoodie.global.findAll("song").done( function(songs) { ... })
 
-    
+
     //
     // Sharing
     //
     // The hoodie.share module allows to share objects with other users. A share
-    // can be public, which means everybody knowing its id can access it. Or the 
+    // can be public, which means everybody knowing its id can access it. Or the
     // access can be limited to specific users. Optionally, a password can be set
     // for additional security. Access can be differenciated between read and write.
     //
@@ -221,11 +221,11 @@
     // subscribe / unsubscribe
     hoodie.share('shareId').subscribe()
     hoodie.share('shareId').unsubscribe()
-      
-    
+
+
     //
     // Send emails
-    // 
+    //
     email = {
       to      : ['you@roundthewor.ld'],
       cc      : ['rest@roundthewor.ld'],
@@ -250,11 +250,11 @@
     //
     </code></pre>
   </div>
-  
+
   <!-- deplendencies for hoodie -->
-  <script src="vendor/jquery/jquery.min.js"></script>
-  <script src="hoodie.js"></script>
-  <script src="vendor/prism/prism.js"></script>
-  
+  <script src="lib/jquery/jquery.js"></script>
+  <script src="dist/hoodie.js"></script>
+  <script src="lib/prism/prism.js"></script>
+
 </body>
 </html>
