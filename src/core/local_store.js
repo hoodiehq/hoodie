@@ -1,18 +1,18 @@
 // LocalStore
 // ============
-// 
+//
 // window.localStrage wrapper and more
-// 
+//
 Hoodie.LocalStore = (function (_super) {
 
   'use strict';
 
   function LocalStore(hoodie) {
     this.hoodie = hoodie;
-    this._triggerDirtyAndIdleEvents = __bind(this._triggerDirtyAndIdleEvents, this);
-    this._handleRemoteChange = __bind(this._handleRemoteChange, this);
-    this.clear = __bind(this.clear, this);
-    this.markAllAsChanged = __bind(this.markAllAsChanged, this);
+    this._triggerDirtyAndIdleEvents = this._triggerDirtyAndIdleEvents.bind(this);
+    this._handleRemoteChange = this._handleRemoteChange.bind(this);
+    this.clear = this.clear.bind(this);
+    this.markAllAsChanged = this.markAllAsChanged.bind(this);
 
     // cache of localStorage for quicker access
     this._cached = {};
@@ -64,9 +64,9 @@ Hoodie.LocalStore = (function (_super) {
   LocalStore.prototype.idleTimeout = 2000;
 
 
-  // 
+  //
   // localStorage proxy
-  // 
+  //
   LocalStore.prototype.db = {
     getItem: function(key) {
       return window.localStorage.getItem(key);
@@ -91,23 +91,23 @@ Hoodie.LocalStore = (function (_super) {
 
   // Save
   // ------
-  // 
+  //
   // saves the passed object into the store and replaces
   // an eventually existing object with same type & id.
-  // 
+  //
   // When id is undefined, it gets generated an new object gets saved
-  // 
+  //
   // It also adds timestamps along the way:
-  // 
+  //
   // * `createdAt` unless it already exists
   // * `updatedAt` every time
   // * `_syncedAt`  if changes comes from remote
-  // 
+  //
   // example usage:
-  // 
+  //
   //     store.save('car', undefined, {color: 'red'})
   //     store.save('car', 'abc4567', {color: 'red'})
-  // 
+  //
   LocalStore.prototype.save = function (type, id, properties, options) {
     var currentObject, defer, error, event, isNew, key, object;
 
@@ -200,13 +200,13 @@ Hoodie.LocalStore = (function (_super) {
 
   // returns all objects from store.
   // Can be optionally filtered by a type or a function
-  // 
+  //
   // example usage:
-  // 
+  //
   //     store.findAll()
   //     store.findAll('car')
   //     store.findAll(function(obj) { return obj.brand == 'Tesla' })
-  // 
+  //
   LocalStore.prototype.findAll = function(filter) {
     var currentType, defer, error, id, key, keys, obj, results, type;
 

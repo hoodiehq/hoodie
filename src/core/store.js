@@ -3,10 +3,10 @@
 
 // This class defines the API that other Stores have to implement to assure a
 // coherent API.
-// 
+//
 // It also implements some validations and functionality that is the same across
 // store impnementations
-// 
+//
 
 Hoodie.Store = (function() {
 
@@ -20,14 +20,14 @@ Hoodie.Store = (function() {
 
   // creates or replaces an an eventually existing object in the store
   // with same type & id.
-  // 
+  //
   // When id is undefined, it gets generated and a new object gets saved
-  // 
+  //
   // example usage:
-  // 
+  //
   //     store.save('car', undefined, {color: 'red'})
   //     store.save('car', 'abc4567', {color: 'red'})
-  // 
+  //
   Store.prototype.save = function(type, id, object, options) {
     var defer;
 
@@ -61,7 +61,7 @@ Hoodie.Store = (function() {
 
   // `.add` is an alias for `.save`, with the difference that there is no id argument.
   // Internally it simply calls `.save(type, undefined, object).
-  // 
+  //
   Store.prototype.add = function(type, object, options) {
 
     if (object === undefined) {
@@ -77,15 +77,15 @@ Hoodie.Store = (function() {
 
   // In contrast to `.save`, the `.update` method does not replace the stored object,
   // but only changes the passed attributes of an exsting object, if it exists
-  // 
+  //
   // both a hash of key/values or a function that applies the update to the passed
   // object can be passed.
-  // 
+  //
   // example usage
-  // 
+  //
   // hoodie.store.update('car', 'abc4567', {sold: true})
   // hoodie.store.update('car', 'abc4567', function(obj) { obj.sold = true })
-  // 
+  //
 
   Store.prototype.update = function(type, id, objectUpdate, options) {
     var defer, _loadPromise, self = this;
@@ -143,11 +143,11 @@ Hoodie.Store = (function() {
 
   // update all objects in the store, can be optionally filtered by a function
   // As an alternative, an array of objects can be passed
-  // 
+  //
   // example usage
-  // 
+  //
   // hoodie.store.updateAll()
-  // 
+  //
   Store.prototype.updateAll = function(filterOrObjects, objectUpdate, options) {
     var promise, self = this;
     options = options || {};
@@ -196,11 +196,11 @@ Hoodie.Store = (function() {
   // ## find
 
   // loads one object from Store, specified by `type` and `id`
-  // 
+  //
   // example usage:
-  // 
+  //
   //     store.find('car', 'abc4567')
-  // 
+  //
   Store.prototype.find = function(type, id) {
     var defer;
     defer = this.hoodie.defer();
@@ -215,7 +215,7 @@ Hoodie.Store = (function() {
   // 1. Try to find a share by given id
   // 2. If share could be found, return it
   // 3. If not, add one and return it.
-  // 
+  //
   Store.prototype.findOrAdd = function(type, id, attributes) {
     var defer, self = this;
 
@@ -238,7 +238,7 @@ Hoodie.Store = (function() {
 
   // returns all objects from store.
   // Can be optionally filtered by a type or a function
-  // 
+  //
   Store.prototype.findAll = function() {
     return this.hoodie.defer();
   };
@@ -246,10 +246,10 @@ Hoodie.Store = (function() {
   // ## Destroy
 
   // Destroyes one object specified by `type` and `id`.
-  // 
+  //
   // when object has been synced before, mark it as deleted.
   // Otherwise remove it from Store.
-  // 
+  //
   Store.prototype.remove = function(type, id, options) {
     var defer;
 
@@ -269,7 +269,7 @@ Hoodie.Store = (function() {
   // ## removeAll
 
   // Destroyes all objects. Can be filtered by a type
-  // 
+  //
   Store.prototype.removeAll = function(type, options) {
     var self = this;
 
@@ -290,9 +290,9 @@ Hoodie.Store = (function() {
 
   };
 
-  // 
+  //
   // ## Private
-  // 
+  //
 
   Store.prototype._now = function() {
     return new Date();
