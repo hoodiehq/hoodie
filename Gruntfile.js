@@ -70,7 +70,9 @@ module.exports = function(grunt) {
     shell: {
       test: {
         command: 'node node_modules/testem/testem.js ci',
-        stdout: true
+        options: {
+          stdout: true
+        }
       }
     }
 
