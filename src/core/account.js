@@ -72,15 +72,15 @@ Hoodie.Account = (function () {
       return this.hoodie.defer().resolve(this.username).promise();
     }
 
-    if (((_ref = this._requests.signOut) != null ? _ref.state() : null) === 'pending') {
+    if (((_ref = this._requests.signOut) !== undefined ? _ref.state() : null) === 'pending') {
       return this._requests.signOut.then(this.hoodie.rejectWith);
     }
 
-    if (((_ref1 = this._requests.signIn) != null ? _ref1.state() : null) === 'pending') {
+    if (((_ref1 = this._requests.signIn) !== undefined ? _ref1.state() : null) === 'pending') {
       return this._requests.signIn;
     }
 
-    if (this.username === void 0) {
+    if (this.username === undefined) {
       return this._sendSignOutRequest().then(function() {
         self._authenticated = false;
         return self.hoodie.rejectWith();
@@ -88,8 +88,12 @@ Hoodie.Account = (function () {
     }
 
     sendAndHandleAuthRequest = function() {
-      return self.request('GET', "/_session").pipe(self._handleAuthenticateRequestSuccess, self._handleRequestError);
+      return self.request('GET', "/_session").pipe(
+        self._handleAuthenticateRequestSuccess,
+        self._handleRequestError
+      );
     };
+
     return this._withSingleRequest('authenticate', sendAndHandleAuthRequest);
   };
 
@@ -153,7 +157,7 @@ Hoodie.Account = (function () {
   };
 
   Account.prototype.hasAnonymousAccount = function() {
-    return this.getAnonymousPassword() != null;
+    return this.getAnonymousPassword() !== undefined;
   };
 
   Account.prototype._anonymousPasswordKey = '_account.anonymousPassword';
@@ -304,7 +308,10 @@ Hoodie.Account = (function () {
     if (!this.hasAccount()) {
       return this._cleanupAndTriggerSignOut();
     }
-    return this.fetch().pipe(this._handleFetchBeforeDestroySucces, this._handleFetchBeforeDestroyError).pipe(this._cleanupAndTriggerSignOut);
+    return this.fetch().pipe(
+      this._handleFetchBeforeDestroySucces,
+      this._handleFetchBeforeDestroyError
+    ).pipe(this._cleanupAndTriggerSignOut);
   };
 
   Account.prototype._prefix = 'org.couchdb.user';
@@ -408,7 +415,7 @@ Hoodie.Account = (function () {
       defer = self.hoodie.defer();
       username = response.name.replace(/^user(_anonymous)?\//, '');
 
-      if (~response.roles.indexOf("error")) {
+      if (response.roles.indexOf("error") !== -1) {
         self.fetch(username).fail(defer.reject).done(function() {
           return defer.reject({
             error: "error",
@@ -629,10 +636,9 @@ Hoodie.Account = (function () {
   };
 
   Account.prototype._withPreviousRequestsAborted = function(name, requestFunction) {
-    var _ref;
-    if ((_ref = this._requests[name]) != null) {
-      if (typeof _ref.abort === "function") {
-        _ref.abort();
+    if (this._requests[name] !== undefined) {
+      if (typeof this._requests[name].abort === "function") {
+        this._requests[name].abort();
       }
     }
     this._requests[name] = requestFunction();
@@ -641,7 +647,7 @@ Hoodie.Account = (function () {
 
   Account.prototype._withSingleRequest = function(name, requestFunction) {
     var _ref;
-    if (((_ref = this._requests[name]) != null ? typeof _ref.state === "function" ? _ref.state() : null : null) === 'pending') {
+    if (((_ref = this._requests[name]) !== undefined ? typeof _ref.state === "function" ? _ref.state() : null : null) === 'pending') {
       return this._requests[name];
     }
 

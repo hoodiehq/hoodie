@@ -269,10 +269,12 @@ Hoodie.Remote = (function(_super) {
   Remote.prototype.push = function(objects) {
     var object, objectsForRemote, _i, _len;
 
-    if (!(objects != null ? objects.length : void 0)) {
+    if (!(objects !== undefined ? objects.length : void 0)) {
       return this.hoodie.resolveWith([]);
     }
+
     objectsForRemote = [];
+
     for (_i = 0, _len = objects.length; _i < _len; _i++) {
       object = objects[_i];
       this._addRevisionTo(object);
@@ -315,13 +317,15 @@ Hoodie.Remote = (function(_super) {
     properties = $.extend({}, object);
 
     for (attr in properties) {
-      if (~this._validSpecialAttributes.indexOf(attr)) {
-        continue;
+      if (properties.hasOwnProperty(attr)) {
+        if (this._validSpecialAttributes.indexOf(attr) !== -1) {
+          continue;
+        }
+        if (!/^_/.test(attr)) {
+          continue;
+        }
+        delete properties[attr];
       }
-      if (!/^_/.test(attr)) {
-        continue;
-      }
-      delete properties[attr];
     }
     properties._id = "" + properties.type + "/" + properties.id;
     if (this.prefix) {

@@ -35,9 +35,9 @@ Hoodie.AccountRemote = (function(_super) {
   };
 
   AccountRemote.prototype.bootstrapKnownObjects = function() {
-    var id, key, type, _i, _len, _ref, _ref1, _results;
+    var id, key, type, _i, _len, _ref, _ref1, _results = [];
     _ref = this.hoodie.store.index();
-    _results = [];
+
     for (_i = 0, _len = _ref.length; _i < _len; _i++) {
       key = _ref[_i];
       _ref1 = key.split(/\//),

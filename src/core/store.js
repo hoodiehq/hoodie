@@ -93,7 +93,7 @@ Hoodie.Store = (function() {
     defer = this.hoodie.defer();
 
     _loadPromise = this.find(type, id).pipe(function(currentObj) {
-      var changedProperties, key, newObj, value;
+      var changedProperties, newObj, value;
 
       // normalize input
       newObj = $.extend(true, {}, currentObj);
@@ -108,16 +108,17 @@ Hoodie.Store = (function() {
 
       // check if something changed
       changedProperties = (function() {
-        var _results;
+        var _results = [];
 
-        _results = [];
-        for (key in objectUpdate) {
-          value = objectUpdate[key];
-          if (!(currentObj[key] !== value)) {
-            continue;
+        for (var key in objectUpdate) {
+          if (objectUpdate.hasOwnProperty(key)) {
+            value = objectUpdate[key];
+            if ((currentObj[key] !== value) === false) {
+              continue;
+            }
+            newObj[key] = value;
+            _results.push(key);
           }
-          newObj[key] = value;
-          _results.push(key);
         }
         return _results;
       })();

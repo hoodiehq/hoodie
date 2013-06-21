@@ -210,8 +210,8 @@ Hoodie.ShareInstance = (function(_super) {
 
   ShareInstance.prototype._parseSecurity = function(security) {
     var access, read, write, _ref, _ref1;
-    read = (_ref = security.members) != null ? _ref.roles : void 0;
-    write = (_ref1 = security.writers) != null ? _ref1.roles : void 0;
+    read = (_ref = security.members) !== null ? _ref.roles : void 0;
+    write = (_ref1 = security.writers) !== null ? _ref1.roles : void 0;
     access = {};
 
     if (read !== undefined) {

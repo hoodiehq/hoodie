@@ -55,10 +55,11 @@ window.Hoodie = (function(_super) {
   Hoodie.prototype.checkConnection = function() {
     var _ref;
 
-    if (((_ref = this._checkConnectionRequest) != null ? typeof _ref.state === "function" ? _ref.state() : null : null) === 'pending') {
+    if (((_ref = this._checkConnectionRequest) !== null ? typeof _ref.state === "function" ? _ref.state() : null : null) === 'pending') {
       return this._checkConnectionRequest;
     }
-    return this._checkConnectionRequest = this.request('GET', '/').pipe(this._handleCheckConnectionSuccess, this._handleCheckConnectionError);
+    this._checkConnectionRequest = this.request('GET', '/').pipe(this._handleCheckConnectionSuccess, this._handleCheckConnectionError);
+    return this._checkConnectionRequest;
   };
 
   Hoodie.prototype.open = function(storeName, options) {
@@ -90,7 +91,7 @@ window.Hoodie = (function(_super) {
   Hoodie.prototype.defer = $.Deferred;
 
   Hoodie.prototype.isPromise = function(obj) {
-    return typeof (obj != null ? obj.done : null) === 'function' && typeof obj.resolve === 'undefined';
+    return typeof (obj !== undefined ? obj.done : null) === 'function' && typeof obj.resolve === 'undefined';
   };
 
   Hoodie.prototype.resolve = function() {

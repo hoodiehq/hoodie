@@ -296,7 +296,7 @@ Hoodie.LocalStore = (function (_super) {
   LocalStore.prototype.cache = function(type, id, object, options) {
     var key;
 
-    if (object == null) {
+    if (object === undefined) {
       object = false;
     }
 
@@ -337,17 +337,21 @@ Hoodie.LocalStore = (function (_super) {
 
     }
 
+
     if (this._isMarkedAsDeleted(object)) {
       this.markAsChanged(type, id, object, options);
       this._cached[key] = false;
       return false;
     }
+
     this._cached[key] = $.extend(true, {}, object);
+
     if (this._isDirty(object)) {
       this.markAsChanged(type, id, this._cached[key], options);
     } else {
       this.clearChanged(type, id);
     }
+
     return $.extend(true, {}, object);
   };
 
@@ -403,16 +407,20 @@ Hoodie.LocalStore = (function (_super) {
 
   LocalStore.prototype.changedObjects = function() {
     var id, key, object, type, _ref, _ref1, _results;
+
     _ref = this._dirty;
     _results = [];
+
     for (key in _ref) {
-      object = _ref[key];
-      _ref1 = key.split('/'),
-      type = _ref1[0],
-      id = _ref1[1];
-      object.type = type;
-      object.id = id;
-      _results.push(object);
+      if (_ref.hasOwnProperty(key)) {
+        object = _ref[key];
+        _ref1 = key.split('/'),
+        type = _ref1[0],
+        id = _ref1[1];
+        object.type = type;
+        object.id = id;
+        _results.push(object);
+      }
     }
     return _results;
   };
@@ -523,17 +531,21 @@ Hoodie.LocalStore = (function (_super) {
 
   LocalStore.prototype._setObject = function(type, id, object) {
     var key, store;
+
     key = "" + type + "/" + id;
     store = $.extend({}, object);
+
     delete store.type;
     delete store.id;
     return this.db.setItem(key, JSON.stringify(store));
   };
 
   LocalStore.prototype._getObject = function(type, id) {
-    var json, key, obj;
+    var key, obj;
+
     key = "" + type + "/" + id;
-    json = this.db.getItem(key);
+    var json = this.db.getItem(key);
+
     if (json) {
       obj = JSON.parse(json);
       obj.type = type;
@@ -545,11 +557,10 @@ Hoodie.LocalStore = (function (_super) {
   };
 
   LocalStore.prototype._saveDirtyIds = function() {
-    var ids;
     if ($.isEmptyObject(this._dirty)) {
       return this.db.removeItem('_dirty');
     } else {
-      ids = Object.keys(this._dirty);
+      var ids = Object.keys(this._dirty);
       return this.db.setItem('_dirty', ids.join(','));
     }
   };
@@ -587,11 +598,14 @@ Hoodie.LocalStore = (function (_super) {
   LocalStore.prototype._triggerEvents = function(event, object, options) {
     this.trigger(event, object, options);
     this.trigger("" + event + ":" + object.type, object, options);
+
     if (event !== 'new') {
       this.trigger("" + event + ":" + object.type + ":" + object.id, object, options);
     }
+
     this.trigger("change", event, object, options);
     this.trigger("change:" + object.type, event, object, options);
+
     if (event !== 'new') {
       this.trigger("change:" + object.type + ":" + object.id, event, object, options);
     }
@@ -599,8 +613,11 @@ Hoodie.LocalStore = (function (_super) {
 
   LocalStore.prototype._triggerDirtyAndIdleEvents = function() {
     var self = this;
+
     this.trigger('dirty');
+
     window.clearTimeout(this._dirtyTimeout);
+
     this._dirtyTimeout = window.setTimeout(function() {
       self.trigger('idle', self.changedObjects());
     }, this.idleTimeout);
