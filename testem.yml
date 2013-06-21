@@ -2,9 +2,7 @@ testrunner: jasmine
 test_page: test/index.html
 launch_in_dev:
     - PhantomJs
-    - Firefox
     - Chrome
-    - Safari
 
 launch_in_ci:
     - PhantomJs
