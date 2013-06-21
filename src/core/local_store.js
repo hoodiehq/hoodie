@@ -73,7 +73,7 @@ Hoodie.LocalStore = (function (_super) {
     }
   };
 
-  LocalStore.prototype.save = function(type, id, properties, options) {
+  LocalStore.prototype.save = function (type, id, properties, options) {
     var currentObject, defer, error, event, isNew, key, object;
 
     options = options || {};
@@ -227,10 +227,7 @@ Hoodie.LocalStore = (function (_super) {
 
     var defer, key, object, objectWasMarkedAsDeleted, promise;
 
-    if (options == null) {
-      options = {};
-    }
-
+    options = options || {};
     defer = LocalStore.__super__.remove.apply(this, arguments);
 
     if (this.hoodie.isPromise(defer)) {
@@ -410,7 +407,9 @@ Hoodie.LocalStore = (function (_super) {
     _results = [];
     for (key in _ref) {
       object = _ref[key];
-      _ref1 = key.split('/'), type = _ref1[0], id = _ref1[1];
+      _ref1 = key.split('/'),
+      type = _ref1[0],
+      id = _ref1[1];
       object.type = type;
       object.id = id;
       _results.push(object);
@@ -496,7 +495,9 @@ Hoodie.LocalStore = (function (_super) {
     _results = [];
     for (_i = 0, _len = keys.length; _i < _len; _i++) {
       key = keys[_i];
-      _ref = key.split('/'), type = _ref[0], id = _ref[1];
+      _ref = key.split('/'),
+      type = _ref[0],
+      id = _ref[1];
       _results.push(obj = this.cache(type, id));
     }
     return _results;
