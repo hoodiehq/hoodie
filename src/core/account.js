@@ -98,8 +98,6 @@ Hoodie.Account = (function () {
   };
 
   Account.prototype.signUp = function(username, password) {
-    var options;
-
     if (password === undefined) {
       password = '';
     }
@@ -122,7 +120,7 @@ Hoodie.Account = (function () {
 
     username = username.toLowerCase();
 
-    options = {
+    var options = {
       data: JSON.stringify({
         _id: this._key(username),
         name: this._userKey(username),
@@ -137,7 +135,11 @@ Hoodie.Account = (function () {
       }),
       contentType: 'application/json'
     };
-    return this.request('PUT', this._url(username), options).pipe(this._handleSignUpSucces(username, password), this._handleRequestError);
+
+    return this.request('PUT', this._url(username), options).pipe(
+      this._handleSignUpSucces(username, password),
+      this._handleRequestError
+    );
   };
 
   Account.prototype.anonymousSignUp = function() {
@@ -153,7 +155,7 @@ Hoodie.Account = (function () {
   };
 
   Account.prototype.hasAccount = function() {
-    return this.username != null;
+    return !!this.username;
   };
 
   Account.prototype.hasAnonymousAccount = function() {

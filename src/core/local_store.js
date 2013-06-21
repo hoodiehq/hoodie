@@ -160,6 +160,18 @@ Hoodie.LocalStore = (function (_super) {
     return this._decoratePromise(defer.promise());
   };
 
+  // findAll
+  // ---------
+
+  // returns all objects from store.
+  // Can be optionally filtered by a type or a function
+  //
+  // example usage:
+  //
+  //     store.findAll()
+  //     store.findAll('car')
+  //     store.findAll(function(obj) { return obj.brand == 'Tesla' })
+  //
   LocalStore.prototype.findAll = function(filter) {
     var currentType, defer, error, id, key, keys, obj, results, type;
 

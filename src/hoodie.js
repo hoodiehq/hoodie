@@ -1,4 +1,4 @@
-window.Hoodie = (function(_super) {
+window.Hoodie = window.Hoodie || (function(_super) {
 
   'use strict';
 
@@ -82,7 +82,8 @@ window.Hoodie = (function(_super) {
       var _i, _results;
       _results = [];
       for (i = _i = 0; 0 <= len ? _i < len : _i > len; i = 0 <= len ? ++_i : --_i) {
-        _results.push(chars[0 | Math.random() * radix]);
+        var rand = Math.random() * radix;
+        _results.push(chars[0] = String(rand).charAt(0));
       }
       return _results;
     })()).join('');
