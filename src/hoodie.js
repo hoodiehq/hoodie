@@ -62,7 +62,6 @@ window.Hoodie = window.Hoodie || (function(_super) {
   //     promise = hoodie.request('GET', '/user_database/doc_id')
   //
   Hoodie.prototype.request = function(type, url, options) {
-    var defaults;
     options = options || {};
 
     // if a relative path passed, prefix with @baseUrl
@@ -70,7 +69,7 @@ window.Hoodie = window.Hoodie || (function(_super) {
       url = "" + this.baseUrl + url;
     }
 
-    defaults = {
+    var defaults = {
       type: type,
       url: url,
       xhrFields: {
@@ -102,13 +101,21 @@ window.Hoodie = window.Hoodie || (function(_super) {
   //
   Hoodie.prototype._checkConnectionRequest = null;
   Hoodie.prototype.checkConnection = function() {
-    if (this._checkConnectionRequest && this._checkConnectionRequest.state() === 'pending') {
-      return this._checkConnectionRequest;
+
+    var req = this._checkConnectionRequest;
+
+    if (req && req.state() === 'pending') {
+      return req;
     }
 
-    this._checkConnectionRequest = this.request('GET', '/').pipe(this._handleCheckConnectionSuccess, this._handleCheckConnectionError);
+    this._checkConnectionRequest = this.request('GET', '/').pipe(
+      this._handleCheckConnectionSuccess,
+      this._handleCheckConnectionError
+    );
+
     return this._checkConnectionRequest;
   };
+
 
   // ## Open stores
 
@@ -123,11 +130,14 @@ window.Hoodie = window.Hoodie || (function(_super) {
   //
   Hoodie.prototype.open = function(storeName, options) {
     options = options || {};
+
     $.extend(options, {
       name: storeName
     });
+
     return new Hoodie.Remote(this, options);
   };
+
 
   // ## uuid
 
@@ -149,15 +159,17 @@ window.Hoodie = window.Hoodie || (function(_super) {
 
     // eehmm, yeah.
     return ((function() {
-      var _i, _results;
-      _results = [];
+      var _i, _results = [];
+
       for (i = _i = 0; 0 <= len ? _i < len : _i > len; i = 0 <= len ? ++_i : --_i) {
         var rand = Math.random() * radix;
         _results.push(chars[0] = String(rand).charAt(0));
       }
+
       return _results;
     })()).join('');
   };
+
 
   // ## Defers / Promises
 
@@ -176,6 +188,7 @@ window.Hoodie = window.Hoodie || (function(_super) {
   //
   Hoodie.prototype.defer = $.Deferred;
 
+
   // returns true if passed object is a promise (but not a deferred),
   // otherwise false.
   Hoodie.prototype.isPromise = function(object) {
@@ -184,15 +197,18 @@ window.Hoodie = window.Hoodie || (function(_super) {
                typeof object.resolve !== 'function');
   };
 
+
   //
   Hoodie.prototype.resolve = function() {
     return this.defer().resolve().promise();
   };
 
+
   //
   Hoodie.prototype.reject = function() {
     return this.defer().reject().promise();
   };
+
 
   //
   Hoodie.prototype.resolveWith = function() {
@@ -228,7 +244,7 @@ window.Hoodie = window.Hoodie || (function(_super) {
   //     hoodie.extend('magic2', function(hoodie) { /* ... */ })
   //     hoodie.magic1.doSomething()
   //     hoodie.magic2.doSomethingElse()
-  // 
+  //
   Hoodie.extend = function(name, Module) {
     this._extensions = this._extensions || {};
     this._extensions[name] = Module;
@@ -252,7 +268,9 @@ window.Hoodie = window.Hoodie || (function(_super) {
         this[instanceName] = new Module(this);
       }
     }
+
   };
+
 
   //
   Hoodie.prototype._handleCheckConnectionSuccess = function() {
@@ -267,6 +285,7 @@ window.Hoodie = window.Hoodie || (function(_super) {
 
     return this.defer().resolve();
   };
+
 
   //
   Hoodie.prototype._handleCheckConnectionError = function() {

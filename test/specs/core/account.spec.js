@@ -8,196 +8,255 @@ describe("Hoodie.Account", function () {
 
     this.hoodie = new Mocks.Hoodie();
     this.requestDefer = this.hoodie.defer();
+
     spyOn(this.hoodie, "request").andReturn(this.requestDefer.promise());
     spyOn(this.hoodie, "trigger");
     spyOn(window, "setTimeout").andCallFake(function (cb) {
       return cb();
     });
+
     this.account = new Hoodie.Account(this.hoodie);
     this.hoodie.request.reset();
     this.account._requests = {};
   });
+
   describe("constructor", function () {
+
     beforeEach(function () {
       return spyOn(Hoodie.Account.prototype, "on");
     });
+
     _when("account.username is set", function () {
+
       beforeEach(function () {
-        return spyOn(this.hoodie.config, "get").andCallFake(function (key) {
+        spyOn(this.hoodie.config, "get").andCallFake(function (key) {
           if (key === '_account.username') {
             return 'joe@example.com';
           }
         });
       });
-      return it("should set @username", function () {
+
+      it("should set @username", function () {
         var account;
         account = new Hoodie.Account(this.hoodie);
-        return expect(account.username).toBe('joe@example.com');
+        expect(account.username).toBe('joe@example.com');
       });
     });
+
     _when("account.ownerHash is set", function () {
+
       beforeEach(function () {
-        return spyOn(this.hoodie.config, "get").andCallFake(function (key) {
+        spyOn(this.hoodie.config, "get").andCallFake(function (key) {
           if (key === '_account.ownerHash') {
             return 'owner_hash123';
           }
         });
       });
-      return it("should set @ownerHash", function () {
-        var account;
-        account = new Hoodie.Account(this.hoodie);
-        return expect(account.ownerHash).toBe('owner_hash123');
-      });
-    });
-    _when("account.ownerHash isn't set", function () {
-      beforeEach(function () {
-        spyOn(this.hoodie.config, "get").andReturn(false);
-        spyOn(this.hoodie, "uuid").andReturn('new_generated_owner_hash');
-        return spyOn(this.hoodie.config, "set");
-      });
+
       it("should set @ownerHash", function () {
         var account;
         account = new Hoodie.Account(this.hoodie);
-        return expect(account.ownerHash).toBe('new_generated_owner_hash');
+        expect(account.ownerHash).toBe('owner_hash123');
       });
-      return it("should set account.ownerHash", function () {
+
+    });
+
+    _when("account.ownerHash isn't set", function () {
+
+      beforeEach(function () {
+        spyOn(this.hoodie.config, "get").andReturn(false);
+        spyOn(this.hoodie, "uuid").andReturn('new_generated_owner_hash');
+        spyOn(this.hoodie.config, "set");
+      });
+
+      it("should set @ownerHash", function () {
         var account;
         account = new Hoodie.Account(this.hoodie);
-        return expect(account.hoodie.config.set).wasCalledWith('_account.ownerHash', 'new_generated_owner_hash');
+        expect(account.ownerHash).toBe('new_generated_owner_hash');
+      });
+
+      it("should set account.ownerHash", function () {
+        var account;
+        account = new Hoodie.Account(this.hoodie);
+        expect(account.hoodie.config.set).wasCalledWith('_account.ownerHash', 'new_generated_owner_hash');
       });
     });
+
     it("should authenticate on next tick", function () {
-      var account;
-      account = new Hoodie.Account(this.hoodie);
-      return expect(window.setTimeout).wasCalledWith(account.authenticate);
+      var account = new Hoodie.Account(this.hoodie);
+      expect(window.setTimeout).wasCalledWith(account.authenticate);
     });
-    return it("should check for a pending password request", function () {
-      var account;
+
+    it("should check for a pending password request", function () {
       spyOn(Hoodie.Account.prototype, "_checkPasswordResetStatus");
-      account = new Hoodie.Account(this.hoodie);
-      return expect(Hoodie.Account.prototype._checkPasswordResetStatus).wasCalled();
+      var account = new Hoodie.Account(this.hoodie);
+
+      expect(Hoodie.Account.prototype._checkPasswordResetStatus).wasCalled();
     });
+
   });
+
   describe("#authenticate()", function () {
+
     beforeEach(function () {
       window.setTimeout.andCallFake(function () {});
       this.account = new Hoodie.Account(this.hoodie);
     });
+
     _when("account is already authenticated", function () {
+
       beforeEach(function () {
         this.account._authenticated = true;
         this.account.username = 'joe@example.com';
         this.promise = this.account.authenticate();
       });
+
       it("should return a promise", function () {
-        return expect(this.promise).toBePromise();
+        expect(this.promise).toBePromise();
       });
-      return it("should resolve the promise", function () {
-        return expect(this.promise).toBeResolvedWith('joe@example.com');
+
+      it("should resolve the promise", function () {
+        expect(this.promise).toBeResolvedWith('joe@example.com');
       });
     });
+
     _when("account is unauthenticated", function () {
+
       beforeEach(function () {
         this.account._authenticated = false;
         this.promise = this.account.authenticate();
       });
+
       it("should return a promise", function () {
-        return expect(this.promise).toBePromise();
+        expect(this.promise).toBePromise();
       });
-      return it("should reject the promise", function () {
-        return expect(this.promise).toBeRejected();
+
+      it("should reject the promise", function () {
+        expect(this.promise).toBeRejected();
       });
     });
+
     _when("there is a pending singIn request", function () {
+
       beforeEach(function () {
         this.signInDefer = this.hoodie.defer();
         this.account._requests.signIn = this.signInDefer.promise();
       });
+
       it("it should be rejected when it is pending and then fails", function () {
-        var promise;
-        promise = this.account.authenticate();
+        var promise = this.account.authenticate();
         this.signInDefer.reject("nope");
-        return expect(promise).toBeRejectedWith("nope");
+
+        expect(promise).toBeRejectedWith("nope");
       });
-      return it("it should be resolved when it is pending and then succeeds", function () {
-        var promise;
-        promise = this.account.authenticate();
+
+      it("it should be resolved when it is pending and then succeeds", function () {
+        var promise = this.account.authenticate();
         this.signInDefer.resolve("funky");
-        return expect(promise).toBeResolvedWith("funky");
+        expect(promise).toBeResolvedWith("funky");
       });
     });
+
     _when("there is a pending singOut request", function () {
+
       beforeEach(function () {
         this.signOutDefer = this.hoodie.defer();
         this.account._requests.signOut = this.signOutDefer.promise();
       });
+
       it("it should be rejected when it is pending and then fails", function () {
-        var promise;
-        promise = this.account.authenticate();
+        var promise = this.account.authenticate();
         this.signOutDefer.reject("nope");
-        return expect(promise).toBeRejectedWith("nope");
+
+        expect(promise).toBeRejectedWith("nope");
       });
-      return it("it should be rejected anyway, even if the pending request succeeds", function () {
-        var promise;
-        promise = this.account.authenticate();
+      it("it should be rejected anyway, even if the pending request succeeds", function () {
+        var promise = this.account.authenticate();
         this.signOutDefer.resolve("funky");
-        return expect(promise).toBeRejectedWith("funky");
+
+        expect(promise).toBeRejectedWith("funky");
       });
     });
+
     _when("account.username is not yet set", function () {
+
       it("should send a sign out request, but not cleanup", function () {
         this.account.authenticate();
-        return expect(this.hoodie.request).wasCalledWith('DELETE', '/_session');
+        expect(this.hoodie.request).wasCalledWith('DELETE', '/_session');
       });
+
       _and("signOut succeeds", function () {
+
         beforeEach(function () {
-          return this.requestDefer.resolve();
+          this.requestDefer.resolve();
         });
-        return it("should return a rejected promise", function () {
-          return expect(this.account.authenticate()).toBeRejected();
+
+        it("should return a rejected promise", function () {
+          expect(this.account.authenticate()).toBeRejected();
         });
+
       });
-      return _and("signOut fails", function () {
+
+      _and("signOut fails", function () {
+
         beforeEach(function () {
-          return this.requestDefer.reject();
+          this.requestDefer.reject();
         });
-        return it("should return a rejected promise", function () {
-          return expect(this.account.authenticate()).toBeRejected();
+
+        it("should return a rejected promise", function () {
+          expect(this.account.authenticate()).toBeRejected();
         });
+
       });
+
     });
+
     _when("username is set not set", function () {
+
       beforeEach(function () {
         delete this.account.username;
         this.signOutDefer = this.hoodie.defer();
         this.account._requests.signOut = this.signOutDefer.promise();
         this.promise = this.account.authenticate();
       });
+
       _and("signOut succeeds", function () {
+
         beforeEach(function () {
-          return this.signOutDefer.resolve();
+          this.signOutDefer.resolve();
         });
-        return it("should return a rejected promise", function () {
-          return expect(this.promise).toBeRejected();
+
+        it("should return a rejected promise", function () {
+          expect(this.promise).toBeRejected();
         });
+
       });
-      return _and("signOut fails", function () {
+
+      _and("signOut fails", function () {
+
         beforeEach(function () {
-          return this.signOutDefer.reject();
+          this.signOutDefer.reject();
         });
-        return it("should return a rejected promise", function () {
-          return expect(this.promise).toBeRejected();
+
+        it("should return a rejected promise", function () {
+          expect(this.promise).toBeRejected();
         });
+
       });
+
     });
-    return _when("account has not been authenticated yet", function () {
+
+    _when("account has not been authenticated yet", function () {
+
       beforeEach(function () {
         this.account.username = 'joe@example.com';
-        return delete this.account._authenticated;
+        delete this.account._authenticated;
       });
+
       it("should return a promise", function () {
-        return expect(this.account.authenticate()).toBePromise();
+        expect(this.account.authenticate()).toBePromise();
       });
+
       it("should send a GET /_session", function () {
         var args;
         this.account.authenticate();
@@ -206,6 +265,7 @@ describe("Hoodie.Account", function () {
         expect(args[0]).toBe('GET');
         return expect(args[1]).toBe('/_session');
       });
+
       it("should not send multiple GET /_session requests", function () {
         this.account.authenticate();
         this.account.authenticate();
