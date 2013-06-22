@@ -31,12 +31,12 @@ module.exports = function(grunt) {
           'src/hoodie.js',
           'src/core/account.js',
           'src/core/config.js',
-          'src/core/email.js',
           'src/core/errors.js',
           'src/core/store.js',
           'src/core/remote.js',
           'src/core/account_remote.js',
           'src/core/local_store.js',
+          'src/extensions/email.js',
           'src/extensions/share.js',
           'src/extensions/user.js',
           'src/extensions/global.js',
@@ -71,7 +71,8 @@ module.exports = function(grunt) {
       test: {
         command: 'node node_modules/testem/testem.js ci',
         options: {
-          stdout: true
+          stdout: true,
+          stderr: true
         }
       }
     }

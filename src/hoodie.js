@@ -180,7 +180,7 @@ window.Hoodie = window.Hoodie || (function(_super) {
   Hoodie.prototype.isPromise = function(object) {
     return !! (object &&
                typeof object.done === 'function' &&
-               typeof object.resolve !== 'undefined');
+               typeof object.resolve !== 'function');
   };
 
   //

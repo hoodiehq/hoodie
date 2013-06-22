@@ -1,13 +1,7 @@
 //  hoodie 0.1.27
 'use strict';
 
-window.__bind = function(fn, me) {
-  return function() {
-    return fn.apply(me, arguments);
-  };
-},
-
-window.__extends = function(child, parent) {
+Object.deepExtend = function(child, parent) {
   for (var key in parent) {
     if (parent.hasOwnProperty(key)) {
       child[key] = parent[key];
@@ -159,18 +153,18 @@ window.Hoodie = window.Hoodie || (function(_super) {
   //
   function Hoodie(baseUrl) {
     this.baseUrl = baseUrl;
-    this._handleCheckConnectionError = __bind(this._handleCheckConnectionError, this);
-    this._handleCheckConnectionSuccess = __bind(this._handleCheckConnectionSuccess, this);
-    this.rejectWith = __bind(this.rejectWith, this);
-    this.resolveWith = __bind(this.resolveWith, this);
-    this.reject = __bind(this.reject, this);
-    this.resolve = __bind(this.resolve, this);
-    this.checkConnection = __bind(this.checkConnection, this);
+    this._handleCheckConnectionError = this._handleCheckConnectionError.bind(this);
+    this._handleCheckConnectionSuccess = this._handleCheckConnectionSuccess.bind(this);
+    this.rejectWith = this.rejectWith.bind(this);
+    this.resolveWith = this.resolveWith.bind(this);
+    this.reject = this.reject.bind(this);
+    this.resolve = this.resolve.bind(this);
+    this.checkConnection = this.checkConnection.bind(this);
 
     // remove trailing slash(es)
     this.baseUrl = this.baseUrl ? this.baseUrl.replace(/\/+$/, '') : "/_api";
 
-    // init core modules 
+    // init core modules
     this.store = new this.constructor.LocalStore(this);
     this.config = new this.constructor.Config(this);
     this.account = new this.constructor.Account(this);
@@ -183,7 +177,7 @@ window.Hoodie = window.Hoodie || (function(_super) {
     this.checkConnection();
   }
 
-  __extends(Hoodie, _super);
+  Object.deepExtend(Hoodie, _super);
 
   // ## Settings
 
@@ -196,7 +190,7 @@ window.Hoodie = window.Hoodie || (function(_super) {
   // ## Requests
 
   // use this method to send requests to the hoodie backend.
-  // 
+  //
   //     promise = hoodie.request('GET', '/user_database/doc_id')
   //
   Hoodie.prototype.request = function(type, url, options) {
@@ -219,33 +213,31 @@ window.Hoodie = window.Hoodie || (function(_super) {
     };
 
     return $.ajax($.extend(defaults, options));
-
   };
 
   // ## Check Connection
 
   // the `checkConnection` method is used, well, to check if
-  // the hoodie backend is reachable at `baseUrl` or not. 
+  // the hoodie backend is reachable at `baseUrl` or not.
   // Check Connection is automatically called on startup
-  // and then each 30 seconds. If it fails, it 
-  // 
+  // and then each 30 seconds. If it fails, it
+  //
   // - sets `hoodie.online = false`
   // - triggers `offline` event
   // - sets `checkConnectionInterval = 3000`
-  // 
+  //
   // when connection can be reestablished, it
-  // 
+  //
   // - sets `hoodie.online = true`
   // - triggers `online` event
   // - sets `checkConnectionInterval = 30000`
   //
   Hoodie.prototype._checkConnectionRequest = null;
   Hoodie.prototype.checkConnection = function() {
-    var _ref;
-
-    if (((_ref = this._checkConnectionRequest) !== null ? typeof _ref.state === "function" ? _ref.state() : null : null) === 'pending') {
+    if (this._checkConnectionRequest && this._checkConnectionRequest.state() === 'pending') {
       return this._checkConnectionRequest;
     }
+
     this._checkConnectionRequest = this.request('GET', '/').pipe(this._handleCheckConnectionSuccess, this._handleCheckConnectionError);
     return this._checkConnectionRequest;
   };
@@ -258,7 +250,7 @@ window.Hoodie = window.Hoodie || (function(_super) {
   // * hoodie.user("joe")
   // * hoodie.global
   // * ... and more
-  // 
+  //
   //     hoodie.open("some_store_name").findAll()
   //
   Hoodie.prototype.open = function(storeName, options) {
@@ -275,11 +267,19 @@ window.Hoodie = window.Hoodie || (function(_super) {
   Hoodie.prototype.uuid = function(len) {
     var chars, i, radix;
 
+    // default uuid length to 7
     if (len === undefined) {
       len = 7;
     }
+
+    // uuids consist of numbers and lowercase letters only.
+    // We stick to lowercase letters to prevent confusion
+    // and to prevent issues with CouchDB, e.g. database
+    // names do wonly allow for lowercase letters.
     chars = '0123456789abcdefghijklmnopqrstuvwxyz'.split('');
     radix = chars.length;
+
+    // eehmm, yeah.
     return ((function() {
       var _i, _results;
       _results = [];
@@ -297,7 +297,7 @@ window.Hoodie = window.Hoodie || (function(_super) {
   // Promises are heavely used throughout the code of hoodie.
   // We currently borrow jQuery's implementation:
   // http://api.jquery.com/category/deferred-object/
-  // 
+  //
   //     defer = hoodie.defer()
   //     if (good) {
   //       defer.resolve('good.')
@@ -305,34 +305,37 @@ window.Hoodie = window.Hoodie || (function(_super) {
   //       defer.reject('not good.')
   //     }
   //     return defer.promise()
-  // 
+  //
   Hoodie.prototype.defer = $.Deferred;
 
-  // 
-  Hoodie.prototype.isPromise = function(obj) {
-    return typeof (obj !== undefined ? obj.done : null) === 'function' && typeof obj.resolve === 'undefined';
+  // returns true if passed object is a promise (but not a deferred),
+  // otherwise false.
+  Hoodie.prototype.isPromise = function(object) {
+    return !! (object &&
+               typeof object.done === 'function' &&
+               typeof object.resolve !== 'function');
   };
 
-  // 
+  //
   Hoodie.prototype.resolve = function() {
     return this.defer().resolve().promise();
   };
 
-  // 
+  //
   Hoodie.prototype.reject = function() {
     return this.defer().reject().promise();
   };
 
-  // 
+  //
   Hoodie.prototype.resolveWith = function() {
-    var _ref;
-    return (_ref = this.defer()).resolve.apply(_ref, arguments).promise();
+    var defer = this.defer();
+    return defer.resolve.apply(defer, arguments).promise();
   };
 
-  // 
+  //
   Hoodie.prototype.rejectWith = function() {
-    var _ref;
-    return (_ref = this.defer()).reject.apply(_ref, arguments).promise();
+    var defer = this.defer();
+    return defer.reject.apply(defer, arguments).promise();
   };
 
 
@@ -343,7 +346,7 @@ window.Hoodie = window.Hoodie || (function(_super) {
   // be disposed using this method. A `dispose` event
   // gets triggered that the modules react on.
   Hoodie.prototype.dispose = function() {
-    return this.trigger('dispose');
+    this.trigger('dispose');
   };
 
 
@@ -357,37 +360,33 @@ window.Hoodie = window.Hoodie || (function(_super) {
   //     hoodie.extend('magic2', function(hoodie) { /* ... */ })
   //     hoodie.magic1.doSomething()
   //     hoodie.magic2.doSomethingElse()
+  // 
   Hoodie.extend = function(name, Module) {
     this._extensions = this._extensions || {};
     this._extensions[name] = Module;
-
-    return this._extensions[name];
   };
   Hoodie.prototype.extend = function(name, Module) {
     this[name] = new Module(this);
-    return this[name];
   };
 
 
   // ## Private
 
-  // 
+  //
   Hoodie.prototype._loadExtensions = function() {
-    var Module, instanceName, _ref, _results;
-    _ref = this.constructor._extensions;
-    _results = [];
+    var Module, instanceName, extensions;
 
-    for (instanceName in _ref) {
-      if (_ref.hasOwnProperty(instanceName)) {
-        Module = _ref[instanceName];
-        _results.push(this[instanceName] = new Module(this));
+    extensions = this.constructor._extensions;
+
+    for (instanceName in extensions) {
+      if (extensions.hasOwnProperty(instanceName)) {
+        Module = extensions[instanceName];
+        this[instanceName] = new Module(this);
       }
-
     }
-    return _results;
   };
 
-  // 
+  //
   Hoodie.prototype._handleCheckConnectionSuccess = function() {
     this.checkConnectionInterval = 30000;
 
@@ -401,7 +400,7 @@ window.Hoodie = window.Hoodie || (function(_super) {
     return this.defer().resolve();
   };
 
-  // 
+  //
   Hoodie.prototype._handleCheckConnectionError = function() {
     this.checkConnectionInterval = 3000;
 
@@ -435,22 +434,22 @@ Hoodie.Account = (function () {
 
     this._handleChangeUsernameAndPasswordRequest = this._handleChangeUsernameAndPasswordRequest;
     this._sendChangeUsernameAndPasswordRequest = this._sendChangeUsernameAndPasswordRequest;
-    this._cleanupAndTriggerSignOut = __bind(this._cleanupAndTriggerSignOut, this);
-    this._cleanup = __bind(this._cleanup, this);
-    this._handleFetchBeforeDestroyError = __bind(this._handleFetchBeforeDestroyError, this);
-    this._handleFetchBeforeDestroySucces = __bind(this._handleFetchBeforeDestroySucces, this);
-    this._handlePasswordResetStatusRequestError = __bind(this._handlePasswordResetStatusRequestError, this);
-    this._handlePasswordResetStatusRequestSuccess = __bind(this._handlePasswordResetStatusRequestSuccess, this);
-    this._checkPasswordResetStatus = __bind(this._checkPasswordResetStatus, this);
-    this._handleSignInSuccess = __bind(this._handleSignInSuccess, this);
-    this._delayedSignIn = __bind(this._delayedSignIn, this);
-    this._handleSignUpSucces = __bind(this._handleSignUpSucces, this);
-    this._handleRequestError = __bind(this._handleRequestError, this);
-    this._handleAuthenticateRequestSuccess = __bind(this._handleAuthenticateRequestSuccess, this);
+    this._cleanupAndTriggerSignOut = this._cleanupAndTriggerSignOut.bind(this);
+    this._cleanup = this._cleanup.bind(this);
+    this._handleFetchBeforeDestroyError = this._handleFetchBeforeDestroyError.bind(this);
+    this._handleFetchBeforeDestroySucces = this._handleFetchBeforeDestroySucces.bind(this);
+    this._handlePasswordResetStatusRequestError = this._handlePasswordResetStatusRequestError.bind(this);
+    this._handlePasswordResetStatusRequestSuccess = this._handlePasswordResetStatusRequestSuccess.bind(this);
+    this._checkPasswordResetStatus = this._checkPasswordResetStatus.bind(this);
+    this._handleSignInSuccess = this._handleSignInSuccess.bind(this);
+    this._delayedSignIn = this._delayedSignIn.bind(this);
+    this._handleSignUpSucces = this._handleSignUpSucces.bind(this);
+    this._handleRequestError = this._handleRequestError.bind(this);
+    this._handleAuthenticateRequestSuccess = this._handleAuthenticateRequestSuccess.bind(this);
 
-    this.fetch = __bind(this.fetch, this);
-    this.signOut = __bind(this.signOut, this);
-    this.authenticate = __bind(this.authenticate, this);
+    this.fetch = this.fetch.bind(this);
+    this.signOut = this.signOut.bind(this);
+    this.authenticate = this.authenticate.bind(this);
 
     // cache for CouchDB _users doc
     this._doc = {};
@@ -1481,9 +1480,9 @@ Hoodie.Account = (function () {
 
 })();
 
-//
+// 
 // Central Config API
-//
+// 
 
 Hoodie.Config = (function() {
 
@@ -1521,9 +1520,9 @@ Hoodie.Config = (function() {
   Config.prototype.id = 'hoodie';
 
   // ## set
-  //
+  // 
   // adds a configuration
-  //
+  // 
   Config.prototype.set = function(key, value) {
     var isSilent, update;
 
@@ -1544,26 +1543,26 @@ Hoodie.Config = (function() {
   };
 
   // ## get
-  //
+  // 
   // receives a configuration
-  //
+  // 
   Config.prototype.get = function(key) {
     return this.cache[key];
   };
 
   // ## clear
-  //
+  // 
   // clears cache and removes object from store
-  //
+  // 
   Config.prototype.clear = function() {
     this.cache = {};
     return this.hoodie.store.remove(this.type, this.id);
   };
 
   // ## remove
-  //
+  // 
   // removes a configuration, is a simple alias for config.set(key, undefined)
-  //
+  // 
   Config.prototype.remove = function(key) {
     return this.set(key, void 0);
   };
@@ -1572,103 +1571,18 @@ Hoodie.Config = (function() {
 
 })();
 
-//
-// Sending emails. Not unicorns
-//
-
-Hoodie.Email = (function () {
-
-  'use strict';
-
-  function Email(hoodie) {
-
-    // TODO
-    // let's subscribe to general `_email` changes and provide
-    // an `on` interface, so devs can listen to events like:
-    //
-    // * hoodie.email.on 'sent',  -> ...
-    // * hoodie.email.on 'error', -> ...
-    //
-    this.hoodie = hoodie;
-    this._handleEmailUpdate = this._handleEmailUpdate;
-  }
-
-  // ## send
-  //
-  // sends an email and returns a promise
-  //
-  Email.prototype.send = function (emailAttributes) {
-    var attributes, defer, self = this;
-
-    if (emailAttributes === null) {
-      emailAttributes = {};
-    }
-
-    defer = this.hoodie.defer();
-    attributes = $.extend({}, emailAttributes);
-
-    if (!this._isValidEmail(emailAttributes.to)) {
-      attributes.error = "Invalid email address (" + (attributes.to || 'empty') + ")";
-      return defer.reject(attributes).promise();
-    }
-
-    this.hoodie.store.add('$email', attributes).then(function (obj) {
-      return self._handleEmailUpdate(defer, obj);
-    });
-
-    return defer.promise();
-  };
-
-  //
-  // ## PRIVATE
-  //
-
-  Email.prototype._isValidEmail = function (email) {
-    if (email === null) {
-      email = '';
-    }
-
-    return new RegExp(/@/).test(email);
-  };
-
-  Email.prototype._handleEmailUpdate = function (defer, attributes) {
-    var self = this;
-
-    if (attributes === null) {
-      attributes = {};
-    }
-
-    if (attributes.error) {
-      return defer.reject(attributes);
-    } else if (attributes.deliveredAt) {
-      return defer.resolve(attributes);
-    } else {
-      return this.hoodie.remote.one("updated:$email:" + attributes.id, function (attributes) {
-        return self._handleEmailUpdate(defer, attributes);
-      });
-    }
-
-  };
-
-  return Email;
-
-})();
-
-// extend Hoodie
-Hoodie.extend('email', Hoodie.Email);
-
-//
+// 
 // one place to rule them all!
-//
+// 
 
 'use strict';
 
 Hoodie.Errors = {
 
   // ## INVALID_KEY
-  //
+  // 
   // thrown when invalid keys are used to store an object
-  //
+  // 
   INVALID_KEY: function (idOrType) {
     var key = idOrType.id ? 'id' : 'type';
 
@@ -1676,13 +1590,13 @@ Hoodie.Errors = {
   },
 
   // ## INVALID_ARGUMENTS
-  //
+  // 
   INVALID_ARGUMENTS: function (msg) {
     return new Error(msg);
   },
 
   // ## NOT_FOUND
-  //
+  // 
   NOT_FOUND: function (type, id) {
     return new Error("" + type + " with " + id + " could not be found");
   }
@@ -2051,18 +1965,18 @@ Hoodie.Remote = (function(_super) {
     this.hoodie = hoodie;
     options = options || {};
 
-    this._handlePullResults = __bind(this._handlePullResults, this);
-    this._handlePullError = __bind(this._handlePullError, this);
-    this._handlePullSuccess = __bind(this._handlePullSuccess, this);
-    this._restartPullRequest = __bind(this._restartPullRequest, this);
-    this._mapDocsFromFindAll = __bind(this._mapDocsFromFindAll, this);
-    this._parseAllFromRemote = __bind(this._parseAllFromRemote, this);
-    this._parseFromRemote = __bind(this._parseFromRemote, this);
-    this.sync = __bind(this.sync, this);
-    this.push = __bind(this.push, this);
-    this.pull = __bind(this.pull, this);
-    this.disconnect = __bind(this.disconnect, this);
-    this.connect = __bind(this.connect, this);
+    this._handlePullResults = this._handlePullResults.bind(this);
+    this._handlePullError = this._handlePullError.bind(this);
+    this._handlePullSuccess = this._handlePullSuccess.bind(this);
+    this._restartPullRequest = this._restartPullRequest.bind(this);
+    this._mapDocsFromFindAll = this._mapDocsFromFindAll.bind(this);
+    this._parseAllFromRemote = this._parseAllFromRemote.bind(this);
+    this._parseFromRemote = this._parseFromRemote.bind(this);
+    this.sync = this.sync.bind(this);
+    this.push = this.push.bind(this);
+    this.pull = this.pull.bind(this);
+    this.disconnect = this.disconnect.bind(this);
+    this.connect = this.connect.bind(this);
 
     if (options.name !== undefined) {
       this.name = options.name;
@@ -2089,7 +2003,7 @@ Hoodie.Remote = (function(_super) {
     }
   }
 
-  __extends(Remote, _super);
+  Object.deepExtend(Remote, _super);
 
 
   // properties
@@ -2748,7 +2662,7 @@ ConnectionError = (function(_super) {
     ConnectionError.__super__.constructor.apply(this, arguments);
   }
 
-  __extends(ConnectionError, _super);
+  Object.deepExtend(ConnectionError, _super);
 
   ConnectionError.prototype.name = "ConnectionError";
 
@@ -2776,11 +2690,11 @@ Hoodie.AccountRemote = (function(_super) {
   function AccountRemote(hoodie, options) {
     this.hoodie = hoodie;
     options = options || {};
-    this._handleSignIn = __bind(this._handleSignIn, this);
-    this._connect = __bind(this._connect, this);
-    this.push = __bind(this.push, this);
-    this.disconnect = __bind(this.disconnect, this);
-    this.connect = __bind(this.connect, this);
+    this._handleSignIn = this._handleSignIn.bind(this);
+    this._connect = this._connect.bind(this);
+    this.push = this.push.bind(this);
+    this.disconnect = this.disconnect.bind(this);
+    this.connect = this.connect.bind(this);
 
     // set name to user's DB name
     this.name = this.hoodie.account.db();
@@ -2801,7 +2715,7 @@ Hoodie.AccountRemote = (function(_super) {
     this.bootstrapKnownObjects();
   }
 
-  __extends(AccountRemote, _super);
+  Object.deepExtend(AccountRemote, _super);
 
   // connect by default
   AccountRemote.prototype.connected = true;
@@ -2945,10 +2859,10 @@ Hoodie.LocalStore = (function (_super) {
 
   function LocalStore(hoodie) {
     this.hoodie = hoodie;
-    this._triggerDirtyAndIdleEvents = __bind(this._triggerDirtyAndIdleEvents, this);
-    this._handleRemoteChange = __bind(this._handleRemoteChange, this);
-    this.clear = __bind(this.clear, this);
-    this.markAllAsChanged = __bind(this.markAllAsChanged, this);
+    this._triggerDirtyAndIdleEvents = this._triggerDirtyAndIdleEvents.bind(this);
+    this._handleRemoteChange = this._handleRemoteChange.bind(this);
+    this.clear = this.clear.bind(this);
+    this.markAllAsChanged = this.markAllAsChanged.bind(this);
 
     // cache of localStorage for quicker access
     this._cached = {};
@@ -2993,7 +2907,7 @@ Hoodie.LocalStore = (function (_super) {
     this._bootstrap();
   }
 
-  __extends(LocalStore, _super);
+  Object.deepExtend(LocalStore, _super);
 
 
   // 2 seconds timout before triggering the `store:idle` event
@@ -3615,6 +3529,91 @@ Hoodie.LocalStore = (function (_super) {
 })(Hoodie.Store);
 
 
+// 
+// Sending emails. Not unicorns
+// 
+
+Hoodie.Email = (function () {
+
+  'use strict';
+
+  function Email(hoodie) {
+
+    // TODO
+    // let's subscribe to general `_email` changes and provide
+    // an `on` interface, so devs can listen to events like:
+    // 
+    // * hoodie.email.on 'sent',  -> ...
+    // * hoodie.email.on 'error', -> ...
+    // 
+    this.hoodie = hoodie;
+    this._handleEmailUpdate = this._handleEmailUpdate;
+  }
+
+  // ## send
+  // 
+  // sends an email and returns a promise
+  // 
+  Email.prototype.send = function (emailAttributes) {
+    var attributes, defer, self = this;
+
+    if (emailAttributes === null) {
+      emailAttributes = {};
+    }
+
+    defer = this.hoodie.defer();
+    attributes = $.extend({}, emailAttributes);
+
+    if (!this._isValidEmail(emailAttributes.to)) {
+      attributes.error = "Invalid email address (" + (attributes.to || 'empty') + ")";
+      return defer.reject(attributes).promise();
+    }
+
+    this.hoodie.store.add('$email', attributes).then(function (obj) {
+      return self._handleEmailUpdate(defer, obj);
+    });
+
+    return defer.promise();
+  };
+
+  // 
+  // ## PRIVATE
+  // 
+
+  Email.prototype._isValidEmail = function (email) {
+    if (email === null) {
+      email = '';
+    }
+
+    return new RegExp(/@/).test(email);
+  };
+
+  Email.prototype._handleEmailUpdate = function (defer, attributes) {
+    var self = this;
+
+    if (attributes === null) {
+      attributes = {};
+    }
+
+    if (attributes.error) {
+      return defer.reject(attributes);
+    } else if (attributes.deliveredAt) {
+      return defer.resolve(attributes);
+    } else {
+      return this.hoodie.remote.one("updated:$email:" + attributes.id, function (attributes) {
+        return self._handleEmailUpdate(defer, attributes);
+      });
+    }
+
+  };
+
+  return Email;
+
+})();
+
+// extend Hoodie
+Hoodie.extend('email', Hoodie.Email);
+
 // Share Module
 // ==============
 
@@ -3666,7 +3665,7 @@ Hoodie.Share = (function () {
   function Share(hoodie) {
     var api;
     this.hoodie = hoodie;
-    this._open = __bind(this._open, this);
+    this._open = this._open.bind(this);
 
     // set pointer to Hoodie.ShareInstance
     this.instance = Hoodie.ShareInstance;
@@ -4011,7 +4010,7 @@ Hoodie.User = (function() {
 
   function User(hoodie) {
     this.hoodie = hoodie;
-    this.api = __bind(this.api, this);
+    this.api = this.api.bind(this);
 
     // extend hodie.store promise API
     this.hoodie.store.decoratePromises({
@@ -4102,15 +4101,15 @@ Hoodie.extend('user', Hoodie.User);
 
 // the Global Module provides a simple API to find objects from the global
 // stores
-//
+// 
 // For example, the syntax to find all objects from the global store
 // looks like this:
-//
+// 
 //     hoodie.global.findAll().done( handleObjects )
-//
+// 
 // okay, might not be the best idea to do that with 1+ million objects, but
 // you get the point
-//
+// 
 
 Hoodie.Global = (function () {
 
@@ -4163,8 +4162,8 @@ Hoodie.ShareInstance = (function(_super) {
 
     options = options || {};
 
-    this._handleSecurityResponse = __bind(this._handleSecurityResponse, this);
-    this._objectBelongsToMe = __bind(this._objectBelongsToMe, this);
+    this._handleSecurityResponse = this._handleSecurityResponse.bind(this);
+    this._objectBelongsToMe = this._objectBelongsToMe.bind(this);
 
     // make sure that we have an id
     this.id = options.id || this.hoodie.uuid();
@@ -4181,7 +4180,7 @@ Hoodie.ShareInstance = (function(_super) {
     ShareInstance.__super__.constructor.apply(this, arguments);
   }
 
-  __extends(ShareInstance, _super);
+  Object.deepExtend(ShareInstance, _super);
 
   // default values
   // ----------------
