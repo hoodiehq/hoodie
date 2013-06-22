@@ -3,6 +3,8 @@ test_page: test/index.html
 launch_in_dev:
     - PhantomJs
     - Chrome
+    - Safari
+    - Firefox
 
 launch_in_ci:
     - PhantomJs
