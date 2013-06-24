@@ -73,7 +73,7 @@ Hoodie.AccountRemote = (function(_super) {
   //
   //
   AccountRemote.prototype.bootstrapKnownObjects = function() {
-    var id, key, type, _i, _len, _ref, _ref1, _results = [];
+    var id, key, type, _i, _len, _ref, _ref1;
     _ref = this.hoodie.store.index();
 
     for (_i = 0, _len = _ref.length; _i < _len; _i++) {
@@ -82,12 +82,11 @@ Hoodie.AccountRemote = (function(_super) {
       type = _ref1[0],
       id = _ref1[1];
 
-      _results.push(this.markAsKnownObject({
+      this.markAsKnownObject({
         type: type,
         id: id
-      }));
+      });
     }
-    return _results;
   };
 
 
