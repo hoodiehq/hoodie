@@ -1,5 +1,4 @@
 before_script:
-  - killall phantomjs
   - npm install -g grunt-cli
 language: node_js
 node_js:
