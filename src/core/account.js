@@ -1065,7 +1065,7 @@ Hoodie.Account = (function () {
       }
     };
 
-    this._withPreviousRequestsAborted('signIn', function() {
+    return this._withPreviousRequestsAborted('signIn', function() {
       var promise = self.request('POST', '/_session', requestOptions);
 
       return promise.pipe(

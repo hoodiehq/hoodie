@@ -23,6 +23,7 @@ window.Hoodie = window.Hoodie || (function(_super) {
 
     this._handleCheckConnectionError = this._handleCheckConnectionError.bind(this);
     this._handleCheckConnectionSuccess = this._handleCheckConnectionSuccess.bind(this);
+    this._pipeRequestError = this._pipeRequestError.bind(this);
     this.rejectWith = this.rejectWith.bind(this);
     this.resolveWith = this.resolveWith.bind(this);
     this.reject = this.reject.bind(this);
@@ -79,7 +80,7 @@ window.Hoodie = window.Hoodie || (function(_super) {
       dataType: 'json'
     };
 
-    return $.ajax($.extend(defaults, options));
+    return $.ajax($.extend(defaults, options)).then( null, this._pipeRequestError );
   };
 
   // ## Check Connection
@@ -299,6 +300,20 @@ window.Hoodie = window.Hoodie || (function(_super) {
     }
 
     return this.defer().reject();
+  };
+
+  Hoodie.prototype._pipeRequestError = function(xhr) {
+    var error;
+
+    try {
+      error = JSON.parse(xhr.responseText);
+    } catch (_error) {
+      error = {
+        error: xhr.responseText || ("Cannot connect to backend at " + this.baseUrl)
+      };
+    }
+
+    return this.rejectWith(error).promise();
   };
 
   return Hoodie;
