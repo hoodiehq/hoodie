@@ -328,7 +328,7 @@ Hoodie.Account = (function () {
   //
   Account.prototype.request = function(type, path, options) {
     options = options || {};
-    return this.hoodie.request.apply(this, arguments);
+    return this.hoodie.request.apply(this.hoodie, arguments);
   };
 
 
