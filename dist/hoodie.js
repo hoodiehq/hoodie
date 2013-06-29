@@ -2413,22 +2413,22 @@ Hoodie.Remote = (function(_super) {
   //
   Remote.prototype.on = function(event, cb) {
     event = event.replace(/(^| )([^ ]+)/g, "$1" + this.name + ":$2");
-    return this.hoodie.on(event, cb);
+    this.hoodie.on(event, cb);
   };
 
   Remote.prototype.one = function(event, cb) {
     event = event.replace(/(^| )([^ ]+)/g, "$1" + this.name + ":$2");
-    return this.hoodie.one(event, cb);
+    this.hoodie.one(event, cb);
   };
 
 
   // namespaced alias for `hoodie.trigger`
   //
   Remote.prototype.trigger = function() {
-    var event, parameters, _ref;
+    var event, parameters;
     event = arguments[0],
     parameters = 2 <= arguments.length ? Array.prototype.slice.call(arguments, 1) : [];
-    return (_ref = this.hoodie).trigger.apply(_ref, ["" + this.name + ":" + event].concat(Array.prototype.slice.call(parameters)));
+    this.hoodie.trigger.apply(this.hoodie, ["" + this.name + ":" + event].concat(Array.prototype.slice.call(parameters)));
   };
 
 
@@ -2854,12 +2854,12 @@ Hoodie.AccountRemote = (function(_super) {
   //
   AccountRemote.prototype.on = function(event, cb) {
     event = event.replace(/(^| )([^ ]+)/g, "$1remote:$2");
-    return this.hoodie.on(event, cb);
+    this.hoodie.on(event, cb);
   };
 
   AccountRemote.prototype.one = function(event, cb) {
     event = event.replace(/(^| )([^ ]+)/g, "$1remote:$2");
-    return this.hoodie.one(event, cb);
+    this.hoodie.one(event, cb);
   };
 
 
@@ -2867,12 +2867,12 @@ Hoodie.AccountRemote = (function(_super) {
   // namespaced alias for `hoodie.trigger`
   //
   AccountRemote.prototype.trigger = function() {
-    var event, parameters, _ref;
+    var event, parameters;
 
     event = arguments[0],
     parameters = 2 <= arguments.length ? Array.prototype.slice.call(arguments, 1) : [];
 
-    return (_ref = this.hoodie).trigger.apply(_ref, ["remote:" + event].concat(Array.prototype.slice.call(parameters)));
+    this.hoodie.trigger.apply(this.hoodie, ["remote:" + event].concat(Array.prototype.slice.call(parameters)));
   };
 
 
@@ -3421,15 +3421,15 @@ Hoodie.LocalStore = (function (_super) {
   };
 
   LocalStore.prototype.trigger = function() {
-    var event, parameters, _ref;
+    var event, parameters;
     event = arguments[0],
     parameters = 2 <= arguments.length ? Array.prototype.slice.call(arguments, 1) : [];
-    return (_ref = this.hoodie).trigger.apply(_ref, ["store:" + event].concat(Array.prototype.slice.call(parameters)));
+    this.hoodie.trigger.apply(this.hoodie, ["store:" + event].concat(Array.prototype.slice.call(parameters)));
   };
 
   LocalStore.prototype.on = function(event, data) {
     event = event.replace(/(^| )([^ ]+)/g, "$1store:$2");
-    return this.hoodie.on(event, data);
+    this.hoodie.on(event, data);
   };
 
   LocalStore.prototype.decoratePromises = function(methods) {
