@@ -1,6 +1,12 @@
 'use strict';
 var _and, _but, _when;
 
+$.ajax = function() {
+  var promise = $.Deferred().promise();
+  promise.abort = function() {};
+  return promise;
+}
+
 
 _when = function(description, specs) {
   return describe("when " + description, specs);

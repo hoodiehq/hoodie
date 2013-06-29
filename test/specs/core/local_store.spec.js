@@ -27,24 +27,46 @@ describe("Hoodie.LocalStore", function() {
       return expect(this.hoodie.on).wasCalledWith('account:signup', store.markAllAsChanged);
     });
     it("should subscribe to remote:change event", function() {
-      var store;
+      var store, object;
       spyOn(Hoodie.LocalStore.prototype, "save");
       spyOn(Hoodie.LocalStore.prototype, "remove");
       store = new Hoodie.LocalStore(this.hoodie);
-      this.object = {
+      object = {
         type: 'car',
         id: '123',
         color: 'red'
       };
-      this.hoodie.trigger('remote:change', 'remove', this.object);
-      this.hoodie.trigger('remote:change', 'update', this.object);
+      this.hoodie.trigger('remote:change', 'remove', object);
+      this.hoodie.trigger('remote:change', 'update', object);
       expect(store.remove).wasCalledWith('car', '123', {
         remote: true
       });
-      return expect(store.save).wasCalledWith('car', '123', this.object, {
+      expect(store.save).wasCalledWith('car', '123', object, {
         remote: true
       });
     });
+
+    it("should subscribe to account:signin event", function() {
+      var store;
+      this.hoodie.on.andCallThrough()
+
+      store = new Hoodie.LocalStore(this.hoodie);
+      expect(store.isBootstrapping()).toBeFalsy();
+      this.hoodie.trigger('account:signin', 'joe@example.com');
+      expect(store.isBootstrapping()).toBeTruthy();
+    });
+
+    it("should subscribe to account:signout event", function() {
+      var store;
+      this.hoodie.on.andCallThrough()
+
+      store = new Hoodie.LocalStore(this.hoodie);
+      this.hoodie.trigger('account:signin', 'joe@example.com');
+      expect(store.isBootstrapping()).toBeTruthy();
+      this.hoodie.trigger('account:signout');
+      expect(store.isBootstrapping()).toBeFalsy();
+    });
+
     _when("there are dirty objects in localStorage", function() {
       beforeEach(function() {
         Hoodie.LocalStore.prototype.db.getItem.andCallFake(function(key) {
@@ -74,7 +96,7 @@ describe("Hoodie.LocalStore", function() {
         return expect(store.cache).wasCalledWith('task', '1');
       });
     });
-    return it("should not mess with LocalStore.prototype", function() {
+    it("should not mess with LocalStore.prototype", function() {
       var promise, store1, store2;
       spyOn(Hoodie.LocalStore.prototype, "isPersistent").andReturn(false);
       store1 = new Hoodie.LocalStore(this.hoodie);

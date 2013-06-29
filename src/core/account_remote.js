@@ -125,7 +125,7 @@ Hoodie.AccountRemote = (function(_super) {
       objects = this.hoodie.store.changedObjects();
     }
 
-    var promise = AccountRemote.__super__.push.call(this, objects);
+    var promise = AccountRemote.__super__.push.apply(this, objects);
     promise.fail(this.hoodie.checkConnection);
 
     return promise;

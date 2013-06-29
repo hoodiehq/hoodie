@@ -2949,7 +2949,7 @@ Hoodie.AccountRemote = (function(_super) {
       objects = this.hoodie.store.changedObjects();
     }
 
-    var promise = AccountRemote.__super__.push.call(this, objects);
+    var promise = AccountRemote.__super__.push.apply(this, objects);
     promise.fail(this.hoodie.checkConnection);
 
     return promise;
@@ -3020,6 +3020,7 @@ Hoodie.LocalStore = (function (_super) {
     this.hoodie = hoodie;
     this._triggerDirtyAndIdleEvents = this._triggerDirtyAndIdleEvents.bind(this);
     this._handleRemoteChange = this._handleRemoteChange.bind(this);
+
     this.clear = this.clear.bind(this);
     this.markAllAsChanged = this.markAllAsChanged.bind(this);
 
@@ -3041,29 +3042,17 @@ Hoodie.LocalStore = (function (_super) {
     // e.g. Safari in private mode, overite the respective methods.
     if (!this.isPersistent()) {
       this.db = {
-        getItem: function() {
-          return null;
-        },
-        setItem: function() {
-          return null;
-        },
-        removeItem: function() {
-          return null;
-        },
-        key: function() {
-          return null;
-        },
-        length: function() {
-          return 0;
-        },
-        clear: function() {
-          return null;
-        }
+        getItem: function() { return null; },
+        setItem: function() { return null; },
+        removeItem: function() { return null; },
+        key: function() { return null; },
+        length: function() { return 0; },
+        clear: function() { return null; }
       };
     }
 
     this._subscribeToOutsideEvents();
-    this._bootstrap();
+    this._bootstrapDirtyObjects();
   }
 
   Object.deepExtend(LocalStore, _super);
@@ -3127,8 +3116,10 @@ Hoodie.LocalStore = (function (_super) {
       return this._decoratePromise(defer);
     }
 
+    // make sure we don't mess with the passed object directly
     object = $.extend(true, {}, properties);
 
+    // generate an id if necessary
     if (id) {
       currentObject = this.cache(type, id);
       isNew = typeof currentObject !== 'object';
@@ -3137,11 +3128,20 @@ Hoodie.LocalStore = (function (_super) {
       id = this.hoodie.uuid();
     }
 
+    // add createdBy hash to new objects
+    // note: we check for `hoodie.account` as in some cases, the code
+    //       might get executed before the account module is initiated.
+    // todo: move ownerHash into a method on the core hoodie module
     if (isNew && this.hoodie.account) {
       object.createdBy = object.createdBy || this.hoodie.account.ownerHash;
     }
 
+    // handle local properties and hidden properties with $ prefix
+    // keep local properties for remote updates
     if (!isNew) {
+
+      // for remote updates, keep local properties (starting with '_')
+      // for local updates, keep hidden properties (starting with '$')
       for (key in currentObject) {
         if (!object.hasOwnProperty(key)) {
           switch (key.charAt(0)) {
@@ -3159,6 +3159,7 @@ Hoodie.LocalStore = (function (_super) {
       }
     }
 
+    // add timestamps
     if (options.remote) {
       object._syncedAt = this._now();
     } else if (!options.silent) {
@@ -3166,6 +3167,13 @@ Hoodie.LocalStore = (function (_super) {
       object.createdAt = object.createdAt || object.updatedAt;
     }
 
+    // handle local changes
+    // 
+    // A local change is meant to be replicated to the
+    // users database, but not beyond. For example when
+    // I subscribed to a share but then decide to unsubscribe,
+    // all objects get removed with local: true flag, so that
+    // they get removed from my database, but won't anywhere else.
     if (options.local) {
       object._$local = true;
     } else {
@@ -3185,6 +3193,14 @@ Hoodie.LocalStore = (function (_super) {
     return this._decoratePromise(defer.promise());
   };
 
+  // find
+  // ------
+
+  // loads one object from Store, specified by `type` and `id`
+  //
+  // example usage:
+  //
+  //     store.find('car', 'abc4567')
   LocalStore.prototype.find = function(type, id) {
     var defer, error, object;
     defer = LocalStore.__super__.find.apply(this, arguments);
@@ -3233,6 +3249,7 @@ Hoodie.LocalStore = (function (_super) {
 
     keys = this.index();
 
+    // normalize filter
     if (typeof filter === 'string') {
       type = filter;
       filter = function(obj) {
@@ -3241,6 +3258,9 @@ Hoodie.LocalStore = (function (_super) {
     }
 
     try {
+
+      // coffeescript gathers the result of the respective for key in keys loops
+      // and returns it as array, which will be stored in the results variable
       results = (function() {
         var _i, _len, _ref, _results;
         _results = [];
@@ -3262,6 +3282,8 @@ Hoodie.LocalStore = (function (_super) {
         }
         return _results;
       }).call(this);
+
+      // sort
       results.sort(function(a, b) {
         if (a.createdAt > b.createdAt) {
           return -1;
@@ -3279,6 +3301,13 @@ Hoodie.LocalStore = (function (_super) {
     return this._decoratePromise(defer.promise());
   };
 
+  // Remove
+  // --------
+
+  // Removes one object specified by `type` and `id`. 
+  // 
+  // when object has been synced before, mark it as deleted. 
+  // Otherwise remove it from Store.
   LocalStore.prototype.remove = function(type, id, options) {
 
     var defer, key, object, objectWasMarkedAsDeleted, promise;
@@ -3325,18 +3354,22 @@ Hoodie.LocalStore = (function (_super) {
     return this._decoratePromise(promise);
   };
 
+  // update / updateAll / removeAll
+  // --------------------------------
+
+  // just decorating returned promises
   LocalStore.prototype.update = function() {
     return this._decoratePromise(LocalStore.__super__.update.apply(this, arguments));
   };
-
   LocalStore.prototype.updateAll = function() {
     return this._decoratePromise(LocalStore.__super__.updateAll.apply(this, arguments));
   };
-
   LocalStore.prototype.removeAll = function() {
     return this._decoratePromise(LocalStore.__super__.removeAll.apply(this, arguments));
   };
 
+  // object key index
+  // TODO: make this cachy
   LocalStore.prototype.index = function() {
     var i, key, keys, _i, _ref;
     keys = [];
@@ -3349,6 +3382,17 @@ Hoodie.LocalStore = (function (_super) {
     return keys;
   };
 
+
+  // Cache
+  // -------
+  
+  // loads an object specified by `type` and `id` only once from localStorage 
+  // and caches it for faster future access. Updates cache when `value` is passed.
+  //
+  // Also checks if object needs to be synched (dirty) or not 
+  //
+  // Pass `options.remote = true` when object comes from remote
+  // Pass 'options.silent = true' to avoid events from being triggered.
   LocalStore.prototype.cache = function(type, id, object, options) {
     var key;
 
@@ -3375,16 +3419,25 @@ Hoodie.LocalStore = (function (_super) {
 
     } else {
 
+      // if the cached key returns false, it means
+      // that we have removed that key. We just 
+      // set it to false for performance reasons, so
+      // that we don't need to look it up again in localStorage
       if (this._cached[key] === false) {
         return false;
       }
 
+      // if key is cached, return it. But make sure
+      // to make a deep copy beforehand (=> true)
       if (this._cached[key]) {
         return $.extend(true, {}, this._cached[key]);
       }
 
+      // if object is not yet cached, load it from localStore
       object = this._getObject(type, id);
 
+      // stop here if object did not exist in localStore
+      // and cache it so we don't need to look it up again
       if (object === false) {
         this.clearChanged(type, id);
         this._cached[key] = false;
@@ -3400,6 +3453,8 @@ Hoodie.LocalStore = (function (_super) {
       return false;
     }
 
+    // here is where we cache the object for
+    // future quick access
     this._cached[key] = $.extend(true, {}, object);
 
     if (this._isDirty(object)) {
@@ -3411,6 +3466,12 @@ Hoodie.LocalStore = (function (_super) {
     return $.extend(true, {}, object);
   };
 
+
+  // Clear changed 
+  // ---------------
+
+  // removes an object from the list of objects that are flagged to by synched (dirty)
+  // and triggers a `store:dirty` event
   LocalStore.prototype.clearChanged = function(type, id) {
     var key;
     if (type && id) {
@@ -3423,10 +3484,22 @@ Hoodie.LocalStore = (function (_super) {
     return window.clearTimeout(this._dirtyTimeout);
   };
 
+
+  // Marked as deleted?
+  // --------------------
+
+  // when an object gets deleted that has been synched before (`_rev` attribute),
+  // it cannot be removed from store but gets a `_deleted: true` attribute
   LocalStore.prototype.isMarkedAsDeleted = function(type, id) {
     return this._isMarkedAsDeleted(this.cache(type, id));
   };
 
+
+  // Mark as changed
+  // -----------------
+
+  // Marks object as changed (dirty). Triggers a `store:dirty` event immediately and a 
+  // `store:idle` event once there is no change within 2 seconds
   LocalStore.prototype.markAsChanged = function(type, id, object, options) {
     var key;
 
@@ -3443,6 +3516,12 @@ Hoodie.LocalStore = (function (_super) {
     return this._triggerDirtyAndIdleEvents();
   };
 
+
+  // Mark all as changed
+  // ------------------------
+
+  // Marks all local object as changed (dirty) to make them sync
+  // with remote
   LocalStore.prototype.markAllAsChanged = function() {
     var self = this;
 
@@ -3456,11 +3535,16 @@ Hoodie.LocalStore = (function (_super) {
       }
 
       self._saveDirtyIds();
-
-      return self._triggerDirtyAndIdleEvents();
+      self._triggerDirtyAndIdleEvents();
     });
   };
 
+
+
+  // changed docs
+  // --------------
+
+  // returns an Array of all dirty documents
   LocalStore.prototype.changedObjects = function() {
     var id, key, object, type, _ref, _ref1, _results;
 
@@ -3481,6 +3565,15 @@ Hoodie.LocalStore = (function (_super) {
     return _results;
   };
 
+
+  // Is dirty?
+  // ----------
+
+  // When no arguments passed, returns `true` or `false` depending on if there are
+  // dirty objects in the store.
+  //
+  // Otherwise it returns `true` or `false` for the passed object. An object is dirty
+  // if it has no `_syncedAt` attribute or if `updatedAt` is more recent than `_syncedAt`
   LocalStore.prototype.isDirty = function(type, id) {
     if (!type) {
       return !$.isEmptyObject(this._dirty);
@@ -3488,6 +3581,13 @@ Hoodie.LocalStore = (function (_super) {
     return this._isDirty(this.cache(type, id));
   };
 
+
+  // Clear
+  // ------
+
+  // clears localStorage and cache
+  // TODO: do not clear entire localStorage, clear only the items that have been stored
+  //       using `hoodie.store` before.
   LocalStore.prototype.clear = function() {
     var defer, error, key, keys, results;
     defer = this.hoodie.defer();
@@ -3515,6 +3615,16 @@ Hoodie.LocalStore = (function (_super) {
     return defer.promise();
   };
 
+
+  // Is persistant?
+  // ----------------
+
+  // returns `true` or `false` depending on whether localStorage is supported or not.
+  // Beware that some browsers like Safari do not support localStorage in private mode.
+  //
+  // inspired by this cappuccino commit
+  // https://github.com/cappuccino/cappuccino/commit/063b05d9643c35b303568a28809e4eb3224f71ec
+  //
   LocalStore.prototype.isPersistent = function() {
     var e;
     try {
@@ -3533,6 +3643,11 @@ Hoodie.LocalStore = (function (_super) {
     return true;
   };
 
+
+  // trigger
+  // ---------
+
+  // proxies to hoodie.trigger
   LocalStore.prototype.trigger = function() {
     var event, parameters, _ref;
     event = arguments[0],
@@ -3540,51 +3655,85 @@ Hoodie.LocalStore = (function (_super) {
     return (_ref = this.hoodie).trigger.apply(_ref, ["store:" + event].concat(Array.prototype.slice.call(parameters)));
   };
 
+
+  // on
+  // ---------
+
+  // proxies to hoodie.on
   LocalStore.prototype.on = function(event, data) {
     event = event.replace(/(^| )([^ ]+)/g, "$1store:$2");
     return this.hoodie.on(event, data);
   };
 
+  // extend
+  // --------
+
+  // extend promises returned by store.api
   LocalStore.prototype.decoratePromises = function(methods) {
     return $.extend(this._promiseApi, methods);
   };
 
-  LocalStore.prototype._bootstrap = function() {
-    var id, key, keys, obj, type, _i, _len, _ref, _results;
+
+  LocalStore.prototype._isBootstrapping = false;
+  LocalStore.prototype.isBootstrapping = function() {
+    return this._isBootstrapping;
+  };
+
+  // Private
+  // ---------
+
+  // bootstrapping dirty objects, to make sure 
+  // that removed objects get pushed after 
+  // page reload.
+  LocalStore.prototype._bootstrapDirtyObjects = function() {
+    var id, key, keys, obj, type, _i, _len, _ref;
     keys = this.db.getItem('_dirty');
+
     if (!keys) {
       return;
     }
+
     keys = keys.split(',');
-    _results = [];
     for (_i = 0, _len = keys.length; _i < _len; _i++) {
       key = keys[_i];
       _ref = key.split('/'),
       type = _ref[0],
       id = _ref[1];
-      _results.push(obj = this.cache(type, id));
+      obj = this.cache(type, id);
     }
-    return _results;
   };
 
+  // subscribe to events coming from account & our remote store.  
   LocalStore.prototype._subscribeToOutsideEvents = function() {
+
+    // account events
     this.hoodie.on('account:cleanup', this.clear);
     this.hoodie.on('account:signup', this.markAllAsChanged);
-    return this.hoodie.on('remote:change', this._handleRemoteChange);
+    this.hoodie.on('account:signin', this._startBootstrappingMode.bind(this));
+    this.hoodie.on('account:signout', this._stopBootstrappingMode.bind(this));
+
+    // remote events
+    this.hoodie.on('remote:change', this._handleRemoteChange);
   };
 
+
+  // when a change come's from our remote store, we differentiate
+  // whether an object has been removed or added / updated and
+  // reflect the change in our local store.
   LocalStore.prototype._handleRemoteChange = function(typeOfChange, object) {
     if (typeOfChange === 'remove') {
-      return this.remove(object.type, object.id, {
+      this.remove(object.type, object.id, {
         remote: true
       });
     } else {
-      return this.save(object.type, object.id, object, {
+      this.save(object.type, object.id, object, {
         remote: true
       });
     }
   };
 
+
+  // more advanced localStorage wrappers to find/store objects
   LocalStore.prototype._setObject = function(type, id, object) {
     var key, store;
 
@@ -3612,6 +3761,8 @@ Hoodie.LocalStore = (function (_super) {
     }
   };
 
+
+  // store IDs of dirty objects
   LocalStore.prototype._saveDirtyIds = function() {
     if ($.isEmptyObject(this._dirty)) {
       return this.db.removeItem('_dirty');
@@ -3621,22 +3772,28 @@ Hoodie.LocalStore = (function (_super) {
     }
   };
 
+  // 
   LocalStore.prototype._now = function() {
     return JSON.stringify(new Date()).replace(/"/g, '');
   };
 
+  // only lowercase letters, numbers and dashes are allowed for ids
   LocalStore.prototype._isValidId = function(key) {
     return new RegExp(/^[a-z0-9\-]+$/).test(key);
   };
 
+  // just like ids, but must start with a letter or a $ (internal types)
   LocalStore.prototype._isValidType = function(key) {
     return new RegExp(/^[a-z$][a-z0-9]+$/).test(key);
   };
 
+  // 
   LocalStore.prototype._isSemanticId = function(key) {
     return new RegExp(/^[a-z$][a-z0-9]+\/[a-z0-9]+$/).test(key);
   };
 
+  // `_isDirty` returns true if there is a local change that
+  // has not been sync'd yet.
   LocalStore.prototype._isDirty = function(object) {
     if (!object.updatedAt) {
       return false;
@@ -3647,10 +3804,12 @@ Hoodie.LocalStore = (function (_super) {
     return object._syncedAt < object.updatedAt;
   };
 
+  // 
   LocalStore.prototype._isMarkedAsDeleted = function(object) {
     return object._deleted === true;
   };
 
+  // 
   LocalStore.prototype._triggerEvents = function(event, object, options) {
     this.trigger(event, object, options);
     this.trigger("" + event + ":" + object.type, object, options);
@@ -3667,6 +3826,7 @@ Hoodie.LocalStore = (function (_super) {
     }
   };
 
+  // 
   LocalStore.prototype._triggerDirtyAndIdleEvents = function() {
     var self = this;
 
@@ -3679,8 +3839,21 @@ Hoodie.LocalStore = (function (_super) {
     }, this.idleTimeout);
   };
 
+  // 
   LocalStore.prototype._decoratePromise = function(promise) {
     return $.extend(promise, this._promiseApi);
+  };
+
+  // 
+  // 
+  LocalStore.prototype._startBootstrappingMode = function() {
+    this._isBootstrapping = true;
+  };
+
+  // 
+  // 
+  LocalStore.prototype._stopBootstrappingMode = function() {
+    this._isBootstrapping = false;
   };
 
   return LocalStore;
