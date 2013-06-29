@@ -1,0 +1,16 @@
+{
+  "name"        : "hoodie",
+  "version"     : "0.1.26",
+  "main"        : ["./dist/hoodie.js"],
+  "dependencies": {
+    "jquery": "~1.9.1"
+  },
+  "ignore": [
+    "test/",
+    "src/",
+    ".gitignore",
+    "Gruntfile.js",
+    "node_modules",
+    "testem.yml"
+  ]
+}

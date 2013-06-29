@@ -2,59 +2,88 @@
 <html>
 <head>
   <title>Jasmine Test Runner</title>
-  <link rel="stylesheet" type="text/css" href="../vendor/jasmine/lib/jasmine-core/jasmine.css">
-  
-  <script src="../vendor/jasmine/lib/jasmine-core/jasmine.js"></script>
-  <script src="../vendor/jasmine/lib/jasmine-core/jasmine-html.js"></script>
-  <script src="../compiled/test/lib/jasmine-helpers.js"></script>
+  <link rel="stylesheet" type="text/css" href="../lib/jasmine/lib/jasmine-core/jasmine.css">
+  <script src="../lib/jasmine/lib/jasmine-core/jasmine.js"></script>
+  <script src="../lib/jasmine/lib/jasmine-core/jasmine-html.js"></script>
+  <script>
+    if (location.hash === '#testem')
+    	document.write('<script src="/testem.js"></'+'script>')
+
+    // Add shim for Function.prototype.bind() from:
+    //    https://developer.mozilla.org/en-US/docs/JavaScript/Reference/Global_Objects/Function/bind#Compatibility
+    if (!Function.prototype.bind) {
+        Function.prototype.bind = function (oThis) {
+            if (typeof this !== "function") {
+                // closest thing possible to the ECMAScript 5 internal IsCallable function
+                throw new TypeError("Function.prototype.bind - what is trying to be bound is not callable");
+            }
+
+            var aArgs = Array.prototype.slice.call(arguments, 1),
+                fToBind = this,
+                fNOP = function () {},
+                fBound = function () {
+                    return fToBind.apply(this instanceof fNOP && oThis
+                                           ? this
+                                           : oThis,
+                                         aArgs.concat(Array.prototype.slice.call(arguments)));
+                };
+
+            fNOP.prototype = this.prototype;
+            fBound.prototype = new fNOP();
+
+            return fBound;
+        };
+    }
+  </script>
+
+  <script src="../test/lib/jasmine-helpers.js"></script>
 
   <!-- dependencies -->
-  <script src="../vendor/jquery/jquery.min.js"></script>
-  <script src="../compiled/src/events.js"></script>
+  <script src="../lib/jquery/jquery.js"></script>
+  <script src="../src/utils.js"></script>
+  <script src="../src/events.js"></script>
 
   <!-- base classes -->
-  <script src="../compiled/src/hoodie.js"></script>
-  <script src="../compiled/src/core/account.js"></script>
-  <script src="../compiled/src/core/store.js"></script>
-  <script src="../compiled/src/core/remote.js"></script>
-  <script src="../compiled/src/core/account_remote.js"></script>
-  <script src="../compiled/src/core/config.js"></script>
-  <script src="../compiled/src/core/email.js"></script>
-  <script src="../compiled/src/core/errors.js"></script>
-  <script src="../compiled/src/core/local_store.js"></script>
+  <script src="../src/hoodie.js"></script>
+  <script src="../src/core/account.js"></script>
+  <script src="../src/core/store.js"></script>
+  <script src="../src/core/remote.js"></script>
+  <script src="../src/core/account_remote.js"></script>
+  <script src="../src/core/config.js"></script>
+  <script src="../src/core/errors.js"></script>
+  <script src="../src/core/local_store.js"></script>
 
-  <script src="../compiled/src/extensions/user.js"></script>
-  <script src="../compiled/src/extensions/global.js"></script>
-  <script src="../compiled/src/extensions/share.js"></script>
-  <script src="../compiled/src/extensions/share_instance.js"></script>
-  
+  <script src="../src/extensions/email.js"></script>
+  <script src="../src/extensions/user.js"></script>
+  <script src="../src/extensions/global.js"></script>
+  <script src="../src/extensions/share.js"></script>
+  <script src="../src/extensions/share_instance.js"></script>
+
   <!-- mocks -->
-  <script src="../compiled/test/mocks/hoodie.mock.js"></script>
-  <script src="../compiled/test/mocks/changes_response.mock.js"></script>
-  <script src="../compiled/test/mocks/changed_docs.mock.js"></script>
-  <script src="../compiled/test/mocks/bulk_update_response.mock.js"></script>
-  
+  <script src="../test/mocks/hoodie.mock.js"></script>
+  <script src="../test/mocks/changes_response.mock.js"></script>
+  <script src="../test/mocks/changed_docs.mock.js"></script>
+  <script src="../test/mocks/bulk_update_response.mock.js"></script>
+
   <!-- specs -->
-  <script src="../compiled/test/specs/events.spec.js"></script>
-  <script src="../compiled/test/specs/hoodie.spec.js"></script>
-  <script src="../compiled/test/specs/core/account.spec.js"></script>
-  <script src="../compiled/test/specs/core/account_remote.spec.js"></script>
-  <script src="../compiled/test/specs/core/config.spec.js"></script>
-  <script src="../compiled/test/specs/core/email.spec.js"></script>
-  <script src="../compiled/test/specs/core/store.spec.js"></script>
-  <script src="../compiled/test/specs/core/local_store.spec.js"></script>
-  <script src="../compiled/test/specs/core/remote.spec.js"></script>
-  
-  <script src="../compiled/test/specs/extensions/user.spec.js"></script>
-  <script src="../compiled/test/specs/extensions/share.spec.js"></script>
-  <script src="../compiled/test/specs/extensions/share_instance.spec.js"></script>
-  <!-- 
-  -->
+  <script src="../test/specs/events.spec.js"></script>
+  <script src="../test/specs/hoodie.spec.js"></script>
+  <script src="../test/specs/core/account.spec.js"></script>
+  <script src="../test/specs/core/account_remote.spec.js"></script>
+  <script src="../test/specs/core/config.spec.js"></script>
+  <script src="../test/specs/core/store.spec.js"></script>
+  <script src="../test/specs/core/local_store.spec.js"></script>
+  <script src="../test/specs/core/remote.spec.js"></script>
+
+  <script src="../test/specs/extensions/email.spec.js"></script>
+  <script src="../test/specs/extensions/user.spec.js"></script>
+  <script src="../test/specs/extensions/share.spec.js"></script>
+  <script src="../test/specs/extensions/share_instance.spec.js"></script>
 </head>
 <body>
   <script>
     jas = jasmine.getEnv()
-    jas.addReporter(new jasmine.TrivialReporter()); 
+    jas.addReporter(new jasmine.TrivialReporter());
     jas.execute();
   </script>
 </body>
