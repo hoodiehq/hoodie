@@ -752,12 +752,12 @@ Hoodie.Account = (function () {
   // shortcut for `hoodie.trigger`
   //
   Account.prototype.trigger = function() {
-    var event, parameters, _ref;
+    var event, parameters;
 
     event = arguments[0],
     parameters = 2 <= arguments.length ? Array.prototype.slice.call(arguments, 1) : [];
 
-    return this.hoodie.trigger.apply(_ref, ["account:" + event].concat(Array.prototype.slice.call(parameters)));
+    this.hoodie.trigger.apply(this.hoodie, ["account:" + event].concat(Array.prototype.slice.call(parameters)));
   };
 
 

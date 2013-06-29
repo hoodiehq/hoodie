@@ -351,6 +351,8 @@ describe("Hoodie.Account", function () {
       });
     });
   });
+
+  
   describe("#signUp(username, password)", function () {
     beforeEach(function () {
       this.account.ownerHash = "owner_hash123";
@@ -1452,7 +1454,17 @@ describe("Hoodie.Account", function () {
       });
     });
   });
-  return describe("#changeUsername(currentPassword, newUsername)", function () {
+
+
+  describe("#resetPassword(username)", function () {
+    it("should proxy to hoodie.trigger", function() {
+      this.account.trigger('say', 'funky', 'fresh')
+      expect(this.hoodie.trigger).wasCalledWith('account:say', 'funky', 'fresh');
+    });
+
+  });
+
+  describe("#changeUsername(currentPassword, newUsername)", function () {
     beforeEach(function () {
       var signInDefers;
       this.signInDefer1 = this.hoodie.defer();
