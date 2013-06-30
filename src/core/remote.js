@@ -389,10 +389,25 @@ Hoodie.Remote = (function(_super) {
   };
 
 
+  // bootstrap
+  // -----------
+
+  // inital pull of data of the remote start. By default, we pull all
+  // changes since the beginning, but this behavior might be adjusted,
+  // e.g for a filtered bootstrap.
+  //
+  Remote.prototype.bootstrap = function() {
+    this.trigger('bootstrap:start');
+    return this.pull().done( this._handleBootstrapSuccess.bind(this) );
+  };
+
+
   // pull changes
   // --------------
 
   // a.k.a. make a GET request to CouchDB's `_changes` feed.
+  // We currently make long poll requests, that we manually abort
+  // and restart each 25 seconds.
   //
   Remote.prototype.pull = function() {
     this._pullRequest = this.request('GET', this._pullUrl());
@@ -700,6 +715,12 @@ Hoodie.Remote = (function(_super) {
     }
   };
 
+
+  // ### handle changes from remote
+  //
+  Remote.prototype._handleBootstrapSuccess = function() {
+    this.trigger('bootstrap:end');
+  };
 
   // ### handle changes from remote
   //

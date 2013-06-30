@@ -109,6 +109,12 @@ Hoodie.LocalStore = (function (_super) {
       return this._decoratePromise(defer);
     }
 
+    // if store is currently bootstrapping data from remote,
+    // we're queueing until it's finished
+    // if (this.isBootstrapping()) {
+    //   return this.enqueue('save', arguments)
+    // };
+
     // make sure we don't mess with the passed object directly
     object = $.extend(true, {}, properties);
 
@@ -183,7 +189,7 @@ Hoodie.LocalStore = (function (_super) {
       defer.reject(error).promise();
     }
 
-    return this._decoratePromise(defer.promise());
+      return this._decoratePromise(defer.promise());
   };
 
   // find
@@ -679,7 +685,7 @@ Hoodie.LocalStore = (function (_super) {
   // that removed objects get pushed after 
   // page reload.
   LocalStore.prototype._bootstrapDirtyObjects = function() {
-    var id, key, keys, obj, type, _i, _len, _ref;
+    var id, keys, obj, type, _i, _len, _ref;
     keys = this.db.getItem('_dirty');
 
     if (!keys) {
@@ -688,8 +694,7 @@ Hoodie.LocalStore = (function (_super) {
 
     keys = keys.split(',');
     for (_i = 0, _len = keys.length; _i < _len; _i++) {
-      key = keys[_i];
-      _ref = key.split('/'),
+      _ref = keys[_i].split('/'),
       type = _ref[0],
       id = _ref[1];
       obj = this.cache(type, id);

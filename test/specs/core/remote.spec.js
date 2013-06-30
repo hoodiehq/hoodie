@@ -368,6 +368,34 @@ describe("Hoodie.Remote", function() {
       return expect(this.remote._since).toBe(100);
     });
   });
+  describe("#bootstrap()", function() {
+    beforeEach(function() {
+      this.bootstrapDefer = this.hoodie.defer();
+      spyOn(this.remote, "pull").andReturn( this.bootstrapDefer );
+      spyOn(this.remote, "trigger");
+    });
+    
+    it("should trigger bootstrap:start event", function() {
+      this.remote.bootstrap()
+      expect(this.remote.trigger).wasCalledWith('bootstrap:start');
+    });
+
+    it("should pull", function() {
+      this.remote.bootstrap()
+      expect(this.remote.pull).wasCalled();
+    });
+
+    _when("bootstrap succeeds", function() {
+      beforeEach(function() {
+        this.bootstrapDefer.resolve()
+      });
+
+      it("should trigger 'bootstrap:end' event", function() {
+        this.remote.bootstrap()
+        expect(this.remote.trigger).wasCalledWith('bootstrap:end');
+      });
+    });
+  });
   describe("#pull()", function() {
     beforeEach(function() {
       this.remote.connected = true;

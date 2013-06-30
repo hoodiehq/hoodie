@@ -69,7 +69,7 @@ describe("Hoodie.LocalStore", function() {
         spyOn(this.store, "clear");
         this.hoodie.trigger('account:cleanup')
       });
-      
+
       // TODO: I can't figuer out why the spec fails, but it works.
       xit("should clear the store", function() {
         expect(this.store.clear).wasCalled();
@@ -142,10 +142,6 @@ describe("Hoodie.LocalStore", function() {
 
         it("should stop bootstrapping mode", function() {
           expect(this.store.isBootstrapping()).toBe(false);
-        });
-
-        it("should trigger bootstrap:end event", function() {
-          expect(this.store.trigger).wasCalledWith('bootstrap:end');
         });
       })
     })
@@ -507,7 +503,7 @@ describe("Hoodie.LocalStore", function() {
       }
       return _results;
     });
-    return _when("called without id", function() {
+    _when("called without id", function() {
       beforeEach(function() {
         var _ref;
         spyOn(this.store, "cache").andReturn('cachedObject');
@@ -539,6 +535,14 @@ describe("Hoodie.LocalStore", function() {
         return it("should pass true (= created) as the second param to the done callback", function() {
           return expect(this.promise).toBeResolvedWith('cachedObject', true);
         });
+      });
+    });
+    _when("store is bootstrapping", function() {
+      beforeEach(function() {
+        spyOn(this.store, "isBootstrapping").andReturn(true);
+      });
+      it("should wait until bootstrapping is finished", function() {
+        
       });
     });
   });

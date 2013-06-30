@@ -21,11 +21,6 @@ Hoodie.AccountRemote = (function(_super) {
   function AccountRemote(hoodie, options) {
     this.hoodie = hoodie;
     options = options || {};
-    this._handleSignIn = this._handleSignIn.bind(this);
-    this._connect = this._connect.bind(this);
-    this.push = this.push.bind(this);
-    this.disconnect = this.disconnect.bind(this);
-    this.connect = this.connect.bind(this);
 
     // set name to user's DB name
     this.name = this.hoodie.account.db();
@@ -36,14 +31,15 @@ Hoodie.AccountRemote = (function(_super) {
     // do not prefix files for my own remote
     options.prefix = '';
 
-    this.hoodie.on('account:signin', this._handleSignIn);
-    this.hoodie.on('account:reauthenticated', this._connect);
-    this.hoodie.on('account:signout', this.disconnect);
-    this.hoodie.on('reconnected', this.connect);
+    this.push = this.push.bind(this);
+    this.hoodie.on('account:signin', this._handleSignIn.bind(this));
+    this.hoodie.on('account:reauthenticated', this._connect.bind(this));
+    this.hoodie.on('account:signout', this.disconnect.bind(this));
+    this.hoodie.on('reconnected', this.connect.bind(this));
     AccountRemote.__super__.constructor.call(this, this.hoodie, options);
 
     // preset known objects with localstore.
-    this.bootstrapKnownObjects();
+    this.loadListOfKnownObjectsFromLocalStore();
   }
 
   Object.deepExtend(AccountRemote, _super);
@@ -54,17 +50,17 @@ Hoodie.AccountRemote = (function(_super) {
 
   // Connect
   // ---------
-  //
+
   // do not start to connect immediately, but authenticate beforehand
   //
   AccountRemote.prototype.connect = function() {
-    return this.hoodie.account.authenticate().pipe(this._connect);
+    return this.hoodie.account.authenticate().pipe(this._connect.bind(this));
   };
 
 
   // disconnect
   // ------------
-  //
+
   //
   AccountRemote.prototype.disconnect = function() {
     this.hoodie.unbind('store:idle', this.push);
@@ -72,11 +68,14 @@ Hoodie.AccountRemote = (function(_super) {
   };
 
 
-  // bootstrapKnownObjects
-  // -----------------------
-  //
-  //
-  AccountRemote.prototype.bootstrapKnownObjects = function() {
+  // loadListOfKnownObjectsFromLocalStore
+  // -------------------------------------------
+
+  // to determine wether to trigger an `add` or `update`
+  // event, the known objects from the user get loaded
+  // from local store initially.
+  // 
+  AccountRemote.prototype.loadListOfKnownObjectsFromLocalStore = function() {
     var id, key, type, _i, _len, _ref, _ref1;
     _ref = this.hoodie.store.index();
 
