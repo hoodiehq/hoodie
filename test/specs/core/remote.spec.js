@@ -317,16 +317,16 @@ describe("Hoodie.Remote", function() {
   });
   describe("#connect()", function() {
     beforeEach(function() {
-      return spyOn(this.remote, "pull");
+      spyOn(this.remote, "bootstrap");
     });
     it("should set connected to true", function() {
       this.remote.connected = false;
       this.remote.connect();
-      return expect(this.remote.connected).toBe(true);
+      expect(this.remote.connected).toBe(true);
     });
-    return it("should pull", function() {
+    it("should bootstrap", function() {
       this.remote.connect();
-      return expect(this.remote.pull).wasCalled();
+      expect(this.remote.bootstrap).wasCalled();
     });
   });
   describe("#disconnect()", function() {

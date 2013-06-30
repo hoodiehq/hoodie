@@ -332,11 +332,12 @@ Hoodie.Remote = (function(_super) {
   // Connect
   // ---------
 
-  // start syncing
-  //
+  // start syncing. `this.bootstrap()` will automatically start
+  // pulling when `this.connected` remains true.
+  // 
   Remote.prototype.connect = function() {
     this.connected = true;
-    return this.pull();
+    return this.bootstrap();
   };
 
 
