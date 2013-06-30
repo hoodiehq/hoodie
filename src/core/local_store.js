@@ -15,13 +15,16 @@ Hoodie.LocalStore = (function (_super) {
     this._triggerDirtyAndIdleEvents = this._triggerDirtyAndIdleEvents.bind(this);
     this._handleRemoteChange = this._handleRemoteChange.bind(this);
     this._startBootstrappingMode = this._startBootstrappingMode.bind(this);
-    this._stopBootstrappingMode = this._stopBootstrappingMode.bind(this);
+    this._endBootstrappingMode = this._endBootstrappingMode.bind(this);
 
     // cache of localStorage for quicker access
     this._cached = {};
 
     // map of dirty objects by their ids
     this._dirty = {};
+
+    // queue of method calls done during bootstrapping
+    this._queue = []
 
     // extend this property with extra functions that will be available
     // on all promises returned by hoodie.store API. It has a reference
@@ -111,9 +114,9 @@ Hoodie.LocalStore = (function (_super) {
 
     // if store is currently bootstrapping data from remote,
     // we're queueing until it's finished
-    // if (this.isBootstrapping()) {
-    //   return this.enqueue('save', arguments)
-    // };
+    if (this.isBootstrapping()) {
+      return this._enqueue('save', arguments);
+    }
 
     // make sure we don't mess with the passed object directly
     object = $.extend(true, {}, properties);
@@ -206,6 +209,13 @@ Hoodie.LocalStore = (function (_super) {
     if (this.hoodie.isPromise(defer)) {
       return this._decoratePromise(defer);
     }
+
+    // if store is currently bootstrapping data from remote,
+    // we're queueing until it's finished
+    if (this.isBootstrapping()) {
+      return this._enqueue('find', arguments);
+    }
+
     try {
       object = this.cache(type, id);
       if (!object) {
@@ -244,6 +254,12 @@ Hoodie.LocalStore = (function (_super) {
 
     if (this.hoodie.isPromise(defer)) {
       return this._decoratePromise(defer);
+    }
+
+    // if store is currently bootstrapping data from remote,
+    // we're queueing until it's finished
+    if (this.isBootstrapping()) {
+      return this._enqueue('findAll', arguments);
     }
 
     keys = this.index();
@@ -316,6 +332,12 @@ Hoodie.LocalStore = (function (_super) {
 
     if (this.hoodie.isPromise(defer)) {
       return this._decoratePromise(defer);
+    }
+
+    // if store is currently bootstrapping data from remote,
+    // we're queueing until it's finished
+    if (this.isBootstrapping()) {
+      return this._enqueue('remove', arguments);
     }
 
     key = "" + type + "/" + id;
@@ -708,7 +730,7 @@ Hoodie.LocalStore = (function (_super) {
     this.hoodie.on('account:cleanup', this.clear);
     this.hoodie.on('account:signup', this.markAllAsChanged);
     this.hoodie.on('remote:bootstrap:start', this._startBootstrappingMode);
-    this.hoodie.on('remote:bootstrap:end', this._stopBootstrappingMode);
+    this.hoodie.on('remote:bootstrap:end', this._endBootstrappingMode);
 
     // remote events
     this.hoodie.on('remote:change', this._handleRemoteChange);
@@ -843,18 +865,34 @@ Hoodie.LocalStore = (function (_super) {
   };
 
   // 
-  // 
   LocalStore.prototype._startBootstrappingMode = function() {
     this._isBootstrapping = true;
     this.trigger('bootstrap:start');
   };
 
   // 
-  // 
-  LocalStore.prototype._stopBootstrappingMode = function() {
+  LocalStore.prototype._endBootstrappingMode = function() {
+    var methodCall, method, args, defer;
+
     this._isBootstrapping = false;
+    while(this._queue.length > 0) {
+      methodCall = this._queue.shift();
+      method = methodCall[0];
+      args = methodCall[1];
+      defer = methodCall[2];
+      this[method].apply(this, args).then(defer.resolve, defer.reject);
+    }
+
     this.trigger('bootstrap:end');
   };
+
+  // 
+  LocalStore.prototype._enqueue = function(method, args) {
+    var defer = this.hoodie.defer();
+    this._queue.push([method, args, defer]);
+    return defer.promise();
+  };
+
 
   return LocalStore;
 
