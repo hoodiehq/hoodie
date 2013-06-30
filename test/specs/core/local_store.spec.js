@@ -120,11 +120,11 @@ describe("Hoodie.LocalStore", function() {
       });
     });
 
-    _when("account:signin event gets fired", function() {
+    _when("remote:bootstrap:start event gets fired", function() {
       beforeEach(function() {
         expect(this.store.isBootstrapping()).toBeFalsy();
         spyOn(this.store, "trigger");
-        this.hoodie.trigger('account:signin', 'joe@example.com');
+        this.hoodie.trigger('remote:bootstrap:start', 'joe@example.com');
       });
 
       it("should start bootstrapping mode", function() {
@@ -135,9 +135,9 @@ describe("Hoodie.LocalStore", function() {
         expect(this.store.trigger).wasCalledWith('bootstrap:start');
       });
 
-      _and("account:signout event gets fired", function() {
+      _and("remote:bootstrap:end event gets fired", function() {
         beforeEach(function() {
-          this.hoodie.trigger('account:signout');
+          this.hoodie.trigger('remote:bootstrap:end');
         });
 
         it("should stop bootstrapping mode", function() {

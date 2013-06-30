@@ -189,7 +189,7 @@ Hoodie.LocalStore = (function (_super) {
       defer.reject(error).promise();
     }
 
-      return this._decoratePromise(defer.promise());
+    return this._decoratePromise(defer.promise());
   };
 
   // find
@@ -707,8 +707,8 @@ Hoodie.LocalStore = (function (_super) {
     // account events
     this.hoodie.on('account:cleanup', this.clear);
     this.hoodie.on('account:signup', this.markAllAsChanged);
-    this.hoodie.on('account:signin', this._startBootstrappingMode);
-    this.hoodie.on('account:signout', this._stopBootstrappingMode);
+    this.hoodie.on('remote:bootstrap:start', this._startBootstrappingMode);
+    this.hoodie.on('remote:bootstrap:end', this._stopBootstrappingMode);
 
     // remote events
     this.hoodie.on('remote:change', this._handleRemoteChange);
