@@ -58,7 +58,7 @@ describe("Hoodie.LocalStore", function() {
           title: 'remember the milk'
         };
         spyOn(Hoodie.LocalStore.prototype, "_getObject").andReturn(this.object);
-        spyOn(Hoodie.LocalStore.prototype, "_isDirty").andReturn(true);
+        spyOn(Hoodie.LocalStore.prototype, "_hasLocalChanges").andReturn(true);
         return spyOn(Hoodie.LocalStore.prototype, "trigger");
       });
       it("should trigger idle event if there are dirty objects in localStorage", function() {
@@ -853,7 +853,7 @@ describe("Hoodie.LocalStore", function() {
     beforeEach(function() {
       spyOn(this.store, "markAsChanged");
       spyOn(this.store, "clearChanged");
-      spyOn(this.store, "_isDirty");
+      spyOn(this.store, "_hasLocalChanges");
       spyOn(this.store, "_isMarkedAsDeleted");
       return this.store._cached = {};
     });
@@ -959,7 +959,7 @@ describe("Hoodie.LocalStore", function() {
           });
           _and("object is dirty", function() {
             beforeEach(function() {
-              return this.store._isDirty.andReturn(true);
+              return this.store._hasLocalChanges.andReturn(true);
             });
             return it("should mark it as changed", function() {
               this.store.cache('couch', '123');
@@ -968,7 +968,7 @@ describe("Hoodie.LocalStore", function() {
           });
           return _and("object is not dirty", function() {
             beforeEach(function() {
-              return this.store._isDirty.andReturn(false);
+              return this.store._hasLocalChanges.andReturn(false);
             });
             _and("not marked as deleted", function() {
               beforeEach(function() {
@@ -1062,18 +1062,18 @@ describe("Hoodie.LocalStore", function() {
       });
     });
   });
-  describe("#isDirty(type, id)", function() {
+  describe("#hasLocalChanges(type, id)", function() {
     _when("no arguments passed", function() {
       it("returns true when there are dirty documents", function() {
         this.store._dirty = {
           "doc/1": {},
           "doc/2": {}
         };
-        return expect(this.store.isDirty()).toBe(true);
+        return expect(this.store.hasLocalChanges()).toBe(true);
       });
       return it("returns false when there are no dirty documents", function() {
         this.store._dirty = {};
-        return expect(this.store.isDirty()).toBe(false);
+        return expect(this.store.hasLocalChanges()).toBe(false);
       });
     });
     return _when("type & id passed", function() {
@@ -1086,7 +1086,7 @@ describe("Hoodie.LocalStore", function() {
             });
           });
           return it("should return false", function() {
-            return expect(this.store.isDirty('couch', '123')).toBe(false);
+            return expect(this.store.hasLocalChanges('couch', '123')).toBe(false);
           });
         });
         return _and("object has been saved without silent:true option", function() {
@@ -1097,7 +1097,7 @@ describe("Hoodie.LocalStore", function() {
             });
           });
           return it("should return true", function() {
-            return expect(this.store.isDirty('couch', '123')).toBe(true);
+            return expect(this.store.hasLocalChanges('couch', '123')).toBe(true);
           });
         });
       });
@@ -1110,7 +1110,7 @@ describe("Hoodie.LocalStore", function() {
             });
           });
           return it("should return false", function() {
-            return expect(this.store.isDirty('couch', '123')).toBeFalsy();
+            return expect(this.store.hasLocalChanges('couch', '123')).toBeFalsy();
           });
         });
         _and("object was updated at the same time", function() {
@@ -1121,7 +1121,7 @@ describe("Hoodie.LocalStore", function() {
             });
           });
           return it("should return false", function() {
-            return expect(this.store.isDirty('couch', '123')).toBeFalsy();
+            return expect(this.store.hasLocalChanges('couch', '123')).toBeFalsy();
           });
         });
         return _and("object was updated later", function() {
@@ -1132,7 +1132,7 @@ describe("Hoodie.LocalStore", function() {
             });
           });
           return it("should return true", function() {
-            return expect(this.store.isDirty('couch', '123')).toBeTruthy();
+            return expect(this.store.hasLocalChanges('couch', '123')).toBeTruthy();
           });
         });
       });
