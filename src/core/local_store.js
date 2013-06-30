@@ -9,11 +9,13 @@ Hoodie.LocalStore = (function (_super) {
 
   function LocalStore(hoodie) {
     this.hoodie = hoodie;
-    this._triggerDirtyAndIdleEvents = this._triggerDirtyAndIdleEvents.bind(this);
-    this._handleRemoteChange = this._handleRemoteChange.bind(this);
 
     this.clear = this.clear.bind(this);
     this.markAllAsChanged = this.markAllAsChanged.bind(this);
+    this._triggerDirtyAndIdleEvents = this._triggerDirtyAndIdleEvents.bind(this);
+    this._handleRemoteChange = this._handleRemoteChange.bind(this);
+    this._startBootstrappingMode = this._startBootstrappingMode.bind(this);
+    this._stopBootstrappingMode = this._stopBootstrappingMode.bind(this);
 
     // cache of localStorage for quicker access
     this._cached = {};
@@ -700,8 +702,8 @@ Hoodie.LocalStore = (function (_super) {
     // account events
     this.hoodie.on('account:cleanup', this.clear);
     this.hoodie.on('account:signup', this.markAllAsChanged);
-    this.hoodie.on('account:signin', this._startBootstrappingMode.bind(this));
-    this.hoodie.on('account:signout', this._stopBootstrappingMode.bind(this));
+    this.hoodie.on('account:signin', this._startBootstrappingMode);
+    this.hoodie.on('account:signout', this._stopBootstrappingMode);
 
     // remote events
     this.hoodie.on('remote:change', this._handleRemoteChange);
@@ -839,12 +841,14 @@ Hoodie.LocalStore = (function (_super) {
   // 
   LocalStore.prototype._startBootstrappingMode = function() {
     this._isBootstrapping = true;
+    this.trigger('bootstrap:start');
   };
 
   // 
   // 
   LocalStore.prototype._stopBootstrappingMode = function() {
     this._isBootstrapping = false;
+    this.trigger('bootstrap:end');
   };
 
   return LocalStore;
