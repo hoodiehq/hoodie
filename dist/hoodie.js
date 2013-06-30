@@ -2389,12 +2389,18 @@ Hoodie.Remote = (function(_super) {
 
   // Connect
   // ---------
+<<<<<<< HEAD
 
   // start syncing
+=======
+  //
+  // start syncing. `this.bootstrap()` will automatically start
+  // pulling when `this.connected` remains true.
+>>>>>>> build
   //
   Remote.prototype.connect = function() {
     this.connected = true;
-    return this.pull();
+    return this.bootstrap();
   };
 
 
@@ -2447,10 +2453,25 @@ Hoodie.Remote = (function(_super) {
   };
 
 
+  // bootstrap
+  // -----------
+
+  // inital pull of data of the remote start. By default, we pull all
+  // changes since the beginning, but this behavior might be adjusted,
+  // e.g for a filtered bootstrap.
+  //
+  Remote.prototype.bootstrap = function() {
+    this.trigger('bootstrap:start');
+    return this.pull().done( this._handleBootstrapSuccess.bind(this) );
+  };
+
+
   // pull changes
   // --------------
 
   // a.k.a. make a GET request to CouchDB's `_changes` feed.
+  // We currently make long poll requests, that we manually abort
+  // and restart each 25 seconds.
   //
   Remote.prototype.pull = function() {
     this._pullRequest = this.request('GET', this._pullUrl());
@@ -2761,6 +2782,12 @@ Hoodie.Remote = (function(_super) {
 
   // ### handle changes from remote
   //
+  Remote.prototype._handleBootstrapSuccess = function() {
+    this.trigger('bootstrap:end');
+  };
+
+  // ### handle changes from remote
+  //
   Remote.prototype._handlePullResults = function(changes) {
     var doc, event, object, _i, _len, _results = [];
 
@@ -2845,11 +2872,6 @@ Hoodie.AccountRemote = (function(_super) {
   function AccountRemote(hoodie, options) {
     this.hoodie = hoodie;
     options = options || {};
-    this._handleSignIn = this._handleSignIn.bind(this);
-    this._connect = this._connect.bind(this);
-    this.push = this.push.bind(this);
-    this.disconnect = this.disconnect.bind(this);
-    this.connect = this.connect.bind(this);
 
     // set name to user's DB name
     this.name = this.hoodie.account.db();
@@ -2860,14 +2882,15 @@ Hoodie.AccountRemote = (function(_super) {
     // do not prefix files for my own remote
     options.prefix = '';
 
-    this.hoodie.on('account:signin', this._handleSignIn);
-    this.hoodie.on('account:reauthenticated', this._connect);
-    this.hoodie.on('account:signout', this.disconnect);
-    this.hoodie.on('reconnected', this.connect);
+    this.push = this.push.bind(this);
+    this.hoodie.on('account:signin', this._handleSignIn.bind(this));
+    this.hoodie.on('account:reauthenticated', this._connect.bind(this));
+    this.hoodie.on('account:signout', this.disconnect.bind(this));
+    this.hoodie.on('reconnected', this.connect.bind(this));
     AccountRemote.__super__.constructor.call(this, this.hoodie, options);
 
     // preset known objects with localstore.
-    this.bootstrapKnownObjects();
+    this.loadListOfKnownObjectsFromLocalStore();
   }
 
   Object.deepExtend(AccountRemote, _super);
@@ -2878,17 +2901,17 @@ Hoodie.AccountRemote = (function(_super) {
 
   // Connect
   // ---------
-  //
+
   // do not start to connect immediately, but authenticate beforehand
   //
   AccountRemote.prototype.connect = function() {
-    return this.hoodie.account.authenticate().pipe(this._connect);
+    return this.hoodie.account.authenticate().pipe(this._connect.bind(this));
   };
 
 
   // disconnect
   // ------------
-  //
+
   //
   AccountRemote.prototype.disconnect = function() {
     this.hoodie.unbind('store:idle', this.push);
@@ -2896,11 +2919,14 @@ Hoodie.AccountRemote = (function(_super) {
   };
 
 
-  // bootstrapKnownObjects
-  // -----------------------
-  //
-  //
-  AccountRemote.prototype.bootstrapKnownObjects = function() {
+  // loadListOfKnownObjectsFromLocalStore
+  // -------------------------------------------
+
+  // to determine wether to trigger an `add` or `update`
+  // event, the known objects from the user get loaded
+  // from local store initially.
+  // 
+  AccountRemote.prototype.loadListOfKnownObjectsFromLocalStore = function() {
     var id, key, type, _i, _len, _ref, _ref1;
     _ref = this.hoodie.store.index();
 
@@ -3018,17 +3044,22 @@ Hoodie.LocalStore = (function (_super) {
 
   function LocalStore(hoodie) {
     this.hoodie = hoodie;
-    this._triggerDirtyAndIdleEvents = this._triggerDirtyAndIdleEvents.bind(this);
-    this._handleRemoteChange = this._handleRemoteChange.bind(this);
 
     this.clear = this.clear.bind(this);
     this.markAllAsChanged = this.markAllAsChanged.bind(this);
+    this._triggerDirtyAndIdleEvents = this._triggerDirtyAndIdleEvents.bind(this);
+    this._handleRemoteChange = this._handleRemoteChange.bind(this);
+    this._startBootstrappingMode = this._startBootstrappingMode.bind(this);
+    this._endBootstrappingMode = this._endBootstrappingMode.bind(this);
 
     // cache of localStorage for quicker access
     this._cached = {};
 
     // map of dirty objects by their ids
     this._dirty = {};
+
+    // queue of method calls done during bootstrapping
+    this._queue = [];
 
     // extend this property with extra functions that will be available
     // on all promises returned by hoodie.store API. It has a reference
@@ -3114,6 +3145,12 @@ Hoodie.LocalStore = (function (_super) {
 
     if (this.hoodie.isPromise(defer)) {
       return this._decoratePromise(defer);
+    }
+
+    // if store is currently bootstrapping data from remote,
+    // we're queueing until it's finished
+    if (this.isBootstrapping()) {
+      return this._enqueue('save', arguments);
     }
 
     // make sure we don't mess with the passed object directly
@@ -3207,6 +3244,13 @@ Hoodie.LocalStore = (function (_super) {
     if (this.hoodie.isPromise(defer)) {
       return this._decoratePromise(defer);
     }
+
+    // if store is currently bootstrapping data from remote,
+    // we're queueing until it's finished
+    if (this.isBootstrapping()) {
+      return this._enqueue('find', arguments);
+    }
+
     try {
       object = this.cache(type, id);
       if (!object) {
@@ -3245,6 +3289,12 @@ Hoodie.LocalStore = (function (_super) {
 
     if (this.hoodie.isPromise(defer)) {
       return this._decoratePromise(defer);
+    }
+
+    // if store is currently bootstrapping data from remote,
+    // we're queueing until it's finished
+    if (this.isBootstrapping()) {
+      return this._enqueue('findAll', arguments);
     }
 
     keys = this.index();
@@ -3319,6 +3369,12 @@ Hoodie.LocalStore = (function (_super) {
       return this._decoratePromise(defer);
     }
 
+    // if store is currently bootstrapping data from remote,
+    // we're queueing until it's finished
+    if (this.isBootstrapping()) {
+      return this._enqueue('remove', arguments);
+    }
+
     key = "" + type + "/" + id;
 
     if (options.remote) {
@@ -3385,7 +3441,7 @@ Hoodie.LocalStore = (function (_super) {
 
   // Cache
   // -------
-  
+
   // loads an object specified by `type` and `id` only once from localStorage 
   // and caches it for faster future access. Updates cache when `value` is passed.
   //
@@ -3649,10 +3705,10 @@ Hoodie.LocalStore = (function (_super) {
 
   // proxies to hoodie.trigger
   LocalStore.prototype.trigger = function() {
-    var event, parameters, _ref;
-    event = arguments[0],
+    var eventName, parameters, _ref;
+    eventName = arguments[0],
     parameters = 2 <= arguments.length ? Array.prototype.slice.call(arguments, 1) : [];
-    return (_ref = this.hoodie).trigger.apply(_ref, ["store:" + event].concat(Array.prototype.slice.call(parameters)));
+    return (_ref = this.hoodie).trigger.apply(_ref, ["store:" + eventName].concat(Array.prototype.slice.call(parameters)));
   };
 
 
@@ -3660,10 +3716,21 @@ Hoodie.LocalStore = (function (_super) {
   // ---------
 
   // proxies to hoodie.on
-  LocalStore.prototype.on = function(event, data) {
-    event = event.replace(/(^| )([^ ]+)/g, "$1store:$2");
-    return this.hoodie.on(event, data);
+  LocalStore.prototype.on = function(eventName, data) {
+    eventName = eventName.replace(/(^| )([^ ]+)/g, "$1store:$2");
+    return this.hoodie.on(eventName, data);
   };
+
+
+  // unbind
+  // ---------
+
+  // proxies to hoodie.unbind
+  LocalStore.prototype.unbind = function(eventName, callback) {
+    eventName = 'store:' + eventName;
+    return this.hoodie.unbind(eventName, callback);
+  };
+
 
   // extend
   // --------
@@ -3686,7 +3753,7 @@ Hoodie.LocalStore = (function (_super) {
   // that removed objects get pushed after 
   // page reload.
   LocalStore.prototype._bootstrapDirtyObjects = function() {
-    var id, key, keys, obj, type, _i, _len, _ref;
+    var id, keys, obj, type, _i, _len, _ref;
     keys = this.db.getItem('_dirty');
 
     if (!keys) {
@@ -3695,8 +3762,7 @@ Hoodie.LocalStore = (function (_super) {
 
     keys = keys.split(',');
     for (_i = 0, _len = keys.length; _i < _len; _i++) {
-      key = keys[_i];
-      _ref = key.split('/'),
+      _ref = keys[_i].split('/'),
       type = _ref[0],
       id = _ref[1];
       obj = this.cache(type, id);
@@ -3709,8 +3775,8 @@ Hoodie.LocalStore = (function (_super) {
     // account events
     this.hoodie.on('account:cleanup', this.clear);
     this.hoodie.on('account:signup', this.markAllAsChanged);
-    this.hoodie.on('account:signin', this._startBootstrappingMode.bind(this));
-    this.hoodie.on('account:signout', this._stopBootstrappingMode.bind(this));
+    this.hoodie.on('remote:bootstrap:start', this._startBootstrappingMode);
+    this.hoodie.on('remote:bootstrap:end', this._endBootstrappingMode);
 
     // remote events
     this.hoodie.on('remote:change', this._handleRemoteChange);
@@ -3845,16 +3911,34 @@ Hoodie.LocalStore = (function (_super) {
   };
 
   // 
-  // 
   LocalStore.prototype._startBootstrappingMode = function() {
     this._isBootstrapping = true;
+    this.trigger('bootstrap:start');
   };
 
   // 
-  // 
-  LocalStore.prototype._stopBootstrappingMode = function() {
+  LocalStore.prototype._endBootstrappingMode = function() {
+    var methodCall, method, args, defer;
+
     this._isBootstrapping = false;
+    while(this._queue.length > 0) {
+      methodCall = this._queue.shift();
+      method = methodCall[0];
+      args = methodCall[1];
+      defer = methodCall[2];
+      this[method].apply(this, args).then(defer.resolve, defer.reject);
+    }
+
+    this.trigger('bootstrap:end');
   };
+
+  // 
+  LocalStore.prototype._enqueue = function(method, args) {
+    var defer = this.hoodie.defer();
+    this._queue.push([method, args, defer]);
+    return defer.promise();
+  };
+
 
   return LocalStore;
 

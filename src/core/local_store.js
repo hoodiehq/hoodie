@@ -24,7 +24,7 @@ Hoodie.LocalStore = (function (_super) {
     this._dirty = {};
 
     // queue of method calls done during bootstrapping
-    this._queue = []
+    this._queue = [];
 
     // extend this property with extra functions that will be available
     // on all promises returned by hoodie.store API. It has a reference
@@ -406,7 +406,7 @@ Hoodie.LocalStore = (function (_super) {
 
   // Cache
   // -------
-  
+
   // loads an object specified by `type` and `id` only once from localStorage 
   // and caches it for faster future access. Updates cache when `value` is passed.
   //
