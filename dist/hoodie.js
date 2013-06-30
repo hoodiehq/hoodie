@@ -17,6 +17,20 @@ Object.deepExtend = function(child, parent) {
   return child;
 };
 
+//
+// Events
+// ------
+//
+// extend any Class with support for
+//
+// * `object.bind('event', cb)`
+// * `object.unbind('event', cb)`
+// * `object.trigger('event', args...)`
+// * `object.one('ev', cb)`
+//
+// based on [Events implementations from Spine](https://github.com/maccman/spine/blob/master/src/spine.coffee#L1)
+//
+
 window.Events = window.Events || (function() {
 
   'use strict';
@@ -2389,15 +2403,10 @@ Hoodie.Remote = (function(_super) {
 
   // Connect
   // ---------
-<<<<<<< HEAD
 
-  // start syncing
-=======
-  //
   // start syncing. `this.bootstrap()` will automatically start
   // pulling when `this.connected` remains true.
->>>>>>> build
-  //
+  // 
   Remote.prototype.connect = function() {
     this.connected = true;
     return this.bootstrap();
@@ -3090,10 +3099,10 @@ Hoodie.LocalStore = (function (_super) {
 
 
   // 2 seconds timout before triggering the `store:idle` event
+  // 
   LocalStore.prototype.idleTimeout = 2000;
 
 
-  //
   // localStorage proxy
   //
   LocalStore.prototype.db = {
@@ -3309,8 +3318,7 @@ Hoodie.LocalStore = (function (_super) {
 
     try {
 
-      // coffeescript gathers the result of the respective for key in keys loops
-      // and returns it as array, which will be stored in the results variable
+      // 
       results = (function() {
         var _i, _len, _ref, _results;
         _results = [];
@@ -3333,7 +3341,7 @@ Hoodie.LocalStore = (function (_super) {
         return _results;
       }).call(this);
 
-      // sort
+      // sort from newest to oldest
       results.sort(function(a, b) {
         if (a.createdAt > b.createdAt) {
           return -1;
@@ -3350,6 +3358,7 @@ Hoodie.LocalStore = (function (_super) {
     }
     return this._decoratePromise(defer.promise());
   };
+
 
   // Remove
   // --------
@@ -3377,6 +3386,7 @@ Hoodie.LocalStore = (function (_super) {
 
     key = "" + type + "/" + id;
 
+    // if change comes from remote, just clean up locally
     if (options.remote) {
       this.db.removeItem(key);
       objectWasMarkedAsDeleted = this._cached[key] && this._isMarkedAsDeleted(this._cached[key]);
@@ -3410,6 +3420,7 @@ Hoodie.LocalStore = (function (_super) {
     return this._decoratePromise(promise);
   };
 
+
   // update / updateAll / removeAll
   // --------------------------------
 
@@ -3423,6 +3434,10 @@ Hoodie.LocalStore = (function (_super) {
   LocalStore.prototype.removeAll = function() {
     return this._decoratePromise(LocalStore.__super__.removeAll.apply(this, arguments));
   };
+
+
+  // index
+  // -------
 
   // object key index
   // TODO: make this cachy
@@ -3597,8 +3612,8 @@ Hoodie.LocalStore = (function (_super) {
 
 
 
-  // changed docs
-  // --------------
+  // changed objects
+  // -----------------
 
   // returns an Array of all dirty documents
   LocalStore.prototype.changedObjects = function() {
@@ -3645,7 +3660,7 @@ Hoodie.LocalStore = (function (_super) {
   // TODO: do not clear entire localStorage, clear only the items that have been stored
   //       using `hoodie.store` before.
   LocalStore.prototype.clear = function() {
-    var defer, error, key, keys, results;
+    var defer, key, keys, results;
     defer = this.hoodie.defer();
     try {
       keys = this.index();
@@ -3665,8 +3680,7 @@ Hoodie.LocalStore = (function (_super) {
       defer.resolve();
       this.trigger("clear");
     } catch (_error) {
-      error = _error;
-      defer.reject(error);
+      defer.reject(_error);
     }
     return defer.promise();
   };
@@ -3682,20 +3696,32 @@ Hoodie.LocalStore = (function (_super) {
   // https://github.com/cappuccino/cappuccino/commit/063b05d9643c35b303568a28809e4eb3224f71ec
   //
   LocalStore.prototype.isPersistent = function() {
-    var e;
     try {
+
+      // we've to put this in here. I've seen Firefox throwing `Security error: 1000`
+      // when cookies have been disabled
       if (!window.localStorage) {
         return false;
       }
+
+      // Just because localStorage exists does not mean it works. In particular it might be disabled
+      // as it is when Safari's private browsing mode is active.
       localStorage.setItem('Storage-Test', "1");
+
+      // that should not happen ...
       if (localStorage.getItem('Storage-Test') !== "1") {
         return false;
       }
+
+      // okay, let's clean up if we got here.
       localStorage.removeItem('Storage-Test');
     } catch (_error) {
-      e = _error;
+
+      // in case of an error, like Safari's Private Pussy, return false
       return false;
     }
+
+    // we're good.
     return true;
   };
 
@@ -3732,8 +3758,8 @@ Hoodie.LocalStore = (function (_super) {
   };
 
 
-  // extend
-  // --------
+  // decorate promises
+  // -------------------
 
   // extend promises returned by store.api
   LocalStore.prototype.decoratePromises = function(methods) {
@@ -3741,10 +3767,16 @@ Hoodie.LocalStore = (function (_super) {
   };
 
 
-  LocalStore.prototype._isBootstrapping = false;
+  // isBootstrapping
+  // -----------------
+
+  // returns true if store is currently bootstrapping data from remote,
+  // otherwise false.
+  LocalStore.prototype._bootstrapping = false;
   LocalStore.prototype.isBootstrapping = function() {
-    return this._isBootstrapping;
+    return this._bootstrapping;
   };
+
 
   // Private
   // ---------
@@ -3799,7 +3831,7 @@ Hoodie.LocalStore = (function (_super) {
   };
 
 
-  // more advanced localStorage wrappers to find/store objects
+  // more advanced localStorage wrappers to find/save objects
   LocalStore.prototype._setObject = function(type, id, object) {
     var key, store;
 
@@ -3810,7 +3842,6 @@ Hoodie.LocalStore = (function (_super) {
     delete store.id;
     return this.db.setItem(key, JSON.stringify(store));
   };
-
   LocalStore.prototype._getObject = function(type, id) {
     var key, obj;
 
@@ -3875,7 +3906,8 @@ Hoodie.LocalStore = (function (_super) {
     return object._deleted === true;
   };
 
-  // 
+  // this is where all the store events get triggered,
+  // like add:task, change:note:abc4567, remove, etc.
   LocalStore.prototype._triggerEvents = function(event, object, options) {
     this.trigger(event, object, options);
     this.trigger("" + event + ":" + object.type, object, options);
@@ -3892,7 +3924,14 @@ Hoodie.LocalStore = (function (_super) {
     }
   };
 
+  // when an object gets changed, two special events get triggerd:
   // 
+  // 1. dirty event  
+  //    the `dirty` event gets triggered immediately, for every 
+  //    change that happens.
+  // 2. idle event
+  //    the `idle` event gets triggered after a short timeout of
+  //    no changes, e.g. 2 seconds.
   LocalStore.prototype._triggerDirtyAndIdleEvents = function() {
     var self = this;
 
@@ -3912,7 +3951,7 @@ Hoodie.LocalStore = (function (_super) {
 
   // 
   LocalStore.prototype._startBootstrappingMode = function() {
-    this._isBootstrapping = true;
+    this._bootstrapping = true;
     this.trigger('bootstrap:start');
   };
 
@@ -3920,7 +3959,7 @@ Hoodie.LocalStore = (function (_super) {
   LocalStore.prototype._endBootstrappingMode = function() {
     var methodCall, method, args, defer;
 
-    this._isBootstrapping = false;
+    this._bootstrapping = false;
     while(this._queue.length > 0) {
       methodCall = this._queue.shift();
       method = methodCall[0];

@@ -616,7 +616,7 @@ Hoodie.LocalStore = (function (_super) {
   // TODO: do not clear entire localStorage, clear only the items that have been stored
   //       using `hoodie.store` before.
   LocalStore.prototype.clear = function() {
-    var defer, error, key, keys, results;
+    var defer, key, keys, results;
     defer = this.hoodie.defer();
     try {
       keys = this.index();
