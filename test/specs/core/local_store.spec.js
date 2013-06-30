@@ -1552,15 +1552,28 @@ describe("Hoodie.LocalStore", function() {
       this.store.on('event', {
         funky: 'fresh'
       });
-      return expect(this.hoodie.on).wasCalledWith('store:event', {
+      expect(this.hoodie.on).wasCalledWith('store:event', {
         funky: 'fresh'
       });
     });
-    return it("should namespace multiple events correctly", function() {
+    it("should namespace multiple events correctly", function() {
       var cb;
       cb = jasmine.createSpy('test');
       this.store.on('super funky fresh', cb);
-      return expect(this.hoodie.on).wasCalledWith('store:super store:funky store:fresh', cb);
+      expect(this.hoodie.on).wasCalledWith('store:super store:funky store:fresh', cb);
+    });
+  });
+
+  // 
+  describe("#unbind", function() {
+    beforeEach(function() {
+      spyOn(this.hoodie, "unbind");
+    });
+    it("should proxy to hoodie.unbind with 'store' namespace", function() {
+      var cb = function() {};
+
+      this.store.unbind('event', cb);
+      expect(this.hoodie.unbind).wasCalledWith('store:event', cb);
     });
   });
 

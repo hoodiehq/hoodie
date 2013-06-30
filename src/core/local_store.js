@@ -670,10 +670,10 @@ Hoodie.LocalStore = (function (_super) {
 
   // proxies to hoodie.trigger
   LocalStore.prototype.trigger = function() {
-    var event, parameters, _ref;
-    event = arguments[0],
+    var eventName, parameters, _ref;
+    eventName = arguments[0],
     parameters = 2 <= arguments.length ? Array.prototype.slice.call(arguments, 1) : [];
-    return (_ref = this.hoodie).trigger.apply(_ref, ["store:" + event].concat(Array.prototype.slice.call(parameters)));
+    return (_ref = this.hoodie).trigger.apply(_ref, ["store:" + eventName].concat(Array.prototype.slice.call(parameters)));
   };
 
 
@@ -681,10 +681,21 @@ Hoodie.LocalStore = (function (_super) {
   // ---------
 
   // proxies to hoodie.on
-  LocalStore.prototype.on = function(event, data) {
-    event = event.replace(/(^| )([^ ]+)/g, "$1store:$2");
-    return this.hoodie.on(event, data);
+  LocalStore.prototype.on = function(eventName, data) {
+    eventName = eventName.replace(/(^| )([^ ]+)/g, "$1store:$2");
+    return this.hoodie.on(eventName, data);
   };
+
+
+  // unbind
+  // ---------
+
+  // proxies to hoodie.unbind
+  LocalStore.prototype.unbind = function(eventName, callback) {
+    eventName = 'store:' + eventName;
+    return this.hoodie.unbind(eventName, callback);
+  };
+
 
   // extend
   // --------
