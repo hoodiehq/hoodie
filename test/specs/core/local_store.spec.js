@@ -542,12 +542,12 @@ describe("Hoodie.LocalStore", function() {
         // we can't force it to return always true, as we'd
         // end up in infinite loop.
         // spyOn(this.store, "isBootstrapping").andReturn(true);
-        this.store._isBootstrapping = true;
+        this.store._bootstrapping = true;
         expect(this.store.isBootstrapping()).toEqual(true);
       });
 
-      it("should wait until bootstrapping is finished", function() {
-        var promise = this.store.save('task', '123', { title: 'do it!' })
+      it(" bootstrapping is finished", function() {
+        var promise = this.should wait untilstore.save('task', '123', { title: 'do it!' })
         promise.fail( function() { console.log(arguments) });
         expect(promise.state()).toEqual('pending');
         this.hoodie.trigger('remote:bootstrap:end');
@@ -577,7 +577,7 @@ describe("Hoodie.LocalStore", function() {
         // we can't force it to return always true, as we'd
         // end up in infinite loop.
         // spyOn(this.store, "isBootstrapping").andReturn(true);
-        this.store._isBootstrapping = true;
+        this.store._bootstrapping = true;
         expect(this.store.isBootstrapping()).toEqual(true);
       });
 
@@ -669,7 +669,7 @@ describe("Hoodie.LocalStore", function() {
         // we can't force it to return always true, as we'd
         // end up in infinite loop.
         // spyOn(this.store, "isBootstrapping").andReturn(true);
-        this.store._isBootstrapping = true;
+        this.store._bootstrapping = true;
         expect(this.store.isBootstrapping()).toEqual(true);
       });
 
@@ -737,7 +737,7 @@ describe("Hoodie.LocalStore", function() {
         // we can't force it to return always true, as we'd
         // end up in infinite loop.
         // spyOn(this.store, "isBootstrapping").andReturn(true);
-        this.store._isBootstrapping = true;
+        this.store._bootstrapping = true;
         expect(this.store.isBootstrapping()).toEqual(true);
       });
 
@@ -866,7 +866,7 @@ describe("Hoodie.LocalStore", function() {
         // we can't force it to return always true, as we'd
         // end up in infinite loop.
         // spyOn(this.store, "isBootstrapping").andReturn(true);
-        this.store._isBootstrapping = true;
+        this.store._bootstrapping = true;
         expect(this.store.isBootstrapping()).toEqual(true);
       });
 
@@ -1009,7 +1009,7 @@ describe("Hoodie.LocalStore", function() {
         // we can't force it to return always true, as we'd
         // end up in infinite loop.
         // spyOn(this.store, "isBootstrapping").andReturn(true);
-        this.store._isBootstrapping = true;
+        this.store._bootstrapping = true;
         expect(this.store.isBootstrapping()).toEqual(true);
 
         spyOn(this.store, "cache").andReturn({ funky: 'fresh' });
