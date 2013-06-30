@@ -23,7 +23,7 @@ Hoodie.ShareInstance = (function(_super) {
 
   // constructor
   // -------------
-  //
+
   // initializes a new share
   //
   function ShareInstance(hoodie, options) {
@@ -51,9 +51,10 @@ Hoodie.ShareInstance = (function(_super) {
 
   Object.deepExtend(ShareInstance, _super);
 
+
   // default values
   // ----------------
-  //
+
   // shares are not accessible to others by default.
   //
   ShareInstance.prototype.access = false;
@@ -61,6 +62,8 @@ Hoodie.ShareInstance = (function(_super) {
 
   // subscribe
   // ---------
+
+  //
   //
   ShareInstance.prototype.subscribe = function() {
     return this.request('GET', '/_security').pipe(this._handleSecurityResponse);
@@ -69,6 +72,8 @@ Hoodie.ShareInstance = (function(_super) {
 
   // unsubscribe
   // -----------
+
+  //
   //
   ShareInstance.prototype.unsubscribe = function() {
     this.hoodie.share.remove(this.id);
@@ -81,7 +86,7 @@ Hoodie.ShareInstance = (function(_super) {
 
   // grant read access
   // -------------------
-  //
+
   // grant read access to the share. If no users passed,
   // everybody can read the share objects. If one or multiple
   // users passed, only these users get read access.
@@ -135,7 +140,7 @@ Hoodie.ShareInstance = (function(_super) {
 
   // revoke read access
   // --------------------
-  //
+
   // revoke read access to the share. If one or multiple
   // users passed, only these users' access gets revoked.
   // Revoking reading access always includes revoking write
@@ -192,7 +197,7 @@ Hoodie.ShareInstance = (function(_super) {
 
   // grant write access
   // --------------------
-  //
+
   // grant write access to the share. If no users passed,
   // everybody can edit the share objects. If one or multiple
   // users passed, only these users get write access. Granting
@@ -231,7 +236,7 @@ Hoodie.ShareInstance = (function(_super) {
 
   // revoke write access
   // --------------------
-  //
+
   // revoke write access to the share. If one or multiple
   // users passed, only these users' write access gets revoked.
   //
@@ -276,10 +281,14 @@ Hoodie.ShareInstance = (function(_super) {
   // PRIVATE
   // ---------
 
+  // 
+  // 
   ShareInstance.prototype._objectBelongsToMe = function(object) {
     return object.$sharedAt === this.id;
   };
 
+  // 
+  // 
   ShareInstance.prototype._handleSecurityResponse = function(security) {
     var access, createdBy;
     access = this._parseSecurity(security);

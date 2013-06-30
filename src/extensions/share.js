@@ -40,7 +40,7 @@ Hoodie.Share = (function () {
 
   // Constructor
   // -------------
-  //
+
   // the constructor returns a function, so it can be called
   // like this: hoodie.share('share_id')
   //
@@ -70,7 +70,7 @@ Hoodie.Share = (function () {
 
   // add
   // --------
-  //
+
   // creates a new share and returns it
   //
   Share.prototype.add = function (options) {
@@ -89,7 +89,7 @@ Hoodie.Share = (function () {
 
   // find
   // ------
-  //
+
   // find an existing share
   //
   Share.prototype.find = function (id) {
@@ -102,7 +102,7 @@ Hoodie.Share = (function () {
 
   // findAll
   // ---------
-  //
+
   // find all my existing shares
   //
   Share.prototype.findAll = function () {
@@ -121,7 +121,7 @@ Hoodie.Share = (function () {
 
   // findOrAdd
   // --------------
-  //
+
   // find or add a new share
   //
   Share.prototype.findOrAdd = function (id, options) {
@@ -137,7 +137,7 @@ Hoodie.Share = (function () {
 
   // save
   // ------
-  //
+
   // add or overwrite a share
   //
   Share.prototype.save = function (id, options) {
@@ -150,7 +150,7 @@ Hoodie.Share = (function () {
 
   // update
   // --------
-  //
+
   // add or overwrite a share
   //
   Share.prototype.update = function (id, changed_options) {
@@ -163,7 +163,7 @@ Hoodie.Share = (function () {
 
   // updateAll
   // -----------
-  //
+
   // update all my existing shares
   //
   Share.prototype.updateAll = function (changed_options) {
@@ -182,7 +182,7 @@ Hoodie.Share = (function () {
 
   // remove
   // ---------
-  //
+
   // deletes an existing share
   //
   Share.prototype.remove = function (id) {
@@ -195,7 +195,7 @@ Hoodie.Share = (function () {
 
   // removeAll
   // ------------
-  //
+
   // delete all existing shares
   //
   Share.prototype.removeAll = function () {
@@ -231,7 +231,7 @@ Hoodie.Share = (function () {
 
 
   // ### open
-  //
+
   // opens a a remote share store, returns a Hoodie.Remote instance
   //
   Share.prototype._open = function (shareId, options) {
@@ -245,14 +245,15 @@ Hoodie.Share = (function () {
 
   // hoodie.store decorations
   // --------------------------
-  //
+
   // hoodie.store decorations add custom methods to promises returned
   // by hoodie.store methods like find, add or update. All methods return
   // methods again that will be executed in the scope of the promise, but
   // with access to the current hoodie instance
   //
 
-  // shareAt
+  // ### shareAt
+
   //
   Share.prototype._storeShareAt = function (shareId) {
     var self = this;
@@ -278,7 +279,8 @@ Hoodie.Share = (function () {
   };
 
 
-  // unshareAt
+  // ### unshareAt
+
   //
   Share.prototype._storeUnshareAt = function (shareId) {
     var self = this;
@@ -309,7 +311,8 @@ Hoodie.Share = (function () {
   };
 
 
-  // unshare
+  // ### unshare
+
   //
   Share.prototype._storeUnshare = function () {
     var self = this;
@@ -338,7 +341,8 @@ Hoodie.Share = (function () {
   };
 
 
-  // share
+  // ### share
+
   //
   Share.prototype._storeShare = function () {
     var self = this;

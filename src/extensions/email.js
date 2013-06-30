@@ -1,11 +1,16 @@
-// 
+// Hoodie Email Extension
+// ========================
+
 // Sending emails. Not unicorns
 // 
-
 Hoodie.Email = (function () {
 
   'use strict';
 
+  // Constructor
+  // -------------
+
+  // 
   function Email(hoodie) {
 
     // TODO
@@ -19,8 +24,10 @@ Hoodie.Email = (function () {
     this._handleEmailUpdate = this._handleEmailUpdate;
   }
 
-  // ## send
-  // 
+
+  // send
+  // -------------
+
   // sends an email and returns a promise
   // 
   Email.prototype.send = function (emailAttributes) {
@@ -45,10 +52,11 @@ Hoodie.Email = (function () {
     return defer.promise();
   };
 
-  // 
-  // ## PRIVATE
-  // 
 
+  // PRIVATE
+  // -------------
+
+  // 
   Email.prototype._isValidEmail = function (email) {
     if (email === null) {
       email = '';

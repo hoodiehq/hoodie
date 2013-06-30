@@ -14,6 +14,10 @@ Hoodie.AccountRemote = (function(_super) {
 
   'use strict';
 
+  // Constructor
+  // -------------
+
+  //
   function AccountRemote(hoodie, options) {
     this.hoodie = hoodie;
     options = options || {};
@@ -92,6 +96,7 @@ Hoodie.AccountRemote = (function(_super) {
 
   // get and set since nr
   // ----------------------
+
   // we store the last since number from the current user's store
   // in his config
   //
@@ -106,7 +111,7 @@ Hoodie.AccountRemote = (function(_super) {
 
   // push
   // ------
-  //
+
   // if no objects passed to be pushed, we default to
   // changed objects in user's local store
   //
@@ -155,6 +160,10 @@ Hoodie.AccountRemote = (function(_super) {
     return (_ref = this.hoodie).trigger.apply(_ref, ["remote:" + event].concat(Array.prototype.slice.call(parameters)));
   };
 
+
+
+  // Private
+  // ---------
 
   //
   AccountRemote.prototype._connect = function() {

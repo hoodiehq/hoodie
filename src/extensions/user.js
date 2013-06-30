@@ -28,6 +28,7 @@ Hoodie.User = (function() {
     return this.api;
   }
 
+  // 
   User.prototype.api = function(userHash, options) {
     options = options || {};
     $.extend(options, {
@@ -39,14 +40,14 @@ Hoodie.User = (function() {
 
   // hoodie.store decorations
   // --------------------------
-  //
+
   // hoodie.store decorations add custom methods to promises returned
   // by hoodie.store methods like find, add or update. All methods return
   // methods again that will be executed in the scope of the promise, but
   // with access to the current hoodie instance
 
-  // publish
-  //
+  // ### publish
+
   // publish an object. If an array of properties passed, publish only these
   // attributes and hide the remaining ones. If no properties passed, publish
   // the entire object.
@@ -70,9 +71,8 @@ Hoodie.User = (function() {
   };
 
 
-  //`unpublish`
-  //
-  // unpublish
+  //`### unpublish`
+
   //
   User.prototype._storeUnpublish = function() {
     var _this = this;

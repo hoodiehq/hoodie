@@ -23,12 +23,9 @@
     <span class="k">this</span><span class="p">.</span><span class="nx">fetch</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">fetch</span><span class="p">.</span><span class="nx">bind</span><span class="p">(</span><span class="k">this</span><span class="p">);</span>
     <span class="k">this</span><span class="p">.</span><span class="nx">signOut</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">signOut</span><span class="p">.</span><span class="nx">bind</span><span class="p">(</span><span class="k">this</span><span class="p">);</span>
     <span class="k">this</span><span class="p">.</span><span class="nx">authenticate</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">authenticate</span><span class="p">.</span><span class="nx">bind</span><span class="p">(</span><span class="k">this</span><span class="p">);</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>cache for CouchDB _users doc</p></div></div><div class="code"><div class="wrapper">    <span class="k">this</span><span class="p">.</span><span class="nx">_doc</span> <span class="o">=</span> <span class="p">{};</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>map of requestPromises. We maintain this list to avoid sending
-the same requests several times.</p></div></div><div class="code"><div class="wrapper">    <span class="k">this</span><span class="p">.</span><span class="nx">_requests</span> <span class="o">=</span> <span class="p">{};</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>init account
-we've put this into its own method so it's easier to
-inherit from Hoodie.Account with custom logic</p></div></div><div class="code"><div class="wrapper">    <span class="k">this</span><span class="p">.</span><span class="nx">init</span><span class="p">();</span>
-  <span class="p">}</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h2 id="properties">Properties</h2></div></div></div><div class="segment"><div class="code"><div class="wrapper">  <span class="nx">Account</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">username</span> <span class="o">=</span> <span class="kc">undefined</span><span class="p">;</span>
-
-  <span class="nx">Account</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">init</span> <span class="o">=</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>handle session</p></div></div><div class="code"><div class="wrapper">    <span class="k">this</span><span class="p">.</span><span class="nx">username</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">hoodie</span><span class="p">.</span><span class="nx">config</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="s1">&#39;_account.username&#39;</span><span class="p">);</span>
+the same requests several times.</p></div></div><div class="code"><div class="wrapper">    <span class="k">this</span><span class="p">.</span><span class="nx">_requests</span> <span class="o">=</span> <span class="p">{};</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>init account</p></div></div><div class="code"><div class="wrapper">    <span class="k">this</span><span class="p">.</span><span class="nx">init</span><span class="p">();</span>
+  <span class="p">}</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h2 id="properties">Properties</h2></div></div></div><div class="segment"><div class="code"><div class="wrapper">  <span class="nx">Account</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">username</span> <span class="o">=</span> <span class="kc">undefined</span><span class="p">;</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h2 id="init">init</h2></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>we've put this into its own method so it's easier to
+inherit from Hoodie.Account and add custom logic</p></div></div><div class="code"><div class="wrapper">  <span class="nx">Account</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">init</span> <span class="o">=</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>handle session</p></div></div><div class="code"><div class="wrapper">    <span class="k">this</span><span class="p">.</span><span class="nx">username</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">hoodie</span><span class="p">.</span><span class="nx">config</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="s1">&#39;_account.username&#39;</span><span class="p">);</span>
     <span class="k">this</span><span class="p">.</span><span class="nx">ownerHash</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">hoodie</span><span class="p">.</span><span class="nx">config</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="s1">&#39;_account.ownerHash&#39;</span><span class="p">);</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>he ownerHash gets stored in every object created by the user.
 Make sure we have one.</p></div></div><div class="code"><div class="wrapper">    <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="k">this</span><span class="p">.</span><span class="nx">ownerHash</span><span class="p">)</span> <span class="p">{</span>
       <span class="k">this</span><span class="p">.</span><span class="nx">_setOwner</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">hoodie</span><span class="p">.</span><span class="nx">uuid</span><span class="p">());</span>
@@ -169,10 +166,9 @@ Besides the standard sign in we also check if the account has been confirmed
         <span class="nx">reauthenticated</span><span class="o">:</span> <span class="kc">true</span>
       <span class="p">});</span>
     <span class="p">}</span>
-  <span class="p">};</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h2 id="sign-out">sign out</h2>
-
-<p>uses standard CouchDB API to invalidate a user session (DELETE /_session)</p></div></div><div class="code"><div class="wrapper">  <span class="nx">Account</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">signOut</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">options</span><span class="p">)</span> <span class="p">{</span>
+  <span class="p">};</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h2 id="sign-out">sign out</h2></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>uses standard CouchDB API to invalidate a user session (DELETE /_session)</p></div></div><div class="code"><div class="wrapper">  <span class="nx">Account</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">signOut</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">options</span><span class="p">)</span> <span class="p">{</span>
     <span class="kd">var</span> <span class="nx">self</span> <span class="o">=</span> <span class="k">this</span><span class="p">;</span>
+
     <span class="nx">options</span> <span class="o">=</span> <span class="nx">options</span> <span class="o">||</span> <span class="p">{};</span>
 
     <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="k">this</span><span class="p">.</span><span class="nx">hasAccount</span><span class="p">())</span> <span class="p">{</span>
@@ -184,32 +180,22 @@ Besides the standard sign in we also check if the account has been confirmed
     <span class="p">}</span>
     <span class="k">this</span><span class="p">.</span><span class="nx">hoodie</span><span class="p">.</span><span class="nx">remote</span><span class="p">.</span><span class="nx">disconnect</span><span class="p">();</span>
     <span class="k">return</span> <span class="k">this</span><span class="p">.</span><span class="nx">_sendSignOutRequest</span><span class="p">().</span><span class="nx">pipe</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">_cleanupAndTriggerSignOut</span><span class="p">);</span>
-  <span class="p">};</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h2 id="on">On</h2>
+  <span class="p">};</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h2 id="on">On</h2></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>shortcut for <code>hoodie.on</code></p></div></div><div class="code"><div class="wrapper">  <span class="nx">Account</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">on</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">eventName</span><span class="p">,</span> <span class="nx">cb</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nx">eventName</span> <span class="o">=</span> <span class="nx">eventName</span><span class="p">.</span><span class="nx">replace</span><span class="p">(</span><span class="sr">/(^| )([^ ]+)/g</span><span class="p">,</span> <span class="s2">&quot;$1account:$2&quot;</span><span class="p">);</span>
+    <span class="k">return</span> <span class="k">this</span><span class="p">.</span><span class="nx">hoodie</span><span class="p">.</span><span class="nx">on</span><span class="p">(</span><span class="nx">eventName</span><span class="p">,</span> <span class="nx">cb</span><span class="p">);</span>
+  <span class="p">};</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h2 id="trigger">Trigger</h2></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>shortcut for <code>hoodie.trigger</code></p></div></div><div class="code"><div class="wrapper">  <span class="nx">Account</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">trigger</span> <span class="o">=</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+    <span class="kd">var</span> <span class="nx">eventName</span><span class="p">,</span> <span class="nx">parameters</span><span class="p">;</span>
 
-<p>shortcut for <code>hoodie.on</code></p></div></div><div class="code"><div class="wrapper">  <span class="nx">Account</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">on</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">event</span><span class="p">,</span> <span class="nx">cb</span><span class="p">)</span> <span class="p">{</span>
-    <span class="nx">event</span> <span class="o">=</span> <span class="nx">event</span><span class="p">.</span><span class="nx">replace</span><span class="p">(</span><span class="sr">/(^| )([^ ]+)/g</span><span class="p">,</span> <span class="s2">&quot;$1account:$2&quot;</span><span class="p">);</span>
-    <span class="k">return</span> <span class="k">this</span><span class="p">.</span><span class="nx">hoodie</span><span class="p">.</span><span class="nx">on</span><span class="p">(</span><span class="nx">event</span><span class="p">,</span> <span class="nx">cb</span><span class="p">);</span>
-  <span class="p">};</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h2 id="trigger">Trigger</h2>
-
-<p>shortcut for <code>hoodie.trigger</code></p></div></div><div class="code"><div class="wrapper">  <span class="nx">Account</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">trigger</span> <span class="o">=</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
-    <span class="kd">var</span> <span class="nx">event</span><span class="p">,</span> <span class="nx">parameters</span><span class="p">,</span> <span class="nx">_ref</span><span class="p">;</span>
-
-    <span class="nx">event</span> <span class="o">=</span> <span class="nx">arguments</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+    <span class="nx">eventName</span> <span class="o">=</span> <span class="nx">arguments</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
     <span class="nx">parameters</span> <span class="o">=</span> <span class="mi">2</span> <span class="o">&lt;=</span> <span class="nx">arguments</span><span class="p">.</span><span class="nx">length</span> <span class="o">?</span> <span class="nb">Array</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">slice</span><span class="p">.</span><span class="nx">call</span><span class="p">(</span><span class="nx">arguments</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span> <span class="o">:</span> <span class="p">[];</span>
 
-    <span class="k">return</span> <span class="k">this</span><span class="p">.</span><span class="nx">hoodie</span><span class="p">.</span><span class="nx">trigger</span><span class="p">.</span><span class="nx">apply</span><span class="p">(</span><span class="nx">_ref</span><span class="p">,</span> <span class="p">[</span><span class="s2">&quot;account:&quot;</span> <span class="o">+</span> <span class="nx">event</span><span class="p">].</span><span class="nx">concat</span><span class="p">(</span><span class="nb">Array</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">slice</span><span class="p">.</span><span class="nx">call</span><span class="p">(</span><span class="nx">parameters</span><span class="p">)));</span>
-  <span class="p">};</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h2 id="request">Request</h2>
-
-<p>shortcut for <code>hoodie.request</code></p></div></div><div class="code"><div class="wrapper">  <span class="nx">Account</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">request</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">type</span><span class="p">,</span> <span class="nx">path</span><span class="p">,</span> <span class="nx">options</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">hoodie</span><span class="p">.</span><span class="nx">trigger</span><span class="p">.</span><span class="nx">apply</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">hoodie</span><span class="p">,</span> <span class="p">[</span><span class="s2">&quot;account:&quot;</span> <span class="o">+</span> <span class="nx">eventName</span><span class="p">].</span><span class="nx">concat</span><span class="p">(</span><span class="nb">Array</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">slice</span><span class="p">.</span><span class="nx">call</span><span class="p">(</span><span class="nx">parameters</span><span class="p">)));</span>
+  <span class="p">};</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h2 id="request">Request</h2></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>shortcut for <code>hoodie.request</code></p></div></div><div class="code"><div class="wrapper">  <span class="nx">Account</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">request</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">type</span><span class="p">,</span> <span class="nx">path</span><span class="p">,</span> <span class="nx">options</span><span class="p">)</span> <span class="p">{</span>
     <span class="nx">options</span> <span class="o">=</span> <span class="nx">options</span> <span class="o">||</span> <span class="p">{};</span>
-    <span class="k">return</span> <span class="k">this</span><span class="p">.</span><span class="nx">hoodie</span><span class="p">.</span><span class="nx">request</span><span class="p">.</span><span class="nx">apply</span><span class="p">(</span><span class="k">this</span><span class="p">,</span> <span class="nx">arguments</span><span class="p">);</span>
-  <span class="p">};</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h2 id="db">db</h2>
-
-<p>return name of db</p></div></div><div class="code"><div class="wrapper">  <span class="nx">Account</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">db</span> <span class="o">=</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="k">this</span><span class="p">.</span><span class="nx">hoodie</span><span class="p">.</span><span class="nx">request</span><span class="p">.</span><span class="nx">apply</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">hoodie</span><span class="p">,</span> <span class="nx">arguments</span><span class="p">);</span>
+  <span class="p">};</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h2 id="db">db</h2></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>return name of db</p></div></div><div class="code"><div class="wrapper">  <span class="nx">Account</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">db</span> <span class="o">=</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
     <span class="k">return</span> <span class="s2">&quot;user/&quot;</span> <span class="o">+</span> <span class="k">this</span><span class="p">.</span><span class="nx">ownerHash</span><span class="p">;</span>
-  <span class="p">};</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h2 id="fetch">fetch</h2>
-
-<p>fetches _users doc from CouchDB and caches it in _doc</p></div></div><div class="code"><div class="wrapper">  <span class="nx">Account</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">fetch</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">username</span><span class="p">)</span> <span class="p">{</span>
+  <span class="p">};</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h2 id="fetch">fetch</h2></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>fetches _users doc from CouchDB and caches it in _doc</p></div></div><div class="code"><div class="wrapper">  <span class="nx">Account</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">fetch</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">username</span><span class="p">)</span> <span class="p">{</span>
     <span class="kd">var</span> <span class="nx">self</span> <span class="o">=</span> <span class="k">this</span><span class="p">;</span>
 
     <span class="k">if</span> <span class="p">(</span><span class="nx">username</span> <span class="o">===</span> <span class="kc">undefined</span><span class="p">)</span> <span class="p">{</span>
@@ -222,6 +208,7 @@ Besides the standard sign in we also check if the account has been confirmed
         <span class="nx">reason</span><span class="o">:</span> <span class="s2">&quot;not logged in&quot;</span>
       <span class="p">}).</span><span class="nx">promise</span><span class="p">();</span>
     <span class="p">}</span>
+
     <span class="k">return</span> <span class="k">this</span><span class="p">.</span><span class="nx">_withSingleRequest</span><span class="p">(</span><span class="s1">&#39;fetch&#39;</span><span class="p">,</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
       <span class="k">return</span> <span class="nx">self</span><span class="p">.</span><span class="nx">request</span><span class="p">(</span><span class="s1">&#39;GET&#39;</span><span class="p">,</span> <span class="nx">self</span><span class="p">.</span><span class="nx">_url</span><span class="p">(</span><span class="nx">username</span><span class="p">)).</span><span class="nx">pipe</span><span class="p">(</span>
         <span class="kc">null</span><span class="p">,</span>
@@ -231,11 +218,11 @@ Besides the standard sign in we also check if the account has been confirmed
         <span class="k">return</span> <span class="nx">self</span><span class="p">.</span><span class="nx">_doc</span><span class="p">;</span>
       <span class="p">});</span>
     <span class="p">});</span>
-  <span class="p">};</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h2 id="change-password">change password</h2>
 
-<p>Note: the hoodie API requires the currentPassword for security reasons,
+  <span class="p">};</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h2 id="change-password">change password</h2></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>Note: the hoodie API requires the currentPassword for security reasons,
 but couchDb doesn't require it for a password change, so it's ignored
 in this implementation of the hoodie API.</p></div></div><div class="code"><div class="wrapper">  <span class="nx">Account</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">changePassword</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">currentPassword</span><span class="p">,</span> <span class="nx">newPassword</span><span class="p">)</span> <span class="p">{</span>
+
     <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="k">this</span><span class="p">.</span><span class="nx">username</span><span class="p">)</span> <span class="p">{</span>
       <span class="k">return</span> <span class="k">this</span><span class="p">.</span><span class="nx">hoodie</span><span class="p">.</span><span class="nx">defer</span><span class="p">().</span><span class="nx">reject</span><span class="p">({</span>
         <span class="nx">error</span><span class="o">:</span> <span class="s2">&quot;unauthenticated&quot;</span><span class="p">,</span>
@@ -244,13 +231,12 @@ in this implementation of the hoodie API.</p></div></div><div class="code"><div 
     <span class="p">}</span>
 
     <span class="k">this</span><span class="p">.</span><span class="nx">hoodie</span><span class="p">.</span><span class="nx">remote</span><span class="p">.</span><span class="nx">disconnect</span><span class="p">();</span>
+
     <span class="k">return</span> <span class="k">this</span><span class="p">.</span><span class="nx">fetch</span><span class="p">().</span><span class="nx">pipe</span><span class="p">(</span>
       <span class="k">this</span><span class="p">.</span><span class="nx">_sendChangeUsernameAndPasswordRequest</span><span class="p">(</span><span class="nx">currentPassword</span><span class="p">,</span> <span class="kc">null</span><span class="p">,</span> <span class="nx">newPassword</span><span class="p">),</span>
       <span class="k">this</span><span class="p">.</span><span class="nx">_handleRequestError</span>
     <span class="p">);</span>
-  <span class="p">};</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h2 id="reset-password">reset password</h2>
-
-<p>This is kind of a hack. We need to create an object anonymously
+  <span class="p">};</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h2 id="reset-password">reset password</h2></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>This is kind of a hack. We need to create an object anonymously
 that is not exposed to others. The only CouchDB API othering such
 functionality is the _users database.</p>
 
@@ -265,8 +251,11 @@ once the password was resetted.</p></div></div><div class="code"><div class="wra
     <span class="p">}</span>
 
     <span class="nx">resetPasswordId</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span> <span class="o">+</span> <span class="nx">username</span> <span class="o">+</span> <span class="s2">&quot;/&quot;</span> <span class="o">+</span> <span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">hoodie</span><span class="p">.</span><span class="nx">uuid</span><span class="p">());</span>
+
     <span class="k">this</span><span class="p">.</span><span class="nx">hoodie</span><span class="p">.</span><span class="nx">config</span><span class="p">.</span><span class="nx">set</span><span class="p">(</span><span class="s1">&#39;_account.resetPasswordId&#39;</span><span class="p">,</span> <span class="nx">resetPasswordId</span><span class="p">);</span>
+
     <span class="nx">key</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span> <span class="o">+</span> <span class="k">this</span><span class="p">.</span><span class="nx">_prefix</span> <span class="o">+</span> <span class="s2">&quot;:$passwordReset/&quot;</span> <span class="o">+</span> <span class="nx">resetPasswordId</span><span class="p">;</span>
+
     <span class="nx">data</span> <span class="o">=</span> <span class="p">{</span>
       <span class="nx">_id</span><span class="o">:</span> <span class="nx">key</span><span class="p">,</span>
       <span class="nx">name</span><span class="o">:</span> <span class="s2">&quot;$passwordReset/&quot;</span> <span class="o">+</span> <span class="nx">resetPasswordId</span><span class="p">,</span>
@@ -276,18 +265,19 @@ once the password was resetted.</p></div></div><div class="code"><div class="wra
       <span class="nx">createdAt</span><span class="o">:</span> <span class="k">this</span><span class="p">.</span><span class="nx">_now</span><span class="p">(),</span>
       <span class="nx">updatedAt</span><span class="o">:</span> <span class="k">this</span><span class="p">.</span><span class="nx">_now</span><span class="p">()</span>
     <span class="p">};</span>
+
     <span class="nx">options</span> <span class="o">=</span> <span class="p">{</span>
       <span class="nx">data</span><span class="o">:</span> <span class="nx">JSON</span><span class="p">.</span><span class="nx">stringify</span><span class="p">(</span><span class="nx">data</span><span class="p">),</span>
       <span class="nx">contentType</span><span class="o">:</span> <span class="s2">&quot;application/json&quot;</span>
     <span class="p">};</span>
+
     <span class="k">return</span> <span class="k">this</span><span class="p">.</span><span class="nx">_withPreviousRequestsAborted</span><span class="p">(</span><span class="s1">&#39;resetPassword&#39;</span><span class="p">,</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
       <span class="k">return</span> <span class="nx">self</span><span class="p">.</span><span class="nx">request</span><span class="p">(</span><span class="s1">&#39;PUT&#39;</span><span class="p">,</span> <span class="s2">&quot;/_users/&quot;</span> <span class="o">+</span> <span class="p">(</span><span class="nb">encodeURIComponent</span><span class="p">(</span><span class="nx">key</span><span class="p">)),</span> <span class="nx">options</span><span class="p">).</span><span class="nx">pipe</span><span class="p">(</span>
         <span class="kc">null</span><span class="p">,</span> <span class="nx">self</span><span class="p">.</span><span class="nx">_handleRequestError</span>
       <span class="p">).</span><span class="nx">done</span><span class="p">(</span><span class="nx">self</span><span class="p">.</span><span class="nx">_checkPasswordResetStatus</span><span class="p">);</span>
     <span class="p">});</span>
-  <span class="p">};</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h2 id="change-username">change username</h2>
 
-<p>Note: the hoodie API requires the current password for security reasons,
+  <span class="p">};</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h2 id="change-username">change username</h2></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>Note: the hoodie API requires the current password for security reasons,
 but technically we cannot (yet) prevent the user to change the username
 without knowing the current password, so it's not impulemented in the current
 implementation of the hoodie API.</p>
@@ -295,23 +285,22 @@ implementation of the hoodie API.</p>
 <p>But the current password is needed to login with the new username.</p></div></div><div class="code"><div class="wrapper">  <span class="nx">Account</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">changeUsername</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">currentPassword</span><span class="p">,</span> <span class="nx">newUsername</span><span class="p">)</span> <span class="p">{</span>
     <span class="nx">newUsername</span> <span class="o">=</span> <span class="nx">newUsername</span> <span class="o">||</span> <span class="s1">&#39;&#39;</span><span class="p">;</span>
     <span class="k">return</span> <span class="k">this</span><span class="p">.</span><span class="nx">_changeUsernameAndPassword</span><span class="p">(</span><span class="nx">currentPassword</span><span class="p">,</span> <span class="nx">newUsername</span><span class="p">.</span><span class="nx">toLowerCase</span><span class="p">());</span>
-  <span class="p">};</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h2 id="destroy">destroy</h2>
-
-<p>destroys a user's account</p></div></div><div class="code"><div class="wrapper">  <span class="nx">Account</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">destroy</span> <span class="o">=</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+  <span class="p">};</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h2 id="destroy">destroy</h2></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>destroys a user's account</p></div></div><div class="code"><div class="wrapper">  <span class="nx">Account</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">destroy</span> <span class="o">=</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
     <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="k">this</span><span class="p">.</span><span class="nx">hasAccount</span><span class="p">())</span> <span class="p">{</span>
       <span class="k">return</span> <span class="k">this</span><span class="p">.</span><span class="nx">_cleanupAndTriggerSignOut</span><span class="p">();</span>
     <span class="p">}</span>
+
     <span class="k">return</span> <span class="k">this</span><span class="p">.</span><span class="nx">fetch</span><span class="p">().</span><span class="nx">pipe</span><span class="p">(</span>
       <span class="k">this</span><span class="p">.</span><span class="nx">_handleFetchBeforeDestroySucces</span><span class="p">,</span>
       <span class="k">this</span><span class="p">.</span><span class="nx">_handleFetchBeforeDestroyError</span>
     <span class="p">).</span><span class="nx">pipe</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">_cleanupAndTriggerSignOut</span><span class="p">);</span>
-  <span class="p">};</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h2 id="private">PRIVATE</h2>
-
-<p>default couchDB user doc prefix</p></div></div><div class="code"><div class="wrapper">  <span class="nx">Account</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">_prefix</span> <span class="o">=</span> <span class="s1">&#39;org.couchdb.user&#39;</span><span class="p">;</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>setters</p></div></div><div class="code"><div class="wrapper">  <span class="nx">Account</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">_setUsername</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">username</span><span class="p">)</span> <span class="p">{</span>
+  <span class="p">};</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h2 id="private">PRIVATE</h2></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>default couchDB user doc prefix</p></div></div><div class="code"><div class="wrapper">  <span class="nx">Account</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">_prefix</span> <span class="o">=</span> <span class="s1">&#39;org.couchdb.user&#39;</span><span class="p">;</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>setters</p></div></div><div class="code"><div class="wrapper">  <span class="nx">Account</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">_setUsername</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">username</span><span class="p">)</span> <span class="p">{</span>
     <span class="k">if</span> <span class="p">(</span><span class="nx">username</span> <span class="o">===</span> <span class="k">this</span><span class="p">.</span><span class="nx">username</span><span class="p">)</span> <span class="p">{</span>
       <span class="k">return</span><span class="p">;</span>
     <span class="p">}</span>
+
     <span class="k">this</span><span class="p">.</span><span class="nx">username</span> <span class="o">=</span> <span class="nx">username</span><span class="p">;</span>
+
     <span class="k">return</span> <span class="k">this</span><span class="p">.</span><span class="nx">hoodie</span><span class="p">.</span><span class="nx">config</span><span class="p">.</span><span class="nx">set</span><span class="p">(</span><span class="s1">&#39;_account.username&#39;</span><span class="p">,</span> <span class="k">this</span><span class="p">.</span><span class="nx">username</span><span class="p">);</span>
   <span class="p">};</span>
 
@@ -359,7 +348,7 @@ to trigger an 'unauthenticated' error, but instead try to sign in.</p></div></di
 in others we get an xhr or even just a string back
 when the couch died entirely. Whe have to handle
 each case</p></div></div><div class="code"><div class="wrapper">  <span class="nx">Account</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">_handleRequestError</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">error</span><span class="p">)</span> <span class="p">{</span>
-    <span class="kd">var</span> <span class="nx">e</span><span class="p">,</span> <span class="nx">xhr</span><span class="p">;</span>
+    <span class="kd">var</span> <span class="nx">e</span><span class="p">;</span>
 
     <span class="nx">error</span> <span class="o">=</span> <span class="nx">error</span> <span class="o">||</span> <span class="p">{};</span>
 
@@ -367,7 +356,7 @@ each case</p></div></div><div class="code"><div class="wrapper">  <span class="n
       <span class="k">return</span> <span class="k">this</span><span class="p">.</span><span class="nx">hoodie</span><span class="p">.</span><span class="nx">defer</span><span class="p">().</span><span class="nx">reject</span><span class="p">(</span><span class="nx">error</span><span class="p">).</span><span class="nx">promise</span><span class="p">();</span>
     <span class="p">}</span>
 
-    <span class="nx">xhr</span> <span class="o">=</span> <span class="nx">error</span><span class="p">;</span>
+    <span class="kd">var</span> <span class="nx">xhr</span> <span class="o">=</span> <span class="nx">error</span><span class="p">;</span>
 
     <span class="k">try</span> <span class="p">{</span>
       <span class="nx">error</span> <span class="o">=</span> <span class="nx">JSON</span><span class="p">.</span><span class="nx">parse</span><span class="p">(</span><span class="nx">xhr</span><span class="p">.</span><span class="nx">responseText</span><span class="p">);</span>
@@ -377,6 +366,7 @@ each case</p></div></div><div class="code"><div class="wrapper">  <span class="n
         <span class="nx">error</span><span class="o">:</span> <span class="nx">xhr</span><span class="p">.</span><span class="nx">responseText</span> <span class="o">||</span> <span class="s2">&quot;unknown&quot;</span>
       <span class="p">};</span>
     <span class="p">}</span>
+
     <span class="k">return</span> <span class="k">this</span><span class="p">.</span><span class="nx">hoodie</span><span class="p">.</span><span class="nx">defer</span><span class="p">().</span><span class="nx">reject</span><span class="p">(</span><span class="nx">error</span><span class="p">).</span><span class="nx">promise</span><span class="p">();</span>
   <span class="p">};</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>handle response of a successful signUp request.
 Response looks like:</p>
@@ -388,6 +378,7 @@ Response looks like:</p>
 }
 </code></pre></div></div><div class="code"><div class="wrapper">  <span class="nx">Account</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">_handleSignUpSucces</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">username</span><span class="p">,</span> <span class="nx">password</span><span class="p">)</span> <span class="p">{</span>
     <span class="kd">var</span> <span class="nx">self</span> <span class="o">=</span> <span class="k">this</span><span class="p">;</span>
+
     <span class="k">return</span> <span class="kd">function</span><span class="p">(</span><span class="nx">response</span><span class="p">)</span> <span class="p">{</span>
       <span class="nx">self</span><span class="p">.</span><span class="nx">trigger</span><span class="p">(</span><span class="s1">&#39;signup&#39;</span><span class="p">,</span> <span class="nx">username</span><span class="p">);</span>
       <span class="nx">self</span><span class="p">.</span><span class="nx">_doc</span><span class="p">.</span><span class="nx">_rev</span> <span class="o">=</span> <span class="nx">response</span><span class="p">.</span><span class="nx">rev</span><span class="p">;</span>
@@ -395,22 +386,25 @@ Response looks like:</p>
     <span class="p">};</span>
   <span class="p">};</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>a delayed sign in is used after sign up and after a
 username change.</p></div></div><div class="code"><div class="wrapper">  <span class="nx">Account</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">_delayedSignIn</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">username</span><span class="p">,</span> <span class="nx">password</span><span class="p">,</span> <span class="nx">options</span><span class="p">,</span> <span class="nx">defer</span><span class="p">)</span> <span class="p">{</span>
-    <span class="kd">var</span> <span class="nx">self</span> <span class="o">=</span> <span class="k">this</span><span class="p">;</span>
-    <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nx">defer</span><span class="p">)</span> <span class="p">{</span>
+    <span class="kd">var</span> <span class="nx">self</span> <span class="o">=</span> <span class="k">this</span><span class="p">;</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>_delayedSignIn might call itself, when the user account
+is pending. In this case it passes the original defer,
+to keep a reference and finally resolve / reject it 
+at some point</p></div></div><div class="code"><div class="wrapper">    <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nx">defer</span><span class="p">)</span> <span class="p">{</span>
       <span class="nx">defer</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">hoodie</span><span class="p">.</span><span class="nx">defer</span><span class="p">();</span>
     <span class="p">}</span>
+
     <span class="nb">window</span><span class="p">.</span><span class="nx">setTimeout</span><span class="p">(</span><span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
-      <span class="kd">var</span> <span class="nx">promise</span><span class="p">;</span>
-      <span class="nx">promise</span> <span class="o">=</span> <span class="nx">self</span><span class="p">.</span><span class="nx">_sendSignInRequest</span><span class="p">(</span><span class="nx">username</span><span class="p">,</span> <span class="nx">password</span><span class="p">);</span>
+      <span class="kd">var</span> <span class="nx">promise</span> <span class="o">=</span> <span class="nx">self</span><span class="p">.</span><span class="nx">_sendSignInRequest</span><span class="p">(</span><span class="nx">username</span><span class="p">,</span> <span class="nx">password</span><span class="p">);</span>
       <span class="nx">promise</span><span class="p">.</span><span class="nx">done</span><span class="p">(</span><span class="nx">defer</span><span class="p">.</span><span class="nx">resolve</span><span class="p">);</span>
-      <span class="k">return</span> <span class="nx">promise</span><span class="p">.</span><span class="nx">fail</span><span class="p">(</span><span class="kd">function</span><span class="p">(</span><span class="nx">error</span><span class="p">)</span> <span class="p">{</span>
-        <span class="k">if</span> <span class="p">(</span><span class="nx">error</span><span class="p">.</span><span class="nx">error</span> <span class="o">===</span> <span class="s1">&#39;unconfirmed&#39;</span><span class="p">)</span> <span class="p">{</span>
-          <span class="k">return</span> <span class="nx">self</span><span class="p">.</span><span class="nx">_delayedSignIn</span><span class="p">(</span><span class="nx">username</span><span class="p">,</span> <span class="nx">password</span><span class="p">,</span> <span class="nx">options</span><span class="p">,</span> <span class="nx">defer</span><span class="p">);</span>
+      <span class="nx">promise</span><span class="p">.</span><span class="nx">fail</span><span class="p">(</span><span class="kd">function</span><span class="p">(</span><span class="nx">error</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">if</span> <span class="p">(</span><span class="nx">error</span><span class="p">.</span><span class="nx">error</span> <span class="o">===</span> <span class="s1">&#39;unconfirmed&#39;</span><span class="p">)</span> <span class="p">{</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>It might take a bit until the account has been confirmed</p></div></div><div class="code"><div class="wrapper">          <span class="nx">self</span><span class="p">.</span><span class="nx">_delayedSignIn</span><span class="p">(</span><span class="nx">username</span><span class="p">,</span> <span class="nx">password</span><span class="p">,</span> <span class="nx">options</span><span class="p">,</span> <span class="nx">defer</span><span class="p">);</span>
         <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
-          <span class="k">return</span> <span class="nx">defer</span><span class="p">.</span><span class="nx">reject</span><span class="p">.</span><span class="nx">apply</span><span class="p">(</span><span class="nx">defer</span><span class="p">,</span> <span class="nx">arguments</span><span class="p">);</span>
+          <span class="nx">defer</span><span class="p">.</span><span class="nx">reject</span><span class="p">.</span><span class="nx">apply</span><span class="p">(</span><span class="nx">defer</span><span class="p">,</span> <span class="nx">arguments</span><span class="p">);</span>
         <span class="p">}</span>
       <span class="p">});</span>
+
     <span class="p">},</span> <span class="mi">300</span><span class="p">);</span>
+
     <span class="k">return</span> <span class="nx">defer</span><span class="p">.</span><span class="nx">promise</span><span class="p">();</span>
   <span class="p">};</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>parse a successful sign in response from couchDB.
 Response looks like:</p>
@@ -518,9 +512,7 @@ error. Otherwise reject the promise with a 'pending' error,
 as we are not waiting for a success full response, but a 401
 error, indicating that our password was changed and our
 current session has been invalidated</p></div></div><div class="code"><div class="wrapper">  <span class="nx">Account</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">_handlePasswordResetStatusRequestSuccess</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">response</span><span class="p">)</span> <span class="p">{</span>
-    <span class="kd">var</span> <span class="nx">defer</span><span class="p">;</span>
-
-    <span class="nx">defer</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">hoodie</span><span class="p">.</span><span class="nx">defer</span><span class="p">();</span>
+    <span class="kd">var</span> <span class="nx">defer</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">hoodie</span><span class="p">.</span><span class="nx">defer</span><span class="p">();</span>
 
     <span class="k">if</span> <span class="p">(</span><span class="nx">response</span><span class="p">.</span><span class="nx">$error</span><span class="p">)</span> <span class="p">{</span>
       <span class="nx">defer</span><span class="p">.</span><span class="nx">reject</span><span class="p">(</span><span class="nx">response</span><span class="p">.</span><span class="nx">$error</span><span class="p">);</span>
@@ -548,6 +540,7 @@ In this case we resolve the promise.</p></div></div><div class="code"><div class
 <li>sign in with new credentials to create new sesion.</li>
 </ol></div></div><div class="code"><div class="wrapper">  <span class="nx">Account</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">_changeUsernameAndPassword</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">currentPassword</span><span class="p">,</span> <span class="nx">newUsername</span><span class="p">,</span> <span class="nx">newPassword</span><span class="p">)</span> <span class="p">{</span>
     <span class="kd">var</span> <span class="nx">self</span> <span class="o">=</span> <span class="k">this</span><span class="p">;</span>
+
     <span class="k">return</span> <span class="k">this</span><span class="p">.</span><span class="nx">_sendSignInRequest</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">username</span><span class="p">,</span> <span class="nx">currentPassword</span><span class="p">,</span> <span class="p">{</span>
       <span class="nx">silent</span><span class="o">:</span> <span class="kc">true</span>
     <span class="p">}).</span><span class="nx">pipe</span><span class="p">(</span><span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
@@ -611,6 +604,7 @@ its ownerHash (see <code>anonymousSignUp</code>)</p>
 is used within <code>signUp</code> method, so we need to be able to differentiate
 between anonyomus and normal users before an account has been created.</p></div></div><div class="code"><div class="wrapper">  <span class="nx">Account</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">_userKey</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">username</span><span class="p">)</span> <span class="p">{</span>
     <span class="kd">var</span> <span class="nx">prefix</span><span class="p">;</span>
+
     <span class="k">if</span> <span class="p">(</span><span class="nx">username</span> <span class="o">===</span> <span class="k">this</span><span class="p">.</span><span class="nx">ownerHash</span><span class="p">)</span> <span class="p">{</span>
       <span class="nx">prefix</span> <span class="o">=</span> <span class="s1">&#39;user_anonymous&#39;</span><span class="p">;</span>
     <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
@@ -633,8 +627,7 @@ from _users doc and add the password in clear text. CouchDB will replace it with
 according password</em>sha and a new salt server side</p></div></div><div class="code"><div class="wrapper">  <span class="nx">Account</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">_sendChangeUsernameAndPasswordRequest</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">currentPassword</span><span class="p">,</span> <span class="nx">newUsername</span><span class="p">,</span> <span class="nx">newPassword</span><span class="p">)</span> <span class="p">{</span>
     <span class="kd">var</span> <span class="nx">self</span> <span class="o">=</span> <span class="k">this</span><span class="p">;</span>
 
-    <span class="k">return</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
-      <span class="kd">var</span> <span class="nx">data</span><span class="p">,</span> <span class="nx">options</span><span class="p">;</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>prepare updated _users doc</p></div></div><div class="code"><div class="wrapper">      <span class="nx">data</span> <span class="o">=</span> <span class="nx">$</span><span class="p">.</span><span class="nx">extend</span><span class="p">({},</span> <span class="nx">self</span><span class="p">.</span><span class="nx">_doc</span><span class="p">);</span>
+    <span class="k">return</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>prepare updated _users doc</p></div></div><div class="code"><div class="wrapper">      <span class="kd">var</span> <span class="nx">data</span> <span class="o">=</span> <span class="nx">$</span><span class="p">.</span><span class="nx">extend</span><span class="p">({},</span> <span class="nx">self</span><span class="p">.</span><span class="nx">_doc</span><span class="p">);</span>
 
       <span class="k">if</span> <span class="p">(</span><span class="nx">newUsername</span><span class="p">)</span> <span class="p">{</span>
         <span class="nx">data</span><span class="p">.</span><span class="nx">$newUsername</span> <span class="o">=</span> <span class="nx">newUsername</span><span class="p">;</span>
@@ -647,7 +640,7 @@ according password</em>sha and a new salt server side</p></div></div><div class=
         <span class="nx">data</span><span class="p">.</span><span class="nx">password</span> <span class="o">=</span> <span class="nx">newPassword</span><span class="p">;</span>
       <span class="p">}</span>
 
-      <span class="nx">options</span> <span class="o">=</span> <span class="p">{</span>
+      <span class="kd">var</span> <span class="nx">options</span> <span class="o">=</span> <span class="p">{</span>
         <span class="nx">data</span><span class="o">:</span> <span class="nx">JSON</span><span class="p">.</span><span class="nx">stringify</span><span class="p">(</span><span class="nx">data</span><span class="p">),</span>
         <span class="nx">contentType</span><span class="o">:</span> <span class="s1">&#39;application/json&#39;</span>
       <span class="p">};</span>
@@ -663,6 +656,7 @@ according password</em>sha and a new salt server side</p></div></div><div class=
   <span class="p">};</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>depending on whether a newUsername has been passed, we can sign in right away
 or have to use the delayed sign in to give the username change worker some time</p></div></div><div class="code"><div class="wrapper">  <span class="nx">Account</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">_handleChangeUsernameAndPasswordRequest</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">newUsername</span><span class="p">,</span> <span class="nx">newPassword</span><span class="p">)</span> <span class="p">{</span>
     <span class="kd">var</span> <span class="nx">self</span> <span class="o">=</span> <span class="k">this</span><span class="p">;</span>
+
     <span class="k">return</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
       <span class="nx">self</span><span class="p">.</span><span class="nx">hoodie</span><span class="p">.</span><span class="nx">remote</span><span class="p">.</span><span class="nx">disconnect</span><span class="p">();</span>
       <span class="k">if</span> <span class="p">(</span><span class="nx">newUsername</span><span class="p">)</span> <span class="p">{</span>
@@ -684,9 +678,13 @@ by cancelling the previous one.</p></div></div><div class="code"><div class="wra
     <span class="k">return</span> <span class="k">this</span><span class="p">.</span><span class="nx">_requests</span><span class="p">[</span><span class="nx">name</span><span class="p">];</span>
   <span class="p">};</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>if there is a pending request, return its promise instead
 of sending another request</p></div></div><div class="code"><div class="wrapper">  <span class="nx">Account</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">_withSingleRequest</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">name</span><span class="p">,</span> <span class="nx">requestFunction</span><span class="p">)</span> <span class="p">{</span>
-    <span class="kd">var</span> <span class="nx">_ref</span><span class="p">;</span>
-    <span class="k">if</span> <span class="p">(((</span><span class="nx">_ref</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">_requests</span><span class="p">[</span><span class="nx">name</span><span class="p">])</span> <span class="o">!==</span> <span class="kc">undefined</span> <span class="o">?</span> <span class="k">typeof</span> <span class="nx">_ref</span><span class="p">.</span><span class="nx">state</span> <span class="o">===</span> <span class="s2">&quot;function&quot;</span> <span class="o">?</span> <span class="nx">_ref</span><span class="p">.</span><span class="nx">state</span><span class="p">()</span> <span class="o">:</span> <span class="kc">null</span> <span class="o">:</span> <span class="kc">null</span><span class="p">)</span> <span class="o">===</span> <span class="s1">&#39;pending&#39;</span><span class="p">)</span> <span class="p">{</span>
-      <span class="k">return</span> <span class="k">this</span><span class="p">.</span><span class="nx">_requests</span><span class="p">[</span><span class="nx">name</span><span class="p">];</span>
+
+    <span class="k">if</span> <span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">_requests</span><span class="p">[</span><span class="nx">name</span><span class="p">]</span> <span class="o">!==</span> <span class="kc">undefined</span><span class="p">)</span> <span class="p">{</span>
+      <span class="k">if</span> <span class="p">(</span><span class="k">typeof</span> <span class="k">this</span><span class="p">.</span><span class="nx">_requests</span><span class="p">[</span><span class="nx">name</span><span class="p">].</span><span class="nx">state</span> <span class="o">===</span> <span class="s2">&quot;function&quot;</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">if</span> <span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">_requests</span><span class="p">[</span><span class="nx">name</span><span class="p">].</span><span class="nx">state</span><span class="p">()</span> <span class="o">===</span> <span class="s1">&#39;pending&#39;</span><span class="p">)</span> <span class="p">{</span>
+          <span class="k">return</span> <span class="k">this</span><span class="p">.</span><span class="nx">_requests</span><span class="p">[</span><span class="nx">name</span><span class="p">];</span>
+        <span class="p">}</span>
+      <span class="p">}</span>
     <span class="p">}</span>
 
     <span class="k">this</span><span class="p">.</span><span class="nx">_requests</span><span class="p">[</span><span class="nx">name</span><span class="p">]</span> <span class="o">=</span> <span class="nx">requestFunction</span><span class="p">();</span>
@@ -704,19 +702,23 @@ other methods like signUp or changePassword do also need to
 sign in the user (again), these need to send the sign in
 request but without a signOut beforehand, as the user remains
 the same.</p></div></div><div class="code"><div class="wrapper">  <span class="nx">Account</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">_sendSignInRequest</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">username</span><span class="p">,</span> <span class="nx">password</span><span class="p">,</span> <span class="nx">options</span><span class="p">)</span> <span class="p">{</span>
-    <span class="kd">var</span> <span class="nx">requestOptions</span><span class="p">,</span>
-      <span class="nx">self</span> <span class="o">=</span> <span class="k">this</span><span class="p">;</span>
+    <span class="kd">var</span> <span class="nx">self</span> <span class="o">=</span> <span class="k">this</span><span class="p">,</span>
     <span class="nx">requestOptions</span> <span class="o">=</span> <span class="p">{</span>
       <span class="nx">data</span><span class="o">:</span> <span class="p">{</span>
         <span class="nx">name</span><span class="o">:</span> <span class="k">this</span><span class="p">.</span><span class="nx">_userKey</span><span class="p">(</span><span class="nx">username</span><span class="p">),</span>
         <span class="nx">password</span><span class="o">:</span> <span class="nx">password</span>
       <span class="p">}</span>
     <span class="p">};</span>
-    <span class="k">return</span> <span class="k">this</span><span class="p">.</span><span class="nx">_withPreviousRequestsAborted</span><span class="p">(</span><span class="s1">&#39;signIn&#39;</span><span class="p">,</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
-      <span class="kd">var</span> <span class="nx">promise</span><span class="p">;</span>
-      <span class="nx">promise</span> <span class="o">=</span> <span class="nx">self</span><span class="p">.</span><span class="nx">request</span><span class="p">(</span><span class="s1">&#39;POST&#39;</span><span class="p">,</span> <span class="s1">&#39;/_session&#39;</span><span class="p">,</span> <span class="nx">requestOptions</span><span class="p">);</span>
-      <span class="k">return</span> <span class="nx">promise</span><span class="p">.</span><span class="nx">pipe</span><span class="p">(</span><span class="nx">self</span><span class="p">.</span><span class="nx">_handleSignInSuccess</span><span class="p">(</span><span class="nx">options</span><span class="p">),</span> <span class="nx">self</span><span class="p">.</span><span class="nx">_handleRequestError</span><span class="p">);</span>
+
+    <span class="k">this</span><span class="p">.</span><span class="nx">_withPreviousRequestsAborted</span><span class="p">(</span><span class="s1">&#39;signIn&#39;</span><span class="p">,</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+      <span class="kd">var</span> <span class="nx">promise</span> <span class="o">=</span> <span class="nx">self</span><span class="p">.</span><span class="nx">request</span><span class="p">(</span><span class="s1">&#39;POST&#39;</span><span class="p">,</span> <span class="s1">&#39;/_session&#39;</span><span class="p">,</span> <span class="nx">requestOptions</span><span class="p">);</span>
+
+      <span class="k">return</span> <span class="nx">promise</span><span class="p">.</span><span class="nx">pipe</span><span class="p">(</span>
+        <span class="nx">self</span><span class="p">.</span><span class="nx">_handleSignInSuccess</span><span class="p">(</span><span class="nx">options</span><span class="p">),</span>
+        <span class="nx">self</span><span class="p">.</span><span class="nx">_handleRequestError</span>
+      <span class="p">);</span>
     <span class="p">});</span>
+
   <span class="p">};</span></div></div></div><div class="segment"><div class="code"><div class="wrapper">  <span class="nx">Account</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">_now</span> <span class="o">=</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
     <span class="k">return</span> <span class="k">new</span> <span class="nb">Date</span><span class="p">();</span>
   <span class="p">};</span>

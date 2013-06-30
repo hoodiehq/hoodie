@@ -141,7 +141,8 @@ window.Hoodie = window.Hoodie || (function(_super) {
 
   'use strict';
 
-  // ## Constructor
+  // Constructor
+  // -------------
 
   // When initializing a hoodie instance, an optional URL
   // can be passed. That's the URL of a hoodie backend.
@@ -172,16 +173,14 @@ window.Hoodie = window.Hoodie || (function(_super) {
     this.account = new this.constructor.Account(this);
     this.remote = new this.constructor.AccountRemote(this);
 
-    // init extensions
     this._loadExtensions();
-
-    // check connection
     this.checkConnection();
   }
 
   Object.deepExtend(Hoodie, _super);
 
-  // ## Settings
+  // Settings
+  // ----------
 
   // `online` (read-only)
   Hoodie.prototype.online = true;
@@ -189,7 +188,8 @@ window.Hoodie = window.Hoodie || (function(_super) {
   // `checkConnectionInterval` (read-only)
   Hoodie.prototype.checkConnectionInterval = 30000;
 
-  // ## Requests
+  // Requests
+  // ----------
 
   // use this method to send requests to the hoodie backend.
   //
@@ -216,7 +216,9 @@ window.Hoodie = window.Hoodie || (function(_super) {
     return $.ajax($.extend(defaults, options)).then( null, this._pipeRequestError );
   };
 
-  // ## Check Connection
+
+  // Check Connection
+  // ------------------
 
   // the `checkConnection` method is used, well, to check if
   // the hoodie backend is reachable at `baseUrl` or not.
@@ -251,7 +253,8 @@ window.Hoodie = window.Hoodie || (function(_super) {
   };
 
 
-  // ## Open stores
+  // Open stores
+  // -------------
 
   // generic method to open a store. Used by
   //
@@ -273,7 +276,8 @@ window.Hoodie = window.Hoodie || (function(_super) {
   };
 
 
-  // ## uuid
+  // uuid
+  // ------
 
   // helper to generate unique ids.
   Hoodie.prototype.uuid = function(len) {
@@ -305,7 +309,8 @@ window.Hoodie = window.Hoodie || (function(_super) {
   };
 
 
-  // ## Defers / Promises
+  // Defers / Promises
+  // -------------------
 
   // returns a defer object for custom promise handlings.
   // Promises are heavely used throughout the code of hoodie.
@@ -368,7 +373,8 @@ window.Hoodie = window.Hoodie || (function(_super) {
   };
 
 
-  // ## Extending hoodie
+  // Extending hoodie
+  // ------------------
 
   // You can either extend the Hoodie class, or a hoodie
   // instance dooring runtime
@@ -453,13 +459,35 @@ window.Hoodie = window.Hoodie || (function(_super) {
 
 })(window.Events);
 
+// expose Hoodie to module loaders. Based on jQuery's implementation.
+if ( typeof module === "object" && module && typeof module.exports === "object" ) {
+
+  // Expose Hoodie as module.exports in loaders that implement the Node
+  // module pattern (including browserify). Do not create the global, since
+  // the user will be storing it themselves locally, and globals are frowned
+  // upon in the Node module world.
+  module.exports = Hoodie;
+} else {
+
+  // Register as a named AMD module, since Hoodie can be concatenated with other
+  // files that may use define, but not via a proper concatenation script that
+  // understands anonymous AMD modules. A named AMD is safest and most robust
+  // way to register. Lowercase hoodie is used because AMD module names are
+  // derived from file names, and Hoodie is normally delivered in a lowercase
+  // file name. 
+  if ( typeof define === "function" && define.amd ) {
+    define( "hoodie", [], function () {
+      'use strict';
+      return Hoodie;
+    } );
+  }
+}
+
 // Hoodie.Account
 // ================
 
 // tell something smart in here.
 //
-//
-
 Hoodie.Account = (function () {
 
   'use strict';
@@ -494,15 +522,20 @@ Hoodie.Account = (function () {
     this._requests = {};
 
     // init account
-    // we've put this into its own method so it's easier to
-    // inherit from Hoodie.Account with custom logic
     this.init();
   }
 
   // Properties
   // ------------
+
+  // 
   Account.prototype.username = undefined;
 
+  // init
+  // ------
+
+  // we've put this into its own method so it's easier to
+  // inherit from Hoodie.Account and add custom logic
   Account.prototype.init = function() {
     // handle session
     this.username = this.hoodie.config.get('_account.username');
@@ -655,7 +688,8 @@ Hoodie.Account = (function () {
 
   // hasAccount
   // ---------------------
-  //
+
+  // 
   Account.prototype.hasAccount = function() {
     return !!this.username;
   };
@@ -663,7 +697,8 @@ Hoodie.Account = (function () {
 
   // hasAnonymousAccount
   // ---------------------
-  //
+
+  // 
   Account.prototype.hasAnonymousAccount = function() {
     return this.getAnonymousPassword() !== undefined;
   };
@@ -671,6 +706,7 @@ Hoodie.Account = (function () {
 
   // set / get / remove anonymous password
   // ---------------------------------------
+
   //
   Account.prototype._anonymousPasswordKey = '_account.anonymousPassword';
 
@@ -730,7 +766,7 @@ Hoodie.Account = (function () {
 
   // sign out
   // ---------
-  //
+
   // uses standard CouchDB API to invalidate a user session (DELETE /_session)
   //
   Account.prototype.signOut = function(options) {
@@ -752,33 +788,33 @@ Hoodie.Account = (function () {
 
   // On
   // ---
-  //
+
   // shortcut for `hoodie.on`
   //
-  Account.prototype.on = function(event, cb) {
-    event = event.replace(/(^| )([^ ]+)/g, "$1account:$2");
-    return this.hoodie.on(event, cb);
+  Account.prototype.on = function(eventName, cb) {
+    eventName = eventName.replace(/(^| )([^ ]+)/g, "$1account:$2");
+    return this.hoodie.on(eventName, cb);
   };
 
 
   // Trigger
   // ---
-  //
+
   // shortcut for `hoodie.trigger`
   //
   Account.prototype.trigger = function() {
-    var event, parameters;
+    var eventName, parameters;
 
-    event = arguments[0],
+    eventName = arguments[0],
     parameters = 2 <= arguments.length ? Array.prototype.slice.call(arguments, 1) : [];
 
-    this.hoodie.trigger.apply(this.hoodie, ["account:" + event].concat(Array.prototype.slice.call(parameters)));
+    this.hoodie.trigger.apply(this.hoodie, ["account:" + eventName].concat(Array.prototype.slice.call(parameters)));
   };
 
 
   // Request
   // ---
-  //
+
   // shortcut for `hoodie.request`
   //
   Account.prototype.request = function(type, path, options) {
@@ -789,7 +825,7 @@ Hoodie.Account = (function () {
 
   // db
   // ----
-  //
+
   // return name of db
   //
   Account.prototype.db = function() {
@@ -799,7 +835,7 @@ Hoodie.Account = (function () {
 
   // fetch
   // -------
-  //
+
   // fetches _users doc from CouchDB and caches it in _doc
   //
   Account.prototype.fetch = function(username) {
@@ -831,7 +867,7 @@ Hoodie.Account = (function () {
 
   // change password
   // -----------------
-  //
+
   // Note: the hoodie API requires the currentPassword for security reasons,
   // but couchDb doesn't require it for a password change, so it's ignored
   // in this implementation of the hoodie API.
@@ -856,7 +892,7 @@ Hoodie.Account = (function () {
 
   // reset password
   // ----------------
-  //
+
   // This is kind of a hack. We need to create an object anonymously
   // that is not exposed to others. The only CouchDB API othering such
   // functionality is the _users database.
@@ -905,7 +941,7 @@ Hoodie.Account = (function () {
 
   // change username
   // -----------------
-  //
+
   // Note: the hoodie API requires the current password for security reasons,
   // but technically we cannot (yet) prevent the user to change the username
   // without knowing the current password, so it's not impulemented in the current
@@ -921,7 +957,7 @@ Hoodie.Account = (function () {
 
   // destroy
   // ---------
-  //
+
   // destroys a user's account
   //
   Account.prototype.destroy = function() {
@@ -938,7 +974,7 @@ Hoodie.Account = (function () {
 
   // PRIVATE
   // ---------
-  //
+
   // default couchDB user doc prefix
   //
   Account.prototype._prefix = 'org.couchdb.user';
@@ -1063,6 +1099,10 @@ Hoodie.Account = (function () {
   Account.prototype._delayedSignIn = function(username, password, options, defer) {
     var self = this;
 
+    // _delayedSignIn might call itself, when the user account
+    // is pending. In this case it passes the original defer,
+    // to keep a reference and finally resolve / reject it 
+    // at some point
     if (!defer) {
       defer = this.hoodie.defer();
     }
@@ -1070,12 +1110,13 @@ Hoodie.Account = (function () {
     window.setTimeout(function() {
       var promise = self._sendSignInRequest(username, password);
       promise.done(defer.resolve);
-
-      return promise.fail(function(error) {
+      promise.fail(function(error) {
         if (error.error === 'unconfirmed') {
-          return self._delayedSignIn(username, password, options, defer);
+
+          // It might take a bit until the account has been confirmed
+          self._delayedSignIn(username, password, options, defer);
         } else {
-          return defer.reject.apply(defer, arguments);
+          defer.reject.apply(defer, arguments);
         }
       });
 
@@ -1542,14 +1583,18 @@ Hoodie.Account = (function () {
 
 })();
 
-// 
-// Central Config API
-// 
+// Hoodie Config API
+// ===================
 
+// 
 Hoodie.Config = (function() {
 
   'use strict';
 
+  // Constructor
+  // -------------
+
+  //
   function Config(hoodie, options) {
     var self = this;
 
@@ -1581,8 +1626,9 @@ Hoodie.Config = (function() {
   Config.prototype.type = '$config';
   Config.prototype.id = 'hoodie';
 
-  // ## set
-  // 
+  // set
+  // ----------
+
   // adds a configuration
   // 
   Config.prototype.set = function(key, value) {
@@ -1604,16 +1650,18 @@ Hoodie.Config = (function() {
 
   };
 
-  // ## get
-  // 
+  // get
+  // ----------
+
   // receives a configuration
   // 
   Config.prototype.get = function(key) {
     return this.cache[key];
   };
 
-  // ## clear
-  // 
+  // clear
+  // ----------
+
   // clears cache and removes object from store
   // 
   Config.prototype.clear = function() {
@@ -1621,8 +1669,9 @@ Hoodie.Config = (function() {
     return this.hoodie.store.remove(this.type, this.id);
   };
 
-  // ## remove
-  // 
+  // remove
+  // ----------
+
   // removes a configuration, is a simple alias for config.set(key, undefined)
   // 
   Config.prototype.remove = function(key) {
@@ -1641,8 +1690,9 @@ Hoodie.Config = (function() {
 
 Hoodie.Errors = {
 
-  // ## INVALID_KEY
-  // 
+  // INVALID_KEY
+  // --------------
+
   // thrown when invalid keys are used to store an object
   // 
   INVALID_KEY: function (idOrType) {
@@ -1651,13 +1701,17 @@ Hoodie.Errors = {
     return new Error("invalid " + key + " '" + idOrType[key] + "': numbers and lowercase letters allowed only");
   },
 
-  // ## INVALID_ARGUMENTS
+  // INVALID_ARGUMENTS
+  // -------------------
+
   // 
   INVALID_ARGUMENTS: function (msg) {
     return new Error(msg);
   },
 
-  // ## NOT_FOUND
+  // NOT_FOUND
+  // -----------
+
   // 
   NOT_FOUND: function (type, id) {
     return new Error("" + type + " with " + id + " could not be found");
@@ -1679,11 +1733,17 @@ Hoodie.Store = (function() {
 
   'use strict';
 
+  // Constructor
+  // ------------
+
+  // set store.hoodie instance variable
   function Store(hoodie) {
     this.hoodie = hoodie;
   }
 
-  // ## Save
+
+  // Save
+  // --------------
 
   // creates or replaces an an eventually existing object in the store
   // with same type & id.
@@ -1709,12 +1769,12 @@ Hoodie.Store = (function() {
       return defer.promise();
     }
 
+    // validations
     if (id && !this._isValidId(id)) {
       return defer.reject(Hoodie.Errors.INVALID_KEY({
         id: id
       })).promise();
     }
-
     if (!this._isValidType(type)) {
       return defer.reject(Hoodie.Errors.INVALID_KEY({
         type: type
@@ -1724,7 +1784,9 @@ Hoodie.Store = (function() {
     return defer;
   };
 
-  // ## Add
+
+  // Add
+  // -------------------
 
   // `.add` is an alias for `.save`, with the difference that there is no id argument.
   // Internally it simply calls `.save(type, undefined, object).
@@ -1740,7 +1802,9 @@ Hoodie.Store = (function() {
     return this.save(type, object.id, object);
   };
 
-  // ## Update
+
+  // Update
+  // -------------------
 
   // In contrast to `.save`, the `.update` method does not replace the stored object,
   // but only changes the passed attributes of an exsting object, if it exists
@@ -1753,7 +1817,6 @@ Hoodie.Store = (function() {
   // hoodie.store.update('car', 'abc4567', {sold: true})
   // hoodie.store.update('car', 'abc4567', function(obj) { obj.sold = true })
   //
-
   Store.prototype.update = function(type, id, objectUpdate, options) {
     var defer, _loadPromise, self = this;
 
@@ -1783,6 +1846,7 @@ Hoodie.Store = (function() {
             if ((currentObj[key] !== value) === false) {
               continue;
             }
+            // workaround for undefined values, as $.extend ignores these
             newObj[key] = value;
             _results.push(key);
           }
@@ -1806,7 +1870,9 @@ Hoodie.Store = (function() {
     return defer.promise();
   };
 
-  // ## updateAll
+
+  // updateAll
+  // -----------------
 
   // update all objects in the store, can be optionally filtered by a function
   // As an alternative, an array of objects can be passed
@@ -1860,7 +1926,9 @@ Hoodie.Store = (function() {
     });
   };
 
-  // ## find
+
+  // find
+  // -----------------
 
   // loads one object from Store, specified by `type` and `id`
   //
@@ -1877,7 +1945,9 @@ Hoodie.Store = (function() {
     return defer;
   };
 
-  // ## find or add
+
+  // find or add
+  // -------------
 
   // 1. Try to find a share by given id
   // 2. If share could be found, return it
@@ -1901,7 +1971,9 @@ Hoodie.Store = (function() {
     return defer.promise();
   };
 
-  // ## findAll
+
+  // findAll
+  // ------------
 
   // returns all objects from store.
   // Can be optionally filtered by a type or a function
@@ -1910,9 +1982,11 @@ Hoodie.Store = (function() {
     return this.hoodie.defer();
   };
 
-  // ## Destroy
 
-  // Destroyes one object specified by `type` and `id`.
+  // Remove
+  // ------------
+
+  // Removes one object specified by `type` and `id`.
   //
   // when object has been synced before, mark it as deleted.
   // Otherwise remove it from Store.
@@ -1933,7 +2007,9 @@ Hoodie.Store = (function() {
     return defer;
   };
 
-  // ## removeAll
+
+  // removeAll
+  // -----------
 
   // Destroyes all objects. Can be filtered by a type
   //
@@ -1965,10 +2041,12 @@ Hoodie.Store = (function() {
     return new Date();
   };
 
+  // / not allowed for id
   Store.prototype._isValidId = function(key) {
     return new RegExp(/^[^\/]+$/).test(key);
   };
 
+  // / not allowed for type
   Store.prototype._isValidType = function(key) {
     return new RegExp(/^[^\/]+$/).test(key);
   };
@@ -2016,14 +2094,18 @@ Hoodie.Store = (function() {
 // * on(event, callback)
 //
 
+// 
 var ConnectionError;
 
 Hoodie.Remote = (function(_super) {
 
   'use strict';
 
+  // Constructor 
+  // -------------
+
+  // sets name (think: namespace) and some other options
   function Remote(hoodie, options) {
-    // sets name (think: namespace) and some other options
     this.hoodie = hoodie;
     options = options || {};
 
@@ -2070,9 +2152,9 @@ Hoodie.Remote = (function(_super) {
 
   // properties
   // ------------
-  //
+
   // name
-  //
+
   // the name of the Remote is the name of the
   // CouchDB database and is also used to prefix
   // triggered events
@@ -2081,7 +2163,7 @@ Hoodie.Remote = (function(_super) {
 
 
   // sync
-  //
+
   // if set to true, updates will be continuously pulled
   // and pushed. Alternatively, `sync` can be set to
   // `pull: true` or `push: true`.
@@ -2090,7 +2172,7 @@ Hoodie.Remote = (function(_super) {
 
 
   // prefix
-  //
+
   //prefix for docs in a CouchDB database, e.g. all docs
   // in public user stores are prefixed by '$public/'
   //
@@ -2099,7 +2181,7 @@ Hoodie.Remote = (function(_super) {
 
   // request
   // ---------
-  //
+
   // wrapper for hoodie.request, with some store specific defaults
   // and a prefixed path
   //
@@ -2127,7 +2209,7 @@ Hoodie.Remote = (function(_super) {
 
   // get
   // -----
-  //
+
   // send a GET request to the named view
   //
   Remote.prototype.get = function() {
@@ -2140,7 +2222,7 @@ Hoodie.Remote = (function(_super) {
 
   // post
   // ------
-  //
+
   // sends a POST request to the specified updated_function
   //
   Remote.prototype.post = function() {
@@ -2150,13 +2232,13 @@ Hoodie.Remote = (function(_super) {
     );
   };
 
-  //
+
   // Store Operations overides
   // ---------------------------
 
   // find
   // ------
-  //
+
   // find one object
   //
   Remote.prototype.find = function(type, id) {
@@ -2182,7 +2264,7 @@ Hoodie.Remote = (function(_super) {
 
   // findAll
   // ---------
-  //
+
   // find all objects, can be filetered by a type
   //
   Remote.prototype.findAll = function(type) {
@@ -2227,7 +2309,7 @@ Hoodie.Remote = (function(_super) {
 
   // save
   // ------
-  //
+
   // save a new object. If it existed before, all properties
   // will be overwritten
   //
@@ -2254,7 +2336,7 @@ Hoodie.Remote = (function(_super) {
 
   // remove
   // ---------
-  //
+
   // remove one object
   //
   Remote.prototype.remove = function(type, id) {
@@ -2266,7 +2348,7 @@ Hoodie.Remote = (function(_super) {
 
   // removeAll
   // ------------
-  //
+
   // remove all objects, can be filtered by type
   //
   Remote.prototype.removeAll = function(type) {
@@ -2278,7 +2360,7 @@ Hoodie.Remote = (function(_super) {
 
   // isKnownObject
   // ---------------
-  //
+
   // determine between a known and a new object
   //
   Remote.prototype.isKnownObject = function(object) {
@@ -2291,8 +2373,8 @@ Hoodie.Remote = (function(_super) {
 
 
   // markAsKnownObject
-  // -------------
-  //
+  // -------------------
+
   // determine between a known and a new object
   //
   Remote.prototype.markAsKnownObject = function(object) {
@@ -2302,13 +2384,12 @@ Hoodie.Remote = (function(_super) {
   };
 
 
-  //
   // synchronization
   // -----------------
 
   // Connect
   // ---------
-  //
+
   // start syncing
   //
   Remote.prototype.connect = function() {
@@ -2319,7 +2400,7 @@ Hoodie.Remote = (function(_super) {
 
   // Disconnect
   // ------------
-  //
+
   // stop syncing changes from remote store
   //
   Remote.prototype.disconnect = function() {
@@ -2338,7 +2419,7 @@ Hoodie.Remote = (function(_super) {
 
   // isConnected
   // -------------
-  //
+
   //
   Remote.prototype.isConnected = function() {
     return this.connected;
@@ -2347,7 +2428,7 @@ Hoodie.Remote = (function(_super) {
 
   // getSinceNr
   // ------------
-  //
+
   // returns the sequence number from wich to start to find changes in pull
   //
   Remote.prototype.getSinceNr = function() {
@@ -2357,7 +2438,7 @@ Hoodie.Remote = (function(_super) {
 
   // setSinceNr
   // ------------
-  //
+
   // sets the sequence number from wich to start to find changes in pull
   //
   Remote.prototype.setSinceNr = function(seq) {
@@ -2368,7 +2449,7 @@ Hoodie.Remote = (function(_super) {
 
   // pull changes
   // --------------
-  //
+
   // a.k.a. make a GET request to CouchDB's `_changes` feed.
   //
   Remote.prototype.pull = function() {
@@ -2385,7 +2466,7 @@ Hoodie.Remote = (function(_super) {
 
   // push changes
   // --------------
-  //
+
   // Push objects to remote store using the `_bulk_docs` API.
   //
   Remote.prototype.push = function(objects) {
@@ -2413,7 +2494,7 @@ Hoodie.Remote = (function(_super) {
 
   // sync changes
   // --------------
-  //
+
   // push objects, then pull updates.
   //
   Remote.prototype.sync = function(objects) {
@@ -2423,7 +2504,7 @@ Hoodie.Remote = (function(_super) {
 
   // Events
   // --------
-  //
+
   // namespaced alias for `hoodie.on`
   //
   Remote.prototype.on = function(event, cb) {
@@ -2449,7 +2530,7 @@ Hoodie.Remote = (function(_super) {
 
   // Private
   // --------------
-  //
+
   // valid CouchDB doc attributes starting with an underscore
   //
   Remote.prototype._validSpecialAttributes = ['_id', '_rev', '_deleted', '_revisions', '_attachments'];
@@ -2457,7 +2538,7 @@ Hoodie.Remote = (function(_super) {
 
   // Parse for remote
   // ------------------
-  //
+
   // parse object for remote storage. All properties starting with an
   // `underscore` do not get synchronized despite the special properties
   // `_id`, `_rev` and `_deleted` (see above)
@@ -2490,9 +2571,8 @@ Hoodie.Remote = (function(_super) {
   };
 
 
-  // _parseFromRemote
-  // -----------------
-  //
+  // ### _parseFromRemote
+
   // normalize objects coming from remote
   //
   // renames `_id` attribute to `id` and removes the type from the id,
@@ -2501,6 +2581,7 @@ Hoodie.Remote = (function(_super) {
   Remote.prototype._parseFromRemote = function(object) {
     var id, ignore, _ref;
 
+    // handle id and type
     id = object._id || object.id;
     delete object._id;
 
@@ -2532,7 +2613,7 @@ Hoodie.Remote = (function(_super) {
 
 
   // ### _addRevisionTo
-  //
+
   // extends passed object with a _rev property
   //
   Remote.prototype._addRevisionTo = function(attributes) {
@@ -2565,7 +2646,7 @@ Hoodie.Remote = (function(_super) {
 
 
   // ### generate new revision id
-  //
+
   //
   Remote.prototype._generateNewRevisionId = function() {
     return this.hoodie.uuid(9);
@@ -2573,7 +2654,7 @@ Hoodie.Remote = (function(_super) {
 
 
   // ### map docs from findAll
-  //
+
   //
   Remote.prototype._mapDocsFromFindAll = function(response) {
     return response.rows.map(function(row) {
@@ -2583,7 +2664,7 @@ Hoodie.Remote = (function(_super) {
 
 
   // ### pull url
-  //
+
   // Depending on whether remote is connected, return a longpoll URL or not
   //
   Remote.prototype._pullUrl = function() {
@@ -2596,12 +2677,19 @@ Hoodie.Remote = (function(_super) {
     }
   };
 
+
+  // ### restart pull request
+
+  // request gets restarted automaticcally 
+  // when aborted (see @_handlePullError)
   Remote.prototype._restartPullRequest = function() {
     if (this._pullRequest) {
       this._pullRequest.abort();
     }
   };
 
+
+  // ### pull success handler
 
   // request gets restarted automaticcally
   // when aborted (see @_handlePullError)
@@ -2616,7 +2704,7 @@ Hoodie.Remote = (function(_super) {
 
 
   // ### pull error handler
-  //
+
   // when there is a change, trigger event,
   // then check for another change
   //
@@ -2644,6 +2732,7 @@ Hoodie.Remote = (function(_super) {
 
     case 404:
       return window.setTimeout(this.pull, 3000);
+
     case 500:
       //
       // Please server, don't give us these. At least not persistently
@@ -2749,6 +2838,10 @@ Hoodie.AccountRemote = (function(_super) {
 
   'use strict';
 
+  // Constructor
+  // -------------
+
+  //
   function AccountRemote(hoodie, options) {
     this.hoodie = hoodie;
     options = options || {};
@@ -2827,6 +2920,7 @@ Hoodie.AccountRemote = (function(_super) {
 
   // get and set since nr
   // ----------------------
+
   // we store the last since number from the current user's store
   // in his config
   //
@@ -2841,7 +2935,7 @@ Hoodie.AccountRemote = (function(_super) {
 
   // push
   // ------
-  //
+
   // if no objects passed to be pushed, we default to
   // changed objects in user's local store
   //
@@ -2890,6 +2984,10 @@ Hoodie.AccountRemote = (function(_super) {
     return (_ref = this.hoodie).trigger.apply(_ref, ["remote:" + event].concat(Array.prototype.slice.call(parameters)));
   };
 
+
+
+  // Private
+  // ---------
 
   //
   AccountRemote.prototype._connect = function() {
@@ -3590,14 +3688,19 @@ Hoodie.LocalStore = (function (_super) {
 })(Hoodie.Store);
 
 
-// 
+// Hoodie Email Extension
+// ========================
+
 // Sending emails. Not unicorns
 // 
-
 Hoodie.Email = (function () {
 
   'use strict';
 
+  // Constructor
+  // -------------
+
+  // 
   function Email(hoodie) {
 
     // TODO
@@ -3611,8 +3714,10 @@ Hoodie.Email = (function () {
     this._handleEmailUpdate = this._handleEmailUpdate;
   }
 
-  // ## send
-  // 
+
+  // send
+  // -------------
+
   // sends an email and returns a promise
   // 
   Email.prototype.send = function (emailAttributes) {
@@ -3637,10 +3742,11 @@ Hoodie.Email = (function () {
     return defer.promise();
   };
 
-  // 
-  // ## PRIVATE
-  // 
 
+  // PRIVATE
+  // -------------
+
+  // 
   Email.prototype._isValidEmail = function (email) {
     if (email === null) {
       email = '';
@@ -3717,7 +3823,7 @@ Hoodie.Share = (function () {
 
   // Constructor
   // -------------
-  //
+
   // the constructor returns a function, so it can be called
   // like this: hoodie.share('share_id')
   //
@@ -3747,7 +3853,7 @@ Hoodie.Share = (function () {
 
   // add
   // --------
-  //
+
   // creates a new share and returns it
   //
   Share.prototype.add = function (options) {
@@ -3766,7 +3872,7 @@ Hoodie.Share = (function () {
 
   // find
   // ------
-  //
+
   // find an existing share
   //
   Share.prototype.find = function (id) {
@@ -3779,7 +3885,7 @@ Hoodie.Share = (function () {
 
   // findAll
   // ---------
-  //
+
   // find all my existing shares
   //
   Share.prototype.findAll = function () {
@@ -3798,7 +3904,7 @@ Hoodie.Share = (function () {
 
   // findOrAdd
   // --------------
-  //
+
   // find or add a new share
   //
   Share.prototype.findOrAdd = function (id, options) {
@@ -3814,7 +3920,7 @@ Hoodie.Share = (function () {
 
   // save
   // ------
-  //
+
   // add or overwrite a share
   //
   Share.prototype.save = function (id, options) {
@@ -3827,7 +3933,7 @@ Hoodie.Share = (function () {
 
   // update
   // --------
-  //
+
   // add or overwrite a share
   //
   Share.prototype.update = function (id, changed_options) {
@@ -3840,7 +3946,7 @@ Hoodie.Share = (function () {
 
   // updateAll
   // -----------
-  //
+
   // update all my existing shares
   //
   Share.prototype.updateAll = function (changed_options) {
@@ -3859,7 +3965,7 @@ Hoodie.Share = (function () {
 
   // remove
   // ---------
-  //
+
   // deletes an existing share
   //
   Share.prototype.remove = function (id) {
@@ -3872,7 +3978,7 @@ Hoodie.Share = (function () {
 
   // removeAll
   // ------------
-  //
+
   // delete all existing shares
   //
   Share.prototype.removeAll = function () {
@@ -3908,7 +4014,7 @@ Hoodie.Share = (function () {
 
 
   // ### open
-  //
+
   // opens a a remote share store, returns a Hoodie.Remote instance
   //
   Share.prototype._open = function (shareId, options) {
@@ -3922,14 +4028,15 @@ Hoodie.Share = (function () {
 
   // hoodie.store decorations
   // --------------------------
-  //
+
   // hoodie.store decorations add custom methods to promises returned
   // by hoodie.store methods like find, add or update. All methods return
   // methods again that will be executed in the scope of the promise, but
   // with access to the current hoodie instance
   //
 
-  // shareAt
+  // ### shareAt
+
   //
   Share.prototype._storeShareAt = function (shareId) {
     var self = this;
@@ -3955,7 +4062,8 @@ Hoodie.Share = (function () {
   };
 
 
-  // unshareAt
+  // ### unshareAt
+
   //
   Share.prototype._storeUnshareAt = function (shareId) {
     var self = this;
@@ -3986,7 +4094,8 @@ Hoodie.Share = (function () {
   };
 
 
-  // unshare
+  // ### unshare
+
   //
   Share.prototype._storeUnshare = function () {
     var self = this;
@@ -4015,7 +4124,8 @@ Hoodie.Share = (function () {
   };
 
 
-  // share
+  // ### share
+
   //
   Share.prototype._storeShare = function () {
     var self = this;
@@ -4084,6 +4194,7 @@ Hoodie.User = (function() {
     return this.api;
   }
 
+  // 
   User.prototype.api = function(userHash, options) {
     options = options || {};
     $.extend(options, {
@@ -4095,14 +4206,14 @@ Hoodie.User = (function() {
 
   // hoodie.store decorations
   // --------------------------
-  //
+
   // hoodie.store decorations add custom methods to promises returned
   // by hoodie.store methods like find, add or update. All methods return
   // methods again that will be executed in the scope of the promise, but
   // with access to the current hoodie instance
 
-  // publish
-  //
+  // ### publish
+
   // publish an object. If an array of properties passed, publish only these
   // attributes and hide the remaining ones. If no properties passed, publish
   // the entire object.
@@ -4126,9 +4237,8 @@ Hoodie.User = (function() {
   };
 
 
-  //`unpublish`
-  //
-  // unpublish
+  //`### unpublish`
+
   //
   User.prototype._storeUnpublish = function() {
     var _this = this;
@@ -4171,7 +4281,6 @@ Hoodie.extend('user', Hoodie.User);
 // okay, might not be the best idea to do that with 1+ million objects, but
 // you get the point
 // 
-
 Hoodie.Global = (function () {
 
   'use strict';
@@ -4215,7 +4324,7 @@ Hoodie.ShareInstance = (function(_super) {
 
   // constructor
   // -------------
-  //
+
   // initializes a new share
   //
   function ShareInstance(hoodie, options) {
@@ -4243,9 +4352,10 @@ Hoodie.ShareInstance = (function(_super) {
 
   Object.deepExtend(ShareInstance, _super);
 
+
   // default values
   // ----------------
-  //
+
   // shares are not accessible to others by default.
   //
   ShareInstance.prototype.access = false;
@@ -4253,6 +4363,8 @@ Hoodie.ShareInstance = (function(_super) {
 
   // subscribe
   // ---------
+
+  //
   //
   ShareInstance.prototype.subscribe = function() {
     return this.request('GET', '/_security').pipe(this._handleSecurityResponse);
@@ -4261,6 +4373,8 @@ Hoodie.ShareInstance = (function(_super) {
 
   // unsubscribe
   // -----------
+
+  //
   //
   ShareInstance.prototype.unsubscribe = function() {
     this.hoodie.share.remove(this.id);
@@ -4273,7 +4387,7 @@ Hoodie.ShareInstance = (function(_super) {
 
   // grant read access
   // -------------------
-  //
+
   // grant read access to the share. If no users passed,
   // everybody can read the share objects. If one or multiple
   // users passed, only these users get read access.
@@ -4327,7 +4441,7 @@ Hoodie.ShareInstance = (function(_super) {
 
   // revoke read access
   // --------------------
-  //
+
   // revoke read access to the share. If one or multiple
   // users passed, only these users' access gets revoked.
   // Revoking reading access always includes revoking write
@@ -4384,7 +4498,7 @@ Hoodie.ShareInstance = (function(_super) {
 
   // grant write access
   // --------------------
-  //
+
   // grant write access to the share. If no users passed,
   // everybody can edit the share objects. If one or multiple
   // users passed, only these users get write access. Granting
@@ -4423,7 +4537,7 @@ Hoodie.ShareInstance = (function(_super) {
 
   // revoke write access
   // --------------------
-  //
+
   // revoke write access to the share. If one or multiple
   // users passed, only these users' write access gets revoked.
   //
@@ -4468,10 +4582,14 @@ Hoodie.ShareInstance = (function(_super) {
   // PRIVATE
   // ---------
 
+  // 
+  // 
   ShareInstance.prototype._objectBelongsToMe = function(object) {
     return object.$sharedAt === this.id;
   };
 
+  // 
+  // 
   ShareInstance.prototype._handleSecurityResponse = function(security) {
     var access, createdBy;
     access = this._parseSecurity(security);

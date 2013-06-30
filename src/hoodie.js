@@ -343,6 +343,9 @@ if ( typeof module === "object" && module && typeof module.exports === "object" 
   // derived from file names, and Hoodie is normally delivered in a lowercase
   // file name. 
   if ( typeof define === "function" && define.amd ) {
-    define( "hoodie", [], function () { return Hoodie; } );
+    define( "hoodie", [], function () {
+      'use strict';
+      return Hoodie;
+    } );
   }
 }
