@@ -8,7 +8,8 @@ window.Hoodie = window.Hoodie || (function(_super) {
 
   'use strict';
 
-  // ## Constructor
+  // Constructor
+  // -------------
 
   // When initializing a hoodie instance, an optional URL
   // can be passed. That's the URL of a hoodie backend.
@@ -39,16 +40,14 @@ window.Hoodie = window.Hoodie || (function(_super) {
     this.account = new this.constructor.Account(this);
     this.remote = new this.constructor.AccountRemote(this);
 
-    // init extensions
     this._loadExtensions();
-
-    // check connection
     this.checkConnection();
   }
 
   Object.deepExtend(Hoodie, _super);
 
-  // ## Settings
+  // Settings
+  // ----------
 
   // `online` (read-only)
   Hoodie.prototype.online = true;
@@ -56,7 +55,8 @@ window.Hoodie = window.Hoodie || (function(_super) {
   // `checkConnectionInterval` (read-only)
   Hoodie.prototype.checkConnectionInterval = 30000;
 
-  // ## Requests
+  // Requests
+  // ----------
 
   // use this method to send requests to the hoodie backend.
   //
@@ -83,7 +83,9 @@ window.Hoodie = window.Hoodie || (function(_super) {
     return $.ajax($.extend(defaults, options)).then( null, this._pipeRequestError );
   };
 
-  // ## Check Connection
+
+  // Check Connection
+  // ------------------
 
   // the `checkConnection` method is used, well, to check if
   // the hoodie backend is reachable at `baseUrl` or not.
@@ -118,7 +120,8 @@ window.Hoodie = window.Hoodie || (function(_super) {
   };
 
 
-  // ## Open stores
+  // Open stores
+  // -------------
 
   // generic method to open a store. Used by
   //
@@ -140,7 +143,8 @@ window.Hoodie = window.Hoodie || (function(_super) {
   };
 
 
-  // ## uuid
+  // uuid
+  // ------
 
   // helper to generate unique ids.
   Hoodie.prototype.uuid = function(len) {
@@ -172,7 +176,8 @@ window.Hoodie = window.Hoodie || (function(_super) {
   };
 
 
-  // ## Defers / Promises
+  // Defers / Promises
+  // -------------------
 
   // returns a defer object for custom promise handlings.
   // Promises are heavely used throughout the code of hoodie.
@@ -235,7 +240,8 @@ window.Hoodie = window.Hoodie || (function(_super) {
   };
 
 
-  // ## Extending hoodie
+  // Extending hoodie
+  // ------------------
 
   // You can either extend the Hoodie class, or a hoodie
   // instance dooring runtime
@@ -319,3 +325,24 @@ window.Hoodie = window.Hoodie || (function(_super) {
   return Hoodie;
 
 })(window.Events);
+
+// expose Hoodie to module loaders. Based on jQuery's implementation.
+if ( typeof module === "object" && module && typeof module.exports === "object" ) {
+
+  // Expose Hoodie as module.exports in loaders that implement the Node
+  // module pattern (including browserify). Do not create the global, since
+  // the user will be storing it themselves locally, and globals are frowned
+  // upon in the Node module world.
+  module.exports = Hoodie;
+} else {
+
+  // Register as a named AMD module, since Hoodie can be concatenated with other
+  // files that may use define, but not via a proper concatenation script that
+  // understands anonymous AMD modules. A named AMD is safest and most robust
+  // way to register. Lowercase hoodie is used because AMD module names are
+  // derived from file names, and Hoodie is normally delivered in a lowercase
+  // file name. 
+  if ( typeof define === "function" && define.amd ) {
+    define( "hoodie", [], function () { return Hoodie; } );
+  }
+}
