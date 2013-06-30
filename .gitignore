@@ -1,4 +1,3 @@
 .DS_Store
 TODO.md
-node_modules/
-ref
+node_modules
