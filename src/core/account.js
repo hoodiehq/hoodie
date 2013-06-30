@@ -3,8 +3,6 @@
 
 // tell something smart in here.
 //
-//
-
 Hoodie.Account = (function () {
 
   'use strict';
@@ -39,15 +37,20 @@ Hoodie.Account = (function () {
     this._requests = {};
 
     // init account
-    // we've put this into its own method so it's easier to
-    // inherit from Hoodie.Account with custom logic
     this.init();
   }
 
   // Properties
   // ------------
+
+  // 
   Account.prototype.username = undefined;
 
+  // init
+  // ------
+
+  // we've put this into its own method so it's easier to
+  // inherit from Hoodie.Account and add custom logic
   Account.prototype.init = function() {
     // handle session
     this.username = this.hoodie.config.get('_account.username');
@@ -200,7 +203,8 @@ Hoodie.Account = (function () {
 
   // hasAccount
   // ---------------------
-  //
+
+  // 
   Account.prototype.hasAccount = function() {
     return !!this.username;
   };
@@ -208,7 +212,8 @@ Hoodie.Account = (function () {
 
   // hasAnonymousAccount
   // ---------------------
-  //
+
+  // 
   Account.prototype.hasAnonymousAccount = function() {
     return this.getAnonymousPassword() !== undefined;
   };
@@ -216,6 +221,7 @@ Hoodie.Account = (function () {
 
   // set / get / remove anonymous password
   // ---------------------------------------
+
   //
   Account.prototype._anonymousPasswordKey = '_account.anonymousPassword';
 
@@ -275,7 +281,7 @@ Hoodie.Account = (function () {
 
   // sign out
   // ---------
-  //
+
   // uses standard CouchDB API to invalidate a user session (DELETE /_session)
   //
   Account.prototype.signOut = function(options) {
@@ -297,33 +303,33 @@ Hoodie.Account = (function () {
 
   // On
   // ---
-  //
+
   // shortcut for `hoodie.on`
   //
-  Account.prototype.on = function(event, cb) {
-    event = event.replace(/(^| )([^ ]+)/g, "$1account:$2");
-    return this.hoodie.on(event, cb);
+  Account.prototype.on = function(eventName, cb) {
+    eventName = eventName.replace(/(^| )([^ ]+)/g, "$1account:$2");
+    return this.hoodie.on(eventName, cb);
   };
 
 
   // Trigger
   // ---
-  //
+
   // shortcut for `hoodie.trigger`
   //
   Account.prototype.trigger = function() {
-    var event, parameters;
+    var eventName, parameters;
 
-    event = arguments[0],
+    eventName = arguments[0],
     parameters = 2 <= arguments.length ? Array.prototype.slice.call(arguments, 1) : [];
 
-    this.hoodie.trigger.apply(this.hoodie, ["account:" + event].concat(Array.prototype.slice.call(parameters)));
+    this.hoodie.trigger.apply(this.hoodie, ["account:" + eventName].concat(Array.prototype.slice.call(parameters)));
   };
 
 
   // Request
   // ---
-  //
+
   // shortcut for `hoodie.request`
   //
   Account.prototype.request = function(type, path, options) {
@@ -334,7 +340,7 @@ Hoodie.Account = (function () {
 
   // db
   // ----
-  //
+
   // return name of db
   //
   Account.prototype.db = function() {
@@ -344,7 +350,7 @@ Hoodie.Account = (function () {
 
   // fetch
   // -------
-  //
+
   // fetches _users doc from CouchDB and caches it in _doc
   //
   Account.prototype.fetch = function(username) {
@@ -376,7 +382,7 @@ Hoodie.Account = (function () {
 
   // change password
   // -----------------
-  //
+
   // Note: the hoodie API requires the currentPassword for security reasons,
   // but couchDb doesn't require it for a password change, so it's ignored
   // in this implementation of the hoodie API.
@@ -401,7 +407,7 @@ Hoodie.Account = (function () {
 
   // reset password
   // ----------------
-  //
+
   // This is kind of a hack. We need to create an object anonymously
   // that is not exposed to others. The only CouchDB API othering such
   // functionality is the _users database.
@@ -450,7 +456,7 @@ Hoodie.Account = (function () {
 
   // change username
   // -----------------
-  //
+
   // Note: the hoodie API requires the current password for security reasons,
   // but technically we cannot (yet) prevent the user to change the username
   // without knowing the current password, so it's not impulemented in the current
@@ -466,7 +472,7 @@ Hoodie.Account = (function () {
 
   // destroy
   // ---------
-  //
+
   // destroys a user's account
   //
   Account.prototype.destroy = function() {
@@ -483,7 +489,7 @@ Hoodie.Account = (function () {
 
   // PRIVATE
   // ---------
-  //
+
   // default couchDB user doc prefix
   //
   Account.prototype._prefix = 'org.couchdb.user';
@@ -608,6 +614,10 @@ Hoodie.Account = (function () {
   Account.prototype._delayedSignIn = function(username, password, options, defer) {
     var self = this;
 
+    // _delayedSignIn might call itself, when the user account
+    // is pending. In this case it passes the original defer,
+    // to keep a reference and finally resolve / reject it 
+    // at some point
     if (!defer) {
       defer = this.hoodie.defer();
     }
@@ -615,12 +625,13 @@ Hoodie.Account = (function () {
     window.setTimeout(function() {
       var promise = self._sendSignInRequest(username, password);
       promise.done(defer.resolve);
-
-      return promise.fail(function(error) {
+      promise.fail(function(error) {
         if (error.error === 'unconfirmed') {
-          return self._delayedSignIn(username, password, options, defer);
+
+          // It might take a bit until the account has been confirmed
+          self._delayedSignIn(username, password, options, defer);
         } else {
-          return defer.reject.apply(defer, arguments);
+          defer.reject.apply(defer, arguments);
         }
       });
 
