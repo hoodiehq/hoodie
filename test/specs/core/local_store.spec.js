@@ -1242,7 +1242,7 @@ describe("Hoodie.LocalStore", function() {
   });
 
   // 
-  describe("#isDirty(type, id)", function() {
+  describe("#hasLocalChanges(type, id)", function() {
     _when("no arguments passed", function() {
       it("returns true when there are dirty documents", function() {
         this.store._dirty = {

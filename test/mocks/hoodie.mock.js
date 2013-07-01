@@ -67,7 +67,7 @@ Mocks.Hoodie = function () {
         return [];
       },
       changedObjects: function () { return []; },
-      isDirty: function () {},
+      hasLocalChanges: function () {},
       decoratePromises: function () {},
       db: {
         getItem: function () {},

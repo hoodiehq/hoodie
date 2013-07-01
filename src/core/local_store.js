@@ -601,7 +601,7 @@ Hoodie.LocalStore = (function (_super) {
   //
   // Otherwise it returns `true` or `false` for the passed object. An object is dirty
   // if it has no `_syncedAt` attribute or if `updatedAt` is more recent than `_syncedAt`
-  LocalStore.prototype.isDirty = function(type, id) {
+  LocalStore.prototype.hasLocalChanges = function(type, id) {
     if (!type) {
       return !$.isEmptyObject(this._dirty);
     }
@@ -845,9 +845,9 @@ Hoodie.LocalStore = (function (_super) {
     return new RegExp(/^[a-z$][a-z0-9]+\/[a-z0-9]+$/).test(key);
   };
 
-  // `_isDirty` returns true if there is a local change that
+  // `_hasLocalChanges` returns true if there is a local change that
   // has not been sync'd yet.
-  LocalStore.prototype._isDirty = function(object) {
+  LocalStore.prototype._hasLocalChanges = function(object) {
     if (!object.updatedAt) {
       return false;
     }
