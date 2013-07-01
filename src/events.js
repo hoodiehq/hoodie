@@ -1,3 +1,17 @@
+//
+// Events
+// ------
+//
+// extend any Class with support for
+//
+// * `object.bind('event', cb)`
+// * `object.unbind('event', cb)`
+// * `object.trigger('event', args...)`
+// * `object.one('ev', cb)`
+//
+// based on [Events implementations from Spine](https://github.com/maccman/spine/blob/master/src/spine.coffee#L1)
+//
+
 window.Events = window.Events || (function() {
 
   'use strict';
