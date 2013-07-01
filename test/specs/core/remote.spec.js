@@ -317,16 +317,16 @@ describe("Hoodie.Remote", function() {
   });
   describe("#connect()", function() {
     beforeEach(function() {
-      return spyOn(this.remote, "pull");
+      spyOn(this.remote, "bootstrap");
     });
     it("should set connected to true", function() {
       this.remote.connected = false;
       this.remote.connect();
-      return expect(this.remote.connected).toBe(true);
+      expect(this.remote.connected).toBe(true);
     });
-    return it("should pull", function() {
+    it("should bootstrap", function() {
       this.remote.connect();
-      return expect(this.remote.pull).wasCalled();
+      expect(this.remote.bootstrap).wasCalled();
     });
   });
   describe("#disconnect()", function() {
@@ -366,6 +366,34 @@ describe("Hoodie.Remote", function() {
       expect(this.remote._since).toBe(void 0);
       this.remote.setSinceNr(100);
       return expect(this.remote._since).toBe(100);
+    });
+  });
+  describe("#bootstrap()", function() {
+    beforeEach(function() {
+      this.bootstrapDefer = this.hoodie.defer();
+      spyOn(this.remote, "pull").andReturn( this.bootstrapDefer );
+      spyOn(this.remote, "trigger");
+    });
+    
+    it("should trigger bootstrap:start event", function() {
+      this.remote.bootstrap()
+      expect(this.remote.trigger).wasCalledWith('bootstrap:start');
+    });
+
+    it("should pull", function() {
+      this.remote.bootstrap()
+      expect(this.remote.pull).wasCalled();
+    });
+
+    _when("bootstrap succeeds", function() {
+      beforeEach(function() {
+        this.bootstrapDefer.resolve()
+      });
+
+      it("should trigger 'bootstrap:end' event", function() {
+        this.remote.bootstrap()
+        expect(this.remote.trigger).wasCalledWith('bootstrap:end');
+      });
     });
   });
   describe("#pull()", function() {
