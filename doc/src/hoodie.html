@@ -14,6 +14,7 @@ hoodie = new Hoodie
 
     <span class="k">this</span><span class="p">.</span><span class="nx">_handleCheckConnectionError</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">_handleCheckConnectionError</span><span class="p">.</span><span class="nx">bind</span><span class="p">(</span><span class="k">this</span><span class="p">);</span>
     <span class="k">this</span><span class="p">.</span><span class="nx">_handleCheckConnectionSuccess</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">_handleCheckConnectionSuccess</span><span class="p">.</span><span class="nx">bind</span><span class="p">(</span><span class="k">this</span><span class="p">);</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">_pipeRequestError</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">_pipeRequestError</span><span class="p">.</span><span class="nx">bind</span><span class="p">(</span><span class="k">this</span><span class="p">);</span>
     <span class="k">this</span><span class="p">.</span><span class="nx">rejectWith</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">rejectWith</span><span class="p">.</span><span class="nx">bind</span><span class="p">(</span><span class="k">this</span><span class="p">);</span>
     <span class="k">this</span><span class="p">.</span><span class="nx">resolveWith</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">resolveWith</span><span class="p">.</span><span class="nx">bind</span><span class="p">(</span><span class="k">this</span><span class="p">);</span>
     <span class="k">this</span><span class="p">.</span><span class="nx">reject</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">reject</span><span class="p">.</span><span class="nx">bind</span><span class="p">(</span><span class="k">this</span><span class="p">);</span>
@@ -45,7 +46,7 @@ hoodie = new Hoodie
       <span class="nx">dataType</span><span class="o">:</span> <span class="s1">&#39;json&#39;</span>
     <span class="p">};</span>
 
-    <span class="k">return</span> <span class="nx">$</span><span class="p">.</span><span class="nx">ajax</span><span class="p">(</span><span class="nx">$</span><span class="p">.</span><span class="nx">extend</span><span class="p">(</span><span class="nx">defaults</span><span class="p">,</span> <span class="nx">options</span><span class="p">));</span>
+    <span class="k">return</span> <span class="nx">$</span><span class="p">.</span><span class="nx">ajax</span><span class="p">(</span><span class="nx">$</span><span class="p">.</span><span class="nx">extend</span><span class="p">(</span><span class="nx">defaults</span><span class="p">,</span> <span class="nx">options</span><span class="p">)).</span><span class="nx">then</span><span class="p">(</span> <span class="kc">null</span><span class="p">,</span> <span class="k">this</span><span class="p">.</span><span class="nx">_pipeRequestError</span> <span class="p">);</span>
   <span class="p">};</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h2 id="check-connection">Check Connection</h2></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>the <code>checkConnection</code> method is used, well, to check if
 the hoodie backend is reachable at <code>baseUrl</code> or not.
 Check Connection is automatically called on startup
@@ -191,6 +192,20 @@ hoodie.magic2.doSomethingElse()
     <span class="p">}</span>
 
     <span class="k">return</span> <span class="k">this</span><span class="p">.</span><span class="nx">defer</span><span class="p">().</span><span class="nx">reject</span><span class="p">();</span>
+  <span class="p">};</span>
+
+  <span class="nx">Hoodie</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">_pipeRequestError</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">xhr</span><span class="p">)</span> <span class="p">{</span>
+    <span class="kd">var</span> <span class="nx">error</span><span class="p">;</span>
+
+    <span class="k">try</span> <span class="p">{</span>
+      <span class="nx">error</span> <span class="o">=</span> <span class="nx">JSON</span><span class="p">.</span><span class="nx">parse</span><span class="p">(</span><span class="nx">xhr</span><span class="p">.</span><span class="nx">responseText</span><span class="p">);</span>
+    <span class="p">}</span> <span class="k">catch</span> <span class="p">(</span><span class="nx">_error</span><span class="p">)</span> <span class="p">{</span>
+      <span class="nx">error</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="nx">error</span><span class="o">:</span> <span class="nx">xhr</span><span class="p">.</span><span class="nx">responseText</span> <span class="o">||</span> <span class="p">(</span><span class="s2">&quot;Cannot connect to backend at &quot;</span> <span class="o">+</span> <span class="k">this</span><span class="p">.</span><span class="nx">baseUrl</span><span class="p">)</span>
+      <span class="p">};</span>
+    <span class="p">}</span>
+
+    <span class="k">return</span> <span class="k">this</span><span class="p">.</span><span class="nx">rejectWith</span><span class="p">(</span><span class="nx">error</span><span class="p">).</span><span class="nx">promise</span><span class="p">();</span>
   <span class="p">};</span>
 
   <span class="k">return</span> <span class="nx">Hoodie</span><span class="p">;</span>

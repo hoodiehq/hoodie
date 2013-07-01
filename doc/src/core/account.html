@@ -710,7 +710,7 @@ the same.</p></div></div><div class="code"><div class="wrapper">  <span class="n
       <span class="p">}</span>
     <span class="p">};</span>
 
-    <span class="k">this</span><span class="p">.</span><span class="nx">_withPreviousRequestsAborted</span><span class="p">(</span><span class="s1">&#39;signIn&#39;</span><span class="p">,</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="k">this</span><span class="p">.</span><span class="nx">_withPreviousRequestsAborted</span><span class="p">(</span><span class="s1">&#39;signIn&#39;</span><span class="p">,</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
       <span class="kd">var</span> <span class="nx">promise</span> <span class="o">=</span> <span class="nx">self</span><span class="p">.</span><span class="nx">request</span><span class="p">(</span><span class="s1">&#39;POST&#39;</span><span class="p">,</span> <span class="s1">&#39;/_session&#39;</span><span class="p">,</span> <span class="nx">requestOptions</span><span class="p">);</span>
 
       <span class="k">return</span> <span class="nx">promise</span><span class="p">.</span><span class="nx">pipe</span><span class="p">(</span>

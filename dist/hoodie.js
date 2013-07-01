@@ -3528,7 +3528,7 @@ Hoodie.LocalStore = (function (_super) {
     // future quick access
     this._cached[key] = $.extend(true, {}, object);
 
-    if (this._isDirty(object)) {
+    if (this._hasLocalChanges(object)) {
       this.markAsChanged(type, id, this._cached[key], options);
     } else {
       this.clearChanged(type, id);
@@ -3645,11 +3645,11 @@ Hoodie.LocalStore = (function (_super) {
   //
   // Otherwise it returns `true` or `false` for the passed object. An object is dirty
   // if it has no `_syncedAt` attribute or if `updatedAt` is more recent than `_syncedAt`
-  LocalStore.prototype.isDirty = function(type, id) {
+  LocalStore.prototype.hasLocalChanges = function(type, id) {
     if (!type) {
       return !$.isEmptyObject(this._dirty);
     }
-    return this._isDirty(this.cache(type, id));
+    return this._hasLocalChanges(this.cache(type, id));
   };
 
 
@@ -3889,9 +3889,9 @@ Hoodie.LocalStore = (function (_super) {
     return new RegExp(/^[a-z$][a-z0-9]+\/[a-z0-9]+$/).test(key);
   };
 
-  // `_isDirty` returns true if there is a local change that
+  // `_hasLocalChanges` returns true if there is a local change that
   // has not been sync'd yet.
-  LocalStore.prototype._isDirty = function(object) {
+  LocalStore.prototype._hasLocalChanges = function(object) {
     if (!object.updatedAt) {
       return false;
     }
