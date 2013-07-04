@@ -89,7 +89,6 @@ window.Hoodie = window.Hoodie || (function(_super) {
     // does not have the `abort` method any more, maybe others
     // as well. See also http://bugs.jquery.com/ticket/14104
     requestPromise = $.ajax($.extend(defaults, options));
-    console.log('requestPromise.abort', requestPromise.abort)
     pipedPromise = requestPromise.then( null, this._pipeRequestError);
     pipedPromise.abort = requestPromise.abort;
 

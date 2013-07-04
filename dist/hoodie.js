@@ -210,6 +210,8 @@ window.Hoodie = window.Hoodie || (function(_super) {
   //     promise = hoodie.request('GET', '/user_database/doc_id')
   //
   Hoodie.prototype.request = function(type, url, options) {
+    var defaults, requestPromise, pipedPromise;
+
     options = options || {};
 
     // if a relative path passed, prefix with @baseUrl
@@ -217,7 +219,7 @@ window.Hoodie = window.Hoodie || (function(_super) {
       url = "" + this.baseUrl + url;
     }
 
-    var defaults = {
+    defaults = {
       type: type,
       url: url,
       xhrFields: {
@@ -227,7 +229,17 @@ window.Hoodie = window.Hoodie || (function(_super) {
       dataType: 'json'
     };
 
-    return $.ajax($.extend(defaults, options)).then( null, this._pipeRequestError );
+    // we are piping the result of the request to return a nicer
+    // error if the request cannot reach the server at all.
+    // We can't return the promise of $.ajax directly because of
+    // the piping, as for whatever reason the returned promise 
+    // does not have the `abort` method any more, maybe others
+    // as well. See also http://bugs.jquery.com/ticket/14104
+    requestPromise = $.ajax($.extend(defaults, options));
+    pipedPromise = requestPromise.then( null, this._pipeRequestError);
+    pipedPromise.abort = requestPromise.abort;
+
+    return pipedPromise;
   };
 
 
