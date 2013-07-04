@@ -5,8 +5,9 @@ describe("Hoodie", function() {
   beforeEach(function() {
     this.hoodie = new Hoodie('http://couch.example.com');
     this.ajaxDefer = $.Deferred();
-
-    spyOn($, "ajax").andReturn(this.ajaxDefer.promise());
+    var ajaxPromise = this.ajaxDefer.promise()
+    ajaxPromise.abort = function() {}
+    spyOn($, "ajax").andReturn(ajaxPromise);
 
     spyOn(window, "setTimeout").andCallFake(function(cb) {
       return cb;
@@ -56,6 +57,12 @@ describe("Hoodie", function() {
 
   describe("#request(type, path, options)", function() {
 
+    // see http://bugs.jquery.com/ticket/14104
+    it("should return a jQuery.ajax compatible promise", function() {
+      var promise = this.hoodie.request('GET', '/');
+      expect(promise).toBePromise();
+      expect(promise.abort).toBeDefined();
+    });
     _when("request('GET', '/')", function() {
       beforeEach(function() {
         var args;
@@ -74,9 +81,6 @@ describe("Hoodie", function() {
       });
       it("should set `crossDomain: true`", function() {
         expect(this.args.crossDomain).toBe(true);
-      });
-      it("should return a promise", function() {
-        expect(this.hoodie.request('GET', '/')).toBePromise();
       });
     });
 

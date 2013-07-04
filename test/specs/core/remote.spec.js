@@ -75,8 +75,10 @@ describe("Hoodie.Remote", function() {
       spyOn(this.hoodie, "request");
     });
     it("should proxy to hoodie.request", function() {
-      this.remote.request("GET", "/something");
+      this.hoodie.request.andReturn('funk');
+      returnedValue = this.remote.request("GET", "/something");
       expect(this.hoodie.request).wasCalled();
+      expect(returnedValue).toEqual('funk');
     });
     it("should set options.contentType to 'application/json'", function() {
       this.remote.request("GET", "/something");
@@ -330,6 +332,11 @@ describe("Hoodie.Remote", function() {
     });
   });
   describe("#disconnect()", function() {
+    it("should not fail when there are no running requests", function() {
+      this.remote._pullRequest = undefined
+      this.remote._pushRequest = undefined
+      expect( this.remote.disconnect ).not.toThrow()
+    });
     it("should abort the pull request", function() {
       this.remote._pullRequest = {
         abort: jasmine.createSpy('pull')
