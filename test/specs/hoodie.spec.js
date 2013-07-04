@@ -35,7 +35,7 @@ describe("Hoodie", function() {
       var hoodie;
       spyOn(Hoodie.prototype, "checkConnection");
       hoodie = new window.Hoodie();
-      return expect(Hoodie.prototype.checkConnection).wasCalled();
+      expect(Hoodie.prototype.checkConnection).wasCalled();
     });
 
     it("store has to be initialized before remote", function() {
@@ -47,10 +47,10 @@ describe("Hoodie", function() {
       });
       spyOn(Hoodie, "AccountRemote").andCallFake(function() {
         order.push('remote');
-        new Mocks.Hoodie().remote;
+        return new Mocks.Hoodie().remote;
       });
       hoodie = new window.Hoodie();
-      return expect(order.join(',')).toBe('store,remote');
+      expect(order.join(',')).toBe('store,remote');
     });
   });
 
@@ -90,9 +90,9 @@ describe("Hoodie", function() {
         });
         this.args = args = $.ajax.mostRecentCall.args[0];
       });
-      return it("should send a POST request to http://couch.example.com/test", function() {
+      it("should send a POST request to http://couch.example.com/test", function() {
         expect(this.args.type).toBe('POST');
-        return expect(this.args.url).toBe('http://couch.example.com/test');
+        expect(this.args.url).toBe('http://couch.example.com/test');
       });
     });
 
@@ -116,7 +116,7 @@ describe("Hoodie", function() {
         });
       });
       xit("should return a rejected promis with Cannot reach backend error", function() {
-        return expect(this.hoodie.request('GET', '/')).toBeRejectedWith({
+        expect(this.hoodie.request('GET', '/')).toBeRejectedWith({
           error: 'Cannot connect to backend at http://couch.example.com'
         });
       });
@@ -130,16 +130,16 @@ describe("Hoodie", function() {
       this.hoodie._checkConnectionRequest = null;
       spyOn(this.hoodie, "request").andReturn(this.requestDefer.promise());
       spyOn(this.hoodie, "trigger");
-      return window.setTimeout.andReturn(null);
+      window.setTimeout.andReturn(null);
     });
     it("should send GET / request", function() {
       this.hoodie.checkConnection();
-      return expect(this.hoodie.request).wasCalledWith('GET', '/');
+      expect(this.hoodie.request).wasCalledWith('GET', '/');
     });
     it("should only send one request at a time", function() {
       this.hoodie.checkConnection();
       this.hoodie.checkConnection();
-      return expect(this.hoodie.request.callCount).toBe(1);
+      expect(this.hoodie.request.callCount).toBe(1);
     });
     _when("hoodie is online", function() {
       beforeEach(function() {
@@ -151,32 +151,32 @@ describe("Hoodie", function() {
             "couchdb": "Welcome",
             "version": "1.2.1"
           });
-          return this.hoodie.checkConnection();
+          this.hoodie.checkConnection();
         });
         it("should check again in 30 seconds", function() {
-          return expect(window.setTimeout).wasCalledWith(this.hoodie.checkConnection, 30000);
+          expect(window.setTimeout).wasCalledWith(this.hoodie.checkConnection, 30000);
         });
-        return it("should not trigger `reconnected` event", function() {
-          return expect(this.hoodie.trigger).wasNotCalledWith('reconnected');
+        it("should not trigger `reconnected` event", function() {
+          expect(this.hoodie.trigger).wasNotCalledWith('reconnected');
         });
       });
-      return _and("request fails", function() {
+      _and("request fails", function() {
         beforeEach(function() {
           this.requestDefer.reject({
             "status": 0,
             "statusText": "Error"
           });
-          return this.hoodie.checkConnection();
+          this.hoodie.checkConnection();
         });
         it("should check again in 3 seconds", function() {
-          return expect(window.setTimeout).wasCalledWith(this.hoodie.checkConnection, 3000);
+          expect(window.setTimeout).wasCalledWith(this.hoodie.checkConnection, 3000);
         });
-        return it("should trigger `disconnected` event", function() {
-          return expect(this.hoodie.trigger).wasCalledWith('disconnected');
+        it("should trigger `disconnected` event", function() {
+          expect(this.hoodie.trigger).wasCalledWith('disconnected');
         });
       });
     });
-    return _when("hoodie is offline", function() {
+    _when("hoodie is offline", function() {
       beforeEach(function() {
         this.hoodie.online = false;
       });
@@ -186,40 +186,40 @@ describe("Hoodie", function() {
             "couchdb": "Welcome",
             "version": "1.2.1"
           });
-          return this.hoodie.checkConnection();
+          this.hoodie.checkConnection();
         });
         it("should check again in 30 seconds", function() {
-          return expect(window.setTimeout).wasCalledWith(this.hoodie.checkConnection, 30000);
+          expect(window.setTimeout).wasCalledWith(this.hoodie.checkConnection, 30000);
         });
-        return it("should trigger `reconnected` event", function() {
-          return expect(this.hoodie.trigger).wasCalledWith('reconnected');
+        it("should trigger `reconnected` event", function() {
+          expect(this.hoodie.trigger).wasCalledWith('reconnected');
         });
       });
-      return _and("request fails", function() {
+      _and("request fails", function() {
         beforeEach(function() {
           this.requestDefer.reject({
             "status": 0,
             "statusText": "Error"
           });
-          return this.hoodie.checkConnection();
+          this.hoodie.checkConnection();
         });
         it("should check again in 3 seconds", function() {
-          return expect(window.setTimeout).wasCalledWith(this.hoodie.checkConnection, 3000);
+          expect(window.setTimeout).wasCalledWith(this.hoodie.checkConnection, 3000);
         });
-        return it("should not trigger `disconnected` event", function() {
-          return expect(this.hoodie.trigger).wasNotCalledWith('disconnected');
+        it("should not trigger `disconnected` event", function() {
+          expect(this.hoodie.trigger).wasNotCalledWith('disconnected');
         });
       });
     });
   });
 
   describe("#open(store, options)", function() {
-    return it("should instantiate a Remote instance", function() {
+    it("should instantiate a Remote instance", function() {
       spyOn(Hoodie, "Remote");
       this.hoodie.open("store_name", {
         option: "value"
       });
-      return expect(Hoodie.Remote).wasCalledWith(this.hoodie, {
+      expect(Hoodie.Remote).wasCalledWith(this.hoodie, {
         name: "store_name",
         option: "value"
       });
@@ -294,12 +294,12 @@ describe("Hoodie", function() {
     it("wraps passad arguments into a promise and returns it", function() {
       var promise;
       promise = this.hoodie.rejectWith('funky', 'fresh');
-      return expect(promise).toBeRejectedWith('funky', 'fresh');
+      expect(promise).toBeRejectedWith('funky', 'fresh');
     });
-    return it("should be applyable", function() {
+    it("should be applyable", function() {
       var promise;
       promise = this.hoodie.resolveWith(1, 2).then(this.hoodie.rejectWith);
-      return expect(promise).toBeRejectedWith(1, 2);
+      expect(promise).toBeRejectedWith(1, 2);
     });
 
   });
@@ -309,7 +309,7 @@ describe("Hoodie", function() {
       spyOn(this.hoodie, "trigger");
     });
 
-    return it("should trigger `dispose` event", function() {
+    it("should trigger `dispose` event", function() {
       this.hoodie.dispose();
       expect(this.hoodie.trigger).wasCalledWith('dispose');
     });
