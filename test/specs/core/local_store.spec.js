@@ -546,8 +546,8 @@ describe("Hoodie.LocalStore", function() {
         expect(this.store.isBootstrapping()).toEqual(true);
       });
 
-      it(" bootstrapping is finished", function() {
-        var promise = this.should wait untilstore.save('task', '123', { title: 'do it!' })
+      it("should wait until bootstrapping is finished", function() {
+        var promise = this.store.save('task', '123', { title: 'do it!' })
         promise.fail( function() { console.log(arguments) });
         expect(promise.state()).toEqual('pending');
         this.hoodie.trigger('remote:bootstrap:end');
