@@ -7,7 +7,6 @@ $.ajax = function() {
   return promise;
 }
 
-
 _when = function(description, specs) {
   return describe("when " + description, specs);
 };

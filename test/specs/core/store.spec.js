@@ -27,6 +27,15 @@ describe("Hoodie.Store", function() {
           expect(promise).toBeRejected();
         });
       });
+      _when("array passed", function() {
+        it("should be rejected", function() {
+          var promise;
+          promise = this.store.save('document', 'abc4567', [1,2,3]);
+          expect(promise.state()).toBe('rejected');
+          // debugger
+          expect(promise).toBeRejected();
+        });
+      });
     });
     it("should not allow type containing /", function() {
       var invalid, key, promise, valid, _i, _j, _len, _len1, _results;
