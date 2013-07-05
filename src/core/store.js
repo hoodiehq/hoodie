@@ -43,8 +43,8 @@ Hoodie.Store = (function() {
 
     defer = this.hoodie.defer();
 
-    if (typeof object !== 'object') {
-      defer.reject(Hoodie.Errors.INVALID_ARGUMENTS("object is " + (typeof object)));
+    if (typeof object !== 'object' || Array.isArray(object)) {
+      defer.reject(Hoodie.Errors.INVALID_ARGUMENTS("invalid object"));
       return defer.promise();
     }
 
