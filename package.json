@@ -9,7 +9,7 @@
         "http-proxy": "*",
         "connect": "2.7.4",
         "corsproxy": "git://github.com/gr2m/CORS-Proxy.git",
-        "multicouch": ">=0.2.8",
+        "multicouch": ">=0.4.1",
         "hoodie-pocket": "git://github.com/hoodiehq/pocket.git",
         "local-tld-lib": "*",
         "underscore": "1.4.4",
