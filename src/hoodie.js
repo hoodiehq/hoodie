@@ -327,7 +327,7 @@ window.Hoodie = window.Hoodie || (function(_super) {
       error = JSON.parse(xhr.responseText);
     } catch (_error) {
       error = {
-        error: xhr.responseText || ("Cannot connect to backend at " + this.baseUrl)
+        error: xhr.responseText || ("Cannot connect to Hoodie server at " + this.baseUrl)
       };
     }
 

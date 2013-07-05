@@ -119,9 +119,9 @@ describe("Hoodie", function() {
           }
         });
       });
-      xit("should return a rejected promis with Cannot reach backend error", function() {
+      it("should return a rejected promis with Cannot reach backend error", function() {
         expect(this.hoodie.request('GET', '/')).toBeRejectedWith({
-          error: 'Cannot connect to backend at http://couch.example.com'
+          error: 'Cannot connect to Hoodie server at http://couch.example.com'
         });
       });
     });
