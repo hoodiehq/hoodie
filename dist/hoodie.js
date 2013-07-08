@@ -474,7 +474,7 @@ window.Hoodie = window.Hoodie || (function(_super) {
       error = JSON.parse(xhr.responseText);
     } catch (_error) {
       error = {
-        error: xhr.responseText || ("Cannot connect to backend at " + this.baseUrl)
+        error: xhr.responseText || ("Cannot connect to Hoodie server at " + this.baseUrl)
       };
     }
 
@@ -1790,8 +1790,8 @@ Hoodie.Store = (function() {
 
     defer = this.hoodie.defer();
 
-    if (typeof object !== 'object') {
-      defer.reject(Hoodie.Errors.INVALID_ARGUMENTS("object is " + (typeof object)));
+    if (typeof object !== 'object' || Array.isArray(object)) {
+      defer.reject(Hoodie.Errors.INVALID_ARGUMENTS("invalid object"));
       return defer.promise();
     }
 
@@ -2096,7 +2096,7 @@ Hoodie.Store = (function() {
 // * findAll(type )
 // * add(type, object)
 // * save(type, id, object)
-// * update(new_properties )
+// * update(type, id, new_properties )
 // * updateAll( type, new_properties)
 // * remove(type, id)
 // * removeAll(type)
@@ -2996,7 +2996,7 @@ Hoodie.AccountRemote = (function(_super) {
       objects = this.hoodie.store.changedObjects();
     }
 
-    var promise = AccountRemote.__super__.push.apply(this, objects);
+    var promise = AccountRemote.__super__.push.call(this, objects);
     promise.fail(this.hoodie.checkConnection);
 
     return promise;

@@ -417,7 +417,7 @@ describe("Hoodie.AccountRemote", function() {
         return it("should push changed documents from store", function() {
           spyOn(this.hoodie.store, "changedObjects").andReturn(['changedDoc']);
           this.remote.push();
-          return expect(Hoodie.Remote.prototype.push).wasCalledWith('changedDoc');
+          return expect(Hoodie.Remote.prototype.push).wasCalledWith(['changedDoc']);
         });
       });
       return _and("push fails", function() {

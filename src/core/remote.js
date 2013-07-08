@@ -12,7 +12,7 @@
 // * findAll(type )
 // * add(type, object)
 // * save(type, id, object)
-// * update(new_properties )
+// * update(type, id, new_properties )
 // * updateAll( type, new_properties)
 // * remove(type, id)
 // * removeAll(type)
