@@ -698,7 +698,10 @@ describe("Hoodie.Remote", function() {
             id: '3'
           }
         ];
-        this.remote.push(this.todoObjects);
+        this.promise = this.remote.push(this.todoObjects);
+      });
+      it("should return a promise", function() {
+        expect(this.promise).toBePromise()
       });
       it("should POST the passed objects", function() {
         var data;
