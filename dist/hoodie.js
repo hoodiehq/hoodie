@@ -1399,6 +1399,9 @@ Hoodie.Account = (function () {
   //
   Account.prototype._cleanup = function(options) {
     options = options || {};
+
+    // hoodie.store is listening on this one
+    this.trigger('cleanup');
     this._authenticated = options.authenticated;
     this.hoodie.config.clear();
     this._setUsername(options.username);

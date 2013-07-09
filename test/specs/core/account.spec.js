@@ -1300,6 +1300,9 @@ describe("Hoodie.Account", function () {
           it("should set config._account.ownerHash to new @ownerHash", function () {
             expect(this.hoodie.config.set).wasCalledWith('_account.ownerHash', 'newHash');
           });
+          it("should trigger clenaup event", function() {
+            expect(this.hoodie.trigger).wasCalledWith('account:cleanup');
+          });
         });
       });
       _and("fetch fails with not_found", function () {
