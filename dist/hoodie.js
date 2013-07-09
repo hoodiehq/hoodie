@@ -2530,6 +2530,8 @@ Hoodie.Remote = (function(_super) {
         new_edits: false
       }
     });
+
+    return this._pushRequest;
   };
 
   // sync changes
