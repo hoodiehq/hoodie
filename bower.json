@@ -1,6 +1,6 @@
 {
   "name"        : "hoodie",
-  "version"     : "0.2.2",
+  "version"     : "0.2.3",
   "main"        : ["./dist/hoodie.js"],
   "dependencies": {
     "jquery": "~1.9.1"
