@@ -22,8 +22,6 @@ window.Hoodie = window.Hoodie || (function(_super) {
   function Hoodie(baseUrl) {
     this.baseUrl = baseUrl;
 
-    this._handleCheckConnectionError = this._handleCheckConnectionError.bind(this);
-    this._handleCheckConnectionSuccess = this._handleCheckConnectionSuccess.bind(this);
     this._pipeRequestError = this._pipeRequestError.bind(this);
     this.rejectWith = this.rejectWith.bind(this);
     this.resolveWith = this.resolveWith.bind(this);
@@ -124,8 +122,8 @@ window.Hoodie = window.Hoodie || (function(_super) {
     }
 
     this._checkConnectionRequest = this.request('GET', '/').pipe(
-      this._handleCheckConnectionSuccess,
-      this._handleCheckConnectionError
+      this._handleCheckConnectionSuccess.bind(this),
+      this._handleCheckConnectionError.bind(this)
     );
 
     return this._checkConnectionRequest;
