@@ -30,8 +30,8 @@
     "grunt-contrib-watch": "~0.4.4",
     "grunt-contrib-concat": "~0.3.0",
     "grunt-groc": "~0.3.0",
-    "testem": "~0.3.17",
-    "grunt-shell": "~0.3.0"
+    "grunt-shell": "~0.3.0",
+    "karma": "~0.8.6"
   },
   "scripts": {
     "test": "grunt test --verbose",

@@ -70,7 +70,7 @@ module.exports = function(grunt) {
 
     shell: {
       test: {
-        command: 'node node_modules/testem/testem.js ci',
+        command: 'node node_modules/karma/bin/karma start',
         options: {
           stdout: true,
           stderr: true
