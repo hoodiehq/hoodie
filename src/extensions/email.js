@@ -6,10 +6,12 @@
 
 Hoodie.extend('email', function(hoodie) {
 
+  'use strict';
+
   // this is the function that gets
   // executed on `hoodie.email( options )`
-  function sendEmail(options) {}
-    var defer, handleSuccess;
+  var sendEmail = function sendEmail(options) {
+    var defer;
 
     // if user has no account, sign up anonymously,
     // so that tasks get replicated to the Couch.
@@ -27,7 +29,7 @@ Hoodie.extend('email', function(hoodie) {
     // add the $email task object to the store. If there is an error,
     // reject right away. If not, wait for updates coming from remote.
     hoodie.store.add('$email', options).then(handleEmailTaskCreated(defer), defer.reject);
-    
+
     return defer.promise();
   };
 
@@ -35,10 +37,10 @@ Hoodie.extend('email', function(hoodie) {
   // successfully in the local store. We then wait for updates
   // coming from remote
   // 
-  handleEmailTaskCreated = function(defer) {
+  var handleEmailTaskCreated = function handleEmailTaskCreated(defer) {
     return function(email) {
       hoodie.remote.on("change:$email:" + email.id, handleEmailTaskChange(defer) );
-    };  
+    };
   };
 
 
@@ -49,7 +51,7 @@ Hoodie.extend('email', function(hoodie) {
   // 
   // When an email was sent, the `sentAt` property gets set (and the object gets removed).
   // When an error occurs, the message gets set in the `$error` property.
-  handleEmailTaskChange = function(defer) {
+  var handleEmailTaskChange = function handleEmailTaskChange(defer) {
     return function(event, email) {
 
       if (email.sentAt) {
@@ -61,6 +63,6 @@ Hoodie.extend('email', function(hoodie) {
       }
     };
   };
-  
-  return sendEmail
+
+  return sendEmail;
 });
