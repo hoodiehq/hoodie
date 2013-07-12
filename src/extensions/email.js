@@ -3,90 +3,64 @@
 
 // Sending emails. Not unicorns
 // 
-Hoodie.Email = (function () {
 
-  'use strict';
+Hoodie.extend('email', function(hoodie) {
 
-  // Constructor
-  // -------------
+  // this is the function that gets
+  // executed on `hoodie.email( options )`
+  function sendEmail(options) {}
+    var defer, handleSuccess;
 
-  // 
-  function Email(hoodie) {
-
-    // TODO
-    // let's subscribe to general `_email` changes and provide
-    // an `on` interface, so devs can listen to events like:
-    // 
-    // * hoodie.email.on 'sent',  -> ...
-    // * hoodie.email.on 'error', -> ...
-    // 
-    this.hoodie = hoodie;
-    this._handleEmailUpdate = this._handleEmailUpdate;
-  }
-
-
-  // send
-  // -------------
-
-  // sends an email and returns a promise
-  // 
-  Email.prototype.send = function (emailAttributes) {
-    var attributes, defer, self = this;
-
-    if (emailAttributes === null) {
-      emailAttributes = {};
+    // if user has no account, sign up anonymously,
+    // so that tasks get replicated to the Couch.
+    if (!hoodie.account.hasAccount()) {
+      hoodie.account.anonymousSignUp();
     }
 
-    defer = this.hoodie.defer();
-    attributes = $.extend({}, emailAttributes);
+    // we need a custom defer, as the returned promise shall not
+    // be resolved before the actual email was sent. Technically,
+    // the confirmation that an email was sent is when the email
+    // task object has been removed remotely.
+    // 
+    defer = hoodie.defer();
 
-    if (!this._isValidEmail(emailAttributes.to)) {
-      attributes.error = "Invalid email address (" + (attributes.to || 'empty') + ")";
-      return defer.reject(attributes).promise();
-    }
-
-    this.hoodie.store.add('$email', attributes).then(function (obj) {
-      return self._handleEmailUpdate(defer, obj);
-    });
-
+    // add the $email task object to the store. If there is an error,
+    // reject right away. If not, wait for updates coming from remote.
+    hoodie.store.add('$email', options).then(handleEmailTaskCreated(defer), defer.reject);
+    
     return defer.promise();
   };
 
-
-  // PRIVATE
-  // -------------
-
+  // this method gets executed, when the $email task was created
+  // successfully in the local store. We then wait for updates
+  // coming from remote
   // 
-  Email.prototype._isValidEmail = function (email) {
-    if (email === null) {
-      email = '';
-    }
-
-    return new RegExp(/@/).test(email);
+  handleEmailTaskCreated = function(defer) {
+    return function(email) {
+      hoodie.remote.on("change:$email:" + email.id, handleEmailTaskChange(defer) );
+    };  
   };
 
-  Email.prototype._handleEmailUpdate = function (defer, attributes) {
-    var self = this;
 
-    if (attributes === null) {
-      attributes = {};
-    }
+  // we listen to two events on $email tasks
+  // 
+  // 1. email was sent
+  // 2. there was an error
+  // 
+  // When an email was sent, the `sentAt` property gets set (and the object gets removed).
+  // When an error occurs, the message gets set in the `$error` property.
+  handleEmailTaskChange = function(defer) {
+    return function(event, email) {
 
-    if (attributes.error) {
-      return defer.reject(attributes);
-    } else if (attributes.deliveredAt) {
-      return defer.resolve(attributes);
-    } else {
-      return this.hoodie.remote.one("updated:$email:" + attributes.id, function (attributes) {
-        return self._handleEmailUpdate(defer, attributes);
-      });
-    }
+      if (email.sentAt) {
+        defer.resolve(email);
+      }
 
+      if (email.$error)  {
+        defer.reject(email);
+      }
+    };
   };
-
-  return Email;
-
-})();
-
-// extend Hoodie
-Hoodie.extend('email', Hoodie.Email);
+  
+  return sendEmail
+});
