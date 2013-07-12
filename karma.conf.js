@@ -29,7 +29,7 @@ files = [
   'src/extensions/share.js',
   'src/extensions/share_instance.js',
   'test/mocks/*.js',
-  'test/specs/*.spec.js'
+  'test/specs/**/*.spec.js'
 ];
 
 
