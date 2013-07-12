@@ -3,4 +3,10 @@ before_script:
 language: node_js
 node_js:
   - "0.10"
-
+  - "0.8"
+notifications:
+  irc:
+    channels:
+      - "irc.freenode.net#hoodie"
+    use_notice: true
+    skip_join: true
