@@ -1,6 +1,6 @@
 {
     "name": "hoodie-server",
-    "version": "0.6.1",
+    "version": "0.6.2",
     "repository": {
         "type": "git",
         "url": "https://github.com/hoodiehq/hoodie-app.git"
@@ -10,7 +10,7 @@
         "http-proxy": "*",
         "connect": "2.7.4",
         "corsproxy": "git://github.com/gr2m/CORS-Proxy.git",
-        "multicouch": ">=0.4.1",
+        "multicouch": ">=0.6.1",
         "hoodie-pocket": "git://github.com/hoodiehq/pocket.git",
         "hoodie-plugins-manager": "git://github.com/hoodiehq/hoodie-plugins-manager.git",
         "local-tld-lib": "*",
