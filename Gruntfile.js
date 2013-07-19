@@ -9,7 +9,7 @@ module.exports = function(grunt) {
     pkg: grunt.file.readJSON('package.json'),
 
     jshint: {
-      files: ['gruntfile.js', 'src/**/*.js'],
+      files: ['Gruntfile.js', 'src/**/*.js'],
       options: {
         jshintrc: '.jshintrc'
       }
@@ -17,7 +17,7 @@ module.exports = function(grunt) {
 
     watch: {
       // files: ['<%= jshint.files %>'],
-      files: ['gruntfile.js', 'src/**/*.js', 'test/specs/**/*.js'],
+      files: ['Gruntfile.js', 'src/**/*.js', 'test/specs/**/*.js'],
       tasks: ['jshint', 'shell:test']
     },
 
