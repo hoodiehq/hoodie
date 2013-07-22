@@ -17,7 +17,19 @@
             "email": "jeresig@gmail.com"
         }
     ],
+    "require": {
+        "robloach/component-installer": "*"
+    },
     "extra": {
-        "js": "jquery.js"
+        "component": {
+            "scripts": [
+                "jquery.js"
+            ],
+            "files": [
+                "jquery.min.js",
+                "jquery-migrate.js",
+                "jquery-migrate.min.js"
+            ]
+        }
     }
 }

@@ -1,9 +1,11 @@
 {
-  "name"        : "hoodie",
-  "version"     : "0.2.3",
-  "main"        : ["./dist/hoodie.js"],
+  "name": "hoodie",
+  "version": "0.2.3",
+  "main": [
+    "./dist/hoodie.js"
+  ],
   "dependencies": {
-    "jquery": "~1.9.1"
+    "jquery": "~1.10.2"
   },
   "ignore": [
     "test/",
