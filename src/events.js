@@ -125,11 +125,9 @@
 
     return {
       bind : bind,
-      on : bind,
       one : one,
       trigger : trigger,
-      unbind : unbind,
-      off : unbind
+      unbind : unbind
     };
   }
 

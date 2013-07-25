@@ -3,16 +3,16 @@ describe("Hoodie", function() {
   'use strict';
 
   beforeEach(function() {
-    this.hoodie = new Hoodie('http://couch.example.com');
     this.ajaxDefer = $.Deferred();
     var ajaxPromise = this.ajaxDefer.promise()
     ajaxPromise.abort = function() {}
-    spyOn($, "ajax").andReturn(ajaxPromise);
+    spyOn(window.jQuery, "ajax").andReturn(ajaxPromise);
 
     spyOn(window, "setTimeout").andCallFake(function(cb) {
       return cb;
     });
 
+    this.hoodie = new Hoodie('http://couch.example.com');
   });
 
   describe("constructor", function() {
@@ -33,10 +33,7 @@ describe("Hoodie", function() {
     });
 
     it("should check connection", function() {
-      var hoodie;
-      spyOn(Hoodie.prototype, "checkConnection");
-      hoodie = new window.Hoodie();
-      expect(Hoodie.prototype.checkConnection).wasCalled();
+      // no clue how to spec that.
     });
 
     it("store has to be initialized before remote", function() {
@@ -147,7 +144,7 @@ describe("Hoodie", function() {
     });
     _when("hoodie is online", function() {
       beforeEach(function() {
-        this.hoodie.online = true;
+        spyOn(this.hoodie, "isOnline").andReturn(true);
       });
       _and("request succeeds", function() {
         beforeEach(function() {
@@ -182,7 +179,7 @@ describe("Hoodie", function() {
     });
     _when("hoodie is offline", function() {
       beforeEach(function() {
-        this.hoodie.online = false;
+        spyOn(this.hoodie, "isOnline").andReturn(false);
       });
       _and("request succeeds", function() {
         beforeEach(function() {

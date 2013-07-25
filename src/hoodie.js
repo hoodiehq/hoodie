@@ -13,249 +13,346 @@
 
   // When initializing a hoodie instance, an optional URL
   // can be passed. That's the URL of a hoodie backend.
-  // If no URL passed it defaults to the current domain
-  // with an `api` subdomain.
+  // If no URL passed it defaults to the current domain.
   //
   //     // init a new hoodie instance
   //     hoodie = new Hoodie
   //
   function Hoodie(baseUrl) {
-    this.baseUrl = baseUrl;
+    var hoodie = this;
 
-    this._pipeRequestError = this._pipeRequestError.bind(this);
-    this.rejectWith = this.rejectWith.bind(this);
-    this.resolveWith = this.resolveWith.bind(this);
-    this.reject = this.reject.bind(this);
-    this.resolve = this.resolve.bind(this);
-    this.checkConnection = this.checkConnection.bind(this);
-
-    // remove trailing slash(es)
-    this.baseUrl = this.baseUrl ? this.baseUrl.replace(/\/+$/, '') : "/_api";
-
-    // init core modules
-    this.store = new this.constructor.LocalStore(this);
-    this.config = new this.constructor.Config(this);
-    this.account = new this.constructor.Account(this);
-    this.remote = new this.constructor.AccountRemote(this);
-
-    this._loadExtensions();
-    this.checkConnection();
-  }
-
-  // TODO: use module loader if present
-  var events = window.Events();
-  Hoodie.prototype.bind = events.bind;
-  Hoodie.prototype.on = events.on;
-  Hoodie.prototype.one = events.one;
-  Hoodie.prototype.trigger = events.trigger;
-  Hoodie.prototype.unbind = events.unbind;
-  Hoodie.prototype.off = events.off;
-
-  // Settings
-  // ----------
-
-  // `online` (read-only)
-  Hoodie.prototype.online = true;
-
-  // `checkConnectionInterval` (read-only)
-  Hoodie.prototype.checkConnectionInterval = 30000;
-
-  // Requests
-  // ----------
-
-  // use this method to send requests to the hoodie backend.
-  //
-  //     promise = hoodie.request('GET', '/user_database/doc_id')
-  //
-  Hoodie.prototype.request = function(type, url, options) {
-    var defaults, requestPromise, pipedPromise;
-
-    options = options || {};
-
-    // if a relative path passed, prefix with @baseUrl
-    if (!/^http/.test(url)) {
-      url = "" + this.baseUrl + url;
+    // enforce initialization with `new`
+    if (! (hoodie instanceof Hoodie)) {
+      throw new Error("usage: new Hoodie(url);");
     }
 
-    defaults = {
-      type: type,
-      url: url,
-      xhrFields: {
-        withCredentials: true
-      },
-      crossDomain: true,
-      dataType: 'json'
-    };
-
-    // we are piping the result of the request to return a nicer
-    // error if the request cannot reach the server at all.
-    // We can't return the promise of $.ajax directly because of
-    // the piping, as for whatever reason the returned promise
-    // does not have the `abort` method any more, maybe others
-    // as well. See also http://bugs.jquery.com/ticket/14104
-    requestPromise = $.ajax($.extend(defaults, options));
-    pipedPromise = requestPromise.then( null, this._pipeRequestError);
-    pipedPromise.abort = requestPromise.abort;
-
-    return pipedPromise;
-  };
+    hoodie.baseUrl = baseUrl ?
+      baseUrl.replace(/\/+$/, '') // remove trailing slash(es)
+      : "/_api"; // default Hoodie API endpoint
 
 
-  // Check Connection
-  // ------------------
-
-  // the `checkConnection` method is used, well, to check if
-  // the hoodie backend is reachable at `baseUrl` or not.
-  // Check Connection is automatically called on startup
-  // and then each 30 seconds. If it fails, it
-  //
-  // - sets `hoodie.online = false`
-  // - triggers `offline` event
-  // - sets `checkConnectionInterval = 3000`
-  //
-  // when connection can be reestablished, it
-  //
-  // - sets `hoodie.online = true`
-  // - triggers `online` event
-  // - sets `checkConnectionInterval = 30000`
-  //
-  Hoodie.prototype._checkConnectionRequest = null;
-  Hoodie.prototype.checkConnection = function() {
-
-    var req = this._checkConnectionRequest;
-
-    if (req && req.state() === 'pending') {
-      return req;
-    }
-
-    this._checkConnectionRequest = this.request('GET', '/').pipe(
-      this._handleCheckConnectionSuccess.bind(this),
-      this._handleCheckConnectionError.bind(this)
-    );
-
-    return this._checkConnectionRequest;
-  };
+    // PUBLIC METHODS
+    // ----------------
 
 
-  // Open stores
-  // -------------
+    // Requests
+    // ----------
 
-  // generic method to open a store. Used by
-  //
-  // * hoodie.remote
-  // * hoodie.user("joe")
-  // * hoodie.global
-  // * ... and more
-  //
-  //     hoodie.open("some_store_name").findAll()
-  //
-  Hoodie.prototype.open = function(storeName, options) {
-    options = options || {};
+    // use this method to send requests to the hoodie backend.
+    //
+    //     promise = hoodie.request('GET', '/user_database/doc_id')
+    //
+    function request(type, url, options) {
+      var defaults, requestPromise, pipedPromise;
 
-    $.extend(options, {
-      name: storeName
-    });
+      options = options || {};
 
-    return new Hoodie.Remote(this, options);
-  };
-
-
-  // uuid
-  // ------
-
-  // helper to generate unique ids.
-  Hoodie.prototype.uuid = function(len) {
-    var chars, i, radix;
-
-    // default uuid length to 7
-    if (len === undefined) {
-      len = 7;
-    }
-
-    // uuids consist of numbers and lowercase letters only.
-    // We stick to lowercase letters to prevent confusion
-    // and to prevent issues with CouchDB, e.g. database
-    // names do wonly allow for lowercase letters.
-    chars = '0123456789abcdefghijklmnopqrstuvwxyz'.split('');
-    radix = chars.length;
-
-    // eehmm, yeah.
-    return ((function() {
-      var _i, _results = [];
-
-      for (i = _i = 0; 0 <= len ? _i < len : _i > len; i = 0 <= len ? ++_i : --_i) {
-        var rand = Math.random() * radix;
-        _results.push(chars[0] = String(rand).charAt(0));
+      // if a relative path passed, prefix with @baseUrl
+      if (!/^http/.test(url)) {
+        url = "" + hoodie.baseUrl + url;
       }
 
-      return _results;
-    })()).join('');
-  };
+      defaults = {
+        type: type,
+        url: url,
+        xhrFields: {
+          withCredentials: true
+        },
+        crossDomain: true,
+        dataType: 'json'
+      };
+
+      // we are piping the result of the request to return a nicer
+      // error if the request cannot reach the server at all.
+      // We can't return the promise of ajax directly because of
+      // the piping, as for whatever reason the returned promise
+      // does not have the `abort` method any more, maybe others
+      // as well. See also http://bugs.jquery.com/ticket/14104
+      requestPromise = $ajax($extend(defaults, options));
+      pipedPromise = requestPromise.then( null, pipeRequestError);
+      pipedPromise.abort = requestPromise.abort;
+
+      return pipedPromise;
+    }
 
 
-  // Defers / Promises
-  // -------------------
+    // Check Connection
+    // ------------------
 
-  // returns a defer object for custom promise handlings.
-  // Promises are heavely used throughout the code of hoodie.
-  // We currently borrow jQuery's implementation:
-  // http://api.jquery.com/category/deferred-object/
-  //
-  //     defer = hoodie.defer()
-  //     if (good) {
-  //       defer.resolve('good.')
-  //     } else {
-  //       defer.reject('not good.')
-  //     }
-  //     return defer.promise()
-  //
-  Hoodie.prototype.defer = $.Deferred;
+    // the `checkConnection` method is used, well, to check if
+    // the hoodie backend is reachable at `baseUrl` or not.
+    // Check Connection is automatically called on startup
+    // and then each 30 seconds. If it fails, it
+    //
+    // - sets `online = false`
+    // - triggers `offline` event
+    // - sets `checkConnectionInterval = 3000`
+    //
+    // when connection can be reestablished, it
+    //
+    // - sets `online = true`
+    // - triggers `online` event
+    // - sets `checkConnectionInterval = 30000`
+    //
+    var online = true;
+    var checkConnectionInterval = 30000;
+    var checkConnectionRequest = null;
+    function checkConnection() {
 
+      var req = checkConnectionRequest;
 
-  // returns true if passed object is a promise (but not a deferred),
-  // otherwise false.
-  Hoodie.prototype.isPromise = function(object) {
-    return !! (object &&
-               typeof object.done === 'function' &&
-               typeof object.resolve !== 'function');
-  };
+      if (req && req.state() === 'pending') {
+        return req;
+      }
 
+      checkConnectionRequest = hoodie.request('GET', '/').pipe(
+        handleCheckConnectionSuccess,
+        handleCheckConnectionError
+      );
 
-  //
-  Hoodie.prototype.resolve = function() {
-    return this.defer().resolve().promise();
-  };
-
-
-  //
-  Hoodie.prototype.reject = function() {
-    return this.defer().reject().promise();
-  };
+      return checkConnectionRequest;
+    }
 
 
-  //
-  Hoodie.prototype.resolveWith = function() {
-    var defer = this.defer();
-    return defer.resolve.apply(defer, arguments).promise();
-  };
+    // isOnline
+    // ----------
 
-  //
-  Hoodie.prototype.rejectWith = function() {
-    var defer = this.defer();
-    return defer.reject.apply(defer, arguments).promise();
-  };
+    //
+    function isOnline() {
+      return online;
+    }
 
 
-  // dispose
-  // ---------
+    // Open stores
+    // -------------
 
-  // if a hoodie instance is not needed anymore, it can
-  // be disposed using this method. A `dispose` event
-  // gets triggered that the modules react on.
-  Hoodie.prototype.dispose = function() {
-    this.trigger('dispose');
-  };
+    // generic method to open a store. Used by
+    //
+    // * hoodie.remote
+    // * hoodie.user("joe")
+    // * hoodie.global
+    // * ... and more
+    //
+    //     hoodie.open("some_store_name").findAll()
+    //
+    function open(storeName, options) {
+      options = options || {};
 
+      $extend(options, {
+        name: storeName
+      });
+
+      return new Hoodie.Remote(hoodie, options);
+    }
+
+
+    // uuid
+    // ------
+
+    // helper to generate unique ids.
+    function uuid(len) {
+      var chars, i, radix;
+
+      // default uuid length to 7
+      if (len === undefined) {
+        len = 7;
+      }
+
+      // uuids consist of numbers and lowercase letters only.
+      // We stick to lowercase letters to prevent confusion
+      // and to prevent issues with CouchDB, e.g. database
+      // names do wonly allow for lowercase letters.
+      chars = '0123456789abcdefghijklmnopqrstuvwxyz'.split('');
+      radix = chars.length;
+
+      // eehmm, yeah.
+      return ((function() {
+        var _i, _results = [];
+
+        for (i = _i = 0; 0 <= len ? _i < len : _i > len; i = 0 <= len ? ++_i : --_i) {
+          var rand = Math.random() * radix;
+          _results.push(chars[0] = String(rand).charAt(0));
+        }
+
+        return _results;
+      })()).join('');
+    }
+
+    // Defers / Promises
+    // -------------------
+
+    // returns a defer object for custom promise handlings.
+    // Promises are heavely used throughout the code of hoodie.
+    // We currently borrow jQuery's implementation:
+    // http://api.jquery.com/category/deferred-object/
+    //
+    //     defer = hoodie.defer()
+    //     if (good) {
+    //       defer.resolve('good.')
+    //     } else {
+    //       defer.reject('not good.')
+    //     }
+    //     return defer.promise()
+    //
+
+    // returns true if passed object is a promise (but not a deferred),
+    // otherwise false.
+    function isPromise(object) {
+      return !! (object &&
+                 typeof object.done === 'function' &&
+                 typeof object.resolve !== 'function');
+    }
+
+    //
+    function resolve() {
+      return $defer().resolve().promise();
+    }
+
+
+    //
+    function reject() {
+      return $defer().reject().promise();
+    }
+
+
+    //
+    function resolveWith() {
+      var _defer = $defer();
+      return _defer.resolve.apply(_defer, arguments).promise();
+    }
+
+    //
+    function rejectWith() {
+      var _defer = $defer();
+      return _defer.reject.apply(_defer, arguments).promise();
+    }
+
+
+    // dispose
+    // ---------
+
+    // if a hoodie instance is not needed anymore, it can
+    // be disposed using this method. A `dispose` event
+    // gets triggered that the modules react on.
+    function dispose() {
+      hoodie.trigger('dispose');
+    }
+
+    //
+    //
+    //
+    function pipeRequestError(xhr) {
+      var error;
+
+      try {
+        error = JSON.parse(xhr.responseText);
+      } catch (_error) {
+        error = {
+          error: xhr.responseText || ("Cannot connect to Hoodie server at " + hoodie.baseUrl)
+        };
+      }
+
+      return rejectWith(error).promise();
+    }
+
+
+    //
+    //
+    //
+    function handleCheckConnectionSuccess() {
+      checkConnectionInterval = 30000;
+
+      window.setTimeout(checkConnection, checkConnectionInterval);
+
+      if (! hoodie.isOnline()) {
+        hoodie.trigger('reconnected');
+        online = true;
+      }
+
+      return $defer().resolve();
+    }
+
+
+    //
+    //
+    //
+    function handleCheckConnectionError() {
+      checkConnectionInterval = 3000;
+
+      window.setTimeout(checkConnection, checkConnectionInterval);
+
+      if (hoodie.isOnline()) {
+        hoodie.trigger('disconnected');
+        online = false;
+      }
+
+      return $defer().reject();
+    }
+
+
+    //
+    //
+    //
+    function extend(name, Module) {
+      hoodie[name] = new Module(hoodie);
+    }
+
+
+    //
+    //
+    //
+    function loadExtensions() {
+      var Module, instanceName;
+
+      for (instanceName in extensions) {
+        if (extensions.hasOwnProperty(instanceName)) {
+          Module = extensions[instanceName];
+          hoodie[instanceName] = new Module(hoodie);
+        }
+      }
+    }
+
+    // get jQuery methods that Hoodie depends on
+    var $defer = window.jQuery.Deferred;
+    var $extend = window.jQuery.extend;
+    var $ajax = window.jQuery.ajax;
+
+
+    // events API
+    var events = window.Events();
+    hoodie.bind = events.bind;
+    hoodie.on = events.bind;
+    hoodie.one = events.one;
+    hoodie.trigger = events.trigger;
+    hoodie.unbind = events.unbind;
+    hoodie.off = events.unbind;
+
+    // hoodie core methods
+    hoodie.isOnline = isOnline;
+    hoodie.checkConnection = checkConnection;
+    hoodie.request = request;
+    hoodie.open = open;
+    hoodie.uuid = uuid;
+    hoodie.dispose = dispose;
+    hoodie.extend = extend;
+
+    // promise helpers
+    hoodie.defer = $defer;
+    hoodie.isPromise = isPromise;
+    hoodie.resolve = resolve;
+    hoodie.reject = reject;
+    hoodie.resolveWith = resolveWith;
+    hoodie.rejectWith = rejectWith;
+
+    // hoodie core modules
+    hoodie.store = new Hoodie.LocalStore(hoodie);
+    hoodie.config = new Hoodie.Config(hoodie);
+    hoodie.account = new Hoodie.Account(hoodie);
+    hoodie.remote = new Hoodie.AccountRemote(hoodie);
+
+    // load global extensions
+    loadExtensions();
+  }
 
   // Extending hoodie
   // ------------------
@@ -269,77 +366,14 @@
   //     hoodie.magic1.doSomething()
   //     hoodie.magic2.doSomethingElse()
   //
+  var extensions = {};
   Hoodie.extend = function(name, Module) {
-    this._extensions = this._extensions || {};
-    this._extensions[name] = Module;
+    extensions[name] = Module;
   };
-  Hoodie.prototype.extend = function(name, Module) {
-    this[name] = new Module(this);
-  };
-
-
-  // ## Private
 
   //
-  Hoodie.prototype._loadExtensions = function() {
-    var Module, instanceName, extensions;
-
-    extensions = this.constructor._extensions;
-
-    for (instanceName in extensions) {
-      if (extensions.hasOwnProperty(instanceName)) {
-        Module = extensions[instanceName];
-        this[instanceName] = new Module(this);
-      }
-    }
-
-  };
-
-
-  //
-  Hoodie.prototype._handleCheckConnectionSuccess = function() {
-    this.checkConnectionInterval = 30000;
-
-    window.setTimeout(this.checkConnection, this.checkConnectionInterval);
-
-    if (!this.online) {
-      this.trigger('reconnected');
-      this.online = true;
-    }
-
-    return this.defer().resolve();
-  };
-
-
-  //
-  Hoodie.prototype._handleCheckConnectionError = function() {
-    this.checkConnectionInterval = 3000;
-
-    window.setTimeout(this.checkConnection, this.checkConnectionInterval);
-
-    if (this.online) {
-      this.trigger('disconnected');
-      this.online = false;
-    }
-
-    return this.defer().reject();
-  };
-
-  Hoodie.prototype._pipeRequestError = function(xhr) {
-    var error;
-
-    try {
-      error = JSON.parse(xhr.responseText);
-    } catch (_error) {
-      error = {
-        error: xhr.responseText || ("Cannot connect to Hoodie server at " + this.baseUrl)
-      };
-    }
-
-    return this.rejectWith(error).promise();
-  };
-
   // expose Hoodie to module loaders. Based on jQuery's implementation.
+  //
   if ( typeof module === "object" && module && typeof module.exports === "object" ) {
 
     // Expose Hoodie as module.exports in loaders that implement the Node
