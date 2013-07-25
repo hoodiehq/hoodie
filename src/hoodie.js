@@ -4,7 +4,7 @@
 // the door to world domination (apps)
 //
 
-window.Hoodie = window.Hoodie || (function(_super) {
+(function(window) {
 
   'use strict';
 
@@ -42,7 +42,14 @@ window.Hoodie = window.Hoodie || (function(_super) {
     this.checkConnection();
   }
 
-  Object.deepExtend(Hoodie, _super);
+  // TODO: use module loader if present
+  var events = window.Events();
+  Hoodie.prototype.bind = events.bind;
+  Hoodie.prototype.on = events.on;
+  Hoodie.prototype.one = events.one;
+  Hoodie.prototype.trigger = events.trigger;
+  Hoodie.prototype.unbind = events.unbind;
+  Hoodie.prototype.off = events.off;
 
   // Settings
   // ----------
@@ -83,7 +90,7 @@ window.Hoodie = window.Hoodie || (function(_super) {
     // we are piping the result of the request to return a nicer
     // error if the request cannot reach the server at all.
     // We can't return the promise of $.ajax directly because of
-    // the piping, as for whatever reason the returned promise 
+    // the piping, as for whatever reason the returned promise
     // does not have the `abort` method any more, maybe others
     // as well. See also http://bugs.jquery.com/ticket/14104
     requestPromise = $.ajax($.extend(defaults, options));
@@ -332,30 +339,31 @@ window.Hoodie = window.Hoodie || (function(_super) {
     return this.rejectWith(error).promise();
   };
 
-  return Hoodie;
+  // expose Hoodie to module loaders. Based on jQuery's implementation.
+  if ( typeof module === "object" && module && typeof module.exports === "object" ) {
 
-})(window.Events);
+    // Expose Hoodie as module.exports in loaders that implement the Node
+    // module pattern (including browserify). Do not create the global, since
+    // the user will be storing it themselves locally, and globals are frowned
+    // upon in the Node module world.
+    module.exports = Hoodie;
 
-// expose Hoodie to module loaders. Based on jQuery's implementation.
-if ( typeof module === "object" && module && typeof module.exports === "object" ) {
 
-  // Expose Hoodie as module.exports in loaders that implement the Node
-  // module pattern (including browserify). Do not create the global, since
-  // the user will be storing it themselves locally, and globals are frowned
-  // upon in the Node module world.
-  module.exports = Hoodie;
-} else {
+  } else if ( typeof define === "function" && define.amd ) {
 
-  // Register as a named AMD module, since Hoodie can be concatenated with other
-  // files that may use define, but not via a proper concatenation script that
-  // understands anonymous AMD modules. A named AMD is safest and most robust
-  // way to register. Lowercase hoodie is used because AMD module names are
-  // derived from file names, and Hoodie is normally delivered in a lowercase
-  // file name. 
-  if ( typeof define === "function" && define.amd ) {
+    // Register as a named AMD module, since Hoodie can be concatenated with other
+    // files that may use define, but not via a proper concatenation script that
+    // understands anonymous AMD modules. A named AMD is safest and most robust
+    // way to register. Lowercase hoodie is used because AMD module names are
+    // derived from file names, and Hoodie is normally delivered in a lowercase
+    // file name.
     define( "hoodie", [], function () {
-      'use strict';
       return Hoodie;
     } );
+  } else {
+
+    // set global
+    window.Hoodie = Hoodie;
   }
-}
+
+})(window);
