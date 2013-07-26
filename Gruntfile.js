@@ -32,6 +32,7 @@ module.exports = function(grunt) {
           'src/hoodie.js',
 
           'src/core/request.js',
+          'src/core/connection.js',
 
           'src/core/store.js',
           'src/core/errors.js',
@@ -40,13 +41,7 @@ module.exports = function(grunt) {
           'src/core/local_store.js',
           'src/core/config.js',
           'src/core/account.js',
-          'src/core/account_remote.js',
-
-          'src/extensions/email.js',
-          'src/extensions/share.js',
-          'src/extensions/user.js',
-          'src/extensions/global.js',
-          'src/extensions/share_instance.js'
+          'src/core/account_remote.js'
         ],
         dest: 'dist/<%= pkg.name %>.js'
       }

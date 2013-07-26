@@ -20,6 +20,7 @@ files = [
   'test/lib/hoodie_extend_patch.js',
 
   'src/core/request.js',
+  'src/core/connection.js',
 
   'src/core/store.js',
   'src/core/remote.js',
@@ -28,11 +29,6 @@ files = [
   'src/core/account.js',
   'src/core/account_remote.js',
   'src/core/errors.js',
-  'src/extensions/email.js',
-  'src/extensions/user.js',
-  'src/extensions/global.js',
-  'src/extensions/share.js',
-  'src/extensions/share_instance.js',
   'test/mocks/*.js',
   'test/specs/**/*.spec.js'
 ];
