@@ -10,6 +10,19 @@
 // it will continuously  synchronize with local store,
 // otherwise sync, pull or push can be called manually
 //
+
+
+// NOTE:
+// this is a workaround to make the old,
+// CoffeeScripty classes compatible with
+// the new Hoodie.extend API.
+// We'll get rid of classes / constructors
+// one by one
+function hoodieRemote (hoodie) {
+  hoodie.remote = new Hoodie.AccountRemote(hoodie);
+}
+
+
 Hoodie.AccountRemote = (function(_super) {
 
   'use strict';
@@ -181,5 +194,3 @@ Hoodie.AccountRemote = (function(_super) {
   return AccountRemote;
 
 })(Hoodie.Remote);
-
-Hoodie.extend('remote', Hoodie.AccountRemote);

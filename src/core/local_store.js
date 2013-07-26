@@ -3,6 +3,17 @@
 //
 // window.localStrage wrapper and more
 //
+
+// NOTE:
+// this is a workaround to make the old,
+// CoffeeScripty classes compatible with
+// the new Hoodie.extend API.
+// We'll get rid of classes / constructors
+// one by one
+function hoodieStore (hoodie) {
+  hoodie.store = new Hoodie.LocalStore(hoodie);
+}
+
 Hoodie.LocalStore = (function (_super) {
 
   'use strict';
@@ -938,5 +949,3 @@ Hoodie.LocalStore = (function (_super) {
   return LocalStore;
 
 })(Hoodie.Store);
-
-Hoodie.extend('store', Hoodie.LocalStore);

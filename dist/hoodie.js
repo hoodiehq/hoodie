@@ -17,145 +17,6 @@ Object.deepExtend = function(child, parent) {
   return child;
 };
 
-//
-// Events
-// ========
-//
-// extend any Class with support for
-//
-// * `object.bind('event', cb)`
-// * `object.unbind('event', cb)`
-// * `object.trigger('event', args...)`
-// * `object.one('ev', cb)`
-//
-// based on [Events implementations from Spine](https://github.com/maccman/spine/blob/master/src/spine.coffee#L1)
-//
-
-(function(window) {
-
-  'use strict';
-
-  function eventsFactory() {
-
-    var callbacks = {};
-
-    // Bind
-    // ------
-    //
-    // bind a callback to an event triggerd by the object
-    //
-    //     object.bind 'cheat', blame
-    //
-    function bind(ev, callback) {
-      var evs, name, _i, _len;
-
-      evs = ev.split(' ');
-
-      for (_i = 0, _len = evs.length; _i < _len; _i++) {
-        name = evs[_i];
-        callbacks[name] = callbacks[name] || [];
-        callbacks[name].push(callback);
-      }
-    }
-
-    // one
-    // -----
-    //
-    // same as `bind`, but does get executed only once
-    //
-    //     object.one 'groundTouch', gameOver
-    //
-    function one(ev, callback) {
-      bind(ev, function() {
-        unbind(ev, callback);
-        callback.apply(null, arguments);
-      });
-    }
-
-    // trigger
-    // ---------
-    //
-    // trigger an event and pass optional parameters for binding.
-    //     object.trigger 'win', score: 1230
-    //
-    function trigger() {
-      var args, callback, ev, list, _i, _len;
-
-      args = 1 <= arguments.length ? Array.prototype.slice.call(arguments, 0) : [];
-      ev = args.shift();
-      list = callbacks[ev];
-
-      if (!list) {
-        return;
-      }
-
-      for (_i = 0, _len = list.length; _i < _len; _i++) {
-        callback = list[_i];
-        callback.apply(null, args);
-      }
-
-      return true;
-    }
-
-    // unbind
-    // --------
-    //
-    // unbind to from all bindings, from all bindings of a specific event
-    // or from a specific binding.
-    //
-    //     object.unbind()
-    //     object.unbind 'move'
-    //     object.unbind 'move', follow
-    //
-    function unbind(ev, callback) {
-      var cb, i, list, _i, _len;
-
-      if (!ev) {
-        callbacks = {};
-        return;
-      }
-
-      list = callbacks[ev];
-
-      if (!list) {
-        return;
-      }
-
-      if (!callback) {
-        delete callbacks[ev];
-        return;
-      }
-
-      for (i = _i = 0, _len = list.length; _i < _len; i = ++_i) {
-        cb = list[i];
-
-        if (cb !== callback) {
-          continue;
-        }
-
-        list = list.slice();
-        list.splice(i, 1);
-        callbacks[ev] = list;
-        break;
-      }
-
-      return;
-    }
-
-    return {
-      bind : bind,
-      one : one,
-      trigger : trigger,
-      unbind : unbind
-    };
-  }
-
-  // set global
-  // TODO: use module loader if present
-  window.Events = eventsFactory;
-
-})(window);
-
 // Hoodie
 // --------
 //
@@ -189,178 +50,64 @@ Object.deepExtend = function(child, parent) {
       : "/_api"; // otherwise default to current domain
 
 
-    // Open stores
-    // -------------
+    // hoodie.extend
+    // ---------------
 
-    // generic method to open a store. Used by
+    // extend hoodie instance:
     //
+    //     hoodie.extend(function(hoodie) {} )
+    //
+    hoodie.extend = function extend(extension) {
+      extension(hoodie);
+    };
+
+    // * hoodie.bind
+    // * hoodie.on
+    // * hoodie.one
+    // * hoodie.trigger
+    // * hoodie.unbind
+    // * hoodie.off
+    hoodie.extend( hoodieEvents );
+
+    // * hoodie.defer
+    // * hoodie.isPromise
+    // * hoodie.resolve
+    // * hoodie.reject
+    // * hoodie.resolveWith
+    // * hoodie.rejectWith
+    hoodie.extend( hoodiePromises );
+
+    // * hoodie.request
+    hoodie.extend( hoodieRequest );
+
+    // * hoodie.isOnline
+    // * hoodie.checkConnection
+    hoodie.extend( hoodieConnection );
+
+    // * hoodie.uuid
+    hoodie.extend( hoodieUUID );
+
+    // * hoodie.dispose
+    hoodie.extend( hoodieDispose );
+
+    // * hoodie.open
+    hoodie.extend( hoodieOpen );
+
+    // * hoodie.store
+    hoodie.extend( hoodieStore );
+
+    // * hoodie.config
+    hoodie.extend( hoodieConfig );
+    debugger
+
+    // * hoodie.account
+    hoodie.extend( hoodieAccount );
+
     // * hoodie.remote
-    // * hoodie.user("joe")
-    // * hoodie.global
-    // * ... and more
-    //
-    //     hoodie.open("some_store_name").findAll()
-    //
-    function open(storeName, options) {
-      options = options || {};
+    hoodie.extend( hoodieRemote );
 
-      $extend(options, {
-        name: storeName
-      });
-
-      return new Hoodie.Remote(hoodie, options);
-    }
-
-
-    // uuid
-    // ------
-
-    // helper to generate unique ids.
-    function uuid(len) {
-      var chars, i, radix;
-
-      // default uuid length to 7
-      if (len === undefined) {
-        len = 7;
-      }
-
-      // uuids consist of numbers and lowercase letters only.
-      // We stick to lowercase letters to prevent confusion
-      // and to prevent issues with CouchDB, e.g. database
-      // names do wonly allow for lowercase letters.
-      chars = '0123456789abcdefghijklmnopqrstuvwxyz'.split('');
-      radix = chars.length;
-
-      // eehmm, yeah.
-      return ((function() {
-        var _i, _results = [];
-
-        for (i = _i = 0; 0 <= len ? _i < len : _i > len; i = 0 <= len ? ++_i : --_i) {
-          var rand = Math.random() * radix;
-          _results.push(chars[0] = String(rand).charAt(0));
-        }
-
-        return _results;
-      })()).join('');
-    }
-
-    // Defers / Promises
-    // -------------------
-
-    // returns a defer object for custom promise handlings.
-    // Promises are heavely used throughout the code of hoodie.
-    // We currently borrow jQuery's implementation:
-    // http://api.jquery.com/category/deferred-object/
-    //
-    //     defer = hoodie.defer()
-    //     if (good) {
-    //       defer.resolve('good.')
-    //     } else {
-    //       defer.reject('not good.')
-    //     }
-    //     return defer.promise()
-    //
-
-    // returns true if passed object is a promise (but not a deferred),
-    // otherwise false.
-    function isPromise(object) {
-      return !! (object &&
-                 typeof object.done === 'function' &&
-                 typeof object.resolve !== 'function');
-    }
-
-    //
-    function resolve() {
-      return $defer().resolve().promise();
-    }
-
-
-    //
-    function reject() {
-      return $defer().reject().promise();
-    }
-
-
-    //
-    function resolveWith() {
-      var _defer = $defer();
-      return _defer.resolve.apply(_defer, arguments).promise();
-    }
-
-    //
-    function rejectWith() {
-      var _defer = $defer();
-      return _defer.reject.apply(_defer, arguments).promise();
-    }
-
-
-    // dispose
-    // ---------
-
-    // if a hoodie instance is not needed anymore, it can
-    // be disposed using this method. A `dispose` event
-    // gets triggered that the modules react on.
-    function dispose() {
-      hoodie.trigger('dispose');
-    }
-
-
-    //
-    // hoodie.extend('myMagic', function(hoodie) {} )
-    // or
-    // hoodie.extend(function(hoodie) {} )
-    //
-    function extend(name, Extension) {
-      if (Extension) {
-        hoodie[name] = new Extension(hoodie);
-      } else {
-        new Extension(hoodie); // anonymous extension
-      }
-    }
-
-
-    //
-    //
-    //
-    function loadExtensions() {
-      for (var i = extensions.length - 1; i >= 0; i--) {
-        if (extensions[i].name) {
-          hoodie[extensions[i].name] = new extensions[i].extension(hoodie);
-        } else {
-          extensions[i].extension(hoodie);
-        }
-      }
-    }
-
-    // get jQuery methods that Hoodie depends on
-    var $defer = window.jQuery.Deferred;
-    var $extend = window.jQuery.extend;
-
-    // events API
-    var events = window.Events();
-    hoodie.bind = events.bind;
-    hoodie.on = events.bind;
-    hoodie.one = events.one;
-    hoodie.trigger = events.trigger;
-    hoodie.unbind = events.unbind;
-    hoodie.off = events.unbind;
-
-    // hoodie core methods
-    hoodie.open = open;
-    hoodie.uuid = uuid;
-    hoodie.dispose = dispose;
-    hoodie.extend = extend;
-
-    // promise helpers
-    hoodie.defer = $defer;
-    hoodie.isPromise = isPromise;
-    hoodie.resolve = resolve;
-    hoodie.reject = reject;
-    hoodie.resolveWith = resolveWith;
-    hoodie.rejectWith = rejectWith;
-
-    // load global extensions
-    loadExtensions();
+    // load user extensions
+    applyExtensions(hoodie);
   }
 
   // Extending hoodie
@@ -380,18 +127,18 @@ Object.deepExtend = function(child, parent) {
   //      Hoodie.extend(funcion(hoodie) { hoodie.myMagic = function() {} })
   //
   var extensions = [];
-  Hoodie.extend = function(name, extension) {
-    if (extension) {
-      extensions.push({
-        name: name,
-        extension: extension
-      });
-    } else {
-      extensions.push({
-        extension: name
-      });
-    }
+  Hoodie.extend = function(extension) {
+    extensions.push(extension);
   };
+
+  //
+  //
+  //
+  function applyExtensions(hoodie) {
+    for (var i = 0; i < extensions.length; i++) {
+      extensions[i](hoodie);
+    }
+  }
 
   //
   // expose Hoodie to module loaders. Based on jQuery's implementation.
@@ -425,42 +172,208 @@ Object.deepExtend = function(child, parent) {
 })(window);
 
 //
+// Events
+// ========
+//
+// extend any Class with support for
+//
+// * `object.bind('event', cb)`
+// * `object.unbind('event', cb)`
+// * `object.trigger('event', args...)`
+// * `object.one('ev', cb)`
+//
+// based on [Events implementations from Spine](https://github.com/maccman/spine/blob/master/src/spine.coffee#L1)
+//
+
+function hoodieEvents(hoodie) {
+
+  'use strict';
+
+  var callbacks = {};
+
+  // Bind
+  // ------
+  //
+  // bind a callback to an event triggerd by the object
+  //
+  //     object.bind 'cheat', blame
+  //
+  function bind(ev, callback) {
+    var evs, name, _i, _len;
+
+    evs = ev.split(' ');
+
+    for (_i = 0, _len = evs.length; _i < _len; _i++) {
+      name = evs[_i];
+      callbacks[name] = callbacks[name] || [];
+      callbacks[name].push(callback);
+    }
+  }
+
+  // one
+  // -----
+  //
+  // same as `bind`, but does get executed only once
+  //
+  //     object.one 'groundTouch', gameOver
+  //
+  function one(ev, callback) {
+    bind(ev, function() {
+      unbind(ev, callback);
+      callback.apply(null, arguments);
+    });
+  }
+
+  // trigger
+  // ---------
+  //
+  // trigger an event and pass optional parameters for binding.
+  //     object.trigger 'win', score: 1230
+  //
+  function trigger() {
+    var args, callback, ev, list, _i, _len;
+
+    args = 1 <= arguments.length ? Array.prototype.slice.call(arguments, 0) : [];
+    ev = args.shift();
+    list = callbacks[ev];
+
+    if (!list) {
+      return;
+    }
+
+    for (_i = 0, _len = list.length; _i < _len; _i++) {
+      callback = list[_i];
+      callback.apply(null, args);
+    }
+
+    return true;
+  }
+
+  // unbind
+  // --------
+  //
+  // unbind to from all bindings, from all bindings of a specific event
+  // or from a specific binding.
+  //
+  //     object.unbind()
+  //     object.unbind 'move'
+  //     object.unbind 'move', follow
+  //
+  function unbind(ev, callback) {
+    var cb, i, list, _i, _len;
+
+    if (!ev) {
+      callbacks = {};
+      return;
+    }
+
+    list = callbacks[ev];
+
+    if (!list) {
+      return;
+    }
+
+    if (!callback) {
+      delete callbacks[ev];
+      return;
+    }
+
+    for (i = _i = 0, _len = list.length; _i < _len; i = ++_i) {
+      cb = list[i];
+
+      if (cb !== callback) {
+        continue;
+      }
+
+      list = list.slice();
+      list.splice(i, 1);
+      callbacks[ev] = list;
+      break;
+    }
+
+    return;
+  }
+
+  hoodie.bind = bind;
+  hoodie.on = bind;
+  hoodie.one = one;
+  hoodie.trigger = trigger;
+  hoodie.unbind = unbind;
+  hoodie.off = unbind;
+}
+
+// Hoodie Defers / Promises
+// ------------------------
+
+// returns a defer object for custom promise handlings.
+// Promises are heavely used throughout the code of hoodie.
+// We currently borrow jQuery's implementation:
+// http://api.jquery.com/category/deferred-object/
+//
+//     defer = hoodie.defer()
+//     if (good) {
+//       defer.resolve('good.')
+//     } else {
+//       defer.reject('not good.')
+//     }
+//     return defer.promise()
+//
+
+function hoodiePromises (hoodie) {
+
+  var $defer = window.jQuery.Deferred;
+
+  // returns true if passed object is a promise (but not a deferred),
+  // otherwise false.
+  function isPromise(object) {
+    return !! (object &&
+               typeof object.done === 'function' &&
+               typeof object.resolve !== 'function');
+  }
+
+  //
+  function resolve() {
+    return $defer().resolve().promise();
+  }
+
+
+  //
+  function reject() {
+    return $defer().reject().promise();
+  }
+
+
+  //
+  function resolveWith() {
+    var _defer = $defer();
+    return _defer.resolve.apply(_defer, arguments).promise();
+  }
+
+  //
+  function rejectWith() {
+    var _defer = $defer();
+    return _defer.reject.apply(_defer, arguments).promise();
+  }
+
+  //
+  // Public API
+  //
+  hoodie.defer = $defer;
+  hoodie.isPromise = isPromise;
+  hoodie.resolve = resolve;
+  hoodie.reject = reject;
+  hoodie.resolveWith = resolveWith;
+  hoodie.rejectWith = rejectWith;
+}
+//
 // hoodie.request
 // ================
 
-// I'd like to modularize hoodie.js for simpler testing
-// and a better overview. This is just an attempt to do
-// so, I'm very open for other suggestions.
 //
-// Hoodie.extend would look like
-//
-//     Hoodie.extend = function(name, extension) {
-//       extensions[name] = extension;
-//     };
-//
-// And the extensions would be loaded like this:
-//
-//     function loadExtensions() {
-//       var extension, name;
-//
-//       for (name in extensions) {
-//         if (extensions.hasOwnProperty(name)) {
-//           extension = extensions[name];
-//           hoodie[name] = extension(hoodie);
-//         }
-//       }
-//     }
-//
-// To test the extensions, I'd patch `Hoodie.extend` in
-// /test/lib/hoodie_extend_patch.js that is loaded only
-// for testing, so that the extensions are exposed and
-// can be accessed in tests with something like
-//
-//     var request = extension('request')
-//
-Hoodie.extend('request', function requestFactory(hoodie) {
+function hoodieRequest(hoodie) {
 
-  'use strict';
+  var $extend = $.extend;
+  var $ajax = $.ajax;
 
   // Requests
   // ----------
@@ -495,7 +408,7 @@ Hoodie.extend('request', function requestFactory(hoodie) {
     // the piping, as for whatever reason the returned promise
     // does not have the `abort` method any more, maybe others
     // as well. See also http://bugs.jquery.com/ticket/14104
-    requestPromise = $.ajax($.extend(defaults, options));
+    requestPromise = $ajax($extend(defaults, options));
     pipedPromise = requestPromise.then( null, pipeRequestError);
     pipedPromise.abort = requestPromise.abort;
 
@@ -523,15 +436,15 @@ Hoodie.extend('request', function requestFactory(hoodie) {
   //
   // public API
   //
-  return request;
-});
+  hoodie.request = request;
+}
 
 //
 // hoodie.checkConnection() & hoodie.isOnline()
 // ============================================
 
 //
-Hoodie.extend(function hoodieConnectionExtension(hoodie) {
+function hoodieConnection(hoodie) {
 
   'use strict';
 
@@ -621,8 +534,96 @@ Hoodie.extend(function hoodieConnectionExtension(hoodie) {
   //
   hoodie.isOnline = isOnline;
   hoodie.checkConnection = checkConnection;
-});
+}
 
+// hoodie.uuid
+// =============
+
+// helper to generate unique ids.
+function hoodieUUID (hoodie) {
+  function uuid(len) {
+    var chars, i, radix;
+
+    // default uuid length to 7
+    if (len === undefined) {
+      len = 7;
+    }
+
+    // uuids consist of numbers and lowercase letters only.
+    // We stick to lowercase letters to prevent confusion
+    // and to prevent issues with CouchDB, e.g. database
+    // names do wonly allow for lowercase letters.
+    chars = '0123456789abcdefghijklmnopqrstuvwxyz'.split('');
+    radix = chars.length;
+
+    // eehmm, yeah.
+    return ((function() {
+      var _i, _results = [];
+
+      for (i = _i = 0; 0 <= len ? _i < len : _i > len; i = 0 <= len ? ++_i : --_i) {
+        var rand = Math.random() * radix;
+        _results.push(chars[0] = String(rand).charAt(0));
+      }
+
+      return _results;
+    })()).join('');
+  }
+
+  //
+  // Public API
+  //
+  hoodie.uuid = uuid;
+}
+// hoodie.dispose
+// ================
+
+function hoodieDispose (hoodie) {
+
+  // if a hoodie instance is not needed anymore, it can
+  // be disposed using this method. A `dispose` event
+  // gets triggered that the modules react on.
+  function dispose() {
+    hoodie.trigger('dispose');
+  }
+
+  //
+  // Public API
+  //
+  hoodie.dispose = dispose;
+}
+
+
+// Open stores
+// -------------
+
+function hoodieOpen(hoodie) {
+
+  var $extend = window.jQuery.extend;
+
+  // generic method to open a store. Used by
+  //
+  // * hoodie.remote
+  // * hoodie.user("joe")
+  // * hoodie.global
+  // * ... and more
+  //
+  //     hoodie.open("some_store_name").findAll()
+  //
+  function open(storeName, options) {
+    options = options || {};
+
+    $extend(options, {
+      name: storeName
+    });
+
+    return new Hoodie.Remote(hoodie, options);
+  }
+
+  //
+  // Public API
+  //
+  hoodie.open = open;
+}
 // Store
 // ============
 
@@ -1035,14 +1036,14 @@ Hoodie.Errors = {
 // * on(event, callback)
 //
 
-// 
+//
 var ConnectionError;
 
 Hoodie.Remote = (function(_super) {
 
   'use strict';
 
-  // Constructor 
+  // Constructor
   // -------------
 
   // sets name (think: namespace) and some other options
@@ -1333,7 +1334,7 @@ Hoodie.Remote = (function(_super) {
 
   // start syncing. `this.bootstrap()` will automatically start
   // pulling when `this.connected` remains true.
-  // 
+  //
   Remote.prototype.connect = function() {
     this.connected = true;
     return this.bootstrap();
@@ -1639,7 +1640,7 @@ Hoodie.Remote = (function(_super) {
 
   // ### restart pull request
 
-  // request gets restarted automaticcally 
+  // request gets restarted automaticcally
   // when aborted (see @_handlePullError)
   Remote.prototype._restartPullRequest = function() {
     if (this._pullRequest) {
@@ -1792,6 +1793,10 @@ ConnectionError = (function(_super) {
 //
 // window.localStrage wrapper and more
 //
+function hoodieStore (hoodie) {
+  hoodie.store = new Hoodie.LocalStore(hoodie);
+}
+
 Hoodie.LocalStore = (function (_super) {
 
   'use strict';
@@ -2728,57 +2733,22 @@ Hoodie.LocalStore = (function (_super) {
 
 })(Hoodie.Store);
 
-Hoodie.extend('store', Hoodie.LocalStore);
-
 // Hoodie Config API
 // ===================
 
 //
-Hoodie.Config = (function() {
+function hoodieConfig(hoodie) {
 
-  'use strict';
-
-  // Constructor
-  // -------------
-
-  //
-  function Config(hoodie, options) {
-    var self = this;
-
-    options = options || {};
-
-    this.hoodie = hoodie;
-    this.clear = this.clear;
-
-    // memory cache
-    this.cache = {};
-
-    if (options.type) {
-      this.type = options.type;
-    }
-
-    if (options.id) {
-      this.id = options.id;
-    }
-
-    this.hoodie.store.find(this.type, this.id).done(function(obj) {
-      self.cache = obj;
-      return self.cache;
-    });
-
-    this.hoodie.on('account:signedOut', this.clear);
-  }
-
-  // used as attribute name in localStorage
-  Config.prototype.type = '$config';
-  Config.prototype.id = 'hoodie';
+  var type = '$config';
+  var id = 'hoodie';
+  var cache = {};
 
   // set
   // ----------
 
   // adds a configuration
   //
-  Config.prototype.set = function(key, value) {
+  function set(key, value) {
     var isSilent, update;
 
     if (this.cache[key] === value) {
@@ -2795,47 +2765,61 @@ Hoodie.Config = (function() {
       silent: isSilent
     });
 
-  };
+  }
 
   // get
   // ----------
 
   // receives a configuration
   //
-  Config.prototype.get = function(key) {
+  function get(key) {
     return this.cache[key];
-  };
+  }
 
   // clear
   // ----------
 
   // clears cache and removes object from store
   //
-  Config.prototype.clear = function() {
+  function clear() {
     this.cache = {};
     return this.hoodie.store.remove(this.type, this.id);
-  };
+  }
 
   // remove
   // ----------
 
   // removes a configuration, is a simple alias for config.set(key, undefined)
   //
-  Config.prototype.remove = function(key) {
+  function remove(key) {
     return this.set(key, void 0);
+  }
+
+  // load cach
+  hoodie.store.find(type, id).done(function(obj) {
+    cache = obj;
+  });
+
+  // clear on sign out
+  hoodie.on('account:signedOut', clear);
+
+  hoodie.config = {
+    set : set,
+    get : get,
+    clear : clear,
+    remove : remove
   };
-
-  return Config;
-
-})();
-
-Hoodie.extend('config', Hoodie.Config);
+}
 
 // Hoodie.Account
 // ================
 
-// tell something smart in here.
 //
+function hoodieAccount (hoodie) {
+  hoodie.account = new Hoodie.Account(hoodie);
+}
+
+
 Hoodie.Account = (function () {
 
   'use strict';
@@ -3932,8 +3916,6 @@ Hoodie.Account = (function () {
 
 })();
 
-Hoodie.extend('account', Hoodie.Account);
-
 // AccountRemote
 // ===============
 
@@ -3946,6 +3928,13 @@ Hoodie.extend('account', Hoodie.Account);
 // it will continuously  synchronize with local store,
 // otherwise sync, pull or push can be called manually
 //
+
+
+function hoodieRemote (hoodie) {
+  hoodie.remote = new Hoodie.AccountRemote(hoodie);
+}
+
+
 Hoodie.AccountRemote = (function(_super) {
 
   'use strict';
@@ -4117,5 +4106,3 @@ Hoodie.AccountRemote = (function(_super) {
   return AccountRemote;
 
 })(Hoodie.Remote);
-
-Hoodie.extend('remote', Hoodie.AccountRemote);

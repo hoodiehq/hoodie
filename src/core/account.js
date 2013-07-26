@@ -1,8 +1,18 @@
 // Hoodie.Account
 // ================
 
-// tell something smart in here.
-//
+
+// NOTE:
+// this is a workaround to make the old,
+// CoffeeScripty classes compatible with
+// the new Hoodie.extend API.
+// We'll get rid of classes / constructors
+// one by one
+function hoodieAccount (hoodie) {
+  hoodie.account = new Hoodie.Account(hoodie);
+}
+
+
 Hoodie.Account = (function () {
 
   'use strict';
@@ -1098,5 +1108,3 @@ Hoodie.Account = (function () {
   return Account;
 
 })();
-
-Hoodie.extend('account', Hoodie.Account);

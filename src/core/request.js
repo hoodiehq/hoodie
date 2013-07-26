@@ -5,7 +5,8 @@
 //
 function hoodieRequest(hoodie) {
 
-  'use strict';
+  var $extend = $.extend;
+  var $ajax = $.ajax;
 
   // Requests
   // ----------
@@ -40,7 +41,7 @@ function hoodieRequest(hoodie) {
     // the piping, as for whatever reason the returned promise
     // does not have the `abort` method any more, maybe others
     // as well. See also http://bugs.jquery.com/ticket/14104
-    requestPromise = $.ajax($.extend(defaults, options));
+    requestPromise = $ajax($extend(defaults, options));
     pipedPromise = requestPromise.then( null, pipeRequestError);
     pipedPromise.abort = requestPromise.abort;
 

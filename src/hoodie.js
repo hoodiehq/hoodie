@@ -40,7 +40,7 @@
     //
     hoodie.extend = function extend(extension) {
       extension(hoodie);
-    }
+    };
 
     // * hoodie.bind
     // * hoodie.on
@@ -74,6 +74,19 @@
     // * hoodie.open
     hoodie.extend( hoodieOpen );
 
+    // * hoodie.store
+    hoodie.extend( hoodieStore );
+
+    // * hoodie.config
+    hoodie.extend( hoodieConfig );
+    debugger
+
+    // * hoodie.account
+    hoodie.extend( hoodieAccount );
+
+    // * hoodie.remote
+    hoodie.extend( hoodieRemote );
+
     // load user extensions
     applyExtensions(hoodie);
   }
@@ -95,17 +108,8 @@
   //      Hoodie.extend(funcion(hoodie) { hoodie.myMagic = function() {} })
   //
   var extensions = [];
-  Hoodie.extend = function(name, extension) {
-    if (extension) {
-      extensions.push({
-        name: name,
-        extension: extension
-      });
-    } else {
-      extensions.push({
-        extension: name
-      });
-    }
+  Hoodie.extend = function(extension) {
+    extensions.push(extension);
   };
 
   //
@@ -113,11 +117,7 @@
   //
   function applyExtensions(hoodie) {
     for (var i = 0; i < extensions.length; i++) {
-      if (extensions[i].name) {
-        hoodie[extensions[i].name] = new extensions[i].extension(hoodie);
-      } else {
-        extensions[i].extension(hoodie);
-      }
+      extensions[i](hoodie);
     }
   }
 
