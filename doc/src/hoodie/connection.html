@@ -1,0 +1,63 @@
+<!DOCTYPE html><html lang="en"><head><title>src/hoodie/connection</title></head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0"><meta name="groc-relative-root" content="../../"><meta name="groc-document-path" content="src/hoodie/connection"><meta name="groc-project-path" content="src/hoodie/connection.js"><link rel="stylesheet" type="text/css" media="all" href="../../assets/style.css"><script type="text/javascript" src="../../assets/behavior.js"></script><body><div id="meta"><div class="file-path">src/hoodie/connection.js</div></div><div id="document"><div class="segment"><div class="comments"><div class="wrapper"><h1 id="hoodiecheckconnection-amp-hoodieisonline">hoodie.checkConnection() &amp; hoodie.isOnline()</h1></div></div></div><div class="segment"><div class="code"><div class="wrapper"><span class="kd">function</span> <span class="nx">hoodieConnection</span><span class="p">(</span><span class="nx">hoodie</span><span class="p">)</span> <span class="p">{</span>
+
+  <span class="s1">&#39;use strict&#39;</span><span class="p">;</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h2 id="check-connection">Check Connection</h2></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>the <code>checkConnection</code> method is used, well, to check if
+the hoodie backend is reachable at <code>baseUrl</code> or not.
+Check Connection is automatically called on startup
+and then each 30 seconds. If it fails, it</p>
+
+<ul>
+<li>sets <code>online = false</code></li>
+<li>triggers <code>offline</code> event</li>
+<li>sets <code>checkConnectionInterval = 3000</code></li>
+</ul>
+
+<p>when connection can be reestablished, it</p>
+
+<ul>
+<li>sets <code>online = true</code></li>
+<li>triggers <code>online</code> event</li>
+<li>sets <code>checkConnectionInterval = 30000</code></li>
+</ul></div></div><div class="code"><div class="wrapper">  <span class="kd">var</span> <span class="nx">online</span> <span class="o">=</span> <span class="kc">true</span><span class="p">;</span>
+  <span class="kd">var</span> <span class="nx">checkConnectionInterval</span> <span class="o">=</span> <span class="mi">30000</span><span class="p">;</span>
+  <span class="kd">var</span> <span class="nx">checkConnectionRequest</span> <span class="o">=</span> <span class="kc">null</span><span class="p">;</span>
+  <span class="kd">function</span> <span class="nx">checkConnection</span><span class="p">()</span> <span class="p">{</span>
+
+    <span class="kd">var</span> <span class="nx">req</span> <span class="o">=</span> <span class="nx">checkConnectionRequest</span><span class="p">;</span>
+
+    <span class="k">if</span> <span class="p">(</span><span class="nx">req</span> <span class="o">&amp;&amp;</span> <span class="nx">req</span><span class="p">.</span><span class="nx">state</span><span class="p">()</span> <span class="o">===</span> <span class="s1">&#39;pending&#39;</span><span class="p">)</span> <span class="p">{</span>
+      <span class="k">return</span> <span class="nx">req</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="nx">checkConnectionRequest</span> <span class="o">=</span> <span class="nx">hoodie</span><span class="p">.</span><span class="nx">request</span><span class="p">(</span><span class="s1">&#39;GET&#39;</span><span class="p">,</span> <span class="s1">&#39;/&#39;</span><span class="p">).</span><span class="nx">pipe</span><span class="p">(</span>
+      <span class="nx">handleCheckConnectionSuccess</span><span class="p">,</span>
+      <span class="nx">handleCheckConnectionError</span>
+    <span class="p">);</span>
+
+    <span class="k">return</span> <span class="nx">checkConnectionRequest</span><span class="p">;</span>
+  <span class="p">}</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h2 id="isonline">isOnline</h2></div></div></div><div class="segment"><div class="code"><div class="wrapper">  <span class="kd">function</span> <span class="nx">isOnline</span><span class="p">()</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="nx">online</span><span class="p">;</span>
+  <span class="p">}</span></div></div></div><div class="segment"><div class="code"><div class="wrapper">  <span class="kd">function</span> <span class="nx">handleCheckConnectionSuccess</span><span class="p">()</span> <span class="p">{</span>
+    <span class="nx">checkConnectionInterval</span> <span class="o">=</span> <span class="mi">30000</span><span class="p">;</span>
+
+    <span class="nb">window</span><span class="p">.</span><span class="nx">setTimeout</span><span class="p">(</span><span class="nx">checkConnection</span><span class="p">,</span> <span class="nx">checkConnectionInterval</span><span class="p">);</span>
+
+    <span class="k">if</span> <span class="p">(</span><span class="o">!</span> <span class="nx">hoodie</span><span class="p">.</span><span class="nx">isOnline</span><span class="p">())</span> <span class="p">{</span>
+      <span class="nx">hoodie</span><span class="p">.</span><span class="nx">trigger</span><span class="p">(</span><span class="s1">&#39;reconnected&#39;</span><span class="p">);</span>
+      <span class="nx">online</span> <span class="o">=</span> <span class="kc">true</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="k">return</span> <span class="nx">hoodie</span><span class="p">.</span><span class="nx">resolve</span><span class="p">();</span>
+  <span class="p">}</span></div></div></div><div class="segment"><div class="code"><div class="wrapper">  <span class="kd">function</span> <span class="nx">handleCheckConnectionError</span><span class="p">()</span> <span class="p">{</span>
+    <span class="nx">checkConnectionInterval</span> <span class="o">=</span> <span class="mi">3000</span><span class="p">;</span>
+
+    <span class="nb">window</span><span class="p">.</span><span class="nx">setTimeout</span><span class="p">(</span><span class="nx">checkConnection</span><span class="p">,</span> <span class="nx">checkConnectionInterval</span><span class="p">);</span>
+
+    <span class="k">if</span> <span class="p">(</span><span class="nx">hoodie</span><span class="p">.</span><span class="nx">isOnline</span><span class="p">())</span> <span class="p">{</span>
+      <span class="nx">hoodie</span><span class="p">.</span><span class="nx">trigger</span><span class="p">(</span><span class="s1">&#39;disconnected&#39;</span><span class="p">);</span>
+      <span class="nx">online</span> <span class="o">=</span> <span class="kc">false</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="k">return</span> <span class="nx">hoodie</span><span class="p">.</span><span class="nx">reject</span><span class="p">();</span>
+  <span class="p">}</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>public API</p></div></div><div class="code"><div class="wrapper">  <span class="nx">hoodie</span><span class="p">.</span><span class="nx">isOnline</span> <span class="o">=</span> <span class="nx">isOnline</span><span class="p">;</span>
+  <span class="nx">hoodie</span><span class="p">.</span><span class="nx">checkConnection</span> <span class="o">=</span> <span class="nx">checkConnection</span><span class="p">;</span>
+<span class="p">}</span></div></div></div></div></body></html>

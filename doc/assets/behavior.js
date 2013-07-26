@@ -14,12 +14,55 @@ f.event={add:function(a,c,d,e,g){var h,i,j,k,l,m,n,o,p,q,r,s;if(!(a.nodeType===3
       "depth": 1,
       "children": [
         {
-          "type": "folder",
+          "type": "file",
           "data": {
-            "path": "src/core",
-            "title": "core"
+            "language": {
+              "nameMatchers": [".js"],
+              "pygmentsLexer": "javascript",
+              "singleLineComment": ["//"],
+              "name": "JavaScript"
+            },
+            "sourcePath": "/Users/gregor/JavaScripts/hood.ie/hoodie.js/src/hoodie.js",
+            "projectPath": "src/hoodie.js",
+            "targetPath": "src/hoodie",
+            "title": "hoodie"
           },
           "depth": 2,
+          "outline": [
+            {
+              "type": "heading",
+              "data": {
+                "level": 2,
+                "title": "Hoodie",
+                "slug": "hoodie"
+              },
+              "depth": 2
+            }, {
+              "type": "heading",
+              "data": {
+                "level": 2,
+                "title": "Constructor",
+                "slug": "constructor"
+              },
+              "depth": 2
+            }, {
+              "type": "heading",
+              "data": {
+                "level": 2,
+                "title": "hoodie.extend",
+                "slug": "hoodieextend"
+              },
+              "depth": 2
+            }, {
+              "type": "heading",
+              "data": {
+                "level": 2,
+                "title": "Extending hoodie",
+                "slug": "extending-hoodie"
+              },
+              "depth": 2
+            }
+          ],
           "children": [
             {
               "type": "file",
@@ -30,9 +73,9 @@ f.event={add:function(a,c,d,e,g){var h,i,j,k,l,m,n,o,p,q,r,s;if(!(a.nodeType===3
                   "singleLineComment": ["//"],
                   "name": "JavaScript"
                 },
-                "sourcePath": "/Users/gregor/JavaScripts/hood.ie/hoodie.js/src/core/account.js",
-                "projectPath": "src/core/account.js",
-                "targetPath": "src/core/account",
+                "sourcePath": "/Users/gregor/JavaScripts/hood.ie/hoodie.js/src/hoodie/account.js",
+                "projectPath": "src/hoodie/account.js",
+                "targetPath": "src/hoodie/account",
                 "firstHeader": {
                   "type": "heading",
                   "data": {
@@ -381,9 +424,9 @@ f.event={add:function(a,c,d,e,g){var h,i,j,k,l,m,n,o,p,q,r,s;if(!(a.nodeType===3
                   "singleLineComment": ["//"],
                   "name": "JavaScript"
                 },
-                "sourcePath": "/Users/gregor/JavaScripts/hood.ie/hoodie.js/src/core/account_remote.js",
-                "projectPath": "src/core/account_remote.js",
-                "targetPath": "src/core/account_remote",
+                "sourcePath": "/Users/gregor/JavaScripts/hood.ie/hoodie.js/src/hoodie/account_remote.js",
+                "projectPath": "src/hoodie/account_remote.js",
+                "targetPath": "src/hoodie/account_remote",
                 "firstHeader": {
                   "type": "heading",
                   "data": {
@@ -540,9 +583,9 @@ f.event={add:function(a,c,d,e,g){var h,i,j,k,l,m,n,o,p,q,r,s;if(!(a.nodeType===3
                   "singleLineComment": ["//"],
                   "name": "JavaScript"
                 },
-                "sourcePath": "/Users/gregor/JavaScripts/hood.ie/hoodie.js/src/core/config.js",
-                "projectPath": "src/core/config.js",
-                "targetPath": "src/core/config",
+                "sourcePath": "/Users/gregor/JavaScripts/hood.ie/hoodie.js/src/hoodie/config.js",
+                "projectPath": "src/hoodie/config.js",
+                "targetPath": "src/hoodie/config",
                 "firstHeader": {
                   "type": "heading",
                   "data": {
@@ -554,14 +597,6 @@ f.event={add:function(a,c,d,e,g){var h,i,j,k,l,m,n,o,p,q,r,s;if(!(a.nodeType===3
                   "depth": 1,
                   "children": [
                     {
-                      "type": "heading",
-                      "data": {
-                        "level": 2,
-                        "title": "Constructor",
-                        "slug": "constructor"
-                      },
-                      "depth": 2
-                    }, {
                       "type": "heading",
                       "data": {
                         "level": 2,
@@ -604,14 +639,6 @@ f.event={add:function(a,c,d,e,g){var h,i,j,k,l,m,n,o,p,q,r,s;if(!(a.nodeType===3
                   "type": "heading",
                   "data": {
                     "level": 2,
-                    "title": "Constructor",
-                    "slug": "constructor"
-                  },
-                  "depth": 2
-                }, {
-                  "type": "heading",
-                  "data": {
-                    "level": 2,
                     "title": "set",
                     "slug": "set"
                   },
@@ -651,9 +678,98 @@ f.event={add:function(a,c,d,e,g){var h,i,j,k,l,m,n,o,p,q,r,s;if(!(a.nodeType===3
                   "singleLineComment": ["//"],
                   "name": "JavaScript"
                 },
-                "sourcePath": "/Users/gregor/JavaScripts/hood.ie/hoodie.js/src/core/errors.js",
-                "projectPath": "src/core/errors.js",
-                "targetPath": "src/core/errors",
+                "sourcePath": "/Users/gregor/JavaScripts/hood.ie/hoodie.js/src/hoodie/connection.js",
+                "projectPath": "src/hoodie/connection.js",
+                "targetPath": "src/hoodie/connection",
+                "firstHeader": {
+                  "type": "heading",
+                  "data": {
+                    "level": 1,
+                    "title": "hoodie.checkConnection() &amp; hoodie.isOnline()",
+                    "slug": "hoodiecheckconnection-amp-hoodieisonline",
+                    "isFileHeader": true
+                  },
+                  "depth": 1,
+                  "children": [
+                    {
+                      "type": "heading",
+                      "data": {
+                        "level": 2,
+                        "title": "Check Connection",
+                        "slug": "check-connection"
+                      },
+                      "depth": 2
+                    }, {
+                      "type": "heading",
+                      "data": {
+                        "level": 2,
+                        "title": "isOnline",
+                        "slug": "isonline"
+                      },
+                      "depth": 2
+                    }
+                  ]
+                },
+                "title": "hoodie.checkConnection() &amp; hoodie.isOnline()"
+              },
+              "depth": 3,
+              "outline": [
+                {
+                  "type": "heading",
+                  "data": {
+                    "level": 2,
+                    "title": "Check Connection",
+                    "slug": "check-connection"
+                  },
+                  "depth": 2
+                }, {
+                  "type": "heading",
+                  "data": {
+                    "level": 2,
+                    "title": "isOnline",
+                    "slug": "isonline"
+                  },
+                  "depth": 2
+                }
+              ]
+            }, {
+              "type": "file",
+              "data": {
+                "language": {
+                  "nameMatchers": [".js"],
+                  "pygmentsLexer": "javascript",
+                  "singleLineComment": ["//"],
+                  "name": "JavaScript"
+                },
+                "sourcePath": "/Users/gregor/JavaScripts/hood.ie/hoodie.js/src/hoodie/dispose.js",
+                "projectPath": "src/hoodie/dispose.js",
+                "targetPath": "src/hoodie/dispose",
+                "firstHeader": {
+                  "type": "heading",
+                  "data": {
+                    "level": 1,
+                    "title": "hoodie.dispose",
+                    "slug": "hoodiedispose",
+                    "isFileHeader": true
+                  },
+                  "depth": 1
+                },
+                "title": "hoodie.dispose"
+              },
+              "depth": 3,
+              "outline": []
+            }, {
+              "type": "file",
+              "data": {
+                "language": {
+                  "nameMatchers": [".js"],
+                  "pygmentsLexer": "javascript",
+                  "singleLineComment": ["//"],
+                  "name": "JavaScript"
+                },
+                "sourcePath": "/Users/gregor/JavaScripts/hood.ie/hoodie.js/src/hoodie/errors.js",
+                "projectPath": "src/hoodie/errors.js",
+                "targetPath": "src/hoodie/errors",
                 "title": "errors"
               },
               "depth": 3,
@@ -693,9 +809,104 @@ f.event={add:function(a,c,d,e,g){var h,i,j,k,l,m,n,o,p,q,r,s;if(!(a.nodeType===3
                   "singleLineComment": ["//"],
                   "name": "JavaScript"
                 },
-                "sourcePath": "/Users/gregor/JavaScripts/hood.ie/hoodie.js/src/core/local_store.js",
-                "projectPath": "src/core/local_store.js",
-                "targetPath": "src/core/local_store",
+                "sourcePath": "/Users/gregor/JavaScripts/hood.ie/hoodie.js/src/hoodie/events.js",
+                "projectPath": "src/hoodie/events.js",
+                "targetPath": "src/hoodie/events",
+                "firstHeader": {
+                  "type": "heading",
+                  "data": {
+                    "level": 1,
+                    "title": "Events",
+                    "slug": "events",
+                    "isFileHeader": true
+                  },
+                  "depth": 1,
+                  "children": [
+                    {
+                      "type": "heading",
+                      "data": {
+                        "level": 2,
+                        "title": "Bind",
+                        "slug": "bind"
+                      },
+                      "depth": 2
+                    }, {
+                      "type": "heading",
+                      "data": {
+                        "level": 2,
+                        "title": "one",
+                        "slug": "one"
+                      },
+                      "depth": 2
+                    }, {
+                      "type": "heading",
+                      "data": {
+                        "level": 2,
+                        "title": "trigger",
+                        "slug": "trigger"
+                      },
+                      "depth": 2
+                    }, {
+                      "type": "heading",
+                      "data": {
+                        "level": 2,
+                        "title": "unbind",
+                        "slug": "unbind"
+                      },
+                      "depth": 2
+                    }
+                  ]
+                },
+                "title": "Events"
+              },
+              "depth": 3,
+              "outline": [
+                {
+                  "type": "heading",
+                  "data": {
+                    "level": 2,
+                    "title": "Bind",
+                    "slug": "bind"
+                  },
+                  "depth": 2
+                }, {
+                  "type": "heading",
+                  "data": {
+                    "level": 2,
+                    "title": "one",
+                    "slug": "one"
+                  },
+                  "depth": 2
+                }, {
+                  "type": "heading",
+                  "data": {
+                    "level": 2,
+                    "title": "trigger",
+                    "slug": "trigger"
+                  },
+                  "depth": 2
+                }, {
+                  "type": "heading",
+                  "data": {
+                    "level": 2,
+                    "title": "unbind",
+                    "slug": "unbind"
+                  },
+                  "depth": 2
+                }
+              ]
+            }, {
+              "type": "file",
+              "data": {
+                "language": {
+                  "nameMatchers": [".js"],
+                  "pygmentsLexer": "javascript",
+                  "singleLineComment": ["//"],
+                  "name": "JavaScript"
+                },
+                "sourcePath": "/Users/gregor/JavaScripts/hood.ie/hoodie.js/src/hoodie/local_store.js",
+                "projectPath": "src/hoodie/local_store.js",
+                "targetPath": "src/hoodie/local_store",
                 "firstHeader": {
                   "type": "heading",
                   "data": {
@@ -766,8 +977,8 @@ f.event={add:function(a,c,d,e,g){var h,i,j,k,l,m,n,o,p,q,r,s;if(!(a.nodeType===3
                       "type": "heading",
                       "data": {
                         "level": 2,
-                        "title": "Clear changed ",
-                        "slug": "clear-changed-"
+                        "title": "Clear changed",
+                        "slug": "clear-changed"
                       },
                       "depth": 2
                     }, {
@@ -941,8 +1152,8 @@ f.event={add:function(a,c,d,e,g){var h,i,j,k,l,m,n,o,p,q,r,s;if(!(a.nodeType===3
                   "type": "heading",
                   "data": {
                     "level": 2,
-                    "title": "Clear changed ",
-                    "slug": "clear-changed-"
+                    "title": "Clear changed",
+                    "slug": "clear-changed"
                   },
                   "depth": 2
                 }, {
@@ -1060,9 +1271,61 @@ f.event={add:function(a,c,d,e,g){var h,i,j,k,l,m,n,o,p,q,r,s;if(!(a.nodeType===3
                   "singleLineComment": ["//"],
                   "name": "JavaScript"
                 },
-                "sourcePath": "/Users/gregor/JavaScripts/hood.ie/hoodie.js/src/core/remote.js",
-                "projectPath": "src/core/remote.js",
-                "targetPath": "src/core/remote",
+                "sourcePath": "/Users/gregor/JavaScripts/hood.ie/hoodie.js/src/hoodie/open.js",
+                "projectPath": "src/hoodie/open.js",
+                "targetPath": "src/hoodie/open",
+                "title": "open"
+              },
+              "depth": 3,
+              "outline": [
+                {
+                  "type": "heading",
+                  "data": {
+                    "level": 2,
+                    "title": "Open stores",
+                    "slug": "open-stores"
+                  },
+                  "depth": 2
+                }
+              ]
+            }, {
+              "type": "file",
+              "data": {
+                "language": {
+                  "nameMatchers": [".js"],
+                  "pygmentsLexer": "javascript",
+                  "singleLineComment": ["//"],
+                  "name": "JavaScript"
+                },
+                "sourcePath": "/Users/gregor/JavaScripts/hood.ie/hoodie.js/src/hoodie/promises.js",
+                "projectPath": "src/hoodie/promises.js",
+                "targetPath": "src/hoodie/promises",
+                "title": "promises"
+              },
+              "depth": 3,
+              "outline": [
+                {
+                  "type": "heading",
+                  "data": {
+                    "level": 2,
+                    "title": "Hoodie Defers / Promises",
+                    "slug": "hoodie-defers--promises"
+                  },
+                  "depth": 2
+                }
+              ]
+            }, {
+              "type": "file",
+              "data": {
+                "language": {
+                  "nameMatchers": [".js"],
+                  "pygmentsLexer": "javascript",
+                  "singleLineComment": ["//"],
+                  "name": "JavaScript"
+                },
+                "sourcePath": "/Users/gregor/JavaScripts/hood.ie/hoodie.js/src/hoodie/remote.js",
+                "projectPath": "src/hoodie/remote.js",
+                "targetPath": "src/hoodie/remote",
                 "firstHeader": {
                   "type": "heading",
                   "data": {
@@ -1085,8 +1348,8 @@ f.event={add:function(a,c,d,e,g){var h,i,j,k,l,m,n,o,p,q,r,s;if(!(a.nodeType===3
                       "type": "heading",
                       "data": {
                         "level": 2,
-                        "title": "Constructor ",
-                        "slug": "constructor-"
+                        "title": "Constructor",
+                        "slug": "constructor"
                       },
                       "depth": 2
                     }, {
@@ -1391,8 +1654,8 @@ f.event={add:function(a,c,d,e,g){var h,i,j,k,l,m,n,o,p,q,r,s;if(!(a.nodeType===3
                   "type": "heading",
                   "data": {
                     "level": 2,
-                    "title": "Constructor ",
-                    "slug": "constructor-"
+                    "title": "Constructor",
+                    "slug": "constructor"
                   },
                   "depth": 2
                 }, {
@@ -1689,9 +1952,56 @@ f.event={add:function(a,c,d,e,g){var h,i,j,k,l,m,n,o,p,q,r,s;if(!(a.nodeType===3
                   "singleLineComment": ["//"],
                   "name": "JavaScript"
                 },
-                "sourcePath": "/Users/gregor/JavaScripts/hood.ie/hoodie.js/src/core/store.js",
-                "projectPath": "src/core/store.js",
-                "targetPath": "src/core/store",
+                "sourcePath": "/Users/gregor/JavaScripts/hood.ie/hoodie.js/src/hoodie/request.js",
+                "projectPath": "src/hoodie/request.js",
+                "targetPath": "src/hoodie/request",
+                "firstHeader": {
+                  "type": "heading",
+                  "data": {
+                    "level": 1,
+                    "title": "hoodie.request",
+                    "slug": "hoodierequest",
+                    "isFileHeader": true
+                  },
+                  "depth": 1,
+                  "children": [
+                    {
+                      "type": "heading",
+                      "data": {
+                        "level": 2,
+                        "title": "Requests",
+                        "slug": "requests"
+                      },
+                      "depth": 2
+                    }
+                  ]
+                },
+                "title": "hoodie.request"
+              },
+              "depth": 3,
+              "outline": [
+                {
+                  "type": "heading",
+                  "data": {
+                    "level": 2,
+                    "title": "Requests",
+                    "slug": "requests"
+                  },
+                  "depth": 2
+                }
+              ]
+            }, {
+              "type": "file",
+              "data": {
+                "language": {
+                  "nameMatchers": [".js"],
+                  "pygmentsLexer": "javascript",
+                  "singleLineComment": ["//"],
+                  "name": "JavaScript"
+                },
+                "sourcePath": "/Users/gregor/JavaScripts/hood.ie/hoodie.js/src/hoodie/store.js",
+                "projectPath": "src/hoodie/store.js",
+                "targetPath": "src/hoodie/store",
                 "firstHeader": {
                   "type": "heading",
                   "data": {
@@ -1887,153 +2197,6 @@ f.event={add:function(a,c,d,e,g){var h,i,j,k,l,m,n,o,p,q,r,s;if(!(a.nodeType===3
                   "depth": 2
                 }
               ]
-            }
-          ]
-        }, {
-          "type": "file",
-          "data": {
-            "language": {
-              "nameMatchers": [".js"],
-              "pygmentsLexer": "javascript",
-              "singleLineComment": ["//"],
-              "name": "JavaScript"
-            },
-            "sourcePath": "/Users/gregor/JavaScripts/hood.ie/hoodie.js/src/events.js",
-            "projectPath": "src/events.js",
-            "targetPath": "src/events",
-            "title": "events"
-          },
-          "depth": 2,
-          "outline": [
-            {
-              "type": "heading",
-              "data": {
-                "level": 2,
-                "title": "Events",
-                "slug": "events"
-              },
-              "depth": 2
-            }, {
-              "type": "heading",
-              "data": {
-                "level": 2,
-                "title": "Bind",
-                "slug": "bind"
-              },
-              "depth": 2
-            }, {
-              "type": "heading",
-              "data": {
-                "level": 2,
-                "title": "one",
-                "slug": "one"
-              },
-              "depth": 2
-            }, {
-              "type": "heading",
-              "data": {
-                "level": 2,
-                "title": "trigger",
-                "slug": "trigger"
-              },
-              "depth": 2
-            }, {
-              "type": "heading",
-              "data": {
-                "level": 2,
-                "title": "unbind",
-                "slug": "unbind"
-              },
-              "depth": 2
-            }
-          ]
-        }, {
-          "type": "folder",
-          "data": {
-            "path": "src/extensions",
-            "title": "extensions"
-          },
-          "depth": 2,
-          "children": [
-            {
-              "type": "file",
-              "data": {
-                "language": {
-                  "nameMatchers": [".js"],
-                  "pygmentsLexer": "javascript",
-                  "singleLineComment": ["//"],
-                  "name": "JavaScript"
-                },
-                "sourcePath": "/Users/gregor/JavaScripts/hood.ie/hoodie.js/src/extensions/email.js",
-                "projectPath": "src/extensions/email.js",
-                "targetPath": "src/extensions/email",
-                "firstHeader": {
-                  "type": "heading",
-                  "data": {
-                    "level": 1,
-                    "title": "Hoodie Email Extension",
-                    "slug": "hoodie-email-extension",
-                    "isFileHeader": true
-                  },
-                  "depth": 1,
-                  "children": [
-                    {
-                      "type": "heading",
-                      "data": {
-                        "level": 2,
-                        "title": "Constructor",
-                        "slug": "constructor"
-                      },
-                      "depth": 2
-                    }, {
-                      "type": "heading",
-                      "data": {
-                        "level": 2,
-                        "title": "send",
-                        "slug": "send"
-                      },
-                      "depth": 2
-                    }, {
-                      "type": "heading",
-                      "data": {
-                        "level": 2,
-                        "title": "PRIVATE",
-                        "slug": "private"
-                      },
-                      "depth": 2
-                    }
-                  ]
-                },
-                "title": "Hoodie Email Extension"
-              },
-              "depth": 3,
-              "outline": [
-                {
-                  "type": "heading",
-                  "data": {
-                    "level": 2,
-                    "title": "Constructor",
-                    "slug": "constructor"
-                  },
-                  "depth": 2
-                }, {
-                  "type": "heading",
-                  "data": {
-                    "level": 2,
-                    "title": "send",
-                    "slug": "send"
-                  },
-                  "depth": 2
-                }, {
-                  "type": "heading",
-                  "data": {
-                    "level": 2,
-                    "title": "PRIVATE",
-                    "slug": "private"
-                  },
-                  "depth": 2
-                }
-              ]
             }, {
               "type": "file",
               "data": {
@@ -2043,720 +2206,23 @@ f.event={add:function(a,c,d,e,g){var h,i,j,k,l,m,n,o,p,q,r,s;if(!(a.nodeType===3
                   "singleLineComment": ["//"],
                   "name": "JavaScript"
                 },
-                "sourcePath": "/Users/gregor/JavaScripts/hood.ie/hoodie.js/src/extensions/global.js",
-                "projectPath": "src/extensions/global.js",
-                "targetPath": "src/extensions/global",
+                "sourcePath": "/Users/gregor/JavaScripts/hood.ie/hoodie.js/src/hoodie/uuid.js",
+                "projectPath": "src/hoodie/uuid.js",
+                "targetPath": "src/hoodie/uuid",
                 "firstHeader": {
                   "type": "heading",
                   "data": {
                     "level": 1,
-                    "title": "Global",
-                    "slug": "global",
+                    "title": "hoodie.uuid",
+                    "slug": "hoodieuuid",
                     "isFileHeader": true
                   },
                   "depth": 1
                 },
-                "title": "Global"
+                "title": "hoodie.uuid"
               },
               "depth": 3,
               "outline": []
-            }, {
-              "type": "file",
-              "data": {
-                "language": {
-                  "nameMatchers": [".js"],
-                  "pygmentsLexer": "javascript",
-                  "singleLineComment": ["//"],
-                  "name": "JavaScript"
-                },
-                "sourcePath": "/Users/gregor/JavaScripts/hood.ie/hoodie.js/src/extensions/share.js",
-                "projectPath": "src/extensions/share.js",
-                "targetPath": "src/extensions/share",
-                "firstHeader": {
-                  "type": "heading",
-                  "data": {
-                    "level": 1,
-                    "title": "Share Module",
-                    "slug": "share-module",
-                    "isFileHeader": true
-                  },
-                  "depth": 1,
-                  "children": [
-                    {
-                      "type": "heading",
-                      "data": {
-                        "level": 2,
-                        "title": "API",
-                        "slug": "api"
-                      },
-                      "depth": 2
-                    }, {
-                      "type": "heading",
-                      "data": {
-                        "level": 2,
-                        "title": "Constructor",
-                        "slug": "constructor"
-                      },
-                      "depth": 2
-                    }, {
-                      "type": "heading",
-                      "data": {
-                        "level": 2,
-                        "title": "add",
-                        "slug": "add"
-                      },
-                      "depth": 2
-                    }, {
-                      "type": "heading",
-                      "data": {
-                        "level": 2,
-                        "title": "find",
-                        "slug": "find"
-                      },
-                      "depth": 2
-                    }, {
-                      "type": "heading",
-                      "data": {
-                        "level": 2,
-                        "title": "findAll",
-                        "slug": "findall"
-                      },
-                      "depth": 2
-                    }, {
-                      "type": "heading",
-                      "data": {
-                        "level": 2,
-                        "title": "findOrAdd",
-                        "slug": "findoradd"
-                      },
-                      "depth": 2
-                    }, {
-                      "type": "heading",
-                      "data": {
-                        "level": 2,
-                        "title": "save",
-                        "slug": "save"
-                      },
-                      "depth": 2
-                    }, {
-                      "type": "heading",
-                      "data": {
-                        "level": 2,
-                        "title": "update",
-                        "slug": "update"
-                      },
-                      "depth": 2
-                    }, {
-                      "type": "heading",
-                      "data": {
-                        "level": 2,
-                        "title": "updateAll",
-                        "slug": "updateall"
-                      },
-                      "depth": 2
-                    }, {
-                      "type": "heading",
-                      "data": {
-                        "level": 2,
-                        "title": "remove",
-                        "slug": "remove"
-                      },
-                      "depth": 2
-                    }, {
-                      "type": "heading",
-                      "data": {
-                        "level": 2,
-                        "title": "removeAll",
-                        "slug": "removeall"
-                      },
-                      "depth": 2
-                    }, {
-                      "type": "heading",
-                      "data": {
-                        "level": 2,
-                        "title": "Private",
-                        "slug": "private"
-                      },
-                      "depth": 2,
-                      "children": [
-                        {
-                          "type": "heading",
-                          "data": {
-                            "level": 3,
-                            "title": "filter share options",
-                            "slug": "filter-share-options"
-                          },
-                          "depth": 3
-                        }, {
-                          "type": "heading",
-                          "data": {
-                            "level": 3,
-                            "title": "open",
-                            "slug": "open"
-                          },
-                          "depth": 3
-                        }
-                      ]
-                    }, {
-                      "type": "heading",
-                      "data": {
-                        "level": 2,
-                        "title": "hoodie.store decorations",
-                        "slug": "hoodiestore-decorations"
-                      },
-                      "depth": 2,
-                      "children": [
-                        {
-                          "type": "heading",
-                          "data": {
-                            "level": 3,
-                            "title": "shareAt",
-                            "slug": "shareat"
-                          },
-                          "depth": 3
-                        }, {
-                          "type": "heading",
-                          "data": {
-                            "level": 3,
-                            "title": "unshareAt",
-                            "slug": "unshareat"
-                          },
-                          "depth": 3
-                        }, {
-                          "type": "heading",
-                          "data": {
-                            "level": 3,
-                            "title": "unshare",
-                            "slug": "unshare"
-                          },
-                          "depth": 3
-                        }, {
-                          "type": "heading",
-                          "data": {
-                            "level": 3,
-                            "title": "share",
-                            "slug": "share"
-                          },
-                          "depth": 3
-                        }
-                      ]
-                    }
-                  ]
-                },
-                "title": "Share Module"
-              },
-              "depth": 3,
-              "outline": [
-                {
-                  "type": "heading",
-                  "data": {
-                    "level": 2,
-                    "title": "API",
-                    "slug": "api"
-                  },
-                  "depth": 2
-                }, {
-                  "type": "heading",
-                  "data": {
-                    "level": 2,
-                    "title": "Constructor",
-                    "slug": "constructor"
-                  },
-                  "depth": 2
-                }, {
-                  "type": "heading",
-                  "data": {
-                    "level": 2,
-                    "title": "add",
-                    "slug": "add"
-                  },
-                  "depth": 2
-                }, {
-                  "type": "heading",
-                  "data": {
-                    "level": 2,
-                    "title": "find",
-                    "slug": "find"
-                  },
-                  "depth": 2
-                }, {
-                  "type": "heading",
-                  "data": {
-                    "level": 2,
-                    "title": "findAll",
-                    "slug": "findall"
-                  },
-                  "depth": 2
-                }, {
-                  "type": "heading",
-                  "data": {
-                    "level": 2,
-                    "title": "findOrAdd",
-                    "slug": "findoradd"
-                  },
-                  "depth": 2
-                }, {
-                  "type": "heading",
-                  "data": {
-                    "level": 2,
-                    "title": "save",
-                    "slug": "save"
-                  },
-                  "depth": 2
-                }, {
-                  "type": "heading",
-                  "data": {
-                    "level": 2,
-                    "title": "update",
-                    "slug": "update"
-                  },
-                  "depth": 2
-                }, {
-                  "type": "heading",
-                  "data": {
-                    "level": 2,
-                    "title": "updateAll",
-                    "slug": "updateall"
-                  },
-                  "depth": 2
-                }, {
-                  "type": "heading",
-                  "data": {
-                    "level": 2,
-                    "title": "remove",
-                    "slug": "remove"
-                  },
-                  "depth": 2
-                }, {
-                  "type": "heading",
-                  "data": {
-                    "level": 2,
-                    "title": "removeAll",
-                    "slug": "removeall"
-                  },
-                  "depth": 2
-                }, {
-                  "type": "heading",
-                  "data": {
-                    "level": 2,
-                    "title": "Private",
-                    "slug": "private"
-                  },
-                  "depth": 2,
-                  "children": [
-                    {
-                      "type": "heading",
-                      "data": {
-                        "level": 3,
-                        "title": "filter share options",
-                        "slug": "filter-share-options"
-                      },
-                      "depth": 3
-                    }, {
-                      "type": "heading",
-                      "data": {
-                        "level": 3,
-                        "title": "open",
-                        "slug": "open"
-                      },
-                      "depth": 3
-                    }
-                  ]
-                }, {
-                  "type": "heading",
-                  "data": {
-                    "level": 2,
-                    "title": "hoodie.store decorations",
-                    "slug": "hoodiestore-decorations"
-                  },
-                  "depth": 2,
-                  "children": [
-                    {
-                      "type": "heading",
-                      "data": {
-                        "level": 3,
-                        "title": "shareAt",
-                        "slug": "shareat"
-                      },
-                      "depth": 3
-                    }, {
-                      "type": "heading",
-                      "data": {
-                        "level": 3,
-                        "title": "unshareAt",
-                        "slug": "unshareat"
-                      },
-                      "depth": 3
-                    }, {
-                      "type": "heading",
-                      "data": {
-                        "level": 3,
-                        "title": "unshare",
-                        "slug": "unshare"
-                      },
-                      "depth": 3
-                    }, {
-                      "type": "heading",
-                      "data": {
-                        "level": 3,
-                        "title": "share",
-                        "slug": "share"
-                      },
-                      "depth": 3
-                    }
-                  ]
-                }
-              ]
-            }, {
-              "type": "file",
-              "data": {
-                "language": {
-                  "nameMatchers": [".js"],
-                  "pygmentsLexer": "javascript",
-                  "singleLineComment": ["//"],
-                  "name": "JavaScript"
-                },
-                "sourcePath": "/Users/gregor/JavaScripts/hood.ie/hoodie.js/src/extensions/share_instance.js",
-                "projectPath": "src/extensions/share_instance.js",
-                "targetPath": "src/extensions/share_instance",
-                "firstHeader": {
-                  "type": "heading",
-                  "data": {
-                    "level": 1,
-                    "title": "Share Instance",
-                    "slug": "share-instance",
-                    "isFileHeader": true
-                  },
-                  "depth": 1,
-                  "children": [
-                    {
-                      "type": "heading",
-                      "data": {
-                        "level": 2,
-                        "title": "constructor",
-                        "slug": "constructor"
-                      },
-                      "depth": 2
-                    }, {
-                      "type": "heading",
-                      "data": {
-                        "level": 2,
-                        "title": "default values",
-                        "slug": "default-values"
-                      },
-                      "depth": 2
-                    }, {
-                      "type": "heading",
-                      "data": {
-                        "level": 2,
-                        "title": "subscribe",
-                        "slug": "subscribe"
-                      },
-                      "depth": 2
-                    }, {
-                      "type": "heading",
-                      "data": {
-                        "level": 2,
-                        "title": "unsubscribe",
-                        "slug": "unsubscribe"
-                      },
-                      "depth": 2
-                    }, {
-                      "type": "heading",
-                      "data": {
-                        "level": 2,
-                        "title": "grant read access",
-                        "slug": "grant-read-access"
-                      },
-                      "depth": 2
-                    }, {
-                      "type": "heading",
-                      "data": {
-                        "level": 2,
-                        "title": "revoke read access",
-                        "slug": "revoke-read-access"
-                      },
-                      "depth": 2
-                    }, {
-                      "type": "heading",
-                      "data": {
-                        "level": 2,
-                        "title": "grant write access",
-                        "slug": "grant-write-access"
-                      },
-                      "depth": 2
-                    }, {
-                      "type": "heading",
-                      "data": {
-                        "level": 2,
-                        "title": "revoke write access",
-                        "slug": "revoke-write-access"
-                      },
-                      "depth": 2
-                    }, {
-                      "type": "heading",
-                      "data": {
-                        "level": 2,
-                        "title": "PRIVATE",
-                        "slug": "private"
-                      },
-                      "depth": 2
-                    }
-                  ]
-                },
-                "title": "Share Instance"
-              },
-              "depth": 3,
-              "outline": [
-                {
-                  "type": "heading",
-                  "data": {
-                    "level": 2,
-                    "title": "constructor",
-                    "slug": "constructor"
-                  },
-                  "depth": 2
-                }, {
-                  "type": "heading",
-                  "data": {
-                    "level": 2,
-                    "title": "default values",
-                    "slug": "default-values"
-                  },
-                  "depth": 2
-                }, {
-                  "type": "heading",
-                  "data": {
-                    "level": 2,
-                    "title": "subscribe",
-                    "slug": "subscribe"
-                  },
-                  "depth": 2
-                }, {
-                  "type": "heading",
-                  "data": {
-                    "level": 2,
-                    "title": "unsubscribe",
-                    "slug": "unsubscribe"
-                  },
-                  "depth": 2
-                }, {
-                  "type": "heading",
-                  "data": {
-                    "level": 2,
-                    "title": "grant read access",
-                    "slug": "grant-read-access"
-                  },
-                  "depth": 2
-                }, {
-                  "type": "heading",
-                  "data": {
-                    "level": 2,
-                    "title": "revoke read access",
-                    "slug": "revoke-read-access"
-                  },
-                  "depth": 2
-                }, {
-                  "type": "heading",
-                  "data": {
-                    "level": 2,
-                    "title": "grant write access",
-                    "slug": "grant-write-access"
-                  },
-                  "depth": 2
-                }, {
-                  "type": "heading",
-                  "data": {
-                    "level": 2,
-                    "title": "revoke write access",
-                    "slug": "revoke-write-access"
-                  },
-                  "depth": 2
-                }, {
-                  "type": "heading",
-                  "data": {
-                    "level": 2,
-                    "title": "PRIVATE",
-                    "slug": "private"
-                  },
-                  "depth": 2
-                }
-              ]
-            }, {
-              "type": "file",
-              "data": {
-                "language": {
-                  "nameMatchers": [".js"],
-                  "pygmentsLexer": "javascript",
-                  "singleLineComment": ["//"],
-                  "name": "JavaScript"
-                },
-                "sourcePath": "/Users/gregor/JavaScripts/hood.ie/hoodie.js/src/extensions/user.js",
-                "projectPath": "src/extensions/user.js",
-                "targetPath": "src/extensions/user",
-                "firstHeader": {
-                  "type": "heading",
-                  "data": {
-                    "level": 1,
-                    "title": "User",
-                    "slug": "user",
-                    "isFileHeader": true
-                  },
-                  "depth": 1,
-                  "children": [
-                    {
-                      "type": "heading",
-                      "data": {
-                        "level": 2,
-                        "title": "hoodie.store decorations",
-                        "slug": "hoodiestore-decorations"
-                      },
-                      "depth": 2,
-                      "children": [
-                        {
-                          "type": "heading",
-                          "data": {
-                            "level": 3,
-                            "title": "publish",
-                            "slug": "publish"
-                          },
-                          "depth": 3
-                        }
-                      ]
-                    }
-                  ]
-                },
-                "title": "User"
-              },
-              "depth": 3,
-              "outline": [
-                {
-                  "type": "heading",
-                  "data": {
-                    "level": 2,
-                    "title": "hoodie.store decorations",
-                    "slug": "hoodiestore-decorations"
-                  },
-                  "depth": 2,
-                  "children": [
-                    {
-                      "type": "heading",
-                      "data": {
-                        "level": 3,
-                        "title": "publish",
-                        "slug": "publish"
-                      },
-                      "depth": 3
-                    }
-                  ]
-                }
-              ]
-            }
-          ]
-        }, {
-          "type": "file",
-          "data": {
-            "language": {
-              "nameMatchers": [".js"],
-              "pygmentsLexer": "javascript",
-              "singleLineComment": ["//"],
-              "name": "JavaScript"
-            },
-            "sourcePath": "/Users/gregor/JavaScripts/hood.ie/hoodie.js/src/hoodie.js",
-            "projectPath": "src/hoodie.js",
-            "targetPath": "src/hoodie",
-            "title": "hoodie"
-          },
-          "depth": 2,
-          "outline": [
-            {
-              "type": "heading",
-              "data": {
-                "level": 2,
-                "title": "Hoodie",
-                "slug": "hoodie"
-              },
-              "depth": 2
-            }, {
-              "type": "heading",
-              "data": {
-                "level": 2,
-                "title": "Constructor",
-                "slug": "constructor"
-              },
-              "depth": 2
-            }, {
-              "type": "heading",
-              "data": {
-                "level": 2,
-                "title": "Settings",
-                "slug": "settings"
-              },
-              "depth": 2
-            }, {
-              "type": "heading",
-              "data": {
-                "level": 2,
-                "title": "Requests",
-                "slug": "requests"
-              },
-              "depth": 2
-            }, {
-              "type": "heading",
-              "data": {
-                "level": 2,
-                "title": "Check Connection",
-                "slug": "check-connection"
-              },
-              "depth": 2
-            }, {
-              "type": "heading",
-              "data": {
-                "level": 2,
-                "title": "Open stores",
-                "slug": "open-stores"
-              },
-              "depth": 2
-            }, {
-              "type": "heading",
-              "data": {
-                "level": 2,
-                "title": "uuid",
-                "slug": "uuid"
-              },
-              "depth": 2
-            }, {
-              "type": "heading",
-              "data": {
-                "level": 2,
-                "title": "Defers / Promises",
-                "slug": "defers--promises"
-              },
-              "depth": 2
-            }, {
-              "type": "heading",
-              "data": {
-                "level": 2,
-                "title": "dispose",
-                "slug": "dispose"
-              },
-              "depth": 2
-            }, {
-              "type": "heading",
-              "data": {
-                "level": 2,
-                "title": "Extending hoodie",
-                "slug": "extending-hoodie"
-              },
-              "depth": 2
-            }, {
-              "type": "heading",
-              "data": {
-                "level": 2,
-                "title": "Private",
-                "slug": "private"
-              },
-              "depth": 2
             }
           ]
         }, {

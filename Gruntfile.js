@@ -30,22 +30,22 @@ module.exports = function(grunt) {
           'src/utils.js',
           'src/hoodie.js',
 
-          'src/core/events.js',
-          'src/core/promises.js',
-          'src/core/request.js',
-          'src/core/connection.js',
-          'src/core/uuid.js',
-          'src/core/dispose.js',
-          'src/core/open.js',
+          'src/hoodie/events.js',
+          'src/hoodie/promises.js',
+          'src/hoodie/request.js',
+          'src/hoodie/connection.js',
+          'src/hoodie/uuid.js',
+          'src/hoodie/dispose.js',
+          'src/hoodie/open.js',
 
-          'src/core/store.js',
-          'src/core/errors.js',
-          'src/core/remote.js',
+          'src/hoodie/store.js',
+          'src/hoodie/errors.js',
+          'src/hoodie/remote.js',
 
-          'src/core/local_store.js',
-          'src/core/config.js',
-          'src/core/account.js',
-          'src/core/account_remote.js'
+          'src/hoodie/local_store.js',
+          'src/hoodie/config.js',
+          'src/hoodie/account.js',
+          'src/hoodie/account_remote.js'
         ],
         dest: 'dist/<%= pkg.name %>.js'
       }

@@ -1,4 +1,14 @@
-<!DOCTYPE html><html lang="en"><head><title>src/core/account</title></head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0"><meta name="groc-relative-root" content="../../"><meta name="groc-document-path" content="src/core/account"><meta name="groc-project-path" content="src/core/account.js"><link rel="stylesheet" type="text/css" media="all" href="../../assets/style.css"><script type="text/javascript" src="../../assets/behavior.js"></script><body><div id="meta"><div class="file-path">src/core/account.js</div></div><div id="document"><div class="segment"><div class="comments"><div class="wrapper"><h1 id="hoodieaccount">Hoodie.Account</h1></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>tell something smart in here.</p></div></div><div class="code"><div class="wrapper"><span class="nx">Hoodie</span><span class="p">.</span><span class="nx">Account</span> <span class="o">=</span> <span class="p">(</span><span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+<!DOCTYPE html><html lang="en"><head><title>src/hoodie/account</title></head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0"><meta name="groc-relative-root" content="../../"><meta name="groc-document-path" content="src/hoodie/account"><meta name="groc-project-path" content="src/hoodie/account.js"><link rel="stylesheet" type="text/css" media="all" href="../../assets/style.css"><script type="text/javascript" src="../../assets/behavior.js"></script><body><div id="meta"><div class="file-path">src/hoodie/account.js</div></div><div id="document"><div class="segment"><div class="comments"><div class="wrapper"><h1 id="hoodieaccount">Hoodie.Account</h1></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>NOTE:
+this is a workaround to make the old,
+CoffeeScripty classes compatible with
+the new Hoodie.extend API.
+We'll get rid of classes / constructors
+one by one</p></div></div><div class="code"><div class="wrapper"><span class="kd">function</span> <span class="nx">hoodieAccount</span> <span class="p">(</span><span class="nx">hoodie</span><span class="p">)</span> <span class="p">{</span>
+  <span class="nx">hoodie</span><span class="p">.</span><span class="nx">account</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Hoodie</span><span class="p">.</span><span class="nx">Account</span><span class="p">(</span><span class="nx">hoodie</span><span class="p">);</span>
+<span class="p">}</span>
+
+
+<span class="nx">Hoodie</span><span class="p">.</span><span class="nx">Account</span> <span class="o">=</span> <span class="p">(</span><span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
 
   <span class="s1">&#39;use strict&#39;</span><span class="p">;</span>
 
@@ -388,7 +398,7 @@ Response looks like:</p>
 username change.</p></div></div><div class="code"><div class="wrapper">  <span class="nx">Account</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">_delayedSignIn</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">username</span><span class="p">,</span> <span class="nx">password</span><span class="p">,</span> <span class="nx">options</span><span class="p">,</span> <span class="nx">defer</span><span class="p">)</span> <span class="p">{</span>
     <span class="kd">var</span> <span class="nx">self</span> <span class="o">=</span> <span class="k">this</span><span class="p">;</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>_delayedSignIn might call itself, when the user account
 is pending. In this case it passes the original defer,
-to keep a reference and finally resolve / reject it 
+to keep a reference and finally resolve / reject it
 at some point</p></div></div><div class="code"><div class="wrapper">    <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nx">defer</span><span class="p">)</span> <span class="p">{</span>
       <span class="nx">defer</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">hoodie</span><span class="p">.</span><span class="nx">defer</span><span class="p">();</span>
     <span class="p">}</span>
@@ -581,9 +591,7 @@ resolved promise</p></div></div><div class="code"><div class="wrapper">  <span c
       <span class="k">return</span> <span class="k">this</span><span class="p">.</span><span class="nx">hoodie</span><span class="p">.</span><span class="nx">defer</span><span class="p">().</span><span class="nx">reject</span><span class="p">(</span><span class="nx">error</span><span class="p">).</span><span class="nx">promise</span><span class="p">();</span>
     <span class="p">}</span>
   <span class="p">};</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>remove everything form the current account, so a new account can be initiated.</p></div></div><div class="code"><div class="wrapper">  <span class="nx">Account</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">_cleanup</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">options</span><span class="p">)</span> <span class="p">{</span>
-    <span class="nx">options</span> <span class="o">=</span> <span class="nx">options</span> <span class="o">||</span> <span class="p">{};</span>
-
-    <span class="k">this</span><span class="p">.</span><span class="nx">trigger</span><span class="p">(</span><span class="s1">&#39;cleanup&#39;</span><span class="p">);</span>
+    <span class="nx">options</span> <span class="o">=</span> <span class="nx">options</span> <span class="o">||</span> <span class="p">{};</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>hoodie.store is listening on this one</p></div></div><div class="code"><div class="wrapper">    <span class="k">this</span><span class="p">.</span><span class="nx">trigger</span><span class="p">(</span><span class="s1">&#39;cleanup&#39;</span><span class="p">);</span>
     <span class="k">this</span><span class="p">.</span><span class="nx">_authenticated</span> <span class="o">=</span> <span class="nx">options</span><span class="p">.</span><span class="nx">authenticated</span><span class="p">;</span>
     <span class="k">this</span><span class="p">.</span><span class="nx">hoodie</span><span class="p">.</span><span class="nx">config</span><span class="p">.</span><span class="nx">clear</span><span class="p">();</span>
     <span class="k">this</span><span class="p">.</span><span class="nx">_setUsername</span><span class="p">(</span><span class="nx">options</span><span class="p">.</span><span class="nx">username</span><span class="p">);</span>

@@ -1,6 +1,15 @@
-<!DOCTYPE html><html lang="en"><head><title>src/core/local_store</title></head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0"><meta name="groc-relative-root" content="../../"><meta name="groc-document-path" content="src/core/local_store"><meta name="groc-project-path" content="src/core/local_store.js"><link rel="stylesheet" type="text/css" media="all" href="../../assets/style.css"><script type="text/javascript" src="../../assets/behavior.js"></script><body><div id="meta"><div class="file-path">src/core/local_store.js</div></div><div id="document"><div class="segment"><div class="comments"><div class="wrapper"><h1 id="localstore">LocalStore</h1>
+<!DOCTYPE html><html lang="en"><head><title>src/hoodie/local_store</title></head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0"><meta name="groc-relative-root" content="../../"><meta name="groc-document-path" content="src/hoodie/local_store"><meta name="groc-project-path" content="src/hoodie/local_store.js"><link rel="stylesheet" type="text/css" media="all" href="../../assets/style.css"><script type="text/javascript" src="../../assets/behavior.js"></script><body><div id="meta"><div class="file-path">src/hoodie/local_store.js</div></div><div id="document"><div class="segment"><div class="comments"><div class="wrapper"><h1 id="localstore">LocalStore</h1>
 
-<p>window.localStrage wrapper and more</p></div></div><div class="code"><div class="wrapper"><span class="nx">Hoodie</span><span class="p">.</span><span class="nx">LocalStore</span> <span class="o">=</span> <span class="p">(</span><span class="kd">function</span> <span class="p">(</span><span class="nx">_super</span><span class="p">)</span> <span class="p">{</span>
+<p>window.localStrage wrapper and more</p></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>NOTE:
+this is a workaround to make the old,
+CoffeeScripty classes compatible with
+the new Hoodie.extend API.
+We'll get rid of classes / constructors
+one by one</p></div></div><div class="code"><div class="wrapper"><span class="kd">function</span> <span class="nx">hoodieStore</span> <span class="p">(</span><span class="nx">hoodie</span><span class="p">)</span> <span class="p">{</span>
+  <span class="nx">hoodie</span><span class="p">.</span><span class="nx">store</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Hoodie</span><span class="p">.</span><span class="nx">LocalStore</span><span class="p">(</span><span class="nx">hoodie</span><span class="p">);</span>
+<span class="p">}</span>
+
+<span class="nx">Hoodie</span><span class="p">.</span><span class="nx">LocalStore</span> <span class="o">=</span> <span class="p">(</span><span class="kd">function</span> <span class="p">(</span><span class="nx">_super</span><span class="p">)</span> <span class="p">{</span>
 
   <span class="s1">&#39;use strict&#39;</span><span class="p">;</span>
 
@@ -231,9 +240,9 @@ we're queueing until it's finished</p></div></div><div class="code"><div class="
       <span class="nx">defer</span><span class="p">.</span><span class="nx">reject</span><span class="p">(</span><span class="nx">error</span><span class="p">).</span><span class="nx">promise</span><span class="p">();</span>
     <span class="p">}</span>
     <span class="k">return</span> <span class="k">this</span><span class="p">.</span><span class="nx">_decoratePromise</span><span class="p">(</span><span class="nx">defer</span><span class="p">.</span><span class="nx">promise</span><span class="p">());</span>
-  <span class="p">};</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h2 id="remove">Remove</h2></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>Removes one object specified by <code>type</code> and <code>id</code>. </p>
+  <span class="p">};</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h2 id="remove">Remove</h2></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>Removes one object specified by <code>type</code> and <code>id</code>.</p>
 
-<p>when object has been synced before, mark it as deleted. 
+<p>when object has been synced before, mark it as deleted.
 Otherwise remove it from Store.</p></div></div><div class="code"><div class="wrapper">  <span class="nx">LocalStore</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">remove</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">type</span><span class="p">,</span> <span class="nx">id</span><span class="p">,</span> <span class="nx">options</span><span class="p">)</span> <span class="p">{</span>
 
     <span class="kd">var</span> <span class="nx">defer</span><span class="p">,</span> <span class="nx">key</span><span class="p">,</span> <span class="nx">object</span><span class="p">,</span> <span class="nx">objectWasMarkedAsDeleted</span><span class="p">,</span> <span class="nx">promise</span><span class="p">;</span>
@@ -298,10 +307,10 @@ TODO: make this cachy</p></div></div><div class="code"><div class="wrapper">  <s
       <span class="p">}</span>
     <span class="p">}</span>
     <span class="k">return</span> <span class="nx">keys</span><span class="p">;</span>
-  <span class="p">};</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h2 id="cache">Cache</h2></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>loads an object specified by <code>type</code> and <code>id</code> only once from localStorage 
+  <span class="p">};</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h2 id="cache">Cache</h2></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>loads an object specified by <code>type</code> and <code>id</code> only once from localStorage
 and caches it for faster future access. Updates cache when <code>value</code> is passed.</p>
 
-<p>Also checks if object needs to be synched (dirty) or not </p>
+<p>Also checks if object needs to be synched (dirty) or not</p>
 
 <p>Pass <code>options.remote = true</code> when object comes from remote
 Pass 'options.silent = true' to avoid events from being triggered.</p></div></div><div class="code"><div class="wrapper">  <span class="nx">LocalStore</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">cache</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">type</span><span class="p">,</span> <span class="nx">id</span><span class="p">,</span> <span class="nx">object</span><span class="p">,</span> <span class="nx">options</span><span class="p">)</span> <span class="p">{</span>
@@ -329,7 +338,7 @@ Pass 'options.silent = true' to avoid events from being triggered.</p></div></di
       <span class="p">}</span>
 
     <span class="p">}</span> <span class="k">else</span> <span class="p">{</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>if the cached key returns false, it means
-that we have removed that key. We just 
+that we have removed that key. We just
 set it to false for performance reasons, so
 that we don't need to look it up again in localStorage</p></div></div><div class="code"><div class="wrapper">      <span class="k">if</span> <span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">_cached</span><span class="p">[</span><span class="nx">key</span><span class="p">]</span> <span class="o">===</span> <span class="kc">false</span><span class="p">)</span> <span class="p">{</span>
         <span class="k">return</span> <span class="kc">false</span><span class="p">;</span>
@@ -360,7 +369,7 @@ future quick access</p></div></div><div class="code"><div class="wrapper">    <s
     <span class="p">}</span>
 
     <span class="k">return</span> <span class="nx">$</span><span class="p">.</span><span class="nx">extend</span><span class="p">(</span><span class="kc">true</span><span class="p">,</span> <span class="p">{},</span> <span class="nx">object</span><span class="p">);</span>
-  <span class="p">};</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h2 id="clear-changed-">Clear changed </h2></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>removes an object from the list of objects that are flagged to by synched (dirty)
+  <span class="p">};</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h2 id="clear-changed">Clear changed</h2></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>removes an object from the list of objects that are flagged to by synched (dirty)
 and triggers a <code>store:dirty</code> event</p></div></div><div class="code"><div class="wrapper">  <span class="nx">LocalStore</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">clearChanged</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">type</span><span class="p">,</span> <span class="nx">id</span><span class="p">)</span> <span class="p">{</span>
     <span class="kd">var</span> <span class="nx">key</span><span class="p">;</span>
     <span class="k">if</span> <span class="p">(</span><span class="nx">type</span> <span class="o">&amp;&amp;</span> <span class="nx">id</span><span class="p">)</span> <span class="p">{</span>
@@ -374,7 +383,7 @@ and triggers a <code>store:dirty</code> event</p></div></div><div class="code"><
   <span class="p">};</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h2 id="marked-as-deleted">Marked as deleted?</h2></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>when an object gets deleted that has been synched before (<code>_rev</code> attribute),
 it cannot be removed from store but gets a <code>_deleted: true</code> attribute</p></div></div><div class="code"><div class="wrapper">  <span class="nx">LocalStore</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">isMarkedAsDeleted</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">type</span><span class="p">,</span> <span class="nx">id</span><span class="p">)</span> <span class="p">{</span>
     <span class="k">return</span> <span class="k">this</span><span class="p">.</span><span class="nx">_isMarkedAsDeleted</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">cache</span><span class="p">(</span><span class="nx">type</span><span class="p">,</span> <span class="nx">id</span><span class="p">));</span>
-  <span class="p">};</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h2 id="mark-as-changed">Mark as changed</h2></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>Marks object as changed (dirty). Triggers a <code>store:dirty</code> event immediately and a 
+  <span class="p">};</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h2 id="mark-as-changed">Mark as changed</h2></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>Marks object as changed (dirty). Triggers a <code>store:dirty</code> event immediately and a
 <code>store:idle</code> event once there is no change within 2 seconds</p></div></div><div class="code"><div class="wrapper">  <span class="nx">LocalStore</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">markAsChanged</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">type</span><span class="p">,</span> <span class="nx">id</span><span class="p">,</span> <span class="nx">object</span><span class="p">,</span> <span class="nx">options</span><span class="p">)</span> <span class="p">{</span>
     <span class="kd">var</span> <span class="nx">key</span><span class="p">;</span>
 
@@ -489,8 +498,8 @@ as it is when Safari's private browsing mode is active.</p></div></div><div clas
 otherwise false.</p></div></div><div class="code"><div class="wrapper">  <span class="nx">LocalStore</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">_bootstrapping</span> <span class="o">=</span> <span class="kc">false</span><span class="p">;</span>
   <span class="nx">LocalStore</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">isBootstrapping</span> <span class="o">=</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
     <span class="k">return</span> <span class="k">this</span><span class="p">.</span><span class="nx">_bootstrapping</span><span class="p">;</span>
-  <span class="p">};</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h2 id="private">Private</h2></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>bootstrapping dirty objects, to make sure 
-that removed objects get pushed after 
+  <span class="p">};</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h2 id="private">Private</h2></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>bootstrapping dirty objects, to make sure
+that removed objects get pushed after
 page reload.</p></div></div><div class="code"><div class="wrapper">  <span class="nx">LocalStore</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">_bootstrapDirtyObjects</span> <span class="o">=</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
     <span class="kd">var</span> <span class="nx">id</span><span class="p">,</span> <span class="nx">keys</span><span class="p">,</span> <span class="nx">obj</span><span class="p">,</span> <span class="nx">type</span><span class="p">,</span> <span class="nx">_i</span><span class="p">,</span> <span class="nx">_len</span><span class="p">,</span> <span class="nx">_ref</span><span class="p">;</span>
     <span class="nx">keys</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">db</span><span class="p">.</span><span class="nx">getItem</span><span class="p">(</span><span class="s1">&#39;_dirty&#39;</span><span class="p">);</span>
@@ -506,7 +515,7 @@ page reload.</p></div></div><div class="code"><div class="wrapper">  <span class
       <span class="nx">id</span> <span class="o">=</span> <span class="nx">_ref</span><span class="p">[</span><span class="mi">1</span><span class="p">];</span>
       <span class="nx">obj</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">cache</span><span class="p">(</span><span class="nx">type</span><span class="p">,</span> <span class="nx">id</span><span class="p">);</span>
     <span class="p">}</span>
-  <span class="p">};</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>subscribe to events coming from account &amp; our remote store.  </p></div></div><div class="code"><div class="wrapper">  <span class="nx">LocalStore</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">_subscribeToOutsideEvents</span> <span class="o">=</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>account events</p></div></div><div class="code"><div class="wrapper">    <span class="k">this</span><span class="p">.</span><span class="nx">hoodie</span><span class="p">.</span><span class="nx">on</span><span class="p">(</span><span class="s1">&#39;account:cleanup&#39;</span><span class="p">,</span> <span class="k">this</span><span class="p">.</span><span class="nx">clear</span><span class="p">);</span>
+  <span class="p">};</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>subscribe to events coming from account &amp; our remote store.</p></div></div><div class="code"><div class="wrapper">  <span class="nx">LocalStore</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">_subscribeToOutsideEvents</span> <span class="o">=</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>account events</p></div></div><div class="code"><div class="wrapper">    <span class="k">this</span><span class="p">.</span><span class="nx">hoodie</span><span class="p">.</span><span class="nx">on</span><span class="p">(</span><span class="s1">&#39;account:cleanup&#39;</span><span class="p">,</span> <span class="k">this</span><span class="p">.</span><span class="nx">clear</span><span class="p">);</span>
     <span class="k">this</span><span class="p">.</span><span class="nx">hoodie</span><span class="p">.</span><span class="nx">on</span><span class="p">(</span><span class="s1">&#39;account:signup&#39;</span><span class="p">,</span> <span class="k">this</span><span class="p">.</span><span class="nx">markAllAsChanged</span><span class="p">);</span>
     <span class="k">this</span><span class="p">.</span><span class="nx">hoodie</span><span class="p">.</span><span class="nx">on</span><span class="p">(</span><span class="s1">&#39;remote:bootstrap:start&#39;</span><span class="p">,</span> <span class="k">this</span><span class="p">.</span><span class="nx">_startBootstrappingMode</span><span class="p">);</span>
     <span class="k">this</span><span class="p">.</span><span class="nx">hoodie</span><span class="p">.</span><span class="nx">on</span><span class="p">(</span><span class="s1">&#39;remote:bootstrap:end&#39;</span><span class="p">,</span> <span class="k">this</span><span class="p">.</span><span class="nx">_endBootstrappingMode</span><span class="p">);</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>remote events</p></div></div><div class="code"><div class="wrapper">    <span class="k">this</span><span class="p">.</span><span class="nx">hoodie</span><span class="p">.</span><span class="nx">on</span><span class="p">(</span><span class="s1">&#39;remote:change&#39;</span><span class="p">,</span> <span class="k">this</span><span class="p">.</span><span class="nx">_handleRemoteChange</span><span class="p">);</span>
@@ -590,8 +599,8 @@ like add:task, change:note:abc4567, remove, etc.</p></div></div><div class="code
   <span class="p">};</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>when an object gets changed, two special events get triggerd:</p>
 
 <ol>
-<li>dirty event <br />
-the <code>dirty</code> event gets triggered immediately, for every 
+<li>dirty event
+the <code>dirty</code> event gets triggered immediately, for every
 change that happens.</li>
 <li>idle event
 the <code>idle</code> event gets triggered after a short timeout of

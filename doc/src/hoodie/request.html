@@ -1,0 +1,45 @@
+<!DOCTYPE html><html lang="en"><head><title>src/hoodie/request</title></head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0"><meta name="groc-relative-root" content="../../"><meta name="groc-document-path" content="src/hoodie/request"><meta name="groc-project-path" content="src/hoodie/request.js"><link rel="stylesheet" type="text/css" media="all" href="../../assets/style.css"><script type="text/javascript" src="../../assets/behavior.js"></script><body><div id="meta"><div class="file-path">src/hoodie/request.js</div></div><div id="document"><div class="segment"><div class="comments"><div class="wrapper"><h1 id="hoodierequest">hoodie.request</h1></div></div></div><div class="segment"><div class="code"><div class="wrapper"><span class="kd">function</span> <span class="nx">hoodieRequest</span><span class="p">(</span><span class="nx">hoodie</span><span class="p">)</span> <span class="p">{</span>
+
+  <span class="kd">var</span> <span class="nx">$extend</span> <span class="o">=</span> <span class="nx">$</span><span class="p">.</span><span class="nx">extend</span><span class="p">;</span>
+  <span class="kd">var</span> <span class="nx">$ajax</span> <span class="o">=</span> <span class="nx">$</span><span class="p">.</span><span class="nx">ajax</span><span class="p">;</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h2 id="requests">Requests</h2></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>sends requests to the hoodie backend.</p>
+
+<pre><code>promise = hoodie.request('GET', '/user_database/doc_id')
+</code></pre></div></div><div class="code"><div class="wrapper">  <span class="kd">function</span> <span class="nx">request</span><span class="p">(</span><span class="nx">type</span><span class="p">,</span> <span class="nx">url</span><span class="p">,</span> <span class="nx">options</span><span class="p">)</span> <span class="p">{</span>
+    <span class="kd">var</span> <span class="nx">defaults</span><span class="p">,</span> <span class="nx">requestPromise</span><span class="p">,</span> <span class="nx">pipedPromise</span><span class="p">;</span>
+
+    <span class="nx">options</span> <span class="o">=</span> <span class="nx">options</span> <span class="o">||</span> <span class="p">{};</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>if a relative path passed, prefix with @baseUrl</p></div></div><div class="code"><div class="wrapper">    <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="sr">/^http/</span><span class="p">.</span><span class="nx">test</span><span class="p">(</span><span class="nx">url</span><span class="p">))</span> <span class="p">{</span>
+      <span class="nx">url</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span> <span class="o">+</span> <span class="nx">hoodie</span><span class="p">.</span><span class="nx">baseUrl</span> <span class="o">+</span> <span class="nx">url</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="nx">defaults</span> <span class="o">=</span> <span class="p">{</span>
+      <span class="nx">type</span><span class="o">:</span> <span class="nx">type</span><span class="p">,</span>
+      <span class="nx">url</span><span class="o">:</span> <span class="nx">url</span><span class="p">,</span>
+      <span class="nx">xhrFields</span><span class="o">:</span> <span class="p">{</span>
+        <span class="nx">withCredentials</span><span class="o">:</span> <span class="kc">true</span>
+      <span class="p">},</span>
+      <span class="nx">crossDomain</span><span class="o">:</span> <span class="kc">true</span><span class="p">,</span>
+      <span class="nx">dataType</span><span class="o">:</span> <span class="s1">&#39;json&#39;</span>
+    <span class="p">};</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>we are piping the result of the request to return a nicer
+error if the request cannot reach the server at all.
+We can't return the promise of ajax directly because of
+the piping, as for whatever reason the returned promise
+does not have the <code>abort</code> method any more, maybe others
+as well. See also http://bugs.jquery.com/ticket/14104</p></div></div><div class="code"><div class="wrapper">    <span class="nx">requestPromise</span> <span class="o">=</span> <span class="nx">$ajax</span><span class="p">(</span><span class="nx">$extend</span><span class="p">(</span><span class="nx">defaults</span><span class="p">,</span> <span class="nx">options</span><span class="p">));</span>
+    <span class="nx">pipedPromise</span> <span class="o">=</span> <span class="nx">requestPromise</span><span class="p">.</span><span class="nx">then</span><span class="p">(</span> <span class="kc">null</span><span class="p">,</span> <span class="nx">pipeRequestError</span><span class="p">);</span>
+    <span class="nx">pipedPromise</span><span class="p">.</span><span class="nx">abort</span> <span class="o">=</span> <span class="nx">requestPromise</span><span class="p">.</span><span class="nx">abort</span><span class="p">;</span>
+
+    <span class="k">return</span> <span class="nx">pipedPromise</span><span class="p">;</span>
+  <span class="p">}</span></div></div></div><div class="segment"><div class="code"><div class="wrapper">  <span class="kd">function</span> <span class="nx">pipeRequestError</span><span class="p">(</span><span class="nx">xhr</span><span class="p">)</span> <span class="p">{</span>
+    <span class="kd">var</span> <span class="nx">error</span><span class="p">;</span>
+
+    <span class="k">try</span> <span class="p">{</span>
+      <span class="nx">error</span> <span class="o">=</span> <span class="nx">JSON</span><span class="p">.</span><span class="nx">parse</span><span class="p">(</span><span class="nx">xhr</span><span class="p">.</span><span class="nx">responseText</span><span class="p">);</span>
+    <span class="p">}</span> <span class="k">catch</span> <span class="p">(</span><span class="nx">_error</span><span class="p">)</span> <span class="p">{</span>
+      <span class="nx">error</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="nx">error</span><span class="o">:</span> <span class="nx">xhr</span><span class="p">.</span><span class="nx">responseText</span> <span class="o">||</span> <span class="p">(</span><span class="s2">&quot;Cannot connect to Hoodie server at &quot;</span> <span class="o">+</span> <span class="nx">hoodie</span><span class="p">.</span><span class="nx">baseUrl</span><span class="p">)</span>
+      <span class="p">};</span>
+    <span class="p">}</span>
+
+    <span class="k">return</span> <span class="nx">hoodie</span><span class="p">.</span><span class="nx">rejectWith</span><span class="p">(</span><span class="nx">error</span><span class="p">).</span><span class="nx">promise</span><span class="p">();</span>
+  <span class="p">}</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>public API</p></div></div><div class="code"><div class="wrapper">  <span class="nx">hoodie</span><span class="p">.</span><span class="nx">request</span> <span class="o">=</span> <span class="nx">request</span><span class="p">;</span>
+<span class="p">}</span></div></div></div></div></body></html>

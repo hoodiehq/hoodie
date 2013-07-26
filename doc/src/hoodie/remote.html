@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><title>src/core/remote</title></head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0"><meta name="groc-relative-root" content="../../"><meta name="groc-document-path" content="src/core/remote"><meta name="groc-project-path" content="src/core/remote.js"><link rel="stylesheet" type="text/css" media="all" href="../../assets/style.css"><script type="text/javascript" src="../../assets/behavior.js"></script><body><div id="meta"><div class="file-path">src/core/remote.js</div></div><div id="document"><div class="segment"><div class="comments"><div class="wrapper"><h1 id="remote">Remote</h1></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>Connection to a remote Couch Database.</p>
+<!DOCTYPE html><html lang="en"><head><title>src/hoodie/remote</title></head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0"><meta name="groc-relative-root" content="../../"><meta name="groc-document-path" content="src/hoodie/remote"><meta name="groc-project-path" content="src/hoodie/remote.js"><link rel="stylesheet" type="text/css" media="all" href="../../assets/style.css"><script type="text/javascript" src="../../assets/behavior.js"></script><body><div id="meta"><div class="file-path">src/hoodie/remote.js</div></div><div id="document"><div class="segment"><div class="comments"><div class="wrapper"><h1 id="remote">Remote</h1></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>Connection to a remote Couch Database.</p>
 
 <h2 id="store-api">store API</h2>
 
@@ -9,7 +9,7 @@
 <li>findAll(type )</li>
 <li>add(type, object)</li>
 <li>save(type, id, object)</li>
-<li>update(new_properties )</li>
+<li>update(type, id, new_properties )</li>
 <li>updateAll( type, new_properties)</li>
 <li>remove(type, id)</li>
 <li>removeAll(type)</li>
@@ -41,7 +41,7 @@
 
 <span class="nx">Hoodie</span><span class="p">.</span><span class="nx">Remote</span> <span class="o">=</span> <span class="p">(</span><span class="kd">function</span><span class="p">(</span><span class="nx">_super</span><span class="p">)</span> <span class="p">{</span>
 
-  <span class="s1">&#39;use strict&#39;</span><span class="p">;</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h2 id="constructor-">Constructor </h2></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>sets name (think: namespace) and some other options</p></div></div><div class="code"><div class="wrapper">  <span class="kd">function</span> <span class="nx">Remote</span><span class="p">(</span><span class="nx">hoodie</span><span class="p">,</span> <span class="nx">options</span><span class="p">)</span> <span class="p">{</span>
+  <span class="s1">&#39;use strict&#39;</span><span class="p">;</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h2 id="constructor">Constructor</h2></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>sets name (think: namespace) and some other options</p></div></div><div class="code"><div class="wrapper">  <span class="kd">function</span> <span class="nx">Remote</span><span class="p">(</span><span class="nx">hoodie</span><span class="p">,</span> <span class="nx">options</span><span class="p">)</span> <span class="p">{</span>
     <span class="k">this</span><span class="p">.</span><span class="nx">hoodie</span> <span class="o">=</span> <span class="nx">hoodie</span><span class="p">;</span>
     <span class="nx">options</span> <span class="o">=</span> <span class="nx">options</span> <span class="o">||</span> <span class="p">{};</span>
 
@@ -263,6 +263,8 @@ and restart each 25 seconds.</p></div></div><div class="code"><div class="wrappe
         <span class="nx">new_edits</span><span class="o">:</span> <span class="kc">false</span>
       <span class="p">}</span>
     <span class="p">});</span>
+
+    <span class="k">return</span> <span class="k">this</span><span class="p">.</span><span class="nx">_pushRequest</span><span class="p">;</span>
   <span class="p">};</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h2 id="sync-changes">sync changes</h2></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>push objects, then pull updates.</p></div></div><div class="code"><div class="wrapper">  <span class="nx">Remote</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">sync</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">objects</span><span class="p">)</span> <span class="p">{</span>
     <span class="k">return</span> <span class="k">this</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="nx">objects</span><span class="p">).</span><span class="nx">pipe</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">pull</span><span class="p">);</span>
   <span class="p">};</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h2 id="events">Events</h2></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>namespaced alias for <code>hoodie.on</code></p></div></div><div class="code"><div class="wrapper">  <span class="nx">Remote</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">on</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">event</span><span class="p">,</span> <span class="nx">cb</span><span class="p">)</span> <span class="p">{</span>
@@ -366,7 +368,7 @@ users database, therefore the <code>-local</code> suffix.</p></div></div><div cl
     <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
       <span class="k">return</span> <span class="s2">&quot;/_changes?include_docs=true&amp;since=&quot;</span> <span class="o">+</span> <span class="nx">since</span><span class="p">;</span>
     <span class="p">}</span>
-  <span class="p">};</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h3 id="restart-pull-request">restart pull request</h3></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>request gets restarted automaticcally 
+  <span class="p">};</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h3 id="restart-pull-request">restart pull request</h3></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>request gets restarted automaticcally
 when aborted (see @_handlePullError)</p></div></div><div class="code"><div class="wrapper">  <span class="nx">Remote</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">_restartPullRequest</span> <span class="o">=</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
     <span class="k">if</span> <span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">_pullRequest</span><span class="p">)</span> <span class="p">{</span>
       <span class="k">this</span><span class="p">.</span><span class="nx">_pullRequest</span><span class="p">.</span><span class="nx">abort</span><span class="p">();</span>

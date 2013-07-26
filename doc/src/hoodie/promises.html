@@ -1,0 +1,36 @@
+<!DOCTYPE html><html lang="en"><head><title>src/hoodie/promises</title></head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0"><meta name="groc-relative-root" content="../../"><meta name="groc-document-path" content="src/hoodie/promises"><meta name="groc-project-path" content="src/hoodie/promises.js"><link rel="stylesheet" type="text/css" media="all" href="../../assets/style.css"><script type="text/javascript" src="../../assets/behavior.js"></script><body><div id="meta"><div class="file-path">src/hoodie/promises.js</div></div><div id="document"><div class="segment"><div class="comments"><div class="wrapper"><h2 id="hoodie-defers--promises">Hoodie Defers / Promises</h2></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>returns a defer object for custom promise handlings.
+Promises are heavely used throughout the code of hoodie.
+We currently borrow jQuery's implementation:
+http://api.jquery.com/category/deferred-object/</p>
+
+<pre><code>defer = hoodie.defer()
+if (good) {
+  defer.resolve('good.')
+} else {
+  defer.reject('not good.')
+}
+return defer.promise()
+</code></pre></div></div><div class="code"><div class="wrapper"><span class="kd">function</span> <span class="nx">hoodiePromises</span> <span class="p">(</span><span class="nx">hoodie</span><span class="p">)</span> <span class="p">{</span>
+
+  <span class="kd">var</span> <span class="nx">$defer</span> <span class="o">=</span> <span class="nb">window</span><span class="p">.</span><span class="nx">jQuery</span><span class="p">.</span><span class="nx">Deferred</span><span class="p">;</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>returns true if passed object is a promise (but not a deferred),
+otherwise false.</p></div></div><div class="code"><div class="wrapper">  <span class="kd">function</span> <span class="nx">isPromise</span><span class="p">(</span><span class="nx">object</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="o">!!</span> <span class="p">(</span><span class="nx">object</span> <span class="o">&amp;&amp;</span>
+               <span class="k">typeof</span> <span class="nx">object</span><span class="p">.</span><span class="nx">done</span> <span class="o">===</span> <span class="s1">&#39;function&#39;</span> <span class="o">&amp;&amp;</span>
+               <span class="k">typeof</span> <span class="nx">object</span><span class="p">.</span><span class="nx">resolve</span> <span class="o">!==</span> <span class="s1">&#39;function&#39;</span><span class="p">);</span>
+  <span class="p">}</span></div></div></div><div class="segment"><div class="code"><div class="wrapper">  <span class="kd">function</span> <span class="nx">resolve</span><span class="p">()</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="nx">$defer</span><span class="p">().</span><span class="nx">resolve</span><span class="p">().</span><span class="nx">promise</span><span class="p">();</span>
+  <span class="p">}</span></div></div></div><div class="segment"><div class="code"><div class="wrapper">  <span class="kd">function</span> <span class="nx">reject</span><span class="p">()</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="nx">$defer</span><span class="p">().</span><span class="nx">reject</span><span class="p">().</span><span class="nx">promise</span><span class="p">();</span>
+  <span class="p">}</span></div></div></div><div class="segment"><div class="code"><div class="wrapper">  <span class="kd">function</span> <span class="nx">resolveWith</span><span class="p">()</span> <span class="p">{</span>
+    <span class="kd">var</span> <span class="nx">_defer</span> <span class="o">=</span> <span class="nx">$defer</span><span class="p">();</span>
+    <span class="k">return</span> <span class="nx">_defer</span><span class="p">.</span><span class="nx">resolve</span><span class="p">.</span><span class="nx">apply</span><span class="p">(</span><span class="nx">_defer</span><span class="p">,</span> <span class="nx">arguments</span><span class="p">).</span><span class="nx">promise</span><span class="p">();</span>
+  <span class="p">}</span></div></div></div><div class="segment"><div class="code"><div class="wrapper">  <span class="kd">function</span> <span class="nx">rejectWith</span><span class="p">()</span> <span class="p">{</span>
+    <span class="kd">var</span> <span class="nx">_defer</span> <span class="o">=</span> <span class="nx">$defer</span><span class="p">();</span>
+    <span class="k">return</span> <span class="nx">_defer</span><span class="p">.</span><span class="nx">reject</span><span class="p">.</span><span class="nx">apply</span><span class="p">(</span><span class="nx">_defer</span><span class="p">,</span> <span class="nx">arguments</span><span class="p">).</span><span class="nx">promise</span><span class="p">();</span>
+  <span class="p">}</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>Public API</p></div></div><div class="code"><div class="wrapper">  <span class="nx">hoodie</span><span class="p">.</span><span class="nx">defer</span> <span class="o">=</span> <span class="nx">$defer</span><span class="p">;</span>
+  <span class="nx">hoodie</span><span class="p">.</span><span class="nx">isPromise</span> <span class="o">=</span> <span class="nx">isPromise</span><span class="p">;</span>
+  <span class="nx">hoodie</span><span class="p">.</span><span class="nx">resolve</span> <span class="o">=</span> <span class="nx">resolve</span><span class="p">;</span>
+  <span class="nx">hoodie</span><span class="p">.</span><span class="nx">reject</span> <span class="o">=</span> <span class="nx">reject</span><span class="p">;</span>
+  <span class="nx">hoodie</span><span class="p">.</span><span class="nx">resolveWith</span> <span class="o">=</span> <span class="nx">resolveWith</span><span class="p">;</span>
+  <span class="nx">hoodie</span><span class="p">.</span><span class="nx">rejectWith</span> <span class="o">=</span> <span class="nx">rejectWith</span><span class="p">;</span>
+<span class="p">}</span></div></div></div></div></body></html>
