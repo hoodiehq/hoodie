@@ -8,8 +8,9 @@
 //
 // Hoodie.extend would look like
 //
-//     Hoodie.extend = function(name, extension) {
-//       extensions[name] = extension;
+//     var extensions = [];
+//     Hoodie.extend = function(extension) {
+//       extensions.push(extension);
 //     };
 //
 // And the extensions would be loaded like this:
@@ -17,22 +18,28 @@
 //     function loadExtensions() {
 //       var extension, name;
 //
-//       for (name in extensions) {
-//         if (extensions.hasOwnProperty(name)) {
-//           extension = extensions[name];
-//           hoodie[name] = extension(hoodie);
-//         }
+//       for (var i = 0; i < extensions.length; i++) {
+//         extensions[i](hoodie)
 //       }
 //     }
 //
-// To test the extensions, I'd patch `Hoodie.extend` in
-// /test/lib/hoodie_extend_patch.js that is loaded only
-// for testing, so that the extensions are exposed and
-// can be accessed in tests with something like
+// To test the extensions, I'd make the functions
+// passed to Hoodie.extend accessible globally. And
+// in the build process, wrap the whole hoodie.js into
+// a closure to prevent it from polluting window.
 //
-//     var request = extension('request')
+//     function hoodieRequestExtension(hoodie){
+//       hoodie.request = function() {}
+//     }
+//     Hoodie.extend(hoodieRequestExtension);
 //
-Hoodie.extend('request', function requestFactory(hoodie) {
+// Then in the specs simply do
+//
+//     this.hoodie = new Mocks.Hoodie();
+//     hoodieRequestExtension(this.hoodie);
+//     this.hoodie.request // can now be tested.
+//
+function hoodieRequestExtension(hoodie) {
 
   'use strict';
 
@@ -97,5 +104,7 @@ Hoodie.extend('request', function requestFactory(hoodie) {
   //
   // public API
   //
-  return request;
-});
+  hoodie.request = request;
+}
+
+Hoodie.extend(hoodieRequestExtension);

@@ -17,7 +17,6 @@ files = [
   'test/lib/jasmine-helpers.js',
 
   'src/hoodie.js',
-  'test/lib/hoodie_extend_patch.js',
 
   'src/core/request.js',
   'src/core/connection.js',
@@ -36,6 +35,7 @@ files = [
 
 // list of files to exclude
 exclude = [
+  'test/specs/extensions/**/*.spec.js'
 ];
 
 

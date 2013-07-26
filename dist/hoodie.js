@@ -189,53 +189,6 @@ Object.deepExtend = function(child, parent) {
       : "/_api"; // otherwise default to current domain
 
 
-    // Check Connection
-    // ------------------
-
-    // the `checkConnection` method is used, well, to check if
-    // the hoodie backend is reachable at `baseUrl` or not.
-    // Check Connection is automatically called on startup
-    // and then each 30 seconds. If it fails, it
-    //
-    // - sets `online = false`
-    // - triggers `offline` event
-    // - sets `checkConnectionInterval = 3000`
-    //
-    // when connection can be reestablished, it
-    //
-    // - sets `online = true`
-    // - triggers `online` event
-    // - sets `checkConnectionInterval = 30000`
-    //
-    var online = true;
-    var checkConnectionInterval = 30000;
-    var checkConnectionRequest = null;
-    function checkConnection() {
-
-      var req = checkConnectionRequest;
-
-      if (req && req.state() === 'pending') {
-        return req;
-      }
-
-      checkConnectionRequest = hoodie.request('GET', '/').pipe(
-        handleCheckConnectionSuccess,
-        handleCheckConnectionError
-      );
-
-      return checkConnectionRequest;
-    }
-
-
-    // isOnline
-    // ----------
-
-    //
-    function isOnline() {
-      return online;
-    }
-
-
     // Open stores
     // -------------
 
@@ -353,44 +306,16 @@ Object.deepExtend = function(child, parent) {
 
 
     //
-    //
-    //
-    function handleCheckConnectionSuccess() {
-      checkConnectionInterval = 30000;
-
-      window.setTimeout(checkConnection, checkConnectionInterval);
-
-      if (! hoodie.isOnline()) {
-        hoodie.trigger('reconnected');
-        online = true;
-      }
-
-      return $defer().resolve();
-    }
-
-
-    //
-    //
-    //
-    function handleCheckConnectionError() {
-      checkConnectionInterval = 3000;
-
-      window.setTimeout(checkConnection, checkConnectionInterval);
-
-      if (hoodie.isOnline()) {
-        hoodie.trigger('disconnected');
-        online = false;
-      }
-
-      return $defer().reject();
-    }
-
-
-    //
-    //
+    // hoodie.extend('myMagic', function(hoodie) {} )
+    // or
+    // hoodie.extend(function(hoodie) {} )
     //
     function extend(name, Extension) {
-      hoodie[name] = new Extension(hoodie);
+      if (Extension) {
+        hoodie[name] = new Extension(hoodie);
+      } else {
+        new Extension(hoodie); // anonymous extension
+      }
     }
 
 
@@ -398,13 +323,11 @@ Object.deepExtend = function(child, parent) {
     //
     //
     function loadExtensions() {
-      var Extension, instanceName;
-
-      for (instanceName in extensions) {
-        if (extensions.hasOwnProperty(instanceName)) {
-          Extension = extensions[instanceName];
-
-          hoodie[instanceName] = new Extension(hoodie);
+      for (var i = extensions.length - 1; i >= 0; i--) {
+        if (extensions[i].name) {
+          hoodie[extensions[i].name] = new extensions[i].extension(hoodie);
+        } else {
+          extensions[i].extension(hoodie);
         }
       }
     }
@@ -423,8 +346,6 @@ Object.deepExtend = function(child, parent) {
     hoodie.off = events.unbind;
 
     // hoodie core methods
-    hoodie.isOnline = isOnline;
-    hoodie.checkConnection = checkConnection;
     hoodie.open = open;
     hoodie.uuid = uuid;
     hoodie.dispose = dispose;
@@ -446,7 +367,7 @@ Object.deepExtend = function(child, parent) {
   // ------------------
 
   // You can either extend the Hoodie class, or a hoodie
-  // instance dooring runtime
+  // instance during runtime
   //
   //     Hoodie.extend('magic1', funcion(hoodie) { /* ... */ })
   //     hoodie = new Hoodie
@@ -454,9 +375,22 @@ Object.deepExtend = function(child, parent) {
   //     hoodie.magic1.doSomething()
   //     hoodie.magic2.doSomethingElse()
   //
-  var extensions = {};
-  Hoodie.extend = function(name, Extension) {
-    extensions[name] = Extension;
+  // Hoodie can also be extended anonymously
+  //
+  //      Hoodie.extend(funcion(hoodie) { hoodie.myMagic = function() {} })
+  //
+  var extensions = [];
+  Hoodie.extend = function(name, extension) {
+    if (extension) {
+      extensions.push({
+        name: name,
+        extension: extension
+      });
+    } else {
+      extensions.push({
+        extension: name
+      });
+    }
   };
 
   //
@@ -491,8 +425,8 @@ Object.deepExtend = function(child, parent) {
 })(window);
 
 //
-// hoodie.request (dreamcode)
-// ============================
+// hoodie.request
+// ================
 
 // I'd like to modularize hoodie.js for simpler testing
 // and a better overview. This is just an attempt to do
@@ -590,6 +524,103 @@ Hoodie.extend('request', function requestFactory(hoodie) {
   // public API
   //
   return request;
+});
+
+//
+// hoodie.checkConnection() & hoodie.isOnline()
+// ============================================
+
+//
+Hoodie.extend(function hoodieConnectionExtension(hoodie) {
+
+  'use strict';
+
+  // Check Connection
+  // ------------------
+
+  // the `checkConnection` method is used, well, to check if
+  // the hoodie backend is reachable at `baseUrl` or not.
+  // Check Connection is automatically called on startup
+  // and then each 30 seconds. If it fails, it
+  //
+  // - sets `online = false`
+  // - triggers `offline` event
+  // - sets `checkConnectionInterval = 3000`
+  //
+  // when connection can be reestablished, it
+  //
+  // - sets `online = true`
+  // - triggers `online` event
+  // - sets `checkConnectionInterval = 30000`
+  //
+  var online = true;
+  var checkConnectionInterval = 30000;
+  var checkConnectionRequest = null;
+  function checkConnection() {
+
+    var req = checkConnectionRequest;
+
+    if (req && req.state() === 'pending') {
+      return req;
+    }
+
+    checkConnectionRequest = hoodie.request('GET', '/').pipe(
+      handleCheckConnectionSuccess,
+      handleCheckConnectionError
+    );
+
+    return checkConnectionRequest;
+  }
+
+
+  // isOnline
+  // ----------
+
+  //
+  function isOnline() {
+    return online;
+  }
+
+
+  //
+  //
+  //
+  function handleCheckConnectionSuccess() {
+    checkConnectionInterval = 30000;
+
+    window.setTimeout(checkConnection, checkConnectionInterval);
+
+    if (! hoodie.isOnline()) {
+      hoodie.trigger('reconnected');
+      online = true;
+    }
+
+    return hoodie.resolve();
+  }
+
+
+  //
+  //
+  //
+  function handleCheckConnectionError() {
+    checkConnectionInterval = 3000;
+
+    window.setTimeout(checkConnection, checkConnectionInterval);
+
+    if (hoodie.isOnline()) {
+      hoodie.trigger('disconnected');
+      online = false;
+    }
+
+    return hoodie.reject();
+  }
+
+
+  //
+  // public API
+  //
+  hoodie.isOnline = isOnline;
+  hoodie.checkConnection = checkConnection;
 });
 
 // Store
@@ -4088,937 +4119,3 @@ Hoodie.AccountRemote = (function(_super) {
 })(Hoodie.Remote);
 
 Hoodie.extend('remote', Hoodie.AccountRemote);
-
-// Hoodie Email Extension
-// ========================
-
-// Sending emails. Not unicorns
-// 
-
-Hoodie.extend('email', function(hoodie) {
-
-  'use strict';
-
-  // this is the function that gets
-  // executed on `hoodie.email( options )`
-  var sendEmail = function sendEmail(options) {
-    var defer;
-
-    // if user has no account, sign up anonymously,
-    // so that tasks get replicated to the Couch.
-    if (!hoodie.account.hasAccount()) {
-      hoodie.account.anonymousSignUp();
-    }
-
-    // we need a custom defer, as the returned promise shall not
-    // be resolved before the actual email was sent. Technically,
-    // the confirmation that an email was sent is when the email
-    // task object has been removed remotely.
-    // 
-    defer = hoodie.defer();
-
-    // add the $email task object to the store. If there is an error,
-    // reject right away. If not, wait for updates coming from remote.
-    hoodie.store.add('$email', options).then(handleEmailTaskCreated(defer), defer.reject);
-
-    return defer.promise();
-  };
-
-  // this method gets executed, when the $email task was created
-  // successfully in the local store. We then wait for updates
-  // coming from remote
-  // 
-  var handleEmailTaskCreated = function handleEmailTaskCreated(defer) {
-    return function(email) {
-      hoodie.remote.on("change:$email:" + email.id, handleEmailTaskChange(defer) );
-    };
-  };
-
-
-  // we listen to two events on $email tasks
-  // 
-  // 1. email was sent
-  // 2. there was an error
-  // 
-  // When an email was sent, the `sentAt` property gets set (and the object gets removed).
-  // When an error occurs, the message gets set in the `$error` property.
-  var handleEmailTaskChange = function handleEmailTaskChange(defer) {
-    return function(event, email) {
-
-      if (email.sentAt) {
-        defer.resolve(email);
-      }
-
-      if (email.$error)  {
-        defer.reject(email);
-      }
-    };
-  };
-
-  return sendEmail;
-});
-
-// Share Module
-// ==============
-
-// When a share gets created, a $share doc gets stored and synched to the user's
-// database. From there the $share worker handles the rest:
-//
-// * creating a share database
-// * creating a share user if a password is used (to be done)
-// * handling the replications
-//
-// The worker updates the $share doc status, which gets synched back to the
-// frontend. When the user deletes the $share doc, the worker removes the
-// database, the user and all replications
-//
-//
-// API
-// -----
-//
-//     // returns a share instance
-//     // with share.id set to 'share_id'
-//     hoodie.share('share_id')
-//
-//     // the rest of the API is a standard store API, with the
-//     // difference that no type has to be set and the returned
-//     // promises are resolved with share instances instead of
-//     // simple objects
-//     hoodie.share.add(attributes)
-//     hoodie.share.find('share_id')
-//     hoodie.share.findAll()
-//     hoodie.share.findOrAdd(id, attributes)
-//     hoodie.share.save(id, attributes)
-//     hoodie.share.update(id, changed_attributes)
-//     hoodie.share.updateAll(changed_attributes)
-//     hoodie.share.remove(id)
-//     hoodie.share.removeAll()
-//
-Hoodie.Share = (function () {
-
-  'use strict';
-
-  // Constructor
-  // -------------
-
-  // the constructor returns a function, so it can be called
-  // like this: hoodie.share('share_id')
-  //
-  // The rest of the API is available as usual.
-  //
-  function Share(hoodie) {
-    var api;
-    this.hoodie = hoodie;
-    this._open = this._open.bind(this);
-
-    // set pointer to Hoodie.ShareInstance
-    this.instance = Hoodie.ShareInstance;
-
-    // return custom api which allows direct call
-    api = this._open;
-    $.extend(api, this);
-
-    this.hoodie.store.decoratePromises({
-      shareAt: this._storeShareAt,
-      unshareAt: this._storeUnshareAt,
-      unshare: this._storeUnshare,
-      share: this._storeShare
-    });
-    return api;
-  }
-
-
-  // add
-  // --------
-
-  // creates a new share and returns it
-  //
-  Share.prototype.add = function (options) {
-    var self = this;
-    if (options === null) {
-      options = {};
-    }
-    return this.hoodie.store.add('$share', this._filterShareOptions(options)).pipe(function (object) {
-      if (!self.hoodie.account.hasAccount()) {
-        self.hoodie.account.anonymousSignUp();
-      }
-      return new self.instance(self.hoodie, object);
-    });
-  };
-
-
-  // find
-  // ------
-
-  // find an existing share
-  //
-  Share.prototype.find = function (id) {
-    var self = this;
-    return this.hoodie.store.find('$share', id).pipe(function (object) {
-      return new self.instance(self.hoodie, object);
-    });
-  };
-
-
-  // findAll
-  // ---------
-
-  // find all my existing shares
-  //
-  Share.prototype.findAll = function () {
-    var self = this;
-    return this.hoodie.store.findAll('$share').pipe(function (objects) {
-      var obj, _i, _len, _results;
-      _results = [];
-      for (_i = 0, _len = objects.length; _i < _len; _i++) {
-        obj = objects[_i];
-        _results.push(new self.instance(self.hoodie, obj));
-      }
-      return _results;
-    });
-  };
-
-
-  // findOrAdd
-  // --------------
-
-  // find or add a new share
-  //
-  Share.prototype.findOrAdd = function (id, options) {
-    var self = this;
-    return this.hoodie.store.findOrAdd('$share', id, this._filterShareOptions(options)).pipe(function (object) {
-      if (!self.hoodie.account.hasAccount()) {
-        self.hoodie.account.anonymousSignUp();
-      }
-      return new self.instance(self.hoodie, object);
-    });
-  };
-
-
-  // save
-  // ------
-
-  // add or overwrite a share
-  //
-  Share.prototype.save = function (id, options) {
-    var self = this;
-    return this.hoodie.store.save('$share', id, this._filterShareOptions(options)).pipe(function (object) {
-      return new self.instance(self.hoodie, object);
-    });
-  };
-
-
-  // update
-  // --------
-
-  // add or overwrite a share
-  //
-  Share.prototype.update = function (id, changed_options) {
-    var self = this;
-    return this.hoodie.store.update('$share', id, this._filterShareOptions(changed_options)).pipe(function (object) {
-      return new self.instance(self.hoodie, object);
-    });
-  };
-
-
-  // updateAll
-  // -----------
-
-  // update all my existing shares
-  //
-  Share.prototype.updateAll = function (changed_options) {
-    var self = this;
-    return this.hoodie.store.updateAll('$share', this._filterShareOptions(changed_options)).pipe(function (objects) {
-      var obj, _i, _len, _results;
-      _results = [];
-      for (_i = 0, _len = objects.length; _i < _len; _i++) {
-        obj = objects[_i];
-        _results.push(new self.instance(self.hoodie, obj));
-      }
-      return _results;
-    });
-  };
-
-
-  // remove
-  // ---------
-
-  // deletes an existing share
-  //
-  Share.prototype.remove = function (id) {
-    this.hoodie.store.findAll(function (obj) {
-      return obj.$shares[id];
-    }).unshareAt(id);
-    return this.hoodie.store.remove('$share', id);
-  };
-
-
-  // removeAll
-  // ------------
-
-  // delete all existing shares
-  //
-  Share.prototype.removeAll = function () {
-    this.hoodie.store.findAll(function (obj) {
-      return obj.$shares;
-    }).unshare();
-    return this.hoodie.store.removeAll('$share');
-  };
-
-
-  // Private
-  //---------
-
-  Share.prototype._allowedOptions = ["id", "access", "createdBy"];
-
-
-  // ### filter share options
-  //
-  Share.prototype._filterShareOptions = function (options) {
-    var filteredOptions, option, _i, _len, _ref;
-    options = options || {};
-
-    filteredOptions = {};
-    _ref = this._allowedOptions;
-    for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-      option = _ref[_i];
-      if (options.hasOwnProperty(option)) {
-        filteredOptions[option] = options[option];
-      }
-    }
-    return filteredOptions;
-  };
-
-
-  // ### open
-
-  // opens a a remote share store, returns a Hoodie.Remote instance
-  //
-  Share.prototype._open = function (shareId, options) {
-    options = options || {};
-    $.extend(options, {
-      id: shareId
-    });
-    return new this.instance(this.hoodie, options);
-  };
-
-
-  // hoodie.store decorations
-  // --------------------------
-
-  // hoodie.store decorations add custom methods to promises returned
-  // by hoodie.store methods like find, add or update. All methods return
-  // methods again that will be executed in the scope of the promise, but
-  // with access to the current hoodie instance
-  //
-
-  // ### shareAt
-
-  //
-  Share.prototype._storeShareAt = function (shareId) {
-    var self = this;
-    return this.pipe(function (objects) {
-      var object, updateObject, _i, _len, _results;
-      updateObject = function (object) {
-        self.hoodie.store.update(object.type, object.id, {
-          $sharedAt: shareId
-        });
-        return object;
-      };
-      if ($.isArray(objects)) {
-        _results = [];
-        for (_i = 0, _len = objects.length; _i < _len; _i++) {
-          object = objects[_i];
-          _results.push(updateObject(object));
-        }
-        return _results;
-      } else {
-        return updateObject(objects);
-      }
-    });
-  };
-
-
-  // ### unshareAt
-
-  //
-  Share.prototype._storeUnshareAt = function (shareId) {
-    var self = this;
-    return this.pipe(function (objects) {
-      var object, updateObject, _i, _len, _results;
-
-      updateObject = function (object) {
-        if (object.$sharedAt !== shareId) {
-          return object;
-        }
-        self.hoodie.store.update(object.type, object.id, {
-          $unshared: true
-        });
-        return object;
-      };
-
-      if ($.isArray(objects)) {
-        _results = [];
-        for (_i = 0, _len = objects.length; _i < _len; _i++) {
-          object = objects[_i];
-          _results.push(updateObject(object));
-        }
-        return _results;
-      } else {
-        return updateObject(objects);
-      }
-    });
-  };
-
-
-  // ### unshare
-
-  //
-  Share.prototype._storeUnshare = function () {
-    var self = this;
-    return this.pipe(function (objects) {
-      var object, updateObject, _i, _len, _results;
-      updateObject = function (object) {
-        if (!object.$sharedAt) {
-          return object;
-        }
-        self.hoodie.store.update(object.type, object.id, {
-          $unshared: true
-        });
-        return object;
-      };
-      if ($.isArray(objects)) {
-        _results = [];
-        for (_i = 0, _len = objects.length; _i < _len; _i++) {
-          object = objects[_i];
-          _results.push(updateObject(object));
-        }
-        return _results;
-      } else {
-        return updateObject(objects);
-      }
-    });
-  };
-
-
-  // ### share
-
-  //
-  Share.prototype._storeShare = function () {
-    var self = this;
-
-    return this.pipe(function (objects) {
-      return self.hoodie.share.add().pipe(function (newShare) {
-        var object, updateObject, value;
-        updateObject = function (object) {
-          self.hoodie.store.update(object.type, object.id, {
-            $sharedAt: newShare.id
-          });
-          return object;
-        };
-        value = (function () {
-          var _i, _len, _results;
-          if ($.isArray(objects)) {
-            _results = [];
-            for (_i = 0, _len = objects.length; _i < _len; _i++) {
-              object = objects[_i];
-              _results.push(updateObject(object));
-            }
-            return _results;
-          } else {
-            return updateObject(objects);
-          }
-        })();
-        return self.hoodie.defer().resolve(value, newShare).promise();
-      });
-    });
-  };
-
-  return Share;
-
-})();
-
-// extend Hoodie
-Hoodie.extend('share', Hoodie.Share);
-
-// User
-// ======
-
-// the User Module provides a simple API to find objects from other users public
-// stores
-//
-// For example, the syntax to find all objects from user "Joe" looks like this:
-//
-//     hoodie.user("Joe").findAll().done( handleObjects )
-//
-
-Hoodie.User = (function() {
-
-  'use strict';
-
-  function User(hoodie) {
-    this.hoodie = hoodie;
-    this.api = this.api.bind(this);
-
-    // extend hodie.store promise API
-    this.hoodie.store.decoratePromises({
-      publish: this._storePublish,
-      unpublish: this._storeUnpublish
-    });
-
-    // vanilla API syntax:
-    // hoodie.user('uuid1234').findAll()
-    return this.api;
-  }
-
-  // 
-  User.prototype.api = function(userHash, options) {
-    options = options || {};
-    $.extend(options, {
-      prefix: '$public'
-    });
-    return this.hoodie.open("user/" + userHash + "/public", options);
-  };
-
-
-  // hoodie.store decorations
-  // --------------------------
-
-  // hoodie.store decorations add custom methods to promises returned
-  // by hoodie.store methods like find, add or update. All methods return
-  // methods again that will be executed in the scope of the promise, but
-  // with access to the current hoodie instance
-
-  // ### publish
-
-  // publish an object. If an array of properties passed, publish only these
-  // attributes and hide the remaining ones. If no properties passed, publish
-  // the entire object.
-  //
-  User.prototype._storePublish = function(properties) {
-    var _this = this;
-    return this.pipe(function(objects) {
-      var object, _i, _len, _results;
-      if (!$.isArray(objects)) {
-        objects = [objects];
-      }
-      _results = [];
-      for (_i = 0, _len = objects.length; _i < _len; _i++) {
-        object = objects[_i];
-        _results.push(_this.hoodie.store.update(object.type, object.id, {
-          $public: properties || true
-        }));
-      }
-      return _results;
-    });
-  };
-
-
-  //`### unpublish`
-
-  //
-  User.prototype._storeUnpublish = function() {
-    var _this = this;
-    return this.pipe(function(objects) {
-      var object, _i, _len, _results;
-      if (!$.isArray(objects)) {
-        objects = [objects];
-      }
-      _results = [];
-      for (_i = 0, _len = objects.length; _i < _len; _i++) {
-        object = objects[_i];
-        if (object.$public) {
-          _results.push(_this.hoodie.store.update(object.type, object.id, {
-            $public: false
-          }));
-        }
-      }
-      return _results;
-    });
-  };
-
-  return User;
-
-})();
-
-// extend Hoodie
-Hoodie.extend('user', Hoodie.User);
-
-// Global
-// ========
-
-// the Global Module provides a simple API to find objects from the global
-// stores
-// 
-// For example, the syntax to find all objects from the global store
-// looks like this:
-// 
-//     hoodie.global.findAll().done( handleObjects )
-// 
-// okay, might not be the best idea to do that with 1+ million objects, but
-// you get the point
-// 
-Hoodie.Global = (function () {
-
-  'use strict';
-
-  function Global(hoodie) {
-
-    // vanilla API syntax:
-    // hoodie.global.findAll()
-    return hoodie.open("global");
-  }
-
-  return Global;
-
-})();
-
-// extend Hoodie
-Hoodie.extend('global', Hoodie.Global);
-
-// Share Instance
-// ========================
-
-// A share instance provides an API to interact with a
-// share. It's extending the default Remote Store by methods
-// to grant or revoke read / write access.
-//
-// By default, a share is only accessible to me. If I want
-// it to share it, I explicatly need to grant access
-// by calling `share.grantReadAccess()`. I can also grant
-// access to only specific users by passing an array:
-// `share.grantReadAccess(['joe','lisa'])`
-//
-// It's plannend to secure a public share with a password,
-// but this feature is not yet implemented.
-//
-// To subscribe to a share created by somebody else, run
-// this code: `hoodie.share('shareId').subscribe()`.
-//
-Hoodie.ShareInstance = (function(_super) {
-
-  'use strict';
-
-  // constructor
-  // -------------
-
-  // initializes a new share
-  //
-  function ShareInstance(hoodie, options) {
-    this.hoodie = hoodie;
-
-    options = options || {};
-
-    this._handleSecurityResponse = this._handleSecurityResponse.bind(this);
-    this._objectBelongsToMe = this._objectBelongsToMe.bind(this);
-
-    // make sure that we have an id
-    this.id = options.id || this.hoodie.uuid();
-
-    // set name from id
-    this.name = "share/" + this.id;
-
-    // set prefix from name
-    this.prefix = this.name;
-
-    // set options
-    $.extend(this, options);
-
-    ShareInstance.__super__.constructor.apply(this, arguments);
-  }
-
-  Object.deepExtend(ShareInstance, _super);
-
-
-  // default values
-  // ----------------
-
-  // shares are not accessible to others by default.
-  //
-  ShareInstance.prototype.access = false;
-
-
-  // subscribe
-  // ---------
-
-  //
-  //
-  ShareInstance.prototype.subscribe = function() {
-    return this.request('GET', '/_security').pipe(this._handleSecurityResponse);
-  };
-
-
-  // unsubscribe
-  // -----------
-
-  //
-  //
-  ShareInstance.prototype.unsubscribe = function() {
-    this.hoodie.share.remove(this.id);
-    this.hoodie.store.removeAll(this._objectBelongsToMe, {
-      local: true
-    });
-    return this;
-  };
-
-
-  // grant read access
-  // -------------------
-
-  // grant read access to the share. If no users passed,
-  // everybody can read the share objects. If one or multiple
-  // users passed, only these users get read access.
-  //
-  // examples:
-  //
-  //     share.grantReadAccess()
-  //     share.grantReadAccess('joe@example.com')
-  //     share.grantReadAccess(['joe@example.com', 'lisa@example.com'])
-  //
-  ShareInstance.prototype.grantReadAccess = function(users) {
-    var currentUsers, user, _i, _len;
-
-    if (this.access === true || this.access.read === true) {
-      return this.hoodie.resolveWith(this);
-    }
-
-    if (typeof users === 'string') {
-      users = [users];
-    }
-
-    if (this.access === false || this.access.read === false) {
-      if (this.access.read !== undefined) {
-        this.access.read = users || true;
-      } else {
-        this.access = users || true;
-      }
-    }
-
-    if (users) {
-      currentUsers = this.access.read || this.access;
-
-      for (_i = 0, _len = users.length; _i < _len; _i++) {
-        user = users[_i];
-        if (currentUsers.indexOf(user) === -1) {
-          currentUsers.push(user);
-        }
-      }
-
-      this.access.read !== undefined ? this.access.read = currentUsers : this.access = currentUsers;
-    } else {
-      this.access.read !== undefined ? this.access.read = true : this.access = true;
-    }
-
-    return this.hoodie.share.update(this.id, {
-      access: this.access
-    });
-
-  };
-
-
-  // revoke read access
-  // --------------------
-
-  // revoke read access to the share. If one or multiple
-  // users passed, only these users' access gets revoked.
-  // Revoking reading access always includes revoking write
-  // access as well.
-  //
-  // examples:
-  //
-  //     share.revokeReadAccess()
-  //     share.revokeReadAccess('joe@example.com')
-  //     share.revokeReadAccess(['joe@example.com', 'lisa@example.com'])
-  //
-  ShareInstance.prototype.revokeReadAccess = function(users) {
-    var changed, currentUsers, idx, user, _i, _len;
-    this.revokeWriteAccess(users);
-    if (this.access === false || this.access.read === false) {
-      return this.hoodie.resolveWith(this);
-    }
-    if (users) {
-      if (this.access === true || this.access.read === true) {
-        return this.hoodie.rejectWith(this);
-      }
-      if (typeof users === 'string') {
-        users = [users];
-      }
-      currentUsers = this.access.read || this.access;
-      changed = false;
-      for (_i = 0, _len = users.length; _i < _len; _i++) {
-        user = users[_i];
-        idx = currentUsers.indexOf(user);
-        if (idx !== -1) {
-          currentUsers.splice(idx, 1);
-          changed = true;
-        }
-      }
-      if (!changed) {
-        return this.hoodie.resolveWith(this);
-      }
-      if (currentUsers.length === 0) {
-        currentUsers = false;
-      }
-      if (this.access.read !== undefined) {
-        this.access.read = currentUsers;
-      } else {
-        this.access = currentUsers;
-      }
-    } else {
-      this.access = false;
-    }
-    return this.hoodie.share.update(this.id, {
-      access: this.access
-    });
-  };
-
-
-  // grant write access
-  // --------------------
-
-  // grant write access to the share. If no users passed,
-  // everybody can edit the share objects. If one or multiple
-  // users passed, only these users get write access. Granting
-  // writing reads always also includes reading rights.
-  //
-  // examples:
-  //
-  //     share.grantWriteAccess()
-  //     share.grantWriteAccess('joe@example.com')
-  //     share.grantWriteAccess(['joe@example.com', 'lisa@example.com'])
-  //
-  ShareInstance.prototype.grantWriteAccess = function(users) {
-    this.grantReadAccess(users);
-
-    if (this.access.read === undefined) {
-      this.access = {
-        read: this.access
-      };
-    }
-    if (this.access.write === true) {
-      return this.hoodie.resolveWith(this);
-    }
-    if (users) {
-      if (typeof users === 'string') {
-        users = [users];
-      }
-      this.access.write = users;
-    } else {
-      this.access.write = true;
-    }
-    return this.hoodie.share.update(this.id, {
-      access: this.access
-    });
-  };
-
-
-  // revoke write access
-  // --------------------
-
-  // revoke write access to the share. If one or multiple
-  // users passed, only these users' write access gets revoked.
-  //
-  // examples:
-  //
-  //     share.revokeWriteAccess()
-  //     share.revokeWriteAccess('joe@example.com')
-  //     share.revokeWriteAccess(['joe@example.com', 'lisa@example.com'])
-  //
-  ShareInstance.prototype.revokeWriteAccess = function(users) {
-    var idx, user, _i, _len;
-
-    if (this.access.write === undefined) {
-      return this.hoodie.resolveWith(this);
-    }
-    if (users) {
-      if (typeof this.access.write === 'boolean') {
-        return this.hoodie.rejectWith(this);
-      }
-      if (typeof users === 'string') {
-        users = [users];
-      }
-      for (_i = 0, _len = users.length; _i < _len; _i++) {
-        user = users[_i];
-        idx = this.access.write.indexOf(user);
-        if (idx !== -1) {
-          this.access.write.splice(idx, 1);
-        }
-      }
-      if (this.access.write.length === 0) {
-        this.access = this.access.read;
-      }
-    } else {
-      this.access = this.access.read;
-    }
-    return this.hoodie.share.update(this.id, {
-      access: this.access
-    });
-  };
-
-
-  // PRIVATE
-  // ---------
-
-  // 
-  // 
-  ShareInstance.prototype._objectBelongsToMe = function(object) {
-    return object.$sharedAt === this.id;
-  };
-
-  // 
-  // 
-  ShareInstance.prototype._handleSecurityResponse = function(security) {
-    var access, createdBy;
-    access = this._parseSecurity(security);
-    createdBy = '$subscription';
-    return this.hoodie.share.findOrAdd(this.id, {
-      access: access,
-      createdBy: createdBy
-    });
-  };
-
-
-  // a db _security response looks like this:
-  //
-  //     {
-  //       members: {
-  //           names: [],
-  //           roles: ["1ihhzfy"]
-  //       },
-  //       writers: {
-  //           names: [],
-  //           roles: ["1ihhzfy"]
-  //       }
-  //     }
-  //
-  // we want to turn it into
-  //
-  //     {read: true, write: true}
-  //
-  // given that users ownerHash is "1ihhzfy"
-  //
-  ShareInstance.prototype._parseSecurity = function(security) {
-    var access, read, write, _ref, _ref1;
-    read = (_ref = security.members) !== null ? _ref.roles : void 0;
-    write = (_ref1 = security.writers) !== null ? _ref1.roles : void 0;
-    access = {};
-
-    if (read !== undefined) {
-      access.read = read === true || read.length === 0;
-      if (read.length) {
-        access.read = -1 !== read.indexOf(this.hoodie.account.ownerHash);
-      }
-    }
-
-    if (write !== undefined) {
-      access.write = write === true || write.length === 0;
-      if (write.length) {
-        access.write = -1 !== write.indexOf(this.hoodie.account.ownerHash);
-      }
-    }
-    return access;
-  };
-
-  return ShareInstance;
-
-})(Hoodie.Remote);

@@ -10,13 +10,13 @@ describe("hoodie.request", function () {
     spyOn(window.jQuery, "ajax").andReturn(ajaxPromise);
 
     this.hoodie = new Mocks.Hoodie();
-    this.request = extension('request')(this.hoodie)
+    hoodieRequestExtension(this.hoodie)
     this.requestDefer = this.hoodie.defer();
   });
 
   // see http://bugs.jquery.com/ticket/14104
   it("should return a jQuery.ajax compatible promise", function() {
-    var promise = this.request('GET', '/');
+    var promise = this.hoodie.request('GET', '/');
     expect(promise).toBePromise();
     expect(promise.abort).toBeDefined();
   });
@@ -24,7 +24,7 @@ describe("hoodie.request", function () {
   _when("request('GET', '/')", function() {
     beforeEach(function() {
       var args;
-      this.request('GET', '/');
+      this.hoodie.request('GET', '/');
       this.args = args = $.ajax.mostRecentCall.args[0];
     });
     it("should send a GET request to http://my.cou.ch/", function() {
@@ -45,7 +45,7 @@ describe("hoodie.request", function () {
   _when("request 'POST', '/test', data: funky: 'fresh'", function() {
     beforeEach(function() {
       var args;
-      this.request('POST', '/test', {
+      this.hoodie.request('POST', '/test', {
         data: {
           funky: 'fresh'
         }
@@ -61,7 +61,7 @@ describe("hoodie.request", function () {
   _when("request('GET', 'http://api.otherapp.com/')", function() {
     beforeEach(function() {
       var args;
-      this.request('GET', 'http://api.otherapp.com/');
+      this.hoodie.request('GET', 'http://api.otherapp.com/');
       this.args = args = $.ajax.mostRecentCall.args[0];
     });
     it("should send a GET request to http://api.otherapp.com/", function() {
@@ -78,7 +78,7 @@ describe("hoodie.request", function () {
       });
     });
     it("should return a rejected promis with Cannot reach backend error", function() {
-      expect(this.request('GET', '/')).toBeRejectedWith({
+      expect(this.hoodie.request('GET', '/')).toBeRejectedWith({
         error: 'Cannot connect to Hoodie server at http://my.cou.ch'
       });
     });

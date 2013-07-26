@@ -31,53 +31,6 @@
       : "/_api"; // otherwise default to current domain
 
 
-    // Check Connection
-    // ------------------
-
-    // the `checkConnection` method is used, well, to check if
-    // the hoodie backend is reachable at `baseUrl` or not.
-    // Check Connection is automatically called on startup
-    // and then each 30 seconds. If it fails, it
-    //
-    // - sets `online = false`
-    // - triggers `offline` event
-    // - sets `checkConnectionInterval = 3000`
-    //
-    // when connection can be reestablished, it
-    //
-    // - sets `online = true`
-    // - triggers `online` event
-    // - sets `checkConnectionInterval = 30000`
-    //
-    var online = true;
-    var checkConnectionInterval = 30000;
-    var checkConnectionRequest = null;
-    function checkConnection() {
-
-      var req = checkConnectionRequest;
-
-      if (req && req.state() === 'pending') {
-        return req;
-      }
-
-      checkConnectionRequest = hoodie.request('GET', '/').pipe(
-        handleCheckConnectionSuccess,
-        handleCheckConnectionError
-      );
-
-      return checkConnectionRequest;
-    }
-
-
-    // isOnline
-    // ----------
-
-    //
-    function isOnline() {
-      return online;
-    }
-
-
     // Open stores
     // -------------
 
@@ -195,44 +148,16 @@
 
 
     //
-    //
-    //
-    function handleCheckConnectionSuccess() {
-      checkConnectionInterval = 30000;
-
-      window.setTimeout(checkConnection, checkConnectionInterval);
-
-      if (! hoodie.isOnline()) {
-        hoodie.trigger('reconnected');
-        online = true;
-      }
-
-      return $defer().resolve();
-    }
-
-
-    //
-    //
-    //
-    function handleCheckConnectionError() {
-      checkConnectionInterval = 3000;
-
-      window.setTimeout(checkConnection, checkConnectionInterval);
-
-      if (hoodie.isOnline()) {
-        hoodie.trigger('disconnected');
-        online = false;
-      }
-
-      return $defer().reject();
-    }
-
-
-    //
-    //
+    // hoodie.extend('myMagic', function(hoodie) {} )
+    // or
+    // hoodie.extend(function(hoodie) {} )
     //
     function extend(name, Extension) {
-      hoodie[name] = new Extension(hoodie);
+      if (Extension) {
+        hoodie[name] = new Extension(hoodie);
+      } else {
+        new Extension(hoodie); // anonymous extension
+      }
     }
 
 
@@ -240,13 +165,11 @@
     //
     //
     function loadExtensions() {
-      var Extension, instanceName;
-
-      for (instanceName in extensions) {
-        if (extensions.hasOwnProperty(instanceName)) {
-          Extension = extensions[instanceName];
-
-          hoodie[instanceName] = new Extension(hoodie);
+      for (var i = 0; i < extensions.length; i++) {
+        if (extensions[i].name) {
+          hoodie[extensions[i].name] = new extensions[i].extension(hoodie);
+        } else {
+          extensions[i].extension(hoodie);
         }
       }
     }
@@ -265,8 +188,6 @@
     hoodie.off = events.unbind;
 
     // hoodie core methods
-    hoodie.isOnline = isOnline;
-    hoodie.checkConnection = checkConnection;
     hoodie.open = open;
     hoodie.uuid = uuid;
     hoodie.dispose = dispose;
@@ -288,7 +209,7 @@
   // ------------------
 
   // You can either extend the Hoodie class, or a hoodie
-  // instance dooring runtime
+  // instance during runtime
   //
   //     Hoodie.extend('magic1', funcion(hoodie) { /* ... */ })
   //     hoodie = new Hoodie
@@ -296,9 +217,22 @@
   //     hoodie.magic1.doSomething()
   //     hoodie.magic2.doSomethingElse()
   //
-  var extensions = {};
-  Hoodie.extend = function(name, Extension) {
-    extensions[name] = Extension;
+  // Hoodie can also be extended anonymously
+  //
+  //      Hoodie.extend(funcion(hoodie) { hoodie.myMagic = function() {} })
+  //
+  var extensions = [];
+  Hoodie.extend = function(name, extension) {
+    if (extension) {
+      extensions.push({
+        name: name,
+        extension: extension
+      });
+    } else {
+      extensions.push({
+        extension: name
+      });
+    }
   };
 
   //
