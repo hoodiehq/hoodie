@@ -31,70 +31,16 @@
       : "/_api"; // otherwise default to current domain
 
 
-    // Open stores
-    // -------------
+    // hoodie.extend
+    // ---------------
 
-    // generic method to open a store. Used by
+    // extend hoodie instance:
     //
-    // * hoodie.remote
-    // * hoodie.user("joe")
-    // * hoodie.global
-    // * ... and more
+    //     hoodie.extend(function(hoodie) {} )
     //
-    //     hoodie.open("some_store_name").findAll()
-    //
-    function open(storeName, options) {
-      options = options || {};
-
-      $extend(options, {
-        name: storeName
-      });
-
-      return new Hoodie.Remote(hoodie, options);
-    }
-
-
-    // dispose
-    // ---------
-
-    // if a hoodie instance is not needed anymore, it can
-    // be disposed using this method. A `dispose` event
-    // gets triggered that the modules react on.
-    function dispose() {
-      hoodie.trigger('dispose');
-    }
-
-
-    //
-    // hoodie.extend('myMagic', function(hoodie) {} )
-    // or
-    // hoodie.extend(function(hoodie) {} )
-    //
-    function extend(extension) {
+    hoodie.extend = function extend(extension) {
       extension(hoodie);
     }
-
-
-    //
-    //
-    //
-    function loadExtensions() {
-      for (var i = 0; i < extensions.length; i++) {
-        if (extensions[i].name) {
-          hoodie[extensions[i].name] = new extensions[i].extension(hoodie);
-        } else {
-          extensions[i].extension(hoodie);
-        }
-      }
-    }
-
-    // get jQuery methods that Hoodie depends on
-    var $extend = window.jQuery.extend;
-
-    // hoodie core methods
-    hoodie.open = open;
-    hoodie.dispose = dispose;
-    hoodie.extend = extend;
 
     // * hoodie.bind
     // * hoodie.on
@@ -122,8 +68,14 @@
     // * hoodie.uuid
     hoodie.extend( hoodieUUID );
 
+    // * hoodie.dispose
+    hoodie.extend( hoodieDispose );
+
+    // * hoodie.open
+    hoodie.extend( hoodieOpen );
+
     // load user extensions
-    loadExtensions();
+    applyExtensions(hoodie);
   }
 
   // Extending hoodie
@@ -155,6 +107,19 @@
       });
     }
   };
+
+  //
+  //
+  //
+  function applyExtensions(hoodie) {
+    for (var i = 0; i < extensions.length; i++) {
+      if (extensions[i].name) {
+        hoodie[extensions[i].name] = new extensions[i].extension(hoodie);
+      } else {
+        extensions[i].extension(hoodie);
+      }
+    }
+  }
 
   //
   // expose Hoodie to module loaders. Based on jQuery's implementation.

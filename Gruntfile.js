@@ -35,6 +35,8 @@ module.exports = function(grunt) {
           'src/core/request.js',
           'src/core/connection.js',
           'src/core/uuid.js',
+          'src/core/dispose.js',
+          'src/core/open.js',
 
           'src/core/store.js',
           'src/core/errors.js',
