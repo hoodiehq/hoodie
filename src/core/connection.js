@@ -3,7 +3,7 @@
 // ============================================
 
 //
-Hoodie.extend(function hoodieConnectionExtension(hoodie) {
+function hoodieConnection(hoodie) {
 
   'use strict';
 
@@ -93,4 +93,4 @@ Hoodie.extend(function hoodieConnectionExtension(hoodie) {
   //
   hoodie.isOnline = isOnline;
   hoodie.checkConnection = checkConnection;
-});
+}

@@ -28,18 +28,18 @@
 // in the build process, wrap the whole hoodie.js into
 // a closure to prevent it from polluting window.
 //
-//     function hoodieRequestExtension(hoodie){
+//     function hoodieRequest(hoodie){
 //       hoodie.request = function() {}
 //     }
-//     Hoodie.extend(hoodieRequestExtension);
+//     Hoodie.extend(hoodieRequest);
 //
 // Then in the specs simply do
 //
 //     this.hoodie = new Mocks.Hoodie();
-//     hoodieRequestExtension(this.hoodie);
+//     hoodieRequest(this.hoodie);
 //     this.hoodie.request // can now be tested.
 //
-function hoodieRequestExtension(hoodie) {
+function hoodieRequest(hoodie) {
 
   'use strict';
 
@@ -106,5 +106,3 @@ function hoodieRequestExtension(hoodie) {
   //
   hoodie.request = request;
 }
-
-Hoodie.extend(hoodieRequestExtension);

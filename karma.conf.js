@@ -13,11 +13,11 @@ files = [
   'test/lib/bind.js',
   'lib/jquery/jquery.js',
   'src/utils.js',
-  'src/events.js',
   'test/lib/jasmine-helpers.js',
 
   'src/hoodie.js',
 
+  'src/core/events.js',
   'src/core/request.js',
   'src/core/connection.js',
 

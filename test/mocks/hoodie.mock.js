@@ -12,7 +12,8 @@ promiseMock = {
 Mocks.Hoodie = function () {
 
   'use strict';
-  var events = Events();
+  var events = {};
+  hoodieEvents(events);
 
   return {
     baseUrl: 'http://my.cou.ch',

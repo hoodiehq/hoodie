@@ -10,7 +10,7 @@ describe("hoodie.request", function () {
     spyOn(window.jQuery, "ajax").andReturn(ajaxPromise);
 
     this.hoodie = new Mocks.Hoodie();
-    hoodieRequestExtension(this.hoodie)
+    hoodieRequest(this.hoodie)
     this.requestDefer = this.hoodie.defer();
   });
 

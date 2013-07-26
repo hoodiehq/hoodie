@@ -28,9 +28,9 @@ module.exports = function(grunt) {
       dist: {
         src: [
           'src/utils.js',
-          'src/events.js',
           'src/hoodie.js',
 
+          'src/core/events.js',
           'src/core/request.js',
           'src/core/connection.js',
 

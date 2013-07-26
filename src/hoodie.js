@@ -152,12 +152,8 @@
     // or
     // hoodie.extend(function(hoodie) {} )
     //
-    function extend(name, Extension) {
-      if (Extension) {
-        hoodie[name] = new Extension(hoodie);
-      } else {
-        new Extension(hoodie); // anonymous extension
-      }
+    function extend(extension) {
+      extension(hoodie);
     }
 
 
@@ -178,15 +174,6 @@
     var $defer = window.jQuery.Deferred;
     var $extend = window.jQuery.extend;
 
-    // events API
-    var events = window.Events();
-    hoodie.bind = events.bind;
-    hoodie.on = events.bind;
-    hoodie.one = events.one;
-    hoodie.trigger = events.trigger;
-    hoodie.unbind = events.unbind;
-    hoodie.off = events.unbind;
-
     // hoodie core methods
     hoodie.open = open;
     hoodie.uuid = uuid;
@@ -201,7 +188,24 @@
     hoodie.resolveWith = resolveWith;
     hoodie.rejectWith = rejectWith;
 
-    // load global extensions
+
+
+    // * hoodie.bind
+    // * hoodie.on
+    // * hoodie.one
+    // * hoodie.trigger
+    // * hoodie.unbind
+    // * hoodie.off
+    hoodie.extend( hoodieEvents );
+
+    // * hoodie.request
+    hoodie.extend( hoodieRequest );
+
+    // * hoodie.isOnline
+    // * hoodie.checkConnection
+    hoodie.extend( hoodieConnection );
+
+    // load user extensions
     loadExtensions();
   }
 
