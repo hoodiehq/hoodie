@@ -6,6 +6,25 @@
 // and a better overview. This is just an attempt to do
 // so, I'm very open for other suggestions.
 //
+// Hoodie.extend would look like
+//
+//     Hoodie.extend = function(name, Extension) {
+//       extensions[name] = Extension;
+//     };
+//
+// And the extensions would be loaded like this:
+//
+//     function loadExtensions() {
+//       var extension, name;
+//
+//       for (name in extensions) {
+//         if (extensions.hasOwnProperty(name)) {
+//           extension = extensions[name];
+//           hoodie[name] = extension(hoodie);
+//         }
+//       }
+//     }
+//
 // If possible, I'd like to avoid to use one of the common
 // module loaders, but be agnostic to them.
 //
