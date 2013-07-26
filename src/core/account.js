@@ -43,7 +43,7 @@ Hoodie.Account = (function () {
   // Properties
   // ------------
 
-  // 
+  //
   Account.prototype.username = undefined;
 
   // init
@@ -130,7 +130,7 @@ Hoodie.Account = (function () {
   // user doc. The account confirmation might take a while, so we keep trying
   // to sign in with a 300ms timeout.
   //
-  Account.prototype.signUp = function(username, password) {
+  Account.prototype.signUp = function(username, password, customData) {
     if (password === undefined) {
       password = '';
     }
@@ -154,19 +154,24 @@ Hoodie.Account = (function () {
     // downcase username
     username = username.toLowerCase();
 
+    var data = {
+      _id: this._key(username),
+      name: this._userKey(username),
+      type: 'user',
+      roles: [],
+      password: password,
+      ownerHash: this.ownerHash,
+      database: this.db(),
+      updatedAt: this._now(),
+      createdAt: this._now(),
+      signedUpAt: username !== this.ownerHash ? this._now() : void 0
+    };
+
+    customData = customData || {};
+    data = $.extend(customData, data);
+
     var options = {
-      data: JSON.stringify({
-        _id: this._key(username),
-        name: this._userKey(username),
-        type: 'user',
-        roles: [],
-        password: password,
-        ownerHash: this.ownerHash,
-        database: this.db(),
-        updatedAt: this._now(),
-        createdAt: this._now(),
-        signedUpAt: username !== this.ownerHash ? this._now() : void 0
-      }),
+      data: JSON.stringify(data),
       contentType: 'application/json'
     };
 
@@ -204,7 +209,7 @@ Hoodie.Account = (function () {
   // hasAccount
   // ---------------------
 
-  // 
+  //
   Account.prototype.hasAccount = function() {
     return !!this.username;
   };
@@ -213,7 +218,7 @@ Hoodie.Account = (function () {
   // hasAnonymousAccount
   // ---------------------
 
-  // 
+  //
   Account.prototype.hasAnonymousAccount = function() {
     return this.getAnonymousPassword() !== undefined;
   };
@@ -616,7 +621,7 @@ Hoodie.Account = (function () {
 
     // _delayedSignIn might call itself, when the user account
     // is pending. In this case it passes the original defer,
-    // to keep a reference and finally resolve / reject it 
+    // to keep a reference and finally resolve / reject it
     // at some point
     if (!defer) {
       defer = this.hoodie.defer();
