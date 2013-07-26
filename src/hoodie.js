@@ -8,11 +8,12 @@
 
   'use strict';
 
+
   // Constructor
   // -------------
 
   // When initializing a hoodie instance, an optional URL
-  // can be passed. That's the URL of a hoodie backend.
+  // can be passed. That's the URL of the hoodie backend.
   // If no URL passed it defaults to the current domain.
   //
   //     // init a new hoodie instance
@@ -26,13 +27,9 @@
       throw new Error("usage: new Hoodie(url);");
     }
 
-    hoodie.baseUrl = baseUrl ?
+    hoodie.baseUrl = baseUrl ? // if baseUrl passed
       baseUrl.replace(/\/+$/, '') // remove trailing slash(es)
-      : "/_api"; // default Hoodie API endpoint
-
-
-    // PUBLIC METHODS
-    // ----------------
+      : "/_api"; // otherwise default to current domain
 
 
     // Requests
@@ -293,8 +290,8 @@
     //
     //
     //
-    function extend(name, Module) {
-      hoodie[name] = new Module(hoodie);
+    function extend(name, Extension) {
+      hoodie[name] = new Extension(hoodie);
     }
 
 
@@ -302,12 +299,12 @@
     //
     //
     function loadExtensions() {
-      var Module, instanceName;
+      var Extension, instanceName;
 
       for (instanceName in extensions) {
         if (extensions.hasOwnProperty(instanceName)) {
-          Module = extensions[instanceName];
-          hoodie[instanceName] = new Module(hoodie);
+          Extension = extensions[instanceName];
+          hoodie[instanceName] = new Extension(hoodie);
         }
       }
     }
@@ -367,8 +364,8 @@
   //     hoodie.magic2.doSomethingElse()
   //
   var extensions = {};
-  Hoodie.extend = function(name, Module) {
-    extensions[name] = Module;
+  Hoodie.extend = function(name, Extension) {
+    extensions[name] = Extension;
   };
 
   //
