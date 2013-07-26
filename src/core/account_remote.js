@@ -10,6 +10,19 @@
 // it will continuously  synchronize with local store,
 // otherwise sync, pull or push can be called manually
 //
+
+
+// NOTE:
+// this is a workaround to make the old,
+// CoffeeScripty classes compatible with
+// the new Hoodie.extend API.
+// We'll get rid of classes / constructors
+// one by one
+function hoodieRemote (hoodie) {
+  hoodie.remote = new Hoodie.AccountRemote(hoodie);
+}
+
+
 Hoodie.AccountRemote = (function(_super) {
 
   'use strict';
@@ -74,7 +87,7 @@ Hoodie.AccountRemote = (function(_super) {
   // to determine wether to trigger an `add` or `update`
   // event, the known objects from the user get loaded
   // from local store initially.
-  // 
+  //
   AccountRemote.prototype.loadListOfKnownObjectsFromLocalStore = function() {
     var id, key, type, _i, _len, _ref, _ref1;
     _ref = this.hoodie.store.index();

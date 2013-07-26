@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Hoodie Test page</title>
+  <link href="lib/prism/prism.css" type="text/css" rel="stylesheet" />
+</head>
+<body>
+
+  <div class="container" style="margin: 50px auto; max-width: 920px;">
+    <pre><code class="language-javascript">
+
+    //
+    // initialize your Hoodie App
+    //
+
+    whereTheMagicHappens = 'https://yourapp.hood.ie';
+    hoodie = new Hoodie(whereTheMagicHappens);
+
+    //
+    // Account
+    //
+
+    // sign up
+    hoodie.account.signUp('joe@example.com', 'secret')
+
+    // sign in
+    hoodie.account.signIn('joe@example.com', 'secret')
+
+    // sign out
+    hoodie.account.signOut()
+
+    // change password
+    hoodie.account.changePassword('currentpassword', 'newpassword')
+
+    // change username
+    hoodie.account.changeUsername('currentpassword', 'newusername')
+
+    // reset password
+    hoodie.account.resetPassword('joe@example.com')
+
+    // destroy account and all its data
+    hoodie.account.destroy()
+
+    //
+    // Store
+    //
+
+    // add a new object
+    type = 'couch'
+    attributes = {color: "red"}
+    hoodie.store.add(type, attributes )
+      .done ( function(newObject) { } )
+
+    // save an object
+    type = 'couch'
+    id   = 'abc4567'
+    attributes  = {color: "red", name: "relax"}
+    hoodie.store.save( type, id, attributes )
+      .done ( function(object) { } )
+
+    // update an existing object
+    type = 'couch'
+    id   = 'abc4567'
+    update = {size: 2}
+    hoodie.store.update( type, id, update )
+      .done ( function(updatedObject) { } )
+
+    // find one object
+    type = 'couch'
+    id   = 'abc4567'
+    hoodie.store.find( type, id )
+      .done ( function(object) { } )
+
+    // Load all objects
+    hoodie.store.findAll()
+      .done ( function(objects) { } )
+
+    // Load all objects from one type
+    type = 'couch'
+    hoodie.store.findAll( type )
+      .done ( function(objects) { } )
+
+    // remove an existing object
+    type = 'couch'
+    id   = 'abc4567'
+    hoodie.store.remove( type, id )
+      .done ( function(removedObject) { } )
+
+    // listen to store events
+    hoodie.store.on( 'add',    function( newObject) { } )
+
+    // new doc created
+    hoodie.store.on( 'add',    function( newObject) { } )
+
+    // existing doc updated
+    hoodie.store.on( 'update', function( updatedObject) { } )
+
+    // doc removed
+    hoodie.store.on( 'remove', function( removedObject) { } )
+
+    // any of the events above
+    hoodie.store.on( 'change', function( event, changedObject) { } )
+
+    // all listeners can be filtered by type
+    hoodie.store.on( "add:couch",    function( newObject) { } )
+    hoodie.store.on( "update:couch", function( updatedObject)  { } )
+    hoodie.store.on( "remove:couch", function( removedObject) { } )
+    hoodie.store.on( "change:couch", function( event, changedObject) { } )
+
+    // ... and by type and id
+    hoodie.store.on( "add:couch:uuid123",    function( newObject) { } )
+    hoodie.store.on( "update:couch:uuid123", function( updatedObject)  { } )
+    hoodie.store.on( "remove:couch:uuid123", function( removedObject) { } )
+    hoodie.store.on( "change:couch:uuid123", function( event, changedObject) { } )
+
+
+    //
+    // Synchronization
+    //
+    // When signed in, local changes do get synched automatically.
+    // You can subscribe to remote updates
+    //
+
+    // new doc created
+    hoodie.remote.on( 'add', function( newObject) { } )
+
+    // existing doc updated
+    hoodie.remote.on( 'update', function( updatedObject) { } )
+
+    // doc removed
+    hoodie.remote.on( 'remove', function( removedObject) { } )
+
+    // any of the events above
+    hoodie.remote.on( 'change', function( event, changedObject) { } )
+
+    // all listeners can be filtered by type
+    hoodie.remote.on( "add:couch",  function( newObject) { } )
+    hoodie.remote.on( "update:couch",  function( updatedObject)  { } )
+    hoodie.remote.on( "remove:couch", function( removedObject) { } )
+    hoodie.remote.on( "change:couch",  function( event, changedObject) { } )
+
+    // ... and by type and id
+    hoodie.remote.on( "add:couch:uuid123",  function( newObject) { } )
+    hoodie.remote.on( "update:couch:uuid123",  function( updatedObject)  { } )
+    hoodie.remote.on( "remove:couch:uuid123", function( removedObject) { } )
+    hoodie.remote.on( "change:couch:uuid123",  function( event, changedObject) { } )
+
+
+    //
+    // Public Shares (Public User Stores)
+    //
+    // Select data you want to share with others and control exactly what will
+    // be shared
+    //
+
+    // make couch object with id "abc4567" public
+    hoodie.store.find("couch","abc4567").publish()
+
+    // make couch with id "abc4567" public, but do only show the color, hide
+    // all other attributes
+    hoodie.store.find("couch","abc4567").publish(['color'])
+
+    // make couch with id "abc4567" private again
+    hoodie.store.find("couch","abc4567").unpublish()
+
+    // find all couch objects from user "joe"
+    hoodie.user("joe").findAll("couch").done( function(couches) { ... })
+
+
+    //
+    // Global Public Store
+    //
+    // When enabled, all publicly shared objects by all users will be
+    // available through the hoodie.global API
+    //
+
+    // find all public songs from all users
+    hoodie.global.findAll("song").done( function(songs) { ... })
+
+
+    //
+    // Sharing
+    //
+    // The hoodie.share module allows to share objects with other users. A share
+    // can be public, which means everybody knowing its id can access it. Or the
+    // access can be limited to specific users. Optionally, a password can be set
+    // for additional security. Access can be differenciated between read and write.
+    //
+
+    // add a new share
+    hoodie.share.add().done( function(share) {} )
+
+    // grant / revoke access
+    share.grantReadAccess()
+    share.grantWriteAccess()
+    share.revokeReadAccess()
+    share.revokeWriteAccess()
+    share.grantReadAccess('joe@example.com')
+    share.revomeWriteAccess(['joe@example.com','lisa@example.com'])
+
+    // add all todo objects to the share
+    hoodie.store.findAll('todo').shareAt(share.id)
+
+    // remove a specific todo from the share
+    hoodie.store.find('todo', '123').unshareAt(share.id)
+
+    // add a new share and add some of my objects to it in one step
+    hoodie.store.findAll('todo').share()
+    .done( function(todos, share) { alert('shared at ' + share.id) } )
+
+    // remove objects from all shares
+    hoodie.store.findAll('todo').unshare()
+
+    // remove share
+    hoodie.share.remove(share.id)
+
+    // open a share and load all its objects
+    hoodie.share('shareIdHere').findAll()
+      .done( function(objects) { } )
+
+    // subscribe / unsubscribe
+    hoodie.share('shareId').subscribe()
+    hoodie.share('shareId').unsubscribe()
+
+
+    //
+    // Send emails
+    //
+    email = {
+      to      : ['you@roundthewor.ld'],
+      cc      : ['rest@roundthewor.ld'],
+      subject : 'rule the wolrd',
+      body    : "we can do it!\nSigned, Joe"
+    }
+
+    hoodie.email.send( email )
+
+      // synched to server
+      .progress ( function(email) { } )
+
+      // email sent successfully
+      .done     ( function(email) { } )
+
+      // something went wrong
+      .fail     ( function(err)   { } )
+
+    //
+    // hoodie.js API docs
+    // http://hoodiehq.github.com/hoodie.js/doc/hoodie.html
+    //
+    </code></pre>
+  </div>
+
+  <!-- deplendencies for hoodie -->
+  <script src="lib/jquery/jquery.js"></script>
+  <script src="dist/hoodie.js"></script>
+  <script src="lib/prism/prism.js"></script>
+
+</body>
+</html>

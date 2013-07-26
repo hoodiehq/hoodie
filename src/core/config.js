@@ -1,98 +1,77 @@
 // Hoodie Config API
 // ===================
 
-// 
-Hoodie.Config = (function() {
+//
+function hoodieConfig(hoodie) {
 
-  'use strict';
-
-  // Constructor
-  // -------------
-
-  //
-  function Config(hoodie, options) {
-    var self = this;
-
-    options = options || {};
-
-    this.hoodie = hoodie;
-    this.clear = this.clear;
-
-    // memory cache
-    this.cache = {};
-
-    if (options.type) {
-      this.type = options.type;
-    }
-
-    if (options.id) {
-      this.id = options.id;
-    }
-
-    this.hoodie.store.find(this.type, this.id).done(function(obj) {
-      self.cache = obj;
-      return self.cache;
-    });
-
-    this.hoodie.on('account:signedOut', this.clear);
-  }
-
-  // used as attribute name in localStorage
-  Config.prototype.type = '$config';
-  Config.prototype.id = 'hoodie';
+  var type = '$config';
+  var id = 'hoodie';
+  var cache = {};
 
   // set
   // ----------
 
   // adds a configuration
-  // 
-  Config.prototype.set = function(key, value) {
+  //
+  function set(key, value) {
     var isSilent, update;
 
-    if (this.cache[key] === value) {
+    if (cache[key] === value) {
       return;
     }
 
-    this.cache[key] = value;
+    cache[key] = value;
 
     update = {};
     update[key] = value;
     isSilent = key.charAt(0) === '_';
 
-    return this.hoodie.store.update(this.type, this.id, update, {
+    return hoodie.store.update(type, id, update, {
       silent: isSilent
     });
 
-  };
+  }
 
   // get
   // ----------
 
   // receives a configuration
-  // 
-  Config.prototype.get = function(key) {
-    return this.cache[key];
-  };
+  //
+  function get(key) {
+    return cache[key];
+  }
 
   // clear
   // ----------
 
   // clears cache and removes object from store
-  // 
-  Config.prototype.clear = function() {
-    this.cache = {};
-    return this.hoodie.store.remove(this.type, this.id);
-  };
+  //
+  function clear() {
+    cache = {};
+    return hoodie.store.remove(type, id);
+  }
 
   // remove
   // ----------
 
   // removes a configuration, is a simple alias for config.set(key, undefined)
-  // 
-  Config.prototype.remove = function(key) {
-    return this.set(key, void 0);
+  //
+  function remove(key) {
+    return set(key, void 0);
+  }
+
+  // load cach
+  hoodie.store.find(type, id).done(function(obj) {
+    cache = obj;
+  });
+
+  // clear on sign out
+  hoodie.on('account:signedOut', clear);
+
+  hoodie.config = {
+    set : set,
+    get : get,
+    clear : clear,
+    remove : remove
   };
-
-  return Config;
-
-})();
+}

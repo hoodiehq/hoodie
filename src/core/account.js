@@ -1,8 +1,18 @@
 // Hoodie.Account
 // ================
 
-// tell something smart in here.
-//
+
+// NOTE:
+// this is a workaround to make the old,
+// CoffeeScripty classes compatible with
+// the new Hoodie.extend API.
+// We'll get rid of classes / constructors
+// one by one
+function hoodieAccount (hoodie) {
+  hoodie.account = new Hoodie.Account(hoodie);
+}
+
+
 Hoodie.Account = (function () {
 
   'use strict';
@@ -43,7 +53,7 @@ Hoodie.Account = (function () {
   // Properties
   // ------------
 
-  // 
+  //
   Account.prototype.username = undefined;
 
   // init
@@ -204,7 +214,7 @@ Hoodie.Account = (function () {
   // hasAccount
   // ---------------------
 
-  // 
+  //
   Account.prototype.hasAccount = function() {
     return !!this.username;
   };
@@ -213,7 +223,7 @@ Hoodie.Account = (function () {
   // hasAnonymousAccount
   // ---------------------
 
-  // 
+  //
   Account.prototype.hasAnonymousAccount = function() {
     return this.getAnonymousPassword() !== undefined;
   };
@@ -616,7 +626,7 @@ Hoodie.Account = (function () {
 
     // _delayedSignIn might call itself, when the user account
     // is pending. In this case it passes the original defer,
-    // to keep a reference and finally resolve / reject it 
+    // to keep a reference and finally resolve / reject it
     // at some point
     if (!defer) {
       defer = this.hoodie.defer();

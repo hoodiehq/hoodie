@@ -3,6 +3,17 @@
 //
 // window.localStrage wrapper and more
 //
+
+// NOTE:
+// this is a workaround to make the old,
+// CoffeeScripty classes compatible with
+// the new Hoodie.extend API.
+// We'll get rid of classes / constructors
+// one by one
+function hoodieStore (hoodie) {
+  hoodie.store = new Hoodie.LocalStore(hoodie);
+}
+
 Hoodie.LocalStore = (function (_super) {
 
   'use strict';
@@ -55,7 +66,7 @@ Hoodie.LocalStore = (function (_super) {
 
 
   // 2 seconds timout before triggering the `store:idle` event
-  // 
+  //
   LocalStore.prototype.idleTimeout = 2000;
 
 
@@ -170,7 +181,7 @@ Hoodie.LocalStore = (function (_super) {
     }
 
     // handle local changes
-    // 
+    //
     // A local change is meant to be replicated to the
     // users database, but not beyond. For example when
     // I subscribed to a share but then decide to unsubscribe,
@@ -274,7 +285,7 @@ Hoodie.LocalStore = (function (_super) {
 
     try {
 
-      // 
+      //
       results = (function() {
         var _i, _len, _ref, _results;
         _results = [];
@@ -319,9 +330,9 @@ Hoodie.LocalStore = (function (_super) {
   // Remove
   // --------
 
-  // Removes one object specified by `type` and `id`. 
-  // 
-  // when object has been synced before, mark it as deleted. 
+  // Removes one object specified by `type` and `id`.
+  //
+  // when object has been synced before, mark it as deleted.
   // Otherwise remove it from Store.
   LocalStore.prototype.remove = function(type, id, options) {
 
@@ -413,10 +424,10 @@ Hoodie.LocalStore = (function (_super) {
   // Cache
   // -------
 
-  // loads an object specified by `type` and `id` only once from localStorage 
+  // loads an object specified by `type` and `id` only once from localStorage
   // and caches it for faster future access. Updates cache when `value` is passed.
   //
-  // Also checks if object needs to be synched (dirty) or not 
+  // Also checks if object needs to be synched (dirty) or not
   //
   // Pass `options.remote = true` when object comes from remote
   // Pass 'options.silent = true' to avoid events from being triggered.
@@ -447,7 +458,7 @@ Hoodie.LocalStore = (function (_super) {
     } else {
 
       // if the cached key returns false, it means
-      // that we have removed that key. We just 
+      // that we have removed that key. We just
       // set it to false for performance reasons, so
       // that we don't need to look it up again in localStorage
       if (this._cached[key] === false) {
@@ -494,7 +505,7 @@ Hoodie.LocalStore = (function (_super) {
   };
 
 
-  // Clear changed 
+  // Clear changed
   // ---------------
 
   // removes an object from the list of objects that are flagged to by synched (dirty)
@@ -525,7 +536,7 @@ Hoodie.LocalStore = (function (_super) {
   // Mark as changed
   // -----------------
 
-  // Marks object as changed (dirty). Triggers a `store:dirty` event immediately and a 
+  // Marks object as changed (dirty). Triggers a `store:dirty` event immediately and a
   // `store:idle` event once there is no change within 2 seconds
   LocalStore.prototype.markAsChanged = function(type, id, object, options) {
     var key;
@@ -737,8 +748,8 @@ Hoodie.LocalStore = (function (_super) {
   // Private
   // ---------
 
-  // bootstrapping dirty objects, to make sure 
-  // that removed objects get pushed after 
+  // bootstrapping dirty objects, to make sure
+  // that removed objects get pushed after
   // page reload.
   LocalStore.prototype._bootstrapDirtyObjects = function() {
     var id, keys, obj, type, _i, _len, _ref;
@@ -757,7 +768,7 @@ Hoodie.LocalStore = (function (_super) {
     }
   };
 
-  // subscribe to events coming from account & our remote store.  
+  // subscribe to events coming from account & our remote store.
   LocalStore.prototype._subscribeToOutsideEvents = function() {
 
     // account events
@@ -825,7 +836,7 @@ Hoodie.LocalStore = (function (_super) {
     }
   };
 
-  // 
+  //
   LocalStore.prototype._now = function() {
     return JSON.stringify(new Date()).replace(/"/g, '');
   };
@@ -840,7 +851,7 @@ Hoodie.LocalStore = (function (_super) {
     return new RegExp(/^[a-z$][a-z0-9]+$/).test(key);
   };
 
-  // 
+  //
   LocalStore.prototype._isSemanticId = function(key) {
     return new RegExp(/^[a-z$][a-z0-9]+\/[a-z0-9]+$/).test(key);
   };
@@ -857,7 +868,7 @@ Hoodie.LocalStore = (function (_super) {
     return object._syncedAt < object.updatedAt;
   };
 
-  // 
+  //
   LocalStore.prototype._isMarkedAsDeleted = function(object) {
     return object._deleted === true;
   };
@@ -881,9 +892,9 @@ Hoodie.LocalStore = (function (_super) {
   };
 
   // when an object gets changed, two special events get triggerd:
-  // 
-  // 1. dirty event  
-  //    the `dirty` event gets triggered immediately, for every 
+  //
+  // 1. dirty event
+  //    the `dirty` event gets triggered immediately, for every
   //    change that happens.
   // 2. idle event
   //    the `idle` event gets triggered after a short timeout of
@@ -900,18 +911,18 @@ Hoodie.LocalStore = (function (_super) {
     }, this.idleTimeout);
   };
 
-  // 
+  //
   LocalStore.prototype._decoratePromise = function(promise) {
     return $.extend(promise, this._promiseApi);
   };
 
-  // 
+  //
   LocalStore.prototype._startBootstrappingMode = function() {
     this._bootstrapping = true;
     this.trigger('bootstrap:start');
   };
 
-  // 
+  //
   LocalStore.prototype._endBootstrappingMode = function() {
     var methodCall, method, args, defer;
 
@@ -927,7 +938,7 @@ Hoodie.LocalStore = (function (_super) {
     this.trigger('bootstrap:end');
   };
 
-  // 
+  //
   LocalStore.prototype._enqueue = function(method, args) {
     var defer = this.hoodie.defer();
     this._queue.push([method, args, defer]);
@@ -938,4 +949,3 @@ Hoodie.LocalStore = (function (_super) {
   return LocalStore;
 
 })(Hoodie.Store);
-

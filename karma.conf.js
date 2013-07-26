@@ -13,21 +13,25 @@ files = [
   'test/lib/bind.js',
   'lib/jquery/jquery.js',
   'src/utils.js',
-  'src/events.js',
   'test/lib/jasmine-helpers.js',
+
   'src/hoodie.js',
-  'src/core/account.js',
+
+  'src/core/events.js',
+  'src/core/promises.js',
+  'src/core/request.js',
+  'src/core/connection.js',
+  'src/core/uuid.js',
+  'src/core/dispose.js',
+  'src/core/open.js',
+
   'src/core/store.js',
   'src/core/remote.js',
-  'src/core/account_remote.js',
-  'src/core/config.js',
-  'src/core/errors.js',
   'src/core/local_store.js',
-  'src/extensions/email.js',
-  'src/extensions/user.js',
-  'src/extensions/global.js',
-  'src/extensions/share.js',
-  'src/extensions/share_instance.js',
+  'src/core/config.js',
+  'src/core/account.js',
+  'src/core/account_remote.js',
+  'src/core/errors.js',
   'test/mocks/*.js',
   'test/specs/**/*.spec.js'
 ];
@@ -35,6 +39,7 @@ files = [
 
 // list of files to exclude
 exclude = [
+  'test/specs/extensions/**/*.spec.js'
 ];
 
 

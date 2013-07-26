@@ -36,14 +36,14 @@
 // * on(event, callback)
 //
 
-// 
+//
 var ConnectionError;
 
 Hoodie.Remote = (function(_super) {
 
   'use strict';
 
-  // Constructor 
+  // Constructor
   // -------------
 
   // sets name (think: namespace) and some other options
@@ -334,7 +334,7 @@ Hoodie.Remote = (function(_super) {
 
   // start syncing. `this.bootstrap()` will automatically start
   // pulling when `this.connected` remains true.
-  // 
+  //
   Remote.prototype.connect = function() {
     this.connected = true;
     return this.bootstrap();
@@ -640,7 +640,7 @@ Hoodie.Remote = (function(_super) {
 
   // ### restart pull request
 
-  // request gets restarted automaticcally 
+  // request gets restarted automaticcally
   // when aborted (see @_handlePullError)
   Remote.prototype._restartPullRequest = function() {
     if (this._pullRequest) {
