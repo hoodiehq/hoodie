@@ -1,6 +1,6 @@
 //
-// hoodie.request (dreamcode)
-// ============================
+// hoodie.request
+// ================
 
 // I'd like to modularize hoodie.js for simpler testing
 // and a better overview. This is just an attempt to do
