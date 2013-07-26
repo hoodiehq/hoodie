@@ -2,42 +2,6 @@
 // hoodie.request
 // ================
 
-// I'd like to modularize hoodie.js for simpler testing
-// and a better overview. This is just an attempt to do
-// so, I'm very open for other suggestions.
-//
-// Hoodie.extend would look like
-//
-//     var extensions = [];
-//     Hoodie.extend = function(extension) {
-//       extensions.push(extension);
-//     };
-//
-// And the extensions would be loaded like this:
-//
-//     function loadExtensions() {
-//       var extension, name;
-//
-//       for (var i = 0; i < extensions.length; i++) {
-//         extensions[i](hoodie)
-//       }
-//     }
-//
-// To test the extensions, I'd make the functions
-// passed to Hoodie.extend accessible globally. And
-// in the build process, wrap the whole hoodie.js into
-// a closure to prevent it from polluting window.
-//
-//     function hoodieRequest(hoodie){
-//       hoodie.request = function() {}
-//     }
-//     Hoodie.extend(hoodieRequest);
-//
-// Then in the specs simply do
-//
-//     this.hoodie = new Mocks.Hoodie();
-//     hoodieRequest(this.hoodie);
-//     this.hoodie.request // can now be tested.
 //
 function hoodieRequest(hoodie) {
 
