@@ -14,7 +14,7 @@
 
 function hoodieEvents(hoodie) {
 
-  'use strict'
+  'use strict';
 
   var callbacks = {};
 

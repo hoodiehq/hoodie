@@ -31,6 +31,7 @@ module.exports = function(grunt) {
           'src/hoodie.js',
 
           'src/core/events.js',
+          'src/core/promises.js',
           'src/core/request.js',
           'src/core/connection.js',
 

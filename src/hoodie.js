@@ -86,55 +86,6 @@
       })()).join('');
     }
 
-    // Defers / Promises
-    // -------------------
-
-    // returns a defer object for custom promise handlings.
-    // Promises are heavely used throughout the code of hoodie.
-    // We currently borrow jQuery's implementation:
-    // http://api.jquery.com/category/deferred-object/
-    //
-    //     defer = hoodie.defer()
-    //     if (good) {
-    //       defer.resolve('good.')
-    //     } else {
-    //       defer.reject('not good.')
-    //     }
-    //     return defer.promise()
-    //
-
-    // returns true if passed object is a promise (but not a deferred),
-    // otherwise false.
-    function isPromise(object) {
-      return !! (object &&
-                 typeof object.done === 'function' &&
-                 typeof object.resolve !== 'function');
-    }
-
-    //
-    function resolve() {
-      return $defer().resolve().promise();
-    }
-
-
-    //
-    function reject() {
-      return $defer().reject().promise();
-    }
-
-
-    //
-    function resolveWith() {
-      var _defer = $defer();
-      return _defer.resolve.apply(_defer, arguments).promise();
-    }
-
-    //
-    function rejectWith() {
-      var _defer = $defer();
-      return _defer.reject.apply(_defer, arguments).promise();
-    }
-
 
     // dispose
     // ---------
@@ -171,7 +122,6 @@
     }
 
     // get jQuery methods that Hoodie depends on
-    var $defer = window.jQuery.Deferred;
     var $extend = window.jQuery.extend;
 
     // hoodie core methods
@@ -180,16 +130,6 @@
     hoodie.dispose = dispose;
     hoodie.extend = extend;
 
-    // promise helpers
-    hoodie.defer = $defer;
-    hoodie.isPromise = isPromise;
-    hoodie.resolve = resolve;
-    hoodie.reject = reject;
-    hoodie.resolveWith = resolveWith;
-    hoodie.rejectWith = rejectWith;
-
-
-
     // * hoodie.bind
     // * hoodie.on
     // * hoodie.one
@@ -197,6 +137,14 @@
     // * hoodie.unbind
     // * hoodie.off
     hoodie.extend( hoodieEvents );
+
+    // * hoodie.defer
+    // * hoodie.isPromise
+    // * hoodie.resolve
+    // * hoodie.reject
+    // * hoodie.resolveWith
+    // * hoodie.rejectWith
+    hoodie.extend( hoodiePromises );
 
     // * hoodie.request
     hoodie.extend( hoodieRequest );
