@@ -8,8 +8,8 @@
 //
 // Hoodie.extend would look like
 //
-//     Hoodie.extend = function(name, Extension) {
-//       extensions[name] = Extension;
+//     Hoodie.extend = function(name, extension) {
+//       extensions[name] = extension;
 //     };
 //
 // And the extensions would be loaded like this:
@@ -25,8 +25,12 @@
 //       }
 //     }
 //
-// If possible, I'd like to avoid to use one of the common
-// module loaders, but be agnostic to them.
+// To test the extensions, I'd patch `Hoodie.extend` in
+// /test/lib/hoodie_extend_patch.js that is loaded only
+// for testing, so that the extensions are exposed and
+// can be accessed in tests with something like
+//
+//     var request = extension('request')
 //
 Hoodie.extend('request', function requestFactory(hoodie) {
 
