@@ -15,7 +15,10 @@ files = [
   'src/utils.js',
   'src/events.js',
   'test/lib/jasmine-helpers.js',
+
   'src/hoodie.js',
+  'test/lib/hoodie_extend_patch.js',
+
   'src/core/request.js',
 
   'src/core/store.js',
