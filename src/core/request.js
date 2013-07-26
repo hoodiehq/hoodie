@@ -97,7 +97,5 @@ Hoodie.extend('request', function requestFactory(hoodie) {
   //
   // public API
   //
-  return {
-    request: request
-  };
+  return request;
 });

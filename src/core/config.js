@@ -1,7 +1,7 @@
 // Hoodie Config API
 // ===================
 
-// 
+//
 Hoodie.Config = (function() {
 
   'use strict';
@@ -45,7 +45,7 @@ Hoodie.Config = (function() {
   // ----------
 
   // adds a configuration
-  // 
+  //
   Config.prototype.set = function(key, value) {
     var isSilent, update;
 
@@ -69,7 +69,7 @@ Hoodie.Config = (function() {
   // ----------
 
   // receives a configuration
-  // 
+  //
   Config.prototype.get = function(key) {
     return this.cache[key];
   };
@@ -78,7 +78,7 @@ Hoodie.Config = (function() {
   // ----------
 
   // clears cache and removes object from store
-  // 
+  //
   Config.prototype.clear = function() {
     this.cache = {};
     return this.hoodie.store.remove(this.type, this.id);
@@ -88,7 +88,7 @@ Hoodie.Config = (function() {
   // ----------
 
   // removes a configuration, is a simple alias for config.set(key, undefined)
-  // 
+  //
   Config.prototype.remove = function(key) {
     return this.set(key, void 0);
   };
@@ -96,3 +96,5 @@ Hoodie.Config = (function() {
   return Config;
 
 })();
+
+Hoodie.extend('config', Hoodie.Config);

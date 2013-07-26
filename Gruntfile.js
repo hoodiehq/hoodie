@@ -30,13 +30,18 @@ module.exports = function(grunt) {
           'src/utils.js',
           'src/events.js',
           'src/hoodie.js',
-          'src/core/account.js',
-          'src/core/config.js',
-          'src/core/errors.js',
+
+          'src/core/request.js',
+
           'src/core/store.js',
+          'src/core/errors.js',
           'src/core/remote.js',
-          'src/core/account_remote.js',
+
           'src/core/local_store.js',
+          'src/core/config.js',
+          'src/core/account.js',
+          'src/core/account_remote.js',
+
           'src/extensions/email.js',
           'src/extensions/share.js',
           'src/extensions/user.js',

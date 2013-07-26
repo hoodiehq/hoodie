@@ -8,7 +8,6 @@
 
   'use strict';
 
-
   // Constructor
   // -------------
 
@@ -30,47 +29,6 @@
     hoodie.baseUrl = baseUrl ? // if baseUrl passed
       baseUrl.replace(/\/+$/, '') // remove trailing slash(es)
       : "/_api"; // otherwise default to current domain
-
-
-    // Requests
-    // ----------
-
-    // use this method to send requests to the hoodie backend.
-    //
-    //     promise = hoodie.request('GET', '/user_database/doc_id')
-    //
-    function request(type, url, options) {
-      var defaults, requestPromise, pipedPromise;
-
-      options = options || {};
-
-      // if a relative path passed, prefix with @baseUrl
-      if (!/^http/.test(url)) {
-        url = "" + hoodie.baseUrl + url;
-      }
-
-      defaults = {
-        type: type,
-        url: url,
-        xhrFields: {
-          withCredentials: true
-        },
-        crossDomain: true,
-        dataType: 'json'
-      };
-
-      // we are piping the result of the request to return a nicer
-      // error if the request cannot reach the server at all.
-      // We can't return the promise of ajax directly because of
-      // the piping, as for whatever reason the returned promise
-      // does not have the `abort` method any more, maybe others
-      // as well. See also http://bugs.jquery.com/ticket/14104
-      requestPromise = $ajax($extend(defaults, options));
-      pipedPromise = requestPromise.then( null, pipeRequestError);
-      pipedPromise.abort = requestPromise.abort;
-
-      return pipedPromise;
-    }
 
 
     // Check Connection
@@ -235,23 +193,6 @@
       hoodie.trigger('dispose');
     }
 
-    //
-    //
-    //
-    function pipeRequestError(xhr) {
-      var error;
-
-      try {
-        error = JSON.parse(xhr.responseText);
-      } catch (_error) {
-        error = {
-          error: xhr.responseText || ("Cannot connect to Hoodie server at " + hoodie.baseUrl)
-        };
-      }
-
-      return rejectWith(error).promise();
-    }
-
 
     //
     //
@@ -304,6 +245,7 @@
       for (instanceName in extensions) {
         if (extensions.hasOwnProperty(instanceName)) {
           Extension = extensions[instanceName];
+
           hoodie[instanceName] = new Extension(hoodie);
         }
       }
@@ -312,8 +254,6 @@
     // get jQuery methods that Hoodie depends on
     var $defer = window.jQuery.Deferred;
     var $extend = window.jQuery.extend;
-    var $ajax = window.jQuery.ajax;
-
 
     // events API
     var events = window.Events();
@@ -327,7 +267,6 @@
     // hoodie core methods
     hoodie.isOnline = isOnline;
     hoodie.checkConnection = checkConnection;
-    hoodie.request = request;
     hoodie.open = open;
     hoodie.uuid = uuid;
     hoodie.dispose = dispose;
@@ -340,12 +279,6 @@
     hoodie.reject = reject;
     hoodie.resolveWith = resolveWith;
     hoodie.rejectWith = rejectWith;
-
-    // hoodie core modules
-    hoodie.store = new Hoodie.LocalStore(hoodie);
-    hoodie.config = new Hoodie.Config(hoodie);
-    hoodie.account = new Hoodie.Account(hoodie);
-    hoodie.remote = new Hoodie.AccountRemote(hoodie);
 
     // load global extensions
     loadExtensions();
