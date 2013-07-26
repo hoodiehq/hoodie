@@ -21,6 +21,7 @@ files = [
   'src/core/promises.js',
   'src/core/request.js',
   'src/core/connection.js',
+  'src/core/uuid.js',
 
   'src/core/store.js',
   'src/core/remote.js',
