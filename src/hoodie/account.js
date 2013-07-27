@@ -1,6 +1,7 @@
+/* exported hoodieAccount */
+
 // Hoodie.Account
 // ================
-
 
 // NOTE:
 // this is a workaround to make the old,
@@ -14,8 +15,6 @@ function hoodieAccount (hoodie) {
 
 
 Hoodie.Account = (function () {
-
-  'use strict';
 
   function Account(hoodie) {
     this.hoodie = hoodie;

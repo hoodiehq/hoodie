@@ -42,13 +42,19 @@
       extension(hoodie);
     };
 
+    /* global hoodieAccount, hoodieRemote, hoodieConfig, hoodieStore,
+              hoodiePromises, hoodieRequest, hoodieConnection, hoodieUUID, hoodieDispose, hoodieOpen
+    */
+
     // * hoodie.bind
     // * hoodie.on
     // * hoodie.one
     // * hoodie.trigger
     // * hoodie.unbind
     // * hoodie.off
+    /*global hoodieEvents */
     hoodie.extend( hoodieEvents );
+
 
     // * hoodie.defer
     // * hoodie.isPromise
@@ -79,7 +85,6 @@
 
     // * hoodie.config
     hoodie.extend( hoodieConfig );
-    debugger
 
     // * hoodie.account
     hoodie.extend( hoodieAccount );

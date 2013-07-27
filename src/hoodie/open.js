@@ -1,3 +1,5 @@
+/* exported hoodieOpen */
+
 // Open stores
 // -------------
 

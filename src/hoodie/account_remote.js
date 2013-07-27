@@ -1,3 +1,5 @@
+/* exported hoodieRemote */
+
 // AccountRemote
 // ===============
 

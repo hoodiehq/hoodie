@@ -1,3 +1,5 @@
+/* exported hoodiePromises */
+
 // Hoodie Defers / Promises
 // ------------------------
 

@@ -1,3 +1,5 @@
+/* exported hoodieDispose */
+
 // hoodie.dispose
 // ================
 

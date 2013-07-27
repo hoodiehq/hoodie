@@ -1,3 +1,5 @@
+/* exported hoodieConfig */
+
 // Hoodie Config API
 // ===================
 

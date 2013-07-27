@@ -1,3 +1,5 @@
+/* exported hoodieUUID */
+
 // hoodie.uuid
 // =============
 

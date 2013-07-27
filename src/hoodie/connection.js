@@ -1,3 +1,5 @@
+/* exported hoodieConnection */
+
 //
 // hoodie.checkConnection() & hoodie.isOnline()
 // ============================================

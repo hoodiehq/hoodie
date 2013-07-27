@@ -29,7 +29,7 @@
   ],
   "debug": false,
   "devel": false,
-  "strict": true,
+  "strict": false,
   "globalstrict": false,
   "asi": false,
   "laxbreak": false,

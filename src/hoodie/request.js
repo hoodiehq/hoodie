@@ -1,3 +1,5 @@
+/* exported hoodieRequest */
+
 //
 // hoodie.request
 // ================

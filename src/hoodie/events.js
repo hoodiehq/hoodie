@@ -1,3 +1,5 @@
+/* exported hoodieEvents */
+
 //
 // Events
 // ========

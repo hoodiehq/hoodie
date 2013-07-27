@@ -1,3 +1,5 @@
+/* exported hoodieStore */
+
 // LocalStore
 // ============
 //
