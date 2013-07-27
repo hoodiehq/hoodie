@@ -128,7 +128,7 @@ function hoodieAccount (hoodie) {
     };
 
     return account.request('PUT', userDocUrl(username), options).pipe(
-      _handleSignUpSucces(username, password),
+      handleSignUpSucces(username, password),
       handleRequestError
     );
   };
@@ -548,7 +548,7 @@ function hoodieAccount (hoodie) {
   //         "rev": "1-e8747d9ae9776706da92810b1baa4248"
   //     }
   //
-  function _handleSignUpSucces(username, password) {
+  function handleSignUpSucces(username, password) {
 
     return function(response) {
       account.trigger('signup', username);
@@ -607,7 +607,7 @@ function hoodieAccount (hoodie) {
   // we want to turn it into "test1", "mvu85hy" or reject the promise
   // in case an error occured ("roles" array contains "error")
   //
-  function _handleSignInSuccess(options) {
+  function handleSignInSuccess(options) {
     options = options || {};
 
     return function(response) {
@@ -931,7 +931,7 @@ function hoodieAccount (hoodie) {
 
       return withPreviousRequestsAborted('updateUsersDoc', function() {
         return account.request('PUT', userDocUrl(), options).pipe(
-          _handleChangeUsernameAndPasswordRequest(newUsername, newPassword || currentPassword),
+          handleChangeUsernameAndPasswordRequest(newUsername, newPassword || currentPassword),
           handleRequestError
         );
       });
@@ -944,7 +944,7 @@ function hoodieAccount (hoodie) {
   // depending on whether a newUsername has been passed, we can sign in right away
   // or have to use the delayed sign in to give the username change worker some time
   //
-  function _handleChangeUsernameAndPasswordRequest(newUsername, newPassword) {
+  function handleChangeUsernameAndPasswordRequest(newUsername, newPassword) {
 
     return function() {
       hoodie.remote.disconnect();
@@ -1023,7 +1023,7 @@ function hoodieAccount (hoodie) {
       var promise = account.request('POST', '/_session', requestOptions);
 
       return promise.pipe(
-        _handleSignInSuccess(options),
+        handleSignInSuccess(options),
         handleRequestError
       );
     });
