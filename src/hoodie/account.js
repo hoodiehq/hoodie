@@ -34,7 +34,7 @@ function hoodieAccount (hoodie) {
   // `hoodie.account.authenticate().done( doSomething ).fail( handleError )`
   //
   account.authenticate = function authenticate() {
-    var sendAndHandleAuthRequest, _ref, _ref1;
+    var sendAndHandleAuthRequest;
 
     if (authenticated === false) {
       return hoodie.defer().reject().promise();
@@ -47,12 +47,12 @@ function hoodieAccount (hoodie) {
     // if there is a pending signOut request, return its promise,
     // but pipe it so that it always ends up rejected
     //
-    if (((_ref = requests.signOut) !== undefined ? _ref.state() : null) === 'pending') {
+    if (requests.signOut && requests.signOut.state() === 'pending') {
       return requests.signOut.then(hoodie.rejectWith);
     }
 
     // if there is apending signIn request, return its promise
-    if (((_ref1 = requests.signIn) !== undefined ? _ref1.state() : null) === 'pending') {
+    if (requests.signIn && requests.signIn.state() === 'pending') {
       return requests.signIn;
     }
 
@@ -1030,20 +1030,15 @@ function hoodieAccount (hoodie) {
 
   }
 
-
   //
-  // TODO: hide from public API, remove _
   function now() {
     return new Date();
   }
 
   //
-  // PUBLIC API
+  // expose public account API
   //
   hoodie.account = account;
-  hoodie.account.getRequest = function() { return requests; };
-
-
 
   // the ownerHash gets stored in every object created by the user.
   // Make sure we have one.
