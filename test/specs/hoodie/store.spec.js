@@ -1,11 +1,11 @@
 describe("Hoodie.Store", function() {
   beforeEach(function() {
     this.hoodie = new Mocks.Hoodie;
-    this.store = new Hoodie.Store(this.hoodie);
+    this.store = hoodieStoreBase(this.hoodie);
   });
   describe("#save(type, id, object, options)", function() {
     beforeEach(function() {
-      spyOn(this.store, "_now").andReturn('now');
+      // spyOn(this.store, "_now").andReturn('now');
     });
     it("should return a defer", function() {
       var promise;

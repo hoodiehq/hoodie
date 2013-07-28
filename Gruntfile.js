@@ -27,7 +27,6 @@ module.exports = function(grunt) {
       },
       dist: {
         src: [
-          'src/utils.js',
           'src/hoodie.js',
 
           'src/hoodie/events.js',

@@ -1,4 +1,5 @@
 /* exported hoodieRemote */
+/* global hoodieRemoteBase */
 
 // AccountRemote
 // ===============
@@ -14,53 +15,21 @@
 //
 
 
-// NOTE:
-// this is a workaround to make the old,
-// CoffeeScripty classes compatible with
-// the new Hoodie.extend API.
-// We'll get rid of classes / constructors
-// one by one
 function hoodieRemote (hoodie) {
-  hoodie.remote = new Hoodie.AccountRemote(hoodie);
-}
 
-
-Hoodie.AccountRemote = (function(_super) {
-
-  'use strict';
-
-  // Constructor
-  // -------------
-
-  //
-  function AccountRemote(hoodie, options) {
-    this.hoodie = hoodie;
-    options = options || {};
+  // inherit from Hoodies Store API
+  var remoteBase = hoodieRemoteBase(hoodie, {
 
     // set name to user's DB name
-    this.name = this.hoodie.account.db();
+    name: hoodie.account.db(),
 
     // we're always connected to our own db
-    this.connected = true;
+    connected: true,
 
     // do not prefix files for my own remote
-    options.prefix = '';
-
-    this.push = this.push.bind(this);
-    this.hoodie.on('account:signin', this._handleSignIn.bind(this));
-    this.hoodie.on('account:reauthenticated', this._connect.bind(this));
-    this.hoodie.on('account:signout', this.disconnect.bind(this));
-    this.hoodie.on('reconnected', this.connect.bind(this));
-    AccountRemote.__super__.constructor.call(this, this.hoodie, options);
-
-    // preset known objects with localstore.
-    this.loadListOfKnownObjectsFromLocalStore();
-  }
-
-  Object.deepExtend(AccountRemote, _super);
-
-  // connect by default
-  AccountRemote.prototype.connected = true;
+    prefix: ''
+  });
+  var remote = Object.create(remoteBase);
 
 
   // Connect
@@ -68,8 +37,8 @@ Hoodie.AccountRemote = (function(_super) {
 
   // do not start to connect immediately, but authenticate beforehand
   //
-  AccountRemote.prototype.connect = function() {
-    return this.hoodie.account.authenticate().pipe(this._connect.bind(this));
+  remote.connect = function connect() {
+    return hoodie.account.authenticate().pipe(connect);
   };
 
 
@@ -77,34 +46,9 @@ Hoodie.AccountRemote = (function(_super) {
   // ------------
 
   //
-  AccountRemote.prototype.disconnect = function() {
-    this.hoodie.unbind('store:idle', this.push);
-    return AccountRemote.__super__.disconnect.apply(this, arguments);
-  };
-
-
-  // loadListOfKnownObjectsFromLocalStore
-  // -------------------------------------------
-
-  // to determine wether to trigger an `add` or `update`
-  // event, the known objects from the user get loaded
-  // from local store initially.
-  //
-  AccountRemote.prototype.loadListOfKnownObjectsFromLocalStore = function() {
-    var id, key, type, _i, _len, _ref, _ref1;
-    _ref = this.hoodie.store.index();
-
-    for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-      key = _ref[_i];
-      _ref1 = key.split(/\//),
-      type = _ref1[0],
-      id = _ref1[1];
-
-      this.markAsKnownObject({
-        type: type,
-        id: id
-      });
-    }
+  remote.disconnect = function disconnect() {
+    hoodie.unbind('store:idle', remote.push);
+    return remoteBase.disconnect.apply(remote, arguments);
   };
 
 
@@ -114,12 +58,12 @@ Hoodie.AccountRemote = (function(_super) {
   // we store the last since number from the current user's store
   // in his config
   //
-  AccountRemote.prototype.getSinceNr = function() {
-    return this.hoodie.config.get('_remote.since') || 0;
+  remote.getSinceNr = function getSinceNr() {
+    return hoodie.config.get('_remote.since') || 0;
   };
 
-  AccountRemote.prototype.setSinceNr = function(since) {
-    return this.hoodie.config.set('_remote.since', since);
+  remote.setSinceNr = function setSinceNr(since) {
+    return hoodie.config.set('_remote.since', since);
   };
 
 
@@ -129,18 +73,18 @@ Hoodie.AccountRemote = (function(_super) {
   // if no objects passed to be pushed, we default to
   // changed objects in user's local store
   //
-  AccountRemote.prototype.push = function(objects) {
-    if (!this.isConnected()) {
+  remote.push = function push(objects) {
+    if (!remote.isConnected()) {
       var error = new window.ConnectionError("Not connected: could not push local changes to remote");
-      return this.hoodie.rejectWith(error);
+      return hoodie.rejectWith(error);
     }
 
     if (!$.isArray(objects)) {
-      objects = this.hoodie.store.changedObjects();
+      objects = hoodie.store.changedObjects();
     }
 
-    var promise = AccountRemote.__super__.push.apply(this, [objects]);
-    promise.fail(this.hoodie.checkConnection);
+    var promise = remoteBase.push.apply(remote, [objects]);
+    promise.fail(hoodie.checkConnection);
 
     return promise;
   };
@@ -151,48 +95,82 @@ Hoodie.AccountRemote = (function(_super) {
   //
   // namespaced alias for `hoodie.on`
   //
-  AccountRemote.prototype.on = function(event, cb) {
+  remote.on = function on(event, cb) {
     event = event.replace(/(^| )([^ ]+)/g, "$1remote:$2");
-    return this.hoodie.on(event, cb);
+    return hoodie.on(event, cb);
   };
 
-  AccountRemote.prototype.one = function(event, cb) {
+  remote.one = function one(event, cb) {
     event = event.replace(/(^| )([^ ]+)/g, "$1remote:$2");
-    return this.hoodie.one(event, cb);
+    return hoodie.one(event, cb);
   };
 
 
   //
   // namespaced alias for `hoodie.trigger`
   //
-  AccountRemote.prototype.trigger = function() {
+  remote.trigger = function trigger() {
     var event, parameters, _ref;
 
     event = arguments[0],
     parameters = 2 <= arguments.length ? Array.prototype.slice.call(arguments, 1) : [];
 
-    return (_ref = this.hoodie).trigger.apply(_ref, ["remote:" + event].concat(Array.prototype.slice.call(parameters)));
+    return (_ref = hoodie).trigger.apply(_ref, ["remote:" + event].concat(Array.prototype.slice.call(parameters)));
   };
-
 
 
   // Private
   // ---------
 
+  // to determine wether to trigger an `add` or `update`
+  // event, the known objects from the user get loaded
+  // from local store initially.
   //
-  AccountRemote.prototype._connect = function() {
-    this.connected = true;
-    this.hoodie.on('store:idle', this.push);
-    return this.sync();
-  };
+  function loadListOfKnownObjectsFromLocalStore() {
+    var id, key, type, _i, _len, _ref, _ref1;
+    _ref = hoodie.store.index();
+
+    for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+      key = _ref[_i];
+      _ref1 = key.split(/\//),
+      type = _ref1[0],
+      id = _ref1[1];
+
+      remote.markAsKnownObject({
+        type: type,
+        id: id
+      });
+    }
+  }
+
+  //
+  function connect() {
+    remote.connected = true;
+    hoodie.on('store:idle', remote.push);
+    return remote.sync();
+  }
+
+  //
+  function handleSignIn() {
+    remote.name = hoodie.account.db();
+    return connect();
+  }
 
 
   //
-  AccountRemote.prototype._handleSignIn = function() {
-    this.name = this.hoodie.account.db();
-    return this._connect();
-  };
+  // Initialization
+  // ----------------
+  //
+  loadListOfKnownObjectsFromLocalStore();
 
-  return AccountRemote;
+  hoodie.on('account:signin', handleSignIn);
+  hoodie.on('account:reauthenticated', connect);
+  hoodie.on('account:signout', remote.disconnect);
+  hoodie.on('reconnected', remote.connect);
 
-})(Hoodie.Remote);
+
+  //
+  // expose remote API
+  //
+  hoodie.remote = remote;
+}

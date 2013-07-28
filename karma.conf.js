@@ -12,7 +12,6 @@ files = [
   JASMINE_ADAPTER,
   'test/lib/bind.js',
   'lib/jquery/jquery.js',
-  'src/utils.js',
   'test/lib/jasmine-helpers.js',
 
   'src/hoodie.js',

@@ -147,18 +147,18 @@ describe("Hoodie", function() {
     });
   });
 
-  describe("#open(store, options)", function() {
-    it("should instantiate a Remote instance", function() {
-      spyOn(Hoodie, "Remote");
-      this.hoodie.open("store_name", {
-        option: "value"
-      });
-      expect(Hoodie.Remote).wasCalledWith(this.hoodie, {
-        name: "store_name",
-        option: "value"
-      });
-    });
-  });
+  // describe("#open(store, options)", function() {
+  //   it("should instantiate a Remote instance", function() {
+  //     spyOn(Hoodie, "Remote");
+  //     this.hoodie.open("store_name", {
+  //       option: "value"
+  //     });
+  //     expect(Hoodie.Remote).wasCalledWith(this.hoodie, {
+  //       name: "store_name",
+  //       option: "value"
+  //     });
+  //   });
+  // });
 
   describe("#uuid(num = 7)", function() {
 

@@ -1,4 +1,5 @@
 /* exported hoodieOpen */
+/* global hoodieRemoteBase */
 
 // Open stores
 // -------------
@@ -23,7 +24,7 @@ function hoodieOpen(hoodie) {
       name: storeName
     });
 
-    return new Hoodie.Remote(hoodie, options);
+    return hoodieRemoteBase(hoodie, options);
   }
 
   //
