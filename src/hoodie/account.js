@@ -9,7 +9,7 @@ function hoodieAccount (hoodie) {
   // public API
   var account = {};
 
-  // flag wether user is currently authenticated or not
+  // flag whether user is currently authenticated or not
   var authenticated;
 
   // cache for CouchDB _users doc

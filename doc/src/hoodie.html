@@ -20,14 +20,19 @@ hoodie = new Hoodie
 <pre><code>hoodie.extend(function(hoodie) {} )
 </code></pre></div></div><div class="code"><div class="wrapper">    <span class="nx">hoodie</span><span class="p">.</span><span class="nx">extend</span> <span class="o">=</span> <span class="kd">function</span> <span class="nx">extend</span><span class="p">(</span><span class="nx">extension</span><span class="p">)</span> <span class="p">{</span>
       <span class="nx">extension</span><span class="p">(</span><span class="nx">hoodie</span><span class="p">);</span>
-    <span class="p">};</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><ul>
+    <span class="p">};</span>
+
+    <span class="cm">/* global hoodieAccount, hoodieRemote, hoodieConfig, hoodieStore,</span>
+<span class="cm">              hoodiePromises, hoodieRequest, hoodieConnection, hoodieUUID, hoodieDispose, hoodieOpen</span>
+<span class="cm">    */</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><ul>
 <li>hoodie.bind</li>
 <li>hoodie.on</li>
 <li>hoodie.one</li>
 <li>hoodie.trigger</li>
 <li>hoodie.unbind</li>
 <li>hoodie.off</li>
-</ul></div></div><div class="code"><div class="wrapper">    <span class="nx">hoodie</span><span class="p">.</span><span class="nx">extend</span><span class="p">(</span> <span class="nx">hoodieEvents</span> <span class="p">);</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><ul>
+</ul></div></div><div class="code"><div class="wrapper">    <span class="cm">/*global hoodieEvents */</span>
+    <span class="nx">hoodie</span><span class="p">.</span><span class="nx">extend</span><span class="p">(</span> <span class="nx">hoodieEvents</span> <span class="p">);</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><ul>
 <li>hoodie.defer</li>
 <li>hoodie.isPromise</li>
 <li>hoodie.resolve</li>
@@ -49,8 +54,7 @@ hoodie = new Hoodie
 <li>hoodie.store</li>
 </ul></div></div><div class="code"><div class="wrapper">    <span class="nx">hoodie</span><span class="p">.</span><span class="nx">extend</span><span class="p">(</span> <span class="nx">hoodieStore</span> <span class="p">);</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><ul>
 <li>hoodie.config</li>
-</ul></div></div><div class="code"><div class="wrapper">    <span class="nx">hoodie</span><span class="p">.</span><span class="nx">extend</span><span class="p">(</span> <span class="nx">hoodieConfig</span> <span class="p">);</span>
-    <span class="kr">debugger</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><ul>
+</ul></div></div><div class="code"><div class="wrapper">    <span class="nx">hoodie</span><span class="p">.</span><span class="nx">extend</span><span class="p">(</span> <span class="nx">hoodieConfig</span> <span class="p">);</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><ul>
 <li>hoodie.account</li>
 </ul></div></div><div class="code"><div class="wrapper">    <span class="nx">hoodie</span><span class="p">.</span><span class="nx">extend</span><span class="p">(</span> <span class="nx">hoodieAccount</span> <span class="p">);</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><ul>
 <li>hoodie.remote</li>
