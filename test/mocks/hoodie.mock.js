@@ -33,9 +33,15 @@ Mocks.Hoodie = function () {
     uuid: function () {
       return 'uuid';
     },
+    resolve: function() {
+      return $.Deferred().resolve().promise();
+    },
     resolveWith: function () {
       var _ref;
       return (_ref = $.Deferred()).resolve.apply(_ref, arguments).promise();
+    },
+    reject: function() {
+      return $.Deferred().reject().promise();
     },
     rejectWith: function () {
       var _ref;

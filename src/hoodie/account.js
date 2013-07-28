@@ -37,11 +37,11 @@ function hoodieAccount (hoodie) {
     var sendAndHandleAuthRequest;
 
     if (authenticated === false) {
-      return hoodie.defer().reject().promise();
+      return hoodie.reject();
     }
 
     if (authenticated === true) {
-      return hoodie.defer().resolve(account.username).promise();
+      return hoodie.resolveWith(account.username);
     }
 
     // if there is a pending signOut request, return its promise,
@@ -60,7 +60,7 @@ function hoodieAccount (hoodie) {
     if (account.username === undefined) {
       return sendSignOutRequest().then(function() {
         authenticated = false;
-        return hoodie.rejectWith();
+        return hoodie.reject();
       });
     }
 
@@ -93,9 +93,9 @@ function hoodieAccount (hoodie) {
     }
 
     if (!username) {
-      return hoodie.defer().reject({
+      return hoodie.rejectWith({
         error: 'username must be set'
-      }).promise();
+      });
     }
 
     if (account.hasAnonymousAccount()) {
@@ -103,9 +103,9 @@ function hoodieAccount (hoodie) {
     }
 
     if (account.hasAccount()) {
-      return hoodie.defer().reject({
+      return hoodie.rejectWith({
         error: 'you have to sign out first'
-      }).promise();
+      });
     }
 
     // downcase username
@@ -317,10 +317,10 @@ function hoodieAccount (hoodie) {
     }
 
     if (!username) {
-      return hoodie.defer().reject({
+      return hoodie.rejectWith({
         error: "unauthenticated",
         reason: "not logged in"
-      }).promise();
+      });
     }
 
     return withSingleRequest('fetch', function() {
@@ -345,10 +345,10 @@ function hoodieAccount (hoodie) {
   account.changePassword = function changePassword(currentPassword, newPassword) {
 
     if (!account.username) {
-      return hoodie.defer().reject({
+      return hoodie.rejectWith({
         error: "unauthenticated",
         reason: "not logged in"
-      }).promise();
+      });
     }
 
     hoodie.remote.disconnect();
@@ -492,7 +492,7 @@ function hoodieAccount (hoodie) {
       authenticated = true;
       setUsername(response.userCtx.name.replace(/^user(_anonymous)?\//, ''));
       setOwner(response.userCtx.roles[0]);
-      return hoodie.defer().resolve(account.username).promise();
+      return hoodie.resolveWith(account.username);
     }
 
     if (account.hasAnonymousAccount()) {
@@ -502,7 +502,7 @@ function hoodieAccount (hoodie) {
 
     authenticated = false;
     account.trigger('error:unauthenticated');
-    return hoodie.defer().reject().promise();
+    return hoodie.reject();
   }
 
 
@@ -520,7 +520,7 @@ function hoodieAccount (hoodie) {
     error = error || {};
 
     if (error.reason) {
-      return hoodie.defer().reject(error).promise();
+      return hoodie.rejectWith(error);
     }
 
     var xhr = error;
@@ -534,7 +534,7 @@ function hoodieAccount (hoodie) {
       };
     }
 
-    return hoodie.defer().reject(error).promise();
+    return hoodie.rejectWith(error);
   }
 
 
@@ -693,9 +693,9 @@ function hoodieAccount (hoodie) {
     resetPasswordId = hoodie.config.get('_account.resetPasswordId');
 
     if (!resetPasswordId) {
-      return hoodie.defer().reject({
+      return hoodie.rejectWith({
         error: "missing"
-      }).promise();
+      });
     }
 
     // send request to check status of password reset
@@ -734,16 +734,14 @@ function hoodieAccount (hoodie) {
   // current session has been invalidated
   //
   function handlePasswordResetStatusRequestSuccess(response) {
-    var defer = hoodie.defer();
+    var error;
 
     if (response.$error) {
-      defer.reject(response.$error);
+      error = response.$error;
     } else {
-      defer.reject({
-        error: 'pending'
-      });
+      error = { error: 'pending' };
     }
-    return defer.promise();
+    return hoodie.rejectWith(error);
   }
 
 
@@ -756,7 +754,7 @@ function hoodieAccount (hoodie) {
       hoodie.config.remove('_account.resetPasswordId');
       account.trigger('passwordreset');
 
-      return hoodie.defer().resolve();
+      return hoodie.resolve();
     } else {
       return handleRequestError(xhr);
     }
@@ -824,9 +822,9 @@ function hoodieAccount (hoodie) {
   //
   function handleFetchBeforeDestroyError(error) {
     if (error.error === 'not_found') {
-      return hoodie.defer().resolve().promise();
+      return hoodie.resolve();
     } else {
-      return hoodie.defer().reject(error).promise();
+      return hoodie.rejectWith(error);
     }
   }
 
@@ -843,7 +841,7 @@ function hoodieAccount (hoodie) {
     setUsername(options.username);
     setOwner(options.ownerHash || hoodie.uuid());
 
-    return hoodie.defer().resolve().promise();
+    return hoodie.resolve();
   }
 
 
