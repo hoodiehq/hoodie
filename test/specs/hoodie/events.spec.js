@@ -3,7 +3,8 @@
 describe('Events', function() {
 
   beforeEach(function() {
-    this.obj = new window.Events();
+    this.obj = {}
+    hoodieEvents(this.obj);
   });
 
   describe('.bind(event, callback)', function() {

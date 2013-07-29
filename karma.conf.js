@@ -27,8 +27,8 @@ files = [
   'src/hoodie/open.js',
 
   'test/mocks/*.js',
-  'test/specs/events.spec.js',
   'test/specs/hoodie.spec.js',
+  'test/specs/hoodie/events.spec.js',
   'test/specs/hoodie/account.spec.js',
   'test/specs/hoodie/account_remote.spec.js',
   'test/specs/hoodie/config.spec.js'
