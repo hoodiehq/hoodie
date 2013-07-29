@@ -1,5 +1,5 @@
 // Karma configuration
-// Generated on Fri Jul 12 2013 09:10:47 GMT+0100 (BST)
+// Generated on Mon Jul 22 2013 13:50:18 GMT+0100 (BST)
 
 
 // base path, that will be used to resolve files and exclude
@@ -8,12 +8,14 @@ basePath = '';
 
 // list of files / patterns to load in the browser
 files = [
-  JASMINE,
-  JASMINE_ADAPTER,
+  MOCHA,
+  MOCHA_ADAPTER,
   'test/lib/bind.js',
-  'lib/jquery/jquery.js',
-  'test/lib/jasmine-helpers.js',
+  { pattern: 'lib/jquery/jquery.js', watched: false, included: true },
+  { pattern: 'lib/expect/expect.js', watched: false, included: true },
+  { pattern: 'lib/sinon.js', watched: false, included: true },
 
+  'test/lib/helpers.js',
   'src/hoodie.js',
 
   'src/hoodie/events.js',
@@ -24,21 +26,18 @@ files = [
   'src/hoodie/dispose.js',
   'src/hoodie/open.js',
 
-  'src/hoodie/store.js',
-  'src/hoodie/remote.js',
-  'src/hoodie/local_store.js',
-  'src/hoodie/config.js',
-  'src/hoodie/account.js',
-  'src/hoodie/account_remote.js',
-  'src/hoodie/errors.js',
   'test/mocks/*.js',
-  'test/specs/**/*.spec.js'
+  'test/specs/events.spec.js',
+  'test/specs/hoodie.spec.js',
+  'test/specs/core/account.spec.js',
+  'test/specs/core/account_remote.spec.js',
+  'test/specs/core/config.spec.js'
 ];
 
 
 // list of files to exclude
 exclude = [
-  'test/specs/extensions/**/*.spec.js'
+
 ];
 
 
