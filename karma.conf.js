@@ -29,9 +29,9 @@ files = [
   'test/mocks/*.js',
   'test/specs/events.spec.js',
   'test/specs/hoodie.spec.js',
-  'test/specs/core/account.spec.js',
-  'test/specs/core/account_remote.spec.js',
-  'test/specs/core/config.spec.js'
+  'test/specs/hoodie/account.spec.js',
+  'test/specs/hoodie/account_remote.spec.js',
+  'test/specs/hoodie/config.spec.js'
 ];
 
 
