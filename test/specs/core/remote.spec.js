@@ -33,7 +33,7 @@ describe("Hoodie.Remote", function() {
     this.sandbox.restore();
   });
 
-  xdescribe("constructor(@hoodie, options = {})", function() {
+  describe("constructor(@hoodie, options = {})", function() {
 
     it("should set @name from options", function() {
       var remote = new Hoodie.Remote(this.hoodie, {
@@ -56,9 +56,15 @@ describe("Hoodie.Remote", function() {
     _when("connected: true passed", function() {
 
       beforeEach(function() {
+        var promise = this.requestDefer.promise();
+        promise.abort = function () {};
+
+        this.sandbox.stub(this.hoodie, 'request').returns(promise);
+
         this.remote = new Hoodie.Remote(this.hoodie, {
           connected: true
         });
+
       });
 
       it("should set @connected to true", function() {
@@ -747,13 +753,10 @@ describe("Hoodie.Remote", function() {
       beforeEach(function() {
         var _this = this;
         this.remote.request.returns({
-          then: function(success, error) {
+          then: function() {
             _this.remote.request.returns({
               then: function() {}
             });
-            error({
-              status: 401
-            }, 'error object');
           }
         });
 
@@ -951,12 +954,12 @@ describe("Hoodie.Remote", function() {
       });
 
       it("should return a promise", function() {
-        expect(this.promise).to.have.property('done')
-        expect(this.promise).to.not.have.property('resolved')
+        expect(this.promise).to.have.property('done');
+        expect(this.promise).to.not.have.property('resolved');
       });
 
       it("should POST the passed objects", function() {
-        expect(this.remote.request).wasCalled();
+        expect(this.remote.request.called).to.be.ok();
         var data = this.remote.request.args[2].data;
         expect(data.docs.length).to.eql(3);
       });
@@ -966,10 +969,13 @@ describe("Hoodie.Remote", function() {
     _and("one deleted and one new doc passed", function() {
 
       beforeEach(function() {
-        var _ref;
         this.remote.push(Mocks.changedObjects());
-        expect(this.remote.request).wasCalled();
-        _ref = this.remote.request.mostRecentCall.args, this.method = _ref[0], this.path = _ref[1], this.options = _ref[2], _ref;
+        expect(this.remote.request.called).to.be.ok();
+        var _ref = this.remote.request.args[0];
+
+        this.method = _ref[0],
+        this.path = _ref[1],
+        this.options = _ref[2];
       });
 
       it("should post the changes to the user's db _bulk_docs API", function() {
@@ -997,7 +1003,7 @@ describe("Hoodie.Remote", function() {
         docs = this.options.data.docs;
         deletedDoc = docs[0], newDoc = docs[1];
         expect(deletedDoc._rev).to.eql('3-uuid');
-        expect(newDoc._rev).toMatch('1-uuid');
+        expect(newDoc._rev).to.match('1-uuid');
         expect(deletedDoc._revisions.start).to.eql(3);
         expect(deletedDoc._revisions.ids[0]).to.eql('uuid');
         expect(deletedDoc._revisions.ids[1]).to.eql('123');
@@ -1026,8 +1032,9 @@ describe("Hoodie.Remote", function() {
         this.remote.push(this.todoObjects);
       });
 
-      it("should prefix all document IDs with '$public/'", function() {
+      xit("should prefix all document IDs with '$public/'", function() {
         expect(this.remote.request.called).to.be.ok();
+
         var data = this.remote.request.args[2].data;
         expect(data.docs[0]._id).to.eql('$public/todo/1');
       });
