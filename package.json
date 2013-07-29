@@ -6,6 +6,7 @@
         "url": "https://github.com/hoodiehq/hoodie-app.git"
     },
     "dependencies": {
+        "hoodie": "latest",
         "http-proxy": "*",
         "connect": "2.7.4",
         "corsproxy": "git://github.com/gr2m/CORS-Proxy.git",
