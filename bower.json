@@ -5,7 +5,8 @@
     "./dist/hoodie.js"
   ],
   "dependencies": {
-    "jquery": "~1.10.2"
+    "jquery": "~1.10.2",
+    "expect": "~0.2.0"
   },
   "ignore": [
     "test/",

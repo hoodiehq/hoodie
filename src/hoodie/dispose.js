@@ -10,6 +10,7 @@ function hoodieDispose (hoodie) {
   // gets triggered that the modules react on.
   function dispose() {
     hoodie.trigger('dispose');
+    hoodie.unbind();
   }
 
   //

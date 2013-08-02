@@ -14,6 +14,7 @@ files = [
   { pattern: 'lib/jquery/jquery.js', watched: false, included: true },
   { pattern: 'lib/expect/expect.js', watched: false, included: true },
   { pattern: 'lib/sinon.js', watched: false, included: true },
+  // { pattern: 'lib/sinon/lib/sinon.js', watched: false, included: true },
 
   'test/lib/helpers.js',
   'src/hoodie.js',
@@ -36,10 +37,12 @@ files = [
 
   'test/mocks/*.js',
   'test/specs/hoodie.spec.js',
-  'test/specs/hoodie/events.spec.js',
-  'test/specs/hoodie/account.spec.js',
-  'test/specs/hoodie/account_remote.spec.js',
-  'test/specs/hoodie/config.spec.js'
+
+  'test/specs/hoodie/dispose.spec.js',
+  // 'test/specs/hoodie/events.spec.js',
+  // 'test/specs/hoodie/account.spec.js',
+  // 'test/specs/hoodie/account_remote.spec.js',
+  // 'test/specs/hoodie/config.spec.js'
 ];
 
 
