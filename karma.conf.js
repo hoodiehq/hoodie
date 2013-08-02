@@ -26,6 +26,14 @@ files = [
   'src/hoodie/dispose.js',
   'src/hoodie/open.js',
 
+  'src/hoodie/store.js',
+  'src/hoodie/remote.js',
+  'src/hoodie/local_store.js',
+  'src/hoodie/config.js',
+  'src/hoodie/account.js',
+  'src/hoodie/account_remote.js',
+  'src/hoodie/errors.js',
+
   'test/mocks/*.js',
   'test/specs/hoodie.spec.js',
   'test/specs/hoodie/events.spec.js',
