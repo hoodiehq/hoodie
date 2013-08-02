@@ -3,7 +3,6 @@ describe('Hoodie', function() {
   'use strict';
 
   beforeEach(function() {
-    this.sandbox = sinon.sandbox.create();
     this.ajaxDefer = $.Deferred();
     var ajaxPromise = this.ajaxDefer.promise();
     ajaxPromise.abort = function() {};
@@ -20,7 +19,6 @@ describe('Hoodie', function() {
 
   afterEach(function () {
     this.hoodie = null;
-    this.sandbox.restore();
   });
 
   describe('constructor', function() {

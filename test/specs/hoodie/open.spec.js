@@ -3,8 +3,6 @@
 describe('#open(store, options)', function() {
 
   beforeEach(function() {
-    this.sandbox = sinon.sandbox.create();
-
     this.hoodie = new Mocks.Hoodie();
 
     this.requestDefer = this.hoodie.defer();
@@ -12,10 +10,6 @@ describe('#open(store, options)', function() {
     this.sandbox.spy(window, 'hoodieRemoteBase');
 
     hoodieOpen(this.hoodie);
-  });
-
-  afterEach(function () {
-    this.sandbox.restore();
   });
 
   it('should instantiate a Remote instance', function() {

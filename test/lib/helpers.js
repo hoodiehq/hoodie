@@ -22,36 +22,22 @@ _but = function(description, specs) {
 
 mocha.setup({globals: ['setTimeout', 'clearTimeout', 'setInterval', 'clearInterval']});
 
-var helper = {
 
-  before: (function () {
+before(function () {
+});
 
-    before(function () {
-      this.sandbox = sinon.sandbox.create();
-    });
+beforeEach(function () {
+  this.sandbox = sinon.sandbox.create();
+});
 
-  }()),
+afterEach(function () {
+  this.sandbox.restore();
+});
 
-  beforeEach: (function () {
 
+after(function () {
+});
 
-  }()),
-
-  afterEach: (function () {
-
-    afterEach(function () {
-      this.sandbox.restore();
-    });
-
-  }()),
-
-  after: (function () {
-
-    after(function () {
-    });
-
-  }())
-};
 
 
 //jasmine.Matchers.prototype.toBePromise = function() {

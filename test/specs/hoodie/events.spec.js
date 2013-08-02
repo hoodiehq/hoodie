@@ -1,5 +1,3 @@
-'use strict';
-
 /* global hoodieEvents:true*/
 
 describe('Events', function() {

@@ -3,21 +3,15 @@
 describe('#checkConnection()', function() {
 
   beforeEach(function() {
-    this.sandbox = sinon.sandbox.create();
-
     this.hoodie = new Mocks.Hoodie();
 
-    this.sandbox.spy(this.hoodie, 'trigger');
     this.requestDefer = this.hoodie.defer();
 
+    this.sandbox.spy(this.hoodie, 'trigger');
     this.sandbox.stub(this.hoodie, 'request').returns(this.requestDefer.promise());
     this.sandbox.spy(window, 'setTimeout');
 
     hoodieConnection(this.hoodie);
-  });
-
-  afterEach(function () {
-    this.sandbox.restore();
   });
 
   it('should have a checkConnection method', function () {
