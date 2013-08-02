@@ -1,16 +1,18 @@
 'use strict';
 
+/* global hoodieEvents:true*/
+
 describe('Events', function() {
 
   beforeEach(function() {
-    this.obj = {}
+    this.obj = {};
     hoodieEvents(this.obj);
   });
 
   describe('.bind(event, callback)', function() {
 
     it('should bind the passed callback to the passed event', function() {
-      var cb= sinon.spy();
+      var cb = sinon.spy();
 
       this.obj.bind('test', cb);
       this.obj.trigger('test');

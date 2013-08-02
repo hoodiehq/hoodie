@@ -42,7 +42,7 @@ describe('Hoodie', function() {
 
 
     // TODO: get rid of this, smells
-    xit('store has to be initialized before remote', function() {
+    it.skip('store has to be initialized before remote', function() {
       var hoodie, order;
 
       order = [];

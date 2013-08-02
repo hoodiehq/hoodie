@@ -20,7 +20,39 @@ _but = function(description, specs) {
   describe("but " + description, specs);
 };
 
-mocha.setup({globals: ['setTimeout', 'clearTimeout']});
+mocha.setup({globals: ['setTimeout', 'clearTimeout', 'setInterval', 'clearInterval']});
+
+var helper = {
+
+  before: (function () {
+
+    before(function () {
+      this.sandbox = sinon.sandbox.create();
+    });
+
+  }()),
+
+  beforeEach: (function () {
+
+
+  }()),
+
+  afterEach: (function () {
+
+    afterEach(function () {
+      this.sandbox.restore();
+    });
+
+  }()),
+
+  after: (function () {
+
+    after(function () {
+    });
+
+  }())
+};
+
 
 //jasmine.Matchers.prototype.toBePromise = function() {
   //return this.actual.done && !this.actual.resolve;

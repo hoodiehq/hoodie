@@ -1,127 +1,139 @@
-// describe('#checkConnection()', function() {
+/* global hoodieConnection:true */
 
-//   beforeEach(function() {
-//     this.requestDefer = this.hoodie.defer();
-//     this.hoodie._checkConnectionRequest = null;
+describe('#checkConnection()', function() {
 
-//     this.sandbox.stub(this.hoodie, 'request').returns(this.requestDefer.promise());
-//     this.sandbox.stub(this.hoodie, 'trigger');
-//     window.setTimeout.returns(null);
-//   });
+  beforeEach(function() {
+    this.sandbox = sinon.sandbox.create();
 
-//   it('should send GET / request', function() {
-//     this.hoodie.checkConnection();
-//     expect(this.hoodie.request.calledWith('GET', '/')).to.be.ok();
-//   });
+    this.hoodie = new Mocks.Hoodie();
 
-//   it('should only send one request at a time', function() {
-//     this.hoodie.checkConnection();
-//     this.hoodie.checkConnection();
-//     expect(this.hoodie.request.callCount).to.eql(1);
-//   });
+    this.sandbox.spy(this.hoodie, 'trigger');
+    this.requestDefer = this.hoodie.defer();
 
-//   _when('hoodie is online', function() {
+    this.sandbox.stub(this.hoodie, 'request').returns(this.requestDefer.promise());
+    this.sandbox.spy(window, 'setTimeout');
 
-//     beforeEach(function() {
-//       this.hoodie.online = true;
-//     });
+    hoodieConnection(this.hoodie);
+  });
 
-//     _and('request succeeds', function() {
+  afterEach(function () {
+    this.sandbox.restore();
+  });
 
-//       beforeEach(function() {
-//         this.requestDefer.resolve({
-//           'couchdb': "Welcome",
-//           'version': "1.2.1"
-//         });
-//         this.hoodie.checkConnection();
-//       });
+  it('should have a checkConnection method', function () {
+    expect(this.hoodie).to.have.property('checkConnection');
+  });
 
-//       it('should check again in 30 seconds', function() {
-//         expect(window.setTimeout.calledWith(this.hoodie.checkConnection, 30000)).to.be.ok();
-//       });
+  it('should have a isOnline method', function () {
+    expect(this.hoodie).to.have.property('isOnline');
+  });
 
-//       it('should not trigger `reconnected` event', function() {
-//         expect(this.hoodie.trigger.calledWith('reconnected')).to.not.be.ok();
-//       });
+  it('should send GET / request', function() {
+    this.hoodie.checkConnection();
+    expect(this.hoodie.request.calledWith('GET', '/')).to.be.ok();
+  });
 
-//     });
+  it('should only send one request at a time', function() {
+    this.hoodie.checkConnection();
+    this.hoodie.checkConnection();
+    expect(this.hoodie.request.callCount).to.eql(1);
+  });
 
-//     _and('request fails', function() {
+  _when('hoodie is online', function() {
 
-//       beforeEach(function() {
-//         this.requestDefer.reject({
-//           'status': 0,
-//           'statusText': "Error"
-//         });
-//         this.hoodie.checkConnection();
-//       });
+    beforeEach(function() {
+      this.sandbox.stub(this.hoodie, 'isOnline').returns(true);
+    });
 
-//       it('should check again in 3 seconds', function() {
-//         expect(window.setTimeout.calledWith(this.hoodie.checkConnection, 3000)).to.be.ok();
-//       });
+    _and('request succeeds', function() {
 
-//       it('should trigger `disconnected` event', function() {
-//         expect(this.hoodie.trigger.calledWith('disconnected')).to.be.ok();
-//       });
+      beforeEach(function() {
+        this.requestDefer.resolve({
+          'couchdb': "Welcome",
+          'version': "1.2.1"
+        });
+        this.hoodie.checkConnection();
+      });
 
-//     });
+      it('should check again in 30 seconds', function() {
+        expect(window.setTimeout.calledWith(this.hoodie.checkConnection, 30000)).to.be.ok();
+      });
 
-//   });
+      it('should not trigger `reconnected` event', function() {
+        expect(this.hoodie.trigger.calledWith('reconnected')).to.not.be.ok();
+      });
 
-//   _when('hoodie is offline', function() {
+    });
 
-//     beforeEach(function() {
-//       this.hoodie.online = false;
-//     });
+    _and('request fails', function() {
 
-//     _and('request succeeds', function() {
+      beforeEach(function() {
+        this.requestDefer.reject({
+          'status': 0,
+          'statusText': "Error"
+        });
+        this.hoodie.checkConnection();
+      });
 
-//       beforeEach(function() {
-//         this.requestDefer.resolve({
-//           'couchdb': "Welcome",
-//           'version': "1.2.1"
-//         });
-//         this.hoodie.checkConnection();
-//       });
+      it('should check again in 3 seconds', function() {
+        expect(window.setTimeout.calledWith(this.hoodie.checkConnection, 3000)).to.be.ok();
+      });
 
-//       it('should check again in 30 seconds', function() {
-//         expect(window.setTimeout.calledWith(this.hoodie.checkConnection, 30000)).to.be.ok();
-//       });
+      it('should trigger `disconnected` event', function() {
+        expect(this.hoodie.trigger.calledWith('disconnected')).to.be.ok();
+      });
 
-//       it('should trigger `reconnected` event', function() {
-//         expect(this.hoodie.trigger.calledWith('reconnected')).to.be.ok();
-//       });
+    });
 
-//     });
+  });
 
-//     _and('request fails', function() {
+  _when('hoodie is offline', function() {
 
-//       beforeEach(function() {
-//         this.requestDefer.reject({
-//           'status': 0,
-//           'statusText': "Error"
-//         });
-//         this.hoodie.checkConnection();
-//       });
+    beforeEach(function() {
+      this.sandbox.stub(this.hoodie, 'isOnline').returns(false);
+    });
 
-//       it('should check again in 3 seconds', function() {
-//         expect(window.setTimeout.calledWith(this.hoodie.checkConnection, 3000)).to.be.ok();
-//       });
+    _and('request succeeds', function() {
 
-//       it('should not trigger `disconnected` event', function() {
-//         expect(this.hoodie.trigger.calledWith('disconnected')).to.not.be.ok();
-//       });
+      beforeEach(function() {
+        this.requestDefer.resolve({
+          'couchdb': "Welcome",
+          'version': "1.2.1"
+        });
+        this.hoodie.checkConnection();
+      });
 
-//     });
+      it('should check again in 30 seconds', function() {
+        expect(window.setTimeout.calledWith(this.hoodie.checkConnection, 30000)).to.be.ok();
+      });
 
-//   });
+      it('should trigger `reconnected` event', function() {
+        expect(this.hoodie.trigger.calledWith('reconnected')).to.be.ok();
+      });
 
-// });
+    });
 
+    _and('request fails', function() {
 
-// it.skip('should check connection', function() {
-//   // we moved this out of the constructor,
-//   // you can manually do
-//   // hoodie = new Hoodie()
-//   // hoodie.checkConnection()
-// });
+      beforeEach(function() {
+        this.requestDefer.reject({
+          'status': 0,
+          'statusText': "Error"
+        });
+        //this.hoodie.checkConnection();
+      });
+
+      it.skip('should check again in 3 seconds', function() {
+        expect(window.setTimeout.calledWith(this.hoodie.checkConnection, 3000)).to.be.ok();
+      });
+
+      it('should not trigger `disconnected` event', function() {
+        expect(this.hoodie.trigger.calledWith('disconnected')).to.not.be.ok();
+      });
+
+    });
+
+  });
+
+});
+
