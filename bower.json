@@ -6,7 +6,8 @@
   ],
   "dependencies": {
     "jquery": "~1.10.2",
-    "expect": "~0.2.0"
+    "expect": "~0.2.0",
+    "sinonjs": "~1.7.1"
   },
   "ignore": [
     "test/",

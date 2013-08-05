@@ -13,7 +13,7 @@ files = [
   'test/lib/bind.js',
   { pattern: 'lib/jquery/jquery.js', watched: false, included: true },
   { pattern: 'lib/expect/expect.js', watched: false, included: true },
-  { pattern: 'lib/sinon.js', watched: false, included: true },
+  { pattern: 'lib/sinonjs/sinon.js', watched: false, included: true },
   // { pattern: 'lib/sinon/lib/sinon.js', watched: false, included: true },
 
   'test/lib/helpers.js',
