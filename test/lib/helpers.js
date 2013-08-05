@@ -34,10 +34,8 @@ afterEach(function () {
   this.sandbox.restore();
 });
 
-
 after(function () {
 });
-
 
 
 //jasmine.Matchers.prototype.toBePromise = function() {
