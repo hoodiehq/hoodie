@@ -34,6 +34,7 @@ describe("Events", function() {
       cb = jasmine.createSpy('test');
       this.obj.one('test', cb);
       this.obj.trigger('test');
+      this.obj.trigger('test');
       expect(cb.callCount).toBe(1);
     });
 
