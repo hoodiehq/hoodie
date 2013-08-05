@@ -48,8 +48,8 @@ window.Events = window.Events || (function() {
   //     object.one 'groundTouch', gameOver
   //
   Events.prototype.one = function(ev, callback) {
-    this.bind(ev, function() {
-      this.unbind(ev, callback);
+    this.bind(ev, function _callback() {
+      this.unbind(ev, _callback);
       callback.apply(this, arguments);
     });
   };
