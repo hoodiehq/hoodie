@@ -10,8 +10,6 @@ describe("Hoodie.Store", function() {
   describe("#save(type, id, object, options)", function() {
 
     beforeEach(function() {
-
-      this.sandbox = sinon.sandbox.create();
       this._nowStub = this.sandbox.stub(this.store, "_now").returns('now');
     });
 

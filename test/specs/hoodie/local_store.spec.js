@@ -6,8 +6,6 @@ describe("Hoodie.LocalStore", function() {
     this.hoodie = new Mocks.Hoodie();
     this.store = new Hoodie.LocalStore(this.hoodie);
 
-    this.sandbox = sinon.sandbox.create();
-
     this.sandbox.stub(this.store, "_setObject");
     this.sandbox.stub(this.store, "_getObject");
     this.sandbox.stub(this.store.db, "getItem");
@@ -21,10 +19,6 @@ describe("Hoodie.LocalStore", function() {
       return 'newTimeout';
     });
 
-  });
-
-  afterEach(function () {
-    this.sandbox.restore();
   });
 
   xdescribe("constructor", function() {

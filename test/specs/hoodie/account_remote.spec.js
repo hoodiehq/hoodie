@@ -5,8 +5,6 @@ describe('Hoodie.AccountRemote', function() {
   beforeEach(function() {
     this.hoodie = new Mocks.Hoodie();
 
-    this.sandbox = sinon.sandbox.create();
-
     this.sandbox.spy(this.hoodie, 'on');
     this.sandbox.spy(this.hoodie, 'one');
     this.sandbox.spy(this.hoodie, 'unbind');
@@ -40,11 +38,6 @@ describe('Hoodie.AccountRemote', function() {
 
     this.remote = new Hoodie.AccountRemote(this.hoodie);
   });
-
-  afterEach(function () {
-    this.sandbox.restore();
-  });
-
 
   describe('constructor(@hoodie, options = {})', function() {
 

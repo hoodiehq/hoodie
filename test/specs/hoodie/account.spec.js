@@ -5,7 +5,6 @@ describe('Hoodie.Account', function () {
   beforeEach(function () {
     localStorage.clear();
 
-    this.sandbox = sinon.sandbox.create();
     this.noop = function () {};
 
     this.hoodie = new Mocks.Hoodie();
@@ -20,10 +19,6 @@ describe('Hoodie.Account', function () {
     this.account = new Hoodie.Account(this.hoodie);
     this.hoodie.request.reset();
     this.account._requests = {};
-  });
-
-  afterEach(function () {
-    this.sandbox.restore();
   });
 
   describe('constructor', function () {

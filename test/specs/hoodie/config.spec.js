@@ -6,17 +6,11 @@ describe('Hoodie.Config', function() {
     this.hoodie = new Mocks.Hoodie();
     this.config = new Hoodie.Config(this.hoodie);
 
-    this.sandbox = sinon.sandbox.create();
-
     this.updateSpy = this.sandbox.stub(this.hoodie.store, 'update').returns('promise');
     this.findSpy = this.sandbox.stub(this.hoodie.store, 'find').returns(this.hoodie.defer().resolve({
       funky: 'fresh'
     }));
 
-  });
-
-  afterEach(function () {
-    this.sandbox.restore();
   });
 
   describe('constructor(@hoodie, options)', function() {
