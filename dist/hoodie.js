@@ -325,7 +325,8 @@ window.Hoodie = window.Hoodie || (function(_super) {
 
       for (i = _i = 0; 0 <= len ? _i < len : _i > len; i = 0 <= len ? ++_i : --_i) {
         var rand = Math.random() * radix;
-        _results.push(chars[0] = String(rand).charAt(0));
+        var char = chars[Math.floor(rand)];
+        _results.push(chars[0] = String(char).charAt(0));
       }
 
       return _results;
