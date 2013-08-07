@@ -31,13 +31,15 @@
   },
   "scripts": {
     "start": "bin/start",
-    "test": "mocha"
+    "test": "grunt test --verbose"
   },
   "engines": {
     "node": ">=0.8.x"
   },
   "devDependencies": {
     "mocha": "*",
-    "grunt": "~0.4.1"
+    "grunt": "~0.4.1",
+    "expect.js": "~0.2.0",
+    "grunt-simple-mocha": "~0.4.0"
   }
 }

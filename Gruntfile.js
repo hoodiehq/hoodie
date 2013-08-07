@@ -2,6 +2,7 @@ module.exports = function (grunt) {
 
   grunt.loadNpmTasks('grunt-contrib-jshint');
   grunt.loadNpmTasks('grunt-contrib-watch');
+  grunt.loadNpmTasks('grunt-simple-mocha');
 
   // Project configuration.
   grunt.initConfig({
@@ -17,6 +18,14 @@ module.exports = function (grunt) {
       }
     },
 
+    simplemocha: {
+      options: {
+        reporter: 'spec',
+        ignoreLeaks: true
+      },
+      full: { src: ['test/**/*-test.js'] }
+    },
+
     watch: {
       files: ['<config:jshint.files>'],
       tasks: 'jshint'
@@ -25,6 +34,6 @@ module.exports = function (grunt) {
   });
 
   // Default task.
-  grunt.registerTask('default', 'jshint');
-
+  grunt.registerTask('default', ['jshint', 'simplemocha:full']);
+  grunt.registerTask('test', ['jshint', 'simplemocha:full']);
 };
