@@ -29,7 +29,8 @@
         "ports": ">=1.0.0",
         "open":"*",
         "mkdirp": "0.3.5",
-        "dispatch": "0.2.0"
+        "dispatch": "0.2.0",
+        "ports": "1.0.0"
     },
     "scripts": {
         "start": "bin/start",
