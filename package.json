@@ -1,41 +1,41 @@
 {
-    "name": "hoodie-app",
-    "version": "0.7.0",
-    "repository": {
-        "type": "git",
-        "url": "https://github.com/hoodiehq/hoodie-app.git"
-    },
-    "dependencies": {
-        "http-proxy": "*",
-        "connect": "2.7.4",
-        "corsproxy": "git://github.com/gr2m/CORS-Proxy.git",
-        "multicouch": ">=0.6.1",
-        "hoodie-pocket": "git://github.com/hoodiehq/pocket.git",
-        "local-tld-lib": "*",
-        "underscore": "1.4.4",
-        "async": "0.2.7",
-        "bytes": "0.2.1",
-        "prompt": "0.2.9",
-        "request": "2.16.6",
-        "follow": "0.9.0",
-        "couchr": "0.0.13",
-        "cli-color": "0.2.2",
-        "lock": "0.0.3",
-        "semver": ">=1.1.4",
-        "send": "0.1.0",
-        "optimist": "0.5.0",
-        "ports": ">=1.0.0",
-        "open":"*",
-        "mkdirp": "0.3.5"
-    },
-    "scripts": {
-        "start": "bin/start",
-        "test": "mocha"
-    },
-    "engines": {
-        "node": ">=0.8.x"
-    },
-    "devDependencies": {
-        "mocha": "*"
-    }
+  "name": "hoodie-app",
+  "version": "0.7.0",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/hoodiehq/hoodie-app.git"
+  },
+  "dependencies": {
+    "http-proxy": "*",
+    "connect": "2.7.4",
+    "corsproxy": "git://github.com/gr2m/CORS-Proxy.git",
+    "multicouch": ">=0.6.1",
+    "hoodie-pocket": "git://github.com/hoodiehq/pocket.git",
+    "local-tld-lib": "*",
+    "underscore": "1.4.4",
+    "async": "0.2.7",
+    "bytes": "0.2.1",
+    "prompt": "0.2.9",
+    "request": "2.16.6",
+    "follow": "0.9.0",
+    "couchr": "0.0.13",
+    "cli-color": "0.2.2",
+    "lock": "0.0.3",
+    "semver": ">=1.1.4",
+    "send": "0.1.0",
+    "optimist": "0.5.0",
+    "ports": ">=1.0.0",
+    "mkdirp": "0.3.5"
+  },
+  "scripts": {
+    "start": "bin/start",
+    "test": "mocha"
+  },
+  "engines": {
+    "node": ">=0.8.x"
+  },
+  "devDependencies": {
+    "mocha": "*",
+    "grunt": "~0.4.1"
+  }
 }
