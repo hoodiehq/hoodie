@@ -23,7 +23,7 @@ module.exports = function (grunt) {
         reporter: 'spec',
         ignoreLeaks: true
       },
-      full: { src: ['test/**/*-test.js'] }
+      full: { src: ['test/runner.js'] }
     },
 
     watch: {
