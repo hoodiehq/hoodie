@@ -9,6 +9,11 @@ function hoodieConnection(hoodie) {
 
   'use strict';
 
+  // state
+  var online = true;
+  var checkConnectionInterval = 30000;
+  var checkConnectionRequest = null;
+
   // Check Connection
   // ------------------
 
@@ -27,10 +32,7 @@ function hoodieConnection(hoodie) {
   // - triggers `online` event
   // - sets `checkConnectionInterval = 30000`
   //
-  var online = true;
-  var checkConnectionInterval = 30000;
-  var checkConnectionRequest = null;
-  function checkConnection() {
+  hoodie.checkConnection = function checkConnection() {
 
     var req = checkConnectionRequest;
 
@@ -44,16 +46,16 @@ function hoodieConnection(hoodie) {
     );
 
     return checkConnectionRequest;
-  }
+  };
 
 
   // isOnline
   // ----------
 
   //
-  function isOnline() {
+  hoodie.isOnline = function isOnline() {
     return online;
-  }
+  };
 
 
   //
@@ -62,7 +64,7 @@ function hoodieConnection(hoodie) {
   function handleCheckConnectionSuccess() {
     checkConnectionInterval = 30000;
 
-    window.setTimeout(checkConnection, checkConnectionInterval);
+    window.setTimeout(hoodie.checkConnection, checkConnectionInterval);
 
     if (! hoodie.isOnline()) {
       hoodie.trigger('reconnected');
@@ -79,7 +81,7 @@ function hoodieConnection(hoodie) {
   function handleCheckConnectionError() {
     checkConnectionInterval = 3000;
 
-    window.setTimeout(checkConnection, checkConnectionInterval);
+    window.setTimeout(hoodie.checkConnection, checkConnectionInterval);
 
     if (hoodie.isOnline()) {
       hoodie.trigger('disconnected');
@@ -88,11 +90,4 @@ function hoodieConnection(hoodie) {
 
     return hoodie.reject();
   }
-
-
-  //
-  // public API
-  //
-  hoodie.isOnline = isOnline;
-  hoodie.checkConnection = checkConnection;
 }

@@ -23,7 +23,7 @@ describe('Hoodie', function() {
 
   describe('constructor', function() {
 
-    it('should store the CouchDB URL', function() {
+    it('should store the base url', function() {
       var hoodie = new Hoodie('http://couch.example.com');
       expect(hoodie.baseUrl).to.eql('http://couch.example.com');
     });
