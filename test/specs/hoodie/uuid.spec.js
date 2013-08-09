@@ -1,14 +1,19 @@
-// describe('#uuid(num = 7)', function() {
+describe('hoodie.uuid()', function() {
 
-//   it('should default to a length of 7', function() {
-//     expect(this.hoodie.uuid().length).to.eql(7);
-//   });
+  beforeEach(function() {
+    this.hoodie = new Mocks.Hoodie();
+    hoodieUUID(this.hoodie);
+  });
 
-//   _when('called with num = 5', function() {
+  it('should default to a length of 7', function() {
+    expect(this.hoodie.uuid().length).to.eql(7);
+  });
 
-//     it('should generate an id with length = 5', function() {
-//       expect(this.hoodie.uuid(5).length).to.eql(5);
-//     });
+  _when('called with num = 5', function() {
 
-//   });
-// });
+    it('should generate an id with length = 5', function() {
+      expect(this.hoodie.uuid(5).length).to.eql(5);
+    });
+
+  });
+});
