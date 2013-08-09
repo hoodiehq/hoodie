@@ -63,6 +63,8 @@
   "unused": true,
   "multistr": true,
   "maxdepth": 4,
-  "indent": 2
+  "indent": 2,
+  "quotmark": "single",
+  "trailing": true
 }
 
