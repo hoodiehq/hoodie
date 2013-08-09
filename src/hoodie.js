@@ -116,6 +116,9 @@
     // check for pending password reset
     hoodie.account.checkPasswordReset();
 
+    // clear config on sign out
+    hoodie.account.on('signedOut', hoodie.config.clear);
+
     // authenticate
     hoodie.account.authenticate();
   }

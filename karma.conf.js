@@ -43,7 +43,7 @@ files = [
   'test/specs/hoodie/open.spec.js',
   'test/specs/hoodie/account.spec.js',
   // 'test/specs/hoodie/account_remote.spec.js',
-  // 'test/specs/hoodie/config.spec.js'
+  'test/specs/hoodie/config.spec.js'
 ];
 
 
