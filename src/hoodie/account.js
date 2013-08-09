@@ -376,7 +376,7 @@ function hoodieAccount (hoodie) {
     resetPasswordId = hoodie.config.get('_account.resetPasswordId');
 
     if (resetPasswordId) {
-      return checkPasswordResetStatus();
+      return account.checkPasswordReset();
     }
 
     resetPasswordId = '' + username + '/' + (hoodie.uuid());
@@ -400,11 +400,62 @@ function hoodieAccount (hoodie) {
       contentType: 'application/json'
     };
 
-    // TODO: spec that checkPasswordResetStatus gets executed
+    // TODO: spec that checkPasswordReset gets executed
     return withPreviousRequestsAborted('resetPassword', function() {
       return account.request('PUT', '/_users/' + (encodeURIComponent(key)), options).pipe(
         null, handleRequestError
-      ).done(checkPasswordResetStatus);
+      ).done(account.checkPasswordReset);
+    });
+  };
+
+  // checkPasswordReset
+  // ---------------------
+
+  // check for the status of a password reset. It might take
+  // a while until the password reset worker picks up the job
+  // and updates it
+  //
+  // If a password reset request was successful, the $passwordRequest
+  // doc gets removed from _users by the worker, therefore a 401 is
+  // what we are waiting for.
+  //
+  // Once called, it continues to request the status update with a
+  // one second timeout.
+  //
+  account.checkPasswordReset = function checkPasswordReset() {
+    var hash, options, resetPasswordId, url, username;
+
+    // reject if there is no pending password reset request
+    resetPasswordId = hoodie.config.get('_account.resetPasswordId');
+
+    if (!resetPasswordId) {
+      return hoodie.rejectWith({
+        error: 'missing'
+      });
+    }
+
+    // send request to check status of password reset
+    username = '$passwordReset/' + resetPasswordId;
+    url = '/_users/' + (encodeURIComponent(userDocPrefix + ':' + username));
+    hash = btoa(username + ':' + resetPasswordId);
+
+    options = {
+      headers: {
+        Authorization: 'Basic ' + hash
+      }
+    };
+
+    return withPreviousRequestsAborted('passwordResetStatus', function() {
+      return account.request('GET', url, options).pipe(
+        handlePasswordResetStatusRequestSuccess,
+        handlePasswordResetStatusRequestError
+      ).fail(function(error) {
+        if (error.error === 'pending') {
+          window.setTimeout(account.checkPasswordReset, 1000);
+          return;
+        }
+        return account.trigger('password_reset:error');
+      });
     });
   };
 
@@ -671,56 +722,6 @@ function hoodieAccount (hoodie) {
       account.fetch();
       return defer.resolve(username, response.roles[0]);
     };
-  }
-
-
-  //
-  // check for the status of a password reset. It might take
-  // a while until the password reset worker picks up the job
-  // and updates it
-  //
-  // If a password reset request was successful, the $passwordRequest
-  // doc gets removed from _users by the worker, therefore a 401 is
-  // what we are waiting for.
-  //
-  // Once called, it continues to request the status update with a
-  // one second timeout.
-  //
-  function checkPasswordResetStatus() {
-    var hash, options, resetPasswordId, url, username;
-
-    // reject if there is no pending password reset request
-    resetPasswordId = hoodie.config.get('_account.resetPasswordId');
-
-    if (!resetPasswordId) {
-      return hoodie.rejectWith({
-        error: 'missing'
-      });
-    }
-
-    // send request to check status of password reset
-    username = '$passwordReset/' + resetPasswordId;
-    url = '/_users/' + (encodeURIComponent('' + userDocPrefix + ':' + username));
-    hash = btoa('' + username + ':' + resetPasswordId);
-
-    options = {
-      headers: {
-        Authorization: 'Basic ' + hash
-      }
-    };
-
-    return withPreviousRequestsAborted('passwordResetStatus', function() {
-      return account.request('GET', url, options).pipe(
-        handlePasswordResetStatusRequestSuccess,
-        handlePasswordResetStatusRequestError
-      ).fail(function(error) {
-        if (error.error === 'pending') {
-          window.setTimeout(checkPasswordResetStatus, 1000);
-          return;
-        }
-        return account.trigger('password_reset:error');
-      });
-    });
   }
 
 
@@ -1038,16 +1039,11 @@ function hoodieAccount (hoodie) {
   //
   hoodie.account = account;
 
+  // TODO: we should move the owner hash on hoodie core, as
+  //       other modules depend on it as well, like hoodie.store.
   // the ownerHash gets stored in every object created by the user.
   // Make sure we have one.
-  if (!account.ownerHash) {
+  if (!hoodie.account.ownerHash) {
     setOwner(hoodie.uuid());
   }
-
-  // authenticate on next tick
-  window.setTimeout(account.authenticate);
-
-  // is there a pending password reset?
-  // TODO: spec that
-  checkPasswordResetStatus();
 }

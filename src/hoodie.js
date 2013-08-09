@@ -96,6 +96,13 @@
 
     // load user extensions
     applyExtensions(hoodie);
+
+
+    // check for pending password reset
+    hoodie.account.checkPasswordReset();
+
+    // authenticate
+    hoodie.account.authenticate();
   }
 
   // Extending hoodie
