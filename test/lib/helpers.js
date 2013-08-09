@@ -71,14 +71,15 @@ expect.Assertion.prototype.resolved = function () {
   return this;
 };
 
-expect.Assertion.prototype.resolvedWith = function (obj) {
+expect.Assertion.prototype.resolvedWith = function () {
+  var args = Array.prototype.slice.call(arguments);
   var resolvedWith;
   this.obj.done( function() { resolvedWith = Array.prototype.slice.call(arguments) });
 
   this.assert(
-      expect.eql(obj, resolvedWith)
-    , function(){ return 'expected to resolve with ' + JSON.stringify(obj) + ', was: ' + JSON.stringify(resolvedWith)}
-    , function(){ return 'expected to not resolve with ' + JSON.stringify(obj) + ', was: ' + JSON.stringify(resolvedWith)});
+      expect.eql(args, resolvedWith)
+    , function(){ return 'expected to resolve with ' + JSON.stringify(args) + ', was: ' + JSON.stringify(resolvedWith)}
+    , function(){ return 'expected to not resolve with ' + JSON.stringify(args) + ', was: ' + JSON.stringify(resolvedWith)});
   return this;
 };
 
@@ -89,14 +90,15 @@ expect.Assertion.prototype.rejected = function () {
   return this;
 };
 
-expect.Assertion.prototype.rejectedWith = function (obj) {
+expect.Assertion.prototype.rejectedWith = function () {
+  var args = Array.prototype.slice.call(arguments);
   var rejectedWith;
   this.obj.fail( function() { rejectedWith = Array.prototype.slice.call(arguments) });
 
   this.assert(
-      expect.eql(obj, rejectedWith)
-    , function(){ return 'expected to rejected with ' + JSON.stringify(obj) + ', was: ' + JSON.stringify(rejectedWith)}
-    , function(){ return 'expected to not rejected with ' + JSON.stringify(obj) + ', was: ' + JSON.stringify(rejectedWith)});
+      expect.eql(args, rejectedWith)
+    , function(){ return 'expected to rejected with ' + JSON.stringify(args) + ', was: ' + JSON.stringify(rejectedWith)}
+    , function(){ return 'expected to not rejected with ' + JSON.stringify(args) + ', was: ' + JSON.stringify(rejectedWith)});
   return this;
 };
 

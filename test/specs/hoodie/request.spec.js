@@ -78,9 +78,9 @@ describe("hoodie.request", function () {
       });
     });
     it("should return a rejected promis with Cannot reach backend error", function() {
-      expect(this.hoodie.request('GET', '/')).to.be.rejectedWith([{
+      expect(this.hoodie.request('GET', '/')).to.be.rejectedWith({
         error: 'Cannot connect to Hoodie server at http://my.cou.ch'
-      }]);
+      });
     });
   });
 });

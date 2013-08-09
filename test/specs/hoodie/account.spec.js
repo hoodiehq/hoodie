@@ -169,7 +169,7 @@ describe('Hoodie.Account', function () {
         });
 
         it('should resolve the promise', function () {
-          expect(this.promise).to.be.resolvedWith(['joe@example.com'])
+          expect(this.promise).to.be.resolvedWith('joe@example.com')
         });
 
         it("should not send any farther requests", function() {
@@ -216,7 +216,7 @@ describe('Hoodie.Account', function () {
           });
 
           it('should return the promise of the sign in request', function () {
-            expect(this.promise).to.be.resolvedWith(['signIn_promise'])
+            expect(this.promise).to.be.resolvedWith('signIn_promise')
           });
         });
       }); // authentication request is successful and returns `name: null`
