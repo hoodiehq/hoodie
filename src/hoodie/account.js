@@ -22,10 +22,6 @@ function hoodieAccount (hoodie) {
   // default couchDB user doc prefix
   var userDocPrefix = 'org.couchdb.user';
 
-  // set username from config (local store)
-  account.username = hoodie.config.get('_account.username');
-  account.ownerHash = hoodie.config.get('_account.ownerHash');
-
 
   // Authenticate
   // --------------
@@ -36,10 +32,12 @@ function hoodieAccount (hoodie) {
   account.authenticate = function authenticate() {
     var sendAndHandleAuthRequest;
 
+    // already tried to authenticate, and failed
     if (authenticated === false) {
       return hoodie.reject();
     }
 
+    // already tried to authenticate, and succeeded
     if (authenticated === true) {
       return hoodie.resolveWith(account.username);
     }
@@ -51,7 +49,8 @@ function hoodieAccount (hoodie) {
       return requests.signOut.then(hoodie.rejectWith);
     }
 
-    // if there is apending signIn request, return its promise
+    // if there is a pending signIn request, return its promise
+    //
     if (requests.signIn && requests.signIn.state() === 'pending') {
       return requests.signIn;
     }
@@ -68,7 +67,7 @@ function hoodieAccount (hoodie) {
     // pending request already, return its promise.
     //
     sendAndHandleAuthRequest = function() {
-      return account.request('GET', '/_session').pipe(
+      return account.request('GET', '/_session').then(
         handleAuthenticateRequestSuccess,
         handleRequestError
       );
@@ -127,7 +126,7 @@ function hoodieAccount (hoodie) {
       contentType: 'application/json'
     };
 
-    return account.request('PUT', userDocUrl(username), options).pipe(
+    return account.request('PUT', userDocUrl(username), options).then(
       handleSignUpSucces(username, password),
       handleRequestError
     );
@@ -225,7 +224,7 @@ function hoodieAccount (hoodie) {
     if (username !== account.username) {
       return account.signOut({
         silent: true
-      }).pipe(function() {
+      }).then(function() {
         return sendSignInRequest(username, password);
       });
     } else {
@@ -253,8 +252,8 @@ function hoodieAccount (hoodie) {
       });
     }
     hoodie.remote.disconnect();
-    // return sendSignOutRequest().pipe(cleanupAndTriggerSignOut);
-    return sendSignOutRequest().pipe(cleanupAndTriggerSignOut);
+    // return sendSignOutRequest().then(cleanupAndTriggerSignOut);
+    return sendSignOutRequest().then(cleanupAndTriggerSignOut);
   };
 
 
@@ -324,7 +323,7 @@ function hoodieAccount (hoodie) {
     }
 
     return withSingleRequest('fetch', function() {
-      return account.request('GET', userDocUrl(username)).pipe(
+      return account.request('GET', userDocUrl(username)).then(
         null,
         handleRequestError
       ).done(function(response) {
@@ -353,7 +352,7 @@ function hoodieAccount (hoodie) {
 
     hoodie.remote.disconnect();
 
-    return account.fetch().pipe(
+    return account.fetch().then(
       sendChangeUsernameAndPasswordRequest(currentPassword, null, newPassword),
       handleRequestError
     );
@@ -402,7 +401,7 @@ function hoodieAccount (hoodie) {
 
     // TODO: spec that checkPasswordReset gets executed
     return withPreviousRequestsAborted('resetPassword', function() {
-      return account.request('PUT', '/_users/' + (encodeURIComponent(key)), options).pipe(
+      return account.request('PUT', '/_users/' + (encodeURIComponent(key)), options).then(
         null, handleRequestError
       ).done(account.checkPasswordReset);
     });
@@ -446,7 +445,7 @@ function hoodieAccount (hoodie) {
     };
 
     return withPreviousRequestsAborted('passwordResetStatus', function() {
-      return account.request('GET', url, options).pipe(
+      return account.request('GET', url, options).then(
         handlePasswordResetStatusRequestSuccess,
         handlePasswordResetStatusRequestError
       ).fail(function(error) {
@@ -486,10 +485,10 @@ function hoodieAccount (hoodie) {
       return cleanupAndTriggerSignOut();
     }
 
-    return account.fetch().pipe(
+    return account.fetch().then(
       handleFetchBeforeDestroySucces,
       handleFetchBeforeDestroyError
-    ).pipe(cleanupAndTriggerSignOut);
+    ).then(cleanupAndTriggerSignOut);
   };
 
 
@@ -547,8 +546,7 @@ function hoodieAccount (hoodie) {
     }
 
     if (account.hasAnonymousAccount()) {
-      account.signIn(account.username, getAnonymousPassword());
-      return;
+      return account.signIn(account.username, getAnonymousPassword());
     }
 
     authenticated = false;
@@ -773,8 +771,8 @@ function hoodieAccount (hoodie) {
 
     return sendSignInRequest(account.username, currentPassword, {
       silent: true
-    }).pipe(function() {
-      return account.fetch().pipe(
+    }).then(function() {
+      return account.fetch().then(
         sendChangeUsernameAndPasswordRequest(currentPassword, newUsername, newPassword)
       );
     });
@@ -929,7 +927,7 @@ function hoodieAccount (hoodie) {
       };
 
       return withPreviousRequestsAborted('updateUsersDoc', function() {
-        return account.request('PUT', userDocUrl(), options).pipe(
+        return account.request('PUT', userDocUrl(), options).then(
           handleChangeUsernameAndPasswordRequest(newUsername, newPassword || currentPassword),
           handleRequestError
         );
@@ -995,7 +993,7 @@ function hoodieAccount (hoodie) {
   //
   function sendSignOutRequest() {
     return withSingleRequest('signOut', function() {
-      return account.request('DELETE', '/_session').pipe(null, handleRequestError);
+      return account.request('DELETE', '/_session').then(null, handleRequestError);
     });
   }
 
@@ -1021,7 +1019,7 @@ function hoodieAccount (hoodie) {
     return withPreviousRequestsAborted('signIn', function() {
       var promise = account.request('POST', '/_session', requestOptions);
 
-      return promise.pipe(
+      return promise.then(
         handleSignInSuccess(options),
         handleRequestError
       );

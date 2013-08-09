@@ -38,7 +38,7 @@ function hoodieConnection(hoodie) {
       return req;
     }
 
-    checkConnectionRequest = hoodie.request('GET', '/').pipe(
+    checkConnectionRequest = hoodie.request('GET', '/').then(
       handleCheckConnectionSuccess,
       handleCheckConnectionError
     );

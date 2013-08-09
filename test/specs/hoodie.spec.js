@@ -84,5 +84,9 @@ describe('Hoodie', function() {
     it("should set rejectWith method", function() {
       expect(typeof this.hoodie.rejectWith).to.eql('function');
     });
+
+    it.skip("should check for a pending checkPasswordReset");
+
+    it.skip("should authenticate");
   });
 });

@@ -44,6 +44,11 @@
       extension(hoodie);
     };
 
+
+    //
+    // Extending hoodie core
+    //
+
     /* global hoodieAccount, hoodieRemote, hoodieConfig, hoodieStore,
               hoodiePromises, hoodieRequest, hoodieConnection, hoodieUUID, hoodieDispose, hoodieOpen
     */
@@ -94,9 +99,19 @@
     // * hoodie.remote
     hoodie.extend( hoodieRemote );
 
-    // load user extensions
+    //
+    // loading user extensions
+    //
     applyExtensions(hoodie);
 
+
+    //
+    // Initializations
+    //
+
+    // set username & hash from config (local store)
+    hoodie.account.username = hoodie.config.get('_account.username');
+    hoodie.account.ownerHash = hoodie.config.get('_account.ownerHash');
 
     // check for pending password reset
     hoodie.account.checkPasswordReset();
