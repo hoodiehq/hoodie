@@ -26,10 +26,10 @@
       throw new Error('usage: new Hoodie(url);');
     }
 
-    if (hoodie.baseUrl !== baseUrl) {
-      '/_api'; // default to current domain
+    if (baseUrl) {
+      hoodie.baseUrl = baseUrl.replace(/\/+$/, '');
     } else {
-      baseUrl.replace(/\/+$/, ''); // remove trailing slash(es)
+      hoodie.baseUrl = '/_api'; // default to current domain
     }
 
 
