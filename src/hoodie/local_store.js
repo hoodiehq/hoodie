@@ -730,9 +730,6 @@ function hoodieStore (hoodie) {
     },
     length: function() {
       return window.localStorage.length;
-    },
-    clear: function() {
-      return window.localStorage.clear();
     }
   };
 
@@ -951,8 +948,7 @@ function hoodieStore (hoodie) {
       setItem: function() { return null; },
       removeItem: function() { return null; },
       key: function() { return null; },
-      length: function() { return 0; },
-      clear: function() { return null; }
+      length: function() { return 0; }
     };
   }
 

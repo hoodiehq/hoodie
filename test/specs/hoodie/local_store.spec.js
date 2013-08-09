@@ -4,14 +4,10 @@ describe("Hoodie.LocalStore", function() {
 
   beforeEach(function() {
     this.hoodie = new Mocks.Hoodie();
-    this.store = new Hoodie.LocalStore(this.hoodie);
 
-    this.sandbox.stub(this.store, "_setObject");
-    this.sandbox.stub(this.store, "_getObject");
-    this.sandbox.stub(this.store.db, "getItem");
-    this.sandbox.stub(this.store.db, "setItem");
-    this.sandbox.stub(this.store.db, "removeItem");
-    this.sandbox.stub(this.store.db, "clear");
+    this.sandbox.stub(window.localStorage, "getItem");
+    this.sandbox.stub(window.localStorage, "setItem");
+    this.sandbox.stub(window.localStorage, "removeItem");
 
     this.sandbox.spy(window, "clearTimeout");
     this.sandbox.stub(window, "setTimeout").returns(function(cb) {
@@ -19,6 +15,9 @@ describe("Hoodie.LocalStore", function() {
       return 'newTimeout';
     });
 
+
+    hoodieStore(this.hoodie);
+    this.store = this.hoodie.store;
   });
 
   xdescribe("constructor", function() {

@@ -39,6 +39,14 @@ after(function () {
 
 
 // expect.js helpers
+expect.Assertion.prototype.called = function() {
+
+  this.assert(
+      this.obj.called
+    , function(){ return 'expected to be called'}
+    , function(){ return 'expected to not be called' });
+  return this
+};
 expect.Assertion.prototype.calledWith = function() {
   var args = Array.prototype.slice.call(arguments);
   var hit = false

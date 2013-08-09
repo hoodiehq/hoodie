@@ -10,10 +10,8 @@ describe('hoodie.uuid()', function() {
   });
 
   _when('called with num = 5', function() {
-
     it('should generate an id with length = 5', function() {
       expect(this.hoodie.uuid(5).length).to.eql(5);
     });
-
   });
 });
