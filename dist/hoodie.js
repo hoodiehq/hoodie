@@ -1,22 +1,4 @@
-//  hoodie 0.2.3
-'use strict';
-
-Object.deepExtend = function(child, parent) {
-  for (var key in parent) {
-    if (parent.hasOwnProperty(key)) {
-      child[key] = parent[key];
-    }
-  }
-  function Ctor() {
-    this.constructor = child;
-  }
-  Ctor.prototype = parent.prototype;
-  child.prototype = new Ctor();
-  child.__super__ = parent.prototype;
-
-  return child;
-};
-
+//  hoodie 0.3.0
 // Hoodie
 // --------
 //
@@ -42,12 +24,14 @@ Object.deepExtend = function(child, parent) {
 
     // enforce initialization with `new`
     if (! (hoodie instanceof Hoodie)) {
-      throw new Error("usage: new Hoodie(url);");
+      throw new Error('usage: new Hoodie(url);');
     }
 
-    hoodie.baseUrl = baseUrl ? // if baseUrl passed
-      baseUrl.replace(/\/+$/, '') // remove trailing slash(es)
-      : "/_api"; // otherwise default to current domain
+    if (hoodie.baseUrl !== baseUrl) {
+      '/_api'; // default to current domain
+    } else {
+      baseUrl.replace(/\/+$/, ''); // remove trailing slash(es)
+    }
 
 
     // hoodie.extend
@@ -137,7 +121,7 @@ Object.deepExtend = function(child, parent) {
   };
 
   //
-  //
+  // detect available extensions and attach to Hoodie Object.
   //
   function applyExtensions(hoodie) {
     for (var i = 0; i < extensions.length; i++) {
@@ -148,7 +132,7 @@ Object.deepExtend = function(child, parent) {
   //
   // expose Hoodie to module loaders. Based on jQuery's implementation.
   //
-  if ( typeof module === "object" && module && typeof module.exports === "object" ) {
+  if ( typeof module === 'object' && module && typeof module.exports === 'object' ) {
 
     // Expose Hoodie as module.exports in loaders that implement the Node
     // module pattern (including browserify). Do not create the global, since
@@ -157,7 +141,7 @@ Object.deepExtend = function(child, parent) {
     module.exports = Hoodie;
 
 
-  } else if ( typeof define === "function" && define.amd ) {
+  } else if ( typeof define === 'function' && define.amd ) {
 
     // Register as a named AMD module, since Hoodie can be concatenated with other
     // files that may use define, but not via a proper concatenation script that
@@ -165,7 +149,7 @@ Object.deepExtend = function(child, parent) {
     // way to register. Lowercase hoodie is used because AMD module names are
     // derived from file names, and Hoodie is normally delivered in a lowercase
     // file name.
-    define( "hoodie", [], function () {
+    define( 'hoodie', [], function () {
       return Hoodie;
     } );
   } else {
@@ -193,8 +177,6 @@ Object.deepExtend = function(child, parent) {
 //
 
 function hoodieEvents(hoodie) {
-
-  'use strict';
 
   var callbacks = {};
 
@@ -401,7 +383,7 @@ function hoodieRequest(hoodie) {
 
     // if a relative path passed, prefix with @baseUrl
     if (!/^http/.test(url)) {
-      url = "" + hoodie.baseUrl + url;
+      url = '' + hoodie.baseUrl + url;
     }
 
     defaults = {
@@ -437,7 +419,7 @@ function hoodieRequest(hoodie) {
       error = JSON.parse(xhr.responseText);
     } catch (_error) {
       error = {
-        error: xhr.responseText || ("Cannot connect to Hoodie server at " + hoodie.baseUrl)
+        error: xhr.responseText || ('Cannot connect to Hoodie server at ' + hoodie.baseUrl)
       };
     }
 
@@ -603,6 +585,7 @@ function hoodieDispose (hoodie) {
   // gets triggered that the modules react on.
   function dispose() {
     hoodie.trigger('dispose');
+    hoodie.unbind();
   }
 
   //
@@ -686,7 +669,7 @@ function hoodieStoreBase(hoodie) {
       defer = hoodie.defer();
 
       if (typeof object !== 'object' || Array.isArray(object)) {
-        defer.reject(Hoodie.Errors.INVALID_ARGUMENTS("invalid object"));
+        defer.reject(Hoodie.Errors.INVALID_ARGUMENTS('invalid object'));
         return defer.promise();
       }
 
@@ -861,7 +844,7 @@ function hoodieStoreBase(hoodie) {
       var defer;
       defer = hoodie.defer();
       if (!(typeof type === 'string' && typeof id === 'string')) {
-        return defer.reject(Hoodie.Errors.INVALID_ARGUMENTS("type & id are required")).promise();
+        return defer.reject(Hoodie.Errors.INVALID_ARGUMENTS('type & id are required')).promise();
       }
       return defer;
     },
@@ -922,7 +905,7 @@ function hoodieStoreBase(hoodie) {
       defer = hoodie.defer();
 
       if (!(typeof type === 'string' && typeof id === 'string')) {
-        return defer.reject(Hoodie.Errors.INVALID_ARGUMENTS("type & id are required")).promise();
+        return defer.reject(Hoodie.Errors.INVALID_ARGUMENTS('type & id are required')).promise();
       }
 
       return defer;
@@ -970,11 +953,9 @@ function hoodieStoreBase(hoodie) {
   return store;
 }
 
-// 
+//
 // one place to rule them all!
-// 
-
-'use strict';
+//
 
 Hoodie.Errors = {
 
@@ -982,17 +963,17 @@ Hoodie.Errors = {
   // --------------
 
   // thrown when invalid keys are used to store an object
-  // 
+  //
   INVALID_KEY: function (idOrType) {
     var key = idOrType.id ? 'id' : 'type';
 
-    return new Error("invalid " + key + " '" + idOrType[key] + "': numbers and lowercase letters allowed only");
+    return new Error('invalid ' + key + '\'' + idOrType[key] + '\': numbers and lowercase letters allowed only');
   },
 
   // INVALID_ARGUMENTS
   // -------------------
 
-  // 
+  //
   INVALID_ARGUMENTS: function (msg) {
     return new Error(msg);
   },
@@ -1000,9 +981,9 @@ Hoodie.Errors = {
   // NOT_FOUND
   // -----------
 
-  // 
+  //
   NOT_FOUND: function (type, id) {
-    return new Error("" + type + " with " + id + " could not be found");
+    return new Error('' + type + ' with ' + id + ' could not be found');
   }
 
 };
@@ -1095,11 +1076,11 @@ function hoodieRemoteBase (hoodie, options) {
     options = options || {};
 
     if (remote.name) {
-      path = "/" + (encodeURIComponent(remote.name)) + path;
+      path = '/' + (encodeURIComponent(remote.name)) + path;
     }
 
     if (remote.baseUrl) {
-      path = "" + remote.baseUrl + path;
+      path = '' + remote.baseUrl + path;
     }
 
     options.contentType = options.contentType || 'application/json';
@@ -1120,7 +1101,7 @@ function hoodieRemoteBase (hoodie, options) {
   //
   remote.get = function get() {
     return console.log.apply(
-      console, [".get() not yet implemented"]
+      console, ['.get() not yet implemented']
       .concat(Array.prototype.slice.call(arguments))
     );
   };
@@ -1133,7 +1114,7 @@ function hoodieRemoteBase (hoodie, options) {
   //
   remote.post = function post() {
     return console.log.apply(
-      console, [".post() not yet implemented"]
+      console, ['.post() not yet implemented']
       .concat(Array.prototype.slice.call(arguments))
     );
   };
@@ -1156,15 +1137,15 @@ function hoodieRemoteBase (hoodie, options) {
       return defer;
     }
 
-    path = "" + type + "/" + id;
+    path = '' + type + '/' + id;
 
     if (remote.prefix) {
       path = remote.prefix + path;
     }
 
-    path = "/" + encodeURIComponent(path);
+    path = '/' + encodeURIComponent(path);
 
-    return remote.request("GET", path).pipe(parseFromRemote);
+    return remote.request('GET', path).pipe(parseFromRemote);
   };
 
 
@@ -1182,14 +1163,14 @@ function hoodieRemoteBase (hoodie, options) {
       return defer;
     }
 
-    path = "/_all_docs?include_docs=true";
+    path = '/_all_docs?include_docs=true';
 
     switch (true) {
     case (type !== undefined) && remote.prefix !== '':
-      startkey = "" + remote.prefix + type + "/";
+      startkey = '' + remote.prefix + type + '/';
       break;
     case type !== undefined:
-      startkey = "" + type + "/";
+      startkey = '' + type + '/';
       break;
     case remote.prefix !== '':
       startkey = remote.prefix;
@@ -1207,9 +1188,9 @@ function hoodieRemoteBase (hoodie, options) {
         charCode = chars.charCodeAt(0);
         return String.fromCharCode(charCode + 1);
       });
-      path = "" + path + "&startkey=\"" + (encodeURIComponent(startkey)) + "\"&endkey=\"" + (encodeURIComponent(endkey)) + "\"";
+      path = '' + path + '&startkey=\'' + (encodeURIComponent(startkey)) + '\'&endkey=\'' + (encodeURIComponent(endkey)) + '\'';
     }
-    return remote.request("GET", path).pipe(mapDocsFromFindAll).pipe(parseAllFromRemote);
+    return remote.request('GET', path).pipe(mapDocsFromFindAll).pipe(parseAllFromRemote);
   };
 
 
@@ -1233,8 +1214,8 @@ function hoodieRemoteBase (hoodie, options) {
       id: id
     }, object);
     object = parseForRemote(object);
-    path = "/" + encodeURIComponent(object._id);
-    return remote.request("PUT", path, {
+    path = '/' + encodeURIComponent(object._id);
+    return remote.request('PUT', path, {
       data: object
     });
   };
@@ -1270,7 +1251,7 @@ function hoodieRemoteBase (hoodie, options) {
   // determine between a known and a new object
   //
   remote.isKnownObject = function isKnownObject(object) {
-    var key = "" + object.type + "/" + object.id;
+    var key = '' + object.type + '/' + object.id;
 
     if (knownObjects[key] !== undefined) {
       return knownObjects[key];
@@ -1284,7 +1265,7 @@ function hoodieRemoteBase (hoodie, options) {
   // determine between a known and a new object
   //
   remote.markAsKnownObject = function markAsKnownObject(object) {
-    var key = "" + object.type + "/" + object.id;
+    var key = '' + object.type + '/' + object.id;
     knownObjects[key] = 1;
     return knownObjects[key];
   };
@@ -1409,7 +1390,7 @@ function hoodieRemoteBase (hoodie, options) {
       object = parseForRemote(object);
       objectsForRemote.push(object);
     }
-    pushRequest = remote.request('POST', "/_bulk_docs", {
+    pushRequest = remote.request('POST', '/_bulk_docs', {
       data: {
         docs: objectsForRemote,
         new_edits: false
@@ -1435,12 +1416,12 @@ function hoodieRemoteBase (hoodie, options) {
   // namespaced alias for `hoodie.on`
   //
   remote.on = function on(event, cb) {
-    event = event.replace(/(^| )([^ ]+)/g, "$1" + remote.name + ":$2");
+    event = event.replace(/(^| )([^ ]+)/g, '$1' + remote.name + ':$2');
     return hoodie.on(event, cb);
   };
 
   remote.one = function one(event, cb) {
-    event = event.replace(/(^| )([^ ]+)/g, "$1" + remote.name + ":$2");
+    event = event.replace(/(^| )([^ ]+)/g, '$1' + remote.name + ':$2');
     return hoodie.one(event, cb);
   };
 
@@ -1451,7 +1432,7 @@ function hoodieRemoteBase (hoodie, options) {
     var event, parameters, _ref;
     event = arguments[0],
     parameters = 2 <= arguments.length ? Array.prototype.slice.call(arguments, 1) : [];
-    return (_ref = hoodie).trigger.apply(_ref, ["" + remote.name + ":" + event].concat(Array.prototype.slice.call(parameters)));
+    return (_ref = hoodie).trigger.apply(_ref, ['' + remote.name + ':' + event].concat(Array.prototype.slice.call(parameters)));
   };
 
   //
@@ -1495,9 +1476,9 @@ function hoodieRemoteBase (hoodie, options) {
     }
 
     // prepare CouchDB id
-    properties._id = "" + properties.type + "/" + properties.id;
+    properties._id = '' + properties.type + '/' + properties.id;
     if (remote.prefix) {
-      properties._id = "" + remote.prefix + properties._id;
+      properties._id = '' + remote.prefix + properties._id;
     }
     delete properties.id;
     return properties;
@@ -1524,7 +1505,7 @@ function hoodieRemoteBase (hoodie, options) {
 
     // turn doc/123 into type = doc & id = 123
     // NOTE: we don't use a simple id.split(/\//) here,
-    // as in some cases IDs might contain "/", too
+    // as in some cases IDs might contain '/', too
     //
     _ref = id.match(/([^\/]+)\/(.*)/),
     ignore = _ref[0],
@@ -1562,10 +1543,10 @@ function hoodieRemoteBase (hoodie, options) {
     // local changes are not meant to be replicated outside of the
     // users database, therefore the `-local` suffix.
     if (attributes._$local) {
-      newRevisionId += "-local";
+      newRevisionId += '-local';
     }
 
-    attributes._rev = "" + (currentRevNr + 1) + "-" + newRevisionId;
+    attributes._rev = '' + (currentRevNr + 1) + '-' + newRevisionId;
     attributes._revisions = {
       start: 1,
       ids: [newRevisionId]
@@ -1604,9 +1585,9 @@ function hoodieRemoteBase (hoodie, options) {
     var since;
     since = remote.getSinceNr();
     if (remote.isConnected()) {
-      return "/_changes?include_docs=true&since=" + since + "&heartbeat=10000&feed=longpoll";
+      return '/_changes?include_docs=true&since=' + since + '&heartbeat=10000&feed=longpoll';
     } else {
-      return "/_changes?include_docs=true&since=" + since;
+      return '/_changes?include_docs=true&since=' + since;
     }
   }
 
@@ -1727,12 +1708,12 @@ function hoodieRemoteBase (hoodie, options) {
         }
       }
 
-      remote.trigger("" + event, object);
-      remote.trigger("" + event + ":" + object.type, object);
-      remote.trigger("" + event + ":" + object.type + ":" + object.id, object);
-      remote.trigger("change", event, object);
-      remote.trigger("change:" + object.type, event, object);
-      remote.trigger("change:" + object.type + ":" + object.id, event, object);
+      remote.trigger('' + event, object);
+      remote.trigger('' + event + ':' + object.type, object);
+      remote.trigger('' + event + ':' + object.type + ':' + object.id, object);
+      remote.trigger('change', event, object);
+      remote.trigger('change:' + object.type, event, object);
+      remote.trigger('change:' + object.type + ':' + object.id, event, object);
     }
   }
 
@@ -2080,7 +2061,7 @@ function hoodieStore (hoodie) {
       return enqueue('remove', arguments);
     }
 
-    key = "" + type + "/" + id;
+    key = '' + type + '/' + id;
 
     // if change comes from remote, just clean up locally
     if (options.remote) {
@@ -2103,13 +2084,13 @@ function hoodieStore (hoodie) {
       object._deleted = true;
       store.cache(type, id, object);
     } else {
-      key = "" + type + "/" + id;
+      key = '' + type + '/' + id;
       db.removeItem(key);
       cached[key] = false;
       store.clearChanged(type, id);
     }
 
-    triggerEvents("remove", object, options);
+    triggerEvents('remove', object, options);
 
     promise = defer.resolve(object).promise();
 
@@ -2168,7 +2149,7 @@ function hoodieStore (hoodie) {
     }
 
     options = options || {};
-    key = "" + type + "/" + id;
+    key = '' + type + '/' + id;
 
     if (object) {
       $.extend(object, {
@@ -2242,7 +2223,7 @@ function hoodieStore (hoodie) {
   store.clearChanged = function clearChanged(type, id) {
     var key;
     if (type && id) {
-      key = "" + type + "/" + id;
+      key = '' + type + '/' + id;
       delete dirty[key];
     } else {
       dirty = {};
@@ -2271,7 +2252,7 @@ function hoodieStore (hoodie) {
     var key;
 
     options = options || {};
-    key = "" + type + "/" + id;
+    key = '' + type + '/' + id;
 
     dirty[key] = object;
     saveDirtyIds();
@@ -2296,7 +2277,7 @@ function hoodieStore (hoodie) {
 
       for (_i = 0, _len = objects.length; _i < _len; _i++) {
         object = objects[_i];
-        key = "" + object.type + "/" + object.id;
+        key = '' + object.type + '/' + object.id;
         dirty[key] = object;
       }
 
@@ -2373,7 +2354,7 @@ function hoodieStore (hoodie) {
       cached = {};
       store.clearChanged();
       defer.resolve();
-      store.trigger("clear");
+      store.trigger('clear');
     } catch (_error) {
       defer.reject(_error);
     }
@@ -2392,7 +2373,7 @@ function hoodieStore (hoodie) {
     var eventName, parameters, _ref;
     eventName = arguments[0],
     parameters = 2 <= arguments.length ? Array.prototype.slice.call(arguments, 1) : [];
-    return (_ref = hoodie).trigger.apply(_ref, ["store:" + eventName].concat(Array.prototype.slice.call(parameters)));
+    return (_ref = hoodie).trigger.apply(_ref, ['store:' + eventName].concat(Array.prototype.slice.call(parameters)));
   };
 
 
@@ -2401,7 +2382,7 @@ function hoodieStore (hoodie) {
 
   // proxies to hoodie.on
   store.on = function on(eventName, data) {
-    eventName = eventName.replace(/(^| )([^ ]+)/g, "$1store:$2");
+    eventName = eventName.replace(/(^| )([^ ]+)/g, '$1store:$2');
     return hoodie.on(eventName, data);
   };
 
@@ -2456,10 +2437,10 @@ function hoodieStore (hoodie) {
 
       // Just because localStorage exists does not mean it works. In particular it might be disabled
       // as it is when Safari's private browsing mode is active.
-      localStorage.setItem('Storage-Test', "1");
+      localStorage.setItem('Storage-Test', '1');
 
       // that should not happen ...
-      if (localStorage.getItem('Storage-Test') !== "1") {
+      if (localStorage.getItem('Storage-Test') !== '1') {
         return false;
       }
 
@@ -2564,7 +2545,7 @@ function hoodieStore (hoodie) {
   function setObject(type, id, object) {
     var key, store;
 
-    key = "" + type + "/" + id;
+    key = '' + type + '/' + id;
     store = $.extend({}, object);
 
     delete store.type;
@@ -2574,7 +2555,7 @@ function hoodieStore (hoodie) {
   function getObject(type, id) {
     var key, obj;
 
-    key = "" + type + "/" + id;
+    key = '' + type + '/' + id;
     var json = db.getItem(key);
 
     if (json) {
@@ -2600,7 +2581,7 @@ function hoodieStore (hoodie) {
 
   //
   function now() {
-    return JSON.stringify(new Date()).replace(/"/g, '');
+    return JSON.stringify(new Date()).replace(/'/g, '');
   }
 
   // only lowercase letters, numbers and dashes are allowed for ids
@@ -2639,17 +2620,17 @@ function hoodieStore (hoodie) {
   // like add:task, change:note:abc4567, remove, etc.
   function triggerEvents(event, object, options) {
     store.trigger(event, object, options);
-    store.trigger("" + event + ":" + object.type, object, options);
+    store.trigger('' + event + ':' + object.type, object, options);
 
     if (event !== 'new') {
-      store.trigger("" + event + ":" + object.type + ":" + object.id, object, options);
+      store.trigger('' + event + ':' + object.type + ':' + object.id, object, options);
     }
 
-    store.trigger("change", event, object, options);
-    store.trigger("change:" + object.type, event, object, options);
+    store.trigger('change', event, object, options);
+    store.trigger('change:' + object.type, event, object, options);
 
     if (event !== 'new') {
-      store.trigger("change:" + object.type + ":" + object.id, event, object, options);
+      store.trigger('change:' + object.type + ':' + object.id, event, object, options);
     }
   }
 
@@ -2885,7 +2866,7 @@ function hoodieAccount (hoodie) {
     // pending request already, return its promise.
     //
     sendAndHandleAuthRequest = function() {
-      return account.request('GET', "/_session").pipe(
+      return account.request('GET', '/_session').pipe(
         handleAuthenticateRequestSuccess,
         handleRequestError
       );
@@ -2900,7 +2881,7 @@ function hoodieAccount (hoodie) {
 
   // uses standard CouchDB API to create a new document in _users db.
   // The backend will automatically create a userDB based on the username
-  // address and approve the account by adding a "confirmed" role to the
+  // address and approve the account by adding a 'confirmed' role to the
   // user doc. The account confirmation might take a while, so we keep trying
   // to sign in with a 300ms timeout.
   //
@@ -2959,7 +2940,7 @@ function hoodieAccount (hoodie) {
   // method can be used. It generates a random password and stores it locally
   // in the browser.
   //
-  // If the user signes up for real later, we "upgrade" his account, meaning we
+  // If the user signes up for real later, we 'upgrade' his account, meaning we
   // change his username and password internally instead of creating another user.
   //
   account.anonymousSignUp = function anonymousSignUp() {
@@ -3018,7 +2999,7 @@ function hoodieAccount (hoodie) {
 
   // uses standard CouchDB API to create a new user session (POST /_session).
   // Besides the standard sign in we also check if the account has been confirmed
-  // (roles include "confirmed" role).
+  // (roles include 'confirmed' role).
   //
   // NOTE: When signing in, all local data gets cleared beforehand (with a signOut).
   //       Otherwise data that has been created beforehand (authenticated with
@@ -3081,7 +3062,7 @@ function hoodieAccount (hoodie) {
   // shortcut for `hoodie.on`
   //
   account.on = function on(eventName, cb) {
-    eventName = eventName.replace(/(^| )([^ ]+)/g, "$1account:$2");
+    eventName = eventName.replace(/(^| )([^ ]+)/g, '$1account:$2');
     return hoodie.on(eventName, cb);
   };
 
@@ -3097,7 +3078,7 @@ function hoodieAccount (hoodie) {
     eventName = arguments[0],
     parameters = 2 <= arguments.length ? Array.prototype.slice.call(arguments, 1) : [];
 
-    hoodie.trigger.apply(hoodie, ["account:" + eventName].concat(Array.prototype.slice.call(parameters)));
+    hoodie.trigger.apply(hoodie, ['account:' + eventName].concat(Array.prototype.slice.call(parameters)));
   };
 
 
@@ -3118,7 +3099,7 @@ function hoodieAccount (hoodie) {
   // return name of db
   //
   account.db = function db() {
-    return "user/" + account.ownerHash;
+    return 'user/' + account.ownerHash;
   };
 
 
@@ -3135,8 +3116,8 @@ function hoodieAccount (hoodie) {
 
     if (!username) {
       return hoodie.rejectWith({
-        error: "unauthenticated",
-        reason: "not logged in"
+        error: 'unauthenticated',
+        reason: 'not logged in'
       });
     }
 
@@ -3163,8 +3144,8 @@ function hoodieAccount (hoodie) {
 
     if (!account.username) {
       return hoodie.rejectWith({
-        error: "unauthenticated",
-        reason: "not logged in"
+        error: 'unauthenticated',
+        reason: 'not logged in'
       });
     }
 
@@ -3196,15 +3177,15 @@ function hoodieAccount (hoodie) {
       return checkPasswordResetStatus();
     }
 
-    resetPasswordId = "" + username + "/" + (hoodie.uuid());
+    resetPasswordId = '' + username + '/' + (hoodie.uuid());
 
     hoodie.config.set('_account.resetPasswordId', resetPasswordId);
 
-    key = "" + userDocPrefix + ":$passwordReset/" + resetPasswordId;
+    key = '' + userDocPrefix + ':$passwordReset/' + resetPasswordId;
 
     data = {
       _id: key,
-      name: "$passwordReset/" + resetPasswordId,
+      name: '$passwordReset/' + resetPasswordId,
       type: 'user',
       roles: [],
       password: resetPasswordId,
@@ -3214,12 +3195,12 @@ function hoodieAccount (hoodie) {
 
     options = {
       data: JSON.stringify(data),
-      contentType: "application/json"
+      contentType: 'application/json'
     };
 
     // TODO: spec that checkPasswordResetStatus gets executed
     return withPreviousRequestsAborted('resetPassword', function() {
-      return account.request('PUT', "/_users/" + (encodeURIComponent(key)), options).pipe(
+      return account.request('PUT', '/_users/' + (encodeURIComponent(key)), options).pipe(
         null, handleRequestError
       ).done(checkPasswordResetStatus);
     });
@@ -3347,7 +3328,7 @@ function hoodieAccount (hoodie) {
     } catch (_error) {
       e = _error;
       error = {
-        error: xhr.responseText || "unknown"
+        error: xhr.responseText || 'unknown'
       };
     }
 
@@ -3360,9 +3341,9 @@ function hoodieAccount (hoodie) {
   // Response looks like:
   //
   //     {
-  //         "ok": true,
-  //         "id": "org.couchdb.user:joe",
-  //         "rev": "1-e8747d9ae9776706da92810b1baa4248"
+  //         'ok': true,
+  //         'id': 'org.couchdb.user:joe',
+  //         'rev': '1-e8747d9ae9776706da92810b1baa4248'
   //     }
   //
   function handleSignUpSucces(username, password) {
@@ -3413,16 +3394,16 @@ function hoodieAccount (hoodie) {
   // Response looks like:
   //
   //     {
-  //         "ok": true,
-  //         "name": "test1",
-  //         "roles": [
-  //             "mvu85hy",
-  //             "confirmed"
+  //         'ok': true,
+  //         'name': 'test1',
+  //         'roles': [
+  //             'mvu85hy',
+  //             'confirmed'
   //         ]
   //     }
   //
-  // we want to turn it into "test1", "mvu85hy" or reject the promise
-  // in case an error occured ("roles" array contains "error")
+  // we want to turn it into 'test1', 'mvu85hy' or reject the promise
+  // in case an error occured ('roles' array contains 'error')
   //
   function handleSignInSuccess(options) {
     options = options || {};
@@ -3435,14 +3416,14 @@ function hoodieAccount (hoodie) {
 
       //
       // if an error occured, the userDB worker stores it to the $error attribute
-      // and adds the "error" role to the users doc object. If the user has the
-      // "error" role, we need to fetch his _users doc to find out what the error
+      // and adds the 'error' role to the users doc object. If the user has the
+      // 'error' role, we need to fetch his _users doc to find out what the error
       // is, before we can reject the promise.
       //
-      if (response.roles.indexOf("error") !== -1) {
+      if (response.roles.indexOf('error') !== -1) {
         account.fetch(username).fail(defer.reject).done(function() {
           return defer.reject({
-            error: "error",
+            error: 'error',
             reason: userDoc.$error
           });
         });
@@ -3451,15 +3432,15 @@ function hoodieAccount (hoodie) {
 
       //
       // When the userDB worker created the database for the user and everthing
-      // worked out, it adds the role "confirmed" to the user. If the role is
+      // worked out, it adds the role 'confirmed' to the user. If the role is
       // not present yet, it might be that the worker didn't pick up the the
       // user doc yet, or there was an error. In this cases, we reject the promise
-      // with an "uncofirmed error"
+      // with an 'uncofirmed error'
       //
-      if (response.roles.indexOf("confirmed") === -1) {
+      if (response.roles.indexOf('confirmed') === -1) {
         return defer.reject({
-          error: "unconfirmed",
-          reason: "account has not been confirmed yet"
+          error: 'unconfirmed',
+          reason: 'account has not been confirmed yet'
         });
       }
 
@@ -3511,18 +3492,18 @@ function hoodieAccount (hoodie) {
 
     if (!resetPasswordId) {
       return hoodie.rejectWith({
-        error: "missing"
+        error: 'missing'
       });
     }
 
     // send request to check status of password reset
-    username = "$passwordReset/" + resetPasswordId;
-    url = "/_users/" + (encodeURIComponent("" + userDocPrefix + ":" + username));
-    hash = btoa("" + username + ":" + resetPasswordId);
+    username = '$passwordReset/' + resetPasswordId;
+    url = '/_users/' + (encodeURIComponent('' + userDocPrefix + ':' + username));
+    hash = btoa('' + username + ':' + resetPasswordId);
 
     options = {
       headers: {
-        Authorization: "Basic " + hash
+        Authorization: 'Basic ' + hash
       }
     };
 
@@ -3632,7 +3613,7 @@ function hoodieAccount (hoodie) {
   //
   // dependend on what kind of error we get, we want to ignore
   // it or not.
-  // When we get a "not_found" it means that the _users doc habe
+  // When we get a 'not_found' it means that the _users doc habe
   // been removed already, so we don't need to do it anymore, but
   // still want to finish the destroy locally, so we return a
   // resolved promise
@@ -3688,7 +3669,7 @@ function hoodieAccount (hoodie) {
     } else {
       type = 'user';
     }
-    return "" + type + "/" + username;
+    return '' + type + '/' + username;
   }
 
 
@@ -3697,14 +3678,14 @@ function hoodieAccount (hoodie) {
   //
   function userDocKey(username) {
     username = username || account.username;
-    return "" + userDocPrefix + ":" + (userTypeAndId(username));
+    return '' + userDocPrefix + ':' + (userTypeAndId(username));
   }
 
   //
   // get URL of my _users doc
   //
   function userDocUrl(username) {
-    return "/_users/" + (encodeURIComponent(userDocKey(username)));
+    return '/_users/' + (encodeURIComponent(userDocKey(username)));
   }
 
 
@@ -3780,7 +3761,7 @@ function hoodieAccount (hoodie) {
   //
   function withPreviousRequestsAborted(name, requestFunction) {
     if (requests[name] !== undefined) {
-      if (typeof requests[name].abort === "function") {
+      if (typeof requests[name].abort === 'function') {
         requests[name].abort();
       }
     }
@@ -3796,7 +3777,7 @@ function hoodieAccount (hoodie) {
   function withSingleRequest(name, requestFunction) {
 
     if (requests[name] !== undefined) {
-      if (typeof requests[name].state === "function") {
+      if (typeof requests[name].state === 'function') {
         if (requests[name].state() === 'pending') {
           return requests[name];
         }
@@ -3946,7 +3927,7 @@ function hoodieRemote (hoodie) {
   //
   remote.push = function push(objects) {
     if (!remote.isConnected()) {
-      var error = new window.ConnectionError("Not connected: could not push local changes to remote");
+      var error = new window.ConnectionError('Not connected: could not push local changes to remote');
       return hoodie.rejectWith(error);
     }
 
@@ -3967,12 +3948,12 @@ function hoodieRemote (hoodie) {
   // namespaced alias for `hoodie.on`
   //
   remote.on = function on(event, cb) {
-    event = event.replace(/(^| )([^ ]+)/g, "$1remote:$2");
+    event = event.replace(/(^| )([^ ]+)/g, '$1remote:$2');
     return hoodie.on(event, cb);
   };
 
   remote.one = function one(event, cb) {
-    event = event.replace(/(^| )([^ ]+)/g, "$1remote:$2");
+    event = event.replace(/(^| )([^ ]+)/g, '$1remote:$2');
     return hoodie.one(event, cb);
   };
 
@@ -3986,7 +3967,7 @@ function hoodieRemote (hoodie) {
     event = arguments[0],
     parameters = 2 <= arguments.length ? Array.prototype.slice.call(arguments, 1) : [];
 
-    return (_ref = hoodie).trigger.apply(_ref, ["remote:" + event].concat(Array.prototype.slice.call(parameters)));
+    return (_ref = hoodie).trigger.apply(_ref, ['remote:' + event].concat(Array.prototype.slice.call(parameters)));
   };
 
 
