@@ -1,83 +1,95 @@
-// describe('#isPromise(object)', function() {
+/* global hoodiePromises:true */
 
-//   it('should return true if object is a promise', function() {
-//     var object = $.Deferred().promise();
-//     expect(this.hoodie.isPromise(object)).to.be.ok();
-//   });
+describe('hoodie promises API', function() {
 
-//   it('should return false for deferred objects', function() {
-//     var object = $.Deferred();
-//     expect(this.hoodie.isPromise(object)).to.not.be.ok();
-//   });
+  beforeEach(function() {
+    this.hoodie = new Mocks.Hoodie();
+    hoodiePromises(this.hoodie);
+  });
 
-//   it('should return false when object is undefined', function() {
-//     expect(this.hoodie.isPromise(void 0)).to.not.be.ok();
-//   });
 
-// });
+  describe('#isPromise(object)', function() {
 
-// describe('#resolve()', function() {
+    it('should return true if object is a promise', function() {
+      var object = $.Deferred().promise();
+      expect(this.hoodie.isPromise(object)).to.be.ok();
+    });
 
-//   it('simply returns resolved promise', function() {
-//     expect(this.hoodie.resolve().state()).to.eql('resolved');
-//   });
+    it('should return false for deferred objects', function() {
+      var object = $.Deferred();
+      expect(this.hoodie.isPromise(object)).to.not.be.ok();
+    });
 
-//   it('should be applyable', function() {
-//     var promise = this.hoodie.reject().then(null, this.hoodie.resolve);
-//     expect(promise.state()).to.eql('resolved');
-//   });
+    it('should return false when object is undefined', function() {
+      expect(this.hoodie.isPromise(void 0)).to.not.be.ok();
+    });
 
-// });
+  });
 
-// describe('#reject()', function() {
+  describe('#resolve()', function() {
 
-//   it('simply returns rejected promise', function() {
-//     expect(this.hoodie.reject().state()).to.eql('rejected');
-//   });
+    it('simply returns resolved promise', function() {
+      expect(this.hoodie.resolve().state()).to.eql('resolved');
+    });
 
-//   it('should be applyable', function() {
-//     var promise = this.hoodie.resolve().then(this.hoodie.reject);
-//     expect(promise.state()).to.eql('rejected');
-//   });
+    it('should be applyable', function() {
+      var promise = this.hoodie.reject().then(null, this.hoodie.resolve);
+      expect(promise.state()).to.eql('resolved');
+    });
 
-// });
+  });
 
-// describe('#resolveWith(something)', function() {
+  describe('#reject()', function() {
 
-//   it('wraps passad arguments into a promise and returns it', function() {
-//     var promise = this.hoodie.resolveWith('funky', 'fresh');
+    it('simply returns rejected promise', function() {
+      expect(this.hoodie.reject().state()).to.eql('rejected');
+    });
 
-//     promise.then(function (a, b) {
-//       expect(a, b).to.eql('funky', 'fresh');
-//     });
+    it('should be applyable', function() {
+      var promise = this.hoodie.resolve().then(this.hoodie.reject);
+      expect(promise.state()).to.eql('rejected');
+    });
 
-//   });
+  });
 
-//   it('should be applyable', function() {
-//     var promise = this.hoodie.rejectWith(1, 2).then(null, this.hoodie.resolveWith);
-//     promise.then(function (a, b) {
-//       expect(a, b).to.eql('1', '2');
-//     });
-//   });
+  describe('#resolveWith(something)', function() {
 
-// });
+    it('wraps passad arguments into a promise and returns it', function() {
+      var promise = this.hoodie.resolveWith('funky', 'fresh');
 
-// describe('#rejectWith(something)', function() {
+      promise.then(function (a, b) {
+        expect(a, b).to.eql('funky', 'fresh');
+      });
 
-//   it('wraps passad arguments into a promise and returns it', function() {
-//     var promise = this.hoodie.rejectWith('funky', 'fresh');
+    });
 
-//     promise.then(this.noop, function (a, b) {
-//       expect(a, b).to.eql('funky', 'fresh');
-//     });
+    it('should be applyable', function() {
+      var promise = this.hoodie.rejectWith(1, 2).then(null, this.hoodie.resolveWith);
+      promise.then(function (a, b) {
+        expect(a, b).to.eql('1', '2');
+      });
+    });
 
-//   });
+  });
 
-//   it('should be applyable', function() {
-//     var promise = this.hoodie.resolveWith(1, 2).then(this.hoodie.rejectWith);
-//     promise.then(this.noop, function (a, b) {
-//       expect(a, b).to.eql('1', '2');
-//     });
-//   });
+  describe('#rejectWith(something)', function() {
 
-// });
+    it('wraps passad arguments into a promise and returns it', function() {
+      var promise = this.hoodie.rejectWith('funky', 'fresh');
+
+      promise.then(this.noop, function (a, b) {
+        expect(a, b).to.eql('funky', 'fresh');
+      });
+
+    });
+
+    it('should be applyable', function() {
+      var promise = this.hoodie.resolveWith(1, 2).then(this.hoodie.rejectWith);
+      promise.then(this.noop, function (a, b) {
+        expect(a, b).to.eql('1', '2');
+      });
+    });
+
+  });
+
+});
