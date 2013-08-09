@@ -86,11 +86,11 @@ function hoodieRemoteBase (hoodie, options) {
     options = options || {};
 
     if (remote.name) {
-      path = "/" + (encodeURIComponent(remote.name)) + path;
+      path = '/' + (encodeURIComponent(remote.name)) + path;
     }
 
     if (remote.baseUrl) {
-      path = "" + remote.baseUrl + path;
+      path = '' + remote.baseUrl + path;
     }
 
     options.contentType = options.contentType || 'application/json';
@@ -111,7 +111,7 @@ function hoodieRemoteBase (hoodie, options) {
   //
   remote.get = function get() {
     return console.log.apply(
-      console, [".get() not yet implemented"]
+      console, ['.get() not yet implemented']
       .concat(Array.prototype.slice.call(arguments))
     );
   };
@@ -124,7 +124,7 @@ function hoodieRemoteBase (hoodie, options) {
   //
   remote.post = function post() {
     return console.log.apply(
-      console, [".post() not yet implemented"]
+      console, ['.post() not yet implemented']
       .concat(Array.prototype.slice.call(arguments))
     );
   };
@@ -147,15 +147,15 @@ function hoodieRemoteBase (hoodie, options) {
       return defer;
     }
 
-    path = "" + type + "/" + id;
+    path = '' + type + '/' + id;
 
     if (remote.prefix) {
       path = remote.prefix + path;
     }
 
-    path = "/" + encodeURIComponent(path);
+    path = '/' + encodeURIComponent(path);
 
-    return remote.request("GET", path).pipe(parseFromRemote);
+    return remote.request('GET', path).pipe(parseFromRemote);
   };
 
 
@@ -173,14 +173,14 @@ function hoodieRemoteBase (hoodie, options) {
       return defer;
     }
 
-    path = "/_all_docs?include_docs=true";
+    path = '/_all_docs?include_docs=true';
 
     switch (true) {
     case (type !== undefined) && remote.prefix !== '':
-      startkey = "" + remote.prefix + type + "/";
+      startkey = '' + remote.prefix + type + '/';
       break;
     case type !== undefined:
-      startkey = "" + type + "/";
+      startkey = '' + type + '/';
       break;
     case remote.prefix !== '':
       startkey = remote.prefix;
@@ -198,9 +198,9 @@ function hoodieRemoteBase (hoodie, options) {
         charCode = chars.charCodeAt(0);
         return String.fromCharCode(charCode + 1);
       });
-      path = "" + path + "&startkey=\"" + (encodeURIComponent(startkey)) + "\"&endkey=\"" + (encodeURIComponent(endkey)) + "\"";
+      path = '' + path + '&startkey=\'' + (encodeURIComponent(startkey)) + '\'&endkey=\'' + (encodeURIComponent(endkey)) + '\'';
     }
-    return remote.request("GET", path).pipe(mapDocsFromFindAll).pipe(parseAllFromRemote);
+    return remote.request('GET', path).pipe(mapDocsFromFindAll).pipe(parseAllFromRemote);
   };
 
 
@@ -224,8 +224,8 @@ function hoodieRemoteBase (hoodie, options) {
       id: id
     }, object);
     object = parseForRemote(object);
-    path = "/" + encodeURIComponent(object._id);
-    return remote.request("PUT", path, {
+    path = '/' + encodeURIComponent(object._id);
+    return remote.request('PUT', path, {
       data: object
     });
   };
@@ -261,7 +261,7 @@ function hoodieRemoteBase (hoodie, options) {
   // determine between a known and a new object
   //
   remote.isKnownObject = function isKnownObject(object) {
-    var key = "" + object.type + "/" + object.id;
+    var key = '' + object.type + '/' + object.id;
 
     if (knownObjects[key] !== undefined) {
       return knownObjects[key];
@@ -275,7 +275,7 @@ function hoodieRemoteBase (hoodie, options) {
   // determine between a known and a new object
   //
   remote.markAsKnownObject = function markAsKnownObject(object) {
-    var key = "" + object.type + "/" + object.id;
+    var key = '' + object.type + '/' + object.id;
     knownObjects[key] = 1;
     return knownObjects[key];
   };
@@ -400,7 +400,7 @@ function hoodieRemoteBase (hoodie, options) {
       object = parseForRemote(object);
       objectsForRemote.push(object);
     }
-    pushRequest = remote.request('POST', "/_bulk_docs", {
+    pushRequest = remote.request('POST', '/_bulk_docs', {
       data: {
         docs: objectsForRemote,
         new_edits: false
@@ -426,12 +426,12 @@ function hoodieRemoteBase (hoodie, options) {
   // namespaced alias for `hoodie.on`
   //
   remote.on = function on(event, cb) {
-    event = event.replace(/(^| )([^ ]+)/g, "$1" + remote.name + ":$2");
+    event = event.replace(/(^| )([^ ]+)/g, '$1' + remote.name + ':$2');
     return hoodie.on(event, cb);
   };
 
   remote.one = function one(event, cb) {
-    event = event.replace(/(^| )([^ ]+)/g, "$1" + remote.name + ":$2");
+    event = event.replace(/(^| )([^ ]+)/g, '$1' + remote.name + ':$2');
     return hoodie.one(event, cb);
   };
 
@@ -442,7 +442,7 @@ function hoodieRemoteBase (hoodie, options) {
     var event, parameters, _ref;
     event = arguments[0],
     parameters = 2 <= arguments.length ? Array.prototype.slice.call(arguments, 1) : [];
-    return (_ref = hoodie).trigger.apply(_ref, ["" + remote.name + ":" + event].concat(Array.prototype.slice.call(parameters)));
+    return (_ref = hoodie).trigger.apply(_ref, ['' + remote.name + ':' + event].concat(Array.prototype.slice.call(parameters)));
   };
 
   //
@@ -486,9 +486,9 @@ function hoodieRemoteBase (hoodie, options) {
     }
 
     // prepare CouchDB id
-    properties._id = "" + properties.type + "/" + properties.id;
+    properties._id = '' + properties.type + '/' + properties.id;
     if (remote.prefix) {
-      properties._id = "" + remote.prefix + properties._id;
+      properties._id = '' + remote.prefix + properties._id;
     }
     delete properties.id;
     return properties;
@@ -515,7 +515,7 @@ function hoodieRemoteBase (hoodie, options) {
 
     // turn doc/123 into type = doc & id = 123
     // NOTE: we don't use a simple id.split(/\//) here,
-    // as in some cases IDs might contain "/", too
+    // as in some cases IDs might contain '/', too
     //
     _ref = id.match(/([^\/]+)\/(.*)/),
     ignore = _ref[0],
@@ -553,10 +553,10 @@ function hoodieRemoteBase (hoodie, options) {
     // local changes are not meant to be replicated outside of the
     // users database, therefore the `-local` suffix.
     if (attributes._$local) {
-      newRevisionId += "-local";
+      newRevisionId += '-local';
     }
 
-    attributes._rev = "" + (currentRevNr + 1) + "-" + newRevisionId;
+    attributes._rev = '' + (currentRevNr + 1) + '-' + newRevisionId;
     attributes._revisions = {
       start: 1,
       ids: [newRevisionId]
@@ -595,9 +595,9 @@ function hoodieRemoteBase (hoodie, options) {
     var since;
     since = remote.getSinceNr();
     if (remote.isConnected()) {
-      return "/_changes?include_docs=true&since=" + since + "&heartbeat=10000&feed=longpoll";
+      return '/_changes?include_docs=true&since=' + since + '&heartbeat=10000&feed=longpoll';
     } else {
-      return "/_changes?include_docs=true&since=" + since;
+      return '/_changes?include_docs=true&since=' + since;
     }
   }
 
@@ -718,12 +718,12 @@ function hoodieRemoteBase (hoodie, options) {
         }
       }
 
-      remote.trigger("" + event, object);
-      remote.trigger("" + event + ":" + object.type, object);
-      remote.trigger("" + event + ":" + object.type + ":" + object.id, object);
-      remote.trigger("change", event, object);
-      remote.trigger("change:" + object.type, event, object);
-      remote.trigger("change:" + object.type + ":" + object.id, event, object);
+      remote.trigger('' + event, object);
+      remote.trigger('' + event + ':' + object.type, object);
+      remote.trigger('' + event + ':' + object.type + ':' + object.id, object);
+      remote.trigger('change', event, object);
+      remote.trigger('change:' + object.type, event, object);
+      remote.trigger('change:' + object.type + ':' + object.id, event, object);
     }
   }
 

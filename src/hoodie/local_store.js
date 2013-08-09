@@ -311,7 +311,7 @@ function hoodieStore (hoodie) {
       return enqueue('remove', arguments);
     }
 
-    key = "" + type + "/" + id;
+    key = '' + type + '/' + id;
 
     // if change comes from remote, just clean up locally
     if (options.remote) {
@@ -334,13 +334,13 @@ function hoodieStore (hoodie) {
       object._deleted = true;
       store.cache(type, id, object);
     } else {
-      key = "" + type + "/" + id;
+      key = '' + type + '/' + id;
       db.removeItem(key);
       cached[key] = false;
       store.clearChanged(type, id);
     }
 
-    triggerEvents("remove", object, options);
+    triggerEvents('remove', object, options);
 
     promise = defer.resolve(object).promise();
 
@@ -399,7 +399,7 @@ function hoodieStore (hoodie) {
     }
 
     options = options || {};
-    key = "" + type + "/" + id;
+    key = '' + type + '/' + id;
 
     if (object) {
       $.extend(object, {
@@ -473,7 +473,7 @@ function hoodieStore (hoodie) {
   store.clearChanged = function clearChanged(type, id) {
     var key;
     if (type && id) {
-      key = "" + type + "/" + id;
+      key = '' + type + '/' + id;
       delete dirty[key];
     } else {
       dirty = {};
@@ -502,7 +502,7 @@ function hoodieStore (hoodie) {
     var key;
 
     options = options || {};
-    key = "" + type + "/" + id;
+    key = '' + type + '/' + id;
 
     dirty[key] = object;
     saveDirtyIds();
@@ -527,7 +527,7 @@ function hoodieStore (hoodie) {
 
       for (_i = 0, _len = objects.length; _i < _len; _i++) {
         object = objects[_i];
-        key = "" + object.type + "/" + object.id;
+        key = '' + object.type + '/' + object.id;
         dirty[key] = object;
       }
 
@@ -604,7 +604,7 @@ function hoodieStore (hoodie) {
       cached = {};
       store.clearChanged();
       defer.resolve();
-      store.trigger("clear");
+      store.trigger('clear');
     } catch (_error) {
       defer.reject(_error);
     }
@@ -623,7 +623,7 @@ function hoodieStore (hoodie) {
     var eventName, parameters, _ref;
     eventName = arguments[0],
     parameters = 2 <= arguments.length ? Array.prototype.slice.call(arguments, 1) : [];
-    return (_ref = hoodie).trigger.apply(_ref, ["store:" + eventName].concat(Array.prototype.slice.call(parameters)));
+    return (_ref = hoodie).trigger.apply(_ref, ['store:' + eventName].concat(Array.prototype.slice.call(parameters)));
   };
 
 
@@ -632,7 +632,7 @@ function hoodieStore (hoodie) {
 
   // proxies to hoodie.on
   store.on = function on(eventName, data) {
-    eventName = eventName.replace(/(^| )([^ ]+)/g, "$1store:$2");
+    eventName = eventName.replace(/(^| )([^ ]+)/g, '$1store:$2');
     return hoodie.on(eventName, data);
   };
 
@@ -687,10 +687,10 @@ function hoodieStore (hoodie) {
 
       // Just because localStorage exists does not mean it works. In particular it might be disabled
       // as it is when Safari's private browsing mode is active.
-      localStorage.setItem('Storage-Test', "1");
+      localStorage.setItem('Storage-Test', '1');
 
       // that should not happen ...
-      if (localStorage.getItem('Storage-Test') !== "1") {
+      if (localStorage.getItem('Storage-Test') !== '1') {
         return false;
       }
 
@@ -795,7 +795,7 @@ function hoodieStore (hoodie) {
   function setObject(type, id, object) {
     var key, store;
 
-    key = "" + type + "/" + id;
+    key = '' + type + '/' + id;
     store = $.extend({}, object);
 
     delete store.type;
@@ -805,7 +805,7 @@ function hoodieStore (hoodie) {
   function getObject(type, id) {
     var key, obj;
 
-    key = "" + type + "/" + id;
+    key = '' + type + '/' + id;
     var json = db.getItem(key);
 
     if (json) {
@@ -831,7 +831,7 @@ function hoodieStore (hoodie) {
 
   //
   function now() {
-    return JSON.stringify(new Date()).replace(/"/g, '');
+    return JSON.stringify(new Date()).replace(/'/g, '');
   }
 
   // only lowercase letters, numbers and dashes are allowed for ids
@@ -870,17 +870,17 @@ function hoodieStore (hoodie) {
   // like add:task, change:note:abc4567, remove, etc.
   function triggerEvents(event, object, options) {
     store.trigger(event, object, options);
-    store.trigger("" + event + ":" + object.type, object, options);
+    store.trigger('' + event + ':' + object.type, object, options);
 
     if (event !== 'new') {
-      store.trigger("" + event + ":" + object.type + ":" + object.id, object, options);
+      store.trigger('' + event + ':' + object.type + ':' + object.id, object, options);
     }
 
-    store.trigger("change", event, object, options);
-    store.trigger("change:" + object.type, event, object, options);
+    store.trigger('change', event, object, options);
+    store.trigger('change:' + object.type, event, object, options);
 
     if (event !== 'new') {
-      store.trigger("change:" + object.type + ":" + object.id, event, object, options);
+      store.trigger('change:' + object.type + ':' + object.id, event, object, options);
     }
   }
 

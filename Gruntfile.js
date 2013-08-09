@@ -63,11 +63,11 @@ module.exports = function(grunt) {
 
     groc: {
       javascript: [
-        "src/**/*.js"
+        'src/**/*.js'
       ],
       options: {
-        "out": "doc/",
-        "whitespace-after-token": false
+        'out': 'doc/',
+        'whitespace-after-token': false
       }
     },
 

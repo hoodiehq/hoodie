@@ -75,7 +75,7 @@ function hoodieRemote (hoodie) {
   //
   remote.push = function push(objects) {
     if (!remote.isConnected()) {
-      var error = new window.ConnectionError("Not connected: could not push local changes to remote");
+      var error = new window.ConnectionError('Not connected: could not push local changes to remote');
       return hoodie.rejectWith(error);
     }
 
@@ -96,12 +96,12 @@ function hoodieRemote (hoodie) {
   // namespaced alias for `hoodie.on`
   //
   remote.on = function on(event, cb) {
-    event = event.replace(/(^| )([^ ]+)/g, "$1remote:$2");
+    event = event.replace(/(^| )([^ ]+)/g, '$1remote:$2');
     return hoodie.on(event, cb);
   };
 
   remote.one = function one(event, cb) {
-    event = event.replace(/(^| )([^ ]+)/g, "$1remote:$2");
+    event = event.replace(/(^| )([^ ]+)/g, '$1remote:$2');
     return hoodie.one(event, cb);
   };
 
@@ -115,7 +115,7 @@ function hoodieRemote (hoodie) {
     event = arguments[0],
     parameters = 2 <= arguments.length ? Array.prototype.slice.call(arguments, 1) : [];
 
-    return (_ref = hoodie).trigger.apply(_ref, ["remote:" + event].concat(Array.prototype.slice.call(parameters)));
+    return (_ref = hoodie).trigger.apply(_ref, ['remote:' + event].concat(Array.prototype.slice.call(parameters)));
   };
 
 

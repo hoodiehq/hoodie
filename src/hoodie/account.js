@@ -68,7 +68,7 @@ function hoodieAccount (hoodie) {
     // pending request already, return its promise.
     //
     sendAndHandleAuthRequest = function() {
-      return account.request('GET', "/_session").pipe(
+      return account.request('GET', '/_session').pipe(
         handleAuthenticateRequestSuccess,
         handleRequestError
       );
@@ -83,7 +83,7 @@ function hoodieAccount (hoodie) {
 
   // uses standard CouchDB API to create a new document in _users db.
   // The backend will automatically create a userDB based on the username
-  // address and approve the account by adding a "confirmed" role to the
+  // address and approve the account by adding a 'confirmed' role to the
   // user doc. The account confirmation might take a while, so we keep trying
   // to sign in with a 300ms timeout.
   //
@@ -142,7 +142,7 @@ function hoodieAccount (hoodie) {
   // method can be used. It generates a random password and stores it locally
   // in the browser.
   //
-  // If the user signes up for real later, we "upgrade" his account, meaning we
+  // If the user signes up for real later, we 'upgrade' his account, meaning we
   // change his username and password internally instead of creating another user.
   //
   account.anonymousSignUp = function anonymousSignUp() {
@@ -201,7 +201,7 @@ function hoodieAccount (hoodie) {
 
   // uses standard CouchDB API to create a new user session (POST /_session).
   // Besides the standard sign in we also check if the account has been confirmed
-  // (roles include "confirmed" role).
+  // (roles include 'confirmed' role).
   //
   // NOTE: When signing in, all local data gets cleared beforehand (with a signOut).
   //       Otherwise data that has been created beforehand (authenticated with
@@ -264,7 +264,7 @@ function hoodieAccount (hoodie) {
   // shortcut for `hoodie.on`
   //
   account.on = function on(eventName, cb) {
-    eventName = eventName.replace(/(^| )([^ ]+)/g, "$1account:$2");
+    eventName = eventName.replace(/(^| )([^ ]+)/g, '$1account:$2');
     return hoodie.on(eventName, cb);
   };
 
@@ -280,7 +280,7 @@ function hoodieAccount (hoodie) {
     eventName = arguments[0],
     parameters = 2 <= arguments.length ? Array.prototype.slice.call(arguments, 1) : [];
 
-    hoodie.trigger.apply(hoodie, ["account:" + eventName].concat(Array.prototype.slice.call(parameters)));
+    hoodie.trigger.apply(hoodie, ['account:' + eventName].concat(Array.prototype.slice.call(parameters)));
   };
 
 
@@ -301,7 +301,7 @@ function hoodieAccount (hoodie) {
   // return name of db
   //
   account.db = function db() {
-    return "user/" + account.ownerHash;
+    return 'user/' + account.ownerHash;
   };
 
 
@@ -318,8 +318,8 @@ function hoodieAccount (hoodie) {
 
     if (!username) {
       return hoodie.rejectWith({
-        error: "unauthenticated",
-        reason: "not logged in"
+        error: 'unauthenticated',
+        reason: 'not logged in'
       });
     }
 
@@ -346,8 +346,8 @@ function hoodieAccount (hoodie) {
 
     if (!account.username) {
       return hoodie.rejectWith({
-        error: "unauthenticated",
-        reason: "not logged in"
+        error: 'unauthenticated',
+        reason: 'not logged in'
       });
     }
 
@@ -379,15 +379,15 @@ function hoodieAccount (hoodie) {
       return checkPasswordResetStatus();
     }
 
-    resetPasswordId = "" + username + "/" + (hoodie.uuid());
+    resetPasswordId = '' + username + '/' + (hoodie.uuid());
 
     hoodie.config.set('_account.resetPasswordId', resetPasswordId);
 
-    key = "" + userDocPrefix + ":$passwordReset/" + resetPasswordId;
+    key = '' + userDocPrefix + ':$passwordReset/' + resetPasswordId;
 
     data = {
       _id: key,
-      name: "$passwordReset/" + resetPasswordId,
+      name: '$passwordReset/' + resetPasswordId,
       type: 'user',
       roles: [],
       password: resetPasswordId,
@@ -397,12 +397,12 @@ function hoodieAccount (hoodie) {
 
     options = {
       data: JSON.stringify(data),
-      contentType: "application/json"
+      contentType: 'application/json'
     };
 
     // TODO: spec that checkPasswordResetStatus gets executed
     return withPreviousRequestsAborted('resetPassword', function() {
-      return account.request('PUT', "/_users/" + (encodeURIComponent(key)), options).pipe(
+      return account.request('PUT', '/_users/' + (encodeURIComponent(key)), options).pipe(
         null, handleRequestError
       ).done(checkPasswordResetStatus);
     });
@@ -530,7 +530,7 @@ function hoodieAccount (hoodie) {
     } catch (_error) {
       e = _error;
       error = {
-        error: xhr.responseText || "unknown"
+        error: xhr.responseText || 'unknown'
       };
     }
 
@@ -543,9 +543,9 @@ function hoodieAccount (hoodie) {
   // Response looks like:
   //
   //     {
-  //         "ok": true,
-  //         "id": "org.couchdb.user:joe",
-  //         "rev": "1-e8747d9ae9776706da92810b1baa4248"
+  //         'ok': true,
+  //         'id': 'org.couchdb.user:joe',
+  //         'rev': '1-e8747d9ae9776706da92810b1baa4248'
   //     }
   //
   function handleSignUpSucces(username, password) {
@@ -596,16 +596,16 @@ function hoodieAccount (hoodie) {
   // Response looks like:
   //
   //     {
-  //         "ok": true,
-  //         "name": "test1",
-  //         "roles": [
-  //             "mvu85hy",
-  //             "confirmed"
+  //         'ok': true,
+  //         'name': 'test1',
+  //         'roles': [
+  //             'mvu85hy',
+  //             'confirmed'
   //         ]
   //     }
   //
-  // we want to turn it into "test1", "mvu85hy" or reject the promise
-  // in case an error occured ("roles" array contains "error")
+  // we want to turn it into 'test1', 'mvu85hy' or reject the promise
+  // in case an error occured ('roles' array contains 'error')
   //
   function handleSignInSuccess(options) {
     options = options || {};
@@ -618,14 +618,14 @@ function hoodieAccount (hoodie) {
 
       //
       // if an error occured, the userDB worker stores it to the $error attribute
-      // and adds the "error" role to the users doc object. If the user has the
-      // "error" role, we need to fetch his _users doc to find out what the error
+      // and adds the 'error' role to the users doc object. If the user has the
+      // 'error' role, we need to fetch his _users doc to find out what the error
       // is, before we can reject the promise.
       //
-      if (response.roles.indexOf("error") !== -1) {
+      if (response.roles.indexOf('error') !== -1) {
         account.fetch(username).fail(defer.reject).done(function() {
           return defer.reject({
-            error: "error",
+            error: 'error',
             reason: userDoc.$error
           });
         });
@@ -634,15 +634,15 @@ function hoodieAccount (hoodie) {
 
       //
       // When the userDB worker created the database for the user and everthing
-      // worked out, it adds the role "confirmed" to the user. If the role is
+      // worked out, it adds the role 'confirmed' to the user. If the role is
       // not present yet, it might be that the worker didn't pick up the the
       // user doc yet, or there was an error. In this cases, we reject the promise
-      // with an "uncofirmed error"
+      // with an 'uncofirmed error'
       //
-      if (response.roles.indexOf("confirmed") === -1) {
+      if (response.roles.indexOf('confirmed') === -1) {
         return defer.reject({
-          error: "unconfirmed",
-          reason: "account has not been confirmed yet"
+          error: 'unconfirmed',
+          reason: 'account has not been confirmed yet'
         });
       }
 
@@ -694,18 +694,18 @@ function hoodieAccount (hoodie) {
 
     if (!resetPasswordId) {
       return hoodie.rejectWith({
-        error: "missing"
+        error: 'missing'
       });
     }
 
     // send request to check status of password reset
-    username = "$passwordReset/" + resetPasswordId;
-    url = "/_users/" + (encodeURIComponent("" + userDocPrefix + ":" + username));
-    hash = btoa("" + username + ":" + resetPasswordId);
+    username = '$passwordReset/' + resetPasswordId;
+    url = '/_users/' + (encodeURIComponent('' + userDocPrefix + ':' + username));
+    hash = btoa('' + username + ':' + resetPasswordId);
 
     options = {
       headers: {
-        Authorization: "Basic " + hash
+        Authorization: 'Basic ' + hash
       }
     };
 
@@ -815,7 +815,7 @@ function hoodieAccount (hoodie) {
   //
   // dependend on what kind of error we get, we want to ignore
   // it or not.
-  // When we get a "not_found" it means that the _users doc habe
+  // When we get a 'not_found' it means that the _users doc habe
   // been removed already, so we don't need to do it anymore, but
   // still want to finish the destroy locally, so we return a
   // resolved promise
@@ -871,7 +871,7 @@ function hoodieAccount (hoodie) {
     } else {
       type = 'user';
     }
-    return "" + type + "/" + username;
+    return '' + type + '/' + username;
   }
 
 
@@ -880,14 +880,14 @@ function hoodieAccount (hoodie) {
   //
   function userDocKey(username) {
     username = username || account.username;
-    return "" + userDocPrefix + ":" + (userTypeAndId(username));
+    return '' + userDocPrefix + ':' + (userTypeAndId(username));
   }
 
   //
   // get URL of my _users doc
   //
   function userDocUrl(username) {
-    return "/_users/" + (encodeURIComponent(userDocKey(username)));
+    return '/_users/' + (encodeURIComponent(userDocKey(username)));
   }
 
 
@@ -963,7 +963,7 @@ function hoodieAccount (hoodie) {
   //
   function withPreviousRequestsAborted(name, requestFunction) {
     if (requests[name] !== undefined) {
-      if (typeof requests[name].abort === "function") {
+      if (typeof requests[name].abort === 'function') {
         requests[name].abort();
       }
     }
@@ -979,7 +979,7 @@ function hoodieAccount (hoodie) {
   function withSingleRequest(name, requestFunction) {
 
     if (requests[name] !== undefined) {
-      if (typeof requests[name].state === "function") {
+      if (typeof requests[name].state === 'function') {
         if (requests[name].state() === 'pending') {
           return requests[name];
         }

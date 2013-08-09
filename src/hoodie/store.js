@@ -37,7 +37,7 @@ function hoodieStoreBase(hoodie) {
       defer = hoodie.defer();
 
       if (typeof object !== 'object' || Array.isArray(object)) {
-        defer.reject(Hoodie.Errors.INVALID_ARGUMENTS("invalid object"));
+        defer.reject(Hoodie.Errors.INVALID_ARGUMENTS('invalid object'));
         return defer.promise();
       }
 
@@ -212,7 +212,7 @@ function hoodieStoreBase(hoodie) {
       var defer;
       defer = hoodie.defer();
       if (!(typeof type === 'string' && typeof id === 'string')) {
-        return defer.reject(Hoodie.Errors.INVALID_ARGUMENTS("type & id are required")).promise();
+        return defer.reject(Hoodie.Errors.INVALID_ARGUMENTS('type & id are required')).promise();
       }
       return defer;
     },
@@ -273,7 +273,7 @@ function hoodieStoreBase(hoodie) {
       defer = hoodie.defer();
 
       if (!(typeof type === 'string' && typeof id === 'string')) {
-        return defer.reject(Hoodie.Errors.INVALID_ARGUMENTS("type & id are required")).promise();
+        return defer.reject(Hoodie.Errors.INVALID_ARGUMENTS('type & id are required')).promise();
       }
 
       return defer;

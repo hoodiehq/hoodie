@@ -23,12 +23,14 @@
 
     // enforce initialization with `new`
     if (! (hoodie instanceof Hoodie)) {
-      throw new Error("usage: new Hoodie(url);");
+      throw new Error('usage: new Hoodie(url);');
     }
 
-    hoodie.baseUrl = baseUrl ? // if baseUrl passed
-      baseUrl.replace(/\/+$/, '') // remove trailing slash(es)
-      : "/_api"; // otherwise default to current domain
+    if (hoodie.baseUrl !== baseUrl) {
+      '/_api'; // default to current domain
+    } else {
+      baseUrl.replace(/\/+$/, ''); // remove trailing slash(es)
+    }
 
 
     // hoodie.extend
@@ -118,7 +120,7 @@
   };
 
   //
-  //
+  // detect available extensions and attach to Hoodie Object.
   //
   function applyExtensions(hoodie) {
     for (var i = 0; i < extensions.length; i++) {
@@ -129,7 +131,7 @@
   //
   // expose Hoodie to module loaders. Based on jQuery's implementation.
   //
-  if ( typeof module === "object" && module && typeof module.exports === "object" ) {
+  if ( typeof module === 'object' && module && typeof module.exports === 'object' ) {
 
     // Expose Hoodie as module.exports in loaders that implement the Node
     // module pattern (including browserify). Do not create the global, since
@@ -138,7 +140,7 @@
     module.exports = Hoodie;
 
 
-  } else if ( typeof define === "function" && define.amd ) {
+  } else if ( typeof define === 'function' && define.amd ) {
 
     // Register as a named AMD module, since Hoodie can be concatenated with other
     // files that may use define, but not via a proper concatenation script that
@@ -146,7 +148,7 @@
     // way to register. Lowercase hoodie is used because AMD module names are
     // derived from file names, and Hoodie is normally delivered in a lowercase
     // file name.
-    define( "hoodie", [], function () {
+    define( 'hoodie', [], function () {
       return Hoodie;
     } );
   } else {

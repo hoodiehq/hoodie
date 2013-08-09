@@ -24,7 +24,7 @@ function hoodieRequest(hoodie) {
 
     // if a relative path passed, prefix with @baseUrl
     if (!/^http/.test(url)) {
-      url = "" + hoodie.baseUrl + url;
+      url = '' + hoodie.baseUrl + url;
     }
 
     defaults = {
@@ -60,7 +60,7 @@ function hoodieRequest(hoodie) {
       error = JSON.parse(xhr.responseText);
     } catch (_error) {
       error = {
-        error: xhr.responseText || ("Cannot connect to Hoodie server at " + hoodie.baseUrl)
+        error: xhr.responseText || ('Cannot connect to Hoodie server at ' + hoodie.baseUrl)
       };
     }
 
