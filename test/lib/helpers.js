@@ -38,62 +38,71 @@ after(function () {
 });
 
 
-//jasmine.Matchers.prototype.toBePromise = function() {
-  //return this.actual.done && !this.actual.resolve;
-//};
+// expect.js helpers
+expect.Assertion.prototype.calledWith = function() {
+  var args = Array.prototype.slice.call(arguments);
+  var hit = false
 
-//jasmine.Matchers.prototype.toBeDefer = function() {
-  //return this.actual.done && this.actual.resolve;
-//};
+  for (var i = 0; i < this.obj.args.length; i++) {
+    if (expect.eql(this.obj.args[i], args)) {
+      hit = true
+    }
+  };
 
-//jasmine.Matchers.prototype.toBeRejected = function() {
-  //return this.actual.state() === 'rejected';
-//};
+  this.assert(
+      hit
+    , function(){ return 'expected to be called with ' + JSON.stringify(args) + ', calls where: ' + JSON.stringify(this.obj.args)}
+    , function(){ return 'expected to not be called with ' + JSON.stringify(args) });
+  return this
+};
 
-//jasmine.Matchers.prototype.toBeResolved = function() {
-  //return this.actual.state() === 'resolved';
-//};
+expect.Assertion.prototype.promise = function () {
+  var isPromise = (typeof this.obj.done === 'function' && this.obj.resolve === undefined);
+  this.assert(
+      isPromise
+    , function(){ return 'expected promise'});
+  return this;
+};
 
-//jasmine.Matchers.prototype.notToBeRejected = function() {
-  //return this.actual.state() !== 'rejected';
-//};
+expect.Assertion.prototype.resolved = function () {
+  this.assert(
+      expect.eql(this.obj.state(), 'resolved')
+    , function(){ return 'expected to be resolved'});
+  return this;
+};
 
-//jasmine.Matchers.prototype.notToBeResolved = function() {
-  //return this.actual.state() !== 'resolved';
-//};
+expect.Assertion.prototype.resolvedWith = function (obj) {
+  var resolvedWith;
+  this.obj.done( function() { resolvedWith = Array.prototype.slice.call(arguments) });
 
-//jasmine.Matchers.prototype.toBeResolvedWith = function() {
-  //var done, expectedArgs;
-  //expectedArgs = jasmine.util.argsToArray(arguments);
-  //if (!this.actual.done) {
-    //throw new Error('Expected a promise, but got ' + jasmine.pp(this.actual) + '.');
-  //}
-  //done = jasmine.createSpy('done');
-  //this.actual.done(done);
-  //this.message = function() {
-    //if (done.callCount === 0) {
-      //return ["Expected spy " + done.identity + " to have been resolved with " + jasmine.pp(expectedArgs) + " but it was never resolved.", "Expected spy " + done.identity + " not to have been resolved with " + jasmine.pp(expectedArgs) + " but it was."];
-    //} else {
-      //return ["Expected spy " + done.identity + " to have been resolved with " + jasmine.pp(expectedArgs) + " but was resolved with " + jasmine.pp(done.argsForCall), "Expected spy " + done.identity + " not to have been resolved with " + jasmine.pp(expectedArgs) + " but was resolved with " + jasmine.pp(done.argsForCall)];
-    //}
-  //};
-  //return this.env.contains_(done.argsForCall, expectedArgs);
-//};
+  this.assert(
+      expect.eql(obj, resolvedWith)
+    , function(){ return 'expected to resolve with ' + JSON.stringify(obj) + ', was: ' + JSON.stringify(resolvedWith)}
+    , function(){ return 'expected to not resolve with ' + JSON.stringify(obj) + ', was: ' + JSON.stringify(resolvedWith)});
+  return this;
+};
 
-//jasmine.Matchers.prototype.toBeRejectedWith = function() {
-  //var expectedArgs, fail;
-  //expectedArgs = jasmine.util.argsToArray(arguments);
-  //if (!this.actual.fail) {
-    //throw new Error('Expected a promise, but got ' + jasmine.pp(this.actual) + '.');
-  //}
-  //fail = jasmine.createSpy('fail');
-  //this.actual.fail(fail);
-  //this.message = function() {
-    //if (fail.callCount === 0) {
-      //return ["Expected spy " + fail.identity + " to have been rejected with " + jasmine.pp(expectedArgs) + " but it was never rejected.", "Expected spy " + fail.identity + " not to have been rejected with " + jasmine.pp(expectedArgs) + " but it was."];
-    //} else {
-      //return ["Expected spy " + fail.identity + " to have been rejected with " + jasmine.pp(expectedArgs) + " but was rejected with " + jasmine.pp(fail.argsForCall), "Expected spy " + fail.identity + " not to have been rejected with " + jasmine.pp(expectedArgs) + " but was rejected with " + jasmine.pp(fail.argsForCall)];
-    //}
-  //};
-  //return this.env.contains_(fail.argsForCall, expectedArgs);
-//};
+expect.Assertion.prototype.rejected = function () {
+  this.assert(
+      expect.eql(this.obj.state(), 'rejected')
+    , function(){ return 'expected to be resolved'});
+  return this;
+};
+
+expect.Assertion.prototype.rejectedWith = function (obj) {
+  var rejectedWith;
+  this.obj.fail( function() { rejectedWith = Array.prototype.slice.call(arguments) });
+
+  this.assert(
+      expect.eql(obj, rejectedWith)
+    , function(){ return 'expected to rejected with ' + JSON.stringify(obj) + ', was: ' + JSON.stringify(rejectedWith)}
+    , function(){ return 'expected to not rejected with ' + JSON.stringify(obj) + ', was: ' + JSON.stringify(rejectedWith)});
+  return this;
+};
+
+expect.Assertion.prototype.pending = function () {
+  this.assert(
+      expect.eql(this.obj.state(), 'pending')
+    , function(){ return 'expected to be resolved'});
+  return this;
+};
