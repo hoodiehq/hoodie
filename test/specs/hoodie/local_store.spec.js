@@ -8,6 +8,7 @@ describe("hoodie.store", function() {
     this.sandbox.stub(window.localStorage, "getItem");
     this.sandbox.stub(window.localStorage, "setItem");
     this.sandbox.stub(window.localStorage, "removeItem");
+    this.sandbox.stub(window.localStorage, "key");
 
     this.sandbox.spy(window, "clearTimeout");
     this.sandbox.stub(window, "setTimeout").returns(function(cb) {
@@ -20,24 +21,56 @@ describe("hoodie.store", function() {
   });
 
   //
-  describe("#subscribeToOutsideEvents", function() {
+  describe("#patchIfNotPersistant", function() {
+    it("can only be run once", function() {
+      this.store.patchIfNotPersistant();
+      expect( this.store.patchIfNotPersistant ).to.eql(undefined)
+    });
+
+    _when("store is persistant", function() {
+      beforeEach(function() {
+        this.sandbox.stub(this.store, 'isPersistent').returns(true)
+        this.store.patchIfNotPersistant();
+      });
+
+      it("should call methods on localStorage", function() {
+        this.store.find('task', '123');
+        expect(window.localStorage.getItem).to.be.called()
+      });
+    }); // store is not persistant
+
+    _when("store is not persistant", function() {
+      beforeEach(function() {
+        this.sandbox.stub(this.store, 'isPersistent').returns(false)
+        this.store.patchIfNotPersistant();
+      });
+
+      it("should not call methods on localStorage", function() {
+        this.store.find('task', '123');
+        expect(window.localStorage.getItem).to.not.be.called()
+      });
+    }); // store is not persistant
+  }); // patchIfNotPersistant
+
+  //
+  xdescribe("#subscribeToOutsideEvents", function() {
     it("can only be run once", function() {
       this.store.subscribeToOutsideEvents();
-      expect(this.store.subscribeToOutsideEvents).to.eql(undefined)
+      expect( this.store.subscribeToOutsideEvents ).to.eql(undefined)
     });
 
     it("should cleanup on account:cleanup", function() {
       this.sandbox.spy(this.store, "clear");
       this.store.subscribeToOutsideEvents()
       this.hoodie.trigger('account:cleanup');
-      expect(this.store.clear.called).to.be.ok();
+      expect( this.store.clear ).to.be.called();
     });
 
     it("should mark all objects as changed on account:signup", function() {
       this.sandbox.spy(this.store, "markAllAsChanged");
       this.store.subscribeToOutsideEvents();
       this.hoodie.trigger('account:signup');
-      expect(this.store.markAllAsChanged).to.be.called();
+      expect( this.store.markAllAsChanged ).to.be.called();
     });
 
     _when("remote:change event gets fired", function() {
@@ -104,7 +137,7 @@ describe("hoodie.store", function() {
         });
       });
     }); // remote:bootstrap
-  });
+  }); // subscribeToOutsideEvents
 
   //
   xdescribe("#save(type, id, object, options)", function() {
