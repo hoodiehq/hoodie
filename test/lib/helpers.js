@@ -59,8 +59,8 @@ expect.Assertion.prototype.calledWith = function() {
 
   this.assert(
       hit
-    , function(){ return 'expected to be called with ' + JSON.stringify(args) + ', calls where: ' + JSON.stringify(this.obj.args)}
-    , function(){ return 'expected to not be called with ' + JSON.stringify(args) });
+    , function(){ return 'expected to be called with \n' + JSON.stringify(args, '', '  ') + ', calls where: \n' + JSON.stringify(this.obj.args, '', '  ')}
+    , function(){ return 'expected to not be called with \n' + JSON.stringify(args, '', '  ') });
   return this
 };
 
@@ -86,8 +86,8 @@ expect.Assertion.prototype.resolvedWith = function () {
 
   this.assert(
       expect.eql(args, resolvedWith)
-    , function(){ return 'expected to resolve with ' + JSON.stringify(args) + ', was: ' + JSON.stringify(resolvedWith)}
-    , function(){ return 'expected to not resolve with ' + JSON.stringify(args) + ', was: ' + JSON.stringify(resolvedWith)});
+    , function(){ return 'expected to resolve with \n' + JSON.stringify(args, '', '  ') + ', was: \n' + JSON.stringify(resolvedWith, '', '  ')}
+    , function(){ return 'expected to not resolve with \n' + JSON.stringify(args, '', '  ') + ', was: \n' + JSON.stringify(resolvedWith, '', '  ')});
   return this;
 };
 
@@ -105,8 +105,8 @@ expect.Assertion.prototype.rejectedWith = function () {
 
   this.assert(
       expect.eql(args, rejectedWith)
-    , function(){ return 'expected to rejected with ' + JSON.stringify(args) + ', was: ' + JSON.stringify(rejectedWith)}
-    , function(){ return 'expected to not rejected with ' + JSON.stringify(args) + ', was: ' + JSON.stringify(rejectedWith)});
+    , function(){ return 'expected to rejected with \n' + JSON.stringify(args, '', '  ') + ', was: \n' + JSON.stringify(rejectedWith, '', '  ')}
+    , function(){ return 'expected to not rejected with \n' + JSON.stringify(args, '', '  ') + ', was: \n' + JSON.stringify(rejectedWith, '', '  ')});
   return this;
 };
 

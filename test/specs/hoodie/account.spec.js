@@ -1031,23 +1031,7 @@ describe('hoodie.account', function () {
 
     beforeEach(function () {
       this.account.username = 'joe@example.com';
-
-      // preset user doc
-      var userDoc = {
-        _id: 'org.couchdb.user:user/joe@example.com',
-        name: 'user/joe@example.com',
-        type: 'user',
-        roles: [],
-        salt: 'absalt',
-        password_sha: 'pwcdef',
-        createdAt: 'someday',
-        updatedAt: 'someday'
-      };
-      this.account.fetch();
-      this.requestDefer.resolve(userDoc);
-      this.account.request.reset();
-      this.requestDefer = this.hoodie.defer();
-      this.account.request.returns(this.requestDefer.promise())
+      presetUserDoc(this);
 
       this.fetchPromise = this.hoodie.defer();
       this.sandbox.stub(this.account, 'fetch').returns(this.fetchPromise);
@@ -1385,7 +1369,7 @@ describe('hoodie.account', function () {
     });
   });
 
-  describe('#fetch()', function () {
+  xdescribe('#fetch()', function () {
 
     _when('username is not set', function () {
 
@@ -1420,29 +1404,15 @@ describe('hoodie.account', function () {
       _when('successful', function () {
 
         beforeEach(function () {
-          this.response = {
-            '_id': 'org.couchdb.user:baz',
-            '_rev': '3-33e4d43a6dff5b29a4bd33f576c7824f',
-            'name': 'baz',
-            'salt': '82163606fa5c100e0095ad63598de810',
-            'password_sha': 'e2e2a4d99632dc5e3fdb41d5d1ff98743a1f344e',
-            'type': 'user',
-            'roles': []
-          };
-          this.requestDefer.resolve(this.response);
+          this.requestDefer.resolve(unconfirmedUserDoc());
         });
 
         it('should resolve its promise', function () {
-          var promise = this.account.fetch(), self = this;
-
-          promise.fail(function (res) {
-            expect(res).to.eql(self.response);
-          });
+          expect(this.account.fetch()).to.be.resolvedWith(unconfirmedUserDoc());
         });
       }); // successful
 
       _when('fails', function () {
-
         beforeEach(function () {
           this.error = {
             error: 'ErrorName',
@@ -1452,198 +1422,187 @@ describe('hoodie.account', function () {
         });
 
         it('should resolve its promise', function () {
-          var promise = this.account.fetch(), self = this;
-
-          promise.fail(function (res) {
-            expect(res).to.eql(self.error);
-          });
+          expect(this.account.fetch()).to.be.rejectedWith(this.error);
         });
       }); // #fails
     }); // username is joe@example.com
   }); // #fetch
 
-  // describe('#destroy()', function () {
+  describe('#destroy()', function () {
 
-  //   beforeEach(function () {
-  //     this.fetchDefer = this.hoodie.defer();
-  //     this.sandbox.spy(this.hoodie.remote, 'disconnect');
-  //     this.sandbox.spy(this.hoodie.config, 'clear');
-  //     this.sandbox.spy(this.hoodie.config, 'set');
-  //     this.sandbox.stub(this.account, 'fetch').returns(this.fetchDefer.promise());
-  //     this.sandbox.stub(this.hoodie, 'uuid').returns('newHash');
-  //     this.account.username = 'joe@example.com';
-  //     this.account._doc = {
-  //       _rev: '1-234'
-  //     };
-  //   });
+    beforeEach(function () {
+      this.account.username = 'joe@example.com';
+      this.sandbox.stub(this.account, 'request').returns( this.requestDefer.promise() );
 
-  //   _when('user has account', function () {
+      presetUserDoc(this);
 
-  //     beforeEach(function () {
-  //       this.sandbox.stub(this.account, 'hasAccount').returns(true);
-  //     });
+      this.fetchDefer = this.hoodie.defer();
+      this.sandbox.spy(this.hoodie.remote, 'disconnect');
+      this.sandbox.spy(this.hoodie.config, 'clear');
+      this.sandbox.spy(this.hoodie.config, 'set');
+      this.sandbox.stub(this.account, 'fetch').returns(this.fetchDefer.promise());
+      this.sandbox.stub(this.hoodie, 'uuid').returns('newHash');
+    });
 
-  //     _and('fetch is successful', function () {
+    _when('user has account', function () {
+      beforeEach(function () {
+        this.sandbox.stub(this.account, 'hasAccount').returns(true);
+      });
 
-  //       beforeEach(function () {
-  //         this.fetchDefer.resolve();
-  //       });
+      _and('fetch is successful', function () {
 
-  //       it('should return a promise', function () {
-  //         expect(this.account.destroy().state()).to.eql('resolved');
-  //       });
+        beforeEach(function () {
+          this.fetchDefer.resolve();
+        });
 
-  //       it('should disconnect', function () {
-  //         this.account.destroy();
-  //         expect(this.hoodie.remote.disconnect.called).to.be.ok();
-  //       });
+        it('should return a promise', function () {
+          expect(this.account.destroy().state()).to.eql('resolved');
+        });
 
-  //       it('should fetch the account', function () {
-  //         this.account.destroy();
-  //         expect(this.account.fetch.called).to.be.ok();
-  //       });
+        it('should disconnect', function () {
+          this.account.destroy();
+          expect(this.hoodie.remote.disconnect.called).to.be.ok();
+        });
 
-  //       it('should send a PUT request to /_users/org.couchdb.user%3Auser%2Fjoe%40example.com', function () {
-  //         this.account.destroy();
-  //         expect(this.hoodie.request.calledWith('PUT', '/_users/org.couchdb.user%3Auser%2Fjoe%40example.com', {
-  //           data: JSON.stringify({
-  //             _rev: '1-234',
-  //             _deleted: true
-  //           }),
-  //           contentType: 'application/json'
-  //         })).to.be.ok();
-  //       });
+        it('should fetch the account', function () {
+          this.account.destroy();
+          expect(this.account.fetch.called).to.be.ok();
+        });
 
-  //       _and('destroy request succesful', function () {
+        it('should send a PUT request to /_users/org.couchdb.user%3Auser%2Fjoe%40example.com', function () {
+          this.account.destroy();
+          var userObject = unconfirmedUserDoc( this.account.username );
+          userObject._deleted = true;
+          expect(this.account.request).to.be.calledWith('PUT', '/_users/org.couchdb.user%3Auser%2Fjoe%40example.com', {
+            data: JSON.stringify(userObject),
+            contentType: 'application/json'
+          })
+        });
 
-  //         beforeEach(function () {
-  //           this.requestDefer.resolve();
-  //           this.account.destroy();
-  //         });
+        _and('destroy request succesful', function () {
+          beforeEach(function () {
+            this.requestDefer.resolve();
+            this.account.destroy();
+          });
 
-  //         it('should unset @username', function () {
-  //           expect(this.account.username).to.be.undefined;
-  //         });
+          it('should unset @username', function () {
+            expect(this.account.username).to.be.undefined;
+          });
 
-  //         it('should regenerate @ownerHash', function () {
-  //           expect(this.account.ownerHash).to.eql('newHash');
-  //         });
+          it('should regenerate @ownerHash', function () {
+            expect(this.account.ownerHash).to.eql('newHash');
+          });
 
-  //         it('should trigger signout event', function () {
-  //           expect(this.hoodie.trigger.calledWith('account:signout')).to.be.ok();
-  //         });
+          it('should trigger signout event', function () {
+            expect(this.hoodie.trigger.calledWith('account:signout')).to.be.ok();
+          });
 
-  //         it('should clear config', function () {
-  //           expect(this.hoodie.config.clear.called).to.be.ok();
-  //         });
+          it('should clear config', function () {
+            expect(this.hoodie.config.clear.called).to.be.ok();
+          });
 
-  //         it('should set config._account.ownerHash to new @ownerHash', function () {
-  //           expect(this.hoodie.config.set.calledWith('_account.ownerHash', 'newHash')).to.be.ok();
-  //         });
+          it('should set config._account.ownerHash to new @ownerHash', function () {
+            expect(this.hoodie.config.set.calledWith('_account.ownerHash', 'newHash')).to.be.ok();
+          });
 
-  //         it('should trigger clenaup event', function() {
-  //           expect(this.hoodie.trigger.calledWith('account:cleanup')).to.be.ok();
-  //         });
+          it('should trigger clenaup event', function() {
+            expect(this.hoodie.trigger.calledWith('account:cleanup')).to.be.ok();
+          });
+        }); // destroy request succesful
+      }); // fetch is successful
 
-  //       });
+      _and('fetch fails with not_found', function () {
 
-  //     });
+        beforeEach(function () {
+          this.error = {
+            error: 'not_found',
+            reason: 'missing'
+          };
+          this.fetchDefer.reject(this.error);
+          this.promise = this.account.destroy();
+          this.promise;
+        });
 
-  //     _and('fetch fails with not_found', function () {
+        it('should resolve anyway', function () {
+          expect(this.promise.state()).to.eql('resolved');
+        });
+      }); // fetch fails with not_found
 
-  //       beforeEach(function () {
-  //         this.error = {
-  //           error: 'not_found',
-  //           reason: 'missing'
-  //         };
-  //         this.fetchDefer.reject(this.error);
-  //         this.promise = this.account.destroy();
-  //         this.promise;
-  //       });
+      _and('fetch fails with unknown error', function () {
 
-  //       it('should resolve anyway', function () {
-  //         expect(this.promise.state()).to.eql('resolved');
-  //       });
+        beforeEach(function () {
+          this.error = {
+            error: 'unknown'
+          };
+          this.fetchDefer.reject(this.error);
+          this.promise = this.account.destroy();
+          this.promise;
+        });
 
-  //     });
+        it('should reject', function () {
+          var self = this;
 
-  //     _and('fetch fails with unknown error', function () {
+          this.promise.fail(function (res) {
+            expect(res).to.eql(self.error);
+          });
+        });
 
-  //       beforeEach(function () {
-  //         this.error = {
-  //           error: 'unknown'
-  //         };
-  //         this.fetchDefer.reject(this.error);
-  //         this.promise = this.account.destroy();
-  //         this.promise;
-  //       });
+        it('should not unset @username', function () {
+          expect(this.account.username).to.eql('joe@example.com');
+        });
 
-  //       it('should reject', function () {
-  //         var self = this;
+        it('should not regenerate @ownerHash', function () {
+          expect(this.account.ownerHash).to.eql('uuid');
+        });
 
-  //         this.promise.fail(function (res) {
-  //           expect(res).to.eql(self.error);
-  //         });
-  //       });
+        it('should not trigger signout event', function () {
+          expect(this.hoodie.trigger.calledWith('account:signout')).to.not.be.ok();
+        });
 
-  //       it('should not unset @username', function () {
-  //         expect(this.account.username).to.eql('joe@example.com');
-  //       });
+        it('should not clear config', function () {
+          expect(this.hoodie.config.clear.called).to.not.be.ok();
+        });
+      }); // fetch fails with unknown error
 
-  //       it('should not regenerate @ownerHash', function () {
-  //         expect(this.account.ownerHash).to.eql('uuid');
-  //       });
+    }); // user has account
 
-  //       it('should not trigger signout event', function () {
-  //         expect(this.hoodie.trigger.calledWith('account:signout')).to.not.be.ok();
-  //       });
+    _when('user has no account', function () {
 
-  //       it('should not clear config', function () {
-  //         expect(this.hoodie.config.clear.called).to.not.be.ok();
-  //       });
+      beforeEach(function () {
+        this.sandbox.stub(this.account, 'hasAccount').returns(false);
+        this.promise = this.account.destroy();
+      });
 
-  //     });
+      it('should return a promise', function () {
+        expect(this.promise.state()).to.eql('resolved');
+      });
 
-  //   });
+      it('should not try to fetch', function () {
+        expect(this.account.fetch.called).to.not.be.ok();
+      });
 
-  //   _when('user has no account', function () {
+      it('should unset @username', function () {
+        expect(this.account.username).to.be.undefined;
+      });
 
-  //     beforeEach(function () {
-  //       this.sandbox.stub(this.account, 'hasAccount').returns(false);
-  //       this.promise = this.account.destroy();
-  //     });
+      it('should regenerate @ownerHash', function () {
+        expect(this.account.ownerHash).to.eql('newHash');
+      });
 
-  //     it('should return a promise', function () {
-  //       expect(this.promise.state()).to.eql('resolved');
-  //     });
+      it('should trigger signout event', function () {
+        expect(this.hoodie.trigger.calledWith('account:signout')).to.be.ok();
+      });
 
-  //     it('should not try to fetch', function () {
-  //       expect(this.account.fetch.called).to.not.be.ok();
-  //     });
+      it('should clear config', function () {
+        expect(this.hoodie.config.clear.called).to.be.ok();
+      });
 
-  //     it('should unset @username', function () {
-  //       expect(this.account.username).to.be.undefined;
-  //     });
+      it('should set config._account.ownerHash to new @ownerHash', function () {
+        expect(this.hoodie.config.set.calledWith('_account.ownerHash', 'newHash')) .to.be.ok();
+      });
+    }); // user has no account
 
-  //     it('should regenerate @ownerHash', function () {
-  //       expect(this.account.ownerHash).to.eql('newHash');
-  //     });
-
-  //     it('should trigger signout event', function () {
-  //       expect(this.hoodie.trigger.calledWith('account:signout')).to.be.ok();
-  //     });
-
-  //     it('should clear config', function () {
-  //       expect(this.hoodie.config.clear.called).to.be.ok();
-  //     });
-
-  //     it('should set config._account.ownerHash to new @ownerHash', function () {
-  //       expect(this.hoodie.config.set.calledWith('_account.ownerHash', 'newHash')) .to.be.ok();
-  //     });
-
-  //   });
-
-  // });
+  }); // #destroy
 
   // xdescribe('#resetPassword(username)', function () {
 
@@ -1993,6 +1952,31 @@ function invalidSessionResponse () {
       name: null
     }
   }
+}
+
+function unconfirmedUserDoc (username) {
+  if (! username) {
+    username = 'joe@example.com'
+  }
+  return {
+    _id: 'org.couchdb.user:user/' + username,
+    _rev: '1-abc',
+    name: 'user/' + username,
+    type: 'user',
+    roles: [],
+    salt: 'absalt',
+    password_sha: 'pwcdef',
+    createdAt: 'someday',
+    updatedAt: 'someday'
+  }
+}
+
+function presetUserDoc(context) {
+  context.account.fetch();
+  context.requestDefer.resolve(unconfirmedUserDoc( context.account.username ));
+  context.account.request.reset();
+  context.requestDefer = context.hoodie.defer();
+  context.account.request.returns(context.requestDefer.promise())
 }
 
 
