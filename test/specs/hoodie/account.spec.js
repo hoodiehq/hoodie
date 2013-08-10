@@ -693,38 +693,36 @@ describe('Hoodie.Account', function () {
     }); // username set
   }); // #signUp
 
-  // describe('#anonymousSignUp()', function () {
+  describe('#anonymousSignUp()', function () {
 
-  //   beforeEach(function () {
-  //     this.signUpDefer = this.hoodie.defer();
+    beforeEach(function () {
+      this.signUpDefer = this.hoodie.defer();
 
-  //     this.sandbox.stub(this.account, 'signUp').returns(this.signUpDefer.promise());
-  //     this.sandbox.stub(this.hoodie, 'uuid').returns('crazyuuid123');
-  //     this.sandbox.spy(this.hoodie.config, 'set');
+      this.sandbox.stub(this.account, 'signUp').returns(this.signUpDefer.promise());
+      this.sandbox.stub(this.hoodie, 'uuid').returns('crazyuuid123');
+      this.sandbox.spy(this.hoodie.config, 'set');
 
-  //     this.account.ownerHash = 'owner_hash123';
-  //   });
+      this.account.ownerHash = 'owner_hash123';
+    });
 
-  //   it('should sign up with username = account.ownerHash and the random password', function () {
-  //     this.account.anonymousSignUp();
-  //     expect(this.account.signUp.calledWith('owner_hash123', 'crazyuuid123')).to.be.ok();
-  //   });
+    it('should sign up with username = account.ownerHash and the random password', function () {
+      this.account.anonymousSignUp();
+      expect(this.account.signUp).to.be.calledWith('owner_hash123', 'crazyuuid123');
+    });
 
-  //   _when('signUp successful', function () {
+    _when('signUp successful', function () {
 
-  //     beforeEach(function () {
-  //       this.signUpDefer.resolve();
-  //     });
+      beforeEach(function () {
+        this.signUpDefer.resolve();
+      });
 
-  //     it('should generate a password and store it locally in _account.anonymousPassword', function () {
-  //       this.account.anonymousSignUp();
-  //       expect(this.hoodie.uuid.calledWith(10)).to.be.ok();
-  //       expect(this.hoodie.config.set.calledWith('_account.anonymousPassword', 'crazyuuid123')).to.be.ok();
-  //     });
-
-  //   });
-
-  // });
+      it('should generate a password and store it locally in _account.anonymousPassword', function () {
+        this.account.anonymousSignUp();
+        expect(this.hoodie.uuid).to.be.calledWith(10);
+        expect(this.hoodie.config.set).to.be.calledWith('_account.anonymousPassword', 'crazyuuid123');
+      });
+    });
+  });
 
   // xdescribe('#signIn(username, password)', function () {
 
