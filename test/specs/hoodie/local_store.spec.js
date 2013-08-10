@@ -1283,47 +1283,11 @@ describe("hoodie.store", function() {
   }); // #hasLocalChanges
 
   //
-  describe("#markAsChanged(type, id, object)", function() {
-
-    beforeEach(function() {
-      this.sandbox.spy(this.store, "trigger");
-      this.store.markAsChanged('couch', '123', {
-        color: 'red'
-      });
-    });
-
-    it("should add it to the dirty list", function() {
-      expect(this.store.hasLocalChanges('couch', '123')).to.be(true);
-    });
-
-    it.only("should start dirty timeout for 2 seconds", function() {
-      expect(this.store.trigger).to.be.calledWith('dirty')
-      expect(this.store.trigger).to.not.be.calledWith('idle')
-      this.clock.tick(2000);
-      expect(this.store.trigger).to.be.calledWith('idle')
-    });
-
-    it("should clear dirty timeout", function() {
-      this.store._dirtyTimeout = 'timeout';
-      this.store.markAsChanged('couch', '123', {
-        color: 'red'
-      });
-      expect(window.clearTimeout.calledWith('timeout')).to.be.ok();
-    });
-
-    it("should trigger 'dirty' event", function() {
-      expect(this.store.trigger.calledWith('dirty')).to.be.ok();
-    });
-  });
-
-  //
-  xdescribe("#markAllAsChanged(type, id, object)", function() {
-
+  describe("#markAllAsChanged(type, id, object)", function() {
     beforeEach(function() {
       this.findAllDefer = this.hoodie.defer();
-      this.sandbox.stub(this.store, "markAsChanged");
       this.sandbox.stub(this.store, "findAll").returns(this.findAllDefer.promise());
-      this.sandbox.stub(this.store, "changedObjects").returns('changedObjects');
+      this.sandbox.spy(this.store, "trigger");
     });
 
     it("should find all local objects", function() {
@@ -1332,7 +1296,6 @@ describe("hoodie.store", function() {
     });
 
     _when("findAll fails", function() {
-
       beforeEach(function() {
         this.findAllDefer.reject({
           reason: 'because'
@@ -1341,19 +1304,12 @@ describe("hoodie.store", function() {
 
       it("should return its rejected promise", function() {
         var promise = this.store.markAllAsChanged();
-        promise.then(this.noop, function (res) {
-          expect(res).to.eql({
-            reason: 'because'
-          });
-        });
+        expect(promise).to.be.rejectedWith({reason: 'because'});
       });
-
-    });
+    }); // findAll fails
 
     _when("findAll succeeds", function() {
-
       beforeEach(function() {
-        this.store._dirty = {};
         this.objects = [
           {
             id: '1',
@@ -1370,38 +1326,21 @@ describe("hoodie.store", function() {
           }
         ];
         this.findAllDefer.resolve(this.objects);
-        this.sandbox.spy(this.store, "trigger");
-        this.store._dirtyTimeout = 'timeout';
         this.store.markAllAsChanged();
       });
 
       it("should add returned obejcts to the dirty list", function() {
-        expect(this.store._dirty['document/1'].name).to.eql('test1');
-        expect(this.store._dirty['document/2'].name).to.eql('test2');
-        expect(this.store._dirty['document/3'].name).to.eql('test3');
-      });
-
-      it("should start dirty timeout for 2 seconds", function() {
-        var args = window.setTimeout.args[0];
-
-        expect(args[1]).to.eql(2000);
-        expect(this.store._dirtyTimeout).to.eql('newTimeout');
-        expect(window.setTimeout.callCount).to.eql(1);
-      });
-
-      it("should clear dirty timeout", function() {
-        expect(window.clearTimeout.calledWith('timeout')).to.be.ok();
-        expect(window.clearTimeout.callCount).to.eql(1);
+        expect(this.store.changedObjects()).to.eql(this.objects)
       });
 
       it("should trigger 'dirty' & 'idle' event", function() {
-        expect(this.store.trigger.calledWith('dirty')).to.be.ok();
-        expect(this.store.trigger.calledWith('idle', 'changedObjects')).to.be.ok();
-        expect(this.store.trigger.callCount).to.eql(2);
+        expect(this.store.trigger).to.be.calledWith('dirty');
+        expect(this.store.trigger).to.not.be.calledWith('idle');
+        this.clock.tick(2000);
+        expect(this.store.trigger).to.be.calledWith('idle', this.objects);
       });
-
-    });
-  });
+    }); // findAll succeeds
+  }); // #markAllAsChanged
 
   //
   xdescribe("#changedObjects()", function() {
