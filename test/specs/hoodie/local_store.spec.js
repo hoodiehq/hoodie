@@ -10,18 +10,14 @@ describe("hoodie.store", function() {
     this.sandbox.stub(window.localStorage, "removeItem");
     this.sandbox.stub(window.localStorage, "key");
 
-    this.sandbox.spy(window, "clearTimeout");
-    this.sandbox.stub(window, "setTimeout").returns(function(cb) {
-      cb();
-      return 'newTimeout';
-    });
+    this.clock = this.sandbox.useFakeTimers(0) // '1970-01-01 00:00:00'
 
     hoodieStore(this.hoodie);
     this.store = this.hoodie.store;
   });
 
   //
-  describe("#patchIfNotPersistant", function() {
+  xdescribe("#patchIfNotPersistant", function() {
     it("can only be run once", function() {
       this.store.patchIfNotPersistant();
       expect( this.store.patchIfNotPersistant ).to.eql(undefined)
@@ -140,94 +136,90 @@ describe("hoodie.store", function() {
   }); // subscribeToOutsideEvents
 
   //
-  xdescribe("#save(type, id, object, options)", function() {
-
-    beforeEach(function() {
-      this.sandbox.stub(this.store, "_now").returns('now');
-    });
+  describe("#save(type, id, object, options)", function() {
 
     it("should return a promise", function() {
       var promise = this.store.save('document', '123', {
         name: 'test'
       });
-      expect(promise.state()).to.eql('pending');
+      expect(promise).to.be.promise();
+    });
+
+    it("should allow numbers and lowercase letters for type only. And must start with a letter or $", function() {
+      var invalid, key, promise, valid, _i, _len;
+      invalid = ['UPPERCASE', 'underLines', '-?&$', '12345', 'a'];
+      valid = ['car', '$email'];
+      for (_i = 0, _len = invalid.length; _i < _len; _i++) {
+        key = invalid[_i];
+        promise = this.store.save(key, 'valid', {});
+        expect(promise).to.be.rejected();
+      }
+      for (_i = 0, _len = valid.length; _i < _len; _i++) {
+        key = valid[_i];
+        promise = this.store.save(key, 'valid', {});
+        expect(promise).to.be.resolved();
+      };
+    });
+
+    it("should allow numbers, lowercase letters and dashes for for id only", function() {
+      var invalid, key, promise, valid, _i, _len;
+      invalid = ['UPPERCASE', 'underLines', '-?&$'];
+      valid = ['abc4567', '1', 123, 'abc-567'];
+
+      for (_i = 0, _len = invalid.length; _i < _len; _i++) {
+        key = invalid[_i];
+        promise = this.store.save('valid', key, {});
+        expect(promise.state()).to.eql('rejected');
+      }
+      for (_i = 0, _len = valid.length; _i < _len; _i++) {
+        key = valid[_i];
+        promise = this.store.save('valid', key, {});
+        expect(promise.state()).to.eql('resolved');
+      }
     });
 
     describe("invalid arguments", function() {
-
       _when("no arguments passed", function() {
-
         it("should be rejected", function() {
-          expect(this.store.save().state()).to.eql('rejected');
+          expect(this.store.save()).to.be.rejected();
         });
-
-      });
+      }); // no arguments passed
 
       _when("no object passed", function() {
-
         it("should be rejected", function() {
           var promise = this.store.save('document', 'abc4567');
-          expect(promise.state()).to.eql('rejected');
+          expect(promise).to.be.rejected();
         });
-
-      });
-
-    });
+      }); //no object passed
+    }); // invalid arguments
 
     _when("id is '123', type is 'document', object is {name: 'test'}", function() {
-
       beforeEach(function() {
+        this.properties = {name: 'test'};
+        window.localStorage.getItem.returns(JSON.stringify(this.properties));
 
-        this.sandbox.stub(this.store, "cache").returns('cachedObject');
-
-        this.promise = this.store.save('document', '123', {
-          name: 'test'
-        }, {
+        this.promise = this.store.save('document', '123', this.properties, {
           option: 'value'
         });
       });
 
       it("should cache document", function() {
-        expect(this.store.cache.called).to.be.ok();
+        // which means we don't call localStorage.getItem again
+        localStorage.getItem.reset()
+        this.promise = this.store.save('document', '123', this.properties)
+        expect(localStorage.getItem).to.not.be.called();
       });
 
       it("should add timestamps", function() {
-        var object = this.store.cache.args[2];
-        expect(object.createdAt).to.eql('now');
-        expect(object.updatedAt).to.eql('now');
-      });
-
-      it("should pass options", function() {
-        var options = this.store.cache.args[3];
-        expect(options.option).to.eql('value');
+        var object = getLastSavedObject();
+        expect(object.createdAt).to.eql( now() );
+        expect(object.updatedAt).to.eql( now() );
       });
 
       _and("options.remote is true", function() {
 
         beforeEach(function() {
-
           this.sandbox.spy(this.store, "trigger");
-
-          this.store.cache.returns(function(type, id, object) {
-            if (object) {
-              return {
-                id: '123',
-                type: 'document',
-                name: 'test',
-                _local: 'something',
-                _rev: '2-345'
-              };
-            } else {
-              return {
-                id: '123',
-                type: 'document',
-                name: 'test',
-                _local: 'something',
-                old_attribute: 'what ever',
-                _rev: '1-234'
-              };
-            }
-          });
 
           this.store.save('document', '123', {
             name: 'test',
@@ -235,18 +227,17 @@ describe("hoodie.store", function() {
           }, {
             remote: true
           });
-
         });
 
         it("should not touch createdAt / updatedAt timestamps", function() {
-          var object = this.store.cache.args[2];
-          expect(object.createdAt).to.be.undefined;
-          expect(object.updatedAt).to.be.undefined;
+          var object = getLastSavedObject();
+          expect(object.createdAt).to.be(undefined);
+          expect(object.updatedAt).to.be(undefined);
         });
 
         it("should add a _syncedAt timestamp", function() {
-          var object = this.store.cache.args[2];
-          expect(object._syncedAt).to.eql('now');
+          var object = getLastSavedObject();
+          expect(object._syncedAt).to.eql( now() );
         });
 
         it("should trigger update & change events", function() {
@@ -255,51 +246,61 @@ describe("hoodie.store", function() {
             id: '123',
             type: 'document',
             name: 'test',
-            _local: 'something',
+            _syncedAt: now(),
             _rev: '2-345'
           };
           options = {
             remote: true
           };
 
-          expect(this.store.trigger.calledWith('update', object, options)).to.be.ok();
-          expect(this.store.trigger.calledWith('update:document', object, options)).to.be.ok();
-          expect(this.store.trigger.calledWith('change', 'update', object, options)).to.be.ok();
-          expect(this.store.trigger.calledWith('change:document', 'update', object, options)).to.be.ok();
+          expect(this.store.trigger).to.be.calledWith('update', object, options);
+          expect(this.store.trigger).to.be.calledWith('update:document', object, options);
+          expect(this.store.trigger).to.be.calledWith('change', 'update', object, options);
+          expect(this.store.trigger).to.be.calledWith('change:document', 'update', object, options);
         });
 
         it("should keep local attributes", function() {
-          var object = this.store.cache.args[2];
+          stubFindItem('document', '1234', {
+            name: 'test',
+            _local: 'something'
+          });
+
+          this.store.save('document', '1234', {
+            name: 'test',
+            _rev: '2-345'
+          }, {
+            remote: true
+          });
+
+          var object = getLastSavedObject();
           expect(object._local).to.eql('something');
         });
 
         it("should update _rev", function() {
-          var object = this.store.cache.args[2];
+          var object = getLastSavedObject();
           expect(object._rev).to.eql('2-345');
         });
-
-      });
+      }); // options.remote is true
 
       _and("options.silent is true", function() {
-
         beforeEach(function() {
+
           this.store.save('document', '123', {
             name: 'test'
           }, {
             silent: true
           });
+
         });
 
         it("should not touch createdAt / updatedAt timestamps", function() {
-          var object = this.store.cache.mostRecentCall.args[2];
-          expect(object.createdAt).to.be.undefined;
-          expect(object.updatedAt).to.be.undefined;
+          var object = getLastSavedObject();
+          expect(object.createdAt).to.be(undefined);
+          expect(object.updatedAt).to.be(undefined);
         });
-
-      });
+      }); // options.silent is true
 
       _and("options.local is true", function() {
-
         beforeEach(function() {
           this.store.save('document', '123', {
             name: 'test'
@@ -309,187 +310,132 @@ describe("hoodie.store", function() {
         });
 
         it("should set _$local = true", function() {
-          var object = this.store.cache.args[2];
+          var object = getLastSavedObject();
           expect(object._$local).to.be.ok();
         });
-
-      });
+      }); // options.local is true
 
       _and("options.local is not set", function() {
-
         beforeEach(function() {
-          return this.store.save('document', '123', {
+          this.store.save('document', '123', {
             name: 'test',
             _$local: true
-          }, {
-            local: void 0
           });
         });
 
         it("should remove _$local attribute", function() {
-          var object = this.store.cache.args[2];
-          expect(object._$local).to.be.undefined;
+          var object = getLastSavedObject();
+          expect(object._$local).to.be(undefined);
         });
-
-      });
+      }); // options.local is not set
 
       _and("object is new (not cached yet)", function() {
-
         beforeEach(function() {
           this.sandbox.spy(this.store, "trigger");
-          this.store.cache.returns(function(type, id, object) {
-            if (object) {
-              return {
-                id: '123',
-                type: 'document',
-                name: 'test',
-                _rev: '1-345'
-              };
-            } else {
-              return void 0;
-            }
-          });
-
-          this.store.save('document', '123', {
+          stubFindItem('document', '1235', null);
+          this.store.save('document', '1235', {
             name: 'test'
           });
-
         });
 
         it("should trigger add & change events", function() {
           var object = {
-            id: '123',
+            id: '1235',
             type: 'document',
             name: 'test',
-            _rev: '1-345'
+            createdAt: now(),
+            updatedAt: now(),
+            createdBy: 'owner_hash'
           };
-          expect(this.store.trigger.calledWith('add', object, {})).to.be.ok();
-          expect(this.store.trigger.calledWith('add:document', object, {})).to.be.ok();
-          expect(this.store.trigger.calledWith('change', 'add', object, {})).to.be.ok();
-          expect(this.store.trigger.calledWith('change:document', 'add', object, {})).to.be.ok();
+          expect(this.store.trigger).to.be.calledWith('add', object, {});
+          expect(this.store.trigger).to.be.calledWith('add:document', object, {});
+          expect(this.store.trigger).to.be.calledWith('change', 'add', object, {});
+          expect(this.store.trigger).to.be.calledWith('change:document', 'add', object, {});
         });
-
-      });
+      }); // object is new (not cached yet)
 
       _when("successful", function() {
-
-        beforeEach(function() {
-          this.store.cache.returns('doc');
-        });
-
         it("should resolve the promise", function() {
-          expect(this.promise.state()).to.eql('resolved');
-        });
-
-        it("should pass the object to done callback", function() {
-          this.promise.then(function (res) {
-            expect(res).to.eql('cachedObject', true);
-          });
+          expect(this.promise).to.be.resolved();
         });
 
         _and("object did exist before", function() {
-
           beforeEach(function() {
-            this.store.cache.returns(function(type, id, object) {
-              if (object) {
-                return 'doc';
-              } else {
-                return {};
-              }
-            });
+            this.properties = {
+              name: 'success',
+              createdAt: now(),
+              updatedAt: 'yesterday',
+              createdBy: 'owner_hash'
+            }
 
-            this.promise = this.store.save('document', '123', {
-              name: 'test'
-            }, {
-              option: 'value'
-            });
-
+            stubFindItem('document', '123successful', this.properties )
+            this.promise = this.store.save('document', '123successful', this.properties);
           });
 
-          it("should pass false (= not created) as the second param to the done callback", function() {
-            this.promise.then(function (res) {
-              expect(res).to.eql('doc', false);
-            });
+          it("should pass the object & false (= not created) to done callback", function() {
+            var object = $.extend({}, this.properties);
+            object.updatedAt = now();
+            object.type = 'document';
+            object.id = '123successful';
+            expect(this.promise).to.be.resolvedWith( object, false )
           });
-
-        });
+        }); // object did exist before
 
         _and("object did not exist before", function() {
-
           beforeEach(function() {
-            this.store.cache.returns(function(type, id, object) {
-              if (object) {
-                return 'doc';
-              } else {
-                return void 0;
-              }
-            });
+            this.properties = {
+              name: 'this is new'
+            }
 
-            this.promise = this.store.save('document', '123', {
-              name: 'test'
-            }, {
-              option: 'value'
-            });
-
+            stubFindItem('document', '123new', null )
+            this.promise = this.store.save('document', '123new', this.properties);
           });
 
           it("should pass true (= new created) as the second param to the done callback", function() {
-            this.promise.then(function (res) {
-              expect(res).to.eql('doc', false);
-            });
+            var object = $.extend({}, this.properties);
+            object.createdAt = now();
+            object.updatedAt = now();
+            object.createdBy = 'owner_hash';
+            object.type = 'document';
+            object.id = '123new';
+
+            expect(this.promise).to.be.resolvedWith(object, true)
           });
-
-          it("should set the createdBy attribute", function() {
-            var object = this.store.cache.args[2];
-            expect(object.createdBy).to.eql('owner_hash');
-          });
-
-        });
-
-      });
+        }); // object did not exist before
+      }); // successful
 
       _when("failed", function() {
-
         beforeEach(function() {
-          this.store.cache.returns(function(type, id, object) {
-            if (object) {
-              throw new Error("i/o error");
-            }
+          window.localStorage.setItem.throws(new Error('funk'));
+          this.promise = this.store.save('document', '123ohoh', {
+            name: 'test'
           });
         });
 
         it("should return a rejected promise", function() {
-          var promise = this.store.save('document', '123', {
-            name: 'test'
-          });
-          expect(promise.state()).to.eql('rejected');
+          expect(this.promise).to.be.rejectedWith('Error: funk');
         });
-
-      });
-
+      }); // failed
     });
 
     _when("id is '123', type is 'document', object is {id: '123', type: 'document', name: 'test'}", function() {
-
       beforeEach(function() {
-        var key, type, _ref;
         this.store.save('document', '123', {
           id: '123',
           type: 'document',
-          name: 'test'
+          name: 'test with id & type'
         });
-
-        _ref = this.store.cache.args[0],
-        type = _ref[0],
-        key = _ref[1],
-        this.object = _ref[2],
-        _ref;
       });
 
+      it("should not save type & id", function() {
+        var object = getLastSavedObject();
+        expect(object.name).to.be('test with id & type');
+        expect(object.type).to.be(undefined);
+        expect(object.id).to.be(undefined);
+      });
     });
 
     _when("id is '123', type is '$internal', object is {action: 'do some background magic'}}", function() {
-
       beforeEach(function() {
         this.promise = this.store.save('$internal', '123', {
           action: 'do some background magic'
@@ -499,177 +445,72 @@ describe("hoodie.store", function() {
       it("should work", function() {
         expect(this.promise.state()).to.eql('resolved');
       });
+    }); // id is '123', type is '$internal', object is {action: 'do some background magic'}}
 
-    });
-
-    _when("id is '123', type is 'document', object is {name: 'test', $hidden: 'fresh'}}", function() {
-
+    _when("id is '123hidden', type is 'document', existing object is {name: 'test', $hidden: 'fresh'}}", function() {
       beforeEach(function() {
-        this.sandbox.stub(this.store, "cache").returns('cachedObject');
-        this.store.cache.andReturn({
-          name: 'test',
-          $hidden: 'fresh'
-        });
+        stubFindItem('document', '123hidden', {name: 'test', $hidden: 'fresh'})
       });
 
       it("should not overwrite $hidden property when not passed", function() {
-        var key, type, _ref;
-        this.store.save('document', '123', {
+        this.store.save('document', '123hidden', {
           name: 'new test'
         });
-
-        _ref = this.store.cache.args[0],
-        type = _ref[0],
-        key = _ref[1],
-        this.object = _ref[2];
-
-        expect(this.object.$hidden).to.eql('fresh');
+        var object = getLastSavedObject()
+        expect(object.$hidden).to.eql('fresh');
       });
 
       it("should overwrite $hidden property when passed", function() {
-        var key, type, _ref;
-        this.store.save('document', '123', {
+        this.store.save('document', '123hidden', {
           name: 'new test',
           $hidden: 'wicked'
         });
 
-        _ref = this.store.cache.args[0],
-        type = _ref[0],
-        key = _ref[1],
-        this.object = _ref[2];
-
-        expect(this.object.$hidden).to.eql('wicked');
+        var object = getLastSavedObject()
+        expect(object.$hidden).to.eql('wicked');
       });
-
-    });
-
-    it("should not overwrite createdAt attribute", function() {
-      var id, object, type, _ref;
-      this.sandbox.stub(this.store, "cache").returns('cachedObject');
-      this.store.save('document', '123', {
-        createdAt: 'check12'
-      });
-
-      _ref = this.store.cache.args[0],
-      type = _ref[0],
-      id = _ref[1],
-      object = _ref[2];
-
-      expect(object.createdAt).to.eql('check12');
-    });
-
-    it("should allow numbers and lowercase letters for type only. And must start with a letter or $", function() {
-      var invalid, key, promise, valid, _i, _j, _len, _len1, _results;
-      invalid = ['UPPERCASE', 'underLines', '-?&$', '12345', 'a'];
-      valid = ['car', '$email'];
-      for (_i = 0, _len = invalid.length; _i < _len; _i++) {
-        key = invalid[_i];
-        promise = this.store.save(key, 'valid', {});
-        expect(promise.state).to.eql('rejected');
-      }
-      _results = [];
-      for (_j = 0, _len1 = valid.length; _j < _len1; _j++) {
-        key = valid[_j];
-        promise = this.store.save(key, 'valid', {});
-        _results.push(expect(promise.state()).to.eql('resolved'));
-      }
-      _results;
-    });
-
-    it("should allow numbers, lowercase letters and dashes for for id only", function() {
-      var invalid, key, promise, valid, _i, _j, _len, _len1, _results;
-      invalid = ['UPPERCASE', 'underLines', '-?&$'];
-      valid = ['abc4567', '1', 123, 'abc-567'];
-
-      for (_i = 0, _len = invalid.length; _i < _len; _i++) {
-        key = invalid[_i];
-        promise = this.store.save('valid', key, {});
-        expect(promise.state()).to.eql('rejected');
-      }
-      _results = [];
-      for (_j = 0, _len1 = valid.length; _j < _len1; _j++) {
-        key = valid[_j];
-        promise = this.store.save('valid', key, {});
-        _results.push(expect(promise.state()).to.eql('resolved'));
-      }
-      _results;
-    });
+    }); // id is '123hidden', type is 'document', object is {name: 'test', $hidden: 'fresh'}}
 
     _when("called without id", function() {
-
       beforeEach(function() {
-        var _ref;
-        this.sandbox.stub(this.store, "cache").returns('cachedObject');
-        this.promise = this.store.save('document', void 0, {
-          name: 'test'
-        }, {
-          option: 'value'
+        this.promise = this.store.save('document', undefined, {
+          name: 'this is new'
         });
-
-        _ref = this.store.cache.args[0],
-        this.type = _ref[0],
-        this.key = _ref[1],
-        this.object = _ref[2],
-        _ref;
       });
 
       it("should generate an id", function() {
-        expect(this.key).to.eql('uuid');
+        var key = getLastSavedKey();
+        expect(key).to.eql('document/uuid');
       });
-
-      it("should set createdBy", function() {
-        expect(this.object.createdBy).to.eql('owner_hash');
-      });
-
-      it("should pass options", function() {
-        var options = this.store.cache.args[3];
-        expect(options.option).to.eql('value');
-      });
-
-      _when("successful", function() {
-
-        it("should resolve the promise", function() {
-          expect(this.promise.state()).to.eql('resolved');
-        });
-
-        it("should pass the object to done callback", function() {
-          this.promise.then(this.noop, function (res) {
-            expect(res).to.eql('cachedObject', true);
-          });
-        });
-
-        it("should pass true (= created) as the second param to the done callback", function() {
-          this.promise.then(this.noop, function (res) {
-            expect(res).to.eql('cachedObject', true);
-          });
-        });
-
-      });
-
-    });
+    }); // called without id
 
     _when("store is bootstrapping", function() {
 
       beforeEach(function() {
-        // we can't force it to return always true, as we'd
-        // end up in infinite loop.
-        // spyOn(this.store, "isBootstrapping").andReturn(true);
-        this.store._bootstrapping = true;
-        expect(this.store.isBootstrapping()).to.be.ok();
+        // // we can't force it to return always true, as we'd
+        // // end up in infinite loop.
+        // // spyOn(this.store, "isBootstrapping").andReturn(true);
+        // this.store._bootstrapping = true;
+        // expect(this.store.isBootstrapping()).to.be.ok();
+
+        var called = false;
+        this.sandbox.stub(this.store, 'isBootstrapping', function() {
+          if (called) return false;
+          called = true;
+          return true;
+        })
       });
 
       it("should wait until bootstrapping is finished", function() {
         var promise = this.store.save('task', '123', { title: 'do it!' });
         promise.fail( function() { console.log(arguments); });
-        expect(promise.state()).to.eql('pending');
-
+        expect(promise).to.be.pending();
+        this.store.subscribeToOutsideEvents();
         this.hoodie.trigger('remote:bootstrap:end');
-
-        expect(promise.state()).to.eql('resolved');
+        expect(promise).to.be.resolved();
       });
-
-    });
-  });
+    }); // store is bootstrapping
+  }); // #save
 
   //
   xdescribe("#add(type, object, options)", function() {
@@ -1061,6 +902,7 @@ describe("hoodie.store", function() {
 
         expect(promise.state()).to.eql('pending');
 
+        this.store.subscribeToOutsideEvents()
         this.hoodie.trigger('remote:bootstrap:end');
 
         expect(promise.state()).to.eql('resolved');
@@ -1841,7 +1683,7 @@ describe("hoodie.store", function() {
         };
         this.store.clearChanged('couch', 123);
 
-        expect(this.store._dirty['couch/123']).to.be.undefined;
+        expect(this.store._dirty['couch/123']).to.be(undefined);
       });
 
       it("should update array of _dirty IDs in localStorage", function() {
@@ -1982,3 +1824,41 @@ describe("hoodie.store", function() {
   });
 
 });
+
+function now() {
+  return '1970-01-01T00:00:00.000Z';
+}
+
+function getLastSavedObject() {
+  var calls = window.localStorage.setItem.args;
+  var object;
+
+  // ignore update of _dirty keys
+  if (calls[calls.length - 1][0] === '_dirty') {
+    object = calls[calls.length - 2][1];
+  } else {
+    object = calls[calls.length - 1][1];
+  }
+  return JSON.parse(object);
+}
+function getLastSavedKey() {
+  var calls = window.localStorage.setItem.args;
+  var key;
+
+  // ignore update of _dirty keys
+  if (calls[calls.length - 1][0] === '_dirty') {
+    key = calls[calls.length - 2][0];
+  } else {
+    key = calls[calls.length - 1][0];
+  }
+  return key;
+}
+function stubFindItem(key, id, object) {
+  var key = [key, id].join('/');
+  if (object) {
+    delete object.id
+    delete object.type
+    object = JSON.stringify(object)
+  }
+  window.localStorage.getItem.withArgs(key).returns(object)
+}

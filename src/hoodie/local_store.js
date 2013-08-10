@@ -160,7 +160,7 @@ function hoodieStore (hoodie) {
       triggerEvents(event, object, options);
     } catch (_error) {
       error = _error;
-      defer.reject(error).promise();
+      defer.reject(error.toString()).promise();
     }
 
     return decoratePromise(defer.promise());
@@ -443,7 +443,6 @@ function hoodieStore (hoodie) {
       }
 
     }
-
 
     if (isMarkedAsDeleted(object)) {
       store.markAsChanged(type, id, object, options);
@@ -830,17 +829,19 @@ function hoodieStore (hoodie) {
 
   // store IDs of dirty objects
   function saveDirtyIds() {
-    if ($.isEmptyObject(dirty)) {
-      return db.removeItem('_dirty');
-    } else {
-      var ids = Object.keys(dirty);
-      return db.setItem('_dirty', ids.join(','));
-    }
+    try {
+      if ($.isEmptyObject(dirty)) {
+        db.removeItem('_dirty');
+      } else {
+        var ids = Object.keys(dirty);
+        db.setItem('_dirty', ids.join(','));
+      }
+    } catch(e) {}
   }
 
   //
   function now() {
-    return JSON.stringify(new Date()).replace(/'/g, '');
+    return JSON.stringify(new Date()).replace(/['"]/g, '');
   }
 
   // only lowercase letters, numbers and dashes are allowed for ids
@@ -932,7 +933,7 @@ function hoodieStore (hoodie) {
       method = methodCall[0];
       args = methodCall[1];
       defer = methodCall[2];
-      this[method].apply(store, args).then(defer.resolve, defer.reject);
+      store[method].apply(store, args).then(defer.resolve, defer.reject);
     }
 
     store.trigger('bootstrap:end');

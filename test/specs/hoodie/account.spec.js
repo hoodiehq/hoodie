@@ -4,10 +4,6 @@
 
 describe('hoodie.account', function () {
 
-  function now() {
-    return '1970-01-01T00:00:00.000Z';
-  }
-
   beforeEach(function () {
     localStorage.clear();
 
@@ -968,7 +964,7 @@ describe('hoodie.account', function () {
             this.account.signIn('joe@example.com', 'secret');
 
             expect(this.account.fetch.calledWith('joe@example.com')).to.be.ok();
-            expect(this.account.username).to.be.undefined;
+            expect(this.account.username).to.be(undefined);
           });
 
           it('should reject with the reason', function () {
@@ -1103,11 +1099,11 @@ describe('hoodie.account', function () {
       });
 
       it('should not send salt', function () {
-        expect(this.data.salt).to.be.undefined;
+        expect(this.data.salt).to.be(undefined);
       });
 
       it.skip('should not send password_sha', function () {
-        expect(this.data.password_sha).to.be.undefined();
+        expect(this.data.password_sha).to.be(undefined);
       });
 
       _when('change password successful', function () {
@@ -1216,7 +1212,7 @@ describe('hoodie.account', function () {
       });
 
       it('should unset @username', function () {
-        expect(this.account.username).to.be.undefined;
+        expect(this.account.username).to.be(undefined);
       });
 
       it('should clear config', function () {
@@ -1269,7 +1265,7 @@ describe('hoodie.account', function () {
         });
 
         it('should unset @username', function () {
-          expect(this.account.username).to.be.undefined;
+          expect(this.account.username).to.be(undefined);
         });
 
         it('should clear config', function () {
@@ -1483,7 +1479,7 @@ describe('hoodie.account', function () {
           });
 
           it('should unset @username', function () {
-            expect(this.account.username).to.be.undefined;
+            expect(this.account.username).to.be(undefined);
           });
 
           it('should regenerate @ownerHash', function () {
@@ -1578,7 +1574,7 @@ describe('hoodie.account', function () {
       });
 
       it('should unset @username', function () {
-        expect(this.account.username).to.be.undefined;
+        expect(this.account.username).to.be(undefined);
       });
 
       it('should regenerate @ownerHash', function () {
@@ -1948,4 +1944,8 @@ function with_session_invalidated_before (callback) {
 
     callback()
   })
+}
+
+function now() {
+  return '1970-01-01T00:00:00.000Z';
 }

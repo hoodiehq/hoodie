@@ -398,7 +398,7 @@ describe("Hoodie.Remote", function() {
       });
 
       it("should not generate a _rev", function() {
-        expect(this.data._rev).to.be.undefined;
+        expect(this.data._rev).to.be(undefined);
       });
 
     });
@@ -983,7 +983,7 @@ describe("Hoodie.Remote", function() {
         doc = docs[0];
         expect(doc.id).to.eqlUndefined();
         expect(doc._id).to.eql('todo/abc3');
-        expect(doc._localInfo).to.be.undefined;
+        expect(doc._localInfo).to.be(undefined);
       });
 
       it("should set data.new_edits to false", function() {

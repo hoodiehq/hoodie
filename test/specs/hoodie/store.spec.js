@@ -231,7 +231,7 @@ describe("Hoodie.Store", function() {
             obj.config.funky = 'fresh';
             return obj;
           });
-          expect(originalObject.config.funky).to.be.undefined;
+          expect(originalObject.config.funky).to.be(undefined);
           expect(this.store.save.called).to.be.ok();
         });
 
