@@ -50,7 +50,7 @@ describe('hoodie.remote', function() {
     it.skip('should have some specs')
   });
 
-  describe('#connect()', function() {
+  xdescribe('#connect()', function() {
     beforeEach(function() {
       this.authenticateDefer = this.hoodie.defer();
       this.sandbox.spy(this.remote, 'sync')
@@ -95,16 +95,15 @@ describe('hoodie.remote', function() {
     }); // successfully authenticated
   }); // #connect
 
-  xdescribe('#disconnect()', function() {
-
+  describe('#disconnect()', function() {
     it('should unsubscribe from stores\'s dirty idle event', function() {
       this.remote.disconnect();
-      expect(this.hoodie.unbind.calledWith('store:idle', this.remote.push)).to.be.ok();
+      expect(this.hoodie.unbind).to.be.calledWith('store:idle', this.remote.push);
     });
 
     it('should set connected to false', function() {
       this.remote.disconnect();
-      expect(this.remote.isConnected()).to.not.be.ok();
+      expect(this.remote.isConnected()).to.be(false);
     });
   }); // #disconnect
 
