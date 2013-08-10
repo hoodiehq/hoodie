@@ -1299,7 +1299,7 @@ describe('hoodie.account', function () {
     }); // user has account
   }); // #signOut
 
-  describe('#hasAccount()', function () {
+  xdescribe('#hasAccount()', function () {
     _when('#username is undefined', function () {
       beforeEach(function () {
         delete this.account.username;
@@ -1321,41 +1321,35 @@ describe('hoodie.account', function () {
     }); // #username is set
   }); // #hasAccount
 
-  // describe('#hasAnonymousAccount()', function () {
+  describe('#hasAnonymousAccount()', function () {
+    _when('_account.anonymousPassword is set', function () {
+      beforeEach(function () {
+        this.sandbox.stub(this.hoodie.config, 'get', function (key) {
+          if (key === '_account.anonymousPassword') {
+            return 'password';
+          }
+        });
+      });
 
-  //   _when('_account.anonymousPassword is set', function () {
+      it('should return true', function () {
+        expect(this.account.hasAnonymousAccount()).to.eql(true);
+      });
+    }); // _account.anonymousPassword is set
 
-  //     beforeEach(function () {
-  //       this.sandbox.stub(this.hoodie.config, 'get').returns(function (key) {
-  //         if (key === '_account.anonymousPassword') {
-  //           return 'password';
-  //         }
-  //       });
-  //     });
+    _when('_account.anonymousPassword is not set', function () {
+      beforeEach(function () {
+        this.sandbox.stub(this.hoodie.config, 'get', function (key) {
+          if (key === '_account.anonymousPassword') {
+            return undefined;
+          }
+        });
+      });
 
-  //     it('should return true', function () {
-  //       expect(this.account.hasAnonymousAccount()).to.eql(true);
-  //     });
-
-  //   });
-
-  //   _when('_account.anonymousPassword is not set', function () {
-
-  //     beforeEach(function () {
-  //       this.sandbox.stub(this.hoodie.config, 'get').returns(function (key) {
-  //         if (key === '_account.anonymousPassword') {
-  //           return undefined;
-  //         }
-  //       });
-  //     });
-
-  //     xit('should return false', function () {
-  //       expect(this.account.hasAnonymousAccount()).to.eql(false);
-  //     });
-
-  //   });
-
-  // });
+      it('should return false', function () {
+        expect(this.account.hasAnonymousAccount()).to.eql(false);
+      });
+    }); // _account.anonymousPassword is not set
+  }); // #hasAnonymousAccount
 
   // describe('#on(event, callback)', function () {
 
