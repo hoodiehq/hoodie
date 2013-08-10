@@ -35,7 +35,7 @@ describe('hoodie.account', function () {
     this.account = this.hoodie.account;
   });
 
-  xdescribe('#authenticate()', function () {
+  describe('#authenticate()', function () {
 
     beforeEach(function() {
       this.sandbox.stub(this.account, 'request').returns(this.requestDefer.promise())
@@ -273,7 +273,7 @@ describe('hoodie.account', function () {
   }); // # authenticate
 
 
-  xdescribe('#signUp(username, password)', function () {
+  describe('#signUp(username, password)', function () {
 
     beforeEach(function () {
       this.sandbox.stub(this.account, 'request', this.fakeRequest);
@@ -693,7 +693,7 @@ describe('hoodie.account', function () {
     }); // username set
   }); // #signUp
 
-  xdescribe('#anonymousSignUp()', function () {
+  describe('#anonymousSignUp()', function () {
 
     beforeEach(function () {
       this.signUpDefer = this.hoodie.defer();
@@ -724,7 +724,7 @@ describe('hoodie.account', function () {
     });
   }); // #anonymousSignUp
 
-  xdescribe('#signIn(username, password)', function () {
+  describe('#signIn(username, password)', function () {
 
     beforeEach(function () {
       this.signOutDefer = this.hoodie.defer();
@@ -1023,7 +1023,7 @@ describe('hoodie.account', function () {
     }); // signout succeeds
   }); // #signIn
 
-  xdescribe('#changePassword(currentPassword, newPassword)', function () {
+  describe('#changePassword(currentPassword, newPassword)', function () {
     beforeEach(function () {
       this.account.username = 'joe@example.com';
       presetUserDoc(this);
@@ -1179,7 +1179,7 @@ describe('hoodie.account', function () {
     }); // fetching _users has an error
   }); // #changePassword
 
-  xdescribe('#signOut(options)', function () {
+  describe('#signOut(options)', function () {
 
     beforeEach(function () {
       this.sandbox.stub(this.hoodie, 'uuid').returns('newHash');
@@ -1279,7 +1279,7 @@ describe('hoodie.account', function () {
     }); // user has account
   }); // #signOut
 
-  xdescribe('#hasAccount()', function () {
+  describe('#hasAccount()', function () {
     _when('#username is undefined', function () {
       beforeEach(function () {
         delete this.account.username;
@@ -1301,7 +1301,7 @@ describe('hoodie.account', function () {
     }); // #username is set
   }); // #hasAccount
 
-  xdescribe('#hasAnonymousAccount()', function () {
+  describe('#hasAnonymousAccount()', function () {
     _when('_account.anonymousPassword is set', function () {
       beforeEach(function () {
         this.sandbox.stub(this.hoodie.config, 'get', function (key) {
@@ -1331,7 +1331,7 @@ describe('hoodie.account', function () {
     }); // _account.anonymousPassword is not set
   }); // #hasAnonymousAccount
 
-  xdescribe('#on(event, callback)', function () {
+  describe('#on(event, callback)', function () {
     beforeEach(function () {
       this.sandbox.spy(this.hoodie, 'on');
     });
@@ -1351,7 +1351,7 @@ describe('hoodie.account', function () {
     });
   }); // #on
 
-  xdescribe('#db()', function () {
+  describe('#db()', function () {
     _when('account.ownerHash is \'owner_hash123\'', function () {
 
       beforeEach(function () {
@@ -1365,7 +1365,7 @@ describe('hoodie.account', function () {
     });
   });
 
-  xdescribe('#fetch()', function () {
+  describe('#fetch()', function () {
 
     _when('username is not set', function () {
 
@@ -1424,7 +1424,7 @@ describe('hoodie.account', function () {
     }); // username is joe@example.com
   }); // #fetch
 
-  xdescribe('#destroy()', function () {
+  describe('#destroy()', function () {
 
     beforeEach(function () {
       this.account.username = 'joe@example.com';
@@ -1599,7 +1599,7 @@ describe('hoodie.account', function () {
     }); // user has no account
   }); // #destroy
 
-  xdescribe('#resetPassword(username)', function () {
+  describe('#resetPassword(username)', function () {
     beforeEach(function () {
       this.sandbox.stub(this.account, 'checkPasswordReset').returns('checkPasswordResetPromise');
     });
@@ -1699,7 +1699,7 @@ describe('hoodie.account', function () {
     }); // there is no pending password reset request
   }); // #resetPassword
 
-  xdescribe('#trigger(event, arg1, arg2, ...)', function () {
+  describe('#trigger(event, arg1, arg2, ...)', function () {
     it('should proxy to hoodie.trigger', function() {
       this.account.trigger('say', 'funky', 'fresh');
       expect(this.hoodie.trigger).to.be.calledWith('account:say', 'funky', 'fresh');
