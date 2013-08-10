@@ -273,7 +273,7 @@ describe('Hoodie.Account', function () {
   }); // # authenticate
 
 
-  describe('#signUp(username, password)', function () {
+  xdescribe('#signUp(username, password)', function () {
 
     beforeEach(function () {
       this.sandbox.stub(this.account, 'request', this.fakeRequest);
@@ -693,7 +693,7 @@ describe('Hoodie.Account', function () {
     }); // username set
   }); // #signUp
 
-  describe('#anonymousSignUp()', function () {
+  xdescribe('#anonymousSignUp()', function () {
 
     beforeEach(function () {
       this.signUpDefer = this.hoodie.defer();
@@ -722,310 +722,307 @@ describe('Hoodie.Account', function () {
         expect(this.hoodie.config.set).to.be.calledWith('_account.anonymousPassword', 'crazyuuid123');
       });
     });
-  });
-
-  // xdescribe('#signIn(username, password)', function () {
-
-  //   beforeEach(function () {
-  //     this.signOutDefer = this.hoodie.defer();
-  //     this.sandbox.stub(this.account, 'signOut').returns(this.signOutDefer.promise());
-  //   });
-
-  //   it('should sign out silently', function () {
-  //     this.account.signIn('joe@example.com', 'secret');
-  //     expect(this.account.signOut.calledWith({
-  //       silent: true
-  //     })).to.be.ok();
-  //   });
-
-  //   it('should downcase username', function () {
-  //     var options, path, type, _ref;
-  //     this.signOutDefer.resolve();
-  //     this.account.signIn('Joe', 'secret');
-  //     _ref = this.hoodie.request.args[0],
-  //     type = _ref[0],
-  //     path = _ref[1],
-  //     options = _ref[2];
-
-  //     expect(options.data.name).to.eql('user/joe');
-  //   });
-
-  //   _when('signing in with current username', function () {
-
-  //     beforeEach(function () {
-  //       var _ref;
-  //       this.account.username = 'joe@example.com';
-  //       this.account.signIn('joe@example.com', 'secret');
-  //       _ref = this.hoodie.request.args[0],
-  //       this.type = _ref[0],
-  //       this.path = _ref[1],
-  //       this.options = _ref[2], _ref;
-  //     });
-
-  //     it('should not sign out', function () {
-  //       expect(this.account.signOut.called).to.not.be.ok();
-  //     });
-
-  //     it('should send a POST request to http://cou.ch/_session', function () {
-  //       expect(this.hoodie.request.called).to.be.ok();
-  //       expect(this.type).to.eql('POST');
-  //       expect(this.path).to.eql('/_session');
-  //     });
-
-  //     _and('signIn successful', function () {
-
-  //       beforeEach(function () {
-  //         this.response = {
-  //           'ok': true,
-  //           'name': 'user/joe@example.com',
-  //           'roles': ['user_hash', 'confirmed']
-  //         };
-  //         this.requestDefer.resolve(this.response);
-  //       });
-
-  //       it('should not trigger `account:cleanup` event', function () {
-  //         this.account.signIn('joe@example.com', 'secret');
-  //         expect(this.hoodie.trigger.calledWith('account:cleanup')).to.not.be.ok();
-  //       });
-
-  //       it('should not trigger signin events', function () {
-  //         expect(this.hoodie.trigger.calledWith('account:signin', 'joe@example.com')).to.not.be.ok();
-  //         expect(this.hoodie.trigger.calledWith('account:signin:anonymous', 'joe@example.com')).to.not.be.ok();
-  //       });
-
-  //       it('should trigger reauthenticated event', function () {
-  //         expect(this.hoodie.trigger.calledWith('account:reauthenticated', 'joe@example.com')).to.be.ok();
-  //       });
-
-  //     });
-
-  //   });
-
-  //   _when('signout errors', function () {
-
-  //     beforeEach(function () {
-  //       this.signOutDefer.reject({
-  //         reason: 'a unicorn just cried'
-  //       });
-  //     });
-
-  //     it('should return the rejected promise', function () {
-  //       var promise = this.account.signOut();
-
-  //       promise.then(this.noop, function (res) {
-  //         expect(res).to.eql({
-  //           reason: 'a unicorn just cried'
-  //         });
-  //       });
-
-  //     });
-
-  //   });
-
-  //   _when('signout succeeds', function () {
+  }); // #anonymousSignUp
+
+  describe('#signIn(username, password)', function () {
+
+    beforeEach(function () {
+      this.signOutDefer = this.hoodie.defer();
+      this.sandbox.stub(this.account, 'signOut').returns(this.signOutDefer.promise());
+    });
+
+    it('should sign out silently', function () {
+      this.account.signIn('joe@example.com', 'secret');
+      expect(this.account.signOut.calledWith({
+        silent: true
+      })).to.be.ok();
+    });
+
+    it('should downcase username', function () {
+      var options, path, type, args;
+      this.signOutDefer.resolve();
+      this.account.signIn('Joe', 'secret');
+      args = this.hoodie.request.args[0],
+      type = args[0],
+      path = args[1],
+      options = args[2];
+
+      expect(options.data.name).to.eql('user/joe');
+    });
+
+    _when('signing in with current username', function () {
+
+      beforeEach(function () {
+        var args;
+        this.account.username = 'joe@example.com';
+        this.account.signIn('joe@example.com', 'secret');
+        args = this.hoodie.request.args[0],
+        this.type = args[0],
+        this.path = args[1],
+        this.options = args[2];
+      });
+
+      it('should not sign out', function () {
+        expect(this.account.signOut.called).to.not.be.ok();
+      });
+
+      it('should send a POST request to http://cou.ch/_session', function () {
+        expect(this.hoodie.request.called).to.be.ok();
+        expect(this.type).to.eql('POST');
+        expect(this.path).to.eql('/_session');
+      });
+
+      _and('signIn successful', function () {
+
+        beforeEach(function () {
+          this.response = {
+            'ok': true,
+            'name': 'user/joe@example.com',
+            'roles': ['user_hash', 'confirmed']
+          };
+          this.requestDefer.resolve(this.response);
+        });
+
+        it('should not trigger `account:cleanup` event', function () {
+          this.account.signIn('joe@example.com', 'secret');
+          expect(this.hoodie.trigger.calledWith('account:cleanup')).to.not.be.ok();
+        });
+
+        it('should not trigger signin events', function () {
+          expect(this.hoodie.trigger.calledWith('account:signin', 'joe@example.com')).to.not.be.ok();
+          expect(this.hoodie.trigger.calledWith('account:signin:anonymous', 'joe@example.com')).to.not.be.ok();
+        });
+
+        it('should trigger reauthenticated event', function () {
+          expect(this.hoodie.trigger.calledWith('account:reauthenticated', 'joe@example.com')).to.be.ok();
+        });
+
+      }); // signIn successful
+
+    }); // signing in with current username
+
+    _when('signout errors', function () {
+
+      beforeEach(function () {
+        this.signOutDefer.reject({
+          reason: 'a unicorn just cried'
+        });
+      });
+
+      it('should return the rejected promise', function () {
+        var promise = this.account.signOut();
+
+        promise.then(this.noop, function (res) {
+          expect(res).to.eql({
+            reason: 'a unicorn just cried'
+          });
+        });
+
+      });
+
+    }); // signout errors
+
+    _when('signout succeeds', function () {
+
+      beforeEach(function () {
+        var args;
+        this.signOutDefer.resolve();
+        this.account.signIn('joe@example.com', 'secret');
+
+        args = this.hoodie.request.args[0],
+        this.type = args[0],
+        this.path = args[1],
+        this.options = args[2];
+      });
+
+      it('should send a POST request to http://cou.ch/_session', function () {
+        expect(this.hoodie.request.called).to.be.ok();
+        expect(this.type).to.eql('POST');
+        expect(this.path).to.eql('/_session');
+      });
+
+      it('should send username as name parameter', function () {
+        expect(this.options.data.name).to.eql('user/joe@example.com');
+      });
+
+      it('should send password', function () {
+        expect(this.options.data.password).to.eql('secret');
+      });
+
+      _and('signIn successful', function () {
 
-  //     beforeEach(function () {
-  //       var _ref;
-  //       this.signOutDefer.resolve();
-  //       this.account.signIn('joe@example.com', 'secret');
+        _and('account is confirmed', function () {
 
-  //       _ref = this.hoodie.request.args[0],
-  //       this.type = _ref[0],
-  //       this.path = _ref[1],
-  //       this.options = _ref[2], _ref;
-  //     });
-
-  //     it('should send a POST request to http://cou.ch/_session', function () {
-  //       expect(this.hoodie.request.called).to.be.ok();
-  //       expect(this.type).to.eql('POST');
-  //       expect(this.path).to.eql('/_session');
-  //     });
-
-  //     it('should send username as name parameter', function () {
-  //       expect(this.options.data.name).to.eql('user/joe@example.com');
-  //     });
-
-  //     it('should send password', function () {
-  //       expect(this.options.data.password).to.eql('secret');
-  //     });
-
-  //     _and('signIn successful', function () {
-
-  //       _and('account is confirmed', function () {
-
-  //         beforeEach(function () {
-  //           this.response = {
-  //             'ok': true,
-  //             'name': 'user/joe@example.com',
-  //             'roles': ['user_hash', 'confirmed']
-  //           };
-  //           this.requestDefer.resolve(this.response);
-
-  //           this.sandbox.spy(this.hoodie.config, 'set');
-
-  //           delete this.account.username;
-  //           this.hoodie.trigger.reset();
-  //         });
-
-  //         _and('user has an anonyomous account', function () {
-
-  //           beforeEach(function () {
-  //             this.sandbox.stub(this.account, 'hasAnonymousAccount').returns(true);
-  //           });
-
-  //           it('should trigger `account:signin:anonymous` event', function () {
-  //             this.account.signIn('joe@example.com', 'secret');
-  //             expect(this.hoodie.trigger.calledWith('account:signin:anonymous', 'joe@example.com')).to.be.ok();
-  //           });
-
-  //         });
-
-  //         _and('user has a manual account', function () {
-
-  //           beforeEach(function () {
-  //             this.sandbox.stub(this.account, 'hasAnonymousAccount').returns(false);
-  //           });
-
-  //           it('should trigger `account:signin` event', function () {
-  //             this.account.signIn('joe@example.com', 'secret');
-  //             expect(this.hoodie.trigger.calledWith('account:signin', 'joe@example.com')).to.be.ok();
-  //           });
-
-  //         });
-
-  //         it('should set @username', function () {
-  //           this.account.signIn('joe@example.com', 'secret');
-
-  //           expect(this.account.username).to.eql('joe@example.com');
-  //           expect(this.hoodie.config.set.calledWith('_account.username', 'joe@example.com')).to.be.ok();
-  //         });
-
-  //         it('should set @ownerHash', function () {
-  //           delete this.account.ownerHash;
-  //           this.account.signIn('joe@example.com', 'secret');
-
-  //           expect(this.account.ownerHash).to.eql('user_hash');
-  //           expect(this.hoodie.config.set.calledWith('_account.ownerHash', 'user_hash')).to.be.ok();
-  //           expect(this.hoodie.config.set.calledWith('createdBy', 'user_hash')).to.be.ok();
-  //         });
-
-  //         it('should fetch the _users doc', function () {
-  //           this.sandbox.spy(this.account, 'fetch');
-  //           this.account.signIn('joe@example.com', 'secret');
-  //           expect(this.account.fetch.called).to.be.ok();
-  //         });
-
-  //         it('should resolve with username and response', function () {
-  //           this.account.signIn('joe@example.com', 'secret').then(function (res) {
-  //             expect(res).to.eql('joe@example.com', 'user_hash');
-  //           });
-
-  //         });
-
-  //       });
-
-  //       _and('account not (yet) confirmed', function () {
-
-  //         beforeEach(function () {
-  //           this.response = {
-  //             'ok': true,
-  //             'name': 'user/joe@example.com',
-  //             'roles': []
-  //           };
-  //           this.requestDefer.resolve(this.response);
-  //         });
-
-  //         it('should reject with unconfirmed error.', function () {
-  //           var promise = this.account.signIn('joe@example.com', 'secret');
-
-  //           promise.fail(function (res) {
-  //             expect(res).to.eql({
-  //               error: 'unconfirmed',
-  //               reason: 'account has not been confirmed yet'
-  //             });
-  //           });
-
-  //         });
-
-  //       });
-
-  //       _and('account has an error', function () {
-
-  //         beforeEach(function () {
-  //           var _this = this;
-  //           this.response = {
-  //             'ok': true,
-  //             'name': 'user/joe@example.com',
-  //             'roles': ['error']
-  //           };
-  //           this.requestDefer.resolve(this.response);
-  //           this.sandbox.stub(this.account, 'fetch').returns(function () {
-  //             _this.account._doc.$error = 'because you stink!';
-  //             return _this.hoodie.defer().resolve();
-  //           });
-
-  //         });
-
-  //         it('should fetch user doc without setting @username', function () {
-  //           this.account.signIn('joe@example.com', 'secret');
-
-  //           expect(this.account.fetch.calledWith('joe@example.com')).to.be.ok();
-  //           expect(this.account.username).to.be.undefined;
-  //         });
-
-  //         it('should reject with the reason', function () {
-  //           this.account.signIn('joe@example.com', 'secret').fail(function (res) {
-  //             expect(res).to.eqlRejectedWith({
-  //               error: 'error',
-  //               reason: 'because you stink!'
-  //             });
-  //           });
-  //         });
-
-  //       });
-
-  //     });
-
-  //     _when('signIn not succesful because unauthorized', function () {
-
-  //       beforeEach(function () {
-  //         this.response = {
-  //           responseText: '{\'error\':\'unauthorized\',\'reason\':\'Name or password is incorrect.\'}'
-  //         };
-  //         this.requestDefer.reject(this.response);
-  //       });
-
-  //       it('should be rejected with unauthorized error', function () {
-  //         this.account.signIn('joe@example.com', 'secret').fail(function (res) {
-  //           expect(res).to.eqlRejectedWith({
-  //             error: 'unauthorized',
-  //             reason: 'Name or password is incorrect.'
-  //           });
-  //         });
-  //       });
-
-  //     });
-
-  //     _when('sign in without password', function () {
-
-  //       xit('should set password to empty string', function () {
-  //         var data, options, path, type, _ref;
-  //         this.account._requests = {};
-  //         this.account.signIn('joe@example.com');
-
-  //         _ref = this.hoodie.request.args[0],
-  //         type = _ref[0],
-  //         path = _ref[1],
-  //         options = _ref[2];
-  //         data = options.data;
-  //         expect(data.password).to.eql('');
-  //       });
-
-  //     });
-
-  //   });
-
-  // });
+          beforeEach(function () {
+            this.response = {
+              'ok': true,
+              'name': 'user/joe@example.com',
+              'roles': ['user_hash', 'confirmed']
+            };
+            this.requestDefer.resolve(this.response);
+
+            this.sandbox.spy(this.hoodie.config, 'set');
+
+            delete this.account.username;
+            this.hoodie.trigger.reset();
+          });
+
+          _and('user has an anonyomous account', function () {
+
+            beforeEach(function () {
+              this.sandbox.stub(this.account, 'hasAnonymousAccount').returns(true);
+            });
+
+            it('should trigger `account:signin:anonymous` event', function () {
+              this.account.signIn('joe@example.com', 'secret');
+              expect(this.hoodie.trigger.calledWith('account:signin:anonymous', 'joe@example.com')).to.be.ok();
+            });
+          }); // user has an anonyomous account
+
+          _and('user has a manual account', function () {
+
+            beforeEach(function () {
+              this.sandbox.stub(this.account, 'hasAnonymousAccount').returns(false);
+            });
+
+            it('should trigger `account:signin` event', function () {
+              this.account.signIn('joe@example.com', 'secret');
+              expect(this.hoodie.trigger.calledWith('account:signin', 'joe@example.com')).to.be.ok();
+            });
+
+          }); // user has a manual account
+
+          it('should set @username', function () {
+            this.account.signIn('joe@example.com', 'secret');
+
+            expect(this.account.username).to.eql('joe@example.com');
+            expect(this.hoodie.config.set.calledWith('_account.username', 'joe@example.com')).to.be.ok();
+          });
+
+          it('should set @ownerHash', function () {
+            delete this.account.ownerHash;
+            this.account.signIn('joe@example.com', 'secret');
+
+            expect(this.account.ownerHash).to.eql('user_hash');
+            expect(this.hoodie.config.set.calledWith('_account.ownerHash', 'user_hash')).to.be.ok();
+            expect(this.hoodie.config.set.calledWith('createdBy', 'user_hash')).to.be.ok();
+          });
+
+          it('should fetch the _users doc', function () {
+            this.sandbox.spy(this.account, 'fetch');
+            this.account.signIn('joe@example.com', 'secret');
+            expect(this.account.fetch.called).to.be.ok();
+          });
+
+          it('should resolve with username and response', function () {
+            this.account.signIn('joe@example.com', 'secret').then(function (res) {
+              expect(res).to.eql('joe@example.com', 'user_hash');
+            });
+          });
+
+        }); // account is confirmed
+
+        _and('account not (yet) confirmed', function () {
+
+          beforeEach(function () {
+            this.response = {
+              'ok': true,
+              'name': 'user/joe@example.com',
+              'roles': []
+            };
+            this.requestDefer.resolve(this.response);
+          });
+
+          it('should reject with unconfirmed error.', function () {
+            var promise = this.account.signIn('joe@example.com', 'secret');
+
+            promise.fail(function (res) {
+              expect(res).to.eql({
+                error: 'unconfirmed',
+                reason: 'account has not been confirmed yet'
+              });
+            });
+
+          });
+
+        }); // account not (yet) confirmed
+
+        _and('account has an error', function () {
+
+          beforeEach(function () {
+
+            this.sandbox.stub(this.account, 'fetch')
+            .returns(this.hoodie.rejectWith({
+              error: 'error',
+              reason: 'because you stink!'
+            }));
+
+            this.requestDefer.resolve({
+              'ok': true,
+              'name': 'user/joe@example.com',
+              'roles': ['error']
+            });
+          });
+
+          it('should fetch user doc without setting @username', function () {
+            this.account.signIn('joe@example.com', 'secret');
+
+            expect(this.account.fetch.calledWith('joe@example.com')).to.be.ok();
+            expect(this.account.username).to.be.undefined;
+          });
+
+          it('should reject with the reason', function () {
+            this.account.signIn('joe@example.com', 'secret').fail(function (res) {
+              expect(res).to.eql({
+                error: 'error',
+                reason: 'because you stink!'
+              });
+            });
+          });
+
+        }); // account has an error
+
+      }); // signIn successful
+
+      _when('signIn not succesful because unauthorized', function () {
+
+        beforeEach(function () {
+          this.response = {
+            responseText: '{\'error\':\'unauthorized\',\'reason\':\'Name or password is incorrect.\'}'
+          };
+          this.requestDefer.reject(this.response);
+        });
+
+        it.skip('should be rejected with unauthorized error', function () {
+          this.account.signIn('joe@example.com', 'secret').fail(function (res) {
+            expect(res).to.eql({
+              error: 'unauthorized',
+              reason: 'Name or password is incorrect.'
+            });
+          });
+        });
+
+      }); // signIn not succesful because unauthorized
+
+      _when('sign in without password', function () {
+
+        it.skip('should set password to empty string', function () {
+          var data, options, path, type, args;
+          this.account.signIn('joe@example.com');
+
+          args = this.hoodie.request.args[0],
+          type = args[0],
+          path = args[1],
+          options = args[2];
+          data = options.data;
+          expect(data.password).to.eql('');
+        });
+
+      }); // sign in without password
+
+    }); // signout succeeds
+
+  }); // #signIn
 
   // describe('#changePassword(currentPassword, newPassword)', function () {
 
