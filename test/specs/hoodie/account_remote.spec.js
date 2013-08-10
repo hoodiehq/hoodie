@@ -95,7 +95,7 @@ describe('hoodie.remote', function() {
     }); // successfully authenticated
   }); // #connect
 
-  describe('#disconnect()', function() {
+  xdescribe('#disconnect()', function() {
     it('should unsubscribe from stores\'s dirty idle event', function() {
       this.remote.disconnect();
       expect(this.hoodie.unbind).to.be.calledWith('store:idle', this.remote.push);
@@ -107,14 +107,14 @@ describe('hoodie.remote', function() {
     });
   }); // #disconnect
 
-  xdescribe('#getSinceNr()', function() {
+  describe('#getSinceNr()', function() {
     beforeEach(function() {
-      this.sandbox.spy(this.hoodie.config, 'get');
+      this.sandbox.stub(this.hoodie.config, 'get');
     });
 
     it('should use user\'s config to get since nr', function() {
       this.remote.getSinceNr();
-      expect(this.hoodie.config.get.calledWith('_remote.since')).to.be.ok();
+      expect(this.hoodie.config.get).to.be.calledWith('_remote.since');
     });
 
     _when('config _remote.since is not defined', function() {
@@ -129,14 +129,14 @@ describe('hoodie.remote', function() {
     });
   }); // #getSinceNr
 
-  xdescribe('#setSinceNr(nr)', function() {
+  describe('#setSinceNr(nr)', function() {
     beforeEach(function() {
       this.sandbox.spy(this.hoodie.config, 'set');
     });
 
     it('should use user\'s config to store since nr persistantly', function() {
       this.remote.setSinceNr(100);
-      expect(this.hoodie.config.set.calledWith('_remote.since', 100)).to.be.ok();
+      expect(this.hoodie.config.set).to.be.calledWith('_remote.since', 100);
     });
   }); // #setSinceNr
 
