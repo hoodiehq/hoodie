@@ -448,7 +448,7 @@ function hoodieStore (hoodie) {
     }
 
     if (isMarkedAsDeleted(object)) {
-      store.markAsChanged(type, id, object, options);
+      markAsChanged(type, id, object, options);
       cached[key] = false;
       return false;
     }
@@ -458,7 +458,7 @@ function hoodieStore (hoodie) {
     cached[key] = $.extend(true, {}, object);
 
     if (hasLocalChanges(object)) {
-      store.markAsChanged(type, id, cached[key], options);
+      markAsChanged(type, id, cached[key], options);
     } else {
       store.clearChanged(type, id);
     }
@@ -492,28 +492,6 @@ function hoodieStore (hoodie) {
   // it cannot be removed from store but gets a `_deleted: true` attribute
   store.isMarkedAsDeleted = function(type, id) {
     return isMarkedAsDeleted(store.cache(type, id));
-  };
-
-
-  // Mark as changed
-  // -----------------
-
-  // Marks object as changed (dirty). Triggers a `store:dirty` event immediately and a
-  // `store:idle` event once there is no change within 2 seconds
-  store.markAsChanged = function markAsChanged(type, id, object, options) {
-    var key;
-
-    options = options || {};
-    key = '' + type + '/' + id;
-
-    dirty[key] = object;
-    saveDirtyIds();
-
-    if (options.silent) {
-      return;
-    }
-
-    return triggerDirtyAndIdleEvents();
   };
 
 
@@ -576,6 +554,10 @@ function hoodieStore (hoodie) {
   store.hasLocalChanges = function(type, id) {
     if (!type) {
       return !$.isEmptyObject(dirty);
+    }
+    var key = [type,id].join('/')
+    if (dirty[key]) {
+      return true
     }
     return hasLocalChanges(store.cache(type, id));
   };
@@ -784,6 +766,27 @@ function hoodieStore (hoodie) {
     subscribeToOutsideEvents();
     delete store.subscribeToOutsideEvents;
   };
+
+
+  //
+  // Marks object as changed (dirty). Triggers a `store:dirty` event immediately and a
+  // `store:idle` event once there is no change within 2 seconds
+  //
+  function markAsChanged(type, id, object, options) {
+    var key;
+
+    options = options || {};
+    key = '' + type + '/' + id;
+
+    dirty[key] = object;
+    saveDirtyIds();
+
+    if (options.silent) {
+      return;
+    }
+
+    return triggerDirtyAndIdleEvents();
+  }
 
 
   // when a change come's from our remote store, we differentiate

@@ -1195,8 +1195,7 @@ describe("hoodie.store", function() {
   }); // #clear
 
   //
-  describe("#hasLocalChanges(type, id)", function() {
-
+  xdescribe("#hasLocalChanges(type, id)", function() {
     _when("no arguments passed", function() {
       it("returns false when there are no local changes", function() {
         expect(this.store.hasLocalChanges()).to.eql(false);
@@ -1284,28 +1283,24 @@ describe("hoodie.store", function() {
   }); // #hasLocalChanges
 
   //
-  xdescribe("#markAsChanged(type, id, object)", function() {
+  describe("#markAsChanged(type, id, object)", function() {
 
     beforeEach(function() {
-      this.store._dirty = {};
-
       this.sandbox.spy(this.store, "trigger");
-
       this.store.markAsChanged('couch', '123', {
         color: 'red'
       });
-
     });
 
     it("should add it to the dirty list", function() {
-      expect(this.store._dirty['couch/123'].color).to.eql('red');
+      expect(this.store.hasLocalChanges('couch', '123')).to.be(true);
     });
 
-    it("should start dirty timeout for 2 seconds", function() {
-      var args = window.setTimeout.args[0];
-
-      expect(args[1]).to.eql(2000);
-      expect(this.store._dirtyTimeout).to.eql('newTimeout');
+    it.only("should start dirty timeout for 2 seconds", function() {
+      expect(this.store.trigger).to.be.calledWith('dirty')
+      expect(this.store.trigger).to.not.be.calledWith('idle')
+      this.clock.tick(2000);
+      expect(this.store.trigger).to.be.calledWith('idle')
     });
 
     it("should clear dirty timeout", function() {
