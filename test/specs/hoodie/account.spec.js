@@ -1321,7 +1321,7 @@ describe('hoodie.account', function () {
     }); // #username is set
   }); // #hasAccount
 
-  describe('#hasAnonymousAccount()', function () {
+  xdescribe('#hasAnonymousAccount()', function () {
     _when('_account.anonymousPassword is set', function () {
       beforeEach(function () {
         this.sandbox.stub(this.hoodie.config, 'get', function (key) {
@@ -1351,7 +1351,7 @@ describe('hoodie.account', function () {
     }); // _account.anonymousPassword is not set
   }); // #hasAnonymousAccount
 
-  describe('#on(event, callback)', function () {
+  xdescribe('#on(event, callback)', function () {
     beforeEach(function () {
       this.sandbox.spy(this.hoodie, 'on');
     });
@@ -1371,7 +1371,7 @@ describe('hoodie.account', function () {
     });
   }); // #on
 
-  describe('#db()', function () {
+  xdescribe('#db()', function () {
     _when('account.ownerHash is \'owner_hash123\'', function () {
 
       beforeEach(function () {
@@ -1385,89 +1385,82 @@ describe('hoodie.account', function () {
     });
   });
 
-  // describe('#fetch()', function () {
+  describe('#fetch()', function () {
 
-  //   _when('username is not set', function () {
+    _when('username is not set', function () {
 
-  //     beforeEach(function () {
-  //       this.account.username = null;
-  //       this.account.fetch();
-  //     });
+      beforeEach(function () {
+        this.account.username = null;
+        this.account.fetch();
+      });
 
-  //     it('should not send any request', function () {
-  //       expect(this.hoodie.request.called).to.not.be.ok();
-  //     });
+      it('should not send any request', function () {
+        expect(this.hoodie.request.called).to.not.be.ok();
+      });
+    }); // username is not set
 
-  //   });
+    _when('username is joe@example.com', function () {
 
-  //   _when('username is joe@example.com', function () {
+      beforeEach(function () {
+        this.account.username = 'joe@example.com';
+        this.account.fetch();
 
-  //     beforeEach(function () {
-  //       this.account.username = 'joe@example.com';
-  //       this.account.fetch();
+        var args = this.hoodie.request.args[0];
+        this.type = args[0];
+        this.path = args[1];
+        this.options = args[2];
+      });
 
-  //       var _ref = this.hoodie.request.args[0];
+      it('should send a GET request to http://cou.ch/_users/org.couchdb.user%3Auser%2Fjoe%40example.com', function () {
+        expect(this.hoodie.request.called).to.be.ok();
+        expect(this.type).to.eql('GET');
+        expect(this.path).to.eql('/_users/org.couchdb.user%3Auser%2Fjoe%40example.com');
+      });
 
-  //       this.type = _ref[0],
-  //       this.path = _ref[1],
-  //       this.options = _ref[2],
-  //       _ref;
-  //     });
+      _when('successful', function () {
 
-  //     it('should send a GET request to http://cou.ch/_users/org.couchdb.user%3Auser%2Fjoe%40example.com', function () {
-  //       expect(this.hoodie.request.called).to.be.ok();
-  //       expect(this.type).to.eql('GET');
-  //       expect(this.path).to.eql('/_users/org.couchdb.user%3Auser%2Fjoe%40example.com');
-  //     });
+        beforeEach(function () {
+          this.response = {
+            '_id': 'org.couchdb.user:baz',
+            '_rev': '3-33e4d43a6dff5b29a4bd33f576c7824f',
+            'name': 'baz',
+            'salt': '82163606fa5c100e0095ad63598de810',
+            'password_sha': 'e2e2a4d99632dc5e3fdb41d5d1ff98743a1f344e',
+            'type': 'user',
+            'roles': []
+          };
+          this.requestDefer.resolve(this.response);
+        });
 
-  //     _when('successful', function () {
+        it('should resolve its promise', function () {
+          var promise = this.account.fetch(), self = this;
 
-  //       beforeEach(function () {
-  //         this.response = {
-  //           '_id': 'org.couchdb.user:baz',
-  //           '_rev': '3-33e4d43a6dff5b29a4bd33f576c7824f',
-  //           'name': 'baz',
-  //           'salt': '82163606fa5c100e0095ad63598de810',
-  //           'password_sha': 'e2e2a4d99632dc5e3fdb41d5d1ff98743a1f344e',
-  //           'type': 'user',
-  //           'roles': []
-  //         };
-  //         this.requestDefer.resolve(this.response);
-  //       });
+          promise.fail(function (res) {
+            expect(res).to.eql(self.response);
+          });
+        });
+      }); // successful
 
-  //       it('should resolve its promise', function () {
-  //         var promise = this.account.fetch(), self = this;
+      _when('fails', function () {
 
-  //         promise.fail(function (res) {
-  //           expect(res).to.eql(self.response);
-  //         });
-  //       });
+        beforeEach(function () {
+          this.error = {
+            error: 'ErrorName',
+            reason: 'ErrorReason'
+          };
+          this.requestDefer.reject(this.error);
+        });
 
-  //     });
+        it('should resolve its promise', function () {
+          var promise = this.account.fetch(), self = this;
 
-  //     _when('fails', function () {
-
-  //       beforeEach(function () {
-  //         this.error = {
-  //           error: 'ErrorName',
-  //           reason: 'ErrorReason'
-  //         };
-  //         this.requestDefer.reject(this.error);
-  //       });
-
-  //       it('should resolve its promise', function () {
-  //         var promise = this.account.fetch(), self = this;
-
-  //         promise.fail(function (res) {
-  //           expect(res).to.eql(self.error);
-  //         });
-  //       });
-
-  //     });
-
-  //   });
-
-  // });
+          promise.fail(function (res) {
+            expect(res).to.eql(self.error);
+          });
+        });
+      }); // #fails
+    }); // username is joe@example.com
+  }); // #fetch
 
   // describe('#destroy()', function () {
 
