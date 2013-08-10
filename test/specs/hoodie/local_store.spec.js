@@ -748,8 +748,7 @@ describe("hoodie.store", function() {
   }); // #findAll
 
   //
-  describe("#remove(type, id)", function() {
-
+  xdescribe("#remove(type, id)", function() {
     _when("objecet cannot be found", function() {
       beforeEach(function() {
         stubFindItem('document', '123', null)
@@ -918,10 +917,12 @@ describe("hoodie.store", function() {
       });
 
     });
-  });
+  }); // #remove
 
   //
-  xdescribe("#cache(type, id, object)", function() {
+  // TODO: remove store.cache method from being accessible from outside.
+  //
+  describe.skip("#cache(type, id, object)", function() {
 
     beforeEach(function() {
       this.sandbox.spy(this.store, "markAsChanged");
@@ -1142,45 +1143,46 @@ describe("hoodie.store", function() {
   });
 
   //
-  xdescribe("#clear()", function() {
+  describe("#clear()", function() {
 
     it("should return a promise", function() {
       var promise = this.store.clear();
-      expect(promise).to.have.property('done');
-      expect(promise).to.not.have.property('resolved');
+      expect(promise).to.be.promise();
     });
 
     it("should clear localStorage", function() {
       this.sandbox.stub(this.store, "index").returns(['$config/hoodie', 'car/123', '_notOurBusiness']);
       this.store.clear();
 
-      expect(this.store.db.removeItem.calledWith('$config/hoodie')).to.be.ok();
-      expect(this.store.db.removeItem.calledWith('car/123')).to.be.ok();
-      expect(this.store.db.removeItem.calledWith('_notOurBusiness')).to.not.be.ok();
+      expect(localStorage.removeItem).to.be.calledWith('$config/hoodie');
+      expect(localStorage.removeItem).to.be.calledWith('car/123');
+      expect(localStorage.removeItem).to.not.be.calledWith('_notOurBusiness');
     });
 
     it("should clear chache", function() {
-      this.store._cached = 'funky';
+      this.store.find('document', '123')
+      this.store.find('document', '123')
+      expect(localStorage.getItem.callCount).to.be(1)
       this.store.clear();
-      expect($.isEmptyObject(this.store._cached)).to.be.ok();
+      this.store.find('document', '123')
+      expect(localStorage.getItem.callCount).to.be(2)
     });
 
     it("should clear dirty docs", function() {
       this.sandbox.spy(this.store, "clearChanged");
       this.store.clear();
-
-      expect(this.store.clearChanged.called).to.be.ok();
+      expect(this.store.clearChanged).to.be.called();
     });
 
     it("should resolve promise", function() {
       var promise = this.store.clear();
-      expect(promise.state()).to.eql('resolved');
+      expect(promise).to.be.resolved();
     });
 
     _when("an error occurs", function() {
 
       beforeEach(function() {
-        this.sandbox.stub(this.store, "clearChanged").returns(function() {
+        this.sandbox.stub(this.store, "clearChanged", function() {
           throw new Error('ooops');
         });
       });
@@ -1189,9 +1191,8 @@ describe("hoodie.store", function() {
         var promise = this.store.clear();
         expect(promise.state()).to.eql('rejected');
       });
-
-    });
-  });
+    }); // an error occurs
+  }); // #clear
 
   //
   xdescribe("#hasLocalChanges(type, id)", function() {
