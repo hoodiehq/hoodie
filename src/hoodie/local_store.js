@@ -348,10 +348,13 @@ function hoodieStore (hoodie) {
   };
 
 
-  // update / updateAll / removeAll
+  // add / update / updateAll / removeAll
   // --------------------------------
 
   // just decorating returned promises
+  store.add = function add() {
+    return decoratePromise(storeBase.add.apply(store, arguments));
+  };
   store.update = function update() {
     return decoratePromise(storeBase.update.apply(store, arguments));
   };

@@ -136,8 +136,7 @@ describe("hoodie.store", function() {
   }); // subscribeToOutsideEvents
 
   //
-  describe("#save(type, id, object, options)", function() {
-
+  xdescribe("#save(type, id, object, options)", function() {
     it("should return a promise", function() {
       var promise = this.store.save('document', '123', {
         name: 'test'
@@ -487,12 +486,6 @@ describe("hoodie.store", function() {
     _when("store is bootstrapping", function() {
 
       beforeEach(function() {
-        // // we can't force it to return always true, as we'd
-        // // end up in infinite loop.
-        // // spyOn(this.store, "isBootstrapping").andReturn(true);
-        // this.store._bootstrapping = true;
-        // expect(this.store.isBootstrapping()).to.be.ok();
-
         var called = false;
         this.sandbox.stub(this.store, 'isBootstrapping', function() {
           if (called) return false;
@@ -514,163 +507,23 @@ describe("hoodie.store", function() {
 
   //
   xdescribe("#add(type, object, options)", function() {
-
-    beforeEach(function() {
-      this.sandbox.stub(this.store, "save").returns('promise');
-    });
-
-    it("should call .save(type, undefined, options) and return its promise", function() {
-      var promise = this.store.add('couch', {
-        funky: 'fresh'
-      });
-
-      expect(this.store.save.calledWith('couch', void 0, {
-        funky: 'fresh'
-      })).to.be.ok();
-
-      expect(promise).to.eql('promise');
-    });
-
-    _when("store is bootstrapping", function() {
-
-      beforeEach(function() {
-        // we can't force it to return always true, as we'd
-        // end up in infinite loop.
-        // spyOn(this.store, "isBootstrapping").andReturn(true);
-        this.store._bootstrapping = true;
-        expect(this.store.isBootstrapping()).to.be.ok();
-      });
-
-      it("should wait until bootstrapping is finished", function() {
-        var promise = this.store.add('task', { title: 'do it!' });
-        promise.fail( function() { console.log(arguments); });
-
-        expect(promise.state()).to.eql('pending');
-        this.hoodie.trigger('remote:bootstrap:end');
-        expect(promise.state()).to.eql('resolved');
-      });
-
-    });
+    it.skip("should return a decorated promise")
   });
 
   //
   xdescribe("#updateAll(objects)", function() {
-
-    beforeEach(function() {
-      this.sandbox.stub(this.hoodie, "isPromise").returns(false);
-      this.todoObjects = [
-        {
-          type: 'todo',
-          id: '1'
-        }, {
-          type: 'todo',
-          id: '2'
-        }, {
-          type: 'todo',
-          id: '3'
-        }
-      ];
-    });
-
-    it("should return a promise", function() {
-      expect(this.store.updateAll(this.todoObjects, {}).state()).to.eql('pending');
-    });
-
-    it("should update objects", function() {
-      var obj, _i, _len, _ref, _results;
-      this.sandbox.spy(this.store, "update");
-
-      this.store.updateAll(this.todoObjects, {
-        funky: 'update'
-      });
-      _ref = this.todoObjects;
-      _results = [];
-      for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-        obj = _ref[_i];
-        _results.push(expect(this.store.update.calledWith(obj.type, obj.id, {
-          funky: 'update'
-        }, {}).to.be.ok()));
-      }
-      _results;
-    });
-
-    it("should resolve the returned promise once all objects have been updated", function() {
-      var promise = this.hoodie.defer().resolve().promise();
-      this.sandbox.stub(this.store, "update").returns(promise);
-
-      expect(this.store.updateAll(this.todoObjects, {}).state()).to.eql('resolved');
-    });
-
-    it("should not resolve the retunred promise unless object updates have been finished", function() {
-      var promise = this.hoodie.defer().promise();
-      this.sandbox.stub(this.store, "update").returns(promise);
-
-      expect(this.store.updateAll(this.todoObjects, {}).state()).not.to.eql('resolved');
-    });
-
-    _when("passed objects is a promise", function() {
-
-      beforeEach(function() {
-        this.hoodie.isPromise.returns(true);
-      });
-
-      it("should update objects returned by promise", function() {
-        var obj, promise, _i, _len, _ref,
-          _this = this;
-        promise = {
-          pipe: function(cb) {
-            cb(_this.todoObjects);
-          }
-        };
-
-        this.sandbox.spy(this.store, "update");
-        this.store.updateAll(promise, {
-          funky: 'update'
-        });
-
-        _ref = this.todoObjects;
-        for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-          obj = _ref[_i];
-          expect(this.store.update.calledWith(obj.type, obj.id, {
-            funky: 'update'
-          }, {})).to.be.ok();
-        }
-      });
-
-    });
-
-    _when("store is bootstrapping", function() {
-
-      beforeEach(function() {
-        // we can't force it to return always true, as we'd
-        // end up in infinite loop.
-        // spyOn(this.store, "isBootstrapping").andReturn(true);
-        this.store._bootstrapping = true;
-        expect(this.store.isBootstrapping()).to.eql(true);
-      });
-
-      it("should wait until bootstrapping is finished", function() {
-        var promise = this.store.updateAll(this.todoObjects, { title: 'do it!' });
-        promise.fail( function() { console.log(arguments); });
-
-        expect(promise.state()).to.eql('pending');
-
-        this.hoodie.trigger('remote:bootstrap:end');
-        expect(promise.state()).to.eql('resolved');
-      });
-
-    });
+    it.skip("should return a decorated promise")
   });
 
   //
-  xdescribe("#find(type, id)", function() {
+  describe("#find(type, id)", function() {
 
     beforeEach(function() {
-      this.sandbox.stub(this.store, "cache");
     });
 
     it("should return a promise", function() {
-      this.promise = this.store.find('document', '123');
+      var promise = this.store.find('document', '123');
+      expect(promise).to.be.promise()
     });
 
     describe("invalid arguments", function() {
@@ -679,7 +532,7 @@ describe("hoodie.store", function() {
 
         it("should call the fail callback", function() {
           var promise = this.store.find();
-          expect(promise.state()).to.eql('rejected');
+          expect(promise).to.be.rejected();
         });
 
       });
@@ -687,7 +540,7 @@ describe("hoodie.store", function() {
       _when("no id passed", function() {
         it("should call the fail callback", function() {
           var promise = this.store.find('document');
-          expect(promise.state()).to.eql('rejected');
+          expect(promise).to.be.rejected();
         });
       });
 
@@ -696,14 +549,18 @@ describe("hoodie.store", function() {
     _when("object can be found", function() {
 
       beforeEach(function() {
-        this.store.cache.andReturn({
-          name: 'test'
-        });
-        this.promise = this.store.find('document', 'abc4567');
+        stubFindItem('document', '123lessie', {
+          name: 'woof'
+        })
+        this.promise = this.store.find('document', '123lessie');
       });
 
       it("should call the done callback", function() {
-        expect(this.promise.state()).to.eql('resolved');
+        expect(this.promise).to.be.resolvedWith({
+          "name": "woof",
+          "type": "document",
+          "id": "123lessie"
+        });
       });
 
     });
@@ -711,44 +568,42 @@ describe("hoodie.store", function() {
     _when("object cannot be found", function() {
 
       beforeEach(function() {
-        this.store.cache.returns(false);
+        stubFindItem('document', 'truelie', null)
         this.promise = this.store.find('document', 'abc4567');
       });
 
       it("should call the fail callback", function() {
-        expect(this.promise.state()).to.eql('rejected');
+        expect(this.promise).to.be.rejected();
       });
-
     });
 
     it("should cache the object after the first get", function() {
-      this.store.find('document', 'abc4567');
-      this.store.find('document', 'abc4567');
-
-      expect(this.store.db.getItem.callCount).to.eql(1);
+      this.store.find('document', 'abc4567cached');
+      this.store.find('document', 'abc4567cached');
+      expect(localStorage.getItem.callCount).to.eql(1);
     });
 
     _when("store is bootstrapping", function() {
 
       beforeEach(function() {
-        // we can't force it to return always true, as we'd
-        // end up in infinite loop.
-        // spyOn(this.store, "isBootstrapping").andReturn(true);
-        this.store._bootstrapping = true;
-        expect(this.store.isBootstrapping()).to.be.ok();
+        var called = false;
+        this.sandbox.stub(this.store, 'isBootstrapping', function() {
+          if (called) return false;
+          called = true;
+          return true;
+        })
       });
 
       it("should wait until bootstrapping is finished", function() {
-        this.store.cache.andReturn({
-          name: 'test'
-        });
-        var promise = this.store.find('todo', '123');
+        stubFindItem('document', '123boot', {
+          name: 'me up'
+        })
+        var promise = this.store.find('document', '123boot');
         promise.fail( function() { console.log(arguments); });
-        expect(promise.state()).to.eql('pending');
-
+        expect(promise).to.be.pending();
+        this.store.subscribeToOutsideEvents();
         this.hoodie.trigger('remote:bootstrap:end');
-
-        expect(promise.state()).to.eql('resolved');
+        expect(promise).to.be.resolved();
       });
     });
   });
