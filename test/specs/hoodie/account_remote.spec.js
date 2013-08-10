@@ -18,31 +18,19 @@ describe('hoodie.remote', function() {
     this.sandbox.spy(this.hoodie, 'trigger');
     this.sandbox.spy(this.hoodie, 'checkConnection');
 
-    this.sandbox.stub(this.hoodie.store, 'remove').returns({
-      then: function(cb) {
-        return cb('objectFromStore');
-      }
-    });
-
-    this.sandbox.stub(this.hoodie.store, 'update').returns({
-      then: function(cb) {
-        return cb('objectFromStore', false);
-      }
-    });
-
-    this.sandbox.stub(this.hoodie.store, 'save').returns({
-      then: function(cb) {
-        return cb('objectFromStore', false);
-      }
-    });
+    this.sandbox.stub(this.hoodie.store, 'remove')
+    .returns(this.hoodie.resolveWith('objectFromStore'));
+    this.sandbox.stub(this.hoodie.store, 'update')
+    .returns(this.hoodie.resolveWith('objectFromStore', false));
+    this.sandbox.stub(this.hoodie.store, 'save')
+    .returns(this.hoodie.resolveWith('objectFromStore', false));
 
     hoodieRemote(this.hoodie);
     this.remote = this.hoodie.remote;
   });
 
-  describe('factory', function() {
-
-    it.only('should set name to users database name', function() {
+  xdescribe('defaults', function() {
+    it('should set name to users database name', function() {
       expect(this.remote.name).to.eql('userhash123');
     });
 
@@ -53,95 +41,61 @@ describe('hoodie.remote', function() {
     it('should connect', function() {
       expect(Hoodie.AccountRemote.prototype.connect.called).to.be.ok();
     });
+  }); // #defaults
 
-    it('should subscribe to `reauthenticated` event', function() {
-      var _i, _len, _ref = this.hoodie.on.args[1];
-
-      for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-        if (_ref === 'account:reauthenticated') {
-          _ref[0]();
-        }
-      }
-      expect(Hoodie.AccountRemote.prototype.connect.called).to.be.ok();
-    });
-
-    xit('should subscribe to `signout` event', function() {
-      var _i, _len, _ref = this.hoodie.on.args[2];
-
-      for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-        if (_ref === 'account:signout') {
-          _ref[1]();
-        }
-      }
-      expect(Hoodie.AccountRemote.prototype.disconnect.called).to.be.ok();
-    });
-
-    it('should set connected to true', function() {
-      expect(this.remote.isConnected()).to.be.ok();
-    });
-
-    it('should subscribe to `reconnected` event', function() {
-      var _i, _len, _ref = this.hoodie.on.args[3];
-
-      for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-
-        if (_ref === 'reconnected') {
-          _ref[1]();
-        }
-      }
-      expect(Hoodie.AccountRemote.prototype.connect.called).to.be.ok();
-    });
-
+  describe("#loadListOfKnownObjectsFromLocalStore", function() {
+    it.skip('should have some specs')
+  });
+  describe("#subscribeToOutsideEvents", function() {
+    it.skip('should have some specs')
   });
 
   describe('#connect()', function() {
-
     beforeEach(function() {
       this.authenticateDefer = this.hoodie.defer();
-      this.sandbox.stub(this.hoodie.account, 'authenticate').returns(this.authenticateDefer.promise());
+      this.sandbox.spy(this.remote, 'sync')
+
+      this.sandbox.stub(this.hoodie.account, 'authenticate')
+      .returns(this.authenticateDefer.promise());
     });
 
     it('should authenticate', function() {
       this.remote.connect();
-      expect(this.hoodie.account.authenticate.called).to.be.ok();
+      expect(this.hoodie.account.authenticate).to.be.called();
     });
 
     _when('successfully authenticated', function() {
-
       beforeEach(function() {
-        return this.authenticateDefer.resolve();
+        this.authenticateDefer.resolve();
       });
 
       it('should set connected to true', function() {
         this.remote.connected = false;
         this.remote.connect();
-        expect(this.remote.connected).to.eql(true);
+        expect(this.remote.connected).to.be(true);
       });
 
       it('should subscribe to store:idle event', function() {
         this.remote.connect();
-        expect(this.hoodie.on.calledWith('store:idle', this.remote.push)).to.be.ok();
+        expect(this.hoodie.on).calledWith('store:idle', this.remote.push);
       });
 
       _and('user signs in, it should connect', function() {
-
         beforeEach(function() {
           this.remote.connected = false;
           this.sandbox.spy(this.remote, 'connect');
-          this.remote._handleSignIn();
+          this.remote.subscribeToOutsideEvents();
+          this.hoodie.trigger('account:signin');
         });
 
         it('should connect', function() {
           expect(this.remote.connected).to.eql(true);
         });
+      }); // user signs in, it should connect
+    }); // successfully authenticated
+  }); // #connect
 
-      });
-
-    });
-
-  });
-
-  describe('#disconnect()', function() {
+  xdescribe('#disconnect()', function() {
 
     it('should unsubscribe from stores\'s dirty idle event', function() {
       this.remote.disconnect();
@@ -152,11 +106,9 @@ describe('hoodie.remote', function() {
       this.remote.disconnect();
       expect(this.remote.isConnected()).to.not.be.ok();
     });
-
-  });
+  }); // #disconnect
 
   xdescribe('#getSinceNr()', function() {
-
     beforeEach(function() {
       this.sandbox.spy(this.hoodie.config, 'get');
     });
@@ -167,7 +119,6 @@ describe('hoodie.remote', function() {
     });
 
     _when('config _remote.since is not defined', function() {
-
       beforeEach(function() {
         this.hoodie.config.get.returns(0);
       });
@@ -177,11 +128,9 @@ describe('hoodie.remote', function() {
       });
 
     });
+  }); // #getSinceNr
 
-  });
-
-  describe('#setSinceNr(nr)', function() {
-
+  xdescribe('#setSinceNr(nr)', function() {
     beforeEach(function() {
       this.sandbox.spy(this.hoodie.config, 'set');
     });
@@ -190,8 +139,7 @@ describe('hoodie.remote', function() {
       this.remote.setSinceNr(100);
       expect(this.hoodie.config.set.calledWith('_remote.since', 100)).to.be.ok();
     });
-
-  });
+  }); // #setSinceNr
 
   xdescribe('#pull()', function() {
 
@@ -489,10 +437,9 @@ describe('hoodie.remote', function() {
       });
 
     });
+  }); // #pull
 
-  });
-
-  describe('#push(docs)', function() {
+  xdescribe('#push(docs)', function() {
 
     beforeEach(function() {
       this.pushDefer = this.hoodie.defer();
@@ -560,10 +507,9 @@ describe('hoodie.remote', function() {
       });
 
     });
+  }); // #push
 
-  });
-
-  describe('#on', function() {
+  xdescribe('#on', function() {
 
     it('should namespace bindings with \'remote\'', function() {
       this.remote.on('funk', 'check');
@@ -575,7 +521,7 @@ describe('hoodie.remote', function() {
       this.remote.on('super funky fresh', cb);
       expect(this.hoodie.on.calledWith('remote:super remote:funky remote:fresh', cb)).to.be.ok();
     });
-  });
+  }); // #on
 
   xdescribe('#one', function() {
 
@@ -589,14 +535,13 @@ describe('hoodie.remote', function() {
       this.remote.one('super funky fresh', cb);
       expect(this.hoodie.one.calledWith('remote:super remote:funky remote:fresh', cb)).to.be.ok();
     });
+  }); // #one
 
-  });
-
-  describe('#trigger', function() {
+  xdescribe('#trigger', function() {
     it('should namespace bindings with \'remote\'', function() {
       this.remote.trigger('funk', 'check');
       expect(this.hoodie.trigger.calledWith('remote:funk', 'check')).to.be.ok();
     });
-  });
+  }); // #trigger
 
 });

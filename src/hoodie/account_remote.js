@@ -38,7 +38,7 @@ function hoodieRemote (hoodie) {
   // do not start to connect immediately, but authenticate beforehand
   //
   remote.connect = function connect() {
-    return hoodie.account.authenticate().pipe(connect);
+    return hoodie.account.authenticate().pipe(doConnect);
   };
 
 
@@ -149,7 +149,7 @@ function hoodieRemote (hoodie) {
   };
 
   //
-  function connect() {
+  function doConnect() {
     remote.connected = true;
     hoodie.on('store:idle', remote.push);
     return remote.sync();
@@ -158,7 +158,7 @@ function hoodieRemote (hoodie) {
   //
   function handleSignIn() {
     remote.name = hoodie.account.db();
-    return connect();
+    return doConnect();
   }
 
   //
@@ -170,7 +170,7 @@ function hoodieRemote (hoodie) {
 
     // account events
     hoodie.on('account:signin', handleSignIn);
-    hoodie.on('account:reauthenticated', connect);
+    hoodie.on('account:reauthenticated', doConnect);
     hoodie.on('account:signout', remote.disconnect);
   }
 
