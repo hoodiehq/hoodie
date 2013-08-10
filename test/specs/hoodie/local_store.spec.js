@@ -9,6 +9,7 @@ describe("hoodie.store", function() {
     this.sandbox.stub(window.localStorage, "setItem");
     this.sandbox.stub(window.localStorage, "removeItem");
     this.sandbox.stub(window.localStorage, "key");
+    this.sandbox.stub(window.localStorage, "length");
 
     this.clock = this.sandbox.useFakeTimers(0) // '1970-01-01 00:00:00'
 
@@ -516,7 +517,7 @@ describe("hoodie.store", function() {
   });
 
   //
-  describe("#find(type, id)", function() {
+  xdescribe("#find(type, id)", function() {
 
     beforeEach(function() {
     });
@@ -584,7 +585,6 @@ describe("hoodie.store", function() {
     });
 
     _when("store is bootstrapping", function() {
-
       beforeEach(function() {
         var called = false;
         this.sandbox.stub(this.store, 'isBootstrapping', function() {
@@ -609,71 +609,55 @@ describe("hoodie.store", function() {
   });
 
   //
-  xdescribe("#findAll(filter)", function() {
-
-    var with_2CatsAnd_3Dogs;
-
-    with_2CatsAnd_3Dogs = function(specs) {
-
-      _and("two cat and three dog objects exist in the store", function() {
-
-        beforeEach(function() {
-          this.sandbox.stub(this.store, "index").returns(["cat/1", "cat/2", "dog/1", "dog/2", "dog/3"]);
-          this.sandbox.stub(this.store, "cache").returns(function(type, id) {
-            var createdAt;
-            id = parseInt(id, 10);
-            if (type === 'dog') {
-              createdAt = id + 10;
-            } else {
-              createdAt = id + 20;
-            }
-            return {
-              name: "" + type + id,
-              age: id,
-              createdAt: new Date(createdAt)
-            };
-          });
-        });
-
-        specs();
-      });
-
-    };
+  describe("#findAll(filter)", function() {
 
     it("should return a promise", function() {
       var promise = this.store.findAll();
-      expect(promise).to.have.property('done');
-      expect(promise).to.not.have.property('resolved');
+      expect(promise).to.be.promise();
     });
 
     with_2CatsAnd_3Dogs(function() {
-
       it("should sort by createdAt", function() {
-        this.store.findAll().then(function (res) {
-          expect(res).to.eql([
-            {
-              name: 'cat2',
-              age: 2,
-              createdAt: new Date(22)
-            }, {
-              name: 'cat1',
-              age: 1,
-              createdAt: new Date(21)
-            }, {
-              name: 'dog3',
-              age: 3,
-              createdAt: new Date(13)
-            }, {
-              name: 'dog2',
-              age: 2,
-              createdAt: new Date(12)
-            }, {
-              name: 'dog1',
-              age: 1,
-              createdAt: new Date(11)
-            }
-          ]);
-        });
+        var promise = this.store.findAll()
+
+        expect(promise).to.be.resolvedWith([
+          {
+            type: 'cat',
+            id: '2',
+            name: 'cat2',
+            age: 2,
+            createdAt: '1970-01-01T00:00:00.022Z',
+            updatedAt: '1970-01-01T00:00:00.022Z'
+          }, {
+            type: 'cat',
+            id: '1',
+            name: 'cat1',
+            age: 1,
+            createdAt: '1970-01-01T00:00:00.021Z',
+            updatedAt: '1970-01-01T00:00:00.021Z'
+          }, {
+            type: 'dog',
+            id: '3',
+            name: 'dog3',
+            age: 3,
+            createdAt: '1970-01-01T00:00:00.013Z',
+            updatedAt: '1970-01-01T00:00:00.013Z'
+          }, {
+            type: 'dog',
+            id: '2',
+            name: 'dog2',
+            age: 2,
+            createdAt: '1970-01-01T00:00:00.012Z',
+            updatedAt: '1970-01-01T00:00:00.012Z'
+          }, {
+            type: 'dog',
+            id: '1',
+            name: 'dog1',
+            age: 1,
+            createdAt: '1970-01-01T00:00:00.011Z',
+            updatedAt: '1970-01-01T00:00:00.011Z'
+          }
+        ]);
       });
 
     });
@@ -687,15 +671,14 @@ describe("hoodie.store", function() {
           success = this.sandbox.spy();
           promise = this.store.findAll();
           promise.done(success);
-          results = success.args[0];
+          results = success.args[0][0];
           expect(results.length).to.eql(5);
         });
       });
 
       _and("no documents exist in the store", function() {
-
         beforeEach(function() {
-          spyOn(this.store, "index").andReturn([]);
+          this.sandbox.stub(this.store, "index").returns([]);
         });
 
         it("should return an empty array", function() {
@@ -704,14 +687,14 @@ describe("hoodie.store", function() {
             expect(res).to.eql([]);
           });
         });
-
-      });
+      }); // no documents exist in the store
 
       _and("there are other documents in localStorage not stored with store", function() {
-
         beforeEach(function() {
           this.sandbox.stub(this.store, "index").returns(["_someConfig", "someOtherShizzle", "whatever", "valid/123"]);
-          this.sandbox.stub(this.store, "cache").returns({});
+          stubFindItem('valid', '123', {
+            am: 'I'
+          })
         });
 
         it("should not return them", function() {
@@ -719,39 +702,38 @@ describe("hoodie.store", function() {
           success = this.sandbox.spy();
           promise = this.store.findAll();
           promise.done(success);
-          results = success.args[0];
+          results = success.args[0][0];
           expect(results.length).to.eql(1);
         });
+      }); // there are other documents in localStorage not stored with store
+    }); // called without a type
 
-      });
-
-    });
-
-    _when("called only with filter `function(obj) { return obj.age === 1}` ", function() {
-
+    _when("called only with filter `function(obj) { return obj.age === 3}`", function() {
       with_2CatsAnd_3Dogs(function() {
-        it("should return one dog", function() {
+        it("should only return the dog aged 3", function() {
           var promise, results, success;
-          success = jasmine.createSpy('success');
+          success = this.sandbox.spy();
           promise = this.store.findAll(function(obj) {
-            return obj.age === 1;
+            return obj.age === 3;
           });
           promise.done(success);
-          results = success.mostRecentCall.args[0];
-          expect(results.length).to.eql(2);
+          results = success.args[0][0];
+          expect(results.length).to.eql(1);
         });
       });
-    });
+    }); // called only with filter `function(obj) { return obj.age === 3}`
+
     _when("store is bootstrapping", function() {
       beforeEach(function() {
-        // we can't force it to return always true, as we'd
-        // end up in infinite loop.
-        // spyOn(this.store, "isBootstrapping").andReturn(true);
-        this.store._bootstrapping = true;
-        expect(this.store.isBootstrapping()).to.be.ok();
+        var called = false;
+        this.sandbox.stub(this.store, 'isBootstrapping', function() {
+          if (called) return false;
+          called = true;
+          return true;
+        })
       });
 
-      it("should wait until bootstrapping is finished", function() {
+      it.only("should wait until bootstrapping is finished", function() {
         var promise = this.store.findAll('todo');
         promise.fail( function() { console.log(arguments); });
 
@@ -1717,3 +1699,51 @@ function stubFindItem(key, id, object) {
   }
   window.localStorage.getItem.withArgs(key).returns(object)
 }
+
+function with_2CatsAnd_3Dogs(specs) {
+
+  _and("two cat and three dog objects exist in the store", function() {
+
+    beforeEach(function() {
+      this.sandbox.stub(this.store, "index").returns([
+        "cat/1",
+        "cat/2",
+        "dog/1",
+        "dog/2",
+        "dog/3"
+      ]);
+      stubFindItem('cat', '1', {
+        name: 'cat1',
+        age: 1,
+        createdAt: '1970-01-01T00:00:00.021Z',
+        updatedAt: '1970-01-01T00:00:00.021Z'
+      })
+      stubFindItem('cat', '2', {
+        name: 'cat2',
+        age: 2,
+        createdAt: '1970-01-01T00:00:00.022Z',
+        updatedAt: '1970-01-01T00:00:00.022Z'
+      })
+      stubFindItem('dog', '1', {
+        name: 'dog1',
+        age: 1,
+        createdAt: '1970-01-01T00:00:00.011Z',
+        updatedAt: '1970-01-01T00:00:00.011Z'
+      })
+      stubFindItem('dog', '2', {
+        name: 'dog2',
+        age: 2,
+        createdAt: '1970-01-01T00:00:00.012Z',
+        updatedAt: '1970-01-01T00:00:00.012Z'
+      })
+      stubFindItem('dog', '3', {
+        name: 'dog3',
+        age: 3,
+        createdAt: '1970-01-01T00:00:00.013Z',
+        updatedAt: '1970-01-01T00:00:00.013Z'
+      })
+    });
+
+    specs();
+  });
+};
