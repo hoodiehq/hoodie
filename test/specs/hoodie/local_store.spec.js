@@ -1283,7 +1283,7 @@ describe("hoodie.store", function() {
   }); // #hasLocalChanges
 
   //
-  describe("#markAllAsChanged(type, id, object)", function() {
+  xdescribe("#markAllAsChanged(type, id, object)", function() {
     beforeEach(function() {
       this.findAllDefer = this.hoodie.defer();
       this.sandbox.stub(this.store, "findAll").returns(this.findAllDefer.promise());
@@ -1343,47 +1343,31 @@ describe("hoodie.store", function() {
   }); // #markAllAsChanged
 
   //
-  xdescribe("#changedObjects()", function() {
+  describe("#changedObjects()", function() {
 
     _when("there are no changed docs", function() {
-
-      beforeEach(function() {
-        this.store._dirty = {};
-      });
-
       it("should return an empty array", function() {
-        expect($.isArray(this.store.changedObjects())).to.be.ok();
-        expect(this.store.changedObjects().length).to.eql(0);
+        expect(this.store.changedObjects()).to.eql([]);
       });
-
     });
 
     _when("there are 2 dirty docs", function() {
-
       beforeEach(function() {
-        this.store._dirty = {
-          'couch/123': {
-            color: 'red'
-          },
-          'couch/456': {
-            color: 'green'
-          }
-        };
+        this.store.save('couch', '123', { color: 'red' })
+        this.store.save('couch', '456', { color: 'blue' })
       });
 
       it("should return the two docs", function() {
         expect(this.store.changedObjects().length).to.eql(2);
       });
 
-      it("should add type and id", function() {
-        var doc1, doc2, _ref;
-        _ref = this.store.changedObjects(), doc1 = _ref[0], doc2 = _ref[1];
-        expect(doc1.type).to.eql('couch');
-        expect(doc1.id).to.eql('123');
+      it.only("should add type and id", function() {
+        var objects = this.store.changedObjects();
+        expect(objects[0].type).to.eql('couch');
+        expect(objects[0].id).to.eql('123');
       });
-
     });
-  });
+  }); // #changedObjects
 
   //
   xdescribe("#isMarkedAsDeleted(type, id)", function() {
