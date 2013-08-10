@@ -1428,7 +1428,7 @@ describe('hoodie.account', function () {
     }); // username is joe@example.com
   }); // #fetch
 
-  describe('#destroy()', function () {
+  xdescribe('#destroy()', function () {
 
     beforeEach(function () {
       this.account.username = 'joe@example.com';
@@ -1563,7 +1563,6 @@ describe('hoodie.account', function () {
           expect(this.hoodie.config.clear.called).to.not.be.ok();
         });
       }); // fetch fails with unknown error
-
     }); // user has account
 
     _when('user has no account', function () {
@@ -1601,119 +1600,107 @@ describe('hoodie.account', function () {
         expect(this.hoodie.config.set.calledWith('_account.ownerHash', 'newHash')) .to.be.ok();
       });
     }); // user has no account
-
   }); // #destroy
 
-  // xdescribe('#resetPassword(username)', function () {
+  describe('#resetPassword(username)', function () {
+    beforeEach(function () {
+      this.sandbox.stub(this.account, 'checkPasswordReset').returns('checkPasswordResetPromise');
+    });
 
-  //   beforeEach(function () {
-  //     this.sandbox.stub(this.account, '_checkPasswordResetStatus').returns('checkPasswordResetPromise');
-  //   });
+    _when('there is a pending password reset request', function () {
 
-  //   _when('there is a pending password reset request', function () {
+      beforeEach(function () {
+        this.sandbox.stub(this.hoodie.config, 'get').returns('joe/uuid567');
+        this.account.resetPassword();
+      });
 
-  //     beforeEach(function () {
-  //       this.sandbox.stub(this.hoodie.config, 'get').returns('joe/uuid567');
-  //       this.account.resetPassword();
-  //     });
+      it('should not send another request', function () {
+        expect(this.hoodie.request.called).to.not.be.ok();
+      });
 
-  //     it('should not send another request', function () {
-  //       expect(this.hoodie.request.called).to.not.be.ok();
-  //     });
+      it('should check for the status of the pending request', function () {
+        expect(this.account.checkPasswordReset.called).to.be.ok();
+      });
 
-  //     it('should check for the status of the pending request', function () {
-  //       expect(this.account._checkPasswordResetStatus.called).to.be.ok();
-  //     });
+      it('should return the promise by the status request', function () {
+        expect(this.account.resetPassword()).to.eql('checkPasswordResetPromise');
+      });
+    }); // there is a pending password reset request
 
-  //     it('should return the promise by the status request', function () {
-  //       expect(this.account.resetPassword()).to.eql('checkPasswordResetPromise');
-  //     });
+    _when('there is no pending password reset request', function () {
 
-  //   });
+      beforeEach(function () {
+        this.sandbox.stub(this.hoodie.config, 'get').returns(void 0);
+        this.sandbox.spy(this.hoodie.config, 'set');
+        this.sandbox.stub(this.hoodie, 'uuid').returns('uuid567');
 
-  //   _when('there is no pending password reset request', function () {
+        this.account.resetPassword('joe@example.com');
 
-  //     beforeEach(function () {
-  //       var _ref;
+        var args = this.hoodie.request.args[0];
+        this.method = args[0];
+        this.path = args[1];
+        this.options = args[2];
+        this.data = JSON.parse(this.options.data);
+      });
 
-  //       this.sandbox.stub(this.hoodie.config, 'get').returns(void 0);
-  //       this.sandbox.spy(this.hoodie.config, 'set');
-  //       this.sandbox.stub(this.account, '_now').returns('now');
-  //       this.sandbox.stub(this.hoodie, 'uuid').returns('uuid567');
+      it('should generate a reset Password Id and store it locally', function () {
+        expect(this.hoodie.config.set.calledWith('_account.resetPasswordId', 'joe@example.com/uuid567')).to.be.ok();
+      });
 
-  //       this.account.resetPassword('joe@example.com');
+      it('should send a PUT request to /_users/org.couchdb.user%3A%24passwordReset%2Fjoe%40example.com%2Fuuid567', function () {
+        expect(this.method).to.eql('PUT');
+        expect(this.path).to.eql('/_users/org.couchdb.user%3A%24passwordReset%2Fjoe%40example.com%2Fuuid567');
+      });
 
-  //       _ref = this.hoodie.request.args[0],
+      it('should send data with contentType \'application/json\'', function () {
+        expect(this.options.contentType).to.eql('application/json');
+      });
 
-  //       this.method = _ref[0],
-  //       this.path = _ref[1],
-  //       this.options = _ref[2];
-  //       this.data = JSON.parse(this.options.data);
-  //     });
+      it('should send a new _users object', function () {
+        expect(this.data._id).to.eql('org.couchdb.user:$passwordReset/joe@example.com/uuid567');
+        expect(this.data.name).to.eql('$passwordReset/joe@example.com/uuid567');
+        expect(this.data.type).to.eql('user');
+        expect(this.data.password).to.eql('joe@example.com/uuid567');
+        expect(this.data.createdAt).to.eql( now() );
+        expect(this.data.updatedAt).to.eql( now() );
+      });
 
-  //     it('should generate a reset Password Id and store it locally', function () {
-  //       expect(this.hoodie.config.set.calledWith('_account.resetPasswordId', 'joe@example.com/uuid567')).to.be.ok();
-  //     });
+      it('should return a promise', function () {
+        expect(this.account.resetPassword('joe@example.com')).to.be.promise();
+      });
 
-  //     it('should send a PUT request to /_users/org.couchdb.user%3A%24passwordReset%2Fjoe%40example.com%2Fuuid567', function () {
-  //       expect(this.method).to.eql('PUT');
-  //       expect(this.path).to.eql('/_users/org.couchdb.user%3A%24passwordReset%2Fjoe%40example.com%2Fuuid567');
-  //     });
+      _when('reset Password request successful', function () {
+        beforeEach(function () {
+          this.promiseSpy = this.sandbox.spy();
+          this.account.checkPasswordReset.returns({
+            then: this.promiseSpy
+          });
+          this.requestDefer.resolve();
+        });
 
-  //     it('should send data with contentType \'application/json\'', function () {
-  //       expect(this.options.contentType).to.eql('application/json');
-  //     });
+        it('should check for the request status', function () {
+          this.account.resetPassword('joe@example.com');
+          expect(this.account.checkPasswordReset.called).to.be.ok();
+        });
 
-  //     it('should send a new _users object', function () {
-  //       expect(this.data._id).to.eql('org.couchdb.user:$passwordReset/joe@example.com/uuid567');
-  //       expect(this.data.name).to.eql('$passwordReset/joe@example.com/uuid567');
-  //       expect(this.data.type).to.eql('user');
-  //       expect(this.data.password).to.eql('joe@example.com/uuid567');
-  //       expect(this.data.createdAt).to.eql('now');
-  //       expect(this.data.updatedAt).to.eql('now');
-  //     });
+        it('should be resolved', function () {
+          expect(this.account.resetPassword('joe@example.com')).to.be.resolved();
+        });
+      });
 
-  //     it('should return a promise', function () {
-  //       expect(this.account.resetPassword('joe@example.com')).to.eqlPromise();
-  //     });
+      _when('reset Password request is not successful', function () {
+        beforeEach(function () {
+          this.requestDefer.reject({responseText: '{\"error\": \"ooops\"}'});
+        });
 
-  //     _when('reset Password request successful', function () {
-
-  //       beforeEach(function () {
-  //         this.promiseSpy = this.sandbox.spy();
-  //         this.account._checkPasswordResetStatus.returns({
-  //           then: this.promiseSpy
-  //         });
-  //         this.requestDefer.resolve();
-  //       });
-
-  //       it('should check for the request status', function () {
-  //         this.account.resetPassword('joe@example.com');
-  //         expect(this.account._checkPasswordResetStatus.called).to.be.ok();
-  //       });
-
-  //       it('should be resolved', function () {
-  //         expect(this.account.resetPassword('joe@example.com')).to.eqlResolved();
-  //       });
-
-  //     });
-
-  //     _when('reset Password request is not successful', function () {
-  //       beforeEach(function () {
-  //         this.requestDefer.reject({responseText: '{\'error\': \'ooops\'}'});
-  //       });
-
-  //       it('should be rejected with the error', function () {
-  //         expect(this.account.resetPassword('joe@example.com')).to.eqlRejectedWith({
-  //           error: 'ooops'
-  //         });
-  //       });
-
-  //     });
-
-  //   });
-
-  // });
+        it('should be rejected with the error', function () {
+          expect(this.account.resetPassword('joe@example.com')).to.be.rejectedWith({
+            error: 'ooops'
+          });
+        });
+      });
+    }); // there is no pending password reset request
+  }); // #resetPassword
 
 
   // xdescribe('#resetPassword(username)', function () {
