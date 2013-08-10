@@ -486,7 +486,7 @@ function hoodieAccount (hoodie) {
     }
 
     return account.fetch().then(
-      handleFetchBeforeDestroySucces,
+      handleFetchBeforeDestroySuccess,
       handleFetchBeforeDestroyError
     ).then(cleanupAndTriggerSignOut);
   };
@@ -797,7 +797,7 @@ function hoodieAccount (hoodie) {
   // we now can be sure that we fetched the latest _users doc, so we can update it
   // without a potential conflict error.
   //
-  function handleFetchBeforeDestroySucces() {
+  function handleFetchBeforeDestroySuccess() {
 
     hoodie.remote.disconnect();
     userDoc._deleted = true;
@@ -945,6 +945,7 @@ function hoodieAccount (hoodie) {
 
     return function() {
       hoodie.remote.disconnect();
+
       if (newUsername) {
         return delayedSignIn(newUsername, newPassword, {
           silent: true
@@ -1024,7 +1025,6 @@ function hoodieAccount (hoodie) {
         handleRequestError
       );
     });
-
   }
 
   //

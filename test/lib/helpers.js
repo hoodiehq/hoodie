@@ -75,7 +75,7 @@ expect.Assertion.prototype.promise = function () {
 expect.Assertion.prototype.resolved = function () {
   this.assert(
       expect.eql(this.obj.state(), 'resolved')
-    , function(){ return 'expected to be resolved'});
+    , function(){ return 'expected to be resolved, but is ' + this.obj.state()});
   return this;
 };
 
@@ -94,7 +94,7 @@ expect.Assertion.prototype.resolvedWith = function () {
 expect.Assertion.prototype.rejected = function () {
   this.assert(
       expect.eql(this.obj.state(), 'rejected')
-    , function(){ return 'expected to be resolved'});
+    , function(){ return 'expected to be rejected, but is ' + this.obj.state()});
   return this;
 };
 
@@ -113,6 +113,6 @@ expect.Assertion.prototype.rejectedWith = function () {
 expect.Assertion.prototype.pending = function () {
   this.assert(
       expect.eql(this.obj.state(), 'pending')
-    , function(){ return 'expected to be resolved'});
+    , function(){ return 'expected to be pending, but is ' + this.obj.state()});
   return this;
 };

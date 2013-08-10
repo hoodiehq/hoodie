@@ -1024,15 +1024,11 @@ describe('hoodie.account', function () {
   }); // #signIn
 
   xdescribe('#changePassword(currentPassword, newPassword)', function () {
-
-    beforeEach(function() {
-      this.sandbox.stub(this.account, 'request').returns(this.requestDefer.promise())
-    });
-
     beforeEach(function () {
       this.account.username = 'joe@example.com';
       presetUserDoc(this);
 
+      this.sandbox.stub(this.account, 'request').returns(this.requestDefer.promise())
       this.fetchPromise = this.hoodie.defer();
       this.sandbox.stub(this.account, 'fetch').returns(this.fetchPromise);
     });
@@ -1432,9 +1428,10 @@ describe('hoodie.account', function () {
 
     beforeEach(function () {
       this.account.username = 'joe@example.com';
-      this.sandbox.stub(this.account, 'request').returns( this.requestDefer.promise() );
 
       presetUserDoc(this);
+
+      this.sandbox.stub(this.account, 'request').returns( this.requestDefer.promise() );
 
       this.fetchDefer = this.hoodie.defer();
       this.sandbox.spy(this.hoodie.remote, 'disconnect');
@@ -1702,231 +1699,176 @@ describe('hoodie.account', function () {
     }); // there is no pending password reset request
   }); // #resetPassword
 
-  describe('#trigger(event, arg1, arg2, ...)', function () {
+  xdescribe('#trigger(event, arg1, arg2, ...)', function () {
     it('should proxy to hoodie.trigger', function() {
       this.account.trigger('say', 'funky', 'fresh');
       expect(this.hoodie.trigger).to.be.calledWith('account:say', 'funky', 'fresh');
     });
   }); // #trigger
 
-  // xdescribe('#changeUsername(currentPassword, newUsername)', function () {
+  describe('#changeUsername(currentPassword, newUsername)', function () {
+    beforeEach(function () {
+      this.account.username = 'joe@example.com';
+      presetUserDoc(this);
 
-  //   beforeEach(function () {
-  //     var signInDefers;
+      this.sandbox.stub(this.account, 'request', this.fakeRequest);
+      this.fetchDefer = this.hoodie.defer();
+      this.sandbox.stub(this.account, 'fetch').returns(this.fetchDefer);
+    });
 
-  //     this.signInDefer1 = this.hoodie.defer();
-  //     this.signInDefer2 = this.hoodie.defer();
+    it('should return a promise', function () {
+      var promise = this.account.changeUsername('secret', 'new.joe@example.com');
+      expect(promise).to.be.promise();
+    });
 
-  //     signInDefers = [this.signInDefer1, this.signInDefer2];
+    _when('sign in successful', function () {
+      beforeEach(function() {
+        this.account.username = 'joe@example.com';
+        this.promise = this.account.changeUsername('secret', 'new.joe@example.com');
+        this.requestDefers[0].resolve(validSignInResponse());
 
-  //     this.sandbox.stub(this.account, '_sendSignInRequest').call(function () {
-  //       return signInDefers.shift();
-  //     });
+      });
+      it('should fetch the _users doc', function () {
+        expect(this.account.fetch).to.be.called();
+      });
 
-  //     this.fetchDefer = this.hoodie.defer();
+      _and('_users doc can be fetched', function () {
 
-  //     this.sandbox.stub(this.account, 'fetch').returns(this.fetchDefer);
-  //     this.sandbox.stub(this.account, '_now').returns('now');
+        beforeEach(function () {
+          this.fetchDefer.resolve();
 
-  //     this.account.username = 'joe@example.com';
-  //     this.account._doc = {
-  //       _id: 'org.couchdb.user:user/joe@example.com',
-  //       name: 'user/joe@example.com',
-  //       type: 'user',
-  //       roles: [],
-  //       salt: 'absalt',
-  //       password_sha: 'pwcdef',
-  //       updatedAt: 'someday',
-  //       createdAt: 'someday'
-  //     };
-  //   });
+          // 2nd request is doc update
+          var args = this.account.request.args[1];
 
-  //   it('should return a promise', function () {
-  //     this.account.changeUsername('secret', 'new.joe@example.com');
-  //     expect(this.account.changeUsername).to.have.property('done');
-  //     expect(this.account.changeUsername).to.not.have.property('resolved');
+          this.type = args[0],
+          this.path = args[1],
+          this.options = args[2];
+          this.data = JSON.parse(this.options.data);
+        });
 
-  //   });
+        it('should send a PUT request to http://cou.ch/_users/org.couchdb.user%3Auser%2Fjoe%40example.com', function () {
+          expect(this.account.request.called).to.be.ok();
+          expect(this.type).to.eql('PUT');
+          expect(this.path).to.eql('/_users/org.couchdb.user%3Auser%2Fjoe%40example.com');
+        });
 
-  //   it('should downcase new username', function () {
-  //     this.sandbox.spy(this.account, '_changeUsernameAndPassword');
+        it('should set contentType to \'application/json\'', function () {
+          expect(this.options.contentType).to.eql('application/json');
+        });
 
-  //     this.account.changeUsername('secret', 'Joe');
-  //     expect(this.account._changeUsernameAndPassword.calledWith('secret', 'joe')).to.be.ok();
-  //   });
+        it('should stringify the data', function () {
+          expect(typeof this.options.data).to.eql('string');
+        });
 
-  //   _when('sign in successful', function () {
+        it('should downcase and set new username to user \'new.joe@example.com\'', function () {
+          expect(this.data.$newUsername).to.eql('new.joe@example.com');
+        });
 
-  //     beforeEach(function () {
-  //       this.signInDefer1.resolve('joe@example.com');
-  //     });
+        it('should have set updatedAt to \'now\'', function () {
+          expect(this.data.updatedAt).to.eql( now() );
+        });
 
-  //     it('should fetch the _users doc', function () {
-  //       this.account.changeUsername('secret', 'new.joe@example.com');
+        it('should not set createdAt to \'now\'', function () {
+          expect(this.data.createdAt).to.not.eql( now() );
+        });
 
-  //       expect(this.account.fetch.called).to.be.ok();
-  //     });
+        _when('_users doc could be updated', function () {
 
-  //     _and('_users doc can be fetched', function () {
+          beforeEach(function () {
+            this.sandbox.spy(this.hoodie.remote, 'disconnect');
+            this.requestDefers[1].resolve();
 
-  //       beforeEach(function () {
-  //         this.fetchDefer.resolve();
-  //         this.account.username = 'joe@example.com';
-  //         this.promise = this.account.changeUsername('secret', 'new.joe@example.com');
+            // after the doc update, it signs in again
+            // with a delay of 300ms
+            this.clock.tick(300);
+          });
 
-  //         var _ref = this.hoodie.request.args[0];
+          it('should disconnect', function () {
+            expect(this.hoodie.remote.disconnect.called).to.be.ok();
+          });
 
-  //         this.type = _ref[0],
-  //         this.path = _ref[1],
-  //         this.options = _ref[2];
-  //         this.data = JSON.parse(this.options.data);
-  //       });
+          it('should sign in with new username', function () {
 
-  //       it('should send a PUT request to http://cou.ch/_users/org.couchdb.user%3Auser%2Fjoe%40example.com', function () {
-  //         expect(this.hoodie.request.called).to.be.ok();
-  //         expect(this.type).to.eql('PUT');
-  //         expect(this.path).to.eql('/_users/org.couchdb.user%3Auser%2Fjoe%40example.com');
-  //       });
+            expect(this.account.request).to.be.calledWith(
+              'POST',
+              '/_session',
+              {
+                data: {
+                  name: 'user/new.joe@example.com',
+                  password: 'secret'
+                }
+              }
+            )
+          });
 
-  //       it('should set contentType to \'application/json\'', function () {
-  //         expect(this.options.contentType).to.eql('application/json');
-  //       });
+          _and('signIn is successful', function () {
+            beforeEach(function () {
+              this.requestDefers[2].resolve( validSignInResponse() )
+            });
 
-  //       it('should stringify the data', function () {
-  //         expect(typeof this.options.data).to.eql('string');
-  //       });
+            it('should be resolved', function () {
+              expect(this.promise).to.be.resolved()
+            });
+          }); // signIn is successful
 
-  //       it('should have set name to user \'joe@example.com\'', function () {
-  //         expect(this.data.$newUsername).to.eql('new.joe@example.com');
-  //       });
+          _but('signIn has an error', function () {
 
-  //       it('should have set updatedAt to \'now\'', function () {
-  //         expect(this.data.updatedAt).to.eql('now');
-  //       });
+            beforeEach(function () {
+              this.requestDefers[2].reject();
+            });
 
-  //       it('should not set createdAt to \'now\'', function () {
-  //         expect(this.data.createdAt).to.not.eql('now');
-  //       });
+            it('should be rejected', function () {
+              expect(this.promise).to.be.rejected()
+            });
+          }); // signIn has an error
+        }); // _users doc could be updated
 
-  //       _when('_users doc could be updated', function () {
+        _when('_users doc could not be updated', function () {
+          beforeEach(function () {
+            this.requestDefers[1].reject();
+          });
 
-  //         beforeEach(function () {
-  //           this.sandbox.spy(this.hoodie.remote, 'disconnect');
-  //           this.requestDefer.resolve();
-  //         });
+          it('should be rejected', function () {
+            expect(this.promise).to.be.rejected()
+          });
+        }); // _users doc could not be updated
+      }); // _users doc can be fetched
 
-  //         it('should disconnect', function () {
-  //           expect(this.hoodie.remote.disconnect.called).to.be.ok();
-  //         });
+      _but('_users doc cannot be fetched', function () {
+        beforeEach(function () {
+          this.fetchDefer.reject();
+        });
 
-  //         it('should sign in with new username', function () {
-  //           expect(this.account._sendSignInRequest.calledWith('new.joe@example.com', 'secret')).to.be.ok();
-  //         });
+        it('should be rejected', function () {
+          expect(this.promise).to.be.rejected();
+        });
+      }); // _users doc cannot be fetched
+    }); // sign in successful
 
-  //         _and('signIn is successful', function () {
+    _when('signIn fails', function () {
+      beforeEach(function () {
+        this.promise = this.account.changeUsername('secret', 'new.joe@example.com');
+        this.requestDefers[0].reject();
+      });
 
-  //           beforeEach(function () {
-  //             this.signInDefer2.resolve('fuckyeah');
-  //           });
-
-  //           it('should be resolved', function () {
-  //             this.promise.then(function (res) {
-  //               expect(res).to.eql('fuckyeah');
-  //             });
-  //           });
-
-  //         });
-
-  //         _but('signIn has an error', function () {
-
-  //           beforeEach(function () {
-  //             this.signInDefer2.reject({
-  //               error: 'oops'
-  //             });
-  //           });
-
-  //           it('should be resolved', function () {
-  //             this.promise.then(function (res) {
-  //               expect(res).to.eql({
-  //                 error: 'oops'
-  //               });
-  //             });
-  //           });
-
-  //         });
-
-  //       });
-
-  //       _when('_users doc could not be updated', function () {
-
-  //         beforeEach(function () {
-  //           this.requestDefer.reject();
-  //         });
-
-  //         it('should be rejected', function () {
-  //           this.promise.then(function (res) {
-  //             expect(res).to.eql({
-  //               error: 'unknown'
-  //             });
-  //           });
-  //         });
-
-  //       });
-
-  //     });
-
-  //     _but('_users doc cannot be fetched', function () {
-
-  //       beforeEach(function () {
-  //         this.fetchDefer.reject({
-  //           error: 'something'
-  //         });
-  //       });
-
-  //       it('should be rejected', function () {
-  //         var promise = this.account.changeUsername('secret', 'new.joe@example.com');
-
-  //         promise.then(function (res) {
-  //           expect(res).to.eql({
-  //             error: 'something'
-  //           });
-  //         });
-  //       });
-
-  //     });
-
-  //   });
-
-  //   _when('signIn not successful', function () {
-
-  //     beforeEach(function () {
-  //       this.signInDefer1.reject({
-  //         error: 'autherror'
-  //       });
-  //     });
-
-  //     it('should be rejected', function () {
-  //       var promise = this.account.changeUsername('secret', 'new.joe@example.com');
-  //       promise.fail(function (res) {
-  //         expect(res).to.eql({
-  //           error: 'autherror'
-  //         });
-  //       });
-
-  //     });
-
-  //   });
-
-  // });
+      it('should be rejected', function () {
+        expect(this.promise).to.be.rejected();
+      });
+    }); // signIn fails
+  });
 
 });
 
 function validSessionResponse () {
   return {
-    userCtx: {
-      name: 'user/joe@example.com',
-      roles: ['user_hash', 'confirmed']
-    }
+    userCtx: validSignInResponse()
+  }
+}
+
+function validSignInResponse () {
+  return {
+    name: 'user/joe@example.com',
+    roles: ['user_hash', 'confirmed']
   }
 }
 
@@ -1951,16 +1893,17 @@ function unconfirmedUserDoc (username) {
     salt: 'absalt',
     password_sha: 'pwcdef',
     createdAt: 'someday',
-    updatedAt: 'someday'
+    updatedAt: 'someday',
+    signedUpAt: 'someday'
   }
 }
 
 function presetUserDoc(context) {
   context.account.fetch();
   context.requestDefer.resolve(unconfirmedUserDoc( context.account.username ));
-  context.account.request.reset();
+  context.hoodie.request.reset();
   context.requestDefer = context.hoodie.defer();
-  context.account.request.returns(context.requestDefer.promise())
+  context.hoodie.request.returns(context.requestDefer.promise())
 }
 
 
