@@ -142,6 +142,11 @@ function hoodieRemote (hoodie) {
       });
     }
   }
+  // allow to run this once from outside
+  remote.loadListOfKnownObjectsFromLocalStore = function() {
+    loadListOfKnownObjectsFromLocalStore();
+    delete remote.loadListOfKnownObjectsFromLocalStore;
+  };
 
   //
   function connect() {
@@ -156,17 +161,26 @@ function hoodieRemote (hoodie) {
     return connect();
   }
 
-
   //
-  // Initialization
-  // ----------------
+  // subscribe to events coming from account
   //
-  loadListOfKnownObjectsFromLocalStore();
+  function subscribeToOutsideEvents() {
 
-  hoodie.on('account:signin', handleSignIn);
-  hoodie.on('account:reauthenticated', connect);
-  hoodie.on('account:signout', remote.disconnect);
-  hoodie.on('reconnected', remote.connect);
+    hoodie.on('reconnected', remote.connect);
+
+    // account events
+    hoodie.on('account:signin', handleSignIn);
+    hoodie.on('account:reauthenticated', connect);
+    hoodie.on('account:signout', remote.disconnect);
+  }
+
+  // allow to run this once from outside
+  remote.subscribeToOutsideEvents = function() {
+    subscribeToOutsideEvents();
+    delete remote.subscribeToOutsideEvents;
+  };
+
+
 
 
   //

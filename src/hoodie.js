@@ -124,6 +124,11 @@
     hoodie.store.subscribeToOutsideEvents();
     hoodie.store.bootstrapDirtyObjects();
 
+    // hoodie.remote
+    hoodie.remote.loadListOfKnownObjectsFromLocalStore();
+    hoodie.remote.subscribeToOutsideEvents();
+    hoodie.remote.connect();
+
     // authenticate
     hoodie.account.authenticate();
   }

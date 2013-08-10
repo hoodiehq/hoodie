@@ -76,6 +76,28 @@ function hoodieRemoteBase (hoodie, options) {
   remote.prefix = '';
 
 
+
+  // defaults
+  // ----------------
+
+  //
+  if (options.name !== undefined) {
+    remote.name = options.name;
+  }
+
+  if (options.prefix !== undefined) {
+    remote.prefix = options.prefix;
+  }
+
+  if (options.connected !== undefined) {
+    remote.connected = options.connected;
+  }
+
+  if (options.baseUrl !== null) {
+    remote.baseUrl = options.baseUrl;
+  }
+
+
   // request
   // ---------
 
@@ -727,32 +749,6 @@ function hoodieRemoteBase (hoodie, options) {
     }
   }
 
-
-
-  //
-  // Initialization
-  // ----------------
-  //
-  if (options.name !== undefined) {
-    remote.name = options.name;
-  }
-
-  if (options.prefix !== undefined) {
-    remote.prefix = options.prefix;
-  }
-
-  if (options.connected !== undefined) {
-    remote.connected = options.connected;
-  }
-
-  if (options.baseUrl !== null) {
-    remote.baseUrl = options.baseUrl;
-  }
-
-
-  if (remote.isConnected()) {
-    remote.connect();
-  }
 
   // expose public API
   return remote;

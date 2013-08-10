@@ -1,6 +1,6 @@
 'use strict';
 
-describe('Hoodie.AccountRemote', function() {
+describe('hoodie.remote', function() {
 
   beforeEach(function() {
     this.hoodie = new Mocks.Hoodie();
@@ -36,19 +36,13 @@ describe('Hoodie.AccountRemote', function() {
       }
     });
 
-    this.remote = new Hoodie.AccountRemote(this.hoodie);
+    hoodieRemote(this.hoodie);
+    this.remote = this.hoodie.remote;
   });
 
-  describe('constructor(@hoodie, options = {})', function() {
+  describe('factory', function() {
 
-    beforeEach(function() {
-      this.sandbox.spy(Hoodie.AccountRemote.prototype, 'disconnect');
-      this.sandbox.spy(Hoodie.AccountRemote.prototype, 'connect');
-
-      this.remote = new Hoodie.AccountRemote(this.hoodie);
-    });
-
-    it('should set name to users database name', function() {
+    it.only('should set name to users database name', function() {
       expect(this.remote.name).to.eql('userhash123');
     });
 

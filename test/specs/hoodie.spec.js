@@ -90,6 +90,8 @@ describe('Hoodie', function() {
     it.skip("should store.patchIfNotPersistant()");
     it.skip("should store.subscribeToOutsideEvents()");
     it.skip("should store.bootstrapDirtyObjects()");
+    it.skip("hoodie.remote.loadListOfKnownObjectsFromLocalStore()");
+    it.skip("hoodie.remote.subscribeToOutsideEvents()");
     it.skip("should authenticate");
   });
 });
