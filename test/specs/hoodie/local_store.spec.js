@@ -1143,7 +1143,7 @@ describe("hoodie.store", function() {
   });
 
   //
-  describe("#clear()", function() {
+  xdescribe("#clear()", function() {
 
     it("should return a promise", function() {
       var promise = this.store.clear();
@@ -1195,83 +1195,56 @@ describe("hoodie.store", function() {
   }); // #clear
 
   //
-  xdescribe("#hasLocalChanges(type, id)", function() {
+  describe("#hasLocalChanges(type, id)", function() {
 
     _when("no arguments passed", function() {
-
-      it("returns true when there are dirty documents", function() {
-        this.store._dirty = {
-          "doc/1": {},
-          "doc/2": {}
-        };
-        expect(this.store.hasLocalChanges()).to.eql(true);
-      });
-
-      it("returns false when there are no dirty documents", function() {
-        this.store._dirty = {};
+      it("returns false when there are no local changes", function() {
         expect(this.store.hasLocalChanges()).to.eql(false);
       });
 
-    });
+      it("returns true when there are local changes", function() {
+        this.store.add('song', { title: "Urlaub in Polen"});
+        expect(this.store.hasLocalChanges()).to.eql(true);
+      });
+    }); // no arguments passed
 
     _when("type & id passed", function() {
 
       _and("object was not yet synced", function() {
-
         _and("object has saved with silent:true option", function() {
 
           beforeEach(function() {
-            this.sandbox.stub(this.store, "cache").returns({
+            stubFindItem('couch', '123', {
               _syncedAt: void 0,
               updatedAt: void 0
             });
           });
 
           it("should return false", function() {
-            expect(this.store.hasLocalChanges('couch', '123')).to.eql(false);
+            expect(this.store.hasLocalChanges('couch', '123')).to.be(false);
           });
-
-        });
+        }); // object has saved with silent:true option
 
         _and("object has been saved without silent:true option", function() {
 
           beforeEach(function() {
-            this.sandbox.stub(this.store, "cache").returns({
+            stubFindItem('couch', '123', {
               _syncedAt: void 0,
-              updatedAt: new Date(0)
+              updatedAt: now()
             });
           });
 
           it("should return true", function() {
-            expect(this.store.hasLocalChanges('couch', '123')).to.eql(true);
+            expect(this.store.hasLocalChanges('couch', '123')).to.be(true);
           });
-
-        });
-
-      });
+        }); // object has been saved without silent:true option
+      }); // object was not yet synced
 
       _and("object was synced", function() {
-
-        _and("object was not updated yet", function() {
-
+        _and("object was updated before", function() {
           beforeEach(function() {
-            this.sandbox.stub(this.store, "cache").returns({
-              _syncedAt: new Date(0),
-              updatedAt: void 0
-            });
-          });
-
-          it("should return false", function() {
-            expect(this.store.hasLocalChanges('couch', '123')).to.not.be.ok();
-          });
-
-        });
-
-        _and("object was updated at the same time", function() {
-
-          beforeEach(function() {
-            this.sandbox.stub(this.store, "cache").returns({
-              _syncedAt: new Date(0),
+            stubFindItem('couch', '123', {
+              _syncedAt: new Date(1),
               updatedAt: new Date(0)
             });
           });
@@ -1279,28 +1252,36 @@ describe("hoodie.store", function() {
           it("should return false", function() {
             expect(this.store.hasLocalChanges('couch', '123')).to.not.be.ok();
           });
+        }); // object was not updated yet
 
-        });
+        _and("object was updated at the same time", function() {
+          beforeEach(function() {
+            stubFindItem('couch', '123', {
+              _syncedAt: new Date(0),
+              updatedAt: new Date(0)
+            });
+          });
+
+          it("should return false", function() {
+            expect(this.store.hasLocalChanges('couch', '123')).to.be(false);
+          });
+        }); // object was updated at the same time
 
         _and("object was updated later", function() {
-
           beforeEach(function() {
-            this.sandbox.stub(this.store, "cache").returns({
+            stubFindItem('couch', '123', {
               _syncedAt: new Date(0),
               updatedAt: new Date(1)
             });
           });
 
           it("should return true", function() {
-            expect(this.store.hasLocalChanges('couch', '123')).to.not.be.ok();
+            expect(this.store.hasLocalChanges('couch', '123')).to.be(true);
           });
-
-        });
-
-      });
-
-    });
-  });
+        }); // object was updated later
+      }); // object was synced
+    }); // type & id passed
+  }); // #hasLocalChanges
 
   //
   xdescribe("#markAsChanged(type, id, object)", function() {

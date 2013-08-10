@@ -71,7 +71,7 @@ function hoodieStoreBase(hoodie) {
 
       options = options || {};
 
-      return store.save(type, object.id, object);
+      return this.save(type, object.id, object);
     },
 
 
@@ -94,7 +94,7 @@ function hoodieStoreBase(hoodie) {
 
       defer = hoodie.defer();
 
-      _loadPromise = store.find(type, id).pipe(function(currentObj) {
+      _loadPromise = this.find(type, id).pipe(function(currentObj) {
         var changedProperties, newObj, value;
 
         // normalize input
@@ -131,13 +131,13 @@ function hoodieStoreBase(hoodie) {
         }
 
         //apply update
-        store.save(type, id, newObj, options).then(defer.resolve, defer.reject);
-      });
+        this.save(type, id, newObj, options).then(defer.resolve, defer.reject);
+      }.bind(this));
 
       // if not found, add it
       _loadPromise.fail(function() {
-        return store.save(type, id, objectUpdate, options).then(defer.resolve, defer.reject);
-      });
+        return this.save(type, id, objectUpdate, options).then(defer.resolve, defer.reject);
+      }.bind(this));
 
       return defer.promise();
     },
@@ -160,7 +160,7 @@ function hoodieStoreBase(hoodie) {
       // normalize the input: make sure we have all objects
       switch (true) {
       case typeof filterOrObjects === 'string':
-        promise = store.findAll(filterOrObjects);
+        promise = this.findAll(filterOrObjects);
         break;
       case hoodie.isPromise(filterOrObjects):
         promise = filterOrObjects;
@@ -169,9 +169,10 @@ function hoodieStoreBase(hoodie) {
         promise = hoodie.defer().resolve(filterOrObjects).promise();
         break;
       default: // e.g. null, update all
-        promise = store.findAll();
+        promise = this.findAll();
       }
 
+      var that = this;
       return promise.pipe(function(objects) {
         // now we update all objects one by one and return a promise
         // that will be resolved once all updates have been finished
@@ -188,7 +189,7 @@ function hoodieStoreBase(hoodie) {
           _results = [];
           for (_i = 0, _len = objects.length; _i < _len; _i++) {
             object = objects[_i];
-            _results.push(store.update(object.type, object.id, objectUpdate, options));
+            _results.push(this.update(object.type, object.id, objectUpdate, options));
           }
           return _results;
         })();
@@ -233,13 +234,13 @@ function hoodieStoreBase(hoodie) {
       }
 
       defer = hoodie.defer();
-      store.find(type, id).done(defer.resolve).fail(function() {
+      this.find(type, id).done(defer.resolve).fail(function() {
         var newAttributes;
         newAttributes = $.extend(true, {
           id: id
         }, attributes);
-        return store.add(type, newAttributes).then(defer.resolve, defer.reject);
-      });
+        return this.add(type, newAttributes).then(defer.resolve, defer.reject);
+      }.bind(this));
       return defer.promise();
     },
 
@@ -288,14 +289,15 @@ function hoodieStoreBase(hoodie) {
     removeAll : function(type, options) {
       options = options || {};
 
-      return store.findAll(type).pipe(function(objects) {
+      var that = this;
+      return this.findAll(type).pipe(function(objects) {
         var object, _i, _len, _results;
 
         _results = [];
 
         for (_i = 0, _len = objects.length; _i < _len; _i++) {
           object = objects[_i];
-          _results.push(store.remove(object.type, object.id, options));
+          _results.push(that.remove(object.type, object.id, options));
         }
 
         return _results;
