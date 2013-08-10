@@ -18,7 +18,7 @@ describe("hoodie.store", function() {
   });
 
   //
-  xdescribe("#patchIfNotPersistant", function() {
+  describe("#patchIfNotPersistant", function() {
     it("can only be run once", function() {
       this.store.patchIfNotPersistant();
       expect( this.store.patchIfNotPersistant ).to.eql(undefined)
@@ -50,7 +50,7 @@ describe("hoodie.store", function() {
   }); // patchIfNotPersistant
 
   //
-  xdescribe("#subscribeToOutsideEvents", function() {
+  describe("#subscribeToOutsideEvents", function() {
     it("can only be run once", function() {
       this.store.subscribeToOutsideEvents();
       expect( this.store.subscribeToOutsideEvents ).to.eql(undefined)
@@ -63,7 +63,7 @@ describe("hoodie.store", function() {
       expect( this.store.clear ).to.be.called();
     });
 
-    it("should mark all objects as changed on account:signup", function() {
+    it.skip("should mark all objects as changed on account:signup", function() {
       this.sandbox.spy(this.store, "markAllAsChanged");
       this.store.subscribeToOutsideEvents();
       this.hoodie.trigger('account:signup');
@@ -137,7 +137,7 @@ describe("hoodie.store", function() {
   }); // subscribeToOutsideEvents
 
   //
-  xdescribe("#save(type, id, object, options)", function() {
+  describe("#save(type, id, object, options)", function() {
     it("should return a promise", function() {
       var promise = this.store.save('document', '123', {
         name: 'test'
@@ -507,17 +507,17 @@ describe("hoodie.store", function() {
   }); // #save
 
   //
-  xdescribe("#add(type, object, options)", function() {
+  describe("#add(type, object, options)", function() {
     it.skip("should return a decorated promise")
   });
 
   //
-  xdescribe("#updateAll(objects)", function() {
+  describe("#updateAll(objects)", function() {
     it.skip("should return a decorated promise")
   });
 
   //
-  xdescribe("#find(type, id)", function() {
+  describe("#find(type, id)", function() {
 
     beforeEach(function() {
     });
@@ -609,7 +609,7 @@ describe("hoodie.store", function() {
   }); // #find
 
   //
-  xdescribe("#findAll(filter)", function() {
+  describe("#findAll(filter)", function() {
 
     it("should return a promise", function() {
       var promise = this.store.findAll();
@@ -748,7 +748,7 @@ describe("hoodie.store", function() {
   }); // #findAll
 
   //
-  xdescribe("#remove(type, id)", function() {
+  describe("#remove(type, id)", function() {
     _when("objecet cannot be found", function() {
       beforeEach(function() {
         stubFindItem('document', '123', null)
@@ -780,7 +780,7 @@ describe("hoodie.store", function() {
         expect(localStorage.getItem.callCount).to.be(1)
       });
 
-      it("should clear document from changed", function() {
+      it.skip("should clear document from changed", function() {
         this.sandbox.spy(this.store, "clearChanged");
         this.store.remove('document', '123');
         expect(this.store.clearChanged).to.be.calledWith('document', '123');
@@ -926,7 +926,7 @@ describe("hoodie.store", function() {
 
     beforeEach(function() {
       this.sandbox.spy(this.store, "markAsChanged");
-      this.sandbox.spy(this.store, "clearChanged");
+      // this.sandbox.spy(this.store, "clearChanged");
       this.sandbox.spy(this.store, "_hasLocalChanges");
       this.sandbox.spy(this.store, "_isMarkedAsDeleted");
       this.store._cached = {};
@@ -956,7 +956,7 @@ describe("hoodie.store", function() {
 
       _and("`options.remote = true` passed", function() {
 
-        it("should clear changed object", function() {
+        it.skip("should clear changed object", function() {
           this.store.cache('couch', '123', {
             color: 'red'
           }, {
@@ -1079,7 +1079,7 @@ describe("hoodie.store", function() {
                 this.store._isMarkedAsDeleted.returns(false);
               });
 
-              it("should clean it", function() {
+              it.skip("should clean it", function() {
                 this.store.cache('couch', '123');
                 expect(this.store.clearChanged.calledWith('couch', '123')).to.be.ok();
               });
@@ -1143,7 +1143,7 @@ describe("hoodie.store", function() {
   });
 
   //
-  xdescribe("#clear()", function() {
+  describe("#clear()", function() {
 
     it("should return a promise", function() {
       var promise = this.store.clear();
@@ -1168,7 +1168,7 @@ describe("hoodie.store", function() {
       expect(localStorage.getItem.callCount).to.be(2)
     });
 
-    it("should clear dirty docs", function() {
+    it.skip("should clear dirty docs", function() {
       this.sandbox.spy(this.store, "clearChanged");
       this.store.clear();
       expect(this.store.clearChanged).to.be.called();
@@ -1182,12 +1182,12 @@ describe("hoodie.store", function() {
     _when("an error occurs", function() {
 
       beforeEach(function() {
-        this.sandbox.stub(this.store, "clearChanged", function() {
-          throw new Error('ooops');
-        });
+        // this.sandbox.stub(this.store, "clearChanged", function() {
+        //   throw new Error('ooops');
+        // });
       });
 
-      it("should reject the promise", function() {
+      it.skip("should reject the promise", function() {
         var promise = this.store.clear();
         expect(promise.state()).to.eql('rejected');
       });
@@ -1195,7 +1195,7 @@ describe("hoodie.store", function() {
   }); // #clear
 
   //
-  xdescribe("#hasLocalChanges(type, id)", function() {
+  describe("#hasLocalChanges(type, id)", function() {
     _when("no arguments passed", function() {
       it("returns false when there are no local changes", function() {
         expect(this.store.hasLocalChanges()).to.eql(false);
@@ -1283,67 +1283,7 @@ describe("hoodie.store", function() {
   }); // #hasLocalChanges
 
   //
-  xdescribe("#markAllAsChanged(type, id, object)", function() {
-    beforeEach(function() {
-      this.findAllDefer = this.hoodie.defer();
-      this.sandbox.stub(this.store, "findAll").returns(this.findAllDefer.promise());
-      this.sandbox.spy(this.store, "trigger");
-    });
-
-    it("should find all local objects", function() {
-      this.store.markAllAsChanged();
-      expect(this.store.findAll.called).to.be.ok();
-    });
-
-    _when("findAll fails", function() {
-      beforeEach(function() {
-        this.findAllDefer.reject({
-          reason: 'because'
-        });
-      });
-
-      it("should return its rejected promise", function() {
-        var promise = this.store.markAllAsChanged();
-        expect(promise).to.be.rejectedWith({reason: 'because'});
-      });
-    }); // findAll fails
-
-    _when("findAll succeeds", function() {
-      beforeEach(function() {
-        this.objects = [
-          {
-            id: '1',
-            type: 'document',
-            name: 'test1'
-          }, {
-            id: '2',
-            type: 'document',
-            name: 'test2'
-          }, {
-            id: '3',
-            type: 'document',
-            name: 'test3'
-          }
-        ];
-        this.findAllDefer.resolve(this.objects);
-        this.store.markAllAsChanged();
-      });
-
-      it("should add returned obejcts to the dirty list", function() {
-        expect(this.store.changedObjects()).to.eql(this.objects)
-      });
-
-      it("should trigger 'dirty' & 'idle' event", function() {
-        expect(this.store.trigger).to.be.calledWith('dirty');
-        expect(this.store.trigger).to.not.be.calledWith('idle');
-        this.clock.tick(2000);
-        expect(this.store.trigger).to.be.calledWith('idle', this.objects);
-      });
-    }); // findAll succeeds
-  }); // #markAllAsChanged
-
-  //
-  xdescribe("#changedObjects()", function() {
+  describe("#changedObjects()", function() {
 
     _when("there are no changed docs", function() {
       it("should return an empty array", function() {
@@ -1370,68 +1310,7 @@ describe("hoodie.store", function() {
   }); // #changedObjects
 
   //
-  xdescribe("#clearChanged(type, id)", function() {
-
-    it("should clear _dirtyTimeout", function() {
-      this.store._dirtyTimeout = 1;
-      this.store.clearChanged('couch', 123);
-      expect(window.clearTimeout.calledWith(1)).to.be.ok();
-    });
-
-    _when("type & id passed", function() {
-
-      it("should remove the respective object from the dirty list", function() {
-        this.store._dirty['couch/123'] = {
-          color: 'red'
-        };
-        this.store.clearChanged('couch', 123);
-
-        expect(this.store._dirty['couch/123']).to.be(undefined);
-      });
-
-      it("should update array of _dirty IDs in localStorage", function() {
-        this.store._dirty = {};
-        this.store._dirty['couch/123'] = {
-          color: 'red'
-        };
-        this.store._dirty['couch/456'] = {
-          color: 'green'
-        };
-        this.store._dirty['couch/789'] = {
-          color: 'black'
-        };
-        this.store.clearChanged('couch', 123);
-        expect(this.store.db.setItem.calledWith('_dirty', 'couch/456,couch/789')).to.be.ok();
-      });
-
-    });
-
-    _when("no arguments passed", function() {
-
-      it("should remove all objects from the dirty list", function() {
-        this.store._dirty = {
-          'couch/123': {
-            color: 'red'
-          },
-          'couch/456': {
-            color: 'green'
-          }
-        };
-
-        this.store.clearChanged();
-
-        expect($.isEmptyObject(this.store._dirty)).to.be.ok();
-      });
-
-      it("should remove _dirty IDs from localStorage", function() {
-        this.store.clearChanged();
-        expect(this.store.db.removeItem.calledWith('_dirty')).to.be.ok();
-      });
-    });
-  });
-
-  //
-  xdescribe("#trigger", function() {
+  describe("#trigger", function() {
 
     beforeEach(function() {
       this.sandbox.spy(this.hoodie, "trigger");
@@ -1449,7 +1328,7 @@ describe("hoodie.store", function() {
   });
 
   //
-  xdescribe("#on", function() {
+  describe("#on", function() {
 
     beforeEach(function() {
       this.sandbox.spy(this.hoodie, "on");
@@ -1472,7 +1351,7 @@ describe("hoodie.store", function() {
   });
 
   //
-  xdescribe("#unbind", function() {
+  describe("#unbind", function() {
 
     beforeEach(function() {
       this.sandbox.spy(this.hoodie, "unbind");
@@ -1487,8 +1366,8 @@ describe("hoodie.store", function() {
   });
 
   //
-  xdescribe("#decoratePromises", function() {
-    var method, _i, _len, _ref, _results;
+  describe("#decoratePromises", function() {
+    var method, _i, _len, methods;
 
     it("should decorate promises returned by the store", function() {
       var funk = sinon.spy();
@@ -1504,13 +1383,12 @@ describe("hoodie.store", function() {
       expect(funk.called).to.be.ok();
     });
 
-    _ref = "add find findAll findOrAdd update updateAll remove removeAll".split(" ");
-    _results = [];
+    methods = "add find findAll findOrAdd update updateAll remove removeAll".split(" ");
 
-    for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-      method = _ref[_i];
+    for (_i = 0, _len = methods.length; _i < _len; _i++) {
+      method = methods[_i];
 
-      _results.push(it("should scope passed methods to returned promise by " + method, function() {
+      it("should scope passed methods to returned promise by " + method, function() {
         var promise;
         this.store.decoratePromises({
           funk: function() {
@@ -1520,10 +1398,8 @@ describe("hoodie.store", function() {
         promise = this.store[method]('task', '12');
         expect(promise.funk()).to.have.property('done');
         expect(promise.funk()).to.not.have.property('resolved');
-      }));
+      });
     }
-
-    _results;
   });
 
 });

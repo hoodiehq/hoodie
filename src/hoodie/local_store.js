@@ -320,7 +320,7 @@ function hoodieStore (hoodie) {
       db.removeItem(key);
       objectWasMarkedAsDeleted = cached[key] && isMarkedAsDeleted(cached[key]);
       cached[key] = false;
-      store.clearChanged(type, id);
+      clearChanged(type, id);
       if (objectWasMarkedAsDeleted && object) {
         return hoodie.resolveWith(object);
       }
@@ -337,7 +337,7 @@ function hoodieStore (hoodie) {
       key = '' + type + '/' + id;
       db.removeItem(key);
       cached[key] = false;
-      store.clearChanged(type, id);
+      clearChanged(type, id);
     }
 
     triggerEvents('remove', object, options);
@@ -413,7 +413,7 @@ function hoodieStore (hoodie) {
       setObject(type, id, object);
 
       if (options.remote) {
-        store.clearChanged(type, id);
+        clearChanged(type, id);
         cached[key] = $.extend(true, {}, object);
         return cached[key];
       }
@@ -440,7 +440,7 @@ function hoodieStore (hoodie) {
       // stop here if object did not exist in localStore
       // and cache it so we don't need to look it up again
       if (object === false) {
-        store.clearChanged(type, id);
+        clearChanged(type, id);
         cached[key] = false;
         return false;
       }
@@ -460,52 +460,11 @@ function hoodieStore (hoodie) {
     if (hasLocalChanges(object)) {
       markAsChanged(type, id, cached[key], options);
     } else {
-      store.clearChanged(type, id);
+      clearChanged(type, id);
     }
 
     return $.extend(true, {}, object);
   };
-
-
-  // Clear changed
-  // ---------------
-
-  // removes an object from the list of objects that are flagged to by synched (dirty)
-  // and triggers a `store:dirty` event
-  store.clearChanged = function clearChanged(type, id) {
-    var key;
-    if (type && id) {
-      key = '' + type + '/' + id;
-      delete dirty[key];
-    } else {
-      dirty = {};
-    }
-    saveDirtyIds();
-    return window.clearTimeout(dirtyTimeout);
-  };
-
-
-  // Mark all as changed
-  // ------------------------
-
-  // Marks all local object as changed (dirty) to make them sync
-  // with remote
-  store.markAllAsChanged = function markAllAsChanged() {
-
-    return store.findAll().pipe(function(objects) {
-      var key, object, _i, _len;
-
-      for (_i = 0, _len = objects.length; _i < _len; _i++) {
-        object = objects[_i];
-        key = '' + object.type + '/' + object.id;
-        dirty[key] = object;
-      }
-
-      saveDirtyIds();
-      triggerDirtyAndIdleEvents();
-    });
-  };
-
 
 
   // changed objects
@@ -576,7 +535,7 @@ function hoodieStore (hoodie) {
         return _results;
       }).call(this);
       cached = {};
-      store.clearChanged();
+      clearChanged();
       defer.resolve();
       store.trigger('clear');
     } catch (_error) {
@@ -743,7 +702,7 @@ function hoodieStore (hoodie) {
 
     // account events
     hoodie.on('account:cleanup', store.clear);
-    hoodie.on('account:signup', store.markAllAsChanged);
+    hoodie.on('account:signup', markAllAsChanged);
     hoodie.on('remote:bootstrap:start', startBootstrappingMode);
     hoodie.on('remote:bootstrap:end', endBootstrappingMode);
 
@@ -777,6 +736,45 @@ function hoodieStore (hoodie) {
 
     return triggerDirtyAndIdleEvents();
   }
+
+  // Clear changed
+  // ---------------
+
+  // removes an object from the list of objects that are flagged to by synched (dirty)
+  // and triggers a `store:dirty` event
+  function clearChanged(type, id) {
+    var key;
+    if (type && id) {
+      key = '' + type + '/' + id;
+      delete dirty[key];
+    } else {
+      dirty = {};
+    }
+    saveDirtyIds();
+    return window.clearTimeout(dirtyTimeout);
+  }
+
+
+  // Mark all as changed
+  // ------------------------
+
+  // Marks all local object as changed (dirty) to make them sync
+  // with remote
+  function markAllAsChanged() {
+
+    return store.findAll().pipe(function(objects) {
+      var key, object, _i, _len;
+
+      for (_i = 0, _len = objects.length; _i < _len; _i++) {
+        object = objects[_i];
+        key = '' + object.type + '/' + object.id;
+        dirty[key] = object;
+      }
+
+      saveDirtyIds();
+      triggerDirtyAndIdleEvents();
+    });
+  };
 
 
   // when a change come's from our remote store, we differentiate
