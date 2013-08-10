@@ -70,11 +70,11 @@ describe('#checkConnection()', function() {
 
       // skipping these because they seem to cause strange error:
       // the string "TypeError: 'undefined' is not an object (evaluating 'hoodie.request('GET', '/').then')" was thrown, throw an Error :)
-      it.skip('should check again in 3 seconds', function() {
+      it('should check again in 3 seconds', function() {
         expect(window.setTimeout).to.be.calledWith(this.hoodie.checkConnection, 3000);
       });
 
-      it.skip('should trigger `disconnected` event', function() {
+      it('should trigger `disconnected` event', function() {
         expect(this.hoodie.trigger.calledWith('disconnected')).to.be.ok();
       });
 
@@ -118,7 +118,7 @@ describe('#checkConnection()', function() {
         //this.hoodie.checkConnection();
       });
 
-      it.skip('should check again in 3 seconds', function() {
+      it('should check again in 3 seconds', function() {
         expect(window.setTimeout).to.be.calledWith(this.hoodie.checkConnection, 3000);
       });
 
