@@ -119,6 +119,11 @@
     // clear config on sign out
     hoodie.account.on('signedOut', hoodie.config.clear);
 
+    // hoodie.store
+    hoodie.store.patchIfNotPersistant();
+    hoodie.store.subscribeToOutsideEvents();
+    hoodie.store.bootstrapDirtyObjects();
+
     // authenticate
     hoodie.account.authenticate();
   }

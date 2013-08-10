@@ -86,8 +86,10 @@ describe('Hoodie', function() {
     });
 
     it.skip("should check for a pending checkPasswordReset");
-
     it.skip("should clear config on signout");
+    it.skip("should store.patchIfNotPersistant()");
+    it.skip("should store.subscribeToOutsideEvents()");
+    it.skip("should store.bootstrapDirtyObjects()");
     it.skip("should authenticate");
   });
 });

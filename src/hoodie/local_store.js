@@ -755,6 +755,12 @@ function hoodieStore (hoodie) {
     }
   }
 
+  // allow to run this once from outside
+  store.bootstrapDirtyObjects = function() {
+    bootstrapDirtyObjects();
+    delete store.bootstrapDirtyObjects;
+  };
+
 
   //
   // subscribe to events coming from account & our remote store.
@@ -770,6 +776,12 @@ function hoodieStore (hoodie) {
     // remote events
     hoodie.on('remote:change', handleRemoteChange);
   }
+
+  // allow to run this once from outside
+  store.subscribeToOutsideEvents = function() {
+    subscribeToOutsideEvents();
+    delete store.subscribeToOutsideEvents;
+  };
 
 
   // when a change come's from our remote store, we differentiate
@@ -933,7 +945,26 @@ function hoodieStore (hoodie) {
     return defer.promise();
   }
 
+  //
+  // patchIfNotPersistant
+  //
+  function patchIfNotPersistant () {
+    if (!store.isPersistent()) {
+      db = {
+        getItem: function() { return null; },
+        setItem: function() { return null; },
+        removeItem: function() { return null; },
+        key: function() { return null; },
+        length: function() { return 0; }
+      };
+    }
+  }
 
+  // allow to run this once from outside
+  store.patchIfNotPersistant = function() {
+    patchIfNotPersistant();
+    delete store.patchIfNotPersistant;
+  };
 
   //
   // initialization
@@ -942,18 +973,7 @@ function hoodieStore (hoodie) {
 
   // if browser does not support local storage persistence,
   // e.g. Safari in private mode, overite the respective methods.
-  if (!store.isPersistent()) {
-    db = {
-      getItem: function() { return null; },
-      setItem: function() { return null; },
-      removeItem: function() { return null; },
-      key: function() { return null; },
-      length: function() { return 0; }
-    };
-  }
 
-  subscribeToOutsideEvents();
-  bootstrapDirtyObjects();
 
 
   //
