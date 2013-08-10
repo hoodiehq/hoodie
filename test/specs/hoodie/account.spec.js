@@ -1351,43 +1351,39 @@ describe('hoodie.account', function () {
     }); // _account.anonymousPassword is not set
   }); // #hasAnonymousAccount
 
-  // describe('#on(event, callback)', function () {
+  describe('#on(event, callback)', function () {
+    beforeEach(function () {
+      this.sandbox.spy(this.hoodie, 'on');
+    });
 
-  //   beforeEach(function () {
-  //     this.sandbox.spy(this.hoodie, 'on');
-  //   });
+    it('should proxy to @hoodie.on() and namespace with account', function () {
+      var party = this.sandbox.spy();
 
-  //   it('should proxy to @hoodie.on() and namespace with account', function () {
-  //     var party = this.sandbox.spy();
+      this.account.on('funky', party);
+      expect(this.hoodie.on.calledWith('account:funky', party)).to.be.ok();
+    });
 
-  //     this.account.on('funky', party);
-  //     expect(this.hoodie.on.calledWith('account:funky', party)).to.be.ok();
-  //   });
+    it('should namespace multiple events correctly', function () {
+      var cb = this.sandbox.spy();
 
-  //   it('should namespace multiple events correctly', function () {
-  //     var cb = this.sandbox.spy();
+      this.account.on('super funky fresh', cb);
+      expect(this.hoodie.on.calledWith('account:super account:funky account:fresh', cb)).to.be.ok();
+    });
+  }); // #on
 
-  //     this.account.on('super funky fresh', cb);
-  //     expect(this.hoodie.on.calledWith('account:super account:funky account:fresh', cb)).to.be.ok();
-  //   });
-  // });
+  describe('#db()', function () {
+    _when('account.ownerHash is \'owner_hash123\'', function () {
 
-  // describe('#db()', function () {
+      beforeEach(function () {
+        this.account.ownerHash = 'owner_hash123';
+        this.account.ownerHash;
+      });
 
-  //   _when('account.ownerHash is \'owner_hash123\'', function () {
-
-  //     beforeEach(function () {
-  //       this.account.ownerHash = 'owner_hash123';
-  //       this.account.ownerHash;
-  //     });
-
-  //     it('should return \'joe$example.com\'', function () {
-  //       (expect(this.account.db())).to.eql('user/owner_hash123');
-  //     });
-
-  //   });
-
-  // });
+      it('should return \'joe$example.com\'', function () {
+        (expect(this.account.db())).to.eql('user/owner_hash123');
+      });
+    });
+  });
 
   // describe('#fetch()', function () {
 
