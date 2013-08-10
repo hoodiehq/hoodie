@@ -606,10 +606,10 @@ describe("hoodie.store", function() {
         expect(promise).to.be.resolved();
       });
     });
-  });
+  }); // #find
 
   //
-  describe("#findAll(filter)", function() {
+  xdescribe("#findAll(filter)", function() {
 
     it("should return a promise", function() {
       var promise = this.store.findAll();
@@ -733,7 +733,7 @@ describe("hoodie.store", function() {
         })
       });
 
-      it.only("should wait until bootstrapping is finished", function() {
+      it("should wait until bootstrapping is finished", function() {
         var promise = this.store.findAll('todo');
         promise.fail( function() { console.log(arguments); });
 
@@ -744,96 +744,89 @@ describe("hoodie.store", function() {
 
         expect(promise.state()).to.eql('resolved');
       });
-
-    });
-  });
+    }); // store is bootstrapping
+  }); // #findAll
 
   //
-  xdescribe("#remove(type, id)", function() {
+  describe("#remove(type, id)", function() {
 
     _when("objecet cannot be found", function() {
-
       beforeEach(function() {
-        this.sandbox.stub(this.store, "cache").returns(false);
+        stubFindItem('document', '123', null)
       });
 
       it("should return a rejected the promise", function() {
         var promise = this.store.remove('document', '123');
         expect(promise.state()).to.eql('rejected');
       });
-
-    });
+    }); // objecet cannot be found
 
     _when("object can be found and has not been synched before", function() {
 
       beforeEach(function() {
-        this.sandbox.stub(this.store, "cache").returns({
+        stubFindItem('document', '123', {
           funky: 'fresh'
         });
       });
 
       it("should remove the object", function() {
         this.store.remove('document', '123');
-        expect(this.store.db.removeItem.calledWith('document/123')).to.be.ok();
+        expect(localStorage.removeItem.calledWith('document/123')).to.be.ok();
       });
 
-      it("should set the _cached object to false", function() {
-        delete this.store._cached['document/123'];
+      it("should cache that object has been removed", function() {
         this.store.remove('document', '123');
-        expect(this.store._cached['document/123']).to.not.be.ok();
+        expect(localStorage.getItem.callCount).to.be(1)
+        this.store.find('document', '123');
+        expect(localStorage.getItem.callCount).to.be(1)
       });
 
       it("should clear document from changed", function() {
         this.sandbox.spy(this.store, "clearChanged");
         this.store.remove('document', '123');
-        expect(this.store.clearChanged.calledWith('document', '123')).to.be.ok();
+        expect(this.store.clearChanged).to.be.calledWith('document', '123');
       });
 
       it("should return a resolved promise", function() {
         var promise = this.store.remove('document', '123');
-        expect(promise.state()).to.eql('resolved');
+        expect(promise).to.be.resolved();
       });
 
       it("should return a clone of the cached object (before it was deleted)", function() {
-        var promise = this.store.remove('document', '123', {
-          remote: true
-        });
-        promise.then(function (res) {
-          expect(res).to.eql({
-            funky: 'fresh'
-          });
-        });
+        var promise = this.store.remove('document', '123');
+        expect(promise).to.be.resolvedWith({
+          type: 'document',
+          id: '123',
+          funky: 'fresh',
+        })
       });
-
     });
 
     _when("object can be found and remove comes from remote", function() {
-
       beforeEach(function() {
-        this.sandbox.stub(this.store, "cache").returns({
-          id: '123',
-          type: 'document',
+        stubFindItem('document', '123', {
           name: 'test'
         });
         this.sandbox.spy(this.store, "trigger");
+        debugger
         this.store.remove('document', '123', {
           remote: true
         });
       });
 
       it("should remove the object", function() {
-        expect(this.store.db.removeItem.calledWith('document/123')).to.be.ok();
+        expect(localStorage.removeItem).to.be.calledWith('document/123');
       });
 
       it("should trigger remove & change trigger events", function() {
 
-        expect(this.store.trigger.calledWith('remove', {
+        expect(this.store.trigger).to.be.calledWith('remove', {
           id: '123',
           type: 'document',
           name: 'test'
         }, {
           remote: true
-        })).to.be.ok();
+        })
 
         expect(this.store.trigger.calledWith('remove:document', {
           id: '123',
@@ -883,43 +876,43 @@ describe("hoodie.store", function() {
 
       beforeEach(function() {
 
-        this.sandbox.stub(this.store, "cache").returns({
+        stubFindItem('document', '123', {
           _syncedAt: 'now'
         });
-
         this.store.remove('document', '123');
       });
 
       it("should mark the object as deleted and cache it", function() {
-        expect(this.store.cache.calledWith('document', '123', {
-          _syncedAt: 'now',
-          _deleted: true
-        })).to.be.ok();
+        var object = getLastSavedObject()
+        expect(object._syncedAt).to.be('now')
+        expect(object._deleted).to.be(true)
       });
 
       it("should not remove the object from store", function() {
-        expect(this.store.db.removeItem.called).to.not.be.ok();
+        expect(localStorage.removeItem).to.not.be.calledWith('document/123');
       });
-
     });
 
     _when("store is bootstrapping", function() {
 
       beforeEach(function() {
-        // we can't force it to return always true, as we'd
-        // end up in infinite loop.
-        // spyOn(this.store, "isBootstrapping").andReturn(true);
-        this.store._bootstrapping = true;
-        expect(this.store.isBootstrapping()).to.be.ok();
-
-        this.sandbox.stub(this.store, "cache").returns({ funky: 'fresh' });
+        var called = false;
+        this.sandbox.stub(this.store, 'isBootstrapping', function() {
+          if (called) return false;
+          called = true;
+          return true;
+        })
       });
 
-      it("should wait until bootstrapping is finished", function() {
-        var promise = this.store.remove('todo', '123');
 
+      it("should wait until bootstrapping is finished", function() {
+        stubFindItem('document', '123', {
+          something: 'here'
+        });
+        var promise = this.store.remove('document', '123');
         expect(promise.state()).to.eql('pending');
 
+        this.store.subscribeToOutsideEvents()
         this.hoodie.trigger('remote:bootstrap:end');
         expect(promise.state()).to.eql('resolved');
       });

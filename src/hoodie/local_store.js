@@ -313,18 +313,18 @@ function hoodieStore (hoodie) {
 
     key = '' + type + '/' + id;
 
+    object = store.cache(type, id);
+
     // if change comes from remote, just clean up locally
     if (options.remote) {
       db.removeItem(key);
       objectWasMarkedAsDeleted = cached[key] && isMarkedAsDeleted(cached[key]);
       cached[key] = false;
       store.clearChanged(type, id);
-      if (objectWasMarkedAsDeleted) {
-        return;
+      if (objectWasMarkedAsDeleted && object) {
+        return hoodie.resolveWith(object);
       }
     }
-
-    object = store.cache(type, id);
 
     if (!object) {
       return decoratePromise(defer.reject(Hoodie.Errors.NOT_FOUND(type, id)).promise());
