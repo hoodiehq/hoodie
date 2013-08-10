@@ -1023,7 +1023,7 @@ describe('hoodie.account', function () {
     }); // signout succeeds
   }); // #signIn
 
-  describe('#changePassword(currentPassword, newPassword)', function () {
+  xdescribe('#changePassword(currentPassword, newPassword)', function () {
 
     beforeEach(function() {
       this.sandbox.stub(this.account, 'request').returns(this.requestDefer.promise())
@@ -1196,115 +1196,108 @@ describe('hoodie.account', function () {
           error: 'unknown'
         });
       });
-
     }); // fetching _users has an error
-
   }); // #changePassword
 
-  // describe('#signOut(options)', function () {
+  describe('#signOut(options)', function () {
 
-  //   beforeEach(function () {
-  //     this.sandbox.stub(this.hoodie, 'uuid').returns('newHash');
-  //     this.sandbox.spy(this.hoodie.config, 'clear');
-  //   });
+    beforeEach(function () {
+      this.sandbox.stub(this.hoodie, 'uuid').returns('newHash');
+      this.sandbox.spy(this.hoodie.config, 'clear');
+    });
 
-  //   _when('called with silent: true', function () {
+    _when('called with silent: true', function () {
 
-  //     it('should not trigger `account:signout` event', function () {
-  //       this.account.signOut({
-  //         silent: true
-  //       });
-  //       expect(this.hoodie.trigger.calledWith('account:signout')).to.not.be.ok();
-  //     });
+      it('should not trigger `account:signout` event', function () {
+        this.account.signOut({
+          silent: true
+        });
+        expect(this.hoodie.trigger.calledWith('account:signout')).to.not.be.ok();
+      });
+    }); // called with silent: true
 
-  //   });
+    _when('user has no account', function () {
 
-  //   _when('user has no account', function () {
+      beforeEach(function () {
+        this.sandbox.stub(this.account, 'hasAccount').returns(false);
+        this.promise = this.account.signOut();
+      });
 
-  //     beforeEach(function () {
-  //       this.sandbox.stub(this.account, 'hasAccount').returns(false);
-  //       this.promise = this.account.signOut();
-  //     });
+      it('should not send any request', function () {
+        expect(this.hoodie.request.called).to.not.be.ok();
+      });
 
-  //     it('should not send any request', function () {
-  //       expect(this.hoodie.request.called).to.not.be.ok();
-  //     });
+      it('should trigger `account:signout` event', function () {
+        expect(this.hoodie.trigger.calledWith('account:signout')).to.be.ok();
+      });
 
-  //     it('should trigger `account:signout` event', function () {
-  //       expect(this.hoodie.trigger.calledWith('account:signout')).to.be.ok();
-  //     });
+      it('should generate new @ownerHash hash', function () {
+        expect(this.account.ownerHash).to.eql('newHash');
+      });
 
-  //     it('should generate new @ownerHash hash', function () {
-  //       expect(this.account.ownerHash).to.eql('newHash');
-  //     });
+      it('should unset @username', function () {
+        expect(this.account.username).to.be.undefined;
+      });
 
-  //     it('should unset @username', function () {
-  //       expect(this.account.username).to.be.undefined;
-  //     });
+      it('should clear config', function () {
+        expect(this.hoodie.config.clear.called).to.be.ok();
+      });
 
-  //     it('should clear config', function () {
-  //       expect(this.hoodie.config.clear.called).to.be.ok();
-  //     });
+      it('should return a resolved promise', function () {
+        expect(this.promise.state()).to.eql('resolved');
+      });
+    }); // user has no account
 
-  //     it('should return a resolved promise', function () {
-  //       expect(this.promise.state()).to.eql('resolved');
-  //     });
+    _when('user has account', function () {
 
-  //   });
+      beforeEach(function () {
+        this.sandbox.spy(this.hoodie.remote, 'disconnect');
+        this.sandbox.stub(this.account, 'hasAccount').returns(true);
+        this.account.signOut();
 
-  //   _when('user has account', function () {
+        var _ref = this.hoodie.request.args[0];
 
-  //     beforeEach(function () {
-  //       this.sandbox.spy(this.hoodie.remote, 'disconnect');
-  //       this.sandbox.stub(this.account, 'hasAccount').returns(true);
-  //       this.account.signOut();
+        this.type = _ref[0],
+        this.path = _ref[1],
+        this.options = _ref[2],
+        _ref;
+      });
 
-  //       var _ref = this.hoodie.request.args[0];
+      it('should disconnect', function () {
+        expect(this.hoodie.remote.disconnect.called).to.be.ok();
+      });
 
-  //       this.type = _ref[0],
-  //       this.path = _ref[1],
-  //       this.options = _ref[2],
-  //       _ref;
-  //     });
+      it('should send a DELETE request to http://cou.ch/_session', function () {
+        expect(this.hoodie.request.called).to.be.ok();
+        expect(this.type).to.eql('DELETE');
+        expect(this.path).to.eql('/_session');
+      });
 
-  //     it('should disconnect', function () {
-  //       expect(this.hoodie.remote.disconnect.called).to.be.ok();
-  //     });
+      _when('signOut request successful', function () {
 
-  //     it('should send a DELETE request to http://cou.ch/_session', function () {
-  //       expect(this.hoodie.request.called).to.be.ok();
-  //       expect(this.type).to.eql('DELETE');
-  //       expect(this.path).to.eql('/_session');
-  //     });
+        beforeEach(function () {
+          this.requestDefer.resolve();
+          this.account.signOut();
+        });
 
-  //     _when('signOut request successful', function () {
+        it('should trigger `account:signout` event', function () {
+          expect(this.hoodie.trigger.calledWith('account:signout')).to.be.ok();
+        });
 
-  //       beforeEach(function () {
-  //         this.requestDefer.resolve();
-  //         this.account.signOut();
-  //       });
+        it('should generate new @ownerHash hash', function () {
+          expect(this.account.ownerHash).to.eql('newHash');
+        });
 
-  //       it('should trigger `account:signout` event', function () {
-  //         expect(this.hoodie.trigger.calledWith('account:signout')).to.be.ok();
-  //       });
+        it('should unset @username', function () {
+          expect(this.account.username).to.be.undefined;
+        });
 
-  //       it('should generate new @ownerHash hash', function () {
-  //         expect(this.account.ownerHash).to.eql('newHash');
-  //       });
-
-  //       it('should unset @username', function () {
-  //         expect(this.account.username).to.be.undefined;
-  //       });
-
-  //       it('should clear config', function () {
-  //         expect(this.hoodie.config.clear.called).to.be.ok();
-  //       });
-
-  //     });
-
-  //   });
-
-  // });
+        it('should clear config', function () {
+          expect(this.hoodie.config.clear.called).to.be.ok();
+        });
+      }); // signOut request successful
+    }); // user has account
+  }); // #signOut
 
   // describe('#hasAccount()', function () {
 
