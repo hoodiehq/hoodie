@@ -1343,7 +1343,7 @@ describe("hoodie.store", function() {
   }); // #markAllAsChanged
 
   //
-  describe("#changedObjects()", function() {
+  xdescribe("#changedObjects()", function() {
 
     _when("there are no changed docs", function() {
       it("should return an empty array", function() {
@@ -1361,40 +1361,13 @@ describe("hoodie.store", function() {
         expect(this.store.changedObjects().length).to.eql(2);
       });
 
-      it.only("should add type and id", function() {
+      it("should add type and id", function() {
         var objects = this.store.changedObjects();
         expect(objects[0].type).to.eql('couch');
         expect(objects[0].id).to.eql('123');
       });
     });
   }); // #changedObjects
-
-  //
-  xdescribe("#isMarkedAsDeleted(type, id)", function() {
-
-    _when("object 'couch/123' is marked as deleted", function() {
-
-      beforeEach(function() {
-        this.sandbox.stub(this.store, "cache").returns({
-          _deleted: true
-        });
-      });
-
-      it("should return true", function() {
-        expect(this.store.isMarkedAsDeleted('couch', '123')).to.be.ok();
-      });
-    });
-
-    _when("object 'couch/123' isn't marked as deleted", function() {
-      beforeEach(function() {
-        this.sandbox.stub(this.store, "cache").returns({});
-      });
-
-      it("should return false", function() {
-        expect(this.store.isMarkedAsDeleted('couch', '123')).to.not.be.ok();
-      });
-    });
-  });
 
   //
   xdescribe("#clearChanged(type, id)", function() {

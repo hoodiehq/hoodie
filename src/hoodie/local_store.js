@@ -485,16 +485,6 @@ function hoodieStore (hoodie) {
   };
 
 
-  // Marked as deleted?
-  // --------------------
-
-  // when an object gets deleted that has been synched before (`_rev` attribute),
-  // it cannot be removed from store but gets a `_deleted: true` attribute
-  store.isMarkedAsDeleted = function(type, id) {
-    return isMarkedAsDeleted(store.cache(type, id));
-  };
-
-
   // Mark all as changed
   // ------------------------
 
