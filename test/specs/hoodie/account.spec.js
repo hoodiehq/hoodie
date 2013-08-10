@@ -1199,7 +1199,7 @@ describe('hoodie.account', function () {
     }); // fetching _users has an error
   }); // #changePassword
 
-  describe('#signOut(options)', function () {
+  xdescribe('#signOut(options)', function () {
 
     beforeEach(function () {
       this.sandbox.stub(this.hoodie, 'uuid').returns('newHash');
@@ -1299,33 +1299,27 @@ describe('hoodie.account', function () {
     }); // user has account
   }); // #signOut
 
-  // describe('#hasAccount()', function () {
+  describe('#hasAccount()', function () {
+    _when('#username is undefined', function () {
+      beforeEach(function () {
+        delete this.account.username;
+      });
 
-  //   _when('#username is undefined', function () {
+      it('should return false', function () {
+        expect(this.account.hasAccount()).to.eql(false);
+      });
+    }); // #username is undefined
 
-  //     beforeEach(function () {
-  //       delete this.account.username;
-  //     });
+    _when('#username is set', function () {
+      beforeEach(function () {
+        this.account.username = 'somebody';
+      });
 
-  //     it('should return false', function () {
-  //       expect(this.account.hasAccount()).to.eql(false);
-  //     });
-  //   });
-
-  //   _when('#username is set', function () {
-
-  //     beforeEach(function () {
-  //       this.account.username = 'somebody';
-  //       this.account.username;
-  //     });
-
-  //     it('should return false', function () {
-  //       expect(this.account.hasAccount()).to.eql(true);
-  //     });
-
-  //   });
-
-  // });
+      it('should return false', function () {
+        expect(this.account.hasAccount()).to.eql(true);
+      });
+    }); // #username is set
+  }); // #hasAccount
 
   // describe('#hasAnonymousAccount()', function () {
 
