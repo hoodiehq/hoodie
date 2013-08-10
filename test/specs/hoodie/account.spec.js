@@ -1602,7 +1602,7 @@ describe('hoodie.account', function () {
     }); // user has no account
   }); // #destroy
 
-  describe('#resetPassword(username)', function () {
+  xdescribe('#resetPassword(username)', function () {
     beforeEach(function () {
       this.sandbox.stub(this.account, 'checkPasswordReset').returns('checkPasswordResetPromise');
     });
@@ -1702,15 +1702,12 @@ describe('hoodie.account', function () {
     }); // there is no pending password reset request
   }); // #resetPassword
 
-
-  // xdescribe('#resetPassword(username)', function () {
-
-  //   it('should proxy to hoodie.trigger', function() {
-  //     this.account.trigger('say', 'funky', 'fresh');
-  //     expect(this.hoodie.trigger.calledWith('account:say', 'funky', 'fresh')).to.be.ok();
-  //   });
-
-  // });
+  describe('#trigger(event, arg1, arg2, ...)', function () {
+    it('should proxy to hoodie.trigger', function() {
+      this.account.trigger('say', 'funky', 'fresh');
+      expect(this.hoodie.trigger).to.be.calledWith('account:say', 'funky', 'fresh');
+    });
+  }); // #trigger
 
   // xdescribe('#changeUsername(currentPassword, newUsername)', function () {
 
