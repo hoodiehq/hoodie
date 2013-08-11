@@ -51,7 +51,6 @@ expect.Assertion.prototype.calledWith = function() {
   var args = Array.prototype.slice.call(arguments);
   var hit = false
 
-  debugger
   for (var i = 0; i < this.obj.args.length; i++) {
     if (expect.eql(this.obj.args[i], args)) {
       hit = true

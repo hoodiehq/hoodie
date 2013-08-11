@@ -12,69 +12,27 @@ describe("Hoodie.Remote", function() {
     this.sandbox.spy(this.hoodie, 'unbind');
     this.sandbox.spy(this.hoodie, 'checkConnection');
 
-    this.sandbox.spy(window, 'setTimeout');
-
     this.requestDefer = this.hoodie.defer();
+    this.sandbox.stub(this.hoodie, 'request').returns(this.requestDefer.promise());
 
-    this.sandbox.stub(this.hoodie.account, 'db').returns('joe$example.com');
+    this.storeApi = Mocks.StoreApi(this.hoodie);
+    this.sandbox.stub(window, 'hoodieStoreApi').returns(this.storeApi);
 
-    this.remote = new Hoodie.Remote(this.hoodie);
-    this.remote.name = 'remotetest';
-
-    this.sandbox.stub(this.remote, 'request').returns(this.requestDefer.promise());
-
-    this.sandbox.spy(Hoodie.Remote.prototype, 'connect');
-
+    this.remote = hoodieRemoteStore(this.hoodie, { name: 'my/store'} );
   });
 
-  describe("constructor(@hoodie, options = {})", function() {
-
+  describe("factory", function() {
     it("should set @name from options", function() {
-      var remote = new Hoodie.Remote(this.hoodie, {
-        name: 'base/path'
-      });
-      expect(remote.name).to.eql('base/path');
-    });
-
-
-    it("should default connected to false", function() {
-      var remote = new Hoodie.Remote(this.hoodie);
-      expect(remote.connected).to.eql(false);
+      expect(this.remote.name).to.eql('my/store');
     });
 
     it("should fallback prefix to ''", function() {
-      var remote = new Hoodie.Remote(this.hoodie);
-      expect(remote.prefix).to.eql('');
-    });
-
-    _when("connected: true passed", function() {
-
-      beforeEach(function() {
-        var promise = this.requestDefer.promise();
-        promise.abort = function () {};
-
-        this.sandbox.stub(this.hoodie, 'request').returns(promise);
-
-        this.remote = new Hoodie.Remote(this.hoodie, {
-          connected: true
-        });
-
-      });
-
-      it("should set @connected to true", function() {
-        expect(this.remote.connected).to.eql(true);
-      });
-
-      it("should start syncing", function() {
-        expect(Hoodie.Remote.prototype.called).to.be.ok();
-      });
-
+      expect(this.remote.prefix).to.eql('');
     });
 
     _when("prefix: $public passed", function() {
-
       beforeEach(function() {
-        this.remote = new Hoodie.Remote(this.hoodie, {
+        this.remote = hoodieRemoteStore(this.hoodie, {
           prefix: '$public'
         });
       });
@@ -85,9 +43,8 @@ describe("Hoodie.Remote", function() {
     });
 
     _when("baseUrl: http://api.otherapp.com passed", function() {
-
       beforeEach(function() {
-        this.remote = new Hoodie.Remote(this.hoodie, {
+        this.remote = hoodieRemoteStore(this.hoodie, {
           baseUrl: 'http://api.otherapp.com'
         });
       });
@@ -96,24 +53,19 @@ describe("Hoodie.Remote", function() {
         expect(this.remote.baseUrl).to.eql('http://api.otherapp.com');
       });
     });
+  }); // factory
 
-  });
-
-  xdescribe("#request(type, path, options)", function() {
+  describe("#request(type, path, options)", function() {
 
     beforeEach(function() {
-      this.remote.request();
       delete this.remote.name;
-      this.sandbox.spy(this.hoodie, "request");
     });
 
     it("should proxy to hoodie.request", function() {
-      var returnedValue;
-
       this.hoodie.request.returns('funk');
-      returnedValue = this.remote.request("GET", "/something");
+      var returnedValue = this.remote.request("GET", "/something");
 
-      expect(this.hoodie.request.called).to.be.ok();
+      expect(this.hoodie.request).to.be.called();
       expect(returnedValue).to.eql('funk');
     });
 
@@ -125,15 +77,11 @@ describe("Hoodie.Remote", function() {
     });
 
     it("should prefix path with @name (encoded)", function() {
-      var path, type;
-      this.remote.name = "my/store";
+      this.remote.name = "my/funky/store";
       this.remote.request("GET", "/something");
-      var _ref = this.hoodie.request.args[0];
+      var typeAndPath = this.hoodie.request.args[0];
 
-      type = _ref[0];
-      path = _ref[1];
-
-      expect(path).to.eql('/my%2Fstore/something');
+      expect(typeAndPath[1]).to.eql('/my%2Ffunky%2Fstore/something');
     });
 
     it("should prefix path with @baseUrl", function() {
@@ -141,12 +89,9 @@ describe("Hoodie.Remote", function() {
       this.remote.baseUrl = 'http://api.otherapp.com';
       this.remote.request("GET", "/something");
 
-      var _ref = this.hoodie.request.args[0];
+      var typeAndPath = this.hoodie.request.args[0];
 
-      type = _ref[0];
-      path = _ref[1];
-
-      expect(path).to.eql('http://api.otherapp.com/something');
+      expect(typeAndPath[1]).to.eql('http://api.otherapp.com/something');
     });
 
     _when("type is POST", function() {
@@ -154,11 +99,11 @@ describe("Hoodie.Remote", function() {
       beforeEach(function() {
         var path, type;
         this.remote.request("POST", "/something");
-        var _ref = this.hoodie.request.args[0];
+        var args = this.hoodie.request.args[0];
 
-        type = _ref[0];
-        path = _ref[1];
-        this.options = _ref[2];
+        type = args[0];
+        path = args[1];
+        this.options = args[2];
       });
 
       it("should default options.dataType to 'json'", function() {
@@ -170,8 +115,7 @@ describe("Hoodie.Remote", function() {
       });
 
     });
-
-  });
+  }); // #request
 
   describe("get(view, params)", function() {});
 

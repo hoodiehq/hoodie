@@ -45,8 +45,8 @@ function hoodieRemoteStore (hoodie, options) {
   var remoteStore = {};
 
 
-  // Store Operations overides
-  // ---------------------------
+  // Remote Store Persistance methods
+  // ----------------------------------
 
   // find
   // ------
@@ -56,7 +56,7 @@ function hoodieRemoteStore (hoodie, options) {
   remoteStore.find = function find(type, id) {
     var path;
 
-    path = '' + type + '/' + id;
+    path = type + '/' + id;
 
     if (remote.prefix) {
       path = remote.prefix + path;
@@ -206,10 +206,6 @@ function hoodieRemoteStore (hoodie, options) {
 
   if (options.prefix !== undefined) {
     remote.prefix = options.prefix;
-  }
-
-  if (options.connected !== undefined) {
-    remote.connected = options.connected;
   }
 
   if (options.baseUrl !== null) {
