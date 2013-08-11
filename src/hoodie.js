@@ -126,11 +126,10 @@
 
     // hoodie.remote
     hoodie.remote.loadListOfKnownObjectsFromLocalStore();
-    hoodie.remote.subscribeToOutsideEvents();
-    hoodie.remote.connect();
+    hoodie.remote.subscribeToEvents();
 
     // authenticate
-    hoodie.account.authenticate();
+    hoodie.account.authenticate().then( hoodie.remote.connect );
   }
 
   // Extending hoodie

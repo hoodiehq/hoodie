@@ -1,4 +1,4 @@
-/* exported hoodieRemoteBase */
+/* exported hoodieRemoteStore */
 /* global hoodieStoreBase */
 
 // Remote
@@ -40,7 +40,7 @@
 //
 
 //
-function hoodieRemoteBase (hoodie, options) {
+function hoodieRemoteStore (hoodie, options) {
 
   // inherit from Hoodies Store API
   var storeBase = hoodieStoreBase(hoodie);
@@ -314,6 +314,7 @@ function hoodieRemoteBase (hoodie, options) {
   //
   remote.connect = function connect() {
     remote.connected = true;
+    remote.trigger('connect'); // TODO: spec that
     return remote.bootstrap();
   };
 
@@ -325,6 +326,7 @@ function hoodieRemoteBase (hoodie, options) {
   //
   remote.disconnect = function disconnect() {
     remote.connected = false;
+    remote.trigger('disconnect'); // TODO: spec that
 
     if (pullRequest) {
       pullRequest.abort();
@@ -351,19 +353,8 @@ function hoodieRemoteBase (hoodie, options) {
 
   // returns the sequence number from wich to start to find changes in pull
   //
+  var since = options.since || 0; // TODO: spec that!
   remote.getSinceNr = function getSinceNr() {
-    return since || 0;
-  };
-
-
-  // setSinceNr
-  // ------------
-
-  // sets the sequence number from wich to start to find changes in pull
-  //
-  var since;
-  remote.setSinceNr = function setSinceNr(seq) {
-    since = seq;
     return since;
   };
 
@@ -371,7 +362,7 @@ function hoodieRemoteBase (hoodie, options) {
   // bootstrap
   // -----------
 
-  // inital pull of data of the remote start. By default, we pull all
+  // inital pull of data of the remote store. By default, we pull all
   // changes since the beginning, but this behavior might be adjusted,
   // e.g for a filtered bootstrap.
   //
@@ -410,7 +401,11 @@ function hoodieRemoteBase (hoodie, options) {
   remote.push = function push(objects) {
     var object, objectsForRemote, _i, _len;
 
-    if (!(objects !== undefined ? objects.length : void 0)) {
+    if (!$.isArray(objects)) {
+      objects = defaultObjectsToPush()
+    }
+
+    if (objects.length === 0) {
       return hoodie.resolveWith([]);
     }
 
@@ -480,6 +475,39 @@ function hoodieRemoteBase (hoodie, options) {
   // valid CouchDB doc attributes starting with an underscore
   //
   var validSpecialAttributes = ['_id', '_rev', '_deleted', '_revisions', '_attachments'];
+
+
+  // default objects to push
+  // --------------------------
+
+  // when pushed without passing any objects, the objects returned from
+  // this method will be passed. It can be overwritten by passing an
+  // array of objects or a function as `options.objects`
+  //
+  var defaultObjectsToPush = function defaultObjectsToPush() {
+    return [];
+  };
+  if (options.defaultObjectsToPush) {
+    if ($.isArray(options.defaultObjectsToPush)) {
+      defaultObjectsToPush = function defaultObjectsToPush() {
+        return options.defaultObjectsToPush;
+      };
+    } else {
+      defaultObjectsToPush = options.defaultObjectsToPush;
+    }
+  }
+
+
+  // setSinceNr
+  // ------------
+
+  // sets the sequence number from wich to start to find changes in pull
+  //
+  function setSinceNr(seq) {
+    since = seq;
+    remote.trigger('pull', since); // TODO: spec that
+    return since;
+  }
 
 
   // Parse for remote
@@ -615,7 +643,7 @@ function hoodieRemoteBase (hoodie, options) {
   //
   function pullUrl() {
     var since;
-    since = remote.getSinceNr();
+    since = getSinceNr();
     if (remote.isConnected()) {
       return '/_changes?include_docs=true&since=' + since + '&heartbeat=10000&feed=longpoll';
     } else {
@@ -641,7 +669,7 @@ function hoodieRemoteBase (hoodie, options) {
   // when aborted (see @_handlePullError)
   //
   function handlePullSuccess(response) {
-    remote.setSinceNr(response.last_seq);
+    setSinceNr(response.last_seq);
     handlePullResults(response.results);
     if (remote.isConnected()) {
       return remote.pull();
@@ -746,6 +774,18 @@ function hoodieRemoteBase (hoodie, options) {
       remote.trigger('change', event, object);
       remote.trigger('change:' + object.type, event, object);
       remote.trigger('change:' + object.type + ':' + object.id, event, object);
+    }
+  }
+
+
+  // bootstrap known objects
+  //
+  if (options.knownObjects) {
+    for (var i = 0; i < options.knownObjects.length; i++) {
+      remote.markAsKnownObject({
+        type: options.knownObjects[i].type,
+        id: options.knownObjects[i].id
+      });
     }
   }
 

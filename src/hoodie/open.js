@@ -1,5 +1,5 @@
 /* exported hoodieOpen */
-/* global hoodieRemoteBase */
+/* global hoodieRemoteStore */
 
 // Open stores
 // -------------
@@ -24,7 +24,7 @@ function hoodieOpen(hoodie) {
       name: storeName
     });
 
-    return hoodieRemoteBase(hoodie, options);
+    return hoodieRemoteStore(hoodie, options);
   }
 
   //

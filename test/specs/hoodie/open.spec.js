@@ -7,7 +7,7 @@ describe('#open(store, options)', function() {
 
     this.requestDefer = this.hoodie.defer();
 
-    this.sandbox.spy(window, 'hoodieRemoteBase');
+    this.sandbox.spy(window, 'hoodieRemoteStore');
 
     hoodieOpen(this.hoodie);
   });
@@ -18,7 +18,7 @@ describe('#open(store, options)', function() {
       option: 'value'
     });
 
-    expect(window.hoodieRemoteBase.withArgs(this.hoodie, {
+    expect(window.hoodieRemoteStore.withArgs(this.hoodie, {
       name: 'store_name',
       option: 'value'
     })).to.be.ok();
