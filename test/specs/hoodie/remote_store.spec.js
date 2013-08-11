@@ -284,7 +284,6 @@ describe("Hoodie.Remote", function() {
   });
 
   describe("#save(type, id, object)", function() {
-
     beforeEach(function() {
       this.sandbox.stub(this.hoodie, "uuid").returns("uuid567");
     });
@@ -336,8 +335,7 @@ describe("Hoodie.Remote", function() {
       it("should not generate a _rev", function() {
         expect(this.data._rev).to.be(undefined);
       });
-
-    });
+    }); // saving car/123 with color: red
 
     _when("saving car/123 with color: red and prefix is 'remote_prefix'", function() {
       beforeEach(function() {
@@ -360,22 +358,20 @@ describe("Hoodie.Remote", function() {
         expect(this.path).to.eql('/my%2Fstore/remote_prefix%2Fcar%2F123');
       });
 
-      it.only("should set _id to `remote_prefix/car/123`", function() {
+      it("should set _id to `remote_prefix/car/123`", function() {
         expect(this.data._id).to.eql('remote_prefix/car/123');
       });
-
-    });
-
+    }); // saving car/123 with color: red and prefix is 'remote_prefix'
   });
 
-  describe("#remove(type, id)", function() {
+  describe.only("#remove(type, id)", function() {
 
     beforeEach(function() {
-      this.sandbox.stub(this.remote, "update").returns("update_promise");
+      this.remote.update.returns("update_promise");
     });
 
     it("should proxy to update with _deleted: true", function() {
-      this.remote.remove('car', 123);
+      this.storeBackend.remove('car', 123);
 
       expect(this.remote.update.calledWith('car', 123, {
         _deleted: true
@@ -383,7 +379,7 @@ describe("Hoodie.Remote", function() {
     });
 
     it("should return promise of update", function() {
-      expect(this.remote.remove('car', 123)).to.eql('update_promise');
+      expect(this.storeBackend.remove('car', 123)).to.eql('update_promise');
     });
 
   });
@@ -395,14 +391,14 @@ describe("Hoodie.Remote", function() {
     });
 
     it("should proxy to updateAll with _deleted: true", function() {
-      this.remote.removeAll('car');
+      this.storeBackend.removeAll('car');
       expect(this.remote.updateAll.calledWith('car', {
         _deleted: true
       })).to.be.ok();
     });
 
     it("should return promise of updateAll", function() {
-      expect(this.remote.removeAll('car')).to.eql('updateAll_promise');
+      expect(this.storeBackend.removeAll('car')).to.eql('updateAll_promise');
     });
 
   });
