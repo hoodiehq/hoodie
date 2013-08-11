@@ -4,7 +4,7 @@
 // the door to world domination (apps)
 //
 
-(function(window) {
+(function(global) {
 
   'use strict';
 
@@ -188,7 +188,7 @@
   } else {
 
     // set global
-    window.Hoodie = Hoodie;
+    global.Hoodie = Hoodie;
   }
 
 })(window);

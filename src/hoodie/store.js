@@ -30,6 +30,39 @@ function hoodieStoreApi(hoodie, options) {
   var storeName = options.name || 'store';
 
 
+  // Validate
+  // --------------
+
+  // by default, we only check for a valid type & id.
+  // the validate method can be overwriten by passing
+  // options.validate
+  //
+  // if `validate` returns nothing, the passed object is
+  // valid. Otherwise it returns an error
+  //
+  api.validate = options.validate;
+
+  if (! options.validate) {
+    api.validate = function(type, id, object, options) {
+
+      if (! type) {
+        return;
+      }
+
+      if (!isValidType(type)) {
+        return Hoodie.Errors.INVALID_KEY({
+          type: type
+        });
+      }
+
+      if (id && !isValidId(id)) {
+        return Hoodie.Errors.INVALID_KEY({
+          id: id
+        });
+      }
+    };
+  }
+
   // Save
   // --------------
 
@@ -54,14 +87,14 @@ function hoodieStoreApi(hoodie, options) {
     }
 
     // validations
-    var error = backend.validate(type, id, properties);
+    var error = api.validate(type, id, properties, options);
     if(error) {
-      return hoodie.rejectWith(error);
+      return rejectWith(error);
     }
 
     // don't mess with passed object
     var object = $.extend(true, {}, properties, {type: type, id: id});
-    return decoratePromise( backend.save(object) );
+    return decoratePromise( backend.save(object, options) );
   };
 
 
@@ -89,9 +122,9 @@ function hoodieStoreApi(hoodie, options) {
   api.find = function find(type, id) {
 
     // validations
-    var error = backend.validate(type, id);
+    var error = api.validate(type, id);
     if(error) {
-      return hoodie.rejectWith(error);
+      return rejectWith(error);
     }
 
     return decoratePromise( backend.find(type, id) );
@@ -120,7 +153,10 @@ function hoodieStoreApi(hoodie, options) {
       return api.add(type, newProperties);
     }
 
-    return api.find(type, id).then(null, handleNotFound);
+    // promise decorations get lost when piped through `then`,
+    // that's why we need to decorate the find's promise again.
+    var promise = api.find(type, id).then(null, handleNotFound);
+    return decoratePromise( promise );
   };
 
 
@@ -130,17 +166,17 @@ function hoodieStoreApi(hoodie, options) {
   // returns all objects from store.
   // Can be optionally filtered by a type or a function
   //
-  api.findAll = function findAll(type) {
+  api.findAll = function findAll(type, options) {
 
     // validations
     if (type) {
-      var error = backend.validate(type);
+      var error = api.validate(type, undefined, undefined, options);
       if(error) {
         return rejectWith(error);
       }
     }
 
-    return decoratePromise( backend.findAll(type) );
+    return decoratePromise( backend.findAll(type, options) );
   };
 
 
@@ -204,7 +240,10 @@ function hoodieStoreApi(hoodie, options) {
       return api.save(type, id, objectUpdate, options);
     }
 
-    return api.find(type, id).then(handleFound, handleNotFound);
+    // promise decorations get lost when piped through `then`,
+    // that's why we need to decorate the find's promise again.
+    var promise = api.find(type, id).then(handleFound, handleNotFound);
+    return decoratePromise( promise );
   };
 
 
@@ -237,7 +276,7 @@ function hoodieStoreApi(hoodie, options) {
       promise = api.findAll();
     }
 
-    return promise.then(function(objects) {
+    promise = promise.then(function(objects) {
       // now we update all objects one by one and return a promise
       // that will be resolved once all updates have been finished
       var object, _updatePromises;
@@ -258,6 +297,8 @@ function hoodieStoreApi(hoodie, options) {
 
       return $.when.apply(null, _updatePromises);
     });
+
+    return decoratePromise( promise );
   };
 
 
@@ -277,7 +318,7 @@ function hoodieStoreApi(hoodie, options) {
     }
 
     // validations
-    var error = backend.validate(type, id);
+    var error = api.validate(type, id, undefined, options);
     if(error) {
       return rejectWith(error);
     }
@@ -296,13 +337,13 @@ function hoodieStoreApi(hoodie, options) {
 
     // validations
     if (type) {
-      var error = backend.validate(type);
+      var error = api.validate(type, options);
       if(error) {
         return rejectWith(error);
       }
     }
 
-    return decoratePromise( backend.removeAll(type), options );
+    return decoratePromise( backend.removeAll(type, options) );
   };
 
 
@@ -346,36 +387,6 @@ function hoodieStoreApi(hoodie, options) {
     eventName = storeName +':' + eventName;
     return hoodie.unbind(eventName, callback);
   };
-
-
-
-  // validate
-  // ----------
-
-  // by default, we only check for a valid type & id.
-  // the validate method can be overwriten by passing
-  // options.validate
-  //
-  // if `validate` returns nothing, the passed object is
-  // valid. Otherwise it returns an error
-  //
-  backend.validate = options.validate;
-  if (! backend.validate) {
-    backend.validate = function(type, id, object) {
-
-      if (!isValidType(type)) {
-        return Hoodie.Errors.INVALID_KEY({
-          type: type
-        });
-      }
-
-      if (arguments.length > 1 && !isValidId(id)) {
-        return Hoodie.Errors.INVALID_KEY({
-          id: id
-        });
-      }
-    };
-  }
 
 
   // required backend methods

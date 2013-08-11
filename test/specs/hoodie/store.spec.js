@@ -4,109 +4,75 @@ describe("hoodieStoreApi", function() {
 
   beforeEach(function() {
     this.hoodie = new Mocks.Hoodie();
-
-    var saveDefer = this.hoodie.defer()
-    var findDefer = this.hoodie.defer()
-    var findAllDefer = this.hoodie.defer()
-    var removeDefer = this.hoodie.defer()
-    var removeAllDefer   = this.hoodie.defer()
-
-
-    this.options = {
-      name: 'funkstore',
-      backend: {
-        save: function() { return saveDefer.promise() },
-        find: function() { return findDefer.promise() },
-        findAll: function() { return findAllDefer.promise() },
-        remove: function() { return removeDefer.promise() },
-        removeAll: function() { return removeAllDefer.promise() }
-      }
-    }
-    this.store = hoodieStoreApi(this.hoodie, this.options)
+    this.options = Mocks.storeOptions('funkstore');
+    this.validate = sinon.stub();
+    this.optionsWithValidate = $.extend({}, this.options, {validate: this.validate});
+    this.store = hoodieStoreApi(this.hoodie, this.options );
+    this.storeWithCustomValidate = hoodieStoreApi(this.hoodie, this.optionsWithValidate );
   });
 
-  xdescribe("#save(type, id, object, options)", function() {
-    it("should return a defer", function() {
+  it("sets store.validate from options.validate", function() {
+    expect(this.storeWithCustomValidate.validate).to.be(this.validate)
+  });
+
+  it("has a default store.validate function", function() {
+    expect(this.store.validate).to.be.a(Function)
+  });
+
+  describe("#validate(type, id, object, options)", function() {
+    it("returns nothing when valid data passed", function() {
+      expect(this.store.validate('type', 'id')).to.be(undefined);
+    });
+
+    it("returns nothing when only a valid type passed", function() {
+      expect(this.store.validate('type')).to.be(undefined);
+    });
+
+    it("returns nothing when undefined type and undefined id passed", function() {
+      expect(this.store.validate(undefined, undefined)).to.be(undefined);
+    });
+
+    it("returns nothing when a valid type and an undefined id passed", function() {
+      expect(this.store.validate('type', undefined)).to.be(undefined);
+    });
+
+    it("returns nothing when nothing passed", function() {
+      var error = this.store.validate();
+      expect(error).to.be(undefined);
+    });
+
+    it("returns an error when invalid type passed", function() {
+      var error = this.store.validate('inva/id');
+      expect(error).to.be.an(Error);
+    });
+
+    it("returns an error when invalid id passed", function() {
+      var error = this.store.validate('valid', 'inva/id');
+      expect(error).to.be.an(Error);
+    });
+  });
+
+  describe("#save(type, id, object, options)", function() {
+    it("should return a promise", function() {
       var promise = this.store.save('document', '123', {
         name: 'test'
       });
       expect(promise).to.be.pending();
     });
 
-    describe("invalid arguments", function() {
+    it("should validate", function() {
+      this.sandbox.spy(this.store, 'validate');
+      this.store.save('type', 'id', {property: 'value'}, {option: 'value'});
+      expect(this.store.validate).to.be.calledWith('type', 'id', {property: 'value'}, {option: 'value'});
+    })
 
-      _when("no arguments passed", function() {
-
-        it("should be rejected", function() {
-          expect(this.store.save()).to.be.rejected();
-        });
-
-      });
-
-      _when("no object passed", function() {
-
-        it("should be rejected", function() {
-          var promise = this.store.save('document', 'abc4567');
-          expect(promise).to.be.rejected();
-        });
-
-      });
-
-      _when("array passed", function() {
-
-        it("should be rejected", function() {
-          var promise = this.store.save('document', 'abc4567', [1,2,3]);
-          expect(promise).to.be.rejected();
-        });
-
-      });
-
-    });
-
-    it("should not allow type containing /", function() {
-
-      var invalid, key, promise, valid, _i, _j, _len, _len1, _results;
-
-      invalid = ['a/b'];
-      valid = ['car', '$email'];
-
-      for (_i = 0, _len = invalid.length; _i < _len; _i++) {
-        key = invalid[_i];
-        promise = this.store.save(key, 'valid', {});
-        expect(promise).to.be.rejected();
-      }
-      _results = [];
-      for (_j = 0, _len1 = valid.length; _j < _len1; _j++) {
-        key = valid[_j];
-        promise = this.store.save(key, 'valid', {});
-        _results.push(expect(promise).to.be.pending());
-      }
-      _results;
-    });
-
-    it("should not allow id containing /", function() {
-
-      var invalid, key, promise, valid, _i, _j, _len, _len1, _results;
-
-      invalid = ['/'];
-      valid = ['abc4567', '1', 123, 'abc-567'];
-
-      for (_i = 0, _len = invalid.length; _i < _len; _i++) {
-        key = invalid[_i];
-        promise = this.store.save('valid', key, {});
-        expect(promise).to.be.rejected();
-      }
-      _results = [];
-      for (_j = 0, _len1 = valid.length; _j < _len1; _j++) {
-        key = valid[_j];
-        promise = this.store.save('valid', key, {});
-        _results.push(expect(promise).to.be.pending());
-      }
-      _results;
+    it("should call backend.save", function() {
+      this.store.save('type', 'id', {property: 'value'}, { option: 'value'})
+      expect(this.options.backend.save).to.be.calledWith({type: 'type', id: 'id', property: 'value'}, { option: 'value'});
     });
   }); // #save
 
-  xdescribe("add(type, object)", function() {
+  describe("add(type, object)", function() {
     beforeEach(function () {
       this.sandbox.stub(this.store, "save").returns("save_promise");
     });
@@ -126,7 +92,7 @@ describe("hoodieStoreApi", function() {
     });
   });
 
-  xdescribe("#update(type, id, update, options)", function() {
+  describe("#update(type, id, update, options)", function() {
     beforeEach(function() {
       this.findDefer = this.hoodie.defer();
       this.saveDefer = this.hoodie.defer();
@@ -145,7 +111,7 @@ describe("hoodieStoreApi", function() {
       it("should add it", function() {
         expect(this.store.save).to.be.calledWith('couch', '123', {
           funky: 'fresh'
-        }, void 0);
+        }, undefined);
       });
     }); // object cannot be found
 
@@ -200,7 +166,6 @@ describe("hoodieStoreApi", function() {
       });
 
       _and("update is a function", function() {
-
         beforeEach(function() {
           this.promise = this.store.update('couch', '123', function() {
             return {
@@ -282,7 +247,7 @@ describe("hoodieStoreApi", function() {
     }); // object can be found
   }); // #update
 
-  xdescribe("#updateAll(objects)", function() {
+  describe("#updateAll(objects)", function() {
     beforeEach(function() {
       this.sandbox.stub(this.hoodie, "isPromise").returns(false);
       this.todoObjects = [
@@ -400,48 +365,31 @@ describe("hoodieStoreApi", function() {
     }); // no objects passed
   }); // #updateAll
 
-  xdescribe("#find(type, id)", function() {
+  describe("#find(type, id)", function() {
     it("should return a promise", function() {
       var promise = this.store.find('document', '123');
       expect(promise).to.be.promise();
     });
-
-    describe("invalid arguments", function() {
-      _when("no arguments passed", function() {
-        it("should be rejected", function() {
-          var promise = this.store.find();
-          expect(promise).to.be.rejected();
-        });
-      });
-
-      _when("no id passed", function() {
-        it("should be rejected", function() {
-          var promise = this.store.find('document');
-          expect(promise).to.be.rejected();
-        });
-      });
-    }); // invalid arguments
-
-    describe("aliases", function() {
-      beforeEach(function() {
-        this.sandbox.spy(this.store, "find");
-      });
-
-      it("should allow to use .find", function() {
-        this.store.find('test', '123');
-        expect(this.store.find.calledWith('test', '123')).to.be.ok();
-      });
-
-    });
   }); // #find
 
-  xdescribe("#findAll(type)", function() {
+  describe("#findAll(type)", function() {
     it("should return a promise", function() {
       expect(this.store.findAll()).to.be.promise();
     });
+
+    it("should validate", function() {
+      this.sandbox.spy(this.store, 'validate');
+      this.store.findAll('type', {option: 'value'});
+      expect(this.store.validate).to.be.calledWith('type', undefined, undefined, {option: 'value'});
+    })
+
+    it("should call backend.save", function() {
+      this.store.findAll('type', {option: 'value'});
+      expect(this.options.backend.findAll).to.be.calledWith('type', {option: 'value'});
+    });
   }); // #findAll
 
-  xdescribe("#findOrAdd(type, id, attributes)", function() {
+  describe("#findOrAdd(type, id, attributes)", function() {
     _when("object exists", function() {
       beforeEach(function() {
         var promise = this.hoodie.defer().resolve('existing_object').promise();
@@ -504,34 +452,25 @@ describe("hoodieStoreApi", function() {
     });
   }); // #findOrAdd
 
-  xdescribe("#remove(type, id)", function() {
-    it("should return a defer", function() {
+  describe("#remove(type, id)", function() {
+    it("should return a promise", function() {
       var defer = this.store.remove('document', '123');
-      expect(defer).to.be.pending();
+      expect(defer).to.be.promise();
     });
 
-    describe("invalid arguments", function() {
-      _when("no arguments passed", function() {
+    it("should validate", function() {
+      this.sandbox.spy(this.store, 'validate');
+      this.store.remove('document', '123', {option: 'value'});
+      expect(this.store.validate).to.be.calledWith('document', '123', undefined, {option: 'value'});
+    })
 
-        it("should be rejected", function() {
-          var promise = this.store.remove();
-          expect(promise).to.be.rejected();
-        });
-
-      });
-
-      _when("no id passed", function() {
-
-        it("should be rejected", function() {
-          var promise= this.store.remove('document');
-          expect(promise).to.be.rejected();
-        });
-
-      });
+    it("should call backend.save", function() {
+      this.store.remove('document', '123', {option: 'value'});
+      expect(this.options.backend.remove).to.be.calledWith('document', '123', {option: 'value'});
     });
   }); // #remove
 
-  xdescribe("#removeAll(type)", function() {
+  describe("#removeAll(type)", function() {
     beforeEach(function() {
       this.findAllDefer = this.hoodie.defer();
       this.sandbox.stub(this.store, 'findAll').returns(this.findAllDefer.promise());
@@ -541,7 +480,16 @@ describe("hoodieStoreApi", function() {
       expect(this.store.removeAll()).to.be.pending();
     });
 
-    it.skip("should call backend.removeAll");
+    it("should validate", function() {
+      this.sandbox.spy(this.store, 'validate');
+      this.store.removeAll('type', {option: 'value'});
+      expect(this.store.validate).to.be.calledWith('type', {option: 'value'});
+    });
+
+    it("should call backend.removeAll", function() {
+      this.store.removeAll('type', { option: 'value'})
+      expect(this.options.backend.removeAll).to.be.calledWith('type', { option: 'value'});
+    });
   }); // #removeAll
 
   //
@@ -599,8 +547,6 @@ describe("hoodieStoreApi", function() {
 
   //
   describe("#decoratePromises", function() {
-    var method, _i, _len, methods;
-
     it("should decorate promises returned by the store", function() {
       var funk = sinon.spy();
 
@@ -615,11 +561,8 @@ describe("hoodieStoreApi", function() {
       expect(funk.called).to.be.ok();
     });
 
-    methods = "add find findAll findOrAdd update updateAll remove removeAll".split(" ");
-
-    for (_i = 0, _len = methods.length; _i < _len; _i++) {
-      method = methods[_i];
-
+    var methods = "add find findAll findOrAdd update updateAll remove removeAll".split(/\s+/);
+    methods.forEach( function(method) {
       it("should scope passed methods to returned promise by " + method, function() {
         var promise;
         this.store.decoratePromises({
@@ -630,7 +573,7 @@ describe("hoodieStoreApi", function() {
         promise = this.store[method]('task', '12');
         expect(promise.funk()).to.be.promise();
       });
-    }
+    });
   }); // #decoratePromises
 });
 

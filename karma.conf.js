@@ -37,17 +37,17 @@ files = [
   'test/mocks/*.js',
 
   // these are good
-  'test/specs/hoodie.spec.js',
-  'test/specs/hoodie/account.spec.js',
-  'test/specs/hoodie/config.spec.js',
-  'test/specs/hoodie/dispose.spec.js',
-  'test/specs/hoodie/events.spec.js',
-  'test/specs/hoodie/promises.spec.js',
-  'test/specs/hoodie/request.spec.js',
-  'test/specs/hoodie/uuid.spec.js'
+  // 'test/specs/hoodie.spec.js',
+  // 'test/specs/hoodie/account.spec.js',
+  // 'test/specs/hoodie/config.spec.js',
+  // 'test/specs/hoodie/dispose.spec.js',
+  // 'test/specs/hoodie/events.spec.js',
+  // 'test/specs/hoodie/promises.spec.js',
+  // 'test/specs/hoodie/request.spec.js',
+  // 'test/specs/hoodie/uuid.spec.js'
 
   // these need to be fixed
-  // 'test/specs/hoodie/store.spec.js',
+  'test/specs/hoodie/store.spec.js',
   // 'test/specs/hoodie/local_store.spec.js',
   // 'test/specs/hoodie/remote_store.spec.js',
   // 'test/specs/hoodie/open.spec.js',
