@@ -42,9 +42,127 @@
 //
 function hoodieRemoteStore (hoodie, options) {
 
-  // inherit from Hoodies Store API
-  var storeBase = hoodieStoreBase(hoodie);
-  var remote = Object.create(storeBase);
+  var remoteStore = {};
+
+
+  // Store Operations overides
+  // ---------------------------
+
+  // find
+  // ------
+
+  // find one object
+  //
+  remoteStore.find = function find(type, id) {
+    var path;
+
+    path = '' + type + '/' + id;
+
+    if (remote.prefix) {
+      path = remote.prefix + path;
+    }
+
+    path = '/' + encodeURIComponent(path);
+
+    return remote.request('GET', path).pipe(parseFromRemote);
+  };
+
+
+  // findAll
+  // ---------
+
+  // find all objects, can be filetered by a type
+  //
+  remoteStore.findAll = function findAll(type) {
+    var endkey, path, startkey;
+
+    path = '/_all_docs?include_docs=true';
+
+    switch (true) {
+    case (type !== undefined) && remote.prefix !== '':
+      startkey = '' + remote.prefix + type + '/';
+      break;
+    case type !== undefined:
+      startkey = '' + type + '/';
+      break;
+    case remote.prefix !== '':
+      startkey = remote.prefix;
+      break;
+    default:
+      startkey = '';
+    }
+
+    if (startkey) {
+
+      // make sure that only objects starting with
+      // `startkey` will be returned
+      endkey = startkey.replace(/.$/, function(chars) {
+        var charCode;
+        charCode = chars.charCodeAt(0);
+        return String.fromCharCode(charCode + 1);
+      });
+      path = '' + path + '&startkey=\'' + (encodeURIComponent(startkey)) + '\'&endkey=\'' + (encodeURIComponent(endkey)) + '\'';
+    }
+
+    return remote.request('GET', path).pipe(mapDocsFromFindAll).pipe(parseAllFromRemote);
+  };
+
+
+  // save
+  // ------
+
+  // save a new object. If it existed before, all properties
+  // will be overwritten
+  //
+  remoteStore.save = function save(object) {
+    var path;
+
+    object = parseForRemote(object);
+    path = '/' + encodeURIComponent(object._id);
+    return remote.request('PUT', path, {
+      data: object
+    });
+  };
+
+
+  // remove
+  // ---------
+
+  // remove one object
+  //
+  remoteStore.remove = function remove(type, id) {
+    return remote.update(type, id, {
+      _deleted: true
+    });
+  };
+
+
+  // removeAll
+  // ------------
+
+  // remove all objects, can be filtered by type
+  //
+  remoteStore.removeAll = function removeAll(type) {
+    return remote.updateAll(type, {
+      _deleted: true
+    });
+  };
+
+
+  var remote = hoodieStoreBase(hoodie, {
+
+    name: options.name,
+
+    backend: {
+      save: remoteStore.save,
+      find: remoteStore.find,
+      findAll: remoteStore.findAll,
+      remove: remoteStore.remove
+    }
+  });
+
+
+
 
 
   // properties
@@ -152,129 +270,7 @@ function hoodieRemoteStore (hoodie, options) {
   };
 
 
-  // Store Operations overides
-  // ---------------------------
 
-  // find
-  // ------
-
-  // find one object
-  //
-  remote.find = function find(type, id) {
-    var defer, path;
-
-    defer = storeBase.find.apply(remote, arguments);
-
-    if (hoodie.isPromise(defer)) {
-      return defer;
-    }
-
-    path = '' + type + '/' + id;
-
-    if (remote.prefix) {
-      path = remote.prefix + path;
-    }
-
-    path = '/' + encodeURIComponent(path);
-
-    return remote.request('GET', path).pipe(parseFromRemote);
-  };
-
-
-  // findAll
-  // ---------
-
-  // find all objects, can be filetered by a type
-  //
-  remote.findAll = function findAll(type) {
-    var defer, endkey, path, startkey;
-
-    defer = storeBase.findAll.apply(remote, arguments);
-
-    if (hoodie.isPromise(defer)) {
-      return defer;
-    }
-
-    path = '/_all_docs?include_docs=true';
-
-    switch (true) {
-    case (type !== undefined) && remote.prefix !== '':
-      startkey = '' + remote.prefix + type + '/';
-      break;
-    case type !== undefined:
-      startkey = '' + type + '/';
-      break;
-    case remote.prefix !== '':
-      startkey = remote.prefix;
-      break;
-    default:
-      startkey = '';
-    }
-
-    if (startkey) {
-
-      // make sure that only objects starting with
-      // `startkey` will be returned
-      endkey = startkey.replace(/.$/, function(chars) {
-        var charCode;
-        charCode = chars.charCodeAt(0);
-        return String.fromCharCode(charCode + 1);
-      });
-      path = '' + path + '&startkey=\'' + (encodeURIComponent(startkey)) + '\'&endkey=\'' + (encodeURIComponent(endkey)) + '\'';
-    }
-    return remote.request('GET', path).pipe(mapDocsFromFindAll).pipe(parseAllFromRemote);
-  };
-
-
-  // save
-  // ------
-
-  // save a new object. If it existed before, all properties
-  // will be overwritten
-  //
-  remote.save = function save(type, id, object) {
-    var defer, path;
-    defer = storeBase.save.apply(remote, arguments);
-    if (hoodie.isPromise(defer)) {
-      return defer;
-    }
-    if (!id) {
-      id = hoodie.uuid();
-    }
-    object = $.extend({
-      type: type,
-      id: id
-    }, object);
-    object = parseForRemote(object);
-    path = '/' + encodeURIComponent(object._id);
-    return remote.request('PUT', path, {
-      data: object
-    });
-  };
-
-
-  // remove
-  // ---------
-
-  // remove one object
-  //
-  remote.remove = function remove(type, id) {
-    return remote.update(type, id, {
-      _deleted: true
-    });
-  };
-
-
-  // removeAll
-  // ------------
-
-  // remove all objects, can be filtered by type
-  //
-  remote.removeAll = function removeAll(type) {
-    return remote.updateAll(type, {
-      _deleted: true
-    });
-  };
 
 
   // isKnownObject
@@ -768,9 +764,9 @@ function hoodieRemoteStore (hoodie, options) {
         }
       }
 
-      remote.trigger('' + event, object);
-      remote.trigger('' + event + ':' + object.type, object);
-      remote.trigger('' + event + ':' + object.type + ':' + object.id, object);
+      remote.trigger(event, object);
+      remote.trigger(event + ':' + object.type, object);
+      remote.trigger(event + ':' + object.type + ':' + object.id, object);
       remote.trigger('change', event, object);
       remote.trigger('change:' + object.type, event, object);
       remote.trigger('change:' + object.type + ':' + object.id, event, object);

@@ -42,7 +42,7 @@
   "expr": true,
   "forin": true,
   "immed": true,
-  "latedef": true,
+  "latedef": false,
   "loopfunc": false,
   "noarg": true,
   "regexp": false,
