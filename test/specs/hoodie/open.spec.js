@@ -4,11 +4,8 @@ describe('#open(store, options)', function() {
 
   beforeEach(function() {
     this.hoodie = new Mocks.Hoodie();
-
     this.requestDefer = this.hoodie.defer();
-
     this.sandbox.spy(window, 'hoodieRemoteStore');
-
     hoodieOpen(this.hoodie);
   });
 
@@ -22,7 +19,6 @@ describe('#open(store, options)', function() {
       name: 'store_name',
       option: 'value'
     })).to.be.ok();
-
   });
 
 });

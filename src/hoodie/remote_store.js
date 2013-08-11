@@ -157,7 +157,8 @@ function hoodieRemoteStore (hoodie, options) {
       save: remoteStore.save,
       find: remoteStore.find,
       findAll: remoteStore.findAll,
-      remove: remoteStore.remove
+      remove: remoteStore.remove,
+      removeAll: remoteStore.removeAll
     }
   });
 
