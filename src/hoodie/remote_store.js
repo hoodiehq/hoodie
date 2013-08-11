@@ -64,7 +64,7 @@ function hoodieRemoteStore (hoodie, options) {
 
     path = '/' + encodeURIComponent(path);
 
-    return remote.request('GET', path).pipe(parseFromRemote);
+    return remote.request('GET', path).then(parseFromRemote);
   };
 
 
@@ -104,7 +104,7 @@ function hoodieRemoteStore (hoodie, options) {
       path = '' + path + '&startkey="' + (encodeURIComponent(startkey)) + '"&endkey="' + (encodeURIComponent(endkey)) + '"';
     }
 
-    return remote.request('GET', path).pipe(mapDocsFromFindAll).pipe(parseAllFromRemote);
+    return remote.request('GET', path).then(mapDocsFromFindAll).then(parseAllFromRemote);
   };
 
 
@@ -401,33 +401,7 @@ function hoodieRemoteStore (hoodie, options) {
   // push objects, then pull updates.
   //
   remote.sync = function sync(objects) {
-    return remote.push(objects).pipe(remote.pull);
-  };
-
-
-  // Events
-  // --------
-
-  // namespaced alias for `hoodie.on`
-  //
-  remote.on = function on(event, cb) {
-    event = event.replace(/(^| )([^ ]+)/g, '$1' + remote.name + ':$2');
-    return hoodie.on(event, cb);
-  };
-
-  remote.one = function one(event, cb) {
-    event = event.replace(/(^| )([^ ]+)/g, '$1' + remote.name + ':$2');
-    return hoodie.one(event, cb);
-  };
-
-
-  // namespaced alias for `hoodie.trigger`
-  //
-  remote.trigger = function trigger() {
-    var event, parameters, _ref;
-    event = arguments[0],
-    parameters = 2 <= arguments.length ? Array.prototype.slice.call(arguments, 1) : [];
-    return (_ref = hoodie).trigger.apply(_ref, ['' + remote.name + ':' + event].concat(Array.prototype.slice.call(parameters)));
+    return remote.push(objects).then(remote.pull);
   };
 
   //
@@ -654,6 +628,8 @@ function hoodieRemoteStore (hoodie, options) {
     if (!remote.isConnected()) {
       return;
     }
+
+    debugger
 
     switch (xhr.status) {
       // Session is invalid. User is still login, but needs to reauthenticate

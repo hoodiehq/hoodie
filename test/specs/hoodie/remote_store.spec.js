@@ -13,7 +13,11 @@ describe("Hoodie.Remote", function() {
     this.sandbox.spy(this.hoodie, 'checkConnection');
 
     this.requestDefer = this.hoodie.defer();
-    this.sandbox.stub(this.hoodie, 'request').returns(this.requestDefer.promise());
+    var promise = this.requestDefer.promise();
+    promise.abort = sinon.spy()
+    this.sandbox.stub(this.hoodie, 'request').returns( promise );
+
+    this.clock = this.sandbox.useFakeTimers(0) // '1970-01-01 00:00:00'
 
     this.storeApi = Mocks.StoreApi(this.hoodie);
     this.sandbox.stub(window, 'hoodieStoreApi').returns(this.storeApi);
@@ -40,7 +44,7 @@ describe("Hoodie.Remote", function() {
       it("should set prefix accordingly", function() {
         expect(this.remote.prefix).to.eql('$public');
       });
-    });
+    }); // prefix: $public passed
 
     _when("baseUrl: http://api.otherapp.com passed", function() {
       beforeEach(function() {
@@ -52,11 +56,10 @@ describe("Hoodie.Remote", function() {
       it("should set baseUrl accordingly", function() {
         expect(this.remote.baseUrl).to.eql('http://api.otherapp.com');
       });
-    });
+    }); // baseUrl: http://api.otherapp.com passed
   }); // factory
 
   describe("#request(type, path, options)", function() {
-
     beforeEach(function() {
       delete this.remote.name;
     });
@@ -95,7 +98,6 @@ describe("Hoodie.Remote", function() {
     });
 
     _when("type is POST", function() {
-
       beforeEach(function() {
         var path, type;
         this.remote.request("POST", "/something");
@@ -113,12 +115,10 @@ describe("Hoodie.Remote", function() {
       it("should default options.dataType to 'json'", function() {
         expect(this.options.processData).to.eql(false);
       });
-
-    });
+    }); // type is POST
   }); // #request
 
   describe("#find(type, id)", function() {
-
     it("should send a GET request to `/type%2Fid`", function() {
       var path, type;
       this.storeBackend.find('car', '123');
@@ -131,7 +131,6 @@ describe("Hoodie.Remote", function() {
     });
 
     _when("prefix is store_prefix/", function() {
-
       beforeEach(function() {
         this.remote.prefix = 'store_prefix/';
       });
@@ -170,14 +169,11 @@ describe("Hoodie.Remote", function() {
           });
 
         });
-
-      });
-
-    });
-  });
+      }); // request successful
+    }); // prefix is store_prefix/
+  }); // #find
 
   describe("#findAll(type)", function() {
-
     it("should return a promise", function() {
       expect(this.storeBackend.findAll()).to.promise();
     });
@@ -207,20 +203,16 @@ describe("Hoodie.Remote", function() {
           this.storeBackend.findAll();
           expect(this.hoodie.request).to.be.calledWith("GET", '/my%2Fstore/_all_docs?include_docs=true&startkey="%24public%2F"&endkey="%24public0"', { "contentType": "application/json" });
         });
-
       });
-
-    });
+    }); // type is not set
 
     _when("type is todo", function() {
-
       it('should send a GET to /_all_docs?include_docs=true&startkey="todo/"&endkey="todo0"', function() {
         this.storeBackend.findAll('todo');
         expect(this.hoodie.request).to.be.calledWith("GET", '/my%2Fstore/_all_docs?include_docs=true&startkey="todo%2F"&endkey="todo0"', { "contentType": "application/json" });
       });
 
       _and("prefix is 'remote_prefix'", function() {
-
         beforeEach(function() {
           this.remote.prefix = 'remote_prefix/';
         });
@@ -229,10 +221,8 @@ describe("Hoodie.Remote", function() {
           this.storeBackend.findAll('todo');
           expect(this.hoodie.request).to.be.calledWith("GET", '/my%2Fstore/_all_docs?include_docs=true&startkey="remote_prefix%2Ftodo%2F"&endkey="remote_prefix%2Ftodo0"', { "contentType": "application/json" });
         });
-
       });
-
-    });
+    }); // type is todo
 
     _when("request success", function() {
 
@@ -264,8 +254,7 @@ describe("Hoodie.Remote", function() {
           expect(res).to.eql([object]);
         });
       });
-
-    });
+    }); // request success
 
     _when("request has an error", function() {
 
@@ -279,9 +268,8 @@ describe("Hoodie.Remote", function() {
           expect(res).to.eql("error");
         });
       });
-
-    });
-  });
+    }); // request has an error
+  }); // #findAll
 
   describe("#save(type, id, object)", function() {
     beforeEach(function() {
@@ -362,7 +350,7 @@ describe("Hoodie.Remote", function() {
         expect(this.data._id).to.eql('remote_prefix/car/123');
       });
     }); // saving car/123 with color: red and prefix is 'remote_prefix'
-  });
+  }); // #save
 
   describe("#remove(type, id)", function() {
 
@@ -381,7 +369,7 @@ describe("Hoodie.Remote", function() {
     it("should return promise of update", function() {
       expect(this.storeBackend.remove('car', 123)).to.eql('update_promise');
     });
-  });
+  }); // #remove
 
   describe("#removeAll(type)", function() {
     beforeEach(function() {
@@ -398,7 +386,7 @@ describe("Hoodie.Remote", function() {
     it("should return promise of updateAll", function() {
       expect(this.storeBackend.removeAll('car')).to.eql('updateAll_promise');
     });
-  });
+  }); // #removeAll
 
   describe("#connect()", function() {
     beforeEach(function() {
@@ -415,7 +403,7 @@ describe("Hoodie.Remote", function() {
       this.remote.connect();
       expect(this.remote.bootstrap.called).to.be.ok();
     });
-  });
+  }); // #connect
 
   describe("#disconnect()", function() {
     it("should abort the pull request", function() {
@@ -435,10 +423,9 @@ describe("Hoodie.Remote", function() {
       this.remote.disconnect();
       expect(pushDeferPromise.abort).to.be.called();
     });
-  });
+  }); // #disconnect
 
-  describe.only("#getSinceNr()", function() {
-
+  describe("#getSinceNr()", function() {
     _when("since not set before", function() {
       it("should return 0", function() {
         expect(this.remote._since).to.eql(void 0);
@@ -456,22 +443,13 @@ describe("Hoodie.Remote", function() {
         expect(this.remote.getSinceNr()).to.eql(100);
       });
     });
-  });
-
-  describe("#setSinceNr(since)", function() {
-    it("should set _since property", function() {
-      expect(this.remote._since).to.eql(void 0);
-      this.remote.setSinceNr(100);
-      expect(this.remote._since).to.eql(100);
-    });
-  });
+  }); // #getSinceNr
 
   describe("#bootstrap()", function() {
 
     beforeEach(function() {
       this.bootstrapDefer = this.hoodie.defer();
       this.sandbox.stub(this.remote, "pull").returns( this.bootstrapDefer );
-      this.sandbox.spy(this.remote, "trigger");
     });
 
     it("should trigger bootstrap:start event", function() {
@@ -494,10 +472,8 @@ describe("Hoodie.Remote", function() {
         this.remote.bootstrap()
         expect(this.remote.trigger.calledWith('bootstrap:end')).to.be.ok();
       });
-
     });
-
-  });
+  }); // #bootstrap
 
   describe("#pull()", function() {
 
@@ -547,18 +523,24 @@ describe("Hoodie.Remote", function() {
 
         _ref = this.hoodie.request.args[0], method = _ref[0], path = _ref[1];
         expect(method).to.eql('GET');
-        expect(path).to.eql('/_changes?include_docs=true&since=0&heartbeat=10000&feed=longpoll');
+        expect(path).to.eql('/my%2Fstore/_changes?include_docs=true&since=0&heartbeat=10000&feed=longpoll');
       });
 
-      it("should set a timeout to restart the pull request", function() {
+      it("restart pull after 25s", function() {
+        var promise = this.requestDefer
+        promise.abort = sinon.stub();
+        this.sandbox.stub(this.remote, 'request').returns( promise )
+
         this.remote.pull();
-        expect(window.setTimeout.calledWith(this.remote._restartPullRequest, 25000)).to.be.ok();
+        this.sandbox.spy(this.remote, 'pull');
+        expect(promise.abort).to.not.be.called();
+        this.clock.tick(25000);
+        // it gets restarted when aborted
+        expect(promise.abort).to.be.called();
       });
-
-    });
+    }); // .isConnected() is true
 
     _when(".isConnected() is false", function() {
-
       beforeEach(function() {
         this.sandbox.stub(this.remote, "isConnected").returns(false);
       });
@@ -569,10 +551,9 @@ describe("Hoodie.Remote", function() {
         expect(this.hoodie.request.called).to.be.ok();
         _ref = this.hoodie.request.args[0], method = _ref[0], path = _ref[1];
         expect(method).to.eql('GET');
-        expect(path).to.eql('/_changes?include_docs=true&since=0');
+        expect(path).to.eql('/my%2Fstore/_changes?include_docs=true&since=0');
       });
-
-    });
+    }); // .isConnected() is false
 
     _when("request is successful / returns changes", function() {
 
@@ -588,40 +569,35 @@ describe("Hoodie.Remote", function() {
         });
       });
 
-      xit("should trigger remote events", function() {
-        this.sandbox.spy(this.remote, "trigger");
-        this.sandbox.spy(this.remote, "isKnownObject").returns(function(object) {
+      it("should trigger remote events", function() {
+        this.sandbox.stub(this.remote, "isKnownObject", function(object) {
           return object.id === 'abc3';
         });
 
         this.remote.pull();
 
-        expect(this.remote.trigger.calledWith('remove', this.object1)).to.be.ok();
-        expect(this.remote.trigger.calledWith('remove:todo', this.object1)).to.be.ok();
-        expect(this.remote.trigger.calledWith('remove:todo:abc3', this.object1)).to.be.ok();
-        expect(this.remote.trigger.calledWith('change', 'remove', this.object1)).to.be.ok();
-        expect(this.remote.trigger.calledWith('change:todo', 'remove', this.object1)).to.be.ok();
-        expect(this.remote.trigger.calledWith('change:todo:abc3', 'remove', this.object1)).to.be.ok();
-        expect(this.remote.trigger.calledWith('add', this.object2)).to.be.ok();
-        expect(this.remote.trigger.calledWith('add:todo', this.object2)).to.be.ok();
-        expect(this.remote.trigger.calledWith('add:todo:abc2', this.object2)).to.be.ok();
-        expect(this.remote.trigger.calledWith('change', 'add', this.object2)).to.be.ok();
-        expect(this.remote.trigger.calledWith('change:todo', 'add', this.object2)).to.be.ok();
-        expect(this.remote.trigger.calledWith('change:todo:abc2', 'add', this.object2)).to.be.ok();
-        expect(this.remote.trigger.calledWith('remove:todo:abc5', this.object4)).to.not.be.ok();
+        expect(this.remote.trigger).to.be.calledWith('remove', this.object1);
+        expect(this.remote.trigger).to.be.calledWith('remove:todo', this.object1);
+        expect(this.remote.trigger).to.be.calledWith('remove:todo:abc3', this.object1);
+        expect(this.remote.trigger).to.be.calledWith('change', 'remove', this.object1);
+        expect(this.remote.trigger).to.be.calledWith('change:todo', 'remove', this.object1);
+        expect(this.remote.trigger).to.be.calledWith('change:todo:abc3', 'remove', this.object1);
+        expect(this.remote.trigger).to.be.calledWith('add', this.object2);
+        expect(this.remote.trigger).to.be.calledWith('add:todo', this.object2);
+        expect(this.remote.trigger).to.be.calledWith('add:todo:abc2', this.object2);
+        expect(this.remote.trigger).to.be.calledWith('change', 'add', this.object2);
+        expect(this.remote.trigger).to.be.calledWith('change:todo', 'add', this.object2);
+        expect(this.remote.trigger).to.be.calledWith('change:todo:abc2', 'add', this.object2);
+        expect(this.remote.trigger).to.not.be.calledWith('remove:todo:abc5', this.object4);
       });
 
       _and(".isConnected() returns true", function() {
 
         beforeEach(function() {
           this.sandbox.stub(this.remote, "isConnected").returns(true);
-          this.sandbox.stub(this.remote, "pull");
         });
 
-        xit("should pull again", function() {
-          this.remote.pull();
-          expect(this.remote.pull.callCount).to.eql(2);
-        });
+        it.skip("should pull again");
 
       });
 
@@ -632,7 +608,6 @@ describe("Hoodie.Remote", function() {
         });
 
         it("should trigger events only for objects with prefix", function() {
-          this.sandbox.spy(this.remote, "trigger");
           this.remote.pull();
           expect(this.remote.trigger.calledWith('add', this.object3)).to.be.ok();
           expect(this.remote.trigger.calledWith('add', this.object2)).to.not.be.ok();
@@ -644,7 +619,6 @@ describe("Hoodie.Remote", function() {
 
         beforeEach(function() {
           this.sandbox.stub(this.remote, "isKnownObject").returns(true);
-          this.sandbox.spy(this.remote, "trigger");
           this.remote.pull();
         });
 
@@ -661,157 +635,91 @@ describe("Hoodie.Remote", function() {
         });
 
       });
-
-    });
+    }); // request is successful / returns changes
 
     _when("request errors with 401 unauthorzied", function() {
 
       beforeEach(function() {
-        var _this = this;
-        this.hoodie.request.returns({
-          then: function() {
-            _this.hoodie.request.returns({
-              then: function() {}
-            });
-          }
-        });
-
+        this.requestDefer.reject({status: 401}, 'error object')
         this.sandbox.spy(this.remote, "disconnect");
       });
 
       it("should disconnect", function() {
         this.remote.pull();
-        expect(this.remote.disconnect.called).to.be.ok();
+        expect(this.remote.disconnect).to.be.called();
       });
 
       it("should trigger an unauthenticated error", function() {
-        this.sandbox.spy(this.remote, "trigger");
         this.remote.pull();
-        expect(this.remote.trigger.calledWith('error:unauthenticated', 'error object')).to.be.ok();
+        expect(this.remote.trigger).to.be.calledWith('error:unauthenticated', 'error object');
       });
-
-    });
+    }); // request errors with 401 unauthorzied
 
     _when("request errors with 404 not found", function() {
-
       beforeEach(function() {
-        var _this = this;
-        this.hoodie.request.returns({
-          then: function(success, error) {
-            _this.hoodie.request.returns({
-              then: function() {}
-            });
-            error({
-              status: 404
-            }, 'error object');
-          }
-        });
+        this.sandbox.spy(window, 'setTimeout')
+        this.requestDefer.reject({status: 404}, 'error object')
       });
 
       it("should try again in 3 seconds (it migh be due to a sign up, the userDB might be created yet)", function() {
         this.remote.pull();
-        expect(window.setTimeout.calledWith(this.remote.pull, 3000)).to.be.ok();
+        expect(window.setTimeout).to.be.calledWith(this.remote.pull, 3000);
       });
-
-    });
+    }); // request errors with 404 not found
 
     _when("request errors with 500 oooops", function() {
-
       beforeEach(function() {
-        var _this = this;
-        this.hoodie.request.returns({
-          then: function(success, error) {
-            _this.hoodie.request.returns({
-              then: function() {}
-            });
-            error({
-              status: 500
-            }, 'error object');
-          }
-        });
+        this.sandbox.spy(window, 'setTimeout')
+        this.requestDefer.reject({status: 500}, 'error object')
       });
 
       it("should try again in 3 seconds (and hope it was only a hiccup ...)", function() {
         this.remote.pull();
-        expect(window.setTimeout.calledWith(this.remote.pull, 3000)).to.be.ok();
+        expect(window.setTimeout).to.be.calledWith(this.remote.pull, 3000);
       });
 
       it("should trigger a server error event", function() {
-        this.sandbox.spy(this.remote, "trigger");
         this.remote.pull();
-        expect(this.remote.trigger.calledWith('error:server', 'error object')).to.be.ok();
+        expect(this.remote.trigger).to.be.calledWith('error:server', 'error object');
       });
 
       it("should check connection", function() {
         this.remote.pull();
-        expect(this.hoodie.checkConnection.called).to.be.ok();
+        expect(this.hoodie.checkConnection).to.be.called();
       });
-
-    });
+    }); // request errors with 500 oooops
 
     _when("request was aborted manually", function() {
-
       beforeEach(function() {
-        var _this = this;
-        this.hoodie.request.returns({
-          then: function(success, error) {
-            _this.hoodie.request.returns({
-              then: function() {}
-            });
-            error({
-              statusText: 'abort'
-            }, 'error object');
-          }
-        });
-
-        this.sandbox.stub(this.remote, "pull");
+        this.sandbox.spy(window, 'setTimeout')
+        this.requestDefer.reject({statusText: 'abort'}, 'error object')
       });
 
       _and("is connected", function() {
-
         beforeEach(function() {
           this.sandbox.stub(this.remote, "isConnected").returns(true);
         });
 
-        it("should pull again", function() {
-          this.remote.pull();
-          expect(this.remote.pull.callCount).to.eql(2);
-        });
-
+        it.skip("should pull again");
       });
 
       _and("is not connected", function() {
-
         beforeEach(function() {
           this.sandbox.stub(this.remote, "isConnected").returns(false);
         });
 
-        it("should not pull again", function() {
-          this.remote.pull();
-          expect(this.remote.pull.callCount).to.eql(1);
-        });
-
+        it.skip("should not pull again");
       });
-
-    });
+    }); // request was aborted manually
 
     _when("there is a different error", function() {
 
       beforeEach(function() {
-        var _this = this;
-        this.hoodie.request.returns({
-          then: function(success, error) {
-            _this.hoodie.request.returns({
-              then: function() {}
-            });
-            error({}, 'error object');
-          }
-        });
-
+        this.sandbox.spy(window, 'setTimeout')
+        this.requestDefer.reject({}, 'error object')
       });
 
       it("should try again in 3 seconds if .isConnected() returns false", function() {
-
         this.sandbox.stub(this.remote, "isConnected").returns(true);
 
         this.remote.pull();
@@ -828,31 +736,25 @@ describe("Hoodie.Remote", function() {
         this.remote.pull();
         expect(this.hoodie.checkConnection.called).to.be.ok();
       });
-
-    });
-
-  });
+    }); // there is a different error
+  }); // #pull
 
   describe("#push(docs)", function() {
-
     beforeEach(function() {
       this.sandbox.stub(Date, "now").returns(10);
       this.remote._timezoneOffset = 1;
     });
 
     _when("no docs passed", function() {
-
       it("shouldn't do anything", function() {
         this.remote.push();
         this.remote.push([]);
 
         expect(this.hoodie.request.called).to.not.be.ok();
       });
-
-    });
+    }); // no docs passed
 
     _and("Array of docs passed", function() {
-
       beforeEach(function() {
         this.todoObjects = [
           {
@@ -876,61 +778,59 @@ describe("Hoodie.Remote", function() {
 
       it("should POST the passed objects", function() {
         expect(this.hoodie.request.called).to.be.ok();
-        var data = this.hoodie.request.args[2].data;
+        var data = JSON.parse(this.hoodie.request.args[0][2].data);
         expect(data.docs.length).to.eql(3);
       });
-
-    });
+    }); // Array of docs passed
 
     _and("one deleted and one new doc passed", function() {
-
       beforeEach(function() {
         this.remote.push(Mocks.changedObjects());
         expect(this.hoodie.request.called).to.be.ok();
         var _ref = this.hoodie.request.args[0];
 
-        this.method = _ref[0],
-        this.path = _ref[1],
-        this.options = _ref[2];
+        this.method = _ref[0];
+        this.path = _ref[1];
+        this.data = JSON.parse(_ref[2].data);
       });
 
       it("should post the changes to the user's db _bulk_docs API", function() {
         expect(this.method).to.eql('POST');
-        expect(this.path).to.eql('/_bulk_docs');
+        expect(this.path).to.eql('/my%2Fstore/_bulk_docs');
       });
 
       it("should send the docs in appropriate format", function() {
         var doc, docs;
-        docs = this.options.data.docs;
+        docs = this.data.docs;
         doc = docs[0];
-        expect(doc.id).to.eqlUndefined();
+        expect(doc.id).to.be(undefined);
         expect(doc._id).to.eql('todo/abc3');
         expect(doc._localInfo).to.be(undefined);
       });
 
       it("should set data.new_edits to false", function() {
         var new_edits;
-        new_edits = this.options.data.new_edits;
+        new_edits = this.data.new_edits;
         expect(new_edits).to.eql(false);
       });
 
       it("should set new _revision ids", function() {
         var deletedDoc, docs, newDoc;
-        docs = this.options.data.docs;
-        deletedDoc = docs[0], newDoc = docs[1];
+        docs = this.data.docs;
+        deletedDoc = docs[0];
+        newDoc = docs[1];
+
         expect(deletedDoc._rev).to.eql('3-uuid');
-        expect(newDoc._rev).to.match('1-uuid');
+        expect(newDoc._rev).to.eql('1-uuid');
         expect(deletedDoc._revisions.start).to.eql(3);
         expect(deletedDoc._revisions.ids[0]).to.eql('uuid');
         expect(deletedDoc._revisions.ids[1]).to.eql('123');
         expect(newDoc._revisions.start).to.eql(1);
         expect(newDoc._revisions.ids[0]).to.eql('uuid');
       });
-
-    });
+    }); // one deleted and one new doc passed
 
     _and("prefix set to $public", function() {
-
       beforeEach(function() {
         this.remote.prefix = '$public/';
         this.todoObjects = [
@@ -948,17 +848,15 @@ describe("Hoodie.Remote", function() {
         this.remote.push(this.todoObjects);
       });
 
-      xit("should prefix all document IDs with '$public/'", function() {
+      it("should prefix all document IDs with '$public/'", function() {
         expect(this.hoodie.request.called).to.be.ok();
 
-        var data = this.hoodie.request.args[2].data;
+        var data = JSON.parse(this.hoodie.request.args[0][2].data);
         expect(data.docs[0]._id).to.eql('$public/todo/1');
       });
-
-    });
+    }); // prefix set to $public
 
     _and("_$local flags set", function() {
-
       beforeEach(function() {
         this.remote.prefix = '$public/';
         this.todoObjects = [
@@ -975,70 +873,35 @@ describe("Hoodie.Remote", function() {
       });
 
       it("should add `-local` suffix to rev number", function() {
-        expect(this.hoodie.request).wasCalled();
-        var data = this.hoodie.request.args[2].data;
+        expect(this.hoodie.request).to.be.called();
+        var data = JSON.parse(this.hoodie.request.args[0][2].data);
         expect(data.docs[0]._rev).to.eql('1-uuid');
         expect(data.docs[1]._rev).to.eql('1-uuid-local');
       });
-
-    });
-
-  });
+    }); // _$local flags set
+  }); // #push
 
   describe("#sync(docs)", function() {
 
     beforeEach(function() {
-      this.sandbox.stub(this.remote, "push").returns(function(docs) {
-        return {
-          pipe: function(cb) {
-            cb(docs);
-          }
-        };
-      });
-
+      this.pushDefer = this.hoodie.defer();
+      this.sandbox.stub(this.remote, "push").returns(this.pushDefer.promise());
       this.sandbox.spy(this.remote, "pull");
+      this.remote.sync([1, 2, 3]);
     });
 
     it("should push changes and pass arguments", function() {
-      this.remote.sync([1, 2, 3]);
       expect(this.remote.push.calledWith([1, 2, 3])).to.be.ok();
     });
 
-    it("should pull changes and pass arguments", function() {
-      this.remote.sync([1, 2, 3]);
-      expect(this.remote.pull.calledWith([1, 2, 3])).to.be.ok();
-    });
+    _when('push successful', function() {
+      beforeEach( function() {
+        this.pushDefer.resolve('hossa!')
+      });
 
-  });
-
-  describe("#on(event, callback)", function() {
-
-    it("should namespace events with `name`", function() {
-      var cb = this.save.spy();
-      this.remote.name = 'databaseName';
-      this.remote.on('funky', cb);
-
-      expect(this.hoodie.on.calledWith('databaseName:funky', cb)).to.be.ok();
-    });
-
-    it("should namespace multiple events correctly", function() {
-      var cb = this.sandbox.spy();
-      this.remote.name = 'databaseName';
-      this.remote.on('super funky fresh', cb);
-      expect(this.hoodie.on.calledWith('databaseName:super databaseName:funky databaseName:fresh', cb)).to.be.ok();
-    });
-
-  });
-
-  describe("#trigger(event, parameters...)", function() {
-
-    it("should namespace events with `name`", function() {
-      var cb = this.sandbox.spy();
-      this.remote.name = 'databaseName';
-      this.remote.trigger('funky', cb);
-      expect(this.hoodie.trigger.calledWith('databaseName:funky', cb)).to.be.ok();
-    });
-
-  });
-
+      it("should pull changes and pass arguments", function() {
+        expect(this.remote.pull).to.be.calledWith('hossa!');
+      });
+    })
+  }); // #sync
 });
