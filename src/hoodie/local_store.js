@@ -17,7 +17,7 @@ function hoodieStore (hoodie) {
   //
 
   // cache of localStorage for quicker access
-  var cached = {};
+  var cachedObject = {};
 
   // map of dirty objects by their ids
   var dirty = {};
@@ -63,16 +63,22 @@ function hoodieStore (hoodie) {
 
     // generate an id if necessary
     if (object.id) {
-      currentObject = store.cache(object.type, object.id);
+      currentObject = cache(object.type, object.id);
       isNew = typeof currentObject !== 'object';
     } else {
       isNew = true;
       object.id = hoodie.uuid();
     }
 
-    // add createdBy hash to new objects
     if (isNew) {
+      // add createdBy hash
       object.createdBy = object.createdBy || hoodie.account.ownerHash;
+    }
+    else {
+      // leave createdBy hash
+      if (currentObject.createdBy) {
+        object.createdBy = currentObject.createdBy;
+      }
     }
 
     // handle local properties and hidden properties with $ prefix
@@ -122,7 +128,7 @@ function hoodieStore (hoodie) {
     defer = hoodie.defer();
 
     try {
-      object = store.cache(object.type, object.id, object, options);
+      object = cache(object.type, object.id, object, options);
       defer.resolve(object, isNew).promise();
       event = isNew ? 'add' : 'update';
       triggerEvents(event, object, options);
@@ -155,7 +161,7 @@ function hoodieStore (hoodie) {
     }
 
     try {
-      object = store.cache(type, id);
+      object = cache(type, id);
       if (!object) {
         defer.reject(Hoodie.Errors.NOT_FOUND(type, id)).promise();
       }
@@ -225,7 +231,7 @@ function hoodieStore (hoodie) {
           currentType = _ref[0],
           id = _ref[1];
 
-          obj = store.cache(currentType, id);
+          obj = cache(currentType, id);
           if (obj && filter(obj)) {
             _results.push(obj);
           } else {
@@ -274,13 +280,13 @@ function hoodieStore (hoodie) {
 
     key = type + '/' + id;
 
-    object = store.cache(type, id);
+    object = cache(type, id);
 
     // if change comes from remote, just clean up locally
     if (options.remote) {
       db.removeItem(key);
-      objectWasMarkedAsDeleted = cached[key] && isMarkedAsDeleted(cached[key]);
-      cached[key] = false;
+      objectWasMarkedAsDeleted = cachedObject[key] && isMarkedAsDeleted(cachedObject[key]);
+      cachedObject[key] = false;
       clearChanged(type, id);
       if (objectWasMarkedAsDeleted && object) {
         return hoodie.resolveWith(object);
@@ -293,11 +299,11 @@ function hoodieStore (hoodie) {
 
     if (object._syncedAt) {
       object._deleted = true;
-      store.cache(type, id, object);
+      cache(type, id, object);
     } else {
       key = type + '/' + id;
       db.removeItem(key);
-      cached[key] = false;
+      cachedObject[key] = false;
       clearChanged(type, id);
     }
 
@@ -385,89 +391,6 @@ function hoodieStore (hoodie) {
   };
 
 
-  // Cache
-  // -------
-
-  // loads an object specified by `type` and `id` only once from localStorage
-  // and caches it for faster future access. Updates cache when `value` is passed.
-  //
-  // Also checks if object needs to be synched (dirty) or not
-  //
-  // Pass `options.remote = true` when object comes from remote
-  // Pass 'options.silent = true' to avoid events from being triggered.
-  store.cache = function cache(type, id, object, options) {
-    var key;
-
-    if (object === undefined) {
-      object = false;
-    }
-
-    options = options || {};
-    key = '' + type + '/' + id;
-
-    if (object) {
-      $.extend(object, {
-        type: type,
-        id: id
-      });
-
-      setObject(type, id, object);
-
-      if (options.remote) {
-        clearChanged(type, id);
-        cached[key] = $.extend(true, {}, object);
-        return cached[key];
-      }
-
-    } else {
-
-      // if the cached key returns false, it means
-      // that we have removed that key. We just
-      // set it to false for performance reasons, so
-      // that we don't need to look it up again in localStorage
-      if (cached[key] === false) {
-        return false;
-      }
-
-      // if key is cached, return it. But make sure
-      // to make a deep copy beforehand (=> true)
-      if (cached[key]) {
-        return $.extend(true, {}, cached[key]);
-      }
-
-      // if object is not yet cached, load it from localStore
-      object = getObject(type, id);
-
-      // stop here if object did not exist in localStore
-      // and cache it so we don't need to look it up again
-      if (object === false) {
-        clearChanged(type, id);
-        cached[key] = false;
-        return false;
-      }
-
-    }
-
-    if (isMarkedAsDeleted(object)) {
-      markAsChanged(type, id, object, options);
-      cached[key] = false;
-      return false;
-    }
-
-    // here is where we cache the object for
-    // future quick access
-    cached[key] = $.extend(true, {}, object);
-
-    if (hasLocalChanges(object)) {
-      markAsChanged(type, id, cached[key], options);
-    } else {
-      clearChanged(type, id);
-    }
-
-    return $.extend(true, {}, object);
-  };
-
-
   // changed objects
   // -----------------
 
@@ -509,7 +432,7 @@ function hoodieStore (hoodie) {
     if (dirty[key]) {
       return true;
     }
-    return hasLocalChanges(store.cache(type, id));
+    return hasLocalChanges(cache(type, id));
   };
 
 
@@ -535,7 +458,7 @@ function hoodieStore (hoodie) {
         }
         return _results;
       }).call(this);
-      cached = {};
+      cachedObject = {};
       clearChanged();
       defer.resolve();
       store.trigger('clear');
@@ -626,6 +549,89 @@ function hoodieStore (hoodie) {
   };
 
 
+  // Cache
+  // -------
+
+  // loads an object specified by `type` and `id` only once from localStorage
+  // and caches it for faster future access. Updates cache when `value` is passed.
+  //
+  // Also checks if object needs to be synched (dirty) or not
+  //
+  // Pass `options.remote = true` when object comes from remote
+  // Pass 'options.silent = true' to avoid events from being triggered.
+  function cache(type, id, object, options) {
+    var key;
+
+    if (object === undefined) {
+      object = false;
+    }
+
+    options = options || {};
+    key = '' + type + '/' + id;
+
+    if (object) {
+      $.extend(object, {
+        type: type,
+        id: id
+      });
+
+      setObject(type, id, object);
+
+      if (options.remote) {
+        clearChanged(type, id);
+        cachedObject[key] = $.extend(true, {}, object);
+        return cachedObject[key];
+      }
+
+    } else {
+
+      // if the cached key returns false, it means
+      // that we have removed that key. We just
+      // set it to false for performance reasons, so
+      // that we don't need to look it up again in localStorage
+      if (cachedObject[key] === false) {
+        return false;
+      }
+
+      // if key is cached, return it. But make sure
+      // to make a deep copy beforehand (=> true)
+      if (cachedObject[key]) {
+        return $.extend(true, {}, cachedObject[key]);
+      }
+
+      // if object is not yet cached, load it from localStore
+      object = getObject(type, id);
+
+      // stop here if object did not exist in localStore
+      // and cache it so we don't need to look it up again
+      if (object === false) {
+        clearChanged(type, id);
+        cachedObject[key] = false;
+        return false;
+      }
+
+    }
+
+    if (isMarkedAsDeleted(object)) {
+      markAsChanged(type, id, object, options);
+      cachedObject[key] = false;
+      return false;
+    }
+
+    // here is where we cache the object for
+    // future quick access
+    cachedObject[key] = $.extend(true, {}, object);
+
+    if (hasLocalChanges(object)) {
+      markAsChanged(type, id, cachedObject[key], options);
+    } else {
+      clearChanged(type, id);
+    }
+
+    return $.extend(true, {}, object);
+  }
+
+
   // bootstrapping dirty objects, to make sure
   // that removed objects get pushed after
   // page reload.
@@ -643,7 +649,7 @@ function hoodieStore (hoodie) {
       _ref = keys[_i].split('/'),
       type = _ref[0],
       id = _ref[1];
-      obj = store.cache(type, id);
+      obj = cache(type, id);
     }
   }
 

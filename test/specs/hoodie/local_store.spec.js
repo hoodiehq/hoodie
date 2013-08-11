@@ -158,12 +158,19 @@ describe("hoodie.store", function() {
       it("should cache document", function() {
         // which means we don't call localStorage.getItem again
         localStorage.getItem.reset()
-        this.promise = this.storeBackend.save({
+        this.storeBackend.save({
           type: 'document',
           id: '123',
           name: 'text'
         });
         expect(localStorage.getItem).to.not.be.called();
+      });
+
+      it("should write the object to localStorage, but without type & id attributes", function() {
+        var object = getLastSavedObject()
+        expect(object.name).to.be('test')
+        expect(object.type).to.be(undefined)
+        expect(object.id).to.be(undefined)
       });
 
       it("should add timestamps", function() {
@@ -238,6 +245,31 @@ describe("hoodie.store", function() {
           var object = getLastSavedObject();
           expect(object._rev).to.eql('2-345');
         });
+
+        it("should clear it from local changes", function() {
+          localStorage.setItem.reset();
+          this.storeBackend.save({
+            type: 'document',
+            id: 'check1',
+            name: 'test',
+            _rev: '1-234'
+          });
+          this.storeBackend.save({
+            type: 'document',
+            id: 'check2',
+            name: 'test',
+            _rev: '1-234'
+          });
+          expect(localStorage.setItem).to.be.calledWith('_dirty', 'document/check1,document/check2')
+          localStorage.setItem.reset();
+          this.storeBackend.save({
+            type: 'document',
+            id: 'check1',
+            name: 'test',
+            _rev: '2-234'
+          }, { remote: true });
+          expect(localStorage.setItem).to.be.calledWith('_dirty', 'document/check2')
+        });
       }); // options.remote is true
 
       _and("options.silent is true", function() {
@@ -294,30 +326,105 @@ describe("hoodie.store", function() {
       }); // options.local is not set
 
       _and("object is new (not cached yet)", function() {
-        beforeEach(function() {
-          stubFindItem('document', '1235', null);
-          this.storeBackend.save({
-            type: 'document',
-            id: '1235',
-            name: 'test'
+        _and("object does exist in localStorage", function() {
+          beforeEach(function() {
+            stubFindItem('document', '1235', {
+              name: 'test',
+              createdBy: 'myself'
+            });
+
+            this.store.trigger.reset()
+            localStorage.setItem.reset()
+            this.storeBackend.save({
+              type: 'document',
+              id: '1235',
+              name: 'test'
+            });
+          });
+
+          it("should not look it up again", function() {
+            localStorage.getItem.reset()
+            this.storeBackend.save({
+              type: 'document',
+              id: '1235',
+              name: 'test'
+            });
+            expect(localStorage.getItem).to.not.be.called();
+          });
+          it("should mark it as change", function() {
+            expect(localStorage.setItem).to.be.calledWith('_dirty', 'document/123,document/1235');
+          });
+          it("should trigger update & change events", function() {
+            var object = {
+              id: '1235',
+              type: 'document',
+              name: 'test',
+              createdAt: now(),
+              updatedAt: now(),
+              createdBy: 'myself'
+            };
+            expect(this.store.trigger).to.be.calledWith('update', object, {});
+            expect(this.store.trigger).to.be.calledWith('update:document', object, {});
+            expect(this.store.trigger).to.be.calledWith('change', 'update', object, {});
+            expect(this.store.trigger).to.be.calledWith('change:document', 'update', object, {});
           });
         });
 
-        it("should trigger add & change events", function() {
-          var object = {
-            id: '1235',
-            type: 'document',
-            name: 'test',
-            createdAt: now(),
-            updatedAt: now(),
-            createdBy: 'owner_hash'
-          };
-          expect(this.store.trigger).to.be.calledWith('add', object, {});
-          expect(this.store.trigger).to.be.calledWith('add:document', object, {});
-          expect(this.store.trigger).to.be.calledWith('change', 'add', object, {});
-          expect(this.store.trigger).to.be.calledWith('change:document', 'add', object, {});
+        _and("object does not exist in localStorage", function() {
+          beforeEach(function() {
+            stubFindItem('document', '1998', null);
+            this.storeBackend.save({
+              type: 'document',
+              id: '1998',
+              name: 'test'
+            });
+          });
+
+          it("should trigger add & change events", function() {
+            var object = {
+              id: '1998',
+              type: 'document',
+              name: 'test',
+              createdAt: now(),
+              updatedAt: now(),
+              createdBy: 'owner_hash'
+            };
+            expect(this.store.trigger).to.be.calledWith('add', object, {});
+            expect(this.store.trigger).to.be.calledWith('add:document', object, {});
+            expect(this.store.trigger).to.be.calledWith('change', 'add', object, {});
+            expect(this.store.trigger).to.be.calledWith('change:document', 'add', object, {});
+          });
+
+          it("should mark it as change", function() {
+            expect(localStorage.setItem).to.be.calledWith('_dirty', 'document/123,document/1998');
+          });
         });
       }); // object is new (not cached yet)
+
+      _and("object is not new (and therefore chached)", function() {
+        beforeEach(function() {
+          this.object = {
+            type: 'document',
+            id: '123560',
+            name: 'old new'
+          }
+          this.storeBackend.save(this.object);
+          localStorage.getItem.reset();
+          this.store.trigger.reset();
+          this.storeBackend.save(this.object);
+        });
+
+        it("should not look it up again", function() {
+          expect(localStorage.getItem).to.not.be.called()
+        });
+
+        it("should trigger update & change events", function() {
+          expect(this.store.trigger).to.be.calledWith('update', this.object, {});
+          expect(this.store.trigger).to.be.calledWith('update:document', this.object, {});
+          expect(this.store.trigger).to.be.calledWith('change', 'update', this.object, {});
+          expect(this.store.trigger).to.be.calledWith('change:document', 'update', this.object, {});
+        });
+      }); // object is not new (and therefore chached)
 
       _when("successful", function() {
         it("should resolve the promise", function() {
@@ -837,6 +944,32 @@ describe("hoodie.store", function() {
       });
     });
 
+    _when("object is removed", function() {
+
+      _but('has been synced before', function() {
+        beforeEach(function() {
+          this.storeBackend.save({
+            type: 'document',
+            id: 'nomore',
+            name: 'test',
+            _rev: '2-234',
+            _deleted: true
+          });
+        });
+
+        it("should cache it as not found for future look ups", function() {
+          localStorage.getItem.reset();
+          var promise = this.storeBackend.find('document', 'nomore');
+          expect(localStorage.getItem).to.not.be.called();
+          expect(promise).to.be.rejected();
+        });
+
+        it("should mark as changed", function() {
+          expect(localStorage.setItem).to.be.calledWith('_dirty', 'document/nomore');
+        });
+      })
+    })
+
     _when("store is bootstrapping", function() {
 
       beforeEach(function() {
@@ -861,229 +994,6 @@ describe("hoodie.store", function() {
 
     });
   }); // #remove
-
-  //
-  // TODO: remove store.cache method from being accessible from outside.
-  //
-  describe.skip("#cache(type, id, object)", function() {
-
-    beforeEach(function() {
-      this.sandbox.spy(this.store, "markAsChanged");
-      // this.sandbox.spy(this.store, "clearChanged");
-      this.sandbox.spy(this.store, "_hasLocalChanges");
-      this.sandbox.spy(this.store, "_isMarkedAsDeleted");
-      this.store._cached = {};
-    });
-
-    _when("object passed", function() {
-
-      it("should write the object to localStorage, but without type & id attributes", function() {
-        this.store.cache('couch', '123', {
-          color: 'red'
-        });
-        expect(this.store.db.setItem.calledWith('couch/123', '{"color":"red"}')).to.be.ok();
-      });
-
-      it("should make a deep copy of passed object", function() {
-        var newObject, originalObject;
-        originalObject = {
-          nested: {
-            property: 'funky'
-          }
-        };
-        this.store.cache('couch', '123', originalObject);
-        newObject = this.store.cache('couch', '123');
-        newObject.nested.property = 'fresh';
-        expect(originalObject.nested.property).to.eql('funky');
-      });
-
-      _and("`options.remote = true` passed", function() {
-
-        it("should clear changed object", function() {
-          this.store.cache('couch', '123', {
-            color: 'red'
-          }, {
-            remote: true
-          });
-          expect(this.store.clearChanged.calledWith('couch', '123')).to.be.ok();
-        });
-
-        it("should make a deep copy of passed object", function() {
-          var newObject, originalObject;
-          originalObject = {
-            nested: {
-              property: 'funky'
-            }
-          };
-          newObject = this.store.cache('couch', '123', originalObject, {
-            remote: true
-          });
-          newObject.nested.property = 'fresh';
-          expect(originalObject.nested.property).to.eql('funky');
-        });
-
-      });
-
-      _and("object is marked as deleted", function() {
-
-        it("should set cache to false store object in _dirty hash", function() {
-          this.store._isMarkedAsDeleted.andReturn(true);
-          this.store._cached = {};
-          this.store._dirty = {};
-          this.store._cached['couch/123'] = {
-            color: 'red'
-          };
-          this.store.cache('couch', '123', {
-            color: 'red',
-            _deleted: true
-          });
-          expect(this.store._cached['couch/123']).to.eql(false);
-        });
-
-      });
-
-    });
-
-    _when("no object passed", function() {
-
-      _and("object is already cached", function() {
-
-        beforeEach(function() {
-          this.store._cached['couch/123'] = {
-            color: 'red'
-          };
-        });
-
-        it("should not find it from localStorage", function() {
-          this.store.cache('couch', '123');
-          expect(this.store.db.getItem.called).to.not.be.ok();
-        });
-
-      });
-
-      _and("object is not yet cached", function() {
-
-        beforeEach(function() {
-          delete this.store._cached['couch/123'];
-        });
-
-        _and("object does exist in localStorage", function() {
-
-          beforeEach(function() {
-            this.object = {
-              type: 'couch',
-              id: '123',
-              color: 'red'
-            };
-            this.store._getObject.andReturn(this.object);
-          });
-
-          it("should cache it for future", function() {
-            this.store.cache('couch', '123');
-            expect(this.store._cached['couch/123'].color).to.eql('red');
-          });
-
-          it("should make a deep copy", function() {
-            var obj1, obj2, originalObject;
-            originalObject = {
-              nested: {
-                property: 'funky'
-              }
-            };
-            this.store._getObject.andReturn(originalObject);
-            obj1 = this.store.cache('couch', '123');
-            obj1.nested.property = 'fresh';
-            obj2 = this.store.cache('couch', '123');
-            expect(obj2.nested.property).to.eql('funky');
-          });
-
-          _and("object is dirty", function() {
-
-            beforeEach(function() {
-              this.store._hasLocalChanges.returns(true);
-            });
-
-            it("should mark it as changed", function() {
-              this.store.cache('couch', '123');
-              expect(this.store.markAsChanged.calledWith('couch', '123', this.object, {})).to.be.ok();
-            });
-
-          });
-
-          _and("object is not dirty", function() {
-
-            beforeEach(function() {
-              this.store._hasLocalChanges.returns(false);
-            });
-
-            _and("not marked as deleted", function() {
-
-              beforeEach(function() {
-                this.store._isMarkedAsDeleted.returns(false);
-              });
-
-              it("should clean it", function() {
-                this.store.cache('couch', '123');
-                expect(this.store.clearChanged.calledWith('couch', '123')).to.be.ok();
-              });
-
-            });
-
-            _but("marked as deleted", function() {
-
-              beforeEach(function() {
-                this.store._isMarkedAsDeleted.returns(true);
-              });
-
-              it("should mark it as changed", function() {
-                var object, options;
-                this.store.cache('couch', '123');
-                object = {
-                  color: 'red',
-                  type: 'couch',
-                  id: '123'
-                };
-                options = {};
-                expect(this.store.markAsChanged.calledWith('couch', '123', object, options)).to.be.ok();
-              });
-
-            });
-
-          });
-
-        });
-
-        _and("object does not exist in localStorage", function() {
-
-          beforeEach(function() {
-            this.store._getObject.returns(false);
-          });
-
-          it("should cache it for future", function() {
-            this.store.cache('couch', '123');
-            expect(this.store._cached['couch/123']).to.eql(false);
-          });
-
-          it("should return false", function() {
-            expect(this.store.cache('couch', '123')).to.eql(false);
-          });
-
-        });
-
-      });
-
-    });
-
-    it("should return the object including type & id attributes", function() {
-      var obj;
-      obj = this.store.cache('couch', '123', {
-        color: 'red'
-      });
-      expect(obj.color).to.eql('red');
-      expect(obj.type).to.eql('couch');
-      expect(obj.id).to.eql('123');
-    });
-  });
 
   //
   describe("#clear()", function() {

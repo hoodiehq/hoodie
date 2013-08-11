@@ -77,6 +77,11 @@ describe("hoodieStoreApi", function() {
       expect(promise).to.be.pending();
     });
 
+    it("should the object including type & id", function() {
+      this.store.save('type', 'id', {property: 'value'}, { option: 'value'})
+      expect(this.options.backend.save).to.be.calledWith({type: 'type', id: 'id', property: 'value'}, { option: 'value'});
+    });
+
     it("should validate", function() {
       this.sandbox.spy(this.store, 'validate');
       this.store.save('type', 'id', {property: 'value'}, {option: 'value'});
@@ -87,9 +92,33 @@ describe("hoodieStoreApi", function() {
       }, {option: 'value'});
     })
 
-    it("should call backend.save", function() {
-      this.store.save('type', 'id', {property: 'value'}, { option: 'value'})
-      expect(this.options.backend.save).to.be.calledWith({type: 'type', id: 'id', property: 'value'}, { option: 'value'});
+    it("should make a deep copy of passed object", function() {
+      var originalObject = {
+        name: 'don\'t mess with me',
+        nested: {
+          property: 'funky'
+        },
+        type: 'document',
+        id: '123'
+      }
+      this.store.save('document', '123', originalObject);
+      var passedObject = this.options.backend.save.args[0][0];
+      passedObject.nested.property = 'fresh'
+      expect(passedObject.nested.property).to.be('fresh');
+      expect(originalObject.nested.property).to.be('funky');
+    });
+
+    it("should make a deep copy of passed options", function() {
+      var originalOptions = {
+        nested: {
+          property: 'funky'
+        }
+      }
+      this.store.save('document', '123', { title: 'yo'}, originalOptions);
+      var passedOptions = this.options.backend.save.args[0][1];
+      passedOptions.nested.property = 'fresh'
+      expect(passedOptions.nested.property).to.be('fresh');
+      expect(originalOptions.nested.property).to.be('funky');
     });
   }); // #save
 

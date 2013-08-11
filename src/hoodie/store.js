@@ -81,6 +81,12 @@ function hoodieStoreApi(hoodie, options) {
   //
   api.save = function save(type, id, properties, options) {
 
+    if ( options ) {
+      options = $.extend(true, {}, options);
+    } else {
+      options = {};
+    }
+
     // don't mess with passed object
     var object = $.extend(true, {}, properties, {type: type, id: id});
 
