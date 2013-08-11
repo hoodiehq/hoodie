@@ -714,8 +714,8 @@ function hoodieStore (hoodie) {
   // Marks all local object as changed (dirty) to make them sync
   // with remote
   function markAllAsChanged() {
-
     return store.findAll().pipe(function(objects) {
+      debugger
       var key, object, _i, _len;
 
       for (_i = 0, _len = objects.length; _i < _len; _i++) {

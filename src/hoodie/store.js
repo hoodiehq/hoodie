@@ -43,21 +43,24 @@ function hoodieStoreApi(hoodie, options) {
   api.validate = options.validate;
 
   if (! options.validate) {
-    api.validate = function(type, id, object, options) {
+    api.validate = function(object, options) {
 
-      if (! type) {
-        return;
+      if (!object) {
+        return Hoodie.Errors.INVALID_ARGUMENTS('no object passed');
       }
-
-      if (!isValidType(type)) {
+      if (!isValidType(object.type)) {
         return Hoodie.Errors.INVALID_KEY({
-          type: type
+          type: object.type
         });
       }
 
-      if (id && !isValidId(id)) {
+      if (! object.id) {
+        return;
+      }
+
+      if (!isValidId(object.id)) {
         return Hoodie.Errors.INVALID_KEY({
-          id: id
+          id: object.id
         });
       }
     };
@@ -78,23 +81,14 @@ function hoodieStoreApi(hoodie, options) {
   //
   api.save = function save(type, id, properties, options) {
 
-    if (options === null) {
-      options = {};
-    }
-
-    if (typeof properties !== 'object' || Array.isArray(properties)) {
-      return rejectWith(Hoodie.Errors.INVALID_ARGUMENTS('invalid object'));
-    }
-
-    // validations
-    var error = api.validate(type, id, properties, options);
-    if(error) {
-      return rejectWith(error);
-    }
-
     // don't mess with passed object
     var object = $.extend(true, {}, properties, {type: type, id: id});
-    return decoratePromise( backend.save(object, options) );
+
+    // validations
+    var error = api.validate(object, options || {});
+    if(error) { return rejectWith(error); }
+
+    return decoratePromise( backend.save(object, options || {}) );
   };
 
 
@@ -120,13 +114,6 @@ function hoodieStoreApi(hoodie, options) {
 
   //
   api.find = function find(type, id) {
-
-    // validations
-    var error = api.validate(type, id);
-    if(error) {
-      return rejectWith(error);
-    }
-
     return decoratePromise( backend.find(type, id) );
   };
 
@@ -167,15 +154,6 @@ function hoodieStoreApi(hoodie, options) {
   // Can be optionally filtered by a type or a function
   //
   api.findAll = function findAll(type, options) {
-
-    // validations
-    if (type) {
-      var error = api.validate(type, undefined, undefined, options);
-      if(error) {
-        return rejectWith(error);
-      }
-    }
-
     return decoratePromise( backend.findAll(type, options) );
   };
 
@@ -311,19 +289,7 @@ function hoodieStoreApi(hoodie, options) {
   // Otherwise remove it from Store.
   //
   api.remove = function remove(type, id, options) {
-    var defer;
-
-    if (!options) {
-      options = {};
-    }
-
-    // validations
-    var error = api.validate(type, id, undefined, options);
-    if(error) {
-      return rejectWith(error);
-    }
-
-    return decoratePromise( backend.remove(type, id, options) );
+    return decoratePromise( backend.remove(type, id, options || {}) );
   };
 
 
@@ -333,17 +299,7 @@ function hoodieStoreApi(hoodie, options) {
   // Destroye all objects. Can be filtered by a type
   //
   api.removeAll = function removeAll(type, options) {
-    options = options || {};
-
-    // validations
-    if (type) {
-      var error = api.validate(type, options);
-      if(error) {
-        return rejectWith(error);
-      }
-    }
-
-    return decoratePromise( backend.removeAll(type, options) );
+    return decoratePromise( backend.removeAll(type, options || {}) );
   };
 
 
