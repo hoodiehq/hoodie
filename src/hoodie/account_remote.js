@@ -1,5 +1,4 @@
 /* exported hoodieRemote */
-/* global hoodieRemoteStore */
 
 // AccountRemote
 // ===============
@@ -17,10 +16,7 @@
 function hoodieRemote (hoodie) {
 
   // inherit from Hoodies Store API
-  var remote = hoodieRemoteStore(hoodie, {
-
-    // set name to user's DB name
-    name: hoodie.account.db(),
+  var remote = hoodie.open(hoodie.account.db(), {
 
     // we're always connected to our own db
     connected: true,
@@ -37,37 +33,13 @@ function hoodieRemote (hoodie) {
     //
     knownObjects: hoodie.store.index().map( function(key) {
       var typeAndId = key.split(/\//);
-      return { tyep: typeAndId[0], id: typeAndId[1]};
+      return { type: typeAndId[0], id: typeAndId[1]};
     })
   });
 
 
   // Private
   // ---------
-
-  // to determine wether to trigger an `add` or `update`
-  // event, the known objects from the user get loaded
-  // from local store initially.
-  //
-  function loadListOfKnownObjectsFromLocalStore() {
-    var _i, _len, keys, typeAndId;
-    keys = hoodie.store.index();
-
-    for (_i = 0, _len = keys.length; _i < _len; _i++) {
-      typeAndId = keys[_i].split(/\//),
-
-      remote.markAsKnownObject({
-        type: typeAndId[0],
-        id: typeAndId[1]
-      });
-    }
-  }
-
-  // allow to run this once from outside
-  remote.loadListOfKnownObjectsFromLocalStore = function() {
-    loadListOfKnownObjectsFromLocalStore();
-    delete remote.loadListOfKnownObjectsFromLocalStore;
-  };
 
   //
   // subscribe to events coming from account
