@@ -402,7 +402,7 @@ function hoodieRemoteStore (hoodie, options) {
     var object, objectsForRemote, _i, _len;
 
     if (!$.isArray(objects)) {
-      objects = defaultObjectsToPush()
+      objects = defaultObjectsToPush();
     }
 
     if (objects.length === 0) {
@@ -643,7 +643,7 @@ function hoodieRemoteStore (hoodie, options) {
   //
   function pullUrl() {
     var since;
-    since = getSinceNr();
+    since = remote.getSinceNr();
     if (remote.isConnected()) {
       return '/_changes?include_docs=true&since=' + since + '&heartbeat=10000&feed=longpoll';
     } else {
