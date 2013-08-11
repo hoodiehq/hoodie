@@ -17,8 +17,8 @@ describe("Hoodie.Remote", function() {
 
     this.storeApi = Mocks.StoreApi(this.hoodie);
     this.sandbox.stub(window, 'hoodieStoreApi').returns(this.storeApi);
-
     this.remote = hoodieRemoteStore(this.hoodie, { name: 'my/store'} );
+    this.storeBackend = hoodieStoreApi.args[0][1].backend;
   });
 
   describe("factory", function() {
@@ -117,17 +117,17 @@ describe("Hoodie.Remote", function() {
     });
   }); // #request
 
-  describe("#find(type, id)", function() {
+  describe.only("#find(type, id)", function() {
 
     it("should send a GET request to `/type%2Fid`", function() {
       var path, type;
-      this.remote.find('car', '123');
-      var _ref = this.remote.request.args[0];
+      this.storeBackend.find('car', '123');
+      var _ref = this.hoodie.request.args[0];
       type = _ref[0],
       path = _ref[1];
 
       expect(type).to.eql('GET');
-      expect(path).to.eql('/car%2F123');
+      expect(path).to.eql('/my%2Fstore/car%2F123');
     });
 
     _when("prefix is store_prefix/", function() {
@@ -138,14 +138,14 @@ describe("Hoodie.Remote", function() {
 
       it("should send request to `store_prefix%2Ftype%2Fid`", function() {
         var path, type;
-        this.remote.find('car', '123');
-        var _ref = this.remote.request.args[0];
+        this.storeBackend.find('car', '123');
+        var _ref = this.hoodie.request.args[0];
 
         type = _ref[0],
         path = _ref[1];
 
         expect(type).to.eql('GET');
-        expect(path).to.eql('/store_prefix%2Fcar%2F123');
+        expect(path).to.eql('/my%2Fstore/store_prefix%2Fcar%2F123');
       });
 
       _and("request successful", function() {
@@ -160,7 +160,7 @@ describe("Hoodie.Remote", function() {
 
         it("should resolve with the doc", function() {
 
-          this.remote.find('todo', '1').then(function (res) {
+          this.storeBackend.find('todo', '1').then(function (res) {
             expect(res).to.eql({
               id: 'fresh',
               type: 'car',
