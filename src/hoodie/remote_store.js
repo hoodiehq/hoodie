@@ -629,8 +629,6 @@ function hoodieRemoteStore (hoodie, options) {
       return;
     }
 
-    debugger
-
     switch (xhr.status) {
       // Session is invalid. User is still login, but needs to reauthenticate
       // before sync can be continued
