@@ -1,24 +1,36 @@
 'use strict';
 
-describe("Hoodie.Store", function() {
+describe("hoodieStoreApi", function() {
 
   beforeEach(function() {
     this.hoodie = new Mocks.Hoodie();
-    this.store = new Hoodie.Store(this.hoodie);
+
+    var saveDefer = this.hoodie.defer()
+    var findDefer = this.hoodie.defer()
+    var findAllDefer = this.hoodie.defer()
+    var removeDefer = this.hoodie.defer()
+    var removeAllDefer   = this.hoodie.defer()
+
+
+    this.options = {
+      name: 'funkstore',
+      backend: {
+        save: function() { return saveDefer.promise() },
+        find: function() { return findDefer.promise() },
+        findAll: function() { return findAllDefer.promise() },
+        remove: function() { return removeDefer.promise() },
+        removeAll: function() { return removeAllDefer.promise() }
+      }
+    }
+    this.store = hoodieStoreApi(this.hoodie, this.options)
   });
 
-  describe("#save(type, id, object, options)", function() {
-
-    beforeEach(function() {
-      this._nowStub = this.sandbox.stub(this.store, "_now").returns('now');
-    });
-
+  xdescribe("#save(type, id, object, options)", function() {
     it("should return a defer", function() {
       var promise = this.store.save('document', '123', {
         name: 'test'
       });
-
-      expect(promise.state()).to.eql('pending');
+      expect(promise).to.be.pending();
     });
 
     describe("invalid arguments", function() {
@@ -26,7 +38,7 @@ describe("Hoodie.Store", function() {
       _when("no arguments passed", function() {
 
         it("should be rejected", function() {
-          expect(this.store.save().state()).to.eql('rejected');
+          expect(this.store.save()).to.be.rejected();
         });
 
       });
@@ -35,7 +47,7 @@ describe("Hoodie.Store", function() {
 
         it("should be rejected", function() {
           var promise = this.store.save('document', 'abc4567');
-          expect(promise.state()).to.eql('rejected');
+          expect(promise).to.be.rejected();
         });
 
       });
@@ -44,7 +56,7 @@ describe("Hoodie.Store", function() {
 
         it("should be rejected", function() {
           var promise = this.store.save('document', 'abc4567', [1,2,3]);
-          expect(promise.state()).to.eql('rejected');
+          expect(promise).to.be.rejected();
         });
 
       });
@@ -61,13 +73,13 @@ describe("Hoodie.Store", function() {
       for (_i = 0, _len = invalid.length; _i < _len; _i++) {
         key = invalid[_i];
         promise = this.store.save(key, 'valid', {});
-        expect(promise.state()).to.eql('rejected');
+        expect(promise).to.be.rejected();
       }
       _results = [];
       for (_j = 0, _len1 = valid.length; _j < _len1; _j++) {
         key = valid[_j];
         promise = this.store.save(key, 'valid', {});
-        _results.push(expect(promise.state()).to.eql('pending'));
+        _results.push(expect(promise).to.be.pending());
       }
       _results;
     });
@@ -82,21 +94,19 @@ describe("Hoodie.Store", function() {
       for (_i = 0, _len = invalid.length; _i < _len; _i++) {
         key = invalid[_i];
         promise = this.store.save('valid', key, {});
-        expect(promise.state()).to.eql('rejected');
+        expect(promise).to.be.rejected();
       }
       _results = [];
       for (_j = 0, _len1 = valid.length; _j < _len1; _j++) {
         key = valid[_j];
         promise = this.store.save('valid', key, {});
-        _results.push(expect(promise.state()).to.eql('pending'));
+        _results.push(expect(promise).to.be.pending());
       }
       _results;
     });
+  }); // #save
 
-  });
-
-  describe("add(type, object)", function() {
-
+  xdescribe("add(type, object)", function() {
     beforeEach(function () {
       this.sandbox.stub(this.store, "save").returns("save_promise");
     });
@@ -114,42 +124,36 @@ describe("Hoodie.Store", function() {
     it("should return promise of save method", function() {
       expect(this.store.add()).to.eql('save_promise');
     });
-
   });
 
   xdescribe("#update(type, id, update, options)", function() {
-
     beforeEach(function() {
-      this.sandbox.spy(this.store, "find");
-      this.sandbox.stub(this.store, "save").returns({
-        then: function() {}
-      });
+      this.findDefer = this.hoodie.defer();
+      this.saveDefer = this.hoodie.defer();
+      this.sandbox.stub(this.store, "find").returns(this.findDefer);
+      this.sandbox.stub(this.store, "save").returns(this.saveDefer);
     });
 
     _when("object cannot be found", function() {
-
       beforeEach(function() {
-        //this.sandbox.stub(this.store.find).returns($.Deferred().reject());
-
+        this.findDefer.reject();
         this.promise = this.store.update('couch', '123', {
           funky: 'fresh'
         });
       });
 
       it("should add it", function() {
-        expect(this.store.save.calledWith('couch', '123', {
+        expect(this.store.save).to.be.calledWith('couch', '123', {
           funky: 'fresh'
-        }, void 0)).to.be.ok;
+        }, void 0);
       });
-
-    });
+    }); // object cannot be found
 
     _when("object can be found", function() {
 
-      //beforeEach(function() {
-        //this.sandbox.stub(this.store.find).returns(this.hoodie.defer().resolve({ style: 'baws' }));
-        //this.sandbox.stub(this.store.save).returns(this.hoodie.defer().resolve('resolved by save'));
-      //});
+      beforeEach(function() {
+        this.findDefer.resolve({ style: 'baws' });
+      });
 
       _and("update is an object", function() {
 
@@ -160,18 +164,18 @@ describe("Hoodie.Store", function() {
         });
 
         it("should save the updated object", function() {
-          expect(this.store.save.calledWith('couch', '123', {
+          expect(this.store.save).to.be.calledWith('couch', '123', {
             style: 'baws',
             funky: 'fresh'
-          }, void 0)).to.be.ok();
+          }, void 0);
         });
 
         it("should return a resolved promise", function() {
+          this.saveDefer.resolve( 'resolved by save' );
           this.promise.then(this.noop, function (res) {
             expect(res).to.eql('resolved by save');
           });
         });
-
       });
 
       _and("update is an object and options passed", function() {
@@ -185,13 +189,12 @@ describe("Hoodie.Store", function() {
         });
 
         it("should not save the object", function() {
-
-          expect(this.store.save.calledWith('couch', '123', {
+          expect(this.store.save).to.be.calledWith('couch', '123', {
             style: 'baws',
             funky: 'fresh'
           }, {
             silent: true
-          })).to.be.ok();
+          });
         });
 
       });
@@ -232,7 +235,7 @@ describe("Hoodie.Store", function() {
             return obj;
           });
           expect(originalObject.config.funky).to.be(undefined);
-          expect(this.store.save.called).to.be.ok();
+          expect(this.store.save).to.be.called();
         });
 
       });
@@ -240,6 +243,11 @@ describe("Hoodie.Store", function() {
       _and("update wouldn't make a change", function() {
 
         beforeEach(function() {
+          this.saveDefer.resolve({
+            type: 'couch',
+            id: '123',
+            style: 'baws'
+          })
           this.promise = this.store.update('couch', '123', function() {
             return {
               style: 'baws'
@@ -248,19 +256,15 @@ describe("Hoodie.Store", function() {
         });
 
         it("should not save the object", function() {
-          expect(this.store.save.called).to.not.be.ok();
+          expect(this.store.save).to.not.be.called();
         });
 
         it("should return a resolved promise", function() {
-          this.promise.then(function (res) {
-            expect(res).to.eql({style: 'baws'});
-          });
+          expect(this.promise).to.be.resolvedWith({style: 'baws'})
         });
-
       });
 
       _but("update wouldn't make a change, but options have been passed", function() {
-
         beforeEach(function() {
           this.promise = this.store.update('couch', '123', {}, {
             "public": true
@@ -274,15 +278,11 @@ describe("Hoodie.Store", function() {
             "public": true
           })).to.be.ok();
         });
-
-      });
-
-    });
-
-  });
+      }); // update wouldn't make a change, but options have been passed
+    }); // object can be found
+  }); // #update
 
   xdescribe("#updateAll(objects)", function() {
-
     beforeEach(function() {
       this.sandbox.stub(this.hoodie, "isPromise").returns(false);
       this.todoObjects = [
@@ -300,38 +300,35 @@ describe("Hoodie.Store", function() {
     });
 
     it("should return a promise", function() {
-      expect(this.store.updateAll(this.todoObjects, {})).to.have.property('done');
-      expect(this.store.updateAll(this.todoObjects, {})).to.not.have.property('resolved');
+      expect(this.store.updateAll(this.todoObjects, {})).to.be.promise();
     });
 
     it("should update objects", function() {
-      var obj, _i, _len, _ref, _results;
+      var obj, _i, _len, _ref;
       this.sandbox.spy(this.store, "update");
 
       this.store.updateAll(this.todoObjects, {
         funky: 'update'
       });
       _ref = this.todoObjects;
-      _results = [];
       for (_i = 0, _len = _ref.length; _i < _len; _i++) {
         obj = _ref[_i];
-        _results.push(expect(this.store.update.calledWith(obj.type, obj.id, {
+        expect(this.store.update).to.be.calledWith(obj.type, obj.id, {
           funky: 'update'
-        }, {})).to.be.ok());
+        }, {})
       }
-      _results;
     });
 
     it("should resolve the returned promise once all objects have been updated", function() {
       var promise = this.hoodie.defer().resolve().promise();
       this.sandbox.stub(this.store, "update").returns(promise);
-      expect(this.store.updateAll(this.todoObjects, {}).state()).to.eql('resolved');
+      expect(this.store.updateAll(this.todoObjects, {})).to.be.resolved();
     });
 
-    it("should not resolve the retunred promise unless object updates have been finished", function() {
+    it("should not resolve the returned promise unless object updates have been finished", function() {
       var promise = this.hoodie.defer().promise();
       this.sandbox.stub(this.store, "update").returns(promise);
-      expect(this.store.updateAll(this.todoObjects, {}).state()).to.not.eql('rejected');
+      expect(this.store.updateAll(this.todoObjects, {})).to.be.pending();
     });
 
     _when("passed objects is a promise", function() {
@@ -341,24 +338,22 @@ describe("Hoodie.Store", function() {
       });
 
       it("should update objects returned by promise", function() {
-        var obj, promise, _i, _len, _ref, _results;
+        var obj, promise, _i, _len, _ref;
 
         promise = this.hoodie.defer().resolve(this.todoObjects).promise();
 
-        this.sanbox.spy(this.store, "update");
+        this.sandbox.spy(this.store, "update");
         this.store.updateAll(promise, {
           funky: 'update'
         });
 
         _ref = this.todoObjects;
-        _results = [];
         for (_i = 0, _len = _ref.length; _i < _len; _i++) {
           obj = _ref[_i];
-          _results.push(expect(this.store.update.calledWith(obj.type, obj.id, {
+          expect(this.store.update.calledWith(obj.type, obj.id, {
             funky: 'update'
-          }, {})).to.be.ok());
+          }, {})).to.be.ok();
         }
-        _results;
       });
 
       it("should update object single object returned by promise", function() {
@@ -373,79 +368,61 @@ describe("Hoodie.Store", function() {
           funky: 'update'
         }, {})).to.be.ok();
       });
-
-    });
+    }); // passed objects is a promise
 
     _when("passed objects is a type (string)", function() {
-
       beforeEach(function() {
-        var findAll_promise = this.sandbox.spy();
-        this.sandbox.stub(this.store, "findAll").returns({
-          pipe: findAll_promise
-        });
+        this.findAllDefer = this.hoodie.defer();
+        this.sandbox.stub(this.store, "findAll").returns(this.findAllDefer.promise());
       });
 
       it("should update objects return by findAll(type)", function() {
         this.store.updateAll("car", {
           funky: 'update'
         });
-        expect(this.store.findAll.calledWith("car")).to.be.ok();
+        expect(this.store.findAll).to.be.calledWith("car");
       });
-
-    });
+    }); // passed objects is a type (string)
 
     _when("no objects passed", function() {
-
       beforeEach(function() {
-        var findAll_promise = this.sandbox.spy();
-        this.sandbox.stub(this.store, "findAll").returns({
-          pipe: findAll_promise
-        });
+        this.findAllDefer = this.hoodie.defer();
+        this.sandbox.stub(this.store, "findAll").returns(this.findAllDefer.promise());
       });
 
       it("should update all objects", function() {
         this.store.updateAll(null, {
           funky: 'update'
         });
-        expect(this.store.findAll.called).to.be.ok();
+        expect(this.store.findAll).to.be.called();
         expect(this.store.findAll.args[0].length).to.eql(0);
       });
+    }); // no objects passed
+  }); // #updateAll
 
-    });
-
-  });
-
-  describe("#find(type, id)", function() {
-
-    it("should return a defer", function() {
-      var defer = this.store.find('document', '123');
-      expect(defer.state()).to.eql('pending');
+  xdescribe("#find(type, id)", function() {
+    it("should return a promise", function() {
+      var promise = this.store.find('document', '123');
+      expect(promise).to.be.promise();
     });
 
     describe("invalid arguments", function() {
-
       _when("no arguments passed", function() {
-
         it("should be rejected", function() {
           var promise = this.store.find();
-          expect(promise.state()).to.eql('rejected');
+          expect(promise).to.be.rejected();
         });
-
       });
 
       _when("no id passed", function() {
-
         it("should be rejected", function() {
           var promise = this.store.find('document');
-          expect(promise.state()).to.eql('rejected');
+          expect(promise).to.be.rejected();
         });
-
       });
-
-    });
+    }); // invalid arguments
 
     describe("aliases", function() {
-
       beforeEach(function() {
         this.sandbox.spy(this.store, "find");
       });
@@ -456,27 +433,16 @@ describe("Hoodie.Store", function() {
       });
 
     });
+  }); // #find
 
-  });
-
-  describe("#findAll(type)", function() {
-
-    it("should return a defer", function() {
-      expect(this.store.findAll().state()).to.eql('pending');
+  xdescribe("#findAll(type)", function() {
+    it("should return a promise", function() {
+      expect(this.store.findAll()).to.be.promise();
     });
+  }); // #findAll
 
-    describe("aliases", function() {
-      beforeEach(function() {
-        this.sandbox.spy(this.store, "findAll");
-      });
-    });
-
-  });
-
-  describe("#findOrAdd(type, id, attributes)", function() {
-
+  xdescribe("#findOrAdd(type, id, attributes)", function() {
     _when("object exists", function() {
-
       beforeEach(function() {
         var promise = this.hoodie.defer().resolve('existing_object').promise();
         this.sandbox.stub(this.store, "find").returns(promise);
@@ -491,11 +457,9 @@ describe("Hoodie.Store", function() {
           expect(res).to.eql('existing_object');
         });
       });
-
     });
 
     _when("object does not exist", function() {
-
       beforeEach(function() {
         this.sandbox.stub(this.store, "find").returns(this.hoodie.defer().reject().promise());
       });
@@ -521,7 +485,7 @@ describe("Hoodie.Store", function() {
           attribute: 'value'
         });
 
-        expect(promise.state()).to.eql('rejected');
+        expect(promise).to.be.rejected();
       });
 
       it("should resolve when `.add` was resolved", function() {
@@ -537,25 +501,21 @@ describe("Hoodie.Store", function() {
           expect(res).to.eql('new_object');
         });
       });
-
     });
+  }); // #findOrAdd
 
-  });
-
-  describe("#remove(type, id)", function() {
-
+  xdescribe("#remove(type, id)", function() {
     it("should return a defer", function() {
       var defer = this.store.remove('document', '123');
-      expect(defer.state()).to.eql('pending');
+      expect(defer).to.be.pending();
     });
 
     describe("invalid arguments", function() {
-
       _when("no arguments passed", function() {
 
         it("should be rejected", function() {
           var promise = this.store.remove();
-          expect(promise.state()).to.eql('rejected');
+          expect(promise).to.be.rejected();
         });
 
       });
@@ -564,101 +524,28 @@ describe("Hoodie.Store", function() {
 
         it("should be rejected", function() {
           var promise= this.store.remove('document');
-          expect(promise.state()).to.eql('rejected');
+          expect(promise).to.be.rejected();
         });
 
       });
-
     });
+  }); // #remove
 
-  });
-
-  describe("#removeAll(type)", function() {
-
+  xdescribe("#removeAll(type)", function() {
     beforeEach(function() {
       this.findAllDefer = this.hoodie.defer();
       this.sandbox.stub(this.store, 'findAll').returns(this.findAllDefer.promise());
     });
 
     it("should return a promise", function() {
-      expect(this.store.removeAll().state()).to.eql('pending');
+      expect(this.store.removeAll()).to.be.pending();
     });
 
-    it("should call store.findAll", function() {
-      this.store.removeAll('filter');
-      expect(this.store.findAll.calledWith('filter')).to.be.ok();
-    });
-
-    _when("store.findAll fails", function() {
-
-      beforeEach(function() {
-        this.findAllDefer.reject({
-          error: 'because'
-        });
-      });
-
-      it("should return a rejected promise", function() {
-        var promise = this.store.removeAll();
-
-        promise.then(this.noop, function (res) {
-          expect(res).to.eql({error: 'because'});
-        });
-      });
-
-    });
-
-    _when("store.findAll returns 3 objects", function() {
-
-      beforeEach(function() {
-        this.sandbox.spy(this.store, 'remove');
-
-        this.object1 = {
-          type: 'task',
-          id: '1',
-          title: 'some'
-        };
-        this.object2 = {
-          type: 'task',
-          id: '2',
-          title: 'thing'
-        };
-        this.object3 = {
-          type: 'task',
-          id: '3',
-          title: 'funny'
-        };
-        this.findAllDefer.resolve([this.object1, this.object2, this.object3]);
-      });
-
-      it("should call remove for each object", function() {
-        this.store.removeAll();
-        expect(this.store.remove.calledWith('task', '1', {})).to.be.ok();
-        expect(this.store.remove.calledWith('task', '2', {})).to.be.ok();
-        expect(this.store.remove.calledWith('task', '3', {})).to.be.ok();
-      });
-
-      it("should pass options", function() {
-        this.store.removeAll(null, {
-          something: 'optional'
-        });
-        expect(this.store.remove.calledWith('task', '1', {
-          something: 'optional'
-        })).to.be.ok();
-        expect(this.store.remove.calledWith('task', '2', {
-          something: 'optional'
-        })).to.be.ok();
-        expect(this.store.remove.calledWith('task', '3', {
-          something: 'optional'
-        })).to.be.ok();
-      });
-
-    });
-
-  });
+    it.skip("should call backend.removeAll");
+  }); // #removeAll
 
   //
   describe("#trigger", function() {
-
     beforeEach(function() {
       this.sandbox.spy(this.hoodie, "trigger");
     });
@@ -668,15 +555,14 @@ describe("Hoodie.Store", function() {
         funky: 'fresh'
       });
 
-      expect(this.hoodie.trigger).to.be.calledWith('store:event', {
+      expect(this.hoodie.trigger).to.be.calledWith('funkstore:event', {
         funky: 'fresh'
       });
     });
-  });
+  }); // #trigger
 
   //
   describe("#on", function() {
-
     beforeEach(function() {
       this.sandbox.spy(this.hoodie, "on");
     });
@@ -685,21 +571,20 @@ describe("Hoodie.Store", function() {
       this.store.on('event', {
         funky: 'fresh'
       });
-      expect(this.hoodie.on.calledWith('store:event', {
+      expect(this.hoodie.on).to.be.calledWith('funkstore:event', {
         funky: 'fresh'
-      })).to.be.ok();
+      });
     });
 
     it("should namespace multiple events correctly", function() {
       var cb = this.sandbox.spy();
       this.store.on('super funky fresh', cb);
-      expect(this.hoodie.on.calledWith('store:super store:funky store:fresh', cb)).to.be.ok();
+      expect(this.hoodie.on.calledWith('funkstore:super funkstore:funky funkstore:fresh', cb)).to.be.ok();
     });
-  });
+  }); // #on
 
   //
   describe("#unbind", function() {
-
     beforeEach(function() {
       this.sandbox.spy(this.hoodie, "unbind");
     });
@@ -708,11 +593,9 @@ describe("Hoodie.Store", function() {
       var cb = function() {};
 
       this.store.unbind('event', cb);
-      expect(this.hoodie.unbind.calledWith('store:event', cb)).to.be.ok();
+      expect(this.hoodie.unbind).to.be.calledWith('funkstore:event', cb);
     });
-  });
-
-
+  }); // #unbind
 
   //
   describe("#decoratePromises", function() {
@@ -745,10 +628,9 @@ describe("Hoodie.Store", function() {
           }
         });
         promise = this.store[method]('task', '12');
-        expect(promise.funk()).to.have.property('done');
-        expect(promise.funk()).to.not.have.property('resolved');
+        expect(promise.funk()).to.be.promise();
       });
     }
-  });
+  }); // #decoratePromises
 });
 

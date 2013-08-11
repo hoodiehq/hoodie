@@ -356,7 +356,8 @@ function hoodieStore (hoodie) {
       save: localStore.save,
       find: localStore.find,
       findAll: localStore.findAll,
-      remove: localStore.remove
+      remove: localStore.remove,
+      removeAll: localStore.removeAll,
     }
   });
 

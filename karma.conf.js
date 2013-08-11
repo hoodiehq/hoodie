@@ -37,7 +37,8 @@ files = [
   'test/mocks/*.js',
   // 'test/specs/hoodie.spec.js',
 
-  'test/specs/hoodie/local_store.spec.js',
+  'test/specs/hoodie/store.spec.js',
+  // 'test/specs/hoodie/local_store.spec.js',
   // 'test/specs/hoodie/dispose.spec.js',
   // 'test/specs/hoodie/events.spec.js',
   // 'test/specs/hoodie/connection.spec.js',

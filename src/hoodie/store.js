@@ -302,7 +302,7 @@ function hoodieStoreApi(hoodie, options) {
       }
     }
 
-    return decoratePromise( removeAll.findAll(type), options );
+    return decoratePromise( backend.removeAll(type), options );
   };
 
 
@@ -320,7 +320,7 @@ function hoodieStoreApi(hoodie, options) {
   // ---------
 
   // proxies to hoodie.trigger
-  event.trigger = function trigger() {
+  api.trigger = function trigger() {
     var eventName, parameters, _ref;
     eventName = arguments[0],
     parameters = 2 <= arguments.length ? Array.prototype.slice.call(arguments, 1) : [];
@@ -332,7 +332,7 @@ function hoodieStoreApi(hoodie, options) {
   // ---------
 
   // proxies to hoodie.on
-  event.on = function on(eventName, data) {
+  api.on = function on(eventName, data) {
     eventName = eventName.replace(/(^| )([^ ]+)/g, '$1'+storeName+':$2');
     return hoodie.on(eventName, data);
   };
@@ -342,7 +342,7 @@ function hoodieStoreApi(hoodie, options) {
   // ---------
 
   // proxies to hoodie.unbind
-  event.unbind = function unbind(eventName, callback) {
+  api.unbind = function unbind(eventName, callback) {
     eventName = storeName +':' + eventName;
     return hoodie.unbind(eventName, callback);
   };
@@ -369,7 +369,7 @@ function hoodieStoreApi(hoodie, options) {
         });
       }
 
-      if (arguments.length > 0 && !isValidId(id)) {
+      if (arguments.length > 1 && !isValidId(id)) {
         return Hoodie.Errors.INVALID_KEY({
           id: id
         });
@@ -398,12 +398,12 @@ function hoodieStoreApi(hoodie, options) {
 
   // / not allowed for id
   function isValidId(key) {
-    return new RegExp(/^[^\/]+$/).test(key);
+    return new RegExp(/^[^\/]+$/).test(key || '');
   }
 
   // / not allowed for type
   function isValidType(key) {
-    return new RegExp(/^[^\/]+$/).test(key);
+    return new RegExp(/^[^\/]+$/).test(key || '');
   }
 
   //
@@ -412,11 +412,11 @@ function hoodieStoreApi(hoodie, options) {
   }
 
   function resolveWith() {
-    var promise = hoodie.resolveWith(null, arguments);
+    var promise = hoodie.resolveWith.apply(null, arguments);
     return decoratePromise(promise);
   }
   function rejectWith() {
-    var promise = hoodie.rejectWith(null, arguments);
+    var promise = hoodie.rejectWith.apply(null, arguments);
     return decoratePromise(promise);
   }
 
