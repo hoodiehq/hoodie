@@ -80,10 +80,10 @@ function hoodieRemoteStore (hoodie, options) {
 
     switch (true) {
     case (type !== undefined) && remote.prefix !== '':
-      startkey = '' + remote.prefix + type + '/';
+      startkey = remote.prefix + type + '/';
       break;
     case type !== undefined:
-      startkey = '' + type + '/';
+      startkey = type + '/';
       break;
     case remote.prefix !== '':
       startkey = remote.prefix;
@@ -101,7 +101,7 @@ function hoodieRemoteStore (hoodie, options) {
         charCode = chars.charCodeAt(0);
         return String.fromCharCode(charCode + 1);
       });
-      path = '' + path + '&startkey=\'' + (encodeURIComponent(startkey)) + '\'&endkey=\'' + (encodeURIComponent(endkey)) + '\'';
+      path = '' + path + '&startkey="' + (encodeURIComponent(startkey)) + '"&endkey="' + (encodeURIComponent(endkey)) + '"';
     }
 
     return remote.request('GET', path).pipe(mapDocsFromFindAll).pipe(parseAllFromRemote);

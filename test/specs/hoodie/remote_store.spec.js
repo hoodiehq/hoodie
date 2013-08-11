@@ -71,9 +71,9 @@ describe("Hoodie.Remote", function() {
 
     it("should set options.contentType to 'application/json'", function() {
       this.remote.request("GET", "/something");
-      expect(this.hoodie.request.calledWith("GET", "/something", {
+      expect(this.hoodie.request).to.be.calledWith("GET", "/something", {
         contentType: 'application/json'
-      })).to.be.ok();
+      });
     });
 
     it("should prefix path with @name (encoded)", function() {
@@ -117,7 +117,7 @@ describe("Hoodie.Remote", function() {
     });
   }); // #request
 
-  describe.only("#find(type, id)", function() {
+  describe("#find(type, id)", function() {
 
     it("should send a GET request to `/type%2Fid`", function() {
       var path, type;
@@ -174,14 +174,12 @@ describe("Hoodie.Remote", function() {
       });
 
     });
-
   });
 
-  describe("#findAll(type)", function() {
+  describe.only("#findAll(type)", function() {
 
     it("should return a promise", function() {
-      expect(this.remote.findAll()).to.have.property('done');
-      expect(this.remote.findAll()).to.not.have.property('resolved');
+      expect(this.storeBackend.findAll()).to.promise();
     });
 
     _when("type is not set", function() {
@@ -193,8 +191,8 @@ describe("Hoodie.Remote", function() {
         });
 
         it("should send a GET to /_all_docs?include_docs=true", function() {
-          this.remote.findAll();
-          expect(this.remote.request.calledWith("GET", "/_all_docs?include_docs=true")).to.be.ok();
+          this.storeBackend.findAll();
+          expect(this.hoodie.request).to.be.calledWith("GET", "/my%2Fstore/_all_docs?include_docs=true", { "contentType": "application/json" });
         });
 
       });
@@ -206,8 +204,8 @@ describe("Hoodie.Remote", function() {
         });
 
         it("should send a GET to /_all_docs?include_docs=true&startkey=\"$public/\"&endkey=\"$public0\"", function() {
-          this.remote.findAll();
-          expect(this.remote.request.calledWith("GET", '/_all_docs?include_docs=true&startkey="%24public%2F"&endkey="%24public0"')).to.be.ok();
+          this.storeBackend.findAll();
+          expect(this.hoodie.request).to.be.calledWith("GET", '/my%2Fstore/_all_docs?include_docs=true&startkey="%24public%2F"&endkey="%24public0"', { "contentType": "application/json" });
         });
 
       });
@@ -217,8 +215,8 @@ describe("Hoodie.Remote", function() {
     _when("type is todo", function() {
 
       it('should send a GET to /_all_docs?include_docs=true&startkey="todo/"&endkey="todo0"', function() {
-        this.remote.findAll('todo');
-        expect(this.remote.request.calledWith("GET", '/_all_docs?include_docs=true&startkey="todo%2F"&endkey="todo0"')).to.be.ok();
+        this.storeBackend.findAll('todo');
+        expect(this.hoodie.request).to.be.calledWith("GET", '/my%2Fstore/_all_docs?include_docs=true&startkey="todo%2F"&endkey="todo0"', { "contentType": "application/json" });
       });
 
       _and("prefix is 'remote_prefix'", function() {
@@ -228,8 +226,8 @@ describe("Hoodie.Remote", function() {
         });
 
         it('should send a GET to /_all_docs?include_docs=true&startkey="remote_prefix%2Ftodo%2F"&endkey="remote_prefix%2Ftodo0"', function() {
-          this.remote.findAll('todo');
-          expect(this.remote.request.calledWith("GET", '/_all_docs?include_docs=true&startkey="remote_prefix%2Ftodo%2F"&endkey="remote_prefix%2Ftodo0"')).to.be.ok();
+          this.storeBackend.findAll('todo');
+          expect(this.hoodie.request).to.be.calledWith("GET", '/my%2Fstore/_all_docs?include_docs=true&startkey="remote_prefix%2Ftodo%2F"&endkey="remote_prefix%2Ftodo0"', { "contentType": "application/json" });
         });
 
       });
@@ -262,7 +260,7 @@ describe("Hoodie.Remote", function() {
           createdAt: '2012-12-12T22:00:00.000Z',
           updatedAt: '2012-12-21T22:00:00.000Z'
         };
-        this.remote.findAll().then(function (res) {
+        this.storeBackend.findAll().then(function (res) {
           expect(res).to.eql([object]);
         });
       });
@@ -276,7 +274,7 @@ describe("Hoodie.Remote", function() {
       });
 
       it("should be rejected with the response error", function() {
-        var promise = this.remote.findAll();
+        var promise = this.storeBackend.findAll();
         promise.fail(function (res) {
           expect(res).to.eql("error");
         });
@@ -305,7 +303,7 @@ describe("Hoodie.Remote", function() {
     });
 
     it("should return promise by @request", function() {
-      this.remote.request.returns('request_promise');
+      this.hoodie.request.returns('request_promise');
       expect(this.remote.save("car", 123, {})).to.eql('request_promise');
     });
 
@@ -316,7 +314,7 @@ describe("Hoodie.Remote", function() {
         this.remote.save("car", 123, {
           color: "red"
         });
-        var _ref = this.remote.request.args[0];
+        var _ref = this.hoodie.request.args[0];
         this.type = _ref[0],
         this.path = _ref[1],
         (_ref1 = _ref[2],
@@ -351,7 +349,7 @@ describe("Hoodie.Remote", function() {
         this.remote.save("car", 123, {
           color: "red"
         });
-        _ref = this.remote.request.args[0], this.type = _ref[0], this.path = _ref[1], (_ref1 = _ref[2], this.data = _ref1.data), _ref;
+        _ref = this.hoodie.request.args[0], this.type = _ref[0], this.path = _ref[1], (_ref1 = _ref[2], this.data = _ref1.data), _ref;
       });
 
       it("should send a PUT request to `/remote_prefix%2Fcar%2F123`", function() {
@@ -561,9 +559,9 @@ describe("Hoodie.Remote", function() {
       it("should send a longpoll GET request to the _changes feed", function() {
         var method, path, _ref;
         this.remote.pull();
-        expect(this.remote.request.called).to.be.ok();
+        expect(this.hoodie.request.called).to.be.ok();
 
-        _ref = this.remote.request.args[0], method = _ref[0], path = _ref[1];
+        _ref = this.hoodie.request.args[0], method = _ref[0], path = _ref[1];
         expect(method).to.eql('GET');
         expect(path).to.eql('/_changes?include_docs=true&since=0&heartbeat=10000&feed=longpoll');
       });
@@ -584,8 +582,8 @@ describe("Hoodie.Remote", function() {
       it("should send a normal GET request to the _changes feed", function() {
         var method, path, _ref;
         this.remote.pull();
-        expect(this.remote.request.called).to.be.ok();
-        _ref = this.remote.request.args[0], method = _ref[0], path = _ref[1];
+        expect(this.hoodie.request.called).to.be.ok();
+        _ref = this.hoodie.request.args[0], method = _ref[0], path = _ref[1];
         expect(method).to.eql('GET');
         expect(path).to.eql('/_changes?include_docs=true&since=0');
       });
@@ -596,9 +594,9 @@ describe("Hoodie.Remote", function() {
 
       beforeEach(function() {
         var _this = this;
-        this.remote.request.returns({
+        this.hoodie.request.returns({
           then: function(success) {
-            _this.remote.request.returns({
+            _this.hoodie.request.returns({
               then: function() {}
             });
             success(Mocks.changesResponse());
@@ -686,9 +684,9 @@ describe("Hoodie.Remote", function() {
 
       beforeEach(function() {
         var _this = this;
-        this.remote.request.returns({
+        this.hoodie.request.returns({
           then: function() {
-            _this.remote.request.returns({
+            _this.hoodie.request.returns({
               then: function() {}
             });
           }
@@ -714,9 +712,9 @@ describe("Hoodie.Remote", function() {
 
       beforeEach(function() {
         var _this = this;
-        this.remote.request.returns({
+        this.hoodie.request.returns({
           then: function(success, error) {
-            _this.remote.request.returns({
+            _this.hoodie.request.returns({
               then: function() {}
             });
             error({
@@ -737,9 +735,9 @@ describe("Hoodie.Remote", function() {
 
       beforeEach(function() {
         var _this = this;
-        this.remote.request.returns({
+        this.hoodie.request.returns({
           then: function(success, error) {
-            _this.remote.request.returns({
+            _this.hoodie.request.returns({
               then: function() {}
             });
             error({
@@ -771,9 +769,9 @@ describe("Hoodie.Remote", function() {
 
       beforeEach(function() {
         var _this = this;
-        this.remote.request.returns({
+        this.hoodie.request.returns({
           then: function(success, error) {
-            _this.remote.request.returns({
+            _this.hoodie.request.returns({
               then: function() {}
             });
             error({
@@ -817,9 +815,9 @@ describe("Hoodie.Remote", function() {
 
       beforeEach(function() {
         var _this = this;
-        this.remote.request.returns({
+        this.hoodie.request.returns({
           then: function(success, error) {
-            _this.remote.request.returns({
+            _this.hoodie.request.returns({
               then: function() {}
             });
             error({}, 'error object');
@@ -864,7 +862,7 @@ describe("Hoodie.Remote", function() {
         this.remote.push();
         this.remote.push([]);
 
-        expect(this.remote.request.called).to.not.be.ok();
+        expect(this.hoodie.request.called).to.not.be.ok();
       });
 
     });
@@ -893,8 +891,8 @@ describe("Hoodie.Remote", function() {
       });
 
       it("should POST the passed objects", function() {
-        expect(this.remote.request.called).to.be.ok();
-        var data = this.remote.request.args[2].data;
+        expect(this.hoodie.request.called).to.be.ok();
+        var data = this.hoodie.request.args[2].data;
         expect(data.docs.length).to.eql(3);
       });
 
@@ -904,8 +902,8 @@ describe("Hoodie.Remote", function() {
 
       beforeEach(function() {
         this.remote.push(Mocks.changedObjects());
-        expect(this.remote.request.called).to.be.ok();
-        var _ref = this.remote.request.args[0];
+        expect(this.hoodie.request.called).to.be.ok();
+        var _ref = this.hoodie.request.args[0];
 
         this.method = _ref[0],
         this.path = _ref[1],
@@ -967,9 +965,9 @@ describe("Hoodie.Remote", function() {
       });
 
       xit("should prefix all document IDs with '$public/'", function() {
-        expect(this.remote.request.called).to.be.ok();
+        expect(this.hoodie.request.called).to.be.ok();
 
-        var data = this.remote.request.args[2].data;
+        var data = this.hoodie.request.args[2].data;
         expect(data.docs[0]._id).to.eql('$public/todo/1');
       });
 
@@ -993,8 +991,8 @@ describe("Hoodie.Remote", function() {
       });
 
       it("should add `-local` suffix to rev number", function() {
-        expect(this.remote.request).wasCalled();
-        var data = this.remote.request.args[2].data;
+        expect(this.hoodie.request).wasCalled();
+        var data = this.hoodie.request.args[2].data;
         expect(data.docs[0]._rev).to.eql('1-uuid');
         expect(data.docs[1]._rev).to.eql('1-uuid-local');
       });
