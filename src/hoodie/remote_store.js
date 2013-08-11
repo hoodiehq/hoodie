@@ -241,35 +241,6 @@ function hoodieRemoteStore (hoodie, options) {
   };
 
 
-  // get
-  // -----
-
-  // send a GET request to the named view
-  //
-  remote.get = function get() {
-    return console.log.apply(
-      console, ['.get() not yet implemented']
-      .concat(Array.prototype.slice.call(arguments))
-    );
-  };
-
-
-  // post
-  // ------
-
-  // sends a POST request to the specified updated_function
-  //
-  remote.post = function post() {
-    return console.log.apply(
-      console, ['.post() not yet implemented']
-      .concat(Array.prototype.slice.call(arguments))
-    );
-  };
-
-
-
-
-
   // isKnownObject
   // ---------------
 

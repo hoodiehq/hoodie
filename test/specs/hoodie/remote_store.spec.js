@@ -117,10 +117,6 @@ describe("Hoodie.Remote", function() {
     });
   }); // #request
 
-  describe("get(view, params)", function() {});
-
-  describe("post(view, params)", function() {});
-
   describe("#find(type, id)", function() {
 
     it("should send a GET request to `/type%2Fid`", function() {
