@@ -176,7 +176,7 @@ describe("Hoodie.Remote", function() {
     });
   });
 
-  describe.only("#findAll(type)", function() {
+  describe("#findAll(type)", function() {
 
     it("should return a promise", function() {
       expect(this.storeBackend.findAll()).to.promise();
@@ -281,50 +281,48 @@ describe("Hoodie.Remote", function() {
       });
 
     });
-
   });
 
-  xdescribe("#save(type, id, object)", function() {
+  describe("#save(type, id, object)", function() {
 
     beforeEach(function() {
       this.sandbox.stub(this.hoodie, "uuid").returns("uuid567");
     });
 
     it("should generate an id if it is undefined", function() {
-      this.remote.save("car", void 0, {});
-      expect(this.hoodie.uuid.called).to.be.ok();
+      this.storeBackend.save({type: 'car'});
+      expect(this.hoodie.uuid).to.be.called();
     });
 
     it("should not generate an id if id is set", function() {
-      this.sandbox.stub(this.remote, "_generateNewRevisionId").returns('newRevId');
-      this.remote.save("car", 123, {});
-
-      expect(this.hoodie.uuid.called).to.not.be.ok();
+      this.storeBackend.save({type: 'car', id: '123'});
+      expect(this.hoodie.uuid).to.not.be.called();
     });
 
     it("should return promise by @request", function() {
       this.hoodie.request.returns('request_promise');
-      expect(this.remote.save("car", 123, {})).to.eql('request_promise');
+      expect(this.storeBackend.save("car", 123, {})).to.eql('request_promise');
     });
 
     _when("saving car/123 with color: red", function() {
 
       beforeEach(function() {
         var _ref1;
-        this.remote.save("car", 123, {
+        this.storeBackend.save({
+          type: 'car',
+          id: '123',
           color: "red"
         });
-        var _ref = this.hoodie.request.args[0];
-        this.type = _ref[0],
-        this.path = _ref[1],
-        (_ref1 = _ref[2],
-         this.data = _ref1.data),
-         _ref;
+
+        var args = this.hoodie.request.args[0];
+        this.type = args[0];
+        this.path = args[1];
+        this.data = JSON.parse(args[2].data);
       });
 
-      it("should send a PUT request to `/car%2F123`", function() {
+      it("should send a PUT request to `/my%2Fstore/car%2F123`", function() {
         expect(this.type).to.eql('PUT');
-        expect(this.path).to.eql('/car%2F123');
+        expect(this.path).to.eql('/my%2Fstore/car%2F123');
       });
 
       it("should add type to saved object", function() {
@@ -342,22 +340,27 @@ describe("Hoodie.Remote", function() {
     });
 
     _when("saving car/123 with color: red and prefix is 'remote_prefix'", function() {
-
       beforeEach(function() {
-        var _ref, _ref1;
+
         this.remote.prefix = 'remote_prefix/';
-        this.remote.save("car", 123, {
+        this.storeBackend.save({
+          type: 'car',
+          id: '123',
           color: "red"
         });
-        _ref = this.hoodie.request.args[0], this.type = _ref[0], this.path = _ref[1], (_ref1 = _ref[2], this.data = _ref1.data), _ref;
+
+        var args = this.hoodie.request.args[0];
+        this.type = args[0];
+        this.path = args[1];
+        this.data = JSON.parse(args[2].data);
       });
 
-      it("should send a PUT request to `/remote_prefix%2Fcar%2F123`", function() {
+      it("should send a PUT request to `/my%2Fstore/remote_prefix%2Fcar%2F123`", function() {
         expect(this.type).to.eql('PUT');
-        expect(this.path).to.eql('/remote_prefix%2Fcar%2F123');
+        expect(this.path).to.eql('/my%2Fstore/remote_prefix%2Fcar%2F123');
       });
 
-      it("should set _id to `remote_prefix/car/123`", function() {
+      it.only("should set _id to `remote_prefix/car/123`", function() {
         expect(this.data._id).to.eql('remote_prefix/car/123');
       });
 

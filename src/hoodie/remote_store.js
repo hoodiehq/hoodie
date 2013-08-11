@@ -117,6 +117,10 @@ function hoodieRemoteStore (hoodie, options) {
   remoteStore.save = function save(object) {
     var path;
 
+    if (!object.id) {
+      object.id = hoodie.uuid();
+    }
+
     object = parseForRemote(object);
     path = '/' + encodeURIComponent(object._id);
     return remote.request('PUT', path, {
