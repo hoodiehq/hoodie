@@ -437,29 +437,25 @@ describe("Hoodie.Remote", function() {
     });
   });
 
-  describe("#getSinceNr()", function() {
+  describe.only("#getSinceNr()", function() {
 
     _when("since not set before", function() {
-
       it("should return 0", function() {
         expect(this.remote._since).to.eql(void 0);
         expect(this.remote.getSinceNr()).to.eql(0);
       });
-
     });
 
     _when("since set to 100 before", function() {
 
       beforeEach(function() {
-        this.remote.setSinceNr(100);
+        this.remote = hoodieRemoteStore(this.hoodie, { since: 100 } );
       });
 
       it("should return 100", function() {
         expect(this.remote.getSinceNr()).to.eql(100);
       });
-
     });
-
   });
 
   describe("#setSinceNr(since)", function() {
