@@ -2,5 +2,6 @@
 be disposed using this method. A <code>dispose</code> event
 gets triggered that the modules react on.</p></div></div><div class="code"><div class="wrapper">  <span class="kd">function</span> <span class="nx">dispose</span><span class="p">()</span> <span class="p">{</span>
     <span class="nx">hoodie</span><span class="p">.</span><span class="nx">trigger</span><span class="p">(</span><span class="s1">&#39;dispose&#39;</span><span class="p">);</span>
+    <span class="nx">hoodie</span><span class="p">.</span><span class="nx">unbind</span><span class="p">();</span>
   <span class="p">}</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>Public API</p></div></div><div class="code"><div class="wrapper">  <span class="nx">hoodie</span><span class="p">.</span><span class="nx">dispose</span> <span class="o">=</span> <span class="nx">dispose</span><span class="p">;</span>
 <span class="p">}</span></div></div></div></div></body></html>

@@ -5,7 +5,7 @@
 // the door to world domination (apps)
 //
 
-(function(window) {
+(function(global) {
 
   'use strict';
 
@@ -27,10 +27,10 @@
       throw new Error('usage: new Hoodie(url);');
     }
 
-    if (hoodie.baseUrl !== baseUrl) {
-      '/_api'; // default to current domain
+    if (baseUrl) {
+      hoodie.baseUrl = baseUrl.replace(/\/+$/, '');
     } else {
-      baseUrl.replace(/\/+$/, ''); // remove trailing slash(es)
+      hoodie.baseUrl = '/_api'; // default to current domain
     }
 
 
@@ -44,6 +44,11 @@
     hoodie.extend = function extend(extension) {
       extension(hoodie);
     };
+
+
+    //
+    // Extending hoodie core
+    //
 
     /* global hoodieAccount, hoodieRemote, hoodieConfig, hoodieStore,
               hoodiePromises, hoodieRequest, hoodieConnection, hoodieUUID, hoodieDispose, hoodieOpen
@@ -95,8 +100,37 @@
     // * hoodie.remote
     hoodie.extend( hoodieRemote );
 
-    // load user extensions
+    //
+    // loading user extensions
+    //
     applyExtensions(hoodie);
+
+
+    //
+    // Initializations
+    //
+
+    // set username & hash from config (local store)
+    hoodie.account.username = hoodie.config.get('_account.username');
+    hoodie.account.ownerHash = hoodie.config.get('_account.ownerHash');
+
+    // check for pending password reset
+    hoodie.account.checkPasswordReset();
+
+    // clear config on sign out
+    hoodie.on('account:signout', hoodie.config.clear);
+
+    // hoodie.store
+    hoodie.store.patchIfNotPersistant();
+    hoodie.store.subscribeToOutsideEvents();
+    hoodie.store.bootstrapDirtyObjects();
+
+    // hoodie.remote
+    hoodie.remote.loadListOfKnownObjectsFromLocalStore();
+    hoodie.remote.subscribeToEvents();
+
+    // authenticate
+    hoodie.account.authenticate().then( hoodie.remote.connect );
   }
 
   // Extending hoodie
@@ -155,7 +189,7 @@
   } else {
 
     // set global
-    window.Hoodie = Hoodie;
+    global.Hoodie = Hoodie;
   }
 
 })(window);
@@ -444,6 +478,11 @@ function hoodieConnection(hoodie) {
 
   'use strict';
 
+  // state
+  var online = true;
+  var checkConnectionInterval = 30000;
+  var checkConnectionRequest = null;
+
   // Check Connection
   // ------------------
 
@@ -462,10 +501,7 @@ function hoodieConnection(hoodie) {
   // - triggers `online` event
   // - sets `checkConnectionInterval = 30000`
   //
-  var online = true;
-  var checkConnectionInterval = 30000;
-  var checkConnectionRequest = null;
-  function checkConnection() {
+  hoodie.checkConnection = function checkConnection() {
 
     var req = checkConnectionRequest;
 
@@ -473,22 +509,22 @@ function hoodieConnection(hoodie) {
       return req;
     }
 
-    checkConnectionRequest = hoodie.request('GET', '/').pipe(
+    checkConnectionRequest = hoodie.request('GET', '/').then(
       handleCheckConnectionSuccess,
       handleCheckConnectionError
     );
 
     return checkConnectionRequest;
-  }
+  };
 
 
   // isOnline
   // ----------
 
   //
-  function isOnline() {
+  hoodie.isOnline = function isOnline() {
     return online;
-  }
+  };
 
 
   //
@@ -497,7 +533,7 @@ function hoodieConnection(hoodie) {
   function handleCheckConnectionSuccess() {
     checkConnectionInterval = 30000;
 
-    window.setTimeout(checkConnection, checkConnectionInterval);
+    window.setTimeout(hoodie.checkConnection, checkConnectionInterval);
 
     if (! hoodie.isOnline()) {
       hoodie.trigger('reconnected');
@@ -514,7 +550,7 @@ function hoodieConnection(hoodie) {
   function handleCheckConnectionError() {
     checkConnectionInterval = 3000;
 
-    window.setTimeout(checkConnection, checkConnectionInterval);
+    window.setTimeout(hoodie.checkConnection, checkConnectionInterval);
 
     if (hoodie.isOnline()) {
       hoodie.trigger('disconnected');
@@ -523,13 +559,6 @@ function hoodieConnection(hoodie) {
 
     return hoodie.reject();
   }
-
-
-  //
-  // public API
-  //
-  hoodie.isOnline = isOnline;
-  hoodie.checkConnection = checkConnection;
 }
 
 /* exported hoodieUUID */
@@ -596,7 +625,7 @@ function hoodieDispose (hoodie) {
 
 
 /* exported hoodieOpen */
-/* global hoodieRemoteBase */
+/* global hoodieRemoteStore */
 
 // Open stores
 // -------------
@@ -621,7 +650,7 @@ function hoodieOpen(hoodie) {
       name: storeName
     });
 
-    return hoodieRemoteBase(hoodie, options);
+    return hoodieRemoteStore(hoodie, options);
   }
 
   //
@@ -630,7 +659,7 @@ function hoodieOpen(hoodie) {
   hoodie.open = open;
 }
 
-/* exported hoodieStoreBase */
+/* exported hoodieStoreApi */
 
 // Store
 // ============
@@ -643,314 +672,389 @@ function hoodieOpen(hoodie) {
 //
 
 /* jslint unused: false */
-function hoodieStoreBase(hoodie) {
+function hoodieStoreApi(hoodie, options) {
 
-  var store = {
-    // Save
-    // --------------
+  // public API
+  var api = {};
 
-    // creates or replaces an an eventually existing object in the store
-    // with same type & id.
-    //
-    // When id is undefined, it gets generated and a new object gets saved
-    //
-    // example usage:
-    //
-    //     store.save('car', undefined, {color: 'red'})
-    //     store.save('car', 'abc4567', {color: 'red'})
-    //
-    save : function(type, id, object, options) {
-      var defer;
+  // persistance logic
+  var backend = {};
 
-      if (options === null) {
-        options = {};
-      }
-
-      defer = hoodie.defer();
-
-      if (typeof object !== 'object' || Array.isArray(object)) {
-        defer.reject(Hoodie.Errors.INVALID_ARGUMENTS('invalid object'));
-        return defer.promise();
-      }
-
-      // validations
-      if (id && !isValidId(id)) {
-        return defer.reject(Hoodie.Errors.INVALID_KEY({
-          id: id
-        })).promise();
-      }
-      if (!isValidType(type)) {
-        return defer.reject(Hoodie.Errors.INVALID_KEY({
-          type: type
-        })).promise();
-      }
-
-      return defer;
-    },
-
-
-    // Add
-    // -------------------
-
-    // `.add` is an alias for `.save`, with the difference that there is no id argument.
-    // Internally it simply calls `.save(type, undefined, object).
-    //
-    add : function(type, object, options) {
-
-      if (object === undefined) {
-        object = {};
-      }
-
-      options = options || {};
-
-      return store.save(type, object.id, object);
-    },
-
-
-    // Update
-    // -------------------
-
-    // In contrast to `.save`, the `.update` method does not replace the stored object,
-    // but only changes the passed attributes of an exsting object, if it exists
-    //
-    // both a hash of key/values or a function that applies the update to the passed
-    // object can be passed.
-    //
-    // example usage
-    //
-    // hoodie.store.update('car', 'abc4567', {sold: true})
-    // hoodie.store.update('car', 'abc4567', function(obj) { obj.sold = true })
-    //
-    update : function(type, id, objectUpdate, options) {
-      var defer, _loadPromise;
-
-      defer = hoodie.defer();
-
-      _loadPromise = store.find(type, id).pipe(function(currentObj) {
-        var changedProperties, newObj, value;
-
-        // normalize input
-        newObj = $.extend(true, {}, currentObj);
-
-        if (typeof objectUpdate === 'function') {
-          objectUpdate = objectUpdate(newObj);
-        }
-
-        if (!objectUpdate) {
-          return defer.resolve(currentObj);
-        }
-
-        // check if something changed
-        changedProperties = (function() {
-          var _results = [];
-
-          for (var key in objectUpdate) {
-            if (objectUpdate.hasOwnProperty(key)) {
-              value = objectUpdate[key];
-              if ((currentObj[key] !== value) === false) {
-                continue;
-              }
-              // workaround for undefined values, as $.extend ignores these
-              newObj[key] = value;
-              _results.push(key);
-            }
-          }
-          return _results;
-        })();
-
-        if (!(changedProperties.length || options)) {
-          return defer.resolve(newObj);
-        }
-
-        //apply update
-        store.save(type, id, newObj, options).then(defer.resolve, defer.reject);
-      });
-
-      // if not found, add it
-      _loadPromise.fail(function() {
-        return store.save(type, id, objectUpdate, options).then(defer.resolve, defer.reject);
-      });
-
-      return defer.promise();
-    },
-
-
-    // updateAll
-    // -----------------
-
-    // update all objects in the store, can be optionally filtered by a function
-    // As an alternative, an array of objects can be passed
-    //
-    // example usage
-    //
-    // hoodie.store.updateAll()
-    //
-    updateAll : function(filterOrObjects, objectUpdate, options) {
-      var promise;
-      options = options || {};
-
-      // normalize the input: make sure we have all objects
-      switch (true) {
-      case typeof filterOrObjects === 'string':
-        promise = store.findAll(filterOrObjects);
-        break;
-      case hoodie.isPromise(filterOrObjects):
-        promise = filterOrObjects;
-        break;
-      case $.isArray(filterOrObjects):
-        promise = hoodie.defer().resolve(filterOrObjects).promise();
-        break;
-      default: // e.g. null, update all
-        promise = store.findAll();
-      }
-
-      return promise.pipe(function(objects) {
-        // now we update all objects one by one and return a promise
-        // that will be resolved once all updates have been finished
-        var defer, object, _updatePromises;
-
-        defer = hoodie.defer();
-
-        if (!$.isArray(objects)) {
-          objects = [objects];
-        }
-
-        _updatePromises = (function() {
-          var _i, _len, _results;
-          _results = [];
-          for (_i = 0, _len = objects.length; _i < _len; _i++) {
-            object = objects[_i];
-            _results.push(store.update(object.type, object.id, objectUpdate, options));
-          }
-          return _results;
-        })();
-
-        $.when.apply(null, _updatePromises).then(defer.resolve);
-        return defer.promise();
-      });
-    },
-
-
-    // find
-    // -----------------
-
-    // loads one object from Store, specified by `type` and `id`
-    //
-    // example usage:
-    //
-    //     store.find('car', 'abc4567')
-    //
-    find : function(type, id) {
-      var defer;
-      defer = hoodie.defer();
-      if (!(typeof type === 'string' && typeof id === 'string')) {
-        return defer.reject(Hoodie.Errors.INVALID_ARGUMENTS('type & id are required')).promise();
-      }
-      return defer;
-    },
-
-
-    // find or add
-    // -------------
-
-    // 1. Try to find a share by given id
-    // 2. If share could be found, return it
-    // 3. If not, add one and return it.
-    //
-    findOrAdd : function(type, id, attributes) {
-      var defer;
-
-      if (attributes === null) {
-        attributes = {};
-      }
-
-      defer = hoodie.defer();
-      store.find(type, id).done(defer.resolve).fail(function() {
-        var newAttributes;
-        newAttributes = $.extend(true, {
-          id: id
-        }, attributes);
-        return store.add(type, newAttributes).then(defer.resolve, defer.reject);
-      });
-      return defer.promise();
-    },
-
-
-    // findAll
-    // ------------
-
-    // returns all objects from store.
-    // Can be optionally filtered by a type or a function
-    //
-    findAll : function() {
-      return hoodie.defer();
-    },
-
-
-    // Remove
-    // ------------
-
-    // Removes one object specified by `type` and `id`.
-    //
-    // when object has been synced before, mark it as deleted.
-    // Otherwise remove it from Store.
-    //
-    remove : function(type, id, options) {
-      var defer;
-
-      if (options === null) {
-        options = {};
-      }
-
-      defer = hoodie.defer();
-
-      if (!(typeof type === 'string' && typeof id === 'string')) {
-        return defer.reject(Hoodie.Errors.INVALID_ARGUMENTS('type & id are required')).promise();
-      }
-
-      return defer;
-    },
-
-
-    // removeAll
-    // -----------
-
-    // Destroyes all objects. Can be filtered by a type
-    //
-    removeAll : function(type, options) {
-      options = options || {};
-
-      return store.findAll(type).pipe(function(objects) {
-        var object, _i, _len, _results;
-
-        _results = [];
-
-        for (_i = 0, _len = objects.length; _i < _len; _i++) {
-          object = objects[_i];
-          _results.push(store.remove(object.type, object.id, options));
-        }
-
-        return _results;
-      });
-
-    }
+  // extend this property with extra functions that will be available
+  // on all promises returned by hoodie.store API. It has a reference
+  // to current hoodie instance by default
+  var promiseApi = {
+    hoodie: hoodie
   };
 
+  // name
+  var storeName = options.name || 'store';
+
+
+  // Validate
+  // --------------
+
+  // by default, we only check for a valid type & id.
+  // the validate method can be overwriten by passing
+  // options.validate
   //
-  // ## Private
+  // if `validate` returns nothing, the passed object is
+  // valid. Otherwise it returns an error
   //
+  api.validate = options.validate;
+
+  if (! options.validate) {
+    api.validate = function(object, options) {
+
+      if (!object) {
+        return Hoodie.Errors.INVALID_ARGUMENTS('no object passed');
+      }
+      if (!isValidType(object.type)) {
+        return Hoodie.Errors.INVALID_KEY({
+          type: object.type
+        });
+      }
+
+      if (! object.id) {
+        return;
+      }
+
+      if (!isValidId(object.id)) {
+        return Hoodie.Errors.INVALID_KEY({
+          id: object.id
+        });
+      }
+    };
+  }
+
+  // Save
+  // --------------
+
+  // creates or replaces an an eventually existing object in the store
+  // with same type & id.
+  //
+  // When id is undefined, it gets generated and a new object gets saved
+  //
+  // example usage:
+  //
+  //     store.save('car', undefined, {color: 'red'})
+  //     store.save('car', 'abc4567', {color: 'red'})
+  //
+  api.save = function save(type, id, properties, options) {
+
+    if ( options ) {
+      options = $.extend(true, {}, options);
+    } else {
+      options = {};
+    }
+
+    // don't mess with passed object
+    var object = $.extend(true, {}, properties, {type: type, id: id});
+
+    // validations
+    var error = api.validate(object, options || {});
+    if(error) { return rejectWith(error); }
+
+    return decoratePromise( backend.save(object, options || {}) );
+  };
+
+
+  // Add
+  // -------------------
+
+  // `.add` is an alias for `.save`, with the difference that there is no id argument.
+  // Internally it simply calls `.save(type, undefined, object).
+  //
+  api.add = function add(type, properties, options) {
+
+    if (properties === undefined) {
+      properties = {};
+    }
+
+    options = options || {};
+    return api.save(type, properties.id, properties);
+  };
+
+
+  // find
+  // ------
+
+  //
+  api.find = function find(type, id) {
+    return decoratePromise( backend.find(type, id) );
+  };
+
+
+  // find or add
+  // -------------
+
+  // 1. Try to find a share by given id
+  // 2. If share could be found, return it
+  // 3. If not, add one and return it.
+  //
+  api.findOrAdd = function findOrAdd(type, id, properties) {
+    var defer;
+
+    if (properties === null) {
+      properties = {};
+    }
+
+    function handleNotFound() {
+      var newProperties;
+      newProperties = $.extend(true, {
+        id: id
+      }, properties);
+      return api.add(type, newProperties);
+    }
+
+    // promise decorations get lost when piped through `then`,
+    // that's why we need to decorate the find's promise again.
+    var promise = api.find(type, id).then(null, handleNotFound);
+    return decoratePromise( promise );
+  };
+
+
+  // findAll
+  // ------------
+
+  // returns all objects from store.
+  // Can be optionally filtered by a type or a function
+  //
+  api.findAll = function findAll(type, options) {
+    return decoratePromise( backend.findAll(type, options) );
+  };
+
+
+  // Update
+  // -------------------
+
+  // In contrast to `.save`, the `.update` method does not replace the stored object,
+  // but only changes the passed attributes of an exsting object, if it exists
+  //
+  // both a hash of key/values or a function that applies the update to the passed
+  // object can be passed.
+  //
+  // example usage
+  //
+  // hoodie.store.update('car', 'abc4567', {sold: true})
+  // hoodie.store.update('car', 'abc4567', function(obj) { obj.sold = true })
+  //
+  api.update = function update(type, id, objectUpdate, options) {
+
+    function handleFound(currentObject) {
+      var changedProperties, newObj, value;
+
+      // normalize input
+      newObj = $.extend(true, {}, currentObject);
+
+      if (typeof objectUpdate === 'function') {
+        objectUpdate = objectUpdate(newObj);
+      }
+
+      if (!objectUpdate) {
+        return resolveWith(currentObject);
+      }
+
+      // check if something changed
+      changedProperties = (function() {
+        var _results = [];
+
+        for (var key in objectUpdate) {
+          if (objectUpdate.hasOwnProperty(key)) {
+            value = objectUpdate[key];
+            if ((currentObject[key] !== value) === false) {
+              continue;
+            }
+            // workaround for undefined values, as $.extend ignores these
+            newObj[key] = value;
+            _results.push(key);
+          }
+        }
+        return _results;
+      })();
+
+      if (!(changedProperties.length || options)) {
+        return resolveWith(newObj);
+      }
+
+      //apply update
+      return api.save(type, id, newObj, options);
+    }
+
+    function handleNotFound() {
+      return api.save(type, id, objectUpdate, options);
+    }
+
+    // promise decorations get lost when piped through `then`,
+    // that's why we need to decorate the find's promise again.
+    var promise = api.find(type, id).then(handleFound, handleNotFound);
+    return decoratePromise( promise );
+  };
+
+
+  // updateAll
+  // -----------------
+
+  // update all objects in the store, can be optionally filtered by a function
+  // As an alternative, an array of objects can be passed
+  //
+  // example usage
+  //
+  // hoodie.store.updateAll()
+  //
+  api.updateAll = function updateAll(filterOrObjects, objectUpdate, options) {
+    var promise;
+    options = options || {};
+
+    // normalize the input: make sure we have all objects
+    switch (true) {
+    case typeof filterOrObjects === 'string':
+      promise = api.findAll(filterOrObjects);
+      break;
+    case hoodie.isPromise(filterOrObjects):
+      promise = filterOrObjects;
+      break;
+    case $.isArray(filterOrObjects):
+      promise = hoodie.defer().resolve(filterOrObjects).promise();
+      break;
+    default: // e.g. null, update all
+      promise = api.findAll();
+    }
+
+    promise = promise.then(function(objects) {
+      // now we update all objects one by one and return a promise
+      // that will be resolved once all updates have been finished
+      var object, _updatePromises;
+
+      if (!$.isArray(objects)) {
+        objects = [objects];
+      }
+
+      _updatePromises = (function() {
+        var _i, _len, _results;
+        _results = [];
+        for (_i = 0, _len = objects.length; _i < _len; _i++) {
+          object = objects[_i];
+          _results.push(api.update(object.type, object.id, objectUpdate, options));
+        }
+        return _results;
+      })();
+
+      return $.when.apply(null, _updatePromises);
+    });
+
+    return decoratePromise( promise );
+  };
+
+
+  // Remove
+  // ------------
+
+  // Removes one object specified by `type` and `id`.
+  //
+  // when object has been synced before, mark it as deleted.
+  // Otherwise remove it from Store.
+  //
+  api.remove = function remove(type, id, options) {
+    return decoratePromise( backend.remove(type, id, options || {}) );
+  };
+
+
+  // removeAll
+  // -----------
+
+  // Destroye all objects. Can be filtered by a type
+  //
+  api.removeAll = function removeAll(type, options) {
+    return decoratePromise( backend.removeAll(type, options || {}) );
+  };
+
+
+  // decorate promises
+  // -------------------
+
+  // extend promises returned by store.api
+  api.decoratePromises = function decoratePromises(methods) {
+    return $.extend(promiseApi, methods);
+  };
+
+
+
+  // trigger
+  // ---------
+
+  // proxies to hoodie.trigger
+  api.trigger = function trigger() {
+    var eventName, parameters, _ref;
+    eventName = arguments[0],
+    parameters = 2 <= arguments.length ? Array.prototype.slice.call(arguments, 1) : [];
+    return (_ref = hoodie).trigger.apply(_ref, [storeName + ':' + eventName].concat(Array.prototype.slice.call(parameters)));
+  };
+
+
+  // on
+  // ---------
+
+  // proxies to hoodie.on
+  api.on = function on(eventName, data) {
+    eventName = eventName.replace(/(^| )([^ ]+)/g, '$1'+storeName+':$2');
+    return hoodie.on(eventName, data);
+  };
+
+
+  // unbind
+  // ---------
+
+  // proxies to hoodie.unbind
+  api.unbind = function unbind(eventName, callback) {
+    eventName = storeName +':' + eventName;
+    return hoodie.unbind(eventName, callback);
+  };
+
+
+  // required backend methods
+  // -------------------------
+  if (! options.backend ) {
+    throw new Error('options.backend must be passed');
+  }
+  var required = 'save find findAll remove removeAll'.split(' ');
+  required.forEach( function(methodName) {
+    if (!options.backend[methodName]) {
+      throw new Error('options.backend.'+methodName+' must be passed.');
+    }
+
+    backend[methodName] = options.backend[methodName];
+  });
+
+
+  // Private
+  // ---------
 
   // / not allowed for id
   function isValidId(key) {
-    return new RegExp(/^[^\/]+$/).test(key);
+    return new RegExp(/^[^\/]+$/).test(key || '');
   }
 
   // / not allowed for type
   function isValidType(key) {
-    return new RegExp(/^[^\/]+$/).test(key);
+    return new RegExp(/^[^\/]+$/).test(key || '');
   }
 
-  return store;
+  //
+  function decoratePromise(promise) {
+    return $.extend(promise, promiseApi);
+  }
+
+  function resolveWith() {
+    var promise = hoodie.resolveWith.apply(null, arguments);
+    return decoratePromise(promise);
+  }
+  function rejectWith() {
+    var promise = hoodie.rejectWith.apply(null, arguments);
+    return decoratePromise(promise);
+  }
+
+  return api;
 }
 
 //
@@ -988,8 +1092,8 @@ Hoodie.Errors = {
 
 };
 
-/* exported hoodieRemoteBase */
-/* global hoodieStoreBase */
+/* exported hoodieRemoteStore */
+/* global hoodieStoreApi */
 
 // Remote
 // ========
@@ -1030,11 +1134,134 @@ Hoodie.Errors = {
 //
 
 //
-function hoodieRemoteBase (hoodie, options) {
+function hoodieRemoteStore (hoodie, options) {
 
-  // inherit from Hoodies Store API
-  var storeBase = hoodieStoreBase(hoodie);
-  var remote = Object.create(storeBase);
+  var remoteStore = {};
+
+
+  // Remote Store Persistance methods
+  // ----------------------------------
+
+  // find
+  // ------
+
+  // find one object
+  //
+  remoteStore.find = function find(type, id) {
+    var path;
+
+    path = type + '/' + id;
+
+    if (remote.prefix) {
+      path = remote.prefix + path;
+    }
+
+    path = '/' + encodeURIComponent(path);
+
+    return remote.request('GET', path).then(parseFromRemote);
+  };
+
+
+  // findAll
+  // ---------
+
+  // find all objects, can be filetered by a type
+  //
+  remoteStore.findAll = function findAll(type) {
+    var endkey, path, startkey;
+
+    path = '/_all_docs?include_docs=true';
+
+    switch (true) {
+    case (type !== undefined) && remote.prefix !== '':
+      startkey = remote.prefix + type + '/';
+      break;
+    case type !== undefined:
+      startkey = type + '/';
+      break;
+    case remote.prefix !== '':
+      startkey = remote.prefix;
+      break;
+    default:
+      startkey = '';
+    }
+
+    if (startkey) {
+
+      // make sure that only objects starting with
+      // `startkey` will be returned
+      endkey = startkey.replace(/.$/, function(chars) {
+        var charCode;
+        charCode = chars.charCodeAt(0);
+        return String.fromCharCode(charCode + 1);
+      });
+      path = '' + path + '&startkey="' + (encodeURIComponent(startkey)) + '"&endkey="' + (encodeURIComponent(endkey)) + '"';
+    }
+
+    return remote.request('GET', path).then(mapDocsFromFindAll).then(parseAllFromRemote);
+  };
+
+
+  // save
+  // ------
+
+  // save a new object. If it existed before, all properties
+  // will be overwritten
+  //
+  remoteStore.save = function save(object) {
+    var path;
+
+    if (!object.id) {
+      object.id = hoodie.uuid();
+    }
+
+    object = parseForRemote(object);
+    path = '/' + encodeURIComponent(object._id);
+    return remote.request('PUT', path, {
+      data: object
+    });
+  };
+
+
+  // remove
+  // ---------
+
+  // remove one object
+  //
+  remoteStore.remove = function remove(type, id) {
+    return remote.update(type, id, {
+      _deleted: true
+    });
+  };
+
+
+  // removeAll
+  // ------------
+
+  // remove all objects, can be filtered by type
+  //
+  remoteStore.removeAll = function removeAll(type) {
+    return remote.updateAll(type, {
+      _deleted: true
+    });
+  };
+
+
+  var remote = hoodieStoreApi(hoodie, {
+
+    name: options.name,
+
+    backend: {
+      save: remoteStore.save,
+      find: remoteStore.find,
+      findAll: remoteStore.findAll,
+      remove: remoteStore.remove,
+      removeAll: remoteStore.removeAll
+    }
+  });
+
+
+
 
 
   // properties
@@ -1066,6 +1293,24 @@ function hoodieRemoteBase (hoodie, options) {
   remote.prefix = '';
 
 
+
+  // defaults
+  // ----------------
+
+  //
+  if (options.name !== undefined) {
+    remote.name = options.name;
+  }
+
+  if (options.prefix !== undefined) {
+    remote.prefix = options.prefix;
+  }
+
+  if (options.baseUrl !== null) {
+    remote.baseUrl = options.baseUrl;
+  }
+
+
   // request
   // ---------
 
@@ -1091,157 +1336,6 @@ function hoodieRemoteBase (hoodie, options) {
       options.data = JSON.stringify(options.data);
     }
     return hoodie.request(type, path, options);
-  };
-
-
-  // get
-  // -----
-
-  // send a GET request to the named view
-  //
-  remote.get = function get() {
-    return console.log.apply(
-      console, ['.get() not yet implemented']
-      .concat(Array.prototype.slice.call(arguments))
-    );
-  };
-
-
-  // post
-  // ------
-
-  // sends a POST request to the specified updated_function
-  //
-  remote.post = function post() {
-    return console.log.apply(
-      console, ['.post() not yet implemented']
-      .concat(Array.prototype.slice.call(arguments))
-    );
-  };
-
-
-  // Store Operations overides
-  // ---------------------------
-
-  // find
-  // ------
-
-  // find one object
-  //
-  remote.find = function find(type, id) {
-    var defer, path;
-
-    defer = storeBase.find.apply(remote, arguments);
-
-    if (hoodie.isPromise(defer)) {
-      return defer;
-    }
-
-    path = '' + type + '/' + id;
-
-    if (remote.prefix) {
-      path = remote.prefix + path;
-    }
-
-    path = '/' + encodeURIComponent(path);
-
-    return remote.request('GET', path).pipe(parseFromRemote);
-  };
-
-
-  // findAll
-  // ---------
-
-  // find all objects, can be filetered by a type
-  //
-  remote.findAll = function findAll(type) {
-    var defer, endkey, path, startkey;
-
-    defer = storeBase.findAll.apply(remote, arguments);
-
-    if (hoodie.isPromise(defer)) {
-      return defer;
-    }
-
-    path = '/_all_docs?include_docs=true';
-
-    switch (true) {
-    case (type !== undefined) && remote.prefix !== '':
-      startkey = '' + remote.prefix + type + '/';
-      break;
-    case type !== undefined:
-      startkey = '' + type + '/';
-      break;
-    case remote.prefix !== '':
-      startkey = remote.prefix;
-      break;
-    default:
-      startkey = '';
-    }
-
-    if (startkey) {
-
-      // make sure that only objects starting with
-      // `startkey` will be returned
-      endkey = startkey.replace(/.$/, function(chars) {
-        var charCode;
-        charCode = chars.charCodeAt(0);
-        return String.fromCharCode(charCode + 1);
-      });
-      path = '' + path + '&startkey=\'' + (encodeURIComponent(startkey)) + '\'&endkey=\'' + (encodeURIComponent(endkey)) + '\'';
-    }
-    return remote.request('GET', path).pipe(mapDocsFromFindAll).pipe(parseAllFromRemote);
-  };
-
-
-  // save
-  // ------
-
-  // save a new object. If it existed before, all properties
-  // will be overwritten
-  //
-  remote.save = function save(type, id, object) {
-    var defer, path;
-    defer = storeBase.save.apply(remote, arguments);
-    if (hoodie.isPromise(defer)) {
-      return defer;
-    }
-    if (!id) {
-      id = hoodie.uuid();
-    }
-    object = $.extend({
-      type: type,
-      id: id
-    }, object);
-    object = parseForRemote(object);
-    path = '/' + encodeURIComponent(object._id);
-    return remote.request('PUT', path, {
-      data: object
-    });
-  };
-
-
-  // remove
-  // ---------
-
-  // remove one object
-  //
-  remote.remove = function remove(type, id) {
-    return remote.update(type, id, {
-      _deleted: true
-    });
-  };
-
-
-  // removeAll
-  // ------------
-
-  // remove all objects, can be filtered by type
-  //
-  remote.removeAll = function removeAll(type) {
-    return remote.updateAll(type, {
-      _deleted: true
-    });
   };
 
 
@@ -1282,6 +1376,7 @@ function hoodieRemoteBase (hoodie, options) {
   //
   remote.connect = function connect() {
     remote.connected = true;
+    remote.trigger('connect'); // TODO: spec that
     return remote.bootstrap();
   };
 
@@ -1293,6 +1388,7 @@ function hoodieRemoteBase (hoodie, options) {
   //
   remote.disconnect = function disconnect() {
     remote.connected = false;
+    remote.trigger('disconnect'); // TODO: spec that
 
     if (pullRequest) {
       pullRequest.abort();
@@ -1319,19 +1415,8 @@ function hoodieRemoteBase (hoodie, options) {
 
   // returns the sequence number from wich to start to find changes in pull
   //
+  var since = options.since || 0; // TODO: spec that!
   remote.getSinceNr = function getSinceNr() {
-    return since || 0;
-  };
-
-
-  // setSinceNr
-  // ------------
-
-  // sets the sequence number from wich to start to find changes in pull
-  //
-  var since;
-  remote.setSinceNr = function setSinceNr(seq) {
-    since = seq;
     return since;
   };
 
@@ -1339,7 +1424,7 @@ function hoodieRemoteBase (hoodie, options) {
   // bootstrap
   // -----------
 
-  // inital pull of data of the remote start. By default, we pull all
+  // inital pull of data of the remote store. By default, we pull all
   // changes since the beginning, but this behavior might be adjusted,
   // e.g for a filtered bootstrap.
   //
@@ -1378,7 +1463,11 @@ function hoodieRemoteBase (hoodie, options) {
   remote.push = function push(objects) {
     var object, objectsForRemote, _i, _len;
 
-    if (!(objects !== undefined ? objects.length : void 0)) {
+    if (!$.isArray(objects)) {
+      objects = defaultObjectsToPush();
+    }
+
+    if (objects.length === 0) {
       return hoodie.resolveWith([]);
     }
 
@@ -1406,33 +1495,7 @@ function hoodieRemoteBase (hoodie, options) {
   // push objects, then pull updates.
   //
   remote.sync = function sync(objects) {
-    return remote.push(objects).pipe(remote.pull);
-  };
-
-
-  // Events
-  // --------
-
-  // namespaced alias for `hoodie.on`
-  //
-  remote.on = function on(event, cb) {
-    event = event.replace(/(^| )([^ ]+)/g, '$1' + remote.name + ':$2');
-    return hoodie.on(event, cb);
-  };
-
-  remote.one = function one(event, cb) {
-    event = event.replace(/(^| )([^ ]+)/g, '$1' + remote.name + ':$2');
-    return hoodie.one(event, cb);
-  };
-
-
-  // namespaced alias for `hoodie.trigger`
-  //
-  remote.trigger = function trigger() {
-    var event, parameters, _ref;
-    event = arguments[0],
-    parameters = 2 <= arguments.length ? Array.prototype.slice.call(arguments, 1) : [];
-    return (_ref = hoodie).trigger.apply(_ref, ['' + remote.name + ':' + event].concat(Array.prototype.slice.call(parameters)));
+    return remote.push(objects).then(remote.pull);
   };
 
   //
@@ -1448,6 +1511,39 @@ function hoodieRemoteBase (hoodie, options) {
   // valid CouchDB doc attributes starting with an underscore
   //
   var validSpecialAttributes = ['_id', '_rev', '_deleted', '_revisions', '_attachments'];
+
+
+  // default objects to push
+  // --------------------------
+
+  // when pushed without passing any objects, the objects returned from
+  // this method will be passed. It can be overwritten by passing an
+  // array of objects or a function as `options.objects`
+  //
+  var defaultObjectsToPush = function defaultObjectsToPush() {
+    return [];
+  };
+  if (options.defaultObjectsToPush) {
+    if ($.isArray(options.defaultObjectsToPush)) {
+      defaultObjectsToPush = function defaultObjectsToPush() {
+        return options.defaultObjectsToPush;
+      };
+    } else {
+      defaultObjectsToPush = options.defaultObjectsToPush;
+    }
+  }
+
+
+  // setSinceNr
+  // ------------
+
+  // sets the sequence number from wich to start to find changes in pull
+  //
+  function setSinceNr(seq) {
+    since = seq;
+    remote.trigger('pull', since); // TODO: spec that
+    return since;
+  }
 
 
   // Parse for remote
@@ -1609,7 +1705,7 @@ function hoodieRemoteBase (hoodie, options) {
   // when aborted (see @_handlePullError)
   //
   function handlePullSuccess(response) {
-    remote.setSinceNr(response.last_seq);
+    setSinceNr(response.last_seq);
     handlePullResults(response.results);
     if (remote.isConnected()) {
       return remote.pull();
@@ -1708,9 +1804,9 @@ function hoodieRemoteBase (hoodie, options) {
         }
       }
 
-      remote.trigger('' + event, object);
-      remote.trigger('' + event + ':' + object.type, object);
-      remote.trigger('' + event + ':' + object.type + ':' + object.id, object);
+      remote.trigger(event, object);
+      remote.trigger(event + ':' + object.type, object);
+      remote.trigger(event + ':' + object.type + ':' + object.id, object);
       remote.trigger('change', event, object);
       remote.trigger('change:' + object.type, event, object);
       remote.trigger('change:' + object.type + ':' + object.id, event, object);
@@ -1718,38 +1814,24 @@ function hoodieRemoteBase (hoodie, options) {
   }
 
 
-
+  // bootstrap known objects
   //
-  // Initialization
-  // ----------------
-  //
-  if (options.name !== undefined) {
-    remote.name = options.name;
+  if (options.knownObjects) {
+    for (var i = 0; i < options.knownObjects.length; i++) {
+      remote.markAsKnownObject({
+        type: options.knownObjects[i].type,
+        id: options.knownObjects[i].id
+      });
+    }
   }
 
-  if (options.prefix !== undefined) {
-    remote.prefix = options.prefix;
-  }
-
-  if (options.connected !== undefined) {
-    remote.connected = options.connected;
-  }
-
-  if (options.baseUrl !== null) {
-    remote.baseUrl = options.baseUrl;
-  }
-
-
-  if (remote.isConnected()) {
-    remote.connect();
-  }
 
   // expose public API
   return remote;
 }
 
 /* exported hoodieStore */
-/* global hoodieStoreBase */
+/* global hoodieStoreApi */
 
 // LocalStore
 // ============
@@ -1759,9 +1841,7 @@ function hoodieRemoteBase (hoodie, options) {
 
 function hoodieStore (hoodie) {
 
-  // inherit from Hoodies Store API
-  var storeBase = hoodieStoreBase(hoodie);
-  var store = Object.create(storeBase);
+  var localStore = {};
 
   //
   // state
@@ -1769,20 +1849,13 @@ function hoodieStore (hoodie) {
   //
 
   // cache of localStorage for quicker access
-  var cached = {};
+  var cachedObject = {};
 
   // map of dirty objects by their ids
   var dirty = {};
 
   // queue of method calls done during bootstrapping
   var queue = [];
-
-  // extend this property with extra functions that will be available
-  // on all promises returned by hoodie.store API. It has a reference
-  // to current hoodie instance by default
-  var promiseApi = {
-    hoodie: hoodie
-  };
 
   // 2 seconds timout before triggering the `store:idle` event
   //
@@ -1809,29 +1882,10 @@ function hoodieStore (hoodie) {
   //     store.save('car', undefined, {color: 'red'})
   //     store.save('car', 'abc4567', {color: 'red'})
   //
-  store.save = function save(type, id, properties, options) {
-    var currentObject, defer, error, event, isNew, key, object;
+  localStore.save = function save(object, options) {
+    var currentObject, defer, error, event, isNew, key;
 
     options = options || {};
-    defer = storeBase.save.apply(store, arguments);
-
-    if (hoodie.isPromise(defer)) {
-      return decoratePromise(defer);
-    }
-
-    // farther validations with custom id/type validation methods.
-    // TODO: make this smarter, maybe add a store.validation to
-    //       the public API. Setting defer to a promise is ... bah
-    if (id && !isValidId(id)) {
-      return hoodie.rejectWith(Hoodie.Errors.INVALID_KEY({
-        id: id
-      }));
-    }
-    if (!isValidType(type)) {
-      return hoodie.rejectWith(Hoodie.Errors.INVALID_KEY({
-        type: type
-      }));
-    }
 
     // if store is currently bootstrapping data from remote,
     // we're queueing until it's finished
@@ -1839,24 +1893,24 @@ function hoodieStore (hoodie) {
       return enqueue('save', arguments);
     }
 
-    // make sure we don't mess with the passed object directly
-    object = $.extend(true, {}, properties);
-
     // generate an id if necessary
-    if (id) {
-      currentObject = store.cache(type, id);
+    if (object.id) {
+      currentObject = cache(object.type, object.id);
       isNew = typeof currentObject !== 'object';
     } else {
       isNew = true;
-      id = hoodie.uuid();
+      object.id = hoodie.uuid();
     }
 
-    // add createdBy hash to new objects
-    // note: we check for `hoodie.account` as in some cases, the code
-    //       might get executed before the account module is initiated.
-    // todo: move ownerHash into a method on the core hoodie module
-    if (isNew && hoodie.account) {
+    if (isNew) {
+      // add createdBy hash
       object.createdBy = object.createdBy || hoodie.account.ownerHash;
+    }
+    else {
+      // leave createdBy hash
+      if (currentObject.createdBy) {
+        object.createdBy = currentObject.createdBy;
+      }
     }
 
     // handle local properties and hidden properties with $ prefix
@@ -1903,18 +1957,21 @@ function hoodieStore (hoodie) {
       delete object._$local;
     }
 
+    defer = hoodie.defer();
+
     try {
-      object = store.cache(type, id, object, options);
+      object = cache(object.type, object.id, object, options);
       defer.resolve(object, isNew).promise();
       event = isNew ? 'add' : 'update';
       triggerEvents(event, object, options);
     } catch (_error) {
       error = _error;
-      defer.reject(error).promise();
+      defer.reject(error.toString());
     }
 
-    return decoratePromise(defer.promise());
+    return defer.promise();
   };
+
 
   // find
   // ------
@@ -1924,12 +1981,10 @@ function hoodieStore (hoodie) {
   // example usage:
   //
   //     store.find('car', 'abc4567')
-  store.find = function(type, id) {
+  localStore.find = function(type, id) {
     var defer, error, object;
-    defer = storeBase.find.apply(store, arguments);
-    if (hoodie.isPromise(defer)) {
-      return decoratePromise(defer);
-    }
+
+    defer = hoodie.defer();
 
     // if store is currently bootstrapping data from remote,
     // we're queueing until it's finished
@@ -1938,7 +1993,7 @@ function hoodieStore (hoodie) {
     }
 
     try {
-      object = store.cache(type, id);
+      object = cache(type, id);
       if (!object) {
         defer.reject(Hoodie.Errors.NOT_FOUND(type, id)).promise();
       }
@@ -1947,8 +2002,10 @@ function hoodieStore (hoodie) {
       error = _error;
       defer.reject(error);
     }
-    return decoratePromise(defer.promise());
+
+    return defer.promise();
   };
+
 
   // findAll
   // ---------
@@ -1962,19 +2019,15 @@ function hoodieStore (hoodie) {
   //     store.findAll('car')
   //     store.findAll(function(obj) { return obj.brand == 'Tesla' })
   //
-  store.findAll = function(filter) {
+  localStore.findAll = function findAll(filter) {
     var currentType, defer, error, id, key, keys, obj, results, type;
+
+
 
     if (filter == null) {
       filter = function() {
         return true;
       };
-    }
-
-    defer = storeBase.findAll.apply(store, arguments);
-
-    if (hoodie.isPromise(defer)) {
-      return decoratePromise(defer);
     }
 
     // if store is currently bootstrapping data from remote,
@@ -1993,6 +2046,8 @@ function hoodieStore (hoodie) {
       };
     }
 
+    defer = hoodie.defer();
+
     try {
 
       //
@@ -2008,7 +2063,7 @@ function hoodieStore (hoodie) {
           currentType = _ref[0],
           id = _ref[1];
 
-          obj = store.cache(currentType, id);
+          obj = cache(currentType, id);
           if (obj && filter(obj)) {
             _results.push(obj);
           } else {
@@ -2033,7 +2088,7 @@ function hoodieStore (hoodie) {
       error = _error;
       defer.reject(error).promise();
     }
-    return decoratePromise(defer.promise());
+    return defer.promise();
   };
 
 
@@ -2044,16 +2099,10 @@ function hoodieStore (hoodie) {
   //
   // when object has been synced before, mark it as deleted.
   // Otherwise remove it from Store.
-  store.remove = function(type, id, options) {
-
-    var defer, key, object, objectWasMarkedAsDeleted, promise;
+  localStore.remove = function remove(type, id, options) {
+    var key, object, objectWasMarkedAsDeleted;
 
     options = options || {};
-    defer = storeBase.remove.apply(store, arguments);
-
-    if (hoodie.isPromise(defer)) {
-      return decoratePromise(defer);
-    }
 
     // if store is currently bootstrapping data from remote,
     // we're queueing until it's finished
@@ -2061,56 +2110,99 @@ function hoodieStore (hoodie) {
       return enqueue('remove', arguments);
     }
 
-    key = '' + type + '/' + id;
+    key = type + '/' + id;
+
+    object = cache(type, id);
 
     // if change comes from remote, just clean up locally
     if (options.remote) {
       db.removeItem(key);
-      objectWasMarkedAsDeleted = cached[key] && isMarkedAsDeleted(cached[key]);
-      cached[key] = false;
-      store.clearChanged(type, id);
-      if (objectWasMarkedAsDeleted) {
-        return;
+      objectWasMarkedAsDeleted = cachedObject[key] && isMarkedAsDeleted(cachedObject[key]);
+      cachedObject[key] = false;
+      clearChanged(type, id);
+      if (objectWasMarkedAsDeleted && object) {
+        return hoodie.resolveWith(object);
       }
     }
 
-    object = store.cache(type, id);
-
     if (!object) {
-      return decoratePromise(defer.reject(Hoodie.Errors.NOT_FOUND(type, id)).promise());
+      return hoodie.rejectWith(Hoodie.Errors.NOT_FOUND(type, id));
     }
 
     if (object._syncedAt) {
       object._deleted = true;
-      store.cache(type, id, object);
+      cache(type, id, object);
     } else {
-      key = '' + type + '/' + id;
+      key = type + '/' + id;
       db.removeItem(key);
-      cached[key] = false;
-      store.clearChanged(type, id);
+      cachedObject[key] = false;
+      clearChanged(type, id);
     }
 
     triggerEvents('remove', object, options);
-
-    promise = defer.resolve(object).promise();
-
-    return decoratePromise(promise);
+    return hoodie.resolveWith(object);
   };
 
 
-  // update / updateAll / removeAll
-  // --------------------------------
+  // Remove all
+  // ----------
 
-  // just decorating returned promises
-  store.update = function update() {
-    return decoratePromise(storeBase.update.apply(store, arguments));
+  // Removes one object specified by `type` and `id`.
+  //
+  // when object has been synced before, mark it as deleted.
+  // Otherwise remove it from Store.
+  localStore.removeAll = function removeAll(type, options) {
+    return store.findAll(type).then(function(objects) {
+      var object, _i, _len, results;
+
+      results = [];
+
+      for (_i = 0, _len = objects.length; _i < _len; _i++) {
+        object = objects[_i];
+        results.push(store.remove(object.type, object.id, options));
+      }
+      return results;
+    });
   };
-  store.updateAll = function updateAll() {
-    return decoratePromise(storeBase.updateAll.apply(store, arguments));
-  };
-  store.removeAll = function removeAll() {
-    return decoratePromise(storeBase.removeAll.apply(store, arguments));
-  };
+
+
+  // validate
+  // ----------
+
+  //
+  function validate (type, id /*, object */ ) {
+
+    if (!isValidType(type)) {
+      return Hoodie.Errors.INVALID_KEY({
+        type: type
+      });
+    }
+
+    if (arguments.length > 0 && !isValidId(id)) {
+      return Hoodie.Errors.INVALID_KEY({
+        id: id
+      });
+    }
+  }
+
+  var store = hoodieStoreApi(hoodie, {
+
+    // validate
+    validate: validate,
+
+    backend: {
+      save: localStore.save,
+      find: localStore.find,
+      findAll: localStore.findAll,
+      remove: localStore.remove,
+      removeAll: localStore.removeAll,
+    }
+  });
+
+
+
+  // extended public API
+  // ---------------------
 
 
   // index
@@ -2129,163 +2221,6 @@ function hoodieStore (hoodie) {
     }
     return keys;
   };
-
-
-  // Cache
-  // -------
-
-  // loads an object specified by `type` and `id` only once from localStorage
-  // and caches it for faster future access. Updates cache when `value` is passed.
-  //
-  // Also checks if object needs to be synched (dirty) or not
-  //
-  // Pass `options.remote = true` when object comes from remote
-  // Pass 'options.silent = true' to avoid events from being triggered.
-  store.cache = function cache(type, id, object, options) {
-    var key;
-
-    if (object === undefined) {
-      object = false;
-    }
-
-    options = options || {};
-    key = '' + type + '/' + id;
-
-    if (object) {
-      $.extend(object, {
-        type: type,
-        id: id
-      });
-
-      setObject(type, id, object);
-
-      if (options.remote) {
-        store.clearChanged(type, id);
-        cached[key] = $.extend(true, {}, object);
-        return cached[key];
-      }
-
-    } else {
-
-      // if the cached key returns false, it means
-      // that we have removed that key. We just
-      // set it to false for performance reasons, so
-      // that we don't need to look it up again in localStorage
-      if (cached[key] === false) {
-        return false;
-      }
-
-      // if key is cached, return it. But make sure
-      // to make a deep copy beforehand (=> true)
-      if (cached[key]) {
-        return $.extend(true, {}, cached[key]);
-      }
-
-      // if object is not yet cached, load it from localStore
-      object = getObject(type, id);
-
-      // stop here if object did not exist in localStore
-      // and cache it so we don't need to look it up again
-      if (object === false) {
-        store.clearChanged(type, id);
-        cached[key] = false;
-        return false;
-      }
-
-    }
-
-
-    if (isMarkedAsDeleted(object)) {
-      store.markAsChanged(type, id, object, options);
-      cached[key] = false;
-      return false;
-    }
-
-    // here is where we cache the object for
-    // future quick access
-    cached[key] = $.extend(true, {}, object);
-
-    if (hasLocalChanges(object)) {
-      store.markAsChanged(type, id, cached[key], options);
-    } else {
-      store.clearChanged(type, id);
-    }
-
-    return $.extend(true, {}, object);
-  };
-
-
-  // Clear changed
-  // ---------------
-
-  // removes an object from the list of objects that are flagged to by synched (dirty)
-  // and triggers a `store:dirty` event
-  store.clearChanged = function clearChanged(type, id) {
-    var key;
-    if (type && id) {
-      key = '' + type + '/' + id;
-      delete dirty[key];
-    } else {
-      dirty = {};
-    }
-    saveDirtyIds();
-    return window.clearTimeout(dirtyTimeout);
-  };
-
-
-  // Marked as deleted?
-  // --------------------
-
-  // when an object gets deleted that has been synched before (`_rev` attribute),
-  // it cannot be removed from store but gets a `_deleted: true` attribute
-  store.isMarkedAsDeleted = function(type, id) {
-    return isMarkedAsDeleted(store.cache(type, id));
-  };
-
-
-  // Mark as changed
-  // -----------------
-
-  // Marks object as changed (dirty). Triggers a `store:dirty` event immediately and a
-  // `store:idle` event once there is no change within 2 seconds
-  store.markAsChanged = function markAsChanged(type, id, object, options) {
-    var key;
-
-    options = options || {};
-    key = '' + type + '/' + id;
-
-    dirty[key] = object;
-    saveDirtyIds();
-
-    if (options.silent) {
-      return;
-    }
-
-    return triggerDirtyAndIdleEvents();
-  };
-
-
-  // Mark all as changed
-  // ------------------------
-
-  // Marks all local object as changed (dirty) to make them sync
-  // with remote
-  store.markAllAsChanged = function markAllAsChanged() {
-
-    return store.findAll().pipe(function(objects) {
-      var key, object, _i, _len;
-
-      for (_i = 0, _len = objects.length; _i < _len; _i++) {
-        object = objects[_i];
-        key = '' + object.type + '/' + object.id;
-        dirty[key] = object;
-      }
-
-      saveDirtyIds();
-      triggerDirtyAndIdleEvents();
-    });
-  };
-
 
 
   // changed objects
@@ -2325,7 +2260,11 @@ function hoodieStore (hoodie) {
     if (!type) {
       return !$.isEmptyObject(dirty);
     }
-    return hasLocalChanges(store.cache(type, id));
+    var key = [type,id].join('/');
+    if (dirty[key]) {
+      return true;
+    }
+    return hasLocalChanges(cache(type, id));
   };
 
 
@@ -2351,58 +2290,14 @@ function hoodieStore (hoodie) {
         }
         return _results;
       }).call(this);
-      cached = {};
-      store.clearChanged();
+      cachedObject = {};
+      clearChanged();
       defer.resolve();
       store.trigger('clear');
     } catch (_error) {
       defer.reject(_error);
     }
     return defer.promise();
-  };
-
-
-
-
-
-  // trigger
-  // ---------
-
-  // proxies to hoodie.trigger
-  store.trigger = function trigger() {
-    var eventName, parameters, _ref;
-    eventName = arguments[0],
-    parameters = 2 <= arguments.length ? Array.prototype.slice.call(arguments, 1) : [];
-    return (_ref = hoodie).trigger.apply(_ref, ['store:' + eventName].concat(Array.prototype.slice.call(parameters)));
-  };
-
-
-  // on
-  // ---------
-
-  // proxies to hoodie.on
-  store.on = function on(eventName, data) {
-    eventName = eventName.replace(/(^| )([^ ]+)/g, '$1store:$2');
-    return hoodie.on(eventName, data);
-  };
-
-
-  // unbind
-  // ---------
-
-  // proxies to hoodie.unbind
-  store.unbind = function unbind(eventName, callback) {
-    eventName = 'store:' + eventName;
-    return hoodie.unbind(eventName, callback);
-  };
-
-
-  // decorate promises
-  // -------------------
-
-  // extend promises returned by store.api
-  store.decoratePromises = function decoratePromises(methods) {
-    return $.extend(promiseApi, methods);
   };
 
 
@@ -2457,6 +2352,8 @@ function hoodieStore (hoodie) {
   };
 
 
+
+
   //
   // Private methods
   // -----------------
@@ -2480,11 +2377,91 @@ function hoodieStore (hoodie) {
     },
     length: function() {
       return window.localStorage.length;
-    },
-    clear: function() {
-      return window.localStorage.clear();
     }
   };
+
+
+  // Cache
+  // -------
+
+  // loads an object specified by `type` and `id` only once from localStorage
+  // and caches it for faster future access. Updates cache when `value` is passed.
+  //
+  // Also checks if object needs to be synched (dirty) or not
+  //
+  // Pass `options.remote = true` when object comes from remote
+  // Pass 'options.silent = true' to avoid events from being triggered.
+  function cache(type, id, object, options) {
+    var key;
+
+    if (object === undefined) {
+      object = false;
+    }
+
+    options = options || {};
+    key = '' + type + '/' + id;
+
+    if (object) {
+      $.extend(object, {
+        type: type,
+        id: id
+      });
+
+      setObject(type, id, object);
+
+      if (options.remote) {
+        clearChanged(type, id);
+        cachedObject[key] = $.extend(true, {}, object);
+        return cachedObject[key];
+      }
+
+    } else {
+
+      // if the cached key returns false, it means
+      // that we have removed that key. We just
+      // set it to false for performance reasons, so
+      // that we don't need to look it up again in localStorage
+      if (cachedObject[key] === false) {
+        return false;
+      }
+
+      // if key is cached, return it. But make sure
+      // to make a deep copy beforehand (=> true)
+      if (cachedObject[key]) {
+        return $.extend(true, {}, cachedObject[key]);
+      }
+
+      // if object is not yet cached, load it from localStore
+      object = getObject(type, id);
+
+      // stop here if object did not exist in localStore
+      // and cache it so we don't need to look it up again
+      if (object === false) {
+        clearChanged(type, id);
+        cachedObject[key] = false;
+        return false;
+      }
+
+    }
+
+    if (isMarkedAsDeleted(object)) {
+      markAsChanged(type, id, object, options);
+      cachedObject[key] = false;
+      return false;
+    }
+
+    // here is where we cache the object for
+    // future quick access
+    cachedObject[key] = $.extend(true, {}, object);
+
+    if (hasLocalChanges(object)) {
+      markAsChanged(type, id, cachedObject[key], options);
+    } else {
+      clearChanged(type, id);
+    }
+
+    return $.extend(true, {}, object);
+  }
 
 
   // bootstrapping dirty objects, to make sure
@@ -2504,7 +2481,7 @@ function hoodieStore (hoodie) {
       _ref = keys[_i].split('/'),
       type = _ref[0],
       id = _ref[1];
-      obj = store.cache(type, id);
+      obj = cache(type, id);
     }
   }
 
@@ -2516,12 +2493,77 @@ function hoodieStore (hoodie) {
 
     // account events
     hoodie.on('account:cleanup', store.clear);
-    hoodie.on('account:signup', store.markAllAsChanged);
+    hoodie.on('account:signup', markAllAsChanged);
     hoodie.on('remote:bootstrap:start', startBootstrappingMode);
     hoodie.on('remote:bootstrap:end', endBootstrappingMode);
 
     // remote events
     hoodie.on('remote:change', handleRemoteChange);
+  }
+
+  // allow to run this once from outside
+  store.subscribeToOutsideEvents = function() {
+    subscribeToOutsideEvents();
+    delete store.subscribeToOutsideEvents;
+  };
+
+
+  //
+  // Marks object as changed (dirty). Triggers a `store:dirty` event immediately and a
+  // `store:idle` event once there is no change within 2 seconds
+  //
+  function markAsChanged(type, id, object, options) {
+    var key;
+
+    options = options || {};
+    key = '' + type + '/' + id;
+
+    dirty[key] = object;
+    saveDirtyIds();
+
+    if (options.silent) {
+      return;
+    }
+
+    return triggerDirtyAndIdleEvents();
+  }
+
+  // Clear changed
+  // ---------------
+
+  // removes an object from the list of objects that are flagged to by synched (dirty)
+  // and triggers a `store:dirty` event
+  function clearChanged(type, id) {
+    var key;
+    if (type && id) {
+      key = '' + type + '/' + id;
+      delete dirty[key];
+    } else {
+      dirty = {};
+    }
+    saveDirtyIds();
+    return window.clearTimeout(dirtyTimeout);
+  }
+
+
+  // Mark all as changed
+  // ------------------------
+
+  // Marks all local object as changed (dirty) to make them sync
+  // with remote
+  function markAllAsChanged() {
+    return store.findAll().pipe(function(objects) {
+      var key, object, _i, _len;
+
+      for (_i = 0, _len = objects.length; _i < _len; _i++) {
+        object = objects[_i];
+        key = '' + object.type + '/' + object.id;
+        dirty[key] = object;
+      }
+
+      saveDirtyIds();
+      triggerDirtyAndIdleEvents();
+    });
   }
 
 
@@ -2571,17 +2613,19 @@ function hoodieStore (hoodie) {
 
   // store IDs of dirty objects
   function saveDirtyIds() {
-    if ($.isEmptyObject(dirty)) {
-      return db.removeItem('_dirty');
-    } else {
-      var ids = Object.keys(dirty);
-      return db.setItem('_dirty', ids.join(','));
-    }
+    try {
+      if ($.isEmptyObject(dirty)) {
+        db.removeItem('_dirty');
+      } else {
+        var ids = Object.keys(dirty);
+        db.setItem('_dirty', ids.join(','));
+      }
+    } catch(e) {}
   }
 
   //
   function now() {
-    return JSON.stringify(new Date()).replace(/'/g, '');
+    return JSON.stringify(new Date()).replace(/['"]/g, '');
   }
 
   // only lowercase letters, numbers and dashes are allowed for ids
@@ -2653,11 +2697,6 @@ function hoodieStore (hoodie) {
   }
 
   //
-  function decoratePromise(promise) {
-    return $.extend(promise, promiseApi);
-  }
-
-  //
   function startBootstrappingMode() {
     bootstrapping = true;
     store.trigger('bootstrap:start');
@@ -2673,7 +2712,7 @@ function hoodieStore (hoodie) {
       method = methodCall[0];
       args = methodCall[1];
       defer = methodCall[2];
-      this[method].apply(store, args).then(defer.resolve, defer.reject);
+      store[method].apply(store, args).then(defer.resolve, defer.reject);
     }
 
     store.trigger('bootstrap:end');
@@ -2686,6 +2725,20 @@ function hoodieStore (hoodie) {
     return defer.promise();
   }
 
+  //
+  // patchIfNotPersistant
+  //
+  function patchIfNotPersistant () {
+    if (!store.isPersistent()) {
+      db = {
+        getItem: function() { return null; },
+        setItem: function() { return null; },
+        removeItem: function() { return null; },
+        key: function() { return null; },
+        length: function() { return 0; }
+      };
+    }
+  }
 
 
   //
@@ -2695,25 +2748,26 @@ function hoodieStore (hoodie) {
 
   // if browser does not support local storage persistence,
   // e.g. Safari in private mode, overite the respective methods.
-  if (!store.isPersistent()) {
-    db = {
-      getItem: function() { return null; },
-      setItem: function() { return null; },
-      removeItem: function() { return null; },
-      key: function() { return null; },
-      length: function() { return 0; },
-      clear: function() { return null; }
-    };
-  }
 
-  subscribeToOutsideEvents();
-  bootstrapDirtyObjects();
 
 
   //
   // expose public API
   //
+  // inherit from Hoodies Store API
   hoodie.store = store;
+
+  // allow to run this once from outside
+  store.bootstrapDirtyObjects = function() {
+    bootstrapDirtyObjects();
+    delete store.bootstrapDirtyObjects;
+  };
+
+  // allow to run this once from outside
+  store.patchIfNotPersistant = function() {
+    patchIfNotPersistant();
+    delete store.patchIfNotPersistant;
+  };
 }
 
 /* exported hoodieConfig */
@@ -2728,12 +2782,16 @@ function hoodieConfig(hoodie) {
   var id = 'hoodie';
   var cache = {};
 
+  // public API
+  var config = {};
+
+
   // set
   // ----------
 
   // adds a configuration
   //
-  function set(key, value) {
+  config.set = function set(key, value) {
     var isSilent, update;
 
     if (cache[key] === value) {
@@ -2749,51 +2807,45 @@ function hoodieConfig(hoodie) {
     return hoodie.store.update(type, id, update, {
       silent: isSilent
     });
-
-  }
+  };
 
   // get
   // ----------
 
   // receives a configuration
   //
-  function get(key) {
+  config.get = function get(key) {
     return cache[key];
-  }
+  };
 
   // clear
   // ----------
 
   // clears cache and removes object from store
   //
-  function clear() {
+  config.clear = function clear() {
     cache = {};
     return hoodie.store.remove(type, id);
-  }
+  };
 
   // remove
   // ----------
 
   // removes a configuration, is a simple alias for config.set(key, undefined)
   //
-  function remove(key) {
-    return set(key, void 0);
-  }
+  config.remove = function remove(key) {
+    return config.set(key, void 0);
+  };
 
-  // load cach
+  // load cache
+  // TODO: I really don't like this being here. And I don't like that if the
+  //       store API will be truly async one day, this will fall on our feet.
   hoodie.store.find(type, id).done(function(obj) {
     cache = obj;
   });
 
-  // clear on sign out
-  hoodie.on('account:signedOut', clear);
-
-  hoodie.config = {
-    set : set,
-    get : get,
-    clear : clear,
-    remove : remove
-  };
+  // exspose public API
+  hoodie.config = config;
 }
 
 /* exported hoodieAccount */
@@ -2820,10 +2872,6 @@ function hoodieAccount (hoodie) {
   // default couchDB user doc prefix
   var userDocPrefix = 'org.couchdb.user';
 
-  // set username from config (local store)
-  account.username = hoodie.config.get('_account.username');
-  account.ownerHash = hoodie.config.get('_account.ownerHash');
-
 
   // Authenticate
   // --------------
@@ -2834,10 +2882,12 @@ function hoodieAccount (hoodie) {
   account.authenticate = function authenticate() {
     var sendAndHandleAuthRequest;
 
+    // already tried to authenticate, and failed
     if (authenticated === false) {
       return hoodie.reject();
     }
 
+    // already tried to authenticate, and succeeded
     if (authenticated === true) {
       return hoodie.resolveWith(account.username);
     }
@@ -2849,7 +2899,8 @@ function hoodieAccount (hoodie) {
       return requests.signOut.then(hoodie.rejectWith);
     }
 
-    // if there is apending signIn request, return its promise
+    // if there is a pending signIn request, return its promise
+    //
     if (requests.signIn && requests.signIn.state() === 'pending') {
       return requests.signIn;
     }
@@ -2866,7 +2917,7 @@ function hoodieAccount (hoodie) {
     // pending request already, return its promise.
     //
     sendAndHandleAuthRequest = function() {
-      return account.request('GET', '/_session').pipe(
+      return account.request('GET', '/_session').then(
         handleAuthenticateRequestSuccess,
         handleRequestError
       );
@@ -2925,7 +2976,7 @@ function hoodieAccount (hoodie) {
       contentType: 'application/json'
     };
 
-    return account.request('PUT', userDocUrl(username), options).pipe(
+    return account.request('PUT', userDocUrl(username), options).then(
       handleSignUpSucces(username, password),
       handleRequestError
     );
@@ -3023,7 +3074,7 @@ function hoodieAccount (hoodie) {
     if (username !== account.username) {
       return account.signOut({
         silent: true
-      }).pipe(function() {
+      }).then(function() {
         return sendSignInRequest(username, password);
       });
     } else {
@@ -3051,8 +3102,8 @@ function hoodieAccount (hoodie) {
       });
     }
     hoodie.remote.disconnect();
-    // return sendSignOutRequest().pipe(cleanupAndTriggerSignOut);
-    return sendSignOutRequest().pipe(cleanupAndTriggerSignOut);
+    // return sendSignOutRequest().then(cleanupAndTriggerSignOut);
+    return sendSignOutRequest().then(cleanupAndTriggerSignOut);
   };
 
 
@@ -3122,7 +3173,7 @@ function hoodieAccount (hoodie) {
     }
 
     return withSingleRequest('fetch', function() {
-      return account.request('GET', userDocUrl(username)).pipe(
+      return account.request('GET', userDocUrl(username)).then(
         null,
         handleRequestError
       ).done(function(response) {
@@ -3151,7 +3202,7 @@ function hoodieAccount (hoodie) {
 
     hoodie.remote.disconnect();
 
-    return account.fetch().pipe(
+    return account.fetch().then(
       sendChangeUsernameAndPasswordRequest(currentPassword, null, newPassword),
       handleRequestError
     );
@@ -3174,7 +3225,7 @@ function hoodieAccount (hoodie) {
     resetPasswordId = hoodie.config.get('_account.resetPasswordId');
 
     if (resetPasswordId) {
-      return checkPasswordResetStatus();
+      return account.checkPasswordReset();
     }
 
     resetPasswordId = '' + username + '/' + (hoodie.uuid());
@@ -3198,11 +3249,62 @@ function hoodieAccount (hoodie) {
       contentType: 'application/json'
     };
 
-    // TODO: spec that checkPasswordResetStatus gets executed
+    // TODO: spec that checkPasswordReset gets executed
     return withPreviousRequestsAborted('resetPassword', function() {
-      return account.request('PUT', '/_users/' + (encodeURIComponent(key)), options).pipe(
+      return account.request('PUT', '/_users/' + (encodeURIComponent(key)), options).then(
         null, handleRequestError
-      ).done(checkPasswordResetStatus);
+      ).done(account.checkPasswordReset);
+    });
+  };
+
+  // checkPasswordReset
+  // ---------------------
+
+  // check for the status of a password reset. It might take
+  // a while until the password reset worker picks up the job
+  // and updates it
+  //
+  // If a password reset request was successful, the $passwordRequest
+  // doc gets removed from _users by the worker, therefore a 401 is
+  // what we are waiting for.
+  //
+  // Once called, it continues to request the status update with a
+  // one second timeout.
+  //
+  account.checkPasswordReset = function checkPasswordReset() {
+    var hash, options, resetPasswordId, url, username;
+
+    // reject if there is no pending password reset request
+    resetPasswordId = hoodie.config.get('_account.resetPasswordId');
+
+    if (!resetPasswordId) {
+      return hoodie.rejectWith({
+        error: 'missing'
+      });
+    }
+
+    // send request to check status of password reset
+    username = '$passwordReset/' + resetPasswordId;
+    url = '/_users/' + (encodeURIComponent(userDocPrefix + ':' + username));
+    hash = btoa(username + ':' + resetPasswordId);
+
+    options = {
+      headers: {
+        Authorization: 'Basic ' + hash
+      }
+    };
+
+    return withPreviousRequestsAborted('passwordResetStatus', function() {
+      return account.request('GET', url, options).then(
+        handlePasswordResetStatusRequestSuccess,
+        handlePasswordResetStatusRequestError
+      ).fail(function(error) {
+        if (error.error === 'pending') {
+          window.setTimeout(account.checkPasswordReset, 1000);
+          return;
+        }
+        return account.trigger('password_reset:error');
+      });
     });
   };
 
@@ -3233,10 +3335,10 @@ function hoodieAccount (hoodie) {
       return cleanupAndTriggerSignOut();
     }
 
-    return account.fetch().pipe(
-      handleFetchBeforeDestroySucces,
+    return account.fetch().then(
+      handleFetchBeforeDestroySuccess,
       handleFetchBeforeDestroyError
-    ).pipe(cleanupAndTriggerSignOut);
+    ).then(cleanupAndTriggerSignOut);
   };
 
 
@@ -3294,8 +3396,7 @@ function hoodieAccount (hoodie) {
     }
 
     if (account.hasAnonymousAccount()) {
-      account.signIn(account.username, getAnonymousPassword());
-      return;
+      return account.signIn(account.username, getAnonymousPassword());
     }
 
     authenticated = false;
@@ -3473,56 +3574,6 @@ function hoodieAccount (hoodie) {
 
 
   //
-  // check for the status of a password reset. It might take
-  // a while until the password reset worker picks up the job
-  // and updates it
-  //
-  // If a password reset request was successful, the $passwordRequest
-  // doc gets removed from _users by the worker, therefore a 401 is
-  // what we are waiting for.
-  //
-  // Once called, it continues to request the status update with a
-  // one second timeout.
-  //
-  function checkPasswordResetStatus() {
-    var hash, options, resetPasswordId, url, username;
-
-    // reject if there is no pending password reset request
-    resetPasswordId = hoodie.config.get('_account.resetPasswordId');
-
-    if (!resetPasswordId) {
-      return hoodie.rejectWith({
-        error: 'missing'
-      });
-    }
-
-    // send request to check status of password reset
-    username = '$passwordReset/' + resetPasswordId;
-    url = '/_users/' + (encodeURIComponent('' + userDocPrefix + ':' + username));
-    hash = btoa('' + username + ':' + resetPasswordId);
-
-    options = {
-      headers: {
-        Authorization: 'Basic ' + hash
-      }
-    };
-
-    return withPreviousRequestsAborted('passwordResetStatus', function() {
-      return account.request('GET', url, options).pipe(
-        handlePasswordResetStatusRequestSuccess,
-        handlePasswordResetStatusRequestError
-      ).fail(function(error) {
-        if (error.error === 'pending') {
-          window.setTimeout(checkPasswordResetStatus, 1000);
-          return;
-        }
-        return account.trigger('password_reset:error');
-      });
-    });
-  }
-
-
-  //
   // If the request was successful there might have occured an
   // error, which the worker stored in the special $error attribute.
   // If that happens, we return a rejected promise with the $error,
@@ -3570,8 +3621,8 @@ function hoodieAccount (hoodie) {
 
     return sendSignInRequest(account.username, currentPassword, {
       silent: true
-    }).pipe(function() {
-      return account.fetch().pipe(
+    }).then(function() {
+      return account.fetch().then(
         sendChangeUsernameAndPasswordRequest(currentPassword, newUsername, newPassword)
       );
     });
@@ -3596,7 +3647,7 @@ function hoodieAccount (hoodie) {
   // we now can be sure that we fetched the latest _users doc, so we can update it
   // without a potential conflict error.
   //
-  function handleFetchBeforeDestroySucces() {
+  function handleFetchBeforeDestroySuccess() {
 
     hoodie.remote.disconnect();
     userDoc._deleted = true;
@@ -3726,7 +3777,7 @@ function hoodieAccount (hoodie) {
       };
 
       return withPreviousRequestsAborted('updateUsersDoc', function() {
-        return account.request('PUT', userDocUrl(), options).pipe(
+        return account.request('PUT', userDocUrl(), options).then(
           handleChangeUsernameAndPasswordRequest(newUsername, newPassword || currentPassword),
           handleRequestError
         );
@@ -3744,6 +3795,7 @@ function hoodieAccount (hoodie) {
 
     return function() {
       hoodie.remote.disconnect();
+
       if (newUsername) {
         return delayedSignIn(newUsername, newPassword, {
           silent: true
@@ -3792,7 +3844,7 @@ function hoodieAccount (hoodie) {
   //
   function sendSignOutRequest() {
     return withSingleRequest('signOut', function() {
-      return account.request('DELETE', '/_session').pipe(null, handleRequestError);
+      return account.request('DELETE', '/_session').then(null, handleRequestError);
     });
   }
 
@@ -3818,12 +3870,11 @@ function hoodieAccount (hoodie) {
     return withPreviousRequestsAborted('signIn', function() {
       var promise = account.request('POST', '/_session', requestOptions);
 
-      return promise.pipe(
+      return promise.then(
         handleSignInSuccess(options),
         handleRequestError
       );
     });
-
   }
 
   //
@@ -3836,22 +3887,16 @@ function hoodieAccount (hoodie) {
   //
   hoodie.account = account;
 
+  // TODO: we should move the owner hash on hoodie core, as
+  //       other modules depend on it as well, like hoodie.store.
   // the ownerHash gets stored in every object created by the user.
   // Make sure we have one.
-  if (!account.ownerHash) {
+  if (!hoodie.account.ownerHash) {
     setOwner(hoodie.uuid());
   }
-
-  // authenticate on next tick
-  window.setTimeout(account.authenticate);
-
-  // is there a pending password reset?
-  // TODO: spec that
-  checkPasswordResetStatus();
 }
 
 /* exported hoodieRemote */
-/* global hoodieRemoteBase */
 
 // AccountRemote
 // ===============
@@ -3866,160 +3911,65 @@ function hoodieAccount (hoodie) {
 // otherwise sync, pull or push can be called manually
 //
 
-
 function hoodieRemote (hoodie) {
 
   // inherit from Hoodies Store API
-  var remoteBase = hoodieRemoteBase(hoodie, {
-
-    // set name to user's DB name
-    name: hoodie.account.db(),
+  var remote = hoodie.open(hoodie.account.db(), {
 
     // we're always connected to our own db
     connected: true,
 
     // do not prefix files for my own remote
-    prefix: ''
+    prefix: '',
+
+    //
+    since: hoodie.config.get('_remote.since') || 0,
+
+    //
+    defaultObjectsToPush: hoodie.store.changedObjects,
+
+    //
+    knownObjects: hoodie.store.index().map( function(key) {
+      var typeAndId = key.split(/\//);
+      return { type: typeAndId[0], id: typeAndId[1]};
+    })
   });
-  var remote = Object.create(remoteBase);
-
-
-  // Connect
-  // ---------
-
-  // do not start to connect immediately, but authenticate beforehand
-  //
-  remote.connect = function connect() {
-    return hoodie.account.authenticate().pipe(connect);
-  };
-
-
-  // disconnect
-  // ------------
-
-  //
-  remote.disconnect = function disconnect() {
-    hoodie.unbind('store:idle', remote.push);
-    return remoteBase.disconnect.apply(remote, arguments);
-  };
-
-
-  // get and set since nr
-  // ----------------------
-
-  // we store the last since number from the current user's store
-  // in his config
-  //
-  remote.getSinceNr = function getSinceNr() {
-    return hoodie.config.get('_remote.since') || 0;
-  };
-
-  remote.setSinceNr = function setSinceNr(since) {
-    return hoodie.config.set('_remote.since', since);
-  };
-
-
-  // push
-  // ------
-
-  // if no objects passed to be pushed, we default to
-  // changed objects in user's local store
-  //
-  remote.push = function push(objects) {
-    if (!remote.isConnected()) {
-      var error = new window.ConnectionError('Not connected: could not push local changes to remote');
-      return hoodie.rejectWith(error);
-    }
-
-    if (!$.isArray(objects)) {
-      objects = hoodie.store.changedObjects();
-    }
-
-    var promise = remoteBase.push.apply(remote, [objects]);
-    promise.fail(hoodie.checkConnection);
-
-    return promise;
-  };
-
-
-  // Events
-  // --------
-  //
-  // namespaced alias for `hoodie.on`
-  //
-  remote.on = function on(event, cb) {
-    event = event.replace(/(^| )([^ ]+)/g, '$1remote:$2');
-    return hoodie.on(event, cb);
-  };
-
-  remote.one = function one(event, cb) {
-    event = event.replace(/(^| )([^ ]+)/g, '$1remote:$2');
-    return hoodie.one(event, cb);
-  };
-
-
-  //
-  // namespaced alias for `hoodie.trigger`
-  //
-  remote.trigger = function trigger() {
-    var event, parameters, _ref;
-
-    event = arguments[0],
-    parameters = 2 <= arguments.length ? Array.prototype.slice.call(arguments, 1) : [];
-
-    return (_ref = hoodie).trigger.apply(_ref, ['remote:' + event].concat(Array.prototype.slice.call(parameters)));
-  };
 
 
   // Private
   // ---------
 
-  // to determine wether to trigger an `add` or `update`
-  // event, the known objects from the user get loaded
-  // from local store initially.
   //
-  function loadListOfKnownObjectsFromLocalStore() {
-    var id, key, type, _i, _len, _ref, _ref1;
-    _ref = hoodie.store.index();
+  // subscribe to events coming from account
+  //
+  function subscribeToEvents() {
 
-    for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-      key = _ref[_i];
-      _ref1 = key.split(/\//),
-      type = _ref1[0],
-      id = _ref1[1];
+    remote.on('disconnect', function() {
+      hoodie.unbind('store:idle', remote.push);
+    });
+    remote.on('connect', function() {
+      hoodie.on('store:idle', remote.push);
+    });
+    remote.on('pull', function(since) {
+      hoodie.config.set('_remote.since', since);
+    });
 
-      remote.markAsKnownObject({
-        type: type,
-        id: id
-      });
-    }
+    hoodie.on('reconnected', remote.connect);
+
+    // account events
+    hoodie.on('account:signin', function() {
+      remote.name = hoodie.account.db();
+      return remote.connect();
+    });
+    hoodie.on('account:reauthenticated', remote.connect);
+    hoodie.on('account:signout', remote.disconnect);
   }
 
-  //
-  function connect() {
-    remote.connected = true;
-    hoodie.on('store:idle', remote.push);
-    return remote.sync();
-  }
-
-  //
-  function handleSignIn() {
-    remote.name = hoodie.account.db();
-    return connect();
-  }
-
-
-  //
-  // Initialization
-  // ----------------
-  //
-  loadListOfKnownObjectsFromLocalStore();
-
-  hoodie.on('account:signin', handleSignIn);
-  hoodie.on('account:reauthenticated', connect);
-  hoodie.on('account:signout', remote.disconnect);
-  hoodie.on('reconnected', remote.connect);
-
+  // allow to run this once from outside
+  remote.subscribeToEvents = function() {
+    subscribeToEvents();
+    delete remote.subscribeToEvents;
+  };
 
   //
   // expose remote API
