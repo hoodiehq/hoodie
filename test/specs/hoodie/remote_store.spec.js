@@ -364,7 +364,7 @@ describe("Hoodie.Remote", function() {
     }); // saving car/123 with color: red and prefix is 'remote_prefix'
   });
 
-  describe.only("#remove(type, id)", function() {
+  describe("#remove(type, id)", function() {
 
     beforeEach(function() {
       this.remote.update.returns("update_promise");
@@ -381,13 +381,11 @@ describe("Hoodie.Remote", function() {
     it("should return promise of update", function() {
       expect(this.storeBackend.remove('car', 123)).to.eql('update_promise');
     });
-
   });
 
   describe("#removeAll(type)", function() {
-
     beforeEach(function() {
-      this.sandbox.stub(this.remote, "updateAll").returns("updateAll_promise");
+      this.remote.updateAll.returns("updateAll_promise");
     });
 
     it("should proxy to updateAll with _deleted: true", function() {
@@ -400,11 +398,9 @@ describe("Hoodie.Remote", function() {
     it("should return promise of updateAll", function() {
       expect(this.storeBackend.removeAll('car')).to.eql('updateAll_promise');
     });
-
   });
 
   describe("#connect()", function() {
-
     beforeEach(function() {
       this.sandbox.spy(this.remote, "bootstrap");
     });
@@ -419,33 +415,26 @@ describe("Hoodie.Remote", function() {
       this.remote.connect();
       expect(this.remote.bootstrap.called).to.be.ok();
     });
-
   });
 
   describe("#disconnect()", function() {
-
-    //it("should not fail when there are no running requests", function() {
-      //this.remote._pullRequest = undefined
-      //this.remote._pushRequest = undefined
-      //expect( this.remote.disconnect ).not.toThrow()
-    //});
-
     it("should abort the pull request", function() {
-      this.remote._pullRequest = {
-        abort: this.sandbox.spy()
-      };
+      var pullDeferPromise = this.hoodie.defer().promise();
+      pullDeferPromise.abort = sinon.spy();
+      this.sandbox.stub(this.remote, 'request').returns(pullDeferPromise)
+      this.remote.pull();
       this.remote.disconnect();
-      expect(this.remote._pullRequest.abort.called).to.be.ok();
+      expect(pullDeferPromise.abort).to.be.called();
     });
 
     it("should abort the push request", function() {
-      this.remote._pushRequest = {
-        abort: this.sandbox.spy()
-      };
+      var pushDeferPromise = this.hoodie.defer().promise();
+      pushDeferPromise.abort = sinon.spy();
+      this.sandbox.stub(this.remote, 'request').returns(pushDeferPromise)
+      this.remote.push([{type: 'funk'}]);
       this.remote.disconnect();
-      expect(this.remote._pushRequest.abort.called).to.be.ok();
+      expect(pushDeferPromise.abort).to.be.called();
     });
-
   });
 
   describe("#getSinceNr()", function() {
