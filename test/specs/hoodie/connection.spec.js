@@ -115,7 +115,7 @@ describe('#checkConnection()', function() {
           'status': 0,
           'statusText': "Error"
         });
-        //this.hoodie.checkConnection();
+        this.hoodie.checkConnection();
       });
 
       it('should check again in 3 seconds', function() {

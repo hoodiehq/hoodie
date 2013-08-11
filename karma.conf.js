@@ -37,23 +37,24 @@ files = [
   'test/mocks/*.js',
 
   // these are good
-  // 'test/specs/hoodie.spec.js',
-  // 'test/specs/hoodie/account.spec.js',
-  // 'test/specs/hoodie/config.spec.js',
-  // 'test/specs/hoodie/dispose.spec.js',
-  // 'test/specs/hoodie/events.spec.js',
-  // 'test/specs/hoodie/promises.spec.js',
-  // 'test/specs/hoodie/request.spec.js',
-  // 'test/specs/hoodie/uuid.spec.js'
+  'test/specs/hoodie.spec.js',
+  'test/specs/hoodie/account.spec.js',
+  'test/specs/hoodie/config.spec.js',
+
+  'test/specs/hoodie/dispose.spec.js',
+  'test/specs/hoodie/events.spec.js',
+  'test/specs/hoodie/local_store.spec.js',
+  'test/specs/hoodie/open.spec.js',
+  'test/specs/hoodie/promises.spec.js',
+  'test/specs/hoodie/request.spec.js',
+  'test/specs/hoodie/store.spec.js',
+  'test/specs/hoodie/remote_store.spec.js',
+  'test/specs/hoodie/uuid.spec.js',
+  'test/specs/hoodie/account_remote.spec.js'
 
   // these need to be fixed
-  'test/specs/hoodie/store.spec.js',
-  // 'test/specs/hoodie/local_store.spec.js',
-  // 'test/specs/hoodie/remote_store.spec.js',
-  // 'test/specs/hoodie/open.spec.js',
-  // 'test/specs/hoodie/account_remote.spec.js',
 
-  // this one throws strange arers:
+  // this one throws strange errors:
   // TypeError: 'undefined' is not an object (evaluating 'hoodie.request('GET', '/').then
   // dunno why yet
   // 'test/specs/hoodie/connection.spec.js'

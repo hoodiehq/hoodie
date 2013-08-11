@@ -1,7 +1,6 @@
 'use strict';
 
 describe('hoodie.remote', function() {
-
   beforeEach(function() {
     this.hoodie = new Mocks.Hoodie();
     this.sandbox.stub(this.hoodie, 'open').returns({});
