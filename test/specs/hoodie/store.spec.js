@@ -19,36 +19,53 @@ describe("hoodieStoreApi", function() {
     expect(this.store.validate).to.be.a(Function)
   });
 
-  describe("#validate(type, id, object, options)", function() {
+  describe("#validate(object, options)", function() {
+    beforeEach(function() {
+      this.object = {
+        type: 'document',
+        id: '123',
+        name: 'bazinga!'
+      }
+    });
     it("returns nothing when valid data passed", function() {
-      expect(this.store.validate('type', 'id')).to.be(undefined);
+      expect(this.store.validate(this.object)).to.be(undefined);
     });
 
-    it("returns nothing when only a valid type passed", function() {
-      expect(this.store.validate('type')).to.be(undefined);
+    it("returns nothing when id is undefined", function() {
+      delete this.object.id
+      expect(this.store.validate(this.object)).to.be(undefined);
     });
 
-    it("returns nothing when undefined type and undefined id passed", function() {
-      expect(this.store.validate(undefined, undefined)).to.be(undefined);
+    it("returns an error when type is undefined", function() {
+      delete this.object.type
+      expect(this.store.validate(this.object)).to.be.an(Error);
     });
 
-    it("returns nothing when a valid type and an undefined id passed", function() {
-      expect(this.store.validate('type', undefined)).to.be(undefined);
-    });
-
-    it("returns nothing when nothing passed", function() {
+    it("returns an error when no object passed", function() {
       var error = this.store.validate();
-      expect(error).to.be(undefined);
+      expect(error).to.be.an(Error);
     });
 
     it("returns an error when invalid type passed", function() {
-      var error = this.store.validate('inva/id');
+      this.object.type = 'inva/id';
+      var error = this.store.validate(this.object);
       expect(error).to.be.an(Error);
     });
 
     it("returns an error when invalid id passed", function() {
-      var error = this.store.validate('valid', 'inva/id');
+      this.object.id = 'inva/id';
+      var error = this.store.validate(this.object);
       expect(error).to.be.an(Error);
+    });
+
+    it('passes object & options', function() {
+      this.sandbox.stub(this.store, 'validate')
+      this.store.save('document', '123', {name: 'test'}, {option: 'value'})
+      expect(this.store.validate).to.be.calledWith({
+        type: 'document',
+        id: '123',
+        name: 'test'
+      }, {option: 'value'})
     });
   });
 
@@ -63,7 +80,11 @@ describe("hoodieStoreApi", function() {
     it("should validate", function() {
       this.sandbox.spy(this.store, 'validate');
       this.store.save('type', 'id', {property: 'value'}, {option: 'value'});
-      expect(this.store.validate).to.be.calledWith('type', 'id', {property: 'value'}, {option: 'value'});
+      expect(this.store.validate).to.be.calledWith({
+        "property": "value",
+        "type": "type",
+        "id": "id"
+      }, {option: 'value'});
     })
 
     it("should call backend.save", function() {
@@ -377,12 +398,6 @@ describe("hoodieStoreApi", function() {
       expect(this.store.findAll()).to.be.promise();
     });
 
-    it("should validate", function() {
-      this.sandbox.spy(this.store, 'validate');
-      this.store.findAll('type', {option: 'value'});
-      expect(this.store.validate).to.be.calledWith('type', undefined, undefined, {option: 'value'});
-    })
-
     it("should call backend.save", function() {
       this.store.findAll('type', {option: 'value'});
       expect(this.options.backend.findAll).to.be.calledWith('type', {option: 'value'});
@@ -458,12 +473,6 @@ describe("hoodieStoreApi", function() {
       expect(defer).to.be.promise();
     });
 
-    it("should validate", function() {
-      this.sandbox.spy(this.store, 'validate');
-      this.store.remove('document', '123', {option: 'value'});
-      expect(this.store.validate).to.be.calledWith('document', '123', undefined, {option: 'value'});
-    })
-
     it("should call backend.save", function() {
       this.store.remove('document', '123', {option: 'value'});
       expect(this.options.backend.remove).to.be.calledWith('document', '123', {option: 'value'});
@@ -478,12 +487,6 @@ describe("hoodieStoreApi", function() {
 
     it("should return a promise", function() {
       expect(this.store.removeAll()).to.be.pending();
-    });
-
-    it("should validate", function() {
-      this.sandbox.spy(this.store, 'validate');
-      this.store.removeAll('type', {option: 'value'});
-      expect(this.store.validate).to.be.calledWith('type', {option: 'value'});
     });
 
     it("should call backend.removeAll", function() {
