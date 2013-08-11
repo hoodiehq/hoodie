@@ -1,5 +1,5 @@
 /* exported hoodieRemoteStore */
-/* global hoodieStoreBase */
+/* global hoodieStoreApi */
 
 // Remote
 // ========
@@ -149,7 +149,7 @@ function hoodieRemoteStore (hoodie, options) {
   };
 
 
-  var remote = hoodieStoreBase(hoodie, {
+  var remote = hoodieStoreApi(hoodie, {
 
     name: options.name,
 

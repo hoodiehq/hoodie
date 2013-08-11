@@ -1,5 +1,5 @@
 /* exported hoodieStore */
-/* global hoodieStoreBase */
+/* global hoodieStoreApi */
 
 // LocalStore
 // ============
@@ -57,7 +57,7 @@ function hoodieStore (hoodie) {
 
     // if store is currently bootstrapping data from remote,
     // we're queueing until it's finished
-    if (localStore.isBootstrapping()) {
+    if (store.isBootstrapping()) {
       return enqueue('save', arguments);
     }
 
@@ -119,6 +119,8 @@ function hoodieStore (hoodie) {
       delete object._$local;
     }
 
+    defer = hoodie.defer();
+
     try {
       object = store.cache(object.type, object.id, object, options);
       defer.resolve(object, isNew).promise();
@@ -126,7 +128,7 @@ function hoodieStore (hoodie) {
       triggerEvents(event, object, options);
     } catch (_error) {
       error = _error;
-      defer.reject(error.toString()).promise();
+      defer.reject(error.toString());
     }
 
     return defer.promise();
@@ -144,9 +146,11 @@ function hoodieStore (hoodie) {
   localStore.find = function(type, id) {
     var defer, error, object;
 
+    defer = hoodie.defer();
+
     // if store is currently bootstrapping data from remote,
     // we're queueing until it's finished
-    if (localStore.isBootstrapping()) {
+    if (store.isBootstrapping()) {
       return enqueue('find', arguments);
     }
 
@@ -180,6 +184,8 @@ function hoodieStore (hoodie) {
   localStore.findAll = function findAll(filter) {
     var currentType, defer, error, id, key, keys, obj, results, type;
 
+
+
     if (filter == null) {
       filter = function() {
         return true;
@@ -188,7 +194,7 @@ function hoodieStore (hoodie) {
 
     // if store is currently bootstrapping data from remote,
     // we're queueing until it's finished
-    if (localStore.isBootstrapping()) {
+    if (store.isBootstrapping()) {
       return enqueue('findAll', arguments);
     }
 
@@ -201,6 +207,8 @@ function hoodieStore (hoodie) {
         return obj.type === type;
       };
     }
+
+    defer = hoodie.defer();
 
     try {
 
@@ -254,13 +262,13 @@ function hoodieStore (hoodie) {
   // when object has been synced before, mark it as deleted.
   // Otherwise remove it from Store.
   localStore.remove = function remove(type, id, options) {
-    var defer, key, object, objectWasMarkedAsDeleted;
+    var key, object, objectWasMarkedAsDeleted;
 
     options = options || {};
 
     // if store is currently bootstrapping data from remote,
     // we're queueing until it's finished
-    if (localStore.isBootstrapping()) {
+    if (store.isBootstrapping()) {
       return enqueue('remove', arguments);
     }
 
@@ -280,7 +288,7 @@ function hoodieStore (hoodie) {
     }
 
     if (!object) {
-      return defer.rejectWith(Hoodie.Errors.NOT_FOUND(type, id));
+      return hoodie.rejectWith(Hoodie.Errors.NOT_FOUND(type, id));
     }
 
     if (object._syncedAt) {
@@ -294,7 +302,7 @@ function hoodieStore (hoodie) {
     }
 
     triggerEvents('remove', object, options);
-    return defer.resolveWith(object);
+    return hoodie.resolveWith(object);
   };
 
 
@@ -339,7 +347,7 @@ function hoodieStore (hoodie) {
     }
   }
 
-  var store = hoodieStoreBase(hoodie, {
+  var store = hoodieStoreApi(hoodie, {
 
     // validate
     validate: validate,

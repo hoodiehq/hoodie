@@ -656,4 +656,99 @@ describe("Hoodie.Store", function() {
 
   });
 
+  //
+  describe("#trigger", function() {
+
+    beforeEach(function() {
+      this.sandbox.spy(this.hoodie, "trigger");
+    });
+
+    it("should proxy to hoodie.trigger with 'store' namespace", function() {
+      this.store.trigger('event', {
+        funky: 'fresh'
+      });
+
+      expect(this.hoodie.trigger).to.be.calledWith('store:event', {
+        funky: 'fresh'
+      });
+    });
+  });
+
+  //
+  describe("#on", function() {
+
+    beforeEach(function() {
+      this.sandbox.spy(this.hoodie, "on");
+    });
+
+    it("should proxy to hoodie.on with 'store' namespace", function() {
+      this.store.on('event', {
+        funky: 'fresh'
+      });
+      expect(this.hoodie.on.calledWith('store:event', {
+        funky: 'fresh'
+      })).to.be.ok();
+    });
+
+    it("should namespace multiple events correctly", function() {
+      var cb = this.sandbox.spy();
+      this.store.on('super funky fresh', cb);
+      expect(this.hoodie.on.calledWith('store:super store:funky store:fresh', cb)).to.be.ok();
+    });
+  });
+
+  //
+  describe("#unbind", function() {
+
+    beforeEach(function() {
+      this.sandbox.spy(this.hoodie, "unbind");
+    });
+
+    it("should proxy to hoodie.unbind with 'store' namespace", function() {
+      var cb = function() {};
+
+      this.store.unbind('event', cb);
+      expect(this.hoodie.unbind.calledWith('store:event', cb)).to.be.ok();
+    });
+  });
+
+
+
+  //
+  describe("#decoratePromises", function() {
+    var method, _i, _len, methods;
+
+    it("should decorate promises returned by the store", function() {
+      var funk = sinon.spy();
+
+      this.store.decoratePromises({
+        funk: funk
+      });
+      var promise = this.store.save('task', {
+        title: 'save the world'
+      });
+
+      promise.funk();
+      expect(funk.called).to.be.ok();
+    });
+
+    methods = "add find findAll findOrAdd update updateAll remove removeAll".split(" ");
+
+    for (_i = 0, _len = methods.length; _i < _len; _i++) {
+      method = methods[_i];
+
+      it("should scope passed methods to returned promise by " + method, function() {
+        var promise;
+        this.store.decoratePromises({
+          funk: function() {
+            return this;
+          }
+        });
+        promise = this.store[method]('task', '12');
+        expect(promise.funk()).to.have.property('done');
+        expect(promise.funk()).to.not.have.property('resolved');
+      });
+    }
+  });
 });
+

@@ -13,7 +13,6 @@
 /* jslint unused: false */
 function hoodieStoreApi(hoodie, options) {
 
-
   // public API
   var api = {};
 
@@ -381,7 +380,7 @@ function hoodieStoreApi(hoodie, options) {
 
   // required backend methods
   // -------------------------
-  if (! $.isArray(options.backend)) {
+  if (! options.backend ) {
     throw new Error('options.backend must be passed');
   }
   var required = 'save find findAll remove removeAll'.split(' ');

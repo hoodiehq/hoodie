@@ -35,15 +35,16 @@ files = [
   'src/hoodie/errors.js',
 
   'test/mocks/*.js',
-  'test/specs/hoodie.spec.js',
+  // 'test/specs/hoodie.spec.js',
 
-  'test/specs/hoodie/dispose.spec.js',
-  'test/specs/hoodie/events.spec.js',
-  'test/specs/hoodie/connection.spec.js',
-  'test/specs/hoodie/open.spec.js',
-  'test/specs/hoodie/account.spec.js',
+  'test/specs/hoodie/local_store.spec.js',
+  // 'test/specs/hoodie/dispose.spec.js',
+  // 'test/specs/hoodie/events.spec.js',
+  // 'test/specs/hoodie/connection.spec.js',
+  // 'test/specs/hoodie/open.spec.js',
+  // 'test/specs/hoodie/account.spec.js',
   // 'test/specs/hoodie/account_remote.spec.js',
-  'test/specs/hoodie/config.spec.js'
+  // 'test/specs/hoodie/config.spec.js'
 ];
 
 

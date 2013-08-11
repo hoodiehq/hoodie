@@ -13,7 +13,9 @@ describe("hoodie.store", function() {
 
     this.clock = this.sandbox.useFakeTimers(0) // '1970-01-01 00:00:00'
 
+    this.sandbox.stub(window, 'hoodieStoreApi').returns(Mocks.StoreApi(this.hoodie));
     hoodieStore(this.hoodie);
+    this.storeBackend = hoodieStoreApi.args[0][1].backend;
     this.store = this.hoodie.store;
   });
 
@@ -31,7 +33,7 @@ describe("hoodie.store", function() {
       });
 
       it("should call methods on localStorage", function() {
-        this.store.find('task', '123');
+        this.storeBackend.find('task', '123');
         expect(window.localStorage.getItem).to.be.called()
       });
     }); // store is not persistant
@@ -43,7 +45,7 @@ describe("hoodie.store", function() {
       });
 
       it("should not call methods on localStorage", function() {
-        this.store.find('task', '123');
+        this.storeBackend.find('task', '123');
         expect(window.localStorage.getItem).to.not.be.called()
       });
     }); // store is not persistant
@@ -138,75 +140,25 @@ describe("hoodie.store", function() {
 
   //
   describe("#save(type, id, object, options)", function() {
-    it("should return a promise", function() {
-      var promise = this.store.save('document', '123', {
-        name: 'test'
-      });
-      expect(promise).to.be.promise();
-    });
-
-    it("should allow numbers and lowercase letters for type only. And must start with a letter or $", function() {
-      var invalid, key, promise, valid, _i, _len;
-      invalid = ['UPPERCASE', 'underLines', '-?&$', '12345', 'a'];
-      valid = ['car', '$email'];
-      for (_i = 0, _len = invalid.length; _i < _len; _i++) {
-        key = invalid[_i];
-        promise = this.store.save(key, 'valid', {});
-        expect(promise).to.be.rejected();
-      }
-      for (_i = 0, _len = valid.length; _i < _len; _i++) {
-        key = valid[_i];
-        promise = this.store.save(key, 'valid', {});
-        expect(promise).to.be.resolved();
-      };
-    });
-
-    it("should allow numbers, lowercase letters and dashes for for id only", function() {
-      var invalid, key, promise, valid, _i, _len;
-      invalid = ['UPPERCASE', 'underLines', '-?&$'];
-      valid = ['abc4567', '1', 123, 'abc-567'];
-
-      for (_i = 0, _len = invalid.length; _i < _len; _i++) {
-        key = invalid[_i];
-        promise = this.store.save('valid', key, {});
-        expect(promise.state()).to.eql('rejected');
-      }
-      for (_i = 0, _len = valid.length; _i < _len; _i++) {
-        key = valid[_i];
-        promise = this.store.save('valid', key, {});
-        expect(promise.state()).to.eql('resolved');
-      }
-    });
-
-    describe("invalid arguments", function() {
-      _when("no arguments passed", function() {
-        it("should be rejected", function() {
-          expect(this.store.save()).to.be.rejected();
-        });
-      }); // no arguments passed
-
-      _when("no object passed", function() {
-        it("should be rejected", function() {
-          var promise = this.store.save('document', 'abc4567');
-          expect(promise).to.be.rejected();
-        });
-      }); //no object passed
-    }); // invalid arguments
-
     _when("id is '123', type is 'document', object is {name: 'test'}", function() {
       beforeEach(function() {
-        this.properties = {name: 'test'};
-        window.localStorage.getItem.returns(JSON.stringify(this.properties));
+        window.localStorage.getItem.returns(JSON.stringify({name: 'test'}));
 
-        this.promise = this.store.save('document', '123', this.properties, {
-          option: 'value'
+        this.promise = this.storeBackend.save({
+          name: 'test',
+          type: 'document',
+          id: '123'
         });
       });
 
       it("should cache document", function() {
         // which means we don't call localStorage.getItem again
         localStorage.getItem.reset()
-        this.promise = this.store.save('document', '123', this.properties)
+        this.promise = this.storeBackend.save({
+          type: 'document',
+          id: '123',
+          name: 'text'
+        });
         expect(localStorage.getItem).to.not.be.called();
       });
 
@@ -217,11 +169,12 @@ describe("hoodie.store", function() {
       });
 
       _and("options.remote is true", function() {
-
         beforeEach(function() {
           this.sandbox.spy(this.store, "trigger");
 
-          this.store.save('document', '123', {
+          this.promise = this.storeBackend.save({
+            type: 'document',
+            id: '123',
             name: 'test',
             _rev: '2-345'
           }, {
@@ -265,7 +218,9 @@ describe("hoodie.store", function() {
             _local: 'something'
           });
 
-          this.store.save('document', '1234', {
+          this.storeBackend.save({
+            type: 'document',
+            id: '1234',
             name: 'test',
             _rev: '2-345'
           }, {
@@ -285,7 +240,9 @@ describe("hoodie.store", function() {
       _and("options.silent is true", function() {
         beforeEach(function() {
 
-          this.store.save('document', '123', {
+          this.storeBackend.save({
+            type: 'document',
+            id: '123',
             name: 'test'
           }, {
             silent: true
@@ -302,7 +259,9 @@ describe("hoodie.store", function() {
 
       _and("options.local is true", function() {
         beforeEach(function() {
-          this.store.save('document', '123', {
+          this.storeBackend.save({
+            type: 'document',
+            id: '123',
             name: 'test'
           }, {
             local: true
@@ -317,7 +276,9 @@ describe("hoodie.store", function() {
 
       _and("options.local is not set", function() {
         beforeEach(function() {
-          this.store.save('document', '123', {
+          this.storeBackend.save({
+            type: 'document',
+            id: '123',
             name: 'test',
             _$local: true
           });
@@ -333,7 +294,9 @@ describe("hoodie.store", function() {
         beforeEach(function() {
           this.sandbox.spy(this.store, "trigger");
           stubFindItem('document', '1235', null);
-          this.store.save('document', '1235', {
+          this.storeBackend.save({
+            type: 'document',
+            id: '1235',
             name: 'test'
           });
         });
@@ -367,9 +330,15 @@ describe("hoodie.store", function() {
               updatedAt: 'yesterday',
               createdBy: 'owner_hash'
             }
-
-            stubFindItem('document', '123successful', this.properties )
-            this.promise = this.store.save('document', '123successful', this.properties);
+            stubFindItem('document', '123successful', this.properties)
+            this.promise = this.storeBackend.save({
+              type: 'document',
+              id: '123successful',
+              name: 'success',
+              createdAt: now(),
+              updatedAt: 'yesterday',
+              createdBy: 'owner_hash'
+            });
           });
 
           it("should pass the object & false (= not created) to done callback", function() {
@@ -383,16 +352,17 @@ describe("hoodie.store", function() {
 
         _and("object did not exist before", function() {
           beforeEach(function() {
-            this.properties = {
+            this.object = {
+              type: 'document',
+              id: '123new',
               name: 'this is new'
             }
-
             stubFindItem('document', '123new', null )
-            this.promise = this.store.save('document', '123new', this.properties);
+            this.promise = this.storeBackend.save(this.object);
           });
 
           it("should pass true (= new created) as the second param to the done callback", function() {
-            var object = $.extend({}, this.properties);
+            var object = $.extend({}, this.object);
             object.createdAt = now();
             object.updatedAt = now();
             object.createdBy = 'owner_hash';
@@ -407,7 +377,9 @@ describe("hoodie.store", function() {
       _when("failed", function() {
         beforeEach(function() {
           window.localStorage.setItem.throws(new Error('funk'));
-          this.promise = this.store.save('document', '123ohoh', {
+          this.promise = this.storeBackend.save({
+            type: 'document',
+            id: '123ohoh',
             name: 'test'
           });
         });
@@ -420,7 +392,7 @@ describe("hoodie.store", function() {
 
     _when("id is '123', type is 'document', object is {id: '123', type: 'document', name: 'test'}", function() {
       beforeEach(function() {
-        this.store.save('document', '123', {
+        this.storeBackend.save({
           id: '123',
           type: 'document',
           name: 'test with id & type'
@@ -437,7 +409,9 @@ describe("hoodie.store", function() {
 
     _when("id is '123', type is '$internal', object is {action: 'do some background magic'}}", function() {
       beforeEach(function() {
-        this.promise = this.store.save('$internal', '123', {
+        this.promise = this.storeBackend.save({
+          type: '$internal',
+          id: '123',
           action: 'do some background magic'
         });
       });
@@ -453,7 +427,9 @@ describe("hoodie.store", function() {
       });
 
       it("should not overwrite $hidden property when not passed", function() {
-        this.store.save('document', '123hidden', {
+        this.storeBackend.save({
+          type: 'document',
+          id: '123hidden',
           name: 'new test'
         });
         var object = getLastSavedObject()
@@ -461,7 +437,9 @@ describe("hoodie.store", function() {
       });
 
       it("should overwrite $hidden property when passed", function() {
-        this.store.save('document', '123hidden', {
+        this.storeBackend.save({
+          type: 'document',
+          id: '123hidden',
           name: 'new test',
           $hidden: 'wicked'
         });
@@ -473,7 +451,8 @@ describe("hoodie.store", function() {
 
     _when("called without id", function() {
       beforeEach(function() {
-        this.promise = this.store.save('document', undefined, {
+        this.promise = this.storeBackend.save({
+          type: 'document',
           name: 'this is new'
         });
       });
@@ -485,7 +464,6 @@ describe("hoodie.store", function() {
     }); // called without id
 
     _when("store is bootstrapping", function() {
-
       beforeEach(function() {
         var called = false;
         this.sandbox.stub(this.store, 'isBootstrapping', function() {
@@ -496,64 +474,30 @@ describe("hoodie.store", function() {
       });
 
       it("should wait until bootstrapping is finished", function() {
-        var promise = this.store.save('task', '123', { title: 'do it!' });
-        promise.fail( function() { console.log(arguments); });
-        expect(promise).to.be.pending();
+        this.storeBackend.save({
+          type: 'task',
+          id: '123',
+          title: 'do it!'
+        });
+        this.sandbox.spy(this.store, 'save')
         this.store.subscribeToOutsideEvents();
         this.hoodie.trigger('remote:bootstrap:end');
-        expect(promise).to.be.resolved();
+        expect(this.store.save).to.be.called();
       });
     }); // store is bootstrapping
   }); // #save
 
   //
-  describe("#add(type, object, options)", function() {
-    it.skip("should return a decorated promise")
-  });
-
-  //
-  describe("#updateAll(objects)", function() {
-    it.skip("should return a decorated promise")
-  });
-
-  //
   describe("#find(type, id)", function() {
-
     beforeEach(function() {
     });
 
-    it("should return a promise", function() {
-      var promise = this.store.find('document', '123');
-      expect(promise).to.be.promise()
-    });
-
-    describe("invalid arguments", function() {
-
-      _when("no arguments passed", function() {
-
-        it("should call the fail callback", function() {
-          var promise = this.store.find();
-          expect(promise).to.be.rejected();
-        });
-
-      });
-
-      _when("no id passed", function() {
-        it("should call the fail callback", function() {
-          var promise = this.store.find('document');
-          expect(promise).to.be.rejected();
-        });
-      });
-
-    });
-
     _when("object can be found", function() {
-
       beforeEach(function() {
         stubFindItem('document', '123lessie', {
           name: 'woof'
         })
-        this.promise = this.store.find('document', '123lessie');
+        this.promise = this.storeBackend.find('document', '123lessie');
       });
 
       it("should call the done callback", function() {
@@ -563,14 +507,13 @@ describe("hoodie.store", function() {
           "id": "123lessie"
         });
       });
-
-    });
+    }); // object can be found
 
     _when("object cannot be found", function() {
 
       beforeEach(function() {
         stubFindItem('document', 'truelie', null)
-        this.promise = this.store.find('document', 'abc4567');
+        this.promise = this.storeBackend.find('document', 'abc4567');
       });
 
       it("should call the fail callback", function() {
@@ -579,8 +522,8 @@ describe("hoodie.store", function() {
     });
 
     it("should cache the object after the first get", function() {
-      this.store.find('document', 'abc4567cached');
-      this.store.find('document', 'abc4567cached');
+      this.storeBackend.find('document', 'abc4567cached');
+      this.storeBackend.find('document', 'abc4567cached');
       expect(localStorage.getItem.callCount).to.eql(1);
     });
 
@@ -598,12 +541,12 @@ describe("hoodie.store", function() {
         stubFindItem('document', '123boot', {
           name: 'me up'
         })
-        var promise = this.store.find('document', '123boot');
-        promise.fail( function() { console.log(arguments); });
-        expect(promise).to.be.pending();
+        this.storeBackend.find('document', '123boot');
+
+        this.sandbox.spy(this.store, 'find')
         this.store.subscribeToOutsideEvents();
         this.hoodie.trigger('remote:bootstrap:end');
-        expect(promise).to.be.resolved();
+        expect(this.store.find).to.be.called();
       });
     });
   }); // #find
@@ -612,13 +555,13 @@ describe("hoodie.store", function() {
   describe("#findAll(filter)", function() {
 
     it("should return a promise", function() {
-      var promise = this.store.findAll();
+      var promise = this.storeBackend.findAll();
       expect(promise).to.be.promise();
     });
 
     with_2CatsAnd_3Dogs(function() {
       it("should sort by createdAt", function() {
-        var promise = this.store.findAll()
+        var promise = this.storeBackend.findAll()
 
         expect(promise).to.be.resolvedWith([
           {
@@ -669,7 +612,7 @@ describe("hoodie.store", function() {
         it("should return'em all", function() {
           var promise, results, success;
           success = this.sandbox.spy();
-          promise = this.store.findAll();
+          promise = this.storeBackend.findAll();
           promise.done(success);
           results = success.args[0][0];
           expect(results.length).to.eql(5);
@@ -682,7 +625,7 @@ describe("hoodie.store", function() {
         });
 
         it("should return an empty array", function() {
-          var promise = this.store.findAll();
+          var promise = this.storeBackend.findAll();
           promise.then(function (res) {
             expect(res).to.eql([]);
           });
@@ -700,7 +643,7 @@ describe("hoodie.store", function() {
         it("should not return them", function() {
           var promise, results, success;
           success = this.sandbox.spy();
-          promise = this.store.findAll();
+          promise = this.storeBackend.findAll();
           promise.done(success);
           results = success.args[0][0];
           expect(results.length).to.eql(1);
@@ -713,7 +656,7 @@ describe("hoodie.store", function() {
         it("should only return the dog aged 3", function() {
           var promise, results, success;
           success = this.sandbox.spy();
-          promise = this.store.findAll(function(obj) {
+          promise = this.storeBackend.findAll(function(obj) {
             return obj.age === 3;
           });
           promise.done(success);
@@ -734,15 +677,12 @@ describe("hoodie.store", function() {
       });
 
       it("should wait until bootstrapping is finished", function() {
-        var promise = this.store.findAll('todo');
-        promise.fail( function() { console.log(arguments); });
+        this.storeBackend.findAll('todo');
 
-        expect(promise.state()).to.eql('pending');
-
-        this.store.subscribeToOutsideEvents()
+        this.sandbox.spy(this.store, 'findAll')
+        this.store.subscribeToOutsideEvents();
         this.hoodie.trigger('remote:bootstrap:end');
-
-        expect(promise.state()).to.eql('resolved');
+        expect(this.store.findAll).to.be.called();
       });
     }); // store is bootstrapping
   }); // #findAll
@@ -755,7 +695,7 @@ describe("hoodie.store", function() {
       });
 
       it("should return a rejected the promise", function() {
-        var promise = this.store.remove('document', '123');
+        var promise = this.storeBackend.remove('document', '123');
         expect(promise.state()).to.eql('rejected');
       });
     }); // objecet cannot be found
@@ -769,30 +709,30 @@ describe("hoodie.store", function() {
       });
 
       it("should remove the object", function() {
-        this.store.remove('document', '123');
+        this.storeBackend.remove('document', '123');
         expect(localStorage.removeItem.calledWith('document/123')).to.be.ok();
       });
 
       it("should cache that object has been removed", function() {
-        this.store.remove('document', '123');
+        this.storeBackend.remove('document', '123');
         expect(localStorage.getItem.callCount).to.be(1)
-        this.store.find('document', '123');
+        this.storeBackend.find('document', '123');
         expect(localStorage.getItem.callCount).to.be(1)
       });
 
       it.skip("should clear document from changed", function() {
         this.sandbox.spy(this.store, "clearChanged");
-        this.store.remove('document', '123');
+        this.storeBackend.remove('document', '123');
         expect(this.store.clearChanged).to.be.calledWith('document', '123');
       });
 
       it("should return a resolved promise", function() {
-        var promise = this.store.remove('document', '123');
+        var promise = this.storeBackend.remove('document', '123');
         expect(promise).to.be.resolved();
       });
 
       it("should return a clone of the cached object (before it was deleted)", function() {
-        var promise = this.store.remove('document', '123');
+        var promise = this.storeBackend.remove('document', '123');
         expect(promise).to.be.resolvedWith({
           type: 'document',
           id: '123',
@@ -807,8 +747,7 @@ describe("hoodie.store", function() {
           name: 'test'
         });
         this.sandbox.spy(this.store, "trigger");
-        debugger
-        this.store.remove('document', '123', {
+        this.storeBackend.remove('document', '123', {
           remote: true
         });
       });
@@ -878,7 +817,7 @@ describe("hoodie.store", function() {
         stubFindItem('document', '123', {
           _syncedAt: 'now'
         });
-        this.store.remove('document', '123');
+        this.storeBackend.remove('document', '123');
       });
 
       it("should mark the object as deleted and cache it", function() {
@@ -908,12 +847,12 @@ describe("hoodie.store", function() {
         stubFindItem('document', '123', {
           something: 'here'
         });
-        var promise = this.store.remove('document', '123');
-        expect(promise.state()).to.eql('pending');
+        this.storeBackend.remove('document', '123');
 
-        this.store.subscribeToOutsideEvents()
+        this.sandbox.spy(this.store, 'remove')
+        this.store.subscribeToOutsideEvents();
         this.hoodie.trigger('remote:bootstrap:end');
-        expect(promise.state()).to.eql('resolved');
+        expect(this.store.remove).to.be.called();
       });
 
     });
@@ -1160,11 +1099,11 @@ describe("hoodie.store", function() {
     });
 
     it("should clear chache", function() {
-      this.store.find('document', '123')
-      this.store.find('document', '123')
+      this.storeBackend.find('document', '123')
+      this.storeBackend.find('document', '123')
       expect(localStorage.getItem.callCount).to.be(1)
       this.store.clear();
-      this.store.find('document', '123')
+      this.storeBackend.find('document', '123')
       expect(localStorage.getItem.callCount).to.be(2)
     });
 
@@ -1202,7 +1141,7 @@ describe("hoodie.store", function() {
       });
 
       it("returns true when there are local changes", function() {
-        this.store.add('song', { title: "Urlaub in Polen"});
+        this.storeBackend.save({ type: 'song', title: "Urlaub in Polen"});
         expect(this.store.hasLocalChanges()).to.eql(true);
       });
     }); // no arguments passed
@@ -1293,8 +1232,16 @@ describe("hoodie.store", function() {
 
     _when("there are 2 dirty docs", function() {
       beforeEach(function() {
-        this.store.save('couch', '123', { color: 'red' })
-        this.store.save('couch', '456', { color: 'blue' })
+        this.storeBackend.save({
+          type: 'couch',
+          id: '123',
+          color: 'red'
+        })
+        this.storeBackend.save({
+          type: 'couch',
+          id: '456',
+          color: 'blue'
+        })
       });
 
       it("should return the two docs", function() {
@@ -1308,100 +1255,6 @@ describe("hoodie.store", function() {
       });
     });
   }); // #changedObjects
-
-  //
-  describe("#trigger", function() {
-
-    beforeEach(function() {
-      this.sandbox.spy(this.hoodie, "trigger");
-    });
-
-    it("should proxy to hoodie.trigger with 'store' namespace", function() {
-      this.store.trigger('event', {
-        funky: 'fresh'
-      });
-
-      expect(this.hoodie.trigger.calledWith('store:event', {
-        funky: 'fresh'
-      })).to.be.ok();
-    });
-  });
-
-  //
-  describe("#on", function() {
-
-    beforeEach(function() {
-      this.sandbox.spy(this.hoodie, "on");
-    });
-
-    it("should proxy to hoodie.on with 'store' namespace", function() {
-      this.store.on('event', {
-        funky: 'fresh'
-      });
-      expect(this.hoodie.on.calledWith('store:event', {
-        funky: 'fresh'
-      })).to.be.ok();
-    });
-
-    it("should namespace multiple events correctly", function() {
-      var cb = this.sandbox.spy();
-      this.store.on('super funky fresh', cb);
-      expect(this.hoodie.on.calledWith('store:super store:funky store:fresh', cb)).to.be.ok();
-    });
-  });
-
-  //
-  describe("#unbind", function() {
-
-    beforeEach(function() {
-      this.sandbox.spy(this.hoodie, "unbind");
-    });
-
-    it("should proxy to hoodie.unbind with 'store' namespace", function() {
-      var cb = function() {};
-
-      this.store.unbind('event', cb);
-      expect(this.hoodie.unbind.calledWith('store:event', cb)).to.be.ok();
-    });
-  });
-
-  //
-  describe("#decoratePromises", function() {
-    var method, _i, _len, methods;
-
-    it("should decorate promises returned by the store", function() {
-      var funk = sinon.spy();
-
-      this.store.decoratePromises({
-        funk: funk
-      });
-      var promise = this.store.save('task', {
-        title: 'save the world'
-      });
-
-      promise.funk();
-      expect(funk.called).to.be.ok();
-    });
-
-    methods = "add find findAll findOrAdd update updateAll remove removeAll".split(" ");
-
-    for (_i = 0, _len = methods.length; _i < _len; _i++) {
-      method = methods[_i];
-
-      it("should scope passed methods to returned promise by " + method, function() {
-        var promise;
-        this.store.decoratePromises({
-          funk: function() {
-            return this;
-          }
-        });
-        promise = this.store[method]('task', '12');
-        expect(promise.funk()).to.have.property('done');
-        expect(promise.funk()).to.not.have.property('resolved');
-      });
-    }
-  });
-
 });
 
 function now() {
