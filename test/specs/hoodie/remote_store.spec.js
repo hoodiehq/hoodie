@@ -507,6 +507,16 @@ describe('Hoodie.Remote', function() {
         content: 'deleted, but unknown',
         _deleted: true
       };
+
+      this.requestDefer1 = this.hoodie.defer();
+      this.requestDefer2 = this.hoodie.defer();
+      this.promise1 = this.requestDefer1.promise();
+      this.promise2 = this.requestDefer2.promise();
+      this.promise1.abort = this.promise2.abort = sinon.spy();
+      var defers = [this.promise1,this.promise2];
+      this.sandbox.stub(this.remote, 'request', function() {
+        return defers.shift();
+      });
     });
 
     _when('.isConnected() is true', function() {
@@ -516,26 +526,23 @@ describe('Hoodie.Remote', function() {
       });
 
       it('should send a longpoll GET request to the _changes feed', function() {
-        var method, path, _ref;
+        var method, path, args;
         this.remote.pull();
-        expect(this.hoodie.request.called).to.be.ok();
+        expect(this.remote.request.called).to.be.ok();
 
-        _ref = this.hoodie.request.args[0], method = _ref[0], path = _ref[1];
+        args = this.remote.request.args[0], method = args[0], path = args[1];
         expect(method).to.eql('GET');
-        expect(path).to.eql('/my%2Fstore/_changes?include_docs=true&since=0&heartbeat=10000&feed=longpoll');
+        expect(path).to.eql('/_changes?include_docs=true&since=0&heartbeat=10000&feed=longpoll');
       });
 
       it('restart pull after 25s', function() {
-        var promise = this.requestDefer;
-        promise.abort = sinon.stub();
-        this.sandbox.stub(this.remote, 'request').returns( promise );
 
         this.remote.pull();
         this.sandbox.spy(this.remote, 'pull');
-        expect(promise.abort).to.not.be.called();
+        expect(this.promise1.abort).to.not.be.called();
         this.clock.tick(25000);
         // it gets restarted when aborted
-        expect(promise.abort).to.be.called();
+        expect(this.promise1.abort).to.be.called();
       });
     }); // .isConnected() is true
 
@@ -545,27 +552,22 @@ describe('Hoodie.Remote', function() {
       });
 
       it('should send a normal GET request to the _changes feed', function() {
-        var method, path, _ref;
+        var method, path, args;
+
         this.remote.pull();
-        expect(this.hoodie.request.called).to.be.ok();
-        _ref = this.hoodie.request.args[0], method = _ref[0], path = _ref[1];
+        expect(this.remote.request).to.be.called();
+        args = this.remote.request.args[0];
+        method = args[0];
+        path = args[1];
         expect(method).to.eql('GET');
-        expect(path).to.eql('/my%2Fstore/_changes?include_docs=true&since=0');
+        expect(path).to.eql('/_changes?include_docs=true&since=0');
       });
     }); // .isConnected() is false
 
     _when('request is successful / returns changes', function() {
 
       beforeEach(function() {
-        var _this = this;
-        this.hoodie.request.returns({
-          then: function(success) {
-            _this.hoodie.request.returns({
-              then: function() {}
-            });
-            success(Mocks.changesResponse());
-          }
-        });
+        this.requestDefer1.resolve( Mocks.changesResponse() );
       });
 
       it('should trigger remote events', function() {
@@ -591,13 +593,15 @@ describe('Hoodie.Remote', function() {
       });
 
       _and('.isConnected() returns true', function() {
-
         beforeEach(function() {
+          this.sandbox.spy(this.remote, 'pull');
           this.sandbox.stub(this.remote, 'isConnected').returns(true);
+          this.remote.pull();
         });
 
-        it.skip('should pull again');
-
+        it('should pull again', function() {
+          expect(this.remote.pull.callCount).to.be(2);
+        });
       });
 
       _and('prefix is set', function() {
@@ -611,7 +615,6 @@ describe('Hoodie.Remote', function() {
           expect(this.remote.trigger.calledWith('add', this.object3)).to.be.ok();
           expect(this.remote.trigger.calledWith('add', this.object2)).to.not.be.ok();
         });
-
       });
 
       _and('object has been returned before', function() {
@@ -639,7 +642,7 @@ describe('Hoodie.Remote', function() {
     _when('request errors with 401 unauthorzied', function() {
 
       beforeEach(function() {
-        this.requestDefer.reject({status: 401}, 'error object');
+        this.requestDefer1.reject({status: 401}, 'error object');
         this.sandbox.spy(this.remote, 'disconnect');
       });
 
@@ -657,7 +660,7 @@ describe('Hoodie.Remote', function() {
     _when('request errors with 404 not found', function() {
       beforeEach(function() {
         this.sandbox.spy(window, 'setTimeout');
-        this.requestDefer.reject({status: 404}, 'error object');
+        this.requestDefer1.reject({status: 404}, 'error object');
       });
 
       it('should try again in 3 seconds (it migh be due to a sign up, the userDB might be created yet)', function() {
@@ -669,7 +672,7 @@ describe('Hoodie.Remote', function() {
     _when('request errors with 500 oooops', function() {
       beforeEach(function() {
         this.sandbox.spy(window, 'setTimeout');
-        this.requestDefer.reject({status: 500}, 'error object');
+        this.requestDefer1.reject({status: 500}, 'error object');
       });
 
       it('should try again in 3 seconds (and hope it was only a hiccup ...)', function() {
@@ -691,23 +694,30 @@ describe('Hoodie.Remote', function() {
     _when('request was aborted manually', function() {
       beforeEach(function() {
         this.sandbox.spy(window, 'setTimeout');
-        this.requestDefer.reject({statusText: 'abort'}, 'error object');
+        this.requestDefer1.reject({statusText: 'abort'}, 'error object');
+        this.sandbox.spy(this.remote, 'pull');
       });
 
       _and('is connected', function() {
         beforeEach(function() {
           this.sandbox.stub(this.remote, 'isConnected').returns(true);
+          this.remote.pull();
         });
 
-        it.skip('should pull again');
+        it('should pull again', function() {
+          expect(this.remote.pull.callCount).to.be(2);
+        });
       });
 
       _and('is not connected', function() {
         beforeEach(function() {
           this.sandbox.stub(this.remote, 'isConnected').returns(false);
+          this.remote.pull();
         });
 
-        it.skip('should not pull again');
+        it('should pull again', function() {
+          expect(this.remote.pull.callCount).to.be(1);
+        });
       });
     }); // request was aborted manually
 
@@ -715,7 +725,7 @@ describe('Hoodie.Remote', function() {
 
       beforeEach(function() {
         this.sandbox.spy(window, 'setTimeout');
-        this.requestDefer.reject({}, 'error object');
+        this.requestDefer1.reject({}, 'error object');
       });
 
       it('should try again in 3 seconds if .isConnected() returns false', function() {
