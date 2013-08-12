@@ -1,3 +1,5 @@
+/* global hoodieUUID:true */
+
 describe('hoodie.uuid()', function() {
 
   beforeEach(function() {

@@ -1,5 +1,4 @@
-'use strict';
-
+/* global hoodieConfig:true */
 describe('Hoodie.Config', function() {
 
   beforeEach(function() {
@@ -9,7 +8,7 @@ describe('Hoodie.Config', function() {
       funky: 'fresh'
     }));
 
-    hoodieConfig( this.hoodie )
+    hoodieConfig( this.hoodie );
     this.config = this.hoodie.config;
   });
 
@@ -22,7 +21,7 @@ describe('Hoodie.Config', function() {
         funky: 'fresh!'
       }, {
         silent: false
-      })
+      });
     });
 
     it('should make the save silent for local settings starting with _', function() {

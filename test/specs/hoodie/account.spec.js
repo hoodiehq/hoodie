@@ -11,21 +11,21 @@ describe('hoodie.account', function () {
 
     this.hoodie = new Mocks.Hoodie();
 
-    this.requestDefer = this.hoodie.defer()
+    this.requestDefer = this.hoodie.defer();
     this.sandbox.stub(this.hoodie, 'request').returns(this.requestDefer.promise());
     this.sandbox.spy(this.hoodie, 'trigger');
 
     // for more sophisticated request stubbing
     this.requestDefers = [];
-    this.fakeRequest = function(method, path, options) {
+    this.fakeRequest = function() {
       var defer = this.hoodie.defer();
       var promise = defer.promise();
       this.requestDefers.push(defer);
       promise.abort = this.noop;
       return promise;
-    }.bind(this)
+    }.bind(this);
 
-    this.clock = this.sandbox.useFakeTimers(0) // '1970-01-01 00:00:00'
+    this.clock = this.sandbox.useFakeTimers(0); // '1970-01-01 00:00:00'
 
     hoodieAccount(this.hoodie);
     this.account = this.hoodie.account;
@@ -34,10 +34,10 @@ describe('hoodie.account', function () {
   describe('#authenticate()', function () {
 
     beforeEach(function() {
-      this.sandbox.stub(this.account, 'request').returns(this.requestDefer.promise())
+      this.sandbox.stub(this.account, 'request').returns(this.requestDefer.promise());
     });
 
-    _when('user is logged in as joe@example.com (hash: "user_hash")', function() {
+    _when('user is logged in as joe@example.com (hash: \'user_hash\')', function() {
       beforeEach(function () {
         this.account.username = 'joe@example.com';
         this.account.ownerHash = 'user_hash';
@@ -65,7 +65,7 @@ describe('hoodie.account', function () {
 
           beforeEach(function () {
             this.signInPromise = this.hoodie.account.signIn('joe@example.com', 'secret');
-            expect(this.signInPromise).to.be.pending()
+            expect(this.signInPromise).to.be.pending();
           });
 
           it('should be rejected when it is pending and then fails', function () {
@@ -90,7 +90,7 @@ describe('hoodie.account', function () {
 
           beforeEach(function () {
             this.signOutPromise = this.hoodie.account.signOut();
-            expect(this.signOutPromise).to.be.pending()
+            expect(this.signOutPromise).to.be.pending();
           });
 
           it('should be rejected when it is pending and then fails', function () {
@@ -128,12 +128,12 @@ describe('hoodie.account', function () {
             });
 
             it('should not set _account.username config', function () {
-              // because it's already "joe@example.com"
+              // because it's already 'joe@example.com'
               expect(this.hoodie.config.set.calledWith('_account.username', 'joe@example.com')).to.not.be.ok();
             });
 
             it('should set account.ownerHash', function () {
-              // because it's already "user_hash"
+              // because it's already 'user_hash'
               expect(this.hoodie.config.set.calledWith('_account.ownerHash', 'user_hash')).to.not.be.ok();
             });
           }); // returns valid session info for joe@example.com
@@ -167,7 +167,7 @@ describe('hoodie.account', function () {
           });
 
           it('should reject the promise', function () {
-            expect(this.promise).to.be.rejectedWith({ error: 'error data' })
+            expect(this.promise).to.be.rejectedWith({ error: 'error data' });
           });
         }); // authentication request has an error
       }); // has not been authenticated yet
@@ -182,11 +182,11 @@ describe('hoodie.account', function () {
         });
 
         it('should resolve the promise', function () {
-          expect(this.promise).to.be.resolvedWith('joe@example.com')
+          expect(this.promise).to.be.resolvedWith('joe@example.com');
         });
 
-        it("should not send any farther requests", function() {
-          expect(this.account.request.called).to.not.be.ok()
+        it('should not send any farther requests', function() {
+          expect(this.account.request.called).to.not.be.ok();
         });
       }); // with_session_validated_before
 
@@ -203,7 +203,7 @@ describe('hoodie.account', function () {
           expect(this.promise).to.be.rejected();
         });
       }); // with_session_invalidated_before
-    }); // user is logged in as joe@example.com (hash: "user_hash")
+    }); // user is logged in as joe@example.com (hash: 'user_hash')
 
     _when('user has an anonymous account', function() {
       beforeEach(function () {
@@ -225,11 +225,11 @@ describe('hoodie.account', function () {
           });
 
           it('should sign in in the background, as we know the password anyway', function () {
-            expect(this.account.signIn.args[0]).to.eql(['randomhash', 'randompass'])
+            expect(this.account.signIn.args[0]).to.eql(['randomhash', 'randompass']);
           });
 
           it('should return the promise of the sign in request', function () {
-            expect(this.promise).to.be.resolvedWith('signIn_promise')
+            expect(this.promise).to.be.resolvedWith('signIn_promise');
           });
         });
       }); // authentication request is successful and returns `name: null`
@@ -322,12 +322,12 @@ describe('hoodie.account', function () {
 
         it('should sign in', function () {
           // because it need to authenticate for the current account
-          // first, before "signing up" for a real account, wich is
+          // first, before 'signing up' for a real account, wich is
           // technically a username change
           expect(this.account.request).to.be.calledWith('POST', '/_session', {
-            "data": {
-              "name": "user/randomUsername",
-              "password": "randomPassword"
+            'data': {
+              'name': 'user/randomUsername',
+              'password': 'randomPassword'
             }
           });
         });
@@ -425,7 +425,7 @@ describe('hoodie.account', function () {
                 });
 
                 it('should be resolved', function () {
-                  expect(this.promise).to.be.resolvedWith('joe@example.com', 'randomhash')
+                  expect(this.promise).to.be.resolvedWith('joe@example.com', 'randomhash');
                 });
 
               });
@@ -497,7 +497,7 @@ describe('hoodie.account', function () {
         it('should be rejected', function () {
           var promise = this.account.signUp('joe@example.com', 'secret');
 
-          expect(promise).to.be.rejectedWith({ error: 'you have to sign out first' })
+          expect(promise).to.be.rejectedWith({ error: 'you have to sign out first' });
         });
 
       }); // user is already logged in
@@ -581,7 +581,7 @@ describe('hoodie.account', function () {
 
             // reset spies
             this.account.request.reset();
-            this.requestDefers = []
+            this.requestDefers = [];
 
             //
             this.account.ownerHash = 'owner_hash123';
@@ -610,7 +610,7 @@ describe('hoodie.account', function () {
 
             // reset spies
             this.account.request.reset();
-            this.requestDefers = []
+            this.requestDefers = [];
 
             //
             this.promise = this.account.signUp('joe@example.com', 'secret');
@@ -634,8 +634,8 @@ describe('hoodie.account', function () {
             var type = args[0];
             var path = args[1];
 
-            expect(type).to.eql('POST')
-            expect(path).to.eql('/_session')
+            expect(type).to.eql('POST');
+            expect(path).to.eql('/_session');
           });
 
           _and('signIn successful', function () {
@@ -644,7 +644,7 @@ describe('hoodie.account', function () {
               this.requestDefers[1].resolve({
                 name: 'joe@example.com',
                 roles: ['user_hash', 'confirmed']
-              })
+              });
             });
 
             it('should resolve its promise', function () {
@@ -1024,7 +1024,7 @@ describe('hoodie.account', function () {
       this.account.username = 'joe@example.com';
       presetUserDoc(this);
 
-      this.sandbox.stub(this.account, 'request').returns(this.requestDefer.promise())
+      this.sandbox.stub(this.account, 'request').returns(this.requestDefer.promise());
       this.fetchPromise = this.hoodie.defer();
       this.sandbox.stub(this.account, 'fetch').returns(this.fetchPromise);
     });
@@ -1469,7 +1469,7 @@ describe('hoodie.account', function () {
           expect(this.account.request).to.be.calledWith('PUT', '/_users/org.couchdb.user%3Auser%2Fjoe%40example.com', {
             data: JSON.stringify(userObject),
             contentType: 'application/json'
-          })
+          });
         });
 
         _and('destroy request succesful', function () {
@@ -1683,7 +1683,7 @@ describe('hoodie.account', function () {
 
       _when('reset Password request is not successful', function () {
         beforeEach(function () {
-          this.requestDefer.reject({responseText: '{\"error\": \"ooops\"}'});
+          this.requestDefer.reject({responseText: '{\'error\': \'ooops\'}'});
         });
 
         it('should be rejected with the error', function () {
@@ -1794,16 +1794,16 @@ describe('hoodie.account', function () {
                   password: 'secret'
                 }
               }
-            )
+            );
           });
 
           _and('signIn is successful', function () {
             beforeEach(function () {
-              this.requestDefers[2].resolve( validSignInResponse() )
+              this.requestDefers[2].resolve( validSignInResponse() );
             });
 
             it('should be resolved', function () {
-              expect(this.promise).to.be.resolved()
+              expect(this.promise).to.be.resolved();
             });
           }); // signIn is successful
 
@@ -1814,7 +1814,7 @@ describe('hoodie.account', function () {
             });
 
             it('should be rejected', function () {
-              expect(this.promise).to.be.rejected()
+              expect(this.promise).to.be.rejected();
             });
           }); // signIn has an error
         }); // _users doc could be updated
@@ -1825,7 +1825,7 @@ describe('hoodie.account', function () {
           });
 
           it('should be rejected', function () {
-            expect(this.promise).to.be.rejected()
+            expect(this.promise).to.be.rejected();
           });
         }); // _users doc could not be updated
       }); // _users doc can be fetched
@@ -1858,14 +1858,14 @@ describe('hoodie.account', function () {
 function validSessionResponse () {
   return {
     userCtx: validSignInResponse()
-  }
+  };
 }
 
 function validSignInResponse () {
   return {
     name: 'user/joe@example.com',
     roles: ['user_hash', 'confirmed']
-  }
+  };
 }
 
 function invalidSessionResponse () {
@@ -1873,12 +1873,12 @@ function invalidSessionResponse () {
     userCtx: {
       name: null
     }
-  }
+  };
 }
 
 function unconfirmedUserDoc (username) {
   if (! username) {
-    username = 'joe@example.com'
+    username = 'joe@example.com';
   }
   return {
     _id: 'org.couchdb.user:user/' + username,
@@ -1891,7 +1891,7 @@ function unconfirmedUserDoc (username) {
     createdAt: 'someday',
     updatedAt: 'someday',
     signedUpAt: 'someday'
-  }
+  };
 }
 
 function presetUserDoc(context) {
@@ -1899,12 +1899,12 @@ function presetUserDoc(context) {
   context.requestDefer.resolve(unconfirmedUserDoc( context.account.username ));
   context.hoodie.request.reset();
   context.requestDefer = context.hoodie.defer();
-  context.hoodie.request.returns(context.requestDefer.promise())
+  context.hoodie.request.returns(context.requestDefer.promise());
 }
 
 
 function with_session_validated_before (callback) {
-  _when("session has been validated_before", function() {
+  _when('session has been validated_before', function() {
     beforeEach(function() {
       var response = {
         userCtx: {
@@ -1921,12 +1921,12 @@ function with_session_validated_before (callback) {
       this.account.request.returns(this.requestDefer.promise());
     });
 
-    callback()
-  })
+    callback();
+  });
 }
 
 function with_session_invalidated_before (callback) {
-  _when("session has been invalidated_before", function() {
+  _when('session has been invalidated_before', function() {
     beforeEach(function() {
       var response = {
         userCtx: {
@@ -1942,8 +1942,8 @@ function with_session_invalidated_before (callback) {
       this.account.request.returns(this.requestDefer.promise());
     });
 
-    callback()
-  })
+    callback();
+  });
 }
 
 function now() {

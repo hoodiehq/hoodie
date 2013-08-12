@@ -42,8 +42,8 @@ describe('#checkConnection()', function() {
 
       beforeEach(function() {
         this.requestDefer.resolve({
-          'couchdb': "Welcome",
-          'version': "1.2.1"
+          'couchdb': 'Welcome',
+          'version': '1.2.1'
         });
         this.hoodie.checkConnection();
       });
@@ -63,13 +63,13 @@ describe('#checkConnection()', function() {
       beforeEach(function() {
         this.requestDefer.reject({
           'status': 0,
-          'statusText': "Error"
+          'statusText': 'Error'
         });
         this.hoodie.checkConnection();
       });
 
       // skipping these because they seem to cause strange error:
-      // the string "TypeError: 'undefined' is not an object (evaluating 'hoodie.request('GET', '/').then')" was thrown, throw an Error :)
+      // the string 'TypeError: 'undefined' is not an object (evaluating 'hoodie.request('GET', '/').then')' was thrown, throw an Error :)
       it('should check again in 3 seconds', function() {
         expect(window.setTimeout).to.be.calledWith(this.hoodie.checkConnection, 3000);
       });
@@ -92,8 +92,8 @@ describe('#checkConnection()', function() {
 
       beforeEach(function() {
         this.requestDefer.resolve({
-          'couchdb': "Welcome",
-          'version': "1.2.1"
+          'couchdb': 'Welcome',
+          'version': '1.2.1'
         });
         this.hoodie.checkConnection();
       });
@@ -113,7 +113,7 @@ describe('#checkConnection()', function() {
       beforeEach(function() {
         this.requestDefer.reject({
           'status': 0,
-          'statusText': "Error"
+          'statusText': 'Error'
         });
         this.hoodie.checkConnection();
       });

@@ -9,15 +9,14 @@ module.exports = function(grunt) {
     pkg: grunt.file.readJSON('package.json'),
 
     jshint: {
-      files: ['Gruntfile.js', 'src/**/*.js'],
+      files: ['Gruntfile.js', 'src/**/*.js','test/specs/**/*.js' ],
       options: {
         jshintrc: '.jshintrc'
       }
     },
 
     watch: {
-      // files: ['<%= jshint.files %>'],
-      files: ['Gruntfile.js', 'src/**/*.js', 'test/specs/**/*.js'],
+      files: ['<%= jshint.files %>'],
       tasks: ['jshint', 'shell:test']
     },
 

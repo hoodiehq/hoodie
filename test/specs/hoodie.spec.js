@@ -109,6 +109,6 @@ describe('Hoodie', function() {
       expect(this.hoodie.remote.connect).to.not.be.called();
       this.hoodie.account.authenticateDefer.resolve();
       expect(this.hoodie.remote.connect).to.be.called();
-    })
+    });
   });
 });
