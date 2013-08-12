@@ -14,7 +14,6 @@
 //
 
 function hoodieRemote (hoodie) {
-
   // inherit from Hoodies Store API
   var remote = hoodie.open(hoodie.account.db(), {
 
@@ -49,9 +48,11 @@ function hoodieRemote (hoodie) {
     hoodie.on('remote:connect', function() {
       hoodie.on('store:idle', remote.push);
     });
+
     hoodie.on('remote:disconnect', function() {
       hoodie.unbind('store:idle', remote.push);
     });
+
     hoodie.on('remote:pull', function(since) {
       hoodie.config.set('_remote.since', since);
     });
@@ -63,6 +64,7 @@ function hoodieRemote (hoodie) {
       remote.name = hoodie.account.db();
       remote.connect();
     });
+
     hoodie.on('account:reauthenticated', remote.connect);
     hoodie.on('account:signout', remote.disconnect);
   }

@@ -6,9 +6,6 @@
 
 //
 function hoodieConnection(hoodie) {
-
-  'use strict';
-
   // state
   var online = true;
   var checkConnectionInterval = 30000;
@@ -33,7 +30,6 @@ function hoodieConnection(hoodie) {
   // - sets `checkConnectionInterval = 30000`
   //
   hoodie.checkConnection = function checkConnection() {
-
     var req = checkConnectionRequest;
 
     if (req && req.state() === 'pending') {

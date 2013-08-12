@@ -5,7 +5,6 @@
 
 //
 function hoodieConfig(hoodie) {
-
   var type = '$config';
   var id = 'hoodie';
   var cache = {};

@@ -6,7 +6,6 @@
 
 //
 function hoodieRequest(hoodie) {
-
   var $extend = $.extend;
   var $ajax = $.ajax;
 

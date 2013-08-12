@@ -5,7 +5,6 @@
 
 //
 function hoodieAccount (hoodie) {
-
   // public API
   var account = {};
 
@@ -87,6 +86,7 @@ function hoodieAccount (hoodie) {
   // to sign in with a 300ms timeout.
   //
   account.signUp = function signUp(username, password) {
+
     if (password === undefined) {
       password = '';
     }
@@ -370,6 +370,7 @@ function hoodieAccount (hoodie) {
   //
   account.resetPassword = function resetPassword(username) {
     var data, key, options, resetPasswordId;
+
     resetPasswordId = hoodie.config.get('_account.resetPasswordId');
 
     if (resetPasswordId) {
@@ -781,8 +782,7 @@ function hoodieAccount (hoodie) {
   // turn an anonymous account into a real account
   //
   function upgradeAnonymousAccount(username, password) {
-    var currentPassword;
-    currentPassword = getAnonymousPassword();
+    var currentPassword = getAnonymousPassword();
 
     return changeUsernameAndPassword(currentPassword, username, password).done(function() {
       account.trigger('signup', username);

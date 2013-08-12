@@ -12,7 +12,6 @@
 
 /* jslint unused: false */
 function hoodieStoreApi(hoodie, options) {
-
   // public API
   var api = {};
 
@@ -243,6 +242,7 @@ function hoodieStoreApi(hoodie, options) {
   //
   api.updateAll = function updateAll(filterOrObjects, objectUpdate, options) {
     var promise;
+
     options = options || {};
 
     // normalize the input: make sure we have all objects
@@ -324,9 +324,12 @@ function hoodieStoreApi(hoodie, options) {
 
   // proxies to hoodie.trigger
   api.trigger = function trigger() {
-    var eventName, parameters, _ref;
-    eventName = arguments[0],
-    parameters = 2 <= arguments.length ? Array.prototype.slice.call(arguments, 1) : [];
+    var eventName, _ref;
+
+    eventName = arguments[0];
+
+    var parameters = 2 <= arguments.length ? Array.prototype.slice.call(arguments, 1) : [];
+
     return (_ref = hoodie).trigger.apply(_ref, [storeName + ':' + eventName].concat(Array.prototype.slice.call(parameters)));
   };
 
@@ -356,8 +359,11 @@ function hoodieStoreApi(hoodie, options) {
   if (! options.backend ) {
     throw new Error('options.backend must be passed');
   }
+
   var required = 'save find findAll remove removeAll'.split(' ');
+
   required.forEach( function(methodName) {
+
     if (!options.backend[methodName]) {
       throw new Error('options.backend.'+methodName+' must be passed.');
     }

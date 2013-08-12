@@ -5,7 +5,6 @@
 // -------------
 
 function hoodieOpen(hoodie) {
-
   var $extend = window.jQuery.extend;
 
   // generic method to open a store. Used by

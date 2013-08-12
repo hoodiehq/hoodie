@@ -15,7 +15,6 @@
 //
 
 function hoodieEvents(hoodie) {
-
   var callbacks = {};
 
   // Bind
