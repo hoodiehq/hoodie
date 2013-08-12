@@ -1,4 +1,3 @@
-// Hoodie
 // --------
 //
 // the door to world domination (apps)
@@ -148,6 +147,7 @@
   //      Hoodie.extend(funcion(hoodie) { hoodie.myMagic = function() {} })
   //
   var extensions = [];
+
   Hoodie.extend = function(extension) {
     extensions.push(extension);
   };
