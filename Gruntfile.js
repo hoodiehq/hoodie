@@ -2,8 +2,10 @@ module.exports = function(grunt) {
 
   'use strict';
 
-  var banner  = '//  <%= pkg.name %> <%= pkg.version%>\n';
-  banner += '';
+  var banner  = '\n// <%= pkg.title %> - <%= pkg.version%>\n';
+  banner += '// https://github.com/hoodiehq/hoodie.js\n';
+  banner += '// Copyright 2012, 2013 https://github.com/hoodiehq/.';
+  banner += ' and other contributors; Licensed Apache License 2.0\n';
 
   grunt.initConfig({
     pkg: grunt.file.readJSON('package.json'),
