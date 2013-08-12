@@ -1686,7 +1686,7 @@ describe('hoodie.account', function () {
           this.requestDefer.reject({responseText: '{"error": "ooops"}'});
         });
 
-        it.only('should be rejected with the error', function () {
+        it('should be rejected with the error', function () {
           expect(this.account.resetPassword('joe@example.com')).to.be.rejectedWith({
             error: 'ooops'
           });
