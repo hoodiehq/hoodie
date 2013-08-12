@@ -5,12 +5,12 @@
 
 // helper to generate unique ids.
 function hoodieUUID (hoodie) {
-  function uuid(len) {
+  function uuid(length) {
     var chars, i, radix;
 
     // default uuid length to 7
-    if (len === undefined) {
-      len = 7;
+    if (length === undefined) {
+      length = 7;
     }
 
     // uuids consist of numbers and lowercase letters only.
@@ -24,9 +24,10 @@ function hoodieUUID (hoodie) {
     return ((function() {
       var _i, _results = [];
 
-      for (i = _i = 0; 0 <= len ? _i < len : _i > len; i = 0 <= len ? ++_i : --_i) {
+      for (i = _i = 0; 0 <= length ? _i < length : _i > length; i = 0 <= length ? ++_i : --_i) {
         var rand = Math.random() * radix;
-        _results.push(chars[0] = String(rand).charAt(0));
+        var char = chars[Math.floor(rand)];
+        _results.push(chars[0] = String(char).charAt(0));
       }
 
       return _results;
