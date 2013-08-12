@@ -125,7 +125,6 @@
     hoodie.store.bootstrapDirtyObjects();
 
     // hoodie.remote
-    hoodie.remote.loadListOfKnownObjectsFromLocalStore();
     hoodie.remote.subscribeToEvents();
 
     // authenticate

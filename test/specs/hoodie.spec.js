@@ -101,7 +101,6 @@ describe('Hoodie', function() {
     });
 
     it('inits remote', function() {
-      expect(this.hoodie.remote.loadListOfKnownObjectsFromLocalStore).to.be.called();
       expect(this.hoodie.remote.subscribeToEvents).to.be.called();
     });
 
