@@ -181,9 +181,10 @@
     // way to register. Lowercase hoodie is used because AMD module names are
     // derived from file names, and Hoodie is normally delivered in a lowercase
     // file name.
-    define( 'hoodie', [], function () {
+    define('hoodie', function () {
       return Hoodie;
-    } );
+    });
+
   } else {
 
     // set global
