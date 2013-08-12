@@ -338,17 +338,17 @@ function hoodieStore (hoodie) {
   // ----------
 
   //
-  function validate (type, id /*, object */ ) {
+  function validate (object) {
 
-    if (!isValidType(type)) {
+    if (!isValidType(object.type)) {
       return Hoodie.Errors.INVALID_KEY({
-        type: type
+        type: object.type
       });
     }
 
-    if (arguments.length > 0 && !isValidId(id)) {
+    if (arguments.length > 0 && !isValidId(object.id)) {
       return Hoodie.Errors.INVALID_KEY({
-        id: id
+        id: object.id
       });
     }
   }
