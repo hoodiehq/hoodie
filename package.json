@@ -31,7 +31,13 @@
     "grunt-contrib-concat": "~0.3.0",
     "grunt-groc": "~0.3.0",
     "grunt-shell": "~0.3.0",
-    "karma": "~0.8.6"
+    "karma": "~0.10.1",
+    "karma-script-launcher": "~0.1.0",
+    "karma-chrome-launcher": "~0.1.0",
+    "karma-firefox-launcher": "~0.1.0",
+    "karma-html2js-preprocessor": "~0.1.0",
+    "karma-phantomjs-launcher": "~0.1.0",
+    "karma-mocha": "~0.1.0"
   },
   "scripts": {
     "test": "grunt test --verbose",
