@@ -72,7 +72,7 @@ describe('Hoodie.Remote', function() {
       expect(returnedValue).to.eql('funk');
     });
 
-    it('should set options.contentType to \'application/json\'', function() {
+    it('should set options.contentType to "application/json"', function() {
       this.remote.request('GET', '/something');
       expect(this.hoodie.request).to.be.calledWith('GET', '/something', {
         contentType: 'application/json'
@@ -107,11 +107,11 @@ describe('Hoodie.Remote', function() {
         this.options = args[2];
       });
 
-      it('should default options.dataType to \'json\'', function() {
+      it('should default options.dataType to "json"', function() {
         expect(this.options.dataType).to.eql('json');
       });
 
-      it('should default options.dataType to \'json\'', function() {
+      it('should default options.dataType to "json"', function() {
         expect(this.options.processData).to.eql(false);
       });
     }); // type is POST
@@ -187,39 +187,39 @@ describe('Hoodie.Remote', function() {
 
         it('should send a GET to /_all_docs?include_docs=true', function() {
           this.storeBackend.findAll();
-          expect(this.hoodie.request).to.be.calledWith("GET", "/my%2Fstore/_all_docs?include_docs=true", { "contentType": "application/json" });
+          expect(this.hoodie.request).to.be.calledWith('GET', '/my%2Fstore/_all_docs?include_docs=true', { 'contentType': 'application/json' });
         });
 
       });
 
-      _and('prefix is \'$public\'', function() {
+      _and('prefix is "$public"', function() {
 
         beforeEach(function() {
           this.remote.prefix = '$public/';
         });
 
-        it('should send a GET to /_all_docs?include_docs=true&startkey=\'$public/\'&endkey=\'$public0\'', function() {
+        it('should send a GET to /_all_docs?include_docs=true&startkey="$public/"&endkey="$public0"', function() {
           this.storeBackend.findAll();
-          expect(this.hoodie.request).to.be.calledWith("GET", '/my%2Fstore/_all_docs?include_docs=true&startkey="%24public%2F"&endkey="%24public0"', { "contentType": "application/json" });
+          expect(this.hoodie.request).to.be.calledWith('GET', '/my%2Fstore/_all_docs?include_docs=true&startkey="%24public%2F"&endkey="%24public0"', { 'contentType': 'application/json' });
         });
       });
     }); // type is not set
 
     _when('type is todo', function() {
-      it('should send a GET to /_all_docs?include_docs=true&startkey=\'todo/\'&endkey=\'todo0\'', function() {
+      it('should send a GET to /_all_docs?include_docs=true&startkey="todo/"&endkey="todo0"', function() {
         this.storeBackend.findAll('todo');
-        expect(this.hoodie.request).to.be.calledWith("GET", '/my%2Fstore/_all_docs?include_docs=true&startkey="todo%2F"&endkey="todo0"', { "contentType": "application/json" });
+        expect(this.hoodie.request).to.be.calledWith('GET', '/my%2Fstore/_all_docs?include_docs=true&startkey="todo%2F"&endkey="todo0"', { 'contentType': 'application/json' });
 
       });
 
-      _and('prefix is \'remote_prefix\'', function() {
+      _and('prefix is "remote_prefix"', function() {
         beforeEach(function() {
           this.remote.prefix = 'remote_prefix/';
         });
 
-        it('should send a GET to /_all_docs?include_docs=true&startkey=\'remote_prefix%2Ftodo%2F\'&endkey=\'remote_prefix%2Ftodo0\'', function() {
+        it('should send a GET to /_all_docs?include_docs=true&startkey="remote_prefix%2Ftodo%2F"&endkey="remote_prefix%2Ftodo0"', function() {
           this.storeBackend.findAll('todo');
-          expect(this.hoodie.request).to.be.calledWith("GET", '/my%2Fstore/_all_docs?include_docs=true&startkey="remote_prefix%2Ftodo%2F"&endkey="remote_prefix%2Ftodo0"', { "contentType": "application/json" });
+          expect(this.hoodie.request).to.be.calledWith('GET', '/my%2Fstore/_all_docs?include_docs=true&startkey="remote_prefix%2Ftodo%2F"&endkey="remote_prefix%2Ftodo0"', { 'contentType': 'application/json' });
         });
       });
     }); // type is todo
@@ -324,7 +324,7 @@ describe('Hoodie.Remote', function() {
       });
     }); // saving car/123 with color: red
 
-    _when('saving car/123 with color: red and prefix is \'remote_prefix\'', function() {
+    _when('saving car/123 with color: red and prefix is "remote_prefix"', function() {
       beforeEach(function() {
 
         this.remote.prefix = 'remote_prefix/';
@@ -467,7 +467,7 @@ describe('Hoodie.Remote', function() {
         this.bootstrapDefer.resolve();
       });
 
-      it('should trigger \'bootstrap:end\' event', function() {
+      it('should trigger "bootstrap:end" event', function() {
         this.remote.bootstrap();
         expect(this.remote.trigger.calledWith('bootstrap:end')).to.be.ok();
       });
@@ -847,7 +847,7 @@ describe('Hoodie.Remote', function() {
         this.remote.push(this.todoObjects);
       });
 
-      it('should prefix all document IDs with \'$public/\'', function() {
+      it('should prefix all document IDs with "$public/"', function() {
         expect(this.hoodie.request.called).to.be.ok();
 
         var data = JSON.parse(this.hoodie.request.args[0][2].data);
