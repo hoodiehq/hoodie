@@ -252,7 +252,6 @@ function hoodieAccount (hoodie) {
       });
     }
     hoodie.remote.disconnect();
-    // return sendSignOutRequest().then(cleanupAndTriggerSignOut);
     return sendSignOutRequest().then(cleanupAndTriggerSignOut);
   };
 
