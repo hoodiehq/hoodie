@@ -187,7 +187,7 @@ describe('Hoodie.Remote', function() {
 
         it('should send a GET to /_all_docs?include_docs=true', function() {
           this.storeBackend.findAll();
-          expect(this.hoodie.request).to.be.calledWith('GET', '/my%2Fstore/_all_docs?include_docs=true', { 'contentType': 'application/json' });
+          expect(this.hoodie.request).to.be.calledWith("GET", "/my%2Fstore/_all_docs?include_docs=true", { "contentType": "application/json" });
         });
 
       });
@@ -200,7 +200,7 @@ describe('Hoodie.Remote', function() {
 
         it('should send a GET to /_all_docs?include_docs=true&startkey=\'$public/\'&endkey=\'$public0\'', function() {
           this.storeBackend.findAll();
-          expect(this.hoodie.request).to.be.calledWith('GET', '/my%2Fstore/_all_docs?include_docs=true&startkey=\'%24public%2F\'&endkey=\'%24public0\'', { 'contentType': 'application/json' });
+          expect(this.hoodie.request).to.be.calledWith("GET", '/my%2Fstore/_all_docs?include_docs=true&startkey="%24public%2F"&endkey="%24public0"', { "contentType": "application/json" });
         });
       });
     }); // type is not set
@@ -208,7 +208,8 @@ describe('Hoodie.Remote', function() {
     _when('type is todo', function() {
       it('should send a GET to /_all_docs?include_docs=true&startkey=\'todo/\'&endkey=\'todo0\'', function() {
         this.storeBackend.findAll('todo');
-        expect(this.hoodie.request).to.be.calledWith('GET', '/my%2Fstore/_all_docs?include_docs=true&startkey=\'todo%2F\'&endkey=\'todo0\'', { 'contentType': 'application/json' });
+        expect(this.hoodie.request).to.be.calledWith("GET", '/my%2Fstore/_all_docs?include_docs=true&startkey="todo%2F"&endkey="todo0"', { "contentType": "application/json" });
+
       });
 
       _and('prefix is \'remote_prefix\'', function() {
@@ -218,7 +219,7 @@ describe('Hoodie.Remote', function() {
 
         it('should send a GET to /_all_docs?include_docs=true&startkey=\'remote_prefix%2Ftodo%2F\'&endkey=\'remote_prefix%2Ftodo0\'', function() {
           this.storeBackend.findAll('todo');
-          expect(this.hoodie.request).to.be.calledWith('GET', '/my%2Fstore/_all_docs?include_docs=true&startkey=\'remote_prefix%2Ftodo%2F\'&endkey=\'remote_prefix%2Ftodo0\'', { 'contentType': 'application/json' });
+          expect(this.hoodie.request).to.be.calledWith("GET", '/my%2Fstore/_all_docs?include_docs=true&startkey="remote_prefix%2Ftodo%2F"&endkey="remote_prefix%2Ftodo0"', { "contentType": "application/json" });
         });
       });
     }); // type is todo
