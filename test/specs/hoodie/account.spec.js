@@ -984,12 +984,12 @@ describe('hoodie.account', function () {
 
         beforeEach(function () {
           this.response = {
-            responseText: '{\'error\':\'unauthorized\',\'reason\':\'Name or password is incorrect.\'}'
+            responseText: '{"error":"unauthorized","reason":"Name or password is incorrect."}'
           };
           this.requestDefer.reject(this.response);
         });
 
-        it.skip('should be rejected with unauthorized error', function () {
+        it('should be rejected with unauthorized error', function () {
           this.account.signIn('joe@example.com', 'secret').fail(function (res) {
             expect(res).to.eql({
               error: 'unauthorized',
@@ -1001,9 +1001,9 @@ describe('hoodie.account', function () {
       }); // signIn not succesful because unauthorized
 
       _when('sign in without password', function () {
-
-        it.skip('should set password to empty string', function () {
+        it('should set password to empty string', function () {
           var data, options, path, type, args;
+          this.hoodie.request.reset();
           this.account.signIn('joe@example.com');
 
           args = this.hoodie.request.args[0],
@@ -1013,9 +1013,7 @@ describe('hoodie.account', function () {
           data = options.data;
           expect(data.password).to.eql('');
         });
-
       }); // sign in without password
-
     }); // signout succeeds
   }); // #signIn
 
@@ -1086,15 +1084,17 @@ describe('hoodie.account', function () {
         expect(this.data.password).to.eql('newSecret');
       });
 
-      it.skip('should allow to set empty password', function () {
-        var _ref = this.account.request.args[0];
+      it('should allow to set empty password', function () {
+        this.account.request.reset();
+        this.account.changePassword('currentSecret', '');
 
-        this.type = _ref[0],
-        this.path = _ref[1],
-        this.options = _ref[2];
+        var args = this.account.request.args[0];
+
+        this.type = args[0],
+        this.path = args[1],
+        this.options = args[2];
         this.data = JSON.parse(this.options.data);
 
-        this.account.changePassword('currentSecret', '');
         expect(this.data.password).to.eql('');
       });
 
@@ -1102,7 +1102,7 @@ describe('hoodie.account', function () {
         expect(this.data.salt).to.be(undefined);
       });
 
-      it.skip('should not send password_sha', function () {
+      it('should not send password_sha', function () {
         expect(this.data.password_sha).to.be(undefined);
       });
 
