@@ -1,5 +1,7 @@
-//  hoodie 0.3.0
-// Hoodie
+
+// Hoodie.js - 0.3.0
+// https://github.com/hoodiehq/hoodie.js
+// Copyright 2012, 2013 https://github.com/hoodiehq/. and other contributors; Licensed Apache License 2.0
 // --------
 //
 // the door to world domination (apps)
@@ -27,10 +29,10 @@
       throw new Error('usage: new Hoodie(url);');
     }
 
-    if (baseUrl) {
-      hoodie.baseUrl = baseUrl.replace(/\/+$/, '');
-    } else {
+    if (!baseUrl) {
       hoodie.baseUrl = '/_api'; // default to current domain
+    } else {
+      hoodie.baseUrl = baseUrl.replace(/\/+$/, '');
     }
 
 
@@ -126,7 +128,6 @@
     hoodie.store.bootstrapDirtyObjects();
 
     // hoodie.remote
-    hoodie.remote.loadListOfKnownObjectsFromLocalStore();
     hoodie.remote.subscribeToEvents();
 
     // authenticate
@@ -150,6 +151,7 @@
   //      Hoodie.extend(funcion(hoodie) { hoodie.myMagic = function() {} })
   //
   var extensions = [];
+
   Hoodie.extend = function(extension) {
     extensions.push(extension);
   };
@@ -183,9 +185,10 @@
     // way to register. Lowercase hoodie is used because AMD module names are
     // derived from file names, and Hoodie is normally delivered in a lowercase
     // file name.
-    define( 'hoodie', [], function () {
+    define('hoodie', function () {
       return Hoodie;
-    } );
+    });
+
   } else {
 
     // set global
@@ -568,32 +571,31 @@ function hoodieConnection(hoodie) {
 
 // helper to generate unique ids.
 function hoodieUUID (hoodie) {
-  function uuid(len) {
-    var chars, i, radix;
+  var chars, i, radix;
+
+  // uuids consist of numbers and lowercase letters only.
+  // We stick to lowercase letters to prevent confusion
+  // and to prevent issues with CouchDB, e.g. database
+  // names do wonly allow for lowercase letters.
+  chars = '0123456789abcdefghijklmnopqrstuvwxyz'.split('');
+  radix = chars.length;
+
+
+  function uuid(length) {
+    var id = '';
 
     // default uuid length to 7
-    if (len === undefined) {
-      len = 7;
+    if (length === undefined) {
+      length = 7;
     }
 
-    // uuids consist of numbers and lowercase letters only.
-    // We stick to lowercase letters to prevent confusion
-    // and to prevent issues with CouchDB, e.g. database
-    // names do wonly allow for lowercase letters.
-    chars = '0123456789abcdefghijklmnopqrstuvwxyz'.split('');
-    radix = chars.length;
+    for (i = 0; i < length; i++) {
+      var rand = Math.random() * radix;
+      var char = chars[Math.floor(rand)];
+      id += String(char).charAt(0);
+    }
 
-    // eehmm, yeah.
-    return ((function() {
-      var _i, _results = [];
-
-      for (i = _i = 0; 0 <= len ? _i < len : _i > len; i = 0 <= len ? ++_i : --_i) {
-        var rand = Math.random() * radix;
-        _results.push(chars[0] = String(rand).charAt(0));
-      }
-
-      return _results;
-    })()).join('');
+    return id;
   }
 
   //
@@ -2170,17 +2172,17 @@ function hoodieStore (hoodie) {
   // ----------
 
   //
-  function validate (type, id /*, object */ ) {
+  function validate (object) {
 
-    if (!isValidType(type)) {
+    if (!isValidType(object.type)) {
       return Hoodie.Errors.INVALID_KEY({
-        type: type
+        type: object.type
       });
     }
 
-    if (arguments.length > 0 && !isValidId(id)) {
+    if (arguments.length > 0 && !isValidId(object.id)) {
       return Hoodie.Errors.INVALID_KEY({
-        id: id
+        id: object.id
       });
     }
   }
@@ -3102,7 +3104,6 @@ function hoodieAccount (hoodie) {
       });
     }
     hoodie.remote.disconnect();
-    // return sendSignOutRequest().then(cleanupAndTriggerSignOut);
     return sendSignOutRequest().then(cleanupAndTriggerSignOut);
   };
 
