@@ -185,7 +185,6 @@ function hoodieAccount (hoodie) {
     return hoodie.config.set(anonymousPasswordKey, password);
   }
 
-  // TODO: hide from public API
   function getAnonymousPassword() {
     return hoodie.config.get(anonymousPasswordKey);
   }

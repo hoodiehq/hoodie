@@ -46,13 +46,13 @@ function hoodieRemote (hoodie) {
   //
   function subscribeToEvents() {
 
-    remote.on('disconnect', function() {
-      hoodie.unbind('store:idle', remote.push);
-    });
-    remote.on('connect', function() {
+    hoodie.on('remote:connect', function() {
       hoodie.on('store:idle', remote.push);
     });
-    remote.on('pull', function(since) {
+    hoodie.on('remote:disconnect', function() {
+      hoodie.unbind('store:idle', remote.push);
+    });
+    hoodie.on('remote:pull', function(since) {
       hoodie.config.set('_remote.since', since);
     });
 
@@ -61,7 +61,7 @@ function hoodieRemote (hoodie) {
     // account events
     hoodie.on('account:signin', function() {
       remote.name = hoodie.account.db();
-      return remote.connect();
+      remote.connect();
     });
     hoodie.on('account:reauthenticated', remote.connect);
     hoodie.on('account:signout', remote.disconnect);
