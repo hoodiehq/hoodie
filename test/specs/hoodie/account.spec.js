@@ -1683,10 +1683,10 @@ describe('hoodie.account', function () {
 
       _when('reset Password request is not successful', function () {
         beforeEach(function () {
-          this.requestDefer.reject({responseText: '{\'error\': \'ooops\'}'});
+          this.requestDefer.reject({responseText: '{"error": "ooops"}'});
         });
 
-        it('should be rejected with the error', function () {
+        it.only('should be rejected with the error', function () {
           expect(this.account.resetPassword('joe@example.com')).to.be.rejectedWith({
             error: 'ooops'
           });
