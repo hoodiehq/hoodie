@@ -16,7 +16,6 @@
     "lib",
     "karma.conf.js",
     "Gruntfile.js",
-    "node_modules",
-    "testem.yml"
+    "node_modules"
   ]
 }
