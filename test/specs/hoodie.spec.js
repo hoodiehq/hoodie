@@ -110,4 +110,13 @@ describe('Hoodie', function() {
       expect(this.hoodie.remote.connect).to.be.called();
     });
   });
+
+  describe('Hoodie.extend', function() {
+    it('should init extenseions on initialization', function() {
+      var extension = sinon.spy();
+      Hoodie.extend( extension );
+      var hoodie = new Hoodie()
+      expect(extension).to.be.calledWith(hoodie)
+    })
+  });
 });
