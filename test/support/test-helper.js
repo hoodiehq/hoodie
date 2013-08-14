@@ -1,4 +1,5 @@
-/*globals before:true, after:true*/
+var sinon = require('sinon');
+var app = require('../../lib/app');
 
 module.exports = {
   before: (function () {
@@ -8,12 +9,17 @@ module.exports = {
   }()),
   beforeEach: (function () {
 
-    beforeEach(function () {});
+    beforeEach(function () {
+      this.app = app;
+      this.sandbox = sinon.sandbox.create();
+    });
 
   }()),
   afterEach: (function () {
 
-    afterEach(function () {});
+    afterEach(function () {
+      this.sandbox.restore();
+    });
 
   }()),
   after: (function () {

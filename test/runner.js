@@ -1,0 +1,15 @@
+require('./support/test-helper');
+require('./unit/app-test');
+require('./unit/changes_pool-test');
+require('./unit/client-test');
+require('./unit/config-test');
+require('./unit/couch-test');
+require('./unit/db_updates-test');
+require('./unit/environment-test');
+require('./unit/hconsole-test');
+require('./unit/installer-test');
+require('./unit/localtld-test');
+require('./unit/nodejitsu_server-test');
+require('./unit/server-test');
+require('./unit/utils-test');
+require('./unit/workers-test');
