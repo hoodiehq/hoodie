@@ -1,75 +1,107 @@
-[![Build Status](https://travis-ci.org/hoodiehq/hoodie.js.png?branch=master)](https://travis-ci.org/hoodiehq/hoodie.js)
 
-hoodie ✪ power to the frontend!
-===============================
 
-hoodie is a JavaScript library that runs in your browser.
-It gives you
+# Hoodie ✪ power to the frontend! [![Build Status](https://travis-ci.org/hoodiehq/hoodie.js.png?branch=master)](https://travis-ci.org/hoodiehq/hoodie.js)
 
-* user authentication
+Hoodie is a JavaScript library for the browser.
+
+It offers you the following pieces of functionality right out of the box:
+
+* user accounts and authentication
 * data storage and sync
 * sharing
 * emails
 * and so much more
 
-And this is what it looks like:
+And here is what it looks like:
+
+### user accounts & authentication
 
 ```javascript
-  //
-  // user authentication & more
-  //
-  hoodie.account.signUp('joe@example.com', 'secret')
-  hoodie.account.signIn('joe@example.com', 'secret')
-  hoodie.account.changePassword('secret', 'new_secret')
-  hoodie.account.changeUsername('secret', 'newusername')
-  hoodie.account.signOut()
-  hoodie.account.resetPassword('joe@example.com')
+  // user signup
+  hoodie.account.signUp('joe@example.com', 'secret');
 
-  //
-  // store data (it will sync to whereever your users sign in)
-  //
-  hoodie.store.add('task', {title: 'build sweetMasterApp tomorrow.'})
-  hoodie.store.findAll('task')
-  hoodie.store.update('task', '123', {done: true})
-  hoodie.store.remove('task', '123')
+  // user signIn
+  hoodie.account.signIn('joe@example.com', 'secret');
 
+  // user password change
+  hoodie.account.changePassword('secret', 'new_secret');
+
+  // user name change
+  hoodie.account.changeUsername('secret', 'newusername');
+
+  // user signout
+  hoodie.account.signOut();
+
+  // user password reset
+  hoodie.account.resetPassword('joe@example.com');
+```
+
+### store data (it will sync to whereever your users sign in)
+
+```javascript
+
+  // add a new document of type 'task'
+  hoodie.store.add('task', {
+    title: 'build sweetMasterApp tomorrow.'
+  });
+
+  // find all 'task' documents
+  hoodie.store.findAll('task');
+
+  // update a 'task' document
+  hoodie.store.update('task', '123', {
+    done: true
+  });
+
+  // remove a 'task' document
+  hoodie.store.remove('task', '123');
+
+  // listen to and act upon document events
   hoodie.store.on('add:task', function(object) {
     alert('new Task added: ' + object.task)
-  })
+  });
+```
 
-  //
-  // publish & share data
-  //
-  hoodie.store.findAll('task').publish()
-  hoodie.user( username ).findAll()
+### publish & share data
+```javascript
 
-  hoodie.store.find('task', '456').share()
-  hoodie.share(shareId).findAll()
-  hoodie.share(shareId).subscribe()
+  // find all 'task' documents and publish them
+  hoodie.store.findAll('task').publish();
 
-  //
-  // sending emails … yep.
-  //
+  // find all documents that belong to a given user
+  hoodie.user( username ).findAll();
+
+  // find a given task and share it
+  hoodie.store.find('task', '456').share();
+
+  // find a all documents on a given share
+  hoodie.share(shareId).findAll();
+
+  // subscribe to a given share
+  hoodie.share(shareId).subscribe();
+```
+
+### sending emails … yep.
+```javascript
+
+  // define an email object
   var magic = hoodie.email.send({
     to      : ['susan@example.com'],
     cc      : ['bill@example.com'],
     subject : 'rule the world',
     body    : 'we can do it!\nSigned, Joe'
-  })
+  });
 
-  magic.done( function(mail) {
-    alert('Mail has been sent to ' + mail.to)
-  })
+  magic.done(function(mail) {
+    alert('Mail has been sent to ' + mail.to);
+  });
 
-  magic.fail( function(eror) {
-    alert('Sory, but something went wrong: ' + error.reason)
-  })
+  magic.fail(function(eror) {
+    alert('Sory, but something went wrong: ' + error.reason);
+  });
 
-  // Like what you see? Good. Because we got more:
-  // http://hoodiehq.github.com/hoodie.js
-  // API DOCS: http://hoodiehq.github.com/hoodie.js/doc/hoodie.html
+
 ```
-
 
 But … how does it work?
 -----------------------
@@ -86,31 +118,27 @@ Every app gets its own hoodie. You need to set one up, because that's `whereTheM
   </script>
 ```
 
-You can get a hoodie for your app with only a few clicks over on [hood.ie](http://hood.ie).
+For more in-depth documentation, head over to [hood.ie](http://hood.ie).
 
-If you like to host the magic yourselves, [there you go](https://github.com/hoodiehq/hoodie-app).
+## Contact
 
+Have a question?
 
-Dependencies
-------------
+* [\#hoodie](http://webchat.freenode.net/?channels=hoodie) on Freenode
+* [@hoodiehq](https://twitter.com/hoodiehq) on Twitter
 
-hoodie borrows some functionality from [jQuery](http://jquery.com), but we plan to remove this dependency soon.
+## Contributing to this project
 
+Anyone and everyone is welcome to contribute. Please take a moment to
+review the [guidelines for contributing](CONTRIBUTING.md).
 
-Feedback
---------
-
-If you have any kind of feedback, especially regarding hoodie's API, please [let us know](https://github.com/hoodiehq/hoodie.js/issues). You can also find us on Twitter: [@hoodiehq](https://twitter.com/hoodiehq)
-
-
-Contribute
-----------
-
-Want to join the revolution? Here's a [quickstart for developers](https://github.com/hoodiehq/hoodie.js/blob/master/quickstart_for_developers.md)
-
+* [Bug reports](CONTRIBUTING.md#bugs)
+* [Feature requests](CONTRIBUTING.md#features)
+* [Pull requests](CONTRIBUTING.md#pull-requests)
 
 License & Copyright
 -------------------
 
-© 2012 Gregor Martynus
+Copyright 2012, 2013 https://github.com/hoodiehq/ and other contributors
+
 Licensed under the Apache License 2.0.
