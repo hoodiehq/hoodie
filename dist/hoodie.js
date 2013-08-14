@@ -1,7 +1,8 @@
 
 // Hoodie.js - 0.3.0
 // https://github.com/hoodiehq/hoodie.js
-// Copyright 2012, 2013 https://github.com/hoodiehq/. and other contributors; Licensed Apache License 2.0
+// Copyright 2012, 2013 https://github.com/hoodiehq/
+// Licensed Apache License 2.0
 // --------
 //
 // the door to world domination (apps)
@@ -214,7 +215,6 @@
 //
 
 function hoodieEvents(hoodie) {
-
   var callbacks = {};
 
   // Bind
@@ -348,7 +348,6 @@ function hoodieEvents(hoodie) {
 //
 
 function hoodiePromises (hoodie) {
-
   var $defer = window.jQuery.Deferred;
 
   // returns true if passed object is a promise (but not a deferred),
@@ -402,7 +401,6 @@ function hoodiePromises (hoodie) {
 
 //
 function hoodieRequest(hoodie) {
-
   var $extend = $.extend;
   var $ajax = $.ajax;
 
@@ -478,9 +476,6 @@ function hoodieRequest(hoodie) {
 
 //
 function hoodieConnection(hoodie) {
-
-  'use strict';
-
   // state
   var online = true;
   var checkConnectionInterval = 30000;
@@ -505,7 +500,6 @@ function hoodieConnection(hoodie) {
   // - sets `checkConnectionInterval = 30000`
   //
   hoodie.checkConnection = function checkConnection() {
-
     var req = checkConnectionRequest;
 
     if (req && req.state() === 'pending') {
@@ -633,7 +627,6 @@ function hoodieDispose (hoodie) {
 // -------------
 
 function hoodieOpen(hoodie) {
-
   var $extend = window.jQuery.extend;
 
   // generic method to open a store. Used by
@@ -675,7 +668,6 @@ function hoodieOpen(hoodie) {
 
 /* jslint unused: false */
 function hoodieStoreApi(hoodie, options) {
-
   // public API
   var api = {};
 
@@ -906,6 +898,7 @@ function hoodieStoreApi(hoodie, options) {
   //
   api.updateAll = function updateAll(filterOrObjects, objectUpdate, options) {
     var promise;
+
     options = options || {};
 
     // normalize the input: make sure we have all objects
@@ -987,9 +980,12 @@ function hoodieStoreApi(hoodie, options) {
 
   // proxies to hoodie.trigger
   api.trigger = function trigger() {
-    var eventName, parameters, _ref;
-    eventName = arguments[0],
-    parameters = 2 <= arguments.length ? Array.prototype.slice.call(arguments, 1) : [];
+    var eventName, _ref;
+
+    eventName = arguments[0];
+
+    var parameters = 2 <= arguments.length ? Array.prototype.slice.call(arguments, 1) : [];
+
     return (_ref = hoodie).trigger.apply(_ref, [storeName + ':' + eventName].concat(Array.prototype.slice.call(parameters)));
   };
 
@@ -1019,8 +1015,11 @@ function hoodieStoreApi(hoodie, options) {
   if (! options.backend ) {
     throw new Error('options.backend must be passed');
   }
+
   var required = 'save find findAll remove removeAll'.split(' ');
+
   required.forEach( function(methodName) {
+
     if (!options.backend[methodName]) {
       throw new Error('options.backend.'+methodName+' must be passed.');
     }
@@ -2779,7 +2778,6 @@ function hoodieStore (hoodie) {
 
 //
 function hoodieConfig(hoodie) {
-
   var type = '$config';
   var id = 'hoodie';
   var cache = {};
@@ -2857,7 +2855,6 @@ function hoodieConfig(hoodie) {
 
 //
 function hoodieAccount (hoodie) {
-
   // public API
   var account = {};
 
@@ -2939,6 +2936,7 @@ function hoodieAccount (hoodie) {
   // to sign in with a 300ms timeout.
   //
   account.signUp = function signUp(username, password) {
+
     if (password === undefined) {
       password = '';
     }
@@ -3037,7 +3035,6 @@ function hoodieAccount (hoodie) {
     return hoodie.config.set(anonymousPasswordKey, password);
   }
 
-  // TODO: hide from public API
   function getAnonymousPassword() {
     return hoodie.config.get(anonymousPasswordKey);
   }
@@ -3223,6 +3220,7 @@ function hoodieAccount (hoodie) {
   //
   account.resetPassword = function resetPassword(username) {
     var data, key, options, resetPasswordId;
+
     resetPasswordId = hoodie.config.get('_account.resetPasswordId');
 
     if (resetPasswordId) {
@@ -3634,8 +3632,7 @@ function hoodieAccount (hoodie) {
   // turn an anonymous account into a real account
   //
   function upgradeAnonymousAccount(username, password) {
-    var currentPassword;
-    currentPassword = getAnonymousPassword();
+    var currentPassword = getAnonymousPassword();
 
     return changeUsernameAndPassword(currentPassword, username, password).done(function() {
       account.trigger('signup', username);
@@ -3913,7 +3910,6 @@ function hoodieAccount (hoodie) {
 //
 
 function hoodieRemote (hoodie) {
-
   // inherit from Hoodies Store API
   var remote = hoodie.open(hoodie.account.db(), {
 
@@ -3945,13 +3941,15 @@ function hoodieRemote (hoodie) {
   //
   function subscribeToEvents() {
 
-    remote.on('disconnect', function() {
-      hoodie.unbind('store:idle', remote.push);
-    });
-    remote.on('connect', function() {
+    hoodie.on('remote:connect', function() {
       hoodie.on('store:idle', remote.push);
     });
-    remote.on('pull', function(since) {
+
+    hoodie.on('remote:disconnect', function() {
+      hoodie.unbind('store:idle', remote.push);
+    });
+
+    hoodie.on('remote:pull', function(since) {
       hoodie.config.set('_remote.since', since);
     });
 
@@ -3960,8 +3958,9 @@ function hoodieRemote (hoodie) {
     // account events
     hoodie.on('account:signin', function() {
       remote.name = hoodie.account.db();
-      return remote.connect();
+      remote.connect();
     });
+
     hoodie.on('account:reauthenticated', remote.connect);
     hoodie.on('account:signout', remote.disconnect);
   }
