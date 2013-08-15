@@ -6,3 +6,9 @@ before_script:
   - npm install -g grunt-cli
 services:
   - couchdb
+notifications:
+  irc:
+    channels:
+      - "irc.freenode.net#hoodie"
+    use_notice: true
+    skip_join: true
