@@ -113,10 +113,6 @@ describe('hoodie.remote', function() {
       expect(this.hoodie.unbind).to.be.calledWith('store:idle', this.remote.push);
     });
 
-    it('subscribes to remote:pull', function() {
-      expect(this.events['remote:pull']).to.be.a(Function);
-    });
-
     it('subscribes to reconnected', function() {
       expect(this.events.reconnected).to.be.a(Function);
     });
