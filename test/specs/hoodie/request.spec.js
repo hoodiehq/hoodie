@@ -5,7 +5,6 @@ describe('hoodie.request', function () {
   'use strict';
 
   beforeEach(function () {
-
     this.hoodie = new Mocks.Hoodie();
     this.ajaxDefer = this.hoodie.defer();
     var ajaxPromise = this.ajaxDefer.promise();
@@ -35,11 +34,27 @@ describe('hoodie.request', function () {
     it('should set `dataType: \'json\'', function() {
       expect(this.args.dataType).to.be('json');
     });
+    it('should set `dataType: \'json\'', function() {
+      expect(this.args.dataType).to.be('json');
+    });
     it('should set `xhrFields` to `withCredentials: true`', function() {
       expect(this.args.xhrFields.withCredentials).to.be(true);
     });
     it('should set `crossDomain: true`', function() {
       expect(this.args.crossDomain).to.be(true);
+    });
+
+    _and('baseUrl is relative', function() {
+      beforeEach(function() {
+        this.hoodie.baseUrl = '/_api';
+        this.hoodie.request('GET', '/');
+        this.args = window.jQuery.ajax.args[1][0];
+      });
+
+      it('should not set CORS headers', function() {
+        expect(this.args.xhrFields).to.be(undefined);
+        expect(this.args.crossDomain).to.be(undefined);
+      });
     });
   });
 

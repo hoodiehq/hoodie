@@ -103,11 +103,6 @@
     // * hoodie.remote
     hoodie.extend( hoodieRemote );
 
-    //
-    // loading user extensions
-    //
-    applyExtensions(hoodie);
-
 
     //
     // Initializations
@@ -133,6 +128,11 @@
 
     // authenticate
     hoodie.account.authenticate().then( hoodie.remote.connect );
+
+    //
+    // loading user extensions
+    //
+    applyExtensions(hoodie);
   }
 
   // Extending hoodie
@@ -416,20 +416,28 @@ function hoodieRequest(hoodie) {
 
     options = options || {};
 
-    // if a relative path passed, prefix with @baseUrl
-    if (!/^http/.test(url)) {
+    defaults = {
+      type: type,
+      dataType: 'json'
+    };
+
+    // if absolute path passed, set CORS headers
+
+    // if relative path passed, prefix with baseUrl
+    if (! /^http/.test(url)) {
       url = '' + hoodie.baseUrl + url;
     }
 
-    defaults = {
-      type: type,
-      url: url,
-      xhrFields: {
+    // if url is cross domain, set CORS headers
+    if (/^http/.test(url)) {
+      defaults.xhrFields = {
         withCredentials: true
-      },
-      crossDomain: true,
-      dataType: 'json'
-    };
+      };
+      defaults.crossDomain = true;
+    }
+
+    defaults.url = url;
+
 
     // we are piping the result of the request to return a nicer
     // error if the request cannot reach the server at all.
@@ -980,13 +988,10 @@ function hoodieStoreApi(hoodie, options) {
 
   // proxies to hoodie.trigger
   api.trigger = function trigger() {
-    var eventName, _ref;
-
+    var eventName;
     eventName = arguments[0];
-
     var parameters = 2 <= arguments.length ? Array.prototype.slice.call(arguments, 1) : [];
-
-    return (_ref = hoodie).trigger.apply(_ref, [storeName + ':' + eventName].concat(Array.prototype.slice.call(parameters)));
+    return hoodie.trigger.apply(hoodie, [storeName + ':' + eventName].concat(Array.prototype.slice.call(parameters)));
   };
 
 
@@ -1005,7 +1010,7 @@ function hoodieStoreApi(hoodie, options) {
 
   // proxies to hoodie.unbind
   api.unbind = function unbind(eventName, callback) {
-    eventName = storeName +':' + eventName;
+    eventName = eventName.replace(/(^| )([^ ]+)/g, '$1'+storeName+':$2');
     return hoodie.unbind(eventName, callback);
   };
 
@@ -1431,7 +1436,7 @@ function hoodieRemoteStore (hoodie, options) {
   //
   remote.bootstrap = function bootstrap() {
     remote.trigger('bootstrap:start');
-    return remote.pull().done( handleBootstrapSuccess.bind(this) );
+    return remote.pull().done( handleBootstrapSuccess );
   };
 
 
@@ -1451,7 +1456,7 @@ function hoodieRemoteStore (hoodie, options) {
       pullRequestTimeout = window.setTimeout(restartPullRequest, 25000);
     }
 
-    return pullRequest.then(handlePullSuccess, handlePullError);
+    return pullRequest.done(handlePullSuccess).fail(handlePullError);
   };
 
 
@@ -3931,6 +3936,40 @@ function hoodieRemote (hoodie) {
       return { type: typeAndId[0], id: typeAndId[1]};
     })
   });
+
+  // trigger
+  // ---------
+
+  // proxies to hoodie.trigger
+  remote.trigger = function trigger() {
+    var eventName;
+
+    eventName = arguments[0];
+
+    var parameters = 2 <= arguments.length ? Array.prototype.slice.call(arguments, 1) : [];
+
+    return hoodie.trigger.apply(hoodie, ['remote:' + eventName].concat(Array.prototype.slice.call(parameters)));
+  };
+
+
+  // on
+  // ---------
+
+  // proxies to hoodie.on
+  remote.on = function on(eventName, data) {
+    eventName = eventName.replace(/(^| )([^ ]+)/g, '$1'+'remote:$2');
+    return hoodie.on(eventName, data);
+  };
+
+
+  // unbind
+  // ---------
+
+  // proxies to hoodie.unbind
+  remote.unbind = function unbind(eventName, callback) {
+    eventName = eventName.replace(/(^| )([^ ]+)/g, '$1'+'remote:$2');
+    return hoodie.unbind(eventName, callback);
+  };
 
 
   // Private

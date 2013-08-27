@@ -336,7 +336,7 @@ function hoodieRemoteStore (hoodie, options) {
   //
   remote.bootstrap = function bootstrap() {
     remote.trigger('bootstrap:start');
-    return remote.pull().done( handleBootstrapSuccess.bind(this) );
+    return remote.pull().done( handleBootstrapSuccess );
   };
 
 
@@ -356,7 +356,7 @@ function hoodieRemoteStore (hoodie, options) {
       pullRequestTimeout = window.setTimeout(restartPullRequest, 25000);
     }
 
-    return pullRequest.then(handlePullSuccess, handlePullError);
+    return pullRequest.done(handlePullSuccess).fail(handlePullError);
   };
 
 

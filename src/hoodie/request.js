@@ -21,20 +21,28 @@ function hoodieRequest(hoodie) {
 
     options = options || {};
 
-    // if a relative path passed, prefix with @baseUrl
-    if (!/^http/.test(url)) {
+    defaults = {
+      type: type,
+      dataType: 'json'
+    };
+
+    // if absolute path passed, set CORS headers
+
+    // if relative path passed, prefix with baseUrl
+    if (! /^http/.test(url)) {
       url = '' + hoodie.baseUrl + url;
     }
 
-    defaults = {
-      type: type,
-      url: url,
-      xhrFields: {
+    // if url is cross domain, set CORS headers
+    if (/^http/.test(url)) {
+      defaults.xhrFields = {
         withCredentials: true
-      },
-      crossDomain: true,
-      dataType: 'json'
-    };
+      };
+      defaults.crossDomain = true;
+    }
+
+    defaults.url = url;
+
 
     // we are piping the result of the request to return a nicer
     // error if the request cannot reach the server at all.
