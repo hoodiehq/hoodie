@@ -24,7 +24,7 @@ function hoodieRemote (hoodie) {
     prefix: '',
 
     //
-    since: hoodie.config.get('_remote.since') || 0,
+    since: sinceNrCallback,
 
     //
     defaultObjectsToPush: hoodie.store.changedObjects,
@@ -74,6 +74,16 @@ function hoodieRemote (hoodie) {
   // Private
   // ---------
 
+  // getter / setter for since number
+  //
+  function sinceNrCallback(sinceNr) {
+    if (sinceNr) {
+      return hoodie.config.set('_remote.since', sinceNr);
+    }
+
+    return hoodie.config.get('_remote.since') || 0;
+  }
+
   //
   // subscribe to events coming from account
   //
@@ -88,7 +98,7 @@ function hoodieRemote (hoodie) {
     });
 
     hoodie.on('remote:pull', function(since) {
-      hoodie.config.set('_remote.since', since);
+
     });
 
     hoodie.on('reconnected', remote.connect);

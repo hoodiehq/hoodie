@@ -323,6 +323,10 @@ function hoodieRemoteStore (hoodie, options) {
   //
   var since = options.since || 0; // TODO: spec that!
   remote.getSinceNr = function getSinceNr() {
+    if (typeof since === 'function') {
+      return since();
+    }
+
     return since;
   };
 
@@ -443,11 +447,17 @@ function hoodieRemoteStore (hoodie, options) {
   // setSinceNr
   // ------------
 
-  // sets the sequence number from wich to start to find changes in pull
+  // sets the sequence number from wich to start to find changes in pull.
+  // If remote store was initialized with since : function(nr) { ... },
+  // call the function with the seq passed. Otherwise simply set the seq
+  // number and return it.
   //
   function setSinceNr(seq) {
+    if (typeof since === 'function') {
+      return since(seq);
+    }
+
     since = seq;
-    remote.trigger('pull', since); // TODO: spec that
     return since;
   }
 

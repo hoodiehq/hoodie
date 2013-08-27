@@ -1,6 +1,6 @@
 /* global hoodieRemoteStore:true, hoodieStoreApi:true */
 
-describe('Hoodie.Remote', function() {
+describe('hoodieRemoteStore', function() {
 
   beforeEach(function() {
 
@@ -425,14 +425,14 @@ describe('Hoodie.Remote', function() {
   }); // #disconnect
 
   describe('#getSinceNr()', function() {
-    _when('since not set before', function() {
+    _when('since not set', function() {
       it('should return 0', function() {
         expect(this.remote._since).to.eql(void 0);
         expect(this.remote.getSinceNr()).to.eql(0);
       });
     });
 
-    _when('since set to 100 before', function() {
+    _when('since set to 100', function() {
 
       beforeEach(function() {
         this.remote = hoodieRemoteStore(this.hoodie, { since: 100 } );
@@ -440,6 +440,17 @@ describe('Hoodie.Remote', function() {
 
       it('should return 100', function() {
         expect(this.remote.getSinceNr()).to.eql(100);
+      });
+    });
+
+    _when('since set to function', function() {
+      beforeEach(function() {
+        this.callback = function() { return 123; };
+        this.remote = hoodieRemoteStore(this.hoodie, { since: this.callback } );
+      });
+
+      it('should return what the function returns', function() {
+        expect(this.remote.getSinceNr()).to.eql(123);
       });
     });
   }); // #getSinceNr
@@ -568,6 +579,21 @@ describe('Hoodie.Remote', function() {
 
       beforeEach(function() {
         this.requestDefer1.resolve( Mocks.changesResponse() );
+      });
+
+      it.only('should set since nr', function() {
+        expect(this.remote.getSinceNr()).to.eql(0);
+        this.remote.pull();
+        expect(this.remote.getSinceNr()).to.eql(20);
+      });
+
+      it.only('should set since nr using callback if initialized with since callback', function() {
+        var callback = sinon.spy();
+        var remote = hoodieRemoteStore(this.hoodie, { name: 'my/store', since: callback} );
+        var promise = this.hoodie.defer().resolve( Mocks.changesResponse() ).promise();
+        this.sandbox.stub(remote, 'request').returns( promise );
+        remote.pull();
+        expect(callback).to.be.calledWith(20);
       });
 
       it('should trigger remote events', function() {

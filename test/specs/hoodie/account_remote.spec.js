@@ -14,16 +14,38 @@ describe('hoodie.remote', function() {
     this.clock = this.sandbox.useFakeTimers(0); // '1970-01-01 00:00:00'
     hoodieRemote(this.hoodie);
     this.remote = this.hoodie.remote;
+    this.openArgs = this.hoodie.open.args[0];
   });
 
-  it('should open the users store with some options', function() {
-    expect(this.hoodie.open).to.be.calledWith('userdb', {
-      connected: true,
-      prefix: '',
-      since: 10,
-      defaultObjectsToPush: this.hoodie.store.changedObjects,
-      knownObjects: [{ type: 'funk', id: '1'}, { type: '$task', id: '2'}]
-    });
+  it('should open the users store', function() {
+    var name = this.openArgs[0];
+    expect(name).to.eql('userdb');
+  });
+
+  it('should open the users store with connected = true', function() {
+    var options = this.openArgs[1];
+    expect(options.connected).to.eql( true );
+  });
+
+  it('should open the users store with prefix = ""', function() {
+    var options = this.openArgs[1];
+    expect(options.prefix).to.eql( '' );
+  });
+
+  it('should pass function that returns current since sequence number', function() {
+    var args = this.openArgs[1];
+    expect(args.since()).to.eql(10);
+  });
+
+
+  it('should open the users store with defaultObjectsToPush', function() {
+    var options = this.openArgs[1];
+    expect(options.defaultObjectsToPush).to.eql( this.hoodie.store.changedObjects );
+  });
+
+  it('should open the users store with knownObjects', function() {
+    var options = this.openArgs[1];
+    expect(options.knownObjects).to.eql( [{ type: 'funk', id: '1'}, { type: '$task', id: '2'}] );
   });
 
   describe('#trigger', function() {
@@ -93,10 +115,6 @@ describe('hoodie.remote', function() {
 
     it('subscribes to remote:pull', function() {
       expect(this.events['remote:pull']).to.be.a(Function);
-    });
-    it('updates _remote.since on remote:pull', function() {
-      this.events['remote:pull'](123);
-      expect(this.hoodie.config.set).to.be.calledWith('_remote.since', 123);
     });
 
     it('subscribes to reconnected', function() {
