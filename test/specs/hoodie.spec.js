@@ -77,10 +77,6 @@ describe('Hoodie', function() {
       expect(this.hoodie.config.get).calledWith('_account.username');
       expect(this.hoodie.account.username).to.be('_account.username');
     });
-    it('presets hoodie.account.ownerHash', function() {
-      expect(this.hoodie.config.get).calledWith('_account.ownerHash');
-      expect(this.hoodie.account.ownerHash).to.be('_account.ownerHash');
-    });
 
     it('checks for a pending password reset', function() {
       expect(this.hoodie.account.checkPasswordReset).to.be.called();

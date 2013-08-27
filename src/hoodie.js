@@ -103,9 +103,8 @@
     // Initializations
     //
 
-    // set username & hash from config (local store)
+    // set username from config (local store)
     hoodie.account.username = hoodie.config.get('_account.username');
-    hoodie.account.ownerHash = hoodie.config.get('_account.ownerHash');
 
     // check for pending password reset
     hoodie.account.checkPasswordReset();

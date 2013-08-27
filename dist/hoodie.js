@@ -108,9 +108,8 @@
     // Initializations
     //
 
-    // set username & hash from config (local store)
+    // set username from config (local store)
     hoodie.account.username = hoodie.config.get('_account.username');
-    hoodie.account.ownerHash = hoodie.config.get('_account.ownerHash');
 
     // check for pending password reset
     hoodie.account.checkPasswordReset();
@@ -3894,6 +3893,7 @@ function hoodieAccount (hoodie) {
   //       other modules depend on it as well, like hoodie.store.
   // the ownerHash gets stored in every object created by the user.
   // Make sure we have one.
+  hoodie.account.ownerHash = hoodie.config.get('_account.ownerHash');
   if (!hoodie.account.ownerHash) {
     setOwner(hoodie.uuid());
   }
