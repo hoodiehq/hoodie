@@ -20,7 +20,7 @@ function Hoodie(baseUrl) {
   var hoodie = this;
 
   // enforce initialization with `new`
-  if (! (hoodie instanceof Hoodie)) {
+  if (!(hoodie instanceof Hoodie)) {
     throw new Error('usage: new Hoodie(url);');
   }
 
