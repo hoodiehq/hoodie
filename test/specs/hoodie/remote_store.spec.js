@@ -581,13 +581,13 @@ describe('hoodieRemoteStore', function() {
         this.requestDefer1.resolve( Mocks.changesResponse() );
       });
 
-      it.only('should set since nr', function() {
+      it('should set since nr', function() {
         expect(this.remote.getSinceNr()).to.eql(0);
         this.remote.pull();
         expect(this.remote.getSinceNr()).to.eql(20);
       });
 
-      it.only('should set since nr using callback if initialized with since callback', function() {
+      it('should set since nr using callback if initialized with since callback', function() {
         var callback = sinon.spy();
         var remote = hoodieRemoteStore(this.hoodie, { name: 'my/store', since: callback} );
         var promise = this.hoodie.defer().resolve( Mocks.changesResponse() ).promise();
