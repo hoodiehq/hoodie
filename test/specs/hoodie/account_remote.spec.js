@@ -26,6 +26,41 @@ describe('hoodie.remote', function() {
     });
   });
 
+  describe('#trigger', function() {
+    beforeEach(function() {
+      this.sandbox.spy(this.hoodie, 'trigger');
+    });
+    it('should prefix events with "remote"', function() {
+      expect(this.remote.name).to.be(undefined);
+      this.remote.trigger('funky', 'fresh');
+      expect(this.hoodie.trigger).to.be.calledWith('remote:funky', 'fresh');
+    });
+  });
+
+  describe('#on', function() {
+    beforeEach(function() {
+      this.sandbox.spy(this.hoodie, 'on');
+    });
+    it('should prefix events with "remote"', function() {
+      expect(this.remote.name).to.be(undefined);
+      var cb = function() {};
+      this.remote.on('funky fresh', cb);
+      expect(this.hoodie.on).to.be.calledWith('remote:funky remote:fresh', cb);
+    });
+  });
+
+  describe('#unbind', function() {
+    beforeEach(function() {
+      this.sandbox.spy(this.hoodie, 'unbind');
+    });
+    it('should prefix events with "remote"', function() {
+      expect(this.remote.name).to.be(undefined);
+      var cb = function() {};
+      this.remote.unbind('funky fresh', cb);
+      expect(this.hoodie.unbind).to.be.calledWith('remote:funky remote:fresh', cb);
+    });
+  });
+
   describe('#subscribeToEvents', function() {
     beforeEach(function() {
       var events = {};

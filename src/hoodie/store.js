@@ -324,13 +324,10 @@ function hoodieStoreApi(hoodie, options) {
 
   // proxies to hoodie.trigger
   api.trigger = function trigger() {
-    var eventName, _ref;
-
+    var eventName;
     eventName = arguments[0];
-
     var parameters = 2 <= arguments.length ? Array.prototype.slice.call(arguments, 1) : [];
-
-    return (_ref = hoodie).trigger.apply(_ref, [storeName + ':' + eventName].concat(Array.prototype.slice.call(parameters)));
+    return hoodie.trigger.apply(hoodie, [storeName + ':' + eventName].concat(Array.prototype.slice.call(parameters)));
   };
 
 
@@ -349,7 +346,7 @@ function hoodieStoreApi(hoodie, options) {
 
   // proxies to hoodie.unbind
   api.unbind = function unbind(eventName, callback) {
-    eventName = storeName +':' + eventName;
+    eventName = eventName.replace(/(^| )([^ ]+)/g, '$1'+storeName+':$2');
     return hoodie.unbind(eventName, callback);
   };
 
