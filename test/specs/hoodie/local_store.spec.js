@@ -585,14 +585,15 @@ describe('hoodie.store', function() {
       });
 
       it('should wait until bootstrapping is finished', function() {
-        this.storeBackend.save({
+        var promise = this.storeBackend.save({
           type: 'task',
-          id: '123',
+          id: '1234',
           title: 'do it!'
         });
+        expect(promise).to.be.pending();
         this.store.subscribeToOutsideEvents();
         this.hoodie.trigger('remote:bootstrap:end');
-        expect(this.store.save).to.be.called();
+        expect(promise).to.be.resolved();
       });
     }); // store is bootstrapping
   }); // #save
@@ -653,10 +654,11 @@ describe('hoodie.store', function() {
         stubFindItem('document', '123boot', {
           name: 'me up'
         });
-        this.storeBackend.find('document', '123boot');
+        var promise = this.storeBackend.find('document', '123boot');
+        expect(promise).to.be.pending();
         this.store.subscribeToOutsideEvents();
         this.hoodie.trigger('remote:bootstrap:end');
-        expect(this.store.find).to.be.called();
+        expect(promise).to.be.resolved();
       });
     });
   }); // #find
@@ -789,10 +791,11 @@ describe('hoodie.store', function() {
       });
 
       it('should wait until bootstrapping is finished', function() {
-        this.storeBackend.findAll('todo');
+        var promise = this.storeBackend.findAll('todo');
+        expect(promise).to.be.pending();
         this.store.subscribeToOutsideEvents();
         this.hoodie.trigger('remote:bootstrap:end');
-        expect(this.store.findAll).to.be.called();
+        expect(promise).to.be.resolved();
       });
     }); // store is bootstrapping
   }); // #findAll
@@ -994,10 +997,11 @@ describe('hoodie.store', function() {
         stubFindItem('document', '123', {
           something: 'here'
         });
-        this.storeBackend.remove('document', '123');
+        var promise = this.storeBackend.remove('document', '123');
+        expect(promise).to.be.pending();
         this.store.subscribeToOutsideEvents();
         this.hoodie.trigger('remote:bootstrap:end');
-        expect(this.store.remove).to.be.called();
+        expect(promise).to.be.resolved();
       });
 
     });

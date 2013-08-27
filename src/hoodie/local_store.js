@@ -880,7 +880,7 @@ function hoodieStore (hoodie) {
       method = methodCall[0];
       args = methodCall[1];
       defer = methodCall[2];
-      store[method].apply(store, args).then(defer.resolve, defer.reject);
+      localStore[method].apply(localStore, args).then(defer.resolve, defer.reject);
     }
 
     store.trigger('bootstrap:end');
