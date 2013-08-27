@@ -97,10 +97,6 @@ function hoodieRemote (hoodie) {
       hoodie.unbind('store:idle', remote.push);
     });
 
-    hoodie.on('remote:pull', function(since) {
-
-    });
-
     hoodie.on('reconnected', remote.connect);
 
     // account events
