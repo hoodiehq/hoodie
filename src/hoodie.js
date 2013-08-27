@@ -98,11 +98,6 @@
     // * hoodie.remote
     hoodie.extend( hoodieRemote );
 
-    //
-    // loading user extensions
-    //
-    applyExtensions(hoodie);
-
 
     //
     // Initializations
@@ -128,6 +123,11 @@
 
     // authenticate
     hoodie.account.authenticate().then( hoodie.remote.connect );
+
+    //
+    // loading user extensions
+    //
+    applyExtensions(hoodie);
   }
 
   // Extending hoodie
