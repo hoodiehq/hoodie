@@ -23,14 +23,6 @@ describe('installer', function () {
     expect(installer).to.have.property('createCouchCredentials');
   });
 
-  it('should have a setupModules property', function () {
-    expect(installer).to.have.property('setupModules');
-  });
-
-  it('should have a createModulesDB property', function () {
-    expect(installer).to.have.property('createModulesDB');
-  });
-
   it('should have a createAppConfig property', function () {
     expect(installer).to.have.property('createAppConfig');
   });
