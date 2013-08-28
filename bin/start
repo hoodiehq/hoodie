@@ -6,19 +6,19 @@
  * Dependencies
  */
 
-var environment = require('../lib/environment'),
-    hconsole = require('../lib/hconsole'),
-    app = require('../lib/app');
+var environment = require('../lib/environment');
+var hconsole = require('../lib/hconsole');
+var app = require('../lib/app');
 
 
 // parse command-line arguments
 var argv = require('optimist')
-    .alias('h', 'help')
-    .describe('help', 'Show usage information')
-    .describe('local-tld', 'Turn on local-tld on supported platforms')
-    .describe('no-local-tld', 'Turn off local-tld on supported platforms')
-    .usage('Usage: start [options]')
-    .argv;
+  .alias('h', 'help')
+  .describe('help', 'Show usage information')
+  .describe('local-tld', 'Turn on local-tld on supported platforms')
+  .describe('no-local-tld', 'Turn off local-tld on supported platforms')
+  .usage('Usage: start [options]')
+  .argv;
 
 /**
  * Start a Hoodie server configured for the current
@@ -26,26 +26,26 @@ var argv = require('optimist')
  */
 
 if (require.main === module) {
-    var project_dir = process.cwd();
+  var project_dir = process.cwd();
 
-    var cfg = environment.getConfig(
-        process.platform,   // platform
-        process.env,        // environment vars
-        project_dir,        // project directory
-        argv                // command-line arguments
-    );
+  var cfg = environment.getConfig(
+    process.platform,   // platform
+    process.env,        // environment vars
+    project_dir,        // project directory
+    argv                // command-line arguments
+  );
 
-    if (argv['help']) {
-        // show usage information
-        return require('optimist').showHelp();
+  if (argv.help) {
+    // show usage information
+    return require('optimist').showHelp();
+  }
+
+  app.init(cfg, function (err) {
+    if (err) {
+      hconsole.error(err);
+      process.exit(1);
     }
-
-    app.init(cfg, function (err) {
-        if (err) {
-            hconsole.error(err);
-            process.exit(1);
-        }
-        // line break before logs
-        console.log('');
-    });
+    // line break before logs
+    console.log('');
+  });
 }
