@@ -15,4 +15,13 @@ describe('utils', function () {
     expect(utils).to.have.property('redirect');
   });
 
+  it('should have a ensurePaths property', function () {
+    expect(utils).to.have.property('ensurePaths');
+  });
+
+  it('should have a exitIfSudo property', function () {
+    expect(utils).to.have.property('exitIfSudo');
+  });
+
+
 });

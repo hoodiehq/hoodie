@@ -14,12 +14,4 @@ describe('Application', function () {
     expect(this.app).to.have.property('writeConfig');
   });
 
-  it('should have a ensurePaths property', function () {
-    expect(this.app).to.have.property('ensurePaths');
-  });
-
-  it('should have a exitIfSudo property', function () {
-    expect(this.app).to.have.property('exitIfSudo');
-  });
-
 });
