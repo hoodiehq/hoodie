@@ -10,8 +10,4 @@ describe('Application', function () {
     expect(this.app).to.have.property('init');
   });
 
-  it('should have a writeConfig property', function () {
-    expect(this.app).to.have.property('writeConfig');
-  });
-
 });

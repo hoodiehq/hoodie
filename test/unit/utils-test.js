@@ -23,5 +23,8 @@ describe('utils', function () {
     expect(utils).to.have.property('exitIfSudo');
   });
 
+  it('should have a writeConfig property', function () {
+    expect(utils).to.have.property('writeConfig');
+  });
 
 });
