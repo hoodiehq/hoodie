@@ -29,7 +29,7 @@
   ],
   "debug": false,
   "devel": false,
-  "strict": true,
+  "strict": false,
   "globalstrict": false,
   "asi": false,
   "laxbreak": false,
@@ -42,7 +42,7 @@
   "expr": true,
   "forin": true,
   "immed": true,
-  "latedef": true,
+  "latedef": false,
   "loopfunc": false,
   "noarg": true,
   "regexp": false,
@@ -63,6 +63,8 @@
   "unused": true,
   "multistr": true,
   "maxdepth": 4,
-  "indent": 2
+  "indent": 2,
+  "quotmark": "single",
+  "trailing": true
 }
 

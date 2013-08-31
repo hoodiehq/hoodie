@@ -1,25 +1,213 @@
+<<<<<<< HEAD
 //  hoodie 0.2.3
 'use strict';
+=======
+>>>>>>> v0.3-cheesecake
 
-Object.deepExtend = function(child, parent) {
-  for (var key in parent) {
-    if (parent.hasOwnProperty(key)) {
-      child[key] = parent[key];
-    }
-  }
-  function Ctor() {
-    this.constructor = child;
-  }
-  Ctor.prototype = parent.prototype;
-  child.prototype = new Ctor();
-  child.__super__ = parent.prototype;
+// Hoodie.js - 0.3.0
+// https://github.com/hoodiehq/hoodie.js
+// Copyright 2012, 2013 https://github.com/hoodiehq/
+// Licensed Apache License 2.0
 
-  return child;
+(function(global) {
+'use strict'
+
+// Hoodie Core
+// -------------
+//
+// the door to world domination (apps)
+//
+
+
+
+// Constructor
+// -------------
+
+// When initializing a hoodie instance, an optional URL
+// can be passed. That's the URL of the hoodie backend.
+// If no URL passed it defaults to the current domain.
+//
+//     // init a new hoodie instance
+//     hoodie = new Hoodie
+//
+function Hoodie(baseUrl) {
+  var hoodie = this;
+
+  // enforce initialization with `new`
+  if (! (hoodie instanceof Hoodie)) {
+    throw new Error('usage: new Hoodie(url);');
+  }
+
+  if (!baseUrl) {
+    hoodie.baseUrl = '/_api'; // default to current domain
+  } else {
+    hoodie.baseUrl = baseUrl.replace(/\/+$/, '');
+  }
+
+
+  // hoodie.extend
+  // ---------------
+
+  // extend hoodie instance:
+  //
+  //     hoodie.extend(function(hoodie) {} )
+  //
+  hoodie.extend = function extend(extension) {
+    extension(hoodie);
+  };
+
+
+  //
+  // Extending hoodie core
+  //
+
+  /* global hoodieAccount, hoodieRemote, hoodieConfig, hoodieStore,
+            hoodiePromises, hoodieRequest, hoodieConnection, hoodieUUID, hoodieDispose, hoodieOpen
+  */
+
+  // * hoodie.bind
+  // * hoodie.on
+  // * hoodie.one
+  // * hoodie.trigger
+  // * hoodie.unbind
+  // * hoodie.off
+  /*global hoodieEvents */
+  hoodie.extend( hoodieEvents );
+
+
+  // * hoodie.defer
+  // * hoodie.isPromise
+  // * hoodie.resolve
+  // * hoodie.reject
+  // * hoodie.resolveWith
+  // * hoodie.rejectWith
+  hoodie.extend( hoodiePromises );
+
+  // * hoodie.request
+  hoodie.extend( hoodieRequest );
+
+  // * hoodie.isOnline
+  // * hoodie.checkConnection
+  hoodie.extend( hoodieConnection );
+
+  // * hoodie.uuid
+  hoodie.extend( hoodieUUID );
+
+  // * hoodie.dispose
+  hoodie.extend( hoodieDispose );
+
+  // * hoodie.open
+  hoodie.extend( hoodieOpen );
+
+  // * hoodie.store
+  hoodie.extend( hoodieStore );
+
+  // * hoodie.config
+  hoodie.extend( hoodieConfig );
+
+  // * hoodie.account
+  hoodie.extend( hoodieAccount );
+
+  // * hoodie.remote
+  hoodie.extend( hoodieRemote );
+
+
+  //
+  // Initializations
+  //
+
+  // set username from config (local store)
+  hoodie.account.username = hoodie.config.get('_account.username');
+
+  // check for pending password reset
+  hoodie.account.checkPasswordReset();
+
+  // clear config on sign out
+  hoodie.on('account:signout', hoodie.config.clear);
+
+  // hoodie.store
+  hoodie.store.patchIfNotPersistant();
+  hoodie.store.subscribeToOutsideEvents();
+  hoodie.store.bootstrapDirtyObjects();
+
+  // hoodie.remote
+  hoodie.remote.subscribeToEvents();
+
+  // authenticate
+  hoodie.account.authenticate().then( hoodie.remote.connect );
+
+  //
+  // loading user extensions
+  //
+  applyExtensions(hoodie);
+}
+
+// Extending hoodie
+// ------------------
+
+// You can either extend the Hoodie class, or a hoodie
+// instance during runtime
+//
+//     Hoodie.extend('magic1', funcion(hoodie) { /* ... */ })
+//     hoodie = new Hoodie
+//     hoodie.extend('magic2', function(hoodie) { /* ... */ })
+//     hoodie.magic1.doSomething()
+//     hoodie.magic2.doSomethingElse()
+//
+// Hoodie can also be extended anonymously
+//
+//      Hoodie.extend(funcion(hoodie) { hoodie.myMagic = function() {} })
+//
+var extensions = [];
+
+Hoodie.extend = function(extension) {
+  extensions.push(extension);
 };
 
 //
+// detect available extensions and attach to Hoodie Object.
+//
+function applyExtensions(hoodie) {
+  for (var i = 0; i < extensions.length; i++) {
+    extensions[i](hoodie);
+  }
+}
+
+//
+// expose Hoodie to module loaders. Based on jQuery's implementation.
+//
+if ( typeof module === 'object' && module && typeof module.exports === 'object' ) {
+
+  // Expose Hoodie as module.exports in loaders that implement the Node
+  // module pattern (including browserify). Do not create the global, since
+  // the user will be storing it themselves locally, and globals are frowned
+  // upon in the Node module world.
+  module.exports = Hoodie;
+
+
+} else if ( typeof define === 'function' && define.amd ) {
+
+  // Register as a named AMD module, since Hoodie can be concatenated with other
+  // files that may use define, but not via a proper concatenation script that
+  // understands anonymous AMD modules. A named AMD is safest and most robust
+  // way to register. Lowercase hoodie is used because AMD module names are
+  // derived from file names, and Hoodie is normally delivered in a lowercase
+  // file name.
+  define('hoodie', function () {
+    return Hoodie;
+  });
+
+} else {
+
+  // set global
+  global.Hoodie = Hoodie;
+}
+
+/* exported hoodieEvents */
+
+//
 // Events
-// ------
+// ========
 //
 // extend any Class with support for
 //
@@ -31,59 +219,54 @@ Object.deepExtend = function(child, parent) {
 // based on [Events implementations from Spine](https://github.com/maccman/spine/blob/master/src/spine.coffee#L1)
 //
 
-window.Events = window.Events || (function() {
+function hoodieEvents(hoodie) {
+  var callbacks = {};
 
-  'use strict';
-
-  function Events() {}
-
-  // ## Bind
+  // Bind
+  // ------
   //
   // bind a callback to an event triggerd by the object
   //
   //     object.bind 'cheat', blame
   //
-  Events.prototype.bind = function(ev, callback) {
-    var calls, evs, name, _i, _len, _results = [];
+  function bind(ev, callback) {
+    var evs, name, _i, _len;
 
     evs = ev.split(' ');
-    calls = this.hasOwnProperty('_callbacks') && this._callbacks || (this._callbacks = {});
 
     for (_i = 0, _len = evs.length; _i < _len; _i++) {
       name = evs[_i];
-      calls[name] = calls[name] || [];
-      _results.push(calls[name].push(callback));
+      callbacks[name] = callbacks[name] || [];
+      callbacks[name].push(callback);
     }
-    return _results;
-  };
+  }
 
-  // alias
-  Events.prototype.on = Events.prototype.bind;
-
-  // ## one
+  // one
+  // -----
   //
   // same as `bind`, but does get executed only once
   //
   //     object.one 'groundTouch', gameOver
   //
-  Events.prototype.one = function(ev, callback) {
-    this.bind(ev, function() {
-      this.unbind(ev, callback);
-      callback.apply(this, arguments);
+  function one(ev, callback) {
+    bind(ev, function() {
+      unbind(ev, callback);
+      callback.apply(null, arguments);
     });
-  };
+  }
 
-  // ## trigger
+  // trigger
+  // ---------
   //
   // trigger an event and pass optional parameters for binding.
   //     object.trigger 'win', score: 1230
   //
-  Events.prototype.trigger = function() {
-    var args, callback, ev, list, _i, _len, _ref;
+  function trigger() {
+    var args, callback, ev, list, _i, _len;
 
     args = 1 <= arguments.length ? Array.prototype.slice.call(arguments, 0) : [];
     ev = args.shift();
-    list = this.hasOwnProperty('_callbacks') && ((_ref = this._callbacks) !== null ? _ref[ev] : null);
+    list = callbacks[ev];
 
     if (!list) {
       return;
@@ -91,13 +274,14 @@ window.Events = window.Events || (function() {
 
     for (_i = 0, _len = list.length; _i < _len; _i++) {
       callback = list[_i];
-      callback.apply(this, args);
+      callback.apply(null, args);
     }
 
     return true;
-  };
+  }
 
-  // ## unbind
+  // unbind
+  // --------
   //
   // unbind to from all bindings, from all bindings of a specific event
   // or from a specific binding.
@@ -106,23 +290,23 @@ window.Events = window.Events || (function() {
   //     object.unbind 'move'
   //     object.unbind 'move', follow
   //
-  Events.prototype.unbind = function(ev, callback) {
-    var cb, i, list, _i, _len, _ref;
+  function unbind(ev, callback) {
+    var cb, i, list, _i, _len;
 
     if (!ev) {
-      this._callbacks = {};
-      return this;
+      callbacks = {};
+      return;
     }
 
-    list = (_ref = this._callbacks) !== null ? _ref[ev] : null;
+    list = callbacks[ev];
 
     if (!list) {
-      return this;
+      return;
     }
 
     if (!callback) {
-      delete this._callbacks[ev];
-      return this;
+      delete callbacks[ev];
+      return;
     }
 
     for (i = _i = 0, _len = list.length; _i < _len; i = ++_i) {
@@ -134,112 +318,181 @@ window.Events = window.Events || (function() {
 
       list = list.slice();
       list.splice(i, 1);
-      this._callbacks[ev] = list;
+      callbacks[ev] = list;
       break;
     }
 
-    return this;
-  };
-
-  return Events;
-
-})();
-
-// Hoodie
-// --------
-//
-// the door to world domination (apps)
-//
-
-window.Hoodie = window.Hoodie || (function(_super) {
-
-  'use strict';
-
-  // Constructor
-  // -------------
-
-  // When initializing a hoodie instance, an optional URL
-  // can be passed. That's the URL of a hoodie backend.
-  // If no URL passed it defaults to the current domain
-  // with an `api` subdomain.
-  //
-  //     // init a new hoodie instance
-  //     hoodie = new Hoodie
-  //
-  function Hoodie(baseUrl) {
-    this.baseUrl = baseUrl;
-
-    this._pipeRequestError = this._pipeRequestError.bind(this);
-    this.rejectWith = this.rejectWith.bind(this);
-    this.resolveWith = this.resolveWith.bind(this);
-    this.reject = this.reject.bind(this);
-    this.resolve = this.resolve.bind(this);
-    this.checkConnection = this.checkConnection.bind(this);
-
-    // remove trailing slash(es)
-    this.baseUrl = this.baseUrl ? this.baseUrl.replace(/\/+$/, '') : "/_api";
-
-    // init core modules
-    this.store = new this.constructor.LocalStore(this);
-    this.config = new this.constructor.Config(this);
-    this.account = new this.constructor.Account(this);
-    this.remote = new this.constructor.AccountRemote(this);
-
-    this._loadExtensions();
-    this.checkConnection();
+    return;
   }
 
-  Object.deepExtend(Hoodie, _super);
+  hoodie.bind = bind;
+  hoodie.on = bind;
+  hoodie.one = one;
+  hoodie.trigger = trigger;
+  hoodie.unbind = unbind;
+  hoodie.off = unbind;
+}
 
-  // Settings
-  // ----------
+/* exported hoodiePromises */
 
-  // `online` (read-only)
-  Hoodie.prototype.online = true;
+// Hoodie Defers / Promises
+// ------------------------
 
-  // `checkConnectionInterval` (read-only)
-  Hoodie.prototype.checkConnectionInterval = 30000;
+// returns a defer object for custom promise handlings.
+// Promises are heavely used throughout the code of hoodie.
+// We currently borrow jQuery's implementation:
+// http://api.jquery.com/category/deferred-object/
+//
+//     defer = hoodie.defer()
+//     if (good) {
+//       defer.resolve('good.')
+//     } else {
+//       defer.reject('not good.')
+//     }
+//     return defer.promise()
+//
+
+function hoodiePromises (hoodie) {
+  var $defer = window.jQuery.Deferred;
+
+  // returns true if passed object is a promise (but not a deferred),
+  // otherwise false.
+  function isPromise(object) {
+    return !! (object &&
+               typeof object.done === 'function' &&
+               typeof object.resolve !== 'function');
+  }
+
+  //
+  function resolve() {
+    return $defer().resolve().promise();
+  }
+
+
+  //
+  function reject() {
+    return $defer().reject().promise();
+  }
+
+
+  //
+  function resolveWith() {
+    var _defer = $defer();
+    return _defer.resolve.apply(_defer, arguments).promise();
+  }
+
+  //
+  function rejectWith() {
+    var _defer = $defer();
+    return _defer.reject.apply(_defer, arguments).promise();
+  }
+
+  //
+  // Public API
+  //
+  hoodie.defer = $defer;
+  hoodie.isPromise = isPromise;
+  hoodie.resolve = resolve;
+  hoodie.reject = reject;
+  hoodie.resolveWith = resolveWith;
+  hoodie.rejectWith = rejectWith;
+}
+
+/* exported hoodieRequest */
+
+//
+// hoodie.request
+// ================
+
+//
+function hoodieRequest(hoodie) {
+  var $extend = $.extend;
+  var $ajax = $.ajax;
 
   // Requests
   // ----------
 
-  // use this method to send requests to the hoodie backend.
+  // sends requests to the hoodie backend.
   //
   //     promise = hoodie.request('GET', '/user_database/doc_id')
   //
-  Hoodie.prototype.request = function(type, url, options) {
+  function request(type, url, options) {
     var defaults, requestPromise, pipedPromise;
 
     options = options || {};
 
-    // if a relative path passed, prefix with @baseUrl
-    if (!/^http/.test(url)) {
-      url = "" + this.baseUrl + url;
-    }
-
     defaults = {
       type: type,
-      url: url,
-      xhrFields: {
-        withCredentials: true
-      },
-      crossDomain: true,
       dataType: 'json'
     };
 
+    // if absolute path passed, set CORS headers
+
+    // if relative path passed, prefix with baseUrl
+    if (! /^http/.test(url)) {
+      url = '' + hoodie.baseUrl + url;
+    }
+
+    // if url is cross domain, set CORS headers
+    if (/^http/.test(url)) {
+      defaults.xhrFields = {
+        withCredentials: true
+      };
+      defaults.crossDomain = true;
+    }
+
+    defaults.url = url;
+
+
     // we are piping the result of the request to return a nicer
     // error if the request cannot reach the server at all.
-    // We can't return the promise of $.ajax directly because of
-    // the piping, as for whatever reason the returned promise 
+    // We can't return the promise of ajax directly because of
+    // the piping, as for whatever reason the returned promise
     // does not have the `abort` method any more, maybe others
     // as well. See also http://bugs.jquery.com/ticket/14104
-    requestPromise = $.ajax($.extend(defaults, options));
-    pipedPromise = requestPromise.then( null, this._pipeRequestError);
+    requestPromise = $ajax($extend(defaults, options));
+    pipedPromise = requestPromise.then( null, pipeRequestError);
     pipedPromise.abort = requestPromise.abort;
 
     return pipedPromise;
-  };
+  }
 
+  //
+  //
+  //
+  function pipeRequestError(xhr) {
+    var error;
+
+    try {
+      error = JSON.parse(xhr.responseText);
+    } catch (_error) {
+      error = {
+        error: xhr.responseText || ('Cannot connect to Hoodie server at ' + hoodie.baseUrl)
+      };
+    }
+
+    return hoodie.rejectWith(error).promise();
+  }
+
+
+  //
+  // public API
+  //
+  hoodie.request = request;
+}
+
+/* exported hoodieConnection */
+
+//
+// hoodie.checkConnection() & hoodie.isOnline()
+// ============================================
+
+//
+function hoodieConnection(hoodie) {
+  // state
+  var online = true;
+  var checkConnectionInterval = 30000;
+  var checkConnectionRequest = null;
 
   // Check Connection
   // ------------------
@@ -249,36 +502,153 @@ window.Hoodie = window.Hoodie || (function(_super) {
   // Check Connection is automatically called on startup
   // and then each 30 seconds. If it fails, it
   //
-  // - sets `hoodie.online = false`
+  // - sets `online = false`
   // - triggers `offline` event
   // - sets `checkConnectionInterval = 3000`
   //
   // when connection can be reestablished, it
   //
-  // - sets `hoodie.online = true`
+  // - sets `online = true`
   // - triggers `online` event
   // - sets `checkConnectionInterval = 30000`
   //
-  Hoodie.prototype._checkConnectionRequest = null;
-  Hoodie.prototype.checkConnection = function() {
-
-    var req = this._checkConnectionRequest;
+  hoodie.checkConnection = function checkConnection() {
+    var req = checkConnectionRequest;
 
     if (req && req.state() === 'pending') {
       return req;
     }
 
-    this._checkConnectionRequest = this.request('GET', '/').pipe(
-      this._handleCheckConnectionSuccess.bind(this),
-      this._handleCheckConnectionError.bind(this)
+    checkConnectionRequest = hoodie.request('GET', '/').then(
+      handleCheckConnectionSuccess,
+      handleCheckConnectionError
     );
 
-    return this._checkConnectionRequest;
+    return checkConnectionRequest;
   };
 
 
-  // Open stores
-  // -------------
+  // isOnline
+  // ----------
+
+  //
+  hoodie.isOnline = function isOnline() {
+    return online;
+  };
+
+
+  //
+  //
+  //
+  function handleCheckConnectionSuccess() {
+    checkConnectionInterval = 30000;
+
+    window.setTimeout(hoodie.checkConnection, checkConnectionInterval);
+
+    if (! hoodie.isOnline()) {
+      hoodie.trigger('reconnected');
+      online = true;
+    }
+
+    return hoodie.resolve();
+  }
+
+
+<<<<<<< HEAD
+      for (i = _i = 0; 0 <= len ? _i < len : _i > len; i = 0 <= len ? ++_i : --_i) {
+        var rand = Math.random() * radix;
+        var char = chars[Math.floor(rand)];
+        _results.push(chars[0] = String(char).charAt(0));
+      }
+=======
+  //
+  //
+  //
+  function handleCheckConnectionError() {
+    checkConnectionInterval = 3000;
+>>>>>>> v0.3-cheesecake
+
+    window.setTimeout(hoodie.checkConnection, checkConnectionInterval);
+
+    if (hoodie.isOnline()) {
+      hoodie.trigger('disconnected');
+      online = false;
+    }
+
+    return hoodie.reject();
+  }
+}
+
+/* exported hoodieUUID */
+
+// hoodie.uuid
+// =============
+
+// helper to generate unique ids.
+function hoodieUUID (hoodie) {
+  var chars, i, radix;
+
+  // uuids consist of numbers and lowercase letters only.
+  // We stick to lowercase letters to prevent confusion
+  // and to prevent issues with CouchDB, e.g. database
+  // names do wonly allow for lowercase letters.
+  chars = '0123456789abcdefghijklmnopqrstuvwxyz'.split('');
+  radix = chars.length;
+
+
+  function uuid(length) {
+    var id = '';
+
+    // default uuid length to 7
+    if (length === undefined) {
+      length = 7;
+    }
+
+    for (i = 0; i < length; i++) {
+      var rand = Math.random() * radix;
+      var char = chars[Math.floor(rand)];
+      id += String(char).charAt(0);
+    }
+
+    return id;
+  }
+
+  //
+  // Public API
+  //
+  hoodie.uuid = uuid;
+}
+
+/* exported hoodieDispose */
+
+// hoodie.dispose
+// ================
+
+function hoodieDispose (hoodie) {
+
+  // if a hoodie instance is not needed anymore, it can
+  // be disposed using this method. A `dispose` event
+  // gets triggered that the modules react on.
+  function dispose() {
+    hoodie.trigger('dispose');
+    hoodie.unbind();
+  }
+
+  //
+  // Public API
+  //
+  hoodie.dispose = dispose;
+}
+
+
+/* exported hoodieOpen */
+/* global hoodieRemoteStore */
+
+// Open stores
+// -------------
+
+function hoodieOpen(hoodie) {
+  var $extend = window.jQuery.extend;
 
   // generic method to open a store. Used by
   //
@@ -289,1461 +659,23 @@ window.Hoodie = window.Hoodie || (function(_super) {
   //
   //     hoodie.open("some_store_name").findAll()
   //
-  Hoodie.prototype.open = function(storeName, options) {
+  function open(storeName, options) {
     options = options || {};
 
-    $.extend(options, {
+    $extend(options, {
       name: storeName
     });
 
-    return new Hoodie.Remote(this, options);
-  };
-
-
-  // uuid
-  // ------
-
-  // helper to generate unique ids.
-  Hoodie.prototype.uuid = function(len) {
-    var chars, i, radix;
-
-    // default uuid length to 7
-    if (len === undefined) {
-      len = 7;
-    }
-
-    // uuids consist of numbers and lowercase letters only.
-    // We stick to lowercase letters to prevent confusion
-    // and to prevent issues with CouchDB, e.g. database
-    // names do wonly allow for lowercase letters.
-    chars = '0123456789abcdefghijklmnopqrstuvwxyz'.split('');
-    radix = chars.length;
-
-    // eehmm, yeah.
-    return ((function() {
-      var _i, _results = [];
-
-      for (i = _i = 0; 0 <= len ? _i < len : _i > len; i = 0 <= len ? ++_i : --_i) {
-        var rand = Math.random() * radix;
-        var char = chars[Math.floor(rand)];
-        _results.push(chars[0] = String(char).charAt(0));
-      }
-
-      return _results;
-    })()).join('');
-  };
-
-
-  // Defers / Promises
-  // -------------------
-
-  // returns a defer object for custom promise handlings.
-  // Promises are heavely used throughout the code of hoodie.
-  // We currently borrow jQuery's implementation:
-  // http://api.jquery.com/category/deferred-object/
-  //
-  //     defer = hoodie.defer()
-  //     if (good) {
-  //       defer.resolve('good.')
-  //     } else {
-  //       defer.reject('not good.')
-  //     }
-  //     return defer.promise()
-  //
-  Hoodie.prototype.defer = $.Deferred;
-
-
-  // returns true if passed object is a promise (but not a deferred),
-  // otherwise false.
-  Hoodie.prototype.isPromise = function(object) {
-    return !! (object &&
-               typeof object.done === 'function' &&
-               typeof object.resolve !== 'function');
-  };
-
-
-  //
-  Hoodie.prototype.resolve = function() {
-    return this.defer().resolve().promise();
-  };
-
-
-  //
-  Hoodie.prototype.reject = function() {
-    return this.defer().reject().promise();
-  };
-
-
-  //
-  Hoodie.prototype.resolveWith = function() {
-    var defer = this.defer();
-    return defer.resolve.apply(defer, arguments).promise();
-  };
-
-  //
-  Hoodie.prototype.rejectWith = function() {
-    var defer = this.defer();
-    return defer.reject.apply(defer, arguments).promise();
-  };
-
-
-  // dispose
-  // ---------
-
-  // if a hoodie instance is not needed anymore, it can
-  // be disposed using this method. A `dispose` event
-  // gets triggered that the modules react on.
-  Hoodie.prototype.dispose = function() {
-    this.trigger('dispose');
-  };
-
-
-  // Extending hoodie
-  // ------------------
-
-  // You can either extend the Hoodie class, or a hoodie
-  // instance dooring runtime
-  //
-  //     Hoodie.extend('magic1', funcion(hoodie) { /* ... */ })
-  //     hoodie = new Hoodie
-  //     hoodie.extend('magic2', function(hoodie) { /* ... */ })
-  //     hoodie.magic1.doSomething()
-  //     hoodie.magic2.doSomethingElse()
-  //
-  Hoodie.extend = function(name, Module) {
-    this._extensions = this._extensions || {};
-    this._extensions[name] = Module;
-  };
-  Hoodie.prototype.extend = function(name, Module) {
-    this[name] = new Module(this);
-  };
-
-
-  // ## Private
-
-  //
-  Hoodie.prototype._loadExtensions = function() {
-    var Module, instanceName, extensions;
-
-    extensions = this.constructor._extensions;
-
-    for (instanceName in extensions) {
-      if (extensions.hasOwnProperty(instanceName)) {
-        Module = extensions[instanceName];
-        this[instanceName] = new Module(this);
-      }
-    }
-
-  };
-
-
-  //
-  Hoodie.prototype._handleCheckConnectionSuccess = function() {
-    this.checkConnectionInterval = 30000;
-
-    window.setTimeout(this.checkConnection, this.checkConnectionInterval);
-
-    if (!this.online) {
-      this.trigger('reconnected');
-      this.online = true;
-    }
-
-    return this.defer().resolve();
-  };
-
-
-  //
-  Hoodie.prototype._handleCheckConnectionError = function() {
-    this.checkConnectionInterval = 3000;
-
-    window.setTimeout(this.checkConnection, this.checkConnectionInterval);
-
-    if (this.online) {
-      this.trigger('disconnected');
-      this.online = false;
-    }
-
-    return this.defer().reject();
-  };
-
-  Hoodie.prototype._pipeRequestError = function(xhr) {
-    var error;
-
-    try {
-      error = JSON.parse(xhr.responseText);
-    } catch (_error) {
-      error = {
-        error: xhr.responseText || ("Cannot connect to Hoodie server at " + this.baseUrl)
-      };
-    }
-
-    return this.rejectWith(error).promise();
-  };
-
-  return Hoodie;
-
-})(window.Events);
-
-// expose Hoodie to module loaders. Based on jQuery's implementation.
-if ( typeof module === "object" && module && typeof module.exports === "object" ) {
-
-  // Expose Hoodie as module.exports in loaders that implement the Node
-  // module pattern (including browserify). Do not create the global, since
-  // the user will be storing it themselves locally, and globals are frowned
-  // upon in the Node module world.
-  module.exports = Hoodie;
-} else {
-
-  // Register as a named AMD module, since Hoodie can be concatenated with other
-  // files that may use define, but not via a proper concatenation script that
-  // understands anonymous AMD modules. A named AMD is safest and most robust
-  // way to register. Lowercase hoodie is used because AMD module names are
-  // derived from file names, and Hoodie is normally delivered in a lowercase
-  // file name. 
-  if ( typeof define === "function" && define.amd ) {
-    define( "hoodie", [], function () {
-      'use strict';
-      return Hoodie;
-    } );
+    return hoodieRemoteStore(hoodie, options);
   }
+
+  //
+  // Public API
+  //
+  hoodie.open = open;
 }
 
-// Hoodie.Account
-// ================
-
-// tell something smart in here.
-//
-Hoodie.Account = (function () {
-
-  'use strict';
-
-  function Account(hoodie) {
-    this.hoodie = hoodie;
-
-    this._handleChangeUsernameAndPasswordRequest = this._handleChangeUsernameAndPasswordRequest;
-    this._sendChangeUsernameAndPasswordRequest = this._sendChangeUsernameAndPasswordRequest;
-    this._cleanupAndTriggerSignOut = this._cleanupAndTriggerSignOut.bind(this);
-    this._cleanup = this._cleanup.bind(this);
-    this._handleFetchBeforeDestroyError = this._handleFetchBeforeDestroyError.bind(this);
-    this._handleFetchBeforeDestroySucces = this._handleFetchBeforeDestroySucces.bind(this);
-    this._handlePasswordResetStatusRequestError = this._handlePasswordResetStatusRequestError.bind(this);
-    this._handlePasswordResetStatusRequestSuccess = this._handlePasswordResetStatusRequestSuccess.bind(this);
-    this._checkPasswordResetStatus = this._checkPasswordResetStatus.bind(this);
-    this._handleSignInSuccess = this._handleSignInSuccess.bind(this);
-    this._delayedSignIn = this._delayedSignIn.bind(this);
-    this._handleSignUpSucces = this._handleSignUpSucces.bind(this);
-    this._handleRequestError = this._handleRequestError.bind(this);
-    this._handleAuthenticateRequestSuccess = this._handleAuthenticateRequestSuccess.bind(this);
-
-    this.fetch = this.fetch.bind(this);
-    this.signOut = this.signOut.bind(this);
-    this.authenticate = this.authenticate.bind(this);
-
-    // cache for CouchDB _users doc
-    this._doc = {};
-
-    // map of requestPromises. We maintain this list to avoid sending
-    // the same requests several times.
-    this._requests = {};
-
-    // init account
-    this.init();
-  }
-
-  // Properties
-  // ------------
-
-  // 
-  Account.prototype.username = undefined;
-
-  // init
-  // ------
-
-  // we've put this into its own method so it's easier to
-  // inherit from Hoodie.Account and add custom logic
-  Account.prototype.init = function() {
-    // handle session
-    this.username = this.hoodie.config.get('_account.username');
-    this.ownerHash = this.hoodie.config.get('_account.ownerHash');
-
-    // he ownerHash gets stored in every object created by the user.
-    // Make sure we have one.
-    if (!this.ownerHash) {
-      this._setOwner(this.hoodie.uuid());
-    }
-
-    // authenticate on next tick
-    window.setTimeout(this.authenticate);
-
-    // is there a pending password reset?
-    this._checkPasswordResetStatus();
-  };
-
-
-  // Authenticate
-  // --------------
-
-  // Use this method to assure that the user is authenticated:
-  // `hoodie.account.authenticate().done( doSomething ).fail( handleError )`
-  //
-  Account.prototype.authenticate = function() {
-    var sendAndHandleAuthRequest, _ref, _ref1, self = this;
-
-    if (this._authenticated === false) {
-      return this.hoodie.defer().reject().promise();
-    }
-
-    if (this._authenticated === true) {
-      return this.hoodie.defer().resolve(this.username).promise();
-    }
-
-    // if there is a pending signOut request, return its promise,
-    // but pipe it so that it always ends up rejected
-    //
-    if (((_ref = this._requests.signOut) !== undefined ? _ref.state() : null) === 'pending') {
-      return this._requests.signOut.then(this.hoodie.rejectWith);
-    }
-
-    // if there is apending signIn request, return its promise
-    if (((_ref1 = this._requests.signIn) !== undefined ? _ref1.state() : null) === 'pending') {
-      return this._requests.signIn;
-    }
-
-    // if username is not set, make sure to end the session
-    if (this.username === undefined) {
-      return this._sendSignOutRequest().then(function() {
-        self._authenticated = false;
-        return self.hoodie.rejectWith();
-      });
-    }
-
-    // send request to check for session status. If there is a
-    // pending request already, return its promise.
-    //
-    sendAndHandleAuthRequest = function() {
-      return self.request('GET', "/_session").pipe(
-        self._handleAuthenticateRequestSuccess,
-        self._handleRequestError
-      );
-    };
-
-    return this._withSingleRequest('authenticate', sendAndHandleAuthRequest);
-  };
-
-
-  // sign up with username & password
-  // ----------------------------------
-
-  // uses standard CouchDB API to create a new document in _users db.
-  // The backend will automatically create a userDB based on the username
-  // address and approve the account by adding a "confirmed" role to the
-  // user doc. The account confirmation might take a while, so we keep trying
-  // to sign in with a 300ms timeout.
-  //
-  Account.prototype.signUp = function(username, password) {
-    if (password === undefined) {
-      password = '';
-    }
-
-    if (!username) {
-      return this.hoodie.defer().reject({
-        error: 'username must be set'
-      }).promise();
-    }
-
-    if (this.hasAnonymousAccount()) {
-      return this._upgradeAnonymousAccount(username, password);
-    }
-
-    if (this.hasAccount()) {
-      return this.hoodie.defer().reject({
-        error: 'you have to sign out first'
-      }).promise();
-    }
-
-    // downcase username
-    username = username.toLowerCase();
-
-    var options = {
-      data: JSON.stringify({
-        _id: this._key(username),
-        name: this._userKey(username),
-        type: 'user',
-        roles: [],
-        password: password,
-        ownerHash: this.ownerHash,
-        database: this.db(),
-        updatedAt: this._now(),
-        createdAt: this._now(),
-        signedUpAt: username !== this.ownerHash ? this._now() : void 0
-      }),
-      contentType: 'application/json'
-    };
-
-    return this.request('PUT', this._url(username), options).pipe(
-      this._handleSignUpSucces(username, password),
-      this._handleRequestError
-    );
-  };
-
-
-  // anonymous sign up
-  // -------------------
-
-  // If the user did not sign up himself yet, but data needs to be transfered
-  // to the couch, e.g. to send an email or to share data, the anonymousSignUp
-  // method can be used. It generates a random password and stores it locally
-  // in the browser.
-  //
-  // If the user signes up for real later, we "upgrade" his account, meaning we
-  // change his username and password internally instead of creating another user.
-  //
-  Account.prototype.anonymousSignUp = function() {
-    var password, username, self = this;
-
-    password = this.hoodie.uuid(10);
-    username = this.ownerHash;
-
-    return this.signUp(username, password).done(function() {
-      self.setAnonymousPassword(password);
-      return self.trigger('signup:anonymous', username);
-    });
-  };
-
-
-  // hasAccount
-  // ---------------------
-
-  // 
-  Account.prototype.hasAccount = function() {
-    return !!this.username;
-  };
-
-
-  // hasAnonymousAccount
-  // ---------------------
-
-  // 
-  Account.prototype.hasAnonymousAccount = function() {
-    return this.getAnonymousPassword() !== undefined;
-  };
-
-
-  // set / get / remove anonymous password
-  // ---------------------------------------
-
-  //
-  Account.prototype._anonymousPasswordKey = '_account.anonymousPassword';
-
-  Account.prototype.setAnonymousPassword = function(password) {
-    return this.hoodie.config.set(this._anonymousPasswordKey, password);
-  };
-
-  Account.prototype.getAnonymousPassword = function() {
-    return this.hoodie.config.get(this._anonymousPasswordKey);
-  };
-
-  Account.prototype.removeAnonymousPassword = function() {
-    return this.hoodie.config.remove(this._anonymousPasswordKey);
-  };
-
-
-  // sign in with username & password
-  // ----------------------------------
-
-  // uses standard CouchDB API to create a new user session (POST /_session).
-  // Besides the standard sign in we also check if the account has been confirmed
-  // (roles include "confirmed" role).
-  //
-  // NOTE: When signing in, all local data gets cleared beforehand (with a signOut).
-  //       Otherwise data that has been created beforehand (authenticated with
-  //       another user account or anonymously) would be merged into the user
-  //       account that signs in. That applies only if username isn't the same as
-  //       current username.
-  //
-  Account.prototype.signIn = function(username, password) {
-    var self = this;
-
-    if (username === null) {
-      username = '';
-    }
-
-    if (password === undefined) {
-      password = '';
-    }
-
-    // downcase
-    username = username.toLowerCase();
-
-    if (this.username !== username) {
-      return this.signOut({
-        silent: true
-      }).pipe(function() {
-        return self._sendSignInRequest(username, password);
-      });
-    } else {
-      return this._sendSignInRequest(username, password, {
-        reauthenticated: true
-      });
-    }
-  };
-
-
-  // sign out
-  // ---------
-
-  // uses standard CouchDB API to invalidate a user session (DELETE /_session)
-  //
-  Account.prototype.signOut = function(options) {
-    var self = this;
-
-    options = options || {};
-
-    if (!this.hasAccount()) {
-      return this._cleanup().then(function() {
-        if (!options.silent) {
-          return self.trigger('signout');
-        }
-      });
-    }
-    this.hoodie.remote.disconnect();
-    return this._sendSignOutRequest().pipe(this._cleanupAndTriggerSignOut);
-  };
-
-
-  // On
-  // ---
-
-  // shortcut for `hoodie.on`
-  //
-  Account.prototype.on = function(eventName, cb) {
-    eventName = eventName.replace(/(^| )([^ ]+)/g, "$1account:$2");
-    return this.hoodie.on(eventName, cb);
-  };
-
-
-  // Trigger
-  // ---
-
-  // shortcut for `hoodie.trigger`
-  //
-  Account.prototype.trigger = function() {
-    var eventName, parameters;
-
-    eventName = arguments[0],
-    parameters = 2 <= arguments.length ? Array.prototype.slice.call(arguments, 1) : [];
-
-    this.hoodie.trigger.apply(this.hoodie, ["account:" + eventName].concat(Array.prototype.slice.call(parameters)));
-  };
-
-
-  // Request
-  // ---
-
-  // shortcut for `hoodie.request`
-  //
-  Account.prototype.request = function(type, path, options) {
-    options = options || {};
-    return this.hoodie.request.apply(this.hoodie, arguments);
-  };
-
-
-  // db
-  // ----
-
-  // return name of db
-  //
-  Account.prototype.db = function() {
-    return "user/" + this.ownerHash;
-  };
-
-
-  // fetch
-  // -------
-
-  // fetches _users doc from CouchDB and caches it in _doc
-  //
-  Account.prototype.fetch = function(username) {
-    var self = this;
-
-    if (username === undefined) {
-      username = this.username;
-    }
-
-    if (!username) {
-      return this.hoodie.defer().reject({
-        error: "unauthenticated",
-        reason: "not logged in"
-      }).promise();
-    }
-
-    return this._withSingleRequest('fetch', function() {
-      return self.request('GET', self._url(username)).pipe(
-        null,
-        self._handleRequestError
-      ).done(function(response) {
-        self._doc = response;
-        return self._doc;
-      });
-    });
-
-  };
-
-
-  // change password
-  // -----------------
-
-  // Note: the hoodie API requires the currentPassword for security reasons,
-  // but couchDb doesn't require it for a password change, so it's ignored
-  // in this implementation of the hoodie API.
-  //
-  Account.prototype.changePassword = function(currentPassword, newPassword) {
-
-    if (!this.username) {
-      return this.hoodie.defer().reject({
-        error: "unauthenticated",
-        reason: "not logged in"
-      }).promise();
-    }
-
-    this.hoodie.remote.disconnect();
-
-    return this.fetch().pipe(
-      this._sendChangeUsernameAndPasswordRequest(currentPassword, null, newPassword),
-      this._handleRequestError
-    );
-  };
-
-
-  // reset password
-  // ----------------
-
-  // This is kind of a hack. We need to create an object anonymously
-  // that is not exposed to others. The only CouchDB API othering such
-  // functionality is the _users database.
-  //
-  // So we actualy sign up a new couchDB user with some special attributes.
-  // It will be picked up by the password reset worker and removeed
-  // once the password was resetted.
-  //
-  Account.prototype.resetPassword = function(username) {
-    var data, key, options, resetPasswordId, self = this;
-    resetPasswordId = this.hoodie.config.get('_account.resetPasswordId');
-
-    if (resetPasswordId) {
-      return this._checkPasswordResetStatus();
-    }
-
-    resetPasswordId = "" + username + "/" + (this.hoodie.uuid());
-
-    this.hoodie.config.set('_account.resetPasswordId', resetPasswordId);
-
-    key = "" + this._prefix + ":$passwordReset/" + resetPasswordId;
-
-    data = {
-      _id: key,
-      name: "$passwordReset/" + resetPasswordId,
-      type: 'user',
-      roles: [],
-      password: resetPasswordId,
-      createdAt: this._now(),
-      updatedAt: this._now()
-    };
-
-    options = {
-      data: JSON.stringify(data),
-      contentType: "application/json"
-    };
-
-    return this._withPreviousRequestsAborted('resetPassword', function() {
-      return self.request('PUT', "/_users/" + (encodeURIComponent(key)), options).pipe(
-        null, self._handleRequestError
-      ).done(self._checkPasswordResetStatus);
-    });
-
-  };
-
-
-  // change username
-  // -----------------
-
-  // Note: the hoodie API requires the current password for security reasons,
-  // but technically we cannot (yet) prevent the user to change the username
-  // without knowing the current password, so it's not impulemented in the current
-  // implementation of the hoodie API.
-  //
-  // But the current password is needed to login with the new username.
-  //
-  Account.prototype.changeUsername = function(currentPassword, newUsername) {
-    newUsername = newUsername || '';
-    return this._changeUsernameAndPassword(currentPassword, newUsername.toLowerCase());
-  };
-
-
-  // destroy
-  // ---------
-
-  // destroys a user's account
-  //
-  Account.prototype.destroy = function() {
-    if (!this.hasAccount()) {
-      return this._cleanupAndTriggerSignOut();
-    }
-
-    return this.fetch().pipe(
-      this._handleFetchBeforeDestroySucces,
-      this._handleFetchBeforeDestroyError
-    ).pipe(this._cleanupAndTriggerSignOut);
-  };
-
-
-  // PRIVATE
-  // ---------
-
-  // default couchDB user doc prefix
-  //
-  Account.prototype._prefix = 'org.couchdb.user';
-
-  // setters
-  Account.prototype._setUsername = function(username) {
-    if (username === this.username) {
-      return;
-    }
-
-    this.username = username;
-
-    return this.hoodie.config.set('_account.username', this.username);
-  };
-
-  Account.prototype._setOwner = function(ownerHash) {
-
-    if (ownerHash === this.ownerHash) {
-      return;
-    }
-
-    this.ownerHash = ownerHash;
-    // `ownerHash` is stored with every new object in the createdBy
-    // attribute. It does not get changed once it's set. That's why
-    // we have to force it to be change for the `$config/hoodie` object.
-    this.hoodie.config.set('createdBy', this.ownerHash);
-
-    return this.hoodie.config.set('_account.ownerHash', this.ownerHash);
-  };
-
-
-  //
-  // handle a successful authentication request.
-  //
-  // As long as there is no server error or internet connection issue,
-  // the authenticate request (GET /_session) does always return
-  // a 200 status. To differentiate whether the user is signed in or
-  // not, we check `userCtx.name` in the response. If the user is not
-  // signed in, it's null, otherwise the name the user signed in with
-  //
-  // If the user is not signed in, we difeerentiate between users that
-  // signed in with a username / password or anonymously. For anonymous
-  // users, the password is stored in local store, so we don't need
-  // to trigger an 'unauthenticated' error, but instead try to sign in.
-  //
-  Account.prototype._handleAuthenticateRequestSuccess = function(response) {
-    if (response.userCtx.name) {
-      this._authenticated = true;
-      this._setUsername(response.userCtx.name.replace(/^user(_anonymous)?\//, ''));
-      this._setOwner(response.userCtx.roles[0]);
-      return this.hoodie.defer().resolve(this.username).promise();
-    }
-
-    if (this.hasAnonymousAccount()) {
-      this.signIn(this.username, this.getAnonymousPassword());
-      return;
-    }
-
-    this._authenticated = false;
-    this.trigger('error:unauthenticated');
-    return this.hoodie.defer().reject().promise();
-  };
-
-
-  //
-  // standard error handling for AJAX requests
-  //
-  // in some case we get the object error directly,
-  // in others we get an xhr or even just a string back
-  // when the couch died entirely. Whe have to handle
-  // each case
-  //
-  Account.prototype._handleRequestError = function(error) {
-    var e;
-
-    error = error || {};
-
-    if (error.reason) {
-      return this.hoodie.defer().reject(error).promise();
-    }
-
-    var xhr = error;
-
-    try {
-      error = JSON.parse(xhr.responseText);
-    } catch (_error) {
-      e = _error;
-      error = {
-        error: xhr.responseText || "unknown"
-      };
-    }
-
-    return this.hoodie.defer().reject(error).promise();
-  };
-
-
-  //
-  // handle response of a successful signUp request.
-  // Response looks like:
-  //
-  //     {
-  //         "ok": true,
-  //         "id": "org.couchdb.user:joe",
-  //         "rev": "1-e8747d9ae9776706da92810b1baa4248"
-  //     }
-  //
-  Account.prototype._handleSignUpSucces = function(username, password) {
-    var self = this;
-
-    return function(response) {
-      self.trigger('signup', username);
-      self._doc._rev = response.rev;
-      return self._delayedSignIn(username, password);
-    };
-  };
-
-
-  //
-  // a delayed sign in is used after sign up and after a
-  // username change.
-  //
-  Account.prototype._delayedSignIn = function(username, password, options, defer) {
-    var self = this;
-
-    // _delayedSignIn might call itself, when the user account
-    // is pending. In this case it passes the original defer,
-    // to keep a reference and finally resolve / reject it 
-    // at some point
-    if (!defer) {
-      defer = this.hoodie.defer();
-    }
-
-    window.setTimeout(function() {
-      var promise = self._sendSignInRequest(username, password);
-      promise.done(defer.resolve);
-      promise.fail(function(error) {
-        if (error.error === 'unconfirmed') {
-
-          // It might take a bit until the account has been confirmed
-          self._delayedSignIn(username, password, options, defer);
-        } else {
-          defer.reject.apply(defer, arguments);
-        }
-      });
-
-    }, 300);
-
-    return defer.promise();
-  };
-
-
-  //
-  // parse a successful sign in response from couchDB.
-  // Response looks like:
-  //
-  //     {
-  //         "ok": true,
-  //         "name": "test1",
-  //         "roles": [
-  //             "mvu85hy",
-  //             "confirmed"
-  //         ]
-  //     }
-  //
-  // we want to turn it into "test1", "mvu85hy" or reject the promise
-  // in case an error occured ("roles" array contains "error")
-  //
-  Account.prototype._handleSignInSuccess = function(options) {
-    var self = this;
-    options = options || {};
-
-    return function(response) {
-      var defer, username;
-
-      defer = self.hoodie.defer();
-      username = response.name.replace(/^user(_anonymous)?\//, '');
-
-      //
-      // if an error occured, the userDB worker stores it to the $error attribute
-      // and adds the "error" role to the users doc object. If the user has the
-      // "error" role, we need to fetch his _users doc to find out what the error
-      // is, before we can reject the promise.
-      //
-      if (response.roles.indexOf("error") !== -1) {
-        self.fetch(username).fail(defer.reject).done(function() {
-          return defer.reject({
-            error: "error",
-            reason: self._doc.$error
-          });
-        });
-        return defer.promise();
-      }
-
-      //
-      // When the userDB worker created the database for the user and everthing
-      // worked out, it adds the role "confirmed" to the user. If the role is
-      // not present yet, it might be that the worker didn't pick up the the
-      // user doc yet, or there was an error. In this cases, we reject the promise
-      // with an "uncofirmed error"
-      //
-      if (response.roles.indexOf("confirmed") === -1) {
-        return defer.reject({
-          error: "unconfirmed",
-          reason: "account has not been confirmed yet"
-        });
-      }
-
-      self._setUsername(username);
-      self._setOwner(response.roles[0]);
-      self._authenticated = true;
-
-      //
-      // options.verbose is true, when a user manually signed via hoodie.account.signIn().
-      // We need to differentiate to other signIn requests, for example right after
-      // the signup or after a session timed out.
-      //
-      if (!(options.silent || options.reauthenticated)) {
-        if (self.hasAnonymousAccount()) {
-          self.trigger('signin:anonymous', username);
-        } else {
-          self.trigger('signin', username);
-        }
-      }
-
-      // user reauthenticated, meaning
-      if (options.reauthenticated) {
-        self.trigger('reauthenticated', username);
-      }
-
-      self.fetch();
-      return defer.resolve(self.username, response.roles[0]);
-    };
-  };
-
-
-  //
-  // check for the status of a password reset. It might take
-  // a while until the password reset worker picks up the job
-  // and updates it
-  //
-  // If a password reset request was successful, the $passwordRequest
-  // doc gets removed from _users by the worker, therefore a 401 is
-  // what we are waiting for.
-  //
-  // Once called, it continues to request the status update with a
-  // one second timeout.
-  //
-  Account.prototype._checkPasswordResetStatus = function() {
-    var hash, options, resetPasswordId, url, username, self = this;
-
-    // reject if there is no pending password reset request
-    resetPasswordId = this.hoodie.config.get('_account.resetPasswordId');
-
-    if (!resetPasswordId) {
-      return this.hoodie.defer().reject({
-        error: "missing"
-      }).promise();
-    }
-
-    // send request to check status of password reset
-    username = "$passwordReset/" + resetPasswordId;
-    url = "/_users/" + (encodeURIComponent("" + this._prefix + ":" + username));
-    hash = btoa("" + username + ":" + resetPasswordId);
-
-    options = {
-      headers: {
-        Authorization: "Basic " + hash
-      }
-    };
-
-    return this._withPreviousRequestsAborted('passwordResetStatus', function() {
-      return self.request('GET', url, options).pipe(
-        self._handlePasswordResetStatusRequestSuccess,
-        self._handlePasswordResetStatusRequestError
-      ).fail(function(error) {
-        if (error.error === 'pending') {
-          window.setTimeout(self._checkPasswordResetStatus, 1000);
-          return;
-        }
-        return self.trigger('password_reset:error');
-      });
-    });
-  };
-
-
-  //
-  // If the request was successful there might have occured an
-  // error, which the worker stored in the special $error attribute.
-  // If that happens, we return a rejected promise with the $error,
-  // error. Otherwise reject the promise with a 'pending' error,
-  // as we are not waiting for a success full response, but a 401
-  // error, indicating that our password was changed and our
-  // current session has been invalidated
-  //
-  Account.prototype._handlePasswordResetStatusRequestSuccess = function(response) {
-    var defer = this.hoodie.defer();
-
-    if (response.$error) {
-      defer.reject(response.$error);
-    } else {
-      defer.reject({
-        error: 'pending'
-      });
-    }
-    return defer.promise();
-  };
-
-
-  //
-  // If the error is a 401, it's exactly what we've been waiting for.
-  // In this case we resolve the promise.
-  //
-  Account.prototype._handlePasswordResetStatusRequestError = function(xhr) {
-    if (xhr.status === 401) {
-      this.hoodie.config.remove('_account.resetPasswordId');
-      this.trigger('passwordreset');
-
-      return this.hoodie.defer().resolve();
-    } else {
-      return this._handleRequestError(xhr);
-    }
-  };
-
-
-  //
-  // change username and password in 3 steps
-  //
-  // 1. assure we have a valid session
-  // 2. update _users doc with new username and new password (if provided)
-  // 3. sign in with new credentials to create new sesion.
-  //
-  Account.prototype._changeUsernameAndPassword = function(currentPassword, newUsername, newPassword) {
-    var self = this;
-
-    return this._sendSignInRequest(this.username, currentPassword, {
-      silent: true
-    }).pipe(function() {
-      return self.fetch().pipe(
-        self._sendChangeUsernameAndPasswordRequest(currentPassword, newUsername, newPassword)
-      );
-    });
-  };
-
-
-  //
-  // turn an anonymous account into a real account
-  //
-  Account.prototype._upgradeAnonymousAccount = function(username, password) {
-    var currentPassword, self = this;
-    currentPassword = this.getAnonymousPassword();
-
-    return this._changeUsernameAndPassword(currentPassword, username, password).done(function() {
-      self.trigger('signup', username);
-      self.removeAnonymousPassword();
-    });
-  };
-
-
-  //
-  // we now can be sure that we fetched the latest _users doc, so we can update it
-  // without a potential conflict error.
-  //
-  Account.prototype._handleFetchBeforeDestroySucces = function() {
-    var self = this;
-
-    this.hoodie.remote.disconnect();
-    this._doc._deleted = true;
-
-    return this._withPreviousRequestsAborted('updateUsersDoc', function() {
-      self.request('PUT', self._url(), {
-        data: JSON.stringify(self._doc),
-        contentType: 'application/json'
-      });
-    });
-  };
-
-
-  //
-  // dependend on what kind of error we get, we want to ignore
-  // it or not.
-  // When we get a "not_found" it means that the _users doc habe
-  // been removed already, so we don't need to do it anymore, but
-  // still want to finish the destroy locally, so we return a
-  // resolved promise
-  //
-  Account.prototype._handleFetchBeforeDestroyError = function(error) {
-    if (error.error === 'not_found') {
-      return this.hoodie.defer().resolve().promise();
-    } else {
-      return this.hoodie.defer().reject(error).promise();
-    }
-  };
-
-  //
-  // remove everything form the current account, so a new account can be initiated.
-  //
-  Account.prototype._cleanup = function(options) {
-    options = options || {};
-
-    // hoodie.store is listening on this one
-    this.trigger('cleanup');
-    this._authenticated = options.authenticated;
-    this.hoodie.config.clear();
-    this._setUsername(options.username);
-    this._setOwner(options.ownerHash || this.hoodie.uuid());
-
-    return this.hoodie.defer().resolve().promise();
-  };
-
-
-  //
-  Account.prototype._cleanupAndTriggerSignOut = function() {
-    var self = this;
-    return this._cleanup().then(function() {
-      return self.trigger('signout');
-    });
-  };
-
-
-  //
-  // depending on wether the user signedUp manually or has been signed up anonymously
-  // the prefix in the CouchDB _users doc differentiates.
-  // An anonymous user is characterized by its username, that equals
-  // its ownerHash (see `anonymousSignUp`)
-  //
-  // We differentiate with `hasAnonymousAccount()`, because `_userKey`
-  // is used within `signUp` method, so we need to be able to differentiate
-  // between anonyomus and normal users before an account has been created.
-  //
-  Account.prototype._userKey = function(username) {
-    var prefix;
-
-    if (username === this.ownerHash) {
-      prefix = 'user_anonymous';
-    } else {
-      prefix = 'user';
-    }
-    return "" + prefix + "/" + username;
-  };
-
-
-  //
-  // turn a username into a valid _users doc._id
-  //
-  Account.prototype._key = function(username) {
-    username = username || this.username;
-    return "" + this._prefix + ":" + (this._userKey(username));
-  };
-
-  //
-  // get URL of my _users doc
-  //
-  Account.prototype._url = function(username) {
-    return "/_users/" + (encodeURIComponent(this._key(username)));
-  };
-
-
-  //
-  // update my _users doc.
-  //
-  // If a new username has been passed, we set the special attribut $newUsername.
-  // This will let the username change worker create create a new _users doc for
-  // the new username and remove the current one
-  //
-  // If a new password has been passed, salt and password_sha get removed
-  // from _users doc and add the password in clear text. CouchDB will replace it with
-  // according password_sha and a new salt server side
-  //
-  Account.prototype._sendChangeUsernameAndPasswordRequest = function(currentPassword, newUsername, newPassword) {
-    var self = this;
-
-    return function() {
-      // prepare updated _users doc
-      var data = $.extend({}, self._doc);
-
-      if (newUsername) {
-        data.$newUsername = newUsername;
-      }
-
-      data.updatedAt = self._now();
-      data.signedUpAt = data.signedUpAt || self._now();
-
-      // trigger password update when newPassword set
-      if (newPassword !== null) {
-        delete data.salt;
-        delete data.password_sha;
-        data.password = newPassword;
-      }
-
-      var options = {
-        data: JSON.stringify(data),
-        contentType: 'application/json'
-      };
-
-      return self._withPreviousRequestsAborted('updateUsersDoc', function() {
-        return self.request('PUT', self._url(), options).pipe(
-          self._handleChangeUsernameAndPasswordRequest(newUsername, newPassword || currentPassword),
-          self._handleRequestError
-        );
-      });
-
-    };
-  };
-
-
-  //
-  // depending on whether a newUsername has been passed, we can sign in right away
-  // or have to use the delayed sign in to give the username change worker some time
-  //
-  Account.prototype._handleChangeUsernameAndPasswordRequest = function(newUsername, newPassword) {
-    var self = this;
-
-    return function() {
-      self.hoodie.remote.disconnect();
-      if (newUsername) {
-        return self._delayedSignIn(newUsername, newPassword, {
-          silent: true
-        });
-      } else {
-        return self.signIn(self.username, newPassword);
-      }
-    };
-  };
-
-
-  //
-  // make sure that the same request doesn't get sent twice
-  // by cancelling the previous one.
-  //
-  Account.prototype._withPreviousRequestsAborted = function(name, requestFunction) {
-    if (this._requests[name] !== undefined) {
-      if (typeof this._requests[name].abort === "function") {
-        this._requests[name].abort();
-      }
-    }
-    this._requests[name] = requestFunction();
-    return this._requests[name];
-  };
-
-
-  //
-  // if there is a pending request, return its promise instead
-  // of sending another request
-  //
-  Account.prototype._withSingleRequest = function(name, requestFunction) {
-
-    if (this._requests[name] !== undefined) {
-      if (typeof this._requests[name].state === "function") {
-        if (this._requests[name].state() === 'pending') {
-          return this._requests[name];
-        }
-      }
-    }
-
-    this._requests[name] = requestFunction();
-    return this._requests[name];
-  };
-
-
-  //
-  Account.prototype._sendSignOutRequest = function() {
-    var self = this;
-    return this._withSingleRequest('signOut', function() {
-      return self.request('DELETE', '/_session').pipe(null, self._handleRequestError);
-    });
-  };
-
-
-  //
-  // the sign in request that starts a CouchDB session if
-  // it succeeds. We separated the actual sign in request from
-  // the signIn method, as the latter also runs signOut intenrtally
-  // to clean up local data before starting a new session. But as
-  // other methods like signUp or changePassword do also need to
-  // sign in the user (again), these need to send the sign in
-  // request but without a signOut beforehand, as the user remains
-  // the same.
-  //
-  Account.prototype._sendSignInRequest = function(username, password, options) {
-    var self = this,
-    requestOptions = {
-      data: {
-        name: this._userKey(username),
-        password: password
-      }
-    };
-
-    return this._withPreviousRequestsAborted('signIn', function() {
-      var promise = self.request('POST', '/_session', requestOptions);
-
-      return promise.pipe(
-        self._handleSignInSuccess(options),
-        self._handleRequestError
-      );
-    });
-
-  };
-
-
-  //
-  //
-  Account.prototype._now = function() {
-    return new Date();
-  };
-
-  return Account;
-
-})();
-
-// Hoodie Config API
-// ===================
-
-// 
-Hoodie.Config = (function() {
-
-  'use strict';
-
-  // Constructor
-  // -------------
-
-  //
-  function Config(hoodie, options) {
-    var self = this;
-
-    options = options || {};
-
-    this.hoodie = hoodie;
-    this.clear = this.clear;
-
-    // memory cache
-    this.cache = {};
-
-    if (options.type) {
-      this.type = options.type;
-    }
-
-    if (options.id) {
-      this.id = options.id;
-    }
-
-    this.hoodie.store.find(this.type, this.id).done(function(obj) {
-      self.cache = obj;
-      return self.cache;
-    });
-
-    this.hoodie.on('account:signedOut', this.clear);
-  }
-
-  // used as attribute name in localStorage
-  Config.prototype.type = '$config';
-  Config.prototype.id = 'hoodie';
-
-  // set
-  // ----------
-
-  // adds a configuration
-  // 
-  Config.prototype.set = function(key, value) {
-    var isSilent, update;
-
-    if (this.cache[key] === value) {
-      return;
-    }
-
-    this.cache[key] = value;
-
-    update = {};
-    update[key] = value;
-    isSilent = key.charAt(0) === '_';
-
-    return this.hoodie.store.update(this.type, this.id, update, {
-      silent: isSilent
-    });
-
-  };
-
-  // get
-  // ----------
-
-  // receives a configuration
-  // 
-  Config.prototype.get = function(key) {
-    return this.cache[key];
-  };
-
-  // clear
-  // ----------
-
-  // clears cache and removes object from store
-  // 
-  Config.prototype.clear = function() {
-    this.cache = {};
-    return this.hoodie.store.remove(this.type, this.id);
-  };
-
-  // remove
-  // ----------
-
-  // removes a configuration, is a simple alias for config.set(key, undefined)
-  // 
-  Config.prototype.remove = function(key) {
-    return this.set(key, void 0);
-  };
-
-  return Config;
-
-})();
-
-// 
-// one place to rule them all!
-// 
-
-'use strict';
-
-Hoodie.Errors = {
-
-  // INVALID_KEY
-  // --------------
-
-  // thrown when invalid keys are used to store an object
-  // 
-  INVALID_KEY: function (idOrType) {
-    var key = idOrType.id ? 'id' : 'type';
-
-    return new Error("invalid " + key + " '" + idOrType[key] + "': numbers and lowercase letters allowed only");
-  },
-
-  // INVALID_ARGUMENTS
-  // -------------------
-
-  // 
-  INVALID_ARGUMENTS: function (msg) {
-    return new Error(msg);
-  },
-
-  // NOT_FOUND
-  // -----------
-
-  // 
-  NOT_FOUND: function (type, id) {
-    return new Error("" + type + " with " + id + " could not be found");
-  }
-
-};
+/* exported hoodieStoreApi */
 
 // Store
 // ============
@@ -1755,18 +687,60 @@ Hoodie.Errors = {
 // store impnementations
 //
 
-Hoodie.Store = (function() {
+/* jslint unused: false */
+function hoodieStoreApi(hoodie, options) {
+  // public API
+  var api = {};
 
-  'use strict';
+  // persistance logic
+  var backend = {};
 
-  // Constructor
-  // ------------
+  // extend this property with extra functions that will be available
+  // on all promises returned by hoodie.store API. It has a reference
+  // to current hoodie instance by default
+  var promiseApi = {
+    hoodie: hoodie
+  };
 
-  // set store.hoodie instance variable
-  function Store(hoodie) {
-    this.hoodie = hoodie;
+  // name
+  var storeName = options.name || 'store';
+
+
+  // Validate
+  // --------------
+
+  // by default, we only check for a valid type & id.
+  // the validate method can be overwriten by passing
+  // options.validate
+  //
+  // if `validate` returns nothing, the passed object is
+  // valid. Otherwise it returns an error
+  //
+  api.validate = options.validate;
+
+  if (! options.validate) {
+    api.validate = function(object, options) {
+
+      if (!object) {
+        return Hoodie.Errors.INVALID_ARGUMENTS('no object passed');
+      }
+      if (!isValidType(object.type)) {
+        return Hoodie.Errors.INVALID_KEY({
+          type: object.type
+        });
+      }
+
+      if (! object.id) {
+        return;
+      }
+
+      if (!isValidId(object.id)) {
+        return Hoodie.Errors.INVALID_KEY({
+          id: object.id
+        });
+      }
+    };
   }
-
 
   // Save
   // --------------
@@ -1781,33 +755,22 @@ Hoodie.Store = (function() {
   //     store.save('car', undefined, {color: 'red'})
   //     store.save('car', 'abc4567', {color: 'red'})
   //
-  Store.prototype.save = function(type, id, object, options) {
-    var defer;
+  api.save = function save(type, id, properties, options) {
 
-    if (options === null) {
+    if ( options ) {
+      options = $.extend(true, {}, options);
+    } else {
       options = {};
     }
 
-    defer = this.hoodie.defer();
-
-    if (typeof object !== 'object' || Array.isArray(object)) {
-      defer.reject(Hoodie.Errors.INVALID_ARGUMENTS("invalid object"));
-      return defer.promise();
-    }
+    // don't mess with passed object
+    var object = $.extend(true, {}, properties, {type: type, id: id});
 
     // validations
-    if (id && !this._isValidId(id)) {
-      return defer.reject(Hoodie.Errors.INVALID_KEY({
-        id: id
-      })).promise();
-    }
-    if (!this._isValidType(type)) {
-      return defer.reject(Hoodie.Errors.INVALID_KEY({
-        type: type
-      })).promise();
-    }
+    var error = api.validate(object, options || {});
+    if(error) { return rejectWith(error); }
 
-    return defer;
+    return decoratePromise( backend.save(object, options || {}) );
   };
 
 
@@ -1817,15 +780,63 @@ Hoodie.Store = (function() {
   // `.add` is an alias for `.save`, with the difference that there is no id argument.
   // Internally it simply calls `.save(type, undefined, object).
   //
-  Store.prototype.add = function(type, object, options) {
+  api.add = function add(type, properties, options) {
 
-    if (object === undefined) {
-      object = {};
+    if (properties === undefined) {
+      properties = {};
     }
 
     options = options || {};
+    return api.save(type, properties.id, properties);
+  };
 
-    return this.save(type, object.id, object);
+
+  // find
+  // ------
+
+  //
+  api.find = function find(type, id) {
+    return decoratePromise( backend.find(type, id) );
+  };
+
+
+  // find or add
+  // -------------
+
+  // 1. Try to find a share by given id
+  // 2. If share could be found, return it
+  // 3. If not, add one and return it.
+  //
+  api.findOrAdd = function findOrAdd(type, id, properties) {
+    var defer;
+
+    if (properties === null) {
+      properties = {};
+    }
+
+    function handleNotFound() {
+      var newProperties;
+      newProperties = $.extend(true, {
+        id: id
+      }, properties);
+      return api.add(type, newProperties);
+    }
+
+    // promise decorations get lost when piped through `then`,
+    // that's why we need to decorate the find's promise again.
+    var promise = api.find(type, id).then(null, handleNotFound);
+    return decoratePromise( promise );
+  };
+
+
+  // findAll
+  // ------------
+
+  // returns all objects from store.
+  // Can be optionally filtered by a type or a function
+  //
+  api.findAll = function findAll(type, options) {
+    return decoratePromise( backend.findAll(type, options) );
   };
 
 
@@ -1843,23 +854,20 @@ Hoodie.Store = (function() {
   // hoodie.store.update('car', 'abc4567', {sold: true})
   // hoodie.store.update('car', 'abc4567', function(obj) { obj.sold = true })
   //
-  Store.prototype.update = function(type, id, objectUpdate, options) {
-    var defer, _loadPromise, self = this;
+  api.update = function update(type, id, objectUpdate, options) {
 
-    defer = this.hoodie.defer();
-
-    _loadPromise = this.find(type, id).pipe(function(currentObj) {
+    function handleFound(currentObject) {
       var changedProperties, newObj, value;
 
       // normalize input
-      newObj = $.extend(true, {}, currentObj);
+      newObj = $.extend(true, {}, currentObject);
 
       if (typeof objectUpdate === 'function') {
         objectUpdate = objectUpdate(newObj);
       }
 
       if (!objectUpdate) {
-        return defer.resolve(currentObj);
+        return resolveWith(currentObject);
       }
 
       // check if something changed
@@ -1869,7 +877,7 @@ Hoodie.Store = (function() {
         for (var key in objectUpdate) {
           if (objectUpdate.hasOwnProperty(key)) {
             value = objectUpdate[key];
-            if ((currentObj[key] !== value) === false) {
+            if ((currentObject[key] !== value) === false) {
               continue;
             }
             // workaround for undefined values, as $.extend ignores these
@@ -1881,19 +889,21 @@ Hoodie.Store = (function() {
       })();
 
       if (!(changedProperties.length || options)) {
-        return defer.resolve(newObj);
+        return resolveWith(newObj);
       }
 
       //apply update
-      self.save(type, id, newObj, options).then(defer.resolve, defer.reject);
-    });
+      return api.save(type, id, newObj, options);
+    }
 
-    // if not found, add it
-    _loadPromise.fail(function() {
-      return self.save(type, id, objectUpdate, options).then(defer.resolve, defer.reject);
-    });
+    function handleNotFound() {
+      return api.save(type, id, objectUpdate, options);
+    }
 
-    return defer.promise();
+    // promise decorations get lost when piped through `then`,
+    // that's why we need to decorate the find's promise again.
+    var promise = api.find(type, id).then(handleFound, handleNotFound);
+    return decoratePromise( promise );
   };
 
 
@@ -1907,31 +917,30 @@ Hoodie.Store = (function() {
   //
   // hoodie.store.updateAll()
   //
-  Store.prototype.updateAll = function(filterOrObjects, objectUpdate, options) {
-    var promise, self = this;
+  api.updateAll = function updateAll(filterOrObjects, objectUpdate, options) {
+    var promise;
+
     options = options || {};
 
     // normalize the input: make sure we have all objects
     switch (true) {
     case typeof filterOrObjects === 'string':
-      promise = this.findAll(filterOrObjects);
+      promise = api.findAll(filterOrObjects);
       break;
-    case this.hoodie.isPromise(filterOrObjects):
+    case hoodie.isPromise(filterOrObjects):
       promise = filterOrObjects;
       break;
     case $.isArray(filterOrObjects):
-      promise = this.hoodie.defer().resolve(filterOrObjects).promise();
+      promise = hoodie.defer().resolve(filterOrObjects).promise();
       break;
     default: // e.g. null, update all
-      promise = this.findAll();
+      promise = api.findAll();
     }
 
-    return promise.pipe(function(objects) {
+    promise = promise.then(function(objects) {
       // now we update all objects one by one and return a promise
       // that will be resolved once all updates have been finished
-      var defer, object, _updatePromises;
-
-      defer = self.hoodie.defer();
+      var object, _updatePromises;
 
       if (!$.isArray(objects)) {
         objects = [objects];
@@ -1942,70 +951,15 @@ Hoodie.Store = (function() {
         _results = [];
         for (_i = 0, _len = objects.length; _i < _len; _i++) {
           object = objects[_i];
-          _results.push(this.update(object.type, object.id, objectUpdate, options));
+          _results.push(api.update(object.type, object.id, objectUpdate, options));
         }
         return _results;
-      }).call(self);
+      })();
 
-      $.when.apply(null, _updatePromises).then(defer.resolve);
-      return defer.promise();
+      return $.when.apply(null, _updatePromises);
     });
-  };
 
-
-  // find
-  // -----------------
-
-  // loads one object from Store, specified by `type` and `id`
-  //
-  // example usage:
-  //
-  //     store.find('car', 'abc4567')
-  //
-  Store.prototype.find = function(type, id) {
-    var defer;
-    defer = this.hoodie.defer();
-    if (!(typeof type === 'string' && typeof id === 'string')) {
-      return defer.reject(Hoodie.Errors.INVALID_ARGUMENTS("type & id are required")).promise();
-    }
-    return defer;
-  };
-
-
-  // find or add
-  // -------------
-
-  // 1. Try to find a share by given id
-  // 2. If share could be found, return it
-  // 3. If not, add one and return it.
-  //
-  Store.prototype.findOrAdd = function(type, id, attributes) {
-    var defer, self = this;
-
-    if (attributes === null) {
-      attributes = {};
-    }
-
-    defer = this.hoodie.defer();
-    this.find(type, id).done(defer.resolve).fail(function() {
-      var newAttributes;
-      newAttributes = $.extend(true, {
-        id: id
-      }, attributes);
-      return self.add(type, newAttributes).then(defer.resolve, defer.reject);
-    });
-    return defer.promise();
-  };
-
-
-  // findAll
-  // ------------
-
-  // returns all objects from store.
-  // Can be optionally filtered by a type or a function
-  //
-  Store.prototype.findAll = function() {
-    return this.hoodie.defer();
+    return decoratePromise( promise );
   };
 
 
@@ -2017,70 +971,148 @@ Hoodie.Store = (function() {
   // when object has been synced before, mark it as deleted.
   // Otherwise remove it from Store.
   //
-  Store.prototype.remove = function(type, id, options) {
-    var defer;
-
-    if (options === null) {
-      options = {};
-    }
-
-    defer = this.hoodie.defer();
-
-    if (!(typeof type === 'string' && typeof id === 'string')) {
-      return defer.reject(Hoodie.Errors.INVALID_ARGUMENTS("type & id are required")).promise();
-    }
-
-    return defer;
+  api.remove = function remove(type, id, options) {
+    return decoratePromise( backend.remove(type, id, options || {}) );
   };
 
 
   // removeAll
   // -----------
 
-  // Destroyes all objects. Can be filtered by a type
+  // Destroye all objects. Can be filtered by a type
   //
-  Store.prototype.removeAll = function(type, options) {
-    var self = this;
-
-    options = options || {};
-
-    return this.findAll(type).pipe(function(objects) {
-      var object, _i, _len, _results;
-
-      _results = [];
-
-      for (_i = 0, _len = objects.length; _i < _len; _i++) {
-        object = objects[_i];
-        _results.push(self.remove(object.type, object.id, options));
-      }
-
-      return _results;
-    });
-
+  api.removeAll = function removeAll(type, options) {
+    return decoratePromise( backend.removeAll(type, options || {}) );
   };
 
-  //
-  // ## Private
-  //
 
-  Store.prototype._now = function() {
-    return new Date();
+  // decorate promises
+  // -------------------
+
+  // extend promises returned by store.api
+  api.decoratePromises = function decoratePromises(methods) {
+    return $.extend(promiseApi, methods);
   };
+
+
+
+  // trigger
+  // ---------
+
+  // proxies to hoodie.trigger
+  api.trigger = function trigger() {
+    var eventName;
+    eventName = arguments[0];
+    var parameters = 2 <= arguments.length ? Array.prototype.slice.call(arguments, 1) : [];
+    return hoodie.trigger.apply(hoodie, [storeName + ':' + eventName].concat(Array.prototype.slice.call(parameters)));
+  };
+
+
+  // on
+  // ---------
+
+  // proxies to hoodie.on
+  api.on = function on(eventName, data) {
+    eventName = eventName.replace(/(^| )([^ ]+)/g, '$1'+storeName+':$2');
+    return hoodie.on(eventName, data);
+  };
+
+
+  // unbind
+  // ---------
+
+  // proxies to hoodie.unbind
+  api.unbind = function unbind(eventName, callback) {
+    eventName = eventName.replace(/(^| )([^ ]+)/g, '$1'+storeName+':$2');
+    return hoodie.unbind(eventName, callback);
+  };
+
+
+  // required backend methods
+  // -------------------------
+  if (! options.backend ) {
+    throw new Error('options.backend must be passed');
+  }
+
+  var required = 'save find findAll remove removeAll'.split(' ');
+
+  required.forEach( function(methodName) {
+
+    if (!options.backend[methodName]) {
+      throw new Error('options.backend.'+methodName+' must be passed.');
+    }
+
+    backend[methodName] = options.backend[methodName];
+  });
+
+
+  // Private
+  // ---------
 
   // / not allowed for id
-  Store.prototype._isValidId = function(key) {
-    return new RegExp(/^[^\/]+$/).test(key);
-  };
+  function isValidId(key) {
+    return new RegExp(/^[^\/]+$/).test(key || '');
+  }
 
   // / not allowed for type
-  Store.prototype._isValidType = function(key) {
-    return new RegExp(/^[^\/]+$/).test(key);
-  };
+  function isValidType(key) {
+    return new RegExp(/^[^\/]+$/).test(key || '');
+  }
 
-  return Store;
+  //
+  function decoratePromise(promise) {
+    return $.extend(promise, promiseApi);
+  }
 
-})();
+  function resolveWith() {
+    var promise = hoodie.resolveWith.apply(null, arguments);
+    return decoratePromise(promise);
+  }
+  function rejectWith() {
+    var promise = hoodie.rejectWith.apply(null, arguments);
+    return decoratePromise(promise);
+  }
 
+  return api;
+}
+
+//
+// one place to rule them all!
+//
+
+Hoodie.Errors = {
+
+  // INVALID_KEY
+  // --------------
+
+  // thrown when invalid keys are used to store an object
+  //
+  INVALID_KEY: function (idOrType) {
+    var key = idOrType.id ? 'id' : 'type';
+
+    return new Error('invalid ' + key + '\'' + idOrType[key] + '\': numbers and lowercase letters allowed only');
+  },
+
+  // INVALID_ARGUMENTS
+  // -------------------
+
+  //
+  INVALID_ARGUMENTS: function (msg) {
+    return new Error(msg);
+  },
+
+  // NOT_FOUND
+  // -----------
+
+  //
+  NOT_FOUND: function (type, id) {
+    return new Error('' + type + ' with ' + id + ' could not be found');
+  }
+
+};
+
+/* exported hoodieRemoteStore */
+/* global hoodieStoreApi */
 
 // Remote
 // ========
@@ -2120,171 +1152,32 @@ Hoodie.Store = (function() {
 // * on(event, callback)
 //
 
-// 
-var ConnectionError;
+//
+function hoodieRemoteStore (hoodie, options) {
 
-Hoodie.Remote = (function(_super) {
-
-  'use strict';
-
-  // Constructor 
-  // -------------
-
-  // sets name (think: namespace) and some other options
-  function Remote(hoodie, options) {
-    this.hoodie = hoodie;
-    options = options || {};
-
-    this._handlePullResults = this._handlePullResults.bind(this);
-    this._handlePullError = this._handlePullError.bind(this);
-    this._handlePullSuccess = this._handlePullSuccess.bind(this);
-    this._restartPullRequest = this._restartPullRequest.bind(this);
-    this._mapDocsFromFindAll = this._mapDocsFromFindAll.bind(this);
-    this._parseAllFromRemote = this._parseAllFromRemote.bind(this);
-    this._parseFromRemote = this._parseFromRemote.bind(this);
-    this.sync = this.sync.bind(this);
-    this.push = this.push.bind(this);
-    this.pull = this.pull.bind(this);
-    this.disconnect = this.disconnect.bind(this);
-    this.connect = this.connect.bind(this);
-
-    if (options.name !== undefined) {
-      this.name = options.name;
-    }
-
-    if (options.prefix !== undefined) {
-      this.prefix = options.prefix;
-    }
-
-    if (options.connected !== undefined) {
-      this.connected = options.connected;
-    }
-
-    if (options.baseUrl !== null) {
-      this.baseUrl = options.baseUrl;
-    }
-
-    // in order to differentiate whether an object from remote should trigger a 'new'
-    // or an 'update' event, we store a hash of known objects
-    this._knownObjects = {};
-
-    if (this.isConnected()) {
-      this.connect();
-    }
-  }
-
-  Object.deepExtend(Remote, _super);
+  var remoteStore = {};
 
 
-  // properties
-  // ------------
-
-  // name
-
-  // the name of the Remote is the name of the
-  // CouchDB database and is also used to prefix
-  // triggered events
-  //
-  Remote.prototype.name = null;
-
-
-  // sync
-
-  // if set to true, updates will be continuously pulled
-  // and pushed. Alternatively, `sync` can be set to
-  // `pull: true` or `push: true`.
-  //
-  Remote.prototype.connected = false;
-
-
-  // prefix
-
-  //prefix for docs in a CouchDB database, e.g. all docs
-  // in public user stores are prefixed by '$public/'
-  //
-  Remote.prototype.prefix = '';
-
-
-  // request
-  // ---------
-
-  // wrapper for hoodie.request, with some store specific defaults
-  // and a prefixed path
-  //
-  Remote.prototype.request = function(type, path, options) {
-    options = options || {};
-
-    if (this.name) {
-      path = "/" + (encodeURIComponent(this.name)) + path;
-    }
-
-    if (this.baseUrl) {
-      path = "" + this.baseUrl + path;
-    }
-
-    options.contentType = options.contentType || 'application/json';
-
-    if (type === 'POST' || type === 'PUT') {
-      options.dataType = options.dataType || 'json';
-      options.processData = options.processData || false;
-      options.data = JSON.stringify(options.data);
-    }
-    return this.hoodie.request(type, path, options);
-  };
-
-
-  // get
-  // -----
-
-  // send a GET request to the named view
-  //
-  Remote.prototype.get = function() {
-    return console.log.apply(
-      console, [".get() not yet implemented"]
-      .concat(Array.prototype.slice.call(arguments))
-    );
-  };
-
-
-  // post
-  // ------
-
-  // sends a POST request to the specified updated_function
-  //
-  Remote.prototype.post = function() {
-    return console.log.apply(
-      console, [".post() not yet implemented"]
-      .concat(Array.prototype.slice.call(arguments))
-    );
-  };
-
-
-  // Store Operations overides
-  // ---------------------------
+  // Remote Store Persistance methods
+  // ----------------------------------
 
   // find
   // ------
 
   // find one object
   //
-  Remote.prototype.find = function(type, id) {
-    var defer, path;
+  remoteStore.find = function find(type, id) {
+    var path;
 
-    defer = Remote.__super__.find.apply(this, arguments);
+    path = type + '/' + id;
 
-    if (this.hoodie.isPromise(defer)) {
-      return defer;
+    if (remote.prefix) {
+      path = remote.prefix + path;
     }
 
-    path = "" + type + "/" + id;
+    path = '/' + encodeURIComponent(path);
 
-    if (this.prefix) {
-      path = this.prefix + path;
-    }
-
-    path = "/" + encodeURIComponent(path);
-
-    return this.request("GET", path).pipe(this._parseFromRemote);
+    return remote.request('GET', path).then(parseFromRemote);
   };
 
 
@@ -2293,26 +1186,20 @@ Hoodie.Remote = (function(_super) {
 
   // find all objects, can be filetered by a type
   //
-  Remote.prototype.findAll = function(type) {
-    var defer, endkey, path, startkey;
+  remoteStore.findAll = function findAll(type) {
+    var endkey, path, startkey;
 
-    defer = Remote.__super__.findAll.apply(this, arguments);
-
-    if (this.hoodie.isPromise(defer)) {
-      return defer;
-    }
-
-    path = "/_all_docs?include_docs=true";
+    path = '/_all_docs?include_docs=true';
 
     switch (true) {
-    case (type !== undefined) && this.prefix !== '':
-      startkey = "" + this.prefix + type + "/";
+    case (type !== undefined) && remote.prefix !== '':
+      startkey = remote.prefix + type + '/';
       break;
     case type !== undefined:
-      startkey = "" + type + "/";
+      startkey = type + '/';
       break;
-    case this.prefix !== '':
-      startkey = this.prefix;
+    case remote.prefix !== '':
+      startkey = remote.prefix;
       break;
     default:
       startkey = '';
@@ -2327,9 +1214,10 @@ Hoodie.Remote = (function(_super) {
         charCode = chars.charCodeAt(0);
         return String.fromCharCode(charCode + 1);
       });
-      path = "" + path + "&startkey=\"" + (encodeURIComponent(startkey)) + "\"&endkey=\"" + (encodeURIComponent(endkey)) + "\"";
+      path = '' + path + '&startkey="' + (encodeURIComponent(startkey)) + '"&endkey="' + (encodeURIComponent(endkey)) + '"';
     }
-    return this.request("GET", path).pipe(this._mapDocsFromFindAll).pipe(this._parseAllFromRemote);
+
+    return remote.request('GET', path).then(mapDocsFromFindAll).then(parseAllFromRemote);
   };
 
 
@@ -2339,22 +1227,16 @@ Hoodie.Remote = (function(_super) {
   // save a new object. If it existed before, all properties
   // will be overwritten
   //
-  Remote.prototype.save = function(type, id, object) {
-    var defer, path;
-    defer = Remote.__super__.save.apply(this, arguments);
-    if (this.hoodie.isPromise(defer)) {
-      return defer;
+  remoteStore.save = function save(object) {
+    var path;
+
+    if (!object.id) {
+      object.id = hoodie.uuid();
     }
-    if (!id) {
-      id = this.hoodie.uuid();
-    }
-    object = $.extend({
-      type: type,
-      id: id
-    }, object);
-    object = this._parseForRemote(object);
-    path = "/" + encodeURIComponent(object._id);
-    return this.request("PUT", path, {
+
+    object = parseForRemote(object);
+    path = '/' + encodeURIComponent(object._id);
+    return remote.request('PUT', path, {
       data: object
     });
   };
@@ -2365,8 +1247,8 @@ Hoodie.Remote = (function(_super) {
 
   // remove one object
   //
-  Remote.prototype.remove = function(type, id) {
-    return this.update(type, id, {
+  remoteStore.remove = function remove(type, id) {
+    return remote.update(type, id, {
       _deleted: true
     });
   };
@@ -2377,10 +1259,102 @@ Hoodie.Remote = (function(_super) {
 
   // remove all objects, can be filtered by type
   //
-  Remote.prototype.removeAll = function(type) {
-    return this.updateAll(type, {
+  remoteStore.removeAll = function removeAll(type) {
+    return remote.updateAll(type, {
       _deleted: true
     });
+  };
+
+
+  var remote = hoodieStoreApi(hoodie, {
+
+    name: options.name,
+
+    backend: {
+      save: remoteStore.save,
+      find: remoteStore.find,
+      findAll: remoteStore.findAll,
+      remove: remoteStore.remove,
+      removeAll: remoteStore.removeAll
+    }
+  });
+
+
+
+
+
+  // properties
+  // ------------
+
+  // name
+
+  // the name of the Remote is the name of the
+  // CouchDB database and is also used to prefix
+  // triggered events
+  //
+  remote.name = null;
+
+
+  // sync
+
+  // if set to true, updates will be continuously pulled
+  // and pushed. Alternatively, `sync` can be set to
+  // `pull: true` or `push: true`.
+  //
+  remote.connected = false;
+
+
+  // prefix
+
+  //prefix for docs in a CouchDB database, e.g. all docs
+  // in public user stores are prefixed by '$public/'
+  //
+  remote.prefix = '';
+
+
+
+  // defaults
+  // ----------------
+
+  //
+  if (options.name !== undefined) {
+    remote.name = options.name;
+  }
+
+  if (options.prefix !== undefined) {
+    remote.prefix = options.prefix;
+  }
+
+  if (options.baseUrl !== null) {
+    remote.baseUrl = options.baseUrl;
+  }
+
+
+  // request
+  // ---------
+
+  // wrapper for hoodie.request, with some store specific defaults
+  // and a prefixed path
+  //
+  remote.request = function request(type, path, options) {
+    options = options || {};
+
+    if (remote.name) {
+      path = '/' + (encodeURIComponent(remote.name)) + path;
+    }
+
+    if (remote.baseUrl) {
+      path = '' + remote.baseUrl + path;
+    }
+
+    options.contentType = options.contentType || 'application/json';
+
+    if (type === 'POST' || type === 'PUT') {
+      options.dataType = options.dataType || 'json';
+      options.processData = options.processData || false;
+      options.data = JSON.stringify(options.data);
+    }
+    return hoodie.request(type, path, options);
   };
 
 
@@ -2389,11 +1363,11 @@ Hoodie.Remote = (function(_super) {
 
   // determine between a known and a new object
   //
-  Remote.prototype.isKnownObject = function(object) {
-    var key = "" + object.type + "/" + object.id;
+  remote.isKnownObject = function isKnownObject(object) {
+    var key = '' + object.type + '/' + object.id;
 
-    if (this._knownObjects[key] !== undefined) {
-      return this._knownObjects[key];
+    if (knownObjects[key] !== undefined) {
+      return knownObjects[key];
     }
   };
 
@@ -2403,10 +1377,10 @@ Hoodie.Remote = (function(_super) {
 
   // determine between a known and a new object
   //
-  Remote.prototype.markAsKnownObject = function(object) {
-    var key = "" + object.type + "/" + object.id;
-    this._knownObjects[key] = 1;
-    return this._knownObjects[key];
+  remote.markAsKnownObject = function markAsKnownObject(object) {
+    var key = '' + object.type + '/' + object.id;
+    knownObjects[key] = 1;
+    return knownObjects[key];
   };
 
 
@@ -2416,12 +1390,13 @@ Hoodie.Remote = (function(_super) {
   // Connect
   // ---------
 
-  // start syncing. `this.bootstrap()` will automatically start
-  // pulling when `this.connected` remains true.
-  // 
-  Remote.prototype.connect = function() {
-    this.connected = true;
-    return this.bootstrap();
+  // start syncing. `remote.bootstrap()` will automatically start
+  // pulling when `remote.connected` remains true.
+  //
+  remote.connect = function connect() {
+    remote.connected = true;
+    remote.trigger('connect'); // TODO: spec that
+    return remote.bootstrap();
   };
 
 
@@ -2430,15 +1405,16 @@ Hoodie.Remote = (function(_super) {
 
   // stop syncing changes from remote store
   //
-  Remote.prototype.disconnect = function() {
-    this.connected = false;
+  remote.disconnect = function disconnect() {
+    remote.connected = false;
+    remote.trigger('disconnect'); // TODO: spec that
 
-    if (this._pullRequest !== undefined) {
-      this._pullRequest.abort();
+    if (pullRequest) {
+      pullRequest.abort();
     }
 
-    if (this._pushRequest !== undefined) {
-      this._pushRequest.abort();
+    if (pushRequest) {
+      pushRequest.abort();
     }
 
   };
@@ -2448,8 +1424,8 @@ Hoodie.Remote = (function(_super) {
   // -------------
 
   //
-  Remote.prototype.isConnected = function() {
-    return this.connected;
+  remote.isConnected = function isConnected() {
+    return remote.connected;
   };
 
 
@@ -2458,32 +1434,26 @@ Hoodie.Remote = (function(_super) {
 
   // returns the sequence number from wich to start to find changes in pull
   //
-  Remote.prototype.getSinceNr = function() {
-    return this._since || 0;
-  };
+  var since = options.since || 0; // TODO: spec that!
+  remote.getSinceNr = function getSinceNr() {
+    if (typeof since === 'function') {
+      return since();
+    }
 
-
-  // setSinceNr
-  // ------------
-
-  // sets the sequence number from wich to start to find changes in pull
-  //
-  Remote.prototype.setSinceNr = function(seq) {
-    this._since = seq;
-    return this._since;
+    return since;
   };
 
 
   // bootstrap
   // -----------
 
-  // inital pull of data of the remote start. By default, we pull all
+  // inital pull of data of the remote store. By default, we pull all
   // changes since the beginning, but this behavior might be adjusted,
   // e.g for a filtered bootstrap.
   //
-  Remote.prototype.bootstrap = function() {
-    this.trigger('bootstrap:start');
-    return this.pull().done( this._handleBootstrapSuccess.bind(this) );
+  remote.bootstrap = function bootstrap() {
+    remote.trigger('bootstrap:start');
+    return remote.pull().done( handleBootstrapSuccess );
   };
 
 
@@ -2494,15 +1464,16 @@ Hoodie.Remote = (function(_super) {
   // We currently make long poll requests, that we manually abort
   // and restart each 25 seconds.
   //
-  Remote.prototype.pull = function() {
-    this._pullRequest = this.request('GET', this._pullUrl());
+  var pullRequest, pullRequestTimeout;
+  remote.pull = function pull() {
+    pullRequest = remote.request('GET', pullUrl());
 
-    if (this.isConnected()) {
-      window.clearTimeout(this._pullRequestTimeout);
-      this._pullRequestTimeout = window.setTimeout(this._restartPullRequest, 25000);
+    if (remote.isConnected()) {
+      window.clearTimeout(pullRequestTimeout);
+      pullRequestTimeout = window.setTimeout(restartPullRequest, 25000);
     }
 
-    return this._pullRequest.then(this._handlePullSuccess, this._handlePullError);
+    return pullRequest.done(handlePullSuccess).fail(handlePullError);
   };
 
 
@@ -2511,29 +1482,34 @@ Hoodie.Remote = (function(_super) {
 
   // Push objects to remote store using the `_bulk_docs` API.
   //
-  Remote.prototype.push = function(objects) {
+  var pushRequest;
+  remote.push = function push(objects) {
     var object, objectsForRemote, _i, _len;
 
-    if (!(objects !== undefined ? objects.length : void 0)) {
-      return this.hoodie.resolveWith([]);
+    if (!$.isArray(objects)) {
+      objects = defaultObjectsToPush();
+    }
+
+    if (objects.length === 0) {
+      return hoodie.resolveWith([]);
     }
 
     objectsForRemote = [];
 
     for (_i = 0, _len = objects.length; _i < _len; _i++) {
       object = objects[_i];
-      this._addRevisionTo(object);
-      object = this._parseForRemote(object);
+      addRevisionTo(object);
+      object = parseForRemote(object);
       objectsForRemote.push(object);
     }
-    this._pushRequest = this.request('POST', "/_bulk_docs", {
+    pushRequest = remote.request('POST', '/_bulk_docs', {
       data: {
         docs: objectsForRemote,
         new_edits: false
       }
     });
 
-    return this._pushRequest;
+    return pushRequest;
   };
 
   // sync changes
@@ -2541,43 +1517,62 @@ Hoodie.Remote = (function(_super) {
 
   // push objects, then pull updates.
   //
-  Remote.prototype.sync = function(objects) {
-    return this.push(objects).pipe(this.pull);
+  remote.sync = function sync(objects) {
+    return remote.push(objects).then(remote.pull);
   };
 
-
-  // Events
-  // --------
-
-  // namespaced alias for `hoodie.on`
   //
-  Remote.prototype.on = function(event, cb) {
-    event = event.replace(/(^| )([^ ]+)/g, "$1" + this.name + ":$2");
-    return this.hoodie.on(event, cb);
-  };
-
-  Remote.prototype.one = function(event, cb) {
-    event = event.replace(/(^| )([^ ]+)/g, "$1" + this.name + ":$2");
-    return this.hoodie.one(event, cb);
-  };
-
-
-  // namespaced alias for `hoodie.trigger`
-  //
-  Remote.prototype.trigger = function() {
-    var event, parameters, _ref;
-    event = arguments[0],
-    parameters = 2 <= arguments.length ? Array.prototype.slice.call(arguments, 1) : [];
-    return (_ref = this.hoodie).trigger.apply(_ref, ["" + this.name + ":" + event].concat(Array.prototype.slice.call(parameters)));
-  };
-
-
   // Private
-  // --------------
+  // ---------
+  //
+
+  // in order to differentiate whether an object from remote should trigger a 'new'
+  // or an 'update' event, we store a hash of known objects
+  var knownObjects = {};
+
 
   // valid CouchDB doc attributes starting with an underscore
   //
-  Remote.prototype._validSpecialAttributes = ['_id', '_rev', '_deleted', '_revisions', '_attachments'];
+  var validSpecialAttributes = ['_id', '_rev', '_deleted', '_revisions', '_attachments'];
+
+
+  // default objects to push
+  // --------------------------
+
+  // when pushed without passing any objects, the objects returned from
+  // this method will be passed. It can be overwritten by passing an
+  // array of objects or a function as `options.objects`
+  //
+  var defaultObjectsToPush = function defaultObjectsToPush() {
+    return [];
+  };
+  if (options.defaultObjectsToPush) {
+    if ($.isArray(options.defaultObjectsToPush)) {
+      defaultObjectsToPush = function defaultObjectsToPush() {
+        return options.defaultObjectsToPush;
+      };
+    } else {
+      defaultObjectsToPush = options.defaultObjectsToPush;
+    }
+  }
+
+
+  // setSinceNr
+  // ------------
+
+  // sets the sequence number from wich to start to find changes in pull.
+  // If remote store was initialized with since : function(nr) { ... },
+  // call the function with the seq passed. Otherwise simply set the seq
+  // number and return it.
+  //
+  function setSinceNr(seq) {
+    if (typeof since === 'function') {
+      return since(seq);
+    }
+
+    since = seq;
+    return since;
+  }
 
 
   // Parse for remote
@@ -2589,13 +1584,13 @@ Hoodie.Remote = (function(_super) {
   //
   // Also `id` gets replaced with `_id` which consists of type & id
   //
-  Remote.prototype._parseForRemote = function(object) {
+  function parseForRemote(object) {
     var attr, properties;
     properties = $.extend({}, object);
 
     for (attr in properties) {
       if (properties.hasOwnProperty(attr)) {
-        if (this._validSpecialAttributes.indexOf(attr) !== -1) {
+        if (validSpecialAttributes.indexOf(attr) !== -1) {
           continue;
         }
         if (!/^_/.test(attr)) {
@@ -2606,13 +1601,13 @@ Hoodie.Remote = (function(_super) {
     }
 
     // prepare CouchDB id
-    properties._id = "" + properties.type + "/" + properties.id;
-    if (this.prefix) {
-      properties._id = "" + this.prefix + properties._id;
+    properties._id = '' + properties.type + '/' + properties.id;
+    if (remote.prefix) {
+      properties._id = '' + remote.prefix + properties._id;
     }
     delete properties.id;
     return properties;
-  };
+  }
 
 
   // ### _parseFromRemote
@@ -2622,20 +1617,20 @@ Hoodie.Remote = (function(_super) {
   // renames `_id` attribute to `id` and removes the type from the id,
   // e.g. `type/123` -> `123`
   //
-  Remote.prototype._parseFromRemote = function(object) {
+  function parseFromRemote(object) {
     var id, ignore, _ref;
 
     // handle id and type
     id = object._id || object.id;
     delete object._id;
 
-    if (this.prefix) {
-      id = id.replace(new RegExp('^' + this.prefix), '');
+    if (remote.prefix) {
+      id = id.replace(new RegExp('^' + remote.prefix), '');
     }
 
     // turn doc/123 into type = doc & id = 123
     // NOTE: we don't use a simple id.split(/\//) here,
-    // as in some cases IDs might contain "/", too
+    // as in some cases IDs might contain '/', too
     //
     _ref = id.match(/([^\/]+)\/(.*)/),
     ignore = _ref[0],
@@ -2643,24 +1638,24 @@ Hoodie.Remote = (function(_super) {
     object.id = _ref[2];
 
     return object;
-  };
+  }
 
-  Remote.prototype._parseAllFromRemote = function(objects) {
+  function parseAllFromRemote(objects) {
     var object, _i, _len, _results;
     _results = [];
     for (_i = 0, _len = objects.length; _i < _len; _i++) {
       object = objects[_i];
-      _results.push(this._parseFromRemote(object));
+      _results.push(parseFromRemote(object));
     }
     return _results;
-  };
+  }
 
 
   // ### _addRevisionTo
 
   // extends passed object with a _rev property
   //
-  Remote.prototype._addRevisionTo = function(attributes) {
+  function addRevisionTo(attributes) {
     var currentRevId, currentRevNr, newRevisionId, _ref;
     try {
       _ref = attributes._rev.split(/-/),
@@ -2668,15 +1663,15 @@ Hoodie.Remote = (function(_super) {
       currentRevId = _ref[1];
     } catch (_error) {}
     currentRevNr = parseInt(currentRevNr, 10) || 0;
-    newRevisionId = this._generateNewRevisionId();
+    newRevisionId = generateNewRevisionId();
 
     // local changes are not meant to be replicated outside of the
     // users database, therefore the `-local` suffix.
     if (attributes._$local) {
-      newRevisionId += "-local";
+      newRevisionId += '-local';
     }
 
-    attributes._rev = "" + (currentRevNr + 1) + "-" + newRevisionId;
+    attributes._rev = '' + (currentRevNr + 1) + '-' + newRevisionId;
     attributes._revisions = {
       start: 1,
       ids: [newRevisionId]
@@ -2686,51 +1681,51 @@ Hoodie.Remote = (function(_super) {
       attributes._revisions.start += currentRevNr;
       return attributes._revisions.ids.push(currentRevId);
     }
-  };
+  }
 
 
   // ### generate new revision id
 
   //
-  Remote.prototype._generateNewRevisionId = function() {
-    return this.hoodie.uuid(9);
-  };
+  function generateNewRevisionId() {
+    return hoodie.uuid(9);
+  }
 
 
   // ### map docs from findAll
 
   //
-  Remote.prototype._mapDocsFromFindAll = function(response) {
+  function mapDocsFromFindAll(response) {
     return response.rows.map(function(row) {
       return row.doc;
     });
-  };
+  }
 
 
   // ### pull url
 
   // Depending on whether remote is connected, return a longpoll URL or not
   //
-  Remote.prototype._pullUrl = function() {
+  function pullUrl() {
     var since;
-    since = this.getSinceNr();
-    if (this.isConnected()) {
-      return "/_changes?include_docs=true&since=" + since + "&heartbeat=10000&feed=longpoll";
+    since = remote.getSinceNr();
+    if (remote.isConnected()) {
+      return '/_changes?include_docs=true&since=' + since + '&heartbeat=10000&feed=longpoll';
     } else {
-      return "/_changes?include_docs=true&since=" + since;
+      return '/_changes?include_docs=true&since=' + since;
     }
-  };
+  }
 
 
   // ### restart pull request
 
-  // request gets restarted automaticcally 
+  // request gets restarted automaticcally
   // when aborted (see @_handlePullError)
-  Remote.prototype._restartPullRequest = function() {
-    if (this._pullRequest) {
-      this._pullRequest.abort();
+  function restartPullRequest() {
+    if (pullRequest) {
+      pullRequest.abort();
     }
-  };
+  }
 
 
   // ### pull success handler
@@ -2738,13 +1733,13 @@ Hoodie.Remote = (function(_super) {
   // request gets restarted automaticcally
   // when aborted (see @_handlePullError)
   //
-  Remote.prototype._handlePullSuccess = function(response) {
-    this.setSinceNr(response.last_seq);
-    this._handlePullResults(response.results);
-    if (this.isConnected()) {
-      return this.pull();
+  function handlePullSuccess(response) {
+    setSinceNr(response.last_seq);
+    handlePullResults(response.results);
+    if (remote.isConnected()) {
+      return remote.pull();
     }
-  };
+  }
 
 
   // ### pull error handler
@@ -2752,8 +1747,8 @@ Hoodie.Remote = (function(_super) {
   // when there is a change, trigger event,
   // then check for another change
   //
-  Remote.prototype._handlePullError = function(xhr, error) {
-    if (!this.isConnected()) {
+  function handlePullError(xhr, error) {
+    if (!remote.isConnected()) {
       return;
     }
 
@@ -2761,8 +1756,8 @@ Hoodie.Remote = (function(_super) {
       // Session is invalid. User is still login, but needs to reauthenticate
       // before sync can be continued
     case 401:
-      this.trigger('error:unauthenticated', error);
-      return this.disconnect();
+      remote.trigger('error:unauthenticated', error);
+      return remote.disconnect();
 
      // the 404 comes, when the requested DB has been removed
      // or does not exist yet.
@@ -2775,20 +1770,20 @@ Hoodie.Remote = (function(_super) {
      //
 
     case 404:
-      return window.setTimeout(this.pull, 3000);
+      return window.setTimeout(remote.pull, 3000);
 
     case 500:
       //
       // Please server, don't give us these. At least not persistently
       //
-      this.trigger('error:server', error);
-      window.setTimeout(this.pull, 3000);
-      return this.hoodie.checkConnection();
+      remote.trigger('error:server', error);
+      window.setTimeout(remote.pull, 3000);
+      return hoodie.checkConnection();
     default:
       // usually a 0, which stands for timeout or server not reachable.
       if (xhr.statusText === 'abort') {
         // manual abort after 25sec. restart pulling changes directly when connected
-        return this.pull();
+        return remote.pull();
       } else {
 
         // oops. This might be caused by an unreachable server.
@@ -2796,352 +1791,108 @@ Hoodie.Remote = (function(_super) {
         // heroku kills the request after ~30s.
         // we'll try again after a 3s timeout
         //
-        window.setTimeout(this.pull, 3000);
-        return this.hoodie.checkConnection();
+        window.setTimeout(remote.pull, 3000);
+        return hoodie.checkConnection();
       }
     }
-  };
+  }
 
 
   // ### handle changes from remote
   //
-  Remote.prototype._handleBootstrapSuccess = function() {
-    this.trigger('bootstrap:end');
-  };
+  function handleBootstrapSuccess() {
+    remote.trigger('bootstrap:end');
+  }
 
   // ### handle changes from remote
   //
-  Remote.prototype._handlePullResults = function(changes) {
-    var doc, event, object, _i, _len, _results = [];
+  function handlePullResults(changes) {
+    var doc, event, object, _i, _len;
 
     for (_i = 0, _len = changes.length; _i < _len; _i++) {
       doc = changes[_i].doc;
 
-      if (this.prefix && doc._id.indexOf(this.prefix) !== 0) {
+      if (remote.prefix && doc._id.indexOf(remote.prefix) !== 0) {
         continue;
       }
 
-      object = this._parseFromRemote(doc);
+      object = parseFromRemote(doc);
 
       if (object._deleted) {
-        if (!this.isKnownObject(object)) {
+        if (!remote.isKnownObject(object)) {
           continue;
         }
         event = 'remove';
-        this.isKnownObject(object);
+        remote.isKnownObject(object);
       } else {
-        if (this.isKnownObject(object)) {
+        if (remote.isKnownObject(object)) {
           event = 'update';
         } else {
           event = 'add';
-          this.markAsKnownObject(object);
+          remote.markAsKnownObject(object);
         }
       }
 
-      this.trigger("" + event, object);
-      this.trigger("" + event + ":" + object.type, object);
-      this.trigger("" + event + ":" + object.type + ":" + object.id, object);
-      this.trigger("change", event, object);
-      this.trigger("change:" + object.type, event, object);
-      _results.push(this.trigger("change:" + object.type + ":" + object.id, event, object));
-
+      remote.trigger(event, object);
+      remote.trigger(event + ':' + object.type, object);
+      remote.trigger(event + ':' + object.type + ':' + object.id, object);
+      remote.trigger('change', event, object);
+      remote.trigger('change:' + object.type, event, object);
+      remote.trigger('change:' + object.type + ':' + object.id, event, object);
     }
-    return _results;
-  };
-
-  return Remote;
-
-})(Hoodie.Store);
-
-ConnectionError = (function(_super) {
-
-  'use strict';
-
-  function ConnectionError(message, data) {
-    this.message = message;
-    this.data = data;
-    ConnectionError.__super__.constructor.apply(this, arguments);
   }
 
-  Object.deepExtend(ConnectionError, _super);
 
-  ConnectionError.prototype.name = "ConnectionError";
-
-  return ConnectionError;
-
-})(Error);
-
-
-// AccountRemote
-// ===============
-
-// Connection / Socket to our couch
-//
-// AccountRemote is using CouchDB's `_changes` feed to
-// listen to changes and `_bulk_docs` to push local changes
-//
-// When hoodie.remote is continuously syncing (default),
-// it will continuously  synchronize with local store,
-// otherwise sync, pull or push can be called manually
-//
-Hoodie.AccountRemote = (function(_super) {
-
-  'use strict';
-
-  // Constructor
-  // -------------
-
+  // bootstrap known objects
   //
-  function AccountRemote(hoodie, options) {
-    this.hoodie = hoodie;
-    options = options || {};
-
-    // set name to user's DB name
-    this.name = this.hoodie.account.db();
-
-    // we're always connected to our own db
-    this.connected = true;
-
-    // do not prefix files for my own remote
-    options.prefix = '';
-
-    this.push = this.push.bind(this);
-    this.hoodie.on('account:signin', this._handleSignIn.bind(this));
-    this.hoodie.on('account:reauthenticated', this._connect.bind(this));
-    this.hoodie.on('account:signout', this.disconnect.bind(this));
-    this.hoodie.on('reconnected', this.connect.bind(this));
-    AccountRemote.__super__.constructor.call(this, this.hoodie, options);
-
-    // preset known objects with localstore.
-    this.loadListOfKnownObjectsFromLocalStore();
-  }
-
-  Object.deepExtend(AccountRemote, _super);
-
-  // connect by default
-  AccountRemote.prototype.connected = true;
-
-
-  // Connect
-  // ---------
-
-  // do not start to connect immediately, but authenticate beforehand
-  //
-  AccountRemote.prototype.connect = function() {
-    return this.hoodie.account.authenticate().pipe(this._connect.bind(this));
-  };
-
-
-  // disconnect
-  // ------------
-
-  //
-  AccountRemote.prototype.disconnect = function() {
-    this.hoodie.unbind('store:idle', this.push);
-    return AccountRemote.__super__.disconnect.apply(this, arguments);
-  };
-
-
-  // loadListOfKnownObjectsFromLocalStore
-  // -------------------------------------------
-
-  // to determine wether to trigger an `add` or `update`
-  // event, the known objects from the user get loaded
-  // from local store initially.
-  // 
-  AccountRemote.prototype.loadListOfKnownObjectsFromLocalStore = function() {
-    var id, key, type, _i, _len, _ref, _ref1;
-    _ref = this.hoodie.store.index();
-
-    for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-      key = _ref[_i];
-      _ref1 = key.split(/\//),
-      type = _ref1[0],
-      id = _ref1[1];
-
-      this.markAsKnownObject({
-        type: type,
-        id: id
+  if (options.knownObjects) {
+    for (var i = 0; i < options.knownObjects.length; i++) {
+      remote.markAsKnownObject({
+        type: options.knownObjects[i].type,
+        id: options.knownObjects[i].id
       });
     }
-  };
+  }
 
 
-  // get and set since nr
-  // ----------------------
+  // expose public API
+  return remote;
+}
 
-  // we store the last since number from the current user's store
-  // in his config
-  //
-  AccountRemote.prototype.getSinceNr = function() {
-    return this.hoodie.config.get('_remote.since') || 0;
-  };
-
-  AccountRemote.prototype.setSinceNr = function(since) {
-    return this.hoodie.config.set('_remote.since', since);
-  };
-
-
-  // push
-  // ------
-
-  // if no objects passed to be pushed, we default to
-  // changed objects in user's local store
-  //
-  AccountRemote.prototype.push = function(objects) {
-    if (!this.isConnected()) {
-      var error = new window.ConnectionError("Not connected: could not push local changes to remote");
-      return this.hoodie.rejectWith(error);
-    }
-
-    if (!$.isArray(objects)) {
-      objects = this.hoodie.store.changedObjects();
-    }
-
-    var promise = AccountRemote.__super__.push.apply(this, [objects]);
-    promise.fail(this.hoodie.checkConnection);
-
-    return promise;
-  };
-
-
-  // Events
-  // --------
-  //
-  // namespaced alias for `hoodie.on`
-  //
-  AccountRemote.prototype.on = function(event, cb) {
-    event = event.replace(/(^| )([^ ]+)/g, "$1remote:$2");
-    return this.hoodie.on(event, cb);
-  };
-
-  AccountRemote.prototype.one = function(event, cb) {
-    event = event.replace(/(^| )([^ ]+)/g, "$1remote:$2");
-    return this.hoodie.one(event, cb);
-  };
-
-
-  //
-  // namespaced alias for `hoodie.trigger`
-  //
-  AccountRemote.prototype.trigger = function() {
-    var event, parameters, _ref;
-
-    event = arguments[0],
-    parameters = 2 <= arguments.length ? Array.prototype.slice.call(arguments, 1) : [];
-
-    return (_ref = this.hoodie).trigger.apply(_ref, ["remote:" + event].concat(Array.prototype.slice.call(parameters)));
-  };
-
-
-
-  // Private
-  // ---------
-
-  //
-  AccountRemote.prototype._connect = function() {
-    this.connected = true;
-    this.hoodie.on('store:idle', this.push);
-    return this.sync();
-  };
-
-
-  //
-  AccountRemote.prototype._handleSignIn = function() {
-    this.name = this.hoodie.account.db();
-    return this._connect();
-  };
-
-  return AccountRemote;
-
-})(Hoodie.Remote);
+/* exported hoodieStore */
+/* global hoodieStoreApi */
 
 // LocalStore
 // ============
 //
 // window.localStrage wrapper and more
 //
-Hoodie.LocalStore = (function (_super) {
 
-  'use strict';
+function hoodieStore (hoodie) {
 
-  function LocalStore(hoodie) {
-    this.hoodie = hoodie;
+  var localStore = {};
 
-    this.clear = this.clear.bind(this);
-    this.markAllAsChanged = this.markAllAsChanged.bind(this);
-    this._triggerDirtyAndIdleEvents = this._triggerDirtyAndIdleEvents.bind(this);
-    this._handleRemoteChange = this._handleRemoteChange.bind(this);
-    this._startBootstrappingMode = this._startBootstrappingMode.bind(this);
-    this._endBootstrappingMode = this._endBootstrappingMode.bind(this);
+  //
+  // state
+  // -------
+  //
 
-    // cache of localStorage for quicker access
-    this._cached = {};
+  // cache of localStorage for quicker access
+  var cachedObject = {};
 
-    // map of dirty objects by their ids
-    this._dirty = {};
+  // map of dirty objects by their ids
+  var dirty = {};
 
-    // queue of method calls done during bootstrapping
-    this._queue = [];
-
-    // extend this property with extra functions that will be available
-    // on all promises returned by hoodie.store API. It has a reference
-    // to current hoodie instance by default
-    this._promiseApi = {
-      hoodie: this.hoodie
-    };
-
-
-    // if browser does not support local storage persistence,
-    // e.g. Safari in private mode, overite the respective methods.
-    if (!this.isPersistent()) {
-      this.db = {
-        getItem: function() { return null; },
-        setItem: function() { return null; },
-        removeItem: function() { return null; },
-        key: function() { return null; },
-        length: function() { return 0; },
-        clear: function() { return null; }
-      };
-    }
-
-    this._subscribeToOutsideEvents();
-    this._bootstrapDirtyObjects();
-  }
-
-  Object.deepExtend(LocalStore, _super);
-
+  // queue of method calls done during bootstrapping
+  var queue = [];
 
   // 2 seconds timout before triggering the `store:idle` event
-  // 
-  LocalStore.prototype.idleTimeout = 2000;
-
-
-  // localStorage proxy
   //
-  LocalStore.prototype.db = {
-    getItem: function(key) {
-      return window.localStorage.getItem(key);
-    },
-    setItem: function(key, value) {
-      return window.localStorage.setItem(key, value);
-    },
-    removeItem: function(key) {
-      return window.localStorage.removeItem(key);
-    },
-    key: function(nr) {
-      return window.localStorage.key(nr);
-    },
-    length: function() {
-      return window.localStorage.length;
-    },
-    clear: function() {
-      return window.localStorage.clear();
-    }
-  };
+  var idleTimeout = 2000;
 
 
-  // Save
+
+
   // ------
   //
   // saves the passed object into the store and replaces
@@ -3160,40 +1911,35 @@ Hoodie.LocalStore = (function (_super) {
   //     store.save('car', undefined, {color: 'red'})
   //     store.save('car', 'abc4567', {color: 'red'})
   //
-  LocalStore.prototype.save = function (type, id, properties, options) {
-    var currentObject, defer, error, event, isNew, key, object;
+  localStore.save = function save(object, options) {
+    var currentObject, defer, error, event, isNew, key;
 
     options = options || {};
-    defer = LocalStore.__super__.save.apply(this, arguments);
-
-    if (this.hoodie.isPromise(defer)) {
-      return this._decoratePromise(defer);
-    }
 
     // if store is currently bootstrapping data from remote,
     // we're queueing until it's finished
-    if (this.isBootstrapping()) {
-      return this._enqueue('save', arguments);
+    if (store.isBootstrapping()) {
+      return enqueue('save', arguments);
     }
 
-    // make sure we don't mess with the passed object directly
-    object = $.extend(true, {}, properties);
-
     // generate an id if necessary
-    if (id) {
-      currentObject = this.cache(type, id);
+    if (object.id) {
+      currentObject = cache(object.type, object.id);
       isNew = typeof currentObject !== 'object';
     } else {
       isNew = true;
-      id = this.hoodie.uuid();
+      object.id = hoodie.uuid();
     }
 
-    // add createdBy hash to new objects
-    // note: we check for `hoodie.account` as in some cases, the code
-    //       might get executed before the account module is initiated.
-    // todo: move ownerHash into a method on the core hoodie module
-    if (isNew && this.hoodie.account) {
-      object.createdBy = object.createdBy || this.hoodie.account.ownerHash;
+    if (isNew) {
+      // add createdBy hash
+      object.createdBy = object.createdBy || hoodie.account.ownerHash;
+    }
+    else {
+      // leave createdBy hash
+      if (currentObject.createdBy) {
+        object.createdBy = currentObject.createdBy;
+      }
     }
 
     // handle local properties and hidden properties with $ prefix
@@ -3221,14 +1967,14 @@ Hoodie.LocalStore = (function (_super) {
 
     // add timestamps
     if (options.remote) {
-      object._syncedAt = this._now();
+      object._syncedAt = now();
     } else if (!options.silent) {
-      object.updatedAt = this._now();
+      object.updatedAt = now();
       object.createdAt = object.createdAt || object.updatedAt;
     }
 
     // handle local changes
-    // 
+    //
     // A local change is meant to be replicated to the
     // users database, but not beyond. For example when
     // I subscribed to a share but then decide to unsubscribe,
@@ -3240,18 +1986,21 @@ Hoodie.LocalStore = (function (_super) {
       delete object._$local;
     }
 
+    defer = hoodie.defer();
+
     try {
-      object = this.cache(type, id, object, options);
+      object = cache(object.type, object.id, object, options);
       defer.resolve(object, isNew).promise();
       event = isNew ? 'add' : 'update';
-      this._triggerEvents(event, object, options);
+      triggerEvents(event, object, options);
     } catch (_error) {
       error = _error;
-      defer.reject(error).promise();
+      defer.reject(error.toString());
     }
 
-    return this._decoratePromise(defer.promise());
+    return defer.promise();
   };
+
 
   // find
   // ------
@@ -3261,21 +2010,19 @@ Hoodie.LocalStore = (function (_super) {
   // example usage:
   //
   //     store.find('car', 'abc4567')
-  LocalStore.prototype.find = function(type, id) {
+  localStore.find = function(type, id) {
     var defer, error, object;
-    defer = LocalStore.__super__.find.apply(this, arguments);
-    if (this.hoodie.isPromise(defer)) {
-      return this._decoratePromise(defer);
-    }
+
+    defer = hoodie.defer();
 
     // if store is currently bootstrapping data from remote,
     // we're queueing until it's finished
-    if (this.isBootstrapping()) {
-      return this._enqueue('find', arguments);
+    if (store.isBootstrapping()) {
+      return enqueue('find', arguments);
     }
 
     try {
-      object = this.cache(type, id);
+      object = cache(type, id);
       if (!object) {
         defer.reject(Hoodie.Errors.NOT_FOUND(type, id)).promise();
       }
@@ -3284,8 +2031,10 @@ Hoodie.LocalStore = (function (_super) {
       error = _error;
       defer.reject(error);
     }
-    return this._decoratePromise(defer.promise());
+
+    return defer.promise();
   };
+
 
   // findAll
   // ---------
@@ -3299,8 +2048,10 @@ Hoodie.LocalStore = (function (_super) {
   //     store.findAll('car')
   //     store.findAll(function(obj) { return obj.brand == 'Tesla' })
   //
-  LocalStore.prototype.findAll = function(filter) {
+  localStore.findAll = function findAll(filter) {
     var currentType, defer, error, id, key, keys, obj, results, type;
+
+
 
     if (filter == null) {
       filter = function() {
@@ -3308,19 +2059,13 @@ Hoodie.LocalStore = (function (_super) {
       };
     }
 
-    defer = LocalStore.__super__.findAll.apply(this, arguments);
-
-    if (this.hoodie.isPromise(defer)) {
-      return this._decoratePromise(defer);
-    }
-
     // if store is currently bootstrapping data from remote,
     // we're queueing until it's finished
-    if (this.isBootstrapping()) {
-      return this._enqueue('findAll', arguments);
+    if (store.isBootstrapping()) {
+      return enqueue('findAll', arguments);
     }
 
-    keys = this.index();
+    keys = store.index();
 
     // normalize filter
     if (typeof filter === 'string') {
@@ -3330,22 +2075,24 @@ Hoodie.LocalStore = (function (_super) {
       };
     }
 
+    defer = hoodie.defer();
+
     try {
 
-      // 
+      //
       results = (function() {
         var _i, _len, _ref, _results;
         _results = [];
         for (_i = 0, _len = keys.length; _i < _len; _i++) {
           key = keys[_i];
-          if (!(this._isSemanticId(key))) {
+          if (!(isSemanticId(key))) {
             continue;
           }
           _ref = key.split('/'),
           currentType = _ref[0],
           id = _ref[1];
 
-          obj = this.cache(currentType, id);
+          obj = cache(currentType, id);
           if (obj && filter(obj)) {
             _results.push(obj);
           } else {
@@ -3370,84 +2117,121 @@ Hoodie.LocalStore = (function (_super) {
       error = _error;
       defer.reject(error).promise();
     }
-    return this._decoratePromise(defer.promise());
+    return defer.promise();
   };
 
 
   // Remove
   // --------
 
-  // Removes one object specified by `type` and `id`. 
-  // 
-  // when object has been synced before, mark it as deleted. 
+  // Removes one object specified by `type` and `id`.
+  //
+  // when object has been synced before, mark it as deleted.
   // Otherwise remove it from Store.
-  LocalStore.prototype.remove = function(type, id, options) {
-
-    var defer, key, object, objectWasMarkedAsDeleted, promise;
+  localStore.remove = function remove(type, id, options) {
+    var key, object, objectWasMarkedAsDeleted;
 
     options = options || {};
-    defer = LocalStore.__super__.remove.apply(this, arguments);
-
-    if (this.hoodie.isPromise(defer)) {
-      return this._decoratePromise(defer);
-    }
 
     // if store is currently bootstrapping data from remote,
     // we're queueing until it's finished
-    if (this.isBootstrapping()) {
-      return this._enqueue('remove', arguments);
+    if (store.isBootstrapping()) {
+      return enqueue('remove', arguments);
     }
 
-    key = "" + type + "/" + id;
+    key = type + '/' + id;
+
+    object = cache(type, id);
 
     // if change comes from remote, just clean up locally
     if (options.remote) {
-      this.db.removeItem(key);
-      objectWasMarkedAsDeleted = this._cached[key] && this._isMarkedAsDeleted(this._cached[key]);
-      this._cached[key] = false;
-      this.clearChanged(type, id);
-      if (objectWasMarkedAsDeleted) {
-        return;
+      db.removeItem(key);
+      objectWasMarkedAsDeleted = cachedObject[key] && isMarkedAsDeleted(cachedObject[key]);
+      cachedObject[key] = false;
+      clearChanged(type, id);
+      if (objectWasMarkedAsDeleted && object) {
+        return hoodie.resolveWith(object);
       }
     }
 
-    object = this.cache(type, id);
-
     if (!object) {
-      return this._decoratePromise(defer.reject(Hoodie.Errors.NOT_FOUND(type, id)).promise());
+      return hoodie.rejectWith(Hoodie.Errors.NOT_FOUND(type, id));
     }
 
     if (object._syncedAt) {
       object._deleted = true;
-      this.cache(type, id, object);
+      cache(type, id, object);
     } else {
-      key = "" + type + "/" + id;
-      this.db.removeItem(key);
-      this._cached[key] = false;
-      this.clearChanged(type, id);
+      key = type + '/' + id;
+      db.removeItem(key);
+      cachedObject[key] = false;
+      clearChanged(type, id);
     }
 
-    this._triggerEvents("remove", object, options);
-
-    promise = defer.resolve(object).promise();
-
-    return this._decoratePromise(promise);
+    triggerEvents('remove', object, options);
+    return hoodie.resolveWith(object);
   };
 
 
-  // update / updateAll / removeAll
-  // --------------------------------
+  // Remove all
+  // ----------
 
-  // just decorating returned promises
-  LocalStore.prototype.update = function() {
-    return this._decoratePromise(LocalStore.__super__.update.apply(this, arguments));
+  // Removes one object specified by `type` and `id`.
+  //
+  // when object has been synced before, mark it as deleted.
+  // Otherwise remove it from Store.
+  localStore.removeAll = function removeAll(type, options) {
+    return store.findAll(type).then(function(objects) {
+      var object, _i, _len, results;
+
+      results = [];
+
+      for (_i = 0, _len = objects.length; _i < _len; _i++) {
+        object = objects[_i];
+        results.push(store.remove(object.type, object.id, options));
+      }
+      return results;
+    });
   };
-  LocalStore.prototype.updateAll = function() {
-    return this._decoratePromise(LocalStore.__super__.updateAll.apply(this, arguments));
-  };
-  LocalStore.prototype.removeAll = function() {
-    return this._decoratePromise(LocalStore.__super__.removeAll.apply(this, arguments));
-  };
+
+
+  // validate
+  // ----------
+
+  //
+  function validate (object) {
+
+    if (!isValidType(object.type)) {
+      return Hoodie.Errors.INVALID_KEY({
+        type: object.type
+      });
+    }
+
+    if (arguments.length > 0 && !isValidId(object.id)) {
+      return Hoodie.Errors.INVALID_KEY({
+        id: object.id
+      });
+    }
+  }
+
+  var store = hoodieStoreApi(hoodie, {
+
+    // validate
+    validate: validate,
+
+    backend: {
+      save: localStore.save,
+      find: localStore.find,
+      findAll: localStore.findAll,
+      remove: localStore.remove,
+      removeAll: localStore.removeAll,
+    }
+  });
+
+
+
+  // extended public API
+  // ---------------------
 
 
   // index
@@ -3455,12 +2239,12 @@ Hoodie.LocalStore = (function (_super) {
 
   // object key index
   // TODO: make this cachy
-  LocalStore.prototype.index = function() {
+  store.index = function index() {
     var i, key, keys, _i, _ref;
     keys = [];
-    for (i = _i = 0, _ref = this.db.length(); 0 <= _ref ? _i < _ref : _i > _ref; i = 0 <= _ref ? ++_i : --_i) {
-      key = this.db.key(i);
-      if (this._isSemanticId(key)) {
+    for (i = _i = 0, _ref = db.length(); 0 <= _ref ? _i < _ref : _i > _ref; i = 0 <= _ref ? ++_i : --_i) {
+      key = db.key(i);
+      if (isSemanticId(key)) {
         keys.push(key);
       }
     }
@@ -3468,172 +2252,14 @@ Hoodie.LocalStore = (function (_super) {
   };
 
 
-  // Cache
-  // -------
-
-  // loads an object specified by `type` and `id` only once from localStorage 
-  // and caches it for faster future access. Updates cache when `value` is passed.
-  //
-  // Also checks if object needs to be synched (dirty) or not 
-  //
-  // Pass `options.remote = true` when object comes from remote
-  // Pass 'options.silent = true' to avoid events from being triggered.
-  LocalStore.prototype.cache = function(type, id, object, options) {
-    var key;
-
-    if (object === undefined) {
-      object = false;
-    }
-
-    options = options || {};
-    key = "" + type + "/" + id;
-
-    if (object) {
-      $.extend(object, {
-        type: type,
-        id: id
-      });
-
-      this._setObject(type, id, object);
-
-      if (options.remote) {
-        this.clearChanged(type, id);
-        this._cached[key] = $.extend(true, {}, object);
-        return this._cached[key];
-      }
-
-    } else {
-
-      // if the cached key returns false, it means
-      // that we have removed that key. We just 
-      // set it to false for performance reasons, so
-      // that we don't need to look it up again in localStorage
-      if (this._cached[key] === false) {
-        return false;
-      }
-
-      // if key is cached, return it. But make sure
-      // to make a deep copy beforehand (=> true)
-      if (this._cached[key]) {
-        return $.extend(true, {}, this._cached[key]);
-      }
-
-      // if object is not yet cached, load it from localStore
-      object = this._getObject(type, id);
-
-      // stop here if object did not exist in localStore
-      // and cache it so we don't need to look it up again
-      if (object === false) {
-        this.clearChanged(type, id);
-        this._cached[key] = false;
-        return false;
-      }
-
-    }
-
-
-    if (this._isMarkedAsDeleted(object)) {
-      this.markAsChanged(type, id, object, options);
-      this._cached[key] = false;
-      return false;
-    }
-
-    // here is where we cache the object for
-    // future quick access
-    this._cached[key] = $.extend(true, {}, object);
-
-    if (this._hasLocalChanges(object)) {
-      this.markAsChanged(type, id, this._cached[key], options);
-    } else {
-      this.clearChanged(type, id);
-    }
-
-    return $.extend(true, {}, object);
-  };
-
-
-  // Clear changed 
-  // ---------------
-
-  // removes an object from the list of objects that are flagged to by synched (dirty)
-  // and triggers a `store:dirty` event
-  LocalStore.prototype.clearChanged = function(type, id) {
-    var key;
-    if (type && id) {
-      key = "" + type + "/" + id;
-      delete this._dirty[key];
-    } else {
-      this._dirty = {};
-    }
-    this._saveDirtyIds();
-    return window.clearTimeout(this._dirtyTimeout);
-  };
-
-
-  // Marked as deleted?
-  // --------------------
-
-  // when an object gets deleted that has been synched before (`_rev` attribute),
-  // it cannot be removed from store but gets a `_deleted: true` attribute
-  LocalStore.prototype.isMarkedAsDeleted = function(type, id) {
-    return this._isMarkedAsDeleted(this.cache(type, id));
-  };
-
-
-  // Mark as changed
-  // -----------------
-
-  // Marks object as changed (dirty). Triggers a `store:dirty` event immediately and a 
-  // `store:idle` event once there is no change within 2 seconds
-  LocalStore.prototype.markAsChanged = function(type, id, object, options) {
-    var key;
-
-    options = options || {};
-    key = "" + type + "/" + id;
-
-    this._dirty[key] = object;
-    this._saveDirtyIds();
-
-    if (options.silent) {
-      return;
-    }
-
-    return this._triggerDirtyAndIdleEvents();
-  };
-
-
-  // Mark all as changed
-  // ------------------------
-
-  // Marks all local object as changed (dirty) to make them sync
-  // with remote
-  LocalStore.prototype.markAllAsChanged = function() {
-    var self = this;
-
-    return this.findAll().pipe(function(objects) {
-      var key, object, _i, _len;
-
-      for (_i = 0, _len = objects.length; _i < _len; _i++) {
-        object = objects[_i];
-        key = "" + object.type + "/" + object.id;
-        self._dirty[key] = object;
-      }
-
-      self._saveDirtyIds();
-      self._triggerDirtyAndIdleEvents();
-    });
-  };
-
-
-
   // changed objects
   // -----------------
 
   // returns an Array of all dirty documents
-  LocalStore.prototype.changedObjects = function() {
+  store.changedObjects = function changedObjects() {
     var id, key, object, type, _ref, _ref1, _results;
 
-    _ref = this._dirty;
+    _ref = dirty;
     _results = [];
 
     for (key in _ref) {
@@ -3659,11 +2285,15 @@ Hoodie.LocalStore = (function (_super) {
   //
   // Otherwise it returns `true` or `false` for the passed object. An object is dirty
   // if it has no `_syncedAt` attribute or if `updatedAt` is more recent than `_syncedAt`
-  LocalStore.prototype.hasLocalChanges = function(type, id) {
+  store.hasLocalChanges = function(type, id) {
     if (!type) {
-      return !$.isEmptyObject(this._dirty);
+      return !$.isEmptyObject(dirty);
     }
-    return this._hasLocalChanges(this.cache(type, id));
+    var key = [type,id].join('/');
+    if (dirty[key]) {
+      return true;
+    }
+    return hasLocalChanges(cache(type, id));
   };
 
 
@@ -3673,30 +2303,41 @@ Hoodie.LocalStore = (function (_super) {
   // clears localStorage and cache
   // TODO: do not clear entire localStorage, clear only the items that have been stored
   //       using `hoodie.store` before.
-  LocalStore.prototype.clear = function() {
+  store.clear = function clear() {
     var defer, key, keys, results;
-    defer = this.hoodie.defer();
+    defer = hoodie.defer();
     try {
-      keys = this.index();
+      keys = store.index();
       results = (function() {
         var _i, _len, _results;
         _results = [];
         for (_i = 0, _len = keys.length; _i < _len; _i++) {
           key = keys[_i];
-          if (this._isSemanticId(key)) {
-            _results.push(this.db.removeItem(key));
+          if (isSemanticId(key)) {
+            _results.push(db.removeItem(key));
           }
         }
         return _results;
       }).call(this);
-      this._cached = {};
-      this.clearChanged();
+      cachedObject = {};
+      clearChanged();
       defer.resolve();
-      this.trigger("clear");
+      store.trigger('clear');
     } catch (_error) {
       defer.reject(_error);
     }
     return defer.promise();
+  };
+
+
+  // isBootstrapping
+  // -----------------
+
+  // returns true if store is currently bootstrapping data from remote,
+  // otherwise false.
+  var bootstrapping = false;
+  store.isBootstrapping = function isBootstrapping() {
+    return bootstrapping;
   };
 
 
@@ -3709,7 +2350,7 @@ Hoodie.LocalStore = (function (_super) {
   // inspired by this cappuccino commit
   // https://github.com/cappuccino/cappuccino/commit/063b05d9643c35b303568a28809e4eb3224f71ec
   //
-  LocalStore.prototype.isPersistent = function() {
+  store.isPersistent = function isPersistent() {
     try {
 
       // we've to put this in here. I've seen Firefox throwing `Security error: 1000`
@@ -3720,10 +2361,10 @@ Hoodie.LocalStore = (function (_super) {
 
       // Just because localStorage exists does not mean it works. In particular it might be disabled
       // as it is when Safari's private browsing mode is active.
-      localStorage.setItem('Storage-Test', "1");
+      localStorage.setItem('Storage-Test', '1');
 
       // that should not happen ...
-      if (localStorage.getItem('Storage-Test') !== "1") {
+      if (localStorage.getItem('Storage-Test') !== '1') {
         return false;
       }
 
@@ -3740,67 +2381,125 @@ Hoodie.LocalStore = (function (_super) {
   };
 
 
-  // trigger
-  // ---------
-
-  // proxies to hoodie.trigger
-  LocalStore.prototype.trigger = function() {
-    var eventName, parameters, _ref;
-    eventName = arguments[0],
-    parameters = 2 <= arguments.length ? Array.prototype.slice.call(arguments, 1) : [];
-    return (_ref = this.hoodie).trigger.apply(_ref, ["store:" + eventName].concat(Array.prototype.slice.call(parameters)));
-  };
 
 
-  // on
-  // ---------
-
-  // proxies to hoodie.on
-  LocalStore.prototype.on = function(eventName, data) {
-    eventName = eventName.replace(/(^| )([^ ]+)/g, "$1store:$2");
-    return this.hoodie.on(eventName, data);
-  };
-
-
-  // unbind
-  // ---------
-
-  // proxies to hoodie.unbind
-  LocalStore.prototype.unbind = function(eventName, callback) {
-    eventName = 'store:' + eventName;
-    return this.hoodie.unbind(eventName, callback);
-  };
-
-
-  // decorate promises
-  // -------------------
-
-  // extend promises returned by store.api
-  LocalStore.prototype.decoratePromises = function(methods) {
-    return $.extend(this._promiseApi, methods);
-  };
-
-
-  // isBootstrapping
+  //
+  // Private methods
   // -----------------
+  //
 
-  // returns true if store is currently bootstrapping data from remote,
-  // otherwise false.
-  LocalStore.prototype._bootstrapping = false;
-  LocalStore.prototype.isBootstrapping = function() {
-    return this._bootstrapping;
+
+  // localStorage proxy
+  //
+  var db = {
+    getItem: function(key) {
+      return window.localStorage.getItem(key);
+    },
+    setItem: function(key, value) {
+      return window.localStorage.setItem(key, value);
+    },
+    removeItem: function(key) {
+      return window.localStorage.removeItem(key);
+    },
+    key: function(nr) {
+      return window.localStorage.key(nr);
+    },
+    length: function() {
+      return window.localStorage.length;
+    }
   };
 
 
-  // Private
-  // ---------
+  // Cache
+  // -------
 
-  // bootstrapping dirty objects, to make sure 
-  // that removed objects get pushed after 
+  // loads an object specified by `type` and `id` only once from localStorage
+  // and caches it for faster future access. Updates cache when `value` is passed.
+  //
+  // Also checks if object needs to be synched (dirty) or not
+  //
+  // Pass `options.remote = true` when object comes from remote
+  // Pass 'options.silent = true' to avoid events from being triggered.
+  function cache(type, id, object, options) {
+    var key;
+
+    if (object === undefined) {
+      object = false;
+    }
+
+    options = options || {};
+    key = '' + type + '/' + id;
+
+    if (object) {
+      $.extend(object, {
+        type: type,
+        id: id
+      });
+
+      setObject(type, id, object);
+
+      if (options.remote) {
+        clearChanged(type, id);
+        cachedObject[key] = $.extend(true, {}, object);
+        return cachedObject[key];
+      }
+
+    } else {
+
+      // if the cached key returns false, it means
+      // that we have removed that key. We just
+      // set it to false for performance reasons, so
+      // that we don't need to look it up again in localStorage
+      if (cachedObject[key] === false) {
+        return false;
+      }
+
+      // if key is cached, return it. But make sure
+      // to make a deep copy beforehand (=> true)
+      if (cachedObject[key]) {
+        return $.extend(true, {}, cachedObject[key]);
+      }
+
+      // if object is not yet cached, load it from localStore
+      object = getObject(type, id);
+
+      // stop here if object did not exist in localStore
+      // and cache it so we don't need to look it up again
+      if (object === false) {
+        clearChanged(type, id);
+        cachedObject[key] = false;
+        return false;
+      }
+
+    }
+
+    if (isMarkedAsDeleted(object)) {
+      markAsChanged(type, id, object, options);
+      cachedObject[key] = false;
+      return false;
+    }
+
+    // here is where we cache the object for
+    // future quick access
+    cachedObject[key] = $.extend(true, {}, object);
+
+    if (hasLocalChanges(object)) {
+      markAsChanged(type, id, cachedObject[key], options);
+    } else {
+      clearChanged(type, id);
+    }
+
+    return $.extend(true, {}, object);
+  }
+
+
+  // bootstrapping dirty objects, to make sure
+  // that removed objects get pushed after
   // page reload.
-  LocalStore.prototype._bootstrapDirtyObjects = function() {
+  //
+  function bootstrapDirtyObjects() {
     var id, keys, obj, type, _i, _len, _ref;
-    keys = this.db.getItem('_dirty');
+    keys = db.getItem('_dirty');
 
     if (!keys) {
       return;
@@ -3811,56 +2510,124 @@ Hoodie.LocalStore = (function (_super) {
       _ref = keys[_i].split('/'),
       type = _ref[0],
       id = _ref[1];
-      obj = this.cache(type, id);
+      obj = cache(type, id);
     }
-  };
+  }
 
-  // subscribe to events coming from account & our remote store.  
-  LocalStore.prototype._subscribeToOutsideEvents = function() {
+
+  //
+  // subscribe to events coming from account & our remote store.
+  //
+  function subscribeToOutsideEvents() {
 
     // account events
-    this.hoodie.on('account:cleanup', this.clear);
-    this.hoodie.on('account:signup', this.markAllAsChanged);
-    this.hoodie.on('remote:bootstrap:start', this._startBootstrappingMode);
-    this.hoodie.on('remote:bootstrap:end', this._endBootstrappingMode);
+    hoodie.on('account:cleanup', store.clear);
+    hoodie.on('account:signup', markAllAsChanged);
+    hoodie.on('remote:bootstrap:start', startBootstrappingMode);
+    hoodie.on('remote:bootstrap:end', endBootstrappingMode);
 
     // remote events
-    this.hoodie.on('remote:change', this._handleRemoteChange);
+    hoodie.on('remote:change', handleRemoteChange);
+  }
+
+  // allow to run this once from outside
+  store.subscribeToOutsideEvents = function() {
+    subscribeToOutsideEvents();
+    delete store.subscribeToOutsideEvents;
   };
+
+
+  //
+  // Marks object as changed (dirty). Triggers a `store:dirty` event immediately and a
+  // `store:idle` event once there is no change within 2 seconds
+  //
+  function markAsChanged(type, id, object, options) {
+    var key;
+
+    options = options || {};
+    key = '' + type + '/' + id;
+
+    dirty[key] = object;
+    saveDirtyIds();
+
+    if (options.silent) {
+      return;
+    }
+
+    return triggerDirtyAndIdleEvents();
+  }
+
+  // Clear changed
+  // ---------------
+
+  // removes an object from the list of objects that are flagged to by synched (dirty)
+  // and triggers a `store:dirty` event
+  function clearChanged(type, id) {
+    var key;
+    if (type && id) {
+      key = '' + type + '/' + id;
+      delete dirty[key];
+    } else {
+      dirty = {};
+    }
+    saveDirtyIds();
+    return window.clearTimeout(dirtyTimeout);
+  }
+
+
+  // Mark all as changed
+  // ------------------------
+
+  // Marks all local object as changed (dirty) to make them sync
+  // with remote
+  function markAllAsChanged() {
+    return store.findAll().pipe(function(objects) {
+      var key, object, _i, _len;
+
+      for (_i = 0, _len = objects.length; _i < _len; _i++) {
+        object = objects[_i];
+        key = '' + object.type + '/' + object.id;
+        dirty[key] = object;
+      }
+
+      saveDirtyIds();
+      triggerDirtyAndIdleEvents();
+    });
+  }
 
 
   // when a change come's from our remote store, we differentiate
   // whether an object has been removed or added / updated and
   // reflect the change in our local store.
-  LocalStore.prototype._handleRemoteChange = function(typeOfChange, object) {
+  function handleRemoteChange(typeOfChange, object) {
     if (typeOfChange === 'remove') {
-      this.remove(object.type, object.id, {
+      store.remove(object.type, object.id, {
         remote: true
       });
     } else {
-      this.save(object.type, object.id, object, {
+      store.save(object.type, object.id, object, {
         remote: true
       });
     }
-  };
+  }
 
 
   // more advanced localStorage wrappers to find/save objects
-  LocalStore.prototype._setObject = function(type, id, object) {
+  function setObject(type, id, object) {
     var key, store;
 
-    key = "" + type + "/" + id;
+    key = '' + type + '/' + id;
     store = $.extend({}, object);
 
     delete store.type;
     delete store.id;
-    return this.db.setItem(key, JSON.stringify(store));
-  };
-  LocalStore.prototype._getObject = function(type, id) {
+    return db.setItem(key, JSON.stringify(store));
+  }
+  function getObject(type, id) {
     var key, obj;
 
-    key = "" + type + "/" + id;
-    var json = this.db.getItem(key);
+    key = '' + type + '/' + id;
+    var json = db.getItem(key);
 
     if (json) {
       obj = JSON.parse(json);
@@ -3870,42 +2637,44 @@ Hoodie.LocalStore = (function (_super) {
     } else {
       return false;
     }
-  };
+  }
 
 
   // store IDs of dirty objects
-  LocalStore.prototype._saveDirtyIds = function() {
-    if ($.isEmptyObject(this._dirty)) {
-      return this.db.removeItem('_dirty');
-    } else {
-      var ids = Object.keys(this._dirty);
-      return this.db.setItem('_dirty', ids.join(','));
-    }
-  };
+  function saveDirtyIds() {
+    try {
+      if ($.isEmptyObject(dirty)) {
+        db.removeItem('_dirty');
+      } else {
+        var ids = Object.keys(dirty);
+        db.setItem('_dirty', ids.join(','));
+      }
+    } catch(e) {}
+  }
 
-  // 
-  LocalStore.prototype._now = function() {
-    return JSON.stringify(new Date()).replace(/"/g, '');
-  };
+  //
+  function now() {
+    return JSON.stringify(new Date()).replace(/['"]/g, '');
+  }
 
   // only lowercase letters, numbers and dashes are allowed for ids
-  LocalStore.prototype._isValidId = function(key) {
-    return new RegExp(/^[a-z0-9\-]+$/).test(key);
-  };
+  function isValidId(id) {
+    return new RegExp(/^[a-z0-9\-]+$/).test(id);
+  }
 
   // just like ids, but must start with a letter or a $ (internal types)
-  LocalStore.prototype._isValidType = function(key) {
-    return new RegExp(/^[a-z$][a-z0-9]+$/).test(key);
-  };
+  function isValidType(type) {
+    return new RegExp(/^[a-z$][a-z0-9]+$/).test(type);
+  }
 
-  // 
-  LocalStore.prototype._isSemanticId = function(key) {
+  //
+  function isSemanticId(key) {
     return new RegExp(/^[a-z$][a-z0-9]+\/[a-z0-9]+$/).test(key);
-  };
+  }
 
-  // `_hasLocalChanges` returns true if there is a local change that
+  // `hasLocalChanges` returns true if there is a local change that
   // has not been sync'd yet.
-  LocalStore.prototype._hasLocalChanges = function(object) {
+  function hasLocalChanges(object) {
     if (!object.updatedAt) {
       return false;
     }
@@ -3913,101 +2682,513 @@ Hoodie.LocalStore = (function (_super) {
       return true;
     }
     return object._syncedAt < object.updatedAt;
-  };
+  }
 
-  // 
-  LocalStore.prototype._isMarkedAsDeleted = function(object) {
+  //
+  function isMarkedAsDeleted(object) {
     return object._deleted === true;
-  };
+  }
 
   // this is where all the store events get triggered,
   // like add:task, change:note:abc4567, remove, etc.
-  LocalStore.prototype._triggerEvents = function(event, object, options) {
-    this.trigger(event, object, options);
-    this.trigger("" + event + ":" + object.type, object, options);
+  function triggerEvents(event, object, options) {
+    store.trigger(event, object, options);
+    store.trigger('' + event + ':' + object.type, object, options);
 
     if (event !== 'new') {
-      this.trigger("" + event + ":" + object.type + ":" + object.id, object, options);
+      store.trigger('' + event + ':' + object.type + ':' + object.id, object, options);
     }
 
-    this.trigger("change", event, object, options);
-    this.trigger("change:" + object.type, event, object, options);
+    store.trigger('change', event, object, options);
+    store.trigger('change:' + object.type, event, object, options);
 
     if (event !== 'new') {
-      this.trigger("change:" + object.type + ":" + object.id, event, object, options);
+      store.trigger('change:' + object.type + ':' + object.id, event, object, options);
     }
-  };
+  }
 
   // when an object gets changed, two special events get triggerd:
-  // 
-  // 1. dirty event  
-  //    the `dirty` event gets triggered immediately, for every 
+  //
+  // 1. dirty event
+  //    the `dirty` event gets triggered immediately, for every
   //    change that happens.
   // 2. idle event
   //    the `idle` event gets triggered after a short timeout of
   //    no changes, e.g. 2 seconds.
-  LocalStore.prototype._triggerDirtyAndIdleEvents = function() {
-    var self = this;
+  var dirtyTimeout;
+  function triggerDirtyAndIdleEvents() {
+    store.trigger('dirty');
+    window.clearTimeout(dirtyTimeout);
 
-    this.trigger('dirty');
+    dirtyTimeout = window.setTimeout(function() {
+      store.trigger('idle', store.changedObjects());
+    }, idleTimeout);
+  }
 
-    window.clearTimeout(this._dirtyTimeout);
+  //
+  function startBootstrappingMode() {
+    bootstrapping = true;
+    store.trigger('bootstrap:start');
+  }
 
-    this._dirtyTimeout = window.setTimeout(function() {
-      self.trigger('idle', self.changedObjects());
-    }, this.idleTimeout);
-  };
-
-  // 
-  LocalStore.prototype._decoratePromise = function(promise) {
-    return $.extend(promise, this._promiseApi);
-  };
-
-  // 
-  LocalStore.prototype._startBootstrappingMode = function() {
-    this._bootstrapping = true;
-    this.trigger('bootstrap:start');
-  };
-
-  // 
-  LocalStore.prototype._endBootstrappingMode = function() {
+  //
+  function endBootstrappingMode() {
     var methodCall, method, args, defer;
 
-    this._bootstrapping = false;
-    while(this._queue.length > 0) {
-      methodCall = this._queue.shift();
+    bootstrapping = false;
+    while(queue.length > 0) {
+      methodCall = queue.shift();
       method = methodCall[0];
       args = methodCall[1];
       defer = methodCall[2];
-      this[method].apply(this, args).then(defer.resolve, defer.reject);
+      localStore[method].apply(localStore, args).then(defer.resolve, defer.reject);
     }
 
-    this.trigger('bootstrap:end');
-  };
+    store.trigger('bootstrap:end');
+  }
 
-  // 
-  LocalStore.prototype._enqueue = function(method, args) {
-    var defer = this.hoodie.defer();
-    this._queue.push([method, args, defer]);
+  //
+  function enqueue(method, args) {
+    var defer = hoodie.defer();
+    queue.push([method, args, defer]);
     return defer.promise();
+  }
+
+  //
+  // patchIfNotPersistant
+  //
+  function patchIfNotPersistant () {
+    if (!store.isPersistent()) {
+      db = {
+        getItem: function() { return null; },
+        setItem: function() { return null; },
+        removeItem: function() { return null; },
+        key: function() { return null; },
+        length: function() { return 0; }
+      };
+    }
+  }
+
+
+  //
+  // initialization
+  // ----------------
+  //
+
+  // if browser does not support local storage persistence,
+  // e.g. Safari in private mode, overite the respective methods.
+
+
+
+  //
+  // expose public API
+  //
+  // inherit from Hoodies Store API
+  hoodie.store = store;
+
+  // allow to run this once from outside
+  store.bootstrapDirtyObjects = function() {
+    bootstrapDirtyObjects();
+    delete store.bootstrapDirtyObjects;
+  };
+
+  // allow to run this once from outside
+  store.patchIfNotPersistant = function() {
+    patchIfNotPersistant();
+    delete store.patchIfNotPersistant;
+  };
+}
+
+/* exported hoodieConfig */
+
+// Hoodie Config API
+// ===================
+
+//
+function hoodieConfig(hoodie) {
+  var type = '$config';
+  var id = 'hoodie';
+  var cache = {};
+
+  // public API
+  var config = {};
+
+
+  // set
+  // ----------
+
+  // adds a configuration
+  //
+  config.set = function set(key, value) {
+    var isSilent, update;
+
+    if (cache[key] === value) {
+      return;
+    }
+
+    cache[key] = value;
+
+    update = {};
+    update[key] = value;
+    isSilent = key.charAt(0) === '_';
+
+    return hoodie.store.update(type, id, update, {
+      silent: isSilent
+    });
+  };
+
+  // get
+  // ----------
+
+  // receives a configuration
+  //
+  config.get = function get(key) {
+    return cache[key];
+  };
+
+  // clear
+  // ----------
+
+  // clears cache and removes object from store
+  //
+  config.clear = function clear() {
+    cache = {};
+    return hoodie.store.remove(type, id);
+  };
+
+  // remove
+  // ----------
+
+  // removes a configuration, is a simple alias for config.set(key, undefined)
+  //
+  config.remove = function remove(key) {
+    return config.set(key, void 0);
+  };
+
+  // load cache
+  // TODO: I really don't like this being here. And I don't like that if the
+  //       store API will be truly async one day, this will fall on our feet.
+  hoodie.store.find(type, id).done(function(obj) {
+    cache = obj;
+  });
+
+  // exspose public API
+  hoodie.config = config;
+}
+
+/* exported hoodieAccount */
+
+// Hoodie.Account
+// ================
+
+//
+function hoodieAccount (hoodie) {
+  // public API
+  var account = {};
+
+  // flag whether user is currently authenticated or not
+  var authenticated;
+
+  // cache for CouchDB _users doc
+  var userDoc = {};
+
+  // map of requestPromises. We maintain this list to avoid sending
+  // the same requests several times.
+  var requests = {};
+
+  // default couchDB user doc prefix
+  var userDocPrefix = 'org.couchdb.user';
+
+
+  // Authenticate
+  // --------------
+
+  // Use this method to assure that the user is authenticated:
+  // `hoodie.account.authenticate().done( doSomething ).fail( handleError )`
+  //
+  account.authenticate = function authenticate() {
+    var sendAndHandleAuthRequest;
+
+    // already tried to authenticate, and failed
+    if (authenticated === false) {
+      return hoodie.reject();
+    }
+
+    // already tried to authenticate, and succeeded
+    if (authenticated === true) {
+      return hoodie.resolveWith(account.username);
+    }
+
+    // if there is a pending signOut request, return its promise,
+    // but pipe it so that it always ends up rejected
+    //
+    if (requests.signOut && requests.signOut.state() === 'pending') {
+      return requests.signOut.then(hoodie.rejectWith);
+    }
+
+    // if there is a pending signIn request, return its promise
+    //
+    if (requests.signIn && requests.signIn.state() === 'pending') {
+      return requests.signIn;
+    }
+
+    // if username is not set, make sure to end the session
+    if (account.username === undefined) {
+      return sendSignOutRequest().then(function() {
+        authenticated = false;
+        return hoodie.reject();
+      });
+    }
+
+    // send request to check for session status. If there is a
+    // pending request already, return its promise.
+    //
+    sendAndHandleAuthRequest = function() {
+      return account.request('GET', '/_session').then(
+        handleAuthenticateRequestSuccess,
+        handleRequestError
+      );
+    };
+
+    return withSingleRequest('authenticate', sendAndHandleAuthRequest);
   };
 
 
-  return LocalStore;
+  // sign up with username & password
+  // ----------------------------------
 
-})(Hoodie.Store);
+  // uses standard CouchDB API to create a new document in _users db.
+  // The backend will automatically create a userDB based on the username
+  // address and approve the account by adding a 'confirmed' role to the
+  // user doc. The account confirmation might take a while, so we keep trying
+  // to sign in with a 300ms timeout.
+  //
+  account.signUp = function signUp(username, password) {
+
+    if (password === undefined) {
+      password = '';
+    }
+
+    if (!username) {
+      return hoodie.rejectWith({
+        error: 'username must be set'
+      });
+    }
+
+    if (account.hasAnonymousAccount()) {
+      return upgradeAnonymousAccount(username, password);
+    }
+
+    if (account.hasAccount()) {
+      return hoodie.rejectWith({
+        error: 'you have to sign out first'
+      });
+    }
+
+    // downcase username
+    username = username.toLowerCase();
+
+    var options = {
+      data: JSON.stringify({
+        _id: userDocKey(username),
+        name: userTypeAndId(username),
+        type: 'user',
+        roles: [],
+        password: password,
+        ownerHash: account.ownerHash,
+        database: account.db(),
+        updatedAt: now(),
+        createdAt: now(),
+        signedUpAt: username !== account.ownerHash ? now() : void 0
+      }),
+      contentType: 'application/json'
+    };
+
+    return account.request('PUT', userDocUrl(username), options).then(
+      handleSignUpSucces(username, password),
+      handleRequestError
+    );
+  };
 
 
-// Hoodie Email Extension
-// ========================
+  // anonymous sign up
+  // -------------------
 
+  // If the user did not sign up himself yet, but data needs to be transfered
+  // to the couch, e.g. to send an email or to share data, the anonymousSignUp
+  // method can be used. It generates a random password and stores it locally
+  // in the browser.
+  //
+  // If the user signes up for real later, we 'upgrade' his account, meaning we
+  // change his username and password internally instead of creating another user.
+  //
+  account.anonymousSignUp = function anonymousSignUp() {
+    var password, username;
+
+    password = hoodie.uuid(10);
+    username = account.ownerHash;
+
+    return account.signUp(username, password).done(function() {
+      setAnonymousPassword(password);
+      return account.trigger('signup:anonymous', username);
+    });
+  };
+
+
+  // hasAccount
+  // ---------------------
+
+  //
+  account.hasAccount = function hasAccount() {
+    return !!account.username;
+  };
+
+
+  // hasAnonymousAccount
+  // ---------------------
+
+  //
+  account.hasAnonymousAccount = function hasAnonymousAccount() {
+    return getAnonymousPassword() !== undefined;
+  };
+
+
+  // set / get / remove anonymous password
+  // ---------------------------------------
+
+  //
+  var anonymousPasswordKey = '_account.anonymousPassword';
+
+  function setAnonymousPassword(password) {
+    return hoodie.config.set(anonymousPasswordKey, password);
+  }
+
+  function getAnonymousPassword() {
+    return hoodie.config.get(anonymousPasswordKey);
+  }
+
+  function removeAnonymousPassword() {
+    return hoodie.config.remove(anonymousPasswordKey);
+  }
+
+
+  // sign in with username & password
+  // ----------------------------------
+
+  // uses standard CouchDB API to create a new user session (POST /_session).
+  // Besides the standard sign in we also check if the account has been confirmed
+  // (roles include 'confirmed' role).
+  //
+  // NOTE: When signing in, all local data gets cleared beforehand (with a signOut).
+  //       Otherwise data that has been created beforehand (authenticated with
+  //       another user account or anonymously) would be merged into the user
+  //       account that signs in. That applies only if username isn't the same as
+  //       current username.
+  //
+  account.signIn = function signIn(username, password) {
+
+    if (username === null) {
+      username = '';
+    }
+
+    if (password === undefined) {
+      password = '';
+    }
+
+    // downcase
+    username = username.toLowerCase();
+
+    if (username !== account.username) {
+      return account.signOut({
+        silent: true
+      }).then(function() {
+        return sendSignInRequest(username, password);
+      });
+    } else {
+      return sendSignInRequest(username, password, {
+        reauthenticated: true
+      });
+    }
+  };
+
+
+  // sign out
+  // ---------
+
+  // uses standard CouchDB API to invalidate a user session (DELETE /_session)
+  //
+  account.signOut = function signOut(options) {
+
+    options = options || {};
+
+    if (!account.hasAccount()) {
+      return cleanup().then(function() {
+        if (!options.silent) {
+          return account.trigger('signout');
+        }
+      });
+    }
+    hoodie.remote.disconnect();
+    return sendSignOutRequest().then(cleanupAndTriggerSignOut);
+  };
+
+
+  // On
+  // ---
+
+  // shortcut for `hoodie.on`
+  //
+  account.on = function on(eventName, cb) {
+    eventName = eventName.replace(/(^| )([^ ]+)/g, '$1account:$2');
+    return hoodie.on(eventName, cb);
+  };
+
+
+  // Trigger
+  // ---
+
+  // shortcut for `hoodie.trigger`
+  //
+  account.trigger = function trigger() {
+    var eventName, parameters;
+
+    eventName = arguments[0],
+    parameters = 2 <= arguments.length ? Array.prototype.slice.call(arguments, 1) : [];
+
+    hoodie.trigger.apply(hoodie, ['account:' + eventName].concat(Array.prototype.slice.call(parameters)));
+  };
+
+
+<<<<<<< HEAD
 // Sending emails. Not unicorns
 // 
 
 Hoodie.extend('email', function(hoodie) {
+=======
+  // Request
+  // ---
+
+  // shortcut for `hoodie.request`
+  //
+  account.request = function request(type, path, options) {
+    options = options || {};
+    return hoodie.request.apply(hoodie, arguments);
+  };
+
+
+  // db
+  // ----
+
+  // return name of db
+  //
+  account.db = function db() {
+    return 'user/' + account.ownerHash;
+  };
+>>>>>>> v0.3-cheesecake
 
   'use strict';
 
+<<<<<<< HEAD
   // this is the function that gets
   // executed on `hoodie.email( options )`
   var sendEmail = function sendEmail(options) {
@@ -4066,868 +3247,872 @@ Hoodie.extend('email', function(hoodie) {
 
   return sendEmail;
 });
+=======
+  // fetch
+  // -------
 
-// Share Module
-// ==============
-
-// When a share gets created, a $share doc gets stored and synched to the user's
-// database. From there the $share worker handles the rest:
-//
-// * creating a share database
-// * creating a share user if a password is used (to be done)
-// * handling the replications
-//
-// The worker updates the $share doc status, which gets synched back to the
-// frontend. When the user deletes the $share doc, the worker removes the
-// database, the user and all replications
-//
-//
-// API
-// -----
-//
-//     // returns a share instance
-//     // with share.id set to 'share_id'
-//     hoodie.share('share_id')
-//
-//     // the rest of the API is a standard store API, with the
-//     // difference that no type has to be set and the returned
-//     // promises are resolved with share instances instead of
-//     // simple objects
-//     hoodie.share.add(attributes)
-//     hoodie.share.find('share_id')
-//     hoodie.share.findAll()
-//     hoodie.share.findOrAdd(id, attributes)
-//     hoodie.share.save(id, attributes)
-//     hoodie.share.update(id, changed_attributes)
-//     hoodie.share.updateAll(changed_attributes)
-//     hoodie.share.remove(id)
-//     hoodie.share.removeAll()
-//
-Hoodie.Share = (function () {
-
-  'use strict';
-
-  // Constructor
-  // -------------
-
-  // the constructor returns a function, so it can be called
-  // like this: hoodie.share('share_id')
+  // fetches _users doc from CouchDB and caches it in _doc
   //
-  // The rest of the API is available as usual.
-  //
-  function Share(hoodie) {
-    var api;
-    this.hoodie = hoodie;
-    this._open = this._open.bind(this);
+  account.fetch = function fetch(username) {
 
-    // set pointer to Hoodie.ShareInstance
-    this.instance = Hoodie.ShareInstance;
-
-    // return custom api which allows direct call
-    api = this._open;
-    $.extend(api, this);
-
-    this.hoodie.store.decoratePromises({
-      shareAt: this._storeShareAt,
-      unshareAt: this._storeUnshareAt,
-      unshare: this._storeUnshare,
-      share: this._storeShare
-    });
-    return api;
-  }
-
-
-  // add
-  // --------
-
-  // creates a new share and returns it
-  //
-  Share.prototype.add = function (options) {
-    var self = this;
-    if (options === null) {
-      options = {};
+    if (username === undefined) {
+      username = account.username;
     }
-    return this.hoodie.store.add('$share', this._filterShareOptions(options)).pipe(function (object) {
-      if (!self.hoodie.account.hasAccount()) {
-        self.hoodie.account.anonymousSignUp();
-      }
-      return new self.instance(self.hoodie, object);
-    });
-  };
 
-
-  // find
-  // ------
-
-  // find an existing share
-  //
-  Share.prototype.find = function (id) {
-    var self = this;
-    return this.hoodie.store.find('$share', id).pipe(function (object) {
-      return new self.instance(self.hoodie, object);
-    });
-  };
-
-
-  // findAll
-  // ---------
-
-  // find all my existing shares
-  //
-  Share.prototype.findAll = function () {
-    var self = this;
-    return this.hoodie.store.findAll('$share').pipe(function (objects) {
-      var obj, _i, _len, _results;
-      _results = [];
-      for (_i = 0, _len = objects.length; _i < _len; _i++) {
-        obj = objects[_i];
-        _results.push(new self.instance(self.hoodie, obj));
-      }
-      return _results;
-    });
-  };
-
-
-  // findOrAdd
-  // --------------
-
-  // find or add a new share
-  //
-  Share.prototype.findOrAdd = function (id, options) {
-    var self = this;
-    return this.hoodie.store.findOrAdd('$share', id, this._filterShareOptions(options)).pipe(function (object) {
-      if (!self.hoodie.account.hasAccount()) {
-        self.hoodie.account.anonymousSignUp();
-      }
-      return new self.instance(self.hoodie, object);
-    });
-  };
-
-
-  // save
-  // ------
-
-  // add or overwrite a share
-  //
-  Share.prototype.save = function (id, options) {
-    var self = this;
-    return this.hoodie.store.save('$share', id, this._filterShareOptions(options)).pipe(function (object) {
-      return new self.instance(self.hoodie, object);
-    });
-  };
-
-
-  // update
-  // --------
-
-  // add or overwrite a share
-  //
-  Share.prototype.update = function (id, changed_options) {
-    var self = this;
-    return this.hoodie.store.update('$share', id, this._filterShareOptions(changed_options)).pipe(function (object) {
-      return new self.instance(self.hoodie, object);
-    });
-  };
-
-
-  // updateAll
-  // -----------
-
-  // update all my existing shares
-  //
-  Share.prototype.updateAll = function (changed_options) {
-    var self = this;
-    return this.hoodie.store.updateAll('$share', this._filterShareOptions(changed_options)).pipe(function (objects) {
-      var obj, _i, _len, _results;
-      _results = [];
-      for (_i = 0, _len = objects.length; _i < _len; _i++) {
-        obj = objects[_i];
-        _results.push(new self.instance(self.hoodie, obj));
-      }
-      return _results;
-    });
-  };
-
-
-  // remove
-  // ---------
-
-  // deletes an existing share
-  //
-  Share.prototype.remove = function (id) {
-    this.hoodie.store.findAll(function (obj) {
-      return obj.$shares[id];
-    }).unshareAt(id);
-    return this.hoodie.store.remove('$share', id);
-  };
-
-
-  // removeAll
-  // ------------
-
-  // delete all existing shares
-  //
-  Share.prototype.removeAll = function () {
-    this.hoodie.store.findAll(function (obj) {
-      return obj.$shares;
-    }).unshare();
-    return this.hoodie.store.removeAll('$share');
-  };
-
-
-  // Private
-  //---------
-
-  Share.prototype._allowedOptions = ["id", "access", "createdBy"];
-
-
-  // ### filter share options
-  //
-  Share.prototype._filterShareOptions = function (options) {
-    var filteredOptions, option, _i, _len, _ref;
-    options = options || {};
-
-    filteredOptions = {};
-    _ref = this._allowedOptions;
-    for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-      option = _ref[_i];
-      if (options.hasOwnProperty(option)) {
-        filteredOptions[option] = options[option];
-      }
+    if (!username) {
+      return hoodie.rejectWith({
+        error: 'unauthenticated',
+        reason: 'not logged in'
+      });
     }
-    return filteredOptions;
-  };
 
-
-  // ### open
-
-  // opens a a remote share store, returns a Hoodie.Remote instance
-  //
-  Share.prototype._open = function (shareId, options) {
-    options = options || {};
-    $.extend(options, {
-      id: shareId
-    });
-    return new this.instance(this.hoodie, options);
-  };
-
-
-  // hoodie.store decorations
-  // --------------------------
-
-  // hoodie.store decorations add custom methods to promises returned
-  // by hoodie.store methods like find, add or update. All methods return
-  // methods again that will be executed in the scope of the promise, but
-  // with access to the current hoodie instance
-  //
-
-  // ### shareAt
-
-  //
-  Share.prototype._storeShareAt = function (shareId) {
-    var self = this;
-    return this.pipe(function (objects) {
-      var object, updateObject, _i, _len, _results;
-      updateObject = function (object) {
-        self.hoodie.store.update(object.type, object.id, {
-          $sharedAt: shareId
-        });
-        return object;
-      };
-      if ($.isArray(objects)) {
-        _results = [];
-        for (_i = 0, _len = objects.length; _i < _len; _i++) {
-          object = objects[_i];
-          _results.push(updateObject(object));
-        }
-        return _results;
-      } else {
-        return updateObject(objects);
-      }
-    });
-  };
-
-
-  // ### unshareAt
-
-  //
-  Share.prototype._storeUnshareAt = function (shareId) {
-    var self = this;
-    return this.pipe(function (objects) {
-      var object, updateObject, _i, _len, _results;
-
-      updateObject = function (object) {
-        if (object.$sharedAt !== shareId) {
-          return object;
-        }
-        self.hoodie.store.update(object.type, object.id, {
-          $unshared: true
-        });
-        return object;
-      };
-
-      if ($.isArray(objects)) {
-        _results = [];
-        for (_i = 0, _len = objects.length; _i < _len; _i++) {
-          object = objects[_i];
-          _results.push(updateObject(object));
-        }
-        return _results;
-      } else {
-        return updateObject(objects);
-      }
-    });
-  };
-
-
-  // ### unshare
-
-  //
-  Share.prototype._storeUnshare = function () {
-    var self = this;
-    return this.pipe(function (objects) {
-      var object, updateObject, _i, _len, _results;
-      updateObject = function (object) {
-        if (!object.$sharedAt) {
-          return object;
-        }
-        self.hoodie.store.update(object.type, object.id, {
-          $unshared: true
-        });
-        return object;
-      };
-      if ($.isArray(objects)) {
-        _results = [];
-        for (_i = 0, _len = objects.length; _i < _len; _i++) {
-          object = objects[_i];
-          _results.push(updateObject(object));
-        }
-        return _results;
-      } else {
-        return updateObject(objects);
-      }
-    });
-  };
-
-
-  // ### share
-
-  //
-  Share.prototype._storeShare = function () {
-    var self = this;
-
-    return this.pipe(function (objects) {
-      return self.hoodie.share.add().pipe(function (newShare) {
-        var object, updateObject, value;
-        updateObject = function (object) {
-          self.hoodie.store.update(object.type, object.id, {
-            $sharedAt: newShare.id
-          });
-          return object;
-        };
-        value = (function () {
-          var _i, _len, _results;
-          if ($.isArray(objects)) {
-            _results = [];
-            for (_i = 0, _len = objects.length; _i < _len; _i++) {
-              object = objects[_i];
-              _results.push(updateObject(object));
-            }
-            return _results;
-          } else {
-            return updateObject(objects);
-          }
-        })();
-        return self.hoodie.defer().resolve(value, newShare).promise();
+    return withSingleRequest('fetch', function() {
+      return account.request('GET', userDocUrl(username)).then(
+        null,
+        handleRequestError
+      ).done(function(response) {
+        userDoc = response;
+        return userDoc;
       });
     });
   };
 
-  return Share;
 
-})();
+  // change password
+  // -----------------
 
-// extend Hoodie
-Hoodie.extend('share', Hoodie.Share);
+  // Note: the hoodie API requires the currentPassword for security reasons,
+  // but couchDb doesn't require it for a password change, so it's ignored
+  // in this implementation of the hoodie API.
+  //
+  account.changePassword = function changePassword(currentPassword, newPassword) {
 
-// User
-// ======
+    if (!account.username) {
+      return hoodie.rejectWith({
+        error: 'unauthenticated',
+        reason: 'not logged in'
+      });
+    }
 
-// the User Module provides a simple API to find objects from other users public
-// stores
-//
-// For example, the syntax to find all objects from user "Joe" looks like this:
-//
-//     hoodie.user("Joe").findAll().done( handleObjects )
-//
+    hoodie.remote.disconnect();
 
-Hoodie.User = (function() {
-
-  'use strict';
-
-  function User(hoodie) {
-    this.hoodie = hoodie;
-    this.api = this.api.bind(this);
-
-    // extend hodie.store promise API
-    this.hoodie.store.decoratePromises({
-      publish: this._storePublish,
-      unpublish: this._storeUnpublish
-    });
-
-    // vanilla API syntax:
-    // hoodie.user('uuid1234').findAll()
-    return this.api;
-  }
-
-  // 
-  User.prototype.api = function(userHash, options) {
-    options = options || {};
-    $.extend(options, {
-      prefix: '$public'
-    });
-    return this.hoodie.open("user/" + userHash + "/public", options);
+    return account.fetch().then(
+      sendChangeUsernameAndPasswordRequest(currentPassword, null, newPassword),
+      handleRequestError
+    );
   };
 
 
-  // hoodie.store decorations
-  // --------------------------
-
-  // hoodie.store decorations add custom methods to promises returned
-  // by hoodie.store methods like find, add or update. All methods return
-  // methods again that will be executed in the scope of the promise, but
-  // with access to the current hoodie instance
-
-  // ### publish
-
-  // publish an object. If an array of properties passed, publish only these
-  // attributes and hide the remaining ones. If no properties passed, publish
-  // the entire object.
-  //
-  User.prototype._storePublish = function(properties) {
-    var _this = this;
-    return this.pipe(function(objects) {
-      var object, _i, _len, _results;
-      if (!$.isArray(objects)) {
-        objects = [objects];
-      }
-      _results = [];
-      for (_i = 0, _len = objects.length; _i < _len; _i++) {
-        object = objects[_i];
-        _results.push(_this.hoodie.store.update(object.type, object.id, {
-          $public: properties || true
-        }));
-      }
-      return _results;
-    });
-  };
-
-
-  //`### unpublish`
-
-  //
-  User.prototype._storeUnpublish = function() {
-    var _this = this;
-    return this.pipe(function(objects) {
-      var object, _i, _len, _results;
-      if (!$.isArray(objects)) {
-        objects = [objects];
-      }
-      _results = [];
-      for (_i = 0, _len = objects.length; _i < _len; _i++) {
-        object = objects[_i];
-        if (object.$public) {
-          _results.push(_this.hoodie.store.update(object.type, object.id, {
-            $public: false
-          }));
-        }
-      }
-      return _results;
-    });
-  };
-
-  return User;
-
-})();
-
-// extend Hoodie
-Hoodie.extend('user', Hoodie.User);
-
-// Global
-// ========
-
-// the Global Module provides a simple API to find objects from the global
-// stores
-// 
-// For example, the syntax to find all objects from the global store
-// looks like this:
-// 
-//     hoodie.global.findAll().done( handleObjects )
-// 
-// okay, might not be the best idea to do that with 1+ million objects, but
-// you get the point
-// 
-Hoodie.Global = (function () {
-
-  'use strict';
-
-  function Global(hoodie) {
-
-    // vanilla API syntax:
-    // hoodie.global.findAll()
-    return hoodie.open("global");
-  }
-
-  return Global;
-
-})();
-
-// extend Hoodie
-Hoodie.extend('global', Hoodie.Global);
-
-// Share Instance
-// ========================
-
-// A share instance provides an API to interact with a
-// share. It's extending the default Remote Store by methods
-// to grant or revoke read / write access.
-//
-// By default, a share is only accessible to me. If I want
-// it to share it, I explicatly need to grant access
-// by calling `share.grantReadAccess()`. I can also grant
-// access to only specific users by passing an array:
-// `share.grantReadAccess(['joe','lisa'])`
-//
-// It's plannend to secure a public share with a password,
-// but this feature is not yet implemented.
-//
-// To subscribe to a share created by somebody else, run
-// this code: `hoodie.share('shareId').subscribe()`.
-//
-Hoodie.ShareInstance = (function(_super) {
-
-  'use strict';
-
-  // constructor
-  // -------------
-
-  // initializes a new share
-  //
-  function ShareInstance(hoodie, options) {
-    this.hoodie = hoodie;
-
-    options = options || {};
-
-    this._handleSecurityResponse = this._handleSecurityResponse.bind(this);
-    this._objectBelongsToMe = this._objectBelongsToMe.bind(this);
-
-    // make sure that we have an id
-    this.id = options.id || this.hoodie.uuid();
-
-    // set name from id
-    this.name = "share/" + this.id;
-
-    // set prefix from name
-    this.prefix = this.name;
-
-    // set options
-    $.extend(this, options);
-
-    ShareInstance.__super__.constructor.apply(this, arguments);
-  }
-
-  Object.deepExtend(ShareInstance, _super);
-
-
-  // default values
+  // reset password
   // ----------------
 
-  // shares are not accessible to others by default.
+  // This is kind of a hack. We need to create an object anonymously
+  // that is not exposed to others. The only CouchDB API othering such
+  // functionality is the _users database.
   //
-  ShareInstance.prototype.access = false;
+  // So we actualy sign up a new couchDB user with some special attributes.
+  // It will be picked up by the password reset worker and removeed
+  // once the password was resetted.
+  //
+  account.resetPassword = function resetPassword(username) {
+    var data, key, options, resetPasswordId;
+
+    resetPasswordId = hoodie.config.get('_account.resetPasswordId');
+
+    if (resetPasswordId) {
+      return account.checkPasswordReset();
+    }
+
+    resetPasswordId = '' + username + '/' + (hoodie.uuid());
+
+    hoodie.config.set('_account.resetPasswordId', resetPasswordId);
+>>>>>>> v0.3-cheesecake
+
+    key = '' + userDocPrefix + ':$passwordReset/' + resetPasswordId;
+
+    data = {
+      _id: key,
+      name: '$passwordReset/' + resetPasswordId,
+      type: 'user',
+      roles: [],
+      password: resetPasswordId,
+      createdAt: now(),
+      updatedAt: now()
+    };
+
+    options = {
+      data: JSON.stringify(data),
+      contentType: 'application/json'
+    };
+
+    // TODO: spec that checkPasswordReset gets executed
+    return withPreviousRequestsAborted('resetPassword', function() {
+      return account.request('PUT', '/_users/' + (encodeURIComponent(key)), options).then(
+        null, handleRequestError
+      ).done(account.checkPasswordReset);
+    });
+  };
+
+  // checkPasswordReset
+  // ---------------------
+
+  // check for the status of a password reset. It might take
+  // a while until the password reset worker picks up the job
+  // and updates it
+  //
+  // If a password reset request was successful, the $passwordRequest
+  // doc gets removed from _users by the worker, therefore a 401 is
+  // what we are waiting for.
+  //
+  // Once called, it continues to request the status update with a
+  // one second timeout.
+  //
+  account.checkPasswordReset = function checkPasswordReset() {
+    var hash, options, resetPasswordId, url, username;
+
+    // reject if there is no pending password reset request
+    resetPasswordId = hoodie.config.get('_account.resetPasswordId');
+
+    if (!resetPasswordId) {
+      return hoodie.rejectWith({
+        error: 'missing'
+      });
+    }
+
+    // send request to check status of password reset
+    username = '$passwordReset/' + resetPasswordId;
+    url = '/_users/' + (encodeURIComponent(userDocPrefix + ':' + username));
+    hash = btoa(username + ':' + resetPasswordId);
+
+    options = {
+      headers: {
+        Authorization: 'Basic ' + hash
+      }
+    };
+
+    return withPreviousRequestsAborted('passwordResetStatus', function() {
+      return account.request('GET', url, options).then(
+        handlePasswordResetStatusRequestSuccess,
+        handlePasswordResetStatusRequestError
+      ).fail(function(error) {
+        if (error.error === 'pending') {
+          window.setTimeout(account.checkPasswordReset, 1000);
+          return;
+        }
+        return account.trigger('password_reset:error');
+      });
+    });
+  };
 
 
-  // subscribe
+  // change username
+  // -----------------
+
+  // Note: the hoodie API requires the current password for security reasons,
+  // but technically we cannot (yet) prevent the user to change the username
+  // without knowing the current password, so it's not impulemented in the current
+  // implementation of the hoodie API.
+  //
+  // But the current password is needed to login with the new username.
+  //
+  account.changeUsername = function changeUsername(currentPassword, newUsername) {
+    newUsername = newUsername || '';
+    return changeUsernameAndPassword(currentPassword, newUsername.toLowerCase());
+  };
+
+
+  // destroy
   // ---------
 
+  // destroys a user's account
   //
-  //
-  ShareInstance.prototype.subscribe = function() {
-    return this.request('GET', '/_security').pipe(this._handleSecurityResponse);
-  };
-
-
-  // unsubscribe
-  // -----------
-
-  //
-  //
-  ShareInstance.prototype.unsubscribe = function() {
-    this.hoodie.share.remove(this.id);
-    this.hoodie.store.removeAll(this._objectBelongsToMe, {
-      local: true
-    });
-    return this;
-  };
-
-
-  // grant read access
-  // -------------------
-
-  // grant read access to the share. If no users passed,
-  // everybody can read the share objects. If one or multiple
-  // users passed, only these users get read access.
-  //
-  // examples:
-  //
-  //     share.grantReadAccess()
-  //     share.grantReadAccess('joe@example.com')
-  //     share.grantReadAccess(['joe@example.com', 'lisa@example.com'])
-  //
-  ShareInstance.prototype.grantReadAccess = function(users) {
-    var currentUsers, user, _i, _len;
-
-    if (this.access === true || this.access.read === true) {
-      return this.hoodie.resolveWith(this);
+  account.destroy = function destroy() {
+    if (!account.hasAccount()) {
+      return cleanupAndTriggerSignOut();
     }
 
-    if (typeof users === 'string') {
-      users = [users];
-    }
-
-    if (this.access === false || this.access.read === false) {
-      if (this.access.read !== undefined) {
-        this.access.read = users || true;
-      } else {
-        this.access = users || true;
-      }
-    }
-
-    if (users) {
-      currentUsers = this.access.read || this.access;
-
-      for (_i = 0, _len = users.length; _i < _len; _i++) {
-        user = users[_i];
-        if (currentUsers.indexOf(user) === -1) {
-          currentUsers.push(user);
-        }
-      }
-
-      this.access.read !== undefined ? this.access.read = currentUsers : this.access = currentUsers;
-    } else {
-      this.access.read !== undefined ? this.access.read = true : this.access = true;
-    }
-
-    return this.hoodie.share.update(this.id, {
-      access: this.access
-    });
-
-  };
-
-
-  // revoke read access
-  // --------------------
-
-  // revoke read access to the share. If one or multiple
-  // users passed, only these users' access gets revoked.
-  // Revoking reading access always includes revoking write
-  // access as well.
-  //
-  // examples:
-  //
-  //     share.revokeReadAccess()
-  //     share.revokeReadAccess('joe@example.com')
-  //     share.revokeReadAccess(['joe@example.com', 'lisa@example.com'])
-  //
-  ShareInstance.prototype.revokeReadAccess = function(users) {
-    var changed, currentUsers, idx, user, _i, _len;
-    this.revokeWriteAccess(users);
-    if (this.access === false || this.access.read === false) {
-      return this.hoodie.resolveWith(this);
-    }
-    if (users) {
-      if (this.access === true || this.access.read === true) {
-        return this.hoodie.rejectWith(this);
-      }
-      if (typeof users === 'string') {
-        users = [users];
-      }
-      currentUsers = this.access.read || this.access;
-      changed = false;
-      for (_i = 0, _len = users.length; _i < _len; _i++) {
-        user = users[_i];
-        idx = currentUsers.indexOf(user);
-        if (idx !== -1) {
-          currentUsers.splice(idx, 1);
-          changed = true;
-        }
-      }
-      if (!changed) {
-        return this.hoodie.resolveWith(this);
-      }
-      if (currentUsers.length === 0) {
-        currentUsers = false;
-      }
-      if (this.access.read !== undefined) {
-        this.access.read = currentUsers;
-      } else {
-        this.access = currentUsers;
-      }
-    } else {
-      this.access = false;
-    }
-    return this.hoodie.share.update(this.id, {
-      access: this.access
-    });
-  };
-
-
-  // grant write access
-  // --------------------
-
-  // grant write access to the share. If no users passed,
-  // everybody can edit the share objects. If one or multiple
-  // users passed, only these users get write access. Granting
-  // writing reads always also includes reading rights.
-  //
-  // examples:
-  //
-  //     share.grantWriteAccess()
-  //     share.grantWriteAccess('joe@example.com')
-  //     share.grantWriteAccess(['joe@example.com', 'lisa@example.com'])
-  //
-  ShareInstance.prototype.grantWriteAccess = function(users) {
-    this.grantReadAccess(users);
-
-    if (this.access.read === undefined) {
-      this.access = {
-        read: this.access
-      };
-    }
-    if (this.access.write === true) {
-      return this.hoodie.resolveWith(this);
-    }
-    if (users) {
-      if (typeof users === 'string') {
-        users = [users];
-      }
-      this.access.write = users;
-    } else {
-      this.access.write = true;
-    }
-    return this.hoodie.share.update(this.id, {
-      access: this.access
-    });
-  };
-
-
-  // revoke write access
-  // --------------------
-
-  // revoke write access to the share. If one or multiple
-  // users passed, only these users' write access gets revoked.
-  //
-  // examples:
-  //
-  //     share.revokeWriteAccess()
-  //     share.revokeWriteAccess('joe@example.com')
-  //     share.revokeWriteAccess(['joe@example.com', 'lisa@example.com'])
-  //
-  ShareInstance.prototype.revokeWriteAccess = function(users) {
-    var idx, user, _i, _len;
-
-    if (this.access.write === undefined) {
-      return this.hoodie.resolveWith(this);
-    }
-    if (users) {
-      if (typeof this.access.write === 'boolean') {
-        return this.hoodie.rejectWith(this);
-      }
-      if (typeof users === 'string') {
-        users = [users];
-      }
-      for (_i = 0, _len = users.length; _i < _len; _i++) {
-        user = users[_i];
-        idx = this.access.write.indexOf(user);
-        if (idx !== -1) {
-          this.access.write.splice(idx, 1);
-        }
-      }
-      if (this.access.write.length === 0) {
-        this.access = this.access.read;
-      }
-    } else {
-      this.access = this.access.read;
-    }
-    return this.hoodie.share.update(this.id, {
-      access: this.access
-    });
+    return account.fetch().then(
+      handleFetchBeforeDestroySuccess,
+      handleFetchBeforeDestroyError
+    ).then(cleanupAndTriggerSignOut);
   };
 
 
   // PRIVATE
   // ---------
 
-  // 
-  // 
-  ShareInstance.prototype._objectBelongsToMe = function(object) {
-    return object.$sharedAt === this.id;
-  };
+  // setters
+  function setUsername(newUsername) {
+    if (account.username === newUsername) {
+      return;
+    }
 
-  // 
-  // 
-  ShareInstance.prototype._handleSecurityResponse = function(security) {
-    var access, createdBy;
-    access = this._parseSecurity(security);
-    createdBy = '$subscription';
-    return this.hoodie.share.findOrAdd(this.id, {
-      access: access,
-      createdBy: createdBy
-    });
-  };
+    account.username = newUsername;
+
+    return hoodie.config.set('_account.username', newUsername);
+  }
+
+  function setOwner(newOwnerHash) {
+
+    if (account.ownerHash === newOwnerHash) {
+      return;
+    }
+
+    account.ownerHash = newOwnerHash;
+
+    // `ownerHash` is stored with every new object in the createdBy
+    // attribute. It does not get changed once it's set. That's why
+    // we have to force it to be change for the `$config/hoodie` object.
+    hoodie.config.set('createdBy', newOwnerHash);
+
+    return hoodie.config.set('_account.ownerHash', newOwnerHash);
+  }
 
 
-  // a db _security response looks like this:
+  //
+  // handle a successful authentication request.
+  //
+  // As long as there is no server error or internet connection issue,
+  // the authenticate request (GET /_session) does always return
+  // a 200 status. To differentiate whether the user is signed in or
+  // not, we check `userCtx.name` in the response. If the user is not
+  // signed in, it's null, otherwise the name the user signed in with
+  //
+  // If the user is not signed in, we difeerentiate between users that
+  // signed in with a username / password or anonymously. For anonymous
+  // users, the password is stored in local store, so we don't need
+  // to trigger an 'unauthenticated' error, but instead try to sign in.
+  //
+  function handleAuthenticateRequestSuccess(response) {
+    if (response.userCtx.name) {
+      authenticated = true;
+      setUsername(response.userCtx.name.replace(/^user(_anonymous)?\//, ''));
+      setOwner(response.userCtx.roles[0]);
+      return hoodie.resolveWith(account.username);
+    }
+
+    if (account.hasAnonymousAccount()) {
+      return account.signIn(account.username, getAnonymousPassword());
+    }
+
+    authenticated = false;
+    account.trigger('error:unauthenticated');
+    return hoodie.reject();
+  }
+
+
+  //
+  // standard error handling for AJAX requests
+  //
+  // in some case we get the object error directly,
+  // in others we get an xhr or even just a string back
+  // when the couch died entirely. Whe have to handle
+  // each case
+  //
+  function handleRequestError(error) {
+    var e;
+
+    error = error || {};
+
+    if (error.reason) {
+      return hoodie.rejectWith(error);
+    }
+
+    var xhr = error;
+
+    try {
+      error = JSON.parse(xhr.responseText);
+    } catch (_error) {
+      e = _error;
+      error = {
+        error: xhr.responseText || 'unknown'
+      };
+    }
+
+    return hoodie.rejectWith(error);
+  }
+
+
+  //
+  // handle response of a successful signUp request.
+  // Response looks like:
   //
   //     {
-  //       members: {
-  //           names: [],
-  //           roles: ["1ihhzfy"]
-  //       },
-  //       writers: {
-  //           names: [],
-  //           roles: ["1ihhzfy"]
-  //       }
+  //         'ok': true,
+  //         'id': 'org.couchdb.user:joe',
+  //         'rev': '1-e8747d9ae9776706da92810b1baa4248'
   //     }
   //
-  // we want to turn it into
-  //
-  //     {read: true, write: true}
-  //
-  // given that users ownerHash is "1ihhzfy"
-  //
-  ShareInstance.prototype._parseSecurity = function(security) {
-    var access, read, write, _ref, _ref1;
-    read = (_ref = security.members) !== null ? _ref.roles : void 0;
-    write = (_ref1 = security.writers) !== null ? _ref1.roles : void 0;
-    access = {};
+  function handleSignUpSucces(username, password) {
 
-    if (read !== undefined) {
-      access.read = read === true || read.length === 0;
-      if (read.length) {
-        access.read = -1 !== read.indexOf(this.hoodie.account.ownerHash);
+    return function(response) {
+      account.trigger('signup', username);
+      userDoc._rev = response.rev;
+      return delayedSignIn(username, password);
+    };
+  }
+
+
+  //
+  // a delayed sign in is used after sign up and after a
+  // username change.
+  //
+  function delayedSignIn(username, password, options, defer) {
+
+    // delayedSignIn might call itself, when the user account
+    // is pending. In this case it passes the original defer,
+    // to keep a reference and finally resolve / reject it
+    // at some point
+    if (!defer) {
+      defer = hoodie.defer();
+    }
+
+    window.setTimeout(function() {
+      var promise = sendSignInRequest(username, password);
+      promise.done(defer.resolve);
+      promise.fail(function(error) {
+        if (error.error === 'unconfirmed') {
+
+          // It might take a bit until the account has been confirmed
+          delayedSignIn(username, password, options, defer);
+        } else {
+          defer.reject.apply(defer, arguments);
+        }
+      });
+
+    }, 300);
+
+    return defer.promise();
+  }
+
+
+  //
+  // parse a successful sign in response from couchDB.
+  // Response looks like:
+  //
+  //     {
+  //         'ok': true,
+  //         'name': 'test1',
+  //         'roles': [
+  //             'mvu85hy',
+  //             'confirmed'
+  //         ]
+  //     }
+  //
+  // we want to turn it into 'test1', 'mvu85hy' or reject the promise
+  // in case an error occured ('roles' array contains 'error')
+  //
+  function handleSignInSuccess(options) {
+    options = options || {};
+
+    return function(response) {
+      var defer, username;
+
+      defer = hoodie.defer();
+      username = response.name.replace(/^user(_anonymous)?\//, '');
+
+      //
+      // if an error occured, the userDB worker stores it to the $error attribute
+      // and adds the 'error' role to the users doc object. If the user has the
+      // 'error' role, we need to fetch his _users doc to find out what the error
+      // is, before we can reject the promise.
+      //
+      if (response.roles.indexOf('error') !== -1) {
+        account.fetch(username).fail(defer.reject).done(function() {
+          return defer.reject({
+            error: 'error',
+            reason: userDoc.$error
+          });
+        });
+        return defer.promise();
+      }
+
+      //
+      // When the userDB worker created the database for the user and everthing
+      // worked out, it adds the role 'confirmed' to the user. If the role is
+      // not present yet, it might be that the worker didn't pick up the the
+      // user doc yet, or there was an error. In this cases, we reject the promise
+      // with an 'uncofirmed error'
+      //
+      if (response.roles.indexOf('confirmed') === -1) {
+        return defer.reject({
+          error: 'unconfirmed',
+          reason: 'account has not been confirmed yet'
+        });
+      }
+
+      setUsername(username);
+      setOwner(response.roles[0]);
+      authenticated = true;
+
+      //
+      // options.verbose is true, when a user manually signed via hoodie.account.signIn().
+      // We need to differentiate to other signIn requests, for example right after
+      // the signup or after a session timed out.
+      //
+      if (!(options.silent || options.reauthenticated)) {
+        if (account.hasAnonymousAccount()) {
+          account.trigger('signin:anonymous', username);
+        } else {
+          account.trigger('signin', username);
+        }
+      }
+
+      // user reauthenticated, meaning
+      if (options.reauthenticated) {
+        account.trigger('reauthenticated', username);
+      }
+
+      account.fetch();
+      return defer.resolve(username, response.roles[0]);
+    };
+  }
+
+
+  //
+  // If the request was successful there might have occured an
+  // error, which the worker stored in the special $error attribute.
+  // If that happens, we return a rejected promise with the $error,
+  // error. Otherwise reject the promise with a 'pending' error,
+  // as we are not waiting for a success full response, but a 401
+  // error, indicating that our password was changed and our
+  // current session has been invalidated
+  //
+  function handlePasswordResetStatusRequestSuccess(response) {
+    var error;
+
+    if (response.$error) {
+      error = response.$error;
+    } else {
+      error = { error: 'pending' };
+    }
+    return hoodie.rejectWith(error);
+  }
+
+
+  //
+  // If the error is a 401, it's exactly what we've been waiting for.
+  // In this case we resolve the promise.
+  //
+  function handlePasswordResetStatusRequestError(xhr) {
+    if (xhr.status === 401) {
+      hoodie.config.remove('_account.resetPasswordId');
+      account.trigger('passwordreset');
+
+      return hoodie.resolve();
+    } else {
+      return handleRequestError(xhr);
+    }
+  }
+
+
+  //
+  // change username and password in 3 steps
+  //
+  // 1. assure we have a valid session
+  // 2. update _users doc with new username and new password (if provided)
+  // 3. sign in with new credentials to create new sesion.
+  //
+  function changeUsernameAndPassword(currentPassword, newUsername, newPassword) {
+
+    return sendSignInRequest(account.username, currentPassword, {
+      silent: true
+    }).then(function() {
+      return account.fetch().then(
+        sendChangeUsernameAndPasswordRequest(currentPassword, newUsername, newPassword)
+      );
+    });
+  }
+
+
+  //
+  // turn an anonymous account into a real account
+  //
+  function upgradeAnonymousAccount(username, password) {
+    var currentPassword = getAnonymousPassword();
+
+    return changeUsernameAndPassword(currentPassword, username, password).done(function() {
+      account.trigger('signup', username);
+      removeAnonymousPassword();
+    });
+  }
+
+
+  //
+  // we now can be sure that we fetched the latest _users doc, so we can update it
+  // without a potential conflict error.
+  //
+  function handleFetchBeforeDestroySuccess() {
+
+    hoodie.remote.disconnect();
+    userDoc._deleted = true;
+
+    return withPreviousRequestsAborted('updateUsersDoc', function() {
+      account.request('PUT', userDocUrl(), {
+        data: JSON.stringify(userDoc),
+        contentType: 'application/json'
+      });
+    });
+  }
+
+
+  //
+  // dependend on what kind of error we get, we want to ignore
+  // it or not.
+  // When we get a 'not_found' it means that the _users doc habe
+  // been removed already, so we don't need to do it anymore, but
+  // still want to finish the destroy locally, so we return a
+  // resolved promise
+  //
+  function handleFetchBeforeDestroyError(error) {
+    if (error.error === 'not_found') {
+      return hoodie.resolve();
+    } else {
+      return hoodie.rejectWith(error);
+    }
+  }
+
+  //
+  // remove everything form the current account, so a new account can be initiated.
+  //
+  function cleanup(options) {
+    options = options || {};
+
+    // hoodie.store is listening on this one
+    account.trigger('cleanup');
+    authenticated = options.authenticated;
+    hoodie.config.clear();
+    setUsername(options.username);
+    setOwner(options.ownerHash || hoodie.uuid());
+
+    return hoodie.resolve();
+  }
+
+
+  //
+  function cleanupAndTriggerSignOut() {
+    return cleanup().then(function() {
+      return account.trigger('signout');
+    });
+  }
+
+
+  //
+  // depending on wether the user signedUp manually or has been signed up
+  // anonymously the prefix in the CouchDB _users doc differentiates.
+  // An anonymous user is characterized by its username, that equals
+  // its ownerHash (see `anonymousSignUp`)
+  //
+  // We differentiate with `hasAnonymousAccount()`, because `userTypeAndId`
+  // is used within `signUp` method, so we need to be able to differentiate
+  // between anonyomus and normal users before an account has been created.
+  //
+  function userTypeAndId(username) {
+    var type;
+
+    if (username === account.ownerHash) {
+      type = 'user_anonymous';
+    } else {
+      type = 'user';
+    }
+    return '' + type + '/' + username;
+  }
+
+
+  //
+  // turn a username into a valid _users doc._id
+  //
+  function userDocKey(username) {
+    username = username || account.username;
+    return '' + userDocPrefix + ':' + (userTypeAndId(username));
+  }
+
+  //
+  // get URL of my _users doc
+  //
+  function userDocUrl(username) {
+    return '/_users/' + (encodeURIComponent(userDocKey(username)));
+  }
+
+
+  //
+  // update my _users doc.
+  //
+  // If a new username has been passed, we set the special attribut $newUsername.
+  // This will let the username change worker create create a new _users doc for
+  // the new username and remove the current one
+  //
+  // If a new password has been passed, salt and password_sha get removed
+  // from _users doc and add the password in clear text. CouchDB will replace it with
+  // according password_sha and a new salt server side
+  //
+  function sendChangeUsernameAndPasswordRequest(currentPassword, newUsername, newPassword) {
+
+    return function() {
+      // prepare updated _users doc
+      var data = $.extend({}, userDoc);
+
+      if (newUsername) {
+        data.$newUsername = newUsername;
+      }
+
+      data.updatedAt = now();
+      data.signedUpAt = data.signedUpAt || now();
+
+      // trigger password update when newPassword set
+      if (newPassword !== null) {
+        delete data.salt;
+        delete data.password_sha;
+        data.password = newPassword;
+      }
+
+      var options = {
+        data: JSON.stringify(data),
+        contentType: 'application/json'
+      };
+
+      return withPreviousRequestsAborted('updateUsersDoc', function() {
+        return account.request('PUT', userDocUrl(), options).then(
+          handleChangeUsernameAndPasswordRequest(newUsername, newPassword || currentPassword),
+          handleRequestError
+        );
+      });
+
+    };
+  }
+
+
+  //
+  // depending on whether a newUsername has been passed, we can sign in right away
+  // or have to use the delayed sign in to give the username change worker some time
+  //
+  function handleChangeUsernameAndPasswordRequest(newUsername, newPassword) {
+
+    return function() {
+      hoodie.remote.disconnect();
+
+      if (newUsername) {
+        return delayedSignIn(newUsername, newPassword, {
+          silent: true
+        });
+      } else {
+        return account.signIn(account.username, newPassword);
+      }
+    };
+  }
+
+
+  //
+  // make sure that the same request doesn't get sent twice
+  // by cancelling the previous one.
+  //
+  function withPreviousRequestsAborted(name, requestFunction) {
+    if (requests[name] !== undefined) {
+      if (typeof requests[name].abort === 'function') {
+        requests[name].abort();
+      }
+    }
+    requests[name] = requestFunction();
+    return requests[name];
+  }
+
+
+  //
+  // if there is a pending request, return its promise instead
+  // of sending another request
+  //
+  function withSingleRequest(name, requestFunction) {
+
+    if (requests[name] !== undefined) {
+      if (typeof requests[name].state === 'function') {
+        if (requests[name].state() === 'pending') {
+          return requests[name];
+        }
       }
     }
 
-    if (write !== undefined) {
-      access.write = write === true || write.length === 0;
-      if (write.length) {
-        access.write = -1 !== write.indexOf(this.hoodie.account.ownerHash);
+    requests[name] = requestFunction();
+    return requests[name];
+  }
+
+
+  //
+  function sendSignOutRequest() {
+    return withSingleRequest('signOut', function() {
+      return account.request('DELETE', '/_session').then(null, handleRequestError);
+    });
+  }
+
+
+  //
+  // the sign in request that starts a CouchDB session if
+  // it succeeds. We separated the actual sign in request from
+  // the signIn method, as the latter also runs signOut intenrtally
+  // to clean up local data before starting a new session. But as
+  // other methods like signUp or changePassword do also need to
+  // sign in the user (again), these need to send the sign in
+  // request but without a signOut beforehand, as the user remains
+  // the same.
+  //
+  function sendSignInRequest(username, password, options) {
+    var requestOptions = {
+      data: {
+        name: userTypeAndId(username),
+        password: password
       }
-    }
-    return access;
+    };
+
+    return withPreviousRequestsAborted('signIn', function() {
+      var promise = account.request('POST', '/_session', requestOptions);
+
+      return promise.then(
+        handleSignInSuccess(options),
+        handleRequestError
+      );
+    });
+  }
+
+  //
+  function now() {
+    return new Date();
+  }
+
+  //
+  // expose public account API
+  //
+  hoodie.account = account;
+
+  // TODO: we should move the owner hash on hoodie core, as
+  //       other modules depend on it as well, like hoodie.store.
+  // the ownerHash gets stored in every object created by the user.
+  // Make sure we have one.
+  hoodie.account.ownerHash = hoodie.config.get('_account.ownerHash');
+  if (!hoodie.account.ownerHash) {
+    setOwner(hoodie.uuid());
+  }
+}
+
+/* exported hoodieRemote */
+
+// AccountRemote
+// ===============
+
+// Connection / Socket to our couch
+//
+// AccountRemote is using CouchDB's `_changes` feed to
+// listen to changes and `_bulk_docs` to push local changes
+//
+// When hoodie.remote is continuously syncing (default),
+// it will continuously  synchronize with local store,
+// otherwise sync, pull or push can be called manually
+//
+
+function hoodieRemote (hoodie) {
+  // inherit from Hoodies Store API
+  var remote = hoodie.open(hoodie.account.db(), {
+
+    // we're always connected to our own db
+    connected: true,
+
+    // do not prefix files for my own remote
+    prefix: '',
+
+    //
+    since: sinceNrCallback,
+
+    //
+    defaultObjectsToPush: hoodie.store.changedObjects,
+
+    //
+    knownObjects: hoodie.store.index().map( function(key) {
+      var typeAndId = key.split(/\//);
+      return { type: typeAndId[0], id: typeAndId[1]};
+    })
+  });
+
+  // trigger
+  // ---------
+
+  // proxies to hoodie.trigger
+  remote.trigger = function trigger() {
+    var eventName;
+
+    eventName = arguments[0];
+
+    var parameters = 2 <= arguments.length ? Array.prototype.slice.call(arguments, 1) : [];
+
+    return hoodie.trigger.apply(hoodie, ['remote:' + eventName].concat(Array.prototype.slice.call(parameters)));
   };
 
-  return ShareInstance;
 
-})(Hoodie.Remote);
+  // on
+  // ---------
+
+  // proxies to hoodie.on
+  remote.on = function on(eventName, data) {
+    eventName = eventName.replace(/(^| )([^ ]+)/g, '$1'+'remote:$2');
+    return hoodie.on(eventName, data);
+  };
+
+
+  // unbind
+  // ---------
+
+  // proxies to hoodie.unbind
+  remote.unbind = function unbind(eventName, callback) {
+    eventName = eventName.replace(/(^| )([^ ]+)/g, '$1'+'remote:$2');
+    return hoodie.unbind(eventName, callback);
+  };
+
+
+  // Private
+  // ---------
+
+  // getter / setter for since number
+  //
+  function sinceNrCallback(sinceNr) {
+    if (sinceNr) {
+      return hoodie.config.set('_remote.since', sinceNr);
+    }
+
+    return hoodie.config.get('_remote.since') || 0;
+  }
+
+  //
+  // subscribe to events coming from account
+  //
+  function subscribeToEvents() {
+
+    hoodie.on('remote:connect', function() {
+      hoodie.on('store:idle', remote.push);
+    });
+
+    hoodie.on('remote:disconnect', function() {
+      hoodie.unbind('store:idle', remote.push);
+    });
+
+    hoodie.on('reconnected', remote.connect);
+
+    // account events
+    hoodie.on('account:signin', function() {
+      remote.name = hoodie.account.db();
+      remote.connect();
+    });
+
+    hoodie.on('account:reauthenticated', remote.connect);
+    hoodie.on('account:signout', remote.disconnect);
+  }
+
+  // allow to run this once from outside
+  remote.subscribeToEvents = function() {
+    subscribeToEvents();
+    delete remote.subscribeToEvents;
+  };
+
+  //
+  // expose remote API
+  //
+  hoodie.remote = remote;
+}
+
+})(window);

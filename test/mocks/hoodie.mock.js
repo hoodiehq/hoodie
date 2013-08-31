@@ -12,24 +12,36 @@ promiseMock = {
 Mocks.Hoodie = function () {
 
   'use strict';
+  var events = {};
+  hoodieEvents(events);
 
   return {
     baseUrl: 'http://my.cou.ch',
-    trigger: Hoodie.prototype.trigger,
+    trigger: events.trigger,
     request: function () {},
     checkConnection: function () {},
     open: function () {},
-    on: Hoodie.prototype.on,
-    one: Hoodie.prototype.one,
-    unbind: Hoodie.prototype.unbind,
+    on: events.bind,
+    one: events.one,
+    unbind: events.unbind,
     defer: $.Deferred,
-    isPromise: Hoodie.prototype.isPromise,
+    isPromise: function(object) {
+      return !! (object &&
+                 typeof object.done === 'function' &&
+                 typeof object.resolve !== 'function');
+    },
     uuid: function () {
       return 'uuid';
+    },
+    resolve: function() {
+      return $.Deferred().resolve().promise();
     },
     resolveWith: function () {
       var _ref;
       return (_ref = $.Deferred()).resolve.apply(_ref, arguments).promise();
+    },
+    reject: function() {
+      return $.Deferred().reject().promise();
     },
     rejectWith: function () {
       var _ref;

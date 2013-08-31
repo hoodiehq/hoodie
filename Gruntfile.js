@@ -2,46 +2,60 @@ module.exports = function(grunt) {
 
   'use strict';
 
-  var banner  = '//  <%= pkg.name %> <%= pkg.version%>\n';
-  banner += '';
+  var banner = '// <%= pkg.title %> - <%= pkg.version%>\n';
+  banner += '// https://github.com/hoodiehq/hoodie.js\n';
+  banner += '// Copyright 2012, 2013 https://github.com/hoodiehq/\n';
+  banner += '// Licensed Apache License 2.0\n';
+  banner += '\n';
+  banner += '(function(global) {\n';
+  banner += '\'use strict\'\n';
+  banner += '\n';
+
+  var footer  = '\n';
+  footer += '})(window);\n';
+
 
   grunt.initConfig({
     pkg: grunt.file.readJSON('package.json'),
 
     jshint: {
-      files: ['Gruntfile.js', 'src/**/*.js'],
+      files: ['Gruntfile.js', 'src/**/*.js','test/specs/**/*.js' ],
       options: {
         jshintrc: '.jshintrc'
       }
     },
 
     watch: {
-      // files: ['<%= jshint.files %>'],
-      files: ['Gruntfile.js', 'src/**/*.js', 'test/specs/**/*.js'],
+      //files: ['<%= jshint.files %>'],
+      files: ['Gruntfile.js', 'src/**/*.js'],
       tasks: ['jshint', 'shell:test']
     },
 
     concat: {
       options: {
-        banner: banner
+        banner: banner,
+        footer: footer
       },
       dist: {
         src: [
-          'src/utils.js',
-          'src/events.js',
           'src/hoodie.js',
-          'src/core/account.js',
-          'src/core/config.js',
-          'src/core/errors.js',
-          'src/core/store.js',
-          'src/core/remote.js',
-          'src/core/account_remote.js',
-          'src/core/local_store.js',
-          'src/extensions/email.js',
-          'src/extensions/share.js',
-          'src/extensions/user.js',
-          'src/extensions/global.js',
-          'src/extensions/share_instance.js'
+
+          'src/hoodie/events.js',
+          'src/hoodie/promises.js',
+          'src/hoodie/request.js',
+          'src/hoodie/connection.js',
+          'src/hoodie/uuid.js',
+          'src/hoodie/dispose.js',
+          'src/hoodie/open.js',
+
+          'src/hoodie/store.js',
+          'src/hoodie/errors.js',
+          'src/hoodie/remote_store.js',
+
+          'src/hoodie/local_store.js',
+          'src/hoodie/config.js',
+          'src/hoodie/account.js',
+          'src/hoodie/account_remote.js'
         ],
         dest: 'dist/<%= pkg.name %>.js'
       }
@@ -60,11 +74,11 @@ module.exports = function(grunt) {
 
     groc: {
       javascript: [
-        "src/**/*.js"
+        'src/**/*.js'
       ],
       options: {
-        "out": "doc/",
-        "whitespace-after-token": false
+        'out': 'doc/',
+        'whitespace-after-token': false
       }
     },
 
