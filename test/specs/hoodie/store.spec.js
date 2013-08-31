@@ -19,6 +19,97 @@ describe('hoodieStoreApi', function() {
     expect(this.store.validate).to.be.a(Function);
   });
 
+  it('returns a function', function() {
+    expect(this.store).to.be.a(Function);
+  });
+
+  describe('store("task")', function() {
+    beforeEach( function() {
+      this.taskStore = this.store('task');
+    });
+
+    it('scopes save method to type "task"', function() {
+      this.taskStore.save('abc', {title: 'milk!'}, { option: 'some value'});
+      expect(this.options.backend.save).to.be.calledWith({type: 'task', id: 'abc', title: 'milk!'}, { option: 'some value'});
+    });
+
+    it('scopes add method to type "task"', function() {
+      this.sandbox.spy(this.taskStore, 'save');
+      this.taskStore.add({title: 'milk!'}, { option: 'some value'});
+      expect(this.taskStore.save).to.be.calledWith('task', undefined, { title: 'milk!'}, { option: 'some value'});
+    });
+
+    it('scopes find method to type "task"', function() {
+      this.taskStore.find('abc');
+      expect(this.options.backend.find).to.be.calledWith('task', 'abc');
+    });
+
+    it('scopes findOrAdd method to type "task"', function() {
+      var promise = this.hoodie.defer().reject().promise();
+      this.sandbox.stub(this.taskStore, 'find').returns(promise);
+      this.sandbox.spy(this.taskStore, 'add');
+
+      this.taskStore.findOrAdd('abc', { title: 'Nutella' });
+      expect(this.taskStore.find).to.be.calledWith('task', 'abc');
+      expect(this.taskStore.add).to.be.calledWith('task', { id: 'abc', title: 'Nutella' });
+    });
+
+    it('scopes findAll method to type "task"', function() {
+      this.taskStore.findAll({option: 'value'});
+      expect(this.options.backend.findAll).to.be.calledWith('task', {option: 'value'});
+    });
+
+    it('scopes update method to type "task"', function() {
+      var promise = this.hoodie.defer().reject().promise();
+      this.sandbox.stub(this.taskStore, 'find').returns(promise);
+      this.sandbox.spy(this.taskStore, 'save');
+
+      this.taskStore.update('abc', { title: 'Nutella' }, {option: 'value'});
+      expect(this.taskStore.find).to.be.calledWith('task', 'abc');
+      expect(this.taskStore.save).to.be.calledWith('task', 'abc', { title: 'Nutella' }, {option: 'value'});
+    });
+
+    it('scopes updateAll method to type "task"', function() {
+      var promise = this.hoodie.defer().resolve([{ type: 'task', id: 'abc', title: 'Nutella' }]).promise();
+      this.sandbox.stub(this.taskStore, 'findAll').returns(promise);
+      this.sandbox.spy(this.taskStore, 'update');
+
+      this.taskStore.updateAll({ title: '2 × Nutella' }, {option: 'value'});
+      expect(this.taskStore.findAll).to.be.calledWith('task');
+      expect(this.taskStore.update).to.be.calledWith('task', 'abc', { title: '2 × Nutella' }, {option: 'value'});
+    });
+
+    it('scopes remove method to type "task"', function() {
+      this.taskStore.remove('abc', {option: 'value'});
+      expect(this.options.backend.remove).to.be.calledWith('task', 'abc', {option: 'value'});
+    });
+
+    it('scopes removeAll method to type "task"', function() {
+      this.taskStore.removeAll({option: 'value'});
+      expect(this.options.backend.removeAll).to.be.calledWith('task', {option: 'value'});
+    });
+
+    it('scopes trigger method to type "task"', function() {
+      this.sandbox.spy(this.hoodie, 'trigger');
+      this.taskStore.trigger('event');
+      expect(this.hoodie.trigger).to.be.calledWith('funkstore:task:event');
+    });
+
+    it('scopes on method to type "task"', function() {
+      this.sandbox.spy(this.hoodie, 'on');
+      var callback = function() {};
+      this.taskStore.on('event1 event2', callback);
+      expect(this.hoodie.on).to.be.calledWith('funkstore:task:event1 funkstore:task:event2', callback);
+    });
+
+    it('scopes unbind method to type "task"', function() {
+      this.sandbox.spy(this.hoodie, 'unbind');
+      var callback = function() {};
+      this.taskStore.unbind('event1 event2', callback);
+      expect(this.hoodie.unbind).to.be.calledWith('funkstore:task:event1 funkstore:task:event2', callback);
+    });
+  });
+
   describe('#validate(object, options)', function() {
     beforeEach(function() {
       this.object = {
