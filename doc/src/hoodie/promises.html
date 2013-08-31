@@ -11,7 +11,6 @@ if (good) {
 }
 return defer.promise()
 </code></pre></div></div><div class="code"><div class="wrapper"><span class="kd">function</span> <span class="nx">hoodiePromises</span> <span class="p">(</span><span class="nx">hoodie</span><span class="p">)</span> <span class="p">{</span>
-
   <span class="kd">var</span> <span class="nx">$defer</span> <span class="o">=</span> <span class="nb">window</span><span class="p">.</span><span class="nx">jQuery</span><span class="p">.</span><span class="nx">Deferred</span><span class="p">;</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>returns true if passed object is a promise (but not a deferred),
 otherwise false.</p></div></div><div class="code"><div class="wrapper">  <span class="kd">function</span> <span class="nx">isPromise</span><span class="p">(</span><span class="nx">object</span><span class="p">)</span> <span class="p">{</span>
     <span class="k">return</span> <span class="o">!!</span> <span class="p">(</span><span class="nx">object</span> <span class="o">&amp;&amp;</span>

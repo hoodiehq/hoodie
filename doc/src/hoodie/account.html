@@ -29,6 +29,7 @@ The backend will automatically create a userDB based on the username
 address and approve the account by adding a 'confirmed' role to the
 user doc. The account confirmation might take a while, so we keep trying
 to sign in with a 300ms timeout.</p></div></div><div class="code"><div class="wrapper">  <span class="nx">account</span><span class="p">.</span><span class="nx">signUp</span> <span class="o">=</span> <span class="kd">function</span> <span class="nx">signUp</span><span class="p">(</span><span class="nx">username</span><span class="p">,</span> <span class="nx">password</span><span class="p">)</span> <span class="p">{</span>
+
     <span class="k">if</span> <span class="p">(</span><span class="nx">password</span> <span class="o">===</span> <span class="kc">undefined</span><span class="p">)</span> <span class="p">{</span>
       <span class="nx">password</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="p">;</span>
     <span class="p">}</span>
@@ -93,7 +94,9 @@ change his username and password internally instead of creating another user.</p
 
   <span class="kd">function</span> <span class="nx">setAnonymousPassword</span><span class="p">(</span><span class="nx">password</span><span class="p">)</span> <span class="p">{</span>
     <span class="k">return</span> <span class="nx">hoodie</span><span class="p">.</span><span class="nx">config</span><span class="p">.</span><span class="nx">set</span><span class="p">(</span><span class="nx">anonymousPasswordKey</span><span class="p">,</span> <span class="nx">password</span><span class="p">);</span>
-  <span class="p">}</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>TODO: hide from public API</p></div></div><div class="code"><div class="wrapper">  <span class="kd">function</span> <span class="nx">getAnonymousPassword</span><span class="p">()</span> <span class="p">{</span>
+  <span class="p">}</span>
+
+  <span class="kd">function</span> <span class="nx">getAnonymousPassword</span><span class="p">()</span> <span class="p">{</span>
     <span class="k">return</span> <span class="nx">hoodie</span><span class="p">.</span><span class="nx">config</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="nx">anonymousPasswordKey</span><span class="p">);</span>
   <span class="p">}</span>
 
@@ -139,7 +142,8 @@ Besides the standard sign in we also check if the account has been confirmed
         <span class="p">}</span>
       <span class="p">});</span>
     <span class="p">}</span>
-    <span class="nx">hoodie</span><span class="p">.</span><span class="nx">remote</span><span class="p">.</span><span class="nx">disconnect</span><span class="p">();</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>return sendSignOutRequest().then(cleanupAndTriggerSignOut);</p></div></div><div class="code"><div class="wrapper">    <span class="k">return</span> <span class="nx">sendSignOutRequest</span><span class="p">().</span><span class="nx">then</span><span class="p">(</span><span class="nx">cleanupAndTriggerSignOut</span><span class="p">);</span>
+    <span class="nx">hoodie</span><span class="p">.</span><span class="nx">remote</span><span class="p">.</span><span class="nx">disconnect</span><span class="p">();</span>
+    <span class="k">return</span> <span class="nx">sendSignOutRequest</span><span class="p">().</span><span class="nx">then</span><span class="p">(</span><span class="nx">cleanupAndTriggerSignOut</span><span class="p">);</span>
   <span class="p">};</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h2 id="on">On</h2></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>shortcut for <code>hoodie.on</code></p></div></div><div class="code"><div class="wrapper">  <span class="nx">account</span><span class="p">.</span><span class="nx">on</span> <span class="o">=</span> <span class="kd">function</span> <span class="nx">on</span><span class="p">(</span><span class="nx">eventName</span><span class="p">,</span> <span class="nx">cb</span><span class="p">)</span> <span class="p">{</span>
     <span class="nx">eventName</span> <span class="o">=</span> <span class="nx">eventName</span><span class="p">.</span><span class="nx">replace</span><span class="p">(</span><span class="sr">/(^| )([^ ]+)/g</span><span class="p">,</span> <span class="s1">&#39;$1account:$2&#39;</span><span class="p">);</span>
     <span class="k">return</span> <span class="nx">hoodie</span><span class="p">.</span><span class="nx">on</span><span class="p">(</span><span class="nx">eventName</span><span class="p">,</span> <span class="nx">cb</span><span class="p">);</span>
@@ -202,6 +206,7 @@ functionality is the _users database.</p>
 It will be picked up by the password reset worker and removeed
 once the password was resetted.</p></div></div><div class="code"><div class="wrapper">  <span class="nx">account</span><span class="p">.</span><span class="nx">resetPassword</span> <span class="o">=</span> <span class="kd">function</span> <span class="nx">resetPassword</span><span class="p">(</span><span class="nx">username</span><span class="p">)</span> <span class="p">{</span>
     <span class="kd">var</span> <span class="nx">data</span><span class="p">,</span> <span class="nx">key</span><span class="p">,</span> <span class="nx">options</span><span class="p">,</span> <span class="nx">resetPasswordId</span><span class="p">;</span>
+
     <span class="nx">resetPasswordId</span> <span class="o">=</span> <span class="nx">hoodie</span><span class="p">.</span><span class="nx">config</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="s1">&#39;_account.resetPasswordId&#39;</span><span class="p">);</span>
 
     <span class="k">if</span> <span class="p">(</span><span class="nx">resetPasswordId</span><span class="p">)</span> <span class="p">{</span>
@@ -497,8 +502,7 @@ In this case we resolve the promise.</p></div></div><div class="code"><div class
       <span class="p">);</span>
     <span class="p">});</span>
   <span class="p">}</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>turn an anonymous account into a real account</p></div></div><div class="code"><div class="wrapper">  <span class="kd">function</span> <span class="nx">upgradeAnonymousAccount</span><span class="p">(</span><span class="nx">username</span><span class="p">,</span> <span class="nx">password</span><span class="p">)</span> <span class="p">{</span>
-    <span class="kd">var</span> <span class="nx">currentPassword</span><span class="p">;</span>
-    <span class="nx">currentPassword</span> <span class="o">=</span> <span class="nx">getAnonymousPassword</span><span class="p">();</span>
+    <span class="kd">var</span> <span class="nx">currentPassword</span> <span class="o">=</span> <span class="nx">getAnonymousPassword</span><span class="p">();</span>
 
     <span class="k">return</span> <span class="nx">changeUsernameAndPassword</span><span class="p">(</span><span class="nx">currentPassword</span><span class="p">,</span> <span class="nx">username</span><span class="p">,</span> <span class="nx">password</span><span class="p">).</span><span class="nx">done</span><span class="p">(</span><span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
       <span class="nx">account</span><span class="p">.</span><span class="nx">trigger</span><span class="p">(</span><span class="s1">&#39;signup&#39;</span><span class="p">,</span> <span class="nx">username</span><span class="p">);</span>
@@ -664,7 +668,8 @@ the same.</p></div></div><div class="code"><div class="wrapper">  <span class="k
   <span class="p">}</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>expose public account API</p></div></div><div class="code"><div class="wrapper">  <span class="nx">hoodie</span><span class="p">.</span><span class="nx">account</span> <span class="o">=</span> <span class="nx">account</span><span class="p">;</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>TODO: we should move the owner hash on hoodie core, as
       other modules depend on it as well, like hoodie.store.
 the ownerHash gets stored in every object created by the user.
-Make sure we have one.</p></div></div><div class="code"><div class="wrapper">  <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nx">hoodie</span><span class="p">.</span><span class="nx">account</span><span class="p">.</span><span class="nx">ownerHash</span><span class="p">)</span> <span class="p">{</span>
+Make sure we have one.</p></div></div><div class="code"><div class="wrapper">  <span class="nx">hoodie</span><span class="p">.</span><span class="nx">account</span><span class="p">.</span><span class="nx">ownerHash</span> <span class="o">=</span> <span class="nx">hoodie</span><span class="p">.</span><span class="nx">config</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="s1">&#39;_account.ownerHash&#39;</span><span class="p">);</span>
+  <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nx">hoodie</span><span class="p">.</span><span class="nx">account</span><span class="p">.</span><span class="nx">ownerHash</span><span class="p">)</span> <span class="p">{</span>
     <span class="nx">setOwner</span><span class="p">(</span><span class="nx">hoodie</span><span class="p">.</span><span class="nx">uuid</span><span class="p">());</span>
   <span class="p">}</span>
 <span class="p">}</span></div></div></div></div></body></html>

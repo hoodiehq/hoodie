@@ -233,17 +233,17 @@ Otherwise remove it from Store.</p></div></div><div class="code"><div class="wra
       <span class="p">}</span>
       <span class="k">return</span> <span class="nx">results</span><span class="p">;</span>
     <span class="p">});</span>
-  <span class="p">};</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h2 id="validate">validate</h2></div></div></div><div class="segment"><div class="code"><div class="wrapper">  <span class="kd">function</span> <span class="nx">validate</span> <span class="p">(</span><span class="nx">type</span><span class="p">,</span> <span class="nx">id</span> <span class="cm">/*, object */</span> <span class="p">)</span> <span class="p">{</span>
+  <span class="p">};</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h2 id="validate">validate</h2></div></div></div><div class="segment"><div class="code"><div class="wrapper">  <span class="kd">function</span> <span class="nx">validate</span> <span class="p">(</span><span class="nx">object</span><span class="p">)</span> <span class="p">{</span>
 
-    <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nx">isValidType</span><span class="p">(</span><span class="nx">type</span><span class="p">))</span> <span class="p">{</span>
+    <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nx">isValidType</span><span class="p">(</span><span class="nx">object</span><span class="p">.</span><span class="nx">type</span><span class="p">))</span> <span class="p">{</span>
       <span class="k">return</span> <span class="nx">Hoodie</span><span class="p">.</span><span class="nx">Errors</span><span class="p">.</span><span class="nx">INVALID_KEY</span><span class="p">({</span>
-        <span class="nx">type</span><span class="o">:</span> <span class="nx">type</span>
+        <span class="nx">type</span><span class="o">:</span> <span class="nx">object</span><span class="p">.</span><span class="nx">type</span>
       <span class="p">});</span>
     <span class="p">}</span>
 
-    <span class="k">if</span> <span class="p">(</span><span class="nx">arguments</span><span class="p">.</span><span class="nx">length</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="o">&amp;&amp;</span> <span class="o">!</span><span class="nx">isValidId</span><span class="p">(</span><span class="nx">id</span><span class="p">))</span> <span class="p">{</span>
+    <span class="k">if</span> <span class="p">(</span><span class="nx">arguments</span><span class="p">.</span><span class="nx">length</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="o">&amp;&amp;</span> <span class="o">!</span><span class="nx">isValidId</span><span class="p">(</span><span class="nx">object</span><span class="p">.</span><span class="nx">id</span><span class="p">))</span> <span class="p">{</span>
       <span class="k">return</span> <span class="nx">Hoodie</span><span class="p">.</span><span class="nx">Errors</span><span class="p">.</span><span class="nx">INVALID_KEY</span><span class="p">({</span>
-        <span class="nx">id</span><span class="o">:</span> <span class="nx">id</span>
+        <span class="nx">id</span><span class="o">:</span> <span class="nx">object</span><span class="p">.</span><span class="nx">id</span>
       <span class="p">});</span>
     <span class="p">}</span>
   <span class="p">}</span>
@@ -592,7 +592,7 @@ no changes, e.g. 2 seconds.</li>
       <span class="nx">method</span> <span class="o">=</span> <span class="nx">methodCall</span><span class="p">[</span><span class="mi">0</span><span class="p">];</span>
       <span class="nx">args</span> <span class="o">=</span> <span class="nx">methodCall</span><span class="p">[</span><span class="mi">1</span><span class="p">];</span>
       <span class="nx">defer</span> <span class="o">=</span> <span class="nx">methodCall</span><span class="p">[</span><span class="mi">2</span><span class="p">];</span>
-      <span class="nx">store</span><span class="p">[</span><span class="nx">method</span><span class="p">].</span><span class="nx">apply</span><span class="p">(</span><span class="nx">store</span><span class="p">,</span> <span class="nx">args</span><span class="p">).</span><span class="nx">then</span><span class="p">(</span><span class="nx">defer</span><span class="p">.</span><span class="nx">resolve</span><span class="p">,</span> <span class="nx">defer</span><span class="p">.</span><span class="nx">reject</span><span class="p">);</span>
+      <span class="nx">localStore</span><span class="p">[</span><span class="nx">method</span><span class="p">].</span><span class="nx">apply</span><span class="p">(</span><span class="nx">localStore</span><span class="p">,</span> <span class="nx">args</span><span class="p">).</span><span class="nx">then</span><span class="p">(</span><span class="nx">defer</span><span class="p">.</span><span class="nx">resolve</span><span class="p">,</span> <span class="nx">defer</span><span class="p">.</span><span class="nx">reject</span><span class="p">);</span>
     <span class="p">}</span>
 
     <span class="nx">store</span><span class="p">.</span><span class="nx">trigger</span><span class="p">(</span><span class="s1">&#39;bootstrap:end&#39;</span><span class="p">);</span>
