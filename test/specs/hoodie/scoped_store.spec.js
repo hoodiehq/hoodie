@@ -1,6 +1,6 @@
 /* global hoodieScopedStoreApi:true */
 
-describe.only('hoodieScopedStoreApi', function() {
+describe('hoodieScopedStoreApi', function() {
 
   beforeEach(function() {
     this.hoodie = new Mocks.Hoodie();
