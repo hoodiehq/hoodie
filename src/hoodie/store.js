@@ -3,17 +3,36 @@
 // Store
 // ============
 
-// This class defines the API that other Stores have to implement to assure a
-// coherent API.
+// This class defines the API that hoodie.store (local store) and hoodie.open
+// (remote store) implement to assure a coherent API. It also implements some
+// basic validations.
 //
-// It also implements some validations and functionality that is the same across
-// store impnementations
+// The returned API provides the following methods:
+//
+// * validate
+// * save
+// * add
+// * find
+// * findOrAdd
+// * findAll
+// * update
+// * updateAll
+// * remove
+// * removeAll
+// * decoratePromises
+// * trigger
+// * on
+// * unbind
+//
+// At the same time, the returned API can be called as function returning a
+// store scoped by the passed type, for example
+//
+//     var taskStore = hoodie.store('task');
+//     taskStore.findAll().then( showAllTasks );
+//     taskStore.update('id123', {done: true});
 //
 
-/* jslint unused: false */
 function hoodieStoreApi(hoodie, options) {
-  // public API
-  var api = {};
 
   // persistance logic
   var backend = {};
@@ -27,6 +46,15 @@ function hoodieStoreApi(hoodie, options) {
 
   // name
   var storeName = options.name || 'store';
+
+  // scope
+  var scope = options.scope;
+
+  // public API
+  var api = function api(scope) {
+    var scopedOptions = $.extend(true, {scope: scope}, options);
+    return hoodieStoreApi(hoodie, scopedOptions);
+  };
 
 
   // Validate
@@ -42,7 +70,7 @@ function hoodieStoreApi(hoodie, options) {
   api.validate = options.validate;
 
   if (! options.validate) {
-    api.validate = function(object, options) {
+    api.validate = function(object /*, options */) {
 
       if (!object) {
         return Hoodie.Errors.INVALID_ARGUMENTS('no object passed');
@@ -80,6 +108,13 @@ function hoodieStoreApi(hoodie, options) {
   //
   api.save = function save(type, id, properties, options) {
 
+    if (scope) {
+      options = properties;
+      properties = id;
+      id = type;
+      type = scope;
+    }
+
     if ( options ) {
       options = $.extend(true, {}, options);
     } else {
@@ -105,12 +140,18 @@ function hoodieStoreApi(hoodie, options) {
   //
   api.add = function add(type, properties, options) {
 
+    if (scope) {
+      options = properties;
+      properties = type;
+      type = scope;
+    }
+
     if (properties === undefined) {
       properties = {};
     }
 
     options = options || {};
-    return api.save(type, properties.id, properties);
+    return api.save(type, properties.id, properties, options);
   };
 
 
@@ -119,6 +160,12 @@ function hoodieStoreApi(hoodie, options) {
 
   //
   api.find = function find(type, id) {
+
+    if (scope) {
+      id = type;
+      type = scope;
+    }
+
     return decoratePromise( backend.find(type, id) );
   };
 
@@ -131,7 +178,11 @@ function hoodieStoreApi(hoodie, options) {
   // 3. If not, add one and return it.
   //
   api.findOrAdd = function findOrAdd(type, id, properties) {
-    var defer;
+    if (scope) {
+      properties = id;
+      id = type;
+      type = scope;
+    }
 
     if (properties === null) {
       properties = {};
@@ -159,6 +210,12 @@ function hoodieStoreApi(hoodie, options) {
   // Can be optionally filtered by a type or a function
   //
   api.findAll = function findAll(type, options) {
+
+    if (scope) {
+      options = type;
+      type = scope;
+    }
+
     return decoratePromise( backend.findAll(type, options) );
   };
 
@@ -178,6 +235,13 @@ function hoodieStoreApi(hoodie, options) {
   // hoodie.store.update('car', 'abc4567', function(obj) { obj.sold = true })
   //
   api.update = function update(type, id, objectUpdate, options) {
+
+    if (scope) {
+      options = objectUpdate;
+      objectUpdate = id;
+      id = type;
+      type = scope;
+    }
 
     function handleFound(currentObject) {
       var changedProperties, newObj, value;
@@ -243,6 +307,12 @@ function hoodieStoreApi(hoodie, options) {
   api.updateAll = function updateAll(filterOrObjects, objectUpdate, options) {
     var promise;
 
+    if (scope) {
+      options = objectUpdate;
+      objectUpdate = filterOrObjects;
+      filterOrObjects = scope;
+    }
+
     options = options || {};
 
     // normalize the input: make sure we have all objects
@@ -295,6 +365,11 @@ function hoodieStoreApi(hoodie, options) {
   // Otherwise remove it from Store.
   //
   api.remove = function remove(type, id, options) {
+    if (scope) {
+      options = id;
+      id = type;
+      type = scope;
+    }
     return decoratePromise( backend.remove(type, id, options || {}) );
   };
 
@@ -305,6 +380,12 @@ function hoodieStoreApi(hoodie, options) {
   // Destroye all objects. Can be filtered by a type
   //
   api.removeAll = function removeAll(type, options) {
+
+    if (scope) {
+      options = type;
+      type = scope;
+    }
+
     return decoratePromise( backend.removeAll(type, options || {}) );
   };
 
@@ -324,10 +405,15 @@ function hoodieStoreApi(hoodie, options) {
 
   // proxies to hoodie.trigger
   api.trigger = function trigger() {
-    var eventName;
-    eventName = arguments[0];
+    var eventName = arguments[0];
     var parameters = 2 <= arguments.length ? Array.prototype.slice.call(arguments, 1) : [];
-    return hoodie.trigger.apply(hoodie, [storeName + ':' + eventName].concat(Array.prototype.slice.call(parameters)));
+    var prefix = storeName;
+
+    if (scope) {
+      prefix = prefix + ':' + scope;
+    }
+
+    return hoodie.trigger.apply(hoodie, [prefix + ':' + eventName].concat(Array.prototype.slice.call(parameters)));
   };
 
 
@@ -336,7 +422,13 @@ function hoodieStoreApi(hoodie, options) {
 
   // proxies to hoodie.on
   api.on = function on(eventName, data) {
-    eventName = eventName.replace(/(^| )([^ ]+)/g, '$1'+storeName+':$2');
+    var prefix = storeName;
+    if (scope) {
+      prefix = prefix + ':' + scope;
+    }
+
+    eventName = eventName.replace(/(^| )([^ ]+)/g, '$1'+prefix+':$2');
+
     return hoodie.on(eventName, data);
   };
 
@@ -346,7 +438,12 @@ function hoodieStoreApi(hoodie, options) {
 
   // proxies to hoodie.unbind
   api.unbind = function unbind(eventName, callback) {
-    eventName = eventName.replace(/(^| )([^ ]+)/g, '$1'+storeName+':$2');
+    var prefix = storeName;
+    if (scope) {
+      prefix = prefix + ':' + scope;
+    }
+
+    eventName = eventName.replace(/(^| )([^ ]+)/g, '$1'+prefix+':$2');
     return hoodie.unbind(eventName, callback);
   };
 
