@@ -1,13 +1,41 @@
-<!DOCTYPE html><html lang="en"><head><title>src/hoodie/store</title></head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0"><meta name="groc-relative-root" content="../../"><meta name="groc-document-path" content="src/hoodie/store"><meta name="groc-project-path" content="src/hoodie/store.js"><link rel="stylesheet" type="text/css" media="all" href="../../assets/style.css"><script type="text/javascript" src="../../assets/behavior.js"></script><body><div id="meta"><div class="file-path">src/hoodie/store.js</div></div><div id="document"><div class="segment"><div class="code"><div class="wrapper"><span class="cm">/* exported hoodieStoreApi */</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h1 id="store">Store</h1></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>This class defines the API that other Stores have to implement to assure a
-coherent API.</p>
+<!DOCTYPE html><html lang="en"><head><title>src/hoodie/store</title></head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0"><meta name="groc-relative-root" content="../../"><meta name="groc-document-path" content="src/hoodie/store"><meta name="groc-project-path" content="src/hoodie/store.js"><link rel="stylesheet" type="text/css" media="all" href="../../assets/style.css"><script type="text/javascript" src="../../assets/behavior.js"></script><body><div id="meta"><div class="file-path">src/hoodie/store.js</div></div><div id="document"><div class="segment"><div class="code"><div class="wrapper"><span class="cm">/* global hoodieScopedStoreApi */</span>
+<span class="cm">/* exported hoodieStoreApi */</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h1 id="store">Store</h1></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>This class defines the API that hoodie.store (local store) and hoodie.open
+(remote store) implement to assure a coherent API. It also implements some
+basic validations.</p>
 
-<p>It also implements some validations and functionality that is the same across
-store impnementations</p></div></div><div class="code"><div class="wrapper"><span class="cm">/* jslint unused: false */</span>
-<span class="kd">function</span> <span class="nx">hoodieStoreApi</span><span class="p">(</span><span class="nx">hoodie</span><span class="p">,</span> <span class="nx">options</span><span class="p">)</span> <span class="p">{</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>public API</p></div></div><div class="code"><div class="wrapper">  <span class="kd">var</span> <span class="nx">api</span> <span class="o">=</span> <span class="p">{};</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>persistance logic</p></div></div><div class="code"><div class="wrapper">  <span class="kd">var</span> <span class="nx">backend</span> <span class="o">=</span> <span class="p">{};</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>extend this property with extra functions that will be available
+<p>The returned API provides the following methods:</p>
+
+<ul>
+<li>validate</li>
+<li>save</li>
+<li>add</li>
+<li>find</li>
+<li>findOrAdd</li>
+<li>findAll</li>
+<li>update</li>
+<li>updateAll</li>
+<li>remove</li>
+<li>removeAll</li>
+<li>decoratePromises</li>
+<li>trigger</li>
+<li>on</li>
+<li>unbind</li>
+</ul>
+
+<p>At the same time, the returned API can be called as function returning a
+store scoped by the passed type, for example</p>
+
+<pre><code>var taskStore = hoodie.store('task');
+taskStore.findAll().then( showAllTasks );
+taskStore.update('id123', {done: true});
+</code></pre></div></div><div class="code"><div class="wrapper"><span class="kd">function</span> <span class="nx">hoodieStoreApi</span><span class="p">(</span><span class="nx">hoodie</span><span class="p">,</span> <span class="nx">options</span><span class="p">)</span> <span class="p">{</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>persistance logic</p></div></div><div class="code"><div class="wrapper">  <span class="kd">var</span> <span class="nx">backend</span> <span class="o">=</span> <span class="p">{};</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>extend this property with extra functions that will be available
 on all promises returned by hoodie.store API. It has a reference
 to current hoodie instance by default</p></div></div><div class="code"><div class="wrapper">  <span class="kd">var</span> <span class="nx">promiseApi</span> <span class="o">=</span> <span class="p">{</span>
     <span class="nx">hoodie</span><span class="o">:</span> <span class="nx">hoodie</span>
-  <span class="p">};</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>name</p></div></div><div class="code"><div class="wrapper">  <span class="kd">var</span> <span class="nx">storeName</span> <span class="o">=</span> <span class="nx">options</span><span class="p">.</span><span class="nx">name</span> <span class="o">||</span> <span class="s1">&#39;store&#39;</span><span class="p">;</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h2 id="validate">Validate</h2></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>by default, we only check for a valid type &amp; id.
+  <span class="p">};</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>name</p></div></div><div class="code"><div class="wrapper">  <span class="kd">var</span> <span class="nx">storeName</span> <span class="o">=</span> <span class="nx">options</span><span class="p">.</span><span class="nx">name</span> <span class="o">||</span> <span class="s1">&#39;store&#39;</span><span class="p">;</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>scope</p></div></div><div class="code"><div class="wrapper">  <span class="kd">var</span> <span class="nx">scope</span> <span class="o">=</span> <span class="nx">options</span><span class="p">.</span><span class="nx">scope</span><span class="p">;</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>public API</p></div></div><div class="code"><div class="wrapper">  <span class="kd">var</span> <span class="nx">api</span> <span class="o">=</span> <span class="kd">function</span> <span class="nx">api</span><span class="p">(</span><span class="nx">type</span><span class="p">,</span> <span class="nx">id</span><span class="p">)</span> <span class="p">{</span>
+    <span class="kd">var</span> <span class="nx">scopedOptions</span> <span class="o">=</span> <span class="nx">$</span><span class="p">.</span><span class="nx">extend</span><span class="p">(</span><span class="kc">true</span><span class="p">,</span> <span class="p">{</span><span class="nx">type</span><span class="o">:</span> <span class="nx">type</span><span class="p">,</span> <span class="nx">id</span><span class="o">:</span> <span class="nx">id</span><span class="p">},</span> <span class="nx">options</span><span class="p">);</span>
+    <span class="k">return</span> <span class="nx">hoodieScopedStoreApi</span><span class="p">(</span><span class="nx">hoodie</span><span class="p">,</span> <span class="nx">api</span><span class="p">,</span> <span class="nx">scopedOptions</span><span class="p">);</span>
+  <span class="p">};</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h2 id="validate">Validate</h2></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>by default, we only check for a valid type &amp; id.
 the validate method can be overwriten by passing
 options.validate</p>
 
@@ -15,7 +43,7 @@ options.validate</p>
 valid. Otherwise it returns an error</p></div></div><div class="code"><div class="wrapper">  <span class="nx">api</span><span class="p">.</span><span class="nx">validate</span> <span class="o">=</span> <span class="nx">options</span><span class="p">.</span><span class="nx">validate</span><span class="p">;</span>
 
   <span class="k">if</span> <span class="p">(</span><span class="o">!</span> <span class="nx">options</span><span class="p">.</span><span class="nx">validate</span><span class="p">)</span> <span class="p">{</span>
-    <span class="nx">api</span><span class="p">.</span><span class="nx">validate</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">object</span><span class="p">,</span> <span class="nx">options</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nx">api</span><span class="p">.</span><span class="nx">validate</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">object</span> <span class="cm">/*, options */</span><span class="p">)</span> <span class="p">{</span>
 
       <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nx">object</span><span class="p">)</span> <span class="p">{</span>
         <span class="k">return</span> <span class="nx">Hoodie</span><span class="p">.</span><span class="nx">Errors</span><span class="p">.</span><span class="nx">INVALID_ARGUMENTS</span><span class="p">(</span><span class="s1">&#39;no object passed&#39;</span><span class="p">);</span>
@@ -47,6 +75,13 @@ with same type &amp; id.</p>
 store.save('car', 'abc4567', {color: 'red'})
 </code></pre></div></div><div class="code"><div class="wrapper">  <span class="nx">api</span><span class="p">.</span><span class="nx">save</span> <span class="o">=</span> <span class="kd">function</span> <span class="nx">save</span><span class="p">(</span><span class="nx">type</span><span class="p">,</span> <span class="nx">id</span><span class="p">,</span> <span class="nx">properties</span><span class="p">,</span> <span class="nx">options</span><span class="p">)</span> <span class="p">{</span>
 
+    <span class="k">if</span> <span class="p">(</span><span class="nx">scope</span><span class="p">)</span> <span class="p">{</span>
+      <span class="nx">options</span> <span class="o">=</span> <span class="nx">properties</span><span class="p">;</span>
+      <span class="nx">properties</span> <span class="o">=</span> <span class="nx">id</span><span class="p">;</span>
+      <span class="nx">id</span> <span class="o">=</span> <span class="nx">type</span><span class="p">;</span>
+      <span class="nx">type</span> <span class="o">=</span> <span class="nx">scope</span><span class="p">;</span>
+    <span class="p">}</span>
+
     <span class="k">if</span> <span class="p">(</span> <span class="nx">options</span> <span class="p">)</span> <span class="p">{</span>
       <span class="nx">options</span> <span class="o">=</span> <span class="nx">$</span><span class="p">.</span><span class="nx">extend</span><span class="p">(</span><span class="kc">true</span><span class="p">,</span> <span class="p">{},</span> <span class="nx">options</span><span class="p">);</span>
     <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
@@ -58,20 +93,36 @@ store.save('car', 'abc4567', {color: 'red'})
   <span class="p">};</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h2 id="add">Add</h2></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p><code>.add</code> is an alias for <code>.save</code>, with the difference that there is no id argument.
 Internally it simply calls `.save(type, undefined, object).</p></div></div><div class="code"><div class="wrapper">  <span class="nx">api</span><span class="p">.</span><span class="nx">add</span> <span class="o">=</span> <span class="kd">function</span> <span class="nx">add</span><span class="p">(</span><span class="nx">type</span><span class="p">,</span> <span class="nx">properties</span><span class="p">,</span> <span class="nx">options</span><span class="p">)</span> <span class="p">{</span>
 
+    <span class="k">if</span> <span class="p">(</span><span class="nx">scope</span><span class="p">)</span> <span class="p">{</span>
+      <span class="nx">options</span> <span class="o">=</span> <span class="nx">properties</span><span class="p">;</span>
+      <span class="nx">properties</span> <span class="o">=</span> <span class="nx">type</span><span class="p">;</span>
+      <span class="nx">type</span> <span class="o">=</span> <span class="nx">scope</span><span class="p">;</span>
+    <span class="p">}</span>
+
     <span class="k">if</span> <span class="p">(</span><span class="nx">properties</span> <span class="o">===</span> <span class="kc">undefined</span><span class="p">)</span> <span class="p">{</span>
       <span class="nx">properties</span> <span class="o">=</span> <span class="p">{};</span>
     <span class="p">}</span>
 
     <span class="nx">options</span> <span class="o">=</span> <span class="nx">options</span> <span class="o">||</span> <span class="p">{};</span>
-    <span class="k">return</span> <span class="nx">api</span><span class="p">.</span><span class="nx">save</span><span class="p">(</span><span class="nx">type</span><span class="p">,</span> <span class="nx">properties</span><span class="p">.</span><span class="nx">id</span><span class="p">,</span> <span class="nx">properties</span><span class="p">);</span>
+    <span class="k">return</span> <span class="nx">api</span><span class="p">.</span><span class="nx">save</span><span class="p">(</span><span class="nx">type</span><span class="p">,</span> <span class="nx">properties</span><span class="p">.</span><span class="nx">id</span><span class="p">,</span> <span class="nx">properties</span><span class="p">,</span> <span class="nx">options</span><span class="p">);</span>
   <span class="p">};</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h2 id="find">find</h2></div></div></div><div class="segment"><div class="code"><div class="wrapper">  <span class="nx">api</span><span class="p">.</span><span class="nx">find</span> <span class="o">=</span> <span class="kd">function</span> <span class="nx">find</span><span class="p">(</span><span class="nx">type</span><span class="p">,</span> <span class="nx">id</span><span class="p">)</span> <span class="p">{</span>
+
+    <span class="k">if</span> <span class="p">(</span><span class="nx">scope</span><span class="p">)</span> <span class="p">{</span>
+      <span class="nx">id</span> <span class="o">=</span> <span class="nx">type</span><span class="p">;</span>
+      <span class="nx">type</span> <span class="o">=</span> <span class="nx">scope</span><span class="p">;</span>
+    <span class="p">}</span>
+
     <span class="k">return</span> <span class="nx">decoratePromise</span><span class="p">(</span> <span class="nx">backend</span><span class="p">.</span><span class="nx">find</span><span class="p">(</span><span class="nx">type</span><span class="p">,</span> <span class="nx">id</span><span class="p">)</span> <span class="p">);</span>
   <span class="p">};</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h2 id="find-or-add">find or add</h2></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><ol>
 <li>Try to find a share by given id</li>
 <li>If share could be found, return it</li>
 <li>If not, add one and return it.</li>
 </ol></div></div><div class="code"><div class="wrapper">  <span class="nx">api</span><span class="p">.</span><span class="nx">findOrAdd</span> <span class="o">=</span> <span class="kd">function</span> <span class="nx">findOrAdd</span><span class="p">(</span><span class="nx">type</span><span class="p">,</span> <span class="nx">id</span><span class="p">,</span> <span class="nx">properties</span><span class="p">)</span> <span class="p">{</span>
-    <span class="kd">var</span> <span class="nx">defer</span><span class="p">;</span>
+    <span class="k">if</span> <span class="p">(</span><span class="nx">scope</span><span class="p">)</span> <span class="p">{</span>
+      <span class="nx">properties</span> <span class="o">=</span> <span class="nx">id</span><span class="p">;</span>
+      <span class="nx">id</span> <span class="o">=</span> <span class="nx">type</span><span class="p">;</span>
+      <span class="nx">type</span> <span class="o">=</span> <span class="nx">scope</span><span class="p">;</span>
+    <span class="p">}</span>
 
     <span class="k">if</span> <span class="p">(</span><span class="nx">properties</span> <span class="o">===</span> <span class="kc">null</span><span class="p">)</span> <span class="p">{</span>
       <span class="nx">properties</span> <span class="o">=</span> <span class="p">{};</span>
@@ -88,6 +139,12 @@ that's why we need to decorate the find's promise again.</p></div></div><div cla
     <span class="k">return</span> <span class="nx">decoratePromise</span><span class="p">(</span> <span class="nx">promise</span> <span class="p">);</span>
   <span class="p">};</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h2 id="findall">findAll</h2></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>returns all objects from store.
 Can be optionally filtered by a type or a function</p></div></div><div class="code"><div class="wrapper">  <span class="nx">api</span><span class="p">.</span><span class="nx">findAll</span> <span class="o">=</span> <span class="kd">function</span> <span class="nx">findAll</span><span class="p">(</span><span class="nx">type</span><span class="p">,</span> <span class="nx">options</span><span class="p">)</span> <span class="p">{</span>
+
+    <span class="k">if</span> <span class="p">(</span><span class="nx">scope</span><span class="p">)</span> <span class="p">{</span>
+      <span class="nx">options</span> <span class="o">=</span> <span class="nx">type</span><span class="p">;</span>
+      <span class="nx">type</span> <span class="o">=</span> <span class="nx">scope</span><span class="p">;</span>
+    <span class="p">}</span>
+
     <span class="k">return</span> <span class="nx">decoratePromise</span><span class="p">(</span> <span class="nx">backend</span><span class="p">.</span><span class="nx">findAll</span><span class="p">(</span><span class="nx">type</span><span class="p">,</span> <span class="nx">options</span><span class="p">)</span> <span class="p">);</span>
   <span class="p">};</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h2 id="update">Update</h2></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>In contrast to <code>.save</code>, the <code>.update</code> method does not replace the stored object,
 but only changes the passed attributes of an exsting object, if it exists</p>
@@ -99,6 +156,13 @@ object can be passed.</p>
 
 <p>hoodie.store.update('car', 'abc4567', {sold: true})
 hoodie.store.update('car', 'abc4567', function(obj) { obj.sold = true })</p></div></div><div class="code"><div class="wrapper">  <span class="nx">api</span><span class="p">.</span><span class="nx">update</span> <span class="o">=</span> <span class="kd">function</span> <span class="nx">update</span><span class="p">(</span><span class="nx">type</span><span class="p">,</span> <span class="nx">id</span><span class="p">,</span> <span class="nx">objectUpdate</span><span class="p">,</span> <span class="nx">options</span><span class="p">)</span> <span class="p">{</span>
+
+    <span class="k">if</span> <span class="p">(</span><span class="nx">scope</span><span class="p">)</span> <span class="p">{</span>
+      <span class="nx">options</span> <span class="o">=</span> <span class="nx">objectUpdate</span><span class="p">;</span>
+      <span class="nx">objectUpdate</span> <span class="o">=</span> <span class="nx">id</span><span class="p">;</span>
+      <span class="nx">id</span> <span class="o">=</span> <span class="nx">type</span><span class="p">;</span>
+      <span class="nx">type</span> <span class="o">=</span> <span class="nx">scope</span><span class="p">;</span>
+    <span class="p">}</span>
 
     <span class="kd">function</span> <span class="nx">handleFound</span><span class="p">(</span><span class="nx">currentObject</span><span class="p">)</span> <span class="p">{</span>
       <span class="kd">var</span> <span class="nx">changedProperties</span><span class="p">,</span> <span class="nx">newObj</span><span class="p">,</span> <span class="nx">value</span><span class="p">;</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>normalize input</p></div></div><div class="code"><div class="wrapper">      <span class="nx">newObj</span> <span class="o">=</span> <span class="nx">$</span><span class="p">.</span><span class="nx">extend</span><span class="p">(</span><span class="kc">true</span><span class="p">,</span> <span class="p">{},</span> <span class="nx">currentObject</span><span class="p">);</span>
@@ -142,6 +206,12 @@ As an alternative, an array of objects can be passed</p>
 <p>hoodie.store.updateAll()</p></div></div><div class="code"><div class="wrapper">  <span class="nx">api</span><span class="p">.</span><span class="nx">updateAll</span> <span class="o">=</span> <span class="kd">function</span> <span class="nx">updateAll</span><span class="p">(</span><span class="nx">filterOrObjects</span><span class="p">,</span> <span class="nx">objectUpdate</span><span class="p">,</span> <span class="nx">options</span><span class="p">)</span> <span class="p">{</span>
     <span class="kd">var</span> <span class="nx">promise</span><span class="p">;</span>
 
+    <span class="k">if</span> <span class="p">(</span><span class="nx">scope</span><span class="p">)</span> <span class="p">{</span>
+      <span class="nx">options</span> <span class="o">=</span> <span class="nx">objectUpdate</span><span class="p">;</span>
+      <span class="nx">objectUpdate</span> <span class="o">=</span> <span class="nx">filterOrObjects</span><span class="p">;</span>
+      <span class="nx">filterOrObjects</span> <span class="o">=</span> <span class="nx">scope</span><span class="p">;</span>
+    <span class="p">}</span>
+
     <span class="nx">options</span> <span class="o">=</span> <span class="nx">options</span> <span class="o">||</span> <span class="p">{};</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>normalize the input: make sure we have all objects</p></div></div><div class="code"><div class="wrapper">    <span class="k">switch</span> <span class="p">(</span><span class="kc">true</span><span class="p">)</span> <span class="p">{</span>
     <span class="k">case</span> <span class="k">typeof</span> <span class="nx">filterOrObjects</span> <span class="o">===</span> <span class="s1">&#39;string&#39;</span><span class="o">:</span>
       <span class="nx">promise</span> <span class="o">=</span> <span class="nx">api</span><span class="p">.</span><span class="nx">findAll</span><span class="p">(</span><span class="nx">filterOrObjects</span><span class="p">);</span>
@@ -181,21 +251,38 @@ that will be resolved once all updates have been finished</p></div></div><div cl
 
 <p>when object has been synced before, mark it as deleted.
 Otherwise remove it from Store.</p></div></div><div class="code"><div class="wrapper">  <span class="nx">api</span><span class="p">.</span><span class="nx">remove</span> <span class="o">=</span> <span class="kd">function</span> <span class="nx">remove</span><span class="p">(</span><span class="nx">type</span><span class="p">,</span> <span class="nx">id</span><span class="p">,</span> <span class="nx">options</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">if</span> <span class="p">(</span><span class="nx">scope</span><span class="p">)</span> <span class="p">{</span>
+      <span class="nx">options</span> <span class="o">=</span> <span class="nx">id</span><span class="p">;</span>
+      <span class="nx">id</span> <span class="o">=</span> <span class="nx">type</span><span class="p">;</span>
+      <span class="nx">type</span> <span class="o">=</span> <span class="nx">scope</span><span class="p">;</span>
+    <span class="p">}</span>
     <span class="k">return</span> <span class="nx">decoratePromise</span><span class="p">(</span> <span class="nx">backend</span><span class="p">.</span><span class="nx">remove</span><span class="p">(</span><span class="nx">type</span><span class="p">,</span> <span class="nx">id</span><span class="p">,</span> <span class="nx">options</span> <span class="o">||</span> <span class="p">{})</span> <span class="p">);</span>
   <span class="p">};</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h2 id="removeall">removeAll</h2></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>Destroye all objects. Can be filtered by a type</p></div></div><div class="code"><div class="wrapper">  <span class="nx">api</span><span class="p">.</span><span class="nx">removeAll</span> <span class="o">=</span> <span class="kd">function</span> <span class="nx">removeAll</span><span class="p">(</span><span class="nx">type</span><span class="p">,</span> <span class="nx">options</span><span class="p">)</span> <span class="p">{</span>
+
+    <span class="k">if</span> <span class="p">(</span><span class="nx">scope</span><span class="p">)</span> <span class="p">{</span>
+      <span class="nx">options</span> <span class="o">=</span> <span class="nx">type</span><span class="p">;</span>
+      <span class="nx">type</span> <span class="o">=</span> <span class="nx">scope</span><span class="p">;</span>
+    <span class="p">}</span>
+
     <span class="k">return</span> <span class="nx">decoratePromise</span><span class="p">(</span> <span class="nx">backend</span><span class="p">.</span><span class="nx">removeAll</span><span class="p">(</span><span class="nx">type</span><span class="p">,</span> <span class="nx">options</span> <span class="o">||</span> <span class="p">{})</span> <span class="p">);</span>
   <span class="p">};</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h2 id="decorate-promises">decorate promises</h2></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>extend promises returned by store.api</p></div></div><div class="code"><div class="wrapper">  <span class="nx">api</span><span class="p">.</span><span class="nx">decoratePromises</span> <span class="o">=</span> <span class="kd">function</span> <span class="nx">decoratePromises</span><span class="p">(</span><span class="nx">methods</span><span class="p">)</span> <span class="p">{</span>
     <span class="k">return</span> <span class="nx">$</span><span class="p">.</span><span class="nx">extend</span><span class="p">(</span><span class="nx">promiseApi</span><span class="p">,</span> <span class="nx">methods</span><span class="p">);</span>
   <span class="p">};</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h2 id="trigger">trigger</h2></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>proxies to hoodie.trigger</p></div></div><div class="code"><div class="wrapper">  <span class="nx">api</span><span class="p">.</span><span class="nx">trigger</span> <span class="o">=</span> <span class="kd">function</span> <span class="nx">trigger</span><span class="p">()</span> <span class="p">{</span>
-    <span class="kd">var</span> <span class="nx">eventName</span><span class="p">;</span>
-    <span class="nx">eventName</span> <span class="o">=</span> <span class="nx">arguments</span><span class="p">[</span><span class="mi">0</span><span class="p">];</span>
+    <span class="kd">var</span> <span class="nx">eventName</span> <span class="o">=</span> <span class="nx">arguments</span><span class="p">[</span><span class="mi">0</span><span class="p">];</span>
     <span class="kd">var</span> <span class="nx">parameters</span> <span class="o">=</span> <span class="mi">2</span> <span class="o">&lt;=</span> <span class="nx">arguments</span><span class="p">.</span><span class="nx">length</span> <span class="o">?</span> <span class="nb">Array</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">slice</span><span class="p">.</span><span class="nx">call</span><span class="p">(</span><span class="nx">arguments</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span> <span class="o">:</span> <span class="p">[];</span>
-    <span class="k">return</span> <span class="nx">hoodie</span><span class="p">.</span><span class="nx">trigger</span><span class="p">.</span><span class="nx">apply</span><span class="p">(</span><span class="nx">hoodie</span><span class="p">,</span> <span class="p">[</span><span class="nx">storeName</span> <span class="o">+</span> <span class="s1">&#39;:&#39;</span> <span class="o">+</span> <span class="nx">eventName</span><span class="p">].</span><span class="nx">concat</span><span class="p">(</span><span class="nb">Array</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">slice</span><span class="p">.</span><span class="nx">call</span><span class="p">(</span><span class="nx">parameters</span><span class="p">)));</span>
+    <span class="kd">var</span> <span class="nx">prefix</span> <span class="o">=</span> <span class="nx">storeName</span><span class="p">;</span>
+
+    <span class="k">return</span> <span class="nx">hoodie</span><span class="p">.</span><span class="nx">trigger</span><span class="p">.</span><span class="nx">apply</span><span class="p">(</span><span class="nx">hoodie</span><span class="p">,</span> <span class="p">[</span><span class="nx">prefix</span> <span class="o">+</span> <span class="s1">&#39;:&#39;</span> <span class="o">+</span> <span class="nx">eventName</span><span class="p">].</span><span class="nx">concat</span><span class="p">(</span><span class="nb">Array</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">slice</span><span class="p">.</span><span class="nx">call</span><span class="p">(</span><span class="nx">parameters</span><span class="p">)));</span>
   <span class="p">};</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h2 id="on">on</h2></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>proxies to hoodie.on</p></div></div><div class="code"><div class="wrapper">  <span class="nx">api</span><span class="p">.</span><span class="nx">on</span> <span class="o">=</span> <span class="kd">function</span> <span class="nx">on</span><span class="p">(</span><span class="nx">eventName</span><span class="p">,</span> <span class="nx">data</span><span class="p">)</span> <span class="p">{</span>
-    <span class="nx">eventName</span> <span class="o">=</span> <span class="nx">eventName</span><span class="p">.</span><span class="nx">replace</span><span class="p">(</span><span class="sr">/(^| )([^ ]+)/g</span><span class="p">,</span> <span class="s1">&#39;$1&#39;</span><span class="o">+</span><span class="nx">storeName</span><span class="o">+</span><span class="s1">&#39;:$2&#39;</span><span class="p">);</span>
+    <span class="kd">var</span> <span class="nx">prefix</span> <span class="o">=</span> <span class="nx">storeName</span><span class="p">;</span>
+
+    <span class="nx">eventName</span> <span class="o">=</span> <span class="nx">eventName</span><span class="p">.</span><span class="nx">replace</span><span class="p">(</span><span class="sr">/(^| )([^ ]+)/g</span><span class="p">,</span> <span class="s1">&#39;$1&#39;</span><span class="o">+</span><span class="nx">prefix</span><span class="o">+</span><span class="s1">&#39;:$2&#39;</span><span class="p">);</span>
+
     <span class="k">return</span> <span class="nx">hoodie</span><span class="p">.</span><span class="nx">on</span><span class="p">(</span><span class="nx">eventName</span><span class="p">,</span> <span class="nx">data</span><span class="p">);</span>
   <span class="p">};</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h2 id="unbind">unbind</h2></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>proxies to hoodie.unbind</p></div></div><div class="code"><div class="wrapper">  <span class="nx">api</span><span class="p">.</span><span class="nx">unbind</span> <span class="o">=</span> <span class="kd">function</span> <span class="nx">unbind</span><span class="p">(</span><span class="nx">eventName</span><span class="p">,</span> <span class="nx">callback</span><span class="p">)</span> <span class="p">{</span>
-    <span class="nx">eventName</span> <span class="o">=</span> <span class="nx">eventName</span><span class="p">.</span><span class="nx">replace</span><span class="p">(</span><span class="sr">/(^| )([^ ]+)/g</span><span class="p">,</span> <span class="s1">&#39;$1&#39;</span><span class="o">+</span><span class="nx">storeName</span><span class="o">+</span><span class="s1">&#39;:$2&#39;</span><span class="p">);</span>
+    <span class="kd">var</span> <span class="nx">prefix</span> <span class="o">=</span> <span class="nx">storeName</span><span class="p">;</span>
+
+    <span class="nx">eventName</span> <span class="o">=</span> <span class="nx">eventName</span><span class="p">.</span><span class="nx">replace</span><span class="p">(</span><span class="sr">/(^| )([^ ]+)/g</span><span class="p">,</span> <span class="s1">&#39;$1&#39;</span><span class="o">+</span><span class="nx">prefix</span><span class="o">+</span><span class="s1">&#39;:$2&#39;</span><span class="p">);</span>
     <span class="k">return</span> <span class="nx">hoodie</span><span class="p">.</span><span class="nx">unbind</span><span class="p">(</span><span class="nx">eventName</span><span class="p">,</span> <span class="nx">callback</span><span class="p">);</span>
   <span class="p">};</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h2 id="required-backend-methods">required backend methods</h2></div></div></div><div class="segment"><div class="code"><div class="wrapper">  <span class="k">if</span> <span class="p">(</span><span class="o">!</span> <span class="nx">options</span><span class="p">.</span><span class="nx">backend</span> <span class="p">)</span> <span class="p">{</span>
     <span class="k">throw</span> <span class="k">new</span> <span class="nb">Error</span><span class="p">(</span><span class="s1">&#39;options.backend must be passed&#39;</span><span class="p">);</span>

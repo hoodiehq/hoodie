@@ -1124,6 +1124,32 @@ f.event={add:function(a,c,d,e,g){var h,i,j,k,l,m,n,o,p,q,r,s;if(!(a.nodeType===3
                   "singleLineComment": ["//"],
                   "name": "JavaScript"
                 },
+                "sourcePath": "/Users/gregor/JavaScripts/hood.ie/hoodie.js/src/hoodie/scoped_store.js",
+                "projectPath": "src/hoodie/scoped_store.js",
+                "targetPath": "src/hoodie/scoped_store",
+                "title": "scoped_store"
+              },
+              "depth": 3,
+              "outline": [
+                {
+                  "type": "heading",
+                  "data": {
+                    "level": 1,
+                    "title": "scoped Store",
+                    "slug": "scoped-store"
+                  },
+                  "depth": 1
+                }
+              ]
+            }, {
+              "type": "file",
+              "data": {
+                "language": {
+                  "nameMatchers": [".js"],
+                  "pygmentsLexer": "javascript",
+                  "singleLineComment": ["//"],
+                  "name": "JavaScript"
+                },
                 "sourcePath": "/Users/gregor/JavaScripts/hood.ie/hoodie.js/src/hoodie/store.js",
                 "projectPath": "src/hoodie/store.js",
                 "targetPath": "src/hoodie/store",
