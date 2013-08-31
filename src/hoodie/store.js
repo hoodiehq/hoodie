@@ -1,3 +1,4 @@
+/* global hoodieScopedStoreApi */
 /* exported hoodieStoreApi */
 
 // Store
@@ -51,9 +52,9 @@ function hoodieStoreApi(hoodie, options) {
   var scope = options.scope;
 
   // public API
-  var api = function api(scope) {
-    var scopedOptions = $.extend(true, {scope: scope}, options);
-    return hoodieStoreApi(hoodie, scopedOptions);
+  var api = function api(type, id) {
+    var scopedOptions = $.extend(true, {type: type, id: id}, options);
+    return hoodieScopedStoreApi(hoodie, api, scopedOptions);
   };
 
 
@@ -409,10 +410,6 @@ function hoodieStoreApi(hoodie, options) {
     var parameters = 2 <= arguments.length ? Array.prototype.slice.call(arguments, 1) : [];
     var prefix = storeName;
 
-    if (scope) {
-      prefix = prefix + ':' + scope;
-    }
-
     return hoodie.trigger.apply(hoodie, [prefix + ':' + eventName].concat(Array.prototype.slice.call(parameters)));
   };
 
@@ -423,9 +420,6 @@ function hoodieStoreApi(hoodie, options) {
   // proxies to hoodie.on
   api.on = function on(eventName, data) {
     var prefix = storeName;
-    if (scope) {
-      prefix = prefix + ':' + scope;
-    }
 
     eventName = eventName.replace(/(^| )([^ ]+)/g, '$1'+prefix+':$2');
 
@@ -439,9 +433,6 @@ function hoodieStoreApi(hoodie, options) {
   // proxies to hoodie.unbind
   api.unbind = function unbind(eventName, callback) {
     var prefix = storeName;
-    if (scope) {
-      prefix = prefix + ':' + scope;
-    }
 
     eventName = eventName.replace(/(^| )([^ ]+)/g, '$1'+prefix+':$2');
     return hoodie.unbind(eventName, callback);

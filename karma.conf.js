@@ -31,6 +31,7 @@ module.exports = function(config) {
       'src/hoodie/open.js',
 
       'src/hoodie/store.js',
+      'src/hoodie/scoped_store.js',
       'src/hoodie/remote_store.js',
       'src/hoodie/local_store.js',
       'src/hoodie/config.js',
