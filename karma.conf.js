@@ -53,6 +53,7 @@ module.exports = function(config) {
       'test/specs/hoodie/promises.spec.js',
       'test/specs/hoodie/request.spec.js',
       'test/specs/hoodie/store.spec.js',
+      'test/specs/hoodie/scoped_store.spec.js',
       'test/specs/hoodie/remote_store.spec.js',
       'test/specs/hoodie/uuid.spec.js',
       'test/specs/hoodie/account_remote.spec.js'
