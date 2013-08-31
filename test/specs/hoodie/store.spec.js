@@ -19,6 +19,117 @@ describe('hoodieStoreApi', function() {
     expect(this.store.validate).to.be.a(Function);
   });
 
+  it('returns a function', function() {
+    expect(this.store).to.be.a(Function);
+  });
+
+  describe('store("task", "id")', function() {
+    beforeEach( function() {
+      this.sandbox.stub(window, 'hoodieScopedStoreApi').returns('scoped api');
+    });
+
+    it('returns scoped API by type when only type set', function() {
+      this.taskStore = this.store('task');
+      expect(window.hoodieScopedStoreApi).to.be.called();
+      var args = window.hoodieScopedStoreApi.args[0];
+      expect(args[0]).to.eql(this.hoodie);
+      expect(args[1]).to.eql(this.store);
+      expect(args[2].type).to.be('task');
+      expect(args[2].id).to.be(undefined);
+      expect(this.taskStore).to.eql('scoped api');
+    });
+
+    it('returns scoped API by type & id when both set', function() {
+      this.taskStore = this.store('task', '123');
+      var args = window.hoodieScopedStoreApi.args[0];
+      expect(args[0]).to.eql(this.hoodie);
+      expect(args[1]).to.eql(this.store);
+      expect(args[2].type).to.be('task');
+      expect(args[2].id).to.be('123');
+    });
+
+    // it('scopes save method to type "task"', function() {
+    //   this.taskStore.save('abc', {title: 'milk!'}, { option: 'some value'});
+    //   expect(this.options.backend.save).to.be.calledWith({type: 'task', id: 'abc', title: 'milk!'}, { option: 'some value'});
+    // });
+
+    // it('scopes add method to type "task"', function() {
+    //   this.sandbox.spy(this.store, 'save');
+    //   this.taskStore.add({title: 'milk!'}, { option: 'some value'});
+    //   expect(this.store.save).to.be.calledWith('task', undefined, { title: 'milk!'}, { option: 'some value'});
+    // });
+
+    // it('scopes find method to type "task"', function() {
+    //   this.taskStore.find('abc');
+    //   expect(this.options.backend.find).to.be.calledWith('task', 'abc');
+    // });
+
+    // it('scopes findOrAdd method to type "task"', function() {
+    //   var promise = this.hoodie.defer().reject().promise();
+    //   this.sandbox.stub(this.store, 'find').returns(promise);
+    //   this.sandbox.spy(this.store, 'add');
+
+    //   this.taskStore.findOrAdd('abc', { title: 'Nutella' });
+    //   expect(this.store.find).to.be.calledWith('task', 'abc');
+    //   expect(this.store.add).to.be.calledWith('task', { id: 'abc', title: 'Nutella' });
+    // });
+
+    // it('scopes findAll method to type "task"', function() {
+    //   this.taskStore.findAll({option: 'value'});
+    //   expect(this.options.backend.findAll).to.be.calledWith('task', {option: 'value'});
+    // });
+
+    // it('scopes update method to type "task"', function() {
+    //   var promise = this.hoodie.defer().reject().promise();
+    //   this.sandbox.stub(this.store, 'find').returns(promise);
+    //   this.sandbox.spy(this.store, 'save');
+
+    //   this.taskStore.update('abc', { title: 'Nutella' }, {option: 'value'});
+    //   expect(this.store.find).to.be.calledWith('task', 'abc');
+    //   expect(this.store.save).to.be.calledWith('task', 'abc', { title: 'Nutella' }, {option: 'value'});
+    // });
+
+    // it('scopes updateAll method to type "task"', function() {
+    //   var promise = this.hoodie.defer().resolve([{ type: 'task', id: 'abc', title: 'Nutella' }]).promise();
+    //   this.sandbox.stub(this.store, 'findAll').returns(promise);
+    //   this.sandbox.spy(this.store, 'update');
+
+    //   this.taskStore.updateAll({ title: '2 × Nutella' }, {option: 'value'});
+    //   expect(this.store.findAll).to.be.calledWith('task');
+    //   expect(this.store.update).to.be.calledWith('task', 'abc', { title: '2 × Nutella' }, {option: 'value'});
+    // });
+
+    // it('scopes remove method to type "task"', function() {
+    //   this.taskStore.remove('abc', {option: 'value'});
+    //   expect(this.options.backend.remove).to.be.calledWith('task', 'abc', {option: 'value'});
+    // });
+
+    // it('scopes removeAll method to type "task"', function() {
+    //   this.taskStore.removeAll({option: 'value'});
+    //   expect(this.options.backend.removeAll).to.be.calledWith('task', {option: 'value'});
+    // });
+
+    // it('scopes trigger method to type "task"', function() {
+    //   this.sandbox.spy(this.hoodie, 'trigger');
+    //   this.taskStore.trigger('event');
+    //   expect(this.hoodie.trigger).to.be.calledWith('funkstore:task:event');
+    // });
+
+    // it('scopes on method to type "task"', function() {
+    //   this.sandbox.spy(this.hoodie, 'on');
+    //   var callback = function() {};
+    //   this.taskStore.on('event1 event2', callback);
+    //   expect(this.hoodie.on).to.be.calledWith('funkstore:task:event1 funkstore:task:event2', callback);
+    // });
+
+    // it('scopes unbind method to type "task"', function() {
+    //   this.sandbox.spy(this.hoodie, 'unbind');
+    //   var callback = function() {};
+    //   this.taskStore.unbind('event1 event2', callback);
+    //   expect(this.hoodie.unbind).to.be.calledWith('funkstore:task:event1 funkstore:task:event2', callback);
+    // });
+  });
+
   describe('#validate(object, options)', function() {
     beforeEach(function() {
       this.object = {

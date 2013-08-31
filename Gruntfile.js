@@ -49,6 +49,7 @@ module.exports = function(grunt) {
           'src/hoodie/open.js',
 
           'src/hoodie/store.js',
+          'src/hoodie/scoped_store.js',
           'src/hoodie/errors.js',
           'src/hoodie/remote_store.js',
 

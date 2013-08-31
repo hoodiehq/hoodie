@@ -31,6 +31,7 @@ module.exports = function(config) {
       'src/hoodie/open.js',
 
       'src/hoodie/store.js',
+      'src/hoodie/scoped_store.js',
       'src/hoodie/remote_store.js',
       'src/hoodie/local_store.js',
       'src/hoodie/config.js',
@@ -52,6 +53,7 @@ module.exports = function(config) {
       'test/specs/hoodie/promises.spec.js',
       'test/specs/hoodie/request.spec.js',
       'test/specs/hoodie/store.spec.js',
+      'test/specs/hoodie/scoped_store.spec.js',
       'test/specs/hoodie/remote_store.spec.js',
       'test/specs/hoodie/uuid.spec.js',
       'test/specs/hoodie/account_remote.spec.js'
