@@ -24,9 +24,8 @@ function Hoodie(baseUrl) {
     throw new Error('usage: new Hoodie(url);');
   }
 
-  if (!baseUrl) {
-    hoodie.baseUrl = '/_api'; // default to current domain
-  } else {
+  if (baseUrl) {
+    // remove trailing slashes
     hoodie.baseUrl = baseUrl.replace(/\/+$/, '');
   }
 

@@ -27,9 +27,9 @@ describe('hoodie.request', function () {
       this.hoodie.request('GET', '/');
       this.args = window.jQuery.ajax.args[0][0];
     });
-    it('should send a GET request to http://my.cou.ch/', function() {
+    it('should send a GET request to http://my.cou.ch/_api/', function() {
       expect(this.args.type).to.be('GET');
-      expect(this.args.url).to.be('http://my.cou.ch/');
+      expect(this.args.url).to.be('http://my.cou.ch/_api/');
     });
     it('should set `dataType: \'json\'', function() {
       expect(this.args.dataType).to.be('json');
@@ -44,11 +44,17 @@ describe('hoodie.request', function () {
       expect(this.args.crossDomain).to.be(true);
     });
 
-    _and('baseUrl is relative', function() {
+    _and('baseUrl is not set', function() {
       beforeEach(function() {
-        this.hoodie.baseUrl = '/_api';
+        this.hoodie.baseUrl = undefined;
+        hoodieRequest(this.hoodie);
         this.hoodie.request('GET', '/');
         this.args = window.jQuery.ajax.args[1][0];
+      });
+
+      it('should send a GET request prefixed by /_api', function() {
+        expect(this.args.type).to.be('GET');
+        expect(this.args.url).to.be('/_api/');
       });
 
       it('should not set CORS headers', function() {
@@ -68,9 +74,9 @@ describe('hoodie.request', function () {
       });
       this.args = args = window.jQuery.ajax.args[0][0];
     });
-    it('should send a POST request to http://my.cou.ch/test', function() {
+    it('should send a POST request to http://my.cou.ch/_api/test', function() {
       expect(this.args.type).to.be('POST');
-      expect(this.args.url).to.be('http://my.cou.ch/test');
+      expect(this.args.url).to.be('http://my.cou.ch/_api/test');
     });
   });
 
