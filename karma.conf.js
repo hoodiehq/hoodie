@@ -38,6 +38,7 @@ module.exports = function(config) {
       'src/hoodie/account.js',
       'src/hoodie/account_remote.js',
       'src/hoodie/errors.js',
+      'src/hoodie/task.js',
 
       'test/mocks/*.js',
 
@@ -56,7 +57,8 @@ module.exports = function(config) {
       'test/specs/hoodie/scoped_store.spec.js',
       'test/specs/hoodie/remote_store.spec.js',
       'test/specs/hoodie/uuid.spec.js',
-      'test/specs/hoodie/account_remote.spec.js'
+      'test/specs/hoodie/account_remote.spec.js',
+      'test/specs/hoodie/task.spec.js'
 
       // these need to be fixed
 
