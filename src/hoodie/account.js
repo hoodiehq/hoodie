@@ -1,4 +1,5 @@
 /* exported hoodieAccount */
+/* global hoodieEvents */
 
 // Hoodie.Account
 // ================
@@ -21,6 +22,8 @@ function hoodieAccount (hoodie) {
   // default couchDB user doc prefix
   var userDocPrefix = 'org.couchdb.user';
 
+  // add events API
+  hoodieEvents(hoodie, { context: account, namespace: 'account'});
 
   // Authenticate
   // --------------
@@ -252,32 +255,6 @@ function hoodieAccount (hoodie) {
     }
     hoodie.remote.disconnect();
     return sendSignOutRequest().then(cleanupAndTriggerSignOut);
-  };
-
-
-  // On
-  // ---
-
-  // shortcut for `hoodie.on`
-  //
-  account.on = function on(eventName, cb) {
-    eventName = eventName.replace(/(^| )([^ ]+)/g, '$1account:$2');
-    return hoodie.on(eventName, cb);
-  };
-
-
-  // Trigger
-  // ---
-
-  // shortcut for `hoodie.trigger`
-  //
-  account.trigger = function trigger() {
-    var eventName, parameters;
-
-    eventName = arguments[0],
-    parameters = 2 <= arguments.length ? Array.prototype.slice.call(arguments, 1) : [];
-
-    hoodie.trigger.apply(hoodie, ['account:' + eventName].concat(Array.prototype.slice.call(parameters)));
   };
 
 
