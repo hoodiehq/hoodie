@@ -100,7 +100,7 @@ Mocks.Hoodie = function () {
     config: {
       set: function () {},
       get: function () {},
-      remove: function () {},
+      unset: function () {},
       clear: function () {}
     },
     remote: {

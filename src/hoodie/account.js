@@ -190,7 +190,7 @@ function hoodieAccount (hoodie) {
   }
 
   function removeAnonymousPassword() {
-    return hoodie.config.remove(anonymousPasswordKey);
+    return hoodie.config.unset(anonymousPasswordKey);
   }
 
 
@@ -749,7 +749,7 @@ function hoodieAccount (hoodie) {
   //
   function handlePasswordResetStatusRequestError(xhr) {
     if (xhr.status === 401) {
-      hoodie.config.remove('_account.resetPasswordId');
+      hoodie.config.unset('_account.resetPasswordId');
       account.trigger('passwordreset');
 
       return hoodie.resolve();

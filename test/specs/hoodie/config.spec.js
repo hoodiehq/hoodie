@@ -45,11 +45,11 @@ describe('Hoodie.Config', function() {
 
   });
 
-  describe('#remove(key)', function() {
+  describe('#unset(key)', function() {
 
-    it('should remove the config using store', function() {
+    it('should unset the config using store', function() {
       this.config.set('funky', 'fresh');
-      this.config.remove('funky');
+      this.config.unset('funky');
 
       expect(this.updateSpy.calledWith('$config', 'hoodie', {
         funky: void 0
