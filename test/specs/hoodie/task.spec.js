@@ -1,10 +1,18 @@
-/* global hoodieOpen:true */
+/* global hoodieTask */
 
 describe('hoodie.task', function() {
 
   beforeEach(function() {
     this.hoodie = new Mocks.Hoodie();
-    hoodieOpen(this.hoodie);
+    this.sandbox.spy(window, 'hoodieEvents');
+    hoodieTask(this.hoodie);
+  });
+
+  it('should add events API', function() {
+    expect(window.hoodieEvents).to.be.calledWith(this.hoodie, {
+      context: this.hoodie.task,
+      namespace: 'task'
+    });
   });
 
   describe('#start()', function() {
@@ -41,24 +49,6 @@ describe('hoodie.task', function() {
 
     it('should be funky', function() {
       expect(this.hoodie.task.remove).to.be('funky');
-    });
-  });
-  describe('#on()', function() {
-    beforeEach(function() {
-
-    });
-
-    it('should be funky', function() {
-      expect(this.hoodie.task.on).to.be('funky');
-    });
-  });
-  describe('#unbind()', function() {
-    beforeEach(function() {
-
-    });
-
-    it('should be funky', function() {
-      expect(this.hoodie.task.unbind).to.be('funky');
     });
   });
 });

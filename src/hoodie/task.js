@@ -1,4 +1,5 @@
 /* exported hoodieTask */
+/* global hoodieEvents */
 
 // Tasks
 // ============
@@ -22,11 +23,13 @@
 //     emailTasks.cancel('id123');
 //
 
-function hoodieTask(hoodie, options) {
+function hoodieTask(hoodie) {
 
   // public API
   var api = {};
 
+  // add events API
+  hoodieEvents(hoodie, { context: api, namespace: 'task' });
 
   //
   api.start = function() {
@@ -58,5 +61,5 @@ function hoodieTask(hoodie, options) {
 
   };
 
-  return api;
+  hoodie.task = api;
 }
