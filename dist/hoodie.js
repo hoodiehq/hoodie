@@ -3077,13 +3077,13 @@ function hoodieConfig(hoodie) {
     return hoodie.store.remove(type, id);
   };
 
-  // remove
+  // unset
   // ----------
 
-  // removes a configuration, is a simple alias for config.set(key, undefined)
+  // unsets a configuration, is a simple alias for config.set(key, undefined)
   //
-  config.remove = function remove(key) {
-    return config.set(key, void 0);
+  config.unset = function unset(key) {
+    return config.set(key, undefined);
   };
 
   // load cache
@@ -3289,7 +3289,7 @@ function hoodieAccount (hoodie) {
   }
 
   function removeAnonymousPassword() {
-    return hoodie.config.remove(anonymousPasswordKey);
+    return hoodie.config.unset(anonymousPasswordKey);
   }
 
 
@@ -3848,7 +3848,7 @@ function hoodieAccount (hoodie) {
   //
   function handlePasswordResetStatusRequestError(xhr) {
     if (xhr.status === 401) {
-      hoodie.config.remove('_account.resetPasswordId');
+      hoodie.config.unset('_account.resetPasswordId');
       account.trigger('passwordreset');
 
       return hoodie.resolve();
