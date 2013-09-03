@@ -32,12 +32,12 @@ function hoodieTask(hoodie) {
   hoodieEvents(hoodie, { context: api, namespace: 'task' });
 
   //
-  api.start = function() {
-
+  api.start = function(type, properties) {
+    return hoodie.store.add('$'+type, properties).then(handleNewTask);
   };
 
   //
-  api.cancel = function() {
+  api.cancel = function(type, id) {
 
   };
 
@@ -61,5 +61,28 @@ function hoodieTask(hoodie) {
 
   };
 
+
+  // Private
+  // -------
+
+  //
+  function handleNewTask(object) {
+    var defer = hoodie.defer();
+    var suffix = ':' + object.type + ':' + object.id;
+
+    hoodie.store.on('remove'+suffix, function(object) {
+      if(object.finishedAt) {
+        return defer.resolve(object);
+      }
+
+      // manually removed / cancelled
+      defer.reject(object);
+    });
+    hoodie.store.on('error'+suffix, defer.reject);
+
+    return defer.promise();
+  }
+
+  // extend hoodie
   hoodie.task = api;
 }
