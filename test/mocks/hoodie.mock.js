@@ -15,7 +15,7 @@ Mocks.Hoodie = function () {
   var events = {};
   hoodieEvents(events);
 
-  var api = {
+  return {
     baseUrl: 'http://my.cou.ch',
     trigger: events.trigger,
     request: function () {},
@@ -47,7 +47,46 @@ Mocks.Hoodie = function () {
       var _ref;
       return (_ref = $.Deferred()).reject.apply(_ref, arguments).promise();
     },
-    store: Mocks.StoreApi(),
+    store: {
+      add: function () {
+        return promiseMock;
+      },
+      remove: function () {
+        return promiseMock;
+      },
+      save: function () {
+        return promiseMock;
+      },
+      update: function () {
+        return promiseMock;
+      },
+      updateAll: function () {
+        return promiseMock;
+      },
+      find: function () {
+        return promiseMock;
+      },
+      findAll: function () {
+        return promiseMock;
+      },
+      findOrAdd: function () {
+        return promiseMock;
+      },
+      removeAll: function () {
+        return promiseMock;
+      },
+      index: function () {
+        return [];
+      },
+      changedObjects: function () { return []; },
+      hasLocalChanges: function () {},
+      decoratePromises: function () {},
+      db: {
+        getItem: function () {},
+        setItem: function () {},
+        removeItem: function () {}
+      }
+    },
     account: {
       authenticate: function () {
         return promiseMock;
@@ -61,7 +100,7 @@ Mocks.Hoodie = function () {
     config: {
       set: function () {},
       get: function () {},
-      unset: function () {},
+      remove: function () {},
       clear: function () {}
     },
     remote: {
@@ -105,6 +144,4 @@ Mocks.Hoodie = function () {
       }
     }
   };
-
-  return api;
 };

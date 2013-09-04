@@ -1,37 +1,31 @@
 var Mocks = window.Mocks || {};
 Mocks.StoreApi = function () {
+  var api = {
+    trigger: sinon.stub(),
+    on: sinon.stub(),
+    one: sinon.stub(),
+    unbind: sinon.stub()
+  };
 
-  var o = { api: function() {} };
+  api.saveDefer = $.Deferred();
+  api.addDefer = $.Deferred();
+  api.findOrAddDefer = $.Deferred();
+  api.findDefer = $.Deferred();
+  api.findAllDefer = $.Deferred();
+  api.updateDefer = $.Deferred();
+  api.updateAllDefer = $.Deferred();
+  api.removeDefer = $.Deferred();
+  api.removeAllDefer = $.Deferred();
 
+  api.save = sinon.stub().returns(api.saveDefer.promise());
+  api.add = sinon.stub().returns(api.addDefer.promise());
+  api.findOrAdd = sinon.stub().returns(api.findOrAddDefer.promise());
+  api.find = sinon.stub().returns(api.findDefer.promise());
+  api.findAll = sinon.stub().returns(api.findAllDefer.promise());
+  api.update = sinon.stub().returns(api.updateDefer.promise());
+  api.updateAll = sinon.stub().returns(api.updateAllDefer.promise());
+  api.remove = sinon.stub().returns(api.removeDefer.promise());
+  api.removeAll = sinon.stub().returns(api.removeAllDefer.promise());
 
-  o.api.trigger = sinon.stub();
-  o.api.on = sinon.stub();
-  o.api.one = sinon.stub();
-  o.api.unbind = sinon.stub();
-
-  o.api.saveDefer = $.Deferred();
-  o.api.addDefer = $.Deferred();
-  o.api.findOrAddDefer = $.Deferred();
-  o.api.findDefer = $.Deferred();
-  o.api.findAllDefer = $.Deferred();
-  o.api.updateDefer = $.Deferred();
-  o.api.updateAllDefer = $.Deferred();
-  o.api.removeDefer = $.Deferred();
-  o.api.removeAllDefer = $.Deferred();
-
-  o.api.save = sinon.stub().returns(o.api.saveDefer.promise());
-  o.api.add = sinon.stub().returns(o.api.addDefer.promise());
-  o.api.findOrAdd = sinon.stub().returns(o.api.findOrAddDefer.promise());
-  o.api.find = sinon.stub().returns(o.api.findDefer.promise());
-  o.api.findAll = sinon.stub().returns(o.api.findAllDefer.promise());
-  o.api.update = sinon.stub().returns(o.api.updateDefer.promise());
-  o.api.updateAll = sinon.stub().returns(o.api.updateAllDefer.promise());
-  o.api.remove = sinon.stub().returns(o.api.removeDefer.promise());
-  o.api.removeAll = sinon.stub().returns(o.api.removeAllDefer.promise());
-
-  sinon.stub(o, 'api', function() {
-    return o.api;
-  });
-
-  return o.api;
+  return api;
 };
