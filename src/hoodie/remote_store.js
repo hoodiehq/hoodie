@@ -179,7 +179,7 @@ function hoodieRemoteStore (hoodie, options) {
   // CouchDB database and is also used to prefix
   // triggered events
   //
-  remoteName = null;
+  var remoteName = null;
 
 
   // sync
@@ -280,7 +280,10 @@ function hoodieRemoteStore (hoodie, options) {
   // start syncing. `remote.bootstrap()` will automatically start
   // pulling when `remote.connected` remains true.
   //
-  remote.connect = function connect() {
+  remote.connect = function connect(name) {
+    if (name) {
+      remoteName = name;
+    }
     remote.connected = true;
     remote.trigger('connect'); // TODO: spec that
     return remote.bootstrap();

@@ -125,11 +125,9 @@ describe('hoodie.remote', function() {
       expect(this.events['account:signin']).to.be.a(Function);
     });
     it('connects to db on account:signin', function() {
-      expect(this.remote.name).to.be(undefined);
       this.hoodie.account.db.returns('dbName');
       this.events['account:signin'](123);
-      expect(this.remote.name).to.be('dbName');
-      expect(this.remote.connect).to.be.called();
+      expect(this.remote.connect).to.be.calledWith('dbName');
     });
 
     it('subscribes to account:reauthenticated', function() {

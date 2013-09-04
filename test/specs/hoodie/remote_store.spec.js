@@ -398,6 +398,14 @@ describe('hoodieRemoteStore', function() {
       this.remote.connect();
       expect(this.remote.bootstrap.called).to.be.ok();
     });
+
+    it('should set new name if passed as param', function() {
+      this.remote.request('GET', '/funk');
+      expect(this.hoodie.request).to.be.calledWith('GET', '/my%2Fstore/funk', { 'contentType': 'application/json' });
+      this.remote.connect('funky/store');
+      this.remote.request('GET', '/funk');
+      expect(this.hoodie.request).to.be.calledWith('GET', '/funky%2Fstore/funk', { 'contentType': 'application/json' });
+    });
   }); // #connect
 
   describe('#disconnect()', function() {
