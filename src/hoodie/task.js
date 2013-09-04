@@ -68,17 +68,28 @@ function hoodieTask(hoodie) {
   //
   function handleNewTask(object) {
     var defer = hoodie.defer();
-    var suffix = ':' + object.type + ':' + object.id;
+    var taskStore = hoodie.store(object.type, object.id);
 
-    hoodie.store.on('remove'+suffix, function(object) {
+    taskStore.on('remove', function(object) {
+
+      // remove "$" from type
+      object.type = object.type.substr(1);
+
+      // task finished by worker.
       if(object.finishedAt) {
         return defer.resolve(object);
       }
 
-      // manually removed / cancelled
+      // manually removed / cancelled.
       defer.reject(object);
     });
-    hoodie.store.on('error'+suffix, defer.reject);
+    taskStore.on('error', function(error, object) {
+
+      // remove "$" from type
+      object.type = object.type.substr(1);
+
+      defer.reject(error, object);
+    });
 
     return defer.promise();
   }
