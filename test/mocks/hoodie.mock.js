@@ -15,7 +15,7 @@ Mocks.Hoodie = function () {
   var events = {};
   hoodieEvents(events);
 
-  return {
+  var api = {
     baseUrl: 'http://my.cou.ch',
     trigger: events.trigger,
     request: function () {},
@@ -47,46 +47,7 @@ Mocks.Hoodie = function () {
       var _ref;
       return (_ref = $.Deferred()).reject.apply(_ref, arguments).promise();
     },
-    store: {
-      add: function () {
-        return promiseMock;
-      },
-      remove: function () {
-        return promiseMock;
-      },
-      save: function () {
-        return promiseMock;
-      },
-      update: function () {
-        return promiseMock;
-      },
-      updateAll: function () {
-        return promiseMock;
-      },
-      find: function () {
-        return promiseMock;
-      },
-      findAll: function () {
-        return promiseMock;
-      },
-      findOrAdd: function () {
-        return promiseMock;
-      },
-      removeAll: function () {
-        return promiseMock;
-      },
-      index: function () {
-        return [];
-      },
-      changedObjects: function () { return []; },
-      hasLocalChanges: function () {},
-      decoratePromises: function () {},
-      db: {
-        getItem: function () {},
-        setItem: function () {},
-        removeItem: function () {}
-      }
-    },
+    store: function() {},
     account: {
       authenticate: function () {
         return promiseMock;
@@ -144,4 +105,48 @@ Mocks.Hoodie = function () {
       }
     }
   };
+
+  var storeApi = {
+    add: function () {
+      return promiseMock;
+    },
+    remove: function () {
+      return promiseMock;
+    },
+    save: function () {
+      return promiseMock;
+    },
+    update: function () {
+      return promiseMock;
+    },
+    updateAll: function () {
+      return promiseMock;
+    },
+    find: function () {
+      return promiseMock;
+    },
+    findAll: function () {
+      return promiseMock;
+    },
+    findOrAdd: function () {
+      return promiseMock;
+    },
+    removeAll: function () {
+      return promiseMock;
+    },
+    index: function () {
+      return [];
+    },
+    changedObjects: function () { return []; },
+    hasLocalChanges: function () {},
+    decoratePromises: function () {}
+  };
+
+  for(var key in storeApi) {
+    if(storeApi.hasOwnProperty(key)) {
+      api.store[key] = storeApi[key];
+    }
+  }
+
+  return api;
 };
