@@ -26,10 +26,6 @@ describe('hoodieRemoteStore', function() {
   });
 
   describe('factory', function() {
-    it('should set @name from options', function() {
-      expect(this.remote.name).to.eql('my/store');
-    });
-
     it('should fallback prefix to \'\'', function() {
       expect(this.remote.prefix).to.eql('');
     });
@@ -74,14 +70,14 @@ describe('hoodieRemoteStore', function() {
 
     it('should set options.contentType to "application/json"', function() {
       this.remote.request('GET', '/something');
-      expect(this.hoodie.request).to.be.calledWith('GET', '/something', {
+      expect(this.hoodie.request).to.be.calledWith('GET', '/my%2Fstore/something', {
         contentType: 'application/json'
       });
     });
 
     it('should prefix path with @name (encoded)', function() {
-      this.remote.name = 'my/funky/store';
-      this.remote.request('GET', '/something');
+      var remote = hoodieRemoteStore(this.hoodie, { name: 'my/funky/store'} );
+      remote.request('GET', '/something');
       var typeAndPath = this.hoodie.request.args[0];
 
       expect(typeAndPath[1]).to.eql('/my%2Ffunky%2Fstore/something');
@@ -93,7 +89,7 @@ describe('hoodieRemoteStore', function() {
 
       var typeAndPath = this.hoodie.request.args[0];
 
-      expect(typeAndPath[1]).to.eql('http://api.otherapp.com/something');
+      expect(typeAndPath[1]).to.eql('http://api.otherapp.com/my%2Fstore/something');
     });
 
     _when('type is POST', function() {

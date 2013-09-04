@@ -9,7 +9,7 @@ describe('hoodie.remote', function() {
     });
     this.sandbox.stub(this.hoodie.account, 'db').returns('userdb');
     this.sandbox.stub(this.hoodie.config, 'get').withArgs('_remote.since').returns(10);
-    this.sandbox.stub(this.hoodie.store, 'index').returns(['funk/1', '$task/2']);
+    this.hoodie.store.index.returns(['funk/1', '$task/2']);
 
     this.clock = this.sandbox.useFakeTimers(0); // '1970-01-01 00:00:00'
     hoodieRemote(this.hoodie);

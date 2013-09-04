@@ -3,10 +3,10 @@ describe('Hoodie.Config', function() {
 
   beforeEach(function() {
     this.hoodie = new Mocks.Hoodie();
-    this.updateSpy = this.sandbox.stub(this.hoodie.store, 'update').returns('promise');
-    this.findSpy = this.sandbox.stub(this.hoodie.store, 'find').returns(this.hoodie.defer().resolve({
+    this.updateSpy = this.hoodie.store.update.returns('promise');
+    this.hoodie.store.findDefer.resolve({
       funky: 'fresh'
-    }));
+    });
 
     hoodieConfig( this.hoodie );
     this.config = this.hoodie.config;
@@ -40,7 +40,7 @@ describe('Hoodie.Config', function() {
 
     it('should get the config using store', function() {
       expect(this.config.get('funky')).to.eql('fresh');
-      expect(this.findSpy.called).to.be.ok();
+      expect(this.hoodie.store.find.called).to.be.ok();
     });
 
   });

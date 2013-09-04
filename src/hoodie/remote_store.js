@@ -179,7 +179,7 @@ function hoodieRemoteStore (hoodie, options) {
   // CouchDB database and is also used to prefix
   // triggered events
   //
-  remote.name = null;
+  remoteName = null;
 
 
   // sync
@@ -205,7 +205,7 @@ function hoodieRemoteStore (hoodie, options) {
 
   //
   if (options.name !== undefined) {
-    remote.name = options.name;
+    remoteName = options.name;
   }
 
   if (options.prefix !== undefined) {
@@ -226,8 +226,8 @@ function hoodieRemoteStore (hoodie, options) {
   remote.request = function request(type, path, options) {
     options = options || {};
 
-    if (remote.name) {
-      path = '/' + (encodeURIComponent(remote.name)) + path;
+    if (remoteName) {
+      path = '/' + (encodeURIComponent(remoteName)) + path;
     }
 
     if (remote.baseUrl) {
