@@ -14,8 +14,24 @@
 // based on [Events implementations from Spine](https://github.com/maccman/spine/blob/master/src/spine.coffee#L1)
 //
 
-function hoodieEvents(hoodie) {
-  var callbacks = {};
+// callbacks are global, while the events API is used at several places,
+// like hoodie.on / hoodie.store.on / hoodie.task.on etc.
+
+function hoodieEvents(hoodie, options) {
+
+  // normalize options hash
+  if (! options) { options = {}; }
+
+  // make sure callbacks hash exists
+  if (! hoodie.eventsCallbacks) { hoodie.eventsCallbacks = {}; }
+
+  var context = hoodie;
+  var namespace = '';
+
+  if (options.context) {
+    context = options.context;
+    namespace = options.namespace + ':';
+  }
 
   // Bind
   // ------
@@ -30,9 +46,9 @@ function hoodieEvents(hoodie) {
     evs = ev.split(' ');
 
     for (_i = 0, _len = evs.length; _i < _len; _i++) {
-      name = evs[_i];
-      callbacks[name] = callbacks[name] || [];
-      callbacks[name].push(callback);
+      name = namespace + evs[_i];
+      hoodie.eventsCallbacks[name] = hoodie.eventsCallbacks[name] || [];
+      hoodie.eventsCallbacks[name].push(callback);
     }
   }
 
@@ -44,10 +60,12 @@ function hoodieEvents(hoodie) {
   //     object.one 'groundTouch', gameOver
   //
   function one(ev, callback) {
-    bind(ev, function() {
-      unbind(ev, callback);
+    ev = namespace + ev;
+    var wrapper = function() {
+      hoodie.unbind(ev, wrapper);
       callback.apply(null, arguments);
-    });
+    };
+    hoodie.bind(ev, wrapper);
   }
 
   // trigger
@@ -61,7 +79,8 @@ function hoodieEvents(hoodie) {
 
     args = 1 <= arguments.length ? Array.prototype.slice.call(arguments, 0) : [];
     ev = args.shift();
-    list = callbacks[ev];
+    ev = namespace + ev;
+    list = hoodie.eventsCallbacks[ev];
 
     if (!list) {
       return;
@@ -86,26 +105,40 @@ function hoodieEvents(hoodie) {
   //     object.unbind 'move', follow
   //
   function unbind(ev, callback) {
-    var cb, i, list, _i, _len;
+    var cb, i, list, _i, _len, evNames;
 
     if (!ev) {
-      callbacks = {};
+      if (!namespace) {
+        hoodie.eventsCallbacks = {};
+      }
+
+      evNames = Object.keys(hoodie.eventsCallbacks);
+      evNames = evNames.filter(function(key) {
+        return key.indexOf(namespace) === 0;
+      });
+      evNames.forEach(function(key) {
+        delete hoodie.eventsCallbacks[key];
+      });
+
       return;
     }
 
-    list = callbacks[ev];
+    ev = namespace + ev;
+
+    list = hoodie.eventsCallbacks[ev];
 
     if (!list) {
       return;
     }
 
     if (!callback) {
-      delete callbacks[ev];
+      delete hoodie.eventsCallbacks[ev];
       return;
     }
 
     for (i = _i = 0, _len = list.length; _i < _len; i = ++_i) {
       cb = list[i];
+
 
       if (cb !== callback) {
         continue;
@@ -113,17 +146,17 @@ function hoodieEvents(hoodie) {
 
       list = list.slice();
       list.splice(i, 1);
-      callbacks[ev] = list;
+      hoodie.eventsCallbacks[ev] = list;
       break;
     }
 
     return;
   }
 
-  hoodie.bind = bind;
-  hoodie.on = bind;
-  hoodie.one = one;
-  hoodie.trigger = trigger;
-  hoodie.unbind = unbind;
-  hoodie.off = unbind;
+  context.bind = bind;
+  context.on = bind;
+  context.one = one;
+  context.trigger = trigger;
+  context.unbind = unbind;
+  context.off = unbind;
 }

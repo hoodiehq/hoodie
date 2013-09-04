@@ -26,6 +26,7 @@ describe('hoodie.account', function () {
     }.bind(this);
 
     this.clock = this.sandbox.useFakeTimers(0); // '1970-01-01 00:00:00'
+    this.sandbox.stub(window, 'hoodieEvents', Mocks.EventsApi);
 
     hoodieAccount(this.hoodie);
     this.account = this.hoodie.account;
@@ -51,7 +52,7 @@ describe('hoodie.account', function () {
 
         it('should send a GET /_session', function () {
           this.account.authenticate();
-          expect(this.account.request.calledWith('GET', '/_session')).to.be.ok();
+          expect(this.account.request).to.be.calledWith('GET', '/_session');
         });
 
         it('should not send multiple GET /_session requests', function () {
@@ -129,12 +130,12 @@ describe('hoodie.account', function () {
 
             it('should not set _account.username config', function () {
               // because it's already 'joe@example.com'
-              expect(this.hoodie.config.set.calledWith('_account.username', 'joe@example.com')).to.not.be.ok();
+              expect(this.hoodie.config.set).to.not.be.calledWith('_account.username', 'joe@example.com');
             });
 
             it('should set account.ownerHash', function () {
               // because it's already 'user_hash'
-              expect(this.hoodie.config.set.calledWith('_account.ownerHash', 'user_hash')).to.not.be.ok();
+              expect(this.hoodie.config.set).to.not.be.calledWith('_account.ownerHash', 'user_hash');
             });
           }); // returns valid session info for joe@example.com
 
@@ -149,8 +150,8 @@ describe('hoodie.account', function () {
               expect(this.promise.state()).to.eql('rejected');
             });
 
-            it('should trigger an `account:error:unauthenticated` event', function () {
-              expect(this.hoodie.trigger.calledWith('account:error:unauthenticated')).to.be.ok();
+            it('should trigger an `error:unauthenticated` event', function () {
+              expect(this.account.trigger).to.be.calledWith('error:unauthenticated');
             });
           }); // session is invalid
         }); // authentication request is successful and
@@ -624,9 +625,8 @@ describe('hoodie.account', function () {
             this.clock.tick(300); // do the delayed sign in
           });
 
-          it('should trigger `account:signup` event', function () {
-
-            expect(this.hoodie.trigger.calledWith('account:signup', 'joe@example.com')).to.be.ok();
+          it('should trigger `signup` event', function () {
+            expect(this.account.trigger).to.be.calledWith('signup', 'joe@example.com');
           });
 
           it('should sign in', function () {
@@ -779,18 +779,18 @@ describe('hoodie.account', function () {
           this.requestDefer.resolve(this.response);
         });
 
-        it('should not trigger `account:cleanup` event', function () {
+        it('should not trigger `cleanup` event', function () {
           this.account.signIn('joe@example.com', 'secret');
-          expect(this.hoodie.trigger.calledWith('account:cleanup')).to.not.be.ok();
+          expect(this.account.trigger).to.not.be.calledWith('cleanup');
         });
 
         it('should not trigger signin events', function () {
-          expect(this.hoodie.trigger.calledWith('account:signin', 'joe@example.com')).to.not.be.ok();
-          expect(this.hoodie.trigger.calledWith('account:signin:anonymous', 'joe@example.com')).to.not.be.ok();
+          expect(this.account.trigger).to.not.be.calledWith('signin', 'joe@example.com');
+          expect(this.account.trigger).to.not.be.calledWith('signin:anonymous', 'joe@example.com');
         });
 
         it('should trigger reauthenticated event', function () {
-          expect(this.hoodie.trigger.calledWith('account:reauthenticated', 'joe@example.com')).to.be.ok();
+          expect(this.account.trigger).to.be.calledWith('reauthenticated', 'joe@example.com');
         });
 
       }); // signIn successful
@@ -860,7 +860,7 @@ describe('hoodie.account', function () {
             this.sandbox.spy(this.hoodie.config, 'set');
 
             delete this.account.username;
-            this.hoodie.trigger.reset();
+            this.account.trigger.reset();
           });
 
           _and('user has an anonyomous account', function () {
@@ -869,9 +869,9 @@ describe('hoodie.account', function () {
               this.sandbox.stub(this.account, 'hasAnonymousAccount').returns(true);
             });
 
-            it('should trigger `account:signin:anonymous` event', function () {
+            it('should trigger `signin:anonymous` event', function () {
               this.account.signIn('joe@example.com', 'secret');
-              expect(this.hoodie.trigger.calledWith('account:signin:anonymous', 'joe@example.com')).to.be.ok();
+              expect(this.account.trigger).to.be.calledWith('signin:anonymous', 'joe@example.com');
             });
           }); // user has an anonyomous account
 
@@ -881,9 +881,9 @@ describe('hoodie.account', function () {
               this.sandbox.stub(this.account, 'hasAnonymousAccount').returns(false);
             });
 
-            it('should trigger `account:signin` event', function () {
+            it('should trigger `signin` event', function () {
               this.account.signIn('joe@example.com', 'secret');
-              expect(this.hoodie.trigger.calledWith('account:signin', 'joe@example.com')).to.be.ok();
+              expect(this.account.trigger).to.be.calledWith('signin', 'joe@example.com');
             });
 
           }); // user has a manual account
@@ -892,7 +892,7 @@ describe('hoodie.account', function () {
             this.account.signIn('joe@example.com', 'secret');
 
             expect(this.account.username).to.eql('joe@example.com');
-            expect(this.hoodie.config.set.calledWith('_account.username', 'joe@example.com')).to.be.ok();
+            expect(this.hoodie.config.set).to.be.calledWith('_account.username', 'joe@example.com');
           });
 
           it('should set @ownerHash', function () {
@@ -900,8 +900,8 @@ describe('hoodie.account', function () {
             this.account.signIn('joe@example.com', 'secret');
 
             expect(this.account.ownerHash).to.eql('user_hash');
-            expect(this.hoodie.config.set.calledWith('_account.ownerHash', 'user_hash')).to.be.ok();
-            expect(this.hoodie.config.set.calledWith('createdBy', 'user_hash')).to.be.ok();
+            expect(this.hoodie.config.set).to.be.calledWith('_account.ownerHash', 'user_hash');
+            expect(this.hoodie.config.set).to.be.calledWith('createdBy', 'user_hash');
           });
 
           it('should fetch the _users doc', function () {
@@ -963,7 +963,7 @@ describe('hoodie.account', function () {
           it('should fetch user doc without setting @username', function () {
             this.account.signIn('joe@example.com', 'secret');
 
-            expect(this.account.fetch.calledWith('joe@example.com')).to.be.ok();
+            expect(this.account.fetch).to.be.calledWith('joe@example.com');
             expect(this.account.username).to.be(undefined);
           });
 
@@ -1120,7 +1120,7 @@ describe('hoodie.account', function () {
 
         it('should sign in', function () {
           this.account.changePassword('currentSecret', 'newSecret');
-          expect(this.account.signIn.calledWith('joe@example.com', 'newSecret')).to.be.ok();
+          expect(this.account.signIn).to.be.calledWith('joe@example.com', 'newSecret');
         });
 
         _when('sign in successful', function () {
@@ -1184,11 +1184,11 @@ describe('hoodie.account', function () {
 
     _when('called with silent: true', function () {
 
-      it('should not trigger `account:signout` event', function () {
+      it('should not trigger `signout` event', function () {
         this.account.signOut({
           silent: true
         });
-        expect(this.hoodie.trigger.calledWith('account:signout')).to.not.be.ok();
+        expect(this.account.trigger).to.not.be.calledWith('signout');
       });
     }); // called with silent: true
 
@@ -1203,8 +1203,8 @@ describe('hoodie.account', function () {
         expect(this.hoodie.request.called).to.not.be.ok();
       });
 
-      it('should trigger `account:signout` event', function () {
-        expect(this.hoodie.trigger.calledWith('account:signout')).to.be.ok();
+      it('should trigger `signout` event', function () {
+        expect(this.account.trigger).to.be.calledWith('signout');
       });
 
       it('should generate new @ownerHash hash', function () {
@@ -1256,8 +1256,8 @@ describe('hoodie.account', function () {
           this.account.signOut();
         });
 
-        it('should trigger `account:signout` event', function () {
-          expect(this.hoodie.trigger.calledWith('account:signout')).to.be.ok();
+        it('should trigger `signout` event', function () {
+          expect(this.account.trigger).to.be.calledWith('signout');
         });
 
         it('should generate new @ownerHash hash', function () {
@@ -1326,26 +1326,6 @@ describe('hoodie.account', function () {
       });
     }); // _account.anonymousPassword is not set
   }); // #hasAnonymousAccount
-
-  describe('#on(event, callback)', function () {
-    beforeEach(function () {
-      this.sandbox.spy(this.hoodie, 'on');
-    });
-
-    it('should proxy to @hoodie.on() and namespace with account', function () {
-      var party = this.sandbox.spy();
-
-      this.account.on('funky', party);
-      expect(this.hoodie.on.calledWith('account:funky', party)).to.be.ok();
-    });
-
-    it('should namespace multiple events correctly', function () {
-      var cb = this.sandbox.spy();
-
-      this.account.on('super funky fresh', cb);
-      expect(this.hoodie.on.calledWith('account:super account:funky account:fresh', cb)).to.be.ok();
-    });
-  }); // #on
 
   describe('#db()', function () {
     _when('account.ownerHash is \'owner_hash123\'', function () {
@@ -1487,7 +1467,7 @@ describe('hoodie.account', function () {
           });
 
           it('should trigger signout event', function () {
-            expect(this.hoodie.trigger.calledWith('account:signout')).to.be.ok();
+            expect(this.account.trigger).to.be.calledWith('signout');
           });
 
           it('should clear config', function () {
@@ -1495,11 +1475,11 @@ describe('hoodie.account', function () {
           });
 
           it('should set config._account.ownerHash to new @ownerHash', function () {
-            expect(this.hoodie.config.set.calledWith('_account.ownerHash', 'newHash')).to.be.ok();
+            expect(this.hoodie.config.set).to.be.calledWith('_account.ownerHash', 'newHash');
           });
 
           it('should trigger clenaup event', function() {
-            expect(this.hoodie.trigger.calledWith('account:cleanup')).to.be.ok();
+            expect(this.account.trigger).to.be.calledWith('cleanup');
           });
         }); // destroy request succesful
       }); // fetch is successful
@@ -1549,7 +1529,7 @@ describe('hoodie.account', function () {
         });
 
         it('should not trigger signout event', function () {
-          expect(this.hoodie.trigger.calledWith('account:signout')).to.not.be.ok();
+          expect(this.account.trigger).to.not.be.calledWith('signout');
         });
 
         it('should not clear config', function () {
@@ -1582,7 +1562,7 @@ describe('hoodie.account', function () {
       });
 
       it('should trigger signout event', function () {
-        expect(this.hoodie.trigger.calledWith('account:signout')).to.be.ok();
+        expect(this.account.trigger).to.be.calledWith('signout');
       });
 
       it('should clear config', function () {
@@ -1637,7 +1617,7 @@ describe('hoodie.account', function () {
       });
 
       it('should generate a reset Password Id and store it locally', function () {
-        expect(this.hoodie.config.set.calledWith('_account.resetPasswordId', 'joe@example.com/uuid567')).to.be.ok();
+        expect(this.hoodie.config.set).to.be.calledWith('_account.resetPasswordId', 'joe@example.com/uuid567');
       });
 
       it('should send a PUT request to /_users/org.couchdb.user%3A%24passwordReset%2Fjoe%40example.com%2Fuuid567', function () {
@@ -1694,13 +1674,6 @@ describe('hoodie.account', function () {
       });
     }); // there is no pending password reset request
   }); // #resetPassword
-
-  describe('#trigger(event, arg1, arg2, ...)', function () {
-    it('should proxy to hoodie.trigger', function() {
-      this.account.trigger('say', 'funky', 'fresh');
-      expect(this.hoodie.trigger).to.be.calledWith('account:say', 'funky', 'fresh');
-    });
-  }); // #trigger
 
   describe('#changeUsername(currentPassword, newUsername)', function () {
     beforeEach(function () {

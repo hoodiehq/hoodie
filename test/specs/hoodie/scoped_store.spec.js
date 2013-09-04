@@ -5,6 +5,7 @@ describe('hoodieScopedStoreApi', function() {
   beforeEach(function() {
     this.hoodie = new Mocks.Hoodie();
     this.store = Mocks.StoreApi(this.hoodie);
+    this.sandbox.spy(window, 'hoodieEvents');
     this.options = Mocks.storeOptions('taskstore');
   });
 
@@ -59,24 +60,8 @@ describe('hoodieScopedStoreApi', function() {
       expect(this.store.removeAll).to.be.calledWith('task', {option: 'value'});
     });
 
-    it('scopes trigger method to type "task"', function() {
-      this.sandbox.spy(this.hoodie, 'trigger');
-      this.scopedStore.trigger('event');
-      expect(this.hoodie.trigger).to.be.calledWith('taskstore:task:event');
-    });
-
-    it('scopes on method to type "task"', function() {
-      this.sandbox.spy(this.hoodie, 'on');
-      var callback = function() {};
-      this.scopedStore.on('event1 event2', callback);
-      expect(this.hoodie.on).to.be.calledWith('taskstore:task:event1 taskstore:task:event2', callback);
-    });
-
-    it('scopes unbind method to type "task"', function() {
-      this.sandbox.spy(this.hoodie, 'unbind');
-      var callback = function() {};
-      this.scopedStore.unbind('event1 event2', callback);
-      expect(this.hoodie.unbind).to.be.calledWith('taskstore:task:event1 taskstore:task:event2', callback);
+    it('adds event API', function() {
+      expect(window.hoodieEvents).to.be.calledWith(this.hoodie, { context : this.scopedStore, namespace: 'taskstore:task' });
     });
   }); // 'when scoped by type only'
 
@@ -127,24 +112,8 @@ describe('hoodieScopedStoreApi', function() {
       expect(this.scopedStore.removeAll).to.be(undefined);
     });
 
-    it('scopes trigger method to type "task" & id "abc"', function() {
-      this.sandbox.spy(this.hoodie, 'trigger');
-      this.scopedStore.trigger('event');
-      expect(this.hoodie.trigger).to.be.calledWith('taskstore:task:abc:event');
-    });
-
-    it('scopes on method to type "task" & id "abc"', function() {
-      this.sandbox.spy(this.hoodie, 'on');
-      var callback = function() {};
-      this.scopedStore.on('event1 event2', callback);
-      expect(this.hoodie.on).to.be.calledWith('taskstore:task:abc:event1 taskstore:task:abc:event2', callback);
-    });
-
-    it('scopes unbind method to type "task" & id "abc"', function() {
-      this.sandbox.spy(this.hoodie, 'unbind');
-      var callback = function() {};
-      this.scopedStore.unbind('event1 event2', callback);
-      expect(this.hoodie.unbind).to.be.calledWith('taskstore:task:abc:event1 taskstore:task:abc:event2', callback);
+    it('adds event API', function() {
+      expect(window.hoodieEvents).to.be.calledWith(this.hoodie, { context : this.scopedStore, namespace: 'taskstore:task:abc' });
     });
   }); // 'when scoped by type only'
 });
