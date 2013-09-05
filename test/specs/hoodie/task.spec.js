@@ -105,13 +105,22 @@ describe('hoodie.task', function() {
       expect(this.hoodie.task.restart).to.be('funky');
     });
   });
-  describe('#remove()', function() {
+  describe('#cancelAll()', function() {
     beforeEach(function() {
 
     });
 
     it('should be funky', function() {
-      expect(this.hoodie.task.remove).to.be('funky');
+      expect(this.hoodie.task.cancelAll).to.be('funky');
+    });
+  });
+  describe('#restartAll()', function() {
+    beforeEach(function() {
+
+    });
+
+    it('should be funky', function() {
+      expect(this.hoodie.task.restartAll).to.be('funky');
     });
   });
 
