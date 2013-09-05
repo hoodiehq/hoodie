@@ -411,6 +411,56 @@ describe('hoodieStoreApi', function() {
     }); // object can be found
   }); // #update
 
+  describe('#updateOrAdd(type, id, update, options)', function() {
+    beforeEach(function() {
+      this.updateDefer = this.hoodie.defer();
+      this.addDefer = this.hoodie.defer();
+      this.sandbox.stub(this.store, 'update').returns(this.updateDefer);
+      this.sandbox.stub(this.store, 'add').returns(this.addDefer);
+
+      this.promise = this.store.updateOrAdd('couch', '123', {
+        funky: 'fresh'
+      }, {option: 'value'});
+    });
+
+    it('updates object', function() {
+      expect(this.store.update).to.be.calledWith('couch', '123', {funky: 'fresh'}, {option: 'value'});
+    });
+
+    _when('object update succeeds', function() {
+      beforeEach(function() {
+        this.updateDefer.resolve('jup');
+      });
+
+      it('should resolve', function() {
+        expect(this.promise).to.be.resolvedWith('jup');
+      });
+    }); // object cannot be found
+
+    _when('object update fails', function() {
+      beforeEach(function() {
+        this.updateDefer.reject('nope');
+      });
+
+      it('should add the object to the store', function() {
+        expect(this.store.add).to.be.calledWith('couch', {
+          id: '123',
+          funky: 'fresh',
+        }, {option: 'value'});
+      });
+
+      it('rejects when adding object fails', function() {
+        this.addDefer.reject('nope');
+        expect(this.promise).to.be.rejectedWith('nope');
+      });
+
+      it('resolves when adding object succeeds', function() {
+        this.addDefer.resolve('yay');
+        expect(this.promise).to.be.resolvedWith('yay');
+      });
+    }); // object cannot be found
+  }); // #updateOrAdd
+
   describe('#updateAll(objects)', function() {
     beforeEach(function() {
       this.sandbox.stub(this.hoodie, 'isPromise').returns(false);

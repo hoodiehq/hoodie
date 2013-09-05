@@ -294,6 +294,23 @@ function hoodieStoreApi(hoodie, options) {
   };
 
 
+  // updateOrAdd
+  // -------------
+
+  // same as `.update()`, but in case the object cannot be found,
+  // it gets created
+  //
+  api.updateOrAdd = function updateOrAdd(type, id, objectUpdate, options) {
+    function handleNotFound() {
+      var properties = $.extend(true, {}, objectUpdate, {id: id});
+      return api.add(type, properties, options);
+    }
+
+    var promise = api.update(type, id, objectUpdate, options).then(null, handleNotFound);
+    return decoratePromise( promise );
+  };
+
+
   // updateAll
   // -----------------
 
