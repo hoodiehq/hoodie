@@ -849,7 +849,7 @@ function hoodieStore (hoodie) {
 
     // sync events have no changes, so we don't trigger
     // "change" events.
-    if (event === 'sync') {
+    if (eventName === 'sync') {
       return;
     }
 

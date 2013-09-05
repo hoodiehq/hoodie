@@ -1,5 +1,5 @@
 /* exported hoodieTask */
-/* global hoodieEvents */
+/* global hoodieEvents, hoodieScopedTask */
 
 // Tasks
 // ============
@@ -26,7 +26,9 @@
 function hoodieTask(hoodie) {
 
   // public API
-  var api = {};
+  var api = function api(type, id) {
+    return hoodieScopedTask(hoodie, api, {type: type, id: id});
+  };
 
   // add events API
   hoodieEvents(hoodie, { context: api, namespace: 'task' });

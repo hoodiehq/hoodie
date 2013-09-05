@@ -313,12 +313,28 @@ describe('hoodie.task', function() {
   });
 
   describe('hoodie.task called as function', function() {
-    beforeEach(function() {
-
+    beforeEach( function() {
+      this.sandbox.stub(window, 'hoodieScopedTask').returns('scoped api');
     });
 
-    it('should return a scope task interface', function() {
-      expect(this.hoodie.task.restartAll).to.be('funky');
+    it('returns scoped API by type when only type set', function() {
+      this.taskStore = this.hoodie.task('task');
+      expect(window.hoodieScopedTask).to.be.called();
+      var args = window.hoodieScopedTask.args[0];
+      expect(args[0]).to.eql(this.hoodie);
+      expect(args[1]).to.eql(this.hoodie.task);
+      expect(args[2].type).to.be('task');
+      expect(args[2].id).to.be(undefined);
+      expect(this.taskStore).to.eql('scoped api');
+    });
+
+    it('returns scoped API by type & id when both set', function() {
+      this.taskStore = this.hoodie.task('task', '123');
+      var args = window.hoodieScopedTask.args[0];
+      expect(args[0]).to.eql(this.hoodie);
+      expect(args[1]).to.eql(this.hoodie.task);
+      expect(args[2].type).to.be('task');
+      expect(args[2].id).to.be('123');
     });
   });
 
