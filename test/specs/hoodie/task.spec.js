@@ -1,5 +1,4 @@
 /* global hoodieTask */
-
 describe('hoodie.task', function() {
 
   beforeEach(function() {
@@ -87,7 +86,7 @@ describe('hoodie.task', function() {
     });
   });
 
-  describe.only('#cancel()', function() {
+  describe('#cancel()', function() {
     beforeEach(function() {
       this.promise = this.task.cancel('message', '123');
     });
@@ -169,15 +168,45 @@ describe('hoodie.task', function() {
     });
   });
 
-  describe('#restart()', function() {
+  describe.only('#restart(type, id, update)', function() {
     beforeEach(function() {
-
+      this.cancelDefer = this.hoodie.defer();
+      this.sandbox.stub(this.hoodie.task, 'cancel').returns(this.cancelDefer.promise());
+      this.sandbox.spy(this.hoodie.task, 'start');
+      this.promise = this.hoodie.task.restart('message', '123', { extra: 'creme'});
     });
 
-    it('should be funky', function() {
-      expect(this.hoodie.task.restart).to.be('funky');
+    it('should cancel a running task', function() {
+      expect(this.hoodie.task.cancel).to.be.calledWith('message', '123');
+    });
+
+    it('rejects with cancel fails', function() {
+      this.cancelDefer.reject('nope.');
+      expect(this.promise).to.be.rejectedWith('nope.');
+    });
+
+    _when('cancelling task succeeds', function() {
+      beforeEach(function() {
+        this.cancelDefer.resolve({
+          type: 'message',
+          id: '123',
+          text: 'funk!',
+          $error: 'this did not work out',
+          $processedAt: 'now'
+        });
+      });
+
+      it('should start the task again, while removing $error & $processed at and adding passed update', function() {
+        expect(this.hoodie.task.start).to.be.calledWith('message', {
+          type: 'message',
+          id: '123',
+          text: 'funk!',
+          extra: 'creme'
+        });
+      });
     });
   });
+
   describe('#cancelAll()', function() {
     beforeEach(function() {
 

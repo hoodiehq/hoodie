@@ -42,8 +42,19 @@ function hoodieTask(hoodie) {
   };
 
   //
-  api.restart = function(type, id, update) {
+  // restart
+  // ---------
 
+  // first, we try to cancel an
+  api.restart = function(type, id, update) {
+    var start = function(object) {
+      $.extend(object, update);
+      delete object.$error;
+      delete object.$processedAt;
+      delete object.cancelledAt;
+      return api.start(object.type, object);
+    };
+    return api.cancel(type, id).then(start);
   };
 
   //
