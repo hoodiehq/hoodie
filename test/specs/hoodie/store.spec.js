@@ -7,6 +7,7 @@ describe('hoodieStoreApi', function() {
     this.options = Mocks.storeOptions('funkstore');
     this.validate = sinon.stub();
     this.optionsWithValidate = $.extend({}, this.options, {validate: this.validate});
+    this.sandbox.spy(window, 'hoodieEvents');
     this.store = hoodieStoreApi(this.hoodie, this.options );
     this.storeWithCustomValidate = hoodieStoreApi(this.hoodie, this.optionsWithValidate );
   });
@@ -21,6 +22,10 @@ describe('hoodieStoreApi', function() {
 
   it('returns a function', function() {
     expect(this.store).to.be.a(Function);
+  });
+
+  it('adds event API', function() {
+    expect(window.hoodieEvents).to.be.calledWith(this.hoodie, { context : this.store, namespace: 'funkstore' });
   });
 
   describe('store("task", "id")', function() {
@@ -634,59 +639,6 @@ describe('hoodieStoreApi', function() {
       expect(this.options.backend.removeAll).to.be.calledWith('type', { option: 'value'});
     });
   }); // #removeAll
-
-  //
-  describe('#trigger', function() {
-    beforeEach(function() {
-      this.sandbox.spy(this.hoodie, 'trigger');
-    });
-
-    it('should proxy to hoodie.trigger with \'store\' namespace', function() {
-      this.store.trigger('event', {
-        funky: 'fresh'
-      });
-
-      expect(this.hoodie.trigger).to.be.calledWith('funkstore:event', {
-        funky: 'fresh'
-      });
-    });
-  }); // #trigger
-
-  //
-  describe('#on', function() {
-    beforeEach(function() {
-      this.sandbox.spy(this.hoodie, 'on');
-    });
-
-    it('should proxy to hoodie.on with \'store\' namespace', function() {
-      this.store.on('event', {
-        funky: 'fresh'
-      });
-      expect(this.hoodie.on).to.be.calledWith('funkstore:event', {
-        funky: 'fresh'
-      });
-    });
-
-    it('should namespace multiple events correctly', function() {
-      var cb = this.sandbox.spy();
-      this.store.on('super funky fresh', cb);
-      expect(this.hoodie.on.calledWith('funkstore:super funkstore:funky funkstore:fresh', cb)).to.be.ok();
-    });
-  }); // #on
-
-  //
-  describe('#unbind', function() {
-    beforeEach(function() {
-      this.sandbox.spy(this.hoodie, 'unbind');
-    });
-
-    it('should proxy to hoodie.unbind with \'store\' namespace', function() {
-      var cb = function() {};
-
-      this.store.unbind('event', cb);
-      expect(this.hoodie.unbind).to.be.calledWith('funkstore:event', cb);
-    });
-  }); // #unbind
 
   //
   describe('#decoratePromises', function() {

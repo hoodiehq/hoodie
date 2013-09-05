@@ -1,5 +1,5 @@
 /* exported hoodieScopedStoreApi */
-/* jshint unused: false */
+/* global hoodieEvents */
 
 // scoped Store
 // ============
@@ -19,6 +19,10 @@ function hoodieScopedStoreApi(hoodie, storeApi, options) {
 
   // scoped by type only
   if (! id) {
+
+    // add events
+    hoodieEvents(hoodie, { context: api, namespace: storeName + ':' + type });
+
     //
     api.save = function save(id, properties, options) {
       return storeApi.save(type, id, properties, options);
@@ -63,35 +67,14 @@ function hoodieScopedStoreApi(hoodie, storeApi, options) {
     api.removeAll = function removeAll(options) {
       return storeApi.removeAll(type, options);
     };
-
-    //
-    api.trigger = function trigger() {
-      var eventName = arguments[0];
-      var parameters = 2 <= arguments.length ? Array.prototype.slice.call(arguments, 1) : [];
-      var prefix = storeName + ':' + type;
-
-      return hoodie.trigger.apply(hoodie, [prefix + ':' + eventName].concat(Array.prototype.slice.call(parameters)));
-    };
-
-    //
-    api.on = function on(eventName, data) {
-      var prefix = storeName + ':' + type;
-      eventName = eventName.replace(/(^| )([^ ]+)/g, '$1'+prefix+':$2');
-
-      return hoodie.on(eventName, data);
-    };
-
-    //
-    api.unbind = function unbind(eventName, callback) {
-      var prefix = storeName + ':' + type;
-
-      eventName = eventName.replace(/(^| )([^ ]+)/g, '$1'+prefix+':$2');
-      return hoodie.unbind(eventName, callback);
-    };
   }
 
   // scoped by both: type & id
   if (id) {
+
+    // add events
+    hoodieEvents(hoodie, { context: api, namespace: storeName + ':' + type + ':' + id });
+
     //
     api.save = function save(properties, options) {
       return storeApi.save(type, id, properties, options);
@@ -110,31 +93,6 @@ function hoodieScopedStoreApi(hoodie, storeApi, options) {
     //
     api.remove = function remove(options) {
       return storeApi.remove(type, id, options);
-    };
-
-    //
-    api.trigger = function trigger() {
-      var eventName = arguments[0];
-      var parameters = 2 <= arguments.length ? Array.prototype.slice.call(arguments, 1) : [];
-      var prefix = storeName + ':' + type + ':' + id;
-
-      return hoodie.trigger.apply(hoodie, [prefix + ':' + eventName].concat(Array.prototype.slice.call(parameters)));
-    };
-
-    //
-    api.on = function on(eventName, data) {
-      var prefix = storeName + ':' + type + ':' + id;
-      eventName = eventName.replace(/(^| )([^ ]+)/g, '$1'+prefix+':$2');
-
-      return hoodie.on(eventName, data);
-    };
-
-    //
-    api.unbind = function unbind(eventName, callback) {
-      var prefix = storeName + ':' + type + ':' + id;
-
-      eventName = eventName.replace(/(^| )([^ ]+)/g, '$1'+prefix+':$2');
-      return hoodie.unbind(eventName, callback);
     };
   }
 
