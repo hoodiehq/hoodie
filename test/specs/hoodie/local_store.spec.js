@@ -79,6 +79,19 @@ describe('hoodie.store', function() {
       this.clock.tick(2000);
       expect(this.store.trigger).to.be.calledWith('idle', 'changedObjects');
     });
+
+    it('should trigger "sync" events on objects that got pushed', function() {
+      this.store.subscribeToOutsideEvents();
+      this.hoodie.trigger('remote:push', { type: 'doc', id: 'funky' });
+      expect(this.store.trigger).to.be.calledWith('sync', { type: 'doc', id: 'funky' }, undefined);
+      expect(this.store.trigger).to.be.calledWith('sync:doc', { type: 'doc', id: 'funky' }, undefined);
+      expect(this.store.trigger).to.be.calledWith('sync:doc:funky', { type: 'doc', id: 'funky' }, undefined);
+
+      expect(this.store.trigger).to.not.be.calledWith('change', 'sync', { type: 'doc', id: 'funky' }, undefined);
+      expect(this.store.trigger).to.not.be.calledWith('change:doc', 'sync', { type: 'doc', id: 'funky' }, undefined);
+      expect(this.store.trigger).to.not.be.calledWith('change:doc:funky', 'sync', { type: 'doc', id: 'funky' }, undefined);
+    });
+
     _when('remote:change event gets fired', function() {
 
       beforeEach(function() {
