@@ -268,16 +268,14 @@ describe('hoodieStoreApi', function() {
 
     _when('object cannot be found', function() {
       beforeEach(function() {
-        this.findDefer.reject();
+        this.findDefer.reject('not_found');
         this.promise = this.store.update('couch', '123', {
           funky: 'fresh'
         });
       });
 
-      it('should add it', function() {
-        expect(this.store.save).to.be.calledWith('couch', '123', {
-          funky: 'fresh'
-        }, undefined);
+      it('should reject', function() {
+        expect(this.promise).to.be.rejectedWith('not_found');
       });
     }); // object cannot be found
 

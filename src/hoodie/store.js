@@ -287,13 +287,9 @@ function hoodieStoreApi(hoodie, options) {
       return api.save(type, id, newObj, options);
     }
 
-    function handleNotFound() {
-      return api.save(type, id, objectUpdate, options);
-    }
-
     // promise decorations get lost when piped through `then`,
     // that's why we need to decorate the find's promise again.
-    var promise = api.find(type, id).then(handleFound, handleNotFound);
+    var promise = api.find(type, id).then(handleFound);
     return decoratePromise( promise );
   };
 
