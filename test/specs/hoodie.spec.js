@@ -33,7 +33,7 @@ describe('Hoodie', function() {
 
     it('should default the CouchDB URL to current domain with a api subdomain', function() {
       var hoodie = new Hoodie();
-      expect(hoodie.baseUrl).to.eql('/_api');
+      expect(hoodie.baseUrl).to.be( undefined );
     });
 
     // test for extending with core modules
