@@ -48,6 +48,7 @@ Mocks.Hoodie = function () {
       return (_ref = $.Deferred()).reject.apply(_ref, arguments).promise();
     },
     store: Mocks.StoreApi(),
+    task: Mocks.hoodieTask(),
     account: {
       authenticate: function () {
         return promiseMock;
@@ -71,38 +72,6 @@ Mocks.Hoodie = function () {
       on: function () {},
       one: function () {},
       trigger: function () {}
-    },
-    share: {
-      add: function () {
-        return promiseMock;
-      },
-      remove: function () {
-        return promiseMock;
-      },
-      save: function () {
-        return promiseMock;
-      },
-      update: function () {
-        return promiseMock;
-      },
-      updateAll: function () {
-        return promiseMock;
-      },
-      find: function () {
-        return promiseMock;
-      },
-      findAll: function () {
-        return promiseMock;
-      },
-      findOrAdd: function () {
-        return promiseMock;
-      },
-      removeAll: function () {
-        return promiseMock;
-      },
-      request: function () {
-        return promiseMock;
-      }
     }
   };
 
