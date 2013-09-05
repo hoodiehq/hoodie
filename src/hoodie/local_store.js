@@ -667,6 +667,7 @@ function hoodieStore (hoodie) {
 
     // remote events
     hoodie.on('remote:change', handleRemoteChange);
+    hoodie.on('remote:push', handlePushedObject);
   }
 
   // allow to run this once from outside
@@ -748,6 +749,14 @@ function hoodieStore (hoodie) {
         remote: true
       });
     }
+  }
+
+
+  //
+  // all local changes get bulk pushed. For each object with local
+  // changes that has been pushed we  trigger a sync event
+  function handlePushedObject(object) {
+    triggerEvents('sync', object);
   }
 
 
@@ -836,6 +845,12 @@ function hoodieStore (hoodie) {
 
     if (event !== 'new') {
       store.trigger('' + event + ':' + object.type + ':' + object.id, object, options);
+    }
+
+    // sync events have no changes, so we don't trigger
+    // "change" events.
+    if (event === 'sync') {
+      return
     }
 
     store.trigger('change', event, object, options);
