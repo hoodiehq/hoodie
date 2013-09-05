@@ -9,6 +9,10 @@ function hoodieRequest(hoodie) {
   var $extend = $.extend;
   var $ajax = $.ajax;
 
+  // Hoodie backend listents to requests prefixed by /_api,
+  // so we prefix all requests with relative URLs
+  var API_PATH = '/_api';
+
   // Requests
   // ----------
 
@@ -30,7 +34,7 @@ function hoodieRequest(hoodie) {
 
     // if relative path passed, prefix with baseUrl
     if (! /^http/.test(url)) {
-      url = '' + hoodie.baseUrl + url;
+      url = (hoodie.baseUrl || '') + API_PATH + url;
     }
 
     // if url is cross domain, set CORS headers
@@ -67,7 +71,7 @@ function hoodieRequest(hoodie) {
       error = JSON.parse(xhr.responseText);
     } catch (_error) {
       error = {
-        error: xhr.responseText || ('Cannot connect to Hoodie server at ' + hoodie.baseUrl)
+        error: xhr.responseText || ('Cannot connect to Hoodie server at ' + (hoodie.baseUrl || '/'))
       };
     }
 
