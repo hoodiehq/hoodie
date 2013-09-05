@@ -8,6 +8,7 @@ It offers you the following pieces of functionality right out of the box:
 
 * user accounts and authentication
 * data storage and sync
+* background tasks
 * sharing
 * emails
 * and so much more
@@ -62,7 +63,75 @@ And here is what it looks like:
   });
 ```
 
-### publish & share data
+### Tasks
+
+Tasks get picked up by backend workers in the background. You can
+think of them as special kind of objects that the describe specific
+tasks that you want backend logic for to be accomplished.
+
+If a task has been completed successfully, it gets removed. If there
+is an error, it stays in the task store to be handled or removed.
+
+
+```js
+// start a new task. Once it was finished, the succes callback gets
+// called. If something went wrong, error callback gets called instead
+hoodie.task.start('message', {to: 'joe', text: 'Party machen?'})
+  .then( showMessageSent, showMessageError )
+
+// cancel a pending task
+hoodie.task.cancel('message', '123')
+
+// restart a pending or canceled task
+hoodie.task.restart('message', '123', { extraProperty: 'value' })
+
+// canceled all pending tasks
+hoodie.task.restartAll()
+
+// restart all pending or canceled tasks
+hoodie.task.restartAll()
+```
+
+You can also subscribe to the following task events
+
+* start
+* cancel
+* error
+* success
+
+```js
+// listen to new tasks
+hoodie.task.on( 'start',    function( newTask) { } )
+
+// task canceled
+hoodie.task.on( 'cancel', function( canceledTask) { } )
+
+// task could not be completed
+hoodie.task.on( 'error', function( errorMessage, task) { } )
+
+// task completed successfully
+hoodie.task.on( 'success', function( completedTask) { } )
+
+// all listeners can be filtered by type
+hoodie.task.on( "start:message",   function( newMessageTask, options) { } )
+hoodie.task.on( "cancel:message",  function( canceledMessageTask, options) { } )
+hoodie.task.on( "error:message",   function( errorMessage, messageTask, options) { } )
+hoodie.task.on( "success:message", function( completedMessageTask, options) { } )
+hoodie.task.on( "change:message",  function( eventName, messageTask, options) { } )
+
+// ... and by type and id
+hoodie.task.on( "start:message:123",   function( newMessageTask, options) { } )
+hoodie.task.on( "cancel:message:123",  function( canceledMessageTask), options  { } )
+hoodie.task.on( "error:message:123",   function( errorMessage, messageTask, options) { } )
+hoodie.task.on( "success:message:123", function( completedMessageTask, options) { } )
+hoodie.task.on( "change:message:123",  function( eventName, messageTask, options) { } )
+```
+
+**note**: if `change` event is `"error"`, the error message gets passed as options.error
+
+
+### publish & share data (work in progress)
+
 ```javascript
 
   // find all 'task' documents and publish them
@@ -81,7 +150,8 @@ And here is what it looks like:
   hoodie.share(shareId).subscribe();
 ```
 
-### sending emails … yep.
+### sending emails (work in progress)
+
 ```javascript
 
   // define an email object

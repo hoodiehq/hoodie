@@ -42,22 +42,17 @@ function hoodieTask(hoodie) {
   };
 
   //
-  api.restart = function() {
+  api.restart = function(type, id, update) {
 
   };
 
   //
-  api.remove = function() {
+  api.cancelAll = function(type) {
 
   };
 
   //
-  api.on = function() {
-
-  };
-
-  //
-  api.unbind = function() {
+  api.restartAll = function(type, update) {
 
   };
 
