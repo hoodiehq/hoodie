@@ -97,7 +97,7 @@ describe('Hoodie', function() {
       expect(this.hoodie.store.bootstrapDirtyObjects).to.be.called();
     });
 
-    it.only('inits task module', function() {
+    it('inits task module', function() {
       expect(this.hoodie.task.subscribeToStoreEvents).to.be.called();
     });
 
