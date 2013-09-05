@@ -126,11 +126,11 @@ function hoodieTask(hoodie) {
       eventName = 'start';
     }
 
-    if (eventName === 'remove' && task.canceledAt) {
+    if (eventName === 'remove' && task.cancelledAt) {
       eventName = 'cancel';
     }
 
-    if (eventName === 'remove' && task.completedAt) {
+    if (eventName === 'remove' && task.$processedAt) {
       eventName = 'success';
     }
 
