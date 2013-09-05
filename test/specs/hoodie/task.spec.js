@@ -168,7 +168,7 @@ describe('hoodie.task', function() {
     });
   });
 
-  describe.only('#restart(type, id, update)', function() {
+  describe('#restart(type, id, update)', function() {
     beforeEach(function() {
       this.cancelDefer = this.hoodie.defer();
       this.sandbox.stub(this.hoodie.task, 'cancel').returns(this.cancelDefer.promise());
@@ -207,21 +207,117 @@ describe('hoodie.task', function() {
     });
   });
 
-  describe('#cancelAll()', function() {
+  describe('#cancelAll(type)', function() {
     beforeEach(function() {
-
+      this.sandbox.spy(this.hoodie.task, 'cancel');
+      this.promise = this.hoodie.task.cancelAll();
     });
 
-    it('should be funky', function() {
-      expect(this.hoodie.task.cancelAll).to.be('funky');
+    it('should findAll task objects in store', function() {
+      var filter;
+      expect(this.hoodie.store.findAll).to.be.called();
+      filter = this.hoodie.store.findAll.args[0][0];
+      expect(filter).to.be.a(Function);
+
+      expect(filter({type: '$task'})).to.eql(true);
+      expect(filter({type: '$message'})).to.eql(true);
+      expect(filter({type: 'doc'})).to.eql(false);
+    });
+
+    it('should filter by passed type', function() {
+      var filter;
+      this.hoodie.task.cancelAll('task');
+      filter = this.hoodie.store.findAll.args[1][0];
+      expect(filter).to.be.a(Function);
+
+      expect(filter({type: '$task'})).to.eql(true);
+      expect(filter({type: '$message'})).to.eql(false);
+      expect(filter({type: 'doc'})).to.eql(false);
+    });
+
+    it('rejects if findAll fails', function() {
+      this.hoodie.store.findAllDefer.reject('damn!');
+      expect(this.promise).to.be.rejectedWith('damn!');
+    });
+
+    _when('findAll succeeds', function() {
+      beforeEach(function() {
+        this.hoodie.store.findAllDefer.resolve([
+          {type: '$task', id: '123'},
+          {type: '$message', id: '124'}
+        ]);
+      });
+
+      it('cancels each task', function() {
+        expect(this.hoodie.task.cancel).to.be.calledWith('task', '123');
+        expect(this.hoodie.task.cancel).to.be.calledWith('message', '124');
+      });
     });
   });
+
   describe('#restartAll()', function() {
+    beforeEach(function() {
+      this.sandbox.spy(this.hoodie.task, 'restart');
+      this.promise = this.hoodie.task.restartAll();
+    });
+
+    it('should findAll task objects in store', function() {
+      var filter;
+      expect(this.hoodie.store.findAll).to.be.called();
+      filter = this.hoodie.store.findAll.args[0][0];
+      expect(filter).to.be.a(Function);
+
+      expect(filter({type: '$task'})).to.eql(true);
+      expect(filter({type: '$message'})).to.eql(true);
+      expect(filter({type: 'doc'})).to.eql(false);
+    });
+
+    it('should filter by passed type', function() {
+      var filter;
+      this.hoodie.task.restartAll('task');
+      filter = this.hoodie.store.findAll.args[1][0];
+      expect(filter).to.be.a(Function);
+
+      expect(filter({type: '$task'})).to.eql(true);
+      expect(filter({type: '$message'})).to.eql(false);
+      expect(filter({type: 'doc'})).to.eql(false);
+    });
+
+    it('rejects if findAll fails', function() {
+      this.hoodie.store.findAllDefer.reject('damn!');
+      expect(this.promise).to.be.rejectedWith('damn!');
+    });
+
+    _when('findAll succeeds', function() {
+      beforeEach(function() {
+        this.hoodie.store.findAllDefer.resolve([
+          {type: '$task', id: '123'},
+          {type: '$message', id: '124'}
+        ]);
+      });
+
+      it('restarts each task', function() {
+        expect(this.hoodie.task.restart).to.be.calledWith('task', '123', undefined);
+        expect(this.hoodie.task.restart).to.be.calledWith('message', '124', undefined);
+      });
+
+      it('passes update', function() {
+        this.hoodie.task.restartAll({extra: 'love'});
+        expect(this.hoodie.task.restart).to.be.calledWith('task', '123', {extra: 'love'});
+        expect(this.hoodie.task.restart).to.be.calledWith('message', '124', {extra: 'love'});
+
+        this.hoodie.task.restartAll('task', {extra: 'creme'});
+        expect(this.hoodie.task.restart).to.be.calledWith('task', '123', {extra: 'creme'});
+      });
+    });
+  });
+
+  describe('hoodie.task called as function', function() {
     beforeEach(function() {
 
     });
 
-    it('should be funky', function() {
+    it('should return a scope task interface', function() {
       expect(this.hoodie.task.restartAll).to.be('funky');
     });
   });

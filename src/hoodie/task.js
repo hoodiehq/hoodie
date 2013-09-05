@@ -59,12 +59,17 @@ function hoodieTask(hoodie) {
 
   //
   api.cancelAll = function(type) {
-
+    return findAll(type).then( cancelTaskObjects );
   };
 
   //
   api.restartAll = function(type, update) {
-
+    if (typeof type === 'object') {
+      update = type;
+    }
+    return findAll(type).then( function(taskObjects) {
+      restartTaskObjects(taskObjects, update);
+    } );
   };
 
   //
@@ -144,6 +149,34 @@ function hoodieTask(hoodie) {
 
     object.type = object.type.substr(1);
     triggerEvents(eventName, object, options);
+  }
+
+  //
+  function findAll (type) {
+    var startsWith = '$';
+    var filter;
+    if (type) {
+      startsWith += type;
+    }
+
+    filter = function(object) {
+      return object.type.indexOf(startsWith) === 0;
+    };
+    return hoodie.store.findAll(filter);
+  }
+
+  //
+  function cancelTaskObjects (taskObjects) {
+    return taskObjects.map( function(taskObject) {
+      return api.cancel(taskObject.type.substr(1), taskObject.id);
+    });
+  }
+
+  //
+  function restartTaskObjects (taskObjects, update) {
+    return taskObjects.map( function(taskObject) {
+      return api.restart(taskObject.type.substr(1), taskObject.id, update);
+    });
   }
 
   // this is where all the task events get triggered,
