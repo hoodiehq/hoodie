@@ -820,6 +820,18 @@ describe('hoodieRemoteStore', function() {
         var data = JSON.parse(this.hoodie.request.args[0][2].data);
         expect(data.docs.length).to.eql(3);
       });
+
+      _when('push request succeeds', function() {
+        beforeEach(function() {
+          this.requestDefer.resolve();
+        });
+
+        it('should trigger push events for each object', function() {
+          expect(this.remote.trigger).to.be.calledWith('push', { type: 'todo', id: '1' });
+          expect(this.remote.trigger).to.be.calledWith('push', { type: 'todo', id: '2' });
+          expect(this.remote.trigger).to.be.calledWith('push', { type: 'todo', id: '3' });
+        });
+      });
     }); // Array of docs passed
 
     _and('one deleted and one new doc passed', function() {

@@ -387,7 +387,9 @@ function hoodieRemoteStore (hoodie, options) {
     objectsForRemote = [];
 
     for (_i = 0, _len = objects.length; _i < _len; _i++) {
-      object = objects[_i];
+
+      // don't mess with original objects
+      object = $.extend(true, {}, objects[_i]);
       addRevisionTo(object);
       object = parseForRemote(object);
       objectsForRemote.push(object);
@@ -399,6 +401,11 @@ function hoodieRemoteStore (hoodie, options) {
       }
     });
 
+    pushRequest.done(function() {
+      for (var i = 0; i < objects.length; i++) {
+        remote.trigger('push', objects[i]);
+      }
+    });
     return pushRequest;
   };
 
