@@ -684,7 +684,7 @@ function hoodieRemoteStore (hoodie, options) {
       } else {
 
         // oops. This might be caused by an unreachable server.
-        // Or the server canceled it for what ever reason, e.g.
+        // Or the server cancelled it for what ever reason, e.g.
         // heroku kills the request after ~30s.
         // we'll try again after a 3s timeout
         //
