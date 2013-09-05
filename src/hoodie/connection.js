@@ -62,7 +62,7 @@ function hoodieConnection(hoodie) {
 
     window.setTimeout(hoodie.checkConnection, checkConnectionInterval);
 
-    if (! hoodie.isOnline()) {
+    if (!hoodie.isOnline()) {
       hoodie.trigger('reconnected');
       online = true;
     }

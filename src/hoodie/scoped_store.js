@@ -18,7 +18,7 @@ function hoodieScopedStoreApi(hoodie, storeApi, options) {
   var api = {};
 
   // scoped by type only
-  if (! id) {
+  if (!id) {
 
     // add events
     hoodieEvents(hoodie, { context: api, namespace: storeName + ':' + type });

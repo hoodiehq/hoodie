@@ -1850,7 +1850,7 @@ function invalidSessionResponse () {
 }
 
 function unconfirmedUserDoc (username) {
-  if (! username) {
+  if (!username) {
     username = 'joe@example.com';
   }
   return {

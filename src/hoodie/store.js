@@ -73,7 +73,7 @@ function hoodieStoreApi(hoodie, options) {
   //
   api.validate = options.validate;
 
-  if (! options.validate) {
+  if (!options.validate) {
     api.validate = function(object /*, options */) {
 
       if (!object) {
@@ -85,7 +85,7 @@ function hoodieStoreApi(hoodie, options) {
         });
       }
 
-      if (! object.id) {
+      if (!object.id) {
         return;
       }
 
@@ -406,7 +406,7 @@ function hoodieStoreApi(hoodie, options) {
 
   // required backend methods
   // -------------------------
-  if (! options.backend ) {
+  if (!options.backend ) {
     throw new Error('options.backend must be passed');
   }
 

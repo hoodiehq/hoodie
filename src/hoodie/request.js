@@ -33,7 +33,7 @@ function hoodieRequest(hoodie) {
     // if absolute path passed, set CORS headers
 
     // if relative path passed, prefix with baseUrl
-    if (! /^http/.test(url)) {
+    if (!/^http/.test(url)) {
       url = (hoodie.baseUrl || '') + API_PATH + url;
     }
 

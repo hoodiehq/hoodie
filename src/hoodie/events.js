@@ -20,10 +20,10 @@
 function hoodieEvents(hoodie, options) {
 
   // normalize options hash
-  if (! options) { options = {}; }
+  if (!options) { options = {}; }
 
   // make sure callbacks hash exists
-  if (! hoodie.eventsCallbacks) { hoodie.eventsCallbacks = {}; }
+  if (!hoodie.eventsCallbacks) { hoodie.eventsCallbacks = {}; }
 
   var context = hoodie;
   var namespace = '';
