@@ -5,7 +5,7 @@ describe('hoodie.task', function() {
   beforeEach(function() {
     this.hoodie = new Mocks.Hoodie();
     this.sandbox.spy(window, 'hoodieEvents');
-
+    this.clock = this.sandbox.useFakeTimers(0); // '1970-01-01 00:00:00'
     hoodieTask(this.hoodie);
     this.task = this.hoodie.task;
   });
@@ -87,15 +87,88 @@ describe('hoodie.task', function() {
     });
   });
 
-  describe('#cancel()', function() {
+  describe.only('#cancel()', function() {
     beforeEach(function() {
-
+      this.promise = this.task.cancel('message', '123');
     });
 
-    it('should be funky', function() {
-      expect(this.hoodie.task.cancel).to.be('funky');
+    it('should add a new $task object using hoodie.store.add', function() {
+      expect(this.hoodie.store.update).to.be.calledWith('$message', '123', { cancelledAt: now()});
+    });
+
+    it('should reject when hoodie.store.add rejects', function() {
+      this.hoodie.store.updateDefer.reject('error');
+      expect(this.promise).to.be.rejectedWith('error');
+    });
+
+    _when('hoodie.store.update succeeds (task has not been synced yet)', function() {
+      beforeEach(function() {
+        this.hoodie.store.updateDefer.resolve({type: 'message', id: '123'});
+      });
+
+      it('should remove the task from store', function() {
+        // instead, it should wait until the worker completes the task
+        expect(this.hoodie.store.remove).to.be.calledWith('$message', '123');
+      });
+
+      _when('removing task from store fails', function() {
+        beforeEach(function() {
+          this.hoodie.store.removeDefer.reject('removeError');
+        });
+
+        it('should reject', function() {
+          expect(this.promise).to.be.rejectedWith('removeError');
+        });
+      });
+
+      _when('removing task from store succeeds', function() {
+        beforeEach(function() {
+          this.hoodie.store.removeDefer.resolve('removeSucces');
+        });
+
+        it('should resolve', function() {
+          expect(this.promise).to.be.resolvedWith('removeSucces');
+        });
+      });
+    });
+
+    _when('hoodie.store.update succeeds (task has been synced already)', function() {
+      beforeEach(function() {
+        this.hoodie.store.updateDefer.resolve({type: 'message', id: '123', _rev: '1-234'});
+      });
+
+      it('should remove the task from store', function() {
+        // instead, it should wait until the worker completes the task
+        expect(this.hoodie.store.remove).to.be.calledWith('$message', '123');
+      });
+
+      _when('removing task from store fails', function() {
+        beforeEach(function() {
+          this.hoodie.store.removeDefer.reject('removeError');
+        });
+
+        it('should reject', function() {
+          expect(this.promise).to.be.rejectedWith('removeError');
+        });
+      });
+
+      _when('removing task from store succeeds', function() {
+        beforeEach(function() {
+          this.hoodie.store.removeDefer.resolve('removeSucces');
+        });
+
+        it('should not resolve yet', function() {
+          expect(this.promise).to.be.pending();
+        });
+
+        it('should resolve when on store:sync:message:123 event', function() {
+          this.hoodie.trigger('store:sync:$message:123', 'done!');
+          expect(this.promise).to.be.resolvedWith('done!');
+        });
+      });
     });
   });
+
   describe('#restart()', function() {
     beforeEach(function() {
 
@@ -182,4 +255,8 @@ describe('hoodie.task', function() {
       expect( this.hoodie.task.trigger ).to.be.calledWith( 'success:message:123', { type: 'message', id: '123', $processedAt: '2013-09-05' }, {option: 'value'} );
     });
   }); // subscribeToStoreEvents
+
+  function now() {
+    return '1970-01-01T00:00:00.000Z';
+  }
 });

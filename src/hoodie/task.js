@@ -38,7 +38,7 @@ function hoodieTask(hoodie) {
 
   //
   api.cancel = function(type, id) {
-
+    return hoodie.store.update('$'+type, id, { cancelledAt: now() }).then(handleCancelledTask);
   };
 
   //
@@ -107,6 +107,25 @@ function hoodieTask(hoodie) {
   }
 
   //
+  function handleCancelledTask (task) {
+    var defer;
+    var type = '$'+task.type;
+    var id = task.id;
+    var removePromise = hoodie.store.remove(type, id);
+
+    if (!task._rev) {
+      // task has not yet been synced.
+      return removePromise;
+    }
+
+    defer = hoodie.defer();
+    hoodie.one('store:sync:'+type+':'+id, defer.resolve);
+    removePromise.fail(defer.reject);
+
+    return defer.promise();
+  }
+
+  //
   function handleStoreChange(eventName, object, options) {
     if (object.type[0] !== '$') {
       return;
@@ -168,6 +187,11 @@ function hoodieTask(hoodie) {
     if (eventName !== 'start') {
       api.trigger('change:' + task.type + ':' + task.id, eventName, task, options);
     }
+  }
+
+  //
+  function now() {
+    return JSON.stringify(new Date()).replace(/['"]/g, '');
   }
 
   // extend hoodie
