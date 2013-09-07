@@ -13,6 +13,7 @@
 // * restart
 // * remove
 // * on
+// * one
 // * unbind
 //
 // At the same time, the returned API can be called as function returning a
@@ -33,21 +34,41 @@ function hoodieTask(hoodie) {
   // add events API
   hoodieEvents(hoodie, { context: api, namespace: 'task' });
 
+
+  // start
+  // -------
+
+  // start a new task. If the user has no account yet, hoodie tries to sign up
+  // for an anonymous account in the background. If that fails, the returned
+  // promise will be rejected.
   //
   api.start = function(type, properties) {
-    return hoodie.store.add('$'+type, properties).then(handleNewTask);
+    if (hoodie.account.hasAccount()) {
+      return hoodie.store.add('$'+type, properties).then(handleNewTask);
+    }
+
+    return hoodie.account.anonymousSignUp().then( function() {
+      return api.start(type, properties);
+    });
   };
 
+
+  // cancel
+  // -------
+
+  // cancel a running task
   //
   api.cancel = function(type, id) {
     return hoodie.store.update('$'+type, id, { cancelledAt: now() }).then(handleCancelledTask);
   };
 
-  //
+
   // restart
   // ---------
 
-  // first, we try to cancel an
+  // first, we try to cancel a running task. If that succeeds, we start
+  // a new one with the same properties as the original
+  //
   api.restart = function(type, id, update) {
     var start = function(object) {
       $.extend(object, update);
@@ -59,10 +80,16 @@ function hoodieTask(hoodie) {
     return api.cancel(type, id).then(start);
   };
 
+  // cancelAll
+  // -----------
+
   //
   api.cancelAll = function(type) {
     return findAll(type).then( cancelTaskObjects );
   };
+
+  // restartAll
+  // -----------
 
   //
   api.restartAll = function(type, update) {
@@ -73,6 +100,7 @@ function hoodieTask(hoodie) {
       restartTaskObjects(taskObjects, update);
     } );
   };
+
 
   //
   // subscribe to store events

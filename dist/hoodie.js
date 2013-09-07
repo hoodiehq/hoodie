@@ -32,9 +32,8 @@ function Hoodie(baseUrl) {
     throw new Error('usage: new Hoodie(url);');
   }
 
-  if (!baseUrl) {
-    hoodie.baseUrl = '/_api'; // default to current domain
-  } else {
+  if (baseUrl) {
+    // remove trailing slashes
     hoodie.baseUrl = baseUrl.replace(/\/+$/, '');
   }
 
@@ -56,7 +55,8 @@ function Hoodie(baseUrl) {
   //
 
   /* global hoodieAccount, hoodieRemote, hoodieConfig, hoodieStore,
-            hoodiePromises, hoodieRequest, hoodieConnection, hoodieUUID, hoodieDispose, hoodieOpen
+            hoodiePromises, hoodieRequest, hoodieConnection, hoodieUUID,
+            hoodieDispose, hoodieOpen, hoodieTask
   */
 
   // * hoodie.bind
@@ -96,6 +96,9 @@ function Hoodie(baseUrl) {
   // * hoodie.store
   hoodie.extend( hoodieStore );
 
+  // * hoodie.task
+  hoodie.extend( hoodieTask );
+
   // * hoodie.config
   hoodie.extend( hoodieConfig );
 
@@ -126,6 +129,9 @@ function Hoodie(baseUrl) {
 
   // hoodie.remote
   hoodie.remote.subscribeToEvents();
+
+  // hoodie.task
+  hoodie.task.subscribeToStoreEvents();
 
   // authenticate
   hoodie.account.authenticate().then( hoodie.remote.connect );
@@ -187,7 +193,7 @@ if ( typeof module === 'object' && module && typeof module.exports === 'object' 
   // way to register. Lowercase hoodie is used because AMD module names are
   // derived from file names, and Hoodie is normally delivered in a lowercase
   // file name.
-  define('hoodie', function () {
+  define(function () {
     return Hoodie;
   });
 
@@ -213,8 +219,24 @@ if ( typeof module === 'object' && module && typeof module.exports === 'object' 
 // based on [Events implementations from Spine](https://github.com/maccman/spine/blob/master/src/spine.coffee#L1)
 //
 
-function hoodieEvents(hoodie) {
-  var callbacks = {};
+// callbacks are global, while the events API is used at several places,
+// like hoodie.on / hoodie.store.on / hoodie.task.on etc.
+
+function hoodieEvents(hoodie, options) {
+
+  // normalize options hash
+  if (!options) { options = {}; }
+
+  // make sure callbacks hash exists
+  if (!hoodie.eventsCallbacks) { hoodie.eventsCallbacks = {}; }
+
+  var context = hoodie;
+  var namespace = '';
+
+  if (options.context) {
+    context = options.context;
+    namespace = options.namespace + ':';
+  }
 
   // Bind
   // ------
@@ -229,9 +251,9 @@ function hoodieEvents(hoodie) {
     evs = ev.split(' ');
 
     for (_i = 0, _len = evs.length; _i < _len; _i++) {
-      name = evs[_i];
-      callbacks[name] = callbacks[name] || [];
-      callbacks[name].push(callback);
+      name = namespace + evs[_i];
+      hoodie.eventsCallbacks[name] = hoodie.eventsCallbacks[name] || [];
+      hoodie.eventsCallbacks[name].push(callback);
     }
   }
 
@@ -243,10 +265,12 @@ function hoodieEvents(hoodie) {
   //     object.one 'groundTouch', gameOver
   //
   function one(ev, callback) {
-    bind(ev, function() {
-      unbind(ev, callback);
+    ev = namespace + ev;
+    var wrapper = function() {
+      hoodie.unbind(ev, wrapper);
       callback.apply(null, arguments);
-    });
+    };
+    hoodie.bind(ev, wrapper);
   }
 
   // trigger
@@ -260,7 +284,8 @@ function hoodieEvents(hoodie) {
 
     args = 1 <= arguments.length ? Array.prototype.slice.call(arguments, 0) : [];
     ev = args.shift();
-    list = callbacks[ev];
+    ev = namespace + ev;
+    list = hoodie.eventsCallbacks[ev];
 
     if (!list) {
       return;
@@ -285,26 +310,40 @@ function hoodieEvents(hoodie) {
   //     object.unbind 'move', follow
   //
   function unbind(ev, callback) {
-    var cb, i, list, _i, _len;
+    var cb, i, list, _i, _len, evNames;
 
     if (!ev) {
-      callbacks = {};
+      if (!namespace) {
+        hoodie.eventsCallbacks = {};
+      }
+
+      evNames = Object.keys(hoodie.eventsCallbacks);
+      evNames = evNames.filter(function(key) {
+        return key.indexOf(namespace) === 0;
+      });
+      evNames.forEach(function(key) {
+        delete hoodie.eventsCallbacks[key];
+      });
+
       return;
     }
 
-    list = callbacks[ev];
+    ev = namespace + ev;
+
+    list = hoodie.eventsCallbacks[ev];
 
     if (!list) {
       return;
     }
 
     if (!callback) {
-      delete callbacks[ev];
+      delete hoodie.eventsCallbacks[ev];
       return;
     }
 
     for (i = _i = 0, _len = list.length; _i < _len; i = ++_i) {
       cb = list[i];
+
 
       if (cb !== callback) {
         continue;
@@ -312,19 +351,19 @@ function hoodieEvents(hoodie) {
 
       list = list.slice();
       list.splice(i, 1);
-      callbacks[ev] = list;
+      hoodie.eventsCallbacks[ev] = list;
       break;
     }
 
     return;
   }
 
-  hoodie.bind = bind;
-  hoodie.on = bind;
-  hoodie.one = one;
-  hoodie.trigger = trigger;
-  hoodie.unbind = unbind;
-  hoodie.off = unbind;
+  context.bind = bind;
+  context.on = bind;
+  context.one = one;
+  context.trigger = trigger;
+  context.unbind = unbind;
+  context.off = unbind;
 }
 
 /* exported hoodiePromises */
@@ -403,6 +442,10 @@ function hoodieRequest(hoodie) {
   var $extend = $.extend;
   var $ajax = $.ajax;
 
+  // Hoodie backend listents to requests prefixed by /_api,
+  // so we prefix all requests with relative URLs
+  var API_PATH = '/_api';
+
   // Requests
   // ----------
 
@@ -423,8 +466,8 @@ function hoodieRequest(hoodie) {
     // if absolute path passed, set CORS headers
 
     // if relative path passed, prefix with baseUrl
-    if (! /^http/.test(url)) {
-      url = '' + hoodie.baseUrl + url;
+    if (!/^http/.test(url)) {
+      url = (hoodie.baseUrl || '') + API_PATH + url;
     }
 
     // if url is cross domain, set CORS headers
@@ -461,7 +504,7 @@ function hoodieRequest(hoodie) {
       error = JSON.parse(xhr.responseText);
     } catch (_error) {
       error = {
-        error: xhr.responseText || ('Cannot connect to Hoodie server at ' + hoodie.baseUrl)
+        error: xhr.responseText || ('Cannot connect to Hoodie server at ' + (hoodie.baseUrl || '/'))
       };
     }
 
@@ -539,7 +582,7 @@ function hoodieConnection(hoodie) {
 
     window.setTimeout(hoodie.checkConnection, checkConnectionInterval);
 
-    if (! hoodie.isOnline()) {
+    if (!hoodie.isOnline()) {
       hoodie.trigger('reconnected');
       online = true;
     }
@@ -661,7 +704,7 @@ function hoodieOpen(hoodie) {
   hoodie.open = open;
 }
 
-/* global hoodieScopedStoreApi */
+/* global hoodieScopedStoreApi, hoodieEvents */
 /* exported hoodieStoreApi */
 
 // Store
@@ -720,6 +763,9 @@ function hoodieStoreApi(hoodie, options) {
     return hoodieScopedStoreApi(hoodie, api, scopedOptions);
   };
 
+  // add event API
+  hoodieEvents(hoodie, { context: api, namespace: storeName });
+
 
   // Validate
   // --------------
@@ -733,7 +779,7 @@ function hoodieStoreApi(hoodie, options) {
   //
   api.validate = options.validate;
 
-  if (! options.validate) {
+  if (!options.validate) {
     api.validate = function(object /*, options */) {
 
       if (!object) {
@@ -745,7 +791,7 @@ function hoodieStoreApi(hoodie, options) {
         });
       }
 
-      if (! object.id) {
+      if (!object.id) {
         return;
       }
 
@@ -947,13 +993,26 @@ function hoodieStoreApi(hoodie, options) {
       return api.save(type, id, newObj, options);
     }
 
-    function handleNotFound() {
-      return api.save(type, id, objectUpdate, options);
-    }
-
     // promise decorations get lost when piped through `then`,
     // that's why we need to decorate the find's promise again.
-    var promise = api.find(type, id).then(handleFound, handleNotFound);
+    var promise = api.find(type, id).then(handleFound);
+    return decoratePromise( promise );
+  };
+
+
+  // updateOrAdd
+  // -------------
+
+  // same as `.update()`, but in case the object cannot be found,
+  // it gets created
+  //
+  api.updateOrAdd = function updateOrAdd(type, id, objectUpdate, options) {
+    function handleNotFound() {
+      var properties = $.extend(true, {}, objectUpdate, {id: id});
+      return api.add(type, properties, options);
+    }
+
+    var promise = api.update(type, id, objectUpdate, options).then(null, handleNotFound);
     return decoratePromise( promise );
   };
 
@@ -1064,47 +1123,9 @@ function hoodieStoreApi(hoodie, options) {
 
 
 
-  // trigger
-  // ---------
-
-  // proxies to hoodie.trigger
-  api.trigger = function trigger() {
-    var eventName = arguments[0];
-    var parameters = 2 <= arguments.length ? Array.prototype.slice.call(arguments, 1) : [];
-    var prefix = storeName;
-
-    return hoodie.trigger.apply(hoodie, [prefix + ':' + eventName].concat(Array.prototype.slice.call(parameters)));
-  };
-
-
-  // on
-  // ---------
-
-  // proxies to hoodie.on
-  api.on = function on(eventName, data) {
-    var prefix = storeName;
-
-    eventName = eventName.replace(/(^| )([^ ]+)/g, '$1'+prefix+':$2');
-
-    return hoodie.on(eventName, data);
-  };
-
-
-  // unbind
-  // ---------
-
-  // proxies to hoodie.unbind
-  api.unbind = function unbind(eventName, callback) {
-    var prefix = storeName;
-
-    eventName = eventName.replace(/(^| )([^ ]+)/g, '$1'+prefix+':$2');
-    return hoodie.unbind(eventName, callback);
-  };
-
-
   // required backend methods
   // -------------------------
-  if (! options.backend ) {
+  if (!options.backend ) {
     throw new Error('options.backend must be passed');
   }
 
@@ -1151,7 +1172,7 @@ function hoodieStoreApi(hoodie, options) {
 }
 
 /* exported hoodieScopedStoreApi */
-/* jshint unused: false */
+/* global hoodieEvents */
 
 // scoped Store
 // ============
@@ -1170,7 +1191,11 @@ function hoodieScopedStoreApi(hoodie, storeApi, options) {
   var api = {};
 
   // scoped by type only
-  if (! id) {
+  if (!id) {
+
+    // add events
+    hoodieEvents(hoodie, { context: api, namespace: storeName + ':' + type });
+
     //
     api.save = function save(id, properties, options) {
       return storeApi.save(type, id, properties, options);
@@ -1215,35 +1240,14 @@ function hoodieScopedStoreApi(hoodie, storeApi, options) {
     api.removeAll = function removeAll(options) {
       return storeApi.removeAll(type, options);
     };
-
-    //
-    api.trigger = function trigger() {
-      var eventName = arguments[0];
-      var parameters = 2 <= arguments.length ? Array.prototype.slice.call(arguments, 1) : [];
-      var prefix = storeName + ':' + type;
-
-      return hoodie.trigger.apply(hoodie, [prefix + ':' + eventName].concat(Array.prototype.slice.call(parameters)));
-    };
-
-    //
-    api.on = function on(eventName, data) {
-      var prefix = storeName + ':' + type;
-      eventName = eventName.replace(/(^| )([^ ]+)/g, '$1'+prefix+':$2');
-
-      return hoodie.on(eventName, data);
-    };
-
-    //
-    api.unbind = function unbind(eventName, callback) {
-      var prefix = storeName + ':' + type;
-
-      eventName = eventName.replace(/(^| )([^ ]+)/g, '$1'+prefix+':$2');
-      return hoodie.unbind(eventName, callback);
-    };
   }
 
   // scoped by both: type & id
   if (id) {
+
+    // add events
+    hoodieEvents(hoodie, { context: api, namespace: storeName + ':' + type + ':' + id });
+
     //
     api.save = function save(properties, options) {
       return storeApi.save(type, id, properties, options);
@@ -1262,31 +1266,6 @@ function hoodieScopedStoreApi(hoodie, storeApi, options) {
     //
     api.remove = function remove(options) {
       return storeApi.remove(type, id, options);
-    };
-
-    //
-    api.trigger = function trigger() {
-      var eventName = arguments[0];
-      var parameters = 2 <= arguments.length ? Array.prototype.slice.call(arguments, 1) : [];
-      var prefix = storeName + ':' + type + ':' + id;
-
-      return hoodie.trigger.apply(hoodie, [prefix + ':' + eventName].concat(Array.prototype.slice.call(parameters)));
-    };
-
-    //
-    api.on = function on(eventName, data) {
-      var prefix = storeName + ':' + type + ':' + id;
-      eventName = eventName.replace(/(^| )([^ ]+)/g, '$1'+prefix+':$2');
-
-      return hoodie.on(eventName, data);
-    };
-
-    //
-    api.unbind = function unbind(eventName, callback) {
-      var prefix = storeName + ':' + type + ':' + id;
-
-      eventName = eventName.replace(/(^| )([^ ]+)/g, '$1'+prefix+':$2');
-      return hoodie.unbind(eventName, callback);
     };
   }
 
@@ -1513,7 +1492,7 @@ function hoodieRemoteStore (hoodie, options) {
   // CouchDB database and is also used to prefix
   // triggered events
   //
-  remote.name = null;
+  var remoteName = null;
 
 
   // sync
@@ -1539,7 +1518,7 @@ function hoodieRemoteStore (hoodie, options) {
 
   //
   if (options.name !== undefined) {
-    remote.name = options.name;
+    remoteName = options.name;
   }
 
   if (options.prefix !== undefined) {
@@ -1560,8 +1539,8 @@ function hoodieRemoteStore (hoodie, options) {
   remote.request = function request(type, path, options) {
     options = options || {};
 
-    if (remote.name) {
-      path = '/' + (encodeURIComponent(remote.name)) + path;
+    if (remoteName) {
+      path = '/' + (encodeURIComponent(remoteName)) + path;
     }
 
     if (remote.baseUrl) {
@@ -1614,7 +1593,10 @@ function hoodieRemoteStore (hoodie, options) {
   // start syncing. `remote.bootstrap()` will automatically start
   // pulling when `remote.connected` remains true.
   //
-  remote.connect = function connect() {
+  remote.connect = function connect(name) {
+    if (name) {
+      remoteName = name;
+    }
     remote.connected = true;
     remote.trigger('connect'); // TODO: spec that
     return remote.bootstrap();
@@ -1718,7 +1700,9 @@ function hoodieRemoteStore (hoodie, options) {
     objectsForRemote = [];
 
     for (_i = 0, _len = objects.length; _i < _len; _i++) {
-      object = objects[_i];
+
+      // don't mess with original objects
+      object = $.extend(true, {}, objects[_i]);
       addRevisionTo(object);
       object = parseForRemote(object);
       objectsForRemote.push(object);
@@ -1730,6 +1714,11 @@ function hoodieRemoteStore (hoodie, options) {
       }
     });
 
+    pushRequest.done(function() {
+      for (var i = 0; i < objects.length; i++) {
+        remote.trigger('push', objects[i]);
+      }
+    });
     return pushRequest;
   };
 
@@ -2008,7 +1997,7 @@ function hoodieRemoteStore (hoodie, options) {
       } else {
 
         // oops. This might be caused by an unreachable server.
-        // Or the server canceled it for what ever reason, e.g.
+        // Or the server cancelled it for what ever reason, e.g.
         // heroku kills the request after ~30s.
         // we'll try again after a 3s timeout
         //
@@ -2749,6 +2738,7 @@ function hoodieStore (hoodie) {
 
     // remote events
     hoodie.on('remote:change', handleRemoteChange);
+    hoodie.on('remote:push', handlePushedObject);
   }
 
   // allow to run this once from outside
@@ -2833,6 +2823,14 @@ function hoodieStore (hoodie) {
   }
 
 
+  //
+  // all local changes get bulk pushed. For each object with local
+  // changes that has been pushed we  trigger a sync event
+  function handlePushedObject(object) {
+    triggerEvents('sync', object);
+  }
+
+
   // more advanced localStorage wrappers to find/save objects
   function setObject(type, id, object) {
     var key, store;
@@ -2912,19 +2910,25 @@ function hoodieStore (hoodie) {
 
   // this is where all the store events get triggered,
   // like add:task, change:note:abc4567, remove, etc.
-  function triggerEvents(event, object, options) {
-    store.trigger(event, object, options);
-    store.trigger('' + event + ':' + object.type, object, options);
+  function triggerEvents(eventName, object, options) {
+    store.trigger(eventName, object, options);
+    store.trigger('' + eventName + ':' + object.type, object, options);
 
-    if (event !== 'new') {
-      store.trigger('' + event + ':' + object.type + ':' + object.id, object, options);
+    if (eventName !== 'new') {
+      store.trigger('' + eventName + ':' + object.type + ':' + object.id, object, options);
     }
 
-    store.trigger('change', event, object, options);
-    store.trigger('change:' + object.type, event, object, options);
+    // sync events have no changes, so we don't trigger
+    // "change" events.
+    if (eventName === 'sync') {
+      return;
+    }
 
-    if (event !== 'new') {
-      store.trigger('change:' + object.type + ':' + object.id, event, object, options);
+    store.trigger('change', eventName, object, options);
+    store.trigger('change:' + object.type, eventName, object, options);
+
+    if (eventName !== 'new') {
+      store.trigger('change:' + object.type + ':' + object.id, eventName, object, options);
     }
   }
 
@@ -3098,6 +3102,7 @@ function hoodieConfig(hoodie) {
 }
 
 /* exported hoodieAccount */
+/* global hoodieEvents */
 
 // Hoodie.Account
 // ================
@@ -3120,6 +3125,8 @@ function hoodieAccount (hoodie) {
   // default couchDB user doc prefix
   var userDocPrefix = 'org.couchdb.user';
 
+  // add events API
+  hoodieEvents(hoodie, { context: account, namespace: 'account'});
 
   // Authenticate
   // --------------
@@ -3351,32 +3358,6 @@ function hoodieAccount (hoodie) {
     }
     hoodie.remote.disconnect();
     return sendSignOutRequest().then(cleanupAndTriggerSignOut);
-  };
-
-
-  // On
-  // ---
-
-  // shortcut for `hoodie.on`
-  //
-  account.on = function on(eventName, cb) {
-    eventName = eventName.replace(/(^| )([^ ]+)/g, '$1account:$2');
-    return hoodie.on(eventName, cb);
-  };
-
-
-  // Trigger
-  // ---
-
-  // shortcut for `hoodie.trigger`
-  //
-  account.trigger = function trigger() {
-    var eventName, parameters;
-
-    eventName = arguments[0],
-    parameters = 2 <= arguments.length ? Array.prototype.slice.call(arguments, 1) : [];
-
-    hoodie.trigger.apply(hoodie, ['account:' + eventName].concat(Array.prototype.slice.call(parameters)));
   };
 
 
@@ -4247,8 +4228,7 @@ function hoodieRemote (hoodie) {
 
     // account events
     hoodie.on('account:signin', function() {
-      remote.name = hoodie.account.db();
-      remote.connect();
+      remote.connect( hoodie.account.db() );
     });
 
     hoodie.on('account:reauthenticated', remote.connect);
@@ -4265,6 +4245,321 @@ function hoodieRemote (hoodie) {
   // expose remote API
   //
   hoodie.remote = remote;
+}
+
+/* exported hoodieTask */
+/* global hoodieEvents, hoodieScopedTask */
+
+// Tasks
+// ============
+
+// This class defines the hoodie.task API.
+//
+// The returned API provides the following methods:
+//
+// * start
+// * cancel
+// * restart
+// * remove
+// * on
+// * unbind
+//
+// At the same time, the returned API can be called as function returning a
+// store scoped by the passed type, for example
+//
+//     var emailTasks = hoodie.task('email');
+//     emailTasks.start( properties );
+//     emailTasks.cancel('id123');
+//
+
+function hoodieTask(hoodie) {
+
+  // public API
+  var api = function api(type, id) {
+    return hoodieScopedTask(hoodie, api, {type: type, id: id});
+  };
+
+  // add events API
+  hoodieEvents(hoodie, { context: api, namespace: 'task' });
+
+  //
+  api.start = function(type, properties) {
+    return hoodie.store.add('$'+type, properties).then(handleNewTask);
+  };
+
+  //
+  api.cancel = function(type, id) {
+    return hoodie.store.update('$'+type, id, { cancelledAt: now() }).then(handleCancelledTask);
+  };
+
+  //
+  // restart
+  // ---------
+
+  // first, we try to cancel an
+  api.restart = function(type, id, update) {
+    var start = function(object) {
+      $.extend(object, update);
+      delete object.$error;
+      delete object.$processedAt;
+      delete object.cancelledAt;
+      return api.start(object.type, object);
+    };
+    return api.cancel(type, id).then(start);
+  };
+
+  //
+  api.cancelAll = function(type) {
+    return findAll(type).then( cancelTaskObjects );
+  };
+
+  //
+  api.restartAll = function(type, update) {
+    if (typeof type === 'object') {
+      update = type;
+    }
+    return findAll(type).then( function(taskObjects) {
+      restartTaskObjects(taskObjects, update);
+    } );
+  };
+
+  //
+  // subscribe to store events
+  // we subscribe to all store changes, pipe through the task ones,
+  // making a few changes along the way.
+  //
+  function subscribeToStoreEvents() {
+
+    // account events
+    hoodie.on('store:change', handleStoreChange);
+  }
+
+  // allow to run this only once from outside (during Hoodie initialization)
+  api.subscribeToStoreEvents = function() {
+    subscribeToStoreEvents();
+    delete api.subscribeToStoreEvents;
+  };
+
+
+  // Private
+  // -------
+
+  //
+  function handleNewTask(object) {
+    var defer = hoodie.defer();
+    var taskStore = hoodie.store(object.type, object.id);
+
+    taskStore.on('remove', function(object) {
+
+      // remove "$" from type
+      object.type = object.type.substr(1);
+
+      // task finished by worker.
+      if(object.finishedAt) {
+        return defer.resolve(object);
+      }
+
+      // manually removed / cancelled.
+      defer.reject(object);
+    });
+    taskStore.on('error', function(error, object) {
+
+      // remove "$" from type
+      object.type = object.type.substr(1);
+
+      defer.reject(error, object);
+    });
+
+    return defer.promise();
+  }
+
+  //
+  function handleCancelledTask (task) {
+    var defer;
+    var type = '$'+task.type;
+    var id = task.id;
+    var removePromise = hoodie.store.remove(type, id);
+
+    if (!task._rev) {
+      // task has not yet been synced.
+      return removePromise;
+    }
+
+    defer = hoodie.defer();
+    hoodie.one('store:sync:'+type+':'+id, defer.resolve);
+    removePromise.fail(defer.reject);
+
+    return defer.promise();
+  }
+
+  //
+  function handleStoreChange(eventName, object, options) {
+    if (object.type[0] !== '$') {
+      return;
+    }
+
+    object.type = object.type.substr(1);
+    triggerEvents(eventName, object, options);
+  }
+
+  //
+  function findAll (type) {
+    var startsWith = '$';
+    var filter;
+    if (type) {
+      startsWith += type;
+    }
+
+    filter = function(object) {
+      return object.type.indexOf(startsWith) === 0;
+    };
+    return hoodie.store.findAll(filter);
+  }
+
+  //
+  function cancelTaskObjects (taskObjects) {
+    return taskObjects.map( function(taskObject) {
+      return api.cancel(taskObject.type.substr(1), taskObject.id);
+    });
+  }
+
+  //
+  function restartTaskObjects (taskObjects, update) {
+    return taskObjects.map( function(taskObject) {
+      return api.restart(taskObject.type.substr(1), taskObject.id, update);
+    });
+  }
+
+  // this is where all the task events get triggered,
+  // like add:message, change:message:abc4567, remove, etc.
+  function triggerEvents(eventName, task, options) {
+    var error;
+
+    // "new" tasks are trigger as "start" events
+    if (eventName === 'new') {
+      eventName = 'start';
+    }
+
+    if (eventName === 'remove' && task.cancelledAt) {
+      eventName = 'cancel';
+    }
+
+    if (eventName === 'remove' && task.$processedAt) {
+      eventName = 'success';
+    }
+
+    if (eventName === 'update' && task.$error) {
+      eventName = 'error';
+      error = task.$error;
+      delete task.$error;
+
+      api.trigger('error', error, task, options);
+      api.trigger('error:' + task.type, error, task, options);
+      api.trigger('error:' + task.type + ':' + task.id, error, task, options);
+
+      options = $.extend({}, options, {error: error});
+      api.trigger('change', 'error', task, options);
+      api.trigger('change:' + task.type, 'error', task, options);
+      api.trigger('change:' + task.type + ':' + task.id, 'error', task, options);
+      return;
+    }
+
+    // ignore all the other events
+    if (eventName !== 'start' && eventName !== 'cancel' && eventName !== 'success') {
+      return;
+    }
+
+    api.trigger(eventName, task, options);
+    api.trigger(eventName + ':' + task.type, task, options);
+
+    if (eventName !== 'start') {
+      api.trigger(eventName + ':' + task.type + ':' + task.id, task, options);
+    }
+
+    api.trigger('change', eventName, task, options);
+    api.trigger('change:' + task.type, eventName, task, options);
+
+    if (eventName !== 'start') {
+      api.trigger('change:' + task.type + ':' + task.id, eventName, task, options);
+    }
+  }
+
+  //
+  function now() {
+    return JSON.stringify(new Date()).replace(/['"]/g, '');
+  }
+
+  // extend hoodie
+  hoodie.task = api;
+}
+
+/* exported hoodieScopedTask */
+/* global hoodieEvents */
+
+// scoped Store
+// ============
+
+// same as store, but with type preset to an initially
+// passed value.
+//
+
+function hoodieScopedTask(hoodie, taskApi, options) {
+
+  var type = options.type;
+  var id = options.id;
+
+  var api = {};
+
+  // scoped by type only
+  if (!id) {
+
+    // add events
+    hoodieEvents(hoodie, { context: api, namespace: 'task:' + type });
+
+    //
+    api.start = function start(properties) {
+      return taskApi.start(type, properties);
+    };
+
+    //
+    api.cancel = function cancel(id) {
+      return taskApi.cancel(type, id);
+    };
+
+    //
+    api.restart = function restart(id, update) {
+      return taskApi.restart(type, id, update);
+    };
+
+    //
+    api.cancelAll = function cancelAll() {
+      return taskApi.cancelAll(type);
+    };
+
+    //
+    api.restartAll = function restartAll(update) {
+      return taskApi.restartAll(type, update);
+    };
+  }
+
+  // scoped by both: type & id
+  if (id) {
+
+    // add events
+    hoodieEvents(hoodie, { context: api, namespace: 'task:' + type + ':' + id});
+
+    //
+    api.cancel = function cancel() {
+      return taskApi.cancel(type, id);
+    };
+
+    //
+    api.restart = function restart(update) {
+      return taskApi.restart(type, id, update);
+    };
+  }
+
+  return api;
 }
 
 })(window);
