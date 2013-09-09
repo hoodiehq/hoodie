@@ -20,7 +20,7 @@
 function hoodieEvents(hoodie, options) {
 
   // normalize options hash
-  if (!options) { options = {}; }
+  options = options || {};
 
   // make sure callbacks hash exists
   if (!hoodie.eventsCallbacks) { hoodie.eventsCallbacks = {}; }
