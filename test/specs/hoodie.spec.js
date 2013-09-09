@@ -13,6 +13,7 @@ describe('Hoodie', function() {
     this.sandbox.stub(window, 'hoodieDispose', Mocks.hoodieDispose);
     this.sandbox.stub(window, 'hoodieOpen', Mocks.hoodieOpen);
     this.sandbox.stub(window, 'hoodieStore', Mocks.hoodieStore);
+    this.sandbox.stub(window, 'hoodieTask', Mocks.hoodieTask);
     this.sandbox.stub(window, 'hoodieConfig', Mocks.hoodieConfig);
     this.sandbox.stub(window, 'hoodieAccount', Mocks.hoodieAccount);
     this.sandbox.stub(window, 'hoodieRemote', Mocks.hoodieRemote);
@@ -33,7 +34,7 @@ describe('Hoodie', function() {
 
     it('should default the CouchDB URL to current domain with a api subdomain', function() {
       var hoodie = new Hoodie();
-      expect(hoodie.baseUrl).to.eql('/_api');
+      expect(hoodie.baseUrl).to.be( undefined );
     });
 
     // test for extending with core modules
@@ -90,13 +91,17 @@ describe('Hoodie', function() {
       expect(this.hoodie.on).to.be.calledWith('account:signout', this.hoodie.config.clear);
     });
 
-    it('inits store', function() {
+    it('inits store module', function() {
       expect(this.hoodie.store.patchIfNotPersistant).to.be.called();
       expect(this.hoodie.store.subscribeToOutsideEvents).to.be.called();
       expect(this.hoodie.store.bootstrapDirtyObjects).to.be.called();
     });
 
-    it('inits remote', function() {
+    it('inits task module', function() {
+      expect(this.hoodie.task.subscribeToStoreEvents).to.be.called();
+    });
+
+    it('inits remote module', function() {
       expect(this.hoodie.remote.subscribeToEvents).to.be.called();
     });
 

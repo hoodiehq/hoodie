@@ -179,7 +179,7 @@ function hoodieRemoteStore (hoodie, options) {
   // CouchDB database and is also used to prefix
   // triggered events
   //
-  remote.name = null;
+  var remoteName = null;
 
 
   // sync
@@ -205,7 +205,7 @@ function hoodieRemoteStore (hoodie, options) {
 
   //
   if (options.name !== undefined) {
-    remote.name = options.name;
+    remoteName = options.name;
   }
 
   if (options.prefix !== undefined) {
@@ -226,8 +226,8 @@ function hoodieRemoteStore (hoodie, options) {
   remote.request = function request(type, path, options) {
     options = options || {};
 
-    if (remote.name) {
-      path = '/' + (encodeURIComponent(remote.name)) + path;
+    if (remoteName) {
+      path = '/' + (encodeURIComponent(remoteName)) + path;
     }
 
     if (remote.baseUrl) {
@@ -280,7 +280,10 @@ function hoodieRemoteStore (hoodie, options) {
   // start syncing. `remote.bootstrap()` will automatically start
   // pulling when `remote.connected` remains true.
   //
-  remote.connect = function connect() {
+  remote.connect = function connect(name) {
+    if (name) {
+      remoteName = name;
+    }
     remote.connected = true;
     remote.trigger('connect'); // TODO: spec that
     return remote.bootstrap();
@@ -384,7 +387,9 @@ function hoodieRemoteStore (hoodie, options) {
     objectsForRemote = [];
 
     for (_i = 0, _len = objects.length; _i < _len; _i++) {
-      object = objects[_i];
+
+      // don't mess with original objects
+      object = $.extend(true, {}, objects[_i]);
       addRevisionTo(object);
       object = parseForRemote(object);
       objectsForRemote.push(object);
@@ -396,6 +401,11 @@ function hoodieRemoteStore (hoodie, options) {
       }
     });
 
+    pushRequest.done(function() {
+      for (var i = 0; i < objects.length; i++) {
+        remote.trigger('push', objects[i]);
+      }
+    });
     return pushRequest;
   };
 
@@ -674,7 +684,7 @@ function hoodieRemoteStore (hoodie, options) {
       } else {
 
         // oops. This might be caused by an unreachable server.
-        // Or the server canceled it for what ever reason, e.g.
+        // Or the server cancelled it for what ever reason, e.g.
         // heroku kills the request after ~30s.
         // we'll try again after a 3s timeout
         //

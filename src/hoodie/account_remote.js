@@ -101,8 +101,7 @@ function hoodieRemote (hoodie) {
 
     // account events
     hoodie.on('account:signin', function() {
-      remote.name = hoodie.account.db();
-      remote.connect();
+      remote.connect( hoodie.account.db() );
     });
 
     hoodie.on('account:reauthenticated', remote.connect);
