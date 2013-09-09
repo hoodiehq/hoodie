@@ -11,10 +11,7 @@ hoodie = new Hoodie
     <span class="k">throw</span> <span class="k">new</span> <span class="nb">Error</span><span class="p">(</span><span class="s1">&#39;usage: new Hoodie(url);&#39;</span><span class="p">);</span>
   <span class="p">}</span>
 
-  <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nx">baseUrl</span><span class="p">)</span> <span class="p">{</span>
-    <span class="nx">hoodie</span><span class="p">.</span><span class="nx">baseUrl</span> <span class="o">=</span> <span class="s1">&#39;/_api&#39;</span><span class="p">;</span> <span class="c1">// default to current domain</span>
-  <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
-    <span class="nx">hoodie</span><span class="p">.</span><span class="nx">baseUrl</span> <span class="o">=</span> <span class="nx">baseUrl</span><span class="p">.</span><span class="nx">replace</span><span class="p">(</span><span class="sr">/\/+$/</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">);</span>
+  <span class="k">if</span> <span class="p">(</span><span class="nx">baseUrl</span><span class="p">)</span> <span class="p">{</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>remove trailing slashes</p></div></div><div class="code"><div class="wrapper">    <span class="nx">hoodie</span><span class="p">.</span><span class="nx">baseUrl</span> <span class="o">=</span> <span class="nx">baseUrl</span><span class="p">.</span><span class="nx">replace</span><span class="p">(</span><span class="sr">/\/+$/</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">);</span>
   <span class="p">}</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h2 id="hoodieextend">hoodie.extend</h2></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>extend hoodie instance:</p>
 
 <pre><code>hoodie.extend(function(hoodie) {} )
@@ -91,7 +88,7 @@ files that may use define, but not via a proper concatenation script that
 understands anonymous AMD modules. A named AMD is safest and most robust
 way to register. Lowercase hoodie is used because AMD module names are
 derived from file names, and Hoodie is normally delivered in a lowercase
-file name.</p></div></div><div class="code"><div class="wrapper">  <span class="nx">define</span><span class="p">(</span><span class="s1">&#39;hoodie&#39;</span><span class="p">,</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+file name.</p></div></div><div class="code"><div class="wrapper">  <span class="nx">define</span><span class="p">(</span><span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
     <span class="k">return</span> <span class="nx">Hoodie</span><span class="p">;</span>
   <span class="p">});</span>
 

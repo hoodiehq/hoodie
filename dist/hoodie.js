@@ -1,4 +1,4 @@
-// Hoodie.js - 0.4.0-pre
+// Hoodie.js - 0.4.0
 // https://github.com/hoodiehq/hoodie.js
 // Copyright 2012, 2013 https://github.com/hoodiehq/
 // Licensed Apache License 2.0
@@ -32,9 +32,8 @@ function Hoodie(baseUrl) {
     throw new Error('usage: new Hoodie(url);');
   }
 
-  if (!baseUrl) {
-    hoodie.baseUrl = '/_api'; // default to current domain
-  } else {
+  if (baseUrl) {
+    // remove trailing slashes
     hoodie.baseUrl = baseUrl.replace(/\/+$/, '');
   }
 
@@ -187,7 +186,7 @@ if ( typeof module === 'object' && module && typeof module.exports === 'object' 
   // way to register. Lowercase hoodie is used because AMD module names are
   // derived from file names, and Hoodie is normally delivered in a lowercase
   // file name.
-  define('hoodie', function () {
+  define(function () {
     return Hoodie;
   });
 
@@ -213,8 +212,25 @@ if ( typeof module === 'object' && module && typeof module.exports === 'object' 
 // based on [Events implementations from Spine](https://github.com/maccman/spine/blob/master/src/spine.coffee#L1)
 //
 
-function hoodieEvents(hoodie) {
-  var callbacks = {};
+// callbacks are global, while the events API is used at several places,
+// like hoodie.on / hoodie.store.on / hoodie.task.on etc.
+
+function hoodieEvents(hoodie, options) {
+  var context = hoodie;
+  var namespace = '';
+
+  // normalize options hash
+  options = options || {};
+
+  // make sure callbacks hash exists
+  if (!hoodie.eventsCallbacks) {
+    hoodie.eventsCallbacks = {};
+  }
+
+  if (options.context) {
+    context = options.context;
+    namespace = options.namespace + ':';
+  }
 
   // Bind
   // ------
@@ -229,9 +245,9 @@ function hoodieEvents(hoodie) {
     evs = ev.split(' ');
 
     for (_i = 0, _len = evs.length; _i < _len; _i++) {
-      name = evs[_i];
-      callbacks[name] = callbacks[name] || [];
-      callbacks[name].push(callback);
+      name = namespace + evs[_i];
+      hoodie.eventsCallbacks[name] = hoodie.eventsCallbacks[name] || [];
+      hoodie.eventsCallbacks[name].push(callback);
     }
   }
 
@@ -243,10 +259,12 @@ function hoodieEvents(hoodie) {
   //     object.one 'groundTouch', gameOver
   //
   function one(ev, callback) {
-    bind(ev, function() {
-      unbind(ev, callback);
+    ev = namespace + ev;
+    var wrapper = function() {
+      hoodie.unbind(ev, wrapper);
       callback.apply(null, arguments);
-    });
+    };
+    hoodie.bind(ev, wrapper);
   }
 
   // trigger
@@ -260,7 +278,8 @@ function hoodieEvents(hoodie) {
 
     args = 1 <= arguments.length ? Array.prototype.slice.call(arguments, 0) : [];
     ev = args.shift();
-    list = callbacks[ev];
+    ev = namespace + ev;
+    list = hoodie.eventsCallbacks[ev];
 
     if (!list) {
       return;
@@ -285,26 +304,40 @@ function hoodieEvents(hoodie) {
   //     object.unbind 'move', follow
   //
   function unbind(ev, callback) {
-    var cb, i, list, _i, _len;
+    var cb, i, list, _i, _len, evNames;
 
     if (!ev) {
-      callbacks = {};
+      if (!namespace) {
+        hoodie.eventsCallbacks = {};
+      }
+
+      evNames = Object.keys(hoodie.eventsCallbacks);
+      evNames = evNames.filter(function(key) {
+        return key.indexOf(namespace) === 0;
+      });
+      evNames.forEach(function(key) {
+        delete hoodie.eventsCallbacks[key];
+      });
+
       return;
     }
 
-    list = callbacks[ev];
+    ev = namespace + ev;
+
+    list = hoodie.eventsCallbacks[ev];
 
     if (!list) {
       return;
     }
 
     if (!callback) {
-      delete callbacks[ev];
+      delete hoodie.eventsCallbacks[ev];
       return;
     }
 
     for (i = _i = 0, _len = list.length; _i < _len; i = ++_i) {
       cb = list[i];
+
 
       if (cb !== callback) {
         continue;
@@ -312,19 +345,19 @@ function hoodieEvents(hoodie) {
 
       list = list.slice();
       list.splice(i, 1);
-      callbacks[ev] = list;
+      hoodie.eventsCallbacks[ev] = list;
       break;
     }
 
     return;
   }
 
-  hoodie.bind = bind;
-  hoodie.on = bind;
-  hoodie.one = one;
-  hoodie.trigger = trigger;
-  hoodie.unbind = unbind;
-  hoodie.off = unbind;
+  context.bind = bind;
+  context.on = bind;
+  context.one = one;
+  context.trigger = trigger;
+  context.unbind = unbind;
+  context.off = unbind;
 }
 
 /* exported hoodiePromises */
@@ -403,6 +436,10 @@ function hoodieRequest(hoodie) {
   var $extend = $.extend;
   var $ajax = $.ajax;
 
+  // Hoodie backend listents to requests prefixed by /_api,
+  // so we prefix all requests with relative URLs
+  var API_PATH = '/_api';
+
   // Requests
   // ----------
 
@@ -423,8 +460,8 @@ function hoodieRequest(hoodie) {
     // if absolute path passed, set CORS headers
 
     // if relative path passed, prefix with baseUrl
-    if (! /^http/.test(url)) {
-      url = '' + hoodie.baseUrl + url;
+    if (!/^http/.test(url)) {
+      url = (hoodie.baseUrl || '') + API_PATH + url;
     }
 
     // if url is cross domain, set CORS headers
@@ -461,7 +498,7 @@ function hoodieRequest(hoodie) {
       error = JSON.parse(xhr.responseText);
     } catch (_error) {
       error = {
-        error: xhr.responseText || ('Cannot connect to Hoodie server at ' + hoodie.baseUrl)
+        error: xhr.responseText || ('Cannot connect to Hoodie server at ' + (hoodie.baseUrl || '/'))
       };
     }
 
@@ -539,7 +576,7 @@ function hoodieConnection(hoodie) {
 
     window.setTimeout(hoodie.checkConnection, checkConnectionInterval);
 
-    if (! hoodie.isOnline()) {
+    if (!hoodie.isOnline()) {
       hoodie.trigger('reconnected');
       online = true;
     }
@@ -661,7 +698,7 @@ function hoodieOpen(hoodie) {
   hoodie.open = open;
 }
 
-/* global hoodieScopedStoreApi */
+/* global hoodieScopedStoreApi, hoodieEvents */
 /* exported hoodieStoreApi */
 
 // Store
@@ -720,6 +757,9 @@ function hoodieStoreApi(hoodie, options) {
     return hoodieScopedStoreApi(hoodie, api, scopedOptions);
   };
 
+  // add event API
+  hoodieEvents(hoodie, { context: api, namespace: storeName });
+
 
   // Validate
   // --------------
@@ -733,7 +773,7 @@ function hoodieStoreApi(hoodie, options) {
   //
   api.validate = options.validate;
 
-  if (! options.validate) {
+  if (!options.validate) {
     api.validate = function(object /*, options */) {
 
       if (!object) {
@@ -745,7 +785,7 @@ function hoodieStoreApi(hoodie, options) {
         });
       }
 
-      if (! object.id) {
+      if (!object.id) {
         return;
       }
 
@@ -947,13 +987,26 @@ function hoodieStoreApi(hoodie, options) {
       return api.save(type, id, newObj, options);
     }
 
-    function handleNotFound() {
-      return api.save(type, id, objectUpdate, options);
-    }
-
     // promise decorations get lost when piped through `then`,
     // that's why we need to decorate the find's promise again.
-    var promise = api.find(type, id).then(handleFound, handleNotFound);
+    var promise = api.find(type, id).then(handleFound);
+    return decoratePromise( promise );
+  };
+
+
+  // updateOrAdd
+  // -------------
+
+  // same as `.update()`, but in case the object cannot be found,
+  // it gets created
+  //
+  api.updateOrAdd = function updateOrAdd(type, id, objectUpdate, options) {
+    function handleNotFound() {
+      var properties = $.extend(true, {}, objectUpdate, {id: id});
+      return api.add(type, properties, options);
+    }
+
+    var promise = api.update(type, id, objectUpdate, options).then(null, handleNotFound);
     return decoratePromise( promise );
   };
 
@@ -1064,47 +1117,9 @@ function hoodieStoreApi(hoodie, options) {
 
 
 
-  // trigger
-  // ---------
-
-  // proxies to hoodie.trigger
-  api.trigger = function trigger() {
-    var eventName = arguments[0];
-    var parameters = 2 <= arguments.length ? Array.prototype.slice.call(arguments, 1) : [];
-    var prefix = storeName;
-
-    return hoodie.trigger.apply(hoodie, [prefix + ':' + eventName].concat(Array.prototype.slice.call(parameters)));
-  };
-
-
-  // on
-  // ---------
-
-  // proxies to hoodie.on
-  api.on = function on(eventName, data) {
-    var prefix = storeName;
-
-    eventName = eventName.replace(/(^| )([^ ]+)/g, '$1'+prefix+':$2');
-
-    return hoodie.on(eventName, data);
-  };
-
-
-  // unbind
-  // ---------
-
-  // proxies to hoodie.unbind
-  api.unbind = function unbind(eventName, callback) {
-    var prefix = storeName;
-
-    eventName = eventName.replace(/(^| )([^ ]+)/g, '$1'+prefix+':$2');
-    return hoodie.unbind(eventName, callback);
-  };
-
-
   // required backend methods
   // -------------------------
-  if (! options.backend ) {
+  if (!options.backend ) {
     throw new Error('options.backend must be passed');
   }
 
@@ -1142,6 +1157,7 @@ function hoodieStoreApi(hoodie, options) {
     var promise = hoodie.resolveWith.apply(null, arguments);
     return decoratePromise(promise);
   }
+
   function rejectWith() {
     var promise = hoodie.rejectWith.apply(null, arguments);
     return decoratePromise(promise);
@@ -1151,7 +1167,7 @@ function hoodieStoreApi(hoodie, options) {
 }
 
 /* exported hoodieScopedStoreApi */
-/* jshint unused: false */
+/* global hoodieEvents */
 
 // scoped Store
 // ============
@@ -1170,7 +1186,11 @@ function hoodieScopedStoreApi(hoodie, storeApi, options) {
   var api = {};
 
   // scoped by type only
-  if (! id) {
+  if (!id) {
+
+    // add events
+    hoodieEvents(hoodie, { context: api, namespace: storeName + ':' + type });
+
     //
     api.save = function save(id, properties, options) {
       return storeApi.save(type, id, properties, options);
@@ -1215,35 +1235,14 @@ function hoodieScopedStoreApi(hoodie, storeApi, options) {
     api.removeAll = function removeAll(options) {
       return storeApi.removeAll(type, options);
     };
-
-    //
-    api.trigger = function trigger() {
-      var eventName = arguments[0];
-      var parameters = 2 <= arguments.length ? Array.prototype.slice.call(arguments, 1) : [];
-      var prefix = storeName + ':' + type;
-
-      return hoodie.trigger.apply(hoodie, [prefix + ':' + eventName].concat(Array.prototype.slice.call(parameters)));
-    };
-
-    //
-    api.on = function on(eventName, data) {
-      var prefix = storeName + ':' + type;
-      eventName = eventName.replace(/(^| )([^ ]+)/g, '$1'+prefix+':$2');
-
-      return hoodie.on(eventName, data);
-    };
-
-    //
-    api.unbind = function unbind(eventName, callback) {
-      var prefix = storeName + ':' + type;
-
-      eventName = eventName.replace(/(^| )([^ ]+)/g, '$1'+prefix+':$2');
-      return hoodie.unbind(eventName, callback);
-    };
   }
 
   // scoped by both: type & id
   if (id) {
+
+    // add events
+    hoodieEvents(hoodie, { context: api, namespace: storeName + ':' + type + ':' + id });
+
     //
     api.save = function save(properties, options) {
       return storeApi.save(type, id, properties, options);
@@ -1262,31 +1261,6 @@ function hoodieScopedStoreApi(hoodie, storeApi, options) {
     //
     api.remove = function remove(options) {
       return storeApi.remove(type, id, options);
-    };
-
-    //
-    api.trigger = function trigger() {
-      var eventName = arguments[0];
-      var parameters = 2 <= arguments.length ? Array.prototype.slice.call(arguments, 1) : [];
-      var prefix = storeName + ':' + type + ':' + id;
-
-      return hoodie.trigger.apply(hoodie, [prefix + ':' + eventName].concat(Array.prototype.slice.call(parameters)));
-    };
-
-    //
-    api.on = function on(eventName, data) {
-      var prefix = storeName + ':' + type + ':' + id;
-      eventName = eventName.replace(/(^| )([^ ]+)/g, '$1'+prefix+':$2');
-
-      return hoodie.on(eventName, data);
-    };
-
-    //
-    api.unbind = function unbind(eventName, callback) {
-      var prefix = storeName + ':' + type + ':' + id;
-
-      eventName = eventName.replace(/(^| )([^ ]+)/g, '$1'+prefix+':$2');
-      return hoodie.unbind(eventName, callback);
     };
   }
 
@@ -1513,7 +1487,7 @@ function hoodieRemoteStore (hoodie, options) {
   // CouchDB database and is also used to prefix
   // triggered events
   //
-  remote.name = null;
+  var remoteName = null;
 
 
   // sync
@@ -1539,7 +1513,7 @@ function hoodieRemoteStore (hoodie, options) {
 
   //
   if (options.name !== undefined) {
-    remote.name = options.name;
+    remoteName = options.name;
   }
 
   if (options.prefix !== undefined) {
@@ -1560,8 +1534,8 @@ function hoodieRemoteStore (hoodie, options) {
   remote.request = function request(type, path, options) {
     options = options || {};
 
-    if (remote.name) {
-      path = '/' + (encodeURIComponent(remote.name)) + path;
+    if (remoteName) {
+      path = '/' + (encodeURIComponent(remoteName)) + path;
     }
 
     if (remote.baseUrl) {
@@ -1614,7 +1588,10 @@ function hoodieRemoteStore (hoodie, options) {
   // start syncing. `remote.bootstrap()` will automatically start
   // pulling when `remote.connected` remains true.
   //
-  remote.connect = function connect() {
+  remote.connect = function connect(name) {
+    if (name) {
+      remoteName = name;
+    }
     remote.connected = true;
     remote.trigger('connect'); // TODO: spec that
     return remote.bootstrap();
@@ -1718,7 +1695,9 @@ function hoodieRemoteStore (hoodie, options) {
     objectsForRemote = [];
 
     for (_i = 0, _len = objects.length; _i < _len; _i++) {
-      object = objects[_i];
+
+      // don't mess with original objects
+      object = $.extend(true, {}, objects[_i]);
       addRevisionTo(object);
       object = parseForRemote(object);
       objectsForRemote.push(object);
@@ -1730,6 +1709,11 @@ function hoodieRemoteStore (hoodie, options) {
       }
     });
 
+    pushRequest.done(function() {
+      for (var i = 0; i < objects.length; i++) {
+        remote.trigger('push', objects[i]);
+      }
+    });
     return pushRequest;
   };
 
@@ -2749,6 +2733,7 @@ function hoodieStore (hoodie) {
 
     // remote events
     hoodie.on('remote:change', handleRemoteChange);
+    hoodie.on('remote:push', handlePushedObject);
   }
 
   // allow to run this once from outside
@@ -2830,6 +2815,14 @@ function hoodieStore (hoodie) {
         remote: true
       });
     }
+  }
+
+
+  //
+  // all local changes get bulk pushed. For each object with local
+  // changes that has been pushed we  trigger a sync event
+  function handlePushedObject(object) {
+    triggerEvents('sync', object);
   }
 
 
@@ -2918,6 +2911,12 @@ function hoodieStore (hoodie) {
 
     if (event !== 'new') {
       store.trigger('' + event + ':' + object.type + ':' + object.id, object, options);
+    }
+
+    // sync events have no changes, so we don't trigger
+    // "change" events.
+    if (event === 'sync') {
+      return;
     }
 
     store.trigger('change', event, object, options);
@@ -3098,6 +3097,7 @@ function hoodieConfig(hoodie) {
 }
 
 /* exported hoodieAccount */
+/* global hoodieEvents */
 
 // Hoodie.Account
 // ================
@@ -3120,6 +3120,8 @@ function hoodieAccount (hoodie) {
   // default couchDB user doc prefix
   var userDocPrefix = 'org.couchdb.user';
 
+  // add events API
+  hoodieEvents(hoodie, { context: account, namespace: 'account'});
 
   // Authenticate
   // --------------
@@ -3351,32 +3353,6 @@ function hoodieAccount (hoodie) {
     }
     hoodie.remote.disconnect();
     return sendSignOutRequest().then(cleanupAndTriggerSignOut);
-  };
-
-
-  // On
-  // ---
-
-  // shortcut for `hoodie.on`
-  //
-  account.on = function on(eventName, cb) {
-    eventName = eventName.replace(/(^| )([^ ]+)/g, '$1account:$2');
-    return hoodie.on(eventName, cb);
-  };
-
-
-  // Trigger
-  // ---
-
-  // shortcut for `hoodie.trigger`
-  //
-  account.trigger = function trigger() {
-    var eventName, parameters;
-
-    eventName = arguments[0],
-    parameters = 2 <= arguments.length ? Array.prototype.slice.call(arguments, 1) : [];
-
-    hoodie.trigger.apply(hoodie, ['account:' + eventName].concat(Array.prototype.slice.call(parameters)));
   };
 
 
@@ -4247,8 +4223,7 @@ function hoodieRemote (hoodie) {
 
     // account events
     hoodie.on('account:signin', function() {
-      remote.name = hoodie.account.db();
-      remote.connect();
+      remote.connect( hoodie.account.db() );
     });
 
     hoodie.on('account:reauthenticated', remote.connect);
