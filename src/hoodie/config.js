@@ -55,13 +55,13 @@ function hoodieConfig(hoodie) {
     return hoodie.store.remove(type, id);
   };
 
-  // remove
+  // unset
   // ----------
 
-  // removes a configuration, is a simple alias for config.set(key, undefined)
+  // unsets a configuration, is a simple alias for config.set(key, undefined)
   //
-  config.remove = function remove(key) {
-    return config.set(key, void 0);
+  config.unset = function unset(key) {
+    return config.set(key, undefined);
   };
 
   // load cache

@@ -24,9 +24,8 @@ function Hoodie(baseUrl) {
     throw new Error('usage: new Hoodie(url);');
   }
 
-  if (!baseUrl) {
-    hoodie.baseUrl = '/_api'; // default to current domain
-  } else {
+  if (baseUrl) {
+    // remove trailing slashes
     hoodie.baseUrl = baseUrl.replace(/\/+$/, '');
   }
 
@@ -48,7 +47,8 @@ function Hoodie(baseUrl) {
   //
 
   /* global hoodieAccount, hoodieRemote, hoodieConfig, hoodieStore,
-            hoodiePromises, hoodieRequest, hoodieConnection, hoodieUUID, hoodieDispose, hoodieOpen
+            hoodiePromises, hoodieRequest, hoodieConnection, hoodieUUID,
+            hoodieDispose, hoodieOpen, hoodieTask
   */
 
   // * hoodie.bind
@@ -88,6 +88,9 @@ function Hoodie(baseUrl) {
   // * hoodie.store
   hoodie.extend( hoodieStore );
 
+  // * hoodie.task
+  hoodie.extend( hoodieTask );
+
   // * hoodie.config
   hoodie.extend( hoodieConfig );
 
@@ -118,6 +121,9 @@ function Hoodie(baseUrl) {
 
   // hoodie.remote
   hoodie.remote.subscribeToEvents();
+
+  // hoodie.task
+  hoodie.task.subscribeToStoreEvents();
 
   // authenticate
   hoodie.account.authenticate().then( hoodie.remote.connect );

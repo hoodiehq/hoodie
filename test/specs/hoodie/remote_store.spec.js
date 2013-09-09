@@ -26,10 +26,6 @@ describe('hoodieRemoteStore', function() {
   });
 
   describe('factory', function() {
-    it('should set @name from options', function() {
-      expect(this.remote.name).to.eql('my/store');
-    });
-
     it('should fallback prefix to \'\'', function() {
       expect(this.remote.prefix).to.eql('');
     });
@@ -74,14 +70,14 @@ describe('hoodieRemoteStore', function() {
 
     it('should set options.contentType to "application/json"', function() {
       this.remote.request('GET', '/something');
-      expect(this.hoodie.request).to.be.calledWith('GET', '/something', {
+      expect(this.hoodie.request).to.be.calledWith('GET', '/my%2Fstore/something', {
         contentType: 'application/json'
       });
     });
 
     it('should prefix path with @name (encoded)', function() {
-      this.remote.name = 'my/funky/store';
-      this.remote.request('GET', '/something');
+      var remote = hoodieRemoteStore(this.hoodie, { name: 'my/funky/store'} );
+      remote.request('GET', '/something');
       var typeAndPath = this.hoodie.request.args[0];
 
       expect(typeAndPath[1]).to.eql('/my%2Ffunky%2Fstore/something');
@@ -93,7 +89,7 @@ describe('hoodieRemoteStore', function() {
 
       var typeAndPath = this.hoodie.request.args[0];
 
-      expect(typeAndPath[1]).to.eql('http://api.otherapp.com/something');
+      expect(typeAndPath[1]).to.eql('http://api.otherapp.com/my%2Fstore/something');
     });
 
     _when('type is POST', function() {
@@ -401,6 +397,14 @@ describe('hoodieRemoteStore', function() {
     it('should bootstrap', function() {
       this.remote.connect();
       expect(this.remote.bootstrap.called).to.be.ok();
+    });
+
+    it('should set new name if passed as param', function() {
+      this.remote.request('GET', '/funk');
+      expect(this.hoodie.request).to.be.calledWith('GET', '/my%2Fstore/funk', { 'contentType': 'application/json' });
+      this.remote.connect('funky/store');
+      this.remote.request('GET', '/funk');
+      expect(this.hoodie.request).to.be.calledWith('GET', '/funky%2Fstore/funk', { 'contentType': 'application/json' });
     });
   }); // #connect
 
@@ -815,6 +819,18 @@ describe('hoodieRemoteStore', function() {
         expect(this.hoodie.request.called).to.be.ok();
         var data = JSON.parse(this.hoodie.request.args[0][2].data);
         expect(data.docs.length).to.eql(3);
+      });
+
+      _when('push request succeeds', function() {
+        beforeEach(function() {
+          this.requestDefer.resolve();
+        });
+
+        it('should trigger push events for each object', function() {
+          expect(this.remote.trigger).to.be.calledWith('push', { type: 'todo', id: '1' });
+          expect(this.remote.trigger).to.be.calledWith('push', { type: 'todo', id: '2' });
+          expect(this.remote.trigger).to.be.calledWith('push', { type: 'todo', id: '3' });
+        });
       });
     }); // Array of docs passed
 

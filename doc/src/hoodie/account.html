@@ -101,7 +101,7 @@ change his username and password internally instead of creating another user.</p
   <span class="p">}</span>
 
   <span class="kd">function</span> <span class="nx">removeAnonymousPassword</span><span class="p">()</span> <span class="p">{</span>
-    <span class="k">return</span> <span class="nx">hoodie</span><span class="p">.</span><span class="nx">config</span><span class="p">.</span><span class="nx">remove</span><span class="p">(</span><span class="nx">anonymousPasswordKey</span><span class="p">);</span>
+    <span class="k">return</span> <span class="nx">hoodie</span><span class="p">.</span><span class="nx">config</span><span class="p">.</span><span class="nx">unset</span><span class="p">(</span><span class="nx">anonymousPasswordKey</span><span class="p">);</span>
   <span class="p">}</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h2 id="sign-in-with-username-amp-password">sign in with username &amp; password</h2></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>uses standard CouchDB API to create a new user session (POST /_session).
 Besides the standard sign in we also check if the account has been confirmed
 (roles include 'confirmed' role).</p>
@@ -479,7 +479,7 @@ current session has been invalidated</p></div></div><div class="code"><div class
   <span class="p">}</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>If the error is a 401, it's exactly what we've been waiting for.
 In this case we resolve the promise.</p></div></div><div class="code"><div class="wrapper">  <span class="kd">function</span> <span class="nx">handlePasswordResetStatusRequestError</span><span class="p">(</span><span class="nx">xhr</span><span class="p">)</span> <span class="p">{</span>
     <span class="k">if</span> <span class="p">(</span><span class="nx">xhr</span><span class="p">.</span><span class="nx">status</span> <span class="o">===</span> <span class="mi">401</span><span class="p">)</span> <span class="p">{</span>
-      <span class="nx">hoodie</span><span class="p">.</span><span class="nx">config</span><span class="p">.</span><span class="nx">remove</span><span class="p">(</span><span class="s1">&#39;_account.resetPasswordId&#39;</span><span class="p">);</span>
+      <span class="nx">hoodie</span><span class="p">.</span><span class="nx">config</span><span class="p">.</span><span class="nx">unset</span><span class="p">(</span><span class="s1">&#39;_account.resetPasswordId&#39;</span><span class="p">);</span>
       <span class="nx">account</span><span class="p">.</span><span class="nx">trigger</span><span class="p">(</span><span class="s1">&#39;passwordreset&#39;</span><span class="p">);</span>
 
       <span class="k">return</span> <span class="nx">hoodie</span><span class="p">.</span><span class="nx">resolve</span><span class="p">();</span>

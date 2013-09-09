@@ -7,6 +7,7 @@ describe('hoodieStoreApi', function() {
     this.options = Mocks.storeOptions('funkstore');
     this.validate = sinon.stub();
     this.optionsWithValidate = $.extend({}, this.options, {validate: this.validate});
+    this.sandbox.spy(window, 'hoodieEvents');
     this.store = hoodieStoreApi(this.hoodie, this.options );
     this.storeWithCustomValidate = hoodieStoreApi(this.hoodie, this.optionsWithValidate );
   });
@@ -17,6 +18,40 @@ describe('hoodieStoreApi', function() {
 
   it('has a default store.validate function', function() {
     expect(this.store.validate).to.be.a(Function);
+  });
+
+  it('returns a function', function() {
+    expect(this.store).to.be.a(Function);
+  });
+
+  it('adds event API', function() {
+    expect(window.hoodieEvents).to.be.calledWith(this.hoodie, { context : this.store, namespace: 'funkstore' });
+  });
+
+  describe('store("task", "id")', function() {
+    beforeEach( function() {
+      this.sandbox.stub(window, 'hoodieScopedStoreApi').returns('scoped api');
+    });
+
+    it('returns scoped API by type when only type set', function() {
+      this.taskStore = this.store('task');
+      expect(window.hoodieScopedStoreApi).to.be.called();
+      var args = window.hoodieScopedStoreApi.args[0];
+      expect(args[0]).to.eql(this.hoodie);
+      expect(args[1]).to.eql(this.store);
+      expect(args[2].type).to.be('task');
+      expect(args[2].id).to.be(undefined);
+      expect(this.taskStore).to.eql('scoped api');
+    });
+
+    it('returns scoped API by type & id when both set', function() {
+      this.taskStore = this.store('task', '123');
+      var args = window.hoodieScopedStoreApi.args[0];
+      expect(args[0]).to.eql(this.hoodie);
+      expect(args[1]).to.eql(this.store);
+      expect(args[2].type).to.be('task');
+      expect(args[2].id).to.be('123');
+    });
   });
 
   describe('#validate(object, options)', function() {
@@ -152,16 +187,14 @@ describe('hoodieStoreApi', function() {
 
     _when('object cannot be found', function() {
       beforeEach(function() {
-        this.findDefer.reject();
+        this.findDefer.reject('not_found');
         this.promise = this.store.update('couch', '123', {
           funky: 'fresh'
         });
       });
 
-      it('should add it', function() {
-        expect(this.store.save).to.be.calledWith('couch', '123', {
-          funky: 'fresh'
-        }, undefined);
+      it('should reject', function() {
+        expect(this.promise).to.be.rejectedWith('not_found');
       });
     }); // object cannot be found
 
@@ -296,6 +329,56 @@ describe('hoodieStoreApi', function() {
       }); // update wouldn't make a change, but options have been passed
     }); // object can be found
   }); // #update
+
+  describe('#updateOrAdd(type, id, update, options)', function() {
+    beforeEach(function() {
+      this.updateDefer = this.hoodie.defer();
+      this.addDefer = this.hoodie.defer();
+      this.sandbox.stub(this.store, 'update').returns(this.updateDefer);
+      this.sandbox.stub(this.store, 'add').returns(this.addDefer);
+
+      this.promise = this.store.updateOrAdd('couch', '123', {
+        funky: 'fresh'
+      }, {option: 'value'});
+    });
+
+    it('updates object', function() {
+      expect(this.store.update).to.be.calledWith('couch', '123', {funky: 'fresh'}, {option: 'value'});
+    });
+
+    _when('object update succeeds', function() {
+      beforeEach(function() {
+        this.updateDefer.resolve('jup');
+      });
+
+      it('should resolve', function() {
+        expect(this.promise).to.be.resolvedWith('jup');
+      });
+    }); // object cannot be found
+
+    _when('object update fails', function() {
+      beforeEach(function() {
+        this.updateDefer.reject('nope');
+      });
+
+      it('should add the object to the store', function() {
+        expect(this.store.add).to.be.calledWith('couch', {
+          id: '123',
+          funky: 'fresh',
+        }, {option: 'value'});
+      });
+
+      it('rejects when adding object fails', function() {
+        this.addDefer.reject('nope');
+        expect(this.promise).to.be.rejectedWith('nope');
+      });
+
+      it('resolves when adding object succeeds', function() {
+        this.addDefer.resolve('yay');
+        expect(this.promise).to.be.resolvedWith('yay');
+      });
+    }); // object cannot be found
+  }); // #updateOrAdd
 
   describe('#updateAll(objects)', function() {
     beforeEach(function() {
@@ -523,59 +606,6 @@ describe('hoodieStoreApi', function() {
       expect(this.options.backend.removeAll).to.be.calledWith('type', { option: 'value'});
     });
   }); // #removeAll
-
-  //
-  describe('#trigger', function() {
-    beforeEach(function() {
-      this.sandbox.spy(this.hoodie, 'trigger');
-    });
-
-    it('should proxy to hoodie.trigger with \'store\' namespace', function() {
-      this.store.trigger('event', {
-        funky: 'fresh'
-      });
-
-      expect(this.hoodie.trigger).to.be.calledWith('funkstore:event', {
-        funky: 'fresh'
-      });
-    });
-  }); // #trigger
-
-  //
-  describe('#on', function() {
-    beforeEach(function() {
-      this.sandbox.spy(this.hoodie, 'on');
-    });
-
-    it('should proxy to hoodie.on with \'store\' namespace', function() {
-      this.store.on('event', {
-        funky: 'fresh'
-      });
-      expect(this.hoodie.on).to.be.calledWith('funkstore:event', {
-        funky: 'fresh'
-      });
-    });
-
-    it('should namespace multiple events correctly', function() {
-      var cb = this.sandbox.spy();
-      this.store.on('super funky fresh', cb);
-      expect(this.hoodie.on.calledWith('funkstore:super funkstore:funky funkstore:fresh', cb)).to.be.ok();
-    });
-  }); // #on
-
-  //
-  describe('#unbind', function() {
-    beforeEach(function() {
-      this.sandbox.spy(this.hoodie, 'unbind');
-    });
-
-    it('should proxy to hoodie.unbind with \'store\' namespace', function() {
-      var cb = function() {};
-
-      this.store.unbind('event', cb);
-      expect(this.hoodie.unbind).to.be.calledWith('funkstore:event', cb);
-    });
-  }); // #unbind
 
   //
   describe('#decoratePromises', function() {

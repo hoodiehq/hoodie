@@ -31,12 +31,15 @@ module.exports = function(config) {
       'src/hoodie/open.js',
 
       'src/hoodie/store.js',
+      'src/hoodie/scoped_store.js',
       'src/hoodie/remote_store.js',
       'src/hoodie/local_store.js',
       'src/hoodie/config.js',
       'src/hoodie/account.js',
       'src/hoodie/account_remote.js',
       'src/hoodie/errors.js',
+      'src/hoodie/task.js',
+      'src/hoodie/scoped_task.js',
 
       'test/mocks/*.js',
 
@@ -52,9 +55,12 @@ module.exports = function(config) {
       'test/specs/hoodie/promises.spec.js',
       'test/specs/hoodie/request.spec.js',
       'test/specs/hoodie/store.spec.js',
+      'test/specs/hoodie/scoped_store.spec.js',
       'test/specs/hoodie/remote_store.spec.js',
       'test/specs/hoodie/uuid.spec.js',
-      'test/specs/hoodie/account_remote.spec.js'
+      'test/specs/hoodie/account_remote.spec.js',
+      'test/specs/hoodie/task.spec.js',
+      'test/specs/hoodie/scoped_task.spec.js'
 
       // these need to be fixed
 

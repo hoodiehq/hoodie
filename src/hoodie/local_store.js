@@ -667,6 +667,7 @@ function hoodieStore (hoodie) {
 
     // remote events
     hoodie.on('remote:change', handleRemoteChange);
+    hoodie.on('remote:push', handlePushedObject);
   }
 
   // allow to run this once from outside
@@ -751,6 +752,14 @@ function hoodieStore (hoodie) {
   }
 
 
+  //
+  // all local changes get bulk pushed. For each object with local
+  // changes that has been pushed we  trigger a sync event
+  function handlePushedObject(object) {
+    triggerEvents('sync', object);
+  }
+
+
   // more advanced localStorage wrappers to find/save objects
   function setObject(type, id, object) {
     var key, store;
@@ -830,19 +839,25 @@ function hoodieStore (hoodie) {
 
   // this is where all the store events get triggered,
   // like add:task, change:note:abc4567, remove, etc.
-  function triggerEvents(event, object, options) {
-    store.trigger(event, object, options);
-    store.trigger('' + event + ':' + object.type, object, options);
+  function triggerEvents(eventName, object, options) {
+    store.trigger(eventName, object, options);
+    store.trigger('' + eventName + ':' + object.type, object, options);
 
-    if (event !== 'new') {
-      store.trigger('' + event + ':' + object.type + ':' + object.id, object, options);
+    if (eventName !== 'new') {
+      store.trigger('' + eventName + ':' + object.type + ':' + object.id, object, options);
     }
 
-    store.trigger('change', event, object, options);
-    store.trigger('change:' + object.type, event, object, options);
+    // sync events have no changes, so we don't trigger
+    // "change" events.
+    if (eventName === 'sync') {
+      return;
+    }
 
-    if (event !== 'new') {
-      store.trigger('change:' + object.type + ':' + object.id, event, object, options);
+    store.trigger('change', eventName, object, options);
+    store.trigger('change:' + object.type, eventName, object, options);
+
+    if (eventName !== 'new') {
+      store.trigger('change:' + object.type + ':' + object.id, eventName, object, options);
     }
   }
 
