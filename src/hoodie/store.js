@@ -457,6 +457,7 @@ function hoodieStoreApi(hoodie, options) {
     var promise = hoodie.resolveWith.apply(null, arguments);
     return decoratePromise(promise);
   }
+
   function rejectWith() {
     var promise = hoodie.rejectWith.apply(null, arguments);
     return decoratePromise(promise);
