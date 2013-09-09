@@ -850,7 +850,7 @@ function hoodieStore (hoodie) {
     // sync events have no changes, so we don't trigger
     // "change" events.
     if (event === 'sync') {
-      return
+      return;
     }
 
     store.trigger('change', event, object, options);
