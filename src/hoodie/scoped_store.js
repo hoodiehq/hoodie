@@ -21,7 +21,10 @@ function hoodieScopedStoreApi(hoodie, storeApi, options) {
   if (!id) {
 
     // add events
-    hoodieEvents(hoodie, { context: api, namespace: storeName + ':' + type });
+    hoodieEvents(hoodie, {
+      context: api,
+      namespace: storeName + ':' + type
+    });
 
     //
     api.save = function save(id, properties, options) {
@@ -73,7 +76,10 @@ function hoodieScopedStoreApi(hoodie, storeApi, options) {
   if (id) {
 
     // add events
-    hoodieEvents(hoodie, { context: api, namespace: storeName + ':' + type + ':' + id });
+    hoodieEvents(hoodie, {
+      context: api,
+      namespace: storeName + ':' + type + ':' + id
+    });
 
     //
     api.save = function save(properties, options) {

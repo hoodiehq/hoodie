@@ -19,7 +19,10 @@ function hoodieScopedTask(hoodie, taskApi, options) {
   if (!id) {
 
     // add events
-    hoodieEvents(hoodie, { context: api, namespace: 'task:' + type });
+    hoodieEvents(hoodie, {
+      context: api,
+      namespace: 'task:' + type
+    });
 
     //
     api.start = function start(properties) {
@@ -51,7 +54,10 @@ function hoodieScopedTask(hoodie, taskApi, options) {
   if (id) {
 
     // add events
-    hoodieEvents(hoodie, { context: api, namespace: 'task:' + type + ':' + id});
+    hoodieEvents(hoodie, {
+      context: api,
+      namespace: 'task:' + type + ':' + id
+    });
 
     //
     api.cancel = function cancel() {

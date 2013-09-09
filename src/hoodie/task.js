@@ -98,7 +98,7 @@ function hoodieTask(hoodie) {
     }
     return findAll(type).then( function(taskObjects) {
       restartTaskObjects(taskObjects, update);
-    } );
+    });
   };
 
 

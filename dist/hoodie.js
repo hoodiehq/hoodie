@@ -223,15 +223,16 @@ if ( typeof module === 'object' && module && typeof module.exports === 'object' 
 // like hoodie.on / hoodie.store.on / hoodie.task.on etc.
 
 function hoodieEvents(hoodie, options) {
-
-  // normalize options hash
-  if (!options) { options = {}; }
-
-  // make sure callbacks hash exists
-  if (!hoodie.eventsCallbacks) { hoodie.eventsCallbacks = {}; }
-
   var context = hoodie;
   var namespace = '';
+
+  // normalize options hash
+  options = options || {};
+
+  // make sure callbacks hash exists
+  if (!hoodie.eventsCallbacks) {
+    hoodie.eventsCallbacks = {};
+  }
 
   if (options.context) {
     context = options.context;
@@ -1194,7 +1195,10 @@ function hoodieScopedStoreApi(hoodie, storeApi, options) {
   if (!id) {
 
     // add events
-    hoodieEvents(hoodie, { context: api, namespace: storeName + ':' + type });
+    hoodieEvents(hoodie, {
+      context: api,
+      namespace: storeName + ':' + type
+    });
 
     //
     api.save = function save(id, properties, options) {
@@ -1246,7 +1250,10 @@ function hoodieScopedStoreApi(hoodie, storeApi, options) {
   if (id) {
 
     // add events
-    hoodieEvents(hoodie, { context: api, namespace: storeName + ':' + type + ':' + id });
+    hoodieEvents(hoodie, {
+      context: api,
+      namespace: storeName + ':' + type + ':' + id
+    });
 
     //
     api.save = function save(properties, options) {
@@ -4262,6 +4269,7 @@ function hoodieRemote (hoodie) {
 // * restart
 // * remove
 // * on
+// * one
 // * unbind
 //
 // At the same time, the returned API can be called as function returning a
@@ -4282,21 +4290,41 @@ function hoodieTask(hoodie) {
   // add events API
   hoodieEvents(hoodie, { context: api, namespace: 'task' });
 
+
+  // start
+  // -------
+
+  // start a new task. If the user has no account yet, hoodie tries to sign up
+  // for an anonymous account in the background. If that fails, the returned
+  // promise will be rejected.
   //
   api.start = function(type, properties) {
-    return hoodie.store.add('$'+type, properties).then(handleNewTask);
+    if (hoodie.account.hasAccount()) {
+      return hoodie.store.add('$'+type, properties).then(handleNewTask);
+    }
+
+    return hoodie.account.anonymousSignUp().then( function() {
+      return api.start(type, properties);
+    });
   };
 
+
+  // cancel
+  // -------
+
+  // cancel a running task
   //
   api.cancel = function(type, id) {
     return hoodie.store.update('$'+type, id, { cancelledAt: now() }).then(handleCancelledTask);
   };
 
-  //
+
   // restart
   // ---------
 
-  // first, we try to cancel an
+  // first, we try to cancel a running task. If that succeeds, we start
+  // a new one with the same properties as the original
+  //
   api.restart = function(type, id, update) {
     var start = function(object) {
       $.extend(object, update);
@@ -4308,10 +4336,16 @@ function hoodieTask(hoodie) {
     return api.cancel(type, id).then(start);
   };
 
+  // cancelAll
+  // -----------
+
   //
   api.cancelAll = function(type) {
     return findAll(type).then( cancelTaskObjects );
   };
+
+  // restartAll
+  // -----------
 
   //
   api.restartAll = function(type, update) {
@@ -4320,8 +4354,9 @@ function hoodieTask(hoodie) {
     }
     return findAll(type).then( function(taskObjects) {
       restartTaskObjects(taskObjects, update);
-    } );
+    });
   };
+
 
   //
   // subscribe to store events
@@ -4514,7 +4549,10 @@ function hoodieScopedTask(hoodie, taskApi, options) {
   if (!id) {
 
     // add events
-    hoodieEvents(hoodie, { context: api, namespace: 'task:' + type });
+    hoodieEvents(hoodie, {
+      context: api,
+      namespace: 'task:' + type
+    });
 
     //
     api.start = function start(properties) {
@@ -4546,7 +4584,10 @@ function hoodieScopedTask(hoodie, taskApi, options) {
   if (id) {
 
     // add events
-    hoodieEvents(hoodie, { context: api, namespace: 'task:' + type + ':' + id});
+    hoodieEvents(hoodie, {
+      context: api,
+      namespace: 'task:' + type + ':' + id
+    });
 
     //
     api.cancel = function cancel() {
