@@ -157,22 +157,6 @@ f.event={add:function(a,c,d,e,g){var h,i,j,k,l,m,n,o,p,q,r,s;if(!(a.nodeType===3
                       "type": "heading",
                       "data": {
                         "level": 2,
-                        "title": "On",
-                        "slug": "on"
-                      },
-                      "depth": 2
-                    }, {
-                      "type": "heading",
-                      "data": {
-                        "level": 2,
-                        "title": "Trigger",
-                        "slug": "trigger"
-                      },
-                      "depth": 2
-                    }, {
-                      "type": "heading",
-                      "data": {
-                        "level": 2,
                         "title": "Request",
                         "slug": "request"
                       },
@@ -1150,6 +1134,32 @@ f.event={add:function(a,c,d,e,g){var h,i,j,k,l,m,n,o,p,q,r,s;if(!(a.nodeType===3
                   "singleLineComment": ["//"],
                   "name": "JavaScript"
                 },
+                "sourcePath": "/Users/gregor/JavaScripts/hood.ie/hoodie.js/src/hoodie/scoped_task.js",
+                "projectPath": "src/hoodie/scoped_task.js",
+                "targetPath": "src/hoodie/scoped_task",
+                "title": "scoped_task"
+              },
+              "depth": 3,
+              "outline": [
+                {
+                  "type": "heading",
+                  "data": {
+                    "level": 1,
+                    "title": "scoped Store",
+                    "slug": "scoped-store"
+                  },
+                  "depth": 1
+                }
+              ]
+            }, {
+              "type": "file",
+              "data": {
+                "language": {
+                  "nameMatchers": [".js"],
+                  "pygmentsLexer": "javascript",
+                  "singleLineComment": ["//"],
+                  "name": "JavaScript"
+                },
                 "sourcePath": "/Users/gregor/JavaScripts/hood.ie/hoodie.js/src/hoodie/store.js",
                 "projectPath": "src/hoodie/store.js",
                 "targetPath": "src/hoodie/store",
@@ -1226,6 +1236,14 @@ f.event={add:function(a,c,d,e,g){var h,i,j,k,l,m,n,o,p,q,r,s;if(!(a.nodeType===3
                       "type": "heading",
                       "data": {
                         "level": 2,
+                        "title": "updateOrAdd",
+                        "slug": "updateoradd"
+                      },
+                      "depth": 2
+                    }, {
+                      "type": "heading",
+                      "data": {
+                        "level": 2,
                         "title": "updateAll",
                         "slug": "updateall"
                       },
@@ -1258,32 +1276,85 @@ f.event={add:function(a,c,d,e,g){var h,i,j,k,l,m,n,o,p,q,r,s;if(!(a.nodeType===3
                       "type": "heading",
                       "data": {
                         "level": 2,
-                        "title": "trigger",
-                        "slug": "trigger"
-                      },
-                      "depth": 2
-                    }, {
-                      "type": "heading",
-                      "data": {
-                        "level": 2,
-                        "title": "on",
-                        "slug": "on"
-                      },
-                      "depth": 2
-                    }, {
-                      "type": "heading",
-                      "data": {
-                        "level": 2,
-                        "title": "unbind",
-                        "slug": "unbind"
-                      },
-                      "depth": 2
-                    }, {
-                      "type": "heading",
-                      "data": {
-                        "level": 2,
                         "title": "required backend methods",
                         "slug": "required-backend-methods"
+                      },
+                      "depth": 2
+                    }, {
+                      "type": "heading",
+                      "data": {
+                        "level": 2,
+                        "title": "Private",
+                        "slug": "private"
+                      },
+                      "depth": 2
+                    }
+                  ]
+                }
+              ]
+            }, {
+              "type": "file",
+              "data": {
+                "language": {
+                  "nameMatchers": [".js"],
+                  "pygmentsLexer": "javascript",
+                  "singleLineComment": ["//"],
+                  "name": "JavaScript"
+                },
+                "sourcePath": "/Users/gregor/JavaScripts/hood.ie/hoodie.js/src/hoodie/task.js",
+                "projectPath": "src/hoodie/task.js",
+                "targetPath": "src/hoodie/task",
+                "title": "task"
+              },
+              "depth": 3,
+              "outline": [
+                {
+                  "type": "heading",
+                  "data": {
+                    "level": 1,
+                    "title": "Tasks",
+                    "slug": "tasks"
+                  },
+                  "depth": 1,
+                  "children": [
+                    {
+                      "type": "heading",
+                      "data": {
+                        "level": 2,
+                        "title": "start",
+                        "slug": "start"
+                      },
+                      "depth": 2
+                    }, {
+                      "type": "heading",
+                      "data": {
+                        "level": 2,
+                        "title": "cancel",
+                        "slug": "cancel"
+                      },
+                      "depth": 2
+                    }, {
+                      "type": "heading",
+                      "data": {
+                        "level": 2,
+                        "title": "restart",
+                        "slug": "restart"
+                      },
+                      "depth": 2
+                    }, {
+                      "type": "heading",
+                      "data": {
+                        "level": 2,
+                        "title": "cancelAll",
+                        "slug": "cancelall"
+                      },
+                      "depth": 2
+                    }, {
+                      "type": "heading",
+                      "data": {
+                        "level": 2,
+                        "title": "restartAll",
+                        "slug": "restartall"
                       },
                       "depth": 2
                     }, {

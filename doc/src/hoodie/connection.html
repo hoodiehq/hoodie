@@ -37,7 +37,7 @@ and then each 30 seconds. If it fails, it</p>
 
     <span class="nb">window</span><span class="p">.</span><span class="nx">setTimeout</span><span class="p">(</span><span class="nx">hoodie</span><span class="p">.</span><span class="nx">checkConnection</span><span class="p">,</span> <span class="nx">checkConnectionInterval</span><span class="p">);</span>
 
-    <span class="k">if</span> <span class="p">(</span><span class="o">!</span> <span class="nx">hoodie</span><span class="p">.</span><span class="nx">isOnline</span><span class="p">())</span> <span class="p">{</span>
+    <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nx">hoodie</span><span class="p">.</span><span class="nx">isOnline</span><span class="p">())</span> <span class="p">{</span>
       <span class="nx">hoodie</span><span class="p">.</span><span class="nx">trigger</span><span class="p">(</span><span class="s1">&#39;reconnected&#39;</span><span class="p">);</span>
       <span class="nx">online</span> <span class="o">=</span> <span class="kc">true</span><span class="p">;</span>
     <span class="p">}</span>

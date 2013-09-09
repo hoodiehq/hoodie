@@ -1,4 +1,4 @@
-// Hoodie.js - 0.4.0-pre
+// Hoodie.js - 0.4.0
 // https://github.com/hoodiehq/hoodie.js
 // Copyright 2012, 2013 https://github.com/hoodiehq/
 // Licensed Apache License 2.0
@@ -1164,6 +1164,7 @@ function hoodieStoreApi(hoodie, options) {
     var promise = hoodie.resolveWith.apply(null, arguments);
     return decoratePromise(promise);
   }
+
   function rejectWith() {
     var promise = hoodie.rejectWith.apply(null, arguments);
     return decoratePromise(promise);
