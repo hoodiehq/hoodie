@@ -18,15 +18,16 @@
 // like hoodie.on / hoodie.store.on / hoodie.task.on etc.
 
 function hoodieEvents(hoodie, options) {
+  var context = hoodie;
+  var namespace = '';
 
   // normalize options hash
   options = options || {};
 
   // make sure callbacks hash exists
-  if (!hoodie.eventsCallbacks) { hoodie.eventsCallbacks = {}; }
-
-  var context = hoodie;
-  var namespace = '';
+  if (!hoodie.eventsCallbacks) {
+    hoodie.eventsCallbacks = {};
+  }
 
   if (options.context) {
     context = options.context;
