@@ -31,7 +31,7 @@
     "grunt-contrib-concat": "~0.3.0",
     "grunt-groc": "~0.3.0",
     "grunt-shell": "~0.3.0",
-    "karma": "~0.10.1",
+    "karma": "~0.11.0",
     "karma-script-launcher": "~0.1.0",
     "karma-chrome-launcher": "~0.1.0",
     "karma-firefox-launcher": "~0.1.0",
