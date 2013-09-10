@@ -5,7 +5,9 @@
     "./dist/hoodie.js"
   ],
   "dependencies": {
-    "jquery": "~1.10.2",
+    "jquery": "~1.10.2"
+  },
+  "devDependencies": {
     "expect": "~0.2.0",
     "sinonjs": "~1.7.1"
   },
