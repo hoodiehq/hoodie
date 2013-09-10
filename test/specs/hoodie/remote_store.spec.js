@@ -385,7 +385,7 @@ describe('hoodieRemoteStore', function() {
 
   describe('#connect()', function() {
     beforeEach(function() {
-      this.sandbox.spy(this.remote, 'bootstrap');
+      this.sandbox.stub(this.remote, 'bootstrap');
     });
 
     it('should set connected to true', function() {
@@ -474,6 +474,14 @@ describe('hoodieRemoteStore', function() {
     it('should pull', function() {
       this.remote.bootstrap();
       expect(this.remote.pull.called).to.be.ok();
+    });
+
+    it('should send a non-longpoll pull request', function() {
+      this.sandbox.stub(this.remote, 'request').returns( this.bootstrapDefer );
+      this.sandbox.stub(this.remote, 'isConnected').returns( true );
+      this.remote.pull.restore();
+      this.remote.bootstrap();
+      expect(this.remote.request).to.be.calledWith('GET', '/_changes?include_docs=true&since=0');
     });
 
     _when('bootstrap succeeds', function() {

@@ -762,9 +762,6 @@ function hoodieStoreApi(hoodie, options) {
   // name
   var storeName = options.name || 'store';
 
-  // scope
-  var scope = options.scope;
-
   // public API
   var api = function api(type, id) {
     var scopedOptions = $.extend(true, {type: type, id: id}, options);
@@ -826,13 +823,6 @@ function hoodieStoreApi(hoodie, options) {
   //
   api.save = function save(type, id, properties, options) {
 
-    if (scope) {
-      options = properties;
-      properties = id;
-      id = type;
-      type = scope;
-    }
-
     if ( options ) {
       options = $.extend(true, {}, options);
     } else {
@@ -858,12 +848,6 @@ function hoodieStoreApi(hoodie, options) {
   //
   api.add = function add(type, properties, options) {
 
-    if (scope) {
-      options = properties;
-      properties = type;
-      type = scope;
-    }
-
     if (properties === undefined) {
       properties = {};
     }
@@ -879,11 +863,6 @@ function hoodieStoreApi(hoodie, options) {
   //
   api.find = function find(type, id) {
 
-    if (scope) {
-      id = type;
-      type = scope;
-    }
-
     return decoratePromise( backend.find(type, id) );
   };
 
@@ -896,11 +875,6 @@ function hoodieStoreApi(hoodie, options) {
   // 3. If not, add one and return it.
   //
   api.findOrAdd = function findOrAdd(type, id, properties) {
-    if (scope) {
-      properties = id;
-      id = type;
-      type = scope;
-    }
 
     if (properties === null) {
       properties = {};
@@ -929,11 +903,6 @@ function hoodieStoreApi(hoodie, options) {
   //
   api.findAll = function findAll(type, options) {
 
-    if (scope) {
-      options = type;
-      type = scope;
-    }
-
     return decoratePromise( backend.findAll(type, options) );
   };
 
@@ -953,13 +922,6 @@ function hoodieStoreApi(hoodie, options) {
   // hoodie.store.update('car', 'abc4567', function(obj) { obj.sold = true })
   //
   api.update = function update(type, id, objectUpdate, options) {
-
-    if (scope) {
-      options = objectUpdate;
-      objectUpdate = id;
-      id = type;
-      type = scope;
-    }
 
     function handleFound(currentObject) {
       var changedProperties, newObj, value;
@@ -1038,12 +1000,6 @@ function hoodieStoreApi(hoodie, options) {
   api.updateAll = function updateAll(filterOrObjects, objectUpdate, options) {
     var promise;
 
-    if (scope) {
-      options = objectUpdate;
-      objectUpdate = filterOrObjects;
-      filterOrObjects = scope;
-    }
-
     options = options || {};
 
     // normalize the input: make sure we have all objects
@@ -1096,11 +1052,6 @@ function hoodieStoreApi(hoodie, options) {
   // Otherwise remove it from Store.
   //
   api.remove = function remove(type, id, options) {
-    if (scope) {
-      options = id;
-      id = type;
-      type = scope;
-    }
     return decoratePromise( backend.remove(type, id, options || {}) );
   };
 
@@ -1111,12 +1062,6 @@ function hoodieStoreApi(hoodie, options) {
   // Destroye all objects. Can be filtered by a type
   //
   api.removeAll = function removeAll(type, options) {
-
-    if (scope) {
-      options = type;
-      type = scope;
-    }
-
     return decoratePromise( backend.removeAll(type, options || {}) );
   };
 
@@ -1669,7 +1614,9 @@ function hoodieRemoteStore (hoodie, options) {
   // changes since the beginning, but this behavior might be adjusted,
   // e.g for a filtered bootstrap.
   //
+  var isBootstrapping = false;
   remote.bootstrap = function bootstrap() {
+    isBootstrapping = true;
     remote.trigger('bootstrap:start');
     return remote.pull().done( handleBootstrapSuccess );
   };
@@ -1929,12 +1876,15 @@ function hoodieRemoteStore (hoodie, options) {
 
   // ### pull url
 
-  // Depending on whether remote is connected, return a longpoll URL or not
+  // Depending on whether remote is connected (= pulling changes continuously)
+  // return a longpoll URL or not. If it is a beginning bootstrap request, do
+  // not return a longpoll URL, as we want it to finish right away, even if there
+  // are no changes on remote.
   //
   function pullUrl() {
     var since;
     since = remote.getSinceNr();
-    if (remote.isConnected()) {
+    if (remote.isConnected() && !isBootstrapping) {
       return '/_changes?include_docs=true&since=' + since + '&heartbeat=10000&feed=longpoll';
     } else {
       return '/_changes?include_docs=true&since=' + since;
@@ -2026,6 +1976,7 @@ function hoodieRemoteStore (hoodie, options) {
   // ### handle changes from remote
   //
   function handleBootstrapSuccess() {
+    isBootstrapping = false;
     remote.trigger('bootstrap:end');
   }
 

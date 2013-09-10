@@ -341,7 +341,9 @@ function hoodieRemoteStore (hoodie, options) {
   // changes since the beginning, but this behavior might be adjusted,
   // e.g for a filtered bootstrap.
   //
+  var isBootstrapping = false;
   remote.bootstrap = function bootstrap() {
+    isBootstrapping = true;
     remote.trigger('bootstrap:start');
     return remote.pull().done( handleBootstrapSuccess );
   };
@@ -601,12 +603,15 @@ function hoodieRemoteStore (hoodie, options) {
 
   // ### pull url
 
-  // Depending on whether remote is connected, return a longpoll URL or not
+  // Depending on whether remote is connected (= pulling changes continuously)
+  // return a longpoll URL or not. If it is a beginning bootstrap request, do
+  // not return a longpoll URL, as we want it to finish right away, even if there
+  // are no changes on remote.
   //
   function pullUrl() {
     var since;
     since = remote.getSinceNr();
-    if (remote.isConnected()) {
+    if (remote.isConnected() && !isBootstrapping) {
       return '/_changes?include_docs=true&since=' + since + '&heartbeat=10000&feed=longpoll';
     } else {
       return '/_changes?include_docs=true&since=' + since;
@@ -698,6 +703,7 @@ function hoodieRemoteStore (hoodie, options) {
   // ### handle changes from remote
   //
   function handleBootstrapSuccess() {
+    isBootstrapping = false;
     remote.trigger('bootstrap:end');
   }
 
