@@ -9,7 +9,8 @@ describe('#checkConnection()', function() {
 
     this.sandbox.spy(this.hoodie, 'trigger');
     this.sandbox.stub(this.hoodie, 'request').returns(this.requestDefer.promise());
-    this.sandbox.spy(window, 'setTimeout');
+    this.sandbox.stub(window, 'setTimeout').returns('checkTimeout');
+    this.sandbox.stub(window, 'clearTimeout');
 
     hoodieConnection(this.hoodie);
   });
@@ -26,6 +27,7 @@ describe('#checkConnection()', function() {
     this.hoodie.checkConnection();
     expect(this.hoodie.request).to.be.calledWith('GET', '/');
   });
+
   it('should only send one request at a time', function() {
     this.hoodie.checkConnection();
     this.hoodie.checkConnection();
@@ -56,6 +58,12 @@ describe('#checkConnection()', function() {
         expect(this.hoodie.trigger.calledWith('reconnected')).to.not.be.ok();
       });
 
+      it('should cancel running timeout when checked again', function() {
+        expect(window.setTimeout.callCount).to.eql(1);
+        this.hoodie.checkConnection();
+        expect(window.setTimeout.callCount).to.eql(2);
+        expect(window.clearTimeout).to.be.calledWith('checkTimeout');
+      });
     });
 
     _and('request fails', function() {
@@ -78,8 +86,13 @@ describe('#checkConnection()', function() {
         expect(this.hoodie.trigger.calledWith('disconnected')).to.be.ok();
       });
 
+      it('should cancel running timeout when checked again', function() {
+        expect(window.setTimeout.callCount).to.eql(1);
+        this.hoodie.checkConnection();
+        expect(window.setTimeout.callCount).to.eql(2);
+        expect(window.clearTimeout).to.be.calledWith('checkTimeout');
+      });
     });
-
   });
 
   _when('hoodie is offline', function() {

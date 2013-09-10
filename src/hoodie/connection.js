@@ -10,6 +10,7 @@ function hoodieConnection(hoodie) {
   var online = true;
   var checkConnectionInterval = 30000;
   var checkConnectionRequest = null;
+  var checkConnectionTimeout = null;
 
   // Check Connection
   // ------------------
@@ -36,6 +37,8 @@ function hoodieConnection(hoodie) {
       return req;
     }
 
+    window.clearTimeout(checkConnectionTimeout);
+
     checkConnectionRequest = hoodie.request('GET', '/').then(
       handleCheckConnectionSuccess,
       handleCheckConnectionError
@@ -60,7 +63,7 @@ function hoodieConnection(hoodie) {
   function handleCheckConnectionSuccess() {
     checkConnectionInterval = 30000;
 
-    window.setTimeout(hoodie.checkConnection, checkConnectionInterval);
+    checkConnectionTimeout = window.setTimeout(hoodie.checkConnection, checkConnectionInterval);
 
     if (!hoodie.isOnline()) {
       hoodie.trigger('reconnected');
@@ -77,7 +80,7 @@ function hoodieConnection(hoodie) {
   function handleCheckConnectionError() {
     checkConnectionInterval = 3000;
 
-    window.setTimeout(hoodie.checkConnection, checkConnectionInterval);
+    checkConnectionTimeout = window.setTimeout(hoodie.checkConnection, checkConnectionInterval);
 
     if (hoodie.isOnline()) {
       hoodie.trigger('disconnected');

@@ -60,15 +60,8 @@ module.exports = function(config) {
       'test/specs/hoodie/uuid.spec.js',
       'test/specs/hoodie/account_remote.spec.js',
       'test/specs/hoodie/task.spec.js',
-      'test/specs/hoodie/scoped_task.spec.js'
-
-      // these need to be fixed
-
-      // this one throws strange errors:
-      // TypeError: 'undefined' is not an object (evaluating 'hoodie.request('GET', '/').then
-      // dunno why yet
-      // 'test/specs/hoodie/connection.spec.js'
-
+      'test/specs/hoodie/scoped_task.spec.js',
+      'test/specs/hoodie/connection.spec.js'
     ],
 
 
