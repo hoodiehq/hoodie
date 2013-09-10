@@ -122,8 +122,12 @@ describe('hoodie.remote', function() {
       expect(this.events.reconnected).to.be.a(Function);
     });
     it('connects on reconnected', function() {
-      this.events.reconnected(123);
+      this.events.reconnected();
       expect(this.remote.connect).to.be.called();
+    });
+    it('disconnects on disconnected', function() {
+      this.events.disconnected();
+      expect(this.remote.disconnect).to.be.called();
     });
 
     it('subscribes to account:signin', function() {

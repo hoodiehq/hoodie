@@ -4240,6 +4240,7 @@ function hoodieRemote (hoodie) {
       hoodie.unbind('store:idle', remote.push);
     });
 
+    hoodie.on('disconnected', remote.disconnect);
     hoodie.on('reconnected', remote.connect);
 
     // account events
