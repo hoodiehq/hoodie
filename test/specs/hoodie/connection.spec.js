@@ -19,8 +19,8 @@ describe('#checkConnection()', function() {
     expect(this.hoodie).to.have.property('checkConnection');
   });
 
-  it('should have a isOnline method', function () {
-    expect(this.hoodie).to.have.property('isOnline');
+  it('should have a isConnected method', function () {
+    expect(this.hoodie).to.have.property('isConnected');
   });
 
   it('should send GET / request', function() {
@@ -37,7 +37,7 @@ describe('#checkConnection()', function() {
   _when('hoodie is online', function() {
 
     beforeEach(function() {
-      this.sandbox.stub(this.hoodie, 'isOnline').returns(true);
+      this.sandbox.stub(this.hoodie, 'isConnected').returns(true);
     });
 
     _and('request succeeds', function() {
@@ -98,7 +98,7 @@ describe('#checkConnection()', function() {
   _when('hoodie is offline', function() {
 
     beforeEach(function() {
-      this.sandbox.stub(this.hoodie, 'isOnline').returns(false);
+      this.sandbox.stub(this.hoodie, 'isConnected').returns(false);
     });
 
     _and('request succeeds', function() {
