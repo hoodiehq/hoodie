@@ -23,7 +23,8 @@ Mocks.hoodieRequest = function(hoodie) {
 };
 
 Mocks.hoodieConnection = function(hoodie) {
-
+  hoodie.isConnected = sinon.spy();
+  hoodie.checkConnection = sinon.spy();
 };
 
 Mocks.hoodieUUID = function(hoodie) {

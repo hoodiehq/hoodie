@@ -140,9 +140,12 @@ function Hoodie(baseUrl) {
     hoodie.remote.connect();
   });
 
-  // check connection if browser goes online / offline
+  // check connection when browser goes online / offline
   window.addEventListener('online', hoodie.checkConnection, false);
   window.addEventListener('offline', hoodie.checkConnection, false);
+
+  // start checking connection
+  hoodie.checkConnection();
 
   //
   // loading user extensions

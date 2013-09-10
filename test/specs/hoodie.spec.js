@@ -123,6 +123,10 @@ describe('Hoodie', function() {
     it('checks connection when user goes online', function() {
       expect(window.addEventListener).to.be.calledWith('online', this.hoodie.checkConnection, false);
     });
+
+    it('checks connection', function() {
+      expect(this.hoodie.checkConnection).to.be.called();
+    });
   });
 
   describe('Hoodie.extend', function() {
