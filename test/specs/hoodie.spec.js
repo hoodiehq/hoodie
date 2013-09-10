@@ -107,8 +107,12 @@ describe('Hoodie', function() {
 
     it('connects to remote when authenticate succeeds', function() {
       expect(this.hoodie.remote.connect).to.not.be.called();
-      this.hoodie.account.authenticateDefer.resolve();
+      this.hoodie.account.authenticateDefer.resolve('joe@example.com');
       expect(this.hoodie.remote.connect).to.be.called();
+
+      expect(this.hoodie.remote.connect).to.not.be.calledWith('joe@example.com');
+      // ... because it would set the remote store name to 'joe@example.com'
+      //     which is not correct. The remote store is 'user/<hash>'
     });
   });
 

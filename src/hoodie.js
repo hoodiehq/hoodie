@@ -126,7 +126,11 @@ function Hoodie(baseUrl) {
   hoodie.task.subscribeToStoreEvents();
 
   // authenticate
-  hoodie.account.authenticate().then( hoodie.remote.connect );
+  // we use a closure to not pass the username to connect, as it
+  // would set the name of the remote store, which is not the username.
+  hoodie.account.authenticate().then( function( /* username */ ) {
+    hoodie.remote.connect();
+  });
 
   //
   // loading user extensions

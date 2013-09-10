@@ -1,5 +1,5 @@
 /* global hoodieConfig:true */
-describe.only('Hoodie.Config', function() {
+describe('Hoodie.Config', function() {
 
   beforeEach(function() {
     this.hoodie = new Mocks.Hoodie();
