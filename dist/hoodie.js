@@ -526,8 +526,8 @@ function hoodieRequest(hoodie) {
 /* exported hoodieConnection */
 
 //
-// hoodie.checkConnection() & hoodie.isOnline()
-// ============================================
+// hoodie.checkConnection() & hoodie.isConnected()
+// =================================================
 
 //
 function hoodieConnection(hoodie) {
@@ -573,11 +573,11 @@ function hoodieConnection(hoodie) {
   };
 
 
-  // isOnline
-  // ----------
+  // isConnected
+  // -------------
 
   //
-  hoodie.isOnline = function isOnline() {
+  hoodie.isConnected = function isConnected() {
     return online;
   };
 
@@ -590,7 +590,7 @@ function hoodieConnection(hoodie) {
 
     checkConnectionTimeout = window.setTimeout(hoodie.checkConnection, checkConnectionInterval);
 
-    if (!hoodie.isOnline()) {
+    if (!hoodie.isConnected()) {
       hoodie.trigger('reconnected');
       online = true;
     }
@@ -607,7 +607,7 @@ function hoodieConnection(hoodie) {
 
     checkConnectionTimeout = window.setTimeout(hoodie.checkConnection, checkConnectionInterval);
 
-    if (hoodie.isOnline()) {
+    if (hoodie.isConnected()) {
       hoodie.trigger('disconnected');
       online = false;
     }
