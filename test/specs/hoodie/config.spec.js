@@ -1,9 +1,9 @@
 /* global hoodieConfig:true */
-describe('Hoodie.Config', function() {
+describe.only('Hoodie.Config', function() {
 
   beforeEach(function() {
     this.hoodie = new Mocks.Hoodie();
-    this.updateSpy = this.hoodie.store.update.returns('promise');
+    this.updateOrAddSpy = this.hoodie.store.updateOrAdd.returns('promise');
     this.hoodie.store.findDefer.resolve({
       funky: 'fresh'
     });
@@ -17,7 +17,7 @@ describe('Hoodie.Config', function() {
     it('should save a $config with key: value', function() {
       this.config.set('funky', 'fresh!');
 
-      expect(this.updateSpy).to.be.calledWith('$config', 'hoodie', {
+      expect(this.hoodie.store.updateOrAdd).to.be.calledWith('$config', 'hoodie', {
         funky: 'fresh!'
       }, {
         silent: false
@@ -27,7 +27,7 @@ describe('Hoodie.Config', function() {
     it('should make the save silent for local settings starting with _', function() {
       this.config.set('_local', 'fresh');
 
-      expect(this.updateSpy.calledWith('$config', 'hoodie', {
+      expect(this.hoodie.store.updateOrAdd.calledWith('$config', 'hoodie', {
         _local: 'fresh'
       }, {
         silent: true
@@ -51,7 +51,7 @@ describe('Hoodie.Config', function() {
       this.config.set('funky', 'fresh');
       this.config.unset('funky');
 
-      expect(this.updateSpy.calledWith('$config', 'hoodie', {
+      expect(this.hoodie.store.updateOrAdd.calledWith('$config', 'hoodie', {
         funky: void 0
       }, {
         silent: false

@@ -3065,7 +3065,7 @@ function hoodieConfig(hoodie) {
     update[key] = value;
     isSilent = key.charAt(0) === '_';
 
-    return hoodie.store.update(type, id, update, {
+    return hoodie.store.updateOrAdd(type, id, update, {
       silent: isSilent
     });
   };
