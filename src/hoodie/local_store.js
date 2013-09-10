@@ -694,7 +694,7 @@ function hoodieStore (hoodie) {
       return;
     }
 
-    return triggerDirtyAndIdleEvents();
+    triggerDirtyAndIdleEvents();
   }
 
   // Clear changed

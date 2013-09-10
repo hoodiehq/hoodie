@@ -140,6 +140,10 @@ function Hoodie(baseUrl) {
     hoodie.remote.connect();
   });
 
+  // check connection if browser goes online / offline
+  window.addEventListener('online', hoodie.checkConnection, false);
+  window.addEventListener('offline', hoodie.checkConnection, false);
+
   //
   // loading user extensions
   //
@@ -2731,7 +2735,7 @@ function hoodieStore (hoodie) {
       return;
     }
 
-    return triggerDirtyAndIdleEvents();
+    triggerDirtyAndIdleEvents();
   }
 
   // Clear changed

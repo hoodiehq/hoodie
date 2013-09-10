@@ -17,6 +17,7 @@ describe('Hoodie', function() {
     this.sandbox.stub(window, 'hoodieConfig', Mocks.hoodieConfig);
     this.sandbox.stub(window, 'hoodieAccount', Mocks.hoodieAccount);
     this.sandbox.stub(window, 'hoodieRemote', Mocks.hoodieRemote);
+    this.sandbox.stub(window, 'addEventListener');
 
     this.hoodie = new Hoodie('http://couch.example.com');
   });
@@ -113,6 +114,14 @@ describe('Hoodie', function() {
       expect(this.hoodie.remote.connect).to.not.be.calledWith('joe@example.com');
       // ... because it would set the remote store name to 'joe@example.com'
       //     which is not correct. The remote store is 'user/<hash>'
+    });
+
+    it('checks connection when user goes offline', function() {
+      expect(window.addEventListener).to.be.calledWith('offline', this.hoodie.checkConnection, false);
+    });
+
+    it('checks connection when user goes online', function() {
+      expect(window.addEventListener).to.be.calledWith('online', this.hoodie.checkConnection, false);
     });
   });
 
