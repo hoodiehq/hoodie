@@ -4226,6 +4226,7 @@ function hoodieRemote (hoodie) {
 
     hoodie.on('remote:connect', function() {
       hoodie.on('store:idle', remote.push);
+      remote.push();
     });
 
     hoodie.on('remote:disconnect', function() {

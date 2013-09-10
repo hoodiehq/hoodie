@@ -5,7 +5,8 @@ describe('hoodie.remote', function() {
     this.hoodie = new Mocks.Hoodie();
     this.sandbox.stub(this.hoodie, 'open').returns({
       connect: sinon.spy(),
-      disconnect: sinon.spy()
+      disconnect: sinon.spy(),
+      push: sinon.spy()
     });
     this.sandbox.stub(this.hoodie.account, 'db').returns('userdb');
     this.sandbox.stub(this.hoodie.config, 'get').withArgs('_remote.since').returns(10);
@@ -99,6 +100,10 @@ describe('hoodie.remote', function() {
 
     it('subscribes to remote:connect', function() {
       expect(this.events['remote:connect']).to.be.a(Function);
+    });
+    it('pushes local changes on remote:connect', function() {
+      this.events['remote:connect']();
+      expect(this.remote.push).to.be.called();
     });
     it('subscribes to store:idle on remote:connect', function() {
       this.events['remote:connect']();
