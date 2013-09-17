@@ -1,6 +1,6 @@
 {
   "name": "hoodie-server",
-  "version": "0.8.1",
+  "version": "0.8.2",
   "main": "lib/app",
   "repository": {
     "type": "git",
@@ -13,7 +13,7 @@
     "corsproxy": "git://github.com/gr2m/CORS-Proxy.git",
     "multicouch": ">=0.6.1",
     "hoodie-pocket": "git://github.com/hoodiehq/pocket.git",
-    "hoodie-plugins-manager": "0.0.3",
+    "hoodie-plugins-manager": "0.0.4",
     "local-tld-lib": "*",
     "underscore": "1.4.4",
     "async": "0.2.7",
