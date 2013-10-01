@@ -1,7 +1,13 @@
 var expect = require('expect.js');
 var hconsole = require('../../lib/hconsole');
 
+var _ = require('underscore');
+
 describe('hconsole', function () {
+
+  it('should expose n number of properties', function () {
+    expect(_.size(hconsole)).to.eql(4);
+  });
 
   it('should have a announce property', function () {
     expect(hconsole).to.have.property('announce');

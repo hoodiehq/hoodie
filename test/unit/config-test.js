@@ -1,7 +1,13 @@
 var expect = require('expect.js');
 var config = require('../../lib/config');
 
+var _ = require('underscore');
+
 describe('config', function () {
+
+  it('should expose n number of properties', function () {
+    expect(_.size(config)).to.eql(13);
+  });
 
   it('should have a path property', function () {
     expect(config).to.have.property('path');

@@ -1,7 +1,13 @@
 var expect = require('expect.js');
 var couch = require('../../lib/couch');
 
+var _ = require('underscore');
+
 describe('couch', function () {
+
+  it('should expose n number of properties', function () {
+    expect(_.size(couch)).to.eql(6);
+  });
 
   it('should have a startMultiCouch property', function () {
     expect(couch).to.have.property('startMultiCouch');
