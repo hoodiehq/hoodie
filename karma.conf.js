@@ -73,7 +73,7 @@ module.exports = function(config) {
 
     // test results reporter to use
     // possible values: 'dots', 'progress', 'junit', 'growl', 'coverage'
-    reporters: ['progress'],
+    reporters: ['progress', 'coverage'],
 
 
     // web server port
@@ -91,6 +91,18 @@ module.exports = function(config) {
 
     // enable / disable watching file and executing tests whenever any file changes
     autoWatch: true,
+
+    preprocessors: {
+      // source files, that you wanna generate coverage for
+      // do not include tests or libraries
+      // (these files will be instrumented by Istanbul)
+      'src/**/*.js': ['coverage']
+    },
+
+    coverageReporter: {
+      type : 'html',
+      dir : 'coverage/'
+    },
 
 
     // Start these browsers, currently available:

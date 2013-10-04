@@ -37,7 +37,8 @@
     "karma-firefox-launcher": "~0.1.0",
     "karma-html2js-preprocessor": "~0.1.0",
     "karma-phantomjs-launcher": "~0.1.0",
-    "karma-mocha": "~0.1.0"
+    "karma-mocha": "~0.1.0",
+    "karma-coverage": "~0.1.0"
   },
   "scripts": {
     "test": "grunt test --verbose",
