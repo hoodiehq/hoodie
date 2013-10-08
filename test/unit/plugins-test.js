@@ -1,6 +1,8 @@
 var expect = require('expect.js');
 var plugins = require('../../lib/plugins');
 
+var _ = require('underscore');
+
 describe('plugins', function () {
 
   beforeEach(function () {
@@ -8,6 +10,10 @@ describe('plugins', function () {
   });
 
   describe('methods', function () {
+
+    it('should expose n number of properties', function () {
+      expect(_.size(plugins)).to.eql(10);
+    });
 
     it('should have a startAll property', function () {
       expect(plugins).to.have.property('startAll');

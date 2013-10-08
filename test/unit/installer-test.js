@@ -1,7 +1,13 @@
 var expect = require('expect.js');
 var installer = require('../../lib/installer');
 
+var _ = require('underscore');
+
 describe('installer', function () {
+
+  it('should expose n number of properties', function () {
+    expect(_.size(installer)).to.eql(16);
+  });
 
   it('should have a generatePassword property', function () {
     expect(installer).to.have.property('generatePassword');
