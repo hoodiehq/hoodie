@@ -371,8 +371,8 @@ f.event={add:function(a,c,d,e,g){var h,i,j,k,l,m,n,o,p,q,r,s;if(!(a.nodeType===3
                   "type": "heading",
                   "data": {
                     "level": 1,
-                    "title": "hoodie.checkConnection() &amp; hoodie.isOnline()",
-                    "slug": "hoodiecheckconnection-amp-hoodieisonline"
+                    "title": "hoodie.checkConnection() &amp; hoodie.isConnected()",
+                    "slug": "hoodiecheckconnection-amp-hoodieisconnected"
                   },
                   "depth": 1,
                   "children": [
@@ -388,8 +388,8 @@ f.event={add:function(a,c,d,e,g){var h,i,j,k,l,m,n,o,p,q,r,s;if(!(a.nodeType===3
                       "type": "heading",
                       "data": {
                         "level": 2,
-                        "title": "isOnline",
-                        "slug": "isonline"
+                        "title": "isConnected",
+                        "slug": "isconnected"
                       },
                       "depth": 2
                     }

@@ -2100,8 +2100,8 @@ function hoodieStore (hoodie) {
     options = options || {};
 
     // if store is currently bootstrapping data from remote,
-    // we're queueing until it's finished
-    if (store.isBootstrapping()) {
+    // we're queueing local saves until it's finished.
+    if (store.isBootstrapping() && !options.remote) {
       return enqueue('save', arguments);
     }
 
@@ -2317,8 +2317,8 @@ function hoodieStore (hoodie) {
     options = options || {};
 
     // if store is currently bootstrapping data from remote,
-    // we're queueing until it's finished
-    if (store.isBootstrapping()) {
+    // we're queueing local removes until it's finished.
+    if (store.isBootstrapping() && !options.remote) {
       return enqueue('remove', arguments);
     }
 

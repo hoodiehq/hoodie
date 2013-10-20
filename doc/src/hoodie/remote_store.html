@@ -192,7 +192,9 @@ pulling when <code>remote.connected</code> remains true.</p></div></div><div cla
     <span class="k">return</span> <span class="nx">since</span><span class="p">;</span>
   <span class="p">};</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h2 id="bootstrap">bootstrap</h2></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>inital pull of data of the remote store. By default, we pull all
 changes since the beginning, but this behavior might be adjusted,
-e.g for a filtered bootstrap.</p></div></div><div class="code"><div class="wrapper">  <span class="nx">remote</span><span class="p">.</span><span class="nx">bootstrap</span> <span class="o">=</span> <span class="kd">function</span> <span class="nx">bootstrap</span><span class="p">()</span> <span class="p">{</span>
+e.g for a filtered bootstrap.</p></div></div><div class="code"><div class="wrapper">  <span class="kd">var</span> <span class="nx">isBootstrapping</span> <span class="o">=</span> <span class="kc">false</span><span class="p">;</span>
+  <span class="nx">remote</span><span class="p">.</span><span class="nx">bootstrap</span> <span class="o">=</span> <span class="kd">function</span> <span class="nx">bootstrap</span><span class="p">()</span> <span class="p">{</span>
+    <span class="nx">isBootstrapping</span> <span class="o">=</span> <span class="kc">true</span><span class="p">;</span>
     <span class="nx">remote</span><span class="p">.</span><span class="nx">trigger</span><span class="p">(</span><span class="s1">&#39;bootstrap:start&#39;</span><span class="p">);</span>
     <span class="k">return</span> <span class="nx">remote</span><span class="p">.</span><span class="nx">pull</span><span class="p">().</span><span class="nx">done</span><span class="p">(</span> <span class="nx">handleBootstrapSuccess</span> <span class="p">);</span>
   <span class="p">};</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h2 id="pull-changes">pull changes</h2></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>a.k.a. make a GET request to CouchDB's <code>_changes</code> feed.
@@ -345,10 +347,13 @@ users database, therefore the <code>-local</code> suffix.</p></div></div><div cl
     <span class="k">return</span> <span class="nx">response</span><span class="p">.</span><span class="nx">rows</span><span class="p">.</span><span class="nx">map</span><span class="p">(</span><span class="kd">function</span><span class="p">(</span><span class="nx">row</span><span class="p">)</span> <span class="p">{</span>
       <span class="k">return</span> <span class="nx">row</span><span class="p">.</span><span class="nx">doc</span><span class="p">;</span>
     <span class="p">});</span>
-  <span class="p">}</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h3 id="pull-url">pull url</h3></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>Depending on whether remote is connected, return a longpoll URL or not</p></div></div><div class="code"><div class="wrapper">  <span class="kd">function</span> <span class="nx">pullUrl</span><span class="p">()</span> <span class="p">{</span>
+  <span class="p">}</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h3 id="pull-url">pull url</h3></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>Depending on whether remote is connected (= pulling changes continuously)
+return a longpoll URL or not. If it is a beginning bootstrap request, do
+not return a longpoll URL, as we want it to finish right away, even if there
+are no changes on remote.</p></div></div><div class="code"><div class="wrapper">  <span class="kd">function</span> <span class="nx">pullUrl</span><span class="p">()</span> <span class="p">{</span>
     <span class="kd">var</span> <span class="nx">since</span><span class="p">;</span>
     <span class="nx">since</span> <span class="o">=</span> <span class="nx">remote</span><span class="p">.</span><span class="nx">getSinceNr</span><span class="p">();</span>
-    <span class="k">if</span> <span class="p">(</span><span class="nx">remote</span><span class="p">.</span><span class="nx">isConnected</span><span class="p">())</span> <span class="p">{</span>
+    <span class="k">if</span> <span class="p">(</span><span class="nx">remote</span><span class="p">.</span><span class="nx">isConnected</span><span class="p">()</span> <span class="o">&amp;&amp;</span> <span class="o">!</span><span class="nx">isBootstrapping</span><span class="p">)</span> <span class="p">{</span>
       <span class="k">return</span> <span class="s1">&#39;/_changes?include_docs=true&amp;since=&#39;</span> <span class="o">+</span> <span class="nx">since</span> <span class="o">+</span> <span class="s1">&#39;&amp;heartbeat=10000&amp;feed=longpoll&#39;</span><span class="p">;</span>
     <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
       <span class="k">return</span> <span class="s1">&#39;/_changes?include_docs=true&amp;since=&#39;</span> <span class="o">+</span> <span class="nx">since</span><span class="p">;</span>
@@ -396,6 +401,7 @@ we'll try again after a 3s timeout</p></div></div><div class="code"><div class="
       <span class="p">}</span>
     <span class="p">}</span>
   <span class="p">}</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h3 id="handle-changes-from-remote">handle changes from remote</h3></div></div></div><div class="segment"><div class="code"><div class="wrapper">  <span class="kd">function</span> <span class="nx">handleBootstrapSuccess</span><span class="p">()</span> <span class="p">{</span>
+    <span class="nx">isBootstrapping</span> <span class="o">=</span> <span class="kc">false</span><span class="p">;</span>
     <span class="nx">remote</span><span class="p">.</span><span class="nx">trigger</span><span class="p">(</span><span class="s1">&#39;bootstrap:end&#39;</span><span class="p">);</span>
   <span class="p">}</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h3 id="handle-changes-from-remote">handle changes from remote</h3></div></div></div><div class="segment"><div class="code"><div class="wrapper">  <span class="kd">function</span> <span class="nx">handlePullResults</span><span class="p">(</span><span class="nx">changes</span><span class="p">)</span> <span class="p">{</span>
     <span class="kd">var</span> <span class="nx">doc</span><span class="p">,</span> <span class="nx">event</span><span class="p">,</span> <span class="nx">object</span><span class="p">,</span> <span class="nx">_i</span><span class="p">,</span> <span class="nx">_len</span><span class="p">;</span>

@@ -26,7 +26,7 @@ store.save('car', 'abc4567', {color: 'red'})
     <span class="kd">var</span> <span class="nx">currentObject</span><span class="p">,</span> <span class="nx">defer</span><span class="p">,</span> <span class="nx">error</span><span class="p">,</span> <span class="nx">event</span><span class="p">,</span> <span class="nx">isNew</span><span class="p">,</span> <span class="nx">key</span><span class="p">;</span>
 
     <span class="nx">options</span> <span class="o">=</span> <span class="nx">options</span> <span class="o">||</span> <span class="p">{};</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>if store is currently bootstrapping data from remote,
-we're queueing until it's finished</p></div></div><div class="code"><div class="wrapper">    <span class="k">if</span> <span class="p">(</span><span class="nx">store</span><span class="p">.</span><span class="nx">isBootstrapping</span><span class="p">())</span> <span class="p">{</span>
+we're queueing local saves until it's finished.</p></div></div><div class="code"><div class="wrapper">    <span class="k">if</span> <span class="p">(</span><span class="nx">store</span><span class="p">.</span><span class="nx">isBootstrapping</span><span class="p">()</span> <span class="o">&amp;&amp;</span> <span class="o">!</span><span class="nx">options</span><span class="p">.</span><span class="nx">remote</span><span class="p">)</span> <span class="p">{</span>
       <span class="k">return</span> <span class="nx">enqueue</span><span class="p">(</span><span class="s1">&#39;save&#39;</span><span class="p">,</span> <span class="nx">arguments</span><span class="p">);</span>
     <span class="p">}</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>generate an id if necessary</p></div></div><div class="code"><div class="wrapper">    <span class="k">if</span> <span class="p">(</span><span class="nx">object</span><span class="p">.</span><span class="nx">id</span><span class="p">)</span> <span class="p">{</span>
       <span class="nx">currentObject</span> <span class="o">=</span> <span class="nx">cache</span><span class="p">(</span><span class="nx">object</span><span class="p">.</span><span class="nx">type</span><span class="p">,</span> <span class="nx">object</span><span class="p">.</span><span class="nx">id</span><span class="p">);</span>
@@ -186,7 +186,7 @@ Otherwise remove it from Store.</p></div></div><div class="code"><div class="wra
     <span class="kd">var</span> <span class="nx">key</span><span class="p">,</span> <span class="nx">object</span><span class="p">,</span> <span class="nx">objectWasMarkedAsDeleted</span><span class="p">;</span>
 
     <span class="nx">options</span> <span class="o">=</span> <span class="nx">options</span> <span class="o">||</span> <span class="p">{};</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>if store is currently bootstrapping data from remote,
-we're queueing until it's finished</p></div></div><div class="code"><div class="wrapper">    <span class="k">if</span> <span class="p">(</span><span class="nx">store</span><span class="p">.</span><span class="nx">isBootstrapping</span><span class="p">())</span> <span class="p">{</span>
+we're queueing local removes until it's finished.</p></div></div><div class="code"><div class="wrapper">    <span class="k">if</span> <span class="p">(</span><span class="nx">store</span><span class="p">.</span><span class="nx">isBootstrapping</span><span class="p">()</span> <span class="o">&amp;&amp;</span> <span class="o">!</span><span class="nx">options</span><span class="p">.</span><span class="nx">remote</span><span class="p">)</span> <span class="p">{</span>
       <span class="k">return</span> <span class="nx">enqueue</span><span class="p">(</span><span class="s1">&#39;remove&#39;</span><span class="p">,</span> <span class="nx">arguments</span><span class="p">);</span>
     <span class="p">}</span>
 
@@ -459,7 +459,7 @@ page reload.</p></div></div><div class="code"><div class="wrapper">  <span class
       <span class="k">return</span><span class="p">;</span>
     <span class="p">}</span>
 
-    <span class="k">return</span> <span class="nx">triggerDirtyAndIdleEvents</span><span class="p">();</span>
+    <span class="nx">triggerDirtyAndIdleEvents</span><span class="p">();</span>
   <span class="p">}</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h2 id="clear-changed">Clear changed</h2></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>removes an object from the list of objects that are flagged to by synched (dirty)
 and triggers a <code>store:dirty</code> event</p></div></div><div class="code"><div class="wrapper">  <span class="kd">function</span> <span class="nx">clearChanged</span><span class="p">(</span><span class="nx">type</span><span class="p">,</span> <span class="nx">id</span><span class="p">)</span> <span class="p">{</span>
     <span class="kd">var</span> <span class="nx">key</span><span class="p">;</span>
