@@ -270,6 +270,47 @@ describe('hoodie.account', function () {
   }); // # authenticate
 
 
+  describe('#isUnauthenticated', function() {
+    beforeEach(function() {
+      this.sandbox.stub(this.account, 'request').returns(this.requestDefer.promise());
+    });
+
+    _when('user has no account', function() {
+      beforeEach(function() {
+        this.sandbox.stub(this.account, 'hasAccount').returns(false);
+      });
+
+      it('returns false', function() {
+        expect(this.account.isUnauthenticated()).to.be(false);
+      });
+    });
+
+    _when('user has account', function() {
+      beforeEach(function() {
+        this.sandbox.stub(this.account, 'hasAccount').returns(true);
+      });
+
+      _and('session has not been validated yet', function () {
+        it('returns false', function() {
+          expect(this.account.isUnauthenticated()).to.be(false);
+        });
+      });
+
+      with_session_validated_before( function () {
+        it('returns false', function() {
+          expect(this.account.isUnauthenticated()).to.be(false);
+        });
+      }); // with_session_validated_before
+
+      with_session_invalidated_before( function () {
+        it('returns true', function() {
+          expect(this.account.isUnauthenticated()).to.be(true);
+        });
+      }); // with_session_invalidated_before
+    });
+  });
+
+
   describe('#signUp(username, password)', function () {
 
     beforeEach(function () {
@@ -1877,7 +1918,7 @@ function presetUserDoc(context) {
 
 
 function with_session_validated_before (callback) {
-  _when('session has been validated_before', function() {
+  _when('session has been validated before', function() {
     beforeEach(function() {
       var response = {
         userCtx: {
@@ -1899,7 +1940,7 @@ function with_session_validated_before (callback) {
 }
 
 function with_session_invalidated_before (callback) {
-  _when('session has been invalidated_before', function() {
+  _when('session has been invalidated before', function() {
     beforeEach(function() {
       var response = {
         userCtx: {
