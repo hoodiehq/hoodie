@@ -608,6 +608,17 @@ describe('hoodie.store', function() {
         this.hoodie.trigger('remote:bootstrap:end');
         expect(promise).to.be.resolved();
       });
+
+      _but('change comes from remote', function() {
+        it('should not wait until bootstrapping is finished', function() {
+          var promise = this.storeBackend.save({
+            type: 'task',
+            id: '1234',
+            title: 'do it!'
+          }, {remote: true});
+          expect(promise).to.be.resolved();
+        });
+      });
     }); // store is bootstrapping
   }); // #save
 
@@ -1017,6 +1028,15 @@ describe('hoodie.store', function() {
         expect(promise).to.be.resolved();
       });
 
+      _but('change comes from remote', function() {
+        it('should not wait until bootstrapping is finished', function() {
+          stubFindItem('document', '123', {
+            something: 'here'
+          });
+          var promise = this.storeBackend.remove('document', '123', {remote: true});
+          expect(promise).to.be.resolved();
+        });
+      });
     });
   }); // #remove
 
