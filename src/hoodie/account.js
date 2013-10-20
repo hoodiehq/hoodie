@@ -252,7 +252,7 @@ function hoodieAccount (hoodie) {
 
     if (username !== account.username) {
       if (! options.moveData) {
-        return signOutAndSignIn()
+        return signOutAndSignIn();
       }
 
       return hoodie.store.findAll()
@@ -266,14 +266,14 @@ function hoodieAccount (hoodie) {
 
           // ignore the account settings
           if (type === '$config' && object.id === 'hoodie') {
-            return
+            return;
           }
 
           delete object.type;
           object.createdBy = hoodie.account.ownerHash;
           hoodie.store.add(type, object);
         });
-      })
+      });
 
     } else {
       return sendSignInRequest(username, password, {
