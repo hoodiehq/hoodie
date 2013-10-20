@@ -835,7 +835,6 @@ describe('hoodie.account', function () {
         });
 
       }); // signIn successful
-
     }); // signing in with current username
 
     _when('signout errors', function () {
@@ -856,7 +855,6 @@ describe('hoodie.account', function () {
         });
 
       });
-
     }); // signout errors
 
     _when('signout succeeds', function () {
@@ -1055,6 +1053,43 @@ describe('hoodie.account', function () {
           expect(data.password).to.eql('');
         });
       }); // sign in without password
+    }); // signout succeeds
+
+    _when('options.moveData = true', function () {
+      beforeEach(function() {
+        var objects = [
+          {type: 'task', id: 'abc', title: 'Milk', createdBy: 'somehash'},
+          {type: 'task', id: 'def', title: 'Wodka', createdBy: 'somehash'},
+          {type: '$config', id: 'hoodie', some: 'funk', createdBy: 'somehash'},
+        ];
+        this.hoodie.store.findAll.returns(this.hoodie.resolveWith(objects));
+        this.signOutDefer.resolve();
+        this.account.signIn('joe@example.com', 'secret', {moveData : true});
+        this.response = {
+          'ok': true,
+          'name': 'user/joe@example.com',
+          'roles': ['user_hash', 'confirmed']
+        };
+        this.requestDefer.resolve(this.response);
+      });
+
+      it.only('moves the data', function() {
+        expect(this.hoodie.store.add).to.be.calledWith('task', {
+          id: 'abc',
+          title: 'Milk',
+          createdBy: 'user_hash'
+        });
+        expect(this.hoodie.store.add).to.be.calledWith('task', {
+          id: 'def',
+          title: 'Wodka',
+          createdBy: 'user_hash'
+        });
+        expect(this.hoodie.store.add).not.to.be.calledWith('$config', {
+          id: 'hoodie',
+          some: 'funk',
+          createdBy: 'user_hash'
+        });
+      });
     }); // signout succeeds
   }); // #signIn
 
