@@ -127,7 +127,11 @@ describe('hoodieRemoteStore', function() {
 
     _when('prefix is store_prefix/', function() {
       beforeEach(function() {
-        this.remote.prefix = 'store_prefix/';
+        this.remote = hoodieRemoteStore(this.hoodie, {
+          name: 'my/store',
+          prefix: 'store_prefix/'
+        } );
+        this.storeBackend = hoodieStoreApi.args[1][1].backend;
       });
 
       it('should send request to `store_prefix%2Ftype%2Fid`', function() {
@@ -143,7 +147,6 @@ describe('hoodieRemoteStore', function() {
       });
 
       _and('request successful', function() {
-
         beforeEach(function() {
           this.requestDefer.resolve({
             _id: 'store_prefix/car/fresh',
@@ -153,7 +156,6 @@ describe('hoodieRemoteStore', function() {
         });
 
         it('should resolve with the doc', function() {
-
           this.storeBackend.find('todo', '1').then(function (res) {
             expect(res).to.eql({
               id: 'fresh',
@@ -162,7 +164,6 @@ describe('hoodieRemoteStore', function() {
               updatedAt: '2012-12-21T22:00:00.000Z'
             });
           });
-
         });
       }); // request successful
     }); // prefix is store_prefix/
@@ -645,10 +646,18 @@ describe('hoodieRemoteStore', function() {
       _and('prefix is set', function() {
 
         beforeEach(function() {
-          this.remote.prefix = 'prefix/';
+          this.remote = hoodieRemoteStore(this.hoodie, {
+            prefix: 'prefix/'
+          } );
+          this.sandbox.stub(this.remote, 'isConnected').returns(true);
+          var defers = [this.promise1,this.promise2];
+          this.sandbox.stub(this.remote, 'request', function() {
+            return defers.shift();
+          });
         });
 
         it('should trigger events only for objects with prefix', function() {
+          debugger
           this.remote.pull();
           expect(this.remote.trigger.calledWith('add', this.object3)).to.be.ok();
           expect(this.remote.trigger.calledWith('add', this.object2)).to.not.be.ok();

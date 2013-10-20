@@ -384,13 +384,15 @@ function hoodieStoreApi(hoodie, options) {
   // ---------
 
   // / not allowed for id
+  var validIdPattern = new RegExp(/^[^\/]+$/)
   function isValidId(key) {
-    return new RegExp(/^[^\/]+$/).test(key || '');
+    return validIdPattern.test(key || '');
   }
 
   // / not allowed for type
+  var validTypePattern = new RegExp(/^[^\/]+$/)
   function isValidType(key) {
-    return new RegExp(/^[^\/]+$/).test(key || '');
+    return validTypePattern.test(key || '');
   }
 
   //

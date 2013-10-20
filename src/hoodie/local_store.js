@@ -806,18 +806,21 @@ function hoodieStore (hoodie) {
   }
 
   // only lowercase letters, numbers and dashes are allowed for ids
+  var validIdPattern = new RegExp(/^[a-z0-9\-]+$/);
   function isValidId(id) {
-    return new RegExp(/^[a-z0-9\-]+$/).test(id);
+    return validIdPattern.test(id);
   }
 
   // just like ids, but must start with a letter or a $ (internal types)
+  var validTypePattern = new RegExp(/^[a-z$][a-z0-9]+$/);
   function isValidType(type) {
-    return new RegExp(/^[a-z$][a-z0-9]+$/).test(type);
+    return validTypePattern.test(type);
   }
 
   //
+  var semanticIdPattern = new RegExp(/^[a-z$][a-z0-9]+\/[a-z0-9]+$/);
   function isSemanticId(key) {
-    return new RegExp(/^[a-z$][a-z0-9]+\/[a-z0-9]+$/).test(key);
+    return semanticIdPattern.test(key);
   }
 
   // `hasLocalChanges` returns true if there is a local change that

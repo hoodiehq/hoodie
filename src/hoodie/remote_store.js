@@ -193,11 +193,11 @@ function hoodieRemoteStore (hoodie, options) {
 
   // prefix
 
-  //prefix for docs in a CouchDB database, e.g. all docs
+  // prefix for docs in a CouchDB database, e.g. all docs
   // in public user stores are prefixed by '$public/'
   //
   remote.prefix = '';
-
+  var remotePrefixPattern = new RegExp('^');
 
 
   // defaults
@@ -210,6 +210,7 @@ function hoodieRemoteStore (hoodie, options) {
 
   if (options.prefix !== undefined) {
     remote.prefix = options.prefix;
+    remotePrefixPattern = new RegExp('^' + remote.prefix);
   }
 
   if (options.baseUrl !== null) {
@@ -524,7 +525,8 @@ function hoodieRemoteStore (hoodie, options) {
     delete object._id;
 
     if (remote.prefix) {
-      id = id.replace(new RegExp('^' + remote.prefix), '');
+      id = id.replace(remotePrefixPattern, '');
+      // id = id.replace(new RegExp('^' + remote.prefix), '');
     }
 
     // turn doc/123 into type = doc & id = 123
