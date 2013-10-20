@@ -657,7 +657,6 @@ describe('hoodieRemoteStore', function() {
         });
 
         it('should trigger events only for objects with prefix', function() {
-          debugger
           this.remote.pull();
           expect(this.remote.trigger.calledWith('add', this.object3)).to.be.ok();
           expect(this.remote.trigger.calledWith('add', this.object2)).to.not.be.ok();

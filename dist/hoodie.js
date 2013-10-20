@@ -1105,13 +1105,15 @@ function hoodieStoreApi(hoodie, options) {
   // ---------
 
   // / not allowed for id
+  var validIdPattern = new RegExp(/^[^\/]+$/);
   function isValidId(key) {
-    return new RegExp(/^[^\/]+$/).test(key || '');
+    return validIdPattern.test(key || '');
   }
 
   // / not allowed for type
+  var validTypePattern = new RegExp(/^[^\/]+$/);
   function isValidType(key) {
-    return new RegExp(/^[^\/]+$/).test(key || '');
+    return validTypePattern.test(key || '');
   }
 
   //
@@ -1473,11 +1475,11 @@ function hoodieRemoteStore (hoodie, options) {
 
   // prefix
 
-  //prefix for docs in a CouchDB database, e.g. all docs
+  // prefix for docs in a CouchDB database, e.g. all docs
   // in public user stores are prefixed by '$public/'
   //
   remote.prefix = '';
-
+  var remotePrefixPattern = new RegExp('^');
 
 
   // defaults
@@ -1490,6 +1492,7 @@ function hoodieRemoteStore (hoodie, options) {
 
   if (options.prefix !== undefined) {
     remote.prefix = options.prefix;
+    remotePrefixPattern = new RegExp('^' + remote.prefix);
   }
 
   if (options.baseUrl !== null) {
@@ -1804,7 +1807,8 @@ function hoodieRemoteStore (hoodie, options) {
     delete object._id;
 
     if (remote.prefix) {
-      id = id.replace(new RegExp('^' + remote.prefix), '');
+      id = id.replace(remotePrefixPattern, '');
+      // id = id.replace(new RegExp('^' + remote.prefix), '');
     }
 
     // turn doc/123 into type = doc & id = 123
@@ -2850,18 +2854,21 @@ function hoodieStore (hoodie) {
   }
 
   // only lowercase letters, numbers and dashes are allowed for ids
+  var validIdPattern = new RegExp(/^[a-z0-9\-]+$/);
   function isValidId(id) {
-    return new RegExp(/^[a-z0-9\-]+$/).test(id);
+    return validIdPattern.test(id);
   }
 
   // just like ids, but must start with a letter or a $ (internal types)
+  var validTypePattern = new RegExp(/^[a-z$][a-z0-9]+$/);
   function isValidType(type) {
-    return new RegExp(/^[a-z$][a-z0-9]+$/).test(type);
+    return validTypePattern.test(type);
   }
 
   //
+  var semanticIdPattern = new RegExp(/^[a-z$][a-z0-9]+\/[a-z0-9]+$/);
   function isSemanticId(key) {
-    return new RegExp(/^[a-z$][a-z0-9]+\/[a-z0-9]+$/).test(key);
+    return semanticIdPattern.test(key);
   }
 
   // `hasLocalChanges` returns true if there is a local change that
