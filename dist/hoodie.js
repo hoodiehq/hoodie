@@ -3141,7 +3141,7 @@ function hoodieAccount (hoodie) {
     }
 
     // if username is not set, make sure to end the session
-    if (account.username === undefined) {
+    if (! account.hasAccount()) {
       return sendSignOutRequest().then(function() {
         authenticated = false;
         return hoodie.reject();
@@ -3159,6 +3159,21 @@ function hoodieAccount (hoodie) {
     };
 
     return withSingleRequest('authenticate', sendAndHandleAuthRequest);
+  };
+
+
+  // isUnauthenticated
+  // -----------------
+
+  // returns true if the user is currently signed but has no valid session,
+  // meaning that the data cannot be synchronized.
+  //
+  account.isUnauthenticated = function() {
+    if (! account.hasAccount()) {
+      return false;
+    }
+
+    return authenticated === false;
   };
 
 
@@ -4213,7 +4228,9 @@ function hoodieRemote (hoodie) {
       remote.connect( hoodie.account.db() );
     });
 
-    hoodie.on('account:reauthenticated', remote.connect);
+    hoodie.on('account:reauthenticated', function() {
+      remote.connect( hoodie.account.db() );
+    });
     hoodie.on('account:signout', remote.disconnect);
   }
 
