@@ -106,7 +106,9 @@ function hoodieRemote (hoodie) {
       remote.connect( hoodie.account.db() );
     });
 
-    hoodie.on('account:reauthenticated', remote.connect);
+    hoodie.on('account:reauthenticated', function() {
+      remote.connect( hoodie.account.db() );
+    });
     hoodie.on('account:signout', remote.disconnect);
   }
 
