@@ -270,7 +270,7 @@ describe('hoodie.account', function () {
   }); // # authenticate
 
 
-  describe('#isUnauthenticated', function() {
+  describe('#hasInvalidSession', function() {
     beforeEach(function() {
       this.sandbox.stub(this.account, 'request').returns(this.requestDefer.promise());
     });
@@ -281,7 +281,7 @@ describe('hoodie.account', function () {
       });
 
       it('returns false', function() {
-        expect(this.account.isUnauthenticated()).to.be(false);
+        expect(this.account.hasInvalidSession()).to.be(false);
       });
     });
 
@@ -292,19 +292,60 @@ describe('hoodie.account', function () {
 
       _and('session has not been validated yet', function () {
         it('returns false', function() {
-          expect(this.account.isUnauthenticated()).to.be(false);
+          expect(this.account.hasInvalidSession()).to.be(false);
         });
       });
 
       with_session_validated_before( function () {
         it('returns false', function() {
-          expect(this.account.isUnauthenticated()).to.be(false);
+          expect(this.account.hasInvalidSession()).to.be(false);
         });
       }); // with_session_validated_before
 
       with_session_invalidated_before( function () {
         it('returns true', function() {
-          expect(this.account.isUnauthenticated()).to.be(true);
+          expect(this.account.hasInvalidSession()).to.be(true);
+        });
+      }); // with_session_invalidated_before
+    });
+  });
+
+
+  describe('#hasValidSession', function() {
+    beforeEach(function() {
+      this.sandbox.stub(this.account, 'request').returns(this.requestDefer.promise());
+    });
+
+    _when('user has no account', function() {
+      beforeEach(function() {
+        this.sandbox.stub(this.account, 'hasAccount').returns(false);
+      });
+
+      it('returns false', function() {
+        expect(this.account.hasValidSession()).to.be(false);
+      });
+    });
+
+    _when('user has account', function() {
+      beforeEach(function() {
+        this.sandbox.stub(this.account, 'hasAccount').returns(true);
+      });
+
+      _and('session has not been validated yet', function () {
+        it('returns false', function() {
+          expect(this.account.hasValidSession()).to.be(false);
+        });
+      });
+
+      with_session_validated_before( function () {
+        it('returns true', function() {
+          expect(this.account.hasValidSession()).to.be(true);
+        });
+      }); // with_session_validated_before
+
+      with_session_invalidated_before( function () {
+        it('returns false', function() {
+          expect(this.account.hasValidSession()).to.be(false);
         });
       }); // with_session_invalidated_before
     });
@@ -1073,7 +1114,7 @@ describe('hoodie.account', function () {
         this.requestDefer.resolve(this.response);
       });
 
-      it.only('moves the data', function() {
+      it('moves the data', function() {
         expect(this.hoodie.store.add).to.be.calledWith('task', {
           id: 'abc',
           title: 'Milk',

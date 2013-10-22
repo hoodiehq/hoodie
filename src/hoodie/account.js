@@ -79,13 +79,28 @@ function hoodieAccount (hoodie) {
   };
 
 
-  // isUnauthenticated
+  // hasValidSession
   // -----------------
 
   // returns true if the user is currently signed but has no valid session,
   // meaning that the data cannot be synchronized.
   //
-  account.isUnauthenticated = function() {
+  account.hasValidSession = function() {
+    if (! account.hasAccount()) {
+      return false;
+    }
+
+    return authenticated === true;
+  };
+
+
+  // hasInvalidSession
+  // -----------------
+
+  // returns true if the user is currently signed but has no valid session,
+  // meaning that the data cannot be synchronized.
+  //
+  account.hasInvalidSession = function() {
     if (! account.hasAccount()) {
       return false;
     }
