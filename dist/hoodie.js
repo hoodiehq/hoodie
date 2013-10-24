@@ -2891,11 +2891,11 @@ function hoodieStore (hoodie) {
   // this is where all the store events get triggered,
   // like add:task, change:note:abc4567, remove, etc.
   function triggerEvents(eventName, object, options) {
-    store.trigger(eventName, object, options);
-    store.trigger('' + eventName + ':' + object.type, object, options);
+    store.trigger(eventName, $.extend(true, {}, object), options);
+    store.trigger('' + eventName + ':' + object.type, $.extend(true, {}, object), options);
 
     if (eventName !== 'new') {
-      store.trigger('' + eventName + ':' + object.type + ':' + object.id, object, options);
+      store.trigger('' + eventName + ':' + object.type + ':' + object.id, $.extend(true, {}, object), options);
     }
 
     // sync events have no changes, so we don't trigger
@@ -2904,11 +2904,11 @@ function hoodieStore (hoodie) {
       return;
     }
 
-    store.trigger('change', eventName, object, options);
-    store.trigger('change:' + object.type, eventName, object, options);
+    store.trigger('change', eventName, $.extend(true, {}, object), options);
+    store.trigger('change:' + object.type, eventName, $.extend(true, {}, object), options);
 
     if (eventName !== 'new') {
-      store.trigger('change:' + object.type + ':' + object.id, eventName, object, options);
+      store.trigger('change:' + object.type + ':' + object.id, eventName, $.extend(true, {}, object), options);
     }
   }
 
@@ -3162,13 +3162,28 @@ function hoodieAccount (hoodie) {
   };
 
 
-  // isUnauthenticated
+  // hasValidSession
   // -----------------
 
   // returns true if the user is currently signed but has no valid session,
   // meaning that the data cannot be synchronized.
   //
-  account.isUnauthenticated = function() {
+  account.hasValidSession = function() {
+    if (! account.hasAccount()) {
+      return false;
+    }
+
+    return authenticated === true;
+  };
+
+
+  // hasInvalidSession
+  // -----------------
+
+  // returns true if the user is currently signed but has no valid session,
+  // meaning that the data cannot be synchronized.
+  //
+  account.hasInvalidSession = function() {
     if (! account.hasAccount()) {
       return false;
     }
@@ -3302,13 +3317,25 @@ function hoodieAccount (hoodie) {
   // Besides the standard sign in we also check if the account has been confirmed
   // (roles include 'confirmed' role).
   //
-  // NOTE: When signing in, all local data gets cleared beforehand (with a signOut).
-  //       Otherwise data that has been created beforehand (authenticated with
-  //       another user account or anonymously) would be merged into the user
-  //       account that signs in. That applies only if username isn't the same as
-  //       current username.
+  // When signing in, by default all local data gets cleared beforehand (with a signOut).
+  // Otherwise data that has been created beforehand (authenticated with another user
+  // account or anonymously) would be merged into the user account that signs in.
+  // That applies only if username isn't the same as current username.
   //
-  account.signIn = function signIn(username, password) {
+  // To prevent data loss, signIn can be called with options.moveData = true, that wll
+  // move all data from the anonymous account to the account the user signed into.
+  //
+  account.signIn = function signIn(username, password, options) {
+    var signOutAndSignIn = function() {
+      return account.signOut({
+        silent: true
+      }).then(function() {
+        return sendSignInRequest(username, password);
+      });
+    };
+    var currentData;
+
+    options = options || {};
 
     if (username === null) {
       username = '';
@@ -3322,11 +3349,30 @@ function hoodieAccount (hoodie) {
     username = username.toLowerCase();
 
     if (username !== account.username) {
-      return account.signOut({
-        silent: true
-      }).then(function() {
-        return sendSignInRequest(username, password);
+      if (! options.moveData) {
+        return signOutAndSignIn();
+      }
+
+      return hoodie.store.findAll()
+      .then(function(data) {
+        currentData = data;
+      })
+      .then(signOutAndSignIn)
+      .done(function() {
+        currentData.forEach(function(object) {
+          var type = object.type;
+
+          // ignore the account settings
+          if (type === '$config' && object.id === 'hoodie') {
+            return;
+          }
+
+          delete object.type;
+          object.createdBy = hoodie.account.ownerHash;
+          hoodie.store.add(type, object);
+        });
       });
+
     } else {
       return sendSignInRequest(username, password, {
         reauthenticated: true
