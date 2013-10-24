@@ -235,6 +235,20 @@ describe('hoodie.store', function() {
           expect(this.store.trigger).to.be.calledWith('change:document', 'update', object, options);
         });
 
+        it('should not change the original object', function() {
+          var origObject = {
+            type: '$test',
+            id: '123',
+            name: 'test task'
+          }
+
+          this.storeBackend.save(origObject);
+          var passedObject1 = this.store.trigger.args.pop()[2]
+          var passedObject2 = this.store.trigger.args.pop()[2]
+          passedObject1.funky = 'fresh'
+          expect(passedObject2.funky).to.not.be('fresh')
+        });
+
         it('should keep local attributes', function() {
           stubFindItem('document', '1234', {
             name: 'test',
