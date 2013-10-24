@@ -1,5 +1,5 @@
 /* global hoodieTask */
-describe('hoodie.task', function() {
+describe.only('hoodie.task', function() {
 
   beforeEach(function() {
     this.hoodie = new Mocks.Hoodie();
@@ -54,11 +54,11 @@ describe('hoodie.task', function() {
             var args = this.hoodie.store.on.args[0];
             expect(args[0]).to.eql('remove');
             this.removeCallback = args[1];
-            this.removeCallback( { type: '$message', id: '123', finishedAt: 'now' } );
+            this.removeCallback( { type: '$message', id: '123', $processedAt: 'now' } );
           });
 
           it('should resolve', function() {
-            expect(this.promise).to.be.resolvedWith( { type: 'message', id: '123', finishedAt: 'now' } );
+            expect(this.promise).to.be.resolvedWith( { type: 'message', id: '123', $processedAt: 'now' } );
           });
         });
 

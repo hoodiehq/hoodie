@@ -134,7 +134,7 @@ function hoodieTask(hoodie) {
       object.type = object.type.substr(1);
 
       // task finished by worker.
-      if(object.finishedAt) {
+      if(object['$processedAt']) {
         return defer.resolve(object);
       }
 
