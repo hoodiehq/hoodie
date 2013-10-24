@@ -84,12 +84,12 @@ describe('hoodie.store', function() {
       this.store.subscribeToOutsideEvents();
       this.hoodie.trigger('remote:push', { type: 'doc', id: 'funky' });
       expect(this.store.trigger).to.be.calledWith('sync', { type: 'doc', id: 'funky' }, undefined);
-      expect(this.store.trigger).to.be.calledWith('sync:doc', { type: 'doc', id: 'funky' }, undefined);
-      expect(this.store.trigger).to.be.calledWith('sync:doc:funky', { type: 'doc', id: 'funky' }, undefined);
+      expect(this.store.trigger).to.be.calledWith('doc:sync', { type: 'doc', id: 'funky' }, undefined);
+      expect(this.store.trigger).to.be.calledWith('doc:funky:sync', { type: 'doc', id: 'funky' }, undefined);
 
       expect(this.store.trigger).to.not.be.calledWith('change', 'sync', { type: 'doc', id: 'funky' }, undefined);
-      expect(this.store.trigger).to.not.be.calledWith('change:doc', 'sync', { type: 'doc', id: 'funky' }, undefined);
-      expect(this.store.trigger).to.not.be.calledWith('change:doc:funky', 'sync', { type: 'doc', id: 'funky' }, undefined);
+      expect(this.store.trigger).to.not.be.calledWith('doc:change', 'sync', { type: 'doc', id: 'funky' }, undefined);
+      expect(this.store.trigger).to.not.be.calledWith('doc:funky:change', 'sync', { type: 'doc', id: 'funky' }, undefined);
     });
 
     _when('remote:change event gets fired', function() {
@@ -239,9 +239,9 @@ describe('hoodie.store', function() {
           };
 
           expect(this.store.trigger).to.be.calledWith('update', object, options);
-          expect(this.store.trigger).to.be.calledWith('update:document', object, options);
+          expect(this.store.trigger).to.be.calledWith('document:update', object, options);
           expect(this.store.trigger).to.be.calledWith('change', 'update', object, options);
-          expect(this.store.trigger).to.be.calledWith('change:document', 'update', object, options);
+          expect(this.store.trigger).to.be.calledWith('document:change', 'update', object, options);
         });
 
         it('should not change the original object', function() {
@@ -400,9 +400,9 @@ describe('hoodie.store', function() {
               createdBy: 'myself'
             };
             expect(this.store.trigger).to.be.calledWith('update', object, {});
-            expect(this.store.trigger).to.be.calledWith('update:document', object, {});
+            expect(this.store.trigger).to.be.calledWith('document:update', object, {});
             expect(this.store.trigger).to.be.calledWith('change', 'update', object, {});
-            expect(this.store.trigger).to.be.calledWith('change:document', 'update', object, {});
+            expect(this.store.trigger).to.be.calledWith('document:change', 'update', object, {});
           });
         });
 
@@ -426,9 +426,9 @@ describe('hoodie.store', function() {
               createdBy: 'owner_hash'
             };
             expect(this.store.trigger).to.be.calledWith('add', object, {});
-            expect(this.store.trigger).to.be.calledWith('add:document', object, {});
+            expect(this.store.trigger).to.be.calledWith('document:add', object, {});
             expect(this.store.trigger).to.be.calledWith('change', 'add', object, {});
-            expect(this.store.trigger).to.be.calledWith('change:document', 'add', object, {});
+            expect(this.store.trigger).to.be.calledWith('document:change', 'add', object, {});
           });
 
           it('should mark it as change', function() {
@@ -456,9 +456,9 @@ describe('hoodie.store', function() {
 
         it('should trigger update & change events', function() {
           expect(this.store.trigger).to.be.calledWith('update', this.object, {});
-          expect(this.store.trigger).to.be.calledWith('update:document', this.object, {});
+          expect(this.store.trigger).to.be.calledWith('document:update', this.object, {});
           expect(this.store.trigger).to.be.calledWith('change', 'update', this.object, {});
-          expect(this.store.trigger).to.be.calledWith('change:document', 'update', this.object, {});
+          expect(this.store.trigger).to.be.calledWith('document:change', 'update', this.object, {});
         });
       }); // object is not new (and therefore chached)
 
@@ -938,11 +938,11 @@ describe('hoodie.store', function() {
           remote: true
         });
 
-        expect(this.store.trigger.calledWith('remove:document', this.remoteObject, {
+        expect(this.store.trigger.calledWith('document:remove', this.remoteObject, {
           remote: true
         })).to.be.ok();
 
-        expect(this.store.trigger.calledWith('remove:document:123', this.remoteObject, {
+        expect(this.store.trigger.calledWith('document:123:remove', this.remoteObject, {
           remote: true
         })).to.be.ok();
 
@@ -950,11 +950,11 @@ describe('hoodie.store', function() {
           remote: true
         })).to.be.ok();
 
-        expect(this.store.trigger.calledWith('change:document', 'remove', this.remoteObject, {
+        expect(this.store.trigger.calledWith('document:change', 'remove', this.remoteObject, {
           remote: true
         })).to.be.ok();
 
-        expect(this.store.trigger.calledWith('change:document:123', 'remove', this.remoteObject, {
+        expect(this.store.trigger.calledWith('document:123:change', 'remove', this.remoteObject, {
           remote: true
         })).to.be.ok();
 

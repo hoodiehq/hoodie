@@ -383,9 +383,9 @@ describe('hoodie.task', function() {
     it('turns "new" store events into "start" task events', function() {
       this.hoodie.trigger('store:change', 'new', { type: '$message', text: 'funk!'}, {option: 'value'});
       expect( this.hoodie.task.trigger ).to.be.calledWith( 'change', 'start', { type: 'message', text: 'funk!'}, {option: 'value'} );
-      expect( this.hoodie.task.trigger ).to.be.calledWith( 'change:message', 'start', { type: 'message', text: 'funk!'}, {option: 'value'} );
+      expect( this.hoodie.task.trigger ).to.be.calledWith( 'message:change', 'start', { type: 'message', text: 'funk!'}, {option: 'value'} );
       expect( this.hoodie.task.trigger ).to.be.calledWith( 'start', { type: 'message', text: 'funk!'}, {option: 'value'} );
-      expect( this.hoodie.task.trigger ).to.be.calledWith( 'start:message', { type: 'message', text: 'funk!'}, {option: 'value'} );
+      expect( this.hoodie.task.trigger ).to.be.calledWith( 'message:start', { type: 'message', text: 'funk!'}, {option: 'value'} );
       expect( this.hoodie.task.trigger.callCount ).to.eql(4);
     });
 
@@ -397,11 +397,11 @@ describe('hoodie.task', function() {
     it('triggers "error" events if tasks are marked so', function() {
       this.hoodie.trigger('store:change', 'update', { type: '$message', id: '123', $error: 'not funky!'}, {option: 'value'});
       expect( this.hoodie.task.trigger ).to.be.calledWith( 'change', 'error', { type: 'message', id: '123' }, {error: 'not funky!', option: 'value'} );
-      expect( this.hoodie.task.trigger ).to.be.calledWith( 'change:message', 'error', { type: 'message', id: '123' }, {error: 'not funky!', option: 'value'} );
-      expect( this.hoodie.task.trigger ).to.be.calledWith( 'change:message:123', 'error', { type: 'message', id: '123' }, {error: 'not funky!', option: 'value'} );
+      expect( this.hoodie.task.trigger ).to.be.calledWith( 'message:change', 'error', { type: 'message', id: '123' }, {error: 'not funky!', option: 'value'} );
+      expect( this.hoodie.task.trigger ).to.be.calledWith( 'message:123:change', 'error', { type: 'message', id: '123' }, {error: 'not funky!', option: 'value'} );
       expect( this.hoodie.task.trigger ).to.be.calledWith( 'error', 'not funky!', { type: 'message', id: '123' }, {option: 'value'} );
-      expect( this.hoodie.task.trigger ).to.be.calledWith( 'error:message', 'not funky!', { type: 'message', id: '123' }, {option: 'value'} );
-      expect( this.hoodie.task.trigger ).to.be.calledWith( 'error:message:123', 'not funky!', { type: 'message', id: '123' }, {option: 'value'} );
+      expect( this.hoodie.task.trigger ).to.be.calledWith( 'message:error', 'not funky!', { type: 'message', id: '123' }, {option: 'value'} );
+      expect( this.hoodie.task.trigger ).to.be.calledWith( 'message:123:error', 'not funky!', { type: 'message', id: '123' }, {option: 'value'} );
       expect( this.hoodie.task.trigger.callCount ).to.eql(6);
     });
 
@@ -409,22 +409,22 @@ describe('hoodie.task', function() {
       this.hoodie.trigger('store:change', 'remove', { type: '$message', id: '123', cancelledAt: '2013-09-05'}, {option: 'value'});
 
       expect( this.hoodie.task.trigger ).to.be.calledWith( 'change', 'cancel', { type: 'message', id: '123', cancelledAt: '2013-09-05' }, {option: 'value'} );
-      expect( this.hoodie.task.trigger ).to.be.calledWith( 'change:message', 'cancel', { type: 'message', id: '123', cancelledAt: '2013-09-05' }, {option: 'value'} );
-      expect( this.hoodie.task.trigger ).to.be.calledWith( 'change:message:123', 'cancel', { type: 'message', id: '123', cancelledAt: '2013-09-05' }, {option: 'value'} );
+      expect( this.hoodie.task.trigger ).to.be.calledWith( 'message:change', 'cancel', { type: 'message', id: '123', cancelledAt: '2013-09-05' }, {option: 'value'} );
+      expect( this.hoodie.task.trigger ).to.be.calledWith( 'message:123:change', 'cancel', { type: 'message', id: '123', cancelledAt: '2013-09-05' }, {option: 'value'} );
       expect( this.hoodie.task.trigger ).to.be.calledWith( 'cancel', { type: 'message', id: '123', cancelledAt: '2013-09-05' }, {option: 'value'} );
-      expect( this.hoodie.task.trigger ).to.be.calledWith( 'cancel:message', { type: 'message', id: '123', cancelledAt: '2013-09-05' }, {option: 'value'} );
-      expect( this.hoodie.task.trigger ).to.be.calledWith( 'cancel:message:123', { type: 'message', id: '123', cancelledAt: '2013-09-05' }, {option: 'value'} );
+      expect( this.hoodie.task.trigger ).to.be.calledWith( 'message:cancel', { type: 'message', id: '123', cancelledAt: '2013-09-05' }, {option: 'value'} );
+      expect( this.hoodie.task.trigger ).to.be.calledWith( 'message:123:cancel', { type: 'message', id: '123', cancelledAt: '2013-09-05' }, {option: 'value'} );
     });
 
     it('triggers "success" events when a task has been removed with a $processedAt timestamp', function() {
       this.hoodie.trigger('store:change', 'remove', { type: '$message', id: '123', $processedAt: '2013-09-05'}, {option: 'value'});
 
       expect( this.hoodie.task.trigger ).to.be.calledWith( 'change', 'success', { type: 'message', id: '123', $processedAt: '2013-09-05' }, {option: 'value'} );
-      expect( this.hoodie.task.trigger ).to.be.calledWith( 'change:message', 'success', { type: 'message', id: '123', $processedAt: '2013-09-05' }, {option: 'value'} );
-      expect( this.hoodie.task.trigger ).to.be.calledWith( 'change:message:123', 'success', { type: 'message', id: '123', $processedAt: '2013-09-05' }, {option: 'value'} );
+      expect( this.hoodie.task.trigger ).to.be.calledWith( 'message:change', 'success', { type: 'message', id: '123', $processedAt: '2013-09-05' }, {option: 'value'} );
+      expect( this.hoodie.task.trigger ).to.be.calledWith( 'message:123:change', 'success', { type: 'message', id: '123', $processedAt: '2013-09-05' }, {option: 'value'} );
       expect( this.hoodie.task.trigger ).to.be.calledWith( 'success', { type: 'message', id: '123', $processedAt: '2013-09-05' }, {option: 'value'} );
-      expect( this.hoodie.task.trigger ).to.be.calledWith( 'success:message', { type: 'message', id: '123', $processedAt: '2013-09-05' }, {option: 'value'} );
-      expect( this.hoodie.task.trigger ).to.be.calledWith( 'success:message:123', { type: 'message', id: '123', $processedAt: '2013-09-05' }, {option: 'value'} );
+      expect( this.hoodie.task.trigger ).to.be.calledWith( 'message:success', { type: 'message', id: '123', $processedAt: '2013-09-05' }, {option: 'value'} );
+      expect( this.hoodie.task.trigger ).to.be.calledWith( 'message:123:success', { type: 'message', id: '123', $processedAt: '2013-09-05' }, {option: 'value'} );
     });
   }); // subscribeToStoreEvents
 

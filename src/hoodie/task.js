@@ -233,13 +233,13 @@ function hoodieTask(hoodie) {
       delete task.$error;
 
       api.trigger('error', error, task, options);
-      api.trigger('error:' + task.type, error, task, options);
-      api.trigger('error:' + task.type + ':' + task.id, error, task, options);
+      api.trigger(task.type + ':error', error, task, options);
+      api.trigger(task.type + ':' + task.id + ':error', error, task, options);
 
       options = $.extend({}, options, {error: error});
       api.trigger('change', 'error', task, options);
-      api.trigger('change:' + task.type, 'error', task, options);
-      api.trigger('change:' + task.type + ':' + task.id, 'error', task, options);
+      api.trigger(task.type + ':change', 'error', task, options);
+      api.trigger(task.type + ':' + task.id + ':change', 'error', task, options);
       return;
     }
 
@@ -249,17 +249,17 @@ function hoodieTask(hoodie) {
     }
 
     api.trigger(eventName, task, options);
-    api.trigger(eventName + ':' + task.type, task, options);
+    api.trigger(task.type + ':' + eventName, task, options);
 
     if (eventName !== 'start') {
-      api.trigger(eventName + ':' + task.type + ':' + task.id, task, options);
+      api.trigger(task.type + ':' + task.id + ':' + eventName, task, options);
     }
 
     api.trigger('change', eventName, task, options);
-    api.trigger('change:' + task.type, eventName, task, options);
+    api.trigger(task.type + ':change', eventName, task, options);
 
     if (eventName !== 'start') {
-      api.trigger('change:' + task.type + ':' + task.id, eventName, task, options);
+      api.trigger(task.type + ':' + task.id + ':change', eventName, task, options);
     }
   }
 
