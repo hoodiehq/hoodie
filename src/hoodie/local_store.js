@@ -852,9 +852,19 @@ function hoodieStore (hoodie) {
     store.trigger(eventName, $.extend(true, {}, object), options);
     store.trigger(object.type + ':' + eventName, $.extend(true, {}, object), options);
 
+    // DEPRECATED
+    // https://github.com/hoodiehq/hoodie.js/issues/146
+    store.trigger(eventName + ':' + object.type, $.extend(true, {}, object), options);
+
     if (eventName !== 'new') {
       store.trigger( object.type + ':' + object.id+ ':' + eventName, $.extend(true, {}, object), options);
+
+      // DEPRECATED
+      // https://github.com/hoodiehq/hoodie.js/issues/146
+      store.trigger( eventName + ':' + object.type + ':' + object.id, $.extend(true, {}, object), options);
     }
+
+
 
     // sync events have no changes, so we don't trigger
     // "change" events.
@@ -865,8 +875,17 @@ function hoodieStore (hoodie) {
     store.trigger('change', eventName, $.extend(true, {}, object), options);
     store.trigger(object.type + ':change', eventName, $.extend(true, {}, object), options);
 
+    // DEPRECATED
+    // https://github.com/hoodiehq/hoodie.js/issues/146
+    store.trigger('change:' + object.type, eventName, $.extend(true, {}, object), options);
+
+
     if (eventName !== 'new') {
       store.trigger(object.type + ':' + object.id + ':change', eventName, $.extend(true, {}, object), options);
+
+      // DEPRECATED
+      // https://github.com/hoodiehq/hoodie.js/issues/146
+      store.trigger('change:' + object.type + ':' + object.id, eventName, $.extend(true, {}, object), options);
     }
   }
 
