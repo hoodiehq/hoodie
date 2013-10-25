@@ -624,7 +624,7 @@ function hoodieRemoteStore (hoodie, options) {
   // ### restart pull request
 
   // request gets restarted automaticcally
-  // when aborted (see @_handlePullError)
+  // when aborted (see handlePullError)
   function restartPullRequest() {
     if (pullRequest) {
       pullRequest.abort();
@@ -635,7 +635,7 @@ function hoodieRemoteStore (hoodie, options) {
   // ### pull success handler
 
   // request gets restarted automaticcally
-  // when aborted (see @_handlePullError)
+  // when aborted (see handlePullError)
   //
   function handlePullSuccess(response) {
     setSinceNr(response.last_seq);

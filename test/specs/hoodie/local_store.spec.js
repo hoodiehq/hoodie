@@ -921,7 +921,7 @@ describe('hoodie.store', function() {
           id: '123',
           name: 'test',
           funky: 'fresh'
-        }
+        };
         this.storeBackend.remove('document', '123', {
           remote: true,
           update: this.remoteObject
