@@ -307,6 +307,11 @@ function hoodieStore (hoodie) {
       clearChanged(type, id);
     }
 
+    // https://github.com/hoodiehq/hoodie.js/issues/147
+    if (options.update) {
+      object = options.update;
+      delete options.update;
+    }
     triggerEvents('remove', object, options);
     return hoodie.resolveWith(object);
   };
@@ -742,7 +747,8 @@ function hoodieStore (hoodie) {
   function handleRemoteChange(typeOfChange, object) {
     if (typeOfChange === 'remove') {
       store.remove(object.type, object.id, {
-        remote: true
+        remote: true,
+        update: object
       });
     } else {
       store.save(object.type, object.id, object, {

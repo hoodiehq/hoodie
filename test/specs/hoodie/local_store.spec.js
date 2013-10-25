@@ -99,7 +99,9 @@ describe('hoodie.store', function() {
         this.object = {
           type: 'car',
           id: '123',
-          color: 'red'
+          _ref: '2-456',
+          color: 'red',
+          _deleted: true
         };
       });
 
@@ -110,7 +112,14 @@ describe('hoodie.store', function() {
 
         it('removes the object in store', function() {
           expect(this.store.remove).to.be.calledWith('car', '123', {
-            remote: true
+            remote: true,
+            update: {
+              type: 'car',
+              id: '123',
+              _ref: '2-456',
+              color: 'red',
+              _deleted: true
+            }
           });
         });
       }); //an object was removed
@@ -839,7 +848,7 @@ describe('hoodie.store', function() {
   }); // #findAll
 
   //
-  describe('#remove(type, id)', function() {
+  describe('#remove(type, id, options)', function() {
     _when('objecet cannot be found', function() {
       beforeEach(function() {
         stubFindItem('document', '123', null);
@@ -907,8 +916,15 @@ describe('hoodie.store', function() {
         stubFindItem('document', '123', {
           name: 'test'
         });
+        this.remoteObject = {
+          type: 'document',
+          id: '123',
+          name: 'test',
+          funky: 'fresh'
+        }
         this.storeBackend.remove('document', '123', {
-          remote: true
+          remote: true,
+          update: this.remoteObject
         });
       });
 
@@ -918,51 +934,27 @@ describe('hoodie.store', function() {
 
       it('should trigger remove & change trigger events', function() {
 
-        expect(this.store.trigger).to.be.calledWith('remove', {
-          id: '123',
-          type: 'document',
-          name: 'test'
-        }, {
+        expect(this.store.trigger).to.be.calledWith('remove', this.remoteObject, {
           remote: true
         });
 
-        expect(this.store.trigger.calledWith('remove:document', {
-          id: '123',
-          type: 'document',
-          name: 'test'
-        }, {
+        expect(this.store.trigger.calledWith('remove:document', this.remoteObject, {
           remote: true
         })).to.be.ok();
 
-        expect(this.store.trigger.calledWith('remove:document:123', {
-          id: '123',
-          type: 'document',
-          name: 'test'
-        }, {
+        expect(this.store.trigger.calledWith('remove:document:123', this.remoteObject, {
           remote: true
         })).to.be.ok();
 
-        expect(this.store.trigger.calledWith('change', 'remove', {
-          id: '123',
-          type: 'document',
-          name: 'test'
-        }, {
+        expect(this.store.trigger.calledWith('change', 'remove', this.remoteObject, {
           remote: true
         })).to.be.ok();
 
-        expect(this.store.trigger.calledWith('change:document', 'remove', {
-          id: '123',
-          type: 'document',
-          name: 'test'
-        }, {
+        expect(this.store.trigger.calledWith('change:document', 'remove', this.remoteObject, {
           remote: true
         })).to.be.ok();
 
-        expect(this.store.trigger.calledWith('change:document:123', 'remove', {
-          id: '123',
-          type: 'document',
-          name: 'test'
-        }, {
+        expect(this.store.trigger.calledWith('change:document:123', 'remove', this.remoteObject, {
           remote: true
         })).to.be.ok();
 
