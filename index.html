@@ -102,16 +102,16 @@
     hoodie.store.on( 'change', function( event, changedObject) { } )
 
     // all listeners can be filtered by type
-    hoodie.store.on( "add:couch",    function( newObject) { } )
-    hoodie.store.on( "update:couch", function( updatedObject)  { } )
-    hoodie.store.on( "remove:couch", function( removedObject) { } )
-    hoodie.store.on( "change:couch", function( event, changedObject) { } )
+    hoodie.store.on( "couch:add",    function( newObject) { } )
+    hoodie.store.on( "couch:update", function( updatedObject)  { } )
+    hoodie.store.on( "couch:remove", function( removedObject) { } )
+    hoodie.store.on( "couch:change", function( event, changedObject) { } )
 
     // ... and by type and id
-    hoodie.store.on( "add:couch:uuid123",    function( newObject) { } )
-    hoodie.store.on( "update:couch:uuid123", function( updatedObject)  { } )
-    hoodie.store.on( "remove:couch:uuid123", function( removedObject) { } )
-    hoodie.store.on( "change:couch:uuid123", function( event, changedObject) { } )
+    hoodie.store.on( "couch:uuid123:add",    function( newObject) { } )
+    hoodie.store.on( "couch:uuid123:update", function( updatedObject)  { } )
+    hoodie.store.on( "couch:uuid123:remove", function( removedObject) { } )
+    hoodie.store.on( "couch:uuid123:change", function( event, changedObject) { } )
 
 
     //
@@ -134,16 +134,16 @@
     hoodie.remote.on( 'change', function( event, changedObject) { } )
 
     // all listeners can be filtered by type
-    hoodie.remote.on( "add:couch",  function( newObject) { } )
-    hoodie.remote.on( "update:couch",  function( updatedObject)  { } )
-    hoodie.remote.on( "remove:couch", function( removedObject) { } )
-    hoodie.remote.on( "change:couch",  function( event, changedObject) { } )
+    hoodie.remote.on( "couch:add",  function( newObject) { } )
+    hoodie.remote.on( "couch:update",  function( updatedObject)  { } )
+    hoodie.remote.on( "couch:remove", function( removedObject) { } )
+    hoodie.remote.on( "couch:change",  function( event, changedObject) { } )
 
     // ... and by type and id
-    hoodie.remote.on( "add:couch:uuid123",  function( newObject) { } )
-    hoodie.remote.on( "update:couch:uuid123",  function( updatedObject)  { } )
-    hoodie.remote.on( "remove:couch:uuid123", function( removedObject) { } )
-    hoodie.remote.on( "change:couch:uuid123",  function( event, changedObject) { } )
+    hoodie.remote.on( "couch:uuid123:add",  function( newObject) { } )
+    hoodie.remote.on( "couch:uuid123:update",  function( updatedObject)  { } )
+    hoodie.remote.on( "couch:uuid123:remove", function( removedObject) { } )
+    hoodie.remote.on( "couch:uuid123:change",  function( event, changedObject) { } )
 
     //
     // Tasks
@@ -194,18 +194,18 @@
     hoodie.task.on( 'success', function( completedTask) { } )
 
     // all listeners can be filtered by type
-    hoodie.task.on( "start:message",   function( newMessageTask, options) { } )
-    hoodie.task.on( "cancel:message",  function( canceledMessageTask, options) { } )
-    hoodie.task.on( "error:message",   function( errorMessage, messageTask, options) { } )
-    hoodie.task.on( "success:message", function( completedMessageTask, options) { } )
-    hoodie.task.on( "change:message",  function( eventName, messageTask, options) { } )
+    hoodie.task.on( "message:start",   function( newMessageTask, options) { } )
+    hoodie.task.on( "message:cancel",  function( canceledMessageTask, options) { } )
+    hoodie.task.on( "message:error",   function( errorMessage, messageTask, options) { } )
+    hoodie.task.on( "message:success", function( completedMessageTask, options) { } )
+    hoodie.task.on( "message:change",  function( eventName, messageTask, options) { } )
 
     // ... and by type and id
-    hoodie.task.on( "start:message:123",   function( newMessageTask, options) { } )
-    hoodie.task.on( "cancel:message:123",  function( canceledMessageTask), options  { } )
-    hoodie.task.on( "error:message:123",   function( errorMessage, messageTask, options) { } )
-    hoodie.task.on( "success:message:123", function( completedMessageTask, options) { } )
-    hoodie.task.on( "change:message:123",  function( eventName, messageTask, options) { } )
+    hoodie.task.on( "message:123:start",   function( newMessageTask, options) { } )
+    hoodie.task.on( "message:123:cancel",  function( canceledMessageTask), options  { } )
+    hoodie.task.on( "message:123:error",   function( errorMessage, messageTask, options) { } )
+    hoodie.task.on( "message:123:success", function( completedMessageTask, options) { } )
+    hoodie.task.on( "message:123:change",  function( eventName, messageTask, options) { } )
 
     // note: if "change" event is error, the error message gets passed as options.error
 
