@@ -1,6 +1,6 @@
 {
   "name": "hoodie-server",
-  "version": "0.8.10",
+  "version": "0.8.11",
   "main": "lib/app",
   "repository": {
     "type": "git",
