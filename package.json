@@ -12,7 +12,7 @@
     "connect": "2.7.4",
     "corsproxy": "git://github.com/gr2m/CORS-Proxy.git",
     "multicouch": ">=0.6.1",
-    "hoodie-pocket": "git://github.com/hoodiehq/pocket.git#new_plugin_architecture",
+    "hoodie-pocket": "0.0.11",
     "hoodie-plugins-manager": "0.0.11",
     "local-tld-lib": "*",
     "underscore": "1.4.4",
