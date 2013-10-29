@@ -6,7 +6,8 @@
     "after",
     "afterEach",
     "before",
-    "beforeEach"
+    "beforeEach",
+    "root"
   ],
 
   "indent": 2,
