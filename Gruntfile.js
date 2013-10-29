@@ -7,6 +7,11 @@ module.exports = function (grunt) {
   // Project configuration.
   grunt.initConfig({
 
+    watch: {
+      files: ['<%= jshint.files %>'],
+      tasks: 'jshint'
+    },
+
     jshint: {
       files: [
         'Gruntfile.js',
@@ -24,12 +29,8 @@ module.exports = function (grunt) {
         ignoreLeaks: true
       },
       full: { src: ['test/runner.js'] }
-    },
-
-    watch: {
-      files: ['<config:jshint.files>'],
-      tasks: 'jshint'
     }
+
 
   });
 
