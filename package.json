@@ -10,7 +10,6 @@
     "hoodie": "git://github.com/hoodiehq/hoodie.js.git",
     "http-proxy": "*",
     "connect": "2.7.4",
-    "corsproxy": "git://github.com/gr2m/CORS-Proxy.git",
     "multicouch": ">=0.6.1",
     "hoodie-pocket": "0.0.11",
     "hoodie-plugins-manager": "0.0.11",
