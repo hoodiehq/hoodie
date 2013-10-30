@@ -1,4 +1,4 @@
-// Hoodie.js - 0.4.0
+// Hoodie.js - 0.4.2
 // https://github.com/hoodiehq/hoodie.js
 // Copyright 2012, 2013 https://github.com/hoodiehq/
 // Licensed Apache License 2.0
@@ -4229,6 +4229,22 @@ function hoodieRemote (hoodie) {
     })
   });
 
+  // Connect
+  // ---------
+
+  // we slightly extend the original remote.connect method
+  // provided by `hoodieRemoteStore`, to check if the user
+  // has an account beforehand. We also hardcode the right
+  // name for remote (current user's database name)
+  //
+  var originalConnectMethod = remote.connect;
+  remote.connect = function connect() {
+    if (! hoodie.account.hasAccount() ) {
+      return hoodie.rejectWith('user has no database to connect to.');
+    }
+    return originalConnectMethod( hoodie.account.db() );
+  };
+
   // trigger
   // ---------
 
@@ -4295,13 +4311,9 @@ function hoodieRemote (hoodie) {
     hoodie.on('reconnected', remote.connect);
 
     // account events
-    hoodie.on('account:signin', function() {
-      remote.connect( hoodie.account.db() );
-    });
+    hoodie.on('account:signin', remote.connect);
 
-    hoodie.on('account:reauthenticated', function() {
-      remote.connect( hoodie.account.db() );
-    });
+    hoodie.on('account:reauthenticated', remote.connect);
     hoodie.on('account:signout', remote.disconnect);
   }
 
