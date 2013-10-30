@@ -1,5 +1,5 @@
 /* global hoodieTask */
-describe.only('hoodie.task', function() {
+describe('hoodie.task', function() {
 
   beforeEach(function() {
     this.hoodie = new Mocks.Hoodie();
