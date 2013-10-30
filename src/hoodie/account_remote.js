@@ -47,9 +47,9 @@ function hoodieRemote (hoodie) {
   var originalConnectMethod = remote.connect;
   remote.connect = function connect() {
     if (! hoodie.account.hasAccount() ) {
-      return hoodie.rejectWith('user has no database to connect to.')
+      return hoodie.rejectWith('user has no database to connect to.');
     }
-    return originalConnectMethod( hoodie.account.db() )
+    return originalConnectMethod( hoodie.account.db() );
   };
 
   // trigger
