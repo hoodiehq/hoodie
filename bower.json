@@ -1,6 +1,6 @@
 {
   "name": "hoodie",
-  "version": "0.4.0",
+  "version": "0.4.1",
   "main": [
     "./dist/hoodie.js"
   ],
@@ -18,5 +18,6 @@
     "karma.conf.js",
     "Gruntfile.js",
     "node_modules"
-  ]
+  ],
+  "homepage": "https://github.com/hoodiehq/hoodie.js",
 }
