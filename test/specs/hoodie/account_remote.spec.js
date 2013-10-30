@@ -3,7 +3,7 @@
 describe('hoodie.remote', function() {
   beforeEach(function() {
     this.hoodie = new Mocks.Hoodie();
-    this.openConnectSpy = sinon.spy()
+    this.openConnectSpy = sinon.spy();
     this.sandbox.stub(this.hoodie, 'open').returns({
       connect: this.openConnectSpy,
       disconnect: sinon.spy(),
@@ -123,14 +123,14 @@ describe('hoodie.remote', function() {
       expect(this.events.reconnected).to.be.a(Function);
     });
     it('connects on reconnected when user has account', function() {
-      this.sandbox.stub(this.hoodie.account, 'hasAccount').returns(true)
-      this.hoodie.account.db.returns('dbnamehere')
+      this.sandbox.stub(this.hoodie.account, 'hasAccount').returns(true);
+      this.hoodie.account.db.returns('dbnamehere');
       this.events.reconnected();
       expect(this.openConnectSpy).to.be.calledWith('dbnamehere');
     });
     it('does not connect on reconnected when user has no account', function() {
-      this.sandbox.stub(this.hoodie.account, 'hasAccount').returns(false)
-      this.hoodie.account.db.returns('dbnamehere')
+      this.sandbox.stub(this.hoodie.account, 'hasAccount').returns(false);
+      this.hoodie.account.db.returns('dbnamehere');
       this.events.reconnected();
       expect(this.openConnectSpy).to.not.be.called();
     });
@@ -143,7 +143,7 @@ describe('hoodie.remote', function() {
       expect(this.events['account:signin']).to.be.a(Function);
     });
     it('connects to db on account:signin', function() {
-      this.sandbox.stub(this.hoodie.account, 'hasAccount').returns(true)
+      this.sandbox.stub(this.hoodie.account, 'hasAccount').returns(true);
       this.hoodie.account.db.returns('dbName');
       this.events['account:signin'](123);
       expect(this.openConnectSpy).to.be.calledWith('dbName');
@@ -153,7 +153,7 @@ describe('hoodie.remote', function() {
       expect(this.events['account:reauthenticated']).to.be.a(Function);
     });
     it('connects on account:reauthenticated', function() {
-      this.sandbox.stub(this.hoodie.account, 'hasAccount').returns(true)
+      this.sandbox.stub(this.hoodie.account, 'hasAccount').returns(true);
       this.hoodie.account.db.returns('dbName');
       this.events['account:reauthenticated'](123);
       expect(this.openConnectSpy).to.be.calledWith('dbName');
