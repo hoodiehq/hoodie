@@ -1,8 +1,0 @@
-jasmine/*
-!jasmine/lib
-jasmine/lib/*
-!jasmine/lib/jasmine-core
-jasmine/lib/jasmine-core/*
-!jasmine/lib/jasmine-core/jasmine.css
-!jasmine/lib/jasmine-core/jasmine.js
-!jasmine/lib/jasmine-core/jasmine-html.js
