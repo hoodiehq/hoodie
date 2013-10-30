@@ -12,10 +12,9 @@
     "sinonjs": "~1.7.1"
   },
   "ignore": [
-    "**.*",
     "test/",
     "src/",
-    "lib",
+    "lib/",
     "karma.conf.js",
     "Gruntfile.js",
     "node_modules"
