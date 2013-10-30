@@ -1906,7 +1906,7 @@ function hoodieRemoteStore (hoodie, options) {
   // ### restart pull request
 
   // request gets restarted automaticcally
-  // when aborted (see @_handlePullError)
+  // when aborted (see handlePullError)
   function restartPullRequest() {
     if (pullRequest) {
       pullRequest.abort();
@@ -1917,7 +1917,7 @@ function hoodieRemoteStore (hoodie, options) {
   // ### pull success handler
 
   // request gets restarted automaticcally
-  // when aborted (see @_handlePullError)
+  // when aborted (see handlePullError)
   //
   function handlePullSuccess(response) {
     setSinceNr(response.last_seq);
@@ -2355,6 +2355,11 @@ function hoodieStore (hoodie) {
       clearChanged(type, id);
     }
 
+    // https://github.com/hoodiehq/hoodie.js/issues/147
+    if (options.update) {
+      object = options.update;
+      delete options.update;
+    }
     triggerEvents('remove', object, options);
     return hoodie.resolveWith(object);
   };
@@ -2790,7 +2795,8 @@ function hoodieStore (hoodie) {
   function handleRemoteChange(typeOfChange, object) {
     if (typeOfChange === 'remove') {
       store.remove(object.type, object.id, {
-        remote: true
+        remote: true,
+        update: object
       });
     } else {
       store.save(object.type, object.id, object, {
@@ -2892,11 +2898,21 @@ function hoodieStore (hoodie) {
   // like add:task, change:note:abc4567, remove, etc.
   function triggerEvents(eventName, object, options) {
     store.trigger(eventName, $.extend(true, {}, object), options);
-    store.trigger('' + eventName + ':' + object.type, $.extend(true, {}, object), options);
+    store.trigger(object.type + ':' + eventName, $.extend(true, {}, object), options);
+
+    // DEPRECATED
+    // https://github.com/hoodiehq/hoodie.js/issues/146
+    store.trigger(eventName + ':' + object.type, $.extend(true, {}, object), options);
 
     if (eventName !== 'new') {
-      store.trigger('' + eventName + ':' + object.type + ':' + object.id, $.extend(true, {}, object), options);
+      store.trigger( object.type + ':' + object.id+ ':' + eventName, $.extend(true, {}, object), options);
+
+      // DEPRECATED
+      // https://github.com/hoodiehq/hoodie.js/issues/146
+      store.trigger( eventName + ':' + object.type + ':' + object.id, $.extend(true, {}, object), options);
     }
+
+
 
     // sync events have no changes, so we don't trigger
     // "change" events.
@@ -2905,9 +2921,18 @@ function hoodieStore (hoodie) {
     }
 
     store.trigger('change', eventName, $.extend(true, {}, object), options);
+    store.trigger(object.type + ':change', eventName, $.extend(true, {}, object), options);
+
+    // DEPRECATED
+    // https://github.com/hoodiehq/hoodie.js/issues/146
     store.trigger('change:' + object.type, eventName, $.extend(true, {}, object), options);
 
+
     if (eventName !== 'new') {
+      store.trigger(object.type + ':' + object.id + ':change', eventName, $.extend(true, {}, object), options);
+
+      // DEPRECATED
+      // https://github.com/hoodiehq/hoodie.js/issues/146
       store.trigger('change:' + object.type + ':' + object.id, eventName, $.extend(true, {}, object), options);
     }
   }
@@ -4428,7 +4453,7 @@ function hoodieTask(hoodie) {
       object.type = object.type.substr(1);
 
       // task finished by worker.
-      if(object.finishedAt) {
+      if(object.$processedAt) {
         return defer.resolve(object);
       }
 
@@ -4527,13 +4552,13 @@ function hoodieTask(hoodie) {
       delete task.$error;
 
       api.trigger('error', error, task, options);
-      api.trigger('error:' + task.type, error, task, options);
-      api.trigger('error:' + task.type + ':' + task.id, error, task, options);
+      api.trigger(task.type + ':error', error, task, options);
+      api.trigger(task.type + ':' + task.id + ':error', error, task, options);
 
       options = $.extend({}, options, {error: error});
       api.trigger('change', 'error', task, options);
-      api.trigger('change:' + task.type, 'error', task, options);
-      api.trigger('change:' + task.type + ':' + task.id, 'error', task, options);
+      api.trigger(task.type + ':change', 'error', task, options);
+      api.trigger(task.type + ':' + task.id + ':change', 'error', task, options);
       return;
     }
 
@@ -4543,17 +4568,17 @@ function hoodieTask(hoodie) {
     }
 
     api.trigger(eventName, task, options);
-    api.trigger(eventName + ':' + task.type, task, options);
+    api.trigger(task.type + ':' + eventName, task, options);
 
     if (eventName !== 'start') {
-      api.trigger(eventName + ':' + task.type + ':' + task.id, task, options);
+      api.trigger(task.type + ':' + task.id + ':' + eventName, task, options);
     }
 
     api.trigger('change', eventName, task, options);
-    api.trigger('change:' + task.type, eventName, task, options);
+    api.trigger(task.type + ':change', eventName, task, options);
 
     if (eventName !== 'start') {
-      api.trigger('change:' + task.type + ':' + task.id, eventName, task, options);
+      api.trigger(task.type + ':' + task.id + ':change', eventName, task, options);
     }
   }
 
