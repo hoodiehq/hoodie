@@ -1,4 +1,8 @@
+<<<<<<< HEAD
 // Hoodie.js - 0.4.5
+=======
+// Hoodie.js - 0.4.2
+>>>>>>> build
 // https://github.com/hoodiehq/hoodie.js
 // Copyright 2012, 2013 https://github.com/hoodiehq/
 // Licensed Apache License 2.0
@@ -4316,7 +4320,10 @@ function hoodieRemote (hoodie) {
 
     // account events
     hoodie.on('account:signin', remote.connect);
+<<<<<<< HEAD
     hoodie.on('account:signin:anonymous', remote.connect);
+=======
+>>>>>>> build
 
     hoodie.on('account:reauthenticated', remote.connect);
     hoodie.on('account:signout', remote.disconnect);
