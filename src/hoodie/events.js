@@ -16,6 +16,9 @@
 
 // callbacks are global, while the events API is used at several places,
 // like hoodie.on / hoodie.store.on / hoodie.task.on etc.
+//
+
+Hoodie.events = hoodieEvents;
 
 function hoodieEvents(hoodie, options) {
   var context = hoodie;
@@ -160,4 +163,5 @@ function hoodieEvents(hoodie, options) {
   context.trigger = trigger;
   context.unbind = unbind;
   context.off = unbind;
+
 }
