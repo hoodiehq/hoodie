@@ -148,19 +148,11 @@ function Hoodie(baseUrl) {
 // Extending hoodie
 // ------------------
 
-// You can either extend the Hoodie class, or a hoodie
-// instance during runtime
+// You can extend the Hoodie class like so:
 //
-//     Hoodie.extend('magic1', funcion(hoodie) { /* ... */ })
-//     hoodie = new Hoodie
-//     hoodie.extend('magic2', function(hoodie) { /* ... */ })
-//     hoodie.magic1.doSomething()
-//     hoodie.magic2.doSomethingElse()
+// Hoodie.extend(funcion(hoodie) { hoodie.myMagic = function() {} })
 //
-// Hoodie can also be extended anonymously
-//
-//      Hoodie.extend(funcion(hoodie) { hoodie.myMagic = function() {} })
-//
+
 var extensions = [];
 
 Hoodie.extend = function(extension) {
