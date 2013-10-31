@@ -10,5 +10,5 @@ notifications:
   irc:
     channels:
       - "irc.freenode.net#hoodie"
-    use_notice: true
+    use_notice: false
     skip_join: true
