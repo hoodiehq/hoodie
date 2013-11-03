@@ -400,6 +400,11 @@ describe('hoodieRemoteStore', function() {
       expect(this.remote.bootstrap.called).to.be.ok();
     });
 
+    it('triggers `connect` event', function() {
+      this.remote.connect();
+      expect(this.remote.trigger).to.be.calledWith('connect');
+    });
+
     it('should set new name if passed as param', function() {
       this.remote.request('GET', '/funk');
       expect(this.hoodie.request).to.be.calledWith('GET', '/my%2Fstore/funk', { 'contentType': 'application/json' });
