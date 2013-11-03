@@ -287,7 +287,7 @@ function hoodieRemoteStore (hoodie, options) {
     }
     remote.connected = true;
     remote.trigger('connect');
-    return remote.bootstrap();
+    return remote.bootstrap().then( this.push );
   };
 
 

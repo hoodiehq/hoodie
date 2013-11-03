@@ -386,7 +386,9 @@ describe('hoodieRemoteStore', function() {
 
   describe('#connect()', function() {
     beforeEach(function() {
-      this.sandbox.stub(this.remote, 'bootstrap');
+      this.bootstrapDefer = this.hoodie.defer();
+      this.sandbox.stub(this.remote, 'bootstrap').returns(this.bootstrapDefer);
+      this.sandbox.spy(this.remote, 'push');
     });
 
     it('should set connected to true', function() {
@@ -411,6 +413,13 @@ describe('hoodieRemoteStore', function() {
       this.remote.connect('funky/store');
       this.remote.request('GET', '/funk');
       expect(this.hoodie.request).to.be.calledWith('GET', '/funky%2Fstore/funk', { 'contentType': 'application/json' });
+    });
+
+    it('pushes after bootstrap finished', function() {
+      this.remote.connect();
+      expect(this.remote.push).to.not.be.called();
+      this.bootstrapDefer.resolve();
+      expect(this.remote.push).to.be.called();
     });
   }); // #connect
 
