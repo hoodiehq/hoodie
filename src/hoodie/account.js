@@ -202,9 +202,17 @@ function hoodieAccount (hoodie) {
   // hasAnonymousAccount
   // ---------------------
 
+  // anonymous accounts get created when data needs to be
+  // synced without the user having an account. That happens
+  // automatically when the user creates a task, but can also
+  // be done manually using hoodie.account.anonymousSignUp(),
+  // e.g. to prevent data loss.
   //
+  // To determine between anonymous and "real" accounts, we
+  // can compare the username to the ownerHash, which is the
+  // same for anonymous accounts.
   account.hasAnonymousAccount = function hasAnonymousAccount() {
-    return getAnonymousPassword() !== undefined;
+    return account.username === account.ownerHash;
   };
 
 
@@ -896,7 +904,7 @@ function hoodieAccount (hoodie) {
   //
   // We differentiate with `hasAnonymousAccount()`, because `userTypeAndId`
   // is used within `signUp` method, so we need to be able to differentiate
-  // between anonyomus and normal users before an account has been created.
+  // between anonymous and normal users before an account has been created.
   //
   function userTypeAndId(username) {
     var type;
