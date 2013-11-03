@@ -148,6 +148,15 @@ describe('hoodie.remote', function() {
       this.events['account:signin'](123);
       expect(this.openConnectSpy).to.be.calledWith('dbName');
     });
+    it('subscribes to account:signin:anonymous', function() {
+      expect(this.events['account:signin:anonymous']).to.be.a(Function);
+    });
+    it('connects to db on account:signin:anonymous', function() {
+      this.sandbox.stub(this.hoodie.account, 'hasAccount').returns(true);
+      this.hoodie.account.db.returns('dbName');
+      this.events['account:signin:anonymous'](123);
+      expect(this.openConnectSpy).to.be.calledWith('dbName');
+    });
 
     it('subscribes to account:reauthenticated', function() {
       expect(this.events['account:reauthenticated']).to.be.a(Function);
