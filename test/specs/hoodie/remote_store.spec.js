@@ -415,16 +415,11 @@ describe('hoodieRemoteStore', function() {
       expect(this.hoodie.request).to.be.calledWith('GET', '/funky%2Fstore/funk', { 'contentType': 'application/json' });
     });
 
-    it('pushes after bootstrap finished', function() {
+    it.only('pushes after bootstrap finished', function() {
       this.remote.connect();
       expect(this.remote.push).to.not.be.called();
-<<<<<<< HEAD
       this.bootstrapDefer.resolve([1,2,3]);
       expect(this.remote.push).to.be.calledWith();
-=======
-      this.bootstrapDefer.resolve();
-      expect(this.remote.push).to.be.called();
->>>>>>> make hoodie.remote.connect push local changes if there are any.
     });
   }); // #connect
 
