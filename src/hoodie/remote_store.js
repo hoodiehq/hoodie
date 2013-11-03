@@ -286,7 +286,7 @@ function hoodieRemoteStore (hoodie, options) {
       remoteName = name;
     }
     remote.connected = true;
-    remote.trigger('connect'); // TODO: spec that
+    remote.trigger('connect');
     return remote.bootstrap();
   };
 
