@@ -415,7 +415,7 @@ describe('hoodieRemoteStore', function() {
       expect(this.hoodie.request).to.be.calledWith('GET', '/funky%2Fstore/funk', { 'contentType': 'application/json' });
     });
 
-    it.only('pushes after bootstrap finished', function() {
+    it('pushes after bootstrap finished', function() {
       this.remote.connect();
       expect(this.remote.push).to.not.be.called();
       this.bootstrapDefer.resolve([1,2,3]);
