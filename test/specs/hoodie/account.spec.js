@@ -1415,13 +1415,10 @@ describe('hoodie.account', function () {
   }); // #hasAccount
 
   describe('#hasAnonymousAccount()', function () {
-    _when('_account.anonymousPassword is set', function () {
+    _when('account.username equals account.ownerHash', function () {
       beforeEach(function () {
-        this.sandbox.stub(this.hoodie.config, 'get', function (key) {
-          if (key === '_account.anonymousPassword') {
-            return 'password';
-          }
-        });
+        this.account.username = 'funky';
+        this.account.ownerHash = 'funky';
       });
 
       it('should return true', function () {
@@ -1429,13 +1426,10 @@ describe('hoodie.account', function () {
       });
     }); // _account.anonymousPassword is set
 
-    _when('_account.anonymousPassword is not set', function () {
+    _when('account.username does not equal account.ownerHash', function () {
       beforeEach(function () {
-        this.sandbox.stub(this.hoodie.config, 'get', function (key) {
-          if (key === '_account.anonymousPassword') {
-            return undefined;
-          }
-        });
+        this.account.username = 'funkyusername';
+        this.account.ownerHash = 'supersecret';
       });
 
       it('should return false', function () {
