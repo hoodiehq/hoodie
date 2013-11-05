@@ -26,7 +26,7 @@ module.exports = function(config) {
       'src/hoodie/promises.js',
       'src/hoodie/request.js',
       'src/hoodie/connection.js',
-      'src/hoodie/uuid.js',
+      'src/hoodie/generate_id.js',
       'src/hoodie/dispose.js',
       'src/hoodie/open.js',
 
@@ -57,7 +57,7 @@ module.exports = function(config) {
       'test/specs/hoodie/store.spec.js',
       'test/specs/hoodie/scoped_store.spec.js',
       'test/specs/hoodie/remote_store.spec.js',
-      'test/specs/hoodie/uuid.spec.js',
+      'test/specs/hoodie/generate_id.spec.js',
       'test/specs/hoodie/account_remote.spec.js',
       'test/specs/hoodie/task.spec.js',
       'test/specs/hoodie/scoped_task.spec.js',
