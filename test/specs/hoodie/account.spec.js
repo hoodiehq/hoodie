@@ -777,7 +777,7 @@ describe('hoodie.account', function () {
       this.signUpDefer = this.hoodie.defer();
 
       this.sandbox.stub(this.account, 'signUp').returns(this.signUpDefer.promise());
-      this.sandbox.stub(this.hoodie, 'uuid').returns('crazyuuid123');
+      this.sandbox.stub(this.hoodie, 'generateId').returns('crazyuuid123');
       this.sandbox.spy(this.hoodie.config, 'set');
 
       this.account.ownerHash = 'owner_hash123';
@@ -796,7 +796,7 @@ describe('hoodie.account', function () {
 
       it('should generate a password and store it locally in _account.anonymousPassword', function () {
         this.account.anonymousSignUp();
-        expect(this.hoodie.uuid).to.be.calledWith(10);
+        expect(this.hoodie.generateId).to.be.calledWith(10);
         expect(this.hoodie.config.set).to.be.calledWith('_account.anonymousPassword', 'crazyuuid123');
       });
     });
@@ -1295,7 +1295,7 @@ describe('hoodie.account', function () {
   describe('#signOut(options)', function () {
 
     beforeEach(function () {
-      this.sandbox.stub(this.hoodie, 'uuid').returns('newHash');
+      this.sandbox.stub(this.hoodie, 'generateId').returns('newHash');
       this.sandbox.spy(this.hoodie.config, 'clear');
     });
 
@@ -1525,7 +1525,7 @@ describe('hoodie.account', function () {
       this.sandbox.spy(this.hoodie.config, 'clear');
       this.sandbox.spy(this.hoodie.config, 'set');
       this.sandbox.stub(this.account, 'fetch').returns(this.fetchDefer.promise());
-      this.sandbox.stub(this.hoodie, 'uuid').returns('newHash');
+      this.sandbox.stub(this.hoodie, 'generateId').returns('newHash');
     });
 
     _when('user has account', function () {
@@ -1716,7 +1716,7 @@ describe('hoodie.account', function () {
       beforeEach(function () {
         this.sandbox.stub(this.hoodie.config, 'get').returns(void 0);
         this.sandbox.spy(this.hoodie.config, 'set');
-        this.sandbox.stub(this.hoodie, 'uuid').returns('uuid567');
+        this.sandbox.stub(this.hoodie, 'generateId').returns('uuid567');
 
         this.account.resetPassword('joe@example.com');
 
