@@ -30,7 +30,7 @@ Mocks.Hoodie = function () {
                  typeof object.done === 'function' &&
                  typeof object.resolve !== 'function');
     },
-    uuid: function () {
+    generateId: function () {
       return 'uuid';
     },
     resolve: function() {

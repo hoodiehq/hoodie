@@ -118,7 +118,7 @@ function hoodieRemoteStore (hoodie, options) {
     var path;
 
     if (!object.id) {
-      object.id = hoodie.uuid();
+      object.id = hoodie.generateId();
     }
 
     object = parseForRemote(object);
@@ -589,7 +589,7 @@ function hoodieRemoteStore (hoodie, options) {
 
   //
   function generateNewRevisionId() {
-    return hoodie.uuid(9);
+    return hoodie.generateId(9);
   }
 
 

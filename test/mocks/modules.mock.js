@@ -27,7 +27,7 @@ Mocks.hoodieConnection = function(hoodie) {
   hoodie.checkConnection = sinon.spy();
 };
 
-Mocks.hoodieUUID = function(hoodie) {
+Mocks.hoodieGenerateId = function(hoodie) {
 
 };
 

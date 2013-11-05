@@ -47,7 +47,7 @@ function Hoodie(baseUrl) {
   //
 
   /* global hoodieAccount, hoodieRemote, hoodieConfig, hoodieStore,
-            hoodiePromises, hoodieRequest, hoodieConnection, hoodieUUID,
+            hoodiePromises, hoodieRequest, hoodieConnection, hoodieGenerateId,
             hoodieDispose, hoodieOpen, hoodieTask
   */
 
@@ -77,7 +77,7 @@ function Hoodie(baseUrl) {
   hoodie.extend( hoodieConnection );
 
   // * hoodie.uuid
-  hoodie.extend( hoodieUUID );
+  hoodie.extend( hoodieGenerateId );
 
   // * hoodie.dispose
   hoodie.extend( hoodieDispose );

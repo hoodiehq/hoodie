@@ -44,7 +44,7 @@ module.exports = function(grunt) {
           'src/hoodie/promises.js',
           'src/hoodie/request.js',
           'src/hoodie/connection.js',
-          'src/hoodie/uuid.js',
+          'src/hoodie/generate_id.js',
           'src/hoodie/dispose.js',
           'src/hoodie/open.js',
 

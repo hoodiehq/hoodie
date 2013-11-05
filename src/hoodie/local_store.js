@@ -67,7 +67,7 @@ function hoodieStore (hoodie) {
       isNew = typeof currentObject !== 'object';
     } else {
       isNew = true;
-      object.id = hoodie.uuid();
+      object.id = hoodie.generateId();
     }
 
     if (isNew) {

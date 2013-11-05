@@ -180,7 +180,7 @@ function hoodieAccount (hoodie) {
   account.anonymousSignUp = function anonymousSignUp() {
     var password, username;
 
-    password = hoodie.uuid(10);
+    password = hoodie.generateId(10);
     username = account.ownerHash;
 
     return account.signUp(username, password).done(function() {
@@ -415,7 +415,7 @@ function hoodieAccount (hoodie) {
       return account.checkPasswordReset();
     }
 
-    resetPasswordId = '' + username + '/' + (hoodie.uuid());
+    resetPasswordId = '' + username + '/' + (hoodie.generateId());
 
     hoodie.config.set('_account.resetPasswordId', resetPasswordId);
 
@@ -874,7 +874,7 @@ function hoodieAccount (hoodie) {
     authenticated = options.authenticated;
     hoodie.config.clear();
     setUsername(options.username);
-    setOwner(options.ownerHash || hoodie.uuid());
+    setOwner(options.ownerHash || hoodie.generateId());
 
     return hoodie.resolve();
   }
@@ -1079,6 +1079,6 @@ function hoodieAccount (hoodie) {
   // Make sure we have one.
   hoodie.account.ownerHash = hoodie.config.get('_account.ownerHash');
   if (!hoodie.account.ownerHash) {
-    setOwner(hoodie.uuid());
+    setOwner(hoodie.generateId());
   }
 }
