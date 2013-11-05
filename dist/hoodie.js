@@ -1,7 +1,11 @@
 <<<<<<< HEAD
+<<<<<<< HEAD
 // Hoodie.js - 0.4.5
 =======
 // Hoodie.js - 0.4.2
+>>>>>>> build
+=======
+// Hoodie.js - 0.4.5
 >>>>>>> build
 // https://github.com/hoodiehq/hoodie.js
 // Copyright 2012, 2013 https://github.com/hoodiehq/
@@ -4321,8 +4325,12 @@ function hoodieRemote (hoodie) {
     // account events
     hoodie.on('account:signin', remote.connect);
 <<<<<<< HEAD
+<<<<<<< HEAD
     hoodie.on('account:signin:anonymous', remote.connect);
 =======
+>>>>>>> build
+=======
+    hoodie.on('account:signin:anonymous', remote.connect);
 >>>>>>> build
 
     hoodie.on('account:reauthenticated', remote.connect);
