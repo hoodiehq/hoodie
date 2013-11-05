@@ -1,4 +1,4 @@
-// Hoodie.js - 0.4.2
+// Hoodie.js - 0.4.5
 // https://github.com/hoodiehq/hoodie.js
 // Copyright 2012, 2013 https://github.com/hoodiehq/
 // Licensed Apache License 2.0
@@ -156,19 +156,11 @@ function Hoodie(baseUrl) {
 // Extending hoodie
 // ------------------
 
-// You can either extend the Hoodie class, or a hoodie
-// instance during runtime
+// You can extend the Hoodie class like so:
 //
-//     Hoodie.extend('magic1', funcion(hoodie) { /* ... */ })
-//     hoodie = new Hoodie
-//     hoodie.extend('magic2', function(hoodie) { /* ... */ })
-//     hoodie.magic1.doSomething()
-//     hoodie.magic2.doSomethingElse()
+// Hoodie.extend(funcion(hoodie) { hoodie.myMagic = function() {} })
 //
-// Hoodie can also be extended anonymously
-//
-//      Hoodie.extend(funcion(hoodie) { hoodie.myMagic = function() {} })
-//
+
 var extensions = [];
 
 Hoodie.extend = function(extension) {
@@ -232,6 +224,9 @@ if ( typeof module === 'object' && module && typeof module.exports === 'object' 
 
 // callbacks are global, while the events API is used at several places,
 // like hoodie.on / hoodie.store.on / hoodie.task.on etc.
+//
+
+Hoodie.events = hoodieEvents;
 
 function hoodieEvents(hoodie, options) {
   var context = hoodie;
@@ -376,6 +371,7 @@ function hoodieEvents(hoodie, options) {
   context.trigger = trigger;
   context.unbind = unbind;
   context.off = unbind;
+
 }
 
 /* exported hoodiePromises */
@@ -3310,9 +3306,17 @@ function hoodieAccount (hoodie) {
   // hasAnonymousAccount
   // ---------------------
 
+  // anonymous accounts get created when data needs to be
+  // synced without the user having an account. That happens
+  // automatically when the user creates a task, but can also
+  // be done manually using hoodie.account.anonymousSignUp(),
+  // e.g. to prevent data loss.
   //
+  // To determine between anonymous and "real" accounts, we
+  // can compare the username to the ownerHash, which is the
+  // same for anonymous accounts.
   account.hasAnonymousAccount = function hasAnonymousAccount() {
-    return getAnonymousPassword() !== undefined;
+    return account.username === account.ownerHash;
   };
 
 
@@ -4004,7 +4008,7 @@ function hoodieAccount (hoodie) {
   //
   // We differentiate with `hasAnonymousAccount()`, because `userTypeAndId`
   // is used within `signUp` method, so we need to be able to differentiate
-  // between anonyomus and normal users before an account has been created.
+  // between anonymous and normal users before an account has been created.
   //
   function userTypeAndId(username) {
     var type;
@@ -4312,6 +4316,7 @@ function hoodieRemote (hoodie) {
 
     // account events
     hoodie.on('account:signin', remote.connect);
+    hoodie.on('account:signin:anonymous', remote.connect);
 
     hoodie.on('account:reauthenticated', remote.connect);
     hoodie.on('account:signout', remote.disconnect);
