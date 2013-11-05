@@ -35,5 +35,5 @@ function hoodieUUID (hoodie) {
   //
   // Public API
   //
-  hoodie.uuid = uuid;
+  hoodie.generateId = uuid;
 }
