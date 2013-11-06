@@ -26,9 +26,8 @@ function hoodieMemoryStore (hoodie, options) {
   // queue of method calls done during bootstrapping
   var queue = [];
 
-  // 2 seconds timout before triggering the `store:idle` event
-  //
-  var idleTimeout = 2000;
+  // 2 seconds timout before triggering the `idle` event
+  var idleTimeout = options.idleTimeout === undefined ? 2000 : options.idleTimeout;
 
 
 
