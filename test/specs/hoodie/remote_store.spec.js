@@ -386,7 +386,9 @@ describe('hoodieRemoteStore', function() {
 
   describe('#connect()', function() {
     beforeEach(function() {
-      this.sandbox.stub(this.remote, 'bootstrap');
+      this.bootstrapDefer = this.hoodie.defer();
+      this.sandbox.stub(this.remote, 'bootstrap').returns(this.bootstrapDefer);
+      this.sandbox.spy(this.remote, 'push');
     });
 
     it('should set connected to true', function() {
@@ -400,12 +402,24 @@ describe('hoodieRemoteStore', function() {
       expect(this.remote.bootstrap.called).to.be.ok();
     });
 
+    it('triggers `connect` event', function() {
+      this.remote.connect();
+      expect(this.remote.trigger).to.be.calledWith('connect');
+    });
+
     it('should set new name if passed as param', function() {
       this.remote.request('GET', '/funk');
       expect(this.hoodie.request).to.be.calledWith('GET', '/my%2Fstore/funk', { 'contentType': 'application/json' });
       this.remote.connect('funky/store');
       this.remote.request('GET', '/funk');
       expect(this.hoodie.request).to.be.calledWith('GET', '/funky%2Fstore/funk', { 'contentType': 'application/json' });
+    });
+
+    it('pushes after bootstrap finished', function() {
+      this.remote.connect();
+      expect(this.remote.push).to.not.be.called();
+      this.bootstrapDefer.resolve([1,2,3]);
+      expect(this.remote.push).to.be.calledWith();
     });
   }); // #connect
 
