@@ -100,6 +100,9 @@ function Hoodie(baseUrl) {
   // * hoodie.remote
   hoodie.extend( hoodieRemote );
 
+  // * hoodie.memory.open
+  hoodie.extend( hoodieMemoryOpen );
+
 
   //
   // Initializations
