@@ -1,4 +1,4 @@
-/* exported hoodieOpen */
+/* exported hoodieMemoryOpen */
 /* global hoodieMemoryStore */
 
 // Open stores

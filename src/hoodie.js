@@ -48,7 +48,7 @@ function Hoodie(baseUrl) {
 
   /* global hoodieAccount, hoodieRemote, hoodieConfig, hoodieStore,
             hoodiePromises, hoodieRequest, hoodieConnection, hoodieUUID,
-            hoodieDispose, hoodieOpen, hoodieTask
+            hoodieDispose, hoodieOpen, hoodieTask, hoodieMemoryOpen
   */
 
   // * hoodie.bind

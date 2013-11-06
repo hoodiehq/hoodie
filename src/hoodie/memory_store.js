@@ -1,4 +1,4 @@
-/* exported hoodieStore */
+/* exported hoodieMemoryStore */
 /* global hoodieStoreApi */
 
 // MemoryStore
@@ -566,7 +566,7 @@ function hoodieMemoryStore (hoodie, options) {
 
     options.remote.on('connect', function() {
       store.on('idle', options.remote.push);
-      remote.push();
+      options.remote.push();
     });
 
     options.remote.on('disconnect', function() {
