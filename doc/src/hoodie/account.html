@@ -25,8 +25,15 @@ pending request already, return its promise.</p></div></div><div class="code"><d
     <span class="p">};</span>
 
     <span class="k">return</span> <span class="nx">withSingleRequest</span><span class="p">(</span><span class="s1">&#39;authenticate&#39;</span><span class="p">,</span> <span class="nx">sendAndHandleAuthRequest</span><span class="p">);</span>
-  <span class="p">};</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h2 id="isunauthenticated">isUnauthenticated</h2></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>returns true if the user is currently signed but has no valid session,
-meaning that the data cannot be synchronized.</p></div></div><div class="code"><div class="wrapper">  <span class="nx">account</span><span class="p">.</span><span class="nx">isUnauthenticated</span> <span class="o">=</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+  <span class="p">};</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h2 id="hasvalidsession">hasValidSession</h2></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>returns true if the user is currently signed but has no valid session,
+meaning that the data cannot be synchronized.</p></div></div><div class="code"><div class="wrapper">  <span class="nx">account</span><span class="p">.</span><span class="nx">hasValidSession</span> <span class="o">=</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+    <span class="k">if</span> <span class="p">(</span><span class="o">!</span> <span class="nx">account</span><span class="p">.</span><span class="nx">hasAccount</span><span class="p">())</span> <span class="p">{</span>
+      <span class="k">return</span> <span class="kc">false</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="k">return</span> <span class="nx">authenticated</span> <span class="o">===</span> <span class="kc">true</span><span class="p">;</span>
+  <span class="p">};</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h2 id="hasinvalidsession">hasInvalidSession</h2></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>returns true if the user is currently signed but has no valid session,
+meaning that the data cannot be synchronized.</p></div></div><div class="code"><div class="wrapper">  <span class="nx">account</span><span class="p">.</span><span class="nx">hasInvalidSession</span> <span class="o">=</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
     <span class="k">if</span> <span class="p">(</span><span class="o">!</span> <span class="nx">account</span><span class="p">.</span><span class="nx">hasAccount</span><span class="p">())</span> <span class="p">{</span>
       <span class="k">return</span> <span class="kc">false</span><span class="p">;</span>
     <span class="p">}</span>
@@ -96,8 +103,16 @@ change his username and password internally instead of creating another user.</p
     <span class="p">});</span>
   <span class="p">};</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h2 id="hasaccount">hasAccount</h2></div></div></div><div class="segment"><div class="code"><div class="wrapper">  <span class="nx">account</span><span class="p">.</span><span class="nx">hasAccount</span> <span class="o">=</span> <span class="kd">function</span> <span class="nx">hasAccount</span><span class="p">()</span> <span class="p">{</span>
     <span class="k">return</span> <span class="o">!!</span><span class="nx">account</span><span class="p">.</span><span class="nx">username</span><span class="p">;</span>
-  <span class="p">};</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h2 id="hasanonymousaccount">hasAnonymousAccount</h2></div></div></div><div class="segment"><div class="code"><div class="wrapper">  <span class="nx">account</span><span class="p">.</span><span class="nx">hasAnonymousAccount</span> <span class="o">=</span> <span class="kd">function</span> <span class="nx">hasAnonymousAccount</span><span class="p">()</span> <span class="p">{</span>
-    <span class="k">return</span> <span class="nx">getAnonymousPassword</span><span class="p">()</span> <span class="o">!==</span> <span class="kc">undefined</span><span class="p">;</span>
+  <span class="p">};</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h2 id="hasanonymousaccount">hasAnonymousAccount</h2></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>anonymous accounts get created when data needs to be
+synced without the user having an account. That happens
+automatically when the user creates a task, but can also
+be done manually using hoodie.account.anonymousSignUp(),
+e.g. to prevent data loss.</p>
+
+<p>To determine between anonymous and "real" accounts, we
+can compare the username to the ownerHash, which is the
+same for anonymous accounts.</p></div></div><div class="code"><div class="wrapper">  <span class="nx">account</span><span class="p">.</span><span class="nx">hasAnonymousAccount</span> <span class="o">=</span> <span class="kd">function</span> <span class="nx">hasAnonymousAccount</span><span class="p">()</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="nx">account</span><span class="p">.</span><span class="nx">username</span> <span class="o">===</span> <span class="nx">account</span><span class="p">.</span><span class="nx">ownerHash</span><span class="p">;</span>
   <span class="p">};</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h2 id="set--get--remove-anonymous-password">set / get / remove anonymous password</h2></div></div></div><div class="segment"><div class="code"><div class="wrapper">  <span class="kd">var</span> <span class="nx">anonymousPasswordKey</span> <span class="o">=</span> <span class="s1">&#39;_account.anonymousPassword&#39;</span><span class="p">;</span>
 
   <span class="kd">function</span> <span class="nx">setAnonymousPassword</span><span class="p">(</span><span class="nx">password</span><span class="p">)</span> <span class="p">{</span>
@@ -114,11 +129,23 @@ change his username and password internally instead of creating another user.</p
 Besides the standard sign in we also check if the account has been confirmed
 (roles include 'confirmed' role).</p>
 
-<p>NOTE: When signing in, all local data gets cleared beforehand (with a signOut).
-      Otherwise data that has been created beforehand (authenticated with
-      another user account or anonymously) would be merged into the user
-      account that signs in. That applies only if username isn't the same as
-      current username.</p></div></div><div class="code"><div class="wrapper">  <span class="nx">account</span><span class="p">.</span><span class="nx">signIn</span> <span class="o">=</span> <span class="kd">function</span> <span class="nx">signIn</span><span class="p">(</span><span class="nx">username</span><span class="p">,</span> <span class="nx">password</span><span class="p">)</span> <span class="p">{</span>
+<p>When signing in, by default all local data gets cleared beforehand (with a signOut).
+Otherwise data that has been created beforehand (authenticated with another user
+account or anonymously) would be merged into the user account that signs in.
+That applies only if username isn't the same as current username.</p>
+
+<p>To prevent data loss, signIn can be called with options.moveData = true, that wll
+move all data from the anonymous account to the account the user signed into.</p></div></div><div class="code"><div class="wrapper">  <span class="nx">account</span><span class="p">.</span><span class="nx">signIn</span> <span class="o">=</span> <span class="kd">function</span> <span class="nx">signIn</span><span class="p">(</span><span class="nx">username</span><span class="p">,</span> <span class="nx">password</span><span class="p">,</span> <span class="nx">options</span><span class="p">)</span> <span class="p">{</span>
+    <span class="kd">var</span> <span class="nx">signOutAndSignIn</span> <span class="o">=</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+      <span class="k">return</span> <span class="nx">account</span><span class="p">.</span><span class="nx">signOut</span><span class="p">({</span>
+        <span class="nx">silent</span><span class="o">:</span> <span class="kc">true</span>
+      <span class="p">}).</span><span class="nx">then</span><span class="p">(</span><span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+        <span class="k">return</span> <span class="nx">sendSignInRequest</span><span class="p">(</span><span class="nx">username</span><span class="p">,</span> <span class="nx">password</span><span class="p">);</span>
+      <span class="p">});</span>
+    <span class="p">};</span>
+    <span class="kd">var</span> <span class="nx">currentData</span><span class="p">;</span>
+
+    <span class="nx">options</span> <span class="o">=</span> <span class="nx">options</span> <span class="o">||</span> <span class="p">{};</span>
 
     <span class="k">if</span> <span class="p">(</span><span class="nx">username</span> <span class="o">===</span> <span class="kc">null</span><span class="p">)</span> <span class="p">{</span>
       <span class="nx">username</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="p">;</span>
@@ -129,11 +156,27 @@ Besides the standard sign in we also check if the account has been confirmed
     <span class="p">}</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>downcase</p></div></div><div class="code"><div class="wrapper">    <span class="nx">username</span> <span class="o">=</span> <span class="nx">username</span><span class="p">.</span><span class="nx">toLowerCase</span><span class="p">();</span>
 
     <span class="k">if</span> <span class="p">(</span><span class="nx">username</span> <span class="o">!==</span> <span class="nx">account</span><span class="p">.</span><span class="nx">username</span><span class="p">)</span> <span class="p">{</span>
-      <span class="k">return</span> <span class="nx">account</span><span class="p">.</span><span class="nx">signOut</span><span class="p">({</span>
-        <span class="nx">silent</span><span class="o">:</span> <span class="kc">true</span>
-      <span class="p">}).</span><span class="nx">then</span><span class="p">(</span><span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
-        <span class="k">return</span> <span class="nx">sendSignInRequest</span><span class="p">(</span><span class="nx">username</span><span class="p">,</span> <span class="nx">password</span><span class="p">);</span>
+      <span class="k">if</span> <span class="p">(</span><span class="o">!</span> <span class="nx">options</span><span class="p">.</span><span class="nx">moveData</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">return</span> <span class="nx">signOutAndSignIn</span><span class="p">();</span>
+      <span class="p">}</span>
+
+      <span class="k">return</span> <span class="nx">hoodie</span><span class="p">.</span><span class="nx">store</span><span class="p">.</span><span class="nx">findAll</span><span class="p">()</span>
+      <span class="p">.</span><span class="nx">then</span><span class="p">(</span><span class="kd">function</span><span class="p">(</span><span class="nx">data</span><span class="p">)</span> <span class="p">{</span>
+        <span class="nx">currentData</span> <span class="o">=</span> <span class="nx">data</span><span class="p">;</span>
+      <span class="p">})</span>
+      <span class="p">.</span><span class="nx">then</span><span class="p">(</span><span class="nx">signOutAndSignIn</span><span class="p">)</span>
+      <span class="p">.</span><span class="nx">done</span><span class="p">(</span><span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+        <span class="nx">currentData</span><span class="p">.</span><span class="nx">forEach</span><span class="p">(</span><span class="kd">function</span><span class="p">(</span><span class="nx">object</span><span class="p">)</span> <span class="p">{</span>
+          <span class="kd">var</span> <span class="nx">type</span> <span class="o">=</span> <span class="nx">object</span><span class="p">.</span><span class="nx">type</span><span class="p">;</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>ignore the account settings</p></div></div><div class="code"><div class="wrapper">          <span class="k">if</span> <span class="p">(</span><span class="nx">type</span> <span class="o">===</span> <span class="s1">&#39;$config&#39;</span> <span class="o">&amp;&amp;</span> <span class="nx">object</span><span class="p">.</span><span class="nx">id</span> <span class="o">===</span> <span class="s1">&#39;hoodie&#39;</span><span class="p">)</span> <span class="p">{</span>
+            <span class="k">return</span><span class="p">;</span>
+          <span class="p">}</span>
+
+          <span class="k">delete</span> <span class="nx">object</span><span class="p">.</span><span class="nx">type</span><span class="p">;</span>
+          <span class="nx">object</span><span class="p">.</span><span class="nx">createdBy</span> <span class="o">=</span> <span class="nx">hoodie</span><span class="p">.</span><span class="nx">account</span><span class="p">.</span><span class="nx">ownerHash</span><span class="p">;</span>
+          <span class="nx">hoodie</span><span class="p">.</span><span class="nx">store</span><span class="p">.</span><span class="nx">add</span><span class="p">(</span><span class="nx">type</span><span class="p">,</span> <span class="nx">object</span><span class="p">);</span>
+        <span class="p">});</span>
       <span class="p">});</span>
+
     <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
       <span class="k">return</span> <span class="nx">sendSignInRequest</span><span class="p">(</span><span class="nx">username</span><span class="p">,</span> <span class="nx">password</span><span class="p">,</span> <span class="p">{</span>
         <span class="nx">reauthenticated</span><span class="o">:</span> <span class="kc">true</span>
@@ -548,7 +591,7 @@ its ownerHash (see <code>anonymousSignUp</code>)</p>
 
 <p>We differentiate with <code>hasAnonymousAccount()</code>, because <code>userTypeAndId</code>
 is used within <code>signUp</code> method, so we need to be able to differentiate
-between anonyomus and normal users before an account has been created.</p></div></div><div class="code"><div class="wrapper">  <span class="kd">function</span> <span class="nx">userTypeAndId</span><span class="p">(</span><span class="nx">username</span><span class="p">)</span> <span class="p">{</span>
+between anonymous and normal users before an account has been created.</p></div></div><div class="code"><div class="wrapper">  <span class="kd">function</span> <span class="nx">userTypeAndId</span><span class="p">(</span><span class="nx">username</span><span class="p">)</span> <span class="p">{</span>
     <span class="kd">var</span> <span class="nx">type</span><span class="p">;</span>
 
     <span class="k">if</span> <span class="p">(</span><span class="nx">username</span> <span class="o">===</span> <span class="nx">account</span><span class="p">.</span><span class="nx">ownerHash</span><span class="p">)</span> <span class="p">{</span>
