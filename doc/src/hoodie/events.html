@@ -10,7 +10,9 @@
 </ul>
 
 <p>based on <a href="https://github.com/maccman/spine/blob/master/src/spine.coffee#L1">Events implementations from Spine</a></p></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>callbacks are global, while the events API is used at several places,
-like hoodie.on / hoodie.store.on / hoodie.task.on etc.</p></div></div><div class="code"><div class="wrapper"><span class="kd">function</span> <span class="nx">hoodieEvents</span><span class="p">(</span><span class="nx">hoodie</span><span class="p">,</span> <span class="nx">options</span><span class="p">)</span> <span class="p">{</span>
+like hoodie.on / hoodie.store.on / hoodie.task.on etc.</p></div></div><div class="code"><div class="wrapper"><span class="nx">Hoodie</span><span class="p">.</span><span class="nx">events</span> <span class="o">=</span> <span class="nx">hoodieEvents</span><span class="p">;</span>
+
+<span class="kd">function</span> <span class="nx">hoodieEvents</span><span class="p">(</span><span class="nx">hoodie</span><span class="p">,</span> <span class="nx">options</span><span class="p">)</span> <span class="p">{</span>
   <span class="kd">var</span> <span class="nx">context</span> <span class="o">=</span> <span class="nx">hoodie</span><span class="p">;</span>
   <span class="kd">var</span> <span class="nx">namespace</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="p">;</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>normalize options hash</p></div></div><div class="code"><div class="wrapper">  <span class="nx">options</span> <span class="o">=</span> <span class="nx">options</span> <span class="o">||</span> <span class="p">{};</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>make sure callbacks hash exists</p></div></div><div class="code"><div class="wrapper">  <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nx">hoodie</span><span class="p">.</span><span class="nx">eventsCallbacks</span><span class="p">)</span> <span class="p">{</span>
     <span class="nx">hoodie</span><span class="p">.</span><span class="nx">eventsCallbacks</span> <span class="o">=</span> <span class="p">{};</span>
@@ -130,4 +132,5 @@ object.unbind 'move', follow
   <span class="nx">context</span><span class="p">.</span><span class="nx">trigger</span> <span class="o">=</span> <span class="nx">trigger</span><span class="p">;</span>
   <span class="nx">context</span><span class="p">.</span><span class="nx">unbind</span> <span class="o">=</span> <span class="nx">unbind</span><span class="p">;</span>
   <span class="nx">context</span><span class="p">.</span><span class="nx">off</span> <span class="o">=</span> <span class="nx">unbind</span><span class="p">;</span>
+
 <span class="p">}</span></div></div></div></div></body></html>

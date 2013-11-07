@@ -64,20 +64,9 @@ would set the name of the remote store, which is not the username.</p></div></di
     <span class="nx">hoodie</span><span class="p">.</span><span class="nx">remote</span><span class="p">.</span><span class="nx">connect</span><span class="p">();</span>
   <span class="p">});</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>check connection when browser goes online / offline</p></div></div><div class="code"><div class="wrapper">  <span class="nb">window</span><span class="p">.</span><span class="nx">addEventListener</span><span class="p">(</span><span class="s1">&#39;online&#39;</span><span class="p">,</span> <span class="nx">hoodie</span><span class="p">.</span><span class="nx">checkConnection</span><span class="p">,</span> <span class="kc">false</span><span class="p">);</span>
   <span class="nb">window</span><span class="p">.</span><span class="nx">addEventListener</span><span class="p">(</span><span class="s1">&#39;offline&#39;</span><span class="p">,</span> <span class="nx">hoodie</span><span class="p">.</span><span class="nx">checkConnection</span><span class="p">,</span> <span class="kc">false</span><span class="p">);</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>start checking connection</p></div></div><div class="code"><div class="wrapper">  <span class="nx">hoodie</span><span class="p">.</span><span class="nx">checkConnection</span><span class="p">();</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>loading user extensions</p></div></div><div class="code"><div class="wrapper">  <span class="nx">applyExtensions</span><span class="p">(</span><span class="nx">hoodie</span><span class="p">);</span>
-<span class="p">}</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h2 id="extending-hoodie">Extending hoodie</h2></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>You can either extend the Hoodie class, or a hoodie
-instance during runtime</p>
+<span class="p">}</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h2 id="extending-hoodie">Extending hoodie</h2></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>You can extend the Hoodie class like so:</p>
 
-<pre><code>Hoodie.extend('magic1', funcion(hoodie) { /* ... */ })
-hoodie = new Hoodie
-hoodie.extend('magic2', function(hoodie) { /* ... */ })
-hoodie.magic1.doSomething()
-hoodie.magic2.doSomethingElse()
-</code></pre>
-
-<p>Hoodie can also be extended anonymously</p>
-
-<pre><code> Hoodie.extend(funcion(hoodie) { hoodie.myMagic = function() {} })
-</code></pre></div></div><div class="code"><div class="wrapper"><span class="kd">var</span> <span class="nx">extensions</span> <span class="o">=</span> <span class="p">[];</span>
+<p>Hoodie.extend(funcion(hoodie) { hoodie.myMagic = function() {} })</p></div></div><div class="code"><div class="wrapper"><span class="kd">var</span> <span class="nx">extensions</span> <span class="o">=</span> <span class="p">[];</span>
 
 <span class="nx">Hoodie</span><span class="p">.</span><span class="nx">extend</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">extension</span><span class="p">)</span> <span class="p">{</span>
   <span class="nx">extensions</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="nx">extension</span><span class="p">);</span>
