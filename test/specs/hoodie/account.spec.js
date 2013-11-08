@@ -1774,7 +1774,7 @@ describe('hoodie.account', function () {
         _and('password reset succeeds', function() {
           beforeEach(function() {
             this.promise = this.account.resetPassword('joe@example.com');
-            this.account.one.witArgs('passwordreset').yields();
+            this.account.one.withArgs('passwordreset').yields();
           });
 
           it.only('should resolve', function() {
@@ -1785,7 +1785,7 @@ describe('hoodie.account', function () {
         _and('password reset fails', function() {
           beforeEach(function() {
             this.promise = this.account.resetPassword('joe@example.com');
-            this.account.one.witArgs('error:passwordreset').yields();
+            this.account.one.withArgs('error:passwordreset').yields();
           });
 
           it('should resolve', function() {
