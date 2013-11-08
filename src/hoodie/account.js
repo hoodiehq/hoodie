@@ -498,7 +498,7 @@ function hoodieAccount (hoodie) {
           window.setTimeout(account.checkPasswordReset, 1000);
           return;
         }
-        return account.trigger('password_reset:error');
+        return account.trigger('passwordreset:error');
       });
     });
   };
