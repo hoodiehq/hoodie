@@ -794,14 +794,14 @@ function hoodieAccount (hoodie) {
   // If the error is a 401, it's exactly what we've been waiting for.
   // In this case we resolve the promise.
   //
-  function handlePasswordResetStatusRequestError(xhr) {
-    if (xhr.status === 401) {
+  function handlePasswordResetStatusRequestError(error) {
+    if (error.error === 'unauthorized') {
       hoodie.config.unset('_account.resetPasswordId');
       account.trigger('passwordreset');
 
       return hoodie.resolve();
     } else {
-      return handleRequestError(xhr);
+      return hoodie.rejectWith(error);
     }
   }
 
