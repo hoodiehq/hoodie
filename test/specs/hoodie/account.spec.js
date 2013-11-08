@@ -1773,19 +1773,19 @@ describe('hoodie.account', function () {
 
         _and('password reset succeeds', function() {
           beforeEach(function() {
-            this.promise = this.account.resetPassword('joe@example.com');
             this.account.one.withArgs('passwordreset').yields();
+            this.promise = this.account.resetPassword('joe@example.com');
           });
 
-          it.only('should resolve', function() {
+          it('should resolve', function() {
             expect(this.promise).to.be.resolved();
           });
         });
 
         _and('password reset fails', function() {
           beforeEach(function() {
-            this.promise = this.account.resetPassword('joe@example.com');
             this.account.one.withArgs('error:passwordreset').yields();
+            this.promise = this.account.resetPassword('joe@example.com');
           });
 
           it('should resolve', function() {
