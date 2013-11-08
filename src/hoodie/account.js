@@ -448,7 +448,8 @@ function hoodieAccount (hoodie) {
     return withPreviousRequestsAborted('resetPassword', function() {
       return account.request('PUT', '/_users/' + (encodeURIComponent(key)), options).then(
         null, handleRequestError
-      ).done(account.checkPasswordReset);
+      ).done( account.checkPasswordReset )
+      .then( awaitPasswordResetResult );
     });
   };
 
@@ -802,6 +803,26 @@ function hoodieAccount (hoodie) {
     } else {
       return handleRequestError(xhr);
     }
+  }
+
+
+  //
+  // wait until a password reset gets either completed or marked as failed
+  // and resolve / reject respectively
+  //
+  function awaitPasswordResetResult() {
+    var defer = hoodie.defer();
+
+    account.one('passwordreset', defer.resolve );
+    account.one('error:passwordreset', defer.reject );
+
+    // clean up callbacks when either gets called
+    defer.always( function() {
+      account.unbind('passwordreset', defer.resolve );
+      account.unbind('error:passwordreset', defer.reject );
+    });
+
+    return defer.promise();
   }
 
 
