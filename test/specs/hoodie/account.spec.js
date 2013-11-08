@@ -1777,7 +1777,7 @@ describe('hoodie.account', function () {
             this.account.one.witArgs('passwordreset').yields();
           });
 
-          it.only('shoudl resolve', function() {
+          it.only('should resolve', function() {
             expect(this.promise).to.be.resolved();
           });
         });
@@ -1788,7 +1788,7 @@ describe('hoodie.account', function () {
             this.account.one.witArgs('error:passwordreset').yields();
           });
 
-          it('shoudl resolve', function() {
+          it('should resolve', function() {
             expect(this.promise).to.be.rejected();
           });
         });
