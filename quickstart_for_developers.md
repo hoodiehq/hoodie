@@ -22,7 +22,7 @@ That's all you need. Make your changes, run the test, send a pull request, win k
 hoodie backend (server)
 -----------------------
 
-If you want to run a hoodie server locally, you need [hoodie app](https://github.com/hoodiehq/hoodie-app).
+If you want to run a hoodie server locally, you need [hoodie server](https://github.com/hoodiehq/hoodie-server).
 
 The hoodie server is a couchDB instance with some workers listening to changes and doing things like
 creating databases for users or sending emails. `hoodie.js` is talking directly with the couchDB api.
