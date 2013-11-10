@@ -448,7 +448,8 @@ function hoodieAccount (hoodie) {
     return withPreviousRequestsAborted('resetPassword', function() {
       return account.request('PUT', '/_users/' + (encodeURIComponent(key)), options).then(
         null, handleRequestError
-      ).done(account.checkPasswordReset);
+      ).done( account.checkPasswordReset )
+      .then( awaitPasswordResetResult );
     });
   };
 
@@ -498,7 +499,7 @@ function hoodieAccount (hoodie) {
           window.setTimeout(account.checkPasswordReset, 1000);
           return;
         }
-        return account.trigger('password_reset:error');
+        return account.trigger('error:passwordreset', error);
       });
     });
   };
@@ -793,15 +794,35 @@ function hoodieAccount (hoodie) {
   // If the error is a 401, it's exactly what we've been waiting for.
   // In this case we resolve the promise.
   //
-  function handlePasswordResetStatusRequestError(xhr) {
-    if (xhr.status === 401) {
+  function handlePasswordResetStatusRequestError(error) {
+    if (error.error === 'unauthorized') {
       hoodie.config.unset('_account.resetPasswordId');
       account.trigger('passwordreset');
 
       return hoodie.resolve();
     } else {
-      return handleRequestError(xhr);
+      return hoodie.rejectWith(error);
     }
+  }
+
+
+  //
+  // wait until a password reset gets either completed or marked as failed
+  // and resolve / reject respectively
+  //
+  function awaitPasswordResetResult() {
+    var defer = hoodie.defer();
+
+    account.one('passwordreset', defer.resolve );
+    account.one('error:passwordreset', defer.reject );
+
+    // clean up callbacks when either gets called
+    defer.always( function() {
+      account.unbind('passwordreset', defer.resolve );
+      account.unbind('error:passwordreset', defer.reject );
+    });
+
+    return defer.promise();
   }
 
 

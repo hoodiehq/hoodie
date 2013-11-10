@@ -1767,8 +1767,30 @@ describe('hoodie.account', function () {
           expect(this.account.checkPasswordReset.called).to.be.ok();
         });
 
-        it('should be resolved', function () {
-          expect(this.account.resetPassword('joe@example.com')).to.be.resolved();
+        it('should be pending', function () {
+          expect(this.account.resetPassword('joe@example.com')).to.be.pending();
+        });
+
+        _and('password reset succeeds', function() {
+          beforeEach(function() {
+            this.account.one.withArgs('passwordreset').yields();
+            this.promise = this.account.resetPassword('joe@example.com');
+          });
+
+          it('should resolve', function() {
+            expect(this.promise).to.be.resolved();
+          });
+        });
+
+        _and('password reset fails', function() {
+          beforeEach(function() {
+            this.account.one.withArgs('error:passwordreset').yields();
+            this.promise = this.account.resetPassword('joe@example.com');
+          });
+
+          it('should resolve', function() {
+            expect(this.promise).to.be.rejected();
+          });
         });
       });
 
