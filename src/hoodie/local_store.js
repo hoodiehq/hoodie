@@ -516,7 +516,7 @@ function hoodieStore (hoodie) {
       localStorage.removeItem('Storage-Test');
     } catch (_error) {
 
-      // in case of an error, like Safari's Private Pussy, return false
+      // in case of an error, like Safari's Private Mode, return false
       return false;
     }
 
