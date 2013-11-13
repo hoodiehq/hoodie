@@ -58,7 +58,10 @@ module.exports = function(grunt) {
           'src/hoodie/account.js',
           'src/hoodie/account_remote.js',
           'src/hoodie/task.js',
-          'src/hoodie/scoped_task.js'
+          'src/hoodie/scoped_task.js',
+
+          'src/hoodie/memory_store.js',
+          'src/hoodie/memory_open.js'
         ],
         dest: 'dist/<%= pkg.name %>.js'
       }
