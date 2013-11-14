@@ -140,10 +140,16 @@ module.exports = function(grunt) {
 =======
             browserName: 'chrome',
             platform: 'linux'
+          },
+          sl_firefox_linux: {
+            base: 'SauceLabs',
+            browserName: 'firefox',
+            platform: 'linux'
           }
         },
         browsers: [
           'PhantomJS',
+<<<<<<< HEAD
           'SL_Chrome',
           'SL_Safari',
           'SL_Firefox',
@@ -151,6 +157,10 @@ module.exports = function(grunt) {
           'SL_IE_9',
           'SL_IE_10'
 >>>>>>> [feature wip] saucelabs travis integration
+=======
+          'sl_chrome_linux',
+          'sl_firefox_linux'
+>>>>>>> [fix] SL browsers
         ]
       },
 
