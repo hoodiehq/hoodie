@@ -107,6 +107,7 @@ module.exports = function(grunt) {
         customLaunchers: {
           sl_chrome_mac: {
 <<<<<<< HEAD
+<<<<<<< HEAD
             base: 'SauceLabs',
 <<<<<<< HEAD
             platform: 'mac 10.8',
@@ -147,27 +148,34 @@ module.exports = function(grunt) {
             browserName: 'chrome',
             platform: 'linux'
 =======
+=======
+            base: 'SauceLabs',
+>>>>>>> [wip] travis setup
             os: 'OS X 10.8',
             browser: 'googlechrome'
 >>>>>>> [wip]
           },
           sl_safari_mac: {
+            base: 'SauceLabs',
             os: 'OS X 10.8',
             browser: 'safari',
             'browser-version': 5
           },
 
           sl_ie8_windows7: {
+            base: 'SauceLabs',
             os: 'Windows 7',
             browser: 'iehta',
             'browser-version': '8'
           },
           sl_ie9_windows: {
+            base: 'SauceLabs',
             os: 'windows',
             browser: 'iexplorer',
             'browser-version': '9'
           },
           sl_ie10_windows: {
+            base: 'SauceLabs',
             os: 'windows',
             browser: 'iexplorer',
             'browser-version': '10'
