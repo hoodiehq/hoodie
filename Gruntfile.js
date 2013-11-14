@@ -128,8 +128,11 @@ module.exports = function(grunt) {
         },
         browsers: [
           'PhantomJS',
-          'sl_chrome_linux',
-          'sl_firefox_linux'
+          'sl_chrome_mac',
+          'sl_safari_mac',
+          'sl_ie8_windows7',
+          'sl_ie9_windows7',
+          'sl_ie10_windows7'
         ]
       },
 
