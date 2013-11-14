@@ -27,7 +27,7 @@ module.exports = function(grunt) {
 
     watch: {
       files: ['<%= jshint.files %>'],
-      tasks: ['jshint', 'shell:test']
+      tasks: ['jshint', 'karma:dev']
     },
 
     concat: {
@@ -84,12 +84,42 @@ module.exports = function(grunt) {
       }
     },
 
-    shell: {
-      test: {
-        command: 'node node_modules/karma/bin/karma start',
-        options: {
-          stdout: true,
-          stderr: true
+    karma: {
+      options: {
+        configFile: 'karma.conf.js',
+        browsers: ['PhantomJS']
+      },
+
+      continuous: {
+        singleRun: true,
+        browsers: ['PhantomJS'],
+        sauceLabs: {
+          username: 'svnlto',
+          accessKey: '104fe381-851b-485f-81d6-8eda57d0e40e',
+          startConnect: true,
+          testName: 'hoodie.js test'
+        },
+        customLaunchers: {
+          sl_chrome_linux: {
+            base: 'SauceLabs',
+            browserName: 'chrome',
+            platform: 'linux'
+          }
+        }
+      },
+
+      dev: {
+        browsers: ['PhantomJS', 'Chrome', 'ChromeCanary']
+      },
+
+      coverage: {
+        reporters: ['progress', 'coverage'],
+        preprocessors: {
+          'src/**/*.js': ['coverage']
+        },
+        coverageReporter: {
+          type : 'html',
+          dir : 'coverage/'
         }
       }
     }
@@ -101,10 +131,10 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-contrib-watch');
   grunt.loadNpmTasks('grunt-contrib-concat');
   grunt.loadNpmTasks('grunt-groc');
-  grunt.loadNpmTasks('grunt-shell');
+  grunt.loadNpmTasks('grunt-karma');
 
   grunt.registerTask('default', ['jshint', 'concat', 'uglify']);
-  grunt.registerTask('build', ['jshint', 'shell:test', 'concat', 'uglify']);
-  grunt.registerTask('test', ['shell:test']);
+  grunt.registerTask('build', ['jshint', 'karma:dev', 'concat', 'uglify']);
+  grunt.registerTask('test', ['karma:dev']);
   grunt.registerTask('docs', ['groc']);
 };
