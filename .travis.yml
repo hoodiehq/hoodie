@@ -1,4 +1,3 @@
-
 before_install:
   - ./support/sauce/sauce_connect_setup.sh
   - npm install -g bower
