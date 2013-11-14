@@ -95,8 +95,13 @@ module.exports = function(grunt) {
       continuous: {
         singleRun: true,
         sauceLabs: {
+<<<<<<< HEAD
           username: 'hoodie',
           accessKey: '1f6164de-f3d1-4af9-83d0-5358b42fbe56',
+=======
+          username: 'svnlto',
+          accessKey: '104fe381-851b-485f-81d6-8eda57d0e40e',
+>>>>>>> [wip]
           testName: 'hoodie.js test'
         },
         customLaunchers: {
@@ -191,6 +196,6 @@ module.exports = function(grunt) {
 
   grunt.registerTask('default', ['jshint', 'concat', 'uglify']);
   grunt.registerTask('build', ['jshint', 'karma:continuous', 'concat', 'uglify']);
-  grunt.registerTask('test', ['karma:dev']);
+  grunt.registerTask('test', ['jshint', 'karma:continuous']);
   grunt.registerTask('docs', ['groc']);
 };

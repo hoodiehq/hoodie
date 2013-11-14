@@ -30,9 +30,6 @@ before_script:
   - chmod +x ./support/**
 >>>>>>> [wip]
 
-script:
-  - ./support/travis/travis_build.sh
-
 after_script:
   - ./support/travis/travis_print_logs.sh
 
