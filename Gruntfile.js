@@ -177,6 +177,7 @@ module.exports = function(grunt) {
         browsers: [
           'PhantomJS',
 <<<<<<< HEAD
+<<<<<<< HEAD
           'SL_Chrome',
           'SL_Safari',
           'SL_Firefox',
@@ -188,6 +189,13 @@ module.exports = function(grunt) {
           'sl_chrome_linux',
           'sl_firefox_linux'
 >>>>>>> [fix] SL browsers
+=======
+          'sl_chrome_mac',
+          'sl_safari_mac',
+          'sl_ie8_windows7',
+          'sl_ie9_windows7',
+          'sl_ie10_windows7'
+>>>>>>> [wip]
         ]
       },
 
