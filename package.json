@@ -45,5 +45,6 @@
   "scripts": {
     "test": "grunt test --verbose",
     "build": "grunt build --verbose"
+    "postinstall": "bower install"
   }
 }
