@@ -7,9 +7,6 @@ before_script:
   - bower install
   - chmod +x ./support/**
 
-script:
-  - ./support/travis/travis_build.sh
-
 after_script:
   - ./support/travis/travis_print_logs.sh
 
