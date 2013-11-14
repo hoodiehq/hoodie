@@ -2,4 +2,4 @@
 
 set -e
 
-grunt karma:continous
+grunt karma:continuous
