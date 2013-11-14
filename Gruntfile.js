@@ -110,7 +110,7 @@ module.exports = function(grunt) {
       },
 
       dev: {
-        browsers: ['PhantomJS', 'Chrome', 'ChromeCanary']
+        browsers: ['PhantomJS']
       },
 
       coverage: {
