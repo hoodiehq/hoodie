@@ -31,14 +31,16 @@
     "grunt-contrib-concat": "~0.3.0",
     "grunt-groc": "~0.3.0",
     "grunt-shell": "~0.3.0",
-    "karma": "~0.11.0",
+    "karma": "~0.10.4",
     "karma-script-launcher": "~0.1.0",
     "karma-chrome-launcher": "~0.1.0",
     "karma-firefox-launcher": "~0.1.0",
     "karma-html2js-preprocessor": "~0.1.0",
     "karma-phantomjs-launcher": "~0.1.0",
     "karma-mocha": "~0.1.0",
-    "karma-coverage": "~0.1.0"
+    "karma-coverage": "~0.1.0",
+    "karma-sauce-launcher": "~0.1.1",
+    "grunt-karma": "~0.6.2"
   },
   "scripts": {
     "test": "grunt test --verbose",
