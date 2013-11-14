@@ -2,10 +2,17 @@ before_install:
   - ./support/sauce/sauce_connect_setup.sh
   - npm install -g bower
   - npm install -g grunt-cli
+  - ./build/sauce/sauce_connect_block.sh
 
 before_script:
   - bower install
   - chmod +x ./support/**
+
+script:
+  - ./build/travis/travis_build.sh
+
+after_script:
+  - ./build/travis/travis_print_logs.sh
 
 language: node_js
 
