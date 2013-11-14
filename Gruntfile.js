@@ -110,6 +110,7 @@ module.exports = function(grunt) {
 <<<<<<< HEAD
             base: 'SauceLabs',
 <<<<<<< HEAD
+<<<<<<< HEAD
             platform: 'mac 10.8',
             browserName: 'chrome'
           },
@@ -154,32 +155,33 @@ module.exports = function(grunt) {
             os: 'OS X 10.8',
             browser: 'googlechrome'
 >>>>>>> [wip]
+=======
+            platform: 'mac 10.8',
+            browserName: 'chrome'
+>>>>>>> [wip]
           },
           sl_safari_mac: {
             base: 'SauceLabs',
-            os: 'OS X 10.8',
-            browser: 'safari',
-            'browser-version': 5
+            platform: 'mac 10.8',
+            browserName: 'safari'
           },
-
-          sl_ie8_windows7: {
-            base: 'SauceLabs',
-            os: 'Windows 7',
-            browser: 'iehta',
-            'browser-version': '8'
-          },
-          sl_ie9_windows: {
-            base: 'SauceLabs',
-            os: 'windows',
-            browser: 'iexplorer',
-            'browser-version': '9'
-          },
-          sl_ie10_windows: {
-            base: 'SauceLabs',
-            os: 'windows',
-            browser: 'iexplorer',
-            'browser-version': '10'
-          }
+          // [wip] windows support
+          //sl_ie8_windows7: {
+            //base: 'SauceLabs',
+            //platform: 'Windows XP',
+            //browserName: 'iehta',
+            //version: 8
+          //},
+          //sl_ie9_windows: {
+            //base: 'SauceLabs',
+            //browserName: 'iexplorer',
+            //version: 9
+          //},
+          //sl_ie10_windows: {
+            //base: 'SauceLabs',
+            //browserName: 'iexplorer',
+            //version: 10
+          //}
 
         },
         browsers: [
@@ -200,9 +202,12 @@ module.exports = function(grunt) {
 =======
           'sl_chrome_mac',
           'sl_safari_mac',
+<<<<<<< HEAD
           'sl_ie8_windows7',
           'sl_ie9_windows7',
           'sl_ie10_windows7'
+>>>>>>> [wip]
+=======
 >>>>>>> [wip]
         ]
       },
