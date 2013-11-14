@@ -1,5 +1,4 @@
 before_install:
-  - mkdir -p $LOGS_DIR
   - ./support/sauce/sauce_connect_setup.sh
   - npm install -g bower
   - npm install -g grunt-cli
