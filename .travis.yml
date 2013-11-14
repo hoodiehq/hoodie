@@ -1,18 +1,18 @@
 before_install:
+  - mkdir -p $LOGS_DIR
+  - ./support/sauce/sauce_connect_setup.sh
   - npm install -g bower
   - npm install -g grunt-cli
+  - ./support/sauce/sauce_connect_block.sh
 
 before_script:
-  - ./build/sauce/sauce_connect_setup.sh
   - bower install
-  - mkdir -p $LOGS_DIR
-  - ./build/sauce/sauce_connect_block.sh
 
 script:
-  - ./build/travis/travis_build.sh
+  - ./support/travis/travis_build.sh
 
 after_script:
-  - ./build/travis/travis_print_logs.sh
+  - ./support/travis/travis_print_logs.sh
 
 language: node_js
 
