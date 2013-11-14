@@ -1,11 +1,14 @@
 before_install:
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
   - ./support/sauce/sauce_connect_setup.sh
 =======
 >>>>>>> ...
 =======
   - mkdir -p $LOGS_DIR
+=======
+>>>>>>> [wip]
   - ./support/sauce/sauce_connect_setup.sh
 >>>>>>> [minor] rename build dir
   - npm install -g bower
