@@ -104,16 +104,17 @@ module.exports = function(grunt) {
             base: 'SauceLabs',
             browserName: 'chrome',
             platform: 'linux'
+          },
+          sl_firefox_linux: {
+            base: 'SauceLabs',
+            browserName: 'firefox',
+            platform: 'linux'
           }
         },
         browsers: [
           'PhantomJS',
-          'SL_Chrome',
-          'SL_Safari',
-          'SL_Firefox',
-          'SL_IE_8',
-          'SL_IE_9',
-          'SL_IE_10'
+          'sl_chrome_linux',
+          'sl_firefox_linux'
         ]
       },
 
@@ -143,7 +144,7 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-karma');
 
   grunt.registerTask('default', ['jshint', 'concat', 'uglify']);
-  grunt.registerTask('build', ['jshint', 'karma:dev', 'concat', 'uglify']);
+  grunt.registerTask('build', ['jshint', 'karma:continuous', 'concat', 'uglify']);
   grunt.registerTask('test', ['karma:dev']);
   grunt.registerTask('docs', ['groc']);
 };
