@@ -10,10 +10,10 @@ before_install:
 >>>>>>> [minor] rename build dir
   - npm install -g bower
   - npm install -g grunt-cli
-  - ./support/sauce/sauce_connect_block.sh
 
 before_script:
   - bower install
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
   - chmod +x ./support/**
@@ -23,6 +23,9 @@ before_script:
 >>>>>>> ...
 =======
 >>>>>>> [minor] rename build dir
+=======
+  - chmod +x ./support/**
+>>>>>>> [wip]
 
 script:
   - ./support/travis/travis_build.sh
