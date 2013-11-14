@@ -1,4 +1,4 @@
-before_script:
+before_install:
   - npm install -g bower
   - npm install -g grunt-cli
 
