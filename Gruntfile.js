@@ -106,6 +106,7 @@ module.exports = function(grunt) {
         },
         customLaunchers: {
           sl_chrome_mac: {
+<<<<<<< HEAD
             base: 'SauceLabs',
 <<<<<<< HEAD
             platform: 'mac 10.8',
@@ -145,12 +146,33 @@ module.exports = function(grunt) {
 =======
             browserName: 'chrome',
             platform: 'linux'
+=======
+            os: 'OS X 10.8',
+            browser: 'googlechrome'
+>>>>>>> [wip]
           },
-          sl_firefox_linux: {
-            base: 'SauceLabs',
-            browserName: 'firefox',
-            platform: 'linux'
+          sl_safari_mac: {
+            os: 'OS X 10.8',
+            browser: 'safari',
+            'browser-version': 5
+          },
+
+          sl_ie8_windows7: {
+            os: 'Windows 7',
+            browser: 'iehta',
+            'browser-version': '8'
+          },
+          sl_ie9_windows: {
+            os: 'windows',
+            browser: 'iexplorer',
+            'browser-version': '9'
+          },
+          sl_ie10_windows: {
+            os: 'windows',
+            browser: 'iexplorer',
+            'browser-version': '10'
           }
+
         },
         browsers: [
           'PhantomJS',
