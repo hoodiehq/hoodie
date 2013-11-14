@@ -7,9 +7,6 @@ before_script:
   - bower install
   - chmod +x ./support/**
 
-after_script:
-  - ./support/travis/travis_print_logs.sh
-
 language: node_js
 
 node_js:
