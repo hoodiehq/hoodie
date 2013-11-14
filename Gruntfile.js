@@ -98,16 +98,32 @@ module.exports = function(grunt) {
           testName: 'hoodie.js test'
         },
         customLaunchers: {
-          sl_chrome_linux: {
-            base: 'SauceLabs',
-            browserName: 'chrome',
-            platform: 'linux'
+          sl_chrome_mac: {
+            os: 'OS X 10.8',
+            browser: 'googlechrome'
           },
-          sl_firefox_linux: {
-            base: 'SauceLabs',
-            browserName: 'firefox',
-            platform: 'linux'
+          sl_safari_mac: {
+            os: 'OS X 10.8',
+            browser: 'safari',
+            'browser-version': 5
+          },
+
+          sl_ie8_windows7: {
+            os: 'Windows 7',
+            browser: 'iehta',
+            'browser-version': '8'
+          },
+          sl_ie9_windows: {
+            os: 'windows',
+            browser: 'iexplorer',
+            'browser-version': '9'
+          },
+          sl_ie10_windows: {
+            os: 'windows',
+            browser: 'iexplorer',
+            'browser-version': '10'
           }
+
         },
         browsers: [
           'PhantomJS',
