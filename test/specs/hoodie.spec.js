@@ -9,7 +9,7 @@ describe('Hoodie', function() {
     this.sandbox.stub(window, 'hoodiePromises', Mocks.hoodiePromises);
     this.sandbox.stub(window, 'hoodieRequest', Mocks.hoodieRequest);
     this.sandbox.stub(window, 'hoodieConnection', Mocks.hoodieConnection);
-    this.sandbox.stub(window, 'hoodieUUID', Mocks.hoodieUUID);
+    this.sandbox.stub(window, 'hoodieGenerateId', Mocks.hoodieGenerateId);
     this.sandbox.stub(window, 'hoodieDispose', Mocks.hoodieDispose);
     this.sandbox.stub(window, 'hoodieOpen', Mocks.hoodieOpen);
     this.sandbox.stub(window, 'hoodieStore', Mocks.hoodieStore);
@@ -51,8 +51,8 @@ describe('Hoodie', function() {
     it('should extend with hoodieConnection module', function() {
       expect(window.hoodieConnection).to.be.calledWith(this.hoodie);
     });
-    it('should extend with hoodieUUID module', function() {
-      expect(window.hoodieUUID).to.be.calledWith(this.hoodie);
+    it('should extend with hoodieGenerateId module', function() {
+      expect(window.hoodieGenerateId).to.be.calledWith(this.hoodie);
     });
     it('should extend with hoodieDispose module', function() {
       expect(window.hoodieDispose).to.be.calledWith(this.hoodie);

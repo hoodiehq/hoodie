@@ -270,17 +270,17 @@ describe('hoodieRemoteStore', function() {
 
   describe('#save(type, id, object)', function() {
     beforeEach(function() {
-      this.sandbox.stub(this.hoodie, 'uuid').returns('uuid567');
+      this.sandbox.stub(this.hoodie, 'generateId').returns('generateId567');
     });
 
     it('should generate an id if it is undefined', function() {
       this.storeBackend.save({type: 'car'});
-      expect(this.hoodie.uuid).to.be.called();
+      expect(this.hoodie.generateId).to.be.called();
     });
 
     it('should not generate an id if id is set', function() {
       this.storeBackend.save({type: 'car', id: '123'});
-      expect(this.hoodie.uuid).to.not.be.called();
+      expect(this.hoodie.generateId).to.not.be.called();
     });
 
     it('should return promise by @request', function() {

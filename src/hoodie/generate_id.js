@@ -1,10 +1,10 @@
-/* exported hoodieUUID */
+/* exported hoodieGenerateId */
 
-// hoodie.uuid
+// hoodie.generateId
 // =============
 
 // helper to generate unique ids.
-function hoodieUUID (hoodie) {
+function hoodieGenerateId (hoodie) {
   var chars, i, radix;
 
   // uuids consist of numbers and lowercase letters only.
@@ -15,7 +15,7 @@ function hoodieUUID (hoodie) {
   radix = chars.length;
 
 
-  function uuid(length) {
+  function generateId(length) {
     var id = '';
 
     // default uuid length to 7
@@ -35,5 +35,5 @@ function hoodieUUID (hoodie) {
   //
   // Public API
   //
-  hoodie.uuid = uuid;
+  hoodie.generateId = generateId;
 }
