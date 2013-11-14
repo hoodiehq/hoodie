@@ -1,5 +1,6 @@
 .DS_Store
 TODO.md
 node_modules
+lib/
 coverage/
 .idea
