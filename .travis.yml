@@ -1,14 +1,32 @@
 before_install:
+  - mkdir -p $LOGS_DIR
+  - ./build/sauce/sauce_connect_setup.sh
   - npm install -g bower
   - npm install -g grunt-cli
+  - ./build/sauce/sauce_connect_block.sh
 
 before_script:
   - bower install
 
+script:
+  - ./build/travis/travis_build.sh
+
+after_script:
+  - ./build/travis/travis_print_logs.sh
+
 language: node_js
+
 node_js:
   - "0.10"
   - "0.8"
+
+env:
+  global:
+    - SAUCE_USERNAME=svnlto
+    - SAUCE_ACCESS_KEY=104fe381-851b-485f-81d6-8eda57d0e40e
+    - SAUCE_CONNECT_READY_FILE=/tmp/sauce-connect-ready
+    - LOGS_DIR=/tmp/hoodiejs-build/logs
+
 notifications:
   irc:
     channels:

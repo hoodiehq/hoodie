@@ -92,7 +92,6 @@ module.exports = function(grunt) {
 
       continuous: {
         singleRun: true,
-        browsers: ['PhantomJS'],
         sauceLabs: {
           username: 'svnlto',
           accessKey: '104fe381-851b-485f-81d6-8eda57d0e40e',
@@ -105,7 +104,16 @@ module.exports = function(grunt) {
             browserName: 'chrome',
             platform: 'linux'
           }
-        }
+        },
+        browsers: [
+          'PhantomJS',
+          'SL_Chrome',
+          'SL_Safari',
+          'SL_Firefox',
+          'SL_IE_8',
+          'SL_IE_9',
+          'SL_IE_10'
+        ]
       },
 
       dev: {
