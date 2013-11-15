@@ -161,7 +161,7 @@ function hoodieAccount (hoodie) {
 
     return account.request('PUT', userDocUrl(username), options).then(
       handleSignUpSuccess(username, password),
-      handleRequestError
+      handleSignUpError(username)
     );
   };
 
@@ -649,6 +649,27 @@ function hoodieAccount (hoodie) {
       account.trigger('signup', username);
       userDoc._rev = response.rev;
       return delayedSignIn(username, password);
+    };
+  }
+
+  //
+  // handle response of a failed signUp request.
+  //
+  // In case of a conflict, reject with "username already exists" error
+  // https://github.com/hoodiehq/hoodie.js/issues/174
+  // Response looks like:
+  //
+  //     {
+  //         "error": "conflict",
+  //         "reason": "Document update conflict."
+  //     }
+  function handleSignUpError(username) {
+
+    return function(error) {
+      if (error.error === 'conflict') {
+        error.reason = 'Username ' + username + ' already exists';
+      }
+      return handleRequestError(error);
     };
   }
 
