@@ -160,7 +160,7 @@ function hoodieAccount (hoodie) {
     };
 
     return account.request('PUT', userDocUrl(username), options).then(
-      handleSignUpSucces(username, password),
+      handleSignUpSuccess(username, password),
       handleRequestError
     );
   };
@@ -643,7 +643,7 @@ function hoodieAccount (hoodie) {
   //         'rev': '1-e8747d9ae9776706da92810b1baa4248'
   //     }
   //
-  function handleSignUpSucces(username, password) {
+  function handleSignUpSuccess(username, password) {
 
     return function(response) {
       account.trigger('signup', username);
