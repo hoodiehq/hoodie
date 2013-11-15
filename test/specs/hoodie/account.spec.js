@@ -748,18 +748,37 @@ describe('hoodie.account', function () {
 
         }); // signUp successful
 
-        _when('signUp has an error', function () {
-
-          beforeEach(function () {
-            this.requestDefer.reject({
-              responseText: '{\'error\':\'forbidden\',\'reason\':\'You stink.\'}'
+        _when('signUp has a conflict error', function () {
+          beforeEach(function() {
+            this.promise = this.account.signUp('exists@example.com', 'secret');
+            this.requestDefers.pop().reject({
+              error : 'conflict',
+              reason : 'Document update conflict.'
             });
           });
 
           it('should reject its promise', function () {
-            var promise = this.account.signUp('notmyfault@example.com', 'secret');
+            this.promise.then(this.noop, function (res) {
+              expect(res).to.eql({
+                error: 'conflict',
+                reason: 'Username exists@example.com already exists'
+              });
+            });
+          });
+        }); // signUp has an error
 
-            promise.then(this.noop, function (res) {
+        _when('signUp has a generic error', function () {
+
+          beforeEach(function () {
+            this.promise = this.account.signUp('exists@example.com', 'secret');
+            this.requestDefers.pop().reject({
+              error : 'forbidden',
+              reason : 'You stink.'
+            });
+          });
+
+          it('should reject its promise', function () {
+            this.promise.then(this.noop, function (res) {
               expect(res).to.eql({
                 error: 'forbidden',
                 reason: 'You stink.'
