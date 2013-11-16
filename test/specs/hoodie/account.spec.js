@@ -748,18 +748,37 @@ describe('hoodie.account', function () {
 
         }); // signUp successful
 
-        _when('signUp has an error', function () {
-
-          beforeEach(function () {
-            this.requestDefer.reject({
-              responseText: '{\'error\':\'forbidden\',\'reason\':\'You stink.\'}'
+        _when('signUp has a conflict error', function () {
+          beforeEach(function() {
+            this.promise = this.account.signUp('exists@example.com', 'secret');
+            this.requestDefers.pop().reject({
+              error : 'conflict',
+              reason : 'Document update conflict.'
             });
           });
 
           it('should reject its promise', function () {
-            var promise = this.account.signUp('notmyfault@example.com', 'secret');
+            this.promise.then(this.noop, function (res) {
+              expect(res).to.eql({
+                error: 'conflict',
+                reason: 'Username exists@example.com already exists'
+              });
+            });
+          });
+        }); // signUp has an error
 
-            promise.then(this.noop, function (res) {
+        _when('signUp has a generic error', function () {
+
+          beforeEach(function () {
+            this.promise = this.account.signUp('exists@example.com', 'secret');
+            this.requestDefers.pop().reject({
+              error : 'forbidden',
+              reason : 'You stink.'
+            });
+          });
+
+          it('should reject its promise', function () {
+            this.promise.then(this.noop, function (res) {
               expect(res).to.eql({
                 error: 'forbidden',
                 reason: 'You stink.'
@@ -777,7 +796,7 @@ describe('hoodie.account', function () {
       this.signUpDefer = this.hoodie.defer();
 
       this.sandbox.stub(this.account, 'signUp').returns(this.signUpDefer.promise());
-      this.sandbox.stub(this.hoodie, 'uuid').returns('crazyuuid123');
+      this.sandbox.stub(this.hoodie, 'generateId').returns('crazyuuid123');
       this.sandbox.spy(this.hoodie.config, 'set');
 
       this.account.ownerHash = 'owner_hash123';
@@ -796,7 +815,7 @@ describe('hoodie.account', function () {
 
       it('should generate a password and store it locally in _account.anonymousPassword', function () {
         this.account.anonymousSignUp();
-        expect(this.hoodie.uuid).to.be.calledWith(10);
+        expect(this.hoodie.generateId).to.be.calledWith(10);
         expect(this.hoodie.config.set).to.be.calledWith('_account.anonymousPassword', 'crazyuuid123');
       });
     });
@@ -1295,7 +1314,7 @@ describe('hoodie.account', function () {
   describe('#signOut(options)', function () {
 
     beforeEach(function () {
-      this.sandbox.stub(this.hoodie, 'uuid').returns('newHash');
+      this.sandbox.stub(this.hoodie, 'generateId').returns('newHash');
       this.sandbox.spy(this.hoodie.config, 'clear');
     });
 
@@ -1525,7 +1544,7 @@ describe('hoodie.account', function () {
       this.sandbox.spy(this.hoodie.config, 'clear');
       this.sandbox.spy(this.hoodie.config, 'set');
       this.sandbox.stub(this.account, 'fetch').returns(this.fetchDefer.promise());
-      this.sandbox.stub(this.hoodie, 'uuid').returns('newHash');
+      this.sandbox.stub(this.hoodie, 'generateId').returns('newHash');
     });
 
     _when('user has account', function () {
@@ -1716,7 +1735,7 @@ describe('hoodie.account', function () {
       beforeEach(function () {
         this.sandbox.stub(this.hoodie.config, 'get').returns(void 0);
         this.sandbox.spy(this.hoodie.config, 'set');
-        this.sandbox.stub(this.hoodie, 'uuid').returns('uuid567');
+        this.sandbox.stub(this.hoodie, 'generateId').returns('uuid567');
 
         this.account.resetPassword('joe@example.com');
 

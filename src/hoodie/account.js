@@ -160,8 +160,8 @@ function hoodieAccount (hoodie) {
     };
 
     return account.request('PUT', userDocUrl(username), options).then(
-      handleSignUpSucces(username, password),
-      handleRequestError
+      handleSignUpSuccess(username, password),
+      handleSignUpError(username)
     );
   };
 
@@ -180,7 +180,7 @@ function hoodieAccount (hoodie) {
   account.anonymousSignUp = function anonymousSignUp() {
     var password, username;
 
-    password = hoodie.uuid(10);
+    password = hoodie.generateId(10);
     username = account.ownerHash;
 
     return account.signUp(username, password).done(function() {
@@ -423,7 +423,7 @@ function hoodieAccount (hoodie) {
       return account.checkPasswordReset();
     }
 
-    resetPasswordId = '' + username + '/' + (hoodie.uuid());
+    resetPasswordId = '' + username + '/' + (hoodie.generateId());
 
     hoodie.config.set('_account.resetPasswordId', resetPasswordId);
 
@@ -643,12 +643,33 @@ function hoodieAccount (hoodie) {
   //         'rev': '1-e8747d9ae9776706da92810b1baa4248'
   //     }
   //
-  function handleSignUpSucces(username, password) {
+  function handleSignUpSuccess(username, password) {
 
     return function(response) {
       account.trigger('signup', username);
       userDoc._rev = response.rev;
       return delayedSignIn(username, password);
+    };
+  }
+
+  //
+  // handle response of a failed signUp request.
+  //
+  // In case of a conflict, reject with "username already exists" error
+  // https://github.com/hoodiehq/hoodie.js/issues/174
+  // Response looks like:
+  //
+  //     {
+  //         "error": "conflict",
+  //         "reason": "Document update conflict."
+  //     }
+  function handleSignUpError(username) {
+
+    return function(error) {
+      if (error.error === 'conflict') {
+        error.reason = 'Username ' + username + ' already exists';
+      }
+      return handleRequestError(error);
     };
   }
 
@@ -903,7 +924,7 @@ function hoodieAccount (hoodie) {
     authenticated = options.authenticated;
     hoodie.config.clear();
     setUsername(options.username);
-    setOwner(options.ownerHash || hoodie.uuid());
+    setOwner(options.ownerHash || hoodie.generateId());
 
     return hoodie.resolve();
   }
@@ -1108,6 +1129,6 @@ function hoodieAccount (hoodie) {
   // Make sure we have one.
   hoodie.account.ownerHash = hoodie.config.get('_account.ownerHash');
   if (!hoodie.account.ownerHash) {
-    setOwner(hoodie.uuid());
+    setOwner(hoodie.generateId());
   }
 }

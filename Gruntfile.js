@@ -26,8 +26,7 @@ module.exports = function(grunt) {
     },
 
     watch: {
-      //files: ['<%= jshint.files %>'],
-      files: ['Gruntfile.js', 'src/**/*.js'],
+      files: ['<%= jshint.files %>'],
       tasks: ['jshint', 'shell:test']
     },
 
@@ -44,7 +43,7 @@ module.exports = function(grunt) {
           'src/hoodie/promises.js',
           'src/hoodie/request.js',
           'src/hoodie/connection.js',
-          'src/hoodie/uuid.js',
+          'src/hoodie/generate_id.js',
           'src/hoodie/dispose.js',
           'src/hoodie/open.js',
 
