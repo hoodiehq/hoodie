@@ -103,7 +103,7 @@ function hoodieRemote (hoodie) {
   //
   // subscribe to events coming from account
   //
-  function subscribeToEvents() {
+  function subscribeToOutsideEvents() {
 
     hoodie.on('remote:connect', function() {
       hoodie.on('store:idle', remote.push);
@@ -126,9 +126,9 @@ function hoodieRemote (hoodie) {
   }
 
   // allow to run this once from outside
-  remote.subscribeToEvents = function() {
-    subscribeToEvents();
-    delete remote.subscribeToEvents;
+  remote.subscribeToOutsideEvents = function() {
+    subscribeToOutsideEvents();
+    delete remote.subscribeToOutsideEvents;
   };
 
   //

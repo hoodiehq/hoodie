@@ -370,14 +370,14 @@ describe('hoodie.task', function() {
   });
 
   //
-  describe('#subscribeToStoreEvents', function() {
+  describe('#subscribeToOutsideEvents', function() {
     beforeEach(function() {
       this.sandbox.spy(this.hoodie.task, 'trigger');
-      this.hoodie.task.subscribeToStoreEvents();
+      this.hoodie.task.subscribeToOutsideEvents();
     });
 
     it('can only be run once', function() {
-      expect( this.hoodie.task.subscribeToStoreEvents ).to.eql(undefined);
+      expect( this.hoodie.task.subscribeToOutsideEvents ).to.eql(undefined);
     });
 
     it('turns "new" store events into "start" task events', function() {
@@ -426,7 +426,7 @@ describe('hoodie.task', function() {
       expect( this.hoodie.task.trigger ).to.be.calledWith( 'message:success', { type: 'message', id: '123', $processedAt: '2013-09-05' }, {option: 'value'} );
       expect( this.hoodie.task.trigger ).to.be.calledWith( 'message:123:success', { type: 'message', id: '123', $processedAt: '2013-09-05' }, {option: 'value'} );
     });
-  }); // subscribeToStoreEvents
+  }); // subscribeToOutsideEvents
 
   function now() {
     return '1970-01-01T00:00:00.000Z';

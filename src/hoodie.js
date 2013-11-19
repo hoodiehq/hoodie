@@ -120,10 +120,10 @@ function Hoodie(baseUrl) {
   hoodie.store.bootstrapDirtyObjects();
 
   // hoodie.remote
-  hoodie.remote.subscribeToEvents();
+  hoodie.remote.subscribeToOutsideEvents();
 
   // hoodie.task
-  hoodie.task.subscribeToStoreEvents();
+  hoodie.task.subscribeToOutsideEvents();
 
   // authenticate
   // we use a closure to not pass the username to connect, as it
