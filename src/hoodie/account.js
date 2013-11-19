@@ -57,7 +57,7 @@ function hoodieAccount (hoodie) {
       return requests.signIn;
     }
 
-    // if username is not set, make sure to end the session
+    // if user has no account, make sure to end the session
     if (! account.hasAccount()) {
       return sendSignOutRequest().then(function() {
         authenticated = false;
