@@ -538,8 +538,28 @@ function hoodieAccount (hoodie) {
   };
 
 
+  //
+  // subscribe to events coming outside
+  //
+  function subscribeToOutsideEvents() {
+    hoodie.on('remote:error:unauthenticated', reauthenticate);
+  }
+
+  // allow to run this once from outside
+  account.subscribeToOutsideEvents = function() {
+    subscribeToOutsideEvents();
+    delete account.subscribeToOutsideEvents;
+  };
+
+
   // PRIVATE
   // ---------
+
+  // reauthenticate: force hoodie to reauthenticate
+  function reauthenticate () {
+    authenticated = undefined;
+    return account.authenticate();
+  }
 
   // setters
   function setUsername(newUsername) {
