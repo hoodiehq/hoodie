@@ -99,11 +99,11 @@ describe('Hoodie', function() {
     });
 
     it('inits task module', function() {
-      expect(this.hoodie.task.subscribeToStoreEvents).to.be.called();
+      expect(this.hoodie.task.subscribeToOutsideEvents).to.be.called();
     });
 
     it('inits remote module', function() {
-      expect(this.hoodie.remote.subscribeToEvents).to.be.called();
+      expect(this.hoodie.remote.subscribeToOutsideEvents).to.be.called();
     });
 
     it('connects to remote when authenticate succeeds', function() {

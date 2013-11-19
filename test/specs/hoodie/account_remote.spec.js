@@ -85,7 +85,7 @@ describe('hoodie.remote', function() {
     });
   });
 
-  describe('#subscribeToEvents', function() {
+  describe('#subscribeToOutsideEvents', function() {
     beforeEach(function() {
       var events = {};
 
@@ -94,7 +94,7 @@ describe('hoodie.remote', function() {
       });
       this.sandbox.spy(this.hoodie, 'unbind');
       this.sandbox.spy(this.hoodie.config, 'set');
-      this.remote.subscribeToEvents();
+      this.remote.subscribeToOutsideEvents();
       this.hoodie.on.reset();
       this.events = events;
     });

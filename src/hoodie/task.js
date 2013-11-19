@@ -107,16 +107,16 @@ function hoodieTask(hoodie) {
   // we subscribe to all store changes, pipe through the task ones,
   // making a few changes along the way.
   //
-  function subscribeToStoreEvents() {
+  function subscribeToOutsideEvents() {
 
     // account events
     hoodie.on('store:change', handleStoreChange);
   }
 
   // allow to run this only once from outside (during Hoodie initialization)
-  api.subscribeToStoreEvents = function() {
-    subscribeToStoreEvents();
-    delete api.subscribeToStoreEvents;
+  api.subscribeToOutsideEvents = function() {
+    subscribeToOutsideEvents();
+    delete api.subscribeToOutsideEvents;
   };
 
 

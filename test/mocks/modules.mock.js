@@ -76,7 +76,7 @@ Mocks.hoodieAccount = function(hoodie) {
 Mocks.hoodieRemote = function(hoodie) {
   var api = {
     loadListOfKnownObjectsFromLocalStore : sinon.spy(),
-    subscribeToEvents : sinon.spy(),
+    subscribeToOutsideEvents : sinon.spy(),
     connect : sinon.spy()
   };
 
