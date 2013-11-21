@@ -2,5 +2,8 @@
     "name": "project1",
     "version": "0.0.1",
     "description": "test project",
-    "dependencies": {}
+    "dependencies": {},
+    "hoodie": {
+        "plugins": []
+    }
 }

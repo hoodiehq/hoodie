@@ -41,14 +41,14 @@ module.exports = function (grunt) {
   // Default task.
   grunt.registerTask('default', [
     'jshint',
-    'simplemocha:full',
-    'nodeunit:all'
+    'nodeunit:all',
+    'simplemocha:full'
   ]);
 
   grunt.registerTask('test', [
     'jshint',
-    'simplemocha:full',
-    'nodeunit:all'
+    'nodeunit:all',
+    'simplemocha:full'
   ]);
 
 };

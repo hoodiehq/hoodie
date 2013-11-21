@@ -3,9 +3,9 @@ var couchr = require('couchr'),
     environment = require('../lib/environment'),
     config = require('../lib/config'),
     app = require('../lib/app'),
-    rimraf = require('rimraf'),
     path = require('path'),
-    url = require('url');
+    url = require('url'),
+    utils = require('./lib/utils');
 
 
 exports['check config dbs are private to admin'] = function (test) {
@@ -20,7 +20,7 @@ exports['check config dbs are private to admin'] = function (test) {
 
   cfg.admin_password = 'testing';
 
-  rimraf(path.resolve(project_dir, 'data'), function (err) {
+  utils.resetFixture(project_dir, function (err) {
     if (err) {
       return test.done(err);
     }
