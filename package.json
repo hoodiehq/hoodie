@@ -43,6 +43,7 @@
     "grunt": "~0.4.1",
     "expect.js": "~0.2.0",
     "grunt-simple-mocha": "~0.4.0",
+    "grunt-contrib-nodeunit": "~0.2.2",
     "sinon": "~1.7.3",
     "grunt-contrib-jshint": "~0.6.2",
     "grunt-contrib-watch": "~0.5.1",
