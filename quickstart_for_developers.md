@@ -19,6 +19,18 @@ That's all you need. Make your changes, run the test, send a pull request, win k
 ```
 
 
+Conventions
+-------------
+
+* we use camelCase for `code` & `object` properties
+* every object has a `type` and an `id` attribute, that gets combined for couchDB to `_id` in the form of {type}/{id}.
+* we only allow characters in `type` & `id` that are also allowed for couchDB database names
+* tasks are just objects, with `type` prefixed by `$`
+* all events are lowercase letters only
+* every user has a database, the name is user/{userHash}
+* if plugins create own databases, we encourage them to follow the convention
+
+
 hoodie backend (server)
 -----------------------
 
