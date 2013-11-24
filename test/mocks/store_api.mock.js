@@ -8,6 +8,9 @@ Mocks.StoreApi = function () {
   o.api.one = sinon.stub();
   o.api.unbind = sinon.stub();
 
+  o.api.hasLocalChanges = sinon.stub();
+  o.api.changedObjects = sinon.stub();
+
   o.api.saveDefer = $.Deferred();
   o.api.addDefer = $.Deferred();
   o.api.findOrAddDefer = $.Deferred();
