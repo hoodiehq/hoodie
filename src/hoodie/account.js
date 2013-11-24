@@ -322,8 +322,11 @@ function hoodieAccount (hoodie) {
         }
       });
     }
-    hoodie.remote.disconnect();
-    return sendSignOutRequest().then(cleanupAndTriggerSignOut);
+
+    return pushLocalChanges(options)
+    .then(hoodie.remote.disconnect)
+    .then(sendSignOutRequest)
+    .then(cleanupAndTriggerSignOut);
   };
 
 
@@ -1076,6 +1079,17 @@ function hoodieAccount (hoodie) {
     return requests[name];
   }
 
+
+  //
+  // push local changes when user signs out, unless he enforces sign out
+  // in any case with `{ignoreLocalChanges: true}`
+  //
+  function pushLocalChanges(options) {
+    if(hoodie.store.hasLocalChanges() && !options.ignoreLocalChanges) {
+      return hoodie.remote.push();
+    }
+    return hoodie.resolve();
+  }
 
   //
   function sendSignOutRequest() {
