@@ -48,7 +48,7 @@ function hoodieAccount (hoodie) {
     // but pipe it so that it always ends up rejected
     //
     if (requests.signOut && requests.signOut.state() === 'pending') {
-      return requests.signOut.then(hoodie.rejectWith);
+      return requests.signOut.then(hoodie.reject);
     }
 
     // if there is a pending signIn request, return its promise
@@ -125,9 +125,7 @@ function hoodieAccount (hoodie) {
     }
 
     if (!username) {
-      return hoodie.rejectWith({
-        error: 'username must be set'
-      });
+      return hoodie.rejectWith('Username must be set.');
     }
 
     if (account.hasAnonymousAccount()) {
@@ -135,9 +133,7 @@ function hoodieAccount (hoodie) {
     }
 
     if (account.hasAccount()) {
-      return hoodie.rejectWith({
-        error: 'you have to sign out first'
-      });
+      return hoodie.rejectWith('Must sign out first.');
     }
 
     // downcase username
@@ -361,8 +357,8 @@ function hoodieAccount (hoodie) {
 
     if (!username) {
       return hoodie.rejectWith({
-        error: 'unauthenticated',
-        reason: 'not logged in'
+        name: 'HoodieUnauthorizedError',
+        message: 'Not signed in'
       });
     }
 
@@ -389,8 +385,8 @@ function hoodieAccount (hoodie) {
 
     if (!account.username) {
       return hoodie.rejectWith({
-        error: 'unauthenticated',
-        reason: 'not logged in'
+        name: 'HoodieUnauthorizedError',
+        message: 'Not signed in'
       });
     }
 
@@ -474,9 +470,7 @@ function hoodieAccount (hoodie) {
     resetPasswordId = hoodie.config.get('_account.resetPasswordId');
 
     if (!resetPasswordId) {
-      return hoodie.rejectWith({
-        error: 'missing'
-      });
+      return hoodie.rejectWith('No pending password reset.');
     }
 
     // send request to check status of password reset
@@ -495,7 +489,7 @@ function hoodieAccount (hoodie) {
         handlePasswordResetStatusRequestSuccess,
         handlePasswordResetStatusRequestError
       ).fail(function(error) {
-        if (error.error === 'pending') {
+        if (error.name === 'HoodiePendingError') {
           window.setTimeout(account.checkPasswordReset, 1000);
           return;
         }
@@ -614,7 +608,7 @@ function hoodieAccount (hoodie) {
 
     error = error || {};
 
-    if (error.reason) {
+    if (error.name) {
       return hoodie.rejectWith(error);
     }
 
@@ -625,7 +619,7 @@ function hoodieAccount (hoodie) {
     } catch (_error) {
       e = _error;
       error = {
-        error: xhr.responseText || 'unknown'
+        message: xhr.responseText || 'Unknown'
       };
     }
 
@@ -657,17 +651,17 @@ function hoodieAccount (hoodie) {
   //
   // In case of a conflict, reject with "username already exists" error
   // https://github.com/hoodiehq/hoodie.js/issues/174
-  // Response looks like:
+  // Error passed for hoodie.request looks like this
   //
   //     {
-  //         "error": "conflict",
-  //         "reason": "Document update conflict."
+  //         "name": "HoodieConflictError",
+  //         "message": "Object already exists."
   //     }
   function handleSignUpError(username) {
 
     return function(error) {
-      if (error.error === 'conflict') {
-        error.reason = 'Username ' + username + ' already exists';
+      if (error.name === 'HoodieConflictError') {
+        error.message = 'Username ' + username + ' already exists';
       }
       return handleRequestError(error);
     };
@@ -692,7 +686,7 @@ function hoodieAccount (hoodie) {
       var promise = sendSignInRequest(username, password);
       promise.done(defer.resolve);
       promise.fail(function(error) {
-        if (error.error === 'unconfirmed') {
+        if (error.name === 'HoodieAccountUnconfirmedError') {
 
           // It might take a bit until the account has been confirmed
           delayedSignIn(username, password, options, defer);
@@ -740,10 +734,7 @@ function hoodieAccount (hoodie) {
       //
       if (response.roles.indexOf('error') !== -1) {
         account.fetch(username).fail(defer.reject).done(function() {
-          return defer.reject({
-            error: 'error',
-            reason: userDoc.$error
-          });
+          return defer.reject(userDoc.$error);
         });
         return defer.promise();
       }
@@ -757,8 +748,8 @@ function hoodieAccount (hoodie) {
       //
       if (response.roles.indexOf('confirmed') === -1) {
         return defer.reject({
-          error: 'unconfirmed',
-          reason: 'account has not been confirmed yet'
+          name: 'HoodieAccountUnconfirmedError',
+          message: 'Account has not been confirmed yet'
         });
       }
 
@@ -793,8 +784,8 @@ function hoodieAccount (hoodie) {
   //
   // If the request was successful there might have occured an
   // error, which the worker stored in the special $error attribute.
-  // If that happens, we return a rejected promise with the $error,
-  // error. Otherwise reject the promise with a 'pending' error,
+  // If that happens, we return a rejected promise with the error
+  // Otherwise reject the promise with a 'pending' error,
   // as we are not waiting for a success full response, but a 401
   // error, indicating that our password was changed and our
   // current session has been invalidated
@@ -805,7 +796,10 @@ function hoodieAccount (hoodie) {
     if (response.$error) {
       error = response.$error;
     } else {
-      error = { error: 'pending' };
+      error = {
+        name: 'HoodiePendingError',
+        message: 'Password reset is still pending'
+      };
     }
     return hoodie.rejectWith(error);
   }
@@ -816,7 +810,7 @@ function hoodieAccount (hoodie) {
   // In this case we resolve the promise.
   //
   function handlePasswordResetStatusRequestError(error) {
-    if (error.error === 'unauthorized') {
+    if (error.name === 'HoodieUnauthorizedError') {
       hoodie.config.unset('_account.resetPasswordId');
       account.trigger('passwordreset');
 
@@ -900,13 +894,13 @@ function hoodieAccount (hoodie) {
   //
   // dependend on what kind of error we get, we want to ignore
   // it or not.
-  // When we get a 'not_found' it means that the _users doc habe
+  // When we get a 'HoodieNotFoundError' it means that the _users doc habe
   // been removed already, so we don't need to do it anymore, but
   // still want to finish the destroy locally, so we return a
   // resolved promise
   //
   function handleFetchBeforeDestroyError(error) {
-    if (error.error === 'not_found') {
+    if (error.name === 'HoodieNotFoundError') {
       return hoodie.resolve();
     } else {
       return hoodie.rejectWith(error);

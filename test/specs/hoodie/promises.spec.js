@@ -64,9 +64,9 @@ describe('hoodie promises API', function() {
     });
 
     it('should be applyable', function() {
-      var promise = this.hoodie.rejectWith(1, 2).then(null, this.hoodie.resolveWith);
-      promise.then(function (a, b) {
-        expect(a, b).to.eql('1', '2');
+      var promise = this.hoodie.rejectWith('FUNKY!').then(null, this.hoodie.resolveWith);
+      promise.then(function (error) {
+        expect(error.message).to.eql('FUNKY!');
       });
     });
 
@@ -74,19 +74,28 @@ describe('hoodie promises API', function() {
 
   describe('#rejectWith(something)', function() {
 
-    it('wraps passad arguments into a promise and returns it', function() {
-      var promise = this.hoodie.rejectWith('funky', 'fresh');
+    it('wraps passad arguments into a promise and returns it as Error', function() {
+      var promise = this.hoodie.rejectWith('funk overflow!');
 
-      promise.then(this.noop, function (a, b) {
-        expect(a, b).to.eql('funky', 'fresh');
+      promise.then(this.noop, function (error) {
+        expect(error).to.be.an(Error);
+        expect(error).to.eql({
+          name: 'HoodieError',
+          message: 'funk overflow!'
+        });
       });
 
     });
 
     it('should be applyable', function() {
-      var promise = this.hoodie.resolveWith(1, 2).then(this.hoodie.rejectWith);
-      promise.then(this.noop, function (a, b) {
-        expect(a, b).to.eql('1', '2');
+      var promise = this.hoodie.resolveWith('wicked!').then(this.hoodie.rejectWith);
+      promise.then(this.noop, function (error) {
+        expect(error).to.be.an(Error);
+        expect(error.name).to.eql('HoodieError');
+        expect(error).to.eql({
+          name: 'HoodieError',
+          message: 'wicked!'
+        });
       });
     });
 

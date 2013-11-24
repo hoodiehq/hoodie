@@ -1,3 +1,4 @@
+/* global HoodieError */
 /* exported hoodiePromises */
 
 // Hoodie Defers / Promises
@@ -47,9 +48,10 @@ function hoodiePromises (hoodie) {
   }
 
   //
-  function rejectWith() {
+  function rejectWith(errorProperties) {
     var _defer = $defer();
-    return _defer.reject.apply(_defer, arguments).promise();
+    var error = new HoodieError(errorProperties);
+    return _defer.reject(error).promise();
   }
 
   //
