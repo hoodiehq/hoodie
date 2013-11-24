@@ -1820,12 +1820,16 @@ describe('hoodie.account', function () {
 
       _when('reset Password request is not successful', function () {
         beforeEach(function () {
-          this.requestDefer.reject({responseText: '{"name": "OoopsError"}'});
+          this.requestDefer.reject({
+            name: 'OoopsError',
+            message: 'Something here'
+          });
         });
 
         it('should be rejected with the error', function () {
           expect(this.account.resetPassword('joe@example.com')).to.be.rejectedWith({
-            name: 'OoopsError'
+            name: 'OoopsError',
+            message: 'Something here'
           });
         });
       });
@@ -1940,7 +1944,10 @@ describe('hoodie.account', function () {
           _but('signIn has an error', function () {
 
             beforeEach(function () {
-              this.requestDefers[2].reject();
+              this.requestDefers[2].reject({
+                name: 'HoodieError',
+                message: 'Something is wrong'
+              });
             });
 
             it('should be rejected', function () {

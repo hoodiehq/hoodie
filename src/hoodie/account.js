@@ -70,8 +70,7 @@ function hoodieAccount (hoodie) {
     //
     sendAndHandleAuthRequest = function() {
       return account.request('GET', '/_session').then(
-        handleAuthenticateRequestSuccess,
-        handleRequestError
+        handleAuthenticateRequestSuccess
       );
     };
 
@@ -363,10 +362,7 @@ function hoodieAccount (hoodie) {
     }
 
     return withSingleRequest('fetch', function() {
-      return account.request('GET', userDocUrl(username)).then(
-        null,
-        handleRequestError
-      ).done(function(response) {
+      return account.request('GET', userDocUrl(username)).done(function(response) {
         userDoc = response;
         return userDoc;
       });
@@ -393,8 +389,7 @@ function hoodieAccount (hoodie) {
     hoodie.remote.disconnect();
 
     return account.fetch().then(
-      sendChangeUsernameAndPasswordRequest(currentPassword, null, newPassword),
-      handleRequestError
+      sendChangeUsernameAndPasswordRequest(currentPassword, null, newPassword)
     );
   };
 
@@ -442,9 +437,7 @@ function hoodieAccount (hoodie) {
 
     // TODO: spec that checkPasswordReset gets executed
     return withPreviousRequestsAborted('resetPassword', function() {
-      return account.request('PUT', '/_users/' + (encodeURIComponent(key)), options).then(
-        null, handleRequestError
-      ).done( account.checkPasswordReset )
+      return account.request('PUT', '/_users/' + (encodeURIComponent(key)), options).done( account.checkPasswordReset )
       .then( awaitPasswordResetResult );
     });
   };
@@ -596,38 +589,6 @@ function hoodieAccount (hoodie) {
 
 
   //
-  // standard error handling for AJAX requests
-  //
-  // in some case we get the object error directly,
-  // in others we get an xhr or even just a string back
-  // when the couch died entirely. Whe have to handle
-  // each case
-  //
-  function handleRequestError(error) {
-    var e;
-
-    error = error || {};
-
-    if (error.name) {
-      return hoodie.rejectWith(error);
-    }
-
-    var xhr = error;
-
-    try {
-      error = JSON.parse(xhr.responseText);
-    } catch (_error) {
-      e = _error;
-      error = {
-        message: xhr.responseText || 'Unknown'
-      };
-    }
-
-    return hoodie.rejectWith(error);
-  }
-
-
-  //
   // handle response of a successful signUp request.
   // Response looks like:
   //
@@ -663,7 +624,7 @@ function hoodieAccount (hoodie) {
       if (error.name === 'HoodieConflictError') {
         error.message = 'Username ' + username + ' already exists';
       }
-      return handleRequestError(error);
+      return hoodie.rejectWith(error);
     };
   }
 
@@ -1008,8 +969,7 @@ function hoodieAccount (hoodie) {
 
       return withPreviousRequestsAborted('updateUsersDoc', function() {
         return account.request('PUT', userDocUrl(), options).then(
-          handleChangeUsernameAndPasswordRequest(newUsername, newPassword || currentPassword),
-          handleRequestError
+          handleChangeUsernameAndPasswordRequest(newUsername, newPassword || currentPassword)
         );
       });
 
@@ -1074,7 +1034,7 @@ function hoodieAccount (hoodie) {
   //
   function sendSignOutRequest() {
     return withSingleRequest('signOut', function() {
-      return account.request('DELETE', '/_session').then(null, handleRequestError);
+      return account.request('DELETE', '/_session');
     });
   }
 
@@ -1101,8 +1061,7 @@ function hoodieAccount (hoodie) {
       var promise = account.request('POST', '/_session', requestOptions);
 
       return promise.then(
-        handleSignInSuccess(options),
-        handleRequestError
+        handleSignInSuccess(options)
       );
     });
   }

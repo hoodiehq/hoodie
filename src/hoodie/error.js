@@ -25,7 +25,7 @@
 //
 // ### Error Conventions
 //
-// We follow JavaScript's native erro conventions,
+// We follow JavaScript's native error conventions,
 // meaning that error names are camelCase with the
 // first letter uppercase as well, and the message
 // starting with an uppercase letter.
