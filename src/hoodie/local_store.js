@@ -25,10 +25,6 @@ function hoodieStore (hoodie) {
   // queue of method calls done during bootstrapping
   var queue = [];
 
-  // 2 seconds timout before triggering the `store:idle` event
-  //
-  var idleTimeout = 2000;
-
 
 
 
@@ -683,8 +679,7 @@ function hoodieStore (hoodie) {
 
 
   //
-  // Marks object as changed (dirty). Triggers a `store:dirty` event immediately and a
-  // `store:idle` event once there is no change within 2 seconds
+  // Marks object as changed (dirty). Triggers a `store:dirty` event
   //
   function markAsChanged(type, id, object, options) {
     var key;
@@ -699,7 +694,7 @@ function hoodieStore (hoodie) {
       return;
     }
 
-    triggerDirtyAndIdleEvents();
+    store.trigger('dirty');
   }
 
   // Clear changed
@@ -716,7 +711,6 @@ function hoodieStore (hoodie) {
       dirty = {};
     }
     saveDirtyIds();
-    return window.clearTimeout(dirtyTimeout);
   }
 
 
@@ -736,7 +730,7 @@ function hoodieStore (hoodie) {
       }
 
       saveDirtyIds();
-      triggerDirtyAndIdleEvents();
+      store.trigger('dirty');
     });
   }
 
@@ -887,24 +881,6 @@ function hoodieStore (hoodie) {
       // https://github.com/hoodiehq/hoodie.js/issues/146
       store.trigger('change:' + object.type + ':' + object.id, eventName, $.extend(true, {}, object), options);
     }
-  }
-
-  // when an object gets changed, two special events get triggerd:
-  //
-  // 1. dirty event
-  //    the `dirty` event gets triggered immediately, for every
-  //    change that happens.
-  // 2. idle event
-  //    the `idle` event gets triggered after a short timeout of
-  //    no changes, e.g. 2 seconds.
-  var dirtyTimeout;
-  function triggerDirtyAndIdleEvents() {
-    store.trigger('dirty');
-    window.clearTimeout(dirtyTimeout);
-
-    dirtyTimeout = window.setTimeout(function() {
-      store.trigger('idle', store.changedObjects());
-    }, idleTimeout);
   }
 
   //

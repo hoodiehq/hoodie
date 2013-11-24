@@ -76,8 +76,6 @@ describe('hoodie.store', function() {
       this.hoodie.trigger('account:signup');
       expect(localStorage.setItem).to.be.calledWith('_dirty', 'doc/funky,doc/fresh');
       expect(this.store.trigger).to.be.calledWith('dirty');
-      this.clock.tick(2000);
-      expect(this.store.trigger).to.be.calledWith('idle', 'changedObjects');
     });
 
     it('should trigger "sync" events on objects that got pushed', function() {
