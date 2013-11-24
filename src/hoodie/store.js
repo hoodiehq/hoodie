@@ -391,7 +391,7 @@ function hoodieStoreApi(hoodie, options) {
 
   // / not allowed for id
   var validIdOrTypePattern = /^[^\/]+$/;
-  var validIdOrTypeRules = "/ not allowed";
+  var validIdOrTypeRules = '/ not allowed';
 
   //
   function decoratePromise(promise) {
