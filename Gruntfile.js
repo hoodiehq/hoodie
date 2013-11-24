@@ -27,7 +27,7 @@ module.exports = function(grunt) {
 
     watch: {
       files: ['<%= jshint.files %>'],
-      tasks: ['jshint', 'karma:dev']
+      tasks: ['karma:dev']
     },
 
     concat: {
