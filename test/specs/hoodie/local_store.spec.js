@@ -1089,7 +1089,7 @@ describe('hoodie.store', function() {
           this.removeDefer.reject('ooops');
         });
 
-        it.only('resolves with the results of the store.remove calls', function() {
+        it('resolves with the results of the store.remove calls', function() {
           expect(this.promise).to.be.rejectedWith('ooops');
         });
       });
