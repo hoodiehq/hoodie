@@ -95,27 +95,13 @@ module.exports = function(grunt) {
       continuous: {
         singleRun: true,
         sauceLabs: {
-<<<<<<< HEAD
-<<<<<<< HEAD
           username: 'hoodie',
           accessKey: '1f6164de-f3d1-4af9-83d0-5358b42fbe56',
-=======
-          username: 'svnlto',
-          accessKey: '104fe381-851b-485f-81d6-8eda57d0e40e',
->>>>>>> [wip]
-=======
-          username: 'gr2m',
-          accessKey: '92dba37c-55e8-44b8-9b12-83f649dcee65',
->>>>>>> [fix] removed invalid stub on localStorage.length
           testName: 'hoodie.js test'
         },
         customLaunchers: {
           sl_chrome_mac: {
-<<<<<<< HEAD
-<<<<<<< HEAD
             base: 'SauceLabs',
-<<<<<<< HEAD
-<<<<<<< HEAD
             platform: 'mac 10.8',
             browserName: 'chrome'
           },
@@ -129,7 +115,6 @@ module.exports = function(grunt) {
             platform: 'Windows 7',
             browserName: 'Firefox'
           },
-<<<<<<< HEAD
           // IE 10 & 11 is WIP
           // sl_ie10_win7: {
           //   base: 'SauceLabs',
@@ -151,93 +136,6 @@ module.exports = function(grunt) {
           'sl_firefox_win7',
           // 'sl_ie10_win7',
           // 'sl_ie11_win8'
-=======
-            browserName: 'chrome',
-            platform: 'linux'
-=======
-=======
-            base: 'SauceLabs',
->>>>>>> [wip] travis setup
-            os: 'OS X 10.8',
-            browser: 'googlechrome'
->>>>>>> [wip]
-=======
-            platform: 'mac 10.8',
-            browserName: 'chrome'
->>>>>>> [wip]
-          },
-          sl_safari_mac: {
-            base: 'SauceLabs',
-            platform: 'mac 10.8',
-            browserName: 'safari'
-          },
-=======
-          sl_ie9_win7: {
-            base: 'SauceLabs',
-            platform: 'Windows 7',
-            browserName: 'iexplorer',
-            version: 9
-          },
-          sl_ie10_win7: {
-            base: 'SauceLabs',
-            platform: 'Windows 7',
-            browserName: 'iexplorer',
-            version: 10
-          }
->>>>>>> [fix] removed invalid stub on localStorage.length
-          // [wip] windows support
-          //sl_ie8_windows7: {
-            //base: 'SauceLabs',
-            //platform: 'Windows XP',
-            //browserName: 'iehta',
-            //version: 8
-          //},
-          //sl_ie9_windows: {
-            //base: 'SauceLabs',
-            //browserName: 'iexplorer',
-            //version: 9
-          //},
-          //sl_ie10_windows: {
-            //base: 'SauceLabs',
-            //browserName: 'iexplorer',
-            //version: 10
-          //}
-
-        },
-        browsers: [
-<<<<<<< HEAD
-          'PhantomJS',
-<<<<<<< HEAD
-<<<<<<< HEAD
-          'SL_Chrome',
-          'SL_Safari',
-          'SL_Firefox',
-          'SL_IE_8',
-          'SL_IE_9',
-          'SL_IE_10'
->>>>>>> [feature wip] saucelabs travis integration
-=======
-          'sl_chrome_linux',
-          'sl_firefox_linux'
->>>>>>> [fix] SL browsers
-=======
-          'sl_chrome_mac',
-          'sl_safari_mac',
-<<<<<<< HEAD
-          'sl_ie8_windows7',
-          'sl_ie9_windows7',
-          'sl_ie10_windows7'
->>>>>>> [wip]
-=======
->>>>>>> [wip]
-=======
-          // 'PhantomJS',
-          // 'sl_chrome_mac',
-          // 'sl_safari_mac',
-          'sl_firefox_win7',
-          // 'sl_ie9_win7',
-          // 'sl_ie10_win7'
->>>>>>> [fix] removed invalid stub on localStorage.length
         ]
       },
 
@@ -268,6 +166,6 @@ module.exports = function(grunt) {
 
   grunt.registerTask('default', ['jshint', 'concat', 'uglify']);
   grunt.registerTask('build', ['jshint', 'karma:continuous', 'concat', 'uglify']);
-  grunt.registerTask('test', ['jshint', 'karma:continuous']);
+  grunt.registerTask('test', ['karma:dev']);
   grunt.registerTask('docs', ['groc']);
 };
