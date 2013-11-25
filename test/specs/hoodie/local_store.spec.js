@@ -9,7 +9,6 @@ describe('hoodie.store', function() {
     this.sandbox.stub(window.localStorage, 'setItem');
     this.sandbox.stub(window.localStorage, 'removeItem');
     this.sandbox.stub(window.localStorage, 'key');
-    this.sandbox.stub(window.localStorage, 'length');
 
     this.clock = this.sandbox.useFakeTimers(0); // '1970-01-01 00:00:00'
 

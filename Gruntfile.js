@@ -93,8 +93,8 @@ module.exports = function(grunt) {
       continuous: {
         singleRun: true,
         sauceLabs: {
-          username: 'svnlto',
-          accessKey: '104fe381-851b-485f-81d6-8eda57d0e40e',
+          username: 'gr2m',
+          accessKey: '92dba37c-55e8-44b8-9b12-83f649dcee65',
           testName: 'hoodie.js test'
         },
         customLaunchers: {
@@ -108,6 +108,23 @@ module.exports = function(grunt) {
             platform: 'mac 10.8',
             browserName: 'safari'
           },
+          sl_firefox_win7: {
+            base: 'SauceLabs',
+            platform: 'Windows 7',
+            browserName: 'Firefox'
+          },
+          sl_ie9_win7: {
+            base: 'SauceLabs',
+            platform: 'Windows 7',
+            browserName: 'iexplorer',
+            version: 9
+          },
+          sl_ie10_win7: {
+            base: 'SauceLabs',
+            platform: 'Windows 7',
+            browserName: 'iexplorer',
+            version: 10
+          }
           // [wip] windows support
           //sl_ie8_windows7: {
             //base: 'SauceLabs',
@@ -128,9 +145,12 @@ module.exports = function(grunt) {
 
         },
         browsers: [
-          'PhantomJS',
-          'sl_chrome_mac',
-          'sl_safari_mac',
+          // 'PhantomJS',
+          // 'sl_chrome_mac',
+          // 'sl_safari_mac',
+          'sl_firefox_win7',
+          // 'sl_ie9_win7',
+          // 'sl_ie10_win7'
         ]
       },
 
