@@ -5,11 +5,20 @@ describe('hoodie.store', function() {
   beforeEach(function() {
     this.hoodie = new Mocks.Hoodie();
 
-    this.sandbox.stub(window.localStorage, 'getItem');
-    this.sandbox.stub(window.localStorage, 'setItem');
-    this.sandbox.stub(window.localStorage, 'removeItem');
-    this.sandbox.stub(window.localStorage, 'key');
-    this.sandbox.stub(window.localStorage, 'length');
+    // see https://github.com/pivotal/jasmine/issues/299
+    Object.defineProperty(localStorage, 'setItem', { writable: true });
+    Object.defineProperty(localStorage, 'getItem', { writable: true });
+    Object.defineProperty(localStorage, 'removeItem', { writable: true });
+    Object.defineProperty(localStorage, 'key', { writable: true });
+    localStorage.setItem = function() {};
+    localStorage.getItem = function() {};
+    localStorage.removeItem = function() {};
+    localStorage.key = function() {};
+
+    this.sandbox.stub(localStorage, 'getItem');
+    this.sandbox.stub(localStorage, 'setItem');
+    this.sandbox.stub(localStorage, 'removeItem');
+    this.sandbox.stub(localStorage, 'key');
 
     this.clock = this.sandbox.useFakeTimers(0); // '1970-01-01 00:00:00'
 
@@ -27,7 +36,7 @@ describe('hoodie.store', function() {
       expect( this.store.patchIfNotPersistant ).to.eql(undefined);
     });
 
-    _when('store is persistant', function() {
+    _when('store is persistent', function() {
       beforeEach(function() {
         this.sandbox.stub(this.store, 'isPersistent').returns(true);
         this.store.patchIfNotPersistant();
@@ -37,9 +46,9 @@ describe('hoodie.store', function() {
         this.storeBackend.find('task', '123');
         expect(window.localStorage.getItem).to.be.called();
       });
-    }); // store is not persistant
+    }); // store is not persistent
 
-    _when('store is not persistant', function() {
+    _when('store is not persistent', function() {
       beforeEach(function() {
         this.sandbox.stub(this.store, 'isPersistent').returns(false);
         this.store.patchIfNotPersistant();
@@ -49,7 +58,7 @@ describe('hoodie.store', function() {
         this.storeBackend.find('task', '123');
         expect(window.localStorage.getItem).to.not.be.called();
       });
-    }); // store is not persistant
+    }); // store is not persistent
   }); // patchIfNotPersistant
 
   //

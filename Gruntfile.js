@@ -27,7 +27,7 @@ module.exports = function(grunt) {
 
     watch: {
       files: ['<%= jshint.files %>'],
-      tasks: ['shell:test']
+      tasks: ['karma:dev']
     },
 
     concat: {
@@ -84,12 +84,71 @@ module.exports = function(grunt) {
       }
     },
 
-    shell: {
-      test: {
-        command: 'node node_modules/karma/bin/karma start',
-        options: {
-          stdout: true,
-          stderr: true
+    karma: {
+      options: {
+        configFile: 'karma.conf.js',
+        browsers: ['PhantomJS']
+      },
+
+      continuous: {
+        singleRun: true,
+        sauceLabs: {
+          username: 'hoodie',
+          accessKey: '1f6164de-f3d1-4af9-83d0-5358b42fbe56',
+          testName: 'hoodie.js test'
+        },
+        customLaunchers: {
+          sl_chrome_mac: {
+            base: 'SauceLabs',
+            platform: 'mac 10.8',
+            browserName: 'chrome'
+          },
+          sl_safari_mac: {
+            base: 'SauceLabs',
+            platform: 'mac 10.8',
+            browserName: 'safari'
+          },
+          sl_firefox_win7: {
+            base: 'SauceLabs',
+            platform: 'Windows 7',
+            browserName: 'Firefox'
+          },
+          // IE 10 & 11 is WIP
+          // sl_ie10_win7: {
+          //   base: 'SauceLabs',
+          //   platform: 'Windows 7',
+          //   browserName: 'internet explorer',
+          //   version: '10'
+          // },
+          // sl_ie11_win8: {
+          //   base: 'SauceLabs',
+          //   platform: 'Windows 8.1',
+          //   browserName: 'internet explorer',
+          //   version: '11'
+          // }
+        },
+        browsers: [
+          'PhantomJS',
+          'sl_chrome_mac',
+          'sl_safari_mac',
+          'sl_firefox_win7',
+          // 'sl_ie10_win7',
+          // 'sl_ie11_win8'
+        ]
+      },
+
+      dev: {
+        browsers: ['PhantomJS']
+      },
+
+      coverage: {
+        reporters: ['progress', 'coverage'],
+        preprocessors: {
+          'src/**/*.js': ['coverage']
+        },
+        coverageReporter: {
+          type : 'html',
+          dir : 'coverage/'
         }
       }
     }
@@ -101,10 +160,10 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-contrib-watch');
   grunt.loadNpmTasks('grunt-contrib-concat');
   grunt.loadNpmTasks('grunt-groc');
-  grunt.loadNpmTasks('grunt-shell');
+  grunt.loadNpmTasks('grunt-karma');
 
   grunt.registerTask('default', ['jshint', 'concat', 'uglify']);
-  grunt.registerTask('build', ['jshint', 'shell:test', 'concat', 'uglify']);
-  grunt.registerTask('test', ['shell:test']);
+  grunt.registerTask('build', ['jshint', 'karma:continuous', 'concat', 'uglify']);
+  grunt.registerTask('test', ['karma:dev']);
   grunt.registerTask('docs', ['groc']);
 };

@@ -1,9 +1,23 @@
-before_script:
+before_install:
+  - ./support/sauce/sauce_connect_setup.sh
+  - npm install -g bower
   - npm install -g grunt-cli
+
+before_script:
+  - bower install
+  - chmod +x ./support/**
+
 language: node_js
+
 node_js:
   - "0.10"
   - "0.8"
+
+env:
+  global:
+    - SAUCE_USERNAME=svnlto
+    - SAUCE_ACCESS_KEY=104fe381-851b-485f-81d6-8eda57d0e40e
+
 notifications:
   irc:
     channels:

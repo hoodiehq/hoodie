@@ -499,7 +499,7 @@ function hoodieAccount (hoodie) {
           window.setTimeout(account.checkPasswordReset, 1000);
           return;
         }
-        return account.trigger('error:passwordreset', error);
+        return account.trigger('passwordreset:error');
       });
     });
   };
