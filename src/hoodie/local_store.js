@@ -326,15 +326,18 @@ function hoodieStore (hoodie) {
   // Otherwise remove it from Store.
   localStore.removeAll = function removeAll(type, options) {
     return store.findAll(type).then(function(objects) {
-      var object, _i, _len, results;
+      var object, _i, _len, resultPromises;
 
-      results = [];
+      resultPromises = [];
 
       for (_i = 0, _len = objects.length; _i < _len; _i++) {
         object = objects[_i];
-        results.push(store.remove(object.type, object.id, options));
+        resultPromises.push(store.remove(object.type, object.id, options));
       }
-      return results;
+
+      return $.when.apply(null, resultPromises)
+      // flatten the spread arguments to one array
+      .then( function() { return Array.prototype.slice.call(arguments); });
     });
   };
 

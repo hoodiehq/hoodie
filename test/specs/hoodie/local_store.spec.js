@@ -1047,6 +1047,138 @@ describe('hoodie.store', function() {
   }); // #remove
 
   //
+  describe('#removeAll(filter)', function() {
+
+    it('should return a promise', function() {
+      var promise = this.storeBackend.removeAll();
+      expect(promise).to.be.promise();
+    });
+
+    _when('there are two cats, Binding & lager', function() {
+      beforeEach(function() {
+        var findAllDefer = this.hoodie.defer();
+        this.removeDefer = this.hoodie.defer();
+        this.store.findAll.returns(findAllDefer.promise());
+        this.store.remove.returns(this.removeDefer.promise());
+        this.promise = this.storeBackend.removeAll();
+
+        findAllDefer.resolve([
+          {type: 'cat', id: '1', name: 'Binding'},
+          {type: 'cat', id: '2', name: 'Lager'}
+        ]);
+      });
+
+      it('should remove all objects returned by findAll and call remove on them', function() {
+        expect(this.store.findAll).to.be.called();
+        expect(this.store.remove).to.be.calledWith('cat', '1', undefined);
+        expect(this.store.remove).to.be.calledWith('cat', '2', undefined);
+      });
+
+      _and('both remove calls succedd', function() {
+        beforeEach(function() {
+          this.removeDefer.resolve({some: 'cat'});
+        });
+
+        it('resolves with the results of the store.remove calls', function() {
+          expect(this.promise).to.be.resolvedWith([{some: 'cat'}, {some: 'cat'}]);
+        });
+      });
+
+      _but('the remove calls fail', function() {
+        beforeEach(function() {
+          this.removeDefer.reject('ooops');
+        });
+
+        it.only('resolves with the results of the store.remove calls', function() {
+          expect(this.promise).to.be.rejectedWith('ooops');
+        });
+      });
+    });
+
+    _when('called without a type', function() {
+
+      with_2CatsAnd_3Dogs(function() {
+
+        it('should return \'em all', function() {
+          var promise, results, success;
+          success = this.sandbox.spy();
+          promise = this.storeBackend.removeAll();
+          promise.done(success);
+          results = success.args[0][0];
+          expect(results.length).to.eql(5);
+        });
+      });
+
+      _and('no documents exist in the store', function() {
+        beforeEach(function() {
+          this.sandbox.stub(this.store, 'index').returns([]);
+        });
+
+        it('should return an empty array', function() {
+          var promise = this.storeBackend.removeAll();
+          promise.then(function (res) {
+            expect(res).to.eql([]);
+          });
+        });
+      }); // no documents exist in the store
+
+      _and('there are other documents in localStorage not stored with store', function() {
+        beforeEach(function() {
+          this.sandbox.stub(this.store, 'index').returns(['_someConfig', 'someOtherShizzle', 'whatever', 'valid/123']);
+          stubFindItem('valid', '123', {
+            am: 'I'
+          });
+        });
+
+        it('should not return them', function() {
+          var promise, results, success;
+          success = this.sandbox.spy();
+          promise = this.storeBackend.removeAll();
+          promise.done(success);
+          results = success.args[0][0];
+          expect(results.length).to.eql(1);
+        });
+      }); // there are other documents in localStorage not stored with store
+    }); // called without a type
+
+    _when('called only with filter `function(obj) { return obj.age === 3}`', function() {
+      with_2CatsAnd_3Dogs(function() {
+        it('should only return the dog aged 3', function() {
+          var promise, results, success;
+          success = this.sandbox.spy();
+          promise = this.storeBackend.removeAll(function(obj) {
+            return obj.age === 3;
+          });
+          promise.done(success);
+          results = success.args[0][0];
+          expect(results.length).to.eql(1);
+        });
+      });
+    }); // called only with filter `function(obj) { return obj.age === 3}`
+
+    _when('store is bootstrapping', function() {
+      beforeEach(function() {
+        var called = false;
+        this.sandbox.stub(this.store, 'isBootstrapping', function() {
+          if (called) {
+            return false;
+          }
+          called = true;
+          return true;
+        });
+      });
+
+      it('should wait until bootstrapping is finished', function() {
+        var promise = this.storeBackend.removeAll('todo');
+        expect(promise).to.be.pending();
+        this.store.subscribeToOutsideEvents();
+        this.hoodie.trigger('remote:bootstrap:end');
+        expect(promise).to.be.resolved();
+      });
+    }); // store is bootstrapping
+  }); // #removeAll
+
+  //
   describe('#clear()', function() {
 
     it('should return a promise', function() {
