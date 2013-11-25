@@ -96,12 +96,17 @@ module.exports = function(grunt) {
         singleRun: true,
         sauceLabs: {
 <<<<<<< HEAD
+<<<<<<< HEAD
           username: 'hoodie',
           accessKey: '1f6164de-f3d1-4af9-83d0-5358b42fbe56',
 =======
           username: 'svnlto',
           accessKey: '104fe381-851b-485f-81d6-8eda57d0e40e',
 >>>>>>> [wip]
+=======
+          username: 'gr2m',
+          accessKey: '92dba37c-55e8-44b8-9b12-83f649dcee65',
+>>>>>>> [fix] removed invalid stub on localStorage.length
           testName: 'hoodie.js test'
         },
         customLaunchers: {
@@ -124,6 +129,7 @@ module.exports = function(grunt) {
             platform: 'Windows 7',
             browserName: 'Firefox'
           },
+<<<<<<< HEAD
           // IE 10 & 11 is WIP
           // sl_ie10_win7: {
           //   base: 'SauceLabs',
@@ -165,6 +171,20 @@ module.exports = function(grunt) {
             platform: 'mac 10.8',
             browserName: 'safari'
           },
+=======
+          sl_ie9_win7: {
+            base: 'SauceLabs',
+            platform: 'Windows 7',
+            browserName: 'iexplorer',
+            version: 9
+          },
+          sl_ie10_win7: {
+            base: 'SauceLabs',
+            platform: 'Windows 7',
+            browserName: 'iexplorer',
+            version: 10
+          }
+>>>>>>> [fix] removed invalid stub on localStorage.length
           // [wip] windows support
           //sl_ie8_windows7: {
             //base: 'SauceLabs',
@@ -185,6 +205,7 @@ module.exports = function(grunt) {
 
         },
         browsers: [
+<<<<<<< HEAD
           'PhantomJS',
 <<<<<<< HEAD
 <<<<<<< HEAD
@@ -209,6 +230,14 @@ module.exports = function(grunt) {
 >>>>>>> [wip]
 =======
 >>>>>>> [wip]
+=======
+          // 'PhantomJS',
+          // 'sl_chrome_mac',
+          // 'sl_safari_mac',
+          'sl_firefox_win7',
+          // 'sl_ie9_win7',
+          // 'sl_ie10_win7'
+>>>>>>> [fix] removed invalid stub on localStorage.length
         ]
       },
 
