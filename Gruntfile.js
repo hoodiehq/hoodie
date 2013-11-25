@@ -27,7 +27,7 @@ module.exports = function(grunt) {
 
     watch: {
       files: ['<%= jshint.files %>'],
-      tasks: ['jshint', 'karma:dev']
+      tasks: ['karma:dev']
     },
 
     concat: {
@@ -113,26 +113,27 @@ module.exports = function(grunt) {
             platform: 'Windows 7',
             browserName: 'Firefox'
           },
-          sl_ie10_win7: {
-            base: 'SauceLabs',
-            platform: 'Windows 7',
-            browserName: 'iexplorer',
-            version: '10'
-          },
-          sl_ie11_win8: {
-            base: 'SauceLabs',
-            platform: 'Windows 8.1',
-            browserName: 'iexplorer',
-            version: '11'
-          }
+          // IE 10 & 11 is WIP
+          // sl_ie10_win7: {
+          //   base: 'SauceLabs',
+          //   platform: 'Windows 7',
+          //   browserName: 'internet explorer',
+          //   version: '10'
+          // },
+          // sl_ie11_win8: {
+          //   base: 'SauceLabs',
+          //   platform: 'Windows 8.1',
+          //   browserName: 'internet explorer',
+          //   version: '11'
+          // }
         },
         browsers: [
           'PhantomJS',
           'sl_chrome_mac',
           'sl_safari_mac',
           'sl_firefox_win7',
-          'sl_ie10_win7',
-          'sl_ie11_win8'
+          // 'sl_ie10_win7',
+          // 'sl_ie11_win8'
         ]
       },
 
@@ -163,6 +164,6 @@ module.exports = function(grunt) {
 
   grunt.registerTask('default', ['jshint', 'concat', 'uglify']);
   grunt.registerTask('build', ['jshint', 'karma:continuous', 'concat', 'uglify']);
-  grunt.registerTask('test', ['jshint', 'karma:continuous']);
+  grunt.registerTask('test', ['karma:dev']);
   grunt.registerTask('docs', ['groc']);
 };
