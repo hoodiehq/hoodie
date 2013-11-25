@@ -93,8 +93,8 @@ module.exports = function(grunt) {
       continuous: {
         singleRun: true,
         sauceLabs: {
-          username: 'gr2m',
-          accessKey: '92dba37c-55e8-44b8-9b12-83f649dcee65',
+          username: 'hoodie',
+          accessKey: '1f6164de-f3d1-4af9-83d0-5358b42fbe56',
           testName: 'hoodie.js test'
         },
         customLaunchers: {
@@ -113,44 +113,26 @@ module.exports = function(grunt) {
             platform: 'Windows 7',
             browserName: 'Firefox'
           },
-          sl_ie9_win7: {
-            base: 'SauceLabs',
-            platform: 'Windows 7',
-            browserName: 'iexplorer',
-            version: 9
-          },
           sl_ie10_win7: {
             base: 'SauceLabs',
             platform: 'Windows 7',
             browserName: 'iexplorer',
-            version: 10
+            version: '10'
+          },
+          sl_ie11_win8: {
+            base: 'SauceLabs',
+            platform: 'Windows 8.1',
+            browserName: 'iexplorer',
+            version: '11'
           }
-          // [wip] windows support
-          //sl_ie8_windows7: {
-            //base: 'SauceLabs',
-            //platform: 'Windows XP',
-            //browserName: 'iehta',
-            //version: 8
-          //},
-          //sl_ie9_windows: {
-            //base: 'SauceLabs',
-            //browserName: 'iexplorer',
-            //version: 9
-          //},
-          //sl_ie10_windows: {
-            //base: 'SauceLabs',
-            //browserName: 'iexplorer',
-            //version: 10
-          //}
-
         },
         browsers: [
-          // 'PhantomJS',
-          // 'sl_chrome_mac',
-          // 'sl_safari_mac',
+          'PhantomJS',
+          'sl_chrome_mac',
+          'sl_safari_mac',
           'sl_firefox_win7',
-          // 'sl_ie9_win7',
-          // 'sl_ie10_win7'
+          'sl_ie10_win7',
+          'sl_ie11_win8'
         ]
       },
 
