@@ -71,7 +71,8 @@ Mocks.Hoodie = function () {
       sync: function () {},
       on: function () {},
       one: function () {},
-      trigger: function () {}
+      trigger: function () {},
+      push: function () {}
     }
   };
 

@@ -186,7 +186,7 @@ describe('hoodie.account', function () {
         });
 
         it('should not send any farther requests', function() {
-          expect(this.account.request.called).to.not.be.ok();
+          expect(this.account.request).to.not.be.called();
         });
       }); // with_session_validated_before
 
@@ -477,7 +477,7 @@ describe('hoodie.account', function () {
               });
 
               it('should hoodie.remote.disconnect', function () {
-                expect(this.hoodie.remote.disconnect.called).to.be.ok();
+                expect(this.hoodie.remote.disconnect).to.be.called();
               });
 
               it('should sign in with new username', function () {
@@ -832,9 +832,9 @@ describe('hoodie.account', function () {
 
     it('should sign out silently', function () {
       this.account.signIn('joe@example.com', 'secret');
-      expect(this.account.signOut.calledWith({
+      expect(this.account.signOut).to.be.calledWith({
         silent: true
-      })).to.be.ok();
+      });
     });
 
     it('should downcase username', function () {
@@ -862,11 +862,11 @@ describe('hoodie.account', function () {
       });
 
       it('should not sign out', function () {
-        expect(this.account.signOut.called).to.not.be.ok();
+        expect(this.account.signOut).to.not.be.called();
       });
 
       it('should send a POST request to http://cou.ch/_session', function () {
-        expect(this.hoodie.request.called).to.be.ok();
+        expect(this.hoodie.request).to.be.called();
         expect(this.type).to.eql('POST');
         expect(this.path).to.eql('/_session');
       });
@@ -935,7 +935,7 @@ describe('hoodie.account', function () {
       });
 
       it('should send a POST request to http://cou.ch/_session', function () {
-        expect(this.hoodie.request.called).to.be.ok();
+        expect(this.hoodie.request).to.be.called();
         expect(this.type).to.eql('POST');
         expect(this.path).to.eql('/_session');
       });
@@ -1010,7 +1010,7 @@ describe('hoodie.account', function () {
           it('should fetch the _users doc', function () {
             this.sandbox.spy(this.account, 'fetch');
             this.account.signIn('joe@example.com', 'secret');
-            expect(this.account.fetch.called).to.be.ok();
+            expect(this.account.fetch).to.be.called();
           });
 
           it('should resolve with username and response', function () {
@@ -1180,7 +1180,7 @@ describe('hoodie.account', function () {
       });
 
       it('should send a PUT request to http://cou.ch/_users/org.couchdb.user%3Auser%2Fjoe%40example.com', function () {
-        expect(this.account.request.called).to.be.ok();
+        expect(this.account.request).to.be.called();
         expect(this.type).to.eql('PUT');
         expect(this.path).to.eql('/_users/org.couchdb.user%3Auser%2Fjoe%40example.com');
       });
@@ -1322,16 +1322,6 @@ describe('hoodie.account', function () {
       this.sandbox.spy(this.hoodie.config, 'clear');
     });
 
-    _when('called with silent: true', function () {
-
-      it('should not trigger `signout` event', function () {
-        this.account.signOut({
-          silent: true
-        });
-        expect(this.account.trigger).to.not.be.calledWith('signout');
-      });
-    }); // called with silent: true
-
     _when('user has no account', function () {
 
       beforeEach(function () {
@@ -1340,7 +1330,7 @@ describe('hoodie.account', function () {
       });
 
       it('should not send any request', function () {
-        expect(this.hoodie.request.called).to.not.be.ok();
+        expect(this.hoodie.request).to.not.be.called();
       });
 
       it('should trigger `signout` event', function () {
@@ -1356,62 +1346,121 @@ describe('hoodie.account', function () {
       });
 
       it('should clear config', function () {
-        expect(this.hoodie.config.clear.called).to.be.ok();
+        expect(this.hoodie.config.clear).to.be.called();
       });
 
       it('should return a resolved promise', function () {
         expect(this.promise.state()).to.eql('resolved');
       });
+
+      _when('called with silent: true', function () {
+        it('should not trigger `signout` event', function () {
+          this.account.trigger.reset();
+          this.account.signOut({
+            silent: true
+          });
+          expect(this.account.trigger).to.not.be.calledWith('signout');
+        });
+      }); // called with silent: true
     }); // user has no account
 
     _when('user has account', function () {
 
       beforeEach(function () {
-        this.sandbox.spy(this.hoodie.remote, 'disconnect');
         this.sandbox.stub(this.account, 'hasAccount').returns(true);
-        this.account.signOut();
-
-        var _ref = this.hoodie.request.args[0];
-
-        this.type = _ref[0],
-        this.path = _ref[1],
-        this.options = _ref[2],
-        _ref;
+        this.sandbox.spy(this.hoodie.remote, 'disconnect');
       });
 
-      it('should disconnect', function () {
-        expect(this.hoodie.remote.disconnect.called).to.be.ok();
-      });
-
-      it('should send a DELETE request to http://cou.ch/_session', function () {
-        expect(this.hoodie.request.called).to.be.ok();
-        expect(this.type).to.eql('DELETE');
-        expect(this.path).to.eql('/_session');
-      });
-
-      _when('signOut request successful', function () {
-
+      _and('user has local changes', function() {
         beforeEach(function () {
-          this.requestDefer.resolve();
+          this.pushDefer = this.hoodie.defer();
+          this.sandbox.stub(this.hoodie.remote, 'push').returns(this.pushDefer.promise());
+          this.hoodie.store.hasLocalChanges.returns(true);
+          this.promise = this.account.signOut();
+        });
+
+        it('should not disconnect', function () {
+          expect(this.hoodie.remote.disconnect).to.not.be.called();
+        });
+
+        it('should return a pending promise', function() {
+          expect(this.promise).to.be.pending();
+        });
+
+        it('should push local changes', function() {
+          expect(this.hoodie.remote.push).to.be.called();
+        });
+
+        _when('push of local changes fails', function() {
+          beforeEach(function() {
+            this.pushDefer.reject();
+          });
+
+          it('should reject', function() {
+            expect(this.promise).to.be.rejected();
+          });
+        });
+
+        _when('push of local changes succeeds', function() {
+          beforeEach(function() {
+            this.pushDefer.resolve();
+          });
+
+          it('should send a DELETE request to http://cou.ch/_session', function () {
+            expect(this.hoodie.request).to.be.calledWith('DELETE', '/_session');
+          });
+        });
+
+        _but('account.signOut called with ignoreLocalChanges: true', function() {
+          beforeEach(function () {
+            this.hoodie.remote.disconnect.reset();
+            this.account.signOut({ignoreLocalChanges: true});
+          });
+
+          it('should disconnect', function () {
+            expect(this.hoodie.remote.disconnect).to.be.called();
+          });
+        });
+      }); // user has local changes
+
+      _and('user has no local changes', function() {
+        beforeEach(function () {
+          this.hoodie.store.hasLocalChanges.returns(false);
           this.account.signOut();
         });
 
-        it('should trigger `signout` event', function () {
-          expect(this.account.trigger).to.be.calledWith('signout');
+        it('should disconnect', function () {
+          expect(this.hoodie.remote.disconnect).to.be.called();
         });
 
-        it('should generate new @ownerHash hash', function () {
-          expect(this.account.ownerHash).to.eql('newHash');
+        it('should send a DELETE request to http://cou.ch/_session', function () {
+          expect(this.hoodie.request).to.be.calledWith('DELETE', '/_session');
         });
 
-        it('should unset @username', function () {
-          expect(this.account.username).to.be(undefined);
-        });
+        _when('signOut request successful', function () {
 
-        it('should clear config', function () {
-          expect(this.hoodie.config.clear.called).to.be.ok();
-        });
-      }); // signOut request successful
+          beforeEach(function () {
+            this.requestDefer.resolve();
+            this.account.signOut();
+          });
+
+          it('should trigger `signout` event', function () {
+            expect(this.account.trigger).to.be.calledWith('signout');
+          });
+
+          it('should generate new @ownerHash hash', function () {
+            expect(this.account.ownerHash).to.eql('newHash');
+          });
+
+          it('should unset @username', function () {
+            expect(this.account.username).to.be(undefined);
+          });
+
+          it('should clear config', function () {
+            expect(this.hoodie.config.clear).to.be.called();
+          });
+        }); // signOut request successful
+      }); // user has no local changes
     }); // user has account
   }); // #signOut
 
@@ -1485,7 +1534,7 @@ describe('hoodie.account', function () {
       });
 
       it('should not send any request', function () {
-        expect(this.hoodie.request.called).to.not.be.ok();
+        expect(this.hoodie.request).to.not.be.called();
       });
     }); // username is not set
 
@@ -1502,7 +1551,7 @@ describe('hoodie.account', function () {
       });
 
       it('should send a GET request to http://cou.ch/_users/org.couchdb.user%3Auser%2Fjoe%40example.com', function () {
-        expect(this.hoodie.request.called).to.be.ok();
+        expect(this.hoodie.request).to.be.called();
         expect(this.type).to.eql('GET');
         expect(this.path).to.eql('/_users/org.couchdb.user%3Auser%2Fjoe%40example.com');
       });
@@ -1568,12 +1617,12 @@ describe('hoodie.account', function () {
 
         it('should disconnect', function () {
           this.account.destroy();
-          expect(this.hoodie.remote.disconnect.called).to.be.ok();
+          expect(this.hoodie.remote.disconnect).to.be.called();
         });
 
         it('should fetch the account', function () {
           this.account.destroy();
-          expect(this.account.fetch.called).to.be.ok();
+          expect(this.account.fetch).to.be.called();
         });
 
         it('should send a PUT request to /_users/org.couchdb.user%3Auser%2Fjoe%40example.com', function () {
@@ -1605,7 +1654,7 @@ describe('hoodie.account', function () {
           });
 
           it('should clear config', function () {
-            expect(this.hoodie.config.clear.called).to.be.ok();
+            expect(this.hoodie.config.clear).to.be.called();
           });
 
           it('should set config._account.ownerHash to new @ownerHash', function () {
@@ -1668,7 +1717,7 @@ describe('hoodie.account', function () {
         });
 
         it('should not clear config', function () {
-          expect(this.hoodie.config.clear.called).to.not.be.ok();
+          expect(this.hoodie.config.clear).to.not.be.called();
         });
       }); // fetch fails with unknown error
     }); // user has account
@@ -1685,7 +1734,7 @@ describe('hoodie.account', function () {
       });
 
       it('should not try to fetch', function () {
-        expect(this.account.fetch.called).to.not.be.ok();
+        expect(this.account.fetch).to.not.be.called();
       });
 
       it('should unset @username', function () {
@@ -1701,11 +1750,11 @@ describe('hoodie.account', function () {
       });
 
       it('should clear config', function () {
-        expect(this.hoodie.config.clear.called).to.be.ok();
+        expect(this.hoodie.config.clear).to.be.called();
       });
 
       it('should set config._account.ownerHash to new @ownerHash', function () {
-        expect(this.hoodie.config.set.calledWith('_account.ownerHash', 'newHash')) .to.be.ok();
+        expect(this.hoodie.config.set).to.be.calledWith('_account.ownerHash', 'newHash');
       });
     }); // user has no account
   }); // #destroy
@@ -1723,11 +1772,11 @@ describe('hoodie.account', function () {
       });
 
       it('should not send another request', function () {
-        expect(this.hoodie.request.called).to.not.be.ok();
+        expect(this.hoodie.request).to.not.be.called();
       });
 
       it('should check for the status of the pending request', function () {
-        expect(this.account.checkPasswordReset.called).to.be.ok();
+        expect(this.account.checkPasswordReset).to.be.called();
       });
 
       it('should return the promise by the status request', function () {
@@ -1788,14 +1837,14 @@ describe('hoodie.account', function () {
 
         it('should check for the request status', function () {
           this.account.resetPassword('joe@example.com');
-          expect(this.account.checkPasswordReset.called).to.be.ok();
+          expect(this.account.checkPasswordReset).to.be.called();
         });
 
         it('should be pending', function () {
           expect(this.account.resetPassword('joe@example.com')).to.be.pending();
         });
 
-        _and('password reset succeeds', function() {
+        _and('password reset fails', function() {
           beforeEach(function() {
             this.account.one.withArgs('passwordreset').yields();
             this.promise = this.account.resetPassword('joe@example.com');
@@ -1877,7 +1926,7 @@ describe('hoodie.account', function () {
         });
 
         it('should send a PUT request to http://cou.ch/_users/org.couchdb.user%3Auser%2Fjoe%40example.com', function () {
-          expect(this.account.request.called).to.be.ok();
+          expect(this.account.request).to.be.called();
           expect(this.type).to.eql('PUT');
           expect(this.path).to.eql('/_users/org.couchdb.user%3Auser%2Fjoe%40example.com');
         });
@@ -1914,7 +1963,7 @@ describe('hoodie.account', function () {
           });
 
           it('should disconnect', function () {
-            expect(this.hoodie.remote.disconnect.called).to.be.ok();
+            expect(this.hoodie.remote.disconnect).to.be.called();
           });
 
           it('should sign in with new username', function () {
