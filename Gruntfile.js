@@ -27,7 +27,8 @@ module.exports = function(grunt) {
 
     watch: {
       files: ['<%= jshint.files %>'],
-      tasks: ['karma:dev']
+      // tasks: ['karma:dev']
+      tasks: ['browserify']
     },
 
     concat: {
@@ -153,10 +154,22 @@ module.exports = function(grunt) {
           dir : 'coverage/'
         }
       }
-    }
+    },
 
+    browserify: {
+      build: {
+        src: ['src/hoodie.js'],
+        dest: 'dist/hoodie.js',
+        options: {
+          external: 'jquery',
+          standalone: 'Hoodie',
+          debug: true
+        }
+      }
+    }
   });
 
+  grunt.loadNpmTasks('grunt-browserify');
   grunt.loadNpmTasks('grunt-contrib-uglify');
   grunt.loadNpmTasks('grunt-contrib-jshint');
   grunt.loadNpmTasks('grunt-contrib-watch');
