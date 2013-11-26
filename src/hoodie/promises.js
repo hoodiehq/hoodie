@@ -1,6 +1,3 @@
-/* global HoodieError */
-/* exported hoodiePromises */
-
 // Hoodie Defers / Promises
 // ------------------------
 
@@ -17,7 +14,9 @@
 //     }
 //     return defer.promise()
 //
+var HoodieError = require('./error');
 
+//
 function hoodiePromises (hoodie) {
   var $defer = window.jQuery.Deferred;
 
@@ -64,3 +63,5 @@ function hoodiePromises (hoodie) {
   hoodie.resolveWith = resolveWith;
   hoodie.rejectWith = rejectWith;
 }
+
+module.exports = hoodiePromises;
