@@ -1,6 +1,6 @@
 {
   "name": "hoodie",
-  "version": "0.4.5",
+  "version": "0.5",
   "main": [
     "./dist/hoodie.js"
   ],
