@@ -1,13 +1,12 @@
-/* exported hoodieScopedStoreApi */
-/* global hoodieEvents */
-
 // scoped Store
 // ============
 
 // same as store, but with type preset to an initially
 // passed value.
 //
+var hoodieEvents = require('./events');
 
+//
 function hoodieScopedStoreApi(hoodie, storeApi, options) {
 
   // name
@@ -108,3 +107,5 @@ function hoodieScopedStoreApi(hoodie, storeApi, options) {
 
   return api;
 }
+
+module.exports = hoodieScopedStoreApi;
