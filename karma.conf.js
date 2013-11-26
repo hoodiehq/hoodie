@@ -9,7 +9,7 @@ module.exports = function(config) {
 
 
     // frameworks to use
-    frameworks: ['mocha'],
+    frameworks: ['mocha', 'browserify'],
 
 
     // list of files / patterns to load in the browser
@@ -103,6 +103,12 @@ module.exports = function(config) {
     // - PhantomJS
     // - IE (only Windows)
     browsers: [],
+
+    preprocessors: {
+      'src/hoodie/**/*': ['browserify']
+    },
+
+    browserify: {},
 
 
     // If browser does not capture in given timeout [ms], kill it
