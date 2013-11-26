@@ -1,5 +1,6 @@
 /* exported hoodieStore */
-/* global hoodieStoreApi */
+/* global hoodieStoreApi,
+   HoodieObjectTypeError, HoodieObjectIdError */
 
 // LocalStore
 // ============
@@ -150,9 +151,7 @@ function hoodieStore (hoodie) {
   //
   //     store.find('car', 'abc4567')
   localStore.find = function(type, id) {
-    var defer, error, object;
-
-    defer = hoodie.defer();
+    var error, object;
 
     // if store is currently bootstrapping data from remote,
     // we're queueing until it's finished
@@ -163,15 +162,16 @@ function hoodieStore (hoodie) {
     try {
       object = cache(type, id);
       if (!object) {
-        defer.reject(Hoodie.Errors.NOT_FOUND(type, id)).promise();
+        return hoodie.rejectWith({
+          name: 'HoodieNotFoundError',
+          message: '"{{type}}" with id "{{id}}" could not be found'
+        });
       }
-      defer.resolve(object);
+      return hoodie.resolveWith(object);
     } catch (_error) {
       error = _error;
-      defer.reject(error);
+      return hoodie.rejectWith(error);
     }
-
-    return defer.promise();
   };
 
 
@@ -224,7 +224,7 @@ function hoodieStore (hoodie) {
         _results = [];
         for (_i = 0, _len = keys.length; _i < _len; _i++) {
           key = keys[_i];
-          if (!(isSemanticId(key))) {
+          if (!(isSemanticKey(key))) {
             continue;
           }
           _ref = key.split('/'),
@@ -294,7 +294,10 @@ function hoodieStore (hoodie) {
     }
 
     if (!object) {
-      return hoodie.rejectWith(Hoodie.Errors.NOT_FOUND(type, id));
+      return hoodie.rejectWith({
+        name: 'HoodieNotFoundError',
+        message: '"{{type}}" with id "{{id}}"" could not be found'
+      });
     }
 
     if (object._syncedAt) {
@@ -345,14 +348,14 @@ function hoodieStore (hoodie) {
   //
   function validate (object) {
 
-    if (!isValidType(object.type)) {
-      return Hoodie.Errors.INVALID_KEY({
+    if (HoodieObjectTypeError.isInvalid(object.type)) {
+      return new HoodieObjectTypeError({
         type: object.type
       });
     }
 
-    if (arguments.length > 0 && !isValidId(object.id)) {
-      return Hoodie.Errors.INVALID_KEY({
+    if (arguments.length > 0 && HoodieObjectIdError.isInvalid(object.id)) {
+      return new HoodieObjectIdError({
         id: object.id
       });
     }
@@ -388,7 +391,7 @@ function hoodieStore (hoodie) {
     keys = [];
     for (i = _i = 0, _ref = db.length(); 0 <= _ref ? _i < _ref : _i > _ref; i = 0 <= _ref ? ++_i : --_i) {
       key = db.key(i);
-      if (isSemanticId(key)) {
+      if (isSemanticKey(key)) {
         keys.push(key);
       }
     }
@@ -457,7 +460,7 @@ function hoodieStore (hoodie) {
         _results = [];
         for (_i = 0, _len = keys.length; _i < _len; _i++) {
           key = keys[_i];
-          if (isSemanticId(key)) {
+          if (isSemanticKey(key)) {
             _results.push(db.removeItem(key));
           }
         }
@@ -811,21 +814,10 @@ function hoodieStore (hoodie) {
     return JSON.stringify(new Date()).replace(/['"]/g, '');
   }
 
-  // only lowercase letters, numbers and dashes are allowed for ids
-  var validIdPattern = new RegExp(/^[a-z0-9\-]+$/);
-  function isValidId(id) {
-    return validIdPattern.test(id);
-  }
 
-  // just like ids, but must start with a letter or a $ (internal types)
-  var validTypePattern = new RegExp(/^[a-z$][a-z0-9]+$/);
-  function isValidType(type) {
-    return validTypePattern.test(type);
-  }
-
-  //
+  // a semantic key consists of a valid type & id, separated by a "/"
   var semanticIdPattern = new RegExp(/^[a-z$][a-z0-9]+\/[a-z0-9]+$/);
-  function isSemanticId(key) {
+  function isSemanticKey(key) {
     return semanticIdPattern.test(key);
   }
 

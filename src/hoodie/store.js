@@ -1,4 +1,5 @@
-/* global hoodieScopedStoreApi, hoodieEvents */
+/* global hoodieScopedStoreApi, hoodieEvents,
+   HoodieError, HoodieObjectTypeError, HoodieObjectIdError */
 /* exported hoodieStoreApi */
 
 // Store
@@ -74,11 +75,15 @@ function hoodieStoreApi(hoodie, options) {
     api.validate = function(object /*, options */) {
 
       if (!object) {
-        return Hoodie.Errors.INVALID_ARGUMENTS('no object passed');
+        return new HoodieError({
+          name: 'InvalidObjectError',
+          message: 'No object passed.'
+        });
       }
-      if (!isValidType(object.type)) {
-        return Hoodie.Errors.INVALID_KEY({
-          type: object.type
+      if (HoodieObjectTypeError.isInvalid(object.type, validIdOrTypePattern)) {
+        return new HoodieObjectTypeError({
+          type: object.type,
+          rules: validIdOrTypeRules
         });
       }
 
@@ -86,9 +91,10 @@ function hoodieStoreApi(hoodie, options) {
         return;
       }
 
-      if (!isValidId(object.id)) {
-        return Hoodie.Errors.INVALID_KEY({
-          id: object.id
+      if (HoodieObjectIdError.isInvalid(object.id, validIdOrTypePattern)) {
+        return new HoodieObjectIdError({
+          id: object.id,
+          rules: validIdOrTypeRules
         });
       }
     };
@@ -120,7 +126,7 @@ function hoodieStoreApi(hoodie, options) {
 
     // validations
     var error = api.validate(object, options || {});
-    if(error) { return rejectWith(error); }
+    if(error) { return hoodie.rejectWith(error); }
 
     return decoratePromise( backend.save(object, options || {}) );
   };
@@ -220,7 +226,7 @@ function hoodieStoreApi(hoodie, options) {
       }
 
       if (!objectUpdate) {
-        return resolveWith(currentObject);
+        return hoodie.resolveWith(currentObject);
       }
 
       // check if something changed
@@ -242,7 +248,7 @@ function hoodieStoreApi(hoodie, options) {
       })();
 
       if (!(changedProperties.length || options)) {
-        return resolveWith(newObj);
+        return hoodie.resolveWith(newObj);
       }
 
       //apply update
@@ -384,30 +390,12 @@ function hoodieStoreApi(hoodie, options) {
   // ---------
 
   // / not allowed for id
-  var validIdPattern = new RegExp(/^[^\/]+$/);
-  function isValidId(key) {
-    return validIdPattern.test(key || '');
-  }
-
-  // / not allowed for type
-  var validTypePattern = new RegExp(/^[^\/]+$/);
-  function isValidType(key) {
-    return validTypePattern.test(key || '');
-  }
+  var validIdOrTypePattern = /^[^\/]+$/;
+  var validIdOrTypeRules = '/ not allowed';
 
   //
   function decoratePromise(promise) {
     return $.extend(promise, promiseApi);
-  }
-
-  function resolveWith() {
-    var promise = hoodie.resolveWith.apply(null, arguments);
-    return decoratePromise(promise);
-  }
-
-  function rejectWith() {
-    var promise = hoodie.rejectWith.apply(null, arguments);
-    return decoratePromise(promise);
   }
 
   return api;

@@ -37,7 +37,9 @@ module.exports = function(config) {
       'src/hoodie/config.js',
       'src/hoodie/account.js',
       'src/hoodie/account_remote.js',
-      'src/hoodie/errors.js',
+      'src/hoodie/error.js',
+      'src/hoodie/error/object_id.js',
+      'src/hoodie/error/object_type.js',
       'src/hoodie/task.js',
       'src/hoodie/scoped_task.js',
 

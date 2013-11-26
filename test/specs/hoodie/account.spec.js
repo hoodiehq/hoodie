@@ -159,16 +159,15 @@ describe('hoodie.account', function () {
 
         //
         _when('authentication request has an error', function () {
-
           beforeEach(function () {
             this.requestDefer.reject({
-              responseText: 'error data'
+              name: 'SomeError'
             });
             this.promise = this.account.authenticate();
           });
 
           it('should reject the promise', function () {
-            expect(this.promise).to.be.rejectedWith({ error: 'error data' });
+            expect(this.promise).to.be.rejectedWith({ name: 'SomeError' });
           });
         }); // authentication request has an error
       }); // has not been authenticated yet
@@ -369,7 +368,7 @@ describe('hoodie.account', function () {
 
       it('should be rejected', function () {
         this.promise.then(this.noop, function (res) {
-          expect(res).to.eql({ error: 'username must be set' });
+          expect(res).to.eql( 'Username must be set.' );
         });
       });
 
@@ -517,13 +516,15 @@ describe('hoodie.account', function () {
 
                 beforeEach(function () {
                   this.requestDefers[2].reject({
-                    reason: 'oops'
+                    name: 'HoodieError',
+                    message: 'Oops'
                   });
                 });
 
                 it('should be resolved', function () {
                   expect(this.promise).to.be.rejectedWith({
-                    reason: 'oops'
+                    name: 'HoodieError',
+                    message: 'Oops'
                   });
                 });
 
@@ -540,7 +541,7 @@ describe('hoodie.account', function () {
               it('should be rejected', function () {
                 this.promise.then(this.noop, function (res) {
                   expect(res).to.eql({
-                    error: 'unknown'
+                    name: 'HoodieError'
                   });
                 });
               });
@@ -553,26 +554,22 @@ describe('hoodie.account', function () {
 
             beforeEach(function () {
               this.fetchDefer.reject({
-                error: 'whatever'
+                name: 'HoodieError'
               });
             });
 
             it('should be rejected', function () {
               this.promise.then(this.noop, function (res) {
                 expect(res).to.eql({
-                  error: 'whatever'
+                  name: 'HoodieError'
                 });
               });
             });
-
           }); // fetching user doc not successful
-
         }); // sign in successful
-
       }); // user has an anonmyous account
 
       _but('user is already logged in', function () {
-
         beforeEach(function () {
           this.sandbox.stub(this.account, 'hasAccount').returns(true);
         });
@@ -580,9 +577,8 @@ describe('hoodie.account', function () {
         it('should be rejected', function () {
           var promise = this.account.signUp('joe@example.com', 'secret');
 
-          expect(promise).to.be.rejectedWith({ error: 'you have to sign out first' });
+          expect(promise).to.be.rejectedWith('Must sign out first.');
         });
-
       }); // user is already logged in
 
       _and('user is logged out', function () {
@@ -737,11 +733,17 @@ describe('hoodie.account', function () {
           _and('signIn not successful', function () {
 
             beforeEach(function () {
-              this.requestDefers[1].reject({ reason: 'is'});
+              this.requestDefers[1].reject({
+                name: 'HoodieError',
+                message: 'This is so'
+              });
             });
 
             it('should resolve its promise', function () {
-              expect(this.promise).to.be.rejectedWith({ reason: 'is'});
+              expect(this.promise).to.be.rejectedWith({
+                name: 'HoodieError',
+                message: 'This is so'
+              });
             });
 
           }); // signIn not successful
@@ -752,16 +754,16 @@ describe('hoodie.account', function () {
           beforeEach(function() {
             this.promise = this.account.signUp('exists@example.com', 'secret');
             this.requestDefers.pop().reject({
-              error : 'conflict',
-              reason : 'Document update conflict.'
+              name: 'HoodieConflictError',
+              message: 'Document update conflict'
             });
           });
 
           it('should reject its promise', function () {
             this.promise.then(this.noop, function (res) {
               expect(res).to.eql({
-                error: 'conflict',
-                reason: 'Username exists@example.com already exists'
+                name: 'HoodieConflictError',
+                message: 'Username exists@example.com already exists'
               });
             });
           });
@@ -772,16 +774,16 @@ describe('hoodie.account', function () {
           beforeEach(function () {
             this.promise = this.account.signUp('exists@example.com', 'secret');
             this.requestDefers.pop().reject({
-              error : 'forbidden',
-              reason : 'You stink.'
+              name: 'HoodieRequestError',
+              message: 'You stink'
             });
           });
 
           it('should reject its promise', function () {
             this.promise.then(this.noop, function (res) {
               expect(res).to.eql({
-                error: 'forbidden',
-                reason: 'You stink.'
+                name: 'HoodieRequestError',
+                message: 'You stink'
               });
             });
           });
@@ -901,7 +903,8 @@ describe('hoodie.account', function () {
 
       beforeEach(function () {
         this.signOutDefer.reject({
-          reason: 'a unicorn just cried'
+          name: 'HoodieError',
+          message: 'a unicorn just cried'
         });
       });
 
@@ -910,7 +913,8 @@ describe('hoodie.account', function () {
 
         promise.then(this.noop, function (res) {
           expect(res).to.eql({
-            reason: 'a unicorn just cried'
+            name: 'HoodieError',
+            message: 'a unicorn just cried'
           });
         });
 
@@ -1018,7 +1022,6 @@ describe('hoodie.account', function () {
         }); // account is confirmed
 
         _and('account not (yet) confirmed', function () {
-
           beforeEach(function () {
             this.response = {
               'ok': true,
@@ -1033,23 +1036,20 @@ describe('hoodie.account', function () {
 
             promise.fail(function (res) {
               expect(res).to.eql({
-                error: 'unconfirmed',
-                reason: 'account has not been confirmed yet'
+                name: 'HoodieAccountUnconfirmedError',
+                message: 'Account has not been confirmed yet'
               });
             });
-
           });
-
         }); // account not (yet) confirmed
 
         _and('account has an error', function () {
 
           beforeEach(function () {
-
             this.sandbox.stub(this.account, 'fetch')
             .returns(this.hoodie.rejectWith({
-              error: 'error',
-              reason: 'because you stink!'
+              name: 'HoodieRequestError',
+              message: 'Because you stink'
             }));
 
             this.requestDefer.resolve({
@@ -1069,34 +1069,31 @@ describe('hoodie.account', function () {
           it('should reject with the reason', function () {
             this.account.signIn('joe@example.com', 'secret').fail(function (res) {
               expect(res).to.eql({
-                error: 'error',
-                reason: 'because you stink!'
+                name: 'HoodieRequestError',
+                message: 'Because you stink'
               });
             });
           });
-
         }); // account has an error
-
       }); // signIn successful
 
       _when('signIn not succesful because unauthorized', function () {
-
         beforeEach(function () {
-          this.response = {
-            responseText: '{"error":"unauthorized","reason":"Name or password is incorrect."}'
+          this.error = {
+            name: 'HoodieUnauthorizedError',
+            message: 'Name or password is incorrect'
           };
-          this.requestDefer.reject(this.response);
+          this.requestDefer.reject(this.error);
         });
 
         it('should be rejected with unauthorized error', function () {
           this.account.signIn('joe@example.com', 'secret').fail(function (res) {
             expect(res).to.eql({
-              error: 'unauthorized',
-              reason: 'Name or password is incorrect.'
+              name: 'HoodieUnauthorizedError',
+              message: 'Name or password is incorrect'
             });
           });
         });
-
       }); // signIn not succesful because unauthorized
 
       _when('sign in without password', function () {
@@ -1283,15 +1280,18 @@ describe('hoodie.account', function () {
       }); // change password successful
 
       _when('change password has an error', function () {
-
         beforeEach(function () {
-          this.requestDefer.reject();
+          this.requestDefer.reject({
+            name: 'HoodieError',
+            message: 'Something wrong'
+          });
         });
 
         it('should reject its promise', function () {
           var promise = this.account.changePassword('currentSecret', 'newSecret');
           expect(promise).to.be.rejectedWith({
-            error: 'unknown'
+            name: 'HoodieError',
+            message: 'Something wrong'
           });
         });
       }); // change password has an error
@@ -1299,13 +1299,17 @@ describe('hoodie.account', function () {
 
     _when('fetching _users has an error', function () {
       beforeEach(function () {
-        this.fetchPromise.reject();
+        this.fetchPromise.reject({
+          name: 'HoodieError',
+          message: 'Something wrong'
+        });
       });
 
       it('should reject its promise', function () {
         var promise = this.account.changePassword('currentSecret', 'newSecret');
         expect(promise).to.be.rejectedWith({
-          error: 'unknown'
+          name: 'HoodieError',
+          message: 'Something wrong'
         });
       });
     }); // fetching _users has an error
@@ -1517,8 +1521,8 @@ describe('hoodie.account', function () {
       _when('fails', function () {
         beforeEach(function () {
           this.error = {
-            error: 'ErrorName',
-            reason: 'ErrorReason'
+            name: 'ErrorName',
+            message: 'Some reason here'
           };
           this.requestDefer.reject(this.error);
         });
@@ -1618,8 +1622,8 @@ describe('hoodie.account', function () {
 
         beforeEach(function () {
           this.error = {
-            error: 'not_found',
-            reason: 'missing'
+            name: 'HoodieNotFoundError',
+            message: 'Missing'
           };
           this.fetchDefer.reject(this.error);
           this.promise = this.account.destroy();
@@ -1635,7 +1639,8 @@ describe('hoodie.account', function () {
 
         beforeEach(function () {
           this.error = {
-            error: 'unknown'
+            name: 'UnknownError',
+            message: 'Dunno'
           };
           this.fetchDefer.reject(this.error);
           this.promise = this.account.destroy();
@@ -1815,12 +1820,16 @@ describe('hoodie.account', function () {
 
       _when('reset Password request is not successful', function () {
         beforeEach(function () {
-          this.requestDefer.reject({responseText: '{"error": "ooops"}'});
+          this.requestDefer.reject({
+            name: 'OoopsError',
+            message: 'Something here'
+          });
         });
 
         it('should be rejected with the error', function () {
           expect(this.account.resetPassword('joe@example.com')).to.be.rejectedWith({
-            error: 'ooops'
+            name: 'OoopsError',
+            message: 'Something here'
           });
         });
       });
@@ -1935,7 +1944,10 @@ describe('hoodie.account', function () {
           _but('signIn has an error', function () {
 
             beforeEach(function () {
-              this.requestDefers[2].reject();
+              this.requestDefers[2].reject({
+                name: 'HoodieError',
+                message: 'Something is wrong'
+              });
             });
 
             it('should be rejected', function () {

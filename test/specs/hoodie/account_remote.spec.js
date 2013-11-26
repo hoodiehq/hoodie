@@ -50,6 +50,31 @@ describe('hoodie.remote', function() {
     expect(options.knownObjects).to.eql( [{ type: 'funk', id: '1'}, { type: '$task', id: '2'}] );
   });
 
+  describe('#connect', function() {
+    _when('user has account', function() {
+      beforeEach(function() {
+        this.sandbox.stub(this.hoodie.account, 'hasAccount').returns(true);
+      });
+
+      it('should connect to user\'s database (ignoring passed argument)', function() {
+        this.remote.connect('whatever');
+        expect(this.openConnectSpy).to.be.calledWith('userdb');
+      });
+    });
+
+    _when('user has no account', function() {
+      beforeEach(function() {
+        this.sandbox.stub(this.hoodie.account, 'hasAccount').returns(false);
+      });
+
+      it('should connect to user\'s database (ignoring passed argument)', function() {
+        var promise = this.remote.connect();
+        expect(this.openConnectSpy).to.not.be.called();
+        expect(promise).to.be.rejectedWith('User has no database to connect to');
+      });
+    });
+  });
+
   describe('#trigger', function() {
     beforeEach(function() {
       this.sandbox.spy(this.hoodie, 'trigger');

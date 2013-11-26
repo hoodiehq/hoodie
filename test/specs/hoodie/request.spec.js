@@ -94,15 +94,128 @@ describe('hoodie.request', function () {
   _when('request fails with empty response', function() {
     beforeEach(function() {
       this.ajaxDefer.reject({
-        xhr: {
-          responseText: ''
-        }
+        responseText: ''
       });
     });
     it('should return a rejected promis with Cannot reach backend error', function() {
       expect(this.hoodie.request('GET', '/')).to.be.rejectedWith({
-        error: 'Cannot connect to Hoodie server at http://my.cou.ch'
+        name: 'HoodieConnectionError',
+        message: 'Could not connect to Hoodie server at {{url}}.',
+        url: 'http://my.cou.ch'
       });
     });
   });
+
+
+  _when('request fails with 400', function() {
+    beforeEach(function() {
+      this.ajaxDefer.reject({
+        status: 400,
+        responseText: '{"reason": "funky"}'
+      });
+    });
+    it('should return rejected with a HoodieRequestError', function() {
+      expect(this.hoodie.request('GET', '/')).to.be.rejectedWith({
+        name: 'HoodieRequestError',
+        message: 'Funky',
+        status: 400
+      });
+    });
+  });
+  _when('request fails with 401', function() {
+    beforeEach(function() {
+      this.ajaxDefer.reject({
+        status: 401,
+        responseText: '{"reason": "funky"}'
+      });
+    });
+    it('should return rejected with a HoodieUnauthorizedError', function() {
+      expect(this.hoodie.request('GET', '/')).to.be.rejectedWith({
+        name: 'HoodieUnauthorizedError',
+        message: 'Funky',
+        status: 401
+      });
+    });
+  });
+
+  _when('request fails with 403', function() {
+    beforeEach(function() {
+      this.ajaxDefer.reject({
+        status: 403,
+        responseText: '{"reason": "funky"}'
+      });
+    });
+    it('should return rejected with a HoodieRequestError', function() {
+      expect(this.hoodie.request('GET', '/')).to.be.rejectedWith({
+        name: 'HoodieRequestError',
+        message: 'Funky',
+        status: 403
+      });
+    });
+  });
+
+  _when('request fails with 409', function() {
+    beforeEach(function() {
+      this.ajaxDefer.reject({
+        status: 409,
+        responseText: '{"reason": "funky"}'
+      });
+    });
+    it('should return rejected with a HoodieConflictError', function() {
+      expect(this.hoodie.request('GET', '/')).to.be.rejectedWith({
+        name: 'HoodieConflictError',
+        message: 'Funky',
+        status: 409
+      });
+    });
+  });
+
+  _when('request fails with 412', function() {
+    beforeEach(function() {
+      this.ajaxDefer.reject({
+        status: 412,
+        responseText: '{"reason": "funky"}'
+      });
+    });
+    it('should return rejected with a HoodieConflictError', function() {
+      expect(this.hoodie.request('GET', '/')).to.be.rejectedWith({
+        name: 'HoodieConflictError',
+        message: 'Funky',
+        status: 412
+      });
+    });
+  });
+
+  _when('request fails with 500', function() {
+    beforeEach(function() {
+      this.ajaxDefer.reject({
+        status: 500,
+        responseText: '{"reason": "funky"}'
+      });
+    });
+    it('should return rejected with a HoodieServerError', function() {
+      expect(this.hoodie.request('GET', '/')).to.be.rejectedWith({
+        name: 'HoodieServerError',
+        message: 'Funky',
+        status: 500
+      });
+    });
+  });
+
+  _when('request fails with unknown error code', function() {
+    beforeEach(function() {
+      this.ajaxDefer.reject({
+        status: 123,
+        responseText: '{"error":"funky_stuff", "reason": "funky"}'
+      });
+    });
+    it('should return rejected with a proper Hoodie Error', function() {
+      expect(this.hoodie.request('GET', '/')).to.be.rejectedWith({
+        name: 'HoodieFunkyStuffError',
+        message: 'Funky',
+        status: 123
+      });
+    });
+  });
+
 });
