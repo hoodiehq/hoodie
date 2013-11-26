@@ -1,5 +1,3 @@
-/* exported hoodieDispose */
-
 // hoodie.dispose
 // ================
 
@@ -19,3 +17,4 @@ function hoodieDispose (hoodie) {
   hoodie.dispose = dispose;
 }
 
+module.exports = hoodieDispose;
