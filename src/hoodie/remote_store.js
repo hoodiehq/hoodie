@@ -1,6 +1,3 @@
-/* exported hoodieRemoteStore */
-/* global hoodieStoreApi */
-
 // Remote
 // ========
 
@@ -38,6 +35,7 @@
 //
 // * on(event, callback)
 //
+var hoodieStoreApi = require('./store');
 
 //
 function hoodieRemoteStore (hoodie, options) {
@@ -763,3 +761,5 @@ function hoodieRemoteStore (hoodie, options) {
   // expose public API
   return remote;
 }
+
+module.exports = hoodieRemoteStore;
