@@ -1,6 +1,3 @@
-/* exported hoodieConnection */
-
-//
 // hoodie.checkConnection() & hoodie.isConnected()
 // =================================================
 
@@ -90,3 +87,5 @@ function hoodieConnection(hoodie) {
     return hoodie.reject();
   }
 }
+
+module.exports = hoodieConnection;
