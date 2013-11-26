@@ -9,7 +9,9 @@
   },
   "devDependencies": {
     "expect": "~0.2.0",
-    "sinonjs": "~1.7.1"
+    "sinonjs": "~1.7.1",
+    "prism.js": "https://raw.github.com/LeaVerou/prism/gh-pages/prism.js",
+    "prism.css": "https://raw.github.com/LeaVerou/prism/gh-pages/themes/prism.css"
   },
   "ignore": [
     "test/",
