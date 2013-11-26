@@ -1,13 +1,12 @@
-/* exported hoodieStore */
-/* global hoodieStoreApi,
-   HoodieObjectTypeError, HoodieObjectIdError */
-
 // LocalStore
 // ============
-//
-// window.localStrage wrapper and more
-//
 
+//
+var hoodieStoreApi = require('./store');
+var HoodieObjectTypeError = require('./error/object_type');
+var HoodieObjectIdError = require('./error/object_id');
+
+//
 function hoodieStore (hoodie) {
 
   var localStore = {};
@@ -972,3 +971,5 @@ function hoodieStore (hoodie) {
     delete store.patchIfNotPersistant;
   };
 }
+
+module.exports = hoodieStore;
