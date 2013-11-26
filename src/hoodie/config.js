@@ -1,5 +1,3 @@
-/* exported hoodieConfig */
-
 // Hoodie Config API
 // ===================
 
@@ -74,3 +72,5 @@ function hoodieConfig(hoodie) {
   // exspose public API
   hoodie.config = config;
 }
+
+module.exports = hoodieConfig;
