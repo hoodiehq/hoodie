@@ -4,18 +4,18 @@
 // the door to world domination (apps)
 //
 
-var hoodieAccount = require('./account.js');
-var hoodieAccountRemote = require('./account_remote.js');
-var hoodieConfig = require('./config.js');
-var hoodiePromises = require('./promises.js');
-var hoodieRequest = require('./request.js');
-var hoodieConnection = require('./connection.js');
-var hoodieDispose = require('./dispose.js');
-var hoodieOpen = require('./open.js');
-var hoodieLocalStore = require('./local_store.js');
-var hoodieGenerateId = require('./generate_id.js');
-var hoodieTask = require('./task.js');
-var hoodieEvents = require('./events.js');
+var hoodieAccount = require('./hoodie/account');
+var hoodieAccountRemote = require('./hoodie/account_remote');
+var hoodieConfig = require('./hoodie/config');
+var hoodiePromises = require('./hoodie/promises');
+var hoodieRequest = require('./hoodie/request');
+var hoodieConnection = require('./hoodie/connection');
+var hoodieDispose = require('./hoodie/dispose');
+var hoodieOpen = require('./hoodie/open');
+var hoodieLocalStore = require('./hoodie/local_store');
+var hoodieGenerateId = require('./hoodie/generate_id');
+var hoodieTask = require('./hoodie/task');
+var hoodieEvents = require('./hoodie/events');
 
 // Constructor
 // -------------
