@@ -1,5 +1,3 @@
-/* exported HoodieError */
-
 // Hoodie Error
 // -------------
 
@@ -57,3 +55,5 @@ function HoodieError(properties) {
 }
 HoodieError.prototype = new Error();
 HoodieError.prototype.constructor = HoodieError;
+
+module.exports = HoodieError;
