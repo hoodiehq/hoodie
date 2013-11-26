@@ -1976,8 +1976,33 @@ describe('hoodie.account', function () {
         expect(this.promise).to.be.rejected();
       });
     }); // signIn fails
-  });
+  }); // #changeUsername
 
+
+  describe('#subscribeToOutsideEvents', function() {
+    beforeEach(function() {
+      var events = {};
+
+      this.sandbox.stub(this.hoodie, 'on', function(eventName, cb) {
+        events[eventName] = cb;
+      });
+      this.sandbox.spy(this.account, 'request');
+      this.sandbox.stub(this.account, 'hasAccount').returns(true);
+      this.account.subscribeToOutsideEvents();
+      this.hoodie.on.reset();
+      this.events = events;
+    });
+
+    it('subscribes to remote:error:unauthenticated', function() {
+      expect(this.events['remote:error:unauthenticated']).to.be.a(Function);
+    });
+
+    it('reauthenticateds on remote:error:unauthenticated', function() {
+      this.hoodie.request.reset();
+      this.events['remote:error:unauthenticated']();
+      expect(this.account.request).to.be.calledWith('GET', '/_session');
+    });
+  });
 });
 
 function validSessionResponse () {

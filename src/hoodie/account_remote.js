@@ -101,7 +101,7 @@ function hoodieRemote (hoodie) {
   }
 
   //
-  // subscribe to events coming from account
+  // subscribe to events coming from outside
   //
   function subscribeToOutsideEvents() {
 
