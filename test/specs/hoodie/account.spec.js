@@ -1423,6 +1423,7 @@ describe('hoodie.account', function () {
         });
       }); // user has local changes
 
+
       _and('user has no local changes', function() {
         beforeEach(function () {
           this.hoodie.store.hasLocalChanges.returns(false);
@@ -1432,7 +1433,6 @@ describe('hoodie.account', function () {
         it('should disconnect', function () {
           expect(this.hoodie.remote.disconnect).to.be.called();
         });
-
         it('should send a DELETE request to http://cou.ch/_session', function () {
           expect(this.hoodie.request).to.be.calledWith('DELETE', '/_session');
         });
