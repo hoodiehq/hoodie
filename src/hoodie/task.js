@@ -1,6 +1,3 @@
-/* exported hoodieTask */
-/* global hoodieEvents, hoodieScopedTask */
-
 // Tasks
 // ============
 
@@ -23,7 +20,10 @@
 //     emailTasks.start( properties );
 //     emailTasks.cancel('id123');
 //
+var hoodieEvents = require('./events');
+var hoodieScopedTask = require('./scoped_task');
 
+//
 function hoodieTask(hoodie) {
 
   // public API
@@ -271,3 +271,5 @@ function hoodieTask(hoodie) {
   // extend hoodie
   hoodie.task = api;
 }
+
+module.exports = hoodieTask;
