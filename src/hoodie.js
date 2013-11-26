@@ -4,7 +4,18 @@
 // the door to world domination (apps)
 //
 
-
+var hoodieAccount = require('./account.js');
+var hoodieAccountRemote = require('./account_remote.js');
+var hoodieConfig = require('./config.js');
+var hoodiePromises = require('./promises.js');
+var hoodieRequest = require('./request.js');
+var hoodieConnection = require('./connection.js');
+var hoodieDispose = require('./dispose.js');
+var hoodieOpen = require('./open.js');
+var hoodieLocalStore = require('./local_store.js');
+var hoodieGenerateId = require('./generate_id.js');
+var hoodieTask = require('./task.js');
+var hoodieEvents = require('./events.js');
 
 // Constructor
 // -------------
@@ -46,18 +57,12 @@ function Hoodie(baseUrl) {
   // Extending hoodie core
   //
 
-  /* global hoodieAccount, hoodieRemote, hoodieConfig, hoodieStore,
-            hoodiePromises, hoodieRequest, hoodieConnection, hoodieGenerateId,
-            hoodieDispose, hoodieOpen, hoodieTask
-  */
-
   // * hoodie.bind
   // * hoodie.on
   // * hoodie.one
   // * hoodie.trigger
   // * hoodie.unbind
   // * hoodie.off
-  /*global hoodieEvents */
   hoodie.extend( hoodieEvents );
 
 
@@ -86,7 +91,7 @@ function Hoodie(baseUrl) {
   hoodie.extend( hoodieOpen );
 
   // * hoodie.store
-  hoodie.extend( hoodieStore );
+  hoodie.extend( hoodieLocalStore );
 
   // * hoodie.task
   hoodie.extend( hoodieTask );
@@ -98,7 +103,7 @@ function Hoodie(baseUrl) {
   hoodie.extend( hoodieAccount );
 
   // * hoodie.remote
-  hoodie.extend( hoodieRemote );
+  hoodie.extend( hoodieAccountRemote );
 
 
   //
