@@ -106,12 +106,12 @@ function hoodieRemote (hoodie) {
   function subscribeToOutsideEvents() {
 
     hoodie.on('remote:connect', function() {
-      hoodie.on('store:idle', remote.push);
+      hoodie.on('store:dirty', remote.push);
       remote.push();
     });
 
     hoodie.on('remote:disconnect', function() {
-      hoodie.unbind('store:idle', remote.push);
+      hoodie.unbind('store:dirty', remote.push);
     });
 
     hoodie.on('disconnected', remote.disconnect);

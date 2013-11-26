@@ -131,17 +131,17 @@ describe('hoodie.remote', function() {
       this.events['remote:connect']();
       expect(this.remote.push).to.be.called();
     });
-    it('subscribes to store:idle on remote:connect', function() {
+    it('subscribes to store:dirty on remote:connect', function() {
       this.events['remote:connect']();
-      expect(this.hoodie.on).to.be.calledWith('store:idle', this.remote.push);
+      expect(this.hoodie.on).to.be.calledWith('store:dirty', this.remote.push);
     });
 
     it('subscribes to remote:disconnect', function() {
       expect(this.events['remote:disconnect']).to.be.a(Function);
     });
-    it('unbinds from store:idle on remote:disconnect', function() {
+    it('unbinds from store:dirty on remote:disconnect', function() {
       this.events['remote:disconnect']();
-      expect(this.hoodie.unbind).to.be.calledWith('store:idle', this.remote.push);
+      expect(this.hoodie.unbind).to.be.calledWith('store:dirty', this.remote.push);
     });
 
     it('subscribes to reconnected', function() {
