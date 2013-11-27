@@ -1,6 +1,6 @@
 var store = require('./store');
 var task  = require('./task');
-var promise = require('./promise');
+var promise = require('./promises');
 
 module.exports = function () {
 
