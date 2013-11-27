@@ -1,11 +1,11 @@
 /* global hoodieConfig:true */
+//var hoodieConfig = require('../../../src/hoodie/config');
 
-var Mocks = require('../../mocks/');
+describe('Hoodie.Config', function() {
 
-//describe('Hoodie.Config', function() {
+  beforeEach(function() {
 
-  //beforeEach(function() {
-    //this.hoodie = Mocks.hoodie();
+    //this.hoodie = this.MOCKS.hoodie.apply(this);
 
     //this.updateOrAddSpy = this.hoodie.store.updateOrAdd.returns('promise');
     //this.hoodie.store.findDefer.resolve({
@@ -13,8 +13,14 @@ var Mocks = require('../../mocks/');
     //});
 
     //hoodieConfig( this.hoodie );
-    //this.config = this.hoodie.config;
-  //});
+
+    this.config = this.hoodie.config;
+  });
+
+
+  it('', function() {
+
+  });
 
   //describe('#set(key, value)', function() {
 
@@ -64,4 +70,4 @@ var Mocks = require('../../mocks/');
 
   //});
 
-//});
+});

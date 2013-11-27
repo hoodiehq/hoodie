@@ -1,9 +1,11 @@
 // hoodieConnection
 module.exports = function() {
 
+  var self = this;
+
   return {
-    isConnected: sinon.spy(),
-    checkConnection: sinon.spy()
+    isConnected: self.sandbox.spy(),
+    checkConnection: self.sandbox.spy()
   };
 
 };

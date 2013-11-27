@@ -1,9 +1,12 @@
 module.exports = function() {
+
+  var self = this;
+
   var api = {
-    get : sinon.stub().returnsArg(0),
-    set : sinon.spy(),
-    remove : sinon.spy(),
-    clear : sinon.spy()
+    get : self.sandbox.stub().returnsArg(0),
+    set : self.sandbox.spy(),
+    remove : self.sandbox.spy(),
+    clear : self.sandbox.spy()
   };
 
   return api;

@@ -1,11 +1,11 @@
 var store = require('./store');
 var task  = require('./task');
 var promise = require('./promises');
+var events = require('./events');
 
 module.exports = function () {
 
   'use strict';
-  var events = {};
 
   var api = {
     baseUrl: 'http://my.cou.ch',

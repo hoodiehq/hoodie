@@ -1,9 +1,11 @@
 module.exports = function() {
 
+  var self = this;
+
   var api = {
-    patchIfNotPersistant : sinon.spy(),
-    subscribeToOutsideEvents : sinon.spy(),
-    bootstrapDirtyObjects : sinon.spy()
+    patchIfNotPersistant : self.sandbox.spy(),
+    subscribeToOutsideEvents : self.sandbox.spy(),
+    bootstrapDirtyObjects : self.sandbox.spy()
   };
 
   return api;
