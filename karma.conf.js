@@ -105,7 +105,7 @@ module.exports = function(config) {
     browsers: [],
 
     preprocessors: {
-      'src/hoodie/**/*': ['browserify']
+      'src/hoodie/hoodie.js': ['browserify']
     },
 
     browserify: {},
