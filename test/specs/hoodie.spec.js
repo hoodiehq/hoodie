@@ -152,13 +152,13 @@ describe('Hoodie', function() {
 
   });
 
-  describe('Hoodie.extend', function() {
-    it('should init extensions on initialization', function() {
-      var extension = sinon.spy();
-      Hoodie.extend( extension );
-      var hoodie = new Hoodie();
-      expect(extension).to.be.calledWith(hoodie);
-    });
-  });
+  //describe('Hoodie.extend', function() {
+    //it('should init extensions on initialization', function() {
+      //var extension = sinon.spy();
+      //Hoodie.extend( extension );
+      //var hoodie = new Hoodie();
+      //expect(extension).to.be.calledWith(hoodie);
+    //});
+  //});
 
 });
