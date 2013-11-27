@@ -1,5 +1,4 @@
-var Mocks = window.Mocks || {};
-Mocks.StoreApi = function () {
+module.exports = function () {
 
   var o = { api: function() {} };
 

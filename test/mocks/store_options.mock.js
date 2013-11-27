@@ -1,6 +1,4 @@
-var Mocks = window.Mocks || {};
-
-Mocks.storeOptions = function(name) {
+module.exports = function(name) {
 
   var options = {};
 

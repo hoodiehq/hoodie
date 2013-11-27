@@ -1,6 +1,5 @@
 var promiseMock;
-
-var Mocks = window.Mocks || {};
+var hoodieEvents = require('../../src/hoodie/events');
 
 promiseMock = {
   pipe: function () {},
@@ -9,7 +8,7 @@ promiseMock = {
   then: function () {}
 };
 
-Mocks.Hoodie = function () {
+module.exports = function () {
 
   'use strict';
   var events = {};

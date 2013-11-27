@@ -1,5 +1,4 @@
-var Mocks = window.Mocks || {};
-Mocks.hoodieTask = function (hoodie) {
+module.exports = function (hoodie) {
 
   if (!hoodie) {
     hoodie = {};
