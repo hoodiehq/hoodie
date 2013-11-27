@@ -1,4 +1,10 @@
-// hoodiePromises
-module.exports = function(hoodie) {
+module.exports = function() {
+
+  return {
+    pipe: function () {},
+    fail: function () {},
+    done: function () {},
+    then: function () {}
+  };
 
 };

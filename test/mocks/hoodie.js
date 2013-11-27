@@ -1,14 +1,6 @@
-/* globals Mocks:true */
-var Mocks = require('./hoodie');
-
-var promiseMock;
-
-promiseMock = {
-  pipe: function () {},
-  fail: function () {},
-  done: function () {},
-  then: function () {}
-};
+var store = require('./store');
+var task  = require('./task');
+var promise = require('./promise');
 
 module.exports = function () {
 
@@ -47,11 +39,11 @@ module.exports = function () {
       var _ref;
       return (_ref = $.Deferred()).reject.apply(_ref, arguments).promise();
     },
-    store: Mocks.store(),
-    task: Mocks.task(),
+    store: store(),
+    task: task(),
     account: {
       authenticate: function () {
-        return promiseMock;
+        return promise();
       },
       db: function () {},
       on: function () {},

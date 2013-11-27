@@ -1,5 +1,4 @@
-// hoodieAccount
-module.exports = function(hoodie) {
+module.exports = function() {
   var api = {
     checkPasswordReset : sinon.spy(),
     authenticate : sinon.stub(),
@@ -9,5 +8,5 @@ module.exports = function(hoodie) {
   api.authenticateDefer = $.Deferred();
   api.authenticate.returns(api.authenticateDefer.promise());
 
-  hoodie.account = api;
+  return api;
 };

@@ -1,26 +1,19 @@
-module.exports = function (hoodie) {
+module.exports = function () {
 
-  if (!hoodie) {
-    hoodie = {};
-  }
+  var task = {};
 
-  hoodie.task = function() {};
+  task.startDefer = $.Deferred();
+  task.cancelDefer = $.Deferred();
+  task.cancelAllDefer = $.Deferred();
+  task.restartDefer = $.Deferred();
+  task.restartAllDefer = $.Deferred();
 
-  hoodie.task.startDefer = $.Deferred();
-  hoodie.task.cancelDefer = $.Deferred();
-  hoodie.task.cancelAllDefer = $.Deferred();
-  hoodie.task.restartDefer = $.Deferred();
-  hoodie.task.restartAllDefer = $.Deferred();
+  task.start = sinon.stub().returns(task.startDefer.promise());
+  task.cancel = sinon.stub().returns(task.cancelDefer.promise());
+  task.cancelAll = sinon.stub().returns(task.cancelAllDefer.promise());
+  task.restart = sinon.stub().returns(task.restartDefer.promise());
+  task.restartAll = sinon.stub().returns(task.restartAllDefer.promise());
+  task.subscribeToOutsideEvents = sinon.spy();
 
-  hoodie.task.start = sinon.stub().returns(hoodie.task.startDefer.promise());
-  hoodie.task.cancel = sinon.stub().returns(hoodie.task.cancelDefer.promise());
-  hoodie.task.cancelAll = sinon.stub().returns(hoodie.task.cancelAllDefer.promise());
-  hoodie.task.restart = sinon.stub().returns(hoodie.task.restartDefer.promise());
-  hoodie.task.restartAll = sinon.stub().returns(hoodie.task.restartAllDefer.promise());
-
-  hoodie.task.subscribeToOutsideEvents = sinon.spy();
-
-  sinon.stub(hoodie, 'task', function() {
-    return hoodie.task;
-  });
+  return task;
 };

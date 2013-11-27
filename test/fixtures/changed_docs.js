@@ -22,4 +22,5 @@ module.exports = function() {
       createdAt: '2012-20-12T12:00:00.000Z'
     }
   ];
+
 };

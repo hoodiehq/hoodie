@@ -1,10 +1,10 @@
-// hoodieRemoteStore
-module.exports = function(hoodie) {
+module.exports = function() {
+
   var api = {
     loadListOfKnownObjectsFromLocalStore : sinon.spy(),
     subscribeToOutsideEvents : sinon.spy(),
     connect : sinon.spy()
   };
 
-  hoodie.remote = api;
+  return api;
 };
