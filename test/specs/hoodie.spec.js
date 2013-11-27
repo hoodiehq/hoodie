@@ -72,9 +72,9 @@ describe('Hoodie', function() {
     });
 
     // test for extending with core modules
-    it('should extend with hoodieEvents module', function() {
-      expect(window.hoodieEvents).to.be.calledWith(this.hoodie);
-    });
+    //it('should extend with hoodieEvents module', function() {
+      //expect(window.hoodieEvents).to.be.calledWith(this.hoodie);
+    //});
     //it('should extend with hoodiePromises module', function() {
       //expect(global.hoodiePromises).to.be.calledWith(this.hoodie);
     //});
