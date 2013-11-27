@@ -1,5 +1,7 @@
+/* globals Mocks:true */
+var Mocks = require('./hoodie');
+
 var promiseMock;
-var hoodieEvents = require('../../src/hoodie/events');
 
 promiseMock = {
   pipe: function () {},
@@ -12,7 +14,6 @@ module.exports = function () {
 
   'use strict';
   var events = {};
-  hoodieEvents(events);
 
   var api = {
     baseUrl: 'http://my.cou.ch',
@@ -46,8 +47,8 @@ module.exports = function () {
       var _ref;
       return (_ref = $.Deferred()).reject.apply(_ref, arguments).promise();
     },
-    store: Mocks.StoreApi(),
-    task: Mocks.hoodieTask(),
+    store: Mocks.store(),
+    task: Mocks.task(),
     account: {
       authenticate: function () {
         return promiseMock;
