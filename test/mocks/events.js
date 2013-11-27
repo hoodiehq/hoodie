@@ -1,8 +1,12 @@
 module.exports = function() {
+
+  var self = this;
+
   return {
-    on : sinon.spy(),
-    one : sinon.spy(),
-    trigger : sinon.spy(),
-    unbind : sinon.spy()
+    on : self.sandbox.spy(),
+    one : self.sandbox.spy(),
+    trigger : self.sandbox.spy(),
+    unbind : self.sandbox.spy()
   };
+
 };

@@ -1,12 +1,13 @@
 module.exports = function() {
-  var api = {
-    checkPasswordReset : sinon.spy(),
-    authenticate : sinon.stub(),
-    on : sinon.spy()
-  };
 
-  api.authenticateDefer = $.Deferred();
-  api.authenticate.returns(api.authenticateDefer.promise());
+  var self = this;
+
+  var api = {
+    checkPasswordReset : self.sandbox.spy(),
+    authenticate : self.sandbox.sinon.stub().returns(api.authenticateDefer.promise()),
+    on : self.sandbox.spy(),
+    authenticateDefer: $.Deferred()
+  };
 
   return api;
 };

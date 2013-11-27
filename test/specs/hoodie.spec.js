@@ -1,16 +1,5 @@
 /* globals Hoodie:true */
 
-//var hoodieAccount = mocks.account();
-//var hoodieConfig = mocks.config();
-//var hoodieConnection = mocks.connnection();
-//var hoodieDispose = mocks.dispose();
-//var hoodieGenerateId = mocks.generate_id();
-//var hoodieOpen = mocks.open();
-//var hoodiePromises = mocks.promises();
-//var hoodieRemoteStore = mocks.remote_store();
-//var hoodieRequest = mocks.request();
-//var hoodieStore = mocks.store();
-//var hoodieTask = mocks.task();
 
 var Hoodie = require('../../src/hoodie');
 
@@ -20,8 +9,21 @@ describe('Hoodie', function() {
 
   beforeEach(function() {
 
-    var hoodieEvents = this.MOCKS.events();
     this.hoodie = new Hoodie('http://couch.example.com');
+
+    var hoodieEvents = this.MOCKS.events.apply(this);
+    //var hoodieAccount = this.Mocks.account.apply(this);
+    //var hoodieConfig = this.Mocks.config();
+    //var hoodieConnection = this.Mocks.connnection();
+    //var hoodieDispose = this.Mocks.dispose();
+    //var hoodieGenerateId = this.Mocks.generate_id();
+    //var hoodieOpen = this.Mocks.open();
+    //var hoodiePromises = this.Mocks.promises();
+    //var hoodieRemoteStore = this.mocks.remote_store();
+    //var hoodieRequest = this.Mocks.request();
+    //var hoodieStore = this.Mocks.store();
+    //var hoodieTask = this.Mocks.task();
+
 
     // stubbing all the modules
     this.sandbox.stub(this.hoodie, 'on', hoodieEvents.on);
