@@ -9,34 +9,16 @@ $.ajax = function() {
 };
 
 _when = function(description, specs) {
-  describe("when " + description, specs);
+  describe('when ' + description, specs);
 };
 
 _and = function(description, specs) {
-  describe("and " + description, specs);
+  describe('and ' + description, specs);
 };
 
 _but = function(description, specs) {
-  describe("but " + description, specs);
+  describe('but ' + description, specs);
 };
-
-mocha.setup({globals: ['setTimeout', 'clearTimeout', 'setInterval', 'clearInterval']});
-
-
-before(function () {
-});
-
-beforeEach(function () {
-  this.sandbox = sinon.sandbox.create();
-});
-
-afterEach(function () {
-  this.sandbox.restore();
-});
-
-after(function () {
-});
-
 
 // expect.js helpers
 expect.Assertion.prototype.called = function() {

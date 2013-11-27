@@ -1,33 +1,18 @@
 /* globals Hoodie:true */
 
-var mocks = require('../mocks/');
-
-var hoodieAccount = mocks.account;
-var hoodieConfig = mocks.config;
-var hoodieConnection = mocks.connnection;
-var hoodieDispose = mocks.dispose;
-var hoodieEvents = mocks.events;
-var hoodieGenerateId = mocks.generate_id;
-var hoodieOpen = mocks.open;
-var hoodiePromises = mocks.promises;
-var hoodieRemoteStore = mocks.remote_store;
-var hoodieRequest = mocks.request;
-var hoodieStore = mocks.store;
-var hoodieTask = mocks.task;
+//var hoodieAccount = mocks.account();
+//var hoodieConfig = mocks.config();
+//var hoodieConnection = mocks.connnection();
+//var hoodieDispose = mocks.dispose();
+//var hoodieGenerateId = mocks.generate_id();
+//var hoodieOpen = mocks.open();
+//var hoodiePromises = mocks.promises();
+//var hoodieRemoteStore = mocks.remote_store();
+//var hoodieRequest = mocks.request();
+//var hoodieStore = mocks.store();
+//var hoodieTask = mocks.task();
 
 var Hoodie = require('../../src/hoodie');
-
-describe('Hoodie', function() {
-
-  beforeEach(function() {
-    this.hoodie = new Hoodie('http://couch.example.com');
-  });
-
-  //it('should hoodie.account.checkPasswordReset()', function() {
-    ////expect(this.hoodie.account.checkPasswordReset).to.be.called();
-  //});
-
-});
 
 describe('Hoodie', function() {
 
@@ -35,11 +20,14 @@ describe('Hoodie', function() {
 
   beforeEach(function() {
 
+    var hoodieEvents = this.MOCKS.events();
+    this.hoodie = new Hoodie('http://couch.example.com');
+
     // stubbing all the modules
-    //this.sandbox.stub(this.hoodie, 'on', hoodieEvents.on);
-    //this.sandbox.stub(this.hoodie, 'one', hoodieEvents.one);
-    //this.sandbox.stub(this.hoodie, 'trigger', hoodieEvents.trigger);
-    //this.sandbox.stub(this.hoodie, 'unbind', hoodieEvents.unbind);
+    this.sandbox.stub(this.hoodie, 'on', hoodieEvents.on);
+    this.sandbox.stub(this.hoodie, 'one', hoodieEvents.one);
+    this.sandbox.stub(this.hoodie, 'trigger', hoodieEvents.trigger);
+    this.sandbox.stub(this.hoodie, 'unbind', hoodieEvents.unbind);
 
     //this.sandbox.stub(global, 'hoodiePromises', hoodiePromises);
     //this.sandbox.stub(global, 'hoodieRequest', hoodieRequest);
@@ -54,7 +42,6 @@ describe('Hoodie', function() {
     //this.sandbox.stub(global, 'hoodieRemoteStore', hoodieRemoteStore);
     //this.sandbox.stub(global, 'addEventListener');
 
-    this.hoodie = new Hoodie('http://couch.example.com');
   });
 
   describe('new Hoodie(baseUrl)', function() {

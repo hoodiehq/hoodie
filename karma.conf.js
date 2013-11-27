@@ -18,7 +18,8 @@ module.exports = function(config) {
       { pattern: 'lib/jquery/jquery.js', watched: false, included: true },
       { pattern: 'lib/expect/expect.js', watched: false, included: true },
       { pattern: 'lib/sinonjs/sinon.js', watched: false, included: true },
-      'test/lib/helpers.js',
+      //'test/lib/helpers.js',
+      'test/lib/setup.js',
 
       'test/specs/hoodie.spec.js',
       // 'test/specs/hoodie/account.spec.js',
@@ -80,7 +81,8 @@ module.exports = function(config) {
 
     preprocessors: {
       'src/hoodie/hoodie.js': ['browserify'],
-      'test/specs/**/*.js': ['browserify']
+      'test/specs/**/*.js': ['browserify'],
+      'test/lib/setup.js': ['browserify']
     },
 
     // https://github.com/xdissent/karma-browserify#options
