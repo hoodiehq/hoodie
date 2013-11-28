@@ -7,10 +7,6 @@ module.exports = function () {
 
   'use strict';
 
-  console.log('this.sandbox')
-  console.log(this.sandbox)
-  console.log(this)
-
   var eventsApi = events.apply(this);
   var promiseApi = promise.apply(this);
 
