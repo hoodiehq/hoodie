@@ -8,10 +8,10 @@ module.exports = {
   generate_id: require('./generate_id'),
   open: require('./open'),
   promises: require('./promises'),
-  remote_store: require('./remote_store'),
+  remoteStore: require('./remote_store'),
   request: require('./request'),
-  local_store: require('./local_store'),
+  localStore: require('./local_store'),
   store: require('./store'),
-  store_backend: require('./store_backend'),
+  storeOptions: require('./store_options'),
   task: require('./task'),
 };

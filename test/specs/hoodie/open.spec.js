@@ -1,12 +1,21 @@
-/* global hoodieOpen:true */
+require('../../lib/setup');
+var remoteStoreStub = sinon.stub();
+
+// stub the requires before loading the actual module
+global.stubRequire('src/hoodie/remote_store', remoteStoreStub);
+var hoodieOpen = require('../../../src/hoodie/open');
 
 describe('#open(store, options)', function() {
 
   beforeEach(function() {
-    this.hoodie = new Mocks.Hoodie();
+    this.hoodie = this.MOCKS.hoodie.apply(this);
     this.requestDefer = this.hoodie.defer();
-    this.sandbox.spy(window, 'hoodieRemoteStore');
+
     hoodieOpen(this.hoodie);
+  });
+
+  after(function() {
+    global.unstubRequire('src/hoodie/remote_store');
   });
 
   it('should instantiate a Remote instance', function() {
@@ -15,10 +24,10 @@ describe('#open(store, options)', function() {
       option: 'value'
     });
 
-    expect(window.hoodieRemoteStore.withArgs(this.hoodie, {
+    expect(remoteStoreStub).to.be.calledWith(this.hoodie, {
       name: 'store_name',
       option: 'value'
-    })).to.be.ok();
+    });
   });
 
 });

@@ -1,10 +1,10 @@
 module.exports = function() {
 
   return {
-    on : this.sandbox.spy(),
-    one : this.sandbox.spy(),
-    trigger : this.sandbox.spy(),
-    unbind : this.sandbox.spy()
+    on : this.sandbox.stub(),
+    one : this.sandbox.stub(),
+    trigger : this.sandbox.stub(),
+    unbind : this.sandbox.stub()
   };
 
 };

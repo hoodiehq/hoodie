@@ -4,6 +4,7 @@ module.exports = (function() {
 
   before(function () {
     this.MOCKS = require('../mocks/');
+    this.FIXTURES = require('../fixtures/');
   });
 
   beforeEach(function () {
@@ -17,7 +18,6 @@ module.exports = (function() {
         JSON.stringify({})
       ]
     );
-
   });
 
   afterEach(function () {

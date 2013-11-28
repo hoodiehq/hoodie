@@ -25,24 +25,22 @@ module.exports = function(config) {
       // incompatibilities with browserify, as discussed (@gr2m & @svnlto)
       // 'test/specs/hoodie.spec.js',
 
-      // 'test/specs/hoodie/account.spec.js',
-      // 'test/specs/hoodie/config.spec.js',
-      'test/specs/wtf.spec.js',
-
-      // 'test/specs/hoodie/dispose.spec.js',
-      // 'test/specs/hoodie/events.spec.js',
-      // 'test/specs/hoodie/local_store.spec.js',
-      // 'test/specs/hoodie/open.spec.js',
-      // 'test/specs/hoodie/promises.spec.js',
-      // 'test/specs/hoodie/request.spec.js',
-      // 'test/specs/hoodie/store.spec.js',
-      // 'test/specs/hoodie/scoped_store.spec.js',
-      // 'test/specs/hoodie/remote_store.spec.js',
-      // 'test/specs/hoodie/generate_id.spec.js',
-      // 'test/specs/hoodie/account_remote.spec.js',
-      // 'test/specs/hoodie/task.spec.js',
-      // 'test/specs/hoodie/scoped_task.spec.js',
-      // 'test/specs/hoodie/connection.spec.js'
+      'test/specs/hoodie/account.spec.js',
+      'test/specs/hoodie/account_remote.spec.js',
+      'test/specs/hoodie/config.spec.js',
+      'test/specs/hoodie/connection.spec.js',
+      'test/specs/hoodie/dispose.spec.js',
+      'test/specs/hoodie/events.spec.js',
+      'test/specs/hoodie/generate_id.spec.js',
+      'test/specs/hoodie/local_store.spec.js',
+      'test/specs/hoodie/open.spec.js',
+      'test/specs/hoodie/promises.spec.js',
+      'test/specs/hoodie/remote_store.spec.js',
+      'test/specs/hoodie/request.spec.js',
+      'test/specs/hoodie/scoped_store.spec.js',
+      'test/specs/hoodie/scoped_task.spec.js',
+      'test/specs/hoodie/store.spec.js',
+      'test/specs/hoodie/task.spec.js'
     ],
 
 

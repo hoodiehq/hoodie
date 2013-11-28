@@ -1,67 +1,42 @@
+// modules
+var account = require('./account');
+var config = require('./config');
+var generateId = require('./generate_id');
 var localStore = require('./local_store');
-var task  = require('./task');
-var promise = require('./promises');
-var events = require('./events');
+var openMethod = require('./open');
+var accountRemote = require('./account_remote');
+var request = require('./request');
+var task = require('./task');
+
+// mixins
+var eventsMixin = require('./events');
+var promiseMixin = require('./promises');
+var connectionMixin = require('./connection');
 
 module.exports = function () {
 
   'use strict';
 
-  var eventsApi = events.apply(this);
-  var promiseApi = promise.apply(this);
-
   var api = {
-    baseUrl: 'http://my.cou.ch',
+    baseUrl: 'https://my.hood.ie',
 
-    // event methods
-    trigger: eventsApi.trigger,
-    on: eventsApi.bind,
-    one: eventsApi.one,
-    unbind: eventsApi.unbind,
+    // helpers
+    request: request.apply(this),
+    open: openMethod.apply(this),
+    generateId: generateId.apply(this),
 
-    // promise methods
-    defer: promiseApi.defer,
-    isPromise: promiseApi.isPromise,
-    resolve: promiseApi.resolve,
-    reject: promiseApi.reject,
-    resolveWith: promiseApi.resolveWith,
-    rejectWith: promiseApi.rejectWith,
-
-    request: function () {},
-    checkConnection: function () {},
-    open: function () {},
-    generateId: function () {
-      return 'uuid';
-    },
-
+    // main modules
     store: localStore.apply(this),
     task: task.apply(this),
-    account: {
-      authenticate: function () {
-        return promise();
-      },
-      db: function () {},
-      on: function () {},
-      ownerHash: 'owner_hash',
-      hasAccount: function () {},
-      anonymousSignUp: function () {}
-    },
-    config: {
-      set: function () {},
-      get: function () {},
-      unset: function () {},
-      clear: function () {}
-    },
-    remote: {
-      connect: function () {},
-      disconnect: function () {},
-      sync: function () {},
-      on: function () {},
-      one: function () {},
-      trigger: function () {},
-      push: function () {}
-    }
+    account: account.apply(this),
+    config: config.apply(this),
+    remote: accountRemote.apply(this),
   };
+
+  // mixin events, promise & connection APIs
+  $.extend(api, eventsMixin.apply(this));
+  $.extend(api, promiseMixin.apply(this));
+  $.extend(api, connectionMixin.apply(this));
 
   return api;
 };

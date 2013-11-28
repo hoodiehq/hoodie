@@ -29,7 +29,9 @@
 //     taskStore.findAll().then( showAllTasks );
 //     taskStore.update('id123', {done: true});
 //
-var hoodieScopedStoreApi = require('./store');
+
+//
+var hoodieScopedStoreApi = require('./scoped_store');
 var hoodieEvents = require('./events');
 var HoodieError = require('./error');
 var HoodieObjectTypeError = require('./error/object_type');

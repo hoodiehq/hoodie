@@ -1,9 +1,15 @@
-/* global hoodieStore:true, hoodieStoreApi:true */
+require('../../lib/setup');
+
+// stub the requires before loading the actual module
+var storeFactory = sinon.stub();
+global.stubRequire('src/hoodie/store', storeFactory);
+
+var hoodieLocalStore = require('../../../src/hoodie/local_store');
 
 describe('hoodie.store', function() {
 
   beforeEach(function() {
-    this.hoodie = new Mocks.Hoodie();
+    this.hoodie = this.MOCKS.hoodie.apply(this);
 
     // see https://github.com/pivotal/jasmine/issues/299
     Object.defineProperty(localStorage, 'setItem', { writable: true });
@@ -22,11 +28,16 @@ describe('hoodie.store', function() {
 
     this.clock = this.sandbox.useFakeTimers(0); // '1970-01-01 00:00:00'
 
-    this.storeApi = Mocks.StoreApi(this.hoodie);
-    this.sandbox.stub(window, 'hoodieStoreApi').returns(this.storeApi);
-    hoodieStore(this.hoodie);
-    this.storeBackend = hoodieStoreApi.args[0][1].backend;
+    storeFactory.reset();
+    storeFactory.returns( this.MOCKS.store.apply(this) );
+
+    hoodieLocalStore(this.hoodie);
+    this.storeBackend = storeFactory.args[0][1].backend;
     this.store = this.hoodie.store;
+  });
+
+  after(function() {
+    global.unstubRequire('src/hoodie/store');
   });
 
   //
@@ -43,6 +54,7 @@ describe('hoodie.store', function() {
       });
 
       it('should call methods on localStorage', function() {
+        debugger
         this.storeBackend.find('task', '123');
         expect(window.localStorage.getItem).to.be.called();
       });
@@ -63,35 +75,40 @@ describe('hoodie.store', function() {
 
   //
   describe('#subscribeToOutsideEvents', function() {
+    beforeEach(function() {
+
+      this.sandbox.spy(this.store, 'clear');
+
+      // this runs this.store.subscribeToOutsideEvents() inside
+      this.outsideEvents = gatherEventCallbackMapForOutsideEvents(this);
+    });
+
     it('can only be run once', function() {
-      this.store.subscribeToOutsideEvents();
       expect( this.store.subscribeToOutsideEvents ).to.eql(undefined);
     });
 
     it('should cleanup on account:cleanup', function() {
-      this.sandbox.spy(this.store, 'clear');
-      this.store.subscribeToOutsideEvents();
-      this.hoodie.trigger('account:cleanup');
-      expect( this.store.clear ).to.be.called();
+      this.outsideEvents['account:cleanup']();
+      expect(this.store.clear).to.be.called();
     });
 
     it('should mark all objects as changed on account:signup', function() {
-      this.storeApi.findAllDefer.resolve([
+
+      var changedObjects = [
         { type: 'doc', id: 'funky' },
         { type: 'doc', id: 'fresh' }
-      ]);
-      this.sandbox.stub(this.store, 'changedObjects').returns('changedObjects');
-      this.store.subscribeToOutsideEvents();
-      this.hoodie.trigger('account:signup');
-      expect(localStorage.setItem).to.be.calledWith('_dirty', 'doc/funky,doc/fresh');
+      ]
+      this.store.findAll.defer.resolve(changedObjects);
+      this.sandbox.stub(this.store, 'changedObjects').returns(changedObjects);
+      this.outsideEvents['account:signup']();
+      expect(window.localStorage.setItem).to.be.calledWith('_dirty', 'doc/funky,doc/fresh');
       expect(this.store.trigger).to.be.calledWith('dirty');
       this.clock.tick(2000);
-      expect(this.store.trigger).to.be.calledWith('idle', 'changedObjects');
+      expect(this.store.trigger).to.be.calledWith('idle', changedObjects);
     });
 
     it('should trigger "sync" events on objects that got pushed', function() {
-      this.store.subscribeToOutsideEvents();
-      this.hoodie.trigger('remote:push', { type: 'doc', id: 'funky' });
+      this.outsideEvents['remote:push']({ type: 'doc', id: 'funky' })
       expect(this.store.trigger).to.be.calledWith('sync', { type: 'doc', id: 'funky' }, undefined);
       expect(this.store.trigger).to.be.calledWith('doc:sync', { type: 'doc', id: 'funky' }, undefined);
       expect(this.store.trigger).to.be.calledWith('doc:funky:sync', { type: 'doc', id: 'funky' }, undefined);
@@ -104,7 +121,6 @@ describe('hoodie.store', function() {
     _when('remote:change event gets fired', function() {
 
       beforeEach(function() {
-        this.store.subscribeToOutsideEvents();
         this.object = {
           type: 'car',
           id: '123',
@@ -116,7 +132,7 @@ describe('hoodie.store', function() {
 
       _and('an object was removed', function() {
         beforeEach(function() {
-          this.hoodie.trigger('remote:change', 'remove', this.object);
+          this.outsideEvents['remote:change']('remove', this.object);
         });
 
         it('removes the object in store', function() {
@@ -135,7 +151,7 @@ describe('hoodie.store', function() {
 
       _and('an object was updated', function() {
         beforeEach(function() {
-          this.hoodie.trigger('remote:change', 'update', this.object);
+          this.outsideEvents['remote:change']('update', this.object);
         });
 
         it('updates the object in store', function() {
@@ -148,9 +164,8 @@ describe('hoodie.store', function() {
 
     _when('remote:bootstrap:start event gets fired', function() {
       beforeEach(function() {
-        this.store.subscribeToOutsideEvents();
         expect(this.store.isBootstrapping()).to.eql(false);
-        this.hoodie.trigger('remote:bootstrap:start', 'joe@example.com');
+        this.outsideEvents['remote:bootstrap:start']('joe@example.com');
       });
 
       it('should start bootstrapping mode', function() {
@@ -163,7 +178,7 @@ describe('hoodie.store', function() {
 
       _and('remote:bootstrap:end event gets fired', function() {
         beforeEach(function() {
-          this.hoodie.trigger('remote:bootstrap:end');
+          this.outsideEvents['remote:bootstrap:end']();
         });
 
         it('should stop bootstrapping mode', function() {
@@ -432,7 +447,7 @@ describe('hoodie.store', function() {
               name: 'test',
               createdAt: now(),
               updatedAt: now(),
-              createdBy: 'owner_hash'
+              createdBy: 'hash123'
             };
             expect(this.store.trigger).to.be.calledWith('add', object, {});
             expect(this.store.trigger).to.be.calledWith('document:add', object, {});
@@ -482,7 +497,7 @@ describe('hoodie.store', function() {
               name: 'success',
               createdAt: now(),
               updatedAt: 'yesterday',
-              createdBy: 'owner_hash'
+              createdBy: 'hash123'
             };
             stubFindItem('document', '123successful', this.properties);
             this.promise = this.storeBackend.save({
@@ -491,7 +506,7 @@ describe('hoodie.store', function() {
               name: 'success',
               createdAt: now(),
               updatedAt: 'yesterday',
-              createdBy: 'owner_hash'
+              createdBy: 'hash123'
             });
           });
 
@@ -519,7 +534,7 @@ describe('hoodie.store', function() {
             var object = $.extend({}, this.object);
             object.createdAt = now();
             object.updatedAt = now();
-            object.createdBy = 'owner_hash';
+            object.createdBy = 'hash123';
             object.type = 'document';
             object.id = '123new';
 
@@ -613,7 +628,7 @@ describe('hoodie.store', function() {
 
       it('should generate an id', function() {
         var key = getLastSavedKey();
-        expect(key).to.eql('document/uuid');
+        expect(key).to.eql('document/uuid123');
       });
     }); // called without id
 
@@ -630,14 +645,14 @@ describe('hoodie.store', function() {
       });
 
       it('should wait until bootstrapping is finished', function() {
+        this.outsideEvents = gatherEventCallbackMapForOutsideEvents(this);
         var promise = this.storeBackend.save({
           type: 'task',
           id: '1234',
           title: 'do it!'
         });
         expect(promise).to.be.pending();
-        this.store.subscribeToOutsideEvents();
-        this.hoodie.trigger('remote:bootstrap:end');
+        this.outsideEvents['remote:bootstrap:end']();
         expect(promise).to.be.resolved();
       });
 
@@ -656,9 +671,6 @@ describe('hoodie.store', function() {
 
   //
   describe('#find(type, id)', function() {
-    beforeEach(function() {
-    });
-
     _when('object can be found', function() {
       beforeEach(function() {
         stubFindItem('document', '123lessie', {
@@ -707,13 +719,13 @@ describe('hoodie.store', function() {
       });
 
       it('should wait until bootstrapping is finished', function() {
+        this.outsideEvents = gatherEventCallbackMapForOutsideEvents(this);
         stubFindItem('document', '123boot', {
           name: 'me up'
         });
         var promise = this.storeBackend.find('document', '123boot');
         expect(promise).to.be.pending();
-        this.store.subscribeToOutsideEvents();
-        this.hoodie.trigger('remote:bootstrap:end');
+        this.outsideEvents['remote:bootstrap:end']();
         expect(promise).to.be.resolved();
       });
     });
@@ -847,10 +859,10 @@ describe('hoodie.store', function() {
       });
 
       it('should wait until bootstrapping is finished', function() {
+        this.outsideEvents = gatherEventCallbackMapForOutsideEvents(this);
         var promise = this.storeBackend.findAll('todo');
         expect(promise).to.be.pending();
-        this.store.subscribeToOutsideEvents();
-        this.hoodie.trigger('remote:bootstrap:end');
+        this.outsideEvents['remote:bootstrap:end']();
         expect(promise).to.be.resolved();
       });
     }); // store is bootstrapping
@@ -1033,13 +1045,13 @@ describe('hoodie.store', function() {
 
 
       it('should wait until bootstrapping is finished', function() {
+        this.outsideEvents = gatherEventCallbackMapForOutsideEvents(this);
         stubFindItem('document', '123', {
           something: 'here'
         });
         var promise = this.storeBackend.remove('document', '123');
         expect(promise).to.be.pending();
-        this.store.subscribeToOutsideEvents();
-        this.hoodie.trigger('remote:bootstrap:end');
+        this.outsideEvents['remote:bootstrap:end']();
         expect(promise).to.be.resolved();
       });
 
@@ -1314,3 +1326,16 @@ function with_2CatsAnd_3Dogs(specs) {
     specs();
   });
 }
+
+function gatherEventCallbackMapForOutsideEvents(context) {
+  var events = {};
+  var oldOn = context.hoodie.on;
+  context.hoodie.on = function() {};
+  context.sandbox.stub(context.hoodie, 'on', function(eventName, cb) {
+    events[eventName] = cb;
+  });
+
+  context.store.subscribeToOutsideEvents();
+  context.hoodie.on = oldOn;
+  return events;
+};

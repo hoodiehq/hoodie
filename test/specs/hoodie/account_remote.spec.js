@@ -1,20 +1,21 @@
-/* global hoodieRemote:true */
+require('../../lib/setup');
+var hoodieAccountRemote = require('../../../src/hoodie/account_remote');
 
 describe('hoodie.remote', function() {
   beforeEach(function() {
-    this.hoodie = new Mocks.Hoodie();
+    this.hoodie = this.MOCKS.hoodie.apply(this);
+
     this.openConnectSpy = sinon.spy();
-    this.sandbox.stub(this.hoodie, 'open').returns({
+    this.hoodie.open.returns({
       connect: this.openConnectSpy,
       disconnect: sinon.spy(),
       push: sinon.spy()
     });
-    this.sandbox.stub(this.hoodie.account, 'db').returns('userdb');
-    this.sandbox.stub(this.hoodie.config, 'get').withArgs('_remote.since').returns(10);
+    this.hoodie.config.get.withArgs('_remote.since').returns(10);
     this.hoodie.store.index.returns(['funk/1', '$task/2']);
 
     this.clock = this.sandbox.useFakeTimers(0); // '1970-01-01 00:00:00'
-    hoodieRemote(this.hoodie);
+    hoodieAccountRemote(this.hoodie);
     this.remote = this.hoodie.remote;
     this.openArgs = this.hoodie.open.args[0];
   });
@@ -53,7 +54,7 @@ describe('hoodie.remote', function() {
   describe('#connect', function() {
     _when('user has account', function() {
       beforeEach(function() {
-        this.sandbox.stub(this.hoodie.account, 'hasAccount').returns(true);
+        this.hoodie.account.hasAccount.returns(true);
       });
 
       it('should connect to user\'s database (ignoring passed argument)', function() {
@@ -64,7 +65,7 @@ describe('hoodie.remote', function() {
 
     _when('user has no account', function() {
       beforeEach(function() {
-        this.sandbox.stub(this.hoodie.account, 'hasAccount').returns(false);
+        this.hoodie.account.hasAccount.returns(false);
       });
 
       it('should connect to user\'s database (ignoring passed argument)', function() {
@@ -76,9 +77,6 @@ describe('hoodie.remote', function() {
   });
 
   describe('#trigger', function() {
-    beforeEach(function() {
-      this.sandbox.spy(this.hoodie, 'trigger');
-    });
     it('should prefix events with "remote"', function() {
       expect(this.remote.name).to.be(undefined);
       this.remote.trigger('funky', 'fresh');
@@ -87,9 +85,6 @@ describe('hoodie.remote', function() {
   });
 
   describe('#on', function() {
-    beforeEach(function() {
-      this.sandbox.spy(this.hoodie, 'on');
-    });
     it('should prefix events with "remote"', function() {
       expect(this.remote.name).to.be(undefined);
       var cb = function() {};
@@ -99,9 +94,6 @@ describe('hoodie.remote', function() {
   });
 
   describe('#unbind', function() {
-    beforeEach(function() {
-      this.sandbox.spy(this.hoodie, 'unbind');
-    });
     it('should prefix events with "remote"', function() {
       expect(this.remote.name).to.be(undefined);
       var cb = function() {};
@@ -114,11 +106,10 @@ describe('hoodie.remote', function() {
     beforeEach(function() {
       var events = {};
 
+      this.hoodie.on = function() {};
       this.sandbox.stub(this.hoodie, 'on', function(eventName, cb) {
         events[eventName] = cb;
       });
-      this.sandbox.spy(this.hoodie, 'unbind');
-      this.sandbox.spy(this.hoodie.config, 'set');
       this.remote.subscribeToOutsideEvents();
       this.hoodie.on.reset();
       this.events = events;
@@ -148,13 +139,13 @@ describe('hoodie.remote', function() {
       expect(this.events.reconnected).to.be.a(Function);
     });
     it('connects on reconnected when user has account', function() {
-      this.sandbox.stub(this.hoodie.account, 'hasAccount').returns(true);
+      this.hoodie.account.hasAccount.returns(true);
       this.hoodie.account.db.returns('dbnamehere');
       this.events.reconnected();
       expect(this.openConnectSpy).to.be.calledWith('dbnamehere');
     });
     it('does not connect on reconnected when user has no account', function() {
-      this.sandbox.stub(this.hoodie.account, 'hasAccount').returns(false);
+      this.hoodie.account.hasAccount.returns(false);
       this.hoodie.account.db.returns('dbnamehere');
       this.events.reconnected();
       expect(this.openConnectSpy).to.not.be.called();
@@ -168,7 +159,7 @@ describe('hoodie.remote', function() {
       expect(this.events['account:signin']).to.be.a(Function);
     });
     it('connects to db on account:signin', function() {
-      this.sandbox.stub(this.hoodie.account, 'hasAccount').returns(true);
+      this.hoodie.account.hasAccount.returns(true);
       this.hoodie.account.db.returns('dbName');
       this.events['account:signin'](123);
       expect(this.openConnectSpy).to.be.calledWith('dbName');
@@ -177,7 +168,7 @@ describe('hoodie.remote', function() {
       expect(this.events['account:signin:anonymous']).to.be.a(Function);
     });
     it('connects to db on account:signin:anonymous', function() {
-      this.sandbox.stub(this.hoodie.account, 'hasAccount').returns(true);
+      this.hoodie.account.hasAccount.returns(true);
       this.hoodie.account.db.returns('dbName');
       this.events['account:signin:anonymous'](123);
       expect(this.openConnectSpy).to.be.calledWith('dbName');
@@ -187,7 +178,7 @@ describe('hoodie.remote', function() {
       expect(this.events['account:reauthenticated']).to.be.a(Function);
     });
     it('connects on account:reauthenticated', function() {
-      this.sandbox.stub(this.hoodie.account, 'hasAccount').returns(true);
+      this.hoodie.account.hasAccount.returns(true);
       this.hoodie.account.db.returns('dbName');
       this.events['account:reauthenticated'](123);
       expect(this.openConnectSpy).to.be.calledWith('dbName');

@@ -1,12 +1,19 @@
-/* global hoodieScopedStoreApi:true */
+require('../../lib/setup');
+
+// stub the requires before loading the actual module
+var eventsMixin = sinon.spy();
+global.stubRequire('src/hoodie/events', eventsMixin);
+
+global.unstubRequire('src/hoodie/scoped_store');
+var hoodieScopedStoreApi = require('../../../src/hoodie/scoped_store');
 
 describe('hoodieScopedStoreApi', function() {
 
   beforeEach(function() {
-    this.hoodie = new Mocks.Hoodie();
-    this.store = Mocks.StoreApi(this.hoodie);
-    this.sandbox.spy(window, 'hoodieEvents');
-    this.options = Mocks.storeOptions('taskstore');
+    this.hoodie = this.MOCKS.hoodie.apply(this);
+    this.store = this.MOCKS.store.apply(this);
+
+    this.options = this.MOCKS.storeOptions('taskstore');
   });
 
   _when('scoped with type = "task"', function() {
@@ -61,7 +68,7 @@ describe('hoodieScopedStoreApi', function() {
     });
 
     it('adds event API', function() {
-      expect(window.hoodieEvents).to.be.calledWith(this.hoodie, { context : this.scopedStore, namespace: 'taskstore:task' });
+      expect(eventsMixin).to.be.calledWith(this.hoodie, { context : this.scopedStore, namespace: 'taskstore:task' });
     });
   }); // 'when scoped by type only'
 
@@ -113,7 +120,7 @@ describe('hoodieScopedStoreApi', function() {
     });
 
     it('adds event API', function() {
-      expect(window.hoodieEvents).to.be.calledWith(this.hoodie, { context : this.scopedStore, namespace: 'taskstore:task:abc' });
+      expect(eventsMixin).to.be.calledWith(this.hoodie, { context : this.scopedStore, namespace: 'taskstore:task:abc' });
     });
   }); // 'when scoped by type only'
 });

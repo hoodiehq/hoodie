@@ -1,11 +1,12 @@
-/* global hoodieRequest:true */
+require('../../lib/setup');
+var hoodieRequest = require('../../../src/hoodie/request');
 
 describe('hoodie.request', function () {
 
   'use strict';
 
   beforeEach(function () {
-    this.hoodie = new Mocks.Hoodie();
+    this.hoodie = this.MOCKS.hoodie.apply(this);
     this.ajaxDefer = this.hoodie.defer();
     var ajaxPromise = this.ajaxDefer.promise();
     ajaxPromise.abort = function() {};
@@ -27,9 +28,9 @@ describe('hoodie.request', function () {
       this.hoodie.request('GET', '/');
       this.args = window.jQuery.ajax.args[0][0];
     });
-    it('should send a GET request to http://my.cou.ch/_api/', function() {
+    it('should send a GET request to https://my.hood.ie/_api/', function() {
       expect(this.args.type).to.be('GET');
-      expect(this.args.url).to.be('http://my.cou.ch/_api/');
+      expect(this.args.url).to.be('https://my.hood.ie/_api/');
     });
     it('should set `dataType: \'json\'', function() {
       expect(this.args.dataType).to.be('json');
@@ -74,9 +75,9 @@ describe('hoodie.request', function () {
       });
       this.args = args = window.jQuery.ajax.args[0][0];
     });
-    it('should send a POST request to http://my.cou.ch/_api/test', function() {
+    it('should send a POST request to https://my.hood.ie/_api/test', function() {
       expect(this.args.type).to.be('POST');
-      expect(this.args.url).to.be('http://my.cou.ch/_api/test');
+      expect(this.args.url).to.be('https://my.hood.ie/_api/test');
     });
   });
 
@@ -101,7 +102,7 @@ describe('hoodie.request', function () {
       expect(this.hoodie.request('GET', '/')).to.be.rejectedWith({
         name: 'HoodieConnectionError',
         message: 'Could not connect to Hoodie server at {{url}}.',
-        url: 'http://my.cou.ch'
+        url: 'https://my.hood.ie'
       });
     });
   });

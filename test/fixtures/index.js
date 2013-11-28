@@ -1,5 +1,5 @@
 module.exports = {
-  bulk_update_response: require('./bulk_update_response'),
-  changed_docs: require('./changed_docs'),
-  changes_response: require('./changes_response')
+  bulkUpdateResponse: require('./bulk_update_response'),
+  changedObjects: require('./changed_objects'),
+  changesResponse: require('./changes_response')
 };

@@ -1,15 +1,35 @@
-/* global hoodieStoreApi:true */
+require('../../lib/setup');
 
-describe('hoodieStoreApi', function() {
+// stub the requires before loading the actual module
+var eventsMixin = sinon.spy();
+var scopedStoreFactory = sinon.stub();
+
+global.stubRequire('src/hoodie/events', eventsMixin);
+global.stubRequire('src/hoodie/scoped_store', scopedStoreFactory);
+
+global.unstubRequire('src/hoodie/store');
+var hoodieStoreFactory = require('../../../src/hoodie/store');
+
+describe('hoodieStoreFactory', function() {
 
   beforeEach(function() {
-    this.hoodie = new Mocks.Hoodie();
-    this.options = Mocks.storeOptions('funkstore');
-    this.validate = sinon.stub();
+    this.hoodie = this.MOCKS.hoodie.apply(this);
+
+    this.options = this.MOCKS.storeOptions('funkstore');
+    this.validate = sinon.spy();
     this.optionsWithValidate = $.extend({}, this.options, {validate: this.validate});
-    this.sandbox.spy(window, 'hoodieEvents');
-    this.store = hoodieStoreApi(this.hoodie, this.options );
-    this.storeWithCustomValidate = hoodieStoreApi(this.hoodie, this.optionsWithValidate );
+
+    scopedStoreFactory.reset();
+    scopedStoreFactory.returns('scoped api');
+
+    this.store = hoodieStoreFactory(this.hoodie, this.options );
+    this.storeWithCustomValidate = hoodieStoreFactory(this.hoodie, this.optionsWithValidate );
+  });
+
+
+  after(function() {
+    global.unstubRequire('src/hoodie/events');
+    global.unstubRequire('src/hoodie/scoped_store');
   });
 
   it('sets store.validate from options.validate', function() {
@@ -25,18 +45,14 @@ describe('hoodieStoreApi', function() {
   });
 
   it('adds event API', function() {
-    expect(window.hoodieEvents).to.be.calledWith(this.hoodie, { context : this.store, namespace: 'funkstore' });
+    expect(eventsMixin).to.be.calledWith(this.hoodie, { context : this.store, namespace: 'funkstore' });
   });
 
   describe('store("task", "id")', function() {
-    beforeEach( function() {
-      this.sandbox.stub(window, 'hoodieScopedStoreApi').returns('scoped api');
-    });
-
     it('returns scoped API by type when only type set', function() {
       this.taskStore = this.store('task');
-      expect(window.hoodieScopedStoreApi).to.be.called();
-      var args = window.hoodieScopedStoreApi.args[0];
+      expect(scopedStoreFactory).to.be.called();
+      var args = scopedStoreFactory.args[0];
       expect(args[0]).to.eql(this.hoodie);
       expect(args[1]).to.eql(this.store);
       expect(args[2].type).to.be('task');
@@ -46,7 +62,7 @@ describe('hoodieStoreApi', function() {
 
     it('returns scoped API by type & id when both set', function() {
       this.taskStore = this.store('task', '123');
-      var args = window.hoodieScopedStoreApi.args[0];
+      var args = scopedStoreFactory.args[0];
       expect(args[0]).to.eql(this.hoodie);
       expect(args[1]).to.eql(this.store);
       expect(args[2].type).to.be('task');

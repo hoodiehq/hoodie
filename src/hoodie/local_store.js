@@ -892,10 +892,11 @@ function hoodieStore (hoodie) {
   function triggerDirtyAndIdleEvents() {
     store.trigger('dirty');
     window.clearTimeout(dirtyTimeout);
+    store.trigger('idle', store.changedObjects());
 
-    dirtyTimeout = window.setTimeout(function() {
-      store.trigger('idle', store.changedObjects());
-    }, idleTimeout);
+    // dirtyTimeout = window.setTimeout(function() {
+    //   store.trigger('idle', store.changedObjects());
+    // }, idleTimeout);
   }
 
   //
