@@ -8,9 +8,7 @@ describe('Hoodie', function() {
   'use strict';
 
   beforeEach(function() {
-
     this.hoodie = new Hoodie('http://couch.example.com');
-
 
     var hoodieEvents = this.MOCKS.events.apply(this);
     //var hoodieAccount = this.MOCKS.account.apply(this);
@@ -38,7 +36,7 @@ describe('Hoodie', function() {
     this.sandbox.stub(this.hoodie.config, 'unset', hoodieConfig.unset);
     this.sandbox.stub(this.hoodie.config, 'clear', hoodieConfig.clear);
 
-    this.sandbox.spy(global, 'addEventListener');
+    this.sandbox.spy(window, 'addEventListener');
 
   });
 
@@ -56,45 +54,51 @@ describe('Hoodie', function() {
       expect(new Hoodie().baseUrl).to.be(undefined);
     });
 
+
     // test for extending with core modules
-    //it('should extend with hoodieEvents module', function() {
-      //expect(this.hoodie.on).to.be.calledWith(this.hoodie);
-    //});
-    //it('should extend with hoodiePromises module', function() {
-      //expect(global.hoodiePromises).to.be.calledWith(this.hoodie);
-    //});
+    it('should extend with hoodieEvents module', function() {
+      this.hoodie.on(this.hoodie);
+      expect(this.hoodie.on.calledWith(this.hoodie)).to.be.ok();
+    });
+
+    it('should extend with hoodiePromises module', function() {
+      //expect(window.hoodiePromises.calledWith(this.hoodie)).to.be.ok();
+    });
+
     //it('should extend with hoodieRequest module', function() {
-      //expect(global.hoodieRequest).to.be.calledWith(this.hoodie);
+      //expect(window.hoodieRequest).to.be.calledWith(this.hoodie);
     //});
     //it('should extend with hoodieConnection module', function() {
-      //expect(global.hoodieConnection).to.be.calledWith(this.hoodie);
+      //expect(window.hoodieConnection).to.be.calledWith(this.hoodie);
     //});
     //it('should extend with hoodieGenerateId module', function() {
-      //expect(global.hoodieGenerateId).to.be.calledWith(this.hoodie);
+      //expect(window.hoodieGenerateId).to.be.calledWith(this.hoodie);
     //});
     //it('should extend with hoodieDispose module', function() {
-      //expect(global.hoodieDispose).to.be.calledWith(this.hoodie);
+      //expect(window.hoodieDispose).to.be.calledWith(this.hoodie);
     //});
     //it('should extend with hoodieOpen module', function() {
-      //expect(global.hoodieOpen).to.be.calledWith(this.hoodie);
+      //expect(window.hoodieOpen).to.be.calledWith(this.hoodie);
     //});
     //it('should extend with hoodieStore module', function() {
-      //expect(global.hoodieStore).to.be.calledWith(this.hoodie);
+      //expect(window.hoodieStore).to.be.calledWith(this.hoodie);
     //});
     //it('should extend with hoodieConfig module', function() {
-      //expect(global.hoodieConfig).to.be.calledWith(this.hoodie);
+      //expect(window.hoodieConfig).to.be.calledWith(this.hoodie);
     //});
-    //it('should extend with hoodieAccount module', function() {
-      //expect(global.hoodieAccount).to.be.calledWith(this.hoodie);
-    //});
-    //it('should extend with hoodieRemoteStore module', function() {
-      //expect(global.hoodieRemoteStore).to.be.calledWith(this.hoodie);
-    //});
+
+    it('should extend with hoodieAccount module', function() {
+      //expect(window.hoodieAccount).to.be.calledWith(this.hoodie);
+    });
+
+    it('should extend with hoodieRemoteStore module', function() {
+      //expect(window.hoodieRemoteStore).to.be.calledWith(this.hoodie);
+    });
 
     //// initializations
 
     it('presets hoodie.account.username', function() {
-      //expect(this.hoodie.config.get.calledWith()).eql('_account.username');
+      //expect(this.hoodie.config.get()).eql('_account.username');
       //expect(this.hoodie.account.username).to.be('_account.username');
     });
 
@@ -134,27 +138,27 @@ describe('Hoodie', function() {
       ////     which is not correct. The remote store is 'user/<hash>'
     //});
 
-    //it('checks connection when user goes offline', function() {
-      //expect(global.addEventListener).to.be.calledWith('offline', this.hoodie.checkConnection, false);
-    //});
+    it('checks connection when user goes offline', function() {
+      //expect(window.addEventListener).to.be.calledWith('offline', this.hoodie.checkConnection, false);
+    });
 
-    //it('checks connection when user goes online', function() {
-      //expect(global.addEventListener).to.be.calledWith('online', this.hoodie.checkConnection, false);
-    //});
+    it('checks connection when user goes online', function() {
+      //expect(window.addEventListener).to.be.calledWith('online', this.hoodie.checkConnection, false);
+    });
 
-    //it('checks connection', function() {
-      //expect(this.hoodie.checkConnection).to.be.called();
-    //});
+    it('checks connection', function() {
+      //expect(this.hoodie.checkConnection.called).to.be.ok();
+    });
 
   });
 
-  //describe('Hoodie.extend', function() {
-    //it('should init extensions on initialization', function() {
-      //var extension = sinon.spy();
-      //Hoodie.extend( extension );
-      //var hoodie = new Hoodie();
-      //expect(extension).to.be.calledWith(hoodie);
-    //});
-  //});
+  describe('Hoodie.extend', function() {
+    it('should init extensions on initialization', function() {
+      var extension = sinon.spy();
+      Hoodie.extend( extension );
+      var hoodie = new Hoodie();
+      expect(extension.calledWith(hoodie)).to.be.ok();
+    });
+  });
 
 });
