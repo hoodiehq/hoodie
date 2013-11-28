@@ -3,14 +3,14 @@ describe('Hoodie.Config', function() {
 
   beforeEach(function() {
     var hoodie = this.MOCKS.hoodie.apply(this);
-    var hoodieConfig = require('../../../src/hoodie/config');
+    //var hoodieConfig = require('../../../src/hoodie/config');
 
     //this.updateOrAddSpy = this.hoodie.store.updateOrAdd.returns('promise');
     //this.hoodie.store.findDefer.resolve({
       //funky: 'fresh'
     //});
 
-    hoodieConfig( hoodie );
+    //hoodieConfig( hoodie );
     // this.config = this.hoodie.config;
   });
 

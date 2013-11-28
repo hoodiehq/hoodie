@@ -1,13 +1,13 @@
+window.mocha.setup({globals: ['setTimeout', 'clearTimeout', 'setInterval', 'clearInterval']});
+
 module.exports = (function() {
 
-  window.mocha.setup({globals: ['setTimeout', 'clearTimeout', 'setInterval', 'clearInterval']});
-
   before(function () {
+    this.MOCKS = require('../mocks/');
   });
 
   beforeEach(function () {
     this.sandbox = sinon.sandbox.create();
-    this.MOCKS = require('../mocks/');
     this.sandbox.useFakeServer();
 
     this.sandbox.server.respondWith(

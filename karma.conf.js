@@ -9,7 +9,7 @@ module.exports = function(config) {
 
 
     // frameworks to use
-    frameworks: ['mocha', 'browserify'],
+    frameworks: ['browserify', 'mocha'],
 
 
     // list of files / patterns to load in the browser
@@ -83,7 +83,8 @@ module.exports = function(config) {
     browsers: [],
 
     preprocessors: {
-      'src/hoodie/hoodie.js': ['browserify'],
+      //'src/hoodie/hoodie.js': ['browserify'],
+      'src/hoodie/config.js': ['browserify'],
       'test/specs/**/*.js': ['browserify'],
       'test/lib/setup.js': ['browserify']
     },
