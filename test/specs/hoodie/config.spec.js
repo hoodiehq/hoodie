@@ -5,21 +5,19 @@ describe('Hoodie.Config', function() {
 
   beforeEach(function() {
 
-    //this.hoodie = this.MOCKS.hoodie.apply(this);
+    this.hoodie = this.MOCKS.hoodie.apply(this);
 
     //this.updateOrAddSpy = this.hoodie.store.updateOrAdd.returns('promise');
     //this.hoodie.store.findDefer.resolve({
       //funky: 'fresh'
     //});
 
-    //hoodieConfig( this.hoodie );
-
+    hoodieConfig( this.hoodie );
     this.config = this.hoodie.config;
   });
 
-
-  it('', function() {
-
+  it('should work', function() {
+    expect(this.config).to.be(Object);
   });
 
   //describe('#set(key, value)', function() {

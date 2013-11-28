@@ -21,7 +21,10 @@ module.exports = function(config) {
       'test/lib/helpers.js',
       'test/lib/setup.js',
 
-      'test/specs/hoodie.spec.js',
+      // ignoring Constructor specs temporarely for 0.5 due to
+      // incompatibilities with browserify, as discussed (@gr2m & @svnlto)
+      // 'test/specs/hoodie.spec.js',
+
       // 'test/specs/hoodie/account.spec.js',
       'test/specs/hoodie/config.spec.js',
 
