@@ -26,10 +26,10 @@ describe('Hoodie', function() {
     var hoodieTask = this.MOCKS.task.apply(this);
 
     // stubbing all the modules
-    this.sandbox.stub(hoodie, 'on', hoodieEvents);
-    this.sandbox.stub(hoodie, 'off', hoodieEvents);
-    this.sandbox.stub(hoodie, 'bind', hoodieEvents);
-    this.sandbox.stub(hoodie, 'trigger', hoodieEvents);
+    this.sandbox.stub(hoodie, 'on', hoodieEvents.on);
+    this.sandbox.stub(hoodie, 'off', hoodieEvents.off);
+    this.sandbox.stub(hoodie, 'bind', hoodieEvents.bind);
+    this.sandbox.stub(hoodie, 'trigger', hoodieEvents.trigger);
     this.sandbox.stub(global, 'hoodiePromises', hoodiePromises);
     this.sandbox.stub(global, 'hoodieRequest', hoodieRequest);
     //this.sandbox.stub(global, 'hoodieConnection', hoodieConnection);
