@@ -1,10 +1,12 @@
 module.exports = function() {
 
   return {
-    pipe: function () {},
-    fail: function () {},
-    done: function () {},
-    then: function () {}
+    defer : function() {},
+    isPromise : function() {},
+    resolve : function() {},
+    reject : function() {},
+    resolveWith : function() {},
+    rejectWith : function() {}
   };
 
 };

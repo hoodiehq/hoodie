@@ -7,40 +7,39 @@ module.exports = function () {
 
   'use strict';
 
+  console.log('this.sandbox')
+  console.log(this.sandbox)
+  console.log(this)
+
+  var eventsApi = events.apply(this);
+  var promiseApi = promise.apply(this);
+
   var api = {
     baseUrl: 'http://my.cou.ch',
-    trigger: events.trigger,
+
+    // event methods
+    trigger: eventsApi.trigger,
+    on: eventsApi.bind,
+    one: eventsApi.one,
+    unbind: eventsApi.unbind,
+
+    // promise methods
+    defer: promiseApi.defer,
+    isPromise: promiseApi.isPromise,
+    resolve: promiseApi.resolve,
+    reject: promiseApi.reject,
+    resolveWith: promiseApi.resolveWith,
+    rejectWith: promiseApi.rejectWith,
+
     request: function () {},
     checkConnection: function () {},
     open: function () {},
-    on: events.bind,
-    one: events.one,
-    unbind: events.unbind,
-    defer: $.Deferred,
-    isPromise: function(object) {
-      return !! (object &&
-                 typeof object.done === 'function' &&
-                 typeof object.resolve !== 'function');
-    },
     generateId: function () {
       return 'uuid';
     },
-    resolve: function() {
-      return $.Deferred().resolve().promise();
-    },
-    resolveWith: function () {
-      var _ref;
-      return (_ref = $.Deferred()).resolve.apply(_ref, arguments).promise();
-    },
-    reject: function() {
-      return $.Deferred().reject().promise();
-    },
-    rejectWith: function () {
-      var _ref;
-      return (_ref = $.Deferred()).reject.apply(_ref, arguments).promise();
-    },
-    store: store(),
-    task: task(),
+
+    store: store.apply(this),
+    task: task.apply(this),
     account: {
       authenticate: function () {
         return promise();

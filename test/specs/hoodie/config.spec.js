@@ -1,23 +1,22 @@
-/* global hoodieConfig:true */
-//var hoodieConfig = require('../../../src/hoodie/config');
+var hoodieConfig = require('../../../src/hoodie/config');
+var hoodieMock = require('../../mocks/hoodie');
 
 describe('Hoodie.Config', function() {
 
   beforeEach(function() {
-
-    this.hoodie = this.MOCKS.hoodie.apply(this);
+    // this.hoodie = hoodieMock.apply(this);
 
     //this.updateOrAddSpy = this.hoodie.store.updateOrAdd.returns('promise');
     //this.hoodie.store.findDefer.resolve({
       //funky: 'fresh'
     //});
 
-    hoodieConfig( this.hoodie );
-    this.config = this.hoodie.config;
+    // hoodieConfig( this.hoodie );
+    // this.config = this.hoodie.config;
   });
 
   it('should work', function() {
-    expect(this.config).to.be(Object);
+    expect(this.sandbox).to.be(Object);
   });
 
   //describe('#set(key, value)', function() {

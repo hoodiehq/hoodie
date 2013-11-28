@@ -10,8 +10,8 @@ module.exports = {
   promises: require('./promises'),
   remote_store: require('./remote_store'),
   request: require('./request'),
+  local_store: require('./local_store'),
   store: require('./store'),
-  store_api: require('./store_api'),
-  store_options: require('./store_options'),
+  store_backend: require('./store_backend'),
   task: require('./task'),
 };
