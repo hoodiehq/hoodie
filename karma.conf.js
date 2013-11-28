@@ -19,14 +19,15 @@ module.exports = function(config) {
       { pattern: 'lib/expect/expect.js', watched: false, included: true },
       { pattern: 'lib/sinonjs/sinon.js', watched: false, included: true },
       'test/lib/helpers.js',
-      'test/lib/setup.js',
+      // 'test/lib/setup.js',
 
       // ignoring Constructor specs temporarely for 0.5 due to
       // incompatibilities with browserify, as discussed (@gr2m & @svnlto)
       // 'test/specs/hoodie.spec.js',
 
       // 'test/specs/hoodie/account.spec.js',
-      'test/specs/hoodie/config.spec.js',
+      // 'test/specs/hoodie/config.spec.js',
+      'test/specs/wtf.spec.js',
 
       // 'test/specs/hoodie/dispose.spec.js',
       // 'test/specs/hoodie/events.spec.js',
