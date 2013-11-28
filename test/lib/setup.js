@@ -1,7 +1,6 @@
 window.mocha.setup({globals: ['setTimeout', 'clearTimeout', 'setInterval', 'clearInterval']});
 
-module.exports = (function() {
-
+module.exports = function(wahtTheFuck, specs) {
   before(function () {
     this.MOCKS = require('../mocks/');
   });
@@ -27,5 +26,5 @@ module.exports = (function() {
   after(function () {
   });
 
-}());
-
+  describe(wahtTheFuck, specs);
+};

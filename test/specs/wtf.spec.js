@@ -1,21 +1,7 @@
-describe('WTF', function() {
-
-  before(function () {
-    this.MOCKS = require('../mocks/');
-  });
+var describeLikeABaws = require('../lib/setup');
+describeLikeABaws('WTF', function() {
 
   beforeEach(function () {
-    this.sandbox = sinon.sandbox.create();
-    this.sandbox.useFakeServer();
-
-    this.sandbox.server.respondWith(
-      'GET', '/_api', [
-        200,
-        {'Content-Type': 'application-json'},
-        JSON.stringify({})
-      ]
-    );
-
     this.hoodie = this.MOCKS.hoodie.apply(this);
     var hoodieConfig = require('../../src/hoodie/config');
 
@@ -28,24 +14,15 @@ describe('WTF', function() {
     this.config = this.hoodie.config;
   });
 
-  afterEach(function () {
-    this.sandbox.restore();
-  });
+  _when('I am funky', function() {
+    it('should save a $config with key: value', function() {
+      this.config.set('funky', 'fresh!');
 
-  after(function () {
-  });
-
-  it('', function() {
-
-  });
-
-  it('should save a $config with key: value', function() {
-    this.config.set('funky', 'fresh!');
-
-    expect(this.hoodie.store.updateOrAdd).to.be.calledWith('$config', 'hoodie', {
-      funky: 'fresh!'
-    }, {
-      silent: false
+      expect(this.hoodie.store.updateOrAdd).to.be.calledWith('$config', 'hoodie', {
+        funky: 'fresh!'
+      }, {
+        silent: false
+      });
     });
   });
 });
