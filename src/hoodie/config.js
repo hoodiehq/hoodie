@@ -3,6 +3,9 @@
 
 //
 function hoodieConfig(hoodie) {
+
+  console.log('hoodie:', hoodie);
+
   var type = '$config';
   var id = 'hoodie';
   var cache = {};

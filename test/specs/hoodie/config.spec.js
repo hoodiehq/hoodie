@@ -1,22 +1,21 @@
-var hoodieConfig = require('../../../src/hoodie/config');
-var hoodieMock = require('../../mocks/hoodie');
 
 describe('Hoodie.Config', function() {
 
   beforeEach(function() {
-    this.hoodie = hoodieMock.apply(this);
+    var hoodie = this.MOCKS.hoodie.apply(this);
+    var hoodieConfig = require('../../../src/hoodie/config');
 
     //this.updateOrAddSpy = this.hoodie.store.updateOrAdd.returns('promise');
     //this.hoodie.store.findDefer.resolve({
       //funky: 'fresh'
     //});
 
-    // hoodieConfig( this.hoodie );
+    hoodieConfig( hoodie );
     // this.config = this.hoodie.config;
   });
 
-  it('should work', function() {
-    expect('funky').to.be('fresh');
+  it('', function() {
+
   });
 
   //describe('#set(key, value)', function() {
