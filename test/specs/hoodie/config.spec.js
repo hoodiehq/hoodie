@@ -4,7 +4,7 @@ var hoodieMock = require('../../mocks/hoodie');
 describe('Hoodie.Config', function() {
 
   beforeEach(function() {
-    // this.hoodie = hoodieMock.apply(this);
+    this.hoodie = hoodieMock.apply(this);
 
     //this.updateOrAddSpy = this.hoodie.store.updateOrAdd.returns('promise');
     //this.hoodie.store.findDefer.resolve({
@@ -16,7 +16,7 @@ describe('Hoodie.Config', function() {
   });
 
   it('should work', function() {
-    expect(this.sandbox).to.be(Object);
+    expect('funky').to.be('fresh');
   });
 
   //describe('#set(key, value)', function() {
