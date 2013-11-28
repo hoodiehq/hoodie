@@ -1,3 +1,4 @@
+require('../../lib/setup');
 var hoodieDispose = require('../../../src/hoodie/dispose');
 
 describe('hoodie.dispose()', function() {
