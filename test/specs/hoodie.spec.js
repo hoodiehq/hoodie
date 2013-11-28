@@ -9,61 +9,56 @@ describe('Hoodie', function() {
 
   beforeEach(function() {
 
-    var hoodie = new Hoodie('http://couch.example.com');
+    this.hoodie = new Hoodie('http://couch.example.com');
 
 
     var hoodieEvents = this.MOCKS.events.apply(this);
-    var hoodieAccount = this.MOCKS.account.apply(this);
+    //var hoodieAccount = this.MOCKS.account.apply(this);
     var hoodieConfig = this.MOCKS.config.apply(this);
-    //var hoodieConnection = this.MOCKS.connnection.apply(this);
-    var hoodieDispose = this.MOCKS.dispose.apply(this);
-    var hoodieGenerateId = this.MOCKS.generate_id.apply(this);
-    var hoodieOpen = this.MOCKS.open.apply(this);
-    var hoodiePromises = this.MOCKS.promises.apply(this);
-    var hoodieRemoteStore = this.MOCKS.remote_store.apply(this);
-    var hoodieRequest = this.MOCKS.request.apply(this);
-    var hoodieStore = this.MOCKS.store.apply(this);
-    var hoodieTask = this.MOCKS.task.apply(this);
+    var hoodieConnection = this.MOCKS.connection.apply(this);
+    //var hoodieGenerateId = this.MOCKS.generate_id.apply(this);
+    //var hoodieOpen = this.MOCKS.open.apply(this);
+    //var hoodiePromises = this.MOCKS.promises.apply(this);
+    //var hoodieRemoteStore = this.MOCKS.remote_store.apply(this);
+    //var hoodieRequest = this.MOCKS.request.apply(this);
+    //var hoodieStore = this.MOCKS.store.apply(this);
+    //var hoodieTask = this.MOCKS.task.apply(this);
 
     // stubbing all the modules
-    this.sandbox.stub(hoodie, 'on', hoodieEvents.on);
-    this.sandbox.stub(hoodie, 'off', hoodieEvents.off);
-    this.sandbox.stub(hoodie, 'bind', hoodieEvents.bind);
-    this.sandbox.stub(hoodie, 'trigger', hoodieEvents.trigger);
-    this.sandbox.stub(global, 'hoodiePromises', hoodiePromises);
-    this.sandbox.stub(global, 'hoodieRequest', hoodieRequest);
-    //this.sandbox.stub(global, 'hoodieConnection', hoodieConnection);
-    this.sandbox.stub(global, 'hoodieGenerateId', hoodieGenerateId);
-    this.sandbox.stub(global, 'hoodieDispose', hoodieDispose);
-    this.sandbox.stub(global, 'hoodieOpen', hoodieOpen);
-    this.sandbox.stub(global, 'hoodieStore', hoodieStore);
-    this.sandbox.stub(global, 'hoodieTask', hoodieTask);
-    this.sandbox.stub(global, 'hoodieConfig', hoodieConfig);
-    this.sandbox.stub(global, 'hoodieAccount', hoodieAccount);
-    this.sandbox.stub(global, 'hoodieRemoteStore', hoodieRemoteStore);
+    this.sandbox.stub(this.hoodie, 'on', hoodieEvents.on);
+    this.sandbox.stub(this.hoodie, 'off', hoodieEvents.off);
+    this.sandbox.stub(this.hoodie, 'bind', hoodieEvents.bind);
+    this.sandbox.stub(this.hoodie, 'trigger', hoodieEvents.trigger);
+
+    this.sandbox.stub(this.hoodie, 'isConnected', hoodieConnection.isConnected);
+    this.sandbox.stub(this.hoodie, 'checkConnection', hoodieConnection.checkConnection);
+
+    this.sandbox.stub(this.hoodie.config, 'get', hoodieConfig.get);
+    this.sandbox.stub(this.hoodie.config, 'set', hoodieConfig.set);
+    this.sandbox.stub(this.hoodie.config, 'unset', hoodieConfig.unset);
+    this.sandbox.stub(this.hoodie.config, 'clear', hoodieConfig.clear);
+
     this.sandbox.spy(global, 'addEventListener');
 
   });
 
   describe('new Hoodie(baseUrl)', function() {
+
     it('should store the base url', function() {
-      var hoodie = new Hoodie('http://couch.example.com');
-      expect(hoodie.baseUrl).to.eql('http://couch.example.com');
+      expect(new Hoodie('http://couch.example.com').baseUrl).to.eql('http://couch.example.com');
     });
 
     it('should remove trailing slash from passed URL', function() {
-      var hoodie = new Hoodie('http://couch.example.com/');
-      expect(hoodie.baseUrl).to.eql('http://couch.example.com');
+      expect(new Hoodie('http://couch.example.com/').baseUrl).to.eql('http://couch.example.com');
     });
 
     it('should default the CouchDB URL to current domain with a api subdomain', function() {
-      var hoodie = new Hoodie();
-      expect(hoodie.baseUrl).to.be( undefined );
+      expect(new Hoodie().baseUrl).to.be(undefined);
     });
 
     // test for extending with core modules
     //it('should extend with hoodieEvents module', function() {
-      //expect(window.hoodieEvents).to.be.calledWith(this.hoodie);
+      //expect(this.hoodie.on).to.be.calledWith(this.hoodie);
     //});
     //it('should extend with hoodiePromises module', function() {
       //expect(global.hoodiePromises).to.be.calledWith(this.hoodie);
@@ -98,10 +93,10 @@ describe('Hoodie', function() {
 
     //// initializations
 
-    //it('presets hoodie.account.username', function() {
-      //expect(this.hoodie.config.get).calledWith('_account.username');
+    it('presets hoodie.account.username', function() {
+      //expect(this.hoodie.config.get.calledWith()).eql('_account.username');
       //expect(this.hoodie.account.username).to.be('_account.username');
-    //});
+    });
 
     //it('checks for a pending password reset', function() {
       //expect(this.hoodie.account.checkPasswordReset).to.be.called();
@@ -111,9 +106,9 @@ describe('Hoodie', function() {
       //expect(this.hoodie.account.authenticate).to.be.called();
     //});
 
-    //it('clears store on signup', function() {
+    it('clears store on signup', function() {
       //expect(this.hoodie.on).to.be.calledWith('account:signout', this.hoodie.config.clear);
-    //});
+    });
 
     //it('inits store module', function() {
       //expect(this.hoodie.store.patchIfNotPersistant).to.be.called();
@@ -139,9 +134,9 @@ describe('Hoodie', function() {
       ////     which is not correct. The remote store is 'user/<hash>'
     //});
 
-    it('checks connection when user goes offline', function() {
-      expect(global.addEventListener).to.be.calledWith('offline', this.hoodie.checkConnection, false);
-    });
+    //it('checks connection when user goes offline', function() {
+      //expect(global.addEventListener).to.be.calledWith('offline', this.hoodie.checkConnection, false);
+    //});
 
     //it('checks connection when user goes online', function() {
       //expect(global.addEventListener).to.be.calledWith('online', this.hoodie.checkConnection, false);
