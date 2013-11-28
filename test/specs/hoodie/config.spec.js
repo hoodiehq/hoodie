@@ -5,7 +5,7 @@ describe('Hoodie.Config', function() {
 
   beforeEach(function() {
     this.hoodie = this.MOCKS.hoodie.apply(this);
-    this.hoodie.store.findDefer.resolve({
+    this.hoodie.store.find.defer.resolve({
       funky: 'fresh'
     });
 

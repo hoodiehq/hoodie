@@ -1,6 +1,7 @@
 require('../../lib/setup');
 
 var hoodieAccount = require('../../../src/hoodie/account');
+
 describe('hoodie.account', function () {
 
   beforeEach(function () {
@@ -24,6 +25,10 @@ describe('hoodie.account', function () {
 
     hoodieAccount(this.hoodie);
     this.account = this.hoodie.account;
+    $.extend(this.account, this.MOCKS.events.apply(this));
+
+    this.account.username = undefined; // 'joe@example.com';
+    this.account.ownerHash = 'hash123';
   });
 
   describe('#authenticate()', function () {
@@ -84,6 +89,7 @@ describe('hoodie.account', function () {
         _when('there is a pending singOut request', function () {
 
           beforeEach(function () {
+            this.hoodie.remote.disconnect.defer.resolve();
             this.signOutPromise = this.hoodie.account.signOut();
             expect(this.signOutPromise).to.be.pending();
           });
@@ -136,7 +142,6 @@ describe('hoodie.account', function () {
           _but('session is invalid', function () {
             beforeEach(function () {
               this.hoodie.request.defer.resolve( invalidSessionResponse() );
-              this.sandbox.spy(this.account, 'trigger');
               this.promise = this.account.authenticate();
             });
 
@@ -203,6 +208,11 @@ describe('hoodie.account', function () {
       beforeEach(function () {
         this.account.username = 'randomhash';
         this.account.ownerHash = 'randomhash';
+
+        // NOTE:
+        // I do not understand, why we have to resetBehavior here.
+        this.hoodie.config.get.resetBehavior();
+
         this.hoodie.config.get.returns('randomPassword');
         this.sandbox.stub(this.account, 'hasAnonymousAccount').returns(true);
         this.sandbox.stub(this.account, 'signIn').returns('signIn_promise');
@@ -265,7 +275,7 @@ describe('hoodie.account', function () {
 
   describe('#hasInvalidSession', function() {
     beforeEach(function() {
-      this.sandbox.stub(this.account, 'request').returns(this.hoodie.request.defer.promise());
+      this.sandbox.stub(this.account, 'request').returns(this.hoodie.request());
     });
 
     _when('user has no account', function() {
@@ -306,7 +316,7 @@ describe('hoodie.account', function () {
 
   describe('#hasValidSession', function() {
     beforeEach(function() {
-      this.sandbox.stub(this.account, 'request').returns(this.hoodie.request.defer.promise());
+      this.sandbox.stub(this.account, 'request').returns(this.hoodie.request());
     });
 
     _when('user has no account', function() {
@@ -371,6 +381,7 @@ describe('hoodie.account', function () {
     _when('username set', function () {
 
       it('should downcase it', function () {
+        this.sandbox.stub(this.account, 'hasAccount').returns(false);
         this.account.signUp('Joe', 'secret');
 
         var args = this.account.request.args[0];
@@ -388,6 +399,11 @@ describe('hoodie.account', function () {
           this.sandbox.stub(this.account, 'hasAnonymousAccount').returns(true);
           this.fetchDefer = this.hoodie.defer();
           this.sandbox.stub(this.account, 'fetch').returns(this.fetchDefer.promise());
+
+          // NOTE:
+          // I do not understand, why we have to resetBehavior here.
+          this.hoodie.config.get.resetBehavior();
+
           this.hoodie.config.get.returns('randomPassword');
           this.account.username = 'randomUsername';
 
@@ -397,6 +413,7 @@ describe('hoodie.account', function () {
         });
 
         it('should sign in', function () {
+
           // because it need to authenticate for the current account
           // first, before 'signing up' for a real account, wich is
           // technically a username change
@@ -434,7 +451,7 @@ describe('hoodie.account', function () {
               this.data = JSON.parse(this.options.data);
             });
 
-            it('should send a PUT request to http://cou.ch/_users/org.couchdb.user%3Auser%2FrandomUsername', function () {
+            it('should send a PUT request to http://my.hood.ie/_users/org.couchdb.user%3Auser%2FrandomUsername', function () {
               expect(this.account.request).to.be.called();
               expect(this.type).to.eql('PUT');
               expect(this.path).to.eql('/_users/org.couchdb.user%3Auser%2FrandomUsername');
@@ -463,7 +480,6 @@ describe('hoodie.account', function () {
             _when('_users doc could be updated', function () {
 
               beforeEach(function () {
-                this.sandbox.spy(this.hoodie.remote, 'disconnect');
                 this.requestDefers[1].resolve();
 
                 // send sign in request which is delayed by 300ms
@@ -588,7 +604,7 @@ describe('hoodie.account', function () {
           this.data = JSON.parse(this.options.data);
         });
 
-        it('should send a PUT request to http://cou.ch/_users/org.couchdb.user%3Auser%2Fjoe%40example.com', function () {
+        it('should send a PUT request to http://my.hood.ie/_users/org.couchdb.user%3Auser%2Fjoe%40example.com', function () {
           expect(this.account.request).to.be.called();
           expect(this.type).to.eql('PUT');
           expect(this.path).to.eql('/_users/org.couchdb.user%3Auser%2Fjoe%40example.com');
@@ -792,14 +808,13 @@ describe('hoodie.account', function () {
       this.signUpDefer = this.hoodie.defer();
 
       this.sandbox.stub(this.account, 'signUp').returns(this.signUpDefer.promise());
-      this.sandbox.stub(this.hoodie, 'generateId').returns('crazyuuid123');
 
       this.account.ownerHash = 'hash123';
     });
 
     it('should sign up with username = account.ownerHash and the random password', function () {
       this.account.anonymousSignUp();
-      expect(this.account.signUp).to.be.calledWith('hash123', 'crazyuuid123');
+      expect(this.account.signUp).to.be.calledWith('hash123', 'uuid123');
     });
 
     _when('signUp successful', function () {
@@ -811,7 +826,7 @@ describe('hoodie.account', function () {
       it('should generate a password and store it locally in _account.anonymousPassword', function () {
         this.account.anonymousSignUp();
         expect(this.hoodie.generateId).to.be.calledWith(10);
-        expect(this.hoodie.config.set).to.be.calledWith('_account.anonymousPassword', 'crazyuuid123');
+        expect(this.hoodie.config.set).to.be.calledWith('_account.anonymousPassword', 'uuid123');
       });
     });
   }); // #anonymousSignUp
@@ -858,7 +873,7 @@ describe('hoodie.account', function () {
         expect(this.account.signOut).to.not.be.called();
       });
 
-      it('should send a POST request to http://cou.ch/_session', function () {
+      it('should send a POST request to http://my.hood.ie/_session', function () {
         expect(this.hoodie.request).to.be.called();
         expect(this.type).to.eql('POST');
         expect(this.path).to.eql('/_session');
@@ -927,7 +942,7 @@ describe('hoodie.account', function () {
         this.options = args[2];
       });
 
-      it('should send a POST request to http://cou.ch/_session', function () {
+      it('should send a POST request to http://my.hood.ie/_session', function () {
         expect(this.hoodie.request).to.be.called();
         expect(this.type).to.eql('POST');
         expect(this.path).to.eql('/_session');
@@ -954,13 +969,13 @@ describe('hoodie.account', function () {
             this.hoodie.request.defer.resolve(this.response);
 
             delete this.account.username;
-            this.account.trigger.reset();
           });
 
           _and('user has an anonyomous account', function () {
 
             beforeEach(function () {
               this.sandbox.stub(this.account, 'hasAnonymousAccount').returns(true);
+
             });
 
             it('should trigger `signin:anonymous` event', function () {
@@ -982,14 +997,14 @@ describe('hoodie.account', function () {
 
           }); // user has a manual account
 
-          it('should set @username', function () {
+          it('should set username', function () {
             this.account.signIn('joe@example.com', 'secret');
 
             expect(this.account.username).to.eql('joe@example.com');
             expect(this.hoodie.config.set).to.be.calledWith('_account.username', 'joe@example.com');
           });
 
-          it('should set @ownerHash', function () {
+          it('should set ownerHash', function () {
             delete this.account.ownerHash;
             this.account.signIn('joe@example.com', 'secret');
 
@@ -1050,7 +1065,7 @@ describe('hoodie.account', function () {
             });
           });
 
-          it('should fetch user doc without setting @username', function () {
+          it('should fetch user doc without setting username', function () {
             this.account.signIn('joe@example.com', 'secret');
 
             expect(this.account.fetch).to.be.calledWith('joe@example.com');
@@ -1146,7 +1161,7 @@ describe('hoodie.account', function () {
       this.account.username = 'joe@example.com';
       presetUserDoc(this);
 
-      this.sandbox.stub(this.account, 'request').returns(this.hoodie.request.defer.promise());
+      this.sandbox.stub(this.account, 'request').returns(this.hoodie.request());
       this.fetchPromise = this.hoodie.defer();
       this.sandbox.stub(this.account, 'fetch').returns(this.fetchPromise);
     });
@@ -1170,7 +1185,7 @@ describe('hoodie.account', function () {
         this.data = JSON.parse(this.options.data);
       });
 
-      it('should send a PUT request to http://cou.ch/_users/org.couchdb.user%3Auser%2Fjoe%40example.com', function () {
+      it('should send a PUT request to http://my.hood.ie/_users/org.couchdb.user%3Auser%2Fjoe%40example.com', function () {
         expect(this.account.request).to.be.called();
         expect(this.type).to.eql('PUT');
         expect(this.path).to.eql('/_users/org.couchdb.user%3Auser%2Fjoe%40example.com');
@@ -1309,7 +1324,7 @@ describe('hoodie.account', function () {
   describe('#signOut(options)', function () {
 
     beforeEach(function () {
-      this.sandbox.stub(this.hoodie, 'generateId').returns('newHash');
+      this.hoodie.remote.disconnect.defer.resolve();
     });
 
     _when('user has no account', function () {
@@ -1327,11 +1342,11 @@ describe('hoodie.account', function () {
         expect(this.account.trigger).to.be.calledWith('signout');
       });
 
-      it('should generate new @ownerHash hash', function () {
-        expect(this.account.ownerHash).to.eql('newHash');
+      it('should generate new ownerHash hash', function () {
+        expect(this.account.ownerHash).to.eql('uuid123');
       });
 
-      it('should unset @username', function () {
+      it('should unset username', function () {
         expect(this.account.username).to.be(undefined);
       });
 
@@ -1358,13 +1373,10 @@ describe('hoodie.account', function () {
 
       beforeEach(function () {
         this.sandbox.stub(this.account, 'hasAccount').returns(true);
-        this.sandbox.spy(this.hoodie.remote, 'disconnect');
       });
 
       _and('user has local changes', function() {
         beforeEach(function () {
-          this.pushDefer = this.hoodie.defer();
-          this.sandbox.stub(this.hoodie.remote, 'push').returns(this.pushDefer.promise());
           this.hoodie.store.hasLocalChanges.returns(true);
           this.promise = this.account.signOut();
         });
@@ -1383,7 +1395,7 @@ describe('hoodie.account', function () {
 
         _when('push of local changes fails', function() {
           beforeEach(function() {
-            this.pushDefer.reject();
+            this.hoodie.remote.push.defer.reject();
           });
 
           it('should reject', function() {
@@ -1393,10 +1405,11 @@ describe('hoodie.account', function () {
 
         _when('push of local changes succeeds', function() {
           beforeEach(function() {
-            this.pushDefer.resolve();
+            this.hoodie.remote.push.defer.resolve();
+            this.hoodie.remote.disconnect.defer.resolve();
           });
 
-          it('should send a DELETE request to http://cou.ch/_session', function () {
+          it('should send a DELETE request to http://my.hood.ie/_session', function () {
             expect(this.hoodie.request).to.be.calledWith('DELETE', '/_session');
           });
         });
@@ -1423,7 +1436,7 @@ describe('hoodie.account', function () {
         it('should disconnect', function () {
           expect(this.hoodie.remote.disconnect).to.be.called();
         });
-        it('should send a DELETE request to http://cou.ch/_session', function () {
+        it('should send a DELETE request to http://my.hood.ie/_session', function () {
           expect(this.hoodie.request).to.be.calledWith('DELETE', '/_session');
         });
 
@@ -1438,11 +1451,11 @@ describe('hoodie.account', function () {
             expect(this.account.trigger).to.be.calledWith('signout');
           });
 
-          it('should generate new @ownerHash hash', function () {
-            expect(this.account.ownerHash).to.eql('newHash');
+          it('should generate new ownerHash hash', function () {
+            expect(this.account.ownerHash).to.eql('uuid123');
           });
 
-          it('should unset @username', function () {
+          it('should unset username', function () {
             expect(this.account.username).to.be(undefined);
           });
 
@@ -1540,7 +1553,7 @@ describe('hoodie.account', function () {
         this.options = args[2];
       });
 
-      it('should send a GET request to http://cou.ch/_users/org.couchdb.user%3Auser%2Fjoe%40example.com', function () {
+      it('should send a GET request to http://my.hood.ie/_users/org.couchdb.user%3Auser%2Fjoe%40example.com', function () {
         expect(this.hoodie.request).to.be.called();
         expect(this.type).to.eql('GET');
         expect(this.path).to.eql('/_users/org.couchdb.user%3Auser%2Fjoe%40example.com');
@@ -1580,12 +1593,10 @@ describe('hoodie.account', function () {
 
       presetUserDoc(this);
 
-      this.sandbox.stub(this.account, 'request').returns( this.hoodie.request.defer.promise() );
+      this.sandbox.stub(this.account, 'request').returns( this.hoodie.request() );
 
       this.fetchDefer = this.hoodie.defer();
-      this.sandbox.spy(this.hoodie.remote, 'disconnect');
       this.sandbox.stub(this.account, 'fetch').returns(this.fetchDefer.promise());
-      this.sandbox.stub(this.hoodie, 'generateId').returns('newHash');
     });
 
     _when('user has account', function () {
@@ -1629,12 +1640,12 @@ describe('hoodie.account', function () {
             this.account.destroy();
           });
 
-          it('should unset @username', function () {
+          it('should unset username', function () {
             expect(this.account.username).to.be(undefined);
           });
 
-          it('should regenerate @ownerHash', function () {
-            expect(this.account.ownerHash).to.eql('newHash');
+          it('should regenerate ownerHash', function () {
+            expect(this.account.ownerHash).to.eql('uuid123');
           });
 
           it('should trigger signout event', function () {
@@ -1645,8 +1656,8 @@ describe('hoodie.account', function () {
             expect(this.hoodie.config.clear).to.be.called();
           });
 
-          it('should set config._account.ownerHash to new @ownerHash', function () {
-            expect(this.hoodie.config.set).to.be.calledWith('_account.ownerHash', 'newHash');
+          it('should set config._account.ownerHash to new ownerHash', function () {
+            expect(this.hoodie.config.set).to.be.calledWith('_account.ownerHash', 'uuid123');
           });
 
           it('should trigger clenaup event', function() {
@@ -1692,12 +1703,12 @@ describe('hoodie.account', function () {
           });
         });
 
-        it('should not unset @username', function () {
+        it('should not unset username', function () {
           expect(this.account.username).to.eql('joe@example.com');
         });
 
-        it('should not regenerate @ownerHash', function () {
-          expect(this.account.ownerHash).to.eql('uuid');
+        it('should not regenerate ownerHash', function () {
+          expect(this.account.ownerHash).to.eql('hash123');
         });
 
         it('should not trigger signout event', function () {
@@ -1725,12 +1736,12 @@ describe('hoodie.account', function () {
         expect(this.account.fetch).to.not.be.called();
       });
 
-      it('should unset @username', function () {
+      it('should unset username', function () {
         expect(this.account.username).to.be(undefined);
       });
 
-      it('should regenerate @ownerHash', function () {
-        expect(this.account.ownerHash).to.eql('newHash');
+      it('should regenerate ownerHash', function () {
+        expect(this.account.ownerHash).to.eql('uuid123');
       });
 
       it('should trigger signout event', function () {
@@ -1741,8 +1752,8 @@ describe('hoodie.account', function () {
         expect(this.hoodie.config.clear).to.be.called();
       });
 
-      it('should set config._account.ownerHash to new @ownerHash', function () {
-        expect(this.hoodie.config.set).to.be.calledWith('_account.ownerHash', 'newHash');
+      it('should set config._account.ownerHash to new ownerHash', function () {
+        expect(this.hoodie.config.set).to.be.calledWith('_account.ownerHash', 'uuid123');
       });
     }); // user has no account
   }); // #destroy
@@ -1755,6 +1766,11 @@ describe('hoodie.account', function () {
     _when('there is a pending password reset request', function () {
 
       beforeEach(function () {
+
+        // NOTE:
+        // I do not understand, why we have to resetBehavior here.
+        this.hoodie.config.get.resetBehavior();
+
         this.hoodie.config.get.returns('joe/uuid567');
         this.account.resetPassword();
       });
@@ -1775,6 +1791,11 @@ describe('hoodie.account', function () {
     _when('there is no pending password reset request', function () {
 
       beforeEach(function () {
+
+        // NOTE:
+        // I do not understand, why we have to resetBehavior here.
+        this.hoodie.config.get.resetBehavior();
+
         this.hoodie.config.get.returns(void 0);
         this.hoodie.generateId.returns('uuid567');
 
@@ -1833,6 +1854,7 @@ describe('hoodie.account', function () {
 
         _and('password reset fails', function() {
           beforeEach(function() {
+            this.account.one.resetBehavior();
             this.account.one.withArgs('passwordreset').yields();
             this.promise = this.account.resetPassword('joe@example.com');
           });
@@ -1912,7 +1934,7 @@ describe('hoodie.account', function () {
           this.data = JSON.parse(this.options.data);
         });
 
-        it('should send a PUT request to http://cou.ch/_users/org.couchdb.user%3Auser%2Fjoe%40example.com', function () {
+        it('should send a PUT request to http://my.hood.ie/_users/org.couchdb.user%3Auser%2Fjoe%40example.com', function () {
           expect(this.account.request).to.be.called();
           expect(this.type).to.eql('PUT');
           expect(this.path).to.eql('/_users/org.couchdb.user%3Auser%2Fjoe%40example.com');
@@ -1941,7 +1963,6 @@ describe('hoodie.account', function () {
         _when('_users doc could be updated', function () {
 
           beforeEach(function () {
-            this.sandbox.spy(this.hoodie.remote, 'disconnect');
             this.requestDefers[1].resolve();
 
             // after the doc update, it signs in again
@@ -2031,6 +2052,9 @@ describe('hoodie.account', function () {
     beforeEach(function() {
       var events = {};
 
+      this.hoodie.on.resetBehavior();
+
+      this.hoodie.on = function() {};
       this.sandbox.stub(this.hoodie, 'on', function(eventName, cb) {
         events[eventName] = cb;
       });
@@ -2094,10 +2118,11 @@ function unconfirmedUserDoc (username) {
 
 function presetUserDoc(context) {
   context.account.fetch();
-  context.requestDefer.resolve(unconfirmedUserDoc( context.account.username ));
+  context.hoodie.request.defer.resolve(unconfirmedUserDoc( context.account.username ));
   context.hoodie.request.reset();
-  context.requestDefer = context.hoodie.defer();
-  context.hoodie.request.returns(context.requestDefer.promise());
+  var defer = $.Deferred();
+  context.hoodie.request.returns(defer.promise());
+  context.hoodie.request.defer = defer;
 }
 
 
@@ -2114,9 +2139,12 @@ function with_session_validated_before (callback) {
       this.account.authenticate();
 
       // now we have to reset the requestDefer
-      this.requestDefer = this.hoodie.defer();
       this.account.request.reset();
-      this.account.request.returns(this.hoodie.request.defer.promise());
+
+      var defer = $.Deferred();
+      this.hoodie.request.returns(defer.promise());
+      this.hoodie.request.defer = defer;
+      this.account.request.returns(defer.promise());
     });
 
     callback();
@@ -2135,9 +2163,12 @@ function with_session_invalidated_before (callback) {
       this.account.authenticate();
 
       // now we have to reset the requestDefer
-      this.requestDefer = this.hoodie.defer();
       this.account.request.reset();
-      this.account.request.returns(this.hoodie.request.defer.promise());
+
+      var defer = $.Deferred();
+      this.hoodie.request.returns(defer.promise());
+      this.hoodie.request.defer = defer;
+      this.account.request.returns(defer.promise());
     });
 
     callback();
