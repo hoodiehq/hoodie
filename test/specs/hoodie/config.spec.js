@@ -1,10 +1,10 @@
 require('../../lib/setup');
+var hoodieConfig = require('../../../src/hoodie/config');
+
 describe('Hoodie.Config', function() {
 
   beforeEach(function() {
     this.hoodie = this.MOCKS.hoodie.apply(this);
-    var hoodieConfig = require('../../../src/hoodie/config');
-
     this.hoodie.store.findDefer.resolve({
       funky: 'fresh'
     });

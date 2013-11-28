@@ -1,14 +1,14 @@
+var events = require('./events');
+
 module.exports = function () {
 
   var o = { api: function() {} };
 
-  o.api.trigger = sinon.stub();
-  o.api.on = sinon.stub();
-  o.api.one = sinon.stub();
-  o.api.unbind = sinon.stub();
+  var eventsMixin = events.apply(this);
+  $.extend(o.api, eventsMixin);
 
-  o.api.validate = sinon.stub();
-  o.api.decoratePromises = sinon.stub();
+  o.api.validate = this.sandbox.stub();
+  o.api.decoratePromises = this.sandbox.stub();
 
   o.api.saveDefer = $.Deferred();
   o.api.addDefer = $.Deferred();
@@ -21,18 +21,18 @@ module.exports = function () {
   o.api.removeDefer = $.Deferred();
   o.api.removeAllDefer = $.Deferred();
 
-  o.api.save = sinon.stub().returns(o.api.saveDefer.promise());
-  o.api.add = sinon.stub().returns(o.api.addDefer.promise());
-  o.api.find = sinon.stub().returns(o.api.findDefer.promise());
-  o.api.findOrAdd = sinon.stub().returns(o.api.findOrAddDefer.promise());
-  o.api.findAll = sinon.stub().returns(o.api.findAllDefer.promise());
-  o.api.update = sinon.stub().returns(o.api.updateDefer.promise());
-  o.api.updateOrAdd = sinon.stub().returns(o.api.updateOrAddDefer.promise());
-  o.api.updateAll = sinon.stub().returns(o.api.updateAllDefer.promise());
-  o.api.remove = sinon.stub().returns(o.api.removeDefer.promise());
-  o.api.removeAll = sinon.stub().returns(o.api.removeAllDefer.promise());
+  o.api.save = this.sandbox.stub().returns(o.api.saveDefer.promise());
+  o.api.add = this.sandbox.stub().returns(o.api.addDefer.promise());
+  o.api.find = this.sandbox.stub().returns(o.api.findDefer.promise());
+  o.api.findOrAdd = this.sandbox.stub().returns(o.api.findOrAddDefer.promise());
+  o.api.findAll = this.sandbox.stub().returns(o.api.findAllDefer.promise());
+  o.api.update = this.sandbox.stub().returns(o.api.updateDefer.promise());
+  o.api.updateOrAdd = this.sandbox.stub().returns(o.api.updateOrAddDefer.promise());
+  o.api.updateAll = this.sandbox.stub().returns(o.api.updateAllDefer.promise());
+  o.api.remove = this.sandbox.stub().returns(o.api.removeDefer.promise());
+  o.api.removeAll = this.sandbox.stub().returns(o.api.removeAllDefer.promise());
 
-  sinon.stub(o, 'api', function() {
+  this.sandbox.stub(o, 'api', function() {
     return o.api;
   });
 

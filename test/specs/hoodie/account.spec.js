@@ -1,7 +1,6 @@
-'use strict';
+require('../../lib/setup');
 
-/* global hoodieAccount:true */
-
+var hoodieAccount = require('../../../src/hoodie/account');
 describe('hoodie.account', function () {
 
   beforeEach(function () {
@@ -9,11 +8,7 @@ describe('hoodie.account', function () {
 
     this.noop = function () {};
 
-    this.hoodie = new Mocks.Hoodie();
-
-    this.requestDefer = this.hoodie.defer();
-    this.sandbox.stub(this.hoodie, 'request').returns(this.requestDefer.promise());
-    this.sandbox.spy(this.hoodie, 'trigger');
+    this.hoodie = this.MOCKS.hoodie.apply(this);
 
     // for more sophisticated request stubbing
     this.requestDefers = [];
@@ -26,7 +21,6 @@ describe('hoodie.account', function () {
     }.bind(this);
 
     this.clock = this.sandbox.useFakeTimers(0); // '1970-01-01 00:00:00'
-    this.sandbox.stub(window, 'hoodieEvents', Mocks.EventsApi);
 
     hoodieAccount(this.hoodie);
     this.account = this.hoodie.account;
@@ -35,7 +29,7 @@ describe('hoodie.account', function () {
   describe('#authenticate()', function () {
 
     beforeEach(function() {
-      this.sandbox.stub(this.account, 'request').returns(this.requestDefer.promise());
+      this.sandbox.stub(this.account, 'request').returns(this.hoodie.request());
     });
 
     _when('user is logged in as joe@example.com (hash: \'user_hash\')', function() {
@@ -71,14 +65,14 @@ describe('hoodie.account', function () {
 
           it('should be rejected when it is pending and then fails', function () {
             var promise = this.account.authenticate();
-            this.requestDefer.reject();
+            this.hoodie.request.defer.reject();
 
             expect(promise).to.be.rejected();
           });
 
           it('should be resolved when it is pending and then succeeds', function () {
             var promise = this.account.authenticate();
-            this.requestDefer.resolve({
+            this.hoodie.request.defer.resolve({
               name: 'joe@example.com',
               roles: ['user_hash', 'confirmed']
             });
@@ -96,14 +90,14 @@ describe('hoodie.account', function () {
 
           it('should be rejected when it is pending and then fails', function () {
             var promise = this.account.authenticate();
-            this.requestDefer.reject();
+            this.hoodie.request.defer.reject();
 
             expect(promise).to.be.rejected();
           });
 
           it('should be rejected anyway, even if the pending request succeeds', function () {
             var promise = this.account.authenticate();
-            this.requestDefer.resolve();
+            this.hoodie.request.defer.resolve();
 
             expect(promise).to.be.rejected();
           });
@@ -113,8 +107,7 @@ describe('hoodie.account', function () {
         _and('authentication request is successful', function () {
           _and('returns a valid session for joe@example.com', function () {
             beforeEach(function () {
-              this.sandbox.spy(this.hoodie.config, 'set');
-              this.requestDefer.resolve(validSessionResponse());
+              this.hoodie.request.defer.resolve(validSessionResponse());
               this.promise = this.account.authenticate();
             });
 
@@ -142,7 +135,8 @@ describe('hoodie.account', function () {
           //
           _but('session is invalid', function () {
             beforeEach(function () {
-              this.requestDefer.resolve( invalidSessionResponse() );
+              this.hoodie.request.defer.resolve( invalidSessionResponse() );
+              this.sandbox.spy(this.account, 'trigger');
               this.promise = this.account.authenticate();
             });
 
@@ -160,7 +154,7 @@ describe('hoodie.account', function () {
         //
         _when('authentication request has an error', function () {
           beforeEach(function () {
-            this.requestDefer.reject({
+            this.hoodie.request.defer.reject({
               name: 'SomeError'
             });
             this.promise = this.account.authenticate();
@@ -209,7 +203,7 @@ describe('hoodie.account', function () {
       beforeEach(function () {
         this.account.username = 'randomhash';
         this.account.ownerHash = 'randomhash';
-        this.sandbox.stub(this.hoodie.config, 'get').returns('randompass');
+        this.hoodie.config.get.returns('randomPassword');
         this.sandbox.stub(this.account, 'hasAnonymousAccount').returns(true);
         this.sandbox.stub(this.account, 'signIn').returns('signIn_promise');
       });
@@ -220,12 +214,12 @@ describe('hoodie.account', function () {
 
           // which means the user has no valid session
           beforeEach(function () {
-            this.requestDefer.resolve(invalidSessionResponse());
+            this.hoodie.request.defer.resolve(invalidSessionResponse());
             this.promise = this.account.authenticate();
           });
 
           it('should sign in in the background, as we know the password anyway', function () {
-            expect(this.account.signIn.args[0]).to.eql(['randomhash', 'randompass']);
+            expect(this.account.signIn.args[0]).to.eql(['randomhash', 'randomPassword']);
           });
 
           it('should return the promise of the sign in request', function () {
@@ -248,7 +242,7 @@ describe('hoodie.account', function () {
 
       _and('signOut succeeds', function () {
         beforeEach(function () {
-          this.requestDefer.resolve();
+          this.hoodie.request.defer.resolve();
         });
 
         it('should return a rejected promise', function () {
@@ -258,7 +252,7 @@ describe('hoodie.account', function () {
 
       _and('signOut fails', function () {
         beforeEach(function () {
-          this.requestDefer.reject();
+          this.hoodie.request.defer.reject();
         });
 
         it('should return a rejected promise', function () {
@@ -271,7 +265,7 @@ describe('hoodie.account', function () {
 
   describe('#hasInvalidSession', function() {
     beforeEach(function() {
-      this.sandbox.stub(this.account, 'request').returns(this.requestDefer.promise());
+      this.sandbox.stub(this.account, 'request').returns(this.hoodie.request.defer.promise());
     });
 
     _when('user has no account', function() {
@@ -312,7 +306,7 @@ describe('hoodie.account', function () {
 
   describe('#hasValidSession', function() {
     beforeEach(function() {
-      this.sandbox.stub(this.account, 'request').returns(this.requestDefer.promise());
+      this.sandbox.stub(this.account, 'request').returns(this.hoodie.request.defer.promise());
     });
 
     _when('user has no account', function() {
@@ -355,7 +349,7 @@ describe('hoodie.account', function () {
 
     beforeEach(function () {
       this.sandbox.stub(this.account, 'request', this.fakeRequest);
-      this.account.ownerHash = 'owner_hash123';
+      this.account.ownerHash = 'hash123';
     });
 
     _when('username not set', function () {
@@ -394,7 +388,7 @@ describe('hoodie.account', function () {
           this.sandbox.stub(this.account, 'hasAnonymousAccount').returns(true);
           this.fetchDefer = this.hoodie.defer();
           this.sandbox.stub(this.account, 'fetch').returns(this.fetchDefer.promise());
-          this.sandbox.stub(this.hoodie.config, 'get').returns('randomPassword');
+          this.hoodie.config.get.returns('randomPassword');
           this.account.username = 'randomUsername';
 
           this.promise = this.account.signUp('joe@example.com', 'secret', {
@@ -535,7 +529,7 @@ describe('hoodie.account', function () {
             _when('_users doc could not be updated', function () {
 
               beforeEach(function () {
-                this.requestDefer.reject();
+                this.hoodie.request.defer.reject();
               });
 
               it('should be rejected', function () {
@@ -624,12 +618,12 @@ describe('hoodie.account', function () {
           expect(this.data.password).to.eql('secret');
         });
 
-        it('should have set ownerHash to \'owner_hash123\'', function () {
-          expect(this.data.ownerHash).to.eql('owner_hash123');
+        it('should have set ownerHash to \'hash123\'', function () {
+          expect(this.data.ownerHash).to.eql('hash123');
         });
 
-        it('should have set database to \'user/owner_hash123\'', function () {
-          expect(this.data.database).to.eql('user/owner_hash123');
+        it('should have set database to \'user/hash123\'', function () {
+          expect(this.data.database).to.eql('user/hash123');
         });
 
         it('should have set createdAt & updatedAt to now', function () {
@@ -663,8 +657,8 @@ describe('hoodie.account', function () {
             this.requestDefers = [];
 
             //
-            this.account.ownerHash = 'owner_hash123';
-            promise = this.account.signUp('owner_hash123', 'secret');
+            this.account.ownerHash = 'hash123';
+            promise = this.account.signUp('hash123', 'secret');
 
             var args = this.account.request.args[0];
             type = args[0],
@@ -677,8 +671,8 @@ describe('hoodie.account', function () {
             expect(this.data.signedUpAt).to.eql(void 0);
           });
 
-          it('should have set name to \'user_anonymous/owner_hash123\'', function () {
-            expect(this.data.name).to.eql('user_anonymous/owner_hash123');
+          it('should have set name to \'user_anonymous/hash123\'', function () {
+            expect(this.data.name).to.eql('user_anonymous/hash123');
           });
 
         });
@@ -799,14 +793,13 @@ describe('hoodie.account', function () {
 
       this.sandbox.stub(this.account, 'signUp').returns(this.signUpDefer.promise());
       this.sandbox.stub(this.hoodie, 'generateId').returns('crazyuuid123');
-      this.sandbox.spy(this.hoodie.config, 'set');
 
-      this.account.ownerHash = 'owner_hash123';
+      this.account.ownerHash = 'hash123';
     });
 
     it('should sign up with username = account.ownerHash and the random password', function () {
       this.account.anonymousSignUp();
-      expect(this.account.signUp).to.be.calledWith('owner_hash123', 'crazyuuid123');
+      expect(this.account.signUp).to.be.calledWith('hash123', 'crazyuuid123');
     });
 
     _when('signUp successful', function () {
@@ -879,7 +872,7 @@ describe('hoodie.account', function () {
             'name': 'user/joe@example.com',
             'roles': ['user_hash', 'confirmed']
           };
-          this.requestDefer.resolve(this.response);
+          this.hoodie.request.defer.resolve(this.response);
         });
 
         it('should not trigger `cleanup` event', function () {
@@ -958,9 +951,7 @@ describe('hoodie.account', function () {
               'name': 'user/joe@example.com',
               'roles': ['user_hash', 'confirmed']
             };
-            this.requestDefer.resolve(this.response);
-
-            this.sandbox.spy(this.hoodie.config, 'set');
+            this.hoodie.request.defer.resolve(this.response);
 
             delete this.account.username;
             this.account.trigger.reset();
@@ -1028,7 +1019,7 @@ describe('hoodie.account', function () {
               'name': 'user/joe@example.com',
               'roles': []
             };
-            this.requestDefer.resolve(this.response);
+            this.hoodie.request.defer.resolve(this.response);
           });
 
           it('should reject with unconfirmed error.', function () {
@@ -1052,7 +1043,7 @@ describe('hoodie.account', function () {
               message: 'Because you stink'
             }));
 
-            this.requestDefer.resolve({
+            this.hoodie.request.defer.resolve({
               'ok': true,
               'name': 'user/joe@example.com',
               'roles': ['error']
@@ -1083,7 +1074,7 @@ describe('hoodie.account', function () {
             name: 'HoodieUnauthorizedError',
             message: 'Name or password is incorrect'
           };
-          this.requestDefer.reject(this.error);
+          this.hoodie.request.defer.reject(this.error);
         });
 
         it('should be rejected with unauthorized error', function () {
@@ -1127,7 +1118,7 @@ describe('hoodie.account', function () {
           'name': 'user/joe@example.com',
           'roles': ['user_hash', 'confirmed']
         };
-        this.requestDefer.resolve(this.response);
+        this.hoodie.request.defer.resolve(this.response);
       });
 
       it('moves the data', function() {
@@ -1155,7 +1146,7 @@ describe('hoodie.account', function () {
       this.account.username = 'joe@example.com';
       presetUserDoc(this);
 
-      this.sandbox.stub(this.account, 'request').returns(this.requestDefer.promise());
+      this.sandbox.stub(this.account, 'request').returns(this.hoodie.request.defer.promise());
       this.fetchPromise = this.hoodie.defer();
       this.sandbox.stub(this.account, 'fetch').returns(this.fetchPromise);
     });
@@ -1244,7 +1235,7 @@ describe('hoodie.account', function () {
         beforeEach(function () {
           this.signInDefer = this.hoodie.defer();
           this.sandbox.stub(this.account, 'signIn').returns(this.signInDefer.promise());
-          this.requestDefer.resolve({
+          this.hoodie.request.defer.resolve({
             'ok': true,
             'id': 'org.couchdb.user:user/bizbiz',
             'rev': '2-345'
@@ -1281,7 +1272,7 @@ describe('hoodie.account', function () {
 
       _when('change password has an error', function () {
         beforeEach(function () {
-          this.requestDefer.reject({
+          this.hoodie.request.defer.reject({
             name: 'HoodieError',
             message: 'Something wrong'
           });
@@ -1319,7 +1310,6 @@ describe('hoodie.account', function () {
 
     beforeEach(function () {
       this.sandbox.stub(this.hoodie, 'generateId').returns('newHash');
-      this.sandbox.spy(this.hoodie.config, 'clear');
     });
 
     _when('user has no account', function () {
@@ -1440,7 +1430,7 @@ describe('hoodie.account', function () {
         _when('signOut request successful', function () {
 
           beforeEach(function () {
-            this.requestDefer.resolve();
+            this.hoodie.request.defer.resolve();
             this.account.signOut();
           });
 
@@ -1511,15 +1501,15 @@ describe('hoodie.account', function () {
   }); // #hasAnonymousAccount
 
   describe('#db()', function () {
-    _when('account.ownerHash is \'owner_hash123\'', function () {
+    _when('account.ownerHash is \'hash123\'', function () {
 
       beforeEach(function () {
-        this.account.ownerHash = 'owner_hash123';
+        this.account.ownerHash = 'hash123';
         this.account.ownerHash;
       });
 
       it('should return \'joe$example.com\'', function () {
-        (expect(this.account.db())).to.eql('user/owner_hash123');
+        (expect(this.account.db())).to.eql('user/hash123');
       });
     });
   });
@@ -1559,7 +1549,7 @@ describe('hoodie.account', function () {
       _when('successful', function () {
 
         beforeEach(function () {
-          this.requestDefer.resolve(unconfirmedUserDoc());
+          this.hoodie.request.defer.resolve(unconfirmedUserDoc());
         });
 
         it('should resolve its promise', function () {
@@ -1573,7 +1563,7 @@ describe('hoodie.account', function () {
             name: 'ErrorName',
             message: 'Some reason here'
           };
-          this.requestDefer.reject(this.error);
+          this.hoodie.request.defer.reject(this.error);
         });
 
         it('should resolve its promise', function () {
@@ -1590,12 +1580,10 @@ describe('hoodie.account', function () {
 
       presetUserDoc(this);
 
-      this.sandbox.stub(this.account, 'request').returns( this.requestDefer.promise() );
+      this.sandbox.stub(this.account, 'request').returns( this.hoodie.request.defer.promise() );
 
       this.fetchDefer = this.hoodie.defer();
       this.sandbox.spy(this.hoodie.remote, 'disconnect');
-      this.sandbox.spy(this.hoodie.config, 'clear');
-      this.sandbox.spy(this.hoodie.config, 'set');
       this.sandbox.stub(this.account, 'fetch').returns(this.fetchDefer.promise());
       this.sandbox.stub(this.hoodie, 'generateId').returns('newHash');
     });
@@ -1637,7 +1625,7 @@ describe('hoodie.account', function () {
 
         _and('destroy request succesful', function () {
           beforeEach(function () {
-            this.requestDefer.resolve();
+            this.hoodie.request.defer.resolve();
             this.account.destroy();
           });
 
@@ -1767,7 +1755,7 @@ describe('hoodie.account', function () {
     _when('there is a pending password reset request', function () {
 
       beforeEach(function () {
-        this.sandbox.stub(this.hoodie.config, 'get').returns('joe/uuid567');
+        this.hoodie.config.get.returns('joe/uuid567');
         this.account.resetPassword();
       });
 
@@ -1787,9 +1775,8 @@ describe('hoodie.account', function () {
     _when('there is no pending password reset request', function () {
 
       beforeEach(function () {
-        this.sandbox.stub(this.hoodie.config, 'get').returns(void 0);
-        this.sandbox.spy(this.hoodie.config, 'set');
-        this.sandbox.stub(this.hoodie, 'generateId').returns('uuid567');
+        this.hoodie.config.get.returns(void 0);
+        this.hoodie.generateId.returns('uuid567');
 
         this.account.resetPassword('joe@example.com');
 
@@ -1832,7 +1819,7 @@ describe('hoodie.account', function () {
           this.account.checkPasswordReset.returns({
             then: this.promiseSpy
           });
-          this.requestDefer.resolve();
+          this.hoodie.request.defer.resolve();
         });
 
         it('should check for the request status', function () {
@@ -1869,7 +1856,7 @@ describe('hoodie.account', function () {
 
       _when('reset Password request is not successful', function () {
         beforeEach(function () {
-          this.requestDefer.reject({
+          this.hoodie.request.defer.reject({
             name: 'OoopsError',
             message: 'Something here'
           });
@@ -2123,13 +2110,13 @@ function with_session_validated_before (callback) {
           roles: ['user_hash', 'confirmed']
         }
       };
-      this.requestDefer.resolve(response);
+      this.hoodie.request.defer.resolve(response);
       this.account.authenticate();
 
       // now we have to reset the requestDefer
       this.requestDefer = this.hoodie.defer();
       this.account.request.reset();
-      this.account.request.returns(this.requestDefer.promise());
+      this.account.request.returns(this.hoodie.request.defer.promise());
     });
 
     callback();
@@ -2144,13 +2131,13 @@ function with_session_invalidated_before (callback) {
           name: null
         }
       };
-      this.requestDefer.resolve(response);
+      this.hoodie.request.defer.resolve(response);
       this.account.authenticate();
 
       // now we have to reset the requestDefer
       this.requestDefer = this.hoodie.defer();
       this.account.request.reset();
-      this.account.request.returns(this.requestDefer.promise());
+      this.account.request.returns(this.hoodie.request.defer.promise());
     });
 
     callback();

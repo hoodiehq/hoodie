@@ -1,10 +1,12 @@
 module.exports = function() {
 
-  var self = this;
+  var checkConnectionDefer = $.Deferred();
+  var checkConnectionPromise = checkConnectionDefer.promise();
+  checkConnectionPromise.defer = checkConnectionDefer;
 
   return {
-    isConnected: self.sandbox.spy(),
-    checkConnection: self.sandbox.spy()
+    isConnected: this.sandbox.stub(),
+    checkConnection: this.sandbox.stub().returns(checkConnectionPromise)
   };
 
 };

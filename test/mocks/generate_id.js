@@ -1,4 +1,4 @@
 // hoodieGenerateId
-module.exports = function(hoodie) {
-
+module.exports = function() {
+  return this.sandbox.stub().returns('uuid');
 };

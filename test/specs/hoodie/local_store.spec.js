@@ -432,7 +432,7 @@ describe('hoodie.store', function() {
               name: 'test',
               createdAt: now(),
               updatedAt: now(),
-              createdBy: 'owner_hash'
+              createdBy: 'hash123'
             };
             expect(this.store.trigger).to.be.calledWith('add', object, {});
             expect(this.store.trigger).to.be.calledWith('document:add', object, {});
@@ -482,7 +482,7 @@ describe('hoodie.store', function() {
               name: 'success',
               createdAt: now(),
               updatedAt: 'yesterday',
-              createdBy: 'owner_hash'
+              createdBy: 'hash123'
             };
             stubFindItem('document', '123successful', this.properties);
             this.promise = this.storeBackend.save({
@@ -491,7 +491,7 @@ describe('hoodie.store', function() {
               name: 'success',
               createdAt: now(),
               updatedAt: 'yesterday',
-              createdBy: 'owner_hash'
+              createdBy: 'hash123'
             });
           });
 
@@ -519,7 +519,7 @@ describe('hoodie.store', function() {
             var object = $.extend({}, this.object);
             object.createdAt = now();
             object.updatedAt = now();
-            object.createdBy = 'owner_hash';
+            object.createdBy = 'hash123';
             object.type = 'document';
             object.id = '123new';
 
