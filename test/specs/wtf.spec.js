@@ -1,5 +1,5 @@
-var describeLikeABaws = require('../lib/setup');
-describeLikeABaws('WTF', function() {
+require('../lib/setup');
+describe('WTF', function() {
 
   beforeEach(function () {
     this.hoodie = this.MOCKS.hoodie.apply(this);
