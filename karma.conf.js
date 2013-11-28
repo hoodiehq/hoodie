@@ -25,9 +25,12 @@ module.exports = function(config) {
       // incompatibilities with browserify, as discussed (@gr2m & @svnlto)
       // 'test/specs/hoodie.spec.js',
 
+
+      'test/specs/wtf.spec.js',
+      'test/specs/hoodie/config.spec.js',
+
       // 'test/specs/hoodie/account.spec.js',
       // 'test/specs/hoodie/config.spec.js',
-      'test/specs/wtf.spec.js',
 
       // 'test/specs/hoodie/dispose.spec.js',
       // 'test/specs/hoodie/events.spec.js',

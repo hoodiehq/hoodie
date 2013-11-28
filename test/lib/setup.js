@@ -17,7 +17,6 @@ module.exports = (function() {
         JSON.stringify({})
       ]
     );
-
   });
 
   afterEach(function () {

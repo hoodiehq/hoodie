@@ -1,69 +1,65 @@
-
+require('../../lib/setup');
 describe('Hoodie.Config', function() {
 
   beforeEach(function() {
-    var hoodie = this.MOCKS.hoodie.apply(this);
-    //var hoodieConfig = require('../../../src/hoodie/config');
+    this.hoodie = this.MOCKS.hoodie.apply(this);
+    var hoodieConfig = require('../../../src/hoodie/config');
 
-    //this.updateOrAddSpy = this.hoodie.store.updateOrAdd.returns('promise');
-    //this.hoodie.store.findDefer.resolve({
-      //funky: 'fresh'
-    //});
+    this.hoodie.store.findDefer.resolve({
+      funky: 'fresh'
+    });
 
-    //hoodieConfig( hoodie );
-    // this.config = this.hoodie.config;
+    hoodieConfig( this.hoodie );
+    this.config = this.hoodie.config;
   });
 
-  it('', function() {
+  describe('#set(key, value)', function() {
+
+    it('should save a $config with key: value', function() {
+      this.config.set('funky', 'fresh!');
+
+      expect(this.hoodie.store.updateOrAdd).to.be.calledWith('$config', 'hoodie', {
+        funky: 'fresh!'
+      }, {
+        silent: false
+      });
+    });
+
+    it('should make the save silent for local settings starting with _', function() {
+      this.config.set('_local', 'fresh');
+
+      expect(this.hoodie.store.updateOrAdd).to.be.calledWith('$config', 'hoodie', {
+        _local: 'fresh'
+      }, {
+        silent: true
+      });
+    });
 
   });
 
-  //describe('#set(key, value)', function() {
+  describe('#get(key)', function() {
 
-    //it('should save a $config with key: value', function() {
-      //this.config.set('funky', 'fresh!');
+    it('should get the config using store', function() {
+      var value = this.config.get('funky');
+      expect(this.hoodie.store.find).to.be.called();
+      expect(value).to.eql('fresh');
+    });
 
-      //expect(this.hoodie.store.updateOrAdd).to.be.calledWith('$config', 'hoodie', {
-        //funky: 'fresh!'
-      //}, {
-        //silent: false
-      //});
-    //});
+  });
 
-    //it('should make the save silent for local settings starting with _', function() {
-      //this.config.set('_local', 'fresh');
+  describe('#unset(key)', function() {
 
-      //expect(this.hoodie.store.updateOrAdd.calledWith('$config', 'hoodie', {
-        //_local: 'fresh'
-      //}, {
-        //silent: true
-      //})).to.be.ok();
-    //});
+    it('should unset the config using store', function() {
+      this.config.set('funky', 'fresh');
+      this.config.unset('funky');
 
-  //});
+      expect(this.hoodie.store.updateOrAdd).to.be.calledWith('$config', 'hoodie', {
+        funky: void 0
+      }, {
+        silent: false
+      });
+    });
 
-  //describe('#get(key)', function() {
-
-    //it('should get the config using store', function() {
-      //expect(this.config.get('funky')).to.eql('fresh');
-      //expect(this.hoodie.store.find.called).to.be.ok();
-    //});
-
-  //});
-
-  //describe('#unset(key)', function() {
-
-    //it('should unset the config using store', function() {
-      //this.config.set('funky', 'fresh');
-      //this.config.unset('funky');
-
-      //expect(this.hoodie.store.updateOrAdd.calledWith('$config', 'hoodie', {
-        //funky: void 0
-      //}, {
-        //silent: false
-      //})).to.be.ok();
-    //});
-
-  //});
+  });
 
 });
