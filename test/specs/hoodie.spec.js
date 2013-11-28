@@ -9,40 +9,39 @@ describe('Hoodie', function() {
 
   beforeEach(function() {
 
-    this.hoodie = new Hoodie('http://couch.example.com');
+    var hoodie = new Hoodie('http://couch.example.com');
+
 
     var hoodieEvents = this.MOCKS.events.apply(this);
-    //var hoodieAccount = this.Mocks.account.apply(this);
-    //var hoodieConfig = this.Mocks.config();
-    //var hoodieConnection = this.Mocks.connnection();
-    //var hoodieDispose = this.Mocks.dispose();
-    //var hoodieGenerateId = this.Mocks.generate_id();
-    //var hoodieOpen = this.Mocks.open();
-    //var hoodiePromises = this.Mocks.promises();
-    //var hoodieRemoteStore = this.mocks.remote_store();
-    //var hoodieRequest = this.Mocks.request();
-    //var hoodieStore = this.Mocks.store();
-    //var hoodieTask = this.Mocks.task();
-
+    var hoodieAccount = this.MOCKS.account.apply(this);
+    var hoodieConfig = this.MOCKS.config.apply(this);
+    //var hoodieConnection = this.MOCKS.connnection.apply(this);
+    var hoodieDispose = this.MOCKS.dispose.apply(this);
+    var hoodieGenerateId = this.MOCKS.generate_id.apply(this);
+    var hoodieOpen = this.MOCKS.open.apply(this);
+    var hoodiePromises = this.MOCKS.promises.apply(this);
+    var hoodieRemoteStore = this.MOCKS.remote_store.apply(this);
+    var hoodieRequest = this.MOCKS.request.apply(this);
+    var hoodieStore = this.MOCKS.store.apply(this);
+    var hoodieTask = this.MOCKS.task.apply(this);
 
     // stubbing all the modules
-    this.sandbox.stub(this.hoodie, 'on', hoodieEvents.on);
-    this.sandbox.stub(this.hoodie, 'one', hoodieEvents.one);
-    this.sandbox.stub(this.hoodie, 'trigger', hoodieEvents.trigger);
-    this.sandbox.stub(this.hoodie, 'unbind', hoodieEvents.unbind);
-
-    //this.sandbox.stub(global, 'hoodiePromises', hoodiePromises);
-    //this.sandbox.stub(global, 'hoodieRequest', hoodieRequest);
+    this.sandbox.stub(hoodie, 'on', hoodieEvents);
+    this.sandbox.stub(hoodie, 'off', hoodieEvents);
+    this.sandbox.stub(hoodie, 'bind', hoodieEvents);
+    this.sandbox.stub(hoodie, 'trigger', hoodieEvents);
+    this.sandbox.stub(global, 'hoodiePromises', hoodiePromises);
+    this.sandbox.stub(global, 'hoodieRequest', hoodieRequest);
     //this.sandbox.stub(global, 'hoodieConnection', hoodieConnection);
-    //this.sandbox.stub(global, 'hoodieGenerateId', hoodieGenerateId);
-    //this.sandbox.stub(global, 'hoodieDispose', hoodieDispose);
-    //this.sandbox.stub(global, 'hoodieOpen', hoodieOpen);
-    //this.sandbox.stub(global, 'hoodieStore', hoodieStore);
-    //this.sandbox.stub(global, 'hoodieTask', hoodieTask);
-    //this.sandbox.stub(global, 'hoodieConfig', hoodieConfig);
-    //this.sandbox.stub(global, 'hoodieAccount', hoodieAccount);
-    //this.sandbox.stub(global, 'hoodieRemoteStore', hoodieRemoteStore);
-    //this.sandbox.stub(global, 'addEventListener');
+    this.sandbox.stub(global, 'hoodieGenerateId', hoodieGenerateId);
+    this.sandbox.stub(global, 'hoodieDispose', hoodieDispose);
+    this.sandbox.stub(global, 'hoodieOpen', hoodieOpen);
+    this.sandbox.stub(global, 'hoodieStore', hoodieStore);
+    this.sandbox.stub(global, 'hoodieTask', hoodieTask);
+    this.sandbox.stub(global, 'hoodieConfig', hoodieConfig);
+    this.sandbox.stub(global, 'hoodieAccount', hoodieAccount);
+    this.sandbox.stub(global, 'hoodieRemoteStore', hoodieRemoteStore);
+    this.sandbox.spy(global, 'addEventListener');
 
   });
 
@@ -140,9 +139,9 @@ describe('Hoodie', function() {
       ////     which is not correct. The remote store is 'user/<hash>'
     //});
 
-    //it('checks connection when user goes offline', function() {
-      //expect(global.addEventListener).to.be.calledWith('offline', this.hoodie.checkConnection, false);
-    //});
+    it('checks connection when user goes offline', function() {
+      expect(global.addEventListener).to.be.calledWith('offline', this.hoodie.checkConnection, false);
+    });
 
     //it('checks connection when user goes online', function() {
       //expect(global.addEventListener).to.be.calledWith('online', this.hoodie.checkConnection, false);

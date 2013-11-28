@@ -4,7 +4,7 @@ module.exports = function() {
 
   var api = {
     checkPasswordReset : self.sandbox.spy(),
-    authenticate : self.sandbox.sinon.stub().returns(api.authenticateDefer.promise()),
+    authenticate : self.sandbox.stub().returns($.Deferred().promise()),
     on : self.sandbox.spy(),
     authenticateDefer: $.Deferred()
   };
