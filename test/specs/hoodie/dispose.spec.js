@@ -1,18 +1,16 @@
-/* global hoodieDispose:true */
+var hoodieDispose = require('../../../src/hoodie/dispose');
 
 describe('hoodie.dispose()', function() {
 
   beforeEach(function() {
-    this.hoodie = new Mocks.Hoodie();
+    this.hoodie = this.MOCKS.hoodie.apply(this);
 
     hoodieDispose(this.hoodie);
-
-    this.sandbox.spy(this.hoodie, 'trigger');
   });
 
   it('should trigger `dispose` event', function() {
     this.hoodie.dispose();
-    expect(this.hoodie.trigger.calledWith('dispose')).to.be.ok();
+    expect(this.hoodie.trigger).to.be.calledWith('dispose');
   });
 
 });
