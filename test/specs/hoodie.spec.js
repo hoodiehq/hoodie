@@ -58,7 +58,7 @@ describe('Hoodie', function() {
     // test for extending with core modules
     it('should extend with hoodieEvents module', function() {
       this.hoodie.on(this.hoodie);
-      expect(this.hoodie.on.calledWith(this.hoodie)).to.be.ok();
+      expect(this.hoodie.on).to.be.calledWith(this.hoodie);
     });
 
     it('should extend with hoodiePromises module', function() {
