@@ -1,9 +1,11 @@
-/* global hoodieStore:true, hoodieStoreApi:true */
+require('../../lib/setup');
+
+var hoodieLocalStore = require('../../../src/hoodie/local_store');
 
 describe('hoodie.store', function() {
 
   beforeEach(function() {
-    this.hoodie = new Mocks.Hoodie();
+    this.hoodie = this.MOCKS.hoodie.apply(this);
 
     // see https://github.com/pivotal/jasmine/issues/299
     Object.defineProperty(localStorage, 'setItem', { writable: true });
@@ -22,10 +24,12 @@ describe('hoodie.store', function() {
 
     this.clock = this.sandbox.useFakeTimers(0); // '1970-01-01 00:00:00'
 
-    this.storeApi = Mocks.StoreApi(this.hoodie);
-    this.sandbox.stub(window, 'hoodieStoreApi').returns(this.storeApi);
-    hoodieStore(this.hoodie);
-    this.storeBackend = hoodieStoreApi.args[0][1].backend;
+    this.storeFactory = this.MOCKS.store.apply(this);
+    // HERE: stub require('./store') with this.storeFactory
+
+    hoodieLocalStore(this.hoodie);
+    // get the backend option of storeFactory call, somehow ...
+    // this.storeBackend = funk.hoodieStoreApi.args[0][1].backend;
     this.store = this.hoodie.store;
   });
 
@@ -76,7 +80,7 @@ describe('hoodie.store', function() {
     });
 
     it('should mark all objects as changed on account:signup', function() {
-      this.storeApi.findAllDefer.resolve([
+      this.storeFactory.findAll.defer.resolve([
         { type: 'doc', id: 'funky' },
         { type: 'doc', id: 'fresh' }
       ]);

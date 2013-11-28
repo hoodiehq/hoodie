@@ -1,11 +1,15 @@
-/* global hoodieOpen:true */
+require('../../lib/setup');
+var hoodieOpen = require('../../../src/hoodie/open');
 
 describe('#open(store, options)', function() {
 
   beforeEach(function() {
-    this.hoodie = new Mocks.Hoodie();
+    this.hoodie = this.MOCKS.hoodie.apply(this);
     this.requestDefer = this.hoodie.defer();
-    this.sandbox.spy(window, 'hoodieRemoteStore');
+
+    // HERE: spy on require('./remote_store') somehow ...
+    // this.sandbox.spy(window, 'hoodieRemoteStore');
+
     hoodieOpen(this.hoodie);
   });
 
@@ -15,10 +19,10 @@ describe('#open(store, options)', function() {
       option: 'value'
     });
 
-    expect(window.hoodieRemoteStore.withArgs(this.hoodie, {
+    expect(window.hoodieRemoteStore).to.be.calledWith(this.hoodie, {
       name: 'store_name',
       option: 'value'
-    })).to.be.ok();
+    });
   });
 
 });
