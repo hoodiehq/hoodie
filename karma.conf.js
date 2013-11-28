@@ -18,7 +18,7 @@ module.exports = function(config) {
       { pattern: 'lib/jquery/jquery.js', watched: false, included: true },
       { pattern: 'lib/expect/expect.js', watched: false, included: true },
       { pattern: 'lib/sinonjs/sinon.js', watched: false, included: true },
-      //'test/lib/helpers.js',
+      'test/lib/helpers.js',
       'test/lib/setup.js',
 
       'test/specs/hoodie.spec.js',
