@@ -1,11 +1,12 @@
-/* global hoodieRequest:true */
+require('../../lib/setup');
+var hoodieRequest = require('../../../src/hoodie/request');
 
 describe('hoodie.request', function () {
 
   'use strict';
 
   beforeEach(function () {
-    this.hoodie = new Mocks.Hoodie();
+    this.hoodie = this.MOCKS.hoodie.apply(this);
     this.ajaxDefer = this.hoodie.defer();
     var ajaxPromise = this.ajaxDefer.promise();
     ajaxPromise.abort = function() {};

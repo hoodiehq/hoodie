@@ -1,9 +1,11 @@
-/* global hoodieGenerateId:true */
+require('../../lib/setup');
+var hoodieGenerateId = require('../../../src/hoodie/generate_id');
 
-describe('hoodie.generateId()', function() {
+
+describe.only('hoodie.generateId()', function() {
 
   beforeEach(function() {
-    this.hoodie = new Mocks.Hoodie();
+    this.hoodie = this.MOCKS.hoodie.apply(this);
     hoodieGenerateId(this.hoodie);
   });
 

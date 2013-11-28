@@ -1,13 +1,18 @@
-/* global hoodieStoreApi:true */
+require('../../lib/setup');
+var hoodieStoreApi = require('../../../src/hoodie/store');
 
 describe('hoodieStoreApi', function() {
 
   beforeEach(function() {
-    this.hoodie = new Mocks.Hoodie();
+    this.hoodie = this.MOCKS.hoodie.apply(this);
+
     this.options = Mocks.storeOptions('funkstore');
     this.validate = sinon.stub();
     this.optionsWithValidate = $.extend({}, this.options, {validate: this.validate});
-    this.sandbox.spy(window, 'hoodieEvents');
+
+    // here we somehow have to be able to spy on require('./store')
+    // this.sandbox.spy(window, 'hoodieEvents');
+
     this.store = hoodieStoreApi(this.hoodie, this.options );
     this.storeWithCustomValidate = hoodieStoreApi(this.hoodie, this.optionsWithValidate );
   });

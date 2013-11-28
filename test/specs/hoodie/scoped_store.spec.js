@@ -1,11 +1,17 @@
+require('../../lib/setup');
+var hoodieStoreApi = require('../../../src/hoodie/store');
+
 /* global hoodieScopedStoreApi:true */
 
 describe('hoodieScopedStoreApi', function() {
 
   beforeEach(function() {
-    this.hoodie = new Mocks.Hoodie();
+    this.hoodie = this.MOCKS.hoodie.apply(this);
     this.store = Mocks.StoreApi(this.hoodie);
-    this.sandbox.spy(window, 'hoodieEvents');
+
+    // here we somehow have to be able to spy on require('./store')
+    // this.sandbox.spy(window, 'hoodieEvents');
+
     this.options = Mocks.storeOptions('taskstore');
   });
 

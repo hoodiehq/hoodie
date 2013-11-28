@@ -30,16 +30,18 @@ module.exports = function(config) {
       'test/specs/hoodie/dispose.spec.js',
       'test/specs/hoodie/events.spec.js',
       'test/specs/hoodie/promises.spec.js',
+      'test/specs/hoodie/request.spec.js',
+      'test/specs/hoodie/generate_id.spec.js',
 
       // dunno how to stub require calls, but it's needed here
       // 'test/specs/hoodie/local_store.spec.js',
-      'test/specs/hoodie/open.spec.js',
-
-      // 'test/specs/hoodie/request.spec.js',
+      // 'test/specs/hoodie/open.spec.js',
       // 'test/specs/hoodie/store.spec.js',
       // 'test/specs/hoodie/scoped_store.spec.js',
+
+
       // 'test/specs/hoodie/remote_store.spec.js',
-      // 'test/specs/hoodie/generate_id.spec.js',
+
       // 'test/specs/hoodie/account_remote.spec.js',
       // 'test/specs/hoodie/task.spec.js',
       // 'test/specs/hoodie/scoped_task.spec.js',

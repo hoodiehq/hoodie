@@ -1,7 +1,7 @@
 require('../../lib/setup');
 var hoodiePromises = require('../../../src/hoodie/promises');
 
-describe.only('hoodie promises API', function() {
+describe('hoodie promises API', function() {
 
   beforeEach(function() {
     this.hoodie = this.MOCKS.hoodie.apply(this);
