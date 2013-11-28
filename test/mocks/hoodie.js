@@ -1,4 +1,4 @@
-var store = require('./store');
+var localStore = require('./local_store');
 var task  = require('./task');
 var promise = require('./promises');
 var events = require('./events');
@@ -34,7 +34,7 @@ module.exports = function () {
       return 'uuid';
     },
 
-    store: store.apply(this),
+    store: localStore.apply(this),
     task: task.apply(this),
     account: {
       authenticate: function () {
