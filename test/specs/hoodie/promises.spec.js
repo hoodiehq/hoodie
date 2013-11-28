@@ -1,9 +1,10 @@
-/* global hoodiePromises:true */
+require('../../lib/setup');
+var hoodiePromises = require('../../../src/hoodie/promises');
 
-describe('hoodie promises API', function() {
+describe.only('hoodie promises API', function() {
 
   beforeEach(function() {
-    this.hoodie = new Mocks.Hoodie();
+    this.hoodie = this.MOCKS.hoodie.apply(this);
     hoodiePromises(this.hoodie);
   });
 
@@ -12,16 +13,16 @@ describe('hoodie promises API', function() {
 
     it('should return true if object is a promise', function() {
       var object = $.Deferred().promise();
-      expect(this.hoodie.isPromise(object)).to.be.ok();
+      expect(this.hoodie.isPromise(object)).to.be(true);
     });
 
     it('should return false for deferred objects', function() {
       var object = $.Deferred();
-      expect(this.hoodie.isPromise(object)).to.not.be.ok();
+      expect(this.hoodie.isPromise(object)).to.be(false);
     });
 
     it('should return false when object is undefined', function() {
-      expect(this.hoodie.isPromise(void 0)).to.not.be.ok();
+      expect(this.hoodie.isPromise(void 0)).to.be(false);
     });
 
   });
@@ -29,12 +30,12 @@ describe('hoodie promises API', function() {
   describe('#resolve()', function() {
 
     it('simply returns resolved promise', function() {
-      expect(this.hoodie.resolve().state()).to.eql('resolved');
+      expect(this.hoodie.resolve().state()).to.be('resolved');
     });
 
     it('should be applyable', function() {
       var promise = this.hoodie.reject().then(null, this.hoodie.resolve);
-      expect(promise.state()).to.eql('resolved');
+      expect(promise).to.be.resolved();
     });
 
   });
@@ -42,12 +43,12 @@ describe('hoodie promises API', function() {
   describe('#reject()', function() {
 
     it('simply returns rejected promise', function() {
-      expect(this.hoodie.reject().state()).to.eql('rejected');
+      expect(this.hoodie.reject()).to.be.rejected();
     });
 
     it('should be applyable', function() {
       var promise = this.hoodie.resolve().then(this.hoodie.reject);
-      expect(promise.state()).to.eql('rejected');
+      expect(promise).to.be.rejected();
     });
 
   });

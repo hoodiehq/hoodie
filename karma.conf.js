@@ -29,10 +29,12 @@ module.exports = function(config) {
       'test/specs/hoodie/config.spec.js',
       'test/specs/hoodie/dispose.spec.js',
       'test/specs/hoodie/events.spec.js',
+      'test/specs/hoodie/promises.spec.js',
 
+      // dunno how to stub require calls, but it's needed here
       // 'test/specs/hoodie/local_store.spec.js',
-      // 'test/specs/hoodie/open.spec.js',
-      // 'test/specs/hoodie/promises.spec.js',
+      'test/specs/hoodie/open.spec.js',
+
       // 'test/specs/hoodie/request.spec.js',
       // 'test/specs/hoodie/store.spec.js',
       // 'test/specs/hoodie/scoped_store.spec.js',
