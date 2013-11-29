@@ -20,6 +20,6 @@ HoodieObjectIdError.isInvalid = function(id, customPattern) {
 HoodieObjectIdError.isValid = function(id, customPattern) {
   return (customPattern || validIdPattern).test(id || '');
 };
-HoodieError.prototype.rules = 'Lowercase letters, numbers and dashes allowed only. Must start with a letter';
+HoodieObjectIdError.prototype.rules = 'Lowercase letters, numbers and dashes allowed only. Must start with a letter';
 
 module.exports = HoodieObjectIdError;
