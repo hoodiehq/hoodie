@@ -176,8 +176,8 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-groc');
   grunt.loadNpmTasks('grunt-karma');
 
-  grunt.registerTask('default', ['jshint', 'concat', 'uglify']);
-  grunt.registerTask('build', ['jshint', 'karma:continuous', 'concat', 'uglify']);
+  grunt.registerTask('default', ['test']);
+  grunt.registerTask('build', ['jshint', 'karma:continuous', 'browserify', 'uglify']);
   grunt.registerTask('test', ['karma:dev']);
   grunt.registerTask('docs', ['groc']);
 };
