@@ -48,7 +48,7 @@
     "graceful-fs": "~2.0.1"
   },
   "scripts": {
-    "test": "grunt test --verbose",
+    "test": "grunt build --verbose",
     "build": "grunt build --verbose",
     "postinstall": "bower install"
   }
