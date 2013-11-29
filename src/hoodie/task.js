@@ -59,7 +59,7 @@ function hoodieTask(hoodie) {
   // cancel a running task
   //
   api.cancel = function(type, id) {
-    return hoodie.store.update('$'+type, id, { cancelledAt: now() }).then(handleCancelledTask);
+    return hoodie.store.update('$'+type, id, { cancelledAt: now() }).then(handleCancelledTaskObject);
   };
 
 
@@ -139,27 +139,41 @@ function hoodieTask(hoodie) {
       }
 
       // manually removed / cancelled.
-      defer.reject(object);
+      defer.reject(new HoodieError({
+        message: 'Task has been cancelled',
+        task: object
+      }));
     });
-    taskStore.on('error', function(error, object) {
+    taskStore.on('update', function(object) {
+      var error = object.$error;
+      if (! object.$error) {
+        return;
+      }
 
       // remove "$" from type
       object.type = object.type.substr(1);
 
-      defer.reject(error, object);
+      delete object.$error;
+      error.object = object;
+      error.message = error.message || 'Something went wrong';
+
+      defer.reject(new HoodieError(error));
+
+      // remove errored task
+      hoodie.store.remove('$' + object.type, object.id);
     });
 
     return defer.promise();
   }
 
   //
-  function handleCancelledTask (task) {
+  function handleCancelledTaskObject (taskObject) {
     var defer;
-    var type = '$'+task.type;
-    var id = task.id;
+    var type = taskObject.type; // no need to prefix with $, it's already prefixed.
+    var id = taskObject.id;
     var removePromise = hoodie.store.remove(type, id);
 
-    if (!task._rev) {
+    if (!taskObject._rev) {
       // task has not yet been synced.
       return removePromise;
     }
