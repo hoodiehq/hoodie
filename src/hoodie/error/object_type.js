@@ -1,12 +1,12 @@
-/* exported HoodieObjectTypeError */
-/* global HoodieError */
-
 // Hoodie Invalid Type Or Id Error
 // -------------------------------
 
 // only lowercase letters, numbers and dashes
 // are allowed for object types, plus must start
 // with a letter.
+//
+var HoodieError = require('../error');
+
 //
 function HoodieObjectTypeError(properties) {
   properties.name = 'HoodieObjectTypeError';
@@ -22,3 +22,5 @@ HoodieObjectTypeError.isValid = function(type, customPattern) {
   return (customPattern || validTypePattern).test(type || '');
 };
 HoodieObjectTypeError.prototype.rules = 'lowercase letters, numbers and dashes allowed only. Must start with a letter';
+
+module.exports = HoodieObjectTypeError;

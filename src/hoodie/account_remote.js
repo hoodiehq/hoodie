@@ -1,5 +1,3 @@
-/* exported hoodieRemote */
-
 // AccountRemote
 // ===============
 
@@ -136,3 +134,5 @@ function hoodieRemote (hoodie) {
   //
   hoodie.remote = remote;
 }
+
+module.exports = hoodieRemote;

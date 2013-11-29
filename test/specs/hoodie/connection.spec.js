@@ -1,14 +1,11 @@
-/* global hoodieConnection:true */
+require('../../lib/setup');
+var hoodieConnection = require('../../../src/hoodie/connection');
 
 describe('#checkConnection()', function() {
 
   beforeEach(function() {
-    this.hoodie = new Mocks.Hoodie();
+    this.hoodie = this.MOCKS.hoodie.apply(this);
 
-    this.requestDefer = this.hoodie.defer();
-
-    this.sandbox.spy(this.hoodie, 'trigger');
-    this.sandbox.stub(this.hoodie, 'request').returns(this.requestDefer.promise());
     this.sandbox.stub(window, 'setTimeout').returns('checkTimeout');
     this.sandbox.stub(window, 'clearTimeout');
 
@@ -43,7 +40,7 @@ describe('#checkConnection()', function() {
     _and('request succeeds', function() {
 
       beforeEach(function() {
-        this.requestDefer.resolve({
+        this.hoodie.request.defer.resolve({
           'couchdb': 'Welcome',
           'version': '1.2.1'
         });
@@ -69,7 +66,7 @@ describe('#checkConnection()', function() {
     _and('request fails', function() {
 
       beforeEach(function() {
-        this.requestDefer.reject({
+        this.hoodie.request.defer.reject({
           'status': 0,
           'statusText': 'Error'
         });
@@ -104,7 +101,7 @@ describe('#checkConnection()', function() {
     _and('request succeeds', function() {
 
       beforeEach(function() {
-        this.requestDefer.resolve({
+        this.hoodie.request.defer.resolve({
           'couchdb': 'Welcome',
           'version': '1.2.1'
         });
@@ -124,7 +121,7 @@ describe('#checkConnection()', function() {
     _and('request fails', function() {
 
       beforeEach(function() {
-        this.requestDefer.reject({
+        this.hoodie.request.defer.reject({
           'status': 0,
           'statusText': 'Error'
         });

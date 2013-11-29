@@ -1,5 +1,3 @@
-/* exported hoodieRequest */
-
 //
 // hoodie.request
 // ================
@@ -158,3 +156,5 @@ function hoodieRequest(hoodie) {
   //
   hoodie.request = request;
 }
+
+module.exports = hoodieRequest;

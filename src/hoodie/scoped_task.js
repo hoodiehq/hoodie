@@ -1,13 +1,12 @@
-/* exported hoodieScopedTask */
-/* global hoodieEvents */
-
 // scoped Store
 // ============
 
 // same as store, but with type preset to an initially
 // passed value.
 //
+var hoodieEvents = require('./events');
 
+//
 function hoodieScopedTask(hoodie, taskApi, options) {
 
   var type = options.type;
@@ -72,3 +71,5 @@ function hoodieScopedTask(hoodie, taskApi, options) {
 
   return api;
 }
+
+module.exports = hoodieScopedTask;

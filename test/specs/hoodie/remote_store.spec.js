@@ -1,28 +1,29 @@
-/* global hoodieRemoteStore:true, hoodieStoreApi:true */
+require('../../lib/setup');
+
+// stub the requires before loading the actual module
+var storeFactory = sinon.stub();
+global.stubRequire('src/hoodie/store', storeFactory);
+
+global.unstubRequire('src/hoodie/remote_store');
+var hoodieRemoteStore = require('../../../src/hoodie/remote_store');
 
 describe('hoodieRemoteStore', function() {
 
   beforeEach(function() {
-
-    this.hoodie = new Mocks.Hoodie();
-
-    this.sandbox.spy(this.hoodie, 'on');
-    this.sandbox.spy(this.hoodie, 'trigger');
-    this.sandbox.spy(this.hoodie, 'one');
-    this.sandbox.spy(this.hoodie, 'unbind');
-    this.sandbox.spy(this.hoodie, 'checkConnection');
+    this.hoodie = this.MOCKS.hoodie.apply(this);
 
     this.requestDefer = this.hoodie.defer();
     var promise = this.requestDefer.promise();
     promise.abort = sinon.spy();
-    this.sandbox.stub(this.hoodie, 'request').returns( promise );
+    this.hoodie.request.returns( promise );
 
     this.clock = this.sandbox.useFakeTimers(0); // '1970-01-01 00:00:00'
 
-    this.storeApi = Mocks.StoreApi(this.hoodie);
-    this.sandbox.stub(window, 'hoodieStoreApi').returns(this.storeApi);
-    this.remote = hoodieRemoteStore(this.hoodie, { name: 'my/store'} );
-    this.storeBackend = hoodieStoreApi.args[0][1].backend;
+    storeFactory.reset();
+    storeFactory.returns( this.MOCKS.store.apply(this) );
+
+    this.remote = hoodieRemoteStore(this.hoodie, { name: 'my/store'});
+    this.storeBackend = storeFactory.args[0][1].backend;
   });
 
   describe('factory', function() {
@@ -131,7 +132,7 @@ describe('hoodieRemoteStore', function() {
           name: 'my/store',
           prefix: 'store_prefix/'
         } );
-        this.storeBackend = hoodieStoreApi.args[1][1].backend;
+        this.storeBackend = storeFactory.args[1][1].backend;
       });
 
       it('should send request to `store_prefix%2Ftype%2Fid`', function() {
@@ -269,9 +270,6 @@ describe('hoodieRemoteStore', function() {
   }); // #findAll
 
   describe('#save(type, id, object)', function() {
-    beforeEach(function() {
-      this.sandbox.stub(this.hoodie, 'generateId').returns('generateId567');
-    });
 
     it('should generate an id if it is undefined', function() {
       this.storeBackend.save({type: 'car'});
@@ -605,7 +603,7 @@ describe('hoodieRemoteStore', function() {
     _when('request is successful / returns changes', function() {
 
       beforeEach(function() {
-        this.requestDefer1.resolve( Mocks.changesResponse() );
+        this.requestDefer1.resolve( this.FIXTURES.changesResponse() );
       });
 
       it('should set since nr', function() {
@@ -617,7 +615,7 @@ describe('hoodieRemoteStore', function() {
       it('should set since nr using callback if initialized with since callback', function() {
         var callback = sinon.spy();
         var remote = hoodieRemoteStore(this.hoodie, { name: 'my/store', since: callback} );
-        var promise = this.hoodie.defer().resolve( Mocks.changesResponse() ).promise();
+        var promise = this.hoodie.defer().resolve( this.FIXTURES.changesResponse() ).promise();
         this.sandbox.stub(remote, 'request').returns( promise );
         remote.pull();
         expect(callback).to.be.calledWith(20);
@@ -866,7 +864,7 @@ describe('hoodieRemoteStore', function() {
 
     _and('one deleted and one new doc passed', function() {
       beforeEach(function() {
-        this.remote.push(Mocks.changedObjects());
+        this.remote.push(this.FIXTURES.changedObjects());
         expect(this.hoodie.request.called).to.be.ok();
         var _ref = this.hoodie.request.args[0];
 
@@ -901,13 +899,13 @@ describe('hoodieRemoteStore', function() {
         deletedDoc = docs[0];
         newDoc = docs[1];
 
-        expect(deletedDoc._rev).to.eql('3-uuid');
-        expect(newDoc._rev).to.eql('1-uuid');
+        expect(deletedDoc._rev).to.eql('3-uuid123');
+        expect(newDoc._rev).to.eql('1-uuid123');
         expect(deletedDoc._revisions.start).to.eql(3);
-        expect(deletedDoc._revisions.ids[0]).to.eql('uuid');
+        expect(deletedDoc._revisions.ids[0]).to.eql('uuid123');
         expect(deletedDoc._revisions.ids[1]).to.eql('123');
         expect(newDoc._revisions.start).to.eql(1);
-        expect(newDoc._revisions.ids[0]).to.eql('uuid');
+        expect(newDoc._revisions.ids[0]).to.eql('uuid123');
       });
     }); // one deleted and one new doc passed
 
@@ -956,8 +954,8 @@ describe('hoodieRemoteStore', function() {
       it('should add `-local` suffix to rev number', function() {
         expect(this.hoodie.request).to.be.called();
         var data = JSON.parse(this.hoodie.request.args[0][2].data);
-        expect(data.docs[0]._rev).to.eql('1-uuid');
-        expect(data.docs[1]._rev).to.eql('1-uuid-local');
+        expect(data.docs[0]._rev).to.eql('1-uuid123');
+        expect(data.docs[1]._rev).to.eql('1-uuid123-local');
       });
     }); // _$local flags set
   }); // #push

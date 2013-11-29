@@ -1,9 +1,10 @@
-/* global hoodieEvents:true*/
+require('../../lib/setup');
 
+var hoodieEvents = require('../../../src/hoodie/events');
 describe('Events', function() {
 
   beforeEach(function() {
-    this.hoodie = {}; // new Mocks.Hoodie();
+    this.hoodie = {};
     hoodieEvents(this.hoodie);
   });
 

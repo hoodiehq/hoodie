@@ -1,5 +1,3 @@
-/* exported hoodieGenerateId */
-
 // hoodie.generateId
 // =============
 
@@ -37,3 +35,5 @@ function hoodieGenerateId (hoodie) {
   //
   hoodie.generateId = generateId;
 }
+
+module.exports = hoodieGenerateId;

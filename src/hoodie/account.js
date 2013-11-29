@@ -1,8 +1,7 @@
-/* exported hoodieAccount */
-/* global hoodieEvents */
-
 // Hoodie.Account
 // ================
+
+var hoodieEvents = require('./events');
 
 //
 function hoodieAccount (hoodie) {
@@ -1119,3 +1118,5 @@ function hoodieAccount (hoodie) {
     setOwner(hoodie.generateId());
   }
 }
+
+module.exports = hoodieAccount;

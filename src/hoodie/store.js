@@ -1,7 +1,3 @@
-/* global hoodieScopedStoreApi, hoodieEvents,
-   HoodieError, HoodieObjectTypeError, HoodieObjectIdError */
-/* exported hoodieStoreApi */
-
 // Store
 // ============
 
@@ -34,6 +30,14 @@
 //     taskStore.update('id123', {done: true});
 //
 
+//
+var hoodieScopedStoreApi = require('./scoped_store');
+var hoodieEvents = require('./events');
+var HoodieError = require('./error');
+var HoodieObjectTypeError = require('./error/object_type');
+var HoodieObjectIdError = require('./error/object_id');
+
+//
 function hoodieStoreApi(hoodie, options) {
 
   // persistance logic
@@ -400,3 +404,5 @@ function hoodieStoreApi(hoodie, options) {
 
   return api;
 }
+
+module.exports = hoodieStoreApi;

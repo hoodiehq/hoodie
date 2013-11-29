@@ -9,7 +9,7 @@ module.exports = function(config) {
 
 
     // frameworks to use
-    frameworks: ['mocha'],
+    frameworks: ['browserify', 'mocha'],
 
 
     // list of files / patterns to load in the browser
@@ -18,52 +18,29 @@ module.exports = function(config) {
       { pattern: 'lib/jquery/jquery.js', watched: false, included: true },
       { pattern: 'lib/expect/expect.js', watched: false, included: true },
       { pattern: 'lib/sinonjs/sinon.js', watched: false, included: true },
-
       'test/lib/helpers.js',
-      'src/hoodie.js',
+      // 'test/lib/setup.js',
 
-      'src/hoodie/events.js',
-      'src/hoodie/promises.js',
-      'src/hoodie/request.js',
-      'src/hoodie/connection.js',
-      'src/hoodie/generate_id.js',
-      'src/hoodie/dispose.js',
-      'src/hoodie/open.js',
+      // ignoring Constructor specs temporarely for 0.5 due to
+      // incompatibilities with browserify, as discussed (@gr2m & @svnlto)
+      // 'test/specs/hoodie.spec.js',
 
-      'src/hoodie/store.js',
-      'src/hoodie/scoped_store.js',
-      'src/hoodie/remote_store.js',
-      'src/hoodie/local_store.js',
-      'src/hoodie/config.js',
-      'src/hoodie/account.js',
-      'src/hoodie/account_remote.js',
-      'src/hoodie/error.js',
-      'src/hoodie/error/object_id.js',
-      'src/hoodie/error/object_type.js',
-      'src/hoodie/task.js',
-      'src/hoodie/scoped_task.js',
-
-      'test/mocks/*.js',
-
-      // these are good
-      'test/specs/hoodie.spec.js',
       'test/specs/hoodie/account.spec.js',
+      'test/specs/hoodie/account_remote.spec.js',
       'test/specs/hoodie/config.spec.js',
-
+      'test/specs/hoodie/connection.spec.js',
       'test/specs/hoodie/dispose.spec.js',
       'test/specs/hoodie/events.spec.js',
+      'test/specs/hoodie/generate_id.spec.js',
       'test/specs/hoodie/local_store.spec.js',
       'test/specs/hoodie/open.spec.js',
       'test/specs/hoodie/promises.spec.js',
-      'test/specs/hoodie/request.spec.js',
-      'test/specs/hoodie/store.spec.js',
-      'test/specs/hoodie/scoped_store.spec.js',
       'test/specs/hoodie/remote_store.spec.js',
-      'test/specs/hoodie/generate_id.spec.js',
-      'test/specs/hoodie/account_remote.spec.js',
-      'test/specs/hoodie/task.spec.js',
+      'test/specs/hoodie/request.spec.js',
+      'test/specs/hoodie/scoped_store.spec.js',
       'test/specs/hoodie/scoped_task.spec.js',
-      'test/specs/hoodie/connection.spec.js'
+      'test/specs/hoodie/store.spec.js',
+      'test/specs/hoodie/task.spec.js'
     ],
 
 
@@ -103,6 +80,16 @@ module.exports = function(config) {
     // - PhantomJS
     // - IE (only Windows)
     browsers: [],
+
+    preprocessors: {
+      //'src/hoodie/hoodie.js': ['browserify'],
+      'src/hoodie/config.js': ['browserify'],
+      'test/specs/**/*.js': ['browserify'],
+      'test/lib/setup.js': ['browserify']
+    },
+
+    // https://github.com/xdissent/karma-browserify#options
+    browserify: {},
 
 
     // If browser does not capture in given timeout [ms], kill it

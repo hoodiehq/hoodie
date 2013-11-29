@@ -1,7 +1,7 @@
 .DS_Store
 TODO.md
 node_modules
-lib/
+/lib/
 coverage/
 .idea
 sauce_connect.log

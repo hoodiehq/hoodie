@@ -1,13 +1,12 @@
-/* exported hoodieStore */
-/* global hoodieStoreApi,
-   HoodieObjectTypeError, HoodieObjectIdError */
-
 // LocalStore
 // ============
-//
-// window.localStrage wrapper and more
-//
 
+//
+var hoodieStoreApi = require('./store');
+var HoodieObjectTypeError = require('./error/object_type');
+var HoodieObjectIdError = require('./error/object_id');
+
+//
 function hoodieStore (hoodie) {
 
   var localStore = {};
@@ -893,10 +892,11 @@ function hoodieStore (hoodie) {
   function triggerDirtyAndIdleEvents() {
     store.trigger('dirty');
     window.clearTimeout(dirtyTimeout);
+    store.trigger('idle', store.changedObjects());
 
-    dirtyTimeout = window.setTimeout(function() {
-      store.trigger('idle', store.changedObjects());
-    }, idleTimeout);
+    // dirtyTimeout = window.setTimeout(function() {
+    //   store.trigger('idle', store.changedObjects());
+    // }, idleTimeout);
   }
 
   //
@@ -972,3 +972,5 @@ function hoodieStore (hoodie) {
     delete store.patchIfNotPersistant;
   };
 }
+
+module.exports = hoodieStore;

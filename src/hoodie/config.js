@@ -1,10 +1,9 @@
-/* exported hoodieConfig */
-
 // Hoodie Config API
 // ===================
 
 //
 function hoodieConfig(hoodie) {
+
   var type = '$config';
   var id = 'hoodie';
   var cache = {};
@@ -74,3 +73,5 @@ function hoodieConfig(hoodie) {
   // exspose public API
   hoodie.config = config;
 }
+
+module.exports = hoodieConfig;

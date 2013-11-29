@@ -1,10 +1,11 @@
-/* global hoodieConfig:true */
+require('../../lib/setup');
+var hoodieConfig = require('../../../src/hoodie/config');
+
 describe('Hoodie.Config', function() {
 
   beforeEach(function() {
-    this.hoodie = new Mocks.Hoodie();
-    this.updateOrAddSpy = this.hoodie.store.updateOrAdd.returns('promise');
-    this.hoodie.store.findDefer.resolve({
+    this.hoodie = this.MOCKS.hoodie.apply(this);
+    this.hoodie.store.find.defer.resolve({
       funky: 'fresh'
     });
 
@@ -27,11 +28,11 @@ describe('Hoodie.Config', function() {
     it('should make the save silent for local settings starting with _', function() {
       this.config.set('_local', 'fresh');
 
-      expect(this.hoodie.store.updateOrAdd.calledWith('$config', 'hoodie', {
+      expect(this.hoodie.store.updateOrAdd).to.be.calledWith('$config', 'hoodie', {
         _local: 'fresh'
       }, {
         silent: true
-      })).to.be.ok();
+      });
     });
 
   });
@@ -39,8 +40,9 @@ describe('Hoodie.Config', function() {
   describe('#get(key)', function() {
 
     it('should get the config using store', function() {
-      expect(this.config.get('funky')).to.eql('fresh');
-      expect(this.hoodie.store.find.called).to.be.ok();
+      var value = this.config.get('funky');
+      expect(this.hoodie.store.find).to.be.called();
+      expect(value).to.eql('fresh');
     });
 
   });
@@ -51,11 +53,11 @@ describe('Hoodie.Config', function() {
       this.config.set('funky', 'fresh');
       this.config.unset('funky');
 
-      expect(this.hoodie.store.updateOrAdd.calledWith('$config', 'hoodie', {
+      expect(this.hoodie.store.updateOrAdd).to.be.calledWith('$config', 'hoodie', {
         funky: void 0
       }, {
         silent: false
-      })).to.be.ok();
+      });
     });
 
   });
