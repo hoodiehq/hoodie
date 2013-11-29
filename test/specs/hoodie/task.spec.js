@@ -84,12 +84,12 @@ describe('hoodie.task', function() {
 
           it('should reject', function() {
             expect(this.promise).to.be.rejectedWith( {
-              "message": "Task has been cancelled",
-              "task": {
-                "type": "message",
-                "id": "123"
+              'message': 'Task has been cancelled',
+              'task': {
+                'type': 'message',
+                'id': '123'
               },
-              "name": "HoodieError"
+              'name': 'HoodieError'
             } );
           });
         });
