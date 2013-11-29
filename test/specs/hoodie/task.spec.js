@@ -195,7 +195,7 @@ describe('hoodie.task', function() {
       _when('removing task from store succeeds', function() {
         beforeEach(function() {
           this.hoodie.store.remove.defer.resolve('removeSucces');
-          this.syncEventCallback = this.hoodie.one.lastCall.args[1]
+          this.syncEventCallback = this.hoodie.one.lastCall.args[1];
         });
 
         it('should not resolve yet', function() {
@@ -456,4 +456,4 @@ function gatherEventCallbackMapForOutsideEvents(context) {
   context.task.subscribeToOutsideEvents();
   context.hoodie.on = oldOn;
   return events;
-};
+}

@@ -54,7 +54,6 @@ describe('hoodie.store', function() {
       });
 
       it('should call methods on localStorage', function() {
-        debugger
         this.storeBackend.find('task', '123');
         expect(window.localStorage.getItem).to.be.called();
       });
@@ -97,7 +96,7 @@ describe('hoodie.store', function() {
       var changedObjects = [
         { type: 'doc', id: 'funky' },
         { type: 'doc', id: 'fresh' }
-      ]
+      ];
       this.store.findAll.defer.resolve(changedObjects);
       this.sandbox.stub(this.store, 'changedObjects').returns(changedObjects);
       this.outsideEvents['account:signup']();
@@ -108,7 +107,7 @@ describe('hoodie.store', function() {
     });
 
     it('should trigger "sync" events on objects that got pushed', function() {
-      this.outsideEvents['remote:push']({ type: 'doc', id: 'funky' })
+      this.outsideEvents['remote:push']({ type: 'doc', id: 'funky' });
       expect(this.store.trigger).to.be.calledWith('sync', { type: 'doc', id: 'funky' }, undefined);
       expect(this.store.trigger).to.be.calledWith('doc:sync', { type: 'doc', id: 'funky' }, undefined);
       expect(this.store.trigger).to.be.calledWith('doc:funky:sync', { type: 'doc', id: 'funky' }, undefined);
@@ -1338,4 +1337,4 @@ function gatherEventCallbackMapForOutsideEvents(context) {
   context.store.subscribeToOutsideEvents();
   context.hoodie.on = oldOn;
   return events;
-};
+}
