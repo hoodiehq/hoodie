@@ -22,6 +22,7 @@
 //
 var hoodieEvents = require('./events');
 var hoodieScopedTask = require('./scoped_task');
+var HoodieError = require('./error');
 
 //
 function hoodieTask(hoodie) {

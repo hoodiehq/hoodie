@@ -83,7 +83,14 @@ describe('hoodie.task', function() {
           });
 
           it('should reject', function() {
-            expect(this.promise).to.be.rejectedWith( { type: 'message', id: '123' } );
+            expect(this.promise).to.be.rejectedWith( {
+              "message": "Task has been cancelled",
+              "task": {
+                "type": "message",
+                "id": "123"
+              },
+              "name": "HoodieError"
+            } );
           });
         });
 
@@ -91,13 +98,13 @@ describe('hoodie.task', function() {
           // meaning that the task could not be finished, the reason gets stored in `$error`
           beforeEach(function() {
             var args = this.hoodie.store.on.args[1];
-            expect(args[0]).to.eql('error');
+            expect(args[0]).to.eql('update');
             this.errorCallback = args[1];
-            this.errorCallback('error', { type: '$message', id: '123' } );
+            this.errorCallback({ type: '$message', id: '123', $error: 'oops' } );
           });
 
           it('should reject', function() {
-            expect(this.promise).to.be.rejectedWith('error', { type: 'message', id: '123' });
+            expect(this.promise).to.be.rejectedWith({ message: 'oops', name: 'HoodieError' });
           });
         });
       });
@@ -143,7 +150,7 @@ describe('hoodie.task', function() {
 
     _when('hoodie.store.update succeeds (task has not been synced yet)', function() {
       beforeEach(function() {
-        this.hoodie.store.update.defer.resolve({type: 'message', id: '123'});
+        this.hoodie.store.update.defer.resolve({type: '$message', id: '123'});
       });
 
       it('should remove the task from store', function() {
@@ -174,7 +181,7 @@ describe('hoodie.task', function() {
 
     _when('hoodie.store.update succeeds (task has been synced already)', function() {
       beforeEach(function() {
-        this.hoodie.store.update.defer.resolve({type: 'message', id: '123', _rev: '1-234'});
+        this.hoodie.store.update.defer.resolve({type: '$message', id: '123', _rev: '1-234'});
       });
 
       it('should remove the task from store', function() {
