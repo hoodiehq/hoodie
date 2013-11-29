@@ -353,7 +353,11 @@ function hoodieStore (hoodie) {
       });
     }
 
-    if (arguments.length > 0 && HoodieObjectIdError.isInvalid(object.id)) {
+    if (!object.id) {
+      return;
+    }
+
+    if (HoodieObjectIdError.isInvalid(object.id)) {
       return new HoodieObjectIdError({
         id: object.id
       });
@@ -762,7 +766,7 @@ function hoodieStore (hoodie) {
 
   //
   // all local changes get bulk pushed. For each object with local
-  // changes that has been pushed we  trigger a sync event
+  // changes that has been pushed we trigger a sync event
   function handlePushedObject(object) {
     triggerEvents('sync', object);
   }
