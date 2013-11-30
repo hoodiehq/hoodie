@@ -51,6 +51,8 @@ function HoodieError(properties) {
     properties.name = 'HoodieError';
   }
 
+  extend(this, properties);
+
   properties.message = properties.message.replace(errorMessageReplacePattern, function(match) {
     var property = match.match(errorMessageFindPropertyPattern)[0];
     return properties[property];
