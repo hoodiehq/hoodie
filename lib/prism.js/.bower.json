@@ -1,0 +1,14 @@
+{
+  "name": "prism.js",
+  "_cacheHeaders": {
+    "ETag": "\"0c6c44f4a2f5e9899422abf3f2008d39\"",
+    "Content-Length": "12765",
+    "Content-Type": "text/plain; charset=utf-8",
+    "Content-Disposition": "inline"
+  },
+  "_release": "e-tag:0c6c44f4a",
+  "main": "index.js",
+  "_source": "https://raw.github.com/LeaVerou/prism/gh-pages/prism.js",
+  "_target": "*",
+  "_originalSource": "https://raw.github.com/LeaVerou/prism/gh-pages/prism.js"
+}
