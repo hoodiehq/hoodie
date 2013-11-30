@@ -21,9 +21,9 @@ describe('#HoodieError()', function() {
   });
   it('requires message to be set', function() {
     var hoodieErrorWithoutMessage = function() {
-      new HoodieError({})
+      new HoodieError({});
     };
-    expect(hoodieErrorWithoutMessage).to.throwError(/FATAL: error.message must be set/)
+    expect(hoodieErrorWithoutMessage).to.throwError(/FATAL: error.message must be set/);
   });
   it('accepts a custom name for the error', function() {
     var error = new HoodieError({name: 'FunkMissingError', message: 'You don\'t have the funk!'});
