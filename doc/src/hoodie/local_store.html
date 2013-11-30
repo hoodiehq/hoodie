@@ -1,7 +1,8 @@
-<!DOCTYPE html><html lang="en"><head><title>src/hoodie/local_store</title></head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0"><meta name="groc-relative-root" content="../../"><meta name="groc-document-path" content="src/hoodie/local_store"><meta name="groc-project-path" content="src/hoodie/local_store.js"><link rel="stylesheet" type="text/css" media="all" href="../../assets/style.css"><script type="text/javascript" src="../../assets/behavior.js"></script><body><div id="meta"><div class="file-path">src/hoodie/local_store.js</div></div><div id="document"><div class="segment"><div class="code"><div class="wrapper"><span class="cm">/* exported hoodieStore */</span>
-<span class="cm">/* global hoodieStoreApi */</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h1 id="localstore">LocalStore</h1>
+<!DOCTYPE html><html lang="en"><head><title>src/hoodie/local_store</title></head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0"><meta name="groc-relative-root" content="../../"><meta name="groc-document-path" content="src/hoodie/local_store"><meta name="groc-project-path" content="src/hoodie/local_store.js"><link rel="stylesheet" type="text/css" media="all" href="../../assets/style.css"><script type="text/javascript" src="../../assets/behavior.js"></script><body><div id="meta"><div class="file-path">src/hoodie/local_store.js</div></div><div id="document"><div class="segment"><div class="comments"><div class="wrapper"><h1 id="localstore">LocalStore</h1></div></div></div><div class="segment"><div class="code"><div class="wrapper"><span class="kd">var</span> <span class="nx">hoodieStoreApi</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">&#39;./store&#39;</span><span class="p">);</span>
+<span class="kd">var</span> <span class="nx">HoodieObjectTypeError</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">&#39;./error/object_type&#39;</span><span class="p">);</span>
+<span class="kd">var</span> <span class="nx">HoodieObjectIdError</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">&#39;./error/object_id&#39;</span><span class="p">);</span>
 
-<p>window.localStrage wrapper and more</p></div></div><div class="code"><div class="wrapper"><span class="kd">function</span> <span class="nx">hoodieStore</span> <span class="p">(</span><span class="nx">hoodie</span><span class="p">)</span> <span class="p">{</span>
+<span class="kd">var</span> <span class="nx">extend</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">&#39;extend&#39;</span><span class="p">);</span></div></div></div><div class="segment"><div class="code"><div class="wrapper"><span class="kd">function</span> <span class="nx">hoodieStore</span> <span class="p">(</span><span class="nx">hoodie</span><span class="p">)</span> <span class="p">{</span>
 
   <span class="kd">var</span> <span class="nx">localStore</span> <span class="o">=</span> <span class="p">{};</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h2 id="state">state</h2></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>cache of localStorage for quicker access</p></div></div><div class="code"><div class="wrapper">  <span class="kd">var</span> <span class="nx">cachedObject</span> <span class="o">=</span> <span class="p">{};</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>map of dirty objects by their ids</p></div></div><div class="code"><div class="wrapper">  <span class="kd">var</span> <span class="nx">dirty</span> <span class="o">=</span> <span class="p">{};</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>queue of method calls done during bootstrapping</p></div></div><div class="code"><div class="wrapper">  <span class="kd">var</span> <span class="nx">queue</span> <span class="o">=</span> <span class="p">[];</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>2 seconds timout before triggering the <code>store:idle</code> event</p></div></div><div class="code"><div class="wrapper">  <span class="kd">var</span> <span class="nx">idleTimeout</span> <span class="o">=</span> <span class="mi">2000</span><span class="p">;</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><hr />
 
@@ -33,7 +34,7 @@ we're queueing local saves until it's finished.</p></div></div><div class="code"
       <span class="nx">isNew</span> <span class="o">=</span> <span class="k">typeof</span> <span class="nx">currentObject</span> <span class="o">!==</span> <span class="s1">&#39;object&#39;</span><span class="p">;</span>
     <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
       <span class="nx">isNew</span> <span class="o">=</span> <span class="kc">true</span><span class="p">;</span>
-      <span class="nx">object</span><span class="p">.</span><span class="nx">id</span> <span class="o">=</span> <span class="nx">hoodie</span><span class="p">.</span><span class="nx">uuid</span><span class="p">();</span>
+      <span class="nx">object</span><span class="p">.</span><span class="nx">id</span> <span class="o">=</span> <span class="nx">hoodie</span><span class="p">.</span><span class="nx">generateId</span><span class="p">();</span>
     <span class="p">}</span>
 
     <span class="k">if</span> <span class="p">(</span><span class="nx">isNew</span><span class="p">)</span> <span class="p">{</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>add createdBy hash</p></div></div><div class="code"><div class="wrapper">      <span class="nx">object</span><span class="p">.</span><span class="nx">createdBy</span> <span class="o">=</span> <span class="nx">object</span><span class="p">.</span><span class="nx">createdBy</span> <span class="o">||</span> <span class="nx">hoodie</span><span class="p">.</span><span class="nx">account</span><span class="p">.</span><span class="nx">ownerHash</span><span class="p">;</span>
@@ -94,9 +95,7 @@ they get removed from my database, but won't anywhere else.</p></div></div><div 
 
 <pre><code>store.find('car', 'abc4567')
 </code></pre></div></div><div class="code"><div class="wrapper">  <span class="nx">localStore</span><span class="p">.</span><span class="nx">find</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">type</span><span class="p">,</span> <span class="nx">id</span><span class="p">)</span> <span class="p">{</span>
-    <span class="kd">var</span> <span class="nx">defer</span><span class="p">,</span> <span class="nx">error</span><span class="p">,</span> <span class="nx">object</span><span class="p">;</span>
-
-    <span class="nx">defer</span> <span class="o">=</span> <span class="nx">hoodie</span><span class="p">.</span><span class="nx">defer</span><span class="p">();</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>if store is currently bootstrapping data from remote,
+    <span class="kd">var</span> <span class="nx">error</span><span class="p">,</span> <span class="nx">object</span><span class="p">;</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>if store is currently bootstrapping data from remote,
 we're queueing until it's finished</p></div></div><div class="code"><div class="wrapper">    <span class="k">if</span> <span class="p">(</span><span class="nx">store</span><span class="p">.</span><span class="nx">isBootstrapping</span><span class="p">())</span> <span class="p">{</span>
       <span class="k">return</span> <span class="nx">enqueue</span><span class="p">(</span><span class="s1">&#39;find&#39;</span><span class="p">,</span> <span class="nx">arguments</span><span class="p">);</span>
     <span class="p">}</span>
@@ -104,15 +103,16 @@ we're queueing until it's finished</p></div></div><div class="code"><div class="
     <span class="k">try</span> <span class="p">{</span>
       <span class="nx">object</span> <span class="o">=</span> <span class="nx">cache</span><span class="p">(</span><span class="nx">type</span><span class="p">,</span> <span class="nx">id</span><span class="p">);</span>
       <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nx">object</span><span class="p">)</span> <span class="p">{</span>
-        <span class="nx">defer</span><span class="p">.</span><span class="nx">reject</span><span class="p">(</span><span class="nx">Hoodie</span><span class="p">.</span><span class="nx">Errors</span><span class="p">.</span><span class="nx">NOT_FOUND</span><span class="p">(</span><span class="nx">type</span><span class="p">,</span> <span class="nx">id</span><span class="p">)).</span><span class="nx">promise</span><span class="p">();</span>
+        <span class="k">return</span> <span class="nx">hoodie</span><span class="p">.</span><span class="nx">rejectWith</span><span class="p">({</span>
+          <span class="nx">name</span><span class="o">:</span> <span class="s1">&#39;HoodieNotFoundError&#39;</span><span class="p">,</span>
+          <span class="nx">message</span><span class="o">:</span> <span class="s1">&#39;&quot;{{type}}&quot; with id &quot;{{id}}&quot; could not be found&#39;</span>
+        <span class="p">});</span>
       <span class="p">}</span>
-      <span class="nx">defer</span><span class="p">.</span><span class="nx">resolve</span><span class="p">(</span><span class="nx">object</span><span class="p">);</span>
+      <span class="k">return</span> <span class="nx">hoodie</span><span class="p">.</span><span class="nx">resolveWith</span><span class="p">(</span><span class="nx">object</span><span class="p">);</span>
     <span class="p">}</span> <span class="k">catch</span> <span class="p">(</span><span class="nx">_error</span><span class="p">)</span> <span class="p">{</span>
       <span class="nx">error</span> <span class="o">=</span> <span class="nx">_error</span><span class="p">;</span>
-      <span class="nx">defer</span><span class="p">.</span><span class="nx">reject</span><span class="p">(</span><span class="nx">error</span><span class="p">);</span>
+      <span class="k">return</span> <span class="nx">hoodie</span><span class="p">.</span><span class="nx">rejectWith</span><span class="p">(</span><span class="nx">error</span><span class="p">);</span>
     <span class="p">}</span>
-
-    <span class="k">return</span> <span class="nx">defer</span><span class="p">.</span><span class="nx">promise</span><span class="p">();</span>
   <span class="p">};</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h2 id="findall">findAll</h2></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>returns all objects from store.
 Can be optionally filtered by a type or a function</p>
 
@@ -149,7 +149,7 @@ we're queueing until it's finished</p></div></div><div class="code"><div class="
         <span class="nx">_results</span> <span class="o">=</span> <span class="p">[];</span>
         <span class="k">for</span> <span class="p">(</span><span class="nx">_i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="nx">_len</span> <span class="o">=</span> <span class="nx">keys</span><span class="p">.</span><span class="nx">length</span><span class="p">;</span> <span class="nx">_i</span> <span class="o">&lt;</span> <span class="nx">_len</span><span class="p">;</span> <span class="nx">_i</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
           <span class="nx">key</span> <span class="o">=</span> <span class="nx">keys</span><span class="p">[</span><span class="nx">_i</span><span class="p">];</span>
-          <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="p">(</span><span class="nx">isSemanticId</span><span class="p">(</span><span class="nx">key</span><span class="p">)))</span> <span class="p">{</span>
+          <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="p">(</span><span class="nx">isSemanticKey</span><span class="p">(</span><span class="nx">key</span><span class="p">)))</span> <span class="p">{</span>
             <span class="k">continue</span><span class="p">;</span>
           <span class="p">}</span>
           <span class="nx">_ref</span> <span class="o">=</span> <span class="nx">key</span><span class="p">.</span><span class="nx">split</span><span class="p">(</span><span class="s1">&#39;/&#39;</span><span class="p">),</span>
@@ -203,7 +203,10 @@ we're queueing local removes until it's finished.</p></div></div><div class="cod
     <span class="p">}</span>
 
     <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nx">object</span><span class="p">)</span> <span class="p">{</span>
-      <span class="k">return</span> <span class="nx">hoodie</span><span class="p">.</span><span class="nx">rejectWith</span><span class="p">(</span><span class="nx">Hoodie</span><span class="p">.</span><span class="nx">Errors</span><span class="p">.</span><span class="nx">NOT_FOUND</span><span class="p">(</span><span class="nx">type</span><span class="p">,</span> <span class="nx">id</span><span class="p">));</span>
+      <span class="k">return</span> <span class="nx">hoodie</span><span class="p">.</span><span class="nx">rejectWith</span><span class="p">({</span>
+        <span class="nx">name</span><span class="o">:</span> <span class="s1">&#39;HoodieNotFoundError&#39;</span><span class="p">,</span>
+        <span class="nx">message</span><span class="o">:</span> <span class="s1">&#39;&quot;{{type}}&quot; with id &quot;{{id}}&quot;&quot; could not be found&#39;</span>
+      <span class="p">});</span>
     <span class="p">}</span>
 
     <span class="k">if</span> <span class="p">(</span><span class="nx">object</span><span class="p">.</span><span class="nx">_syncedAt</span><span class="p">)</span> <span class="p">{</span>
@@ -237,14 +240,18 @@ Otherwise remove it from Store.</p></div></div><div class="code"><div class="wra
     <span class="p">});</span>
   <span class="p">};</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h2 id="validate">validate</h2></div></div></div><div class="segment"><div class="code"><div class="wrapper">  <span class="kd">function</span> <span class="nx">validate</span> <span class="p">(</span><span class="nx">object</span><span class="p">)</span> <span class="p">{</span>
 
-    <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nx">isValidType</span><span class="p">(</span><span class="nx">object</span><span class="p">.</span><span class="nx">type</span><span class="p">))</span> <span class="p">{</span>
-      <span class="k">return</span> <span class="nx">Hoodie</span><span class="p">.</span><span class="nx">Errors</span><span class="p">.</span><span class="nx">INVALID_KEY</span><span class="p">({</span>
+    <span class="k">if</span> <span class="p">(</span><span class="nx">HoodieObjectTypeError</span><span class="p">.</span><span class="nx">isInvalid</span><span class="p">(</span><span class="nx">object</span><span class="p">.</span><span class="nx">type</span><span class="p">))</span> <span class="p">{</span>
+      <span class="k">return</span> <span class="k">new</span> <span class="nx">HoodieObjectTypeError</span><span class="p">({</span>
         <span class="nx">type</span><span class="o">:</span> <span class="nx">object</span><span class="p">.</span><span class="nx">type</span>
       <span class="p">});</span>
     <span class="p">}</span>
 
-    <span class="k">if</span> <span class="p">(</span><span class="nx">arguments</span><span class="p">.</span><span class="nx">length</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="o">&amp;&amp;</span> <span class="o">!</span><span class="nx">isValidId</span><span class="p">(</span><span class="nx">object</span><span class="p">.</span><span class="nx">id</span><span class="p">))</span> <span class="p">{</span>
-      <span class="k">return</span> <span class="nx">Hoodie</span><span class="p">.</span><span class="nx">Errors</span><span class="p">.</span><span class="nx">INVALID_KEY</span><span class="p">({</span>
+    <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nx">object</span><span class="p">.</span><span class="nx">id</span><span class="p">)</span> <span class="p">{</span>
+      <span class="k">return</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="k">if</span> <span class="p">(</span><span class="nx">HoodieObjectIdError</span><span class="p">.</span><span class="nx">isInvalid</span><span class="p">(</span><span class="nx">object</span><span class="p">.</span><span class="nx">id</span><span class="p">))</span> <span class="p">{</span>
+      <span class="k">return</span> <span class="k">new</span> <span class="nx">HoodieObjectIdError</span><span class="p">({</span>
         <span class="nx">id</span><span class="o">:</span> <span class="nx">object</span><span class="p">.</span><span class="nx">id</span>
       <span class="p">});</span>
     <span class="p">}</span>
@@ -265,7 +272,7 @@ TODO: make this cachy</p></div></div><div class="code"><div class="wrapper">  <s
     <span class="nx">keys</span> <span class="o">=</span> <span class="p">[];</span>
     <span class="k">for</span> <span class="p">(</span><span class="nx">i</span> <span class="o">=</span> <span class="nx">_i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="nx">_ref</span> <span class="o">=</span> <span class="nx">db</span><span class="p">.</span><span class="nx">length</span><span class="p">();</span> <span class="mi">0</span> <span class="o">&lt;=</span> <span class="nx">_ref</span> <span class="o">?</span> <span class="nx">_i</span> <span class="o">&lt;</span> <span class="nx">_ref</span> <span class="o">:</span> <span class="nx">_i</span> <span class="o">&gt;</span> <span class="nx">_ref</span><span class="p">;</span> <span class="nx">i</span> <span class="o">=</span> <span class="mi">0</span> <span class="o">&lt;=</span> <span class="nx">_ref</span> <span class="o">?</span> <span class="o">++</span><span class="nx">_i</span> <span class="o">:</span> <span class="o">--</span><span class="nx">_i</span><span class="p">)</span> <span class="p">{</span>
       <span class="nx">key</span> <span class="o">=</span> <span class="nx">db</span><span class="p">.</span><span class="nx">key</span><span class="p">(</span><span class="nx">i</span><span class="p">);</span>
-      <span class="k">if</span> <span class="p">(</span><span class="nx">isSemanticId</span><span class="p">(</span><span class="nx">key</span><span class="p">))</span> <span class="p">{</span>
+      <span class="k">if</span> <span class="p">(</span><span class="nx">isSemanticKey</span><span class="p">(</span><span class="nx">key</span><span class="p">))</span> <span class="p">{</span>
         <span class="nx">keys</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="nx">key</span><span class="p">);</span>
       <span class="p">}</span>
     <span class="p">}</span>
@@ -313,7 +320,7 @@ TODO: do not clear entire localStorage, clear only the items that have been stor
         <span class="nx">_results</span> <span class="o">=</span> <span class="p">[];</span>
         <span class="k">for</span> <span class="p">(</span><span class="nx">_i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="nx">_len</span> <span class="o">=</span> <span class="nx">keys</span><span class="p">.</span><span class="nx">length</span><span class="p">;</span> <span class="nx">_i</span> <span class="o">&lt;</span> <span class="nx">_len</span><span class="p">;</span> <span class="nx">_i</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
           <span class="nx">key</span> <span class="o">=</span> <span class="nx">keys</span><span class="p">[</span><span class="nx">_i</span><span class="p">];</span>
-          <span class="k">if</span> <span class="p">(</span><span class="nx">isSemanticId</span><span class="p">(</span><span class="nx">key</span><span class="p">))</span> <span class="p">{</span>
+          <span class="k">if</span> <span class="p">(</span><span class="nx">isSemanticKey</span><span class="p">(</span><span class="nx">key</span><span class="p">))</span> <span class="p">{</span>
             <span class="nx">_results</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="nx">db</span><span class="p">.</span><span class="nx">removeItem</span><span class="p">(</span><span class="nx">key</span><span class="p">));</span>
           <span class="p">}</span>
         <span class="p">}</span>
@@ -343,7 +350,7 @@ when cookies have been disabled</p></div></div><div class="code"><div class="wra
 as it is when Safari's private browsing mode is active.</p></div></div><div class="code"><div class="wrapper">      <span class="nx">localStorage</span><span class="p">.</span><span class="nx">setItem</span><span class="p">(</span><span class="s1">&#39;Storage-Test&#39;</span><span class="p">,</span> <span class="s1">&#39;1&#39;</span><span class="p">);</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>that should not happen ...</p></div></div><div class="code"><div class="wrapper">      <span class="k">if</span> <span class="p">(</span><span class="nx">localStorage</span><span class="p">.</span><span class="nx">getItem</span><span class="p">(</span><span class="s1">&#39;Storage-Test&#39;</span><span class="p">)</span> <span class="o">!==</span> <span class="s1">&#39;1&#39;</span><span class="p">)</span> <span class="p">{</span>
         <span class="k">return</span> <span class="kc">false</span><span class="p">;</span>
       <span class="p">}</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>okay, let's clean up if we got here.</p></div></div><div class="code"><div class="wrapper">      <span class="nx">localStorage</span><span class="p">.</span><span class="nx">removeItem</span><span class="p">(</span><span class="s1">&#39;Storage-Test&#39;</span><span class="p">);</span>
-    <span class="p">}</span> <span class="k">catch</span> <span class="p">(</span><span class="nx">_error</span><span class="p">)</span> <span class="p">{</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>in case of an error, like Safari's Private Pussy, return false</p></div></div><div class="code"><div class="wrapper">      <span class="k">return</span> <span class="kc">false</span><span class="p">;</span>
+    <span class="p">}</span> <span class="k">catch</span> <span class="p">(</span><span class="nx">_error</span><span class="p">)</span> <span class="p">{</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>in case of an error, like Safari's Private Mode, return false</p></div></div><div class="code"><div class="wrapper">      <span class="k">return</span> <span class="kc">false</span><span class="p">;</span>
     <span class="p">}</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>we're good.</p></div></div><div class="code"><div class="wrapper">    <span class="k">return</span> <span class="kc">true</span><span class="p">;</span>
   <span class="p">};</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h2 id="private-methods">Private methods</h2></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>localStorage proxy</p></div></div><div class="code"><div class="wrapper">  <span class="kd">var</span> <span class="nx">db</span> <span class="o">=</span> <span class="p">{</span>
     <span class="nx">getItem</span><span class="o">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">key</span><span class="p">)</span> <span class="p">{</span>
@@ -378,7 +385,7 @@ Pass 'options.silent = true' to avoid events from being triggered.</p></div></di
     <span class="nx">key</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span> <span class="o">+</span> <span class="nx">type</span> <span class="o">+</span> <span class="s1">&#39;/&#39;</span> <span class="o">+</span> <span class="nx">id</span><span class="p">;</span>
 
     <span class="k">if</span> <span class="p">(</span><span class="nx">object</span><span class="p">)</span> <span class="p">{</span>
-      <span class="nx">$</span><span class="p">.</span><span class="nx">extend</span><span class="p">(</span><span class="nx">object</span><span class="p">,</span> <span class="p">{</span>
+      <span class="nx">extend</span><span class="p">(</span><span class="nx">object</span><span class="p">,</span> <span class="p">{</span>
         <span class="nx">type</span><span class="o">:</span> <span class="nx">type</span><span class="p">,</span>
         <span class="nx">id</span><span class="o">:</span> <span class="nx">id</span>
       <span class="p">});</span>
@@ -387,7 +394,7 @@ Pass 'options.silent = true' to avoid events from being triggered.</p></div></di
 
       <span class="k">if</span> <span class="p">(</span><span class="nx">options</span><span class="p">.</span><span class="nx">remote</span><span class="p">)</span> <span class="p">{</span>
         <span class="nx">clearChanged</span><span class="p">(</span><span class="nx">type</span><span class="p">,</span> <span class="nx">id</span><span class="p">);</span>
-        <span class="nx">cachedObject</span><span class="p">[</span><span class="nx">key</span><span class="p">]</span> <span class="o">=</span> <span class="nx">$</span><span class="p">.</span><span class="nx">extend</span><span class="p">(</span><span class="kc">true</span><span class="p">,</span> <span class="p">{},</span> <span class="nx">object</span><span class="p">);</span>
+        <span class="nx">cachedObject</span><span class="p">[</span><span class="nx">key</span><span class="p">]</span> <span class="o">=</span> <span class="nx">extend</span><span class="p">(</span><span class="kc">true</span><span class="p">,</span> <span class="p">{},</span> <span class="nx">object</span><span class="p">);</span>
         <span class="k">return</span> <span class="nx">cachedObject</span><span class="p">[</span><span class="nx">key</span><span class="p">];</span>
       <span class="p">}</span>
 
@@ -501,7 +508,7 @@ reflect the change in our local store.</p></div></div><div class="code"><div cla
       <span class="p">});</span>
     <span class="p">}</span>
   <span class="p">}</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>all local changes get bulk pushed. For each object with local
-changes that has been pushed we  trigger a sync event</p></div></div><div class="code"><div class="wrapper">  <span class="kd">function</span> <span class="nx">handlePushedObject</span><span class="p">(</span><span class="nx">object</span><span class="p">)</span> <span class="p">{</span>
+changes that has been pushed we trigger a sync event</p></div></div><div class="code"><div class="wrapper">  <span class="kd">function</span> <span class="nx">handlePushedObject</span><span class="p">(</span><span class="nx">object</span><span class="p">)</span> <span class="p">{</span>
     <span class="nx">triggerEvents</span><span class="p">(</span><span class="s1">&#39;sync&#39;</span><span class="p">,</span> <span class="nx">object</span><span class="p">);</span>
   <span class="p">}</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>more advanced localStorage wrappers to find/save objects</p></div></div><div class="code"><div class="wrapper">  <span class="kd">function</span> <span class="nx">setObject</span><span class="p">(</span><span class="nx">type</span><span class="p">,</span> <span class="nx">id</span><span class="p">,</span> <span class="nx">object</span><span class="p">)</span> <span class="p">{</span>
     <span class="kd">var</span> <span class="nx">key</span><span class="p">,</span> <span class="nx">store</span><span class="p">;</span>
@@ -538,14 +545,8 @@ changes that has been pushed we  trigger a sync event</p></div></div><div class=
     <span class="p">}</span> <span class="k">catch</span><span class="p">(</span><span class="nx">e</span><span class="p">)</span> <span class="p">{}</span>
   <span class="p">}</span></div></div></div><div class="segment"><div class="code"><div class="wrapper">  <span class="kd">function</span> <span class="nx">now</span><span class="p">()</span> <span class="p">{</span>
     <span class="k">return</span> <span class="nx">JSON</span><span class="p">.</span><span class="nx">stringify</span><span class="p">(</span><span class="k">new</span> <span class="nb">Date</span><span class="p">()).</span><span class="nx">replace</span><span class="p">(</span><span class="sr">/[&#39;&quot;]/g</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">);</span>
-  <span class="p">}</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>only lowercase letters, numbers and dashes are allowed for ids</p></div></div><div class="code"><div class="wrapper">  <span class="kd">var</span> <span class="nx">validIdPattern</span> <span class="o">=</span> <span class="k">new</span> <span class="nb">RegExp</span><span class="p">(</span><span class="sr">/^[a-z0-9\-]+$/</span><span class="p">);</span>
-  <span class="kd">function</span> <span class="nx">isValidId</span><span class="p">(</span><span class="nx">id</span><span class="p">)</span> <span class="p">{</span>
-    <span class="k">return</span> <span class="nx">validIdPattern</span><span class="p">.</span><span class="nx">test</span><span class="p">(</span><span class="nx">id</span><span class="p">);</span>
-  <span class="p">}</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>just like ids, but must start with a letter or a $ (internal types)</p></div></div><div class="code"><div class="wrapper">  <span class="kd">var</span> <span class="nx">validTypePattern</span> <span class="o">=</span> <span class="k">new</span> <span class="nb">RegExp</span><span class="p">(</span><span class="sr">/^[a-z$][a-z0-9]+$/</span><span class="p">);</span>
-  <span class="kd">function</span> <span class="nx">isValidType</span><span class="p">(</span><span class="nx">type</span><span class="p">)</span> <span class="p">{</span>
-    <span class="k">return</span> <span class="nx">validTypePattern</span><span class="p">.</span><span class="nx">test</span><span class="p">(</span><span class="nx">type</span><span class="p">);</span>
-  <span class="p">}</span></div></div></div><div class="segment"><div class="code"><div class="wrapper">  <span class="kd">var</span> <span class="nx">semanticIdPattern</span> <span class="o">=</span> <span class="k">new</span> <span class="nb">RegExp</span><span class="p">(</span><span class="sr">/^[a-z$][a-z0-9]+\/[a-z0-9]+$/</span><span class="p">);</span>
-  <span class="kd">function</span> <span class="nx">isSemanticId</span><span class="p">(</span><span class="nx">key</span><span class="p">)</span> <span class="p">{</span>
+  <span class="p">}</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>a semantic key consists of a valid type &amp; id, separated by a "/"</p></div></div><div class="code"><div class="wrapper">  <span class="kd">var</span> <span class="nx">semanticIdPattern</span> <span class="o">=</span> <span class="k">new</span> <span class="nb">RegExp</span><span class="p">(</span><span class="sr">/^[a-z$][a-z0-9]+\/[a-z0-9]+$/</span><span class="p">);</span>
+  <span class="kd">function</span> <span class="nx">isSemanticKey</span><span class="p">(</span><span class="nx">key</span><span class="p">)</span> <span class="p">{</span>
     <span class="k">return</span> <span class="nx">semanticIdPattern</span><span class="p">.</span><span class="nx">test</span><span class="p">(</span><span class="nx">key</span><span class="p">);</span>
   <span class="p">}</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p><code>hasLocalChanges</code> returns true if there is a local change that
 has not been sync'd yet.</p></div></div><div class="code"><div class="wrapper">  <span class="kd">function</span> <span class="nx">hasLocalChanges</span><span class="p">(</span><span class="nx">object</span><span class="p">)</span> <span class="p">{</span>
@@ -638,4 +639,6 @@ e.g. Safari in private mode, overite the respective methods.</p></div></div></di
     <span class="nx">patchIfNotPersistant</span><span class="p">();</span>
     <span class="k">delete</span> <span class="nx">store</span><span class="p">.</span><span class="nx">patchIfNotPersistant</span><span class="p">;</span>
   <span class="p">};</span>
-<span class="p">}</span></div></div></div></div></body></html>
+<span class="p">}</span>
+
+<span class="nx">module</span><span class="p">.</span><span class="nx">exports</span> <span class="o">=</span> <span class="nx">hoodieStore</span><span class="p">;</span></div></div></div></div></body></html>

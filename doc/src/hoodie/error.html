@@ -1,0 +1,55 @@
+<!DOCTYPE html><html lang="en"><head><title>src/hoodie/error</title></head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0"><meta name="groc-relative-root" content="../../"><meta name="groc-document-path" content="src/hoodie/error"><meta name="groc-project-path" content="src/hoodie/error.js"><link rel="stylesheet" type="text/css" media="all" href="../../assets/style.css"><script type="text/javascript" src="../../assets/behavior.js"></script><body><div id="meta"><div class="file-path">src/hoodie/error.js</div></div><div id="document"><div class="segment"><div class="comments"><div class="wrapper"><h2 id="hoodie-error">Hoodie Error</h2></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>With the custom hoodie error function
+we normalize all errors the get returned
+when using hoodie.rejectWith</p>
+
+<p>The native JavaScript error method has
+a name &amp; a message property. HoodieError
+requires these, but on top allows for
+unlimited custom properties.</p>
+
+<p>Instead of being initialized with just
+the message, HoodieError expects an
+object with properites. The <code>message</code>
+property is required. The name will
+fallback to <code>error</code>.</p>
+
+<p><code>message</code> can also contain placeholders
+in the form of `{{propertyName}}`` which
+will get replaced automatically with passed
+extra properties.</p>
+
+<h3 id="error-conventions">Error Conventions</h3>
+
+<p>We follow JavaScript's native error conventions,
+meaning that error names are camelCase with the
+first letter uppercase as well, and the message
+starting with an uppercase letter.</p></div></div><div class="code"><div class="wrapper"><span class="kd">var</span> <span class="nx">errorMessageReplacePattern</span> <span class="o">=</span> <span class="sr">/\{\{\s*\w+\s*\}\}/g</span><span class="p">;</span>
+<span class="kd">var</span> <span class="nx">errorMessageFindPropertyPattern</span> <span class="o">=</span> <span class="sr">/\w+/</span><span class="p">;</span>
+
+<span class="kd">var</span> <span class="nx">extend</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">&#39;extend&#39;</span><span class="p">);</span>
+
+<span class="kd">function</span> <span class="nx">HoodieError</span><span class="p">(</span><span class="nx">properties</span><span class="p">)</span> <span class="p">{</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>normalize arguments</p></div></div><div class="code"><div class="wrapper">  <span class="k">if</span> <span class="p">(</span><span class="k">typeof</span> <span class="nx">properties</span> <span class="o">===</span> <span class="s1">&#39;string&#39;</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nx">properties</span> <span class="o">=</span> <span class="p">{</span>
+      <span class="nx">message</span><span class="o">:</span> <span class="nx">properties</span>
+    <span class="p">};</span>
+  <span class="p">}</span>
+
+  <span class="k">if</span> <span class="p">(</span><span class="o">!</span> <span class="nx">properties</span><span class="p">.</span><span class="nx">message</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">throw</span> <span class="s1">&#39;FATAL: error.message must be set&#39;</span><span class="p">;</span>
+  <span class="p">}</span>
+
+  <span class="k">if</span> <span class="p">(</span><span class="o">!</span> <span class="nx">properties</span><span class="p">.</span><span class="nx">name</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nx">properties</span><span class="p">.</span><span class="nx">name</span> <span class="o">=</span> <span class="s1">&#39;HoodieError&#39;</span><span class="p">;</span>
+  <span class="p">}</span>
+
+  <span class="nx">extend</span><span class="p">(</span><span class="k">this</span><span class="p">,</span> <span class="nx">properties</span><span class="p">);</span>
+
+  <span class="nx">properties</span><span class="p">.</span><span class="nx">message</span> <span class="o">=</span> <span class="nx">properties</span><span class="p">.</span><span class="nx">message</span><span class="p">.</span><span class="nx">replace</span><span class="p">(</span><span class="nx">errorMessageReplacePattern</span><span class="p">,</span> <span class="kd">function</span><span class="p">(</span><span class="nx">match</span><span class="p">)</span> <span class="p">{</span>
+    <span class="kd">var</span> <span class="nx">property</span> <span class="o">=</span> <span class="nx">match</span><span class="p">.</span><span class="nx">match</span><span class="p">(</span><span class="nx">errorMessageFindPropertyPattern</span><span class="p">)[</span><span class="mi">0</span><span class="p">];</span>
+    <span class="k">return</span> <span class="nx">properties</span><span class="p">[</span><span class="nx">property</span><span class="p">];</span>
+  <span class="p">});</span>
+<span class="p">}</span>
+<span class="nx">HoodieError</span><span class="p">.</span><span class="nx">prototype</span> <span class="o">=</span> <span class="k">new</span> <span class="nb">Error</span><span class="p">();</span>
+<span class="nx">HoodieError</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">constructor</span> <span class="o">=</span> <span class="nx">HoodieError</span><span class="p">;</span>
+
+<span class="nx">module</span><span class="p">.</span><span class="nx">exports</span> <span class="o">=</span> <span class="nx">HoodieError</span><span class="p">;</span></div></div></div></div></body></html>
