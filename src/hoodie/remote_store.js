@@ -37,6 +37,8 @@
 //
 var hoodieStoreApi = require('./store');
 
+var extend = require('extend');
+
 //
 function hoodieRemoteStore (hoodie, options) {
 
@@ -390,7 +392,7 @@ function hoodieRemoteStore (hoodie, options) {
     for (_i = 0, _len = objects.length; _i < _len; _i++) {
 
       // don't mess with original objects
-      object = $.extend(true, {}, objects[_i]);
+      object = extend(true, {}, objects[_i]);
       addRevisionTo(object);
       object = parseForRemote(object);
       objectsForRemote.push(object);
@@ -484,7 +486,7 @@ function hoodieRemoteStore (hoodie, options) {
   //
   function parseForRemote(object) {
     var attr, properties;
-    properties = $.extend({}, object);
+    properties = extend({}, object);
 
     for (attr in properties) {
       if (properties.hasOwnProperty(attr)) {

@@ -2,6 +2,7 @@
 // ================
 
 var hoodieEvents = require('./events');
+var extend = require('extend');
 
 //
 function hoodieAccount (hoodie) {
@@ -968,7 +969,7 @@ function hoodieAccount (hoodie) {
 
     return function() {
       // prepare updated _users doc
-      var data = $.extend({}, userDoc);
+      var data = extend({}, userDoc);
 
       if (newUsername) {
         data.$newUsername = newUsername;

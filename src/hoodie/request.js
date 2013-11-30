@@ -18,8 +18,9 @@
 // * HoodieConflictError
 // * HoodieServerError
 //
+var extend = require('extend');
+
 function hoodieRequest(hoodie) {
-  var $extend = $.extend;
   var $ajax = $.ajax;
 
   // Hoodie backend listents to requests prefixed by /_api,
@@ -67,7 +68,7 @@ function hoodieRequest(hoodie) {
     // the piping, as for whatever reason the returned promise
     // does not have the `abort` method any more, maybe others
     // as well. See also http://bugs.jquery.com/ticket/14104
-    requestPromise = $ajax($extend(defaults, options));
+    requestPromise = $ajax(extend(defaults, options));
     pipedPromise = requestPromise.then( null, handleRequestError);
     pipedPromise.abort = requestPromise.abort;
 

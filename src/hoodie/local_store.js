@@ -6,6 +6,8 @@ var hoodieStoreApi = require('./store');
 var HoodieObjectTypeError = require('./error/object_type');
 var HoodieObjectIdError = require('./error/object_id');
 
+var extend = require('extend');
+
 //
 function hoodieStore (hoodie) {
 
@@ -581,7 +583,7 @@ function hoodieStore (hoodie) {
     key = '' + type + '/' + id;
 
     if (object) {
-      $.extend(object, {
+      extend(object, {
         type: type,
         id: id
       });
@@ -590,7 +592,7 @@ function hoodieStore (hoodie) {
 
       if (options.remote) {
         clearChanged(type, id);
-        cachedObject[key] = $.extend(true, {}, object);
+        cachedObject[key] = extend(true, {}, object);
         return cachedObject[key];
       }
 

@@ -3,6 +3,8 @@
 
 var hoodieRemoteStore = require('./remote_store');
 
+var extend = require('extend');
+
 function hoodieOpen(hoodie) {
 
   // generic method to open a store. Used by
@@ -17,7 +19,7 @@ function hoodieOpen(hoodie) {
   function open(storeName, options) {
     options = options || {};
 
-    $.extend(options, {
+    extend(options, {
       name: storeName
     });
 

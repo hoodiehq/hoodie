@@ -63,7 +63,7 @@ function Hoodie(baseUrl) {
   // * hoodie.trigger
   // * hoodie.unbind
   // * hoodie.off
-  hoodie.extend( hoodieEvents );
+  hoodie.extend(hoodieEvents);
 
 
   // * hoodie.defer
@@ -72,38 +72,38 @@ function Hoodie(baseUrl) {
   // * hoodie.reject
   // * hoodie.resolveWith
   // * hoodie.rejectWith
-  hoodie.extend( hoodiePromises );
+  hoodie.extend(hoodiePromises );
 
   // * hoodie.request
-  hoodie.extend( hoodieRequest );
+  hoodie.extend(hoodieRequest);
 
   // * hoodie.isOnline
   // * hoodie.checkConnection
-  hoodie.extend( hoodieConnection );
+  hoodie.extend(hoodieConnection);
 
   // * hoodie.uuid
-  hoodie.extend( hoodieGenerateId );
+  hoodie.extend(hoodieGenerateId);
 
   // * hoodie.dispose
-  hoodie.extend( hoodieDispose );
+  hoodie.extend(hoodieDispose);
 
   // * hoodie.open
-  hoodie.extend( hoodieOpen );
+  hoodie.extend(hoodieOpen);
 
   // * hoodie.store
-  hoodie.extend( hoodieLocalStore );
+  hoodie.extend(hoodieLocalStore);
 
   // * hoodie.task
-  hoodie.extend( hoodieTask );
+  hoodie.extend(hoodieTask);
 
   // * hoodie.config
-  hoodie.extend( hoodieConfig );
+  hoodie.extend(hoodieConfig);
 
   // * hoodie.account
-  hoodie.extend( hoodieAccount );
+  hoodie.extend(hoodieAccount);
 
   // * hoodie.remote
-  hoodie.extend( hoodieAccountRemote );
+  hoodie.extend(hoodieAccountRemote);
 
 
   //

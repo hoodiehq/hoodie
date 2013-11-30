@@ -50,5 +50,12 @@
   "scripts": {
     "test": "grunt build --verbose",
     "build": "grunt build --verbose"
+  },
+  "browser": {
+    "path": false,
+    "fs": false
+  },
+  "dependencies": {
+    "extend": "~1.2.1"
   }
 }

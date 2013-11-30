@@ -24,6 +24,8 @@ var hoodieEvents = require('./events');
 var hoodieScopedTask = require('./scoped_task');
 var HoodieError = require('./error');
 
+var extend = require('extend');
+
 //
 function hoodieTask(hoodie) {
 
@@ -60,7 +62,9 @@ function hoodieTask(hoodie) {
   // cancel a running task
   //
   api.cancel = function(type, id) {
-    return hoodie.store.update('$'+type, id, { cancelledAt: now() }).then(handleCancelledTaskObject);
+    return hoodie.store.update('$' + type, id, {
+      cancelledAt: now()
+    }).then(handleCancelledTaskObject);
   };
 
 
@@ -72,12 +76,13 @@ function hoodieTask(hoodie) {
   //
   api.restart = function(type, id, update) {
     var start = function(object) {
-      $.extend(object, update);
+      extend(object, update);
       delete object.$error;
       delete object.$processedAt;
       delete object.cancelledAt;
       return api.start(object.type, object);
     };
+
     return api.cancel(type, id).then(start);
   };
 
@@ -94,12 +99,15 @@ function hoodieTask(hoodie) {
 
   //
   api.restartAll = function(type, update) {
+
     if (typeof type === 'object') {
       update = type;
     }
+
     return findAll(type).then( function(taskObjects) {
       restartTaskObjects(taskObjects, update);
     });
+
   };
 
 
@@ -109,7 +117,6 @@ function hoodieTask(hoodie) {
   // making a few changes along the way.
   //
   function subscribeToOutsideEvents() {
-
     // account events
     hoodie.on('store:change', handleStoreChange);
   }
@@ -145,8 +152,10 @@ function hoodieTask(hoodie) {
         task: object
       }));
     });
+
     taskStore.on('update', function(object) {
       var error = object.$error;
+
       if (! object.$error) {
         return;
       }
@@ -251,10 +260,14 @@ function hoodieTask(hoodie) {
       api.trigger(task.type + ':error', error, task, options);
       api.trigger(task.type + ':' + task.id + ':error', error, task, options);
 
-      options = $.extend({}, options, {error: error});
+      options = extend({}, options, {
+        error: error
+      });
+
       api.trigger('change', 'error', task, options);
       api.trigger(task.type + ':change', 'error', task, options);
       api.trigger(task.type + ':' + task.id + ':change', 'error', task, options);
+
       return;
     }
 
