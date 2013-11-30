@@ -1,6 +1,7 @@
 require('../../lib/setup');
 
 var hoodieEvents = require('../../../src/hoodie/events');
+
 describe('Events', function() {
 
   beforeEach(function() {
@@ -10,7 +11,7 @@ describe('Events', function() {
 
   describe('.bind(event, callback)', function() {
     it('should bind the passed callback to the passed event', function() {
-      var cb = sinon.spy();
+      var cb = this.sandbox.spy();
 
       this.hoodie.bind('test', cb);
       this.hoodie.trigger('test');
@@ -19,7 +20,7 @@ describe('Events', function() {
     });
 
     it('should allow to pass multiple events', function() {
-      var cb = sinon.spy();
+      var cb = this.sandbox.spy();
 
       this.hoodie.bind('test1 test2', cb);
       this.hoodie.trigger('test1');
@@ -31,7 +32,7 @@ describe('Events', function() {
 
   describe('.one(event, callback)', function() {
     it('should bind passed callback to first occurence of passed event', function() {
-      var cb = sinon.spy();
+      var cb = this.sandbox.spy();
 
       this.hoodie.one('test', cb);
       this.hoodie.trigger('test');
@@ -44,8 +45,8 @@ describe('Events', function() {
   describe('.trigger(event, args...)', function() {
     it('should call subscribed callbacks', function() {
       var cb1, cb2;
-      cb1 = sinon.spy();
-      cb2 = sinon.spy();
+      cb1 = this.sandbox.spy();
+      cb2 = this.sandbox.spy();
       this.hoodie.bind('test', cb1);
       this.hoodie.bind('test', cb2);
       this.hoodie.trigger('test');
@@ -55,7 +56,7 @@ describe('Events', function() {
     });
 
     it('should pass arguments', function() {
-      var cb = sinon.spy();
+      var cb = this.sandbox.spy();
       this.hoodie.bind('test', cb);
       this.hoodie.trigger('test', 'arg1', 'arg2', 'arg3');
 
@@ -67,7 +68,7 @@ describe('Events', function() {
     _when('callback passed', function() {
 
       it('should unsubscribe the callback', function() {
-        var cb = sinon.spy();
+        var cb = this.sandbox.spy();
         this.hoodie.bind('test', cb);
         this.hoodie.unbind('test', cb);
         this.hoodie.trigger('test');
@@ -79,8 +80,8 @@ describe('Events', function() {
     _when('no callback passed', function() {
       it('should unsubscribe all callbacks', function() {
         var cb1, cb2;
-        cb1 = sinon.spy();
-        cb2 = sinon.spy();
+        cb1 = this.sandbox.spy();
+        cb2 = this.sandbox.spy();
         this.hoodie.bind('test', cb1);
         this.hoodie.bind('test', cb2);
         this.hoodie.unbind('test');
@@ -100,7 +101,7 @@ describe('Events', function() {
 
     describe('.bind(event, callback)', function() {
       it('should bind the passed callback to the passed event on context', function() {
-        var cb = sinon.spy();
+        var cb = this.sandbox.spy();
 
         this.context.bind('test', cb);
         this.context.trigger('test');
@@ -109,7 +110,7 @@ describe('Events', function() {
       });
 
       it('should bind the passed callback to the passed event namespaced by "funky"', function() {
-        var cb = sinon.spy();
+        var cb = this.sandbox.spy();
 
         this.hoodie.bind('funky:test', cb);
         this.context.trigger('test');
@@ -120,7 +121,7 @@ describe('Events', function() {
 
     describe('.one(event, callback)', function() {
       it('should bind passed callback to first occurence of passed event on context', function() {
-        var cb = sinon.spy();
+        var cb = this.sandbox.spy();
 
         this.context.one('test', cb);
         this.context.trigger('test');
@@ -130,7 +131,7 @@ describe('Events', function() {
       });
 
       it('should bind passed callback to first occurence of passed event namespaced by "funky"', function() {
-        var cb = sinon.spy();
+        var cb = this.sandbox.spy();
 
         this.context.one('test', cb);
         this.hoodie.trigger('funky:test');
@@ -143,7 +144,7 @@ describe('Events', function() {
     describe('.unbind(event, callback)', function() {
       _when('callback passed', function() {
         it('should unsubscribe the callback on context', function() {
-          var cb = sinon.spy();
+          var cb = this.sandbox.spy();
           this.context.bind('test', cb);
           this.context.unbind('test', cb);
           this.context.trigger('test');
@@ -152,7 +153,7 @@ describe('Events', function() {
         });
 
         it('should unsubscribe the callback namespaced by "funky"', function() {
-          var cb = sinon.spy();
+          var cb = this.sandbox.spy();
           this.context.bind('test', cb);
           this.context.unbind('test', cb);
           this.hoodie.trigger('funky:test');
@@ -164,9 +165,9 @@ describe('Events', function() {
       _when('no callback passed', function() {
         it('should unsubscribe all callbacks namespaced by "funky"', function() {
           var cb1, cb2, cb3;
-          cb1 = sinon.spy();
-          cb2 = sinon.spy();
-          cb3 = sinon.spy();
+          cb1 = this.sandbox.spy();
+          cb2 = this.sandbox.spy();
+          cb3 = this.sandbox.spy();
           this.hoodie.bind('funky:test', cb1);
           this.hoodie.bind('funky:test', cb2);
           this.hoodie.bind('test', cb3);
