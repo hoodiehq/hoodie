@@ -40,18 +40,20 @@ function HoodieError(properties) {
   }
 
   if (! properties.message) {
-    throw 'FATAL: error.message must be set';
+    throw new Error('FATAL: error.message must be set');
   }
 
+  // must check for properties, as this.name is always set.
   if (! properties.name) {
     properties.name = 'HoodieError';
   }
 
-  $.extend(this, properties);
   properties.message = properties.message.replace(errorMessageReplacePattern, function(match) {
     var property = match.match(errorMessageFindPropertyPattern)[0];
     return properties[property];
   });
+
+  $.extend(this, properties);
 }
 HoodieError.prototype = new Error();
 HoodieError.prototype.constructor = HoodieError;
