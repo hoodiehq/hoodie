@@ -258,7 +258,7 @@ function hoodieStoreApi(hoodie, options) {
             if ((currentObject[key] !== value) === false) {
               continue;
             }
-            // workaround for undefined values, as $.extend ignores these
+            // workaround for undefined values, as extend ignores these
             newObj[key] = value;
             _results.push(key);
           }

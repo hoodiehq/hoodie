@@ -609,7 +609,7 @@ function hoodieStore (hoodie) {
       // if key is cached, return it. But make sure
       // to make a deep copy beforehand (=> true)
       if (cachedObject[key]) {
-        return $.extend(true, {}, cachedObject[key]);
+        return extend(true, {}, cachedObject[key]);
       }
 
       // if object is not yet cached, load it from localStore
@@ -633,7 +633,7 @@ function hoodieStore (hoodie) {
 
     // here is where we cache the object for
     // future quick access
-    cachedObject[key] = $.extend(true, {}, object);
+    cachedObject[key] = extend(true, {}, object);
 
     if (hasLocalChanges(object)) {
       markAsChanged(type, id, cachedObject[key], options);
@@ -641,7 +641,7 @@ function hoodieStore (hoodie) {
       clearChanged(type, id);
     }
 
-    return $.extend(true, {}, object);
+    return extend(true, {}, object);
   }
 
 
@@ -779,7 +779,7 @@ function hoodieStore (hoodie) {
     var key, store;
 
     key = '' + type + '/' + id;
-    store = $.extend({}, object);
+    store = extend({}, object);
 
     delete store.type;
     delete store.id;
@@ -846,19 +846,19 @@ function hoodieStore (hoodie) {
   // this is where all the store events get triggered,
   // like add:task, change:note:abc4567, remove, etc.
   function triggerEvents(eventName, object, options) {
-    store.trigger(eventName, $.extend(true, {}, object), options);
-    store.trigger(object.type + ':' + eventName, $.extend(true, {}, object), options);
+    store.trigger(eventName, extend(true, {}, object), options);
+    store.trigger(object.type + ':' + eventName, extend(true, {}, object), options);
 
     // DEPRECATED
     // https://github.com/hoodiehq/hoodie.js/issues/146
-    store.trigger(eventName + ':' + object.type, $.extend(true, {}, object), options);
+    store.trigger(eventName + ':' + object.type, extend(true, {}, object), options);
 
     if (eventName !== 'new') {
-      store.trigger( object.type + ':' + object.id+ ':' + eventName, $.extend(true, {}, object), options);
+      store.trigger( object.type + ':' + object.id+ ':' + eventName, extend(true, {}, object), options);
 
       // DEPRECATED
       // https://github.com/hoodiehq/hoodie.js/issues/146
-      store.trigger( eventName + ':' + object.type + ':' + object.id, $.extend(true, {}, object), options);
+      store.trigger( eventName + ':' + object.type + ':' + object.id, extend(true, {}, object), options);
     }
 
 
@@ -869,20 +869,20 @@ function hoodieStore (hoodie) {
       return;
     }
 
-    store.trigger('change', eventName, $.extend(true, {}, object), options);
-    store.trigger(object.type + ':change', eventName, $.extend(true, {}, object), options);
+    store.trigger('change', eventName, extend(true, {}, object), options);
+    store.trigger(object.type + ':change', eventName, extend(true, {}, object), options);
 
     // DEPRECATED
     // https://github.com/hoodiehq/hoodie.js/issues/146
-    store.trigger('change:' + object.type, eventName, $.extend(true, {}, object), options);
+    store.trigger('change:' + object.type, eventName, extend(true, {}, object), options);
 
 
     if (eventName !== 'new') {
-      store.trigger(object.type + ':' + object.id + ':change', eventName, $.extend(true, {}, object), options);
+      store.trigger(object.type + ':' + object.id + ':change', eventName, extend(true, {}, object), options);
 
       // DEPRECATED
       // https://github.com/hoodiehq/hoodie.js/issues/146
-      store.trigger('change:' + object.type + ':' + object.id, eventName, $.extend(true, {}, object), options);
+      store.trigger('change:' + object.type + ':' + object.id, eventName, extend(true, {}, object), options);
     }
   }
 
