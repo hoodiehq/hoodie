@@ -1,0 +1,14 @@
+{
+  "name": "prism.css",
+  "_cacheHeaders": {
+    "ETag": "\"f7360f5b4c598186aca3eedc4a5f3de4\"",
+    "Content-Length": "1985",
+    "Content-Type": "text/plain; charset=utf-8",
+    "Content-Disposition": "inline"
+  },
+  "_release": "e-tag:f7360f5b4",
+  "main": "index.css",
+  "_source": "https://raw.github.com/LeaVerou/prism/gh-pages/themes/prism.css",
+  "_target": "*",
+  "_originalSource": "https://raw.github.com/LeaVerou/prism/gh-pages/themes/prism.css"
+}
