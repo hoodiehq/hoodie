@@ -1350,10 +1350,6 @@ describe('hoodie.account', function () {
         expect(this.account.username).to.be(undefined);
       });
 
-      it('should clear config', function () {
-        expect(this.hoodie.config.clear).to.be.called();
-      });
-
       it('should return a resolved promise', function () {
         expect(this.promise.state()).to.eql('resolved');
       });
@@ -1459,9 +1455,6 @@ describe('hoodie.account', function () {
             expect(this.account.username).to.be(undefined);
           });
 
-          it('should clear config', function () {
-            expect(this.hoodie.config.clear).to.be.called();
-          });
         }); // signOut request successful
       }); // user has no local changes
     }); // user has account
@@ -1652,10 +1645,6 @@ describe('hoodie.account', function () {
             expect(this.account.trigger).to.be.calledWith('signout');
           });
 
-          it('should clear config', function () {
-            expect(this.hoodie.config.clear).to.be.called();
-          });
-
           it('should set config._account.ownerHash to new ownerHash', function () {
             expect(this.hoodie.config.set).to.be.calledWith('_account.ownerHash', 'uuid123');
           });
@@ -1746,10 +1735,6 @@ describe('hoodie.account', function () {
 
       it('should trigger signout event', function () {
         expect(this.account.trigger).to.be.calledWith('signout');
-      });
-
-      it('should clear config', function () {
-        expect(this.hoodie.config.clear).to.be.called();
       });
 
       it('should set config._account.ownerHash to new ownerHash', function () {

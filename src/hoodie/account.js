@@ -899,7 +899,7 @@ function hoodieAccount (hoodie) {
     // hoodie.store is listening on this one
     account.trigger('cleanup');
     authenticated = options.authenticated;
-    hoodie.config.clear();
+
     setUsername(options.username);
     setOwner(options.ownerHash || hoodie.generateId());
 
