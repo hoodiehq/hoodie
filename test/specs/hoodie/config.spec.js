@@ -69,8 +69,8 @@ describe('Hoodie.Config', function() {
     });
 
     it('subscribes to account:cleanup', function() {
-      this.events['account:cleanup']()
-      expect(this.config.clear).to.be.called()
+      this.events['account:cleanup']();
+      expect(this.config.clear).to.be.called();
     });
 
     it('can only be called once', function() {

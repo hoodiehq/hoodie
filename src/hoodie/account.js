@@ -893,15 +893,16 @@ function hoodieAccount (hoodie) {
   //
   // remove everything form the current account, so a new account can be initiated.
   //
-  function cleanup(options) {
-    options = options || {};
+  function cleanup() {
 
-    // hoodie.store is listening on this one
+    // unset username
+    setUsername(undefined);
+
+    // reset ownerhash
+    setOwner(hoodie.generateId());
+
+    // allow other modules to clean up local data & caches
     account.trigger('cleanup');
-    authenticated = options.authenticated;
-
-    setUsername(options.username);
-    setOwner(options.ownerHash || hoodie.generateId());
 
     return hoodie.resolve();
   }
