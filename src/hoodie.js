@@ -119,6 +119,9 @@ function Hoodie(baseUrl) {
   // clear config on sign out
   hoodie.on('account:signout', hoodie.config.clear);
 
+  // hoodie.config
+  hoodie.config.subscribeToOutsideEvents();
+
   // hoodie.store
   hoodie.store.patchIfNotPersistant();
   hoodie.store.subscribeToOutsideEvents();

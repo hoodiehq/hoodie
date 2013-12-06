@@ -595,8 +595,8 @@ function hoodieAccount (hoodie) {
   function handleAuthenticateRequestSuccess(response) {
     if (response.userCtx.name) {
       authenticated = true;
-      setUsername(response.userCtx.name.replace(/^user(_anonymous)?\//, ''));
       setOwner(response.userCtx.roles[0]);
+      setUsername(response.userCtx.name.replace(/^user(_anonymous)?\//, ''));
       return hoodie.resolveWith(account.username);
     }
 
@@ -736,8 +736,8 @@ function hoodieAccount (hoodie) {
         });
       }
 
-      setUsername(username);
       setOwner(response.roles[0]);
+      setUsername(username);
       authenticated = true;
 
       //
@@ -893,15 +893,16 @@ function hoodieAccount (hoodie) {
   //
   // remove everything form the current account, so a new account can be initiated.
   //
-  function cleanup(options) {
-    options = options || {};
+  function cleanup() {
 
-    // hoodie.store is listening on this one
+    // unset username
+    setUsername(undefined);
+
+    // reset ownerhash
+    setOwner(hoodie.generateId());
+
+    // allow other modules to clean up local data & caches
     account.trigger('cleanup');
-    authenticated = options.authenticated;
-    hoodie.config.clear();
-    setUsername(options.username);
-    setOwner(options.ownerHash || hoodie.generateId());
 
     return hoodie.resolve();
   }

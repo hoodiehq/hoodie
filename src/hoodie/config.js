@@ -72,6 +72,21 @@ function hoodieConfig(hoodie) {
 
   // exspose public API
   hoodie.config = config;
+
+  //
+  // subscribe to events coming from account & our remote store.
+  //
+  function subscribeToOutsideEvents() {
+
+    // account events
+    hoodie.on('account:cleanup', config.clear);
+  }
+
+  // allow to run this once from outside
+  config.subscribeToOutsideEvents = function() {
+    subscribeToOutsideEvents();
+    delete config.subscribeToOutsideEvents;
+  };
 }
 
 module.exports = hoodieConfig;
