@@ -489,7 +489,7 @@ function hoodieAccount (hoodie) {
           window.setTimeout(account.checkPasswordReset, 1000);
           return;
         }
-        return account.trigger('passwordreset:error');
+        return account.trigger('error:passwordreset', error);
       });
     });
   };
@@ -500,8 +500,8 @@ function hoodieAccount (hoodie) {
 
   // Note: the hoodie API requires the current password for security reasons,
   // but technically we cannot (yet) prevent the user to change the username
-  // without knowing the current password, so it's not impulemented in the current
-  // implementation of the hoodie API.
+  // without knowing the current password, so it's ignored in the current
+  // implementation.
   //
   // But the current password is needed to login with the new username.
   //
@@ -774,11 +774,13 @@ function hoodieAccount (hoodie) {
   // error, indicating that our password was changed and our
   // current session has been invalidated
   //
-  function handlePasswordResetStatusRequestSuccess(response) {
+  function handlePasswordResetStatusRequestSuccess(passwordResetObject) {
     var error;
 
-    if (response.$error) {
-      error = response.$error;
+    if (passwordResetObject.$error) {
+      error = passwordResetObject.$error;
+      error.object = passwordResetObject;
+      delete error.object.$error;
     } else {
       error = {
         name: 'HoodiePendingError',
@@ -813,17 +815,46 @@ function hoodieAccount (hoodie) {
     var defer = hoodie.defer();
 
     account.one('passwordreset', defer.resolve );
-    account.one('error:passwordreset', defer.reject );
+    account.on('error:passwordreset', removePasswordResetObject );
+    account.on('error:passwordreset', defer.reject );
 
     // clean up callbacks when either gets called
     defer.always( function() {
       account.unbind('passwordreset', defer.resolve );
+      account.unbind('error:passwordreset', removePasswordResetObject );
       account.unbind('error:passwordreset', defer.reject );
     });
 
     return defer.promise();
   }
 
+  //
+  // when a password reset fails, remove it from /_users
+  //
+  function removePasswordResetObject (error) {
+    var passwordResetObject = error.object;
+
+    // get username & password for authentication
+    var username = passwordResetObject.name; // $passwordReset/username/randomhash
+    var password = username.substr(15); // => // username/randomhash
+    var url = '/_users/' + (encodeURIComponent(userDocPrefix + ':' + username));
+    var hash = btoa(username + ':' + password);
+
+    // mark as deleted
+    passwordResetObject._deleted = true;
+
+    var options = {
+      headers: {
+        Authorization: 'Basic ' + hash
+      },
+      contentType: 'application/json',
+      data: JSON.stringify(passwordResetObject)
+    };
+
+    // cleanup
+    account.request('PUT', url, options);
+    hoodie.config.unset('_account.resetPasswordId');
+  }
 
   //
   // change username and password in 3 steps
