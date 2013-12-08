@@ -1866,12 +1866,35 @@ describe('hoodie.account', function () {
 
         _and('password reset fails', function() {
           beforeEach(function() {
-            this.account.one.withArgs('error:passwordreset').yields();
+            var error = {
+              name: 'HoodieNotFoundError',
+              message: 'user joe@example.com could not be found',
+              object: {
+                // leaving out irrelevant properties here.
+                rev: '1-234',
+                name: '$passwordReset/joe@example.com/uuid567'
+              }
+            };
+            this.account.on.withArgs('error:passwordreset').yields(error);
             this.promise = this.account.resetPassword('joe@example.com');
           });
 
           it('should resolve', function() {
             expect(this.promise).to.be.rejected();
+          });
+
+          it('should deleted the $passwordReset object from /_users', function() {
+            var newObject = {
+              rev: '1-234',
+              name: '$passwordReset/joe@example.com/uuid567',
+              _deleted: true
+            };
+            var auth = btoa('$passwordReset/joe@example.com/uuid567:joe@example.com/uuid567');
+            expect(this.hoodie.request).to.be.calledWith('PUT', this.path, {
+              headers: { Authorization: 'Basic ' + auth },
+              contentType: 'application/json',
+              data: JSON.stringify(newObject)
+            });
           });
         });
       });
