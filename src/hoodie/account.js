@@ -1010,7 +1010,7 @@ function hoodieAccount (hoodie) {
       data.signedUpAt = data.signedUpAt || now();
 
       // trigger password update when newPassword set
-      if (newPassword !== null) {
+      if (newPassword !== undefined) {
         delete data.salt;
         delete data.password_sha;
         data.password = newPassword;
@@ -1023,7 +1023,7 @@ function hoodieAccount (hoodie) {
 
       return withPreviousRequestsAborted('updateUsersDoc', function() {
         return account.request('PUT', userDocUrl(), options).then(
-          handleChangeUsernameAndPasswordRequest(newUsername, newPassword || currentPassword)
+          handleChangeUsernameAndPasswordResponse(newUsername, newPassword || currentPassword)
         );
       });
 
@@ -1033,21 +1033,54 @@ function hoodieAccount (hoodie) {
 
   //
   // depending on whether a newUsername has been passed, we can sign in right away
-  // or have to use the delayed sign in to give the username change worker some time
+  // or have to wait until the worker removed the old account
   //
-  function handleChangeUsernameAndPasswordRequest(newUsername, newPassword) {
+  function handleChangeUsernameAndPasswordResponse(newUsername, newPassword) {
 
     return function() {
       hoodie.remote.disconnect();
 
       if (newUsername) {
-        return delayedSignIn(newUsername, newPassword, {
-          silent: true
+        // note that if username has been changed, newPassword is the current password.
+        // We always change either the one, or the other.
+        return awaitCurrentAccountRemoved(account.username, newPassword)
+        .then( function() {
+          return account.signIn(newUsername, newPassword);
         });
       } else {
         return account.signIn(account.username, newPassword);
       }
     };
+  }
+
+  //
+  // keep sending sign in requests until the server returns a 401
+  //
+  function awaitCurrentAccountRemoved (username, password, defer) {
+    if (!defer) {
+      defer = hoodie.defer();
+    }
+
+    var requestOptions = {
+      data: {
+        name: userTypeAndId(username),
+        password: password
+      }
+    };
+
+    withPreviousRequestsAborted('signIn', function() {
+      return account.request('POST', '/_session', requestOptions);
+    }).done( function() {
+      window.setTimeout(awaitCurrentAccountRemoved, 300, username, password, defer);
+    }).fail( function(error) {
+      if (error.status === 401) {
+        return defer.resolve();
+      }
+
+      defer.reject(error);
+    });
+
+    return defer.promise();
   }
 
 
