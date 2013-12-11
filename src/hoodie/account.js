@@ -978,7 +978,7 @@ function hoodieAccount (hoodie) {
       data.signedUpAt = data.signedUpAt || now();
 
       // trigger password update when newPassword set
-      if (newPassword !== null) {
+      if (newPassword !== undefined) {
         delete data.salt;
         delete data.password_sha;
         data.password = newPassword;

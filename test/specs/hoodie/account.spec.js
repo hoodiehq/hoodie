@@ -1960,6 +1960,11 @@ describe('hoodie.account', function () {
           expect(this.data.createdAt).to.not.eql( now() );
         });
 
+        it('should not remove salt or password_sha properties', function() {
+          expect(this.data.salt).to.be('salt');
+          expect(this.data.password_sha).to.be('password_sha');
+        });
+
         _when('_users doc could be updated', function () {
 
           beforeEach(function () {
@@ -2107,8 +2112,8 @@ function unconfirmedUserDoc (username) {
     name: 'user/' + username,
     type: 'user',
     roles: [],
-    salt: 'absalt',
-    password_sha: 'pwcdef',
+    salt: 'salt',
+    password_sha: 'password_sha',
     createdAt: 'someday',
     updatedAt: 'someday',
     signedUpAt: 'someday'
