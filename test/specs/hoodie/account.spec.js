@@ -440,7 +440,6 @@ describe('hoodie.account', function () {
           });
 
           _when('fetching user doc successful', function () {
-
             beforeEach(function () {
               this.fetchDefer.resolve();
 
@@ -482,63 +481,110 @@ describe('hoodie.account', function () {
               beforeEach(function () {
                 this.requestDefers[1].resolve();
 
-                // send sign in request which is delayed by 300ms
+                // after the doc update, it signs in again
+                // with a delay of 300ms
                 this.clock.tick(300);
               });
 
-              it('should hoodie.remote.disconnect', function () {
+              it('should disconnect', function () {
                 expect(this.hoodie.remote.disconnect).to.be.called();
               });
 
-              it('should sign in with new username', function () {
+              it('should sign in with old username', function () {
 
-                var args = this.account.request.args[2];
-                var type = args[0];
-                var path = args[1];
-                var options = args[2];
-                var data = options.data;
-
-                var username = 'joe@example.com';
-                var password = 'secret';
-
-                expect(type).to.eql('POST');
-                expect(path).to.eql('/_session');
-                expect(data.name).to.eql( 'user/' + username );
-                expect(data.password).to.eql( password );
+                expect(this.account.request).to.be.calledWith(
+                  'POST',
+                  '/_session',
+                  {
+                    data: {
+                      name: 'user/randomUsername',
+                      password: 'secret'
+                    }
+                  }
+                );
               });
 
-              _and('signIn is successful', function () {
-
+              _when('sign in to old account succeeds', function() {
                 beforeEach(function () {
-                  this.requestDefers[2].resolve({
-                    name : 'joe@example.com',
-                    roles : ['randomhash', 'confirmed']
+                  this.account.request.reset();
+                  this.requestDefers[2].resolve();
+
+                  // after the doc update, it signs in again
+                  // with a delay of 300ms
+                  this.clock.tick(300);
+                });
+
+                it('should sign in with old username again', function () {
+                  expect(this.account.request).to.be.calledWith(
+                    'POST',
+                    '/_session',
+                    {
+                      data: {
+                        name: 'user/randomUsername',
+                        password: 'secret'
+                      }
+                    }
+                  );
+                });
+
+                _and('sign in fails with a server error', function() {
+                  beforeEach(function () {
+                    this.requestDefers[3].reject({
+                      name: 'HoodieServerError',
+                      message: 'oopps',
+                      status: 500
+                    });
+
+                    // after the doc update, it signs in again
+                    // with a delay of 300ms
+                    this.clock.tick(300);
+                  });
+
+                  it('should sign in with old username again', function () {
+                    expect(this.promise).to.be.rejected();
                   });
                 });
 
-                it('should be resolved', function () {
-                  expect(this.promise).to.be.resolvedWith('joe@example.com', 'randomhash');
-                });
+                _and('sign in fails with unauthorized error', function() {
+                  beforeEach(function () {
+                    this.signInDefer = $.Deferred();
+                    this.sandbox.stub(this.account, 'signIn').returns(this.signInDefer.promise());
+                    this.account.request.reset();
+                    this.requestDefers[3].reject({
+                      name: 'HoodieUnauthorizedError',
+                      message: 'nope',
+                      status: 401
+                    });
+                  });
 
+                  it('should sign in with new username', function () {
+                    expect(this.account.signIn).to.be.calledWith(
+                      'joe@example.com',
+                      'secret'
+                    );
+                  });
+
+                  _and('sign in to new account succeeds', function() {
+                    beforeEach(function () {
+                      this.signInDefer.resolve();
+                    });
+
+                    it('should resolve', function() {
+                      expect(this.promise).to.be.resolved();
+                    });
+                  });
+
+                  _and('sign in to new account fails', function() {
+                    beforeEach(function () {
+                      this.signInDefer.reject('ooops');
+                    });
+
+                    it('should reject', function() {
+                      expect(this.promise).to.be.rejectedWith('ooops');
+                    });
+                  });
+                });
               });
-
-              _but('signIn has an error', function () {
-
-                beforeEach(function () {
-                  this.requestDefers[2].reject({
-                    name: 'HoodieError',
-                    message: 'Oops'
-                  });
-                });
-
-                it('should be resolved', function () {
-                  expect(this.promise).to.be.rejectedWith({
-                    name: 'HoodieError',
-                    message: 'Oops'
-                  });
-                });
-
-              }); // signIn has an error
 
             }); // _users doc could be updated
 
@@ -1960,6 +2006,11 @@ describe('hoodie.account', function () {
           expect(this.data.createdAt).to.not.eql( now() );
         });
 
+        it('should not remove salt or password_sha properties', function() {
+          expect(this.data.salt).to.be('salt');
+          expect(this.data.password_sha).to.be('password_sha');
+        });
+
         _when('_users doc could be updated', function () {
 
           beforeEach(function () {
@@ -1974,43 +2025,101 @@ describe('hoodie.account', function () {
             expect(this.hoodie.remote.disconnect).to.be.called();
           });
 
-          it('should sign in with new username', function () {
+          it('should sign in with old username', function () {
 
             expect(this.account.request).to.be.calledWith(
               'POST',
               '/_session',
               {
                 data: {
-                  name: 'user/new.joe@example.com',
+                  name: 'user/joe@example.com',
                   password: 'secret'
                 }
               }
             );
           });
 
-          _and('signIn is successful', function () {
+          _when('sign in to old account succeeds', function() {
             beforeEach(function () {
-              this.requestDefers[2].resolve( validSignInResponse() );
+              this.account.request.reset();
+              this.requestDefers[2].resolve();
+
+              // after the doc update, it signs in again
+              // with a delay of 300ms
+              this.clock.tick(300);
             });
 
-            it('should be resolved', function () {
-              expect(this.promise).to.be.resolved();
+            it('should sign in with old username again', function () {
+              expect(this.account.request).to.be.calledWith(
+                'POST',
+                '/_session',
+                {
+                  data: {
+                    name: 'user/joe@example.com',
+                    password: 'secret'
+                  }
+                }
+              );
             });
-          }); // signIn is successful
 
-          _but('signIn has an error', function () {
+            _and('sign in fails with a server error', function() {
+              beforeEach(function () {
+                this.requestDefers[3].reject({
+                  name: 'HoodieServerError',
+                  message: 'oopps',
+                  status: 500
+                });
 
-            beforeEach(function () {
-              this.requestDefers[2].reject({
-                name: 'HoodieError',
-                message: 'Something is wrong'
+                // after the doc update, it signs in again
+                // with a delay of 300ms
+                this.clock.tick(300);
+              });
+
+              it('should sign in with old username again', function () {
+                expect(this.promise).to.be.rejected();
               });
             });
 
-            it('should be rejected', function () {
-              expect(this.promise).to.be.rejected();
+            _and('sign in fails with unauthorized error', function() {
+              beforeEach(function () {
+                this.signInDefer = $.Deferred();
+                this.sandbox.stub(this.account, 'signIn').returns(this.signInDefer.promise());
+                this.account.request.reset();
+                this.requestDefers[3].reject({
+                  name: 'HoodieUnauthorizedError',
+                  message: 'nope',
+                  status: 401
+                });
+              });
+
+              it('should sign in with new username', function () {
+                expect(this.account.signIn).to.be.calledWith(
+                  'new.joe@example.com',
+                  'secret'
+                );
+              });
+
+              _and('sign in to new account succeeds', function() {
+                beforeEach(function () {
+                  this.signInDefer.resolve();
+                });
+
+                it('should resolve', function() {
+                  expect(this.promise).to.be.resolved();
+                });
+              });
+
+              _and('sign in to new account fails', function() {
+                beforeEach(function () {
+                  this.signInDefer.reject('ooops');
+                });
+
+                it('should reject', function() {
+                  expect(this.promise).to.be.rejectedWith('ooops');
+                });
+              });
             });
-          }); // signIn has an error
+          });
         }); // _users doc could be updated
 
         _when('_users doc could not be updated', function () {
@@ -2107,8 +2216,8 @@ function unconfirmedUserDoc (username) {
     name: 'user/' + username,
     type: 'user',
     roles: [],
-    salt: 'absalt',
-    password_sha: 'pwcdef',
+    salt: 'salt',
+    password_sha: 'password_sha',
     createdAt: 'someday',
     updatedAt: 'someday',
     signedUpAt: 'someday'
