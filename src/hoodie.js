@@ -92,6 +92,8 @@ function Hoodie(baseUrl) {
 
   // * hoodie.store
   hoodie.extend(hoodieLocalStore);
+  // workaround, until we ship https://github.com/hoodiehq/hoodie.js/issues/199
+  hoodie.store.patchIfNotPersistant();
 
   // * hoodie.task
   hoodie.extend(hoodieTask);
@@ -120,7 +122,6 @@ function Hoodie(baseUrl) {
   hoodie.on('account:signout', hoodie.config.clear);
 
   // hoodie.store
-  hoodie.store.patchIfNotPersistant();
   hoodie.store.subscribeToOutsideEvents();
   hoodie.store.bootstrapDirtyObjects();
 
