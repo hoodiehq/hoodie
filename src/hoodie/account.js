@@ -486,7 +486,7 @@ function hoodieAccount (hoodie) {
         handlePasswordResetStatusRequestError
       ).fail(function(error) {
         if (error.name === 'HoodiePendingError') {
-          window.setTimeout(account.checkPasswordReset, 1000);
+          global.setTimeout(account.checkPasswordReset, 1000);
           return;
         }
         return account.trigger('error:passwordreset', error);
@@ -666,7 +666,7 @@ function hoodieAccount (hoodie) {
       defer = hoodie.defer();
     }
 
-    window.setTimeout(function() {
+    global.setTimeout(function() {
       var promise = sendSignInRequest(username, password);
       promise.done(defer.resolve);
       promise.fail(function(error) {

@@ -138,8 +138,8 @@ function Hoodie(baseUrl) {
   });
 
   // check connection when browser goes online / offline
-  window.addEventListener('online', hoodie.checkConnection, false);
-  window.addEventListener('offline', hoodie.checkConnection, false);
+  global.addEventListener('online', hoodie.checkConnection, false);
+  global.addEventListener('offline', hoodie.checkConnection, false);
 
   // start checking connection
   hoodie.checkConnection();

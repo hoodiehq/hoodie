@@ -362,8 +362,8 @@ function hoodieRemoteStore (hoodie, options) {
     pullRequest = remote.request('GET', pullUrl());
 
     if (remote.isConnected()) {
-      window.clearTimeout(pullRequestTimeout);
-      pullRequestTimeout = window.setTimeout(restartPullRequest, 25000);
+      global.clearTimeout(pullRequestTimeout);
+      pullRequestTimeout = global.setTimeout(restartPullRequest, 25000);
     }
 
     return pullRequest.done(handlePullSuccess).fail(handlePullError);
@@ -674,14 +674,14 @@ function hoodieRemoteStore (hoodie, options) {
      //
 
     case 404:
-      return window.setTimeout(remote.pull, 3000);
+      return global.setTimeout(remote.pull, 3000);
 
     case 500:
       //
       // Please server, don't give us these. At least not persistently
       //
       remote.trigger('error:server', error);
-      window.setTimeout(remote.pull, 3000);
+      global.setTimeout(remote.pull, 3000);
       return hoodie.checkConnection();
     default:
       // usually a 0, which stands for timeout or server not reachable.
@@ -695,7 +695,7 @@ function hoodieRemoteStore (hoodie, options) {
         // heroku kills the request after ~30s.
         // we'll try again after a 3s timeout
         //
-        window.setTimeout(remote.pull, 3000);
+        global.setTimeout(remote.pull, 3000);
         return hoodie.checkConnection();
       }
     }

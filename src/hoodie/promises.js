@@ -18,7 +18,7 @@ var HoodieError = require('./error');
 
 //
 function hoodiePromises (hoodie) {
-  var $defer = window.jQuery.Deferred;
+  var $defer = global.jQuery.Deferred;
 
   // returns true if passed object is a promise (but not a deferred),
   // otherwise false.

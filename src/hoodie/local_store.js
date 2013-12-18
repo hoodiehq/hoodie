@@ -507,7 +507,7 @@ function hoodieStore (hoodie) {
 
       // we've to put this in here. I've seen Firefox throwing `Security error: 1000`
       // when cookies have been disabled
-      if (!window.localStorage) {
+      if (!global.localStorage) {
         return false;
       }
 
@@ -545,19 +545,19 @@ function hoodieStore (hoodie) {
   //
   var db = {
     getItem: function(key) {
-      return window.localStorage.getItem(key);
+      return global.localStorage.getItem(key);
     },
     setItem: function(key, value) {
-      return window.localStorage.setItem(key, value);
+      return global.localStorage.setItem(key, value);
     },
     removeItem: function(key) {
-      return window.localStorage.removeItem(key);
+      return global.localStorage.removeItem(key);
     },
     key: function(nr) {
-      return window.localStorage.key(nr);
+      return global.localStorage.key(nr);
     },
     length: function() {
-      return window.localStorage.length;
+      return global.localStorage.length;
     }
   };
 
@@ -724,7 +724,7 @@ function hoodieStore (hoodie) {
       dirty = {};
     }
     saveDirtyIds();
-    return window.clearTimeout(dirtyTimeout);
+    return global.clearTimeout(dirtyTimeout);
   }
 
 
@@ -897,9 +897,9 @@ function hoodieStore (hoodie) {
   var dirtyTimeout;
   function triggerDirtyAndIdleEvents() {
     store.trigger('dirty');
-    window.clearTimeout(dirtyTimeout);
+    global.clearTimeout(dirtyTimeout);
 
-    dirtyTimeout = window.setTimeout(function() {
+    dirtyTimeout = global.setTimeout(function() {
       store.trigger('idle', store.changedObjects());
     }, idleTimeout);
   }
