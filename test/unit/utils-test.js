@@ -5,7 +5,7 @@ var _ = require('underscore');
 describe('utils', function () {
 
   it('should expose n number of properties', function () {
-    expect(_.size(utils)).to.eql(6);
+    expect(_.size(utils)).to.eql(7);
   });
 
   it('should have a ensureDir property', function () {
@@ -30,6 +30,10 @@ describe('utils', function () {
 
   it('should have a processSend property', function () {
     expect(utils).to.have.property('processSend');
+  });
+
+  it('should have a isNodejitsu property', function () {
+    expect(utils).to.have.property('isNodejitsu');
   });
 
 });
