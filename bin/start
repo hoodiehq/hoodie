@@ -6,9 +6,9 @@
  * Dependencies
  */
 
-var environment = require('../lib/environment');
-var hconsole = require('../lib/hconsole');
-var app = require('../lib/app');
+var environment = require('../lib/core/environment');
+var hconsole = require('../lib/utils/hconsole');
+var app = require('../lib');
 
 
 // parse command-line arguments

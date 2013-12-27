@@ -1,15 +1,14 @@
 {
   "name": "hoodie-server",
   "version": "0.8.16",
-  "main": "lib/app",
+  "version": "0.8.14",
+  "main": "lib/index",
   "repository": {
     "type": "git",
     "url": "https://github.com/hoodiehq/hoodie-server.git"
   },
   "dependencies": {
     "hoodie": "git://github.com/hoodiehq/hoodie.js.git",
-    "http-proxy": "0.10.x",
-    "connect": "2.7.4",
     "multicouch": ">=0.6.1",
     "hoodie-pocket": "0.0.12",
     "hoodie-plugins-manager": "0.0.11",
@@ -24,12 +23,12 @@
     "cli-color": "0.2.2",
     "lock": "0.0.3",
     "semver": ">=1.1.4",
-    "send": "0.1.0",
     "optimist": "0.5.0",
-    "ports": ">=1.0.0",
+    "ports": "1.0.0",
     "mkdirp": "0.3.5",
-    "dispatch": "0.2.0",
-    "ports": "1.0.0"
+    "good": "git://github.com/spumko/good",
+    "hapi": "git://github.com/spumko/hapi",
+    "hoodie-plugin-users": "0.0.9"
   },
   "scripts": {
     "start": "bin/start",
@@ -48,5 +47,10 @@
     "grunt-contrib-jshint": "~0.6.2",
     "grunt-contrib-watch": "~0.5.1",
     "rimraf": "2.2.2"
+  },
+  "hoodie": {
+    "plugins": [
+      "hoodie-plugin-users"
+    ]
   }
 }
