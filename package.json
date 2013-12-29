@@ -27,8 +27,7 @@
     "ports": "1.0.0",
     "mkdirp": "0.3.5",
     "good": "git://github.com/spumko/good",
-    "hapi": "git://github.com/spumko/hapi",
-    "hoodie-plugin-users": "0.0.9"
+    "hapi": "git://github.com/spumko/hapi"
   },
   "scripts": {
     "start": "bin/start",
@@ -49,8 +48,6 @@
     "rimraf": "2.2.2"
   },
   "hoodie": {
-    "plugins": [
-      "hoodie-plugin-users"
-    ]
+    "plugins": []
   }
 }
