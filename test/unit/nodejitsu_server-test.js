@@ -1,5 +1,5 @@
 var expect = require('expect.js');
-var nju = require('../../lib/nodejitsu_server');
+var nju = require('../../lib/server/nodejitsu_server');
 
 var _ = require('underscore');
 

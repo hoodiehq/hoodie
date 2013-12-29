@@ -1,5 +1,5 @@
 var expect = require('expect.js');
-var workers = require('../../lib/workers');
+var workers = require('../../lib/core/workers');
 
 describe('workers', function () {
 

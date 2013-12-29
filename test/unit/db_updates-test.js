@@ -1,5 +1,5 @@
 var expect = require('expect.js');
-var dbUpdates = require('../../lib/db_updates');
+var dbUpdates = require('../../lib/couchdb/db_updates');
 
 describe('db_updates', function () {
 

@@ -1,5 +1,5 @@
 var expect = require('expect.js');
-var cp = require('../../lib/changes_pool');
+var cp = require('../../lib/couchdb/changes_pool');
 
 describe('changes_pool', function () {
 

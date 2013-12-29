@@ -1,12 +1,12 @@
 var expect = require('expect.js');
-var couch = require('../../lib/couch');
+var couch = require('../../lib/couchdb/index');
 
 var _ = require('underscore');
 
 describe('couch', function () {
 
   it('should expose n number of properties', function () {
-    expect(_.size(couch)).to.eql(7);
+    expect(_.size(couch)).to.eql(9);
   });
 
   it('should have a startMultiCouch property', function () {
@@ -33,4 +33,15 @@ describe('couch', function () {
     expect(couch).to.have.property('dbUpdatesAvailable');
   });
 
+  it('should have a change_pool property', function () {
+    expect(couch).to.have.property('changes_pool');
+  });
+
+  it('should have a db_updates property', function () {
+    expect(couch).to.have.property('db_updates');
+  });
+
+  it('should have a installer property', function () {
+    expect(couch).to.have.property('installer');
+  });
 });

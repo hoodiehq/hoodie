@@ -1,8 +1,8 @@
 var couchr = require('couchr'),
     async = require('async'),
-    environment = require('../lib/environment'),
-    config = require('../lib/config'),
-    app = require('../lib/app'),
+    environment = require('../lib/core/environment'),
+    config = require('../lib/core/config'),
+    app = require('../lib/index'),
     path = require('path'),
     url = require('url'),
     utils = require('./lib/utils');

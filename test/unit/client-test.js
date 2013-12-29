@@ -1,5 +1,5 @@
 var expect = require('expect.js');
-var client = require('../../lib/client');
+var client = require('../../lib/couchdb/client');
 
 var _ = require('underscore');
 
