@@ -26,7 +26,6 @@
     "optimist": "0.5.0",
     "ports": "1.0.0",
     "mkdirp": "0.3.5",
-    "good": "git://github.com/spumko/good",
     "hapi": "git://github.com/spumko/hapi"
   },
   "scripts": {
