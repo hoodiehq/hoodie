@@ -27,7 +27,7 @@ module.exports = function(grunt) {
 
     watch: {
       files: ['<%= jshint.files %>'],
-      tasks: ['jshint', 'browserify', 'karma:dev']
+      tasks: ['jshint', 'browserify:dev', 'karma:dev']
     },
 
     concat: {
@@ -156,13 +156,21 @@ module.exports = function(grunt) {
     },
 
     browserify: {
-      build: {
+      dev: {
         src: ['src/hoodie.js'],
         dest: 'dist/hoodie.js',
         options: {
           external: 'jquery',
           standalone: 'Hoodie',
           debug: true
+        }
+      },
+      build: {
+        src: ['src/hoodie.js'],
+        dest: 'dist/hoodie.js',
+        options: {
+          external: 'jquery',
+          standalone: 'Hoodie'
         }
       }
     }
@@ -177,7 +185,7 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-karma');
 
   grunt.registerTask('default', ['test']);
-  grunt.registerTask('build', ['jshint', 'karma:continuous', 'browserify', 'uglify']);
+  grunt.registerTask('build', ['jshint', 'karma:continuous', 'browserify:build', 'uglify']);
   grunt.registerTask('test', ['karma:dev']);
   grunt.registerTask('docs', ['groc']);
 };
