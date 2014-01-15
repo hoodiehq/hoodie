@@ -1,5 +1,4 @@
 
-
 # Hoodie ✪ power to the frontend! [![Build Status](https://travis-ci.org/hoodiehq/hoodie.js.png?branch=master)](https://travis-ci.org/hoodiehq/hoodie.js)
 
 Hoodie is a JavaScript library for the browser.
@@ -175,8 +174,6 @@ You can also subscribe to the following task events
 
 But … how does it work?
 -----------------------
-
-It's magic, stupid!™
 
 Every app gets its own hoodie. You need to set one up, because that's `whereTheMagicHappens`:
 
