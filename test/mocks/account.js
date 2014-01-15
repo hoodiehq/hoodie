@@ -24,7 +24,7 @@ module.exports = function() {
     changePassword : this.sandbox.stub().returns(changePasswordDefer.promise()),
     changeUsername : this.sandbox.stub().returns(changeUsernameDefer.promise()),
     checkPasswordReset : this.sandbox.stub().returns(checkPasswordResetDefer.promise()),
-    db : this.sandbox.stub(),
+    db : this.sandbox.stub().returns('userdb'),
     destroy : this.sandbox.stub().returns(destroyDefer.promise()),
     fetch : this.sandbox.stub().returns(fetchDefer.promise()),
     hasAccount : this.sandbox.stub(),

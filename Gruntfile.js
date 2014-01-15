@@ -7,19 +7,12 @@ module.exports = function(grunt) {
   banner += '// Copyright 2012, 2013 https://github.com/hoodiehq/\n';
   banner += '// Licensed Apache License 2.0\n';
   banner += '\n';
-  banner += '(function(global) {\n';
-  banner += '\'use strict\'\n';
-  banner += '\n';
-
-  var footer  = '\n';
-  footer += '})(window);\n';
-
 
   grunt.initConfig({
     pkg: grunt.file.readJSON('package.json'),
 
     jshint: {
-      files: ['Gruntfile.js', 'src/**/*.js','test/specs/**/*.js' ],
+      files: ['Gruntfile.js', 'src/**/*.js', 'test/specs/**/*.js'],
       options: {
         jshintrc: '.jshintrc'
       }
@@ -27,41 +20,15 @@ module.exports = function(grunt) {
 
     watch: {
       files: ['<%= jshint.files %>'],
-      // tasks: ['karma:dev']
-      tasks: ['karma:dev']
+      tasks: ['jshint', 'browserify:dev', 'karma:dev']
     },
 
     concat: {
       options: {
-        banner: banner,
-        footer: footer
+        banner: banner
       },
       dist: {
-        src: [
-          'src/hoodie.js',
-
-          'src/hoodie/events.js',
-          'src/hoodie/promises.js',
-          'src/hoodie/request.js',
-          'src/hoodie/connection.js',
-          'src/hoodie/generate_id.js',
-          'src/hoodie/dispose.js',
-          'src/hoodie/open.js',
-
-          'src/hoodie/store.js',
-          'src/hoodie/scoped_store.js',
-          'src/hoodie/remote_store.js',
-          'src/hoodie/error.js',
-          'src/hoodie/error/object_id.js',
-          'src/hoodie/error/object_type.js',
-
-          'src/hoodie/local_store.js',
-          'src/hoodie/config.js',
-          'src/hoodie/account.js',
-          'src/hoodie/account_remote.js',
-          'src/hoodie/task.js',
-          'src/hoodie/scoped_task.js'
-        ],
+        src: ['dist/hoodie.js'],
         dest: 'dist/<%= pkg.name %>.js'
       }
     },
@@ -78,9 +45,7 @@ module.exports = function(grunt) {
     },
 
     groc: {
-      javascript: [
-        'src/**/*.js'
-      ],
+      javascript: ['src/**/*.js'],
       options: {
         'out': 'doc/',
         'whitespace-after-token': false
@@ -130,13 +95,9 @@ module.exports = function(grunt) {
           //   version: '11'
           // }
         },
-        browsers: [
-          'PhantomJS',
-          'sl_chrome_mac',
-          'sl_safari_mac',
-          'sl_firefox_win7',
-          // 'sl_ie10_win7',
-          // 'sl_ie11_win8'
+        browsers: ['PhantomJS', 'sl_chrome_mac', 'sl_safari_mac', 'sl_firefox_win7',
+        // 'sl_ie10_win7',
+        // 'sl_ie11_win8'
         ]
       },
 
@@ -150,14 +111,14 @@ module.exports = function(grunt) {
           'src/**/*.js': ['coverage']
         },
         coverageReporter: {
-          type : 'html',
-          dir : 'coverage/'
+          type: 'html',
+          dir: 'coverage/'
         }
       }
     },
 
     browserify: {
-      build: {
+      dev: {
         src: ['src/hoodie.js'],
         dest: 'dist/hoodie.js',
         options: {
@@ -165,20 +126,41 @@ module.exports = function(grunt) {
           standalone: 'Hoodie',
           debug: true
         }
+      },
+      build: {
+        src: ['src/hoodie.js'],
+        dest: 'dist/hoodie.js',
+        options: {
+          external: 'jquery',
+          standalone: 'Hoodie'
+        }
+      }
+    },
+
+    // https://github.com/vojtajina/grunt-bump
+    // bump version of hoodie.js
+    bump: {
+      options: {
+        files: ['package.json', 'bower.json'],
+        updateConfigs: [],
+        commit: true,
+        commitMessage: 'Release %VERSION%',
+        commitFiles: ['package.json', 'bower.json'],
+        // '-a' for all files
+        createTag: true,
+        tagName: '%VERSION%',
+        tagMessage: 'Version %VERSION%',
+        push: true,
+        pushTo: 'origin'
       }
     }
   });
 
-  grunt.loadNpmTasks('grunt-browserify');
-  grunt.loadNpmTasks('grunt-contrib-uglify');
-  grunt.loadNpmTasks('grunt-contrib-jshint');
-  grunt.loadNpmTasks('grunt-contrib-watch');
-  grunt.loadNpmTasks('grunt-contrib-concat');
-  grunt.loadNpmTasks('grunt-groc');
-  grunt.loadNpmTasks('grunt-karma');
+  // load all tasks defined in node_modules starting with 'grunt-'
+  require('load-grunt-tasks')(grunt);
 
-  grunt.registerTask('default', ['jshint', 'concat', 'uglify']);
-  grunt.registerTask('build', ['jshint', 'karma:continuous', 'concat', 'uglify']);
+  grunt.registerTask('default', ['test']);
+  grunt.registerTask('build', ['jshint', 'karma:continuous', 'browserify:build', 'concat', 'uglify']);
   grunt.registerTask('test', ['karma:dev']);
   grunt.registerTask('docs', ['groc']);
 };

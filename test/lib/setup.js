@@ -1,9 +1,12 @@
-window.mocha.setup({globals: ['setTimeout', 'clearTimeout', 'setInterval', 'clearInterval']});
+window.mocha.setup({
+  globals: ['setTimeout', 'clearTimeout', 'setInterval', 'clearInterval']
+});
 
 module.exports = (function() {
 
   before(function () {
     this.MOCKS = require('../mocks/');
+    this.FIXTURES = require('../fixtures/');
   });
 
   beforeEach(function () {

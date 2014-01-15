@@ -15,37 +15,35 @@ module.exports = function(config) {
     // list of files / patterns to load in the browser
     files: [
       'test/lib/bind.js',
-      { pattern: 'lib/jquery/jquery.js', watched: false, included: true },
-      { pattern: 'lib/expect/expect.js', watched: false, included: true },
-      { pattern: 'lib/sinonjs/sinon.js', watched: false, included: true },
+      { pattern: 'node_modules/hoodie.js-assets/jquery/jquery.js', watched: false, included: true },
+      { pattern: 'node_modules/expect.js/expect.js', watched: false, included: true },
+      { pattern: 'node_modules/sinon/pkg/sinon-1.7.3.js', watched: false, included: true },
       'test/lib/helpers.js',
       // 'test/lib/setup.js',
 
       // ignoring Constructor specs temporarely for 0.5 due to
       // incompatibilities with browserify, as discussed (@gr2m & @svnlto)
       // 'test/specs/hoodie.spec.js',
+      //
+      //
+      'test/specs/core/account/index.spec.js',
+      'test/specs/core/account/remote.spec.js',
+      'test/specs/core/error/error.spec.js',
+      'test/specs/core/store/local.spec.js',
+      'test/specs/core/store/remote.spec.js',
+      'test/specs/core/store/scoped.spec.js',
+      'test/specs/core/store/store.spec.js',
+      'test/specs/core/config.spec.js',
+      'test/specs/core/connection.spec.js',
+      'test/specs/core/events.spec.js',
+      'test/specs/core/request.spec.js',
+      'test/specs/core/task/scoped.spec.js',
+      'test/specs/core/task/task.spec.js',
 
-      'test/specs/hoodie/account.spec.js',
-      'test/specs/hoodie/config.spec.js',
-      'test/specs/hoodie/dispose.spec.js',
-      'test/specs/hoodie/events.spec.js',
-      'test/specs/hoodie/promises.spec.js',
-      'test/specs/hoodie/request.spec.js',
-      'test/specs/hoodie/generate_id.spec.js',
-
-      // dunno how to stub require calls, but it's needed here
-      // 'test/specs/hoodie/local_store.spec.js',
-      // 'test/specs/hoodie/open.spec.js',
-      // 'test/specs/hoodie/store.spec.js',
-      // 'test/specs/hoodie/scoped_store.spec.js',
-
-
-      // 'test/specs/hoodie/remote_store.spec.js',
-
-      // 'test/specs/hoodie/account_remote.spec.js',
-      // 'test/specs/hoodie/task.spec.js',
-      // 'test/specs/hoodie/scoped_task.spec.js',
-      // 'test/specs/hoodie/connection.spec.js'
+      'test/specs/utils/open.spec.js',
+      'test/specs/utils/dispose.spec.js',
+      'test/specs/utils/generate_id.spec.js',
+      'test/specs/utils/promises.spec.js'
     ],
 
 
@@ -87,8 +85,6 @@ module.exports = function(config) {
     browsers: [],
 
     preprocessors: {
-      //'src/hoodie/hoodie.js': ['browserify'],
-      'src/hoodie/config.js': ['browserify'],
       'test/specs/**/*.js': ['browserify'],
       'test/lib/setup.js': ['browserify']
     },

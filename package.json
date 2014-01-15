@@ -2,7 +2,7 @@
   "name": "hoodie",
   "title": "Hoodie.js",
   "description": "Hoodie library for the browser",
-  "version": "0.5.0",
+  "version": "0.5.3",
   "main": "./dist/hoodie.js",
   "homepage": "http://hood.ie",
   "repository": {
@@ -44,11 +44,17 @@
     "grunt-browserify": "~1.2.11",
     "grunt-umd": "~1.3.0",
     "browserify": "~2.35.1",
-    "karma-browserify": "0.0.5"
+    "karma-browserify": "git://github.com/gr2m/karma-browserify.git",
+    "graceful-fs": "~2.0.1",
+    "hoodie.js-assets": "git://github.com/gr2m/hoodie.js-assets.git",
+    "expect.js": "~0.2.0",
+    "sinon": "~1.7.1",
+    "load-grunt-tasks": "~0.2.1",
+    "grunt-bump": "0.0.13",
+    "extend": "~1.2.1"
   },
   "scripts": {
-    "test": "grunt test --verbose",
-    "build": "grunt build --verbose",
-    "postinstall": "bower install"
+    "test": "grunt build --verbose",
+    "build": "grunt build --verbose"
   }
 }

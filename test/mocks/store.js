@@ -10,27 +10,38 @@ module.exports = function () {
   o.api.validate = this.sandbox.stub();
   o.api.decoratePromises = this.sandbox.stub();
 
-  o.api.saveDefer = $.Deferred();
-  o.api.addDefer = $.Deferred();
-  o.api.findDefer = $.Deferred();
-  o.api.findOrAddDefer = $.Deferred();
-  o.api.findAllDefer = $.Deferred();
-  o.api.updateDefer = $.Deferred();
-  o.api.updateOrAddDefer = $.Deferred();
-  o.api.updateAllDefer = $.Deferred();
-  o.api.removeDefer = $.Deferred();
-  o.api.removeAllDefer = $.Deferred();
+  var saveDefer = $.Deferred();
+  var addDefer = $.Deferred();
+  var findDefer = $.Deferred();
+  var findOrAddDefer = $.Deferred();
+  var findAllDefer = $.Deferred();
+  var updateDefer = $.Deferred();
+  var updateOrAddDefer = $.Deferred();
+  var updateAllDefer = $.Deferred();
+  var removeDefer = $.Deferred();
+  var removeAllDefer = $.Deferred();
 
-  o.api.save = this.sandbox.stub().returns(o.api.saveDefer.promise());
-  o.api.add = this.sandbox.stub().returns(o.api.addDefer.promise());
-  o.api.find = this.sandbox.stub().returns(o.api.findDefer.promise());
-  o.api.findOrAdd = this.sandbox.stub().returns(o.api.findOrAddDefer.promise());
-  o.api.findAll = this.sandbox.stub().returns(o.api.findAllDefer.promise());
-  o.api.update = this.sandbox.stub().returns(o.api.updateDefer.promise());
-  o.api.updateOrAdd = this.sandbox.stub().returns(o.api.updateOrAddDefer.promise());
-  o.api.updateAll = this.sandbox.stub().returns(o.api.updateAllDefer.promise());
-  o.api.remove = this.sandbox.stub().returns(o.api.removeDefer.promise());
-  o.api.removeAll = this.sandbox.stub().returns(o.api.removeAllDefer.promise());
+  o.api.save = this.sandbox.stub().returns(saveDefer.promise());
+  o.api.add = this.sandbox.stub().returns(addDefer.promise());
+  o.api.find = this.sandbox.stub().returns(findDefer.promise());
+  o.api.findOrAdd = this.sandbox.stub().returns(findOrAddDefer.promise());
+  o.api.findAll = this.sandbox.stub().returns(findAllDefer.promise());
+  o.api.update = this.sandbox.stub().returns(updateDefer.promise());
+  o.api.updateOrAdd = this.sandbox.stub().returns(updateOrAddDefer.promise());
+  o.api.updateAll = this.sandbox.stub().returns(updateAllDefer.promise());
+  o.api.remove = this.sandbox.stub().returns(removeDefer.promise());
+  o.api.removeAll = this.sandbox.stub().returns(removeAllDefer.promise());
+
+  o.api.save.defer = saveDefer;
+  o.api.add.defer = addDefer;
+  o.api.find.defer = findDefer;
+  o.api.findOrAdd.defer = findOrAddDefer;
+  o.api.findAll.defer = findAllDefer;
+  o.api.update.defer = updateDefer;
+  o.api.updateOrAdd.defer = updateOrAddDefer;
+  o.api.updateAll.defer = updateAllDefer;
+  o.api.remove.defer = removeDefer;
+  o.api.removeAll.defer = removeAllDefer;
 
   this.sandbox.stub(o, 'api', function() {
     return o.api;

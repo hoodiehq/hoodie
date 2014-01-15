@@ -12,6 +12,6 @@ module.exports = {
   request: require('./request'),
   localStore: require('./local_store'),
   store: require('./store'),
-  storeBackend: require('./store_backend'),
+  storeOptions: require('./store_options'),
   task: require('./task'),
 };
