@@ -7,15 +7,16 @@
 var hoodieAccount = require('./hoodie/account');
 var hoodieAccountRemote = require('./hoodie/account_remote');
 var hoodieConfig = require('./hoodie/config');
-var hoodiePromises = require('./hoodie/promises');
-var hoodieRequest = require('./hoodie/request');
 var hoodieConnection = require('./hoodie/connection');
 var hoodieDispose = require('./hoodie/dispose');
-var hoodieOpen = require('./hoodie/open');
-var hoodieLocalStore = require('./hoodie/local_store');
-var hoodieGenerateId = require('./hoodie/generate_id');
-var hoodieTask = require('./hoodie/task');
 var hoodieEvents = require('./hoodie/events');
+var hoodieGenerateId = require('./hoodie/generate_id');
+var hoodieId = require('./hoodie/id');
+var hoodieLocalStore = require('./hoodie/local_store');
+var hoodieOpen = require('./hoodie/open');
+var hoodiePromises = require('./hoodie/promises');
+var hoodieRequest = require('./hoodie/request');
+var hoodieTask = require('./hoodie/task');
 
 // Constructor
 // -------------
@@ -92,6 +93,8 @@ function Hoodie(baseUrl) {
 
   // * hoodie.store
   hoodie.extend(hoodieLocalStore);
+  // workaround, until we ship https://github.com/hoodiehq/hoodie.js/issues/199
+  hoodie.store.patchIfNotPersistant();
 
   // * hoodie.task
   hoodie.extend(hoodieTask);
@@ -105,22 +108,36 @@ function Hoodie(baseUrl) {
   // * hoodie.remote
   hoodie.extend(hoodieAccountRemote);
 
+  // * hoodie.id
+  hoodie.extend(hoodieId);
+
 
   //
   // Initializations
   //
 
+  // init config
+  hoodie.config.init();
+
+  // init hoodieId
+  hoodie.id.init();
+
   // set username from config (local store)
   hoodie.account.username = hoodie.config.get('_account.username');
+
+  // init hoodie.remote API
+  hoodie.remote.init();
 
   // check for pending password reset
   hoodie.account.checkPasswordReset();
 
-  // clear config on sign out
-  hoodie.on('account:signout', hoodie.config.clear);
+  // hoodie.id
+  hoodie.id.subscribeToOutsideEvents();
+
+  // hoodie.config
+  hoodie.config.subscribeToOutsideEvents();
 
   // hoodie.store
-  hoodie.store.patchIfNotPersistant();
   hoodie.store.subscribeToOutsideEvents();
   hoodie.store.bootstrapDirtyObjects();
 

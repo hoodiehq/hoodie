@@ -28,7 +28,8 @@ describe('hoodie.account', function () {
     $.extend(this.account, this.MOCKS.events.apply(this));
 
     this.account.username = undefined; // 'joe@example.com';
-    this.account.ownerHash = 'hash123';
+
+    this.hoodie.id.returns('hash123');
   });
 
   describe('#authenticate()', function () {
@@ -37,10 +38,9 @@ describe('hoodie.account', function () {
       this.sandbox.stub(this.account, 'request').returns(this.hoodie.request());
     });
 
-    _when('user is logged in as joe@example.com (hash: \'user_hash\')', function() {
+    _when('user is logged in as joe@example.com', function() {
       beforeEach(function () {
         this.account.username = 'joe@example.com';
-        this.account.ownerHash = 'user_hash';
       });
 
       _and('session has not been validated yet', function () {
@@ -79,7 +79,7 @@ describe('hoodie.account', function () {
             var promise = this.account.authenticate();
             this.hoodie.request.defer.resolve({
               name: 'joe@example.com',
-              roles: ['user_hash', 'confirmed']
+              roles: ['hash123', 'confirmed']
             });
 
             expect(promise).to.be.resolved();
@@ -130,11 +130,6 @@ describe('hoodie.account', function () {
             it('should not set _account.username config', function () {
               // because it's already 'joe@example.com'
               expect(this.hoodie.config.set).to.not.be.calledWith('_account.username', 'joe@example.com');
-            });
-
-            it('should set account.ownerHash', function () {
-              // because it's already 'user_hash'
-              expect(this.hoodie.config.set).to.not.be.calledWith('_account.ownerHash', 'user_hash');
             });
           }); // returns valid session info for joe@example.com
 
@@ -202,12 +197,11 @@ describe('hoodie.account', function () {
           expect(this.promise).to.be.rejected();
         });
       }); // with_session_invalidated_before
-    }); // user is logged in as joe@example.com (hash: 'user_hash')
+    }); // user is logged in as joe@example.com (hash: 'hash123')
 
     _when('user has an anonymous account', function() {
       beforeEach(function () {
         this.account.username = 'randomhash';
-        this.account.ownerHash = 'randomhash';
 
         // NOTE:
         // I do not understand, why we have to resetBehavior here.
@@ -242,7 +236,6 @@ describe('hoodie.account', function () {
     _when('user has no account', function () {
       beforeEach(function() {
         delete this.account.username;
-        this.account.ownerHash = 'randomhash';
       });
 
       it('should send a sign out request, but not cleanup', function () {
@@ -359,7 +352,6 @@ describe('hoodie.account', function () {
 
     beforeEach(function () {
       this.sandbox.stub(this.account, 'request', this.fakeRequest);
-      this.account.ownerHash = 'hash123';
     });
 
     _when('username not set', function () {
@@ -634,10 +626,6 @@ describe('hoodie.account', function () {
           expect(this.data.password).to.eql('secret');
         });
 
-        it('should have set ownerHash to \'hash123\'', function () {
-          expect(this.data.ownerHash).to.eql('hash123');
-        });
-
         it('should have set database to \'user/hash123\'', function () {
           expect(this.data.database).to.eql('user/hash123');
         });
@@ -673,8 +661,7 @@ describe('hoodie.account', function () {
             this.requestDefers = [];
 
             //
-            this.account.ownerHash = 'hash123';
-            promise = this.account.signUp('hash123', 'secret');
+            promise = this.account.signUp( this.hoodie.id() , 'secret');
 
             var args = this.account.request.args[0];
             type = args[0],
@@ -731,12 +718,12 @@ describe('hoodie.account', function () {
             beforeEach(function () {
               this.requestDefers[1].resolve({
                 name: 'joe@example.com',
-                roles: ['user_hash', 'confirmed']
+                roles: ['hash123', 'confirmed']
               });
             });
 
             it('should resolve its promise', function () {
-              expect(this.promise).to.be.resolvedWith('joe@example.com', 'user_hash');
+              expect(this.promise).to.be.resolvedWith('joe@example.com', 'hash123');
             });
           }); // signIn successful
 
@@ -808,13 +795,11 @@ describe('hoodie.account', function () {
       this.signUpDefer = this.hoodie.defer();
 
       this.sandbox.stub(this.account, 'signUp').returns(this.signUpDefer.promise());
-
-      this.account.ownerHash = 'hash123';
     });
 
-    it('should sign up with username = account.ownerHash and the random password', function () {
+    it('should sign up with username = hoodie.id() and the random password', function () {
       this.account.anonymousSignUp();
-      expect(this.account.signUp).to.be.calledWith('hash123', 'uuid123');
+      expect(this.account.signUp).to.be.calledWith( 'hash123' , 'uuid123');
     });
 
     _when('signUp successful', function () {
@@ -885,7 +870,7 @@ describe('hoodie.account', function () {
           this.response = {
             'ok': true,
             'name': 'user/joe@example.com',
-            'roles': ['user_hash', 'confirmed']
+            'roles': ['hash123', 'confirmed']
           };
           this.hoodie.request.defer.resolve(this.response);
         });
@@ -964,7 +949,7 @@ describe('hoodie.account', function () {
             this.response = {
               'ok': true,
               'name': 'user/joe@example.com',
-              'roles': ['user_hash', 'confirmed']
+              'roles': ['hash123', 'confirmed']
             };
             this.hoodie.request.defer.resolve(this.response);
 
@@ -992,7 +977,7 @@ describe('hoodie.account', function () {
 
             it('should trigger `signin` event', function () {
               this.account.signIn('joe@example.com', 'secret');
-              expect(this.account.trigger).to.be.calledWith('signin', 'joe@example.com');
+              expect(this.account.trigger).to.be.calledWith('signin', 'joe@example.com', 'hash123');
             });
 
           }); // user has a manual account
@@ -1004,15 +989,6 @@ describe('hoodie.account', function () {
             expect(this.hoodie.config.set).to.be.calledWith('_account.username', 'joe@example.com');
           });
 
-          it('should set ownerHash', function () {
-            delete this.account.ownerHash;
-            this.account.signIn('joe@example.com', 'secret');
-
-            expect(this.account.ownerHash).to.eql('user_hash');
-            expect(this.hoodie.config.set).to.be.calledWith('_account.ownerHash', 'user_hash');
-            expect(this.hoodie.config.set).to.be.calledWith('createdBy', 'user_hash');
-          });
-
           it('should fetch the _users doc', function () {
             this.sandbox.spy(this.account, 'fetch');
             this.account.signIn('joe@example.com', 'secret');
@@ -1021,7 +997,7 @@ describe('hoodie.account', function () {
 
           it('should resolve with username and response', function () {
             this.account.signIn('joe@example.com', 'secret').then(function (res) {
-              expect(res).to.eql('joe@example.com', 'user_hash');
+              expect(res).to.eql('joe@example.com', 'hash123');
             });
           });
 
@@ -1131,7 +1107,7 @@ describe('hoodie.account', function () {
         this.response = {
           'ok': true,
           'name': 'user/joe@example.com',
-          'roles': ['user_hash', 'confirmed']
+          'roles': ['hash123', 'confirmed']
         };
         this.hoodie.request.defer.resolve(this.response);
       });
@@ -1140,17 +1116,17 @@ describe('hoodie.account', function () {
         expect(this.hoodie.store.add).to.be.calledWith('task', {
           id: 'abc',
           title: 'Milk',
-          createdBy: 'user_hash'
+          createdBy: 'hash123'
         });
         expect(this.hoodie.store.add).to.be.calledWith('task', {
           id: 'def',
           title: 'Wodka',
-          createdBy: 'user_hash'
+          createdBy: 'hash123'
         });
         expect(this.hoodie.store.add).not.to.be.calledWith('$config', {
           id: 'hoodie',
           some: 'funk',
-          createdBy: 'user_hash'
+          createdBy: 'hash123'
         });
       });
     }); // signout succeeds
@@ -1342,16 +1318,12 @@ describe('hoodie.account', function () {
         expect(this.account.trigger).to.be.calledWith('signout');
       });
 
-      it('should generate new ownerHash hash', function () {
-        expect(this.account.ownerHash).to.eql('uuid123');
+      it('should trigger `cleanup` event', function () {
+        expect(this.account.trigger).to.be.calledWith('cleanup');
       });
 
       it('should unset username', function () {
         expect(this.account.username).to.be(undefined);
-      });
-
-      it('should clear config', function () {
-        expect(this.hoodie.config.clear).to.be.called();
       });
 
       it('should return a resolved promise', function () {
@@ -1451,16 +1423,12 @@ describe('hoodie.account', function () {
             expect(this.account.trigger).to.be.calledWith('signout');
           });
 
-          it('should generate new ownerHash hash', function () {
-            expect(this.account.ownerHash).to.eql('uuid123');
+          it('should trigger `cleanup` event', function () {
+            expect(this.account.trigger).to.be.calledWith('cleanup');
           });
 
           it('should unset username', function () {
             expect(this.account.username).to.be(undefined);
-          });
-
-          it('should clear config', function () {
-            expect(this.hoodie.config.clear).to.be.called();
           });
         }); // signOut request successful
       }); // user has no local changes
@@ -1490,10 +1458,9 @@ describe('hoodie.account', function () {
   }); // #hasAccount
 
   describe('#hasAnonymousAccount()', function () {
-    _when('account.username equals account.ownerHash', function () {
+    _when('account.username equals hoodie.id()', function () {
       beforeEach(function () {
-        this.account.username = 'funky';
-        this.account.ownerHash = 'funky';
+        this.account.username = 'hash123';
       });
 
       it('should return true', function () {
@@ -1501,10 +1468,9 @@ describe('hoodie.account', function () {
       });
     }); // _account.anonymousPassword is set
 
-    _when('account.username does not equal account.ownerHash', function () {
+    _when('account.username does not equal hoodie.id()', function () {
       beforeEach(function () {
         this.account.username = 'funkyusername';
-        this.account.ownerHash = 'supersecret';
       });
 
       it('should return false', function () {
@@ -1514,11 +1480,10 @@ describe('hoodie.account', function () {
   }); // #hasAnonymousAccount
 
   describe('#db()', function () {
-    _when('account.ownerHash is \'hash123\'', function () {
+    _when('hoodie.id() returns \'hash123\'', function () {
 
-      beforeEach(function () {
-        this.account.ownerHash = 'hash123';
-        this.account.ownerHash;
+      beforeEach(function() {
+        this.hoodie.id.returns('hash123');
       });
 
       it('should return \'joe$example.com\'', function () {
@@ -1644,23 +1609,11 @@ describe('hoodie.account', function () {
             expect(this.account.username).to.be(undefined);
           });
 
-          it('should regenerate ownerHash', function () {
-            expect(this.account.ownerHash).to.eql('uuid123');
-          });
-
           it('should trigger signout event', function () {
             expect(this.account.trigger).to.be.calledWith('signout');
           });
 
-          it('should clear config', function () {
-            expect(this.hoodie.config.clear).to.be.called();
-          });
-
-          it('should set config._account.ownerHash to new ownerHash', function () {
-            expect(this.hoodie.config.set).to.be.calledWith('_account.ownerHash', 'uuid123');
-          });
-
-          it('should trigger clenaup event', function() {
+          it('should trigger cleanup event', function() {
             expect(this.account.trigger).to.be.calledWith('cleanup');
           });
         }); // destroy request succesful
@@ -1707,10 +1660,6 @@ describe('hoodie.account', function () {
           expect(this.account.username).to.eql('joe@example.com');
         });
 
-        it('should not regenerate ownerHash', function () {
-          expect(this.account.ownerHash).to.eql('hash123');
-        });
-
         it('should not trigger signout event', function () {
           expect(this.account.trigger).to.not.be.calledWith('signout');
         });
@@ -1740,20 +1689,12 @@ describe('hoodie.account', function () {
         expect(this.account.username).to.be(undefined);
       });
 
-      it('should regenerate ownerHash', function () {
-        expect(this.account.ownerHash).to.eql('uuid123');
-      });
-
       it('should trigger signout event', function () {
         expect(this.account.trigger).to.be.calledWith('signout');
       });
 
-      it('should clear config', function () {
-        expect(this.hoodie.config.clear).to.be.called();
-      });
-
-      it('should set config._account.ownerHash to new ownerHash', function () {
-        expect(this.hoodie.config.set).to.be.calledWith('_account.ownerHash', 'uuid123');
+      it('should trigger cleanup event', function () {
+        expect(this.account.trigger).to.be.calledWith('cleanup');
       });
     }); // user has no account
   }); // #destroy
@@ -2108,7 +2049,7 @@ function validSessionResponse () {
 function validSignInResponse () {
   return {
     name: 'user/joe@example.com',
-    roles: ['user_hash', 'confirmed']
+    roles: ['hash123', 'confirmed']
   };
 }
 
@@ -2154,7 +2095,7 @@ function with_session_validated_before (callback) {
       var response = {
         userCtx: {
           name: 'user/joe@example.com',
-          roles: ['user_hash', 'confirmed']
+          roles: ['hash123', 'confirmed']
         }
       };
       this.hoodie.request.defer.resolve(response);
