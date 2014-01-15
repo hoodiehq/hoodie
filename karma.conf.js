@@ -33,6 +33,7 @@ module.exports = function(config) {
       'test/specs/hoodie/error.spec.js',
       'test/specs/hoodie/events.spec.js',
       'test/specs/hoodie/generate_id.spec.js',
+      'test/specs/hoodie/id.spec.js',
       'test/specs/hoodie/local_store.spec.js',
       'test/specs/hoodie/open.spec.js',
       'test/specs/hoodie/promises.spec.js',
