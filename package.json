@@ -48,7 +48,8 @@
     "graceful-fs": "~2.0.1",
     "hoodie.js-assets": "git://github.com/gr2m/hoodie.js-assets.git",
     "expect.js": "~0.2.0",
-    "sinon": "~1.7.1"
+    "sinon": "~1.7.1",
+    "load-grunt-tasks": "~0.2.1"
   },
   "scripts": {
     "test": "grunt build --verbose",

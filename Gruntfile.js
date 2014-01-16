@@ -176,13 +176,8 @@ module.exports = function(grunt) {
     }
   });
 
-  grunt.loadNpmTasks('grunt-browserify');
-  grunt.loadNpmTasks('grunt-contrib-uglify');
-  grunt.loadNpmTasks('grunt-contrib-jshint');
-  grunt.loadNpmTasks('grunt-contrib-watch');
-  grunt.loadNpmTasks('grunt-contrib-concat');
-  grunt.loadNpmTasks('grunt-groc');
-  grunt.loadNpmTasks('grunt-karma');
+  // load all tasks defined in node_modules starting with 'grunt-'
+  require('load-grunt-tasks')(grunt);
 
   grunt.registerTask('default', ['test']);
   grunt.registerTask('build', ['jshint', 'karma:continuous', 'browserify:build', 'uglify']);
