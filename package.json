@@ -2,7 +2,7 @@
   "name": "hoodie",
   "title": "Hoodie.js",
   "description": "Hoodie library for the browser",
-  "version": "0.5.1",
+  "version": "0.5.2",
   "main": "./dist/hoodie.js",
   "homepage": "http://hood.ie",
   "repository": {
@@ -50,7 +50,8 @@
     "hoodie.js-assets": "git://github.com/gr2m/hoodie.js-assets.git",
     "expect.js": "~0.2.0",
     "sinon": "~1.7.1",
-    "load-grunt-tasks": "~0.2.1"
+    "load-grunt-tasks": "~0.2.1",
+    "grunt-bump": "0.0.13"
   },
   "scripts": {
     "test": "grunt build --verbose",
