@@ -173,6 +173,23 @@ module.exports = function(grunt) {
           standalone: 'Hoodie'
         }
       }
+    },
+
+    // https://github.com/vojtajina/grunt-bump
+    // bump version of hoodie.js
+    bump: {
+      options: {
+        files: ['package.json', 'bower.json'],
+        updateConfigs: [],
+        commit: true,
+        commitMessage: 'Release %VERSION%',
+        commitFiles: ['package.json', 'bower.json'], // '-a' for all files
+        createTag: true,
+        tagName: '%VERSION%',
+        tagMessage: 'Version %VERSION%',
+        push: true,
+        pushTo: 'origin'
+      }
     }
   });
 
