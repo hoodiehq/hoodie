@@ -8,7 +8,7 @@
   },
   "dependencies": {
     "hoodie": "git://github.com/hoodiehq/hoodie.js.git",
-    "http-proxy": "*",
+    "http-proxy": "0.10.x*",
     "connect": "2.7.4",
     "multicouch": ">=0.6.1",
     "hoodie-pocket": "0.0.12",
