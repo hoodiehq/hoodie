@@ -8,11 +8,11 @@
     "url": "https://github.com/hoodiehq/hoodie-server.git"
   },
   "dependencies": {
-    "hoodie": "git://github.com/hoodiehq/hoodie.js.git",
-    "multicouch": ">=0.6.1",
+    "hoodie": "0.5.2",
+    "multicouch": "0.6.1",
     "hoodie-pocket": "0.0.12",
     "hoodie-plugins-manager": "0.0.11",
-    "local-tld-lib": "*",
+    "local-tld-lib": "1.0.2",
     "underscore": "1.4.4",
     "async": "0.2.7",
     "bytes": "0.2.1",
@@ -22,12 +22,12 @@
     "couchr": "0.0.13",
     "cli-color": "0.2.2",
     "lock": "0.0.3",
-    "semver": ">=1.1.4",
+    "semver": "1.1.4",
     "optimist": "0.5.0",
     "ports": "1.0.0",
     "mkdirp": "0.3.5",
-    "hapi": "~2.0.0-preview",
-    "http-proxy": "~0.10.4"
+    "hapi": "2.0.0",
+    "http-proxy": "0.10.4"
   },
   "scripts": {
     "start": "bin/start",
