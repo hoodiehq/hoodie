@@ -230,7 +230,7 @@ function hoodieTask(hoodie) {
     var error;
 
     // "new" tasks are trigger as "start" events
-    if (eventName === 'new') {
+    if (eventName === 'add') {
       eventName = 'start';
     }
 
