@@ -399,7 +399,7 @@ describe('hoodie.task', function() {
     });
 
     it('turns "new" store events into "start" task events', function() {
-      this.events['store:change']('new', { type: '$message', text: 'funk!'}, {option: 'value'});
+      this.events['store:change']('add', { type: '$message', text: 'funk!'}, {option: 'value'});
       expect( this.task.trigger ).to.be.calledWith( 'change', 'start', { type: 'message', text: 'funk!'}, {option: 'value'} );
       expect( this.task.trigger ).to.be.calledWith( 'message:change', 'start', { type: 'message', text: 'funk!'}, {option: 'value'} );
       expect( this.task.trigger ).to.be.calledWith( 'start', { type: 'message', text: 'funk!'}, {option: 'value'} );
@@ -408,7 +408,7 @@ describe('hoodie.task', function() {
     });
 
     it('ignores tasks on non-task objects', function() {
-      this.events['store:change']('new', { type: 'message', text: 'funk!'}, {option: 'value'});
+      this.events['store:change']('add', { type: 'message', text: 'funk!'}, {option: 'value'});
       expect( this.task.trigger ).to.not.be.called();
     });
 
