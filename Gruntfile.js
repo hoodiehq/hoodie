@@ -4,7 +4,7 @@ module.exports = function(grunt) {
 
   var banner = '// <%= pkg.title %> - <%= pkg.version%>\n';
   banner += '// https://github.com/hoodiehq/hoodie.js\n';
-  banner += '// Copyright 2012, 2013 https://github.com/hoodiehq/\n';
+  banner += '// Copyright 2012 - 2014 https://github.com/hoodiehq/\n';
   banner += '// Licensed Apache License 2.0\n';
   banner += '\n';
   banner += '(function(global) {\n';

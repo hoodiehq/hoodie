@@ -20,6 +20,7 @@
   ],
   "keywords": [
     "nobackend",
+    "offline-first",
     "frontend-only"
   ],
   "devDependencies": {
@@ -44,7 +45,7 @@
     "grunt-browserify": "~1.2.11",
     "grunt-umd": "~1.3.0",
     "browserify": "~2.35.1",
-    "karma-browserify": "git://github.com/gr2m/karma-browserify.git",
+    "karma-browserify": "0.0.6",
     "graceful-fs": "~2.0.1",
     "hoodie.js-assets": "git://github.com/gr2m/hoodie.js-assets.git",
     "expect.js": "~0.2.0",
