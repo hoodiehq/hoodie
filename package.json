@@ -11,7 +11,7 @@
     "hoodie": "0.5.2",
     "multicouch": "0.8.1",
     "hoodie-pocket": "0.0.12",
-    "hoodie-plugins-manager": "0.0.11",
+    "hoodie-plugins-manager": "0.1.2",
     "local-tld-lib": "1.0.2",
     "underscore": "1.4.4",
     "async": "0.2.7",
