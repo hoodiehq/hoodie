@@ -29,6 +29,11 @@ function hoodieId (hoodie) {
   //
   function init() {
     id = hoodie.config.get('_hoodieId');
+
+    // DEPRECATED, remove before 1.0
+    if (! id) {
+      hoodie.config.get('_account.ownerHash');
+    }
   }
 
   // allow to run init only once from outside
