@@ -4,18 +4,18 @@
 // the door to world domination (apps)
 //
 
-var hoodieAccount = require('./hoodie/account');
-var hoodieAccountRemote = require('./hoodie/account_remote');
-var hoodieConfig = require('./hoodie/config');
-var hoodiePromises = require('./hoodie/promises');
-var hoodieRequest = require('./hoodie/request');
-var hoodieConnection = require('./hoodie/connection');
-var hoodieDispose = require('./hoodie/dispose');
-var hoodieOpen = require('./hoodie/open');
-var hoodieLocalStore = require('./hoodie/local_store');
-var hoodieGenerateId = require('./hoodie/generate_id');
-var hoodieTask = require('./hoodie/task');
-var hoodieEvents = require('./hoodie/events');
+var hoodieAccount = require('./core/account');
+var hoodieAccountRemote = require('./core/account/remote');
+var hoodieConfig = require('./core/config');
+var hoodiePromises = require('./utils/promises');
+var hoodieRequest = require('./core/request');
+var hoodieConnection = require('./core/connection');
+var hoodieDispose = require('./utils/dispose');
+var hoodieOpen = require('./utils/open');
+var hoodieLocalStore = require('./core/store/local');
+var hoodieGenerateId = require('./utils/generate_id');
+var hoodieTask = require('./core/task/index');
+var hoodieEvents = require('./core/events');
 
 // Constructor
 // -------------
@@ -72,7 +72,7 @@ function Hoodie(baseUrl) {
   // * hoodie.reject
   // * hoodie.resolveWith
   // * hoodie.rejectWith
-  hoodie.extend(hoodiePromises );
+  hoodie.extend(hoodiePromises);
 
   // * hoodie.request
   hoodie.extend(hoodieRequest);
@@ -134,7 +134,7 @@ function Hoodie(baseUrl) {
   // authenticate
   // we use a closure to not pass the username to connect, as it
   // would set the name of the remote store, which is not the username.
-  hoodie.account.authenticate().then( function( /* username */ ) {
+  hoodie.account.authenticate().then(function( /* username */ ) {
     hoodie.remote.connect();
   });
 
@@ -158,7 +158,6 @@ function Hoodie(baseUrl) {
 //
 // Hoodie.extend(funcion(hoodie) { hoodie.myMagic = function() {} })
 //
-
 var extensions = [];
 
 Hoodie.extend = function(extension) {
@@ -174,32 +173,4 @@ function applyExtensions(hoodie) {
   }
 }
 
-//
-// expose Hoodie to module loaders. Based on jQuery's implementation.
-//
-if ( typeof module === 'object' && module && typeof module.exports === 'object' ) {
-
-  // Expose Hoodie as module.exports in loaders that implement the Node
-  // module pattern (including browserify). Do not create the global, since
-  // the user will be storing it themselves locally, and globals are frowned
-  // upon in the Node module world.
-  module.exports = Hoodie;
-
-
-} else if ( typeof define === 'function' && define.amd ) {
-
-  // Register as a named AMD module, since Hoodie can be concatenated with other
-  // files that may use define, but not via a proper concatenation script that
-  // understands anonymous AMD modules. A named AMD is safest and most robust
-  // way to register. Lowercase hoodie is used because AMD module names are
-  // derived from file names, and Hoodie is normally delivered in a lowercase
-  // file name.
-  define(function () {
-    return Hoodie;
-  });
-
-} else {
-
-  // set global
-  global.Hoodie = Hoodie;
-}
+module.exports = Hoodie;

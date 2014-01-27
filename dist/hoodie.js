@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 !function(e){"object"==typeof exports?module.exports=e():"function"==typeof define&&define.amd?define(e):"undefined"!=typeof window?window.Hoodie=e():"undefined"!=typeof global?global.Hoodie=e():"undefined"!=typeof self&&(self.Hoodie=e())}(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);throw new Error("Cannot find module '"+o+"'")}var f=n[o]={exports:{}};t[o][0].call(f.exports,function(e){var n=t[o][1][e];return s(n?n:e)},f,f.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 var hasOwn = Object.prototype.hasOwnProperty;
 var toString = Object.prototype.toString;
@@ -231,69 +232,110 @@ function Hoodie(baseUrl) {
   //
   applyExtensions(hoodie);
 }
+=======
+// Hoodie.js - 0.5.3
+// https://github.com/hoodiehq/hoodie.js
+// Copyright 2012, 2013 https://github.com/hoodiehq/
+// Licensed Apache License 2.0
 
-// Extending hoodie
-// ------------------
+!function(e){"object"==typeof exports?module.exports=e():"function"==typeof define&&define.amd?define(e):"undefined"!=typeof window?window.Hoodie=e():"undefined"!=typeof global?global.Hoodie=e():"undefined"!=typeof self&&(self.Hoodie=e())}(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);throw new Error("Cannot find module '"+o+"'")}var f=n[o]={exports:{}};t[o][0].call(f.exports,function(e){var n=t[o][1][e];return s(n?n:e)},f,f.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
+var hasOwn = Object.prototype.hasOwnProperty;
+var toString = Object.prototype.toString;
+>>>>>>> dev_browserify
 
-// You can extend the Hoodie class like so:
-//
-// Hoodie.extend(funcion(hoodie) { hoodie.myMagic = function() {} })
-//
+function isPlainObject(obj) {
+	if (!obj || toString.call(obj) !== '[object Object]' || obj.nodeType || obj.setInterval)
+		return false;
 
-var extensions = [];
+	var has_own_constructor = hasOwn.call(obj, 'constructor');
+	var has_is_property_of_method = hasOwn.call(obj.constructor.prototype, 'isPrototypeOf');
+	// Not own constructor property must be Object
+	if (obj.constructor && !has_own_constructor && !has_is_property_of_method)
+		return false;
 
-Hoodie.extend = function(extension) {
-  extensions.push(extension);
+	// Own properties are enumerated firstly, so to speed up,
+	// if last one is own, then all properties are own.
+	var key;
+	for ( key in obj ) {}
+
+	return key === undefined || hasOwn.call( obj, key );
 };
 
-//
-// detect available extensions and attach to Hoodie Object.
-//
-function applyExtensions(hoodie) {
-  for (var i = 0; i < extensions.length; i++) {
-    extensions[i](hoodie);
-  }
-}
+module.exports = function extend() {
+	var options, name, src, copy, copyIsArray, clone,
+	    target = arguments[0] || {},
+	    i = 1,
+	    length = arguments.length,
+	    deep = false;
 
-//
-// expose Hoodie to module loaders. Based on jQuery's implementation.
-//
-if ( typeof module === 'object' && module && typeof module.exports === 'object' ) {
+	// Handle a deep copy situation
+	if ( typeof target === "boolean" ) {
+		deep = target;
+		target = arguments[1] || {};
+		// skip the boolean and the target
+		i = 2;
+	}
 
-  // Expose Hoodie as module.exports in loaders that implement the Node
-  // module pattern (including browserify). Do not create the global, since
-  // the user will be storing it themselves locally, and globals are frowned
-  // upon in the Node module world.
-  module.exports = Hoodie;
+	// Handle case when target is a string or something (possible in deep copy)
+	if ( typeof target !== "object" && typeof target !== "function") {
+		target = {};
+	}
 
+	for ( ; i < length; i++ ) {
+		// Only deal with non-null/undefined values
+		if ( (options = arguments[ i ]) != null ) {
+			// Extend the base object
+			for ( name in options ) {
+				src = target[ name ];
+				copy = options[ name ];
 
-} else if ( typeof define === 'function' && define.amd ) {
+				// Prevent never-ending loop
+				if ( target === copy ) {
+					continue;
+				}
 
-  // Register as a named AMD module, since Hoodie can be concatenated with other
-  // files that may use define, but not via a proper concatenation script that
-  // understands anonymous AMD modules. A named AMD is safest and most robust
-  // way to register. Lowercase hoodie is used because AMD module names are
-  // derived from file names, and Hoodie is normally delivered in a lowercase
-  // file name.
-  define(function () {
-    return Hoodie;
-  });
+				// Recurse if we're merging plain objects or arrays
+				if ( deep && copy && ( isPlainObject(copy) || (copyIsArray = Array.isArray(copy)) ) ) {
+					if ( copyIsArray ) {
+						copyIsArray = false;
+						clone = src && Array.isArray(src) ? src : [];
 
-} else {
+					} else {
+						clone = src && isPlainObject(src) ? src : {};
+					}
 
-  // set global
-  global.Hoodie = Hoodie;
-}
+					// Never move original objects, clone them
+					target[ name ] = extend( deep, clone, copy );
 
+				// Don't bring in undefined values
+				} else if ( copy !== undefined ) {
+					target[ name ] = copy;
+				}
+			}
+		}
+	}
+
+	// Return the modified object
+	return target;
+};
+
+<<<<<<< HEAD
 },{"./hoodie/account":3,"./hoodie/account_remote":4,"./hoodie/config":5,"./hoodie/connection":6,"./hoodie/dispose":7,"./hoodie/events":11,"./hoodie/generate_id":12,"./hoodie/local_store":13,"./hoodie/open":14,"./hoodie/promises":15,"./hoodie/request":17,"./hoodie/task":21}],3:[function(require,module,exports){
 var global=typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {};// Hoodie.Account
 // ================
 
 var hoodieEvents = require('./events');
 var extend = require('extend');
+=======
+},{}],2:[function(require,module,exports){
+// Hoodie.Account
+// ================
+
+var hoodieEvents = require('../events');
+>>>>>>> dev_browserify
 
 //
-function hoodieAccount (hoodie) {
+function hoodieAccount(hoodie) {
   // public API
   var account = {};
 
@@ -311,7 +353,10 @@ function hoodieAccount (hoodie) {
   var userDocPrefix = 'org.couchdb.user';
 
   // add events API
-  hoodieEvents(hoodie, { context: account, namespace: 'account'});
+  hoodieEvents(hoodie, {
+    context: account,
+    namespace: 'account'
+  });
 
   // Authenticate
   // --------------
@@ -346,7 +391,7 @@ function hoodieAccount (hoodie) {
     }
 
     // if user has no account, make sure to end the session
-    if (! account.hasAccount()) {
+    if (!account.hasAccount()) {
       return sendSignOutRequest().then(function() {
         authenticated = false;
         return hoodie.reject();
@@ -358,8 +403,7 @@ function hoodieAccount (hoodie) {
     //
     sendAndHandleAuthRequest = function() {
       return account.request('GET', '/_session').then(
-        handleAuthenticateRequestSuccess
-      );
+      handleAuthenticateRequestSuccess);
     };
 
     return withSingleRequest('authenticate', sendAndHandleAuthRequest);
@@ -373,7 +417,7 @@ function hoodieAccount (hoodie) {
   // meaning that the data cannot be synchronized.
   //
   account.hasValidSession = function() {
-    if (! account.hasAccount()) {
+    if (!account.hasAccount()) {
       return false;
     }
 
@@ -388,7 +432,7 @@ function hoodieAccount (hoodie) {
   // meaning that the data cannot be synchronized.
   //
   account.hasInvalidSession = function() {
-    if (! account.hasAccount()) {
+    if (!account.hasAccount()) {
       return false;
     }
 
@@ -443,9 +487,7 @@ function hoodieAccount (hoodie) {
     };
 
     return account.request('PUT', userDocUrl(username), options).then(
-      handleSignUpSuccess(username, password),
-      handleSignUpError(username)
-    );
+    handleSignUpSuccess(username, password), handleSignUpError(username));
   };
 
 
@@ -535,12 +577,12 @@ function hoodieAccount (hoodie) {
   //
   account.signIn = function signIn(username, password, options) {
     var signOutAndSignIn = function() {
-      return account.signOut({
-        silent: true
-      }).then(function() {
-        return sendSignInRequest(username, password);
-      });
-    };
+        return account.signOut({
+          silent: true
+        }).then(function() {
+          return sendSignInRequest(username, password);
+        });
+      };
     var currentData;
 
     options = options || {};
@@ -557,16 +599,13 @@ function hoodieAccount (hoodie) {
     username = username.toLowerCase();
 
     if (username !== account.username) {
-      if (! options.moveData) {
+      if (!options.moveData) {
         return signOutAndSignIn();
       }
 
-      return hoodie.store.findAll()
-      .then(function(data) {
+      return hoodie.store.findAll().then(function(data) {
         currentData = data;
-      })
-      .then(signOutAndSignIn)
-      .done(function() {
+      }).then(signOutAndSignIn).done(function() {
         currentData.forEach(function(object) {
           var type = object.type;
 
@@ -606,10 +645,7 @@ function hoodieAccount (hoodie) {
       });
     }
 
-    return pushLocalChanges(options)
-    .then(hoodie.remote.disconnect)
-    .then(sendSignOutRequest)
-    .then(cleanupAndTriggerSignOut);
+    return pushLocalChanges(options).then(hoodie.remote.disconnect).then(sendSignOutRequest).then(cleanupAndTriggerSignOut);
   };
 
 
@@ -680,8 +716,7 @@ function hoodieAccount (hoodie) {
     hoodie.remote.disconnect();
 
     return account.fetch().then(
-      sendChangeUsernameAndPasswordRequest(currentPassword, null, newPassword)
-    );
+    sendChangeUsernameAndPasswordRequest(currentPassword, null, newPassword));
   };
 
 
@@ -728,8 +763,7 @@ function hoodieAccount (hoodie) {
 
     // TODO: spec that checkPasswordReset gets executed
     return withPreviousRequestsAborted('resetPassword', function() {
-      return account.request('PUT', '/_users/' + (encodeURIComponent(key)), options).done( account.checkPasswordReset )
-      .then( awaitPasswordResetResult );
+      return account.request('PUT', '/_users/' + (encodeURIComponent(key)), options).done(account.checkPasswordReset).then(awaitPasswordResetResult);
     });
   };
 
@@ -770,9 +804,7 @@ function hoodieAccount (hoodie) {
 
     return withPreviousRequestsAborted('passwordResetStatus', function() {
       return account.request('GET', url, options).then(
-        handlePasswordResetStatusRequestSuccess,
-        handlePasswordResetStatusRequestError
-      ).fail(function(error) {
+      handlePasswordResetStatusRequestSuccess, handlePasswordResetStatusRequestError).fail(function(error) {
         if (error.name === 'HoodiePendingError') {
           global.setTimeout(account.checkPasswordReset, 1000);
           return;
@@ -810,9 +842,7 @@ function hoodieAccount (hoodie) {
     }
 
     return account.fetch().then(
-      handleFetchBeforeDestroySuccess,
-      handleFetchBeforeDestroyError
-    ).then(cleanupAndTriggerSignOut);
+    handleFetchBeforeDestroySuccess, handleFetchBeforeDestroyError).then(cleanupAndTriggerSignOut);
   };
 
 
@@ -834,7 +864,7 @@ function hoodieAccount (hoodie) {
   // ---------
 
   // reauthenticate: force hoodie to reauthenticate
-  function reauthenticate () {
+  function reauthenticate() {
     authenticated = undefined;
     return account.authenticate();
   }
@@ -1102,6 +1132,7 @@ function hoodieAccount (hoodie) {
   function awaitPasswordResetResult() {
     var defer = hoodie.defer();
 
+<<<<<<< HEAD
     account.one('passwordreset', defer.resolve );
     account.on('error:passwordreset', removePasswordResetObject );
     account.on('error:passwordreset', defer.reject );
@@ -1111,6 +1142,15 @@ function hoodieAccount (hoodie) {
       account.unbind('passwordreset', defer.resolve );
       account.unbind('error:passwordreset', removePasswordResetObject );
       account.unbind('error:passwordreset', defer.reject );
+=======
+    account.one('passwordreset', defer.resolve);
+    account.one('error:passwordreset', defer.reject);
+
+    // clean up callbacks when either gets called
+    defer.always(function() {
+      account.unbind('passwordreset', defer.resolve);
+      account.unbind('error:passwordreset', defer.reject);
+>>>>>>> dev_browserify
     });
 
     return defer.promise();
@@ -1157,8 +1197,7 @@ function hoodieAccount (hoodie) {
       silent: true
     }).then(function() {
       return account.fetch().then(
-        sendChangeUsernameAndPasswordRequest(currentPassword, newUsername, newPassword)
-      );
+      sendChangeUsernameAndPasswordRequest(currentPassword, newUsername, newPassword));
     });
   }
 
@@ -1311,8 +1350,12 @@ function hoodieAccount (hoodie) {
 
       return withPreviousRequestsAborted('updateUsersDoc', function() {
         return account.request('PUT', userDocUrl(), options).then(
+<<<<<<< HEAD
           handleChangeUsernameAndPasswordResponse(newUsername, newPassword || currentPassword)
         );
+=======
+        handleChangeUsernameAndPasswordResponse(newUsername, newPassword || currentPassword));
+>>>>>>> dev_browserify
       });
 
     };
@@ -1331,8 +1374,12 @@ function hoodieAccount (hoodie) {
       if (newUsername) {
         // note that if username has been changed, newPassword is the current password.
         // We always change either the one, or the other.
+<<<<<<< HEAD
         return awaitCurrentAccountRemoved(account.username, newPassword)
         .then( function() {
+=======
+        return awaitCurrentAccountRemoved(account.username, newPassword).then(function() {
+>>>>>>> dev_browserify
           return account.signIn(newUsername, newPassword);
         });
       } else {
@@ -1344,7 +1391,11 @@ function hoodieAccount (hoodie) {
   //
   // keep sending sign in requests until the server returns a 401
   //
+<<<<<<< HEAD
   function awaitCurrentAccountRemoved (username, password, defer) {
+=======
+  function awaitCurrentAccountRemoved(username, password, defer) {
+>>>>>>> dev_browserify
     if (!defer) {
       defer = hoodie.defer();
     }
@@ -1358,9 +1409,15 @@ function hoodieAccount (hoodie) {
 
     withPreviousRequestsAborted('signIn', function() {
       return account.request('POST', '/_session', requestOptions);
+<<<<<<< HEAD
     }).done( function() {
       window.setTimeout(awaitCurrentAccountRemoved, 300, username, password, defer);
     }).fail( function(error) {
+=======
+    }).done(function() {
+      window.setTimeout(awaitCurrentAccountRemoved, 300, username, password, defer);
+    }).fail(function(error) {
+>>>>>>> dev_browserify
       if (error.status === 401) {
         return defer.resolve();
       }
@@ -1411,7 +1468,7 @@ function hoodieAccount (hoodie) {
   // in any case with `{ignoreLocalChanges: true}`
   //
   function pushLocalChanges(options) {
-    if(hoodie.store.hasLocalChanges() && !options.ignoreLocalChanges) {
+    if (hoodie.store.hasLocalChanges() && !options.ignoreLocalChanges) {
       return hoodie.remote.push();
     }
     return hoodie.resolve();
@@ -1447,8 +1504,7 @@ function hoodieAccount (hoodie) {
       var promise = account.request('POST', '/_session', requestOptions);
 
       return promise.then(
-        handleSignInSuccess(options)
-      );
+      handleSignInSuccess(options));
     });
   }
 
@@ -1474,7 +1530,11 @@ function hoodieAccount (hoodie) {
 
 module.exports = hoodieAccount;
 
+<<<<<<< HEAD
 },{"./events":11,"extend":1}],4:[function(require,module,exports){
+=======
+},{"../events":9}],3:[function(require,module,exports){
+>>>>>>> dev_browserify
 // AccountRemote
 // ===============
 
@@ -1693,7 +1753,11 @@ function hoodieConfig(hoodie) {
 
 module.exports = hoodieConfig;
 
+<<<<<<< HEAD
 },{}],6:[function(require,module,exports){
+=======
+},{}],5:[function(require,module,exports){
+>>>>>>> dev_browserify
 var global=typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {};// hoodie.checkConnection() & hoodie.isConnected()
 // =================================================
 
@@ -1786,6 +1850,7 @@ function hoodieConnection(hoodie) {
 
 module.exports = hoodieConnection;
 
+<<<<<<< HEAD
 },{}],7:[function(require,module,exports){
 // hoodie.dispose
 // ================
@@ -1809,6 +1874,9 @@ function hoodieDispose (hoodie) {
 module.exports = hoodieDispose;
 
 },{}],8:[function(require,module,exports){
+=======
+},{}],6:[function(require,module,exports){
+>>>>>>> dev_browserify
 // Hoodie Error
 // -------------
 
@@ -1842,8 +1910,11 @@ module.exports = hoodieDispose;
 var errorMessageReplacePattern = /\{\{\s*\w+\s*\}\}/g;
 var errorMessageFindPropertyPattern = /\w+/;
 
+<<<<<<< HEAD
 var extend = require('extend');
 
+=======
+>>>>>>> dev_browserify
 function HoodieError(properties) {
 
   // normalize arguments
@@ -1853,37 +1924,57 @@ function HoodieError(properties) {
     };
   }
 
+<<<<<<< HEAD
   if (! properties.message) {
+=======
+  if (!properties.message) {
+>>>>>>> dev_browserify
     throw new Error('FATAL: error.message must be set');
   }
 
   // must check for properties, as this.name is always set.
+<<<<<<< HEAD
   if (! properties.name) {
     properties.name = 'HoodieError';
   }
 
   extend(this, properties);
 
+=======
+  if (!properties.name) {
+    properties.name = 'HoodieError';
+  }
+
+>>>>>>> dev_browserify
   properties.message = properties.message.replace(errorMessageReplacePattern, function(match) {
     var property = match.match(errorMessageFindPropertyPattern)[0];
     return properties[property];
   });
 
+<<<<<<< HEAD
   extend(this, properties);
+=======
+  $.extend(this, properties);
+>>>>>>> dev_browserify
 }
 HoodieError.prototype = new Error();
 HoodieError.prototype.constructor = HoodieError;
 
 module.exports = HoodieError;
 
+<<<<<<< HEAD
 },{"extend":1}],9:[function(require,module,exports){
+=======
+
+},{}],7:[function(require,module,exports){
+>>>>>>> dev_browserify
 // Hoodie Invalid Type Or Id Error
 // -------------------------------
 
 // only lowercase letters, numbers and dashes
 // are allowed for object IDs.
 //
-var HoodieError = require('../error');
+var HoodieError = require('./error');
 
 //
 function HoodieObjectIdError(properties) {
@@ -1894,7 +1985,7 @@ function HoodieObjectIdError(properties) {
 }
 var validIdPattern = /^[a-z0-9\-]+$/;
 HoodieObjectIdError.isInvalid = function(id, customPattern) {
-  return ! (customPattern || validIdPattern).test(id || '');
+  return !(customPattern || validIdPattern).test(id || '');
 };
 HoodieObjectIdError.isValid = function(id, customPattern) {
   return (customPattern || validIdPattern).test(id || '');
@@ -1903,7 +1994,11 @@ HoodieObjectIdError.prototype.rules = 'Lowercase letters, numbers and dashes all
 
 module.exports = HoodieObjectIdError;
 
+<<<<<<< HEAD
 },{"../error":8}],10:[function(require,module,exports){
+=======
+},{"./error":6}],8:[function(require,module,exports){
+>>>>>>> dev_browserify
 // Hoodie Invalid Type Or Id Error
 // -------------------------------
 
@@ -1911,8 +2006,14 @@ module.exports = HoodieObjectIdError;
 // are allowed for object types, plus must start
 // with a letter.
 //
-var HoodieError = require('../error');
+var HoodieError = require('./error');
 
+// Hoodie Invalid Type Or Id Error
+// -------------------------------
+
+// only lowercase letters, numbers and dashes
+// are allowed for object types, plus must start
+// with a letter.
 //
 function HoodieObjectTypeError(properties) {
   properties.name = 'HoodieObjectTypeError';
@@ -1922,7 +2023,7 @@ function HoodieObjectTypeError(properties) {
 }
 var validTypePattern = /^[a-z$][a-z0-9]+$/;
 HoodieObjectTypeError.isInvalid = function(type, customPattern) {
-  return ! (customPattern || validTypePattern).test(type || '');
+  return !(customPattern || validTypePattern).test(type || '');
 };
 HoodieObjectTypeError.isValid = function(type, customPattern) {
   return (customPattern || validTypePattern).test(type || '');
@@ -1931,7 +2032,11 @@ HoodieObjectTypeError.prototype.rules = 'lowercase letters, numbers and dashes a
 
 module.exports = HoodieObjectTypeError;
 
+<<<<<<< HEAD
 },{"../error":8}],11:[function(require,module,exports){
+=======
+},{"./error":6}],9:[function(require,module,exports){
+>>>>>>> dev_browserify
 // Events
 // ========
 //
@@ -1948,7 +2053,6 @@ module.exports = HoodieObjectTypeError;
 // callbacks are global, while the events API is used at several places,
 // like hoodie.on / hoodie.store.on / hoodie.task.on etc.
 //
-
 function hoodieEvents(hoodie, options) {
   var context = hoodie;
   var namespace = '';
@@ -1995,9 +2099,9 @@ function hoodieEvents(hoodie, options) {
   function one(ev, callback) {
     ev = namespace + ev;
     var wrapper = function() {
-      hoodie.unbind(ev, wrapper);
-      callback.apply(null, arguments);
-    };
+        hoodie.unbind(ev, wrapper);
+        callback.apply(null, arguments);
+      };
     hoodie.bind(ev, wrapper);
   }
 
@@ -2096,6 +2200,7 @@ function hoodieEvents(hoodie, options) {
 
 module.exports = hoodieEvents;
 
+<<<<<<< HEAD
 },{}],12:[function(require,module,exports){
 // hoodie.generateId
 // =============
@@ -2103,48 +2208,179 @@ module.exports = hoodieEvents;
 // helper to generate unique ids.
 function hoodieGenerateId (hoodie) {
   var chars, i, radix;
+=======
+},{}],10:[function(require,module,exports){
+//
+// hoodie.request
+// ================
+>>>>>>> dev_browserify
 
-  // uuids consist of numbers and lowercase letters only.
-  // We stick to lowercase letters to prevent confusion
-  // and to prevent issues with CouchDB, e.g. database
-  // names do wonly allow for lowercase letters.
-  chars = '0123456789abcdefghijklmnopqrstuvwxyz'.split('');
-  radix = chars.length;
+// Hoodie's central place to send request to its backend.
+// At the moment, it's a wrapper around jQuery's ajax method,
+// but we might get rid of this dependency in the future.
+//
+// It has build in support for CORS and a standard error
+// handling that normalizes errors returned by CouchDB
+// to JavaScript's native conventions of errors having
+// a name & a message property.
+//
+// Common errors to expect:
+//
+// * HoodieRequestError
+// * HoodieUnauthorizedError
+// * HoodieConflictError
+// * HoodieServerError
 
+var hoodieUtils = require('../utils/index');
 
-  function generateId(length) {
-    var id = '';
+var extend = require('extend');
 
-    // default uuid length to 7
-    if (length === undefined) {
-      length = 7;
+function hoodieRequest(hoodie) {
+  var $ajax = $.ajax;
+
+  // Hoodie backend listents to requests prefixed by /_api,
+  // so we prefix all requests with relative URLs
+  var API_PATH = '/_api';
+
+  // Requests
+  // ----------
+
+  // sends requests to the hoodie backend.
+  //
+  //     promise = hoodie.request('GET', '/user_database/doc_id')
+  //
+  function request(type, url, options) {
+    var defaults, requestPromise, pipedPromise;
+
+    options = options || {};
+
+    defaults = {
+      type: type,
+      dataType: 'json'
+    };
+
+    // if absolute path passed, set CORS headers
+
+    // if relative path passed, prefix with baseUrl
+    if (!/^http/.test(url)) {
+      url = (hoodie.baseUrl || '') + API_PATH + url;
     }
 
-    for (i = 0; i < length; i++) {
-      var rand = Math.random() * radix;
-      var char = chars[Math.floor(rand)];
-      id += String(char).charAt(0);
+    // if url is cross domain, set CORS headers
+    if (/^http/.test(url)) {
+      defaults.xhrFields = {
+        withCredentials: true
+      };
+      defaults.crossDomain = true;
     }
 
-    return id;
+    defaults.url = url;
+
+
+    // we are piping the result of the request to return a nicer
+    // error if the request cannot reach the server at all.
+    // We can't return the promise of ajax directly because of
+    // the piping, as for whatever reason the returned promise
+    // does not have the `abort` method any more, maybe others
+    // as well. See also http://bugs.jquery.com/ticket/14104
+    requestPromise = $ajax(extend(defaults, options));
+    pipedPromise = requestPromise.then( null, handleRequestError);
+    pipedPromise.abort = requestPromise.abort;
+
+    return pipedPromise;
   }
 
   //
-  // Public API
   //
-  hoodie.generateId = generateId;
+  //
+  function handleRequestError(xhr) {
+    var error;
+
+    try {
+      error = parseErrorFromResponse(xhr);
+    } catch (_error) {
+
+      if (xhr.responseText) {
+        error = xhr.responseText;
+      } else {
+        error = {
+          name: 'HoodieConnectionError',
+          message: 'Could not connect to Hoodie server at {{url}}.',
+          url: hoodie.baseUrl || '/'
+        };
+      }
+    }
+
+    return hoodie.rejectWith(error).promise();
+  }
+
+  //
+  // CouchDB returns errors in JSON format, with the properties
+  // `error` and `reason`. Hoodie uses JavaScript's native Error
+  // properties `name` and `message` instead, so we are normalizing
+  // that.
+  //
+  // Besides the renaming we also do a matching with a map of known
+  // errors to make them more clear. For reference, see
+  // https://wiki.apache.org/couchdb/Default_http_errors &
+  // https://github.com/apache/couchdb/blob/master/src/couchdb/couch_httpd.erl#L807
+  //
+
+  function parseErrorFromResponse(xhr) {
+    var error = JSON.parse(xhr.responseText);
+
+    // get error name
+    error.name = HTTP_STATUS_ERROR_MAP[xhr.status];
+    if (! error.name) {
+      error.name = hoodieUtils.hoodiefyRequestErrorName(error.error);
+    }
+
+    // store status & message
+    error.status = xhr.status;
+    error.message = error.reason || '';
+    error.message = error.message.charAt(0).toUpperCase() + error.message.slice(1);
+
+    // cleanup
+    delete error.error;
+    delete error.reason;
+
+    return error;
+  }
+
+  // map CouchDB HTTP status codes to Hoodie Errors
+  var HTTP_STATUS_ERROR_MAP = {
+    400: 'HoodieRequestError', // bad request
+    401: 'HoodieUnauthorizedError',
+    403: 'HoodieRequestError', // forbidden
+    404: 'HoodieNotFoundError', // forbidden
+    409: 'HoodieConflictError',
+    412: 'HoodieConflictError', // file exist
+    500: 'HoodieServerError'
+  };
+
+  //
+  // public API
+  //
+  hoodie.request = request;
 }
 
-module.exports = hoodieGenerateId;
+module.exports = hoodieRequest;
 
+<<<<<<< HEAD
 },{}],13:[function(require,module,exports){
 var global=typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {};// LocalStore
+=======
+},{"../utils/index":20,"extend":1}],11:[function(require,module,exports){
+// LocalStore
+>>>>>>> dev_browserify
 // ============
 
 //
 var hoodieStoreApi = require('./store');
-var HoodieObjectTypeError = require('./error/object_type');
-var HoodieObjectIdError = require('./error/object_id');
+var HoodieObjectTypeError = require('../error/object_type');
+var HoodieObjectIdError = require('../error/object_id');
+
+var extend = require('extend');
 
 var extend = require('extend');
 
@@ -3120,6 +3356,7 @@ function hoodieStore (hoodie) {
 
 module.exports = hoodieStore;
 
+<<<<<<< HEAD
 },{"./error/object_id":9,"./error/object_type":10,"./store":20,"extend":1}],14:[function(require,module,exports){
 // Open stores
 // -------------
@@ -3228,6 +3465,10 @@ module.exports = hoodiePromises;
 
 },{"./error":8}],16:[function(require,module,exports){
 var global=typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {};// Remote
+=======
+},{"../error/object_id":7,"../error/object_type":8,"./store":14,"extend":1}],12:[function(require,module,exports){
+// Remote
+>>>>>>> dev_browserify
 // ========
 
 // Connection to a remote Couch Database.
@@ -3268,8 +3509,14 @@ var hoodieStoreApi = require('./store');
 
 var extend = require('extend');
 
+<<<<<<< HEAD
 //
 function hoodieRemoteStore (hoodie, options) {
+=======
+
+//
+function hoodieRemoteStore(hoodie, options) {
+>>>>>>> dev_browserify
 
   var remoteStore = {};
 
@@ -3516,7 +3763,9 @@ function hoodieRemoteStore (hoodie, options) {
     }
     remote.connected = true;
     remote.trigger('connect');
-    return remote.bootstrap().then( function() { remote.push(); } );
+    return remote.bootstrap().then(function() {
+      remote.push();
+    });
   };
 
 
@@ -3528,7 +3777,6 @@ function hoodieRemoteStore (hoodie, options) {
   remote.disconnect = function disconnect() {
     remote.connected = false;
     remote.trigger('disconnect'); // TODO: spec that
-
     if (pullRequest) {
       pullRequest.abort();
     }
@@ -3575,7 +3823,7 @@ function hoodieRemoteStore (hoodie, options) {
   remote.bootstrap = function bootstrap() {
     isBootstrapping = true;
     remote.trigger('bootstrap:start');
-    return remote.pull().done( handleBootstrapSuccess );
+    return remote.pull().done(handleBootstrapSuccess);
   };
 
 
@@ -3673,8 +3921,8 @@ function hoodieRemoteStore (hoodie, options) {
   // array of objects or a function as `options.objects`
   //
   var defaultObjectsToPush = function defaultObjectsToPush() {
-    return [];
-  };
+      return [];
+    };
   if (options.defaultObjectsToPush) {
     if ($.isArray(options.defaultObjectsToPush)) {
       defaultObjectsToPush = function defaultObjectsToPush() {
@@ -3762,10 +4010,7 @@ function hoodieRemoteStore (hoodie, options) {
     // NOTE: we don't use a simple id.split(/\//) here,
     // as in some cases IDs might contain '/', too
     //
-    _ref = id.match(/([^\/]+)\/(.*)/),
-    ignore = _ref[0],
-    object.type = _ref[1],
-    object.id = _ref[2];
+    _ref = id.match(/([^\/]+)\/(.*)/), ignore = _ref[0], object.type = _ref[1], object.id = _ref[2];
 
     return object;
   }
@@ -3788,9 +4033,7 @@ function hoodieRemoteStore (hoodie, options) {
   function addRevisionTo(attributes) {
     var currentRevId, currentRevNr, newRevisionId, _ref;
     try {
-      _ref = attributes._rev.split(/-/),
-      currentRevNr = _ref[0],
-      currentRevId = _ref[1];
+      _ref = attributes._rev.split(/-/), currentRevNr = _ref[0], currentRevId = _ref[1];
     } catch (_error) {}
     currentRevNr = parseInt(currentRevNr, 10) || 0;
     newRevisionId = generateNewRevisionId();
@@ -3892,16 +4135,15 @@ function hoodieRemoteStore (hoodie, options) {
       remote.trigger('error:unauthenticated', error);
       return remote.disconnect();
 
-     // the 404 comes, when the requested DB has been removed
-     // or does not exist yet.
-     //
-     // BUT: it might also happen that the background workers did
-     //      not create a pending database yet. Therefore,
-     //      we try it again in 3 seconds
-     //
-     // TODO: review / rethink that.
-     //
-
+      // the 404 comes, when the requested DB has been removed
+      // or does not exist yet.
+      //
+      // BUT: it might also happen that the background workers did
+      //      not create a pending database yet. Therefore,
+      //      we try it again in 3 seconds
+      //
+      // TODO: review / rethink that.
+      //
     case 404:
       return global.setTimeout(remote.pull, 3000);
 
@@ -3995,6 +4237,7 @@ function hoodieRemoteStore (hoodie, options) {
 
 module.exports = hoodieRemoteStore;
 
+<<<<<<< HEAD
 },{"./store":20,"extend":1}],17:[function(require,module,exports){
 //
 // hoodie.request
@@ -4272,13 +4515,952 @@ function hoodieScopedStoreApi(hoodie, storeApi, options) {
 module.exports = hoodieScopedStoreApi;
 
 },{"./events":11}],19:[function(require,module,exports){
+=======
+},{"./store":14,"extend":1}],13:[function(require,module,exports){
+>>>>>>> dev_browserify
 // scoped Store
 // ============
 
 // same as store, but with type preset to an initially
 // passed value.
 //
+var hoodieEvents = require('../events');
+
+//
+function hoodieScopedStoreApi(hoodie, storeApi, options) {
+
+  // name
+  var storeName = options.name || 'store';
+  var type = options.type;
+  var id = options.id;
+
+  var api = {};
+
+  // scoped by type only
+  if (!id) {
+
+    // add events
+    hoodieEvents(hoodie, {
+      context: api,
+      namespace: storeName + ':' + type
+    });
+
+    //
+    api.save = function save(id, properties, options) {
+      return storeApi.save(type, id, properties, options);
+    };
+
+    //
+    api.add = function add(properties, options) {
+      return storeApi.add(type, properties, options);
+    };
+
+    //
+    api.find = function find(id) {
+      return storeApi.find(type, id);
+    };
+
+    //
+    api.findOrAdd = function findOrAdd(id, properties) {
+      return storeApi.findOrAdd(type, id, properties);
+    };
+
+    //
+    api.findAll = function findAll(options) {
+      return storeApi.findAll(type, options);
+    };
+
+    //
+    api.update = function update(id, objectUpdate, options) {
+      return storeApi.update(type, id, objectUpdate, options);
+    };
+
+    //
+    api.updateAll = function updateAll(objectUpdate, options) {
+      return storeApi.updateAll(type, objectUpdate, options);
+    };
+
+    //
+    api.remove = function remove(id, options) {
+      return storeApi.remove(type, id, options);
+    };
+
+    //
+    api.removeAll = function removeAll(options) {
+      return storeApi.removeAll(type, options);
+    };
+  }
+
+  // scoped by both: type & id
+  if (id) {
+
+    // add events
+    hoodieEvents(hoodie, {
+      context: api,
+      namespace: storeName + ':' + type + ':' + id
+    });
+
+    //
+    api.save = function save(properties, options) {
+      return storeApi.save(type, id, properties, options);
+    };
+
+    //
+    api.find = function find() {
+      return storeApi.find(type, id);
+    };
+
+    //
+    api.update = function update(objectUpdate, options) {
+      return storeApi.update(type, id, objectUpdate, options);
+    };
+
+    //
+    api.remove = function remove(options) {
+      return storeApi.remove(type, id, options);
+    };
+  }
+
+  //
+  api.decoratePromises = storeApi.decoratePromises;
+  api.validate = storeApi.validate;
+
+  return api;
+}
+
+module.exports = hoodieScopedStoreApi;
+
+<<<<<<< HEAD
+},{"./events":11}],20:[function(require,module,exports){
+=======
+},{"../events":9}],14:[function(require,module,exports){
+>>>>>>> dev_browserify
+// Store
+// ============
+
+// This class defines the API that hoodie.store (local store) and hoodie.open
+// (remote store) implement to assure a coherent API. It also implements some
+// basic validations.
+//
+// The returned API provides the following methods:
+//
+// * validate
+// * save
+// * add
+// * find
+// * findOrAdd
+// * findAll
+// * update
+// * updateAll
+// * remove
+// * removeAll
+// * decoratePromises
+// * trigger
+// * on
+// * unbind
+//
+// At the same time, the returned API can be called as function returning a
+// store scoped by the passed type, for example
+//
+//     var taskStore = hoodie.store('task');
+//     taskStore.findAll().then( showAllTasks );
+//     taskStore.update('id123', {done: true});
+//
+
+//
+<<<<<<< HEAD
+var hoodieScopedStoreApi = require('./scoped_store');
 var hoodieEvents = require('./events');
+var HoodieError = require('./error');
+var HoodieObjectTypeError = require('./error/object_type');
+var HoodieObjectIdError = require('./error/object_id');
+=======
+var hoodieScopedStoreApi = require('./scoped');
+var hoodieEvents = require('../events');
+var HoodieError = require('../error/error');
+var HoodieObjectTypeError = require('../error/object_type');
+var HoodieObjectIdError = require('../error/object_id');
+
+var extend = require('extend');
+>>>>>>> dev_browserify
+
+var extend = require('extend');
+
+//
+function hoodieStoreApi(hoodie, options) {
+
+  // persistance logic
+  var backend = {};
+
+  // extend this property with extra functions that will be available
+  // on all promises returned by hoodie.store API. It has a reference
+  // to current hoodie instance by default
+  var promiseApi = {
+    hoodie: hoodie
+  };
+
+  // name
+  var storeName = options.name || 'store';
+
+  // public API
+  var api = function api(type, id) {
+<<<<<<< HEAD
+    var scopedOptions = extend(true, {type: type, id: id}, options);
+    return hoodieScopedStoreApi(hoodie, api, scopedOptions);
+  };
+=======
+      var scopedOptions = extend(true, {
+        type: type,
+        id: id
+      }, options);
+      return hoodieScopedStoreApi(hoodie, api, scopedOptions);
+    };
+>>>>>>> dev_browserify
+
+  // add event API
+  hoodieEvents(hoodie, {
+    context: api,
+    namespace: storeName
+  });
+
+
+  // Validate
+  // --------------
+
+  // by default, we only check for a valid type & id.
+  // the validate method can be overwriten by passing
+  // options.validate
+  //
+  // if `validate` returns nothing, the passed object is
+  // valid. Otherwise it returns an error
+  //
+  api.validate = options.validate;
+
+  if (!options.validate) {
+<<<<<<< HEAD
+
+    api.validate = function(object /*, options */) {
+=======
+    api.validate = function(object /*, options */ ) {
+>>>>>>> dev_browserify
+
+      if (!object) {
+        return new HoodieError({
+          name: 'InvalidObjectError',
+          message: 'No object passed.'
+        });
+      }
+
+      if (HoodieObjectTypeError.isInvalid(object.type, validIdOrTypePattern)) {
+        return new HoodieObjectTypeError({
+          type: object.type,
+          rules: validIdOrTypeRules
+        });
+      }
+
+      if (!object.id) {
+        return;
+      }
+
+      if (HoodieObjectIdError.isInvalid(object.id, validIdOrTypePattern)) {
+        return new HoodieObjectIdError({
+          id: object.id,
+          rules: validIdOrTypeRules
+        });
+      }
+
+    };
+
+  }
+
+  // Save
+  // --------------
+
+  // creates or replaces an an eventually existing object in the store
+  // with same type & id.
+  //
+  // When id is undefined, it gets generated and a new object gets saved
+  //
+  // example usage:
+  //
+  //     store.save('car', undefined, {color: 'red'})
+  //     store.save('car', 'abc4567', {color: 'red'})
+  //
+  api.save = function save(type, id, properties, options) {
+
+    if (options) {
+      options = extend(true, {}, options);
+    } else {
+      options = {};
+    }
+
+    // don't mess with passed object
+    var object = extend(true, {}, properties, {
+      type: type,
+      id: id
+    });
+
+    // validations
+    var error = api.validate(object, options || {});
+<<<<<<< HEAD
+
+=======
+>>>>>>> dev_browserify
+    if (error) {
+      return hoodie.rejectWith(error);
+    }
+
+    return decoratePromise(backend.save(object, options || {}));
+  };
+
+
+  // Add
+  // -------------------
+
+  // `.add` is an alias for `.save`, with the difference that there is no id argument.
+  // Internally it simply calls `.save(type, undefined, object).
+  //
+  api.add = function add(type, properties, options) {
+
+    if (properties === undefined) {
+      properties = {};
+    }
+
+    options = options || {};
+
+    return api.save(type, properties.id, properties, options);
+  };
+
+
+  // find
+  // ------
+
+  //
+  api.find = function find(type, id) {
+
+    return decoratePromise(backend.find(type, id));
+  };
+
+
+  // find or add
+  // -------------
+
+  // 1. Try to find a share by given id
+  // 2. If share could be found, return it
+  // 3. If not, add one and return it.
+  //
+  api.findOrAdd = function findOrAdd(type, id, properties) {
+
+    if (properties === null) {
+      properties = {};
+    }
+
+    function handleNotFound() {
+      var newProperties;
+      newProperties = extend(true, {
+        id: id
+      }, properties);
+      return api.add(type, newProperties);
+    }
+
+    // promise decorations get lost when piped through `then`,
+    // that's why we need to decorate the find's promise again.
+    var promise = api.find(type, id).then(null, handleNotFound);
+    return decoratePromise(promise);
+  };
+
+
+  // findAll
+  // ------------
+
+  // returns all objects from store.
+  // Can be optionally filtered by a type or a function
+  //
+  api.findAll = function findAll(type, options) {
+<<<<<<< HEAD
+    return decoratePromise( backend.findAll(type, options) );
+=======
+
+    return decoratePromise(backend.findAll(type, options));
+>>>>>>> dev_browserify
+  };
+
+
+  // Update
+  // -------------------
+
+  // In contrast to `.save`, the `.update` method does not replace the stored object,
+  // but only changes the passed attributes of an exsting object, if it exists
+  //
+  // both a hash of key/values or a function that applies the update to the passed
+  // object can be passed.
+  //
+  // example usage
+  //
+  // hoodie.store.update('car', 'abc4567', {sold: true})
+  // hoodie.store.update('car', 'abc4567', function(obj) { obj.sold = true })
+  //
+  api.update = function update(type, id, objectUpdate, options) {
+
+    function handleFound(currentObject) {
+      var changedProperties, newObj, value;
+
+      // normalize input
+      newObj = extend(true, {}, currentObject);
+
+      if (typeof objectUpdate === 'function') {
+        objectUpdate = objectUpdate(newObj);
+      }
+
+      if (!objectUpdate) {
+        return hoodie.resolveWith(currentObject);
+      }
+
+      // check if something changed
+      changedProperties = (function() {
+        var _results = [];
+
+        for (var key in objectUpdate) {
+          if (objectUpdate.hasOwnProperty(key)) {
+            value = objectUpdate[key];
+            if ((currentObject[key] !== value) === false) {
+              continue;
+            }
+            // workaround for undefined values, as extend ignores these
+            newObj[key] = value;
+            _results.push(key);
+          }
+        }
+        return _results;
+      })();
+
+      if (!(changedProperties.length || options)) {
+        return hoodie.resolveWith(newObj);
+      }
+
+      //apply update
+      return api.save(type, id, newObj, options);
+    }
+
+    // promise decorations get lost when piped through `then`,
+    // that's why we need to decorate the find's promise again.
+    var promise = api.find(type, id).then(handleFound);
+    return decoratePromise(promise);
+  };
+
+
+  // updateOrAdd
+  // -------------
+
+  // same as `.update()`, but in case the object cannot be found,
+  // it gets created
+  //
+  api.updateOrAdd = function updateOrAdd(type, id, objectUpdate, options) {
+    function handleNotFound() {
+      var properties = extend(true, {}, objectUpdate, {
+        id: id
+      });
+<<<<<<< HEAD
+
+=======
+>>>>>>> dev_browserify
+      return api.add(type, properties, options);
+    }
+
+    var promise = api.update(type, id, objectUpdate, options).then(null, handleNotFound);
+<<<<<<< HEAD
+
+    return decoratePromise( promise );
+=======
+    return decoratePromise(promise);
+>>>>>>> dev_browserify
+  };
+
+
+  // updateAll
+  // -----------------
+
+  // update all objects in the store, can be optionally filtered by a function
+  // As an alternative, an array of objects can be passed
+  //
+  // example usage
+  //
+  // hoodie.store.updateAll()
+  //
+  api.updateAll = function updateAll(filterOrObjects, objectUpdate, options) {
+    var promise;
+
+    options = options || {};
+
+    // normalize the input: make sure we have all objects
+    switch (true) {
+    case typeof filterOrObjects === 'string':
+      promise = api.findAll(filterOrObjects);
+      break;
+    case hoodie.isPromise(filterOrObjects):
+      promise = filterOrObjects;
+      break;
+    case $.isArray(filterOrObjects):
+      promise = hoodie.defer().resolve(filterOrObjects).promise();
+      break;
+    default:
+      // e.g. null, update all
+      promise = api.findAll();
+    }
+
+    promise = promise.then(function(objects) {
+      // now we update all objects one by one and return a promise
+      // that will be resolved once all updates have been finished
+      var object, _updatePromises;
+
+      if (!$.isArray(objects)) {
+        objects = [objects];
+      }
+
+      _updatePromises = (function() {
+        var _i, _len, _results;
+        _results = [];
+        for (_i = 0, _len = objects.length; _i < _len; _i++) {
+          object = objects[_i];
+          _results.push(api.update(object.type, object.id, objectUpdate, options));
+        }
+        return _results;
+      })();
+
+      return $.when.apply(null, _updatePromises);
+    });
+
+    return decoratePromise(promise);
+  };
+
+
+  // Remove
+  // ------------
+
+  // Removes one object specified by `type` and `id`.
+  //
+  // when object has been synced before, mark it as deleted.
+  // Otherwise remove it from Store.
+  //
+  api.remove = function remove(type, id, options) {
+    return decoratePromise(backend.remove(type, id, options || {}));
+  };
+
+
+  // removeAll
+  // -----------
+
+  // Destroye all objects. Can be filtered by a type
+  //
+  api.removeAll = function removeAll(type, options) {
+    return decoratePromise(backend.removeAll(type, options || {}));
+  };
+
+
+  // decorate promises
+  // -------------------
+
+  // extend promises returned by store.api
+  api.decoratePromises = function decoratePromises(methods) {
+    return extend(promiseApi, methods);
+  };
+
+
+
+  // required backend methods
+  // -------------------------
+  if (!options.backend) {
+    throw new Error('options.backend must be passed');
+  }
+
+  var required = 'save find findAll remove removeAll'.split(' ');
+
+  required.forEach(function(methodName) {
+
+    if (!options.backend[methodName]) {
+      throw new Error('options.backend.' + methodName + ' must be passed.');
+    }
+
+    backend[methodName] = options.backend[methodName];
+  });
+
+
+  // Private
+  // ---------
+
+  // / not allowed for id
+  var validIdOrTypePattern = /^[^\/]+$/;
+  var validIdOrTypeRules = '/ not allowed';
+
+  //
+  function decoratePromise(promise) {
+    return extend(promise, promiseApi);
+  }
+
+  return api;
+}
+
+module.exports = hoodieStoreApi;
+
+<<<<<<< HEAD
+},{"./error":8,"./error/object_id":9,"./error/object_type":10,"./events":11,"./scoped_store":18,"extend":1}],21:[function(require,module,exports){
+=======
+},{"../error/error":6,"../error/object_id":7,"../error/object_type":8,"../events":9,"./scoped":13,"extend":1}],15:[function(require,module,exports){
+>>>>>>> dev_browserify
+// Tasks
+// ============
+
+// This class defines the hoodie.task API.
+//
+// The returned API provides the following methods:
+//
+// * start
+// * cancel
+// * restart
+// * remove
+// * on
+// * one
+// * unbind
+//
+// At the same time, the returned API can be called as function returning a
+// store scoped by the passed type, for example
+//
+//     var emailTasks = hoodie.task('email');
+//     emailTasks.start( properties );
+//     emailTasks.cancel('id123');
+//
+<<<<<<< HEAD
+var hoodieEvents = require('./events');
+var hoodieScopedTask = require('./scoped_task');
+var HoodieError = require('./error');
+=======
+var hoodieEvents = require('../events');
+var hoodieScopedTask = require('./scoped');
+var HoodieError = require('../error/error');
+>>>>>>> dev_browserify
+
+var extend = require('extend');
+
+//
+function hoodieTask(hoodie) {
+
+  // public API
+  var api = function api(type, id) {
+      return hoodieScopedTask(hoodie, api, {
+        type: type,
+        id: id
+      });
+    };
+
+  // add events API
+  hoodieEvents(hoodie, {
+    context: api,
+    namespace: 'task'
+  });
+
+
+  // start
+  // -------
+
+  // start a new task. If the user has no account yet, hoodie tries to sign up
+  // for an anonymous account in the background. If that fails, the returned
+  // promise will be rejected.
+  //
+  api.start = function(type, properties) {
+    if (hoodie.account.hasAccount()) {
+      return hoodie.store.add('$' + type, properties).then(handleNewTask);
+    }
+
+    return hoodie.account.anonymousSignUp().then(function() {
+      return api.start(type, properties);
+    });
+  };
+
+
+  // cancel
+  // -------
+
+  // cancel a running task
+  //
+  api.cancel = function(type, id) {
+    return hoodie.store.update('$' + type, id, {
+      cancelledAt: now()
+    }).then(handleCancelledTaskObject);
+  };
+
+
+  // restart
+  // ---------
+
+  // first, we try to cancel a running task. If that succeeds, we start
+  // a new one with the same properties as the original
+  //
+  api.restart = function(type, id, update) {
+    var start = function(object) {
+<<<<<<< HEAD
+      extend(object, update);
+      delete object.$error;
+      delete object.$processedAt;
+      delete object.cancelledAt;
+      return api.start(object.type, object);
+    };
+
+=======
+        extend(object, update);
+        delete object.$error;
+        delete object.$processedAt;
+        delete object.cancelledAt;
+        return api.start(object.type, object);
+      };
+>>>>>>> dev_browserify
+    return api.cancel(type, id).then(start);
+  };
+
+  // cancelAll
+  // -----------
+
+  //
+  api.cancelAll = function(type) {
+    return findAll(type).then(cancelTaskObjects);
+  };
+
+  // restartAll
+  // -----------
+
+  //
+  api.restartAll = function(type, update) {
+
+    if (typeof type === 'object') {
+      update = type;
+    }
+<<<<<<< HEAD
+
+    return findAll(type).then( function(taskObjects) {
+=======
+    return findAll(type).then(function(taskObjects) {
+>>>>>>> dev_browserify
+      restartTaskObjects(taskObjects, update);
+    });
+
+  };
+
+
+  //
+  // subscribe to store events
+  // we subscribe to all store changes, pipe through the task ones,
+  // making a few changes along the way.
+  //
+  function subscribeToOutsideEvents() {
+    // account events
+    hoodie.on('store:change', handleStoreChange);
+  }
+
+  // allow to run this only once from outside (during Hoodie initialization)
+  api.subscribeToOutsideEvents = function() {
+    subscribeToOutsideEvents();
+    delete api.subscribeToOutsideEvents;
+  };
+
+
+  // Private
+  // -------
+
+  //
+  function handleNewTask(object) {
+    var defer = hoodie.defer();
+    var taskStore = hoodie.store(object.type, object.id);
+
+    taskStore.on('remove', function(object) {
+
+      // remove "$" from type
+      object.type = object.type.substr(1);
+
+      // task finished by worker.
+      if (object.$processedAt) {
+        return defer.resolve(object);
+      }
+
+      // manually removed / cancelled.
+      defer.reject(new HoodieError({
+        message: 'Task has been cancelled',
+        task: object
+      }));
+    });
+<<<<<<< HEAD
+
+    taskStore.on('update', function(object) {
+      var error = object.$error;
+
+      if (! object.$error) {
+=======
+    taskStore.on('update', function(object) {
+      var error = object.$error;
+      if (!object.$error) {
+>>>>>>> dev_browserify
+        return;
+      }
+
+      // remove "$" from type
+      object.type = object.type.substr(1);
+
+      delete object.$error;
+      error.object = object;
+      error.message = error.message || 'Something went wrong';
+
+      defer.reject(new HoodieError(error));
+
+      // remove errored task
+      hoodie.store.remove('$' + object.type, object.id);
+    });
+
+    return defer.promise();
+  }
+
+  //
+<<<<<<< HEAD
+  function handleCancelledTaskObject (taskObject) {
+=======
+  function handleCancelledTaskObject(taskObject) {
+>>>>>>> dev_browserify
+    var defer;
+    var type = taskObject.type; // no need to prefix with $, it's already prefixed.
+    var id = taskObject.id;
+    var removePromise = hoodie.store.remove(type, id);
+
+    if (!taskObject._rev) {
+      // task has not yet been synced.
+      return removePromise;
+    }
+
+    defer = hoodie.defer();
+    hoodie.one('store:sync:' + type + ':' + id, defer.resolve);
+    removePromise.fail(defer.reject);
+
+    return defer.promise();
+  }
+
+  //
+  function handleStoreChange(eventName, object, options) {
+    if (object.type[0] !== '$') {
+      return;
+    }
+
+    object.type = object.type.substr(1);
+    triggerEvents(eventName, object, options);
+  }
+
+  //
+  function findAll(type) {
+    var startsWith = '$';
+    var filter;
+    if (type) {
+      startsWith += type;
+    }
+
+    filter = function(object) {
+      return object.type.indexOf(startsWith) === 0;
+    };
+    return hoodie.store.findAll(filter);
+  }
+
+  //
+  function cancelTaskObjects(taskObjects) {
+    return taskObjects.map(function(taskObject) {
+      return api.cancel(taskObject.type.substr(1), taskObject.id);
+    });
+  }
+
+  //
+  function restartTaskObjects(taskObjects, update) {
+    return taskObjects.map(function(taskObject) {
+      return api.restart(taskObject.type.substr(1), taskObject.id, update);
+    });
+  }
+
+  // this is where all the task events get triggered,
+  // like add:message, change:message:abc4567, remove, etc.
+  function triggerEvents(eventName, task, options) {
+    var error;
+
+    // "new" tasks are trigger as "start" events
+    if (eventName === 'add') {
+      eventName = 'start';
+    }
+
+    if (eventName === 'remove' && task.cancelledAt) {
+      eventName = 'cancel';
+    }
+
+    if (eventName === 'remove' && task.$processedAt) {
+      eventName = 'success';
+    }
+
+    if (eventName === 'update' && task.$error) {
+      eventName = 'error';
+      error = task.$error;
+      delete task.$error;
+
+      api.trigger('error', error, task, options);
+      api.trigger(task.type + ':error', error, task, options);
+      api.trigger(task.type + ':' + task.id + ':error', error, task, options);
+
+      options = extend({}, options, {
+        error: error
+      });
+<<<<<<< HEAD
+
+=======
+>>>>>>> dev_browserify
+      api.trigger('change', 'error', task, options);
+      api.trigger(task.type + ':change', 'error', task, options);
+      api.trigger(task.type + ':' + task.id + ':change', 'error', task, options);
+
+      return;
+    }
+
+    // ignore all the other events
+    if (eventName !== 'start' && eventName !== 'cancel' && eventName !== 'success') {
+      return;
+    }
+
+    api.trigger(eventName, task, options);
+    api.trigger(task.type + ':' + eventName, task, options);
+
+    if (eventName !== 'start') {
+      api.trigger(task.type + ':' + task.id + ':' + eventName, task, options);
+    }
+
+    api.trigger('change', eventName, task, options);
+    api.trigger(task.type + ':change', eventName, task, options);
+
+    if (eventName !== 'start') {
+      api.trigger(task.type + ':' + task.id + ':change', eventName, task, options);
+    }
+  }
+
+  //
+  function now() {
+    return JSON.stringify(new Date()).replace(/['"]/g, '');
+  }
+
+  // extend hoodie
+  hoodie.task = api;
+}
+
+module.exports = hoodieTask;
+
+<<<<<<< HEAD
+},{"./error":8,"./events":11,"./scoped_task":19,"extend":1}]},{},[2])
+(2)
+=======
+},{"../error/error":6,"../events":9,"./scoped":16,"extend":1}],16:[function(require,module,exports){
+// scoped Store
+// ============
+
+// same as store, but with type preset to an initially
+// passed value.
+//
+var hoodieEvents = require('../events');
 
 //
 function hoodieScopedTask(hoodie, taskApi, options) {
@@ -4348,741 +5530,401 @@ function hoodieScopedTask(hoodie, taskApi, options) {
 
 module.exports = hoodieScopedTask;
 
-},{"./events":11}],20:[function(require,module,exports){
-// Store
-// ============
-
-// This class defines the API that hoodie.store (local store) and hoodie.open
-// (remote store) implement to assure a coherent API. It also implements some
-// basic validations.
+},{"../events":9}],17:[function(require,module,exports){
+var global=typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {};// Hoodie Core
+// -------------
 //
-// The returned API provides the following methods:
-//
-// * validate
-// * save
-// * add
-// * find
-// * findOrAdd
-// * findAll
-// * update
-// * updateAll
-// * remove
-// * removeAll
-// * decoratePromises
-// * trigger
-// * on
-// * unbind
-//
-// At the same time, the returned API can be called as function returning a
-// store scoped by the passed type, for example
-//
-//     var taskStore = hoodie.store('task');
-//     taskStore.findAll().then( showAllTasks );
-//     taskStore.update('id123', {done: true});
+// the door to world domination (apps)
 //
 
+var hoodieAccount = require('./core/account');
+var hoodieAccountRemote = require('./core/account/remote');
+var hoodieConfig = require('./core/config');
+var hoodiePromises = require('./utils/promises');
+var hoodieRequest = require('./core/request');
+var hoodieConnection = require('./core/connection');
+var hoodieDispose = require('./utils/dispose');
+var hoodieOpen = require('./utils/open');
+var hoodieLocalStore = require('./core/store/local');
+var hoodieGenerateId = require('./utils/generate_id');
+var hoodieTask = require('./core/task/index');
+var hoodieEvents = require('./core/events');
+
+// Constructor
+// -------------
+
+// When initializing a hoodie instance, an optional URL
+// can be passed. That's the URL of the hoodie backend.
+// If no URL passed it defaults to the current domain.
 //
-var hoodieScopedStoreApi = require('./scoped_store');
-var hoodieEvents = require('./events');
-var HoodieError = require('./error');
-var HoodieObjectTypeError = require('./error/object_type');
-var HoodieObjectIdError = require('./error/object_id');
-
-var extend = require('extend');
-
+//     // init a new hoodie instance
+//     hoodie = new Hoodie
 //
-function hoodieStoreApi(hoodie, options) {
+function Hoodie(baseUrl) {
+  var hoodie = this;
 
-  // persistance logic
-  var backend = {};
+  // enforce initialization with `new`
+  if (!(hoodie instanceof Hoodie)) {
+    throw new Error('usage: new Hoodie(url);');
+  }
 
-  // extend this property with extra functions that will be available
-  // on all promises returned by hoodie.store API. It has a reference
-  // to current hoodie instance by default
-  var promiseApi = {
-    hoodie: hoodie
+  if (baseUrl) {
+    // remove trailing slashes
+    hoodie.baseUrl = baseUrl.replace(/\/+$/, '');
+  }
+
+
+  // hoodie.extend
+  // ---------------
+
+  // extend hoodie instance:
+  //
+  //     hoodie.extend(function(hoodie) {} )
+  //
+  hoodie.extend = function extend(extension) {
+    extension(hoodie);
   };
 
-  // name
-  var storeName = options.name || 'store';
 
-  // public API
-  var api = function api(type, id) {
-    var scopedOptions = extend(true, {type: type, id: id}, options);
-    return hoodieScopedStoreApi(hoodie, api, scopedOptions);
-  };
+  //
+  // Extending hoodie core
+  //
 
-  // add event API
-  hoodieEvents(hoodie, {
-    context: api,
-    namespace: storeName
+  // * hoodie.bind
+  // * hoodie.on
+  // * hoodie.one
+  // * hoodie.trigger
+  // * hoodie.unbind
+  // * hoodie.off
+  hoodie.extend(hoodieEvents);
+
+
+  // * hoodie.defer
+  // * hoodie.isPromise
+  // * hoodie.resolve
+  // * hoodie.reject
+  // * hoodie.resolveWith
+  // * hoodie.rejectWith
+  hoodie.extend(hoodiePromises);
+
+  // * hoodie.request
+  hoodie.extend(hoodieRequest);
+
+  // * hoodie.isOnline
+  // * hoodie.checkConnection
+  hoodie.extend(hoodieConnection);
+
+  // * hoodie.uuid
+  hoodie.extend(hoodieGenerateId);
+
+  // * hoodie.dispose
+  hoodie.extend(hoodieDispose);
+
+  // * hoodie.open
+  hoodie.extend(hoodieOpen);
+
+  // * hoodie.store
+  hoodie.extend(hoodieLocalStore);
+  // workaround, until we ship https://github.com/hoodiehq/hoodie.js/issues/199
+  hoodie.store.patchIfNotPersistant();
+
+  // * hoodie.task
+  hoodie.extend(hoodieTask);
+
+  // * hoodie.config
+  hoodie.extend(hoodieConfig);
+
+  // * hoodie.account
+  hoodie.extend(hoodieAccount);
+
+  // * hoodie.remote
+  hoodie.extend(hoodieAccountRemote);
+
+
+  //
+  // Initializations
+  //
+
+  // set username from config (local store)
+  hoodie.account.username = hoodie.config.get('_account.username');
+
+  // check for pending password reset
+  hoodie.account.checkPasswordReset();
+
+  // clear config on sign out
+  hoodie.on('account:signout', hoodie.config.clear);
+
+  // hoodie.store
+  hoodie.store.subscribeToOutsideEvents();
+  hoodie.store.bootstrapDirtyObjects();
+
+  // hoodie.remote
+  hoodie.remote.subscribeToOutsideEvents();
+
+  // hoodie.task
+  hoodie.task.subscribeToOutsideEvents();
+
+  // authenticate
+  // we use a closure to not pass the username to connect, as it
+  // would set the name of the remote store, which is not the username.
+  hoodie.account.authenticate().then(function( /* username */ ) {
+    hoodie.remote.connect();
   });
 
+  // check connection when browser goes online / offline
+  window.addEventListener('online', hoodie.checkConnection, false);
+  window.addEventListener('offline', hoodie.checkConnection, false);
 
-  // Validate
-  // --------------
-
-  // by default, we only check for a valid type & id.
-  // the validate method can be overwriten by passing
-  // options.validate
-  //
-  // if `validate` returns nothing, the passed object is
-  // valid. Otherwise it returns an error
-  //
-  api.validate = options.validate;
-
-  if (!options.validate) {
-
-    api.validate = function(object /*, options */) {
-
-      if (!object) {
-        return new HoodieError({
-          name: 'InvalidObjectError',
-          message: 'No object passed.'
-        });
-      }
-
-      if (HoodieObjectTypeError.isInvalid(object.type, validIdOrTypePattern)) {
-        return new HoodieObjectTypeError({
-          type: object.type,
-          rules: validIdOrTypeRules
-        });
-      }
-
-      if (!object.id) {
-        return;
-      }
-
-      if (HoodieObjectIdError.isInvalid(object.id, validIdOrTypePattern)) {
-        return new HoodieObjectIdError({
-          id: object.id,
-          rules: validIdOrTypeRules
-        });
-      }
-
-    };
-
-  }
-
-  // Save
-  // --------------
-
-  // creates or replaces an an eventually existing object in the store
-  // with same type & id.
-  //
-  // When id is undefined, it gets generated and a new object gets saved
-  //
-  // example usage:
-  //
-  //     store.save('car', undefined, {color: 'red'})
-  //     store.save('car', 'abc4567', {color: 'red'})
-  //
-  api.save = function save(type, id, properties, options) {
-
-    if (options) {
-      options = extend(true, {}, options);
-    } else {
-      options = {};
-    }
-
-    // don't mess with passed object
-    var object = extend(true, {}, properties, {
-      type: type,
-      id: id
-    });
-
-    // validations
-    var error = api.validate(object, options || {});
-
-    if (error) {
-      return hoodie.rejectWith(error);
-    }
-
-    return decoratePromise( backend.save(object, options || {}) );
-  };
-
-
-  // Add
-  // -------------------
-
-  // `.add` is an alias for `.save`, with the difference that there is no id argument.
-  // Internally it simply calls `.save(type, undefined, object).
-  //
-  api.add = function add(type, properties, options) {
-
-    if (properties === undefined) {
-      properties = {};
-    }
-
-    options = options || {};
-
-    return api.save(type, properties.id, properties, options);
-  };
-
-
-  // find
-  // ------
+  // start checking connection
+  hoodie.checkConnection();
 
   //
-  api.find = function find(type, id) {
-
-    return decoratePromise( backend.find(type, id) );
-  };
-
-
-  // find or add
-  // -------------
-
-  // 1. Try to find a share by given id
-  // 2. If share could be found, return it
-  // 3. If not, add one and return it.
+  // loading user extensions
   //
-  api.findOrAdd = function findOrAdd(type, id, properties) {
-
-    if (properties === null) {
-      properties = {};
-    }
-
-    function handleNotFound() {
-      var newProperties;
-      newProperties = extend(true, {
-        id: id
-      }, properties);
-      return api.add(type, newProperties);
-    }
-
-    // promise decorations get lost when piped through `then`,
-    // that's why we need to decorate the find's promise again.
-    var promise = api.find(type, id).then(null, handleNotFound);
-    return decoratePromise( promise );
-  };
-
-
-  // findAll
-  // ------------
-
-  // returns all objects from store.
-  // Can be optionally filtered by a type or a function
-  //
-  api.findAll = function findAll(type, options) {
-    return decoratePromise( backend.findAll(type, options) );
-  };
-
-
-  // Update
-  // -------------------
-
-  // In contrast to `.save`, the `.update` method does not replace the stored object,
-  // but only changes the passed attributes of an exsting object, if it exists
-  //
-  // both a hash of key/values or a function that applies the update to the passed
-  // object can be passed.
-  //
-  // example usage
-  //
-  // hoodie.store.update('car', 'abc4567', {sold: true})
-  // hoodie.store.update('car', 'abc4567', function(obj) { obj.sold = true })
-  //
-  api.update = function update(type, id, objectUpdate, options) {
-
-    function handleFound(currentObject) {
-      var changedProperties, newObj, value;
-
-      // normalize input
-      newObj = extend(true, {}, currentObject);
-
-      if (typeof objectUpdate === 'function') {
-        objectUpdate = objectUpdate(newObj);
-      }
-
-      if (!objectUpdate) {
-        return hoodie.resolveWith(currentObject);
-      }
-
-      // check if something changed
-      changedProperties = (function() {
-        var _results = [];
-
-        for (var key in objectUpdate) {
-          if (objectUpdate.hasOwnProperty(key)) {
-            value = objectUpdate[key];
-            if ((currentObject[key] !== value) === false) {
-              continue;
-            }
-            // workaround for undefined values, as extend ignores these
-            newObj[key] = value;
-            _results.push(key);
-          }
-        }
-        return _results;
-      })();
-
-      if (!(changedProperties.length || options)) {
-        return hoodie.resolveWith(newObj);
-      }
-
-      //apply update
-      return api.save(type, id, newObj, options);
-    }
-
-    // promise decorations get lost when piped through `then`,
-    // that's why we need to decorate the find's promise again.
-    var promise = api.find(type, id).then(handleFound);
-    return decoratePromise( promise );
-  };
-
-
-  // updateOrAdd
-  // -------------
-
-  // same as `.update()`, but in case the object cannot be found,
-  // it gets created
-  //
-  api.updateOrAdd = function updateOrAdd(type, id, objectUpdate, options) {
-    function handleNotFound() {
-      var properties = extend(true, {}, objectUpdate, {
-        id: id
-      });
-
-      return api.add(type, properties, options);
-    }
-
-    var promise = api.update(type, id, objectUpdate, options).then(null, handleNotFound);
-
-    return decoratePromise( promise );
-  };
-
-
-  // updateAll
-  // -----------------
-
-  // update all objects in the store, can be optionally filtered by a function
-  // As an alternative, an array of objects can be passed
-  //
-  // example usage
-  //
-  // hoodie.store.updateAll()
-  //
-  api.updateAll = function updateAll(filterOrObjects, objectUpdate, options) {
-    var promise;
-
-    options = options || {};
-
-    // normalize the input: make sure we have all objects
-    switch (true) {
-    case typeof filterOrObjects === 'string':
-      promise = api.findAll(filterOrObjects);
-      break;
-    case hoodie.isPromise(filterOrObjects):
-      promise = filterOrObjects;
-      break;
-    case $.isArray(filterOrObjects):
-      promise = hoodie.defer().resolve(filterOrObjects).promise();
-      break;
-    default: // e.g. null, update all
-      promise = api.findAll();
-    }
-
-    promise = promise.then(function(objects) {
-      // now we update all objects one by one and return a promise
-      // that will be resolved once all updates have been finished
-      var object, _updatePromises;
-
-      if (!$.isArray(objects)) {
-        objects = [objects];
-      }
-
-      _updatePromises = (function() {
-        var _i, _len, _results;
-        _results = [];
-        for (_i = 0, _len = objects.length; _i < _len; _i++) {
-          object = objects[_i];
-          _results.push(api.update(object.type, object.id, objectUpdate, options));
-        }
-        return _results;
-      })();
-
-      return $.when.apply(null, _updatePromises);
-    });
-
-    return decoratePromise( promise );
-  };
-
-
-  // Remove
-  // ------------
-
-  // Removes one object specified by `type` and `id`.
-  //
-  // when object has been synced before, mark it as deleted.
-  // Otherwise remove it from Store.
-  //
-  api.remove = function remove(type, id, options) {
-    return decoratePromise( backend.remove(type, id, options || {}) );
-  };
-
-
-  // removeAll
-  // -----------
-
-  // Destroye all objects. Can be filtered by a type
-  //
-  api.removeAll = function removeAll(type, options) {
-    return decoratePromise( backend.removeAll(type, options || {}) );
-  };
-
-
-  // decorate promises
-  // -------------------
-
-  // extend promises returned by store.api
-  api.decoratePromises = function decoratePromises(methods) {
-    return extend(promiseApi, methods);
-  };
-
-
-
-  // required backend methods
-  // -------------------------
-  if (!options.backend ) {
-    throw new Error('options.backend must be passed');
-  }
-
-  var required = 'save find findAll remove removeAll'.split(' ');
-
-  required.forEach( function(methodName) {
-
-    if (!options.backend[methodName]) {
-      throw new Error('options.backend.'+methodName+' must be passed.');
-    }
-
-    backend[methodName] = options.backend[methodName];
-  });
-
-
-  // Private
-  // ---------
-
-  // / not allowed for id
-  var validIdOrTypePattern = /^[^\/]+$/;
-  var validIdOrTypeRules = '/ not allowed';
-
-  //
-  function decoratePromise(promise) {
-    return extend(promise, promiseApi);
-  }
-
-  return api;
+  applyExtensions(hoodie);
 }
 
-module.exports = hoodieStoreApi;
+// Extending hoodie
+// ------------------
 
-},{"./error":8,"./error/object_id":9,"./error/object_type":10,"./events":11,"./scoped_store":18,"extend":1}],21:[function(require,module,exports){
-// Tasks
-// ============
+// You can extend the Hoodie class like so:
+//
+// Hoodie.extend(funcion(hoodie) { hoodie.myMagic = function() {} })
+//
+var extensions = [];
 
-// This class defines the hoodie.task API.
-//
-// The returned API provides the following methods:
-//
-// * start
-// * cancel
-// * restart
-// * remove
-// * on
-// * one
-// * unbind
-//
-// At the same time, the returned API can be called as function returning a
-// store scoped by the passed type, for example
-//
-//     var emailTasks = hoodie.task('email');
-//     emailTasks.start( properties );
-//     emailTasks.cancel('id123');
-//
-var hoodieEvents = require('./events');
-var hoodieScopedTask = require('./scoped_task');
-var HoodieError = require('./error');
-
-var extend = require('extend');
+Hoodie.extend = function(extension) {
+  extensions.push(extension);
+};
 
 //
-function hoodieTask(hoodie) {
-
-  // public API
-  var api = function api(type, id) {
-    return hoodieScopedTask(hoodie, api, {type: type, id: id});
-  };
-
-  // add events API
-  hoodieEvents(hoodie, { context: api, namespace: 'task' });
-
-
-  // start
-  // -------
-
-  // start a new task. If the user has no account yet, hoodie tries to sign up
-  // for an anonymous account in the background. If that fails, the returned
-  // promise will be rejected.
-  //
-  api.start = function(type, properties) {
-    if (hoodie.account.hasAccount()) {
-      return hoodie.store.add('$'+type, properties).then(handleNewTask);
-    }
-
-    return hoodie.account.anonymousSignUp().then( function() {
-      return api.start(type, properties);
-    });
-  };
-
-
-  // cancel
-  // -------
-
-  // cancel a running task
-  //
-  api.cancel = function(type, id) {
-    return hoodie.store.update('$' + type, id, {
-      cancelledAt: now()
-    }).then(handleCancelledTaskObject);
-  };
-
-
-  // restart
-  // ---------
-
-  // first, we try to cancel a running task. If that succeeds, we start
-  // a new one with the same properties as the original
-  //
-  api.restart = function(type, id, update) {
-    var start = function(object) {
-      extend(object, update);
-      delete object.$error;
-      delete object.$processedAt;
-      delete object.cancelledAt;
-      return api.start(object.type, object);
-    };
-
-    return api.cancel(type, id).then(start);
-  };
-
-  // cancelAll
-  // -----------
-
-  //
-  api.cancelAll = function(type) {
-    return findAll(type).then( cancelTaskObjects );
-  };
-
-  // restartAll
-  // -----------
-
-  //
-  api.restartAll = function(type, update) {
-
-    if (typeof type === 'object') {
-      update = type;
-    }
-
-    return findAll(type).then( function(taskObjects) {
-      restartTaskObjects(taskObjects, update);
-    });
-
-  };
-
-
-  //
-  // subscribe to store events
-  // we subscribe to all store changes, pipe through the task ones,
-  // making a few changes along the way.
-  //
-  function subscribeToOutsideEvents() {
-    // account events
-    hoodie.on('store:change', handleStoreChange);
+// detect available extensions and attach to Hoodie Object.
+//
+function applyExtensions(hoodie) {
+  for (var i = 0; i < extensions.length; i++) {
+    extensions[i](hoodie);
   }
+}
 
-  // allow to run this only once from outside (during Hoodie initialization)
-  api.subscribeToOutsideEvents = function() {
-    subscribeToOutsideEvents();
-    delete api.subscribeToOutsideEvents;
-  };
+//
+// expose Hoodie to module loaders. Based on jQuery's implementation.
+//
+if ( typeof module === 'object' && module && typeof module.exports === 'object' ) {
+
+  // Expose Hoodie as module.exports in loaders that implement the Node
+  // module pattern (including browserify). Do not create the global, since
+  // the user will be storing it themselves locally, and globals are frowned
+  // upon in the Node module world.
+  module.exports = Hoodie;
 
 
-  // Private
-  // -------
+} else if ( typeof define === 'function' && define.amd ) {
 
-  //
-  function handleNewTask(object) {
-    var defer = hoodie.defer();
-    var taskStore = hoodie.store(object.type, object.id);
+  // Register as a named AMD module, since Hoodie can be concatenated with other
+  // files that may use define, but not via a proper concatenation script that
+  // understands anonymous AMD modules. A named AMD is safest and most robust
+  // way to register. Lowercase hoodie is used because AMD module names are
+  // derived from file names, and Hoodie is normally delivered in a lowercase
+  // file name.
+  define([], function () {
+    return Hoodie;
+  });
 
-    taskStore.on('remove', function(object) {
+} else {
 
-      // remove "$" from type
-      object.type = object.type.substr(1);
+  // set global
+  global.Hoodie = Hoodie;
+}
 
-      // task finished by worker.
-      if(object.$processedAt) {
-        return defer.resolve(object);
-      }
 
-      // manually removed / cancelled.
-      defer.reject(new HoodieError({
-        message: 'Task has been cancelled',
-        task: object
-      }));
-    });
+},{"./core/account":2,"./core/account/remote":3,"./core/config":4,"./core/connection":5,"./core/events":9,"./core/request":10,"./core/store/local":11,"./core/task/index":15,"./utils/dispose":18,"./utils/generate_id":19,"./utils/open":21,"./utils/promises":22}],18:[function(require,module,exports){
+// hoodie.dispose
+// ================
 
-    taskStore.on('update', function(object) {
-      var error = object.$error;
+function hoodieDispose (hoodie) {
 
-      if (! object.$error) {
-        return;
-      }
-
-      // remove "$" from type
-      object.type = object.type.substr(1);
-
-      delete object.$error;
-      error.object = object;
-      error.message = error.message || 'Something went wrong';
-
-      defer.reject(new HoodieError(error));
-
-      // remove errored task
-      hoodie.store.remove('$' + object.type, object.id);
-    });
-
-    return defer.promise();
+  // if a hoodie instance is not needed anymore, it can
+  // be disposed using this method. A `dispose` event
+  // gets triggered that the modules react on.
+  function dispose() {
+    hoodie.trigger('dispose');
+    hoodie.unbind();
   }
 
   //
-  function handleCancelledTaskObject (taskObject) {
-    var defer;
-    var type = taskObject.type; // no need to prefix with $, it's already prefixed.
-    var id = taskObject.id;
-    var removePromise = hoodie.store.remove(type, id);
+  // Public API
+  //
+  hoodie.dispose = dispose;
+}
 
-    if (!taskObject._rev) {
-      // task has not yet been synced.
-      return removePromise;
+module.exports = hoodieDispose;
+
+},{}],19:[function(require,module,exports){
+// hoodie.generateId
+// =============
+
+// helper to generate unique ids.
+function hoodieGenerateId (hoodie) {
+  var chars, i, radix;
+
+  // uuids consist of numbers and lowercase letters only.
+  // We stick to lowercase letters to prevent confusion
+  // and to prevent issues with CouchDB, e.g. database
+  // names do wonly allow for lowercase letters.
+  chars = '0123456789abcdefghijklmnopqrstuvwxyz'.split('');
+  radix = chars.length;
+
+
+  function generateId(length) {
+    var id = '';
+
+    // default uuid length to 7
+    if (length === undefined) {
+      length = 7;
     }
 
-    defer = hoodie.defer();
-    hoodie.one('store:sync:'+type+':'+id, defer.resolve);
-    removePromise.fail(defer.reject);
+    for (i = 0; i < length; i++) {
+      var rand = Math.random() * radix;
+      var char = chars[Math.floor(rand)];
+      id += String(char).charAt(0);
+    }
 
-    return defer.promise();
+    return id;
   }
 
   //
-  function handleStoreChange(eventName, object, options) {
-    if (object.type[0] !== '$') {
-      return;
-    }
-
-    object.type = object.type.substr(1);
-    triggerEvents(eventName, object, options);
-  }
-
+  // Public API
   //
-  function findAll (type) {
-    var startsWith = '$';
-    var filter;
-    if (type) {
-      startsWith += type;
-    }
+  hoodie.generateId = generateId;
+}
 
-    filter = function(object) {
-      return object.type.indexOf(startsWith) === 0;
-    };
-    return hoodie.store.findAll(filter);
-  }
+module.exports = hoodieGenerateId;
 
-  //
-  function cancelTaskObjects (taskObjects) {
-    return taskObjects.map( function(taskObject) {
-      return api.cancel(taskObject.type.substr(1), taskObject.id);
-    });
-  }
+},{}],20:[function(require,module,exports){
+module.exports = {
 
-  //
-  function restartTaskObjects (taskObjects, update) {
-    return taskObjects.map( function(taskObject) {
-      return api.restart(taskObject.type.substr(1), taskObject.id, update);
-    });
-  }
-
-  // this is where all the task events get triggered,
-  // like add:message, change:message:abc4567, remove, etc.
-  function triggerEvents(eventName, task, options) {
-    var error;
-
-    // "new" tasks are trigger as "start" events
-    if (eventName === 'add') {
-      eventName = 'start';
-    }
-
-    if (eventName === 'remove' && task.cancelledAt) {
-      eventName = 'cancel';
-    }
-
-    if (eventName === 'remove' && task.$processedAt) {
-      eventName = 'success';
-    }
-
-    if (eventName === 'update' && task.$error) {
-      eventName = 'error';
-      error = task.$error;
-      delete task.$error;
-
-      api.trigger('error', error, task, options);
-      api.trigger(task.type + ':error', error, task, options);
-      api.trigger(task.type + ':' + task.id + ':error', error, task, options);
-
-      options = extend({}, options, {
-        error: error
-      });
-
-      api.trigger('change', 'error', task, options);
-      api.trigger(task.type + ':change', 'error', task, options);
-      api.trigger(task.type + ':' + task.id + ':change', 'error', task, options);
-
-      return;
-    }
-
-    // ignore all the other events
-    if (eventName !== 'start' && eventName !== 'cancel' && eventName !== 'success') {
-      return;
-    }
-
-    api.trigger(eventName, task, options);
-    api.trigger(task.type + ':' + eventName, task, options);
-
-    if (eventName !== 'start') {
-      api.trigger(task.type + ':' + task.id + ':' + eventName, task, options);
-    }
-
-    api.trigger('change', eventName, task, options);
-    api.trigger(task.type + ':change', eventName, task, options);
-
-    if (eventName !== 'start') {
-      api.trigger(task.type + ':' + task.id + ':change', eventName, task, options);
-    }
-  }
-
-  //
-  function now() {
+  now: function () {
     return JSON.stringify(new Date()).replace(/['"]/g, '');
+  },
+
+  hoodiefyRequestErrorName: function (name) {
+    name = name.replace(/(^\w|_\w)/g, function (match) {
+      return (match[1] || match[0]).toUpperCase();
+    });
+
+    return 'Hoodie' + name + 'Error';
   }
 
-  // extend hoodie
-  hoodie.task = api;
+};
+
+},{}],21:[function(require,module,exports){
+// Open stores
+// -------------
+
+var hoodieRemoteStore = require('../core/store/remote');
+
+var extend = require('extend');
+
+function hoodieOpen(hoodie) {
+
+  // generic method to open a store. Used by
+  //
+  // * hoodie.remote
+  // * hoodie.user("joe")
+  // * hoodie.global
+  // * ... and more
+  //
+  //     hoodie.open("some_store_name").findAll()
+  //
+  function open(storeName, options) {
+    options = options || {};
+
+    extend(options, {
+      name: storeName
+    });
+
+    return hoodieRemoteStore(hoodie, options);
+  }
+
+  //
+  // Public API
+  //
+  hoodie.open = open;
 }
 
-module.exports = hoodieTask;
+module.exports = hoodieOpen;
 
-},{"./error":8,"./events":11,"./scoped_task":19,"extend":1}]},{},[2])
-(2)
+},{"../core/store/remote":12,"extend":1}],22:[function(require,module,exports){
+// Hoodie Defers / Promises
+// ------------------------
+
+// returns a defer object for custom promise handlings.
+// Promises are heavely used throughout the code of hoodie.
+// We currently borrow jQuery's implementation:
+// http://api.jquery.com/category/deferred-object/
+//
+//     defer = hoodie.defer()
+//     if (good) {
+//       defer.resolve('good.')
+//     } else {
+//       defer.reject('not good.')
+//     }
+//     return defer.promise()
+//
+var HoodieError = require('../core/error/error');
+
+//
+function hoodiePromises (hoodie) {
+  var $defer = window.jQuery.Deferred;
+
+  // returns true if passed object is a promise (but not a deferred),
+  // otherwise false.
+  function isPromise(object) {
+    return !! (object &&
+               typeof object.done === 'function' &&
+               typeof object.resolve !== 'function');
+  }
+
+  //
+  function resolve() {
+    return $defer().resolve().promise();
+  }
+
+
+  //
+  function reject() {
+    return $defer().reject().promise();
+  }
+
+
+  //
+  function resolveWith() {
+    var _defer = $defer();
+    return _defer.resolve.apply(_defer, arguments).promise();
+  }
+
+  //
+  function rejectWith(errorProperties) {
+    var _defer = $defer();
+    var error = new HoodieError(errorProperties);
+    return _defer.reject(error).promise();
+  }
+
+  //
+  // Public API
+  //
+  hoodie.defer = $defer;
+  hoodie.isPromise = isPromise;
+  hoodie.resolve = resolve;
+  hoodie.reject = reject;
+  hoodie.resolveWith = resolveWith;
+  hoodie.rejectWith = rejectWith;
+}
+
+module.exports = hoodiePromises;
+
+},{"../core/error/error":6}]},{},[17])
+(17)
+>>>>>>> dev_browserify
 });
 ;

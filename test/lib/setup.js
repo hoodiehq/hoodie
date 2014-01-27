@@ -1,4 +1,6 @@
-window.mocha.setup({globals: ['setTimeout', 'clearTimeout', 'setInterval', 'clearInterval']});
+window.mocha.setup({
+  globals: ['setTimeout', 'clearTimeout', 'setInterval', 'clearInterval']
+});
 
 module.exports = (function() {
 
