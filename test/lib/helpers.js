@@ -1,6 +1,6 @@
 'use strict';
 
-var _and, _but, _when, describeLikeABaws;
+var _and, _but, _when;
 
 $.ajax = function() {
   var promise = $.Deferred().promise();

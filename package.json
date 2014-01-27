@@ -20,6 +20,7 @@
   ],
   "keywords": [
     "nobackend",
+    "offline-first",
     "frontend-only"
   ],
   "devDependencies": {
@@ -50,7 +51,8 @@
     "expect.js": "~0.2.0",
     "sinon": "~1.7.1",
     "load-grunt-tasks": "~0.2.1",
-    "grunt-bump": "0.0.13"
+    "grunt-bump": "0.0.13",
+    "extend": "~1.2.1"
   },
   "scripts": {
     "test": "grunt build --verbose",

@@ -1,5 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><title>src/hoodie/remote_store</title></head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0"><meta name="groc-relative-root" content="../../"><meta name="groc-document-path" content="src/hoodie/remote_store"><meta name="groc-project-path" content="src/hoodie/remote_store.js"><link rel="stylesheet" type="text/css" media="all" href="../../assets/style.css"><script type="text/javascript" src="../../assets/behavior.js"></script><body><div id="meta"><div class="file-path">src/hoodie/remote_store.js</div></div><div id="document"><div class="segment"><div class="code"><div class="wrapper"><span class="cm">/* exported hoodieRemoteStore */</span>
-<span class="cm">/* global hoodieStoreApi */</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h1 id="remote">Remote</h1></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>Connection to a remote Couch Database.</p>
+<!DOCTYPE html><html lang="en"><head><title>src/hoodie/remote_store</title></head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0"><meta name="groc-relative-root" content="../../"><meta name="groc-document-path" content="src/hoodie/remote_store"><meta name="groc-project-path" content="src/hoodie/remote_store.js"><link rel="stylesheet" type="text/css" media="all" href="../../assets/style.css"><script type="text/javascript" src="../../assets/behavior.js"></script><body><div id="meta"><div class="file-path">src/hoodie/remote_store.js</div></div><div id="document"><div class="segment"><div class="comments"><div class="wrapper"><h1 id="remote">Remote</h1></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>Connection to a remote Couch Database.</p>
 
 <h2 id="store-api">store API</h2>
 
@@ -38,7 +37,9 @@
 
 <ul>
 <li>on(event, callback)</li>
-</ul></div></div></div><div class="segment"><div class="code"><div class="wrapper"><span class="kd">function</span> <span class="nx">hoodieRemoteStore</span> <span class="p">(</span><span class="nx">hoodie</span><span class="p">,</span> <span class="nx">options</span><span class="p">)</span> <span class="p">{</span>
+</ul></div></div><div class="code"><div class="wrapper"><span class="kd">var</span> <span class="nx">hoodieStoreApi</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">&#39;./store&#39;</span><span class="p">);</span>
+
+<span class="kd">var</span> <span class="nx">extend</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">&#39;extend&#39;</span><span class="p">);</span></div></div></div><div class="segment"><div class="code"><div class="wrapper"><span class="kd">function</span> <span class="nx">hoodieRemoteStore</span> <span class="p">(</span><span class="nx">hoodie</span><span class="p">,</span> <span class="nx">options</span><span class="p">)</span> <span class="p">{</span>
 
   <span class="kd">var</span> <span class="nx">remoteStore</span> <span class="o">=</span> <span class="p">{};</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h2 id="remote-store-persistance-methods">Remote Store Persistance methods</h2></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h2 id="find">find</h2></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>find one object</p></div></div><div class="code"><div class="wrapper">  <span class="nx">remoteStore</span><span class="p">.</span><span class="nx">find</span> <span class="o">=</span> <span class="kd">function</span> <span class="nx">find</span><span class="p">(</span><span class="nx">type</span><span class="p">,</span> <span class="nx">id</span><span class="p">)</span> <span class="p">{</span>
     <span class="kd">var</span> <span class="nx">path</span><span class="p">;</span>
@@ -86,7 +87,7 @@ will be overwritten</p></div></div><div class="code"><div class="wrapper">  <spa
     <span class="kd">var</span> <span class="nx">path</span><span class="p">;</span>
 
     <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nx">object</span><span class="p">.</span><span class="nx">id</span><span class="p">)</span> <span class="p">{</span>
-      <span class="nx">object</span><span class="p">.</span><span class="nx">id</span> <span class="o">=</span> <span class="nx">hoodie</span><span class="p">.</span><span class="nx">uuid</span><span class="p">();</span>
+      <span class="nx">object</span><span class="p">.</span><span class="nx">id</span> <span class="o">=</span> <span class="nx">hoodie</span><span class="p">.</span><span class="nx">generateId</span><span class="p">();</span>
     <span class="p">}</span>
 
     <span class="nx">object</span> <span class="o">=</span> <span class="nx">parseForRemote</span><span class="p">(</span><span class="nx">object</span><span class="p">);</span>
@@ -225,7 +226,7 @@ and restart each 25 seconds.</p></div></div><div class="code"><div class="wrappe
 
     <span class="nx">objectsForRemote</span> <span class="o">=</span> <span class="p">[];</span>
 
-    <span class="k">for</span> <span class="p">(</span><span class="nx">_i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="nx">_len</span> <span class="o">=</span> <span class="nx">objects</span><span class="p">.</span><span class="nx">length</span><span class="p">;</span> <span class="nx">_i</span> <span class="o">&lt;</span> <span class="nx">_len</span><span class="p">;</span> <span class="nx">_i</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>don't mess with original objects</p></div></div><div class="code"><div class="wrapper">      <span class="nx">object</span> <span class="o">=</span> <span class="nx">$</span><span class="p">.</span><span class="nx">extend</span><span class="p">(</span><span class="kc">true</span><span class="p">,</span> <span class="p">{},</span> <span class="nx">objects</span><span class="p">[</span><span class="nx">_i</span><span class="p">]);</span>
+    <span class="k">for</span> <span class="p">(</span><span class="nx">_i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="nx">_len</span> <span class="o">=</span> <span class="nx">objects</span><span class="p">.</span><span class="nx">length</span><span class="p">;</span> <span class="nx">_i</span> <span class="o">&lt;</span> <span class="nx">_len</span><span class="p">;</span> <span class="nx">_i</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>don't mess with original objects</p></div></div><div class="code"><div class="wrapper">      <span class="nx">object</span> <span class="o">=</span> <span class="nx">extend</span><span class="p">(</span><span class="kc">true</span><span class="p">,</span> <span class="p">{},</span> <span class="nx">objects</span><span class="p">[</span><span class="nx">_i</span><span class="p">]);</span>
       <span class="nx">addRevisionTo</span><span class="p">(</span><span class="nx">object</span><span class="p">);</span>
       <span class="nx">object</span> <span class="o">=</span> <span class="nx">parseForRemote</span><span class="p">(</span><span class="nx">object</span><span class="p">);</span>
       <span class="nx">objectsForRemote</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="nx">object</span><span class="p">);</span>
@@ -275,7 +276,7 @@ number and return it.</p></div></div><div class="code"><div class="wrapper">  <s
 
 <p>Also <code>id</code> gets replaced with <code>_id</code> which consists of type &amp; id</p></div></div><div class="code"><div class="wrapper">  <span class="kd">function</span> <span class="nx">parseForRemote</span><span class="p">(</span><span class="nx">object</span><span class="p">)</span> <span class="p">{</span>
     <span class="kd">var</span> <span class="nx">attr</span><span class="p">,</span> <span class="nx">properties</span><span class="p">;</span>
-    <span class="nx">properties</span> <span class="o">=</span> <span class="nx">$</span><span class="p">.</span><span class="nx">extend</span><span class="p">({},</span> <span class="nx">object</span><span class="p">);</span>
+    <span class="nx">properties</span> <span class="o">=</span> <span class="nx">extend</span><span class="p">({},</span> <span class="nx">object</span><span class="p">);</span>
 
     <span class="k">for</span> <span class="p">(</span><span class="nx">attr</span> <span class="k">in</span> <span class="nx">properties</span><span class="p">)</span> <span class="p">{</span>
       <span class="k">if</span> <span class="p">(</span><span class="nx">properties</span><span class="p">.</span><span class="nx">hasOwnProperty</span><span class="p">(</span><span class="nx">attr</span><span class="p">))</span> <span class="p">{</span>
@@ -343,7 +344,7 @@ users database, therefore the <code>-local</code> suffix.</p></div></div><div cl
       <span class="k">return</span> <span class="nx">attributes</span><span class="p">.</span><span class="nx">_revisions</span><span class="p">.</span><span class="nx">ids</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="nx">currentRevId</span><span class="p">);</span>
     <span class="p">}</span>
   <span class="p">}</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h3 id="generate-new-revision-id">generate new revision id</h3></div></div></div><div class="segment"><div class="code"><div class="wrapper">  <span class="kd">function</span> <span class="nx">generateNewRevisionId</span><span class="p">()</span> <span class="p">{</span>
-    <span class="k">return</span> <span class="nx">hoodie</span><span class="p">.</span><span class="nx">uuid</span><span class="p">(</span><span class="mi">9</span><span class="p">);</span>
+    <span class="k">return</span> <span class="nx">hoodie</span><span class="p">.</span><span class="nx">generateId</span><span class="p">(</span><span class="mi">9</span><span class="p">);</span>
   <span class="p">}</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><h3 id="map-docs-from-findall">map docs from findAll</h3></div></div></div><div class="segment"><div class="code"><div class="wrapper">  <span class="kd">function</span> <span class="nx">mapDocsFromFindAll</span><span class="p">(</span><span class="nx">response</span><span class="p">)</span> <span class="p">{</span>
     <span class="k">return</span> <span class="nx">response</span><span class="p">.</span><span class="nx">rows</span><span class="p">.</span><span class="nx">map</span><span class="p">(</span><span class="kd">function</span><span class="p">(</span><span class="nx">row</span><span class="p">)</span> <span class="p">{</span>
       <span class="k">return</span> <span class="nx">row</span><span class="p">.</span><span class="nx">doc</span><span class="p">;</span>
@@ -446,4 +447,6 @@ we'll try again after a 3s timeout</p></div></div><div class="code"><div class="
       <span class="p">});</span>
     <span class="p">}</span>
   <span class="p">}</span></div></div></div><div class="segment"><div class="comments"><div class="wrapper"><p>expose public API</p></div></div><div class="code"><div class="wrapper">  <span class="k">return</span> <span class="nx">remote</span><span class="p">;</span>
-<span class="p">}</span></div></div></div></div></body></html>
+<span class="p">}</span>
+
+<span class="nx">module</span><span class="p">.</span><span class="nx">exports</span> <span class="o">=</span> <span class="nx">hoodieRemoteStore</span><span class="p">;</span></div></div></div></div></body></html>
