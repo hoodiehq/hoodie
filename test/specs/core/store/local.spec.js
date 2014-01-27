@@ -447,7 +447,7 @@ describe('hoodie.store', function() {
               name: 'test',
               createdAt: now(),
               updatedAt: now(),
-              createdBy: 'hash123'
+              createdBy: 'hoodieid'
             };
             expect(this.store.trigger).to.be.calledWith('add', object, {});
             expect(this.store.trigger).to.be.calledWith('document:add', object, {});
@@ -497,7 +497,7 @@ describe('hoodie.store', function() {
               name: 'success',
               createdAt: now(),
               updatedAt: 'yesterday',
-              createdBy: 'hash123'
+              createdBy: 'hoodieid'
             };
             stubFindItem('document', '123successful', this.properties);
             this.promise = this.storeBackend.save({
@@ -506,7 +506,7 @@ describe('hoodie.store', function() {
               name: 'success',
               createdAt: now(),
               updatedAt: 'yesterday',
-              createdBy: 'hash123'
+              createdBy: 'hoodieid'
             });
           });
 
@@ -534,7 +534,7 @@ describe('hoodie.store', function() {
             var object = extend({}, this.object);
             object.createdAt = now();
             object.updatedAt = now();
-            object.createdBy = 'hash123';
+            object.createdBy = 'hoodieid';
             object.type = 'document';
             object.id = '123new';
 

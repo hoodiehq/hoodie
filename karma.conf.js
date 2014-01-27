@@ -36,6 +36,7 @@ module.exports = function(config) {
       'test/specs/core/config.spec.js',
       'test/specs/core/connection.spec.js',
       'test/specs/core/events.spec.js',
+      'test/specs/core/id.spec.js',
       'test/specs/core/request.spec.js',
       'test/specs/core/task/scoped.spec.js',
       'test/specs/core/task/task.spec.js',
