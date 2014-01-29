@@ -12,7 +12,7 @@
     "connect": "2.7.4",
     "multicouch": ">=0.6.1",
     "hoodie-pocket": "0.0.12",
-    "hoodie-plugins-manager": "0.0.11",
+    "hoodie-plugins-manager": "0.1.4",
     "local-tld-lib": "*",
     "underscore": "1.4.4",
     "async": "0.2.7",
