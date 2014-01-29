@@ -1,5 +1,5 @@
 var expect = require('expect.js');
-var plugins = require('../../lib/plugins');
+var plugins = require('../../lib/core/plugins');
 
 var _ = require('underscore');
 

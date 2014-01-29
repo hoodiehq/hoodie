@@ -1,5 +1,5 @@
 var expect = require('expect.js');
-var couch = require('../../lib/couch');
+var couch = require('../../lib/couchdb/index');
 
 var _ = require('underscore');
 
@@ -29,4 +29,7 @@ describe('couch', function () {
     expect(couch).to.have.property('stop');
   });
 
+  it('should have a installer property', function () {
+    expect(couch).to.have.property('installer');
+  });
 });

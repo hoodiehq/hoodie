@@ -1,19 +1,17 @@
 {
   "name": "hoodie-server",
-  "version": "0.8.15",
-  "main": "lib/app",
+  "version": "0.9.0",
+  "main": "lib/index",
   "repository": {
     "type": "git",
     "url": "https://github.com/hoodiehq/hoodie-server.git"
   },
   "dependencies": {
-    "hoodie": "git://github.com/hoodiehq/hoodie.js.git",
-    "http-proxy": "*",
-    "connect": "2.7.4",
-    "multicouch": ">=0.6.1",
+    "hoodie": "0.5.2",
+    "multicouch": "0.8.1",
     "hoodie-pocket": "0.0.12",
     "hoodie-plugins-manager": "0.1.4",
-    "local-tld-lib": "*",
+    "local-tld-lib": "1.0.2",
     "underscore": "1.4.4",
     "async": "0.2.7",
     "bytes": "0.2.1",
@@ -23,19 +21,23 @@
     "couchr": "0.0.13",
     "cli-color": "0.2.2",
     "lock": "0.0.3",
-    "semver": ">=1.1.4",
-    "send": "0.1.0",
+    "semver": "1.1.4",
     "optimist": "0.5.0",
     "ports": "1.0.0",
     "mkdirp": "0.3.5",
+<<<<<<< HEAD
     "dispatch": "0.2.0"
+=======
+    "hapi": "2.1.1",
+    "http-proxy": "0.10.4"
+>>>>>>> 916798b972bb3de4d7e30c38e72d5f5066a84ca0
   },
   "scripts": {
     "start": "bin/start",
     "test": "grunt test --verbose"
   },
   "engines": {
-    "node": ">=0.8.x"
+    "node": ">=0.10.x"
   },
   "devDependencies": {
     "mocha": "*",
@@ -47,5 +49,8 @@
     "grunt-contrib-jshint": "~0.6.2",
     "grunt-contrib-watch": "~0.5.1",
     "rimraf": "2.2.2"
+  },
+  "hoodie": {
+    "plugins": []
   }
 }

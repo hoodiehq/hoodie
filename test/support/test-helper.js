@@ -1,5 +1,5 @@
 var sinon = require('sinon');
-var app = require('../../lib/app');
+var app = require('../../lib/index');
 
 module.exports = {
   before: (function () {
