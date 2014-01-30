@@ -61,8 +61,8 @@ module.exports = function(grunt) {
       continuous: {
         singleRun: true,
         sauceLabs: {
-          username: 'hoodie',
-          accessKey: '1f6164de-f3d1-4af9-83d0-5358b42fbe56',
+          username: 'hoodiehq',
+          accessKey: '6ab72d53-5807-40bb-be53-64cb7adba626',
           testName: 'hoodie.js test'
         },
         customLaunchers: {
@@ -140,17 +140,23 @@ module.exports = function(grunt) {
     // https://github.com/vojtajina/grunt-bump
     // bump version of hoodie.js
     bump: {
-      options: {
-        files: ['package.json', 'bower.json'],
-        updateConfigs: [],
-        commit: true,
-        commitMessage: 'Release %VERSION%',
-        commitFiles: ['package.json', 'bower.json'], // '-a' for all files
-        createTag: true,
-        tagName: '%VERSION%',
-        tagMessage: 'Version %VERSION%',
-        push: true,
-        pushTo: 'origin'
+      versions: {
+        options: {
+          files: ['package.json', 'bower.json'],
+          updateConfigs: []
+          //push: true,
+          //pushTo: 'origin'
+        }
+      },
+      release: {
+        options: {
+          commit: true,
+          commitMessage: 'Release %VERSION%',
+          commitFiles: ['package.json', 'bower.json'], // '-a' for all files
+          createTag: true,
+          tagName: '%VERSION%',
+          tagMessage: 'Version %VERSION%'
+        }
       }
     }
   });
