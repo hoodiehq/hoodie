@@ -35,16 +35,28 @@ describe('Hoodie.Config', function() {
       });
     });
 
+    it('should clear if _hoodieId gets set', function() {
+      this.hoodie.store.remove.reset();
+      this.config.set('_hoodieId', 'funky');
+      expect(this.hoodie.store.remove).to.be.calledWith('$config', 'hoodie', {
+        silent: true
+      });
+
+      this.hoodie.store.remove.reset();
+      this.config.set('something', 'fresh');
+      expect(this.hoodie.store.remove).to.not.be.called();
+    });
   });
 
   describe('#get(key)', function() {
-
-    it('should get the config using store', function() {
-      var value = this.config.get('funky');
-      expect(this.hoodie.store.find).to.be.called();
-      expect(value).to.eql('fresh');
+    it('should get the config from memory cache', function() {
+      var value = this.config.get('whatever');
+      expect(value).to.be( undefined );
+      
+      this.config.set('funky', 'fresh');
+      value = this.config.get('funky');
+      expect(value).to.be( 'fresh' );
     });
-
   });
 
   describe('#unset(key)', function() {

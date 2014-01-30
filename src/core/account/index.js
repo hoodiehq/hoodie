@@ -147,11 +147,11 @@ function hoodieAccount(hoodie) {
         type: 'user',
         roles: [],
         password: password,
-        ownerHash: account.ownerHash,
+        hoodieId: hoodie.id(),
         database: account.db(),
         updatedAt: now(),
         createdAt: now(),
-        signedUpAt: username !== account.ownerHash ? now() : void 0
+        signedUpAt: username !== hoodie.id() ? now() : void 0
       }),
       contentType: 'application/json'
     };
@@ -176,7 +176,7 @@ function hoodieAccount(hoodie) {
     var password, username;
 
     password = hoodie.generateId(10);
-    username = account.ownerHash;
+    username = hoodie.id();
 
     return account.signUp(username, password).done(function() {
       setAnonymousPassword(password);
@@ -204,10 +204,10 @@ function hoodieAccount(hoodie) {
   // e.g. to prevent data loss.
   //
   // To determine between anonymous and "real" accounts, we
-  // can compare the username to the ownerHash, which is the
+  // can compare the username to the hoodie.id, which is the
   // same for anonymous accounts.
   account.hasAnonymousAccount = function hasAnonymousAccount() {
-    return account.username === account.ownerHash;
+    return account.username === hoodie.id();
   };
 
 
@@ -285,7 +285,7 @@ function hoodieAccount(hoodie) {
           }
 
           delete object.type;
-          object.createdBy = hoodie.account.ownerHash;
+          object.createdBy = hoodie.id();
           hoodie.store.add(type, object);
         });
       });
@@ -336,7 +336,7 @@ function hoodieAccount(hoodie) {
   // return name of db
   //
   account.db = function db() {
-    return 'user/' + account.ownerHash;
+    return 'user/' + hoodie.id();
   };
 
 
@@ -550,22 +550,6 @@ function hoodieAccount(hoodie) {
     return hoodie.config.set('_account.username', newUsername);
   }
 
-  function setOwner(newOwnerHash) {
-
-    if (account.ownerHash === newOwnerHash) {
-      return;
-    }
-
-    account.ownerHash = newOwnerHash;
-
-    // `ownerHash` is stored with every new object in the createdBy
-    // attribute. It does not get changed once it's set. That's why
-    // we have to force it to be change for the `$config/hoodie` object.
-    hoodie.config.set('createdBy', newOwnerHash);
-
-    return hoodie.config.set('_account.ownerHash', newOwnerHash);
-  }
-
 
   //
   // handle a successful authentication request.
@@ -584,8 +568,6 @@ function hoodieAccount(hoodie) {
   function handleAuthenticateRequestSuccess(response) {
     if (response.userCtx.name) {
       authenticated = true;
-      setUsername(response.userCtx.name.replace(/^user(_anonymous)?\//, ''));
-      setOwner(response.userCtx.roles[0]);
       return hoodie.resolveWith(account.username);
     }
 
@@ -693,10 +675,11 @@ function hoodieAccount(hoodie) {
     options = options || {};
 
     return function(response) {
-      var defer, username;
+      var defer, username, hoodieId;
 
       defer = hoodie.defer();
       username = response.name.replace(/^user(_anonymous)?\//, '');
+      hoodieId = response.roles[0];
 
       //
       // if an error occured, the userDB worker stores it to the $error attribute
@@ -726,19 +709,19 @@ function hoodieAccount(hoodie) {
       }
 
       setUsername(username);
-      setOwner(response.roles[0]);
       authenticated = true;
 
       //
-      // options.verbose is true, when a user manually signed via hoodie.account.signIn().
-      // We need to differentiate to other signIn requests, for example right after
-      // the signup or after a session timed out.
+      // options.silent is true when we need to sign in the
+      // the user without signIn method being called. That's
+      // currently the case for changeUsername.
+      // Also don't trigger 'signin' when reauthenticating
       //
       if (!(options.silent || options.reauthenticated)) {
         if (account.hasAnonymousAccount()) {
           account.trigger('signin:anonymous', username);
         } else {
-          account.trigger('signin', username);
+          account.trigger('signin', username, hoodieId);
         }
       }
 
@@ -912,15 +895,12 @@ function hoodieAccount(hoodie) {
   //
   // remove everything form the current account, so a new account can be initiated.
   //
-  function cleanup(options) {
-    options = options || {};
+  function cleanup() {
 
-    // hoodie.store is listening on this one
+    // allow other modules to clean up local data & caches
     account.trigger('cleanup');
-    authenticated = options.authenticated;
-    hoodie.config.clear();
-    setUsername(options.username);
-    setOwner(options.ownerHash || hoodie.generateId());
+    authenticated = undefined;
+    setUsername(undefined);
 
     return hoodie.resolve();
   }
@@ -938,7 +918,7 @@ function hoodieAccount(hoodie) {
   // depending on wether the user signedUp manually or has been signed up
   // anonymously the prefix in the CouchDB _users doc differentiates.
   // An anonymous user is characterized by its username, that equals
-  // its ownerHash (see `anonymousSignUp`)
+  // its hoodie.id (see `anonymousSignUp`)
   //
   // We differentiate with `hasAnonymousAccount()`, because `userTypeAndId`
   // is used within `signUp` method, so we need to be able to differentiate
@@ -947,7 +927,7 @@ function hoodieAccount(hoodie) {
   function userTypeAndId(username) {
     var type;
 
-    if (username === account.ownerHash) {
+    if (username === hoodie.id()) {
       type = 'user_anonymous';
     } else {
       type = 'user';
@@ -1158,15 +1138,6 @@ function hoodieAccount(hoodie) {
   // expose public account API
   //
   hoodie.account = account;
-
-  // TODO: we should move the owner hash on hoodie core, as
-  //       other modules depend on it as well, like hoodie.store.
-  // the ownerHash gets stored in every object created by the user.
-  // Make sure we have one.
-  hoodie.account.ownerHash = hoodie.config.get('_account.ownerHash');
-  if (!hoodie.account.ownerHash) {
-    setOwner(hoodie.generateId());
-  }
 }
 
 module.exports = hoodieAccount;

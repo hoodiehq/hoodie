@@ -30,6 +30,14 @@ function hoodieConfig(hoodie) {
     update[key] = value;
     isSilent = key.charAt(0) === '_';
 
+    // we have to assure that _hoodieId has always the
+    // same value as createdBy for $config/hoodie
+    // Also see config.js:77ff
+    if (key === '_hoodieId') {
+      hoodie.store.remove(type, id, {silent: true});
+      update = cache;
+    }
+
     return hoodie.store.updateOrAdd(type, id, update, {
       silent: isSilent
     });
@@ -57,18 +65,51 @@ function hoodieConfig(hoodie) {
   // unset
   // ----------
 
-  // unsets a configuration, is a simple alias for config.set(key, undefined)
+  // unsets a configuration. If configuration is present, calls
+  // config.set(key, undefined). Otherwise resolves without store
+  // interaction.
   //
   config.unset = function unset(key) {
+    if (typeof config.get(key) === 'undefined') {
+      return hoodie.resolve();
+    }
+
     return config.set(key, undefined);
   };
 
-  // load cache
-  // TODO: I really don't like this being here. And I don't like that if the
-  //       store API will be truly async one day, this will fall on our feet.
-  hoodie.store.find(type, id).done(function(obj) {
-    cache = obj;
-  });
+  //
+  // load current configuration from localStore.
+  // The init method to be called on hoodie startup
+  //
+  function init() {
+    // TODO: I really don't like this being here. And I don't like that if the
+    //       store API will be truly async one day, this will fall on our feet.
+    //       We should discuss if we make config a simple object in localStorage,
+    //       outside of hoodie.store, and use localStorage sync API directly to
+    //       interact with it, also in future versions.
+    hoodie.store.find(type, id).done(function(obj) {
+      cache = obj;
+    });
+  }
+
+  // allow to run init only once
+  config.init = function() {
+    init();
+    delete config.init;
+  };
+
+  //
+  // subscribe to events coming from other modules
+  //
+  function subscribeToOutsideEvents() {
+    hoodie.on('account:cleanup', config.clear);
+  }
+
+  // allow to run this once from outside
+  config.subscribeToOutsideEvents = function() {
+    subscribeToOutsideEvents();
+    delete config.subscribeToOutsideEvents;
+  };
 
   // exspose public API
   hoodie.config = config;

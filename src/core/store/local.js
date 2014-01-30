@@ -76,7 +76,7 @@ function hoodieStore (hoodie) {
 
     if (isNew) {
       // add createdBy hash
-      object.createdBy = object.createdBy || hoodie.account.ownerHash;
+      object.createdBy = object.createdBy || hoodie.id();
     }
     else {
       // leave createdBy hash

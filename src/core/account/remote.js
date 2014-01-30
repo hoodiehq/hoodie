@@ -9,6 +9,12 @@
 // When hoodie.remote is continuously syncing (default),
 // it will continuously  synchronize with local store,
 // otherwise sync, pull or push can be called manually
+// 
+// Note that hoodieRemote must be initialized before the
+// API is available:
+// 
+//     hoodieRemote(hoodie);
+//     hoodie.remote.init();
 //
 
 function hoodieRemote (hoodie) {
@@ -135,4 +141,15 @@ function hoodieRemote (hoodie) {
   hoodie.remote = remote;
 }
 
-module.exports = hoodieRemote;
+function hoodieRemoteFactory(hoodie) {
+
+  var init = function() {
+    hoodieRemote(hoodie);
+  };
+
+  hoodie.remote = {
+    init: init
+  };
+}
+
+module.exports = hoodieRemoteFactory;

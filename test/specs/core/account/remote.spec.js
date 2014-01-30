@@ -16,8 +16,13 @@ describe('hoodie.remote', function() {
 
     this.clock = this.sandbox.useFakeTimers(0); // '1970-01-01 00:00:00'
     hoodieAccountRemote(this.hoodie);
+    this.hoodie.remote.init();
     this.remote = this.hoodie.remote;
     this.openArgs = this.hoodie.open.args[0];
+  });
+
+  it('should not allow to re-initialize', function() {
+    expect(this.remote.init).to.be(undefined);
   });
 
   it('should open the users store', function() {
