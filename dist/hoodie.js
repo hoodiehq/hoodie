@@ -1,3 +1,8 @@
+// Hoodie.js - 0.5.4
+// https://github.com/hoodiehq/hoodie.js
+// Copyright 2012 - 2014 https://github.com/hoodiehq/
+// Licensed Apache License 2.0
+
 !function(e){"object"==typeof exports?module.exports=e():"function"==typeof define&&define.amd?define(e):"undefined"!=typeof window?window.Hoodie=e():"undefined"!=typeof global?global.Hoodie=e():"undefined"!=typeof self&&(self.Hoodie=e())}(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);throw new Error("Cannot find module '"+o+"'")}var f=n[o]={exports:{}};t[o][0].call(f.exports,function(e){var n=t[o][1][e];return s(n?n:e)},f,f.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 var hasOwn = Object.prototype.hasOwnProperty;
 var toString = Object.prototype.toString;
@@ -228,11 +233,11 @@ function hoodieAccount(hoodie) {
         type: 'user',
         roles: [],
         password: password,
-        ownerHash: account.ownerHash,
+        hoodieId: hoodie.id(),
         database: account.db(),
         updatedAt: now(),
         createdAt: now(),
-        signedUpAt: username !== account.ownerHash ? now() : void 0
+        signedUpAt: username !== hoodie.id() ? now() : void 0
       }),
       contentType: 'application/json'
     };
@@ -257,7 +262,7 @@ function hoodieAccount(hoodie) {
     var password, username;
 
     password = hoodie.generateId(10);
-    username = account.ownerHash;
+    username = hoodie.id();
 
     return account.signUp(username, password).done(function() {
       setAnonymousPassword(password);
@@ -285,10 +290,10 @@ function hoodieAccount(hoodie) {
   // e.g. to prevent data loss.
   //
   // To determine between anonymous and "real" accounts, we
-  // can compare the username to the ownerHash, which is the
+  // can compare the username to the hoodie.id, which is the
   // same for anonymous accounts.
   account.hasAnonymousAccount = function hasAnonymousAccount() {
-    return account.username === account.ownerHash;
+    return account.username === hoodie.id();
   };
 
 
@@ -366,7 +371,7 @@ function hoodieAccount(hoodie) {
           }
 
           delete object.type;
-          object.createdBy = hoodie.account.ownerHash;
+          object.createdBy = hoodie.id();
           hoodie.store.add(type, object);
         });
       });
@@ -417,7 +422,7 @@ function hoodieAccount(hoodie) {
   // return name of db
   //
   account.db = function db() {
-    return 'user/' + account.ownerHash;
+    return 'user/' + hoodie.id();
   };
 
 
@@ -631,22 +636,6 @@ function hoodieAccount(hoodie) {
     return hoodie.config.set('_account.username', newUsername);
   }
 
-  function setOwner(newOwnerHash) {
-
-    if (account.ownerHash === newOwnerHash) {
-      return;
-    }
-
-    account.ownerHash = newOwnerHash;
-
-    // `ownerHash` is stored with every new object in the createdBy
-    // attribute. It does not get changed once it's set. That's why
-    // we have to force it to be change for the `$config/hoodie` object.
-    hoodie.config.set('createdBy', newOwnerHash);
-
-    return hoodie.config.set('_account.ownerHash', newOwnerHash);
-  }
-
 
   //
   // handle a successful authentication request.
@@ -665,8 +654,6 @@ function hoodieAccount(hoodie) {
   function handleAuthenticateRequestSuccess(response) {
     if (response.userCtx.name) {
       authenticated = true;
-      setUsername(response.userCtx.name.replace(/^user(_anonymous)?\//, ''));
-      setOwner(response.userCtx.roles[0]);
       return hoodie.resolveWith(account.username);
     }
 
@@ -774,10 +761,11 @@ function hoodieAccount(hoodie) {
     options = options || {};
 
     return function(response) {
-      var defer, username;
+      var defer, username, hoodieId;
 
       defer = hoodie.defer();
       username = response.name.replace(/^user(_anonymous)?\//, '');
+      hoodieId = response.roles[0];
 
       //
       // if an error occured, the userDB worker stores it to the $error attribute
@@ -807,19 +795,19 @@ function hoodieAccount(hoodie) {
       }
 
       setUsername(username);
-      setOwner(response.roles[0]);
       authenticated = true;
 
       //
-      // options.verbose is true, when a user manually signed via hoodie.account.signIn().
-      // We need to differentiate to other signIn requests, for example right after
-      // the signup or after a session timed out.
+      // options.silent is true when we need to sign in the
+      // the user without signIn method being called. That's
+      // currently the case for changeUsername.
+      // Also don't trigger 'signin' when reauthenticating
       //
       if (!(options.silent || options.reauthenticated)) {
         if (account.hasAnonymousAccount()) {
           account.trigger('signin:anonymous', username);
         } else {
-          account.trigger('signin', username);
+          account.trigger('signin', username, hoodieId);
         }
       }
 
@@ -993,15 +981,12 @@ function hoodieAccount(hoodie) {
   //
   // remove everything form the current account, so a new account can be initiated.
   //
-  function cleanup(options) {
-    options = options || {};
+  function cleanup() {
 
-    // hoodie.store is listening on this one
+    // allow other modules to clean up local data & caches
     account.trigger('cleanup');
-    authenticated = options.authenticated;
-    hoodie.config.clear();
-    setUsername(options.username);
-    setOwner(options.ownerHash || hoodie.generateId());
+    authenticated = undefined;
+    setUsername(undefined);
 
     return hoodie.resolve();
   }
@@ -1019,7 +1004,7 @@ function hoodieAccount(hoodie) {
   // depending on wether the user signedUp manually or has been signed up
   // anonymously the prefix in the CouchDB _users doc differentiates.
   // An anonymous user is characterized by its username, that equals
-  // its ownerHash (see `anonymousSignUp`)
+  // its hoodie.id (see `anonymousSignUp`)
   //
   // We differentiate with `hasAnonymousAccount()`, because `userTypeAndId`
   // is used within `signUp` method, so we need to be able to differentiate
@@ -1028,7 +1013,7 @@ function hoodieAccount(hoodie) {
   function userTypeAndId(username) {
     var type;
 
-    if (username === account.ownerHash) {
+    if (username === hoodie.id()) {
       type = 'user_anonymous';
     } else {
       type = 'user';
@@ -1239,15 +1224,6 @@ function hoodieAccount(hoodie) {
   // expose public account API
   //
   hoodie.account = account;
-
-  // TODO: we should move the owner hash on hoodie core, as
-  //       other modules depend on it as well, like hoodie.store.
-  // the ownerHash gets stored in every object created by the user.
-  // Make sure we have one.
-  hoodie.account.ownerHash = hoodie.config.get('_account.ownerHash');
-  if (!hoodie.account.ownerHash) {
-    setOwner(hoodie.generateId());
-  }
 }
 
 module.exports = hoodieAccount;
@@ -1264,6 +1240,12 @@ module.exports = hoodieAccount;
 // When hoodie.remote is continuously syncing (default),
 // it will continuously  synchronize with local store,
 // otherwise sync, pull or push can be called manually
+// 
+// Note that hoodieRemote must be initialized before the
+// API is available:
+// 
+//     hoodieRemote(hoodie);
+//     hoodie.remote.init();
 //
 
 function hoodieRemote (hoodie) {
@@ -1390,7 +1372,18 @@ function hoodieRemote (hoodie) {
   hoodie.remote = remote;
 }
 
-module.exports = hoodieRemote;
+function hoodieRemoteFactory(hoodie) {
+
+  var init = function() {
+    hoodieRemote(hoodie);
+  };
+
+  hoodie.remote = {
+    init: init
+  };
+}
+
+module.exports = hoodieRemoteFactory;
 
 },{}],4:[function(require,module,exports){
 // Hoodie Config API
@@ -1425,6 +1418,14 @@ function hoodieConfig(hoodie) {
     update[key] = value;
     isSilent = key.charAt(0) === '_';
 
+    // we have to assure that _hoodieId has always the
+    // same value as createdBy for $config/hoodie
+    // Also see config.js:77ff
+    if (key === '_hoodieId') {
+      hoodie.store.remove(type, id, {silent: true});
+      update = cache;
+    }
+
     return hoodie.store.updateOrAdd(type, id, update, {
       silent: isSilent
     });
@@ -1452,18 +1453,51 @@ function hoodieConfig(hoodie) {
   // unset
   // ----------
 
-  // unsets a configuration, is a simple alias for config.set(key, undefined)
+  // unsets a configuration. If configuration is present, calls
+  // config.set(key, undefined). Otherwise resolves without store
+  // interaction.
   //
   config.unset = function unset(key) {
+    if (typeof config.get(key) === 'undefined') {
+      return hoodie.resolve();
+    }
+
     return config.set(key, undefined);
   };
 
-  // load cache
-  // TODO: I really don't like this being here. And I don't like that if the
-  //       store API will be truly async one day, this will fall on our feet.
-  hoodie.store.find(type, id).done(function(obj) {
-    cache = obj;
-  });
+  //
+  // load current configuration from localStore.
+  // The init method to be called on hoodie startup
+  //
+  function init() {
+    // TODO: I really don't like this being here. And I don't like that if the
+    //       store API will be truly async one day, this will fall on our feet.
+    //       We should discuss if we make config a simple object in localStorage,
+    //       outside of hoodie.store, and use localStorage sync API directly to
+    //       interact with it, also in future versions.
+    hoodie.store.find(type, id).done(function(obj) {
+      cache = obj;
+    });
+  }
+
+  // allow to run init only once
+  config.init = function() {
+    init();
+    delete config.init;
+  };
+
+  //
+  // subscribe to events coming from other modules
+  //
+  function subscribeToOutsideEvents() {
+    hoodie.on('account:cleanup', config.clear);
+  }
+
+  // allow to run this once from outside
+  config.subscribeToOutsideEvents = function() {
+    subscribeToOutsideEvents();
+    delete config.subscribeToOutsideEvents;
+  };
 
   // exspose public API
   hoodie.config = config;
@@ -1856,6 +1890,74 @@ function hoodieEvents(hoodie, options) {
 module.exports = hoodieEvents;
 
 },{}],10:[function(require,module,exports){
+// hoodie.id
+// =========
+
+// generates a random id and persists using hoodie.config
+// until the user signs out or deletes local data
+function hoodieId (hoodie) {
+  var id;
+
+  function getId() {
+    if (! id) {
+      setId( hoodie.generateId() );
+    }
+    return id;
+  }
+
+  function setId(newId) {
+    id = newId;
+    
+    hoodie.config.set('_hoodieId', newId);
+  }
+
+  function unsetId () {
+    id = undefined;
+    hoodie.config.unset('_hoodieId');
+  }
+
+  //
+  // initialize
+  //
+  function init() {
+    id = hoodie.config.get('_hoodieId');
+
+    // DEPRECATED, remove before 1.0
+    if (! id) {
+      hoodie.config.get('_account.ownerHash');
+    }
+  }
+
+  // allow to run init only once from outside
+  getId.init = function() {
+    init();
+    delete getId.init;
+  };
+
+  //
+  // subscribe to events coming from other modules
+  //
+  function subscribeToOutsideEvents() {
+    hoodie.on('account:cleanup', unsetId);
+    hoodie.on('account:signin', function(username, hoodieId) {
+      setId(hoodieId);
+    });
+  }
+
+  // allow to run this only once from outside
+  getId.subscribeToOutsideEvents = function() {
+    subscribeToOutsideEvents();
+    delete getId.subscribeToOutsideEvents;
+  };
+
+  //
+  // Public API
+  //
+  hoodie.id = getId;
+}
+
+module.exports = hoodieId;
+},{}],11:[function(require,module,exports){
 //
 // hoodie.request
 // ================
@@ -2010,7 +2112,7 @@ function hoodieRequest(hoodie) {
 
 module.exports = hoodieRequest;
 
-},{"../utils/index":20,"extend":1}],11:[function(require,module,exports){
+},{"../utils/index":21,"extend":1}],12:[function(require,module,exports){
 var global=typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {};// LocalStore
 // ============
 
@@ -2089,7 +2191,7 @@ function hoodieStore (hoodie) {
 
     if (isNew) {
       // add createdBy hash
-      object.createdBy = object.createdBy || hoodie.account.ownerHash;
+      object.createdBy = object.createdBy || hoodie.id();
     }
     else {
       // leave createdBy hash
@@ -2995,7 +3097,7 @@ function hoodieStore (hoodie) {
 
 module.exports = hoodieStore;
 
-},{"../error/object_id":7,"../error/object_type":8,"./store":14,"extend":1}],12:[function(require,module,exports){
+},{"../error/object_id":7,"../error/object_type":8,"./store":15,"extend":1}],13:[function(require,module,exports){
 var global=typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {};// Remote
 // ========
 
@@ -3759,7 +3861,7 @@ function hoodieRemoteStore(hoodie, options) {
 
 module.exports = hoodieRemoteStore;
 
-},{"./store":14,"extend":1}],13:[function(require,module,exports){
+},{"./store":15,"extend":1}],14:[function(require,module,exports){
 // scoped Store
 // ============
 
@@ -3872,7 +3974,7 @@ function hoodieScopedStoreApi(hoodie, storeApi, options) {
 
 module.exports = hoodieScopedStoreApi;
 
-},{"../events":9}],14:[function(require,module,exports){
+},{"../events":9}],15:[function(require,module,exports){
 // Store
 // ============
 
@@ -4303,7 +4405,7 @@ function hoodieStoreApi(hoodie, options) {
 
 module.exports = hoodieStoreApi;
 
-},{"../error/error":6,"../error/object_id":7,"../error/object_type":8,"../events":9,"./scoped":13,"extend":1}],15:[function(require,module,exports){
+},{"../error/error":6,"../error/object_id":7,"../error/object_type":8,"../events":9,"./scoped":14,"extend":1}],16:[function(require,module,exports){
 // Tasks
 // ============
 
@@ -4611,7 +4713,7 @@ function hoodieTask(hoodie) {
 
 module.exports = hoodieTask;
 
-},{"../error/error":6,"../events":9,"./scoped":16,"extend":1}],16:[function(require,module,exports){
+},{"../error/error":6,"../events":9,"./scoped":17,"extend":1}],17:[function(require,module,exports){
 // scoped Store
 // ============
 
@@ -4688,7 +4790,7 @@ function hoodieScopedTask(hoodie, taskApi, options) {
 
 module.exports = hoodieScopedTask;
 
-},{"../events":9}],17:[function(require,module,exports){
+},{"../events":9}],18:[function(require,module,exports){
 var global=typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {};// Hoodie Core
 // -------------
 //
@@ -4698,15 +4800,17 @@ var global=typeof self !== "undefined" ? self : typeof window !== "undefined" ? 
 var hoodieAccount = require('./core/account');
 var hoodieAccountRemote = require('./core/account/remote');
 var hoodieConfig = require('./core/config');
-var hoodiePromises = require('./utils/promises');
-var hoodieRequest = require('./core/request');
 var hoodieConnection = require('./core/connection');
-var hoodieDispose = require('./utils/dispose');
-var hoodieOpen = require('./utils/open');
-var hoodieLocalStore = require('./core/store/local');
-var hoodieGenerateId = require('./utils/generate_id');
-var hoodieTask = require('./core/task/index');
 var hoodieEvents = require('./core/events');
+var hoodieId = require('./core/id');
+var hoodieLocalStore = require('./core/store/local');
+var hoodieRequest = require('./core/request');
+var hoodieTask = require('./core/task/index');
+
+var hoodieDispose = require('./utils/dispose');
+var hoodieGenerateId = require('./utils/generate_id');
+var hoodieOpen = require('./utils/open');
+var hoodiePromises = require('./utils/promises');
 
 // Constructor
 // -------------
@@ -4799,19 +4903,34 @@ function Hoodie(baseUrl) {
   // * hoodie.remote
   hoodie.extend(hoodieAccountRemote);
 
+  // * hoodie.id
+  hoodie.extend(hoodieId);
+
 
   //
   // Initializations
   //
 
+  // init config
+  hoodie.config.init();
+
+  // init hoodieId
+  hoodie.id.init();
+
   // set username from config (local store)
   hoodie.account.username = hoodie.config.get('_account.username');
+
+  // init hoodie.remote API
+  hoodie.remote.init();
 
   // check for pending password reset
   hoodie.account.checkPasswordReset();
 
-  // clear config on sign out
-  hoodie.on('account:signout', hoodie.config.clear);
+  // hoodie.id
+  hoodie.id.subscribeToOutsideEvents();
+
+  // hoodie.config
+  hoodie.config.subscribeToOutsideEvents();
 
   // hoodie.store
   hoodie.store.subscribeToOutsideEvents();
@@ -4867,7 +4986,7 @@ function applyExtensions(hoodie) {
 
 module.exports = Hoodie;
 
-},{"./core/account":2,"./core/account/remote":3,"./core/config":4,"./core/connection":5,"./core/events":9,"./core/request":10,"./core/store/local":11,"./core/task/index":15,"./utils/dispose":18,"./utils/generate_id":19,"./utils/open":21,"./utils/promises":22}],18:[function(require,module,exports){
+},{"./core/account":2,"./core/account/remote":3,"./core/config":4,"./core/connection":5,"./core/events":9,"./core/id":10,"./core/request":11,"./core/store/local":12,"./core/task/index":16,"./utils/dispose":19,"./utils/generate_id":20,"./utils/open":22,"./utils/promises":23}],19:[function(require,module,exports){
 // hoodie.dispose
 // ================
 
@@ -4889,7 +5008,7 @@ function hoodieDispose (hoodie) {
 
 module.exports = hoodieDispose;
 
-},{}],19:[function(require,module,exports){
+},{}],20:[function(require,module,exports){
 // hoodie.generateId
 // =============
 
@@ -4930,7 +5049,7 @@ function hoodieGenerateId (hoodie) {
 
 module.exports = hoodieGenerateId;
 
-},{}],20:[function(require,module,exports){
+},{}],21:[function(require,module,exports){
 module.exports = {
 
   now: function () {
@@ -4947,7 +5066,7 @@ module.exports = {
 
 };
 
-},{}],21:[function(require,module,exports){
+},{}],22:[function(require,module,exports){
 // Open stores
 // -------------
 
@@ -4980,7 +5099,7 @@ function hoodieOpen(hoodie) {
 
 module.exports = hoodieOpen;
 
-},{"../core/store/remote":12,"extend":1}],22:[function(require,module,exports){
+},{"../core/store/remote":13,"extend":1}],23:[function(require,module,exports){
 var global=typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {};// Hoodie Defers / Promises
 // ------------------------
 
@@ -5049,7 +5168,7 @@ function hoodiePromises (hoodie) {
 
 module.exports = hoodiePromises;
 
-},{"../core/error/error":6}]},{},[17])
-(17)
+},{"../core/error/error":6}]},{},[18])
+(18)
 });
 ;
