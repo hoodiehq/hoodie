@@ -7,6 +7,7 @@ var openMethod = require('./open');
 var accountRemote = require('./account_remote');
 var request = require('./request');
 var task = require('./task');
+var id = require('./id');
 
 // mixins
 var eventsMixin = require('./events');
@@ -24,6 +25,7 @@ module.exports = function () {
     request: request.apply(this),
     open: openMethod.apply(this),
     generateId: generateId.apply(this),
+    id: id.apply(this),
 
     // main modules
     store: localStore.apply(this),

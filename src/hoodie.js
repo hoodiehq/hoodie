@@ -7,15 +7,17 @@
 var hoodieAccount = require('./core/account');
 var hoodieAccountRemote = require('./core/account/remote');
 var hoodieConfig = require('./core/config');
-var hoodiePromises = require('./utils/promises');
-var hoodieRequest = require('./core/request');
 var hoodieConnection = require('./core/connection');
-var hoodieDispose = require('./utils/dispose');
-var hoodieOpen = require('./utils/open');
-var hoodieLocalStore = require('./core/store/local');
-var hoodieGenerateId = require('./utils/generate_id');
-var hoodieTask = require('./core/task/index');
 var hoodieEvents = require('./core/events');
+var hoodieId = require('./core/id');
+var hoodieLocalStore = require('./core/store/local');
+var hoodieRequest = require('./core/request');
+var hoodieTask = require('./core/task/index');
+
+var hoodieDispose = require('./utils/dispose');
+var hoodieGenerateId = require('./utils/generate_id');
+var hoodieOpen = require('./utils/open');
+var hoodiePromises = require('./utils/promises');
 
 // Constructor
 // -------------
@@ -107,19 +109,34 @@ function Hoodie(baseUrl) {
   // * hoodie.remote
   hoodie.extend(hoodieAccountRemote);
 
+  // * hoodie.id
+  hoodie.extend(hoodieId);
+
 
   //
   // Initializations
   //
 
+  // init config
+  hoodie.config.init();
+
+  // init hoodieId
+  hoodie.id.init();
+
   // set username from config (local store)
   hoodie.account.username = hoodie.config.get('_account.username');
+
+  // init hoodie.remote API
+  hoodie.remote.init();
 
   // check for pending password reset
   hoodie.account.checkPasswordReset();
 
-  // clear config on sign out
-  hoodie.on('account:signout', hoodie.config.clear);
+  // hoodie.id
+  hoodie.id.subscribeToOutsideEvents();
+
+  // hoodie.config
+  hoodie.config.subscribeToOutsideEvents();
 
   // hoodie.store
   hoodie.store.subscribeToOutsideEvents();
