@@ -347,7 +347,7 @@ function hoodieRemoteStore(hoodie, options) {
   remote.bootstrap = function bootstrap() {
     isBootstrapping = true;
     remote.trigger('bootstrap:start');
-    return remote.pull().done(handleBootstrapSuccess);
+    return remote.pull().done(handleBootstrapSuccess).fail(handleBootstrapError);
   };
 
 
@@ -697,11 +697,18 @@ function hoodieRemoteStore(hoodie, options) {
   }
 
 
-  // ### handle changes from remote
+  // ### handle initial bootstrapping from remote
   //
   function handleBootstrapSuccess() {
     isBootstrapping = false;
     remote.trigger('bootstrap:end');
+  }
+
+  // ### handle error of initial bootstrapping from remote
+  //
+  function handleBootstrapError(error) {
+    isBootstrapping = false;
+    remote.trigger('bootstrap:error', error);
   }
 
   // ### handle changes from remote
