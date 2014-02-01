@@ -498,14 +498,24 @@ describe('hoodieRemoteStore', function() {
     });
 
     _when('bootstrap succeeds', function() {
-
       beforeEach(function() {
         this.bootstrapDefer.resolve();
       });
 
       it('should trigger "bootstrap:end" event', function() {
         this.remote.bootstrap();
-        expect(this.remote.trigger.calledWith('bootstrap:end')).to.be.ok();
+        expect(this.remote.trigger).to.be.calledWith('bootstrap:end');
+      });
+    });
+
+    _when('bootstrap fails', function() {
+      beforeEach(function() {
+        this.bootstrapDefer.reject({message: 'bootstrapping aborted'});
+      });
+
+      it('should trigger "bootstrap:error" event', function() {
+        this.remote.bootstrap();
+        expect(this.remote.trigger).to.be.calledWith('bootstrap:error', {message: 'bootstrapping aborted'});
       });
     });
   }); // #bootstrap

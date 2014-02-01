@@ -679,6 +679,7 @@ function hoodieStore (hoodie) {
     hoodie.on('account:signup', markAllAsChanged);
     hoodie.on('remote:bootstrap:start', startBootstrappingMode);
     hoodie.on('remote:bootstrap:end', endBootstrappingMode);
+    hoodie.on('remote:bootstrap:error', abortBootstrappingMode);
 
     // remote events
     hoodie.on('remote:change', handleRemoteChange);
@@ -926,6 +927,20 @@ function hoodieStore (hoodie) {
     }
 
     store.trigger('bootstrap:end');
+  }
+
+  //
+  function abortBootstrappingMode(error) {
+    var methodCall, defer;
+
+    bootstrapping = false;
+    while(queue.length > 0) {
+      methodCall = queue.shift();
+      defer = methodCall[2];
+      defer.reject(error);
+    }
+
+    store.trigger('bootstrap:error', error);
   }
 
   //

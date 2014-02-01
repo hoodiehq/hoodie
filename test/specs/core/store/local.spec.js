@@ -166,6 +166,7 @@ describe('hoodie.store', function() {
       beforeEach(function() {
         expect(this.store.isBootstrapping()).to.eql(false);
         this.outsideEvents['remote:bootstrap:start']('joe@example.com');
+        this.promise = this.storeBackend.findAll();
       });
 
       it('should start bootstrapping mode', function() {
@@ -176,6 +177,10 @@ describe('hoodie.store', function() {
         expect(this.store.trigger).to.be.calledWith('bootstrap:start');
       });
 
+      it('should enqueue all hoodie.store methods', function() {
+        expect(this.promise).to.be.pending();
+      });
+
       _and('remote:bootstrap:end event gets fired', function() {
         beforeEach(function() {
           this.outsideEvents['remote:bootstrap:end']();
@@ -184,8 +189,26 @@ describe('hoodie.store', function() {
         it('should stop bootstrapping mode', function() {
           expect(this.store.isBootstrapping()).to.eql(false);
         });
-      });
-    }); // remote:bootstrap
+
+        it('should dequeue all hoodie.store methods', function() {
+          expect(this.promise).to.be.resolvedWith([]);
+        });
+      }); // remote:bootstrap:end
+
+      _and('remote:bootstrap:error event gets fired', function() {
+        beforeEach(function() {
+          this.outsideEvents['remote:bootstrap:error']({message: 'bootstrapping aborted'});
+        });
+
+        it('should stop bootstrapping mode', function() {
+          expect(this.store.isBootstrapping()).to.eql(false);
+        });
+
+        it('should dequeue all hoodie.store methods', function() {
+          expect(this.promise).to.be.rejectedWith({message: 'bootstrapping aborted'});
+        });
+      }); // remote:bootstrap:error
+    }); // remote:bootstrap:start
   }); // subscribeToOutsideEvents
 
   //
