@@ -23,8 +23,6 @@ module.exports = function(config) {
 
       // ignoring Constructor specs temporarely for 0.5 due to
       // incompatibilities with browserify, as discussed (@gr2m & @svnlto)
-      // 'test/specs/hoodie.spec.js',
-      //
       //
       'test/specs/core/account/index.spec.js',
       'test/specs/core/account/remote.spec.js',
