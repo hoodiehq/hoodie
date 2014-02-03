@@ -14,7 +14,7 @@
 //     }
 //     return defer.promise()
 //
-var HoodieError = require('../core/error/error');
+var HoodieError = require('../lib/error/error');
 
 //
 function hoodiePromises (hoodie) {

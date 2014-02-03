@@ -2,8 +2,8 @@ require('../../lib/setup');
 var remoteStoreStub = sinon.stub();
 
 // stub the requires before loading the actual module
-global.stubRequire('src/core/store/remote', remoteStoreStub);
-var hoodieOpen = require('../../../src/utils/open');
+global.stubRequire('src/lib/store/remote', remoteStoreStub);
+var hoodieOpen = require('../../../src/hoodie/open');
 
 describe('#open(store, options)', function() {
 
@@ -15,7 +15,7 @@ describe('#open(store, options)', function() {
   });
 
   after(function() {
-    global.unstubRequire('src/core/store/remote');
+    global.unstubRequire('src/lib/store/remote');
   });
 
   it('should instantiate a Remote instance', function() {

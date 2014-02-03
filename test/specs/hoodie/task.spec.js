@@ -1,13 +1,13 @@
-require('../../../lib/setup');
+require('../../lib/setup');
 
 // stub the requires before loading the actual module
 var eventsMixin = sinon.spy();
 var hoodieScopedTaskFactory = sinon.stub();
-global.stubRequire('src/core/events', eventsMixin);
+global.stubRequire('src/lib/events', eventsMixin);
 
-global.stubRequire('src/core/task/scoped', hoodieScopedTaskFactory);
-global.unstubRequire('src/core/task/index');
-var hoodieTask = require('../../../../src/core/task/index');
+global.stubRequire('src/lib/task/scoped', hoodieScopedTaskFactory);
+global.unstubRequire('src/hoodie/task');
+var hoodieTask = require('../../../src/hoodie/task');
 
 var extend = require('extend');
 

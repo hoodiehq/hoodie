@@ -1,9 +1,7 @@
 // Open stores
 // -------------
 
-var hoodieRemoteStore = require('../core/store/remote');
-var extend = require('extend');
-
+var hoodieRemoteStore = require('../lib/store/remote');
 var extend = require('extend');
 
 function hoodieOpen(hoodie) {

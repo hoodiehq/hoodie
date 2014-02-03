@@ -1,5 +1,5 @@
 require('../../lib/setup');
-var hoodieId = require('../../../src/core/id');
+var hoodieId = require('../../../src/hoodie/id');
 
 describe('hoodie.id()', function() {
 

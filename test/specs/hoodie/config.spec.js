@@ -1,5 +1,5 @@
 require('../../lib/setup');
-var hoodieConfig = require('../../../src/core/config');
+var hoodieConfig = require('../../../src/hoodie/config');
 
 describe('Hoodie.Config', function() {
 

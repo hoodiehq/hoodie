@@ -1,7 +1,6 @@
 require('../../lib/setup');
 var hoodieGenerateId = require('../../../src/utils/generate_id');
 
-
 describe('hoodie.generateId()', function() {
 
   beforeEach(function() {
