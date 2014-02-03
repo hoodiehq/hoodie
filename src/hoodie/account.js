@@ -1,7 +1,7 @@
 // Hoodie.Account
 // ================
 
-var hoodieEvents = require('../events');
+var hoodieEvents = require('../lib/events');
 var extend = require('extend');
 
 //

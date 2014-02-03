@@ -2,10 +2,10 @@ require('../../../lib/setup');
 
 // stub the requires before loading the actual module
 var storeFactory = sinon.stub();
-global.stubRequire('src/core/store/store', storeFactory);
+global.stubRequire('src/lib/store/api', storeFactory);
 
-global.unstubRequire('src/core/store/remote');
-var hoodieRemoteStore = require('../../../../src/core/store/remote');
+global.unstubRequire('src/lib/store/remote');
+var hoodieRemoteStore = require('../../../../src/lib/store/remote');
 
 describe('hoodieRemoteStore', function() {
 

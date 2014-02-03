@@ -1,6 +1,6 @@
-require('../../../lib/setup');
+require('../../lib/setup');
 
-var hoodieAccount = require('../../../../src/core/account');
+var hoodieAccount = require('../../../src/hoodie/account');
 var extend = require('extend');
 
 describe('hoodie.account', function() {

@@ -26,25 +26,24 @@ module.exports = function(config) {
       // 'test/specs/hoodie.spec.js',
       //
       //
-      'test/specs/core/account/index.spec.js',
-      'test/specs/core/account/remote.spec.js',
-      'test/specs/core/error/error.spec.js',
-      'test/specs/core/store/local.spec.js',
-      'test/specs/core/store/remote.spec.js',
-      'test/specs/core/store/scoped.spec.js',
-      'test/specs/core/store/store.spec.js',
-      'test/specs/core/config.spec.js',
-      'test/specs/core/connection.spec.js',
-      'test/specs/core/events.spec.js',
-      'test/specs/core/id.spec.js',
-      'test/specs/core/request.spec.js',
-      'test/specs/core/task/scoped.spec.js',
-      'test/specs/core/task/task.spec.js',
-
-      'test/specs/utils/open.spec.js',
-      'test/specs/utils/dispose.spec.js',
+      'test/specs/hoodie/account.spec.js',
+      'test/specs/hoodie/config.spec.js',
+      'test/specs/hoodie/connection.spec.js',
+      'test/specs/hoodie/dispose.spec.js',
+      'test/specs/hoodie/id.spec.js',
+      'test/specs/hoodie/open.spec.js',
+      'test/specs/hoodie/remote.spec.js',
+      'test/specs/hoodie/store.spec.js',
+      'test/specs/hoodie/task.spec.js',
+      'test/specs/lib/error/error.spec.js',
+      'test/specs/lib/events.spec.js',
+      'test/specs/lib/store/remote.spec.js',
+      'test/specs/lib/store/scoped.spec.js',
+      'test/specs/lib/store/api.spec.js',
+      'test/specs/lib/task/scoped.spec.js',
       'test/specs/utils/generate_id.spec.js',
-      'test/specs/utils/promises.spec.js'
+      'test/specs/utils/promises.spec.js',
+      'test/specs/utils/request.spec.js'
     ],
 
 

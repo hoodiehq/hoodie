@@ -20,9 +20,9 @@
 //     emailTasks.start( properties );
 //     emailTasks.cancel('id123');
 //
-var hoodieEvents = require('../events');
-var hoodieScopedTask = require('./scoped');
-var HoodieError = require('../error/error');
+var hoodieEvents = require('../lib/events');
+var hoodieScopedTask = require('../lib/task/scoped');
+var HoodieError = require('../lib/error/error');
 
 var extend = require('extend');
 

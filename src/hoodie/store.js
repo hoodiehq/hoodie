@@ -2,11 +2,9 @@
 // ============
 
 //
-var hoodieStoreApi = require('./store');
-var HoodieObjectTypeError = require('../error/object_type');
-var HoodieObjectIdError = require('../error/object_id');
-
-var extend = require('extend');
+var hoodieStoreApi = require('../lib/store/api');
+var HoodieObjectTypeError = require('../lib/error/object_type');
+var HoodieObjectIdError = require('../lib/error/object_id');
 
 var extend = require('extend');
 

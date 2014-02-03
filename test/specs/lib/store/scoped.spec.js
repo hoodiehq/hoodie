@@ -3,10 +3,10 @@ require('../../../lib/setup');
 // stub the requires before loading the actual module
 var eventsMixin = sinon.spy();
 
-global.stubRequire('src/core/events', eventsMixin);
-global.unstubRequire('src/core/store/scoped');
+global.stubRequire('src/lib/events', eventsMixin);
+global.unstubRequire('src/lib/store/scoped');
 
-var hoodieScopedStoreApi = require('../../../../src/core/store/scoped');
+var hoodieScopedStoreApi = require('../../../../src/lib/store/scoped');
 
 describe('hoodieScopedStoreApi', function() {
 

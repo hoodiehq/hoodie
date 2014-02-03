@@ -1,5 +1,5 @@
-require('../../../lib/setup');
-var hoodieAccountRemote = require('../../../../src/core/account/remote');
+require('../../lib/setup');
+var hoodieAccountRemote = require('../../../src/hoodie/remote');
 
 describe('hoodie.remote', function() {
   beforeEach(function() {

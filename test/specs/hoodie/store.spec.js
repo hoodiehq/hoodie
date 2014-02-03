@@ -1,10 +1,10 @@
-require('../../../lib/setup');
+require('../../lib/setup');
 
 // stub the requires before loading the actual module
 var storeFactory = sinon.stub();
-global.stubRequire('src/core/store/store', storeFactory);
+global.stubRequire('src/lib/store/api', storeFactory);
 
-var hoodieLocalStore = require('../../../../src/core/store/local');
+var hoodieLocalStore = require('../../../src/hoodie/store');
 var extend = require('extend');
 
 describe('hoodie.store', function() {
@@ -38,7 +38,7 @@ describe('hoodie.store', function() {
   });
 
   after(function() {
-    global.unstubRequire('src/core/store/store');
+    global.unstubRequire('src/lib/store/api');
   });
 
   //

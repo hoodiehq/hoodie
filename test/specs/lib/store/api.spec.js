@@ -4,11 +4,11 @@ require('../../../lib/setup');
 var eventsMixin = sinon.spy();
 var scopedStoreFactory = sinon.stub();
 
-global.stubRequire('src/core/events', eventsMixin);
-global.stubRequire('src/core/store/scoped', scopedStoreFactory);
+global.stubRequire('src/lib/events', eventsMixin);
+global.stubRequire('src/lib/store/scoped', scopedStoreFactory);
 
-global.unstubRequire('src/core/store/store');
-var hoodieStoreFactory = require('../../../../src/core/store/store');
+global.unstubRequire('src/lib/store/api');
+var hoodieStoreFactory = require('../../../../src/lib/store/api');
 
 var extend = require('extend');
 
@@ -30,8 +30,8 @@ describe('hoodieStoreFactory', function() {
 
 
   after(function() {
-    global.unstubRequire('src/core/events');
-    global.unstubRequire('src/core/store/scoped');
+    global.unstubRequire('src/lib/events');
+    global.unstubRequire('src/lib/store/scoped');
   });
 
   it('sets store.validate from options.validate', function() {

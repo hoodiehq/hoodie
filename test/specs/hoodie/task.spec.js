@@ -3,11 +3,13 @@ require('../../lib/setup');
 // stub the requires before loading the actual module
 var eventsMixin = sinon.spy();
 var hoodieScopedTaskFactory = sinon.stub();
-global.stubRequire('src/hoodie/events', eventsMixin);
-global.stubRequire('src/hoodie/scoped_task', hoodieScopedTaskFactory);
+global.stubRequire('src/lib/events', eventsMixin);
 
+global.stubRequire('src/lib/task/scoped', hoodieScopedTaskFactory);
 global.unstubRequire('src/hoodie/task');
 var hoodieTask = require('../../../src/hoodie/task');
+
+var extend = require('extend');
 
 describe('hoodie.task', function() {
 
@@ -18,7 +20,7 @@ describe('hoodie.task', function() {
     this.clock = this.sandbox.useFakeTimers(0); // '1970-01-01 00:00:00'
     hoodieTask(this.hoodie);
     this.task = this.hoodie.task;
-    $.extend(this.task, eventsMixin);
+    extend(this.task, eventsMixin);
   });
 
   it('should add events API', function() {
@@ -35,11 +37,17 @@ describe('hoodie.task', function() {
 
     _when('user has account', function() {
       beforeEach(function() {
-        this.promise = this.task.start('message', { to: 'joe', text: 'hi'});
+        this.promise = this.task.start('message', {
+          to: 'joe',
+          text: 'hi'
+        });
       });
 
       it('should add a new $task object using hoodie.store.add', function() {
-        expect(this.hoodie.store.add).to.be.calledWith('$message', { to: 'joe', text: 'hi'});
+        expect(this.hoodie.store.add).to.be.calledWith('$message', {
+          to: 'joe',
+          text: 'hi'
+        });
       });
 
       it('should reject when hoodie.store.add rejects', function() {
@@ -49,7 +57,10 @@ describe('hoodie.task', function() {
 
       _when('hoodie.store.add succeeds', function() {
         beforeEach(function() {
-          this.hoodie.store.add.defer.resolve({type: 'message', id: '123'});
+          this.hoodie.store.add.defer.resolve({
+            type: 'message',
+            id: '123'
+          });
         });
 
         it('should not resolve directly', function() {
@@ -64,11 +75,19 @@ describe('hoodie.task', function() {
             var args = this.hoodie.store.on.args[0];
             expect(args[0]).to.eql('remove');
             this.removeCallback = args[1];
-            this.removeCallback( { type: '$message', id: '123', $processedAt: 'now' } );
+            this.removeCallback({
+              type: '$message',
+              id: '123',
+              $processedAt: 'now'
+            });
           });
 
           it('should resolve', function() {
-            expect(this.promise).to.be.resolvedWith( { type: 'message', id: '123', $processedAt: 'now' } );
+            expect(this.promise).to.be.resolvedWith({
+              type: 'message',
+              id: '123',
+              $processedAt: 'now'
+            });
           });
         });
 
@@ -79,18 +98,21 @@ describe('hoodie.task', function() {
             var args = this.hoodie.store.on.args[0];
             expect(args[0]).to.eql('remove');
             this.removeCallback = args[1];
-            this.removeCallback( { type: '$message', id: '123' } );
+            this.removeCallback({
+              type: '$message',
+              id: '123'
+            });
           });
 
           it('should reject', function() {
-            expect(this.promise).to.be.rejectedWith( {
+            expect(this.promise).to.be.rejectedWith({
               'message': 'Task has been cancelled',
               'task': {
                 'type': 'message',
                 'id': '123'
               },
               'name': 'HoodieError'
-            } );
+            });
           });
         });
 
@@ -100,11 +122,18 @@ describe('hoodie.task', function() {
             var args = this.hoodie.store.on.args[1];
             expect(args[0]).to.eql('update');
             this.errorCallback = args[1];
-            this.errorCallback({ type: '$message', id: '123', $error: 'oops' } );
+            this.errorCallback({
+              type: '$message',
+              id: '123',
+              $error: 'oops'
+            });
           });
 
           it('should reject', function() {
-            expect(this.promise).to.be.rejectedWith({ message: 'oops', name: 'HoodieError' });
+            expect(this.promise).to.be.rejectedWith({
+              message: 'oops',
+              name: 'HoodieError'
+            });
           });
         });
       });
@@ -113,7 +142,10 @@ describe('hoodie.task', function() {
     _when('user has no account', function() {
       beforeEach(function() {
         this.hoodie.account.hasAccount.returns(false);
-        this.promise = this.task.start('message', { to: 'joe', text: 'hi'});
+        this.promise = this.task.start('message', {
+          to: 'joe',
+          text: 'hi'
+        });
       });
 
       it('should sign up for an anonymous account', function() {
@@ -128,7 +160,10 @@ describe('hoodie.task', function() {
       it('should call task.start again if signup suceeded', function() {
         this.sandbox.stub(this.task, 'start').returns('funk');
         this.hoodie.account.anonymousSignUp.defer.resolve();
-        expect(this.task.start).to.be.calledWith('message', { to: 'joe', text: 'hi'});
+        expect(this.task.start).to.be.calledWith('message', {
+          to: 'joe',
+          text: 'hi'
+        });
         expect(this.promise).to.be.resolvedWith('funk');
       });
     });
@@ -140,7 +175,9 @@ describe('hoodie.task', function() {
     });
 
     it('should add a new $task object using hoodie.store.add', function() {
-      expect(this.hoodie.store.update).to.be.calledWith('$message', '123', { cancelledAt: now()});
+      expect(this.hoodie.store.update).to.be.calledWith('$message', '123', {
+        cancelledAt: now()
+      });
     });
 
     it('should reject when hoodie.store.add rejects', function() {
@@ -150,7 +187,10 @@ describe('hoodie.task', function() {
 
     _when('hoodie.store.update succeeds (task has not been synced yet)', function() {
       beforeEach(function() {
-        this.hoodie.store.update.defer.resolve({type: '$message', id: '123'});
+        this.hoodie.store.update.defer.resolve({
+          type: '$message',
+          id: '123'
+        });
       });
 
       it('should remove the task from store', function() {
@@ -181,7 +221,11 @@ describe('hoodie.task', function() {
 
     _when('hoodie.store.update succeeds (task has been synced already)', function() {
       beforeEach(function() {
-        this.hoodie.store.update.defer.resolve({type: '$message', id: '123', _rev: '1-234'});
+        this.hoodie.store.update.defer.resolve({
+          type: '$message',
+          id: '123',
+          _rev: '1-234'
+        });
       });
 
       it('should remove the task from store', function() {
@@ -222,7 +266,9 @@ describe('hoodie.task', function() {
       this.cancelDefer = this.hoodie.defer();
       this.sandbox.stub(this.hoodie.task, 'cancel').returns(this.cancelDefer.promise());
       this.sandbox.stub(this.hoodie.task, 'start');
-      this.promise = this.hoodie.task.restart('message', '123', { extra: 'creme'});
+      this.promise = this.hoodie.task.restart('message', '123', {
+        extra: 'creme'
+      });
     });
 
     it('should cancel a running task', function() {
@@ -268,9 +314,15 @@ describe('hoodie.task', function() {
       filter = this.hoodie.store.findAll.args[0][0];
       expect(filter).to.be.a(Function);
 
-      expect(filter({type: '$task'})).to.eql(true);
-      expect(filter({type: '$message'})).to.eql(true);
-      expect(filter({type: 'doc'})).to.eql(false);
+      expect(filter({
+        type: '$task'
+      })).to.eql(true);
+      expect(filter({
+        type: '$message'
+      })).to.eql(true);
+      expect(filter({
+        type: 'doc'
+      })).to.eql(false);
     });
 
     it('should filter by passed type', function() {
@@ -279,9 +331,15 @@ describe('hoodie.task', function() {
       filter = this.hoodie.store.findAll.args[1][0];
       expect(filter).to.be.a(Function);
 
-      expect(filter({type: '$task'})).to.eql(true);
-      expect(filter({type: '$message'})).to.eql(false);
-      expect(filter({type: 'doc'})).to.eql(false);
+      expect(filter({
+        type: '$task'
+      })).to.eql(true);
+      expect(filter({
+        type: '$message'
+      })).to.eql(false);
+      expect(filter({
+        type: 'doc'
+      })).to.eql(false);
     });
 
     it('rejects if findAll fails', function() {
@@ -291,10 +349,13 @@ describe('hoodie.task', function() {
 
     _when('findAll succeeds', function() {
       beforeEach(function() {
-        this.hoodie.store.findAll.defer.resolve([
-          {type: '$task', id: '123'},
-          {type: '$message', id: '124'}
-        ]);
+        this.hoodie.store.findAll.defer.resolve([{
+          type: '$task',
+          id: '123'
+        }, {
+          type: '$message',
+          id: '124'
+        }]);
       });
 
       it('cancels each task', function() {
@@ -316,9 +377,15 @@ describe('hoodie.task', function() {
       filter = this.hoodie.store.findAll.args[0][0];
       expect(filter).to.be.a(Function);
 
-      expect(filter({type: '$task'})).to.eql(true);
-      expect(filter({type: '$message'})).to.eql(true);
-      expect(filter({type: 'doc'})).to.eql(false);
+      expect(filter({
+        type: '$task'
+      })).to.eql(true);
+      expect(filter({
+        type: '$message'
+      })).to.eql(true);
+      expect(filter({
+        type: 'doc'
+      })).to.eql(false);
     });
 
     it('should filter by passed type', function() {
@@ -327,9 +394,15 @@ describe('hoodie.task', function() {
       filter = this.hoodie.store.findAll.args[1][0];
       expect(filter).to.be.a(Function);
 
-      expect(filter({type: '$task'})).to.eql(true);
-      expect(filter({type: '$message'})).to.eql(false);
-      expect(filter({type: 'doc'})).to.eql(false);
+      expect(filter({
+        type: '$task'
+      })).to.eql(true);
+      expect(filter({
+        type: '$message'
+      })).to.eql(false);
+      expect(filter({
+        type: 'doc'
+      })).to.eql(false);
     });
 
     it('rejects if findAll fails', function() {
@@ -339,10 +412,13 @@ describe('hoodie.task', function() {
 
     _when('findAll succeeds', function() {
       beforeEach(function() {
-        this.hoodie.store.findAll.defer.resolve([
-          {type: '$task', id: '123'},
-          {type: '$message', id: '124'}
-        ]);
+        this.hoodie.store.findAll.defer.resolve([{
+          type: '$task',
+          id: '123'
+        }, {
+          type: '$message',
+          id: '124'
+        }]);
       });
 
       it('restarts each task', function() {
@@ -351,18 +427,28 @@ describe('hoodie.task', function() {
       });
 
       it('passes update', function() {
-        this.hoodie.task.restartAll({extra: 'love'});
-        expect(this.hoodie.task.restart).to.be.calledWith('task', '123', {extra: 'love'});
-        expect(this.hoodie.task.restart).to.be.calledWith('message', '124', {extra: 'love'});
+        this.hoodie.task.restartAll({
+          extra: 'love'
+        });
+        expect(this.hoodie.task.restart).to.be.calledWith('task', '123', {
+          extra: 'love'
+        });
+        expect(this.hoodie.task.restart).to.be.calledWith('message', '124', {
+          extra: 'love'
+        });
 
-        this.hoodie.task.restartAll('task', {extra: 'creme'});
-        expect(this.hoodie.task.restart).to.be.calledWith('task', '123', {extra: 'creme'});
+        this.hoodie.task.restartAll('task', {
+          extra: 'creme'
+        });
+        expect(this.hoodie.task.restart).to.be.calledWith('task', '123', {
+          extra: 'creme'
+        });
       });
     });
   });
 
   describe('hoodie.task called as function', function() {
-    beforeEach( function() {
+    beforeEach(function() {
       hoodieScopedTaskFactory.reset();
       hoodieScopedTaskFactory.returns('scoped api');
     });
@@ -395,57 +481,209 @@ describe('hoodie.task', function() {
     });
 
     it('can only be run once', function() {
-      expect( this.task.subscribeToOutsideEvents ).to.eql(undefined);
+      expect(this.task.subscribeToOutsideEvents).to.eql(undefined);
     });
 
     it('turns "new" store events into "start" task events', function() {
-      this.events['store:change']('add', { type: '$message', text: 'funk!'}, {option: 'value'});
-      expect( this.task.trigger ).to.be.calledWith( 'change', 'start', { type: 'message', text: 'funk!'}, {option: 'value'} );
-      expect( this.task.trigger ).to.be.calledWith( 'message:change', 'start', { type: 'message', text: 'funk!'}, {option: 'value'} );
-      expect( this.task.trigger ).to.be.calledWith( 'start', { type: 'message', text: 'funk!'}, {option: 'value'} );
-      expect( this.task.trigger ).to.be.calledWith( 'message:start', { type: 'message', text: 'funk!'}, {option: 'value'} );
-      expect( this.task.trigger.callCount ).to.eql(4);
+      this.events['store:change']('add', {
+        type: '$message',
+        text: 'funk!'
+      }, {
+        option: 'value'
+      });
+      expect(this.task.trigger).to.be.calledWith('change', 'start', {
+        type: 'message',
+        text: 'funk!'
+      }, {
+        option: 'value'
+      });
+      expect(this.task.trigger).to.be.calledWith('message:change', 'start', {
+        type: 'message',
+        text: 'funk!'
+      }, {
+        option: 'value'
+      });
+      expect(this.task.trigger).to.be.calledWith('start', {
+        type: 'message',
+        text: 'funk!'
+      }, {
+        option: 'value'
+      });
+      expect(this.task.trigger).to.be.calledWith('message:start', {
+        type: 'message',
+        text: 'funk!'
+      }, {
+        option: 'value'
+      });
+      expect(this.task.trigger.callCount).to.eql(4);
     });
 
     it('ignores tasks on non-task objects', function() {
-      this.events['store:change']('add', { type: 'message', text: 'funk!'}, {option: 'value'});
-      expect( this.task.trigger ).to.not.be.called();
+      this.events['store:change']('add', {
+        type: 'message',
+        text: 'funk!'
+      }, {
+        option: 'value'
+      });
+      expect(this.task.trigger).to.not.be.called();
     });
 
     it('triggers "error" events if tasks are marked so', function() {
-      this.events['store:change']('update', { type: '$message', id: '123', $error: 'not funky!'}, {option: 'value'});
-      expect( this.task.trigger ).to.be.calledWith( 'change', 'error', { type: 'message', id: '123' }, {error: 'not funky!', option: 'value'} );
-      expect( this.task.trigger ).to.be.calledWith( 'message:change', 'error', { type: 'message', id: '123' }, {error: 'not funky!', option: 'value'} );
-      expect( this.task.trigger ).to.be.calledWith( 'message:123:change', 'error', { type: 'message', id: '123' }, {error: 'not funky!', option: 'value'} );
-      expect( this.task.trigger ).to.be.calledWith( 'error', 'not funky!', { type: 'message', id: '123' }, {option: 'value'} );
-      expect( this.task.trigger ).to.be.calledWith( 'message:error', 'not funky!', { type: 'message', id: '123' }, {option: 'value'} );
-      expect( this.task.trigger ).to.be.calledWith( 'message:123:error', 'not funky!', { type: 'message', id: '123' }, {option: 'value'} );
-      expect( this.task.trigger.callCount ).to.eql(6);
+      this.events['store:change']('update', {
+        type: '$message',
+        id: '123',
+        $error: 'not funky!'
+      }, {
+        option: 'value'
+      });
+      expect(this.task.trigger).to.be.calledWith('change', 'error', {
+        type: 'message',
+        id: '123'
+      }, {
+        error: 'not funky!',
+        option: 'value'
+      });
+      expect(this.task.trigger).to.be.calledWith('message:change', 'error', {
+        type: 'message',
+        id: '123'
+      }, {
+        error: 'not funky!',
+        option: 'value'
+      });
+      expect(this.task.trigger).to.be.calledWith('message:123:change', 'error', {
+        type: 'message',
+        id: '123'
+      }, {
+        error: 'not funky!',
+        option: 'value'
+      });
+      expect(this.task.trigger).to.be.calledWith('error', 'not funky!', {
+        type: 'message',
+        id: '123'
+      }, {
+        option: 'value'
+      });
+      expect(this.task.trigger).to.be.calledWith('message:error', 'not funky!', {
+        type: 'message',
+        id: '123'
+      }, {
+        option: 'value'
+      });
+      expect(this.task.trigger).to.be.calledWith('message:123:error', 'not funky!', {
+        type: 'message',
+        id: '123'
+      }, {
+        option: 'value'
+      });
+      expect(this.task.trigger.callCount).to.eql(6);
     });
 
     it('triggers "cancel" events when a task has been removed with a cancelledAt timestamp', function() {
-      this.events['store:change']('remove', { type: '$message', id: '123', cancelledAt: '2013-09-05'}, {option: 'value'});
+      this.events['store:change']('remove', {
+        type: '$message',
+        id: '123',
+        cancelledAt: '2013-09-05'
+      }, {
+        option: 'value'
+      });
 
-      expect( this.task.trigger ).to.be.calledWith( 'change', 'cancel', { type: 'message', id: '123', cancelledAt: '2013-09-05' }, {option: 'value'} );
-      expect( this.task.trigger ).to.be.calledWith( 'message:change', 'cancel', { type: 'message', id: '123', cancelledAt: '2013-09-05' }, {option: 'value'} );
-      expect( this.task.trigger ).to.be.calledWith( 'message:123:change', 'cancel', { type: 'message', id: '123', cancelledAt: '2013-09-05' }, {option: 'value'} );
-      expect( this.task.trigger ).to.be.calledWith( 'cancel', { type: 'message', id: '123', cancelledAt: '2013-09-05' }, {option: 'value'} );
-      expect( this.task.trigger ).to.be.calledWith( 'message:cancel', { type: 'message', id: '123', cancelledAt: '2013-09-05' }, {option: 'value'} );
-      expect( this.task.trigger ).to.be.calledWith( 'message:123:cancel', { type: 'message', id: '123', cancelledAt: '2013-09-05' }, {option: 'value'} );
+      expect(this.task.trigger).to.be.calledWith('change', 'cancel', {
+        type: 'message',
+        id: '123',
+        cancelledAt: '2013-09-05'
+      }, {
+        option: 'value'
+      });
+      expect(this.task.trigger).to.be.calledWith('message:change', 'cancel', {
+        type: 'message',
+        id: '123',
+        cancelledAt: '2013-09-05'
+      }, {
+        option: 'value'
+      });
+      expect(this.task.trigger).to.be.calledWith('message:123:change', 'cancel', {
+        type: 'message',
+        id: '123',
+        cancelledAt: '2013-09-05'
+      }, {
+        option: 'value'
+      });
+      expect(this.task.trigger).to.be.calledWith('cancel', {
+        type: 'message',
+        id: '123',
+        cancelledAt: '2013-09-05'
+      }, {
+        option: 'value'
+      });
+      expect(this.task.trigger).to.be.calledWith('message:cancel', {
+        type: 'message',
+        id: '123',
+        cancelledAt: '2013-09-05'
+      }, {
+        option: 'value'
+      });
+      expect(this.task.trigger).to.be.calledWith('message:123:cancel', {
+        type: 'message',
+        id: '123',
+        cancelledAt: '2013-09-05'
+      }, {
+        option: 'value'
+      });
     });
 
     it('triggers "success" events when a task has been removed with a $processedAt timestamp', function() {
-      this.events['store:change']('remove', { type: '$message', id: '123', $processedAt: '2013-09-05'}, {option: 'value'});
+      this.events['store:change']('remove', {
+        type: '$message',
+        id: '123',
+        $processedAt: '2013-09-05'
+      }, {
+        option: 'value'
+      });
 
-      expect( this.task.trigger ).to.be.calledWith( 'change', 'success', { type: 'message', id: '123', $processedAt: '2013-09-05' }, {option: 'value'} );
-      expect( this.task.trigger ).to.be.calledWith( 'message:change', 'success', { type: 'message', id: '123', $processedAt: '2013-09-05' }, {option: 'value'} );
-      expect( this.task.trigger ).to.be.calledWith( 'message:123:change', 'success', { type: 'message', id: '123', $processedAt: '2013-09-05' }, {option: 'value'} );
-      expect( this.task.trigger ).to.be.calledWith( 'success', { type: 'message', id: '123', $processedAt: '2013-09-05' }, {option: 'value'} );
-      expect( this.task.trigger ).to.be.calledWith( 'message:success', { type: 'message', id: '123', $processedAt: '2013-09-05' }, {option: 'value'} );
-      expect( this.task.trigger ).to.be.calledWith( 'message:123:success', { type: 'message', id: '123', $processedAt: '2013-09-05' }, {option: 'value'} );
+      expect(this.task.trigger).to.be.calledWith('change', 'success', {
+        type: 'message',
+        id: '123',
+        $processedAt: '2013-09-05'
+      }, {
+        option: 'value'
+      });
+      expect(this.task.trigger).to.be.calledWith('message:change', 'success', {
+        type: 'message',
+        id: '123',
+        $processedAt: '2013-09-05'
+      }, {
+        option: 'value'
+      });
+      expect(this.task.trigger).to.be.calledWith('message:123:change', 'success', {
+        type: 'message',
+        id: '123',
+        $processedAt: '2013-09-05'
+      }, {
+        option: 'value'
+      });
+      expect(this.task.trigger).to.be.calledWith('success', {
+        type: 'message',
+        id: '123',
+        $processedAt: '2013-09-05'
+      }, {
+        option: 'value'
+      });
+      expect(this.task.trigger).to.be.calledWith('message:success', {
+        type: 'message',
+        id: '123',
+        $processedAt: '2013-09-05'
+      }, {
+        option: 'value'
+      });
+      expect(this.task.trigger).to.be.calledWith('message:123:success', {
+        type: 'message',
+        id: '123',
+        $processedAt: '2013-09-05'
+      }, {
+        option: 'value'
+      });
     });
   }); // subscribeToOutsideEvents
-
   function now() {
     return '1970-01-01T00:00:00.000Z';
   }

@@ -36,7 +36,7 @@
 // * on(event, callback)
 //
 
-var hoodieStoreApi = require('./store');
+var hoodieStoreApi = require('./api');
 var extend = require('extend');
 
 //

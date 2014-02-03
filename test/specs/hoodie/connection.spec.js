@@ -1,5 +1,5 @@
 require('../../lib/setup');
-var hoodieConnection = require('../../../src/core/connection');
+var hoodieConnection = require('../../../src/hoodie/connection');
 
 describe('#checkConnection()', function() {
 

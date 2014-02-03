@@ -11,11 +11,21 @@ hoodie.js uses [grunt.js](http://gruntjs.com) for automation and [phantomJS](htt
 That's all you need. Make your changes, run the test, send a pull request, win karma. We've lots to give
 
 ```bash
-  grunt concat               # Build lib/
-  grunt watch                # Build lib/ and watch for changes
-  grunt test                 # Run all test
-  grunt build                # build hoodie.min.js
-  grunt docs                 # create docs from code
+  grunt test        # Run all test
+  grunt watch       # Build lib/ and watch for changes
+  grunt build       # build dist/hoodie.js & dist/hoodie.min.js
+```
+
+
+Hoodie Folders & Files
+----------------------
+
+```
+src
+├── hoodie.js    Entry point. Builds the Hoodie instance
+├── hoodie       hoodie core modules, exposed as hoodie.moduleName
+├── lib          internally used modules, exposed in `Hoodie.extend( function(hoodie, lib) {})`
+└── utils        internally used helper methods, exposed in `Hoodie.extend( function(hoodie, lib, utils) {})`
 ```
 
 

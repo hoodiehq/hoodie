@@ -1,5 +1,5 @@
 require('../../lib/setup');
-var HoodieError = require('../../../src/hoodie/error');
+var HoodieError = require('../../../src/lib/error/error');
 
 describe('#HoodieError()', function() {
 
@@ -12,21 +12,28 @@ describe('#HoodieError()', function() {
     expect(error.message).to.be('There is no Santa Clause');
   });
   it('can be called with an object', function() {
-    var error = new HoodieError({ message: 'There is no Santa Clause' });
+    var error = new HoodieError({
+      message: 'There is no Santa Clause'
+    });
     expect(error.message).to.be('There is no Santa Clause');
   });
   it('defaults name to HoodieError', function() {
-    var error = new HoodieError({ message: 'There is no Santa Clause' });
+    var error = new HoodieError({
+      message: 'There is no Santa Clause'
+    });
     expect(error.name).to.be('HoodieError');
   });
   it('requires message to be set', function() {
     var hoodieErrorWithoutMessage = function() {
-      new HoodieError({});
-    };
+        new HoodieError({});
+      };
     expect(hoodieErrorWithoutMessage).to.throwError(/FATAL: error.message must be set/);
   });
   it('accepts a custom name for the error', function() {
-    var error = new HoodieError({name: 'FunkMissingError', message: 'You don\'t have the funk!'});
+    var error = new HoodieError({
+      name: 'FunkMissingError',
+      message: 'You don\'t have the funk!'
+    });
     expect(error.name).to.be('FunkMissingError');
   });
   it('passes all other properties to instance', function() {
