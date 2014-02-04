@@ -17,7 +17,6 @@ var hoodieOpen = require('./hoodie/open');
 var hoodieEvents = require('./lib/events');
 
 var hoodieRequest = require('./utils/request');
-var hoodieGenerateId = require('./utils/generate_id');
 var hoodiePromises = require('./utils/promises');
 
 // Constructor
@@ -83,9 +82,6 @@ function Hoodie(baseUrl) {
   // * hoodie.isOnline
   // * hoodie.checkConnection
   hoodie.extend(hoodieConnection);
-
-  // * hoodie.uuid
-  hoodie.extend(hoodieGenerateId);
 
   // * hoodie.dispose
   hoodie.extend(hoodieDispose);

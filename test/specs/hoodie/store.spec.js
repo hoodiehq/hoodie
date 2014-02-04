@@ -4,6 +4,9 @@ require('../../lib/setup');
 var storeFactory = sinon.stub();
 global.stubRequire('src/lib/store/api', storeFactory);
 
+var generateIdMock = require('../../mocks/utils/generate_id');
+global.stubRequire('src/utils/generate_id', generateIdMock);
+
 var hoodieLocalStore = require('../../../src/hoodie/store');
 var extend = require('extend');
 
@@ -11,6 +14,7 @@ describe('hoodie.store', function() {
 
   beforeEach(function() {
     this.hoodie = this.MOCKS.hoodie.apply(this);
+    generateIdMock.returns('uuid123');
 
     // see https://github.com/pivotal/jasmine/issues/299
     Object.defineProperty(localStorage, 'setItem', { writable: true });
