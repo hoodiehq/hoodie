@@ -1,4 +1,3 @@
-
 # Hoodie ✪ power to the frontend! [![Build Status](https://travis-ci.org/hoodiehq/hoodie.js.png?branch=master)](https://travis-ci.org/hoodiehq/hoodie.js)
 
 Hoodie is a JavaScript library for the browser.
@@ -206,6 +205,6 @@ review the [guidelines for contributing](CONTRIBUTING.md).
 License & Copyright
 -------------------
 
-Copyright 2012, 2013 https://github.com/hoodiehq/ and other contributors
+Copyright 2012-2014 https://github.com/hoodiehq/ and other contributors
 
 Licensed under the Apache License 2.0.
