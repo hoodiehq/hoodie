@@ -44,14 +44,6 @@ module.exports = function(grunt) {
       }
     },
 
-    groc: {
-      javascript: ['src/**/*.js'],
-      options: {
-        'out': 'doc/',
-        'whitespace-after-token': false
-      }
-    },
-
     karma: {
       options: {
         configFile: 'karma.conf.js',
@@ -167,5 +159,4 @@ module.exports = function(grunt) {
   grunt.registerTask('default', ['test']);
   grunt.registerTask('build', ['jshint', 'karma:continuous', 'browserify:build', 'concat', 'uglify']);
   grunt.registerTask('test', ['karma:dev']);
-  grunt.registerTask('docs', ['groc']);
 };
