@@ -1,4 +1,7 @@
 require('../../lib/setup');
+
+var generateIdMock = require('../../mocks/utils/generate_id');
+global.stubRequire('src/utils/generate_id', generateIdMock);
 var hoodieId = require('../../../src/hoodie/id');
 
 describe('hoodie.id()', function() {
@@ -7,7 +10,7 @@ describe('hoodie.id()', function() {
     this.hoodie = this.MOCKS.hoodie.apply(this);
     hoodieId(this.hoodie);
     this.id = this.hoodie.id;
-    this.hoodie.generateId.returns('randomid');
+    generateIdMock.returns('randomid');
   });
   it('returns a random id when called the first time', function() {
     var id = this.id();
@@ -15,10 +18,10 @@ describe('hoodie.id()', function() {
   });
 
   it('generates a new id only once', function() {
-    this.hoodie.generateId.reset();
+    generateIdMock.reset();
     var id1 = this.id();
     var id2 = this.id();
-    expect(this.hoodie.generateId.calledOnce).to.be.ok();
+    expect(generateIdMock.calledOnce).to.be.ok();
     expect(id1).to.eql(id2);
   });
 
@@ -60,13 +63,13 @@ describe('hoodie.id()', function() {
     });
 
     it('unsets hoodieId on account:cleanup', function() {
-      this.hoodie.generateId.returns('currentId');
+      generateIdMock.returns('currentId');
       var currentId = this.id();
       expect(currentId).to.be('currentId');
 
       this.events['account:cleanup']();
       this.hoodie.config.set.reset();
-      this.hoodie.generateId.returns('newId');
+      generateIdMock.returns('newId');
       var newId = this.id();
       
       expect(newId).to.be('newId');

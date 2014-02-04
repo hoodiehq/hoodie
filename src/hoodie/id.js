@@ -1,6 +1,8 @@
 // hoodie.id
 // =========
 
+var generateId = require('../utils/generate_id');
+
 // generates a random id and persists using hoodie.config
 // until the user signs out or deletes local data
 function hoodieId (hoodie) {
@@ -8,7 +10,7 @@ function hoodieId (hoodie) {
 
   function getId() {
     if (! id) {
-      setId( hoodie.generateId() );
+      setId( generateId() );
     }
     return id;
   }

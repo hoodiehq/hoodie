@@ -5,6 +5,7 @@
 var hoodieStoreApi = require('../lib/store/api');
 var HoodieObjectTypeError = require('../lib/error/object_type');
 var HoodieObjectIdError = require('../lib/error/object_id');
+var generateId = require('../utils/generate_id');
 
 var extend = require('extend');
 
@@ -69,7 +70,7 @@ function hoodieStore (hoodie) {
       isNew = typeof currentObject !== 'object';
     } else {
       isNew = true;
-      object.id = hoodie.generateId();
+      object.id = generateId();
     }
 
     if (isNew) {

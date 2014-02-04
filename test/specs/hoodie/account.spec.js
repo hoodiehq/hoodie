@@ -1,5 +1,8 @@
 require('../../lib/setup');
 
+var generateIdMock = require('../../mocks/utils/generate_id');
+global.stubRequire('src/utils/generate_id', generateIdMock);
+
 var hoodieAccount = require('../../../src/hoodie/account');
 var extend = require('extend');
 
@@ -11,6 +14,7 @@ describe('hoodie.account', function() {
     this.noop = function() {};
 
     this.hoodie = this.MOCKS.hoodie.apply(this);
+    generateIdMock.returns('uuid123');
 
     // for more sophisticated request stubbing
     this.requestDefers = [];
@@ -819,7 +823,7 @@ describe('hoodie.account', function() {
 
       it('should generate a password and store it locally in _account.anonymousPassword', function() {
         this.account.anonymousSignUp();
-        expect(this.hoodie.generateId).to.be.calledWith(10);
+        expect(generateIdMock).to.be.calledWith(10);
         expect(this.hoodie.config.set).to.be.calledWith('_account.anonymousPassword', 'uuid123');
       });
     });
@@ -1716,7 +1720,7 @@ describe('hoodie.account', function() {
         this.hoodie.config.get.resetBehavior();
 
         this.hoodie.config.get.returns(void 0);
-        this.hoodie.generateId.returns('uuid567');
+        generateIdMock.returns('uuid567');
 
         this.account.resetPassword('joe@example.com');
 

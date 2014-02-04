@@ -1,7 +1,6 @@
 // modules
 var account = require('./account');
 var config = require('./config');
-var generateId = require('./generate_id');
 var localStore = require('./local_store');
 var openMethod = require('./open');
 var accountRemote = require('./account_remote');
@@ -24,7 +23,6 @@ module.exports = function () {
     // helpers
     request: request.apply(this),
     open: openMethod.apply(this),
-    generateId: generateId.apply(this),
     id: id.apply(this),
 
     // main modules
