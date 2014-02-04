@@ -30,7 +30,6 @@
     "grunt-contrib-jshint": "~0.6.0",
     "grunt-contrib-watch": "~0.4.4",
     "grunt-contrib-concat": "~0.3.0",
-    "grunt-groc": "~0.3.0",
     "grunt-shell": "~0.3.0",
     "karma": "~0.10.4",
     "karma-script-launcher": "~0.1.0",
