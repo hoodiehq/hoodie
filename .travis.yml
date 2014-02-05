@@ -1,11 +1,11 @@
 before_install:
-  - ./support/sauce/sauce_connect_setup.sh
+  - ./test/support/sauce/sauce_connect_setup.sh
   - npm install -g bower
   - npm install -g grunt-cli
 
 before_script:
   - bower install
-  - chmod +x ./support/**
+  - chmod +x ./test/support/**
 
 language: node_js
 
