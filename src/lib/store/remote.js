@@ -38,6 +38,7 @@
 
 var hoodieStoreApi = require('./api');
 var extend = require('extend');
+var generateId = require('../../utils/generate_id');
 
 //
 function hoodieRemoteStore(hoodie, options) {
@@ -118,7 +119,7 @@ function hoodieRemoteStore(hoodie, options) {
     var path;
 
     if (!object.id) {
-      object.id = hoodie.generateId();
+      object.id = generateId();
     }
 
     object = parseForRemote(object);
@@ -585,7 +586,7 @@ function hoodieRemoteStore(hoodie, options) {
 
   //
   function generateNewRevisionId() {
-    return hoodie.generateId(9);
+    return generateId(9);
   }
 
 
