@@ -4,7 +4,6 @@ module.exports = {
   connection: require('./connection'),
   dispose: require('./dispose'),
   events: require('./events'),
-  generate_id: require('./generate_id'),
   hoodie: require('./hoodie'),
   id: require('./id'),
   localStore: require('./local_store'),

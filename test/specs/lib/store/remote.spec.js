@@ -4,6 +4,9 @@ require('../../../lib/setup');
 var storeFactory = sinon.stub();
 global.stubRequire('src/lib/store/api', storeFactory);
 
+var generateIdMock = require('../../../mocks/utils/generate_id');
+global.stubRequire('src/utils/generate_id', generateIdMock);
+
 global.unstubRequire('src/lib/store/remote');
 var hoodieRemoteStore = require('../../../../src/lib/store/remote');
 
@@ -11,6 +14,7 @@ describe('hoodieRemoteStore', function() {
 
   beforeEach(function() {
     this.hoodie = this.MOCKS.hoodie.apply(this);
+    generateIdMock.returns('uuid123');
 
     this.requestDefer = this.hoodie.defer();
     var promise = this.requestDefer.promise();
@@ -272,13 +276,15 @@ describe('hoodieRemoteStore', function() {
   describe('#save(type, id, object)', function() {
 
     it('should generate an id if it is undefined', function() {
+      generateIdMock.reset();
       this.storeBackend.save({type: 'car'});
-      expect(this.hoodie.generateId).to.be.called();
+      expect(generateIdMock).to.be.called();
     });
 
     it('should not generate an id if id is set', function() {
+      generateIdMock.reset();
       this.storeBackend.save({type: 'car', id: '123'});
-      expect(this.hoodie.generateId).to.not.be.called();
+      expect(generateIdMock).to.not.be.called();
     });
 
     it('should return promise by @request', function() {

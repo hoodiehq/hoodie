@@ -3,6 +3,7 @@
 
 var hoodieEvents = require('../lib/events');
 var extend = require('extend');
+var generateId = require('../utils/generate_id');
 
 //
 function hoodieAccount(hoodie) {
@@ -175,7 +176,7 @@ function hoodieAccount(hoodie) {
   account.anonymousSignUp = function anonymousSignUp() {
     var password, username;
 
-    password = hoodie.generateId(10);
+    password = generateId(10);
     username = hoodie.id();
 
     return account.signUp(username, password).done(function() {
@@ -410,7 +411,7 @@ function hoodieAccount(hoodie) {
       return account.checkPasswordReset();
     }
 
-    resetPasswordId = '' + username + '/' + (hoodie.generateId());
+    resetPasswordId = '' + username + '/' + (generateId());
 
     hoodie.config.set('_account.resetPasswordId', resetPasswordId);
 
