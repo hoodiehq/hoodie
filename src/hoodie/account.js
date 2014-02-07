@@ -473,7 +473,7 @@ function hoodieAccount(hoodie) {
       }
     };
 
-    return withPreviousRequestsAborted('passwordResetStatus', function() {
+    return withSingleRequest('passwordResetStatus', function() {
       return account.request('GET', url, options).then(
       handlePasswordResetStatusRequestSuccess, handlePasswordResetStatusRequestError).fail(function(error) {
         if (error.name === 'HoodiePendingError') {
