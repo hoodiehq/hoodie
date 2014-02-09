@@ -11,3 +11,4 @@ require('./unit/nodejitsu_server-test');
 require('./unit/server-test');
 require('./unit/utils-test');
 require('./integration/require');
+require('./integration/handle_404');
