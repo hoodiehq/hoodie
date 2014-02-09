@@ -4,6 +4,6 @@
   "version": "0.3.0",
   "main": "index",
   "peerDependencies": {
-    "hapi": "1.x.x"
+    "hapi": "2.x.x"
   }
 }
