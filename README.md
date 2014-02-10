@@ -165,7 +165,7 @@ You can also subscribe to the following task events
   });
 
   magic.fail(function(eror) {
-    alert('Sory, but something went wrong: ' + error.reason);
+    alert('Sorry, but something went wrong: ' + error.reason);
   });
 
 
