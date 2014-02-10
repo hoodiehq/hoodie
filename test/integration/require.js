@@ -1,8 +1,8 @@
 var expect = require('expect.js');
 var hoodie_server = require('../../');
 
-describe('Requireability', function (done) {
-  it('should require & start', function () {
+describe('Requireability', function () {
+  it('should require & start', function (done) {
     var config = {
       www_port: 5010,
       admin_port: 5020,

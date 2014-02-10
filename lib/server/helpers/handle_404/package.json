@@ -1,9 +1,10 @@
 {
-  "name": "admin",
+  "name": "handle_404",
   "description": "",
-  "version": "0.3.0",
+  "version": "1.0.0",
   "main": "index",
   "peerDependencies": {
     "hapi": "2.x.x"
   }
 }
+
