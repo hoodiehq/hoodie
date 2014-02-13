@@ -26,7 +26,7 @@
     "ports": "1.0.0",
     "mkdirp": "0.3.5",
     "dispatch": "0.2.0",
-    "hapi": "2.1.1",
+    "hapi": "2.3.0",
     "http-proxy": "0.10.4"
   },
   "scripts": {
