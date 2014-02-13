@@ -8,16 +8,16 @@ describe('utils', function () {
     expect(_.size(utils)).to.eql(7);
   });
 
+  it('should have a generatePassword property', function () {
+    expect(utils).to.have.property('generatePassword');
+  });
+
   it('should have a ensureDir property', function () {
     expect(utils).to.have.property('ensureDir');
   });
 
   it('should have a jsonClone property', function () {
     expect(utils).to.have.property('jsonClone');
-  });
-
-  it('should have a redirect property', function () {
-    expect(utils).to.have.property('redirect');
   });
 
   it('should have a ensurePaths property', function () {

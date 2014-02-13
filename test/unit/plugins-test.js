@@ -27,8 +27,6 @@ describe('plugins', function () {
       expect(plugins).to.have.property('hasWorker');
     });
 
-    it.skip('should should confirm worker existance', function () {});
-
     it('should have a getPluginNames property', function () {
       expect(plugins).to.have.property('getPluginNames');
     });
@@ -36,3 +34,4 @@ describe('plugins', function () {
   });
 
 });
+
