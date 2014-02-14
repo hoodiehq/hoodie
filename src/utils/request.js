@@ -18,7 +18,7 @@
 // * HoodieConflictError
 // * HoodieServerError
 
-var hoodieUtils = require('../utils/index');
+var hoodiefyRequestErrorName = require('./hoodiefy_request_error_name');
 var extend = require('extend');
 
 function hoodieRequest(hoodie) {
@@ -118,7 +118,7 @@ function hoodieRequest(hoodie) {
     // get error name
     error.name = HTTP_STATUS_ERROR_MAP[xhr.status];
     if (! error.name) {
-      error.name = hoodieUtils.hoodiefyRequestErrorName(error.error);
+      error.name = hoodiefyRequestErrorName(error.error);
     }
 
     // store status & message
