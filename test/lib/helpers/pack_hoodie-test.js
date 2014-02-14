@@ -23,7 +23,6 @@ var config = {
 // it has the expected output (sort of).
 exports['we get a readable stream with concatenated js'] = function (t) {
   var stream = hoodiejs(config);
-  var offset = 0;
   var chunks = [];
   stream.on('data', function (buf) {
     chunks.push(buf.toString());
