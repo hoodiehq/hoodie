@@ -33,7 +33,7 @@ module.exports = function (grunt) {
     },
 
     nodeunit: {
-      all: ['test/test-*.js']
+      all: ['test/test-*.js', 'test/lib/helpers/*-test.js']
     }
 
   });
