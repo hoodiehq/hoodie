@@ -1,6 +1,8 @@
 // Hoodie Config API
 // ===================
 
+var resolve = require('../utils/promise/resolve');
+
 //
 function hoodieConfig(hoodie) {
 
@@ -71,7 +73,7 @@ function hoodieConfig(hoodie) {
   //
   config.unset = function unset(key) {
     if (typeof config.get(key) === 'undefined') {
-      return hoodie.resolve();
+      return resolve();
     }
 
     return config.set(key, undefined);

@@ -1,9 +1,12 @@
 require('../../lib/setup');
 
 var generateIdMock = require('../../mocks/utils/generate_id');
+var getDefer = require('../../../src/utils/promise/defer');
+
 global.stubRequire('src/utils/generate_id', generateIdMock);
 
 var hoodieAccount = require('../../../src/hoodie/account');
+
 var extend = require('extend');
 
 describe('hoodie.account', function() {
@@ -354,7 +357,6 @@ describe('hoodie.account', function() {
     });
 
     _when('username not set', function() {
-
       beforeEach(function() {
         this.promise = this.account.signUp('', 'secret', {
           name: 'Joe Doe'
@@ -362,14 +364,11 @@ describe('hoodie.account', function() {
       });
 
       it('should be rejected', function() {
-        this.promise.then(this.noop, function(res) {
-          expect(res).to.eql('Username must be set.');
-        });
+        expect(this.promise).to.be.rejectedWith('Username must be set.');
       });
-
     }); // username not set
-    _when('username set', function() {
 
+    _when('username set', function() {
       it('should downcase it', function() {
         this.sandbox.stub(this.account, 'hasAccount').returns(false);
         this.account.signUp('Joe', 'secret');
@@ -381,9 +380,7 @@ describe('hoodie.account', function() {
       });
 
       _and('user has an anonmyous account', function() {
-
         beforeEach(function() {
-
           this.sandbox.stub(this.account, 'hasAnonymousAccount').returns(true);
           this.fetchDefer = this.hoodie.defer();
           this.sandbox.stub(this.account, 'fetch').returns(this.fetchDefer.promise());
@@ -525,7 +522,7 @@ describe('hoodie.account', function() {
 
                 _and('sign in fails with unauthorized error', function() {
                   beforeEach(function() {
-                    this.signInDefer = $.Deferred();
+                    this.signInDefer = getDefer();
                     this.sandbox.stub(this.account, 'signIn').returns(this.signInDefer.promise());
                     this.account.request.reset();
                     this.requestDefers[3].reject({
@@ -565,15 +562,11 @@ describe('hoodie.account', function() {
             _when('_users doc could not be updated', function() {
 
               beforeEach(function() {
-                this.hoodie.request.defer.reject();
+                this.requestDefers.pop().reject();
               });
 
               it('should be rejected', function() {
-                this.promise.then(this.noop, function(res) {
-                  expect(res).to.eql({
-                    name: 'HoodieError'
-                  });
-                });
+                expect(this.promise).to.be.rejected();
               });
 
             }); // _users doc could not be updated
@@ -581,17 +574,11 @@ describe('hoodie.account', function() {
           _when('fetching user doc not successful', function() {
 
             beforeEach(function() {
-              this.fetchDefer.reject({
-                name: 'HoodieError'
-              });
+              this.fetchDefer.reject('nope.');
             });
 
             it('should be rejected', function() {
-              this.promise.then(this.noop, function(res) {
-                expect(res).to.eql({
-                  name: 'HoodieError'
-                });
-              });
+              expect(this.promise).to.be.rejectedWith('nope.');
             });
           }); // fetching user doc not successful
         }); // sign in successful
@@ -603,7 +590,6 @@ describe('hoodie.account', function() {
 
         it('should be rejected', function() {
           var promise = this.account.signUp('joe@example.com', 'secret');
-
           expect(promise).to.be.rejectedWith('Must sign out first.');
         });
       }); // user is already logged in
@@ -1971,7 +1957,7 @@ describe('hoodie.account', function() {
 
             _and('sign in fails with unauthorized error', function() {
               beforeEach(function() {
-                this.signInDefer = $.Deferred();
+                this.signInDefer = getDefer();
                 this.sandbox.stub(this.account, 'signIn').returns(this.signInDefer.promise());
                 this.account.request.reset();
                 this.requestDefers[3].reject({
@@ -2110,7 +2096,7 @@ function presetUserDoc(context) {
   context.account.fetch();
   context.hoodie.request.defer.resolve(unconfirmedUserDoc(context.account.username));
   context.hoodie.request.reset();
-  var defer = $.Deferred();
+  var defer = getDefer();
   context.hoodie.request.returns(defer.promise());
   context.hoodie.request.defer = defer;
 }
@@ -2131,7 +2117,7 @@ function with_session_validated_before(callback) {
       // now we have to reset the requestDefer
       this.account.request.reset();
 
-      var defer = $.Deferred();
+      var defer = getDefer();
       this.hoodie.request.returns(defer.promise());
       this.hoodie.request.defer = defer;
       this.account.request.returns(defer.promise());
@@ -2155,7 +2141,7 @@ function with_session_invalidated_before(callback) {
       // now we have to reset the requestDefer
       this.account.request.reset();
 
-      var defer = $.Deferred();
+      var defer = getDefer();
       this.hoodie.request.returns(defer.promise());
       this.hoodie.request.defer = defer;
       this.account.request.returns(defer.promise());

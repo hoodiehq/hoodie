@@ -1,8 +1,13 @@
 // hoodie.checkConnection() & hoodie.isConnected()
 // =================================================
 
+
+var reject = require('../utils/promise/reject');
+var resolve = require('../utils/promise/resolve');
+
 //
 function hoodieConnection(hoodie) {
+
   // state
   var online = true;
   var checkConnectionInterval = 30000;
@@ -67,7 +72,7 @@ function hoodieConnection(hoodie) {
       online = true;
     }
 
-    return hoodie.resolve();
+    return resolve();
   }
 
 
@@ -84,7 +89,7 @@ function hoodieConnection(hoodie) {
       online = false;
     }
 
-    return hoodie.reject();
+    return reject();
   }
 }
 

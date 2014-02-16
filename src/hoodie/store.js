@@ -9,6 +9,10 @@ var generateId = require('../utils/generate_id');
 
 var extend = require('extend');
 
+var getDefer = require('../utils/promise/defer');
+var rejectWith = require('../utils/promise/reject_with');
+var resolveWith = require('../utils/promise/resolve_with');
+
 //
 function hoodieStore (hoodie) {
 
@@ -128,7 +132,7 @@ function hoodieStore (hoodie) {
       delete object._$local;
     }
 
-    defer = hoodie.defer();
+    defer = getDefer();
 
     try {
       object = cache(object.type, object.id, object, options);
@@ -164,15 +168,15 @@ function hoodieStore (hoodie) {
     try {
       object = cache(type, id);
       if (!object) {
-        return hoodie.rejectWith({
+        return rejectWith({
           name: 'HoodieNotFoundError',
           message: '"{{type}}" with id "{{id}}" could not be found'
         });
       }
-      return hoodie.resolveWith(object);
+      return resolveWith(object);
     } catch (_error) {
       error = _error;
-      return hoodie.rejectWith(error);
+      return rejectWith(error);
     }
   };
 
@@ -216,7 +220,7 @@ function hoodieStore (hoodie) {
       };
     }
 
-    defer = hoodie.defer();
+    defer = getDefer();
 
     try {
 
@@ -291,12 +295,12 @@ function hoodieStore (hoodie) {
       cachedObject[key] = false;
       clearChanged(type, id);
       if (objectWasMarkedAsDeleted && object) {
-        return hoodie.resolveWith(object);
+        return resolveWith(object);
       }
     }
 
     if (!object) {
-      return hoodie.rejectWith({
+      return rejectWith({
         name: 'HoodieNotFoundError',
         message: '"{{type}}" with id "{{id}}"" could not be found'
       });
@@ -318,7 +322,7 @@ function hoodieStore (hoodie) {
       delete options.update;
     }
     triggerEvents('remove', object, options);
-    return hoodie.resolveWith(object);
+    return resolveWith(object);
   };
 
 
@@ -458,7 +462,7 @@ function hoodieStore (hoodie) {
   //       using `hoodie.store` before.
   store.clear = function clear() {
     var defer, key, keys, results;
-    defer = hoodie.defer();
+    defer = getDefer();
     try {
       keys = store.index();
       results = (function() {
@@ -944,7 +948,7 @@ function hoodieStore (hoodie) {
 
   //
   function enqueue(method, args) {
-    var defer = hoodie.defer();
+    var defer = getDefer();
     queue.push([method, args, defer]);
     return defer.promise();
   }

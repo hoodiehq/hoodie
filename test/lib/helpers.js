@@ -85,6 +85,15 @@ expect.Assertion.prototype.rejectedWith = function () {
   var rejectedWith;
   this.obj.fail( function() { rejectedWith = Array.prototype.slice.call(arguments) });
 
+  // hoodie turns a string into an Error Object.
+  // For simplicity, allow to test for rejectedWith(message)
+  // as it is usually in the code, instead of rejectedWith( new HoodieError(message) )
+  if (rejectedWith && typeof args[0] === 'string') {
+    rejectedWith[0] = rejectedWith[0].message || rejectedWith[0];
+  }
+
+
+
   this.assert(
       expect.eql(args, rejectedWith)
     , function(){ return 'expected to rejected with \n' + JSON.stringify(args, '', '  ') + ', was: \n' + JSON.stringify(rejectedWith, '', '  ')}
