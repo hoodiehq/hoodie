@@ -68,11 +68,11 @@ module.exports = function(grunt) {
             platform: 'mac 10.8',
             browserName: 'safari'
           },
-          sl_firefox_win7: {
-            base: 'SauceLabs',
-            platform: 'Windows 7',
-            browserName: 'Firefox'
-          },
+          //sl_firefox_win7: {
+            //base: 'SauceLabs',
+            //platform: 'Windows 7',
+            //browserName: 'Firefox'
+          //},
           // IE 10 & 11 is WIP
           // sl_ie10_win7: {
           //   base: 'SauceLabs',
@@ -87,7 +87,11 @@ module.exports = function(grunt) {
           //   version: '11'
           // }
         },
-        browsers: ['PhantomJS', 'sl_chrome_mac', 'sl_safari_mac', 'sl_firefox_win7',
+        browsers: [
+          'PhantomJS',
+          'sl_chrome_mac',
+          'sl_safari_mac',
+          //'sl_firefox_win7',
         // 'sl_ie10_win7',
         // 'sl_ie11_win8'
         ]
