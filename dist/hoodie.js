@@ -1,4 +1,4 @@
-// Hoodie.js - 0.6.3
+// Hoodie.js - 0.6.5
 // https://github.com/hoodiehq/hoodie.js
 // Copyright 2012 - 2014 https://github.com/hoodiehq/
 // Licensed Apache License 2.0
@@ -103,7 +103,6 @@ var hoodieOpen = require('./hoodie/open');
 var hoodieEvents = require('./lib/events');
 
 var hoodieRequest = require('./utils/request');
-var hoodieGenerateId = require('./utils/generate_id');
 var hoodiePromises = require('./utils/promises');
 
 // Constructor
@@ -169,9 +168,6 @@ function Hoodie(baseUrl) {
   // * hoodie.isOnline
   // * hoodie.checkConnection
   hoodie.extend(hoodieConnection);
-
-  // * hoodie.uuid
-  hoodie.extend(hoodieGenerateId);
 
   // * hoodie.dispose
   hoodie.extend(hoodieDispose);
@@ -280,12 +276,13 @@ function applyExtensions(hoodie) {
 
 module.exports = Hoodie;
 
-},{"./hoodie/account":3,"./hoodie/config":4,"./hoodie/connection":5,"./hoodie/dispose":6,"./hoodie/id":7,"./hoodie/open":8,"./hoodie/remote":9,"./hoodie/store":10,"./hoodie/task":11,"./lib/events":15,"./utils/generate_id":20,"./utils/promises":22,"./utils/request":23}],3:[function(require,module,exports){
+},{"./hoodie/account":3,"./hoodie/config":4,"./hoodie/connection":5,"./hoodie/dispose":6,"./hoodie/id":7,"./hoodie/open":8,"./hoodie/remote":9,"./hoodie/store":10,"./hoodie/task":11,"./lib/events":15,"./utils/promises":22,"./utils/request":23}],3:[function(require,module,exports){
 var global=typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {};// Hoodie.Account
 // ================
 
 var hoodieEvents = require('../lib/events');
 var extend = require('extend');
+var generateId = require('../utils/generate_id');
 
 //
 function hoodieAccount(hoodie) {
@@ -458,7 +455,7 @@ function hoodieAccount(hoodie) {
   account.anonymousSignUp = function anonymousSignUp() {
     var password, username;
 
-    password = hoodie.generateId(10);
+    password = generateId(10);
     username = hoodie.id();
 
     return account.signUp(username, password).done(function() {
@@ -693,7 +690,7 @@ function hoodieAccount(hoodie) {
       return account.checkPasswordReset();
     }
 
-    resetPasswordId = '' + username + '/' + (hoodie.generateId());
+    resetPasswordId = '' + username + '/' + (generateId());
 
     hoodie.config.set('_account.resetPasswordId', resetPasswordId);
 
@@ -755,7 +752,7 @@ function hoodieAccount(hoodie) {
       }
     };
 
-    return withPreviousRequestsAborted('passwordResetStatus', function() {
+    return withSingleRequest('passwordResetStatus', function() {
       return account.request('GET', url, options).then(
       handlePasswordResetStatusRequestSuccess, handlePasswordResetStatusRequestError).fail(function(error) {
         if (error.name === 'HoodiePendingError') {
@@ -1425,7 +1422,7 @@ function hoodieAccount(hoodie) {
 
 module.exports = hoodieAccount;
 
-},{"../lib/events":15,"extend":1}],4:[function(require,module,exports){
+},{"../lib/events":15,"../utils/generate_id":20,"extend":1}],4:[function(require,module,exports){
 // Hoodie Config API
 // ===================
 
@@ -1664,6 +1661,8 @@ module.exports = hoodieDispose;
 // hoodie.id
 // =========
 
+var generateId = require('../utils/generate_id');
+
 // generates a random id and persists using hoodie.config
 // until the user signs out or deletes local data
 function hoodieId (hoodie) {
@@ -1671,7 +1670,7 @@ function hoodieId (hoodie) {
 
   function getId() {
     if (! id) {
-      setId( hoodie.generateId() );
+      setId( generateId() );
     }
     return id;
   }
@@ -1728,7 +1727,8 @@ function hoodieId (hoodie) {
 }
 
 module.exports = hoodieId;
-},{}],8:[function(require,module,exports){
+
+},{"../utils/generate_id":20}],8:[function(require,module,exports){
 // Open stores
 // -------------
 
@@ -1924,6 +1924,7 @@ var global=typeof self !== "undefined" ? self : typeof window !== "undefined" ? 
 var hoodieStoreApi = require('../lib/store/api');
 var HoodieObjectTypeError = require('../lib/error/object_type');
 var HoodieObjectIdError = require('../lib/error/object_id');
+var generateId = require('../utils/generate_id');
 
 var extend = require('extend');
 
@@ -1988,7 +1989,7 @@ function hoodieStore (hoodie) {
       isNew = typeof currentObject !== 'object';
     } else {
       isNew = true;
-      object.id = hoodie.generateId();
+      object.id = generateId();
     }
 
     if (isNew) {
@@ -2914,7 +2915,7 @@ function hoodieStore (hoodie) {
 
 module.exports = hoodieStore;
 
-},{"../lib/error/object_id":13,"../lib/error/object_type":14,"../lib/store/api":16,"extend":1}],11:[function(require,module,exports){
+},{"../lib/error/object_id":13,"../lib/error/object_type":14,"../lib/store/api":16,"../utils/generate_id":20,"extend":1}],11:[function(require,module,exports){
 // Tasks
 // ============
 
@@ -3985,6 +3986,7 @@ var global=typeof self !== "undefined" ? self : typeof window !== "undefined" ? 
 
 var hoodieStoreApi = require('./api');
 var extend = require('extend');
+var generateId = require('../../utils/generate_id');
 
 //
 function hoodieRemoteStore(hoodie, options) {
@@ -4065,7 +4067,7 @@ function hoodieRemoteStore(hoodie, options) {
     var path;
 
     if (!object.id) {
-      object.id = hoodie.generateId();
+      object.id = generateId();
     }
 
     object = parseForRemote(object);
@@ -4532,7 +4534,7 @@ function hoodieRemoteStore(hoodie, options) {
 
   //
   function generateNewRevisionId() {
-    return hoodie.generateId(9);
+    return generateId(9);
   }
 
 
@@ -4715,7 +4717,7 @@ function hoodieRemoteStore(hoodie, options) {
 
 module.exports = hoodieRemoteStore;
 
-},{"./api":16,"extend":1}],18:[function(require,module,exports){
+},{"../../utils/generate_id":20,"./api":16,"extend":1}],18:[function(require,module,exports){
 // scoped Store
 // ============
 
@@ -4906,63 +4908,47 @@ function hoodieScopedTask(hoodie, taskApi, options) {
 module.exports = hoodieScopedTask;
 
 },{"../events":15}],20:[function(require,module,exports){
-// hoodie.generateId
-// =============
+var chars, i, radix;
+
+// uuids consist of numbers and lowercase letters only.
+// We stick to lowercase letters to prevent confusion
+// and to prevent issues with CouchDB, e.g. database
+// names do wonly allow for lowercase letters.
+chars = '0123456789abcdefghijklmnopqrstuvwxyz'.split('');
+radix = chars.length;
 
 // helper to generate unique ids.
-function hoodieGenerateId (hoodie) {
-  var chars, i, radix;
+function generateId (length) {
+  var id = '';
 
-  // uuids consist of numbers and lowercase letters only.
-  // We stick to lowercase letters to prevent confusion
-  // and to prevent issues with CouchDB, e.g. database
-  // names do wonly allow for lowercase letters.
-  chars = '0123456789abcdefghijklmnopqrstuvwxyz'.split('');
-  radix = chars.length;
-
-
-  function generateId(length) {
-    var id = '';
-
-    // default uuid length to 7
-    if (length === undefined) {
-      length = 7;
-    }
-
-    for (i = 0; i < length; i++) {
-      var rand = Math.random() * radix;
-      var char = chars[Math.floor(rand)];
-      id += String(char).charAt(0);
-    }
-
-    return id;
+  // default uuid length to 7
+  if (length === undefined) {
+    length = 7;
   }
 
-  //
-  // Public API
-  //
-  hoodie.generateId = generateId;
+  for (i = 0; i < length; i++) {
+    var rand = Math.random() * radix;
+    var char = chars[Math.floor(rand)];
+    id += String(char).charAt(0);
+  }
+
+  return id;
 }
 
-module.exports = hoodieGenerateId;
+module.exports = generateId;
 
 },{}],21:[function(require,module,exports){
-module.exports = {
+var findLettersToUpperCase = /(^\w|_\w)/g;
 
-  now: function () {
-    return JSON.stringify(new Date()).replace(/['"]/g, '');
-  },
+function hoodiefyRequestErrorName (name) {
+  name = name.replace(findLettersToUpperCase, function (match) {
+    return (match[1] || match[0]).toUpperCase();
+  });
 
-  hoodiefyRequestErrorName: function (name) {
-    name = name.replace(/(^\w|_\w)/g, function (match) {
-      return (match[1] || match[0]).toUpperCase();
-    });
+  return 'Hoodie' + name + 'Error';
+}
 
-    return 'Hoodie' + name + 'Error';
-  }
-
-};
-
+module.exports = hoodiefyRequestErrorName;
 },{}],22:[function(require,module,exports){
 var global=typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {};// Hoodie Defers / Promises
 // ------------------------
@@ -5053,7 +5039,7 @@ module.exports = hoodiePromises;
 // * HoodieConflictError
 // * HoodieServerError
 
-var hoodieUtils = require('../utils/index');
+var hoodiefyRequestErrorName = require('./hoodiefy_request_error_name');
 var extend = require('extend');
 
 function hoodieRequest(hoodie) {
@@ -5153,7 +5139,7 @@ function hoodieRequest(hoodie) {
     // get error name
     error.name = HTTP_STATUS_ERROR_MAP[xhr.status];
     if (! error.name) {
-      error.name = hoodieUtils.hoodiefyRequestErrorName(error.error);
+      error.name = hoodiefyRequestErrorName(error.error);
     }
 
     // store status & message
@@ -5187,7 +5173,7 @@ function hoodieRequest(hoodie) {
 
 module.exports = hoodieRequest;
 
-},{"../utils/index":21,"extend":1}]},{},[2])
+},{"./hoodiefy_request_error_name":21,"extend":1}]},{},[2])
 (2)
 });
 ;
