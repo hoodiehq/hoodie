@@ -14,8 +14,12 @@ var hoodieDispose = require('./hoodie/dispose');
 var hoodieTask = require('./hoodie/task');
 var hoodieOpen = require('./hoodie/open');
 var hoodieRequest = require('./hoodie/request');
-
 var hoodieEvents = require('./lib/events');
+
+// for plugins
+var lib = require('./lib');
+var util = require('./utils');
+
 
 // Constructor
 // -------------
@@ -171,7 +175,7 @@ Hoodie.extend = function(extension) {
 //
 function applyExtensions(hoodie) {
   for (var i = 0; i < extensions.length; i++) {
-    extensions[i](hoodie);
+    extensions[i](hoodie, lib, util);
   }
 }
 
