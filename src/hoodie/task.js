@@ -26,6 +26,8 @@ var HoodieError = require('../lib/error/error');
 
 var extend = require('extend');
 
+var getDefer = require('../utils/promise/defer');
+
 //
 function hoodieTask(hoodie) {
 
@@ -137,7 +139,7 @@ function hoodieTask(hoodie) {
 
   //
   function handleNewTask(object) {
-    var defer = hoodie.defer();
+    var defer = getDefer();
     var taskStore = hoodie.store(object.type, object.id);
 
     taskStore.on('remove', function(object) {
@@ -191,7 +193,7 @@ function hoodieTask(hoodie) {
       return removePromise;
     }
 
-    defer = hoodie.defer();
+    defer = getDefer();
     hoodie.one('store:sync:' + type + ':' + id, defer.resolve);
     removePromise.fail(defer.reject);
 

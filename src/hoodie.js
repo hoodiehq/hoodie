@@ -13,11 +13,13 @@ var hoodieLocalStore = require('./hoodie/store');
 var hoodieDispose = require('./hoodie/dispose');
 var hoodieTask = require('./hoodie/task');
 var hoodieOpen = require('./hoodie/open');
-
+var hoodieRequest = require('./hoodie/request');
 var hoodieEvents = require('./lib/events');
 
-var hoodieRequest = require('./utils/request');
-var hoodiePromises = require('./utils/promises');
+// for plugins
+var lib = require('./lib');
+var util = require('./utils');
+
 
 // Constructor
 // -------------
@@ -37,10 +39,8 @@ function Hoodie(baseUrl) {
     throw new Error('usage: new Hoodie(url);');
   }
 
-  if (baseUrl) {
-    // remove trailing slashes
-    hoodie.baseUrl = baseUrl.replace(/\/+$/, '');
-  }
+  // remove trailing slashes
+  hoodie.baseUrl = baseUrl ? baseUrl.replace(/\/+$/, '') : '';
 
 
   // hoodie.extend
@@ -66,18 +66,6 @@ function Hoodie(baseUrl) {
   // * hoodie.unbind
   // * hoodie.off
   hoodie.extend(hoodieEvents);
-
-
-  // * hoodie.defer
-  // * hoodie.isPromise
-  // * hoodie.resolve
-  // * hoodie.reject
-  // * hoodie.resolveWith
-  // * hoodie.rejectWith
-  hoodie.extend(hoodiePromises);
-
-  // * hoodie.request
-  hoodie.extend(hoodieRequest);
 
   // * hoodie.isOnline
   // * hoodie.checkConnection
@@ -109,6 +97,9 @@ function Hoodie(baseUrl) {
 
   // * hoodie.id
   hoodie.extend(hoodieId);
+
+  // * hoodie.request
+  hoodie.extend(hoodieRequest);
 
 
   //
@@ -184,7 +175,7 @@ Hoodie.extend = function(extension) {
 //
 function applyExtensions(hoodie) {
   for (var i = 0; i < extensions.length; i++) {
-    extensions[i](hoodie);
+    extensions[i](hoodie, lib, util);
   }
 }
 

@@ -38,6 +38,11 @@ var HoodieObjectTypeError = require('../error/object_type');
 var HoodieObjectIdError = require('../error/object_id');
 var extend = require('extend');
 
+var getDefer = require('../../utils/promise/defer');
+var rejectWith = require('../../utils/promise/reject_with');
+var resolveWith = require('../../utils/promise/resolve_with');
+var isPromise = require('../../utils/promise/is_promise');
+
 //
 function hoodieStoreApi(hoodie, options) {
 
@@ -145,7 +150,7 @@ function hoodieStoreApi(hoodie, options) {
     var error = api.validate(object, options || {});
 
     if (error) {
-      return hoodie.rejectWith(error);
+      return rejectWith(error);
     }
 
     return decoratePromise(backend.save(object, options || {}));
@@ -246,7 +251,7 @@ function hoodieStoreApi(hoodie, options) {
       }
 
       if (!objectUpdate) {
-        return hoodie.resolveWith(currentObject);
+        return resolveWith(currentObject);
       }
 
       // check if something changed
@@ -268,7 +273,7 @@ function hoodieStoreApi(hoodie, options) {
       })();
 
       if (!(changedProperties.length || options)) {
-        return hoodie.resolveWith(newObj);
+        return resolveWith(newObj);
       }
 
       //apply update
@@ -323,11 +328,11 @@ function hoodieStoreApi(hoodie, options) {
     case typeof filterOrObjects === 'string':
       promise = api.findAll(filterOrObjects);
       break;
-    case hoodie.isPromise(filterOrObjects):
+    case isPromise(filterOrObjects):
       promise = filterOrObjects;
       break;
     case $.isArray(filterOrObjects):
-      promise = hoodie.defer().resolve(filterOrObjects).promise();
+      promise = getDefer().resolve(filterOrObjects).promise();
       break;
     default:
       // e.g. null, update all

@@ -1,5 +1,5 @@
 require('../../lib/setup');
-var hoodieRequest = require('../../../src/utils/request');
+var hoodieRequest = require('../../../src/hoodie/request');
 
 describe('hoodie.request', function () {
 
