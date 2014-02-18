@@ -1,6 +1,6 @@
 {
   "name": "hoodie-server",
-  "version": "0.9.13",
+  "version": "0.9.14",
   "main": "lib/index",
   "repository": {
     "type": "git",
@@ -10,7 +10,7 @@
     "hoodie": "0.6.0",
     "multicouch": "0.8.1",
     "hoodie-pocket": "0.0.13",
-    "hoodie-plugins-manager": "0.1.4",
+    "hoodie-plugins-manager": "0.2.4",
     "local-tld-lib": "1.0.2",
     "underscore": "1.4.4",
     "async": "0.2.7",
