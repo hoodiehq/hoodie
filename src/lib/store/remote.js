@@ -39,6 +39,7 @@
 var hoodieStoreApi = require('./api');
 var extend = require('extend');
 var generateId = require('../../utils/generate_id');
+var resolveWith = require('../../utils/promise/resolve_with');
 
 //
 function hoodieRemoteStore(hoodie, options) {
@@ -222,10 +223,10 @@ function hoodieRemoteStore(hoodie, options) {
   // request
   // ---------
 
-  // wrapper for hoodie.request, with some store specific defaults
+  // wrapper for hoodie's request, with some store specific defaults
   // and a prefixed path
   //
-  remote.request = function request(type, path, options) {
+  remote.request = function remoteRequest(type, path, options) {
     options = options || {};
 
     if (remoteName) {
@@ -386,7 +387,7 @@ function hoodieRemoteStore(hoodie, options) {
     }
 
     if (objects.length === 0) {
-      return hoodie.resolveWith([]);
+      return resolveWith([]);
     }
 
     objectsForRemote = [];

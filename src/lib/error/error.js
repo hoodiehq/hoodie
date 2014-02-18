@@ -3,7 +3,7 @@
 
 // With the custom hoodie error function
 // we normalize all errors the get returned
-// when using hoodie.rejectWith
+// when using hoodie's rejectWith
 //
 // The native JavaScript error method has
 // a name & a message property. HoodieError
