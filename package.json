@@ -29,7 +29,8 @@
     "hapi": "2.4.0",
     "http-proxy": "1.0.2",
     "combine-streams": "0.0.4",
-    "hoodie-pocket-uikit": "^1.0.0"
+    "hoodie-pocket-uikit": "^1.0.0",
+    "lodash": "^2.4.1"
   },
   "scripts": {
     "start": "bin/start",

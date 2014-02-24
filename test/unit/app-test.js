@@ -1,6 +1,6 @@
 var expect = require('expect.js');
 
-var _ = require('underscore');
+var _ = require('lodash');
 
 describe('Application', function () {
 

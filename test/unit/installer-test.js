@@ -1,7 +1,7 @@
 var expect = require('expect.js');
 var installer = require('../../lib/couchdb/installer');
 
-var _ = require('underscore');
+var _ = require('lodash');
 
 describe('installer', function () {
 

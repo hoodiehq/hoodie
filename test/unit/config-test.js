@@ -1,7 +1,7 @@
 var expect = require('expect.js');
 var config = require('../../lib/core/config');
 
-var _ = require('underscore');
+var _ = require('lodash');
 
 describe('config', function () {
 

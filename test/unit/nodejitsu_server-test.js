@@ -1,7 +1,7 @@
 var expect = require('expect.js');
 var nju = require('../../lib/server/nodejitsu_server');
 
-var _ = require('underscore');
+var _ = require('lodash');
 
 describe('nodejitsu_server', function () {
 

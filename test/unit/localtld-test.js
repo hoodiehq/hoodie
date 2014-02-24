@@ -1,7 +1,7 @@
 var expect = require('expect.js');
 var localtld = require('../../lib/utils/localtld');
 
-var _ = require('underscore');
+var _ = require('lodash');
 
 describe('localtld', function () {
 

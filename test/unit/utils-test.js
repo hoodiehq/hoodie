@@ -1,6 +1,6 @@
 var expect = require('expect.js');
 var utils = require('../../lib/utils');
-var _ = require('underscore');
+var _ = require('lodash');
 
 describe('utils', function () {
 

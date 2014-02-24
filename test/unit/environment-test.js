@@ -1,7 +1,7 @@
 var expect = require('expect.js');
 var env = require('../../lib/core/environment');
 
-var _ = require('underscore');
+var _ = require('lodash');
 
 describe('environment', function () {
 

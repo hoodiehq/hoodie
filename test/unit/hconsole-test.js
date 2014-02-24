@@ -1,7 +1,7 @@
 var expect = require('expect.js');
 var hconsole = require('../../lib/utils/hconsole');
 
-var _ = require('underscore');
+var _ = require('lodash');
 
 describe('hconsole', function () {
 

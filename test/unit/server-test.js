@@ -1,7 +1,7 @@
 var expect = require('expect.js');
 var server = require('../../lib/server/index');
 
-var _ = require('underscore');
+var _ = require('lodash');
 
 describe('server', function () {
 

@@ -1,7 +1,7 @@
 var expect = require('expect.js');
 var couch = require('../../lib/couchdb/index');
 
-var _ = require('underscore');
+var _ = require('lodash');
 
 describe('couch', function () {
 
