@@ -7,7 +7,7 @@
     "url": "https://github.com/hoodiehq/hoodie-server.git"
   },
   "dependencies": {
-    "hoodie": "0.6.0",
+    "hoodie": "0.6.5",
     "multicouch": "0.8.1",
     "hoodie-pocket": "0.0.13",
     "hoodie-plugins-manager": "0.2.4",
@@ -28,9 +28,9 @@
     "dispatch": "0.2.0",
     "hapi": "2.4.0",
     "http-proxy": "1.0.2",
-    "combine-streams": "0.0.4",
     "hoodie-pocket-uikit": "^1.0.0",
-    "lodash": "^2.4.1"
+    "lodash": "^2.4.1",
+    "browserify": "^3.30.2"
   },
   "scripts": {
     "start": "bin/start",
