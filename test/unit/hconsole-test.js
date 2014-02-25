@@ -6,7 +6,7 @@ var _ = require('lodash');
 describe('hconsole', function () {
 
   it('should expose n number of properties', function () {
-    expect(_.size(hconsole)).to.eql(4);
+    expect(_.size(hconsole)).to.eql(5);
   });
 
   it('should have a announce property', function () {
@@ -23,6 +23,10 @@ describe('hconsole', function () {
 
   it('should have a error property', function () {
     expect(hconsole).to.have.property('error');
+  });
+
+  it('should have a hr property', function () {
+    expect(hconsole).to.have.property('hr');
   });
 
 });
