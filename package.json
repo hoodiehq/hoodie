@@ -49,6 +49,6 @@
     "rimraf": "2.2.2"
   },
   "hoodie": {
-    "plugins": []
+    "plugins": ["hoodie-plugin-test"]
   }
 }

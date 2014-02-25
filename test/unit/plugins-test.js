@@ -12,7 +12,7 @@ describe('plugins', function () {
   describe('methods', function () {
 
     it('should expose n number of properties', function () {
-      expect(_.size(plugins)).to.eql(10);
+      expect(_.size(plugins)).to.eql(11);
     });
 
     it('should have a startAll property', function () {
