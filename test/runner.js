@@ -11,6 +11,7 @@ require('./unit/nodejitsu_server-test');
 require('./unit/server-test');
 require('./unit/utils-test');
 require('./unit/couch-utils-test');
+require('./unit/helpers-pack_hoodie-test');
 require('./integration/require');
 // todo: fix 404 helper
 // require('./integration/handle_404');
