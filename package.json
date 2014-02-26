@@ -26,9 +26,9 @@
     "mkdirp": "0.3.5",
     "hapi": "2.4.0",
     "http-proxy": "1.0.2",
-    "hoodie-pocket-uikit": "^1.0.0",
     "lodash": "^2.4.1",
-    "browserify": "^3.30.2"
+    "browserify": "^3.30.2",
+    "combine-streams": "0.0.4"
   },
   "scripts": {
     "start": "bin/start",
