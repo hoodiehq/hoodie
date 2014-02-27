@@ -6,7 +6,7 @@
 // The returned API provides the following methods:
 //
 // * start
-// * cancel
+// * abort
 // * restart
 // * remove
 // * on
@@ -18,7 +18,7 @@
 //
 //     var emailTasks = hoodie.task('email');
 //     emailTasks.start( properties );
-//     emailTasks.cancel('id123');
+//     emailTasks.abort('id123');
 //
 var hoodieEvents = require('../lib/events');
 var hoodieScopedTask = require('../lib/task/scoped');
@@ -64,22 +64,22 @@ function hoodieTask(hoodie) {
   };
 
 
-  // cancel
+  // abort
   // -------
 
-  // cancel a running task
+  // abort a running task
   //
-  api.cancel = function(type, id) {
+  api.abort = function(type, id) {
     return hoodie.store.update('$' + type, id, {
-      cancelledAt: now()
-    }).then(handleCancelledTaskObject);
+      abortedAt: now()
+    }).then(handleAbortedTaskObject);
   };
 
 
   // restart
   // ---------
 
-  // first, we try to cancel a running task. If that succeeds, we start
+  // first, we try to abort a running task. If that succeeds, we start
   // a new one with the same properties as the original
   //
   api.restart = function(type, id, update) {
@@ -87,18 +87,18 @@ function hoodieTask(hoodie) {
       extend(object, update);
       delete object.$error;
       delete object.$processedAt;
-      delete object.cancelledAt;
+      delete object.abortedAt;
       return api.start(object.type, object);
     };
-    return api.cancel(type, id).then(start);
+    return api.abort(type, id).then(start);
   };
 
-  // cancelAll
+  // abortAll
   // -----------
 
   //
-  api.cancelAll = function(type) {
-    return findAll(type).then(cancelTaskObjects);
+  api.abortAll = function(type) {
+    return findAll(type).then(abortTaskObjects);
   };
 
   // restartAll
@@ -152,9 +152,9 @@ function hoodieTask(hoodie) {
         return defer.resolve(object);
       }
 
-      // manually removed / cancelled.
+      // manually removed / aborted.
       defer.reject(new HoodieError({
-        message: 'Task has been cancelled',
+        message: 'Task has been aborted',
         task: object
       }));
     });
@@ -182,7 +182,7 @@ function hoodieTask(hoodie) {
   }
 
   //
-  function handleCancelledTaskObject(taskObject) {
+  function handleAbortedTaskObject(taskObject) {
     var defer;
     var type = taskObject.type; // no need to prefix with $, it's already prefixed.
     var id = taskObject.id;
@@ -225,9 +225,9 @@ function hoodieTask(hoodie) {
   }
 
   //
-  function cancelTaskObjects(taskObjects) {
+  function abortTaskObjects(taskObjects) {
     return taskObjects.map(function(taskObject) {
-      return api.cancel(taskObject.type.substr(1), taskObject.id);
+      return api.abort(taskObject.type.substr(1), taskObject.id);
     });
   }
 
@@ -248,8 +248,8 @@ function hoodieTask(hoodie) {
       eventName = 'start';
     }
 
-    if (eventName === 'remove' && task.cancelledAt) {
-      eventName = 'cancel';
+    if (eventName === 'remove' && task.abortedAt) {
+      eventName = 'abort';
     }
 
     if (eventName === 'remove' && task.$processedAt) {
@@ -277,7 +277,7 @@ function hoodieTask(hoodie) {
     }
 
     // ignore all the other events
-    if (eventName !== 'start' && eventName !== 'cancel' && eventName !== 'success') {
+    if (eventName !== 'start' && eventName !== 'abort' && eventName !== 'success') {
       return;
     }
 

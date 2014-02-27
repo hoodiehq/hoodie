@@ -106,7 +106,7 @@ describe('hoodie.task', function() {
 
           it('should reject', function() {
             expect(this.promise).to.be.rejectedWith({
-              'message': 'Task has been cancelled',
+              'message': 'Task has been aborted',
               'task': {
                 'type': 'message',
                 'id': '123'
@@ -169,14 +169,14 @@ describe('hoodie.task', function() {
     });
   });
 
-  describe('#cancel()', function() {
+  describe('#abort()', function() {
     beforeEach(function() {
-      this.promise = this.task.cancel('message', '123');
+      this.promise = this.task.abort('message', '123');
     });
 
     it('should add a new $task object using hoodie.store.add', function() {
       expect(this.hoodie.store.update).to.be.calledWith('$message', '123', {
-        cancelledAt: now()
+        abortedAt: now()
       });
     });
 
@@ -263,26 +263,26 @@ describe('hoodie.task', function() {
 
   describe('#restart(type, id, update)', function() {
     beforeEach(function() {
-      this.cancelDefer = this.hoodie.defer();
-      this.sandbox.stub(this.hoodie.task, 'cancel').returns(this.cancelDefer.promise());
+      this.abortDefer = this.hoodie.defer();
+      this.sandbox.stub(this.hoodie.task, 'abort').returns(this.abortDefer.promise());
       this.sandbox.stub(this.hoodie.task, 'start');
       this.promise = this.hoodie.task.restart('message', '123', {
         extra: 'creme'
       });
     });
 
-    it('should cancel a running task', function() {
-      expect(this.hoodie.task.cancel).to.be.calledWith('message', '123');
+    it('should abort a running task', function() {
+      expect(this.hoodie.task.abort).to.be.calledWith('message', '123');
     });
 
-    it('rejects with cancel fails', function() {
-      this.cancelDefer.reject('nope.');
+    it('rejects with abort fails', function() {
+      this.abortDefer.reject('nope.');
       expect(this.promise).to.be.rejectedWith('nope.');
     });
 
-    _when('cancelling task succeeds', function() {
+    _when('aborting task succeeds', function() {
       beforeEach(function() {
-        this.cancelDefer.resolve({
+        this.abortDefer.resolve({
           type: 'message',
           id: '123',
           text: 'funk!',
@@ -302,10 +302,10 @@ describe('hoodie.task', function() {
     });
   });
 
-  describe('#cancelAll(type)', function() {
+  describe('#abortAll(type)', function() {
     beforeEach(function() {
-      this.sandbox.spy(this.hoodie.task, 'cancel');
-      this.promise = this.hoodie.task.cancelAll();
+      this.sandbox.spy(this.hoodie.task, 'abort');
+      this.promise = this.hoodie.task.abortAll();
     });
 
     it('should findAll task objects in store', function() {
@@ -327,7 +327,7 @@ describe('hoodie.task', function() {
 
     it('should filter by passed type', function() {
       var filter;
-      this.hoodie.task.cancelAll('task');
+      this.hoodie.task.abortAll('task');
       filter = this.hoodie.store.findAll.args[1][0];
       expect(filter).to.be.a(Function);
 
@@ -358,9 +358,9 @@ describe('hoodie.task', function() {
         }]);
       });
 
-      it('cancels each task', function() {
-        expect(this.hoodie.task.cancel).to.be.calledWith('task', '123');
-        expect(this.hoodie.task.cancel).to.be.calledWith('message', '124');
+      it('aborts each task', function() {
+        expect(this.hoodie.task.abort).to.be.calledWith('task', '123');
+        expect(this.hoodie.task.abort).to.be.calledWith('message', '124');
       });
     });
   });
@@ -578,54 +578,54 @@ describe('hoodie.task', function() {
       expect(this.task.trigger.callCount).to.eql(6);
     });
 
-    it('triggers "cancel" events when a task has been removed with a cancelledAt timestamp', function() {
+    it('triggers "abort" events when a task has been removed with a abortedAt timestamp', function() {
       this.events['store:change']('remove', {
         type: '$message',
         id: '123',
-        cancelledAt: '2013-09-05'
+        abortedAt: '2013-09-05'
       }, {
         option: 'value'
       });
 
-      expect(this.task.trigger).to.be.calledWith('change', 'cancel', {
+      expect(this.task.trigger).to.be.calledWith('change', 'abort', {
         type: 'message',
         id: '123',
-        cancelledAt: '2013-09-05'
+        abortedAt: '2013-09-05'
       }, {
         option: 'value'
       });
-      expect(this.task.trigger).to.be.calledWith('message:change', 'cancel', {
+      expect(this.task.trigger).to.be.calledWith('message:change', 'abort', {
         type: 'message',
         id: '123',
-        cancelledAt: '2013-09-05'
+        abortedAt: '2013-09-05'
       }, {
         option: 'value'
       });
-      expect(this.task.trigger).to.be.calledWith('message:123:change', 'cancel', {
+      expect(this.task.trigger).to.be.calledWith('message:123:change', 'abort', {
         type: 'message',
         id: '123',
-        cancelledAt: '2013-09-05'
+        abortedAt: '2013-09-05'
       }, {
         option: 'value'
       });
-      expect(this.task.trigger).to.be.calledWith('cancel', {
+      expect(this.task.trigger).to.be.calledWith('abort', {
         type: 'message',
         id: '123',
-        cancelledAt: '2013-09-05'
+        abortedAt: '2013-09-05'
       }, {
         option: 'value'
       });
-      expect(this.task.trigger).to.be.calledWith('message:cancel', {
+      expect(this.task.trigger).to.be.calledWith('message:abort', {
         type: 'message',
         id: '123',
-        cancelledAt: '2013-09-05'
+        abortedAt: '2013-09-05'
       }, {
         option: 'value'
       });
-      expect(this.task.trigger).to.be.calledWith('message:123:cancel', {
+      expect(this.task.trigger).to.be.calledWith('message:123:abort', {
         type: 'message',
         id: '123',
-        cancelledAt: '2013-09-05'
+        abortedAt: '2013-09-05'
       }, {
         option: 'value'
       });

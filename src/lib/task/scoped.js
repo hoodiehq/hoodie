@@ -29,8 +29,8 @@ function hoodieScopedTask(hoodie, taskApi, options) {
     };
 
     //
-    api.cancel = function cancel(id) {
-      return taskApi.cancel(type, id);
+    api.abort = function abort(id) {
+      return taskApi.abort(type, id);
     };
 
     //
@@ -39,8 +39,8 @@ function hoodieScopedTask(hoodie, taskApi, options) {
     };
 
     //
-    api.cancelAll = function cancelAll() {
-      return taskApi.cancelAll(type);
+    api.abortAll = function abortAll() {
+      return taskApi.abortAll(type);
     };
 
     //
@@ -59,8 +59,8 @@ function hoodieScopedTask(hoodie, taskApi, options) {
     });
 
     //
-    api.cancel = function cancel() {
-      return taskApi.cancel(type, id);
+    api.abort = function abort() {
+      return taskApi.abort(type, id);
     };
 
     //

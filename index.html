@@ -161,31 +161,31 @@
     hoodie.task.start('message', {to: 'joe', text: 'Party machen?'})
       .then( showMessageSent, showMessageError )
 
-    // cancel a pending task
-    hoodie.task.cancel('message', '123')
+    // abort a pending task
+    hoodie.task.abort('message', '123')
 
-    // restart a pending or canceled task
+    // restart a pending or aborted task
     hoodie.task.restart('message', '123', { extraProperty: 'value' })
 
-    // canceled all pending tasks
-    hoodie.task.restartAll()
+    // abort all pending tasks
+    hoodie.task.abortAll()
 
-    // restart all pending or canceled tasks
+    // restart all pending or aborted tasks
     hoodie.task.restartAll()
 
     //
     // task events:
     //
     // * start
-    // * cancel
+    // * abort
     // * error
     // * success
 
     // listen to new tasks
     hoodie.task.on( 'start',    function( newTask) { } )
 
-    // task canceled
-    hoodie.task.on( 'cancel', function( canceledTask) { } )
+    // task aborted
+    hoodie.task.on( 'abort', function( abortedTask) { } )
 
     // task could not be completed
     hoodie.task.on( 'error', function( errorMessage, task) { } )
@@ -195,14 +195,14 @@
 
     // all listeners can be filtered by type
     hoodie.task.on( "message:start",   function( newMessageTask, options) { } )
-    hoodie.task.on( "message:cancel",  function( canceledMessageTask, options) { } )
+    hoodie.task.on( "message:abort",  function( abortedMessageTask, options) { } )
     hoodie.task.on( "message:error",   function( errorMessage, messageTask, options) { } )
     hoodie.task.on( "message:success", function( completedMessageTask, options) { } )
     hoodie.task.on( "message:change",  function( eventName, messageTask, options) { } )
 
     // ... and by type and id
     hoodie.task.on( "message:123:start",   function( newMessageTask, options) { } )
-    hoodie.task.on( "message:123:cancel",  function( canceledMessageTask), options  { } )
+    hoodie.task.on( "message:123:abort",  function( abortedMessageTask), options  { } )
     hoodie.task.on( "message:123:error",   function( errorMessage, messageTask, options) { } )
     hoodie.task.on( "message:123:success", function( completedMessageTask, options) { } )
     hoodie.task.on( "message:123:change",  function( eventName, messageTask, options) { } )

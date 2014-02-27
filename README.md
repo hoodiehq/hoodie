@@ -77,23 +77,23 @@ is an error, it stays in the task store to be handled or removed.
   hoodie.task.start('message', {to: 'joe', text: 'Party machen?'})
     .then( showMessageSent, showMessageError )
 
-  // cancel a pending task
-  hoodie.task.cancel('message', '123')
+  // abort a pending task
+  hoodie.task.abort('message', '123')
 
-  // restart a pending or canceled task
+  // restart a pending or aborted task
   hoodie.task.restart('message', '123', { extraProperty: 'value' })
 
-  // canceled all pending tasks
+  // aborted all pending tasks
   hoodie.task.restartAll()
 
-  // restart all pending or canceled tasks
+  // restart all pending or aborted tasks
   hoodie.task.restartAll()
 ```
 
 You can also subscribe to the following task events
 
 * start
-* cancel
+* abort
 * error
 * success
 
@@ -101,8 +101,8 @@ You can also subscribe to the following task events
   // listen to new tasks
   hoodie.task.on('start', function (newTask) {});
 
-  // task canceled
-  hoodie.task.on('cancel', function (canceledTask) {});
+  // task aborted
+  hoodie.task.on('abort', function (abortedTask) {});
 
   // task could not be completed
   hoodie.task.on('error', function (errorMessage, task) {});
@@ -112,14 +112,14 @@ You can also subscribe to the following task events
 
   // all listeners can be filtered by type
   hoodie.task.on('start:message',   function (newMessageTask, options) {});
-  hoodie.task.on('cancel:message',  function (canceledMessageTask, options) {});
+  hoodie.task.on('abort:message',  function (abortedMessageTask, options) {});
   hoodie.task.on('error:message',   function (errorMessage, messageTask, options) {});
   hoodie.task.on('success:message', function (completedMessageTask, options) {});
   hoodie.task.on('change:message',  function (eventName, messageTask, options) {});
 
   // ... and by type and id
   hoodie.task.on('start:message:123',   function (newMessageTask, options) {});
-  hoodie.task.on('cancel:message:123',  function (canceledMessageTask, options) {});
+  hoodie.task.on('abort:message:123',  function (abortedMessageTask, options) {});
   hoodie.task.on('error:message:123',   function (errorMessage, messageTask, options) {});
   hoodie.task.on('success:message:123', function (completedMessageTask, options) {});
   hoodie.task.on('change:message:123',  function (eventName, messageTask, options) {});

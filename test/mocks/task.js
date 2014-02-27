@@ -4,14 +4,14 @@ module.exports = function () {
   var api = {};
 
   var startDefer = $.Deferred();
-  var cancelDefer = $.Deferred();
-  var cancelAllDefer = $.Deferred();
+  var abortDefer = $.Deferred();
+  var abortAllDefer = $.Deferred();
   var restartDefer = $.Deferred();
   var restartAllDefer = $.Deferred();
 
   api.start = sinon.stub().returns(startDefer.promise());
-  api.cancel = sinon.stub().returns(cancelDefer.promise());
-  api.cancelAll = sinon.stub().returns(cancelAllDefer.promise());
+  api.abort = sinon.stub().returns(abortDefer.promise());
+  api.abortAll = sinon.stub().returns(abortAllDefer.promise());
   api.restart = sinon.stub().returns(restartDefer.promise());
   api.restartAll = sinon.stub().returns(restartAllDefer.promise());
   api.subscribeToOutsideEvents = sinon.spy();
@@ -21,8 +21,8 @@ module.exports = function () {
 
   // backdoor access to deferreds
   api.start.defer = startDefer;
-  api.cancel.defer = cancelDefer;
-  api.cancelAll.defer = cancelAllDefer;
+  api.abort.defer = abortDefer;
+  api.abortAll.defer = abortAllDefer;
   api.restart.defer = restartDefer;
   api.restartAll.defer = restartAllDefer;
 
