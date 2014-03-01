@@ -13,5 +13,4 @@ require('./unit/utils-test');
 require('./unit/couch-utils-test');
 require('./unit/helpers-pack_hoodie-test');
 require('./integration/require');
-// todo: fix 404 helper
-// require('./integration/handle_404');
+require('./integration/handle_404');
