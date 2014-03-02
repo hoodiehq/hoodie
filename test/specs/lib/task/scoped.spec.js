@@ -25,14 +25,14 @@ describe('hoodieScopedTaskFactory', function() {
       expect(this.task.start).to.be.calledWith('message', { title: 'milk!'});
     });
 
-    it('scopes cancel method to type "message"', function() {
-      this.scopedTask.cancel('abc');
-      expect(this.task.cancel).to.be.calledWith('message', 'abc');
+    it('scopes abort method to type "message"', function() {
+      this.scopedTask.abort('abc');
+      expect(this.task.abort).to.be.calledWith('message', 'abc');
     });
 
-    it('scopes cancelAll method to type "message"', function() {
-      this.scopedTask.cancelAll();
-      expect(this.task.cancelAll).to.be.calledWith('message');
+    it('scopes abortAll method to type "message"', function() {
+      this.scopedTask.abortAll();
+      expect(this.task.abortAll).to.be.calledWith('message');
     });
 
     it('scopes restart method to type "message"', function() {
@@ -63,13 +63,13 @@ describe('hoodieScopedTaskFactory', function() {
       expect(this.scopedTask.start).to.be(undefined);
     });
 
-    it('scopes cancel method to type "message" & id "abc"', function() {
-      this.scopedTask.cancel();
-      expect(this.task.cancel).to.be.calledWith('message', 'abc');
+    it('scopes abort method to type "message" & id "abc"', function() {
+      this.scopedTask.abort();
+      expect(this.task.abort).to.be.calledWith('message', 'abc');
     });
 
-    it('does not have an cancelAll method', function() {
-      expect(this.scopedTask.cancelAll).to.be(undefined);
+    it('does not have an abortAll method', function() {
+      expect(this.scopedTask.abortAll).to.be(undefined);
     });
 
     it('scopes restart method to type "message" & id "abc"', function() {
