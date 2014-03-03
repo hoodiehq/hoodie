@@ -111,18 +111,18 @@ You can also subscribe to the following task events
   hoodie.task.on('success', function (completedTask) {});
 
   // all listeners can be filtered by type
-  hoodie.task.on('start:message',   function (newMessageTask, options) {});
-  hoodie.task.on('abort:message',  function (abortedMessageTask, options) {});
-  hoodie.task.on('error:message',   function (errorMessage, messageTask, options) {});
-  hoodie.task.on('success:message', function (completedMessageTask, options) {});
-  hoodie.task.on('change:message',  function (eventName, messageTask, options) {});
+  hoodie.task.on('message:start',   function (newMessageTask, options) {});
+  hoodie.task.on('message:abort',  function (abortedMessageTask, options) {});
+  hoodie.task.on('message:error',   function (errorMessage, messageTask, options) {});
+  hoodie.task.on('message:success', function (completedMessageTask, options) {});
+  hoodie.task.on('message:change',  function (eventName, messageTask, options) {});
 
   // ... and by type and id
-  hoodie.task.on('start:message:123',   function (newMessageTask, options) {});
-  hoodie.task.on('abort:message:123',  function (abortedMessageTask, options) {});
-  hoodie.task.on('error:message:123',   function (errorMessage, messageTask, options) {});
-  hoodie.task.on('success:message:123', function (completedMessageTask, options) {});
-  hoodie.task.on('change:message:123',  function (eventName, messageTask, options) {});
+  hoodie.task.on('message:start:123',   function (newMessageTask, options) {});
+  hoodie.task.on('message:abort:123',  function (abortedMessageTask, options) {});
+  hoodie.task.on('message:error:123',   function (errorMessage, messageTask, options) {});
+  hoodie.task.on('message:success:123', function (completedMessageTask, options) {});
+  hoodie.task.on('message:change:123',  function (eventName, messageTask, options) {});
 ```
 
 **note**: if `change` event is `"error"`, the error message gets passed as options.error
