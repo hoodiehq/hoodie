@@ -2,7 +2,6 @@ module.exports = {
   account: require('./account'),
   config: require('./config'),
   connection: require('./connection'),
-  dispose: require('./dispose'),
   events: require('./events'),
   hoodie: require('./hoodie'),
   id: require('./id'),

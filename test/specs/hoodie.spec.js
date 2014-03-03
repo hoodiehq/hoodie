@@ -74,9 +74,6 @@ describe('Hoodie', function() {
     //it('should extend with hoodieGenerateId module', function() {
       //expect(window.hoodieGenerateId).to.be.calledWith(this.hoodie);
     //});
-    //it('should extend with hoodieDispose module', function() {
-      //expect(window.hoodieDispose).to.be.calledWith(this.hoodie);
-    //});
     //it('should extend with hoodieOpen module', function() {
       //expect(window.hoodieOpen).to.be.calledWith(this.hoodie);
     //});

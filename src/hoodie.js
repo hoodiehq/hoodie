@@ -10,7 +10,6 @@ var hoodieConfig = require('./hoodie/config');
 var hoodieConnection = require('./hoodie/connection');
 var hoodieId = require('./hoodie/id');
 var hoodieLocalStore = require('./hoodie/store');
-var hoodieDispose = require('./hoodie/dispose');
 var hoodieTask = require('./hoodie/task');
 var hoodieOpen = require('./hoodie/open');
 var hoodieRequest = require('./hoodie/request');
@@ -69,9 +68,6 @@ function Hoodie(baseUrl) {
   // * hoodie.isOnline
   // * hoodie.checkConnection
   hoodie.extend(hoodieConnection);
-
-  // * hoodie.dispose
-  hoodie.extend(hoodieDispose);
 
   // * hoodie.open
   hoodie.extend(hoodieOpen);
