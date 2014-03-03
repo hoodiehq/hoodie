@@ -1523,7 +1523,7 @@ describe('hoodie.account', function() {
       }); // #fails
     }); // username is joe@example.com
   }); // #fetch
-  describe('#destroy()', function() {
+  describe('#destroy(currentPassword)', function() {
 
     beforeEach(function() {
       this.account.username = 'joe@example.com';
@@ -1548,21 +1548,21 @@ describe('hoodie.account', function() {
         });
 
         it('should return a promise', function() {
-          expect(this.account.destroy().state()).to.eql('resolved');
+          expect(this.account.destroy(currentPassword).state()).to.eql('resolved');
         });
 
         it('should disconnect', function() {
-          this.account.destroy();
+          this.account.destroy(currentPassword);
           expect(this.hoodie.remote.disconnect).to.be.called();
         });
 
         it('should fetch the account', function() {
-          this.account.destroy();
+          this.account.destroy(currentPassword);
           expect(this.account.fetch).to.be.called();
         });
 
         it('should send a PUT request to /_users/org.couchdb.user%3Auser%2Fjoe%40example.com', function() {
-          this.account.destroy();
+          this.account.destroy(currentPassword);
           var userObject = unconfirmedUserDoc(this.account.username);
           userObject._deleted = true;
           expect(this.account.request).to.be.calledWith('PUT', '/_users/org.couchdb.user%3Auser%2Fjoe%40example.com', {
@@ -1574,7 +1574,7 @@ describe('hoodie.account', function() {
         _and('destroy request succesful', function() {
           beforeEach(function() {
             this.hoodie.request.defer.resolve();
-            this.account.destroy();
+            this.account.destroy(currentPassword);
           });
 
           it('should unset username', function() {
@@ -1599,7 +1599,7 @@ describe('hoodie.account', function() {
             message: 'Missing'
           };
           this.fetchDefer.reject(this.error);
-          this.promise = this.account.destroy();
+          this.promise = this.account.destroy(currentPassword);
           this.promise;
         });
 
@@ -1615,7 +1615,7 @@ describe('hoodie.account', function() {
             message: 'Dunno'
           };
           this.fetchDefer.reject(this.error);
-          this.promise = this.account.destroy();
+          this.promise = this.account.destroy(currentPassword);
           this.promise;
         });
 
@@ -1644,7 +1644,7 @@ describe('hoodie.account', function() {
 
       beforeEach(function() {
         this.sandbox.stub(this.account, 'hasAccount').returns(false);
-        this.promise = this.account.destroy();
+        this.promise = this.account.destroy(currentPassword);
       });
 
       it('should return a promise', function() {
