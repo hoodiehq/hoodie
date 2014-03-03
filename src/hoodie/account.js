@@ -513,7 +513,7 @@ function hoodieAccount(hoodie) {
 
   // destroys a user's account
   //
-  account.destroy = function destroy() {
+  account.destroy = function destroy(currentPassword) {
     if (!account.hasAccount()) {
       return cleanupAndTriggerSignOut();
     }

@@ -63,9 +63,9 @@ And here is what it looks like:
 
 ### Tasks
 
-Tasks get picked up by backend workers in the background. You can
-think of them as special kind of objects that the describe specific
-tasks that you want backend logic for to be accomplished.
+Tasks get picked up by backend workers in the background. You can think
+of them as special objects that describe specific tasks, for which you
+want backend logic.
 
 If a task has been completed successfully, it gets removed. If there
 is an error, it stays in the task store to be handled or removed.
@@ -74,7 +74,7 @@ is an error, it stays in the task store to be handled or removed.
 ```js
   // start a new task. Once it was finished, the succes callback gets
   // called. If something went wrong, error callback gets called instead
-  hoodie.task.start('message', {to: 'joe', text: 'Party machen?'})
+  hoodie.task.start('message', {to: 'joe', text: 'Do you want to party?'})
     .then( showMessageSent, showMessageError )
 
   // abort a pending task

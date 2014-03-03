@@ -39,7 +39,7 @@
     hoodie.account.resetPassword('joe@example.com')
 
     // destroy account and all its data
-    hoodie.account.destroy()
+    hoodie.account.destroy('currentpassword')
 
     //
     // Store
@@ -148,17 +148,17 @@
     //
     // Tasks
     //
-    // Tasks get picked up by backend workers in the background. You can
-    // think of them as special kind of objects that the describe specific
-    // tasks that you want backend logic for to be accomplished.
+    // Tasks get picked up by backend workers in the background. You can think
+    // of them as special objects that describe specific tasks, for which you
+    // want backend logic.
     //
     // If a task has been completed successfully, it gets removed. If there
     // is an error, it stays in the task store to be handled or removed.
     //
 
-    // start a new task. Once it was finished, the succes callback gets
-    // called. If something went wrong, error callback gets called instead
-    hoodie.task.start('message', {to: 'joe', text: 'Party machen?'})
+    // start a new task. Once it finishes, the success callback is called.
+    // If something went wrong, the error callback gets called instead
+    hoodie.task.start('message', {to: 'joe', text: 'Do you want to party?'})
       .then( showMessageSent, showMessageError )
 
     // abort a pending task
@@ -319,7 +319,7 @@
     </code></pre>
   </div>
 
-  <!-- deplendencies for hoodie -->
+  <!-- dependencies for hoodie -->
   <script src="node_modules/hoodie.js-assets/jquery/jquery.js"></script>
   <script src="dist/hoodie.js"></script>
   <script src="node_modules/hoodie.js-assets/prism.js/index.js"></script>
