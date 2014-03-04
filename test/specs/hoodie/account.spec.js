@@ -68,7 +68,7 @@ describe('hoodie.account', function() {
           expect(this.account.request.calledOnce).to.be.ok();
         });
 
-        _and('there is a pending singIn request', function() {
+        _and('there is a pending signIn request', function() {
 
           beforeEach(function() {
             this.signInPromise = this.hoodie.account.signIn('joe@example.com', 'secret');
@@ -93,7 +93,7 @@ describe('hoodie.account', function() {
           });
         });
 
-        _when('there is a pending singOut request', function() {
+        _when('there is a pending signOut request', function() {
 
           beforeEach(function() {
             this.hoodie.remote.disconnect.defer.resolve();
@@ -1833,6 +1833,14 @@ describe('hoodie.account', function() {
       this.sandbox.stub(this.account, 'request', this.fakeRequest);
       this.fetchDefer = this.hoodie.defer();
       this.sandbox.stub(this.account, 'fetch').returns(this.fetchDefer);
+    });
+
+    it('should return a name conflict', function() {
+      var promise = this.account.changeUsername('secret', 'joe@example.com');
+      expect(promise).to.be.rejectedWith({
+        name: 'HoodieConflictError',
+        message: 'Usernames identical'
+      });
     });
 
     it('should return a promise', function() {

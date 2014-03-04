@@ -501,8 +501,14 @@ function hoodieAccount(hoodie) {
   // But the current password is needed to login with the new username.
   //
   account.changeUsername = function changeUsername(currentPassword, newUsername) {
-    newUsername = newUsername || '';
-    return changeUsernameAndPassword(currentPassword, newUsername.toLowerCase());
+    if (newUsername !== account.username) {
+      newUsername = newUsername || '';
+      return changeUsernameAndPassword(currentPassword, newUsername.toLowerCase());
+    }
+    return rejectWith({
+      name: 'HoodieConflictError',
+      message: 'Usernames identical'
+    });
   };
 
 
