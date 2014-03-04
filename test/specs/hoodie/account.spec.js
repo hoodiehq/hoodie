@@ -1835,6 +1835,14 @@ describe('hoodie.account', function() {
       this.sandbox.stub(this.account, 'fetch').returns(this.fetchDefer);
     });
 
+    it('should return a name conflict', function() {
+      var promise = this.account.changeUsername('secret', 'joe@example.com');
+      expect(promise).to.be.rejectedWith({
+        name: 'HoodieConflictError',
+        message: 'Usernames identical'
+      });
+    });
+
     it('should return a promise', function() {
       var promise = this.account.changeUsername('secret', 'new.joe@example.com');
       expect(promise).to.be.promise();
