@@ -90,8 +90,7 @@ function hoodieAccount(hoodie) {
   // hasValidSession
   // -----------------
 
-  // returns true if the user is currently signed but has no valid session,
-  // meaning that the data cannot be synchronized.
+  // returns true if the user is signed in, and has a valid cookie.
   //
   account.hasValidSession = function() {
     if (!account.hasAccount()) {
@@ -105,8 +104,7 @@ function hoodieAccount(hoodie) {
   // hasInvalidSession
   // -----------------
 
-  // returns true if the user is currently signed but has no valid session,
-  // meaning that the data cannot be synchronized.
+  // returns true if the user is signed in, but does not have a valid cookie 
   //
   account.hasInvalidSession = function() {
     if (!account.hasAccount()) {
