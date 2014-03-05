@@ -20,6 +20,7 @@
 
 var hoodiefyRequestErrorName = require('../utils/hoodiefy_request_error_name');
 var extend = require('extend');
+var rejectWith = require('../utils/promise/reject_with');
 
 function hoodieRequest(hoodie) {
   var $ajax = $.ajax;
@@ -97,7 +98,7 @@ function hoodieRequest(hoodie) {
       }
     }
 
-    return hoodie.rejectWith(error).promise();
+    return rejectWith(error).promise();
   }
 
   //
