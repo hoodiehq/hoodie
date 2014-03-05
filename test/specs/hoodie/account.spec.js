@@ -522,8 +522,9 @@ describe('hoodie.account', function() {
 
                 _and('sign in fails with unauthorized error', function() {
                   beforeEach(function() {
-                    this.signInDefer = getDefer();
-                    this.sandbox.stub(this.account, 'signIn').returns(this.signInDefer.promise());
+                    this.signOutDefer = getDefer();
+                    this.sandbox.stub(this.account, 'signOut').returns(this.signOutDefer.promise());
+
                     this.account.request.reset();
                     this.requestDefers[3].reject({
                       name: 'HoodieUnauthorizedError',
@@ -532,27 +533,43 @@ describe('hoodie.account', function() {
                     });
                   });
 
-                  it('should sign in with new username', function() {
-                    expect(this.account.signIn).to.be.calledWith('joe@example.com', 'secret');
-                  });
-
-                  _and('sign in to new account succeeds', function() {
-                    beforeEach(function() {
-                      this.signInDefer.resolve();
-                    });
-
-                    it('should resolve', function() {
-                      expect(this.promise).to.be.resolved();
+                  it('should sign out silently and ignore local changes', function() {
+                    expect(this.account.signOut).to.be.calledWith({
+                      silent: true,
+                      ignoreLocalChanges: true
                     });
                   });
 
-                  _and('sign in to new account fails', function() {
+                  _and('sign out succeeds', function() {
                     beforeEach(function() {
-                      this.signInDefer.reject('ooops');
+                      this.signInDefer = getDefer();
+                      this.sandbox.stub(this.account, 'signIn').returns(this.signInDefer.promise());
+
+                      this.signOutDefer.resolve();
                     });
 
-                    it('should reject', function() {
-                      expect(this.promise).to.be.rejectedWith('ooops');
+                    it('should sign in with new username', function() {
+                      expect(this.account.signIn).to.be.calledWith('joe@example.com', 'secret');
+                    });
+
+                    _and('sign in to new account succeeds', function() {
+                      beforeEach(function() {
+                        this.signInDefer.resolve();
+                      });
+
+                      it('should resolve', function() {
+                        expect(this.promise).to.be.resolved();
+                      });
+                    });
+
+                    _and('sign in to new account fails', function() {
+                      beforeEach(function() {
+                        this.signInDefer.reject('ooops');
+                      });
+
+                      it('should reject', function() {
+                        expect(this.promise).to.be.rejectedWith('ooops');
+                      });
                     });
                   });
                 });
@@ -1965,8 +1982,9 @@ describe('hoodie.account', function() {
 
             _and('sign in fails with unauthorized error', function() {
               beforeEach(function() {
-                this.signInDefer = getDefer();
-                this.sandbox.stub(this.account, 'signIn').returns(this.signInDefer.promise());
+                this.signOutDefer = getDefer();
+                this.sandbox.stub(this.account, 'signOut').returns(this.signOutDefer.promise());
+
                 this.account.request.reset();
                 this.requestDefers[3].reject({
                   name: 'HoodieUnauthorizedError',
@@ -1975,27 +1993,44 @@ describe('hoodie.account', function() {
                 });
               });
 
-              it('should sign in with new username', function() {
-                expect(this.account.signIn).to.be.calledWith('new.joe@example.com', 'secret');
-              });
-
-              _and('sign in to new account succeeds', function() {
-                beforeEach(function() {
-                  this.signInDefer.resolve();
-                });
-
-                it('should resolve', function() {
-                  expect(this.promise).to.be.resolved();
+              it('should sign out silently and ignore local changes', function() {
+                expect(this.account.signOut).to.be.calledWith({
+                  silent: true,
+                  ignoreLocalChanges: true
                 });
               });
 
-              _and('sign in to new account fails', function() {
+
+              _and('sign out succeeds', function() {
                 beforeEach(function() {
-                  this.signInDefer.reject('ooops');
+                  this.signInDefer = getDefer();
+                  this.sandbox.stub(this.account, 'signIn').returns(this.signInDefer.promise());
+
+                  this.signOutDefer.resolve();
                 });
 
-                it('should reject', function() {
-                  expect(this.promise).to.be.rejectedWith('ooops');
+                it('should sign in with new username', function() {
+                  expect(this.account.signIn).to.be.calledWith('new.joe@example.com', 'secret');
+                });
+
+                _and('sign in to new account succeeds', function() {
+                  beforeEach(function() {
+                    this.signInDefer.resolve();
+                  });
+
+                  it('should resolve', function() {
+                    expect(this.promise).to.be.resolved();
+                  });
+                });
+
+                _and('sign in to new account fails', function() {
+                  beforeEach(function() {
+                    this.signInDefer.reject('ooops');
+                  });
+
+                  it('should reject', function() {
+                    expect(this.promise).to.be.rejectedWith('ooops');
+                  });
                 });
               });
             });
