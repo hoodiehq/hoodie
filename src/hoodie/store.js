@@ -555,8 +555,10 @@ function hoodieStore (hoodie) {
         return extend(true, {}, cachedObject[key]);
       }
 
+      key = '' + type + '/' + id;
+
       // if object is not yet cached, load it from localStore
-      object = lsHelper.getObject(type, id);
+      object = lsHelper.getObject(key);
 
       // stop here if object did not exist in localStore
       // and cache it so we don't need to look it up again

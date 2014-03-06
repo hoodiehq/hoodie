@@ -88,19 +88,7 @@ exports.setObject = function (key, object) {
   return exports.setItem(key, global.JSON.stringify(store));
 };
 
-exports.getObject = function (type, id) {
-  var key, obj;
-
-  key = '' + type + '/' + id;
-  var json = exports.getItem(key);
-
-  if (json) {
-    obj = json;
-    obj.type = type;
-    obj.id = id;
-    return obj;
-  } else {
-    return false;
-  }
+exports.getObject = function (key) {
+  return exports.getItem(key) ? exports.getItem(key) : false;
 };
 
