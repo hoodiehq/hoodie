@@ -13,6 +13,8 @@ var getDefer = require('../utils/promise/defer');
 var rejectWith = require('../utils/promise/reject_with');
 var resolveWith = require('../utils/promise/resolve_with');
 
+var lsHelper = require('../utils').localstorage;
+
 //
 function hoodieStore (hoodie) {
 
@@ -290,7 +292,7 @@ function hoodieStore (hoodie) {
 
     // if change comes from remote, just clean up locally
     if (options.remote) {
-      db.removeItem(key);
+      lsHelper.removeItem(key);
       objectWasMarkedAsDeleted = cachedObject[key] && isMarkedAsDeleted(cachedObject[key]);
       cachedObject[key] = false;
       clearChanged(type, id);
@@ -311,7 +313,7 @@ function hoodieStore (hoodie) {
       cache(type, id, object);
     } else {
       key = type + '/' + id;
-      db.removeItem(key);
+      lsHelper.removeItem(key);
       cachedObject[key] = false;
       clearChanged(type, id);
     }
@@ -399,8 +401,8 @@ function hoodieStore (hoodie) {
   store.index = function index() {
     var i, key, keys, _i, _ref;
     keys = [];
-    for (i = _i = 0, _ref = db.length(); 0 <= _ref ? _i < _ref : _i > _ref; i = 0 <= _ref ? ++_i : --_i) {
-      key = db.key(i);
+    for (i = _i = 0, _ref = lsHelper.length(); 0 <= _ref ? _i < _ref : _i > _ref; i = 0 <= _ref ? ++_i : --_i) {
+      key = lsHelper.key(i);
       if (isSemanticKey(key)) {
         keys.push(key);
       }
@@ -471,7 +473,7 @@ function hoodieStore (hoodie) {
         for (_i = 0, _len = keys.length; _i < _len; _i++) {
           key = keys[_i];
           if (isSemanticKey(key)) {
-            _results.push(db.removeItem(key));
+            _results.push(lsHelper.removeItem(key));
           }
         }
         return _results;
@@ -497,74 +499,10 @@ function hoodieStore (hoodie) {
     return bootstrapping;
   };
 
-
-  // Is persistant?
-  // ----------------
-
-  // returns `true` or `false` depending on whether localStorage is supported or not.
-  // Beware that some browsers like Safari do not support localStorage in private mode.
-  //
-  // inspired by this cappuccino commit
-  // https://github.com/cappuccino/cappuccino/commit/063b05d9643c35b303568a28809e4eb3224f71ec
-  //
-  store.isPersistent = function isPersistent() {
-    try {
-
-      // we've to put this in here. I've seen Firefox throwing `Security error: 1000`
-      // when cookies have been disabled
-      if (!global.localStorage) {
-        return false;
-      }
-
-      // Just because localStorage exists does not mean it works. In particular it might be disabled
-      // as it is when Safari's private browsing mode is active.
-      localStorage.setItem('Storage-Test', '1');
-
-      // that should not happen ...
-      if (localStorage.getItem('Storage-Test') !== '1') {
-        return false;
-      }
-
-      // okay, let's clean up if we got here.
-      localStorage.removeItem('Storage-Test');
-    } catch (_error) {
-
-      // in case of an error, like Safari's Private Mode, return false
-      return false;
-    }
-
-    // we're good.
-    return true;
-  };
-
-
-
-
   //
   // Private methods
   // -----------------
   //
-
-
-  // localStorage proxy
-  //
-  var db = {
-    getItem: function(key) {
-      return global.localStorage.getItem(key);
-    },
-    setItem: function(key, value) {
-      return global.localStorage.setItem(key, value);
-    },
-    removeItem: function(key) {
-      return global.localStorage.removeItem(key);
-    },
-    key: function(nr) {
-      return global.localStorage.key(nr);
-    },
-    length: function() {
-      return global.localStorage.length;
-    }
-  };
 
 
   // Cache
@@ -593,7 +531,7 @@ function hoodieStore (hoodie) {
         id: id
       });
 
-      setObject(type, id, object);
+      lsHelper.setObject(type, id, object);
 
       if (options.remote) {
         clearChanged(type, id);
@@ -656,7 +594,7 @@ function hoodieStore (hoodie) {
   //
   function bootstrapDirtyObjects() {
     var id, keys, obj, type, _i, _len, _ref;
-    keys = db.getItem('_dirty');
+    keys = lsHelper.getItem('_dirty');
 
     if (!keys) {
       return;
@@ -780,22 +718,12 @@ function hoodieStore (hoodie) {
   }
 
 
-  // more advanced localStorage wrappers to find/save objects
-  function setObject(type, id, object) {
-    var key, store;
 
-    key = '' + type + '/' + id;
-    store = extend({}, object);
-
-    delete store.type;
-    delete store.id;
-    return db.setItem(key, JSON.stringify(store));
-  }
   function getObject(type, id) {
     var key, obj;
 
     key = '' + type + '/' + id;
-    var json = db.getItem(key);
+    var json = lsHelper.getItem(key);
 
     if (json) {
       obj = JSON.parse(json);
@@ -812,10 +740,10 @@ function hoodieStore (hoodie) {
   function saveDirtyIds() {
     try {
       if ($.isEmptyObject(dirty)) {
-        db.removeItem('_dirty');
+        lsHelper.removeItem('_dirty');
       } else {
         var ids = Object.keys(dirty);
-        db.setItem('_dirty', ids.join(','));
+        lsHelper.setItem('_dirty', ids.join(','));
       }
     } catch(e) {}
   }
@@ -957,8 +885,8 @@ function hoodieStore (hoodie) {
   // patchIfNotPersistant
   //
   function patchIfNotPersistant () {
-    if (!store.isPersistent()) {
-      db = {
+    if (!lsHelper.isPersistent()) {
+      lsHelper = {
         getItem: function() { return null; },
         setItem: function() { return null; },
         removeItem: function() { return null; },

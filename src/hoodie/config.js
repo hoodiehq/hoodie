@@ -2,6 +2,7 @@
 // ===================
 
 var resolve = require('../utils/promise/resolve');
+var localstorage = require('../utils').localstorage;
 
 //
 function hoodieConfig(hoodie) {
@@ -36,13 +37,11 @@ function hoodieConfig(hoodie) {
     // same value as createdBy for $config/hoodie
     // Also see config.js:77ff
     if (key === '_hoodieId') {
-      hoodie.store.remove(type, id, {silent: true});
+      localstorage.removeItem(type);
       update = cache;
     }
 
-    return hoodie.store.updateOrAdd(type, id, update, {
-      silent: isSilent
-    });
+    localstorage.setItem(type, id);
   };
 
   // get
@@ -57,19 +56,18 @@ function hoodieConfig(hoodie) {
   // clear
   // ----------
 
-  // clears cache and removes object from store
+  // clears cache and removes object from localStorage
   //
   config.clear = function clear() {
     cache = {};
-    return hoodie.store.remove(type, id);
+    return localstorage.removeItem(type);
   };
 
   // unset
   // ----------
 
   // unsets a configuration. If configuration is present, calls
-  // config.set(key, undefined). Otherwise resolves without store
-  // interaction.
+  // config.set(key, undefined).
   //
   config.unset = function unset(key) {
     if (typeof config.get(key) === 'undefined') {
@@ -118,3 +116,4 @@ function hoodieConfig(hoodie) {
 }
 
 module.exports = hoodieConfig;
+
