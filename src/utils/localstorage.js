@@ -80,11 +80,8 @@ exports.length = function () {
 };
 
 // more advanced localStorage wrappers to find/save objects
-exports.setObject = function (type, id, object) {
-  var key, store;
-
-  key = '' + type + '/' + id;
-  store = extend({}, object);
+exports.setObject = function (key, object) {
+  var store = extend({}, object);
 
   delete store.type;
   delete store.id;

@@ -531,7 +531,7 @@ function hoodieStore (hoodie) {
         id: id
       });
 
-      lsHelper.setObject(type, id, object);
+      lsHelper.setObject(key, object);
 
       if (options.remote) {
         clearChanged(type, id);
