@@ -1,4 +1,7 @@
 module.exports = {
+  config: require('./config'),
   generateId: require('./generate_id'),
-  promise : require('./promise')
+  localStorageWrapper: require('./local_storage_wrapper'),
+  promise: require('./promise')
 };
+

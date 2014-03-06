@@ -1,4 +1,8 @@
 require('../../lib/setup');
+
+var configMock = require('../../mocks/utils/config');
+global.stubRequire('src/utils/config', configMock);
+
 var hoodieAccountRemote = require('../../../src/hoodie/remote');
 
 describe('hoodie.remote', function() {
@@ -11,7 +15,7 @@ describe('hoodie.remote', function() {
       disconnect: sinon.spy(),
       push: sinon.spy()
     });
-    this.hoodie.config.get.withArgs('_remote.since').returns(10);
+    configMock.get.withArgs('_remote.since').returns(10);
     this.hoodie.store.index.returns(['funk/1', '$task/2']);
 
     this.clock = this.sandbox.useFakeTimers(0); // '1970-01-01 00:00:00'

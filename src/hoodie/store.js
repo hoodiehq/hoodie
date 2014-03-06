@@ -13,6 +13,8 @@ var getDefer = require('../utils/promise/defer');
 var rejectWith = require('../utils/promise/reject_with');
 var resolveWith = require('../utils/promise/resolve_with');
 
+var localStorageWrapper = require('../utils/local_storage_wrapper');
+
 //
 function hoodieStore (hoodie) {
 
@@ -290,7 +292,7 @@ function hoodieStore (hoodie) {
 
     // if change comes from remote, just clean up locally
     if (options.remote) {
-      db.removeItem(key);
+      localStorageWrapper.removeItem(key);
       objectWasMarkedAsDeleted = cachedObject[key] && isMarkedAsDeleted(cachedObject[key]);
       cachedObject[key] = false;
       clearChanged(type, id);
@@ -311,7 +313,7 @@ function hoodieStore (hoodie) {
       cache(type, id, object);
     } else {
       key = type + '/' + id;
-      db.removeItem(key);
+      localStorageWrapper.removeItem(key);
       cachedObject[key] = false;
       clearChanged(type, id);
     }
@@ -399,8 +401,8 @@ function hoodieStore (hoodie) {
   store.index = function index() {
     var i, key, keys, _i, _ref;
     keys = [];
-    for (i = _i = 0, _ref = db.length(); 0 <= _ref ? _i < _ref : _i > _ref; i = 0 <= _ref ? ++_i : --_i) {
-      key = db.key(i);
+    for (i = _i = 0, _ref = localStorageWrapper.length(); 0 <= _ref ? _i < _ref : _i > _ref; i = 0 <= _ref ? ++_i : --_i) {
+      key = localStorageWrapper.key(i);
       if (isSemanticKey(key)) {
         keys.push(key);
       }
@@ -471,7 +473,7 @@ function hoodieStore (hoodie) {
         for (_i = 0, _len = keys.length; _i < _len; _i++) {
           key = keys[_i];
           if (isSemanticKey(key)) {
-            _results.push(db.removeItem(key));
+            _results.push(localStorageWrapper.removeItem(key));
           }
         }
         return _results;
@@ -497,74 +499,10 @@ function hoodieStore (hoodie) {
     return bootstrapping;
   };
 
-
-  // Is persistant?
-  // ----------------
-
-  // returns `true` or `false` depending on whether localStorage is supported or not.
-  // Beware that some browsers like Safari do not support localStorage in private mode.
-  //
-  // inspired by this cappuccino commit
-  // https://github.com/cappuccino/cappuccino/commit/063b05d9643c35b303568a28809e4eb3224f71ec
-  //
-  store.isPersistent = function isPersistent() {
-    try {
-
-      // we've to put this in here. I've seen Firefox throwing `Security error: 1000`
-      // when cookies have been disabled
-      if (!global.localStorage) {
-        return false;
-      }
-
-      // Just because localStorage exists does not mean it works. In particular it might be disabled
-      // as it is when Safari's private browsing mode is active.
-      localStorage.setItem('Storage-Test', '1');
-
-      // that should not happen ...
-      if (localStorage.getItem('Storage-Test') !== '1') {
-        return false;
-      }
-
-      // okay, let's clean up if we got here.
-      localStorage.removeItem('Storage-Test');
-    } catch (_error) {
-
-      // in case of an error, like Safari's Private Mode, return false
-      return false;
-    }
-
-    // we're good.
-    return true;
-  };
-
-
-
-
   //
   // Private methods
   // -----------------
   //
-
-
-  // localStorage proxy
-  //
-  var db = {
-    getItem: function(key) {
-      return global.localStorage.getItem(key);
-    },
-    setItem: function(key, value) {
-      return global.localStorage.setItem(key, value);
-    },
-    removeItem: function(key) {
-      return global.localStorage.removeItem(key);
-    },
-    key: function(nr) {
-      return global.localStorage.key(nr);
-    },
-    length: function() {
-      return global.localStorage.length;
-    }
-  };
 
 
   // Cache
@@ -578,7 +516,7 @@ function hoodieStore (hoodie) {
   // Pass `options.remote = true` when object comes from remote
   // Pass 'options.silent = true' to avoid events from being triggered.
   function cache(type, id, object, options) {
-    var key;
+    var key, storedObject;
 
     if (object === undefined) {
       object = false;
@@ -593,7 +531,11 @@ function hoodieStore (hoodie) {
         id: id
       });
 
-      setObject(type, id, object);
+      // we do not store type & id in localStorage values
+      storedObject = extend({}, object);
+      delete storedObject.type;
+      delete storedObject.id;
+      localStorageWrapper.setObject(key, storedObject);
 
       if (options.remote) {
         clearChanged(type, id);
@@ -617,16 +559,22 @@ function hoodieStore (hoodie) {
         return extend(true, {}, cachedObject[key]);
       }
 
+      key = '' + type + '/' + id;
+
       // if object is not yet cached, load it from localStore
-      object = getObject(type, id);
+      object = localStorageWrapper.getObject(key);
 
       // stop here if object did not exist in localStore
       // and cache it so we don't need to look it up again
-      if (object === false) {
+      if (! object) {
         clearChanged(type, id);
         cachedObject[key] = false;
         return false;
       }
+
+      // add type & id as we don't store these in localStorage values
+      object.type = type;
+      object.id = id;
 
     }
 
@@ -656,7 +604,7 @@ function hoodieStore (hoodie) {
   //
   function bootstrapDirtyObjects() {
     var id, keys, obj, type, _i, _len, _ref;
-    keys = db.getItem('_dirty');
+    keys = localStorageWrapper.getItem('_dirty');
 
     if (!keys) {
       return;
@@ -779,43 +727,14 @@ function hoodieStore (hoodie) {
     triggerEvents('sync', object);
   }
 
-
-  // more advanced localStorage wrappers to find/save objects
-  function setObject(type, id, object) {
-    var key, store;
-
-    key = '' + type + '/' + id;
-    store = extend({}, object);
-
-    delete store.type;
-    delete store.id;
-    return db.setItem(key, JSON.stringify(store));
-  }
-  function getObject(type, id) {
-    var key, obj;
-
-    key = '' + type + '/' + id;
-    var json = db.getItem(key);
-
-    if (json) {
-      obj = JSON.parse(json);
-      obj.type = type;
-      obj.id = id;
-      return obj;
-    } else {
-      return false;
-    }
-  }
-
-
   // store IDs of dirty objects
   function saveDirtyIds() {
     try {
       if ($.isEmptyObject(dirty)) {
-        db.removeItem('_dirty');
+        localStorageWrapper.removeItem('_dirty');
       } else {
         var ids = Object.keys(dirty);
-        db.setItem('_dirty', ids.join(','));
+        localStorageWrapper.setItem('_dirty', ids.join(','));
       }
     } catch(e) {}
   }
@@ -954,22 +873,6 @@ function hoodieStore (hoodie) {
   }
 
   //
-  // patchIfNotPersistant
-  //
-  function patchIfNotPersistant () {
-    if (!store.isPersistent()) {
-      db = {
-        getItem: function() { return null; },
-        setItem: function() { return null; },
-        removeItem: function() { return null; },
-        key: function() { return null; },
-        length: function() { return 0; }
-      };
-    }
-  }
-
-
-  //
   // initialization
   // ----------------
   //
@@ -989,12 +892,6 @@ function hoodieStore (hoodie) {
   store.bootstrapDirtyObjects = function() {
     bootstrapDirtyObjects();
     delete store.bootstrapDirtyObjects;
-  };
-
-  // allow to run this once from outside
-  store.patchIfNotPersistant = function() {
-    patchIfNotPersistant();
-    delete store.patchIfNotPersistant;
   };
 }
 

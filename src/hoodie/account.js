@@ -4,6 +4,7 @@
 var hoodieEvents = require('../lib/events');
 var extend = require('extend');
 var generateId = require('../utils/generate_id');
+var config = require('../utils/config');
 
 var getDefer = require('../utils/promise/defer');
 var reject = require('../utils/promise/reject');
@@ -223,15 +224,15 @@ function hoodieAccount(hoodie) {
   var anonymousPasswordKey = '_account.anonymousPassword';
 
   function setAnonymousPassword(password) {
-    return hoodie.config.set(anonymousPasswordKey, password);
+    return config.set(anonymousPasswordKey, password);
   }
 
   function getAnonymousPassword() {
-    return hoodie.config.get(anonymousPasswordKey);
+    return config.get(anonymousPasswordKey);
   }
 
   function removeAnonymousPassword() {
-    return hoodie.config.unset(anonymousPasswordKey);
+    return config.unset(anonymousPasswordKey);
   }
 
 
@@ -409,7 +410,7 @@ function hoodieAccount(hoodie) {
   account.resetPassword = function resetPassword(username) {
     var data, key, options, resetPasswordId;
 
-    resetPasswordId = hoodie.config.get('_account.resetPasswordId');
+    resetPasswordId = config.get('_account.resetPasswordId');
 
     if (resetPasswordId) {
       return account.checkPasswordReset();
@@ -417,7 +418,7 @@ function hoodieAccount(hoodie) {
 
     resetPasswordId = '' + username + '/' + (generateId());
 
-    hoodie.config.set('_account.resetPasswordId', resetPasswordId);
+    config.set('_account.resetPasswordId', resetPasswordId);
 
     key = '' + userDocPrefix + ':$passwordReset/' + resetPasswordId;
 
@@ -460,7 +461,7 @@ function hoodieAccount(hoodie) {
     var hash, options, resetPasswordId, url, username;
 
     // reject if there is no pending password reset request
-    resetPasswordId = hoodie.config.get('_account.resetPasswordId');
+    resetPasswordId = config.get('_account.resetPasswordId');
 
     if (!resetPasswordId) {
       return rejectWith('No pending password reset.');
@@ -558,7 +559,7 @@ function hoodieAccount(hoodie) {
 
     account.username = newUsername;
 
-    return hoodie.config.set('_account.username', newUsername);
+    return config.set('_account.username', newUsername);
   }
 
 
@@ -779,7 +780,7 @@ function hoodieAccount(hoodie) {
   //
   function handlePasswordResetStatusRequestError(error) {
     if (error.name === 'HoodieUnauthorizedError') {
-      hoodie.config.unset('_account.resetPasswordId');
+      config.unset('_account.resetPasswordId');
       account.trigger('passwordreset');
 
       return resolve();
@@ -835,7 +836,7 @@ function hoodieAccount(hoodie) {
 
     // cleanup
     account.request('PUT', url, options);
-    hoodie.config.unset('_account.resetPasswordId');
+    config.unset('_account.resetPasswordId');
   }
 
   //

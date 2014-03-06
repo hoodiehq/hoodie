@@ -1,7 +1,9 @@
 require('../../lib/setup');
 
 var generateIdMock = require('../../mocks/utils/generate_id');
+var configMock = require('../../mocks/utils/config');
 global.stubRequire('src/utils/generate_id', generateIdMock);
+global.stubRequire('src/utils/config', configMock);
 var hoodieId = require('../../../src/hoodie/id');
 
 describe('hoodie.id()', function() {
@@ -26,15 +28,16 @@ describe('hoodie.id()', function() {
   });
 
   it('stores the new id in config', function() {
-    this.hoodie.config.set.reset();
-    this.hoodie.config.clear.reset();
+    configMock.set.reset();
+    configMock.clear.reset();
     this.id();
-    expect(this.hoodie.config.set).to.be.calledWith('_hoodieId', 'randomid');
+    expect(configMock.set).to.be.calledWith('_hoodieId', 'randomid');
   });
+
   describe('hoodie.id.init()', function() {
     it('loads the last hoodieId from config on initialization', function() {
-      this.hoodie.config.get.resetBehavior();
-      this.hoodie.config.get.returns('lastHoodieId');
+      configMock.get.resetBehavior();
+      configMock.get.returns('lastHoodieId');
       this.id.init();
       var id = this.id();
       expect(id).to.be('lastHoodieId');
@@ -68,12 +71,12 @@ describe('hoodie.id()', function() {
       expect(currentId).to.be('currentId');
 
       this.events['account:cleanup']();
-      this.hoodie.config.set.reset();
+      configMock.set.reset();
       generateIdMock.returns('newId');
       var newId = this.id();
-      
+
       expect(newId).to.be('newId');
-      expect(this.hoodie.config.set).to.be.calledWith('_hoodieId', 'newId');
+      expect(configMock.set).to.be.calledWith('_hoodieId', 'newId');
     });
 
     it('subscribes to account:signin', function() {
@@ -81,9 +84,9 @@ describe('hoodie.id()', function() {
     });
 
     it('sets hoodieId on account:signin', function() {
-      this.hoodie.config.set.reset();
+      configMock.set.reset();
       this.events['account:signin']('joe@example.com', 'funkyId');
-      expect(this.hoodie.config.set).to.be.calledWith('_hoodieId', 'funkyId');
+      expect(configMock.set).to.be.calledWith('_hoodieId', 'funkyId');
       expect( this.id() ).to.be('funkyId');
     });
 

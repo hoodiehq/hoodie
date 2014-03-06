@@ -6,7 +6,6 @@
 
 var hoodieAccount = require('./hoodie/account');
 var hoodieAccountRemote = require('./hoodie/remote');
-var hoodieConfig = require('./hoodie/config');
 var hoodieConnection = require('./hoodie/connection');
 var hoodieId = require('./hoodie/id');
 var hoodieLocalStore = require('./hoodie/store');
@@ -17,7 +16,7 @@ var hoodieEvents = require('./lib/events');
 
 // for plugins
 var lib = require('./lib');
-var util = require('./utils');
+var utils = require('./utils');
 
 // Constructor
 // -------------
@@ -75,14 +74,8 @@ function Hoodie(baseUrl) {
   // * hoodie.store
   hoodie.extend(hoodieLocalStore);
 
-  // workaround, until we ship https://github.com/hoodiehq/hoodie.js/issues/199
-  hoodie.store.patchIfNotPersistant();
-
   // * hoodie.task
   hoodie.extend(hoodieTask);
-
-  // * hoodie.config
-  hoodie.extend(hoodieConfig);
 
   // * hoodie.account
   hoodie.extend(hoodieAccount);
@@ -101,14 +94,14 @@ function Hoodie(baseUrl) {
   // Initializations
   //
 
-  // init config
-  hoodie.config.init();
+  // cleanup config on signout
+  hoodie.on('account:cleanup', utils.config.clear);
 
   // init hoodieId
   hoodie.id.init();
 
   // set username from config (local store)
-  hoodie.account.username = hoodie.config.get('_account.username');
+  hoodie.account.username = utils.config.get('_account.username');
 
   // init hoodie.remote API
   hoodie.remote.init();
@@ -118,9 +111,6 @@ function Hoodie(baseUrl) {
 
   // hoodie.id
   hoodie.id.subscribeToOutsideEvents();
-
-  // hoodie.config
-  hoodie.config.subscribeToOutsideEvents();
 
   // hoodie.store
   hoodie.store.subscribeToOutsideEvents();
@@ -170,7 +160,7 @@ Hoodie.extend = function(extension) {
 //
 function applyExtensions(hoodie) {
   for (var i = 0; i < extensions.length; i++) {
-    extensions[i](hoodie, lib, util);
+    extensions[i](hoodie, lib, utils);
   }
 }
 

@@ -1,6 +1,5 @@
 // modules
 var account = require('./account');
-var config = require('./config');
 var localStore = require('./local_store');
 var openMethod = require('./open');
 var accountRemote = require('./account_remote');
@@ -29,7 +28,6 @@ module.exports = function () {
     store: localStore.apply(this),
     task: task.apply(this),
     account: account.apply(this),
-    config: config.apply(this),
     remote: accountRemote.apply(this),
   };
 
