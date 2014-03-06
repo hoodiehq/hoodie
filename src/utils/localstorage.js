@@ -95,7 +95,7 @@ exports.getObject = function (type, id) {
   var json = exports.getItem(key);
 
   if (json) {
-    obj = global.JSON.parse(json);
+    obj = json;
     obj.type = type;
     obj.id = id;
     return obj;
