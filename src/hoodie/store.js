@@ -556,7 +556,7 @@ function hoodieStore (hoodie) {
       }
 
       // if object is not yet cached, load it from localStore
-      object = getObject(type, id);
+      object = lsHelper.getObject(type, id);
 
       // stop here if object did not exist in localStore
       // and cache it so we don't need to look it up again
@@ -716,25 +716,6 @@ function hoodieStore (hoodie) {
   function handlePushedObject(object) {
     triggerEvents('sync', object);
   }
-
-
-
-  function getObject(type, id) {
-    var key, obj;
-
-    key = '' + type + '/' + id;
-    var json = lsHelper.getItem(key);
-
-    if (json) {
-      obj = JSON.parse(json);
-      obj.type = type;
-      obj.id = id;
-      return obj;
-    } else {
-      return false;
-    }
-  }
-
 
   // store IDs of dirty objects
   function saveDirtyIds() {

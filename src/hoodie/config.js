@@ -1,7 +1,6 @@
 // Hoodie Config API
 // ===================
 
-var resolve = require('../utils/promise/resolve');
 var localstorage = require('../utils').localstorage;
 
 //
@@ -20,8 +19,6 @@ function hoodieConfig(hoodie) {
   // adds a configuration
   //
   config.set = function set(key, value) {
-    var update;
-
     cache[key] = value;
     localstorage.setObject(CONFIG_STORE_KEY, cache);
   };
