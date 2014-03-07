@@ -13,7 +13,7 @@ var getDefer = require('../utils/promise/defer');
 var rejectWith = require('../utils/promise/reject_with');
 var resolveWith = require('../utils/promise/resolve_with');
 
-var lsHelper = require('../utils').localstorage;
+var lsHelper = require('../utils/localstorage');
 
 //
 function hoodieStore (hoodie) {
@@ -869,13 +869,11 @@ function hoodieStore (hoodie) {
   //
   function patchIfNotPersistant () {
     if (!lsHelper.isPersistent()) {
-      lsHelper = {
-        getItem: function() { return null; },
-        setItem: function() { return null; },
-        removeItem: function() { return null; },
-        key: function() { return null; },
-        length: function() { return 0; }
-      };
+      lsHelper.getItem = function() { return null; };
+      lsHelper.setItem = function() { return null; };
+      lsHelper.removeItem = function() { return null; };
+      lsHelper.key = function() { return null; };
+      lsHelper.length = function() { return 0; };
     }
   }
 

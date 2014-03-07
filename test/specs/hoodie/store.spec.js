@@ -7,29 +7,17 @@ global.stubRequire('src/lib/store/api', storeFactory);
 var generateIdMock = require('../../mocks/utils/generate_id');
 global.stubRequire('src/utils/generate_id', generateIdMock);
 
+var localStorageMock = require('../../mocks/utils/localstorage');
+global.stubRequire('src/utils/localstorage', localStorageMock);
+
 var hoodieLocalStore = require('../../../src/hoodie/store');
 var extend = require('extend');
 
-describe('hoodie.store', function() {
+describe.only('hoodie.store', function() {
 
   beforeEach(function() {
     this.hoodie = this.MOCKS.hoodie.apply(this);
     generateIdMock.returns('uuid123');
-
-    // see https://github.com/pivotal/jasmine/issues/299
-    Object.defineProperty(localStorage, 'setItem', { writable: true });
-    Object.defineProperty(localStorage, 'getItem', { writable: true });
-    Object.defineProperty(localStorage, 'removeItem', { writable: true });
-    Object.defineProperty(localStorage, 'key', { writable: true });
-    localStorage.setItem = function() {};
-    localStorage.getItem = function() {};
-    localStorage.removeItem = function() {};
-    localStorage.key = function() {};
-
-    this.sandbox.stub(localStorage, 'getItem');
-    this.sandbox.stub(localStorage, 'setItem');
-    this.sandbox.stub(localStorage, 'removeItem');
-    this.sandbox.stub(localStorage, 'key');
 
     this.clock = this.sandbox.useFakeTimers(0); // '1970-01-01 00:00:00'
 
@@ -43,6 +31,8 @@ describe('hoodie.store', function() {
 
   after(function() {
     global.unstubRequire('src/lib/store/api');
+    global.unstubRequire('src/utils/generate_id');
+    global.unstubRequire('src/utils/localstorage');
   });
 
   //
@@ -54,25 +44,25 @@ describe('hoodie.store', function() {
 
     _when('store is persistent', function() {
       beforeEach(function() {
-        this.sandbox.stub(this.store, 'isPersistent').returns(true);
+        localStorageMock.isPersistent.returns(true);
         this.store.patchIfNotPersistant();
       });
 
       it('should call methods on localStorage', function() {
         this.storeBackend.find('task', '123');
-        expect(global.localStorage.getItem).to.be.called();
+        expect(localStorageMock.getItem).to.be.called();
       });
     }); // store is not persistent
 
     _when('store is not persistent', function() {
       beforeEach(function() {
-        this.sandbox.stub(this.store, 'isPersistent').returns(false);
+        localStorageMock.isPersistent.returns(false);
         this.store.patchIfNotPersistant();
       });
 
       it('should not call methods on localStorage', function() {
         this.storeBackend.find('task', '123');
-        expect(global.localStorage.getItem).to.not.be.called();
+        expect(localStorageMock.getItem).to.not.be.called();
       });
     }); // store is not persistent
   }); // patchIfNotPersistant
@@ -105,7 +95,7 @@ describe('hoodie.store', function() {
       this.store.findAll.defer.resolve(changedObjects);
       this.sandbox.stub(this.store, 'changedObjects').returns(changedObjects);
       this.outsideEvents['account:signup']();
-      expect(global.localStorage.setItem).to.be.calledWith('_dirty', 'doc/funky,doc/fresh');
+      expect(localStorageMock.setItem).to.be.calledWith('_dirty', 'doc/funky,doc/fresh');
       expect(this.store.trigger).to.be.calledWith('dirty');
       this.clock.tick(2000);
       expect(this.store.trigger).to.be.calledWith('idle', changedObjects);
@@ -219,7 +209,7 @@ describe('hoodie.store', function() {
   describe('#save(type, id, object, options)', function() {
     _when('id is \'123\', type is \'document\', object is {name: \'test\'}', function() {
       beforeEach(function() {
-        global.localStorage.getItem.returns(JSON.stringify({name: 'test'}));
+        localStorageMock.getItem.returns(JSON.stringify({name: 'test'}));
 
         this.promise = this.storeBackend.save({
           name: 'test',
@@ -572,7 +562,7 @@ describe('hoodie.store', function() {
 
       _when('failed', function() {
         beforeEach(function() {
-          global.localStorage.setItem.throws(new Error('funk'));
+          localStorageMock.setItem.throws(new Error('funk'));
           this.promise = this.storeBackend.save({
             type: 'document',
             id: '123ohoh',
@@ -1273,7 +1263,7 @@ function now() {
 }
 
 function getLastSavedObject() {
-  var calls = global.localStorage.setItem.args;
+  var calls = localStorageMock.setItem.args;
   var object;
 
   // ignore update of _dirty keys
@@ -1285,7 +1275,7 @@ function getLastSavedObject() {
   return JSON.parse(object);
 }
 function getLastSavedKey() {
-  var calls = global.localStorage.setItem.args;
+  var calls = localStorageMock.setItem.args;
   var key;
 
   // ignore update of _dirty keys
@@ -1303,7 +1293,7 @@ function stubFindItem(key, id, object) {
     delete object.type;
     object = JSON.stringify(object);
   }
-  global.localStorage.getItem.withArgs(key).returns(object);
+  localStorageMock.getItem.withArgs(key).returns(object);
 }
 
 function with_2CatsAnd_3Dogs(specs) {
