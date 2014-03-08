@@ -513,7 +513,7 @@ function hoodieRemoteStore(hoodie, options) {
   }
 
 
-  // ### _parseFromRemote
+  // ### parseFromRemote
 
   // normalize objects coming from remote
   //
@@ -521,7 +521,7 @@ function hoodieRemoteStore(hoodie, options) {
   // e.g. `type/123` -> `123`
   //
   function parseFromRemote(object) {
-    var id, ignore, _ref;
+    var id, matches;
 
     // handle id and type
     id = object._id || object.id;
@@ -529,26 +529,20 @@ function hoodieRemoteStore(hoodie, options) {
 
     if (remote.prefix) {
       id = id.replace(remotePrefixPattern, '');
-      // id = id.replace(new RegExp('^' + remote.prefix), '');
     }
 
     // turn doc/123 into type = doc & id = 123
     // NOTE: we don't use a simple id.split(/\//) here,
     // as in some cases IDs might contain '/', too
     //
-    _ref = id.match(/([^\/]+)\/(.*)/), ignore = _ref[0], object.type = _ref[1], object.id = _ref[2];
+    matches = id.match(/([^\/]+)\/(.*)/);
+    object.type = matches[1], object.id = matches[2];
 
     return object;
   }
 
   function parseAllFromRemote(objects) {
-    var object, _i, _len, _results;
-    _results = [];
-    for (_i = 0, _len = objects.length; _i < _len; _i++) {
-      object = objects[_i];
-      _results.push(parseFromRemote(object));
-    }
-    return _results;
+    return objects.map(parseFromRemote);
   }
 
 
@@ -557,9 +551,9 @@ function hoodieRemoteStore(hoodie, options) {
   // extends passed object with a _rev property
   //
   function addRevisionTo(attributes) {
-    var currentRevId, currentRevNr, newRevisionId, _ref;
+    var currentRevId, currentRevNr, newRevisionId, parts;
     try {
-      _ref = attributes._rev.split(/-/), currentRevNr = _ref[0], currentRevId = _ref[1];
+      parts = attributes._rev.split(/-/), currentRevNr = parts[0], currentRevId = parts[1];
     } catch (_error) {}
     currentRevNr = parseInt(currentRevNr, 10) || 0;
     newRevisionId = generateNewRevisionId();
