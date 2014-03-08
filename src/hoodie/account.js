@@ -843,6 +843,7 @@ function hoodieAccount(hoodie) {
   //
   // 1. assure we have a valid session
   // 2. update _users doc with new username and new password (if provided)
+  // 3. if username changed, wait until current _users doc got removed
   // 3. sign in with new credentials to create new sesion.
   //
   function changeUsernameAndPassword(currentPassword, newUsername, newPassword) {
@@ -850,14 +851,17 @@ function hoodieAccount(hoodie) {
     return sendSignInRequest(account.username, currentPassword, {
       silent: true
     }).then(function() {
-      return account.fetch().then(
-      sendChangeUsernameAndPasswordRequest(currentPassword, newUsername, newPassword));
+      return account.fetch().then(sendChangeUsernameAndPasswordRequest(currentPassword, newUsername, newPassword));
     });
   }
 
 
   //
-  // turn an anonymous account into a real account
+  // turn an anonymous account into a real account. Internally, this is what happens:
+  // 
+  // 1. rename the username from `<hoodieId>` to `username`
+  // 2. Set password to `password`
+  // 3. 
   //
   function upgradeAnonymousAccount(username, password) {
     var currentPassword = getAnonymousPassword();
@@ -1022,7 +1026,13 @@ function hoodieAccount(hoodie) {
         // note that if username has been changed, newPassword is the current password.
         // We always change either the one, or the other.
         return awaitCurrentAccountRemoved(account.username, newPassword).then( function() {
-          return account.signIn(newUsername, newPassword);
+
+          // we do signOut explicitely although signOut is build into hoodie.signIn to
+          // work around trouble in case of local changes. See 
+          // https://github.com/hoodiehq/hoodie.js/issues/256
+          return account.signOut({silent:true, ignoreLocalChanges: true}).then(function() {
+            return account.signIn(newUsername, newPassword);
+          });
         });
       } else {
         return account.signIn(account.username, newPassword);
