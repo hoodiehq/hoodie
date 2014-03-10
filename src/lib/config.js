@@ -1,7 +1,7 @@
 // Hoodie Config API
 // ===================
 
-var localstorage = require('../utils').localstorage;
+var localStorageWrapper = require('../utils').localStorageWrapperWrapper;
 
 //
 function hoodieConfig(hoodie) {
@@ -20,7 +20,7 @@ function hoodieConfig(hoodie) {
   //
   config.set = function set(key, value) {
     cache[key] = value;
-    localstorage.setObject(CONFIG_STORE_KEY, cache);
+    localStorageWrapper.setObject(CONFIG_STORE_KEY, cache);
   };
 
   // get
@@ -35,11 +35,11 @@ function hoodieConfig(hoodie) {
   // clear
   // ----------
 
-  // clears cache and removes object from localStorage
+  // clears cache and removes object from localStorageWrapper
   //
   config.clear = function clear() {
     cache = {};
-    return localstorage.removeItem(CONFIG_STORE_KEY);
+    return localStorageWrapper.removeItem(CONFIG_STORE_KEY);
   };
 
   // unset
@@ -50,7 +50,7 @@ function hoodieConfig(hoodie) {
   //
   config.unset = function unset(key) {
     delete cache[key];
-    localstorage.setObject(CONFIG_STORE_KEY, cache);
+    localStorageWrapper.setObject(CONFIG_STORE_KEY, cache);
   };
 
   //
@@ -58,7 +58,7 @@ function hoodieConfig(hoodie) {
   // The init method to be called on hoodie startup
   //
   function init() {
-    cache = localstorage.getObject(CONFIG_STORE_KEY);
+    cache = localStorageWrapper.getObject(CONFIG_STORE_KEY);
   }
 
   // allow to run init only once
@@ -80,8 +80,6 @@ function hoodieConfig(hoodie) {
     delete config.subscribeToOutsideEvents;
   };
 
-  // exspose public API
-  hoodie.config = config;
 }
 
 module.exports = hoodieConfig;

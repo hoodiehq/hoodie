@@ -6,13 +6,13 @@
 
 var hoodieAccount = require('./hoodie/account');
 var hoodieAccountRemote = require('./hoodie/remote');
-var hoodieConfig = require('./hoodie/config');
 var hoodieConnection = require('./hoodie/connection');
 var hoodieId = require('./hoodie/id');
 var hoodieLocalStore = require('./hoodie/store');
 var hoodieTask = require('./hoodie/task');
 var hoodieOpen = require('./hoodie/open');
 var hoodieRequest = require('./hoodie/request');
+var hoodieConfig = require('./lib/config');
 var hoodieEvents = require('./lib/events');
 
 // for plugins

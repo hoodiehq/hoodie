@@ -31,6 +31,7 @@ describe('hoodie.id()', function() {
     this.id();
     expect(this.hoodie.config.set).to.be.calledWith('_hoodieId', 'randomid');
   });
+
   describe('hoodie.id.init()', function() {
     it('loads the last hoodieId from config on initialization', function() {
       this.hoodie.config.get.resetBehavior();
@@ -71,7 +72,7 @@ describe('hoodie.id()', function() {
       this.hoodie.config.set.reset();
       generateIdMock.returns('newId');
       var newId = this.id();
-      
+
       expect(newId).to.be('newId');
       expect(this.hoodie.config.set).to.be.calledWith('_hoodieId', 'newId');
     });

@@ -2,6 +2,21 @@ var extend = require('extend');
 
 // Is persistant?
 // ----------------
+//
+
+exports.patchIfNotPersistant = function () {
+
+  if (!exports.isPersistent()) {
+    module.exports = {
+      getItem: function() { return null; },
+      setItem: function() { return null; },
+      removeItem: function() { return null; },
+      key: function() { return null; },
+      length: function() { return 0; }
+    };
+  }
+
+};
 
 // returns `true` or `false` depending on whether localStorage is supported or not.
 // Beware that some browsers like Safari do not support localStorage in private mode.

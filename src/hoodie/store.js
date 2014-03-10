@@ -13,7 +13,7 @@ var getDefer = require('../utils/promise/defer');
 var rejectWith = require('../utils/promise/reject_with');
 var resolveWith = require('../utils/promise/resolve_with');
 
-var lsHelper = require('../utils/localstorage');
+var localStorageWrapper = require('../utils').localStorageWrapper;
 
 //
 function hoodieStore (hoodie) {
@@ -292,7 +292,7 @@ function hoodieStore (hoodie) {
 
     // if change comes from remote, just clean up locally
     if (options.remote) {
-      lsHelper.removeItem(key);
+      localStorageWrapper.removeItem(key);
       objectWasMarkedAsDeleted = cachedObject[key] && isMarkedAsDeleted(cachedObject[key]);
       cachedObject[key] = false;
       clearChanged(type, id);
@@ -313,7 +313,7 @@ function hoodieStore (hoodie) {
       cache(type, id, object);
     } else {
       key = type + '/' + id;
-      lsHelper.removeItem(key);
+      localStorageWrapper.removeItem(key);
       cachedObject[key] = false;
       clearChanged(type, id);
     }
@@ -401,8 +401,8 @@ function hoodieStore (hoodie) {
   store.index = function index() {
     var i, key, keys, _i, _ref;
     keys = [];
-    for (i = _i = 0, _ref = lsHelper.length(); 0 <= _ref ? _i < _ref : _i > _ref; i = 0 <= _ref ? ++_i : --_i) {
-      key = lsHelper.key(i);
+    for (i = _i = 0, _ref = localStorageWrapper.length(); 0 <= _ref ? _i < _ref : _i > _ref; i = 0 <= _ref ? ++_i : --_i) {
+      key = localStorageWrapper.key(i);
       if (isSemanticKey(key)) {
         keys.push(key);
       }
@@ -473,7 +473,7 @@ function hoodieStore (hoodie) {
         for (_i = 0, _len = keys.length; _i < _len; _i++) {
           key = keys[_i];
           if (isSemanticKey(key)) {
-            _results.push(lsHelper.removeItem(key));
+            _results.push(localStorageWrapper.removeItem(key));
           }
         }
         return _results;
@@ -531,7 +531,7 @@ function hoodieStore (hoodie) {
         id: id
       });
 
-      lsHelper.setObject(key, object);
+      localStorageWrapper.setObject(key, object);
 
       if (options.remote) {
         clearChanged(type, id);
@@ -558,7 +558,7 @@ function hoodieStore (hoodie) {
       key = '' + type + '/' + id;
 
       // if object is not yet cached, load it from localStore
-      object = lsHelper.getObject(key);
+      object = localStorageWrapper.getObject(key);
 
       // stop here if object did not exist in localStore
       // and cache it so we don't need to look it up again
@@ -596,7 +596,7 @@ function hoodieStore (hoodie) {
   //
   function bootstrapDirtyObjects() {
     var id, keys, obj, type, _i, _len, _ref;
-    keys = lsHelper.getItem('_dirty');
+    keys = localStorageWrapper.getItem('_dirty');
 
     if (!keys) {
       return;
@@ -723,10 +723,10 @@ function hoodieStore (hoodie) {
   function saveDirtyIds() {
     try {
       if ($.isEmptyObject(dirty)) {
-        lsHelper.removeItem('_dirty');
+        localStorageWrapper.removeItem('_dirty');
       } else {
         var ids = Object.keys(dirty);
-        lsHelper.setItem('_dirty', ids.join(','));
+        localStorageWrapper.setItem('_dirty', ids.join(','));
       }
     } catch(e) {}
   }
@@ -867,16 +867,7 @@ function hoodieStore (hoodie) {
   //
   // patchIfNotPersistant
   //
-  function patchIfNotPersistant () {
-    if (!lsHelper.isPersistent()) {
-      lsHelper.getItem = function() { return null; };
-      lsHelper.setItem = function() { return null; };
-      lsHelper.removeItem = function() { return null; };
-      lsHelper.key = function() { return null; };
-      lsHelper.length = function() { return 0; };
-    }
-  }
-
+  localStorageWrapper.patchIfNotPersistant();
 
   //
   // initialization
@@ -902,7 +893,7 @@ function hoodieStore (hoodie) {
 
   // allow to run this once from outside
   store.patchIfNotPersistant = function() {
-    patchIfNotPersistant();
+    localStorageWrapper.patchIfNotPersistant();
     delete store.patchIfNotPersistant;
   };
 }
