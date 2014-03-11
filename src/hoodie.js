@@ -6,13 +6,13 @@
 
 var hoodieAccount = require('./hoodie/account');
 var hoodieAccountRemote = require('./hoodie/remote');
-var hoodieConfig = require('./hoodie/config');
 var hoodieConnection = require('./hoodie/connection');
 var hoodieId = require('./hoodie/id');
 var hoodieLocalStore = require('./hoodie/store');
 var hoodieTask = require('./hoodie/task');
 var hoodieOpen = require('./hoodie/open');
 var hoodieRequest = require('./hoodie/request');
+var hoodieConfig = require('./lib/config');
 var hoodieEvents = require('./lib/events');
 
 // for plugins
@@ -75,9 +75,6 @@ function Hoodie(baseUrl) {
   // * hoodie.store
   hoodie.extend(hoodieLocalStore);
 
-  // workaround, until we ship https://github.com/hoodiehq/hoodie.js/issues/199
-  hoodie.store.patchIfNotPersistant();
-
   // * hoodie.task
   hoodie.extend(hoodieTask);
 
@@ -100,6 +97,9 @@ function Hoodie(baseUrl) {
   //
   // Initializations
   //
+
+  // patch store be not throw errors if localStorage is not supported
+  util.localStorageWrapper.patchIfNotPersistant();
 
   // init config
   hoodie.config.init();
