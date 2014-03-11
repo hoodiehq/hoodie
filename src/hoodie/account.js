@@ -79,8 +79,7 @@ function hoodieAccount(hoodie) {
     // pending request already, return its promise.
     //
     sendAndHandleAuthRequest = function() {
-      return account.request('GET', '/_session').then(
-      handleAuthenticateRequestSuccess);
+      return account.request('GET', '/_session').then(handleAuthenticateRequestSuccess);
     };
 
     return withSingleRequest('authenticate', sendAndHandleAuthRequest);
