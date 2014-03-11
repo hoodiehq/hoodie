@@ -1,7 +1,7 @@
 // Hoodie Config API
 // ===================
 
-var localStorageWrapper = require('../utils').localStorageWrapperWrapper;
+var localStorageWrapper = require('../utils/local_storage_wrapper');
 
 //
 function hoodieConfig(hoodie) {

@@ -13,7 +13,7 @@ var getDefer = require('../utils/promise/defer');
 var rejectWith = require('../utils/promise/reject_with');
 var resolveWith = require('../utils/promise/resolve_with');
 
-var localStorageWrapper = require('../utils').localStorageWrapper;
+var localStorageWrapper = require('../utils/local_storage_wrapper');
 
 //
 function hoodieStore (hoodie) {
