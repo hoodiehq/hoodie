@@ -20,9 +20,9 @@ describe('#checkConnection()', function() {
     expect(this.hoodie).to.have.property('isConnected');
   });
 
-  it('should send GET / request', function() {
+  it('should send GET /hoodieId=<hoodieid> request', function() {
     this.hoodie.checkConnection();
-    expect(this.hoodie.request).to.be.calledWith('GET', '/');
+    expect(this.hoodie.request).to.be.calledWith('GET', '/?hoodieId=hoodieid');
   });
 
   it('should only send one request at a time', function() {
