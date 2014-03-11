@@ -516,7 +516,7 @@ function hoodieStore (hoodie) {
   // Pass `options.remote = true` when object comes from remote
   // Pass 'options.silent = true' to avoid events from being triggered.
   function cache(type, id, object, options) {
-    var key;
+    var key, storedObject;
 
     if (object === undefined) {
       object = false;
@@ -531,7 +531,11 @@ function hoodieStore (hoodie) {
         id: id
       });
 
-      localStorageWrapper.setObject(key, object);
+      // we do not store type & id in localStorage values
+      storedObject = extend({}, object);
+      delete storedObject.type;
+      delete storedObject.id;
+      localStorageWrapper.setObject(key, storedObject);
 
       if (options.remote) {
         clearChanged(type, id);
@@ -562,11 +566,15 @@ function hoodieStore (hoodie) {
 
       // stop here if object did not exist in localStore
       // and cache it so we don't need to look it up again
-      if (object === false) {
+      if (! object) {
         clearChanged(type, id);
         cachedObject[key] = false;
         return false;
       }
+
+      // add type & id as we don't store these in localStorage values
+      object.type = type;
+      object.id = id;
 
     }
 

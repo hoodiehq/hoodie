@@ -5,11 +5,12 @@
 exports.patchIfNotPersistant = function () {
 
   if (!exports.isPersistent()) {
-    module.exports.getItem = function() { return null; };
-    module.exports.setItem = function() { return null; };
-    module.exports.removeItem = function() { return null; };
-    module.exports.key = function() { return null; };
-    module.exports.length = function() { return 0; };
+    exports.getItem = function() { return null; };
+    exports.setItem = function() { return null; };
+    exports.removeItem = function() { return null; };
+    exports.key = function() { return null; };
+    exports.length = function() { return 0; };
+    exports.patchIfNotPersistant = function() { return null; };
   }
 
 };
@@ -92,14 +93,11 @@ exports.length = function () {
 
 // more advanced localStorage wrappers to find/save objects
 exports.setObject = function (key, object) {
-  var store = extend({}, object);
-
-  delete store.type;
-  delete store.id;
-  return exports.setItem(key, global.JSON.stringify(store));
+  return exports.setItem(key, global.JSON.stringify(object));
 };
 
 exports.getObject = function (key) {
-  return exports.getItem(key) ? exports.getItem(key) : false;
+  var object = exports.getItem(key);
+  return object ? object : null;
 };
 

@@ -7,13 +7,13 @@ global.stubRequire('src/lib/store/api', storeFactory);
 var generateIdMock = require('../../mocks/utils/generate_id');
 global.stubRequire('src/utils/generate_id', generateIdMock);
 
-var localStorageMock = require('../../mocks/utils/localstorage');
-global.stubRequire('src/utils/localstorage', localStorageMock);
+var localStorageMock = require('../../mocks/utils/local_storage_wrapper');
+global.stubRequire('src/utils/local_storage_wrapper', localStorageMock);
 
 var hoodieLocalStore = require('../../../src/hoodie/store');
 var extend = require('extend');
 
-describe.only('hoodie.store', function() {
+describe('hoodie.store', function() {
 
   beforeEach(function() {
     this.hoodie = this.MOCKS.hoodie.apply(this);
@@ -27,45 +27,17 @@ describe.only('hoodie.store', function() {
     hoodieLocalStore(this.hoodie);
     this.storeBackend = storeFactory.args[0][1].backend;
     this.store = this.hoodie.store;
+
+    localStorageMock.getObject.reset();
+    localStorageMock.setObject.reset();
+    localStorageMock.removeItem.reset();
   });
 
   after(function() {
     global.unstubRequire('src/lib/store/api');
     global.unstubRequire('src/utils/generate_id');
-    global.unstubRequire('src/utils/localstorage');
+    global.unstubRequire('src/utils/local_storage_wrapper');
   });
-
-  //
-  describe('#patchIfNotPersistant', function() {
-    it('can only be run once', function() {
-      this.store.patchIfNotPersistant();
-      expect( this.store.patchIfNotPersistant ).to.eql(undefined);
-    });
-
-    _when('store is persistent', function() {
-      beforeEach(function() {
-        localStorageMock.isPersistent.returns(true);
-        this.store.patchIfNotPersistant();
-      });
-
-      it('should call methods on localStorage', function() {
-        this.storeBackend.find('task', '123');
-        expect(localStorageMock.getItem).to.be.called();
-      });
-    }); // store is not persistent
-
-    _when('store is not persistent', function() {
-      beforeEach(function() {
-        localStorageMock.isPersistent.returns(false);
-        this.store.patchIfNotPersistant();
-      });
-
-      it('should not call methods on localStorage', function() {
-        this.storeBackend.find('task', '123');
-        expect(localStorageMock.getItem).to.not.be.called();
-      });
-    }); // store is not persistent
-  }); // patchIfNotPersistant
 
   //
   describe('#subscribeToOutsideEvents', function() {
@@ -209,7 +181,7 @@ describe.only('hoodie.store', function() {
   describe('#save(type, id, object, options)', function() {
     _when('id is \'123\', type is \'document\', object is {name: \'test\'}', function() {
       beforeEach(function() {
-        localStorageMock.getItem.returns(JSON.stringify({name: 'test'}));
+        localStorageMock.getObject.returns({name: 'test'});
 
         this.promise = this.storeBackend.save({
           name: 'test',
@@ -219,14 +191,14 @@ describe.only('hoodie.store', function() {
       });
 
       it('should cache document', function() {
-        // which means we don't call localStorage.getItem again
-        localStorage.getItem.reset();
+        // which means we don't call localStorageMock.getObject again
+        localStorageMock.getObject.reset();
         this.storeBackend.save({
           type: 'document',
           id: '123',
           name: 'text'
         });
-        expect(localStorage.getItem).to.not.be.called();
+        expect(localStorageMock.getObject).to.not.be.called();
       });
 
       it('should write the object to localStorage, but without type & id attributes', function() {
@@ -300,7 +272,7 @@ describe.only('hoodie.store', function() {
         });
 
         it('should keep local attributes', function() {
-          stubFindItem('document', '1234', {
+          stubFindObject('document', '1234', {
             name: 'test',
             _local: 'something'
           });
@@ -324,7 +296,7 @@ describe.only('hoodie.store', function() {
         });
 
         it('should clear it from local changes', function() {
-          localStorage.setItem.reset();
+          localStorageMock.setObject.reset();
           this.storeBackend.save({
             type: 'document',
             id: 'check1',
@@ -337,15 +309,15 @@ describe.only('hoodie.store', function() {
             name: 'test',
             _rev: '1-234'
           });
-          expect(localStorage.setItem).to.be.calledWith('_dirty', 'document/check1,document/check2');
-          localStorage.setItem.reset();
+          expect(localStorageMock.setItem).to.be.calledWith('_dirty', 'document/check1,document/check2');
+          localStorageMock.setObject.reset();
           this.storeBackend.save({
             type: 'document',
             id: 'check1',
             name: 'test',
             _rev: '2-234'
           }, { remote: true });
-          expect(localStorage.setItem).to.be.calledWith('_dirty', 'document/check2');
+          expect(localStorageMock.setItem).to.be.calledWith('_dirty', 'document/check2');
         });
       }); // options.remote is true
 
@@ -405,13 +377,13 @@ describe.only('hoodie.store', function() {
       _and('object is new (not cached yet)', function() {
         _and('object does exist in localStorage', function() {
           beforeEach(function() {
-            stubFindItem('document', '1235', {
+            stubFindObject('document', '1235', {
               name: 'test',
               createdBy: 'myself'
             });
 
             this.store.trigger.reset();
-            localStorage.setItem.reset();
+            localStorageMock.setObject.reset();
             this.storeBackend.save({
               type: 'document',
               id: '1235',
@@ -420,16 +392,16 @@ describe.only('hoodie.store', function() {
           });
 
           it('should not look it up again', function() {
-            localStorage.getItem.reset();
+            localStorageMock.getObject.reset();
             this.storeBackend.save({
               type: 'document',
               id: '1235',
               name: 'test'
             });
-            expect(localStorage.getItem).to.not.be.called();
+            expect(localStorageMock.getObject).to.not.be.called();
           });
           it('should mark it as change', function() {
-            expect(localStorage.setItem).to.be.calledWith('_dirty', 'document/123,document/1235');
+            expect(localStorageMock.setItem).to.be.calledWith('_dirty', 'document/123,document/1235');
           });
           it('should trigger update & change events', function() {
             var object = {
@@ -449,7 +421,7 @@ describe.only('hoodie.store', function() {
 
         _and('object does not exist in localStorage', function() {
           beforeEach(function() {
-            stubFindItem('document', '1998', null);
+            stubFindObject('document', '1998', null);
             this.storeBackend.save({
               type: 'document',
               id: '1998',
@@ -473,7 +445,7 @@ describe.only('hoodie.store', function() {
           });
 
           it('should mark it as change', function() {
-            expect(localStorage.setItem).to.be.calledWith('_dirty', 'document/123,document/1998');
+            expect(localStorageMock.setItem).to.be.calledWith('_dirty', 'document/123,document/1998');
           });
         });
       }); // object is new (not cached yet)
@@ -486,13 +458,13 @@ describe.only('hoodie.store', function() {
             name: 'old new'
           };
           this.storeBackend.save(this.object);
-          localStorage.getItem.reset();
+          localStorageMock.getObject.reset();
           this.store.trigger.reset();
           this.storeBackend.save(this.object);
         });
 
         it('should not look it up again', function() {
-          expect(localStorage.getItem).to.not.be.called();
+          expect(localStorageMock.getObject).to.not.be.called();
         });
 
         it('should trigger update & change events', function() {
@@ -516,7 +488,7 @@ describe.only('hoodie.store', function() {
               updatedAt: 'yesterday',
               createdBy: 'hoodieid'
             };
-            stubFindItem('document', '123successful', this.properties);
+            stubFindObject('document', '123successful', this.properties);
             this.promise = this.storeBackend.save({
               type: 'document',
               id: '123successful',
@@ -543,7 +515,7 @@ describe.only('hoodie.store', function() {
               id: '123new',
               name: 'this is new'
             };
-            stubFindItem('document', '123new', null );
+            stubFindObject('document', '123new', null );
             this.promise = this.storeBackend.save(this.object);
           });
 
@@ -562,7 +534,7 @@ describe.only('hoodie.store', function() {
 
       _when('failed', function() {
         beforeEach(function() {
-          localStorageMock.setItem.throws(new Error('funk'));
+          localStorageMock.setObject.throws(new Error('funk'));
           this.promise = this.storeBackend.save({
             type: 'document',
             id: '123ohoh',
@@ -570,27 +542,16 @@ describe.only('hoodie.store', function() {
           });
         });
 
+        after(function() {
+          // TODO: how to undo the localStorageMock.setObject.throws?
+          // localStorageMock.setObject.reset();
+          localStorageMock.setObject = sinon.stub();
+        });
+
         it('should return a rejected promise', function() {
           expect(this.promise).to.be.rejectedWith('Error: funk');
         });
       }); // failed
-    });
-
-    _when('id is \'123\', type is \'document\', object is {id: \'123\', type: \'document\', name: \'test\'}', function() {
-      beforeEach(function() {
-        this.storeBackend.save({
-          id: '123',
-          type: 'document',
-          name: 'test with id & type'
-        });
-      });
-
-      it('should not save type & id', function() {
-        var object = getLastSavedObject();
-        expect(object.name).to.be('test with id & type');
-        expect(object.type).to.be(undefined);
-        expect(object.id).to.be(undefined);
-      });
     });
 
     _when('id is \'123\', type is \'$internal\', object is {action: \'do some background magic\'}}', function() {
@@ -609,7 +570,7 @@ describe.only('hoodie.store', function() {
 
     _when('id is \'123hidden\', type is \'document\', existing object is {name: \'test\', $hidden: \'fresh\'}}', function() {
       beforeEach(function() {
-        stubFindItem('document', '123hidden', {name: 'test', $hidden: 'fresh'});
+        stubFindObject('document', '123hidden', {name: 'test', $hidden: 'fresh'});
       });
 
       it('should not overwrite $hidden property when not passed', function() {
@@ -690,7 +651,7 @@ describe.only('hoodie.store', function() {
   describe('#find(type, id)', function() {
     _when('object can be found', function() {
       beforeEach(function() {
-        stubFindItem('document', '123lessie', {
+        stubFindObject('document', '123lessie', {
           name: 'woof'
         });
         this.promise = this.storeBackend.find('document', '123lessie');
@@ -708,19 +669,20 @@ describe.only('hoodie.store', function() {
     _when('object cannot be found', function() {
 
       beforeEach(function() {
-        stubFindItem('document', 'truelie', null);
+        stubFindObject('document', 'abc4567', null);
         this.promise = this.storeBackend.find('document', 'abc4567');
       });
 
-      it('should call the fail callback', function() {
+      it('should be rejected', function() {
         expect(this.promise).to.be.rejected();
       });
     });
 
     it('should cache the object after the first get', function() {
+      localStorageMock.getObject.reset();
       this.storeBackend.find('document', 'abc4567cached');
       this.storeBackend.find('document', 'abc4567cached');
-      expect(localStorage.getItem.callCount).to.eql(1);
+      expect(localStorageMock.getObject.callCount).to.eql(1);
     });
 
     _when('store is bootstrapping', function() {
@@ -737,7 +699,7 @@ describe.only('hoodie.store', function() {
 
       it('should wait until bootstrapping is finished', function() {
         this.outsideEvents = gatherEventCallbackMapForOutsideEvents(this);
-        stubFindItem('document', '123boot', {
+        stubFindObject('document', '123boot', {
           name: 'me up'
         });
         var promise = this.storeBackend.find('document', '123boot');
@@ -832,7 +794,7 @@ describe.only('hoodie.store', function() {
       _and('there are other documents in localStorage not stored with store', function() {
         beforeEach(function() {
           this.sandbox.stub(this.store, 'index').returns(['_someConfig', 'someOtherShizzle', 'whatever', 'valid/123']);
-          stubFindItem('valid', '123', {
+          stubFindObject('valid', '123', {
             am: 'I'
           });
         });
@@ -889,7 +851,7 @@ describe.only('hoodie.store', function() {
   describe('#remove(type, id, options)', function() {
     _when('objecet cannot be found', function() {
       beforeEach(function() {
-        stubFindItem('document', '123', null);
+        stubFindObject('document', '123', null);
       });
 
       it('should return a rejected the promise', function() {
@@ -901,37 +863,38 @@ describe.only('hoodie.store', function() {
     _when('object can be found and has not been synched before', function() {
 
       beforeEach(function() {
-        stubFindItem('document', '123', {
+        stubFindObject('document', '123', {
           funky: 'fresh'
         });
+        localStorageMock.getObject.reset();
       });
 
       it('should remove the object', function() {
         this.storeBackend.remove('document', '123');
-        expect(localStorage.removeItem.calledWith('document/123')).to.be.ok();
+        expect(localStorageMock.removeItem.calledWith('document/123')).to.be.ok();
       });
 
       it('should cache that object has been removed', function() {
         this.storeBackend.remove('document', '123');
-        expect(localStorage.getItem.callCount).to.be(1);
+        expect(localStorageMock.getObject.callCount).to.be(1);
         this.storeBackend.find('document', '123');
-        expect(localStorage.getItem.callCount).to.be(1);
+        expect(localStorageMock.getObject.callCount).to.be(1);
       });
 
       it('should clear document from changed', function() {
 
         // when no dirty objects remaining, remove _dirty
         this.storeBackend.save({ type: 'document', id:'123', tilte: 'funk'});
-        expect(localStorage.setItem).to.be.calledWith('_dirty', 'document/123');
+        expect(localStorageMock.setItem).to.be.calledWith('_dirty', 'document/123');
         this.storeBackend.remove('document', '123');
-        expect(localStorage.removeItem).to.be.calledWith('_dirty');
+        expect(localStorageMock.removeItem).to.be.calledWith('_dirty');
 
         // when dirty objects remaining, remove the specific key for `_dirty`
         this.storeBackend.save({ type: 'document', id:'123', tilte: 'funk'});
         this.storeBackend.save({ type: 'document', id:'1234', tilte: 'funk'});
-        localStorage.setItem.reset();
+        localStorageMock.setObject.reset();
         this.storeBackend.remove('document', '123');
-        expect(localStorage.setItem).to.be.calledWith('_dirty', 'document/1234');
+        expect(localStorageMock.setItem).to.be.calledWith('_dirty', 'document/1234');
       });
 
       it('should return a resolved promise', function() {
@@ -951,7 +914,7 @@ describe.only('hoodie.store', function() {
 
     _when('object can be found and remove comes from remote', function() {
       beforeEach(function() {
-        stubFindItem('document', '123', {
+        stubFindObject('document', '123', {
           name: 'test'
         });
         this.remoteObject = {
@@ -967,7 +930,7 @@ describe.only('hoodie.store', function() {
       });
 
       it('should remove the object', function() {
-        expect(localStorage.removeItem).to.be.calledWith('document/123');
+        expect(localStorageMock.removeItem).to.be.calledWith('document/123');
       });
 
       it('should trigger remove & change trigger events', function() {
@@ -1004,9 +967,10 @@ describe.only('hoodie.store', function() {
 
       beforeEach(function() {
 
-        stubFindItem('document', '123', {
+        stubFindObject('document', '123', {
           _syncedAt: 'now'
         });
+        localStorageMock.removeItem.reset();
         this.storeBackend.remove('document', '123');
       });
 
@@ -1017,7 +981,7 @@ describe.only('hoodie.store', function() {
       });
 
       it('should not remove the object from store', function() {
-        expect(localStorage.removeItem).to.not.be.calledWith('document/123');
+        expect(localStorageMock.removeItem).to.not.be.calledWith('document/123');
       });
     });
 
@@ -1035,14 +999,14 @@ describe.only('hoodie.store', function() {
         });
 
         it('should cache it as not found for future look ups', function() {
-          localStorage.getItem.reset();
+          localStorageMock.getObject.reset();
           var promise = this.storeBackend.find('document', 'nomore');
-          expect(localStorage.getItem).to.not.be.called();
+          expect(localStorageMock.getObject).to.not.be.called();
           expect(promise).to.be.rejected();
         });
 
         it('should mark as changed', function() {
-          expect(localStorage.setItem).to.be.calledWith('_dirty', 'document/nomore');
+          expect(localStorageMock.setItem).to.be.calledWith('_dirty', 'document/nomore');
         });
       });
     });
@@ -1063,7 +1027,7 @@ describe.only('hoodie.store', function() {
 
       it('should wait until bootstrapping is finished', function() {
         this.outsideEvents = gatherEventCallbackMapForOutsideEvents(this);
-        stubFindItem('document', '123', {
+        stubFindObject('document', '123', {
           something: 'here'
         });
         var promise = this.storeBackend.remove('document', '123');
@@ -1074,7 +1038,7 @@ describe.only('hoodie.store', function() {
 
       _but('change comes from remote', function() {
         it('should not wait until bootstrapping is finished', function() {
-          stubFindItem('document', '123', {
+          stubFindObject('document', '123', {
             something: 'here'
           });
           var promise = this.storeBackend.remove('document', '123', {remote: true});
@@ -1086,7 +1050,6 @@ describe.only('hoodie.store', function() {
 
   //
   describe('#clear()', function() {
-
     it('should return a promise', function() {
       var promise = this.store.clear();
       expect(promise).to.be.promise();
@@ -1096,24 +1059,24 @@ describe.only('hoodie.store', function() {
       this.sandbox.stub(this.store, 'index').returns(['$config/hoodie', 'car/123', '_notOurBusiness']);
       this.store.clear();
 
-      expect(localStorage.removeItem).to.be.calledWith('$config/hoodie');
-      expect(localStorage.removeItem).to.be.calledWith('car/123');
-      expect(localStorage.removeItem).to.not.be.calledWith('_notOurBusiness');
+      expect(localStorageMock.removeItem).to.be.calledWith('$config/hoodie');
+      expect(localStorageMock.removeItem).to.be.calledWith('car/123');
+      expect(localStorageMock.removeItem).to.not.be.calledWith('_notOurBusiness');
     });
 
     it('should clear chache', function() {
       this.storeBackend.find('document', '123');
       this.storeBackend.find('document', '123');
-      expect(localStorage.getItem.callCount).to.be(1);
+      expect(localStorageMock.getObject.callCount).to.be(1);
       this.store.clear();
       this.storeBackend.find('document', '123');
-      expect(localStorage.getItem.callCount).to.be(2);
+      expect(localStorageMock.getObject.callCount).to.be(2);
     });
 
     it('should clear dirty docs', function() {
-      localStorage.removeItem.reset();
+      localStorageMock.removeItem.reset();
       this.store.clear();
-      expect(localStorage.removeItem).to.be.calledWith('_dirty');
+      expect(localStorageMock.removeItem).to.be.calledWith('_dirty');
     });
 
     it('should resolve promise', function() {
@@ -1153,7 +1116,7 @@ describe.only('hoodie.store', function() {
         _and('object has saved with silent:true option', function() {
 
           beforeEach(function() {
-            stubFindItem('couch', '123', {
+            stubFindObject('couch', '123', {
               _syncedAt: void 0,
               updatedAt: void 0
             });
@@ -1167,7 +1130,7 @@ describe.only('hoodie.store', function() {
         _and('object has been saved without silent:true option', function() {
 
           beforeEach(function() {
-            stubFindItem('couch', '123', {
+            stubFindObject('couch', '123', {
               _syncedAt: void 0,
               updatedAt: now()
             });
@@ -1182,7 +1145,7 @@ describe.only('hoodie.store', function() {
       _and('object was synced', function() {
         _and('object was updated before', function() {
           beforeEach(function() {
-            stubFindItem('couch', '123', {
+            stubFindObject('couch', '123', {
               _syncedAt: new Date(1),
               updatedAt: new Date(0)
             });
@@ -1195,7 +1158,7 @@ describe.only('hoodie.store', function() {
 
         _and('object was updated at the same time', function() {
           beforeEach(function() {
-            stubFindItem('couch', '123', {
+            stubFindObject('couch', '123', {
               _syncedAt: new Date(0),
               updatedAt: new Date(0)
             });
@@ -1208,7 +1171,7 @@ describe.only('hoodie.store', function() {
 
         _and('object was updated later', function() {
           beforeEach(function() {
-            stubFindItem('couch', '123', {
+            stubFindObject('couch', '123', {
               _syncedAt: new Date(0),
               updatedAt: new Date(1)
             });
@@ -1263,37 +1226,24 @@ function now() {
 }
 
 function getLastSavedObject() {
-  var calls = localStorageMock.setItem.args;
-  var object;
-
-  // ignore update of _dirty keys
-  if (calls[calls.length - 1][0] === '_dirty') {
-    object = calls[calls.length - 2][1];
-  } else {
-    object = calls[calls.length - 1][1];
-  }
-  return JSON.parse(object);
+  var calls = localStorageMock.setObject.args;
+  var object = calls[calls.length - 1][1];
+  return object;
 }
 function getLastSavedKey() {
-  var calls = localStorageMock.setItem.args;
-  var key;
+  var calls = localStorageMock.setObject.args;
+  var key = calls[calls.length - 1][0];
 
-  // ignore update of _dirty keys
-  if (calls[calls.length - 1][0] === '_dirty') {
-    key = calls[calls.length - 2][0];
-  } else {
-    key = calls[calls.length - 1][0];
-  }
   return key;
 }
-function stubFindItem(key, id, object) {
+function stubFindObject(key, id, object) {
   key = [key, id].join('/');
   if (object) {
+    object = extend({}, object);
     delete object.id;
     delete object.type;
-    object = JSON.stringify(object);
   }
-  localStorageMock.getItem.withArgs(key).returns(object);
+  localStorageMock.getObject.withArgs(key).returns(object);
 }
 
 function with_2CatsAnd_3Dogs(specs) {
@@ -1308,31 +1258,31 @@ function with_2CatsAnd_3Dogs(specs) {
         'dog/2',
         'dog/3'
       ]);
-      stubFindItem('cat', '1', {
+      stubFindObject('cat', '1', {
         name: 'cat1',
         age: 1,
         createdAt: '1970-01-01T00:00:00.021Z',
         updatedAt: '1970-01-01T00:00:00.021Z'
       });
-      stubFindItem('cat', '2', {
+      stubFindObject('cat', '2', {
         name: 'cat2',
         age: 2,
         createdAt: '1970-01-01T00:00:00.022Z',
         updatedAt: '1970-01-01T00:00:00.022Z'
       });
-      stubFindItem('dog', '1', {
+      stubFindObject('dog', '1', {
         name: 'dog1',
         age: 1,
         createdAt: '1970-01-01T00:00:00.011Z',
         updatedAt: '1970-01-01T00:00:00.011Z'
       });
-      stubFindItem('dog', '2', {
+      stubFindObject('dog', '2', {
         name: 'dog2',
         age: 2,
         createdAt: '1970-01-01T00:00:00.012Z',
         updatedAt: '1970-01-01T00:00:00.012Z'
       });
-      stubFindItem('dog', '3', {
+      stubFindObject('dog', '3', {
         name: 'dog3',
         age: 3,
         createdAt: '1970-01-01T00:00:00.013Z',
