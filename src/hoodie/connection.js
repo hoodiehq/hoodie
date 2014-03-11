@@ -34,6 +34,7 @@ function hoodieConnection(hoodie) {
   //
   hoodie.checkConnection = function checkConnection() {
     var req = checkConnectionRequest;
+    var path = '/?hoodieId=' + hoodie.id();
 
     if (req && req.state() === 'pending') {
       return req;
@@ -41,7 +42,7 @@ function hoodieConnection(hoodie) {
 
     global.clearTimeout(checkConnectionTimeout);
 
-    checkConnectionRequest = hoodie.request('GET', '/').then(
+    checkConnectionRequest = hoodie.request('GET', path).then(
       handleCheckConnectionSuccess,
       handleCheckConnectionError
     );
