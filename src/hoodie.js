@@ -75,9 +75,6 @@ function Hoodie(baseUrl) {
   // * hoodie.store
   hoodie.extend(hoodieLocalStore);
 
-  // workaround, until we ship https://github.com/hoodiehq/hoodie.js/issues/199
-  hoodie.store.patchIfNotPersistant();
-
   // * hoodie.task
   hoodie.extend(hoodieTask);
 
@@ -100,6 +97,9 @@ function Hoodie(baseUrl) {
   //
   // Initializations
   //
+
+  // patch store be not throw errors if localStorage is not supported
+  util.localStorageWrapper.patchIfNotPersistant();
 
   // init config
   hoodie.config.init();
