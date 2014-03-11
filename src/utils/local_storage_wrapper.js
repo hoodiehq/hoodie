@@ -1,5 +1,3 @@
-var extend = require('extend');
-
 // Is persistant?
 // ----------------
 //
@@ -7,13 +5,11 @@ var extend = require('extend');
 exports.patchIfNotPersistant = function () {
 
   if (!exports.isPersistent()) {
-    module.exports = {
-      getItem: function() { return null; },
-      setItem: function() { return null; },
-      removeItem: function() { return null; },
-      key: function() { return null; },
-      length: function() { return 0; }
-    };
+    module.exports.getItem = function() { return null; };
+    module.exports.setItem = function() { return null; };
+    module.exports.removeItem = function() { return null; };
+    module.exports.key = function() { return null; };
+    module.exports.length = function() { return 0; };
   }
 
 };
