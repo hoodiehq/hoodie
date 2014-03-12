@@ -96,7 +96,6 @@ var hoodieConfig = require('./hoodie/config');
 var hoodieConnection = require('./hoodie/connection');
 var hoodieId = require('./hoodie/id');
 var hoodieLocalStore = require('./hoodie/store');
-var hoodieDispose = require('./hoodie/dispose');
 var hoodieTask = require('./hoodie/task');
 var hoodieOpen = require('./hoodie/open');
 var hoodieRequest = require('./hoodie/request');
@@ -155,9 +154,6 @@ function Hoodie(baseUrl) {
   // * hoodie.isOnline
   // * hoodie.checkConnection
   hoodie.extend(hoodieConnection);
-
-  // * hoodie.dispose
-  hoodie.extend(hoodieDispose);
 
   // * hoodie.open
   hoodie.extend(hoodieOpen);
@@ -266,7 +262,7 @@ function applyExtensions(hoodie) {
 
 module.exports = Hoodie;
 
-},{"./hoodie/account":3,"./hoodie/config":4,"./hoodie/connection":5,"./hoodie/dispose":6,"./hoodie/id":7,"./hoodie/open":8,"./hoodie/remote":9,"./hoodie/request":10,"./hoodie/store":11,"./hoodie/task":12,"./lib":18,"./lib/events":17,"./utils":27}],3:[function(require,module,exports){
+},{"./hoodie/account":3,"./hoodie/config":4,"./hoodie/connection":5,"./hoodie/id":6,"./hoodie/open":7,"./hoodie/remote":8,"./hoodie/request":9,"./hoodie/store":10,"./hoodie/task":11,"./lib":17,"./lib/events":16,"./utils":26}],3:[function(require,module,exports){
 var global=typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {};// Hoodie.Account
 // ================
 
@@ -348,8 +344,7 @@ function hoodieAccount(hoodie) {
     // pending request already, return its promise.
     //
     sendAndHandleAuthRequest = function() {
-      return account.request('GET', '/_session').then(
-      handleAuthenticateRequestSuccess);
+      return account.request('GET', '/_session').then(handleAuthenticateRequestSuccess);
     };
 
     return withSingleRequest('authenticate', sendAndHandleAuthRequest);
@@ -359,8 +354,7 @@ function hoodieAccount(hoodie) {
   // hasValidSession
   // -----------------
 
-  // returns true if the user is currently signed but has no valid session,
-  // meaning that the data cannot be synchronized.
+  // returns true if the user is signed in, and has a valid cookie.
   //
   account.hasValidSession = function() {
     if (!account.hasAccount()) {
@@ -374,8 +368,7 @@ function hoodieAccount(hoodie) {
   // hasInvalidSession
   // -----------------
 
-  // returns true if the user is currently signed but has no valid session,
-  // meaning that the data cannot be synchronized.
+  // returns true if the user is signed in, but does not have a valid cookie 
   //
   account.hasInvalidSession = function() {
     if (!account.hasAccount()) {
@@ -772,8 +765,14 @@ function hoodieAccount(hoodie) {
   // But the current password is needed to login with the new username.
   //
   account.changeUsername = function changeUsername(currentPassword, newUsername) {
-    newUsername = newUsername || '';
-    return changeUsernameAndPassword(currentPassword, newUsername.toLowerCase());
+    if (newUsername !== account.username) {
+      newUsername = newUsername || '';
+      return changeUsernameAndPassword(currentPassword, newUsername.toLowerCase());
+    }
+    return rejectWith({
+      name: 'HoodieConflictError',
+      message: 'Usernames identical'
+    });
   };
 
 
@@ -1108,6 +1107,7 @@ function hoodieAccount(hoodie) {
   //
   // 1. assure we have a valid session
   // 2. update _users doc with new username and new password (if provided)
+  // 3. if username changed, wait until current _users doc got removed
   // 3. sign in with new credentials to create new sesion.
   //
   function changeUsernameAndPassword(currentPassword, newUsername, newPassword) {
@@ -1115,14 +1115,17 @@ function hoodieAccount(hoodie) {
     return sendSignInRequest(account.username, currentPassword, {
       silent: true
     }).then(function() {
-      return account.fetch().then(
-      sendChangeUsernameAndPasswordRequest(currentPassword, newUsername, newPassword));
+      return account.fetch().then(sendChangeUsernameAndPasswordRequest(currentPassword, newUsername, newPassword));
     });
   }
 
 
   //
-  // turn an anonymous account into a real account
+  // turn an anonymous account into a real account. Internally, this is what happens:
+  // 
+  // 1. rename the username from `<hoodieId>` to `username`
+  // 2. Set password to `password`
+  // 3. 
   //
   function upgradeAnonymousAccount(username, password) {
     var currentPassword = getAnonymousPassword();
@@ -1287,7 +1290,13 @@ function hoodieAccount(hoodie) {
         // note that if username has been changed, newPassword is the current password.
         // We always change either the one, or the other.
         return awaitCurrentAccountRemoved(account.username, newPassword).then( function() {
-          return account.signIn(newUsername, newPassword);
+
+          // we do signOut explicitely although signOut is build into hoodie.signIn to
+          // work around trouble in case of local changes. See 
+          // https://github.com/hoodiehq/hoodie.js/issues/256
+          return account.signOut({silent:true, ignoreLocalChanges: true}).then(function() {
+            return account.signIn(newUsername, newPassword);
+          });
         });
       } else {
         return account.signIn(account.username, newPassword);
@@ -1418,7 +1427,7 @@ function hoodieAccount(hoodie) {
 
 module.exports = hoodieAccount;
 
-},{"../lib/events":17,"../utils/generate_id":25,"../utils/promise/defer":28,"../utils/promise/reject":31,"../utils/promise/reject_with":32,"../utils/promise/resolve":33,"../utils/promise/resolve_with":34,"extend":1}],4:[function(require,module,exports){
+},{"../lib/events":16,"../utils/generate_id":24,"../utils/promise/defer":27,"../utils/promise/reject":30,"../utils/promise/reject_with":31,"../utils/promise/resolve":32,"../utils/promise/resolve_with":33,"extend":1}],4:[function(require,module,exports){
 // Hoodie Config API
 // ===================
 
@@ -1540,7 +1549,7 @@ function hoodieConfig(hoodie) {
 
 module.exports = hoodieConfig;
 
-},{"../utils/promise/resolve":33}],5:[function(require,module,exports){
+},{"../utils/promise/resolve":32}],5:[function(require,module,exports){
 var global=typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {};// hoodie.checkConnection() & hoodie.isConnected()
 // =================================================
 
@@ -1638,29 +1647,7 @@ function hoodieConnection(hoodie) {
 
 module.exports = hoodieConnection;
 
-},{"../utils/promise/reject":31,"../utils/promise/resolve":33}],6:[function(require,module,exports){
-// hoodie.dispose
-// ================
-
-function hoodieDispose (hoodie) {
-
-  // if a hoodie instance is not needed anymore, it can
-  // be disposed using this method. A `dispose` event
-  // gets triggered that the modules react on.
-  function dispose() {
-    hoodie.trigger('dispose');
-    hoodie.unbind();
-  }
-
-  //
-  // Public API
-  //
-  hoodie.dispose = dispose;
-}
-
-module.exports = hoodieDispose;
-
-},{}],7:[function(require,module,exports){
+},{"../utils/promise/reject":30,"../utils/promise/resolve":32}],6:[function(require,module,exports){
 // hoodie.id
 // =========
 
@@ -1731,7 +1718,7 @@ function hoodieId (hoodie) {
 
 module.exports = hoodieId;
 
-},{"../utils/generate_id":25}],8:[function(require,module,exports){
+},{"../utils/generate_id":24}],7:[function(require,module,exports){
 // Open stores
 // -------------
 
@@ -1762,7 +1749,7 @@ function hoodieOpen(hoodie) {
 
 module.exports = hoodieOpen;
 
-},{"../lib/store/remote":21,"extend":1}],9:[function(require,module,exports){
+},{"../lib/store/remote":20,"extend":1}],8:[function(require,module,exports){
 // AccountRemote
 // ===============
 
@@ -1921,7 +1908,7 @@ function hoodieRemoteFactory(hoodie) {
 
 module.exports = hoodieRemoteFactory;
 
-},{"../utils/promise/reject_with":32}],10:[function(require,module,exports){
+},{"../utils/promise/reject_with":31}],9:[function(require,module,exports){
 //
 // hoodie.request
 // ================
@@ -1944,6 +1931,7 @@ module.exports = hoodieRemoteFactory;
 
 var hoodiefyRequestErrorName = require('../utils/hoodiefy_request_error_name');
 var extend = require('extend');
+var rejectWith = require('../utils/promise/reject_with');
 
 function hoodieRequest(hoodie) {
   var $ajax = $.ajax;
@@ -2021,7 +2009,7 @@ function hoodieRequest(hoodie) {
       }
     }
 
-    return hoodie.rejectWith(error).promise();
+    return rejectWith(error).promise();
   }
 
   //
@@ -2076,7 +2064,7 @@ function hoodieRequest(hoodie) {
 
 module.exports = hoodieRequest;
 
-},{"../utils/hoodiefy_request_error_name":26,"extend":1}],11:[function(require,module,exports){
+},{"../utils/hoodiefy_request_error_name":25,"../utils/promise/reject_with":31,"extend":1}],10:[function(require,module,exports){
 var global=typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {};// LocalStore
 // ============
 
@@ -3079,7 +3067,7 @@ function hoodieStore (hoodie) {
 
 module.exports = hoodieStore;
 
-},{"../lib/error/object_id":15,"../lib/error/object_type":16,"../lib/store/api":19,"../utils/generate_id":25,"../utils/promise/defer":28,"../utils/promise/reject_with":32,"../utils/promise/resolve_with":34,"extend":1}],12:[function(require,module,exports){
+},{"../lib/error/object_id":14,"../lib/error/object_type":15,"../lib/store/api":18,"../utils/generate_id":24,"../utils/promise/defer":27,"../utils/promise/reject_with":31,"../utils/promise/resolve_with":33,"extend":1}],11:[function(require,module,exports){
 // Tasks
 // ============
 
@@ -3389,7 +3377,7 @@ function hoodieTask(hoodie) {
 
 module.exports = hoodieTask;
 
-},{"../lib/error/error":13,"../lib/events":17,"../lib/task/scoped":24,"../utils/promise/defer":28,"extend":1}],13:[function(require,module,exports){
+},{"../lib/error/error":12,"../lib/events":16,"../lib/task/scoped":23,"../utils/promise/defer":27,"extend":1}],12:[function(require,module,exports){
 // Hoodie Error
 // -------------
 
@@ -3455,14 +3443,14 @@ HoodieError.prototype.constructor = HoodieError;
 module.exports = HoodieError;
 
 
-},{"extend":1}],14:[function(require,module,exports){
+},{"extend":1}],13:[function(require,module,exports){
 module.exports = {
   error: require('./error'),
   objectId: require('./object_id'),
   objectType: require('./object_type')
 };
 
-},{"./error":13,"./object_id":15,"./object_type":16}],15:[function(require,module,exports){
+},{"./error":12,"./object_id":14,"./object_type":15}],14:[function(require,module,exports){
 // Hoodie Invalid Type Or Id Error
 // -------------------------------
 
@@ -3489,7 +3477,7 @@ HoodieObjectIdError.prototype.rules = 'Lowercase letters, numbers and dashes all
 
 module.exports = HoodieObjectIdError;
 
-},{"./error":13}],16:[function(require,module,exports){
+},{"./error":12}],15:[function(require,module,exports){
 // Hoodie Invalid Type Or Id Error
 // -------------------------------
 
@@ -3523,7 +3511,7 @@ HoodieObjectTypeError.prototype.rules = 'lowercase letters, numbers and dashes a
 
 module.exports = HoodieObjectTypeError;
 
-},{"./error":13}],17:[function(require,module,exports){
+},{"./error":12}],16:[function(require,module,exports){
 // Events
 // ========
 //
@@ -3687,7 +3675,7 @@ function hoodieEvents(hoodie, options) {
 
 module.exports = hoodieEvents;
 
-},{}],18:[function(require,module,exports){
+},{}],17:[function(require,module,exports){
 module.exports = {
   error: require('./error'),
   events: require('./events'),
@@ -3695,7 +3683,7 @@ module.exports = {
   task: require('./task')
 };
 
-},{"./error":14,"./events":17,"./store":20,"./task":23}],19:[function(require,module,exports){
+},{"./error":13,"./events":16,"./store":19,"./task":22}],18:[function(require,module,exports){
 // Store
 // ============
 
@@ -4131,14 +4119,14 @@ function hoodieStoreApi(hoodie, options) {
 
 module.exports = hoodieStoreApi;
 
-},{"../../utils/promise/defer":28,"../../utils/promise/is_promise":30,"../../utils/promise/reject_with":32,"../../utils/promise/resolve_with":34,"../error/error":13,"../error/object_id":15,"../error/object_type":16,"../events":17,"./scoped":22,"extend":1}],20:[function(require,module,exports){
+},{"../../utils/promise/defer":27,"../../utils/promise/is_promise":29,"../../utils/promise/reject_with":31,"../../utils/promise/resolve_with":33,"../error/error":12,"../error/object_id":14,"../error/object_type":15,"../events":16,"./scoped":21,"extend":1}],19:[function(require,module,exports){
 module.exports = {
   api: require('./api'),
   remote: require('./remote'),
   scoped: require('./scoped')
 };
 
-},{"./api":19,"./remote":21,"./scoped":22}],21:[function(require,module,exports){
+},{"./api":18,"./remote":20,"./scoped":21}],20:[function(require,module,exports){
 var global=typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {};// Remote
 // ========
 
@@ -4654,7 +4642,7 @@ function hoodieRemoteStore(hoodie, options) {
   }
 
 
-  // ### _parseFromRemote
+  // ### parseFromRemote
 
   // normalize objects coming from remote
   //
@@ -4662,7 +4650,7 @@ function hoodieRemoteStore(hoodie, options) {
   // e.g. `type/123` -> `123`
   //
   function parseFromRemote(object) {
-    var id, ignore, _ref;
+    var id, matches;
 
     // handle id and type
     id = object._id || object.id;
@@ -4670,26 +4658,20 @@ function hoodieRemoteStore(hoodie, options) {
 
     if (remote.prefix) {
       id = id.replace(remotePrefixPattern, '');
-      // id = id.replace(new RegExp('^' + remote.prefix), '');
     }
 
     // turn doc/123 into type = doc & id = 123
     // NOTE: we don't use a simple id.split(/\//) here,
     // as in some cases IDs might contain '/', too
     //
-    _ref = id.match(/([^\/]+)\/(.*)/), ignore = _ref[0], object.type = _ref[1], object.id = _ref[2];
+    matches = id.match(/([^\/]+)\/(.*)/);
+    object.type = matches[1], object.id = matches[2];
 
     return object;
   }
 
   function parseAllFromRemote(objects) {
-    var object, _i, _len, _results;
-    _results = [];
-    for (_i = 0, _len = objects.length; _i < _len; _i++) {
-      object = objects[_i];
-      _results.push(parseFromRemote(object));
-    }
-    return _results;
+    return objects.map(parseFromRemote);
   }
 
 
@@ -4698,9 +4680,9 @@ function hoodieRemoteStore(hoodie, options) {
   // extends passed object with a _rev property
   //
   function addRevisionTo(attributes) {
-    var currentRevId, currentRevNr, newRevisionId, _ref;
+    var currentRevId, currentRevNr, newRevisionId, parts;
     try {
-      _ref = attributes._rev.split(/-/), currentRevNr = _ref[0], currentRevId = _ref[1];
+      parts = attributes._rev.split(/-/), currentRevNr = parts[0], currentRevId = parts[1];
     } catch (_error) {}
     currentRevNr = parseInt(currentRevNr, 10) || 0;
     newRevisionId = generateNewRevisionId();
@@ -4911,7 +4893,7 @@ function hoodieRemoteStore(hoodie, options) {
 
 module.exports = hoodieRemoteStore;
 
-},{"../../utils/generate_id":25,"../../utils/promise/resolve_with":34,"./api":19,"extend":1}],22:[function(require,module,exports){
+},{"../../utils/generate_id":24,"../../utils/promise/resolve_with":33,"./api":18,"extend":1}],21:[function(require,module,exports){
 // scoped Store
 // ============
 
@@ -5024,12 +5006,12 @@ function hoodieScopedStoreApi(hoodie, storeApi, options) {
 
 module.exports = hoodieScopedStoreApi;
 
-},{"../events":17}],23:[function(require,module,exports){
+},{"../events":16}],22:[function(require,module,exports){
 module.exports = {
   scoped: require('./scoped')
 };
 
-},{"./scoped":24}],24:[function(require,module,exports){
+},{"./scoped":23}],23:[function(require,module,exports){
 // scoped Store
 // ============
 
@@ -5106,7 +5088,7 @@ function hoodieScopedTask(hoodie, taskApi, options) {
 
 module.exports = hoodieScopedTask;
 
-},{"../events":17}],25:[function(require,module,exports){
+},{"../events":16}],24:[function(require,module,exports){
 var chars, i, radix;
 
 // uuids consist of numbers and lowercase letters only.
@@ -5136,7 +5118,7 @@ function generateId (length) {
 
 module.exports = generateId;
 
-},{}],26:[function(require,module,exports){
+},{}],25:[function(require,module,exports){
 var findLettersToUpperCase = /(^\w|_\w)/g;
 
 function hoodiefyRequestErrorName (name) {
@@ -5148,15 +5130,15 @@ function hoodiefyRequestErrorName (name) {
 }
 
 module.exports = hoodiefyRequestErrorName;
-},{}],27:[function(require,module,exports){
+},{}],26:[function(require,module,exports){
 module.exports = {
   generateId: require('./generate_id'),
   promise : require('./promise')
 };
 
-},{"./generate_id":25,"./promise":29}],28:[function(require,module,exports){
+},{"./generate_id":24,"./promise":28}],27:[function(require,module,exports){
 var global=typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {};module.exports = global.jQuery.Deferred;
-},{}],29:[function(require,module,exports){
+},{}],28:[function(require,module,exports){
 module.exports = {
   defer: require('./defer'),
   isPromise: require('./is_promise'),
@@ -5166,7 +5148,7 @@ module.exports = {
   resolve: require('./resolve'),
 };
 
-},{"./defer":28,"./is_promise":30,"./reject":31,"./reject_with":32,"./resolve":33,"./resolve_with":34}],30:[function(require,module,exports){
+},{"./defer":27,"./is_promise":29,"./reject":30,"./reject_with":31,"./resolve":32,"./resolve_with":33}],29:[function(require,module,exports){
 // returns true if passed object is a promise (but not a deferred),
 // otherwise false.
 function isPromise(object) {
@@ -5176,7 +5158,7 @@ function isPromise(object) {
 }
 
 module.exports = isPromise;
-},{}],31:[function(require,module,exports){
+},{}],30:[function(require,module,exports){
 var defer = require('./defer');
 //
 function reject() {
@@ -5184,7 +5166,7 @@ function reject() {
 }
 
 module.exports = reject;
-},{"./defer":28}],32:[function(require,module,exports){
+},{"./defer":27}],31:[function(require,module,exports){
 var getDefer = require('./defer');
 var HoodieError = require('../../lib/error/error');
 
@@ -5196,7 +5178,7 @@ function rejectWith(errorProperties) {
 
 module.exports = rejectWith;
 
-},{"../../lib/error/error":13,"./defer":28}],33:[function(require,module,exports){
+},{"../../lib/error/error":12,"./defer":27}],32:[function(require,module,exports){
 var defer = require('./defer');
 //
 function resolve() {
@@ -5204,7 +5186,7 @@ function resolve() {
 }
 
 module.exports = resolve;
-},{"./defer":28}],34:[function(require,module,exports){
+},{"./defer":27}],33:[function(require,module,exports){
 var getDefer = require('./defer');
 
 //
@@ -5215,7 +5197,7 @@ function resolveWith() {
 
 module.exports = resolveWith;
 
-},{"./defer":28}]},{},[2])
+},{"./defer":27}]},{},[2])
 (2)
 });
 ;
