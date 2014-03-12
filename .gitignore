@@ -1,5 +1,5 @@
+.DS_Store
+*.swp
 node_modules
 data
-.DS_Store
 /test/fixtures/project1/data
-/lib/helpers/hoodie_bundle_concat.js
