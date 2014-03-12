@@ -7,7 +7,7 @@ var _ = require('lodash');
 describe('pack_hoodie', function () {
 
   // Dummy config object with plugins attribute.
-  var config = { plugins: [] };
+  var config = { app: {}, plugins: [] };
 
   it('should be a function', function () {
     expect(hoodiejs).to.be.a(Function);
