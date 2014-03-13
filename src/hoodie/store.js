@@ -123,9 +123,9 @@ function hoodieStore (hoodie) {
     //
     // A local change is meant to be replicated to the
     // users database, but not beyond. For example when
-    // I subscribed to a share but then decide to unsubscribe,
+    // a user subscribes to a share but then decides to unsubscribe,
     // all objects get removed with local: true flag, so that
-    // they get removed from my database, but won't anywhere else.
+    // they get removed from the users database, but will remain elsewhere.
     if (options.local) {
       object._$local = true;
     } else {
@@ -755,7 +755,7 @@ function hoodieStore (hoodie) {
   }
 
 
-  // when a change come's from our remote store, we differentiate
+  // when a change comes from our remote store, we differentiate
   // whether an object has been removed or added / updated and
   // reflect the change in our local store.
   function handleRemoteChange(typeOfChange, object) {
@@ -774,7 +774,7 @@ function hoodieStore (hoodie) {
 
   //
   // all local changes get bulk pushed. For each object with local
-  // changes that has been pushed we trigger a sync event
+  // changes that have been pushed we trigger a sync event
   function handlePushedObject(object) {
     triggerEvents('sync', object);
   }
@@ -833,7 +833,7 @@ function hoodieStore (hoodie) {
   }
 
   // `hasLocalChanges` returns true if there is a local change that
-  // has not been sync'd yet.
+  // has not been synced yet.
   function hasLocalChanges(object) {
     if (!object.updatedAt) {
       return false;
