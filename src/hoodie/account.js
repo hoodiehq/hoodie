@@ -168,13 +168,13 @@ function hoodieAccount(hoodie) {
   // anonymous sign up
   // -------------------
 
-  // If the user did not sign up himself yet, but data needs to be transfered
+  // If the user did not sign up yet, but data needs to be transferred
   // to the couch, e.g. to send an email or to share data, the anonymousSignUp
   // method can be used. It generates a random password and stores it locally
   // in the browser.
   //
-  // If the user signes up for real later, we 'upgrade' his account, meaning we
-  // change his username and password internally instead of creating another user.
+  // If the user signs up for real later, we 'upgrade' the account, meaning we
+  // change the username and password internally instead of creating another user.
   //
   account.anonymousSignUp = function anonymousSignUp() {
     var password, username;
