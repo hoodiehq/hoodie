@@ -19,11 +19,9 @@ describe('#HoodieError()', function() {
     var error = new HoodieError({ message: 'There is no Santa Clause' });
     expect(error.name).to.be('HoodieError');
   });
-  it('requires message to be set', function() {
-    var hoodieErrorWithoutMessage = function() {
-      new HoodieError({});
-    };
-    expect(hoodieErrorWithoutMessage).to.throwError(/FATAL: error.message must be set/);
+  it('falls back message to "Something went wrong"', function() {
+    var error = new HoodieError({});
+    expect(error.message).to.be('Something went wrong');
   });
   it('accepts a custom name for the error', function() {
     var error = new HoodieError({name: 'FunkMissingError', message: 'You don\'t have the funk!'});
