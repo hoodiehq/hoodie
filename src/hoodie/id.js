@@ -34,7 +34,7 @@ function hoodieId (hoodie) {
 
     // DEPRECATED, remove before 1.0
     if (! id) {
-      hoodie.config.get('_account.ownerHash');
+      id = hoodie.config.get('_account.ownerHash');
     }
   }
 
