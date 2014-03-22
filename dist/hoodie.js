@@ -1,4 +1,4 @@
-// Hoodie.js - 0.7.0
+// Hoodie.js - 0.7.1
 // https://github.com/hoodiehq/hoodie.js
 // Copyright 2012 - 2014 https://github.com/hoodiehq/
 // Licensed Apache License 2.0
@@ -433,13 +433,13 @@ function hoodieAccount(hoodie) {
   // anonymous sign up
   // -------------------
 
-  // If the user did not sign up himself yet, but data needs to be transfered
+  // If the user did not sign up yet, but data needs to be transferred
   // to the couch, e.g. to send an email or to share data, the anonymousSignUp
   // method can be used. It generates a random password and stores it locally
   // in the browser.
   //
-  // If the user signes up for real later, we 'upgrade' his account, meaning we
-  // change his username and password internally instead of creating another user.
+  // If the user signs up for real later, we 'upgrade' the account, meaning we
+  // change the username and password internally instead of creating another user.
   //
   account.anonymousSignUp = function anonymousSignUp() {
     var password, username;
@@ -1586,6 +1586,7 @@ function hoodieConnection(hoodie) {
   //
   hoodie.checkConnection = function checkConnection() {
     var req = checkConnectionRequest;
+    var path = '/?hoodieId=' + hoodie.id();
 
     if (req && req.state() === 'pending') {
       return req;
@@ -1593,7 +1594,7 @@ function hoodieConnection(hoodie) {
 
     global.clearTimeout(checkConnectionTimeout);
 
-    checkConnectionRequest = hoodie.request('GET', '/').then(
+    checkConnectionRequest = hoodie.request('GET', path).then(
       handleCheckConnectionSuccess,
       handleCheckConnectionError
     );
@@ -2190,9 +2191,9 @@ function hoodieStore (hoodie) {
     //
     // A local change is meant to be replicated to the
     // users database, but not beyond. For example when
-    // I subscribed to a share but then decide to unsubscribe,
+    // a user subscribes to a share but then decides to unsubscribe,
     // all objects get removed with local: true flag, so that
-    // they get removed from my database, but won't anywhere else.
+    // they get removed from the users database, but will remain elsewhere.
     if (options.local) {
       object._$local = true;
     } else {
@@ -2822,7 +2823,7 @@ function hoodieStore (hoodie) {
   }
 
 
-  // when a change come's from our remote store, we differentiate
+  // when a change comes from our remote store, we differentiate
   // whether an object has been removed or added / updated and
   // reflect the change in our local store.
   function handleRemoteChange(typeOfChange, object) {
@@ -2841,7 +2842,7 @@ function hoodieStore (hoodie) {
 
   //
   // all local changes get bulk pushed. For each object with local
-  // changes that has been pushed we trigger a sync event
+  // changes that have been pushed we trigger a sync event
   function handlePushedObject(object) {
     triggerEvents('sync', object);
   }
@@ -2900,7 +2901,7 @@ function hoodieStore (hoodie) {
   }
 
   // `hasLocalChanges` returns true if there is a local change that
-  // has not been sync'd yet.
+  // has not been synced yet.
   function hasLocalChanges(object) {
     if (!object.updatedAt) {
       return false;
@@ -3423,7 +3424,7 @@ function HoodieError(properties) {
   }
 
   if (! properties.message) {
-    throw new Error('FATAL: error.message must be set');
+    properties.message = 'Something went wrong';
   }
 
   // must check for properties, as this.name is always set.
