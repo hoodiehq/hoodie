@@ -43,7 +43,7 @@ function HoodieError(properties) {
   }
 
   if (! properties.message) {
-    throw new Error('FATAL: error.message must be set');
+    properties.message = 'Something went wrong';
   }
 
   // must check for properties, as this.name is always set.
