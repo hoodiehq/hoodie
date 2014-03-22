@@ -1,4 +1,4 @@
-// Hoodie.js - 0.7.1
+// Hoodie.js - 0.7.2
 // https://github.com/hoodiehq/hoodie.js
 // Copyright 2012 - 2014 https://github.com/hoodiehq/
 // Licensed Apache License 2.0
@@ -1685,7 +1685,7 @@ function hoodieId (hoodie) {
 
     // DEPRECATED, remove before 1.0
     if (! id) {
-      hoodie.config.get('_account.ownerHash');
+      id = hoodie.config.get('_account.ownerHash');
     }
   }
 
