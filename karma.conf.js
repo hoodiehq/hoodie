@@ -34,7 +34,6 @@ module.exports = function(config) {
       'test/specs/hoodie/store.spec.js',
       'test/specs/hoodie/task.spec.js',
       'test/specs/lib/error/error.spec.js',
-      'test/specs/lib/events.spec.js',
       'test/specs/lib/store/remote.spec.js',
       'test/specs/lib/store/scoped.spec.js',
       'test/specs/lib/store/api.spec.js',
