@@ -5,7 +5,7 @@ var _ = require('lodash');
 describe('utils', function () {
 
   it('should expose n number of properties', function () {
-    expect(_.size(couchUtils)).to.eql(13);
+    expect(_.size(couchUtils)).to.eql(14);
   });
 
   it('should have a isAdminParty property', function () {
