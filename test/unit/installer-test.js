@@ -6,7 +6,7 @@ var _ = require('lodash');
 describe('installer', function () {
 
   it('should expose n number of properties', function () {
-    expect(_.size(installer)).to.eql(4);
+    expect(_.size(installer)).to.eql(5);
   });
 
   it('should have a setupUsers property', function () {
