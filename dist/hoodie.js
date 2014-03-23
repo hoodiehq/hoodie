@@ -1,4 +1,4 @@
-// Hoodie.js - 0.7.2
+// Hoodie.js - 0.7.3
 // https://github.com/hoodiehq/hoodie.js
 // Copyright 2012 - 2014 https://github.com/hoodiehq/
 // Licensed Apache License 2.0
@@ -506,64 +506,28 @@ function hoodieAccount(hoodie) {
   // Besides the standard sign in we also check if the account has been confirmed
   // (roles include 'confirmed' role).
   //
-  // When signing in, by default all local data gets cleared beforehand (with a signOut).
+  // When signing in, by default all local data gets cleared beforehand.
   // Otherwise data that has been created beforehand (authenticated with another user
   // account or anonymously) would be merged into the user account that signs in.
-  // That applies only if username isn't the same as current username.
+  // That only applies if username isn't the same as current username.
   //
   // To prevent data loss, signIn can be called with options.moveData = true, that wll
   // move all data from the anonymous account to the account the user signed into.
   //
   account.signIn = function signIn(username, password, options) {
-    var signOutAndSignIn = function() {
-        return account.signOut({
-          silent: true
-        }).then(function() {
-          return sendSignInRequest(username, password);
-        });
-      };
-    var currentData;
+    var isNotReauthenticating = username !== account.username;
 
-    options = options || {};
-
-    if (username === null) {
-      username = '';
-    }
-
-    if (password === undefined) {
-      password = '';
-    }
-
-    // downcase
+    if (! username) { username = ''; }
+    if (! password) { password = ''; }
     username = username.toLowerCase();
 
-    if (username !== account.username) {
-      if (!options.moveData) {
-        return signOutAndSignIn();
-      }
-
-      return hoodie.store.findAll().then(function(data) {
-        currentData = data;
-      }).then(signOutAndSignIn).done(function() {
-        currentData.forEach(function(object) {
-          var type = object.type;
-
-          // ignore the account settings
-          if (type === '$config' && object.id === 'hoodie') {
-            return;
-          }
-
-          delete object.type;
-          object.createdBy = hoodie.id();
-          hoodie.store.add(type, object);
-        });
-      });
-
-    } else {
-      return sendSignInRequest(username, password, {
-        reauthenticated: true
+    if (account.hasAccount() && isNotReauthenticating && !options.moveData) {
+      return pushLocalChanges().then(function() {
+        return sendSignInRequest(username, password, options);
       });
     }
+
+    return sendSignInRequest(username, password, options);
   };
 
 
@@ -573,18 +537,15 @@ function hoodieAccount(hoodie) {
   // uses standard CouchDB API to invalidate a user session (DELETE /_session)
   //
   account.signOut = function signOut(options) {
-
+    var cleanupMethod;
     options = options || {};
+    cleanupMethod = options.silent ? cleanup : cleanupAndTriggerSignOut;
 
     if (!account.hasAccount()) {
-      return cleanup().then(function() {
-        if (!options.silent) {
-          return account.trigger('signout');
-        }
-      });
+      return cleanupMethod();
     }
 
-    return pushLocalChanges(options).then(hoodie.remote.disconnect).then(sendSignOutRequest).then(cleanupAndTriggerSignOut);
+    return pushLocalChanges(options).then(hoodie.remote.disconnect).then(sendSignOutRequest).then(cleanupMethod);
   };
 
 
@@ -821,7 +782,6 @@ function hoodieAccount(hoodie) {
     }
 
     account.username = newUsername;
-
     return hoodie.config.set('_account.username', newUsername);
   }
 
@@ -950,23 +910,62 @@ function hoodieAccount(hoodie) {
     options = options || {};
 
     return function(response) {
-      var defer, username, hoodieId;
+      var newUsername;
+      var newHoodieId;
+      var oldUsername;
+      var isReauthenticating;
+      var currentData;
 
-      defer = getDefer();
-      username = response.name.replace(/^user(_anonymous)?\//, '');
-      hoodieId = response.roles[0];
+      function setNewUsernameAndTriggerEvents() {
+        setUsername(newUsername);
+        authenticated = true;
+
+        //
+        // options.silent is true when we need to sign in the
+        // the user without signIn method being called. That's
+        // currently the case for changeUsername.
+        // Also don't trigger 'signin' when reauthenticating
+        //
+        if (!options.silent && !isReauthenticating) {
+          if (account.hasAnonymousAccount()) {
+            account.trigger('signin:anonymous', newUsername);
+          } else {
+            account.trigger('signin', newUsername, newHoodieId);
+          }
+        }
+
+        // user reauthenticated, meaning
+        if (isReauthenticating) {
+          account.trigger('reauthenticated', newUsername);
+        }
+
+        account.fetch();
+        return resolveWith(newUsername);
+      }
+
+      newUsername = response.name.replace(/^user(_anonymous)?\//, '');
+      oldUsername = account.username;
+      isReauthenticating = (newUsername === oldUsername);
+      newHoodieId = response.roles[0];
 
       //
       // if an error occured, the userDB worker stores it to the $error attribute
       // and adds the 'error' role to the users doc object. If the user has the
       // 'error' role, we need to fetch his _users doc to find out what the error
       // is, before we can reject the promise.
+      // 
+      // TODO: 
+      // In that case we reject the sign in, but towards the backend we still get
+      // a new session, and the old one gets removed. That leads to a state like
+      // a session timeout: I'm still signed in with the old username, but not
+      // authorized anymore. A better approach might be to send an extra 
+      // GET /_users/<user-doc-id> with HTTP basic auth to see if the user account
+      // is valid and only if it is, we'd send the POST /_session request.
       //
       if (response.roles.indexOf('error') !== -1) {
-        account.fetch(username).fail(defer.reject).done(function() {
-          return defer.reject(userDoc.$error);
+        return account.fetch(newUsername).then(function() {
+          return rejectWith(userDoc.$error);
         });
-        return defer.promise();
       }
 
       //
@@ -977,36 +976,48 @@ function hoodieAccount(hoodie) {
       // with an 'uncofirmed error'
       //
       if (response.roles.indexOf('confirmed') === -1) {
-        return defer.reject({
+        return rejectWith({
           name: 'HoodieAccountUnconfirmedError',
           message: 'Account has not been confirmed yet'
         });
       }
-
-      setUsername(username);
-      authenticated = true;
-
-      //
-      // options.silent is true when we need to sign in the
-      // the user without signIn method being called. That's
-      // currently the case for changeUsername.
-      // Also don't trigger 'signin' when reauthenticating
-      //
-      if (!(options.silent || options.reauthenticated)) {
-        if (account.hasAnonymousAccount()) {
-          account.trigger('signin:anonymous', username);
-        } else {
-          account.trigger('signin', username, hoodieId);
+      if (! isReauthenticating) {
+        if (!options.moveData) {
+          return cleanupAndDisconnect().then(setNewUsernameAndTriggerEvents);
         }
+
+        // 
+        // TODO
+        // move the code below into `hoodie.store`. We should trigger something like 
+        // an `account:movedata` like so
+        // 
+        // ```
+        // account.trigger('movedata');
+        // ```
+        // 
+        // That would set a flag in hoodie.store so that the next time store.clear
+        // gets called, it would not remove all data, but only update the hoodie.id()
+        // in `createdBy` of all the objects.
+        // 
+        return hoodie.store.findAll().then(function(data) {
+          currentData = data;
+        }).then(cleanupAndDisconnect).then(setNewUsernameAndTriggerEvents).done(function() {
+          currentData.forEach(function(object) {
+            var type = object.type;
+
+            // ignore the account settings
+            if (type === '$config' && object.id === 'hoodie') {
+              return;
+            }
+
+            delete object.type;
+            object.createdBy = hoodie.id();
+            hoodie.store.add(type, object);
+          });
+        });
       }
 
-      // user reauthenticated, meaning
-      if (options.reauthenticated) {
-        account.trigger('reauthenticated', username);
-      }
-
-      account.fetch();
-      return defer.resolve(username, response.roles[0]);
+      return setNewUsernameAndTriggerEvents();
     };
   }
 
@@ -1154,7 +1165,6 @@ function hoodieAccount(hoodie) {
     });
   }
 
-
   //
   // dependend on what kind of error we get, we want to ignore
   // it or not.
@@ -1173,6 +1183,7 @@ function hoodieAccount(hoodie) {
 
   //
   // remove everything form the current account, so a new account can be initiated.
+  // make sure to remove a promise.
   //
   function cleanup() {
 
@@ -1182,6 +1193,14 @@ function hoodieAccount(hoodie) {
     setUsername(undefined);
 
     return resolve();
+  }
+
+  // 
+  // make sure to remove a promise
+  // 
+  function cleanupAndDisconnect() {
+    hoodie.remote.disconnect();
+    return cleanup();
   }
 
 
@@ -1409,8 +1428,7 @@ function hoodieAccount(hoodie) {
     return withPreviousRequestsAborted('signIn', function() {
       var promise = account.request('POST', '/_session', requestOptions);
 
-      return promise.then(
-      handleSignInSuccess(options));
+      return promise.then(handleSignInSuccess(options));
     });
   }
 
