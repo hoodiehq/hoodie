@@ -124,6 +124,8 @@ function hoodieAccount(hoodie) {
   // to sign in with a 300ms timeout.
   //
   account.signUp = function signUp(username, password) {
+    var options;
+
 
     if (password === undefined) {
       password = '';
@@ -144,7 +146,7 @@ function hoodieAccount(hoodie) {
     // downcase username
     username = username.toLowerCase();
 
-    var options = {
+    options = {
       data: JSON.stringify({
         _id: userDocKey(username),
         name: userTypeAndId(username),
@@ -160,8 +162,8 @@ function hoodieAccount(hoodie) {
       contentType: 'application/json'
     };
 
-    return account.request('PUT', userDocUrl(username), options).then(
-    handleSignUpSuccess(username, password), handleSignUpError(username));
+    return account.request('PUT', userDocUrl(username), options)
+    .then(handleSignUpSuccess(username, password), handleSignUpError(username));
   };
 
 
@@ -566,7 +568,7 @@ function hoodieAccount(hoodie) {
     return function(response) {
       account.trigger('signup', username);
       userDoc._rev = response.rev;
-      return delayedSignIn(username, password);
+      return delayedSignIn(username, password, {moveData: true});
     };
   }
 
@@ -607,7 +609,7 @@ function hoodieAccount(hoodie) {
     }
 
     global.setTimeout(function() {
-      var promise = sendSignInRequest(username, password);
+      var promise = sendSignInRequest(username, password, options);
       promise.done(defer.resolve);
       promise.fail(function(error) {
         if (error.name === 'HoodieAccountUnconfirmedError') {
@@ -1049,7 +1051,7 @@ function hoodieAccount(hoodie) {
           // work around trouble in case of local changes. See 
           // https://github.com/hoodiehq/hoodie.js/issues/256
           return account.signOut({silent:true, ignoreLocalChanges: true}).then(function() {
-            return account.signIn(newUsername, newPassword);
+            return account.signIn(newUsername, newPassword, {moveData: true});
           });
         });
       } else {
