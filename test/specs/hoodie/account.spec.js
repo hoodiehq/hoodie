@@ -549,7 +549,7 @@ describe('hoodie.account', function() {
                     });
 
                     it('should sign in with new username', function() {
-                      expect(this.account.signIn).to.be.calledWith('joe@example.com', 'secret');
+                      expect(this.account.signIn).to.be.calledWith('joe@example.com', 'secret', {moveData: true});
                     });
 
                     _and('sign in to new account succeeds', function() {
@@ -737,13 +737,14 @@ describe('hoodie.account', function() {
           _and('signIn successful', function() {
 
             beforeEach(function() {
+              this.hoodie.store.findAll.defer.resolve([]);
               this.requestDefers[1].resolve({
                 name: 'joe@example.com',
                 roles: ['hash123', 'confirmed']
               });
             });
 
-            it('should resolve its promise', function() {
+            it.only('should resolve its promise', function() {
               expect(this.promise).to.be.resolvedWith('joe@example.com');
             });
           }); // signIn successful
@@ -1989,7 +1990,7 @@ describe('hoodie.account', function() {
                 });
 
                 it('should sign in with new username', function() {
-                  expect(this.account.signIn).to.be.calledWith('new.joe@example.com', 'secret');
+                  expect(this.account.signIn).to.be.calledWith('new.joe@example.com', 'secret', {moveData: true});
                 });
 
                 _and('sign in to new account succeeds', function() {
