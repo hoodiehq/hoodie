@@ -744,7 +744,7 @@ describe('hoodie.account', function() {
               });
             });
 
-            it.only('should resolve its promise', function() {
+            it('should resolve its promise', function() {
               expect(this.promise).to.be.resolvedWith('joe@example.com');
             });
           }); // signIn successful
