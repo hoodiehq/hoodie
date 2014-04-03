@@ -258,6 +258,8 @@ function hoodieAccount(hoodie) {
     if (! password) { password = ''; }
     username = username.toLowerCase();
 
+    options = options || {};
+
     if (account.hasAccount() && isNotReauthenticating && !options.moveData) {
       return pushLocalChanges().then(function() {
         return sendSignInRequest(username, password, options);
