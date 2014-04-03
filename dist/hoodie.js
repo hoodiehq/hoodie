@@ -1,4 +1,4 @@
-// Hoodie.js - 0.7.3
+// Hoodie.js - 0.7.4
 // https://github.com/hoodiehq/hoodie.js
 // Copyright 2012 - 2014 https://github.com/hoodiehq/
 // Licensed Apache License 2.0
@@ -522,6 +522,8 @@ function hoodieAccount(hoodie) {
     if (! username) { username = ''; }
     if (! password) { password = ''; }
     username = username.toLowerCase();
+
+    options = options || {};
 
     if (account.hasAccount() && isNotReauthenticating && !options.moveData) {
       return pushLocalChanges().then(function() {
