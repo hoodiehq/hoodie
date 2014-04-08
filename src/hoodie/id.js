@@ -2,8 +2,9 @@
 // =========
 
 var generateId = require('../utils/generate_id');
+var config = require('../utils/config');
 
-// generates a random id and persists using hoodie.config
+// generates a random id and persists using config
 // until the user signs out or deletes local data
 function hoodieId (hoodie) {
   var id;
@@ -18,23 +19,23 @@ function hoodieId (hoodie) {
   function setId(newId) {
     id = newId;
     
-    hoodie.config.set('_hoodieId', newId);
+    config.set('_hoodieId', newId);
   }
 
   function unsetId () {
     id = undefined;
-    hoodie.config.unset('_hoodieId');
+    config.unset('_hoodieId');
   }
 
   //
   // initialize
   //
   function init() {
-    id = hoodie.config.get('_hoodieId');
+    id = config.get('_hoodieId');
 
     // DEPRECATED, remove before 1.0
     if (! id) {
-      id = hoodie.config.get('_account.ownerHash');
+      id = config.get('_account.ownerHash');
     }
   }
 

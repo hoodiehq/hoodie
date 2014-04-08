@@ -1,8 +1,11 @@
+<<<<<<< HEAD
 // Hoodie.js - 0.7.4
 // https://github.com/hoodiehq/hoodie.js
 // Copyright 2012 - 2014 https://github.com/hoodiehq/
 // Licensed Apache License 2.0
 
+=======
+>>>>>>> refactor/config
 !function(e){"object"==typeof exports?module.exports=e():"function"==typeof define&&define.amd?define(e):"undefined"!=typeof window?window.Hoodie=e():"undefined"!=typeof global?global.Hoodie=e():"undefined"!=typeof self&&(self.Hoodie=e())}(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);throw new Error("Cannot find module '"+o+"'")}var f=n[o]={exports:{}};t[o][0].call(f.exports,function(e){var n=t[o][1][e];return s(n?n:e)},f,f.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 var hasOwn = Object.prototype.hasOwnProperty;
 var toString = Object.prototype.toString;
@@ -92,13 +95,13 @@ var global=typeof self !== "undefined" ? self : typeof window !== "undefined" ? 
 
 var hoodieAccount = require('./hoodie/account');
 var hoodieAccountRemote = require('./hoodie/remote');
-var hoodieConfig = require('./hoodie/config');
 var hoodieConnection = require('./hoodie/connection');
 var hoodieId = require('./hoodie/id');
 var hoodieLocalStore = require('./hoodie/store');
 var hoodieTask = require('./hoodie/task');
 var hoodieOpen = require('./hoodie/open');
 var hoodieRequest = require('./hoodie/request');
+var hoodieConfig = require('./lib/config');
 var hoodieEvents = require('./lib/events');
 
 // for plugins
@@ -262,7 +265,11 @@ function applyExtensions(hoodie) {
 
 module.exports = Hoodie;
 
+<<<<<<< HEAD
 },{"./hoodie/account":3,"./hoodie/config":4,"./hoodie/connection":5,"./hoodie/id":6,"./hoodie/open":7,"./hoodie/remote":8,"./hoodie/request":9,"./hoodie/store":10,"./hoodie/task":11,"./lib":17,"./lib/events":16,"./utils":26}],3:[function(require,module,exports){
+=======
+},{"./hoodie/account":3,"./hoodie/connection":4,"./hoodie/id":5,"./hoodie/open":6,"./hoodie/remote":7,"./hoodie/request":8,"./hoodie/store":9,"./hoodie/task":10,"./lib":17,"./lib/config":11,"./lib/events":16,"./utils":26}],3:[function(require,module,exports){
+>>>>>>> refactor/config
 var global=typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {};// Hoodie.Account
 // ================
 
@@ -1449,6 +1456,7 @@ function hoodieAccount(hoodie) {
 
 module.exports = hoodieAccount;
 
+<<<<<<< HEAD
 },{"../lib/events":16,"../utils/generate_id":24,"../utils/promise/defer":27,"../utils/promise/reject":30,"../utils/promise/reject_with":31,"../utils/promise/resolve":32,"../utils/promise/resolve_with":33,"extend":1}],4:[function(require,module,exports){
 // Hoodie Config API
 // ===================
@@ -1572,6 +1580,9 @@ function hoodieConfig(hoodie) {
 module.exports = hoodieConfig;
 
 },{"../utils/promise/resolve":32}],5:[function(require,module,exports){
+=======
+},{"../lib/events":16,"../utils/generate_id":24,"../utils/promise/defer":28,"../utils/promise/reject":31,"../utils/promise/reject_with":32,"../utils/promise/resolve":33,"../utils/promise/resolve_with":34,"extend":1}],4:[function(require,module,exports){
+>>>>>>> refactor/config
 var global=typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {};// hoodie.checkConnection() & hoodie.isConnected()
 // =================================================
 
@@ -1670,7 +1681,11 @@ function hoodieConnection(hoodie) {
 
 module.exports = hoodieConnection;
 
+<<<<<<< HEAD
 },{"../utils/promise/reject":30,"../utils/promise/resolve":32}],6:[function(require,module,exports){
+=======
+},{"../utils/promise/reject":31,"../utils/promise/resolve":33}],5:[function(require,module,exports){
+>>>>>>> refactor/config
 // hoodie.id
 // =========
 
@@ -1741,7 +1756,11 @@ function hoodieId (hoodie) {
 
 module.exports = hoodieId;
 
+<<<<<<< HEAD
 },{"../utils/generate_id":24}],7:[function(require,module,exports){
+=======
+},{"../utils/generate_id":24}],6:[function(require,module,exports){
+>>>>>>> refactor/config
 // Open stores
 // -------------
 
@@ -1772,7 +1791,11 @@ function hoodieOpen(hoodie) {
 
 module.exports = hoodieOpen;
 
+<<<<<<< HEAD
 },{"../lib/store/remote":20,"extend":1}],8:[function(require,module,exports){
+=======
+},{"../lib/store/remote":20,"extend":1}],7:[function(require,module,exports){
+>>>>>>> refactor/config
 // AccountRemote
 // ===============
 
@@ -1931,7 +1954,11 @@ function hoodieRemoteFactory(hoodie) {
 
 module.exports = hoodieRemoteFactory;
 
+<<<<<<< HEAD
 },{"../utils/promise/reject_with":31}],9:[function(require,module,exports){
+=======
+},{"../utils/promise/reject_with":32}],8:[function(require,module,exports){
+>>>>>>> refactor/config
 //
 // hoodie.request
 // ================
@@ -2087,7 +2114,11 @@ function hoodieRequest(hoodie) {
 
 module.exports = hoodieRequest;
 
+<<<<<<< HEAD
 },{"../utils/hoodiefy_request_error_name":25,"../utils/promise/reject_with":31,"extend":1}],10:[function(require,module,exports){
+=======
+},{"../utils/hoodiefy_request_error_name":25,"../utils/promise/reject_with":32,"extend":1}],9:[function(require,module,exports){
+>>>>>>> refactor/config
 var global=typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {};// LocalStore
 // ============
 
@@ -2102,6 +2133,8 @@ var extend = require('extend');
 var getDefer = require('../utils/promise/defer');
 var rejectWith = require('../utils/promise/reject_with');
 var resolveWith = require('../utils/promise/resolve_with');
+
+var localStorageWrapper = require('../utils/local_storage_wrapper');
 
 //
 function hoodieStore (hoodie) {
@@ -2380,7 +2413,7 @@ function hoodieStore (hoodie) {
 
     // if change comes from remote, just clean up locally
     if (options.remote) {
-      db.removeItem(key);
+      localStorageWrapper.removeItem(key);
       objectWasMarkedAsDeleted = cachedObject[key] && isMarkedAsDeleted(cachedObject[key]);
       cachedObject[key] = false;
       clearChanged(type, id);
@@ -2401,7 +2434,7 @@ function hoodieStore (hoodie) {
       cache(type, id, object);
     } else {
       key = type + '/' + id;
-      db.removeItem(key);
+      localStorageWrapper.removeItem(key);
       cachedObject[key] = false;
       clearChanged(type, id);
     }
@@ -2489,8 +2522,8 @@ function hoodieStore (hoodie) {
   store.index = function index() {
     var i, key, keys, _i, _ref;
     keys = [];
-    for (i = _i = 0, _ref = db.length(); 0 <= _ref ? _i < _ref : _i > _ref; i = 0 <= _ref ? ++_i : --_i) {
-      key = db.key(i);
+    for (i = _i = 0, _ref = localStorageWrapper.length(); 0 <= _ref ? _i < _ref : _i > _ref; i = 0 <= _ref ? ++_i : --_i) {
+      key = localStorageWrapper.key(i);
       if (isSemanticKey(key)) {
         keys.push(key);
       }
@@ -2561,7 +2594,7 @@ function hoodieStore (hoodie) {
         for (_i = 0, _len = keys.length; _i < _len; _i++) {
           key = keys[_i];
           if (isSemanticKey(key)) {
-            _results.push(db.removeItem(key));
+            _results.push(localStorageWrapper.removeItem(key));
           }
         }
         return _results;
@@ -2587,74 +2620,10 @@ function hoodieStore (hoodie) {
     return bootstrapping;
   };
 
-
-  // Is persistant?
-  // ----------------
-
-  // returns `true` or `false` depending on whether localStorage is supported or not.
-  // Beware that some browsers like Safari do not support localStorage in private mode.
-  //
-  // inspired by this cappuccino commit
-  // https://github.com/cappuccino/cappuccino/commit/063b05d9643c35b303568a28809e4eb3224f71ec
-  //
-  store.isPersistent = function isPersistent() {
-    try {
-
-      // we've to put this in here. I've seen Firefox throwing `Security error: 1000`
-      // when cookies have been disabled
-      if (!global.localStorage) {
-        return false;
-      }
-
-      // Just because localStorage exists does not mean it works. In particular it might be disabled
-      // as it is when Safari's private browsing mode is active.
-      localStorage.setItem('Storage-Test', '1');
-
-      // that should not happen ...
-      if (localStorage.getItem('Storage-Test') !== '1') {
-        return false;
-      }
-
-      // okay, let's clean up if we got here.
-      localStorage.removeItem('Storage-Test');
-    } catch (_error) {
-
-      // in case of an error, like Safari's Private Mode, return false
-      return false;
-    }
-
-    // we're good.
-    return true;
-  };
-
-
-
-
   //
   // Private methods
   // -----------------
   //
-
-
-  // localStorage proxy
-  //
-  var db = {
-    getItem: function(key) {
-      return global.localStorage.getItem(key);
-    },
-    setItem: function(key, value) {
-      return global.localStorage.setItem(key, value);
-    },
-    removeItem: function(key) {
-      return global.localStorage.removeItem(key);
-    },
-    key: function(nr) {
-      return global.localStorage.key(nr);
-    },
-    length: function() {
-      return global.localStorage.length;
-    }
-  };
 
 
   // Cache
@@ -2683,7 +2652,7 @@ function hoodieStore (hoodie) {
         id: id
       });
 
-      setObject(type, id, object);
+      localStorageWrapper.setObject(key, object);
 
       if (options.remote) {
         clearChanged(type, id);
@@ -2707,12 +2676,14 @@ function hoodieStore (hoodie) {
         return extend(true, {}, cachedObject[key]);
       }
 
+      key = '' + type + '/' + id;
+
       // if object is not yet cached, load it from localStore
-      object = getObject(type, id);
+      object = localStorageWrapper.getObject(key);
 
       // stop here if object did not exist in localStore
       // and cache it so we don't need to look it up again
-      if (object === false) {
+      if (! object) {
         clearChanged(type, id);
         cachedObject[key] = false;
         return false;
@@ -2746,7 +2717,7 @@ function hoodieStore (hoodie) {
   //
   function bootstrapDirtyObjects() {
     var id, keys, obj, type, _i, _len, _ref;
-    keys = db.getItem('_dirty');
+    keys = localStorageWrapper.getItem('_dirty');
 
     if (!keys) {
       return;
@@ -2869,43 +2840,14 @@ function hoodieStore (hoodie) {
     triggerEvents('sync', object);
   }
 
-
-  // more advanced localStorage wrappers to find/save objects
-  function setObject(type, id, object) {
-    var key, store;
-
-    key = '' + type + '/' + id;
-    store = extend({}, object);
-
-    delete store.type;
-    delete store.id;
-    return db.setItem(key, JSON.stringify(store));
-  }
-  function getObject(type, id) {
-    var key, obj;
-
-    key = '' + type + '/' + id;
-    var json = db.getItem(key);
-
-    if (json) {
-      obj = JSON.parse(json);
-      obj.type = type;
-      obj.id = id;
-      return obj;
-    } else {
-      return false;
-    }
-  }
-
-
   // store IDs of dirty objects
   function saveDirtyIds() {
     try {
       if ($.isEmptyObject(dirty)) {
-        db.removeItem('_dirty');
+        localStorageWrapper.removeItem('_dirty');
       } else {
         var ids = Object.keys(dirty);
-        db.setItem('_dirty', ids.join(','));
+        localStorageWrapper.setItem('_dirty', ids.join(','));
       }
     } catch(e) {}
   }
@@ -3046,18 +2988,7 @@ function hoodieStore (hoodie) {
   //
   // patchIfNotPersistant
   //
-  function patchIfNotPersistant () {
-    if (!store.isPersistent()) {
-      db = {
-        getItem: function() { return null; },
-        setItem: function() { return null; },
-        removeItem: function() { return null; },
-        key: function() { return null; },
-        length: function() { return 0; }
-      };
-    }
-  }
-
+  localStorageWrapper.patchIfNotPersistant();
 
   //
   // initialization
@@ -3083,14 +3014,18 @@ function hoodieStore (hoodie) {
 
   // allow to run this once from outside
   store.patchIfNotPersistant = function() {
-    patchIfNotPersistant();
+    localStorageWrapper.patchIfNotPersistant();
     delete store.patchIfNotPersistant;
   };
 }
 
 module.exports = hoodieStore;
 
+<<<<<<< HEAD
 },{"../lib/error/object_id":14,"../lib/error/object_type":15,"../lib/store/api":18,"../utils/generate_id":24,"../utils/promise/defer":27,"../utils/promise/reject_with":31,"../utils/promise/resolve_with":33,"extend":1}],11:[function(require,module,exports){
+=======
+},{"../lib/error/object_id":14,"../lib/error/object_type":15,"../lib/store/api":18,"../utils/generate_id":24,"../utils/local_storage_wrapper":27,"../utils/promise/defer":28,"../utils/promise/reject_with":32,"../utils/promise/resolve_with":34,"extend":1}],10:[function(require,module,exports){
+>>>>>>> refactor/config
 // Tasks
 // ============
 
@@ -3400,7 +3335,99 @@ function hoodieTask(hoodie) {
 
 module.exports = hoodieTask;
 
+<<<<<<< HEAD
 },{"../lib/error/error":12,"../lib/events":16,"../lib/task/scoped":23,"../utils/promise/defer":27,"extend":1}],12:[function(require,module,exports){
+=======
+},{"../lib/error/error":12,"../lib/events":16,"../lib/task/scoped":23,"../utils/promise/defer":28,"extend":1}],11:[function(require,module,exports){
+// Hoodie Config API
+// ===================
+
+var localStorageWrapper = require('../utils/local_storage_wrapper');
+
+//
+function hoodieConfig(hoodie) {
+
+  var CONFIG_STORE_KEY = '_hoodie_config';
+  var cache = {};
+
+  // public API
+  var config = {};
+
+
+  // set
+  // ----------
+
+  // adds a configuration
+  //
+  config.set = function set(key, value) {
+    cache[key] = value;
+    localStorageWrapper.setObject(CONFIG_STORE_KEY, cache);
+  };
+
+  // get
+  // ----------
+
+  // receives a configuration
+  //
+  config.get = function get(key) {
+    return cache[key];
+  };
+
+  // clear
+  // ----------
+
+  // clears cache and removes object from localStorageWrapper
+  //
+  config.clear = function clear() {
+    cache = {};
+    return localStorageWrapper.removeItem(CONFIG_STORE_KEY);
+  };
+
+  // unset
+  // ----------
+
+  // unsets a configuration. If configuration is present, calls
+  // config.set(key, undefined).
+  //
+  config.unset = function unset(key) {
+    delete cache[key];
+    localStorageWrapper.setObject(CONFIG_STORE_KEY, cache);
+  };
+
+  //
+  // load current configuration from localStore.
+  // The init method to be called on hoodie startup
+  //
+  function init() {
+    cache = localStorageWrapper.getObject(CONFIG_STORE_KEY);
+  }
+
+  // allow to run init only once
+  config.init = function() {
+    init();
+    delete config.init;
+  };
+
+  //
+  // subscribe to events coming from other modules
+  //
+  function subscribeToOutsideEvents() {
+    hoodie.on('account:cleanup', config.clear);
+  }
+
+  // allow to run this once from outside
+  config.subscribeToOutsideEvents = function() {
+    subscribeToOutsideEvents();
+    delete config.subscribeToOutsideEvents;
+  };
+
+}
+
+module.exports = hoodieConfig;
+
+
+},{"../utils/local_storage_wrapper":27}],12:[function(require,module,exports){
+>>>>>>> refactor/config
 // Hoodie Error
 // -------------
 
@@ -4142,7 +4169,11 @@ function hoodieStoreApi(hoodie, options) {
 
 module.exports = hoodieStoreApi;
 
+<<<<<<< HEAD
 },{"../../utils/promise/defer":27,"../../utils/promise/is_promise":29,"../../utils/promise/reject_with":31,"../../utils/promise/resolve_with":33,"../error/error":12,"../error/object_id":14,"../error/object_type":15,"../events":16,"./scoped":21,"extend":1}],19:[function(require,module,exports){
+=======
+},{"../../utils/promise/defer":28,"../../utils/promise/is_promise":30,"../../utils/promise/reject_with":32,"../../utils/promise/resolve_with":34,"../error/error":12,"../error/object_id":14,"../error/object_type":15,"../events":16,"./scoped":21,"extend":1}],19:[function(require,module,exports){
+>>>>>>> refactor/config
 module.exports = {
   api: require('./api'),
   remote: require('./remote'),
@@ -4916,7 +4947,11 @@ function hoodieRemoteStore(hoodie, options) {
 
 module.exports = hoodieRemoteStore;
 
+<<<<<<< HEAD
 },{"../../utils/generate_id":24,"../../utils/promise/resolve_with":33,"./api":18,"extend":1}],21:[function(require,module,exports){
+=======
+},{"../../utils/generate_id":24,"../../utils/promise/resolve_with":34,"./api":18,"extend":1}],21:[function(require,module,exports){
+>>>>>>> refactor/config
 // scoped Store
 // ============
 
@@ -5156,10 +5191,123 @@ module.exports = hoodiefyRequestErrorName;
 },{}],26:[function(require,module,exports){
 module.exports = {
   generateId: require('./generate_id'),
-  promise : require('./promise')
+  promise: require('./promise'),
+  localStorageWrapper: require('./local_storage_wrapper')
 };
 
+
+},{"./generate_id":24,"./local_storage_wrapper":27,"./promise":29}],27:[function(require,module,exports){
+var global=typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {};// Is persistant?
+// ----------------
+//
+
+exports.patchIfNotPersistant = function () {
+
+  if (!exports.isPersistent()) {
+    module.exports.getItem = function() { return null; };
+    module.exports.setItem = function() { return null; };
+    module.exports.removeItem = function() { return null; };
+    module.exports.key = function() { return null; };
+    module.exports.length = function() { return 0; };
+  }
+
+};
+
+// returns `true` or `false` depending on whether localStorage is supported or not.
+// Beware that some browsers like Safari do not support localStorage in private mode.
+//
+// inspired by this cappuccino commit
+// https://github.com/cappuccino/cappuccino/commit/063b05d9643c35b303568a28809e4eb3224f71ec
+//
+
+exports.isPersistent = function () {
+  try {
+
+    // we've to put this in here. I've seen Firefox throwing `Security error: 1000`
+    // when cookies have been disabled
+    if (!global.localStorage) {
+      return false;
+    }
+
+    // Just because localStorage exists does not mean it works. In particular it might be disabled
+    // as it is when Safari's private browsing mode is active.
+    localStorage.setItem('Storage-Test', '1');
+
+    // that should not happen ...
+    if (localStorage.getItem('Storage-Test') !== '1') {
+      return false;
+    }
+
+    // okay, let's clean up if we got here.
+    localStorage.removeItem('Storage-Test');
+  } catch (_error) {
+
+    // in case of an error, like Safari's Private Mode, return false
+    return false;
+  }
+
+  // we're good.
+  return true;
+
+};
+
+exports.setItem = function (name, item) {
+
+  if (typeof item === 'object') {
+    global.localStorage.setItem(name, window.JSON.stringify(item));
+  } else {
+    global.localStorage.setItem(name, item);
+  }
+
+};
+
+exports.getItem = function (name) {
+  var item = global.localStorage.getItem(name);
+
+  if (typeof item !== 'undefined') {
+    try {
+      item = global.JSON.parse(item);
+    } catch (e) {}
+  }
+
+  return item;
+};
+
+exports.removeItem = function (name) {
+  return global.localStorage.removeItem(name);
+};
+
+exports.clear = function () {
+  return global.localStorage.clear();
+};
+
+exports.key = function (nr) {
+  return global.localStorage.key(nr);
+};
+
+exports.length = function () {
+  return global.localStorage.length;
+};
+
+<<<<<<< HEAD
 },{"./generate_id":24,"./promise":28}],27:[function(require,module,exports){
+=======
+// more advanced localStorage wrappers to find/save objects
+exports.setObject = function (key, object) {
+  var store = extend({}, object);
+
+  delete store.type;
+  delete store.id;
+  return exports.setItem(key, global.JSON.stringify(store));
+};
+
+exports.getObject = function (key) {
+  return exports.getItem(key) ? exports.getItem(key) : false;
+};
+
+
+},{}],28:[function(require,module,exports){
+>>>>>>> refactor/config
 var global=typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {};module.exports = global.jQuery.Deferred;
 },{}],28:[function(require,module,exports){
 module.exports = {
@@ -5201,7 +5349,11 @@ function rejectWith(errorProperties) {
 
 module.exports = rejectWith;
 
+<<<<<<< HEAD
 },{"../../lib/error/error":12,"./defer":27}],32:[function(require,module,exports){
+=======
+},{"../../lib/error/error":12,"./defer":28}],33:[function(require,module,exports){
+>>>>>>> refactor/config
 var defer = require('./defer');
 //
 function resolve() {

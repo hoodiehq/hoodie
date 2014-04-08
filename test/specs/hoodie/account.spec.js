@@ -1,9 +1,11 @@
 require('../../lib/setup');
 
 var generateIdMock = require('../../mocks/utils/generate_id');
+var configMock = require('../../mocks/utils/config');
 var getDefer = require('../../../src/utils/promise/defer');
 
 global.stubRequire('src/utils/generate_id', generateIdMock);
+global.stubRequire('src/utils/config', configMock);
 
 var hoodieAccount = require('../../../src/hoodie/account');
 
@@ -136,7 +138,7 @@ describe('hoodie.account', function() {
 
             it('should not set _account.username config', function() {
               // because it's already 'joe@example.com'
-              expect(this.hoodie.config.set).to.not.be.calledWith('_account.username', 'joe@example.com');
+              expect(configMock.set).to.not.be.calledWith('_account.username', 'joe@example.com');
             });
           }); // returns valid session info for joe@example.com
 
@@ -211,9 +213,9 @@ describe('hoodie.account', function() {
 
         // NOTE:
         // I do not understand, why we have to resetBehavior here.
-        this.hoodie.config.get.resetBehavior();
+        configMock.get.resetBehavior();
 
-        this.hoodie.config.get.returns('randomPassword');
+        configMock.get.returns('randomPassword');
         this.sandbox.stub(this.account, 'hasAnonymousAccount').returns(true);
         this.sandbox.stub(this.account, 'signIn').returns('signIn_promise');
       });
@@ -387,9 +389,9 @@ describe('hoodie.account', function() {
 
           // NOTE:
           // I do not understand, why we have to resetBehavior here.
-          this.hoodie.config.get.resetBehavior();
+          configMock.get.resetBehavior();
 
-          this.hoodie.config.get.returns('randomPassword');
+          configMock.get.returns('randomPassword');
           this.account.username = 'randomUsername';
 
           this.promise = this.account.signUp('joe@example.com', 'secret', {
@@ -828,7 +830,7 @@ describe('hoodie.account', function() {
       it('should generate a password and store it locally in _account.anonymousPassword', function() {
         this.account.anonymousSignUp();
         expect(generateIdMock).to.be.calledWith(10);
-        expect(this.hoodie.config.set).to.be.calledWith('_account.anonymousPassword', 'uuid123');
+        expect(configMock.set).to.be.calledWith('_account.anonymousPassword', 'uuid123');
       });
     });
   }); // #anonymousSignUp
@@ -912,7 +914,7 @@ describe('hoodie.account', function() {
           this.account.signIn('joe@example.com', 'secret');
 
           expect(this.account.username).to.eql('joe@example.com');
-          expect(this.hoodie.config.set).to.be.calledWith('_account.username', 'joe@example.com');
+          expect(configMock.set).to.be.calledWith('_account.username', 'joe@example.com');
         });
 
         it('should fetch the _users doc', function() {
@@ -1633,7 +1635,7 @@ describe('hoodie.account', function() {
         });
 
         it('should not clear config', function() {
-          expect(this.hoodie.config.clear).to.not.be.called();
+          expect(configMock.clear).to.not.be.called();
         });
       }); // fetch fails with unknown error
     }); // user has account
@@ -1676,9 +1678,9 @@ describe('hoodie.account', function() {
 
         // NOTE:
         // I do not understand, why we have to resetBehavior here.
-        this.hoodie.config.get.resetBehavior();
+        configMock.get.resetBehavior();
 
-        this.hoodie.config.get.returns('joe/uuid567');
+        configMock.get.returns('joe/uuid567');
         this.account.resetPassword();
       });
 
@@ -1700,9 +1702,9 @@ describe('hoodie.account', function() {
 
         // NOTE:
         // I do not understand, why we have to resetBehavior here.
-        this.hoodie.config.get.resetBehavior();
+        configMock.get.resetBehavior();
 
-        this.hoodie.config.get.returns(void 0);
+        configMock.get.returns(void 0);
         generateIdMock.returns('uuid567');
 
         this.account.resetPassword('joe@example.com');
@@ -1715,7 +1717,7 @@ describe('hoodie.account', function() {
       });
 
       it('should generate a reset Password Id and store it locally', function() {
-        expect(this.hoodie.config.set).to.be.calledWith('_account.resetPasswordId', 'joe@example.com/uuid567');
+        expect(configMock.set).to.be.calledWith('_account.resetPasswordId', 'joe@example.com/uuid567');
       });
 
       it('should send a PUT request to /_users/org.couchdb.user%3A%24passwordReset%2Fjoe%40example.com%2Fuuid567', function() {

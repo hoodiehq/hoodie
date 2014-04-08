@@ -17,6 +17,7 @@
 //     hoodie.remote.init();
 //
 
+var config = require('../utils/config');
 var rejectWith = require('../utils/promise/reject_with');
 
 function hoodieRemote (hoodie) {
@@ -100,10 +101,10 @@ function hoodieRemote (hoodie) {
   //
   function sinceNrCallback(sinceNr) {
     if (sinceNr) {
-      return hoodie.config.set('_remote.since', sinceNr);
+      return config.set('_remote.since', sinceNr);
     }
 
-    return hoodie.config.get('_remote.since') || 0;
+    return config.get('_remote.since') || 0;
   }
 
   //

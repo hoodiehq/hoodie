@@ -1,6 +1,5 @@
 module.exports = {
   account: require('./account'),
-  config: require('./config'),
   connection: require('./connection'),
   events: require('./events'),
   hoodie: require('./hoodie'),
