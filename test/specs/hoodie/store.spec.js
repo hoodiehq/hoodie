@@ -323,7 +323,7 @@ describe('hoodie.store', function() {
 
       _and('options.silent is true', function() {
         beforeEach(function() {
-
+          this.store.trigger.reset();
           this.storeBackend.save({
             type: 'document',
             id: '123',
@@ -338,6 +338,10 @@ describe('hoodie.store', function() {
           var object = getLastSavedObject();
           expect(object.createdAt).to.be(undefined);
           expect(object.updatedAt).to.be(undefined);
+        });
+
+        it('should not trigger any events', function() {
+          expect(this.store.trigger).to.not.be.called();
         });
       }); // options.silent is true
 

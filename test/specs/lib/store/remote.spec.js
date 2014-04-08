@@ -871,9 +871,9 @@ describe('hoodieRemoteStore', function() {
         });
 
         it('should trigger push events for each object', function() {
-          expect(this.remote.trigger).to.be.calledWith('push', { type: 'todo', id: '1' });
-          expect(this.remote.trigger).to.be.calledWith('push', { type: 'todo', id: '2' });
-          expect(this.remote.trigger).to.be.calledWith('push', { type: 'todo', id: '3' });
+          expect(this.remote.trigger).to.be.calledWith('push', { type: 'todo', id: '1', _rev: '1-uuid123' });
+          expect(this.remote.trigger).to.be.calledWith('push', { type: 'todo', id: '2', _rev: '1-uuid123' });
+          expect(this.remote.trigger).to.be.calledWith('push', { type: 'todo', id: '3', _rev: '1-uuid123' });
         });
       });
     }); // Array of docs passed
