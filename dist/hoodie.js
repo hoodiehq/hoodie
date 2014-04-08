@@ -1,11 +1,8 @@
-<<<<<<< HEAD
-// Hoodie.js - 0.7.4
+// Hoodie.js - 0.7.5
 // https://github.com/hoodiehq/hoodie.js
 // Copyright 2012 - 2014 https://github.com/hoodiehq/
 // Licensed Apache License 2.0
 
-=======
->>>>>>> refactor/config
 !function(e){"object"==typeof exports?module.exports=e():"function"==typeof define&&define.amd?define(e):"undefined"!=typeof window?window.Hoodie=e():"undefined"!=typeof global?global.Hoodie=e():"undefined"!=typeof self&&(self.Hoodie=e())}(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);throw new Error("Cannot find module '"+o+"'")}var f=n[o]={exports:{}};t[o][0].call(f.exports,function(e){var n=t[o][1][e];return s(n?n:e)},f,f.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 var hasOwn = Object.prototype.hasOwnProperty;
 var toString = Object.prototype.toString;
@@ -101,12 +98,11 @@ var hoodieLocalStore = require('./hoodie/store');
 var hoodieTask = require('./hoodie/task');
 var hoodieOpen = require('./hoodie/open');
 var hoodieRequest = require('./hoodie/request');
-var hoodieConfig = require('./lib/config');
 var hoodieEvents = require('./lib/events');
 
 // for plugins
 var lib = require('./lib');
-var util = require('./utils');
+var utils = require('./utils');
 
 // Constructor
 // -------------
@@ -164,14 +160,8 @@ function Hoodie(baseUrl) {
   // * hoodie.store
   hoodie.extend(hoodieLocalStore);
 
-  // workaround, until we ship https://github.com/hoodiehq/hoodie.js/issues/199
-  hoodie.store.patchIfNotPersistant();
-
   // * hoodie.task
   hoodie.extend(hoodieTask);
-
-  // * hoodie.config
-  hoodie.extend(hoodieConfig);
 
   // * hoodie.account
   hoodie.extend(hoodieAccount);
@@ -190,14 +180,14 @@ function Hoodie(baseUrl) {
   // Initializations
   //
 
-  // init config
-  hoodie.config.init();
+  // cleanup config on signout
+  hoodie.on('account:cleanup', utils.config.clear);
 
   // init hoodieId
   hoodie.id.init();
 
   // set username from config (local store)
-  hoodie.account.username = hoodie.config.get('_account.username');
+  hoodie.account.username = utils.config.get('_account.username');
 
   // init hoodie.remote API
   hoodie.remote.init();
@@ -207,9 +197,6 @@ function Hoodie(baseUrl) {
 
   // hoodie.id
   hoodie.id.subscribeToOutsideEvents();
-
-  // hoodie.config
-  hoodie.config.subscribeToOutsideEvents();
 
   // hoodie.store
   hoodie.store.subscribeToOutsideEvents();
@@ -259,23 +246,20 @@ Hoodie.extend = function(extension) {
 //
 function applyExtensions(hoodie) {
   for (var i = 0; i < extensions.length; i++) {
-    extensions[i](hoodie, lib, util);
+    extensions[i](hoodie, lib, utils);
   }
 }
 
 module.exports = Hoodie;
 
-<<<<<<< HEAD
-},{"./hoodie/account":3,"./hoodie/config":4,"./hoodie/connection":5,"./hoodie/id":6,"./hoodie/open":7,"./hoodie/remote":8,"./hoodie/request":9,"./hoodie/store":10,"./hoodie/task":11,"./lib":17,"./lib/events":16,"./utils":26}],3:[function(require,module,exports){
-=======
-},{"./hoodie/account":3,"./hoodie/connection":4,"./hoodie/id":5,"./hoodie/open":6,"./hoodie/remote":7,"./hoodie/request":8,"./hoodie/store":9,"./hoodie/task":10,"./lib":17,"./lib/config":11,"./lib/events":16,"./utils":26}],3:[function(require,module,exports){
->>>>>>> refactor/config
+},{"./hoodie/account":3,"./hoodie/connection":4,"./hoodie/id":5,"./hoodie/open":6,"./hoodie/remote":7,"./hoodie/request":8,"./hoodie/store":9,"./hoodie/task":10,"./lib":16,"./lib/events":15,"./utils":26}],3:[function(require,module,exports){
 var global=typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {};// Hoodie.Account
 // ================
 
 var hoodieEvents = require('../lib/events');
 var extend = require('extend');
 var generateId = require('../utils/generate_id');
+var config = require('../utils/config');
 
 var getDefer = require('../utils/promise/defer');
 var reject = require('../utils/promise/reject');
@@ -496,15 +480,15 @@ function hoodieAccount(hoodie) {
   var anonymousPasswordKey = '_account.anonymousPassword';
 
   function setAnonymousPassword(password) {
-    return hoodie.config.set(anonymousPasswordKey, password);
+    return config.set(anonymousPasswordKey, password);
   }
 
   function getAnonymousPassword() {
-    return hoodie.config.get(anonymousPasswordKey);
+    return config.get(anonymousPasswordKey);
   }
 
   function removeAnonymousPassword() {
-    return hoodie.config.unset(anonymousPasswordKey);
+    return config.unset(anonymousPasswordKey);
   }
 
 
@@ -645,7 +629,7 @@ function hoodieAccount(hoodie) {
   account.resetPassword = function resetPassword(username) {
     var data, key, options, resetPasswordId;
 
-    resetPasswordId = hoodie.config.get('_account.resetPasswordId');
+    resetPasswordId = config.get('_account.resetPasswordId');
 
     if (resetPasswordId) {
       return account.checkPasswordReset();
@@ -653,7 +637,7 @@ function hoodieAccount(hoodie) {
 
     resetPasswordId = '' + username + '/' + (generateId());
 
-    hoodie.config.set('_account.resetPasswordId', resetPasswordId);
+    config.set('_account.resetPasswordId', resetPasswordId);
 
     key = '' + userDocPrefix + ':$passwordReset/' + resetPasswordId;
 
@@ -696,7 +680,7 @@ function hoodieAccount(hoodie) {
     var hash, options, resetPasswordId, url, username;
 
     // reject if there is no pending password reset request
-    resetPasswordId = hoodie.config.get('_account.resetPasswordId');
+    resetPasswordId = config.get('_account.resetPasswordId');
 
     if (!resetPasswordId) {
       return rejectWith('No pending password reset.');
@@ -793,7 +777,7 @@ function hoodieAccount(hoodie) {
     }
 
     account.username = newUsername;
-    return hoodie.config.set('_account.username', newUsername);
+    return config.set('_account.username', newUsername);
   }
 
 
@@ -1065,7 +1049,7 @@ function hoodieAccount(hoodie) {
   //
   function handlePasswordResetStatusRequestError(error) {
     if (error.name === 'HoodieUnauthorizedError') {
-      hoodie.config.unset('_account.resetPasswordId');
+      config.unset('_account.resetPasswordId');
       account.trigger('passwordreset');
 
       return resolve();
@@ -1121,7 +1105,7 @@ function hoodieAccount(hoodie) {
 
     // cleanup
     account.request('PUT', url, options);
-    hoodie.config.unset('_account.resetPasswordId');
+    config.unset('_account.resetPasswordId');
   }
 
   //
@@ -1456,133 +1440,7 @@ function hoodieAccount(hoodie) {
 
 module.exports = hoodieAccount;
 
-<<<<<<< HEAD
-},{"../lib/events":16,"../utils/generate_id":24,"../utils/promise/defer":27,"../utils/promise/reject":30,"../utils/promise/reject_with":31,"../utils/promise/resolve":32,"../utils/promise/resolve_with":33,"extend":1}],4:[function(require,module,exports){
-// Hoodie Config API
-// ===================
-
-var resolve = require('../utils/promise/resolve');
-
-//
-function hoodieConfig(hoodie) {
-
-  var type = '$config';
-  var id = 'hoodie';
-  var cache = {};
-
-  // public API
-  var config = {};
-
-
-  // set
-  // ----------
-
-  // adds a configuration
-  //
-  config.set = function set(key, value) {
-    var isSilent, update;
-
-    if (cache[key] === value) {
-      return;
-    }
-
-    cache[key] = value;
-
-    update = {};
-    update[key] = value;
-    isSilent = key.charAt(0) === '_';
-
-    // we have to assure that _hoodieId has always the
-    // same value as createdBy for $config/hoodie
-    // Also see config.js:77ff
-    if (key === '_hoodieId') {
-      hoodie.store.remove(type, id, {silent: true});
-      update = cache;
-    }
-
-    return hoodie.store.updateOrAdd(type, id, update, {
-      silent: isSilent
-    });
-  };
-
-  // get
-  // ----------
-
-  // receives a configuration
-  //
-  config.get = function get(key) {
-    return cache[key];
-  };
-
-  // clear
-  // ----------
-
-  // clears cache and removes object from store
-  //
-  config.clear = function clear() {
-    cache = {};
-    return hoodie.store.remove(type, id);
-  };
-
-  // unset
-  // ----------
-
-  // unsets a configuration. If configuration is present, calls
-  // config.set(key, undefined). Otherwise resolves without store
-  // interaction.
-  //
-  config.unset = function unset(key) {
-    if (typeof config.get(key) === 'undefined') {
-      return resolve();
-    }
-
-    return config.set(key, undefined);
-  };
-
-  //
-  // load current configuration from localStore.
-  // The init method to be called on hoodie startup
-  //
-  function init() {
-    // TODO: I really don't like this being here. And I don't like that if the
-    //       store API will be truly async one day, this will fall on our feet.
-    //       We should discuss if we make config a simple object in localStorage,
-    //       outside of hoodie.store, and use localStorage sync API directly to
-    //       interact with it, also in future versions.
-    hoodie.store.find(type, id).done(function(obj) {
-      cache = obj;
-    });
-  }
-
-  // allow to run init only once
-  config.init = function() {
-    init();
-    delete config.init;
-  };
-
-  //
-  // subscribe to events coming from other modules
-  //
-  function subscribeToOutsideEvents() {
-    hoodie.on('account:cleanup', config.clear);
-  }
-
-  // allow to run this once from outside
-  config.subscribeToOutsideEvents = function() {
-    subscribeToOutsideEvents();
-    delete config.subscribeToOutsideEvents;
-  };
-
-  // exspose public API
-  hoodie.config = config;
-}
-
-module.exports = hoodieConfig;
-
-},{"../utils/promise/resolve":32}],5:[function(require,module,exports){
-=======
-},{"../lib/events":16,"../utils/generate_id":24,"../utils/promise/defer":28,"../utils/promise/reject":31,"../utils/promise/reject_with":32,"../utils/promise/resolve":33,"../utils/promise/resolve_with":34,"extend":1}],4:[function(require,module,exports){
->>>>>>> refactor/config
+},{"../lib/events":15,"../utils/config":23,"../utils/generate_id":24,"../utils/promise/defer":28,"../utils/promise/reject":31,"../utils/promise/reject_with":32,"../utils/promise/resolve":33,"../utils/promise/resolve_with":34,"extend":1}],4:[function(require,module,exports){
 var global=typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {};// hoodie.checkConnection() & hoodie.isConnected()
 // =================================================
 
@@ -1681,17 +1539,14 @@ function hoodieConnection(hoodie) {
 
 module.exports = hoodieConnection;
 
-<<<<<<< HEAD
-},{"../utils/promise/reject":30,"../utils/promise/resolve":32}],6:[function(require,module,exports){
-=======
 },{"../utils/promise/reject":31,"../utils/promise/resolve":33}],5:[function(require,module,exports){
->>>>>>> refactor/config
 // hoodie.id
 // =========
 
 var generateId = require('../utils/generate_id');
+var config = require('../utils/config');
 
-// generates a random id and persists using hoodie.config
+// generates a random id and persists using config
 // until the user signs out or deletes local data
 function hoodieId (hoodie) {
   var id;
@@ -1706,23 +1561,23 @@ function hoodieId (hoodie) {
   function setId(newId) {
     id = newId;
     
-    hoodie.config.set('_hoodieId', newId);
+    config.set('_hoodieId', newId);
   }
 
   function unsetId () {
     id = undefined;
-    hoodie.config.unset('_hoodieId');
+    config.unset('_hoodieId');
   }
 
   //
   // initialize
   //
   function init() {
-    id = hoodie.config.get('_hoodieId');
+    id = config.get('_hoodieId');
 
     // DEPRECATED, remove before 1.0
     if (! id) {
-      id = hoodie.config.get('_account.ownerHash');
+      id = config.get('_account.ownerHash');
     }
   }
 
@@ -1756,11 +1611,7 @@ function hoodieId (hoodie) {
 
 module.exports = hoodieId;
 
-<<<<<<< HEAD
-},{"../utils/generate_id":24}],7:[function(require,module,exports){
-=======
-},{"../utils/generate_id":24}],6:[function(require,module,exports){
->>>>>>> refactor/config
+},{"../utils/config":23,"../utils/generate_id":24}],6:[function(require,module,exports){
 // Open stores
 // -------------
 
@@ -1791,11 +1642,7 @@ function hoodieOpen(hoodie) {
 
 module.exports = hoodieOpen;
 
-<<<<<<< HEAD
-},{"../lib/store/remote":20,"extend":1}],8:[function(require,module,exports){
-=======
-},{"../lib/store/remote":20,"extend":1}],7:[function(require,module,exports){
->>>>>>> refactor/config
+},{"../lib/store/remote":19,"extend":1}],7:[function(require,module,exports){
 // AccountRemote
 // ===============
 
@@ -1815,6 +1662,7 @@ module.exports = hoodieOpen;
 //     hoodie.remote.init();
 //
 
+var config = require('../utils/config');
 var rejectWith = require('../utils/promise/reject_with');
 
 function hoodieRemote (hoodie) {
@@ -1898,10 +1746,10 @@ function hoodieRemote (hoodie) {
   //
   function sinceNrCallback(sinceNr) {
     if (sinceNr) {
-      return hoodie.config.set('_remote.since', sinceNr);
+      return config.set('_remote.since', sinceNr);
     }
 
-    return hoodie.config.get('_remote.since') || 0;
+    return config.get('_remote.since') || 0;
   }
 
   //
@@ -1954,11 +1802,7 @@ function hoodieRemoteFactory(hoodie) {
 
 module.exports = hoodieRemoteFactory;
 
-<<<<<<< HEAD
-},{"../utils/promise/reject_with":31}],9:[function(require,module,exports){
-=======
-},{"../utils/promise/reject_with":32}],8:[function(require,module,exports){
->>>>>>> refactor/config
+},{"../utils/config":23,"../utils/promise/reject_with":32}],8:[function(require,module,exports){
 //
 // hoodie.request
 // ================
@@ -2114,11 +1958,7 @@ function hoodieRequest(hoodie) {
 
 module.exports = hoodieRequest;
 
-<<<<<<< HEAD
-},{"../utils/hoodiefy_request_error_name":25,"../utils/promise/reject_with":31,"extend":1}],10:[function(require,module,exports){
-=======
 },{"../utils/hoodiefy_request_error_name":25,"../utils/promise/reject_with":32,"extend":1}],9:[function(require,module,exports){
->>>>>>> refactor/config
 var global=typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {};// LocalStore
 // ============
 
@@ -2637,7 +2477,7 @@ function hoodieStore (hoodie) {
   // Pass `options.remote = true` when object comes from remote
   // Pass 'options.silent = true' to avoid events from being triggered.
   function cache(type, id, object, options) {
-    var key;
+    var key, storedObject;
 
     if (object === undefined) {
       object = false;
@@ -2652,7 +2492,11 @@ function hoodieStore (hoodie) {
         id: id
       });
 
-      localStorageWrapper.setObject(key, object);
+      // we do not store type & id in localStorage values
+      storedObject = extend({}, object);
+      delete storedObject.type;
+      delete storedObject.id;
+      localStorageWrapper.setObject(key, storedObject);
 
       if (options.remote) {
         clearChanged(type, id);
@@ -2688,6 +2532,10 @@ function hoodieStore (hoodie) {
         cachedObject[key] = false;
         return false;
       }
+
+      // add type & id as we don't store these in localStorage values
+      object.type = type;
+      object.id = id;
 
     }
 
@@ -2986,11 +2834,6 @@ function hoodieStore (hoodie) {
   }
 
   //
-  // patchIfNotPersistant
-  //
-  localStorageWrapper.patchIfNotPersistant();
-
-  //
   // initialization
   // ----------------
   //
@@ -3011,21 +2854,11 @@ function hoodieStore (hoodie) {
     bootstrapDirtyObjects();
     delete store.bootstrapDirtyObjects;
   };
-
-  // allow to run this once from outside
-  store.patchIfNotPersistant = function() {
-    localStorageWrapper.patchIfNotPersistant();
-    delete store.patchIfNotPersistant;
-  };
 }
 
 module.exports = hoodieStore;
 
-<<<<<<< HEAD
-},{"../lib/error/object_id":14,"../lib/error/object_type":15,"../lib/store/api":18,"../utils/generate_id":24,"../utils/promise/defer":27,"../utils/promise/reject_with":31,"../utils/promise/resolve_with":33,"extend":1}],11:[function(require,module,exports){
-=======
-},{"../lib/error/object_id":14,"../lib/error/object_type":15,"../lib/store/api":18,"../utils/generate_id":24,"../utils/local_storage_wrapper":27,"../utils/promise/defer":28,"../utils/promise/reject_with":32,"../utils/promise/resolve_with":34,"extend":1}],10:[function(require,module,exports){
->>>>>>> refactor/config
+},{"../lib/error/object_id":13,"../lib/error/object_type":14,"../lib/store/api":17,"../utils/generate_id":24,"../utils/local_storage_wrapper":27,"../utils/promise/defer":28,"../utils/promise/reject_with":32,"../utils/promise/resolve_with":34,"extend":1}],10:[function(require,module,exports){
 // Tasks
 // ============
 
@@ -3335,99 +3168,7 @@ function hoodieTask(hoodie) {
 
 module.exports = hoodieTask;
 
-<<<<<<< HEAD
-},{"../lib/error/error":12,"../lib/events":16,"../lib/task/scoped":23,"../utils/promise/defer":27,"extend":1}],12:[function(require,module,exports){
-=======
-},{"../lib/error/error":12,"../lib/events":16,"../lib/task/scoped":23,"../utils/promise/defer":28,"extend":1}],11:[function(require,module,exports){
-// Hoodie Config API
-// ===================
-
-var localStorageWrapper = require('../utils/local_storage_wrapper');
-
-//
-function hoodieConfig(hoodie) {
-
-  var CONFIG_STORE_KEY = '_hoodie_config';
-  var cache = {};
-
-  // public API
-  var config = {};
-
-
-  // set
-  // ----------
-
-  // adds a configuration
-  //
-  config.set = function set(key, value) {
-    cache[key] = value;
-    localStorageWrapper.setObject(CONFIG_STORE_KEY, cache);
-  };
-
-  // get
-  // ----------
-
-  // receives a configuration
-  //
-  config.get = function get(key) {
-    return cache[key];
-  };
-
-  // clear
-  // ----------
-
-  // clears cache and removes object from localStorageWrapper
-  //
-  config.clear = function clear() {
-    cache = {};
-    return localStorageWrapper.removeItem(CONFIG_STORE_KEY);
-  };
-
-  // unset
-  // ----------
-
-  // unsets a configuration. If configuration is present, calls
-  // config.set(key, undefined).
-  //
-  config.unset = function unset(key) {
-    delete cache[key];
-    localStorageWrapper.setObject(CONFIG_STORE_KEY, cache);
-  };
-
-  //
-  // load current configuration from localStore.
-  // The init method to be called on hoodie startup
-  //
-  function init() {
-    cache = localStorageWrapper.getObject(CONFIG_STORE_KEY);
-  }
-
-  // allow to run init only once
-  config.init = function() {
-    init();
-    delete config.init;
-  };
-
-  //
-  // subscribe to events coming from other modules
-  //
-  function subscribeToOutsideEvents() {
-    hoodie.on('account:cleanup', config.clear);
-  }
-
-  // allow to run this once from outside
-  config.subscribeToOutsideEvents = function() {
-    subscribeToOutsideEvents();
-    delete config.subscribeToOutsideEvents;
-  };
-
-}
-
-module.exports = hoodieConfig;
-
-
-},{"../utils/local_storage_wrapper":27}],12:[function(require,module,exports){
->>>>>>> refactor/config
+},{"../lib/error/error":11,"../lib/events":15,"../lib/task/scoped":22,"../utils/promise/defer":28,"extend":1}],11:[function(require,module,exports){
 // Hoodie Error
 // -------------
 
@@ -3493,14 +3234,14 @@ HoodieError.prototype.constructor = HoodieError;
 module.exports = HoodieError;
 
 
-},{"extend":1}],13:[function(require,module,exports){
+},{"extend":1}],12:[function(require,module,exports){
 module.exports = {
   error: require('./error'),
   objectId: require('./object_id'),
   objectType: require('./object_type')
 };
 
-},{"./error":12,"./object_id":14,"./object_type":15}],14:[function(require,module,exports){
+},{"./error":11,"./object_id":13,"./object_type":14}],13:[function(require,module,exports){
 // Hoodie Invalid Type Or Id Error
 // -------------------------------
 
@@ -3527,7 +3268,7 @@ HoodieObjectIdError.prototype.rules = 'Lowercase letters, numbers and dashes all
 
 module.exports = HoodieObjectIdError;
 
-},{"./error":12}],15:[function(require,module,exports){
+},{"./error":11}],14:[function(require,module,exports){
 // Hoodie Invalid Type Or Id Error
 // -------------------------------
 
@@ -3561,7 +3302,7 @@ HoodieObjectTypeError.prototype.rules = 'lowercase letters, numbers and dashes a
 
 module.exports = HoodieObjectTypeError;
 
-},{"./error":12}],16:[function(require,module,exports){
+},{"./error":11}],15:[function(require,module,exports){
 // Events
 // ========
 //
@@ -3725,7 +3466,7 @@ function hoodieEvents(hoodie, options) {
 
 module.exports = hoodieEvents;
 
-},{}],17:[function(require,module,exports){
+},{}],16:[function(require,module,exports){
 module.exports = {
   error: require('./error'),
   events: require('./events'),
@@ -3733,7 +3474,7 @@ module.exports = {
   task: require('./task')
 };
 
-},{"./error":13,"./events":16,"./store":19,"./task":22}],18:[function(require,module,exports){
+},{"./error":12,"./events":15,"./store":18,"./task":21}],17:[function(require,module,exports){
 // Store
 // ============
 
@@ -4169,18 +3910,14 @@ function hoodieStoreApi(hoodie, options) {
 
 module.exports = hoodieStoreApi;
 
-<<<<<<< HEAD
-},{"../../utils/promise/defer":27,"../../utils/promise/is_promise":29,"../../utils/promise/reject_with":31,"../../utils/promise/resolve_with":33,"../error/error":12,"../error/object_id":14,"../error/object_type":15,"../events":16,"./scoped":21,"extend":1}],19:[function(require,module,exports){
-=======
-},{"../../utils/promise/defer":28,"../../utils/promise/is_promise":30,"../../utils/promise/reject_with":32,"../../utils/promise/resolve_with":34,"../error/error":12,"../error/object_id":14,"../error/object_type":15,"../events":16,"./scoped":21,"extend":1}],19:[function(require,module,exports){
->>>>>>> refactor/config
+},{"../../utils/promise/defer":28,"../../utils/promise/is_promise":30,"../../utils/promise/reject_with":32,"../../utils/promise/resolve_with":34,"../error/error":11,"../error/object_id":13,"../error/object_type":14,"../events":15,"./scoped":20,"extend":1}],18:[function(require,module,exports){
 module.exports = {
   api: require('./api'),
   remote: require('./remote'),
   scoped: require('./scoped')
 };
 
-},{"./api":18,"./remote":20,"./scoped":21}],20:[function(require,module,exports){
+},{"./api":17,"./remote":19,"./scoped":20}],19:[function(require,module,exports){
 var global=typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {};// Remote
 // ========
 
@@ -4947,11 +4684,7 @@ function hoodieRemoteStore(hoodie, options) {
 
 module.exports = hoodieRemoteStore;
 
-<<<<<<< HEAD
-},{"../../utils/generate_id":24,"../../utils/promise/resolve_with":33,"./api":18,"extend":1}],21:[function(require,module,exports){
-=======
-},{"../../utils/generate_id":24,"../../utils/promise/resolve_with":34,"./api":18,"extend":1}],21:[function(require,module,exports){
->>>>>>> refactor/config
+},{"../../utils/generate_id":24,"../../utils/promise/resolve_with":34,"./api":17,"extend":1}],20:[function(require,module,exports){
 // scoped Store
 // ============
 
@@ -5064,12 +4797,12 @@ function hoodieScopedStoreApi(hoodie, storeApi, options) {
 
 module.exports = hoodieScopedStoreApi;
 
-},{"../events":16}],22:[function(require,module,exports){
+},{"../events":15}],21:[function(require,module,exports){
 module.exports = {
   scoped: require('./scoped')
 };
 
-},{"./scoped":23}],23:[function(require,module,exports){
+},{"./scoped":22}],22:[function(require,module,exports){
 // scoped Store
 // ============
 
@@ -5146,7 +4879,73 @@ function hoodieScopedTask(hoodie, taskApi, options) {
 
 module.exports = hoodieScopedTask;
 
-},{"../events":16}],24:[function(require,module,exports){
+},{"../events":15}],23:[function(require,module,exports){
+// Hoodie Config API
+// ===================
+
+var localStorageWrapper = require('../utils/local_storage_wrapper');
+
+// public API
+var config = {};
+
+var CONFIG_STORE_KEY = '_hoodie_config';
+var cache;
+
+// set
+// ----------
+
+// adds a configuration
+//
+config.set = function set(key, value) {
+  cache[key] = value;
+  localStorageWrapper.setObject(CONFIG_STORE_KEY, cache);
+};
+
+// get
+// ----------
+
+// receives a configuration
+//
+config.get = function get(key) {
+  return cache[key];
+};
+
+// clear
+// ----------
+
+// clears cache and removes object from localStorageWrapper
+//
+config.clear = function clear() {
+  cache = {};
+  return localStorageWrapper.removeItem(CONFIG_STORE_KEY);
+};
+
+// unset
+// ----------
+
+// unsets a configuration. If configuration is present, calls
+// config.set(key, undefined).
+//
+config.unset = function unset(key) {
+  delete cache[key];
+  localStorageWrapper.setObject(CONFIG_STORE_KEY, cache);
+};
+
+//
+// load current configuration from localStore.
+// The init method needs to be called once on startup
+//
+function init() {
+  cache = localStorageWrapper.getObject(CONFIG_STORE_KEY) || {};
+}
+
+// initialize
+init();
+
+module.exports = config;
+
+
+},{"../utils/local_storage_wrapper":27}],24:[function(require,module,exports){
 var chars, i, radix;
 
 // uuids consist of numbers and lowercase letters only.
@@ -5190,28 +4989,79 @@ function hoodiefyRequestErrorName (name) {
 module.exports = hoodiefyRequestErrorName;
 },{}],26:[function(require,module,exports){
 module.exports = {
+  config: require('./config'),
   generateId: require('./generate_id'),
-  promise: require('./promise'),
-  localStorageWrapper: require('./local_storage_wrapper')
+  localStorageWrapper: require('./local_storage_wrapper'),
+  promise: require('./promise')
 };
 
 
-},{"./generate_id":24,"./local_storage_wrapper":27,"./promise":29}],27:[function(require,module,exports){
-var global=typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {};// Is persistant?
-// ----------------
-//
+},{"./config":23,"./generate_id":24,"./local_storage_wrapper":27,"./promise":29}],27:[function(require,module,exports){
+var global=typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {};// public API
+var store = {};
 
-exports.patchIfNotPersistant = function () {
+store.setItem = function (name, item) {
+  global.localStorage.setItem(name, item);
+};
 
-  if (!exports.isPersistent()) {
-    module.exports.getItem = function() { return null; };
-    module.exports.setItem = function() { return null; };
-    module.exports.removeItem = function() { return null; };
-    module.exports.key = function() { return null; };
-    module.exports.length = function() { return 0; };
+store.getItem = function (name) {
+  return global.localStorage.getItem(name);
+};
+
+store.removeItem = function (name) {
+  return global.localStorage.removeItem(name);
+};
+
+store.clear = function () {
+  return global.localStorage.clear();
+};
+
+store.key = function (nr) {
+  return global.localStorage.key(nr);
+};
+
+store.length = function () {
+  return global.localStorage.length;
+};
+
+// more advanced localStorage wrappers to find/save objects
+store.setObject = function (key, object) {
+  return store.setItem(key, global.JSON.stringify(object));
+};
+
+store.getObject = function (key) {
+  var item = store.getItem(key);
+
+  if (! item) {
+    return null;
   }
 
+  try {
+    return global.JSON.parse(item);
+  } catch (e) {
+    return null;
+  }
 };
+
+function init() {
+  store.isPersistent = isPersistent();
+  if (store.isPersistent) {
+    return;
+  }
+
+  // if store is not persistent, patch all store methods
+  store.getItem = function() { return null; };
+  store.setItem = function() { return null; };
+  store.removeItem = function() { return null; };
+  store.key = function() { return null; };
+  store.length = function() { return 0; };
+  store.isPersistent = function() { return false; };
+}
+
+
+// Is persistant?
+// ----------------
+//
 
 // returns `true` or `false` depending on whether localStorage is supported or not.
 // Beware that some browsers like Safari do not support localStorage in private mode.
@@ -5220,7 +5070,7 @@ exports.patchIfNotPersistant = function () {
 // https://github.com/cappuccino/cappuccino/commit/063b05d9643c35b303568a28809e4eb3224f71ec
 //
 
-exports.isPersistent = function () {
+function isPersistent() {
   try {
 
     // we've to put this in here. I've seen Firefox throwing `Security error: 1000`
@@ -5248,68 +5098,16 @@ exports.isPersistent = function () {
 
   // we're good.
   return true;
+}
 
-};
+// initialize
+init();
 
-exports.setItem = function (name, item) {
-
-  if (typeof item === 'object') {
-    global.localStorage.setItem(name, window.JSON.stringify(item));
-  } else {
-    global.localStorage.setItem(name, item);
-  }
-
-};
-
-exports.getItem = function (name) {
-  var item = global.localStorage.getItem(name);
-
-  if (typeof item !== 'undefined') {
-    try {
-      item = global.JSON.parse(item);
-    } catch (e) {}
-  }
-
-  return item;
-};
-
-exports.removeItem = function (name) {
-  return global.localStorage.removeItem(name);
-};
-
-exports.clear = function () {
-  return global.localStorage.clear();
-};
-
-exports.key = function (nr) {
-  return global.localStorage.key(nr);
-};
-
-exports.length = function () {
-  return global.localStorage.length;
-};
-
-<<<<<<< HEAD
-},{"./generate_id":24,"./promise":28}],27:[function(require,module,exports){
-=======
-// more advanced localStorage wrappers to find/save objects
-exports.setObject = function (key, object) {
-  var store = extend({}, object);
-
-  delete store.type;
-  delete store.id;
-  return exports.setItem(key, global.JSON.stringify(store));
-};
-
-exports.getObject = function (key) {
-  return exports.getItem(key) ? exports.getItem(key) : false;
-};
-
+module.exports = store;
 
 },{}],28:[function(require,module,exports){
->>>>>>> refactor/config
 var global=typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {};module.exports = global.jQuery.Deferred;
-},{}],28:[function(require,module,exports){
+},{}],29:[function(require,module,exports){
 module.exports = {
   defer: require('./defer'),
   isPromise: require('./is_promise'),
@@ -5319,7 +5117,7 @@ module.exports = {
   resolve: require('./resolve'),
 };
 
-},{"./defer":27,"./is_promise":29,"./reject":30,"./reject_with":31,"./resolve":32,"./resolve_with":33}],29:[function(require,module,exports){
+},{"./defer":28,"./is_promise":30,"./reject":31,"./reject_with":32,"./resolve":33,"./resolve_with":34}],30:[function(require,module,exports){
 // returns true if passed object is a promise (but not a deferred),
 // otherwise false.
 function isPromise(object) {
@@ -5329,7 +5127,7 @@ function isPromise(object) {
 }
 
 module.exports = isPromise;
-},{}],30:[function(require,module,exports){
+},{}],31:[function(require,module,exports){
 var defer = require('./defer');
 //
 function reject() {
@@ -5337,7 +5135,7 @@ function reject() {
 }
 
 module.exports = reject;
-},{"./defer":27}],31:[function(require,module,exports){
+},{"./defer":28}],32:[function(require,module,exports){
 var getDefer = require('./defer');
 var HoodieError = require('../../lib/error/error');
 
@@ -5349,11 +5147,7 @@ function rejectWith(errorProperties) {
 
 module.exports = rejectWith;
 
-<<<<<<< HEAD
-},{"../../lib/error/error":12,"./defer":27}],32:[function(require,module,exports){
-=======
-},{"../../lib/error/error":12,"./defer":28}],33:[function(require,module,exports){
->>>>>>> refactor/config
+},{"../../lib/error/error":11,"./defer":28}],33:[function(require,module,exports){
 var defer = require('./defer');
 //
 function resolve() {
@@ -5361,7 +5155,7 @@ function resolve() {
 }
 
 module.exports = resolve;
-},{"./defer":27}],33:[function(require,module,exports){
+},{"./defer":28}],34:[function(require,module,exports){
 var getDefer = require('./defer');
 
 //
@@ -5372,7 +5166,7 @@ function resolveWith() {
 
 module.exports = resolveWith;
 
-},{"./defer":27}]},{},[2])
+},{"./defer":28}]},{},[2])
 (2)
 });
 ;
