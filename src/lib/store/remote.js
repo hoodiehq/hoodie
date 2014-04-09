@@ -395,7 +395,7 @@ function hoodieRemoteStore(hoodie, options) {
     // don't mess with the originals
     objects = objects.map(function(object) {
       return extend(true, {}, object);
-    })
+    });
 
     objectsForRemote = [];
     for (var i = 0; i < objects.length; i++) {
