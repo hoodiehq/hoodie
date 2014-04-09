@@ -261,7 +261,7 @@ function hoodieStoreApi(hoodie, options) {
         for (var key in objectUpdate) {
           if (objectUpdate.hasOwnProperty(key)) {
             value = objectUpdate[key];
-            if ((currentObject[key] !== value) === false) {
+            if (currentObject[key] === value) {
               continue;
             }
             // workaround for undefined values, as extend ignores these
