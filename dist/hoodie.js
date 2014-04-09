@@ -1,4 +1,4 @@
-// Hoodie.js - 0.7.5
+// Hoodie.js - 0.8.1
 // https://github.com/hoodiehq/hoodie.js
 // Copyright 2012 - 2014 https://github.com/hoodiehq/
 // Licensed Apache License 2.0
@@ -1759,7 +1759,6 @@ function hoodieRemote (hoodie) {
 
     hoodie.on('remote:connect', function() {
       hoodie.on('store:idle', remote.push);
-      remote.push();
     });
 
     hoodie.on('remote:disconnect', function() {
@@ -2101,7 +2100,9 @@ function hoodieStore (hoodie) {
       object = cache(object.type, object.id, object, options);
       defer.resolve(object, isNew).promise();
       event = isNew ? 'add' : 'update';
-      triggerEvents(event, object, options);
+      if (!options.silent) {
+        triggerEvents(event, object, options);
+      }
     } catch (_error) {
       error = _error;
       defer.reject(error.toString());
@@ -2683,9 +2684,23 @@ function hoodieStore (hoodie) {
 
   //
   // all local changes get bulk pushed. For each object with local
-  // changes that have been pushed we trigger a sync event
+  // changes that have been pushed we trigger a sync event.
+  // Besides that, we also remove objects that have only been marked
+  // as _deleted and mark the others as synced.
   function handlePushedObject(object) {
     triggerEvents('sync', object);
+
+    if (object._deleted) {
+      store.remove(object.type, object.id, {
+        remote: true,
+        silent: true
+      });
+    } else {
+      store.save(object.type, object.id, object, {
+        remote: true,
+        silent: true
+      });
+    }
   }
 
   // store IDs of dirty objects
@@ -3738,7 +3753,7 @@ function hoodieStoreApi(hoodie, options) {
         for (var key in objectUpdate) {
           if (objectUpdate.hasOwnProperty(key)) {
             value = objectUpdate[key];
-            if ((currentObject[key] !== value) === false) {
+            if (currentObject[key] === value) {
               continue;
             }
             // workaround for undefined values, as extend ignores these
@@ -4299,10 +4314,12 @@ function hoodieRemoteStore(hoodie, options) {
   // Push objects to remote store using the `_bulk_docs` API.
   //
   var pushRequest;
+  var pushedObjectRevisions = {};
   remote.push = function push(objects) {
-    var object, objectsForRemote, _i, _len;
+    var object;
+    var objectsForRemote = [];
 
-    if (!$.isArray(objects)) {
+    if (! $.isArray(objects)) {
       objects = defaultObjectsToPush();
     }
 
@@ -4310,15 +4327,22 @@ function hoodieRemoteStore(hoodie, options) {
       return resolveWith([]);
     }
 
+    // don't mess with the originals
+    objects = objects.map(function(object) {
+      return extend(true, {}, object);
+    });
+
     objectsForRemote = [];
+    for (var i = 0; i < objects.length; i++) {
 
-    for (_i = 0, _len = objects.length; _i < _len; _i++) {
-
-      // don't mess with original objects
-      object = extend(true, {}, objects[_i]);
+      object = objects[i];
       addRevisionTo(object);
       object = parseForRemote(object);
       objectsForRemote.push(object);
+
+      // store the revision to prevent change events from
+      // being triggered for the same object revisions
+      pushedObjectRevisions[object._rev] = 1;
     }
     pushRequest = remote.request('POST', '/_bulk_docs', {
       data: {
@@ -4329,6 +4353,7 @@ function hoodieRemoteStore(hoodie, options) {
 
     pushRequest.done(function() {
       for (var i = 0; i < objects.length; i++) {
+        delete objects[i]._revisions;
         remote.trigger('push', objects[i]);
       }
     });
@@ -4630,12 +4655,16 @@ function hoodieRemoteStore(hoodie, options) {
   // ### handle changes from remote
   //
   function handlePullResults(changes) {
-    var doc, event, object, _i, _len;
+    var doc, event, object;
 
-    for (_i = 0, _len = changes.length; _i < _len; _i++) {
-      doc = changes[_i].doc;
+    for (var i = 0; i < changes.length; i++) {
+      doc = changes[i].doc;
 
       if (remote.prefix && doc._id.indexOf(remote.prefix) !== 0) {
+        continue;
+      }
+
+      if (pushedObjectRevisions[doc._rev]) {
         continue;
       }
 
@@ -4663,6 +4692,10 @@ function hoodieRemoteStore(hoodie, options) {
       remote.trigger('change:' + object.type, event, object);
       remote.trigger('change:' + object.type + ':' + object.id, event, object);
     }
+
+    // reset the hash for pushed object revisison after
+    // every response from the longpoll GET /_changes 
+    pushedObjectRevisions = {};
   }
 
 
