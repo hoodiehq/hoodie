@@ -140,7 +140,9 @@ function hoodieStore (hoodie) {
       object = cache(object.type, object.id, object, options);
       defer.resolve(object, isNew).promise();
       event = isNew ? 'add' : 'update';
-      triggerEvents(event, object, options);
+      if (!options.silent) {
+        triggerEvents(event, object, options);
+      }
     } catch (_error) {
       error = _error;
       defer.reject(error.toString());
@@ -722,9 +724,23 @@ function hoodieStore (hoodie) {
 
   //
   // all local changes get bulk pushed. For each object with local
-  // changes that have been pushed we trigger a sync event
+  // changes that have been pushed we trigger a sync event.
+  // Besides that, we also remove objects that have only been marked
+  // as _deleted and mark the others as synced.
   function handlePushedObject(object) {
     triggerEvents('sync', object);
+
+    if (object._deleted) {
+      store.remove(object.type, object.id, {
+        remote: true,
+        silent: true
+      });
+    } else {
+      store.save(object.type, object.id, object, {
+        remote: true,
+        silent: true
+      });
+    }
   }
 
   // store IDs of dirty objects
