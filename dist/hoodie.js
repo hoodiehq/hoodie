@@ -2461,6 +2461,12 @@ function hoodieStore (hoodie) {
     return bootstrapping;
   };
 
+
+  // isPersistent
+  store.isPersistent = function isPersistent() {
+    return localStorageWrapper.isPersistent;
+  };
+
   //
   // Private methods
   // -----------------
