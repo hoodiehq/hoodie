@@ -262,7 +262,7 @@ function hoodieAccount(hoodie) {
     options = options || {};
 
     if (account.hasAccount() && isNotReauthenticating && !options.moveData) {
-      return pushLocalChanges().then(function() {
+      return pushLocalChanges(options).then(function() {
         return sendSignInRequest(username, password, options);
       });
     }
