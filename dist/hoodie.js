@@ -5098,7 +5098,7 @@ function init() {
 }
 
 
-// Is persistant?
+// Is persistent?
 // ----------------
 //
 
