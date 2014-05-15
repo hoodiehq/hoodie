@@ -40,6 +40,7 @@ var hoodieStoreApi = require('./api');
 var extend = require('extend');
 var generateId = require('../../utils/generate_id');
 var resolveWith = require('../../utils/promise/resolve_with');
+var defer = require('../../utils/promise/defer');
 
 //
 function hoodieRemoteStore(hoodie, options) {
@@ -283,15 +284,27 @@ function hoodieRemoteStore(hoodie, options) {
   // start syncing. `remote.bootstrap()` will automatically start
   // pulling when `remote.connected` remains true.
   //
+  var connectDefer;
   remote.connect = function connect(name) {
+    if (remote.connected) {
+      return connectDefer.promise();
+    }
+
     if (name) {
       remoteName = name;
     }
+
+    connectDefer = defer();
     remote.connected = true;
     remote.trigger('connect');
-    return remote.bootstrap().then(function() {
-      remote.push();
-    });
+    remote.bootstrap().then(function() {
+      // note: remote.push must be called without arguments
+      // but bootstrap() resolves with an array. That's why
+      // we need a wrapping anonymous function here.
+      return remote.push();
+    }).then(connectDefer.resolve, connectDefer.reject);
+
+    return connectDefer.promise();
   };
 
 
