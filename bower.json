@@ -4,6 +4,9 @@
   "main": [
     "./dist/hoodie.js"
   ],
+  "dependencies": {
+    "jquery": "^1.9.1 || ^2.0.2"
+  },
   "ignore": [
     "test/",
     "src/",
