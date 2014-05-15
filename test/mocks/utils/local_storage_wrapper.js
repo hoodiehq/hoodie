@@ -10,7 +10,6 @@ api.removeItem = sinon.stub();
 api.setItem = sinon.stub();
 api.setItem = sinon.stub();
 api.setObject = sinon.stub();
-api.patchIfNotPersistant = sinon.stub();
 
 // generateId
 module.exports = api;

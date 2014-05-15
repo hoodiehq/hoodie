@@ -11,7 +11,7 @@ var hoodieAccount = require('../../../src/hoodie/account');
 
 var extend = require('extend');
 
-describe('hoodie.account', function() {
+describe.only('hoodie.account', function() {
 
   beforeEach(function() {
     localStorage.clear();

@@ -13,7 +13,6 @@ module.exports = function () {
   o.api.decoratePromises = this.sandbox.stub();
   o.api.subscribeToOutsideEvents = this.sandbox.stub();
   o.api.bootstrapDirtyObjects = this.sandbox.stub();
-  o.api.patchIfNotPersistant = this.sandbox.stub();
 
   var saveDefer = $.Deferred();
   var addDefer = $.Deferred();

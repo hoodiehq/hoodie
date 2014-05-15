@@ -8,7 +8,7 @@
 // * `object.trigger('event', args...)`
 // * `object.one('ev', cb)`
 //
-// based on [Events implementations from Spine](https://github.com/maccman/spine/blob/master/src/spine.coffee#L1)
+// based on [Events implementations from Spine](https://github.com/spine/spine/blob/master/src/spine.coffee#L1)
 //
 
 // callbacks are global, while the events API is used at several places,
