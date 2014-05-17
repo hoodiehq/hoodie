@@ -156,7 +156,8 @@ module.exports = function(grunt) {
   // load all tasks defined in node_modules starting with 'grunt-'
   require('load-grunt-tasks')(grunt);
 
-  grunt.registerTask('default', ['test']);
-  grunt.registerTask('build', ['jshint', 'karma:continuous', 'browserify:build', 'concat', 'uglify']);
-  grunt.registerTask('test', ['karma:dev']);
+  grunt.registerTask('build', ['browserify:build', 'concat', 'uglify']);
+  grunt.registerTask('test', ['jshint', 'karma:continuous', 'build']);
+  grunt.registerTask('default', ['build']);
+
 };

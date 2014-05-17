@@ -57,7 +57,7 @@
     "grunt-conventional-changelog": "~1.1.0"
   },
   "scripts": {
-    "test": "grunt build --verbose",
+    "test": "grunt test --verbose",
     "build": "grunt build --verbose"
   }
 }
