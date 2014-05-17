@@ -153,6 +153,27 @@ module.exports = function(grunt) {
     }
   });
 
+  grunt.registerTask('release', function() {
+
+    // forward arguments to the bump-only task
+    this.args.unshift('bump-only');
+
+    // refresh package information
+    grunt.registerTask('refresh', function() {
+      grunt.config.set('pkg', grunt.file.readJSON('package.json'));
+    });
+
+    grunt.task.run([
+      'karma:dev',
+      this.args.join(':'),
+      'refresh',
+      'build',
+      'changelog',
+      'bump-commit'
+    ]);
+
+  });
+
   // load all tasks defined in node_modules starting with 'grunt-'
   require('load-grunt-tasks')(grunt);
 
