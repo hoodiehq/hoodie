@@ -53,7 +53,8 @@
     "expect.js": "~0.2.0",
     "sinon": "~1.7.1",
     "load-grunt-tasks": "~0.2.1",
-    "grunt-bump": "0.0.13"
+    "grunt-bump": "0.0.13",
+    "grunt-conventional-changelog": "~1.1.0"
   },
   "scripts": {
     "test": "grunt build --verbose",
