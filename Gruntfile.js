@@ -2,11 +2,12 @@ module.exports = function(grunt) {
 
   'use strict';
 
-  var banner = '// <%= pkg.title %> - <%= pkg.version%>\n';
-  banner += '// https://github.com/hoodiehq/hoodie.js\n';
-  banner += '// Copyright 2012 - 2014 https://github.com/hoodiehq/\n';
-  banner += '// Licensed Apache License 2.0\n';
-  banner += '\n';
+  require('load-grunt-tasks')(grunt);
+
+  var banner = '// <%= pkg.title %> - <%= pkg.version%>\n' +
+    '// https://github.com/hoodiehq/hoodie.js\n' +
+    '// Copyright 2012 - 2014 https://github.com/hoodiehq/\n' +
+    '// Licensed Apache License 2.0\n\n';
 
   grunt.initConfig({
     pkg: grunt.file.readJSON('package.json'),
@@ -68,11 +69,11 @@ module.exports = function(grunt) {
             platform: 'mac 10.8',
             browserName: 'safari'
           },
-          //sl_firefox_win7: {
-            //base: 'SauceLabs',
-            //platform: 'Windows 7',
-            //browserName: 'Firefox'
-          //},
+          // sl_firefox_win7: {
+          //   base: 'SauceLabs',
+          //   platform: 'Windows 7',
+          //   browserName: 'Firefox'
+          // },
           // IE 10 & 11 is WIP
           // sl_ie10_win7: {
           //   base: 'SauceLabs',
@@ -91,9 +92,9 @@ module.exports = function(grunt) {
           'PhantomJS',
           'sl_chrome_mac',
           'sl_safari_mac',
-          //'sl_firefox_win7',
-        // 'sl_ie10_win7',
-        // 'sl_ie11_win8'
+          // 'sl_firefox_win7',
+          // 'sl_ie10_win7',
+          // 'sl_ie11_win8'
         ]
       },
 
@@ -151,6 +152,7 @@ module.exports = function(grunt) {
         pushTo: 'origin master'
       }
     }
+
   });
 
   grunt.registerTask('release', function() {
@@ -173,9 +175,6 @@ module.exports = function(grunt) {
     ]);
 
   });
-
-  // load all tasks defined in node_modules starting with 'grunt-'
-  require('load-grunt-tasks')(grunt);
 
   grunt.registerTask('build', ['browserify:build', 'concat', 'uglify']);
   grunt.registerTask('test', ['jshint', 'karma:continuous', 'build']);
