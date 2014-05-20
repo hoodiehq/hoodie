@@ -454,7 +454,7 @@ describe('hoodie.store', function() {
         });
       }); // object is new (not cached yet)
 
-      _and('object is not new (and therefore chached)', function() {
+      _and('object is not new (and therefore cached)', function() {
         beforeEach(function() {
           this.object = {
             type: 'document',
@@ -477,7 +477,7 @@ describe('hoodie.store', function() {
           expect(this.store.trigger).to.be.calledWith('change', 'update', this.object, {});
           expect(this.store.trigger).to.be.calledWith('document:change', 'update', this.object, {});
         });
-      }); // object is not new (and therefore chached)
+      }); // object is not new (and therefore cached)
 
       _when('successful', function() {
         it('should resolve the promise', function() {
@@ -853,7 +853,7 @@ describe('hoodie.store', function() {
 
   //
   describe('#remove(type, id, options)', function() {
-    _when('objecet cannot be found', function() {
+    _when('object cannot be found', function() {
       beforeEach(function() {
         stubFindObject('document', '123', null);
       });
@@ -862,7 +862,7 @@ describe('hoodie.store', function() {
         var promise = this.storeBackend.remove('document', '123');
         expect(promise.state()).to.eql('rejected');
       });
-    }); // objecet cannot be found
+    }); // object cannot be found
 
     _when('object can be found and has not been synched before', function() {
 
@@ -888,14 +888,14 @@ describe('hoodie.store', function() {
       it('should clear document from changed', function() {
 
         // when no dirty objects remaining, remove _dirty
-        this.storeBackend.save({ type: 'document', id:'123', tilte: 'funk'});
+        this.storeBackend.save({ type: 'document', id:'123', title: 'funk'});
         expect(localStorageMock.setItem).to.be.calledWith('_dirty', 'document/123');
         this.storeBackend.remove('document', '123');
         expect(localStorageMock.removeItem).to.be.calledWith('_dirty');
 
         // when dirty objects remaining, remove the specific key for `_dirty`
-        this.storeBackend.save({ type: 'document', id:'123', tilte: 'funk'});
-        this.storeBackend.save({ type: 'document', id:'1234', tilte: 'funk'});
+        this.storeBackend.save({ type: 'document', id:'123', title: 'funk'});
+        this.storeBackend.save({ type: 'document', id:'1234', title: 'funk'});
         localStorageMock.setObject.reset();
         this.storeBackend.remove('document', '123');
         expect(localStorageMock.setItem).to.be.calledWith('_dirty', 'document/1234');
@@ -1068,7 +1068,7 @@ describe('hoodie.store', function() {
       expect(localStorageMock.removeItem).to.not.be.calledWith('_notOurBusiness');
     });
 
-    it('should clear chache', function() {
+    it('should clear cache', function() {
       this.storeBackend.find('document', '123');
       this.storeBackend.find('document', '123');
       expect(localStorageMock.getObject.callCount).to.be(1);

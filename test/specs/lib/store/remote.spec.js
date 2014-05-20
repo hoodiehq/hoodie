@@ -737,7 +737,7 @@ describe('hoodieRemoteStore', function() {
         this.requestDefer1.reject({status: 404}, 'error object');
       });
 
-      it('should try again in 3 seconds (it migh be due to a sign up, the userDB might be created yet)', function() {
+      it('should try again in 3 seconds (it might be due to a sign up, the userDB might be created yet)', function() {
         this.remote.pull();
         expect(global.setTimeout).to.be.calledWith(this.remote.pull, 3000);
       });

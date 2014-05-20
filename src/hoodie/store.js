@@ -34,7 +34,7 @@ function hoodieStore (hoodie) {
   // queue of method calls done during bootstrapping
   var queue = [];
 
-  // 2 seconds timout before triggering the `store:idle` event
+  // 2 seconds timeout before triggering the `store:idle` event
   //
   var idleTimeout = 2000;
 
@@ -833,7 +833,7 @@ function hoodieStore (hoodie) {
     }
   }
 
-  // when an object gets changed, two special events get triggerd:
+  // when an object gets changed, two special events get triggered:
   //
   // 1. dirty event
   //    the `dirty` event gets triggered immediately, for every
@@ -900,7 +900,7 @@ function hoodieStore (hoodie) {
   //
 
   // if browser does not support local storage persistence,
-  // e.g. Safari in private mode, overite the respective methods.
+  // e.g. Safari in private mode, overwrite the respective methods.
 
 
 

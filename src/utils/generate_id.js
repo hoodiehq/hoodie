@@ -3,7 +3,8 @@ var chars, i, radix;
 // uuids consist of numbers and lowercase letters only.
 // We stick to lowercase letters to prevent confusion
 // and to prevent issues with CouchDB, e.g. database
-// names do wonly allow for lowercase letters.
+// names only allow for lowercase letters.
+
 chars = '0123456789abcdefghijklmnopqrstuvwxyz'.split('');
 radix = chars.length;
 

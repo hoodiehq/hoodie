@@ -364,12 +364,12 @@ function hoodieAccount(hoodie) {
   // ----------------
 
   // This is kind of a hack. We need to create an object anonymously
-  // that is not exposed to others. The only CouchDB API othering such
+  // that is not exposed to others. The only CouchDB API offering such
   // functionality is the _users database.
   //
-  // So we actualy sign up a new couchDB user with some special attributes.
-  // It will be picked up by the password reset worker and removeed
-  // once the password was resetted.
+  // So we actually sign up a new couchDB user with some special attributes.
+  // It will be picked up by the password reset worker and removed
+  // once the password was reset.
   //
   account.resetPassword = function resetPassword(username) {
     var data, key, options, resetPasswordId;
@@ -535,7 +535,7 @@ function hoodieAccount(hoodie) {
   // not, we check `userCtx.name` in the response. If the user is not
   // signed in, it's null, otherwise the name the user signed in with
   //
-  // If the user is not signed in, we difeerentiate between users that
+  // If the user is not signed in, we differentiate between users that
   // signed in with a username / password or anonymously. For anonymous
   // users, the password is stored in local store, so we don't need
   // to trigger an 'unauthenticated' error, but instead try to sign in.
@@ -644,7 +644,7 @@ function hoodieAccount(hoodie) {
   //     }
   //
   // we want to turn it into 'test1', 'mvu85hy' or reject the promise
-  // in case an error occured ('roles' array contains 'error')
+  // in case an error occurred ('roles' array contains 'error')
   //
   function handleSignInSuccess(options) {
     options = options || {};
@@ -689,7 +689,7 @@ function hoodieAccount(hoodie) {
       newHoodieId = response.roles[0];
 
       //
-      // if an error occured, the userDB worker stores it to the $error attribute
+      // if an error occurred, the userDB worker stores it to the $error attribute
       // and adds the 'error' role to the users doc object. If the user has the
       // 'error' role, we need to fetch his _users doc to find out what the error
       // is, before we can reject the promise.
@@ -709,11 +709,11 @@ function hoodieAccount(hoodie) {
       }
 
       //
-      // When the userDB worker created the database for the user and everthing
+      // When the userDB worker created the database for the user and everything
       // worked out, it adds the role 'confirmed' to the user. If the role is
       // not present yet, it might be that the worker didn't pick up the the
       // user doc yet, or there was an error. In this cases, we reject the promise
-      // with an 'uncofirmed error'
+      // with an 'unconfirmed error'
       //
       if (response.roles.indexOf('confirmed') === -1) {
         return rejectWith({
@@ -763,7 +763,7 @@ function hoodieAccount(hoodie) {
 
 
   //
-  // If the request was successful there might have occured an
+  // If the request was successful there might have occurred an
   // error, which the worker stored in the special $error attribute.
   // If that happens, we return a rejected promise with the error
   // Otherwise reject the promise with a 'pending' error,
@@ -859,7 +859,7 @@ function hoodieAccount(hoodie) {
   // 1. assure we have a valid session
   // 2. update _users doc with new username and new password (if provided)
   // 3. if username changed, wait until current _users doc got removed
-  // 3. sign in with new credentials to create new sesion.
+  // 3. sign in with new credentials to create new session.
   //
   function changeUsernameAndPassword(currentPassword, newUsername, newPassword) {
 
@@ -906,9 +906,9 @@ function hoodieAccount(hoodie) {
   }
 
   //
-  // dependend on what kind of error we get, we want to ignore
+  // dependant on what kind of error we get, we want to ignore
   // it or not.
-  // When we get a 'HoodieNotFoundError' it means that the _users doc habe
+  // When we get a 'HoodieNotFoundError' it means that the _users doc have
   // been removed already, so we don't need to do it anymore, but
   // still want to finish the destroy locally, so we return a
   // resolved promise
@@ -953,7 +953,7 @@ function hoodieAccount(hoodie) {
 
 
   //
-  // depending on wether the user signedUp manually or has been signed up
+  // depending on whether the user signedUp manually or has been signed up
   // anonymously the prefix in the CouchDB _users doc differentiates.
   // An anonymous user is characterized by its username, that equals
   // its hoodie.id (see `anonymousSignUp`)
@@ -993,7 +993,7 @@ function hoodieAccount(hoodie) {
   //
   // update my _users doc.
   //
-  // If a new username has been passed, we set the special attribut $newUsername.
+  // If a new username has been passed, we set the special attribute $newUsername.
   // This will let the username change worker create create a new _users doc for
   // the new username and remove the current one
   //
@@ -1050,7 +1050,7 @@ function hoodieAccount(hoodie) {
         // We always change either the one, or the other.
         return awaitCurrentAccountRemoved(account.username, newPassword).then( function() {
 
-          // we do signOut explicitely although signOut is build into hoodie.signIn to
+          // we do signOut explicitly although signOut is build into hoodie.signIn to
           // work around trouble in case of local changes. See 
           // https://github.com/hoodiehq/hoodie.js/issues/256
           return account.signOut({silent:true, ignoreLocalChanges: true}).then(function() {
@@ -1150,7 +1150,7 @@ function hoodieAccount(hoodie) {
   //
   // the sign in request that starts a CouchDB session if
   // it succeeds. We separated the actual sign in request from
-  // the signIn method, as the latter also runs signOut intenrtally
+  // the signIn method, as the latter also runs signOut internally
   // to clean up local data before starting a new session. But as
   // other methods like signUp or changePassword do also need to
   // sign in the user (again), these need to send the sign in

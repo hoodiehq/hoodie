@@ -147,7 +147,7 @@ function Hoodie(baseUrl) {
 
 // You can extend the Hoodie class like so:
 //
-// Hoodie.extend(funcion(hoodie) { hoodie.myMagic = function() {} })
+// Hoodie.extend(function(hoodie) { hoodie.myMagic = function() {} })
 //
 var extensions = [];
 
