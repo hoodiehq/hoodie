@@ -182,10 +182,9 @@ If you have commit access, please follow this process for merging patches and cu
 
 ### Releasing a new version
 
-1. Include all new functional changes in the CHANGELOG.
-2. Use a dedicated commit to increment the version. The version needs to be
-   added to the `CHANGELOG.md` (inc. date) and the `package.json`.
-3. The commit message must be of `v0.0.0` format.
-4. Create an annotated tag for the version: `git tag -m "v0.0.0" v0.0.0`.
-5. Push the changes and tags to GitHub: `git push --tags origin master`.
-6. Publish the new version to npm: `npm publish`.
+Releasing a new version is automated with `grunt release`.
+You may add flags to specify the new version.
+
+1. `grunt release` or `grunt release:patch`: 0.0.1 => 0.0.2
+2. `grunt release:minor`: 0.0.2 => 0.1.0
+3. `grunt release:major`: 0.1.0 => 1.0.0
