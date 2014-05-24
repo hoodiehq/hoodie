@@ -5,6 +5,18 @@ module.exports = function (grunt) {
   // Project configuration.
   grunt.initConfig({
 
+    bump: {
+      options: {
+        commitMessage: 'chore(release): v%VERSION%',
+        files: ['package.json'],
+        commitFiles: [
+          'package.json',
+          'CHANGELOG.md'
+        ],
+        pushTo: 'origin master'
+      }
+    },
+
     watch: {
       files: ['<%= jshint.files %>'],
       tasks: 'jshint'
