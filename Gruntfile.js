@@ -1,6 +1,6 @@
 module.exports = function (grunt) {
 
-  require('load-grunt-tasks')(grunt)
+  require('load-grunt-tasks')(grunt);
 
   // Project configuration.
   grunt.initConfig({
@@ -44,6 +44,20 @@ module.exports = function (grunt) {
     nodeunit: {
       all: ['test/test-*.js']
     }
+
+  });
+
+  grunt.registerTask('release', function () {
+
+    // Forward arguments to the bump-only task
+    this.args.unshift('bump-only');
+
+    grunt.task.run([
+      'test',
+      this.args.join(':'),
+      'changelog',
+      'bump-commit'
+    ]);
 
   });
 
