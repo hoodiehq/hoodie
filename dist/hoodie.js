@@ -1,4 +1,4 @@
-// Hoodie.js - 0.8.1
+// Hoodie.js - 0.8.3
 // https://github.com/hoodiehq/hoodie.js
 // Copyright 2012 - 2014 https://github.com/hoodiehq/
 // Licensed Apache License 2.0
@@ -195,17 +195,14 @@ function Hoodie(baseUrl) {
   // check for pending password reset
   hoodie.account.checkPasswordReset();
 
-  // hoodie.id
-  hoodie.id.subscribeToOutsideEvents();
-
-  // hoodie.store
-  hoodie.store.subscribeToOutsideEvents();
+  // make sure removed but not yet synced objects get pushed.
   hoodie.store.bootstrapDirtyObjects();
 
-  // hoodie.remote
+  // subscribe to cross events
+  hoodie.account.subscribeToOutsideEvents();
+  hoodie.id.subscribeToOutsideEvents();
+  hoodie.store.subscribeToOutsideEvents();
   hoodie.remote.subscribeToOutsideEvents();
-
-  // hoodie.task
   hoodie.task.subscribeToOutsideEvents();
 
   // authenticate
@@ -517,7 +514,7 @@ function hoodieAccount(hoodie) {
     options = options || {};
 
     if (account.hasAccount() && isNotReauthenticating && !options.moveData) {
-      return pushLocalChanges().then(function() {
+      return pushLocalChanges(options).then(function() {
         return sendSignInRequest(username, password, options);
       });
     }
@@ -3334,7 +3331,7 @@ module.exports = HoodieObjectTypeError;
 // * `object.trigger('event', args...)`
 // * `object.one('ev', cb)`
 //
-// based on [Events implementations from Spine](https://github.com/maccman/spine/blob/master/src/spine.coffee#L1)
+// based on [Events implementations from Spine](https://github.com/spine/spine/blob/master/src/spine.coffee#L1)
 //
 
 // callbacks are global, while the events API is used at several places,
@@ -5098,7 +5095,7 @@ function init() {
 }
 
 
-// Is persistant?
+// Is persistent?
 // ----------------
 //
 
