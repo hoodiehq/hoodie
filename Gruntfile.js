@@ -1,9 +1,6 @@
 module.exports = function (grunt) {
 
-  grunt.loadNpmTasks('grunt-contrib-jshint');
-  grunt.loadNpmTasks('grunt-contrib-watch');
-  grunt.loadNpmTasks('grunt-simple-mocha');
-  grunt.loadNpmTasks('grunt-contrib-nodeunit');
+  require('load-grunt-tasks')(grunt)
 
   // Project configuration.
   grunt.initConfig({
