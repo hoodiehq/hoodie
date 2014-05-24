@@ -109,17 +109,14 @@ function Hoodie(baseUrl) {
   // check for pending password reset
   hoodie.account.checkPasswordReset();
 
-  // hoodie.id
-  hoodie.id.subscribeToOutsideEvents();
-
-  // hoodie.store
-  hoodie.store.subscribeToOutsideEvents();
+  // make sure removed but not yet synced objects get pushed.
   hoodie.store.bootstrapDirtyObjects();
 
-  // hoodie.remote
+  // subscribe to cross events
+  hoodie.account.subscribeToOutsideEvents();
+  hoodie.id.subscribeToOutsideEvents();
+  hoodie.store.subscribeToOutsideEvents();
   hoodie.remote.subscribeToOutsideEvents();
-
-  // hoodie.task
   hoodie.task.subscribeToOutsideEvents();
 
   // authenticate
