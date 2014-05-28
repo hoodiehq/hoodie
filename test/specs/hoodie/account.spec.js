@@ -468,7 +468,9 @@ describe('hoodie.account', function() {
 
             // reset spies
             this.account.request.reset();
-            this.requestDefers = [];
+
+            // do not reset by setting to [], see #304
+            this.requestDefers.length = 0;
 
             //
             promise = this.account.signUp(this.hoodie.id(), 'secret');
@@ -491,10 +493,11 @@ describe('hoodie.account', function() {
         _when('signUp successful', function() {
 
           beforeEach(function() {
-
             // reset spies
             this.account.request.reset();
-            this.requestDefers = [];
+
+            // do not reset by setting to [], see #304
+            this.requestDefers.length = 0;
 
             this.promise = this.account.signUp('joe@example.com', 'secret');
             var response = {
@@ -2078,11 +2081,11 @@ function unconfirmedUserDoc(username) {
   };
 }
 
-// 
+//
 // this is a hack to set the value of the internal userDoc variable.
 // As it's not accessible from outside, we call account.fetch()
 // and fake its response, then reset the hoodie.request stub
-// 
+//
 function presetUserDoc(context) {
   context.account.fetch();
   context.hoodie.request.defer.resolve(unconfirmedUserDoc(context.account.username));
@@ -2118,7 +2121,7 @@ function with_session_validated_before(callback) {
         this.hoodie.request.returns(defer.promise());
         this.hoodie.request.defer = defer;
       }
-      
+
     });
 
     callback();
