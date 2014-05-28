@@ -1258,7 +1258,7 @@ describe('hoodie.account', function() {
       });
 
       it('should trigger `signout` event', function() {
-        expect(this.account.trigger).to.be.calledWith('signout');
+        expect(this.account.trigger).to.be.calledWith('signout', undefined);
       });
 
       it('should trigger `cleanup` event', function() {
@@ -1286,6 +1286,7 @@ describe('hoodie.account', function() {
     _when('user has account', function() {
 
       beforeEach(function() {
+        this.account.username = 'joe@example.com';
         this.sandbox.stub(this.account, 'hasAccount').returns(true);
       });
 
@@ -1362,8 +1363,8 @@ describe('hoodie.account', function() {
             this.account.signOut();
           });
 
-          it('should trigger `signout` event', function() {
-            expect(this.account.trigger).to.be.calledWith('signout');
+          it('should trigger `signout` event with username', function() {
+            expect(this.account.trigger).to.be.calledWith('signout', 'joe@example.com');
           });
 
           it('should trigger `cleanup` event', function () {
@@ -1501,6 +1502,7 @@ describe('hoodie.account', function() {
 
     _when('user has account', function() {
       beforeEach(function() {
+        this.account.username = 'joe@example.com';
         this.sandbox.stub(this.account, 'hasAccount').returns(true);
       });
 
@@ -1546,7 +1548,7 @@ describe('hoodie.account', function() {
 
 
           it('should trigger signout event', function() {
-            expect(this.account.trigger).to.be.calledWith('signout');
+            expect(this.account.trigger).to.be.calledWith('signout', 'joe@example.com');
           });
 
           it('should trigger clenaup event', function() {
@@ -1607,6 +1609,7 @@ describe('hoodie.account', function() {
 
       beforeEach(function() {
         this.sandbox.stub(this.account, 'hasAccount').returns(false);
+        this.account.username = undefined;
         this.promise = this.account.destroy();
       });
 
@@ -1623,7 +1626,7 @@ describe('hoodie.account', function() {
       });
 
       it('should trigger signout event', function() {
-        expect(this.account.trigger).to.be.calledWith('signout');
+        expect(this.account.trigger).to.be.calledWith('signout', undefined);
       });
 
       it('should trigger cleanup event', function() {
