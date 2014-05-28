@@ -683,6 +683,26 @@ describe('hoodie.task', function() {
         option: 'value'
       });
     });
+
+    it('doesn\'t triggers "success" event when a task has been removed with a $error', function() {
+      this.events['store:change']('remove', {
+        type: '$message',
+        id: '123',
+        $processedAt: '2013-09-05',
+        $error: { name: 'FunkyError' }
+      }, {
+        option: 'value'
+      });
+
+      expect(this.task.trigger).to.not.be.calledWith('success', {
+        type: 'message',
+        id: '123',
+        $processedAt: '2013-09-05',
+        $error: { name: 'FunkyError' }
+      }, {
+        option: 'value'
+      });
+    });
   }); // subscribeToOutsideEvents
   function now() {
     return '1970-01-01T00:00:00.000Z';
