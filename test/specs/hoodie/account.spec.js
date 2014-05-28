@@ -8,7 +8,6 @@ global.stubRequire('src/utils/generate_id', generateIdMock);
 global.stubRequire('src/utils/config', configMock);
 
 var hoodieAccount = require('../../../src/hoodie/account');
-
 var extend = require('extend');
 
 describe('hoodie.account', function() {
@@ -37,14 +36,16 @@ describe('hoodie.account', function() {
     this.account = this.hoodie.account;
     extend(this.account, this.MOCKS.events.apply(this));
 
-    this.account.username = undefined; // 'joe@example.com';
+    this.account.username = undefined;
+    // makes hasAnonyomusAccount return false by default
+    configMock.get.withArgs('_account.anonymousPassword').returns(undefined);
     this.hoodie.id.returns('hash123');
   });
 
   describe('#authenticate()', function() {
 
     beforeEach(function() {
-      this.sandbox.stub(this.account, 'request').returns(this.hoodie.request());
+      this.sandbox.stub(this.account, 'request', this.fakeRequest);
     });
 
     _when('user is logged in as joe@example.com', function() {
@@ -79,14 +80,14 @@ describe('hoodie.account', function() {
 
           it('should be rejected when it is pending and then fails', function() {
             var promise = this.account.authenticate();
-            this.hoodie.request.defer.reject();
+            this.requestDefers[0].reject();
 
             expect(promise).to.be.rejected();
           });
 
           it('should be resolved when it is pending and then succeeds', function() {
             var promise = this.account.authenticate();
-            this.hoodie.request.defer.resolve({
+            this.requestDefers[0].resolve({
               name: 'joe@example.com',
               roles: ['hash123', 'confirmed']
             });
@@ -105,14 +106,14 @@ describe('hoodie.account', function() {
 
           it('should be rejected when it is pending and then fails', function() {
             var promise = this.account.authenticate();
-            this.hoodie.request.defer.reject();
+            this.requestDefers[0].reject();
 
             expect(promise).to.be.rejected();
           });
 
           it('should be rejected anyway, even if the pending request succeeds', function() {
             var promise = this.account.authenticate();
-            this.hoodie.request.defer.resolve();
+            this.requestDefers[0].resolve();
 
             expect(promise).to.be.rejected();
           });
@@ -122,8 +123,8 @@ describe('hoodie.account', function() {
         _and('authentication request is successful', function() {
           _and('returns a valid session for joe@example.com', function() {
             beforeEach(function() {
-              this.hoodie.request.defer.resolve(validSessionResponse());
               this.promise = this.account.authenticate();
+              this.requestDefers[0].resolve(validSessionResponse());
             });
 
             it('should resolve the promise with \'joe@example.com\'', function() {
@@ -145,8 +146,8 @@ describe('hoodie.account', function() {
           //
           _but('session is invalid', function() {
             beforeEach(function() {
-              this.hoodie.request.defer.resolve(invalidSessionResponse());
               this.promise = this.account.authenticate();
+              this.requestDefers[0].resolve(invalidSessionResponse());
             });
 
             it('should reject the promise', function() {
@@ -163,10 +164,10 @@ describe('hoodie.account', function() {
         //
         _when('authentication request has an error', function() {
           beforeEach(function() {
-            this.hoodie.request.defer.reject({
+            this.promise = this.account.authenticate();
+            this.requestDefers[0].reject({
               name: 'SomeError'
             });
-            this.promise = this.account.authenticate();
           });
 
           it('should reject the promise', function() {
@@ -178,6 +179,7 @@ describe('hoodie.account', function() {
       }); // has not been authenticated yet
       with_session_validated_before(function() {
         beforeEach(function() {
+          this.account.request.reset();
           this.promise = this.account.authenticate();
         });
 
@@ -209,15 +211,16 @@ describe('hoodie.account', function() {
     }); // user is logged in as joe@example.com (hash: 'hash123')
     _when('user has an anonymous account', function() {
       beforeEach(function() {
-        this.account.username = 'randomhash';
+        this.signInDefer = getDefer();
 
         // NOTE:
         // I do not understand, why we have to resetBehavior here.
         configMock.get.resetBehavior();
+        configMock.get.withArgs('_account.anonymousPassword').returns('randomPassword');
+        this.hoodie.id.returns('randomhash');
 
-        configMock.get.returns('randomPassword');
         this.sandbox.stub(this.account, 'hasAnonymousAccount').returns(true);
-        this.sandbox.stub(this.account, 'signIn').returns('signIn_promise');
+        this.sandbox.stub(this.account, 'signIn').returns(this.signInDefer);
       });
 
       //
@@ -226,8 +229,9 @@ describe('hoodie.account', function() {
 
           // which means the user has no valid session
           beforeEach(function() {
-            this.hoodie.request.defer.resolve(invalidSessionResponse());
             this.promise = this.account.authenticate();
+            this.requestDefers[0].resolve(invalidSessionResponse());
+            this.signInDefer.reject('unauthenticated');
           });
 
           it('should sign in in the background, as we know the password anyway', function() {
@@ -235,7 +239,7 @@ describe('hoodie.account', function() {
           });
 
           it('should return the promise of the sign in request', function() {
-            expect(this.promise).to.be.resolvedWith('signIn_promise');
+            expect(this.promise).to.be.rejectedWith('unauthenticated');
           });
         });
       }); // authentication request is successful and returns `name: null`
@@ -252,21 +256,23 @@ describe('hoodie.account', function() {
 
       _and('signOut succeeds', function() {
         beforeEach(function() {
-          this.hoodie.request.defer.resolve();
+          this.promise = this.account.authenticate();
+          this.requestDefers[0].resolve();
         });
 
         it('should return a rejected promise', function() {
-          expect(this.account.authenticate()).to.be.rejected();
+          expect(this.promise).to.be.rejected();
         });
       });
 
       _and('signOut fails', function() {
         beforeEach(function() {
-          this.hoodie.request.defer.reject();
+          this.promise = this.account.authenticate();
+          this.requestDefers[0].reject();
         });
 
         it('should return a rejected promise', function() {
-          expect(this.account.authenticate()).to.be.rejected();
+          expect(this.promise).to.be.rejected();
         });
       });
     });
@@ -381,227 +387,6 @@ describe('hoodie.account', function() {
         expect(this.path).to.eql('/_users/org.couchdb.user%3Auser%2Fjoe');
       });
 
-      _and('user has an anonmyous account', function() {
-        beforeEach(function() {
-          this.sandbox.stub(this.account, 'hasAnonymousAccount').returns(true);
-          this.fetchDefer = this.hoodie.defer();
-          this.sandbox.stub(this.account, 'fetch').returns(this.fetchDefer.promise());
-
-          // NOTE:
-          // I do not understand, why we have to resetBehavior here.
-          configMock.get.resetBehavior();
-
-          configMock.get.returns('randomPassword');
-          this.account.username = 'randomUsername';
-
-          this.promise = this.account.signUp('joe@example.com', 'secret', {
-            name: 'Joe Doe'
-          });
-        });
-
-        it('should sign in', function() {
-
-          // because it need to authenticate for the current account
-          // first, before 'signing up' for a real account, wich is
-          // technically a username change
-          expect(this.account.request).to.be.calledWith('POST', '/_session', {
-            'data': {
-              'name': 'user/randomUsername',
-              'password': 'randomPassword'
-            }
-          });
-        });
-
-        _when('sign in successful', function() {
-
-          beforeEach(function() {
-            this.requestDefers[0].resolve({
-              name: 'randomUsername',
-              roles: ['randomhash', 'confirmed']
-            });
-            this.account.hasAnonymousAccount.returns(false);
-          });
-
-          it('should fetch the _users doc', function() {
-            expect(this.account.fetch).to.be.called();
-          });
-
-          _when('fetching user doc successful', function() {
-            beforeEach(function() {
-              this.fetchDefer.resolve();
-
-              var args = this.account.request.args[1];
-              this.type = args[0], this.path = args[1], this.options = args[2];
-              this.data = JSON.parse(this.options.data);
-            });
-
-            it('should send a PUT request to http://my.hood.ie/_users/org.couchdb.user%3Auser%2FrandomUsername', function() {
-              expect(this.account.request).to.be.called();
-              expect(this.type).to.eql('PUT');
-              expect(this.path).to.eql('/_users/org.couchdb.user%3Auser%2FrandomUsername');
-            });
-
-            it('should set contentType to \'application/json\'', function() {
-              expect(this.options.contentType).to.eql('application/json');
-            });
-
-            it('should stringify the data', function() {
-              expect(typeof this.options.data).to.eql('string');
-            });
-
-            it('should have set name to user \'joe@example.com\'', function() {
-              expect(this.data.$newUsername).to.eql('joe@example.com');
-            });
-
-            it('should have set updatedAt to now', function() {
-              expect(this.data.updatedAt).to.eql(now());
-            });
-
-            it('should have set signedUpAt to now', function() {
-              expect(this.data.signedUpAt).to.eql(now());
-            });
-
-            _when('_users doc could be updated', function() {
-
-              beforeEach(function() {
-                this.requestDefers[1].resolve();
-
-                // after the doc update, it signs in again
-                // with a delay of 300ms
-                this.clock.tick(300);
-              });
-
-              it('should disconnect', function() {
-                expect(this.hoodie.remote.disconnect).to.be.called();
-              });
-
-              it('should sign in with old username', function() {
-
-                expect(this.account.request).to.be.calledWith('POST', '/_session', {
-                  data: {
-                    name: 'user/randomUsername',
-                    password: 'secret'
-                  }
-                });
-              });
-
-              _when('sign in to old account succeeds', function() {
-                beforeEach(function() {
-                  this.account.request.reset();
-                  this.requestDefers[2].resolve();
-
-                  // after the doc update, it signs in again
-                  // with a delay of 300ms
-                  this.clock.tick(300);
-                });
-
-                it('should sign in with old username again', function() {
-                  expect(this.account.request).to.be.calledWith('POST', '/_session', {
-                    data: {
-                      name: 'user/randomUsername',
-                      password: 'secret'
-                    }
-                  });
-                });
-
-                _and('sign in fails with a server error', function() {
-                  beforeEach(function() {
-                    this.requestDefers[3].reject({
-                      name: 'HoodieServerError',
-                      message: 'oopps',
-                      status: 500
-                    });
-
-                    // after the doc update, it signs in again
-                    // with a delay of 300ms
-                    this.clock.tick(300);
-                  });
-
-                  it('should sign in with old username again', function() {
-                    expect(this.promise).to.be.rejected();
-                  });
-                });
-
-                _and('sign in fails with unauthorized error', function() {
-                  beforeEach(function() {
-                    this.signOutDefer = getDefer();
-                    this.sandbox.stub(this.account, 'signOut').returns(this.signOutDefer.promise());
-
-                    this.account.request.reset();
-                    this.requestDefers[3].reject({
-                      name: 'HoodieUnauthorizedError',
-                      message: 'nope',
-                      status: 401
-                    });
-                  });
-
-                  it('should sign out silently and ignore local changes', function() {
-                    expect(this.account.signOut).to.be.calledWith({
-                      silent: true,
-                      ignoreLocalChanges: true
-                    });
-                  });
-
-                  _and('sign out succeeds', function() {
-                    beforeEach(function() {
-                      this.signInDefer = getDefer();
-                      this.sandbox.stub(this.account, 'signIn').returns(this.signInDefer.promise());
-
-                      this.signOutDefer.resolve();
-                    });
-
-                    it('should sign in with new username', function() {
-                      expect(this.account.signIn).to.be.calledWith('joe@example.com', 'secret', {moveData: true});
-                    });
-
-                    _and('sign in to new account succeeds', function() {
-                      beforeEach(function() {
-                        this.signInDefer.resolve();
-                      });
-
-                      it('should resolve', function() {
-                        expect(this.promise).to.be.resolved();
-                      });
-                    });
-
-                    _and('sign in to new account fails', function() {
-                      beforeEach(function() {
-                        this.signInDefer.reject('ooops');
-                      });
-
-                      it('should reject', function() {
-                        expect(this.promise).to.be.rejectedWith('ooops');
-                      });
-                    });
-                  });
-                });
-              });
-
-            }); // _users doc could be updated
-            _when('_users doc could not be updated', function() {
-
-              beforeEach(function() {
-                this.requestDefers.pop().reject();
-              });
-
-              it('should be rejected', function() {
-                expect(this.promise).to.be.rejected();
-              });
-
-            }); // _users doc could not be updated
-          }); // fetching user doc successful
-          _when('fetching user doc not successful', function() {
-
-            beforeEach(function() {
-              this.fetchDefer.reject('nope.');
-            });
-
-            it('should be rejected', function() {
-              expect(this.promise).to.be.rejectedWith('nope.');
-            });
-          }); // fetching user doc not successful
-        }); // sign in successful
-      }); // user has an anonmyous account
       _but('user is already logged in', function() {
         beforeEach(function() {
           this.sandbox.stub(this.account, 'hasAccount').returns(true);
@@ -711,7 +496,6 @@ describe('hoodie.account', function() {
             this.account.request.reset();
             this.requestDefers = [];
 
-            //
             this.promise = this.account.signUp('joe@example.com', 'secret');
             var response = {
               'ok': true,
@@ -721,10 +505,6 @@ describe('hoodie.account', function() {
 
             this.requestDefers[0].resolve(response);
             this.clock.tick(300); // do the delayed sign in
-          });
-
-          it('should trigger `signup` event', function() {
-            expect(this.account.trigger).to.be.calledWith('signup', 'joe@example.com');
           });
 
           it('should sign in', function() {
@@ -746,9 +526,14 @@ describe('hoodie.account', function() {
               });
             });
 
-            it('should resolve its promise', function() {
-              expect(this.promise).to.be.resolvedWith('joe@example.com');
+            it('should trigger `signup` event', function() {
+              expect(this.account.trigger).to.be.calledWith('signup', 'joe@example.com');
             });
+
+            it('should resolve its promise', function() {
+              expect(this.promise).to.be.resolvedWith('joe@example.com', 'hash123', {moveData: true});
+            });
+
           }); // signIn successful
           _and('signIn not successful', function() {
 
@@ -759,7 +544,7 @@ describe('hoodie.account', function() {
               });
             });
 
-            it('should resolve its promise', function() {
+            it('should reject its promise', function() {
               expect(this.promise).to.be.rejectedWith({
                 name: 'HoodieError',
                 message: 'This is so'
@@ -807,24 +592,252 @@ describe('hoodie.account', function() {
         }); // signUp has an error
       }); // user is logged out
     }); // username set
+
+    _and('user has an anonmyous account', function() {
+      beforeEach(function() {
+        this.fetchDefer = this.hoodie.defer();
+        this.sandbox.stub(this.account, 'fetch').returns(this.fetchDefer.promise());
+
+        // NOTE:
+        // I do not understand, why we have to resetBehavior here.
+        configMock.get.resetBehavior();
+
+        configMock.get.withArgs('_account.anonymousPassword').returns('randomPassword');
+        this.hoodie.id.returns('hash123');
+
+        this.promise = this.account.signUp('joe@example.com', 'secret', {
+          name: 'Joe Doe'
+        });
+      });
+
+      it('should sign in', function() {
+
+        // because it need to authenticate for the current account
+        // first, before 'signing up' for a real account, wich is
+        // technically a username change
+        expect(this.account.request).to.be.calledWith('POST', '/_session', {
+          'data': {
+            'name': 'user_anonymous/hash123',
+            'password': 'randomPassword'
+          }
+        });
+      });
+
+      _when('sign in successful', function() {
+
+        beforeEach(function() {
+          this.requestDefers[0].resolve({
+            name: 'hash123',
+            roles: ['hash123', 'confirmed']
+          });
+        });
+
+        it('should fetch the _users doc', function() {
+          expect(this.account.fetch).to.be.called();
+        });
+
+        _when('fetching user doc successful', function() {
+          beforeEach(function() {
+            this.fetchDefer.resolve();
+
+            var args = this.account.request.args[1];
+            this.type = args[0], this.path = args[1], this.options = args[2];
+            this.data = JSON.parse(this.options.data);
+          });
+
+          it('should send a PUT request to http://my.hood.ie/_users/org.couchdb.user%3Auser%2Fjoe%40example.com', function() {
+            expect(this.account.request).to.be.called();
+            expect(this.type).to.eql('PUT');
+            expect(this.path).to.eql('/_users/org.couchdb.user%3Auser_anonymous%2Fhash123');
+          });
+
+          it('should set contentType to \'application/json\'', function() {
+            expect(this.options.contentType).to.eql('application/json');
+          });
+
+          it('should stringify the data', function() {
+            expect(typeof this.options.data).to.eql('string');
+          });
+
+          it('should have set name to user \'joe@example.com\'', function() {
+            expect(this.data.$newUsername).to.eql('joe@example.com');
+          });
+
+          it('should have set updatedAt to now', function() {
+            expect(this.data.updatedAt).to.eql(now());
+          });
+
+          it('should have set signedUpAt to now', function() {
+            expect(this.data.signedUpAt).to.eql(now());
+          });
+
+          _when('_users doc could be updated', function() {
+
+            beforeEach(function() {
+              this.requestDefers[1].resolve();
+
+              // after the doc update, it signs in again
+              // with a delay of 300ms
+              this.clock.tick(300);
+            });
+
+            it('should disconnect', function() {
+              expect(this.hoodie.remote.disconnect).to.be.called();
+            });
+
+            it('should sign in with old username', function() {
+
+              expect(this.account.request).to.be.calledWith('POST', '/_session', {
+                data: {
+                  name: 'user_anonymous/hash123',
+                  password: 'secret'
+                }
+              });
+            });
+
+            _when('sign in to old account succeeds', function() {
+              beforeEach(function() {
+                this.account.request.reset();
+                this.requestDefers[2].resolve();
+
+                // after the doc update, it signs in again
+                // with a delay of 300ms
+                this.clock.tick(300);
+              });
+
+              it('should sign in with old username again', function() {
+                expect(this.account.request).to.be.calledWith('POST', '/_session', {
+                  data: {
+                    name: 'user_anonymous/hash123',
+                    password: 'secret'
+                  }
+                });
+              });
+
+              _and('sign in fails with a server error', function() {
+                beforeEach(function() {
+                  this.requestDefers[3].reject({
+                    name: 'HoodieServerError',
+                    message: 'oopps',
+                    status: 500
+                  });
+
+                  // after the doc update, it signs in again
+                  // with a delay of 300ms
+                  this.clock.tick(300);
+                });
+
+                it('should sign in with old username again', function() {
+                  expect(this.promise).to.be.rejected();
+                });
+              });
+
+              _and('sign in fails with unauthorized error', function() {
+                beforeEach(function() {
+                  this.signOutDefer = getDefer();
+                  this.sandbox.stub(this.account, 'signOut').returns(this.signOutDefer.promise());
+
+                  this.account.request.reset();
+                  this.requestDefers[3].reject({
+                    name: 'HoodieUnauthorizedError',
+                    message: 'nope',
+                    status: 401
+                  });
+                });
+
+                it('should sign out silently and ignore local changes', function() {
+                  expect(this.account.signOut).to.be.calledWith({
+                    silent: true,
+                    ignoreLocalChanges: true
+                  });
+                });
+
+                _and('sign out succeeds', function() {
+                  beforeEach(function() {
+                    this.signInDefer = getDefer();
+                    this.sandbox.stub(this.account, 'signIn').returns(this.signInDefer.promise());
+
+                    this.signOutDefer.resolve();
+                  });
+
+                  it('should sign in with new username', function() {
+                    expect(this.account.signIn).to.be.calledWith('joe@example.com', 'secret', {moveData: true});
+                  });
+
+                  _and('sign in to new account succeeds', function() {
+                    beforeEach(function() {
+                      this.signInDefer.resolve();
+                    });
+
+                    it('should resolve', function() {
+                      expect(this.promise).to.be.resolved();
+                    });
+                  });
+
+                  _and('sign in to new account fails', function() {
+                    beforeEach(function() {
+                      this.signInDefer.reject('ooops');
+                    });
+
+                    it('should reject', function() {
+                      expect(this.promise).to.be.rejectedWith('ooops');
+                    });
+                  });
+                });
+              });
+            });
+
+          }); // _users doc could be updated
+          _when('_users doc could not be updated', function() {
+
+            beforeEach(function() {
+              this.requestDefers.pop().reject();
+            });
+
+            it('should be rejected', function() {
+              expect(this.promise).to.be.rejected();
+            });
+
+          }); // _users doc could not be updated
+        }); // fetching user doc successful
+        _when('fetching user doc not successful', function() {
+
+          beforeEach(function() {
+            this.fetchDefer.reject('nope.');
+          });
+
+          it('should be rejected', function() {
+            expect(this.promise).to.be.rejectedWith('nope.');
+          });
+        }); // fetching user doc not successful
+      }); // sign in successful
+    }); // user has an anonmyous account
   }); // #signUp
+
   describe('#anonymousSignUp()', function() {
 
     beforeEach(function() {
-      this.signUpDefer = this.hoodie.defer();
+      var args;
 
-      this.sandbox.stub(this.account, 'signUp').returns(this.signUpDefer.promise());
-    });
-
-    it('should sign up with username = hoodie.id() and the random password', function() {
+      this.sandbox.stub(this.account, 'request', this.fakeRequest);
       this.account.anonymousSignUp();
-      expect(this.account.signUp).to.be.calledWith('hash123', 'uuid123');
+
+      args = this.account.request.args[0];
+      this.type = args[0], this.path = args[1], this.options = args[2];
+      this.data = JSON.parse(this.options.data);
+      this.signUpDefer = this.hoodie.defer();
     });
 
-    _when('signUp successful', function() {
+    it('should send a PUT request to http://my.hood.ie/_users/org.couchdb.user%3Auser_anonymous%2Fhash123', function() {
+      expect(this.account.request).to.be.called();
+      expect(this.type).to.eql('PUT');
+      expect(this.path).to.eql('/_users/org.couchdb.user%3Auser_anonymous%2Fhash123');
+    });
+
+    _when('signUp request successful', function() {
 
       beforeEach(function() {
-        this.signUpDefer.resolve();
+        this.requestDefers[0].resolve(unconfirmedUserDoc('hash123'));
       });
 
       it('should generate a password and store it locally in _account.anonymousPassword', function() {
@@ -886,30 +899,6 @@ describe('hoodie.account', function() {
           expect(this.account.trigger).to.be.calledWith('cleanup');
         });
 
-        _and('user has an anonyomous account', function() {
-
-          beforeEach(function() {
-            this.sandbox.stub(this.account, 'hasAnonymousAccount').returns(true);
-
-          });
-
-          it('should trigger `signin:anonymous` event', function() {
-            this.account.signIn('joe@example.com', 'secret');
-            expect(this.account.trigger).to.be.calledWith('signin:anonymous', 'joe@example.com');
-          });
-        }); // user has an anonyomous account
-        _and('user has a manual account', function() {
-
-          beforeEach(function() {
-            this.sandbox.stub(this.account, 'hasAnonymousAccount').returns(false);
-          });
-
-          it('should trigger `signin` event', function() {
-            this.account.signIn('joe@example.com', 'secret');
-            expect(this.account.trigger).to.be.calledWith('signin', 'joe@example.com', 'hash123');
-          });
-
-        }); // user has a manual account
         it('should set username', function() {
           this.account.signIn('joe@example.com', 'secret');
 
@@ -923,12 +912,15 @@ describe('hoodie.account', function() {
           expect(this.account.fetch).to.be.called();
         });
 
-        it('should resolve with username and response', function() {
-          this.account.signIn('joe@example.com', 'secret').then(function(res) {
-            expect(res).to.eql('joe@example.com', 'hash123');
-          });
+        it('should resolve with username, hoodieId and options', function() {
+          var promise = this.account.signIn('joe@example.com', 'secret', {foo: 'bar'});
+          expect(promise).to.be.resolvedWith('joe@example.com', 'hash123', {foo: 'bar'});
         });
 
+        it('should trigger `signin` event', function() {
+          this.account.signIn('joe@example.com', 'secret', {funky: 'bar'});
+          expect(this.account.trigger).to.be.calledWith('signin', 'joe@example.com', 'hash123', {funky: 'bar'});
+        });
       }); // account is confirmed
       _and('account not (yet) confirmed', function() {
         beforeEach(function() {
@@ -1072,23 +1064,6 @@ describe('hoodie.account', function() {
 
     _when('options.moveData = true', function() {
       beforeEach(function() {
-        var objects = [{
-          type: 'task',
-          id: 'abc',
-          title: 'Milk',
-          createdBy: 'somehash'
-        }, {
-          type: 'task',
-          id: 'def',
-          title: 'Wodka',
-          createdBy: 'somehash'
-        }, {
-          type: '$config',
-          id: 'hoodie',
-          some: 'funk',
-          createdBy: 'somehash'
-        }, ];
-        this.hoodie.store.findAll.returns(this.hoodie.resolveWith(objects));
         this.account.signIn('joe@example.com', 'secret', {
           moveData: true
         });
@@ -1100,22 +1075,8 @@ describe('hoodie.account', function() {
         this.hoodie.request.defer.resolve(this.response);
       });
 
-      it('moves the data', function() {
-        expect(this.hoodie.store.add).to.be.calledWith('task', {
-          id: 'abc',
-          title: 'Milk',
-          createdBy: 'hash123'
-        });
-        expect(this.hoodie.store.add).to.be.calledWith('task', {
-          id: 'def',
-          title: 'Wodka',
-          createdBy: 'hash123'
-        });
-        expect(this.hoodie.store.add).not.to.be.calledWith('$config', {
-          id: 'hoodie',
-          some: 'funk',
-          createdBy: 'hash123'
-        });
+      it('triggers movedata  event', function() {
+        expect(this.account.trigger).to.be.calledWith('movedata');
       });
     }); // signout succeeds
   }); // #signIn
@@ -1434,18 +1395,18 @@ describe('hoodie.account', function() {
     }); // #username is set
   }); // #hasAccount
   describe('#hasAnonymousAccount()', function() {
-    _when('account.username equals account.id()', function() {
+    _when('anonymous password is set', function() {
       beforeEach(function() {
-        this.account.username = 'hash123';
+        configMock.get.withArgs('_account.anonymousPassword').returns('secretfunk');
       });
 
       it('should return true', function() {
         expect(this.account.hasAnonymousAccount()).to.eql(true);
       });
     }); // _account.anonymousPassword is set
-    _when('account.username does not equal account.id()', function() {
+    _when('anonymous password is set', function() {
       beforeEach(function() {
-        this.account.username = 'funkyusername';
+        configMock.get.withArgs('_account.anonymousPassword').returns(undefined);
       });
 
       it('should return false', function() {
@@ -2117,6 +2078,11 @@ function unconfirmedUserDoc(username) {
   };
 }
 
+// 
+// this is a hack to set the value of the internal userDoc variable.
+// As it's not accessible from outside, we call account.fetch()
+// and fake its response, then reset the hoodie.request stub
+// 
 function presetUserDoc(context) {
   context.account.fetch();
   context.hoodie.request.defer.resolve(unconfirmedUserDoc(context.account.username));
@@ -2130,22 +2096,29 @@ function presetUserDoc(context) {
 function with_session_validated_before(callback) {
   _when('session has been validated before', function() {
     beforeEach(function() {
+      var defer;
       var response = {
         userCtx: {
           name: 'user/joe@example.com',
           roles: ['hash123', 'confirmed']
         }
       };
-      this.hoodie.request.defer.resolve(response);
+
       this.account.authenticate();
 
-      // now we have to reset the requestDefer
-      this.account.request.reset();
+      if (this.requestDefers.length) {
+        this.requestDefers.pop().resolve(response);
+      } else {
+        this.hoodie.request.defer.resolve(response);
 
-      var defer = getDefer();
-      this.hoodie.request.returns(defer.promise());
-      this.hoodie.request.defer = defer;
-      this.account.request.returns(defer.promise());
+        // now we have to reset the requestDefer
+        this.account.request.reset();
+
+        defer = getDefer();
+        this.hoodie.request.returns(defer.promise());
+        this.hoodie.request.defer = defer;
+      }
+      
     });
 
     callback();
@@ -2155,21 +2128,26 @@ function with_session_validated_before(callback) {
 function with_session_invalidated_before(callback) {
   _when('session has been invalidated before', function() {
     beforeEach(function() {
+      var defer;
       var response = {
         userCtx: {
           name: null
         }
       };
-      this.hoodie.request.defer.resolve(response);
+
       this.account.authenticate();
+      if (this.requestDefers.length) {
+        this.requestDefers.pop().resolve(response);
+      } else {
+        this.hoodie.request.defer.resolve(response);
 
-      // now we have to reset the requestDefer
-      this.account.request.reset();
+        // now we have to reset the requestDefer
+        this.account.request.reset();
 
-      var defer = getDefer();
-      this.hoodie.request.returns(defer.promise());
-      this.hoodie.request.defer = defer;
-      this.account.request.returns(defer.promise());
+        defer = getDefer();
+        this.hoodie.request.returns(defer.promise());
+        this.hoodie.request.defer = defer;
+      }
     });
 
     callback();

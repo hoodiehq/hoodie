@@ -6,6 +6,7 @@ var hoodieStoreApi = require('../lib/store/api');
 var HoodieObjectTypeError = require('../lib/error/object_type');
 var HoodieObjectIdError = require('../lib/error/object_id');
 var generateId = require('../utils/generate_id');
+var config = require('../utils/config');
 
 var extend = require('extend');
 
@@ -634,8 +635,9 @@ function hoodieStore (hoodie) {
   function subscribeToOutsideEvents() {
 
     // account events
-    hoodie.on('account:cleanup', store.clear);
     hoodie.on('account:signup', markAllAsChanged);
+    hoodie.on('account:movedata', moveData);
+    hoodie.on('account:cleanup', store.clear);
     hoodie.on('remote:bootstrap:start', startBootstrappingMode);
     hoodie.on('remote:bootstrap:end', endBootstrappingMode);
     hoodie.on('remote:bootstrap:error', abortBootstrappingMode);
@@ -892,6 +894,36 @@ function hoodieStore (hoodie) {
     var defer = getDefer();
     queue.push([method, args, defer]);
     return defer.promise();
+  }
+
+  // 
+  // 1. we store all existing data and config in memory
+  // 2. we write it back on signin, with new hoodieId/username
+  // 
+  function moveData () {
+    var oldObjects = [];
+    var oldConfig;
+    var oldHoodieId;
+
+    store.findAll().done( function(data) {
+      oldObjects = data;
+      oldHoodieId = hoodie.id();
+      oldConfig = config.get();
+
+      hoodie.one('signin', function(newUsername, newHoodieId) {
+        for (var key in oldConfig) {
+          if (oldConfig.hasOwnProperty(key) && key !== '_account.username' && key !== '_hoodieId') {
+            config.set(key, oldConfig[key]);
+          }
+        }
+        oldObjects.forEach(function(object) {
+          if (object.createdBy === oldHoodieId) {
+            object.createdBy = newHoodieId;
+          }
+          store.add(object.type, object);
+        });
+      });
+    });
   }
 
   //

@@ -124,6 +124,8 @@ function hoodieRemote (hoodie) {
     hoodie.on('reconnected', remote.connect);
 
     // account events
+    hoodie.on('account:signup', remote.connect);
+    hoodie.on('account:signup:anonymous', remote.connect);
     hoodie.on('account:signin', remote.connect);
     hoodie.on('account:signin:anonymous', remote.connect);
 

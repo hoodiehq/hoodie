@@ -53,6 +53,7 @@ function hoodieId (hoodie) {
     hoodie.on('account:signin', function(username, hoodieId) {
       setId(hoodieId);
     });
+    hoodie.on('account:signin:anonymous', setId);
   }
 
   // allow to run this only once from outside
