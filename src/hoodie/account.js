@@ -104,7 +104,7 @@ function hoodieAccount(hoodie) {
   // hasInvalidSession
   // -----------------
 
-  // returns true if the user is signed in, but does not have a valid cookie 
+  // returns true if the user is signed in, but does not have a valid cookie
   //
   account.hasInvalidSession = function() {
     if (!account.hasAccount()) {
@@ -695,12 +695,12 @@ function hoodieAccount(hoodie) {
       // and adds the 'error' role to the users doc object. If the user has the
       // 'error' role, we need to fetch his _users doc to find out what the error
       // is, before we can reject the promise.
-      // 
-      // TODO: 
+      //
+      // TODO:
       // In that case we reject the sign in, but towards the backend we still get
       // a new session, and the old one gets removed. That leads to a state like
       // a session timeout: I'm still signed in with the old username, but not
-      // authorized anymore. A better approach might be to send an extra 
+      // authorized anymore. A better approach might be to send an extra
       // GET /_users/<user-doc-id> with HTTP basic auth to see if the user account
       // is valid and only if it is, we'd send the POST /_session request.
       //
@@ -842,10 +842,10 @@ function hoodieAccount(hoodie) {
 
   //
   // turn an anonymous account into a real account. Internally, this is what happens:
-  // 
+  //
   // 1. rename the username from `<hoodieId>` to `username`
   // 2. Set password to `password`
-  // 3. 
+  // 3.
   //
   function upgradeAnonymousAccount(username, password) {
     var currentPassword = getAnonymousPassword();
@@ -904,9 +904,9 @@ function hoodieAccount(hoodie) {
     return resolve();
   }
 
-  // 
+  //
   // make sure to remove a promise
-  // 
+  //
   function disconnect() {
     return hoodie.remote.disconnect();
   }
@@ -914,8 +914,9 @@ function hoodieAccount(hoodie) {
 
   //
   function cleanupAndTriggerSignOut() {
+    var username = account.username;
     return cleanup().then(function() {
-      return account.trigger('signout');
+      return account.trigger('signout', username);
     });
   }
 
@@ -1021,7 +1022,7 @@ function hoodieAccount(hoodie) {
         return awaitCurrentAccountRemoved(currentUsername, newPassword).then( function() {
 
           // we do signOut explicitely although signOut is build into hoodie.signIn to
-          // work around trouble in case of local changes. See 
+          // work around trouble in case of local changes. See
           // https://github.com/hoodiehq/hoodie.js/issues/256
           return account.signOut({silent:true, ignoreLocalChanges: true}).then(function() {
             return account.signIn(newUsername, newPassword, {moveData: true});
@@ -1142,17 +1143,17 @@ function hoodieAccount(hoodie) {
     });
   }
 
-  // 
+  //
   // Creates a /_users document that will techincally allow
   // to authenticate with passed username / password. But in
   // Hoodie there is also an "unconfirmed" state that is the
   // default state until the Hoodie Server creates the user
   // database and sets a confirmed flag + user roles.
-  // 
+  //
   // sendSignUpRequest calls the progress callbacks when the
   // user doc got created, but does not resolve before the
   // user account got confirmed.
-  // 
+  //
   function sendSignUpRequest (username, password) {
     var defer = getDefer();
     var options;
