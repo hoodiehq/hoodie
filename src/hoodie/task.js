@@ -252,7 +252,7 @@ function hoodieTask(hoodie) {
       eventName = 'abort';
     }
 
-    if (eventName === 'remove' && task.$processedAt) {
+    if (eventName === 'remove' && task.$processedAt && !task.$error) {
       eventName = 'success';
     }
 
