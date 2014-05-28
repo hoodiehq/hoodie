@@ -11,11 +11,13 @@ var app = require('../lib');
 
 // parse command-line arguments
 var argv = require('optimist')
-  .alias('h', 'help')
-  .describe('help', 'Show usage information')
+  .usage('Usage: $0 [options]')
+  .alias('w', 'www')
+  .describe('www', 'Set www root directory')
   .describe('local-tld', 'Turn on local-tld on supported platforms')
   .describe('no-local-tld', 'Turn off local-tld on supported platforms')
-  .usage('Usage: start [options]')
+  .alias('h', 'help')
+  .describe('help', 'Show usage information')
   .argv;
 
 /**
