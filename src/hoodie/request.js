@@ -25,7 +25,7 @@ var rejectWith = require('../utils/promise/reject_with');
 function hoodieRequest(hoodie) {
   var $ajax = $.ajax;
 
-  // Hoodie backend listents to requests prefixed by /_api,
+  // Hoodie backend listens to requests prefixed by /_api,
   // so we prefix all requests with relative URLs
   var API_PATH = '/_api';
 

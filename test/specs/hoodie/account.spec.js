@@ -387,6 +387,7 @@ describe('hoodie.account', function() {
         expect(this.path).to.eql('/_users/org.couchdb.user%3Auser%2Fjoe');
       });
 
+
       _but('user is already logged in', function() {
         beforeEach(function() {
           this.sandbox.stub(this.account, 'hasAccount').returns(true);
@@ -978,7 +979,7 @@ describe('hoodie.account', function() {
         });
       }); // account has an error
     }); // signIn successful
-    _when('signIn not succesful because unauthorized', function() {
+    _when('signIn not successful because unauthorized', function() {
       beforeEach(function() {
         this.error = {
           name: 'HoodieUnauthorizedError',
@@ -995,7 +996,7 @@ describe('hoodie.account', function() {
           });
         });
       });
-    }); // signIn not succesful because unauthorized
+    }); // signIn not successful because unauthorized
     _when('sign in without password', function() {
       it('should set password to empty string', function() {
         var data, options, path, type, args;
@@ -1536,7 +1537,7 @@ describe('hoodie.account', function() {
           });
         });
 
-        _and('destroy request succesful', function() {
+        _and('destroy request successful', function() {
           beforeEach(function() {
             this.hoodie.request.defer.resolve();
             this.account.destroy();
@@ -1554,7 +1555,7 @@ describe('hoodie.account', function() {
           it('should trigger clenaup event', function() {
             expect(this.account.trigger).to.be.calledWith('cleanup');
           });
-        }); // destroy request succesful
+        }); // destroy request successful
       }); // fetch is successful
       _and('fetch fails with not_found', function() {
 

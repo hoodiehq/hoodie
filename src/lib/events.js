@@ -34,7 +34,7 @@ function hoodieEvents(hoodie, options) {
   // Bind
   // ------
   //
-  // bind a callback to an event triggerd by the object
+  // bind a callback to an event triggered by the object
   //
   //     object.bind 'cheat', blame
   //

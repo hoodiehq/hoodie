@@ -35,7 +35,7 @@ And here is what it looks like:
   hoodie.account.resetPassword('joe@example.com');
 ```
 
-### store data (it will sync to whereever your users sign in)
+### store data (it will sync to wherever your users sign in)
 
 ```javascript
 
@@ -72,7 +72,7 @@ is an error, it stays in the task store to be handled or removed.
 
 
 ```js
-  // start a new task. Once it was finished, the succes callback gets
+  // start a new task. Once it was finished, the success callback gets
   // called. If something went wrong, error callback gets called instead
   hoodie.task.start('message', {to: 'joe', text: 'Do you want to party?'})
     .then( showMessageSent, showMessageError )
@@ -164,7 +164,7 @@ You can also subscribe to the following task events
     alert('Mail has been sent to ' + mail.to);
   });
 
-  magic.fail(function(eror) {
+  magic.fail(function(error) {
     alert('Sorry, but something went wrong: ' + error.reason);
   });
 
