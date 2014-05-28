@@ -46,7 +46,7 @@ var isPromise = require('../../utils/promise/is_promise');
 //
 function hoodieStoreApi(hoodie, options) {
 
-  // persistance logic
+  // persistence logic
   var backend = {};
 
   // extend this property with extra functions that will be available
@@ -79,7 +79,7 @@ function hoodieStoreApi(hoodie, options) {
   // --------------
 
   // by default, we only check for a valid type & id.
-  // the validate method can be overwriten by passing
+  // the validate method can be overwritten by passing
   // options.validate
   //
   // if `validate` returns nothing, the passed object is
@@ -228,7 +228,7 @@ function hoodieStoreApi(hoodie, options) {
   // -------------------
 
   // In contrast to `.save`, the `.update` method does not replace the stored object,
-  // but only changes the passed attributes of an exsting object, if it exists
+  // but only changes the passed attributes of an existing object, if it exists
   //
   // both a hash of key/values or a function that applies the update to the passed
   // object can be passed.
@@ -381,7 +381,7 @@ function hoodieStoreApi(hoodie, options) {
   // removeAll
   // -----------
 
-  // Destroye all objects. Can be filtered by a type
+  // Destroy all objects. Can be filtered by a type
   //
   api.removeAll = function removeAll(type, options) {
     return decoratePromise(backend.removeAll(type, options || {}));

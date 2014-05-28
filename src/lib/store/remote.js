@@ -47,7 +47,7 @@ function hoodieRemoteStore(hoodie, options) {
   var remoteStore = {};
 
 
-  // Remote Store Persistance methods
+  // Remote Store Persistence methods
   // ----------------------------------
 
   // find
@@ -73,7 +73,7 @@ function hoodieRemoteStore(hoodie, options) {
   // findAll
   // ---------
 
-  // find all objects, can be filetered by a type
+  // find all objects, can be filtered by a type
   //
   remoteStore.findAll = function findAll(type) {
     var endkey, path, startkey;
@@ -326,7 +326,7 @@ function hoodieRemoteStore(hoodie, options) {
   // getSinceNr
   // ------------
 
-  // returns the sequence number from wich to start to find changes in pull
+  // returns the sequence number from which to start to find changes in pull
   //
   var since = options.since || 0; // TODO: spec that!
   remote.getSinceNr = function getSinceNr() {
@@ -341,7 +341,7 @@ function hoodieRemoteStore(hoodie, options) {
   // bootstrap
   // -----------
 
-  // inital pull of data of the remote store. By default, we pull all
+  // initial pull of data of the remote store. By default, we pull all
   // changes since the beginning, but this behavior might be adjusted,
   // e.g for a filtered bootstrap.
   //
@@ -473,7 +473,7 @@ function hoodieRemoteStore(hoodie, options) {
   // setSinceNr
   // ------------
 
-  // sets the sequence number from wich to start to find changes in pull.
+  // sets the sequence number from which to start to find changes in pull.
   // If remote store was initialized with since : function(nr) { ... },
   // call the function with the seq passed. Otherwise simply set the seq
   // number and return it.
@@ -625,7 +625,7 @@ function hoodieRemoteStore(hoodie, options) {
 
   // ### restart pull request
 
-  // request gets restarted automaticcally
+  // request gets restarted automatically
   // when aborted (see handlePullError)
   function restartPullRequest() {
     if (pullRequest) {
@@ -636,7 +636,7 @@ function hoodieRemoteStore(hoodie, options) {
 
   // ### pull success handler
 
-  // request gets restarted automaticcally
+  // request gets restarted automatically
   // when aborted (see handlePullError)
   //
   function handlePullSuccess(response) {
@@ -758,7 +758,7 @@ function hoodieRemoteStore(hoodie, options) {
       remote.trigger('change:' + object.type + ':' + object.id, event, object);
     }
 
-    // reset the hash for pushed object revisison after
+    // reset the hash for pushed object revision after
     // every response from the longpoll GET /_changes 
     pushedObjectRevisions = {};
   }

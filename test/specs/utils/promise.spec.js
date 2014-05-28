@@ -74,7 +74,7 @@ describe('hoodie promises API', function() {
 
   describe('#rejectWith(something)', function() {
 
-    it('wraps passad arguments into a promise and returns it as Error', function() {
+    it('wraps passed arguments into a promise and returns it as Error', function() {
       var promise = rejectWith('funk overflow!');
 
       promise.then(this.noop, function (error) {

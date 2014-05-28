@@ -98,7 +98,7 @@ describe('hoodie.request', function () {
         responseText: ''
       });
     });
-    it('should return a rejected promis with Cannot reach backend error', function() {
+    it('should return a rejected promise with Cannot reach backend error', function() {
       expect(this.hoodie.request('GET', '/')).to.be.rejectedWith({
         name: 'HoodieConnectionError',
         message: 'Could not connect to Hoodie server at https://my.hood.ie.',

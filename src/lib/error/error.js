@@ -12,7 +12,7 @@
 //
 // Instead of being initialized with just
 // the message, HoodieError expects an
-// object with properites. The `message`
+// object with properties. The `message`
 // property is required. The name will
 // fallback to `error`.
 //

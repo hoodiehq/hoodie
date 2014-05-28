@@ -157,7 +157,7 @@ describe('hoodie.task', function() {
         expect(this.promise).to.be.rejectedWith('nope.');
       });
 
-      it('should call task.start again if signup suceeded', function() {
+      it('should call task.start again if signup succeeded', function() {
         this.sandbox.stub(this.task, 'start').returns('funk');
         this.hoodie.account.anonymousSignUp.defer.resolve();
         expect(this.task.start).to.be.calledWith('message', {
@@ -210,11 +210,11 @@ describe('hoodie.task', function() {
 
       _when('removing task from store succeeds', function() {
         beforeEach(function() {
-          this.hoodie.store.remove.defer.resolve('removeSucces');
+          this.hoodie.store.remove.defer.resolve('removeSuccess');
         });
 
         it('should resolve', function() {
-          expect(this.promise).to.be.resolvedWith('removeSucces');
+          expect(this.promise).to.be.resolvedWith('removeSuccess');
         });
       });
     });
@@ -245,7 +245,7 @@ describe('hoodie.task', function() {
 
       _when('removing task from store succeeds', function() {
         beforeEach(function() {
-          this.hoodie.store.remove.defer.resolve('removeSucces');
+          this.hoodie.store.remove.defer.resolve('removeSuccess');
           this.syncEventCallback = this.hoodie.one.lastCall.args[1];
         });
 
