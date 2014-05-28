@@ -1,3 +1,17 @@
+<a name="0.9.1"></a>
+### 0.9.1 (2014-05-28)
+
+
+#### Bug Fixes
+
+* **hoodie.task:** triggers 'success' event right before 'error' ([cc54ab22](https://github.com/hoodiehq/hoodie.js/commit/cc54ab22f04ebb3460edf8dd87c2990f802912e5))
+
+
+#### Features
+
+* **hoodie.account:** pass username on signout event ([d196e50c](https://github.com/hoodiehq/hoodie.js/commit/d196e50c62371015b9ec4d031e4824b721073adb))
+
+
 <a name="0.9.0"></a>
 ## 0.9.0 (2014-05-28)
 
