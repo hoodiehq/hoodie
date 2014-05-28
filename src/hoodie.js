@@ -48,7 +48,7 @@ function Hoodie(baseUrl) {
   //     hoodie.extend(function(hoodie) {} )
   //
   hoodie.extend = function extend(extension) {
-    extension(hoodie);
+    extension(hoodie, lib, utils);
   };
 
 
