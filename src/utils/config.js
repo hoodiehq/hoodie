@@ -2,6 +2,7 @@
 // ===================
 
 var localStorageWrapper = require('../utils/local_storage_wrapper');
+var extend = require('extend');
 
 // public API
 var config = {};
@@ -25,7 +26,10 @@ config.set = function set(key, value) {
 // receives a configuration
 //
 config.get = function get(key) {
-  return cache[key];
+  if (key) {
+    return cache[key];
+  }
+  return extend({}, cache);
 };
 
 // clear

@@ -125,9 +125,6 @@ function hoodieAccount(hoodie) {
   // to sign in with a 300ms timeout.
   //
   account.signUp = function signUp(username, password) {
-    var options;
-
-
     if (password === undefined) {
       password = '';
     }
@@ -144,27 +141,10 @@ function hoodieAccount(hoodie) {
       return rejectWith('Must sign out first.');
     }
 
-    // downcase username
-    username = username.toLowerCase();
-
-    options = {
-      data: JSON.stringify({
-        _id: userDocKey(username),
-        name: userTypeAndId(username),
-        type: 'user',
-        roles: [],
-        password: password,
-        hoodieId: hoodie.id(),
-        database: account.db(),
-        updatedAt: now(),
-        createdAt: now(),
-        signedUpAt: username !== hoodie.id() ? now() : void 0
-      }),
-      contentType: 'application/json'
-    };
-
-    return account.request('PUT', userDocUrl(username), options)
-    .then(handleSignUpSuccess(username, password), handleSignUpError(username));
+    return sendSignUpRequest(username, password)
+    .done(function() {
+      account.trigger('signup', username);
+    });
   };
 
 
@@ -185,9 +165,12 @@ function hoodieAccount(hoodie) {
     password = generateId(10);
     username = hoodie.id();
 
-    return account.signUp(username, password).done(function() {
+    return sendSignUpRequest(username, password)
+    .progress( function() {
       setAnonymousPassword(password);
-      return account.trigger('signup:anonymous', username);
+    })
+    .done(function() {
+      account.trigger('signup:anonymous');
     });
   };
 
@@ -197,7 +180,8 @@ function hoodieAccount(hoodie) {
 
   //
   account.hasAccount = function hasAccount() {
-    return !!account.username;
+    var hasUsername = !!account.username;
+    return hasUsername || account.hasAnonymousAccount();
   };
 
 
@@ -214,7 +198,7 @@ function hoodieAccount(hoodie) {
   // can compare the username to the hoodie.id, which is the
   // same for anonymous accounts.
   account.hasAnonymousAccount = function hasAnonymousAccount() {
-    return account.username === hoodie.id();
+    return !! getAnonymousPassword();
   };
 
 
@@ -236,6 +220,14 @@ function hoodieAccount(hoodie) {
     return config.unset(anonymousPasswordKey);
   }
 
+  function anonymousSignIn () {
+    var username = hoodie.id();
+    var password = getAnonymousPassword();
+    return account.signIn(username, password).done( function() {
+      account.trigger('signin:anonymous', username);
+    });
+  }
+
 
   // sign in with username & password
   // ----------------------------------
@@ -253,21 +245,49 @@ function hoodieAccount(hoodie) {
   // move all data from the anonymous account to the account the user signed into.
   //
   account.signIn = function signIn(username, password, options) {
-    var isNotReauthenticating = username !== account.username;
+    var isReauthenticating = (username === account.username);
+    var isSilent;
+    var promise;
 
     if (! username) { username = ''; }
     if (! password) { password = ''; }
     username = username.toLowerCase();
 
     options = options || {};
+    isSilent = options.silent;
 
-    if (account.hasAccount() && isNotReauthenticating && !options.moveData) {
-      return pushLocalChanges(options).then(function() {
+    if (account.hasAccount() && !isReauthenticating && !options.moveData) {
+      promise = pushLocalChanges(options).then(function() {
         return sendSignInRequest(username, password, options);
       });
+    } else {
+      promise = sendSignInRequest(username, password, options);
     }
 
-    return sendSignInRequest(username, password, options);
+    if (!isReauthenticating) {
+      promise.done(disconnect);
+    }
+
+    return promise.done( function(newUsername, newHoodieId) {
+      if (options.moveData) {
+        if (!isSilent) {
+          account.trigger('movedata');
+        }
+      }
+      if (! isReauthenticating) {
+        cleanup();
+      }
+      if (isReauthenticating) {
+        if (!isSilent) {
+          account.trigger('reauthenticated', newUsername);
+        }
+      } else {
+        setUsername(newUsername);
+      }
+      if (!isSilent) {
+        account.trigger('signin', newUsername, newHoodieId, options);
+      }
+    });
   };
 
 
@@ -285,7 +305,7 @@ function hoodieAccount(hoodie) {
       return cleanupMethod();
     }
 
-    return pushLocalChanges(options).then(hoodie.remote.disconnect).then(sendSignOutRequest).then(cleanupMethod);
+    return pushLocalChanges(options).then(disconnect).then(sendSignOutRequest).then(cleanupMethod);
   };
 
 
@@ -316,9 +336,10 @@ function hoodieAccount(hoodie) {
   // fetches _users doc from CouchDB and caches it in _doc
   //
   account.fetch = function fetch(username) {
+    var currentUsername = account.hasAnonymousAccount() ? hoodie.id() : account.username;
 
     if (username === undefined) {
-      username = account.username;
+      username = currentUsername;
     }
 
     if (!username) {
@@ -353,10 +374,13 @@ function hoodieAccount(hoodie) {
       });
     }
 
-    hoodie.remote.disconnect();
+    disconnect();
 
-    return account.fetch().then(
-    sendChangeUsernameAndPasswordRequest(currentPassword, null, newPassword));
+    return account.fetch()
+    .then(sendChangeUsernameAndPasswordRequest(currentPassword, null, newPassword))
+    .done( function() {
+      account.trigger('changepassword');
+    });
   };
 
 
@@ -403,7 +427,12 @@ function hoodieAccount(hoodie) {
 
     // TODO: spec that checkPasswordReset gets executed
     return withPreviousRequestsAborted('resetPassword', function() {
-      return account.request('PUT', '/_users/' + (encodeURIComponent(key)), options).done(account.checkPasswordReset).then(awaitPasswordResetResult);
+      return account.request('PUT', '/_users/' + (encodeURIComponent(key)), options)
+      .done(account.checkPasswordReset)
+      .then(awaitPasswordResetResult)
+      .done(function() {
+        account.trigger('resetpassword');
+      });
     });
   };
 
@@ -466,9 +495,15 @@ function hoodieAccount(hoodie) {
   // But the current password is needed to login with the new username.
   //
   account.changeUsername = function changeUsername(currentPassword, newUsername) {
-    if (newUsername !== account.username) {
+    var currentUsername = account.hasAnonymousAccount() ? hoodie.id() : account.username;
+
+    if (newUsername !== currentUsername) {
       newUsername = newUsername || '';
-      return changeUsernameAndPassword(currentPassword, newUsername.toLowerCase());
+      return changeUsernameAndPassword(currentPassword, newUsername.toLowerCase())
+      .done( function() {
+        setUsername(newUsername);
+        account.trigger('changeusername', newUsername);
+      });
     }
     return rejectWith({
       name: 'HoodieConflictError',
@@ -547,7 +582,7 @@ function hoodieAccount(hoodie) {
     }
 
     if (account.hasAnonymousAccount()) {
-      return account.signIn(account.username, getAnonymousPassword());
+      return anonymousSignIn();
     }
 
     authenticated = false;
@@ -569,7 +604,6 @@ function hoodieAccount(hoodie) {
   function handleSignUpSuccess(username, password) {
 
     return function(response) {
-      account.trigger('signup', username);
       userDoc._rev = response.rev;
       return delayedSignIn(username, password, {moveData: true});
     };
@@ -644,7 +678,7 @@ function hoodieAccount(hoodie) {
   //     }
   //
   // we want to turn it into 'test1', 'mvu85hy' or reject the promise
-  // in case an error occured ('roles' array contains 'error')
+  // in case an error occured ('roles' array contains 'error' or is empty)
   //
   function handleSignInSuccess(options) {
     options = options || {};
@@ -652,40 +686,8 @@ function hoodieAccount(hoodie) {
     return function(response) {
       var newUsername;
       var newHoodieId;
-      var oldUsername;
-      var isReauthenticating;
-      var currentData;
-
-      function setNewUsernameAndTriggerEvents() {
-        setUsername(newUsername);
-        authenticated = true;
-
-        //
-        // options.silent is true when we need to sign in the
-        // the user without signIn method being called. That's
-        // currently the case for changeUsername.
-        // Also don't trigger 'signin' when reauthenticating
-        //
-        if (!options.silent && !isReauthenticating) {
-          if (account.hasAnonymousAccount()) {
-            account.trigger('signin:anonymous', newUsername);
-          } else {
-            account.trigger('signin', newUsername, newHoodieId);
-          }
-        }
-
-        // user reauthenticated, meaning
-        if (isReauthenticating) {
-          account.trigger('reauthenticated', newUsername);
-        }
-
-        account.fetch();
-        return resolveWith(newUsername);
-      }
 
       newUsername = response.name.replace(/^user(_anonymous)?\//, '');
-      oldUsername = account.username;
-      isReauthenticating = (newUsername === oldUsername);
       newHoodieId = response.roles[0];
 
       //
@@ -721,43 +723,10 @@ function hoodieAccount(hoodie) {
           message: 'Account has not been confirmed yet'
         });
       }
-      if (! isReauthenticating) {
-        if (!options.moveData) {
-          return cleanupAndDisconnect().then(setNewUsernameAndTriggerEvents);
-        }
+      authenticated = true;
 
-        // 
-        // TODO
-        // move the code below into `hoodie.store`. We should trigger something like 
-        // an `account:movedata` like so
-        // 
-        // ```
-        // account.trigger('movedata');
-        // ```
-        // 
-        // That would set a flag in hoodie.store so that the next time store.clear
-        // gets called, it would not remove all data, but only update the hoodie.id()
-        // in `createdBy` of all the objects.
-        // 
-        return hoodie.store.findAll().then(function(data) {
-          currentData = data;
-        }).then(cleanupAndDisconnect).then(setNewUsernameAndTriggerEvents).done(function() {
-          currentData.forEach(function(object) {
-            var type = object.type;
-
-            // ignore the account settings
-            if (type === '$config' && object.id === 'hoodie') {
-              return;
-            }
-
-            delete object.type;
-            object.createdBy = hoodie.id();
-            hoodie.store.add(type, object);
-          });
-        });
-      }
-
-      return setNewUsernameAndTriggerEvents();
+      account.fetch();
+      return resolveWith(newUsername, newHoodieId, options);
     };
   }
 
@@ -862,11 +831,11 @@ function hoodieAccount(hoodie) {
   // 3. sign in with new credentials to create new sesion.
   //
   function changeUsernameAndPassword(currentPassword, newUsername, newPassword) {
+    var currentUsername = account.hasAnonymousAccount() ? hoodie.id() : account.username;
 
-    return sendSignInRequest(account.username, currentPassword, {
-      silent: true
-    }).then(function() {
-      return account.fetch().then(sendChangeUsernameAndPasswordRequest(currentPassword, newUsername, newPassword));
+    return sendSignInRequest(currentUsername, currentPassword).then(function() {
+      return account.fetch()
+      .then(sendChangeUsernameAndPasswordRequest(currentPassword, newUsername, newPassword));
     });
   }
 
@@ -894,7 +863,7 @@ function hoodieAccount(hoodie) {
   //
   function handleFetchBeforeDestroySuccess() {
 
-    hoodie.remote.disconnect();
+    disconnect();
     userDoc._deleted = true;
 
     return withPreviousRequestsAborted('updateUsersDoc', function() {
@@ -938,9 +907,8 @@ function hoodieAccount(hoodie) {
   // 
   // make sure to remove a promise
   // 
-  function cleanupAndDisconnect() {
-    hoodie.remote.disconnect();
-    return cleanup();
+  function disconnect() {
+    return hoodie.remote.disconnect();
   }
 
 
@@ -978,8 +946,10 @@ function hoodieAccount(hoodie) {
   // turn a username into a valid _users doc._id
   //
   function userDocKey(username) {
-    username = username || account.username;
-    return '' + userDocPrefix + ':' + (userTypeAndId(username));
+    var currentUsername = account.hasAnonymousAccount() ? hoodie.id() : account.username;
+
+    username = username || currentUsername;
+    return '' + userDocPrefix + ':' + userTypeAndId(username);
   }
 
   //
@@ -1027,9 +997,8 @@ function hoodieAccount(hoodie) {
       };
 
       return withPreviousRequestsAborted('updateUsersDoc', function() {
-        return account.request('PUT', userDocUrl(), options).then(
-          handleChangeUsernameAndPasswordResponse(newUsername, newPassword || currentPassword)
-        );
+        return account.request('PUT', userDocUrl(), options)
+        .then(handleChangeUsernameAndPasswordResponse(newUsername, newPassword || currentPassword));
       });
 
     };
@@ -1041,14 +1010,15 @@ function hoodieAccount(hoodie) {
   // or have to wait until the worker removed the old account
   //
   function handleChangeUsernameAndPasswordResponse(newUsername, newPassword) {
+    var currentUsername = account.hasAnonymousAccount() ? hoodie.id() : account.username;
 
     return function() {
-      hoodie.remote.disconnect();
+      disconnect();
 
       if (newUsername) {
         // note that if username has been changed, newPassword is the current password.
         // We always change either the one, or the other.
-        return awaitCurrentAccountRemoved(account.username, newPassword).then( function() {
+        return awaitCurrentAccountRemoved(currentUsername, newPassword).then( function() {
 
           // we do signOut explicitely although signOut is build into hoodie.signIn to
           // work around trouble in case of local changes. See 
@@ -1058,7 +1028,7 @@ function hoodieAccount(hoodie) {
           });
         });
       } else {
-        return account.signIn(account.username, newPassword);
+        return account.signIn(currentUsername, newPassword);
       }
     };
   }
@@ -1171,6 +1141,46 @@ function hoodieAccount(hoodie) {
       return promise.then(handleSignInSuccess(options));
     });
   }
+
+  // 
+  // Creates a /_users document that will techincally allow
+  // to authenticate with passed username / password. But in
+  // Hoodie there is also an "unconfirmed" state that is the
+  // default state until the Hoodie Server creates the user
+  // database and sets a confirmed flag + user roles.
+  // 
+  // sendSignUpRequest calls the progress callbacks when the
+  // user doc got created, but does not resolve before the
+  // user account got confirmed.
+  // 
+  function sendSignUpRequest (username, password) {
+    var defer = getDefer();
+    var options;
+
+    username = username.toLowerCase();
+    options = {
+      data: JSON.stringify({
+        _id: userDocKey(username),
+        name: userTypeAndId(username),
+        type: 'user',
+        roles: [],
+        password: password,
+        hoodieId: hoodie.id(),
+        database: account.db(),
+        updatedAt: now(),
+        createdAt: now(),
+        signedUpAt: username !== hoodie.id() ? now() : void 0
+      }),
+      contentType: 'application/json'
+    };
+    account.request('PUT', userDocUrl(username), options)
+    .done(defer.notify)
+    .then(handleSignUpSuccess(username, password), handleSignUpError(username))
+    .then(defer.resolve, defer.reject);
+
+    return defer.promise();
+  }
+
 
   //
   function now() {
