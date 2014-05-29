@@ -451,7 +451,7 @@ function hoodieAccount(hoodie) {
   // one second timeout.
   //
   account.checkPasswordReset = function checkPasswordReset() {
-    var hash, options, resetPasswordId, url, username;
+    var hash, options, resetPasswordId, url, username, couchUsername;
 
     // reject if there is no pending password reset request
     resetPasswordId = config.get('_account.resetPasswordId');
@@ -460,10 +460,13 @@ function hoodieAccount(hoodie) {
       return rejectWith('No pending password reset.');
     }
 
+    // username is part of resetPasswordId, see account.resetPassword
+    username = resetPasswordId.split('/')[0];
+
     // send request to check status of password reset
-    username = '$passwordReset/' + resetPasswordId;
-    url = '/_users/' + (encodeURIComponent(userDocPrefix + ':' + username));
-    hash = btoa(username + ':' + resetPasswordId);
+    couchUsername = '$passwordReset/' + resetPasswordId;
+    url = '/_users/' + (encodeURIComponent(userDocPrefix + ':' + couchUsername));
+    hash = btoa(couchUsername + ':' + resetPasswordId);
 
     options = {
       headers: {
@@ -473,12 +476,12 @@ function hoodieAccount(hoodie) {
 
     return withSingleRequest('passwordResetStatus', function() {
       return account.request('GET', url, options).then(
-      handlePasswordResetStatusRequestSuccess, handlePasswordResetStatusRequestError).fail(function(error) {
+      handlePasswordResetStatusRequestSuccess, handlePasswordResetStatusRequestError(username)).fail(function(error) {
         if (error.name === 'HoodiePendingError') {
           global.setTimeout(account.checkPasswordReset, 1000);
           return;
         }
-        return account.trigger('error:passwordreset', error);
+        return account.trigger('error:passwordreset', error, username);
       });
     });
   };
@@ -761,15 +764,17 @@ function hoodieAccount(hoodie) {
   // If the error is a 401, it's exactly what we've been waiting for.
   // In this case we resolve the promise.
   //
-  function handlePasswordResetStatusRequestError(error) {
-    if (error.name === 'HoodieUnauthorizedError') {
-      config.unset('_account.resetPasswordId');
-      account.trigger('passwordreset');
+  function handlePasswordResetStatusRequestError(username) {
+    return function(error) {
+      if (error.name === 'HoodieUnauthorizedError') {
+        config.unset('_account.resetPasswordId');
+        account.trigger('passwordreset', username);
 
-      return resolve();
-    } else {
-      return rejectWith(error);
-    }
+        return resolve();
+      } else {
+        return rejectWith(error);
+      }
+    };
   }
 
 
