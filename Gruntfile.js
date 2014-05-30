@@ -9,6 +9,37 @@ module.exports = function(grunt) {
     '// Copyright 2012 - 2014 https://github.com/hoodiehq/\n' +
     '// Licensed Apache License 2.0\n\n';
 
+  var customLaunchers = {
+    sl_chrome_mac: {
+      base: 'SauceLabs',
+      platform: 'mac 10.8',
+      browserName: 'chrome'
+    },
+    sl_safari_mac: {
+      base: 'SauceLabs',
+      platform: 'mac 10.8',
+      browserName: 'safari'
+    }//,
+    // sl_firefox_win7: {
+    //   base: 'SauceLabs',
+    //   platform: 'Windows 7',
+    //   browserName: 'Firefox'
+    // },
+    // IE 10 & 11 is WIP
+    // sl_ie10_win7: {
+    //   base: 'SauceLabs',
+    //   platform: 'Windows 7',
+    //   browserName: 'internet explorer',
+    //   version: '10'
+    // },
+    // sl_ie11_win8: {
+    //   base: 'SauceLabs',
+    //   platform: 'Windows 8.1',
+    //   browserName: 'internet explorer',
+    //   version: '11'
+    // }
+  };
+
   grunt.initConfig({
     pkg: grunt.file.readJSON('package.json'),
 
@@ -54,48 +85,12 @@ module.exports = function(grunt) {
       continuous: {
         singleRun: true,
         sauceLabs: {
-          username: 'hoodiehq',
-          accessKey: '6ab72d53-5807-40bb-be53-64cb7adba626',
-          testName: 'hoodie.js test'
+          tunnelIdentifier: process.env.TRAVIS_JOB_NUMBER,
+          testName: 'hoodie.js test',
         },
-        customLaunchers: {
-          sl_chrome_mac: {
-            base: 'SauceLabs',
-            platform: 'mac 10.8',
-            browserName: 'chrome'
-          },
-          sl_safari_mac: {
-            base: 'SauceLabs',
-            platform: 'mac 10.8',
-            browserName: 'safari'
-          },
-          // sl_firefox_win7: {
-          //   base: 'SauceLabs',
-          //   platform: 'Windows 7',
-          //   browserName: 'Firefox'
-          // },
-          // IE 10 & 11 is WIP
-          // sl_ie10_win7: {
-          //   base: 'SauceLabs',
-          //   platform: 'Windows 7',
-          //   browserName: 'internet explorer',
-          //   version: '10'
-          // },
-          // sl_ie11_win8: {
-          //   base: 'SauceLabs',
-          //   platform: 'Windows 8.1',
-          //   browserName: 'internet explorer',
-          //   version: '11'
-          // }
-        },
-        browsers: [
-          'PhantomJS',
-          'sl_chrome_mac',
-          'sl_safari_mac',
-          // 'sl_firefox_win7',
-          // 'sl_ie10_win7',
-          // 'sl_ie11_win8'
-        ]
+        customLaunchers: customLaunchers,
+        browsers: Object.keys(customLaunchers),
+        reporters: ['progress', 'saucelabs']
       },
 
       dev: {

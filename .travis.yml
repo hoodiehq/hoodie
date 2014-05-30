@@ -12,8 +12,8 @@ node_js:
 
 env:
   global:
-    - SAUCE_USERNAME=svnlto
-    - SAUCE_ACCESS_KEY=104fe381-851b-485f-81d6-8eda57d0e40e
+    - SAUCE_USERNAME=hoodiehq
+    - SAUCE_ACCESS_KEY=6ab72d53-5807-40bb-be53-64cb7adba626
 
 notifications:
   irc:
