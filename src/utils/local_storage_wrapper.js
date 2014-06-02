@@ -1,37 +1,36 @@
 // public API
-var store = {};
 
-store.setItem = function (name, item) {
+exports.setItem = function (name, item) {
   global.localStorage.setItem(name, item);
 };
 
-store.getItem = function (name) {
+exports.getItem = function (name) {
   return global.localStorage.getItem(name);
 };
 
-store.removeItem = function (name) {
+exports.removeItem = function (name) {
   return global.localStorage.removeItem(name);
 };
 
-store.clear = function () {
+exports.clear = function () {
   return global.localStorage.clear();
 };
 
-store.key = function (nr) {
+exports.key = function (nr) {
   return global.localStorage.key(nr);
 };
 
-store.length = function () {
+exports.length = function () {
   return global.localStorage.length;
 };
 
 // more advanced localStorage wrappers to find/save objects
-store.setObject = function (key, object) {
-  return store.setItem(key, global.JSON.stringify(object));
+exports.setObject = function (key, object) {
+  return exports.setItem(key, global.JSON.stringify(object));
 };
 
-store.getObject = function (key) {
-  var item = store.getItem(key);
+exports.getObject = function (key) {
+  var item = exports.getItem(key);
 
   if (! item) {
     return null;
@@ -45,18 +44,17 @@ store.getObject = function (key) {
 };
 
 function init() {
-  store.isPersistent = isPersistent();
-  if (store.isPersistent) {
+  if (exports.isPersistent) {
     return;
   }
 
   // if store is not persistent, patch all store methods
-  store.getItem = function() { return null; };
-  store.setItem = function() { return null; };
-  store.removeItem = function() { return null; };
-  store.key = function() { return null; };
-  store.length = function() { return 0; };
-  store.isPersistent = function() { return false; };
+  exports.getItem = function() { return null; };
+  exports.setItem = function() { return null; };
+  exports.removeItem = function() { return null; };
+  exports.key = function() { return null; };
+  exports.length = function() { return 0; };
+  exports.isPersistent = function() { return false; };
 }
 
 
@@ -71,7 +69,7 @@ function init() {
 // https://github.com/cappuccino/cappuccino/commit/063b05d9643c35b303568a28809e4eb3224f71ec
 //
 
-function isPersistent() {
+exports.isPersistent = function() {
   try {
 
     // we've to put this in here. I've seen Firefox throwing `Security error: 1000`
@@ -99,9 +97,8 @@ function isPersistent() {
 
   // we're good.
   return true;
-}
+};
 
 // initialize
 init();
 
-module.exports = store;

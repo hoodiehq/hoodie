@@ -4,7 +4,7 @@
 var hoodieRemoteStore = require('../lib/store/remote');
 var extend = require('extend');
 
-function hoodieOpen(hoodie) {
+module.exports = function hoodieOpen(hoodie) {
 
   // generic method to open a store.
   //
@@ -24,6 +24,5 @@ function hoodieOpen(hoodie) {
   // Public API
   //
   hoodie.open = open;
-}
+};
 
-module.exports = hoodieOpen;

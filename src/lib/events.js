@@ -14,7 +14,7 @@
 // callbacks are global, while the events API is used at several places,
 // like hoodie.on / hoodie.store.on / hoodie.task.on etc.
 //
-function hoodieEvents(hoodie, options) {
+module.exports = function (hoodie, options) {
   var context = hoodie;
   var namespace = '';
 
@@ -157,6 +157,5 @@ function hoodieEvents(hoodie, options) {
   context.trigger = trigger;
   context.unbind = unbind;
   context.off = unbind;
-}
+};
 
-module.exports = hoodieEvents;

@@ -10,14 +10,11 @@ var config = require('../utils/config');
 
 var extend = require('extend');
 
-var getDefer = require('../utils/promise/defer');
-var rejectWith = require('../utils/promise/reject_with');
-var resolveWith = require('../utils/promise/resolve_with');
+var utils = require('../utils/');
 
 var localStorageWrapper = require('../utils/local_storage_wrapper');
 
-//
-function hoodieStore (hoodie) {
+module.exports = function hoodieStore (hoodie) {
 
   var localStore = {};
 
@@ -60,15 +57,15 @@ function hoodieStore (hoodie) {
   //     store.save('car', undefined, {color: 'red'})
   //     store.save('car', 'abc4567', {color: 'red'})
   //
-  localStore.save = function save(object, options) {
-    var currentObject, defer, error, event, isNew, key;
+  localStore.save = utils.toPromise(function (object, options, callback) {
+    var currentObject, event, isNew, key;
 
     options = options || {};
 
     // if store is currently bootstrapping data from remote,
     // we're queueing local saves until it's finished.
     if (store.isBootstrapping() && !options.remote) {
-      return enqueue('save', arguments);
+      return exports.enqueue('save', arguments);
     }
 
     // generate an id if necessary
@@ -135,22 +132,19 @@ function hoodieStore (hoodie) {
       delete object._$local;
     }
 
-    defer = getDefer();
-
     try {
       object = cache(object.type, object.id, object, options);
-      defer.resolve(object, isNew).promise();
       event = isNew ? 'add' : 'update';
+
+      callback(object, isNew);
+
       if (!options.silent) {
         triggerEvents(event, object, options);
       }
-    } catch (_error) {
-      error = _error;
-      defer.reject(error.toString());
+    } catch (error) {
+      return callback(error);
     }
-
-    return defer.promise();
-  };
+  });
 
 
   // find
@@ -161,29 +155,28 @@ function hoodieStore (hoodie) {
   // example usage:
   //
   //     store.find('car', 'abc4567')
-  localStore.find = function(type, id) {
-    var error, object;
+  localStore.find = utils.toPromise(function (type, id, callback) {
+    var object;
 
     // if store is currently bootstrapping data from remote,
     // we're queueing until it's finished
     if (store.isBootstrapping()) {
-      return enqueue('find', arguments);
+      return exports.enqueue('find', arguments);
     }
 
     try {
       object = cache(type, id);
       if (!object) {
-        return rejectWith({
+        return callback({
           name: 'HoodieNotFoundError',
           message: '"{{type}}" with id "{{id}}" could not be found'
         });
       }
-      return resolveWith(object);
-    } catch (_error) {
-      error = _error;
-      return rejectWith(error);
+      return callback(object);
+    } catch (error) {
+      return callback(error);
     }
-  };
+  });
 
 
   // findAll
@@ -198,10 +191,8 @@ function hoodieStore (hoodie) {
   //     store.findAll('car')
   //     store.findAll(function(obj) { return obj.brand == 'Tesla' })
   //
-  localStore.findAll = function findAll(filter) {
-    var currentType, defer, error, id, key, keys, obj, results, type;
-
-
+  localStore.findAll = utils.toPromise(function (filter, callback) {
+    var currentType, id, key, keys, obj, results, type;
 
     if (filter == null) {
       filter = function() {
@@ -212,7 +203,7 @@ function hoodieStore (hoodie) {
     // if store is currently bootstrapping data from remote,
     // we're queueing until it's finished
     if (store.isBootstrapping()) {
-      return enqueue('findAll', arguments);
+      return exports.enqueue('findAll', arguments);
     }
 
     keys = store.index();
@@ -224,8 +215,6 @@ function hoodieStore (hoodie) {
         return obj.type === type;
       };
     }
-
-    defer = getDefer();
 
     try {
 
@@ -262,13 +251,11 @@ function hoodieStore (hoodie) {
           return 0;
         }
       });
-      defer.resolve(results).promise();
-    } catch (_error) {
-      error = _error;
-      defer.reject(error).promise();
+      return callback(results);
+    } catch (error) {
+      return callback(error);
     }
-    return defer.promise();
-  };
+  });
 
 
   // Remove
@@ -278,7 +265,7 @@ function hoodieStore (hoodie) {
   //
   // when object has been synced before, mark it as deleted.
   // Otherwise remove it from Store.
-  localStore.remove = function remove(type, id, options) {
+  localStore.remove = utils.toPromise(function (type, id, options, callback) {
     var key, object, objectWasMarkedAsDeleted;
 
     options = options || {};
@@ -286,7 +273,7 @@ function hoodieStore (hoodie) {
     // if store is currently bootstrapping data from remote,
     // we're queueing local removes until it's finished.
     if (store.isBootstrapping() && !options.remote) {
-      return enqueue('remove', arguments);
+      return exports.enqueue('remove', arguments);
     }
 
     key = type + '/' + id;
@@ -300,12 +287,12 @@ function hoodieStore (hoodie) {
       cachedObject[key] = false;
       clearChanged(type, id);
       if (objectWasMarkedAsDeleted && object) {
-        return resolveWith(object);
+        return callback(object);
       }
     }
 
     if (!object) {
-      return rejectWith({
+      return callback({
         name: 'HoodieNotFoundError',
         message: '"{{type}}" with id "{{id}}"" could not be found'
       });
@@ -327,8 +314,8 @@ function hoodieStore (hoodie) {
       delete options.update;
     }
     triggerEvents('remove', object, options);
-    return resolveWith(object);
-  };
+    return callback(object);
+  });
 
 
   // Remove all
@@ -338,7 +325,7 @@ function hoodieStore (hoodie) {
   //
   // when object has been synced before, mark it as deleted.
   // Otherwise remove it from Store.
-  localStore.removeAll = function removeAll(type, options) {
+  localStore.removeAll = utils.toPromise(function(type, options) {
     return store.findAll(type).then(function(objects) {
       var object, _i, _len, results;
 
@@ -350,7 +337,7 @@ function hoodieStore (hoodie) {
       }
       return results;
     });
-  };
+  });
 
 
   // validate
@@ -465,9 +452,8 @@ function hoodieStore (hoodie) {
   // clears localStorage and cache
   // TODO: do not clear entire localStorage, clear only the items that have been stored
   //       using `hoodie.store` before.
-  store.clear = function clear() {
-    var defer, key, keys, results;
-    defer = getDefer();
+  store.clear = utils.toPromise(function (callback) {
+    var key, keys, results;
     try {
       keys = store.index();
       results = (function() {
@@ -483,13 +469,12 @@ function hoodieStore (hoodie) {
       }).call(this);
       cachedObject = {};
       clearChanged();
-      defer.resolve();
       store.trigger('clear');
-    } catch (_error) {
-      defer.reject(_error);
+      return callback();
+    } catch (error) {
+      return callback(error);
     }
-    return defer.promise();
-  };
+  });
 
 
   // isBootstrapping
@@ -890,16 +875,15 @@ function hoodieStore (hoodie) {
   }
 
   //
-  function enqueue(method, args) {
-    var defer = getDefer();
-    queue.push([method, args, defer]);
-    return defer.promise();
-  }
+  exports.enqueue = utils.toPromise(function (method, args, callback) {
+    queue.push([method, args]);
+    return callback();
+  });
 
-  // 
+  //
   // 1. we store all existing data and config in memory
   // 2. we write it back on signin, with new hoodieId/username
-  // 
+  //
   function moveData () {
     var oldObjects = [];
     var oldConfig;
@@ -947,6 +931,5 @@ function hoodieStore (hoodie) {
     bootstrapDirtyObjects();
     delete store.bootstrapDirtyObjects;
   };
-}
+};
 
-module.exports = hoodieStore;

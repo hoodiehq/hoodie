@@ -6,3 +6,4 @@ module.exports = {
   resolveWith: require('./resolve_with'),
   resolve: require('./resolve'),
 };
+

@@ -7,7 +7,7 @@
 var hoodieEvents = require('../events');
 
 //
-function hoodieScopedTask(hoodie, taskApi, options) {
+module.exports = function (hoodie, taskApi, options) {
 
   var type = options.type;
   var id = options.id;
@@ -70,6 +70,4 @@ function hoodieScopedTask(hoodie, taskApi, options) {
   }
 
   return api;
-}
-
-module.exports = hoodieScopedTask;
+};

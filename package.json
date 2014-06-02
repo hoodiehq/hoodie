@@ -24,6 +24,8 @@
     "frontend-only"
   ],
   "dependencies": {
+    "argsarray": "0.0.1",
+    "bluebird": "^1.2.4",
     "extend": "~1.2.1"
   },
   "devDependencies": {
