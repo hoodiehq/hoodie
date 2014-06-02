@@ -38,10 +38,10 @@ var HoodieObjectTypeError = require('../error/object_type');
 var HoodieObjectIdError = require('../error/object_id');
 var extend = require('extend');
 var utils = require('../../utils/');
+var isPromise = require('../../utils/promise/is_promise');
 
 //
 module.exports = function (hoodie, options) {
-var isPromise = require('../../utils/promise/is_promise');
 
   // persistence logic
   var backend = {};
@@ -177,7 +177,6 @@ var isPromise = require('../../utils/promise/is_promise');
 
   //
   api.find = function find(type, id) {
-
     return decoratePromise(backend.find(type, id));
   };
 
