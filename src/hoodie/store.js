@@ -80,8 +80,7 @@ module.exports = function hoodieStore (hoodie) {
     if (isNew) {
       // add createdBy hash
       object.createdBy = object.createdBy || hoodie.id();
-    }
-    else {
+    } else {
       // leave createdBy hash
       if (currentObject.createdBy) {
         object.createdBy = currentObject.createdBy;
@@ -136,13 +135,13 @@ module.exports = function hoodieStore (hoodie) {
       object = cache(object.type, object.id, object, options);
       event = isNew ? 'add' : 'update';
 
-      callback(object, isNew);
+      callback(null, object, isNew);
 
       if (!options.silent) {
         triggerEvents(event, object, options);
       }
     } catch (error) {
-      return callback(error);
+      return callback(error, null);
     }
   });
 
@@ -170,11 +169,11 @@ module.exports = function hoodieStore (hoodie) {
         return callback({
           name: 'HoodieNotFoundError',
           message: '"{{type}}" with id "{{id}}" could not be found'
-        });
+        }, null);
       }
-      return callback(object);
+      return callback(null, object);
     } catch (error) {
-      return callback(error);
+      return callback(error, null);
     }
   });
 
@@ -251,9 +250,9 @@ module.exports = function hoodieStore (hoodie) {
           return 0;
         }
       });
-      return callback(results);
+      return callback(null, results);
     } catch (error) {
-      return callback(error);
+      return callback(error, null);
     }
   });
 
@@ -287,7 +286,7 @@ module.exports = function hoodieStore (hoodie) {
       cachedObject[key] = false;
       clearChanged(type, id);
       if (objectWasMarkedAsDeleted && object) {
-        return callback(object);
+        return callback(null, object);
       }
     }
 
@@ -295,7 +294,7 @@ module.exports = function hoodieStore (hoodie) {
       return callback({
         name: 'HoodieNotFoundError',
         message: '"{{type}}" with id "{{id}}"" could not be found'
-      });
+      }, null);
     }
 
     if (object._syncedAt) {
@@ -325,7 +324,7 @@ module.exports = function hoodieStore (hoodie) {
   //
   // when object has been synced before, mark it as deleted.
   // Otherwise remove it from Store.
-  localStore.removeAll = utils.toPromise(function(type, options) {
+  localStore.removeAll = utils.toPromise(function(type, options, callback) {
     return store.findAll(type).then(function(objects) {
       var object, _i, _len, results;
 
@@ -335,7 +334,8 @@ module.exports = function hoodieStore (hoodie) {
         object = objects[_i];
         results.push(store.remove(object.type, object.id, options));
       }
-      return results;
+
+      return callback(null, results);
     });
   });
 
@@ -470,9 +470,9 @@ module.exports = function hoodieStore (hoodie) {
       cachedObject = {};
       clearChanged();
       store.trigger('clear');
-      return callback();
+      return callback(null);
     } catch (error) {
-      return callback(error);
+      return callback(error, null);
     }
   });
 
@@ -877,7 +877,7 @@ module.exports = function hoodieStore (hoodie) {
   //
   exports.enqueue = utils.toPromise(function (method, args, callback) {
     queue.push([method, args]);
-    return callback();
+    return callback(null);
   });
 
   //

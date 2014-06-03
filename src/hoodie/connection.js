@@ -71,7 +71,7 @@ module.exports = function hoodieConnection(hoodie) {
       online = true;
     }
 
-    return callback();
+    return callback(null);
   });
 
 
@@ -89,7 +89,7 @@ module.exports = function hoodieConnection(hoodie) {
       online = false;
     }
 
-    return callback();
+    return callback(null);
   });
 
 };

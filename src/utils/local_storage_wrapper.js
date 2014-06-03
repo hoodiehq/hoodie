@@ -44,6 +44,7 @@ exports.getObject = function (key) {
 };
 
 function init() {
+
   if (exports.isPersistent) {
     return;
   }
@@ -71,7 +72,6 @@ function init() {
 
 exports.isPersistent = function() {
   try {
-
     // we've to put this in here. I've seen Firefox throwing `Security error: 1000`
     // when cookies have been disabled
     if (!global.localStorage) {

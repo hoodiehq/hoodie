@@ -89,3 +89,7 @@ exports.toPromise = function (func) {
 
 };
 
+exports.now = function () {
+  return new Date();
+};
+

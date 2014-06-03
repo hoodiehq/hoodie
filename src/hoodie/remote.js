@@ -55,7 +55,7 @@ function hoodieRemote (hoodie) {
 
   remote.connect = utils.toPromise(function (callback) {
     if (!hoodie.account.hasAccount()) {
-      return callback('User has no database to connect to');
+      return callback(new Error('User has no database to connect to'));
     }
     return originalConnectMethod(hoodie.account.db());
   });

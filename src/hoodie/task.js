@@ -147,14 +147,14 @@ module.exports = function (hoodie) {
 
       // task finished by worker.
       if (object.$processedAt) {
-        return callback(object);
+        return callback(null, object);
       }
 
       // manually removed / aborted.
       callback(new HoodieError({
         message: 'Task has been aborted',
         task: object
-      }));
+      }), null);
     });
 
     taskStore.on('update', function(object) {
@@ -174,10 +174,10 @@ module.exports = function (hoodie) {
       // remove errored task
       hoodie.store.remove('$' + object.type, object.id);
 
-      return callback(new HoodieError(error));
+      return callback(new HoodieError(error), null);
     });
 
-    return callback();
+    return callback(null);
   });
 
   //
@@ -191,10 +191,10 @@ module.exports = function (hoodie) {
       return removePromise;
     }
 
-    hoodie.one('store:sync:' + type + ':' + id, callback());
+    hoodie.one('store:sync:' + type + ':' + id, callback(null));
     removePromise.fail(callback);
 
-    return callback();
+    return callback(null);
   });
 
   //

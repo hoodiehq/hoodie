@@ -12,8 +12,10 @@ var resolve = require('../utils/promise/resolve');
 var rejectWith = require('../utils/promise/reject_with');
 var resolveWith = require('../utils/promise/resolve_with');
 
-//
-function hoodieAccount(hoodie) {
+
+var utils = require('../utils/');
+
+module.exports = function (hoodie) {
   // public API
   var account = {};
 
@@ -125,6 +127,7 @@ function hoodieAccount(hoodie) {
   // to sign in with a 300ms timeout.
   //
   account.signUp = function signUp(username, password) {
+
     if (password === undefined) {
       password = '';
     }
@@ -180,8 +183,7 @@ function hoodieAccount(hoodie) {
 
   //
   account.hasAccount = function hasAccount() {
-    var hasUsername = !!account.username;
-    return hasUsername || account.hasAnonymousAccount();
+    return !!account.username || account.hasAnonymousAccount();
   };
 
 
@@ -198,7 +200,7 @@ function hoodieAccount(hoodie) {
   // can compare the username to the hoodie.id, which is the
   // same for anonymous accounts.
   account.hasAnonymousAccount = function hasAnonymousAccount() {
-    return !! getAnonymousPassword();
+    return !!getAnonymousPassword();
   };
 
 
@@ -249,8 +251,8 @@ function hoodieAccount(hoodie) {
     var isSilent;
     var promise;
 
-    if (! username) { username = ''; }
-    if (! password) { password = ''; }
+    if (!username) { username = ''; }
+    if (!password) { password = ''; }
     username = username.toLowerCase();
 
     options = options || {};
@@ -274,7 +276,7 @@ function hoodieAccount(hoodie) {
           account.trigger('movedata');
         }
       }
-      if (! isReauthenticating) {
+      if (!isReauthenticating) {
         cleanup();
       }
       if (isReauthenticating) {
@@ -305,7 +307,10 @@ function hoodieAccount(hoodie) {
       return cleanupMethod();
     }
 
-    return pushLocalChanges(options).then(disconnect).then(sendSignOutRequest).then(cleanupMethod);
+    return pushLocalChanges(options)
+    .then(disconnect)
+    .then(sendSignOutRequest)
+    .then(cleanupMethod);
   };
 
 
@@ -416,8 +421,8 @@ function hoodieAccount(hoodie) {
       type: 'user',
       roles: [],
       password: resetPasswordId,
-      createdAt: now(),
-      updatedAt: now()
+      createdAt: utils.now(),
+      updatedAt: utils.now()
     };
 
     options = {
@@ -987,8 +992,8 @@ function hoodieAccount(hoodie) {
         data.$newUsername = newUsername;
       }
 
-      data.updatedAt = now();
-      data.signedUpAt = data.signedUpAt || now();
+      data.updatedAt = utils.now();
+      data.signedUpAt = data.signedUpAt || utils.now();
 
       // trigger password update when newPassword set
       if (newPassword !== undefined) {
@@ -1173,9 +1178,9 @@ function hoodieAccount(hoodie) {
         password: password,
         hoodieId: hoodie.id(),
         database: account.db(),
-        updatedAt: now(),
-        createdAt: now(),
-        signedUpAt: username !== hoodie.id() ? now() : void 0
+        updatedAt: utils.now(),
+        createdAt: utils.now(),
+        signedUpAt: username !== hoodie.id() ? utils.now() : void 0
       }),
       contentType: 'application/json'
     };
@@ -1187,16 +1192,8 @@ function hoodieAccount(hoodie) {
     return defer.promise();
   }
 
-
-  //
-  function now() {
-    return new Date();
-  }
-
   //
   // expose public account API
   //
   hoodie.account = account;
-}
-
-module.exports = hoodieAccount;
+};
