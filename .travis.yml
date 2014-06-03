@@ -11,3 +11,11 @@ notifications:
       - "irc.freenode.net#hoodie"
     use_notice: false
     skip_join: true
+deploy:
+  provider: npm
+  email: me@svenlito.com
+  api_key:
+    secure: YREeUOw1K6UNi3KC0W5prxktLXCGIP/H9x749gpkyeuLADkIjHe8Dx3usJoELHxtGMeJpzcCGBhWDdyoStkLpglr6+J4714Tk9dZurzhCi2xioWaLJwnBM+n6V7TJIt1GcNZhuPMd6WZhsHqgORFiOUI37MMJRdZyUO4kQ9YaY0=
+  on:
+    tags: true
+    repo: hoodiehq/hoodie.js
