@@ -10,15 +10,14 @@ module.exports = function hoodieId (hoodie) {
   var id;
 
   function getId() {
-    if (! id) {
-      setId( generateId() );
+    if (!id) {
+      setId(generateId());
     }
     return id;
   }
 
   function setId(newId) {
     id = newId;
-
     config.set('_hoodieId', newId);
   }
 

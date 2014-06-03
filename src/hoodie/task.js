@@ -70,7 +70,7 @@ module.exports = function (hoodie) {
   //
   api.abort = function(type, id) {
     return hoodie.store.update('$' + type, id, {
-      abortedAt: now()
+      abortedAt: utils.nowStringified()
     }).then(exports.handleAbortedTaskObject);
   };
 
@@ -291,11 +291,6 @@ module.exports = function (hoodie) {
     if (eventName !== 'start') {
       api.trigger(task.type + ':' + task.id + ':change', eventName, task, options);
     }
-  }
-
-  //
-  function now() {
-    return JSON.stringify(new Date()).replace(/['"]/g, '');
   }
 
   // extend hoodie

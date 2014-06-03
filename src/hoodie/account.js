@@ -163,7 +163,7 @@ module.exports = function (hoodie) {
     username = hoodie.id();
 
     return sendSignUpRequest(username, password)
-    .progress( function() {
+    .progress(function() {
       setAnonymousPassword(password);
     })
     .done(function() {
@@ -1189,4 +1189,5 @@ module.exports = function (hoodie) {
   // expose public account API
   //
   hoodie.account = account;
+
 };

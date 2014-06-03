@@ -27,7 +27,7 @@ module.exports = function (hoodie) {
 
   // Hoodie backend listens to requests prefixed by /_api,
   // so we prefix all requests with relative URLs
-  var API_PATH = '/_api';
+  var API_PATH = hoodie.API_PATH;
 
   // Requests
   // ----------
@@ -149,4 +149,5 @@ module.exports = function (hoodie) {
   // public API
   //
   hoodie.request = request;
+
 };

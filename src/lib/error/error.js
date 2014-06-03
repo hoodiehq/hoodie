@@ -35,7 +35,7 @@ var extend = require('extend');
 
 module.exports = HoodieError;
 
-function HoodieError (properties) {
+var HoodieError = function (properties) {
 
   // normalize arguments
   if (typeof properties === 'string') {
@@ -44,12 +44,12 @@ function HoodieError (properties) {
     };
   }
 
-  if (! properties.message) {
+  if (!properties.message) {
     properties.message = 'Something went wrong';
   }
 
   // must check for properties, as this.name is always set.
-  if (! properties.name) {
+  if (!properties.name) {
     properties.name = 'HoodieError';
   }
 
@@ -58,7 +58,7 @@ function HoodieError (properties) {
     return properties[property];
   });
   extend(this, properties);
-}
+};
 
 HoodieError.prototype = new Error();
 

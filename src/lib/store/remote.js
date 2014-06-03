@@ -399,6 +399,7 @@ module.exports = function hoodieRemoteStore(hoodie, options) {
     });
 
     objectsForRemote = [];
+
     for (var i = 0; i < objects.length; i++) {
 
       object = objects[i];
@@ -459,8 +460,9 @@ module.exports = function hoodieRemoteStore(hoodie, options) {
   // array of objects or a function as `options.objects`
   //
   var defaultObjectsToPush = function defaultObjectsToPush() {
-      return [];
-    };
+    return [];
+  };
+
   if (options.defaultObjectsToPush) {
     if ($.isArray(options.defaultObjectsToPush)) {
       defaultObjectsToPush = function defaultObjectsToPush() {

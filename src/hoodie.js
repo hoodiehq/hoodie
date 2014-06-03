@@ -41,6 +41,8 @@ function Hoodie(baseUrl) {
 
   hoodie.checkConnectionInterval = 3000;
 
+  hoodie.API_PATH = '/_api';
+
 
   // hoodie.extend
   // ---------------
