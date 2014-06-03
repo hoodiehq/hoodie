@@ -2755,7 +2755,7 @@ return Promise;
 
 };
 
-},{"./any.js":2,"./async.js":3,"./call_get.js":5,"./cancel.js":6,"./captured_trace.js":7,"./catch_filter.js":8,"./direct_resolve.js":9,"./errors.js":10,"./errors_api_rejection":11,"./filter.js":13,"./finally.js":14,"./generators.js":15,"./global.js":16,"./map.js":17,"./nodeify.js":18,"./progress.js":19,"./promise_array.js":21,"./promise_resolver.js":22,"./promisify.js":24,"./props.js":26,"./race.js":28,"./reduce.js":29,"./settle.js":31,"./some.js":33,"./synchronous_inspection.js":35,"./thenables.js":36,"./timers.js":37,"./util.js":38,"__browserify_process":39}],21:[function(require,module,exports){
+},{"./any.js":2,"./async.js":3,"./call_get.js":5,"./cancel.js":6,"./captured_trace.js":7,"./catch_filter.js":8,"./direct_resolve.js":9,"./errors.js":10,"./errors_api_rejection":11,"./filter.js":13,"./finally.js":14,"./generators.js":15,"./global.js":16,"./map.js":17,"./nodeify.js":18,"./progress.js":19,"./promise_array.js":21,"./promise_resolver.js":22,"./promisify.js":24,"./props.js":26,"./race.js":28,"./reduce.js":29,"./settle.js":31,"./some.js":33,"./synchronous_inspection.js":35,"./thenables.js":36,"./timers.js":37,"./util.js":38,"__browserify_process":40}],21:[function(require,module,exports){
 /**
  * Copyright (c) 2014 Petka Antonov
  * 
@@ -4231,7 +4231,7 @@ else {
 
 module.exports = schedule;
 
-},{"./global.js":16,"__browserify_process":39}],31:[function(require,module,exports){
+},{"./global.js":16,"__browserify_process":40}],31:[function(require,module,exports){
 /**
  * Copyright (c) 2014 Petka Antonov
  * 
@@ -5052,6 +5052,8 @@ var ret = {
 module.exports = ret;
 
 },{"./es5.js":12,"./global.js":16}],39:[function(require,module,exports){
+
+},{}],40:[function(require,module,exports){
 // shim for using process in browser
 
 var process = module.exports = {};
@@ -5106,7 +5108,7 @@ process.chdir = function (dir) {
     throw new Error('process.chdir is not supported');
 };
 
-},{}],40:[function(require,module,exports){
+},{}],41:[function(require,module,exports){
 var hasOwn = Object.prototype.hasOwnProperty;
 var toString = Object.prototype.toString;
 
@@ -5186,7 +5188,485 @@ module.exports = function extend() {
 	return target;
 };
 
-},{}],41:[function(require,module,exports){
+},{}],42:[function(require,module,exports){
+var process=require("__browserify_process");var Promise = require('pouchdb-promise');
+var getArgs = require('argsarray');
+module.exports = toPromise;
+function toPromise(func) {
+  //create the function we will be returning
+  return getArgs(function (args) {
+    var self = this;
+    var tempCB =
+      (typeof args[args.length - 1] === 'function') ? args.pop() : false;
+    // if the last argument is a function, assume its a callback
+    var usedCB;
+    if (tempCB) {
+      // if it was a callback, create a new callback which calls it,
+      // but do so async so we don't trap any errors
+      usedCB = function (err, resp) {
+        process.nextTick(function () {
+          tempCB(err, resp);
+        });
+      };
+    }
+    var promise = new Promise(function (fulfill, reject) {
+      var resp;
+      try {
+        args.push(function (err, mesg) {
+          if (err) {
+            reject(err);
+          } else {
+            fulfill(mesg);
+          }
+        });
+        resp = func.apply(self, args);
+        if (resp && typeof resp.then === 'function') {
+          fulfill(resp);
+        }
+      } catch (e) {
+        reject(e);
+      }
+    });
+    // if there is a callback, call it back
+    if (usedCB) {
+      promise.then(function (result) {
+        usedCB(null, result);
+      }, usedCB);
+    }
+    promise.cancel = function () {
+      return this;
+    };
+    return promise;
+  });
+}
+},{"__browserify_process":40,"argsarray":1,"pouchdb-promise":43}],43:[function(require,module,exports){
+var global=typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {};if (typeof global.Promise === 'function') {
+  module.exports = global.Promise;
+} else {
+  module.exports = require('bluebird');
+}
+},{"bluebird":48}],44:[function(require,module,exports){
+'use strict';
+
+module.exports = INTERNAL;
+
+function INTERNAL() {}
+},{}],45:[function(require,module,exports){
+'use strict';
+var Promise = require('./promise');
+var reject = require('./reject');
+var resolve = require('./resolve');
+var INTERNAL = require('./INTERNAL');
+var handlers = require('./handlers');
+var noArray = reject(new TypeError('must be an array'));
+module.exports = function all(iterable) {
+  if (Object.prototype.toString.call(iterable) !== '[object Array]') {
+    return noArray;
+  }
+
+  var len = iterable.length;
+  if (!len) {
+    return resolve([]);
+  }
+
+  var values = new Array(len);
+  var resolved = 0;
+  var i = -1;
+  var promise = new Promise(INTERNAL);
+  
+  while (++i < len) {
+    allResolver(iterable[i], i);
+  }
+  return promise;
+  function allResolver(value, i) {
+    resolve(value).then(resolveFromAll, function (error) {
+      handlers.reject(promise, error);
+    });
+    function resolveFromAll(outValue) {
+      values[i] = outValue;
+      if (++resolved === len) {
+        handlers.resolve(promise, values);
+      }
+    }
+  }
+};
+},{"./INTERNAL":44,"./handlers":47,"./promise":49,"./reject":51,"./resolve":52}],46:[function(require,module,exports){
+'use strict';
+
+module.exports = getThen;
+
+function getThen(obj) {
+  // Make sure we only access the accessor once as required by the spec
+  var then = obj && obj.then;
+  if (obj && typeof obj === 'object' && typeof then === 'function') {
+    return function appyThen() {
+      then.apply(obj, arguments);
+    };
+  }
+}
+},{}],47:[function(require,module,exports){
+'use strict';
+var tryCatch = require('./tryCatch');
+var getThen = require('./getThen');
+var resolveThenable = require('./resolveThenable');
+var states = require('./states');
+
+exports.resolve = function (self, value) {
+  var result = tryCatch(getThen, value);
+  if (result.status === 'error') {
+    return exports.reject(self, result.value);
+  }
+  var thenable = result.value;
+
+  if (thenable) {
+    resolveThenable.safely(self, thenable);
+  } else {
+    self.state = states.FULFILLED;
+    self.outcome = value;
+    var i = -1;
+    var len = self.queue.length;
+    while (++i < len) {
+      self.queue[i].callFulfilled(value);
+    }
+  }
+  return self;
+};
+exports.reject = function (self, error) {
+  self.state = states.REJECTED;
+  self.outcome = error;
+  var i = -1;
+  var len = self.queue.length;
+  while (++i < len) {
+    self.queue[i].callRejected(error);
+  }
+  return self;
+};
+},{"./getThen":46,"./resolveThenable":53,"./states":54,"./tryCatch":55}],48:[function(require,module,exports){
+module.exports = exports = require('./promise');
+
+exports.resolve = require('./resolve');
+exports.reject = require('./reject');
+exports.all = require('./all');
+},{"./all":45,"./promise":49,"./reject":51,"./resolve":52}],49:[function(require,module,exports){
+'use strict';
+
+var unwrap = require('./unwrap');
+var INTERNAL = require('./INTERNAL');
+var resolveThenable = require('./resolveThenable');
+var states = require('./states');
+var QueueItem = require('./queueItem');
+
+module.exports = Promise;
+function Promise(resolver) {
+  if (!(this instanceof Promise)) {
+    return new Promise(resolver);
+  }
+  if (typeof resolver !== 'function') {
+    throw new TypeError('reslover must be a function');
+  }
+  this.state = states.PENDING;
+  this.queue = [];
+  if (resolver !== INTERNAL) {
+    resolveThenable.safely(this, resolver);
+  }
+}
+
+Promise.prototype['catch'] = function (onRejected) {
+  return this.then(null, onRejected);
+};
+Promise.prototype.then = function (onFulfilled, onRejected) {
+  var onFulfilledFunc = typeof onFulfilled === 'function';
+  var onRejectedFunc = typeof onRejected === 'function';
+  if (typeof onFulfilled !== 'function' && this.state === states.FULFILLED ||
+    typeof onRejected !== 'function' && this.state === states.REJECTED) {
+    return this;
+  }
+  var promise = new Promise(INTERNAL);
+
+  
+  if (this.state !== states.PENDING) {
+    var resolver = this.state === states.FULFILLED ? onFulfilled: onRejected;
+    unwrap(promise, resolver, this.outcome);
+  } else {
+    this.queue.push(new QueueItem(promise, onFulfilled, onRejected));
+  }
+
+  return promise;
+};
+
+},{"./INTERNAL":44,"./queueItem":50,"./resolveThenable":53,"./states":54,"./unwrap":56}],50:[function(require,module,exports){
+'use strict';
+var handlers = require('./handlers');
+var unwrap = require('./unwrap');
+
+module.exports = QueueItem;
+function QueueItem(promise, onFulfilled, onRejected) {
+  this.promise = promise;
+  if (typeof onFulfilled === 'function') {
+    this.onFulfilled = onFulfilled;
+    this.callFulfilled = this.otherCallFulfilled;
+  }
+  if (typeof onRejected === 'function') {
+    this.onRejected = onRejected;
+    this.callRejected = this.otherCallRejected;
+  }
+}
+QueueItem.prototype.callFulfilled = function (value) {
+  handlers.resolve(this.promise, value);
+};
+QueueItem.prototype.otherCallFulfilled = function (value) {
+  unwrap(this.promise, this.onFulfilled, value);
+};
+QueueItem.prototype.callRejected = function (value) {
+  handlers.reject(this.promise, value);
+};
+QueueItem.prototype.otherCallRejected = function (value) {
+  unwrap(this.promise, this.onRejected, value);
+};
+},{"./handlers":47,"./unwrap":56}],51:[function(require,module,exports){
+'use strict';
+
+var Promise = require('./promise');
+var INTERNAL = require('./INTERNAL');
+var handlers = require('./handlers');
+module.exports = reject;
+
+function reject(reason) {
+	var promise = new Promise(INTERNAL);
+	return handlers.reject(promise, reason);
+}
+},{"./INTERNAL":44,"./handlers":47,"./promise":49}],52:[function(require,module,exports){
+'use strict';
+
+var Promise = require('./promise');
+var INTERNAL = require('./INTERNAL');
+var handlers = require('./handlers');
+module.exports = resolve;
+
+var FALSE = handlers.resolve(new Promise(INTERNAL), false);
+var NULL = handlers.resolve(new Promise(INTERNAL), null);
+var UNDEFINED = handlers.resolve(new Promise(INTERNAL), void 0);
+var ZERO = handlers.resolve(new Promise(INTERNAL), 0);
+var EMPTYSTRING = handlers.resolve(new Promise(INTERNAL), '');
+
+function resolve(value) {
+  if (value) {
+    if (value instanceof Promise) {
+      return value;
+    }
+    return handlers.resolve(new Promise(INTERNAL), value);
+  }
+  var valueType = typeof value;
+  switch (valueType) {
+    case 'boolean':
+      return FALSE;
+    case 'undefined':
+      return UNDEFINED;
+    case 'object':
+      return NULL;
+    case 'number':
+      return ZERO;
+    case 'string':
+      return EMPTYSTRING;
+  }
+}
+},{"./INTERNAL":44,"./handlers":47,"./promise":49}],53:[function(require,module,exports){
+'use strict';
+var handlers = require('./handlers');
+var tryCatch = require('./tryCatch');
+function safelyResolveThenable(self, thenable) {
+  // Either fulfill, reject or reject with error
+  var called = false;
+  function onError(value) {
+    if (called) {
+      return;
+    }
+    called = true;
+    handlers.reject(self, value);
+  }
+
+  function onSuccess(value) {
+    if (called) {
+      return;
+    }
+    called = true;
+    handlers.resolve(self, value);
+  }
+
+  function tryToUnwrap() {
+    thenable(onSuccess, onError);
+  }
+  
+  var result = tryCatch(tryToUnwrap);
+  if (result.status === 'error') {
+    onError(result.value);
+  }
+}
+exports.safely = safelyResolveThenable;
+},{"./handlers":47,"./tryCatch":55}],54:[function(require,module,exports){
+// Lazy man's symbols for states
+
+exports.REJECTED = ['REJECTED'];
+exports.FULFILLED = ['FULFILLED'];
+exports.PENDING = ['PENDING'];
+},{}],55:[function(require,module,exports){
+'use strict';
+
+module.exports = tryCatch;
+
+function tryCatch(func, value) {
+  var out = {};
+  try {
+    out.value = func(value);
+    out.status = 'success';
+  } catch (e) {
+    out.status = 'error';
+    out.value = e;
+  }
+  return out;
+}
+},{}],56:[function(require,module,exports){
+'use strict';
+
+var immediate = require('immediate');
+var handlers = require('./handlers');
+module.exports = unwrap;
+
+function unwrap(promise, func, value) {
+  immediate(function () {
+    var returnValue;
+    try {
+      returnValue = func(value);
+    } catch (e) {
+      return handlers.reject(promise, e);
+    }
+    if (returnValue === promise) {
+      handlers.reject(promise, new TypeError('Cannot resolve promise with itself'));
+    } else {
+      handlers.resolve(promise, returnValue);
+    }
+  });
+}
+},{"./handlers":47,"immediate":57}],57:[function(require,module,exports){
+'use strict';
+var types = [
+  require('./nextTick'),
+  require('./mutation.js'),
+  require('./messageChannel'),
+  require('./stateChange'),
+  require('./timeout')
+];
+var draining;
+var queue = [];
+function drainQueue() {
+  draining = true;
+  var i, oldQueue;
+  var len = queue.length;
+  while (len) {
+    oldQueue = queue;
+    queue = [];
+    i = -1;
+    while (++i < len) {
+      oldQueue[i]();
+    }
+    len = queue.length;
+  }
+  draining = false;
+}
+var scheduleDrain;
+var i = -1;
+var len = types.length;
+while (++ i < len) {
+  if (types[i] && types[i].test && types[i].test()) {
+    scheduleDrain = types[i].install(drainQueue);
+    break;
+  }
+}
+module.exports = immediate;
+function immediate(task) {
+  if (queue.push(task) === 1 && !draining) {
+    scheduleDrain();
+  }
+}
+},{"./messageChannel":58,"./mutation.js":59,"./nextTick":39,"./stateChange":60,"./timeout":61}],58:[function(require,module,exports){
+var global=typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {};'use strict';
+
+exports.test = function () {
+  if (global.setImmediate) {
+    // we can only get here in IE10
+    // which doesn't handel postMessage well
+    return false;
+  }
+  return typeof global.MessageChannel !== 'undefined';
+};
+
+exports.install = function (func) {
+  var channel = new global.MessageChannel();
+  channel.port1.onmessage = func;
+  return function () {
+    channel.port2.postMessage(0);
+  };
+};
+},{}],59:[function(require,module,exports){
+var global=typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {};'use strict';
+//based off rsvp https://github.com/tildeio/rsvp.js
+//license https://github.com/tildeio/rsvp.js/blob/master/LICENSE
+//https://github.com/tildeio/rsvp.js/blob/master/lib/rsvp/asap.js
+
+var Mutation = global.MutationObserver || global.WebKitMutationObserver;
+
+exports.test = function () {
+  return Mutation;
+};
+
+exports.install = function (handle) {
+  var called = 0;
+  var observer = new Mutation(handle);
+  var element = global.document.createTextNode('');
+  observer.observe(element, {
+    characterData: true
+  });
+  return function () {
+    element.data = (called = ++called % 2);
+  };
+};
+},{}],60:[function(require,module,exports){
+var global=typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {};'use strict';
+
+exports.test = function () {
+  return 'document' in global && 'onreadystatechange' in global.document.createElement('script');
+};
+
+exports.install = function (handle) {
+  return function () {
+
+    // Create a <script> element; its readystatechange event will be fired asynchronously once it is inserted
+    // into the document. Do so, thus queuing up the task. Remember to clean up once it's been called.
+    var scriptEl = global.document.createElement('script');
+    scriptEl.onreadystatechange = function () {
+      handle();
+
+      scriptEl.onreadystatechange = null;
+      scriptEl.parentNode.removeChild(scriptEl);
+      scriptEl = null;
+    };
+    global.document.documentElement.appendChild(scriptEl);
+
+    return handle;
+  };
+};
+},{}],61:[function(require,module,exports){
+'use strict';
+exports.test = function () {
+  return true;
+};
+
+exports.install = function (t) {
+  return function () {
+    setTimeout(t, 0);
+  };
+};
+},{}],62:[function(require,module,exports){
 var global=typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {};// Hoodie Core
 // -------------
 //
@@ -5354,7 +5834,7 @@ function applyExtensions(hoodie) {
 
 module.exports = Hoodie;
 
-},{"./hoodie/account":42,"./hoodie/connection":43,"./hoodie/id":44,"./hoodie/open":45,"./hoodie/remote":46,"./hoodie/request":47,"./hoodie/store":48,"./hoodie/task":49,"./lib":55,"./lib/events":54,"./utils/":65}],42:[function(require,module,exports){
+},{"./hoodie/account":63,"./hoodie/connection":64,"./hoodie/id":65,"./hoodie/open":66,"./hoodie/remote":67,"./hoodie/request":68,"./hoodie/store":69,"./hoodie/task":70,"./lib":76,"./lib/events":75,"./utils/":86}],63:[function(require,module,exports){
 var global=typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {};// Hoodie.Account
 // ================
 
@@ -5369,8 +5849,10 @@ var resolve = require('../utils/promise/resolve');
 var rejectWith = require('../utils/promise/reject_with');
 var resolveWith = require('../utils/promise/resolve_with');
 
-//
-function hoodieAccount(hoodie) {
+
+var utils = require('../utils/');
+
+module.exports = function (hoodie) {
   // public API
   var account = {};
 
@@ -5482,6 +5964,7 @@ function hoodieAccount(hoodie) {
   // to sign in with a 300ms timeout.
   //
   account.signUp = function signUp(username, password) {
+
     if (password === undefined) {
       password = '';
     }
@@ -5537,8 +6020,7 @@ function hoodieAccount(hoodie) {
 
   //
   account.hasAccount = function hasAccount() {
-    var hasUsername = !!account.username;
-    return hasUsername || account.hasAnonymousAccount();
+    return !!account.username || account.hasAnonymousAccount();
   };
 
 
@@ -5555,7 +6037,7 @@ function hoodieAccount(hoodie) {
   // can compare the username to the hoodie.id, which is the
   // same for anonymous accounts.
   account.hasAnonymousAccount = function hasAnonymousAccount() {
-    return !! getAnonymousPassword();
+    return !!getAnonymousPassword();
   };
 
 
@@ -5606,8 +6088,8 @@ function hoodieAccount(hoodie) {
     var isSilent;
     var promise;
 
-    if (! username) { username = ''; }
-    if (! password) { password = ''; }
+    if (!username) { username = ''; }
+    if (!password) { password = ''; }
     username = username.toLowerCase();
 
     options = options || {};
@@ -5631,7 +6113,7 @@ function hoodieAccount(hoodie) {
           account.trigger('movedata');
         }
       }
-      if (! isReauthenticating) {
+      if (!isReauthenticating) {
         cleanup();
       }
       if (isReauthenticating) {
@@ -5662,7 +6144,10 @@ function hoodieAccount(hoodie) {
       return cleanupMethod();
     }
 
-    return pushLocalChanges(options).then(disconnect).then(sendSignOutRequest).then(cleanupMethod);
+    return pushLocalChanges(options)
+    .then(disconnect)
+    .then(sendSignOutRequest)
+    .then(cleanupMethod);
   };
 
 
@@ -5773,8 +6258,8 @@ function hoodieAccount(hoodie) {
       type: 'user',
       roles: [],
       password: resetPasswordId,
-      createdAt: now(),
-      updatedAt: now()
+      createdAt: utils.now(),
+      updatedAt: utils.now()
     };
 
     options = {
@@ -6344,8 +6829,8 @@ function hoodieAccount(hoodie) {
         data.$newUsername = newUsername;
       }
 
-      data.updatedAt = now();
-      data.signedUpAt = data.signedUpAt || now();
+      data.updatedAt = utils.now();
+      data.signedUpAt = data.signedUpAt || utils.now();
 
       // trigger password update when newPassword set
       if (newPassword !== undefined) {
@@ -6530,9 +7015,9 @@ function hoodieAccount(hoodie) {
         password: password,
         hoodieId: hoodie.id(),
         database: account.db(),
-        updatedAt: now(),
-        createdAt: now(),
-        signedUpAt: username !== hoodie.id() ? now() : void 0
+        updatedAt: utils.now(),
+        createdAt: utils.now(),
+        signedUpAt: username !== hoodie.id() ? utils.now() : void 0
       }),
       contentType: 'application/json'
     };
@@ -6544,21 +7029,13 @@ function hoodieAccount(hoodie) {
     return defer.promise();
   }
 
-
-  //
-  function now() {
-    return new Date();
-  }
-
   //
   // expose public account API
   //
   hoodie.account = account;
-}
+};
 
-module.exports = hoodieAccount;
-
-},{"../lib/events":54,"../utils/config":62,"../utils/generate_id":63,"../utils/promise/defer":67,"../utils/promise/reject":70,"../utils/promise/reject_with":71,"../utils/promise/resolve":72,"../utils/promise/resolve_with":73,"extend":40}],43:[function(require,module,exports){
+},{"../lib/events":75,"../utils/":86,"../utils/config":83,"../utils/generate_id":84,"../utils/promise/defer":88,"../utils/promise/reject":91,"../utils/promise/reject_with":92,"../utils/promise/resolve":93,"../utils/promise/resolve_with":94,"extend":41}],64:[function(require,module,exports){
 var global=typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {};// hoodie.checkConnection() & hoodie.isConnected()
 // =================================================
 
@@ -6632,7 +7109,7 @@ module.exports = function hoodieConnection(hoodie) {
       online = true;
     }
 
-    return callback();
+    return callback(null);
   });
 
 
@@ -6650,12 +7127,12 @@ module.exports = function hoodieConnection(hoodie) {
       online = false;
     }
 
-    return callback();
+    return callback(null);
   });
 
 };
 
-},{"../utils/":65}],44:[function(require,module,exports){
+},{"../utils/":86}],65:[function(require,module,exports){
 // hoodie.id
 // =========
 
@@ -6727,7 +7204,7 @@ module.exports = function hoodieId (hoodie) {
 };
 
 
-},{"../utils/config":62,"../utils/generate_id":63}],45:[function(require,module,exports){
+},{"../utils/config":83,"../utils/generate_id":84}],66:[function(require,module,exports){
 // Open stores
 // -------------
 
@@ -6757,7 +7234,7 @@ module.exports = function hoodieOpen(hoodie) {
 };
 
 
-},{"../lib/store/remote":58,"extend":40}],46:[function(require,module,exports){
+},{"../lib/store/remote":79,"extend":41}],67:[function(require,module,exports){
 // AccountRemote
 // ===============
 
@@ -6815,7 +7292,7 @@ function hoodieRemote (hoodie) {
 
   remote.connect = utils.toPromise(function (callback) {
     if (!hoodie.account.hasAccount()) {
-      return callback('User has no database to connect to');
+      return callback(new Error('User has no database to connect to'));
     }
     return originalConnectMethod(hoodie.account.db());
   });
@@ -6918,7 +7395,7 @@ module.exports = function hoodieRemoteFactory(hoodie) {
 
 };
 
-},{"../utils/":65,"../utils/config":62}],47:[function(require,module,exports){
+},{"../utils/":86,"../utils/config":83}],68:[function(require,module,exports){
 //
 // hoodie.request
 // ================
@@ -7074,7 +7551,7 @@ function hoodieRequest(hoodie) {
 
 module.exports = hoodieRequest;
 
-},{"../utils/hoodiefy_request_error_name":64,"../utils/promise/reject_with":71,"extend":40}],48:[function(require,module,exports){
+},{"../utils/hoodiefy_request_error_name":85,"../utils/promise/reject_with":92,"extend":41}],69:[function(require,module,exports){
 var global=typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {};// LocalStore
 // ============
 
@@ -7157,8 +7634,7 @@ module.exports = function hoodieStore (hoodie) {
     if (isNew) {
       // add createdBy hash
       object.createdBy = object.createdBy || hoodie.id();
-    }
-    else {
+    } else {
       // leave createdBy hash
       if (currentObject.createdBy) {
         object.createdBy = currentObject.createdBy;
@@ -7213,13 +7689,13 @@ module.exports = function hoodieStore (hoodie) {
       object = cache(object.type, object.id, object, options);
       event = isNew ? 'add' : 'update';
 
-      callback(object, isNew);
+      callback(null, object, isNew);
 
       if (!options.silent) {
         triggerEvents(event, object, options);
       }
     } catch (error) {
-      return callback(error);
+      return callback(error, null);
     }
   });
 
@@ -7247,11 +7723,11 @@ module.exports = function hoodieStore (hoodie) {
         return callback({
           name: 'HoodieNotFoundError',
           message: '"{{type}}" with id "{{id}}" could not be found'
-        });
+        }, null);
       }
-      return callback(object);
+      return callback(null, object);
     } catch (error) {
-      return callback(error);
+      return callback(error, null);
     }
   });
 
@@ -7328,9 +7804,9 @@ module.exports = function hoodieStore (hoodie) {
           return 0;
         }
       });
-      return callback(results);
+      return callback(null, results);
     } catch (error) {
-      return callback(error);
+      return callback(error, null);
     }
   });
 
@@ -7364,7 +7840,7 @@ module.exports = function hoodieStore (hoodie) {
       cachedObject[key] = false;
       clearChanged(type, id);
       if (objectWasMarkedAsDeleted && object) {
-        return callback(object);
+        return callback(null, object);
       }
     }
 
@@ -7372,7 +7848,7 @@ module.exports = function hoodieStore (hoodie) {
       return callback({
         name: 'HoodieNotFoundError',
         message: '"{{type}}" with id "{{id}}"" could not be found'
-      });
+      }, null);
     }
 
     if (object._syncedAt) {
@@ -7402,7 +7878,7 @@ module.exports = function hoodieStore (hoodie) {
   //
   // when object has been synced before, mark it as deleted.
   // Otherwise remove it from Store.
-  localStore.removeAll = utils.toPromise(function(type, options) {
+  localStore.removeAll = utils.toPromise(function(type, options, callback) {
     return store.findAll(type).then(function(objects) {
       var object, _i, _len, results;
 
@@ -7412,7 +7888,8 @@ module.exports = function hoodieStore (hoodie) {
         object = objects[_i];
         results.push(store.remove(object.type, object.id, options));
       }
-      return results;
+
+      return callback(null, results);
     });
   });
 
@@ -7547,9 +8024,9 @@ module.exports = function hoodieStore (hoodie) {
       cachedObject = {};
       clearChanged();
       store.trigger('clear');
-      return callback();
+      return callback(null);
     } catch (error) {
-      return callback(error);
+      return callback(error, null);
     }
   });
 
@@ -7954,7 +8431,7 @@ module.exports = function hoodieStore (hoodie) {
   //
   exports.enqueue = utils.toPromise(function (method, args, callback) {
     queue.push([method, args]);
-    return callback();
+    return callback(null);
   });
 
   //
@@ -8011,7 +8488,7 @@ module.exports = function hoodieStore (hoodie) {
 };
 
 
-},{"../lib/error/object_id":52,"../lib/error/object_type":53,"../lib/store/api":56,"../utils/":65,"../utils/config":62,"../utils/generate_id":63,"../utils/local_storage_wrapper":66,"extend":40}],49:[function(require,module,exports){
+},{"../lib/error/object_id":73,"../lib/error/object_type":74,"../lib/store/api":77,"../utils/":86,"../utils/config":83,"../utils/generate_id":84,"../utils/local_storage_wrapper":87,"extend":41}],70:[function(require,module,exports){
 // Tasks
 // ============
 
@@ -8161,14 +8638,14 @@ module.exports = function (hoodie) {
 
       // task finished by worker.
       if (object.$processedAt) {
-        return callback(object);
+        return callback(null, object);
       }
 
       // manually removed / aborted.
       callback(new HoodieError({
         message: 'Task has been aborted',
         task: object
-      }));
+      }), null);
     });
 
     taskStore.on('update', function(object) {
@@ -8188,10 +8665,10 @@ module.exports = function (hoodie) {
       // remove errored task
       hoodie.store.remove('$' + object.type, object.id);
 
-      return callback(new HoodieError(error));
+      return callback(new HoodieError(error), null);
     });
 
-    return callback();
+    return callback(null);
   });
 
   //
@@ -8205,10 +8682,10 @@ module.exports = function (hoodie) {
       return removePromise;
     }
 
-    hoodie.one('store:sync:' + type + ':' + id, callback());
+    hoodie.one('store:sync:' + type + ':' + id, callback(null));
     removePromise.fail(callback);
 
-    return callback();
+    return callback(null);
   });
 
   //
@@ -8316,7 +8793,7 @@ module.exports = function (hoodie) {
   hoodie.task = api;
 };
 
-},{"../lib/error/error":50,"../lib/events":54,"../lib/task/scoped":61,"../utils/":65,"extend":40}],50:[function(require,module,exports){
+},{"../lib/error/error":71,"../lib/events":75,"../lib/task/scoped":82,"../utils/":86,"extend":41}],71:[function(require,module,exports){
 // Hoodie Error
 // -------------
 
@@ -8352,7 +8829,9 @@ var errorMessageFindPropertyPattern = /\w+/;
 
 var extend = require('extend');
 
-function HoodieError(properties) {
+module.exports = HoodieError;
+
+function HoodieError (properties) {
 
   // normalize arguments
   if (typeof properties === 'string') {
@@ -8376,20 +8855,21 @@ function HoodieError(properties) {
   });
   extend(this, properties);
 }
+
 HoodieError.prototype = new Error();
+
 HoodieError.prototype.constructor = HoodieError;
 
-module.exports = HoodieError;
 
 
-},{"extend":40}],51:[function(require,module,exports){
+},{"extend":41}],72:[function(require,module,exports){
 module.exports = {
   error: require('./error'),
   objectId: require('./object_id'),
   objectType: require('./object_type')
 };
 
-},{"./error":50,"./object_id":52,"./object_type":53}],52:[function(require,module,exports){
+},{"./error":71,"./object_id":73,"./object_type":74}],73:[function(require,module,exports){
 // Hoodie Invalid Type Or Id Error
 // -------------------------------
 
@@ -8397,26 +8877,30 @@ module.exports = {
 // are allowed for object IDs.
 //
 var HoodieError = require('./error');
+var validIdPattern = /^[a-z0-9\-]+$/;
 
 //
-function HoodieObjectIdError(properties) {
+function HoodieObjectIdError (properties) {
   properties.name = 'HoodieObjectIdError';
   properties.message = '"{{id}}" is invalid object id. {{rules}}.';
 
   return new HoodieError(properties);
 }
-var validIdPattern = /^[a-z0-9\-]+$/;
-HoodieObjectIdError.isInvalid = function(id, customPattern) {
+
+HoodieObjectIdError.isInvalid = function (id, customPattern) {
   return !(customPattern || validIdPattern).test(id || '');
 };
-HoodieObjectIdError.isValid = function(id, customPattern) {
+
+HoodieObjectIdError.isValid = function (id, customPattern) {
   return (customPattern || validIdPattern).test(id || '');
 };
+
 HoodieObjectIdError.prototype.rules = 'Lowercase letters, numbers and dashes allowed only. Must start with a letter';
 
 module.exports = HoodieObjectIdError;
 
-},{"./error":50}],53:[function(require,module,exports){
+
+},{"./error":71}],74:[function(require,module,exports){
 // Hoodie Invalid Type Or Id Error
 // -------------------------------
 
@@ -8425,6 +8909,7 @@ module.exports = HoodieObjectIdError;
 // with a letter.
 //
 var HoodieError = require('./error');
+var validTypePattern = /^[a-z$][a-z0-9]+$/;
 
 // Hoodie Invalid Type Or Id Error
 // -------------------------------
@@ -8433,24 +8918,27 @@ var HoodieError = require('./error');
 // are allowed for object types, plus must start
 // with a letter.
 //
-function HoodieObjectTypeError(properties) {
+function HoodieObjectTypeError (properties) {
   properties.name = 'HoodieObjectTypeError';
   properties.message = '"{{type}}" is invalid object type. {{rules}}.';
 
   return new HoodieError(properties);
 }
-var validTypePattern = /^[a-z$][a-z0-9]+$/;
+
 HoodieObjectTypeError.isInvalid = function(type, customPattern) {
   return !(customPattern || validTypePattern).test(type || '');
 };
+
 HoodieObjectTypeError.isValid = function(type, customPattern) {
   return (customPattern || validTypePattern).test(type || '');
 };
+
 HoodieObjectTypeError.prototype.rules = 'lowercase letters, numbers and dashes allowed only. Must start with a letter';
 
 module.exports = HoodieObjectTypeError;
 
-},{"./error":50}],54:[function(require,module,exports){
+
+},{"./error":71}],75:[function(require,module,exports){
 // Events
 // ========
 //
@@ -8613,7 +9101,7 @@ module.exports = function (hoodie, options) {
 };
 
 
-},{}],55:[function(require,module,exports){
+},{}],76:[function(require,module,exports){
 module.exports = {
   error: require('./error'),
   events: require('./events'),
@@ -8621,7 +9109,7 @@ module.exports = {
   task: require('./task')
 };
 
-},{"./error":51,"./events":54,"./store":57,"./task":60}],56:[function(require,module,exports){
+},{"./error":72,"./events":75,"./store":78,"./task":81}],77:[function(require,module,exports){
 // Store
 // ============
 
@@ -8662,10 +9150,10 @@ var HoodieObjectTypeError = require('../error/object_type');
 var HoodieObjectIdError = require('../error/object_id');
 var extend = require('extend');
 var utils = require('../../utils/');
+var isPromise = require('../../utils/promise/is_promise');
 
 //
 module.exports = function (hoodie, options) {
-var isPromise = require('../../utils/promise/is_promise');
 
   // persistence logic
   var backend = {};
@@ -8801,7 +9289,6 @@ var isPromise = require('../../utils/promise/is_promise');
 
   //
   api.find = function find(type, id) {
-
     return decoratePromise(backend.find(type, id));
   };
 
@@ -9053,14 +9540,14 @@ var isPromise = require('../../utils/promise/is_promise');
 };
 
 
-},{"../../utils/":65,"../../utils/promise/is_promise":69,"../error/error":50,"../error/object_id":52,"../error/object_type":53,"../events":54,"./scoped":59,"extend":40}],57:[function(require,module,exports){
+},{"../../utils/":86,"../../utils/promise/is_promise":90,"../error/error":71,"../error/object_id":73,"../error/object_type":74,"../events":75,"./scoped":80,"extend":41}],78:[function(require,module,exports){
 module.exports = {
   api: require('./api'),
   remote: require('./remote'),
   scoped: require('./scoped')
 };
 
-},{"./api":56,"./remote":58,"./scoped":59}],58:[function(require,module,exports){
+},{"./api":77,"./remote":79,"./scoped":80}],79:[function(require,module,exports){
 var global=typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {};// Remote
 // ========
 
@@ -9845,7 +10332,7 @@ module.exports = function hoodieRemoteStore(hoodie, options) {
   return remote;
 };
 
-},{"../../utils/":65,"../../utils/generate_id":63,"./api":56,"extend":40}],59:[function(require,module,exports){
+},{"../../utils/":86,"../../utils/generate_id":84,"./api":77,"extend":41}],80:[function(require,module,exports){
 // scoped Store
 // ============
 
@@ -9956,12 +10443,12 @@ module.exports = function (hoodie, storeApi, options) {
   return api;
 };
 
-},{"../events":54}],60:[function(require,module,exports){
+},{"../events":75}],81:[function(require,module,exports){
 module.exports = {
   scoped: require('./scoped')
 };
 
-},{"./scoped":61}],61:[function(require,module,exports){
+},{"./scoped":82}],82:[function(require,module,exports){
 // scoped Store
 // ============
 
@@ -10036,7 +10523,7 @@ module.exports = function (hoodie, taskApi, options) {
   return api;
 };
 
-},{"../events":54}],62:[function(require,module,exports){
+},{"../events":75}],83:[function(require,module,exports){
 // Hoodie Config API
 // ===================
 
@@ -10106,7 +10593,7 @@ init();
 module.exports = config;
 
 
-},{"../utils/local_storage_wrapper":66,"extend":40}],63:[function(require,module,exports){
+},{"../utils/local_storage_wrapper":87,"extend":41}],84:[function(require,module,exports){
 var chars, i, radix;
 
 // uuids consist of numbers and lowercase letters only.
@@ -10118,7 +10605,7 @@ chars = '0123456789abcdefghijklmnopqrstuvwxyz'.split('');
 radix = chars.length;
 
 // helper to generate unique ids.
-function generateId (length) {
+module.exports = function (length) {
   var id = '';
 
   // default uuid length to 7
@@ -10133,11 +10620,10 @@ function generateId (length) {
   }
 
   return id;
-}
 
-module.exports = generateId;
+};
 
-},{}],64:[function(require,module,exports){
+},{}],85:[function(require,module,exports){
 var findLettersToUpperCase = /(^\w|_\w)/g;
 
 function hoodiefyRequestErrorName (name) {
@@ -10149,14 +10635,12 @@ function hoodiefyRequestErrorName (name) {
 }
 
 module.exports = hoodiefyRequestErrorName;
-},{}],65:[function(require,module,exports){
-var process=require("__browserify_process"),global=typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {};if (typeof global.Promise === 'function') {
+},{}],86:[function(require,module,exports){
+var global=typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {};if (typeof global.Promise === 'function') {
   exports.Promise = global.Promise;
 } else {
   exports.Promise = require('bluebird');
 }
-
-var Promise = exports.Promise;
 
 exports.config = require('./config');
 
@@ -10169,80 +10653,14 @@ exports.promise = require('./promise');
 
 exports.getArguments = require('argsarray');
 
-exports.once = function (fun) {
-  var called = false;
-  return exports.getArguments(function (args) {
-    if (called) {
-      if (typeof console.trace === 'function') {
-        console.trace();
-      }
-      throw new Error('once called  more than once');
-    } else {
-      called = true;
-      fun.apply(this, args);
-    }
-  });
-};
+exports.toPromise = require('pouchdb-topromise');
 
-exports.toPromise = function (func) {
-  //create the function we will be returning
-  return exports.getArguments(function (args) {
-    var self = this;
-    var tempCB = (typeof args[args.length - 1] === 'function') ? args.pop() : false;
-    // if the last argument is a function, assume its a callback
-    var usedCB;
-
-    if (tempCB) {
-      // if it was a callback, create a new callback which calls it,
-      // but do so async so we don't trap any errors
-      usedCB = function (err, resp) {
-        process.nextTick(function () {
-          tempCB(err, resp);
-        });
-      };
-    }
-
-    var promise = new Promise(function (fulfill, reject) {
-      var resp;
-
-      try {
-        var callback = exports.once(function (err, mesg) {
-          if (err) {
-            reject(err);
-          } else {
-            fulfill(mesg);
-          }
-        });
-        // create a callback for this invocation
-        // apply the function in the orig context
-        args.push(callback);
-        resp = func.apply(self, args);
-        if (resp && typeof resp.then === 'function') {
-          fulfill(resp);
-        }
-      } catch (e) {
-        reject(e);
-      }
-    });
-
-    // if there is a callback, call it back
-    if (usedCB) {
-      promise.then(function (result) {
-        usedCB(null, result);
-      }, usedCB);
-    }
-    promise.cancel = function () {
-      return this;
-    };
-
-    return promise;
-
-  });
-
+exports.now = function () {
+  return new Date();
 };
 
 
-},{"./config":62,"./generate_id":63,"./local_storage_wrapper":66,"./promise":68,"__browserify_process":39,"argsarray":1,"bluebird":4}],66:[function(require,module,exports){
+},{"./config":83,"./generate_id":84,"./local_storage_wrapper":87,"./promise":89,"argsarray":1,"bluebird":4,"pouchdb-topromise":42}],87:[function(require,module,exports){
 var global=typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {};// public API
 
 exports.setItem = function (name, item) {
@@ -10289,6 +10707,7 @@ exports.getObject = function (key) {
 };
 
 function init() {
+
   if (exports.isPersistent) {
     return;
   }
@@ -10316,7 +10735,6 @@ function init() {
 
 exports.isPersistent = function() {
   try {
-
     // we've to put this in here. I've seen Firefox throwing `Security error: 1000`
     // when cookies have been disabled
     if (!global.localStorage) {
@@ -10348,10 +10766,10 @@ exports.isPersistent = function() {
 init();
 
 
-},{}],67:[function(require,module,exports){
+},{}],88:[function(require,module,exports){
 var global=typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {};module.exports = global.jQuery.Deferred;
 
-},{}],68:[function(require,module,exports){
+},{}],89:[function(require,module,exports){
 module.exports = {
   defer: require('./defer'),
   isPromise: require('./is_promise'),
@@ -10362,7 +10780,7 @@ module.exports = {
 };
 
 
-},{"./defer":67,"./is_promise":69,"./reject":70,"./reject_with":71,"./resolve":72,"./resolve_with":73}],69:[function(require,module,exports){
+},{"./defer":88,"./is_promise":90,"./reject":91,"./reject_with":92,"./resolve":93,"./resolve_with":94}],90:[function(require,module,exports){
 // returns true if passed object is a promise (but not a deferred),
 // otherwise false.
 function isPromise(object) {
@@ -10372,7 +10790,7 @@ function isPromise(object) {
 }
 
 module.exports = isPromise;
-},{}],70:[function(require,module,exports){
+},{}],91:[function(require,module,exports){
 var defer = require('./defer');
 //
 function reject() {
@@ -10380,7 +10798,7 @@ function reject() {
 }
 
 module.exports = reject;
-},{"./defer":67}],71:[function(require,module,exports){
+},{"./defer":88}],92:[function(require,module,exports){
 var getDefer = require('./defer');
 var HoodieError = require('../../lib/error/error');
 
@@ -10392,7 +10810,7 @@ function rejectWith(errorProperties) {
 
 module.exports = rejectWith;
 
-},{"../../lib/error/error":50,"./defer":67}],72:[function(require,module,exports){
+},{"../../lib/error/error":71,"./defer":88}],93:[function(require,module,exports){
 var defer = require('./defer');
 //
 function resolve() {
@@ -10400,7 +10818,7 @@ function resolve() {
 }
 
 module.exports = resolve;
-},{"./defer":67}],73:[function(require,module,exports){
+},{"./defer":88}],94:[function(require,module,exports){
 var getDefer = require('./defer');
 
 //
@@ -10411,7 +10829,7 @@ function resolveWith() {
 
 module.exports = resolveWith;
 
-},{"./defer":67}]},{},[41])
-(41)
+},{"./defer":88}]},{},[62])
+(62)
 });
 ;
