@@ -38,7 +38,7 @@ var HoodieObjectTypeError = require('../error/object_type');
 var HoodieObjectIdError = require('../error/object_id');
 var extend = require('extend');
 var utils = require('../../utils/');
-var isPromise = require('../../utils/promise/is_promise');
+var promiseUtils = require('../../utils/promise');
 
 //
 module.exports = function (hoodie, options) {
@@ -324,7 +324,7 @@ module.exports = function (hoodie, options) {
     case typeof filterOrObjects === 'string':
       promise = api.findAll(filterOrObjects);
       break;
-    case isPromise(filterOrObjects):
+    case promiseUtils.isPromise(filterOrObjects):
       promise = filterOrObjects;
       break;
     case $.isArray(filterOrObjects):

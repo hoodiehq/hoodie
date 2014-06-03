@@ -5,6 +5,7 @@
 var hoodieStoreApi = require('../lib/store/api');
 var HoodieObjectTypeError = require('../lib/error/object_type');
 var HoodieObjectIdError = require('../lib/error/object_id');
+
 var generateId = require('../utils/generate_id');
 var config = require('../utils/config');
 
@@ -35,8 +36,6 @@ module.exports = function hoodieStore (hoodie) {
   // 2 seconds timeout before triggering the `store:idle` event
   //
   var idleTimeout = 2000;
-
-
 
 
   // ------

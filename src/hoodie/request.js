@@ -20,9 +20,9 @@
 
 var hoodiefyRequestErrorName = require('../utils/hoodiefy_request_error_name');
 var extend = require('extend');
-var rejectWith = require('../utils/promise/reject_with');
+var promise = require('../utils/promise/');
 
-function hoodieRequest(hoodie) {
+module.exports = function (hoodie) {
   var $ajax = $.ajax;
 
   // Hoodie backend listens to requests prefixed by /_api,
@@ -98,7 +98,7 @@ function hoodieRequest(hoodie) {
       }
     }
 
-    return rejectWith(error).promise();
+    return promise.rejectWith(error).promise();
   }
 
   //
@@ -149,6 +149,4 @@ function hoodieRequest(hoodie) {
   // public API
   //
   hoodie.request = request;
-}
-
-module.exports = hoodieRequest;
+};

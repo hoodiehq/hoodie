@@ -6,14 +6,8 @@ var extend = require('extend');
 var generateId = require('../utils/generate_id');
 var config = require('../utils/config');
 
-var getDefer = require('../utils/promise/defer');
-var reject = require('../utils/promise/reject');
-var resolve = require('../utils/promise/resolve');
-var rejectWith = require('../utils/promise/reject_with');
-var resolveWith = require('../utils/promise/resolve_with');
-
-
 var utils = require('../utils/');
+var promise = require('../utils/promise/');
 
 module.exports = function (hoodie) {
   // public API
@@ -49,19 +43,19 @@ module.exports = function (hoodie) {
 
     // already tried to authenticate, and failed
     if (authenticated === false) {
-      return reject();
+      return promise.reject();
     }
 
     // already tried to authenticate, and succeeded
     if (authenticated === true) {
-      return resolveWith(account.username);
+      return promise.resolveWith(account.username);
     }
 
     // if there is a pending signOut request, return its promise,
     // but pipe it so that it always ends up rejected
     //
     if (requests.signOut && requests.signOut.state() === 'pending') {
-      return requests.signOut.then(reject);
+      return requests.signOut.then(promise.reject);
     }
 
     // if there is a pending signIn request, return its promise
@@ -74,7 +68,7 @@ module.exports = function (hoodie) {
     if (!account.hasAccount()) {
       return sendSignOutRequest().then(function() {
         authenticated = false;
-        return reject();
+        return promise.reject();
       });
     }
 
@@ -133,7 +127,7 @@ module.exports = function (hoodie) {
     }
 
     if (!username) {
-      return rejectWith('Username must be set.');
+      return promise.rejectWith('Username must be set.');
     }
 
     if (account.hasAnonymousAccount()) {
@@ -141,7 +135,7 @@ module.exports = function (hoodie) {
     }
 
     if (account.hasAccount()) {
-      return rejectWith('Must sign out first.');
+      return promise.rejectWith('Must sign out first.');
     }
 
     return sendSignUpRequest(username, password)
@@ -348,7 +342,7 @@ module.exports = function (hoodie) {
     }
 
     if (!username) {
-      return rejectWith({
+      return promise.rejectWith({
         name: 'HoodieUnauthorizedError',
         message: 'Not signed in'
       });
@@ -373,7 +367,7 @@ module.exports = function (hoodie) {
   account.changePassword = function changePassword(currentPassword, newPassword) {
 
     if (!account.username) {
-      return rejectWith({
+      return promise.rejectWith({
         name: 'HoodieUnauthorizedError',
         message: 'Not signed in'
       });
@@ -462,7 +456,7 @@ module.exports = function (hoodie) {
     resetPasswordId = config.get('_account.resetPasswordId');
 
     if (!resetPasswordId) {
-      return rejectWith('No pending password reset.');
+      return promise.rejectWith('No pending password reset.');
     }
 
     // username is part of resetPasswordId, see account.resetPassword
@@ -513,7 +507,7 @@ module.exports = function (hoodie) {
         account.trigger('changeusername', newUsername);
       });
     }
-    return rejectWith({
+    return promise.rejectWith({
       name: 'HoodieConflictError',
       message: 'Usernames identical'
     });
@@ -586,7 +580,7 @@ module.exports = function (hoodie) {
   function handleAuthenticateRequestSuccess(response) {
     if (response.userCtx.name) {
       authenticated = true;
-      return resolveWith(account.username);
+      return promise.resolveWith(account.username);
     }
 
     if (account.hasAnonymousAccount()) {
@@ -595,7 +589,7 @@ module.exports = function (hoodie) {
 
     authenticated = false;
     account.trigger('error:unauthenticated');
-    return reject();
+    return promise.reject();
   }
 
 
@@ -634,7 +628,7 @@ module.exports = function (hoodie) {
       if (error.name === 'HoodieConflictError') {
         error.message = 'Username ' + username + ' already exists';
       }
-      return rejectWith(error);
+      return promise.rejectWith(error);
     };
   }
 
@@ -650,25 +644,25 @@ module.exports = function (hoodie) {
     // to keep a reference and finally resolve / reject it
     // at some point
     if (!defer) {
-      defer = getDefer();
+      defer = promise.defer();
     }
 
     global.setTimeout(function() {
       var promise = sendSignInRequest(username, password, options);
-      promise.done(defer.resolve);
+      promise.done(promise.defer.resolve);
       promise.fail(function(error) {
         if (error.name === 'HoodieAccountUnconfirmedError') {
 
           // It might take a bit until the account has been confirmed
           delayedSignIn(username, password, options, defer);
         } else {
-          defer.reject.apply(defer, arguments);
+          promise.defer.reject.apply(defer, arguments);
         }
       });
 
     }, 300);
 
-    return defer.promise();
+    return promise.defer.promise();
   }
 
 
@@ -714,7 +708,7 @@ module.exports = function (hoodie) {
       //
       if (response.roles.indexOf('error') !== -1) {
         return account.fetch(newUsername).then(function() {
-          return rejectWith(userDoc.$error);
+          return promise.rejectWith(userDoc.$error);
         });
       }
 
@@ -726,7 +720,7 @@ module.exports = function (hoodie) {
       // with an 'unconfirmed error'
       //
       if (response.roles.indexOf('confirmed') === -1) {
-        return rejectWith({
+        return promise.rejectWith({
           name: 'HoodieAccountUnconfirmedError',
           message: 'Account has not been confirmed yet'
         });
@@ -734,7 +728,7 @@ module.exports = function (hoodie) {
       authenticated = true;
 
       account.fetch();
-      return resolveWith(newUsername, newHoodieId, options);
+      return promise.resolveWith(newUsername, newHoodieId, options);
     };
   }
 
@@ -761,7 +755,7 @@ module.exports = function (hoodie) {
         message: 'Password reset is still pending'
       };
     }
-    return rejectWith(error);
+    return promise.rejectWith(error);
   }
 
 
@@ -775,9 +769,9 @@ module.exports = function (hoodie) {
         config.unset('_account.resetPasswordId');
         account.trigger('passwordreset', username);
 
-        return resolve();
+        return promise.resolve();
       } else {
-        return rejectWith(error);
+        return promise.rejectWith(error);
       }
     };
   }
@@ -788,20 +782,20 @@ module.exports = function (hoodie) {
   // and resolve / reject respectively
   //
   function awaitPasswordResetResult() {
-    var defer = getDefer();
+    var defer = promise.defer();
 
-    account.one('passwordreset', defer.resolve );
+    account.one('passwordreset', promise.defer.resolve );
     account.on('error:passwordreset', removePasswordResetObject );
-    account.on('error:passwordreset', defer.reject );
+    account.on('error:passwordreset', promise.defer.reject );
 
     // clean up callbacks when either gets called
     defer.always( function() {
-      account.unbind('passwordreset', defer.resolve );
+      account.unbind('passwordreset', promise.defer.resolve );
       account.unbind('error:passwordreset', removePasswordResetObject );
-      account.unbind('error:passwordreset', defer.reject );
+      account.unbind('error:passwordreset', promise.defer.reject );
     });
 
-    return defer.promise();
+    return promise.defer.promise();
   }
 
   //
@@ -894,9 +888,9 @@ module.exports = function (hoodie) {
   //
   function handleFetchBeforeDestroyError(error) {
     if (error.name === 'HoodieNotFoundError') {
-      return resolve();
+      return promise.resolve();
     } else {
-      return rejectWith(error);
+      return promise.rejectWith(error);
     }
   }
 
@@ -911,7 +905,7 @@ module.exports = function (hoodie) {
     authenticated = undefined;
     setUsername(undefined);
 
-    return resolve();
+    return promise.resolve();
   }
 
   //
@@ -1049,7 +1043,7 @@ module.exports = function (hoodie) {
   //
   function awaitCurrentAccountRemoved(username, password, defer) {
     if (!defer) {
-      defer = getDefer();
+      defer = promise.defer();
     }
 
     var requestOptions = {
@@ -1065,13 +1059,13 @@ module.exports = function (hoodie) {
       global.setTimeout(awaitCurrentAccountRemoved, 300, username, password, defer);
     }).fail(function(error) {
       if (error.status === 401) {
-        return defer.resolve();
+        return promise.defer.resolve();
       }
 
-      defer.reject(error);
+      promise.defer.reject(error);
     });
 
-    return defer.promise();
+    return promise.defer.promise();
   }
 
 
@@ -1117,7 +1111,7 @@ module.exports = function (hoodie) {
     if (hoodie.store.hasLocalChanges() && !options.ignoreLocalChanges) {
       return hoodie.remote.push();
     }
-    return resolve();
+    return promise.resolve();
   }
 
   //
@@ -1165,7 +1159,6 @@ module.exports = function (hoodie) {
   // user account got confirmed.
   //
   function sendSignUpRequest (username, password) {
-    var defer = getDefer();
     var options;
 
     username = username.toLowerCase();
@@ -1185,11 +1178,11 @@ module.exports = function (hoodie) {
       contentType: 'application/json'
     };
     account.request('PUT', userDocUrl(username), options)
-    .done(defer.notify)
+    .done(promise.defer.notify)
     .then(handleSignUpSuccess(username, password), handleSignUpError(username))
-    .then(defer.resolve, defer.reject);
+    .then(promise.defer.resolve, promise.defer.reject);
 
-    return defer.promise();
+    return promise.defer.promise();
   }
 
   //
