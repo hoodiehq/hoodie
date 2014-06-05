@@ -1,4 +1,4 @@
-// Hoodie.js - 0.9.1
+// Hoodie.js - 0.9.2
 // https://github.com/hoodiehq/hoodie.js
 // Copyright 2012 - 2014 https://github.com/hoodiehq/
 // Licensed Apache License 2.0
@@ -134,7 +134,7 @@ function Hoodie(baseUrl) {
   //     hoodie.extend(function(hoodie) {} )
   //
   hoodie.extend = function extend(extension) {
-    extension(hoodie);
+    extension(hoodie, lib, utils);
   };
 
 
@@ -230,7 +230,7 @@ function Hoodie(baseUrl) {
 
 // You can extend the Hoodie class like so:
 //
-// Hoodie.extend(funcion(hoodie) { hoodie.myMagic = function() {} })
+// Hoodie.extend(function(hoodie) { hoodie.myMagic = function() {} })
 //
 var extensions = [];
 
@@ -395,6 +395,7 @@ function hoodieAccount(hoodie) {
 
     return sendSignUpRequest(username, password)
     .done(function() {
+      setUsername(username);
       account.trigger('signup', username);
     });
   };
@@ -640,12 +641,12 @@ function hoodieAccount(hoodie) {
   // ----------------
 
   // This is kind of a hack. We need to create an object anonymously
-  // that is not exposed to others. The only CouchDB API othering such
+  // that is not exposed to others. The only CouchDB API offering such
   // functionality is the _users database.
   //
-  // So we actualy sign up a new couchDB user with some special attributes.
-  // It will be picked up by the password reset worker and removeed
-  // once the password was resetted.
+  // So we actually sign up a new couchDB user with some special attributes.
+  // It will be picked up by the password reset worker and removed
+  // once the password was reset.
   //
   account.resetPassword = function resetPassword(username) {
     var data, key, options, resetPasswordId;
@@ -703,7 +704,7 @@ function hoodieAccount(hoodie) {
   // one second timeout.
   //
   account.checkPasswordReset = function checkPasswordReset() {
-    var hash, options, resetPasswordId, url, username;
+    var hash, options, resetPasswordId, url, username, couchUsername;
 
     // reject if there is no pending password reset request
     resetPasswordId = config.get('_account.resetPasswordId');
@@ -712,10 +713,13 @@ function hoodieAccount(hoodie) {
       return rejectWith('No pending password reset.');
     }
 
+    // username is part of resetPasswordId, see account.resetPassword
+    username = resetPasswordId.split('/')[0];
+
     // send request to check status of password reset
-    username = '$passwordReset/' + resetPasswordId;
-    url = '/_users/' + (encodeURIComponent(userDocPrefix + ':' + username));
-    hash = btoa(username + ':' + resetPasswordId);
+    couchUsername = '$passwordReset/' + resetPasswordId;
+    url = '/_users/' + (encodeURIComponent(userDocPrefix + ':' + couchUsername));
+    hash = btoa(couchUsername + ':' + resetPasswordId);
 
     options = {
       headers: {
@@ -725,12 +729,12 @@ function hoodieAccount(hoodie) {
 
     return withSingleRequest('passwordResetStatus', function() {
       return account.request('GET', url, options).then(
-      handlePasswordResetStatusRequestSuccess, handlePasswordResetStatusRequestError).fail(function(error) {
+      handlePasswordResetStatusRequestSuccess, handlePasswordResetStatusRequestError(username)).fail(function(error) {
         if (error.name === 'HoodiePendingError') {
           global.setTimeout(account.checkPasswordReset, 1000);
           return;
         }
-        return account.trigger('error:passwordreset', error);
+        return account.trigger('error:passwordreset', error, username);
       });
     });
   };
@@ -822,7 +826,7 @@ function hoodieAccount(hoodie) {
   // not, we check `userCtx.name` in the response. If the user is not
   // signed in, it's null, otherwise the name the user signed in with
   //
-  // If the user is not signed in, we difeerentiate between users that
+  // If the user is not signed in, we differentiate between users that
   // signed in with a username / password or anonymously. For anonymous
   // users, the password is stored in local store, so we don't need
   // to trigger an 'unauthenticated' error, but instead try to sign in.
@@ -857,7 +861,7 @@ function hoodieAccount(hoodie) {
 
     return function(response) {
       userDoc._rev = response.rev;
-      return delayedSignIn(username, password, {moveData: true});
+      return delayedSignIn(username, password);
     };
   }
 
@@ -930,7 +934,7 @@ function hoodieAccount(hoodie) {
   //     }
   //
   // we want to turn it into 'test1', 'mvu85hy' or reject the promise
-  // in case an error occured ('roles' array contains 'error' or is empty)
+  // in case an error occurred ('roles' array contains 'error' or is empty)
   //
   function handleSignInSuccess(options) {
     options = options || {};
@@ -943,7 +947,7 @@ function hoodieAccount(hoodie) {
       newHoodieId = response.roles[0];
 
       //
-      // if an error occured, the userDB worker stores it to the $error attribute
+      // if an error occurred, the userDB worker stores it to the $error attribute
       // and adds the 'error' role to the users doc object. If the user has the
       // 'error' role, we need to fetch his _users doc to find out what the error
       // is, before we can reject the promise.
@@ -963,11 +967,11 @@ function hoodieAccount(hoodie) {
       }
 
       //
-      // When the userDB worker created the database for the user and everthing
+      // When the userDB worker created the database for the user and everything
       // worked out, it adds the role 'confirmed' to the user. If the role is
       // not present yet, it might be that the worker didn't pick up the the
       // user doc yet, or there was an error. In this cases, we reject the promise
-      // with an 'uncofirmed error'
+      // with an 'unconfirmed error'
       //
       if (response.roles.indexOf('confirmed') === -1) {
         return rejectWith({
@@ -984,7 +988,7 @@ function hoodieAccount(hoodie) {
 
 
   //
-  // If the request was successful there might have occured an
+  // If the request was successful there might have occurred an
   // error, which the worker stored in the special $error attribute.
   // If that happens, we return a rejected promise with the error
   // Otherwise reject the promise with a 'pending' error,
@@ -1013,15 +1017,17 @@ function hoodieAccount(hoodie) {
   // If the error is a 401, it's exactly what we've been waiting for.
   // In this case we resolve the promise.
   //
-  function handlePasswordResetStatusRequestError(error) {
-    if (error.name === 'HoodieUnauthorizedError') {
-      config.unset('_account.resetPasswordId');
-      account.trigger('passwordreset');
+  function handlePasswordResetStatusRequestError(username) {
+    return function(error) {
+      if (error.name === 'HoodieUnauthorizedError') {
+        config.unset('_account.resetPasswordId');
+        account.trigger('passwordreset', username);
 
-      return resolve();
-    } else {
-      return rejectWith(error);
-    }
+        return resolve();
+      } else {
+        return rejectWith(error);
+      }
+    };
   }
 
 
@@ -1080,7 +1086,7 @@ function hoodieAccount(hoodie) {
   // 1. assure we have a valid session
   // 2. update _users doc with new username and new password (if provided)
   // 3. if username changed, wait until current _users doc got removed
-  // 3. sign in with new credentials to create new sesion.
+  // 3. sign in with new credentials to create new session.
   //
   function changeUsernameAndPassword(currentPassword, newUsername, newPassword) {
     var currentUsername = account.hasAnonymousAccount() ? hoodie.id() : account.username;
@@ -1127,9 +1133,9 @@ function hoodieAccount(hoodie) {
   }
 
   //
-  // dependend on what kind of error we get, we want to ignore
+  // dependant on what kind of error we get, we want to ignore
   // it or not.
-  // When we get a 'HoodieNotFoundError' it means that the _users doc habe
+  // When we get a 'HoodieNotFoundError' it means that the _users doc have
   // been removed already, so we don't need to do it anymore, but
   // still want to finish the destroy locally, so we return a
   // resolved promise
@@ -1174,7 +1180,7 @@ function hoodieAccount(hoodie) {
 
 
   //
-  // depending on wether the user signedUp manually or has been signed up
+  // depending on whether the user signedUp manually or has been signed up
   // anonymously the prefix in the CouchDB _users doc differentiates.
   // An anonymous user is characterized by its username, that equals
   // its hoodie.id (see `anonymousSignUp`)
@@ -1216,7 +1222,7 @@ function hoodieAccount(hoodie) {
   //
   // update my _users doc.
   //
-  // If a new username has been passed, we set the special attribut $newUsername.
+  // If a new username has been passed, we set the special attribute $newUsername.
   // This will let the username change worker create create a new _users doc for
   // the new username and remove the current one
   //
@@ -1273,7 +1279,7 @@ function hoodieAccount(hoodie) {
         // We always change either the one, or the other.
         return awaitCurrentAccountRemoved(currentUsername, newPassword).then( function() {
 
-          // we do signOut explicitely although signOut is build into hoodie.signIn to
+          // we do signOut explicitly although signOut is build into hoodie.signIn to
           // work around trouble in case of local changes. See
           // https://github.com/hoodiehq/hoodie.js/issues/256
           return account.signOut({silent:true, ignoreLocalChanges: true}).then(function() {
@@ -1373,7 +1379,7 @@ function hoodieAccount(hoodie) {
   //
   // the sign in request that starts a CouchDB session if
   // it succeeds. We separated the actual sign in request from
-  // the signIn method, as the latter also runs signOut intenrtally
+  // the signIn method, as the latter also runs signOut internally
   // to clean up local data before starting a new session. But as
   // other methods like signUp or changePassword do also need to
   // sign in the user (again), these need to send the sign in
@@ -1840,7 +1846,7 @@ var rejectWith = require('../utils/promise/reject_with');
 function hoodieRequest(hoodie) {
   var $ajax = $.ajax;
 
-  // Hoodie backend listents to requests prefixed by /_api,
+  // Hoodie backend listens to requests prefixed by /_api,
   // so we prefix all requests with relative URLs
   var API_PATH = '/_api';
 
@@ -2006,7 +2012,7 @@ function hoodieStore (hoodie) {
   // queue of method calls done during bootstrapping
   var queue = [];
 
-  // 2 seconds timout before triggering the `store:idle` event
+  // 2 seconds timeout before triggering the `store:idle` event
   //
   var idleTimeout = 2000;
 
@@ -2806,7 +2812,7 @@ function hoodieStore (hoodie) {
     }
   }
 
-  // when an object gets changed, two special events get triggerd:
+  // when an object gets changed, two special events get triggered:
   //
   // 1. dirty event
   //    the `dirty` event gets triggered immediately, for every
@@ -2903,7 +2909,7 @@ function hoodieStore (hoodie) {
   //
 
   // if browser does not support local storage persistence,
-  // e.g. Safari in private mode, overite the respective methods.
+  // e.g. Safari in private mode, overwrite the respective methods.
 
 
 
@@ -3247,7 +3253,7 @@ module.exports = hoodieTask;
 //
 // Instead of being initialized with just
 // the message, HoodieError expects an
-// object with properites. The `message`
+// object with properties. The `message`
 // property is required. The name will
 // fallback to `error`.
 //
@@ -3403,7 +3409,7 @@ function hoodieEvents(hoodie, options) {
   // Bind
   // ------
   //
-  // bind a callback to an event triggerd by the object
+  // bind a callback to an event triggered by the object
   //
   //     object.bind 'cheat', blame
   //
@@ -3587,7 +3593,7 @@ var isPromise = require('../../utils/promise/is_promise');
 //
 function hoodieStoreApi(hoodie, options) {
 
-  // persistance logic
+  // persistence logic
   var backend = {};
 
   // extend this property with extra functions that will be available
@@ -3620,7 +3626,7 @@ function hoodieStoreApi(hoodie, options) {
   // --------------
 
   // by default, we only check for a valid type & id.
-  // the validate method can be overwriten by passing
+  // the validate method can be overwritten by passing
   // options.validate
   //
   // if `validate` returns nothing, the passed object is
@@ -3769,7 +3775,7 @@ function hoodieStoreApi(hoodie, options) {
   // -------------------
 
   // In contrast to `.save`, the `.update` method does not replace the stored object,
-  // but only changes the passed attributes of an exsting object, if it exists
+  // but only changes the passed attributes of an existing object, if it exists
   //
   // both a hash of key/values or a function that applies the update to the passed
   // object can be passed.
@@ -3922,7 +3928,7 @@ function hoodieStoreApi(hoodie, options) {
   // removeAll
   // -----------
 
-  // Destroye all objects. Can be filtered by a type
+  // Destroy all objects. Can be filtered by a type
   //
   api.removeAll = function removeAll(type, options) {
     return decoratePromise(backend.removeAll(type, options || {}));
@@ -4031,7 +4037,7 @@ function hoodieRemoteStore(hoodie, options) {
   var remoteStore = {};
 
 
-  // Remote Store Persistance methods
+  // Remote Store Persistence methods
   // ----------------------------------
 
   // find
@@ -4057,7 +4063,7 @@ function hoodieRemoteStore(hoodie, options) {
   // findAll
   // ---------
 
-  // find all objects, can be filetered by a type
+  // find all objects, can be filtered by a type
   //
   remoteStore.findAll = function findAll(type) {
     var endkey, path, startkey;
@@ -4310,7 +4316,7 @@ function hoodieRemoteStore(hoodie, options) {
   // getSinceNr
   // ------------
 
-  // returns the sequence number from wich to start to find changes in pull
+  // returns the sequence number from which to start to find changes in pull
   //
   var since = options.since || 0; // TODO: spec that!
   remote.getSinceNr = function getSinceNr() {
@@ -4325,7 +4331,7 @@ function hoodieRemoteStore(hoodie, options) {
   // bootstrap
   // -----------
 
-  // inital pull of data of the remote store. By default, we pull all
+  // initial pull of data of the remote store. By default, we pull all
   // changes since the beginning, but this behavior might be adjusted,
   // e.g for a filtered bootstrap.
   //
@@ -4457,7 +4463,7 @@ function hoodieRemoteStore(hoodie, options) {
   // setSinceNr
   // ------------
 
-  // sets the sequence number from wich to start to find changes in pull.
+  // sets the sequence number from which to start to find changes in pull.
   // If remote store was initialized with since : function(nr) { ... },
   // call the function with the seq passed. Otherwise simply set the seq
   // number and return it.
@@ -4609,7 +4615,7 @@ function hoodieRemoteStore(hoodie, options) {
 
   // ### restart pull request
 
-  // request gets restarted automaticcally
+  // request gets restarted automatically
   // when aborted (see handlePullError)
   function restartPullRequest() {
     if (pullRequest) {
@@ -4620,7 +4626,7 @@ function hoodieRemoteStore(hoodie, options) {
 
   // ### pull success handler
 
-  // request gets restarted automaticcally
+  // request gets restarted automatically
   // when aborted (see handlePullError)
   //
   function handlePullSuccess(response) {
@@ -4742,7 +4748,7 @@ function hoodieRemoteStore(hoodie, options) {
       remote.trigger('change:' + object.type + ':' + object.id, event, object);
     }
 
-    // reset the hash for pushed object revisison after
+    // reset the hash for pushed object revision after
     // every response from the longpoll GET /_changes 
     pushedObjectRevisions = {};
   }
@@ -5037,7 +5043,8 @@ var chars, i, radix;
 // uuids consist of numbers and lowercase letters only.
 // We stick to lowercase letters to prevent confusion
 // and to prevent issues with CouchDB, e.g. database
-// names do wonly allow for lowercase letters.
+// names only allow for lowercase letters.
+
 chars = '0123456789abcdefghijklmnopqrstuvwxyz'.split('');
 radix = chars.length;
 

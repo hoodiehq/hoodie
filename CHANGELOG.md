@@ -1,3 +1,18 @@
+<a name="0.9.2"></a>
+### 0.9.2 (2014-06-05)
+
+
+#### Bug Fixes
+
+* **account:** hoodie.account.signUp() to persist username ([5d58bf08](https://github.com/hoodiehq/hoodie.js/commit/5d58bf088159d907473151073580c5ec7cc2845d))
+* **hoodie:** pass lib & utils to hoodie.extend callback ([92cc90e8](https://github.com/hoodiehq/hoodie.js/commit/92cc90e8c1be7cca3cd882ab201e6cd5babaabfe))
+
+
+#### Features
+
+* **account:** 'passwordreset' events now pass username ([3048451c](https://github.com/hoodiehq/hoodie.js/commit/3048451cf4517fcf0f193d31e3af72cd09af15c6))
+
+
 <a name="0.9.1"></a>
 ### 0.9.1 (2014-05-28)
 
