@@ -511,7 +511,7 @@ describe('hoodie.account', function() {
             this.clock.tick(300); // do the delayed sign in
           });
 
-          it('should sign in', function() {
+          it('should send sign in request', function() {
             var args = this.account.request.args[1];
             var type = args[0];
             var path = args[1];
@@ -520,7 +520,7 @@ describe('hoodie.account', function() {
             expect(path).to.eql('/_session');
           });
 
-          _and('signIn successful', function() {
+          _and('sign in request successful', function() {
 
             beforeEach(function() {
               this.hoodie.store.findAll.defer.resolve([]);
@@ -530,12 +530,16 @@ describe('hoodie.account', function() {
               });
             });
 
+            it('should persist new username', function() {
+              expect(configMock.set).to.be.calledWith('_account.username', 'joe@example.com');
+              expect(this.account.username).to.be('joe@example.com');
+            });
             it('should trigger `signup` event', function() {
               expect(this.account.trigger).to.be.calledWith('signup', 'joe@example.com');
             });
 
             it('should resolve its promise', function() {
-              expect(this.promise).to.be.resolvedWith('joe@example.com', 'hash123', {moveData: true});
+              expect(this.promise).to.be.resolvedWith('joe@example.com', 'hash123', {});
             });
 
           }); // signIn successful

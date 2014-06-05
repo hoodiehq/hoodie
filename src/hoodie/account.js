@@ -143,6 +143,7 @@ function hoodieAccount(hoodie) {
 
     return sendSignUpRequest(username, password)
     .done(function() {
+      setUsername(username);
       account.trigger('signup', username);
     });
   };
@@ -608,7 +609,7 @@ function hoodieAccount(hoodie) {
 
     return function(response) {
       userDoc._rev = response.rev;
-      return delayedSignIn(username, password, {moveData: true});
+      return delayedSignIn(username, password);
     };
   }
 
