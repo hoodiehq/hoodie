@@ -49,7 +49,8 @@
     "load-grunt-tasks": "^0.4.0",
     "mocha": "*",
     "rimraf": "^2.2.2",
-    "sinon": "^1.7.3"
+    "sinon": "^1.7.3",
+    "moment": "~2.6.0"
   },
   "hoodie": {
     "plugins": []
