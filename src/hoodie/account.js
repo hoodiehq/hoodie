@@ -6,14 +6,10 @@ var extend = require('extend');
 var generateId = require('../utils/generate_id');
 var config = require('../utils/config');
 
-var getDefer = require('../utils/promise/defer');
-var reject = require('../utils/promise/reject');
-var resolve = require('../utils/promise/resolve');
-var rejectWith = require('../utils/promise/reject_with');
-var resolveWith = require('../utils/promise/resolve_with');
+var utils = require('../utils/');
+var promise = require('../utils/promise/');
 
-//
-function hoodieAccount(hoodie) {
+module.exports = function (hoodie) {
   // public API
   var account = {};
 
@@ -47,19 +43,19 @@ function hoodieAccount(hoodie) {
 
     // already tried to authenticate, and failed
     if (authenticated === false) {
-      return reject();
+      return promise.reject();
     }
 
     // already tried to authenticate, and succeeded
     if (authenticated === true) {
-      return resolveWith(account.username);
+      return promise.resolveWith(account.username);
     }
 
     // if there is a pending signOut request, return its promise,
     // but pipe it so that it always ends up rejected
     //
     if (requests.signOut && requests.signOut.state() === 'pending') {
-      return requests.signOut.then(reject);
+      return requests.signOut.then(promise.reject);
     }
 
     // if there is a pending signIn request, return its promise
@@ -72,7 +68,7 @@ function hoodieAccount(hoodie) {
     if (!account.hasAccount()) {
       return sendSignOutRequest().then(function() {
         authenticated = false;
-        return reject();
+        return promise.reject();
       });
     }
 
@@ -125,12 +121,13 @@ function hoodieAccount(hoodie) {
   // to sign in with a 300ms timeout.
   //
   account.signUp = function signUp(username, password) {
+
     if (password === undefined) {
       password = '';
     }
 
     if (!username) {
-      return rejectWith('Username must be set.');
+      return promise.rejectWith('Username must be set.');
     }
 
     if (account.hasAnonymousAccount()) {
@@ -138,7 +135,7 @@ function hoodieAccount(hoodie) {
     }
 
     if (account.hasAccount()) {
-      return rejectWith('Must sign out first.');
+      return promise.rejectWith('Must sign out first.');
     }
 
     return sendSignUpRequest(username, password)
@@ -167,7 +164,7 @@ function hoodieAccount(hoodie) {
     username = hoodie.id();
 
     return sendSignUpRequest(username, password)
-    .progress( function() {
+    .progress(function() {
       setAnonymousPassword(password);
     })
     .done(function() {
@@ -181,8 +178,7 @@ function hoodieAccount(hoodie) {
 
   //
   account.hasAccount = function hasAccount() {
-    var hasUsername = !!account.username;
-    return hasUsername || account.hasAnonymousAccount();
+    return !!account.username || account.hasAnonymousAccount();
   };
 
 
@@ -199,7 +195,7 @@ function hoodieAccount(hoodie) {
   // can compare the username to the hoodie.id, which is the
   // same for anonymous accounts.
   account.hasAnonymousAccount = function hasAnonymousAccount() {
-    return !! getAnonymousPassword();
+    return !!getAnonymousPassword();
   };
 
 
@@ -250,8 +246,8 @@ function hoodieAccount(hoodie) {
     var isSilent;
     var promise;
 
-    if (! username) { username = ''; }
-    if (! password) { password = ''; }
+    if (!username) { username = ''; }
+    if (!password) { password = ''; }
     username = username.toLowerCase();
 
     options = options || {};
@@ -275,7 +271,7 @@ function hoodieAccount(hoodie) {
           account.trigger('movedata');
         }
       }
-      if (! isReauthenticating) {
+      if (!isReauthenticating) {
         cleanup();
       }
       if (isReauthenticating) {
@@ -306,7 +302,10 @@ function hoodieAccount(hoodie) {
       return cleanupMethod();
     }
 
-    return pushLocalChanges(options).then(disconnect).then(sendSignOutRequest).then(cleanupMethod);
+    return pushLocalChanges(options)
+    .then(disconnect)
+    .then(sendSignOutRequest)
+    .then(cleanupMethod);
   };
 
 
@@ -344,7 +343,7 @@ function hoodieAccount(hoodie) {
     }
 
     if (!username) {
-      return rejectWith({
+      return promise.rejectWith({
         name: 'HoodieUnauthorizedError',
         message: 'Not signed in'
       });
@@ -369,7 +368,7 @@ function hoodieAccount(hoodie) {
   account.changePassword = function changePassword(currentPassword, newPassword) {
 
     if (!account.username) {
-      return rejectWith({
+      return promise.rejectWith({
         name: 'HoodieUnauthorizedError',
         message: 'Not signed in'
       });
@@ -417,8 +416,8 @@ function hoodieAccount(hoodie) {
       type: 'user',
       roles: [],
       password: resetPasswordId,
-      createdAt: now(),
-      updatedAt: now()
+      createdAt: utils.now(),
+      updatedAt: utils.now()
     };
 
     options = {
@@ -458,7 +457,7 @@ function hoodieAccount(hoodie) {
     resetPasswordId = config.get('_account.resetPasswordId');
 
     if (!resetPasswordId) {
-      return rejectWith('No pending password reset.');
+      return promise.rejectWith('No pending password reset.');
     }
 
     // username is part of resetPasswordId, see account.resetPassword
@@ -509,7 +508,7 @@ function hoodieAccount(hoodie) {
         account.trigger('changeusername', newUsername);
       });
     }
-    return rejectWith({
+    return promise.rejectWith({
       name: 'HoodieConflictError',
       message: 'Usernames identical'
     });
@@ -582,7 +581,7 @@ function hoodieAccount(hoodie) {
   function handleAuthenticateRequestSuccess(response) {
     if (response.userCtx.name) {
       authenticated = true;
-      return resolveWith(account.username);
+      return promise.resolveWith(account.username);
     }
 
     if (account.hasAnonymousAccount()) {
@@ -591,7 +590,7 @@ function hoodieAccount(hoodie) {
 
     authenticated = false;
     account.trigger('error:unauthenticated');
-    return reject();
+    return promise.reject();
   }
 
 
@@ -630,7 +629,7 @@ function hoodieAccount(hoodie) {
       if (error.name === 'HoodieConflictError') {
         error.message = 'Username ' + username + ' already exists';
       }
-      return rejectWith(error);
+      return promise.rejectWith(error);
     };
   }
 
@@ -646,25 +645,25 @@ function hoodieAccount(hoodie) {
     // to keep a reference and finally resolve / reject it
     // at some point
     if (!defer) {
-      defer = getDefer();
+      defer = promise.defer();
     }
 
     global.setTimeout(function() {
       var promise = sendSignInRequest(username, password, options);
-      promise.done(defer.resolve);
+      promise.done(promise.defer.resolve);
       promise.fail(function(error) {
         if (error.name === 'HoodieAccountUnconfirmedError') {
 
           // It might take a bit until the account has been confirmed
           delayedSignIn(username, password, options, defer);
         } else {
-          defer.reject.apply(defer, arguments);
+          promise.defer.reject.apply(defer, arguments);
         }
       });
 
     }, 300);
 
-    return defer.promise();
+    return promise.defer.promise();
   }
 
 
@@ -710,7 +709,7 @@ function hoodieAccount(hoodie) {
       //
       if (response.roles.indexOf('error') !== -1) {
         return account.fetch(newUsername).then(function() {
-          return rejectWith(userDoc.$error);
+          return promise.rejectWith(userDoc.$error);
         });
       }
 
@@ -722,7 +721,7 @@ function hoodieAccount(hoodie) {
       // with an 'unconfirmed error'
       //
       if (response.roles.indexOf('confirmed') === -1) {
-        return rejectWith({
+        return promise.rejectWith({
           name: 'HoodieAccountUnconfirmedError',
           message: 'Account has not been confirmed yet'
         });
@@ -730,7 +729,7 @@ function hoodieAccount(hoodie) {
       authenticated = true;
 
       account.fetch();
-      return resolveWith(newUsername, newHoodieId, options);
+      return promise.resolveWith(newUsername, newHoodieId, options);
     };
   }
 
@@ -757,7 +756,7 @@ function hoodieAccount(hoodie) {
         message: 'Password reset is still pending'
       };
     }
-    return rejectWith(error);
+    return promise.rejectWith(error);
   }
 
 
@@ -771,9 +770,9 @@ function hoodieAccount(hoodie) {
         config.unset('_account.resetPasswordId');
         account.trigger('passwordreset', username);
 
-        return resolve();
+        return promise.resolve();
       } else {
-        return rejectWith(error);
+        return promise.rejectWith(error);
       }
     };
   }
@@ -784,20 +783,20 @@ function hoodieAccount(hoodie) {
   // and resolve / reject respectively
   //
   function awaitPasswordResetResult() {
-    var defer = getDefer();
+    var defer = promise.defer();
 
-    account.one('passwordreset', defer.resolve );
+    account.one('passwordreset', promise.defer.resolve );
     account.on('error:passwordreset', removePasswordResetObject );
-    account.on('error:passwordreset', defer.reject );
+    account.on('error:passwordreset', promise.defer.reject );
 
     // clean up callbacks when either gets called
     defer.always( function() {
-      account.unbind('passwordreset', defer.resolve );
+      account.unbind('passwordreset', promise.defer.resolve );
       account.unbind('error:passwordreset', removePasswordResetObject );
-      account.unbind('error:passwordreset', defer.reject );
+      account.unbind('error:passwordreset', promise.defer.reject );
     });
 
-    return defer.promise();
+    return promise.defer.promise();
   }
 
   //
@@ -890,9 +889,9 @@ function hoodieAccount(hoodie) {
   //
   function handleFetchBeforeDestroyError(error) {
     if (error.name === 'HoodieNotFoundError') {
-      return resolve();
+      return promise.resolve();
     } else {
-      return rejectWith(error);
+      return promise.rejectWith(error);
     }
   }
 
@@ -907,7 +906,7 @@ function hoodieAccount(hoodie) {
     authenticated = undefined;
     setUsername(undefined);
 
-    return resolve();
+    return promise.resolve();
   }
 
   //
@@ -988,8 +987,8 @@ function hoodieAccount(hoodie) {
         data.$newUsername = newUsername;
       }
 
-      data.updatedAt = now();
-      data.signedUpAt = data.signedUpAt || now();
+      data.updatedAt = utils.now();
+      data.signedUpAt = data.signedUpAt || utils.now();
 
       // trigger password update when newPassword set
       if (newPassword !== undefined) {
@@ -1045,7 +1044,7 @@ function hoodieAccount(hoodie) {
   //
   function awaitCurrentAccountRemoved(username, password, defer) {
     if (!defer) {
-      defer = getDefer();
+      defer = promise.defer();
     }
 
     var requestOptions = {
@@ -1061,13 +1060,13 @@ function hoodieAccount(hoodie) {
       global.setTimeout(awaitCurrentAccountRemoved, 300, username, password, defer);
     }).fail(function(error) {
       if (error.status === 401) {
-        return defer.resolve();
+        return promise.defer.resolve();
       }
 
-      defer.reject(error);
+      promise.defer.reject(error);
     });
 
-    return defer.promise();
+    return promise.defer.promise();
   }
 
 
@@ -1113,7 +1112,7 @@ function hoodieAccount(hoodie) {
     if (hoodie.store.hasLocalChanges() && !options.ignoreLocalChanges) {
       return hoodie.remote.push();
     }
-    return resolve();
+    return promise.resolve();
   }
 
   //
@@ -1161,7 +1160,6 @@ function hoodieAccount(hoodie) {
   // user account got confirmed.
   //
   function sendSignUpRequest (username, password) {
-    var defer = getDefer();
     var options;
 
     username = username.toLowerCase();
@@ -1174,30 +1172,23 @@ function hoodieAccount(hoodie) {
         password: password,
         hoodieId: hoodie.id(),
         database: account.db(),
-        updatedAt: now(),
-        createdAt: now(),
-        signedUpAt: username !== hoodie.id() ? now() : void 0
+        updatedAt: utils.now(),
+        createdAt: utils.now(),
+        signedUpAt: username !== hoodie.id() ? utils.now() : void 0
       }),
       contentType: 'application/json'
     };
     account.request('PUT', userDocUrl(username), options)
-    .done(defer.notify)
+    .done(promise.defer.notify)
     .then(handleSignUpSuccess(username, password), handleSignUpError(username))
-    .then(defer.resolve, defer.reject);
+    .then(promise.defer.resolve, promise.defer.reject);
 
-    return defer.promise();
-  }
-
-
-  //
-  function now() {
-    return new Date();
+    return promise.defer.promise();
   }
 
   //
   // expose public account API
   //
   hoodie.account = account;
-}
 
-module.exports = hoodieAccount;
+};

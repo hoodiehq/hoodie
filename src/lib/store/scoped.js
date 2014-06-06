@@ -7,7 +7,7 @@
 var hoodieEvents = require('../events');
 
 //
-function hoodieScopedStoreApi(hoodie, storeApi, options) {
+module.exports = function (hoodie, storeApi, options) {
 
   // name
   var storeName = options.name || 'store';
@@ -106,6 +106,4 @@ function hoodieScopedStoreApi(hoodie, storeApi, options) {
   api.validate = storeApi.validate;
 
   return api;
-}
-
-module.exports = hoodieScopedStoreApi;
+};

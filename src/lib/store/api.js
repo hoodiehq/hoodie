@@ -37,14 +37,11 @@ var HoodieError = require('../error/error');
 var HoodieObjectTypeError = require('../error/object_type');
 var HoodieObjectIdError = require('../error/object_id');
 var extend = require('extend');
-
-var getDefer = require('../../utils/promise/defer');
-var rejectWith = require('../../utils/promise/reject_with');
-var resolveWith = require('../../utils/promise/resolve_with');
-var isPromise = require('../../utils/promise/is_promise');
+var utils = require('../../utils/');
+var promiseUtils = require('../../utils/promise');
 
 //
-function hoodieStoreApi(hoodie, options) {
+module.exports = function (hoodie, options) {
 
   // persistence logic
   var backend = {};
@@ -132,7 +129,7 @@ function hoodieStoreApi(hoodie, options) {
   //     store.save('car', undefined, {color: 'red'})
   //     store.save('car', 'abc4567', {color: 'red'})
   //
-  api.save = function save(type, id, properties, options) {
+  api.save = utils.toPromise(function (type, id, properties, options, callback) {
 
     if (options) {
       options = extend(true, {}, options);
@@ -150,11 +147,11 @@ function hoodieStoreApi(hoodie, options) {
     var error = api.validate(object, options || {});
 
     if (error) {
-      return rejectWith(error);
+      return callback(error);
     }
 
     return decoratePromise(backend.save(object, options || {}));
-  };
+  });
 
 
   // Add
@@ -180,7 +177,6 @@ function hoodieStoreApi(hoodie, options) {
 
   //
   api.find = function find(type, id) {
-
     return decoratePromise(backend.find(type, id));
   };
 
@@ -238,7 +234,7 @@ function hoodieStoreApi(hoodie, options) {
   // hoodie.store.update('car', 'abc4567', {sold: true})
   // hoodie.store.update('car', 'abc4567', function(obj) { obj.sold = true })
   //
-  api.update = function update(type, id, objectUpdate, options) {
+  api.update = utils.toPromise(function (type, id, objectUpdate, options, callback) {
 
     function handleFound(currentObject) {
       var changedProperties, newObj, value;
@@ -251,7 +247,7 @@ function hoodieStoreApi(hoodie, options) {
       }
 
       if (!objectUpdate) {
-        return resolveWith(currentObject);
+        return callback(currentObject);
       }
 
       // check if something changed
@@ -273,7 +269,7 @@ function hoodieStoreApi(hoodie, options) {
       })();
 
       if (!(changedProperties.length || options)) {
-        return resolveWith(newObj);
+        return callback(newObj);
       }
 
       //apply update
@@ -284,7 +280,7 @@ function hoodieStoreApi(hoodie, options) {
     // that's why we need to decorate the find's promise again.
     var promise = api.find(type, id).then(handleFound);
     return decoratePromise(promise);
-  };
+  });
 
 
   // updateOrAdd
@@ -318,7 +314,7 @@ function hoodieStoreApi(hoodie, options) {
   //
   // hoodie.store.updateAll()
   //
-  api.updateAll = function updateAll(filterOrObjects, objectUpdate, options) {
+  api.updateAll = utils.toPromise(function (filterOrObjects, objectUpdate, options, callback) {
     var promise;
 
     options = options || {};
@@ -328,11 +324,11 @@ function hoodieStoreApi(hoodie, options) {
     case typeof filterOrObjects === 'string':
       promise = api.findAll(filterOrObjects);
       break;
-    case isPromise(filterOrObjects):
+    case promiseUtils.isPromise(filterOrObjects):
       promise = filterOrObjects;
       break;
     case $.isArray(filterOrObjects):
-      promise = getDefer().resolve(filterOrObjects).promise();
+      promise = callback(filterOrObjects);
       break;
     default:
       // e.g. null, update all
@@ -358,11 +354,11 @@ function hoodieStoreApi(hoodie, options) {
         return _results;
       })();
 
-      return $.when.apply(null, _updatePromises);
+      return callback(null, _updatePromises);
     });
 
     return decoratePromise(promise);
-  };
+  });
 
 
   // Remove
@@ -429,6 +425,5 @@ function hoodieStoreApi(hoodie, options) {
   }
 
   return api;
-}
+};
 
-module.exports = hoodieStoreApi;

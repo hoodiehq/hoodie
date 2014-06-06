@@ -1,10 +1,6 @@
 require('../../lib/setup');
 
-var isPromise = require('../../../src/utils/promise/is_promise');
-var resolve = require('../../../src/utils/promise/resolve');
-var reject = require('../../../src/utils/promise/reject');
-var resolveWith = require('../../../src/utils/promise/resolve_with');
-var rejectWith = require('../../../src/utils/promise/reject_with');
+var promise = require('../../../src/utils/promise/');
 
 describe('hoodie promises API', function() {
 
@@ -12,16 +8,16 @@ describe('hoodie promises API', function() {
 
     it('should return true if object is a promise', function() {
       var object = $.Deferred().promise();
-      expect(isPromise(object)).to.be(true);
+      expect(promise.isPromise(object)).to.be(true);
     });
 
     it('should return false for deferred objects', function() {
       var object = $.Deferred();
-      expect(isPromise(object)).to.be(false);
+      expect(promise.isPromise(object)).to.be(false);
     });
 
     it('should return false when object is undefined', function() {
-      expect(isPromise(void 0)).to.be(false);
+      expect(promise.isPromise(void 0)).to.be(false);
     });
 
   });
@@ -29,11 +25,11 @@ describe('hoodie promises API', function() {
   describe('#resolve()', function() {
 
     it('simply returns resolved promise', function() {
-      expect(resolve().state()).to.be('resolved');
+      expect(promise.resolve().state()).to.be('resolved');
     });
 
     it('should be applyable', function() {
-      var promise = reject().then(null, resolve);
+      var promise = promise.reject().then(null, promise.resolve);
       expect(promise).to.be.resolved();
     });
 
@@ -42,11 +38,11 @@ describe('hoodie promises API', function() {
   describe('#reject()', function() {
 
     it('simply returns rejected promise', function() {
-      expect(reject()).to.be.rejected();
+      expect(promise.reject()).to.be.rejected();
     });
 
     it('should be applyable', function() {
-      var promise = resolve().then(reject);
+      var promise = promise.resolve().then(promise.reject);
       expect(promise).to.be.rejected();
     });
 
@@ -55,7 +51,7 @@ describe('hoodie promises API', function() {
   describe('#resolveWith(something)', function() {
 
     it('wraps passad arguments into a promise and returns it', function() {
-      var promise = resolveWith('funky', 'fresh');
+      var promise = promise.resolveWith('funky', 'fresh');
 
       promise.then(function (a, b) {
         expect(a, b).to.eql('funky', 'fresh');
@@ -64,7 +60,7 @@ describe('hoodie promises API', function() {
     });
 
     it('should be applyable', function() {
-      var promise = rejectWith('FUNKY!').then(null, resolveWith);
+      var promise = promise.rejectWith('FUNKY!').then(null, promise.resolveWith);
       promise.then(function (error) {
         expect(error.message).to.eql('FUNKY!');
       });
@@ -75,7 +71,7 @@ describe('hoodie promises API', function() {
   describe('#rejectWith(something)', function() {
 
     it('wraps passed arguments into a promise and returns it as Error', function() {
-      var promise = rejectWith('funk overflow!');
+      var promise = promise.rejectWith('funk overflow!');
 
       promise.then(this.noop, function (error) {
         expect(error).to.be.an(Error);
@@ -88,7 +84,7 @@ describe('hoodie promises API', function() {
     });
 
     it('should be applyable', function() {
-      var promise = resolveWith('wicked!').then(rejectWith);
+      var promise = promise.resolveWith('wicked!').then(promise.rejectWith);
       promise.then(this.noop, function (error) {
         expect(error).to.be.an(Error);
         expect(error.name).to.eql('HoodieError');

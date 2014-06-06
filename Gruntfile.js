@@ -10,16 +10,16 @@ module.exports = function(grunt) {
     '// Licensed Apache License 2.0\n\n';
 
   var customLaunchers = {
-    sl_chrome_mac: {
-      base: 'SauceLabs',
-      platform: 'mac 10.8',
-      browserName: 'chrome'
-    },
-    sl_safari_mac: {
-      base: 'SauceLabs',
-      platform: 'mac 10.8',
-      browserName: 'safari'
-    }//,
+    // sl_chrome_mac: {
+    //   base: 'SauceLabs',
+    //   platform: 'mac 10.8',
+    //   browserName: 'chrome'
+    // },
+    // sl_safari_mac: {
+    //   base: 'SauceLabs',
+    //   platform: 'mac 10.8',
+    //   browserName: 'safari'
+    // }//,
     // sl_firefox_win7: {
     //   base: 'SauceLabs',
     //   platform: 'Windows 7',
