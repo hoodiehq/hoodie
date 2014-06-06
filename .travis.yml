@@ -1,35 +1,28 @@
 before_install:
-  - npm install -g bower
-  - npm install -g grunt-cli
-
+- npm install -g bower
+- npm install -g grunt-cli
 before_script:
-  - bower install
-
+- bower install
 language: node_js
-
 node_js:
-  - "0.10"
-
+- '0.10'
 env:
   global:
-    - SAUCE_USERNAME=hoodiehq
-    - SAUCE_ACCESS_KEY=6ab72d53-5807-40bb-be53-64cb7adba626
-
+  - SAUCE_USERNAME=hoodiehq
+  - SAUCE_ACCESS_KEY=6ab72d53-5807-40bb-be53-64cb7adba626
 notifications:
   irc:
     channels:
-      - "chat.freenode.net#hoodie"
+    - chat.freenode.net#hoodie
     use_notice: true
     skip_join: true
-
 addons:
   sauce_connect: true
-
 deploy:
   provider: npm
   email: me@svenlito.com
   api_key:
-    secure: YREeUOw1K6UNi3KC0W5prxktLXCGIP/H9x749gpkyeuLADkIjHe8Dx3usJoELHxtGMeJpzcCGBhWDdyoStkLpglr6+J4714Tk9dZurzhCi2xioWaLJwnBM+n6V7TJIt1GcNZhuPMd6WZhsHqgORFiOUI37MMJRdZyUO4kQ9YaY0=
+    secure: bhLkyV8E/BjAQj/yrvY0ZeqwAtOfEKZeEEtL/J6Z7kTwo7P2M8seoyzmYjUYhd4mRfpVXzgyG3yj4BrCAT/VUt78kcs7IGXuM6GcuJBVm98wrMbz7Dw0YxDLNpPRzQ8CuBNOf7mtmc2C3EcB+f+Cii0gYf8ZeKbb7T5sPy1U0u4=
   on:
     tags: true
     repo: hoodiehq/hoodie.js
