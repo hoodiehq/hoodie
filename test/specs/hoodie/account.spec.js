@@ -2,7 +2,7 @@ require('../../lib/setup');
 
 var generateIdMock = require('../../mocks/utils/generate_id');
 var configMock = require('../../mocks/utils/config');
-var promise = require('../../../src/utils/promise/');
+var getDefer = require('../../../src/utils/promise/defer');
 
 global.stubRequire('src/utils/generate_id', generateIdMock);
 global.stubRequire('src/utils/config', configMock);
@@ -211,7 +211,7 @@ describe('hoodie.account', function() {
     }); // user is logged in as joe@example.com (hash: 'hash123')
     _when('user has an anonymous account', function() {
       beforeEach(function() {
-        this.signInDefer = promise.defer();
+        this.signInDefer = getDefer();
 
         // NOTE:
         // I do not understand, why we have to resetBehavior here.
@@ -742,7 +742,7 @@ describe('hoodie.account', function() {
 
               _and('sign in fails with unauthorized error', function() {
                 beforeEach(function() {
-                  this.signOutDefer = promise.defer();
+                  this.signOutDefer = getDefer();
                   this.sandbox.stub(this.account, 'signOut').returns(this.signOutDefer.promise());
 
                   this.account.request.reset();
@@ -762,7 +762,7 @@ describe('hoodie.account', function() {
 
                 _and('sign out succeeds', function() {
                   beforeEach(function() {
-                    this.signInDefer = promise.defer();
+                    this.signInDefer = getDefer();
                     this.sandbox.stub(this.account, 'signIn').returns(this.signInDefer.promise());
 
                     this.signOutDefer.resolve();
@@ -1936,7 +1936,7 @@ describe('hoodie.account', function() {
 
             _and('sign in fails with unauthorized error', function() {
               beforeEach(function() {
-                this.signOutDefer = promise.defer();
+                this.signOutDefer = getDefer();
                 this.sandbox.stub(this.account, 'signOut').returns(this.signOutDefer.promise());
 
                 this.account.request.reset();
@@ -1957,7 +1957,7 @@ describe('hoodie.account', function() {
 
               _and('sign out succeeds', function() {
                 beforeEach(function() {
-                  this.signInDefer = promise.defer();
+                  this.signInDefer = getDefer();
                   this.sandbox.stub(this.account, 'signIn').returns(this.signInDefer.promise());
 
                   this.signOutDefer.resolve();
@@ -2098,7 +2098,7 @@ function presetUserDoc(context) {
   context.account.fetch();
   context.hoodie.request.defer.resolve(unconfirmedUserDoc(context.account.username));
   context.hoodie.request.reset();
-  var defer = promise.defer();
+  var defer = getDefer();
   context.hoodie.request.returns(defer.promise());
   context.hoodie.request.defer = defer;
 }
@@ -2125,7 +2125,7 @@ function with_session_validated_before(callback) {
         // now we have to reset the requestDefer
         this.account.request.reset();
 
-        defer = promise.defer();
+        defer = getDefer();
         this.hoodie.request.returns(defer.promise());
         this.hoodie.request.defer = defer;
       }
@@ -2155,7 +2155,7 @@ function with_session_invalidated_before(callback) {
         // now we have to reset the requestDefer
         this.account.request.reset();
 
-        defer = promise.defer();
+        defer = getDefer();
         this.hoodie.request.returns(defer.promise());
         this.hoodie.request.defer = defer;
       }

@@ -16,7 +16,7 @@ var hoodieEvents = require('./lib/events');
 
 // for plugins
 var lib = require('./lib');
-var utils = require('./utils/');
+var utils = require('./utils');
 
 // Constructor
 // -------------
@@ -38,10 +38,6 @@ function Hoodie(baseUrl) {
 
   // remove trailing slashes
   hoodie.baseUrl = baseUrl ? baseUrl.replace(/\/+$/, '') : '';
-
-  hoodie.checkConnectionInterval = 3000;
-
-  hoodie.API_PATH = '/_api';
 
 
   // hoodie.extend

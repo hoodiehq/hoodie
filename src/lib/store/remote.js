@@ -39,10 +39,10 @@
 var hoodieStoreApi = require('./api');
 var extend = require('extend');
 var generateId = require('../../utils/generate_id');
-var utils = require('../../utils/');
+var resolveWith = require('../../utils/promise/resolve_with');
 
 //
-module.exports = function hoodieRemoteStore(hoodie, options) {
+function hoodieRemoteStore(hoodie, options) {
 
   var remoteStore = {};
 
@@ -380,8 +380,7 @@ module.exports = function hoodieRemoteStore(hoodie, options) {
   //
   var pushRequest;
   var pushedObjectRevisions = {};
-
-  remote.push = utils.toPromise(function (objects, callback) {
+  remote.push = function push(objects) {
     var object;
     var objectsForRemote = [];
 
@@ -390,7 +389,7 @@ module.exports = function hoodieRemoteStore(hoodie, options) {
     }
 
     if (objects.length === 0) {
-      return callback([]);
+      return resolveWith([]);
     }
 
     // don't mess with the originals
@@ -399,7 +398,6 @@ module.exports = function hoodieRemoteStore(hoodie, options) {
     });
 
     objectsForRemote = [];
-
     for (var i = 0; i < objects.length; i++) {
 
       object = objects[i];
@@ -424,9 +422,8 @@ module.exports = function hoodieRemoteStore(hoodie, options) {
         remote.trigger('push', objects[i]);
       }
     });
-
     return pushRequest;
-  });
+  };
 
   // sync changes
   // --------------
@@ -460,9 +457,8 @@ module.exports = function hoodieRemoteStore(hoodie, options) {
   // array of objects or a function as `options.objects`
   //
   var defaultObjectsToPush = function defaultObjectsToPush() {
-    return [];
-  };
-
+      return [];
+    };
   if (options.defaultObjectsToPush) {
     if ($.isArray(options.defaultObjectsToPush)) {
       defaultObjectsToPush = function defaultObjectsToPush() {
@@ -763,7 +759,7 @@ module.exports = function hoodieRemoteStore(hoodie, options) {
     }
 
     // reset the hash for pushed object revision after
-    // every response from the longpoll GET /_changes
+    // every response from the longpoll GET /_changes 
     pushedObjectRevisions = {};
   }
 
@@ -782,4 +778,6 @@ module.exports = function hoodieRemoteStore(hoodie, options) {
 
   // expose public API
   return remote;
-};
+}
+
+module.exports = hoodieRemoteStore;

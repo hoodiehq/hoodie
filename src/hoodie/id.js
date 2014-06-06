@@ -6,18 +6,19 @@ var config = require('../utils/config');
 
 // generates a random id and persists using config
 // until the user signs out or deletes local data
-module.exports = function hoodieId (hoodie) {
+function hoodieId (hoodie) {
   var id;
 
   function getId() {
-    if (!id) {
-      setId(generateId());
+    if (! id) {
+      setId( generateId() );
     }
     return id;
   }
 
   function setId(newId) {
     id = newId;
+    
     config.set('_hoodieId', newId);
   }
 
@@ -65,5 +66,6 @@ module.exports = function hoodieId (hoodie) {
   // Public API
   //
   hoodie.id = getId;
-};
+}
 
+module.exports = hoodieId;

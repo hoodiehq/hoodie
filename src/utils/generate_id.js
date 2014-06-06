@@ -9,7 +9,7 @@ chars = '0123456789abcdefghijklmnopqrstuvwxyz'.split('');
 radix = chars.length;
 
 // helper to generate unique ids.
-module.exports = function (length) {
+function generateId (length) {
   var id = '';
 
   // default uuid length to 7
@@ -24,5 +24,6 @@ module.exports = function (length) {
   }
 
   return id;
+}
 
-};
+module.exports = generateId;

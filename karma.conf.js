@@ -38,7 +38,7 @@ module.exports = function(config) {
       'test/specs/lib/store/scoped.spec.js',
       'test/specs/lib/store/api.spec.js',
       'test/specs/lib/task/scoped.spec.js',
-
+      
       'test/specs/utils/generate_id.spec.js',
       'test/specs/utils/promise.spec.js',
       'test/specs/utils/local_storage_wrapper.spec.js',
