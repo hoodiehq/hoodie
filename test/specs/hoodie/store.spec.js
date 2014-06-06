@@ -10,9 +10,6 @@ global.stubRequire('src/utils/generate_id', generateIdMock);
 var localStorageMock = require('../../mocks/utils/local_storage_wrapper');
 global.stubRequire('src/utils/local_storage_wrapper', localStorageMock);
 
-var configMock = require('../../mocks/utils/config');
-global.stubRequire('src/utils/config', configMock);
-
 var hoodieLocalStore = require('../../../src/hoodie/store');
 var extend = require('extend');
 
@@ -74,49 +71,34 @@ describe('hoodie.store', function() {
         title: 'Funk',
         createdBy: 'someOtherHoodieId'
       }];
-      var config = {
-        funky: 'config',
-        '_account.username': 'oldUsername',
-        '_hoodieId': 'somehash'
-      };
       var signInCallback;
       this.store.findAll.reset();
       this.store.findAll.returns(this.hoodie.resolveWith(objects));
-      configMock.get.resetBehavior();
-      configMock.get.returns(config);
       this.hoodie.one.reset();
       this.hoodie.id.returns('oldHoodieId');
 
       this.outsideEvents['account:movedata']();
       expect(this.store.findAll).to.be.called();
       expect(this.hoodie.one).to.be.called();
-      expect(this.hoodie.one.args[0][0]).to.be('signin');
+      expect(this.hoodie.one.args[0][0]).to.be('account:signin');
       signInCallback = this.hoodie.one.args[0][1];
 
       signInCallback('newUsername', 'newHoodieId');
-      expect(configMock.set).to.be.calledWith('funky', 'config');
-      expect(configMock.set).to.not.be.calledWith('_account.username', 'oldUsername');
-      expect(configMock.set).to.not.be.calledWith('_account.username', 'oldUsername');
-      expect(configMock.set).to.not.be.calledWith('_hoodieId', 'somehash');
 
-      expect(this.store.add).to.be.calledWith('item', {
-        type: 'item',
-        id: 'abc',
+      expect(localStorageMock.setObject).to.be.calledWith('item/abc', {
         title: 'Milk',
         createdBy: 'newHoodieId'
       });
-      expect(this.store.add).to.be.calledWith('item', {
-        type: 'item',
-        id: 'def',
+      expect(localStorageMock.setObject).to.be.calledWith('item/def', {
         title: 'Wodka',
         createdBy: 'newHoodieId'
       });
-      expect(this.store.add).to.be.calledWith('item', {
-        type: 'item',
-        id: 'ghi',
+      expect(localStorageMock.setObject).to.be.calledWith('item/ghi', {
         title: 'Funk',
         createdBy: 'someOtherHoodieId'
       });
+
+      expect(localStorageMock.setItem).to.be.calledWith('_dirty', 'item/abc,item/def,item/ghi');
     });
 
     it('should cleanup on account:cleanup', function() {
