@@ -7,7 +7,7 @@
     "url": "https://github.com/hoodiehq/hoodie-server.git"
   },
   "dependencies": {
-    "hoodie": "^0.9.2",
+    "hoodie": "^0.9.3",
     "multicouch": "^0.8.1",
     "hoodie-pocket": "^0.0.13",
     "hoodie-plugins-manager": "^0.2.5",
