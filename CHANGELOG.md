@@ -1,3 +1,12 @@
+<a name="0.9.4"></a>
+### 0.9.4 (2014-06-06)
+
+
+#### Bug Fixes
+
+* **account:** signin in from anonymous account now moves data correctly ([914dd515](https://github.com/hoodiehq/hoodie.js/commit/914dd515ee80fedda8afe92bffa1ff0b9437f3e5))
+
+
 <a name="0.9.3"></a>
 ### 0.9.3 (2014-06-06)
 
