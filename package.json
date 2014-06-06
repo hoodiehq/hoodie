@@ -24,7 +24,8 @@
     "frontend-only"
   ],
   "dependencies": {
-    "extend": "~1.2.1"
+    "extend": "~1.2.1",
+    "bluebird": "~2.0.5"
   },
   "devDependencies": {
     "grunt": "~0.4.1",
