@@ -1,3 +1,12 @@
+<a name="0.9.3"></a>
+### 0.9.3 (2014-06-06)
+
+
+#### Bug Fixes
+
+* **sync:** trigger remove events for completed tasks ([a2d94fa8](https://github.com/hoodiehq/hoodie.js/commit/a2d94fa88c90669d2aee8998d8840a710d919781))
+
+
 <a name="0.9.2"></a>
 ### 0.9.2 (2014-06-05)
 

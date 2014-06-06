@@ -1,4 +1,4 @@
-// Hoodie.js - 0.9.2
+// Hoodie.js - 0.9.3
 // https://github.com/hoodiehq/hoodie.js
 // Copyright 2012 - 2014 https://github.com/hoodiehq/
 // Licensed Apache License 2.0
@@ -4392,6 +4392,7 @@ function hoodieRemoteStore(hoodie, options) {
 
       object = objects[i];
       addRevisionTo(object);
+      remote.markAsKnownObject(object);
       object = parseForRemote(object);
       objectsForRemote.push(object);
 
@@ -4749,7 +4750,7 @@ function hoodieRemoteStore(hoodie, options) {
     }
 
     // reset the hash for pushed object revision after
-    // every response from the longpoll GET /_changes 
+    // every response from the longpoll GET /_changes
     pushedObjectRevisions = {};
   }
 
