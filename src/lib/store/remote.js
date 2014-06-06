@@ -402,6 +402,7 @@ function hoodieRemoteStore(hoodie, options) {
 
       object = objects[i];
       addRevisionTo(object);
+      remote.markAsKnownObject(object);
       object = parseForRemote(object);
       objectsForRemote.push(object);
 
@@ -759,7 +760,7 @@ function hoodieRemoteStore(hoodie, options) {
     }
 
     // reset the hash for pushed object revision after
-    // every response from the longpoll GET /_changes 
+    // every response from the longpoll GET /_changes
     pushedObjectRevisions = {};
   }
 
