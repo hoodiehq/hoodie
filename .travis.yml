@@ -1,21 +1,21 @@
 language: node_js
 node_js:
-  - "0.10"
+- '0.10'
 before_script:
-  - npm install -g grunt-cli
+- npm install -g grunt-cli
 services:
-  - couchdb
+- couchdb
 notifications:
   irc:
     channels:
-      - "irc.freenode.net#hoodie"
+    - irc.freenode.net#hoodie
     use_notice: false
     skip_join: true
 deploy:
   provider: npm
   email: me@svenlito.com
   api_key:
-    secure: YREeUOw1K6UNi3KC0W5prxktLXCGIP/H9x749gpkyeuLADkIjHe8Dx3usJoELHxtGMeJpzcCGBhWDdyoStkLpglr6+J4714Tk9dZurzhCi2xioWaLJwnBM+n6V7TJIt1GcNZhuPMd6WZhsHqgORFiOUI37MMJRdZyUO4kQ9YaY0=
+    secure: SyrsOUC9vC6RnZ9aiLv8zgYSSR02F+m3eMuTfTLRSrK4lSnA8EDCZR1w+CyUiOT0rV2UBDm+2ZbdMD/yxHAebTBdXDHEszA5cwCZbjrBxtniHcmo8AHNOONiFGrS3azTMqQsJMcB6WXo5QL54qD2yY0IRt86YfQFXuIA4408+C0=
   on:
     tags: true
-    repo: hoodiehq/hoodie.js
+    repo: hoodiehq/hoodie-server
