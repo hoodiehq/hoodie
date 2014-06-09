@@ -1087,7 +1087,7 @@ describe('hoodie.account', function() {
         expect(this.account.trigger).to.be.calledWith('movedata');
       });
 
-      it.only('does not trigger cleanup event', function() {
+      it('does not trigger cleanup event', function() {
         expect(this.account.trigger).to.not.be.calledWith('cleanup');
       });
     }); // signout succeeds

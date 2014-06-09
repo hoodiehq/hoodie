@@ -27,6 +27,10 @@ store.length = function () {
 
 // more advanced localStorage wrappers to find/save objects
 store.setObject = function (key, object) {
+  if (typeof object !== 'object') {
+    return store.setItem(key, object);
+  }
+
   return store.setItem(key, global.JSON.stringify(object));
 };
 
@@ -40,7 +44,7 @@ store.getObject = function (key) {
   try {
     return global.JSON.parse(item);
   } catch (e) {
-    return null;
+    return item;
   }
 };
 
