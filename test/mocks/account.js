@@ -18,6 +18,7 @@ module.exports = function() {
   var api = {
     username : 'joe@example.com',
     ownerHash : 'hash123',
+    bearerToken : 'dXNlci2Mjow9N2Rh2WyZfioB1ubE',
 
     anonymousSignUp : this.sandbox.stub().returns(anonymousSignUpDefer.promise()),
     authenticate : this.sandbox.stub().returns(authenticateDefer.promise()),

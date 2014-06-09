@@ -142,8 +142,9 @@ function hoodieAccount(hoodie) {
     }
 
     return sendSignUpRequest(username, password)
-    .done(function() {
+    .done(function(newUsername, newHoodieId, newBearerToken) {
       setUsername(username);
+      setBearerToken(newBearerToken);
       account.trigger('signup', username);
     });
   };
@@ -269,13 +270,14 @@ function hoodieAccount(hoodie) {
       promise.done(disconnect);
     }
 
-    return promise.done( function(newUsername, newHoodieId) {
+    return promise.done( function(newUsername, newHoodieId, newBearerToken) {
       if (options.moveData) {
         account.trigger('movedata');
       }
       if (!isReauthenticating && !options.moveData) {
         cleanup();
       }
+      setBearerToken(newBearerToken);
       if (isReauthenticating) {
         if (!isSilent) {
           account.trigger('reauthenticated', newUsername);
@@ -566,6 +568,15 @@ function hoodieAccount(hoodie) {
     return config.set('_account.username', newUsername);
   }
 
+  function setBearerToken(newBearerToken) {
+    if (account.bearerToken === newBearerToken) {
+      return;
+    }
+
+    account.bearerToken = newBearerToken;
+    return config.set('_account.bearerToken', newBearerToken);
+  }
+
 
   //
   // handle a successful authentication request.
@@ -680,11 +691,12 @@ function hoodieAccount(hoodie) {
   //         'roles': [
   //             'mvu85hy',
   //             'confirmed'
-  //         ]
+  //         ],
+  //         'bearerToken': 'dXNlci2Mjow9N2Rh2WyZfioB1ubEsc5n9taWNoaWVsMjo1MzkxOEQKpdFA'
   //     }
   //
-  // we want to turn it into 'test1', 'mvu85hy' or reject the promise
-  // in case an error occurred ('roles' array contains 'error' or is empty)
+  // we want to turn it into 'test1', 'mvu85hy', 'dXNlci2Mjow9N2Rh2WyZfioB1ubEsc5n9taWNoaWVsMjo1MzkxOEQKpdFA'
+  // or reject the promise in case an error occurred ('roles' array contains 'error' or is empty)
   //
   function handleSignInSuccess(options) {
     options = options || {};
@@ -692,9 +704,11 @@ function hoodieAccount(hoodie) {
     return function(response) {
       var newUsername;
       var newHoodieId;
+      var newBearerToken;
 
       newUsername = response.name.replace(/^user(_anonymous)?\//, '');
       newHoodieId = response.roles[0];
+      newBearerToken = response.bearerToken;
 
       //
       // if an error occurred, the userDB worker stores it to the $error attribute
@@ -731,8 +745,9 @@ function hoodieAccount(hoodie) {
       }
       authenticated = true;
 
+      setBearerToken(newBearerToken);
       account.fetch();
-      return resolveWith(newUsername, newHoodieId, options);
+      return resolveWith(newUsername, newHoodieId, newBearerToken, options);
     };
   }
 
@@ -908,6 +923,7 @@ function hoodieAccount(hoodie) {
     account.trigger('cleanup');
     authenticated = undefined;
     setUsername(undefined);
+    setBearerToken(undefined);
 
     return resolve();
   }

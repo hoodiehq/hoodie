@@ -63,6 +63,11 @@ function hoodieRequest(hoodie) {
 
     defaults.url = url;
 
+    if (hoodie.account.bearerToken) {
+      defaults.headers = {
+        Authorization: 'Bearer ' + hoodie.account.bearerToken
+      };
+    }
 
     // we are piping the result of the request to return a nicer
     // error if the request cannot reach the server at all.
