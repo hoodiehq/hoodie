@@ -645,18 +645,18 @@ describe('hoodieRemoteStore', function() {
         this.remote.pull();
 
         expect(this.remote.trigger).to.be.calledWith('remove', this.object1);
-        expect(this.remote.trigger).to.be.calledWith('remove:todo', this.object1);
-        expect(this.remote.trigger).to.be.calledWith('remove:todo:abc3', this.object1);
+        expect(this.remote.trigger).to.be.calledWith('todo:remove', this.object1);
+        expect(this.remote.trigger).to.be.calledWith('todo:abc3:remove', this.object1);
         expect(this.remote.trigger).to.be.calledWith('change', 'remove', this.object1);
-        expect(this.remote.trigger).to.be.calledWith('change:todo', 'remove', this.object1);
-        expect(this.remote.trigger).to.be.calledWith('change:todo:abc3', 'remove', this.object1);
+        expect(this.remote.trigger).to.be.calledWith('todo:change', 'remove', this.object1);
+        expect(this.remote.trigger).to.be.calledWith('todo:abc3:change', 'remove', this.object1);
         expect(this.remote.trigger).to.be.calledWith('add', this.object2);
-        expect(this.remote.trigger).to.be.calledWith('add:todo', this.object2);
-        expect(this.remote.trigger).to.be.calledWith('add:todo:abc2', this.object2);
+        expect(this.remote.trigger).to.be.calledWith('todo:add', this.object2);
+        expect(this.remote.trigger).to.be.calledWith('todo:abc2:add', this.object2);
         expect(this.remote.trigger).to.be.calledWith('change', 'add', this.object2);
-        expect(this.remote.trigger).to.be.calledWith('change:todo', 'add', this.object2);
-        expect(this.remote.trigger).to.be.calledWith('change:todo:abc2', 'add', this.object2);
-        expect(this.remote.trigger).to.not.be.calledWith('remove:todo:abc5', this.object4);
+        expect(this.remote.trigger).to.be.calledWith('todo:change', 'add', this.object2);
+        expect(this.remote.trigger).to.be.calledWith('todo:abc2:change', 'add', this.object2);
+        expect(this.remote.trigger).to.not.be.calledWith('todo:abc5:remove', this.object4);
       });
 
       _and('.isConnected() returns true', function() {
