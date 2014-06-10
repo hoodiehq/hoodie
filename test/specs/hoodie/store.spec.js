@@ -13,7 +13,7 @@ global.stubRequire('src/utils/local_storage_wrapper', localStorageMock);
 var hoodieLocalStore = require('../../../src/hoodie/store');
 var extend = require('extend');
 
-describe.only('hoodie.store', function() {
+describe('hoodie.store', function() {
 
   beforeEach(function() {
     this.hoodie = this.MOCKS.hoodie.apply(this);
