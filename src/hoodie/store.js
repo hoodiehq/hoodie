@@ -289,8 +289,13 @@ function hoodieStore (hoodie) {
     }
 
     key = type + '/' + id;
-
     object = cache(type, id);
+
+    // https://github.com/hoodiehq/hoodie.js/issues/147
+    if (options.update) {
+      object = options.update;
+      delete options.update;
+    }
 
     // if change comes from remote, just clean up locally
     if (options.remote) {
@@ -298,17 +303,24 @@ function hoodieStore (hoodie) {
       objectWasMarkedAsDeleted = cachedObject[key] && isMarkedAsDeleted(cachedObject[key]);
       cachedObject[key] = false;
       clearChanged(type, id);
-      if (objectWasMarkedAsDeleted && object) {
+      if (object) {
+        if (!objectWasMarkedAsDeleted) {
+          triggerEvents('remove', object, options);
+        }
         return resolveWith(object);
       }
     }
 
+
+    //
     if (!object) {
       return rejectWith({
         name: 'HoodieNotFoundError',
         message: '"{{type}}" with id "{{id}}"" could not be found'
       });
     }
+
+
 
     if (object._syncedAt) {
       object._deleted = true;
@@ -320,11 +332,7 @@ function hoodieStore (hoodie) {
       clearChanged(type, id);
     }
 
-    // https://github.com/hoodiehq/hoodie.js/issues/147
-    if (options.update) {
-      object = options.update;
-      delete options.update;
-    }
+
     triggerEvents('remove', object, options);
     return resolveWith(object);
   };
