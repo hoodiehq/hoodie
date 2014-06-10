@@ -1,4 +1,4 @@
-// Hoodie.js - 0.9.4
+// Hoodie.js - 0.9.5
 // https://github.com/hoodiehq/hoodie.js
 // Copyright 2012 - 2014 https://github.com/hoodiehq/
 // Licensed Apache License 2.0
@@ -1983,7 +1983,6 @@ var hoodieStoreApi = require('../lib/store/api');
 var HoodieObjectTypeError = require('../lib/error/object_type');
 var HoodieObjectIdError = require('../lib/error/object_id');
 var generateId = require('../utils/generate_id');
-var config = require('../utils/config');
 
 var extend = require('extend');
 
@@ -2267,8 +2266,13 @@ function hoodieStore (hoodie) {
     }
 
     key = type + '/' + id;
-
     object = cache(type, id);
+
+    // https://github.com/hoodiehq/hoodie.js/issues/147
+    if (options.update) {
+      object = options.update;
+      delete options.update;
+    }
 
     // if change comes from remote, just clean up locally
     if (options.remote) {
@@ -2276,17 +2280,24 @@ function hoodieStore (hoodie) {
       objectWasMarkedAsDeleted = cachedObject[key] && isMarkedAsDeleted(cachedObject[key]);
       cachedObject[key] = false;
       clearChanged(type, id);
-      if (objectWasMarkedAsDeleted && object) {
+      if (object) {
+        if (!objectWasMarkedAsDeleted) {
+          triggerEvents('remove', object, options);
+        }
         return resolveWith(object);
       }
     }
 
+
+    //
     if (!object) {
       return rejectWith({
         name: 'HoodieNotFoundError',
         message: '"{{type}}" with id "{{id}}"" could not be found'
       });
     }
+
+
 
     if (object._syncedAt) {
       object._deleted = true;
@@ -2298,11 +2309,7 @@ function hoodieStore (hoodie) {
       clearChanged(type, id);
     }
 
-    // https://github.com/hoodiehq/hoodie.js/issues/147
-    if (options.update) {
-      object = options.update;
-      delete options.update;
-    }
+
     triggerEvents('remove', object, options);
     return resolveWith(object);
   };
@@ -2928,7 +2935,7 @@ function hoodieStore (hoodie) {
 
 module.exports = hoodieStore;
 
-},{"../lib/error/object_id":13,"../lib/error/object_type":14,"../lib/store/api":17,"../utils/config":23,"../utils/generate_id":24,"../utils/local_storage_wrapper":27,"../utils/promise/defer":28,"../utils/promise/reject_with":32,"../utils/promise/resolve_with":34,"extend":1}],10:[function(require,module,exports){
+},{"../lib/error/object_id":13,"../lib/error/object_type":14,"../lib/store/api":17,"../utils/generate_id":24,"../utils/local_storage_wrapper":27,"../utils/promise/defer":28,"../utils/promise/reject_with":32,"../utils/promise/resolve_with":34,"extend":1}],10:[function(require,module,exports){
 // Tasks
 // ============
 
@@ -5120,6 +5127,10 @@ store.length = function () {
 
 // more advanced localStorage wrappers to find/save objects
 store.setObject = function (key, object) {
+  if (typeof object !== 'object') {
+    return store.setItem(key, object);
+  }
+
   return store.setItem(key, global.JSON.stringify(object));
 };
 
@@ -5133,7 +5144,7 @@ store.getObject = function (key) {
   try {
     return global.JSON.parse(item);
   } catch (e) {
-    return null;
+    return item;
   }
 };
 
