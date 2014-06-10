@@ -1,3 +1,12 @@
+<a name="0.9.6"></a>
+### 0.9.6 (2014-06-10)
+
+
+#### Bug Fixes
+
+* **remote:** trigger doc:change, not change:doc ([355bd064](https://github.com/hoodiehq/hoodie.js/commit/355bd0642185c517647fff3564cc3723a8baa223))
+
+
 <a name="0.9.5"></a>
 ### 0.9.5 (2014-06-10)
 

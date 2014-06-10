@@ -1,4 +1,4 @@
-// Hoodie.js - 0.9.5
+// Hoodie.js - 0.9.6
 // https://github.com/hoodiehq/hoodie.js
 // Copyright 2012 - 2014 https://github.com/hoodiehq/
 // Licensed Apache License 2.0
@@ -4749,9 +4749,17 @@ function hoodieRemoteStore(hoodie, options) {
       }
 
       remote.trigger(event, object);
+      remote.trigger(object.type + ':' + event, object);
+      remote.trigger(object.type + ':' + object.id + ':' + event, object);
+      remote.trigger('change', event, object);
+      remote.trigger(object.type + ':change', event, object);
+      remote.trigger(object.type + ':' + object.id + ':change', event, object);
+
+      // DEPRECATED
+      // https://github.com/hoodiehq/hoodie.js/issues/146
+      // https://github.com/hoodiehq/hoodie.js/issues/326
       remote.trigger(event + ':' + object.type, object);
       remote.trigger(event + ':' + object.type + ':' + object.id, object);
-      remote.trigger('change', event, object);
       remote.trigger('change:' + object.type, event, object);
       remote.trigger('change:' + object.type + ':' + object.id, event, object);
     }
