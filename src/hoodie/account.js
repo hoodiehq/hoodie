@@ -275,7 +275,7 @@ function hoodieAccount(hoodie) {
           account.trigger('movedata');
         }
       }
-      if (! isReauthenticating) {
+      if (!isReauthenticating && !options.moveData) {
         cleanup();
       }
       if (isReauthenticating) {

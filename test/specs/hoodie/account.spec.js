@@ -1086,6 +1086,10 @@ describe('hoodie.account', function() {
       it('triggers movedata  event', function() {
         expect(this.account.trigger).to.be.calledWith('movedata');
       });
+
+      it('does not trigger cleanup event', function() {
+        expect(this.account.trigger).to.not.be.calledWith('cleanup');
+      });
     }); // signout succeeds
   }); // #signIn
   describe('#changePassword(currentPassword, newPassword)', function() {

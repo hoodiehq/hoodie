@@ -6,7 +6,6 @@ var hoodieStoreApi = require('../lib/store/api');
 var HoodieObjectTypeError = require('../lib/error/object_type');
 var HoodieObjectIdError = require('../lib/error/object_id');
 var generateId = require('../utils/generate_id');
-var config = require('../utils/config');
 
 var extend = require('extend');
 
@@ -290,8 +289,13 @@ function hoodieStore (hoodie) {
     }
 
     key = type + '/' + id;
-
     object = cache(type, id);
+
+    // https://github.com/hoodiehq/hoodie.js/issues/147
+    if (options.update) {
+      object = options.update;
+      delete options.update;
+    }
 
     // if change comes from remote, just clean up locally
     if (options.remote) {
@@ -299,17 +303,24 @@ function hoodieStore (hoodie) {
       objectWasMarkedAsDeleted = cachedObject[key] && isMarkedAsDeleted(cachedObject[key]);
       cachedObject[key] = false;
       clearChanged(type, id);
-      if (objectWasMarkedAsDeleted && object) {
+      if (object) {
+        if (!objectWasMarkedAsDeleted) {
+          triggerEvents('remove', object, options);
+        }
         return resolveWith(object);
       }
     }
 
+
+    //
     if (!object) {
       return rejectWith({
         name: 'HoodieNotFoundError',
         message: '"{{type}}" with id "{{id}}"" could not be found'
       });
     }
+
+
 
     if (object._syncedAt) {
       object._deleted = true;
@@ -321,11 +332,7 @@ function hoodieStore (hoodie) {
       clearChanged(type, id);
     }
 
-    // https://github.com/hoodiehq/hoodie.js/issues/147
-    if (options.update) {
-      object = options.update;
-      delete options.update;
-    }
+
     triggerEvents('remove', object, options);
     return resolveWith(object);
   };
@@ -896,32 +903,32 @@ function hoodieStore (hoodie) {
     return defer.promise();
   }
 
-  // 
+  //
   // 1. we store all existing data and config in memory
   // 2. we write it back on signin, with new hoodieId/username
-  // 
+  //
   function moveData () {
     var oldObjects = [];
-    var oldConfig;
     var oldHoodieId;
 
     store.findAll().done( function(data) {
       oldObjects = data;
-      oldHoodieId = hoodie.id();
-      oldConfig = config.get();
 
-      hoodie.one('signin', function(newUsername, newHoodieId) {
-        for (var key in oldConfig) {
-          if (oldConfig.hasOwnProperty(key) && key !== '_account.username' && key !== '_hoodieId') {
-            config.set(key, oldConfig[key]);
-          }
-        }
+      if (! oldObjects.length) {
+        return;
+      }
+      oldHoodieId = hoodie.id();
+
+      hoodie.one('account:signin', function(newUsername, newHoodieId) {
         oldObjects.forEach(function(object) {
           if (object.createdBy === oldHoodieId) {
             object.createdBy = newHoodieId;
           }
-          store.add(object.type, object);
+          object = cache(object.type, object.id, object);
+          markAsChanged(object.type, object.id, object, {silent: true});
         });
+
+        triggerDirtyAndIdleEvents();
       });
     });
   }
