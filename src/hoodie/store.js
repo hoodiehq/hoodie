@@ -777,7 +777,7 @@ function hoodieStore (hoodie) {
 
 
   // a semantic key consists of a valid type & id, separated by a "/"
-  var semanticIdPattern = new RegExp(/^[a-z$][a-z0-9]+\/[a-z0-9]+$/);
+  var semanticIdPattern = new RegExp(/^[a-z$][a-z0-9-]+\/[a-z0-9]+$/);
   function isSemanticKey(key) {
     return semanticIdPattern.test(key);
   }

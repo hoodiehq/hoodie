@@ -20,7 +20,7 @@ function HoodieObjectTypeError(properties) {
 
   return new HoodieError(properties);
 }
-var validTypePattern = /^[a-z$][a-z0-9]+$/;
+var validTypePattern = /^[a-z$][a-z0-9-]+$/;
 HoodieObjectTypeError.isInvalid = function(type, customPattern) {
   return !(customPattern || validTypePattern).test(type || '');
 };
