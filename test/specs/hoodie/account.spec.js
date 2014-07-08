@@ -753,10 +753,10 @@ describe('hoodie.account', function() {
                   });
                 });
 
-                it('should sign out silently and ignore local changes', function() {
+                it('should sign out silently', function() {
                   expect(this.account.signOut).to.be.calledWith({
                     silent: true,
-                    ignoreLocalChanges: true
+                    moveData: true
                   });
                 });
 
@@ -1348,6 +1348,24 @@ describe('hoodie.account', function() {
 
           it('should disconnect', function() {
             expect(this.hoodie.remote.disconnect).to.be.called();
+          });
+        });
+
+        _but('account.signOut called with moveData: true', function() {
+          beforeEach(function() {
+            this.hoodie.remote.disconnect.reset();
+            this.hoodie.remote.push.reset();
+            this.account.signOut({
+              moveData: true
+            });
+          });
+
+          it('should not disconnect', function() {
+            expect(this.hoodie.remote.disconnect).to.not.be.called();
+          });
+
+          it('should not push local changes', function() {
+            expect(this.hoodie.remote.push).to.not.be.called();
           });
         });
       }); // user has local changes
@@ -1951,10 +1969,10 @@ describe('hoodie.account', function() {
                 });
               });
 
-              it('should sign out silently and ignore local changes', function() {
+              it('should sign out silently', function() {
                 expect(this.account.signOut).to.be.calledWith({
                   silent: true,
-                  ignoreLocalChanges: true
+                  moveData: true
                 });
               });
 
