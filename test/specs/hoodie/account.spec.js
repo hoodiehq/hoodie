@@ -769,7 +769,7 @@ describe('hoodie.account', function() {
                   });
 
                   it('should sign in with new username', function() {
-                    expect(this.account.signIn).to.be.calledWith('joe@example.com', 'secret', {moveData: true});
+                    expect(this.account.signIn).to.be.calledWith('joe@example.com', 'secret', {moveData: true, silent: true});
                   });
 
                   _and('sign in to new account succeeds', function() {
@@ -1191,7 +1191,7 @@ describe('hoodie.account', function() {
 
         it('should sign in', function() {
           this.account.changePassword('currentSecret', 'newSecret');
-          expect(this.account.signIn).to.be.calledWith('joe@example.com', 'newSecret');
+          expect(this.account.signIn).to.be.calledWith('joe@example.com', 'newSecret', {silent: true});
         });
 
         _when('sign in successful', function() {
@@ -1874,7 +1874,7 @@ describe('hoodie.account', function() {
 
         it('should not remove salt or password_sha properties', function() {
           expect(this.data.salt).to.be('salt');
-          expect(this.data.password_sha).to.be('password_sha');
+          expect(this.data.password_sha).to.be('password_sha'); // jshint ignore:line
         });
 
         _when('_users doc could be updated', function() {
@@ -1968,7 +1968,7 @@ describe('hoodie.account', function() {
                 });
 
                 it('should sign in with new username', function() {
-                  expect(this.account.signIn).to.be.calledWith('new.joe@example.com', 'secret', {moveData: true});
+                  expect(this.account.signIn).to.be.calledWith('new.joe@example.com', 'secret', {moveData: true, silent: true});
                 });
 
                 _and('sign in to new account succeeds', function() {
