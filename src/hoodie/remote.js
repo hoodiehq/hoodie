@@ -9,16 +9,16 @@
 // When hoodie.remote is continuously syncing (default),
 // it will continuously  synchronize with local store,
 // otherwise sync, pull or push can be called manually
-//
+// 
 // Note that hoodieRemote must be initialized before the
 // API is available:
-//
+// 
 //     hoodieRemote(hoodie);
 //     hoodie.remote.init();
 //
 
 var config = require('../utils/config');
-var utils = require('../utils/');
+var rejectWith = require('../utils/promise/reject_with');
 
 function hoodieRemote (hoodie) {
   // inherit from Hoodies Store API
@@ -52,13 +52,12 @@ function hoodieRemote (hoodie) {
   // name for remote (current user's database name)
   //
   var originalConnectMethod = remote.connect;
-
-  remote.connect = utils.toPromise(function (callback) {
-    if (!hoodie.account.hasAccount()) {
-      return callback(new Error('User has no database to connect to'));
+  remote.connect = function connect() {
+    if (! hoodie.account.hasAccount() ) {
+      return rejectWith('User has no database to connect to');
     }
-    return originalConnectMethod(hoodie.account.db());
-  });
+    return originalConnectMethod( hoodie.account.db() );
+  };
 
   // trigger
   // ---------
@@ -146,7 +145,7 @@ function hoodieRemote (hoodie) {
   hoodie.remote = remote;
 }
 
-module.exports = function hoodieRemoteFactory(hoodie) {
+function hoodieRemoteFactory(hoodie) {
 
   var init = function() {
     hoodieRemote(hoodie);
@@ -155,5 +154,6 @@ module.exports = function hoodieRemoteFactory(hoodie) {
   hoodie.remote = {
     init: init
   };
+}
 
-};
+module.exports = hoodieRemoteFactory;

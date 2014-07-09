@@ -25,10 +25,11 @@ var hoodieScopedTask = require('../lib/task/scoped');
 var HoodieError = require('../lib/error/error');
 
 var extend = require('extend');
-var utils = require('../utils/');
+
+var getDefer = require('../utils/promise/defer');
 
 //
-module.exports = function (hoodie) {
+function hoodieTask(hoodie) {
 
   // public API
   var api = function api(type, id) {
@@ -54,7 +55,7 @@ module.exports = function (hoodie) {
   //
   api.start = function(type, properties) {
     if (hoodie.account.hasAccount()) {
-      return hoodie.store.add('$' + type, properties).then(exports.handleNewTask);
+      return hoodie.store.add('$' + type, properties).then(handleNewTask);
     }
 
     return hoodie.account.anonymousSignUp().then(function() {
@@ -70,8 +71,8 @@ module.exports = function (hoodie) {
   //
   api.abort = function(type, id) {
     return hoodie.store.update('$' + type, id, {
-      abortedAt: utils.nowStringified()
-    }).then(exports.handleAbortedTaskObject);
+      abortedAt: now()
+    }).then(handleAbortedTaskObject);
   };
 
 
@@ -137,7 +138,8 @@ module.exports = function (hoodie) {
   // -------
 
   //
-  exports.handleNewTask = utils.toPromise(function (object, callback) {
+  function handleNewTask(object) {
+    var defer = getDefer();
     var taskStore = hoodie.store(object.type, object.id);
 
     taskStore.on('remove', function(object) {
@@ -147,20 +149,19 @@ module.exports = function (hoodie) {
 
       // task finished by worker.
       if (object.$processedAt) {
-        return callback(null, object);
+        return defer.resolve(object);
       }
 
       // manually removed / aborted.
-      callback(new HoodieError({
+      defer.reject(new HoodieError({
         message: 'Task has been aborted',
         task: object
-      }), null);
+      }));
     });
-
     taskStore.on('update', function(object) {
       var error = object.$error;
 
-      if (!object.$error) {
+      if (! object.$error) {
         return;
       }
 
@@ -171,17 +172,18 @@ module.exports = function (hoodie) {
       error.object = object;
       error.message = error.message || 'Something went wrong';
 
+      defer.reject(new HoodieError(error));
+
       // remove errored task
       hoodie.store.remove('$' + object.type, object.id);
-
-      return callback(new HoodieError(error), null);
     });
 
-    return callback(null);
-  });
+    return defer.promise();
+  }
 
   //
-  exports.handleAbortedTaskObject = utils.toPromise(function (taskObject, callback) {
+  function handleAbortedTaskObject(taskObject) {
+    var defer;
     var type = taskObject.type; // no need to prefix with $, it's already prefixed.
     var id = taskObject.id;
     var removePromise = hoodie.store.remove(type, id);
@@ -191,11 +193,12 @@ module.exports = function (hoodie) {
       return removePromise;
     }
 
-    hoodie.one('store:sync:' + type + ':' + id, callback(null));
-    removePromise.fail(callback);
+    defer = getDefer();
+    hoodie.one('store:sync:' + type + ':' + id, defer.resolve);
+    removePromise.fail(defer.reject);
 
-    return callback(null);
-  });
+    return defer.promise();
+  }
 
   //
   function handleStoreChange(eventName, object, options) {
@@ -293,6 +296,13 @@ module.exports = function (hoodie) {
     }
   }
 
+  //
+  function now() {
+    return JSON.stringify(new Date()).replace(/['"]/g, '');
+  }
+
   // extend hoodie
   hoodie.task = api;
-};
+}
+
+module.exports = hoodieTask;

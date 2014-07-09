@@ -2,7 +2,7 @@
   "name": "hoodie",
   "title": "Hoodie.js",
   "description": "Hoodie library for the browser",
-  "version": "0.9.1",
+  "version": "0.9.6",
   "main": "./src/hoodie.js",
   "homepage": "http://hood.ie",
   "repository": {
@@ -24,10 +24,8 @@
     "frontend-only"
   ],
   "dependencies": {
-    "argsarray": "0.0.1",
-    "bluebird": "^1.2.4",
     "extend": "~1.2.1",
-    "pouchdb-topromise": "0.0.0"
+    "bluebird": "~2.0.5"
   },
   "devDependencies": {
     "grunt": "~0.4.1",

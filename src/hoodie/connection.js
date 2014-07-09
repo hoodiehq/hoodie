@@ -2,12 +2,15 @@
 // =================================================
 
 
-var utils = require('../utils/');
+var reject = require('../utils/promise/reject');
+var resolve = require('../utils/promise/resolve');
 
-module.exports = function hoodieConnection(hoodie) {
+//
+function hoodieConnection(hoodie) {
 
   // state
   var online = true;
+  var checkConnectionInterval = 30000;
   var checkConnectionRequest = null;
   var checkConnectionTimeout = null;
 
@@ -40,8 +43,8 @@ module.exports = function hoodieConnection(hoodie) {
     global.clearTimeout(checkConnectionTimeout);
 
     checkConnectionRequest = hoodie.request('GET', path).then(
-      exports.handleCheckConnectionSuccess,
-      exports.handleCheckConnectionError
+      handleCheckConnectionSuccess,
+      handleCheckConnectionError
     );
 
     return checkConnectionRequest;
@@ -60,36 +63,35 @@ module.exports = function hoodieConnection(hoodie) {
   //
   //
   //
-  exports.handleCheckConnectionSuccess = utils.toPromise(function (callback) {
+  function handleCheckConnectionSuccess() {
+    checkConnectionInterval = 30000;
 
-    hoodie.checkConnectionInterval = 30000;
-
-    checkConnectionTimeout = global.setTimeout(hoodie.checkConnection, hoodie.checkConnectionInterval);
+    checkConnectionTimeout = global.setTimeout(hoodie.checkConnection, checkConnectionInterval);
 
     if (!hoodie.isConnected()) {
       hoodie.trigger('reconnected');
       online = true;
     }
 
-    return callback(null);
-  });
+    return resolve();
+  }
 
 
   //
   //
   //
-  exports.handleCheckConnectionError = utils.toPromise(function (callback) {
+  function handleCheckConnectionError() {
+    checkConnectionInterval = 3000;
 
-    hoodie.checkConnectionInterval = 3000;
-
-    checkConnectionTimeout = global.setTimeout(hoodie.checkConnection, hoodie.checkConnectionInterval);
+    checkConnectionTimeout = global.setTimeout(hoodie.checkConnection, checkConnectionInterval);
 
     if (hoodie.isConnected()) {
       hoodie.trigger('disconnected');
       online = false;
     }
 
-    return callback(null);
-  });
+    return reject();
+  }
+}
 
-};
+module.exports = hoodieConnection;

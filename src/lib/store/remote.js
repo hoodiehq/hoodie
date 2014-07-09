@@ -39,10 +39,10 @@
 var hoodieStoreApi = require('./api');
 var extend = require('extend');
 var generateId = require('../../utils/generate_id');
-var utils = require('../../utils/');
+var resolveWith = require('../../utils/promise/resolve_with');
 
 //
-module.exports = function hoodieRemoteStore(hoodie, options) {
+function hoodieRemoteStore(hoodie, options) {
 
   var remoteStore = {};
 
@@ -380,8 +380,7 @@ module.exports = function hoodieRemoteStore(hoodie, options) {
   //
   var pushRequest;
   var pushedObjectRevisions = {};
-
-  remote.push = utils.toPromise(function (objects, callback) {
+  remote.push = function push(objects) {
     var object;
     var objectsForRemote = [];
 
@@ -390,7 +389,7 @@ module.exports = function hoodieRemoteStore(hoodie, options) {
     }
 
     if (objects.length === 0) {
-      return callback([]);
+      return resolveWith([]);
     }
 
     // don't mess with the originals
@@ -399,11 +398,11 @@ module.exports = function hoodieRemoteStore(hoodie, options) {
     });
 
     objectsForRemote = [];
-
     for (var i = 0; i < objects.length; i++) {
 
       object = objects[i];
       addRevisionTo(object);
+      remote.markAsKnownObject(object);
       object = parseForRemote(object);
       objectsForRemote.push(object);
 
@@ -424,9 +423,8 @@ module.exports = function hoodieRemoteStore(hoodie, options) {
         remote.trigger('push', objects[i]);
       }
     });
-
     return pushRequest;
-  });
+  };
 
   // sync changes
   // --------------
@@ -460,9 +458,8 @@ module.exports = function hoodieRemoteStore(hoodie, options) {
   // array of objects or a function as `options.objects`
   //
   var defaultObjectsToPush = function defaultObjectsToPush() {
-    return [];
-  };
-
+      return [];
+    };
   if (options.defaultObjectsToPush) {
     if ($.isArray(options.defaultObjectsToPush)) {
       defaultObjectsToPush = function defaultObjectsToPush() {
@@ -755,9 +752,17 @@ module.exports = function hoodieRemoteStore(hoodie, options) {
       }
 
       remote.trigger(event, object);
+      remote.trigger(object.type + ':' + event, object);
+      remote.trigger(object.type + ':' + object.id + ':' + event, object);
+      remote.trigger('change', event, object);
+      remote.trigger(object.type + ':change', event, object);
+      remote.trigger(object.type + ':' + object.id + ':change', event, object);
+
+      // DEPRECATED
+      // https://github.com/hoodiehq/hoodie.js/issues/146
+      // https://github.com/hoodiehq/hoodie.js/issues/326
       remote.trigger(event + ':' + object.type, object);
       remote.trigger(event + ':' + object.type + ':' + object.id, object);
-      remote.trigger('change', event, object);
       remote.trigger('change:' + object.type, event, object);
       remote.trigger('change:' + object.type + ':' + object.id, event, object);
     }
@@ -782,4 +787,6 @@ module.exports = function hoodieRemoteStore(hoodie, options) {
 
   // expose public API
   return remote;
-};
+}
+
+module.exports = hoodieRemoteStore;

@@ -1,18 +1,7 @@
-exports.config = require('./config');
-
-exports.generate_id = require('./generate_id');
-
-exports.local_storage_wrapper = require('./local_storage_wrapper');
-
-exports.promise = require('./promise');
-
-exports.toPromise = require('pouchdb-topromise');
-
-exports.now = function () {
-  return new Date();
-};
-
-exports.nowStringified = function () {
-  return JSON.stringify(new Date()).replace(/['"]/g, '');
+module.exports = {
+  config: require('./config'),
+  generateId: require('./generate_id'),
+  localStorageWrapper: require('./local_storage_wrapper'),
+  promise: require('./promise')
 };
 

@@ -33,9 +33,7 @@ var errorMessageFindPropertyPattern = /\w+/;
 
 var extend = require('extend');
 
-module.exports = HoodieError;
-
-var HoodieError = function (properties) {
+function HoodieError(properties) {
 
   // normalize arguments
   if (typeof properties === 'string') {
@@ -44,12 +42,12 @@ var HoodieError = function (properties) {
     };
   }
 
-  if (!properties.message) {
+  if (! properties.message) {
     properties.message = 'Something went wrong';
   }
 
   // must check for properties, as this.name is always set.
-  if (!properties.name) {
+  if (! properties.name) {
     properties.name = 'HoodieError';
   }
 
@@ -58,10 +56,9 @@ var HoodieError = function (properties) {
     return properties[property];
   });
   extend(this, properties);
-};
-
+}
 HoodieError.prototype = new Error();
-
 HoodieError.prototype.constructor = HoodieError;
 
+module.exports = HoodieError;
 
