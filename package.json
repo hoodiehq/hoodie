@@ -25,9 +25,11 @@
   ],
   "dependencies": {
     "extend": "~1.2.1",
-    "bluebird": "~2.0.5"
+    "bluebird": "~2.0.5",
+    "lie": "^2.6.0"
   },
   "browser": {
+    "bluebird": "lie"
   },
   "devDependencies": {
     "grunt": "~0.4.1",
