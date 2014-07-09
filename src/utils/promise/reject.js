@@ -1,7 +1,11 @@
-var defer = require('./defer');
-//
-function reject() {
-  return defer().reject().promise();
-}
+var dfd = require('./defer');
 
-module.exports = reject;
+module.exports = function reject() {
+  var deferred = dfd();
+
+  deferred.reject();
+
+  return deferred.promise;
+
+};
+

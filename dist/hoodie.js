@@ -7057,7 +7057,7 @@ function hoodieRequest(hoodie) {
       }
     }
 
-    return rejectWith(error).promise();
+    return rejectWith(error);
   }
 
   //
@@ -10359,26 +10359,22 @@ module.exports = store;
 },{}],64:[function(require,module,exports){
 var Promise = require('bluebird');
 
-module.exports = function Defer () {
-  var defer = this;
+module.exports = function Defer() {
+  var resolve, reject, promise;
 
-  // Backwards compatibility with jQuery Defer
-  if (!(defer instanceof Defer)) {
-    return new Defer();
-  }
-
-  var resolve, reject;
-  var promise = new Promise(function(res, rej) {
-      resolve = res;
-      reject = rej;
-    });
+  promise = new Promise(function () {
+    resolve = arguments[0];
+    reject = arguments[1];
+  });
 
   return {
-      resolve: resolve,
-      reject: reject,
-      promise: promise
-    };
+    resolve: resolve,
+    reject: reject,
+    promise: promise
+  };
+
 };
+
 
 },{"bluebird":3}],65:[function(require,module,exports){
 module.exports = {
@@ -10387,57 +10383,68 @@ module.exports = {
   rejectWith: require('./reject_with'),
   reject: require('./reject'),
   resolveWith: require('./resolve_with'),
-  resolve: require('./resolve'),
+  resolve: require('./resolve')
 };
 
+
 },{"./defer":64,"./is_promise":66,"./reject":67,"./reject_with":68,"./resolve":69,"./resolve_with":70}],66:[function(require,module,exports){
-// returns true if passed object is a promise (but not a deferred),
-// otherwise false.
-function isPromise(object) {
-  return !! (object &&
-             typeof object.done === 'function' &&
-             typeof object.resolve !== 'function');
-}
+module.exports = function isPromise (object) {
+  return (typeof object.then === 'function');
+};
 
-module.exports = isPromise;
+
 },{}],67:[function(require,module,exports){
-var defer = require('./defer');
-//
-function reject() {
-  return defer().reject().promise();
-}
+var dfd = require('./defer');
 
-module.exports = reject;
+module.exports = function reject() {
+  var deferred = dfd();
+
+  deferred.reject();
+
+  return deferred.promise;
+
+};
+
+
 },{"./defer":64}],68:[function(require,module,exports){
-var getDefer = require('./defer');
+var dfd = require('./defer');
 var HoodieError = require('../../lib/error/error');
 
-//
-function rejectWith(errorProperties) {
+module.exports = function rejectWith(errorProperties) {
   var error = new HoodieError(errorProperties);
-  return getDefer().reject(error).promise();
-}
+  var deferred = dfd();
 
-module.exports = rejectWith;
+  deferred.cancel(error);
+
+  return deferred.promise;
+
+};
+
 
 },{"../../lib/error/error":47,"./defer":64}],69:[function(require,module,exports){
-var defer = require('./defer');
-//
-function resolve() {
-  return defer().resolve().promise();
-}
+var dfd = require('./defer');
 
-module.exports = resolve;
+module.exports = function resolve() {
+  var deferred = dfd();
+
+  deferred.resolve();
+
+  return deferred.promise;
+
+};
+
 },{"./defer":64}],70:[function(require,module,exports){
-var getDefer = require('./defer');
+var dfd = require('./defer');
 
-//
-function resolveWith() {
-  var defer = getDefer();
-  return defer.resolve.apply(defer, arguments).promise();
-}
+module.exports = function resolveWith() {
+  var deferred = dfd();
 
-module.exports = resolveWith;
+  deferred.resolve.apply(deferred, arguments);
+
+  return deferred.promise;
+
+};
+
 
 },{"./defer":64}]},{},[38])
 (38)

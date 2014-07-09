@@ -27,6 +27,8 @@
     "extend": "~1.2.1",
     "bluebird": "~2.0.5"
   },
+  "browser": {
+  },
   "devDependencies": {
     "grunt": "~0.4.1",
     "jshint": "~2.1.3",

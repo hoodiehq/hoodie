@@ -1,10 +1,13 @@
-var getDefer = require('./defer');
+var dfd = require('./defer');
 var HoodieError = require('../../lib/error/error');
 
-//
-function rejectWith(errorProperties) {
+module.exports = function rejectWith(errorProperties) {
   var error = new HoodieError(errorProperties);
-  return getDefer().reject(error).promise();
-}
+  var deferred = dfd();
 
-module.exports = rejectWith;
+  deferred.reject(error);
+
+  return deferred.promise;
+
+};
+

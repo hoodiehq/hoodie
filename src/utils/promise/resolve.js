@@ -1,7 +1,10 @@
-var defer = require('./defer');
-//
-function resolve() {
-  return defer().resolve().promise();
-}
+var dfd = require('./defer');
 
-module.exports = resolve;
+module.exports = function resolve() {
+  var deferred = dfd();
+
+  deferred.resolve();
+
+  return deferred.promise;
+
+};

@@ -1,16 +1,15 @@
-var chars, i, radix;
-
 // uuids consist of numbers and lowercase letters only.
 // We stick to lowercase letters to prevent confusion
 // and to prevent issues with CouchDB, e.g. database
 // names only allow for lowercase letters.
 
-chars = '0123456789abcdefghijklmnopqrstuvwxyz'.split('');
-radix = chars.length;
+var chars = '0123456789abcdefghijklmnopqrstuvwxyz'.split('');
+var radix = chars.length;
 
 // helper to generate unique ids.
-function generateId (length) {
+module.exports = function generateId (length) {
   var id = '';
+  var i;
 
   // default uuid length to 7
   if (length === undefined) {
@@ -24,6 +23,6 @@ function generateId (length) {
   }
 
   return id;
-}
 
-module.exports = generateId;
+};
+

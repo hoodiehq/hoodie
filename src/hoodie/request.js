@@ -98,7 +98,7 @@ function hoodieRequest(hoodie) {
       }
     }
 
-    return rejectWith(error).promise();
+    return rejectWith(error);
   }
 
   //
