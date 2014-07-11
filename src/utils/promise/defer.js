@@ -1,7 +1,7 @@
 if (typeof global.Promise === 'function') {
   exports.Promise = global.Promise;
 } else {
-  exports.Promise = require('lie');
+  exports.Promise = require('bluebird');
 }
 
 var Promise = exports.Promise;

@@ -114,17 +114,21 @@ module.exports = function(grunt) {
         src: ['src/hoodie.js'],
         dest: 'dist/hoodie.js',
         options: {
-          external: 'jquery',
-          standalone: 'Hoodie',
-          debug: true
+          bundleOptions: {
+            standalone: 'Hoodie',
+            debug: true
+          },
+          external: 'jquery'
         }
       },
       build: {
         src: ['src/hoodie.js'],
         dest: 'dist/hoodie.js',
         options: {
-          external: 'jquery',
-          standalone: 'Hoodie'
+          bundleOptions: {
+            standalone: 'Hoodie'
+          },
+          external: 'jquery'
         }
       }
     },
