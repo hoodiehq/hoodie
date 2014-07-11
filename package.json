@@ -27,7 +27,7 @@
     "lodash": "^2.4.1",
     "watch": "^0.9.0",
     "hapi": "^4.0.1",
-    "browserify": "^4.1.2",
+    "browserify": "^4.2.0",
     "hoodie-pocket-uikit": "^2.0.0"
   },
   "scripts": {
