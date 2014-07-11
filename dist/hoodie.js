@@ -3,7 +3,7 @@
 // Copyright 2012 - 2014 https://github.com/hoodiehq/
 // Licensed Apache License 2.0
 
-!function(e){"object"==typeof exports?module.exports=e():"function"==typeof define&&define.amd?define(e):"undefined"!=typeof window?window.Hoodie=e():"undefined"!=typeof global?global.Hoodie=e():"undefined"!=typeof self&&(self.Hoodie=e())}(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);throw new Error("Cannot find module '"+o+"'")}var f=n[o]={exports:{}};t[o][0].call(f.exports,function(e){var n=t[o][1][e];return s(n?n:e)},f,f.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
+(function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);throw new Error("Cannot find module '"+o+"'")}var f=n[o]={exports:{}};t[o][0].call(f.exports,function(e){var n=t[o][1][e];return s(n?n:e)},f,f.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 
 },{}],2:[function(require,module,exports){
 var hasOwn = Object.prototype.hasOwnProperty;
@@ -428,7 +428,8 @@ function immediate(task) {
   }
 }
 },{"./messageChannel":16,"./mutation.js":17,"./nextTick":1,"./stateChange":18,"./timeout":19}],16:[function(require,module,exports){
-var global=typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {};'use strict';
+(function (global){
+'use strict';
 
 exports.test = function () {
   if (global.setImmediate) {
@@ -446,8 +447,10 @@ exports.install = function (func) {
     channel.port2.postMessage(0);
   };
 };
+}).call(this,typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
 },{}],17:[function(require,module,exports){
-var global=typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {};'use strict';
+(function (global){
+'use strict';
 //based off rsvp https://github.com/tildeio/rsvp.js
 //license https://github.com/tildeio/rsvp.js/blob/master/LICENSE
 //https://github.com/tildeio/rsvp.js/blob/master/lib/rsvp/asap.js
@@ -469,8 +472,10 @@ exports.install = function (handle) {
     element.data = (called = ++called % 2);
   };
 };
+}).call(this,typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
 },{}],18:[function(require,module,exports){
-var global=typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {};'use strict';
+(function (global){
+'use strict';
 
 exports.test = function () {
   return 'document' in global && 'onreadystatechange' in global.document.createElement('script');
@@ -494,6 +499,7 @@ exports.install = function (handle) {
     return handle;
   };
 };
+}).call(this,typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
 },{}],19:[function(require,module,exports){
 'use strict';
 exports.test = function () {
@@ -506,7 +512,8 @@ exports.install = function (t) {
   };
 };
 },{}],20:[function(require,module,exports){
-var global=typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {};// Hoodie Core
+(function (global){
+// Hoodie Core
 // -------------
 //
 // the door to world domination (apps)
@@ -671,8 +678,10 @@ function applyExtensions(hoodie) {
 
 module.exports = Hoodie;
 
+}).call(this,typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
 },{"./hoodie/account":21,"./hoodie/connection":22,"./hoodie/id":23,"./hoodie/open":24,"./hoodie/remote":25,"./hoodie/request":26,"./hoodie/store":27,"./hoodie/task":28,"./lib":34,"./lib/events":33,"./utils":44}],21:[function(require,module,exports){
-var global=typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {};// Hoodie.Account
+(function (global){
+// Hoodie.Account
 // ================
 
 var hoodieEvents = require('../lib/events');
@@ -1876,8 +1885,10 @@ function hoodieAccount(hoodie) {
 
 module.exports = hoodieAccount;
 
+}).call(this,typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
 },{"../lib/events":33,"../utils/config":41,"../utils/generate_id":42,"../utils/promise/defer":46,"../utils/promise/reject":49,"../utils/promise/reject_with":50,"../utils/promise/resolve":51,"../utils/promise/resolve_with":52,"extend":2}],22:[function(require,module,exports){
-var global=typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {};// hoodie.checkConnection() & hoodie.isConnected()
+(function (global){
+// hoodie.checkConnection() & hoodie.isConnected()
 // =================================================
 
 
@@ -1975,6 +1986,7 @@ function hoodieConnection(hoodie) {
 
 module.exports = hoodieConnection;
 
+}).call(this,typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
 },{"../utils/promise/reject":49,"../utils/promise/resolve":51}],23:[function(require,module,exports){
 // hoodie.id
 // =========
@@ -2397,7 +2409,8 @@ function hoodieRequest(hoodie) {
 module.exports = hoodieRequest;
 
 },{"../utils/hoodiefy_request_error_name":43,"../utils/promise/reject_with":50,"extend":2}],27:[function(require,module,exports){
-var global=typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {};// LocalStore
+(function (global){
+// LocalStore
 // ============
 
 //
@@ -3357,6 +3370,7 @@ function hoodieStore (hoodie) {
 
 module.exports = hoodieStore;
 
+}).call(this,typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
 },{"../lib/error/object_id":31,"../lib/error/object_type":32,"../lib/store/api":35,"../utils/generate_id":42,"../utils/local_storage_wrapper":45,"../utils/promise/defer":46,"../utils/promise/reject_with":50,"../utils/promise/resolve_with":52,"extend":2}],28:[function(require,module,exports){
 // Tasks
 // ============
@@ -4417,7 +4431,8 @@ module.exports = {
 };
 
 },{"./api":35,"./remote":37,"./scoped":38}],37:[function(require,module,exports){
-var global=typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {};// Remote
+(function (global){
+// Remote
 // ========
 
 // Connection to a remote Couch Database.
@@ -5210,6 +5225,7 @@ function hoodieRemoteStore(hoodie, options) {
 
 module.exports = hoodieRemoteStore;
 
+}).call(this,typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
 },{"../../utils/generate_id":42,"../../utils/promise/resolve_with":52,"./api":35,"extend":2}],38:[function(require,module,exports){
 // scoped Store
 // ============
@@ -5527,7 +5543,8 @@ module.exports = {
 
 
 },{"./config":41,"./generate_id":42,"./local_storage_wrapper":45,"./promise":47}],45:[function(require,module,exports){
-var global=typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {};// public API
+(function (global){
+// public API
 var store = {};
 
 store.setItem = function (name, item) {
@@ -5639,8 +5656,16 @@ init();
 
 module.exports = store;
 
+}).call(this,typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
 },{}],46:[function(require,module,exports){
-var Promise = require('bluebird');
+(function (global){
+if (typeof global.Promise === 'function') {
+  exports.Promise = global.Promise;
+} else {
+  exports.Promise = require('lie');
+}
+
+var Promise = exports.Promise;
 
 module.exports = function Defer() {
   var resolve, reject, promise;
@@ -5659,7 +5684,8 @@ module.exports = function Defer() {
 };
 
 
-},{"bluebird":6}],47:[function(require,module,exports){
+}).call(this,typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
+},{"lie":6}],47:[function(require,module,exports){
 module.exports = {
   defer: require('./defer'),
   isPromise: require('./is_promise'),
@@ -5729,7 +5755,4 @@ module.exports = function resolveWith() {
 };
 
 
-},{"./defer":46}]},{},[20])
-(20)
-});
-;
+},{"./defer":46}]},{},[20]);

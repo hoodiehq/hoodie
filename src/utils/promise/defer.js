@@ -1,4 +1,10 @@
-var Promise = require('bluebird');
+if (typeof global.Promise === 'function') {
+  exports.Promise = global.Promise;
+} else {
+  exports.Promise = require('lie');
+}
+
+var Promise = exports.Promise;
 
 module.exports = function Defer() {
   var resolve, reject, promise;
