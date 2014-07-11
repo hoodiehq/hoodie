@@ -1,13 +1,19 @@
 var path = require('path');
 var Stream = require('stream');
 var expect = require('expect.js');
-var hoodiejs = require('../../lib/helpers/pack_hoodie');
+var hoodiejs = require('../../lib/utils/pack_hoodie');
+var path = require('path');
 var _ = require('lodash');
 
 describe('pack_hoodie', function () {
 
   // Dummy config object with plugins attribute.
-  var config = { app: {}, plugins: [] };
+  var config = {
+    hoodie: {
+      app_path: path.resolve(__dirname, '../../data')
+    },
+    plugins: []
+  };
 
   it('should be a function', function () {
     expect(hoodiejs).to.be.a(Function);
