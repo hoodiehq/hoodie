@@ -1,4 +1,8 @@
 module.exports = function isPromise (object) {
-  return (typeof object.then === 'function');
+  if (object && object.then) {
+    return (typeof object.then === 'function');
+  } else {
+    return false;
+  }
 };
 

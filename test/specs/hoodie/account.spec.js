@@ -12,6 +12,11 @@ var extend = require('extend');
 
 describe('hoodie.account', function() {
 
+  after(function (){
+    global.unstubRequire('src/utils/generate_id');
+    global.unstubRequire('src/utils/config');
+  });
+
   beforeEach(function() {
     localStorage.clear();
 

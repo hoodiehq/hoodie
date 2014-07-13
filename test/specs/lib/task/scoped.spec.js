@@ -9,6 +9,10 @@ var hoodieScopedTaskFactory = require('../../../../src/lib/task/scoped');
 
 describe('hoodieScopedTaskFactory', function() {
 
+  after(function() {
+    global.unstubRequire('src/lib/events');
+  });
+
   beforeEach(function() {
     this.hoodie = this.MOCKS.hoodie.apply(this);
     this.task = this.MOCKS.task.apply(this);

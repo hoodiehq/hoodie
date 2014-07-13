@@ -13,6 +13,11 @@ var extend = require('extend');
 
 describe('hoodie.task', function() {
 
+  after(function() {
+    global.unstubRequire('src/lib/task/scoped');
+    global.unstubRequire('src/lib/events');
+  });
+
   beforeEach(function() {
     var eventsMixin = this.MOCKS.events.apply(this);
 

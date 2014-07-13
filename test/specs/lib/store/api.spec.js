@@ -14,6 +14,11 @@ var extend = require('extend');
 
 describe('hoodieStoreFactory', function() {
 
+  after(function() {
+    global.unstubRequire('src/lib/events');
+    global.unstubRequire('src/lib/store/scoped');
+  });
+
   beforeEach(function() {
     this.hoodie = this.MOCKS.hoodie.apply(this);
 
@@ -28,11 +33,6 @@ describe('hoodieStoreFactory', function() {
     this.storeWithCustomValidate = hoodieStoreFactory(this.hoodie, this.optionsWithValidate );
   });
 
-
-  after(function() {
-    global.unstubRequire('src/lib/events');
-    global.unstubRequire('src/lib/store/scoped');
-  });
 
   it('sets store.validate from options.validate', function() {
     expect(this.storeWithCustomValidate.validate).to.be(this.validate);

@@ -22,7 +22,7 @@ describe('localStorageWrapper', function() {
     this.sandbox.stub(localStorage, 'key');
   });
 
-  // 
+  //
   describe('#setObject(key, object)', function() {
     it('should write an object to localStorage', function() {
       localStorageWrapper.setObject('key', {funky: 'fresh'});
@@ -30,7 +30,7 @@ describe('localStorageWrapper', function() {
     });
   });
 
-  // 
+  //
   describe('#getObject(key, object)', function() {
     _when('key exists in localStorage and has valid JSON', function() {
       beforeEach(function() {
@@ -50,6 +50,6 @@ describe('localStorageWrapper', function() {
         expect(object).to.be(null);
       });
     });
-    
+
   });
 });

@@ -15,6 +15,14 @@ var extend = require('extend');
 
 describe('hoodie.store', function() {
 
+  after(function() {
+    global.unstubRequire('src/lib/store/api');
+    global.unstubRequire('src/utils/generate_id');
+    global.unstubRequire('src/utils/local_storage_wrapper');
+    global.unstubRequire('src/utils/config');
+  });
+
+
   beforeEach(function() {
     this.hoodie = this.MOCKS.hoodie.apply(this);
     generateIdMock.returns('uuid123');
@@ -31,13 +39,6 @@ describe('hoodie.store', function() {
     localStorageMock.getObject.reset();
     localStorageMock.setObject.reset();
     localStorageMock.removeItem.reset();
-  });
-
-  after(function() {
-    global.unstubRequire('src/lib/store/api');
-    global.unstubRequire('src/utils/generate_id');
-    global.unstubRequire('src/utils/local_storage_wrapper');
-    global.unstubRequire('src/utils/config');
   });
 
   //

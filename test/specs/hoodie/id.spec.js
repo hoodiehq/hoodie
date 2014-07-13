@@ -8,6 +8,11 @@ var hoodieId = require('../../../src/hoodie/id');
 
 describe('hoodie.id()', function() {
 
+  after(function (){
+    global.unstubRequire('src/utils/generate_id');
+    global.unstubRequire('src/utils/config');
+  });
+
   beforeEach(function() {
     this.hoodie = this.MOCKS.hoodie.apply(this);
     hoodieId(this.hoodie);

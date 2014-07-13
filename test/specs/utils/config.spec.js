@@ -8,6 +8,10 @@ var config = require('../../../src/utils/config');
 
 describe('config', function() {
 
+  after(function() {
+    global.unstubRequire('src/utils/local_storage_wrapper');
+  });
+
   beforeEach(function() {
     localStorageWrapperMock.setObject.reset();
     localStorageWrapperMock.removeItem.reset();

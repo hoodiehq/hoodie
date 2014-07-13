@@ -10,6 +10,10 @@ var hoodieScopedStoreApi = require('../../../../src/lib/store/scoped');
 
 describe('hoodieScopedStoreApi', function() {
 
+  after(function() {
+    global.unstubRequire('src/lib/events');
+  });
+
   beforeEach(function() {
     this.hoodie = this.MOCKS.hoodie.apply(this);
     this.store = this.MOCKS.store.apply(this);

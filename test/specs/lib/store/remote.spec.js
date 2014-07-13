@@ -12,6 +12,11 @@ var hoodieRemoteStore = require('../../../../src/lib/store/remote');
 
 describe('hoodieRemoteStore', function() {
 
+  after(function() {
+    global.unstubRequire('src/utils/generate_id');
+    global.unstubRequire('src/lib/store/api');
+  });
+
   beforeEach(function() {
     this.hoodie = this.MOCKS.hoodie.apply(this);
     generateIdMock.returns('uuid123');
