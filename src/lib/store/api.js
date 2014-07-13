@@ -358,7 +358,9 @@ function hoodieStoreApi(hoodie, options) {
         return _results;
       })();
 
-      return $.when.apply(null, _updatePromises);
+      return $.when.apply(null, _updatePromises).then(function() {
+        return Array.prototype.slice.call(arguments);
+      });
     });
 
     return decoratePromise(promise);

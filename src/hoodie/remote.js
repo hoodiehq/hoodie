@@ -9,10 +9,10 @@
 // When hoodie.remote is continuously syncing (default),
 // it will continuously  synchronize with local store,
 // otherwise sync, pull or push can be called manually
-// 
+//
 // Note that hoodieRemote must be initialized before the
 // API is available:
-// 
+//
 //     hoodieRemote(hoodie);
 //     hoodie.remote.init();
 //
@@ -128,6 +128,7 @@ function hoodieRemote (hoodie) {
     hoodie.on('account:signup:anonymous', remote.connect);
     hoodie.on('account:signin', remote.connect);
     hoodie.on('account:signin:anonymous', remote.connect);
+    hoodie.on('account:changeusername', remote.connect);
 
     hoodie.on('account:reauthenticated', remote.connect);
     hoodie.on('account:signout', remote.disconnect);

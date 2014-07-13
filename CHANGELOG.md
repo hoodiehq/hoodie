@@ -1,3 +1,17 @@
+<a name="0.9.7"></a>
+### 0.9.7 (2014-07-02)
+
+
+#### Bug Fixes
+
+* hoodie.store.updateAll to resolve with array of updated objects ([dff493ec](https://github.com/hoodiehq/hoodie.js/commit/dff493ec992e77b6a0c4fab69113e0efa64abedc))
+
+
+#### Features
+
+* **hoodie.store:** allow dashes in type names ([0764e83d](https://github.com/hoodiehq/hoodie.js/commit/0764e83d74264cfc67f06297ae4274b125a35f5d), closes [#296](https://github.com/hoodiehq/hoodie.js/issues/296))
+
+
 <a name="0.9.6"></a>
 ### 0.9.6 (2014-06-10)
 

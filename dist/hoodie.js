@@ -1,4 +1,4 @@
-// Hoodie.js - 0.9.6
+// Hoodie.js - 0.9.7
 // https://github.com/hoodiehq/hoodie.js
 // Copyright 2012 - 2014 https://github.com/hoodiehq/
 // Licensed Apache License 2.0
@@ -7915,7 +7915,7 @@ function hoodieStore (hoodie) {
 
 
   // a semantic key consists of a valid type & id, separated by a "/"
-  var semanticIdPattern = new RegExp(/^[a-z$][a-z0-9]+\/[a-z0-9]+$/);
+  var semanticIdPattern = new RegExp(/^[a-z$][a-z0-9-]+\/[a-z0-9]+$/);
   function isSemanticKey(key) {
     return semanticIdPattern.test(key);
   }
@@ -8530,7 +8530,7 @@ function HoodieObjectTypeError(properties) {
 
   return new HoodieError(properties);
 }
-var validTypePattern = /^[a-z$][a-z0-9]+$/;
+var validTypePattern = /^[a-z$][a-z0-9-]+$/;
 HoodieObjectTypeError.isInvalid = function(type, customPattern) {
   return !(customPattern || validTypePattern).test(type || '');
 };
@@ -9074,7 +9074,9 @@ function hoodieStoreApi(hoodie, options) {
         return _results;
       })();
 
-      return $.when.apply(null, _updatePromises);
+      return $.when.apply(null, _updatePromises).then(function() {
+        return Array.prototype.slice.call(arguments);
+      });
     });
 
     return decoratePromise(promise);

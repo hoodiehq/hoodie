@@ -271,9 +271,7 @@ function hoodieAccount(hoodie) {
 
     return promise.done( function(newUsername, newHoodieId) {
       if (options.moveData) {
-        if (!isSilent) {
-          account.trigger('movedata');
-        }
+        account.trigger('movedata');
       }
       if (!isReauthenticating && !options.moveData) {
         cleanup();
@@ -304,6 +302,10 @@ function hoodieAccount(hoodie) {
 
     if (!account.hasAccount()) {
       return cleanupMethod();
+    }
+
+    if (options.moveData) {
+      return sendSignOutRequest();
     }
 
     return pushLocalChanges(options).then(disconnect).then(sendSignOutRequest).then(cleanupMethod);
@@ -1030,12 +1032,12 @@ function hoodieAccount(hoodie) {
           // we do signOut explicitly although signOut is build into hoodie.signIn to
           // work around trouble in case of local changes. See
           // https://github.com/hoodiehq/hoodie.js/issues/256
-          return account.signOut({silent:true, ignoreLocalChanges: true}).then(function() {
-            return account.signIn(newUsername, newPassword, {moveData: true});
+          return account.signOut({silent:true, moveData: true}).then(function() {
+            return account.signIn(newUsername, newPassword, {moveData: true, silent: true});
           });
         });
       } else {
-        return account.signIn(currentUsername, newPassword);
+        return account.signIn(currentUsername, newPassword, {silent: true});
       }
     };
   }

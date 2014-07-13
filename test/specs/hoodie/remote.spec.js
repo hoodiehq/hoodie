@@ -198,8 +198,19 @@ describe('hoodie.remote', function() {
       expect(this.events['account:signout']).to.be.a(Function);
     });
     it('disconnects on account:signout', function() {
-      this.events['account:signout'](123);
+      this.events['account:signout']('joe@example.com');
       expect(this.remote.disconnect).to.be.called();
+    });
+
+    it('subscribes to account:changeusername', function() {
+      expect(this.events['account:changeusername']).to.be.a(Function);
+    });
+
+    it('connects on account:changeusername', function() {
+      this.hoodie.account.hasAccount.returns(true);
+      this.hoodie.account.db.returns('dbName');
+      this.events['account:changeusername'](123);
+      expect(this.openConnectSpy).to.be.calledWith('dbName');
     });
   });
 });
