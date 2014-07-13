@@ -1897,7 +1897,7 @@ describe('hoodie.account', function() {
 
         it('should not remove salt or password_sha properties', function() {
           expect(this.data.salt).to.be('salt');
-          expect(this.data.password_sha).to.be('password_sha'); // jshint ignore:line
+          expect(this.data.password_sha).to.be('password_sha');
         });
 
         _when('_users doc could be updated', function() {
