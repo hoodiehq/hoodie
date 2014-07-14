@@ -2,7 +2,7 @@
 // =========
 
 var generateId = require('../utils/generate_id');
-var config = require('../utils/config');
+var config = require('../utils/config')();
 
 // generates a random id and persists using config
 // until the user signs out or deletes local data

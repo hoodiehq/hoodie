@@ -4,20 +4,39 @@
 var localStorageWrapper = require('../utils/local_storage_wrapper');
 var extend = require('extend');
 
-// public API
-var config = {};
+var exports = module.exports = function(storeKey) {
+  storeKey = storeKey || '_hoodie_config';
 
-var CONFIG_STORE_KEY = '_hoodie_config';
-var cache;
+  var store = {
+    get: localStorageWrapper.getObject.bind(null, storeKey),
+    set: localStorageWrapper.setObject.bind(null, storeKey),
+    remove: localStorageWrapper.removeItem.bind(null, storeKey)
+  };
+
+  //
+  // load current configuration from localStore.
+  //
+  var config = store.get() || {};
+
+  var state = {config: config, store: store};
+
+  // public API
+  return {
+    set: exports.set.bind(null, state),
+    get: exports.get.bind(null, state),
+    clear: exports.clear.bind(null, state),
+    unset: exports.unset.bind(null, state)
+  };
+};
 
 // set
 // ----------
 
 // adds a configuration
 //
-config.set = function set(key, value) {
-  cache[key] = value;
-  localStorageWrapper.setObject(CONFIG_STORE_KEY, cache);
+exports.set = function (state, key, value) {
+  state.config[key] = value;
+  state.store.set(state.config);
 };
 
 // get
@@ -25,21 +44,21 @@ config.set = function set(key, value) {
 
 // receives a configuration
 //
-config.get = function get(key) {
+exports.get = function (state, key) {
   if (key) {
-    return cache[key];
+    return state.config[key];
   }
-  return extend({}, cache);
+  return extend({}, state.config);
 };
 
 // clear
 // ----------
 
-// clears cache and removes object from localStorageWrapper
+// clears config and removes object from localStorageWrapper
 //
-config.clear = function clear() {
-  cache = {};
-  return localStorageWrapper.removeItem(CONFIG_STORE_KEY);
+exports.clear = function (state) {
+  state.config = {};
+  return state.store.remove();
 };
 
 // unset
@@ -48,21 +67,7 @@ config.clear = function clear() {
 // unsets a configuration. If configuration is present, calls
 // config.set(key, undefined).
 //
-config.unset = function unset(key) {
-  delete cache[key];
-  localStorageWrapper.setObject(CONFIG_STORE_KEY, cache);
+exports.unset = function (state, key) {
+  delete state.config[key];
+  state.store.set(state.config);
 };
-
-//
-// load current configuration from localStore.
-// The init method needs to be called once on startup
-//
-function init() {
-  cache = localStorageWrapper.getObject(CONFIG_STORE_KEY) || {};
-}
-
-// initialize
-init();
-
-module.exports = config;
-
