@@ -1057,16 +1057,25 @@ function hoodieAccount(hoodie) {
       }
     };
 
-    withPreviousRequestsAborted('signIn', function() {
-      return account.request('POST', '/_session', requestOptions);
-    }).done(function() {
-      global.setTimeout(awaitCurrentAccountRemoved, 300, username, password, defer);
+    // CHANGES
+    // 1. Load /_users doc instead of POST /_sesssion
+    // 2. if 404: resolve
+    // 3. if $newUsername set: pending => repeat
+    // 4. if $error set: reject
+    account.fetch().done(function(userDoc) {
+      if (userDoc.$error) {
+        return defer.reject(userDoc.$error);
+      }
+      if (userDoc.$newUsername) {
+        // username change is still pending
+        global.setTimeout(awaitCurrentAccountRemoved, 300, username, password, defer);
+        return
+      }
     }).fail(function(error) {
-      if (error.status === 401) {
+      if (error.status === 404) {
+        // /_users doc has been removed as expected: resolve
         return defer.resolve();
       }
-
-      defer.reject(error);
     });
 
     return defer.promise();
