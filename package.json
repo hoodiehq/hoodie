@@ -10,7 +10,7 @@
     "hoodie": "^0.9.3",
     "multicouch": "^0.8.1",
     "hoodie-pocket": "^0.0.13",
-    "hoodie-plugins-manager": "^0.2.5",
+    "hoodie-plugins-manager": "^0.2.6",
     "local-tld-lib": "^1.0.2",
     "async": "^0.2.7",
     "bytes": "^0.2.1",
