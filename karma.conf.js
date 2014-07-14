@@ -19,27 +19,26 @@ module.exports = function(config) {
       { pattern: 'node_modules/expect.js/expect.js', watched: false, included: true },
       { pattern: 'node_modules/sinon/pkg/sinon-1.7.3.js', watched: false, included: true },
       'test/lib/helpers.js',
-      // 'test/lib/setup.js',
 
       //'test/specs/hoodie/account.spec.js',
-      //'test/specs/hoodie/connection.spec.js',
-      'test/specs/hoodie/id.spec.js',
       //'test/specs/hoodie/open.spec.js',
-      'test/specs/hoodie/remote.spec.js',
       //'test/specs/hoodie/request.spec.js',
       //'test/specs/hoodie/store.spec.js',
       //'test/specs/hoodie/task.spec.js',
-
-      'test/specs/lib/error/error.spec.js',
-      'test/specs/lib/store/remote.spec.js',
-      'test/specs/lib/store/scoped.spec.js',
       //'test/specs/lib/store/api.spec.js',
-      'test/specs/lib/task/scoped.spec.js',
+
+      //'test/specs/hoodie/id.spec.js',
+      //'test/specs/utils/config.spec.js'
+      //'test/specs/lib/store/remote.spec.js',
+      //'test/specs/lib/store/scoped.spec.js',
+      //'test/specs/lib/task/scoped.spec.js',
+      'test/specs/hoodie/remote.spec.js',
+      'test/specs/lib/error/error.spec.js',
+      'test/specs/hoodie/connection.spec.js',
 
       'test/specs/utils/generate_id.spec.js',
       'test/specs/utils/promise.spec.js',
       'test/specs/utils/local_storage_wrapper.spec.js',
-      'test/specs/utils/config.spec.js'
     ],
 
 
@@ -81,7 +80,6 @@ module.exports = function(config) {
     browsers: [],
 
     preprocessors: {
-      //'lib/**/*.js': ['browserify'],
       'test/specs/**/*.js': ['browserify'],
       'test/lib/setup.js': ['browserify']
     },
@@ -96,6 +94,5 @@ module.exports = function(config) {
 
     // Continuous Integration mode
     // if true, it capture browsers, run tests and exit
-    singleRun: true
   });
 };
