@@ -178,7 +178,7 @@ function hoodieTask(hoodie) {
       hoodie.store.remove('$' + object.type, object.id);
     });
 
-    return defer.promise();
+    return defer;
   }
 
   //
@@ -197,7 +197,7 @@ function hoodieTask(hoodie) {
     hoodie.one('store:sync:' + type + ':' + id, defer.resolve);
     removePromise.fail(defer.reject);
 
-    return defer.promise();
+    return defer;
   }
 
   //

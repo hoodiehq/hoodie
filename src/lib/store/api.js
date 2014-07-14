@@ -332,7 +332,7 @@ function hoodieStoreApi(hoodie, options) {
       promise = filterOrObjects;
       break;
     case $.isArray(filterOrObjects):
-      promise = getDefer().resolve(filterOrObjects).promise();
+      promise = getDefer().resolve(filterOrObjects);
       break;
     default:
       // e.g. null, update all
