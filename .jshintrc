@@ -6,11 +6,13 @@
   "dojo": false,
   "jquery": true,
   "devel": true,
+  "global": [
+    "Hoodie"
+  ],
   "predef": [
     "sinon",
     "define",
     "require",
-    "Hoodie",
     "it",
     "describe",
     "expect",

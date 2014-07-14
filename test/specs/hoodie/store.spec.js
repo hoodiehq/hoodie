@@ -21,7 +21,6 @@ describe('hoodie.store', function() {
     global.unstubRequire('src/lib/store/api');
     global.unstubRequire('src/utils/generate_id');
     global.unstubRequire('src/utils/local_storage_wrapper');
-    global.unstubRequire('src/utils/config');
   });
 
 

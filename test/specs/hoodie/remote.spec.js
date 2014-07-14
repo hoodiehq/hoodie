@@ -1,16 +1,16 @@
 require('../../lib/setup');
 
-var configMock = require('../../mocks/utils/config');
+var config = require('../../../src/utils/config');
 var hoodieAccountRemote = require('../../../src/hoodie/remote');
 
 describe('hoodie.remote', function() {
 
   before(function () {
-    global.stubRequire('src/utils/config', configMock);
+    config.set('_remote.since', 10);
   });
 
   after(function() {
-    global.unstubRequire('src/utils/config');
+    config.clear();
   });
 
   beforeEach(function() {
@@ -22,7 +22,7 @@ describe('hoodie.remote', function() {
       disconnect: sinon.spy(),
       push: sinon.spy()
     });
-    configMock.get.withArgs('_remote.since').returns(10);
+
     this.hoodie.store.index.returns(['funk/1', '$task/2']);
 
     this.clock = this.sandbox.useFakeTimers(0); // '1970-01-01 00:00:00'
@@ -51,7 +51,7 @@ describe('hoodie.remote', function() {
     expect(options.prefix).to.eql( '' );
   });
 
-  it.skip('should pass function that returns current since sequence number', function() {
+  it('should pass function that returns current since sequence number', function() {
     var args = this.openArgs[1];
     expect(args.since()).to.eql(10);
   });
@@ -73,7 +73,7 @@ describe('hoodie.remote', function() {
         this.hoodie.account.hasAccount.returns(true);
       });
 
-      it.skip('should connect to user\'s database (ignoring passed argument)', function() {
+      it('should connect to user\'s database (ignoring passed argument)', function() {
         this.remote.connect('whatever');
         expect(this.openConnectSpy).to.be.calledWith('userdb');
       });
@@ -84,10 +84,12 @@ describe('hoodie.remote', function() {
         this.hoodie.account.hasAccount.returns(false);
       });
 
-      it.skip('should connect to user\'s database (ignoring passed argument)', function() {
+      it('should connect to user\'s database (ignoring passed argument)', function() {
         var promise = this.remote.connect();
         expect(this.openConnectSpy).to.not.be.called();
-        expect(promise).to.be.rejectedWith('User has no database to connect to');
+        expect(promise.state[0]).to.eql('REJECTED');
+        expect(promise.outcome instanceof Error).to.eql(true);
+        expect(promise.outcome.message).to.eql('User has no database to connect to');
       });
     });
   });

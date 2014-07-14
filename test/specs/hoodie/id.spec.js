@@ -16,7 +16,7 @@ describe('hoodie.id()', function() {
     expect((this.id()).length).to.eql(7);
   });
 
-  it.only('generates a new id only once', function() {
+  it('generates a new id only once', function() {
     config.clear();
     var id1 = this.id();
     var id2 = this.id();

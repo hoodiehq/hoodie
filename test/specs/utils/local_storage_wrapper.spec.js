@@ -4,10 +4,6 @@ var localStorageWrapper = require('../../../src/utils/local_storage_wrapper');
 
 describe('localStorageWrapper', function() {
 
-  before(function () {
-    global.unstubRequire('src/utils/local_storage_wrapper');
-  });
-
   beforeEach(function() {
     var noop = function () {};
 

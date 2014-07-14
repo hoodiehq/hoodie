@@ -28,7 +28,7 @@ var utils = require('./utils');
 //     // init a new hoodie instance
 //     hoodie = new Hoodie
 //
-function Hoodie(baseUrl) {
+var Hoodie = module.exports = function (baseUrl) {
   var hoodie = this;
 
   // enforce initialization with `new`
@@ -137,7 +137,7 @@ function Hoodie(baseUrl) {
   // loading user extensions
   //
   applyExtensions(hoodie);
-}
+};
 
 // Extending hoodie
 // ------------------
@@ -161,4 +161,3 @@ function applyExtensions(hoodie) {
   }
 }
 
-module.exports = Hoodie;

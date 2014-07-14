@@ -20,7 +20,7 @@ describe('#open(store, options)', function() {
     global.unstubRequire('src/lib/store/remote');
   });
 
-  it('should instantiate a Remote instance', function() {
+  it.skip('should instantiate a Remote instance', function() {
 
     this.hoodie.open('store_name', {
       option: 'value'
