@@ -18,7 +18,7 @@ function hoodieId (hoodie) {
 
   function setId(newId) {
     id = newId;
-    
+
     config.set('_hoodieId', newId);
   }
 

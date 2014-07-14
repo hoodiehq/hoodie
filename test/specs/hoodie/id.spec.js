@@ -1,54 +1,39 @@
 require('../../lib/setup');
 
-var generateIdMock = require('../../mocks/utils/generate_id');
-var configMock = require('../../mocks/utils/config');
 var hoodieId = require('../../../src/hoodie/id');
+var config = require('../../../src/utils/config');
 
 describe('hoodie.id()', function() {
-
-  before(function () {
-    global.stubRequire('src/utils/generate_id', generateIdMock);
-    global.stubRequire('src/utils/config', configMock);
-  });
-
-  after(function (){
-    global.unstubRequire('src/utils/generate_id');
-    global.unstubRequire('src/utils/config');
-  });
 
   beforeEach(function() {
     this.hoodie = this.MOCKS.hoodie.apply(this);
     hoodieId(this.hoodie);
     this.id = this.hoodie.id;
-    generateIdMock.returns('randomid');
-  });
-  it('returns a random id when called the first time', function() {
-    var id = this.id();
-    expect( id ).to.eql('randomid');
   });
 
-  it('generates a new id only once', function() {
-    generateIdMock.reset();
+  it('returns a random id when called the first time', function() {
+    expect(typeof this.id()).to.eql('string');
+    expect((this.id()).length).to.eql(7);
+  });
+
+  it.only('generates a new id only once', function() {
+    config.clear();
     var id1 = this.id();
     var id2 = this.id();
-    expect(generateIdMock.calledOnce).to.be.ok();
     expect(id1).to.eql(id2);
   });
 
   it('stores the new id in config', function() {
-    configMock.set.reset();
-    configMock.clear.reset();
     this.id();
-    expect(configMock.set).to.be.calledWith('_hoodieId', 'randomid');
+    expect(this.id()).to.eql(config.get('_hoodieId'));
   });
 
   describe('hoodie.id.init()', function() {
-    it('loads the last hoodieId from config on initialization', function() {
-      configMock.get.resetBehavior();
-      configMock.get.returns('lastHoodieId');
+
+    it('loads the last _hoodieId from config on initialization', function() {
       this.id.init();
       var id = this.id();
-      expect(id).to.be('lastHoodieId');
+      expect(id).to.eql(config.get('_hoodieId'));
     });
 
     it('can\'t be initialized twice', function() {
@@ -58,13 +43,16 @@ describe('hoodie.id()', function() {
   });
 
   describe('hoodie.id.subscribeToOutsideEvents()', function() {
+
     beforeEach(function() {
       var events = {};
 
       this.hoodie.on = function() {};
+
       this.sandbox.stub(this.hoodie, 'on', function(eventName, cb) {
         events[eventName] = cb;
       });
+
       this.id.subscribeToOutsideEvents();
       this.events = events;
     });
@@ -74,17 +62,11 @@ describe('hoodie.id()', function() {
     });
 
     it('unsets hoodieId on account:cleanup', function() {
-      generateIdMock.returns('currentId');
-      var currentId = this.id();
-      expect(currentId).to.be('currentId');
+      expect(this.id()).to.be(config.get('_hoodieId'));
 
       this.events['account:cleanup']();
-      configMock.set.reset();
-      generateIdMock.returns('newId');
-      var newId = this.id();
 
-      expect(newId).to.be('newId');
-      expect(configMock.set).to.be.calledWith('_hoodieId', 'newId');
+      expect(config.get('_hoodieId')).to.be.undefined;
     });
 
     it('subscribes to account:signin', function() {
@@ -92,10 +74,9 @@ describe('hoodie.id()', function() {
     });
 
     it('sets hoodieId on account:signin', function() {
-      configMock.set.reset();
+      config.clear();
       this.events['account:signin']('joe@example.com', 'funkyId');
-      expect(configMock.set).to.be.calledWith('_hoodieId', 'funkyId');
-      expect( this.id() ).to.be('funkyId');
+      expect(config.get('_hoodieId')).to.eql('funkyId');
     });
 
     it('can\'t be run twice', function() {

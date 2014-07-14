@@ -9,15 +9,19 @@ describe('localStorageWrapper', function() {
   });
 
   beforeEach(function() {
+    var noop = function () {};
+
     // see https://github.com/pivotal/jasmine/issues/299
     Object.defineProperty(localStorage, 'setItem', { writable: true });
     Object.defineProperty(localStorage, 'getItem', { writable: true });
     Object.defineProperty(localStorage, 'removeItem', { writable: true });
     Object.defineProperty(localStorage, 'key', { writable: true });
-    localStorage.setItem = function() {};
-    localStorage.getItem = function() {};
-    localStorage.removeItem = function() {};
-    localStorage.key = function() {};
+
+    localStorage.setItem = noop;
+    localStorage.getItem = noop;
+    localStorage.removeItem = noop;
+    localStorage.key = noop;
+
     this.sandbox.stub(localStorage, 'getItem');
     this.sandbox.stub(localStorage, 'setItem');
     this.sandbox.stub(localStorage, 'removeItem');

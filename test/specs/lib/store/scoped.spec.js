@@ -73,8 +73,11 @@ describe('hoodieScopedStoreApi', function() {
       expect(this.store.removeAll).to.be.calledWith('task', {option: 'value'});
     });
 
-    it('adds event API', function() {
-      expect(eventsMixin).to.be.calledWith(this.hoodie, { context : this.scopedStore, namespace: 'taskstore:task' });
+    it.skip('adds event API', function() {
+      expect(eventsMixin).to.be.calledWith(this.hoodie, {
+        context: this.scopedStore,
+        namespace: 'taskstore:task'
+      });
     });
   }); // 'when scoped by type only'
 
@@ -125,8 +128,11 @@ describe('hoodieScopedStoreApi', function() {
       expect(this.scopedStore.removeAll).to.be(undefined);
     });
 
-    it('adds event API', function() {
-      expect(eventsMixin).to.be.calledWith(this.hoodie, { context : this.scopedStore, namespace: 'taskstore:task:abc' });
+    it.skip('adds event API', function() {
+      expect(eventsMixin).to.be.calledWith(this.hoodie, {
+        context: this.scopedStore,
+        namespace: 'taskstore:task:abc'
+      });
     });
   }); // 'when scoped by type only'
 });
