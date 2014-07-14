@@ -1,15 +1,17 @@
 require('../../lib/setup');
 
 var localStorageWrapperMock = require('../../mocks/utils/local_storage_wrapper');
-global.stubRequire('src/utils/local_storage_wrapper', localStorageWrapperMock);
-
-global.unstubRequire('src/utils/config');
 var config = require('../../../src/utils/config');
 
 describe('config', function() {
 
+  before(function () {
+    global.stubRequire('src/utils/local_storage_wrapper', localStorageWrapperMock);
+  });
+
   after(function() {
     global.unstubRequire('src/utils/local_storage_wrapper');
+    global.unstubRequire('src/utils/config');
   });
 
   beforeEach(function() {

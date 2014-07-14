@@ -1,18 +1,19 @@
 require('../../../lib/setup');
 
-// stub the requires before loading the actual module
 var storeFactory = sinon.stub();
-global.stubRequire('src/lib/store/api', storeFactory);
 
 var generateIdMock = require('../../../mocks/utils/generate_id');
-global.stubRequire('src/utils/generate_id', generateIdMock);
-
-global.unstubRequire('src/lib/store/remote');
 var hoodieRemoteStore = require('../../../../src/lib/store/remote');
 
 describe('hoodieRemoteStore', function() {
 
+  before(function () {
+    global.stubRequire('src/lib/store/api', storeFactory);
+    global.stubRequire('src/utils/generate_id', generateIdMock);
+  });
+
   after(function() {
+    global.unstubRequire('src/lib/store/remote');
     global.unstubRequire('src/utils/generate_id');
     global.unstubRequire('src/lib/store/api');
   });

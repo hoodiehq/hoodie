@@ -2,18 +2,20 @@ require('../../lib/setup');
 
 // stub the requires before loading the actual module
 var storeFactory = sinon.stub();
-global.stubRequire('src/lib/store/api', storeFactory);
 
 var generateIdMock = require('../../mocks/utils/generate_id');
-global.stubRequire('src/utils/generate_id', generateIdMock);
-
 var localStorageMock = require('../../mocks/utils/local_storage_wrapper');
-global.stubRequire('src/utils/local_storage_wrapper', localStorageMock);
-
 var hoodieLocalStore = require('../../../src/hoodie/store');
+
 var extend = require('extend');
 
 describe('hoodie.store', function() {
+
+  before(function () {
+    global.stubRequire('src/lib/store/api', storeFactory);
+    global.stubRequire('src/utils/generate_id', generateIdMock);
+    global.stubRequire('src/utils/local_storage_wrapper', localStorageMock);
+  });
 
   after(function() {
     global.unstubRequire('src/lib/store/api');

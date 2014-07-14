@@ -4,13 +4,15 @@ var generateIdMock = require('../../mocks/utils/generate_id');
 var configMock = require('../../mocks/utils/config');
 var getDefer = require('../../../src/utils/promise/defer');
 
-global.stubRequire('src/utils/generate_id', generateIdMock);
-global.stubRequire('src/utils/config', configMock);
-
 var hoodieAccount = require('../../../src/hoodie/account');
 var extend = require('extend');
 
 describe('hoodie.account', function() {
+
+  before(function () {
+    global.stubRequire('src/utils/generate_id', generateIdMock);
+    global.stubRequire('src/utils/config', configMock);
+  });
 
   after(function (){
     global.unstubRequire('src/utils/generate_id');

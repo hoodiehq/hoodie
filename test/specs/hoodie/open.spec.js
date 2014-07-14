@@ -1,11 +1,13 @@
 require('../../lib/setup');
-var remoteStoreStub = sinon.stub();
 
-// stub the requires before loading the actual module
-global.stubRequire('src/lib/store/remote', remoteStoreStub);
+var remoteStoreStub = sinon.stub();
 var hoodieOpen = require('../../../src/hoodie/open');
 
 describe('#open(store, options)', function() {
+
+  before(function () {
+    global.stubRequire('src/lib/store/remote', remoteStoreStub);
+  });
 
   beforeEach(function() {
     this.hoodie = this.MOCKS.hoodie.apply(this);
