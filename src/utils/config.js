@@ -1,7 +1,7 @@
 // Hoodie Config API
 // ===================
 
-var localStorageWrapper = require('../utils/local_storage_wrapper');
+var localStorageWrapper = require('../utils/local_storage_wrapper')();
 var extend = require('extend');
 
 var exports = module.exports = function(storeKey) {
