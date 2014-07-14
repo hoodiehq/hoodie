@@ -4,7 +4,7 @@ require('../../lib/setup');
 var storeFactory = sinon.stub();
 
 var generateIdMock = require('../../mocks/utils/generate_id');
-var localStorageMock = require('../../mocks/utils/local_storage_wrapper');
+var localStorageMock = require('../../mocks/utils/local_storage_wrapper')();
 var hoodieLocalStore = require('../../../src/hoodie/store');
 
 var extend = require('extend');
