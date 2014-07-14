@@ -1,6 +1,6 @@
 require('../../lib/setup');
 
-var config = require('../../../src/utils/config');
+var config = require('../../../src/utils/config')();
 var hoodieAccountRemote = require('../../../src/hoodie/remote');
 
 describe('hoodie.remote', function() {
