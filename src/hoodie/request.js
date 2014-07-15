@@ -18,7 +18,7 @@
 // * HoodieConflictError
 // * HoodieServerError
 
-var hoodiefyRequestErrorName = require('../utils/hoodiefy_request_error_name');
+var hoodiefyRequestErrorName = require('../utils/hoodiefy_request_error_name')();
 var extend = require('extend');
 var rejectWith = require('../utils/promise/reject_with');
 
