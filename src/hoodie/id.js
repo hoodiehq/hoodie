@@ -1,7 +1,7 @@
 // hoodie.id
 // =========
 
-var generateId = require('../utils/generate_id');
+var generateId = require('../utils/generate_id')();
 var config = require('../utils/config')();
 
 // generates a random id and persists using config

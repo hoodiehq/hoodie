@@ -3,7 +3,7 @@
 
 var hoodieEvents = require('../lib/events');
 var extend = require('extend');
-var generateId = require('../utils/generate_id');
+var generateId = require('../utils/generate_id')();
 var config = require('../utils/config');
 
 var getDefer = require('../utils/promise/defer');

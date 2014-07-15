@@ -5,7 +5,7 @@
 var hoodieStoreApi = require('../lib/store/api');
 var HoodieObjectTypeError = require('../lib/error/object_type');
 var HoodieObjectIdError = require('../lib/error/object_id');
-var generateId = require('../utils/generate_id');
+var generateId = require('../utils/generate_id')();
 
 var extend = require('extend');
 

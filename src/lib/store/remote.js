@@ -38,7 +38,7 @@
 
 var hoodieStoreApi = require('./api');
 var extend = require('extend');
-var generateId = require('../../utils/generate_id');
+var generateId = require('../../utils/generate_id')();
 var resolveWith = require('../../utils/promise/resolve_with');
 
 //
