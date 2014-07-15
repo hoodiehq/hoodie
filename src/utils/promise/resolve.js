@@ -6,5 +6,4 @@ module.exports = function resolve() {
   deferred.resolve();
 
   return deferred.promise;
-
 };

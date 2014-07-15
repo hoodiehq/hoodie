@@ -6,6 +6,4 @@ module.exports = function resolveWith() {
   deferred.resolve.apply(deferred, arguments);
 
   return deferred.promise;
-
 };
-

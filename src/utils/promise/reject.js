@@ -6,6 +6,4 @@ module.exports = function reject() {
   deferred.reject();
 
   return deferred.promise;
-
 };
-

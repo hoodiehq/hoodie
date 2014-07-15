@@ -1,10 +1,9 @@
-if (typeof global.Promise === 'function') {
-  exports.Promise = global.Promise;
-} else {
-  exports.Promise = require('bluebird');
-}
-
-var Promise = exports.Promise;
+var Promise = exports.Promise = (function() {
+  if (typeof global.Promise === 'function') {
+    return global.Promise;
+  }
+  return require('bluebird');
+})();
 
 module.exports = function Defer() {
   var resolve, reject, promise;
@@ -19,6 +18,4 @@ module.exports = function Defer() {
     reject: reject,
     promise: promise
   };
-
 };
-
