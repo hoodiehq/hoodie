@@ -3,7 +3,7 @@ require('../../lib/setup');
 // stub the requires before loading the actual module
 var storeFactory = sinon.stub();
 
-var generateIdMock = require('../../mocks/utils/generate_id');
+var generateIdMock = require('../../mocks/utils/generate_id')();
 var localStorageMock = require('../../mocks/utils/local_storage_wrapper')();
 var hoodieLocalStore = require('../../../src/hoodie/store');
 

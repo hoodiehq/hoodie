@@ -1,6 +1,6 @@
 require('../../lib/setup');
 
-var generateIdMock = require('../../mocks/utils/generate_id');
+var generateIdMock = require('../../mocks/utils/generate_id')();
 var configMock = require('../../mocks/utils/config');
 var getDefer = require('../../../src/utils/promise/defer');
 
