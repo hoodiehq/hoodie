@@ -6,106 +6,90 @@
 //
 var hoodieEvents = require('../events');
 
-//
-function hoodieScopedStoreApi(hoodie, storeApi, options) {
-
-  // name
+var exports = module.exports = function (hoodie, storeApi, options) {
+  var api = {};
+  var id = options.id;
   var storeName = options.name || 'store';
   var type = options.type;
-  var id = options.id;
 
-  var api = {};
-
-  // scoped by type only
-  if (!id) {
-
-    // add events
-    hoodieEvents(hoodie, {
-      context: api,
-      namespace: storeName + ':' + type
-    });
-
-    //
-    api.save = function save(id, properties, options) {
-      return storeApi.save(type, id, properties, options);
-    };
-
-    //
-    api.add = function add(properties, options) {
-      return storeApi.add(type, properties, options);
-    };
-
-    //
-    api.find = function find(id) {
-      return storeApi.find(type, id);
-    };
-
-    //
-    api.findOrAdd = function findOrAdd(id, properties) {
-      return storeApi.findOrAdd(type, id, properties);
-    };
-
-    //
-    api.findAll = function findAll(options) {
-      return storeApi.findAll(type, options);
-    };
-
-    //
-    api.update = function update(id, objectUpdate, options) {
-      return storeApi.update(type, id, objectUpdate, options);
-    };
-
-    //
-    api.updateAll = function updateAll(objectUpdate, options) {
-      return storeApi.updateAll(type, objectUpdate, options);
-    };
-
-    //
-    api.remove = function remove(id, options) {
-      return storeApi.remove(type, id, options);
-    };
-
-    //
-    api.removeAll = function removeAll(options) {
-      return storeApi.removeAll(type, options);
-    };
-  }
-
-  // scoped by both: type & id
-  if (id) {
-
-    // add events
-    hoodieEvents(hoodie, {
-      context: api,
-      namespace: storeName + ':' + type + ':' + id
-    });
-
-    //
-    api.save = function save(properties, options) {
-      return storeApi.save(type, id, properties, options);
-    };
-
-    //
-    api.find = function find() {
-      return storeApi.find(type, id);
-    };
-
-    //
-    api.update = function update(objectUpdate, options) {
-      return storeApi.update(type, id, objectUpdate, options);
-    };
-
-    //
-    api.remove = function remove(options) {
-      return storeApi.remove(type, id, options);
-    };
-  }
+  // add events
+  hoodieEvents(hoodie, {
+    context: api,
+    namespace: [storeName, type, id].join(':').replace(/:$/,'')
+  });
 
   //
   api.decoratePromises = storeApi.decoratePromises;
   api.validate = storeApi.validate;
 
-  return api;
-}
+  // scoped by both: type & id
+  if (id) {
+    ['save', 'find', 'update', 'remove'].forEach(function(method) {
+      api[method] = exports[method].bind(null, storeApi, type, id);
+    });
 
-module.exports = hoodieScopedStoreApi;
+    return api;
+  }
+
+  // scoped by type only
+  [
+    'save',
+    'add',
+    'find',
+    'findOrAdd',
+    'findAll',
+    'update',
+    'updateAll',
+    'remove',
+    'removeAll'
+  ].forEach(function(method) {
+    api[method] = exports[method].bind(null, storeApi, type);
+  });
+
+  return api;
+};
+
+//
+exports.save = function save(storeApi, type, id, properties, options) {
+  return storeApi.save(type, id, properties, options);
+};
+
+//
+exports.add = function add(storeApi, type, properties, options) {
+  return storeApi.add(type, properties, options);
+};
+
+//
+exports.find = function find(storeApi, type, id)  {
+  return storeApi.find(type, id);
+};
+
+//
+exports.findOrAdd = function findOrAdd(storeApi, type, id, properties) {
+  return storeApi.findOrAdd(type, id, properties);
+};
+
+//
+exports.findAll = function findAll(storeApi, type, options) {
+  return storeApi.findAll(type, options);
+};
+
+//
+exports.update = function update(storeApi, type, id, objectUpdate, options) {
+  return storeApi.update(type, id, objectUpdate, options);
+};
+
+//
+exports.updateAll = function updateAll(storeApi, type, objectUpdate, options) {
+  return storeApi.updateAll(type, objectUpdate, options);
+};
+
+//
+exports.remove = function remove(storeApi, type, id, options) {
+  return storeApi.remove(type, id, options);
+};
+
+//
+exports.removeAll = function removeAll(storeApi, type, options) {
+  return storeApi.removeAll(type, options);
+};
