@@ -1,24 +1,26 @@
 language: node_js
 node_js:
-  - '0.10'
+- '0.10'
 before_script:
-  - npm install -g grunt-cli
+- npm install -g grunt-cli
 after_success:
-  - grunt ghrelease
+- grunt ghrelease
 services:
-  - couchdb
+- couchdb
 notifications:
   irc:
     channels:
-      - irc.freenode.net#hoodie
+    - irc.freenode.net#hoodie
     use_notice: false
     skip_join: true
+env:
+  global:
+    secure: XsrDeTJKI8++Pn+delTyGxoDz/oUmBDyz9wEA3PzervvsGcYi7r6laUvGEzro78+HYze1nDmHJV13O2oDXY/P6Y2A0mmOm5T8bpiaRbNRPtSdaJi0aC6e7e+As/vPl9N+LKr6IJMrW+TEwtpp4BB63SKGL07duNKysHJn1tCxo4=
 deploy:
   provider: npm
-  email: me@svenlito.com
+  email: stephan@thehoodiefirm.com
   api_key:
-    secure: SyrsOUC9vC6RnZ9aiLv8zgYSSR02F+m3eMuTfTLRSrK4lSnA8EDCZR1w+CyUiOT0rV2UBDm+2ZbdMD/yxHAebTBdXDHEszA5cwCZbjrBxtniHcmo8AHNOONiFGrS3azTMqQsJMcB6WXo5QL54qD2yY0IRt86YfQFXuIA4408+C0=
+    secure: Rm83345BReBNviK1yDwROvgeosHlm5XRcySikhGLCa/eVUtAw5mGC0SGltoo2tJoEnYgDyUIcOpn/MScCzwnGVsKePCkLz1Ccf4jr8wh3QchDjvGZ78R1dijaVnnV2EtMr1HMea28aLDxHgldCKRwbuZ4le/4qGuYatyxComtDM=
   on:
     all_branches: true
     tags: true
-    repo: hoodiehq/hoodie-server
