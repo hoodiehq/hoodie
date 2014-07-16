@@ -302,6 +302,9 @@ function hoodieRemoteStore(hoodie, options) {
   //
   remote.disconnect = function disconnect() {
     remote.connected = false;
+    // https://github.com/hoodiehq/hoodie.js/issues/342
+    pushedObjectRevisions = {};
+
     remote.trigger('disconnect'); // TODO: spec that
     if (pullRequest) {
       pullRequest.abort();
