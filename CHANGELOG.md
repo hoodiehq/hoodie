@@ -1,3 +1,18 @@
+<a name="1.1.0"></a>
+## 1.1.0 (2014-07-17)
+
+
+#### Bug Fixes
+
+* **environment:** Change `custom_ports` option to `custom-ports` as descibed in help. ([e4f0ec53](https://github.com/hoodiehq/hoodie-server/commit/e4f0ec5375d844b936b6dbc7d176368c1442192a))
+* **options:** reverse order of custom ports arguments ([e76b8493](https://github.com/hoodiehq/hoodie-server/commit/e76b849371bb9a154ec08dc79803e36f502c8763))
+
+
+#### Features
+
+* **environment:** Permit users to specify custom ports with hoodie start --custom-ports 1111,2222, ([796105c2](https://github.com/hoodiehq/hoodie-server/commit/796105c2388a83a68aeb7a4b286d76399fd59b99))
+
+
 <a name="1.0.0"></a>
 ## 1.0.0 (2014-07-14)
 
