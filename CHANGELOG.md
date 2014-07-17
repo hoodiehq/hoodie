@@ -1,3 +1,12 @@
+<a name="1.1.1"></a>
+### 1.1.1 (2014-07-17)
+
+
+#### Bug Fixes
+
+* **custom-ports:** unify on `custom-ports` ([5bb8865a](https://github.com/hoodiehq/hoodie-server/commit/5bb8865a768f0052d223a50e4ed27f6763a69338))
+
+
 <a name="1.1.0"></a>
 ## 1.1.0 (2014-07-17)
 
