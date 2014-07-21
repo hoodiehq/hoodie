@@ -1,4 +1,5 @@
 require('../../lib/setup');
+
 var hoodieConnection = require('../../../src/hoodie/connection');
 
 describe('#checkConnection()', function() {
@@ -73,8 +74,6 @@ describe('#checkConnection()', function() {
         this.hoodie.checkConnection();
       });
 
-      // skipping these because they seem to cause strange error:
-      // the string 'TypeError: 'undefined' is not an object (evaluating 'hoodie.request('GET', '/').then')' was thrown, throw an Error :)
       it('should check again in 3 seconds', function() {
         expect(global.setTimeout).to.be.calledWith(this.hoodie.checkConnection, 3000);
       });

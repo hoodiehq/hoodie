@@ -35,9 +35,17 @@ describe('hoodie promises API', function() {
       expect(typeof resolve()).to.be('object');
     });
 
-    it.skip('should be applyable', function() {
+    it('should be applyable', function (done) {
       var promise = reject().then(null, resolve);
-      expect(promise).to.be.resolved();
+
+      promise.then(function () {
+        expect(promise).to.be.resolved();
+        done();
+      }).catch(function () {
+        expect(promise).to.be.resolved();
+        done();
+      });
+
     });
 
   });
@@ -48,9 +56,16 @@ describe('hoodie promises API', function() {
       expect(typeof reject()).to.be('object');
     });
 
-    it.skip('should be applyable', function() {
-      var promise = resolve();
-      expect(promise).to.be.rejected();
+    it('should be applyable', function(done) {
+      var promise = reject();
+
+      promise.then(function () {
+        expect(promise).to.be.rejected();
+        done();
+      }).catch(function () {
+        expect(promise).to.be.rejected();
+        done();
+      });
     });
 
   });

@@ -2,6 +2,7 @@
 // We stick to lowercase letters to prevent confusion
 // and to prevent issues with CouchDB, e.g. database
 // names only allow for lowercase letters.
+
 var exports = module.exports = function(chars) {
   chars = chars || '0123456789abcdefghijklmnopqrstuvwxyz'.split('');
 
@@ -26,3 +27,4 @@ exports.generateId = function(chars, length) {
 
   return id;
 };
+

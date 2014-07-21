@@ -89,6 +89,7 @@ describe('hoodieScopedTaskFactory', function() {
         namespace: 'task:message:abc'
       });
     });
+
   }); // 'when scoped by type only'
 
 });

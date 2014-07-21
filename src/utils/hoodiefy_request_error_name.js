@@ -11,3 +11,4 @@ exports.hoodiefyRequestErrorName = function(findLettersToUpperCase, name) {
 
   return 'Hoodie' + name + 'Error';
 };
+

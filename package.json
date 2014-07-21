@@ -58,9 +58,6 @@
     "load-grunt-tasks": "~0.2.1",
     "sinon": "~1.7.1"
   },
-  "browser": {
-    "bluebird": "lie"
-  },
   "scripts": {
     "test": "grunt test --verbose",
     "build": "grunt build --verbose"

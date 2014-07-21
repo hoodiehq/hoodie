@@ -1,3 +1,4 @@
+
 var exports = module.exports = function() {
   if (!exports.hasLocalStorage()) {
     return exports.createWrapper(exports.localStub, false);

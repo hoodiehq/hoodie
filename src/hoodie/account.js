@@ -13,7 +13,7 @@ var rejectWith = require('../utils/promise/reject_with');
 var resolveWith = require('../utils/promise/resolve_with');
 
 //
-function hoodieAccount(hoodie) {
+module.exports = function hoodieAccount(hoodie) {
   // public API
   var account = {};
 
@@ -1200,6 +1200,5 @@ function hoodieAccount(hoodie) {
   // expose public account API
   //
   hoodie.account = account;
-}
+};
 
-module.exports = hoodieAccount;
