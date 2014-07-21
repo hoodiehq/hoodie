@@ -32,7 +32,7 @@
   },
   "scripts": {
     "start": "bin/start",
-    "test": "grunt test --verbose"
+    "test": "grunt ci --verbose"
   },
   "engines": {
     "node": ">=0.10.22"
@@ -43,7 +43,7 @@
     "grunt-contrib-jshint": "^0.6.2",
     "grunt-contrib-nodeunit": "^0.2.2",
     "grunt-contrib-watch": "^0.5.1",
-    "grunt-release-hoodie": "^1.3.0",
+    "grunt-release-hoodie": "^1.4.1",
     "grunt-simple-mocha": "^0.4.0",
     "load-grunt-tasks": "^0.4.0",
     "mocha": "*",

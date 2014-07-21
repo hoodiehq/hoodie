@@ -56,4 +56,5 @@ module.exports = function (grunt) {
 
   // Default task.
   grunt.registerTask('default', ['test']);
+  grunt.registerTask('ci', ['test', 'integration-test']);
 };
