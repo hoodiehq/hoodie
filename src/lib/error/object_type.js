@@ -6,28 +6,23 @@
 // with a letter.
 //
 var HoodieError = require('./error');
-var validTypePattern = /^[a-z$][a-z0-9-]+$/;
+var validation = require('./validation');
 
-// Hoodie Invalid Type Or Id Error
-// -------------------------------
+module.exports = (function() {
+  var validTypePattern = /^[a-z$][a-z0-9-]+$/;
 
-// only lowercase letters, numbers and dashes
-// are allowed for object types, plus must start
-// with a letter.
-//
-var HoodieObjectTypeError = module.exports = function (properties) {
-  properties.name = 'HoodieObjectTypeError';
-  properties.message = '"{{type}}" is invalid object type. {{rules}}.';
+  function HoodieObjectTypeError(properties) {
+    properties.name = 'HoodieObjectTypeError';
+    properties.message = '"{{type}}" is invalid object type. {{rules}}.';
 
-  return new HoodieError(properties);
-};
+    return new HoodieError(properties);
+  }
 
-HoodieObjectTypeError.isInvalid = function(type, customPattern) {
-  return !(customPattern || validTypePattern).test(type || '');
-};
+  HoodieObjectTypeError.isValid = validation.isValid.bind(null, validTypePattern);
+  HoodieObjectTypeError.isInvalid = validation.isInvalid.bind(null, validTypePattern);
 
-HoodieObjectTypeError.isValid = function(type, customPattern) {
-  return (customPattern || validTypePattern).test(type || '');
-};
+  HoodieObjectTypeError.prototype.rules = 'lowercase letters, numbers and dashes allowed only. Must start with a letter';
 
-HoodieObjectTypeError.prototype.rules = 'lowercase letters, numbers and dashes allowed only. Must start with a letter';
+  return HoodieObjectTypeError;
+})();
+
