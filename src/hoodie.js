@@ -97,9 +97,6 @@ var Hoodie = module.exports = function (baseUrl) {
   // cleanup config on signout
   hoodie.on('account:cleanup', utils.config.clear);
 
-  // init hoodieId
-  hoodie.id.init();
-
   // set username from config (local store)
   hoodie.account.username = utils.config.get('_account.username');
 
@@ -114,7 +111,6 @@ var Hoodie = module.exports = function (baseUrl) {
 
   // subscribe to cross events
   hoodie.account.subscribeToOutsideEvents();
-  hoodie.id.subscribeToOutsideEvents();
   hoodie.store.subscribeToOutsideEvents();
   hoodie.remote.subscribeToOutsideEvents();
   hoodie.task.subscribeToOutsideEvents();
