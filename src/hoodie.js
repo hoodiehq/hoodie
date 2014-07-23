@@ -100,9 +100,6 @@ var Hoodie = module.exports = function (baseUrl) {
   // set username from config (local store)
   hoodie.account.username = utils.config.get('_account.username');
 
-  // init hoodie.remote API
-  hoodie.remote.init();
-
   // check for pending password reset
   hoodie.account.checkPasswordReset();
 
@@ -112,7 +109,6 @@ var Hoodie = module.exports = function (baseUrl) {
   // subscribe to cross events
   hoodie.account.subscribeToOutsideEvents();
   hoodie.store.subscribeToOutsideEvents();
-  hoodie.remote.subscribeToOutsideEvents();
   hoodie.task.subscribeToOutsideEvents();
 
   // authenticate
