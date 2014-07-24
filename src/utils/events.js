@@ -1,4 +1,3 @@
-/*jshint forin: false */
 var EventEmitter = require('events').EventEmitter;
 var inherits = require('inherits');
 var extend = require('extend');
@@ -25,11 +24,11 @@ exports.METHODS = (function() {
   var METHODS = [];
   var pt = EventEmitter.prototype;
 
-  for (var fn in pt) {
+  Object.keys(pt).forEach(function(fn) {
     if (typeof pt[fn] === 'function') {
       METHODS.push(fn);
     }
-  }
+  });
 
   return METHODS.concat(Object.keys(exports.MAP));
 })();
