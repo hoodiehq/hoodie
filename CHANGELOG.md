@@ -1,3 +1,12 @@
+<a name="1.1.2"></a>
+### 1.1.2 (2014-07-23)
+
+
+#### Features
+
+* **config:** log where config is read from ([f9e72aac](https://github.com/hoodiehq/hoodie-server/commit/f9e72aacc0cf0d42c149eb586f0e2c1c4663ef01), closes [#69](https://github.com/hoodiehq/hoodie-server/issues/69))
+
+
 <a name="1.1.1"></a>
 ### 1.1.1 (2014-07-17)
 
