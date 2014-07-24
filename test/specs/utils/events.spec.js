@@ -20,6 +20,15 @@ describe('events', function() {
       expect(hoodie.once).to.be.a(Function);
     });
 
+    it('should map to scopedEventEmitter', function() {
+      this.sandbox.spy(hoodieEvents, 'scopedEventEmitter');
+
+      var hoodie = {};
+      hoodieEvents(hoodie);
+      hoodieEvents(hoodie, {}, 'foo');
+
+      expect(hoodieEvents.scopedEventEmitter.calledOnce).to.be.ok();
+    });
   });
 
   describe('METHODS', function() {

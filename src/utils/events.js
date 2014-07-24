@@ -4,7 +4,11 @@ var inherits = require('inherits');
 var extend = require('extend');
 
 
-var exports = module.exports = function(hoodie) {
+var exports = module.exports = function(hoodie, context, namespace) {
+  if (context && namespace) {
+    return exports.scopedEventEmitter.apply(null, arguments);
+  }
+
   var emitter = new exports.HoodieEventEmitter();
   extend(hoodie, emitter);
   return emitter;
