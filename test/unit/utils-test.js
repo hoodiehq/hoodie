@@ -5,7 +5,7 @@ var _ = require('lodash');
 describe('utils', function () {
 
   it('should expose n number of properties', function () {
-    expect(_.size(utils)).to.eql(7);
+    expect(_.size(utils)).to.eql(8);
   });
 
   it('should have a generatePassword property', function () {
@@ -34,6 +34,10 @@ describe('utils', function () {
 
   it('should have a hconsole property', function () {
     expect(utils).to.have.property('hconsole');
+  });
+
+  it('should have a showConfigPath property', function () {
+    expect(utils).to.have.property('showConfigPath');
   });
 
 });
