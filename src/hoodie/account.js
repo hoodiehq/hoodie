@@ -1,16 +1,17 @@
 // Hoodie.Account
 // ================
 
-var hoodieEvents = require('../lib/events');
 var extend = require('extend');
-var generateId = require('../utils/generate_id')();
-var config = require('../utils/config');
+var utils = require('../utils');
 
-var getDefer = require('../utils/promise/defer');
-var reject = require('../utils/promise/reject');
-var resolve = require('../utils/promise/resolve');
-var rejectWith = require('../utils/promise/reject_with');
-var resolveWith = require('../utils/promise/resolve_with');
+var config = utils.config;
+var generateId = utils.generateId;
+
+var getDefer = utils.promise.defer;
+var reject = utils.promise.reject;
+var resolve = utils.promise.resolve;
+var rejectWith = utils.promise.rejectWith;
+var resolveWith = utils.promise.resolveWith;
 
 //
 module.exports = function hoodieAccount(hoodie) {
@@ -31,10 +32,7 @@ module.exports = function hoodieAccount(hoodie) {
   var userDocPrefix = 'org.couchdb.user';
 
   // add events API
-  hoodieEvents(hoodie, {
-    context: account,
-    namespace: 'account'
-  });
+  utils.events(hoodie, account, 'account');
 
   // Authenticate
   // --------------
