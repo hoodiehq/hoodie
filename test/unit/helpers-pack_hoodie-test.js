@@ -1,8 +1,6 @@
-var path = require('path');
 var Stream = require('stream');
 var expect = require('expect.js');
 var hoodiejs = require('../../lib/helpers/pack_hoodie');
-var _ = require('lodash');
 
 describe('pack_hoodie', function () {
 
@@ -14,6 +12,9 @@ describe('pack_hoodie', function () {
   });
 
   it('should return a readable stream on empty cache', function (done) {
+
+    this.timeout(5000);
+
     var stream = hoodiejs(config);
 
     expect(stream).to.be.a(Stream);
