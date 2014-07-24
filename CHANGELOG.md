@@ -1,3 +1,12 @@
+<a name="1.2.2"></a>
+### 1.2.2 (2014-07-24)
+
+
+#### Features
+
+* **hapi:** upgrade hapi to version 6 ([487a32b9](https://github.com/hoodiehq/hoodie-server/commit/487a32b954c7f03bd1e87264ab052c891ca82239))
+
+
 <a name="1.2.1"></a>
 ### 1.2.1 (2014-07-24)
 
