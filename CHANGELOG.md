@@ -1,3 +1,19 @@
+<a name="1.2.0"></a>
+## 1.2.0 (2014-07-24)
+
+
+#### Bug Fixes
+
+* **config:** only show config location once ([aa342d21](https://github.com/hoodiehq/hoodie-server/commit/aa342d213342d49aae9285dab48e33e4a86519c7))
+* **environment:** consolidate cfg / config/ env variables inside hoodie server. #294 ([2a91c593](https://github.com/hoodiehq/hoodie-server/commit/2a91c593afb7fcd63330fb679a4cd75852a3247b))
+* **jshint:** fix errors ([7b149aef](https://github.com/hoodiehq/hoodie-server/commit/7b149aef4f8b7a92cf4f1a6c94bf3e9d58262f7d))
+
+
+#### Features
+
+* **logging:** adds verbose argument ([694644ae](https://github.com/hoodiehq/hoodie-server/commit/694644aef025d897f5c1e299c107cf4062942f6e))
+
+
 <a name="1.1.2"></a>
 ### 1.1.2 (2014-07-23)
 
