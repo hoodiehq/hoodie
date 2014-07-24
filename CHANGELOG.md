@@ -1,3 +1,12 @@
+<a name="1.2.1"></a>
+### 1.2.1 (2014-07-24)
+
+
+#### Bug Fixes
+
+* **data_path:** fix lost data_path commits ([9fc6fc70](https://github.com/hoodiehq/hoodie-server/commit/9fc6fc70a8f9ca45f038104cd44409688a1c9a69))
+
+
 <a name="1.2.0"></a>
 ## 1.2.0 (2014-07-24)
 
