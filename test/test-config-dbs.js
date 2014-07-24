@@ -1,7 +1,7 @@
 var couchr = require('couchr'),
     async = require('async'),
     environment = require('../lib/core/environment'),
-    config = require('../lib/core/config'),
+    configStore = require('../lib/core/config_store'),
     app = require('../lib/index'),
     path = require('path'),
     url = require('url'),
@@ -45,7 +45,7 @@ exports['check config dbs are private to admin'] = function (test) {
         },
         function (cb) {
           var appdb = url.resolve(cfg.couch.url, '/app');
-          config.getCouchCredentials(cfg, function (err, username, password) {
+          configStore.getCouchCredentials(cfg, function (err, username, password) {
             var parsed = url.parse(appdb);
             parsed.auth = username + ':' + password;
             appdb = url.format(parsed);
@@ -57,7 +57,7 @@ exports['check config dbs are private to admin'] = function (test) {
         },
         function (cb) {
           var plugindb = url.resolve(cfg.couch.url, '/plugins');
-          config.getCouchCredentials(cfg, function (err, username, password) {
+          configStore.getCouchCredentials(cfg, function (err, username, password) {
             if (err) {
               return test.done(err);
             }
