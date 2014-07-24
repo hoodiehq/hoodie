@@ -97,6 +97,43 @@ describe('events', function() {
       expect(cb.calledOnce).to.be.ok();
     });
 
+    it('should listen to deeply scoped events', function() {
+      var hoodie = {};
+      hoodieEvents(hoodie);
+
+      var context = {};
+      var namespace = 'test';
+
+      hoodieEvents.scopedEventEmitter(hoodie, context, namespace);
+      expect(context.on).to.be.a(Function);
+
+      var deepContext = {};
+      var deepNamespace = namespace + ':foo';
+
+      hoodieEvents.scopedEventEmitter(hoodie, deepContext, deepNamespace);
+
+      var cb = this.sandbox.spy();
+      hoodie.on('test:foo:bar', cb);
+
+      var ctxCb = this.sandbox.spy();
+      context.on('foo:bar', ctxCb);
+
+      var deepCb = this.sandbox.spy();
+      deepContext.on('bar', deepCb);
+
+      var data = {bar: 'bar'};
+      deepContext.emit('bar', data);
+
+      expect(cb.calledWithExactly(data)).to.be.ok();
+      expect(cb.calledOnce).to.be.ok();
+
+      expect(ctxCb.calledWithExactly(data)).to.be.ok();
+      expect(ctxCb.calledOnce).to.be.ok();
+
+      expect(deepCb.calledWithExactly(data)).to.be.ok();
+      expect(deepCb.calledOnce).to.be.ok();
+    });
+
   });
 
 });
