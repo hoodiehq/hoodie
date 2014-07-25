@@ -91,7 +91,6 @@ var Hoodie = module.exports = function (baseUrl) {
 
   // subscribe to cross events
   hoodie.store.subscribeToOutsideEvents();
-  hoodie.task.subscribeToOutsideEvents();
 
   // authenticate
   // we use a closure to not pass the username to connect, as it
