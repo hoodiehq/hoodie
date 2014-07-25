@@ -15,6 +15,13 @@ var exports = module.exports = function(hoodie) {
 
   hoodie.checkConnection = exports.checkConnection.bind(null, state);
   hoodie.isConnected = exports.isConnected.bind(null, state);
+
+  // check connection when browser goes online / offline
+  global.addEventListener('online', hoodie.checkConnection, false);
+  global.addEventListener('offline', hoodie.checkConnection, false);
+
+  // start checking connection
+  hoodie.checkConnection();
 };
 
 // Check Connection

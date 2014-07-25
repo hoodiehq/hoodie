@@ -100,13 +100,6 @@ var Hoodie = module.exports = function (baseUrl) {
     hoodie.remote.connect();
   });
 
-  // check connection when browser goes online / offline
-  global.addEventListener('online', hoodie.checkConnection, false);
-  global.addEventListener('offline', hoodie.checkConnection, false);
-
-  // start checking connection
-  hoodie.checkConnection();
-
   //
   // loading user extensions
   //
