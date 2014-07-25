@@ -32,16 +32,17 @@
 
 //
 var hoodieScopedStoreApi = require('./scoped');
-var hoodieEvents = require('../events');
 var HoodieError = require('../error/error');
 var HoodieObjectTypeError = require('../error/object_type');
 var HoodieObjectIdError = require('../error/object_id');
 var extend = require('extend');
 
-var getDefer = require('../../utils/promise/defer');
-var rejectWith = require('../../utils/promise/reject_with');
-var resolveWith = require('../../utils/promise/resolve_with');
-var isPromise = require('../../utils/promise/is_promise');
+var utils = require('../../utils');
+var promise = utils.promise;
+var getDefer = promise.defer;
+var rejectWith = promise.rejectWith;
+var resolveWith = promise.resolveWith;
+var isPromise = promise.isPromise;
 
 //
 function hoodieStoreApi(hoodie, options) {
@@ -68,12 +69,7 @@ function hoodieStoreApi(hoodie, options) {
     return hoodieScopedStoreApi(hoodie, api, scopedOptions);
   };
 
-  // add event API
-  hoodieEvents(hoodie, {
-    context: api,
-    namespace: storeName
-  });
-
+  utils.events(hoodie, api, storeName);
 
   // Validate
   // --------------

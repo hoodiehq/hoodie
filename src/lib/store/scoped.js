@@ -4,7 +4,7 @@
 // same as store, but with type preset to an initially
 // passed value.
 //
-var hoodieEvents = require('../events');
+var utils = require('../../utils');
 
 var exports = module.exports = function (hoodie, storeApi, options) {
   var api = {};
@@ -13,10 +13,11 @@ var exports = module.exports = function (hoodie, storeApi, options) {
   var type = options.type;
 
   // add events
-  hoodieEvents(hoodie, {
-    context: api,
-    namespace: [storeName, type, id].join(':').replace(/:$/,'')
-  });
+  utils.events(
+    hoodie,
+    api,
+    [storeName, type, id].join(':').replace(/:$/,'')
+  );
 
   //
   api.decoratePromises = storeApi.decoratePromises;

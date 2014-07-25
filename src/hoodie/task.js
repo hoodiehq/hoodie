@@ -20,13 +20,13 @@
 //     emailTasks.start( properties );
 //     emailTasks.abort('id123');
 //
-var hoodieEvents = require('../lib/events');
 var hoodieScopedTask = require('../lib/task/scoped');
 var HoodieError = require('../lib/error/error');
 
 var extend = require('extend');
 
-var getDefer = require('../utils/promise/defer');
+var utils = require('../utils');
+var getDefer = utils.promise.defer;
 
 //
 function hoodieTask(hoodie) {
@@ -40,11 +40,7 @@ function hoodieTask(hoodie) {
     };
 
   // add events API
-  hoodieEvents(hoodie, {
-    context: api,
-    namespace: 'task'
-  });
-
+  utils.events(hoodie, api, 'task');
 
   // start
   // -------

@@ -12,7 +12,6 @@ var hoodieLocalStore = require('./hoodie/store');
 var hoodieTask = require('./hoodie/task');
 var hoodieOpen = require('./hoodie/open');
 var hoodieRequest = require('./hoodie/request');
-var hoodieEvents = require('./lib/events');
 
 // for plugins
 var lib = require('./lib');
@@ -51,18 +50,11 @@ var Hoodie = module.exports = function (baseUrl) {
     extension(hoodie, lib, utils);
   };
 
+  utils.events(hoodie);
 
   //
   // Extending hoodie core
   //
-
-  // * hoodie.bind
-  // * hoodie.on
-  // * hoodie.one
-  // * hoodie.trigger
-  // * hoodie.unbind
-  // * hoodie.off
-  hoodie.extend(hoodieEvents);
 
   // * hoodie.isOnline
   // * hoodie.checkConnection
