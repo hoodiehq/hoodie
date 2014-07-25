@@ -86,20 +86,10 @@ var Hoodie = module.exports = function (baseUrl) {
   // Initializations
   //
 
-  // cleanup config on signout
-  hoodie.on('account:cleanup', utils.config.clear);
-
-  // set username from config (local store)
-  hoodie.account.username = utils.config.get('_account.username');
-
-  // check for pending password reset
-  hoodie.account.checkPasswordReset();
-
   // make sure removed but not yet synced objects get pushed.
   hoodie.store.bootstrapDirtyObjects();
 
   // subscribe to cross events
-  hoodie.account.subscribeToOutsideEvents();
   hoodie.store.subscribeToOutsideEvents();
   hoodie.task.subscribeToOutsideEvents();
 

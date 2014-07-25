@@ -4,7 +4,8 @@ var helpers = require('./helpers');
 
 module.exports = function(hoodie) {
   var account = {};
-  var username;
+  // set username from config (local store)
+  var username = utils.config.get('_account.username');
   var state = {
     // flag whether user is currently authenticated or not
     authenticated: null,
@@ -39,6 +40,12 @@ module.exports = function(hoodie) {
   });
 
   hoodie.on('remote:error:unauthenticated', helpers.reauthenticate.bind(null, state));
+
+  // cleanup config on signout
+  account.on('cleanup', utils.config.clear);
+
+  // check for pending password reset
+  account.checkPasswordReset();
 
   hoodie.account = account;
 };
