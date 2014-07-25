@@ -32,26 +32,10 @@ module.exports = function(hoodie) {
   };
 
   // public API
-  [
-    'authenticate',
-    'hasValidSession',
-    'hasInvalidSession',
-    'signUp',
-    'anonymousSignUp',
-    'hasAccount',
-    'hasAnonymousAccount',
-    'signIn',
-    'signOut',
-    'request',
-    'db',
-    'fetch',
-    'changePassword',
-    'resetPassword',
-    'checkPasswordReset',
-    'changeUsername',
-    'destroy'
-  ].forEach(function(method) {
-    account[method] = api[method].bind(null, state);
+  Object.keys(api).forEach(function(method) {
+    if (typeof api[method] === 'function') {
+      account[method] = api[method].bind(null, state);
+    }
   });
 
   hoodie.on('remote:error:unauthenticated', helpers.reauthenticate.bind(null, state));
