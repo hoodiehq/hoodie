@@ -3,10 +3,10 @@
 
 var extend = require('extend');
 
-var generateId = require('../../utils/generate_id')();
-var config = require('../../utils/config')();
-var promise = require('../../utils/promise');
-
+var utils = require('../../utils');
+var generateId = utils.generateId;
+var config = utils.config;
+var promise = utils.promise;
 var getDefer = promise.defer;
 var reject = promise.reject;
 var resolve = promise.resolve;
@@ -119,7 +119,7 @@ exports.signUp = function(state, username, password) {
   return exports.sendSignUpRequest(state, username, password)
     .done(function() {
       exports.setUsername(state, username);
-      account.trigger('signup', username);
+      state.events.emit('signup', username);
     });
 };
 
@@ -146,7 +146,7 @@ exports.anonymousSignUp = function(state) {
     exports.setAnonymousPassword(state, password);
   })
   .done(function() {
-    account.trigger('signup:anonymous');
+    state.events.emit('signup:anonymous');
   });
 };
 
@@ -218,20 +218,20 @@ exports.signIn = function(state, username, password, options) {
 
   return promise.done( function(newUsername, newHoodieId) {
     if (options.moveData) {
-      account.trigger('movedata');
+      state.events.emit('movedata');
     }
     if (!isReauthenticating && !options.moveData) {
       exports.cleanup(state);
     }
     if (isReauthenticating) {
       if (!isSilent) {
-        account.trigger('reauthenticated', newUsername);
+        state.events.emit('reauthenticated', newUsername);
       }
     } else {
       exports.setUsername(state, newUsername);
     }
     if (!isSilent) {
-      account.trigger('signin', newUsername, newHoodieId, options);
+      state.events.emit('signin', newUsername, newHoodieId, options);
     }
   });
 };
@@ -331,7 +331,7 @@ exports.changePassword = function(state, currentPassword, newPassword) {
   return exports.fetch(state)
     .then(exports.sendChangeUsernameAndPasswordRequest(state, currentPassword, null, newPassword))
     .done( function() {
-      account.trigger('changepassword');
+      state.events.emit('changepassword');
     });
 };
 
@@ -383,7 +383,7 @@ exports.resetPassword = function(state, username) {
       .done(exports.checkPasswordReset.bind(null, state))
       .then(exports.awaitPasswordResetResult.bind(null, state))
       .done(function() {
-        account.trigger('resetpassword');
+        state.events.emit('resetpassword');
       });
   });
 };
@@ -434,7 +434,7 @@ exports.checkPasswordReset = function(state) {
           global.setTimeout(exports.checkPasswordReset.bind(null, state), 1000);
           return;
         }
-        return account.trigger('error:passwordreset', error, username);
+        return state.events.emit('error:passwordreset', error, username);
       });
   });
 };
@@ -458,7 +458,7 @@ exports.changeUsername = function(state, currentPassword, newUsername) {
     return exports.changeUsernameAndPassword(state, currentPassword, newUsername.toLowerCase())
     .done( function() {
       exports.setUsername(state, newUsername);
-      account.trigger('changeusername', newUsername);
+      state.events.emit('changeusername', newUsername);
     });
   }
   return rejectWith({
@@ -508,7 +508,7 @@ exports.anonymousSignIn = function(state) {
   var password = exports.getAnonymousPassword(state);
   return exports.signIn(username, password)
     .done(function() {
-      account.trigger('signin:anonymous', username);
+      state.events.emit('signin:anonymous', username);
     });
 };
 
@@ -554,7 +554,7 @@ exports.handleAuthenticateRequestSuccess = function(state, response) {
   }
 
   state.authenticated = false;
-  account.trigger('error:unauthenticated');
+  state.events.emit('error:unauthenticated');
   return reject();
 };
 
@@ -733,7 +733,7 @@ exports.handlePasswordResetStatusRequestError = function(state, username) {
   return function(error) {
     if (error.name === 'HoodieUnauthorizedError') {
       config.unset('_account.resetPasswordId');
-      account.trigger('passwordreset', username);
+      state.events.emit('passwordreset', username);
 
       return resolve();
     } else {
@@ -750,15 +750,15 @@ exports.handlePasswordResetStatusRequestError = function(state, username) {
 exports.awaitPasswordResetResult = function(state) {
   var defer = getDefer();
 
-  account.one('passwordreset', defer.resolve );
-  account.on('error:passwordreset', exports.removePasswordResetObject.bind(null, state));
-  account.on('error:passwordreset', defer.reject );
+  state.events.once('passwordreset', defer.resolve );
+  state.events.on('error:passwordreset', exports.removePasswordResetObject.bind(null, state));
+  state.events.on('error:passwordreset', defer.reject );
 
   // clean up callbacks when either gets called
   defer.always( function() {
-    account.unbind('passwordreset', defer.resolve );
-    account.unbind('error:passwordreset', exports.removePasswordResetObject.bind(null, state));
-    account.unbind('error:passwordreset', defer.reject );
+    state.events.removeListener('passwordreset', defer.resolve );
+    state.events.removeListener('error:passwordreset', exports.removePasswordResetObject.bind(null, state));
+    state.events.removeListener('error:passwordreset', defer.reject );
   });
 
   return defer.promise();
@@ -822,7 +822,7 @@ exports.upgradeAnonymousAccount = function(state, username, password) {
 
   return exports.changeUsernameAndPassword(state, currentPassword, username, password)
     .done(function() {
-      account.trigger('signup', username);
+      state.events.emit('signup', username);
       exports.removeAnonymousPassword(state);
     });
 };
@@ -868,7 +868,7 @@ exports.handleFetchBeforeDestroyError = function(state, error) {
 exports.cleanup = function(state) {
 
   // allow other modules to clean up local data & caches
-  account.trigger('cleanup');
+  state.events.emit('cleanup');
   state.authenticated = undefined;
   exports.setUsername(undefined);
 
@@ -887,7 +887,7 @@ exports.disconnect = function(state) {
 exports.cleanupAndTriggerSignOut = function(state) {
   var username = account.username;
   return exports.cleanup(state).then(function() {
-    return account.trigger('signout', username);
+    return state.events.emit('signout', username);
   });
 };
 
