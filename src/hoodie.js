@@ -12,7 +12,6 @@ var hoodieLocalStore = require('./hoodie/store');
 var hoodieTask = require('./hoodie/task');
 var hoodieOpen = require('./hoodie/open');
 var hoodieRequest = require('./hoodie/request');
-var hoodieEvents = require('./lib/events');
 
 // for plugins
 var lib = require('./lib');
@@ -51,18 +50,11 @@ var Hoodie = module.exports = function (baseUrl) {
     extension(hoodie, lib, utils);
   };
 
+  utils.events(hoodie);
 
   //
   // Extending hoodie core
   //
-
-  // * hoodie.bind
-  // * hoodie.on
-  // * hoodie.one
-  // * hoodie.trigger
-  // * hoodie.unbind
-  // * hoodie.off
-  hoodie.extend(hoodieEvents);
 
   // * hoodie.isOnline
   // * hoodie.checkConnection
@@ -97,14 +89,8 @@ var Hoodie = module.exports = function (baseUrl) {
   // cleanup config on signout
   hoodie.on('account:cleanup', utils.config.clear);
 
-  // init hoodieId
-  hoodie.id.init();
-
   // set username from config (local store)
   hoodie.account.username = utils.config.get('_account.username');
-
-  // init hoodie.remote API
-  hoodie.remote.init();
 
   // check for pending password reset
   hoodie.account.checkPasswordReset();
@@ -114,9 +100,7 @@ var Hoodie = module.exports = function (baseUrl) {
 
   // subscribe to cross events
   hoodie.account.subscribeToOutsideEvents();
-  hoodie.id.subscribeToOutsideEvents();
   hoodie.store.subscribeToOutsideEvents();
-  hoodie.remote.subscribeToOutsideEvents();
   hoodie.task.subscribeToOutsideEvents();
 
   // authenticate

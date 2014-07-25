@@ -6,66 +6,46 @@ var config = require('../utils/config')();
 
 // generates a random id and persists using config
 // until the user signs out or deletes local data
-function hoodieId (hoodie) {
-  var id;
-
-  function getId() {
-    if (! id) {
-      setId( generateId() );
-    }
-    return id;
-  }
-
-  function setId(newId) {
-    id = newId;
-
-    config.set('_hoodieId', newId);
-  }
-
-  function unsetId () {
-    id = undefined;
-    config.unset('_hoodieId');
-  }
-
-  //
-  // initialize
-  //
-  function init() {
-    id = config.get('_hoodieId');
-
-    // DEPRECATED, remove before 1.0
-    if (! id) {
-      id = config.get('_account.ownerHash');
-    }
-  }
-
-  // allow to run init only once from outside
-  getId.init = function() {
-    init();
-    delete getId.init;
+var exports = module.exports = function(hoodie) {
+  var state = {
+    id: config.get('_hoodieId')
   };
+
+  // DEPRECATED, remove before 1.0
+  if (!state.id) {
+    state.id = config.get('_account.ownerHash');
+  }
 
   //
   // subscribe to events coming from other modules
   //
-  function subscribeToOutsideEvents() {
-    hoodie.on('account:cleanup', unsetId);
-    hoodie.on('account:signin', function(username, hoodieId) {
-      setId(hoodieId);
-    });
-    hoodie.on('account:signin:anonymous', setId);
-  }
-
-  // allow to run this only once from outside
-  getId.subscribeToOutsideEvents = function() {
-    subscribeToOutsideEvents();
-    delete getId.subscribeToOutsideEvents;
-  };
+  hoodie.on('account:cleanup', exports.unsetId.bind(null, state));
+  hoodie.on('account:signin', function(username, hoodieId) {
+    exports.setId(state, hoodieId);
+  });
+  hoodie.on('account:signin:anonymous', exports.setId.bind(null, state));
 
   //
   // Public API
   //
-  hoodie.id = getId;
-}
+  hoodie.id = exports.id.bind(null, state);
+};
 
-module.exports = hoodieId;
+
+exports.id = function(state) {
+  if (!state.id) {
+    exports.setId(state, generateId());
+  }
+  return state.id;
+};
+
+exports.setId = function(state, newId) {
+  state.id = newId;
+
+  config.set('_hoodieId', state.id);
+};
+
+exports.unsetId = function(state) {
+  delete state.id;
+  config.unset('_hoodieId');
+};

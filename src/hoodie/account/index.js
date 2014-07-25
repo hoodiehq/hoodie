@@ -1,4 +1,4 @@
-var hoodieEvents = require('../../lib/events');
+var utils = require('../../utils');
 var api = require('./api');
 
 module.exports = function(hoodie) {
@@ -40,10 +40,11 @@ module.exports = function(hoodie) {
   });
 
   // add events API
-  hoodieEvents(hoodie, {
-    context: account,
-    namespace: 'account'
-  });
+  utils.events(
+    hoodie,
+    account,
+    'account'
+  );
 
   hoodie.on('remote:error:unauthenticated', api.reauthenticate.bind(null, state));
 

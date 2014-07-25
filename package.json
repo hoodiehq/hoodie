@@ -24,8 +24,9 @@
     "frontend-only"
   ],
   "dependencies": {
-    "extend": "~1.2.1",
     "bluebird": "~2.0.5",
+    "extend": "~1.2.1",
+    "inherits": "^2.0.1",
     "lie": "^2.6.0"
   },
   "devDependencies": {

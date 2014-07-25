@@ -4,7 +4,7 @@
 // same as store, but with type preset to an initially
 // passed value.
 //
-var hoodieEvents = require('../events');
+var utils = require('../../utils');
 
 var exports = module.exports = function (hoodie, taskApi, options) {
   var api = {};
@@ -12,10 +12,11 @@ var exports = module.exports = function (hoodie, taskApi, options) {
   var type = options.type;
 
   // add events
-  hoodieEvents(hoodie, {
-    context: api,
-    namespace: ['task', type, id].join(':').replace(/:$/,'')
-  });
+  utils.events(
+    hoodie,
+    api,
+    ['task', type, id].join(':').replace(/:$/,'')
+  );
 
   // scoped by both: type & id
   if (id) {
