@@ -1,5 +1,6 @@
 var utils = require('../../utils');
 var api = require('./api');
+var helpers = require('./helpers');
 
 module.exports = function(hoodie) {
   var account = {};
@@ -53,7 +54,7 @@ module.exports = function(hoodie) {
     account[method] = api[method].bind(null, state);
   });
 
-  hoodie.on('remote:error:unauthenticated', api.reauthenticate.bind(null, state));
+  hoodie.on('remote:error:unauthenticated', helpers.reauthenticate.bind(null, state));
 
   hoodie.account = account;
 };
