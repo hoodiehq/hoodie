@@ -3,7 +3,7 @@ var api = require('./api');
 
 module.exports = function(hoodie) {
   var account = {};
-
+  var username;
   var state = {
     // flag whether user is currently authenticated or not
     authenticated: null,
@@ -20,7 +20,14 @@ module.exports = function(hoodie) {
     // cache for CouchDB _users doc
     userDoc: {},
     // default couchDB user doc prefix
-    userDocPrefix: 'org.couchdb.user'
+    userDocPrefix: 'org.couchdb.user',
+    get username() {
+      return username;
+    },
+    set username(input) {
+      username = input;
+      account.username = input;
+    }
   };
 
   // public API

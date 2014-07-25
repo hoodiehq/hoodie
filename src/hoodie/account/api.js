@@ -156,7 +156,7 @@ exports.anonymousSignUp = function(state) {
 
 //
 exports.hasAccount = function(state) {
-  var hasUsername = !!account.username;
+  var hasUsername = !!state.username;
   return hasUsername || exports.hasAnonymousAccount(state);
 };
 
@@ -193,7 +193,7 @@ exports.hasAnonymousAccount = function(state) {
 // move all data from the anonymous account to the account the user signed into.
 //
 exports.signIn = function(state, username, password, options) {
-  var isReauthenticating = (username === account.username);
+  var isReauthenticating = (username === state.username);
   var isSilent;
   var promise;
 
@@ -288,7 +288,7 @@ exports.db = function(state) {
 // fetches _users doc from CouchDB and caches it in _doc
 //
 exports.fetch = function(state, username) {
-  var currentUsername = exports.hasAnonymousAccount(state) ? state.hoodie.id() : account.username;
+  var currentUsername = exports.hasAnonymousAccount(state) ? state.hoodie.id() : state.username;
 
   if (username === undefined) {
     username = currentUsername;
@@ -319,7 +319,7 @@ exports.fetch = function(state, username) {
 //
 exports.changePassword = function(state, currentPassword, newPassword) {
 
-  if (!account.username) {
+  if (!state.username) {
     return rejectWith({
       name: 'HoodieUnauthorizedError',
       message: 'Not signed in'
@@ -451,7 +451,7 @@ exports.checkPasswordReset = function(state) {
 // But the current password is needed to login with the new username.
 //
 exports.changeUsername = function(state, currentPassword, newUsername) {
-  var currentUsername = exports.hasAnonymousAccount(state) ? state.hoodie.id() : account.username;
+  var currentUsername = exports.hasAnonymousAccount(state) ? state.hoodie.id() : state.username;
 
   if (newUsername !== currentUsername) {
     newUsername = newUsername || '';
@@ -521,12 +521,12 @@ exports.reauthenticate = function(state) {
 
 // setters
 exports.setUsername = function(state, newUsername) {
-  if (account.username === newUsername) {
+  if (state.username === newUsername) {
     return;
   }
 
-  account.username = newUsername;
-  return config.set('_account.username', newUsername);
+  state.username = newUsername;
+  return config.set('_state.username', newUsername);
 };
 
 //
@@ -546,7 +546,7 @@ exports.setUsername = function(state, newUsername) {
 exports.handleAuthenticateRequestSuccess = function(state, response) {
   if (response.userCtx.name) {
     state.authenticated = true;
-    return resolveWith(account.username);
+    return resolveWith(state.username);
   }
 
   if (exports.hasAnonymousAccount(state)) {
@@ -801,7 +801,7 @@ exports.removePasswordResetObject = function(state, error) {
 // 3. sign in with new credentials to create new session.
 //
 exports.changeUsernameAndPassword = function(state, currentPassword, newUsername, newPassword) {
-  var currentUsername = exports.hasAnonymousAccount(state) ? state.hoodie.id() : account.username;
+  var currentUsername = exports.hasAnonymousAccount(state) ? state.hoodie.id() : state.username;
 
   return exports.sendSignInRequest(state, currentUsername, currentPassword).then(function() {
     return exports.fetch(state)
@@ -885,7 +885,7 @@ exports.disconnect = function(state) {
 
 //
 exports.cleanupAndTriggerSignOut = function(state) {
-  var username = account.username;
+  var username = state.username;
   return exports.cleanup(state).then(function() {
     return state.events.emit('signout', username);
   });
@@ -918,7 +918,7 @@ exports.userTypeAndId = function(state, username) {
 // turn a username into a valid _users doc._id
 //
 exports.userDocKey = function(state, username) {
-  var currentUsername = exports.hasAnonymousAccount(state) ? state.hoodie.id() : account.username;
+  var currentUsername = exports.hasAnonymousAccount(state) ? state.hoodie.id() : state.username;
 
   username = username || currentUsername;
   return '' + state.userDocPrefix + ':' + exports.userTypeAndId(username);
@@ -982,7 +982,7 @@ exports.sendChangeUsernameAndPasswordRequest = function(state, currentPassword, 
 // or have to wait until the worker removed the old account
 //
 exports.handleChangeUsernameAndPasswordResponse = function(state, newUsername, newPassword) {
-  var currentUsername = state.hasAnonymousAccount(state) ? state.hoodie.id() : account.username;
+  var currentUsername = state.hasAnonymousAccount(state) ? state.hoodie.id() : state.username;
 
   return function() {
     exports.disconnect(state);
