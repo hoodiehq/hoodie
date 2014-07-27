@@ -81,17 +81,6 @@ var Hoodie = module.exports = function (baseUrl) {
   // * hoodie.request
   hoodie.extend(hoodieRequest);
 
-
-  //
-  // Initializations
-  //
-
-  // make sure removed but not yet synced objects get pushed.
-  hoodie.store.bootstrapDirtyObjects();
-
-  // subscribe to cross events
-  hoodie.store.subscribeToOutsideEvents();
-
   // authenticate
   // we use a closure to not pass the username to connect, as it
   // would set the name of the remote store, which is not the username.
