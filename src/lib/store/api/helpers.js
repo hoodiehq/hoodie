@@ -1,8 +1,9 @@
 var extend = require('extend');
 
-var HoodieError = require('../error/error');
-var HoodieObjectTypeError = require('../error/object_type');
-var HoodieObjectIdError = require('../error/object_id');
+var error = require('../../error');
+var HoodieError = error.error;
+var HoodieObjectTypeError = error.objectType;
+var HoodieObjectIdError = error.objectId;
 
 // Private
 // ---------

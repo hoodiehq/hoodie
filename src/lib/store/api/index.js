@@ -31,10 +31,10 @@
 //
 
 //
-var hoodieScopedStoreApi = require('./scoped');
+var hoodieScopedStoreApi = require('../scoped');
 var extend = require('extend');
 
-var utils = require('../../utils');
+var utils = require('../../../utils');
 
 var helpers = require('./helpers');
 var apiMethods = require('./api');
