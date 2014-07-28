@@ -21,7 +21,7 @@ exports.VALID_SPECIAL_ATTRIBUTES = ['_id', '_rev', '_deleted', '_revisions', '_a
 // array of objects or a function as `options.objects`
 //
 exports.defaultObjectsToPush = (function(state) {
-  if (state.options.defaultObjectsToPush) {
+  if (state && state.options && state.options.defaultObjectsToPush) {
     if (global.$.isArray(state.options.defaultObjectsToPush)) {
       return function() {
         return state.options.defaultObjectsToPush;
