@@ -83,7 +83,7 @@ module.exports = function(config) {
         // 'test/specs/lib/store/api.spec.js',
         // 'test/specs/lib/store/remote.spec.js',
         // 'test/specs/lib/store/scoped.spec.js',
-        'test/specs/lib/task/scoped.spec.js',
+        // 'test/specs/lib/task/scoped.spec.js',
 
         'test/specs/utils/config.spec.js',
         'test/specs/utils/events.spec.js',

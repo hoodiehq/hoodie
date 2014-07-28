@@ -6,15 +6,10 @@ var hoodieScopedTaskFactory = require('../../../../src/lib/task/scoped');
 
 describe('hoodieScopedTaskFactory', function() {
 
-  beforeEach(function() {
-    this.hoodie = this.MOCKS.hoodie.apply(this);
-    this.task = this.MOCKS.task.apply(this);
-  });
-
   _when('scoped with type = "message"', function() {
     beforeEach(function() {
       var options = { type: 'message' };
-      this.scopedTask = hoodieScopedTaskFactory(this.hoodie, this.task, options );
+      this.scopedTask = hoodieScopedTaskFactory(this.hoodie, this.task, options);
     });
 
     it('scopes start method to type "message"', function() {
