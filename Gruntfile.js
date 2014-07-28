@@ -176,7 +176,7 @@ module.exports = function(grunt) {
   });
 
   grunt.registerTask('build', ['browserify:build', 'concat', 'uglify']);
-  grunt.registerTask('test', ['jshint', 'karma:continuous', 'build']);
+  grunt.registerTask('test', ['jshint', 'karma:dev', 'build']);
   grunt.registerTask('default', ['build']);
 
 };
