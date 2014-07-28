@@ -20,6 +20,8 @@ module.exports = function(config) {
       { pattern: 'node_modules/sinon/pkg/sinon-1.7.3.js', watched: false, included: true },
       'test/lib/helpers.js',
 
+      // 'test/specs/**/*.spec.js'
+
       // 'test/specs/hoodie/account.spec.js',
       // 'test/specs/hoodie/connection.spec.js',
       // 'test/specs/hoodie/id.spec.js',
@@ -30,11 +32,11 @@ module.exports = function(config) {
       // 'test/specs/hoodie/task.spec.js',
 
 
-      // 'test/specs/lib/error/error.spec.js',
+      'test/specs/lib/error/error.spec.js',
       // 'test/specs/lib/store/api.spec.js',
       // 'test/specs/lib/store/remote.spec.js',
       // 'test/specs/lib/store/scoped.spec.js',
-      // 'test/specs/lib/task/scoped.spec.js',
+      'test/specs/lib/task/scoped.spec.js',
 
       'test/specs/utils/config.spec.js',
       'test/specs/utils/events.spec.js',

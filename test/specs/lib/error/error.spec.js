@@ -1,6 +1,7 @@
 require('../../../lib/setup');
 
-var HoodieError = require('../../../../src/lib/error/error');
+var lib = require('../../../../src/lib');
+var HoodieError = lib.error.error;
 
 describe('#HoodieError()', function() {
 
