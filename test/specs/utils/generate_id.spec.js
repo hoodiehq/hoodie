@@ -1,6 +1,6 @@
 require('../../lib/setup');
 
-var generateId = require('../../../src/utils/generate_id')();
+var generateId = require('../../../src/utils').generateId;
 
 describe('generateId()', function() {
 

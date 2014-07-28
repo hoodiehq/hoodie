@@ -1,6 +1,6 @@
 require('../../lib/setup');
 
-var localStorageWrapper = require('../../../src/utils/local_storage_wrapper')();
+var localStorageWrapper = require('../../../src/utils').localStorageWrapper;
 
 describe('localStorageWrapper', function() {
 

@@ -1,6 +1,6 @@
 require('../../lib/setup');
 
-var config = require('../../../src/utils/config')();
+var config = require('../../../src/utils').config;
 
 describe('config', function() {
 

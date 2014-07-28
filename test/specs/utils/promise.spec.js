@@ -1,10 +1,11 @@
 require('../../lib/setup');
-
-var isPromise = require('../../../src/utils/promise/is_promise');
-var resolve = require('../../../src/utils/promise/resolve');
-var reject = require('../../../src/utils/promise/reject');
-var resolveWith = require('../../../src/utils/promise/resolve_with');
-var rejectWith = require('../../../src/utils/promise/reject_with');
+var utils = require('../../../src/utils');
+var promise = utils.promise;
+var isPromise = promise.isPromise;
+var resolve = promise.resolve;
+var reject = promise.reject;
+var resolveWith = promise.resolveWith;
+var rejectWith = promise.rejectWith;
 
 var noop = function() {};
 

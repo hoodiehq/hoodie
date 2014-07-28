@@ -1,6 +1,6 @@
 require('../../lib/setup');
 var events = require('events');
-var hoodieEvents = require('../../../src/utils/events');
+var hoodieEvents = require('../../../src/utils').events;
 
 describe('events', function() {
 
