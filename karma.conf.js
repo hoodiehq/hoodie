@@ -68,7 +68,7 @@ module.exports = function(config) {
         // 'test/specs/**/*.spec.js'
 
         // 'test/specs/hoodie/account.spec.js',
-        // 'test/specs/hoodie/connection.spec.js',
+        'test/specs/hoodie/connection.spec.js',
         'test/specs/hoodie/id.spec.js',
         // 'test/specs/hoodie/open.spec.js',
         // 'test/specs/hoodie/remote.spec.js',

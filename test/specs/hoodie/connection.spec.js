@@ -1,143 +1,99 @@
 require('../../lib/setup');
 
+var utils = require('../../../src/utils');
+var promise = utils.promise;
 var hoodieConnection = require('../../../src/hoodie/connection');
 
-describe('#checkConnection()', function() {
-
-  beforeEach(function() {
-    this.hoodie = this.MOCKS.hoodie.apply(this);
-
-    this.sandbox.stub(global, 'setTimeout').returns('checkTimeout');
-    this.sandbox.stub(global, 'clearTimeout');
-
-    hoodieConnection(this.hoodie);
+describe('checkConnection()', function() {
+  it('should return pending request', function() {
+    var state = {
+      checkConnectionRequest: {
+        state: this.sandbox.stub().returns('pending')
+      }
+    };
+    var result = hoodieConnection.checkConnection(state);
+    expect(result).to.be(state.checkConnectionRequest);
+    expect(state.checkConnectionRequest.state).to.be.called();
   });
 
-  it('should have a checkConnection method', function () {
-    expect(this.hoodie).to.have.property('checkConnection');
+  it('should create and handle new request', function() {
+    var defer = promise.defer();
+    this.sandbox.spy(defer.promise, 'then');
+
+    var state = {
+      hoodie: {
+        id: this.sandbox.stub().returns('foo'),
+        request: this.sandbox.stub().returns(defer.promise)
+      }
+    };
+
+    hoodieConnection.checkConnection(state);
+
+    expect(state.hoodie.id).to.be.called();
+    expect(state.hoodie.request).to.be.calledWith('GET', '/?hoodieId=foo');
+
+    var handlers = defer.promise.then.args[0];
+    expect(handlers[0]).to.be.a(Function);
+    expect(handlers[1]).to.be.a(Function);
   });
-
-  it('should have a isConnected method', function () {
-    expect(this.hoodie).to.have.property('isConnected');
-  });
-
-  it('should send GET /hoodieId=<hoodieid> request', function() {
-    this.hoodie.checkConnection();
-    expect(this.hoodie.request).to.be.calledWith('GET', '/?hoodieId=hoodieid');
-  });
-
-  it('should only send one request at a time', function() {
-    this.hoodie.checkConnection();
-    this.hoodie.checkConnection();
-    expect(this.hoodie.request.callCount).to.eql(1);
-  });
-
-  _when('hoodie is online', function() {
-
-    beforeEach(function() {
-      this.sandbox.stub(this.hoodie, 'isConnected').returns(true);
-    });
-
-    _and('request succeeds', function() {
-
-      beforeEach(function() {
-        this.hoodie.request.defer.resolve({
-          'couchdb': 'Welcome',
-          'version': '1.2.1'
-        });
-        this.hoodie.checkConnection();
-      });
-
-      it('should check again in 30 seconds', function() {
-        expect(global.setTimeout).to.be.calledWith(this.hoodie.checkConnection, 30000);
-      });
-
-      it('should not trigger `reconnected` event', function() {
-        expect(this.hoodie.trigger.calledWith('reconnected')).to.not.be.ok();
-      });
-
-      it('should cancel running timeout when checked again', function() {
-        expect(global.setTimeout.callCount).to.eql(1);
-        this.hoodie.checkConnection();
-        expect(global.setTimeout.callCount).to.eql(2);
-        expect(global.clearTimeout).to.be.calledWith('checkTimeout');
-      });
-    });
-
-    _and('request fails', function() {
-
-      beforeEach(function() {
-        this.hoodie.request.defer.reject({
-          'status': 0,
-          'statusText': 'Error'
-        });
-        this.hoodie.checkConnection();
-      });
-
-      it('should check again in 3 seconds', function() {
-        expect(global.setTimeout).to.be.calledWith(this.hoodie.checkConnection, 3000);
-      });
-
-      it('should trigger `disconnected` event', function() {
-        expect(this.hoodie.trigger.calledWith('disconnected')).to.be.ok();
-      });
-
-      it('should cancel running timeout when checked again', function() {
-        expect(global.setTimeout.callCount).to.eql(1);
-        this.hoodie.checkConnection();
-        expect(global.setTimeout.callCount).to.eql(2);
-        expect(global.clearTimeout).to.be.calledWith('checkTimeout');
-      });
-    });
-  });
-
-  _when('hoodie is offline', function() {
-
-    beforeEach(function() {
-      this.sandbox.stub(this.hoodie, 'isConnected').returns(false);
-    });
-
-    _and('request succeeds', function() {
-
-      beforeEach(function() {
-        this.hoodie.request.defer.resolve({
-          'couchdb': 'Welcome',
-          'version': '1.2.1'
-        });
-        this.hoodie.checkConnection();
-      });
-
-      it('should check again in 30 seconds', function() {
-        expect(global.setTimeout).to.be.calledWith(this.hoodie.checkConnection, 30000);
-      });
-
-      it('should trigger `reconnected` event', function() {
-        expect(this.hoodie.trigger).to.be.calledWith('reconnected');
-      });
-
-    });
-
-    _and('request fails', function() {
-
-      beforeEach(function() {
-        this.hoodie.request.defer.reject({
-          'status': 0,
-          'statusText': 'Error'
-        });
-        this.hoodie.checkConnection();
-      });
-
-      it('should check again in 3 seconds', function() {
-        expect(global.setTimeout).to.be.calledWith(this.hoodie.checkConnection, 3000);
-      });
-
-      it('should not trigger `disconnected` event', function() {
-        expect(this.hoodie.trigger).to.not.be.calledWith('disconnected');
-      });
-
-    });
-
-  });
-
 });
 
+describe('isConnected()', function() {
+  it('should return connection status', function() {
+    expect(hoodieConnection.isConnected({online: true})).to.be.ok();
+    expect(hoodieConnection.isConnected({online: false})).not.to.be.ok();
+    expect(hoodieConnection.isConnected({})).not.to.be.ok();
+    expect(hoodieConnection.isConnected()).not.to.be.ok();
+  });
+});
+
+describe('handleConnection()', function() {
+  it('should schedule connection check', function() {
+    var state = {
+      online: true
+    };
+    hoodieConnection.handleConnection(state, 1e3, 'a', true);
+    expect(state.checkConnectionTimeout).to.be.a('number');
+    global.clearTimeout(state.checkConnectionTimeout);
+  });
+
+  it('should update connection status', function() {
+    var state = {
+      hoodie: {
+        emit: this.sandbox.stub(),
+      },
+      online: true
+    };
+    hoodieConnection.handleConnection(state, 1e3, 'a', false);
+    global.clearTimeout(state.checkConnectionTimeout);
+    expect(state.online).not.to.be.ok();
+    hoodieConnection.handleConnection(state, 1e3, 'b', true);
+    global.clearTimeout(state.checkConnectionTimeout);
+    expect(state.online).to.be.ok();
+
+    expect(state.hoodie.emit).to.be.calledTwice();
+    var events = state.hoodie.emit.args;
+    expect(events[0][0]).to.be('a');
+    expect(events[1][0]).to.be('b');
+  });
+
+  it('should reject promise', function() {
+    var state = {
+      online: false
+    };
+    var result = hoodieConnection.handleConnection(state, 1e3, 'a', false);
+    global.clearTimeout(state.checkConnectionTimeout);
+    expect(result).to.be.promise();
+    expect(result).to.be.rejected();
+  });
+
+  it('should resolve promise', function() {
+    var state = {
+      online: true
+    };
+    var result = hoodieConnection.handleConnection(state, 1e3, 'a', true);
+    global.clearTimeout(state.checkConnectionTimeout);
+    expect(result).to.be.promise();
+    expect(result).to.be.resolved();
+  });
+});
