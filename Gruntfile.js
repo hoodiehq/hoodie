@@ -52,7 +52,7 @@ module.exports = function(grunt) {
 
     watch: {
       files: ['<%= jshint.files %>'],
-      tasks: ['jshint', 'browserify:dev', 'karma:dev']
+      tasks: ['browserify:dev', 'karma:dev', 'jshint']
     },
 
     concat: {
@@ -151,7 +151,6 @@ module.exports = function(grunt) {
         pushTo: 'origin master'
       }
     }
-
   });
 
   grunt.registerTask('release', function() {
