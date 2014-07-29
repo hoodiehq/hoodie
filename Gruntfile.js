@@ -79,49 +79,18 @@ module.exports = function(grunt) {
       }
     },
 
-    // https://github.com/vojtajina/grunt-bump
-    // bump version of hoodie.js
-    bump: {
-      options: {
-        commitMessage: 'chore(release): v%VERSION%',
-        files: [
-          'bower.json',
-          'package.json'
-        ],
-        commitFiles: [
-          'dist/*',
-          'bower.json',
-          'package.json',
-          'CHANGELOG.md'
-        ],
-        pushTo: 'origin master'
-      }
+    release: {
+      tasks: ['karma:dev', 'refresh', 'build', 'changelog']
     }
   });
 
-  grunt.registerTask('release', function() {
-
-    // forward arguments to the bump-only task
-    this.args.unshift('bump-only');
-
-    // refresh package information
-    grunt.registerTask('refresh', function() {
-      grunt.config.set('pkg', grunt.file.readJSON('package.json'));
-    });
-
-    grunt.task.run([
-      'karma:dev',
-      this.args.join(':'),
-      'refresh',
-      'build',
-      'changelog',
-      'bump-commit'
-    ]);
-
+  // refresh package information
+  grunt.registerTask('refresh', function() {
+    grunt.config.set('pkg', grunt.file.readJSON('package.json'));
   });
 
   grunt.registerTask('build', ['browserify:build', 'concat', 'uglify']);
   grunt.registerTask('test', ['jshint', 'karma:dev', 'build']);
+  grunt.registerTask('ci', ['test', 'integration-test']);
   grunt.registerTask('default', ['build']);
-
 };
