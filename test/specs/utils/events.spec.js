@@ -27,7 +27,7 @@ describe('events', function() {
       hoodieEvents(hoodie);
       hoodieEvents(hoodie, {}, 'foo');
 
-      expect(hoodieEvents.scopedEventEmitter.calledOnce).to.be.ok();
+      expect(hoodieEvents.scopedEventEmitter).to.be.calledOnce();
     });
   });
 
@@ -73,8 +73,8 @@ describe('events', function() {
       var data = {bar: 'bar'};
       context.emit('foo', data);
 
-      expect(cb.calledWithExactly(data)).to.be.ok();
-      expect(cb.calledOnce).to.be.ok();
+    expect(cb).to.be.calledWithExactly(data);
+    expect(cb).to.be.calledOnce();
     });
 
     it('should emit scoped events on hoodie', function() {
@@ -93,8 +93,8 @@ describe('events', function() {
       var data = {bar: 'bar'};
       context.emit('foo', data);
 
-      expect(cb.calledWithExactly(data)).to.be.ok();
-      expect(cb.calledOnce).to.be.ok();
+      expect(cb).to.be.calledWithExactly(data);
+      expect(cb).to.be.calledOnce();
     });
 
     it('should listen to deeply scoped events', function() {
@@ -124,14 +124,14 @@ describe('events', function() {
       var data = {bar: 'bar'};
       deepContext.emit('bar', data);
 
-      expect(cb.calledWithExactly(data)).to.be.ok();
-      expect(cb.calledOnce).to.be.ok();
+      expect(cb).to.be.calledWithExactly(data);
+      expect(cb).to.be.calledOnce();
 
-      expect(ctxCb.calledWithExactly(data)).to.be.ok();
-      expect(ctxCb.calledOnce).to.be.ok();
+      expect(ctxCb).to.be.calledWithExactly(data);
+      expect(ctxCb).to.be.calledOnce();
 
-      expect(deepCb.calledWithExactly(data)).to.be.ok();
-      expect(deepCb.calledOnce).to.be.ok();
+      expect(deepCb).to.be.calledWithExactly(data);
+      expect(deepCb).to.be.calledOnce();
     });
 
   });
