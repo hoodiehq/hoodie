@@ -31,7 +31,6 @@
   },
   "devDependencies": {
     "browserify": "^4.2.0",
-    "expect.js": "~0.2.0",
     "graceful-fs": "~2.0.1",
     "grunt": "~0.4.1",
     "grunt-browserify": "^2.1.3",
@@ -56,8 +55,8 @@
     "karma-phantomjs-launcher": "^0.1.4",
     "karma-sauce-launcher": "^0.2.9",
     "karma-script-launcher": "^0.1.0",
-    "load-grunt-tasks": "~0.2.1",
-    "sinon": "~1.7.1"
+    "karma-sinon-expect": "^0.1.4",
+    "load-grunt-tasks": "~0.2.1"
   },
   "scripts": {
     "test": "grunt test --verbose",
