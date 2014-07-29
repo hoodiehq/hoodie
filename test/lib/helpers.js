@@ -20,32 +20,6 @@ _but = function(description, specs) {
   describe('but ' + description, specs);
 };
 
-// expect.js helpers
-expect.Assertion.prototype.called = function() {
-
-  this.assert(
-      this.obj.called
-    , function(){ return 'expected to be called'}
-    , function(){ return 'expected to not be called' });
-  return this
-};
-expect.Assertion.prototype.calledWith = function() {
-  var args = Array.prototype.slice.call(arguments);
-  var hit = false
-
-  for (var i = 0; i < this.obj.args.length; i++) {
-    if (expect.eql(this.obj.args[i], args)) {
-      hit = true
-    }
-  };
-
-  this.assert(
-      hit
-    , function(){ return 'expected to be called with \n' + JSON.stringify(args, '', '  ') + ', calls where: \n' + JSON.stringify(this.obj.args, '', '  ')}
-    , function(){ return 'expected to not be called with \n' + JSON.stringify(args, '', '  ') });
-  return this
-};
-
 expect.Assertion.prototype.promise = function () {
   var isPromise = (typeof this.obj.done === 'function' && this.obj.resolve === undefined);
   this.assert(
