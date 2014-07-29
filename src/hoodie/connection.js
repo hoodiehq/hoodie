@@ -43,11 +43,12 @@ var exports = module.exports = function(hoodie) {
 //
 exports.checkConnection = function(state) {
   var req = state.checkConnectionRequest;
-  var path = '/?hoodieId=' + state.hoodie.id();
 
-  if (req && req.state() === 'pending') {
+  if (req && req.state && req.state() === 'pending') {
     return req;
   }
+
+  var path = '/?hoodieId=' + state.hoodie.id();
 
   global.clearTimeout(state.checkConnectionTimeout);
 
@@ -64,7 +65,7 @@ exports.checkConnection = function(state) {
 
 //
 exports.isConnected = function(state) {
-  return state.online;
+  return state && state.online;
 };
 
 //
@@ -78,7 +79,7 @@ exports.handleConnection = function(state, interval, event, online) {
   );
 
   if (exports.isConnected(state) !== online) {
-    state.hoodie.trigger(event);
+    state.hoodie.emit(event);
     state.online = online;
   }
 
