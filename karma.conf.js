@@ -72,7 +72,7 @@ module.exports = function(config) {
         'test/specs/hoodie/id.spec.js',
         // 'test/specs/hoodie/open.spec.js',
         // 'test/specs/hoodie/remote.spec.js',
-        // 'test/specs/hoodie/request.spec.js',
+        'test/specs/hoodie/request.spec.js',
         // 'test/specs/hoodie/store.spec.js',
         // 'test/specs/hoodie/task.spec.js',
 
