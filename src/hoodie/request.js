@@ -1,7 +1,7 @@
 var extend = require('extend');
 var utils = require('../utils');
 
-var hoodiefyRequestErrorName = require('../utils/hoodiefy_request_error_name')();
+var hoodiefyRequestErrorName = utils.hoodiefyRequestErrorName;
 var rejectWith = utils.promise.rejectWith;
 var $ajax = global.jQuery.ajax;
 
@@ -95,7 +95,7 @@ exports.handleRequestError = function(hoodie, xhr) {
     error = exports.parseErrorFromResponse(xhr);
   } catch (_error) {
 
-    if (xhr.responseText) {
+    if (xhr && xhr.responseText) {
       error = xhr.responseText;
     } else {
       error = {
@@ -122,7 +122,7 @@ exports.handleRequestError = function(hoodie, xhr) {
 //
 
 // map CouchDB HTTP status codes to Hoodie Errors
-var HTTP_STATUS_ERROR_MAP = {
+exports.HTTP_STATUS_ERROR_MAP = {
   400: 'HoodieRequestError', // bad request
   401: 'HoodieUnauthorizedError',
   403: 'HoodieRequestError', // forbidden
@@ -134,10 +134,10 @@ var HTTP_STATUS_ERROR_MAP = {
 
 exports.parseErrorFromResponse = function(xhr) {
   var error = JSON.parse(xhr.responseText);
-
   // get error name
-  error.name = HTTP_STATUS_ERROR_MAP[xhr.status];
-  if (! error.name) {
+  error.name = exports.HTTP_STATUS_ERROR_MAP[xhr.status];
+
+  if (!error.name) {
     error.name = hoodiefyRequestErrorName(error.error);
   }
 
