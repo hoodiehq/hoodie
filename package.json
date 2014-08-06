@@ -1,6 +1,6 @@
 {
   "name": "hoodie-server",
-  "version": "1.2.2",
+  "version": "1.2.3",
   "main": "lib/index",
   "repository": {
     "type": "git",
@@ -53,5 +53,6 @@
   },
   "hoodie": {
     "plugins": []
-  }
+  },
+  "codename": "killer-bat"
 }

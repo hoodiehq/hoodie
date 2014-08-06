@@ -1,3 +1,12 @@
+<a name="1.2.3"></a>
+### 1.2.3 (2014-08-06)
+
+
+#### Bug Fixes
+
+* **api:** return 404 for /_api/_all_dbs ([8ecdafde](https://github.com/hoodiehq/hoodie-server/commit/8ecdafde81629d2d8a0dc134f95da24064d5706d))
+
+
 <a name="1.2.2"></a>
 ### 1.2.2 (2014-07-24)
 
