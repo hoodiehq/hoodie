@@ -191,8 +191,10 @@ If you have commit access, please follow this process for merging patches and cu
 ### Releasing a new version
 
 Releasing a new version is automated with `grunt release`.
-You may add flags to specify the new version.
+According to the semver spec the command tries to find the correct version based on changes made.
 
-1. `grunt release` or `grunt release:patch`: 0.0.1 => 0.0.2
+You may still add flags to specify new versions explicitly.
+1. `grunt release:patch`: 0.0.1 => 0.0.2
 2. `grunt release:minor`: 0.0.2 => 0.1.0
 3. `grunt release:major`: 0.1.0 => 1.0.0
+4. `grunt release --setversion=4.12.3-alpha.19`: 1.0.0 => 4.12.3-alpha.19
