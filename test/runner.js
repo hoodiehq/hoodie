@@ -15,3 +15,4 @@ require('./unit/helpers-pack_hoodie-test');
 require('./integration/require');
 require('./integration/handle_404');
 require('./integration/assets');
+require('./integration/block-all-dbs');
