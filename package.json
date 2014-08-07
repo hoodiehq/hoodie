@@ -1,6 +1,6 @@
 {
   "name": "hoodie-server",
-  "version": "1.2.3",
+  "version": "1.2.4",
   "main": "lib/index",
   "repository": {
     "type": "git",
@@ -54,5 +54,5 @@
   "hoodie": {
     "plugins": []
   },
-  "codename": "killer-bat"
+  "codename": "hunky-dory-cheetah"
 }
