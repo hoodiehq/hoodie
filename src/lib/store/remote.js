@@ -287,6 +287,9 @@ function hoodieRemoteStore(hoodie, options) {
     if (name) {
       remoteName = name;
     }
+    if (remote.connected) {
+      return;
+    }
     remote.connected = true;
     remote.trigger('connect');
     return remote.bootstrap().then(function() {
