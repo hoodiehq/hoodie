@@ -2,7 +2,7 @@ var store = require('./api');
 
 var helpers = require('./helpers');
 
-var utils = require('../utils');
+var utils = require('../../utils');
 
 var generateId = utils.generateId;
 var localStorageWrapper = utils.localStorageWrapper;

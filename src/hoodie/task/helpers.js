@@ -1,7 +1,7 @@
-var lib = require('../lib');
+var lib = require('../../lib');
 var HoodieError = lib.error.error;
 
-var utils = require('../utils');
+var utils = require('../../utils');
 var getDefer = utils.promise.defer;
 var extend = require('extend');
 

@@ -20,8 +20,8 @@
 //     emailTasks.start( properties );
 //     emailTasks.abort('id123');
 //
-var lib = require('../lib');
-var utils = require('../utils');
+var lib = require('../../lib');
+var utils = require('../../utils');
 var api = require('./api');
 var helpers = require('./helpers');
 

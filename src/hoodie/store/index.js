@@ -1,13 +1,13 @@
-var hoodieStoreApi = require('../lib/store/api');
-var HoodieObjectTypeError = require('../lib/error/object_type');
-var HoodieObjectIdError = require('../lib/error/object_id');
+var hoodieStoreApi = require('../../lib/store/api');
+var HoodieObjectTypeError = require('../../lib/error/object_type');
+var HoodieObjectIdError = require('../../lib/error/object_id');
 
 var api = require('./api');
 var bootstrap = require('./bootstrap');
 var helpers = require('./helpers');
 var localStore = require('./localstore');
 
-var localStorageWrapper = require('../utils/local_storage_wrapper');
+var localStorageWrapper = require('../../utils/local_storage_wrapper');
 
 //
 var exports = module.exports = function(hoodie) {

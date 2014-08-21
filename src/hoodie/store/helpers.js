@@ -1,6 +1,6 @@
 var extend = require('extend');
 
-var utils = require('../utils');
+var utils = require('../../utils');
 var promise = utils.promise;
 var getDefer = promise.defer;
 var localStorageWrapper = utils.localStorageWrapper;

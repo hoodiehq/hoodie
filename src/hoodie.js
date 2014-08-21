@@ -49,18 +49,14 @@ module.exports = (function() {
     //
 
     // order matters b/c of cross module dependencies
-    [
-      'account',
-      'remote',
-      'connection',
-      'id',
-      'task',
-      'open',
-      'store',
-      'request'
-    ].forEach(function(module) {
-      hoodie.extend(require('./hoodie/' + module));
-    });
+    hoodie.extend(require('./hoodie/account'));
+    hoodie.extend(require('./hoodie/remote'));
+    hoodie.extend(require('./hoodie/connection'));
+    hoodie.extend(require('./hoodie/id'));
+    hoodie.extend(require('./hoodie/task'));
+    hoodie.extend(require('./hoodie/open'));
+    hoodie.extend(require('./hoodie/store'));
+    hoodie.extend(require('./hoodie/request'));
 
     // authenticate
     // we use a closure to not pass the username to connect, as it
