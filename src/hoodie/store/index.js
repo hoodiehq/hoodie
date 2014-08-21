@@ -47,16 +47,16 @@ var exports = module.exports = function(hoodie) {
   });
 
   // account events
-  hoodie.account.on('signup', helpers.markAllAsChanged.bind(null, state));
-  hoodie.account.on('movedata', helpers.moveData.bind(null, state));
-  hoodie.account.on('cleanup', api.clear.bind(null, state));
+  hoodie.on('account:signup', helpers.markAllAsChanged.bind(null, state));
+  hoodie.on('account:movedata', helpers.moveData.bind(null, state));
+  hoodie.on('account:cleanup', api.clear.bind(null, state));
 
   // remote events
-  hoodie.remote.on('bootstrap:start', bootstrap.start.bind(null, state));
-  hoodie.remote.on('bootstrap:end', bootstrap.end.bind(null, state));
-  hoodie.remote.on('bootstrap:error', bootstrap.abort.bind(null, state));
-  hoodie.remote.on('change', helpers.handleRemoteChange.bind(null, state));
-  hoodie.remote.on('push', helpers.handlePushedObject.bind(null, state));
+  hoodie.on('remote:bootstrap:start', bootstrap.start.bind(null, state));
+  hoodie.on('remote:bootstrap:end', bootstrap.end.bind(null, state));
+  hoodie.on('remote:bootstrap:error', bootstrap.abort.bind(null, state));
+  hoodie.on('remote:change', helpers.handleRemoteChange.bind(null, state));
+  hoodie.on('remote:push', helpers.handlePushedObject.bind(null, state));
 
   exports.bootstrapDirtyObjects(state);
 

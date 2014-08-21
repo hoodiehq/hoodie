@@ -108,4 +108,6 @@ module.exports = function(hoodie, options) {
       api[method] = apiMethods[method].bind(null, state);
     }
   });
+
+  return api;
 };

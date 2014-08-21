@@ -49,13 +49,13 @@ module.exports = (function() {
     //
 
     // order matters b/c of cross module dependencies
+    hoodie.extend(require('./hoodie/id'));
+    hoodie.extend(require('./hoodie/store'));
     hoodie.extend(require('./hoodie/account'));
     hoodie.extend(require('./hoodie/remote'));
     hoodie.extend(require('./hoodie/connection'));
-    hoodie.extend(require('./hoodie/id'));
     hoodie.extend(require('./hoodie/task'));
     hoodie.extend(require('./hoodie/open'));
-    hoodie.extend(require('./hoodie/store'));
     hoodie.extend(require('./hoodie/request'));
 
     // authenticate
