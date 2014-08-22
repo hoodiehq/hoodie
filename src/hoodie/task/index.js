@@ -32,7 +32,7 @@ var exports = module.exports = function(hoodie) {
   // (the function itself serves as the taskApi object)
   var scopedTask;
   var task = function () {
-    scopedTask.apply(null, arguments);
+    return scopedTask.apply(null, arguments);
   };
   scopedTask = exports.scopedTask.bind(null, hoodie, task);
 

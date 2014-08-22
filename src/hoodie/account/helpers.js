@@ -74,7 +74,7 @@ exports.handleAuthenticateRequestSuccess = function(state, response) {
     return resolveWith(state.username);
   }
 
-  if (exports.hasAnonymousAccount(state)) {
+  if (state.hoodie.account.hasAnonymousAccount()) {
     return exports.anonymousSignIn(state);
   }
 
@@ -153,7 +153,7 @@ exports.delayedSignIn = function(state, username, password, options, defer) {
 
   }, 300);
 
-  return defer.promise();
+  return defer.promise;
 };
 
 
@@ -286,7 +286,7 @@ exports.awaitPasswordResetResult = function(state) {
     state.events.removeListener('error:passwordreset', defer.reject );
   });
 
-  return defer.promise();
+  return defer.promise;
 };
 
 //
@@ -313,7 +313,7 @@ exports.removePasswordResetObject = function(state, error) {
   };
 
   // cleanup
-  exports.request(state, 'PUT', url, options);
+  state.hoodie.account.request('PUT', url, options);
   config.unset('_account.resetPasswordId');
 };
 
@@ -363,7 +363,7 @@ exports.handleFetchBeforeDestroySuccess = function(state) {
   state.userDoc._deleted = true;
 
   return exports.withPreviousRequestsAborted(state, 'updateUsersDoc', function() {
-    exports.request(state, 'PUT', exports.userDocUrl(), {
+    state.hoodie.account.request('PUT', exports.userDocUrl(), {
       data: JSON.stringify(state.userDoc),
       contentType: 'application/json'
     });
@@ -494,7 +494,7 @@ exports.sendChangeUsernameAndPasswordRequest = function(state, currentPassword, 
     };
 
     return exports.withPreviousRequestsAborted(state, 'updateUsersDoc', function() {
-      return exports.request(state, 'PUT', exports.userDocUrl(state), options)
+      return state.hoodie.account.request('PUT', exports.userDocUrl(state), options)
       .then(exports.handleChangeUsernameAndPasswordResponse(newUsername, newPassword || currentPassword));
     });
 
@@ -546,7 +546,7 @@ exports.awaitCurrentAccountRemoved = function(state, username, password, defer) 
   };
 
   exports.withPreviousRequestsAborted(state, 'signIn', function() {
-    return exports.request(state, 'POST', '/_session', requestOptions);
+    return state.hoodie.account.request('POST', '/_session', requestOptions);
   }).done(function() {
     global.setTimeout(exports.awaitCurrentAccountRemoved.bind(null, state), 300, username, password, defer);
   }).fail(function(error) {
@@ -557,7 +557,7 @@ exports.awaitCurrentAccountRemoved = function(state, username, password, defer) 
     defer.reject(error);
   });
 
-  return defer.promise();
+  return defer.promise;
 };
 
 
@@ -609,7 +609,7 @@ exports.pushLocalChanges = function(state, options) {
 //
 exports.sendSignOutRequest = function(state) {
   return exports.withSingleRequest(state, 'signOut', function() {
-    return exports.request(state, 'DELETE', '/_session');
+    return state.hoodie.account.request('DELETE', '/_session');
   });
 };
 
@@ -633,7 +633,7 @@ exports.sendSignInRequest = function(state, username, password, options) {
   };
 
   return exports.withPreviousRequestsAborted(state, 'signIn', function() {
-    var promise = exports.request(state, 'POST', '/_session', requestOptions);
+    var promise = state.hoodie.account.request('POST', '/_session', requestOptions);
 
     return promise.then(exports.handleSignInSuccess(state, options));
   });
@@ -670,12 +670,12 @@ exports.sendSignUpRequest = function(state, username, password) {
     }),
     contentType: 'application/json'
   };
-  exports.request(state, 'PUT', exports.userDocUrl(state, username), options)
+  state.hoodie.account.request('PUT', exports.userDocUrl(state, username), options)
   .done(defer.notify)
   .then(exports.handleSignUpSuccess(state, username, password), exports.handleSignUpError(state, username))
   .then(defer.resolve, defer.reject);
 
-  return defer.promise();
+  return defer.promise;
 };
 
 

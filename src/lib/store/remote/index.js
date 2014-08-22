@@ -146,5 +146,5 @@ module.exports = function(hoodie, options) {
     }
   }
 
-  hoodie.remote = remote;
+  return remote;
 };

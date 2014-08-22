@@ -54,8 +54,8 @@ exports.authenticate = function(state) {
   // pending request already, return its promise.
   //
   return helpers.withSingleRequest(state, 'authenticate', function() {
-    return exports.request('GET', '/_session')
-      .then(helpers.handleAuthenticateRequestSuccess.bind(state));
+    return exports.request(state, 'GET', '/_session')
+      .then(helpers.handleAuthenticateRequestSuccess.bind(null, state));
   });
 };
 
@@ -264,9 +264,12 @@ exports.signOut = function(state, options) {
 
 // shortcut
 //
-exports.request = function(state, type, path, options) {
-  options = options || {};
-  return state.hoodie.request.apply(state.hoodie, arguments);
+exports.request = function(state, type, url, options) {
+  return state.hoodie.request.apply(state.hoodie, [
+    type,
+    url,
+    options || {}
+  ]);
 };
 
 

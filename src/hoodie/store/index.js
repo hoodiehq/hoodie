@@ -7,7 +7,7 @@ var bootstrap = require('./bootstrap');
 var helpers = require('./helpers');
 var localStore = require('./localstore');
 
-var localStorageWrapper = require('../../utils/local_storage_wrapper');
+var localStorageWrapper = require('../../utils').localStorageWrapper;
 
 //
 var exports = module.exports = function(hoodie) {

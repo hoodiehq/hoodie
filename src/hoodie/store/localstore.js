@@ -1,5 +1,3 @@
-var store = require('./api');
-
 var helpers = require('./helpers');
 
 var utils = require('../../utils');
@@ -40,7 +38,7 @@ exports.save = function(state, object, options) {
 
   // if store is currently bootstrapping data from remote,
   // we're queueing local saves until it's finished.
-  if (store.isBootstrapping(state) && !options.remote) {
+  if (state.hoodie.store.isBootstrapping(state) && !options.remote) {
     return helpers.enqueue(state, 'save', arguments);
   }
 
@@ -111,7 +109,7 @@ exports.save = function(state, object, options) {
 
   try {
     object = helpers.cache(state, object.type, object.id, object, options);
-    defer.resolve(object, isNew).promise();
+    defer.resolve(object, isNew);
     event = isNew ? 'add' : 'update';
     if (!options.silent) {
       helpers.emitEvents(state, event, object, options);
@@ -121,7 +119,7 @@ exports.save = function(state, object, options) {
     defer.reject(error.toString());
   }
 
-  return defer.promise();
+  return defer.promise;
 };
 
 
@@ -138,7 +136,7 @@ exports.find = function(state, type, id) {
 
   // if store is currently bootstrapping data from remote,
   // we're queueing until it's finished
-  if (store.isBootstrapping()) {
+  if (state.hoodie.store.isBootstrapping()) {
     return helpers.enqueue(state, 'find', arguments);
   }
 
@@ -183,11 +181,11 @@ exports.findAll = function(state, filter) {
 
   // if store is currently bootstrapping data from remote,
   // we're queueing until it's finished
-  if (store.isBootstrapping()) {
+  if (state.hoodie.store.isBootstrapping()) {
     return helpers.enqueue(state, 'findAll', arguments);
   }
 
-  keys = store.index();
+  keys = state.hoodie.store.index();
 
   // normalize filter
   if (typeof filter === 'string') {
@@ -234,12 +232,12 @@ exports.findAll = function(state, filter) {
         return 0;
       }
     });
-    defer.resolve(results).promise();
+    defer.resolve(results);
   } catch (_error) {
     error = _error;
-    defer.reject(error).promise();
+    defer.reject(error);
   }
-  return defer.promise();
+  return defer.promise;
 };
 
 
@@ -257,7 +255,7 @@ exports.remove = function(state, type, id, options) {
 
   // if store is currently bootstrapping data from remote,
   // we're queueing local removes until it's finished.
-  if (store.isBootstrapping() && !options.remote) {
+  if (state.hoodie.store.isBootstrapping() && !options.remote) {
     return helpers.enqueue(state, 'remove', arguments);
   }
 
@@ -319,14 +317,14 @@ exports.remove = function(state, type, id, options) {
 // when object has been synced before, mark it as deleted.
 // Otherwise remove it from Store.
 exports.removeAll = function(state, type, options) {
-  return store.findAll(type).then(function(objects) {
+  return state.hoodie.store.findAll(type).then(function(objects) {
     var object, _i, _len, results;
 
     results = [];
 
     for (_i = 0, _len = objects.length; _i < _len; _i++) {
       object = objects[_i];
-      results.push(store.remove(object.type, object.id, options));
+      results.push(state.hoodie.store.remove(object.type, object.id, options));
     }
     return results;
   });

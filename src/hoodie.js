@@ -4,10 +4,6 @@
 // the door to world domination (apps)
 //
 
-// for plugins
-var lib = require('./lib');
-var utils = require('./utils');
-
 // Constructor
 // -------------
 
@@ -18,7 +14,12 @@ var utils = require('./utils');
 //     // init a new hoodie instance
 //     hoodie = new Hoodie
 //
-module.exports = (function() {
+var Hoodie = module.exports = (function() {
+
+  // for plugins
+  var lib = require('./lib');
+  var utils = require('./utils');
+
   function Hoodie(baseUrl) {
     var hoodie = this;
 
@@ -50,13 +51,14 @@ module.exports = (function() {
 
     // order matters b/c of cross module dependencies
     hoodie.extend(require('./hoodie/id'));
+    hoodie.extend(require('./hoodie/open'));
+    hoodie.extend(require('./hoodie/request'));
+    hoodie.extend(require('./hoodie/connection'));
+
     hoodie.extend(require('./hoodie/store'));
     hoodie.extend(require('./hoodie/account'));
     hoodie.extend(require('./hoodie/remote'));
-    hoodie.extend(require('./hoodie/connection'));
     hoodie.extend(require('./hoodie/task'));
-    hoodie.extend(require('./hoodie/open'));
-    hoodie.extend(require('./hoodie/request'));
 
     // authenticate
     // we use a closure to not pass the username to connect, as it

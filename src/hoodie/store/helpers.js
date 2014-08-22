@@ -305,7 +305,7 @@ exports.emitDirtyAndIdleEvents = function(state) {
 exports.enqueue = function(state, method, args) {
   var defer = getDefer();
   state.queue.push([method, args, defer]);
-  return defer.promise();
+  return defer.promise;
 };
 
 //

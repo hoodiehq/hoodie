@@ -104,7 +104,7 @@ exports.clear = function(state) {
   } catch (_error) {
     defer.reject(_error);
   }
-  return defer.promise();
+  return defer.promise;
 };
 
 
