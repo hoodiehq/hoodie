@@ -303,7 +303,7 @@ exports.fetch = function(state, username) {
   }
 
   return helpers.withSingleRequest(state, 'fetch', function() {
-    return exports.request(state, 'GET', exports.userDocUrl(state, username)).done(function(response) {
+    return exports.request(state, 'GET', helpers.userDocUrl(state, username)).done(function(response) {
       state.userDoc = response;
       return state.userDoc;
     });

@@ -7,11 +7,27 @@ var Promise = exports.Promise = (function() {
     PromiseClass = require('bluebird');
   }
   PromiseClass.prototype.done = function done(callback) {
-    this.then(callback);
+    // this.then(callback);
+    var promise = this;
+    this.then(function() {
+      try {
+        callback.apply(null, arguments);
+      } catch(e) {
+        debugger
+      }
+    });
     return this;
   };
   PromiseClass.prototype.fail = function fail(callback) {
-    this.then(null, callback);
+    // this.then(null, callback);
+    var promise = this;
+    this.then(null, function() {
+      try {
+        callback.apply(null, arguments);
+      } catch(e) {
+        debugger
+      }
+    });
     return this;
   };
   PromiseClass.prototype.always = function always(callback) {
@@ -36,6 +52,9 @@ module.exports = function Defer() {
   return {
     resolve: resolve,
     reject: reject,
-    promise: promise
+    promise: promise,
+    notify: function() {
+      console.log('NOTE: defer.notify is currently not working');
+    }
   };
 };

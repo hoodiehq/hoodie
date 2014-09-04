@@ -198,7 +198,7 @@ exports.handleSignInSuccess = function(state, options) {
     // is valid and only if it is, we'd send the POST /_session request.
     //
     if (response.roles.indexOf('error') !== -1) {
-      return exports.fetch(state, newUsername).then(function() {
+      return state.hoodie.account.fetch(state, newUsername).then(function() {
         return rejectWith(state.userDoc.$error);
       });
     }
@@ -218,7 +218,7 @@ exports.handleSignInSuccess = function(state, options) {
     }
     state.authenticated = true;
 
-    exports.fetch(state);
+    state.hoodie.account.fetch(state);
     return resolveWith(newUsername, newHoodieId, options);
   };
 };
@@ -329,7 +329,7 @@ exports.changeUsernameAndPassword = function(state, currentPassword, newUsername
   var currentUsername = state.hoodie.account.hasAnonymousAccount(state) ? state.hoodie.id() : state.username;
 
   return exports.sendSignInRequest(state, currentUsername, currentPassword).then(function() {
-    return exports.fetch(state)
+    return state.hoodie.account.fetch(state)
     .then(exports.sendChangeUsernameAndPasswordRequest(state, currentPassword, newUsername, newPassword));
   });
 };

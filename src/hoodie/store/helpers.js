@@ -146,7 +146,7 @@ exports.clearChanged = function(state, type, id) {
 // Marks all local object as changed (dirty) to make them sync
 // with remote
 exports.markAllAsChanged = function(state) {
-  return state.hoodie.store.findAll().pipe(function(objects) {
+  return state.hoodie.store.findAll().done(function(objects) {
     var key, object, _i, _len;
 
     for (_i = 0, _len = objects.length; _i < _len; _i++) {
