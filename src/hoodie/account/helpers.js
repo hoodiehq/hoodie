@@ -31,7 +31,7 @@ exports.removeAnonymousPassword = function() {
 exports.anonymousSignIn = function(state) {
   var username = state.hoodie.id();
   var password = exports.getAnonymousPassword(state);
-  return exports.signIn(username, password)
+  return state.hoodie.account.signIn(username, password)
     .done(function() {
       state.events.emit('signin:anonymous', username);
     });
@@ -98,7 +98,7 @@ exports.handleSignUpSuccess = function(state, username, password) {
 
   return function(response) {
     state.userDoc._rev = response.rev;
-    return exports.delayedSignIn(username, password);
+    return exports.delayedSignIn(state, username, password);
   };
 };
 
@@ -326,7 +326,7 @@ exports.removePasswordResetObject = function(state, error) {
 // 3. sign in with new credentials to create new session.
 //
 exports.changeUsernameAndPassword = function(state, currentPassword, newUsername, newPassword) {
-  var currentUsername = exports.hasAnonymousAccount(state) ? state.hoodie.id() : state.username;
+  var currentUsername = state.hoodie.account.hasAnonymousAccount(state) ? state.hoodie.id() : state.username;
 
   return exports.sendSignInRequest(state, currentUsername, currentPassword).then(function() {
     return exports.fetch(state)
@@ -443,17 +443,17 @@ exports.userTypeAndId = function(state, username) {
 // turn a username into a valid _users doc._id
 //
 exports.userDocKey = function(state, username) {
-  var currentUsername = exports.hasAnonymousAccount(state) ? state.hoodie.id() : state.username;
+  var currentUsername = state.hoodie.account.hasAnonymousAccount(state) ? state.hoodie.id() : state.username;
 
   username = username || currentUsername;
-  return '' + state.userDocPrefix + ':' + exports.userTypeAndId(username);
+  return '' + state.userDocPrefix + ':' + exports.userTypeAndId(state, username);
 };
 
 //
 // get URL of my _users doc
 //
 exports.userDocUrl = function(state, username) {
-  return '/_users/' + (encodeURIComponent(exports.userDocKey(username)));
+  return '/_users/' + (encodeURIComponent(exports.userDocKey(state, username)));
 };
 
 
@@ -507,7 +507,7 @@ exports.sendChangeUsernameAndPasswordRequest = function(state, currentPassword, 
 // or have to wait until the worker removed the old account
 //
 exports.handleChangeUsernameAndPasswordResponse = function(state, newUsername, newPassword) {
-  var currentUsername = state.hasAnonymousAccount(state) ? state.hoodie.id() : state.username;
+  var currentUsername = state.hoodie.account.hasAnonymousAccount(state) ? state.hoodie.id() : state.username;
 
   return function() {
     exports.disconnect(state);
@@ -520,12 +520,12 @@ exports.handleChangeUsernameAndPasswordResponse = function(state, newUsername, n
         // we do signOut explicitly although signOut is build into hoodie.signIn to
         // work around trouble in case of local changes. See
         // https://github.com/hoodiehq/hoodie.js/issues/256
-        return exports.signOut(state, {silent:true, moveData: true}).then(function() {
-          return exports.signIn(state, newUsername, newPassword, {moveData: true, silent: true});
+        return state.hoodie.account.signOut(state, {silent:true, moveData: true}).then(function() {
+          return state.hoodie.account.signIn(state, newUsername, newPassword, {moveData: true, silent: true});
         });
       });
     } else {
-      return exports.signIn(state, currentUsername, newPassword, {silent: true});
+      return state.hoodie.account.signIn(state, currentUsername, newPassword, {silent: true});
     }
   };
 };
@@ -665,7 +665,7 @@ exports.sendSignUpRequest = function(state, username, password) {
       roles: [],
       password: password,
       hoodieId: state.hoodie.id(),
-      database: exports.db(state),
+      database: state.hoodie.account.db(state),
       updatedAt: exports.now(state),
       createdAt: exports.now(state),
       signedUpAt: username !== state.hoodie.id() ? exports.now(state) : void 0

@@ -8,15 +8,19 @@ var Promise = exports.Promise = (function() {
   }
   PromiseClass.prototype.done = function done(callback) {
     this.then(callback);
+    return this;
   };
   PromiseClass.prototype.fail = function fail(callback) {
     this.then(null, callback);
+    return this;
   };
   PromiseClass.prototype.always = function always(callback) {
     this.then(callback, callback);
+    return this;
   };
   PromiseClass.prototype.progress = function progress() {
     console.log('NOTE: promise.progress is currently not working');
+    return this;
   };
   return PromiseClass;
 })();
