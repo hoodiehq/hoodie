@@ -1,9 +1,24 @@
 /*jshint -W079 */
 var Promise = exports.Promise = (function() {
+  var PromiseClass;
   if (typeof global.Promise === 'function') {
-    return global.Promise;
+    PromiseClass = global.Promise;
+  } else {
+    PromiseClass = require('bluebird');
   }
-  return require('bluebird');
+  PromiseClass.prototype.done = function done(callback) {
+    this.then(callback);
+  };
+  PromiseClass.prototype.fail = function fail(callback) {
+    this.then(null, callback);
+  };
+  PromiseClass.prototype.always = function always(callback) {
+    this.then(callback, callback);
+  };
+  PromiseClass.prototype.progress = function progress() {
+    console.log('NOTE: promise.progress is currently not working');
+  };
+  return PromiseClass;
 })();
 
 module.exports = function Defer() {
