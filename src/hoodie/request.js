@@ -2,6 +2,7 @@ var extend = require('extend');
 var utils = require('../utils');
 
 var hoodiefyRequestErrorName = utils.hoodiefyRequestErrorName;
+var getDefer = utils.promise.defer;
 var rejectWith = utils.promise.rejectWith;
 var $ajax = global.jQuery.ajax;
 
@@ -44,13 +45,15 @@ var exports = module.exports = function(hoodie) {
 var API_PATH = '/_api';
 
 exports.request = function(hoodie, type, url, options) {
-
-  options = options || {};
-
   var defaults = {
     type: type,
     dataType: 'json'
   };
+  var requestDefer = getDefer();
+  var requestPromise = requestDefer.promise;
+  var jQueryPromise;
+  options = options || {};
+
 
   // if absolute path passed, set CORS headers
 
@@ -75,12 +78,12 @@ exports.request = function(hoodie, type, url, options) {
   // the piping, as for whatever reason the returned promise
   // does not have the `abort` method any more, maybe others
   // as well. See also http://bugs.jquery.com/ticket/14104
-  var requestPromise = $ajax(extend(defaults, options));
+  jQueryPromise = $ajax(extend(defaults, options)).then(requestDefer.resolve, requestDefer.reject);
   var pipedPromise = requestPromise.then(
     null,
     exports.handleRequestError.bind(null, hoodie)
   );
-  pipedPromise.abort = requestPromise.abort;
+  pipedPromise.abort = jQueryPromise.abort;
 
   return pipedPromise;
 };

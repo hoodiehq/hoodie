@@ -582,15 +582,17 @@ exports.withPreviousRequestsAborted = function(state, name, requestFunction) {
 //
 exports.withSingleRequest = function(state, name, requestFunction) {
 
-  if (state.requests[name] !== undefined) {
-    if (typeof state.requests[name].state === 'function') {
-      if (state.requests[name].state() === 'pending') {
-        return state.requests[name];
-      }
-    }
+  if (state.requests[name] && state.requests[name].state === 'pending') {
+    return state.requests[name];
   }
 
   state.requests[name] = requestFunction();
+  state.requests[name].state = 'pending';
+  state.requests[name].then(function() {
+    state.requests[name].state = 'fullfiled';
+  },function() {
+    state.requests[name].state = 'rejected';
+  });
   return state.requests[name];
 };
 

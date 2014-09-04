@@ -32,13 +32,13 @@ exports.authenticate = function(state) {
   // if there is a pending signOut request, return its promise,
   // but pipe it so that it always ends up rejected
   //
-  if (requests.signOut && requests.signOut.state() === 'pending') {
+  if (requests.signOut && requests.signOut.state === 'pending') {
     return requests.signOut.then(reject);
   }
 
   // if there is a pending signIn request, return its promise
   //
-  if (requests.signIn && requests.signIn.state() === 'pending') {
+  if (requests.signIn && requests.signIn.state === 'pending') {
     return state.requests.signIn;
   }
 

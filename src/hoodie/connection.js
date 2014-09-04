@@ -41,11 +41,10 @@ var exports = module.exports = function(hoodie) {
 // - sets `online = true`
 // - triggers `reconnected` event
 //
-exports.checkConnection = function(state) {
-  var req = state.checkConnectionRequest;
+exports.checkConnection = function(state) {;
 
-  if (req && req.state && req.state() === 'pending') {
-    return req;
+  if (state.checkConnectionRequest) {
+    return state.checkConnectionRequest;
   }
 
   var path = '/?hoodieId=' + state.hoodie.id();
@@ -72,7 +71,7 @@ exports.isConnected = function(state) {
 //
 //
 exports.handleConnection = function(state, interval, event, online) {
-
+  state.checkConnectionRequest = undefined;
   state.checkConnectionTimeout = global.setTimeout(
     exports.checkConnection.bind(null, state),
     interval
