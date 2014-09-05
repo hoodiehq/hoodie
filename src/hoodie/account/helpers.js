@@ -51,7 +51,7 @@ exports.setUsername = function(state, newUsername) {
   }
 
   state.username = newUsername;
-  return config.set('_state.username', newUsername);
+  return config.set('_account.username', newUsername);
 };
 
 //
@@ -198,7 +198,7 @@ exports.handleSignInSuccess = function(state, options) {
     // is valid and only if it is, we'd send the POST /_session request.
     //
     if (response.roles.indexOf('error') !== -1) {
-      return state.hoodie.account.fetch(state, newUsername).then(function() {
+      return state.hoodie.account.fetch(newUsername).then(function() {
         return rejectWith(state.userDoc.$error);
       });
     }
@@ -218,7 +218,7 @@ exports.handleSignInSuccess = function(state, options) {
     }
     state.authenticated = true;
 
-    state.hoodie.account.fetch(state);
+    state.hoodie.account.fetch(newUsername);
     return resolveWith(newUsername, newHoodieId, options);
   };
 };
@@ -326,10 +326,10 @@ exports.removePasswordResetObject = function(state, error) {
 // 3. sign in with new credentials to create new session.
 //
 exports.changeUsernameAndPassword = function(state, currentPassword, newUsername, newPassword) {
-  var currentUsername = state.hoodie.account.hasAnonymousAccount(state) ? state.hoodie.id() : state.username;
+  var currentUsername = state.hoodie.account.hasAnonymousAccount() ? state.hoodie.id() : state.username;
 
   return exports.sendSignInRequest(state, currentUsername, currentPassword).then(function() {
-    return state.hoodie.account.fetch(state)
+    return state.hoodie.account.fetch()
     .then(exports.sendChangeUsernameAndPasswordRequest(state, currentPassword, newUsername, newPassword));
   });
 };
@@ -443,7 +443,7 @@ exports.userTypeAndId = function(state, username) {
 // turn a username into a valid _users doc._id
 //
 exports.userDocKey = function(state, username) {
-  var currentUsername = state.hoodie.account.hasAnonymousAccount(state) ? state.hoodie.id() : state.username;
+  var currentUsername = state.hoodie.account.hasAnonymousAccount() ? state.hoodie.id() : state.username;
 
   username = username || currentUsername;
   return '' + state.userDocPrefix + ':' + exports.userTypeAndId(state, username);
@@ -507,7 +507,7 @@ exports.sendChangeUsernameAndPasswordRequest = function(state, currentPassword, 
 // or have to wait until the worker removed the old account
 //
 exports.handleChangeUsernameAndPasswordResponse = function(state, newUsername, newPassword) {
-  var currentUsername = state.hoodie.account.hasAnonymousAccount(state) ? state.hoodie.id() : state.username;
+  var currentUsername = state.hoodie.account.hasAnonymousAccount() ? state.hoodie.id() : state.username;
 
   return function() {
     exports.disconnect(state);
@@ -520,12 +520,12 @@ exports.handleChangeUsernameAndPasswordResponse = function(state, newUsername, n
         // we do signOut explicitly although signOut is build into hoodie.signIn to
         // work around trouble in case of local changes. See
         // https://github.com/hoodiehq/hoodie.js/issues/256
-        return state.hoodie.account.signOut(state, {silent:true, moveData: true}).then(function() {
-          return state.hoodie.account.signIn(state, newUsername, newPassword, {moveData: true, silent: true});
+        return state.hoodie.account.signOut({silent:true, moveData: true}).then(function() {
+          return state.hoodie.account.signIn(newUsername, newPassword, {moveData: true, silent: true});
         });
       });
     } else {
-      return state.hoodie.account.signIn(state, currentUsername, newPassword, {silent: true});
+      return state.hoodie.account.signIn(currentUsername, newPassword, {silent: true});
     }
   };
 };
@@ -665,7 +665,7 @@ exports.sendSignUpRequest = function(state, username, password) {
       roles: [],
       password: password,
       hoodieId: state.hoodie.id(),
-      database: state.hoodie.account.db(state),
+      database: state.hoodie.account.db(),
       updatedAt: exports.now(state),
       createdAt: exports.now(state),
       signedUpAt: username !== state.hoodie.id() ? exports.now(state) : void 0

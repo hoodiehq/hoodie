@@ -1,5 +1,6 @@
-var config = require('../utils/config');
-var promise = require('../utils/promise');
+var utils = require('../utils');
+var config = utils.config;
+var rejectWith = utils.promise.rejectWith;
 
 // AccountRemote
 // ===============
@@ -79,7 +80,7 @@ var exports = module.exports = function(hoodie) {
 //
 exports.connect = function(hoodie, originalConnectMethod) {
   if (!hoodie.account.hasAccount()) {
-    return promise.rejectWith('User has no database to connect to');
+    return rejectWith('User has no database to connect to');
   }
   return originalConnectMethod(hoodie.account.db());
 };
