@@ -134,17 +134,17 @@ exports.emitEvents = function(state, eventName, task, options) {
     error = task.$error;
     delete task.$error;
 
-    state.events.emit('error', error, task, options);
-    state.events.emit(task.type + ':error', error, task, options);
-    state.events.emit(task.type + ':' + task.id + ':error', error, task, options);
+    state.events.trigger('error', error, task, options);
+    state.events.trigger(task.type + ':error', error, task, options);
+    state.events.trigger(task.type + ':' + task.id + ':error', error, task, options);
 
     options = extend({}, options, {
       error: error
     });
 
-    state.events.emit('change', 'error', task, options);
-    state.events.emit(task.type + ':change', 'error', task, options);
-    state.events.emit(task.type + ':' + task.id + ':change', 'error', task, options);
+    state.events.trigger('change', 'error', task, options);
+    state.events.trigger(task.type + ':change', 'error', task, options);
+    state.events.trigger(task.type + ':' + task.id + ':change', 'error', task, options);
 
     return;
   }
@@ -154,18 +154,18 @@ exports.emitEvents = function(state, eventName, task, options) {
     return;
   }
 
-  state.events.emit(eventName, task, options);
-  state.events.emit(task.type + ':' + eventName, task, options);
+  state.events.trigger(eventName, task, options);
+  state.events.trigger(task.type + ':' + eventName, task, options);
 
   if (eventName !== 'start') {
-    state.events.emit(task.type + ':' + task.id + ':' + eventName, task, options);
+    state.events.trigger(task.type + ':' + task.id + ':' + eventName, task, options);
   }
 
-  state.events.emit('change', eventName, task, options);
-  state.events.emit(task.type + ':change', eventName, task, options);
+  state.events.trigger('change', eventName, task, options);
+  state.events.trigger(task.type + ':change', eventName, task, options);
 
   if (eventName !== 'start') {
-    state.events.emit(task.type + ':' + task.id + ':change', eventName, task, options);
+    state.events.trigger(task.type + ':' + task.id + ':change', eventName, task, options);
   }
 };
 

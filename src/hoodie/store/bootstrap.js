@@ -5,7 +5,7 @@ var exports = module.exports;
 //
 exports.start = function(state) {
   state.bootstrapping = true;
-  state.hoodie.store.emit('bootstrap:start');
+  state.hoodie.store.trigger('bootstrap:start');
 };
 
 //
@@ -24,7 +24,7 @@ exports.end = function(state) {
       .then(defer.resolve, defer.reject);
   }
 
-  state.hoodie.store.emit('bootstrap:end');
+  state.hoodie.store.trigger('bootstrap:end');
 };
 
 //
@@ -38,5 +38,5 @@ exports.abort = function(state, error) {
     defer.reject(error);
   }
 
-  state.hoodie.store.emit('bootstrap:error', error);
+  state.hoodie.store.trigger('bootstrap:error', error);
 };

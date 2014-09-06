@@ -244,19 +244,19 @@ exports.isMarkedAsDeleted = function(state, object) {
 // like add:task, change:note:abc4567, remove, etc.
 exports.emitEvents = function(state, eventName, object, options) {
   // TODO: get eventEmitter directly from utils.events
-  state.hoodie.store.emit(eventName, extend(true, {}, object), options);
-  state.hoodie.store.emit(object.type + ':' + eventName, extend(true, {}, object), options);
+  state.hoodie.store.trigger(eventName, extend(true, {}, object), options);
+  state.hoodie.store.trigger(object.type + ':' + eventName, extend(true, {}, object), options);
 
   // DEPRECATED
   // https://github.com/hoodiehq/hoodie.js/issues/146
-  state.hoodie.store.emit(eventName + ':' + object.type, extend(true, {}, object), options);
+  state.hoodie.store.trigger(eventName + ':' + object.type, extend(true, {}, object), options);
 
   if (eventName !== 'new') {
-    state.hoodie.store.emit( object.type + ':' + object.id+ ':' + eventName, extend(true, {}, object), options);
+    state.hoodie.store.trigger( object.type + ':' + object.id+ ':' + eventName, extend(true, {}, object), options);
 
     // DEPRECATED
     // https://github.com/hoodiehq/hoodie.js/issues/146
-    state.hoodie.store.emit( eventName + ':' + object.type + ':' + object.id, extend(true, {}, object), options);
+    state.hoodie.store.trigger( eventName + ':' + object.type + ':' + object.id, extend(true, {}, object), options);
   }
 
 
@@ -267,20 +267,20 @@ exports.emitEvents = function(state, eventName, object, options) {
     return;
   }
 
-  state.hoodie.store.emit('change', eventName, extend(true, {}, object), options);
-  state.hoodie.store.emit(object.type + ':change', eventName, extend(true, {}, object), options);
+  state.hoodie.store.trigger('change', eventName, extend(true, {}, object), options);
+  state.hoodie.store.trigger(object.type + ':change', eventName, extend(true, {}, object), options);
 
   // DEPRECATED
   // https://github.com/hoodiehq/hoodie.js/issues/146
-  state.hoodie.store.emit('change:' + object.type, eventName, extend(true, {}, object), options);
+  state.hoodie.store.trigger('change:' + object.type, eventName, extend(true, {}, object), options);
 
 
   if (eventName !== 'new') {
-    state.hoodie.store.emit(object.type + ':' + object.id + ':change', eventName, extend(true, {}, object), options);
+    state.hoodie.store.trigger(object.type + ':' + object.id + ':change', eventName, extend(true, {}, object), options);
 
     // DEPRECATED
     // https://github.com/hoodiehq/hoodie.js/issues/146
-    state.hoodie.store.emit('change:' + object.type + ':' + object.id, eventName, extend(true, {}, object), options);
+    state.hoodie.store.trigger('change:' + object.type + ':' + object.id, eventName, extend(true, {}, object), options);
   }
 };
 
@@ -293,11 +293,11 @@ exports.emitEvents = function(state, eventName, object, options) {
 //    the `idle` event gets triggered after a short timeout of
 //    no changes, e.g. 2 seconds.
 exports.emitDirtyAndIdleEvents = function(state) {
-  state.hoodie.store.emit('dirty');
+  state.hoodie.store.trigger('dirty');
   global.clearTimeout(state.dirtyTimeout);
 
   state.dirtyTimeout = global.setTimeout(function() {
-    state.hoodie.store.emit('idle', state.hoodie.store.changedObjects());
+    state.hoodie.store.trigger('idle', state.hoodie.store.changedObjects());
   }, state.idleTimeout);
 };
 

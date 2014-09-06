@@ -117,7 +117,7 @@ exports.signUp = function(state, username, password) {
   return helpers.sendSignUpRequest(state, username, password)
     .done(function() {
       helpers.setUsername(state, username);
-      state.events.emit('signup', username);
+      state.events.trigger('signup', username);
     });
 };
 
@@ -144,7 +144,7 @@ exports.anonymousSignUp = function(state) {
     helpers.setAnonymousPassword(state, password);
   })
   .done(function() {
-    state.events.emit('signup:anonymous');
+    state.events.trigger('signup:anonymous');
   });
 };
 
@@ -216,20 +216,20 @@ exports.signIn = function(state, username, password, options) {
 
   return promise.done( function(newUsername, newHoodieId) {
     if (options.moveData) {
-      state.events.emit('movedata');
+      state.events.trigger('movedata');
     }
     if (!isReauthenticating && !options.moveData) {
       helpers.cleanup(state);
     }
     if (isReauthenticating) {
       if (!isSilent) {
-        state.events.emit('reauthenticated', newUsername);
+        state.events.trigger('reauthenticated', newUsername);
       }
     } else {
       helpers.setUsername(state, newUsername);
     }
     if (!isSilent) {
-      state.events.emit('signin', newUsername, newHoodieId, options);
+      state.events.trigger('signin', newUsername, newHoodieId, options);
     }
   });
 };
@@ -332,7 +332,7 @@ exports.changePassword = function(state, currentPassword, newPassword) {
   return exports.fetch(state)
     .then(helpers.sendChangeUsernameAndPasswordRequest(state, currentPassword, null, newPassword))
     .done( function() {
-      state.events.emit('changepassword');
+      state.events.trigger('changepassword');
     });
 };
 
@@ -384,7 +384,7 @@ exports.resetPassword = function(state, username) {
       .done(exports.checkPasswordReset.bind(null, state))
       .then(helpers.awaitPasswordResetResult.bind(null, state))
       .done(function() {
-        state.events.emit('resetpassword');
+        state.events.trigger('resetpassword');
       });
   });
 };
@@ -435,7 +435,7 @@ exports.checkPasswordReset = function(state) {
           global.setTimeout(exports.checkPasswordReset.bind(null, state), 1000);
           return;
         }
-        return state.events.emit('error:passwordreset', error, username);
+        return state.events.trigger('error:passwordreset', error, username);
       });
   });
 };
@@ -459,7 +459,7 @@ exports.changeUsername = function(state, currentPassword, newUsername) {
     return exports.changeUsernameAndPassword(state, currentPassword, newUsername.toLowerCase())
     .done( function() {
       helpers.setUsername(state, newUsername);
-      state.events.emit('changeusername', newUsername);
+      state.events.trigger('changeusername', newUsername);
     });
   }
   return rejectWith({

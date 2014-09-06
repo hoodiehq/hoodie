@@ -78,7 +78,7 @@ exports.handleConnection = function(state, interval, event, online) {
   );
 
   if (exports.isConnected(state) !== online) {
-    state.hoodie.emit(event);
+    state.hoodie.trigger(event);
     state.online = online;
   }
 

@@ -33,7 +33,7 @@ exports.anonymousSignIn = function(state) {
   var password = exports.getAnonymousPassword(state);
   return state.hoodie.account.signIn(username, password)
     .done(function() {
-      state.events.emit('signin:anonymous', username);
+      state.events.trigger('signin:anonymous', username);
     });
 };
 
@@ -79,7 +79,7 @@ exports.handleAuthenticateRequestSuccess = function(state, response) {
   }
 
   state.authenticated = false;
-  state.events.emit('error:unauthenticated');
+  state.events.trigger('error:unauthenticated');
   return reject();
 };
 
@@ -258,7 +258,7 @@ exports.handlePasswordResetStatusRequestError = function(state, username) {
   return function(error) {
     if (error.name === 'HoodieUnauthorizedError') {
       config.unset('_account.resetPasswordId');
-      state.events.emit('passwordreset', username);
+      state.events.trigger('passwordreset', username);
 
       return resolve();
     } else {
@@ -347,7 +347,7 @@ exports.upgradeAnonymousAccount = function(state, username, password) {
 
   return exports.changeUsernameAndPassword(state, currentPassword, username, password)
     .done(function() {
-      state.events.emit('signup', username);
+      state.events.trigger('signup', username);
       exports.removeAnonymousPassword(state);
     });
 };
@@ -393,9 +393,9 @@ exports.handleFetchBeforeDestroyError = function(state, error) {
 exports.cleanup = function(state) {
 
   // allow other modules to clean up local data & caches
-  state.events.emit('cleanup');
+  state.events.trigger('cleanup');
   state.authenticated = undefined;
-  exports.setUsername(undefined);
+  exports.setUsername(state, undefined);
 
   return resolve();
 };
@@ -412,7 +412,7 @@ exports.disconnect = function(state) {
 exports.cleanupAndTriggerSignOut = function(state) {
   var username = state.username;
   return exports.cleanup(state).then(function() {
-    return state.events.emit('signout', username);
+    return state.events.trigger('signout', username);
   });
 };
 

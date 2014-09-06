@@ -78,7 +78,9 @@ exports.request = function(hoodie, type, url, options) {
   // the piping, as for whatever reason the returned promise
   // does not have the `abort` method any more, maybe others
   // as well. See also http://bugs.jquery.com/ticket/14104
-  jQueryPromise = $ajax(extend(defaults, options)).then(requestDefer.resolve, requestDefer.reject);
+  jQueryPromise = $ajax(extend(defaults, options))
+    .done(requestDefer.resolve)
+    .fail(requestDefer.reject);
   var pipedPromise = requestPromise.then(
     null,
     exports.handleRequestError.bind(null, hoodie)

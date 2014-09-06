@@ -225,7 +225,7 @@ exports.handlePullError = function(state, xhr, error) {
     // Session is invalid. User is still login, but needs to reauthenticate
     // before sync can be continued
   case 401:
-    state.hoodie.remote.emit('error:unauthenticated', error);
+    state.hoodie.remote.trigger('error:unauthenticated', error);
     return state.hoodie.remote.disconnect();
 
     // the 404 comes, when the requested DB has been removed
@@ -244,7 +244,7 @@ exports.handlePullError = function(state, xhr, error) {
     //
     // Please server, don't give us these. At least not persistently
     //
-    state.hoodie.remote.emit('error:server', error);
+    state.hoodie.remote.trigger('error:server', error);
     global.setTimeout(state.hoodie.remote.pull, 3000);
     return state.hoodie.checkConnection();
   default:
@@ -270,14 +270,14 @@ exports.handlePullError = function(state, xhr, error) {
 //
 exports.handleBootstrapSuccess = function(state) {
   state.isBootstrapping = false;
-  state.hoodie.remote.emit('bootstrap:end');
+  state.hoodie.remote.trigger('bootstrap:end');
 };
 
 // ### handle error of initial bootstrapping from remote
 //
 exports.handleBootstrapError = function(state, error) {
   state.isBootstrapping = false;
-  state.hoodie.remote.emit('bootstrap:error', error);
+  state.hoodie.remote.trigger('bootstrap:error', error);
 };
 
 // ### handle changes from remote
@@ -315,20 +315,20 @@ exports.handlePullResults = function(state, changes) {
       }
     }
 
-    remote.emit(event, object);
-    remote.emit(object.type + ':' + event, object);
-    remote.emit(object.type + ':' + object.id + ':' + event, object);
-    remote.emit('change', event, object);
-    remote.emit(object.type + ':change', event, object);
-    remote.emit(object.type + ':' + object.id + ':change', event, object);
+    remote.trigger(event, object);
+    remote.trigger(object.type + ':' + event, object);
+    remote.trigger(object.type + ':' + object.id + ':' + event, object);
+    remote.trigger('change', event, object);
+    remote.trigger(object.type + ':change', event, object);
+    remote.trigger(object.type + ':' + object.id + ':change', event, object);
 
     // DEPRECATED
     // https://github.com/hoodiehq/hoodie.js/issues/146
     // https://github.com/hoodiehq/hoodie.js/issues/326
-    remote.emit(event + ':' + object.type, object);
-    remote.emit(event + ':' + object.type + ':' + object.id, object);
-    remote.emit('change:' + object.type, event, object);
-    remote.emit('change:' + object.type + ':' + object.id, event, object);
+    remote.trigger(event + ':' + object.type, object);
+    remote.trigger(event + ':' + object.type + ':' + object.id, object);
+    remote.trigger('change:' + object.type, event, object);
+    remote.trigger('change:' + object.type + ':' + object.id, event, object);
   }
 
   // reset the hash for pushed object revision after

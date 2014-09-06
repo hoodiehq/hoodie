@@ -73,7 +73,7 @@ exports.connect = function(state, name) {
     state.remoteName = name;
   }
   state.connected = true;
-  state.hoodie.remote.emit('connect');
+  state.hoodie.remote.trigger('connect');
   return state.hoodie.remote.bootstrap().then(function() {
     state.hoodie.remote.push();
   });
@@ -87,7 +87,7 @@ exports.connect = function(state, name) {
 //
 exports.disconnect = function(state) {
   state.connected = false;
-  state.hoodie.remote.emit('disconnect'); // TODO: spec that
+  state.hoodie.remote.trigger('disconnect'); // TODO: spec that
   if (state.pullRequest) {
     state.pullRequest.abort();
   }
@@ -131,7 +131,7 @@ exports.getSinceNr = function(state) {
 //
 exports.bootstrap = function(state) {
   state.isBootstrapping = true;
-  state.hoodie.remote.emit('bootstrap:start');
+  state.hoodie.remote.trigger('bootstrap:start');
   return state.hoodie.remote.pull()
     .done(helpers.handleBootstrapSuccess.bind(null, state))
     .fail(helpers.handleBootstrapError.bind(null, state));
@@ -204,7 +204,7 @@ exports.push = function(state, objects) {
   state.pushRequest.done(function() {
     for (var i = 0; i < objects.length; i++) {
       delete objects[i]._revisions;
-      state.hoodie.remote.emit('push', objects[i]);
+      state.hoodie.remote.trigger('push', objects[i]);
     }
   });
   return state.pushRequest;

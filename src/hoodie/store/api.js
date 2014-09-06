@@ -100,7 +100,7 @@ exports.clear = function(state) {
     helpers.clearChanged();
     defer.resolve();
     // TODO: get eventEmitter directly from utils.events
-    state.hoodie.store.emit('clear');
+    state.hoodie.store.trigger('clear');
   } catch (_error) {
     defer.reject(_error);
   }
