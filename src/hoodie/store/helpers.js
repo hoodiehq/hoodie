@@ -43,7 +43,7 @@ exports.cache = function(state, type, id, object, options) {
     localStorageWrapper.setObject(key, storedObject);
 
     if (options.remote) {
-      exports.clearChanged(state.type, id);
+      exports.clearChanged(state, type, id);
       state.cachedObject[key] = extend(true, {}, object);
       return state.cachedObject[key];
     }
@@ -93,7 +93,7 @@ exports.cache = function(state, type, id, object, options) {
   // future quick access
   state.cachedObject[key] = extend(true, {}, object);
 
-  if (state.hoodie.store.hasLocalChanges(object)) {
+  if (exports.hasLocalChanges(state, object)) {
     exports.markAsChanged(state, type, id, state.cachedObject[key], options);
   } else {
     exports.clearChanged(state, type, id);
@@ -201,14 +201,12 @@ exports.handlePushedObject = function(state, object) {
 
 // store IDs of dirty objects
 exports.saveDirtyIds = function(state) {
-  try {
-    if (global.$.isEmptyObject(state.dirty)) {
-      localStorageWrapper.removeItem('_dirty');
-    } else {
-      var ids = Object.keys(state.dirty);
-      localStorageWrapper.setItem('_dirty', ids.join(','));
-    }
-  } catch(e) {}
+  if (global.$.isEmptyObject(state.dirty)) {
+    localStorageWrapper.removeItem('_dirty');
+  } else {
+    var ids = Object.keys(state.dirty);
+    localStorageWrapper.setItem('_dirty', ids.join(','));
+  }
 };
 
 //

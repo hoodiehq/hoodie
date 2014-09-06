@@ -214,7 +214,7 @@ exports.signIn = function(state, username, password, options) {
     promise.done(helpers.disconnect.bind(null, state));
   }
 
-  return promise.done( function(newUsername, newHoodieId) {
+  promise.done( function(newUsername) {
     if (options.moveData) {
       state.events.trigger('movedata');
     }
@@ -229,7 +229,7 @@ exports.signIn = function(state, username, password, options) {
       helpers.setUsername(state, newUsername);
     }
     if (!isSilent) {
-      state.events.trigger('signin', newUsername, newHoodieId, options);
+      state.events.trigger('signin', newUsername, state.newHoodieId, options);
     }
   });
 };

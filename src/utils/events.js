@@ -22,13 +22,14 @@ var exports = module.exports = function(hoodie, context, namespace) {
 
 exports.METHODS = ['on','off','one','trigger','bind','undbind'];
 
+var regexMatchBeginningOfEventNames = /(^|\s)/g;
 exports.scopedEventEmitter = function(hoodie, context, namespace) {
   var scopedEmitter = {};
 
   exports.METHODS.forEach(function(fn) {
     scopedEmitter[fn] = function() {
       var args = [].slice.call(arguments);
-      args[0] = namespace + ':' + args[0];
+      args[0] = args[0].replace(regexMatchBeginningOfEventNames, '$1' + namespace + ':');
       hoodie[fn].apply(hoodie, args);
     };
   });

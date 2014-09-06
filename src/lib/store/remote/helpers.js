@@ -20,20 +20,16 @@ exports.VALID_SPECIAL_ATTRIBUTES = ['_id', '_rev', '_deleted', '_revisions', '_a
 // this method will be passed. It can be overwritten by passing an
 // array of objects or a function as `options.objects`
 //
-exports.defaultObjectsToPush = (function(state) {
-  if (state && state.options && state.options.defaultObjectsToPush) {
-    if (global.$.isArray(state.options.defaultObjectsToPush)) {
-      return function() {
-        return state.options.defaultObjectsToPush;
-      };
-    } else {
-      return state.options.defaultObjectsToPush;
-    }
-  }
-  return function() {
+exports.defaultObjectsToPush = function(state) {
+  if (! state.options || ! state.options.defaultObjectsToPush) {
     return [];
-  };
-})();
+  }
+  if (global.$.isArray(state.options.defaultObjectsToPush)) {
+    return state.options.defaultObjectsToPush;
+  } else {
+    return state.options.defaultObjectsToPush();
+  }
+};
 
 // setSinceNr
 // ------------
@@ -125,10 +121,12 @@ exports.parseAllFromRemote = function(state, objects) {
 // extends passed object with a _rev property
 //
 exports.addRevisionTo = function(state, attributes) {
-  var currentRevId, currentRevNr, newRevisionId, parts;
-  try {
-    parts = attributes._rev.split(/-/), currentRevNr = parts[0], currentRevId = parts[1];
-  } catch (_error) {}
+  var currentRevId, currentRevNr, newRevisionId, revParts;
+  if (attributes._rev) {
+    revParts = attributes._rev.split(/-/);
+    currentRevNr = revParts[0];
+    currentRevId = revParts[1];
+  }
   currentRevNr = parseInt(currentRevNr, 10) || 0;
   newRevisionId = exports.generateNewRevisionId(state);
 

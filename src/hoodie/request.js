@@ -96,6 +96,15 @@ exports.request = function(hoodie, type, url, options) {
 exports.handleRequestError = function(hoodie, xhr) {
   var error;
 
+  // handle manual abort of request
+  if (xhr.statusText === 'abort') {
+
+    return rejectWith({
+      name: 'HoodieConnectionAbortError',
+      message: 'Request has been aborted',
+    });
+  }
+
   try {
     error = exports.parseErrorFromResponse(xhr);
   } catch (_error) {

@@ -70,7 +70,7 @@ exports.hasLocalChanges = function(state, type, id) {
   if (state.dirty[key]) {
     return true;
   }
-  return helpers.hasLocalChanges(state, helpers.cache(type, id));
+  return helpers.hasLocalChanges(state, helpers.cache(state, type, id));
 };
 
 
@@ -97,7 +97,7 @@ exports.clear = function(state) {
       return _results;
     }).call(this);
     state.cachedObject = {};
-    helpers.clearChanged();
+    helpers.clearChanged(state);
     defer.resolve();
     // TODO: get eventEmitter directly from utils.events
     state.hoodie.store.trigger('clear');

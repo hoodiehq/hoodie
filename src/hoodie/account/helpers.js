@@ -217,9 +217,10 @@ exports.handleSignInSuccess = function(state, options) {
       });
     }
     state.authenticated = true;
+    state.newHoodieId = newHoodieId;
 
     state.hoodie.account.fetch(newUsername);
-    return resolveWith(newUsername, newHoodieId, options);
+    return resolveWith(newUsername);
   };
 };
 

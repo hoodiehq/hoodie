@@ -43,7 +43,7 @@ exports.save = function(state, type, id, properties, options) {
     return rejectWith(error);
   }
 
-  return exports.decoratePromise(state, state.backend.save(object, options || {}));
+  return helpers.decoratePromise(state, state.backend.save(object, options || {}));
 };
 
 

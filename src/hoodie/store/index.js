@@ -58,10 +58,12 @@ var exports = module.exports = function(hoodie) {
   hoodie.on('remote:change', helpers.handleRemoteChange.bind(null, state));
   hoodie.on('remote:push', helpers.handlePushedObject.bind(null, state));
 
-  exports.bootstrapDirtyObjects(state);
-
   // expose public API
+  // FIXME: must be setup before exports.bootstrapDirtyObjects as
+  //        it depends on state.hoodie.store ...
   hoodie.store = store;
+
+  exports.bootstrapDirtyObjects(state);
 };
 
 // bootstrapping dirty objects, to make sure
