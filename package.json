@@ -40,7 +40,7 @@
     "grunt-contrib-uglify": "^0.5.1",
     "grunt-contrib-watch": "^0.6.1",
     "grunt-karma": "^0.8.3",
-    "grunt-release-hoodie": "~2.7.0-rc.4",
+    "grunt-release-hoodie": "^2.7.0",
     "hoodie.js-assets": "git://github.com/gr2m/hoodie.js-assets.git",
     "karma": "^0.12.19",
     "karma-browserifast": "^0.6.1",
