@@ -41,7 +41,7 @@ var exports = module.exports = function(hoodie) {
 // - sets `online = true`
 // - triggers `reconnected` event
 //
-exports.checkConnection = function(state) {;
+exports.checkConnection = function(state) {
 
   if (state.checkConnectionRequest) {
     return state.checkConnectionRequest;

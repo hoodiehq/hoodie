@@ -1,6 +1,5 @@
 
 var JQEventEmitter = require('jqevents');
-var inherits = require('inherits');
 var extend = require('extend');
 
 
@@ -21,7 +20,7 @@ var exports = module.exports = function(hoodie, context, namespace) {
   return emitter;
 };
 
-exports.METHODS = ['on','off','one','trigger','bind','undbind']
+exports.METHODS = ['on','off','one','trigger','bind','undbind'];
 
 exports.scopedEventEmitter = function(hoodie, context, namespace) {
   var scopedEmitter = {};

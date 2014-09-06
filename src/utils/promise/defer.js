@@ -7,27 +7,27 @@ var Promise = exports.Promise = (function() {
     PromiseClass = require('bluebird');
   }
   PromiseClass.prototype.done = function done(callback) {
-    // this.then(callback);
-    var promise = this;
-    this.then(function() {
-      try {
-        callback.apply(null, arguments);
-      } catch(e) {
-        debugger
-      }
-    });
+    this.then(callback);
+    // var promise = this;
+    // this.then(function() {
+    //   try {
+    //     callback.apply(null, arguments);
+    //   } catch(e) {
+    //     debugger
+    //   }
+    // });
     return this;
   };
   PromiseClass.prototype.fail = function fail(callback) {
-    // this.then(null, callback);
-    var promise = this;
-    this.then(null, function() {
-      try {
-        callback.apply(null, arguments);
-      } catch(e) {
-        debugger
-      }
-    });
+    this.then(null, callback);
+    // var promise = this;
+    // this.then(null, function() {
+    //   try {
+    //     callback.apply(null, arguments);
+    //   } catch(e) {
+    //     debugger
+    //   }
+    // });
     return this;
   };
   PromiseClass.prototype.always = function always(callback) {
