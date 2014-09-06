@@ -6,14 +6,16 @@ var hoodieConnection = require('../../../src/hoodie/connection');
 
 describe('checkConnection()', function() {
   it('should return pending request', function() {
+    var pendingPromise = promise.defer().promise;
+    var checkConnectionPromise;
     var state = {
-      checkConnectionRequest: {
-        state: this.sandbox.stub().returns('pending')
+      hoodie: {
+        id: this.sandbox.stub().returns('foo'),
+        request: this.sandbox.stub().returns(pendingPromise)
       }
     };
-    var result = hoodieConnection.checkConnection(state);
-    expect(result).to.be(state.checkConnectionRequest);
-    expect(state.checkConnectionRequest.state).to.be.called();
+    checkConnectionPromise = hoodieConnection.checkConnection(state);
+    expect(state.checkConnectionRequest).to.be(checkConnectionPromise);
   });
 
   it('should create and handle new request', function() {
@@ -40,10 +42,8 @@ describe('checkConnection()', function() {
 
 describe('isConnected()', function() {
   it('should return connection status', function() {
-    expect(hoodieConnection.isConnected({online: true})).to.be.ok();
-    expect(hoodieConnection.isConnected({online: false})).not.to.be.ok();
-    expect(hoodieConnection.isConnected({})).not.to.be.ok();
-    expect(hoodieConnection.isConnected()).not.to.be.ok();
+    expect(hoodieConnection.isConnected({online: true})).to.be(true);
+    expect(hoodieConnection.isConnected({online: false})).to.be(false);
   });
 });
 
@@ -57,10 +57,10 @@ describe('handleConnection()', function() {
     global.clearTimeout(state.checkConnectionTimeout);
   });
 
-  it('should update connection status', function() {
+  it.only('should update connection status', function() {
     var state = {
       hoodie: {
-        emit: this.sandbox.stub(),
+        trigger: this.sandbox.stub(),
       },
       online: true
     };
@@ -71,8 +71,8 @@ describe('handleConnection()', function() {
     global.clearTimeout(state.checkConnectionTimeout);
     expect(state.online).to.be.ok();
 
-    expect(state.hoodie.emit).to.be.calledTwice();
-    var events = state.hoodie.emit.args;
+    expect(state.hoodie.trigger).to.be.calledTwice();
+    var events = state.hoodie.trigger.args;
     expect(events[0][0]).to.be('a');
     expect(events[1][0]).to.be('b');
   });

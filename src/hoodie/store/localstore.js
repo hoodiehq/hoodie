@@ -112,7 +112,7 @@ exports.save = function(state, object, options) {
     defer.resolve(object, isNew);
     event = isNew ? 'add' : 'update';
     if (!options.silent) {
-      helpers.emitEvents(state, event, object, options);
+      helpers.triggerEvents(state, event, object, options);
     }
   } catch (_error) {
     error = _error;
@@ -276,7 +276,7 @@ exports.remove = function(state, type, id, options) {
     helpers.clearChanged(state, type, id);
     if (object) {
       if (!objectWasMarkedAsDeleted) {
-        helpers.emitEvents(state, 'remove', object, options);
+        helpers.triggerEvents(state, 'remove', object, options);
       }
       return resolveWith(object);
     }
@@ -304,7 +304,7 @@ exports.remove = function(state, type, id, options) {
   }
 
 
-  helpers.emitEvents(state, 'remove', object, options);
+  helpers.triggerEvents(state, 'remove', object, options);
   return resolveWith(object);
 };
 

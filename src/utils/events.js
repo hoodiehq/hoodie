@@ -12,6 +12,7 @@ var exports = module.exports = function(hoodie, context, namespace) {
 
   // aliases
   emitter.trigger = emitter.emit;
+  emitter.one = emitter.once;
   emitter.bind = emitter.on;
   emitter.unbind = emitter.off;
 
@@ -20,7 +21,7 @@ var exports = module.exports = function(hoodie, context, namespace) {
   return emitter;
 };
 
-exports.METHODS = ['on','off','one','trigger','bind','undbind'];
+exports.METHODS = ['on','off','one','trigger','bind','unbind'];
 
 var regexMatchBeginningOfEventNames = /(^|\s)/g;
 exports.scopedEventEmitter = function(hoodie, context, namespace) {

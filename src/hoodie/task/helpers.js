@@ -80,7 +80,7 @@ exports.handleStoreChange = function(state, eventName, object, options) {
   }
 
   object.type = object.type.substr(1);
-  exports.emitEvents(state, eventName, object, options);
+  exports.triggerEvents(state, eventName, object, options);
 };
 
 //
@@ -113,7 +113,7 @@ exports.restartTaskObjects = function(state, taskObjects, update) {
 
 // this is where all the task events get triggered,
 // like add:message, change:message:abc4567, remove, etc.
-exports.emitEvents = function(state, eventName, task, options) {
+exports.triggerEvents = function(state, eventName, task, options) {
   var error;
 
   // "new" tasks are trigger as "start" events

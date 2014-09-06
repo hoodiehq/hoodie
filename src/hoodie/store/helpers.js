@@ -119,7 +119,7 @@ exports.markAsChanged = function(state, type, id, object, options) {
     return;
   }
 
-  exports.emitDirtyAndIdleEvents(state);
+  exports.triggerDirtyAndIdleEvents(state);
 };
 
 // Clear changed
@@ -156,7 +156,7 @@ exports.markAllAsChanged = function(state) {
     }
 
     exports.saveDirtyIds(state);
-    exports.emitDirtyAndIdleEvents(state);
+    exports.triggerDirtyAndIdleEvents(state);
   });
 };
 
@@ -184,7 +184,7 @@ exports.handleRemoteChange = function(state, typeOfChange, object) {
 // Besides that, we also remove objects that have only been marked
 // as _deleted and mark the others as synced.
 exports.handlePushedObject = function(state, object) {
-  exports.emitEvents(state, 'sync', object);
+  exports.triggerEvents(state, 'sync', object);
 
   if (object._deleted) {
     state.hoodie.store.remove(object.type, object.id, {
@@ -240,7 +240,7 @@ exports.isMarkedAsDeleted = function(state, object) {
 
 // this is where all the store events get triggered,
 // like add:task, change:note:abc4567, remove, etc.
-exports.emitEvents = function(state, eventName, object, options) {
+exports.triggerEvents = function(state, eventName, object, options) {
   // TODO: get eventEmitter directly from utils.events
   state.hoodie.store.trigger(eventName, extend(true, {}, object), options);
   state.hoodie.store.trigger(object.type + ':' + eventName, extend(true, {}, object), options);
@@ -290,7 +290,7 @@ exports.emitEvents = function(state, eventName, object, options) {
 // 2. idle event
 //    the `idle` event gets triggered after a short timeout of
 //    no changes, e.g. 2 seconds.
-exports.emitDirtyAndIdleEvents = function(state) {
+exports.triggerDirtyAndIdleEvents = function(state) {
   state.hoodie.store.trigger('dirty');
   global.clearTimeout(state.dirtyTimeout);
 
@@ -331,7 +331,7 @@ exports.moveData = function (state) {
         exports.markAsChanged(state.object.type, object.id, object, {silent: true});
       });
 
-      exports.emitDirtyAndIdleEvents(state);
+      exports.triggerDirtyAndIdleEvents(state);
     });
   });
 };

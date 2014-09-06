@@ -9,15 +9,16 @@ describe('events', function() {
     it('should return instance of EventEmitter', function() {
       var emitter = hoodieEvents();
       expect(emitter).to.be.a(events.EventEmitter);
-      expect(emitter).to.be.a(hoodieEvents.HoodieEventEmitter);
     });
 
     it('should extend hoodie instance', function() {
       var hoodie = {};
       hoodieEvents(hoodie);
 
+      expect(hoodie.on).to.be.a(Function);
+      expect(hoodie.off).to.be.a(Function);
       expect(hoodie.one).to.be.a(Function);
-      expect(hoodie.once).to.be.a(Function);
+      expect(hoodie.trigger).to.be.a(Function);
     });
 
     it('should map to scopedEventEmitter', function() {
@@ -46,7 +47,7 @@ describe('events', function() {
   describe('HoodieEventEmitter', function() {
 
     it('should have all methods', function() {
-      var emitter = new hoodieEvents.HoodieEventEmitter();
+      var emitter = hoodieEvents();
 
       hoodieEvents.METHODS.forEach(function(fn) {
         expect(emitter[fn]).to.be.a(Function);
@@ -57,7 +58,7 @@ describe('events', function() {
 
   describe('scopedEventEmitter', function() {
 
-    it('should emit events on context', function() {
+    it('should trigger events on context', function() {
       var hoodie = {};
       hoodieEvents(hoodie);
 
@@ -71,13 +72,13 @@ describe('events', function() {
       context.on('foo', cb);
 
       var data = {bar: 'bar'};
-      context.emit('foo', data);
+      context.trigger('foo', data);
 
-    expect(cb).to.be.calledWithExactly(data);
-    expect(cb).to.be.calledOnce();
+      expect(cb).to.be.calledWithExactly(data);
+      expect(cb).to.be.calledOnce();
     });
 
-    it('should emit scoped events on hoodie', function() {
+    it('should trigger scoped events on hoodie', function() {
       var hoodie = {};
       hoodieEvents(hoodie);
 
@@ -91,7 +92,7 @@ describe('events', function() {
       hoodie.on('test:foo', cb);
 
       var data = {bar: 'bar'};
-      context.emit('foo', data);
+      context.trigger('foo', data);
 
       expect(cb).to.be.calledWithExactly(data);
       expect(cb).to.be.calledOnce();
@@ -122,7 +123,7 @@ describe('events', function() {
       deepContext.on('bar', deepCb);
 
       var data = {bar: 'bar'};
-      deepContext.emit('bar', data);
+      deepContext.trigger('bar', data);
 
       expect(cb).to.be.calledWithExactly(data);
       expect(cb).to.be.calledOnce();
