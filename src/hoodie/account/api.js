@@ -458,7 +458,7 @@ exports.changeUsername = function(state, currentPassword, newUsername) {
 
   if (newUsername !== currentUsername) {
     newUsername = newUsername || '';
-    return exports.changeUsernameAndPassword(state, currentPassword, newUsername.toLowerCase())
+    return helpers.changeUsernameAndPassword(state, currentPassword, newUsername.toLowerCase())
     .done( function() {
       helpers.setUsername(state, newUsername);
       state.events.trigger('changeusername', newUsername);
