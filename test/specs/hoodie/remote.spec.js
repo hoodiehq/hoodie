@@ -1,11 +1,18 @@
 require('../../lib/setup');
 
-var configMock = require('../../mocks/utils/config');
-global.stubRequire('src/utils/config', configMock);
-
+var config = require('../../../src/utils/config')();
 var hoodieAccountRemote = require('../../../src/hoodie/remote');
 
 describe('hoodie.remote', function() {
+
+  before(function () {
+    config.set('_remote.since', 10);
+  });
+
+  after(function() {
+    config.clear();
+  });
+
   beforeEach(function() {
     this.hoodie = this.MOCKS.hoodie.apply(this);
 
@@ -15,7 +22,7 @@ describe('hoodie.remote', function() {
       disconnect: sinon.spy(),
       push: sinon.spy()
     });
-    configMock.get.withArgs('_remote.since').returns(10);
+
     this.hoodie.store.index.returns(['funk/1', '$task/2']);
 
     this.clock = this.sandbox.useFakeTimers(0); // '1970-01-01 00:00:00'
@@ -80,7 +87,9 @@ describe('hoodie.remote', function() {
       it('should connect to user\'s database (ignoring passed argument)', function() {
         var promise = this.remote.connect();
         expect(this.openConnectSpy).to.not.be.called();
-        expect(promise).to.be.rejectedWith('User has no database to connect to');
+        expect(promise.state[0]).to.eql('REJECTED');
+        expect(promise.outcome instanceof Error).to.eql(true);
+        expect(promise.outcome.message).to.eql('User has no database to connect to');
       });
     });
   });

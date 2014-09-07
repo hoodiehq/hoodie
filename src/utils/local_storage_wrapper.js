@@ -1,32 +1,39 @@
-// public API
-var store = {};
 
-store.setItem = function (name, item) {
-  global.localStorage.setItem(name, item);
+var exports = module.exports = function() {
+  if (!exports.hasLocalStorage()) {
+    return exports.createWrapper(exports.localStub, false);
+  }
+
+  return exports.createWrapper(global.localStorage, true);
 };
 
-store.getItem = function (name) {
-  return global.localStorage.getItem(name);
+exports.createWrapper = function(store, isPersistent) {
+  return {
+    getItem: store.getItem.bind(store),
+    setItem: store.setItem.bind(store),
+    removeItem: store.removeItem.bind(store),
+    key: store.key.bind(store),
+    isPersistent: isPersistent,
+    length: function() { return store.length; },
+    setObject: exports.setObject.bind(null, store),
+    getObject: exports.getObject.bind(null, store)
+  };
 };
 
-store.removeItem = function (name) {
-  return global.localStorage.removeItem(name);
+var noop = function() {
+  return null;
 };
 
-store.clear = function () {
-  return global.localStorage.clear();
-};
-
-store.key = function (nr) {
-  return global.localStorage.key(nr);
-};
-
-store.length = function () {
-  return global.localStorage.length;
+exports.localStub = {
+  getItem: noop,
+  setItem: noop,
+  removeItem: noop,
+  key: noop,
+  length: 0
 };
 
 // more advanced localStorage wrappers to find/save objects
-store.setObject = function (key, object) {
+exports.setObject = function (store, key, object) {
   if (typeof object !== 'object') {
     return store.setItem(key, object);
   }
@@ -34,10 +41,10 @@ store.setObject = function (key, object) {
   return store.setItem(key, global.JSON.stringify(object));
 };
 
-store.getObject = function (key) {
+exports.getObject = function (store, key) {
   var item = store.getItem(key);
 
-  if (! item) {
+  if (!item) {
     return null;
   }
 
@@ -47,22 +54,6 @@ store.getObject = function (key) {
     return item;
   }
 };
-
-function init() {
-  store.isPersistent = isPersistent();
-  if (store.isPersistent) {
-    return;
-  }
-
-  // if store is not persistent, patch all store methods
-  store.getItem = function() { return null; };
-  store.setItem = function() { return null; };
-  store.removeItem = function() { return null; };
-  store.key = function() { return null; };
-  store.length = function() { return 0; };
-  store.isPersistent = function() { return false; };
-}
-
 
 // Is persistent?
 // ----------------
@@ -75,7 +66,7 @@ function init() {
 // https://github.com/cappuccino/cappuccino/commit/063b05d9643c35b303568a28809e4eb3224f71ec
 //
 
-function isPersistent() {
+exports.hasLocalStorage = function() {
   try {
 
     // we've to put this in here. I've seen Firefox throwing `Security error: 1000`
@@ -86,15 +77,15 @@ function isPersistent() {
 
     // Just because localStorage exists does not mean it works. In particular it might be disabled
     // as it is when Safari's private browsing mode is active.
-    localStorage.setItem('Storage-Test', '1');
+    global.localStorage.setItem('Storage-Test', '1');
 
     // that should not happen ...
-    if (localStorage.getItem('Storage-Test') !== '1') {
+    if (global.localStorage.getItem('Storage-Test') !== '1') {
       return false;
     }
 
     // okay, let's clean up if we got here.
-    localStorage.removeItem('Storage-Test');
+    global.localStorage.removeItem('Storage-Test');
   } catch (_error) {
 
     // in case of an error, like Safari's Private Mode, return false
@@ -103,9 +94,4 @@ function isPersistent() {
 
   // we're good.
   return true;
-}
-
-// initialize
-init();
-
-module.exports = store;
+};
