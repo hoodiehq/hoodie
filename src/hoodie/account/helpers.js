@@ -496,7 +496,7 @@ exports.sendChangeUsernameAndPasswordRequest = function(state, currentPassword, 
 
     return exports.withPreviousRequestsAborted(state, 'updateUsersDoc', function() {
       return state.hoodie.account.request('PUT', exports.userDocUrl(state), options)
-      .then(exports.handleChangeUsernameAndPasswordResponse(newUsername, newPassword || currentPassword));
+      .then(exports.handleChangeUsernameAndPasswordResponse(state, newUsername, newPassword || currentPassword));
     });
 
   };
