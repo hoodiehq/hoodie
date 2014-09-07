@@ -232,6 +232,8 @@ exports.signIn = function(state, username, password, options) {
       state.events.trigger('signin', newUsername, state.newHoodieId, options);
     }
   });
+
+  return promise;
 };
 
 // sign out
