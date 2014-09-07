@@ -360,11 +360,11 @@ exports.upgradeAnonymousAccount = function(state, username, password) {
 //
 exports.handleFetchBeforeDestroySuccess = function(state) {
 
-  exports.disconnect();
+  exports.disconnect(state);
   state.userDoc._deleted = true;
 
   return exports.withPreviousRequestsAborted(state, 'updateUsersDoc', function() {
-    state.hoodie.account.request('PUT', exports.userDocUrl(), {
+    state.hoodie.account.request('PUT', exports.userDocUrl(state), {
       data: JSON.stringify(state.userDoc),
       contentType: 'application/json'
     });
