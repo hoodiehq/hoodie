@@ -140,15 +140,10 @@ exports.anonymousSignUp = function(state) {
   username = state.hoodie.id();
 
   return helpers.sendSignUpRequest(state, username, password)
-  // FIXME: once we have support for progress again,
-  //        call `helpers.setAnonymousPassword` in the progress callback,
-  //        otherwise this will in future if there are custom user
-  //        confirmation flows.
-  // .progress( function() {
-  //   helpers.setAnonymousPassword(state, password);
-  // })
-  .done(function() {
+  .progress( function() {
     helpers.setAnonymousPassword(state, password);
+  })
+  .done(function() {
     state.events.trigger('signup:anonymous');
   });
 };
