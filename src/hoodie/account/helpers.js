@@ -41,7 +41,7 @@ exports.anonymousSignIn = function(state) {
 // reauthenticate: force hoodie to reauthenticate
 exports.reauthenticate = function(state) {
   state.authenticated = undefined;
-  return exports.authenticate();
+  return state.hoodie.account.authenticate();
 };
 
 // setters
