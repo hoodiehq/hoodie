@@ -1,68 +1,49 @@
 /*jshint -W079 */
 var Promise = exports.Promise = (function() {
-  var PromiseClass;
   if (typeof global.Promise === 'function') {
-    PromiseClass = global.Promise;
-  } else {
-    PromiseClass = require('bluebird');
+    return global.Promise;
   }
-  if (! PromiseClass.prototype.done) {
-    PromiseClass.prototype.done = function done(callback) {
-      this.then(callback);
-      return this;
-    };
-  }
-  if (! PromiseClass.prototype.fail) {
-    PromiseClass.prototype.fail = function fail(callback) {
-      this.then(null, callback);
-      return this;
-    };
-  }
-  if (! PromiseClass.prototype.always) {
-    PromiseClass.prototype.always = function always(callback) {
-      this.then(callback, callback);
-      return this;
-    };
-  }
-  if (! PromiseClass.prototype.progress) {
-    PromiseClass.prototype.progress = function progress(callback) {
-      if (this._progressCallbacks) {
-        this._progressCallbacks.push(callback);
-      }
-      return this;
-    };
-  }
-  return PromiseClass;
+  return require('bluebird');
 })();
 
 module.exports = function Defer() {
-  var defer, resolve, reject, promise;
-
-  promise = new Promise(function (resolveCallback, rejectCallback) {
-    resolve = function() {
-      defer.notify = noop;
+  var defer = {};
+  defer.promise = new Promise(function (resolveCallback, rejectCallback) {
+    defer.resolve = function resolve() {
+      defer.notify = function noop () {};
       resolveCallback.apply(null, arguments);
     };
-    reject = function() {
-      defer.notify = noop;
+    defer.reject = function reject() {
+      defer.notify = function noop () {};
       rejectCallback.apply(null, arguments);
     };
   });
 
-  promise._progressCallbacks = [];
-  function notify() {
+  defer.promise._progressCallbacks = [];
+  defer.notify = function notify() {
     var args = Array.prototype.slice.call(arguments);
-    promise._progressCallbacks.forEach(function(callback) {
+    defer.promise._progressCallbacks.forEach(function(callback) {
       callback.apply(null, args);
     });
-  }
-  function noop () {}
+  };
 
-  defer = {
-    resolve: resolve,
-    reject: reject,
-    promise: promise,
-    notify: notify
+  defer.promise.done = function done(callback) {
+    this.then(callback);
+    return this;
+  };
+  defer.promise.fail = function fail(callback) {
+    this.then(null, callback);
+    return this;
+  };
+  defer.promise.always = function always(callback) {
+    this.then(callback, callback);
+    return this;
+  };
+  defer.promise.progress = function progress(callback) {
+    if (this._progressCallbacks) {
+      this._progressCallbacks.push(callback);
+    }
+    return this;
   };
 
   return defer;
