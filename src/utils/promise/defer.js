@@ -19,6 +19,9 @@ module.exports = function Defer() {
     };
   });
 
+  // add done, fail, always, progress callbacks
+  wrapPromise(defer.promise);
+
   defer.promise._progressCallbacks = [];
   defer.notify = function notify() {
     var args = Array.prototype.slice.call(arguments);
@@ -27,24 +30,35 @@ module.exports = function Defer() {
     });
   };
 
-  defer.promise.done = function done(callback) {
+  return defer;
+};
+
+function wrapPromise (promise) {
+  if (promise.done) {
+    return promise;
+  }
+
+  promise.done = function done(callback) {
     this.then(callback);
     return this;
   };
-  defer.promise.fail = function fail(callback) {
+  promise.fail = function fail(callback) {
     this.then(null, callback);
     return this;
   };
-  defer.promise.always = function always(callback) {
+  promise.always = function always(callback) {
     this.then(callback, callback);
     return this;
   };
-  defer.promise.progress = function progress(callback) {
+  promise.progress = function progress(callback) {
     if (this._progressCallbacks) {
       this._progressCallbacks.push(callback);
     }
     return this;
   };
-
-  return defer;
-};
+  promise.then = function then (onResolve, onReject) {
+    promise = Promise.prototype.then.call(this, onResolve, onReject);
+    wrapPromise(promise);
+    return promise;
+  };
+}
