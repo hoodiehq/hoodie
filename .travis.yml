@@ -26,3 +26,7 @@ deploy:
   on:
     tags: true
     repo: hoodiehq/hoodie.js
+sudo: false
+cache:
+  directories:
+  - node_modules
