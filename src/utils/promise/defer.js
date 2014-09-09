@@ -6,24 +6,32 @@ var Promise = exports.Promise = (function() {
   } else {
     PromiseClass = require('bluebird');
   }
-  PromiseClass.prototype.done = function done(callback) {
-    this.then(callback);
-    return this;
-  };
-  PromiseClass.prototype.fail = function fail(callback) {
-    this.then(null, callback);
-    return this;
-  };
-  PromiseClass.prototype.always = function always(callback) {
-    this.then(callback, callback);
-    return this;
-  };
-  PromiseClass.prototype.progress = function progress(callback) {
-    if (this._progressCallbacks) {
-      this._progressCallbacks.push(callback);
-    }
-    return this;
-  };
+  if (! PromiseClass.prototype.done) {
+    PromiseClass.prototype.done = function done(callback) {
+      this.then(callback);
+      return this;
+    };
+  }
+  if (! PromiseClass.prototype.fail) {
+    PromiseClass.prototype.fail = function fail(callback) {
+      this.then(null, callback);
+      return this;
+    };
+  }
+  if (! PromiseClass.prototype.always) {
+    PromiseClass.prototype.always = function always(callback) {
+      this.then(callback, callback);
+      return this;
+    };
+  }
+  if (! PromiseClass.prototype.progress) {
+    PromiseClass.prototype.progress = function progress(callback) {
+      if (this._progressCallbacks) {
+        this._progressCallbacks.push(callback);
+      }
+      return this;
+    };
+  }
   return PromiseClass;
 })();
 
