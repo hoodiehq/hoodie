@@ -22,7 +22,7 @@ exports.find = function(state, type, id) {
 
   path = '/' + encodeURIComponent(path);
 
-  return state.hoodie.remote.request('GET', path)
+  return state.remote.request('GET', path)
     .then(helpers.parseFromRemote.bind(null, state));
 };
 
@@ -67,7 +67,7 @@ exports.findAll = function(state, type) {
       (encodeURIComponent(endkey)) + '"';
   }
 
-  return state.hoodie.remote.request('GET', path)
+  return state.remote.request('GET', path)
     .then(helpers.mapDocsFromFindAll.bind(null, state))
     .then(helpers.parseAllFromRemote.bind(null, state));
 };
@@ -88,7 +88,7 @@ exports.save = function(state, object) {
 
   object = helpers.parseForRemote(state, object);
   path = '/' + encodeURIComponent(object._id);
-  return state.hoodie.remote.request('PUT', path, {
+  return state.remote.request('PUT', path, {
     data: object
   });
 };
@@ -100,7 +100,7 @@ exports.save = function(state, object) {
 // remove one object
 //
 exports.remove = function(state, type, id) {
-  return state.hoodie.remote.update(type, id, {
+  return state.remote.update(type, id, {
     _deleted: true
   });
 };
@@ -112,7 +112,7 @@ exports.remove = function(state, type, id) {
 // remove all objects, can be filtered by type
 //
 exports.removeAll = function(state, type) {
-  return state.hoodie.remote.updateAll(type, {
+  return state.remote.updateAll(type, {
     _deleted: true
   });
 };

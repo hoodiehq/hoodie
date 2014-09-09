@@ -146,7 +146,7 @@ exports.bootstrap = function(state) {
 // and restart each 25 seconds.
 //
 exports.pull = function(state) {
-  state.pullRequest = state.hoodie.remote.request('GET', helpers.pullUrl(state));
+  state.pullRequest = state.remote.request('GET', helpers.pullUrl(state));
 
   if (state.hoodie.remote.isConnected()) {
     global.clearTimeout(state.pullRequestTimeout);
@@ -194,7 +194,7 @@ exports.push = function(state, objects) {
     // being triggered for the same object revisions
     state.pushedObjectRevisions[object._rev] = 1;
   }
-  state.pushRequest = state.hoodie.remote.request('POST', '/_bulk_docs', {
+  state.pushRequest = state.remote.request('POST', '/_bulk_docs', {
     data: {
       docs: objectsForRemote,
       new_edits: false

@@ -146,5 +146,8 @@ module.exports = function(hoodie, options) {
     }
   }
 
+  // externalize current remote instance
+  state.remote = remote;
+
   return remote;
 };

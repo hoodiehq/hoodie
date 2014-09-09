@@ -75,7 +75,7 @@ module.exports = function(hoodie, options) {
   // if `validate` returns nothing, the passed object is
   // valid. Otherwise it returns an error
   //
-  api.validate = state.validate = helpers.defaultValidate.bind(null, state);
+  api.validate = state.validate = helpers.defaultValidate.bind(null);
 
   if (typeof options.validate === 'function') {
     api.validate = state.validate = options.validate;
