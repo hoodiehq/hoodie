@@ -73,9 +73,9 @@ exports.connect = function(state, name) {
     state.remoteName = name;
   }
   state.connected = true;
-  state.hoodie.remote.trigger('connect');
-  return state.hoodie.remote.bootstrap().then(function() {
-    state.hoodie.remote.push();
+  state.remote.trigger('connect');
+  return state.remote.bootstrap().then(function() {
+    state.remote.push();
   });
 };
 
@@ -87,7 +87,7 @@ exports.connect = function(state, name) {
 //
 exports.disconnect = function(state) {
   state.connected = false;
-  state.hoodie.remote.trigger('disconnect'); // TODO: spec that
+  state.remote.trigger('disconnect'); // TODO: spec that
   if (state.pullRequest) {
     state.pullRequest.abort();
   }
@@ -131,8 +131,8 @@ exports.getSinceNr = function(state) {
 //
 exports.bootstrap = function(state) {
   state.isBootstrapping = true;
-  state.hoodie.remote.trigger('bootstrap:start');
-  return state.hoodie.remote.pull()
+  state.remote.trigger('bootstrap:start');
+  return state.remote.pull()
     .done(helpers.handleBootstrapSuccess.bind(null, state))
     .fail(helpers.handleBootstrapError.bind(null, state));
 };
@@ -148,7 +148,7 @@ exports.bootstrap = function(state) {
 exports.pull = function(state) {
   state.pullRequest = state.remote.request('GET', helpers.pullUrl(state));
 
-  if (state.hoodie.remote.isConnected()) {
+  if (state.remote.isConnected()) {
     global.clearTimeout(state.pullRequestTimeout);
     state.pullRequestTimeout = global.setTimeout(state.restartPullRequest, 25000);
   }
@@ -186,7 +186,7 @@ exports.push = function(state, objects) {
 
     object = objects[i];
     helpers.addRevisionTo(state, object);
-    state.hoodie.remote.markAsKnownObject(object);
+    state.remote.markAsKnownObject(object);
     object = helpers.parseForRemote(state, object);
     objectsForRemote.push(object);
 
@@ -204,7 +204,7 @@ exports.push = function(state, objects) {
   state.pushRequest.done(function() {
     for (var i = 0; i < objects.length; i++) {
       delete objects[i]._revisions;
-      state.hoodie.remote.trigger('push', objects[i]);
+      state.remote.trigger('push', objects[i]);
     }
   });
   return state.pushRequest;
@@ -216,5 +216,5 @@ exports.push = function(state, objects) {
 // push objects, then pull updates.
 //
 exports.sync = function(state, objects) {
-  return state.hoodie.remote.push(objects).then(state.hoodie.remote.pull);
+  return state.remote.push(objects).then(state.remote.pull);
 };

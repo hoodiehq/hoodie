@@ -175,8 +175,8 @@ exports.mapDocsFromFindAll = function(state, response) {
 // are no changes on remote.
 //
 exports.pullUrl = function(state) {
-  var since = state.hoodie.remote.getSinceNr();
-  if (state.hoodie.remote.isConnected() && !state.isBootstrapping) {
+  var since = state.remote.getSinceNr();
+  if (state.remote.isConnected() && !state.isBootstrapping) {
     return '/_changes?include_docs=true&since=' + since + '&heartbeat=10000&feed=longpoll';
   } else {
     return '/_changes?include_docs=true&since=' + since;
@@ -203,8 +203,8 @@ exports.restartPullRequest = function(state) {
 exports.handlePullSuccess = function(state, response) {
   exports.setSinceNr(state, response.last_seq);
   exports.handlePullResults(state, response.results);
-  if (state.hoodie.remote.isConnected()) {
-    return state.hoodie.remote.pull();
+  if (state.remote.isConnected()) {
+    return state.remote.pull();
   }
 };
 
@@ -215,7 +215,7 @@ exports.handlePullSuccess = function(state, response) {
 // then check for another change
 //
 exports.handlePullError = function(state, xhr, error) {
-  if (!state.hoodie.remote.isConnected()) {
+  if (!state.remote.isConnected()) {
     return;
   }
 
@@ -223,8 +223,8 @@ exports.handlePullError = function(state, xhr, error) {
     // Session is invalid. User is still login, but needs to reauthenticate
     // before sync can be continued
   case 401:
-    state.hoodie.remote.trigger('error:unauthenticated', error);
-    return state.hoodie.remote.disconnect();
+    state.remote.trigger('error:unauthenticated', error);
+    return state.remote.disconnect();
 
     // the 404 comes, when the requested DB has been removed
     // or does not exist yet.
@@ -236,20 +236,20 @@ exports.handlePullError = function(state, xhr, error) {
     // TODO: review / rethink that.
     //
   case 404:
-    return global.setTimeout(state.hoodie.remote.pull, 3000);
+    return global.setTimeout(state.remote.pull, 3000);
 
   case 500:
     //
     // Please server, don't give us these. At least not persistently
     //
-    state.hoodie.remote.trigger('error:server', error);
-    global.setTimeout(state.hoodie.remote.pull, 3000);
+    state.remote.trigger('error:server', error);
+    global.setTimeout(state.remote.pull, 3000);
     return state.hoodie.checkConnection();
   default:
     // usually a 0, which stands for timeout or server not reachable.
     if (xhr.statusText === 'abort') {
       // manual abort after 25sec. restart pulling changes directly when connected
-      return state.hoodie.remote.pull();
+      return state.remote.pull();
     } else {
 
       // oops. This might be caused by an unreachable server.
@@ -257,7 +257,7 @@ exports.handlePullError = function(state, xhr, error) {
       // heroku kills the request after ~30s.
       // we'll try again after a 3s timeout
       //
-      global.setTimeout(state.hoodie.remote.pull, 3000);
+      global.setTimeout(state.remote.pull, 3000);
       return state.hoodie.checkConnection();
     }
   }
@@ -268,14 +268,14 @@ exports.handlePullError = function(state, xhr, error) {
 //
 exports.handleBootstrapSuccess = function(state) {
   state.isBootstrapping = false;
-  state.hoodie.remote.trigger('bootstrap:end');
+  state.remote.trigger('bootstrap:end');
 };
 
 // ### handle error of initial bootstrapping from remote
 //
 exports.handleBootstrapError = function(state, error) {
   state.isBootstrapping = false;
-  state.hoodie.remote.trigger('bootstrap:error', error);
+  state.remote.trigger('bootstrap:error', error);
 };
 
 // ### handle changes from remote
@@ -283,7 +283,7 @@ exports.handleBootstrapError = function(state, error) {
 exports.handlePullResults = function(state, changes) {
   var doc, event, object;
 
-  var remote = state.hoodie.remote;
+  var remote = state.remote;
 
   for (var i = 0; i < changes.length; i++) {
     doc = changes[i].doc;
@@ -299,7 +299,7 @@ exports.handlePullResults = function(state, changes) {
     object = exports.parseFromRemote(state, doc);
 
     if (object._deleted) {
-      if (!state.hoodie.remote.isKnownObject(object)) {
+      if (!state.remote.isKnownObject(object)) {
         continue;
       }
       event = 'remove';
