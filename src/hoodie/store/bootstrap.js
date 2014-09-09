@@ -19,7 +19,7 @@ exports.end = function(state) {
     args = methodCall[1];
     defer = methodCall[2];
     localStore[method]
-      .bind(localStore, state)
+      .bind(localStore)
       .apply(localStore, args)
       .then(defer.resolve, defer.reject);
   }

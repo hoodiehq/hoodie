@@ -51,7 +51,7 @@ exports.handleNewTask = function(state, object) {
     state.hoodie.store.remove('$' + object.type, object.id);
   });
 
-  return defer;
+  return defer.promise;
 };
 
 //
@@ -70,7 +70,7 @@ exports.handleAbortedTaskObject = function(state, taskObject) {
   state.hoodie.once('store:sync:' + type + ':' + id, defer.resolve);
   removePromise.fail(defer.reject);
 
-  return defer;
+  return defer.promise;
 };
 
 //
