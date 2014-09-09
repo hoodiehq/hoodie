@@ -8,53 +8,54 @@ var Promise = exports.Promise = (function() {
   }
   PromiseClass.prototype.done = function done(callback) {
     this.then(callback);
-    // var promise = this;
-    // this.then(function() {
-    //   try {
-    //     callback.apply(null, arguments);
-    //   } catch(e) {
-    //     debugger
-    //   }
-    // });
     return this;
   };
   PromiseClass.prototype.fail = function fail(callback) {
     this.then(null, callback);
-    // var promise = this;
-    // this.then(null, function() {
-    //   try {
-    //     callback.apply(null, arguments);
-    //   } catch(e) {
-    //     debugger
-    //   }
-    // });
     return this;
   };
   PromiseClass.prototype.always = function always(callback) {
     this.then(callback, callback);
     return this;
   };
-  PromiseClass.prototype.progress = function progress() {
-    console.log('NOTE: promise.progress is currently not working');
+  PromiseClass.prototype.progress = function progress(callback) {
+    if (this._progressCallbacks) {
+      this._progressCallbacks.push(callback);
+    }
     return this;
   };
   return PromiseClass;
 })();
 
 module.exports = function Defer() {
-  var resolve, reject, promise;
+  var defer, resolve, reject, promise;
 
-  promise = new Promise(function () {
-    resolve = arguments[0];
-    reject = arguments[1];
+  promise = new Promise(function (resolveCallback, rejectCallback) {
+    resolve = function() {
+      defer.notify = noop;
+      resolveCallback.apply(null, arguments);
+    };
+    reject = function() {
+      defer.notify = noop;
+      rejectCallback.apply(null, arguments);
+    };
   });
 
-  return {
+  promise._progressCallbacks = [];
+  function notify() {
+    var args = Array.prototype.slice.call(arguments);
+    promise._progressCallbacks.forEach(function(callback) {
+      callback.apply(null, args);
+    });
+  }
+  function noop () {}
+
+  defer = {
     resolve: resolve,
     reject: reject,
     promise: promise,
-    notify: function() {
-      console.log('NOTE: defer.notify is currently not working');
-    }
+    notify: notify
   };
+
+  return defer;
 };
