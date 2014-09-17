@@ -1,3 +1,13 @@
+<a name="1.3.0"></a>
+## 1.3.0 (2014-09-17)
+
+
+#### Features
+
+* **hapi:** upgrade to latest ([98e805df](https://github.com/hoodiehq/hoodie-server/commit/98e805dfa38fd80e5281b7e4c85502bb899a21e3))
+* **requests:** allow request sizes up to 10 MB ([36d4ecba](https://github.com/hoodiehq/hoodie-server/commit/36d4ecbaef2b3c68e711da7dd4a30ed37840133c))
+
+
 <a name="1.2.4"></a>
 ### 1.2.4 (2014-08-07)
 
