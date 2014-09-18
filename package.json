@@ -43,7 +43,7 @@
     "grunt-contrib-jshint": "^0.6.2",
     "grunt-contrib-nodeunit": "^0.2.2",
     "grunt-contrib-watch": "^0.5.1",
-    "grunt-release-hoodie": "^2.5.0",
+    "grunt-release-hoodie": "^2.7.1",
     "grunt-simple-mocha": "^0.4.0",
     "load-grunt-tasks": "^0.4.0",
     "mocha": "*",
