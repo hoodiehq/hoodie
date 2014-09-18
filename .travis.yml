@@ -6,6 +6,7 @@ before_script:
 services:
 - couchdb
 notifications:
+  email: false
   irc:
     channels:
     - irc.freenode.net#hoodie
