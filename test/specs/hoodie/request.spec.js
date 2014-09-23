@@ -45,6 +45,10 @@ describe('hoodie.request', function () {
       expect(this.args.crossDomain).to.be(true);
     });
 
+    it('should set the Authorization "Bearer ..." header', function() {
+      expect(this.args.headers.Authorization).to.be('Bearer dXNlci2Mjow9N2Rh2WyZfioB1ubE');
+    });
+
     _and('baseUrl is not set', function() {
       beforeEach(function() {
         this.hoodie.baseUrl = undefined;

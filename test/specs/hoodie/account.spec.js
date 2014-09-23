@@ -51,6 +51,7 @@ describe('hoodie.account', function() {
     _when('user is logged in as joe@example.com', function() {
       beforeEach(function() {
         this.account.username = 'joe@example.com';
+        this.account.bearerToken = 'dXNlci2Mjow9N2Rh2WyZfioB1ubE';
       });
 
       _and('session has not been validated yet', function() {
@@ -89,6 +90,7 @@ describe('hoodie.account', function() {
             var promise = this.account.authenticate();
             this.requestDefers[0].resolve({
               name: 'joe@example.com',
+              bearerToken: 'dXNlci2Mjow9N2Rh2WyZfioB1ubE',
               roles: ['hash123', 'confirmed']
             });
 
@@ -137,9 +139,18 @@ describe('hoodie.account', function() {
               expect(this.account.username).to.eql('joe@example.com');
             });
 
+            it('should set account.bearerToken', function() {
+              expect(this.account.bearerToken).to.eql('dXNlci2Mjow9N2Rh2WyZfioB1ubE');
+            });
+
             it('should not set _account.username config', function() {
               // because it's already 'joe@example.com'
               expect(configMock.set).to.not.be.calledWith('_account.username', 'joe@example.com');
+            });
+
+            it('should not set _account.bearerToken config', function() {
+              // because it's already 'dXNlci2Mjow9N2Rh2WyZfioB1ubE'
+              expect(configMock.set).to.not.be.calledWith('_account.bearerToken', 'dXNlci2Mjow9N2Rh2WyZfioB1ubE');
             });
           }); // returns valid session info for joe@example.com
 
@@ -526,6 +537,7 @@ describe('hoodie.account', function() {
               this.hoodie.store.findAll.defer.resolve([]);
               this.requestDefers[1].resolve({
                 name: 'joe@example.com',
+                bearerToken: 'dXNlci2Mjow9N2Rh2WyZfioB1ubE',
                 roles: ['hash123', 'confirmed']
               });
             });
@@ -534,12 +546,16 @@ describe('hoodie.account', function() {
               expect(configMock.set).to.be.calledWith('_account.username', 'joe@example.com');
               expect(this.account.username).to.be('joe@example.com');
             });
+            it('should persist new bearerToken', function() {
+              expect(configMock.set).to.be.calledWith('_account.bearerToken', 'dXNlci2Mjow9N2Rh2WyZfioB1ubE');
+              expect(this.account.bearerToken).to.be('dXNlci2Mjow9N2Rh2WyZfioB1ubE');
+            });
             it('should trigger `signup` event', function() {
               expect(this.account.trigger).to.be.calledWith('signup', 'joe@example.com');
             });
 
             it('should resolve its promise', function() {
-              expect(this.promise).to.be.resolvedWith('joe@example.com', 'hash123', {});
+              expect(this.promise).to.be.resolvedWith('joe@example.com', 'hash123', 'dXNlci2Mjow9N2Rh2WyZfioB1ubE', {});
             });
 
           }); // signIn successful
@@ -636,6 +652,7 @@ describe('hoodie.account', function() {
         beforeEach(function() {
           this.requestDefers[0].resolve({
             name: 'hash123',
+            bearerToken: 'dXNlci2Mjow9N2Rh2WyZfioB1ubE',
             roles: ['hash123', 'confirmed']
           });
         });
@@ -894,6 +911,7 @@ describe('hoodie.account', function() {
           this.response = {
             'ok': true,
             'name': 'user/joe@example.com',
+            'bearerToken': 'dXNlci2Mjow9N2Rh2WyZfioB1ubE',
             'roles': ['hash123', 'confirmed']
           };
           this.hoodie.request.defer.resolve(this.response);
@@ -914,15 +932,22 @@ describe('hoodie.account', function() {
           expect(configMock.set).to.be.calledWith('_account.username', 'joe@example.com');
         });
 
+        it('should set bearerToken', function() {
+          this.account.signIn('joe@example.com', 'secret');
+
+          expect(this.account.username).to.eql('joe@example.com');
+          expect(configMock.set).to.be.calledWith('_account.username', 'joe@example.com');
+        });
+
         it('should fetch the _users doc', function() {
           this.sandbox.spy(this.account, 'fetch');
           this.account.signIn('joe@example.com', 'secret');
           expect(this.account.fetch).to.be.called();
         });
 
-        it('should resolve with username, hoodieId and options', function() {
+        it('should resolve with username, hoodieId, bearerToken and options', function() {
           var promise = this.account.signIn('joe@example.com', 'secret', {foo: 'bar'});
-          expect(promise).to.be.resolvedWith('joe@example.com', 'hash123', {foo: 'bar'});
+          expect(promise).to.be.resolvedWith('joe@example.com', 'hash123', 'dXNlci2Mjow9N2Rh2WyZfioB1ubE', {foo: 'bar'});
         });
 
         it('should trigger `signin` event', function() {
@@ -1048,6 +1073,7 @@ describe('hoodie.account', function() {
           this.response = {
             'ok': true,
             'name': 'user/joe@example.com',
+            'bearerToken': 'dXNlci2Mjow9N2Rh2WyZfioB1ubE',
             'roles': ['hash123', 'confirmed']
           };
           this.hoodie.request.defer.resolve(this.response);
@@ -1078,6 +1104,7 @@ describe('hoodie.account', function() {
         this.response = {
           'ok': true,
           'name': 'user/joe@example.com',
+          'bearerToken': 'dXNlci2Mjow9N2Rh2WyZfioB1ubE',
           'roles': ['hash123', 'confirmed']
         };
         this.hoodie.request.defer.resolve(this.response);
@@ -2081,6 +2108,7 @@ function validSessionResponse() {
 function validSignInResponse() {
   return {
     name: 'user/joe@example.com',
+    bearerToken: 'dXNlci2Mjow9N2Rh2WyZfioB1ubE',
     roles: ['hash123', 'confirmed']
   };
 }
@@ -2133,6 +2161,7 @@ function with_session_validated_before(callback) {
       var response = {
         userCtx: {
           name: 'user/joe@example.com',
+          bearerToken: 'dXNlci2Mjow9N2Rh2WyZfioB1ubE',
           roles: ['hash123', 'confirmed']
         }
       };

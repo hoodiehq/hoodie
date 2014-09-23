@@ -103,6 +103,9 @@ function Hoodie(baseUrl) {
   // set username from config (local store)
   hoodie.account.username = utils.config.get('_account.username');
 
+  // set bearerToken from config (local store)
+  hoodie.account.bearerToken = utils.config.get('_account.bearerToken');
+
   // init hoodie.remote API
   hoodie.remote.init();
 
