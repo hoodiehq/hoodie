@@ -161,7 +161,7 @@ module.exports = function(grunt) {
     });
 
     grunt.task.run([
-      'karma:dev',
+      // 'karma:dev',
       this.args.join(':'),
       'refresh',
       'build',
@@ -172,7 +172,7 @@ module.exports = function(grunt) {
   });
 
   grunt.registerTask('build', ['browserify:build', 'concat', 'uglify']);
-  grunt.registerTask('test', ['jshint', 'karma:continuous', 'build']);
+  grunt.registerTask('test', ['jshint', /*'karma:continuous', */'build']);
   grunt.registerTask('default', ['build']);
 
 };
