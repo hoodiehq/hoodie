@@ -13,7 +13,7 @@
     "cli-color": "^0.3.2",
     "couchr": "0.0.14",
     "follow": "^0.11.2",
-    "hapi": "~6.8.1",
+    "hapi": "^6.9.0",
     "hoodie": "^1.0.0-beta.1",
     "hoodie-admin-dashboard": "^1.0.0",
     "hoodie-admin-dashboard-uikit": "^3.0.0",
@@ -29,7 +29,7 @@
     "request": "^2.16.6",
     "semver": "^2.3.2",
     "watch": "^0.11.0",
-    "nipple": "^2.5.6"
+    "wreck": "~5.0.1"
   },
   "scripts": {
     "start": "bin/start",

@@ -17,7 +17,7 @@ describe('api plugin', function () {
   it('should export a register function', function () {
     expect(plugin.register).to.be.an(Function);
   });
-  
+
   describe('mapProxyPath', function () {
     before(function () {
       plugin.internals.couchCfg = {
@@ -78,7 +78,7 @@ describe('api plugin', function () {
       });
     });
   });
-  
+
   describe('extractToken', function () {
     it('should return the token if there is one', function () {
       var ret = plugin.internals.extractToken(['AuthSession=some-token; Version=bla bla bla']);
@@ -90,7 +90,7 @@ describe('api plugin', function () {
       expect(ret).to.be.an('undefined');
     });
   });
-  
+
   describe('addCorseAndBearerToken', function () {
     it('should return a 500 if there is an error', function (done) {
       plugin.internals.addCorsAndBearerToken('something went wrong', {}, {}, function (err) {
@@ -104,14 +104,14 @@ describe('api plugin', function () {
       });
     });
 
-    it('should return a 500 if nipple.read fails', function (done) {
+    it('should return a 500 if wreck.read fails', function (done) {
       var stream = new Stream();
 
       stream.pipe = function(dest) {
         dest.write('the body');
       };
       plugin.internals.addCorsAndBearerToken(null, stream, {}, function (err) {
-        expect(err).to.eql('nipple.read failed');
+        expect(err).to.eql('wreck.read failed');
         return {
           code: function(statusCode) {
             expect(statusCode).to.eql(500);
@@ -120,7 +120,7 @@ describe('api plugin', function () {
         };
       });
     });
-    
+
     it('should call reply and hold', function (done) {
       var stream = new Stream();
 
@@ -169,7 +169,7 @@ describe('api plugin', function () {
         };
       });
     });
-    
+
     it('should pass through the headers and add CORS headers', function (done) {
       var stream = new Stream();
 
