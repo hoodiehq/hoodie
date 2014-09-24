@@ -1,18 +1,24 @@
 require('../../../lib/setup');
 
-// stub the requires before loading the actual module
 var eventsMixin = sinon.spy();
 var scopedStoreFactory = sinon.stub();
 
-global.stubRequire('src/lib/events', eventsMixin);
-global.stubRequire('src/lib/store/scoped', scopedStoreFactory);
-
-global.unstubRequire('src/lib/store/api');
 var hoodieStoreFactory = require('../../../../src/lib/store/api');
-
 var extend = require('extend');
 
 describe('hoodieStoreFactory', function() {
+
+  before(function () {
+
+    global.stubRequire('src/lib/events', eventsMixin);
+    global.stubRequire('src/lib/store/scoped', scopedStoreFactory);
+  });
+
+  after(function() {
+    global.unstubRequire('src/lib/events');
+    global.unstubRequire('src/lib/store/scoped');
+    global.unstubRequire('src/lib/store/api');
+  });
 
   beforeEach(function() {
     this.hoodie = this.MOCKS.hoodie.apply(this);
@@ -28,11 +34,6 @@ describe('hoodieStoreFactory', function() {
     this.storeWithCustomValidate = hoodieStoreFactory(this.hoodie, this.optionsWithValidate );
   });
 
-
-  after(function() {
-    global.unstubRequire('src/lib/events');
-    global.unstubRequire('src/lib/store/scoped');
-  });
 
   it('sets store.validate from options.validate', function() {
     expect(this.storeWithCustomValidate.validate).to.be(this.validate);

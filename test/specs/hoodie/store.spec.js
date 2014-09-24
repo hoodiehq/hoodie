@@ -2,18 +2,27 @@ require('../../lib/setup');
 
 // stub the requires before loading the actual module
 var storeFactory = sinon.stub();
-global.stubRequire('src/lib/store/api', storeFactory);
 
-var generateIdMock = require('../../mocks/utils/generate_id');
-global.stubRequire('src/utils/generate_id', generateIdMock);
-
-var localStorageMock = require('../../mocks/utils/local_storage_wrapper');
-global.stubRequire('src/utils/local_storage_wrapper', localStorageMock);
-
+var generateIdMock = require('../../mocks/utils/generate_id')();
+var localStorageMock = require('../../mocks/utils/local_storage_wrapper')();
 var hoodieLocalStore = require('../../../src/hoodie/store');
+
 var extend = require('extend');
 
 describe('hoodie.store', function() {
+
+  before(function () {
+    global.stubRequire('src/lib/store/api', storeFactory);
+    global.stubRequire('src/utils/generate_id', generateIdMock);
+    global.stubRequire('src/utils/local_storage_wrapper', localStorageMock);
+  });
+
+  after(function() {
+    global.unstubRequire('src/lib/store/api');
+    global.unstubRequire('src/utils/generate_id');
+    global.unstubRequire('src/utils/local_storage_wrapper');
+  });
+
 
   beforeEach(function() {
     this.hoodie = this.MOCKS.hoodie.apply(this);
@@ -31,13 +40,6 @@ describe('hoodie.store', function() {
     localStorageMock.getObject.reset();
     localStorageMock.setObject.reset();
     localStorageMock.removeItem.reset();
-  });
-
-  after(function() {
-    global.unstubRequire('src/lib/store/api');
-    global.unstubRequire('src/utils/generate_id');
-    global.unstubRequire('src/utils/local_storage_wrapper');
-    global.unstubRequire('src/utils/config');
   });
 
   //

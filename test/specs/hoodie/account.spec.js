@@ -1,16 +1,23 @@
 require('../../lib/setup');
 
-var generateIdMock = require('../../mocks/utils/generate_id');
+var generateIdMock = require('../../mocks/utils/generate_id')();
 var configMock = require('../../mocks/utils/config');
 var getDefer = require('../../../src/utils/promise/defer');
-
-global.stubRequire('src/utils/generate_id', generateIdMock);
-global.stubRequire('src/utils/config', configMock);
 
 var hoodieAccount = require('../../../src/hoodie/account');
 var extend = require('extend');
 
 describe('hoodie.account', function() {
+
+  before(function () {
+    global.stubRequire('src/utils/generate_id', generateIdMock);
+    global.stubRequire('src/utils/config', configMock);
+  });
+
+  after(function (){
+    global.unstubRequire('src/utils/generate_id');
+    global.unstubRequire('src/utils/config');
+  });
 
   beforeEach(function() {
     localStorage.clear();
@@ -1919,7 +1926,7 @@ describe('hoodie.account', function() {
 
         it('should not remove salt or password_sha properties', function() {
           expect(this.data.salt).to.be('salt');
-          expect(this.data.password_sha).to.be('password_sha'); // jshint ignore:line
+          expect(this.data.password_sha).to.be('password_sha');
         });
 
         _when('_users doc could be updated', function() {

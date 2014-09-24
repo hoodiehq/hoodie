@@ -28,37 +28,39 @@
 // first letter uppercase as well, and the message
 // starting with an uppercase letter.
 //
-var errorMessageReplacePattern = /\{\{\s*\w+\s*\}\}/g;
-var errorMessageFindPropertyPattern = /\w+/;
-
 var extend = require('extend');
 
-function HoodieError(properties) {
+module.exports = (function() {
+  var replacePattern = /\{\{\s*\w+\s*\}\}/g;
+  var findPropertyPattern = /\w+/;
 
-  // normalize arguments
-  if (typeof properties === 'string') {
-    properties = {
-      message: properties
-    };
+  function HoodieError(properties) {
+    // normalize arguments
+    if (typeof properties === 'string') {
+      properties = {
+        message: properties
+      };
+    }
+
+    if (!properties.message) {
+      properties.message = 'Something went wrong';
+    }
+
+    if (!properties.name) {
+      properties.name = 'HoodieError';
+    }
+
+    // must check for properties, as this.name is always set.
+    properties.message = properties.message.replace(replacePattern, function(match) {
+      var property = match.match(findPropertyPattern)[0];
+      return properties[property];
+    });
+
+    extend(this, properties);
   }
 
-  if (! properties.message) {
-    properties.message = 'Something went wrong';
-  }
+  HoodieError.prototype = new Error();
+  HoodieError.prototype.constructor = HoodieError;
 
-  // must check for properties, as this.name is always set.
-  if (! properties.name) {
-    properties.name = 'HoodieError';
-  }
-
-  properties.message = properties.message.replace(errorMessageReplacePattern, function(match) {
-    var property = match.match(errorMessageFindPropertyPattern)[0];
-    return properties[property];
-  });
-  extend(this, properties);
-}
-HoodieError.prototype = new Error();
-HoodieError.prototype.constructor = HoodieError;
-
-module.exports = HoodieError;
-
+  return HoodieError;
+})();

@@ -1,30 +1,32 @@
 require('../../../lib/setup');
 
-// stub the requires before loading the actual module
 var storeFactory = sinon.stub();
-global.stubRequire('src/lib/store/api', storeFactory);
 
-var generateIdMock = require('../../../mocks/utils/generate_id');
-global.stubRequire('src/utils/generate_id', generateIdMock);
-
-global.unstubRequire('src/lib/store/remote');
 var hoodieRemoteStore = require('../../../../src/lib/store/remote');
+var config = require('../../../../src/utils/config');
 
 describe('hoodieRemoteStore', function() {
 
+  before(function () {
+    config.set('_hoodieId', 'uuid123');
+  });
+
+  after(function() {
+    config.clear();
+  });
+
   beforeEach(function() {
     this.hoodie = this.MOCKS.hoodie.apply(this);
-    generateIdMock.returns('uuid123');
 
     this.requestDefer = this.hoodie.defer();
     var promise = this.requestDefer.promise();
     promise.abort = sinon.spy();
-    this.hoodie.request.returns( promise );
+    this.hoodie.request.returns(promise);
 
     this.clock = this.sandbox.useFakeTimers(0); // '1970-01-01 00:00:00'
 
     storeFactory.reset();
-    storeFactory.returns( this.MOCKS.store.apply(this) );
+    storeFactory.returns(this.hoodie);
 
     this.remote = hoodieRemoteStore(this.hoodie, { name: 'my/store'});
     this.storeBackend = storeFactory.args[0][1].backend;
@@ -276,15 +278,15 @@ describe('hoodieRemoteStore', function() {
   describe('#save(type, id, object)', function() {
 
     it('should generate an id if it is undefined', function() {
-      generateIdMock.reset();
+      config.clear();
       this.storeBackend.save({type: 'car'});
-      expect(generateIdMock).to.be.called();
+      expect(config.set).to.be.called();
     });
 
-    it('should not generate an id if id is set', function() {
-      generateIdMock.reset();
+    it.skip('should not generate an id if id is set', function() {
+      config.clear();
       this.storeBackend.save({type: 'car', id: '123'});
-      expect(generateIdMock).to.not.be.called();
+      expect(config.get('')).to.not.be.called();
     });
 
     it('should return promise by @request', function() {
