@@ -21,7 +21,7 @@ var exports = module.exports = function(hoodie) {
   global.addEventListener('offline', hoodie.checkConnection, false);
 
   // start checking connection
-  hoodie.checkConnection();
+  setTimeout(hoodie.checkConnection);
 };
 
 // Check Connection
