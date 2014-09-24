@@ -1022,8 +1022,14 @@ function hoodieAccount(hoodie) {
       };
 
       return withPreviousRequestsAborted('updateUsersDoc', function() {
-        return account.request('PUT', userDocUrl(), options)
-        .then(handleChangeUsernameAndPasswordResponse(newUsername, newPassword || currentPassword));
+        var defer = getDefer();
+
+        account.request('PUT', userDocUrl(), options)
+        .done(defer.notify)
+        .then(handleChangeUsernameAndPasswordResponse(newUsername, newPassword || currentPassword))
+        .done(defer.resolve);
+
+        return defer.promise();
       });
 
     };
