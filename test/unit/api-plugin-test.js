@@ -1,7 +1,8 @@
 var expect = require('expect.js');
 var plugin = require('../../lib/server/plugins/api/index');
 
-var Stream = require('stream');
+var Wreck = require('wreck');
+
 var _ = require('lodash');
 
 describe('api plugin', function () {
@@ -105,11 +106,8 @@ describe('api plugin', function () {
     });
 
     it('should return a 500 if wreck.read fails', function (done) {
-      var stream = new Stream();
+      var stream = Wreck.toReadableStream('the body');
 
-      stream.pipe = function(dest) {
-        dest.write('the body');
-      };
       plugin.internals.addCorsAndBearerToken(null, stream, {}, function (err) {
         expect(err).to.eql('wreck.read failed');
         return {
@@ -122,11 +120,8 @@ describe('api plugin', function () {
     });
 
     it('should call reply and hold', function (done) {
-      var stream = new Stream();
+      var stream = Wreck.toReadableStream(JSON.stringify({ the: 'body' }));
 
-      stream.pipe = function(dest) {
-        dest.write(JSON.stringify({ the: 'body' }));
-      };
       plugin.internals.addCorsAndBearerToken(null, stream, {}, function (data) {
         expect(data).to.eql({the: 'body'});
         return {
@@ -148,11 +143,8 @@ describe('api plugin', function () {
     });
 
     it('should set status 200 for OPTIONS requests', function () {
-      var stream = new Stream();
+      var stream = Wreck.toReadableStream(JSON.stringify({ the: 'body' }));
 
-      stream.pipe = function(dest) {
-        dest.write(JSON.stringify({ the: 'body' }));
-      };
       stream.headers = {
         some: 'header',
       };
@@ -171,11 +163,8 @@ describe('api plugin', function () {
     });
 
     it('should pass through the headers and add CORS headers', function (done) {
-      var stream = new Stream();
+      var stream = Wreck.toReadableStream(JSON.stringify({ the: 'body' }));
 
-      stream.pipe = function(dest) {
-        dest.write(JSON.stringify({ the: 'body' }));
-      };
       stream.headers = {
         some: 'header',
       };
@@ -211,11 +200,8 @@ describe('api plugin', function () {
     });
 
     it('should strip any set-cookie headers and add them into the body', function (done) {
-      var stream = new Stream();
+      var stream = Wreck.toReadableStream(JSON.stringify({ the: 'body' }));
 
-      stream.pipe = function(dest) {
-        dest.write(JSON.stringify({ the: 'body' }));
-      };
       stream.headers = {
         some: 'header',
         'set-cookie': ['AuthSession=some-token; Version=bla bla bla']
