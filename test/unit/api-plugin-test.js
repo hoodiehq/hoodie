@@ -2,6 +2,7 @@ var expect = require('expect.js');
 var plugin = require('../../lib/server/plugins/api/index');
 
 var Wreck = require('wreck');
+var Events = require('events');
 
 var _ = require('lodash');
 
@@ -106,10 +107,11 @@ describe('api plugin', function () {
     });
 
     it('should return a 500 if wreck.read fails', function (done) {
-      var stream = Wreck.toReadableStream('the body');
+      var res = new Events.EventEmitter();
+      res.pipe = function () { };
 
-      plugin.internals.addCorsAndBearerToken(null, stream, {}, function (err) {
-        expect(err).to.eql('wreck.read failed');
+      plugin.internals.addCorsAndBearerToken(null, res, { headers: {} }, function (err) {
+        expect(err.isBoom).to.eql(true);
         return {
           code: function(statusCode) {
             expect(statusCode).to.eql(500);
@@ -117,12 +119,15 @@ describe('api plugin', function () {
           }
         };
       });
+      res.emit('error', new Error('my error'));
     });
 
     it('should call reply and hold', function (done) {
       var stream = Wreck.toReadableStream(JSON.stringify({ the: 'body' }));
+      stream.headers = {};
+      stream.statusCode = 200;
 
-      plugin.internals.addCorsAndBearerToken(null, stream, {}, function (data) {
+      plugin.internals.addCorsAndBearerToken(null, stream, { headers: {} }, function (data) {
         expect(data).to.eql({the: 'body'});
         return {
           code: function(statusCode) {
@@ -142,20 +147,27 @@ describe('api plugin', function () {
       });
     });
 
-    it('should set status 200 for OPTIONS requests', function () {
+    it('should set status 200 for OPTIONS requests', function (done) {
       var stream = Wreck.toReadableStream(JSON.stringify({ the: 'body' }));
 
       stream.headers = {
         some: 'header',
       };
       stream.statusCode = 405;
-      plugin.internals.addCorsAndBearerToken(null, stream, { method: 'options' }, function (data) {
+      plugin.internals.addCorsAndBearerToken(null, stream, { method: 'options', headers: {} }, function (data) {
         expect(data).to.eql({the: 'body'});
         return {
           code: function(statusCode) {
             expect(statusCode).to.eql(200);
             return {
-              hold: function () {}
+              hold: function () {
+                function Resp() {};
+                Resp.prototype.send = function() {
+                  expect(this.headers).to.be.an('object');
+                  done();
+                };
+                return new Resp();
+              }
             };
           }
         };
@@ -207,7 +219,7 @@ describe('api plugin', function () {
         'set-cookie': ['AuthSession=some-token; Version=bla bla bla']
       };
       stream.statusCode = 200;
-      plugin.internals.addCorsAndBearerToken(null, stream, {}, function (data) {
+      plugin.internals.addCorsAndBearerToken(null, stream, { headers: {} }, function (data) {
         expect(data).to.eql({the: 'body', bearerToken: 'some-token'});
         return {
           code: function(statusCode) {
