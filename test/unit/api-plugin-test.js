@@ -198,11 +198,11 @@ describe('api plugin', function () {
                 Resp.prototype.send = function() {
                   expect(this.headers).to.eql({
                     some: 'header',
-                    'Access-Control-Allow-Origin': 'some-origin',
-                    'Access-Control-Allow-Headers': 'authorization, content-length, content-type, if-match, if-none-match, origin, x-requested-with, custom-header',
-                    'Access-Control-Expose-Headers': 'content-type, content-length, etag',
-                    'Access-Control-Allow-Methods': 'GET, PUT, POST, DELETE',
-                    'Access-Control-Allow-Credentials': 'true'
+                    'access-control-allow-origin': 'some-origin',
+                    'access-control-allow-headers': 'authorization, content-length, content-type, if-match, if-none-match, origin, x-requested-with, custom-header',
+                    'access-control-expose-headers': 'content-type, content-length, etag',
+                    'access-control-allow-methods': 'GET, PUT, POST, DELETE',
+                    'access-control-allow-credentials': 'true'
                   });
                   done();
                 };

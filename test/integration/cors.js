@@ -23,8 +23,8 @@ describe('setting CORS headers', function () {
       path: '/_api/_session/'
     }, function (res) {
       expect(res.headers['access-control-allow-origin']).to.be('*');
-      expect(res.headers['access-control-allow-headers']).to.be('Authorization, Content-Length, Content-Type, If-Match, If-None-Match, Origin, X-Requested-With');
-      expect(res.headers['access-control-expose-headers']).to.be('Content-Type, Content-Length, ETag');
+      expect(res.headers['access-control-allow-headers']).to.be('authorization, content-length, content-type, if-match, if-none-match, origin, x-requested-with, host, connection, transfer-encoding');
+      expect(res.headers['access-control-expose-headers']).to.be('content-type, content-length, etag');
       expect(res.headers['access-control-allow-methods']).to.be('GET, PUT, POST, DELETE');
       expect(res.headers['access-control-allow-credentials']).to.be('true');
 
@@ -44,8 +44,8 @@ describe('setting CORS headers', function () {
       }
     }, function (res) {
       expect(res.headers['access-control-allow-origin']).to.be('http://some.app.com/');
-      expect(res.headers['access-control-allow-headers']).to.be('Authorization, Content-Length, Content-Type, If-Match, If-None-Match, Origin, X-Requested-With');
-      expect(res.headers['access-control-expose-headers']).to.be('Content-Type, Content-Length, ETag');
+      expect(res.headers['access-control-allow-headers']).to.be('authorization, content-length, content-type, if-match, if-none-match, origin, x-requested-with, host, connection');
+      expect(res.headers['access-control-expose-headers']).to.be('content-type, content-length, etag');
       expect(res.headers['access-control-allow-methods']).to.be('GET, PUT, POST, DELETE');
       expect(res.headers['access-control-allow-credentials']).to.be('true');
 
