@@ -128,7 +128,8 @@ describe('api plugin', function () {
       stream.statusCode = 200;
 
       plugin.internals.addCorsAndBearerToken(null, stream, { headers: {} }, function (data) {
-        expect(data).to.eql({the: 'body'});
+        var fixture = JSON.stringify({"the": "body"}) + '\n';
+        expect(data).to.eql(fixture);
         return {
           code: function(statusCode) {
             expect(statusCode).to.eql(200);
@@ -155,7 +156,8 @@ describe('api plugin', function () {
       };
       stream.statusCode = 405;
       plugin.internals.addCorsAndBearerToken(null, stream, { method: 'options', headers: {} }, function (data) {
-        expect(data).to.eql({the: 'body'});
+        var fixture = JSON.stringify({"the": "body"}) + '\n';
+        expect(data).to.eql(fixture);
         return {
           code: function(statusCode) {
             expect(statusCode).to.eql(200);
@@ -221,7 +223,8 @@ describe('api plugin', function () {
       };
       stream.statusCode = 200;
       plugin.internals.addCorsAndBearerToken(null, stream, { headers: {} }, function (data) {
-        expect(data).to.eql({the: 'body', bearerToken: 'some-token'});
+        var fixture = JSON.stringify({"the": "body", "bearerToken": "some-token"}) + '\n';
+        expect(data).to.eql(fixture);
         return {
           code: function(statusCode) {
             expect(statusCode).to.eql(200);
