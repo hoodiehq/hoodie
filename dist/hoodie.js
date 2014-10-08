@@ -1,4 +1,4 @@
-// Hoodie.js - 0.9.7
+// Hoodie.js - 1.0.0
 // https://github.com/hoodiehq/hoodie.js
 // Copyright 2012 - 2014 https://github.com/hoodiehq/
 // Licensed Apache License 2.0
@@ -188,6 +188,9 @@ function Hoodie(baseUrl) {
 
   // set username from config (local store)
   hoodie.account.username = utils.config.get('_account.username');
+
+  // set bearerToken from config (local store)
+  hoodie.account.bearerToken = utils.config.get('_account.bearerToken');
 
   // init hoodie.remote API
   hoodie.remote.init();
@@ -394,8 +397,9 @@ function hoodieAccount(hoodie) {
     }
 
     return sendSignUpRequest(username, password)
-    .done(function() {
+    .done(function(newUsername, newHoodieId, newBearerToken) {
       setUsername(username);
+      setBearerToken(newBearerToken);
       account.trigger('signup', username);
     });
   };
@@ -521,15 +525,14 @@ function hoodieAccount(hoodie) {
       promise.done(disconnect);
     }
 
-    return promise.done( function(newUsername, newHoodieId) {
+    return promise.done( function(newUsername, newHoodieId, newBearerToken) {
       if (options.moveData) {
-        if (!isSilent) {
-          account.trigger('movedata');
-        }
+        account.trigger('movedata');
       }
       if (!isReauthenticating && !options.moveData) {
         cleanup();
       }
+      setBearerToken(newBearerToken);
       if (isReauthenticating) {
         if (!isSilent) {
           account.trigger('reauthenticated', newUsername);
@@ -556,6 +559,10 @@ function hoodieAccount(hoodie) {
 
     if (!account.hasAccount()) {
       return cleanupMethod();
+    }
+
+    if (options.moveData) {
+      return sendSignOutRequest();
     }
 
     return pushLocalChanges(options).then(disconnect).then(sendSignOutRequest).then(cleanupMethod);
@@ -816,6 +823,15 @@ function hoodieAccount(hoodie) {
     return config.set('_account.username', newUsername);
   }
 
+  function setBearerToken(newBearerToken) {
+    if (account.bearerToken === newBearerToken) {
+      return;
+    }
+
+    account.bearerToken = newBearerToken;
+    return config.set('_account.bearerToken', newBearerToken);
+  }
+
 
   //
   // handle a successful authentication request.
@@ -930,11 +946,12 @@ function hoodieAccount(hoodie) {
   //         'roles': [
   //             'mvu85hy',
   //             'confirmed'
-  //         ]
+  //         ],
+  //         'bearerToken': 'dXNlci2Mjow9N2Rh2WyZfioB1ubEsc5n9taWNoaWVsMjo1MzkxOEQKpdFA'
   //     }
   //
-  // we want to turn it into 'test1', 'mvu85hy' or reject the promise
-  // in case an error occurred ('roles' array contains 'error' or is empty)
+  // we want to turn it into 'test1', 'mvu85hy', 'dXNlci2Mjow9N2Rh2WyZfioB1ubEsc5n9taWNoaWVsMjo1MzkxOEQKpdFA'
+  // or reject the promise in case an error occurred ('roles' array contains 'error' or is empty)
   //
   function handleSignInSuccess(options) {
     options = options || {};
@@ -942,9 +959,11 @@ function hoodieAccount(hoodie) {
     return function(response) {
       var newUsername;
       var newHoodieId;
+      var newBearerToken;
 
       newUsername = response.name.replace(/^user(_anonymous)?\//, '');
       newHoodieId = response.roles[0];
+      newBearerToken = response.bearerToken;
 
       //
       // if an error occurred, the userDB worker stores it to the $error attribute
@@ -981,8 +1000,9 @@ function hoodieAccount(hoodie) {
       }
       authenticated = true;
 
+      setBearerToken(newBearerToken);
       account.fetch();
-      return resolveWith(newUsername, newHoodieId, options);
+      return resolveWith(newUsername, newHoodieId, newBearerToken, options);
     };
   }
 
@@ -1158,6 +1178,7 @@ function hoodieAccount(hoodie) {
     account.trigger('cleanup');
     authenticated = undefined;
     setUsername(undefined);
+    setBearerToken(undefined);
 
     return resolve();
   }
@@ -1256,8 +1277,14 @@ function hoodieAccount(hoodie) {
       };
 
       return withPreviousRequestsAborted('updateUsersDoc', function() {
-        return account.request('PUT', userDocUrl(), options)
-        .then(handleChangeUsernameAndPasswordResponse(newUsername, newPassword || currentPassword));
+        var defer = getDefer();
+
+        account.request('PUT', userDocUrl(), options)
+        .done(defer.notify)
+        .then(handleChangeUsernameAndPasswordResponse(newUsername, newPassword || currentPassword))
+        .done(defer.resolve);
+
+        return defer.promise();
       });
 
     };
@@ -1282,12 +1309,12 @@ function hoodieAccount(hoodie) {
           // we do signOut explicitly although signOut is build into hoodie.signIn to
           // work around trouble in case of local changes. See
           // https://github.com/hoodiehq/hoodie.js/issues/256
-          return account.signOut({silent:true, ignoreLocalChanges: true}).then(function() {
-            return account.signIn(newUsername, newPassword, {moveData: true});
+          return account.signOut({silent:true, moveData: true}).then(function() {
+            return account.signIn(newUsername, newPassword, {moveData: true, silent: true});
           });
         });
       } else {
-        return account.signIn(currentUsername, newPassword);
+        return account.signIn(currentUsername, newPassword, {silent: true});
       }
     };
   }
@@ -1669,10 +1696,10 @@ module.exports = hoodieOpen;
 // When hoodie.remote is continuously syncing (default),
 // it will continuously  synchronize with local store,
 // otherwise sync, pull or push can be called manually
-// 
+//
 // Note that hoodieRemote must be initialized before the
 // API is available:
-// 
+//
 //     hoodieRemote(hoodie);
 //     hoodie.remote.init();
 //
@@ -1788,6 +1815,7 @@ function hoodieRemote (hoodie) {
     hoodie.on('account:signup:anonymous', remote.connect);
     hoodie.on('account:signin', remote.connect);
     hoodie.on('account:signin:anonymous', remote.connect);
+    hoodie.on('account:changeusername', remote.connect);
 
     hoodie.on('account:reauthenticated', remote.connect);
     hoodie.on('account:signout', remote.disconnect);
@@ -1884,6 +1912,11 @@ function hoodieRequest(hoodie) {
 
     defaults.url = url;
 
+    if (hoodie.account.bearerToken) {
+      defaults.headers = {
+        Authorization: 'Bearer ' + hoodie.account.bearerToken
+      };
+    }
 
     // we are piping the result of the request to return a nicer
     // error if the request cannot reach the server at all.
