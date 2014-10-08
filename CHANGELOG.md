@@ -1,3 +1,18 @@
+<a name="2.0.0-beta.1"></a>
+## 2.0.0-beta.1 (2014-10-08)
+
+
+#### Bug Fixes
+
+* **assets:** re-rename pocket->admin-dashboard ([2dc50428](https://github.com/hoodiehq/hoodie-server/commit/2dc50428fc846bf0405b383fcf064fd1cab9b276))
+* **cors:** make all headers lowercase, otherwise hapi will overwrite them ([8978e3fa](https://github.com/hoodiehq/hoodie-server/commit/8978e3fae1a2e2f85369fce138497aaf6a9e87b9))
+* **test:** hapi chomps newlines, we like newlines ([97d621f6](https://github.com/hoodiehq/hoodie-server/commit/97d621f6a426898d4ae34b6e2713a52ff4729066))
+
+BREAKING CHANGE:
+
+depends on hoodie > 1.0.0-beta.1 || 1.0.0 for bearer token compatibility
+
+
 <a name="1.3.0"></a>
 ## 1.3.0 (2014-09-17)
 
