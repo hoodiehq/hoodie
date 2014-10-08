@@ -15,7 +15,7 @@
     "follow": "^0.11.2",
     "hapi": "^6.9.0",
     "hoodie": "^1.0.0-beta.2",
-    "hoodie-admin-dashboard": "^1.0.0",
+    "hoodie-admin-dashboard": "^2.0.0",
     "hoodie-admin-dashboard-uikit": "^3.0.0",
     "hoodie-plugins-manager": "^0.2.6",
     "local-tld-lib": "^1.0.2",
