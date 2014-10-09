@@ -403,7 +403,22 @@ describe('hoodieRemoteStore', function() {
 
     it('should bootstrap', function() {
       this.remote.connect();
-      expect(this.remote.bootstrap.called).to.be.ok();
+      expect(this.remote.bootstrap).to.be.called();
+    });
+
+    it('should bootstrap only once', function() {
+      var promise1, promise2;
+      // sanity check
+      expect(this.remote.isConnected()).to.be(false);
+
+      this.remote.bootstrap.reset();
+      promise1 = this.remote.connect();
+      promise2 = this.remote.connect();
+      expect(this.remote.bootstrap.callCount).to.be(1);
+
+      // sanity checks
+      expect(promise1).to.be.pending();
+      expect(promise2).to.be.pending();
     });
 
     it('triggers `connect` event', function() {
