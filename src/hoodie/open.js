@@ -22,5 +22,8 @@ exports.open = function(hoodie, storeName, options) {
     name: storeName
   });
 
-  return hoodieRemoteStore(hoodie, options);
+  return exports.hoodieRemoteStore(hoodie, options);
 };
+
+// export for testing
+exports.hoodieRemoteStore = hoodieRemoteStore;
