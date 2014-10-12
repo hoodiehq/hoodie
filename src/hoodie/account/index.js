@@ -47,5 +47,8 @@ module.exports = function(hoodie) {
   // check for pending password reset
   account.checkPasswordReset();
 
+  // init bearer token
+  account.bearerToken = utils.config.get('_account.bearerToken');
+
   hoodie.account = account;
 };

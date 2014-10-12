@@ -54,6 +54,15 @@ exports.setUsername = function(state, newUsername) {
   return config.set('_account.username', newUsername);
 };
 
+exports.setBearerToken = function(state, newBearerToken) {
+  if (state.hoodie.account.bearerToken === newBearerToken) {
+    return;
+  }
+
+  state.hoodie.account.bearerToken = newBearerToken;
+  return config.set('_account.bearerToken', newBearerToken);
+};
+
 //
 // handle a successful authentication request.
 //
@@ -179,9 +188,11 @@ exports.handleSignInSuccess = function(state, options) {
   return function(response) {
     var newUsername;
     var newHoodieId;
+    var newBearerToken;
 
     newUsername = response.name.replace(/^user(_anonymous)?\//, '');
     newHoodieId = response.roles[0];
+    newBearerToken = response.bearerToken;
 
     //
     // if an error occurred, the userDB worker stores it to the $error attribute
@@ -217,9 +228,16 @@ exports.handleSignInSuccess = function(state, options) {
       });
     }
     state.authenticated = true;
-    state.newHoodieId = newHoodieId;
 
+    state.newHoodieId = newHoodieId;
+    state.newBearerToken = newBearerToken;
+
+    // TODO: remove setBearerToken & account.fetch here.
+    //       Find a better way to get user account properties
+    //       after sign in / sign up.
+    exports.setBearerToken(state, newBearerToken);
     state.hoodie.account.fetch(newUsername);
+
     return resolveWith(newUsername);
   };
 };
@@ -397,6 +415,7 @@ exports.cleanup = function(state) {
   state.events.trigger('cleanup');
   state.authenticated = undefined;
   exports.setUsername(state, undefined);
+  exports.setBearerToken(state, undefined);
 
   return resolve();
 };

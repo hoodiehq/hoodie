@@ -220,6 +220,7 @@ exports.signIn = function(state, username, password, options) {
     }
     if (!isReauthenticating && !options.moveData) {
       helpers.cleanup(state);
+      helpers.setBearerToken(state, state.newBearerToken);
     }
     if (isReauthenticating) {
       if (!isSilent) {
