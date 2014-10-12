@@ -47,6 +47,9 @@ module.exports = function(hoodie) {
   // check for pending password reset
   account.checkPasswordReset();
 
+  // init username
+  account.username = username;
+
   // init bearer token
   account.bearerToken = utils.config.get('_account.bearerToken');
 
