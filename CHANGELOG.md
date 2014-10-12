@@ -1,3 +1,12 @@
+<a name="1.0.0-beta.2"></a>
+### 1.0.0-beta.2 (2014-10-08)
+
+
+#### Bug Fixes
+
+* hoodie.account.signUp() should call .progress when coming from an anonymous acco ([c770f59f](https://github.com/hoodiehq/hoodie.js/commit/c770f59f6f0dcbd43e848cee64366bf1c47450a5))
+
+
 <a name="0.9.7"></a>
 ### 0.9.7 (2014-07-02)
 
