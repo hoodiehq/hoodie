@@ -1,5 +1,4 @@
 require('../../lib/setup');
-var utils = require('../../../src/utils');
 var hoodieRequest = require('../../../src/hoodie/request');
 describe('request()', function() {
   beforeEach(function() {
