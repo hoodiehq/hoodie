@@ -4,7 +4,6 @@ var utils = require('../utils');
 var hoodiefyRequestErrorName = utils.hoodiefyRequestErrorName;
 var getDefer = utils.promise.defer;
 var rejectWith = utils.promise.rejectWith;
-var $ajax = global.jQuery.ajax;
 
 //
 // hoodie.request
@@ -81,7 +80,7 @@ exports.request = function(hoodie, type, url, options) {
   // the piping, as for whatever reason the returned promise
   // does not have the `abort` method any more, maybe others
   // as well. See also http://bugs.jquery.com/ticket/14104
-  jQueryPromise = $ajax(extend(defaults, options))
+  jQueryPromise = global.jQuery.ajax(extend(defaults, options))
     .done(requestDefer.resolve)
     .fail(requestDefer.reject);
   var pipedPromise = requestPromise.then(
