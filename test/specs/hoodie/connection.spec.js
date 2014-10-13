@@ -57,7 +57,7 @@ describe('handleConnection()', function() {
     global.clearTimeout(state.checkConnectionTimeout);
   });
 
-  it.only('should update connection status', function() {
+  it('should update connection status', function() {
     var state = {
       hoodie: {
         trigger: this.sandbox.stub(),
