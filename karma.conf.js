@@ -41,7 +41,7 @@ module.exports = function(config) {
 
     // level of logging
     // possible values: config.LOG_DISABLE || config.LOG_ERROR || config.LOG_WARN || config.LOG_INFO || config.LOG_DEBUG
-    logLevel: config.LOG_DEBUG,
+    logLevel: config.LOG_INFO, // LOG_DEBUG,
 
 
     // enable / disable watching file and executing tests whenever any file changes
@@ -67,21 +67,20 @@ module.exports = function(config) {
       files: [
         // 'test/specs/**/*.spec.js'
 
-        // 'test/specs/hoodie/account.spec.js',
+        'test/specs/hoodie/account.spec.js',
         'test/specs/hoodie/connection.spec.js',
         'test/specs/hoodie/id.spec.js',
-        // 'test/specs/hoodie/open.spec.js',
-        // 'test/specs/hoodie/remote.spec.js',
+        'test/specs/hoodie/open.spec.js',
+        'test/specs/hoodie/remote.spec.js',
         'test/specs/hoodie/request.spec.js',
-        // 'test/specs/hoodie/store.spec.js',
-        // 'test/specs/hoodie/task.spec.js',
-
+        'test/specs/hoodie/store.spec.js',
+        'test/specs/hoodie/task.spec.js',
 
         'test/specs/lib/error/error.spec.js',
-        // 'test/specs/lib/store/api.spec.js',
-        // 'test/specs/lib/store/remote.spec.js',
-        // 'test/specs/lib/store/scoped.spec.js',
-        // 'test/specs/lib/task/scoped.spec.js',
+        'test/specs/lib/store/api.spec.js',
+        'test/specs/lib/store/remote.spec.js',
+        'test/specs/lib/store/scoped.spec.js',
+        'test/specs/lib/task/scoped.spec.js',
 
         'test/specs/utils/config.spec.js',
         'test/specs/utils/events.spec.js',
