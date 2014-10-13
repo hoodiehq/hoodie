@@ -27,15 +27,15 @@ var exports = module.exports = function(hoodie) {
     idleTimeout: 2000
   };
 
-  var store = hoodieStoreApi(hoodie, {
+  var store = exports.hoodieStoreApi(hoodie, {
     // validate
     validate: exports.validate,
     backend: {
-      save: localStore.save.bind(null, state),
-      find: localStore.find.bind(null, state),
-      findAll: localStore.findAll.bind(null, state),
-      remove: localStore.remove.bind(null, state),
-      removeAll: localStore.removeAll.bind(null, state)
+      save: exports.localStore.save.bind(null, state),
+      find: exports.localStore.find.bind(null, state),
+      findAll: exports.localStore.findAll.bind(null, state),
+      remove: exports.localStore.remove.bind(null, state),
+      removeAll: exports.localStore.removeAll.bind(null, state)
     }
   });
 
@@ -59,18 +59,18 @@ var exports = module.exports = function(hoodie) {
   hoodie.on('remote:push', helpers.handlePushedObject.bind(null, state));
 
   // expose public API
-  // FIXME: must be setup before exports.bootstrapDirtyObjects as
+  // FIXME: must be setup before exports.bootstrapChangedObjects as
   //        it depends on state.hoodie.store ...
   hoodie.store = store;
 
-  exports.bootstrapDirtyObjects(state);
+  exports.bootstrapChangedObjects(state);
 };
 
 // bootstrapping dirty objects, to make sure
 // that removed objects get pushed after
 // page reload.
 //
-exports.bootstrapDirtyObjects = function(state) {
+exports.bootstrapChangedObjects = function(state) {
   var keys = localStorageWrapper.getItem('_dirty');
 
   if (!keys) {
@@ -106,3 +106,7 @@ exports.validate = function(object) {
     });
   }
 };
+
+// exports for testing
+exports.hoodieStoreApi = hoodieStoreApi;
+exports.localStore = localStore;
