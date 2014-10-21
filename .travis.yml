@@ -16,6 +16,8 @@ notifications:
     - chat.freenode.net#hoodie
     use_notice: true
     skip_join: true
+  slack:
+    secure: MgFo6b/cW1DhM/FubUCT0LoFtnykT9yI6YLVwhKnOjr7iCO19Le883XxLeqNMBzdOjfZdAi4RBbyTTrBY8w6Lmk7e8e/6BlHoyYIfImcQV0gbRmZmHWAXooGFe/N0sb+Tcx2ryvWMebFGd5/XLHWSOXWvFfGENRa1P3pzXFqGek=
 addons:
   sauce_connect: true
 deploy:
