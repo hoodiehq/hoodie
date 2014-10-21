@@ -12,6 +12,8 @@ notifications:
     - irc.freenode.net#hoodie
     use_notice: false
     skip_join: true
+  slack:
+    secure: cH3y/V7D/BgRG25CpAO8kVPg/SmYchTWmyjL/HStm3SIXRDUxRvtBg2SFXziQg/2Hcx82JIEVxPA9LvHbMJY3P/Khr8RSHDVXg+MVEDneg9hh13m4abXiBZCSvisWQK+KhCkMc9eFN/OtfTm0xcxRmZkEjfMiN+YgqRIICnOSzE=
 env:
   global:
   - secure: NeaMPJ5vUh6ikHdSeKnmCvCj+vBVzP9pYWSRjUWNzhRk7CajDZdldJ89WwFv3vuo3UNXEFMA3B6fKW2vQoaTYsBNNkFpsYe5QcbMJTsTJ0gkap9qYALlgaV6R2RrxoFMqGj+jwLPq/5e9g+DxrLFasnPXf+/gy5g5ZqWc/VHNzs=
