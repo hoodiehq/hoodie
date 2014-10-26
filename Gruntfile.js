@@ -59,21 +59,12 @@ module.exports = function(grunt) {
       options: {
         banner: banner
       },
-      dist: {
-        src: ['dist/hoodie.js'],
-        dest: 'dist/<%= pkg.name %>.js'
-      }
     },
 
     uglify: {
       options: {
         banner: banner
       },
-      dist: {
-        files: {
-          'dist/<%= pkg.name %>.min.js': ['<%= concat.dist.dest %>']
-        }
-      }
     },
 
     karma: {
@@ -109,26 +100,6 @@ module.exports = function(grunt) {
       }
     },
 
-    browserify: {
-      dev: {
-        src: ['src/hoodie.js'],
-        dest: 'dist/hoodie.js',
-        options: {
-          external: 'jquery',
-          standalone: 'Hoodie',
-          debug: true
-        }
-      },
-      build: {
-        src: ['src/hoodie.js'],
-        dest: 'dist/hoodie.js',
-        options: {
-          external: 'jquery',
-          standalone: 'Hoodie'
-        }
-      }
-    },
-
     // https://github.com/vojtajina/grunt-bump
     // bump version of hoodie.js
     bump: {
@@ -139,7 +110,6 @@ module.exports = function(grunt) {
           'package.json'
         ],
         commitFiles: [
-          'dist/*',
           'bower.json',
           'package.json',
           'CHANGELOG.md'
