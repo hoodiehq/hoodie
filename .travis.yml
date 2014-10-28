@@ -31,3 +31,4 @@ env:
 cache:
   directories:
   - node_modules
+sudo: false
