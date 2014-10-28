@@ -11,6 +11,8 @@ changes, and helping you finalize your pull requests.
 
 ## Using the issue tracker
 
+First things first: **Do NOT report security vulnerablities in public issues!** Please disclose responsibly by letting [the Hoodie team](mailto:team@thehoodiefirm.com?subject=Security) know upfront. We will assess the issue as soon as possible on a best-effort basis and will give you an estimate for when we have a fix and release available for an eventual public disclosure.
+
 The issue tracker is the preferred channel for [bug reports](#bugs),
 [features requests](#features) and [submitting pull
 requests](#pull-requests), but please respect the following restrictions:
@@ -150,6 +152,12 @@ included in the project:
 **IMPORTANT**: By submitting a patch, you agree to license your work under the
 same license as that used by the project.
 
+<a name="triagers"></a>
+## Triagers 
+
+There is a [defined process](TRIAGING.md) to manage issues, because this helps to speed up releases and minimizes user pain.
+Triaging is a great way to contribute to Hoodie without having to write code. 
+If you are interested, please [leave a comment here](https://github.com/hoodiehq/discussion/issues/50) asking to join the triaging team.
 
 <a name="maintainers"></a>
 ## Maintainers

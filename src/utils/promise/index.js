@@ -4,5 +4,6 @@ module.exports = {
   rejectWith: require('./reject_with'),
   reject: require('./reject'),
   resolveWith: require('./resolve_with'),
-  resolve: require('./resolve'),
+  resolve: require('./resolve')
 };
+
