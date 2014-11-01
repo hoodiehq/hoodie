@@ -78,8 +78,12 @@ expect.Assertion.prototype.rejectedWith = function () {
 };
 
 expect.Assertion.prototype.pending = function () {
+  var isPending = true;
+  this.obj.always(function() {
+    isPending = false;
+  });
   this.assert(
-      expect.eql(this.obj.isPending(), true)
+      expect.eql(isPending, true)
     , function(){ return 'expected to be pending, but is ' + this.obj});
   return this;
 };

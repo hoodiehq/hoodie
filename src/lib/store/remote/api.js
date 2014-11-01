@@ -1,5 +1,6 @@
 var extend = require('extend');
 var utils = require('../../../utils');
+var getDefer = utils.promise.defer;
 var resolveWith = utils.promise.resolveWith;
 
 var helpers = require('./helpers');
@@ -68,15 +69,22 @@ exports.markAsKnownObject = function(state, object) {
 // start syncing. `remote.bootstrap()` will automatically start
 // pulling when `remote.connected` remains true.
 //
+var connectDefer;
 exports.connect = function(state, name) {
+  if (state.connected) {
+    return connectDefer.promise;
+  }
+  connectDefer = getDefer();
   if (name) {
     state.remoteName = name;
   }
   state.connected = true;
   state.remote.trigger('connect');
-  return state.remote.bootstrap().then(function() {
-    state.remote.push();
-  });
+  state.remote.bootstrap().then(function() {
+    return state.remote.push();
+  }).then(connectDefer.resolve, connectDefer.reject)
+
+  return connectDefer.promise;
 };
 
 
@@ -96,6 +104,7 @@ exports.disconnect = function(state) {
     state.pushRequest.abort();
   }
 
+  connectDefer = undefined;
 };
 
 
