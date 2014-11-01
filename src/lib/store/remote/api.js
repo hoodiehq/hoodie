@@ -82,7 +82,7 @@ exports.connect = function(state, name) {
   state.remote.trigger('connect');
   state.remote.bootstrap().then(function() {
     return state.remote.push();
-  }).then(connectDefer.resolve, connectDefer.reject)
+  }).then(connectDefer.resolve, connectDefer.reject);
 
   return connectDefer.promise;
 };
