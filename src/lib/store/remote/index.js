@@ -41,16 +41,18 @@ var api = require('./api');
 //
 
 module.exports = function(hoodie, options) {
-  var baseUrl;
-  var connected = false;
-  var prefix = '';
+  var internals = {
+    connected: false,
+    prefix: '',
+    baseUrl: undefined
+  };
 
   var state = {
     get baseUrl() {
-      return baseUrl;
+      return internals.baseUrl;
     },
     set baseUrl(input) {
-      baseUrl = input;
+      internals.baseUrl = input;
       remote.baseUrl = input;
     },
     // sync
@@ -59,10 +61,10 @@ module.exports = function(hoodie, options) {
     // `pull: true` or `push: true`.
     //
     get connected() {
-      return connected;
+      return internals.connected;
     },
     set connected(input) {
-      connected = input;
+      internals.connected = input;
       remote.connected = input;
     },
     // prefix
@@ -70,10 +72,10 @@ module.exports = function(hoodie, options) {
     // in public user stores are prefixed by '$public/'
     //
     get prefix() {
-      return prefix;
+      return internals.prefix;
     },
     set prefix(input) {
-      prefix = input;
+      internals.prefix = input;
       remote.prefix = input;
     },
 
