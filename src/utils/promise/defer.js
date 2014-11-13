@@ -34,9 +34,10 @@ module.exports = function Defer() {
 };
 
 function wrapPromise (promise) {
-  if (promise.done) {
+  if (promise._isHoodiePromise) {
     return promise;
   }
+  promise._isHoodiePromise = true;
 
   promise.done = function done(callback) {
     this.then(callback);
