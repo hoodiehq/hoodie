@@ -67,3 +67,33 @@ describe('hoodie.store setup', function() {
   });
 
 });
+
+describe('hoodie.store.findAll', function() {
+  it('accepts filter function', function(done) {
+    var state = {
+      cachedObject: {
+        'note/123': { type: 'note', id: '123', isPublic: true },
+        'note/456': { type: 'note', id: '456', isPublic: false }
+      },
+      dirty: {},
+      hoodie: {
+        store: {
+          isBootstrapping: function () { return false; },
+          trigger: function() {},
+          index: function() { return ['note/123', 'note/456']; }
+        },
+        id: function() { return 'hoodieid'; }
+      }
+    };
+    var findPublic = function(object) {
+      return object.isPublic;
+    };
+
+    hoodieStore.localStore.findAll(state, findPublic)
+    .done(function(objects) {
+      expect(objects.length).to.be(1);
+      expect(objects[0].id).to.be('123');
+      done();
+    }).catch(done);
+  });
+});
