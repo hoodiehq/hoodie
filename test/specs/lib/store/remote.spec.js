@@ -27,7 +27,7 @@ describe('remote bootstrapping', function() {
     this.remote = remoteStore(this.hoodie, this.options);
   });
 
-  it.only('should bootstrap only once', function() {
+  it('should bootstrap only once', function() {
     var promise1, promise2;
     var bootstrapPromise = {
       then: function() { return bootstrapPromise; }
