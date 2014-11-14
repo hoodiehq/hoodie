@@ -2,7 +2,7 @@ require('../../lib/setup');
 
 var hoodieStore = require('../../../src/hoodie/store');
 
-describe('hoodie.remote setup', function() {
+describe('hoodie.store setup', function() {
 
   beforeEach(function () {
     var hoodieEventBindings = this.hoodieEventBindings = {};
