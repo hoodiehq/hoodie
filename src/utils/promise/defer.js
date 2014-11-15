@@ -1,8 +1,8 @@
 /*jshint -W079 */
 var Promise = exports.Promise = (function() {
-  if (typeof global.Promise === 'function') {
-    return global.Promise;
-  }
+  // if (typeof global.Promise === 'function') {
+  //   return global.Promise;
+  // }
   return require('bluebird');
 })();
 
@@ -59,21 +59,19 @@ function wrapPromise (promise) {
   promise.then = function (onResolve, onReject) {
     promise = Promise.prototype.then.call(this,
       passProgressCallbacks(this, onResolve),
-      onReject);
+      passProgressCallbacks(this, onReject));
     wrapPromise(promise);
     promise._progressCallbacks = this._progressCallbacks;
     return promise;
   };
 
   function passProgressCallbacks(promise, callback) {
+    if (! callback) {
+      return null;
+    }
+
     return function() {
-      var newPromise;
-
-      if (! callback) {
-        return;
-      }
-
-      newPromise = callback.apply(promise, arguments);
+      var newPromise = callback.apply(promise, arguments);
       if (newPromise && newPromise._progressCallbacks && promise._progressCallbacks) {
         newPromise._progressCallbacks = newPromise._progressCallbacks.concat(promise._progressCallbacks);
       }
