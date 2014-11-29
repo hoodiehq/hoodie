@@ -531,6 +531,8 @@ function hoodieRemoteStore(hoodie, options) {
   // renames `_id` attribute to `id` and removes the type from the id,
   // e.g. `type/123` -> `123`
   //
+  // can return null if the id is not in hoodie format (type/str)
+  //
   function parseFromRemote(object) {
     var id, matches;
 
@@ -547,13 +549,21 @@ function hoodieRemoteStore(hoodie, options) {
     // as in some cases IDs might contain '/', too
     //
     matches = id.match(/([^\/]+)\/(.*)/);
+    if (matches == null) {
+      console.log('hoodie: unhandled id ' + id);
+      return null;
+    }
     object.type = matches[1], object.id = matches[2];
 
     return object;
   }
 
+  function isNotNull(object) {
+    return object !== null;
+  }
+
   function parseAllFromRemote(objects) {
-    return objects.map(parseFromRemote);
+    return objects.map(parseFromRemote).filter(isNotNull);
   }
 
 
@@ -735,6 +745,9 @@ function hoodieRemoteStore(hoodie, options) {
       }
 
       object = parseFromRemote(doc);
+      if (!object) {
+        continue;
+      }
 
       if (object._deleted) {
         if (!remote.isKnownObject(object)) {
