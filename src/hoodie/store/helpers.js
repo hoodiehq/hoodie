@@ -216,7 +216,7 @@ exports.now = function() {
 
 
 // a semantic key consists of a valid type & id, separated by a "/"
-exports.SEMANTIC_ID_PATTERN = new RegExp(/^[a-z$][a-z0-9-]+\/[a-z0-9]+$/);
+exports.SEMANTIC_ID_PATTERN = new RegExp(/^[a-z$][a-z0-9-]+\/[a-z0-9-]+$/);
 exports.isSemanticKey = function(state, key) {
   return exports.SEMANTIC_ID_PATTERN.test(key);
 };
