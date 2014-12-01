@@ -90,6 +90,8 @@ exports.parseForRemote = function(state, object) {
 // renames `_id` attribute to `id` and removes the type from the id,
 // e.g. `type/123` -> `123`
 //
+// can return null if the id is not in hoodie format (type/str)
+//
 exports.parseFromRemote = function(state, object) {
   var id, matches;
 
@@ -106,13 +108,21 @@ exports.parseFromRemote = function(state, object) {
   // as in some cases IDs might contain '/', too
   //
   matches = id.match(/([^\/]+)\/(.*)/);
+  if (matches == null) {
+    console.log('hoodie: unhandled id ' + id);
+    return null;
+  }
   object.type = matches[1], object.id = matches[2];
 
   return object;
 };
 
+function isNotNull(object) {
+  return object !== null;
+}
+
 exports.parseAllFromRemote = function(state, objects) {
-  return objects.map(exports.parseFromRemote.bind(null, state));
+  return objects.map(exports.parseFromRemote.bind(null, state).filter(isNotNull));
 };
 
 
@@ -297,6 +307,9 @@ exports.handlePullResults = function(state, changes) {
     }
 
     object = exports.parseFromRemote(state, doc);
+    if (!object) {
+      continue;
+    }
 
     if (object._deleted) {
       if (!state.remote.isKnownObject(object)) {
