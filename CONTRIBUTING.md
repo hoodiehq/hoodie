@@ -100,7 +100,7 @@ included in the project:
    # Clone your fork of the repo into the current directory
    git clone https://github.com/<your-username>/hoodie.js
    # Navigate to the newly cloned directory
-   cd Hoodie.js
+   cd hoodie.js
    # Assign the original repo to a remote called "upstream"
    git remote add upstream https://github.com/hoodiehq/hoodie.js
    ```
