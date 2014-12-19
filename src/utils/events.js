@@ -11,10 +11,23 @@ var exports = module.exports = function(hoodie, context, namespace) {
   var emitter = JQEventEmitter.create();
 
   // aliases
-  emitter.trigger = emitter.emit;
   emitter.one = emitter.once;
   emitter.bind = emitter.on;
   emitter.unbind = emitter.off;
+
+  // monkey patch emit with try-catch
+  // because of https://github.com/hoodiehq/hoodie.js/issues/376
+  emitter.trigger = emitter.emit = (function(emit) {
+    return function() {
+      try {
+        emit.apply(emitter, arguments);
+      } catch (error) {
+        setTimeout(function() {
+          throw error;
+        });
+      }
+    };
+  })(emitter.emit);
 
   extend(hoodie, emitter);
 
