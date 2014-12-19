@@ -61,7 +61,20 @@ describe('remoteApi.connect', function() {
   // TODO: add tests
 });
 describe('remoteApi.disconnect', function() {
-  // TODO: add tests
+  beforeEach(function() {
+    this.hoodie = {
+      trigger: function() {}
+    };
+    this.options = {
+      name: 'remoteMock'
+    };
+    this.remote = remoteStore(this.hoodie, this.options);
+  });
+
+  it('should return a promise', function() {
+    var promise = this.remote.disconnect();
+    expect(promise.then).to.be.a(Function);
+  });
 });
 describe('remoteApi.isConnected', function() {
   // TODO: add tests
