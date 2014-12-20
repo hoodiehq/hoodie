@@ -62,4 +62,9 @@ function wrapPromise (promise) {
     wrapPromise(promise);
     return promise;
   };
+  promise.catch = function catch_(error) {
+    promise = Promise.prototype.catch.call(this, error);
+    wrapPromise(promise);
+    return promise;
+  };
 }
