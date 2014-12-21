@@ -146,7 +146,10 @@ exports.anonymousSignUp = function(state) {
   })
   .done(function() {
     state.events.trigger('signup:anonymous');
-  });
+  }).then(function() {
+    // resolve with null, do not pass anonymous username
+    return resolve();
+  })
 };
 
 
