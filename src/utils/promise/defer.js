@@ -1,10 +1,5 @@
 /*jshint -W079 */
-var Promise = exports.Promise = (function() {
-  if (typeof global.Promise === 'function') {
-    return global.Promise;
-  }
-  return require('bluebird');
-})();
+var Promise = require('./promise');
 
 module.exports = function Defer() {
   var defer = {};
