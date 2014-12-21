@@ -487,15 +487,21 @@ exports.changeUsername = function(state, currentPassword, newUsername) {
 //
 exports.destroy = function(state) {
   var currentUsername = state.username;
+  var promise;
 
   if (!exports.hasAccount(state)) {
-    return helpers.cleanupAndTriggerSignOut(state);
+    promise = helpers.cleanupAndTriggerSignOut(state);
+  } else {
+    promise = exports.fetch(state)
+      .then(helpers.handleFetchBeforeDestroySuccess.bind(null, state), helpers.handleFetchBeforeDestroyError.bind(null, state))
+      .then(helpers.cleanupAndTriggerSignOut.bind(null, state))
+      .then(function() {
+        return currentUsername;
+      });
   }
 
-  return exports.fetch(state)
-    .then(helpers.handleFetchBeforeDestroySuccess.bind(null, state), helpers.handleFetchBeforeDestroyError.bind(null, state))
-    .then(helpers.cleanupAndTriggerSignOut.bind(null, state))
-    .then(function() {
-      return currentUsername;
-    });
+  return promise.then(function() {
+    state.events.trigger('destroy', currentUsername);
+    return resolveWith(currentUsername);
+  });
 };
