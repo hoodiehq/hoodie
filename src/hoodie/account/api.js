@@ -8,6 +8,7 @@ var generateId = utils.generateId;
 var config = utils.config;
 var promise = utils.promise;
 var reject = promise.reject;
+var resolve = promise.resolve;
 var rejectWith = promise.rejectWith;
 var resolveWith = promise.resolveWith;
 
@@ -334,6 +335,10 @@ exports.changePassword = function(state, currentPassword, newPassword) {
 
   return exports.fetch(state)
     .then(helpers.sendChangeUsernameAndPasswordRequest(state, currentPassword, null, newPassword))
+    .then(function() {
+      // resolve with null instead of current username
+      return resolve();
+    })
     .done( function() {
       state.events.trigger('changepassword');
     });
