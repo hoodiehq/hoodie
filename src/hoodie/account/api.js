@@ -232,9 +232,10 @@ exports.signIn = function(state, username, password, options) {
       }
     } else {
       helpers.setUsername(state, newUsername);
-    }
-    if (!isSilent) {
-      state.events.trigger('signin', newUsername, state.newHoodieId, options);
+
+      if (!isSilent) {
+        state.events.trigger('signin', newUsername, state.newHoodieId, options);
+      }
     }
   });
 
