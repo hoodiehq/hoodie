@@ -486,11 +486,16 @@ exports.changeUsername = function(state, currentPassword, newUsername) {
 // destroys a user's account
 //
 exports.destroy = function(state) {
+  var currentUsername = state.username;
+
   if (!exports.hasAccount(state)) {
     return helpers.cleanupAndTriggerSignOut(state);
   }
 
   return exports.fetch(state)
     .then(helpers.handleFetchBeforeDestroySuccess.bind(null, state), helpers.handleFetchBeforeDestroyError.bind(null, state))
-    .then(helpers.cleanupAndTriggerSignOut.bind(null, state));
+    .then(helpers.cleanupAndTriggerSignOut.bind(null, state))
+    .then(function() {
+      return currentUsername;
+    });
 };
