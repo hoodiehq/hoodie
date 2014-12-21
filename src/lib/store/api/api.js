@@ -61,7 +61,26 @@ exports.add = function(state, type, properties, options) {
 
   options = options || {};
 
-  return exports.save(state, type, properties.id, properties, options);
+  if (! properties.id) {
+    return exports.save(state, type, properties.id, properties, options);
+  }
+
+  return exports.find(state, type, properties.id)
+  .then(function(object) {
+    return rejectWith({
+      name: 'HoodieConflictError',
+      message: '"{{type}}" with id "{{id}}" already exists',
+      type: object.type,
+      id: object.id
+    });
+  })
+  .catch(function(error) {
+    if (error.name === 'HoodieNotFoundError') {
+      return exports.save(state, type, properties.id, properties, options);
+    }
+
+    throw error;
+  });
 };
 
 
