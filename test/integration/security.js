@@ -29,4 +29,24 @@ describe('block _all_dbs', function () {
       done();
     });
   });
+
+
+  it('should log into admin', function (done) {
+    var body = 'name=admin&password=' + config.admin_password;
+    var req = http.request({
+      host: '127.0.0.1',
+      port: config.admin_port,
+      method: 'post',
+      path: '/_api/_session',
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded',
+        'Content-length': body.length
+      }
+    }, function (res) {
+      expect(res.statusCode).to.be(200);
+      done();
+    });
+    req.write(body);
+    req.end();
+  });
 });
