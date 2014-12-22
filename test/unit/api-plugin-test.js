@@ -197,7 +197,7 @@ describe('api plugin', function () {
                 function Resp() {};
                 Resp.prototype.send = function() {
                   expect(this.headers).to.eql({
-                    some: 'header',
+                    some: 'header', 'content-length': 15,
                     'access-control-allow-origin': 'some-origin',
                     'access-control-allow-headers': 'authorization, content-length, content-type, if-match, if-none-match, origin, x-requested-with, custom-header',
                     'access-control-expose-headers': 'content-type, content-length, etag',
