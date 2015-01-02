@@ -149,7 +149,7 @@ exports.anonymousSignUp = function(state) {
   }).then(function() {
     // resolve with null, do not pass anonymous username
     return resolve();
-  })
+  });
 };
 
 
