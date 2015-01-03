@@ -3,77 +3,78 @@
 // Copyright 2012 - 2014 https://github.com/hoodiehq/
 // Licensed Apache License 2.0
 
-!function(e){"object"==typeof exports?module.exports=e():"function"==typeof define&&define.amd?define(e):"undefined"!=typeof window?window.Hoodie=e():"undefined"!=typeof global?global.Hoodie=e():"undefined"!=typeof self&&(self.Hoodie=e())}(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);throw new Error("Cannot find module '"+o+"'")}var f=n[o]={exports:{}};t[o][0].call(f.exports,function(e){var n=t[o][1][e];return s(n?n:e)},f,f.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
+(function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);throw new Error("Cannot find module '"+o+"'")}var f=n[o]={exports:{}};t[o][0].call(f.exports,function(e){var n=t[o][1][e];return s(n?n:e)},f,f.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 var hasOwn = Object.prototype.hasOwnProperty;
 var toString = Object.prototype.toString;
+var undefined;
 
-function isPlainObject(obj) {
-	if (!obj || toString.call(obj) !== '[object Object]' || obj.nodeType || obj.setInterval)
+var isPlainObject = function isPlainObject(obj) {
+	"use strict";
+	if (!obj || toString.call(obj) !== '[object Object]' || obj.nodeType || obj.setInterval) {
 		return false;
+	}
 
 	var has_own_constructor = hasOwn.call(obj, 'constructor');
-	var has_is_property_of_method = hasOwn.call(obj.constructor.prototype, 'isPrototypeOf');
+	var has_is_property_of_method = obj.constructor && obj.constructor.prototype && hasOwn.call(obj.constructor.prototype, 'isPrototypeOf');
 	// Not own constructor property must be Object
-	if (obj.constructor && !has_own_constructor && !has_is_property_of_method)
+	if (obj.constructor && !has_own_constructor && !has_is_property_of_method) {
 		return false;
+	}
 
 	// Own properties are enumerated firstly, so to speed up,
 	// if last one is own, then all properties are own.
 	var key;
-	for ( key in obj ) {}
+	for (key in obj) {}
 
-	return key === undefined || hasOwn.call( obj, key );
+	return key === undefined || hasOwn.call(obj, key);
 };
 
 module.exports = function extend() {
+	"use strict";
 	var options, name, src, copy, copyIsArray, clone,
-	    target = arguments[0] || {},
-	    i = 1,
-	    length = arguments.length,
-	    deep = false;
+		target = arguments[0],
+		i = 1,
+		length = arguments.length,
+		deep = false;
 
 	// Handle a deep copy situation
-	if ( typeof target === "boolean" ) {
+	if (typeof target === "boolean") {
 		deep = target;
 		target = arguments[1] || {};
 		// skip the boolean and the target
 		i = 2;
+	} else if (typeof target !== "object" && typeof target !== "function" || target == undefined) {
+			target = {};
 	}
 
-	// Handle case when target is a string or something (possible in deep copy)
-	if ( typeof target !== "object" && typeof target !== "function") {
-		target = {};
-	}
-
-	for ( ; i < length; i++ ) {
+	for (; i < length; ++i) {
 		// Only deal with non-null/undefined values
-		if ( (options = arguments[ i ]) != null ) {
+		if ((options = arguments[i]) != null) {
 			// Extend the base object
-			for ( name in options ) {
-				src = target[ name ];
-				copy = options[ name ];
+			for (name in options) {
+				src = target[name];
+				copy = options[name];
 
 				// Prevent never-ending loop
-				if ( target === copy ) {
+				if (target === copy) {
 					continue;
 				}
 
 				// Recurse if we're merging plain objects or arrays
-				if ( deep && copy && ( isPlainObject(copy) || (copyIsArray = Array.isArray(copy)) ) ) {
-					if ( copyIsArray ) {
+				if (deep && copy && (isPlainObject(copy) || (copyIsArray = Array.isArray(copy)))) {
+					if (copyIsArray) {
 						copyIsArray = false;
 						clone = src && Array.isArray(src) ? src : [];
-
 					} else {
 						clone = src && isPlainObject(src) ? src : {};
 					}
 
 					// Never move original objects, clone them
-					target[ name ] = extend( deep, clone, copy );
+					target[name] = extend(deep, clone, copy);
 
 				// Don't bring in undefined values
-				} else if ( copy !== undefined ) {
-					target[ name ] = copy;
+				} else if (copy !== undefined) {
+					target[name] = copy;
 				}
 			}
 		}
@@ -83,8 +84,10 @@ module.exports = function extend() {
 	return target;
 };
 
+
 },{}],2:[function(require,module,exports){
-var global=typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {};// Hoodie Core
+(function (global){
+// Hoodie Core
 // -------------
 //
 // the door to world domination (apps)
@@ -252,8 +255,10 @@ function applyExtensions(hoodie) {
 
 module.exports = Hoodie;
 
+}).call(this,typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
 },{"./hoodie/account":3,"./hoodie/connection":4,"./hoodie/id":5,"./hoodie/open":6,"./hoodie/remote":7,"./hoodie/request":8,"./hoodie/store":9,"./hoodie/task":10,"./lib":16,"./lib/events":15,"./utils":26}],3:[function(require,module,exports){
-var global=typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {};// Hoodie.Account
+(function (global){
+// Hoodie.Account
 // ================
 
 var hoodieEvents = require('../lib/events');
@@ -1481,8 +1486,10 @@ function hoodieAccount(hoodie) {
 
 module.exports = hoodieAccount;
 
+}).call(this,typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
 },{"../lib/events":15,"../utils/config":23,"../utils/generate_id":24,"../utils/promise/defer":28,"../utils/promise/reject":31,"../utils/promise/reject_with":32,"../utils/promise/resolve":33,"../utils/promise/resolve_with":34,"extend":1}],4:[function(require,module,exports){
-var global=typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {};// hoodie.checkConnection() & hoodie.isConnected()
+(function (global){
+// hoodie.checkConnection() & hoodie.isConnected()
 // =================================================
 
 
@@ -1580,6 +1587,7 @@ function hoodieConnection(hoodie) {
 
 module.exports = hoodieConnection;
 
+}).call(this,typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
 },{"../utils/promise/reject":31,"../utils/promise/resolve":33}],5:[function(require,module,exports){
 // hoodie.id
 // =========
@@ -2008,7 +2016,8 @@ function hoodieRequest(hoodie) {
 module.exports = hoodieRequest;
 
 },{"../utils/hoodiefy_request_error_name":25,"../utils/promise/reject_with":32,"extend":1}],9:[function(require,module,exports){
-var global=typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {};// LocalStore
+(function (global){
+// LocalStore
 // ============
 
 //
@@ -2968,6 +2977,7 @@ function hoodieStore (hoodie) {
 
 module.exports = hoodieStore;
 
+}).call(this,typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
 },{"../lib/error/object_id":13,"../lib/error/object_type":14,"../lib/store/api":17,"../utils/generate_id":24,"../utils/local_storage_wrapper":27,"../utils/promise/defer":28,"../utils/promise/reject_with":32,"../utils/promise/resolve_with":34,"extend":1}],10:[function(require,module,exports){
 // Tasks
 // ============
@@ -4030,7 +4040,8 @@ module.exports = {
 };
 
 },{"./api":17,"./remote":19,"./scoped":20}],19:[function(require,module,exports){
-var global=typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {};// Remote
+(function (global){
+// Remote
 // ========
 
 // Connection to a remote Couch Database.
@@ -4563,6 +4574,8 @@ function hoodieRemoteStore(hoodie, options) {
   // renames `_id` attribute to `id` and removes the type from the id,
   // e.g. `type/123` -> `123`
   //
+  // can return null if the id is not in hoodie format (type/str)
+  //
   function parseFromRemote(object) {
     var id, matches;
 
@@ -4579,13 +4592,21 @@ function hoodieRemoteStore(hoodie, options) {
     // as in some cases IDs might contain '/', too
     //
     matches = id.match(/([^\/]+)\/(.*)/);
+    if (matches == null) {
+      console.log('hoodie: unhandled id ' + id);
+      return null;
+    }
     object.type = matches[1], object.id = matches[2];
 
     return object;
   }
 
+  function isNotNull(object) {
+    return object !== null;
+  }
+
   function parseAllFromRemote(objects) {
-    return objects.map(parseFromRemote);
+    return objects.map(parseFromRemote).filter(isNotNull);
   }
 
 
@@ -4767,6 +4788,9 @@ function hoodieRemoteStore(hoodie, options) {
       }
 
       object = parseFromRemote(doc);
+      if (!object) {
+        continue;
+      }
 
       if (object._deleted) {
         if (!remote.isKnownObject(object)) {
@@ -4823,6 +4847,7 @@ function hoodieRemoteStore(hoodie, options) {
 
 module.exports = hoodieRemoteStore;
 
+}).call(this,typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
 },{"../../utils/generate_id":24,"../../utils/promise/resolve_with":34,"./api":17,"extend":1}],20:[function(require,module,exports){
 // scoped Store
 // ============
@@ -5141,7 +5166,8 @@ module.exports = {
 
 
 },{"./config":23,"./generate_id":24,"./local_storage_wrapper":27,"./promise":29}],27:[function(require,module,exports){
-var global=typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {};// public API
+(function (global){
+// public API
 var store = {};
 
 store.setItem = function (name, item) {
@@ -5253,8 +5279,11 @@ init();
 
 module.exports = store;
 
+}).call(this,typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
 },{}],28:[function(require,module,exports){
-var global=typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {};module.exports = global.jQuery.Deferred;
+(function (global){
+module.exports = global.jQuery.Deferred;
+}).call(this,typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
 },{}],29:[function(require,module,exports){
 module.exports = {
   defer: require('./defer'),
@@ -5314,7 +5343,4 @@ function resolveWith() {
 
 module.exports = resolveWith;
 
-},{"./defer":28}]},{},[2])
-(2)
-});
-;
+},{"./defer":28}]},{},[2]);
