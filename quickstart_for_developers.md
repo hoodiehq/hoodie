@@ -13,7 +13,6 @@ That's all you need. Make your changes, run the test, send a pull request, win k
 ```bash
   grunt test        # Run all test
   grunt watch       # Build lib/ and watch for changes
-  grunt build       # build dist/hoodie.js & dist/hoodie.min.js
 ```
 
 

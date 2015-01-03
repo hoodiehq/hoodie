@@ -4,11 +4,6 @@ module.exports = function(grunt) {
 
   require('load-grunt-tasks')(grunt);
 
-  var banner = '// <%= pkg.title %> - <%= pkg.version%>\n' +
-    '// https://github.com/hoodiehq/hoodie.js\n' +
-    '// Copyright 2012 - 2014 https://github.com/hoodiehq/\n' +
-    '// Licensed Apache License 2.0\n\n';
-
   grunt.initConfig({
     pkg: grunt.file.readJSON('package.json'),
 
@@ -21,28 +16,7 @@ module.exports = function(grunt) {
 
     watch: {
       files: ['<%= jshint.files %>'],
-      tasks: ['browserify:dev', 'karma:dev', 'jshint']
-    },
-
-    concat: {
-      options: {
-        banner: banner
-      },
-      dist: {
-        src: ['dist/hoodie.js'],
-        dest: 'dist/<%= pkg.name %>.js'
-      }
-    },
-
-    uglify: {
-      options: {
-        banner: banner
-      },
-      dist: {
-        files: {
-          'dist/<%= pkg.name %>.min.js': ['<%= concat.dist.dest %>']
-        }
-      }
+      tasks: ['karma:dev', 'jshint']
     },
 
     karma: {
@@ -55,32 +29,8 @@ module.exports = function(grunt) {
       }
     },
 
-    browserify: {
-      dev: {
-        src: ['src/hoodie.js'],
-        dest: 'dist/hoodie.js',
-        options: {
-          bundleOptions: {
-            standalone: 'Hoodie',
-            debug: true
-          },
-          external: 'jquery'
-        }
-      },
-      build: {
-        src: ['src/hoodie.js'],
-        dest: 'dist/hoodie.js',
-        options: {
-          bundleOptions: {
-            standalone: 'Hoodie'
-          },
-          external: 'jquery'
-        }
-      }
-    },
-
     release: {
-      tasks: ['karma:dev', 'refresh', 'build', 'changelog']
+      tasks: ['karma:dev', 'refresh', 'changelog']
     }
   });
 
@@ -89,8 +39,7 @@ module.exports = function(grunt) {
     grunt.config.set('pkg', grunt.file.readJSON('package.json'));
   });
 
-  grunt.registerTask('build', ['browserify:build', 'concat', 'uglify']);
-  grunt.registerTask('test', ['jshint', 'karma:dev', 'build']);
+  grunt.registerTask('test', ['jshint', 'karma:dev']);
   grunt.registerTask('ci', ['test', 'integration-test']);
-  grunt.registerTask('default', ['build']);
+  grunt.registerTask('default', ['test']);
 };
