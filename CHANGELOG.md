@@ -1,3 +1,20 @@
+<a name="2.0.1"></a>
+### 2.0.1 (2015-01-18)
+
+
+#### Bug Fixes
+
+* **admin:** update to changes in request API ([8ab9547d](https://github.com/hoodiehq/hoodie-server/commit/8ab9547d65fbdcd5decc434e8ae9f18f9e85c4c7))
+* **bearertoken:** send correct content-length header ([a46625c5](https://github.com/hoodiehq/hoodie-server/commit/a46625c5234299fecb0a6b4c0bee3e53e258a5ac))
+* **proxy:** set proxy target hostname to avoid SSL errors ([1d353d98](https://github.com/hoodiehq/hoodie-server/commit/1d353d98a2ec6fa26bbdce9f63217ca4888f8bd4))
+* **test:**
+  * hapi chomps newlines, we like newlines ([1d6d373e](https://github.com/hoodiehq/hoodie-server/commit/1d6d373e82c8266cd6f0a283ad4dc1bb1c8f4fc2))
+  * use Wreck in test suite ([98f5b64d](https://github.com/hoodiehq/hoodie-server/commit/98f5b64d1319bc90824a611a7da57cf632efa469))
+  * hapi chomps newlines, we like newlines ([cf9a6bb5](https://github.com/hoodiehq/hoodie-server/commit/cf9a6bb5c890e6c3568d78f87ecb524acdc8a399))
+  * use Wreck in test suite ([252c402e](https://github.com/hoodiehq/hoodie-server/commit/252c402e8e2f518e603826ace7653048821c8af8))
+* **tests:** increase timeouts ([da770dea](https://github.com/hoodiehq/hoodie-server/commit/da770dea55850939cedbaf3ae64913453f40380f))
+
+
 <a name="2.0.0"></a>
 ## 2.0.0 (2014-10-08)
 
