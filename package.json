@@ -26,7 +26,7 @@
     "optimist": "^0.6.1",
     "ports": "^1.1.0",
     "prompt": "^0.2.9",
-    "request": "^2.16.6",
+    "request": "^2.51.0",
     "semver": "^2.3.2",
     "watch": "^0.11.0",
     "wreck": "~5.0.1"
@@ -44,7 +44,7 @@
     "grunt-contrib-jshint": "^0.6.2",
     "grunt-contrib-nodeunit": "^0.2.2",
     "grunt-contrib-watch": "^0.5.1",
-    "grunt-release-hoodie": "^2.8.0-beta.1",
+    "grunt-release-hoodie": "^2.9.0",
     "grunt-simple-mocha": "^0.4.0",
     "load-grunt-tasks": "^0.4.0",
     "mocha": "*",

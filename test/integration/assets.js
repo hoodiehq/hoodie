@@ -10,6 +10,7 @@ var config = {
 };
 
 describe('handle assets', function () {
+  this.timeout(30000);
 
   before(function (done) {
     hoodie_server.start(config, done);
