@@ -16,6 +16,9 @@ exports.handleNewTask = function(state, object) {
   var taskStore = state.hoodie.store(object.type, object.id);
 
   taskStore.on('sync', function(object) {
+    // remove "$" from type
+    object.type = object.type.substr(1);
+
     defer.notify(object);
   });
 

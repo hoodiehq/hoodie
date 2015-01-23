@@ -1,5 +1,7 @@
 var extend = require('extend');
 var helpers = require('./helpers');
+var utils = require('../../utils');
+var getDefer = utils.promise.defer;
 
 var exports = module.exports;
 
@@ -11,14 +13,20 @@ var exports = module.exports;
 // promise will be rejected.
 //
 exports.start = function(state, type, properties) {
+  var defer;
+
   if (state.hoodie.account.hasAccount()) {
     return state.hoodie.store.add('$' + type, properties)
       .then(helpers.handleNewTask.bind(null, state));
   }
 
-  return state.hoodie.account.anonymousSignUp().then(function() {
-    return exports.start(state, type, properties);
-  });
+  defer = getDefer();
+  state.hoodie.account.anonymousSignUp().then(function() {
+    return exports.start(state, type, properties)
+    .progress(defer.notify);
+  }).done(defer.resolve).fail(defer.reject)
+
+  return defer.promise;
 };
 
 
