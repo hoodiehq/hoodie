@@ -86,6 +86,12 @@ exports.save = function(state, properties) {
     properties.id = generateId();
   }
 
+  // add timestamps and user id
+  properties.createdBy = properties.createdBy || state.hoodie.id();
+  properties.updatedAt = new Date().toJSON();
+  properties.createdAt = properties.createdAt || properties.updatedAt;
+
+
   remoteProperties = helpers.parseForRemote(state, properties);
   path = '/' + encodeURIComponent(remoteProperties._id);
   return state.remote.request('PUT', path, {
