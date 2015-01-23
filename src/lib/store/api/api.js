@@ -256,7 +256,7 @@ exports.updateAll = function(state, filterOrObjects, objectUpdate, options) {
   promise = promise.then(function(objects) {
     // now we update all objects one by one and return a promise
     // that will be resolved once all updates have been finished
-    var object, updatePromises;
+    var updatePromises;
 
     if (!$.isArray(objects)) {
       objects = [objects];

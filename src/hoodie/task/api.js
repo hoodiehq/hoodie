@@ -24,7 +24,7 @@ exports.start = function(state, type, properties) {
   state.hoodie.account.anonymousSignUp().then(function() {
     return exports.start(state, type, properties)
     .progress(defer.notify);
-  }).done(defer.resolve).fail(defer.reject)
+  }).done(defer.resolve).fail(defer.reject);
 
   return defer.promise;
 };
