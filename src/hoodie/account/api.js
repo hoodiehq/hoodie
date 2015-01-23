@@ -248,22 +248,25 @@ exports.signIn = function(state, username, password, options) {
 // uses standard CouchDB API to invalidate a user session (DELETE /_session)
 //
 exports.signOut = function(state, options) {
-  var cleanupMethod;
+  var cleanupMethod, promise, currentUsername;
   options = options || {};
   cleanupMethod = options.silent ? helpers.cleanup : helpers.cleanupAndTriggerSignOut;
+  currentUsername = state.username;
 
   if (!exports.hasAccount(state)) {
-    return cleanupMethod(state);
+    promise = cleanupMethod(state);
+  } else if (options.moveData) {
+    promise = helpers.sendSignOutRequest(state);
+  } else {
+    promise = helpers.pushLocalChanges(state, options)
+      .then(helpers.disconnect.bind(null, state))
+      .then(helpers.sendSignOutRequest.bind(null, state))
+      .then(cleanupMethod.bind(null, state));
   }
 
-  if (options.moveData) {
-    return helpers.sendSignOutRequest(state);
-  }
-
-  return helpers.pushLocalChanges(state, options)
-    .then(helpers.disconnect.bind(null, state))
-    .then(helpers.sendSignOutRequest.bind(null, state))
-    .then(cleanupMethod.bind(null, state));
+  return promise.then(function() {
+    return resolveWith(currentUsername);
+  });
 };
 
 
@@ -487,11 +490,22 @@ exports.changeUsername = function(state, currentPassword, newUsername) {
 // destroys a user's account
 //
 exports.destroy = function(state) {
+  var currentUsername = state.username;
+  var promise;
+
   if (!exports.hasAccount(state)) {
-    return helpers.cleanupAndTriggerSignOut(state);
+    promise = helpers.cleanupAndTriggerSignOut(state);
+  } else {
+    promise = exports.fetch(state)
+      .then(helpers.handleFetchBeforeDestroySuccess.bind(null, state), helpers.handleFetchBeforeDestroyError.bind(null, state))
+      .then(helpers.cleanupAndTriggerSignOut.bind(null, state))
+      .then(function() {
+        return currentUsername;
+      });
   }
 
-  return exports.fetch(state)
-    .then(helpers.handleFetchBeforeDestroySuccess.bind(null, state), helpers.handleFetchBeforeDestroyError.bind(null, state))
-    .then(helpers.cleanupAndTriggerSignOut.bind(null, state));
+  return promise.then(function() {
+    state.events.trigger('destroy', currentUsername);
+    return resolveWith(currentUsername);
+  });
 };
