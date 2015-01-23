@@ -15,6 +15,10 @@ exports.handleNewTask = function(state, object) {
   var defer = getDefer();
   var taskStore = state.hoodie.store(object.type, object.id);
 
+  taskStore.on('sync', function(object) {
+    defer.notify(object);
+  });
+
   taskStore.on('remove', function(object) {
 
     // remove "$" from type
