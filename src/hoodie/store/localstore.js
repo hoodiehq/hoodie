@@ -289,7 +289,7 @@ exports.remove = function(state, type, id, options) {
   if (!object) {
     return rejectWith({
       name: 'HoodieNotFoundError',
-      message: '"{{type}}" with id "{{id}}"" could not be found',
+      message: '"{{type}}" with id "{{id}}" could not be found',
       type: type,
       id: id
     });
