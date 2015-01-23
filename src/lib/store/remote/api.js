@@ -2,6 +2,7 @@ var extend = require('extend');
 var utils = require('../../../utils');
 var getDefer = utils.promise.defer;
 var resolveWith = utils.promise.resolveWith;
+var resolve = utils.promise.resolve;
 
 var helpers = require('./helpers');
 
@@ -105,6 +106,7 @@ exports.disconnect = function(state) {
   }
 
   connectDefer = undefined;
+  return resolve();
 };
 
 
