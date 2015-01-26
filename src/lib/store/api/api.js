@@ -244,7 +244,7 @@ exports.updateAll = function(state, filterOrObjects, objectUpdate, options) {
     promise = filterOrObjects;
     break;
   case $.isArray(filterOrObjects):
-    promise = getDefer().resolve(filterOrObjects);
+    promise = resolveWith(filterOrObjects);
     break;
   default:
     // e.g. null, update all
