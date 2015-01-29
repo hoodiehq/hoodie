@@ -165,16 +165,20 @@ exports.markAllAsChanged = function(state) {
 // whether an object has been removed or added / updated and
 // reflect the change in our local store.
 exports.handleRemoteChange = function(state, typeOfChange, object) {
+  var promise;
   if (typeOfChange === 'remove') {
-    state.hoodie.store.remove(object.type, object.id, {
+    promise = state.hoodie.store.remove(object.type, object.id, {
       remote: true,
       update: object
     });
   } else {
-    state.hoodie.store.save(object.type, object.id, object, {
+    promise = state.hoodie.store.save(object.type, object.id, object, {
       remote: true
     });
   }
+
+  // avoid "Unhandled promise rejection" errors
+  promise.catch(function(){});
 };
 
 
@@ -184,19 +188,24 @@ exports.handleRemoteChange = function(state, typeOfChange, object) {
 // Besides that, we also remove objects that have only been marked
 // as _deleted and mark the others as synced.
 exports.handlePushedObject = function(state, object) {
+  var promise;
+
   exports.triggerEvents(state, 'sync', object);
 
   if (object._deleted) {
-    state.hoodie.store.remove(object.type, object.id, {
+    promise = state.hoodie.store.remove(object.type, object.id, {
       remote: true,
       silent: true
     });
   } else {
-    state.hoodie.store.save(object.type, object.id, object, {
+    promise = state.hoodie.store.save(object.type, object.id, object, {
       remote: true,
       silent: true
     });
   }
+
+  // avoid "Unhandled promise rejection" errors
+  promise.catch(function(){});
 };
 
 // store IDs of dirty objects
