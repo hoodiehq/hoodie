@@ -66,7 +66,9 @@ var Hoodie = module.exports = (function() {
     // we use a closure to not pass the username to connect, as it
     // would set the name of the remote store, which is not the username.
     hoodie.account.authenticate().then(function( /* username */ ) {
-      hoodie.remote.connect();
+      return hoodie.remote.connect();
+    }).catch(function() {
+      // silent "Unhandled promise rejection" in case of error
     });
 
     //

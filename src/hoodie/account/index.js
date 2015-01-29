@@ -45,7 +45,9 @@ module.exports = function(hoodie) {
   account.on('cleanup', utils.config.clear);
 
   // check for pending password reset
-  account.checkPasswordReset();
+  account.checkPasswordReset().catch(function() {
+    // silent "Unhandled promise rejection" in case of error
+  });
 
   // init username
   account.username = username;
