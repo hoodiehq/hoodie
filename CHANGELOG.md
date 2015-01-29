@@ -1,3 +1,12 @@
+<a name="1.0.3"></a>
+### 1.0.3 (2015-01-29)
+
+
+#### Bug Fixes
+
+* handle unhandled rejected promises (#402) ([f319c72e](https://github.com/hoodiehq/hoodie.js/commit/f319c72e277840740b821e20589a2abc480d378f))
+
+
 <a name="1.0.1"></a>
 ### 1.0.1 (2015-01-23)
 
