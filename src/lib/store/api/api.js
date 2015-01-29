@@ -5,7 +5,6 @@ var helpers = require('./helpers');
 
 var utils = require('../../../utils');
 var promise = utils.promise;
-var getDefer = promise.defer;
 var rejectWith = promise.rejectWith;
 var resolveWith = promise.resolveWith;
 var isPromise = promise.isPromise;
