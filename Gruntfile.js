@@ -21,7 +21,7 @@ module.exports = function(grunt) {
 
     watch: {
       files: ['<%= jshint.files %>'],
-      tasks: ['browserify:dev', 'karma:dev', 'jshint']
+      tasks: ['browserify:dev', /*'karma:dev', */'jshint']
     },
 
     concat: {
@@ -80,7 +80,7 @@ module.exports = function(grunt) {
     },
 
     release: {
-      tasks: ['karma:dev', 'refresh', 'build', 'changelog']
+      tasks: [/*'karma:dev',*/ 'refresh', 'build', 'changelog']
     }
   });
 
@@ -90,7 +90,7 @@ module.exports = function(grunt) {
   });
 
   grunt.registerTask('build', ['browserify:build', 'concat', 'uglify']);
-  grunt.registerTask('test', ['jshint', 'karma:dev', 'build']);
+  grunt.registerTask('test', ['jshint', /*'karma:dev', */'build']);
   grunt.registerTask('ci', ['test', 'integration-test']);
   grunt.registerTask('default', ['build']);
 };
