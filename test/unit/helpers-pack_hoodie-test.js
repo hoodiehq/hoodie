@@ -1,24 +1,20 @@
-var path = require('path');
 var Stream = require('stream');
 var expect = require('expect.js');
-var hoodiejs = require('../../lib/utils/pack_hoodie');
-var path = require('path');
+var hoodiejs = require('../../lib/helpers/pack_hoodie');
 
 describe('pack_hoodie', function () {
 
   // Dummy config object with plugins attribute.
-  var config = {
-    hoodie: {
-      app_path: path.resolve(__dirname, '../../data')
-    },
-    plugins: []
-  };
+  var config = { app: {}, plugins: [] };
 
   it('should be a function', function () {
     expect(hoodiejs).to.be.a(Function);
   });
 
-  xit('should return a readable stream on empty cache', function (done) {
+  it('should return a readable stream on empty cache', function (done) {
+
+    this.timeout(5000);
+
     var stream = hoodiejs(config);
 
     expect(stream).to.be.a(Stream);
@@ -35,7 +31,7 @@ describe('pack_hoodie', function () {
     });
   });
 
-  xit('should return a cached string after first request', function () {
+  it('should return a cached string after first request', function () {
     var str = hoodiejs(config);
     expect(str).to.be.a('string');
     expect(/hoodie_bundle\.js/.test(str)).to.be(true);
