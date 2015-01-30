@@ -19,7 +19,7 @@ describe('pack_hoodie', function () {
     expect(hoodiejs).to.be.a(Function);
   });
 
-  it('should return a readable stream on empty cache', function (done) {
+  xit('should return a readable stream on empty cache', function (done) {
     var stream = hoodiejs(config);
 
     expect(stream).to.be.a(Stream);
@@ -36,7 +36,7 @@ describe('pack_hoodie', function () {
     });
   });
 
-  it('should return a cached string after first request', function () {
+  xit('should return a cached string after first request', function () {
     var str = hoodiejs(config);
     expect(str).to.be.a('string');
     expect(/hoodie_bundle\.js/.test(str)).to.be(true);

@@ -16,8 +16,12 @@ var argv = require('optimist')
   .describe('www', 'Set www root directory')
   .describe('local-tld', 'Turn on local-tld on supported platforms')
   .describe('no-local-tld', 'Turn off local-tld on supported platforms')
+  .alias('c', 'custom-ports')
+  .describe('custom-ports', 'Provide custom ports www,admin,couchdb')
   .alias('h', 'help')
   .describe('help', 'Show usage information')
+  .alias('v', 'verbose')
+  .describe('verbose', 'Shows more verbose console output')
   .argv;
 
 /**
@@ -26,12 +30,11 @@ var argv = require('optimist')
  */
 
 if (require.main === module) {
-  var project_dir = process.cwd();
 
-  var cfg = environment.getConfig(
+  var env_config = environment.getConfig(
     process.platform,   // platform
     process.env,        // environment vars
-    project_dir,        // project directory
+    process.cwd(),      // project directory
     argv                // command-line arguments
   );
 
@@ -40,7 +43,7 @@ if (require.main === module) {
     return require('optimist').showHelp();
   }
 
-  app.init(cfg, function (err) {
+  app.start(env_config, function (err) {
     if (err) {
       hconsole.error(err);
       process.exit(1);
