@@ -3,7 +3,6 @@ var Stream = require('stream');
 var expect = require('expect.js');
 var hoodiejs = require('../../lib/utils/pack_hoodie');
 var path = require('path');
-var _ = require('lodash');
 
 describe('pack_hoodie', function () {
 
