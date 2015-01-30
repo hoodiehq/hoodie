@@ -5,7 +5,7 @@ var helpers = require('./helpers');
 module.exports = function(hoodie) {
   var account = {};
   // set username from config (local store)
-  var username = utils.config.get('_account.username');
+  var _username = utils.config.get('_account.username');
   var state = {
     // flag whether user is currently authenticated or not
     authenticated: null,
@@ -24,10 +24,10 @@ module.exports = function(hoodie) {
     // default couchDB user doc prefix
     userDocPrefix: 'org.couchdb.user',
     get username() {
-      return username;
+      return _username;
     },
     set username(input) {
-      username = input;
+      _username = input;
       account.username = input;
     }
   };
@@ -50,7 +50,7 @@ module.exports = function(hoodie) {
   });
 
   // init username
-  account.username = username;
+  account.username = _username;
 
   // init bearer token
   account.bearerToken = utils.config.get('_account.bearerToken');
