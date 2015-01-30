@@ -32,7 +32,7 @@ describe('block _all_dbs', function () {
   });
 
 
-  xit('should log into admin', function (done) {
+  it('should log into admin', function (done) {
     var body = 'name=admin&password=' + config.admin_password;
     var req = http.request({
       host: '127.0.0.1',

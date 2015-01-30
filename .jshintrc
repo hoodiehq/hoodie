@@ -10,6 +10,7 @@
     "sinon",
     "define",
     "require",
+    "Hoodie",
     "it",
     "describe",
     "expect",
