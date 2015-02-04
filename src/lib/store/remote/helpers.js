@@ -109,7 +109,6 @@ exports.parseFromRemote = function(state, object) {
   //
   matches = id.match(/([^\/]+)\/(.*)/);
   if (matches == null) {
-    console.log('hoodie: unhandled id ' + id);
     return null;
   }
   object.type = matches[1], object.id = matches[2];
