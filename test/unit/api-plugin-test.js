@@ -128,14 +128,14 @@ describe('api plugin', function () {
       stream.statusCode = 200;
 
       plugin.internals.addCorsAndBearerToken(null, stream, { headers: {} }, function (data) {
-        var fixture = JSON.stringify({"the": "body"}) + '\n';
-        expect(data).to.eql(fixture);
+        var fixture = JSON.stringify({the: 'body'}) + '\n';
+        expect(data.toString()).to.eql(fixture);
         return {
           code: function(statusCode) {
             expect(statusCode).to.eql(200);
             return {
               hold: function () {
-                function Resp() {};
+                function Resp() {}
                 Resp.prototype.send = function() {
                   expect(this.headers).to.be.an('object');
                   done();
