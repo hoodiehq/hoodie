@@ -2,11 +2,12 @@
 
 var _and, _but, _when;
 
-$.ajax = function() {
-  var promise = $.Deferred().promise();
-  promise.abort = function() {};
-  return promise;
-};
+// TODO: garbas
+// $.ajax = function() {
+//   var promise = $.Deferred().promise();
+//   promise.abort = function() {};
+//   return promise;
+// };
 
 _when = function(description, specs) {
   describe('when ' + description, specs);

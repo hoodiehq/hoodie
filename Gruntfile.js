@@ -39,7 +39,7 @@ module.exports = function(grunt) {
     grunt.config.set('pkg', grunt.file.readJSON('package.json'));
   });
 
-  grunt.registerTask('test', ['jshint'/*, 'karma:dev'*/]);
+  grunt.registerTask('test', ['jshint', 'karma:dev']);
   grunt.registerTask('ci', ['test', 'integration-test']);
   grunt.registerTask('default', ['test']);
 };

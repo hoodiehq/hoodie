@@ -14,7 +14,6 @@ module.exports = function(config) {
 
     // list of files / patterns to load in the browser
     files: [
-      { pattern: 'node_modules/hoodie.js-assets/jquery/jquery.js', watched: false, included: true },
       'test/lib/bind.js',
       'test/lib/helpers.js'
     ],

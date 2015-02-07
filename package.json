@@ -25,10 +25,13 @@
   ],
   "dependencies": {
     "bluebird": "^2.2.2",
+    "es3ify": "^0.1.3",
     "extend": "^1.3.0",
     "inherits": "^2.0.1",
+    "jqevents": "~0.1.1",
     "lie": "^2.6.0",
-    "jqevents": "~0.1.1"
+    "pouchdb": "^3.3.0",
+    "request": "~2.28.0"
   },
   "devDependencies": {
     "browserify": "^4.2.0",
@@ -51,5 +54,8 @@
   },
   "scripts": {
     "test": "grunt ci --verbose"
+  },
+  "browser": {
+    "pouchdb/lib/deps/request": "pouchdb/lib/deps/request-browser"
   }
 }

@@ -1,5 +1,6 @@
-var extend = require('extend');
+//var extend = require('extend');
 var utils = require('../utils');
+//var ajax = require('pouchdb/lib/deps/ajax');
 
 var hoodiefyRequestErrorName = utils.hoodiefyRequestErrorName;
 var getDefer = utils.promise.defer;
@@ -10,13 +11,7 @@ var rejectWith = utils.promise.rejectWith;
 // ================
 
 // Hoodie's central place to send request to its backend.
-// At the moment, it's a wrapper around jQuery's ajax method,
-// but we might get rid of this dependency in the future.
-//
-// It has build in support for CORS and a standard error
-// handling that normalizes errors returned by CouchDB
-// to JavaScript's native conventions of errors having
-// a name & a message property.
+// Its using pouchdb's ajax module.
 //
 // Common errors to expect:
 //
@@ -50,7 +45,7 @@ exports.request = function(hoodie, type, url, options) {
   };
   var requestDefer = getDefer();
   var requestPromise = requestDefer.promise;
-  var jQueryPromise;
+
   options = options || {};
 
   if (hoodie.account.bearerToken) {
@@ -64,13 +59,14 @@ exports.request = function(hoodie, type, url, options) {
     url = (hoodie.baseUrl || '') + API_PATH + url;
   }
 
+  // TODO: garbas; this should be ported to pouchdb's request-browser
   // if url is cross domain, set CORS headers
-  if (/^http/.test(url)) {
-    defaults.xhrFields = {
-      withCredentials: true
-    };
-    defaults.crossDomain = true;
-  }
+  //if (/^http/.test(url)) {
+  //  defaults.xhrFields = {
+  //    withCredentials: true
+  //  };
+  //  defaults.crossDomain = true;
+  //}
 
   defaults.url = url;
 
@@ -80,14 +76,15 @@ exports.request = function(hoodie, type, url, options) {
   // the piping, as for whatever reason the returned promise
   // does not have the `abort` method any more, maybe others
   // as well. See also http://bugs.jquery.com/ticket/14104
-  jQueryPromise = global.jQuery.ajax(extend(defaults, options))
-    .done(requestDefer.resolve)
-    .fail(requestDefer.reject);
+  // TODO: garbas; replace with pouchdb's ajax but make it a promise
+  //jQueryPromise = global.jQuery.ajax(extend(defaults, options))
+  //  .done(requestDefer.resolve)
+  //  .fail(requestDefer.reject);
   var pipedPromise = requestPromise.then(
     null,
     exports.handleRequestError.bind(null, hoodie)
   );
-  pipedPromise.abort = jQueryPromise.abort;
+  //pipedPromise.abort = jQueryPromise.abort;
 
   return pipedPromise;
 };
