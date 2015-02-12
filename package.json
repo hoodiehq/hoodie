@@ -17,7 +17,7 @@
     "hoodie": "^1.0.0-beta.2",
     "hoodie-admin-dashboard": "^2.0.0",
     "hoodie-admin-dashboard-uikit": "^3.0.0",
-    "hoodie-plugins-manager": "^0.2.6",
+    "hoodie-plugins-manager": "^0.4.0",
     "local-tld-lib": "^1.0.2",
     "lock": "^0.1.0",
     "lodash": "^2.4.1",
