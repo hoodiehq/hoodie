@@ -1,3 +1,18 @@
+<a name="2.1.0"></a>
+## 2.1.0 (2015-02-12)
+
+
+#### Bug Fixes
+
+* **api:** Debug: hapi, internal, implementation, error (#322) ([cdf2caac](https://github.com/hoodiehq/hoodie-server/commit/cdf2caac0d7338736dec39f44cca2304b9e22ab1))
+* **tests:** check for buffers ([c9ec210d](https://github.com/hoodiehq/hoodie-server/commit/c9ec210d13d2771925bc42fc062bcb218538dd7b))
+
+
+#### Features
+
+* updated hoodie.js to 0.9.2 ([1a3e54e9](https://github.com/hoodiehq/hoodie-server/commit/1a3e54e9f7a4c7fb3731040dc50e08f8831ac426))
+
+
 <a name="2.0.1"></a>
 ### 2.0.1 (2015-01-18)
 
