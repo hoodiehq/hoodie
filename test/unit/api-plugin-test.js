@@ -123,12 +123,12 @@ describe('api plugin', function () {
     });
 
     it('should call reply and hold', function (done) {
-      var stream = Wreck.toReadableStream(JSON.stringify({ the: 'body' }));
+      var stream = Wreck.toReadableStream('{"the":"body"}');
       stream.headers = {};
       stream.statusCode = 200;
 
       plugin.internals.addCorsAndBearerToken(null, stream, { headers: {} }, function (data) {
-        var fixture = JSON.stringify({the: 'body'}) + '\n';
+        var fixture = '{"the":"body"}';
         expect(data.toString()).to.eql(fixture);
         return {
           code: function(statusCode) {
@@ -149,15 +149,15 @@ describe('api plugin', function () {
     });
 
     it('should set status 200 for OPTIONS requests', function (done) {
-      var stream = Wreck.toReadableStream(JSON.stringify({ the: 'body' }));
+      var stream = Wreck.toReadableStream('{"the":"body"}');
 
       stream.headers = {
         some: 'header',
       };
       stream.statusCode = 405;
       plugin.internals.addCorsAndBearerToken(null, stream, { method: 'options', headers: {} }, function (data) {
-        var fixture = JSON.stringify({the: 'body'}) + '\n';
-        expect(data).to.eql(fixture);
+        var fixture = '{"the":"body"}';
+        expect(data.toString()).to.eql(fixture);
         return {
           code: function(statusCode) {
             expect(statusCode).to.eql(200);
@@ -187,8 +187,8 @@ describe('api plugin', function () {
         method: 'get',
         headers: { 'origin': 'some-origin', 'custom-header': 'add me to -Allowed-Headers' }
       }, function (data) {
-        var fixture = JSON.stringify({the: 'body'}) + '\n';
-        expect(data).to.eql(fixture);
+        var fixture = '{"the":"body"}';
+        expect(data.toString()).to.eql(fixture);
         return {
           code: function(statusCode) {
             expect(statusCode).to.eql(200);
@@ -197,7 +197,7 @@ describe('api plugin', function () {
                 function Resp() {}
                 Resp.prototype.send = function() {
                   expect(this.headers).to.eql({
-                    some: 'header', 'content-length': 15,
+                    some: 'header', 'content-length': 14,
                     'access-control-allow-origin': 'some-origin',
                     'access-control-allow-headers': 'authorization, content-length, content-type, if-match, if-none-match, origin, x-requested-with, custom-header',
                     'access-control-expose-headers': 'content-type, content-length, etag',
@@ -219,7 +219,7 @@ describe('api plugin', function () {
         the: 'body',
         bearerToken: 'some-token'
       };
-      var fixture = JSON.stringify(payload) + '\n';
+      var fixture = '{"the":"body","bearerToken":"some-token"}';
       var stream = Wreck.toReadableStream(JSON.stringify(payload));
 
       stream.statusCode = 200;
@@ -229,7 +229,7 @@ describe('api plugin', function () {
       };
 
       plugin.internals.addCorsAndBearerToken(null, stream, { headers: {} }, function (data) {
-        expect(data).to.eql(fixture);
+        expect(data.toString()).to.eql(fixture);
 
         return {
           code: function(statusCode) {
