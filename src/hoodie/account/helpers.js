@@ -294,12 +294,12 @@ exports.handlePasswordResetStatusRequestError = function(state, username) {
 exports.awaitPasswordResetResult = function(state) {
   var defer = getDefer();
 
-  state.events.once('passwordreset', defer.resolve );
+  state.events.one('passwordreset', defer.resolve );
   state.events.on('error:passwordreset', exports.removePasswordResetObject.bind(null, state));
   state.events.on('error:passwordreset', defer.reject );
 
   // clean up callbacks when either gets called
-  defer.always( function() {
+  defer.promise.always( function() {
     state.events.removeListener('passwordreset', defer.resolve );
     state.events.removeListener('error:passwordreset', exports.removePasswordResetObject.bind(null, state));
     state.events.removeListener('error:passwordreset', defer.reject );
