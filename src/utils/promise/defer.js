@@ -4,13 +4,13 @@ var Promise = require('./promise');
 module.exports = function Defer() {
   var defer = {};
   defer.promise = new Promise(function (resolveCallback, rejectCallback) {
-    defer.resolve = function resolve() {
+    defer.resolve = function resolve(what) {
       defer.notify = function noop () {};
-      resolveCallback.apply(null, arguments);
+      resolveCallback(what);
     };
-    defer.reject = function reject() {
+    defer.reject = function reject(what) {
       defer.notify = function noop () {};
-      rejectCallback.apply(null, arguments);
+      rejectCallback(what);
     };
   });
 

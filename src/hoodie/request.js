@@ -82,7 +82,9 @@ exports.request = function(hoodie, type, url, options) {
   // as well. See also http://bugs.jquery.com/ticket/14104
   jQueryPromise = global.jQuery.ajax(extend(defaults, options))
     .done(requestDefer.resolve)
-    .fail(requestDefer.reject);
+    .fail(function(xhr, error) {
+      requestDefer.reject(error);
+    });
   var pipedPromise = requestPromise.then(
     null,
     exports.handleRequestError.bind(null, hoodie)
