@@ -341,6 +341,28 @@ exports.changePassword = function(state, currentPassword, newPassword) {
   helpers.disconnect(state);
 
   return exports.fetch(state)
+    .then(function () {
+      var dfd = promise.defer();
+
+      $.ajax({
+        type: 'POST',
+        url: '/_api/_session',
+        data: { name: state.userDoc.name, password: currentPassword },
+        dataType: 'json'
+      }).then(function () {
+        dfd.resolve();
+      }, function (xhr) {
+        if (xhr.status === 401) {
+          return dfd.reject({
+            name: 'HoodieUnauthorizedError',
+            message: 'Current password is incorrect'
+          });
+        }
+        dfd.reject({ message: xhr.responseJSON.reason });
+      });
+
+      return dfd.promise;
+    })
     .then(helpers.sendChangeUsernameAndPasswordRequest(state, currentPassword, null, newPassword))
     .then(function() {
       // resolve with null instead of current username
