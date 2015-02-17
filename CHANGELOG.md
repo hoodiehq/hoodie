@@ -1,3 +1,15 @@
+<a name="1.0.4"></a>
+### 1.0.4 (2015-02-17)
+
+
+#### Bug Fixes
+
+* promise handling ([7072d10c](https://github.com/hoodiehq/hoodie.js/commit/7072d10caa47c465e26f2d326ef0ccf13025c734))
+* avoid getters/setters having the same name as variables used inside ([7bac63a7](https://github.com/hoodiehq/hoodie.js/commit/7bac63a764458c0c126a4554828cc96ad9fac32c))
+* avoid "Unhandled promise rejection" when pulling changes (#402) ([39ec4874](https://github.com/hoodiehq/hoodie.js/commit/39ec4874f222d0854a285c1ebf20a92d52fc457d))
+* **account:** fix hoodie.account.resetPassword() ([0ba2f194](https://github.com/hoodiehq/hoodie.js/commit/0ba2f194963e7df29fec32725c612b3d81e47029), closes [#410](https://github.com/hoodiehq/hoodie.js/issues/410))
+
+
 <a name="1.0.3"></a>
 ### 1.0.3 (2015-01-29)
 
