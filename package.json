@@ -2,7 +2,7 @@
   "name": "hoodie",
   "title": "Hoodie.js",
   "description": "Hoodie library for the browser",
-  "version": "1.0.5",
+  "version": "1.0.6",
   "main": "./src/hoodie.js",
   "homepage": "http://hood.ie",
   "repository": {

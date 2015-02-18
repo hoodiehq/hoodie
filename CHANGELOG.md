@@ -1,3 +1,14 @@
+<a name="1.0.6"></a>
+### 1.0.6 (2015-02-18)
+
+
+#### Bug Fixes
+
+* silents "unhandled rejected promises" (#402) ([171cb568](https://github.com/hoodiehq/hoodie.js/commit/171cb568aac39aa360abc2abb4acbfd01d581037))
+* ignore _design docs ([f335e5ec](https://github.com/hoodiehq/hoodie.js/commit/f335e5ecd7bf91c8c2a03638499e6dbed4ea9ab0))
+* **account:** reject password change when current password is wrong ([596e8156](https://github.com/hoodiehq/hoodie.js/commit/596e8156428077b53975ea4a47cbc4d46a11193c), closes [#103](https://github.com/hoodiehq/hoodie.js/issues/103))
+
+
 <a name="1.0.4"></a>
 ### 1.0.4 (2015-02-17)
 
