@@ -166,6 +166,11 @@ exports.markAllAsChanged = function(state) {
 // reflect the change in our local store.
 exports.handleRemoteChange = function(state, typeOfChange, object) {
   var promise;
+
+  if (object.type === '_design') {
+    return;
+  }
+
   if (typeOfChange === 'remove') {
     promise = state.hoodie.store.remove(object.type, object.id, {
       remote: true,
