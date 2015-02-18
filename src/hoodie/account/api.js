@@ -341,6 +341,14 @@ exports.changePassword = function(state, currentPassword, newPassword) {
   helpers.disconnect(state);
 
   return exports.fetch(state)
+    .then(function () {
+      return state.hoodie.request('POST', '/_session', {
+        data: {
+          name: state.userDoc.name,
+          password: currentPassword
+        }
+      });
+    })
     .then(helpers.sendChangeUsernameAndPasswordRequest(state, currentPassword, null, newPassword))
     .then(function() {
       // resolve with null instead of current username
