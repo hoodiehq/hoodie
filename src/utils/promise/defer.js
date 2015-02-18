@@ -27,6 +27,7 @@ module.exports = function Defer() {
   return defer;
 };
 
+function noop(){}
 function wrapPromise (promise) {
   if (promise._isHoodiePromise) {
     return promise;
@@ -34,15 +35,15 @@ function wrapPromise (promise) {
   promise._isHoodiePromise = true;
 
   promise.done = function done(callback) {
-    this.then(callback);
+    this.then(callback).catch(noop);
     return this;
   };
   promise.fail = function fail(callback) {
-    this.then(null, callback);
+    this.then(null, callback).catch(noop);
     return this;
   };
   promise.always = function always(callback) {
-    this.then(callback, callback);
+    this.then(callback, callback).catch(noop);
     return this;
   };
   promise.progress = function progress(callback) {

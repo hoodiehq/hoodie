@@ -83,10 +83,7 @@ exports.request = function(hoodie, type, url, options) {
   jQueryPromise = global.jQuery.ajax(extend(defaults, options))
     .done(requestDefer.resolve)
     .fail(requestDefer.reject);
-  var pipedPromise = requestPromise.then(
-    null,
-    exports.handleRequestError.bind(null, hoodie)
-  );
+  var pipedPromise = requestPromise.catch(exports.handleRequestError.bind(null, hoodie));
   pipedPromise.abort = jQueryPromise.abort;
 
   return pipedPromise;

@@ -204,7 +204,7 @@ exports.handlePullSuccess = function(state, response) {
   exports.setSinceNr(state, response.last_seq);
   exports.handlePullResults(state, response.results);
   if (state.remote.isConnected()) {
-    return state.remote.pull();
+    state.remote.pull().catch(function(){});
   }
 };
 
@@ -224,7 +224,7 @@ exports.handlePullError = function(state, xhr, error) {
     // before sync can be continued
   case 401:
     state.remote.trigger('error:unauthenticated', error);
-    return state.remote.disconnect();
+    return state.remote.disconnect().catch(function(){});
 
     // the 404 comes, when the requested DB has been removed
     // or does not exist yet.
@@ -244,12 +244,12 @@ exports.handlePullError = function(state, xhr, error) {
     //
     state.remote.trigger('error:server', error);
     global.setTimeout(state.remote.pullSilently, 3000);
-    return state.hoodie.checkConnection();
+    return state.hoodie.checkConnection().catch(function(){});
   default:
     // usually a 0, which stands for timeout or server not reachable.
     if (xhr.statusText === 'abort') {
       // manual abort after 25sec. restart pulling changes directly when connected
-      return state.remote.pull();
+      return state.remote.pull().catch(function(){});
     } else {
 
       // oops. This might be caused by an unreachable server.
@@ -258,7 +258,7 @@ exports.handlePullError = function(state, xhr, error) {
       // we'll try again after a 3s timeout
       //
       global.setTimeout(state.remote.pullSilently, 3000);
-      return state.hoodie.checkConnection();
+      return state.hoodie.checkConnection().catch(function(){});
     }
   }
 };

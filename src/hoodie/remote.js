@@ -43,26 +43,37 @@ var exports = module.exports = function(hoodie) {
   //
   // subscribe to events coming from outside
   //
+  function noop(){}
+  function pushSilently(objects) {
+    remote.push(objects).catch(noop);
+  }
+  function connectSilently(username) {
+    remote.connect(username).catch(noop);
+  }
+  function disconnectSilently() {
+    remote.disconnect().catch(noop);
+  }
+
   hoodie.on('remote:connect', function() {
-    hoodie.on('store:idle', remote.push);
+    hoodie.on('store:idle', pushSilently);
   });
 
   hoodie.on('remote:disconnect', function() {
-    hoodie.unbind('store:idle', remote.push);
+    hoodie.unbind('store:idle', pushSilently);
   });
 
-  hoodie.on('disconnected', remote.disconnect);
-  hoodie.on('reconnected', remote.connect);
+  hoodie.on('disconnected', disconnectSilently);
+  hoodie.on('reconnected', connectSilently);
 
   // account events
-  hoodie.on('account:signup', remote.connect);
-  hoodie.on('account:signup:anonymous', remote.connect);
-  hoodie.on('account:signin', remote.connect);
-  hoodie.on('account:signin:anonymous', remote.connect);
-  hoodie.on('account:changeusername', remote.connect);
+  hoodie.on('account:signup', connectSilently);
+  hoodie.on('account:signup:anonymous', connectSilently);
+  hoodie.on('account:signin', connectSilently);
+  hoodie.on('account:signin:anonymous', connectSilently);
+  hoodie.on('account:changeusername', connectSilently);
 
-  hoodie.on('account:reauthenticated', remote.connect);
-  hoodie.on('account:signout', remote.disconnect);
+  hoodie.on('account:reauthenticated', connectSilently);
+  hoodie.on('account:signout', disconnectSilently);
 
   //
   // expose remote API
