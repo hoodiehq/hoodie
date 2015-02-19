@@ -259,16 +259,8 @@ exports.triggerEvents = function(state, eventName, object, options) {
   state.hoodie.store.trigger(eventName, extend(true, {}, object), options);
   state.hoodie.store.trigger(object.type + ':' + eventName, extend(true, {}, object), options);
 
-  // DEPRECATED
-  // https://github.com/hoodiehq/hoodie.js/issues/146
-  state.hoodie.store.trigger(eventName + ':' + object.type, extend(true, {}, object), options);
-
   if (eventName !== 'new') {
     state.hoodie.store.trigger( object.type + ':' + object.id+ ':' + eventName, extend(true, {}, object), options);
-
-    // DEPRECATED
-    // https://github.com/hoodiehq/hoodie.js/issues/146
-    state.hoodie.store.trigger( eventName + ':' + object.type + ':' + object.id, extend(true, {}, object), options);
   }
 
 
@@ -282,17 +274,9 @@ exports.triggerEvents = function(state, eventName, object, options) {
   state.hoodie.store.trigger('change', eventName, extend(true, {}, object), options);
   state.hoodie.store.trigger(object.type + ':change', eventName, extend(true, {}, object), options);
 
-  // DEPRECATED
-  // https://github.com/hoodiehq/hoodie.js/issues/146
-  state.hoodie.store.trigger('change:' + object.type, eventName, extend(true, {}, object), options);
-
-
   if (eventName !== 'new') {
     state.hoodie.store.trigger(object.type + ':' + object.id + ':change', eventName, extend(true, {}, object), options);
 
-    // DEPRECATED
-    // https://github.com/hoodiehq/hoodie.js/issues/146
-    state.hoodie.store.trigger('change:' + object.type + ':' + object.id, eventName, extend(true, {}, object), options);
   }
 };
 

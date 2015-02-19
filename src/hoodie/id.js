@@ -12,11 +12,6 @@ var exports = module.exports = function(hoodie) {
     id: config.get('_hoodieId')
   };
 
-  // DEPRECATED, remove before 1.0
-  if (!state.id) {
-    state.id = config.get('_account.ownerHash');
-  }
-
   //
   // subscribe to events coming from other modules
   //
