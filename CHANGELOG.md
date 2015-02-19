@@ -1,3 +1,29 @@
+<a name="2.0.0"></a>
+## 2.0.0 (2015-02-19)
+
+
+#### Breaking Changes
+
+* 
+The hoodie id is now expected to be in localStorage `_hoodieId`
+key, the deprecated `_account.ownerHash` key is no longer working.
+
+The order of triggered events with type prefix is
+`<type>:<id>:<eventname>`. The deprecated order
+`<eventname>:<type>:<id>` is no longer working.
+
+See https://github.com/hoodiehq/hoodie.js/issues/146
+and https://github.com/hoodiehq/hoodie.js/issues/326
+
+* * *
+
+This commit was sponsored by The Hoodie Firm.
+You can hire The Hoodie Firm:
+
+http://go.hood.ie/thehoodiefirm
+ ([54987289](https://github.com/hoodiehq/hoodie.js/commit/549872894bc0fecfa5e61dc5650699f4c60214d7))
+
+
 <a name="1.0.6"></a>
 ### 1.0.6 (2015-02-18)
 
