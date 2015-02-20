@@ -108,7 +108,22 @@ exports.signUp = function(state, username, password) {
   }
 
   if (exports.hasAnonymousAccount(state)) {
-    return helpers.upgradeAnonymousAccount(state, username, password);
+    return helpers.upgradeAnonymousAccount(state, username, password)
+    .catch(function(error) {
+      if (error.name !== 'HoodieUnauthorizedError') {
+        throw error;
+      }
+
+      // if error is a 401, it means that the anonymous account has been
+      // deleted in CouchDB. In that case, just sign up the normal way
+      // https://github.com/hoodiehq/hoodie.js/issues/413
+      helpers.removeAnonymousPassword(state);
+      return helpers.sendSignUpRequest(state, username, password)
+      .done(function() {
+        helpers.setUsername(state, username);
+        state.events.trigger('signup', username);
+      });
+    });
   }
 
   if (exports.hasAccount(state)) {
