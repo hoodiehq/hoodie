@@ -1,3 +1,12 @@
+<a name="2.0.1"></a>
+### 2.0.1 (2015-02-21)
+
+
+#### Bug Fixes
+
+* fallback to normal signUp routine when upgrade from anonymous account fails with ([9fb0d28b](https://github.com/hoodiehq/hoodie.js/commit/9fb0d28be5ebe407f88e10952d8a712fc99aa973))
+
+
 <a name="2.0.0"></a>
 ## 2.0.0 (2015-02-19)
 
