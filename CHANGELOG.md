@@ -1,3 +1,12 @@
+<a name="3.0.0"></a>
+## 3.0.0 (2015-02-22)
+
+
+#### Bug Fixes
+
+* more robust check if hoodie-server is run in app environment or standalone ([1253aa40](https://github.com/hoodiehq/hoodie-server/commit/1253aa40ec20ac3f9133de8bf19596924242fac8))
+
+
 <a name="2.1.3"></a>
 ### 2.1.3 (2015-02-19)
 
