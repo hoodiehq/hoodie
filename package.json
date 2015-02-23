@@ -26,9 +26,10 @@
   "dependencies": {
     "bluebird": "^2.2.2",
     "extend": "^1.3.0",
+    "humble-localstorage": "^1.4.1",
     "inherits": "^2.0.1",
-    "lie": "^2.6.0",
-    "jqevents": "~0.1.1"
+    "jqevents": "~0.1.1",
+    "lie": "^2.6.0"
   },
   "devDependencies": {
     "browserify": "^4.2.0",

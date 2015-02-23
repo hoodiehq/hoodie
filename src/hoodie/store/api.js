@@ -19,7 +19,7 @@ var exports = module.exports;
 exports.index = function(state) {
   var i, key, keys, _i, _ref;
   keys = [];
-  for (i = _i = 0, _ref = localStorageWrapper.length(); 0 <= _ref ? _i < _ref : _i > _ref; i = 0 <= _ref ? ++_i : --_i) {
+  for (i = _i = 0, _ref = localStorageWrapper.length; 0 <= _ref ? _i < _ref : _i > _ref; i = 0 <= _ref ? ++_i : --_i) {
     key = localStorageWrapper.key(i);
     if (helpers.isSemanticKey(state, key)) {
       keys.push(key);

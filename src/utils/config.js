@@ -1,7 +1,7 @@
 // Hoodie Config API
 // ===================
 
-var localStorageWrapper = require('../utils/local_storage_wrapper')();
+var localStorageWrapper = require('humble-localstorage');
 var extend = require('extend');
 
 var exports = module.exports = function(storeKey) {
