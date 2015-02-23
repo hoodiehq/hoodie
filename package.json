@@ -38,7 +38,7 @@
     "grunt-contrib-jshint": "^0.9.2",
     "grunt-contrib-watch": "^0.6.1",
     "grunt-karma": "^0.8.3",
-    "grunt-release-hoodie": "^2.8.1",
+    "grunt-release-hoodie": "latest",
     "karma": "^0.12.19",
     "karma-browserifast": "^0.6.1",
     "karma-chrome-launcher": "^0.1.4",
