@@ -1,3 +1,12 @@
+<a name="2.0.2"></a>
+### 2.0.2 (2015-02-23)
+
+
+#### Bug Fixes
+
+* utils.localStorageWrapper.clear() is undefined (#415) ([9eb55339](https://github.com/hoodiehq/hoodie.js/commit/9eb553399b7f88e2fd0e5619bebf04c330c01417))
+
+
 <a name="2.0.1"></a>
 ### 2.0.1 (2015-02-21)
 
