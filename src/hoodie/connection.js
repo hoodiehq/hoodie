@@ -54,7 +54,7 @@ exports.checkConnection = function(state) {
   state.checkConnectionRequest = state.hoodie.request('GET', path).then(
     exports.handleConnection.bind(null, state, 30000, 'reconnected', true),
     exports.handleConnection.bind(null, state, 3000, 'disconnected', false)
-  );
+  ).catch(function() {}); // silent expected errors when checking connection
 
   return state.checkConnectionRequest;
 };
