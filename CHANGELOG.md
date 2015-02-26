@@ -1,3 +1,12 @@
+<a name="2.0.3"></a>
+### 2.0.3 (2015-02-26)
+
+
+#### Bug Fixes
+
+* another "Unhandled rejection error" (#418) ([fe83398b](https://github.com/hoodiehq/hoodie.js/commit/fe83398b2c8ee86b58acdcaa08711234ad1d8016))
+
+
 <a name="2.0.2"></a>
 ### 2.0.2 (2015-02-23)
 
