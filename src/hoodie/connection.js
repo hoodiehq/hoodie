@@ -17,11 +17,11 @@ var exports = module.exports = function(hoodie) {
   hoodie.isConnected = exports.isConnected.bind(null, state);
 
   // check connection when browser goes online / offline
-  global.addEventListener('online', hoodie.checkConnection, false);
-  global.addEventListener('offline', hoodie.checkConnection, false);
+  global.addEventListener('online', checkConnectionSilently.bind(null, state), false);
+  global.addEventListener('offline', checkConnectionSilently.bind(null, state), false);
 
   // start checking connection
-  setTimeout(hoodie.checkConnection);
+  setTimeout(checkConnectionSilently.bind(null, state));
 };
 
 // Check Connection
@@ -51,12 +51,13 @@ exports.checkConnection = function(state) {
 
   global.clearTimeout(state.checkConnectionTimeout);
 
-  state.checkConnectionRequest = state.hoodie.request('GET', path).then(
-    exports.handleConnection.bind(null, state, 30000, 'reconnected', true),
-    exports.handleConnection.bind(null, state, 3000, 'disconnected', false)
-  ).catch(function() {}); // silent expected errors when checking connection
+  state.checkConnectionRequest = state.hoodie.request('GET', path)
+    .done(exports.handleConnection.bind(null, state, 30000, 'reconnected', true))
+    .fail(exports.handleConnection.bind(null, state, 3000, 'disconnected', false));
 
-  return state.checkConnectionRequest;
+  return state.checkConnectionRequest.then(function(/* response */) {
+    return; // resolve with undefined. Some day we might return the hoodie-server version here.
+  });
 };
 
 // isConnected
@@ -73,7 +74,7 @@ exports.isConnected = function(state) {
 exports.handleConnection = function(state, interval, event, online) {
   state.checkConnectionRequest = undefined;
   state.checkConnectionTimeout = global.setTimeout(
-    exports.checkConnection.bind(null, state),
+    checkConnectionSilently.bind(null, state),
     interval
   );
 
@@ -84,3 +85,7 @@ exports.handleConnection = function(state, interval, event, online) {
 
   return promise[online ? 'resolve' : 'reject']();
 };
+
+function checkConnectionSilently(state) {
+  exports.checkConnection(state).catch(function() {}); // silent expected errors when checking connection
+}
