@@ -326,7 +326,7 @@ exports.moveData = function (state) {
           object.createdBy = newHoodieId;
         }
         object = exports.cache(state, object.type, object.id, object);
-        exports.markAsChanged(object.type, object.id, object, {silent: true});
+        exports.markAsChanged(state, object.type, object.id, object, {silent: true});
       });
 
       exports.triggerDirtyAndIdleEvents(state);
