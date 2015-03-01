@@ -1,3 +1,13 @@
+<a name="3.1.0"></a>
+## 3.1.0 (2015-03-01)
+
+
+#### Features
+
+* **hooks:** add plugin hooks ([7c4c7902](https://github.com/hoodiehq/hoodie-server/commit/7c4c79025ffd8f7e60fb04b851504402d99c9aa4))
+* **plugins:** expose hoodie-server environment to plugins ([559b8ac7](https://github.com/hoodiehq/hoodie-server/commit/559b8ac72afcb81726eb49ad51e1a8e1a17e062c))
+
+
 <a name="3.0.0"></a>
 ## 3.0.0 (2015-02-22)
 
