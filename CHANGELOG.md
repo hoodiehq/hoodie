@@ -1,3 +1,14 @@
+<a name="2.0.4"></a>
+### 2.0.4 (2015-03-01)
+
+
+#### Bug Fixes
+
+* hoodie.checkConnection() to reject on error ([07dd7c4d](https://github.com/hoodiehq/hoodie.js/commit/07dd7c4d096bf3c988c59dac013957bf72e77cf2))
+* move data on username change (jup, again) ([a35297d9](https://github.com/hoodiehq/hoodie.js/commit/a35297d9a1201e37012d08bd78df220c4bfcb9ac))
+* move data on username change ([0b985335](https://github.com/hoodiehq/hoodie.js/commit/0b98533550d8c18825d9aeb1c3510ed77dcd0874))
+
+
 <a name="2.0.3"></a>
 ### 2.0.3 (2015-02-26)
 
