@@ -1,3 +1,12 @@
+<a name="3.1.1"></a>
+### 3.1.1 (2015-03-22)
+
+
+#### Bug Fixes
+
+* **hooks:** dynamic hooks do not return a boolean ([11946076](https://github.com/hoodiehq/hoodie-server/commit/119460767c930586cc150bde936d9cfb36614fa6))
+
+
 <a name="3.1.0"></a>
 ## 3.1.0 (2015-03-01)
 
