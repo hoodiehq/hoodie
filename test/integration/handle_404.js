@@ -1,7 +1,6 @@
 var expect = require('expect.js');
 var hoodie_server = require('../../');
 var http = require('http');
-var os = require('os');
 
 var config = {
   www_port: 5011,
@@ -30,9 +29,9 @@ describe('handle 404', function () {
       }
     }, function (res) {
       var buf = '';
-      res.on('data', function (chunk) { buf += chunk});
+      res.on('data', function (chunk) { buf += chunk; });
       res.on('end', function () {
-        expect(buf).to.be('hi' + os.EOL);
+        expect(buf).to.be('hi\n');
         done();
       });
     });
@@ -50,7 +49,7 @@ describe('handle 404', function () {
       }
     }, function (res) {
       var buf = '';
-      res.on('data', function (chunk) { buf += chunk});
+      res.on('data', function (chunk) { buf += chunk; });
       res.on('end', function () {
         buf = JSON.parse(buf);
         expect(buf.statusCode).to.be(404);
