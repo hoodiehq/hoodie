@@ -1,3 +1,4 @@
+var ajax = require('pouchdb-ajax');
 var extend = require('extend');
 var utils = require('../utils');
 
@@ -10,8 +11,6 @@ var rejectWith = utils.promise.rejectWith;
 // ================
 
 // Hoodie's central place to send request to its backend.
-// At the moment, it's a wrapper around jQuery's ajax method,
-// but we might get rid of this dependency in the future.
 //
 // It has build in support for CORS and a standard error
 // handling that normalizes errors returned by CouchDB
@@ -43,14 +42,17 @@ var exports = module.exports = function(hoodie) {
 //
 var API_PATH = '/_api';
 
-exports.request = function(hoodie, type, url, options) {
+exports.request = function(hoodie, method, url, options) {
+  //passing in an XHR instance just lets us test it
   var defaults = {
-    type: type,
-    dataType: 'json'
+    method: method,
+    json: true
   };
+  
   var requestDefer = getDefer();
   var requestPromise = requestDefer.promise;
-  var jQueryPromise;
+  
+  
   options = options || {};
 
   if (hoodie.account.bearerToken) {
@@ -64,46 +66,48 @@ exports.request = function(hoodie, type, url, options) {
     url = (hoodie.baseUrl || '') + API_PATH + url;
   }
 
-  // if url is cross domain, set CORS headers
-  if (/^http/.test(url)) {
-    defaults.xhrFields = {
-      withCredentials: true
-    };
-    defaults.crossDomain = true;
+  defaults.url = url;
+  
+  //passing `data` as an option is throughout the code
+  if(options.data){
+    options.body = options.data;
+    delete options.data;
   }
 
-  defaults.url = url;
-
-  // we are piping the result of the request to return a nicer
-  // error if the request cannot reach the server at all.
-  // We can't return the promise of ajax directly because of
-  // the piping, as for whatever reason the returned promise
-  // does not have the `abort` method any more, maybe others
-  // as well. See also http://bugs.jquery.com/ticket/14104
-  jQueryPromise = global.jQuery.ajax(extend(defaults, options))
-    .done(requestDefer.resolve)
-    .fail(requestDefer.reject);
-  var pipedPromise = requestPromise.catch(exports.handleRequestError.bind(null, hoodie));
-  pipedPromise.abort = jQueryPromise.abort;
-
-  return pipedPromise;
+  var ajaxRequest = ajax(extend(defaults, options), function(err, response, data){
+    if(err){
+      return requestDefer.reject(err);
+    }
+    requestDefer.resolve(response, data);
+  });
+  var promise = requestPromise.catch(exports.handleRequestError.bind(null, hoodie));
+  
+  promise.abort = ajaxRequest.abort;
+  return promise;
 };
 
 //
 //
 //
-exports.handleRequestError = function(hoodie, xhr) {
+exports.handleRequestError = function(hoodie, pouchError) {
   var error;
 
   // handle manual abort of request
-  if (xhr.statusText === 'abort') {
+  //I can't immediately see a way to port this
+  //pouchdb-ajax doesn't expose the xhr or it's error
+  //directly, and afaik it doesn't pass along any
+  //means to direct an abort
+  /*if (xhr.statusText === 'abort') {
 
     return rejectWith({
       name: 'HoodieConnectionAbortError',
       message: 'Request has been aborted',
     });
-  }
+  }*/
 
+  /*
+  //see notes above parseErrorFromResponse function definition
+  //at the end of the file
   try {
     error = exports.parseErrorFromResponse(xhr);
   } catch (_error) {
@@ -117,8 +121,11 @@ exports.handleRequestError = function(hoodie, xhr) {
         url: hoodie.baseUrl || '/'
       };
     }
-  }
-
+  }*/
+  error = Object.create(pouchError);
+  error.name = exports.HTTP_STATUS_ERROR_MAP[pouchError.status];;
+  error.message = error.message.charAt(0).toUpperCase() + error.message.slice(1);
+  
   return rejectWith(error);
 };
 
@@ -145,6 +152,14 @@ exports.HTTP_STATUS_ERROR_MAP = {
   500: 'HoodieServerError'
 };
 
+
+/**
+ * pouch-ajax already parses the error and doesn't pass
+ * along the xhr instance for us to be able to parse the
+ * error here ourselves
+ * so I'm not quite sure how to port this functionality over
+ * without losing some of it
+ */
 exports.parseErrorFromResponse = function(xhr) {
   var error = JSON.parse(xhr.responseText);
   // get error name

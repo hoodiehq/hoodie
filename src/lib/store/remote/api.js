@@ -1,4 +1,5 @@
 var extend = require('extend');
+var isArray = require('lodash/lang/isArray');
 var utils = require('../../../utils');
 var getDefer = utils.promise.defer;
 var resolveWith = utils.promise.resolveWith;
@@ -29,7 +30,7 @@ exports.request = function(state, type, path, options) {
   if (type === 'POST' || type === 'PUT') {
     options.dataType = options.dataType || 'json';
     options.processData = options.processData || false;
-    options.data = JSON.stringify(options.data);
+    options.body = JSON.stringify(options.body);
   }
   return state.hoodie.request(type, path, options);
 };
@@ -179,7 +180,7 @@ exports.push = function(state, objects) {
   var object;
   var objectsForRemote = [];
 
-  if (! $.isArray(objects)) {
+  if (! isArray(objects)) {
     objects = helpers.defaultObjectsToPush(state);
   }
 
@@ -206,7 +207,7 @@ exports.push = function(state, objects) {
     state.pushedObjectRevisions[object._rev] = 1;
   }
   state.pushRequest = state.remote.request('POST', '/_bulk_docs', {
-    data: {
+    body: {
       docs: objectsForRemote,
       new_edits: false
     }

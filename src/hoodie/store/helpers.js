@@ -4,6 +4,7 @@ var utils = require('../../utils');
 var promise = utils.promise;
 var getDefer = promise.defer;
 var localStorageWrapper = utils.localStorageWrapper;
+var isEmpty = require('lodash/lang/isEmpty');
 //
 // Private methods
 // -----------------
@@ -215,7 +216,7 @@ exports.handlePushedObject = function(state, object) {
 
 // store IDs of dirty objects
 exports.saveDirtyIds = function(state) {
-  if (global.$.isEmptyObject(state.dirty)) {
+  if (isEmpty(state.dirty)) {
     localStorageWrapper.removeItem('_dirty');
   } else {
     var ids = Object.keys(state.dirty);

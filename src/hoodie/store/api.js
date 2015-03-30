@@ -4,6 +4,7 @@ var getDefer = promise.defer;
 var localStorageWrapper = utils.localStorageWrapper;
 
 var helpers = require('./helpers');
+var isEmpty = require('lodash/lang/isEmpty');
 
 // TODO: remove coffeescript artifacts
 
@@ -64,7 +65,7 @@ exports.changedObjects = function(state) {
 // if it has no `_syncedAt` attribute or if `updatedAt` is more recent than `_syncedAt`
 exports.hasLocalChanges = function(state, type, id) {
   if (!type) {
-    return !global.$.isEmptyObject(state.dirty);
+    return !isEmpty(state.dirty);
   }
   var key = [type,id].join('/');
   if (state.dirty[key]) {

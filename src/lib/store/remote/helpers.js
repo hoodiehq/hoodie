@@ -1,4 +1,5 @@
 var extend = require('extend');
+var isArray = require('lodash/lang/isArray');
 var utils = require('../../../utils');
 var generateId = utils.generateId;
 
@@ -24,7 +25,7 @@ exports.defaultObjectsToPush = function(state) {
   if (! state.options || ! state.options.defaultObjectsToPush) {
     return [];
   }
-  if (global.$.isArray(state.options.defaultObjectsToPush)) {
+  if (isArray(state.options.defaultObjectsToPush)) {
     return state.options.defaultObjectsToPush;
   } else {
     return state.options.defaultObjectsToPush();

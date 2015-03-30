@@ -29,7 +29,9 @@
     "humble-localstorage": "^1.4.1",
     "inherits": "^2.0.1",
     "jqevents": "~0.1.1",
-    "lie": "^2.6.0"
+    "lie": "^2.6.0",
+    "lodash": "^3.6.0",
+    "pouchdb-ajax": "^1.0.0"
   },
   "devDependencies": {
     "browserify": "^4.2.0",

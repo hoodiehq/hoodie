@@ -358,7 +358,7 @@ exports.changePassword = function(state, currentPassword, newPassword) {
   return exports.fetch(state)
     .then(function () {
       return state.hoodie.request('POST', '/_session', {
-        data: {
+        body: {
           name: state.userDoc.name,
           password: currentPassword
         }
@@ -412,8 +412,7 @@ exports.resetPassword = function(state, username) {
   };
 
   options = {
-    data: JSON.stringify(data),
-    contentType: 'application/json'
+    body: JSON.stringify(data)
   };
 
   // TODO: spec that checkPasswordReset gets executed

@@ -186,6 +186,7 @@ exports.handleSignInSuccess = function(state, options) {
   options = options || {};
 
   return function(response) {
+    
     var newUsername;
     var newHoodieId;
     var newBearerToken;
@@ -327,8 +328,7 @@ exports.removePasswordResetObject = function(state, error) {
     headers: {
       Authorization: 'Basic ' + hash
     },
-    contentType: 'application/json',
-    data: JSON.stringify(passwordResetObject)
+    body: JSON.stringify(passwordResetObject)
   };
 
   // cleanup
@@ -383,8 +383,7 @@ exports.handleFetchBeforeDestroySuccess = function(state) {
 
   return exports.withPreviousRequestsAborted(state, 'updateUsersDoc', function() {
     state.hoodie.account.request('PUT', exports.userDocUrl(state), {
-      data: JSON.stringify(state.userDoc),
-      contentType: 'application/json'
+      body: JSON.stringify(state.userDoc)
     });
   });
 };
@@ -509,8 +508,7 @@ exports.sendChangeUsernameAndPasswordRequest = function(state, currentPassword, 
     }
 
     var options = {
-      data: JSON.stringify(data),
-      contentType: 'application/json'
+      body: JSON.stringify(data)
     };
 
     return exports.withPreviousRequestsAborted(state, 'updateUsersDoc', function() {
@@ -559,7 +557,7 @@ exports.awaitCurrentAccountRemoved = function(state, username, password, defer) 
   }
 
   var requestOptions = {
-    data: {
+    body: {
       name: exports.userTypeAndId(state, username),
       password: password
     }
@@ -648,7 +646,7 @@ exports.sendSignOutRequest = function(state) {
 //
 exports.sendSignInRequest = function(state, username, password, options) {
   var requestOptions = {
-    data: {
+    body: {
       name: exports.userTypeAndId(state, username),
       password: password
     }
@@ -678,7 +676,7 @@ exports.sendSignUpRequest = function(state, username, password) {
 
   username = username.toLowerCase();
   options = {
-    data: JSON.stringify({
+    body: JSON.stringify({
       _id: exports.userDocKey(state, username),
       name: exports.userTypeAndId(state, username),
       type: 'user',
