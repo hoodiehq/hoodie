@@ -54,7 +54,7 @@ exports.restart = function(state, type, id, update) {
     delete object.$error;
     delete object.$processedAt;
     delete object.abortedAt;
-    return exports.start(state, object.type, object);
+    return exports.start(state, object.type.substr(1), object);
   };
   return exports.abort(state, type, id).then(start);
 };
