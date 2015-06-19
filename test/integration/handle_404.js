@@ -3,20 +3,13 @@ var hoodie_server = require('../../');
 var http = require('http');
 
 var config = {
-  www_port: 5011,
-  admin_port: 5021,
+  www_port: 5001,
+  admin_port: 5011,
   admin_password: '12345'
 };
 
 describe('handle 404', function () {
   this.timeout(30000);
-
-  before(function (done) {
-    hoodie_server.start(config, done);
-  });
-
-  // TODO: I guess we should kill the server once we are done with the tests
-  //after(function (done) {});
 
   it('should send index.html on accept: text/html', function (done) {
     http.get({
@@ -26,7 +19,8 @@ describe('handle 404', function () {
       path: '/does_not_exist',
       headers: {
         accept: 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8'
-      }
+      },
+      agent: false
     }, function (res) {
       var buf = '';
       res.on('data', function (chunk) { buf += chunk; });
@@ -46,7 +40,8 @@ describe('handle 404', function () {
       path: '/does_not_exist',
       headers: {
         accept: 'application/json'
-      }
+      },
+      agent: false
     }, function (res) {
       var buf = '';
       res.on('data', function (chunk) { buf += chunk; });

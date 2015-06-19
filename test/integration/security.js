@@ -4,20 +4,13 @@ var http = require('http');
 var os = require('os');
 
 var config = {
-  www_port: 5051,
-  admin_port: 5061,
+  www_port: 5001,
+  admin_port: 5011,
   admin_password: '12345'
 };
 
 describe('block _all_dbs', function () {
   this.timeout(30000);
-
-  before(function (done) {
-    hoodie_server.start(config, done);
-  });
-
-  // TODO: I guess we should kill the server once we are done with the tests
-  //after(function (done) {});
 
   it('should 404 on /_api/_all_dbs', function (done) {
     http.get({
@@ -25,6 +18,7 @@ describe('block _all_dbs', function () {
       port: config.www_port,
       method: 'get',
       path: '/_api/_all_dbs',
+      agent: false
     }, function (res) {
       expect(res.statusCode).to.be(404);
       done();
@@ -42,7 +36,8 @@ describe('block _all_dbs', function () {
       headers: {
         'Content-Type': 'application/x-www-form-urlencoded',
         'Content-length': body.length
-      }
+      },
+      agent: false
     }, function (res) {
       expect(res.statusCode).to.be(200);
       done();
