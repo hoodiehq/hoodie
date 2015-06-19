@@ -19,3 +19,4 @@ require('./integration/handle_404');
 require('./integration/assets');
 require('./integration/security');
 require('./integration/cors');
+require('./integration/force-gzip');
