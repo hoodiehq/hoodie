@@ -13,13 +13,6 @@ var config = {
 describe('handle forced gzip', function () {
   this.timeout(30000);
 
-  before(function (done) {
-    hoodie_server.start(config, done);
-  });
-
-  // TODO: I guess we should kill the server once we are done with the tests
-  //after(function (done) {});
-
   it('should receive gzip when gzip accept header sent', function (done) {
     http.get({
       host: '127.0.0.1',
