@@ -3,11 +3,7 @@ var hoodie_server = require('../../');
 var http = require('http');
 var os = require('os');
 
-var config = {
-  www_port: 5001,
-  admin_port: 5011,
-  admin_password: '12345'
-};
+var config = require('../support/test-config');
 
 describe('block _all_dbs', function () {
   this.timeout(30000);

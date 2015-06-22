@@ -4,11 +4,7 @@ var http = require('http');
 var zlib = require('zlib');
 var os = require('os');
 
-var config = {
-  www_port: 5100,
-  admin_port: 5110,
-  admin_password: '12345'
-};
+var config = require('../support/test-config');
 
 describe('handle forced gzip', function () {
   this.timeout(30000);
