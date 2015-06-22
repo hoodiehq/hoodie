@@ -140,10 +140,23 @@ exports.getSinceNr = function(state) {
 // changes since the beginning, but this behavior might be adjusted,
 // e.g for a filtered bootstrap.
 //
+// As several firewalls and anti virus software strip out Accept-Encoding
+// request headers, ~15% of users end up with much bigger download sizes
+// than needed. So we created a workaround to force gzip via url param,
+// and fallback to normal request if it fails:
+// https://github.com/hoodiehq/hoodie.js/issues/423
+//
+// More background:
+// http://www.stevesouders.com/blog/2010/07/12/velocity-forcing-gzip-compression/
+//
 exports.bootstrap = function(state) {
   state.isBootstrapping = true;
   state.remote.trigger('bootstrap:start');
-  return state.remote.pull()
+  return state.remote.pull({forceGzip: true})
+    .catch(function () {
+      // TODO: make this smarter: restart only if parsing response fails
+      return state.remote.pull();
+    })
     .done(helpers.handleBootstrapSuccess.bind(null, state))
     .fail(helpers.handleBootstrapError.bind(null, state));
 };
@@ -156,8 +169,8 @@ exports.bootstrap = function(state) {
 // We currently make long poll requests, that we manually abort
 // and restart each 25 seconds.
 //
-exports.pull = function(state) {
-  state.pullRequest = state.remote.request('GET', helpers.pullUrl(state));
+exports.pull = function(state, options) {
+  state.pullRequest = state.remote.request('GET', helpers.pullUrl(state, options));
 
   if (state.remote.isConnected()) {
     global.clearTimeout(state.pullRequestTimeout);

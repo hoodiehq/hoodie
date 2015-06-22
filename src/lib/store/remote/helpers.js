@@ -174,12 +174,13 @@ exports.mapDocsFromFindAll = function(state, response) {
 // not return a longpoll URL, as we want it to finish right away, even if there
 // are no changes on remote.
 //
-exports.pullUrl = function(state) {
+exports.pullUrl = function(state, options) {
   var since = state.remote.getSinceNr();
+  var forceGzipOption = options && options.forceGzip && '&force_gzip=true' || '';
   if (state.remote.isConnected() && !state.isBootstrapping) {
     return '/_changes?include_docs=true&since=' + since + '&heartbeat=10000&feed=longpoll';
   } else {
-    return '/_changes?include_docs=true&since=' + since;
+    return '/_changes?include_docs=true&since=' + since + forceGzipOption;
   }
 };
 
