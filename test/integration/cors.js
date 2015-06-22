@@ -4,24 +4,21 @@ var http = require('http');
 var os = require('os');
 
 var config = {
-  www_port: 5032,
-  admin_port: 5042,
+  www_port: 5001,
+  admin_port: 5011,
   admin_password: '12345'
 };
 
 describe('setting CORS headers', function () {
   this.timeout(30000);
 
-  before(function (done) {
-    hoodie_server.start(config, done);
-  });
-
   it('should respond to OPTIONS with the right CORS headers when no origin is given', function (done) {
     http.get({
       host: '127.0.0.1',
       port: config.www_port,
       method: 'options',
-      path: '/_api/_session/'
+      path: '/_api/_session/',
+      agent: false
     }, function (res) {
       expect(res.headers['access-control-allow-origin']).to.be('*');
       expect(res.headers['access-control-allow-headers']).to.be('authorization, content-length, content-type, if-match, if-none-match, origin, x-requested-with, host, connection, transfer-encoding');
@@ -42,7 +39,8 @@ describe('setting CORS headers', function () {
       path: '/_api/_session/',
       headers: {
         origin: 'http://some.app.com/'
-      }
+      },
+      agent: false
     }, function (res) {
       expect(res.headers['access-control-allow-origin']).to.be('http://some.app.com/');
       expect(res.headers['access-control-allow-headers']).to.be('authorization, content-length, content-type, if-match, if-none-match, origin, x-requested-with, host, connection');

@@ -4,20 +4,13 @@ var http = require('http');
 var os = require('os');
 
 var config = {
-  www_port: 5031,
-  admin_port: 5041,
+  www_port: 5001,
+  admin_port: 5011,
   admin_password: '12345'
 };
 
 describe('handle assets', function () {
   this.timeout(30000);
-
-  before(function (done) {
-    hoodie_server.start(config, done);
-  });
-
-  // TODO: I guess we should kill the server once we are done with the tests
-  //after(function (done) {});
 
   it('should get asset path', function (done) {
     http.get({
@@ -25,6 +18,7 @@ describe('handle assets', function () {
       port: config.www_port,
       method: 'get',
       path: '/_api/_plugins/_assets/index.html',
+      agent: false
     }, function (res) {
       expect(res.statusCode).to.be(200);
       done();
