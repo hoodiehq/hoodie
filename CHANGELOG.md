@@ -1,3 +1,17 @@
+<a name"3.2.0"></a>
+## 3.2.0 (2015-06-22)
+
+
+#### Bug Fixes
+
+* **test:** fix hanging tests, speed up tests ([f831db69](https://github.com/hoodiehq/hoodie-server/commit/f831db69))
+
+
+#### Features
+
+* **http:** Allow clients to request a gzip response with ?gzip=force or cookie ([932d3370](https://github.com/hoodiehq/hoodie-server/commit/932d3370))
+
+
 <a name"3.1.4"></a>
 ### 3.1.4 (2015-05-26)
 
