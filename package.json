@@ -7,13 +7,13 @@
     "url": "https://github.com/hoodiehq/hoodie-server.git"
   },
   "dependencies": {
-    "async": "^0.9.0",
+    "async": "^1.2.1",
     "browserify": "^4.2.0",
-    "bytes": "^1.0.0",
-    "cli-color": "^0.3.2",
-    "couchr": "0.0.14",
-    "follow": "^0.11.2",
-    "hapi": "^8.5.1",
+    "bytes": "^2.1.0",
+    "cli-color": "^1.0.0",
+    "couchr": "0.0.16",
+    "follow": "^0.12.1",
+    "hapi": "^8.6.1",
     "hoodie": "^2.1.1",
     "hoodie-admin-dashboard": "^2.0.0",
     "hoodie-admin-dashboard-uikit": "^3.0.0",
@@ -26,9 +26,9 @@
     "optimist": "^0.6.1",
     "ports": "^1.1.0",
     "prompt": "^0.2.9",
-    "request": "^2.51.0",
+    "request": "^2.58.0",
     "semver": "^4.3.6",
-    "watch": "^0.11.0",
+    "watch": "^0.16.0",
     "wreck": "^6.0.0"
   },
   "scripts": {
@@ -39,18 +39,18 @@
     "node": ">=0.10.22"
   },
   "devDependencies": {
-    "expect.js": "^0.2.0",
+    "expect.js": "^0.3.1",
     "grunt": "^0.4.5",
-    "grunt-contrib-jshint": "^0.6.2",
-    "grunt-contrib-nodeunit": "^0.2.2",
-    "grunt-contrib-watch": "^0.5.1",
+    "grunt-contrib-jshint": "^0.11.2",
+    "grunt-contrib-nodeunit": "^0.4.1",
+    "grunt-contrib-watch": "^0.6.1",
     "grunt-release-hoodie": "latest",
     "grunt-simple-mocha": "^0.4.0",
     "load-grunt-tasks": "^0.4.0",
     "mocha": "*",
-    "moment": "~2.6.0",
-    "rimraf": "^2.2.2",
-    "sinon": "^1.7.3"
+    "moment": "^2.10.3",
+    "rimraf": "^2.4.0",
+    "sinon": "^1.15.3"
   },
   "hoodie": {
     "plugins": []
