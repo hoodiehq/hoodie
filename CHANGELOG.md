@@ -1,3 +1,14 @@
+<a name"4.0.0"></a>
+## 4.0.0 (2015-06-24)
+
+
+#### Bug Fixes
+
+* **gzip:**
+  * remove gzip test file and cookie handling ([a22bfce7](https://github.com/hoodiehq/hoodie-server/commit/a22bfce7))
+  * change gzip=force url parameter to force_gzip=true ([7731ab7c](https://github.com/hoodiehq/hoodie-server/commit/7731ab7c))
+
+
 <a name"3.2.0"></a>
 ## 3.2.0 (2015-06-22)
 
