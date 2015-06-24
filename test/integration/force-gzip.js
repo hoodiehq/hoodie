@@ -52,7 +52,7 @@ describe('handle forced gzip', function () {
       host: '127.0.0.1',
       port: config.www_port,
       method: 'get',
-      path: '/_api/?gzip=force',
+      path: '/_api/?force_gzip=true',
     }, function (res) {
       expect(res.headers['content-encoding']).to.be('gzip');
       res.on('end', function() {
