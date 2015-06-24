@@ -69,18 +69,4 @@ describe('handle forced gzip', function () {
     });
   });
 
-  it('should receive a force-gzip html file', function (done) {
-    http.get({
-      host: '127.0.0.1',
-      port: config.www_port,
-      method: 'get',
-      path: '/_api/_files/force-gzip.html',
-      agent: false
-    }, function (res) {
-      expect(res.statusCode).to.be(200);
-      done();
-    });
-  });
-
-
 });
