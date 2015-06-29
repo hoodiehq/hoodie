@@ -1,3 +1,17 @@
+<a name"2.1.0"></a>
+## 2.1.0 (2015-06-29)
+
+
+#### Bug Fixes
+
+* restart pull request correctly ([aa8fc3a1](https://github.com/hoodiehq/hoodie.js/commit/aa8fc3a1))
+
+
+#### Features
+
+* force gzip for bootstrapping #423 ([778ec026](https://github.com/hoodiehq/hoodie.js/commit/778ec026))
+
+
 <a name="2.0.4"></a>
 ### 2.0.4 (2015-03-01)
 
