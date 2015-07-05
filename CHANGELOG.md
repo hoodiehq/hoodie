@@ -1,3 +1,12 @@
+<a name"2.1.1"></a>
+### 2.1.1 (2015-07-05)
+
+
+#### Bug Fixes
+
+* pass state when restarting pull request ([4f3d48ca](https://github.com/hoodiehq/hoodie.js/commit/4f3d48ca))
+
+
 <a name"2.1.0"></a>
 ## 2.1.0 (2015-06-29)
 
