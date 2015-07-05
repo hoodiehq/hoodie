@@ -174,7 +174,7 @@ exports.pull = function(state, options) {
 
   if (state.remote.isConnected()) {
     global.clearTimeout(state.pullRequestTimeout);
-    state.pullRequestTimeout = global.setTimeout(helpers.restartPullRequest, 25000);
+    state.pullRequestTimeout = global.setTimeout(helpers.restartPullRequest.bind(null, state), 25000);
   }
 
   return state.pullRequest
