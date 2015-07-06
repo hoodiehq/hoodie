@@ -1,3 +1,12 @@
+<a name"4.0.2"></a>
+### 4.0.2 (2015-07-06)
+
+
+#### Bug Fixes
+
+* **semver:** updating for security fix ([76653122](https://github.com/hoodiehq/hoodie-server/commit/76653122))
+
+
 <a name"4.0.1"></a>
 ### 4.0.1 (2015-06-30)
 
