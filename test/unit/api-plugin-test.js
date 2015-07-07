@@ -3,8 +3,8 @@ var Events = require('events');
 var expect = require('expect.js');
 var Wreck = require('wreck');
 
-var plugin = require('../../lib/server/plugins/api');
-var pluginInternals = require('../../lib/server/plugins/api/internals');
+var plugin = require('../../lib/server/hapi_plugins/api');
+var pluginInternals = require('../../lib/server/hapi_plugins/api/internals');
 
 
 describe('api plugin', function () {
