@@ -1,34 +1,29 @@
-var expect = require('expect.js');
-var plugin = require('../../lib/server/plugins/api/index');
-
-var Wreck = require('wreck');
-var Events = require('events');
-
 var _ = require('lodash');
+var Events = require('events');
+var expect = require('expect.js');
+var Wreck = require('wreck');
+
+var plugin = require('../../lib/server/plugins/api');
+var pluginInternals = require('../../lib/server/plugins/api/internals');
+
 
 describe('api plugin', function () {
 
   it('should expose n number of properties', function () {
-    expect(_.size(plugin)).to.eql(2);
-  });
-
-  it('should export its internals (so we can test them here)', function () {
-    expect(plugin.internals).to.be.an(Object);
+    expect(_.size(plugin)).to.eql(1);
   });
 
   it('should export a register function', function () {
-    expect(plugin.register).to.be.an(Function);
+    expect(plugin.register).to.be.a(Function);
   });
 
   describe('mapProxyPath', function () {
-    before(function () {
-      plugin.internals.couchCfg = {
-        url: 'http://couch.somewhere:1234'
-      };
-    });
+    var couchCfg = {
+      url: 'http://couch.somewhere:1234'
+    };
 
     it('should prepend the couchCfg url', function () {
-      plugin.internals.mapProxyPath({
+      pluginInternals.mapProxyPath(couchCfg, {
         headers: {},
         url: {
           path: '/_api/some/path'
@@ -39,7 +34,7 @@ describe('api plugin', function () {
     });
 
     it('should pass the headers through', function () {
-      plugin.internals.mapProxyPath({
+      pluginInternals.mapProxyPath(couchCfg, {
         headers: {
           some: 'header'
         },
@@ -52,7 +47,7 @@ describe('api plugin', function () {
     });
 
     it('should strip any cookies', function () {
-      plugin.internals.mapProxyPath({
+      pluginInternals.mapProxyPath(couchCfg, {
         headers: {
           some: 'header',
           cookie: 'strip-me'
@@ -66,7 +61,7 @@ describe('api plugin', function () {
     });
 
     it('should move any bearer token to the cookie', function () {
-      plugin.internals.mapProxyPath({
+      pluginInternals.mapProxyPath(couchCfg, {
         headers: {
           some: 'header',
           cookie: 'strip-me',
@@ -83,19 +78,19 @@ describe('api plugin', function () {
 
   describe('extractToken', function () {
     it('should return the token if there is one', function () {
-      var ret = plugin.internals.extractToken(['AuthSession=some-token; Version=bla bla bla']);
+      var ret = pluginInternals.extractToken(['AuthSession=some-token; Version=bla bla bla']);
       expect(ret).to.eql('some-token');
     });
 
     it('should return undefined if there is none', function () {
-      var ret = plugin.internals.extractToken(['Some=other-cookie; Version=bla bla bla']);
+      var ret = pluginInternals.extractToken(['Some=other-cookie; Version=bla bla bla']);
       expect(ret).to.be.an('undefined');
     });
   });
 
   describe('addCorseAndBearerToken', function () {
     it('should return a 500 if there is an error', function (done) {
-      plugin.internals.addCorsAndBearerToken('something went wrong', {}, {}, function (err) {
+      pluginInternals.addCorsAndBearerToken('something went wrong', {}, {}, function (err) {
         expect(err).to.eql('something went wrong');
         return {
           code: function(statusCode) {
@@ -110,7 +105,7 @@ describe('api plugin', function () {
       var res = new Events.EventEmitter();
       res.pipe = function () { };
 
-      plugin.internals.addCorsAndBearerToken(null, res, { headers: {} }, function (err) {
+      pluginInternals.addCorsAndBearerToken(null, res, { headers: {} }, function (err) {
         expect(err.isBoom).to.eql(true);
         return {
           code: function(statusCode) {
@@ -127,7 +122,7 @@ describe('api plugin', function () {
       stream.headers = {};
       stream.statusCode = 200;
 
-      plugin.internals.addCorsAndBearerToken(null, stream, { headers: {} }, function (data) {
+      pluginInternals.addCorsAndBearerToken(null, stream, { headers: {} }, function (data) {
         var fixture = '{"the":"body"}';
         expect(data.toString()).to.eql(fixture);
         return {
@@ -155,7 +150,7 @@ describe('api plugin', function () {
         some: 'header',
       };
       stream.statusCode = 405;
-      plugin.internals.addCorsAndBearerToken(null, stream, { method: 'options', headers: {} }, function (data) {
+      pluginInternals.addCorsAndBearerToken(null, stream, { method: 'options', headers: {} }, function (data) {
         var fixture = '{"the":"body"}';
         expect(data.toString()).to.eql(fixture);
         return {
@@ -183,7 +178,7 @@ describe('api plugin', function () {
         some: 'header',
       };
       stream.statusCode = 200;
-      plugin.internals.addCorsAndBearerToken(null, stream, {
+      pluginInternals.addCorsAndBearerToken(null, stream, {
         method: 'get',
         headers: { 'origin': 'some-origin', 'custom-header': 'add me to -Allowed-Headers' }
       }, function (data) {
@@ -228,7 +223,7 @@ describe('api plugin', function () {
         'set-cookie': ['AuthSession=some-token; Version=bla bla bla']
       };
 
-      plugin.internals.addCorsAndBearerToken(null, stream, { headers: {} }, function (data) {
+      pluginInternals.addCorsAndBearerToken(null, stream, { headers: {} }, function (data) {
         expect(data.toString()).to.eql(fixture);
 
         return {
