@@ -223,7 +223,7 @@ describe('api plugin', function () {
         'set-cookie': ['AuthSession=some-token; Version=bla bla bla']
       };
 
-      pluginInternals.addCorsAndBearerToken(null, stream, { headers: {} }, function (data) {
+      pluginInternals.addCorsAndBearerToken(null, stream, { method: 'post', path:'/_api/_session', headers: {} }, function (data) {
         expect(data.toString()).to.eql(fixture);
 
         return {
