@@ -1,3 +1,21 @@
+<a name"4.0.3"></a>
+### 4.0.3 (2015-07-16)
+
+
+#### Bug Fixes
+
+* **api:** send bearer token only on session request ([02d571c9](https://github.com/hoodiehq/hoodie-server/commit/02d571c9))
+* **environment:**
+  * remove unnecessary/harmful internal `is_in_app` flag ([9cda215b](https://github.com/hoodiehq/hoodie-server/commit/9cda215b))
+  * use require.resolve to find admin-dashboard on disk ([f28f5ce7](https://github.com/hoodiehq/hoodie-server/commit/f28f5ce7))
+* **plugins:**
+  * resolvePluginPath if hoodie-server is npm linked contd. ([debb36df](https://github.com/hoodiehq/hoodie-server/commit/debb36df))
+  * resolvePluginPath if hoodie-server is npm linked ([b7408e24](https://github.com/hoodiehq/hoodie-server/commit/b7408e24))
+* **plugins-api:**
+  * remove unused force-gzip.html route ([b59b3767](https://github.com/hoodiehq/hoodie-server/commit/b59b3767))
+  * use require.resolve to find admin-dashboard-uikit on disk ([b2f2d1bf](https://github.com/hoodiehq/hoodie-server/commit/b2f2d1bf))
+
+
 <a name"4.0.2"></a>
 ### 4.0.2 (2015-07-06)
 
