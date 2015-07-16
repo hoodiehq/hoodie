@@ -29,7 +29,7 @@
     "request": "^2.51.0",
     "semver": "^4.3.6",
     "watch": "^0.11.0",
-    "wreck": "^5.5.1"
+    "wreck": "^6.0.0"
   },
   "scripts": {
     "start": "bin/start",
