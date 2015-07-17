@@ -33,20 +33,13 @@
   },
   "scripts": {
     "start": "bin/start",
-    "test": "grunt ci --verbose"
+    "test": "mocha test/runner.js"
   },
   "engines": {
     "node": ">=0.10.22"
   },
   "devDependencies": {
     "expect.js": "^0.3.1",
-    "grunt": "^0.4.5",
-    "grunt-contrib-jshint": "^0.11.2",
-    "grunt-contrib-nodeunit": "^0.4.1",
-    "grunt-contrib-watch": "^0.6.1",
-    "grunt-release-hoodie": "latest",
-    "grunt-simple-mocha": "^0.4.0",
-    "load-grunt-tasks": "^0.4.0",
     "mocha": "*",
     "moment": "^2.10.3",
     "rimraf": "^2.4.0",
