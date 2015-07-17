@@ -1,5 +1,5 @@
 {
-  "name": "hoodie-server",
+  "name": "@hoodie/server",
   "version": "4.0.3",
   "main": "lib/index",
   "repository": {
