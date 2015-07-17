@@ -1,6 +1,5 @@
 {
   "name": "@hoodie/server",
-  "version": "4.0.3",
   "main": "lib/index",
   "repository": {
     "type": "git",
@@ -33,7 +32,8 @@
   },
   "scripts": {
     "start": "bin/start",
-    "test": "mocha test/runner.js"
+    "test": "mocha test/runner.js",
+    "semantic-release": "semantic-release-scripts pre && npm publish && semantic-release-scripts post"
   },
   "engines": {
     "node": ">=0.10.22"
@@ -43,7 +43,8 @@
     "mocha": "*",
     "moment": "^2.10.3",
     "rimraf": "^2.4.0",
-    "sinon": "^1.15.3"
+    "sinon": "^1.15.3",
+    "semantic-release-scripts": "^1.1.1"
   },
   "hoodie": {
     "plugins": []
