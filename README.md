@@ -1,17 +1,17 @@
-![Hoodie Dog Mascot](https://avatars1.githubusercontent.com/u/1888826?v=3&s=200)
+![The Low-Profile Dog Hoodie Mascot](https://avatars1.githubusercontent.com/u/1888826?v=3&s=200)
 
 # Welcome to `hoodie-server!` 🎉
 
 [![Build Status](https://travis-ci.org/hoodiehq/hoodie-server.svg?branch=next)](https://travis-ci.org/hoodiehq/hoodie-server)
-[![Dependency Status](https://david-dm.org/hoodiehq/hoodie-server/next.svg)](https://david-dm.org/hoodiehq/hoodie-server)
-[![devDependency Status](https://david-dm.org/hoodiehq/hoodie-server/next/dev-status.svg)](https://david-dm.org/hoodiehq/hoodie-server#info=devDependencies)
+[![Dependency Status](https://david-dm.org/hoodiehq/hoodie-server/next.svg)](https://david-dm.org/hoodiehq/hoodie-server/next)
+[![devDependency Status](https://david-dm.org/hoodiehq/hoodie-server/next/dev-status.svg)](https://david-dm.org/hoodiehq/hoodie-server/next#info=dependencies)
 
 
 `hoodie-server` is the core server component of Hoodie. Together with `hoodie-client`, it forms the two parts that make up the Hoodie system.
 
 `hoodie-server` is responsible for a number of things on the server:
 
-- check the envoronment to make sure Hoodie can run properly
+- check the environment to make sure Hoodie can run properly
 - start an instance of CouchDB, Hoodie’s database
 - start a webserver each for the Hoodie app itself and the Hoodie Admin Dashboard
 - start all Hoodie plugins that might be installed
@@ -22,9 +22,13 @@ You can use `hoodie-server` on its own, if you want to work on it, help fix bugs
 
 ## Usage
 
-As noted before, this isn’t meant to be run standalone, but if you are helping out with development, or build your own plugins, or just want to spelunk around, here’s how it works.
+As noted before, this isn’t meant to be run standalone, but if you are helping out with development, or build your own plugins, or just want to spelunk around, here’s how it works:
 
-After cloning this git repository, run `npm install` to fetch all dependencies.
+```
+git clone git@github.com:hoodiehq/server.git
+cd server
+npm install
+```
 
 When that’s done, you can run `./bin/start` to start `hoodie-server`. Usually, `hoodie-server` is run within the context of an existing frontend application, but when you run it alone, it will use its `www/` directory to serve the web app. For now, this is just a simple `index.html` file that says `hi`.
 
