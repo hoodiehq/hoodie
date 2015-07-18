@@ -14,10 +14,13 @@ describe('setting CORS headers', function () {
       port: config.www_port,
       method: 'options',
       path: '/_api/_session/',
-      agent: false
+      agent: false,
+      headers: {
+        'transfer-encoding': 'chunked'
+      }
     }, function (res) {
       expect(res.headers['access-control-allow-origin']).to.be('*');
-      expect(res.headers['access-control-allow-headers']).to.be('authorization, content-length, content-type, if-match, if-none-match, origin, x-requested-with, host, connection, transfer-encoding');
+      expect(res.headers['access-control-allow-headers']).to.be('authorization, content-length, content-type, if-match, if-none-match, origin, x-requested-with, transfer-encoding, host, connection');
       expect(res.headers['access-control-expose-headers']).to.be('content-type, content-length, etag');
       expect(res.headers['access-control-allow-methods']).to.be('GET, PUT, POST, DELETE');
       expect(res.headers['access-control-allow-credentials']).to.be('true');
@@ -34,12 +37,13 @@ describe('setting CORS headers', function () {
       method: 'get',
       path: '/_api/_session/',
       headers: {
-        origin: 'http://some.app.com/'
+        origin: 'http://some.app.com/',
+        'transfer-encoding': 'chunked'
       },
       agent: false
     }, function (res) {
       expect(res.headers['access-control-allow-origin']).to.be('http://some.app.com/');
-      expect(res.headers['access-control-allow-headers']).to.be('authorization, content-length, content-type, if-match, if-none-match, origin, x-requested-with, host, connection');
+      expect(res.headers['access-control-allow-headers']).to.be('authorization, content-length, content-type, if-match, if-none-match, origin, x-requested-with, transfer-encoding, host, connection');
       expect(res.headers['access-control-expose-headers']).to.be('content-type, content-length, etag');
       expect(res.headers['access-control-allow-methods']).to.be('GET, PUT, POST, DELETE');
       expect(res.headers['access-control-allow-credentials']).to.be('true');
