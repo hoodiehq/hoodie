@@ -22,6 +22,8 @@ var argv = require('optimist')
   .describe('help', 'Show usage information')
   .alias('v', 'verbose')
   .describe('verbose', 'Shows more verbose console output')
+  .alias('d', 'debug')
+  .describe('debug', 'Shows hapi internal debug output')
   .argv;
 
 /**
