@@ -1,19 +1,15 @@
 language: node_js
 node_js:
+- iojs-v2
+- iojs-v1
+- '0.12'
 - '0.10'
+before_install:
+- npm i -g npm@^2.0.0
 before_script:
-- npm install -g grunt-cli
+- npm prune
 services:
 - couchdb
-notifications:
-  email: false
-  irc:
-    channels:
-    - irc.freenode.net#hoodie
-    use_notice: false
-    skip_join: true
-  slack:
-    secure: cH3y/V7D/BgRG25CpAO8kVPg/SmYchTWmyjL/HStm3SIXRDUxRvtBg2SFXziQg/2Hcx82JIEVxPA9LvHbMJY3P/Khr8RSHDVXg+MVEDneg9hh13m4abXiBZCSvisWQK+KhCkMc9eFN/OtfTm0xcxRmZkEjfMiN+YgqRIICnOSzE=
 env:
   global:
   - secure: NeaMPJ5vUh6ikHdSeKnmCvCj+vBVzP9pYWSRjUWNzhRk7CajDZdldJ89WwFv3vuo3UNXEFMA3B6fKW2vQoaTYsBNNkFpsYe5QcbMJTsTJ0gkap9qYALlgaV6R2RrxoFMqGj+jwLPq/5e9g+DxrLFasnPXf+/gy5g5ZqWc/VHNzs=
@@ -25,10 +21,6 @@ deploy:
     tags: true
   api_key:
     secure: F9PSxt6ZWIaKuxFvGR5yGKFlp/kQbEOcnUNC9/bbkMOcd+vWvhexuwEQP4E7enVxaDxWNeV7w4k2iPjnxJt4HspGp3dKfpgLzIblEwfD4Ke5H0oe67gldjQcKJpnuCPuDPKpy4JlT2IJgS/yNyhazPYKBXBiSXUVv8kqB627Zq0=
-before_deploy:
-- grunt before-deploy
-after_deploy:
-- grunt after-deploy
 sudo: false
 cache:
   directories:
