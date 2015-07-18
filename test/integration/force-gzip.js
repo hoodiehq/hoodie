@@ -4,7 +4,7 @@ var http = require('http');
 var zlib = require('zlib');
 var os = require('os');
 
-var config = require('../support/test-config');
+var config = require('../lib/config');
 
 describe('handle forced gzip', function () {
   this.timeout(30000);

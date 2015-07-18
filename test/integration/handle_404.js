@@ -2,7 +2,7 @@ var expect = require('expect.js');
 var hoodie_server = require('../../');
 var http = require('http');
 
-var config = require('../support/test-config');
+var config = require('../lib/config');
 
 describe('handle 404', function () {
   this.timeout(30000);

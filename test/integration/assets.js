@@ -3,7 +3,7 @@ var hoodie_server = require('../../');
 var http = require('http');
 var os = require('os');
 
-var config = require('../support/test-config');
+var config = require('../lib/config');
 
 describe('handle assets', function () {
   this.timeout(30000);

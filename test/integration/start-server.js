@@ -1,7 +1,7 @@
 var expect = require('expect.js');
 var hoodie_server = require('../../');
 
-var config = require('../support/test-config');
+var config = require('../lib/config');
 
 describe('handle assets', function () {
   this.timeout(30000);

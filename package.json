@@ -33,7 +33,7 @@
   },
   "scripts": {
     "start": "bin/start",
-    "test": "mocha test/runner.js",
+    "test": "mocha test/index.js",
     "test:style": "standard",
     "semantic-release": "semantic-release-scripts pre && npm publish && semantic-release-scripts post"
   },

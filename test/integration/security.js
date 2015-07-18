@@ -3,7 +3,7 @@ var hoodie_server = require('../../');
 var http = require('http');
 var os = require('os');
 
-var config = require('../support/test-config');
+var config = require('../lib/config');
 
 describe('block _all_dbs', function () {
   this.timeout(30000);
@@ -57,7 +57,7 @@ var utils = require('../lib/utils');
 describe('check config dbs are private to admin', function() {
 
   it('should make sure config dbs are private', function(done) {
-    var project_dir = path.resolve(__dirname, '../fixtures/project1');
+    var project_dir = path.resolve(__dirname, '../lib/fixtures/project1');
 
     var cfg = environment.getConfig(
       process.platform,   // platform
