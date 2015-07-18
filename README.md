@@ -1,9 +1,8 @@
-# hoodie-server
+# Welcome to `hoodie-server!` 🎉
+
 [![Build Status](https://travis-ci.org/hoodiehq/hoodie-server.svg?branch=next)](https://travis-ci.org/hoodiehq/hoodie-server)
 [![Dependency Status](https://david-dm.org/hoodiehq/hoodie-server/next.svg)](https://david-dm.org/hoodiehq/hoodie-server)
 [![devDependency Status](https://david-dm.org/hoodiehq/hoodie-server/next/dev-status.svg)](https://david-dm.org/hoodiehq/hoodie-server#info=devDependencies)
-
-# Welcome to `hoodie-server!` 🎉
 
 ![Hoodie Dog Mascot](https://avatars1.githubusercontent.com/u/1888826?v=3&s=200)
 
