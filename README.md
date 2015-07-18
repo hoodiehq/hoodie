@@ -1,10 +1,11 @@
+![Hoodie Dog Mascot](https://avatars1.githubusercontent.com/u/1888826?v=3&s=200)
+
 # Welcome to `hoodie-server!` 🎉
 
 [![Build Status](https://travis-ci.org/hoodiehq/hoodie-server.svg?branch=next)](https://travis-ci.org/hoodiehq/hoodie-server)
 [![Dependency Status](https://david-dm.org/hoodiehq/hoodie-server/next.svg)](https://david-dm.org/hoodiehq/hoodie-server)
 [![devDependency Status](https://david-dm.org/hoodiehq/hoodie-server/next/dev-status.svg)](https://david-dm.org/hoodiehq/hoodie-server#info=devDependencies)
 
-![Hoodie Dog Mascot](https://avatars1.githubusercontent.com/u/1888826?v=3&s=200)
 
 `hoodie-server` is the core server component of Hoodie. Together with `hoodie-client`, it forms the two parts that make up the Hoodie system.
 
