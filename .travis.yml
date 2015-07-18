@@ -10,6 +10,8 @@ before_script:
 - npm prune
 services:
 - couchdb
+notifications:
+  email: false
 env:
   global:
   - secure: NeaMPJ5vUh6ikHdSeKnmCvCj+vBVzP9pYWSRjUWNzhRk7CajDZdldJ89WwFv3vuo3UNXEFMA3B6fKW2vQoaTYsBNNkFpsYe5QcbMJTsTJ0gkap9qYALlgaV6R2RrxoFMqGj+jwLPq/5e9g+DxrLFasnPXf+/gy5g5ZqWc/VHNzs=
