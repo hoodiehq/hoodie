@@ -44,6 +44,7 @@ Options:
   --custom-ports  Provide custom ports www,admin,couchdb
   --help          Show usage information
   --verbose       Shows more verbose console output
+  --debug         Shows hapi internal debug output
 ```
 
 If that doesn’t make much sense just yet, don’t worry about it.
