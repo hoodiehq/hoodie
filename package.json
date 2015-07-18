@@ -6,6 +6,7 @@
     "url": "https://github.com/hoodiehq/hoodie-server.git"
   },
   "dependencies": {
+    "@hoodie/ci-results": "^1.0.0",
     "async": "^1.2.1",
     "browserify": "^11.0.0",
     "bytes": "^2.1.0",
