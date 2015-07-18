@@ -9,7 +9,7 @@ describe('Requireability', function () {
       admin_port: 5031,
       admin_password: '12345'
     };
-    this.timeout(5000);
+    this.timeout(10000);
     hoodie_server.start(config, function() {
       // verify this function get called
       expect(true).to.be(true);
