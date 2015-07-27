@@ -63,7 +63,16 @@
   "scripts": {
     "semantic-release": "semantic-release-scripts pre && npm publish && semantic-release-scripts post",
     "start": "bin/start",
-    "test": "mocha test/index.js",
-    "test:style": "standard"
+    "test": "standard && mocha test/index.js"
+  },
+  "standard": {
+    "global": [
+      "after",
+      "afterEach",
+      "before",
+      "beforeEach",
+      "describe",
+      "it"
+    ]
   }
 }

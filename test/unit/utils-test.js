@@ -1,39 +1,38 @@
-var expect = require('expect.js');
-var utils = require('../../lib/utils');
-var _ = require('lodash');
+var _ = require('lodash')
+var expect = require('expect.js')
+
+var utils = require('../../lib/utils')
 
 describe('utils', function () {
-
   it('should expose n number of properties', function () {
-    expect(_.size(utils)).to.eql(7);
-  });
+    expect(_.size(utils)).to.eql(7)
+  })
 
   it('should have a generatePassword property', function () {
-    expect(utils).to.have.property('generatePassword');
-  });
+    expect(utils).to.have.property('generatePassword')
+  })
 
   it('should have a ensureDir property', function () {
-    expect(utils).to.have.property('ensureDir');
-  });
+    expect(utils).to.have.property('ensureDir')
+  })
 
   it('should have a jsonClone property', function () {
-    expect(utils).to.have.property('jsonClone');
-  });
+    expect(utils).to.have.property('jsonClone')
+  })
 
   it('should have a ensurePaths property', function () {
-    expect(utils).to.have.property('ensurePaths');
-  });
+    expect(utils).to.have.property('ensurePaths')
+  })
 
   it('should have a processSend property', function () {
-    expect(utils).to.have.property('processSend');
-  });
+    expect(utils).to.have.property('processSend')
+  })
 
   it('should have a hconsole property', function () {
-    expect(utils).to.have.property('hconsole');
-  });
+    expect(utils).to.have.property('hconsole')
+  })
 
   it('should have a showConfigPath property', function () {
-    expect(utils).to.have.property('showConfigPath');
-  });
-
-});
+    expect(utils).to.have.property('showConfigPath')
+  })
+})

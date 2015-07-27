@@ -1,17 +1,16 @@
-var expect = require('expect.js');
-var hoodie_server = require('../../');
+var hoodie_server = require('../../')
 
-var config = require('../lib/config');
+var config = require('../lib/config')
 
 describe('handle assets', function () {
-  this.timeout(30000);
+  this.timeout(30000)
 
   before(function (done) {
-    hoodie_server.start(config, done);
-  });
+    hoodie_server.start(config, done)
+  })
 
   it('should start server', function (done) {
-    done();
-  });
+    done()
+  })
 
-});
+})

@@ -1,11 +1,11 @@
-var expect = require('expect.js');
-var hoodie_server = require('../../');
-var http = require('http');
+var http = require('http')
 
-var config = require('../lib/config');
+var expect = require('expect.js')
+
+var config = require('../lib/config')
 
 describe('handle 404', function () {
-  this.timeout(30000);
+  this.timeout(30000)
 
   it('should send index.html on accept: text/html', function (done) {
     http.get({
@@ -18,15 +18,16 @@ describe('handle 404', function () {
       },
       agent: false
     }, function (res) {
-      var buf = '';
-      res.on('data', function (chunk) { buf += chunk; });
+      var buf = ''
+      res.on('data', function (chunk) {
+        buf += chunk
+      })
       res.on('end', function () {
-        expect(buf).to.be('hi\n');
-        done();
-      });
-    });
-  });
-
+        expect(buf).to.be('hi\n')
+        done()
+      })
+    })
+  })
 
   it('should send a JSON 404 on anything but accept: text/html*', function (done) {
     http.get({
@@ -39,14 +40,16 @@ describe('handle 404', function () {
       },
       agent: false
     }, function (res) {
-      var buf = '';
-      res.on('data', function (chunk) { buf += chunk; });
+      var buf = ''
+      res.on('data', function (chunk) {
+        buf += chunk
+      })
       res.on('end', function () {
-        buf = JSON.parse(buf);
-        expect(buf.statusCode).to.be(404);
-        expect(buf.error).to.be('Not Found');
-        done();
-      });
-    });
-  });
-});
+        buf = JSON.parse(buf)
+        expect(buf.statusCode).to.be(404)
+        expect(buf.error).to.be('Not Found')
+        done()
+      })
+    })
+  })
+})

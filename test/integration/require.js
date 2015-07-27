@@ -1,20 +1,21 @@
-var expect = require('expect.js');
-var hoodie_server = require('../../');
+var expect = require('expect.js')
+
+var hoodie_server = require('../../')
 
 describe('Requireability', function () {
-  this.timeout(30000);
+  this.timeout(30000)
   it('should require & start', function (done) {
     var config = {
       www_port: 5021,
       admin_port: 5031,
       admin_password: '12345'
-    };
-    this.timeout(10000);
-    hoodie_server.start(config, function() {
+    }
+    this.timeout(10000)
+    hoodie_server.start(config, function () {
       // verify this function get called
-      expect(true).to.be(true);
+      expect(true).to.be(true)
       done()
-    });
-  });
+    })
+  })
 
-});
+})

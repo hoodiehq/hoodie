@@ -1,16 +1,14 @@
-var expect = require('expect.js');
-var env = require('../../lib/core/environment');
+var _ = require('lodash')
+var expect = require('expect.js')
 
-var _ = require('lodash');
+var env = require('../../lib/core/environment')
 
 describe('environment', function () {
-
   it('should expose n number of properties', function () {
-    expect(_.size(env)).to.eql(1);
-  });
+    expect(_.size(env)).to.eql(1)
+  })
 
   it('should have a getConfig property', function () {
-    expect(env).to.have.property('getConfig');
-  });
-
-});
+    expect(env).to.have.property('getConfig')
+  })
+})

@@ -1,40 +1,38 @@
-var Stream = require('stream');
-var expect = require('expect.js');
-var hoodiejs = require('../../lib/helpers/pack_hoodie');
+var expect = require('expect.js')
+var Stream = require('stream')
+
+var hoodiejs = require('../../lib/helpers/pack_hoodie')
 
 describe('pack_hoodie', function () {
-
   // Dummy config object with plugins attribute.
-  var config = { app: {}, plugins: [] };
+  var config = { app: {}, plugins: [] }
 
   it('should be a function', function () {
-    expect(hoodiejs).to.be.a(Function);
-  });
+    expect(hoodiejs).to.be.a(Function)
+  })
 
   it.skip('should return a readable stream on empty cache', function (done) {
+    this.timeout(5000)
 
-    this.timeout(5000);
+    var stream = hoodiejs(config)
 
-    var stream = hoodiejs(config);
+    expect(stream).to.be.a(Stream)
+    expect(stream.readable).to.be(true)
 
-    expect(stream).to.be.a(Stream);
-    expect(stream.readable).to.be(true);
-
-    var chunks = [];
+    var chunks = []
     stream.on('data', function (buf) {
-      chunks.push(buf);
-    });
+      chunks.push(buf)
+    })
     stream.on('end', function () {
-      var js = chunks.join('');
-      expect(/hoodie_bundle\.js/.test(js)).to.be(true);
-      done();
-    });
-  });
+      var js = chunks.join('')
+      expect(/hoodie_bundle\.js/.test(js)).to.be(true)
+      done()
+    })
+  })
 
   it.skip('should return a cached string after first request', function () {
-    var str = hoodiejs(config);
-    expect(str).to.be.a('string');
-    expect(/hoodie_bundle\.js/.test(str)).to.be(true);
-  });
-
-});
+    var str = hoodiejs(config)
+    expect(str).to.be.a('string')
+    expect(/hoodie_bundle\.js/.test(str)).to.be(true)
+  })
+})

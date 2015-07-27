@@ -1,12 +1,11 @@
-var expect = require('expect.js');
-var hoodie_server = require('../../');
-var http = require('http');
-var os = require('os');
+var http = require('http')
 
-var config = require('../lib/config');
+var expect = require('expect.js')
+
+var config = require('../lib/config')
 
 describe('handle assets', function () {
-  this.timeout(30000);
+  this.timeout(30000)
 
   it('should get asset path', function (done) {
     http.get({
@@ -16,9 +15,8 @@ describe('handle assets', function () {
       path: '/_api/_plugins/_assets/index.html',
       agent: false
     }, function (res) {
-      expect(res.statusCode).to.be(200);
-      done();
-    });
-  });
-
-});
+      expect(res.statusCode).to.be(200)
+      done()
+    })
+  })
+})

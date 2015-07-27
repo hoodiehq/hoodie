@@ -1,12 +1,11 @@
-var expect = require('expect.js');
-var hoodie_server = require('../../');
-var http = require('http');
-var os = require('os');
+var http = require('http')
 
-var config = require('../lib/config');
+var expect = require('expect.js')
+
+var config = require('../lib/config')
 
 describe('block _all_dbs', function () {
-  this.timeout(30000);
+  this.timeout(30000)
 
   it('should 404 on /_api/_all_dbs', function (done) {
     http.get({
@@ -16,14 +15,13 @@ describe('block _all_dbs', function () {
       path: '/_api/_all_dbs',
       agent: false
     }, function (res) {
-      expect(res.statusCode).to.be(404);
-      done();
-    });
-  });
-
+      expect(res.statusCode).to.be(404)
+      done()
+    })
+  })
 
   it('should log into admin', function (done) {
-    var body = 'name=admin&password=' + config.admin_password;
+    var body = 'name=admin&password=' + config.admin_password
     var req = http.request({
       host: '127.0.0.1',
       port: config.admin_port,
@@ -35,98 +33,97 @@ describe('block _all_dbs', function () {
       },
       agent: false
     }, function (res) {
-      expect(res.statusCode).to.be(200);
-      done();
-    });
-    req.write(body);
-    req.end();
-  });
+      expect(res.statusCode).to.be(200)
+      done()
+    })
+    req.write(body)
+    req.end()
+  })
 
-});
+})
 
 /* tests ported over from nodeunit, hence the sligtly different style */
-var couchr = require('couchr');
-var async = require('async');
-var environment = require('../../lib/core/environment');
-var configStore = require('../../lib/core/config_store');
-var app = require('../../lib/index');
-var path = require('path');
-var url = require('url');
-var utils = require('../lib/utils');
+var path = require('path')
+var url = require('url')
 
-describe('check config dbs are private to admin', function() {
+var async = require('async')
+var couchr = require('couchr')
 
-  it('should make sure config dbs are private', function(done) {
-    var project_dir = path.resolve(__dirname, '../lib/fixtures/project1');
+var app = require('../../lib/index')
+var configStore = require('../../lib/core/config_store')
+var environment = require('../../lib/core/environment')
+var utils = require('../lib/utils')
+
+describe('check config dbs are private to admin', function () {
+  it('should make sure config dbs are private', function (done) {
+    var project_dir = path.resolve(__dirname, '../lib/fixtures/project1')
 
     var cfg = environment.getConfig(
-      process.platform,   // platform
-      process.env,        // environment vars
-      project_dir,        // project directory
+      process.platform, // platform
+      process.env, // environment vars
+      project_dir, // project directory
       []                  // command-line arguments
-    );
+    )
 
-    cfg.admin_password = 'testing';
+    cfg.admin_password = 'testing'
 
     utils.resetFixture(project_dir, function (err) {
       if (err) {
-        return done(err);
+        return done(err)
       }
       app.init(cfg, function (err) {
         if (err) {
-          return done(err);
+          return done(err)
         }
         async.parallel([
           function (cb) {
-            var appdb = url.resolve(cfg.couch.url, '/app');
-            couchr.get(appdb, function (err, data, res) {
-              expect(res.statusCode).to.be(401);
-              cb();
-            });
+            var appdb = url.resolve(cfg.couch.url, '/app')
+            couchr.get(appdb, function (er, data, res) {
+              expect(res.statusCode).to.be(401)
+              cb()
+            })
           },
           function (cb) {
-            var plugindb = url.resolve(cfg.couch.url, '/plugins');
-            couchr.get(plugindb, function (err, data, res) {
-              expect(res.statusCode).to.be(401);
-              cb();
-            });
+            var plugindb = url.resolve(cfg.couch.url, '/plugins')
+            couchr.get(plugindb, function (er, data, res) {
+              expect(res.statusCode).to.be(401)
+              cb()
+            })
           },
           function (cb) {
-            var appdb = url.resolve(cfg.couch.url, '/app');
-            configStore.getCouchCredentials(cfg, function (err, username, password) {
-              var parsed = url.parse(appdb);
-              parsed.auth = username + ':' + password;
-              appdb = url.format(parsed);
-              couchr.get(appdb, function (err, data, res) {
-                expect(res.statusCode).to.be(200);
-                cb();
-              });
-            });
+            var appdb = url.resolve(cfg.couch.url, '/app')
+            configStore.getCouchCredentials(cfg, function (er, username, password) {
+              var parsed = url.parse(appdb)
+              parsed.auth = username + ':' + password
+              appdb = url.format(parsed)
+              couchr.get(appdb, function (er, data, res) {
+                expect(res.statusCode).to.be(200)
+                cb()
+              })
+            })
           },
           function (cb) {
-            var plugindb = url.resolve(cfg.couch.url, '/plugins');
+            var plugindb = url.resolve(cfg.couch.url, '/plugins')
             configStore.getCouchCredentials(cfg, function (err, username, password) {
               if (err) {
-                return done(err);
+                return done(err)
               }
-              var parsed = url.parse(plugindb);
-              parsed.auth = username + ':' + password;
-              plugindb = url.format(parsed);
-              couchr.get(plugindb, function (err, data, res) {
-                expect(res.statusCode).to.be(200);
-                cb();
-              });
-            });
+              var parsed = url.parse(plugindb)
+              parsed.auth = username + ':' + password
+              plugindb = url.format(parsed)
+              couchr.get(plugindb, function (er, data, res) {
+                expect(res.statusCode).to.be(200)
+                cb()
+              })
+            })
           }
-        ],
-        function (err) {
+        ], function (err) {
           if (err) {
-            return done(err);
+            return done(err)
           }
-          done();
-        });
-      });
-    });
-
-  });
-});
+          done()
+        })
+      })
+    })
+  })
+})
