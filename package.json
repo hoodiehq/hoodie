@@ -1,9 +1,9 @@
 {
   "name": "@hoodie/server",
-  "main": "lib/index",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/hoodiehq/hoodie-server.git"
+  "description": "The core of the Hoodie backend",
+  "author": "The Hoodie Community",
+  "bugs": {
+    "url": "https://github.com/hoodiehq/hoodie-server/issues"
   },
   "dependencies": {
     "@hoodie/ci-results": "^1.0.0",
@@ -31,26 +31,40 @@
     "watch": "^0.16.0",
     "wreck": "^6.0.0"
   },
-  "scripts": {
-    "start": "bin/start",
-    "test": "mocha test/index.js",
-    "test:style": "standard",
-    "semantic-release": "semantic-release-scripts pre && npm publish && semantic-release-scripts post"
-  },
-  "engines": {
-    "node": ">=0.10.22"
-  },
   "devDependencies": {
     "expect.js": "^0.3.1",
     "mocha": "*",
     "moment": "^2.10.3",
     "rimraf": "^2.4.0",
-    "semantic-release-scripts": "^1.1.1",
+    "semantic-release": "^4.0.0",
     "sinon": "^1.15.3",
     "standard": "^5.0.0-2"
   },
-  "hoodie": {
-    "plugins": []
+  "engines": {
+    "node": ">=0.10.22"
   },
-  "codename": "hunky-dory-cheetah"
+  "homepage": "https://github.com/hoodiehq/hoodie-server",
+  "keywords": [
+    "frontend-only",
+    "hapi",
+    "hoodie",
+    "nobackend",
+    "offline-first"
+  ],
+  "license": "Apache-2.0",
+  "main": "lib/index.js",
+  "publishConfig": {
+    "access": "public",
+    "tag": "next"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/hoodiehq/hoodie-server.git"
+  },
+  "scripts": {
+    "semantic-release": "semantic-release-scripts pre && npm publish && semantic-release-scripts post",
+    "start": "bin/start",
+    "test": "mocha test/index.js",
+    "test:style": "standard"
+  }
 }
