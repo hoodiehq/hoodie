@@ -18,7 +18,6 @@
     "hoodie-admin-dashboard": "^2.0.0",
     "hoodie-admin-dashboard-uikit": "^3.0.0",
     "hoodie-plugins-manager": "^0.5.0",
-    "local-tld-lib": "^1.0.2",
     "lock": "^0.1.0",
     "lodash": "^3.9.3",
     "mkdirp": "^0.5.0",

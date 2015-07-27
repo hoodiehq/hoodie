@@ -39,8 +39,6 @@ Usage: node ./bin/start [options]
 
 Options:
   --www           Set www root directory
-  --local-tld     Turn on local-tld on supported platforms
-  --no-local-tld  Turn off local-tld on supported platforms
   --custom-ports  Provide custom ports www,admin,couchdb
   --help          Show usage information
   --verbose       Shows more verbose console output

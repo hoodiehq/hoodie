@@ -14,8 +14,6 @@ var argv = require('optimist')
   .usage('Usage: $0 [options]')
   .alias('w', 'www')
   .describe('www', 'Set www root directory')
-  .describe('local-tld', 'Turn on local-tld on supported platforms')
-  .describe('no-local-tld', 'Turn off local-tld on supported platforms')
   .alias('c', 'custom-ports')
   .describe('custom-ports', 'Provide custom ports www,admin,couchdb')
   .alias('h', 'help')
@@ -54,4 +52,3 @@ if (require.main === module) {
     console.log('');
   });
 }
-
