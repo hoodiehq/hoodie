@@ -5,7 +5,7 @@ var _ = require('lodash');
 describe('utils', function () {
 
   it('should expose n number of properties', function () {
-    expect(_.size(utils)).to.eql(8);
+    expect(_.size(utils)).to.eql(7);
   });
 
   it('should have a generatePassword property', function () {
@@ -26,10 +26,6 @@ describe('utils', function () {
 
   it('should have a processSend property', function () {
     expect(utils).to.have.property('processSend');
-  });
-
-  it('should have a isNodejitsu property', function () {
-    expect(utils).to.have.property('isNodejitsu');
   });
 
   it('should have a hconsole property', function () {

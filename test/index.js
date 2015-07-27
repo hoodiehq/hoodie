@@ -7,7 +7,6 @@ require('./unit/hconsole-test');
 require('./unit/installer-test');
 require('./unit/localtld-test');
 require('./unit/plugins-test');
-require('./unit/nodejitsu_server-test');
 require('./unit/server-test');
 require('./unit/api-plugin-test');
 require('./unit/utils-test');
