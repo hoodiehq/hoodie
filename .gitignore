@@ -1,6 +1,10 @@
-*~
-.DS_Store
-*.swp
-node_modules
+# common
+
 data
-/test/fixtures/project1/data
+coverage
+node_modules
+*.log
+*.dump
+*.swp
+.DS_Store
+.nyc_output
