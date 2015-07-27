@@ -31,9 +31,11 @@
     "wreck": "^6.0.0"
   },
   "devDependencies": {
+    "coveralls": "^2.11.3",
     "expect.js": "^0.3.1",
     "mocha": "*",
     "moment": "^2.10.3",
+    "nyc": "^3.0.1",
     "rimraf": "^2.4.0",
     "semantic-release": "^4.0.0",
     "sinon": "^1.15.3",
@@ -61,9 +63,12 @@
     "url": "https://github.com/hoodiehq/hoodie-server.git"
   },
   "scripts": {
+    "coverage": "nyc report",
+    "coverage:upload": "npm run coverage -- --reporter=lcovonly && coveralls < coverage/lcov.info",
+    "pretest": "standard",
     "semantic-release": "semantic-release-scripts pre && npm publish && semantic-release-scripts post",
     "start": "bin/start",
-    "test": "standard && mocha test/index.js"
+    "test": "nyc mocha test/index.js"
   },
   "standard": {
     "global": [

@@ -1,4 +1,12 @@
+sudo: false
 language: node_js
+services:
+- couchdb
+cache:
+  directories:
+  - node_modules
+notifications:
+  email: false
 node_js:
 - iojs-v2
 - iojs-v1
@@ -8,22 +16,5 @@ before_install:
 - npm i -g npm@^2.0.0
 before_script:
 - npm prune
-services:
-- couchdb
-notifications:
-  email: false
-env:
-  global:
-  - secure: NeaMPJ5vUh6ikHdSeKnmCvCj+vBVzP9pYWSRjUWNzhRk7CajDZdldJ89WwFv3vuo3UNXEFMA3B6fKW2vQoaTYsBNNkFpsYe5QcbMJTsTJ0gkap9qYALlgaV6R2RrxoFMqGj+jwLPq/5e9g+DxrLFasnPXf+/gy5g5ZqWc/VHNzs=
-deploy:
-  provider: npm
-  email: stephan@thehoodiefirm.com
-  on:
-    all_branches: true
-    tags: true
-  api_key:
-    secure: F9PSxt6ZWIaKuxFvGR5yGKFlp/kQbEOcnUNC9/bbkMOcd+vWvhexuwEQP4E7enVxaDxWNeV7w4k2iPjnxJt4HspGp3dKfpgLzIblEwfD4Ke5H0oe67gldjQcKJpnuCPuDPKpy4JlT2IJgS/yNyhazPYKBXBiSXUVv8kqB627Zq0=
-sudo: false
-cache:
-  directories:
-  - node_modules
+after_script:
+- npm run coverage:upload

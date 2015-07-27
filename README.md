@@ -3,6 +3,7 @@
 # Welcome to `hoodie-server!` 🎉
 
 [![Build Status](https://travis-ci.org/hoodiehq/hoodie-server.svg?branch=next)](https://travis-ci.org/hoodiehq/hoodie-server)
+[![Coverage Status](https://coveralls.io/repos/hoodiehq/hoodie-server/badge.svg?branch=next&service=github)](https://coveralls.io/github/hoodiehq/hoodie-server?branch=next)
 [![Dependency Status](https://david-dm.org/hoodiehq/hoodie-server/next.svg)](https://david-dm.org/hoodiehq/hoodie-server/next)
 [![devDependency Status](https://david-dm.org/hoodiehq/hoodie-server/next/dev-status.svg)](https://david-dm.org/hoodiehq/hoodie-server/next#info=dependencies)
 
