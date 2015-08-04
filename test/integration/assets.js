@@ -1,22 +1,13 @@
-var http = require('http')
+var request = require('request')
+var test = require('tap').test
 
-var expect = require('expect.js')
-
+var startServerTest = require('../lib/start-server-test')
 var config = require('../lib/config')
 
-describe('handle assets', function () {
-  this.timeout(30000)
-
-  it('should get asset path', function (done) {
-    http.get({
-      host: '127.0.0.1',
-      port: config.www_port,
-      method: 'get',
-      path: '/_api/_plugins/_assets/index.html',
-      agent: false
-    }, function (res) {
-      expect(res.statusCode).to.be(200)
-      done()
-    })
+startServerTest(test, 'should get asset path', config, function (t, end) {
+  request.get(config.url + '/_api/_plugins/_assets/index.html', function (error, res) {
+    if (error) throw error
+    t.is(res.statusCode, 200)
+    end()
   })
 })

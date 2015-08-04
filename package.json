@@ -25,21 +25,21 @@
     "optimist": "^0.6.1",
     "ports": "^1.1.0",
     "prompt": "^0.2.9",
-    "request": "^2.58.0",
+    "request": "^2.60.0",
     "semver": "^5.0.1",
     "watch": "^0.16.0",
     "wreck": "^6.0.0"
   },
   "devDependencies": {
+    "bl": "^1.0.0",
     "coveralls": "^2.11.3",
-    "expect.js": "^0.3.1",
-    "mocha": "*",
     "moment": "^2.10.3",
     "nyc": "^3.0.1",
     "rimraf": "^2.4.0",
     "semantic-release": "^4.0.0",
     "sinon": "^1.15.3",
-    "standard": "^5.0.0-2"
+    "standard": "^5.0.0-2",
+    "tap": "^1.3.2"
   },
   "engines": {
     "node": ">=0.10.22"
@@ -68,7 +68,7 @@
     "pretest": "standard",
     "semantic-release": "semantic-release-scripts pre && npm publish && semantic-release-scripts post",
     "start": "bin/start",
-    "test": "nyc mocha test/index.js"
+    "test": "nyc tap --no-cov ./test/integration/*.js"
   },
   "standard": {
     "global": [

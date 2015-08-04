@@ -1,70 +1,51 @@
-var http = require('http')
-
-var expect = require('expect.js')
 var zlib = require('zlib')
 
+var bl = require('bl')
+var request = require('request')
+var test = require('tap').test
+
+var startServerTest = require('../lib/start-server-test')
 var config = require('../lib/config')
 
-describe('handle forced gzip', function () {
-  this.timeout(30000)
-
-  it('should receive gzip when gzip accept header sent', function (done) {
-    http.get({
-      host: '127.0.0.1',
-      port: config.www_port,
-      method: 'get',
-      path: '/_api/',
+startServerTest(test, 'handle forced gzip', config, function (t, end) {
+  t.test('should receive gzip when gzip accept header sent', function (tt) {
+    tt.plan(3)
+    request.get(config.url + '/_api/', {
       headers: {
         'Accept-Encoding': 'gzip, deflate'
       }
-    }, function (res) {
-      expect(res.headers['content-encoding']).to.be('gzip')
-      res.on('end', function () {
-        done()
+    })
+    .on('response', function (res) {
+      tt.is(res.headers['content-encoding'], 'gzip')
+    })
+    .pipe(bl(function (error, data) {
+      if (error) throw error
+      zlib.gunzip(data, function (error, udat) {
+        tt.error(error)
+        tt.ok(/couchdb/.test(udat.toString()))
       })
-
-      var gunzip = zlib.createGunzip()
-      gunzip.on('error', function (error) {
-        console.log('Error, ', error)
-        done(error)
-      })
-
-      res.pipe(gunzip)
-
+    }))
+  })
+  t.test('should receive no gzip when no gzip accept header sent', function (tt) {
+    request.get(config.url + '/_api/')
+    .on('response', function (res) {
+      tt.notOk(res.headers['content-encoding'])
+      tt.end()
     })
   })
-
-  it('should receive no gzip when no gzip accept header sent', function (done) {
-    http.get({
-      host: '127.0.0.1',
-      port: config.www_port,
-      method: 'get',
-      path: '/_api/'
-    }, function (res) {
-      expect(res.headers['content-encoding']).to.be(undefined)
-      done()
+  t.test('should receive gzip when no gzip accept header sent but force query param', function (tt) {
+    tt.plan(3)
+    request.get(config.url + '/_api/?force_gzip=true')
+    .on('response', function (res) {
+      tt.is(res.headers['content-encoding'], 'gzip')
     })
-  })
-
-  it('should receive gzip when no gzip accept header sent but force query param', function (done) {
-    http.get({
-      host: '127.0.0.1',
-      port: config.www_port,
-      method: 'get',
-      path: '/_api/?force_gzip=true'
-    }, function (res) {
-      expect(res.headers['content-encoding']).to.be('gzip')
-      res.on('end', function () {
-        done()
+    .pipe(bl(function (error, data) {
+      if (error) throw error
+      zlib.gunzip(data, function (error, udat) {
+        tt.error(error)
+        tt.ok(/couchdb/.test(udat.toString()))
       })
-
-      var gunzip = zlib.createGunzip()
-      gunzip.on('error', function (error) {
-        console.log('Error, ', error)
-        done(error)
-      })
-
-      res.pipe(gunzip)
-    })
+    }))
   })
+  t.test('teardown', end)
 })

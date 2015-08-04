@@ -1,55 +1,32 @@
-var http = require('http')
+var request = require('request')
+var test = require('tap').test
 
-var expect = require('expect.js')
-
+var startServerTest = require('../lib/start-server-test')
 var config = require('../lib/config')
 
-describe('handle 404', function () {
-  this.timeout(30000)
-
-  it('should send index.html on accept: text/html', function (done) {
-    http.get({
-      host: '127.0.0.1',
-      port: config.www_port,
-      method: 'get',
-      path: '/does_not_exist',
+startServerTest(test, 'handle 404', config, function (t, end) {
+  t.test('should send index.html on accept: text/html', function (tt) {
+    request.get(config.url + '/does_not_exist', {
       headers: {
         accept: 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8'
-      },
-      agent: false
-    }, function (res) {
-      var buf = ''
-      res.on('data', function (chunk) {
-        buf += chunk
-      })
-      res.on('end', function () {
-        expect(buf).to.be('hi\n')
-        done()
-      })
+      }
+    }, function (error, res, data) {
+      if (error) throw error
+      tt.is(data, 'hi\n')
+      tt.is(res.statusCode, 200)
+      tt.end()
     })
   })
-
-  it('should send a JSON 404 on anything but accept: text/html*', function (done) {
-    http.get({
-      host: '127.0.0.1',
-      port: config.www_port,
-      method: 'get',
-      path: '/does_not_exist',
-      headers: {
-        accept: 'application/json'
-      },
-      agent: false
-    }, function (res) {
-      var buf = ''
-      res.on('data', function (chunk) {
-        buf += chunk
-      })
-      res.on('end', function () {
-        buf = JSON.parse(buf)
-        expect(buf.statusCode).to.be(404)
-        expect(buf.error).to.be('Not Found')
-        done()
-      })
+  t.test('should send a JSON 404 on anything but accept: text/html*', function (tt) {
+    request.get(config.url + '/does_not_exist', {
+      json: true
+    }, function (error, res, data) {
+      if (error) throw error
+      tt.is(data.error, 'Not Found')
+      tt.is(data.statusCode, 404)
+      tt.is(res.statusCode, 404)
+      tt.end()
     })
   })
+  t.test('teardown', end)
 })
