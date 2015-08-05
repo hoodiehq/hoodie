@@ -7,21 +7,23 @@
   },
   "dependencies": {
     "@hoodie/ci-results": "^1.0.0",
-    "async": "^1.2.1",
+    "async": "^1.4.0",
     "browserify": "^11.0.0",
     "bytes": "^2.1.0",
     "cli-color": "^1.0.0",
     "couchr": "0.0.16",
+    "dataurl": "0.1.0",
     "follow": "^0.12.1",
     "hapi": "^8.6.1",
     "hoodie": "^2.1.1",
     "hoodie-admin-dashboard": "^2.0.0",
     "hoodie-admin-dashboard-uikit": "^3.0.0",
-    "hoodie-plugins-manager": "^0.5.0",
+    "hoodie-plugins-api": "0.4.0",
     "lock": "^0.1.0",
-    "lodash": "^3.9.3",
+    "lodash": "^3.10.0",
     "mkdirp": "^0.5.0",
     "multicouch": "^0.8.1",
+    "nodemailer": "0.5.2",
     "optimist": "^0.6.1",
     "ports": "^1.1.0",
     "prompt": "^0.2.9",
@@ -38,7 +40,7 @@
     "nyc": "^3.0.1",
     "rimraf": "^2.4.0",
     "semantic-release": "^4.0.0",
-    "standard": "^5.0.0-2",
+    "standard": "^5.0.0",
     "tap": "^1.3.2"
   },
   "engines": {
@@ -68,7 +70,7 @@
     "pretest": "standard",
     "semantic-release": "semantic-release-scripts pre && npm publish && semantic-release-scripts post",
     "start": "bin/start",
-    "test": "nyc tap --no-cov ./test/{unit,integration}/*.js"
+    "test": "nyc tap --no-cov ./test/{unit,integration}/*.js ./test/integration/plugins/manager/*.js"
   },
   "standard": {
     "global": [
