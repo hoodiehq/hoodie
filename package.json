@@ -68,7 +68,7 @@
     "coverage": "nyc report",
     "coverage:upload": "npm run -s coverage -- --reporter=text-lcov | coveralls",
     "pretest": "standard",
-    "semantic-release": "semantic-release-scripts pre && npm publish && semantic-release-scripts post",
+    "semantic-release": "semantic-release pre && npm publish && semantic-release post",
     "start": "bin/start",
     "test": "nyc tap --no-cov ./test/{unit,integration}/*.js ./test/integration/plugins/manager/*.js"
   },
