@@ -3,6 +3,7 @@ var expect = require('expect.js')
 
 var utils = require('../../lib/utils')
 
+require('tap').mochaGlobals()
 describe('utils', function () {
   it('should expose n number of properties', function () {
     expect(_.size(utils)).to.eql(7)

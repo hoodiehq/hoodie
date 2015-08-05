@@ -3,6 +3,7 @@ var expect = require('expect.js')
 
 var env = require('../../lib/core/environment')
 
+require('tap').mochaGlobals()
 describe('environment', function () {
   it('should expose n number of properties', function () {
     expect(_.size(env)).to.eql(1)

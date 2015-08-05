@@ -3,11 +3,8 @@ var expect = require('expect.js')
 
 var plugins = require('../../lib/core/plugins')
 
+require('tap').mochaGlobals()
 describe('plugins', function () {
-  beforeEach(function () {
-    this.pluginPath = process.cwd() + '/test/support/node_modules/hoodie-plugin-cheesecake'
-  })
-
   describe('methods', function () {
     it('should expose n number of properties', function () {
       expect(_.size(plugins)).to.eql(12)

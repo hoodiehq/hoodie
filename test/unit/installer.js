@@ -3,6 +3,7 @@ var expect = require('expect.js')
 
 var installer = require('../../lib/couchdb/installer')
 
+require('tap').mochaGlobals()
 describe('installer', function () {
   it('should expose n number of properties', function () {
     expect(_.size(installer)).to.eql(5)

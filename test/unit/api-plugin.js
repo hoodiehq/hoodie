@@ -6,6 +6,7 @@ var Wreck = require('wreck')
 var plugin = require('../../lib/server/hapi_plugins/api')
 var pluginInternals = require('../../lib/server/hapi_plugins/api/internals')
 
+require('tap').mochaGlobals()
 describe('api plugin', function () {
   it('should expose n number of properties', function () {
     expect(_.size(plugin)).to.eql(1)

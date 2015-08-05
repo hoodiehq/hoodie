@@ -3,6 +3,7 @@ var expect = require('expect.js')
 
 var hconsole = require('../../lib/utils/hconsole')
 
+require('tap').mochaGlobals()
 describe('hconsole', function () {
   it('should expose n number of properties', function () {
     expect(_.size(hconsole)).to.eql(5)

@@ -3,6 +3,7 @@ var expect = require('expect.js')
 
 var configStore = require('../../lib/core/config_store')
 
+require('tap').mochaGlobals()
 describe('configStore', function () {
   it('should expose n number of properties', function () {
     expect(_.size(configStore)).to.eql(13)

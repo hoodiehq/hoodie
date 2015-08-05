@@ -3,6 +3,7 @@ var expect = require('expect.js')
 
 var couch = require('../../lib/couchdb/index')
 
+require('tap').mochaGlobals()
 describe('couch', function () {
   it('should expose n number of properties', function () {
     expect(_.size(couch)).to.eql(5)
