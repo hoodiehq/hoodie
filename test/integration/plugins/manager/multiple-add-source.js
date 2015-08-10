@@ -42,13 +42,12 @@ test('get config values from plugin manager', function (t) {
         async.apply(hoodie.task.addSource, 'testdb'),
         async.apply(hoodie.task.addSource, 'testdb'),
         async.apply(hoodie.task.addSource, 'testdb')
-      ],
-        function (error) {
+      ], function (error) {
+        if (error) throw error
+        db.add('$email', {to: 'to', from: 'from'}, function (error) {
           if (error) throw error
-          db.add('$email', {to: 'to', from: 'from'}, function (error) {
-            if (error) throw error
-          })
         })
+      })
     })
   })
 })
