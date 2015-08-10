@@ -36,6 +36,7 @@
     "bl": "^1.0.0",
     "coveralls": "^2.11.3",
     "expect.js": "^0.3.1",
+    "nodeunit": "^0.9.1",
     "nyc": "^3.0.1",
     "rimraf": "^2.4.0",
     "semantic-release": "^4.0.0",
@@ -69,7 +70,13 @@
     "pretest": "standard",
     "semantic-release": "semantic-release pre && npm publish && semantic-release post",
     "start": "bin/start",
-    "test": "nyc tap --no-cov ./test/{unit,integration}/*.js ./test/integration/plugins/manager/*.js"
+    "test:unit": "tap --no-cov ./test/unit/*.js",
+    "test:integration:core": "tap --no-cov ./test/integration/*.js",
+    "test:integration:manager": "tap --no-cov ./test/integration/plugins/manager/*.js",
+    "test:integration:api": "nodeunit ./test/integration/plugins/api/*.js",
+    "test:integration": "npm run -s test:integration:core && npm run -s test:integration:manager && npm run -s test:integration:api",
+    "test:all": "npm run -s test:unit && npm run -s test:integration",
+    "test": "nyc npm run -s test:all"
   },
   "standard": {
     "global": [
