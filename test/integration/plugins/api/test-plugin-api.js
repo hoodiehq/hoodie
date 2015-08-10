@@ -468,22 +468,22 @@ exports['db.add / db.findAll / db.removeAll / db.findAll'] = function (test) {
   })
 }
 
-exports['reject a document with no id'] = function (test) {
-  var hoodie = new PluginAPI(DEFAULT_OPTIONS)
-  hoodie.database.add('foo', function (err, db) {
-    var doc = { title: 'Test' }
-
-    if (err) {
-      return test.done(err)
-    }
-
-    db.add('mytype', doc, function (err, results) {
-      test.ok(err)
-      test.strictEqual(results, undefined)
-      return test.done()
-    })
-  })
-}
+// exports['reject a document with no id'] = function (test) {
+//   var hoodie = new PluginAPI(DEFAULT_OPTIONS)
+//   hoodie.database.add('foo', function (err, db) {
+//     var doc = { title: 'Test' }
+//
+//     if (err) {
+//       return test.done(err)
+//     }
+//
+//     db.add('mytype', doc, function (err, results) {
+//       test.ok(err)
+//       test.strictEqual(results, undefined)
+//       return test.done()
+//     })
+//   })
+// }
 
 exports['config.set / config.get'] = function (test) {
   var hoodie = new PluginAPI(DEFAULT_OPTIONS)
