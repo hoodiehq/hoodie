@@ -1,3 +1,4 @@
+var _ = require('lodash')
 var nodemailer = require('nodemailer')
 var request = require('request').defaults({json: true})
 var test = require('tap').test
@@ -6,7 +7,7 @@ var OPTS = require('./lib/default-options')
 var pluginsManager = require('../../../../lib/plugins/manager')
 
 test('sendEmail function', function (t) {
-  t.plan(6)
+  t.plan(4)
   var email = {
     to: 'to@hood.ie',
     from: 'from@hood.ie',
@@ -18,8 +19,7 @@ test('sendEmail function', function (t) {
   var close_calls = []
 
   var _createTransport = nodemailer.createTransport
-  nodemailer.createTransport = function (type, config) {
-    t.equal(type, 'SMTP')
+  nodemailer.createTransport = function (config) {
     createTransport_calls.push(config)
     return {
       close: function (callback) {
@@ -53,7 +53,14 @@ test('sendEmail function', function (t) {
         request.put(url, {body: doc}, function (error) {
           if (error) throw error
           setTimeout(function () {
-            hoodie.sendEmail(email, function () {
+            var email2 = _.clone(email)
+            email2.attachments = [{
+              filename: 'text3.txt',
+              path: '/path/to/file.txt'
+            }, {
+              path: 'data:text/plain;base64,aGVsbG8gd29ybGQ='
+            }]
+            hoodie.sendEmail(email2, function () {
               t.same(createTransport_calls, [
                 {
                   host: 'emailhost',
@@ -62,13 +69,13 @@ test('sendEmail function', function (t) {
                     user: 'gmail.user@gmail.com',
                     pass: 'userpass'
                   },
-                  secureConnection: true,
+                  secure: true,
                   service: 'Gmail'
                 },
                 {
                   host: 'emailhost2',
                   port: 123,
-                  secureConnection: false,
+                  secure: false,
                   service: 'Gmail2'
                 }
               ])
@@ -80,11 +87,12 @@ test('sendEmail function', function (t) {
                     user: 'gmail.user@gmail.com',
                     pass: 'userpass'
                   },
-                  secureConnection: true,
+                  secure: true,
                   service: 'Gmail'
                 }
               ])
-              t.same(sendMail_calls, [email, email])
+              delete email2.attachments[0].path
+              t.same(sendMail_calls, [email, email2])
               nodemailer.createTransport = _createTransport
               manager.stop(function (error) {
                 t.error(error)
