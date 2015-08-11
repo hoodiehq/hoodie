@@ -6,7 +6,7 @@ var utils = require('../../lib/utils')
 require('tap').mochaGlobals()
 describe('utils', function () {
   it('should expose n number of properties', function () {
-    expect(_.size(utils)).to.eql(7)
+    expect(_.size(utils)).to.eql(6)
   })
 
   it('should have a generatePassword property', function () {
@@ -15,10 +15,6 @@ describe('utils', function () {
 
   it('should have a ensureDir property', function () {
     expect(utils).to.have.property('ensureDir')
-  })
-
-  it('should have a jsonClone property', function () {
-    expect(utils).to.have.property('jsonClone')
   })
 
   it('should have a ensurePaths property', function () {
