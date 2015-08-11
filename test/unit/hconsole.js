@@ -6,11 +6,7 @@ var hconsole = require('../../lib/utils/hconsole')
 require('tap').mochaGlobals()
 describe('hconsole', function () {
   it('should expose n number of properties', function () {
-    expect(_.size(hconsole)).to.eql(4)
-  })
-
-  it('should have a linebreak property', function () {
-    expect(hconsole).to.have.property('linebreak')
+    expect(_.size(hconsole)).to.eql(3)
   })
 
   it('should have a spinner property', function () {
