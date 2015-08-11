@@ -1,0 +1,59 @@
+{
+  "name": "@hoodie/dev-top-level",
+  "description": "Hoodie enables you to express yourself through technology by making web app development very fast, easy and accessible.",
+  "version": "0.0.0-development",
+  "author": "The Hoodie Community",
+  "bin": {
+    "hoodie": "./node_modules/hoodie-server/bin/start"
+  },
+  "bugs": {
+    "url": "https://github.com/hoodiehq/hoodie/issues"
+  },
+  "bundleDependencies": [
+    "hoodie",
+    "hoodie-admin-dashboard",
+    "hoodie-admin-dashboard-uikit",
+    "hoodie-plugin-appconfig",
+    "hoodie-plugin-email",
+    "hoodie-plugin-users",
+    "hoodie-server"
+  ],
+  "dependencies": {
+    "hoodie": "2.1.1",
+    "hoodie-admin-dashboard": "^2.0.0",
+    "hoodie-admin-dashboard-uikit": "^3.0.0",
+    "hoodie-plugin-appconfig": "^2.0.1",
+    "hoodie-plugin-email": "^1.0.0",
+    "hoodie-plugin-users": "^2.2.2",
+    "hoodie-server": "^5.0.0"
+  },
+  "devDependencies": {
+    "hoodie-integration-test": "^1.0.9",
+    "hoodie-plugin-test": "^1.0.0",
+    "mkdirp": "^0.5.1",
+    "my-first-hoodie": "^3.2.1",
+    "rimraf": "^2.4.2"
+  },
+  "homepage": "https://github.com/hoodiehq/hoodie#readme",
+  "hoodie": {
+    "plugins": [
+      "hoodie-plugin-appconfig",
+      "hoodie-plugin-email",
+      "hoodie-plugin-users",
+      "hoodie-plugin-test"
+    ]
+  },
+  "keywords": [
+    "frontend-only",
+    "nobackend",
+    "offline-first"
+  ],
+  "license": "Apache-2.0",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/hoodiehq/hoodie.git"
+  },
+  "scripts": {
+    "test": "./bin/test"
+  }
+}

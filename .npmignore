@@ -1,0 +1,17 @@
+# common
+
+data
+coverage
+node_modules
+*.log
+*.dump
+*.swp
+.DS_Store
+.nyc_output
+.tmp
+
+# npm specific
+
+.gitignore
+.npmrc
+.travis.yml
