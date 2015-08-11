@@ -9,15 +9,6 @@
   "bugs": {
     "url": "https://github.com/hoodiehq/hoodie/issues"
   },
-  "bundleDependencies": [
-    "hoodie",
-    "hoodie-admin-dashboard",
-    "hoodie-admin-dashboard-uikit",
-    "hoodie-plugin-appconfig",
-    "hoodie-plugin-email",
-    "hoodie-plugin-users",
-    "hoodie-server"
-  ],
   "dependencies": {
     "hoodie": "2.1.1",
     "hoodie-admin-dashboard": "^2.0.0",
@@ -59,7 +50,7 @@
     "url": "https://github.com/hoodiehq/hoodie.git"
   },
   "scripts": {
-    "semantic-release": "semantic-release pre && npm publish && semantic-release post",
+    "semantic-release": "semantic-release pre && ./bin/bundle.js && npm publish && semantic-release post",
     "test": "./bin/test"
   }
 }
