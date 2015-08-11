@@ -1,6 +1,7 @@
 {
   "name": "hoodie-server",
   "description": "The core of the Hoodie backend",
+  "version": "5.0.0",
   "author": "The Hoodie Community",
   "bugs": {
     "url": "https://github.com/hoodiehq/hoodie-server/issues"
@@ -28,6 +29,7 @@
     "wreck": "^6.0.0"
   },
   "devDependencies": {
+    "@hoodie/bundle-bump-bot": "^1.0.0",
     "@hoodie/ci-results": "^1.0.0",
     "bl": "^1.0.0",
     "coveralls": "^2.11.3",
@@ -73,6 +75,7 @@
   "scripts": {
     "coverage": "nyc report",
     "coverage:upload": "npm run -s coverage -- --reporter=text-lcov | coveralls",
+    "postsemantic-release": "bundle-bump-bot",
     "pretest": "standard",
     "semantic-release": "semantic-release pre && npm publish && semantic-release post",
     "start": "bin/start",
