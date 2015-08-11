@@ -28,6 +28,7 @@
     "hoodie-server": "^5.0.0"
   },
   "devDependencies": {
+    "grunt-cli": "^0.1.13",
     "hoodie-integration-test": "^1.0.9",
     "hoodie-plugin-test": "^1.0.0",
     "mkdirp": "^0.5.1",
