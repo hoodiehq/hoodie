@@ -59,7 +59,7 @@ Please note that you need to run a Selenium Standalone Server if you're running 
 
 `java -jar selenium-server-standalone-2.46.0.jar`
 
-Once Selenium is running you can execute `npm test` in another branch
+Once Selenium is running you can execute `npm test` in another terminal tab.
 
 ## License
 
