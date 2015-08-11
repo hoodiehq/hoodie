@@ -10,7 +10,6 @@
     "browserify": "^11.0.0",
     "bytes": "^2.1.0",
     "cli-color": "^1.0.0",
-    "couchr": "0.0.16",
     "dataurl": "0.1.0",
     "follow": "^0.12.1",
     "hapi": "^8.6.1",

@@ -4,8 +4,8 @@ var url = require('url')
 
 var _ = require('lodash')
 var async = require('async')
-var couchr = require('couchr')
 var moment = require('moment')
+var request = require('request').defaults({json: true})
 
 var PluginAPI = require('../../../../lib/plugins/api').PluginAPI
 var utils = require('./lib/utils')
@@ -39,9 +39,9 @@ exports.setUp = function (callback) {
       config: {foo: 'bar'}
     }
     async.series([
-      async.apply(couchr.put, url.resolve(base, 'plugins')),
-      async.apply(couchr.put, url.resolve(base, 'app')),
-      async.apply(couchr.put, url.resolve(base, 'app/config'), appconfig)
+      async.apply(request.put, url.resolve(base, 'plugins')),
+      async.apply(request.put, url.resolve(base, 'app')),
+      async.apply(request.put, url.resolve(base, 'app/config'), {body: appconfig})
     ],
       callback)
   })
@@ -513,13 +513,13 @@ exports['config.set / config.get'] = function (test) {
     var myplugin_url = hoodie._resolve('plugins/plugin%2Fmyplugin')
     var otherplugin_url = hoodie._resolve('plugins/plugin%2Fotherplugin')
 
-    couchr.get(myplugin_url, function (err, doc) {
+    request.get(myplugin_url, function (err, res, doc) {
       if (err) {
         return test.done(err)
       }
       test.equal(doc.config.foo, 'baz')
-      couchr.get(otherplugin_url, function (err) {
-        test.same(err.error, 'not_found')
+      request.get(otherplugin_url, function (err, res) {
+        test.same(res.statusCode, 404)
         test.done()
       })
     })
@@ -602,7 +602,7 @@ exports['new databases are only accessible to _admin users'] = function (test) {
     if (err) {
       return test.done(err)
     }
-    couchr.get(COUCH.url + '/foo/_all_docs', function (err, body, res) {
+    request.get(COUCH.url + '/foo/_all_docs', function (err, res) {
       test.equal(res.statusCode, 401)
       test.done()
     })
@@ -634,21 +634,21 @@ exports['db.grantWriteAccess / db.revokeWriteAccess'] = function (test) {
     }
     var tasks = [
       async.apply(hoodie.account.add, 'user', userdoc),
-      async.apply(couchr.get, db_url + '/_all_docs'),
+      async.apply(request.get, db_url + '/_all_docs'),
       async.apply(db.grantWriteAccess, 'user', 'testuser'),
-      async.apply(couchr.get, db_url + '/_all_docs'),
-      async.apply(couchr.put, db_url + '/some_doc', {data: {asdf: 123}}),
+      async.apply(request.get, db_url + '/_all_docs'),
+      async.apply(request.put, db_url + '/some_doc', {body: {asdf: 123}}),
       async.apply(db.revokeWriteAccess, 'user', 'testuser'),
-      async.apply(couchr.get, db_url + '/_all_docs'),
-      async.apply(couchr.put, db_url + '/some_doc2', {data: {asdf: 123}})
+      async.apply(request.get, db_url + '/_all_docs'),
+      async.apply(request.put, db_url + '/some_doc2', {body: {asdf: 123}})
     ]
     async.series(tasks.map(ignoreErrs), function (err, results) {
-      test.equal(results[1][1].statusCode, 401)
-      test.equal(results[3][1].statusCode, 200)
-      test.equal(results[4][1].statusCode, 201)
+      test.equal(results[1][0].statusCode, 401)
+      test.equal(results[3][0].statusCode, 200)
+      test.equal(results[4][0].statusCode, 201)
       // after revoke - cannot write but can still read!
-      test.equal(results[6][1].statusCode, 200)
-      test.equal(results[7][1].statusCode, 401)
+      test.equal(results[6][0].statusCode, 200)
+      test.equal(results[7][0].statusCode, 401)
       test.done()
     })
   })
@@ -679,21 +679,21 @@ exports['db.grantReadAccess / revokeReadAccess for specific users'] = function (
     }
     var tasks = [
       async.apply(hoodie.account.add, 'user', userdoc),
-      async.apply(couchr.get, db_url + '/_all_docs'),
+      async.apply(request.get, db_url + '/_all_docs'),
       async.apply(db.grantReadAccess, 'user', 'testuser'),
-      async.apply(couchr.get, db_url + '/_all_docs'),
-      async.apply(couchr.put, db_url + '/some_doc', {data: {asdf: 123}}),
+      async.apply(request.get, db_url + '/_all_docs'),
+      async.apply(request.put, db_url + '/some_doc', {body: {asdf: 123}}),
       async.apply(db.revokeReadAccess, 'user', 'testuser'),
-      async.apply(couchr.get, db_url + '/_all_docs'),
-      async.apply(couchr.put, db_url + '/some_doc2', {data: {asdf: 123}})
+      async.apply(request.get, db_url + '/_all_docs'),
+      async.apply(request.put, db_url + '/some_doc2', {body: {asdf: 123}})
     ]
     async.series(tasks.map(ignoreErrs), function (err, results) {
-      test.equal(results[1][1].statusCode, 401)
-      test.equal(results[3][1].statusCode, 200)
-      test.equal(results[4][1].statusCode, 401)
+      test.equal(results[1][0].statusCode, 401)
+      test.equal(results[3][0].statusCode, 200)
+      test.equal(results[4][0].statusCode, 401)
       // after revoke
-      test.equal(results[6][1].statusCode, 401)
-      test.equal(results[7][1].statusCode, 401)
+      test.equal(results[6][0].statusCode, 401)
+      test.equal(results[7][0].statusCode, 401)
       test.done()
     })
   })
@@ -724,21 +724,21 @@ exports['db.revokeReadAccess for a user with write access'] = function (test) {
     }
     var tasks = [
       async.apply(hoodie.account.add, 'user', userdoc),
-      async.apply(couchr.get, db_url + '/_all_docs'),
+      async.apply(request.get, db_url + '/_all_docs'),
       async.apply(db.grantWriteAccess, 'user', 'testuser'),
-      async.apply(couchr.get, db_url + '/_all_docs'),
-      async.apply(couchr.put, db_url + '/some_doc', {data: {asdf: 123}}),
+      async.apply(request.get, db_url + '/_all_docs'),
+      async.apply(request.put, db_url + '/some_doc', {body: {asdf: 123}}),
       async.apply(db.revokeReadAccess, 'user', 'testuser'),
-      async.apply(couchr.get, db_url + '/_all_docs'),
-      async.apply(couchr.put, db_url + '/some_doc2', {data: {asdf: 123}})
+      async.apply(request.get, db_url + '/_all_docs'),
+      async.apply(request.put, db_url + '/some_doc2', {body: {asdf: 123}})
     ]
     async.series(tasks.map(ignoreErrs), function (err, results) {
-      test.equal(results[1][1].statusCode, 401)
-      test.equal(results[3][1].statusCode, 200)
-      test.equal(results[4][1].statusCode, 201)
+      test.equal(results[1][0].statusCode, 401)
+      test.equal(results[3][0].statusCode, 200)
+      test.equal(results[4][0].statusCode, 201)
       // after revoke - user cannot read or write
-      test.equal(results[6][1].statusCode, 401)
-      test.equal(results[7][1].statusCode, 401)
+      test.equal(results[6][0].statusCode, 401)
+      test.equal(results[7][0].statusCode, 401)
       test.done()
     })
   })
@@ -769,7 +769,7 @@ exports['db.grantPublicReadAccess / revokePublicReadAccess'] = function (test) {
         })
       }
     }
-    var opt = {data: {asdf: 123}}
+    var opt = {body: {asdf: 123}}
     var userdoc1 = {
       id: 'testuser1',
       password: 'testing'
@@ -783,34 +783,34 @@ exports['db.grantPublicReadAccess / revokePublicReadAccess'] = function (test) {
       async.apply(hoodie.account.add, 'user', userdoc2),
       async.apply(db.grantWriteAccess, 'user', 'testuser1'),
       db.grantPublicReadAccess,
-      async.apply(couchr.get, db_url_testuser1 + '/_all_docs'),
-      async.apply(couchr.put, db_url_testuser1 + '/some_doc', opt),
-      async.apply(couchr.get, db_url_testuser2 + '/_all_docs'),
-      async.apply(couchr.put, db_url_testuser2 + '/some_doc2', opt),
-      async.apply(couchr.get, db_url + '/_all_docs'),
-      async.apply(couchr.put, db_url + '/some_doc3', opt),
+      async.apply(request.get, db_url_testuser1 + '/_all_docs'),
+      async.apply(request.put, db_url_testuser1 + '/some_doc', opt),
+      async.apply(request.get, db_url_testuser2 + '/_all_docs'),
+      async.apply(request.put, db_url_testuser2 + '/some_doc2', opt),
+      async.apply(request.get, db_url + '/_all_docs'),
+      async.apply(request.put, db_url + '/some_doc3', opt),
       db.revokePublicReadAccess,
-      async.apply(couchr.get, db_url_testuser1 + '/_all_docs'),
-      async.apply(couchr.put, db_url_testuser1 + '/some_doc4', opt),
-      async.apply(couchr.get, db_url_testuser2 + '/_all_docs'),
-      async.apply(couchr.put, db_url_testuser2 + '/some_doc5', opt),
-      async.apply(couchr.get, db_url + '/_all_docs'),
-      async.apply(couchr.put, db_url + '/some_doc6', opt)
+      async.apply(request.get, db_url_testuser1 + '/_all_docs'),
+      async.apply(request.put, db_url_testuser1 + '/some_doc4', opt),
+      async.apply(request.get, db_url_testuser2 + '/_all_docs'),
+      async.apply(request.put, db_url_testuser2 + '/some_doc5', opt),
+      async.apply(request.get, db_url + '/_all_docs'),
+      async.apply(request.put, db_url + '/some_doc6', opt)
     ]
     async.series(tasks.map(ignoreErrs), function (err, results) {
-      test.equal(results[4][1].statusCode, 200) // testuser1 read
-      test.equal(results[5][1].statusCode, 201) // testuser1 write
-      test.equal(results[6][1].statusCode, 200) // testuser2 read
-      test.equal(results[7][1].statusCode, 401) // testuser2 write
-      test.equal(results[8][1].statusCode, 200) // anonyous read
-      test.equal(results[9][1].statusCode, 401) // anonymous write
+      test.equal(results[4][0].statusCode, 200) // testuser1 read
+      test.equal(results[5][0].statusCode, 201) // testuser1 write
+      test.equal(results[6][0].statusCode, 200) // testuser2 read
+      test.equal(results[7][0].statusCode, 401) // testuser2 write
+      test.equal(results[8][0].statusCode, 200) // anonyous read
+      test.equal(results[9][0].statusCode, 401) // anonymous write
       // after revoke - testuser1 retains original permisisons
-      test.equal(results[11][1].statusCode, 200) // testuser1 read
-      test.equal(results[12][1].statusCode, 201) // testuser1 write
-      test.equal(results[13][1].statusCode, 401) // testuser2 read
-      test.equal(results[14][1].statusCode, 401) // testuesr2 write
-      test.equal(results[15][1].statusCode, 401) // anonymous read
-      test.equal(results[16][1].statusCode, 401) // anonymous write
+      test.equal(results[11][0].statusCode, 200) // testuser1 read
+      test.equal(results[12][0].statusCode, 201) // testuser1 write
+      test.equal(results[13][0].statusCode, 401) // testuser2 read
+      test.equal(results[14][0].statusCode, 401) // testuesr2 write
+      test.equal(results[15][0].statusCode, 401) // anonymous read
+      test.equal(results[16][0].statusCode, 401) // anonymous write
       test.done()
     })
   })
@@ -841,7 +841,7 @@ exports['db.grantPublicWriteAccess / revokePublicWriteAccess'] = function (test)
         })
       }
     }
-    var opt = {data: {asdf: 123}}
+    var opt = {body: {asdf: 123}}
     var userdoc1 = {
       id: 'testuser1',
       password: 'testing'
@@ -855,34 +855,34 @@ exports['db.grantPublicWriteAccess / revokePublicWriteAccess'] = function (test)
       async.apply(hoodie.account.add, 'user', userdoc2),
       async.apply(db.grantWriteAccess, 'user', 'testuser1'),
       db.grantPublicWriteAccess,
-      async.apply(couchr.get, db_url_testuser1 + '/_all_docs'),
-      async.apply(couchr.put, db_url_testuser1 + '/some_doc1', opt),
-      async.apply(couchr.get, db_url_testuser2 + '/_all_docs'),
-      async.apply(couchr.put, db_url_testuser2 + '/some_doc2', opt),
-      async.apply(couchr.get, db_url + '/_all_docs'),
-      async.apply(couchr.put, db_url + '/some_doc3', opt),
+      async.apply(request.get, db_url_testuser1 + '/_all_docs'),
+      async.apply(request.put, db_url_testuser1 + '/some_doc1', opt),
+      async.apply(request.get, db_url_testuser2 + '/_all_docs'),
+      async.apply(request.put, db_url_testuser2 + '/some_doc2', opt),
+      async.apply(request.get, db_url + '/_all_docs'),
+      async.apply(request.put, db_url + '/some_doc3', opt),
       db.revokePublicWriteAccess,
-      async.apply(couchr.get, db_url_testuser1 + '/_all_docs'),
-      async.apply(couchr.put, db_url_testuser1 + '/some_doc4', opt),
-      async.apply(couchr.get, db_url_testuser2 + '/_all_docs'),
-      async.apply(couchr.put, db_url_testuser2 + '/some_doc5', opt),
-      async.apply(couchr.get, db_url + '/_all_docs'),
-      async.apply(couchr.put, db_url + '/some_doc6', opt)
+      async.apply(request.get, db_url_testuser1 + '/_all_docs'),
+      async.apply(request.put, db_url_testuser1 + '/some_doc4', opt),
+      async.apply(request.get, db_url_testuser2 + '/_all_docs'),
+      async.apply(request.put, db_url_testuser2 + '/some_doc5', opt),
+      async.apply(request.get, db_url + '/_all_docs'),
+      async.apply(request.put, db_url + '/some_doc6', opt)
     ]
     async.series(tasks.map(ignoreErrs), function (err, results) {
-      test.equal(results[4][1].statusCode, 200) // testuser1 read
-      test.equal(results[5][1].statusCode, 201) // testuser1 write
-      test.equal(results[6][1].statusCode, 200) // testuser2 read
-      test.equal(results[7][1].statusCode, 201) // testuser2 write
-      test.equal(results[8][1].statusCode, 200) // anonyous read
-      test.equal(results[9][1].statusCode, 201) // anonymous write
+      test.equal(results[4][0].statusCode, 200) // testuser1 read
+      test.equal(results[5][0].statusCode, 201) // testuser1 write
+      test.equal(results[6][0].statusCode, 200) // testuser2 read
+      test.equal(results[7][0].statusCode, 201) // testuser2 write
+      test.equal(results[8][0].statusCode, 200) // anonyous read
+      test.equal(results[9][0].statusCode, 201) // anonymous write
       // after revoke - testuser1 retains original permisisons
-      test.equal(results[11][1].statusCode, 200) // testuser1 read
-      test.equal(results[12][1].statusCode, 201) // testuser1 write
-      test.equal(results[13][1].statusCode, 200) // testuser2 read
-      test.equal(results[14][1].statusCode, 401) // testuesr2 write
-      test.equal(results[15][1].statusCode, 200) // anonymous read
-      test.equal(results[16][1].statusCode, 401) // anonymous write
+      test.equal(results[11][0].statusCode, 200) // testuser1 read
+      test.equal(results[12][0].statusCode, 201) // testuser1 write
+      test.equal(results[13][0].statusCode, 200) // testuser2 read
+      test.equal(results[14][0].statusCode, 401) // testuesr2 write
+      test.equal(results[15][0].statusCode, 200) // anonymous read
+      test.equal(results[16][0].statusCode, 401) // anonymous write
       test.done()
     })
   })
@@ -913,7 +913,7 @@ exports['db.revokePublicReadAccess should also revoke public write access'] = fu
         })
       }
     }
-    var opt = {data: {asdf: 123}}
+    var opt = {body: {asdf: 123}}
     var userdoc1 = {
       id: 'testuser1',
       password: 'testing'
@@ -927,34 +927,34 @@ exports['db.revokePublicReadAccess should also revoke public write access'] = fu
       async.apply(hoodie.account.add, 'user', userdoc2),
       async.apply(db.grantReadAccess, 'user', 'testuser1'),
       db.grantPublicWriteAccess,
-      async.apply(couchr.get, db_url_testuser1 + '/_all_docs'),
-      async.apply(couchr.put, db_url_testuser1 + '/some_doc1', opt),
-      async.apply(couchr.get, db_url_testuser2 + '/_all_docs'),
-      async.apply(couchr.put, db_url_testuser2 + '/some_doc2', opt),
-      async.apply(couchr.get, db_url + '/_all_docs'),
-      async.apply(couchr.put, db_url + '/some_doc3', opt),
+      async.apply(request.get, db_url_testuser1 + '/_all_docs'),
+      async.apply(request.put, db_url_testuser1 + '/some_doc1', opt),
+      async.apply(request.get, db_url_testuser2 + '/_all_docs'),
+      async.apply(request.put, db_url_testuser2 + '/some_doc2', opt),
+      async.apply(request.get, db_url + '/_all_docs'),
+      async.apply(request.put, db_url + '/some_doc3', opt),
       db.revokePublicReadAccess,
-      async.apply(couchr.get, db_url_testuser1 + '/_all_docs'),
-      async.apply(couchr.put, db_url_testuser1 + '/some_doc4', opt),
-      async.apply(couchr.get, db_url_testuser2 + '/_all_docs'),
-      async.apply(couchr.put, db_url_testuser2 + '/some_doc5', opt),
-      async.apply(couchr.get, db_url + '/_all_docs'),
-      async.apply(couchr.put, db_url + '/some_doc6', opt)
+      async.apply(request.get, db_url_testuser1 + '/_all_docs'),
+      async.apply(request.put, db_url_testuser1 + '/some_doc4', opt),
+      async.apply(request.get, db_url_testuser2 + '/_all_docs'),
+      async.apply(request.put, db_url_testuser2 + '/some_doc5', opt),
+      async.apply(request.get, db_url + '/_all_docs'),
+      async.apply(request.put, db_url + '/some_doc6', opt)
     ]
     async.series(tasks.map(ignoreErrs), function (err, results) {
-      test.equal(results[4][1].statusCode, 200) // testuser1 read
-      test.equal(results[5][1].statusCode, 201) // testuser1 write
-      test.equal(results[6][1].statusCode, 200) // testuser2 read
-      test.equal(results[7][1].statusCode, 201) // testuser2 write
-      test.equal(results[8][1].statusCode, 200) // anonyous read
-      test.equal(results[9][1].statusCode, 201) // anonymous write
+      test.equal(results[4][0].statusCode, 200) // testuser1 read
+      test.equal(results[5][0].statusCode, 201) // testuser1 write
+      test.equal(results[6][0].statusCode, 200) // testuser2 read
+      test.equal(results[7][0].statusCode, 201) // testuser2 write
+      test.equal(results[8][0].statusCode, 200) // anonyous read
+      test.equal(results[9][0].statusCode, 201) // anonymous write
       // after revoke - testuser1 retains original permisisons
-      test.equal(results[11][1].statusCode, 200) // testuser1 read
-      test.equal(results[12][1].statusCode, 401) // testuser1 write
-      test.equal(results[13][1].statusCode, 401) // testuser2 read
-      test.equal(results[14][1].statusCode, 401) // testuesr2 write
-      test.equal(results[15][1].statusCode, 401) // anonymous read
-      test.equal(results[16][1].statusCode, 401) // anonymous write
+      test.equal(results[11][0].statusCode, 200) // testuser1 read
+      test.equal(results[12][0].statusCode, 401) // testuser1 write
+      test.equal(results[13][0].statusCode, 401) // testuser2 read
+      test.equal(results[14][0].statusCode, 401) // testuesr2 write
+      test.equal(results[15][0].statusCode, 401) // anonymous read
+      test.equal(results[16][0].statusCode, 401) // anonymous write
       test.done()
     })
   })
@@ -1063,16 +1063,16 @@ exports['db.remove: access doc properties on delete change'] = function (test) {
     async.apply(hoodie.database('foo').add, 'mytype', doc),
     async.apply(hoodie.database('foo').remove, 'mytype', doc.id),
     async.apply(
-      couchr.get,
+      request.get,
       hoodie._resolve('/foo/_changes'),
-      {include_docs: true}
+      {qs: {include_docs: true}}
     ),
     async.apply(hoodie.database.remove, 'foo')
   ], function (err, results) {
     if (err) {
       return test.done(err)
     }
-    var change = results[3][0].results[1]
+    var change = results[3][1].results[1]
     delete change.doc._rev
     delete change.doc.createdAt
     test.same(change.doc, {
