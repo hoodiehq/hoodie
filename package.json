@@ -63,6 +63,9 @@
   "publishConfig": {
     "tag": "next"
   },
+  "release": {
+    "branch": "next"
+  },
   "repository": {
     "type": "git",
     "url": "https://github.com/hoodiehq/hoodie-server.git"
