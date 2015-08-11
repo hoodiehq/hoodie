@@ -33,7 +33,8 @@
     "hoodie-plugin-test": "^1.0.0",
     "mkdirp": "^0.5.1",
     "my-first-hoodie": "^3.2.1",
-    "rimraf": "^2.4.2"
+    "rimraf": "^2.4.2",
+    "semantic-release": "^4.0.3"
   },
   "homepage": "https://github.com/hoodiehq/hoodie#readme",
   "hoodie": {
@@ -50,11 +51,15 @@
     "offline-first"
   ],
   "license": "Apache-2.0",
+  "publishConfig": {
+    "access": "public"
+  },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/hoodiehq/hoodie.git"
+    "url": "https://github.com/hoodiehq/hoodie.git"
   },
   "scripts": {
+    "semantic-release": "semantic-release pre && npm publish && semantic-release post",
     "test": "./bin/test"
   }
 }
