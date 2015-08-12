@@ -6,7 +6,7 @@ var app = require('../../lib/index')
 require('tap').mochaGlobals()
 describe('Application', function () {
   it('should expose n number of properties', function () {
-    expect(_.size(app)).to.eql(2)
+    expect(_.size(app)).to.eql(3)
   })
 
   it('should have a init property', function () {
@@ -15,5 +15,9 @@ describe('Application', function () {
 
   it('should have a start property', function () {
     expect(app).to.have.property('start')
+  })
+
+  it('should have a configureServer property', function () {
+    expect(app).to.have.property('configureServer')
   })
 })

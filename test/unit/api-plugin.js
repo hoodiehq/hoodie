@@ -3,8 +3,8 @@ var Events = require('events')
 var expect = require('expect.js')
 var Wreck = require('wreck')
 
-var plugin = require('../../lib/server/hapi_plugins/api')
-var pluginInternals = require('../../lib/server/hapi_plugins/api/internals')
+var plugin = require('../../lib/hapi_plugins/api')
+var pluginInternals = require('../../lib/hapi_plugins/api/internals')
 
 require('tap').mochaGlobals()
 describe('api plugin', function () {

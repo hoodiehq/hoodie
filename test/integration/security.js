@@ -7,25 +7,24 @@ var test = require('tap').test
 
 var app = require('../../lib/index')
 var configStore = require('../../lib/core/config_store')
-var environment = require('../../lib/core/environment')
+var config = require('../../lib/core/config')
 var utils = require('../lib/utils')
 
 var startServerTest = require('../lib/start-server-test')
-var config = require('../lib/config')
 
-startServerTest(test, 'block _all_dbs', config, function (t, end) {
+startServerTest(test, 'block _all_dbs', function (t, env_config, end) {
   t.test('should 404 on /_api/_all_dbs', function (tt) {
-    request.get(config.url + '/_api/_all_dbs', function (error, res) {
+    request.get(env_config.www_link + '/_api/_all_dbs', function (error, res) {
       tt.error(error)
       tt.is(res.statusCode, 404)
       tt.end()
     })
   })
   t.test('should log into admin', function (tt) {
-    request.post(config.url + '/_api/_session', {
+    request.post(env_config.www_link + '/_api/_session', {
       form: {
         name: 'admin',
-        password: config.admin_password
+        password: env_config.admin_password
       }
     }, function (error, res, data) {
       tt.error(error)
@@ -35,12 +34,10 @@ startServerTest(test, 'block _all_dbs', config, function (t, end) {
   })
   t.test('check config dbs are private to admin', function (tt) {
     var projectDir = path.resolve(__dirname, '../lib/fixtures/project1')
-    var cfg = environment.getConfig(
-      process.platform, // platform
-      process.env,     // environment vars
-      projectDir,     // project directory
-      []             // command-line arguments
-    )
+    var cfg = config({
+      cwd: projectDir
+    })
+
     cfg.admin_password = 'testing'
     console.log(cfg.couch.url)
 

@@ -1,13 +1,6 @@
 #!/usr/bin/env node
 
-/**
- * Dependencies
- */
-
-var environment = require('../lib/core/environment')
-var hconsole = require('../lib/utils/hconsole')
 var app = require('../lib')
-
 
 // parse command-line arguments
 var argv = require('optimist')
@@ -24,31 +17,26 @@ var argv = require('optimist')
   .describe('debug', 'Shows hapi internal debug output')
   .argv
 
+
+if (require.main !== module) return
+
 /**
  * Start a Hoodie server configured for the current
  * platform and environment
  */
 
-if (require.main === module) {
-
-  var env_config = environment.getConfig(
-    process.platform,   // platform
-    process.env,        // environment vars
-    process.cwd(),      // project directory
-    argv                // command-line arguments
-  )
-
-  if (argv.help) {
-    // show usage information
-    return require('optimist').showHelp()
-  }
-
-  app.start(env_config, function (err) {
-    if (err) {
-      hconsole.error(err)
-      process.exit(1)
-    }
-    // line break before logs
-    console.log('')
-  })
+if (argv.help) {
+  return require('optimist').showHelp()
 }
+
+console.log('Initializing Hoodie')
+app.start({
+  argv: argv
+}, function (err, server, env_config) {
+  if (err) return console.error(err)
+
+  server.start(function () {
+    console.log('WWW:   ', env_config.www_link)
+    console.log('Admin: ', env_config.admin_link)
+  })
+})
