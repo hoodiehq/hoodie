@@ -39,7 +39,6 @@ startServerTest(test, 'block _all_dbs', function (t, env_config, end) {
     })
 
     cfg.admin_password = 'testing'
-    console.log(cfg.couch.url)
 
     utils.resetFixture(projectDir, function (error) {
       if (error) throw error

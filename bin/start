@@ -29,15 +29,15 @@ if (argv.help) {
   return require('optimist').showHelp()
 }
 
-console.log('Initializing Hoodie')
+console.error('Initializing Hoodie')
 app.start({
   argv: argv
 }, function (err, server, env_config) {
   if (err) return console.error(err)
 
   server.start(function () {
-    console.log('WWW:     ', env_config.www_link)
-    console.log('Admin:   ', env_config.admin_link)
-    console.log('CouchDB: ', env_config.couch.url)
+    console.error('WWW:     ', env_config.www_link)
+    console.error('Admin:   ', env_config.admin_link)
+    console.error('CouchDB: ', env_config.couch.url)
   })
 })
