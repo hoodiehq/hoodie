@@ -16,7 +16,7 @@
     "hoodie-plugin-appconfig": "^2.0.1",
     "hoodie-plugin-email": "^1.0.0",
     "hoodie-plugin-users": "^2.2.2",
-    "hoodie-server": "5.0.4"
+    "hoodie-server": "5.0.5"
   },
   "devDependencies": {
     "grunt-cli": "^0.1.13",
