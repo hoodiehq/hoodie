@@ -1,6 +1,16 @@
-![The Low-Profile Dog Hoodie Mascot](https://avatars1.githubusercontent.com/u/1888826?v=3&s=200)
-
 # Welcome to Hoodie 🎉
+
+<img src="https://avatars1.githubusercontent.com/u/1888826?v=3&s=200"
+ alt="The Low-Profile Dog Hoodie Mascot" title="The Low-Profile Dog Hoodie Mascot" align="right" />
+
+> A very promising open-source library for building offline-first apps.
+> — Smashing Magazine 
+
+> The Hoodie team is one of the nicest and welcoming that I’ve ever known.
+> — Katrin Apel 
+
+> ❤ Hood.ie - a fast offline-first architecture for webapps. Super-simple user management & storage. Great for mobile.
+> — Addy Osmani 
 
 [![Join our Chat](https://img.shields.io/badge/Chat-IRC%20or%20Slack-blue.svg)](http://hood.ie/chat)
 [![js-standard-style](https://img.shields.io/badge/code%20style-standard-brightgreen.svg?style=flat)](https://github.com/feross/standard)
