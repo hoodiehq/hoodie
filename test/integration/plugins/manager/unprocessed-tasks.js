@@ -1,22 +1,17 @@
 var async = require('async')
-var request = require('request')
+var request = require('request').defaults({json: true})
 var test = require('tap').test
 
 var OPTS = require('./lib/default-options')
 var pluginsManager = require('../../../../lib/plugins/manager')
 
 function postDoc (url, doc, cb) {
-  request.post(url, {
-    headers: {
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify(doc)
-  }, cb)
+  request.post(url, {body: doc}, cb)
 }
 
 test('unprocessed tasks should be handled on addSource', function (t) {
   var dburl = OPTS.base_url + '/testdb2'
-  request.put(dburl, {body: JSON.stringify({name: 'testdb2'})}, function (error, res) {
+  request.put(dburl, {body: {name: 'testdb2'}}, function (error, res) {
     if (error) throw error
     t.is(res.statusCode, 201, 'HTTP status code')
     var names = ['foo', 'bar', 'baz']

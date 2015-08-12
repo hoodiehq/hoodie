@@ -1,4 +1,4 @@
-var request = require('request')
+var request = require('request').defaults({json: true})
 var test = require('tap').test
 
 var OPTS = require('./lib/default-options')
@@ -12,7 +12,7 @@ test('automatically update plugin config', function (t) {
     t.is(hoodie.config.get('foo'), 'wibble')
 
     var url = hoodie._resolve('plugins/plugin%2Fmyplugin')
-    var doc = JSON.stringify({config: {foo: 'wibble2'}})
+    var doc = {config: {foo: 'wibble2'}}
     setTimeout(function () {
       request.put(url, {body: doc}, function (error, res) {
         if (error) throw error

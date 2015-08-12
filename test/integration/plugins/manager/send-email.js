@@ -1,5 +1,5 @@
 var nodemailer = require('nodemailer')
-var request = require('request')
+var request = require('request').defaults({json: true})
 var test = require('tap').test
 
 var OPTS = require('./lib/default-options')
@@ -47,11 +47,10 @@ test('sendEmail function', function (t) {
       }
       var url = hoodie._resolve('app/config')
 
-      request.get(url, function (error, res, data) {
+      request.get(url, function (error, res, doc) {
         if (error) throw error
-        var doc = JSON.parse(data)
         doc.config = appcfg
-        request.put(url, {body: JSON.stringify(doc)}, function (error) {
+        request.put(url, {body: doc}, function (error) {
           if (error) throw error
           setTimeout(function () {
             hoodie.sendEmail(email, function () {

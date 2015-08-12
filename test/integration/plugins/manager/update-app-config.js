@@ -1,4 +1,4 @@
-var request = require('request')
+var request = require('request').defaults({json: true})
 var test = require('tap').test
 
 var OPTS = require('./lib/default-options')
@@ -13,11 +13,10 @@ test('automatically update app config', function (t) {
 
     var url = hoodie._resolve('app/config')
     setTimeout(function () {
-      request.get(url, function (error, res, data) {
+      request.get(url, function (error, res, doc) {
         if (error) throw error
-        var doc = JSON.parse(data)
         doc.config.foo = 'wibble'
-        request.put(url, {body: JSON.stringify(doc)}, function (error) {
+        request.put(url, {body: doc}, function (error) {
           if (error) throw error
           // test that couchdb change event causes config to update
           setTimeout(function () {
