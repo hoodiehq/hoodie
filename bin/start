@@ -36,7 +36,8 @@ app.start({
   if (err) return console.error(err)
 
   server.start(function () {
-    console.log('WWW:   ', env_config.www_link)
-    console.log('Admin: ', env_config.admin_link)
+    console.log('WWW:     ', env_config.www_link)
+    console.log('Admin:   ', env_config.admin_link)
+    console.log('CouchDB: ', env_config.couch.url)
   })
 })
