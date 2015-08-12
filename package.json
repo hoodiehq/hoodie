@@ -10,6 +10,7 @@
     "async": "^1.4.0",
     "browserify": "^11.0.0",
     "bytes": "^2.1.0",
+    "char-spinner": "^1.0.1",
     "cli-color": "^1.0.0",
     "dataurl": "0.1.0",
     "follow": "^0.12.1",

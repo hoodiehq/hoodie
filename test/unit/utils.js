@@ -6,7 +6,7 @@ var utils = require('../../lib/utils')
 require('tap').mochaGlobals()
 describe('utils', function () {
   it('should expose n number of properties', function () {
-    expect(_.size(utils)).to.eql(6)
+    expect(_.size(utils)).to.eql(5)
   })
 
   it('should have a generatePassword property', function () {
@@ -23,10 +23,6 @@ describe('utils', function () {
 
   it('should have a processSend property', function () {
     expect(utils).to.have.property('processSend')
-  })
-
-  it('should have a hconsole property', function () {
-    expect(utils).to.have.property('hconsole')
   })
 
   it('should have a showConfigPath property', function () {
