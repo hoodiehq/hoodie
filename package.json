@@ -33,7 +33,6 @@
     "@hoodie/ci-results": "^1.0.0",
     "bl": "^1.0.0",
     "coveralls": "^2.11.3",
-    "expect.js": "^0.3.1",
     "hoodie": "^2.1.1",
     "hoodie-admin-dashboard": "^2.0.0",
     "hoodie-admin-dashboard-uikit": "^3.0.0",
@@ -86,11 +85,5 @@
     "test:integration:core": "tap --no-cov ./test/integration/*.js",
     "test:integration:manager": "tap --no-cov ./test/integration/plugins/manager/*.js",
     "test:unit": "tap --no-cov ./test/unit/*.js"
-  },
-  "standard": {
-    "global": [
-      "describe",
-      "it"
-    ]
   }
 }
