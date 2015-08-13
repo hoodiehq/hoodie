@@ -8,10 +8,6 @@ var pluginInternals = require('../../lib/hapi_plugins/api/internals')
 
 require('tap').mochaGlobals()
 describe('api plugin', function () {
-  it('should expose n number of properties', function () {
-    expect(_.size(plugin)).to.eql(1)
-  })
-
   it('should export a register function', function () {
     expect(plugin.register).to.be.a(Function)
   })
