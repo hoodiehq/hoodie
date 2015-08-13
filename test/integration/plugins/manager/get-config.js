@@ -2,8 +2,10 @@ var request = require('request').defaults({json: true})
 var tap = require('tap')
 var test = tap.test
 
-var OPTS = require('./lib/default-options')
+var OPTS = require('../lib/default-options')
 var pluginsManager = require('../../../../lib/plugins/manager')
+
+require('../lib/setup-teardown')(tap)
 
 test('get config values from plugin manager', function (t) {
   var doc = {
@@ -11,7 +13,7 @@ test('get config values from plugin manager', function (t) {
       asdf: 123
     }
   }
-  request.put(OPTS.base_url + '/plugins/plugin%2Fmyplugin9', {body: doc}, function (error, res) {
+  request.put(OPTS.base_url + 'plugins/plugin%2Fmyplugin9', {body: doc}, function (error, res) {
     if (error) throw error
     t.is(res.statusCode, 201, 'HTTP status code')
     pluginsManager.start(OPTS, function (error, manager) {
@@ -21,7 +23,6 @@ test('get config values from plugin manager', function (t) {
       manager.stop(function (error) {
         t.error(error)
         t.end()
-        process.exit()
       })
     })
   })

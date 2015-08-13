@@ -2,8 +2,10 @@ var async = require('async')
 var tap = require('tap')
 var test = tap.test
 
-var OPTS = require('./lib/default-options')
+var OPTS = require('../lib/default-options')
 var pluginsManager = require('../../../../lib/plugins/manager')
+
+require('../lib/setup-teardown')(tap)
 
 test('changed docs passed to plugins can be modified', function (t) {
   pluginsManager.start(OPTS, function (error, manager) {
@@ -45,7 +47,6 @@ test('changed docs passed to plugins can be modified', function (t) {
           manager.stop(function (error) {
             if (error) throw error
             t.end()
-            process.exit()
           })
         }, 200)
       })

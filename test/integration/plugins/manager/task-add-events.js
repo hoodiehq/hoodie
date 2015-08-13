@@ -1,8 +1,10 @@
 var tap = require('tap')
 var test = tap.test
 
-var OPTS = require('./lib/default-options')
+var OPTS = require('../lib/default-options')
 var pluginsManager = require('../../../../lib/plugins/manager')
+
+require('../lib/setup-teardown')(tap)
 
 test('get config values from plugin manager', function (t) {
   t.plan(9)
@@ -28,7 +30,6 @@ test('get config values from plugin manager', function (t) {
           manager.stop(function (error) {
             t.error(error)
             t.end()
-            process.exit()
           })
         }, 200)
       })

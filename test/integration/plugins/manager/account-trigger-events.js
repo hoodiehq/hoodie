@@ -2,8 +2,10 @@ var async = require('async')
 var tap = require('tap')
 var test = tap.test
 
-var OPTS = require('./lib/default-options')
+var OPTS = require('../lib/default-options')
 var pluginsManager = require('../../../../lib/plugins/manager')
+
+require('../lib/setup-teardown')(tap)
 
 test('trigger account events in plugins', function (t) {
   pluginsManager.start(OPTS, function (error, manager) {
@@ -47,7 +49,6 @@ test('trigger account events in plugins', function (t) {
           manager.stop(function (error) {
             t.error(error)
             t.end()
-            process.exit()
           })
         }, 200)
       })

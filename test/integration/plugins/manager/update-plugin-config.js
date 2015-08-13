@@ -2,15 +2,17 @@ var request = require('request').defaults({json: true})
 var tap = require('tap')
 var test = tap.test
 
-var OPTS = require('./lib/default-options')
+var OPTS = require('../lib/default-options')
 var pluginsManager = require('../../../../lib/plugins/manager')
+
+require('../lib/setup-teardown')(tap)
 
 test('automatically update plugin config', function (t) {
   pluginsManager.start(OPTS, function (error, manager) {
     if (error) throw error
     var hoodie = manager.createAPI({name: 'myplugin'})
 
-    t.is(hoodie.config.get('foo'), 'wibble')
+    t.is(hoodie.config.get('foo'), 'bar')
 
     var url = hoodie._resolve('plugins/plugin%2Fmyplugin')
     var doc = {config: {foo: 'wibble2'}}
@@ -24,7 +26,6 @@ test('automatically update plugin config', function (t) {
           manager.stop(function (error) {
             t.error(error)
             t.end()
-            process.exit()
           })
         }, 200)
       })

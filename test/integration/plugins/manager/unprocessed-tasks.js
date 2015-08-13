@@ -3,15 +3,17 @@ var request = require('request').defaults({json: true})
 var tap = require('tap')
 var test = tap.test
 
-var OPTS = require('./lib/default-options')
+var OPTS = require('../lib/default-options')
 var pluginsManager = require('../../../../lib/plugins/manager')
 
 function postDoc (url, doc, cb) {
   request.post(url, {body: doc}, cb)
 }
 
+require('../lib/setup-teardown')(tap)
+
 test('unprocessed tasks should be handled on addSource', function (t) {
-  var dburl = OPTS.base_url + '/testdb2'
+  var dburl = OPTS.base_url + 'testdb2'
   request.put(dburl, {body: {name: 'testdb2'}}, function (error, res) {
     if (error) throw error
     t.is(res.statusCode, 201, 'HTTP status code')
@@ -69,7 +71,6 @@ test('unprocessed tasks should be handled on addSource', function (t) {
                 manager.stop(function (error) {
                   t.error(error)
                   t.end()
-                  process.exit()
                 })
               }, 10000)
             })

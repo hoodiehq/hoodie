@@ -2,8 +2,10 @@ var request = require('request').defaults({json: true})
 var tap = require('tap')
 var test = tap.test
 
-var OPTS = require('./lib/default-options')
+var OPTS = require('../lib/default-options')
 var pluginsManager = require('../../../../lib/plugins/manager')
+
+require('../lib/setup-teardown')(tap)
 
 test('automatically update app config', function (t) {
   pluginsManager.start(OPTS, function (error, manager) {
@@ -25,7 +27,6 @@ test('automatically update app config', function (t) {
             manager.stop(function (error) {
               t.error(error)
               t.end()
-              process.exit()
             })
           }, 200)
         })
