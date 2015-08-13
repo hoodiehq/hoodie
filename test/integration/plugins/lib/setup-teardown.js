@@ -27,7 +27,15 @@ module.exports = function (tap) {
 
     tt.test('database', function (t) {
       var appconfig = {
-        config: {foo: 'bar'}
+        config: {
+          foo: 'bar',
+          email_host: 'emailhost',
+          email_port: 465,
+          email_user: 'gmail.user@gmail.com',
+          email_pass: 'userpass',
+          email_secure: true,
+          email_service: 'Gmail'
+        }
       }
       async.series([
         async.apply(request.put, COUCH.url + '_config/admins/' + COUCH.user, {body: COUCH.pass}),

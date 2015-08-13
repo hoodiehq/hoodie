@@ -4,9 +4,9 @@ var test = tap.test
 
 var PluginAPI = require('../../../../lib/plugins/api').PluginAPI
 
-var DEFAULT_OPTIONS = require('./lib/default-options')
+var DEFAULT_OPTIONS = require('../lib/default-options')
 
-require('./lib/setup-teardown')(tap)
+require('../lib/setup-teardown')(tap)
 
 test('account.add / findAll / get / remove / update', function (t) {
   var hoodie = new PluginAPI(DEFAULT_OPTIONS)

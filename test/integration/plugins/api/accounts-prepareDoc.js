@@ -1,7 +1,7 @@
 var tap = require('tap')
 var test = tap.test
 
-require('./lib/setup-teardown')(tap)
+require('../lib/setup-teardown')(tap)
 
 test('accounts.prepareDoc', function (t) {
   var doc = {

@@ -4,9 +4,9 @@ var test = tap.test
 
 var PluginAPI = require('../../../../lib/plugins/api').PluginAPI
 
-var DEFAULT_OPTIONS = require('./lib/default-options')
+var DEFAULT_OPTIONS = require('../lib/default-options')
 
-require('./lib/setup-teardown')(tap)
+require('../lib/setup-teardown')(tap)
 
 test('pass sendEmail calls to plugins-manager', function (t) {
   t.plan(2)

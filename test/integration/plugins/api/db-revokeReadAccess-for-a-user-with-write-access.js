@@ -8,10 +8,10 @@ var test = tap.test
 
 var PluginAPI = require('../../../../lib/plugins/api').PluginAPI
 
-var DEFAULT_OPTIONS = require('./lib/default-options')
+var DEFAULT_OPTIONS = require('../lib/default-options')
 var COUCH = DEFAULT_OPTIONS.couchdb
 
-require('./lib/setup-teardown')(tap)
+require('../lib/setup-teardown')(tap)
 
 test('db.revokeReadAccess for a user with write access', function (t) {
   var hoodie = new PluginAPI(DEFAULT_OPTIONS)
