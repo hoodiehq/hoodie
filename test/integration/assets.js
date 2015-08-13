@@ -1,5 +1,6 @@
 var request = require('request')
-var test = require('tap').test
+var tap = require('tap')
+var test = tap.test
 
 var startServerTest = require('../lib/start-server-test')
 

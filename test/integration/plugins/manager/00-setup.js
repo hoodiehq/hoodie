@@ -4,7 +4,8 @@ var async = require('async')
 var mkdirp = require('mkdirp')
 var request = require('request').defaults({json: true})
 var rimraf = require('rimraf')
-var test = require('tap').test
+var tap = require('tap')
+var test = tap.test
 
 var OPTS = require('./lib/default-options')
 

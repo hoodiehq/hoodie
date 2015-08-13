@@ -1,6 +1,7 @@
 var async = require('async')
 var request = require('request').defaults({json: true})
-var test = require('tap').test
+var tap = require('tap')
+var test = tap.test
 
 var OPTS = require('./lib/default-options')
 var pluginsManager = require('../../../../lib/plugins/manager')

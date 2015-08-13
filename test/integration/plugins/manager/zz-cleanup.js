@@ -1,5 +1,6 @@
 var exec = require('child_process').exec
-var test = require('tap').test
+var tap = require('tap')
+var test = tap.test
 
 test('cleanup', function (t) {
   if (process.env.CI) return t.end()

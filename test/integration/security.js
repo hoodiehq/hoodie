@@ -3,7 +3,8 @@ var url = require('url')
 
 var async = require('async')
 var request = require('request')
-var test = require('tap').test
+var tap = require('tap')
+var test = tap.test
 
 var app = require('../../lib/index')
 var configStore = require('../../lib/core/config_store')
