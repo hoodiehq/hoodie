@@ -16,7 +16,7 @@ module.exports = function (tap) {
             file: false
           },
           httpd: {
-            port: 5984
+            port: 5985
           }
         }
       }, function (error, pouch) {

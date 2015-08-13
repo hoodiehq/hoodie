@@ -5,7 +5,7 @@ var OPTS = {
   couchdb: {
     user: 'admin',
     pass: 'password',
-    url: 'http://localhost:5984/'
+    url: 'http://localhost:5985/'
   },
   config: {
     app: {foo: 'bar'},
