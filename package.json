@@ -37,10 +37,10 @@
     "hoodie": "^2.1.1",
     "hoodie-admin-dashboard": "^2.0.0",
     "hoodie-admin-dashboard-uikit": "^3.0.0",
-    "nodeunit": "^0.9.1",
     "nyc": "^3.0.1",
     "rimraf": "^2.4.0",
     "semantic-release": "^4.0.0",
+    "spawn-pouchdb-server": "^2.1.0",
     "standard": "^5.0.0",
     "tap": "^1.3.2"
   },
@@ -82,7 +82,7 @@
     "test": "nyc npm run -s test:all",
     "test:all": "npm run -s test:unit && npm run -s test:integration",
     "test:integration": "npm run -s test:integration:core && npm run -s test:integration:manager && npm run -s test:integration:api",
-    "test:integration:api": "nodeunit ./test/integration/plugins/api/*.js",
+    "test:integration:api": "tap --no-cov ./test/integration/plugins/api/*.js",
     "test:integration:core": "tap --no-cov ./test/integration/*.js",
     "test:integration:manager": "tap --no-cov ./test/integration/plugins/manager/*.js",
     "test:unit": "tap --no-cov ./test/unit/*.js"
