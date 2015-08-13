@@ -34,34 +34,34 @@ test('trigger task events in plugins', function (t) {
         async.apply(db.update, '$mytask', 'asdf', {foo: 'bar'}),
         async.apply(db.remove, '$mytask', 'asdf')
       ],
-        function (error, results) {
-          if (error) throw error
-          // give it time to return in _changes feed
-          setTimeout(function () {
-            t.same(tasklist, [
-              'change test',
-              'mytask:change test',
-              'change test',
-              'mytask:change test',
-              'change deleted',
-              'mytask:change deleted'
-            ])
-            // task events should no longer fire from this db
-            hoodie.task.removeSource('user/foo')
-            tasklist = []
-            db.add('$othertask', doc, function () {
-              // give it time to return in _changes feed
-              setTimeout(function () {
-                t.same(tasklist, [])
-                manager.stop(function (error) {
-                  t.error(error)
-                  t.end()
-                  process.exit()
-                })
-              }, 200)
-            })
-          }, 2000)
-        })
+      function (error, results) {
+        if (error) throw error
+        // give it time to return in _changes feed
+        setTimeout(function () {
+          t.same(tasklist, [
+            'change test',
+            'mytask:change test',
+            'change test',
+            'mytask:change test',
+            'change deleted',
+            'mytask:change deleted'
+          ])
+          // task events should no longer fire from this db
+          hoodie.task.removeSource('user/foo')
+          tasklist = []
+          db.add('$othertask', doc, function () {
+            // give it time to return in _changes feed
+            setTimeout(function () {
+              t.same(tasklist, [])
+              manager.stop(function (error) {
+                t.error(error)
+                t.end()
+                process.exit()
+              })
+            }, 200)
+          })
+        }, 2000)
+      })
     })
   })
 })

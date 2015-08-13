@@ -16,7 +16,6 @@ test('get config values from plugin manager', function (t) {
     pluginsManager.start(OPTS, function (error, manager) {
       if (error) throw error
       var hoodie = manager.createAPI({name: 'myplugin9'})
-      t.is(hoodie.config.get('foo'), 'bar')
       t.is(hoodie.config.get('asdf'), 123)
       manager.stop(function (error) {
         t.error(error)

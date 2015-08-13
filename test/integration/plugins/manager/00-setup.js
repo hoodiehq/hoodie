@@ -2,7 +2,7 @@ var exec = require('child_process').exec
 
 var async = require('async')
 var mkdirp = require('mkdirp')
-var request = require('request')
+var request = require('request').defaults({json: true})
 var rimraf = require('rimraf')
 var test = require('tap').test
 
@@ -35,10 +35,10 @@ test('database', function (t) {
     }
   }
   async.series([
-    async.apply(request.put, OPTS.couchdb.url + '/_config/admins/' + OPTS.couchdb.user, {body: JSON.stringify(OPTS.couchdb.pass)}),
+    async.apply(request.put, OPTS.couchdb.url + '/_config/admins/' + OPTS.couchdb.user, {body: OPTS.couchdb.pass}),
     async.apply(request.put, OPTS.base_url + '/plugins'),
     async.apply(request.put, OPTS.base_url + '/app'),
-    async.apply(request.put, OPTS.base_url + '/app/config', {body: JSON.stringify(appconfig)})
+    async.apply(request.put, OPTS.base_url + '/app/config', {body: appconfig})
   ],
   function (error, results) {
     t.error(error)
