@@ -13,11 +13,11 @@ test('db.addPermission with existing doc', function (t) {
   var hoodie = new PluginAPI(DEFAULT_OPTIONS)
   var permission_fn = function (newDoc) {
     if (newDoc.type === 'notthis') {
-      throw {unauthorized: 'nope!'}
+      throw new Error('nope!')
     }
   }
   var permission_fn2 = function () {
-    throw {unauthorized: 'nope2!'}
+    throw new Error('nope!')
   }
   var doc = {
     id: 'bar',

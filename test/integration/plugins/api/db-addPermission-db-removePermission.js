@@ -13,7 +13,7 @@ test('db.addPermission / db.removePermission', function (t) {
   var hoodie = new PluginAPI(DEFAULT_OPTIONS)
   var permission_fn = function (newDoc) {
     if (newDoc.type === 'notthis') {
-      throw {unauthorized: 'nope!'}
+      throw new Error('nope!')
     }
   }
   var doc = {
