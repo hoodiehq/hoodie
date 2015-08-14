@@ -1,44 +1,62 @@
 #!/usr/bin/env node
 
-var app = require('../lib')
-
-// parse command-line arguments
-var argv = require('optimist')
-  .usage('Usage: $0 [options]')
-  .alias('w', 'www')
-  .describe('www', 'Set www root directory')
-  .alias('c', 'custom-ports')
-  .describe('custom-ports', 'Provide custom ports www,admin,couchdb')
-  .alias('h', 'help')
-  .describe('help', 'Show usage information')
-  .alias('v', 'verbose')
-  .describe('verbose', 'Shows more verbose console output')
-  .alias('d', 'debug')
-  .describe('debug', 'Shows hapi internal debug output')
-  .alias('m', 'in-memory')
-  .describe('in-memory', 'Use a pure in-memory database which will be deleted upon restart')
-  .argv
-
 if (require.main !== module) return
 
-/**
- * Start a Hoodie server configured for the current
- * platform and environment
- */
+var emoji = require('node-emoji')
+
+var app = require('../lib')
+var log = require('../lib/utils/log')
+
+var parse = require('optimist')
+.usage('Usage: $0 [options]')
+
+.alias('w', 'www')
+.describe('www', 'Set www root directory')
+
+.alias('c', 'custom-ports')
+.describe('custom-ports', 'Provide custom ports www,admin,couchdb')
+
+.alias('m', 'in-memory')
+.describe('in-memory', 'Use a pure in-memory database which will be deleted upon restart')
+
+.alias('h', 'help')
+.describe('help', 'Show usage information')
+
+.alias('v', 'verbose')
+.alias('d', 'verbose')
+.alias('debug', 'verbose')
+.describe('loglevel', 'Set the loglevel')
+.default('loglevel', 'warn')
+
+log.levels.forEach(function (level) {
+  parse = parse.describe(level, 'Set the loglevel to ' + level)
+})
+
+var argv = parse.argv
+
+log.levels.some(function (level) {
+  if (argv[level]) argv.loglevel = level
+  return !!argv[level]
+})
 
 if (argv.help) {
   return require('optimist').showHelp()
 }
 
-console.error('Initializing Hoodie')
+log.raw.level = argv.loglevel
+
+log.verbose('Initializing server and database')
+
 app.start({
   argv: argv
 }, function (err, server, env_config) {
-  if (err) return console.error(err)
+  if (err) return log.error('Failed to start the Hoodie Server', err)
+
+  log.verbose('Starting Server')
 
   server.start(function () {
-    console.error('WWW:     ', env_config.www_link)
-    console.error('Admin:   ', env_config.admin_link)
-    console.error('CouchDB: ', env_config.couch.url)
+    console.log(emoji.get('dog') + ' Your Hoodie app has started on ' + env_config.www_link)
+    log.verbose('Serving admin-dashboard at ' + env_config.admin_link)
+    log.verbose('Database running at ' + env_config.couch.url)
   })
 })

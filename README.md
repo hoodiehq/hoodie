@@ -36,14 +36,21 @@ When that’s done, you can run `./bin/start` to start `hoodie-server`. Usually,
 There are a few options to change the behaviour of `hoodie-server`. See a list by running `./bin/start --help`. It looks something like this:
 
 ```
-Usage: node ./bin/start [options]
+Usage: npm start -- [options]
 
 Options:
   --www           Set www root directory
   --custom-ports  Provide custom ports www,admin,couchdb
+  --in-memory     Use a pure in-memory database which will be deleted upon restart
   --help          Show usage information
-  --verbose       Shows more verbose console output
-  --debug         Shows hapi internal debug output
+  --loglevel      Set the loglevel [default: "warn"]
+  --silly         Set the loglevel to silly
+  --verbose       Set the loglevel to verbose
+  --info          Set the loglevel to info
+  --http          Set the loglevel to http
+  --warn          Set the loglevel to warn
+  --error         Set the loglevel to error
+  --silent        Set the loglevel to silent
 ```
 
 If that doesn’t make much sense just yet, don’t worry about it.
