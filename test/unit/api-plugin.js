@@ -1,5 +1,6 @@
 var Events = require('events')
-var test = require('tap').test
+var tap = require('tap')
+var test = tap.test
 var Wreck = require('wreck')
 
 var plugin = require('../../lib/hapi_plugins/api')
