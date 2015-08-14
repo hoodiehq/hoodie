@@ -5,7 +5,7 @@ var request = require('request')
 var tap = require('tap')
 var test = tap.test
 
-var startServerTest = require('../lib/start-server-test')
+var startServerTest = require('./lib/start-server-test')
 
 startServerTest(test, 'handle forced gzip', function (t, env_config, end) {
   t.test('should receive gzip when gzip accept header sent', function (tt) {

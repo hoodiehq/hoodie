@@ -2,7 +2,7 @@ var request = require('request')
 var tap = require('tap')
 var test = tap.test
 
-var startServerTest = require('../lib/start-server-test')
+var startServerTest = require('./lib/start-server-test')
 
 startServerTest(test, 'setting CORS headers', function (t, env_config, end) {
   t.test('should respond to OPTIONS with the right CORS headers when no origin is given', function (tt) {

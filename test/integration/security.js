@@ -11,7 +11,7 @@ var app = require('../../lib/index')
 var credentials = require('../../lib/couchdb/credentials')
 var config = require('../../lib/core/config')
 
-var startServerTest = require('../lib/start-server-test')
+var startServerTest = require('./lib/start-server-test')
 
 startServerTest(test, 'block _all_dbs', function (t, env_config, end) {
   t.test('should 404 on /_api/_all_dbs', function (tt) {
@@ -36,7 +36,7 @@ startServerTest(test, 'block _all_dbs', function (t, env_config, end) {
   })
 
   t.test('check config dbs are private to admin', function (tt) {
-    var projectDir = path.resolve(__dirname, '../lib/fixtures/project1')
+    var projectDir = path.resolve(__dirname, './lib/fixtures/project1')
     var cfg = config({
       cwd: projectDir,
       argv: {
@@ -45,28 +45,28 @@ startServerTest(test, 'block _all_dbs', function (t, env_config, end) {
     })
 
     cfg.admin_password = 'testing'
-    async.series([
-      rimraf.bind(null, cfg.hoodie.data_path),
-      app.init.bind(null, cfg),
-      function (server, cb) {
+    async.waterfall([
+      async.apply(rimraf, cfg.hoodie.data_path),
+      async.apply(app.init, cfg),
+      function (server, env_cfg, cb) {
         server.start(cb)
       },
       function (cb) {
-        request.get(cfg.couch.url + '/app', function (error, res) {
+        request.get(cfg.couch.url + '/app/_all_docs', function (error, res) {
           tt.error(error)
           tt.is(res.statusCode, 401)
           cb()
         })
       },
       function (cb) {
-        request.get(cfg.couch.url + '/plugins', function (error, res) {
+        request.get(cfg.couch.url + '/plugins/_all_docs', function (error, res) {
           tt.error(error)
           tt.is(res.statusCode, 401)
           cb()
         })
       },
       function (cb) {
-        var appdb = cfg.couch.url + '/app'
+        var appdb = cfg.couch.url + '/app/_all_docs'
         var couchdb = credentials.get(cfg.hoodie.data_path)
 
         var parsed = url.parse(appdb)
@@ -80,7 +80,7 @@ startServerTest(test, 'block _all_dbs', function (t, env_config, end) {
         })
       },
       function (cb) {
-        var plugindb = cfg.couch.url + '/plugins'
+        var plugindb = cfg.couch.url + '/plugins/_all_docs'
         var couchdb = credentials.get(cfg.hoodie.data_path)
 
         var parsed = url.parse(plugindb)

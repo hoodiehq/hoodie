@@ -1,6 +1,6 @@
 var ports = require('ports')
 
-var hoodieServer = require('../../')
+var hoodieServer = require('../../../')
 
 module.exports = function (test, name, testfn) {
 

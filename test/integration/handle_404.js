@@ -2,7 +2,7 @@ var request = require('request')
 var tap = require('tap')
 var test = tap.test
 
-var startServerTest = require('../lib/start-server-test')
+var startServerTest = require('./lib/start-server-test')
 
 startServerTest(test, 'handle 404', function (t, env_config, end) {
   t.test('should send index.html on accept: text/html', function (tt) {
