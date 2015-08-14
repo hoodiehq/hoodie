@@ -22,7 +22,7 @@ startServerTest(test, 'handle forced gzip', function (t, env_config, end) {
       if (error) throw error
       zlib.gunzip(data, function (error, udat) {
         tt.error(error)
-        tt.ok(/couchdb/.test(udat.toString()))
+        tt.ok(/Welcome/.test(udat.toString()))
       })
     }))
   })
@@ -43,7 +43,7 @@ startServerTest(test, 'handle forced gzip', function (t, env_config, end) {
       if (error) throw error
       zlib.gunzip(data, function (error, udat) {
         tt.error(error)
-        tt.ok(/couchdb/.test(udat.toString()))
+        tt.ok(/Welcome/.test(udat.toString()))
       })
     }))
   })
