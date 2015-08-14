@@ -7,7 +7,7 @@ var tap = require('tap')
 var test = tap.test
 
 var app = require('../../lib/index')
-var configStore = require('../../lib/core/config_store')
+var credentials = require('../../lib/couchdb/credentials')
 var config = require('../../lib/core/config')
 var utils = require('../lib/utils')
 
@@ -62,29 +62,28 @@ startServerTest(test, 'block _all_dbs', function (t, env_config, end) {
           },
           function (cb) {
             var appdb = cfg.couch.url + '/app'
-            configStore.getCouchCredentials(cfg, function (er, username, password) {
-              var parsed = url.parse(appdb)
-              parsed.auth = username + ':' + password
-              appdb = url.format(parsed)
-              request.get(appdb, function (error, res) {
-                tt.error(error)
-                tt.is(res.statusCode, 200)
-                cb()
-              })
+            var couchdb = credentials.get(cfg.hoodie.data_path)
+
+            var parsed = url.parse(appdb)
+            parsed.auth = couchdb.username + ':' + couchdb.password
+            appdb = url.format(parsed)
+            request.get(appdb, function (error, res) {
+              tt.error(error)
+              tt.is(res.statusCode, 200)
+              cb()
             })
           },
           function (cb) {
             var plugindb = cfg.couch.url + '/plugins'
-            configStore.getCouchCredentials(cfg, function (error, username, password) {
-              if (error) throw error
-              var parsed = url.parse(plugindb)
-              parsed.auth = username + ':' + password
-              plugindb = url.format(parsed)
-              request.get(plugindb, function (error, res) {
-                tt.error(error)
-                tt.is(res.statusCode, 200)
-                cb()
-              })
+            var couchdb = credentials.get(cfg.hoodie.data_path)
+
+            var parsed = url.parse(plugindb)
+            parsed.auth = couchdb.username + ':' + couchdb.password
+            plugindb = url.format(parsed)
+            request.get(plugindb, function (error, res) {
+              tt.error(error)
+              tt.is(res.statusCode, 200)
+              cb()
             })
           }
         ], function (error) {

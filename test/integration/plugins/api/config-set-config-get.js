@@ -41,7 +41,7 @@ test('config.set / config.get', function (t) {
       if (err) t.fail()
 
       t.equal(doc.config.foo, 'baz')
-      request.get(otherplugin_url, function (err, res) {
+      request.get(otherplugin_url, function (er, res) {
         t.same(res.statusCode, 404)
         t.end()
       })
