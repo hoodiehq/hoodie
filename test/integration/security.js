@@ -38,7 +38,10 @@ startServerTest(test, 'block _all_dbs', function (t, env_config, end) {
   t.test('check config dbs are private to admin', function (tt) {
     var projectDir = path.resolve(__dirname, '../lib/fixtures/project1')
     var cfg = config({
-      cwd: projectDir
+      cwd: projectDir,
+      argv: {
+        'in-memory': true
+      }
     })
 
     cfg.admin_password = 'testing'

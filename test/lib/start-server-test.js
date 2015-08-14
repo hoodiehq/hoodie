@@ -7,7 +7,8 @@ module.exports = function (test, name, testfn) {
   test(name, function (t) {
     hoodieServer.start({
       argv: {
-        'custom-ports': '5001,5011,' + ports.getPort('hoodie-server-couch')
+        'custom-ports': '5001,5011,' + ports.getPort('hoodie-server-couch'),
+        'in-memory': true
       },
       env: {
         HOODIE_SETUP_PASSWORD: '12345'
