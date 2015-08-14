@@ -15,8 +15,9 @@ var argv = require('optimist')
   .describe('verbose', 'Shows more verbose console output')
   .alias('d', 'debug')
   .describe('debug', 'Shows hapi internal debug output')
+  .alias('m', 'in-memory')
+  .describe('in-memory', 'Use a pure in-memory database which will be deleted upon restart')
   .argv
-
 
 if (require.main !== module) return
 
