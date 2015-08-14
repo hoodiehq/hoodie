@@ -5,7 +5,7 @@ if (require.main !== module) return
 var emoji = require('node-emoji')
 
 var app = require('../lib')
-var log = require('../lib/utils/log')
+var log = require('../lib/log')
 
 var parse = require('optimist')
 .usage('Usage: $0 [options]')

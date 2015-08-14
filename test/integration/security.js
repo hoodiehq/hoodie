@@ -8,7 +8,7 @@ var tap = require('tap')
 var test = tap.test
 
 var app = require('../../lib/index')
-var credentials = require('../../lib/couchdb/credentials')
+var credentials = require('../../lib/couchdb/utils').credentials
 var config = require('../../lib/core/config')
 
 var startServerTest = require('./lib/start-server-test')
