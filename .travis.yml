@@ -1,7 +1,5 @@
 sudo: false
 language: node_js
-services:
-- couchdb
 cache:
   directories:
   - node_modules
