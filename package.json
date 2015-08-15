@@ -6,7 +6,6 @@
     "url": "https://github.com/hoodiehq/hoodie-server/issues"
   },
   "dependencies": {
-    "ansi": "^0.3.0",
     "async": "^1.4.0",
     "browserify": "^11.0.0",
     "bytes": "^2.1.0",
