@@ -45,18 +45,18 @@ if (argv.help) {
 
 log.raw.level = argv.loglevel
 
-log.verbose('Initializing server and database')
+log.verbose('app', 'Initializing')
 
 app.start({
   argv: argv
 }, function (err, server, env_config) {
   if (err) return log.error('Failed to start the Hoodie Server', err)
 
-  log.verbose('Starting Server')
+  log.verbose('app', 'Starting')
 
   server.start(function () {
     console.log(emoji.get('dog') + ' Your Hoodie app has started on ' + env_config.www_link)
-    log.verbose('Serving admin-dashboard at ' + env_config.admin_link)
-    log.verbose('Database running at ' + env_config.couch.url)
+    log.verbose('app', 'Serving admin-dashboard at ' + env_config.admin_link)
+    log.verbose('app', 'Database running at ' + env_config.couch.url)
   })
 })
