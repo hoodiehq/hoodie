@@ -1,11 +1,8 @@
 var ports = require('ports')
 
-var hoodieServer = require('../../../')
-
 module.exports = function (test, name, testfn) {
-
   test(name, function (t) {
-    hoodieServer.start({
+    require('../../../')({
       argv: {
         'custom-ports': '5001,5011,' + ports.getPort('hoodie-server-couch'),
         'in-memory': true

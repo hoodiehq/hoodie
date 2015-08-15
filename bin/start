@@ -2,12 +2,9 @@
 
 if (require.main !== module) return
 
-var emoji = require('node-emoji')
+var optimist = require('optimist')
 
-var app = require('../lib')
-var log = require('../lib/log')
-
-var parse = require('optimist')
+var parse = optimist
 .usage('Usage: $0 [options]')
 
 .alias('w', 'www')
@@ -28,6 +25,8 @@ var parse = require('optimist')
 .describe('loglevel', 'Set the loglevel')
 .default('loglevel', 'warn')
 
+var log = require('../lib/log')
+
 log.levels.forEach(function (level) {
   parse = parse.describe(level, 'Set the loglevel to ' + level)
 })
@@ -40,22 +39,22 @@ log.levels.some(function (level) {
 })
 
 if (argv.help) {
-  return require('optimist').showHelp()
+  return optimist.showHelp()
 }
 
 log.raw.level = argv.loglevel
 
 log.verbose('app', 'Initializing')
 
-app.start({
+require('../lib')({
   argv: argv
 }, function (err, server, env_config) {
-  if (err) return log.error('Failed to start the Hoodie Server', err)
+  if (err) return log.error('app', 'Failed to initialize', err)
 
   log.verbose('app', 'Starting')
 
   server.start(function () {
-    console.log(emoji.get('dog') + ' Your Hoodie app has started on ' + env_config.www_link)
+    console.log(require('node-emoji').get('dog') + ' Your Hoodie app has started on ' + env_config.www_link)
     log.verbose('app', 'Serving admin-dashboard at ' + env_config.admin_link)
     log.verbose('app', 'Database running at ' + env_config.couch.url)
   })
