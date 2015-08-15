@@ -3,8 +3,8 @@ var tap = require('tap')
 var test = tap.test
 var Wreck = require('wreck')
 
-var plugin = require('../../lib/hapi_plugins/api')
-var pluginInternals = require('../../lib/hapi_plugins/api/internals')
+var plugin = require('../../lib/hapi/api')
+var pluginInternals = require('../../lib/hapi/api/internals')
 
 test('is a valid hapi plugin', function (t) {
   t.is(typeof plugin.register, 'function', 'register function')
