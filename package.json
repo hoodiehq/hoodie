@@ -25,6 +25,7 @@
     "request": "^2.60.0",
     "semver": "^5.0.1",
     "spawn-pouchdb-server": "^3.0.0",
+    "uglify-js": "^2.4.24",
     "watch": "^0.16.0",
     "wreck": "^6.0.0"
   },
