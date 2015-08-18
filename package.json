@@ -7,7 +7,7 @@
   },
   "dependencies": {
     "async": "^1.4.0",
-    "browserify": "^11.0.0",
+    "browserify": "^11.0.1",
     "bytes": "^2.1.0",
     "follow": "^0.12.1",
     "h2o2": "^4.0.1",
