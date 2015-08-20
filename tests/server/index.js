@@ -50,17 +50,13 @@ http.createServer(corsify(function (req, res) {
   .on('end', function () {
     console.log('browser testsuite browserified')
 
-    var timeout = setTimeout(function () {
-      console.log('hoodie app did not start')
-      process.exit(1)
-    }, 10000)
-
     process.env.HOODIE_SETUP_PASSWORD = '12345'
 
     // starting a new hoodie app from the test folder
     hoodieProcess = childProcess.spawn(
       './node_modules/hoodie-server/bin/start', [
         '-m',
+        '--loglevel=error',
         '--www',
         './tests/www',
         '--custom-ports',
@@ -68,12 +64,15 @@ http.createServer(corsify(function (req, res) {
       ]
     )
 
+    hoodieProcess.stderr.on('data', function (log) {
+      console.log('hoodie app failed to start')
+      process.exit(1)
+    })
+
     hoodieProcess.stdout.on('data', function (log) {
       if (!/hoodie app has started/i.test(log)) return
 
       console.log('hoodie app started')
-
-      clearTimeout(timeout)
 
       launcher(function (err, launch) {
         if (err) {
@@ -98,11 +97,6 @@ http.createServer(corsify(function (req, res) {
     hoodieProcess.stderr.pipe(process.stderr)
   })
   .pipe(output)
-})
-
-process.on('uncaughtException', function(err) {
-  console.log(err)
-  console.log(err.stack)
 })
 
 process.on('exit', function (status) {
