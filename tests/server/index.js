@@ -55,6 +55,10 @@ http.createServer(corsify(function (req, res) {
       process.exit(1)
     }, 10000)
 
+    if (process.env.CI === 'true') {
+      process.env.COUCH_URL = 'http://localhost:5984/'
+    }
+
     process.env.HOODIE_SETUP_PASSWORD = '12345'
 
     // starting a new hoodie app from the test folder
