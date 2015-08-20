@@ -6,6 +6,10 @@ notifications:
   email: false
 node_js:
 - '0.12'
+env:
+  matrix:
+  - COUCH_URL=http://localhost:5984/
+  - COUCH_URL=
 before_install:
 - npm i -g npm@^2.0.0
 - "export DISPLAY=:99.0"
