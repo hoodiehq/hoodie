@@ -3,16 +3,13 @@ var url = require('url')
 
 var test = require('tape').createHarness()
 
-var Hoodie = global.Hoodie
+require('./hoodie.js')(test)
 
 var reqOptions = url.parse(process.env.TEST_RESULT_SERVER)
 reqOptions.method = 'POST'
+test.createStream()
 
-test.createStream().pipe(http.request(reqOptions, function (res) {
-  console.log(res.responseMessage)
+.on('data', console.log.bind(console))
+.pipe(http.request(reqOptions, function () {
+  console.log('results uploaded')
 }))
-
-test('test', function (t) {
-  t.ok(Hoodie, 'hoodie module exposed')
-  t.end()
-})
