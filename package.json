@@ -8,8 +8,9 @@
   "dependencies": {
     "async": "^1.4.0",
     "browserify": "^11.0.1",
-    "bytes": "^2.1.0",
     "follow": "^0.12.1",
+    "good": "^6.3.0",
+    "good-squeeze": "^2.1.0",
     "h2o2": "^4.0.1",
     "hapi": "^9.0.1",
     "inert": "^3.0.1",
@@ -26,7 +27,6 @@
     "semver": "^5.0.1",
     "spawn-pouchdb-server": "^3.0.0",
     "uglify-js": "^2.4.24",
-    "watch": "^0.16.0",
     "wreck": "^6.0.0"
   },
   "devDependencies": {
