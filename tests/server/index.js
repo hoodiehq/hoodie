@@ -26,10 +26,12 @@ http.createServer(corsify(function (req, res) {
 
   // detect when the tests ended and end process
   var stream = finished(function (results) {
-    res.writeHead(200)
-    res.write('ok')
-    res.end()
-    process.exit()
+    setTimeout(function () {
+      res.writeHead(200)
+      res.write('ok')
+      res.end()
+      process.exit()
+    }, 0)
   })
   req.pipe(stream)
 
