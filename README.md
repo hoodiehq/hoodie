@@ -26,8 +26,8 @@ You can use `hoodie-server` on its own, if you want to work on it, help fix bugs
 As noted before, this isn’t meant to be run standalone, but if you are helping out with development, or build your own plugins, or just want to spelunk around, here’s how it works:
 
 ```
-git clone git@github.com:hoodiehq/server.git
-cd server
+git clone git@github.com:hoodiehq/hoodie-server.git
+cd hoodie-server
 npm install
 ```
 
