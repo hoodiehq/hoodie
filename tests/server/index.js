@@ -53,11 +53,10 @@ http.createServer(corsify(function (req, res) {
     console.log('browser testsuite browserified')
 
     process.env.HOODIE_SETUP_PASSWORD = '12345'
-
+    process.env.COUCH_URL = 'http://localhost:5984/'
     // starting a new hoodie app from the test folder
     hoodieProcess = childProcess.spawn(
       './node_modules/hoodie-server/bin/start', [
-        '-m',
         '--loglevel=error',
         '--www',
         './tests/www',
@@ -68,7 +67,7 @@ http.createServer(corsify(function (req, res) {
 
     hoodieProcess.stderr.on('data', function (log) {
       console.log('hoodie app failed to start')
-      process.exit(1)
+      // process.nextTick(process.exit.bind(null, 1))
     })
 
     hoodieProcess.stdout.on('data', function (log) {

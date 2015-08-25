@@ -1,0 +1,4 @@
+#!/bin/bash
+
+rm -rf ./data && mkdir ./data
+couchdb -n -a /usr/local/etc/couchdb/default.ini -a ./tests/couchdb.ini
