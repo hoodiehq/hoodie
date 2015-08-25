@@ -1,6 +1,8 @@
 var http = require('http')
 var url = require('url')
 
+localStorage.clear()
+
 var test = require('tape').createHarness()
 
 require('./api.js')(test)
