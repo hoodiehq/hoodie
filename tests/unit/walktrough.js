@@ -7,7 +7,7 @@ module.exports = function (test) {
     hoodie.account.destroy({ignoreLocalChanges: true})
 
     .then(function () {
-      t.ok('data cleaned up')
+      t.ok(true, 'data cleaned up')
 
       return hoodie.store.add('test', {id: 'not-signed-in'})
     })
@@ -32,11 +32,11 @@ module.exports = function (test) {
       return hoodie.account.signOut()
     })
 
-    // .then(function () {
-    //   t.ok('signout successful')
+    .then(function () {
+      t.ok(true, 'signout successful')
 
-    //   return hoodie.store.find('test', 'not-signed-in')
-    // }, t.fail)
+      return hoodie.store.find('test', 'not-signed-in')
+    }, t.fail)
 
     // .catch(function (error) {
     //   t.is(error.name, 'HoodieUnauthorizedError', 'object does not exist after sign out')
