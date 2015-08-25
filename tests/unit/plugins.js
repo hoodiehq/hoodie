@@ -6,8 +6,7 @@ module.exports = function (test) {
     t.is(typeof hoodie.test, 'function', 'method exposed')
     hoodie.test({foo: 'bar'})
     .then(function (res) {
-      console.log(res)
-      t.ok(res)
+      t.is(res.foo, 'bar', 'response')
       t.end()
     }, t.fail)
   })
