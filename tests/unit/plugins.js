@@ -10,19 +10,28 @@ module.exports = function (test) {
 
       return hoodie.request('GET', '/_plugins/test/_api')
     }, t.fail)
+
     .then(function (res) {
       t.is(res.method, 'get', 'dynamic hook GET')
 
       return hoodie.request('POST', '/_plugins/test/_api', {data: {test: true}})
     }, t.fail)
+
     .then(function (res) {
       t.ok(res.payload.test, 'dynamic hook POST')
 
       return hoodie.test({foo: 'bar'})
     }, t.fail)
+
     .then(function (res) {
       t.is(res.foo, 'bar', 'response is ok')
-      t.end()
+
+      return hoodie.test({foo: 'bar', fail: true})
     }, t.fail)
+
+    .then(t.fail, function (res) {
+      t.ok(res.error, 'has error')
+      t.end()
+    })
   })
 }

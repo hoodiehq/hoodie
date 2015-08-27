@@ -27,8 +27,6 @@ module.exports = function (test) {
     .then(function (object) {
       t.is(object.id, 'not-signed-in', 'object exists after sign up')
 
-      // TODO: signout currently fails because hoodie pushes the local changes to remote
-      //       which fails
       return hoodie.account.signOut()
     })
 
