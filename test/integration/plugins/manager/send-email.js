@@ -37,7 +37,7 @@ test('sendEmail function', function (t) {
       }
     }
   }
-  pluginsManager.start(OPTS, function (error, manager) {
+  pluginsManager.start(OPTS.couch_url, function (error, manager) {
     if (error) throw error
     var hoodie = manager.createAPI({name: 'myplugin'})
     hoodie.sendEmail(email, function () {

@@ -8,7 +8,7 @@ require('../lib/setup-teardown')(tap)
 
 test('get config values from plugin manager', function (t) {
   t.plan(9)
-  pluginsManager.start(OPTS, function (error, manager) {
+  pluginsManager.start(OPTS.couch_url, function (error, manager) {
     if (error) throw error
     var hoodie = manager.createAPI({name: 'myplugin'})
     hoodie.task.on('add', function (dbname, task) {

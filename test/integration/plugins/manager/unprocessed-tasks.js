@@ -51,7 +51,7 @@ test('unprocessed tasks should be handled on addSource', function (t) {
         ],
           function (error) {
             if (error) throw error
-            pluginsManager.start(OPTS, function (error, manager) {
+            pluginsManager.start(OPTS.couch_url, function (error, manager) {
               if (error) throw error
               var hoodie = manager.createAPI({name: 'myplugin'})
               hoodie.task.addSource('testdb2')

@@ -5,7 +5,6 @@ var test = tap.test
 var PluginAPI = require('../../../../lib/plugins/api').PluginAPI
 
 var DEFAULT_OPTIONS = require('../lib/default-options')
-var COUCH = DEFAULT_OPTIONS.couchdb
 
 require('../lib/setup-teardown')(tap)
 
@@ -13,7 +12,7 @@ test('config.set / config.get', function (t) {
   var hoodie = new PluginAPI(DEFAULT_OPTIONS)
   var hoodie2 = new PluginAPI({
     name: 'otherplugin',
-    couchdb: COUCH,
+    couch_url: DEFAULT_OPTIONS.couch_url,
     config: DEFAULT_OPTIONS.config
   })
 

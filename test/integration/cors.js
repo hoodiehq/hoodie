@@ -1,3 +1,5 @@
+var url = require('url')
+
 var request = require('request')
 var tap = require('tap')
 var test = tap.test
@@ -6,7 +8,7 @@ var startServerTest = require('./lib/start-server-test')
 
 startServerTest(test, 'setting CORS headers', function (t, env_config, end) {
   t.test('should respond to OPTIONS with the right CORS headers when no origin is given', function (tt) {
-    request.get(env_config.www_link + '/_api/_session/', {
+    request.get(url.format(env_config.app) + '/_api/_session/', {
       headers: {
         'transfer-encoding': 'chunked'
       }
@@ -22,7 +24,7 @@ startServerTest(test, 'setting CORS headers', function (t, env_config, end) {
     })
   })
   t.test('should echo the origin back if one is given', function (tt) {
-    request.get(env_config.www_link + '/_api/_session/', {
+    request.get(url.format(env_config.app) + '/_api/_session/', {
       headers: {
         origin: 'http://some.app.com/',
         'transfer-encoding': 'chunked'

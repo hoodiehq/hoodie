@@ -8,7 +8,7 @@ var pluginsManager = require('../../../../lib/plugins/manager')
 require('../lib/setup-teardown')(tap)
 
 test('changed docs passed to plugins can be modified', function (t) {
-  pluginsManager.start(OPTS, function (error, manager) {
+  pluginsManager.start(OPTS.couch_url, function (error, manager) {
     if (error) throw error
 
     var hoodie1 = manager.createAPI({name: 'myplugin1'})

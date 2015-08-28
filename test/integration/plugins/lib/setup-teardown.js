@@ -1,9 +1,10 @@
+var url = require('url')
+
 var async = require('async')
 var request = require('request').defaults({json: true})
 var spawnPouchdbServer = require('spawn-pouchdb-server')
 
 var DEFAULT_OPTIONS = require('./default-options')
-var COUCH = DEFAULT_OPTIONS.couchdb
 
 module.exports = function (tap) {
   tap.test('setup', function (tt) {
@@ -37,8 +38,11 @@ module.exports = function (tap) {
           email_service: 'Gmail'
         }
       }
+      var couchdb = url.parse(DEFAULT_OPTIONS.base_url)
+      var auth = couchdb.auth.split(':')
+      delete couchdb.auth
       async.series([
-        async.apply(request.put, COUCH.url + '_config/admins/' + COUCH.user, {body: COUCH.pass}),
+        async.apply(request.put, url.format(couchdb) + '_config/admins/' + auth[0], {body: auth[1]}),
         async.apply(request.put, DEFAULT_OPTIONS.base_url + 'plugins'),
         async.apply(request.put, DEFAULT_OPTIONS.base_url + 'app'),
         async.apply(request.put, DEFAULT_OPTIONS.base_url + 'app/config', {body: appconfig})

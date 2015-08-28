@@ -9,14 +9,15 @@ var test = tap.test
 var PluginAPI = require('../../../../lib/plugins/api').PluginAPI
 
 var DEFAULT_OPTIONS = require('../lib/default-options')
-var COUCH = DEFAULT_OPTIONS.couchdb
 
 require('../lib/setup-teardown')(tap)
 
 test('db.revokeReadAccess for a user with write access', function (t) {
   var hoodie = new PluginAPI(DEFAULT_OPTIONS)
+  var couchdb = url.parse(DEFAULT_OPTIONS.base_url)
+  delete couchdb.auth
 
-  var db_url = url.parse(COUCH.url + 'foo/')
+  var db_url = url.parse(url.format(couchdb) + 'foo/')
   db_url.auth = 'user/testuser:testing'
   db_url = url.format(db_url)
 

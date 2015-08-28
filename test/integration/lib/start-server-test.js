@@ -1,20 +1,17 @@
-var ports = require('ports')
-
 module.exports = function (test, name, testfn) {
   test(name, function (t) {
     require('../../../')({
-      argv: {
-        'custom-ports': '5001,5011,' + ports.getPort('hoodie-server-couch'),
-        'in-memory': true
-      },
-      env: {
-        HOODIE_SETUP_PASSWORD: '12345'
-      }
+      inMemory: true,
+      port: 5001,
+      adminPort: 5011,
+      adminPassword: '12345',
+      loglevel: 'error'
     }, function (error, server, env_config) {
       if (error) throw error
 
       server.start(function () {
-        testfn(t, env_config, function () {
+        testfn(t, env_config, function (tt) {
+          if (tt && tt.end) tt.end()
           t.end()
           process.exit()
         })

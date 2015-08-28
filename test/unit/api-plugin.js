@@ -1,4 +1,6 @@
 var Events = require('events')
+var url = require('url')
+
 var tap = require('tap')
 var test = tap.test
 var Wreck = require('wreck')
@@ -15,9 +17,7 @@ test('is a valid hapi plugin', function (t) {
 test('mapProxyPath', function (t) {
   t.plan(4)
 
-  var couchCfg = {
-    url: 'http://couch.somewhere:1234'
-  }
+  var couchCfg = url.parse('http://couch.somewhere:1234')
 
   t.test('should prepend the couchCfg url', function (tt) {
     tt.plan(1)
