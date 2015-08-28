@@ -16,16 +16,18 @@
     "hoodie-plugin-appconfig": "^2.0.1",
     "hoodie-plugin-email": "^1.0.0",
     "hoodie-plugin-users": "^2.2.2",
-    "hoodie-server": "6.1.0"
+    "hoodie-server": "^9.3.3"
   },
   "devDependencies": {
-    "grunt-cli": "^0.1.13",
-    "hoodie-integration-test": "^1.0.9",
-    "hoodie-plugin-test": "^1.0.0",
-    "mkdirp": "^0.5.1",
-    "my-first-hoodie": "^3.2.1",
-    "rimraf": "^2.4.2",
-    "semantic-release": "^4.0.3"
+    "browser-launcher": "^1.0.0",
+    "browserify": "^11.0.1",
+    "corsify": "^2.1.0",
+    "envify": "^3.4.0",
+    "hoodie-plugin-test": "hoodiehq/hoodie-plugin-test",
+    "semantic-release": "^4.0.3",
+    "tap-finished": "0.0.1",
+    "tap-spec": "^4.0.2",
+    "tape": "^4.1.0"
   },
   "homepage": "https://github.com/hoodiehq/hoodie#readme",
   "hoodie": {
@@ -51,6 +53,6 @@
   },
   "scripts": {
     "semantic-release": "semantic-release pre && ./bin/bundle.js && npm publish && semantic-release post",
-    "test": "./bin/test"
+    "test": "node ./tests/server/index.js"
   }
 }

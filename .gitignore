@@ -3,6 +3,7 @@
 data
 coverage
 node_modules
+tests/www/tests.js
 *.log
 *.dump
 *.swp
