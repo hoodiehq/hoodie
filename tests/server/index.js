@@ -8,6 +8,7 @@ var corsify = require('corsify')
 var envify = require('envify/custom')
 var finished = require('tap-finished')
 var launcher = require('browser-launcher')
+var request = require('request')
 var tapSpec = require('tap-spec')()
 
 var hoodieProcess
@@ -52,50 +53,62 @@ http.createServer(corsify(function (req, res) {
   .on('end', function () {
     console.log('browser testsuite browserified')
 
-    process.env.HOODIE_SETUP_PASSWORD = '12345'
-    process.env.COUCH_URL = 'http://localhost:5984/'
-    // starting a new hoodie app from the test folder
-    hoodieProcess = childProcess.spawn(
-      './node_modules/hoodie-server/bin/start', [
-        '--loglevel=error',
+    request.put('http://localhost:5984/_config/admins/myadmin', {
+      json: true,
+      body: 'secure'
+    }, function (err, res, body) {
+      if (err) process.exit(1)
+      console.log('couchdb admin exists')
+
+      // starting a new hoodie app from the test folder
+      hoodieProcess = childProcess.spawn(
+        './bin/start.js', [
+        '--db-url',
+        'http://myadmin:secure@localhost:5984/',
+        '--admin-password',
+        '12345',
+        '--loglevel',
+        'error',
         '--www',
         './tests/www',
-        '--custom-ports',
-        '6001,6002,6003'
-      ]
-    )
+        '--port',
+        '6001',
+        '--admin-port',
+        '6002'
+      ])
 
-    hoodieProcess.stderr.on('data', function (log) {
-      console.log('hoodie app failed to start')
-      // process.nextTick(process.exit.bind(null, 1))
-    })
+      hoodieProcess.stderr.on('data', function (log) {
+        console.log('hoodie app failed to start')
+        // process.nextTick(process.exit.bind(null, 1))
+      })
 
-    hoodieProcess.stdout.on('data', function (log) {
-      if (!/hoodie app has started/i.test(log)) return
+      hoodieProcess.stdout.on('data', function (log) {
+        if (!/hoodie app has started/i.test(log)) return
 
-      console.log('hoodie app started')
+        console.log('hoodie app started')
 
-      launcher(function (err, launch) {
-        if (err) {
-          console.log(err)
-          process.exit(1)
-        }
-
-        launch('http://localhost:6001', {
-          headless: process.env.CI === 'true',
-          browser: launch.browsers.local[0].name
-        }, function (err) {
+        launcher(function (err, launch) {
           if (err) {
             console.log(err)
             process.exit(1)
           }
+
+          launch('http://localhost:6001', {
+            headless: process.env.CI === 'true',
+            browser: launch.browsers.local[0].name
+          }, function (err) {
+            if (err) {
+              console.log(err)
+              process.exit(1)
+            }
+          })
         })
       })
-    })
 
-    // without piping this somewhere the above data handler won't get called
-    hoodieProcess.stdout.pipe(process.stderr)
-    hoodieProcess.stderr.pipe(process.stderr)
+      // without piping this somewhere the above data handler won't get called
+      hoodieProcess.stdout.pipe(process.stderr)
+      hoodieProcess.stderr.pipe(process.stderr)
+    })
   })
   .pipe(output)
 })

@@ -4,7 +4,7 @@
   "version": "0.0.0-development",
   "author": "The Hoodie Community",
   "bin": {
-    "hoodie": "./node_modules/hoodie-server/bin/start"
+    "hoodie": "./bin/start.js"
   },
   "bugs": {
     "url": "https://github.com/hoodiehq/hoodie/issues"
@@ -16,7 +16,12 @@
     "hoodie-plugin-appconfig": "^2.0.1",
     "hoodie-plugin-email": "^1.0.0",
     "hoodie-plugin-users": "^2.2.2",
-    "hoodie-server": "^9.3.3"
+    "hoodie-server": "10.0.1",
+    "lodash": "^3.10.1",
+    "node-emoji": "^1.0.3",
+    "nopt": "^3.0.3",
+    "npmlog": "^1.2.1",
+    "rc": "^1.1.1"
   },
   "devDependencies": {
     "browser-launcher": "^1.0.0",
@@ -24,6 +29,7 @@
     "corsify": "^2.1.0",
     "envify": "^3.4.0",
     "hoodie-plugin-test": "hoodiehq/hoodie-plugin-test",
+    "request": "^2.61.0",
     "semantic-release": "^4.0.3",
     "tap-finished": "0.0.1",
     "tap-spec": "^4.0.2",
