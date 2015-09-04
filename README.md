@@ -29,29 +29,33 @@ As noted before, this isn’t meant to be run standalone, but if you are helping
 git clone git@github.com:hoodiehq/hoodie-server.git
 cd hoodie-server
 npm install
+npm link
+cd ..
+git clone git@github.com:hoodiehq/hoodie.git
+cd hoodie
+npm install
+npm link hoodie-server
 ```
 
-When that’s done, you can run `./bin/start` to start `hoodie-server`. Usually, `hoodie-server` is run within the context of an existing frontend application, but when you run it alone, it will use its `www/` directory to serve the web app. For now, this is just a simple `index.html` file that says `hi`.
+When that’s done, you can run `./bin/start` to start `hoodie` with your local `hoodie-server`.
 
-There are a few options to change the behaviour of `hoodie-server`. See a list by running `./bin/start --help`. It looks something like this:
+There are a few options to change the behaviour of `hoodie-server`.
 
-```
-Usage: npm start -- [options]
+path: Project path (optional) Default: process.cwd()
+loglevel: (optional) Default: 'warn'
 
-Options:
-  --www           Set www root directory
-  --custom-ports  Provide custom ports www,admin,couchdb
-  --in-memory     Use a pure in-memory database which will be deleted upon restart
-  --help          Show usage information
-  --loglevel      Set the loglevel [default: "warn"]
-  --silly         Set the loglevel to silly
-  --verbose       Set the loglevel to verbose
-  --info          Set the loglevel to info
-  --http          Set the loglevel to http
-  --warn          Set the loglevel to warn
-  --error         Set the loglevel to error
-  --silent        Set the loglevel to silent
-```
+port: Port-number to run the Hoodie App on (optional)
+bindAddress': Address that Hoodie binds to (optional) Default: 127.0.0.1
+www: WWW path (optional) Default: path.join(options.path, 'www')
+
+adminPort: Port-number to run the admin-dashboard on (optional)
+adminPassword: Password for the admin-dashboard (required on first run)
+
+dbPort: Port-number to run the PouchDB Server on (optional)
+inMemory: Whether to start the PouchDB Server in memory (optional) Default: false
+dbPassword: Password to use for the PouchDB Server `_hoodie` admin user (optional)
+dbUrl: If provided does not start PouchDB Server and uses external CouchDB. Has to contain credentials. (optional)
+data: Data path (optional) Default: path.join(options.path, 'data')
 
 If that doesn’t make much sense just yet, don’t worry about it.
 
