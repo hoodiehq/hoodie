@@ -13,6 +13,7 @@
     "good-squeeze": "^2.1.0",
     "h2o2": "^4.0.1",
     "hapi": "^9.0.1",
+    "hapi-couchdb-store": "^1.1.0",
     "inert": "^3.0.1",
     "lodash": "^3.10.0",
     "mkdirp": "^0.5.0",
