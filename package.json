@@ -1,7 +1,6 @@
 {
-  "name": "@hoodie/dev-top-level",
+  "name": "hoodie",
   "description": "Hoodie enables you to express yourself through technology by making web app development very fast, easy and accessible.",
-  "version": "0.0.0-development",
   "author": "The Hoodie Community",
   "bin": {
     "hoodie": "./bin/start.js"
@@ -30,7 +29,7 @@
     "envify": "^3.4.0",
     "hoodie-plugin-test": "hoodiehq/hoodie-plugin-test",
     "request": "^2.61.0",
-    "semantic-release": "^4.0.3",
+    "semantic-release": "^4.3.5",
     "tap-finished": "0.0.1",
     "tap-spec": "^4.0.2",
     "tape": "^4.1.0"
@@ -50,15 +49,15 @@
     "offline-first"
   ],
   "license": "Apache-2.0",
-  "publishConfig": {
-    "access": "public"
+  "release": {
+    "tag": "next"
   },
   "repository": {
     "type": "git",
     "url": "https://github.com/hoodiehq/hoodie.git"
   },
   "scripts": {
-    "semantic-release": "semantic-release pre && ./bin/bundle.js && npm publish && semantic-release post",
+    "semantic-release": "semantic-release pre && npm publish && semantic-release post",
     "test": "node ./tests/server/index.js"
   }
 }

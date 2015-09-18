@@ -4,13 +4,13 @@
  alt="The Low-Profile Dog Hoodie Mascot" title="The Low-Profile Dog Hoodie Mascot" align="right" />
 
 > A very promising open-source library for building offline-first apps.
-> — Smashing Magazine 
+> — Smashing Magazine
 
 > The Hoodie team is one of the nicest and welcoming that I’ve ever known.
-> — Katrin Apel 
+> — Katrin Apel
 
 > ❤ Hood.ie - a fast offline-first architecture for webapps. Super-simple user management & storage. Great for mobile.
-> — Addy Osmani 
+> — Addy Osmani
 
 [![Join our Chat](https://img.shields.io/badge/Chat-IRC%20or%20Slack-blue.svg)](http://hood.ie/chat)
 [![js-standard-style](https://img.shields.io/badge/code%20style-standard-brightgreen.svg?style=flat)](https://github.com/feross/standard)
@@ -22,9 +22,7 @@
 
 ## Installation
 
-`npm install --save @hoodie/dev-top-level`
-
-_Note: In the future this will be `npm install --save hoodie`, but this is a temporary developer preview name._
+`npm install --save hoodie`
 
 Add this to your `package.json`:
 
@@ -62,14 +60,6 @@ If you want to read or contribute to the source-code you can get to it in the in
 - [**plugin-appconfig**](https://github.com/hoodiehq/hoodie-plugin-appconfig)
 - [**plugin-email**](https://github.com/hoodiehq/hoodie-plugin-email)
 - [**plugin-users**](https://github.com/hoodiehq/hoodie-plugin-users)
-
-## Development
-
-Please note that you need to run a Selenium Standalone Server if you're running the tests locally. You can download it on the [project's website](http://www.seleniumhq.org/download/).
-
-`java -jar selenium-server-standalone-2.46.0.jar`
-
-Once Selenium is running you can execute `npm test` in another terminal tab.
 
 ## License
 
