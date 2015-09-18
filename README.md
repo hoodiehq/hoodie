@@ -22,7 +22,9 @@
 
 ## Installation
 
-`npm install --save hoodie`
+`npm install --save hoodie@next`
+
+_Note_: This is still a developer preview. Look at [my-first-hoodie](https://github.com/hoodiehq/my-first-hoodie) to get the current stable Hoodie install.
 
 Add this to your `package.json`:
 
@@ -52,7 +54,7 @@ If you want to read or contribute to the source-code you can get to it in the in
 ### Core Components
 
 - [**server**](https://github.com/hoodiehq/hoodie-server)
-- [**client**](https://github.com/hoodiehq/hoodie.js)
+- [**client**](https://github.com/hoodiehq/hoodie-client)
 - [**admin-dashboard**](https://github.com/hoodiehq/hoodie-admin-dashboard)
 
 ### Core Plugins
