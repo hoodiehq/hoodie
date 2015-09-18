@@ -15,6 +15,7 @@
     "hapi": "^10.4.1",
     "hapi-couchdb-account": "^1.0.0",
     "hapi-couchdb-store": "^1.1.1",
+    "hoodie-client": "^1.0.0",
     "inert": "^3.1.0",
     "lodash": "^3.10.1",
     "mkdirp": "^0.5.1",
