@@ -31,7 +31,7 @@ log.disp = {
   error: 'Err!' + emoji.get('anger') + ' ',
   silent: 'silent'
 }
-log.heading = emoji.get('dog') + ' Hoodie'
+log.heading = emoji.get('dog') + '  Hoodie'
 
 var knownOpts = {
   'admin-password': String,
