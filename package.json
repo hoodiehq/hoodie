@@ -15,7 +15,7 @@
     "hoodie-plugin-appconfig": "^2.0.1",
     "hoodie-plugin-email": "^1.0.0",
     "hoodie-plugin-users": "^2.2.2",
-    "hoodie-server": "10.2.1",
+    "hoodie-server": "11.0.0",
     "lodash": "^3.10.1",
     "node-emoji": "^1.0.3",
     "nopt": "^3.0.3",
