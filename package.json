@@ -12,10 +12,10 @@
     "good": "^6.4.0",
     "good-squeeze": "^2.1.0",
     "h2o2": "^4.0.1",
-    "hapi": "^9.3.1",
+    "hapi": "^10.4.1",
     "hapi-couchdb-account": "^1.0.0",
     "hapi-couchdb-store": "^1.1.1",
-    "inert": "^3.0.2",
+    "inert": "^3.1.0",
     "lodash": "^3.10.1",
     "mkdirp": "^0.5.1",
     "moment": "^2.10.6",
@@ -44,7 +44,7 @@
     "tap": "^2.1.1"
   },
   "engines": {
-    "node": ">=0.10.22"
+    "node": ">=4"
   },
   "homepage": "https://github.com/hoodiehq/hoodie-server",
   "keywords": [
