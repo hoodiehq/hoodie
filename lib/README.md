@@ -1,11 +1,14 @@
-# `./lib`
+# Module Structure
 
-This is the main `hoodie-server` code directory.
+This is the directory where all the `hoodie-server` code lies. It is divided into multiple sections:
 
-We differentiate a few different sections:
-
-- `./core`: sets up the configuration environment, starts plugins and registers hooks.
-- `./couchdb`: helps with starting and setting up a CouchDB instance `hoodie-server` can use.
-- `./helper`: small pieces of code that don’t fit anywhere else.
-- `./server`: the main HTTP API server setup, including definition of routes.
-- `./utils`: other small pieces of code that are used all over the place.
+| Section | Explanation |
+| --- | --- |
+| [`bundle`](bundle.js) | bundle the frontend code |
+| [`config-store`](config-store.js) | persist config in "data/config.json" |
+| [`config`](config.js) | normalize and apply defaults to config |
+| [`database`](database) | set up and start the database (CouchDB/PouchDB Server) |
+| [`hapi`](hapi) | internal hapi plugins including the hoodie API |
+| [`hooks`](hooks.js) | load and run hooks |
+| [`index`](index.js) | put it all together for `require('hooodie-server')` |
+| [`plugins`](plugins) | provide an API for, load and start plugins |
