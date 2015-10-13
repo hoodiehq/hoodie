@@ -13,6 +13,11 @@ tests/www/tests.js
 
 # npm specific
 
+bin/*
+!bin/start.js
+tests
+.editorconfig
 .gitignore
+.hoodierc
 .npmrc
 .travis.yml
