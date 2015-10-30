@@ -8,8 +8,7 @@ var rimraf = require('rimraf')
 var tap = require('tap')
 var test = tap.test
 
-var app = require('../../lib/index')
-var config = require('../../lib/config')
+var app = require('../../lib')
 
 var startServerTest = require('./lib/start-server-test')
 
@@ -37,16 +36,16 @@ startServerTest(test, 'block _all_dbs', function (t, env_config, end) {
 
   t.test('check config dbs are private to admin', function (tt) {
     var projectDir = path.resolve(__dirname, './lib/fixtures/project1')
-    var env_config = config({
+    var options = {
       inMemory: true,
       id: 'hoodie-test-fixture',
       path: projectDir,
       adminPassword: 'testing'
-    })
+    }
 
     async.waterfall([
-      async.apply(rimraf, env_config.paths.data),
-      async.apply(app.init, env_config),
+      async.apply(rimraf, path.join(projectDir, 'data')),
+      async.apply(app, options),
       function (server, env_config, cb) {
         server.start(cb)
       },
