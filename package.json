@@ -35,8 +35,7 @@
     "bl": "^1.0.0",
     "bundle-bump-bot": "^1.1.0",
     "coveralls": "^2.11.4",
-    "hoodie-admin-dashboard": "^2.0.0",
-    "hoodie-admin-dashboard-uikit": "^3.0.0",
+    "hoodie-admin-dashboard": "^3.1.0",
     "hoodie-client": "^1.0.0",
     "nyc": "^3.2.2",
     "rimraf": "^2.4.3",
@@ -58,9 +57,8 @@
   "license": "Apache-2.0",
   "main": "lib/index.js",
   "peerDependencies": {
-    "hoodie-client": "^1.0.0",
-    "hoodie-admin-dashboard": "^2.0.0",
-    "hoodie-admin-dashboard-uikit": "^3.0.0"
+    "hoodie-admin-dashboard": "^3.1.0",
+    "hoodie-client": "^1.0.0"
   },
   "publishConfig": {
     "tag": "next"
