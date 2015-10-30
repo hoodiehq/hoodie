@@ -8,6 +8,7 @@
   "dependencies": {
     "async": "^1.4.2",
     "browserify": "^12.0.1",
+    "deep-freeze": "0.0.1",
     "follow": "^0.12.1",
     "good": "^6.4.0",
     "good-squeeze": "^2.1.0",
