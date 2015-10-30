@@ -14,7 +14,7 @@ startServerTest(test, 'handle 404', function (t, env_config, end) {
       }
     }, function (error, res, data) {
       if (error) throw error
-      tt.is(data, 'hi\n')
+      tt.match(data, /<html/)
       tt.is(res.statusCode, 200)
       tt.end()
     })
