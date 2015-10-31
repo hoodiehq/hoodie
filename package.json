@@ -29,7 +29,7 @@
     "semver": "^5.0.3",
     "spawn-pouchdb-server": "^3.3.0",
     "uglify-js": "^2.5.0",
-    "wreck": "^6.3.0"
+    "wreck": "^7.0.0"
   },
   "devDependencies": {
     "@hoodie/ci-results": "^1.0.0",
