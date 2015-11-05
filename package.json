@@ -22,7 +22,7 @@
     "moment": "^2.10.6",
     "my-first-hoodie": "^4.0.0",
     "nodemailer": "^1.8.0",
-    "npmlog": "^1.2.1",
+    "npmlog": "^2.0.0",
     "ports": "^1.1.0",
     "random-string": "^0.1.2",
     "request": "^2.65.0",
