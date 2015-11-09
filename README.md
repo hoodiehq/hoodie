@@ -45,23 +45,29 @@ That's it! Running `npm start` will now serve a hoodie-app from your `www` folde
 
 Run `npm start -- --help` to see more options.
 
-## Why is there no code in this repo?
+## Why is there no code in this repository?
 
-Hoodie consists of many components that are bundled and tested in this top-level module.
+Hoodie consists of three main components that are integrated and tested altogether in this top-level module.
 
-If you want to read or contribute to the source-code you can get to it in the individual repos.
+1. [**client**](https://github.com/hoodiehq/hoodie-client)  
+   Hoodie’s front-end client for the browser. It integrates the following client modules:
+   1. [client-account](https://github.com/hoodiehq/hoodie-client-account)  
+   2. [client-store](https://github.com/hoodiehq/hoodie-client-store)  
+   3. [client-task](https://github.com/hoodiehq/hoodie-client-task)  
+   4. [client-log](https://github.com/hoodiehq/hoodie-client-log)  
+   5. [client-connection-status](https://github.com/hoodiehq/hoodie-client-connection-status)  
 
-### Core Components
 
-- [**server**](https://github.com/hoodiehq/hoodie-server)
-- [**client**](https://github.com/hoodiehq/hoodie-client)
-- [**admin-dashboard**](https://github.com/hoodiehq/hoodie-admin-dashboard)
+2. [**server**](https://github.com/hoodiehq/hoodie-server)  
+   Hoodie’s magical back-end. It integrates the following hapi plugins:
+   1. [server-account](https://github.com/hoodiehq/hoodie-server-account)
+   2. [server-store](https://github.com/hoodiehq/hoodie-server-store)
+   3. [server-task](https://github.com/hoodiehq/hoodie-server-task)
 
-### Core Plugins
 
-- [**plugin-appconfig**](https://github.com/hoodiehq/hoodie-plugin-appconfig)
-- [**plugin-email**](https://github.com/hoodiehq/hoodie-plugin-email)
-- [**plugin-users**](https://github.com/hoodiehq/hoodie-plugin-users)
+3. [**admin-dashboard**](https://github.com/hoodiehq/hoodie-admin-dashboard)  
+   Hoodie’s built-in admin dashboard web application
+
 
 ## License
 
