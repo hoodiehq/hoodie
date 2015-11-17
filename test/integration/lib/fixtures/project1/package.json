@@ -1,9 +1,6 @@
 {
-    "name": "project1",
-    "version": "0.0.1",
-    "description": "test project",
-    "dependencies": {},
-    "hoodie": {
-        "plugins": []
-    }
+  "name": "project1",
+  "version": "0.0.1",
+  "description": "test project",
+  "dependencies": {}
 }

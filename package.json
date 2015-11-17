@@ -7,9 +7,7 @@
   },
   "dependencies": {
     "async": "^1.4.2",
-    "browserify": "^12.0.1",
     "deep-freeze": "0.0.1",
-    "follow": "^0.12.1",
     "good": "^6.4.0",
     "good-squeeze": "^2.1.0",
     "h2o2": "^4.0.1",
@@ -19,20 +17,16 @@
     "inert": "^3.1.0",
     "lodash": "^3.10.1",
     "mkdirp": "^0.5.1",
-    "moment": "^2.10.6",
     "my-first-hoodie": "^4.0.0",
-    "nodemailer": "^1.8.0",
     "npmlog": "^2.0.0",
     "ports": "^1.1.0",
     "random-string": "^0.1.2",
     "request": "^2.65.0",
     "semver": "^5.0.3",
     "spawn-pouchdb-server": "^3.3.0",
-    "uglify-js": "^2.5.0",
     "wreck": "^7.0.0"
   },
   "devDependencies": {
-    "@hoodie/ci-results": "^1.0.0",
     "bl": "^1.0.0",
     "bundle-bump-bot": "^1.1.0",
     "coveralls": "^2.11.4",
@@ -78,10 +72,8 @@
     "pretest": "standard",
     "semantic-release": "semantic-release pre && npm publish && semantic-release post",
     "start": "bin/start",
-    "test": "nyc tap --no-cov ./test/unit/*.js ./test/integration/*.js ./test/integration/plugins/manager/*.js ./test/integration/plugins/api/*.js",
-    "test:integration:api": "tap --no-cov ./test/integration/plugins/api/*.js",
+    "test": "nyc tap --no-cov ./test/unit/*.js ./test/integration/*.js",
     "test:integration:core": "tap --no-cov ./test/integration/*.js",
-    "test:integration:manager": "tap --no-cov ./test/integration/plugins/manager/*.js",
     "test:unit": "tap --no-cov ./test/unit/*.js"
   }
 }

@@ -57,21 +57,7 @@ startServerTest(test, 'block _all_dbs', function (t, env_config, end) {
         })
       },
       function (cb) {
-        request.get(url.format(_.omit(env_config.db, 'auth')) + '/plugins/_all_docs', function (error, res) {
-          tt.error(error)
-          tt.is(res.statusCode, 401)
-          cb()
-        })
-      },
-      function (cb) {
         request.get(url.format(env_config.db) + '/app/_all_docs', function (error, res) {
-          tt.error(error)
-          tt.is(res.statusCode, 200)
-          cb()
-        })
-      },
-      function (cb) {
-        request.get(url.format(env_config.db) + '/plugins/_all_docs', function (error, res) {
           tt.error(error)
           tt.is(res.statusCode, 200)
           cb()
