@@ -20,7 +20,7 @@
   },
   "devDependencies": {
     "browser-launcher": "^1.0.0",
-    "browserify": "^11.0.1",
+    "browserify": "^12.0.1",
     "corsify": "^2.1.0",
     "envify": "^3.4.0",
     "hoodie-plugin-test": "hoodiehq/hoodie-plugin-test",
