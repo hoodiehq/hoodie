@@ -59,7 +59,7 @@ Hoodie consists of three main components that are integrated and tested altogeth
 
 
 2. [**server**](https://github.com/hoodiehq/hoodie-server)  
-   Hoodie’s magical back-end. It integrates the following hapi plugins:
+   Hoodie’s back-end. It integrates the following hapi plugins:
    1. [server-account](https://github.com/hoodiehq/hoodie-server-account)
    2. [server-store](https://github.com/hoodiehq/hoodie-server-store)
    3. [server-task](https://github.com/hoodiehq/hoodie-server-task)
