@@ -81,22 +81,6 @@ test('mapProxyPath', function (t) {
   })
 })
 
-test('extractToken', function (t) {
-  t.plan(2)
-
-  t.test('should return the token if there is one', function (tt) {
-    var ret = pluginInternals.extractToken(['AuthSession=some-token; Version=bla bla bla'])
-    tt.is(ret, 'some-token')
-    tt.end()
-  })
-
-  t.test('should return undefined if there is none', function (tt) {
-    var ret = pluginInternals.extractToken(['Some=other-cookie; Version=bla bla bla'])
-    tt.is(ret, undefined)
-    tt.end()
-  })
-})
-
 test('addCorseAndBearerToken', function (t) {
   t.plan(6)
 
