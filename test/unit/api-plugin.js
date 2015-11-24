@@ -82,7 +82,7 @@ test('mapProxyPath', function (t) {
 })
 
 test('addCorseAndBearerToken', function (t) {
-  t.plan(6)
+  t.plan(4)
 
   t.test('should return a 500 if there is an error', function (tt) {
     tt.plan(2)
@@ -132,74 +132,6 @@ test('addCorseAndBearerToken', function (t) {
               function Resp () {}
               Resp.prototype.send = function () {
                 tt.type(this.headers, 'object')
-              }
-              return new Resp()
-            }
-          }
-        }
-      }
-    })
-  })
-
-  t.test('should set status 200 for OPTIONS requests', function (tt) {
-    tt.plan(3)
-
-    var stream = Wreck.toReadableStream('{"the":"body"}')
-
-    stream.headers = {
-      some: 'header'
-    }
-    stream.statusCode = 405
-    pluginInternals.addCorsAndBearerToken(null, stream, { method: 'options', headers: {} }, function (data) {
-      var fixture = '{"the":"body"}'
-      tt.is(data.toString(), fixture)
-      return {
-        code: function (statusCode) {
-          tt.is(statusCode, 200)
-          return {
-            hold: function () {
-              function Resp () {}
-              Resp.prototype.send = function () {
-                tt.type(this.headers, 'object')
-              }
-              return new Resp()
-            }
-          }
-        }
-      }
-    })
-  })
-
-  t.test('should pass through the headers and add CORS headers', function (tt) {
-    tt.plan(3)
-
-    var stream = Wreck.toReadableStream(JSON.stringify({ the: 'body' }))
-
-    stream.headers = {
-      some: 'header'
-    }
-    stream.statusCode = 200
-    pluginInternals.addCorsAndBearerToken(null, stream, {
-      method: 'get',
-      headers: { 'origin': 'some-origin', 'custom-header': 'add me to -Allowed-Headers' }
-    }, function (data) {
-      var fixture = '{"the":"body"}'
-      tt.is(data.toString(), fixture)
-      return {
-        code: function (statusCode) {
-          tt.is(statusCode, 200)
-          return {
-            hold: function () {
-              function Resp () {}
-              Resp.prototype.send = function () {
-                tt.same(this.headers, {
-                  some: 'header', 'content-length': 14,
-                  'access-control-allow-origin': 'some-origin',
-                  'access-control-allow-headers': 'authorization, content-length, content-type, if-match, if-none-match, origin, x-requested-with, custom-header',
-                  'access-control-expose-headers': 'content-type, content-length, etag',
-                  'access-control-allow-methods': 'GET, PUT, POST, DELETE',
-                  'access-control-allow-credentials': 'true'
-                })
               }
               return new Resp()
             }
