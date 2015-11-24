@@ -18,7 +18,7 @@
     "lodash": "^3.10.1",
     "mkdirp": "^0.5.1",
     "my-first-hoodie": "^4.0.0",
-    "npmlog": "^2.0.0",
+    "npmlog": "^1.2.1",
     "ports": "^1.1.0",
     "random-string": "^0.1.2",
     "request": "^2.65.0",
@@ -31,7 +31,7 @@
     "bundle-bump-bot": "^1.1.0",
     "coveralls": "^2.11.4",
     "hoodie-admin-dashboard": "^3.1.0",
-    "hoodie-client": "^1.0.0",
+    "hoodie-client": "^2.2.0",
     "nyc": "^3.2.2",
     "rimraf": "^2.4.3",
     "semantic-release": "^4.3.5",
@@ -53,7 +53,7 @@
   "main": "lib/index.js",
   "peerDependencies": {
     "hoodie-admin-dashboard": "^3.1.0",
-    "hoodie-client": "^1.0.0"
+    "hoodie-client": "^2.2.0"
   },
   "publishConfig": {
     "tag": "next"
