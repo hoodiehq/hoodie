@@ -6,7 +6,7 @@ var test = tap.test
 var Wreck = require('wreck')
 
 var plugin = require('../../lib/hapi/api')
-var pluginInternals = require('../../lib/hapi/api/internals')
+var api = require('../../lib/hapi/api')
 
 test('is a valid hapi plugin', function (t) {
   t.is(typeof plugin.register, 'function', 'register function')
@@ -22,7 +22,7 @@ test('mapProxyPath', function (t) {
   t.test('should prepend the couchCfg url', function (tt) {
     tt.plan(1)
 
-    pluginInternals.mapProxyPath(couchCfg, {
+    api.mapProxyPath(couchCfg, {
       headers: {},
       url: {
         path: '/hoodie/some/path'
@@ -35,7 +35,7 @@ test('mapProxyPath', function (t) {
   t.test('should pass the headers through', function (tt) {
     tt.plan(1)
 
-    pluginInternals.mapProxyPath(couchCfg, {
+    api.mapProxyPath(couchCfg, {
       headers: {
         some: 'header'
       },
@@ -50,7 +50,7 @@ test('mapProxyPath', function (t) {
   t.test('should strip any cookies', function (tt) {
     tt.plan(1)
 
-    pluginInternals.mapProxyPath(couchCfg, {
+    api.mapProxyPath(couchCfg, {
       headers: {
         some: 'header',
         cookie: 'strip-me'
@@ -66,7 +66,7 @@ test('mapProxyPath', function (t) {
   t.test('should move any bearer token to the cookie', function (tt) {
     tt.plan(1)
 
-    pluginInternals.mapProxyPath(couchCfg, {
+    api.mapProxyPath(couchCfg, {
       headers: {
         some: 'header',
         cookie: 'strip-me',
@@ -87,7 +87,7 @@ test('addCorseAndBearerToken', function (t) {
   t.test('should return a 500 if there is an error', function (tt) {
     tt.plan(2)
 
-    pluginInternals.addCorsAndBearerToken('something went wrong', {}, {}, function (err) {
+    api.addBearerToken('something went wrong', {}, {}, function (err) {
       tt.is(err, 'something went wrong')
       return {
         code: function (statusCode) {
@@ -103,7 +103,7 @@ test('addCorseAndBearerToken', function (t) {
     var res = new Events.EventEmitter()
     res.pipe = function () {}
 
-    pluginInternals.addCorsAndBearerToken(null, res, {headers: {}}, function (err) {
+    api.addBearerToken(null, res, {headers: {}}, function (err) {
       tt.ok(err.isBoom)
       return {
         code: function (statusCode) {
@@ -121,7 +121,7 @@ test('addCorseAndBearerToken', function (t) {
     stream.headers = {}
     stream.statusCode = 200
 
-    pluginInternals.addCorsAndBearerToken(null, stream, { headers: {} }, function (data) {
+    api.addBearerToken(null, stream, { headers: {} }, function (data) {
       var fixture = '{"the":"body"}'
       tt.is(data.toString(), fixture)
       return {
@@ -157,7 +157,7 @@ test('addCorseAndBearerToken', function (t) {
       'set-cookie': ['AuthSession=some-token; Version=bla bla bla']
     }
 
-    pluginInternals.addCorsAndBearerToken(null, stream, { method: 'post', path: '/hoodie/_session', headers: {} }, function (data) {
+    api.addBearerToken(null, stream, { method: 'post', path: '/hoodie/_session', headers: {} }, function (data) {
       tt.is(data.toString(), fixture)
 
       return {
