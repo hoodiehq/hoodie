@@ -25,7 +25,7 @@ test('mapProxyPath', function (t) {
     pluginInternals.mapProxyPath(couchCfg, {
       headers: {},
       url: {
-        path: '/_api/some/path'
+        path: '/hoodie/some/path'
       }
     }, function (arg1, url) {
       tt.is(url, 'http://couch.somewhere:1234/some/path')
@@ -40,7 +40,7 @@ test('mapProxyPath', function (t) {
         some: 'header'
       },
       url: {
-        path: '/_api/some/path'
+        path: '/hoodie/some/path'
       }
     }, function (arg1, url, headers) {
       tt.is(headers.some, 'header')
@@ -56,7 +56,7 @@ test('mapProxyPath', function (t) {
         cookie: 'strip-me'
       },
       url: {
-        path: '/_api/some/path'
+        path: '/hoodie/some/path'
       }
     }, function (arg1, url, headers) {
       tt.is(headers.cookie, undefined)
@@ -73,7 +73,7 @@ test('mapProxyPath', function (t) {
         authorization: 'Bearer my-token'
       },
       url: {
-        path: '/_api/some/path'
+        path: '/hoodie/some/path'
       }
     }, function (arg1, url, headers) {
       tt.is(headers.cookie, 'AuthSession=my-token')
@@ -241,7 +241,7 @@ test('addCorseAndBearerToken', function (t) {
       'set-cookie': ['AuthSession=some-token; Version=bla bla bla']
     }
 
-    pluginInternals.addCorsAndBearerToken(null, stream, { method: 'post', path: '/_api/_session', headers: {} }, function (data) {
+    pluginInternals.addCorsAndBearerToken(null, stream, { method: 'post', path: '/hoodie/_session', headers: {} }, function (data) {
       tt.is(data.toString(), fixture)
 
       return {

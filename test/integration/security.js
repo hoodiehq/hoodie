@@ -13,8 +13,8 @@ var app = require('../../lib')
 var startServerTest = require('./lib/start-server-test')
 
 startServerTest(test, 'block _all_dbs', function (t, env_config, end) {
-  t.test('should 404 on /_api/_all_dbs', function (tt) {
-    request.get(url.format(env_config.app) + '/_api/_all_dbs', function (error, res) {
+  t.test('should 404 on /hoodie/_all_dbs', function (tt) {
+    request.get(url.format(env_config.app) + '/hoodie/_all_dbs', function (error, res) {
       tt.error(error)
       tt.is(res.statusCode, 404)
       tt.end()
@@ -22,7 +22,7 @@ startServerTest(test, 'block _all_dbs', function (t, env_config, end) {
   })
 
   t.test('should log into admin', function (tt) {
-    request.post(url.format(env_config.app) + '/_api/_session', {
+    request.post(url.format(env_config.app) + '/hoodie/_session', {
       form: {
         name: 'admin',
         password: env_config.admin.password
