@@ -10,7 +10,7 @@
     "deep-freeze": "0.0.1",
     "good": "^6.4.0",
     "good-squeeze": "^2.1.0",
-    "h2o2": "^4.0.1",
+    "h2o2": "^4.0.2",
     "hapi": "^11.0.3",
     "hoodie-server-account": "^1.0.0",
     "hoodie-server-store": "^1.0.1",
@@ -22,9 +22,9 @@
     "ports": "^1.1.0",
     "random-string": "^0.1.2",
     "request": "^2.65.0",
+    "require-relative": "^0.8.7",
     "semver": "^5.0.3",
-    "spawn-pouchdb-server": "^3.3.0",
-    "wreck": "^7.0.0"
+    "spawn-pouchdb-server": "^3.3.0"
   },
   "devDependencies": {
     "bl": "^1.0.0",
@@ -72,8 +72,6 @@
     "pretest": "standard",
     "semantic-release": "semantic-release pre && npm publish && semantic-release post",
     "start": "bin/start",
-    "test": "nyc tap --no-cov ./test/unit/*.js ./test/integration/*.js",
-    "test:integration:core": "tap --no-cov ./test/integration/*.js",
-    "test:unit": "tap --no-cov ./test/unit/*.js"
+    "test": "nyc tap --no-cov ./test/integration/*.js"
   }
 }
