@@ -3,7 +3,6 @@ module.exports = function (test, name, testfn) {
     require('../../../')({
       inMemory: true,
       port: 5001,
-      adminPort: 5011,
       adminPassword: '12345',
       loglevel: 'error'
     }, function (error, server, env_config) {

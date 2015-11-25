@@ -6,7 +6,6 @@
     "url": "https://github.com/hoodiehq/hoodie-server/issues"
   },
   "dependencies": {
-    "async": "^1.4.2",
     "deep-freeze": "0.0.1",
     "good": "^6.4.0",
     "good-squeeze": "^2.1.0",
@@ -16,15 +15,15 @@
     "hoodie-server-store": "^1.0.1",
     "inert": "^3.1.0",
     "lodash": "^3.10.1",
+    "memdown": "^1.1.0",
     "mkdirp": "^0.5.1",
     "my-first-hoodie": "^4.0.0",
     "npmlog": "^2.0.0",
     "ports": "^1.1.0",
+    "pouchdb": "^5.1.0",
     "random-string": "^0.1.2",
     "request": "^2.65.0",
-    "require-relative": "^0.8.7",
-    "semver": "^5.0.3",
-    "spawn-pouchdb-server": "^3.3.0"
+    "require-relative": "^0.8.7"
   },
   "devDependencies": {
     "bl": "^1.0.0",

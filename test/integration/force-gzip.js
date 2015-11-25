@@ -8,10 +8,10 @@ var test = tap.test
 
 var startServerTest = require('./lib/start-server-test')
 
-startServerTest(test, 'handle forced gzip', function (t, env_config, end) {
+startServerTest(test, 'handle forced gzip', function (t, config, end) {
   t.test('should receive gzip when gzip accept header sent', function (tt) {
     tt.plan(4)
-    request.get(url.format(env_config.app) + '/hoodie', {
+    request.get(url.format(config.app) + '/hoodie', {
       headers: {'Accept-Encoding': 'gzip, deflate'}
     })
     .on('response', function (res) {
@@ -26,7 +26,7 @@ startServerTest(test, 'handle forced gzip', function (t, env_config, end) {
     }))
   })
   t.test('should receive no gzip when no gzip accept header sent', function (tt) {
-    request.get(url.format(env_config.app) + '/hoodie')
+    request.get(url.format(config.app) + '/hoodie')
     .on('response', function (res) {
       tt.notOk(res.headers['content-encoding'])
       tt.end()
@@ -34,7 +34,7 @@ startServerTest(test, 'handle forced gzip', function (t, env_config, end) {
   })
   t.test('should receive gzip when no gzip accept header sent but force query param', function (tt) {
     tt.plan(4)
-    request.get(url.format(env_config.app) + '/hoodie?force_gzip=true')
+    request.get(url.format(config.app) + '/hoodie?force_gzip=true')
     .on('response', function (res) {
       tt.is(res.headers['content-encoding'], 'gzip')
     })
