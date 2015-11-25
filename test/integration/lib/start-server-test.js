@@ -5,11 +5,11 @@ module.exports = function (test, name, testfn) {
       port: 5001,
       adminPassword: '12345',
       loglevel: 'error'
-    }, function (error, server, env_config) {
+    }, function (error, server, config) {
       if (error) throw error
 
       server.start(function () {
-        testfn(t, env_config, function (tt) {
+        testfn(t, config, function (tt) {
           if (tt && tt.end) tt.end()
           t.end()
           process.exit()

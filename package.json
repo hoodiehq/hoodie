@@ -19,9 +19,7 @@
     "mkdirp": "^0.5.1",
     "my-first-hoodie": "^4.0.0",
     "npmlog": "^2.0.0",
-    "ports": "^1.1.0",
     "pouchdb": "^5.1.0",
-    "random-string": "^0.1.2",
     "request": "^2.65.0",
     "require-relative": "^0.8.7"
   },
