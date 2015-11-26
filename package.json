@@ -30,6 +30,7 @@
     "hoodie-admin-dashboard": "^3.1.0",
     "hoodie-client": "^2.2.0",
     "nyc": "^3.2.2",
+    "proxyquire": "^1.7.3",
     "rimraf": "^2.4.3",
     "semantic-release": "^4.3.5",
     "standard": "^5.3.1",
@@ -69,6 +70,6 @@
     "pretest": "standard",
     "semantic-release": "semantic-release pre && npm publish && semantic-release post",
     "start": "bin/start",
-    "test": "nyc tap --no-cov ./test/integration/*.js"
+    "test": "nyc tap --no-cov ./test/{unit,integration}/*.js"
   }
 }
