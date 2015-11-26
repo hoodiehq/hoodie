@@ -29,6 +29,7 @@
     "coveralls": "^2.11.4",
     "hoodie-admin-dashboard": "^3.1.0",
     "hoodie-client": "^2.2.0",
+    "nock": "^3.3.2",
     "nyc": "^3.2.2",
     "proxyquire": "^1.7.3",
     "rimraf": "^2.4.3",
@@ -70,6 +71,7 @@
     "pretest": "standard",
     "semantic-release": "semantic-release pre && npm publish && semantic-release post",
     "start": "bin/start",
-    "test": "nyc tap --no-cov ./test/{unit,integration}/*.js"
+    "test": "nyc tap --no-cov ./test/{unit,integration}/{*,private/*}.js",
+    "test:public": "tap --no-cov ./test/{unit,integration}/*.js"
   }
 }
