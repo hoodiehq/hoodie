@@ -10,34 +10,29 @@
 
 `hoodie-server` is the core server component of Hoodie. Together with `hoodie-client`, it forms the two parts that make up the Hoodie system.
 
-`hoodie-server` is responsible for a number of things on the server:
+`hoodie-server` itself is responsible for only a few things:
 
-- check the environment to make sure Hoodie can run properly
-- start an instance of CouchDB, Hoodie’s database
-- start a webserver each for the Hoodie app itself and the Hoodie Admin Dashboard
-- start all Hoodie plugins that might be installed
+- provide a normalized [config](lib/config.js) for itself and all core components/plugins
+- provide an API to interact with [databases](lib/database.js) to components/plugins
+- start and configure a [hapi server](lib/hapi.js) that also serves [static components](lib/static.js) like hoodie-client and hoodie-admin-dashboard
 
-`hoodie-server` isn’t meant to be used by itself and it is used by the `hoodie` module, which also inlcude `hoodie-client` to form Hoodie.
+The rest is handled by components like [hoodie-server-account](https://github.com/hoodiehq/hoodie-server-account), or [hoodie-server-store](https://github.com/hoodiehq/hoodie-server-store).
 
-You can use `hoodie-server` on its own, if you want to work on it, help fix bugs or test new versions. And when you are writing your own plugin, you can use `hoodie-server` for debugging.
+`hoodie-server` isn’t meant to be used by itself and it is used by the `hoodie` module, which also inlcudes `hoodie-client` to form Hoodie.
+
+You can use `hoodie-server` on its own, if you want to work on it, help fix bugs or test new versions. And when you are writing your own components/plugins, you can use `hoodie-server` for debugging.
 
 ## Usage
 
-As noted before, this isn’t meant to be run standalone, but if you are helping out with development, or build your own plugins, or just want to spelunk around, here’s how it works:
+As noted before, this isn’t meant to be run standalone, but if you are helping out with development, or build your own components/plugins, or just want to spelunk around, here’s how it works:
 
 ```
 git clone git@github.com:hoodiehq/hoodie-server.git
 cd hoodie-server
+npm install -g hoodie-start
 npm install
-npm link
-cd ..
-git clone git@github.com:hoodiehq/hoodie.git
-cd hoodie
-npm install
-npm link hoodie-server
+hoodie-start
 ```
-
-When that’s done, you can run `./bin/start` to start `hoodie` with your local `hoodie-server`.
 
 There are a few options to change the behaviour of `hoodie-server`.
 
@@ -48,12 +43,7 @@ port: Port-number to run the Hoodie App on (optional)
 bindAddress': Address that Hoodie binds to (optional) Default: 127.0.0.1
 www: WWW path (optional) Default: path.join(options.path, 'www')
 
-adminPort: Port-number to run the admin-dashboard on (optional)
-adminPassword: Password for the admin-dashboard (required on first run)
-
-dbPort: Port-number to run the PouchDB Server on (optional)
 inMemory: Whether to start the PouchDB Server in memory (optional) Default: false
-dbPassword: Password to use for the PouchDB Server `_hoodie` admin user (optional)
 dbUrl: If provided does not start PouchDB Server and uses external CouchDB. Has to contain credentials. (optional)
 data: Data path (optional) Default: path.join(options.path, 'data')
 
@@ -67,16 +57,9 @@ The tests live in `test/unit` and `test/integration`. `test/unit` tests (or “u
 
 If you are adding new features to `hoodie-server` you should provide test cases for the new feature. Depending on the feature, you either best write unit tests or integration tests and sometimes even both. The more tests we have, the more confidently we can release future versions of `hoodie-server`.
 
-## Need Help?
+## Need help or want to help?
 
-// how to ask for support
-//  chat
-//  issues
-// how to file bug reports
-
-## Wanna help?
-
-// point to hoodie/CONTRIBUTING.md
+It’s best to join our [chat](http://hood.ie/chat/).
 
 ## License
 
