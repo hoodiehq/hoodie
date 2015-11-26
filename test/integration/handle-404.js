@@ -1,34 +1,49 @@
 var url = require('url')
 
-var request = require('request')
-var tap = require('tap')
-var test = tap.test
+var test = require('tap').test
 
-var startServerTest = require('./lib/start-server-test')
+var hoodieServer = require('../../')
 
-startServerTest(test, 'handle 404', function (t, env_config, end) {
-  t.test('should send index.html on accept: text/html', function (tt) {
-    request.get(url.format(env_config.app) + '/does_not_exist', {
-      headers: {
-        accept: 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8'
-      }
-    }, function (error, res, data) {
-      tt.error(error)
-      tt.match(data, /<html/)
-      tt.is(res.statusCode, 200)
-      tt.end()
+test('forward all requests that accept html to app', function (t) {
+  t.test('send index.html on accept: text/html', function (tt) {
+    hoodieServer({
+      inMemory: true,
+      loglevel: 'error'
+    }, function (err, server, config) {
+      tt.error(err, 'hoodie-server loads without error')
+
+      server.inject({
+        url: url.resolve(url.format(config.app), 'does_not_exist'),
+        headers: {
+          accept: 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8'
+        }
+      }, function (res) {
+        tt.is(res.statusCode, 200, 'statusCode is 200')
+        tt.match(res.payload, /<html/, 'response is HTML')
+        server.stop(tt.end)
+      })
     })
   })
-  t.test('should send a JSON 404 on anything but accept: text/html*', function (tt) {
-    request.get(url.format(env_config.app) + '/does_not_exist', {
-      json: true
-    }, function (error, res, data) {
-      tt.error(error)
-      tt.is(data.error, 'Not Found')
-      tt.is(data.statusCode, 404)
-      tt.is(res.statusCode, 404)
-      tt.end()
+
+  t.test('send a JSON 404 on anything but accept: text/html*', function (tt) {
+    hoodieServer({
+      inMemory: true,
+      loglevel: 'error'
+    }, function (err, server, config) {
+      tt.error(err)
+
+      server.inject({
+        url: url.resolve(url.format(config.app), 'does_not_exist'),
+        headers: {
+          accept: 'application/json'
+        }
+      }, function (res) {
+        tt.is(res.statusCode, 404, 'statusCode is 404')
+        tt.is(res.result.error, 'Not Found', 'Not Found error')
+        server.stop(tt.end)
+      })
     })
   })
-  t.test('teardown', end)
+
+  t.end()
 })
