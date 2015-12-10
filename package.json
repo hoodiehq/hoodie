@@ -29,7 +29,7 @@
     "hoodie-admin-dashboard": "^3.1.0",
     "hoodie-client": "^2.2.0",
     "nock": "^3.3.2",
-    "nyc": "^3.2.2",
+    "nyc": "^5.0.0",
     "proxyquire": "^1.7.3",
     "rimraf": "^2.4.3",
     "semantic-release": "^4.3.5",
