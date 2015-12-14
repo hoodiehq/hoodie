@@ -9,7 +9,7 @@
     "deep-freeze": "0.0.1",
     "good": "^6.4.0",
     "good-squeeze": "^2.1.0",
-    "h2o2": "^4.0.2",
+    "h2o2": "^5.0.0",
     "hapi": "^11.0.3",
     "hoodie-server-account": "^1.0.0",
     "hoodie-server-store": "^1.0.1",
