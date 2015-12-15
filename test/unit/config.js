@@ -26,16 +26,6 @@ test('config', function (t) {
       protocol: 'http'
     }, 'uses "http://127.0.0.1:8080/" as app url')
 
-    tt.throws(function () {
-      'use strict'
-      config.app = {}
-    }, /read only/, 'config is frozen/immutable')
-
-    tt.throws(function () {
-      'use strict'
-      config.app.foo = {}
-    }, /not extensible/, 'config is deeply frozen/immutable')
-
     tt.end()
   })
 
