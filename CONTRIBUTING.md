@@ -142,7 +142,22 @@ included in the project:
 9. If you are asked to amend your changes before they can be merged in, please
    use `git commit --amend` (or rebasing for multi-commit Pull Requests) and
    force push to your remote feature branch. You may also be asked to squash
-   commits.
+   commits to follow our commit conventions, as they are used by
+   [semantic-release](https://github.com/semantic-release/semantic-release) to
+   automatically determine the new version and release to npm. In a nutshell:
+
+   #### Commit Message Conventions
+
+   - Commit test files with `test: ...` or `test(scope): ...` prefix
+   - Commit bug fixes with `fix: ...` or `fix(scope): ...` prefix
+   - Commit breaking changes by adding `BREAKING CHANGE: ` in the commit body
+     (not the subject line)
+   - Commit changes to `package.json`, `.gitignore` and other meta files with
+     `chore(filenamewithoutext): ...`
+   - Commit changes to README files or comments with `docs: ...`
+
+   We follow [Angular’s Commit Message Conventions](https://docs.google.com/document/d/1QrDFcIiPjSLDn3EL15IJygNPiHORgU1_OOAqWjiDU5Y/edit).
+   But don’t worry about it, we are happy to help :)
 
 
 **IMPORTANT**: By submitting a patch, you agree to license your work under the
