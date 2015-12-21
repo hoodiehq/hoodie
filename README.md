@@ -29,9 +29,9 @@ As noted before, this isn’t meant to be run standalone. But; if you are helpin
 ```
 git clone git@github.com:hoodiehq/hoodie-server.git
 cd hoodie-server
-npm install -g hoodie-start
+npm install hoodie-start@next
 npm install
-hoodie-start
+./node_modules/.bin/hoodie-start
 ```
 
 There are a few options to change the behaviour of `hoodie-server`.
