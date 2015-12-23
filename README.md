@@ -12,9 +12,9 @@
 
 `hoodie-server` itself is responsible for only a few things:
 
-- provide a normalized [config](lib/config.js) for itself and all core components/plugins
-- provide an API to interact with [databases](lib/database.js) to components/plugins
-- start and configure a [hapi server](lib/hapi.js) that also serves [static components](lib/static.js) like hoodie-client and hoodie-admin-dashboard
+- providing a normalized [config](lib/config.js) for itself and all core components/plugins
+- providing an API to interact with [databases](lib/database.js) to components/plugins
+- starting and configuring a [hapi server](lib/hapi.js) that also serves [static components](lib/static.js) like hoodie-client and hoodie-admin-dashboard
 
 The rest is handled by components like [hoodie-server-account](https://github.com/hoodiehq/hoodie-server-account), or [hoodie-server-store](https://github.com/hoodiehq/hoodie-server-store).
 
@@ -24,7 +24,7 @@ You can use `hoodie-server` on its own, if you want to work on it, help fix bugs
 
 ## Usage
 
-As noted before, this isn’t meant to be run standalone, but if you are helping out with development, or build your own components/plugins, or just want to spelunk around, here’s how it works:
+As noted before, this isn’t meant to be run standalone. But; if you are helping out with development, building your own components/plugins, or just want to spelunk around, here’s how it works:
 
 ```
 git clone git@github.com:hoodiehq/hoodie-server.git
@@ -55,7 +55,7 @@ The `hoodie-server` test suite is run with `npm test`.
 
 The tests live in `test/unit` and `test/integration`. `test/unit` tests (or “unit tests”) are to test the behaviour of individual sub-modules within `hoodie-server`, while `test/integration` tests (or “integration tests”) are used to test the behaviour of a fully running instance of `hoodie-server`, e.g. the behaviour of its HTTP API.
 
-If you are adding new features to `hoodie-server` you should provide test cases for the new feature. Depending on the feature, you either best write unit tests or integration tests and sometimes even both. The more tests we have, the more confidently we can release future versions of `hoodie-server`.
+If you are adding new features to `hoodie-server` you should provide test cases for the new feature. Depending on the feature, it's either best to write unit tests or integration tests and sometimes even both. The more tests we have, the more confidently we can release future versions of `hoodie-server`.
 
 ## Need help or want to help?
 
