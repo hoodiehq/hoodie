@@ -1,5 +1,6 @@
 {
   "name": "hoodie",
+  "version": "0.0.0-semantically-released",
   "description": "Hoodie enables you to express yourself through technology by making web app development very fast, easy and accessible.",
   "author": "The Hoodie Community",
   "bin": {
