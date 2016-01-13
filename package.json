@@ -7,15 +7,16 @@
   },
   "dependencies": {
     "@hoodie/server-account-node-sessions": "^1.0.0",
-    "async": "^1.5.0",
+    "async": "^1.5.2",
     "good": "^6.4.0",
     "good-squeeze": "^2.1.0",
     "h2o2": "^5.0.0",
-    "hapi": "^12.0.0",
+    "hapi": "^12.1.0",
     "hoodie-server-store": "^1.0.1",
     "inert": "^3.1.0",
+    "istanbul": "^0.4.2",
     "jsonfile": "^2.2.3",
-    "lodash": "^3.10.1",
+    "lodash": "^4.0.0",
     "memdown": "^1.1.0",
     "mkdirp": "^0.5.1",
     "my-first-hoodie": "^4.0.0",
@@ -33,12 +34,12 @@
     "hoodie-admin-dashboard": "^3.1.0",
     "hoodie-client": "^2.2.0",
     "nock": "^5.2.1",
-    "nyc": "^5.0.0",
+    "nyc": "^5.3.0",
     "proxyquire": "^1.7.3",
     "rimraf": "^2.4.3",
     "semantic-release": "^4.3.5",
     "standard": "^5.3.1",
-    "tap": "^2.1.1"
+    "tap": "^5.0.1"
   },
   "engines": {
     "node": ">=4"
