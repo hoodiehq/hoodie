@@ -191,12 +191,22 @@ The process for merging looks like this:
 ```
 git checkout master # or the main branch configured on github
 git pull # get latest changes
-git checkout feature-branch # replace name with your brnach
+git checkout feature-branch # replace name with your branch
 git rebase master
 git checkout master
-git merge feature-branch # replace name with your brnach
+git merge feature-branch # replace name with your branch
 git push
 ```
+
+When merging PRs from forked repositories, we reccomend you install the [hub](https://github.com/github/hub) command line tools.
+
+This allows you to do:
+
+```
+hub checkout link-to-pull-request
+```
+
+meaning that you will automatically check out the branch for the pull request, without needing any other steps like setting git upstreams! :sparkles:
 
 ### Submitting changes
 
