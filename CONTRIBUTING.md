@@ -186,6 +186,18 @@ If you have commit access, please follow this process for merging patches and cu
 5. If the change is good, and authored by another maintainer/collaborator, give
    them a "+1" comment and let them handle the merge.
 
+The process for merging looks like this:
+
+```
+git checkout master # or the main branch configured on github
+git pull # get latest changes
+git checkout feature-branch # replace name with your brnach
+git rebase master
+git checkout master
+git merge feature-branch # replace name with your brnach
+git push
+```
+
 ### Submitting changes
 
 1. All non-trivial changes should be put up for review using GitHub Pull
