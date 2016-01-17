@@ -20,7 +20,6 @@
     "memdown": "^1.1.0",
     "mkdirp": "^0.5.1",
     "my-first-hoodie": "^4.0.0",
-    "nock": "^3.4.0",
     "npmlog": "^2.0.0",
     "pouchdb": "^5.1.0",
     "pouchdb-users": "^1.0.0",
