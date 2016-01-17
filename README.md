@@ -24,7 +24,7 @@ You can use `hoodie-server` on its own, if you want to work on it, help fix bugs
 
 ## Usage
 
-As noted before, this isn’t meant to be run standalone. But; if you are helping out with development, building your own components/plugins, or just want to spelunk around, here’s how it works:
+As noted before, this isn’t meant to be run standalone. But if you are helping out with development, building your own components/plugins, or just want to spelunk around, here’s how it works:
 
 ```
 git clone git@github.com:hoodiehq/hoodie-server.git
@@ -36,16 +36,16 @@ npm install
 
 There are a few options to change the behaviour of `hoodie-server`.
 
-path: Project path (optional) Default: process.cwd()
-loglevel: (optional) Default: 'warn'
-
-port: Port-number to run the Hoodie App on (optional)
-bindAddress': Address that Hoodie binds to (optional) Default: 127.0.0.1
-www: WWW path (optional) Default: path.join(options.path, 'www')
-
-inMemory: Whether to start the PouchDB Server in memory (optional) Default: false
-dbUrl: If provided does not start PouchDB Server and uses external CouchDB. Has to contain credentials. (optional)
-data: Data path (optional) Default: path.join(options.path, 'data')
+option        | default                        |   description
+------------- | -----------------------------  | -------------
+path          | process.cwd()                  | Project path
+loglevel      | 'warn'                         |
+port          | 8080                           | Port-number to run the Hoddie App on
+bindAddress   | 127.0.0.1                      | Address that Hoodie binds to
+www           | path.join(options.path, 'www') | WWW path
+inMemory      | false                          | Whether to start the PouchDB Server in memory
+dbUrl         | PouchDB Server                 | If provided does not start PouchDB Server and uses external CouchDB. Has to contain credentials.
+data          | path.join(options.path, 'data')| Data path
 
 If that doesn’t make much sense just yet, don’t worry about it.
 
