@@ -84,7 +84,7 @@ implementing features, refactoring code), otherwise you risk spending a lot of
 time working on something that the project's developers might not want to merge
 into the project.
 
-Please adhere to [JavaScript Standard Style](https://github.com/feross/standard) and any other requirements (such as test coverage).
+Please adhere to our [JavaScript Coding Style](CODING_STYLE.md) and any other requirements (such as test coverage).
 
 Adhering to the following this process is the best way to get your work
 included in the project:
