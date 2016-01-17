@@ -186,6 +186,28 @@ If you have commit access, please follow this process for merging patches and cu
 5. If the change is good, and authored by another maintainer/collaborator, give
    them a "+1" comment and let them handle the merge.
 
+The process for merging looks like this:
+
+```
+git checkout master # or the main branch configured on github
+git pull # get latest changes
+git checkout feature-branch # replace name with your branch
+git rebase master
+git checkout master
+git merge feature-branch # replace name with your branch
+git push
+```
+
+When merging PRs from forked repositories, we reccomend you install the [hub](https://github.com/github/hub) command line tools.
+
+This allows you to do:
+
+```
+hub checkout link-to-pull-request
+```
+
+meaning that you will automatically check out the branch for the pull request, without needing any other steps like setting git upstreams! :sparkles:
+
 ### Submitting changes
 
 1. All non-trivial changes should be put up for review using GitHub Pull
