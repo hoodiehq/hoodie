@@ -1,7 +1,7 @@
 {
   "name": "hoodie-server",
   "description": "The core of the Hoodie backend",
-  "author": "The Hoodie Community",
+  "author": "The Hoodie Community and other contributors | http://hood.ie/",
   "bugs": {
     "url": "https://github.com/hoodiehq/hoodie-server/issues"
   },
