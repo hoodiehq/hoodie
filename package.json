@@ -32,7 +32,7 @@
     "coveralls": "^2.11.4",
     "hoodie-admin-dashboard": "^3.1.0",
     "hoodie-client": "^2.2.0",
-    "nock": "^6.0.1",
+    "nock": "^7.0.1",
     "nyc": "^5.3.0",
     "proxyquire": "^1.7.3",
     "rimraf": "^2.4.3",
