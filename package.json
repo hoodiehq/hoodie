@@ -11,7 +11,7 @@
     "good": "^6.4.0",
     "good-squeeze": "^2.1.0",
     "h2o2": "^5.0.0",
-    "hapi": "^12.1.0",
+    "hapi": "^13.0.0",
     "hoodie-server-store": "^1.0.1",
     "inert": "^3.1.0",
     "istanbul": "^0.4.2",
