@@ -24,7 +24,7 @@
 
 `npm install --save hoodie@next`
 
-_Note_: This is still a developer preview. Look at [my-first-hoodie](https://github.com/hoodiehq/my-first-hoodie) to get the current stable Hoodie install.
+_Note_: This is still a developer preview. Look at [Hoodie’s new Tracker App](https://github.com/hoodiehq/hoodie-app-tracker) to get the current stable Hoodie install.
 
 Add this to your `package.json`:
 
