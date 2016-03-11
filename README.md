@@ -31,13 +31,6 @@ Add this to your `package.json`:
 ```json
 "scripts": {
   "start": "hoodie"
-},
-"hoodie": {
-  "plugins": [
-    "hoodie-plugin-appconfig",
-    "hoodie-plugin-email",
-    "hoodie-plugin-users"
-  ]
 }
 ```
 

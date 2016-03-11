@@ -12,7 +12,7 @@
   "dependencies": {
     "hoodie-admin-dashboard": "^3.1.0",
     "hoodie-admin-dashboard-uikit": "^3.0.0",
-    "hoodie-server": "git://github.com/hoodiehq/hoodie-server#tent",
+    "hoodie-server": "git://github.com/hoodiehq/hoodie-server#tent-pouchdb",
     "hoodie-client": "^3.1.0",
     "hoodie-start": "^1.0.2"
   },
@@ -32,14 +32,6 @@
     "node": ">=4"
   },
   "homepage": "https://github.com/hoodiehq/hoodie#readme",
-  "hoodie": {
-    "plugins": [
-      "hoodie-plugin-appconfig",
-      "hoodie-plugin-email",
-      "hoodie-plugin-users",
-      "hoodie-plugin-test"
-    ]
-  },
   "keywords": [
     "frontend-only",
     "nobackend",
