@@ -40,7 +40,7 @@ option        | default                        |   description
 ------------- | -----------------------------  | -------------
 path          | process.cwd()                  | Project path
 loglevel      | 'warn'                         |
-port          | 8080                           | Port-number to run the Hoddie App on
+port          | 8080                           | Port-number to run the Hoodie App on
 bindAddress   | 127.0.0.1                      | Address that Hoodie binds to
 www           | path.join(options.path, 'www') | WWW path
 inMemory      | false                          | Whether to start the PouchDB Server in memory
