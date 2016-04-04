@@ -44,17 +44,17 @@ Hoodie consists of three main components that are integrated and tested altogeth
 
 1. [**client**](https://github.com/hoodiehq/hoodie-client)  
    Hoodie’s front-end client for the browser. It integrates the following client modules:
-   1. [client-account](https://github.com/hoodiehq/hoodie-client-account)  
-   2. [client-store](https://github.com/hoodiehq/hoodie-client-store)  
-   3. [client-task](https://github.com/hoodiehq/hoodie-client-task)  
-   4. [client-log](https://github.com/hoodiehq/hoodie-client-log)  
-   5. [client-connection-status](https://github.com/hoodiehq/hoodie-client-connection-status)  
+   1. [account-client](https://github.com/hoodiehq/hoodie-account-client)
+   2. [store-client](https://github.com/hoodiehq/hoodie-store-client)
+   3. [client-task](https://github.com/hoodiehq/hoodie-client-task)
+   4. [log-client](https://github.com/hoodiehq/hoodie-log-client)
+   5. [connection-status](https://github.com/hoodiehq/hoodie-connection-status)
 
 
 2. [**server**](https://github.com/hoodiehq/hoodie-server)  
    Hoodie’s back-end. It integrates the following hapi plugins:
-   1. [server-account](https://github.com/hoodiehq/hoodie-server-account)
-   2. [server-store](https://github.com/hoodiehq/hoodie-server-store)
+   1. [account-server](https://github.com/hoodiehq/hoodie-account-server)
+   2. [store-server](https://github.com/hoodiehq/hoodie-store-server)
    3. [server-task](https://github.com/hoodiehq/hoodie-server-task)
 
 
