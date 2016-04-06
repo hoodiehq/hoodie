@@ -40,8 +40,9 @@ Add this to your `package.json`:
   ]
 }
 ```
+Before your first run, you need to set the admin panel password. The doesn't really work yet, so just do `npm start -- --admin-password 123` when you do this the first time. 
 
-That's it! Running `npm start` will now serve a hoodie-app from your `www` folder.
+That's it! From now on, running `npm start` will now serve a hoodie-app from your `www` folder.
 
 Run `npm start -- --help` to see more options.
 
