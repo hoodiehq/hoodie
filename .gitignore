@@ -7,4 +7,5 @@ node_modules
 *.dump
 *.swp
 .DS_Store
+.hoodie
 .nyc_output
