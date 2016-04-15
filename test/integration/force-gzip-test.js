@@ -4,12 +4,16 @@ var zlib = require('zlib')
 var test = require('tap').test
 
 var hoodieServer = require('../../')
+var mockCouchDB = require('./utils/mock-couchdb')
 
 test('handle forced gzip', function (t) {
   t.test('receive gzip when gzip accept header sent', function (tt) {
+    mockCouchDB()
+
     hoodieServer({
       inMemory: true,
-      loglevel: 'error'
+      loglevel: 'error',
+      dbUrl: 'http://admin:secret@localhost:5984'
     }, function (err, server, config) {
       tt.error(err, 'hoodie-server loads without error')
 
@@ -21,9 +25,12 @@ test('handle forced gzip', function (t) {
   })
 
   t.test('receive no gzip when no gzip accept header sent', function (tt) {
+    mockCouchDB()
+
     hoodieServer({
       inMemory: true,
-      loglevel: 'error'
+      loglevel: 'error',
+      dbUrl: 'http://admin:secret@localhost:5984'
     }, function (err, server, config) {
       tt.error(err, 'hoodie-server loads without error')
 
@@ -35,9 +42,12 @@ test('handle forced gzip', function (t) {
   })
 
   t.test('receive gzip when gzip accept header sent', function (tt) {
+    mockCouchDB()
+
     hoodieServer({
       inMemory: true,
-      loglevel: 'error'
+      loglevel: 'error',
+      dbUrl: 'http://admin:secret@localhost:5984'
     }, function (err, server, config) {
       tt.error(err, 'hoodie-server loads without error')
 

@@ -4,11 +4,15 @@ var request = require('request')
 var test = require('tap').test
 
 var hoodieServer = require('../../')
+var mockCouchDB = require('./utils/mock-couchdb')
 
 test('smoke test', function (t) {
+  mockCouchDB()
+
   hoodieServer({
     inMemory: true,
-    loglevel: 'error'
+    loglevel: 'error',
+    dbUrl: 'http://admin:secret@localhost:5984'
   }, function (err, server, config) {
     t.error(err, 'hoodie-server loads without error')
 

@@ -6,20 +6,21 @@ var mkdirp = {
   sync: function () {},
   '@noCallThru': true
 }
+var cwd = process.cwd()
 
 test('config', function (t) {
   t.test('default', function (tt) {
     var getConfig = proxyquire('../../lib/config', {mkdirp: mkdirp})
 
     var config = getConfig({})
-    var cwd = process.cwd()
 
     tt.is(config.name, 'hoodie-server', 'exposes name from package.json')
-    tt.is(config.paths.project, cwd, 'uses cwd as project path')
-    tt.ok(config.paths.data.startsWith(cwd), 'derives data path from cwd')
-    tt.match(config.paths.www, /my-first-hoodie/, 'falls back to my-first-hoodie for www')
+    tt.ok(config.paths.data.startsWith(cwd), 'derives hoodie path from cwd')
+    tt.match(config.paths.public, cwd + '/public', 'falls back to hoodie-server/public')
 
-    tt.same(config.db, {}, 'uses empty db config')
+    tt.same(config.db, {
+      prefix: cwd + '/.hoodie/data/'
+    }, 'uses default db config')
     tt.same(config.app, {
       hostname: '127.0.0.1',
       port: 8080,
@@ -30,12 +31,8 @@ test('config', function (t) {
   })
 
   t.test('applies overwrites', function (tt) {
-    var getConfig = proxyquire('../../lib/config', {
+    var options = {
       mkdirp: mkdirp,
-      'project-path/package.json': {
-        name: 'overwritten',
-        '@noCallThru': true
-      },
       fs: {
         statSync: function () {
           return {
@@ -46,20 +43,23 @@ test('config', function (t) {
         },
         '@noCallThru': true
       }
-    })
+    }
+    options[cwd + '/package.json'] = {
+      name: 'overwritten',
+      '@noCallThru': true
+    }
+    var getConfig = proxyquire('../../lib/config', options)
 
     var config = getConfig({
-      path: 'project-path',
       data: 'data-path',
-      www: 'www-path',
+      public: 'public-path',
       bindAddress: 'hoodie-test',
       port: 1337
     })
 
     tt.is(config.name, 'overwritten', 'exposes name from package.json')
-    tt.is(config.paths.project, 'project-path', 'uses path option as project path')
     tt.is(config.paths.data, 'data-path', 'uses data option as data path')
-    tt.is(config.paths.www, 'www-path', 'uses www option as www path')
+    tt.is(config.paths.public, 'public-path', 'uses public option as public path')
 
     tt.same(config.app, {
       hostname: 'hoodie-test',
