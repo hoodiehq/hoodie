@@ -1,44 +1,47 @@
 {
   "name": "hoodie-server",
+  "version": "0.0.0-placeholder-for-git-install",
   "description": "The core of the Hoodie backend",
   "author": "The Hoodie Community and other contributors | http://hood.ie/",
   "bugs": {
     "url": "https://github.com/hoodiehq/hoodie-server/issues"
   },
   "dependencies": {
-    "@hoodie/server-account-node-sessions": "^1.0.0",
+    "@hoodie/account": "1.0.0",
+    "@hoodie/store": "1.0.0",
     "async": "^1.5.2",
+    "boom": "^3.1.0",
     "good": "^6.4.0",
     "good-squeeze": "^2.1.0",
     "h2o2": "^5.0.0",
     "hapi": "^13.0.0",
-    "hoodie-server-store": "^1.0.1",
     "inert": "^3.1.0",
-    "istanbul": "^0.4.2",
+    "joi": "^7.0.1",
     "jsonfile": "^2.2.3",
     "lodash": "^4.0.0",
+    "lout": "^8.0.1",
     "memdown": "^1.1.0",
     "mkdirp": "^0.5.1",
-    "my-first-hoodie": "^4.0.0",
     "npmlog": "^2.0.0",
     "pouchdb": "^5.1.0",
-    "pouchdb-users": "^1.0.0",
+    "pouchdb-users": "^1.0.2",
     "randomstring": "^1.1.3",
     "request": "^2.65.0",
-    "require-relative": "^0.8.7"
+    "require-relative": "^0.8.7",
+    "vision": "^4.0.1"
   },
   "devDependencies": {
     "bundle-bump-bot": "^1.1.0",
     "coveralls": "^2.11.4",
     "hoodie-admin-dashboard": "^3.1.0",
-    "hoodie-client": "^2.2.0",
+    "hoodie-client": "^3.1.0",
     "nock": "^8.0.0",
     "nyc": "^6.0.0",
     "proxyquire": "^1.7.3",
     "rimraf": "^2.4.3",
     "semantic-release": "^4.3.5",
     "standard": "^6.0.4",
-    "tap": "^5.0.1"
+    "tap": "^5.1.1"
   },
   "engines": {
     "node": ">=4"
@@ -55,7 +58,7 @@
   "main": "lib/index.js",
   "peerDependencies": {
     "hoodie-admin-dashboard": "^3.1.0",
-    "hoodie-client": "^2.2.0"
+    "hoodie-client": "^3.1.0"
   },
   "publishConfig": {
     "tag": "next"
@@ -74,6 +77,6 @@
     "pretest": "standard",
     "semantic-release": "semantic-release pre && npm publish && semantic-release post",
     "start": "bin/start",
-    "test": "nyc tap --no-cov ./test/{unit,integration}/{**,**/**}.js"
+    "test": "nyc tap --no-cov ./test/{unit,integration}/{**,**/**}-test.js"
   }
 }
