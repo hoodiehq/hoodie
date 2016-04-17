@@ -24,7 +24,7 @@
     "corsify": "^2.1.0",
     "envify": "^3.4.0",
     "hoodie-plugin-test": "hoodiehq/hoodie-plugin-test",
-    "request": "^2.61.0",
+    "request": "^2.72.0",
     "semantic-release": "^4.3.5",
     "tap-finished": "0.0.1",
     "tap-spec": "^4.0.2",
