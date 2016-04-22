@@ -1,5 +1,5 @@
 {
-  "name": "hoodie-server",
+  "name": "@hoodie/server",
   "version": "0.0.0-placeholder-for-git-install",
   "description": "The core of the Hoodie backend",
   "author": "The Hoodie Community and other contributors | http://hood.ie/",
@@ -61,10 +61,7 @@
     "hoodie-client": "^3.1.0"
   },
   "publishConfig": {
-    "tag": "next"
-  },
-  "release": {
-    "branch": "next"
+    "access": "public"
   },
   "repository": {
     "type": "git",
