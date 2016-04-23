@@ -16,7 +16,8 @@
     "hoodie-plugin-email": "^1.0.0",
     "hoodie-plugin-users": "^2.2.2",
     "hoodie-server": "11.0.0",
-    "hoodie-start": "^1.0.1"
+    "hoodie-start": "^1.0.1",
+    "@hoodie/server": "18.0.0"
   },
   "devDependencies": {
     "browser-launcher": "^1.0.0",
