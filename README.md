@@ -14,7 +14,7 @@
 
 - providing a normalized [config](lib/config.js) for itself and all core components/plugins
 - providing an API to interact with [databases](lib/database.js) to components/plugins
-- starting and configuring a [hapi server](lib/hapi.js) that also [serves static assets](lib/public.js) like hoodie-client and hoodie-admin-dashboard
+- starting and configuring a [hapi server](lib/hapi.js) that also [serves static assets](lib/public.js) like hoodie-client and hoodie-admin-dashboard ([#493](https://github.com/hoodiehq/hoodie-server/issues/493))
 
 The rest is handled by components like [hoodie-account-server](https://github.com/hoodiehq/hoodie-account-server), or [hoodie-store-server](https://github.com/hoodiehq/hoodie-store-server).
 
