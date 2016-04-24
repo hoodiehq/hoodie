@@ -29,6 +29,7 @@
   ],
   "license": "Apache-2.0",
   "release": {
+    "branch": "camp",
     "tag": "camp"
   },
   "repository": {
