@@ -7,6 +7,7 @@ tests/www/tests.js
 *.log
 *.dump
 *.swp
+.dont-break
 .DS_Store
 .nyc_output
 .tmp
