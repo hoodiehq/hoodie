@@ -10,23 +10,13 @@
     "url": "https://github.com/hoodiehq/hoodie/issues"
   },
   "dependencies": {
-    "hoodie-admin-dashboard": "^3.1.0",
-    "hoodie-admin-dashboard-uikit": "^3.0.0",
-    "hoodie-server": "^17.0.0",
-    "hoodie-client": "^3.1.0",
-    "hoodie-start": "^1.0.2"
+    "@hoodie/server": "^19.0.0",
+    "@hoodie/client": "^4.0.1",
+    "@hoodie/start": "^3.0.0"
   },
   "devDependencies": {
-    "browser-launcher": "^1.0.0",
-    "browserify": "^13.0.0",
-    "corsify": "^2.1.0",
-    "envify": "^3.4.0",
-    "hoodie-plugin-test": "hoodiehq/hoodie-plugin-test",
-    "request": "^2.61.0",
-    "semantic-release": "^4.3.5",
-    "tap-finished": "0.0.1",
-    "tap-spec": "^4.0.2",
-    "tape": "^4.1.0"
+    "semantic-release": "^6.2.1",
+    "standard": "^6.0.8"
   },
   "engines": {
     "node": ">=4"
@@ -47,6 +37,6 @@
   },
   "scripts": {
     "semantic-release": "semantic-release pre && npm publish && semantic-release post",
-    "test": "node ./tests/server/index.js"
+    "test": "standard"
   }
 }
