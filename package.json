@@ -15,6 +15,7 @@
     "@hoodie/start": "^3.0.0"
   },
   "devDependencies": {
+    "dont-break": "^0.4.2",
     "semantic-release": "^6.2.1",
     "standard": "^6.0.8"
   },
@@ -38,6 +39,7 @@
   },
   "scripts": {
     "semantic-release": "semantic-release pre && npm publish && semantic-release post",
-    "test": "standard"
+    "pretest": "standard",
+    "test": "echo hoodie-app-tracker > .dont-break && dont-break --timeout 600"
   }
 }
