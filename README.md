@@ -33,7 +33,7 @@ Add this to your `package.json`:
   "start": "hoodie"
 }
 ```
-Before your first run, you need to set the admin panel password. The doesn't really work yet, so just do `npm start -- --admin-password 123` when you do this the first time. 
+Before your first run, you need to set the admin panel password. The doesn't really work yet, so just do `npm start -- --admin-password 123` when you do this the first time.
 
 That's it! From now on, running `npm start` will now serve a hoodie-app from your `www` folder.
 
@@ -47,21 +47,14 @@ Hoodie consists of three main components that are integrated and tested altogeth
    Hoodie’s front-end client for the browser. It integrates the following client modules:
    1. [account-client](https://github.com/hoodiehq/hoodie-account-client)
    2. [store-client](https://github.com/hoodiehq/hoodie-store-client)
-   3. [client-task](https://github.com/hoodiehq/hoodie-client-task)
-   4. [log-client](https://github.com/hoodiehq/hoodie-log-client)
-   5. [connection-status](https://github.com/hoodiehq/hoodie-connection-status)
+   3. [log-client](https://github.com/hoodiehq/hoodie-log-client)
+   4. [connection-status](https://github.com/hoodiehq/hoodie-connection-status)
 
 
 2. [**server**](https://github.com/hoodiehq/hoodie-server)  
    Hoodie’s back-end. It integrates the following hapi plugins:
    1. [account-server](https://github.com/hoodiehq/hoodie-account-server)
    2. [store-server](https://github.com/hoodiehq/hoodie-store-server)
-   3. [server-task](https://github.com/hoodiehq/hoodie-server-task)
-
-
-3. [**admin-dashboard**](https://github.com/hoodiehq/hoodie-admin-dashboard)  
-   Hoodie’s built-in admin dashboard web application
-
 
 ## License
 
