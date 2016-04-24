@@ -34,7 +34,7 @@
     "bundle-bump-bot": "^1.1.0",
     "coveralls": "^2.11.4",
     "hoodie-admin-dashboard": "^3.1.0",
-    "hoodie-client": "^3.1.0",
+    "@hoodie/client": "^4.0.1",
     "nock": "^8.0.0",
     "nyc": "^6.0.0",
     "proxyquire": "^1.7.3",
@@ -58,7 +58,7 @@
   "main": "lib/index.js",
   "peerDependencies": {
     "hoodie-admin-dashboard": "^3.1.0",
-    "hoodie-client": "^3.1.0"
+    "@hoodie/client": "^4.0.1"
   },
   "publishConfig": {
     "access": "public"
