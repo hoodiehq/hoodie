@@ -1,3 +1,3 @@
 #!/usr/bin/env node
 
-require('hoodie-start')
+require('@hoodie/start')
