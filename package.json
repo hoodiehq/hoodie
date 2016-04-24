@@ -7,8 +7,8 @@
     "url": "https://github.com/hoodiehq/hoodie-server/issues"
   },
   "dependencies": {
-    "@hoodie/account": "1.0.0",
-    "@hoodie/store": "1.0.0",
+    "@hoodie/account": "^1.0.0",
+    "@hoodie/store": "^1.0.0",
     "async": "^1.5.2",
     "boom": "^3.1.0",
     "good": "^6.4.0",
