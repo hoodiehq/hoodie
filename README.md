@@ -1,6 +1,6 @@
 ![The Low-Profile Dog Hoodie Mascot](https://avatars1.githubusercontent.com/u/1888826?v=3&s=200)
 
-# Welcome to `hoodie-server!` 🎉
+# Welcome to Hoodie Server! 🎉
 
 [![Build Status](https://travis-ci.org/hoodiehq/hoodie-server.svg?branch=next)](https://travis-ci.org/hoodiehq/hoodie-server)
 [![Coverage Status](https://coveralls.io/repos/hoodiehq/hoodie-server/badge.svg?branch=next&service=github)](https://coveralls.io/github/hoodiehq/hoodie-server?branch=next)
@@ -8,9 +8,9 @@
 [![devDependency Status](https://david-dm.org/hoodiehq/hoodie-server/next/dev-status.svg)](https://david-dm.org/hoodiehq/hoodie-server/next#info=dependencies)
 
 
-`hoodie-server` is the core server component of Hoodie. Together with `hoodie-client`, it forms the two parts that make up the Hoodie system.
+`@hoodie/server` is the core server component of Hoodie. Together with `@hoodie/client`, it forms the two parts that make up the Hoodie system.
 
-`hoodie-server` itself is responsible for only a few things:
+`@hoodie/server` itself is responsible for only a few things:
 
 - providing a normalized [config](lib/config.js) for itself and all core components/plugins
 - providing an API to interact with [databases](lib/database.js) to components/plugins
@@ -18,9 +18,9 @@
 
 The rest is handled by components like [hoodie-account-server](https://github.com/hoodiehq/hoodie-account-server), or [hoodie-store-server](https://github.com/hoodiehq/hoodie-store-server).
 
-`hoodie-server` isn’t meant to be used by itself and it is used by the `hoodie` module, which also inlcudes `hoodie-client` to form Hoodie.
+`@hoodie/server` isn’t meant to be used by itself and it is used by the `hoodie` module, which also inlcudes `@hoodie/client` to form Hoodie.
 
-You can use `hoodie-server` on its own, if you want to work on it, help fix bugs or test new versions. And when you are writing your own components/plugins, you can use `hoodie-server` for debugging.
+You can use `@hoodie/server` on its own, if you want to work on it, help fix bugs or test new versions. And when you are writing your own components/plugins, you can use `@hoodie/server` for debugging.
 
 ## Usage
 
@@ -34,7 +34,7 @@ npm install
 ./node_modules/.bin/hoodie-start
 ```
 
-There are a few options to change the behaviour of `hoodie-server`.
+There are a few options to change the behaviour of `@hoodie/server`.
 
 option        | default                            | description
 ------------- | ---------------------------------- | -------------
@@ -50,11 +50,11 @@ If that doesn’t make much sense just yet, don’t worry about it.
 
 ## Testing
 
-The `hoodie-server` test suite is run with `npm test`.
+The `@hoodie/server` test suite is run with `npm test`.
 
-The tests live in `test/unit` and `test/integration`. `test/unit` tests (or “unit tests”) are to test the behaviour of individual sub-modules within `hoodie-server`, while `test/integration` tests (or “integration tests”) are used to test the behaviour of a fully running instance of `hoodie-server`, e.g. the behaviour of its HTTP API.
+The tests live in `test/unit` and `test/integration`. `test/unit` tests (or “unit tests”) are to test the behaviour of individual sub-modules within `@hoodie/server`, while `test/integration` tests (or “integration tests”) are used to test the behaviour of a fully running instance of `@hoodie/server`, e.g. the behaviour of its HTTP API.
 
-If you are adding new features to `hoodie-server` you should provide test cases for the new feature. Depending on the feature, it's either best to write unit tests or integration tests and sometimes even both. The more tests we have, the more confidently we can release future versions of `hoodie-server`.
+If you are adding new features to `@hoodie/server` you should provide test cases for the new feature. Depending on the feature, it's either best to write unit tests or integration tests and sometimes even both. The more tests we have, the more confidently we can release future versions of `@hoodie/server`.
 
 ## Need help or want to help?
 
