@@ -38,6 +38,7 @@
   },
   "scripts": {
     "semantic-release": "semantic-release pre && npm publish && semantic-release post",
-    "test": "standard"
+    "pretest": "standard",
+    "test": "echo hoodie-app-tracker > .dont-break && dont-break"
   }
 }
