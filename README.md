@@ -22,7 +22,7 @@
 
 ## Installation
 
-`npm install --save hoodie@next`
+`npm install --save hoodie@camp`
 
 _Note_: This is still a developer preview. Look at [Hoodie’s new Tracker App](https://github.com/hoodiehq/hoodie-app-tracker) to get the current stable Hoodie install.
 
