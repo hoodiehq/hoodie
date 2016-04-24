@@ -29,7 +29,7 @@ As noted before, this isn’t meant to be run standalone. But if you are helping
 ```
 git clone git@github.com:hoodiehq/hoodie-server.git
 cd hoodie-server
-npm install hoodie-start@next
+npm install @hoodie/start
 npm install
 ./node_modules/.bin/hoodie-start
 ```
