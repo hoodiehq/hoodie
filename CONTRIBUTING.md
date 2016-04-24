@@ -8,11 +8,17 @@ the developers managing and developing this open source project. In return,
 they should reciprocate that respect in addressing your issue, assessing
 changes, and helping you finalize your pull requests.
 
-As for everything else in the project, the contributions to Hoodie are governed by our [Code of Conduct](http://hood.ie/code-of-conduct/).
+As for everything else in the project, the contributions to Hoodie are governed
+by our [Code of Conduct](http://hood.ie/code-of-conduct/).
 
 ## Using the issue tracker
 
-First things first: **Do NOT report security vulnerablities in public issues!** Please disclose responsibly by letting [the Hoodie team](mailto:team@thehoodiefirm.com?subject=Security) know upfront. We will assess the issue as soon as possible on a best-effort basis and will give you an estimate for when we have a fix and release available for an eventual public disclosure.
+First things first: **Do NOT report security vulnerablities in public issues!**
+Please disclose responsibly by letting [the Hoodie
+team](mailto:team@thehoodiefirm.com?subject=Security) know upfront. We will
+assess the issue as soon as possible on a best-effort basis and will give you
+an estimate for when we have a fix and release available for an eventual public
+disclosure.
 
 The issue tracker is the preferred channel for [bug reports](#bugs),
 [features requests](#features) and [submitting pull
@@ -84,7 +90,8 @@ implementing features, refactoring code), otherwise you risk spending a lot of
 time working on something that the project's developers might not want to merge
 into the project.
 
-Please adhere to [JavaScript Standard Style](https://github.com/feross/standard) and any other requirements (such as test coverage).
+Please adhere to our [JavaScript Coding Style](CODING_STYLE.md) and any other
+requirements (such as test coverage).
 
 Adhering to the following this process is the best way to get your work
 included in the project:
@@ -125,7 +132,8 @@ included in the project:
    [interactive rebase](https://help.github.com/articles/interactive-rebase)
    feature to tidy up your commits before making them public.
 
-6. Locally merge (or rebase) the upstream development branch into your topic branch:
+6. Locally merge (or rebase) the upstream development branch into your topic
+   branch:
 
    ```bash
    git pull [--rebase] upstream master
@@ -166,9 +174,11 @@ same license as that used by the project.
 
 ## Triagers
 
-There is a [defined process](TRIAGING.md) to manage issues, because this helps to speed up releases and minimizes user pain.
-Triaging is a great way to contribute to Hoodie without having to write code.
-If you are interested, please [leave a comment here](https://github.com/hoodiehq/discussion/issues/50) asking to join the triaging team.
+There is a [defined process](TRIAGING.md) to manage issues, because this helps
+to speed up releases and minimizes user pain. Triaging is a great way to
+contribute to Hoodie without having to write code. If you are interested,
+please [leave a comment here](https://github.com/hoodiehq/discussion/issues/50)
+asking to join the triaging team.
 
 ## Maintainers
 
@@ -198,7 +208,8 @@ git merge feature-branch # replace name with your branch
 git push
 ```
 
-When merging PRs from forked repositories, we reccomend you install the [hub](https://github.com/github/hub) command line tools.
+When merging PRs from forked repositories, we reccomend you install the
+[hub](https://github.com/github/hub) command line tools.
 
 This allows you to do:
 
@@ -206,7 +217,8 @@ This allows you to do:
 hub checkout link-to-pull-request
 ```
 
-meaning that you will automatically check out the branch for the pull request, without needing any other steps like setting git upstreams! :sparkles:
+meaning that you will automatically check out the branch for the pull request,
+without needing any other steps like setting git upstreams! :sparkles:
 
 ### Submitting changes
 

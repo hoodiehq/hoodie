@@ -22,25 +22,18 @@
 
 ## Installation
 
-`npm install --save hoodie@next`
+`npm install --save hoodie@camp`
 
-_Note_: This is still a developer preview. Look at [my-first-hoodie](https://github.com/hoodiehq/my-first-hoodie) to get the current stable Hoodie install.
+_Note_: This is still a developer preview. Look at [Hoodie’s new Tracker App](https://github.com/hoodiehq/hoodie-app-tracker) to get the current stable Hoodie install.
 
 Add this to your `package.json`:
 
 ```json
 "scripts": {
   "start": "hoodie"
-},
-"hoodie": {
-  "plugins": [
-    "hoodie-plugin-appconfig",
-    "hoodie-plugin-email",
-    "hoodie-plugin-users"
-  ]
 }
 ```
-Before your first run, you need to set the admin panel password. The doesn't really work yet, so just do `npm start -- --admin-password 123` when you do this the first time. 
+Before your first run, you need to set the admin panel password. The doesn't really work yet, so just do `npm start -- --admin-password 123` when you do this the first time.
 
 That's it! From now on, running `npm start` will now serve a hoodie-app from your `www` folder.
 
@@ -52,23 +45,16 @@ Hoodie consists of three main components that are integrated and tested altogeth
 
 1. [**client**](https://github.com/hoodiehq/hoodie-client)  
    Hoodie’s front-end client for the browser. It integrates the following client modules:
-   1. [client-account](https://github.com/hoodiehq/hoodie-client-account)  
-   2. [client-store](https://github.com/hoodiehq/hoodie-client-store)  
-   3. [client-task](https://github.com/hoodiehq/hoodie-client-task)  
-   4. [client-log](https://github.com/hoodiehq/hoodie-client-log)  
-   5. [client-connection-status](https://github.com/hoodiehq/hoodie-client-connection-status)  
+   1. [account-client](https://github.com/hoodiehq/hoodie-account-client)
+   2. [store-client](https://github.com/hoodiehq/hoodie-store-client)
+   3. [log-client](https://github.com/hoodiehq/hoodie-log-client)
+   4. [connection-status](https://github.com/hoodiehq/hoodie-connection-status)
 
 
 2. [**server**](https://github.com/hoodiehq/hoodie-server)  
    Hoodie’s back-end. It integrates the following hapi plugins:
-   1. [server-account](https://github.com/hoodiehq/hoodie-server-account)
-   2. [server-store](https://github.com/hoodiehq/hoodie-server-store)
-   3. [server-task](https://github.com/hoodiehq/hoodie-server-task)
-
-
-3. [**admin-dashboard**](https://github.com/hoodiehq/hoodie-admin-dashboard)  
-   Hoodie’s built-in admin dashboard web application
-
+   1. [account-server](https://github.com/hoodiehq/hoodie-account-server)
+   2. [store-server](https://github.com/hoodiehq/hoodie-store-server)
 
 ## License
 

@@ -6,8 +6,13 @@ notifications:
   email: false
 node_js:
 - 4
+before_script:
+- npm prune
 before_install:
 - "export DISPLAY=:99.0"
 - "sh -e /etc/init.d/xvfb start"
 after_success:
 - npm run semantic-release
+branches:
+  except:
+    - /^v\d+\.\d+\.\d+$/

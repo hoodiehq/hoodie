@@ -1,5 +1,6 @@
 {
   "name": "hoodie",
+  "version": "0.0.0-semantically-released",
   "description": "Hoodie enables you to express yourself through technology by making web app development very fast, easy and accessible.",
   "author": "The Hoodie Community",
   "bin": {
@@ -9,39 +10,18 @@
     "url": "https://github.com/hoodiehq/hoodie/issues"
   },
   "dependencies": {
-    "hoodie": "2.1.1",
-    "hoodie-admin-dashboard": "^2.0.0",
-    "hoodie-admin-dashboard-uikit": "^3.0.0",
-    "hoodie-plugin-appconfig": "^2.0.1",
-    "hoodie-plugin-email": "^1.0.0",
-    "hoodie-plugin-users": "^2.2.2",
-    "hoodie-server": "11.0.0",
-    "hoodie-start": "^1.0.1"
+    "@hoodie/server": "^19.0.0",
+    "@hoodie/client": "^4.0.1",
+    "@hoodie/start": "^3.0.0"
   },
   "devDependencies": {
-    "browser-launcher": "^1.0.0",
-    "browserify": "^13.0.0",
-    "corsify": "^2.1.0",
-    "envify": "^3.4.0",
-    "hoodie-plugin-test": "hoodiehq/hoodie-plugin-test",
-    "request": "^2.61.0",
-    "semantic-release": "^4.3.5",
-    "tap-finished": "0.0.1",
-    "tap-spec": "^4.0.2",
-    "tape": "^4.1.0"
+    "semantic-release": "^6.2.1",
+    "standard": "^6.0.8"
   },
   "engines": {
     "node": ">=4"
   },
   "homepage": "https://github.com/hoodiehq/hoodie#readme",
-  "hoodie": {
-    "plugins": [
-      "hoodie-plugin-appconfig",
-      "hoodie-plugin-email",
-      "hoodie-plugin-users",
-      "hoodie-plugin-test"
-    ]
-  },
   "keywords": [
     "frontend-only",
     "nobackend",
@@ -49,7 +29,8 @@
   ],
   "license": "Apache-2.0",
   "release": {
-    "tag": "next"
+    "branch": "camp",
+    "tag": "camp"
   },
   "repository": {
     "type": "git",
@@ -57,6 +38,7 @@
   },
   "scripts": {
     "semantic-release": "semantic-release pre && npm publish && semantic-release post",
-    "test": "node ./tests/server/index.js"
+    "pretest": "standard",
+    "test": "echo hoodie-app-tracker > .dont-break && dont-break"
   }
 }
