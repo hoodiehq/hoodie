@@ -20,11 +20,9 @@
 [![Dependency Status](https://david-dm.org/hoodiehq/hoodie.svg)](https://david-dm.org/hoodiehq/hoodie)
 [![devDependency Status](https://david-dm.org/hoodiehq/hoodie/dev-status.svg)](https://david-dm.org/hoodiehq/hoodie#info=devDependencies)
 
-## Installation
+## Setup
 
 `npm install --save hoodie@camp`
-
-_Note_: This is still a developer preview. Look at [Hoodie’s new Tracker App](https://github.com/hoodiehq/hoodie-app-tracker) to get the current stable Hoodie install.
 
 Add this to your `package.json`:
 
@@ -33,15 +31,48 @@ Add this to your `package.json`:
   "start": "hoodie"
 }
 ```
-Before your first run, you need to set the admin panel password. The doesn't really work yet, so just do `npm start -- --admin-password 123` when you do this the first time.
 
-That's it! From now on, running `npm start` will now serve a hoodie-app from your `www` folder.
+Now run `npm start` to start your Hoodie app.
 
-Run `npm start -- --help` to see more options.
+## Usage
 
-## Why is there no code in this repository?
+Run `npm start -- --help` to see all available CLI options.
 
-Hoodie consists of three main components that are integrated and tested altogether in this top-level module.
+Options can also be specified as environment variables (prefixed with "hoodie_") or inside a ".hoodierc" file (json or ini).
+
+option        | default                            | description
+------------- | ---------------------------------- | -------------
+loglevel      | 'warn'                             |
+port          | 8080                               | Port-number to run the Hoodie App on
+bindAddress   | 127.0.0.1                          | Address that Hoodie binds to
+public        | path.join(options.path, 'public')  | path to static assets
+inMemory      | false                              | Whether to start the PouchDB Server in memory
+dbUrl         | PouchDB Server                     | If provided does not start PouchDB Server and uses external CouchDB. Has to contain credentials.
+data          | path.join(options.path, '.hoodie') | Data path
+
+## Testing
+
+The `hoodie` test suite is run with `npm test`.
+
+The tests live in `test/unit` and `test/integration`. `test/unit` tests (or “unit tests”) are to test the behaviour of individual sub-modules within `hoodie`, while `test/integration` tests (or “integration tests”) are used to test the behaviour of a fully running instance of `hoodie`, e.g. the behaviour of its HTTP API.
+
+If you are adding new features to `hoodie` you should provide test cases for the new feature. Depending on the feature, it's either best to write unit tests or integration tests and sometimes even both. The more tests we have, the more confidently we can release future versions of `hoodie`.
+
+
+## Architecture
+
+Hoodie is server built on top of [hapi](http://hapijs.com) with frontend APIs
+for account and store related tasks.
+
+It consists of three main components
+
+1. [**account**](https://github.com/hoodiehq/hoodie-account)  
+   Hoodie’s account module. It exposes a [JSON API](http://jsonapi.org/), a
+   a corresponding client and a generic account UI.
+
+1. [**store**](https://github.com/hoodiehq/hoodie-store)  
+   Hoodie’s store module. It exposes [CouchDB’s Document API](https://wiki.apache.org/couchdb/HTTP_Document_API),
+   a corresponding client and a generic store UI.
 
 1. [**client**](https://github.com/hoodiehq/hoodie-client)  
    Hoodie’s front-end client for the browser. It integrates the following client modules:
@@ -50,11 +81,9 @@ Hoodie consists of three main components that are integrated and tested altogeth
    3. [log-client](https://github.com/hoodiehq/hoodie-log-client)
    4. [connection-status](https://github.com/hoodiehq/hoodie-connection-status)
 
+## Need help or want to help?
 
-2. [**server**](https://github.com/hoodiehq/hoodie-server)  
-   Hoodie’s back-end. It integrates the following hapi plugins:
-   1. [account-server](https://github.com/hoodiehq/hoodie-account-server)
-   2. [store-server](https://github.com/hoodiehq/hoodie-store-server)
+It’s best to join our [chat](http://hood.ie/chat/).
 
 ## License
 
