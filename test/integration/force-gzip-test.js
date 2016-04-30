@@ -15,7 +15,7 @@ test('handle forced gzip', function (t) {
       loglevel: 'error',
       dbUrl: 'http://admin:secret@localhost:5984'
     }, function (err, server, config) {
-      tt.error(err, 'hoodie-server loads without error')
+      tt.error(err, 'hoodie loads without error')
 
       server.inject({
         url: url.resolve(url.format(config.app), 'hoodie'),
@@ -32,7 +32,7 @@ test('handle forced gzip', function (t) {
       loglevel: 'error',
       dbUrl: 'http://admin:secret@localhost:5984'
     }, function (err, server, config) {
-      tt.error(err, 'hoodie-server loads without error')
+      tt.error(err, 'hoodie loads without error')
 
       server.inject({url: url.resolve(url.format(config.app), 'hoodie')}, function (res) {
         tt.notOk(res.headers['content-encoding'])
@@ -49,7 +49,7 @@ test('handle forced gzip', function (t) {
       loglevel: 'error',
       dbUrl: 'http://admin:secret@localhost:5984'
     }, function (err, server, config) {
-      tt.error(err, 'hoodie-server loads without error')
+      tt.error(err, 'hoodie loads without error')
 
       server.inject({
         url: url.resolve(url.format(config.app), 'hoodie?force_gzip=true')

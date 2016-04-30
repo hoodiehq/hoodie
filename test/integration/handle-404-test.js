@@ -14,7 +14,7 @@ test('forward all requests that accept html to app', function (t) {
       loglevel: 'error',
       dbUrl: 'http://admin:secret@localhost:5984'
     }, function (err, server, config) {
-      tt.error(err, 'hoodie-server loads without error')
+      tt.error(err, 'hoodie loads without error')
 
       server.inject({
         url: url.resolve(url.format(config.app), 'does_not_exist'),

@@ -14,10 +14,10 @@ test('smoke test', function (t) {
     loglevel: 'error',
     dbUrl: 'http://admin:secret@localhost:5984'
   }, function (err, server, config) {
-    t.error(err, 'hoodie-server loads without error')
+    t.error(err, 'hoodie loads without error')
 
     server.start(function (err) {
-      t.error(err, 'hoodie-server starts without error')
+      t.error(err, 'hoodie starts without error')
       request({
         url: url.resolve(url.format(config.app), 'hoodie'),
         json: true

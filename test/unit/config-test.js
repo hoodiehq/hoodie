@@ -14,9 +14,9 @@ test('config', function (t) {
 
     var config = getConfig({})
 
-    tt.is(config.name, '@hoodie/server', 'exposes name from package.json')
+    tt.is(config.name, 'hoodie', 'exposes name from package.json')
     tt.ok(config.paths.data.startsWith(cwd), 'derives hoodie path from cwd')
-    tt.match(config.paths.public, cwd + '/public', 'falls back to hoodie-server/public')
+    tt.match(config.paths.public, cwd + '/public', 'falls back to hoodie/public')
 
     tt.same(config.db, {
       prefix: cwd + '/.hoodie/data/'
