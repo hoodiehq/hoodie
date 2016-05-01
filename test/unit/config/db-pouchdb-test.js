@@ -3,7 +3,7 @@ var proxyquire = require('proxyquire')
 
 test('generate couch config', function (t) {
   t.test('read from file', function (tt) {
-    var generatedConfig = proxyquire('../../../lib/couchdb.js', {
+    var pouchDbConfig = proxyquire('../../../lib/config/db/pouchdb.js', {
       fs: {
         existsSync: function () {
           return true
@@ -18,18 +18,18 @@ test('generate couch config', function (t) {
         },
         '@noCallThru': true
       }
-    }).internals.generatedConfig
+    })
 
-    var result = generatedConfig({paths: {data: ''}})
-
-    tt.is(result.secret, 'a')
-    tt.is(result.authentication_db, '_users')
-
-    tt.end()
+    pouchDbConfig({paths: {data: ''}}, function (error, result) {
+      tt.error(error)
+      tt.is(result.secret, 'a')
+      tt.is(result.authentication_db, '_users')
+      tt.end()
+    })
   })
 
   t.test('generate and write to file', function (tt) {
-    var generatedConfig = proxyquire('../../../lib/couchdb.js', {
+    var pouchDbConfig = proxyquire('../../../lib/config/db/pouchdb.js', {
       fs: {
         existsSync: function () {
           return false
@@ -40,14 +40,14 @@ test('generate couch config', function (t) {
         writeFileSync: function () {},
         '@noCallThru': true
       }
-    }).internals.generatedConfig
+    })
 
-    var result = generatedConfig({paths: {data: ''}})
-
-    tt.is(result.secret.length, 32)
-    tt.is(result.authentication_db, '_users')
-
-    tt.end()
+    pouchDbConfig({paths: {data: ''}}, function (error, result) {
+      tt.error(error)
+      tt.is(result.secret.length, 32)
+      tt.is(result.authentication_db, '_users')
+      tt.end()
+    })
   })
 
   t.end()
