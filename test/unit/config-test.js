@@ -71,7 +71,7 @@ test('config', function (t) {
   })
 
   t.test('custom db', function (tt) {
-    tt.plan(3)
+    tt.plan(2)
 
     var memdown = {}
 
@@ -87,11 +87,9 @@ test('config', function (t) {
     })
 
     var config = getConfig({
-      dbUrl: 'http://user:pass@example.com/',
       inMemory: true
     })
 
-    tt.is(config.db.url, 'http://user:pass@example.com/', 'uses passed db url')
     tt.is(config.db.db, memdown, 'uses memdown for in memory')
 
     getConfig({
