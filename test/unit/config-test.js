@@ -3,15 +3,11 @@ var test = require('tap').test
 var proxyquire = require('proxyquire')
 require('npmlog').level = 'silent'
 
-var mkdirp = {
-  sync: function () {},
-  '@noCallThru': true
-}
 var cwd = process.cwd()
 
 test('config', function (t) {
   t.test('default', function (tt) {
-    var getConfig = proxyquire('../../lib/config', {mkdirp: mkdirp})
+    var getConfig = require('../../lib/config')
 
     var config = getConfig({})
 
@@ -32,11 +28,7 @@ test('config', function (t) {
   })
 
   t.test('applies overwrites', function (tt) {
-    var options = {
-      mkdirp: mkdirp
-    }
-
-    var getConfig = proxyquire('../../lib/config', options)
+    var getConfig = require('../../lib/config')
     simple.mock(getConfig.internals, 'getDefaults').returnWith({
       name: 'overwritten',
       paths: {
@@ -80,7 +72,6 @@ test('config', function (t) {
 
     var getConfig = proxyquire('../../lib/config', {
       memdown: memdown,
-      mkdirp: mkdirp,
       npmlog: {
         warn: function () {
           tt.ok(true, 'warns about missing auth in db url')
