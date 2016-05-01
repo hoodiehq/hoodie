@@ -117,6 +117,5 @@ getHoodieServer(options, function (error, server, envConfig) {
 
   server.start(function () {
     console.log((useEmoji ? emoji.get('dog') + '  ' : '') + 'Your Hoodie app has started on ' + url.format(envConfig.app))
-    log.verbose('app', 'Database running at ' + url.format(_.omit(envConfig.db, 'auth')))
   })
 })
