@@ -3,7 +3,7 @@ var test = require('tap').test
 
 test('check couch vendor', function (t) {
   t.test('request fails', function (tt) {
-    var checkVendor = require('../../../lib/couchdb.js').checkVendor
+    var checkVendor = require('../../../lib/couchdb.js').internals.checkVendor
 
     tt.plan(2)
 
@@ -21,7 +21,7 @@ test('check couch vendor', function (t) {
   })
 
   t.test('verify vendor', function (tt) {
-    var checkVendor = require('../../../lib/couchdb.js').checkVendor
+    var checkVendor = require('../../../lib/couchdb.js').internals.checkVendor
     tt.plan(3)
 
     checkVendor({}, function (input, callback) {

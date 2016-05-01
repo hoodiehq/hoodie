@@ -18,7 +18,7 @@ test('generate couch config', function (t) {
         },
         '@noCallThru': true
       }
-    }).generatedConfig
+    }).internals.generatedConfig
 
     var result = generatedConfig({paths: {data: ''}})
 
@@ -40,7 +40,7 @@ test('generate couch config', function (t) {
         writeFileSync: function () {},
         '@noCallThru': true
       }
-    }).generatedConfig
+    }).internals.generatedConfig
 
     var result = generatedConfig({paths: {data: ''}})
 
