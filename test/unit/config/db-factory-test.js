@@ -1,7 +1,7 @@
 var test = require('tap').test
 var proxyquire = require('proxyquire')
 
-test('database api', function (t) {
+test('database api factory', function (t) {
   t.test('use default adapter', function (tt) {
     function PouchDB (name) {
       this.name = name
@@ -13,7 +13,7 @@ test('database api', function (t) {
       return PouchDB
     }
 
-    var database = proxyquire('../../lib/database', {
+    var database = proxyquire('../../../lib/config/db/factory', {
       pouchdb: PouchDB
     })({db: {foo: 'foo'}})
 
@@ -36,7 +36,7 @@ test('database api', function (t) {
       return PouchDB
     }
 
-    var database = proxyquire('../../lib/database', {
+    var database = proxyquire('../../../lib/config/db/factory', {
       pouchdb: PouchDB
     })({db: {url: 'http://example.com'}})
 
