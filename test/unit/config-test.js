@@ -1,3 +1,4 @@
+var simple = require('simple-mock')
 var test = require('tap').test
 var proxyquire = require('proxyquire')
 require('npmlog').level = 'silent'
@@ -32,23 +33,24 @@ test('config', function (t) {
 
   t.test('applies overwrites', function (tt) {
     var options = {
-      mkdirp: mkdirp,
-      fs: {
-        statSync: function () {
-          return {
-            isDirectory: function () {
-              return true
-            }
-          }
-        },
-        '@noCallThru': true
-      }
+      mkdirp: mkdirp
     }
-    options[cwd + '/package.json'] = {
-      name: 'overwritten',
-      '@noCallThru': true
-    }
+
     var getConfig = proxyquire('../../lib/config', options)
+    simple.mock(getConfig.internals, 'getDefaults').returnWith({
+      name: 'overwritten',
+      paths: {
+        data: 'data path',
+        public: 'public path'
+      },
+      app: {
+        hostname: 'host.name',
+        port: 1234,
+        protocol: 'http'
+      },
+      db: {},
+      admin: {}
+    })
 
     var config = getConfig({
       data: 'data-path',
@@ -67,6 +69,7 @@ test('config', function (t) {
       protocol: 'http'
     }, 'uses "http://hoodie-test:1337/" as app url')
 
+    simple.restore()
     tt.end()
   })
 
