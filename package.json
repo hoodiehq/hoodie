@@ -16,7 +16,7 @@
   },
   "devDependencies": {
     "semantic-release": "^6.2.1",
-    "standard": "^6.0.8"
+    "standard": "^7.0.0"
   },
   "engines": {
     "node": ">=4"
