@@ -1,6 +1,5 @@
 var simple = require('simple-mock')
 var test = require('tap').test
-var proxyquire = require('proxyquire')
 require('npmlog').level = 'silent'
 
 var cwd = process.cwd()
@@ -16,7 +15,7 @@ test('config', function (t) {
       tt.ok(config.paths.data.startsWith(cwd), 'derives hoodie path from cwd')
       tt.match(config.paths.public, cwd + '/public', 'falls back to hoodie/public')
 
-      tt.same(config.db.prefix, cwd + '/.hoodie/data/', 'uses default db config')
+      tt.same(config.db.prefix, cwd + '/.hoodie/data', 'uses default db config')
       tt.same(config.app, {
         hostname: '127.0.0.1',
         port: 8080,
@@ -29,15 +28,15 @@ test('config', function (t) {
 
   t.test('applies overwrites', function (tt) {
     var getConfig = require('../../lib/config')
-    simple.mock(getConfig.internals, 'getDefaults').returnWith({
+    simple.mock(getConfig.internals, 'parseOptions').returnWith({
       name: 'overwritten',
       paths: {
-        data: 'data path',
-        public: 'public path'
+        data: 'data-path',
+        public: 'public-path'
       },
       app: {
-        hostname: 'host.name',
-        port: 1234,
+        hostname: 'hoodie-test',
+        port: 1337,
         protocol: 'http'
       },
       db: {},
@@ -79,19 +78,26 @@ test('config', function (t) {
     tt.plan(3)
 
     var memdown = {}
-    var getConfig = proxyquire('../../lib/config', {
-      memdown: memdown,
-      npmlog: {
-        warn: function () {},
-        info: function () {}
-      }
-    })
+    var getConfig = require('../../lib/config')
 
     simple.mock(getConfig.internals, 'couchDbConfig').callbackWith(null, {
       secret: 'secret',
       authentication_db: '_users',
       admins: {}
     })
+    simple.mock(getConfig.internals, 'parseOptions', function (options) {
+      return {
+        paths: {
+          data: 'data-path'
+        },
+        db: {
+          db: memdown
+        }
+      }
+    })
+    simple.mock(getConfig.internals, 'accountConfig').callbackWith(null)
+    simple.mock(getConfig.internals, 'pouchDbConfig').callbackWith(null)
+    simple.mock(getConfig.internals, 'storeConfig').callbackWith(null)
 
     getConfig({
       inMemory: true

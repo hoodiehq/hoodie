@@ -20,10 +20,17 @@ test('generate couch config', function (t) {
       }
     })
 
-    pouchDbConfig({paths: {data: ''}}, function (error, result) {
+    pouchDbConfig({
+      config: {
+        db: {},
+        paths: {
+          data: ''
+        }
+      }
+    }, function (error, result) {
       tt.error(error)
-      tt.is(result.secret, 'a')
-      tt.is(result.authentication_db, '_users')
+      tt.is(result.db.secret, 'a')
+      tt.is(result.db.authenticationDb, '_users')
       tt.end()
     })
   })
@@ -42,10 +49,17 @@ test('generate couch config', function (t) {
       }
     })
 
-    pouchDbConfig({paths: {data: ''}}, function (error, result) {
+    pouchDbConfig({
+      config: {
+        db: {},
+        paths: {
+          data: ''
+        }
+      }
+    }, function (error, result) {
       tt.error(error)
-      tt.is(result.secret.length, 32)
-      tt.is(result.authentication_db, '_users')
+      tt.is(result.db.secret.length, 32)
+      tt.is(result.db.authenticationDb, '_users')
       tt.end()
     })
   })
