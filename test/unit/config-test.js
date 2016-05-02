@@ -1,118 +1,86 @@
+var proxyquire = require('proxyquire').noCallThru()
 var simple = require('simple-mock')
 var test = require('tap').test
-require('npmlog').level = 'silent'
 
-var cwd = process.cwd()
+test('config', function (group) {
+  group.test('defaults', function (t) {
+    var config = {
+      db: {}
+    }
+    var accountConfigMock = simple.stub().callbackWith(null)
+    var couchDbConfigMock = simple.stub().callbackWith(null)
+    var getDatabaseFactoryMock = simple.stub().returnWith('getDatabase')
+    var parseOptionsMock = simple.stub().returnWith(config)
+    var pouchDbConfigMock = simple.stub().callbackWith(null)
+    var storeConfigMock = simple.stub().callbackWith(null)
 
-test('config', function (t) {
-  t.test('default', function (tt) {
-    var getConfig = require('../../lib/config')
+    var getConfig = proxyquire('../../lib/config', {
+      './account': accountConfigMock,
+      './db/couchdb': couchDbConfigMock,
+      './db/factory': getDatabaseFactoryMock,
+      './parse-options': parseOptionsMock,
+      './db/pouchdb': pouchDbConfigMock,
+      './store': storeConfigMock
+    })
 
     getConfig({}, function (error, config) {
-      tt.error(error)
+      t.error(error)
 
-      tt.is(config.name, 'hoodie', 'exposes name from package.json')
-      tt.ok(config.paths.data.startsWith(cwd), 'derives hoodie path from cwd')
-      tt.match(config.paths.public, cwd + '/public', 'falls back to hoodie/public')
-
-      tt.same(config.db.prefix, cwd + '/.hoodie/data', 'uses default db config')
-      tt.same(config.app, {
-        hostname: '127.0.0.1',
-        port: 8080,
-        protocol: 'http'
-      }, 'uses "http://127.0.0.1:8080/" as app url')
-
-      tt.end()
-    })
-  })
-
-  t.test('applies overwrites', function (tt) {
-    var getConfig = require('../../lib/config')
-    simple.mock(getConfig.internals, 'parseOptions').returnWith({
-      name: 'overwritten',
-      paths: {
-        data: 'data-path',
-        public: 'public-path'
-      },
-      app: {
-        hostname: 'hoodie-test',
-        port: 1337,
-        protocol: 'http'
-      },
-      db: {},
-      account: {},
-      admin: {},
-      store: {}
-    })
-
-    simple.mock(getConfig.internals, 'pouchDbConfig').callbackWith(null, {
-      secret: 'secret',
-      authentication_db: '_users',
-      admins: {}
-    })
-
-    getConfig({
-      data: 'data-path',
-      public: 'public-path',
-      bindAddress: 'hoodie-test',
-      port: 1337
-    }, function (error, config) {
-      tt.error(error)
-
-      tt.is(config.name, 'overwritten', 'exposes name from package.json')
-      tt.is(config.paths.data, 'data-path', 'uses data option as data path')
-      tt.is(config.paths.public, 'public-path', 'uses public option as public path')
-
-      tt.same(config.app, {
-        hostname: 'hoodie-test',
-        port: 1337,
-        protocol: 'http'
-      }, 'uses "http://hoodie-test:1337/" as app url')
-
-      simple.restore()
-      tt.end()
-    })
-  })
-
-  t.test('custom db', function (tt) {
-    tt.plan(3)
-
-    var memdown = {}
-    var getConfig = require('../../lib/config')
-
-    simple.mock(getConfig.internals, 'couchDbConfig').callbackWith(null, {
-      secret: 'secret',
-      authentication_db: '_users',
-      admins: {}
-    })
-    simple.mock(getConfig.internals, 'parseOptions', function (options) {
-      return {
-        paths: {
-          data: 'data-path'
-        },
-        db: {
-          db: memdown
-        }
+      var state = {
+        config: config,
+        getDatabase: 'getDatabase'
       }
-    })
-    simple.mock(getConfig.internals, 'accountConfig').callbackWith(null)
-    simple.mock(getConfig.internals, 'pouchDbConfig').callbackWith(null)
-    simple.mock(getConfig.internals, 'storeConfig').callbackWith(null)
 
-    getConfig({
-      inMemory: true
-    }, function (error, config) {
-      tt.error(error)
-      tt.is(config.db.db, memdown, 'uses memdown for in memory')
-    })
+      t.is(couchDbConfigMock.callCount, 0, 'couchdb config not called')
+      t.same(pouchDbConfigMock.lastCall.arg, state, 'called pouchdb config')
+      t.same(accountConfigMock.lastCall.arg, state, 'called account config')
+      t.same(storeConfigMock.lastCall.arg, state, 'called store config')
 
-    getConfig({
-      dbUrl: 'http://example.com/'
-    }, function (error, config) {
-      simple.restore()
-      tt.ok(error, 'returns error if db URL misses auth')
+      t.ok(pouchDbConfigMock.lastCall.k < accountConfigMock.lastCall.k, 'pouch config called before account config')
+      t.ok(pouchDbConfigMock.lastCall.k < storeConfigMock.lastCall.k, 'pouch config called before store config')
+
+      t.end()
     })
   })
 
-  t.end()
+  group.test('with dbUrl', function (t) {
+    var config = {
+      db: {
+        url: 'http://foo:bar@baz.com'
+      }
+    }
+    var accountConfigMock = simple.stub().callbackWith(null)
+    var couchDbConfigMock = simple.stub().callbackWith(null)
+    var getDatabaseFactoryMock = simple.stub().returnWith('getDatabase')
+    var parseOptionsMock = simple.stub().returnWith(config)
+    var pouchDbConfigMock = simple.stub().callbackWith(null)
+    var storeConfigMock = simple.stub().callbackWith(null)
+
+    var getConfig = proxyquire('../../lib/config', {
+      './account': accountConfigMock,
+      './db/couchdb': couchDbConfigMock,
+      './db/factory': getDatabaseFactoryMock,
+      './parse-options': parseOptionsMock,
+      './db/pouchdb': pouchDbConfigMock,
+      './store': storeConfigMock
+    })
+
+    getConfig({}, function (error, config) {
+      t.error(error)
+
+      var state = {
+        config: config,
+        getDatabase: 'getDatabase'
+      }
+
+      t.is(pouchDbConfigMock.callCount, 0, 'PouchDB config not called')
+      t.same(couchDbConfigMock.lastCall.arg, state, 'called couchdb config')
+      t.same(accountConfigMock.lastCall.arg, state, 'called account config')
+      t.same(storeConfigMock.lastCall.arg, state, 'called store config')
+
+      t.end()
+    })
+  })
+
+  group.end()
 })
