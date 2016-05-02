@@ -3,16 +3,12 @@ var url = require('url')
 var test = require('tap').test
 
 var hoodieServer = require('../../')
-var mockCouchDB = require('./utils/mock-couchdb')
 
 test('forward all requests that accept html to app', function (group) {
   group.test('send index.html on accept: text/html', function (t) {
-    mockCouchDB()
-
     hoodieServer({
       inMemory: true,
-      loglevel: 'error',
-      dbUrl: 'http://admin:secret@localhost:5984'
+      loglevel: 'error'
     }, function (err, server, config) {
       t.error(err, 'hoodie loads without error')
 
@@ -30,12 +26,9 @@ test('forward all requests that accept html to app', function (group) {
   })
 
   group.test('send a JSON 404 on anything but accept: text/html*', function (t) {
-    mockCouchDB()
-
     hoodieServer({
       inMemory: true,
-      loglevel: 'error',
-      dbUrl: 'http://admin:secret@localhost:5984'
+      loglevel: 'error'
     }, function (err, server, config) {
       t.error(err)
 
