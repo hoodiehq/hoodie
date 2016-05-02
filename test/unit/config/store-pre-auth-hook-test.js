@@ -9,7 +9,7 @@ var preAuthHook = proxyquire('../../../lib/config/store/pre-auth-hook', {
   'boom': BoomStub
 })
 
-test('store pre auth hook', function (t) {
+test('store pre auth hook', function (group) {
   var session = {
     session: {
       id: 'session123'
@@ -18,7 +18,7 @@ test('store pre auth hook', function (t) {
       id: 'user123'
     }
   }
-  var findSessionStub = simple.stub().returnWith({ // don’t use resolveWith to avoid async
+  var findSessionStub = simple.stub().returnWith({ // don’group use resolveWith to avoid async
     then: function (callback) {
       callback(session)
       return {
@@ -52,7 +52,7 @@ test('store pre auth hook', function (t) {
 
   preAuthHook(request, reply)
 
-  t.is(reply.continue.callCount, 1, 'reply.continue() called')
+  group.is(reply.continue.callCount, 1, 'reply.continue() called')
 
-  t.end()
+  group.end()
 })

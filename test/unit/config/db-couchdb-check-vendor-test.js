@@ -3,43 +3,43 @@ var test = require('tap').test
 
 var checkVendor = require('../../../lib/config/db/couchdb-check-vendor.js')
 
-test('check couch vendor', function (t) {
-  t.test('request fails', function (tt) {
-    tt.plan(2)
+test('check couch vendor', function (group) {
+  group.test('request fails', function (t) {
+    t.plan(2)
 
     checkVendor({db: {url: '<% COUCH URL %>'}}, function (input, callback) {
       callback(new Error())
     }, function (err) {
-      tt.match(err.message, '<% COUCH URL %>')
+      t.match(err.message, '<% COUCH URL %>')
     })
 
     checkVendor({db: {url: '<% COUCH URL %>'}}, function (input, callback) {
       callback(null, {statusCode: 500})
     }, function (err) {
-      tt.match(err.message, '<% COUCH URL %>')
+      t.match(err.message, '<% COUCH URL %>')
     })
   })
 
-  t.test('verify vendor', function (tt) {
-    tt.plan(3)
+  group.test('verify vendor', function (t) {
+    t.plan(3)
 
     checkVendor({}, function (input, callback) {
       callback(null, null, {
         couchdb: 'Welcome!'
       })
-    }, tt.error)
+    }, t.error)
 
     var tmp = log.warn
     log.warn = function (scope, message) {
       log.warn = tmp
-      tt.match(message, '<% VENDOR %>')
+      t.match(message, '<% VENDOR %>')
     }
     checkVendor({}, function (input, callback) {
       callback(null, null, {
         '<% VENDOR %>': 'Welcome!'
       })
-    }, tt.error)
+    }, t.error)
   })
 
-  t.end()
+  group.end()
 })

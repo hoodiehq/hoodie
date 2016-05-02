@@ -3,7 +3,7 @@ var simple = require('simple-mock')
 var test = require('tap').test
 
 test('config', function (group) {
-  group.test('defaults', function (t) {
+  group.test('defaults', function (group) {
     var config = {
       db: {}
     }
@@ -24,26 +24,26 @@ test('config', function (group) {
     })
 
     getConfig({}, function (error, config) {
-      t.error(error)
+      group.error(error)
 
       var state = {
         config: config,
         getDatabase: 'getDatabase'
       }
 
-      t.is(couchDbConfigMock.callCount, 0, 'couchdb config not called')
-      t.same(pouchDbConfigMock.lastCall.arg, state, 'called pouchdb config')
-      t.same(accountConfigMock.lastCall.arg, state, 'called account config')
-      t.same(storeConfigMock.lastCall.arg, state, 'called store config')
+      group.is(couchDbConfigMock.callCount, 0, 'couchdb config not called')
+      group.same(pouchDbConfigMock.lastCall.arg, state, 'called pouchdb config')
+      group.same(accountConfigMock.lastCall.arg, state, 'called account config')
+      group.same(storeConfigMock.lastCall.arg, state, 'called store config')
 
-      t.ok(pouchDbConfigMock.lastCall.k < accountConfigMock.lastCall.k, 'pouch config called before account config')
-      t.ok(pouchDbConfigMock.lastCall.k < storeConfigMock.lastCall.k, 'pouch config called before store config')
+      group.ok(pouchDbConfigMock.lastCall.k < accountConfigMock.lastCall.k, 'pouch config called before account config')
+      group.ok(pouchDbConfigMock.lastCall.k < storeConfigMock.lastCall.k, 'pouch config called before store config')
 
-      t.end()
+      group.end()
     })
   })
 
-  group.test('with dbUrl', function (t) {
+  group.test('with dbUrl', function (group) {
     var config = {
       db: {
         url: 'http://foo:bar@baz.com'
@@ -66,19 +66,19 @@ test('config', function (group) {
     })
 
     getConfig({}, function (error, config) {
-      t.error(error)
+      group.error(error)
 
       var state = {
         config: config,
         getDatabase: 'getDatabase'
       }
 
-      t.is(pouchDbConfigMock.callCount, 0, 'PouchDB config not called')
-      t.same(couchDbConfigMock.lastCall.arg, state, 'called couchdb config')
-      t.same(accountConfigMock.lastCall.arg, state, 'called account config')
-      t.same(storeConfigMock.lastCall.arg, state, 'called store config')
+      group.is(pouchDbConfigMock.callCount, 0, 'PouchDB config not called')
+      group.same(couchDbConfigMock.lastCall.arg, state, 'called couchdb config')
+      group.same(accountConfigMock.lastCall.arg, state, 'called account config')
+      group.same(storeConfigMock.lastCall.arg, state, 'called store config')
 
-      t.end()
+      group.end()
     })
   })
 

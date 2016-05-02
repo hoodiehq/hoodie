@@ -1,8 +1,8 @@
 var test = require('tap').test
 var proxyquire = require('proxyquire')
 
-test('generate couch config', function (t) {
-  t.test('read from file', function (tt) {
+test('generate couch config', function (group) {
+  group.test('read from file', function (t) {
     var pouchDbConfig = proxyquire('../../../lib/config/db/pouchdb.js', {
       fs: {
         existsSync: function () {
@@ -28,14 +28,14 @@ test('generate couch config', function (t) {
         }
       }
     }, function (error, result) {
-      tt.error(error)
-      tt.is(result.db.secret, 'a')
-      tt.is(result.db.authenticationDb, '_users')
-      tt.end()
+      t.error(error)
+      t.is(result.db.secret, 'a')
+      t.is(result.db.authenticationDb, '_users')
+      t.end()
     })
   })
 
-  t.test('generate and write to file', function (tt) {
+  group.test('generate and write to file', function (t) {
     var pouchDbConfig = proxyquire('../../../lib/config/db/pouchdb.js', {
       fs: {
         existsSync: function () {
@@ -57,12 +57,12 @@ test('generate couch config', function (t) {
         }
       }
     }, function (error, result) {
-      tt.error(error)
-      tt.is(result.db.secret.length, 32)
-      tt.is(result.db.authenticationDb, '_users')
-      tt.end()
+      t.error(error)
+      t.is(result.db.secret.length, 32)
+      t.is(result.db.authenticationDb, '_users')
+      t.end()
     })
   })
 
-  t.end()
+  group.end()
 })

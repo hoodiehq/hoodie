@@ -19,7 +19,7 @@ nock('http://127.0.0.1:5984')
     user: 'secret'
   })
 
-test('init couchdb', function (t) {
+test('init couchdb', function (group) {
   var couchdb = require('../../../lib/config/db/couchdb')
 
   couchdb({
@@ -29,14 +29,14 @@ test('init couchdb', function (t) {
       }
     }
   }, function (err, result) {
-    t.error(err)
+    group.error(err)
 
-    t.is(result.db.secret, 'foo')
-    t.is(result.db.authenticationDb, '_users')
-    t.same(result.db.admins, {
+    group.is(result.db.secret, 'foo')
+    group.is(result.db.authenticationDb, '_users')
+    group.same(result.db.admins, {
       user: 'secret'
     })
 
-    t.end()
+    group.end()
   })
 })

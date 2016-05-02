@@ -13,33 +13,33 @@ var registerPlugins = proxyquire('../../lib/plugins', {
 })
 
 test('plugins', function (group) {
-  group.test('account registration', function (t) {
+  group.test('account registration', function (group) {
     registerPlugins({
       account: 'account options'
     }, function (error, plugins) {
-      t.error(error)
+      group.error(error)
 
       var accountPlugin = plugins[plugins.length - 2]
 
-      t.is(accountPlugin.options, 'account options', 'passes config.account')
-      t.is(accountPlugin.routes.prefix, '/hoodie/account/api', 'sets account path prefix')
+      group.is(accountPlugin.options, 'account options', 'passes config.account')
+      group.is(accountPlugin.routes.prefix, '/hoodie/account/api', 'sets account path prefix')
 
-      t.end()
+      group.end()
     })
   })
 
-  group.test('store registration', function (t) {
+  group.test('store registration', function (group) {
     registerPlugins({
       store: 'store options'
     }, function (error, plugins) {
-      t.error(error)
+      group.error(error)
 
       var accountPlugin = plugins[plugins.length - 1]
 
-      t.is(accountPlugin.options, 'store options', 'passes config.store')
-      t.is(accountPlugin.routes.prefix, '/hoodie/store/api', 'sets store path prefix')
+      group.is(accountPlugin.options, 'store options', 'passes config.store')
+      group.is(accountPlugin.routes.prefix, '/hoodie/store/api', 'sets store path prefix')
 
-      t.end()
+      group.end()
     })
   })
 

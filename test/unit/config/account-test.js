@@ -9,7 +9,7 @@ var accountConfig = proxyquire('../../../lib/config/account', {
   'pouchdb-users': pouchdbUsersStub
 })
 
-test('account config', function (t) {
+test('account config', function (group) {
   var installUsersBehaviorStub = simple.stub().resolveWith()
   var pluginStub = simple.stub()
   var dbStub = {
@@ -29,14 +29,14 @@ test('account config', function (t) {
       }
     }
   }, function (error, config) {
-    t.error(error)
+    group.error(error)
 
-    t.is(pluginStub.lastCall.arg, pouchdbUsersStub, 'installs pouchdb-users')
-    t.is(installUsersBehaviorStub.callCount, 1, 'installs user behavior')
-    t.is(config.account.admins, 'db admins', 'sets config.account.admins')
-    t.is(config.account.secret, 'db secret', 'sets config.account.secret')
-    t.same(config.account.usersDb, dbStub, 'sets config.account.usersDb')
+    group.is(pluginStub.lastCall.arg, pouchdbUsersStub, 'installs pouchdb-users')
+    group.is(installUsersBehaviorStub.callCount, 1, 'installs user behavior')
+    group.is(config.account.admins, 'db admins', 'sets config.account.admins')
+    group.is(config.account.secret, 'db secret', 'sets config.account.secret')
+    group.same(config.account.usersDb, dbStub, 'sets config.account.usersDb')
 
-    t.end()
+    group.end()
   })
 })

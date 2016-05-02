@@ -9,7 +9,7 @@ var storeConfig = proxyquire('../../../lib/config/store', {
 })
 
 test('store config', function (group) {
-  group.test('with config.db.url = http://foo:bar@baz.com', function (t) {
+  group.test('with config.db.url = http://foo:bar@baz.com', function (group) {
     storeConfig({
       config: {
         db: {
@@ -18,16 +18,16 @@ test('store config', function (group) {
         store: {}
       }
     }, function (error, config) {
-      t.error(error)
+      group.error(error)
 
-      t.is(config.store.couchdb, 'http://baz.com', 'sets config.store.couchdb')
-      t.is(config.store.PouchDB, undefined, 'does not set config.store.PouchDB')
+      group.is(config.store.couchdb, 'http://baz.com', 'sets config.store.couchdb')
+      group.is(config.store.PouchDB, undefined, 'does not set config.store.PouchDB')
 
-      t.end()
+      group.end()
     })
   })
 
-  group.test('without config.db.url', function (t) {
+  group.test('without config.db.url', function (group) {
     storeConfig({
       config: {
         db: {},
@@ -37,12 +37,12 @@ test('store config', function (group) {
         PouchDB: 'PouchDB'
       }
     }, function (error, config) {
-      t.error(error)
+      group.error(error)
 
-      t.is(config.store.PouchDB, 'PouchDB', 'sets config.store.PouchDB')
-      t.is(config.store.couchdb, undefined, 'does not set config.store.couchdb')
+      group.is(config.store.PouchDB, 'PouchDB', 'sets config.store.PouchDB')
+      group.is(config.store.couchdb, undefined, 'does not set config.store.couchdb')
 
-      t.end()
+      group.end()
     })
   })
 

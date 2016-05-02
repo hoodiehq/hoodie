@@ -7,7 +7,7 @@ var hoodieServer = require('../../')
 var mockCouchDB = require('./utils/mock-couchdb')
 
 test('handle forced gzip', function (group) {
-  group.test('receive gzip when gzip accept header sent', function (t) {
+  group.test('receive gzip when gzip accept header sent', function (group) {
     mockCouchDB()
 
     hoodieServer({
@@ -15,16 +15,16 @@ test('handle forced gzip', function (group) {
       loglevel: 'error',
       dbUrl: 'http://admin:secret@localhost:5984'
     }, function (err, server, config) {
-      t.error(err, 'hoodie loads without error')
+      group.error(err, 'hoodie loads without error')
 
       server.inject({
         url: url.resolve(url.format(config.app), 'hoodie'),
         headers: {'Accept-Encoding': 'gzip, deflate'}
-      }, testGzip.bind(null, t, server))
+      }, testGzip.bind(null, group, server))
     })
   })
 
-  group.test('receive no gzip when no gzip accept header sent', function (t) {
+  group.test('receive no gzip when no gzip accept header sent', function (group) {
     mockCouchDB()
 
     hoodieServer({
@@ -32,16 +32,16 @@ test('handle forced gzip', function (group) {
       loglevel: 'error',
       dbUrl: 'http://admin:secret@localhost:5984'
     }, function (err, server, config) {
-      t.error(err, 'hoodie loads without error')
+      group.error(err, 'hoodie loads without error')
 
       server.inject({url: url.resolve(url.format(config.app), 'hoodie')}, function (res) {
-        t.notOk(res.headers['content-encoding'])
-        server.stop(t.end)
+        group.notOk(res.headers['content-encoding'])
+        server.stop(group.end)
       })
     })
   })
 
-  group.test('receive gzip when gzip accept header sent', function (t) {
+  group.test('receive gzip when gzip accept header sent', function (group) {
     mockCouchDB()
 
     hoodieServer({
@@ -49,23 +49,23 @@ test('handle forced gzip', function (group) {
       loglevel: 'error',
       dbUrl: 'http://admin:secret@localhost:5984'
     }, function (err, server, config) {
-      t.error(err, 'hoodie loads without error')
+      group.error(err, 'hoodie loads without error')
 
       server.inject({
         url: url.resolve(url.format(config.app), 'hoodie?force_gzip=true')
-      }, testGzip.bind(null, t, server))
+      }, testGzip.bind(null, group, server))
     })
   })
 
   group.end()
 })
 
-function testGzip (t, server, res) {
-  t.is(res.headers['content-encoding'], 'gzip', 'content is gzip encoded')
+function testGzip (group, server, res) {
+  group.is(res.headers['content-encoding'], 'gzip', 'content is gzip encoded')
 
   zlib.gunzip(res.rawPayload, function (error, udat) {
-    t.error(error, 'gunzips without error')
-    t.ok(/hoodie/.test(udat.toString()), 'correct content')
-    server.stop(t.end)
+    group.error(error, 'gunzips without error')
+    group.ok(/hoodie/.test(udat.toString()), 'correct content')
+    server.stop(group.end)
   })
 }
