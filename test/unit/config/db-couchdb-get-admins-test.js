@@ -1,9 +1,9 @@
 var test = require('tap').test
 
+var getAdmins = require('../../../lib/config/db/couchdb-get-admins.js')
+
 test('get couch admins', function (t) {
   t.test('request fails', function (tt) {
-    var getAdmins = require('../../../lib/config/db/couchdb.js').internals.getAdmins
-
     tt.plan(2)
 
     getAdmins(function (input, callback) {
@@ -20,8 +20,6 @@ test('get couch admins', function (t) {
   })
 
   t.test('request succeds', function (tt) {
-    var getAdmins = require('../../../lib/config/db/couchdb.js').internals.getAdmins
-
     getAdmins(function (input, callback) {
       tt.is(input.url, '/_config/admins')
       callback(null, null, {

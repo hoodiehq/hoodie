@@ -1,10 +1,10 @@
 var log = require('npmlog')
 var test = require('tap').test
 
+var checkVendor = require('../../../lib/config/db/couchdb-check-vendor.js')
+
 test('check couch vendor', function (t) {
   t.test('request fails', function (tt) {
-    var checkVendor = require('../../../lib/config/db/couchdb.js').internals.checkVendor
-
     tt.plan(2)
 
     checkVendor({db: {url: '<% COUCH URL %>'}}, function (input, callback) {
@@ -21,7 +21,6 @@ test('check couch vendor', function (t) {
   })
 
   t.test('verify vendor', function (tt) {
-    var checkVendor = require('../../../lib/config/db/couchdb.js').internals.checkVendor
     tt.plan(3)
 
     checkVendor({}, function (input, callback) {

@@ -1,9 +1,9 @@
 var test = require('tap').test
 
+var setConfig = require('../../../lib/config/db/couchdb-set-config.js')
+
 test('set couch config', function (t) {
   t.test('request fails', function (tt) {
-    var setConfig = require('../../../lib/config/db/couchdb.js').internals.setConfig
-
     tt.plan(2)
 
     setConfig(function (input, callback) {
@@ -20,8 +20,6 @@ test('set couch config', function (t) {
   })
 
   t.test('request succeds', function (tt) {
-    var setConfig = require('../../../lib/config/db/couchdb.js').internals.setConfig
-
     tt.plan(4)
 
     setConfig(function (input, callback) {
