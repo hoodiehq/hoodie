@@ -14,7 +14,7 @@ test('handle forced gzip', function (group) {
       group.error(err, 'hoodie loads without error')
 
       server.inject({
-        url: 'http:' + url.resolve(url.format(config.server.connection), 'hoodie'),
+        url: url.resolve(toUrl(config.server.connection), 'hoodie'),
         headers: {'Accept-Encoding': 'gzip, deflate'}
       }, testGzip.bind(null, group, server))
     })
@@ -27,7 +27,7 @@ test('handle forced gzip', function (group) {
     }, function (err, server, config) {
       group.error(err, 'hoodie loads without error')
 
-      server.inject({url: 'http:' + url.resolve(url.format(config.server.connection), 'hoodie')}, function (res) {
+      server.inject({url: url.resolve(toUrl(config.server.connection), 'hoodie')}, function (res) {
         group.notOk(res.headers['content-encoding'])
         server.stop(group.end)
       })
@@ -42,7 +42,7 @@ test('handle forced gzip', function (group) {
       group.error(err, 'hoodie loads without error')
 
       server.inject({
-        url: 'http:' + url.resolve(url.format(config.server.connection), 'hoodie?force_gzip=true')
+        url: url.resolve(toUrl(config.server.connection), 'hoodie?force_gzip=true')
       }, testGzip.bind(null, group, server))
     })
   })
@@ -57,5 +57,13 @@ function testGzip (group, server, res) {
     group.error(error, 'gunzips without error')
     group.ok(/hoodie/.test(udat.toString()), 'correct content')
     server.stop(group.end)
+  })
+}
+
+function toUrl (connection) {
+  return url.format({
+    protocol: 'http',
+    hostname: connection.host,
+    port: connection.port
   })
 }
