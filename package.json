@@ -69,6 +69,7 @@
     "coverage": "nyc report --reporter=text-lcov | coveralls",
     "semantic-release": "semantic-release pre && npm publish && semantic-release post",
     "postsemantic-release": "npm run coverage",
+    "start": "./bin/start.js",
     "pretest": "standard",
     "test": "nyc tap --no-cov ./test/{unit,integration}/{**,**/**}-test.js"
   }

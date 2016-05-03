@@ -69,8 +69,10 @@ npm install
 ```
 
 The `hoodie` test suite is run with `npm test`.
+You can [read more about testing Hoodie](test).
 
-You can [read more about testing Hoodie](test)
+You can start hoodie for itself using `npm start`. It will  serve the contents
+of the [public folder](public).
 
 ## License
 
