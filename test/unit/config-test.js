@@ -13,6 +13,7 @@ test('config', function (group) {
       db: {}
     }
     var accountConfigMock = simple.stub().callbackWith(null)
+    var assureFolders = simple.stub().callbackWith(null)
     var couchDbConfigMock = simple.stub().callbackWith(null)
     var getDatabaseFactoryMock = simple.stub().returnWith('getDatabase')
     var parseOptionsMock = simple.stub().returnWith(config)
@@ -21,6 +22,7 @@ test('config', function (group) {
 
     var getConfig = proxyquire('../../lib/config', {
       './account': accountConfigMock,
+      './assure-folders': assureFolders,
       './db/couchdb': couchDbConfigMock,
       './db/factory': getDatabaseFactoryMock,
       './parse-options': parseOptionsMock,
@@ -65,6 +67,7 @@ test('config', function (group) {
       }
     }
     var accountConfigMock = simple.stub().callbackWith(null)
+    var assureFolders = simple.stub().callbackWith(null)
     var couchDbConfigMock = simple.stub().callbackWith(null)
     var getDatabaseFactoryMock = simple.stub().returnWith('getDatabase')
     var parseOptionsMock = simple.stub().returnWith(config)
@@ -73,6 +76,7 @@ test('config', function (group) {
 
     var getConfig = proxyquire('../../lib/config', {
       './account': accountConfigMock,
+      './assure-folders': assureFolders,
       './db/couchdb': couchDbConfigMock,
       './db/factory': getDatabaseFactoryMock,
       './parse-options': parseOptionsMock,
@@ -110,6 +114,7 @@ test('config', function (group) {
       db: {}
     }
     var accountConfigMock = simple.stub().callbackWith(null)
+    var assureFolders = simple.stub().callbackWith(null)
     var couchDbConfigMock = simple.stub().callbackWith(null)
     var getDatabaseFactoryMock = simple.stub().returnWith('getDatabase')
     var parseOptionsMock = simple.stub().returnWith(config)
@@ -118,6 +123,7 @@ test('config', function (group) {
 
     var getConfig = proxyquire('../../lib/config', {
       './account': accountConfigMock,
+      './assure-folders': assureFolders,
       './db/couchdb': couchDbConfigMock,
       './db/factory': getDatabaseFactoryMock,
       './parse-options': parseOptionsMock,
