@@ -10,7 +10,6 @@ node_js:
 before_script:
 - npm prune
 after_success:
-- npm run coverage:upload
 - npm run semantic-release
 branches:
   except:

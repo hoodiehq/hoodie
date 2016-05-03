@@ -65,9 +65,9 @@
     "url": "https://github.com/hoodiehq/hoodie.git"
   },
   "scripts": {
-    "coverage": "nyc report",
-    "coverage:upload": "npm run -s coverage -- --reporter=text-lcov | coveralls",
+    "coverage": "nyc report --reporter=text-lcov | coveralls",
     "semantic-release": "semantic-release pre && npm publish && semantic-release post",
+    "postsemantic-release": "npm run coverage",
     "pretest": "standard",
     "test": "nyc tap --no-cov ./test/{unit,integration}/{**,**/**}-test.js"
   }
