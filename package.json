@@ -40,7 +40,6 @@
     "vision": "^4.1.0"
   },
   "devDependencies": {
-    "bundle-bump-bot": "^1.1.0",
     "coveralls": "^2.11.9",
     "nock": "^8.0.0",
     "nyc": "^6.4.2",
