@@ -25,6 +25,10 @@ If you have any questions come say hi in our [chat](http://hood.ie/chat/).
 
 `npm install --save hoodie`
 
+<!--
+  TODO: automate package.json update using postinstall
+        https://twitter.com/boennemann/status/726579520661282817
+-->
 Add this to your `package.json`:
 
 ```json
