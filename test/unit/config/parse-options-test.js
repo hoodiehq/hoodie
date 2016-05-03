@@ -10,7 +10,7 @@ var getDefaultsMock = function () {
       data: 'data path',
       public: 'public path'
     },
-    app: {
+    connection: {
       host: 'host name',
       port: 'app port'
     }
@@ -38,8 +38,8 @@ test('parse options', function (group) {
     group.is(config.name, 'foo', 'sets config.name from defaults')
     group.is(config.paths.data, 'data path', 'sets config.paths.data from defaults')
     group.is(config.paths.public, 'public path', 'sets config.public.data from defaults')
-    group.is(config.server.connection.host, 'host name', 'sets config.server.connection.host from defaults')
-    group.is(config.server.connection.port, 'app port', 'sets config.server.connection.port from defaults')
+    group.is(config.connection.host, 'host name', 'sets config.connection.host from defaults')
+    group.is(config.connection.port, 'app port', 'sets config.connection.port from defaults')
     group.is(config.db.prefix, 'data path/data' + pathSeperator, 'sets config.db.prefix based on default data path')
 
     group.end()
@@ -55,8 +55,8 @@ test('parse options', function (group) {
 
     group.is(config.paths.data, 'options.data', 'uses data option as data path')
     group.is(config.paths.public, 'options.public', 'uses public option as public path')
-    group.is(config.server.connection.host, 'options.bindAddress', 'sets config.server.connection.host from options.bindAddress')
-    group.is(config.server.connection.port, 'options.port', 'sets config.server.connection.port from options.port')
+    group.is(config.connection.host, 'options.bindAddress', 'sets config.connection.host from options.bindAddress')
+    group.is(config.connection.port, 'options.port', 'sets config.connection.port from options.port')
 
     group.end()
   })

@@ -13,7 +13,7 @@ test('forward all requests that accept html to app', function (group) {
       t.error(err, 'hoodie loads without error')
 
       server.inject({
-        url: url.resolve(toUrl(config.server.connection), 'does_not_exist'),
+        url: url.resolve(toUrl(config.connection), 'does_not_exist'),
         headers: {
           accept: 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8'
         }
@@ -33,7 +33,7 @@ test('forward all requests that accept html to app', function (group) {
       t.error(err)
 
       server.inject({
-        url: url.resolve(toUrl(config.server.connection), 'does_not_exist'),
+        url: url.resolve(toUrl(config.connection), 'does_not_exist'),
         headers: {
           accept: 'application/json'
         }

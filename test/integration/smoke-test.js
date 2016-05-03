@@ -16,7 +16,7 @@ test('smoke test', function (group) {
       group.error(err, 'hoodie starts without error')
 
       request({
-        url: url.resolve(toUrl(config.server.connection), 'hoodie'),
+        url: url.resolve(toUrl(config.connection), 'hoodie'),
         json: true
       }, function (error, res, data) {
         group.error(error, 'no error on request')
