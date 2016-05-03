@@ -14,11 +14,13 @@ test('smoke test', function (group) {
 
     server.start(function (err) {
       group.error(err, 'hoodie starts without error')
+
       request({
-        url: url.resolve(url.format(config.app), 'hoodie'),
+        url: 'http:' + url.resolve(url.format(config.server.connection) + ':' + config.server.connection.port, 'hoodie'),
         json: true
-      }, function (err, res, data) {
-        group.error(err, 'no error on request')
+      }, function (error, res, data) {
+        group.error(error, 'no error on request')
+
         group.is(res.statusCode, 200, 'status 200')
         group.ok(data.hoodie, 'is hoodie')
 
