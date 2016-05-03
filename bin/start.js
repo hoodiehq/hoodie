@@ -107,13 +107,13 @@ log.level = options.loglevel || 'warn'
 
 log.verbose('app', 'Initializing')
 
-getHoodieServer(options, function (err, server, env_config) {
+getHoodieServer(options, function (err, server, envConfig) {
   if (err) return log.error('app', 'Failed to initialize', err)
 
   log.verbose('app', 'Starting')
 
   server.start(function () {
-    console.log((useEmoji ? emoji.get('dog') + ' ' : '') + 'Your Hoodie app has started on ' + url.format(env_config.app))
-    log.verbose('app', 'Database running at ' + url.format(_.omit(env_config.db, 'auth')))
+    console.log((useEmoji ? emoji.get('dog') + ' ' : '') + 'Your Hoodie app has started on ' + url.format(envConfig.app))
+    log.verbose('app', 'Database running at ' + url.format(_.omit(envConfig.db, 'auth')))
   })
 })
