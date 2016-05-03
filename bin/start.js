@@ -105,17 +105,17 @@ var options = rc('hoodie', {}, _.mapKeys(_.omit(argv, ['argv']), function (value
 
 log.level = options.loglevel || 'warn'
 
-log.verbose('app', 'Initializing')
+log.verbose('app', 'Initialising')
 
-getHoodieServer(options, function (error, server, envConfig) {
+getHoodieServer(options, function (error, server, config) {
   if (error) {
     var stack = new Error().stack.split('\n').slice(2).join('\n')
-    return log.error('app', 'Failed to initialize:\n' + stack, error)
+    return log.error('app', 'Failed to initialise:\n' + stack, error)
   }
 
   log.verbose('app', 'Starting')
 
   server.start(function () {
-    console.log((useEmoji ? emoji.get('dog') + '  ' : '') + 'Your Hoodie app has started on ' + url.format(envConfig.app))
+    console.log((useEmoji ? emoji.get('dog') + '  ' : '') + 'Your Hoodie app has started on ' + url.format(config.app))
   })
 })
