@@ -48,7 +48,7 @@
     "proxyquire": "^1.7.4",
     "rimraf": "^2.5.2",
     "semantic-release": "^6.2.1",
-    "standard": "^6.0.8",
+    "standard": "^7.0.1",
     "tap": "^5.7.1"
   },
   "engines": {
