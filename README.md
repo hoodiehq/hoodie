@@ -13,7 +13,7 @@ Hoodie lets you build apps [without _thinking_ about the backend](http://nobacke
 and makes sure that they work great [independent from connectivity](http://offlinefirst.org/).
 
 This is Hoodie’s main repository. It starts a server and serves the client API.
-Read more about [Hoodie’s core modules](#architecture).
+Read more about [how things work](lib).
 
 A good place to start is our [Tracker App](https://github.com/hoodiehq/hoodie-app-tracker).
 You can play around with Hoodie’s APIs in the browser console and see how it
@@ -25,6 +25,10 @@ If you have any questions come say hi in our [chat](http://hood.ie/chat/).
 
 `npm install --save hoodie`
 
+<!--
+  TODO: automate package.json update using postinstall
+        https://twitter.com/boennemann/status/726579520661282817
+-->
 Add this to your `package.json`:
 
 ```json
@@ -41,15 +45,15 @@ Run `npm start -- --help` to see all available CLI options.
 
 Options can also be specified as environment variables (prefixed with `hoodie_`) or inside a `.hoodierc` file (json or ini).
 
-option        | default                            | description
-------------- | ---------------------------------- | -------------
-loglevel      | 'warn'                             |
-port          | 8080                               | Port-number to run the Hoodie App on
-bindAddress   | 127.0.0.1                          | Address that Hoodie binds to
-public        | path.join(options.path, 'public')  | path to static assets
-inMemory      | false                              | Whether to start the PouchDB Server in memory
-dbUrl         | –                                  | If provided uses external CouchDB. Has to contain credentials.
-data          | path.join(options.path, '.hoodie') | Data path
+option        | default       | description
+------------- | ------------- | -------------
+loglevel      | `'warn'`      | One of: error, warn, info, verbose, silly
+port          | `8080`        | Port-number to run the Hoodie App on
+bindAddress   | `'127.0.0.1'` | Address that Hoodie binds to
+public        | `'public'`    | path to static assets
+inMemory      | `false`       | Whether to start the PouchDB Server in memory
+dbUrl         | –             | If provided, uses external CouchDB. URL has to contain credentials.
+data          | `'.hoodie'`   | Data path
 
 Hoodie is using the [rc](https://www.npmjs.com/package/rc) module to retrieve
 configuration from CLI arguments, environment variables and configuration files.
@@ -65,31 +69,10 @@ npm install
 ```
 
 The `hoodie` test suite is run with `npm test`.
+You can [read more about testing Hoodie](test).
 
-You can [read more about testing Hoodie](test)
-
-## Architecture
-
-Hoodie is server built on top of [hapi](http://hapijs.com) with frontend APIs
-for account and store related tasks.
-
-It consists of three main components
-
-1. [**account**](https://github.com/hoodiehq/hoodie-account)  
-   Hoodie’s account module. It exposes [JSON API](http://jsonapi.org/) routes,
-   a corresponding server API at `server.plugins.account.api`,
-   a client API and a generic account UI.
-
-1. [**store**](https://github.com/hoodiehq/hoodie-store)  
-   Hoodie’s store module. It exposes [CouchDB’s Document API](https://wiki.apache.org/couchdb/HTTP_Document_API),
-   a corresponding client and a generic store UI.
-
-1. [**client**](https://github.com/hoodiehq/hoodie-client)  
-   Hoodie’s front-end client for the browser. It integrates the following client modules:
-   1. [account-client](https://github.com/hoodiehq/hoodie-account-client)
-   2. [store-client](https://github.com/hoodiehq/hoodie-store-client)
-   3. [log-client](https://github.com/hoodiehq/hoodie-log-client)
-   4. [connection-status](https://github.com/hoodiehq/hoodie-connection-status)
+You can start hoodie for itself using `npm start`. It will  serve the contents
+of the [public folder](public).
 
 ## License
 
