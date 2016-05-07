@@ -45,15 +45,15 @@ Run `npm start -- --help` to see all available CLI options.
 
 Options can also be specified as environment variables (prefixed with `hoodie_`) or inside a `.hoodierc` file (json or ini).
 
-option        | default                            | description
-------------- | ---------------------------------- | -------------
-loglevel      | 'warn'                             | One of: error, warn, info, verbose, silly
-port          | 8080                               | Port-number to run the Hoodie App on
-bindAddress   | 127.0.0.1                          | Address that Hoodie binds to
-public        | path.join(options.path, 'public')  | path to static assets
-inMemory      | false                              | Whether to start the PouchDB Server in memory
-dbUrl         | –                                  | If provided, uses external CouchDB. URL has to contain credentials.
-data          | path.join(options.path, '.hoodie') | Data path
+option        | default       | description
+------------- | ------------- | -------------
+loglevel      | `'warn'`      | One of: error, warn, info, verbose, silly
+port          | `8080`        | Port-number to run the Hoodie App on
+bindAddress   | `'127.0.0.1'` | Address that Hoodie binds to
+public        | `'public'`    | path to static assets
+inMemory      | `false`       | Whether to start the PouchDB Server in memory
+dbUrl         | –             | If provided, uses external CouchDB. URL has to contain credentials.
+data          | `'.hoodie'`   | Data path
 
 Hoodie is using the [rc](https://www.npmjs.com/package/rc) module to retrieve
 configuration from CLI arguments, environment variables and configuration files.
