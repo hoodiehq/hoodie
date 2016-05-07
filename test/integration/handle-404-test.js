@@ -3,54 +3,55 @@ var url = require('url')
 var test = require('tap').test
 
 var hoodieServer = require('../../')
-var mockCouchDB = require('./utils/mock-couchdb')
 
-test('forward all requests that accept html to app', function (t) {
-  t.test('send index.html on accept: text/html', function (tt) {
-    mockCouchDB()
-
+test('forward all requests that accept html to app', function (group) {
+  group.test('send index.html on accept: text/html', function (t) {
     hoodieServer({
       inMemory: true,
-      loglevel: 'error',
-      dbUrl: 'http://admin:secret@localhost:5984'
+      loglevel: 'error'
     }, function (err, server, config) {
-      tt.error(err, 'hoodie loads without error')
+      t.error(err, 'hoodie loads without error')
 
       server.inject({
-        url: url.resolve(url.format(config.app), 'does_not_exist'),
+        url: url.resolve(toUrl(config.connection), 'does_not_exist'),
         headers: {
           accept: 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8'
         }
       }, function (res) {
-        tt.is(res.statusCode, 200, 'statusCode is 200')
-        tt.match(res.payload, /<html/, 'response is HTML')
-        server.stop(tt.end)
+        t.is(res.statusCode, 200, 'statusCode is 200')
+        t.match(res.payload, /<html/, 'response is HTML')
+        server.stop(t.end)
       })
     })
   })
 
-  t.test('send a JSON 404 on anything but accept: text/html*', function (tt) {
-    mockCouchDB()
-
+  group.test('send a JSON 404 on anything but accept: text/html*', function (t) {
     hoodieServer({
       inMemory: true,
-      loglevel: 'error',
-      dbUrl: 'http://admin:secret@localhost:5984'
+      loglevel: 'error'
     }, function (err, server, config) {
-      tt.error(err)
+      t.error(err)
 
       server.inject({
-        url: url.resolve(url.format(config.app), 'does_not_exist'),
+        url: url.resolve(toUrl(config.connection), 'does_not_exist'),
         headers: {
           accept: 'application/json'
         }
       }, function (res) {
-        tt.is(res.statusCode, 404, 'statusCode is 404')
-        tt.is(res.result.error, 'Not Found', 'Not Found error')
-        server.stop(tt.end)
+        t.is(res.statusCode, 404, 'statusCode is 404')
+        t.is(res.result.error, 'Not Found', 'Not Found error')
+        server.stop(t.end)
       })
     })
   })
 
-  t.end()
+  group.end()
 })
+
+function toUrl (connection) {
+  return url.format({
+    protocol: 'http',
+    hostname: connection.host,
+    port: connection.port
+  })
+}

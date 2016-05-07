@@ -4,30 +4,36 @@ var request = require('request')
 var test = require('tap').test
 
 var hoodieServer = require('../../')
-var mockCouchDB = require('./utils/mock-couchdb')
 
-test('smoke test', function (t) {
-  mockCouchDB()
-
+test('smoke test', function (group) {
   hoodieServer({
     inMemory: true,
-    loglevel: 'error',
-    dbUrl: 'http://admin:secret@localhost:5984'
+    loglevel: 'error'
   }, function (err, server, config) {
-    t.error(err, 'hoodie loads without error')
+    group.error(err, 'hoodie loads without error')
 
     server.start(function (err) {
-      t.error(err, 'hoodie starts without error')
-      request({
-        url: url.resolve(url.format(config.app), 'hoodie'),
-        json: true
-      }, function (err, res, data) {
-        t.error(err, 'no error on request')
-        t.is(res.statusCode, 200, 'status 200')
-        t.ok(data.hoodie, 'is hoodie')
+      group.error(err, 'hoodie starts without error')
 
-        server.stop(t.end)
+      request({
+        url: url.resolve(toUrl(config.connection), 'hoodie'),
+        json: true
+      }, function (error, res, data) {
+        group.error(error, 'no error on request')
+
+        group.is(res.statusCode, 200, 'status 200')
+        group.ok(data.hoodie, 'is hoodie')
+
+        server.stop(group.end)
       })
     })
   })
 })
+
+function toUrl (connection) {
+  return url.format({
+    protocol: 'http',
+    hostname: connection.host,
+    port: connection.port
+  })
+}

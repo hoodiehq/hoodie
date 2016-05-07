@@ -28,15 +28,15 @@ log.style = {
 log.prefixStyle = {fg: 'magenta'}
 log.headingStyle = {}
 log.disp = {
-  silly: 'Sill' + (useEmoji ? emoji.get('mega') + ' ' : ''),
-  verbose: 'Verb' + (useEmoji ? emoji.get('speech_balloon') + ' ' : ''),
-  info: 'Info' + (useEmoji ? emoji.get('mag') + ' ' : ''),
-  http: 'HTTP' + (useEmoji ? emoji.get('link') + ' ' : ''),
-  warn: 'Warn' + (useEmoji ? emoji.get('zap') + ' ' : ''),
-  error: 'Err!' + (useEmoji ? emoji.get('anger') + ' ' : ''),
+  silly: 'Sill',
+  verbose: 'Verb',
+  info: 'Info',
+  http: 'HTTP',
+  warn: 'Warn',
+  error: 'Err!',
   silent: 'silent'
 }
-log.heading = (useEmoji ? emoji.get('dog') + ' ' : '') + 'Hoodie'
+log.heading = (useEmoji ? emoji.get('dog') + '  ' : '') + 'Hoodie'
 
 if (semver.lt(process.versions.node, '4.0.0')) {
   log.error('env', 'A node version >=4 is required to run Hoodie')
@@ -105,15 +105,17 @@ var options = rc('hoodie', {}, _.mapKeys(_.omit(argv, ['argv']), function (value
 
 log.level = options.loglevel || 'warn'
 
-log.verbose('app', 'Initializing')
+log.verbose('app', 'Initialising')
 
-getHoodieServer(options, function (err, server, envConfig) {
-  if (err) return log.error('app', 'Failed to initialize', err)
+getHoodieServer(options, function (error, server, config) {
+  if (error) {
+    var stack = new Error().stack.split('\n').slice(2).join('\n')
+    return log.error('app', 'Failed to initialise:\n' + stack, error)
+  }
 
   log.verbose('app', 'Starting')
 
   server.start(function () {
-    console.log((useEmoji ? emoji.get('dog') + ' ' : '') + 'Your Hoodie app has started on ' + url.format(envConfig.app))
-    log.verbose('app', 'Database running at ' + url.format(_.omit(envConfig.db, 'auth')))
+    console.log((useEmoji ? emoji.get('dog') + '  ' : '') + 'Your Hoodie app has started on ' + url.format(config.connection))
   })
 })

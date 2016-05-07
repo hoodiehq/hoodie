@@ -1,103 +1,152 @@
+var resolvePath = require('path').resolve
+
+var proxyquire = require('proxyquire').noCallThru()
+var simple = require('simple-mock')
 var test = require('tap').test
-var proxyquire = require('proxyquire')
-require('npmlog').level = 'silent'
 
-var mkdirp = {
-  sync: function () {},
-  '@noCallThru': true
-}
-var cwd = process.cwd()
-
-test('config', function (t) {
-  t.test('default', function (tt) {
-    var getConfig = proxyquire('../../lib/config', {mkdirp: mkdirp})
-
-    var config = getConfig({})
-
-    tt.is(config.name, 'hoodie', 'exposes name from package.json')
-    tt.ok(config.paths.data.startsWith(cwd), 'derives hoodie path from cwd')
-    tt.match(config.paths.public, cwd + '/public', 'falls back to hoodie/public')
-
-    tt.same(config.db, {
-      prefix: cwd + '/.hoodie/data/'
-    }, 'uses default db config')
-    tt.same(config.app, {
-      hostname: '127.0.0.1',
-      port: 8080,
-      protocol: 'http'
-    }, 'uses "http://127.0.0.1:8080/" as app url')
-
-    tt.end()
-  })
-
-  t.test('applies overwrites', function (tt) {
-    var options = {
-      mkdirp: mkdirp,
-      fs: {
-        statSync: function () {
-          return {
-            isDirectory: function () {
-              return true
-            }
-          }
-        },
-        '@noCallThru': true
-      }
+test('config', function (group) {
+  group.test('defaults', function (t) {
+    var config = {
+      paths: {
+        public: 'public path'
+      },
+      db: {}
     }
-    options[cwd + '/package.json'] = {
-      name: 'overwritten',
-      '@noCallThru': true
-    }
-    var getConfig = proxyquire('../../lib/config', options)
-
-    var config = getConfig({
-      data: 'data-path',
-      public: 'public-path',
-      bindAddress: 'hoodie-test',
-      port: 1337
-    })
-
-    tt.is(config.name, 'overwritten', 'exposes name from package.json')
-    tt.is(config.paths.data, 'data-path', 'uses data option as data path')
-    tt.is(config.paths.public, 'public-path', 'uses public option as public path')
-
-    tt.same(config.app, {
-      hostname: 'hoodie-test',
-      port: 1337,
-      protocol: 'http'
-    }, 'uses "http://hoodie-test:1337/" as app url')
-
-    tt.end()
-  })
-
-  t.test('custom db', function (tt) {
-    tt.plan(3)
-
-    var memdown = {}
+    var accountConfigMock = simple.stub().callbackWith(null)
+    var assureFolders = simple.stub().callbackWith(null)
+    var couchDbConfigMock = simple.stub().callbackWith(null)
+    var getDatabaseFactoryMock = simple.stub().returnWith('getDatabase')
+    var parseOptionsMock = simple.stub().returnWith(config)
+    var pouchDbConfigMock = simple.stub().callbackWith(null)
+    var storeConfigMock = simple.stub().callbackWith(null)
 
     var getConfig = proxyquire('../../lib/config', {
-      memdown: memdown,
-      mkdirp: mkdirp,
-      npmlog: {
-        warn: function () {
-          tt.ok(true, 'warns about missing auth in db url')
-        },
-        info: function () {}
+      './account': accountConfigMock,
+      './assure-folders': assureFolders,
+      './db/couchdb': couchDbConfigMock,
+      './db/factory': getDatabaseFactoryMock,
+      './parse-options': parseOptionsMock,
+      './db/pouchdb': pouchDbConfigMock,
+      './store': storeConfigMock,
+      'fs': {
+        statSync: simple.stub().returnWith({
+          isDirectory: simple.stub()
+        })
       }
     })
 
-    var config = getConfig({
-      dbUrl: 'http://user:pass@example.com/',
-      inMemory: true
-    })
+    getConfig({}, function (error, config) {
+      t.error(error)
 
-    tt.is(config.db.url, 'http://user:pass@example.com/', 'uses passed db url')
-    tt.is(config.db.db, memdown, 'uses memdown for in memory')
+      var state = {
+        config: config,
+        getDatabase: 'getDatabase'
+      }
 
-    getConfig({
-      dbUrl: 'http://example.com/'
+      t.is(config.paths.public, 'public path', 'sets public path')
+
+      t.is(couchDbConfigMock.callCount, 0, 'couchdb config not called')
+      t.same(pouchDbConfigMock.lastCall.arg, state, 'called pouchdb config')
+      t.same(accountConfigMock.lastCall.arg, state, 'called account config')
+      t.same(storeConfigMock.lastCall.arg, state, 'called store config')
+
+      t.ok(pouchDbConfigMock.lastCall.k < accountConfigMock.lastCall.k, 'pouch config called before account config')
+      t.ok(pouchDbConfigMock.lastCall.k < storeConfigMock.lastCall.k, 'pouch config called before store config')
+
+      t.end()
     })
   })
 
-  t.end()
+  group.test('with dbUrl', function (t) {
+    var config = {
+      paths: {
+        public: 'public path'
+      },
+      db: {
+        url: 'http://foo:bar@baz.com'
+      }
+    }
+    var accountConfigMock = simple.stub().callbackWith(null)
+    var assureFolders = simple.stub().callbackWith(null)
+    var couchDbConfigMock = simple.stub().callbackWith(null)
+    var getDatabaseFactoryMock = simple.stub().returnWith('getDatabase')
+    var parseOptionsMock = simple.stub().returnWith(config)
+    var pouchDbConfigMock = simple.stub().callbackWith(null)
+    var storeConfigMock = simple.stub().callbackWith(null)
+
+    var getConfig = proxyquire('../../lib/config', {
+      './account': accountConfigMock,
+      './assure-folders': assureFolders,
+      './db/couchdb': couchDbConfigMock,
+      './db/factory': getDatabaseFactoryMock,
+      './parse-options': parseOptionsMock,
+      './db/pouchdb': pouchDbConfigMock,
+      './store': storeConfigMock,
+      'fs': {
+        statSync: simple.stub().returnWith({
+          isDirectory: simple.stub()
+        })
+      }
+    })
+
+    getConfig({}, function (error, config) {
+      t.error(error)
+
+      var state = {
+        config: config,
+        getDatabase: 'getDatabase'
+      }
+
+      t.is(pouchDbConfigMock.callCount, 0, 'PouchDB config not called')
+      t.same(couchDbConfigMock.lastCall.arg, state, 'called couchdb config')
+      t.same(accountConfigMock.lastCall.arg, state, 'called account config')
+      t.same(storeConfigMock.lastCall.arg, state, 'called store config')
+
+      t.end()
+    })
+  })
+
+  group.test('if public puth does not exist', function (t) {
+    var config = {
+      paths: {
+        public: 'public path'
+      },
+      db: {}
+    }
+    var accountConfigMock = simple.stub().callbackWith(null)
+    var assureFolders = simple.stub().callbackWith(null)
+    var couchDbConfigMock = simple.stub().callbackWith(null)
+    var getDatabaseFactoryMock = simple.stub().returnWith('getDatabase')
+    var parseOptionsMock = simple.stub().returnWith(config)
+    var pouchDbConfigMock = simple.stub().callbackWith(null)
+    var storeConfigMock = simple.stub().callbackWith(null)
+
+    var getConfig = proxyquire('../../lib/config', {
+      './account': accountConfigMock,
+      './assure-folders': assureFolders,
+      './db/couchdb': couchDbConfigMock,
+      './db/factory': getDatabaseFactoryMock,
+      './parse-options': parseOptionsMock,
+      './db/pouchdb': pouchDbConfigMock,
+      './store': storeConfigMock,
+      'fs': {
+        statSync: simple.stub().returnWith({
+          isDirectory: simple.stub().throwWith(new Error())
+        })
+      },
+      'npmlog': {
+        info: simple.stub()
+      }
+    })
+
+    getConfig({}, function (error, config) {
+      t.error(error)
+
+      t.is(config.paths.public, resolvePath(__dirname, '../../public'), 'defaults to hoodie/public')
+
+      t.end()
+    })
+  })
+
+  group.end()
 })
