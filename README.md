@@ -28,7 +28,7 @@ If you have any questions come say hi in our [chat](http://hood.ie/chat/).
 
 <!--
   TODO: automate package.json update using postinstall
-        https://twitter.com/boennemann/status/726579520661282817
+        https://github.com/hoodiehq/hoodie/issues/477
 -->
 Add this to your `package.json`:
 
