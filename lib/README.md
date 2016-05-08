@@ -38,7 +38,7 @@ for account and store related tasks.
      [account-server](https://github.com/hoodiehq/hoodie-account-server) and
      exposes a generic account UI.
 
-   1. ### <a name="account-client"></a> account-client [:octocat:](https://github.com/hoodiehq/hoodie-account-client) [![Build Status](https://travis-ci.org/hoodiehq/hoodie-account-client.svg?branch=master)](https://travis-ci.org/hoodiehq/hoodie-account-client) [![Coverage Status](https://coveralls.io/repos/hoodiehq/hoodie-account-client/badge.svg?branch=master)](https://coveralls.io/r/hoodiehq/hoodie-account-client?branch=master) [![Dependency Status](https://david-dm.org/hoodiehq/hoodie-account-client.svg)](https://david-dm.org/hoodiehq/hoodie-account-client)
+   1. ### <a name="account-client"></a>account-client [:octocat:](https://github.com/hoodiehq/hoodie-account-client) [![Build Status](https://travis-ci.org/hoodiehq/hoodie-account-client.svg?branch=master)](https://travis-ci.org/hoodiehq/hoodie-account-client) [![Coverage Status](https://coveralls.io/repos/hoodiehq/hoodie-account-client/badge.svg?branch=master)](https://coveralls.io/r/hoodiehq/hoodie-account-client?branch=master) [![Dependency Status](https://david-dm.org/hoodiehq/hoodie-account-client.svg)](https://david-dm.org/hoodiehq/hoodie-account-client)
 
       > Client for the [Account JSON API](http://docs.accountjsonapi.apiary.io).
         It persists session information in localStorage and provides
@@ -59,7 +59,7 @@ for account and store related tasks.
      [store-server](https://github.com/hoodiehq/hoodie-store-server) and exposes
       a generic store UI.
 
-   1. ### <a name="store-client"></a> store-client [:octocat:](https://github.com/hoodiehq/hoodie-store-client) [![Build Status](https://travis-ci.org/hoodiehq/hoodie-store-client.svg?branch=master)](https://travis-ci.org/hoodiehq/hoodie-store-client) [![Coverage Status](https://coveralls.io/repos/hoodiehq/hoodie-store-client/badge.svg?branch=master)](https://coveralls.io/r/hoodiehq/hoodie-store-client?branch=master) [![Dependency Status](https://david-dm.org/hoodiehq/hoodie-store-client.svg)](https://david-dm.org/hoodiehq/hoodie-store-client)
+   1. ### <a name="store-client"></a>store-client [:octocat:](https://github.com/hoodiehq/hoodie-store-client) [![Build Status](https://travis-ci.org/hoodiehq/hoodie-store-client.svg?branch=master)](https://travis-ci.org/hoodiehq/hoodie-store-client) [![Coverage Status](https://coveralls.io/repos/hoodiehq/hoodie-store-client/badge.svg?branch=master)](https://coveralls.io/r/hoodiehq/hoodie-store-client?branch=master) [![Dependency Status](https://david-dm.org/hoodiehq/hoodie-store-client.svg)](https://david-dm.org/hoodiehq/hoodie-store-client)
 
       > Store client for data persistence and offline sync. It combines [pouchdb-hoodie-api](https://github.com/hoodiehq/pouchdb-hoodie-api)
         and [pouchdb-hoodie-sync](https://github.com/hoodiehq/pouchdb-hoodie-sync).
