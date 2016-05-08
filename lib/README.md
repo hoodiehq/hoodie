@@ -1,3 +1,5 @@
+[back to hoodie](../README.md)
+
 # How Hoodie works
 
 After [installing hoodie](../#setup), `npm start` will run [bin/start.js](../bin/start.js)
@@ -38,7 +40,7 @@ for account and store related tasks.
      [account-server](https://github.com/hoodiehq/hoodie-account-server) and
      exposes a generic account UI.
 
-   1. ### account-server [:octocat:](https://github.com/hoodiehq/hoodie-account-server#readme) [![Build Status](https://api.travis-ci.org/hoodiehq/hoodie-account-server.svg?branch=master)](https://travis-ci.org/hoodiehq/hoodie-account-server) [![Coverage Status](https://coveralls.io/repos/hoodiehq/hoodie-server-account/badge.svg?branch=master)](https://coveralls.io/r/hoodiehq/hoodie-server-account?branch=master) [![Dependency Status](https://david-dm.org/hoodiehq/hoodie-account-server.svg)](https://david-dm.org/hoodiehq/hoodie-account-server)
+   1. ### account-server [:octocat:](https://github.com/hoodiehq/hoodie-account-server#readme) [![Build Status](https://api.travis-ci.org/hoodiehq/hoodie-account-server.svg?branch=master)](https://travis-ci.org/hoodiehq/hoodie-account-server) [![Coverage Status](https://coveralls.io/repos/hoodiehq/hoodie-account-server/badge.svg?branch=master)](https://coveralls.io/r/hoodiehq/hoodie-account-server?branch=master) [![Dependency Status](https://david-dm.org/hoodiehq/hoodie-account-server.svg)](https://david-dm.org/hoodiehq/hoodie-account-server)
 
       > [Hapi](http://hapijs.com/) plugin that implements the
         [Account JSON API](http://docs.accountjsonapi.apiary.io) routes and
