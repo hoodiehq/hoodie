@@ -1,12 +1,12 @@
 [back to hoodie](../README.md)
 
-# How Hoodie works
+# hoodie/server
 
 After [installing hoodie](../#setup), `npm start` will run [bin/start.js](../bin/start.js)
 which reads out [configuration](../#usage) from all the different places using
 the [rc](https://www.npmjs.com/package/rc) package, then passes it as options to
 `getHoodieServer`, the main function returned by this package, defined in
-[lib/index.js](index.js).
+[server/index.js](index.js).
 
 Hoodie is built on [Hapi](https://hapijs.com).
 
@@ -21,7 +21,7 @@ Hoodie uses [CouchDB](https://couchdb.apache.org/) for data persistence and
 authentication. If `options.dbUrl` is not set, it falls back to [PouchDB](https://pouchdb.com/).
 
 Once all configuration is taken care of, the internal plugins are initialised
-(see [lib/plugins/index.js](plugins/index.js)). We define simple Hapi plugins
+(see [server/plugins/index.js](plugins/index.js)). We define simple Hapi plugins
 for [logging](plugins/log.js) and for [serving the app’s public assets and the Hoodie client](plugins/public.js).
 We also load the core modules and register them with the Hapi server.
 

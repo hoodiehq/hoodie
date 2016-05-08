@@ -7,7 +7,7 @@ test('bundle client', function (t) {
     pipe: simple.stub(),
     on: simple.stub()
   }
-  var bundleClient = proxyquire('../../lib/bundle-client', {
+  var bundleClient = proxyquire('../../server/bundle-client', {
     npmlog: {
       silly: simple.stub(),
       info: simple.stub()

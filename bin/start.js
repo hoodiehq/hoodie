@@ -12,7 +12,7 @@ var rc = require('rc')
 var relative = require('require-relative')
 var semver = require('semver')
 
-var getHoodieServer = require('../lib')
+var getHoodieServer = require('../server')
 
 var useEmoji = process.platform === 'darwin'
 

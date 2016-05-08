@@ -1,6 +1,6 @@
 var test = require('tap').test
 
-var getAdmins = require('../../../lib/config/db/couchdb-get-admins.js')
+var getAdmins = require('../../../server/config/db/couchdb-get-admins.js')
 
 test('get couch admins', function (group) {
   group.test('request fails', function (t) {

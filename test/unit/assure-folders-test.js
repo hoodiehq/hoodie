@@ -5,7 +5,7 @@ var test = require('tap').test
 test('assure config folders', function (group) {
   group.test('without config.db.prefix', function (t) {
     var mkdirpMock = simple.stub().callbackWith(null)
-    var assureFolders = proxyquire('../../lib/config/assure-folders', {
+    var assureFolders = proxyquire('../../server/config/assure-folders', {
       mkdirp: mkdirpMock
     })
 
@@ -28,7 +28,7 @@ test('assure config folders', function (group) {
 
   group.test('with config.db.prefix', function (t) {
     var mkdirpMock = simple.stub().callbackWith(null)
-    var assureFolders = proxyquire('../../lib/config/assure-folders', {
+    var assureFolders = proxyquire('../../server/config/assure-folders', {
       mkdirp: mkdirpMock
     })
 

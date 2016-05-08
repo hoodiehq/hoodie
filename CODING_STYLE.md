@@ -98,8 +98,8 @@ In the root, have
 In most cases you will have `index.js` file which is listed in `package.json`
 as the `"main"` property.
 
-If you want to split up logic into separate files, move them into a `lib/` folder.
-Put reusable, state-less helper methods into `lib/utils/`
+If you want to split up logic into separate files, move them into a `server/` folder.
+Put reusable, state-less helper methods into `server/utils/`
 
 For tests, create a `test/` folder. If your module becomes a bit more complex,
 split up the tests in `test/unit` and `test/integration/`. All files that contain

@@ -14,7 +14,7 @@ Hoodie lets you build apps [without _thinking_ about the backend](http://nobacke
 and makes sure that they work great [independent from connectivity](http://offlinefirst.org/).
 
 This is Hoodie’s main repository. It starts a server and serves the client API.
-Read more about [how things work](lib).
+Read more about [how the Hoodie server works](server).
 
 A good place to start is our [Tracker App](https://github.com/hoodiehq/hoodie-app-tracker).
 You can play around with Hoodie’s APIs in the browser console and see how it

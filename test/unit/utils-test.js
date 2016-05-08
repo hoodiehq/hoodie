@@ -1,7 +1,7 @@
 var test = require('tap').test
 require('npmlog').level = 'silent'
 
-var removeAuth = require('../../lib/utils/remove-auth-from-url')
+var removeAuth = require('../../server/utils/remove-auth-from-url')
 
 test('utils', function (group) {
   group.test('removeAuth', function (group) {

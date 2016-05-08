@@ -5,7 +5,7 @@ var test = require('tap').test
 var BoomStub = {
   '@noCallThru': true
 }
-var preAuthHook = proxyquire('../../../lib/config/store/pre-auth-hook', {
+var preAuthHook = proxyquire('../../../server/config/store/pre-auth-hook', {
   'boom': BoomStub
 })
 

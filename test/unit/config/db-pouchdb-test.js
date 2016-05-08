@@ -3,7 +3,7 @@ var proxyquire = require('proxyquire')
 
 test('generate couch config', function (group) {
   group.test('read from file', function (t) {
-    var pouchDbConfig = proxyquire('../../../lib/config/db/pouchdb.js', {
+    var pouchDbConfig = proxyquire('../../../server/config/db/pouchdb.js', {
       fs: {
         existsSync: function () {
           return true
@@ -36,7 +36,7 @@ test('generate couch config', function (group) {
   })
 
   group.test('generate and write to file', function (t) {
-    var pouchDbConfig = proxyquire('../../../lib/config/db/pouchdb.js', {
+    var pouchDbConfig = proxyquire('../../../server/config/db/pouchdb.js', {
       fs: {
         existsSync: function () {
           return false

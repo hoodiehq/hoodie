@@ -4,7 +4,7 @@ var test = require('tap').test
 var preAuthHookStub = {
   '@noCallThru': true
 }
-var storeConfig = proxyquire('../../../lib/config/store', {
+var storeConfig = proxyquire('../../../server/config/store', {
   './pre-auth-hook': preAuthHookStub
 })
 

@@ -20,7 +20,7 @@ test('config', function (group) {
     var pouchDbConfigMock = simple.stub().callbackWith(null)
     var storeConfigMock = simple.stub().callbackWith(null)
 
-    var getConfig = proxyquire('../../lib/config', {
+    var getConfig = proxyquire('../../server/config', {
       './account': accountConfigMock,
       './assure-folders': assureFolders,
       './db/couchdb': couchDbConfigMock,
@@ -74,7 +74,7 @@ test('config', function (group) {
     var pouchDbConfigMock = simple.stub().callbackWith(null)
     var storeConfigMock = simple.stub().callbackWith(null)
 
-    var getConfig = proxyquire('../../lib/config', {
+    var getConfig = proxyquire('../../server/config', {
       './account': accountConfigMock,
       './assure-folders': assureFolders,
       './db/couchdb': couchDbConfigMock,
@@ -121,7 +121,7 @@ test('config', function (group) {
     var pouchDbConfigMock = simple.stub().callbackWith(null)
     var storeConfigMock = simple.stub().callbackWith(null)
 
-    var getConfig = proxyquire('../../lib/config', {
+    var getConfig = proxyquire('../../server/config', {
       './account': accountConfigMock,
       './assure-folders': assureFolders,
       './db/couchdb': couchDbConfigMock,

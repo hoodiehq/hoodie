@@ -1,7 +1,7 @@
 var log = require('npmlog')
 var test = require('tap').test
 
-var checkVendor = require('../../../lib/config/db/couchdb-check-vendor.js')
+var checkVendor = require('../../../server/config/db/couchdb-check-vendor.js')
 
 test('check couch vendor', function (group) {
   group.test('request fails', function (t) {

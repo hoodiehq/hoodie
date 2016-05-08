@@ -2,7 +2,7 @@ var simple = require('simple-mock')
 var test = require('tap').test
 var proxyquire = require('proxyquire').noCallThru()
 
-var registerPlugins = proxyquire('../../lib/plugins', {
+var registerPlugins = proxyquire('../../server/plugins', {
   '@hoodie/store': function () {},
   '@hoodie/account': function () {}
 })

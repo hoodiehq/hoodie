@@ -5,7 +5,7 @@ var test = require('tap').test
 var pouchdbUsersStub = {
   '@noCallThru': true
 }
-var accountConfig = proxyquire('../../../lib/config/account', {
+var accountConfig = proxyquire('../../../server/config/account', {
   'pouchdb-users': pouchdbUsersStub
 })
 

@@ -1,6 +1,6 @@
 var test = require('tap').test
 
-var setConfig = require('../../../lib/config/db/couchdb-set-config.js')
+var setConfig = require('../../../server/config/db/couchdb-set-config.js')
 
 test('set couch config', function (group) {
   group.test('request fails', function (t) {

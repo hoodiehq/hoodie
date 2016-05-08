@@ -25,7 +25,7 @@ var memdownMock = {
   '@noCallThru': true
 }
 
-var parseOptions = proxyquire('../../../lib/config/parse-options', {
+var parseOptions = proxyquire('../../../server/config/parse-options', {
   'memdown': memdownMock,
   'npmlog': logMock,
   './defaults': getDefaultsMock

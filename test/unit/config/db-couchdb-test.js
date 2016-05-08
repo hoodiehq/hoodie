@@ -20,7 +20,7 @@ nock('http://127.0.0.1:5984')
   })
 
 test('init couchdb', function (group) {
-  var couchdb = require('../../../lib/config/db/couchdb')
+  var couchdb = require('../../../server/config/db/couchdb')
 
   couchdb({
     config: {

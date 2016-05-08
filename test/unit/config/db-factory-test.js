@@ -13,7 +13,7 @@ test('database api factory', function (group) {
       return PouchDB
     }
 
-    var database = proxyquire('../../../lib/config/db/factory', {
+    var database = proxyquire('../../../server/config/db/factory', {
       pouchdb: PouchDB
     })({db: {foo: 'foo'}})
 
@@ -36,7 +36,7 @@ test('database api factory', function (group) {
       return PouchDB
     }
 
-    var database = proxyquire('../../../lib/config/db/factory', {
+    var database = proxyquire('../../../server/config/db/factory', {
       pouchdb: PouchDB
     })({db: {url: 'http://example.com'}})
 
