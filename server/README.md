@@ -31,7 +31,7 @@ and the URL where hoodie is running is logged to the terminal.
 
 ## Architecture
 
-Hoodie is server built on top of [hapi](http://hapijs.com) with frontend APIs
+Hoodie is a server built on top of [hapi](http://hapijs.com) with frontend APIs
 for account and store related tasks.
 
 1. ## account [:octocat:](https://github.com/hoodiehq/hoodie-account#readme) [![Build Status](https://travis-ci.org/hoodiehq/hoodie-account.svg?branch=master)](https://travis-ci.org/hoodiehq/hoodie-account) [![Dependency Status](https://david-dm.org/hoodiehq/hoodie-account.svg)](https://david-dm.org/hoodiehq/hoodie-account)
