@@ -4,12 +4,13 @@ var path = require('path')
 
 var defaultsDeep = require('lodash').defaultsDeep
 var log = require('npmlog')
+var extend = require('extend')
 
 var getDefaults = require('./defaults')
 var removeAuth = require('../utils/remove-auth-from-url')
 
 function parseOptions (options, callback) {
-  var config = {
+  var config = extend(true, options, {
     loglevel: options.loglevel,
     paths: {
       data: options.data,
@@ -20,7 +21,7 @@ function parseOptions (options, callback) {
       port: options.port
     },
     db: {}
-  }
+  })
 
   defaultsDeep(config, getDefaults())
 
