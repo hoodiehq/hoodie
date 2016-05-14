@@ -31,7 +31,33 @@ function registerPlugins (server, config, callback) {
       }
     }
   })
-  var plugins = hapiPlugins.concat(localPlugins, hoodieCorePlugins)
+  var thirdPartyPlugins = config.plugins.map(function (plugin) {
+    if(typeof plugin == 'string') plugin = {name: plugin}
+    
+    var module = 'hoodie-plugin-' + plugin.name
+    if('module' in plugin) module = plugin.module
+    
+    try {
+      require.resolve(module);
+    } catch(e) {
+        return false
+    }
+    
+    var hapiPlugin = {
+      register: require(module),
+      options: plugin,
+      routes: {
+        prefix: '/hoodie/' + plugin.name + '/api'
+      }
+    }
+    
+    // possibly put checks for non-standard overrides here, such as plugin path, custom routes, etc
+    
+    return hapiPlugin
+  }).filter(function (plugin) {
+    return plugin
+  })
+  var plugins = hapiPlugins.concat(localPlugins, hoodieCorePlugins, thirdPartyPlugins)
 
   log.silly('hapi', 'Registering internal plugins')
   server.register(plugins, function (error) {
