@@ -32,17 +32,17 @@ function registerPlugins (server, config, callback) {
     }
   })
   var thirdPartyPlugins = config.plugins.map(function (plugin) {
-    if(typeof plugin == 'string') plugin = {name: plugin}
-    
+    if (typeof plugin === 'string') plugin = {name: plugin}
+
     var module = 'hoodie-plugin-' + plugin.name
-    if('module' in plugin) module = plugin.module
-    
+    if ('module' in plugin) module = plugin.module
+
     try {
-      require.resolve(module);
-    } catch(e) {
-        return false
+      require.resolve(module)
+    } catch (e) {
+      return false
     }
-    
+
     var hapiPlugin = {
       register: require(module),
       options: plugin,
@@ -50,9 +50,9 @@ function registerPlugins (server, config, callback) {
         prefix: '/hoodie/' + plugin.name + '/api'
       }
     }
-    
+
     // possibly put checks for non-standard overrides here, such as plugin path, custom routes, etc
-    
+
     return hapiPlugin
   }).filter(function (plugin) {
     return plugin
