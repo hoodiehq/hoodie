@@ -20,7 +20,8 @@ function parseOptions (options, callback) {
       host: options.bindAddress,
       port: options.port
     },
-    db: {}
+    db: {},
+    plugins: []
   })
 
   defaultsDeep(config, getDefaults())
