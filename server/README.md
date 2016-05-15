@@ -8,7 +8,7 @@ the [rc](https://www.npmjs.com/package/rc) package, then passes it as options to
 `getHoodieServer`, the main function returned by this package, defined in
 [server/index.js](index.js).
 
-Hoodie is built on [Hapi](https://hapijs.com).
+Hoodie is built on [Hapi](http://hapijs.com).
 
 In `getHoodieServer` the passed options are amended with defaults and parsed
 into configuration for the Hapi server and the core modules (see [architecture](#architecture)).
