@@ -7,7 +7,7 @@
 [![Dependency Status](https://david-dm.org/hoodiehq/hoodie.svg)](https://david-dm.org/hoodiehq/hoodie)
 [![devDependency Status](https://david-dm.org/hoodiehq/hoodie/dev-status.svg)](https://david-dm.org/hoodiehq/hoodie#info=devDependencies)
 
-<a href="http://hood.ie/animals/#low-profile-dog"><img src="https://cloud.githubusercontent.com/assets/39992/15275708/08695d6a-1aa1-11e6-9b62-9597fd6acbc3.png"
+<a href="http://hood.ie/animals/#low-profile-dog"><img src="https://avatars1.githubusercontent.com/u/1888826?v=3&s=200"
  alt="The Low-Profile Dog Hoodie Mascot" title="The Low-Profile Dog Hoodie Mascot" align="right" /></a>
 
 Hoodie lets you build apps [without _thinking_ about the backend](http://nobackend.org/)
@@ -22,7 +22,7 @@ works all together in its [simple HTML & JavaScript code](https://github.com/hoo
 
 If you have any questions come say hi in our [chat](http://hood.ie/chat/).
 
-<a href="http://conferences.oreilly.com/oscon/open-source-us/public/schedule/detail/51586" title="OSCON Contribute"><img alt="Open Source Convention Logo" src="oscon.png" align="left"></a> Coming to [OSCON in Austin](http://conferences.oreilly.com/oscon/open-source-us)? Join our [OSCON Contribute](http://conferences.oreilly.com/oscon/open-source-us) hackathon – we would love to have you. [Please sign up for free](https://ti.to/hoodie/oscon-meet-the-hoodies/) so we can better plan :) 
+<a href="http://conferences.oreilly.com/oscon/open-source-us/public/schedule/detail/51586" title="OSCON Contribute"><img alt="Open Source Convention Logo" src="https://cloud.githubusercontent.com/assets/39992/15275708/08695d6a-1aa1-11e6-9b62-9597fd6acbc3.png" align="left"></a> Coming to [OSCON in Austin](http://conferences.oreilly.com/oscon/open-source-us)? Join our [OSCON Contribute](http://conferences.oreilly.com/oscon/open-source-us) hackathon – we would love to have you. [Please sign up for free](https://ti.to/hoodie/oscon-meet-the-hoodies/) so we can better plan :) 
 
 ## Setup
 
