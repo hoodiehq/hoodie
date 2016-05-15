@@ -138,6 +138,10 @@ getHoodieServer(options, function (error, server, config) {
   log.verbose('app', 'Starting')
 
   server.start(function () {
-    console.log((useEmoji ? emoji.get('dog') + '  ' : '') + 'Your Hoodie app has started on ' + url.format(config.connection))
+    console.log((useEmoji ? emoji.get('dog') + '  ' : '') + 'Your Hoodie app has started on ' + url.format({
+      protocol: 'http',
+      hostname: config.connection.host,
+      port: config.connection.port
+    }))
   })
 })
