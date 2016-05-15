@@ -22,6 +22,8 @@ works all together in its [simple HTML & JavaScript code](https://github.com/hoo
 
 If you have any questions come say hi in our [chat](http://hood.ie/chat/).
 
+<a href="http://conferences.oreilly.com/oscon/open-source-us/public/schedule/detail/51586" title="OSCON Contribute"><img alt="Open Source Convention Logo" src="oscon.png" align="left"></a> Coming to [OSCON in Austin](http://conferences.oreilly.com/oscon/open-source-us)? Join our [OSCON Contribute](http://conferences.oreilly.com/oscon/open-source-us) hackathon – we would love to have you. [Please sign up for free](https://ti.to/hoodie/oscon-meet-the-hoodies/) so we can better plan :) 
+
 ## Setup
 
 `npm install --save hoodie`
