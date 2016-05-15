@@ -22,7 +22,9 @@ works all together in its [simple HTML & JavaScript code](https://github.com/hoo
 
 If you have any questions come say hi in our [chat](http://hood.ie/chat/).
 
-<a href="http://conferences.oreilly.com/oscon/open-source-us/public/schedule/detail/51586" title="OSCON Contribute"><img alt="Open Source Convention Logo" src="https://cloud.githubusercontent.com/assets/39992/15275708/08695d6a-1aa1-11e6-9b62-9597fd6acbc3.png" align="left"></a> Coming to [OSCON in Austin](http://conferences.oreilly.com/oscon/open-source-us)? Join our [OSCON Contribute](http://conferences.oreilly.com/oscon/open-source-us) hackathon – we would love to have you. [Please sign up for free](https://ti.to/hoodie/oscon-meet-the-hoodies/) so we can better plan :) 
+<a href="http://conferences.oreilly.com/oscon/open-source-us/public/schedule/detail/51586" title="OSCON Contribute"><img alt="Open Source Convention Logo" src="https://cloud.githubusercontent.com/assets/39992/15275708/08695d6a-1aa1-11e6-9b62-9597fd6acbc3.png" align="left" widht="210"></a> Coming to [OSCON in Austin](http://conferences.oreilly.com/oscon/open-source-us)? Join our [OSCON Contribute](http://conferences.oreilly.com/oscon/open-source-us) hackathon – we would love to have you.
+
+[Please sign up for free](https://ti.to/hoodie/oscon-meet-the-hoodies/) so we can better plan :) 
 
 ## Setup
 
