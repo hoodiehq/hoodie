@@ -16,6 +16,10 @@ function register (server, options, next) {
     hoodieVersion = 'development'
   }
 
+  var hoodiePublicPath = path.join(require.resolve('../../package.json'), '..', 'public')
+  var accountPublicPath = path.join(require.resolve('@hoodie/account/package.json'), '..', 'public')
+  var storePublicPath = path.join(require.resolve('@hoodie/store/package.json'), '..', 'public')
+
   server.route([{
     method: 'GET',
     path: '/{p*}',
@@ -28,7 +32,37 @@ function register (server, options, next) {
     }
   }, {
     method: 'GET',
-    path: '/hoodie',
+    path: '/hoodie/{p*}',
+    handler: {
+      directory: {
+        path: hoodiePublicPath,
+        listing: false,
+        index: true
+      }
+    }
+  }, {
+    method: 'GET',
+    path: '/hoodie/account/{p*}',
+    handler: {
+      directory: {
+        path: accountPublicPath,
+        listing: false,
+        index: true
+      }
+    }
+  }, {
+    method: 'GET',
+    path: '/hoodie/store/{p*}',
+    handler: {
+      directory: {
+        path: storePublicPath,
+        listing: false,
+        index: true
+      }
+    }
+  }, {
+    method: 'GET',
+    path: '/hoodie/info.json',
     handler: function (request, reply) {
       reply({
         hoodie: true,
@@ -62,9 +96,10 @@ function register (server, options, next) {
 
     var is404 = response.output.statusCode === 404
     var isHTML = /text\/html/.test(request.headers.accept)
+    var isHoodiePath = /^\/hoodie\//.test(request.path)
 
     // We only care about 404 for html requests...
-    if (!is404 || !isHTML) {
+    if (!is404 || !isHTML || isHoodiePath) {
       return reply.continue()
     }
 
