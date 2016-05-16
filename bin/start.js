@@ -11,6 +11,7 @@ var nopt = require('nopt')
 var rc = require('rc')
 var relative = require('require-relative')
 var semver = require('semver')
+var dot = require('dot-object')
 
 var getHoodieServer = require('../server')
 
@@ -60,7 +61,8 @@ var knownOpts = {
   public: path,
   'in-memory': Boolean,
   data: path,
-  'db-url': String
+  'db-url': String,
+  plugins: Array
 }
 
 var shortHands = {
@@ -98,6 +100,10 @@ if (argv.version) {
     process.exit(1)
   }
 }
+
+// convert argv dot-strings to objects
+// similar to minimist (rc uses this for argv)
+argv = dot.object(argv)
 
 var options = rc('hoodie', {}, _.mapKeys(_.omit(argv, ['argv']), function (value, key) {
   return _.camelCase(key)
