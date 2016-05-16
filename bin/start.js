@@ -62,7 +62,7 @@ var knownOpts = {
   'in-memory': Boolean,
   data: path,
   'db-url': String,
-  plugins: Array
+  plugins: Boolean
 }
 
 var shortHands = {
