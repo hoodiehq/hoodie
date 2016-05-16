@@ -32,6 +32,7 @@ function registerPlugins (server, config, callback) {
       }
     }
   })
+  if (!('plugins' in config)) config.plugins = []
   var thirdPartyPlugins = config.plugins.map(function (plugin) {
     if (typeof plugin === 'string') plugin = {name: plugin}
 
