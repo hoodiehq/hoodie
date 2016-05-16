@@ -7,16 +7,11 @@ module.exports.register.attributes = {
 var fs = require('fs')
 var path = require('path')
 
-var relative = require('require-relative')
-
 function register (server, options, next) {
   var app = path.join(options.config.paths.public, 'index.html')
   var hoodieVersion
   try {
-    hoodieVersion = relative(
-      'hoodie/package.json',
-      process.cwd()
-    ).version
+    hoodieVersion = require('hoodie/package.json').version
   } catch (err) {
     hoodieVersion = 'development'
   }
