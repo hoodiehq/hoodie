@@ -10,7 +10,17 @@ var getDefaults = require('./defaults')
 var removeAuth = require('../utils/remove-auth-from-url')
 
 function parseOptions (options, callback) {
-  var config = extend(true, options, {
+  // collect options from all sources and merge
+  var projectPath = process.cwd()
+  var pkg = require(path.join(projectPath, 'package.json'))
+  if (!('hoodie' in pkg)) pkg.hoodie = {}
+
+  // merged options
+  // assume packageOptions are the base, anything from rc extends on this
+  extend(true, options, pkg.hoodie)
+
+  // construct final config
+  var config = {
     loglevel: options.loglevel,
     paths: {
       data: options.data,
@@ -20,11 +30,13 @@ function parseOptions (options, callback) {
       host: options.bindAddress,
       port: options.port
     },
-    db: {},
-    plugins: []
-  })
+    db: {}
+  }
 
+  // defaults are applied after user configurations are merged
   defaultsDeep(config, getDefaults())
+  // we also want to merge config back with options so the user has access to all options
+  extend(true, config, options)
 
   log.level = config.loglevel
 

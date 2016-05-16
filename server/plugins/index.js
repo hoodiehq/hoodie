@@ -1,6 +1,7 @@
 module.exports = registerPlugins
 
 var log = require('npmlog')
+var defaultsDeep = require('lodash').defaultsDeep
 
 function registerPlugins (server, config, callback) {
   var options = {
@@ -31,28 +32,41 @@ function registerPlugins (server, config, callback) {
       }
     }
   })
-  if (!('plugins' in config)) config.plugins = []
   var thirdPartyPlugins = config.plugins.map(function (plugin) {
     if (typeof plugin === 'string') plugin = {name: plugin}
 
-    var module = 'hoodie-plugin-' + plugin.name
-    if ('module' in plugin) module = plugin.module
+    // ensure name doesn't contain 'hoodie-plugin-'
+    plugin.name.replace('hoodie-plugin-', '')
 
+    // ensure we have some defaults
+    defaultsDeep(plugin, {
+      package: 'hoodie-plugin-' + plugin.name,
+      options: {},
+      routes: {}
+    })
+
+    // can we find the package?
     try {
-      require.resolve(module)
+      require.resolve(plugin.package)
     } catch (e) {
       return false
     }
 
+    // hapi requires the exported function AND attributes
+    var register = require(plugin.package)
+    register.attributes = {
+      pkg: require(plugin.package + '/package.json')
+    }
+
     var hapiPlugin = {
-      register: require(module),
-      options: plugin,
-      routes: {
-        prefix: '/hoodie/' + plugin.name + '/api'
-      }
+      register: register,
+      options: plugin.options,
+      routes: plugin.routes
     }
 
     // possibly put checks for non-standard overrides here, such as plugin path, custom routes, etc
+
+    log.silly('hapi', 'Registering "' + plugin.name + '" plugin')
 
     return hapiPlugin
   }).filter(function (plugin) {

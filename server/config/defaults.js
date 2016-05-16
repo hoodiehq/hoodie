@@ -27,6 +27,7 @@ function getDefaults () {
     // core modules
     account: {},
     admin: {},
-    store: {}
+    store: {},
+    plugins: []
   }
 }
