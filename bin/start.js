@@ -71,7 +71,7 @@ var options = yargs
   },
   public: {
     type: 'string',
-    default: path.join(process.cwd(), 'public'),
+    default: './public',
     normalize: true
   },
   m: {
@@ -81,7 +81,7 @@ var options = yargs
   },
   data: {
     type: 'string',
-    default: path.join(process.cwd(), '.hoodie'),
+    default: './.hoodie',
     normalize: true
   },
   'db-url': {
