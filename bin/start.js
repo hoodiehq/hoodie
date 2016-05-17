@@ -92,9 +92,9 @@ var args = yargs
     describe: 'If provided, uses external CouchDB. URL has to contain credentials.'
   },
   plugins: {
-    type: 'array',
+    type: 'boolean',
     default: {},
-    describe: 'Define options, keyed by their name',
+    describe: 'Define options, keyed by their name'
   }
 })
 .help('h', 'Show this help message')
