@@ -116,8 +116,10 @@ var options = yargs
 .env('hoodie')
 .epilogue('Options can also be specified as environment variables (prefixed with "hoodie_") or inside a ".hoodierc" file (json or ini).')
 .wrap(Math.min(150, yargs.terminalWidth()))
-.config(_.omit(rc('hoodie', {}, null), ['config', 'configs']))
 .argv
+
+// merge with rc config
+_.defaultsDeep(options, _.omit(rc('hoodie', {}, null), ['config', 'configs']))
 
 log.level = options.loglevel || 'warn'
 
