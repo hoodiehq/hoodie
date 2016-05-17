@@ -1,6 +1,5 @@
 module.exports = parseOptions
 
-var fs = require('fs')
 var path = require('path')
 
 var defaultsDeep = require('lodash').defaultsDeep
@@ -10,13 +9,11 @@ var getDefaults = require('./defaults')
 var removeAuth = require('../utils/remove-auth-from-url')
 
 function parseOptions (options, callback) {
-  var projectPath = process.cwd()
-
   var config = {
     loglevel: options.loglevel,
     paths: {
-      data: fs.existsSync(path.join(projectPath, options.data)) ? path.normalize(path.join(projectPath, options.data)) : undefined,
-      public: fs.existsSync(path.join(projectPath, options.public)) ? path.normalize(path.join(projectPath, options.public)) : undefined
+      data: options.data,
+      public: options.public
     },
     connection: {
       host: options.bindAddress,
