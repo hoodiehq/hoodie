@@ -105,11 +105,6 @@ var args = yargs
   try {
     var pkg = require('../package.json')
     console.log(pkg.version, '\n')
-    _.forEach(pkg.dependencies, function (value, key) {
-      if (!/^hoodie/.test(key)) return
-
-      console.log(key + ': ' + value)
-    })
     process.exit(0)
   } catch (e) {
     process.exit(1)
