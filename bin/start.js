@@ -86,7 +86,7 @@ var options = yargs
   },
   'db-url': {
     type: 'string',
-    default: null
+    default: undefined
   },
   plugins: {
     describe: 'Define plugins to be loaded and their options',
