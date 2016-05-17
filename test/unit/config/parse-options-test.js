@@ -13,7 +13,8 @@ var getDefaultsMock = function () {
     connection: {
       host: 'host name',
       port: 'app port'
-    }
+    },
+    db: {}
   }
 }
 getDefaultsMock['@noCallThru'] = true

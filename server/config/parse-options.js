@@ -2,22 +2,46 @@ module.exports = parseOptions
 
 var path = require('path')
 
-var defaultsDeep = require('lodash').defaultsDeep
+var _ = require('lodash')
 var log = require('npmlog')
-var extend = require('extend')
 
 var getDefaults = require('./defaults')
 var removeAuth = require('../utils/remove-auth-from-url')
 
 function parseOptions (options, callback) {
-  // collect options from all sources and merge
-  var projectPath = process.cwd()
-  var pkg = require(path.join(projectPath, 'package.json'))
-  if (!('hoodie' in pkg)) pkg.hoodie = {}
+  // ensure we have all required options
+  _.defaultsDeep(options, {
+    plugins: {}
+  })
 
-  // merged options
-  // assume packageOptions are the base, anything from rc extends on this
-  extend(true, options, pkg.hoodie)
+  // collect options from package.json
+  var pkg = {
+    hoodie: {
+      plugins: {}
+    }
+  }
+  try {
+    var appPkg = require(path.join(process.cwd(), 'package.json'))
+    _.defaultsDeep(pkg, appPkg)
+  } catch (e) {}
+
+  // we only want to "enable" plugins specified in package.json
+  // plugin options can be added or overridden in .hoodierc
+  var plugins = Object.keys(pkg.hoodie.plugins).map(function (key) {
+    var plugin = pkg.hoodie.plugins[key]
+    if (typeof plugin === 'string') plugin = {name: plugin}
+    // ensure name doesn't contain 'hoodie-plugin-'
+    plugin.name.replace('hoodie-plugin-', '')
+
+    _.defaultsDeep(plugin, {
+      name: plugin.name,
+      package: 'hoodie-plugin-' + plugin.name,
+      routes: {},
+      options: {}
+    })
+    if (plugin.name in options.plugins) _.assignIn(plugin.options, options.plugins[plugin.name])
+    return plugin
+  })
 
   // construct final config
   var config = {
@@ -30,13 +54,11 @@ function parseOptions (options, callback) {
       host: options.bindAddress,
       port: options.port
     },
-    db: {}
+    plugins: plugins
   }
 
-  // defaults are applied after user configurations are merged
-  defaultsDeep(config, getDefaults())
-  // we also want to merge config back with options so the user has access to all options
-  extend(true, config, options)
+  // apply config defaults
+  _.defaultsDeep(config, getDefaults())
 
   log.level = config.loglevel
 
