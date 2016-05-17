@@ -70,7 +70,7 @@ var args = yargs
   },
   public: {
     type: 'string',
-    default: './public',
+    default: undefined,
     normalize: true
   },
   m: {
@@ -80,7 +80,7 @@ var args = yargs
   },
   data: {
     type: 'string',
-    default: './.hoodie',
+    default: undefined,
     normalize: true
   },
   'db-url': {
