@@ -40,7 +40,7 @@ if (semver.lt(process.versions.node, '4.0.0')) {
   process.exit(1)
 }
 
-var options = yargs
+var args = yargs
 .options({
   loglevel: {
     choices: [
@@ -117,8 +117,9 @@ var options = yargs
 .wrap(Math.min(150, yargs.terminalWidth()))
 .argv
 
-// merge with rc config
-_.defaultsDeep(options, _.omit(rc('hoodie', {}, null), ['config', 'configs']))
+// merge args with rc config
+// rc generates 'config' and 'configs', which we don't need
+var options = _.omit(rc('hoodie', args, null), ['config', 'configs'])
 
 log.level = options.loglevel || 'warn'
 
