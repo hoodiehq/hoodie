@@ -1,17 +1,14 @@
 #!/usr/bin/env node
 
-var fs = require('fs')
 var path = require('path')
 var url = require('url')
 
 var _ = require('lodash')
 var emoji = require('node-emoji')
 var log = require('npmlog')
-var nopt = require('nopt')
+var yargs = require('yargs')
 var rc = require('rc')
-var relative = require('require-relative')
 var semver = require('semver')
-var dot = require('dot-object')
 
 var getHoodieServer = require('../server')
 
@@ -44,51 +41,66 @@ if (semver.lt(process.versions.node, '4.0.0')) {
   process.exit(1)
 }
 
-var knownOpts = {
-  help: Boolean,
-  version: Boolean,
-  loglevel: [
-    'silly',
-    'verbose',
-    'info',
-    'http',
-    'warn',
-    'error',
-    'silent'
-  ],
-  port: Number,
-  'bind-address': String,
-  public: path,
-  'in-memory': Boolean,
-  data: path,
-  'db-url': String,
-  plugins: Boolean
-}
-
-var shortHands = {
-  h: '--help',
-  usage: '--help',
-  v: '--version',
-  m: '--in-memory',
-  s: ['--loglevel', 'silent'],
-  d: ['--loglevel', 'info'],
-  dd: ['--loglevel', 'verbose'],
-  ddd: ['--loglevel', 'silly'],
-  silent: ['--loglevel', 'silent'],
-  verbose: ['--loglevel', 'verbose'],
-  quiet: ['--loglevel', 'warn']
-}
-
-var argv = nopt(knownOpts, shortHands)
-
-if (argv.help) {
-  process.stdout.write(fs.readFileSync(path.join(__dirname, 'readme.txt'), 'utf8'))
-  process.exit(0)
-}
-
-if (argv.version) {
+var options = yargs
+.options({
+  loglevel: {
+    choices: [
+      'silly',
+      'verbose',
+      'info',
+      'http',
+      'warn',
+      'error',
+      'silent'
+    ],
+    default: function () {
+      if ('s' in yargs.argv || 'ddd' in yargs.argv) return 'silly'
+      if ('d' in yargs.argv) return 'info'
+      if ('dd' in yargs.argv || 'verbose' in yargs.argv) return 'verbose'
+      if ('silent' in yargs.argv) return 'silent'
+      return 'warn'
+    }
+  },
+  port: {
+    type: 'number',
+    default: 6004
+  },
+  'bind-address': {
+    type: 'string',
+    default: '0.0.0.0'
+  },
+  public: {
+    type: 'string',
+    default: path.join(process.cwd(), 'public'),
+    normalize: true
+  },
+  m: {
+    alias: 'in-memory',
+    type: 'boolean',
+    default: true
+  },
+  data: {
+    type: 'string',
+    default: path.join(process.cwd(), '.hoodie'),
+    normalize: true
+  },
+  'db-url': {
+    type: 'string',
+    default: null
+  },
+  plugins: {
+    describe: 'Define plugins to be loaded and their options',
+    type: 'array',
+    default: []
+  }
+})
+.help('h', 'Show this help message')
+.alias('h', 'help')
+.alias('h', 'usage')
+.showHelpOnFail(false, 'Specify --help for available options')
+.version(function () {
   try {
-    var pkg = relative('hoodie/package.json')
+    var pkg = require('../package.json')
     console.log(pkg.version, '\n')
     _.forEach(pkg.dependencies, function (value, key) {
       if (!/^hoodie/.test(key)) return
@@ -99,15 +111,13 @@ if (argv.version) {
   } catch (e) {
     process.exit(1)
   }
-}
-
-// convert argv dot-strings to objects
-// similar to minimist (rc uses this for argv)
-argv = dot.object(argv)
-
-var options = rc('hoodie', {}, _.mapKeys(_.omit(argv, ['argv']), function (value, key) {
-  return _.camelCase(key)
-}))
+})
+.alias('v', 'version')
+.env('hoodie')
+.epilogue('Options can also be specified as environment variables (prefixed with "hoodie_") or inside a ".hoodierc" file (json or ini).')
+.wrap(Math.min(150, yargs.terminalWidth()))
+.config(_.omit(rc('hoodie', {}, null), ['config', 'configs']))
+.argv
 
 log.level = options.loglevel || 'warn'
 
