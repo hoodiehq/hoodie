@@ -62,35 +62,39 @@ var args = yargs
   },
   port: {
     type: 'number',
-    default: 6004
+    default: 6004,
+    describe: 'Port-number to run the Hoodie App on'
   },
   'bind-address': {
     type: 'string',
-    default: '0.0.0.0'
+    default: '127.0.0.1',
+    describe: 'Address that Hoodie binds to'
   },
   public: {
     type: 'string',
-    default: undefined,
-    normalize: true
+    default: './public',
+    describe: 'Path to static assets'
   },
   m: {
     alias: 'in-memory',
     type: 'boolean',
-    default: true
+    default: true,
+    describe: 'Whether to start the PouchDB Server in memory'
   },
   data: {
     type: 'string',
-    default: undefined,
-    normalize: true
+    default: './.hoodie',
+    describe: 'Data path'
   },
   'db-url': {
     type: 'string',
-    default: undefined
+    default: undefined,
+    describe: 'If provided, uses external CouchDB. URL has to contain credentials.'
   },
   plugins: {
-    describe: 'Define plugins to be loaded and their options',
     type: 'array',
-    default: []
+    default: {},
+    describe: 'Define options, keyed by their name',
   }
 })
 .help('h', 'Show this help message')
