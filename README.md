@@ -28,27 +28,55 @@ If you have any questions come say hi in our [chat](http://hood.ie/chat/).
 
 ### [OSCON Contribute](http://conferences.oreilly.com/oscon/open-source-us)
 
-Coming to [OSCON in Austin](http://conferences.oreilly.com/oscon/open-source-us)? Join our hackathon – we would love to have you. Please **[sign up for free](https://ti.to/hoodie/oscon-meet-the-hoodies/)** so we can better plan :) 
+Coming to [OSCON in Austin](http://conferences.oreilly.com/oscon/open-source-us)? Join our hackathon – we would love to have you. Please **[sign up for free](https://ti.to/hoodie/oscon-meet-the-hoodies/)** so we can better plan :)
 
 ---
 
 ## Setup
 
-`npm install --save hoodie`
+Hoodie is a [Node.js](https://nodejs.org/en/) package. You need Node Version 4
+or higher, check your installed version with `node -v`.
+
+First, create a folder and a [package.json](https://docs.npmjs.com/files/package.json) file
+
+```
+cd my-app
+npm init -y
+```
+
+Next install hoodie and save it as dependency
+
+```
+npm install --save hoodie
+```
 
 <!--
   TODO: automate package.json update using postinstall
         https://github.com/hoodiehq/hoodie/issues/477
 -->
-Add this to your `package.json`:
+Add a `"start"` script and set it to `"hoodie"` in your `package.json`. The
+result should look something like this
 
 ```json
-"scripts": {
-  "start": "hoodie"
+{
+  "name": "my-app",
+  "version": "1.0.0",
+  "scripts": {
+    "start": "hoodie",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "dependencies": {
+    "hoodie": "^22.0.2"
+  }
 }
 ```
 
-Now run `npm start` to start your Hoodie app.
+There might be more properties and `22.0.2` will likely be a higher number, but
+that’s okay.
+
+Now run `npm start` to start your Hoodie app.s
+
+You can find a more thorough description in our [Getting Started Guide](http://docs.hood.ie/camp/start/index.html).
 
 ## Usage
 
