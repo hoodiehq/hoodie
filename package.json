@@ -10,16 +10,6 @@
   "bugs": {
     "url": "https://github.com/hoodiehq/hoodie/issues"
   },
-  "hoodie": {
-    "plugins": {
-      "agtract": {
-        "name": "agtract",
-        "options": {
-          "salt": "package.json"
-        }
-      }
-    }
-  },
   "dependencies": {
     "@hoodie/account": "^1.0.0",
     "@hoodie/client": "^4.0.3",
