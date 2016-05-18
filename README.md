@@ -75,7 +75,7 @@ result should look something like this
 There might be more properties and `22.0.2` will likely be a higher number, but
 that’s okay.
 
-Now run `npm start` to start your Hoodie app.s
+Now run `npm start` to start your Hoodie app.
 
 You can find a more thorough description in our [Getting Started Guide](http://docs.hood.ie/camp/start/index.html).
 
