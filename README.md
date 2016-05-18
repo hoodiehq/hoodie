@@ -40,6 +40,7 @@ or higher, check your installed version with `node -v`.
 First, create a folder and a [package.json](https://docs.npmjs.com/files/package.json) file
 
 ```
+mkdir my-app
 cd my-app
 npm init -y
 ```
