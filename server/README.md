@@ -51,7 +51,7 @@ for account and store related tasks.
 
       > [see below](#account-client)
 
-1. ## store [:octocat:](https://github.com/hoodiehq/hoodie-store#readme) [![Build Status](https://travis-ci.org/hoodiehq/hoodie-store.svg?branch=master)](https://travis-ci.org/hoodiehq/hoodie-store) [![Dependency Status](https://david-dm.org/hoodiehq/hoodie-store.svg)](https://david-dm.org/hoodiehq/hoodie-store)
+2. ## store [:octocat:](https://github.com/hoodiehq/hoodie-store#readme) [![Build Status](https://travis-ci.org/hoodiehq/hoodie-store.svg?branch=master)](https://travis-ci.org/hoodiehq/hoodie-store) [![Dependency Status](https://david-dm.org/hoodiehq/hoodie-store.svg)](https://david-dm.org/hoodiehq/hoodie-store)
 
    > Hoodie’s store core module. It combines [store-client](https://github.com/hoodiehq/hoodie-store-client),
      [store-server](https://github.com/hoodiehq/hoodie-store-server) and exposes
@@ -68,7 +68,7 @@ for account and store related tasks.
 
       > [see below](#store-client)
 
-1. ## client [:octocat:](https://github.com/hoodiehq/hoodie-client#readme) [![Build Status](https://travis-ci.org/hoodiehq/hoodie-client.svg?branch=master)](https://travis-ci.org/hoodiehq/hoodie-client) [![Coverage Status](https://coveralls.io/repos/hoodiehq/hoodie-client/badge.svg?branch=master)](https://coveralls.io/r/hoodiehq/hoodie-client?branch=master) [![Dependency Status](https://david-dm.org/hoodiehq/hoodie-client.svg)](https://david-dm.org/hoodiehq/hoodie-client)
+3. ## client [:octocat:](https://github.com/hoodiehq/hoodie-client#readme) [![Build Status](https://travis-ci.org/hoodiehq/hoodie-client.svg?branch=master)](https://travis-ci.org/hoodiehq/hoodie-client) [![Coverage Status](https://coveralls.io/repos/hoodiehq/hoodie-client/badge.svg?branch=master)](https://coveralls.io/r/hoodiehq/hoodie-client?branch=master) [![Dependency Status](https://david-dm.org/hoodiehq/hoodie-client.svg)](https://david-dm.org/hoodiehq/hoodie-client)
 
    > Hoodie’s front-end client for the browser. It integrates Hoodie’s client
      core modules: [account-client](https://github.com/hoodiehq/hoodie-account-client), [store-client](https://github.com/hoodiehq/hoodie-store),
@@ -109,3 +109,12 @@ for account and store related tasks.
 
       > JavaScript library for logging to the browser console. If available, it
         takes advantage of [CSS-based styling of console log outputs](https://developer.mozilla.org/en-US/docs/Web/API/Console#Styling_console_output).
+
+4. ## admin [:octocat:](https://github.com/hoodiehq/hoodie-admin#readme) [![Build Status](https://travis-ci.org/hoodiehq/hoodie-admin.svg?branch=master)](https://travis-ci.org/hoodiehq/hoodie-admin) [![Dependency Status](https://david-dm.org/hoodiehq/hoodie-admin.svg)](https://david-dm.org/hoodiehq/hoodie-admin)
+
+   > Hoodie’s built-in Admin Dashboard, built with [Ember.js](http://emberjs.com)
+
+   1. ### <a name="admin-client"></a>admin-client [:octocat:](https://github.com/hoodiehq/hoodie-admin-client#readme) [![Build Status](https://travis-ci.org/hoodiehq/hoodie-admin-client.svg?branch=master)](https://travis-ci.org/hoodiehq/hoodie-admin-client) [![Coverage Status](https://coveralls.io/repos/hoodiehq/hoodie-admin-client/badge.svg?branch=master)](https://coveralls.io/r/hoodiehq/hoodie-admin-client?branch=master) [![Dependency Status](https://david-dm.org/hoodiehq/hoodie-admin-client.svg)](https://david-dm.org/hoodiehq/hoodie-account-client)
+
+      > Hoodie’s front-end admin client for the browser. Used in the Admin Dashboard,
+        but can also be used standalone for custom admin dashboard.

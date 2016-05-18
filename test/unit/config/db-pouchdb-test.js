@@ -16,6 +16,7 @@ test('generate couch config', function (group) {
             couch_httpd_auth_secret: 'a'
           }
         },
+        writeFileSync: function () {},
         '@noCallThru': true
       }
     })
