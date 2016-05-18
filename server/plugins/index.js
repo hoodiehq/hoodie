@@ -1,6 +1,7 @@
 module.exports = registerPlugins
 
 var log = require('npmlog')
+var defaultsDeep = require('lodash').defaultsDeep
 
 function registerPlugins (server, config, callback) {
   var options = {
@@ -40,10 +41,12 @@ function registerPlugins (server, config, callback) {
     }
 
     // hapi requires the exported function AND attributes
-    var register = require(plugin.package)
-    register.attributes = {
-      pkg: require(plugin.package + '/package.json')
-    }
+    var register = defaultsDeep(require(plugin.package), {
+      attributes: {
+        name: plugin.name,
+        pkg: require(plugin.package + '/package.json')
+      }
+    })
 
     var hapiPlugin = {
       register: register,
