@@ -5,10 +5,12 @@ var url = require('url')
 var _ = require('lodash')
 var emoji = require('node-emoji')
 var log = require('npmlog')
-var yargs = require('yargs')
+var path = require('path')
 var rc = require('rc')
 var semver = require('semver')
+var yargs = require('yargs')
 
+var defaults = require('../server/config/defaults')()
 var getHoodieServer = require('../server')
 
 var useEmoji = process.platform === 'darwin'
@@ -62,28 +64,28 @@ var args = yargs
   },
   port: {
     type: 'number',
-    default: 6004,
+    default: defaults.connection.port,
     describe: 'Port-number to run the Hoodie App on'
   },
   'bind-address': {
     type: 'string',
-    default: '127.0.0.1',
+    default: defaults.connection.host,
     describe: 'Address that Hoodie binds to'
   },
   public: {
     type: 'string',
-    default: './public',
+    default: defaults.paths.public.replace(process.cwd() + path.sep, ''),
     describe: 'Path to static assets'
   },
   m: {
     alias: 'in-memory',
     type: 'boolean',
-    default: true,
+    default: false,
     describe: 'Whether to start the PouchDB Server in memory'
   },
   data: {
     type: 'string',
-    default: './.hoodie',
+    default: defaults.paths.data.replace(process.cwd() + path.sep, ''),
     describe: 'Data path'
   },
   'db-url': {
