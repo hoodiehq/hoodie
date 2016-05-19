@@ -107,10 +107,26 @@ function register (server, options, next) {
 
     var is404 = response.output.statusCode === 404
     var isHTML = /text\/html/.test(request.headers.accept)
+    var isAccountPath = /^\/hoodie\/account\//.test(request.path)
+    var isAdminPath = /^\/hoodie\/admin\//.test(request.path)
+    var isStorePath = /^\/hoodie\/store\//.test(request.path)
     var isHoodiePath = /^\/hoodie\//.test(request.path)
 
     // We only care about 404 for html requests...
-    if (!is404 || !isHTML || isHoodiePath) {
+    if (!is404 || !isHTML) {
+      return reply.continue()
+    }
+
+    if (isAccountPath) {
+      return reply(fs.createReadStream(path.join(accountPublicPath, 'index.html')))
+    }
+    if (isAdminPath) {
+      return reply(fs.createReadStream(path.join(adminPublicPath, 'index.html')))
+    }
+    if (isStorePath) {
+      return reply(fs.createReadStream(path.join(storePublicPath, 'index.html')))
+    }
+    if (isHoodiePath) {
       return reply.continue()
     }
 
