@@ -14,7 +14,6 @@ function bundleClient (config, callback) {
   var bundleTargetPath = path.join(config.paths.data, 'client.js')
   var bundleTargetMinPath = path.join(config.paths.data, 'client.min.js')
   
-  // james
   var bundler = browserify()
   bundler.add(path.join(hoodieClientModulePath, 'index.js'))
   config.plugins.map(function (plugin) {
