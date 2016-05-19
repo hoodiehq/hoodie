@@ -28,6 +28,6 @@ function getDefaults () {
     account: {},
     admin: {},
     store: {},
-    plugins: []
+    plugins: {}
   }
 }

@@ -32,7 +32,8 @@ function registerPlugins (server, config, callback) {
       }
     }
   })
-  var thirdPartyPlugins = config.plugins.map(function (plugin) {
+  var thirdPartyPlugins = Object.keys(config.plugins).map(function (key) {
+    var plugin = config.plugins[key]
     // can we find the package?
     try {
       require.resolve(plugin.package)
