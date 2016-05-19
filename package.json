@@ -17,6 +17,7 @@
     "@hoodie/store": "^1.0.1",
     "async": "^1.5.2",
     "boom": "^3.1.2",
+    "browserify": "^13.0.1",
     "extend": "^3.0.0",
     "good": "^6.6.3",
     "good-squeeze": "^3.0.1",
@@ -38,6 +39,8 @@
     "request": "^2.72.0",
     "require-relative": "^0.8.7",
     "semver": "^5.1.0",
+    "uglify-js": "^2.6.2",
+    "uglifyify": "^3.0.1",
     "vision": "^4.1.0",
     "yargs": "^4.7.0"
   },
