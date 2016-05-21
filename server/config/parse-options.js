@@ -27,21 +27,21 @@ function parseOptions (options, callback) {
 
   // we only want to "enable" plugins specified in package.json
   // plugin options can be added or overridden in .hoodierc
-  var plugins = Object.keys(pkg.hoodie.plugins).reduce(function (plugins, current) {
+  var plugins = Object.keys(pkg.hoodie.plugins).reduce(function (object, current) {
     var plugin = pkg.hoodie.plugins[current]
     if (typeof plugin === 'string') plugin = {name: plugin}
-    // ensure name doesn't contain 'hoodie-plugin-'
-    plugin.name.replace('hoodie-plugin-', '')
 
     _.defaultsDeep(plugin, {
-      name: plugin.name,
-      package: 'hoodie-plugin-' + plugin.name,
+      name: current,
+      package: 'hoodie-plugin-' + current,
       routes: {},
       options: {}
     })
+    // ensure name doesn't contain 'hoodie-plugin-'
+    plugin.name.replace('hoodie-plugin-', '')
     if (plugin.name in options.plugins) _.assignIn(plugin.options, options.plugins[plugin.name])
-    plugins[plugin.name] = plugin
-    return plugins
+    object[plugin.name] = plugin
+    return object
   }, {})
 
   // construct final config
