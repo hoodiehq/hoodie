@@ -14,7 +14,9 @@ function getHoodieServer (options, callback) {
     if (error) {
       return callback(error)
     }
-    var hapiConfig = {}
+    var hapiConfig = {
+      app: config
+    }
 
     if (log.level === 'debug') {
       hapiConfig = {
