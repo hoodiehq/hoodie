@@ -18,7 +18,7 @@ var getDefaultsMock = {
   account: 'account options',
   admin: {},
   store: 'store options',
-  plugins: []
+  plugins: {}
 }
 
 var registerPlugins = proxyquire('../../server/plugins', {
