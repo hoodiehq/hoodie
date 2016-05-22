@@ -4,7 +4,7 @@ var Boom = require('boom')
 
 /**
  * All requests to /hoodie/store are prefixed by user database names, which
- * are "user/{accountId}". `onStorePreAuth` checks if the bearerToken is
+ * are "user/{accountId}". `onStorePreAuth` checks if the sessionToken is
  * a valid session Id, and if it belongs to the right user. If either fails,
  * it responds with an `unauthorized` error
  *
@@ -12,13 +12,13 @@ var Boom = require('boom')
  */
 function onStorePreAuth (request, reply) {
   var server = request.connection.server
-  var bearerToken = toBearerToken(request)
+  var sessionToken = toSessionToken(request)
 
-  if (!bearerToken) {
+  if (!sessionToken) {
     return reply(Boom.unauthorized())
   }
 
-  server.plugins.account.api.sessions.find(bearerToken)
+  server.plugins.account.api.sessions.find(sessionToken)
 
   .then(function (session) {
     var accountId = session.account.id
@@ -41,10 +41,10 @@ function onStorePreAuth (request, reply) {
   })
 }
 
-function toBearerToken (request) {
+function toSessionToken (request) {
   var token
   if (request.headers.authorization) {
-    token = request.headers.authorization.substring('Bearer '.length)
+    token = request.headers.authorization.substring('session '.length)
   }
   return token
 }
