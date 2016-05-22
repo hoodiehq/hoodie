@@ -10,38 +10,47 @@ var removeAuth = require('../utils/remove-auth-from-url')
 
 function parseOptions (options, callback) {
   // ensure we have all required options
-  _.defaultsDeep(options, {
+  _.defaults(options, {
     plugins: {}
   })
 
   // collect options from package.json
-  var pkg = {
-    hoodie: {
-      plugins: {}
-    }
-  }
+  var packagePath = path.join(process.cwd(), 'package.json')
   try {
-    var appPkg = require(path.join(process.cwd(), 'package.json'))
-    _.defaultsDeep(pkg, appPkg)
-  } catch (e) {}
+    var pkg = require(packagePath)
+    _.defaultsDeep(pkg, {
+      hoodie: {
+        plugins: {}
+      }
+    })
+  } catch (e) {
+    log.warn('No package.json at ' + packagePath)
+  }
 
   // we only want to "enable" plugins specified in package.json
   // plugin options can be added or overridden in .hoodierc
-  var plugins = Object.keys(pkg.hoodie.plugins).reduce(function (object, current) {
-    var plugin = pkg.hoodie.plugins[current]
-    if (typeof plugin === 'string') plugin = {name: plugin}
+  var plugins = Object.keys(pkg.hoodie.plugins).reduce(function (pluginsMap, pluginName) {
+    var plugin = pkg.hoodie.plugins[pluginName]
+    if (typeof plugin === 'string') {
+      plugin = {
+        name: plugin
+      }
+    }
 
     _.defaultsDeep(plugin, {
-      name: current,
-      package: 'hoodie-plugin-' + current,
+      name: pluginName,
+      package: 'hoodie-plugin-' + pluginName,
       routes: {},
       options: {}
     })
-    // ensure name doesn't contain 'hoodie-plugin-'
-    plugin.name.replace('hoodie-plugin-', '')
-    if (plugin.name in options.plugins) _.assignIn(plugin.options, options.plugins[plugin.name])
-    object[plugin.name] = plugin
-    return object
+
+    if (options.plugins.hasOwnProperty(plugin.name)) {
+      _.assign(plugin.options, options.plugins[plugin.name])
+    }
+
+    pluginsMap[plugin.name] = plugin
+
+    return pluginsMap
   }, {})
 
   // construct final config
