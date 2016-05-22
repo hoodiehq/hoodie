@@ -19,7 +19,7 @@ function register (server, options, next) {
   var hoodiePublicPath = path.join(require.resolve('../../package.json'), '..', 'public')
   var accountPublicPath = path.join(require.resolve('@hoodie/account/package.json'), '..', 'public')
   var storePublicPath = path.join(require.resolve('@hoodie/store/package.json'), '..', 'public')
-  var adminPublicPath = path.join(require.resolve('@hoodie/admin/package.json'), '..', 'public')
+  var adminPublicPath = path.join(require.resolve('@hoodie/admin/package.json'), '..', 'dist')
 
   server.route([{
     method: 'GET',
