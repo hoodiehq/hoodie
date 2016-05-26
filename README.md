@@ -25,7 +25,7 @@ If you have any questions come say hi in our [chat](http://hood.ie/chat/).
 ## Setup
 
 Hoodie is a [Node.js](https://nodejs.org/en/) package. You need Node Version 4
-or higher, check your installed version with `node -v`.
+or higher and npm Version 2 or higher, check your installed version with `node -v` and 'npm -v'.
 
 First, create a folder and a [package.json](https://docs.npmjs.com/files/package.json) file
 
