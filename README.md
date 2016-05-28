@@ -22,20 +22,10 @@ works all together in its [simple HTML & JavaScript code](https://github.com/hoo
 
 If you have any questions come say hi in our [chat](http://hood.ie/chat/).
 
----
-
-<a href="http://conferences.oreilly.com/oscon/open-source-us/public/schedule/detail/51586" title="OSCON Contribute"><img alt="Open Source Convention Logo" src="https://cloud.githubusercontent.com/assets/39992/15275708/08695d6a-1aa1-11e6-9b62-9597fd6acbc3.png" align="left" width="296"></a>
-
-### [OSCON Contribute](http://conferences.oreilly.com/oscon/open-source-us)
-
-Coming to [OSCON in Austin](http://conferences.oreilly.com/oscon/open-source-us)? Join our hackathon – we would love to have you. Please **[sign up for free](https://ti.to/hoodie/oscon-meet-the-hoodies/)** so we can better plan :)
-
----
-
 ## Setup
 
 Hoodie is a [Node.js](https://nodejs.org/en/) package. You need Node Version 4
-or higher, check your installed version with `node -v`.
+or higher and npm Version 2 or higher, check your installed version with `node -v` and 'npm -v'.
 
 First, create a folder and a [package.json](https://docs.npmjs.com/files/package.json) file
 

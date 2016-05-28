@@ -140,5 +140,6 @@ getHoodieServer(options, function (error, server, config) {
       hostname: config.connection.host,
       port: config.connection.port
     }))
+    console.log('Stop server with control + c')
   })
 })
