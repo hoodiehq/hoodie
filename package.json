@@ -21,6 +21,7 @@
     "good-squeeze": "^3.0.1",
     "h2o2": "^5.1.0",
     "hapi": "^13.3.0",
+    "hapi-cors-headers": "^1.0.0",
     "inert": "^4.0.0",
     "joi": "^8.0.5",
     "jsonfile": "^2.3.0",
