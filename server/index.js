@@ -8,6 +8,7 @@ var bundleClient = require('./bundle-client')
 var getConfig = require('./config')
 var registerPlugins = require('./plugins')
 var userDatabases = require('./utils/user-databases')
+var corsHeaders = require('hapi-cors-headers')
 
 function getHoodieServer (options, callback) {
   getConfig(options, function (error, config) {
@@ -27,6 +28,7 @@ function getHoodieServer (options, callback) {
 
     var server = new hapi.Server(hapiConfig)
     server.connection(config.connection)
+    server.ext('onPreResponse', corsHeaders)
 
     async.parallel([
       registerPlugins.bind(null, server, config),
