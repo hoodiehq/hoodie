@@ -1,6 +1,25 @@
 var simple = require('simple-mock')
 var test = require('tap').test
-var proxyquire = require('proxyquire').noCallThru()
+var proxyquire = require('proxyquire')
+
+var getDefaultsMock = {
+  name: 'foo',
+  paths: {
+    data: 'data path',
+    public: 'public path'
+  },
+  connection: {
+    host: 'host name',
+    port: 'app port'
+  },
+  db: {},
+
+  // core modules
+  account: 'account options',
+  admin: {},
+  store: 'store options',
+  plugins: {}
+}
 
 var registerPlugins = proxyquire('../../server/plugins', {
   '@hoodie/store': function () {},
@@ -14,8 +33,7 @@ test('plugins', function (group) {
     var server = {
       register: simple.stub().callbackWith(null)
     }
-    var config = { account: 'account options' }
-    registerPlugins(server, config, function (error) {
+    registerPlugins(server, getDefaultsMock, function (error) {
       group.error(error)
 
       var plugins = server.register.lastCall.arg
@@ -32,8 +50,7 @@ test('plugins', function (group) {
     var server = {
       register: simple.stub().callbackWith(null)
     }
-    var config = { store: 'store options' }
-    registerPlugins(server, config, function (error) {
+    registerPlugins(server, getDefaultsMock, function (error) {
       group.error(error)
 
       var plugins = server.register.lastCall.arg

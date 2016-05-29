@@ -2,13 +2,58 @@ module.exports = parseOptions
 
 var path = require('path')
 
-var defaultsDeep = require('lodash').defaultsDeep
+var _ = require('lodash')
 var log = require('npmlog')
 
 var getDefaults = require('./defaults')
 var removeAuth = require('../utils/remove-auth-from-url')
 
 function parseOptions (options, callback) {
+  // ensure we have all required options
+  _.defaults(options, {
+    plugins: {}
+  })
+
+  // collect options from package.json
+  var packagePath = path.join(process.cwd(), 'package.json')
+  try {
+    var pkg = require(packagePath)
+    _.defaultsDeep(pkg, {
+      hoodie: {
+        plugins: {}
+      }
+    })
+  } catch (e) {
+    log.warn('No package.json at ' + packagePath)
+  }
+
+  // we only want to "enable" plugins specified in package.json
+  // plugin options can be added or overridden in .hoodierc
+  var plugins = Object.keys(pkg.hoodie.plugins).reduce(function (pluginsMap, pluginName) {
+    var plugin = pkg.hoodie.plugins[pluginName]
+    if (typeof plugin === 'string') {
+      plugin = {
+        name: plugin
+      }
+    }
+
+    _.defaultsDeep(plugin, {
+      name: pluginName,
+      package: 'hoodie-plugin-' + pluginName,
+      routes: {},
+      options: {}
+    })
+
+    if (options.plugins.hasOwnProperty(plugin.name)) {
+      _.assign(plugin.options, options.plugins[plugin.name])
+    }
+
+    pluginsMap[plugin.name] = plugin
+
+    return pluginsMap
+  }, {})
+
+  // construct final config
   var config = {
     loglevel: options.loglevel,
     paths: {
@@ -19,10 +64,11 @@ function parseOptions (options, callback) {
       host: options.bindAddress,
       port: options.port
     },
-    db: {}
+    plugins: plugins
   }
 
-  defaultsDeep(config, getDefaults())
+  // apply config defaults
+  _.defaultsDeep(config, getDefaults())
 
   log.level = config.loglevel
 
