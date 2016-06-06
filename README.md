@@ -74,6 +74,7 @@ You can find a more thorough description in our [Getting Started Guide](http://d
 Run `npm start -- --help` to see all available CLI options.
 
 Options can also be specified as environment variables (prefixed with `hoodie_`) or inside a `.hoodierc` file (json or ini).
+App-specific default values can be set in `package.json` in `"hoodie": {}`, e.g. `"hoodie": {"port": 1234}`.
 
 option        | default       | description
 ------------- | ------------- | -------------
