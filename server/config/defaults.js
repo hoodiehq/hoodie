@@ -4,10 +4,8 @@ var path = require('path')
 
 function getDefaults () {
   var projectPath = process.cwd()
-  var pkg = require(path.join(projectPath, 'package.json'))
 
   return {
-    name: pkg.name,
     loglevel: 'warn',
     paths: {
       data: path.join(projectPath, '.hoodie'),
@@ -27,6 +25,7 @@ function getDefaults () {
     // core modules
     account: {},
     admin: {},
+    client: {},
     store: {},
 
     // plugins

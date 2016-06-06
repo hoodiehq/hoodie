@@ -10,13 +10,14 @@ var log = require('npmlog')
 var accountConfig = require('./account')
 var assureFolders = require('./assure-folders')
 var couchDbConfig = require('./db/couchdb')
+var getAppOptions = require('./app-options')
 var getDatabaseFactory = require('./db/factory')
 var parseOptions = require('./parse-options')
 var pouchDbConfig = require('./db/pouchdb')
 var storeConfig = require('./store')
 
 function getConfig (options, callback) {
-  var config = parseOptions(options)
+  var config = parseOptions(options, getAppOptions())
   var dbConfig = config.db.url ? couchDbConfig : pouchDbConfig
   var state = {
     config: config,
