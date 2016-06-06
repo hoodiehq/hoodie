@@ -17,6 +17,7 @@ test('config', function (group) {
     var couchDbConfigMock = simple.stub().callbackWith(null)
     var getDatabaseFactoryMock = simple.stub().returnWith('getDatabase')
     var parseOptionsMock = simple.stub().returnWith(config)
+    var appOptionsMock = simple.stub().returnWith('app options')
     var pouchDbConfigMock = simple.stub().callbackWith(null)
     var storeConfigMock = simple.stub().callbackWith(null)
 
@@ -26,6 +27,7 @@ test('config', function (group) {
       './db/couchdb': couchDbConfigMock,
       './db/factory': getDatabaseFactoryMock,
       './parse-options': parseOptionsMock,
+      './app-options': appOptionsMock,
       './db/pouchdb': pouchDbConfigMock,
       './store': storeConfigMock,
       'fs': {
@@ -43,6 +45,7 @@ test('config', function (group) {
         getDatabase: 'getDatabase'
       }
 
+      t.is(parseOptionsMock.lastCall.args[1], 'app options', 'passes app options to parseOptions')
       t.is(config.paths.public, 'public path', 'sets public path')
 
       t.is(couchDbConfigMock.callCount, 0, 'couchdb config not called')
@@ -71,6 +74,7 @@ test('config', function (group) {
     var couchDbConfigMock = simple.stub().callbackWith(null)
     var getDatabaseFactoryMock = simple.stub().returnWith('getDatabase')
     var parseOptionsMock = simple.stub().returnWith(config)
+    var appOptionsMock = simple.stub().returnWith({})
     var pouchDbConfigMock = simple.stub().callbackWith(null)
     var storeConfigMock = simple.stub().callbackWith(null)
 
@@ -80,6 +84,7 @@ test('config', function (group) {
       './db/couchdb': couchDbConfigMock,
       './db/factory': getDatabaseFactoryMock,
       './parse-options': parseOptionsMock,
+      './app-options': appOptionsMock,
       './db/pouchdb': pouchDbConfigMock,
       './store': storeConfigMock,
       'fs': {
@@ -118,6 +123,7 @@ test('config', function (group) {
     var couchDbConfigMock = simple.stub().callbackWith(null)
     var getDatabaseFactoryMock = simple.stub().returnWith('getDatabase')
     var parseOptionsMock = simple.stub().returnWith(config)
+    var appOptionsMock = simple.stub().returnWith({})
     var pouchDbConfigMock = simple.stub().callbackWith(null)
     var storeConfigMock = simple.stub().callbackWith(null)
 
@@ -127,6 +133,7 @@ test('config', function (group) {
       './db/couchdb': couchDbConfigMock,
       './db/factory': getDatabaseFactoryMock,
       './parse-options': parseOptionsMock,
+      './app-options': appOptionsMock,
       './db/pouchdb': pouchDbConfigMock,
       './store': storeConfigMock,
       'fs': {
