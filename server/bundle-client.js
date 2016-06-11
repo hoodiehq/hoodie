@@ -19,8 +19,8 @@ function bundleClient (config, callback) {
   stream.pipe(fs.createWriteStream(bundleTargetPath))
   stream.on('error', callback)
   stream.on('end', function () {
-    // TODO: pass client configuration to constructor
-    fs.appendFile(bundleTargetPath, '\n\nhoodie = new Hoodie()', function (error) {
+    var options = config.client ? JSON.stringify(config.client) : ''
+    fs.appendFile(bundleTargetPath, '\n\nhoodie = new Hoodie(' + options + ')', function (error) {
       if (error) {
         return callback(error)
       }
