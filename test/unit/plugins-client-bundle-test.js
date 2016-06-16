@@ -8,7 +8,7 @@ test('bundle client', function (group) {
       pipe: simple.stub(),
       on: simple.stub()
     }
-    var bundleClient = proxyquire('../../server/bundle-client', {
+    var bundleClient = proxyquire('../../server/plugins/client/bundle', {
       npmlog: {
         silly: simple.stub(),
         info: simple.stub()
@@ -40,7 +40,7 @@ test('bundle client', function (group) {
       on: simple.stub()
     }
     var appendFile = simple.stub().callbackWith(null)
-    var bundleClient = proxyquire('../../server/bundle-client', {
+    var bundleClient = proxyquire('../../server/plugins/client/bundle', {
       npmlog: {
         silly: simple.stub(),
         info: simple.stub()
