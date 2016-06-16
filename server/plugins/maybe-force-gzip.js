@@ -1,6 +1,6 @@
 module.exports.register = register
 module.exports.register.attributes = {
-  name: 'maybe-force-gzip'
+  name: 'hoodie-local-maybe-force-gzip'
 }
 
 // allow clients to request a gzip response, even if the

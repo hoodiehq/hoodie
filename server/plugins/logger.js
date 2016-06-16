@@ -1,6 +1,6 @@
 module.exports.register = register
 module.exports.register.attributes = {
-  name: 'hoodie-logger'
+  name: 'hoodie-local-logger'
 }
 
 var qs = require('querystring')

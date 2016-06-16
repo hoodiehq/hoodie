@@ -1,10 +1,8 @@
 module.exports = getHoodieServer
 
-var async = require('async')
 var hapi = require('hapi')
 var log = require('npmlog')
 
-var bundleClient = require('./bundle-client')
 var getConfig = require('./config')
 var registerPlugins = require('./plugins')
 var userDatabases = require('./utils/user-databases')
@@ -30,10 +28,7 @@ function getHoodieServer (options, callback) {
     server.connection(config.connection)
     server.ext('onPreResponse', corsHeaders)
 
-    async.parallel([
-      registerPlugins.bind(null, server, config),
-      bundleClient.bind(null, config)
-    ], function (error) {
+    registerPlugins(server, config, function (error) {
       if (error) {
         return callback(error)
       }

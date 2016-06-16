@@ -1,6 +1,6 @@
 module.exports.register = register
 module.exports.register.attributes = {
-  name: 'hoodie-public',
+  name: 'hoodie-local-public',
   dependencies: 'inert'
 }
 
@@ -80,18 +80,6 @@ function register (server, options, next) {
         name: options.config.name,
         version: hoodieVersion
       })
-    }
-  }, {
-    method: 'GET',
-    path: '/hoodie/client.js',
-    handler: {
-      file: path.join(options.config.paths.data, 'client.js')
-    }
-  }, {
-    method: 'GET',
-    path: '/hoodie/client.min.js',
-    handler: {
-      file: path.join(options.config.paths.data, 'client.min.js')
     }
   }])
 

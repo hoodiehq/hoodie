@@ -13,6 +13,7 @@ function registerPlugins (server, config, callback) {
     require('lout')
   ]
   var localPlugins = [
+    require('./client'),
     require('./logger'),
     require('./maybe-force-gzip'),
     require('./public')
