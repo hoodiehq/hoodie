@@ -25,7 +25,7 @@ function pouchDbConfig (state, callback) {
       charset: 'hex'
     })
 
-    if (adminPassword) {
+    if (!state.config.inMemory && adminPassword) {
       jsonfile.writeFileSync(storePath, Object.assign(store, {
         couch_httpd_auth_secret: secret
       }), {spaces: 2})
@@ -55,10 +55,12 @@ function pouchDbConfig (state, callback) {
       admin: '-pbkdf2-' + doc.derived_key + ',' + doc.salt + ',10'
     }
 
-    jsonfile.writeFileSync(storePath, Object.assign(store, {
-      couch_httpd_auth_secret: secret,
-      admins: state.config.db.admins
-    }), {spaces: 2})
+    if (!state.config.inMemory) {
+      jsonfile.writeFileSync(storePath, Object.assign(store, {
+        couch_httpd_auth_secret: secret,
+        admins: state.config.db.admins
+      }), {spaces: 2})
+    }
 
     callback(null, state.config)
   })

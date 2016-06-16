@@ -4,6 +4,10 @@ var parallel = require('async').parallel
 var mkdirp = require('mkdirp')
 
 function assureFolders (state, callback) {
+  if (state.config.inMemory) {
+    return callback()
+  }
+
   var tasks = [
     mkdirp.bind(null, state.config.paths.data)
   ]
