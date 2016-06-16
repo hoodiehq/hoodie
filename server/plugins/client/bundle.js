@@ -1,34 +1,16 @@
 module.exports = bundleClient
 
 var fs = require('fs')
-var path = require('path')
 
-var log = require('npmlog')
+function bundleClient (hoodieClientPath, config, callback) {
+  fs.readFile(hoodieClientPath, function (error, clientBuffer) {
+    if (error) {
+      return callback(error)
+    }
 
-function bundleClient (config, callback) {
-  var hoodieClientModulePath = path.dirname(require.resolve('@hoodie/client/package.json'))
-  var hoodieClientPath = path.join(hoodieClientModulePath, 'dist/hoodie.js')
-  var bundleTargetPath = path.join(config.paths.data, 'client.js')
-
-  // https://github.com/hoodiehq/hoodie-client/issues/34
-  // var hoodieMinPath = path.join(hoodieClientModulePath, 'dist/hoodie.min.js')
-
-  log.silly('bundle', 'bundling ' + hoodieClientPath + ' into ' + bundleTargetPath)
-
-  var stream = fs.createReadStream(hoodieClientPath)
-  stream.pipe(fs.createWriteStream(bundleTargetPath))
-  stream.on('error', callback)
-  stream.on('end', function () {
     var options = config.client ? JSON.stringify(config.client) : ''
-    fs.appendFile(bundleTargetPath, '\n\nhoodie = new Hoodie(' + options + ')', function (error) {
-      if (error) {
-        return callback(error)
-      }
+    var initBuffer = Buffer('\n\nhoodie = new Hoodie(' + options + ')')
 
-      log.silly('bundle', 'appended Hoodie init code to ' + bundleTargetPath)
-      log.info('bundle', 'bundled Hoodie client into ' + bundleTargetPath)
-
-      callback()
-    })
+    callback(null, Buffer.concat([clientBuffer, initBuffer]))
   })
 }
