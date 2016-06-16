@@ -4,6 +4,16 @@ var fs = require('fs')
 
 var parallel = require('async').parallel
 
+/**
+ * we compare the mtime (modified time) for the Hoodie client and the target
+ * bundle file. If the latter does not exist or Hoodie client was modified
+ * more recently, we read out the client and add the `new Hoodie()` init code,
+ * otherwise we simply read out the bundle file.
+ *
+ * This optimisation is in preparation for plugins. Plugins can extend the
+ * client, so we need to browserify on-the-fly to avoid dependency duplication,
+ * and avoiding unneeded bundling with browserify saves a significant time.
+ */
 function bundleClient (hoodieClientPath, bundleTargetPath, config, callback) {
   parallel([
     getModifiedTime.bind(null, hoodieClientPath),
