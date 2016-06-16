@@ -51,6 +51,7 @@ function parseOptions (options, appOptions, callback) {
     if (options.inMemory) {
       log.info('config', 'Storing all data in memory only')
       config.db.db = require('memdown')
+      config.inMemory = true
     } else {
       config.db.prefix = path.join(config.paths.data, 'data' + path.sep)
       log.info('config', 'No CouchDB URL provided, falling back to PouchDB')
