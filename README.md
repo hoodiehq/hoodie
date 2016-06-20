@@ -107,7 +107,7 @@ of the [public folder](public).
 
 ## Backers
 
-[Become a backer](https://opencollective.com/hoodie#backer) and show your Hoodie support!
+[Become a backer](https://opencollective.com/hoodie#support) and show your Hoodie support!
 
 [![](https://opencollective.com/hoodie/backer/0/avatar)](https://opencollective.com/hoodie/backer/0/website)
 [![](https://opencollective.com/hoodie/backer/1/avatar)](https://opencollective.com/hoodie/backer/1/website)
@@ -139,6 +139,31 @@ of the [public folder](public).
 [![](https://opencollective.com/hoodie/backer/27/avatar)](https://opencollective.com/hoodie/backer/27/website)
 [![](https://opencollective.com/hoodie/backer/28/avatar)](https://opencollective.com/hoodie/backer/28/website)
 [![](https://opencollective.com/hoodie/backer/29/avatar)](https://opencollective.com/hoodie/backer/29/website)
+
+## Official Sponsors
+
+Show your support for Hoodie and [help us sustain our inclusive community](http://hood.ie/blog/sustaining-hoodie.html). We will publicly appreciate your support and are happy to get your word out, as long as it aligns with our [Code of Conduct](http://hood.ie/code-of-conduct/).
+
+[![](https://opencollective.com/hoodie/sponsor/0/avatar)](https://opencollective.com/hoodie/sponsor/0/website)
+[![](https://opencollective.com/hoodie/sponsor/1/avatar)](https://opencollective.com/hoodie/sponsor/1/website)
+[![](https://opencollective.com/hoodie/sponsor/2/avatar)](https://opencollective.com/hoodie/sponsor/2/website)
+[![](https://opencollective.com/hoodie/sponsor/3/avatar)](https://opencollective.com/hoodie/sponsor/3/website)
+[![](https://opencollective.com/hoodie/sponsor/4/avatar)](https://opencollective.com/hoodie/sponsor/4/website)
+[![](https://opencollective.com/hoodie/sponsor/5/avatar)](https://opencollective.com/hoodie/sponsor/5/website)
+[![](https://opencollective.com/hoodie/sponsor/6/avatar)](https://opencollective.com/hoodie/sponsor/6/website)
+[![](https://opencollective.com/hoodie/sponsor/7/avatar)](https://opencollective.com/hoodie/sponsor/7/website)
+[![](https://opencollective.com/hoodie/sponsor/8/avatar)](https://opencollective.com/hoodie/sponsor/8/website)
+[![](https://opencollective.com/hoodie/sponsor/9/avatar)](https://opencollective.com/hoodie/sponsor/9/website)
+[![](https://opencollective.com/hoodie/sponsor/10/avatar)](https://opencollective.com/hoodie/sponsor/10/website)
+[![](https://opencollective.com/hoodie/sponsor/11/avatar)](https://opencollective.com/hoodie/sponsor/11/website)
+[![](https://opencollective.com/hoodie/sponsor/12/avatar)](https://opencollective.com/hoodie/sponsor/12/website)
+[![](https://opencollective.com/hoodie/sponsor/13/avatar)](https://opencollective.com/hoodie/sponsor/13/website)
+[![](https://opencollective.com/hoodie/sponsor/14/avatar)](https://opencollective.com/hoodie/sponsor/14/website)
+[![](https://opencollective.com/hoodie/sponsor/15/avatar)](https://opencollective.com/hoodie/sponsor/15/website)
+[![](https://opencollective.com/hoodie/sponsor/16/avatar)](https://opencollective.com/hoodie/sponsor/16/website)
+[![](https://opencollective.com/hoodie/sponsor/17/avatar)](https://opencollective.com/hoodie/sponsor/17/website)
+[![](https://opencollective.com/hoodie/sponsor/18/avatar)](https://opencollective.com/hoodie/sponsor/18/website)
+[![](https://opencollective.com/hoodie/sponsor/19/avatar)](https://opencollective.com/hoodie/sponsor/19/website)
 
 ## License
 
