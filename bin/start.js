@@ -126,20 +126,36 @@ log.level = options.loglevel || 'warn'
 
 log.verbose('app', 'Initialising')
 
-getHoodieServer(options, function (error, server, config) {
-  if (error) {
-    var stack = new Error().stack.split('\n').slice(2).join('\n')
-    return log.error('app', 'Failed to initialise:\n' + stack, error)
+// CLI argument flow control
+if (process.argv.length < 3) {
+  startHoodie()
+} else {
+  switch (process.argv[2]) {
+    case 'setup':
+      // TODO write setup flow
+      console.log('run setup')
+      break
+    default:
+
   }
+}
 
-  log.verbose('app', 'Starting')
+function startHoodie () {
+  getHoodieServer(options, function (error, server, config) {
+    if (error) {
+      var stack = new Error().stack.split('\n').slice(2).join('\n')
+      return log.error('app', 'Failed to initialise:\n' + stack, error)
+    }
 
-  server.start(function () {
-    console.log((useEmoji ? emoji.get('dog') + '  ' : '') + 'Your Hoodie app has started on ' + url.format({
-      protocol: 'http',
-      hostname: config.connection.host,
-      port: config.connection.port
-    }))
-    console.log('Stop server with control + c')
+    log.verbose('app', 'Starting')
+
+    server.start(function () {
+      console.log((useEmoji ? emoji.get('dog') + '  ' : '') + 'Your Hoodie app has started on ' + url.format({
+        protocol: 'http',
+        hostname: config.connection.host,
+        port: config.connection.port
+      }))
+      console.log('Stop server with control + c')
+    })
   })
-})
+}
