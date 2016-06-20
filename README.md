@@ -105,6 +105,41 @@ You can [read more about testing Hoodie](test).
 You can start hoodie for itself using `npm start`. It will  serve the contents
 of the [public folder](public).
 
+## Backers
+
+[Become a backer](https://opencollective.com/hoodie#backer) and show your Hoodie support!
+
+[![](https://opencollective.com/hoodie/backer/0/avatar)](https://opencollective.com/hoodie/backer/0/website)
+[![](https://opencollective.com/hoodie/backer/1/avatar)](https://opencollective.com/hoodie/backer/1/website)
+[![](https://opencollective.com/hoodie/backer/2/avatar)](https://opencollective.com/hoodie/backer/2/website)
+[![](https://opencollective.com/hoodie/backer/3/avatar)](https://opencollective.com/hoodie/backer/3/website)
+[![](https://opencollective.com/hoodie/backer/4/avatar)](https://opencollective.com/hoodie/backer/4/website)
+[![](https://opencollective.com/hoodie/backer/5/avatar)](https://opencollective.com/hoodie/backer/5/website)
+[![](https://opencollective.com/hoodie/backer/6/avatar)](https://opencollective.com/hoodie/backer/6/website)
+[![](https://opencollective.com/hoodie/backer/7/avatar)](https://opencollective.com/hoodie/backer/7/website)
+[![](https://opencollective.com/hoodie/backer/8/avatar)](https://opencollective.com/hoodie/backer/8/website)
+[![](https://opencollective.com/hoodie/backer/9/avatar)](https://opencollective.com/hoodie/backer/9/website)
+[![](https://opencollective.com/hoodie/backer/10/avatar)](https://opencollective.com/hoodie/backer/10/website)
+[![](https://opencollective.com/hoodie/backer/11/avatar)](https://opencollective.com/hoodie/backer/11/website)
+[![](https://opencollective.com/hoodie/backer/12/avatar)](https://opencollective.com/hoodie/backer/12/website)
+[![](https://opencollective.com/hoodie/backer/13/avatar)](https://opencollective.com/hoodie/backer/13/website)
+[![](https://opencollective.com/hoodie/backer/14/avatar)](https://opencollective.com/hoodie/backer/14/website)
+[![](https://opencollective.com/hoodie/backer/15/avatar)](https://opencollective.com/hoodie/backer/15/website)
+[![](https://opencollective.com/hoodie/backer/16/avatar)](https://opencollective.com/hoodie/backer/16/website)
+[![](https://opencollective.com/hoodie/backer/17/avatar)](https://opencollective.com/hoodie/backer/17/website)
+[![](https://opencollective.com/hoodie/backer/18/avatar)](https://opencollective.com/hoodie/backer/18/website)
+[![](https://opencollective.com/hoodie/backer/19/avatar)](https://opencollective.com/hoodie/backer/19/website)
+[![](https://opencollective.com/hoodie/backer/20/avatar)](https://opencollective.com/hoodie/backer/20/website)
+[![](https://opencollective.com/hoodie/backer/21/avatar)](https://opencollective.com/hoodie/backer/21/website)
+[![](https://opencollective.com/hoodie/backer/22/avatar)](https://opencollective.com/hoodie/backer/22/website)
+[![](https://opencollective.com/hoodie/backer/23/avatar)](https://opencollective.com/hoodie/backer/23/website)
+[![](https://opencollective.com/hoodie/backer/24/avatar)](https://opencollective.com/hoodie/backer/24/website)
+[![](https://opencollective.com/hoodie/backer/25/avatar)](https://opencollective.com/hoodie/backer/25/website)
+[![](https://opencollective.com/hoodie/backer/26/avatar)](https://opencollective.com/hoodie/backer/26/website)
+[![](https://opencollective.com/hoodie/backer/27/avatar)](https://opencollective.com/hoodie/backer/27/website)
+[![](https://opencollective.com/hoodie/backer/28/avatar)](https://opencollective.com/hoodie/backer/28/website)
+[![](https://opencollective.com/hoodie/backer/29/avatar)](https://opencollective.com/hoodie/backer/29/website)
+
 ## License
 
 [Apache 2.0](LICENSE)
