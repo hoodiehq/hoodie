@@ -40,7 +40,7 @@ test('store pre auth hook', function (group) {
   var request = {
     path: 'user123',
     headers: {
-      authorization: 'Bearer session123'
+      authorization: 'Session session123'
     },
     connection: {
       server: serverStub
