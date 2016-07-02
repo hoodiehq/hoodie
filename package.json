@@ -39,6 +39,7 @@
     "request": "^2.72.0",
     "require-relative": "^0.8.7",
     "semver": "^5.1.0",
+    "strip-url-auth": "^1.0.1",
     "vision": "^4.1.0",
     "yargs": "^4.7.0"
   },
