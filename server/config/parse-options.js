@@ -4,9 +4,9 @@ var path = require('path')
 
 var defaultsDeep = require('lodash').defaultsDeep
 var log = require('npmlog')
+var stripUrlAuth = require('strip-url-auth')
 
 var getDefaults = require('./defaults')
-var removeAuth = require('../utils/remove-auth-from-url')
 
 /**
  * Parse options into internal config structure.
@@ -46,7 +46,7 @@ function parseOptions (options, appOptions, callback) {
 
   if (options.dbUrl) {
     config.db.url = options.dbUrl
-    log.info('config', 'Connecting to CouchDB at ' + removeAuth(options.dbUrl))
+    log.info('config', 'Connecting to CouchDB at ' + stripUrlAuth(options.dbUrl))
   } else {
     if (options.inMemory) {
       log.info('config', 'Storing all data in memory only')
