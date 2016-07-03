@@ -78,13 +78,13 @@ App-specific default values can be set in `package.json` in `"hoodie": {}`, e.g.
 
 option        | default       | description
 ------------- | ------------- | -------------
+bindAddress   | `'127.0.0.1'` | Address that Hoodie binds to
+data          | `'.hoodie'`   | Data path
+dbUrl         | –             | If provided, uses external CouchDB. URL has to contain credentials.
+inMemory      | `false`       | Whether to start the PouchDB Server in memory
 loglevel      | `'warn'`      | One of: error, warn, info, verbose, silly
 port          | `8080`        | Port-number to run the Hoodie App on
-bindAddress   | `'127.0.0.1'` | Address that Hoodie binds to
 public        | `'public'`    | path to static assets
-inMemory      | `false`       | Whether to start the PouchDB Server in memory
-dbUrl         | –             | If provided, uses external CouchDB. URL has to contain credentials.
-data          | `'.hoodie'`   | Data path
 
 Hoodie is using the [rc](https://www.npmjs.com/package/rc) module to retrieve
 configuration from CLI arguments, environment variables and configuration files.
