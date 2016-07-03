@@ -36,13 +36,16 @@ function parseOptions (options, appOptions, callback) {
     connection: {
       host: options.bindAddress,
       port: options.port
-    },
-    db: {}
+    }
   }
 
   defaultsDeep(config, getDefaults())
 
   log.level = config.loglevel
+
+  if (options.url) {
+    config.url = options.url
+  }
 
   if (options.dbUrl) {
     config.db.url = options.dbUrl
