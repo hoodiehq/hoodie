@@ -37,12 +37,17 @@ test('bundle client', function (group) {
       }
     })
 
-    bundleClient('client.js', 'bundle.js', {}, function (error, buffer) {
+    bundleClient('client.js', 'bundle.js', {
+      connection: {
+        host: '127.0.0.1',
+        port: 8080
+      }
+    }, function (error, buffer) {
       t.error(error)
 
       t.is(readFileMock.callCount, 1, 'readFile called once')
       t.is(readFileMock.lastCall.arg, 'client.js', 'read bundle')
-      t.is(buffer.toString(), 'hoodie client content\n\nhoodie = new Hoodie()')
+      t.is(buffer.toString(), 'hoodie client content\n\nhoodie = new Hoodie({"url":"http://127.0.0.1:8080"})')
 
       t.end()
     })
