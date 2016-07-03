@@ -3,6 +3,7 @@ module.exports = bundleClient
 var fs = require('fs')
 
 var parallel = require('async').parallel
+var defaultsDeep = require('lodash').defaultsDeep
 
 /**
  * we compare the mtime (modified time) for the Hoodie client and the target
@@ -58,6 +59,13 @@ function buildBundle (config, hoodieClientPath, callback) {
       return callback(error)
     }
 
+    if (config.connection) {
+      defaultsDeep(config, {
+        client: {
+          url: 'http://' + config.connection.host + ':' + config.connection.port
+        }
+      })
+    }
     var options = config.client ? JSON.stringify(config.client) : ''
     var initBuffer = Buffer('\n\nhoodie = new Hoodie(' + options + ')')
 
