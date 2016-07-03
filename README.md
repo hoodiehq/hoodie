@@ -85,6 +85,7 @@ inMemory      | `false`       | Whether to start the PouchDB Server in memory
 loglevel      | `'warn'`      | One of: error, warn, info, verbose, silly
 port          | `8080`        | Port-number to run the Hoodie App on
 public        | `'public'`    | path to static assets
+url           | -             | Optional: external URL at which Hoodie Server is accessible
 
 Hoodie is using the [rc](https://www.npmjs.com/package/rc) module to retrieve
 configuration from CLI arguments, environment variables and configuration files.
