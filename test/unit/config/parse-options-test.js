@@ -13,7 +13,9 @@ var getDefaultsMock = function () {
     connection: {
       host: 'host name',
       port: 'app port'
-    }
+    },
+    db: {},
+    client: {}
   }
 }
 getDefaultsMock['@noCallThru'] = true
@@ -36,6 +38,7 @@ test('parse options', function (group) {
     var config = parseOptions({})
 
     t.is(config.name, 'foo', 'sets config.name from defaults')
+    t.is(config.url, undefined, 'does not set config.url by default')
     t.is(config.paths.data, 'data path', 'sets config.paths.data from defaults')
     t.is(config.paths.public, 'public path', 'sets config.public.data from defaults')
     t.is(config.connection.host, 'host name', 'sets config.connection.host from defaults')
@@ -50,10 +53,12 @@ test('parse options', function (group) {
       data: 'options.data',
       public: 'options.public',
       bindAddress: 'options.bindAddress',
-      port: 'options.port'
+      port: 'options.port',
+      url: 'options.url'
     })
 
     t.is(config.paths.data, 'options.data', 'uses data option as data path')
+    t.is(config.url, 'options.url', 'sets config.url from options.url')
     t.is(config.paths.public, 'options.public', 'uses public option as public path')
     t.is(config.connection.host, 'options.bindAddress', 'sets config.connection.host from options.bindAddress')
     t.is(config.connection.port, 'options.port', 'sets config.connection.port from options.port')
