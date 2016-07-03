@@ -58,7 +58,7 @@ function buildBundle (config, hoodieClientPath, callback) {
       return callback(error)
     }
 
-    var options = config.client ? JSON.stringify(config.client) : ''
+    var options = config.url ? '{url: "' + config.url + '"}' : ''
     var initBuffer = Buffer('\n\nhoodie = new Hoodie(' + options + ')')
 
     callback(null, Buffer.concat([clientBuffer, initBuffer]))
