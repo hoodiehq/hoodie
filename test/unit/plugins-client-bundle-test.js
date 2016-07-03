@@ -64,13 +64,11 @@ test('bundle client', function (group) {
     })
 
     bundleClient('client.js', 'bundle.js', {
-      client: {
-        foo: 'bar'
-      }
+      url: 'https://myapp.com'
     }, function (error, buffer) {
       t.error(error)
 
-      t.is(buffer.toString(), 'hoodie client content\n\nhoodie = new Hoodie({"foo":"bar"})')
+      t.is(buffer.toString(), 'hoodie client content\n\nhoodie = new Hoodie({url: "https://myapp.com"})')
 
       t.end()
     })
