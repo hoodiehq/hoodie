@@ -111,7 +111,7 @@ test('config', function (group) {
     })
   })
 
-  group.test('if public puth does not exist', function (t) {
+  group.test('if public path does not exist', function (t) {
     var config = {
       paths: {
         public: 'public path'
