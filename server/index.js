@@ -1,12 +1,12 @@
 module.exports = getHoodieServer
 
+var corsHeaders = require('hapi-cors-headers')
 var hapi = require('hapi')
 var log = require('npmlog')
 
 var getConfig = require('./config')
 var registerPlugins = require('./plugins')
 var userDatabases = require('./utils/user-databases')
-var corsHeaders = require('hapi-cors-headers')
 
 function getHoodieServer (options, callback) {
   getConfig(options, function (error, config) {
