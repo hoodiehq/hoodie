@@ -15,7 +15,7 @@
     "@hoodie/admin": "^1.0.1",
     "@hoodie/client": "^5.0.0",
     "@hoodie/store": "^1.0.1",
-    "async": "^1.5.2",
+    "async": "^2.0.0",
     "boom": "^3.1.2",
     "good": "^6.6.3",
     "good-squeeze": "^4.0.0",
