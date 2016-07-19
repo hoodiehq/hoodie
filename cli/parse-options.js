@@ -2,11 +2,8 @@ module.exports = parseOptions
 
 var path = require('path')
 
-var defaultsDeep = require('lodash').defaultsDeep
 var log = require('npmlog')
 var stripUrlAuth = require('strip-url-auth')
-
-var getDefaults = require('./defaults')
 
 /**
  * Parse options into internal config structure.
@@ -24,22 +21,15 @@ var getDefaults = require('./defaults')
  * passe set the `inMemory: true` option. If it’s not set, leveldown is used
  * with the prefix set to `options.data` + 'data' (`.hoodie/data` by default).
  */
-function parseOptions (options, appOptions, callback) {
-  defaultsDeep(options, appOptions)
-
+function parseOptions (options) {
   var config = {
     loglevel: options.loglevel,
     paths: {
       data: options.data,
       public: options.public
     },
-    connection: {
-      host: options.bindAddress,
-      port: options.port
-    }
+    db: {}
   }
-
-  defaultsDeep(config, getDefaults())
 
   log.level = config.loglevel
 

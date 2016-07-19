@@ -5,27 +5,27 @@ var series = require('async').series
 var statSync = require('fs').statSync
 var resolvePath = require('path').resolve
 
+var defaultsDeep = require('lodash').defaultsDeep
 var log = require('npmlog')
 
 var accountConfig = require('./account')
 var assureFolders = require('./assure-folders')
 var couchDbConfig = require('./db/couchdb')
-var getAppOptions = require('./app-options')
 var getDatabaseFactory = require('./db/factory')
-var parseOptions = require('./parse-options')
+var getDefaults = require('./defaults')
 var pouchDbConfig = require('./db/pouchdb')
 var storeConfig = require('./store')
 
-function getConfig (options, callback) {
-  var config = parseOptions(options, getAppOptions())
+function getConfig (config, callback) {
+  defaultsDeep(config, getDefaults())
   var dbConfig = config.db.url ? couchDbConfig : pouchDbConfig
   var state = {
     config: config,
     getDatabase: getDatabaseFactory(config)
   }
 
-  if (options.dbUrl && !parseUrl(options.dbUrl).auth) {
-    return callback('Authentication details missing from database URL: ' + options.dbUrl)
+  if (config.db.url && !parseUrl(config.db.url).auth) {
+    return callback('Authentication details missing from database URL: ' + config.db.url)
   }
 
   // check if app has public folder. Fallback to Hoodie’s public folder if not

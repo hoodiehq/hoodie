@@ -85,7 +85,6 @@ function register (server, options, next) {
 
   // serve app whenever an html page is requested
   // and no other document is available
-  // TODO: do not serve app when request.path starts with `/hoodie/`
   server.ext('onPostHandler', function (request, reply) {
     var response = request.response
 

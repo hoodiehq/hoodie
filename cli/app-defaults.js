@@ -1,9 +1,8 @@
-module.exports = getAppOptions
+module.exports = getAppDefaults
 
 var join = require('path').join
 
-function getAppOptions () {
-  var projectPath = process.cwd()
+function getAppDefaults (projectPath) {
   var pkg = require(join(projectPath, 'package.json'))
   var appOptions = pkg.hoodie || {}
 
