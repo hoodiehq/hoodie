@@ -7,13 +7,13 @@ var pathMock = {
 
 test('app options', function (group) {
   group.test('without hoodie setting', function (t) {
-    var getAppOptions = proxyquire('../../../server/config/app-options', {
+    var getAppDefaults = proxyquire('../../../cli/app-defaults', {
       'path': pathMock,
       './package.json': {
         name: 'pkg-name'
       }
     })
-    var options = getAppOptions()
+    var options = getAppDefaults()
 
     t.deepEqual(options, {name: 'pkg-name'}, 'sets name from pkg.name')
 
@@ -21,7 +21,7 @@ test('app options', function (group) {
   })
 
   group.test('with hoodie.port', function (t) {
-    var getAppOptions = proxyquire('../../../server/config/app-options', {
+    var getAppDefaults = proxyquire('../../../cli/app-defaults', {
       'path': pathMock,
       './package.json': {
         name: 'pkg-name',
@@ -30,7 +30,7 @@ test('app options', function (group) {
         }
       }
     })
-    var options = getAppOptions()
+    var options = getAppDefaults()
 
     t.deepEqual(options.port, 1234, 'sets port from pkg.hoodie.port')
 

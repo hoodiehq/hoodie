@@ -1,48 +1,65 @@
-var url = require('url')
 var zlib = require('zlib')
 
+var Hapi = require('hapi')
 var test = require('tap').test
 
-var hoodieServer = require('../../')
+var hoodie = require('../../').register
+var hapiOptions = {
+  debug: {
+    request: ['error'],
+    log: ['error']
+  }
+}
+var hapiPluginOptions = {
+  register: hoodie,
+  options: {
+    inMemory: true,
+    loglevel: 'error',
+    db: {
+      db: require('memdown')
+    }
+  }
+}
+
+require('npmlog').level = 'error'
 
 test('handle forced gzip', function (group) {
   group.test('receive gzip when gzip accept header sent', function (group) {
-    hoodieServer({
-      inMemory: true,
-      loglevel: 'error'
-    }, function (err, server, config) {
-      group.error(err, 'hoodie loads without error')
+    var server = new Hapi.Server(hapiOptions)
+    server.connection({port: 8090})
+    server.register(hapiPluginOptions, function (error) {
+      group.error(error, 'hoodie loads without error')
 
       server.inject({
-        url: url.resolve(toUrl(config.connection), 'hoodie/info.json'),
+        url: 'http://localhost:8090/hoodie/info.json',
         headers: {'Accept-Encoding': 'gzip, deflate'}
       }, testGzip.bind(null, group, server))
     })
   })
 
   group.test('receive no gzip when no gzip accept header sent', function (group) {
-    hoodieServer({
-      inMemory: true,
-      loglevel: 'error'
-    }, function (err, server, config) {
-      group.error(err, 'hoodie loads without error')
+    var server = new Hapi.Server(hapiOptions)
+    server.connection({port: 8090})
+    server.register(hapiPluginOptions, function (error) {
+      group.error(error, 'hoodie loads without error')
 
-      server.inject({url: url.resolve(toUrl(config.connection), 'hoodie/info.json')}, function (res) {
-        group.notOk(res.headers['content-encoding'])
+      server.inject({
+        url: 'http://localhost:8090/hoodie/info.json'
+      }, function (response) {
+        group.notOk(response.headers['content-encoding'])
         server.stop(group.end)
       })
     })
   })
 
   group.test('receive gzip when gzip accept header sent', function (group) {
-    hoodieServer({
-      inMemory: true,
-      loglevel: 'error'
-    }, function (err, server, config) {
-      group.error(err, 'hoodie loads without error')
+    var server = new Hapi.Server(hapiOptions)
+    server.connection({port: 8090})
+    server.register(hapiPluginOptions, function (error) {
+      group.error(error, 'hoodie loads without error')
 
       server.inject({
-        url: url.resolve(toUrl(config.connection), 'hoodie/info.json?force_gzip=true')
+        url: 'http://localhost:8090/hoodie/info.json?force_gzip=true'
       }, testGzip.bind(null, group, server))
     })
   })
@@ -50,20 +67,12 @@ test('handle forced gzip', function (group) {
   group.end()
 })
 
-function testGzip (group, server, res) {
-  group.is(res.headers['content-encoding'], 'gzip', 'content is gzip encoded')
+function testGzip (group, server, response) {
+  group.is(response.headers['content-encoding'], 'gzip', 'content is gzip encoded')
 
-  zlib.gunzip(res.rawPayload, function (error, udat) {
+  zlib.gunzip(response.rawPayload, function (error, udat) {
     group.error(error, 'gunzips without error')
     group.ok(/hoodie/.test(udat.toString()), 'correct content')
     server.stop(group.end)
-  })
-}
-
-function toUrl (connection) {
-  return url.format({
-    protocol: 'http',
-    hostname: connection.host,
-    port: connection.port
   })
 }

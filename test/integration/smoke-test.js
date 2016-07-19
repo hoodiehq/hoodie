@@ -1,39 +1,48 @@
-var url = require('url')
-
+var Hapi = require('hapi')
 var request = require('request')
 var test = require('tap').test
 
-var hoodieServer = require('../../')
-
-test('smoke test', function (group) {
-  hoodieServer({
+var hoodie = require('../../').register
+var hapiOptions = {
+  debug: {
+    request: ['error'],
+    log: ['error']
+  }
+}
+var hapiPluginOptions = {
+  register: hoodie,
+  options: {
     inMemory: true,
-    loglevel: 'error'
-  }, function (err, server, config) {
-    group.error(err, 'hoodie loads without error')
+    loglevel: 'error',
+    db: {
+      db: require('memdown')
+    }
+  }
+}
 
-    server.start(function (err) {
-      group.error(err, 'hoodie starts without error')
+require('npmlog').level = 'error'
+
+test('smoke test', function (t) {
+  var server = new Hapi.Server(hapiOptions)
+  server.connection({port: 8090})
+
+  server.register(hapiPluginOptions, function (error) {
+    t.error(error, 'loads hoodie plugin without error')
+
+    server.start(function (error) {
+      t.error(error, 'hoodie starts without error')
 
       request({
-        url: url.resolve(toUrl(config.connection), 'hoodie/info.json'),
+        url: 'http://localhost:8090/hoodie/info.json',
         json: true
-      }, function (error, res, data) {
-        group.error(error, 'no error on request')
+      }, function (error, response, data) {
+        t.error(error, 'no error on request')
 
-        group.is(res.statusCode, 200, 'status 200')
-        group.ok(data.hoodie, 'is hoodie')
+        t.is(response.statusCode, 200, 'status 200')
+        t.ok(data.hoodie, 'is hoodie')
 
-        server.stop(group.end)
+        server.stop(t.end)
       })
     })
   })
 })
-
-function toUrl (connection) {
-  return url.format({
-    protocol: 'http',
-    hostname: connection.host,
-    port: connection.port
-  })
-}

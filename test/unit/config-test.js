@@ -6,17 +6,10 @@ var test = require('tap').test
 
 test('config', function (group) {
   group.test('defaults', function (t) {
-    var config = {
-      paths: {
-        public: 'public path'
-      },
-      db: {}
-    }
     var accountConfigMock = simple.stub().callbackWith(null)
     var assureFolders = simple.stub().callbackWith(null)
     var couchDbConfigMock = simple.stub().callbackWith(null)
     var getDatabaseFactoryMock = simple.stub().returnWith('getDatabase')
-    var parseOptionsMock = simple.stub().returnWith(config)
     var appOptionsMock = simple.stub().returnWith('app options')
     var pouchDbConfigMock = simple.stub().callbackWith(null)
     var storeConfigMock = simple.stub().callbackWith(null)
@@ -26,7 +19,6 @@ test('config', function (group) {
       './assure-folders': assureFolders,
       './db/couchdb': couchDbConfigMock,
       './db/factory': getDatabaseFactoryMock,
-      './parse-options': parseOptionsMock,
       './app-options': appOptionsMock,
       './db/pouchdb': pouchDbConfigMock,
       './store': storeConfigMock,
@@ -45,9 +37,6 @@ test('config', function (group) {
         getDatabase: 'getDatabase'
       }
 
-      t.is(parseOptionsMock.lastCall.args[1], 'app options', 'passes app options to parseOptions')
-      t.is(config.paths.public, 'public path', 'sets public path')
-
       t.is(couchDbConfigMock.callCount, 0, 'couchdb config not called')
       t.same(pouchDbConfigMock.lastCall.arg, state, 'called pouchdb config')
       t.same(accountConfigMock.lastCall.arg, state, 'called account config')
@@ -60,20 +49,11 @@ test('config', function (group) {
     })
   })
 
-  group.test('with dbUrl', function (t) {
-    var config = {
-      paths: {
-        public: 'public path'
-      },
-      db: {
-        url: 'http://foo:bar@baz.com'
-      }
-    }
+  group.test('with db.url', function (t) {
     var accountConfigMock = simple.stub().callbackWith(null)
     var assureFolders = simple.stub().callbackWith(null)
     var couchDbConfigMock = simple.stub().callbackWith(null)
     var getDatabaseFactoryMock = simple.stub().returnWith('getDatabase')
-    var parseOptionsMock = simple.stub().returnWith(config)
     var appOptionsMock = simple.stub().returnWith({})
     var pouchDbConfigMock = simple.stub().callbackWith(null)
     var storeConfigMock = simple.stub().callbackWith(null)
@@ -83,7 +63,6 @@ test('config', function (group) {
       './assure-folders': assureFolders,
       './db/couchdb': couchDbConfigMock,
       './db/factory': getDatabaseFactoryMock,
-      './parse-options': parseOptionsMock,
       './app-options': appOptionsMock,
       './db/pouchdb': pouchDbConfigMock,
       './store': storeConfigMock,
@@ -94,7 +73,11 @@ test('config', function (group) {
       }
     })
 
-    getConfig({}, function (error, config) {
+    getConfig({
+      db: {
+        url: 'http://admin:secret@localhost:5984'
+      }
+    }, function (error, config) {
       t.error(error)
 
       var state = {
@@ -112,17 +95,10 @@ test('config', function (group) {
   })
 
   group.test('if public path does not exist', function (t) {
-    var config = {
-      paths: {
-        public: 'public path'
-      },
-      db: {}
-    }
     var accountConfigMock = simple.stub().callbackWith(null)
     var assureFolders = simple.stub().callbackWith(null)
     var couchDbConfigMock = simple.stub().callbackWith(null)
     var getDatabaseFactoryMock = simple.stub().returnWith('getDatabase')
-    var parseOptionsMock = simple.stub().returnWith(config)
     var appOptionsMock = simple.stub().returnWith({})
     var pouchDbConfigMock = simple.stub().callbackWith(null)
     var storeConfigMock = simple.stub().callbackWith(null)
@@ -132,7 +108,6 @@ test('config', function (group) {
       './assure-folders': assureFolders,
       './db/couchdb': couchDbConfigMock,
       './db/factory': getDatabaseFactoryMock,
-      './parse-options': parseOptionsMock,
       './app-options': appOptionsMock,
       './db/pouchdb': pouchDbConfigMock,
       './store': storeConfigMock,
