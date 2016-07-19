@@ -57,12 +57,12 @@ result should look something like this
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "dependencies": {
-    "hoodie": "^22.0.2"
+    "hoodie": "^24.0.0"
   }
 }
 ```
 
-There might be more properties and `22.0.2` will likely be a higher number, but
+There might be more properties and `24.0.0` will likely be a higher number, but
 that’s okay.
 
 Now run `npm start` to start your Hoodie app.
@@ -71,24 +71,104 @@ You can find a more thorough description in our [Getting Started Guide](http://d
 
 ## Usage
 
-Run `npm start -- --help` to see all available CLI options.
+`hoodie` can be used as as CLI (Command Line Interface) or as [hapi plugin](http://hapijs.com/tutorials/plugins).
+The options are slightly different, see below
 
-Options can also be specified as environment variables (prefixed with `hoodie_`) or inside a `.hoodierc` file (json or ini).
-App-specific default values can be set in `package.json` in `"hoodie": {}`, e.g. `"hoodie": {"port": 1234}`.
+### CLI
 
-option        | default       | description
-------------- | ------------- | -------------
-bindAddress   | `'127.0.0.1'` | Address that Hoodie binds to
-data          | `'.hoodie'`   | Data path
-dbUrl         | –             | If provided, uses external CouchDB. URL has to contain credentials.
-inMemory      | `false`       | Whether to start the PouchDB Server in memory
-loglevel      | `'warn'`      | One of: error, warn, info, verbose, silly
-port          | `8080`        | Port-number to run the Hoodie App on
-public        | `'public'`    | path to static assets
-url           | -             | Optional: external URL at which Hoodie Server is accessible
+Once you finished the [setup](#setup), you can start your hoodie server with
 
-Hoodie is using the [rc](https://www.npmjs.com/package/rc) module to retrieve
-configuration from CLI arguments, environment variables and configuration files.
+```
+npm start
+```
+
+To pass CLI options to Hoodie, you have to separate them with `--`, for example:
+
+```
+npm start -- --port=8090 --inMemory
+```
+
+Available CLI options are
+
+option                    | default       | description
+------------------------- | ------------- | -------------
+`--bindAddress`           | `'127.0.0.1'` | Address that Hoodie binds to
+`--data`                  | `'.hoodie'`   | Data path
+`--dbUrl`                 | –             | If provided, uses external CouchDB. URL has to contain credentials.
+`--loglevel`              | `'warn'`      | One of: silent, error, warn, http, info, verbose, silly
+`-m`, `--inMemory`        | `false`       | Whether to start the PouchDB Server in memory
+`--port`                  | `8080`        | Port-number to run the Hoodie App on
+`--public`                | `'public'`    | path to static assets
+`--url`                   | -             | Optional: external URL at which Hoodie Server is accessible (e.g. `http://myhoodieapp.com`)
+`-h`, `--help`, `--usage` | -             | Prints help and available options
+`-v`, `--version`         | -             | Shows Hoodie version
+
+Hoodie CLI is using [rc](#) for configuration, so the same options can be set with environment variables and config files. Environment variables are prefixed with `hoodie_`. Examples: `hoodie_port=8090` or `hoodie_inMemory=true`. Configuration files can be in INI or JSON format and [can be placed at different locations](https://www.npmjs.com/package/rc#standards). Most commonly you would place a `.hoodierc` file in your app’s directory, and it can look like this
+
+```js
+{
+  port: 8090,
+  inMemory: true
+}
+```
+
+The priority of configuration:
+
+1. command line arguments
+2. Environment variables
+3. `.hoodierc` files
+4. Your app’s defaults form `"hoodie"` key in `"package.json"`
+5. Hoodie’s defaults as shown in table above
+
+### hapi plugin
+
+You can load `hoodie` as hapi plugin to use it in your existing hapi application:
+
+```js
+var Hapi = require('hapi')
+var hoodie = require('hoodie').register
+
+var server = new Hapi.Server()
+server.connection({
+  host: 'localhost',
+  port: 8000
+})
+
+server.register({
+  register: hoodie,
+  options: { // pass options here
+    inMemory: true,
+    db: {
+      db: require('memdown')
+    }
+    public: 'dist'
+  }
+}, function (error) {
+  if (error) {
+    throw error
+  }
+
+  server.start(function (error) {
+    if (error) {
+      throw error
+    }
+
+    console.log(('Server running at:', server.info.uri)
+  })
+})
+```
+
+The available options are
+
+option                    | default      | description
+------------------------- | ------------ | -------------
+**paths.data**            | `'.hoodie'`  | Data path
+**paths.public**          | `'public'`   | Public path
+**db**                    | –            | [PouchDB options](https://pouchdb.com/api.html#create_database)
+**inMemory**              | `false`      | If set to true, configuration and other files will not be read from / written to the file system
+**client**                | `{}`         | [Hoodie Client](https://github.com/hoodiehq/hoodie-client#constructor) options. `client.url` is set based on hapi’s `server.info.host`
+**account**               | `{}`         | [Hoodie Account Server](https://github.com/hoodiehq/hoodie-account-server/tree/master/plugin#options) options. `account.admins`, `account.secret` and `account.usersDb` are set based on `db` option above.
+**store**                 | `{}`         | [Hoodie Store Server](https://github.com/hoodiehq/hoodie-store-server#options) options. `store.couchdb`, `store.PouchDB` are set based on `db` option above. `store.hooks.onPreAuth` is set to bind user authentication for Hoodie Account to Hoodie Store.
 
 ## Testing
 
