@@ -1,5 +1,3 @@
-var pathSeperator = require('path').sep
-
 var proxyquire = require('proxyquire')
 var test = require('tap').test
 
@@ -41,7 +39,6 @@ test('parse options', function (group) {
     t.is(config.url, undefined, 'does not set config.url by default')
     t.is(config.paths.data, 'data', 'sets config.paths.data from defaults')
     t.is(config.paths.public, 'public', 'sets config.public.data from defaults')
-    t.is(config.db.prefix, 'data/data' + pathSeperator, 'sets config.db.prefix based on default data path')
 
     t.end()
   })
@@ -79,7 +76,7 @@ test('parse options', function (group) {
       inMemory: true
     })
 
-    t.is(config.db.db, memdownMock, 'Sets config.db.db to memdown')
+    t.is(config.inMemory, true, 'Sets config.inMemory to true')
 
     t.end()
   })
