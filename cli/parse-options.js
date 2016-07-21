@@ -1,9 +1,6 @@
 module.exports = parseOptions
 
-var path = require('path')
-
 var log = require('npmlog')
-var stripUrlAuth = require('strip-url-auth')
 
 /**
  * Parse options into internal config structure.
@@ -39,17 +36,9 @@ function parseOptions (options) {
 
   if (options.dbUrl) {
     config.db.url = options.dbUrl
-    log.info('config', 'Connecting to CouchDB at ' + stripUrlAuth(options.dbUrl))
-  } else {
-    if (options.inMemory) {
-      log.info('config', 'Storing all data in memory only')
-      config.db.db = require('memdown')
-      config.inMemory = true
-    } else {
-      config.db.prefix = path.join(config.paths.data, 'data' + path.sep)
-      log.info('config', 'No CouchDB URL provided, falling back to PouchDB')
-      log.info('config', 'Writing PouchDB database files to ' + config.db.prefix)
-    }
+  }
+  if (options.inMemory) {
+    config.inMemory = true
   }
 
   return config

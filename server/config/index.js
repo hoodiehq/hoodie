@@ -1,12 +1,12 @@
 module.exports = getConfig
 
 var parseUrl = require('url').parse
-var series = require('async').series
 var statSync = require('fs').statSync
-var resolvePath = require('path').resolve
+var path = require('path')
 
 var defaultsDeep = require('lodash').defaultsDeep
 var log = require('npmlog')
+var series = require('async').series
 
 var accountConfig = require('./account')
 var assureFolders = require('./assure-folders')
@@ -18,6 +18,18 @@ var storeConfig = require('./store')
 
 function getConfig (config, callback) {
   defaultsDeep(config, getDefaults())
+
+  if (!config.db.url) {
+    if (config.inMemory) {
+      log.info('config', 'Storing all data in memory only')
+      config.db.db = require('memdown')
+    } else {
+      config.db.prefix = path.join(config.paths.data, 'data' + path.sep)
+      log.info('config', 'No CouchDB URL provided, falling back to PouchDB')
+      log.info('config', 'Writing PouchDB database files to ' + config.db.prefix)
+    }
+  }
+
   var dbConfig = config.db.url ? couchDbConfig : pouchDbConfig
   var state = {
     config: config,
@@ -32,7 +44,7 @@ function getConfig (config, callback) {
   try {
     statSync(config.paths.public).isDirectory()
   } catch (err) {
-    config.paths.public = resolvePath(__dirname, '../../public')
+    config.paths.public = path.resolve(__dirname, '../../public')
     log.info('config', 'The "public" app path does not exist. Serving ' + config.paths.public)
   }
 
