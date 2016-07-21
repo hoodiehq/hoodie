@@ -103,7 +103,7 @@ option                    | default       | description
 `-h`, `--help`, `--usage` | -             | Prints help and available options
 `-v`, `--version`         | -             | Shows Hoodie version
 
-Hoodie CLI is using [rc](#) for configuration, so the same options can be set with environment variables and config files. Environment variables are prefixed with `hoodie_`. Examples: `hoodie_port=8090` or `hoodie_inMemory=true`. Configuration files can be in INI or JSON format and [can be placed at different locations](https://www.npmjs.com/package/rc#standards). Most commonly you would place a `.hoodierc` file in your app’s directory, and it can look like this
+Hoodie CLI is using [rc](https://www.npmjs.com/package/rc) for configuration, so the same options can be set with environment variables and config files. Environment variables are prefixed with `hoodie_`. Examples: `hoodie_port=8090` or `hoodie_inMemory=true`. Configuration files can be in INI or JSON format and [can be placed at different locations](https://www.npmjs.com/package/rc#standards). Most commonly you would place a `.hoodierc` file in your app’s directory, and it can look like this
 
 ```js
 {
