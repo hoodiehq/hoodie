@@ -1,7 +1,7 @@
 module.exports = bundleClient
 
+var EventEmitter = require('events').EventEmitter
 var fs = require('fs')
-
 var parallel = require('async').parallel
 
 /**
@@ -52,15 +52,22 @@ function getModifiedTime (path, callback) {
 }
 
 function buildBundle (config, hoodieClientPath, callback) {
-  fs.readFile(hoodieClientPath, function (error, clientBuffer) {
-    /* istanbul ignore if */
-    if (error) {
-      return callback(error)
-    }
+  var browserify = require('browserify')([], {
+    standalone: 'Hoodie'
+  })
+
+  browserify.require(hoodieClientPath)
+
+  var bundleEE = new EventEmitter()
+
+  bundleEE.on('done', function (error, buffer) {
+    if (error) throw error
 
     var options = config.url ? '{url: "' + config.url + '"}' : ''
     var initBuffer = Buffer('\n\nhoodie = new Hoodie(' + options + ')')
 
-    callback(null, Buffer.concat([clientBuffer, initBuffer]))
+    callback(null, Buffer.concat([buffer, initBuffer]))
   })
+
+  browserify.bundle(bundleEE.emit.bind(bundleEE, 'done'))
 }

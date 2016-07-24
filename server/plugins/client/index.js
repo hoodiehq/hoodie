@@ -12,7 +12,7 @@ var log = require('npmlog')
 
 function register (server, options, next) {
   var hoodieClientModulePath = path.dirname(require.resolve('@hoodie/client/package.json'))
-  var hoodieClientPath = path.join(hoodieClientModulePath, 'dist/hoodie.js')
+  var hoodieClientPath = path.join(hoodieClientModulePath, 'index.js')
   var bundleTargetPath = path.join(options.config.paths.data, 'client.js')
   var bundlePromise
 

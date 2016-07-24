@@ -17,6 +17,7 @@
     "@hoodie/store": "^1.0.1",
     "async": "^2.0.0",
     "boom": "^3.1.2",
+    "browserify": "^13.0.1",
     "good": "^6.6.3",
     "good-squeeze": "^4.0.0",
     "h2o2": "^5.1.0",

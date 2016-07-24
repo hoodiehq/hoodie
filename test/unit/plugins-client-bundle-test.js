@@ -23,10 +23,17 @@ test('bundle client', function (group) {
   })
 
   group.test('bundle does not exist', function (t) {
-    var readFileMock = simple.stub().callbackWith(null, new Buffer('hoodie client content'))
+    var bundleMock = simple.stub().callbackWith(null, new Buffer('hoodie client content'))
+    var requireMock = simple.stub()
+
     var bundleClient = proxyquire('../../server/plugins/client/bundle', {
+      browserify: function () {
+        return {
+          bundle: bundleMock,
+          require: requireMock
+        }
+      },
       fs: {
-        readFile: readFileMock,
         stat: simple.stub().callFn(function (path, callback) {
           if (path === 'client.js') {
             return callback(null, {mtime: new Date()})
@@ -40,8 +47,8 @@ test('bundle client', function (group) {
     bundleClient('client.js', 'bundle.js', {}, function (error, buffer) {
       t.error(error)
 
-      t.is(readFileMock.callCount, 1, 'readFile called once')
-      t.is(readFileMock.lastCall.arg, 'client.js', 'read bundle')
+      t.is(requireMock.lastCall.arg, 'client.js', 'require client')
+      t.is(bundleMock.callCount, 1, 'bundle called once')
       t.is(buffer.toString(), 'hoodie client content\n\nhoodie = new Hoodie()')
 
       t.end()
@@ -49,10 +56,17 @@ test('bundle client', function (group) {
   })
 
   group.test('with client options', function (t) {
-    var readFileMock = simple.stub().callbackWith(null, new Buffer('hoodie client content'))
+    var bundleMock = simple.stub().callbackWith(null, new Buffer('hoodie client content'))
+    var requireMock = simple.stub()
+
     var bundleClient = proxyquire('../../server/plugins/client/bundle', {
+      browserify: function () {
+        return {
+          bundle: bundleMock,
+          require: requireMock
+        }
+      },
       fs: {
-        readFile: readFileMock,
         stat: simple.stub().callFn(function (path, callback) {
           if (path === 'client.js') {
             return callback(null, {mtime: new Date()})
