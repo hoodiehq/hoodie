@@ -73,6 +73,6 @@
     "postsemantic-release": "npm run coverage",
     "start": "./bin/start.js",
     "pretest": "standard",
-    "test": "nyc tap --no-cov ./test/{unit,integration}/{**,**/**}-test.js"
+    "test": "nyc tap --no-cov './test/{unit,integration}/**/*-test.js'"
   }
 }
