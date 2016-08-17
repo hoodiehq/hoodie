@@ -3,14 +3,50 @@ module.exports.register.attributes = {
   name: 'hoodie'
 }
 
-var corsHeaders = require('hapi-cors-headers')
+var path = require('path')
+var urlParse = require('url').parse
 
-var getConfig = require('./config')
+var corsHeaders = require('hapi-cors-headers')
+var hoodieServer = require('@hoodie/server').register
+var log = require('npmlog')
+var PouchDB = require('pouchdb-core')
+
 var registerPlugins = require('./plugins')
-var userDatabases = require('./utils/user-databases')
 
 function register (server, options, next) {
-  getConfig(options, function (error, config) {
+  if (!options.db) {
+    options.db = {}
+  }
+
+  if (!options.db.url) {
+    if (options.inMemory) {
+      PouchDB.plugin(require('pouchdb-adapter-memory'))
+      log.info('config', 'Storing all data in memory only')
+    } else {
+      PouchDB.plugin(require('pouchdb-adapter-leveldb'))
+      options.db.prefix = path.join(options.paths.data, 'data' + path.sep)
+      log.info('config', 'No CouchDB URL provided, falling back to PouchDB')
+      log.info('config', 'Writing PouchDB database files to ' + options.db.prefix)
+    }
+  }
+
+  if (options.db.url) {
+    if (!urlParse(options.db.url).auth) {
+      return next(new Error('Authentication details missing from database URL: ' + options.db.url))
+    }
+
+    PouchDB.plugin(require('pouchdb-adapter-http'))
+    options.db.prefix = options.db.url
+    delete options.db.url
+  }
+
+  options.PouchDB = PouchDB.defaults(options.db)
+  delete options.db
+
+  server.register({
+    register: hoodieServer,
+    options: options
+  }, function (error) {
     if (error) {
       return next(error)
     }
@@ -19,16 +55,12 @@ function register (server, options, next) {
       sandbox: 'plugin'
     })
 
-    registerPlugins(server, config, function (error) {
+    registerPlugins(server, options, function (error) {
       if (error) {
         return next(error)
       }
 
-      // add / remove user databases on signups / account deletions
-      server.plugins.account.api.accounts.on('add', userDatabases.add.bind(null, config, server))
-      server.plugins.account.api.accounts.on('remove', userDatabases.remove.bind(null, config, server))
-
-      next(null, server, config)
+      next(null, server, options)
     })
   })
 }

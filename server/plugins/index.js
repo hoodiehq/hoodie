@@ -7,10 +7,7 @@ function registerPlugins (server, config, callback) {
     config: config
   }
   var hapiPlugins = [
-    require('h2o2'),
-    require('inert'),
-    require('vision'),
-    require('lout')
+    require('inert')
   ]
   var localPlugins = [
     require('./client'),
@@ -23,19 +20,9 @@ function registerPlugins (server, config, callback) {
       register: register
     }
   })
-  var hoodieCorePlugins = ['account', 'store'].map(function (name) {
-    return {
-      register: require('@hoodie/' + name),
-      options: config[name],
-      routes: {
-        prefix: '/hoodie/' + name + '/api'
-      }
-    }
-  })
-  var plugins = hapiPlugins.concat(localPlugins, hoodieCorePlugins)
 
   log.silly('hapi', 'Registering internal plugins')
-  server.register(plugins, function (error) {
+  server.register(hapiPlugins.concat(localPlugins), function (error) {
     if (error) {
       return callback(error)
     }
