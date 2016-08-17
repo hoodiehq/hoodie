@@ -2,20 +2,16 @@
 
 # hoodie/server
 
-After [installing hoodie](../#setup), `npm start` will run [bin/start.js](../bin/start.js)
+After [installing hoodie](../#setup), `npm start` will run [cli/index.js](../cli/start.js)
 which reads out [configuration](../#usage) from all the different places using
 the [rc](https://www.npmjs.com/package/rc) package, then passes it as options to
-`getHoodieServer`, the main function returned by this package, defined in
-[server/index.js](index.js).
+[server/index.js](../server/index.js), the Hoodie core [hapi plugin](http://hapijs.com).
 
-Hoodie is built on [Hapi](http://hapijs.com).
-
-In `getHoodieServer` the passed options are amended with defaults and parsed
-into configuration for the Hapi server and the core modules (see [architecture](#architecture)).
-For example, [hoodie-account-server](https://github.com/hoodiehq/hoodie-account-server)
-and [hoodie-store-server](https://github.com/hoodiehq/hoodie-store-server) require
-different options, which are extracted from options and stored in `config.account`
-and `config.store` respectively.
+In [server/index.js](../server/index.js) the passed options are amended with defaults and parsed
+into configuration for the Hapi server. It passes the configuration on to [hoodie-server]('#hoodie-server'),
+which combines the core server modules. It also bundles the Hoodie client on first request to `/hoodie/client.js`
+and passes in the configuration for the client. It also makes the app’s `public` folder accessible at
+the `/` root path, and Hoodie’s Core UIs at `/hoodie/admin`, `/hoodie/account` and `/hoodie/store`.
 
 Hoodie uses [CouchDB](https://couchdb.apache.org/) for data persistence and
 authentication. If `options.dbUrl` is not set, it falls back to [PouchDB](https://pouchdb.com/).
@@ -23,10 +19,8 @@ authentication. If `options.dbUrl` is not set, it falls back to [PouchDB](https:
 Once all configuration is taken care of, the internal plugins are initialised
 (see [server/plugins/index.js](plugins/index.js)). We define simple Hapi plugins
 for [logging](plugins/log.js) and for [serving the app’s public assets and the Hoodie client](plugins/public.js).
-We also load the core modules and register them with the Hapi server.
 
-Once everything is setup, `getHoodieServer` runs the callback and passes the
-Hapi `server` instance. The server is then started at the end of [bin/start.js](../bin/start.js)
+Once everything is setup, the server is then started at the end of [cli/start.js](../cli/start.js)
 and the URL where hoodie is running is logged to the terminal.
 
 ## Architecture
@@ -34,11 +28,10 @@ and the URL where hoodie is running is logged to the terminal.
 Hoodie is a server built on top of [hapi](http://hapijs.com) with frontend APIs
 for account and store related tasks.
 
-1. ## account [:octocat:](https://github.com/hoodiehq/hoodie-account#readme) [![Build Status](https://travis-ci.org/hoodiehq/hoodie-account.svg?branch=master)](https://travis-ci.org/hoodiehq/hoodie-account) [![Dependency Status](https://david-dm.org/hoodiehq/hoodie-account.svg)](https://david-dm.org/hoodiehq/hoodie-account)
+1. ## server [:octocat:](https://github.com/hoodiehq/hoodie-server#readme) [![Build Status](https://travis-ci.org/hoodiehq/hoodie-server.svg?branch=master)](https://travis-ci.org/hoodiehq/hoodie-server) [![Coverage Status](https://coveralls.io/repos/hoodiehq/hoodie-server/badge.svg?branch=master)](https://coveralls.io/r/hoodiehq/hoodie-server?branch=master) [![Dependency Status](https://david-dm.org/hoodiehq/hoodie-server.svg)](https://david-dm.org/hoodiehq/hoodie-server)
 
-   > Hoodie’s account core module. It combines [account-client](https://github.com/hoodiehq/hoodie-account-client),
-     [account-server](https://github.com/hoodiehq/hoodie-account-server) and
-     exposes a generic account UI.
+   > Hoodie’s core server logic as hapi plugin. It integrates Hoodie’s server
+     core modules: [account-server](https://github.com/hoodiehq/hoodie-account-server), [store-server](https://github.com/hoodiehq/hoodie-store-server)
 
    1. ### account-server [:octocat:](https://github.com/hoodiehq/hoodie-account-server#readme) [![Build Status](https://api.travis-ci.org/hoodiehq/hoodie-account-server.svg?branch=master)](https://travis-ci.org/hoodiehq/hoodie-account-server) [![Coverage Status](https://coveralls.io/repos/hoodiehq/hoodie-account-server/badge.svg?branch=master)](https://coveralls.io/r/hoodiehq/hoodie-account-server?branch=master) [![Dependency Status](https://david-dm.org/hoodiehq/hoodie-account-server.svg)](https://david-dm.org/hoodiehq/hoodie-account-server)
 
@@ -47,31 +40,16 @@ for account and store related tasks.
         exposes a corresponding API at `server.plugins.account.api.*`,
         persisting user accounts using [PouchDB](https://pouchdb.com).
 
-   2. ### account-client [:octocat:](https://github.com/hoodiehq/hoodie-account-client#readme) [![Build Status](https://travis-ci.org/hoodiehq/hoodie-account-client.svg?branch=master)](https://travis-ci.org/hoodiehq/hoodie-account-client) [![Coverage Status](https://coveralls.io/repos/hoodiehq/hoodie-account-client/badge.svg?branch=master)](https://coveralls.io/r/hoodiehq/hoodie-account-client?branch=master) [![Dependency Status](https://david-dm.org/hoodiehq/hoodie-account-client.svg)](https://david-dm.org/hoodiehq/hoodie-account-client)
-
-      > [see below](#account-client)
-
-2. ## store [:octocat:](https://github.com/hoodiehq/hoodie-store#readme) [![Build Status](https://travis-ci.org/hoodiehq/hoodie-store.svg?branch=master)](https://travis-ci.org/hoodiehq/hoodie-store) [![Dependency Status](https://david-dm.org/hoodiehq/hoodie-store.svg)](https://david-dm.org/hoodiehq/hoodie-store)
-
-   > Hoodie’s store core module. It combines [store-client](https://github.com/hoodiehq/hoodie-store-client),
-     [store-server](https://github.com/hoodiehq/hoodie-store-server) and exposes
-      a generic store UI.
-
-
-   1. ### store-server [:octocat:](https://github.com/hoodiehq/hoodie-store-server#readme) [![Build Status](https://travis-ci.org/hoodiehq/hoodie-store-server.svg?branch=master)](https://travis-ci.org/hoodiehq/hoodie-store-server) [![Coverage Status](https://coveralls.io/repos/hoodiehq/hoodie-store-server/badge.svg?branch=master)](https://coveralls.io/r/hoodiehq/hoodie-store-server?branch=master) [![Dependency Status](https://david-dm.org/hoodiehq/hoodie-store-server.svg)](https://david-dm.org/hoodiehq/hoodie-store-server)
+   2. ### store-server [:octocat:](https://github.com/hoodiehq/hoodie-store-server#readme) [![Build Status](https://travis-ci.org/hoodiehq/hoodie-store-server.svg?branch=master)](https://travis-ci.org/hoodiehq/hoodie-store-server) [![Coverage Status](https://coveralls.io/repos/hoodiehq/hoodie-store-server/badge.svg?branch=master)](https://coveralls.io/r/hoodiehq/hoodie-store-server?branch=master) [![Dependency Status](https://david-dm.org/hoodiehq/hoodie-store-server.svg)](https://david-dm.org/hoodiehq/hoodie-store-server)
 
       > [Hapi](http://hapijs.com/) plugin that implements [CouchDB’s Document API](https://wiki.apache.org/couchdb/HTTP_Document_API).
-        Compatible with [CouchDB](https://couchdb.apache.org/) and [PouchDB](https://pouchdb.com/)
-        for persistence.
+        Compatible with [CouchDB](https://couchdb.apache.org/)
+        and [PouchDB](https://pouchdb.com/) for persistence.
 
-   2. ### store-client [:octocat:](https://github.com/hoodiehq/hoodie-store-client#readme) [![Build Status](https://travis-ci.org/hoodiehq/hoodie-store-client.svg?branch=master)](https://travis-ci.org/hoodiehq/hoodie-store-client) [![Coverage Status](https://coveralls.io/repos/hoodiehq/hoodie-store-client/badge.svg?branch=master)](https://coveralls.io/r/hoodiehq/hoodie-store-client?branch=master) [![Dependency Status](https://david-dm.org/hoodiehq/hoodie-store-client.svg)](https://david-dm.org/hoodiehq/hoodie-store-client)
-
-      > [see below](#store-client)
-
-3. ## client [:octocat:](https://github.com/hoodiehq/hoodie-client#readme) [![Build Status](https://travis-ci.org/hoodiehq/hoodie-client.svg?branch=master)](https://travis-ci.org/hoodiehq/hoodie-client) [![Coverage Status](https://coveralls.io/repos/hoodiehq/hoodie-client/badge.svg?branch=master)](https://coveralls.io/r/hoodiehq/hoodie-client?branch=master) [![Dependency Status](https://david-dm.org/hoodiehq/hoodie-client.svg)](https://david-dm.org/hoodiehq/hoodie-client)
+2. ## client [:octocat:](https://github.com/hoodiehq/hoodie-client#readme) [![Build Status](https://travis-ci.org/hoodiehq/hoodie-client.svg?branch=master)](https://travis-ci.org/hoodiehq/hoodie-client) [![Coverage Status](https://coveralls.io/repos/hoodiehq/hoodie-client/badge.svg?branch=master)](https://coveralls.io/r/hoodiehq/hoodie-client?branch=master) [![Dependency Status](https://david-dm.org/hoodiehq/hoodie-client.svg)](https://david-dm.org/hoodiehq/hoodie-client)
 
    > Hoodie’s front-end client for the browser. It integrates Hoodie’s client
-     core modules: [account-client](https://github.com/hoodiehq/hoodie-account-client), [store-client](https://github.com/hoodiehq/hoodie-store),
+     core modules: [account-client](https://github.com/hoodiehq/hoodie-account-client), [store-client](https://github.com/hoodiehq/hoodie-store-client),
      [connection-status](https://github.com/hoodiehq/hoodie-connection-status)
      and [log](https://github.com/hoodiehq/hoodie-log)
 
@@ -110,7 +88,17 @@ for account and store related tasks.
       > JavaScript library for logging to the browser console. If available, it
         takes advantage of [CSS-based styling of console log outputs](https://developer.mozilla.org/en-US/docs/Web/API/Console#Styling_console_output).
 
-4. ## admin [:octocat:](https://github.com/hoodiehq/hoodie-admin#readme) [![Build Status](https://travis-ci.org/hoodiehq/hoodie-admin.svg?branch=master)](https://travis-ci.org/hoodiehq/hoodie-admin) [![Dependency Status](https://david-dm.org/hoodiehq/hoodie-admin.svg)](https://david-dm.org/hoodiehq/hoodie-admin)
+3. ## account [:octocat:](https://github.com/hoodiehq/hoodie-account#readme) [![Build Status](https://travis-ci.org/hoodiehq/hoodie-account.svg?branch=master)](https://travis-ci.org/hoodiehq/hoodie-account) [![Dependency Status](https://david-dm.org/hoodiehq/hoodie-account.svg)](https://david-dm.org/hoodiehq/hoodie-account)
+
+   > Hoodie’s account core module. It combines [account-client](account-client),
+     [account-server](#account-server) and exposes a generic account UI.
+
+4. ## store [:octocat:](https://github.com/hoodiehq/hoodie-store#readme) [![Build Status](https://travis-ci.org/hoodiehq/hoodie-store.svg?branch=master)](https://travis-ci.org/hoodiehq/hoodie-store) [![Dependency Status](https://david-dm.org/hoodiehq/hoodie-store.svg)](https://david-dm.org/hoodiehq/hoodie-store)
+
+   > Hoodie’s store core module. It combines [store-client](#store-client),
+     [store-server](#store-server) and exposes a generic store UI.
+
+5. ## admin [:octocat:](https://github.com/hoodiehq/hoodie-admin#readme) [![Build Status](https://travis-ci.org/hoodiehq/hoodie-admin.svg?branch=master)](https://travis-ci.org/hoodiehq/hoodie-admin) [![Dependency Status](https://david-dm.org/hoodiehq/hoodie-admin.svg)](https://david-dm.org/hoodiehq/hoodie-admin)
 
    > Hoodie’s built-in Admin Dashboard, built with [Ember.js](http://emberjs.com)
 
