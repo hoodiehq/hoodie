@@ -1,4 +1,4 @@
-var proxyquire = require('proxyquire')
+var proxyquire = require('proxyquire').noCallThru()
 var test = require('tap').test
 
 var getDefaultsMock = function () {
@@ -16,15 +16,10 @@ var getDefaultsMock = function () {
 }
 getDefaultsMock['@noCallThru'] = true
 var logMock = {
-  '@noCallThru': true,
   info: function () {}
-}
-var memdownMock = {
-  '@noCallThru': true
 }
 
 var parseOptions = proxyquire('../../../cli/parse-options', {
-  'memdown': memdownMock,
   'npmlog': logMock,
   './defaults': getDefaultsMock
 })

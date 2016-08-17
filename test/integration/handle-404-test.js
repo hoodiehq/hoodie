@@ -6,10 +6,7 @@ var hapiPluginOptions = {
   register: hoodie,
   options: {
     inMemory: true,
-    loglevel: 'error',
-    db: {
-      db: require('memdown')
-    }
+    loglevel: 'error'
   }
 }
 
