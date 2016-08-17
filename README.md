@@ -138,9 +138,6 @@ server.register({
   register: hoodie,
   options: { // pass options here
     inMemory: true,
-    db: {
-      db: require('memdown')
-    }
     public: 'dist'
   }
 }, function (error) {
