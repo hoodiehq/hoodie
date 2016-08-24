@@ -43,7 +43,7 @@
     "request": "^2.72.0",
     "semantic-release": "^6.2.1",
     "simple-mock": "^0.7.0",
-    "standard": "^7.0.0",
+    "standard": "^8.0.0",
     "tap": "^6.1.0"
   },
   "engines": {
