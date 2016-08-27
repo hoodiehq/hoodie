@@ -24,6 +24,19 @@ function register (server, options, next) {
       log.info('config', 'Storing all data in memory only')
     } else {
       PouchDB.plugin(require('pouchdb-adapter-leveldb'))
+
+      // this is a temporary workaround until we replace options.db with options.PouchDB:
+      // https://github.com/hoodiehq/hoodie/issues/555
+      if (!options.paths) {
+        options.paths = {
+          data: '.hoodie',
+          public: 'public'
+        }
+      }
+      if (!options.paths.data) {
+        options.paths.data = '.hoodie'
+      }
+
       options.db.prefix = path.join(options.paths.data, 'data' + path.sep)
       log.info('config', 'No CouchDB URL provided, falling back to PouchDB')
       log.info('config', 'Writing PouchDB database files to ' + options.db.prefix)
