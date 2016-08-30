@@ -32,6 +32,19 @@ test('server with options.db.url lacking auth', function (t) {
   })
 })
 
+test('does not modify the passed options object', function (t) {
+  var options = {
+    db: {
+      url: 'http://admin:admin@localhost:5984'
+    }
+  }
+
+  hapiPlugin.register(serverMock, options, function () {})
+
+  t.is(options.db.url, 'http://admin:admin@localhost:5984')
+  t.end()
+})
+
 test('server with empty options (#554)', function (t) {
   hapiPlugin.register(serverMock, {}, function (error, config) {
     t.error(error)
