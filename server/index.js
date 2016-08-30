@@ -10,12 +10,12 @@ var corsHeaders = require('hapi-cors-headers')
 var hoodieServer = require('@hoodie/server').register
 var log = require('npmlog')
 var PouchDB = require('pouchdb-core')
-var cloneDeep = require('lodash').cloneDeep
+var _ = require('lodash')
 
 var registerPlugins = require('./plugins')
 
 function register (server, options, next) {
-  options = cloneDeep(options)
+  options = _.cloneDeep(options)
   if (!options.db) {
     options.db = {}
   }
