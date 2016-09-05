@@ -30,7 +30,7 @@
     "pouchdb-adapter-http": "^5.4.5",
     "pouchdb-adapter-leveldb": "^5.4.5",
     "pouchdb-adapter-memory": "^5.4.5",
-    "pouchdb-core": "^5.4.5",
+    "pouchdb-core": "^6.0.4",
     "rc": "^1.1.6",
     "semver": "^5.1.0",
     "yargs": "^5.0.0"
