@@ -14,7 +14,7 @@
     "@hoodie/account": "^2.0.0",
     "@hoodie/admin": "^1.0.1",
     "@hoodie/client": "^5.0.0",
-    "@hoodie/server": "^20.0.0",
+    "@hoodie/server": "^21.1.0",
     "@hoodie/store": "^1.0.1",
     "async": "^2.0.0",
     "browserify": "^13.0.1",
