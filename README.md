@@ -10,8 +10,11 @@
 <table>
   <tr>
     <td>
+       <a href="https://hacktoberfest.digitalocean.com/"><img height="200" src="https://dl.dropboxusercontent.com/u/732913/hacktoberfest.png"
+ alt="Hacktoberfest 2016 Banner"align="right" /></a>
       <a href="http://hood.ie/animals/#low-profile-dog"><img src="https://avatars1.githubusercontent.com/u/1888826?v=3&s=200"
  alt="The Low-Profile Dog Hoodie Mascot" title="The Low-Profile Dog Hoodie Mascot" align="right" /></a>
+
  
       <h2> Hallo <a href="https://hacktoberfest.digitalocean.com/">Hacktoberfest</a> Friends 🐶👋</h2>
       
