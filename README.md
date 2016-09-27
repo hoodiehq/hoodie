@@ -7,8 +7,21 @@
 [![Dependency Status](https://david-dm.org/hoodiehq/hoodie.svg)](https://david-dm.org/hoodiehq/hoodie)
 [![devDependency Status](https://david-dm.org/hoodiehq/hoodie/dev-status.svg)](https://david-dm.org/hoodiehq/hoodie#info=devDependencies)
 
-<a href="http://hood.ie/animals/#low-profile-dog"><img src="https://avatars1.githubusercontent.com/u/1888826?v=3&s=200"
+<table>
+  <tr>
+    <td>
+      <a href="http://hood.ie/animals/#low-profile-dog"><img src="https://avatars1.githubusercontent.com/u/1888826?v=3&s=200"
  alt="The Low-Profile Dog Hoodie Mascot" title="The Low-Profile Dog Hoodie Mascot" align="right" /></a>
+ 
+      <h2> Hallo <a href="https://hacktoberfest.digitalocean.com/">Hacktoberfest</a> Friends 🐶👋</h2>
+      
+      <p>
+        We have some great issues prepared for you to work on, check out our <a href="https://github.com/hoodiehq/camp/issues">Hoodie Camp</a> repository :) If you have any questions or just want to say hi, please ping us <a href="https://twitter.com/hoodiehq">on Twitter</a> or join our <a href="http://hood.ie/chat/">Chat</a>. We are looking forward to meet you all! Happy hacktobering!  🙌💻
+      </p>
+    </td>
+  </tr>
+</table>
+
 
 Hoodie lets you build apps [without _thinking_ about the backend](http://nobackend.org/)
 and makes sure that they work great [independent from connectivity](http://offlinefirst.org/).
