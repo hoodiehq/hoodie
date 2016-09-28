@@ -13,7 +13,8 @@ function registerPlugins (server, config, callback) {
     require('./client'),
     require('./logger'),
     require('./maybe-force-gzip'),
-    require('./public')
+    require('./public'),
+    require('./repl')
   ].map(function (register) {
     return {
       options: options,
