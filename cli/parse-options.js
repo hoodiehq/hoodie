@@ -37,8 +37,13 @@ function parseOptions (options) {
   if (options.dbUrl) {
     config.db.url = options.dbUrl
   }
+
   if (options.inMemory) {
     config.inMemory = true
+  }
+
+  if (options.console) {
+    config.console = true
   }
 
   return config

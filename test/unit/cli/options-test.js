@@ -14,6 +14,7 @@ var yargsApi = {
   'epilogue',
   'help',
   'options',
+  'command',
   'showHelpOnFail',
   'version',
   'terminalWidth',
