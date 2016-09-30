@@ -33,7 +33,7 @@
     "pouchdb-core": "^6.0.4",
     "rc": "^1.1.6",
     "semver": "^5.1.0",
-    "yargs": "^5.0.0"
+    "yargs": "^6.0.0"
   },
   "devDependencies": {
     "coveralls": "^2.11.9",
