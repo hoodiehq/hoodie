@@ -1,0 +1,44 @@
+body {
+  background-color:#FCFCFC;
+  animation-name: graytocolorimg;
+  animation-duration: 4s;
+}
+h1 {
+  font-family:Helvetica, Arial, sans-serif;
+  color:#e94e1b;
+  text-align:center;
+  letter-spacing:2px;
+  font-size:39px;
+}
+.info {
+  margin-left:10%;
+  margin-right:10%;
+  background-color: white;
+  border-radius:25px;
+  padding: 20px;
+  border: 1px solid lightgray;
+  font-family: sans-serif;
+}
+#doggy {
+  text-align:center;
+}
+h2 {
+  color:#e94e1b;
+  letter-spacing: 2px;
+}
+code {
+  background-color:#ECECEC;
+  padding:3px;
+}
+a {
+  color:orange;
+  text-decoration:none;
+}
+ol {
+  line-height:3em;
+}
+
+@keyframes graytocolorimg {
+  from {filter: grayscale(100%);}
+  to {filter: grayscale(0%);}
+}
