@@ -2,6 +2,8 @@ var proxyquire = require('proxyquire').noCallThru()
 var simple = require('simple-mock')
 var test = require('tap').test
 
+require('npmlog').level = 'error'
+
 test('bundle client', function (group) {
   group.test('client & bundle with same mtime', function (t) {
     var readFileMock = simple.stub().callbackWith(null, new Buffer('bundle content'))
@@ -101,6 +103,27 @@ test('bundle client', function (group) {
 
       t.end()
     })
+  })
+
+  group.test('browserify.build failing throws error', function (t) {
+    var error = new Error('TestError')
+
+    var bundleClient = proxyquire('../../server/plugins/client/bundle', {
+      browserify: function () {
+        return {
+          bundle: simple.stub().callbackWith(error),
+          require: simple.stub()
+        }
+      },
+      async: {
+        parallel: simple.stub().callbackWith(null, [2, 1])
+      }
+    })
+
+    t.throws(function () {
+      bundleClient('client.js', 'bundle.js', {}, simple.stub())
+    }, error)
+    t.end()
   })
 
   group.end()
