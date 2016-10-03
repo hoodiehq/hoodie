@@ -108,7 +108,7 @@ Available CLI options are
 
 option                    | default       | description
 ------------------------- | ------------- | -------------
-`--bindAddress`           | `'127.0.0.1'` | Address that Hoodie binds to
+`--address`               | `'127.0.0.1'` | Address to which Hoodie binds
 `--data`                  | `'.hoodie'`   | Data path
 `--dbUrl`                 | –             | If provided, uses external CouchDB. URL has to contain credentials.
 `--loglevel`              | `'warn'`      | One of: silent, error, warn, http, info, verbose, silly
