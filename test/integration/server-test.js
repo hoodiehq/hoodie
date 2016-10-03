@@ -51,3 +51,34 @@ test('server with empty options (#554)', function (t) {
     t.end()
   })
 })
+
+test('paths without data-attribute', function (t) {
+  var options = {
+    paths: {
+      public: 'public'
+    }
+  }
+
+  hapiPlugin.register(serverMock, options, function (error, server, options) {
+    t.error(error)
+    t.is(options.paths.data, '.hoodie', 'Sets .hoodie as standard paths.data if not given')
+    t.end()
+  })
+})
+
+test('error on register is passed to callback', function (t) {
+  var serverErrorMock = {
+    register: simple.stub().callbackWith(new Error()),
+    ext: simple.stub()
+  }
+
+  hapiPlugin.register(serverErrorMock, {
+    paths: {
+      data: '.'
+    }
+  }, function (error, server, options) {
+    t.ok(error)
+    t.end()
+  })
+})
+
