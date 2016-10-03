@@ -8,7 +8,8 @@ var fs = require('fs')
 var path = require('path')
 
 function register (server, options, next) {
-  var app = path.join(options.config.paths.public, 'index.html')
+  var publicFolder = options.config.public || 'public'
+  var app = path.join(publicFolder, 'index.html')
   var hoodieVersion
   try {
     hoodieVersion = require('hoodie/package.json').version
@@ -26,7 +27,7 @@ function register (server, options, next) {
     path: '/{p*}',
     handler: {
       directory: {
-        path: options.config.paths.public,
+        path: publicFolder,
         listing: false,
         index: true
       }

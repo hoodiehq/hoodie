@@ -58,19 +58,17 @@ function register (server, options, next) {
   options.PouchDB = PouchDB.defaults(options.db)
   delete options.db
 
-  server.register({
-    register: hoodieServer,
-    options: options
-  }, function (error) {
+  server.ext('onPreResponse', corsHeaders)
+
+  registerPlugins(server, options, function (error) {
     if (error) {
       return next(error)
     }
 
-    server.ext('onPreResponse', corsHeaders, {
-      sandbox: 'plugin'
-    })
-
-    registerPlugins(server, options, function (error) {
+    server.register({
+      register: hoodieServer,
+      options: options
+    }, function (error) {
       if (error) {
         return next(error)
       }

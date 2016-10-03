@@ -66,8 +66,7 @@ function logger (event) {
   }
 
   if (event.event === 'request' || event.event === 'log') {
-    var level = findLogLevel(log.levels, event.tags) || 'verbose'
-
+    var level = findLogLevel(Object.keys(log.levels), event.tags) || 'verbose'
     return log[level](
       event.event,
       new Date(event.timestamp).toISOString(),
