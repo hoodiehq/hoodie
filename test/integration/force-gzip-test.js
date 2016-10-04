@@ -73,3 +73,4 @@ function testGzip (group, server, response) {
     server.stop(group.end)
   })
 }
+

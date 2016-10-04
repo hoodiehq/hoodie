@@ -53,5 +53,26 @@ test('forward all requests that accept html to app', function (group) {
     })
   })
 
+  group.test('send a 404 on a unknown /hoodie-request', function (t) {
+    var server = new Hapi.Server()
+    server.connection({port: 8090})
+    server.register(hapiPluginOptions, function (error) {
+      t.error(error, 'hoodie loads without error')
+
+      server.inject({
+        url: 'http://localhost:8090/hoodie/unkown',
+        headers: {
+          accept: 'text/html'
+        }
+      }, function (response) {
+        t.is(response.statusCode, 404, 'statusCode is 404')
+        t.is(response.result.error, 'Not Found', 'Not Found error')
+
+        server.stop(t.end)
+      })
+    })
+  })
+
   group.end()
 })
+

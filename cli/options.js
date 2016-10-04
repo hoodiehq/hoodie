@@ -1,5 +1,6 @@
 module.exports = getCliOptions
 
+var log = require('npmlog')
 var pick = require('lodash').pick
 var rc = require('rc')
 var yargs = require('yargs')
@@ -92,6 +93,11 @@ function getCliOptions (projectPath) {
     .epilogue('Options can also be specified as environment variables (prefixed with "hoodie_") or inside a ".hoodierc" file (json or ini).')
     .wrap(Math.min(150, yargs.terminalWidth()))
     .argv
+
+  if (options.bindAddress) {
+    log.warn('The use of --bindAddress is deprecated. Use the --address option instead.')
+    options.address = options.bindAddress
+  }
 
   // rc & yargs are setting keys we are not interested in, like in-memory or _
   // so we only pick the relevant ones based on they keys of the default options.

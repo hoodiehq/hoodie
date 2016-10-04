@@ -31,8 +31,7 @@ test('admin client in the REPL scope', function (t) {
     Net.Socket.prototype.address = function () {
       Net.Socket.prototype.address = address
       return {
-        family: 'IPv4',
-        address: '127.0.0.1'
+        family: 'IPv4'
       }
     }
 
