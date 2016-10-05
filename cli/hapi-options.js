@@ -7,7 +7,8 @@ function getHapiOptions (options) {
     server: {},
     connection: {
       port: options.port,
-      address: options.address
+      address: options.address,
+      routes: { log: true }
     }
   }
 
