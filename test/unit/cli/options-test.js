@@ -58,11 +58,10 @@ function createCliOptionsProxy (yargsApi) {
 test('console command', function (t) {
   var yargsApi = createYargsMock({ console: true, port: 'cli-port' })
   var getCliOptions = createCliOptionsProxy(yargsApi)
-  var cliOptions = getCliOptions()
+  getCliOptions()
   var args = yargsApi.command.lastCall.args
   var command = args.pop()
-  var commandDescription = args.pop()
-  var commandName = args.pop()
+  var commandName = args.shift()
 
   command(yargsApi)
 
