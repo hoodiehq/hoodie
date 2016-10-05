@@ -19,7 +19,7 @@
     "async": "^2.0.0",
     "browserify": "^13.0.1",
     "good": "^6.6.3",
-    "good-squeeze": "^4.0.0",
+    "good-squeeze": "^5.0.0",
     "h2o2": "^5.1.0",
     "hapi": "^15.1.1",
     "hapi-cors-headers": "^1.0.0",
