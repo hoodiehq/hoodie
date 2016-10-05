@@ -61,7 +61,9 @@ function buildBundle (config, hoodieClientPath, callback) {
   var bundleEE = new EventEmitter()
 
   bundleEE.on('done', function (error, buffer) {
-    if (error) throw error
+    if (error) {
+      return callback(error)
+    }
 
     var options = config.url ? '{url: "' + config.url + '"}' : ''
     var initBuffer = Buffer('\n\nhoodie = new Hoodie(' + options + ')')
