@@ -10,6 +10,7 @@ function createYargsMock (argv) {
     'env',
     'epilogue',
     'help',
+    'option',
     'options',
     'command',
     'showHelpOnFail',
@@ -53,6 +54,22 @@ function createCliOptionsProxy (yargsApi) {
     '../package.json': packageJsonMock
   })
 }
+
+test('console command', function (t) {
+  var yargsApi = createYargsMock({ console: true, port: 'cli-port' })
+  var getCliOptions = createCliOptionsProxy(yargsApi)
+  var cliOptions = getCliOptions()
+  var args = yargsApi.command.lastCall.args
+  var command = args.pop()
+  var commandDescription = args.pop()
+  var commandName = args.pop()
+
+  command(yargsApi)
+
+  t.is(commandName, 'console', 'CLI is getting the REPL console command')
+
+  t.end()
+})
 
 test('config', function (group) {
   var yargsApi = createYargsMock({ port: 'cli-port' })
