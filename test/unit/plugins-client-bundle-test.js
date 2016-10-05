@@ -106,12 +106,12 @@ test('bundle client', function (group) {
   })
 
   group.test('browserify.build failing throws error', function (t) {
-    var error = new Error('TestError')
+    var testError = new Error('TestError')
 
     var bundleClient = proxyquire('../../server/plugins/client/bundle', {
       browserify: function () {
         return {
-          bundle: simple.stub().callbackWith(error),
+          bundle: simple.stub().callbackWith(testError),
           require: simple.stub()
         }
       },
@@ -120,11 +120,11 @@ test('bundle client', function (group) {
       }
     })
 
-    t.throws(function () {
-      bundleClient('client.js', 'bundle.js', {}, simple.stub())
-    }, error)
-    t.end()
+    bundleClient('client.js', 'bundle.js', {}, function (error) {
+      t.ok(error)
+      t.equal(error, testError)
+      t.end()
+    })
   })
-
   group.end()
 })
