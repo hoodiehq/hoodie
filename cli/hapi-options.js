@@ -21,6 +21,8 @@ function getHapiOptions (options) {
 
   if (options.url) {
     hapiOptions.connection.host = url.parse(options.url).hostname
+  } else {
+    hapiOptions.connection.host = 'localhost'
   }
 
   return hapiOptions
