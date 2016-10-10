@@ -5,9 +5,10 @@ var test = require('tap').test
 test('logger', function (group) {
   var logger
   var npmlogMock
-  var serverMock
 
   group.beforeEach(function (done) {
+    var serverMock
+
     npmlogMock = {
       http: simple.spy(),
       error: simple.spy(),
@@ -19,16 +20,19 @@ test('logger', function (group) {
       }
     }
 
-    var loggerPlugin = proxyquire('../../../server/plugins/logger', {
-      'npmlog': npmlogMock
-    })
-
     serverMock = {
       register: simple.spy()
     }
 
-    loggerPlugin.register(serverMock)
-    logger = serverMock.register.lastCall.arg.options.reporters[0].config.callback
+    require('../../../server/plugins/logger').register(serverMock)
+    var transformModule = serverMock.register.lastCall.arg.options.reporters.hoodieReporter[1].module
+    var TransformClass = proxyquire(transformModule, {
+      'npmlog': npmlogMock
+    })
+
+    // can also use with 'new', but just calling as a function so that line 9
+    // is also covered under test
+    logger = TransformClass()
 
     done()
   })
@@ -41,7 +45,7 @@ test('logger', function (group) {
       timestamp: new Date().getTime()
     }
 
-    logger(eventMock)
+    logger._transform(eventMock, 'utf8', function () {})
 
     t.is(npmlogMock.error.callCount, 1, 'Calls npmlog.error')
     var args = npmlogMock.error.lastCall.args
@@ -56,7 +60,7 @@ test('logger', function (group) {
   group.test('response without query', function (t) {
     var responseEventMock = createResponseEventMock()
 
-    logger(responseEventMock)
+    logger._transform(responseEventMock, 'utf8', function () {})
 
     t.is(npmlogMock.http.callCount, 1, 'Calls npmlog.http')
     var args = npmlogMock.http.lastCall.args
@@ -77,7 +81,7 @@ test('logger', function (group) {
       testKey: 'testValue'
     }
 
-    logger(responseEventMock)
+    logger._transform(responseEventMock, 'utf8', function () {})
 
     t.is(npmlogMock.http.callCount, 1, 'Calls npmlog.http')
     var args = npmlogMock.http.lastCall.args
@@ -95,7 +99,7 @@ test('logger', function (group) {
       data: 'testDate'
     }
 
-    logger(requestEventMock)
+    logger._transform(requestEventMock, 'utf8', function () {})
 
     t.is(npmlogMock.verbose.callCount, 1, 'Calls npmlog.verbose by default')
     var args = npmlogMock.verbose.lastCall.args
@@ -113,7 +117,7 @@ test('logger', function (group) {
       data: 'testData'
     }
 
-    logger(requestEventMock)
+    logger._transform(requestEventMock, 'utf8', function () {})
 
     t.is(npmlogMock.warn.callCount, 1, 'Calls npmlog.warn')
     t.is(requestEventMock.tags.length, 0, 'Strips loglevel-tag')
@@ -130,7 +134,7 @@ test('logger', function (group) {
       event: 'unkownEvent'
     }
 
-    logger(sillyEvent)
+    logger._transform(sillyEvent, 'utf8', function () {})
 
     t.is(npmlogMock.silly.callCount, 1, 'Calls npmlog.silly')
     var args = npmlogMock.silly.lastCall.args
@@ -141,36 +145,18 @@ test('logger', function (group) {
     t.end()
   })
 
-  group.test('GoodEvent creation', function (t) {
-    var GoodEvent = serverMock.register.lastCall.arg.options.reporters[0].reporter
-
-    var goodEvent = new GoodEvent({}, {})
-    t.type(goodEvent._callback, 'function', 'Assign default callback')
-    t.type(goodEvent._callback(), 'undefined', 'Default calllbacks does nothing')
-
-    t.end()
-  })
-
-  group.test('GoodEvent.init()', function (t) {
-    var GoodEvent = serverMock.register.lastCall.arg.options.reporters[0].reporter
-
-    var constructorCb = simple.spy()
-    var goodEvent = new GoodEvent({}, {
-      callback: constructorCb
-    })
-
-    var streamMock = {
-      pipe: simple.spy().returnWith({
-        on: simple.spy().callbackWith(null)
-      })
+  group.test('next callback', function (t) {
+    var eventMock = {
+      event: 'ops'
     }
 
-    var functionCb = simple.spy()
-    goodEvent.init(streamMock, null, functionCb)
+    var transformCallback = simple.spy()
 
-    simple.spy(goodEvent._callback)
-    t.is(constructorCb.callCount, 1, 'Invokes callback given to constructor')
-    t.is(functionCb.callCount, 1, 'Invokes given callback')
+    logger._transform(eventMock, 'utf8', transformCallback)
+
+    t.equals(transformCallback.callCount, 1, 'callback is called')
+    t.equals(transformCallback.lastCall.args[1], eventMock, 'data is passed through transform')
+
     t.end()
   })
 
@@ -191,4 +177,3 @@ test('logger', function (group) {
 
   group.end()
 })
-
