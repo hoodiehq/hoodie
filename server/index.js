@@ -20,6 +20,9 @@ function register (server, options, next) {
     options.db = {}
   }
 
+  // mapreduce is required for `db.query()`
+  PouchDB.plugin(require('pouchdb-mapreduce'))
+
   if (!options.db.url) {
     if (options.inMemory) {
       PouchDB.plugin(require('pouchdb-adapter-memory'))
