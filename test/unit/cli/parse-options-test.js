@@ -76,6 +76,16 @@ test('parse options', function (group) {
     t.end()
   })
 
+  group.test('console', function (t) {
+    var config = parseOptions({
+      console: true
+    })
+
+    t.is(config.console, true, 'Sets config.console to true')
+
+    t.end()
+  })
+
   group.end()
 })
 

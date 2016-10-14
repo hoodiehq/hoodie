@@ -13,6 +13,7 @@
   "dependencies": {
     "@hoodie/account": "^2.0.0",
     "@hoodie/admin": "^1.0.1",
+    "@hoodie/admin-client": "^1.0.2",
     "@hoodie/client": "^5.0.0",
     "@hoodie/server": "^21.1.0",
     "@hoodie/store": "^1.0.1",
@@ -33,6 +34,7 @@
     "pouchdb-core": "^6.0.4",
     "pouchdb-mapreduce": "^6.0.6",
     "rc": "^1.1.6",
+    "reptile": "^2.2.1",
     "semver": "^5.1.0",
     "yargs": "^6.0.0"
   },
