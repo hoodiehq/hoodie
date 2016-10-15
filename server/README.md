@@ -37,8 +37,11 @@ for account and store related tasks.
 
       > [Hapi](http://hapijs.com/) plugin that implements the
         [Account JSON API](http://docs.accountjsonapi.apiary.io) routes and
-        exposes a corresponding API at `server.plugins.account.api.*`,
-        persisting user accounts using [PouchDB](https://pouchdb.com).
+        exposes a corresponding API at `server.plugins.account.api.*`.
+
+        1. #### account-server-api [:octocat:](https://github.com/hoodiehq/hoodie-account-server-api#readme) [![Build Status](https://api.travis-ci.org/hoodiehq/hoodie-account-server-api.svg?branch=master)](https://travis-ci.org/hoodiehq/hoodie-account-server-api) [![Coverage Status](https://coveralls.io/repos/hoodiehq/hoodie-account-server-api/badge.svg?branch=master)](https://coveralls.io/r/hoodiehq/hoodie-account-server-api?branch=master) [![Dependency Status](https://david-dm.org/hoodiehq/hoodie-account-server-api.svg)](https://david-dm.org/hoodiehq/hoodie-account-server-api)
+
+        > JavaScript API for accounts and sessions backed by [PouchDB](https://pouchdb.com)
 
    2. ### store-server [:octocat:](https://github.com/hoodiehq/hoodie-store-server#readme) [![Build Status](https://travis-ci.org/hoodiehq/hoodie-store-server.svg?branch=master)](https://travis-ci.org/hoodiehq/hoodie-store-server) [![Coverage Status](https://coveralls.io/repos/hoodiehq/hoodie-store-server/badge.svg?branch=master)](https://coveralls.io/r/hoodiehq/hoodie-store-server?branch=master) [![Dependency Status](https://david-dm.org/hoodiehq/hoodie-store-server.svg)](https://david-dm.org/hoodiehq/hoodie-store-server)
 
