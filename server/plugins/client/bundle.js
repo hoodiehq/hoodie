@@ -73,3 +73,4 @@ function buildBundle (config, hoodieClientPath, callback) {
 
   browserify.bundle(bundleEE.emit.bind(bundleEE, 'done'))
 }
+
