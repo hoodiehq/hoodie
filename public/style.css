@@ -4,6 +4,7 @@ body {
   animation-duration: 2s;
 }
 
+/*this sets the styling for all h1 elements found in the html*/
 h1 {
   font-family:Helvetica, Arial, sans-serif;
   color:#e94e1b;
