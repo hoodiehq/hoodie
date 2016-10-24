@@ -4,6 +4,14 @@
 		"selected_items":
 		[
 			[
+				"chai",
+				"chaiImmutable"
+			],
+			[
+				"get",
+				"getAncestorPath"
+			],
+			[
 				"repl",
 				"replServer〔variable〕"
 			],
@@ -56,10 +64,6 @@
 				"createElement〔function〕"
 			],
 			[
-				"chai",
-				"chai-immutable"
-			],
-			[
 				"user",
 				"username"
 			],
@@ -70,10 +74,6 @@
 			[
 				"nex",
 				"nextState"
-			],
-			[
-				"get",
-				"getGitHubProfile〔function〕"
 			],
 			[
 				"file",
@@ -444,45 +444,45 @@
 	"buffers":
 	[
 		{
-			"file": "/Users/jonathandeng/GoogleDrive/Programming/hoodie/cli/hoodie.txt",
+			"file": "/Users/jonathandeng/GoogleDrive/Programming/react-native-app/OTW/app/actions/actionTypes.js",
 			"settings":
 			{
-				"buffer_size": 2699,
+				"buffer_size": 172,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "/Users/jonathandeng/GoogleDrive/Programming/react-native-app/OTW/app/reducers/navReducer.js",
+			"settings":
+			{
+				"buffer_size": 782,
 				"encoding": "UTF-8",
 				"line_ending": "Unix"
 			}
 		},
 		{
-			"file": "/Users/jonathandeng/GoogleDrive/Programming/hoodie/CONTRIBUTING.md",
+			"file": "/Users/jonathandeng/GoogleDrive/Programming/react-native-app/OTW/app/index.js",
 			"settings":
 			{
-				"buffer_size": 8994,
+				"buffer_size": 58,
 				"encoding": "UTF-8",
 				"line_ending": "Unix"
 			}
 		},
 		{
-			"file": "/Users/jonathandeng/GoogleDrive/Programming/hoodie/CODING_STYLE.md",
+			"file": "/Users/jonathandeng/GoogleDrive/Programming/react-native-app/OTW/app/actions/navActions.js",
 			"settings":
 			{
-				"buffer_size": 4767,
-				"line_ending": "Unix"
-			}
-		},
-		{
-			"file": "/Users/jonathandeng/GoogleDrive/Programming/hoodie/test/unit/repl-test.js",
-			"settings":
-			{
-				"buffer_size": 89,
+				"buffer_size": 197,
 				"encoding": "UTF-8",
 				"line_ending": "Unix"
 			}
 		},
 		{
-			"file": "client-test.js",
+			"file": "/Users/jonathandeng/GoogleDrive/Programming/react-native-app/OTW/app/components/signIn.js",
 			"settings":
 			{
-				"buffer_size": 4050,
+				"buffer_size": 1809,
 				"line_ending": "Unix"
 			}
 		}
@@ -550,16 +550,16 @@
 	"build_varint": "",
 	"command_palette":
 	{
-		"height": 81.0,
-		"last_filter": "set babel",
+		"height": 207.0,
+		"last_filter": "set bab",
 		"selected_items":
 		[
 			[
-				"set babel",
+				"set bab",
 				"Set Syntax: JavaScript (Babel)"
 			],
 			[
-				"set bab",
+				"set babel",
 				"Set Syntax: JavaScript (Babel)"
 			],
 			[
@@ -999,7 +999,7 @@
 				"Package Control: Install Package"
 			]
 		],
-		"width": 537.0
+		"width": 575.0
 	},
 	"console":
 	{
@@ -1020,15 +1020,17 @@
 	},
 	"expanded_folders":
 	[
-		"/Users/jonathandeng/GoogleDrive/Programming/hoodie",
-		"/Users/jonathandeng/GoogleDrive/Programming/hoodie/cli",
-		"/Users/jonathandeng/GoogleDrive/Programming/hoodie/test",
-		"/Users/jonathandeng/GoogleDrive/Programming/hoodie/test/unit",
-		"/Users/jonathandeng/GoogleDrive/Programming/hoodie/test/unit/client"
+		"/Users/jonathandeng/GoogleDrive/Programming/react-native-app/OTW/app",
+		"/Users/jonathandeng/GoogleDrive/Programming/react-native-app/OTW/app/actions",
+		"/Users/jonathandeng/GoogleDrive/Programming/react-native-app/OTW/app/components",
+		"/Users/jonathandeng/GoogleDrive/Programming/react-native-app/OTW/app/reducers",
+		"/Users/jonathandeng/GoogleDrive/Programming/react-native-app/OTW/app/reducers/auth"
 	],
 	"file_history":
 	[
-		"/Users/jonathandeng/GoogleDrive/Programming/hoodie/cli/repl.js",
+		"/Users/jonathandeng/GoogleDrive/Programming/react-native-app/OTW/app/reducers/index.js",
+		"/Users/jonathandeng/GoogleDrive/Programming/react-native-app/OTW/app/containers/store.js",
+		"/Users/jonathandeng/GoogleDrive/Programming/react-native-app/OTW/package.json",
 		"/Users/jonathandeng/GoogleDrive/Programming/hoodie-app/www/index.html",
 		"/Users/jonathandeng/GoogleDrive/Programming/hoodie-app/www/assets/js/main.js",
 		"/Users/jonathandeng/.bashrc",
@@ -1153,9 +1155,7 @@
 		"/Users/jonathandeng/Google Drive/Programming/how-far-hr/app/assets/styles/main.css",
 		"/Users/jonathandeng/Google Drive/Programming/how-far-hr/app/components/Footer.jsx",
 		"/Users/jonathandeng/Library/Application Support/Sublime Text 3/Packages/User/SideBarEnhancements/Open With/Side Bar.sublime-menu",
-		"/Users/jonathandeng/Google Drive/Programming/how-far-hr/app/state.js",
-		"/Users/jonathandeng/Google Drive/Programming/how-far-hr/.babelrc",
-		"/Users/jonathandeng/Google Drive/Programming/how-far-hr/app/index.html"
+		"/Users/jonathandeng/Google Drive/Programming/how-far-hr/app/state.js"
 	],
 	"find":
 	{
@@ -1175,6 +1175,7 @@
 		"case_sensitive": false,
 		"find_history":
 		[
+			"';\n",
 			"PS1",
 			"INITIAL_STATE",
 			">\n",
@@ -1265,129 +1266,16 @@
 	"groups":
 	[
 		{
-			"selected": 0,
+			"selected": 2,
 			"sheets":
 			[
 				{
 					"buffer": 0,
-					"file": "/Users/jonathandeng/GoogleDrive/Programming/hoodie/cli/hoodie.txt",
+					"file": "/Users/jonathandeng/GoogleDrive/Programming/react-native-app/OTW/app/actions/actionTypes.js",
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 2699,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								2699,
-								2699
-							]
-						],
-						"settings":
-						{
-							"bracket_highlighter.busy": false,
-							"bracket_highlighter.locations":
-							{
-								"close":
-								{
-								},
-								"icon":
-								{
-								},
-								"open":
-								{
-								},
-								"unmatched":
-								{
-								}
-							},
-							"bracket_highlighter.regions":
-							[
-								"bh_default",
-								"bh_default_center",
-								"bh_default_open",
-								"bh_default_close",
-								"bh_default_content",
-								"bh_regex",
-								"bh_regex_center",
-								"bh_regex_open",
-								"bh_regex_close",
-								"bh_regex_content",
-								"bh_c_define",
-								"bh_c_define_center",
-								"bh_c_define_open",
-								"bh_c_define_close",
-								"bh_c_define_content",
-								"bh_double_quote",
-								"bh_double_quote_center",
-								"bh_double_quote_open",
-								"bh_double_quote_close",
-								"bh_double_quote_content",
-								"bh_angle",
-								"bh_angle_center",
-								"bh_angle_open",
-								"bh_angle_close",
-								"bh_angle_content",
-								"bh_single_quote",
-								"bh_single_quote_center",
-								"bh_single_quote_open",
-								"bh_single_quote_close",
-								"bh_single_quote_content",
-								"bh_round",
-								"bh_round_center",
-								"bh_round_open",
-								"bh_round_close",
-								"bh_round_content",
-								"bh_unmatched",
-								"bh_unmatched_center",
-								"bh_unmatched_open",
-								"bh_unmatched_close",
-								"bh_unmatched_content",
-								"bh_square",
-								"bh_square_center",
-								"bh_square_open",
-								"bh_square_close",
-								"bh_square_content",
-								"bh_curly",
-								"bh_curly_center",
-								"bh_curly_open",
-								"bh_curly_close",
-								"bh_curly_content",
-								"bh_tag",
-								"bh_tag_center",
-								"bh_tag_open",
-								"bh_tag_close",
-								"bh_tag_content"
-							],
-							"color_scheme": "Packages/User/Color Highlighter/themes/Material Brogrammer.tmTheme",
-							"git_savvy.file_path": "/Users/jonathandeng/GoogleDrive/Programming/hoodie/cli/hoodie.txt",
-							"git_savvy.repo_path": "/Users/jonathandeng/GoogleDrive/Programming/hoodie",
-							"syntax": "Packages/Text/Plain text.tmLanguage",
-							"tab_size": 2,
-							"translate_tabs_to_spaces": true
-						},
-						"translation.x": 0.0,
-						"translation.y": 0.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 0,
-					"type": "text"
-				}
-			]
-		},
-		{
-			"selected": 1,
-			"sheets":
-			[
-				{
-					"buffer": 1,
-					"file": "/Users/jonathandeng/GoogleDrive/Programming/hoodie/CONTRIBUTING.md",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 8994,
+						"buffer_size": 172,
 						"regions":
 						{
 						},
@@ -1475,148 +1363,32 @@
 								"bh_tag_content"
 							],
 							"color_scheme": "Packages/User/Color Highlighter/themes/Material Brogrammer.tmTheme",
-							"git_savvy.file_path": "/Users/jonathandeng/GoogleDrive/Programming/hoodie/CONTRIBUTING.md",
-							"git_savvy.repo_path": "/Users/jonathandeng/GoogleDrive/Programming/hoodie",
-							"syntax": "Packages/Markdown/Markdown.sublime-syntax",
-							"tab_size": 3,
-							"translate_tabs_to_spaces": true
+							"git_savvy.file_path": "/Users/jonathandeng/GoogleDrive/Programming/react-native-app/OTW/app/actions/actionTypes.js",
+							"git_savvy.repo_path": "/Users/jonathandeng/GoogleDrive/Programming/react-native-app",
+							"syntax": "Packages/JavaScript/JavaScript.sublime-syntax"
 						},
 						"translation.x": 0.0,
-						"translation.y": 3063.0,
+						"translation.y": 0.0,
 						"zoom_level": 1.0
 					},
 					"stack_index": 4,
 					"type": "text"
 				},
 				{
-					"buffer": 2,
-					"file": "/Users/jonathandeng/GoogleDrive/Programming/hoodie/CODING_STYLE.md",
+					"buffer": 1,
+					"file": "/Users/jonathandeng/GoogleDrive/Programming/react-native-app/OTW/app/reducers/navReducer.js",
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 4767,
+						"buffer_size": 782,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								3746,
-								3746
-							]
-						],
-						"settings":
-						{
-							"bracket_highlighter.busy": false,
-							"bracket_highlighter.locations":
-							{
-								"close":
-								{
-								},
-								"icon":
-								{
-								},
-								"open":
-								{
-								},
-								"unmatched":
-								{
-								}
-							},
-							"bracket_highlighter.regions":
-							[
-								"bh_curly",
-								"bh_curly_center",
-								"bh_curly_open",
-								"bh_curly_close",
-								"bh_curly_content",
-								"bh_double_quote",
-								"bh_double_quote_center",
-								"bh_double_quote_open",
-								"bh_double_quote_close",
-								"bh_double_quote_content",
-								"bh_regex",
-								"bh_regex_center",
-								"bh_regex_open",
-								"bh_regex_close",
-								"bh_regex_content",
-								"bh_square",
-								"bh_square_center",
-								"bh_square_open",
-								"bh_square_close",
-								"bh_square_content",
-								"bh_angle",
-								"bh_angle_center",
-								"bh_angle_open",
-								"bh_angle_close",
-								"bh_angle_content",
-								"bh_single_quote",
-								"bh_single_quote_center",
-								"bh_single_quote_open",
-								"bh_single_quote_close",
-								"bh_single_quote_content",
-								"bh_unmatched",
-								"bh_unmatched_center",
-								"bh_unmatched_open",
-								"bh_unmatched_close",
-								"bh_unmatched_content",
-								"bh_default",
-								"bh_default_center",
-								"bh_default_open",
-								"bh_default_close",
-								"bh_default_content",
-								"bh_round",
-								"bh_round_center",
-								"bh_round_open",
-								"bh_round_close",
-								"bh_round_content",
-								"bh_c_define",
-								"bh_c_define_center",
-								"bh_c_define_open",
-								"bh_c_define_close",
-								"bh_c_define_content",
-								"bh_tag",
-								"bh_tag_center",
-								"bh_tag_open",
-								"bh_tag_close",
-								"bh_tag_content"
-							],
-							"color_scheme": "Packages/User/Color Highlighter/themes/Material Brogrammer.tmTheme",
-							"git_savvy.file_path": "/Users/jonathandeng/GoogleDrive/Programming/hoodie/CODING_STYLE.md",
-							"git_savvy.repo_path": "/Users/jonathandeng/GoogleDrive/Programming/hoodie",
-							"history_list_is_closing": true,
-							"syntax": "Packages/Markdown/Markdown.sublime-syntax",
-							"tab_size": 2,
-							"translate_tabs_to_spaces": true
-						},
-						"translation.x": 0.0,
-						"translation.y": 1703.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 3,
-					"type": "text"
-				}
-			]
-		},
-		{
-			"selected": 0,
-			"sheets":
-			[
-				{
-					"buffer": 3,
-					"file": "/Users/jonathandeng/GoogleDrive/Programming/hoodie/test/unit/repl-test.js",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 89,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								87,
-								87
+								0,
+								0
 							]
 						],
 						"settings":
@@ -1645,46 +1417,46 @@
 								"bh_curly_open",
 								"bh_curly_close",
 								"bh_curly_content",
-								"bh_double_quote",
-								"bh_double_quote_center",
-								"bh_double_quote_open",
-								"bh_double_quote_close",
-								"bh_double_quote_content",
-								"bh_regex",
-								"bh_regex_center",
-								"bh_regex_open",
-								"bh_regex_close",
-								"bh_regex_content",
-								"bh_square",
-								"bh_square_center",
-								"bh_square_open",
-								"bh_square_close",
-								"bh_square_content",
 								"bh_angle",
 								"bh_angle_center",
 								"bh_angle_open",
 								"bh_angle_close",
 								"bh_angle_content",
-								"bh_single_quote",
-								"bh_single_quote_center",
-								"bh_single_quote_open",
-								"bh_single_quote_close",
-								"bh_single_quote_content",
-								"bh_unmatched",
-								"bh_unmatched_center",
-								"bh_unmatched_open",
-								"bh_unmatched_close",
-								"bh_unmatched_content",
-								"bh_default",
-								"bh_default_center",
-								"bh_default_open",
-								"bh_default_close",
-								"bh_default_content",
 								"bh_round",
 								"bh_round_center",
 								"bh_round_open",
 								"bh_round_close",
 								"bh_round_content",
+								"bh_double_quote",
+								"bh_double_quote_center",
+								"bh_double_quote_open",
+								"bh_double_quote_close",
+								"bh_double_quote_content",
+								"bh_unmatched",
+								"bh_unmatched_center",
+								"bh_unmatched_open",
+								"bh_unmatched_close",
+								"bh_unmatched_content",
+								"bh_single_quote",
+								"bh_single_quote_center",
+								"bh_single_quote_open",
+								"bh_single_quote_close",
+								"bh_single_quote_content",
+								"bh_default",
+								"bh_default_center",
+								"bh_default_open",
+								"bh_default_close",
+								"bh_default_content",
+								"bh_square",
+								"bh_square_center",
+								"bh_square_open",
+								"bh_square_close",
+								"bh_square_content",
+								"bh_regex",
+								"bh_regex_center",
+								"bh_regex_open",
+								"bh_regex_close",
+								"bh_regex_content",
 								"bh_c_define",
 								"bh_c_define_center",
 								"bh_c_define_open",
@@ -1697,8 +1469,8 @@
 								"bh_tag_content"
 							],
 							"color_scheme": "Packages/User/Color Highlighter/themes/Material Brogrammer.tmTheme",
-							"git_savvy.file_path": "/Users/jonathandeng/GoogleDrive/Programming/hoodie/test/unit/repl-test.js",
-							"git_savvy.repo_path": "/Users/jonathandeng/GoogleDrive/Programming/hoodie",
+							"git_savvy.file_path": "/Users/jonathandeng/GoogleDrive/Programming/react-native-app/OTW/app/reducers/navReducer.js",
+							"git_savvy.repo_path": "/Users/jonathandeng/GoogleDrive/Programming/react-native-app",
 							"syntax": "Packages/JavaScript/JavaScript.sublime-syntax"
 						},
 						"translation.x": 0.0,
@@ -1709,24 +1481,25 @@
 					"type": "text"
 				},
 				{
-					"buffer": 4,
-					"file": "client-test.js",
+					"buffer": 2,
+					"file": "/Users/jonathandeng/GoogleDrive/Programming/react-native-app/OTW/app/index.js",
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 4050,
+						"buffer_size": 58,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								0,
-								0
+								58,
+								58
 							]
 						],
 						"settings":
 						{
+							"auto_complete": false,
 							"bracket_highlighter.busy": false,
 							"bracket_highlighter.locations":
 							{
@@ -1745,51 +1518,178 @@
 							},
 							"bracket_highlighter.regions":
 							[
-								"bh_curly",
-								"bh_curly_center",
-								"bh_curly_open",
-								"bh_curly_close",
-								"bh_curly_content",
 								"bh_double_quote",
 								"bh_double_quote_center",
 								"bh_double_quote_open",
 								"bh_double_quote_close",
 								"bh_double_quote_content",
-								"bh_regex",
-								"bh_regex_center",
-								"bh_regex_open",
-								"bh_regex_close",
-								"bh_regex_content",
-								"bh_square",
-								"bh_square_center",
-								"bh_square_open",
-								"bh_square_close",
-								"bh_square_content",
-								"bh_angle",
-								"bh_angle_center",
-								"bh_angle_open",
-								"bh_angle_close",
-								"bh_angle_content",
-								"bh_single_quote",
-								"bh_single_quote_center",
-								"bh_single_quote_open",
-								"bh_single_quote_close",
-								"bh_single_quote_content",
-								"bh_unmatched",
-								"bh_unmatched_center",
-								"bh_unmatched_open",
-								"bh_unmatched_close",
-								"bh_unmatched_content",
-								"bh_default",
-								"bh_default_center",
-								"bh_default_open",
-								"bh_default_close",
-								"bh_default_content",
 								"bh_round",
 								"bh_round_center",
 								"bh_round_open",
 								"bh_round_close",
 								"bh_round_content",
+								"bh_default",
+								"bh_default_center",
+								"bh_default_open",
+								"bh_default_close",
+								"bh_default_content",
+								"bh_c_define",
+								"bh_c_define_center",
+								"bh_c_define_open",
+								"bh_c_define_close",
+								"bh_c_define_content",
+								"bh_unmatched",
+								"bh_unmatched_center",
+								"bh_unmatched_open",
+								"bh_unmatched_close",
+								"bh_unmatched_content",
+								"bh_curly",
+								"bh_curly_center",
+								"bh_curly_open",
+								"bh_curly_close",
+								"bh_curly_content",
+								"bh_regex",
+								"bh_regex_center",
+								"bh_regex_open",
+								"bh_regex_close",
+								"bh_regex_content",
+								"bh_tag",
+								"bh_tag_center",
+								"bh_tag_open",
+								"bh_tag_close",
+								"bh_tag_content",
+								"bh_square",
+								"bh_square_center",
+								"bh_square_open",
+								"bh_square_close",
+								"bh_square_content",
+								"bh_single_quote",
+								"bh_single_quote_center",
+								"bh_single_quote_open",
+								"bh_single_quote_close",
+								"bh_single_quote_content",
+								"bh_angle",
+								"bh_angle_center",
+								"bh_angle_open",
+								"bh_angle_close",
+								"bh_angle_content"
+							],
+							"color_scheme": "Packages/User/Color Highlighter/themes/Material Brogrammer.tmTheme",
+							"git_savvy.file_path": "/Users/jonathandeng/GoogleDrive/Programming/react-native-app/OTW/app/index.js",
+							"git_savvy.repo_path": "/Users/jonathandeng/GoogleDrive/Programming/react-native-app",
+							"syntax": "Packages/JavaScript/JavaScript.sublime-syntax"
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 0,
+					"type": "text"
+				}
+			]
+		},
+		{
+			"selected": 1,
+			"sheets":
+			[
+				{
+					"buffer": 3,
+					"file": "/Users/jonathandeng/GoogleDrive/Programming/react-native-app/OTW/app/actions/navActions.js",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 197,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								197,
+								196
+							]
+						],
+						"settings":
+						{
+							"auto_complete": false,
+							"bracket_highlighter.busy": false,
+							"bracket_highlighter.locations":
+							{
+								"close":
+								{
+									"1":
+									[
+										196,
+										197
+									]
+								},
+								"icon":
+								{
+									"1":
+									[
+										"Packages/BracketHighlighter/icons/curly_bracket.png",
+										"brackethighlighter.default"
+									]
+								},
+								"open":
+								{
+									"1":
+									[
+										159,
+										160
+									]
+								},
+								"unmatched":
+								{
+								}
+							},
+							"bracket_highlighter.regions":
+							[
+								"bh_curly",
+								"bh_curly_center",
+								"bh_curly_open",
+								"bh_curly_close",
+								"bh_curly_content",
+								"bh_angle",
+								"bh_angle_center",
+								"bh_angle_open",
+								"bh_angle_close",
+								"bh_angle_content",
+								"bh_round",
+								"bh_round_center",
+								"bh_round_open",
+								"bh_round_close",
+								"bh_round_content",
+								"bh_double_quote",
+								"bh_double_quote_center",
+								"bh_double_quote_open",
+								"bh_double_quote_close",
+								"bh_double_quote_content",
+								"bh_unmatched",
+								"bh_unmatched_center",
+								"bh_unmatched_open",
+								"bh_unmatched_close",
+								"bh_unmatched_content",
+								"bh_single_quote",
+								"bh_single_quote_center",
+								"bh_single_quote_open",
+								"bh_single_quote_close",
+								"bh_single_quote_content",
+								"bh_default",
+								"bh_default_center",
+								"bh_default_open",
+								"bh_default_close",
+								"bh_default_content",
+								"bh_square",
+								"bh_square_center",
+								"bh_square_open",
+								"bh_square_close",
+								"bh_square_content",
+								"bh_regex",
+								"bh_regex_center",
+								"bh_regex_open",
+								"bh_regex_close",
+								"bh_regex_content",
 								"bh_c_define",
 								"bh_c_define_center",
 								"bh_c_define_open",
@@ -1802,9 +1702,129 @@
 								"bh_tag_content"
 							],
 							"color_scheme": "Packages/User/Color Highlighter/themes/Material Brogrammer.tmTheme",
-							"git_savvy.file_path": "/Users/jonathandeng/GoogleDrive/Programming/hoodie/test/unit/client/client-test.js",
-							"git_savvy.repo_path": "/Users/jonathandeng/GoogleDrive/Programming/hoodie",
-							"syntax": "Packages/JavaScript/JavaScript.sublime-syntax",
+							"git_savvy.file_path": "/Users/jonathandeng/GoogleDrive/Programming/react-native-app/OTW/app/actions/navActions.js",
+							"git_savvy.repo_path": "/Users/jonathandeng/GoogleDrive/Programming/react-native-app",
+							"syntax": "Packages/JavaScript/JavaScript.sublime-syntax"
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 3,
+					"type": "text"
+				},
+				{
+					"buffer": 4,
+					"file": "/Users/jonathandeng/GoogleDrive/Programming/react-native-app/OTW/app/components/signIn.js",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 1809,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								0,
+								0
+							]
+						],
+						"settings":
+						{
+							"bracket_highlighter.busy": false,
+							"bracket_highlighter.locations":
+							{
+								"close":
+								{
+									"1":
+									[
+										1086,
+										1087
+									]
+								},
+								"icon":
+								{
+									"1":
+									[
+										"Packages/BracketHighlighter/icons/round_bracket.png",
+										"brackethighlighter.default"
+									]
+								},
+								"open":
+								{
+									"1":
+									[
+										341,
+										342
+									]
+								},
+								"unmatched":
+								{
+								}
+							},
+							"bracket_highlighter.regions":
+							[
+								"bh_curly",
+								"bh_curly_center",
+								"bh_curly_open",
+								"bh_curly_close",
+								"bh_curly_content",
+								"bh_angle",
+								"bh_angle_center",
+								"bh_angle_open",
+								"bh_angle_close",
+								"bh_angle_content",
+								"bh_round",
+								"bh_round_center",
+								"bh_round_open",
+								"bh_round_close",
+								"bh_round_content",
+								"bh_double_quote",
+								"bh_double_quote_center",
+								"bh_double_quote_open",
+								"bh_double_quote_close",
+								"bh_double_quote_content",
+								"bh_unmatched",
+								"bh_unmatched_center",
+								"bh_unmatched_open",
+								"bh_unmatched_close",
+								"bh_unmatched_content",
+								"bh_single_quote",
+								"bh_single_quote_center",
+								"bh_single_quote_open",
+								"bh_single_quote_close",
+								"bh_single_quote_content",
+								"bh_default",
+								"bh_default_center",
+								"bh_default_open",
+								"bh_default_close",
+								"bh_default_content",
+								"bh_square",
+								"bh_square_center",
+								"bh_square_open",
+								"bh_square_close",
+								"bh_square_content",
+								"bh_regex",
+								"bh_regex_center",
+								"bh_regex_open",
+								"bh_regex_close",
+								"bh_regex_content",
+								"bh_c_define",
+								"bh_c_define_center",
+								"bh_c_define_open",
+								"bh_c_define_close",
+								"bh_c_define_content",
+								"bh_tag",
+								"bh_tag_center",
+								"bh_tag_open",
+								"bh_tag_close",
+								"bh_tag_content"
+							],
+							"color_scheme": "Packages/User/Color Highlighter/themes/Material Brogrammer.tmTheme",
+							"git_savvy.file_path": "/Users/jonathandeng/GoogleDrive/Programming/react-native-app/OTW/app/components/signIn.js",
+							"git_savvy.repo_path": "/Users/jonathandeng/GoogleDrive/Programming/react-native-app",
+							"syntax": "Packages/Babel/JavaScript (Babel).sublime-syntax",
 							"tab_size": 2,
 							"translate_tabs_to_spaces": true
 						},
@@ -1834,13 +1854,7 @@
 				0,
 				0,
 				1,
-				2
-			],
-			[
-				1,
-				1,
-				2,
-				2
+				1
 			],
 			[
 				1,
@@ -1852,13 +1866,12 @@
 		"cols":
 		[
 			0.0,
-			0.5,
+			0.526592006097,
 			1.0
 		],
 		"rows":
 		[
 			0.0,
-			0.778185580312,
 			1.0
 		]
 	},
@@ -1884,7 +1897,7 @@
 		"height": 120.0
 	},
 	"pinned_build_system": "Packages/User/babel.sublime-build",
-	"project": "hoodie-repl.sublime-project",
+	"project": "greenfield.sublime-project",
 	"replace":
 	{
 		"height": 50.0
@@ -1898,7 +1911,15 @@
 		[
 			[
 				"",
-				"CONTRIBUTING.md"
+				"actions/actionTypes.js"
+			],
+			[
+				"re",
+				"reducer.js"
+			],
+			[
+				"com",
+				"commonAncestor.js"
 			],
 			[
 				"por",
@@ -2135,10 +2156,6 @@
 			[
 				"no-sql",
 				"no-sql-compare-sql/nonRelationExplanaiton.js"
-			],
-			[
-				"re",
-				"README.md"
 			],
 			[
 				"ind",
@@ -2403,22 +2420,18 @@
 			[
 				"api",
 				"api_keys_jon"
-			],
-			[
-				"bow",
-				"bower.json"
 			]
 		],
 		"width": 0.0
 	},
 	"select_project":
 	{
-		"height": 500.0,
+		"height": 0.0,
 		"last_filter": "",
 		"selected_items":
 		[
 		],
-		"width": 380.0
+		"width": 0.0
 	},
 	"select_symbol":
 	{
