@@ -60,28 +60,10 @@ npm install --save hoodie
 <!--
   TODO: automate package.json update using postinstall
         https://github.com/hoodiehq/hoodie/issues/477
+        https://github.com/hoodiehq/hoodie/pull/592
 -->
-Add a `"start"` script and set it to `"hoodie"` in your `package.json`. The
-result should look something like this
 
-```json
-{
-  "name": "my-app",
-  "version": "1.0.0",
-  "scripts": {
-    "start": "hoodie",
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "dependencies": {
-    "hoodie": "^24.0.0"
-  }
-}
-```
-
-There might be more properties and `24.0.0` will likely be a higher number, but
-that’s okay.
-
-Now run `npm start` to start your Hoodie app.
+Now simply use `npm start` to start up your Hoodie app!
 
 You can find a more thorough description in our [Getting Started Guide](http://docs.hood.ie/camp/start/index.html).
 
