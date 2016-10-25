@@ -1,8 +1,13 @@
 var repl = require('repl')
-var fs = require('fs')
 
-var HoodieAdmin = require('./index.js')
-var loader = require('./loader')
+var AccountAdmin = require('@hoodie/account-client/admin')
+var Loader = require('./loader')
+var getCliOptions = require('./options.js');
+
+var options = getCliOptions(/*how to get the proct path???*/)
+
+// create new instance of Account Admin
+var admin = AccountAdmin(options)
 
 console.log(`
   Hello ${process.env.USER}! I am hoodie admin account REPL! 🐶
@@ -12,8 +17,6 @@ console.log(`
 
   Happy hacking!
 `);
-
-var admin = HoodieAdmin();
 
 var replServer = repl.start({
   prompt: 'hoodie> ',

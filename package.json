@@ -63,8 +63,9 @@
   "scripts": {
     "coverage": "nyc report --reporter=text-lcov | coveralls",
     "semantic-release": "semantic-release pre && npm publish && semantic-release post",
-    "start": "./bin/start.js",
+    "start": "./bin/start.js && npm run account-repl",
     "pretest": "standard",
-    "test": "nyc tap --no-cov './test/{unit,integration}/**/*-test.js'"
+    "test": "nyc tap --no-cov './test/{unit,integration}/**/*-test.js'",
+    "account-repl": "node cli/repl.js"
   }
 }
