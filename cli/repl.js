@@ -1,6 +1,7 @@
 var repl = require('repl')
 
 var AccountAdmin = require('@hoodie/account-client/admin')
+
 var Loader = require('./loader')
 var getCliOptions = require('./options.js');
 
