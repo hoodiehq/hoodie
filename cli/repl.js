@@ -1,31 +1,23 @@
-var repl = require('repl');
-var fs = require('fs');
+var repl = require('repl')
+var fs = require('fs')
 
-var getHoodieDefaults = require('./hoodie-defaults');
-var compatibilityCheck = require('./compatibility-check.js');
-var getHapiOptions = require('./hapi-options.js');
-var getCliOptions = require('./options.js');
-var parseOptions = require('./parse-options.js');
+var HoodieAdmin = require('./index.js')
+var loader = require('./loader')
 
 console.log(`
-  Hello ${process.env.USER}! I am hoodie REPL! 🐶
+  Hello ${process.env.USER}! I am hoodie admin account REPL! 🐶
 
-  hoodie REPL is an application specific CLI for hoodie development.
-  To access the help menu, just run the node command help()
-  This REPL give you access to admin actions, variables.
+  hoodie REPL is an application specific REPL for hoodie development that gives
+  you access to the Account Admin Methods.
+
   Happy hacking!
 `);
+
+var admin = HoodieAdmin();
 
 var replServer = repl.start({
   prompt: 'hoodie> ',
 });
 
-replServer.context.getHoodieDefaults = getHoodieDefaults;
-replServer.context.compatibilityCheck = compatibilityCheck;
-replServer.context.getCliOptions = getCliOptions;
-replServer.context.parseOptions = parseOptions;
-
-replServer.context.help = function() {
-  console.log('how can I help you?');
-}
+replServer.context.admin = admin;
 
