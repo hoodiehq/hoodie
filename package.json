@@ -45,7 +45,7 @@
     "semantic-release": "^6.2.1",
     "simple-mock": "^0.7.0",
     "standard": "^8.0.0",
-    "tap": "^7.0.0"
+    "tap": "^8.0.0"
   },
   "engines": {
     "node": ">=4"
