@@ -42,7 +42,7 @@
     "nyc": "^8.1.0",
     "proxyquire": "^1.7.4",
     "request": "^2.72.0",
-    "semantic-release": "^6.2.1",
+    "semantic-release": "^4.3.5",
     "simple-mock": "^0.7.0",
     "standard": "^8.0.0",
     "tap": "^8.0.0"
