@@ -36,6 +36,8 @@ var packageJsonMock = {
   version: '1.0.0'
 }
 
+var mockWebrootLocator = simple.spy(function (arg) { return arg })
+
 function createCliOptionsProxy (yargsApi) {
   return proxyquire('../../../cli/options', {
     'npmlog': { warn: simple.spy() },
@@ -48,6 +50,7 @@ function createCliOptionsProxy (yargsApi) {
       }
     },
     './app-defaults': mockAppDefaults(),
+    './webroot-locator': mockWebrootLocator,
     'yargs': yargsApi,
     '../package.json': packageJsonMock
   })
@@ -96,6 +99,16 @@ test('config', function (group) {
 
     simple.restore(console, 'log')
     simple.restore(process, 'exit')
+    t.end()
+  })
+
+  group.test('public option', function (t) {
+    var fallbackValue = 'fallback-public'
+    mockWebrootLocator.returnWith(fallbackValue)
+
+    var options = getCliOptions(yargsApi)
+
+    t.equal(options.public, fallbackValue, 'uses the value returned from webroot locator')
     t.end()
   })
 
