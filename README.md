@@ -1,6 +1,6 @@
 # hoodie
 
-> A generic backend with a client API for Offline First applications
+> A generic backend with a client API for Offline First applications.
 
 [![Build Status](https://travis-ci.org/hoodiehq/hoodie.svg?branch=master)](https://travis-ci.org/hoodiehq/hoodie)
 [![Coverage Status](https://coveralls.io/repos/hoodiehq/hoodie/badge.svg?branch=master)](https://coveralls.io/r/hoodiehq/hoodie?branch=master)
@@ -9,7 +9,7 @@
 
 <table>
   <tr>
-    <td>
+    <th>
        <a href="https://hacktoberfest.digitalocean.com/"><img height="200" src="https://dl.dropboxusercontent.com/u/732913/hacktoberfest.png"
  alt="Hacktoberfest 2016 Banner"align="right" /></a>
       <a href="http://hood.ie/animals/#low-profile-dog"><img src="https://avatars1.githubusercontent.com/u/1888826?v=3&s=200"
@@ -21,7 +21,7 @@
       <p>
         We have some great issues prepared for you to work on, check out our <a href="https://github.com/hoodiehq/camp/issues">Hoodie Camp</a> repository :) If you have any questions or just want to say hi, please ping us <a href="https://twitter.com/hoodiehq">on Twitter</a> or join our <a href="http://hood.ie/chat/">Chat</a>. We are looking forward to meet you all! Happy hacktobering!  🙌💻
       </p>
-    </td>
+    </th>
   </tr>
 </table>
 
