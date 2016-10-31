@@ -1,4 +1,5 @@
 module.exports = locateWebroot
+
 var fs = require('fs')
 var pathModule = require('path')
 
