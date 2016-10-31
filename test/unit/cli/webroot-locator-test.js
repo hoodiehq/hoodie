@@ -16,13 +16,14 @@ test('webroot locator', function (group) {
   var webrootLocator = proxyquire('../../../cli/webroot-locator',
     {fs: fsMock})
 
-  group.afterEach(function () {
+  group.afterEach(function (done) {
     fsMock.existsSync.actions.length = 0
     fsMock.existsSync.reset()
     fsMock.statSync.actions.length = 0
     fsMock.statSync.reset()
     statsMock.isDirectory.actions.length = 0
     statsMock.isDirectory.reset()
+    done()
   })
 
   group.test('will return the passed location if it exists and is a directory', function (t) {
@@ -50,7 +51,7 @@ test('webroot locator', function (group) {
 
     t.equal(fsMock.existsSync.lastCall.args[0], configuredLocation, 'path existence check')
     t.equal(statsMock.isDirectory.callCount, 1, 'path directory check')
-    t.equal(webroot, path.resolve('../../../public'), 'correct location returned')
+    t.equal(webroot, path.resolve(__dirname, '../../../public'), 'correct location returned')
 
     t.end()
   })
@@ -62,8 +63,8 @@ test('webroot locator', function (group) {
     var webroot = webrootLocator(configuredLocation)
 
     t.equal(fsMock.existsSync.lastCall.args[0], configuredLocation, 'path existence check')
-    t.equal(fsMock.statSync.callCount, 0, configuredLocation, 'no stat check')
-    t.equal(webroot, path.resolve('../../../public'), 'correct location returned')
+    t.equal(fsMock.statSync.callCount, 0, 'no stat check')
+    t.equal(webroot, path.resolve(__dirname, '../../../public'), 'correct location returned')
 
     t.end()
   })
