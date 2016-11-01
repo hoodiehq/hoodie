@@ -47,7 +47,7 @@ if (saveRequested) {
       // - https://nodejs.org/api/path.html#path_path_parse_path
       var base = path.parse(pathToAppRoot).base
       var readMeContents = '# ' + base + '\n' + 'Created with [hoodie](https://github.com/hoodiehq)'
-      fs.writeFile(fd, readMeContents,
+      fs.writeFile(path.join(pathToAppRoot, 'README.md'), readMeContents,
         function (error) {
           if (error) {
             log.error('setup', 'Could not create README.md at ' + pathToAppRoot)
