@@ -31,7 +31,7 @@ if (saveRequested) {
 
   // Create README.md if one is not found.
   // - https://nodejs.org/api/fs.html#fs_fs_access_path_mode_callback
-  var readmePath = path.join(pathToAppRoot, 'README.md');
+  var readmePath = path.join(pathToAppRoot, 'README.md')
   fs.open(readmePath, 'wx',
     function (error, fd) {
       if (error) {
