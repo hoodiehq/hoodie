@@ -7,6 +7,7 @@ var yargs = require('yargs')
 
 var getAppDefaults = require('./app-defaults')
 var getHoodieDefaults = require('./hoodie-defaults')
+var webrootLocator = require('./webroot-locator')
 
 function getCliOptions (projectPath) {
   var hoodieDefaults = getHoodieDefaults()
@@ -97,6 +98,8 @@ function getCliOptions (projectPath) {
     log.warn('The use of --bindAddress is deprecated. Use the --address option instead.')
     options.address = options.bindAddress
   }
+
+  options.public = webrootLocator(options.public)
 
   // rc & yargs are setting keys we are not interested in, like in-memory or _
   // so we only pick the relevant ones based on they keys of the default options.

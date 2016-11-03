@@ -13,7 +13,8 @@ var hapiPluginOptions = {
   register: hoodie,
   options: {
     inMemory: true,
-    loglevel: 'error'
+    loglevel: 'error',
+    paths: {}
   }
 }
 
