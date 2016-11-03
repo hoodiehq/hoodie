@@ -36,7 +36,7 @@ var packageJsonMock = {
   version: '1.0.0'
 }
 
-var mockWebrootLocator = simple.stub(function (arg) { return arg })
+var mockWebrootLocator = simple.stub()
 
 function createCliOptionsProxy (yargsApi) {
   return proxyquire('../../../cli/options', {

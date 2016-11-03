@@ -13,15 +13,16 @@ var statsMock = {
 }
 
 test('webroot locator', function (group) {
-  var webrootLocator = proxyquire('../../../cli/webroot-locator',
-    {fs: fsMock})
+  var webrootLocator = proxyquire('../../../cli/webroot-locator', {
+    fs: fsMock
+  })
 
   group.afterEach(function (done) {
-    fsMock.existsSync.actions.length = 0
+    fsMock.existsSync.actions = []
     fsMock.existsSync.reset()
-    fsMock.statSync.actions.length = 0
+    fsMock.statSync.actions = []
     fsMock.statSync.reset()
-    statsMock.isDirectory.actions.length = 0
+    statsMock.isDirectory.actions = []
     statsMock.isDirectory.reset()
     done()
   })
