@@ -1,20 +1,25 @@
 var repl = require('repl')
+var PouchDB = require('pouchdb-core')
 
-var AccountAdmin = require('@hoodie/account-client/admin')
+var AccountApi = require('@hoodie/account-server/api')
 
-var Loader = require('./loader')
-var getCliOptions = require('./options.js');
+var Loader = require('./loader') //what did I need the loader for?
+var getOptions = require('./options.js')
 
-var options = getCliOptions(/*how to get the proct path???*/)
+var projectPath = process.cwd()
+var options = getOptions(projectPath)
 
-// create new instance of Account Admin
-var admin = AccountAdmin(options)
+var api = new AccountApi({
+  PouchDB: PouchDB,
+  usersDb: '_users',
+  secret: 'secret'
+})
 
 console.log(`
-  Hello ${process.env.USER}! I am hoodie admin account REPL! 🐶
+  Hello ${process.env.USER}! I am the hoodie console! 🐶
 
-  hoodie REPL is an application specific REPL for hoodie development that gives
-  you access to the Account Admin Methods.
+  hoodie REPL is an application specific node REPL that gives
+  you access to the account server API, including session and account methods.
 
   Happy hacking!
 `);
@@ -23,5 +28,6 @@ var replServer = repl.start({
   prompt: 'hoodie> ',
 });
 
-replServer.context.admin = admin;
+replServer.context.options = options;
+replServer.context.api = api;
 

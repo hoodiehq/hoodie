@@ -1,0 +1,116 @@
+/* ==========================================================================
+   Hoodie Sign In / Sign Up / Sign out stylings
+   ========================================================================== */
+
+body {
+  background: url('../img/pattern_130.gif');
+}
+
+b {
+    position: absolute;
+    left: -999em;
+}
+
+.container {
+  position: relative;
+  background: #fff;
+  margin-top: -10px;
+  padding: 0;
+  box-shadow: 0 0 10px rgba(0,0,0,.5);
+}
+
+
+/* hide contents until we know if user is signed in or not */
+body .hoodie-account-signedin,
+body .hoodie-account-signedout,
+body .hoodie-account-error {
+  display: none;
+}
+
+html[data-hoodie-account-status=signedin]  .hoodie-account-signedin,
+html[data-hoodie-account-status=error]     .hoodie-account-error,
+html[data-hoodie-account-status=signedout] .hoodie-account-signedout {
+  display: block;
+}
+
+.hoodie-accountbar {
+  position: absolute;
+  top: 20px;
+  right: 10px;
+}
+
+.content {
+  padding: 10px;
+  float: left;
+  width: 380px;
+}
+.code {
+  margin: 0 0 0 400px;
+  position: relative;
+}
+.code:before {
+  content: 'main.js';
+  display: block;
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  font-size: 48px;
+  font-family: "Arial Black", sans-serif;
+  color: rgba(255, 255, 255, 0.1);
+}
+
+.code pre {
+  border-radius: 0;
+  border-width: 0 0 0 1px;
+  margin: 0;
+  padding-left: 20px;
+}
+
+.copy {
+  padding: 10px;
+  margin: 30px 0 0;
+  border-radius: 5px;
+}
+.jumbotron,
+.copy {
+  background: #EBE7DA;
+  margin: 0;
+  border-radius: 0;
+}
+.copy p {
+  margin: 0;
+}
+
+ul#todolist {
+  margin: 0 0 10px;
+  padding: 0;
+}
+
+#todolist li {
+  list-style-type: none;
+}
+
+#todolist li input[type=checkbox] {
+  display: inline-block;
+  vertical-align: middle;
+  margin: 0 5px 0 0;
+}
+
+#todolist li input[type=text] {
+  display:none
+}
+
+#todolist li.editing input[type=text] {
+  display: inline-block;
+  vertical-align: middle;
+}
+
+#todolist li.editing label {
+  display: none;
+}
+
+#todolist li label {
+  cursor: pointer;
+  display: inline-block;
+  vertical-align: middle;
+}

@@ -1,0 +1,81 @@
+{
+  "name": "my-first-hoodie",
+  "version": "3.2.1",
+  "bundleDependencies": [
+    "hoodie-plugin-appconfig",
+    "hoodie-plugin-email",
+    "hoodie-plugin-users",
+    "hoodie-server"
+  ],
+  "dependencies": {
+    "hoodie-plugin-appconfig": "^2.0.1",
+    "hoodie-plugin-email": "^1.0.0",
+    "hoodie-plugin-users": "^2.2.2",
+    "hoodie-server": "^4.0.2"
+  },
+  "engines": {
+    "node": ">=0.10.22"
+  },
+  "files": [
+    "www/"
+  ],
+  "hoodie": {
+    "plugins": [
+      "hoodie-plugin-appconfig",
+      "hoodie-plugin-email",
+      "hoodie-plugin-users"
+    ]
+  },
+  "scripts": {
+    "start": "node node_modules/hoodie-server/bin/start"
+  },
+  "type": "app",
+  "gitHead": "33fdb70357c415bbed56bbbd5197c805c0264294",
+  "description": "[![Dependency Status](https://david-dm.org/hoodiehq/my-first-hoodie.svg)](https://david-dm.org/hoodiehq/my-first-hoodie)",
+  "_id": "my-first-hoodie@3.2.1",
+  "_shasum": "240df30b9664e56a04bb2ba2ad26c52e5691d763",
+  "_from": "my-first-hoodie@3.2.1",
+  "_npmVersion": "2.13.0",
+  "_nodeVersion": "2.3.0",
+  "_npmUser": {
+    "name": "boennemann",
+    "email": "stephan@boennemann.me"
+  },
+  "dist": {
+    "shasum": "240df30b9664e56a04bb2ba2ad26c52e5691d763",
+    "tarball": "https://registry.npmjs.org/my-first-hoodie/-/my-first-hoodie-3.2.1.tgz"
+  },
+  "maintainers": [
+    {
+      "name": "svnlto",
+      "email": "me@svenlito.com"
+    },
+    {
+      "name": "caolan",
+      "email": "caolan.mcmahon@gmail.com"
+    },
+    {
+      "name": "gr2m",
+      "email": "gregor@martynus.net"
+    },
+    {
+      "name": "jan",
+      "email": "jan@apache.org"
+    },
+    {
+      "name": "espy",
+      "email": "hello@alexfeyerke.com"
+    },
+    {
+      "name": "boennemann",
+      "email": "stephan@boennemann.me"
+    },
+    {
+      "name": "hoodiebot",
+      "email": "stephan@thehoodiefirm.com"
+    }
+  ],
+  "directories": {},
+  "_resolved": "https://registry.npmjs.org/my-first-hoodie/-/my-first-hoodie-3.2.1.tgz",
+  "readme": "ERROR: No README data found!"
+}
