@@ -66,6 +66,6 @@
     "start": "./bin/start.js",
     "pretest": "standard",
     "test": "nyc tap --no-cov './test/{unit,integration}/**/*-test.js'",
-    "account-repl": "node cli/repl.js"
+    "console": "node cli/console.js"
   }
 }
