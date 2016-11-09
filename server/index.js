@@ -19,6 +19,11 @@ function register (server, options, next) {
   if (!options.db) {
     options.db = {}
   }
+  if (!options.paths) {
+    options.paths = {
+      public: 'public'
+    }
+  }
 
   // mapreduce is required for `db.query()`
   PouchDB.plugin(require('pouchdb-mapreduce'))
@@ -32,12 +37,6 @@ function register (server, options, next) {
 
       // this is a temporary workaround until we replace options.db with options.PouchDB:
       // https://github.com/hoodiehq/hoodie/issues/555
-      if (!options.paths) {
-        options.paths = {
-          data: '.hoodie',
-          public: 'public'
-        }
-      }
       if (!options.paths.data) {
         options.paths.data = '.hoodie'
       }
