@@ -3,7 +3,7 @@
 > A generic backend with a client API for Offline First applications
 
 [![Build Status](https://travis-ci.org/hoodiehq/hoodie.svg?branch=master)](https://travis-ci.org/hoodiehq/hoodie)
-[![Coverage Status](https://coveralls.io/repos/hoodiehq/hoodie/badge.svg?branch=master)](https://coveralls.io/r/hoodiehq/hoodie?branch=master)
+[![Coverage Status](https://coveralls.io/github/hoodiehq/hoodie?branch=master)](https://coveralls.io/r/hoodiehq/hoodie?branch=master)
 [![Dependency Status](https://david-dm.org/hoodiehq/hoodie.svg)](https://david-dm.org/hoodiehq/hoodie)
 [![devDependency Status](https://david-dm.org/hoodiehq/hoodie/dev-status.svg)](https://david-dm.org/hoodiehq/hoodie#info=devDependencies)
 
