@@ -84,10 +84,10 @@ implementing features, refactoring code), otherwise you risk spending a lot of
 time working on something that the project's developers might not want to merge
 into the project.
 
-Please adhere to [JavaScript Standard Style](https://github.com/feross/standard) and any other requirements (such as test coverage).
+### For new Contributors
 
-Adhering to the following this process is the best way to get your work
-included in the project:
+If you never created a pull request before, welcome :tada: :smile: [Here is a great tutorial](https://egghead.io/series/how-to-contribute-to-an-open-source-project-on-github)
+on how to send one :)
 
 1. [Fork](http://help.github.com/fork-a-repo/) the project, clone your fork,
    and configure the remotes:
@@ -117,21 +117,13 @@ included in the project:
 
 4. Make sure to update, or add to the tests when appropriate. Patches and
    features will not be accepted without tests. Run `npm test` to check that
-   all tests pass after you've made changes.
+   all tests pass after you've made changes. Look for a `Testing` section in
+   the project’s README for more information.
 
-5. Commit your changes in logical chunks. Please adhere to these [git commit
-   message guidelines](https://docs.google.com/document/d/1QrDFcIiPjSLDn3EL15IJygNPiHORgU1_OOAqWjiDU5Y/)
-   or your code can't be merged into the main project. Use Git's
-   [interactive rebase](https://help.github.com/articles/interactive-rebase)
-   feature to tidy up your commits before making them public.
+5. If you added or changed a feature, make sure to document it accordingly in
+   the `README.md` file.
 
-6. Locally merge (or rebase) the upstream development branch into your topic branch:
-
-   ```bash
-   git pull [--rebase] upstream master
-   ```
-
-7. Push your topic branch up to your fork:
+6. Push your topic branch up to your fork:
 
    ```bash
    git push origin <topic-branch-name>
@@ -140,10 +132,47 @@ included in the project:
 8. [Open a Pull Request](https://help.github.com/articles/using-pull-requests/)
     with a clear title and description.
 
-9. If you are asked to amend your changes before they can be merged in, please
-   use `git commit --amend` (or rebasing for multi-commit Pull Requests) and
-   force push to your remote feature branch. You may also be asked to squash
-   commits to follow our commit conventions, as they are used by
+### For Members of the Hoodie Contributors Team
+
+1. Clone the repo and create a branch
+
+   ```bash
+   git clone https://github.com/hoodiehq/<repo-name>
+   cd <repo-name>
+   git checkout -b <topic-branch-name>
+   ```
+
+2. Make sure to update, or add to the tests when appropriate. Patches and
+   features will not be accepted without tests. Run `npm test` to check that
+   all tests pass after you've made changes. Look for a `Testing` section in
+   the project’s README for more information.
+
+3. If you added or changed a feature, make sure to document it accordingly in
+   the `README.md` file.
+
+4. Push your topic branch up to our repo
+
+   ```bash
+   git push origin <topic-branch-name>
+   ```
+
+5. Open a Pull Request using your branch with a clear title and description.
+
+Optionally, you can help us with these things. But don’t worry if they are too
+complicated, we can help you out and teach you as we go :)
+
+1. Update your branch to the latest changes in the upstream master branch. You
+   can do that locally with
+
+   ```bash
+   git pull --rebase upstream master
+   ```
+
+   Afterwards force push your changes to your remote feature branch.
+
+2. Once a pull request is good to go, you can tidy up your commit messages using
+   Git's [interactive rebase](https://help.github.com/articles/interactive-rebase).
+   Please follow our commit message conventions shown below, as they are used by
    [semantic-release](https://github.com/semantic-release/semantic-release) to
    automatically determine the new version and release to npm. In a nutshell:
 
@@ -156,10 +185,7 @@ included in the project:
    - Commit changes to `package.json`, `.gitignore` and other meta files with
      `chore(filenamewithoutext): ...`
    - Commit changes to README files or comments with `docs: ...`
-
-   We follow [Angular’s Commit Message Conventions](https://docs.google.com/document/d/1QrDFcIiPjSLDn3EL15IJygNPiHORgU1_OOAqWjiDU5Y/edit).
-   But don’t worry about it, we are happy to help :)
-
+   - Cody style changes with `style: standard`
 
 **IMPORTANT**: By submitting a patch, you agree to license your work under the
 same license as that used by the project.
@@ -177,16 +203,43 @@ If you have commit access, please follow this process for merging patches and cu
 ### Reviewing changes
 
 1. Check that a change is within the scope and philosophy of the component.
-2. Check that a change has any necessary tests and a well formed, descriptive commit message.
-3. Checkout the change and test it locally.
-4. If the change is good, and authored by someone who cannot commit to
-   `master`, please try to avoid using GitHub's merge button. Apply the change
-   to `master` locally (feel free to amend any minor problems in the author's
-   original commit if necessary).
-5. If the change is good, and authored by another maintainer/collaborator, give
-   them a "+1" comment and let them handle the merge.
+2. Check that a change has any necessary tests.
+3. Check that a change has any necessary documentation.
+4. If there is anything you don’t like, leave a comment below the respective
+   lines and submit a "Request changes" review. Repeat until everything has
+   been addressed.
+5. If you are not sure about something, mention `@hoodie/maintainers` or specific
+   people for help in a comment.
+6. If there is only a tiny change left before you can merge it and you think
+   it’s best to fix it yourself, you can directly commit to the author’s fork.
+   Leave a comment about it so the author and others will know.
+7. Once everything looks good, add an "Approve" review. Don’t forget to say
+   something nice 👏🐶💖✨
+8. If the commit messages follow [our conventions](@commit-message-conventions)
 
-The process for merging looks like this:
+   1. If there is a breaking change, make sure that `BREAKING CHANGE:` with
+      _exactly_ that spelling (incl. the ":") is in body of the according
+      commit message. This is _very important_, better look twice :)
+   2. Make sure there are `fix: ...` or `feat: ...` commits depending on wether
+      a bug was fixed or a feature was added. **Gotcha:** look for spaces before
+      the prefixes of ` fix:` and ` feat:`, these get ignored by semantic-release.
+   3. Use the "Rebase and merge" button to merge the pull request.
+   4. Done! You are awesome! Thanks so much for your help 🤗
+
+9. If the commit messages _do not_ follow our conventions
+
+   1. Use the "squash and merge" button to clean up the commits and merge at
+      the same time: ✨🎩
+   2. Is there a breaking change? Describe it in the commit body. Start with
+      _exactly_ `BREAKING CHANGE:` followed by an empty line. For the commit
+      subject:
+   3. Was a new feature added? Use `feat: ...` prefix in the commit subject
+   4. Was a bug fixed? Use `fix: ...` in the commit subject
+
+Sometimes there might be a good reason to merge changes locally. The process
+looks like this:
+
+### Reviewing and merging changes locally
 
 ```
 git checkout master # or the main branch configured on github
@@ -198,7 +251,8 @@ git merge feature-branch # replace name with your branch
 git push
 ```
 
-When merging PRs from forked repositories, we reccomend you install the [hub](https://github.com/github/hub) command line tools.
+When merging PRs from forked repositories, we recommend you install the
+[hub](https://github.com/github/hub) command line tools.
 
 This allows you to do:
 
@@ -206,16 +260,5 @@ This allows you to do:
 hub checkout link-to-pull-request
 ```
 
-meaning that you will automatically check out the branch for the pull request, without needing any other steps like setting git upstreams! :sparkles:
-
-### Submitting changes
-
-1. All non-trivial changes should be put up for review using GitHub Pull
-   Requests.
-2. Your change should not be merged into `master` (or another feature branch),
-   without at least one "+1" comment from another maintainer/collaborator
-   on the project.
-3. Try to avoid using GitHub's merge button. Locally rebase your change onto
-   `master` and then push to GitHub.
-4. Once a feature branch has been merged into its target branch, please delete
-   the feature branch from the remote repository.
+meaning that you will automatically check out the branch for the pull request,
+without needing any other steps like setting git upstreams! :sparkles:
