@@ -1,6 +1,5 @@
 module.exports = bundleClient
 
-var EventEmitter = require('events').EventEmitter
 var fs = require('fs')
 var parallel = require('async').parallel
 
@@ -28,7 +27,7 @@ function bundleClient (hoodieClientPath, bundleTargetPath, config, callback) {
     var targetTime = results[1]
     var hasUpdate = sourceTime > targetTime
 
-    var get = hasUpdate ? buildBundle.bind(null, config, hoodieClientPath) : fs.readFile.bind(null, bundleTargetPath)
+    var get = hasUpdate ? buildBundle.bind(null, config) : fs.readFile.bind(null, bundleTargetPath)
 
     get(function (error, buffer) {
       if (error) {
@@ -51,36 +50,29 @@ function getModifiedTime (path, callback) {
   })
 }
 
-function buildBundle (config, hoodieClientPath, callback) {
-  var browserify = require('browserify')([], {
-    standalone: 'Hoodie'
+function buildBundle (config, callback) {
+  var ReadableStream = require('stream').Readable
+  var browserify = require('browserify')
+  var stream = new ReadableStream()
+
+  var b = browserify(stream, {
+    standalone: 'hoodie'
   })
+  var hoodieBundleSource = ''
 
-  browserify.require(hoodieClientPath)
+  hoodieBundleSource += 'var Hoodie = require("@hoodie/client")\n'
+  hoodieBundleSource += 'var options = {\n'
+  if (config.url) {
+    hoodieBundleSource += '  url: "' + config.url + '",\n'
+  } else {
+    hoodieBundleSource += '  url: location.origin,\n'
+  }
+  hoodieBundleSource += '  PouchDB: require("pouchdb-browser")\n'
+  hoodieBundleSource += '}\n'
+  hoodieBundleSource += 'module.exports = new Hoodie(options)\n'
 
-  var bundleEE = new EventEmitter()
+  stream.push(hoodieBundleSource)
+  stream.push(null)
 
-  bundleEE.on('done', function (error, buffer) {
-    if (error) {
-      return callback(error)
-    }
-
-    var initScript = '\n\n'
-    if (config.url) {
-      initScript += 'var hoodieOptions = {url: "' + config.url + '"}\n'
-    }
-    else {
-      initScript += 'var hoodieOptions = {}\n'
-      initScript += 'if (location && location.origin) {\n'
-      initScript += '  hoodieOptions.url = location.origin\n'
-      initScript += '}\n\n'
-    }
-    initScript += 'hoodie = new Hoodie(hoodieOptions)'
-
-    var initBuffer = Buffer(initScript)
-    callback(null, Buffer.concat([buffer, initBuffer]))
-  })
-
-  browserify.bundle(bundleEE.emit.bind(bundleEE, 'done'))
+  b.bundle(callback)
 }
-

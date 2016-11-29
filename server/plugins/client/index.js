@@ -24,4 +24,3 @@ function register (server, options, next) {
 
   next()
 }
-
