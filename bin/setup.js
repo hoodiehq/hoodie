@@ -20,9 +20,9 @@ if (saveRequested) {
     log.info('setup', 'start script already set to "' + packageJson.scripts[ 'start' ] +
     ', you can start hoodie with "npm run start-hoodie" instead')
 
-    packageJson.scripts[ 'start-hoodie' ] = packageJson.script[ 'start' ]
+    packageJson.scripts[ 'start-hoodie' ] = packageJson.scripts[ 'start' ]
   } else {
-    packageJson.script[ 'start' ] = 'hoodie'
+    packageJson.scripts[ 'start' ] = 'hoodie'
   }
 
   var newPackageJson = JSON.stringify(packageJson, null, 2)
