@@ -65,9 +65,19 @@ function buildBundle (config, hoodieClientPath, callback) {
       return callback(error)
     }
 
-    var options = config.url ? '{url: "' + config.url + '"}' : ''
-    var initBuffer = Buffer('\n\nhoodie = new Hoodie(' + options + ')')
+    var initScript = '\n\n'
+    if (config.url) {
+      initScript += 'var hoodieOptions = {url: "' + config.url + '"}\n'
+    }
+    else {
+      initScript += 'var hoodieOptions = {}\n'
+      initScript += 'if (location && location.origin) {\n'
+      initScript += '  hoodieOptions.url = location.origin\n'
+      initScript += '}\n\n'
+    }
+    initScript += 'hoodie = new Hoodie(hoodieOptions)'
 
+    var initBuffer = Buffer(initScript)
     callback(null, Buffer.concat([buffer, initBuffer]))
   })
 

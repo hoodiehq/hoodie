@@ -51,7 +51,15 @@ test('bundle client', function (group) {
 
       t.is(requireMock.lastCall.arg, 'client.js', 'require client')
       t.is(bundleMock.callCount, 1, 'bundle called once')
-      t.is(buffer.toString(), 'hoodie client content\n\nhoodie = new Hoodie()')
+
+      var expectation = 'hoodie client content\n\n'
+      expectation += 'var hoodieOptions = {}\n'
+      expectation += 'if (location && location.origin) {\n'
+      expectation += '  hoodieOptions.url = location.origin\n'
+      expectation += '}\n\n'
+      expectation += 'hoodie = new Hoodie(hoodieOptions)'
+
+      t.is(buffer.toString(), expectation)
 
       t.end()
     })
@@ -84,7 +92,10 @@ test('bundle client', function (group) {
     }, function (error, buffer) {
       t.error(error)
 
-      t.is(buffer.toString(), 'hoodie client content\n\nhoodie = new Hoodie({url: "https://myapp.com"})')
+      var expectation = 'hoodie client content\n\n'
+      expectation += 'var hoodieOptions = {url: "https://myapp.com"}\n'
+      expectation += 'hoodie = new Hoodie(hoodieOptions)'
+      t.is(buffer.toString(), expectation)
 
       t.end()
     })
