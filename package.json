@@ -13,7 +13,7 @@
   "dependencies": {
     "@hoodie/account": "^2.0.0",
     "@hoodie/admin": "^1.0.1",
-    "@hoodie/client": "^6.0.0",
+    "@hoodie/client": "^7.0.0",
     "@hoodie/server": "^21.1.0",
     "@hoodie/store": "^1.0.1",
     "async": "^2.0.0",
