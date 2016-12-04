@@ -28,6 +28,9 @@ test('bundle client', function (group) {
     var bundleMock = simple.stub().callbackWith(null, new Buffer('hoodie client content'))
     var requireMock = simple.stub()
 
+    var streamStub = {
+      push: simple.stub()
+    }
     var bundleClient = proxyquire('../../server/plugins/client/bundle', {
       browserify: function () {
         return {
@@ -43,23 +46,24 @@ test('bundle client', function (group) {
 
           callback(new Error('boom'))
         })
+      },
+      stream: {
+        Readable: simple.stub().returnWith(streamStub)
       }
     })
 
     bundleClient('client.js', 'bundle.js', {}, function (error, buffer) {
       t.error(error)
 
-      t.is(requireMock.lastCall.arg, 'client.js', 'require client')
       t.is(bundleMock.callCount, 1, 'bundle called once')
 
-      var expectation = 'hoodie client content\n\n'
-      expectation += 'var hoodieOptions = {}\n'
-      expectation += 'if (location && location.origin) {\n'
-      expectation += '  hoodieOptions.url = location.origin\n'
-      expectation += '}\n\n'
-      expectation += 'hoodie = new Hoodie(hoodieOptions)'
-
-      t.is(buffer.toString(), expectation)
+      var expected = 'var Hoodie = require("@hoodie/client")\n' +
+                     'var options = {\n' +
+                     '  url: location.origin,\n' +
+                     '  PouchDB: require("pouchdb-browser")\n' +
+                     '}\n' +
+                     'module.exports = new Hoodie(options)\n'
+      t.is(streamStub.push.calls[0].arg, expected)
 
       t.end()
     })
@@ -69,6 +73,9 @@ test('bundle client', function (group) {
     var bundleMock = simple.stub().callbackWith(null, new Buffer('hoodie client content'))
     var requireMock = simple.stub()
 
+    var streamStub = {
+      push: simple.stub()
+    }
     var bundleClient = proxyquire('../../server/plugins/client/bundle', {
       browserify: function () {
         return {
@@ -84,6 +91,9 @@ test('bundle client', function (group) {
 
           callback(new Error('boom'))
         })
+      },
+      stream: {
+        Readable: simple.stub().returnWith(streamStub)
       }
     })
 
@@ -92,10 +102,13 @@ test('bundle client', function (group) {
     }, function (error, buffer) {
       t.error(error)
 
-      var expectation = 'hoodie client content\n\n'
-      expectation += 'var hoodieOptions = {url: "https://myapp.com"}\n'
-      expectation += 'hoodie = new Hoodie(hoodieOptions)'
-      t.is(buffer.toString(), expectation)
+      var expected = 'var Hoodie = require("@hoodie/client")\n' +
+                     'var options = {\n' +
+                     '  url: "https://myapp.com",\n' +
+                     '  PouchDB: require("pouchdb-browser")\n' +
+                     '}\n' +
+                     'module.exports = new Hoodie(options)\n'
+      t.is(streamStub.push.calls[0].arg, expected)
 
       t.end()
     })
@@ -137,5 +150,6 @@ test('bundle client', function (group) {
       t.end()
     })
   })
+
   group.end()
 })
