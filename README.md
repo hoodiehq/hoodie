@@ -149,6 +149,43 @@ option                    | default      | description
 **account**               | `{}`         | [Hoodie Account Server](https://github.com/hoodiehq/hoodie-account-server/tree/master/plugin#options) options. `account.admins`, `account.secret` and `account.usersDb` are set based on `db` option above.
 **store**                 | `{}`         | [Hoodie Store Server](https://github.com/hoodiehq/hoodie-store-server#options) options. `store.couchdb`, `store.PouchDB` are set based on `db` option above. `store.hooks.onPreAuth` is set to bind user authentication for Hoodie Account to Hoodie Store.
 
+## Extending Hoodie for your app
+
+You can add custom behavior to your hoodie-based application in a few ways:
+
+1. The server-side functionality can be extended by adding a module constructed as a [hapi plugin](http://hapijs.com/tutorials/plugins)
+ to the path `hoodie/server`. E.g:
+ 
+```js
+exports.register = function (server, options, next) {
+  // server-relevant code here
+  next();
+}
+
+exports.register.attributes = {
+  'name': 'my-app'
+}
+```
+ 
+2. The client-side functionality can be extended by adding a module that can be interpreted as a [hoodie plugin](https://github.com/hoodiehq/hoodie-client#hoodieplugin)
+ to the path `hoodie/client`, which by default will be built into the client.js package by browserify. 
+ 
+```js
+module.exports = {
+  demonstratePlugin: function () { // will be attached as hoodie.demonstratePlugin()
+    // client-relevant code here
+  }
+}
+```
+
+Both of the above paths will be imported as if Node modules, so the path to the entry file for each module can be
+`hoodie/{server,client}.js` or `hoodie/{server,client}/index.js`.
+   
+Note that for now only the file modification time of the entry file of the client module is used to determine the
+freshness of the client bundle and therefore whether it should be rebuilt on the first request after a server restart.
+If your client code stretches to many files, you may need to update the `mtime` of the client entry file by using
+`touch` or a similar method before restarting your server to ensure that the client bundle is rebuilt.
+   
 ## Testing
 
 Local setup
