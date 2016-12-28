@@ -1,5 +1,6 @@
 var simple = require('simple-mock')
 var test = require('tap').test
+var path = require('path')
 
 var hapiPlugin = require('../../server')
 var serverMock = {
@@ -82,3 +83,21 @@ test('error on register is passed to callback', function (t) {
   })
 })
 
+test('application root with valid server module', function (t) {
+  var options = {
+    paths: {
+      public: 'public'
+    }
+  }
+  var savedPath = process.cwd()
+  t.tearDown(function () {
+    process.chdir(savedPath)
+  })
+
+  process.chdir(path.resolve(__dirname, '../fixture/app-dir-with-server/'))
+
+  hapiPlugin.register(serverMock, options, function (error, server, options) {
+    t.error(error)
+    t.end()
+  })
+})

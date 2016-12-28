@@ -102,13 +102,14 @@ test('config', function (group) {
     t.end()
   })
 
-  group.test('public option', function (t) {
+  group.test('path options', function (t) {
     var fallbackValue = 'fallback-public'
     mockWebrootLocator.returnWith(fallbackValue)
 
-    var options = getCliOptions(yargsApi)
+    var projectPath = 'project-path'
+    var options = getCliOptions(projectPath)
 
-    t.equal(options.public, fallbackValue, 'uses the value returned from webroot locator')
+    t.equal(options.public, fallbackValue, 'public option uses the value returned from webroot locator')
     t.end()
   })
 
