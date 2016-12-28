@@ -25,7 +25,8 @@ function parseOptions (options) {
       data: options.data,
       public: options.public
     },
-    db: {}
+    db: {},
+    inMemory: Boolean(options.inMemory)
   }
 
   log.level = config.loglevel
@@ -36,9 +37,6 @@ function parseOptions (options) {
 
   if (options.dbUrl) {
     config.db.url = options.dbUrl
-  }
-  if (options.inMemory) {
-    config.inMemory = true
   }
 
   return config
