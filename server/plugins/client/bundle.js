@@ -1,33 +1,54 @@
 module.exports = bundleClient
 
 var fs = require('fs')
+var path = require('path')
 var parallel = require('async').parallel
+var requireResolve = require('../resolver')
+
+function checkModule (module) {
+  try {
+    requireResolve(module)
+    return true
+  } catch (err) {
+    if (err.code !== 'MODULE_NOT_FOUND') {
+      throw err
+    }
+    return false
+  }
+}
 
 /**
- * we compare the mtime (modified time) for the Hoodie client and the target
- * bundle file. If the latter does not exist or Hoodie client was modified
- * more recently, we read out the client and add the `new Hoodie()` init code,
- * otherwise we simply read out the bundle file.
+ * we compare the mtime (modified time) for the last modified dependency of the
+ * Hoodie client and the target bundle file. If the latter does not exist or
+ * any dependency was modified more recently, we read out the client and add
+ * the `new Hoodie()` init code, otherwise we simply read out the bundle file.
  *
  * This optimisation is in preparation for plugins. Plugins can extend the
  * client, so we need to browserify on-the-fly to avoid dependency duplication,
  * and avoiding unneeded bundling with browserify saves a significant time.
  */
 function bundleClient (hoodieClientPath, bundleTargetPath, config, callback) {
-  parallel([
+  var plugins = [
+    path.resolve('hoodie/client')
+  ].filter(checkModule)
+  var getPluginsModifiedTimes = plugins.map(function (pluginPath) {
+    return getModifiedTime.bind(null, requireResolve(pluginPath))
+  })
+
+  parallel(getPluginsModifiedTimes.concat([
     getModifiedTime.bind(null, hoodieClientPath),
     getModifiedTime.bind(null, bundleTargetPath)
-  ], function (error, results) {
+  ]), function (error, results) {
     /* istanbul ignore if */
     if (error) {
       return callback(error)
     }
 
-    var sourceTime = results[0]
-    var targetTime = results[1]
+    var targetTime = results.pop()
+    var sourceTime = Math.max.apply(null, results)
     var hasUpdate = sourceTime > targetTime
 
-    var get = hasUpdate ? buildBundle.bind(null, config) : fs.readFile.bind(null, bundleTargetPath)
+    var get = hasUpdate ? buildBundle.bind(null, config, plugins) : fs.readFile.bind(null, bundleTargetPath)
 
     get(function (error, buffer) {
       if (error) {
@@ -50,7 +71,7 @@ function getModifiedTime (path, callback) {
   })
 }
 
-function buildBundle (config, callback) {
+function buildBundle (config, plugins, callback) {
   var ReadableStream = require('stream').Readable
   var browserify = require('browserify')
   var stream = new ReadableStream()
@@ -70,6 +91,9 @@ function buildBundle (config, callback) {
   hoodieBundleSource += '  PouchDB: require("pouchdb-browser")\n'
   hoodieBundleSource += '}\n'
   hoodieBundleSource += 'module.exports = new Hoodie(options)\n'
+  plugins.forEach(function(pluginPath) {
+    hoodieBundleSource += '  .plugin(require("' + pluginPath + '"))\n'
+  })
 
   stream.push(hoodieBundleSource)
   stream.push(null)

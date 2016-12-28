@@ -16,14 +16,12 @@ var registerPlugins = require('./plugins')
 
 function register (server, options, next) {
   options = _.cloneDeep(options)
-  if (!options.db) {
-    options.db = {}
-  }
-  if (!options.paths) {
-    options.paths = {
+  _.defaultsDeep(options, {
+    db: {},
+    paths: {
       public: 'public'
     }
-  }
+  })
 
   // mapreduce is required for `db.query()`
   PouchDB.plugin(require('pouchdb-mapreduce'))

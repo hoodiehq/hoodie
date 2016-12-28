@@ -8,7 +8,7 @@ var fs = require('fs')
 var path = require('path')
 
 function register (server, options, next) {
-  var publicFolder = options.config.paths.public || 'public'
+  var publicFolder = options.config.paths.public
   var app = path.join(publicFolder, 'index.html')
   var hoodieVersion
   try {
