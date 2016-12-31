@@ -143,7 +143,7 @@ option                    | default      | description
 ------------------------- | ------------ | -------------
 **paths.data**            | `'.hoodie'`  | Data path
 **paths.public**          | `'public'`   | Public path
-**db**                    | –            | [PouchDB options](https://pouchdb.com/api.html#create_database)
+**PouchDB**               | –            | [PouchDB options](https://pouchdb.com/api.html#create_database)
 **inMemory**              | `false`      | If set to true, configuration and other files will not be read from / written to the file system
 **client**                | `{}`         | [Hoodie Client](https://github.com/hoodiehq/hoodie-client#constructor) options. `client.url` is set based on hapi’s `server.info.host`
 **account**               | `{}`         | [Hoodie Account Server](https://github.com/hoodiehq/hoodie-account-server/tree/master/plugin#options) options. `account.admins`, `account.secret` and `account.usersDb` are set based on `db` option above.
