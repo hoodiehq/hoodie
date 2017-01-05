@@ -41,7 +41,8 @@ test('parse options', function (group) {
       public: 'options.public',
       url: 'options.url',
       dbUrl: 'http://foo:bar@baz.com',
-      inMemory: 'aNonNullString'
+      inMemory: 'aNonNullString',
+      adminPassword: 'secret'
     })
 
     t.is(config.paths.data, 'options.data', 'uses data option as data path')
@@ -49,6 +50,7 @@ test('parse options', function (group) {
     t.is(config.paths.public, 'options.public', 'uses public option as public path')
     t.is(config.db.url, 'http://foo:bar@baz.com', 'sets config.db.url from options.dbUrl')
     t.is(config.inMemory, true, 'Sets config.inMemory to boolean equivalent of options.inMemory')
+    t.is(config.adminPassword, 'secret', 'Sets config.adminPassword')
 
     t.end()
   })
