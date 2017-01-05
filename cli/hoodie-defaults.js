@@ -9,6 +9,7 @@ function getHoodieDefaults () {
     dbUrl: undefined,
     inMemory: false,
     loglevel: 'warn',
-    url: undefined
+    url: undefined,
+    adminPassword: undefined
   }
 }

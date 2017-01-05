@@ -39,5 +39,9 @@ function parseOptions (options) {
     config.db.url = options.dbUrl
   }
 
+  if (options.adminPassword) {
+    config.adminPassword = options.adminPassword
+  }
+
   return config
 }
