@@ -71,6 +71,7 @@ option                    | default       | description
 `--address`               | `'127.0.0.1'` | Address to which Hoodie binds
 `--data`                  | `'.hoodie'`   | Data path
 `--dbUrl`                 | –             | If provided, uses external CouchDB. URL has to contain credentials.
+`--adminPassword`         | –             | Password to login to Admin Dashboard. Login is not possible if `adminPassword` option is not set.
 `--loglevel`              | `'warn'`      | One of: silent, error, warn, http, info, verbose, silly
 `-m`, `--inMemory`        | `false`       | Whether to start the PouchDB Server in memory
 `--port`                  | `8080`        | Port-number to run the Hoodie App on
@@ -84,7 +85,8 @@ Hoodie CLI is using [rc](https://www.npmjs.com/package/rc) for configuration, so
 ```json
 {
   "port": 8090,
-  "inMemory": true
+  "inMemory": true,
+  "adminPassword": "secret"
 }
 ```
 
@@ -138,6 +140,7 @@ option                    | default      | description
 **paths.data**            | `'.hoodie'`  | Data path
 **paths.public**          | `'public'`   | Public path
 **db**                    | –            | [PouchDB options](https://pouchdb.com/api.html#create_database)
+**adminPassword**         | –            | Password to login to Admin Dashboard. Login is not possible if `adminPassword` option is not set.
 **inMemory**              | `false`      | If set to true, configuration and other files will not be read from / written to the file system
 **client**                | `{}`         | [Hoodie Client](https://github.com/hoodiehq/hoodie-client#constructor) options. `client.url` is set based on hapi’s `server.info.host`
 **account**               | `{}`         | [Hoodie Account Server](https://github.com/hoodiehq/hoodie-account-server/tree/master/plugin#options) options. `account.admins`, `account.secret` and `account.usersDb` are set based on `db` option above.
