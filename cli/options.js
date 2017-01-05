@@ -73,6 +73,11 @@ function getCliOptions (projectPath) {
         type: 'string',
         default: defaults.url,
         describe: 'URL at which Hoodie Server is accessible (e.g. http://myhoodieapp.com)'
+      },
+      adminPassword: {
+        type: 'string',
+        default: defaults.adminPassword,
+        describe: 'Password to login to Admin Dashboard. Login is not possible unless set.'
       }
     })
     .help('h', 'Show this help message')
