@@ -67,8 +67,6 @@ for account and store related tasks.
    2. ### <a name="store-client"></a>store-client [:octocat:](https://github.com/hoodiehq/hoodie-store-client#readme) [![Build Status](https://travis-ci.org/hoodiehq/hoodie-store-client.svg?branch=master)](https://travis-ci.org/hoodiehq/hoodie-store-client) [![Coverage Status](https://coveralls.io/repos/hoodiehq/hoodie-store-client/badge.svg?branch=master)](https://coveralls.io/r/hoodiehq/hoodie-store-client?branch=master) [![Dependency Status](https://david-dm.org/hoodiehq/hoodie-store-client.svg)](https://david-dm.org/hoodiehq/hoodie-store-client)
 
       > Store client for data persistence and offline sync. It combines [pouchdb-hoodie-api](https://github.com/hoodiehq/pouchdb-hoodie-api) and [pouchdb-hoodie-sync](https://github.com/hoodiehq/pouchdb-hoodie-sync).
-      It adds a few other methods like `.isPersistent()` or `.hasLocalChanges()`
-      and a scoped store API.
 
       1. #### pouchdb-hoodie-api [:octocat:](https://github.com/hoodiehq/pouchdb-hoodie-api#readme) [![Build Status](https://travis-ci.org/hoodiehq/pouchdb-hoodie-api.svg?branch=master)](https://travis-ci.org/hoodiehq/pouchdb-hoodie-api) [![Coverage Status](https://coveralls.io/repos/hoodiehq/pouchdb-hoodie-api/badge.svg?branch=master)](https://coveralls.io/r/hoodiehq/pouchdb-hoodie-api?branch=master) [![Dependency Status](https://david-dm.org/hoodiehq/pouchdb-hoodie-api.svg)](https://david-dm.org/hoodiehq/pouchdb-hoodie-api)
 
