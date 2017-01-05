@@ -41,12 +41,6 @@ Next install hoodie and save it as dependency
 npm install --save hoodie
 ```
 
-<!--
-  TODO: automate package.json update using postinstall
-        https://github.com/hoodiehq/hoodie/issues/477
-        https://github.com/hoodiehq/hoodie/pull/592
--->
-
 Now simply use `npm start` to start up your Hoodie app!
 
 You can find a more thorough description in our [Getting Started Guide](http://docs.hood.ie/camp/start/index.html).
@@ -155,7 +149,7 @@ You can add custom behavior to your hoodie-based application in a few ways:
 
 1. The server-side functionality can be extended by adding a module constructed as a [hapi plugin](http://hapijs.com/tutorials/plugins)
  to the path `hoodie/server`. E.g:
- 
+
 ```js
 exports.register = function (server, options, next) {
   // server-relevant code here
@@ -166,10 +160,10 @@ exports.register.attributes = {
   'name': 'my-app'
 }
 ```
- 
+
 2. The client-side functionality can be extended by adding a module that can be interpreted as a [hoodie plugin](https://github.com/hoodiehq/hoodie-client#hoodieplugin)
- to the path `hoodie/client`, which by default will be built into the client.js package by browserify. 
- 
+ to the path `hoodie/client`, which by default will be built into the client.js package by browserify.
+
 ```js
 module.exports = {
   demonstratePlugin: function () { // will be attached as hoodie.demonstratePlugin()
@@ -180,12 +174,12 @@ module.exports = {
 
 Both of the above paths will be imported as if Node modules, so the path to the entry file for each module can be
 `hoodie/{server,client}.js` or `hoodie/{server,client}/index.js`.
-   
+
 Note that for now only the file modification time of the entry file of the client module is used to determine the
 freshness of the client bundle and therefore whether it should be rebuilt on the first request after a server restart.
 If your client code stretches to many files, you may need to update the `mtime` of the client entry file by using
 `touch` or a similar method before restarting your server to ensure that the client bundle is rebuilt.
-   
+
 ## Testing
 
 Local setup
