@@ -1,7 +1,7 @@
 Welcome to Hoodie
 =================
 
-Hoodie is backend for web applications with a JavaScript API for your frontend.
+Hoodie is a backend for web applications with a JavaScript API for your frontend.
 If you love building apps with HTML, CSS and JavaScript or a frontend framework,
 but *dread* backend work, Hoodie is for you.
 
