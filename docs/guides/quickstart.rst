@@ -8,7 +8,7 @@ and how to include and use the Hoodie library in your project.
 Prerequisites
 ~~~~~~~~~~~~~
 
-For all OS, you’ll need Node.js installed. You can download Node from
+For all operating systems, you’ll need Node.js installed. You can download Node from
 `nodejs.org`_. We recommend the LTS (Long Term Support) version.
 
 Make sure you have version 4 or higher. You can find out with
