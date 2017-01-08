@@ -11,11 +11,9 @@
     "url": "https://github.com/hoodiehq/hoodie/issues"
   },
   "dependencies": {
-    "@hoodie/account": "^2.0.0",
     "@hoodie/admin": "^1.0.1",
     "@hoodie/client": "^9.0.0",
     "@hoodie/server": "^22.0.0",
-    "@hoodie/store": "^1.0.1",
     "async": "^2.0.0",
     "browserify": "^13.0.1",
     "good": "^7.0.2",
