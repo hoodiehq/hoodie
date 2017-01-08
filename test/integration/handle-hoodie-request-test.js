@@ -42,12 +42,25 @@ test('respond to all /hoodie/* - requests with an index.html', function (group) 
 
   group.test('respond to simple /hoodie/', function (t) {
     server.inject({
+      url: 'http://localhost:8090/hoodie/unkown.css',
+      headers: {
+        accept: 'text/css'
+      }
+    }, function (response) {
+      t.is(response.statusCode, 404, 'statusCode is 404')
+
+      t.end()
+    })
+  })
+
+  group.test('respond to simple /hoodie/', function (t) {
+    server.inject({
       url: 'http://localhost:8090/hoodie/unkown',
       headers: {
         accept: 'text/html'
       }
     }, function (response) {
-      t.is(response.statusCode, 404, 'statusCode is 404')
+      t.is(response.statusCode, 200, 'statusCode is 200')
 
       server.stop(t.end)
     })
