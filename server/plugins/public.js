@@ -94,15 +94,15 @@ function register (server, options, next) {
     }
 
     var is404 = response.output.statusCode === 404
-    var isHTML = /text\/html/.test(request.headers.accept)
+    var isResource = /(text\/css|application\/json|application\/javascript|image\/png|image\/jpeg)/.test(request.headers.accept) || /.(css|js|png|jpg)$/.test(request.path)
     var isAccountPath = /^\/hoodie\/account\//.test(request.path)
     var isAdminPath = /^\/hoodie\/admin\//.test(request.path)
     var isStorePath = /^\/hoodie\/store\//.test(request.path)
     var isHoodiePath = /^\/hoodie\//.test(request.path)
 
     // We only care about 404 for html requests...
-    if (!is404 || !isHTML) {
-      return reply.continue()
+    if (is404 && isResource) {
+      return reply(fs.createReadStream(path.join(hoodiePublicPath, '404.html'))).code(404)
     }
 
     if (isAccountPath) {
@@ -115,7 +115,7 @@ function register (server, options, next) {
       return reply(fs.createReadStream(path.join(storePublicPath, 'index.html')))
     }
     if (isHoodiePath) {
-      return reply.continue()
+      return reply(fs.createReadStream(path.join(hoodiePublicPath, 'index.html')))
     }
 
     // Serve index.html
