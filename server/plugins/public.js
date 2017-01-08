@@ -18,8 +18,6 @@ function register (server, options, next) {
   }
 
   var hoodiePublicPath = path.join(require.resolve('../../package.json'), '..', 'public')
-  var accountPublicPath = path.join(require.resolve('@hoodie/account/package.json'), '..', 'public')
-  var storePublicPath = path.join(require.resolve('@hoodie/store/package.json'), '..', 'public')
   var adminPublicPath = path.join(require.resolve('@hoodie/admin/package.json'), '..', 'dist')
 
   server.route([{
@@ -38,26 +36,6 @@ function register (server, options, next) {
     handler: {
       directory: {
         path: hoodiePublicPath,
-        listing: false,
-        index: true
-      }
-    }
-  }, {
-    method: 'GET',
-    path: '/hoodie/account/{p*}',
-    handler: {
-      directory: {
-        path: accountPublicPath,
-        listing: false,
-        index: true
-      }
-    }
-  }, {
-    method: 'GET',
-    path: '/hoodie/store/{p*}',
-    handler: {
-      directory: {
-        path: storePublicPath,
         listing: false,
         index: true
       }
@@ -95,9 +73,7 @@ function register (server, options, next) {
 
     var is404 = response.output.statusCode === 404
     var isResource = /(text\/css|application\/json|application\/javascript|image\/png|image\/jpeg)/.test(request.headers.accept) || /.(css|js|png|jpg)$/.test(request.path)
-    var isAccountPath = /^\/hoodie\/account\//.test(request.path)
     var isAdminPath = /^\/hoodie\/admin\//.test(request.path)
-    var isStorePath = /^\/hoodie\/store\//.test(request.path)
     var isHoodiePath = /^\/hoodie\//.test(request.path)
 
     // We only care about 404 for html requests...
@@ -105,14 +81,8 @@ function register (server, options, next) {
       return reply(fs.createReadStream(path.join(hoodiePublicPath, '404.html'))).code(404)
     }
 
-    if (isAccountPath) {
-      return reply(fs.createReadStream(path.join(accountPublicPath, 'index.html')))
-    }
     if (isAdminPath) {
       return reply(fs.createReadStream(path.join(adminPublicPath, 'index.html')))
-    }
-    if (isStorePath) {
-      return reply(fs.createReadStream(path.join(storePublicPath, 'index.html')))
     }
     if (isHoodiePath) {
       return reply(fs.createReadStream(path.join(hoodiePublicPath, 'index.html')))
