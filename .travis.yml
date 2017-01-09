@@ -6,6 +6,7 @@ node_js:
   - 4
 before_script:
   - npm prune
+  - bin/quick-start-test.sh
 after_success:
   - npm run semantic-release
   - npm run coverage
