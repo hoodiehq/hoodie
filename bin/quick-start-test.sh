@@ -2,7 +2,7 @@
 HOODIE_FOLDER=$(pwd)
 TEMP_ROOT=$(mktemp -d)
 pushd $TEMP_ROOT
-trap "{ popd; rm -rf $TEMP_ROOT; exit 255; }" EXIT
+trap "{ CODE=$?; popd; rm -rf $TEMP_ROOT; exit $CODE; }" EXIT
 
 ## docs/guides/quickstart.rst:41
 
