@@ -91,7 +91,7 @@ function buildBundle (config, plugins, callback) {
   hoodieBundleSource += '  PouchDB: require("pouchdb-browser")\n'
   hoodieBundleSource += '}\n'
   hoodieBundleSource += 'module.exports = new Hoodie(options)\n'
-  plugins.forEach(function(pluginPath) {
+  plugins.forEach(function (pluginPath) {
     hoodieBundleSource += '  .plugin(require("' + pluginPath + '"))\n'
   })
 
