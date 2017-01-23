@@ -14,6 +14,9 @@ test('server', function (t) {
   hapiPlugin.register(serverMock, {
     paths: {
       data: '.'
+    },
+    db: {
+      adapter: 'pouchdb-adapter-fs'
     }
   }, function (error, config) {
     t.error(error)
@@ -34,8 +37,12 @@ test('does not modify the passed options object', function (t) {
   t.end()
 })
 
-test('server with empty options (#554)', function (t) {
-  hapiPlugin.register(serverMock, {}, function (error, config) {
+test('server with options without options.path (#554)', function (t) {
+  hapiPlugin.register(serverMock, {
+    db: {
+      adapter: 'pouchdb-adapter-fs'
+    }
+  }, function (error, config) {
     t.error(error)
     t.end()
   })
@@ -50,6 +57,9 @@ test('error on register is passed to callback', function (t) {
   hapiPlugin.register(serverErrorMock, {
     paths: {
       data: '.'
+    },
+    db: {
+      adapter: 'pouchdb-adapter-fs'
     }
   }, function (error, server, options) {
     t.ok(error)
@@ -61,6 +71,9 @@ test('application root with valid server module', function (t) {
   var options = {
     paths: {
       public: 'public'
+    },
+    db: {
+      adapter: 'pouchdb-adapter-fs'
     }
   }
   var savedPath = process.cwd()

@@ -26,7 +26,9 @@ var parseOptions = proxyquire('../../../cli/parse-options', {
 
 test('parse options', function (group) {
   group.test('unset keys', function (t) {
-    var config = parseOptions({})
+    var config = parseOptions({
+      dbAdapter: 'pouchdb-adapter-fs'
+    })
 
     t.notOk(config.hasOwnProperty('url'), 'does not set config.url by default')
     t.is(config.inMemory, false, 'sets config.inMemory to false by default')

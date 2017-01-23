@@ -19,6 +19,9 @@ test('calls callback with error if server.register fails', function (t) {
   register(serverMock, {
     paths: {
       data: '.'
+    },
+    db: {
+      adapter: 'pouchdb-adapter-fs'
     }
   }, function (error) {
     t.ok(error)
@@ -26,4 +29,3 @@ test('calls callback with error if server.register fails', function (t) {
     t.end()
   })
 })
-

@@ -46,6 +46,7 @@ function createCliOptionsProxy (yargsApi) {
         port: 'hoodie-default-port',
         public: 'hoodie-default-public',
         dbUrl: 'hoodie-default-dbUrl',
+        dbAdapter: 'hoodie-default-dbAdapter',
         address: 'hoodie-localhost'
       }
     },
@@ -66,6 +67,7 @@ test('config', function (group) {
 
     t.is(cliOptions.public.default, 'app-default-public', 'App defaults override hoodie defaults')
     t.is(cliOptions.dbUrl.default, 'hoodie-default-dbUrl', 'Falls back to Hoodie defaults')
+    t.is(cliOptions.dbAdapter.default, 'hoodie-default-dbAdapter', 'Falls back to Hoodie defaults')
     t.is(options.port, 'cli-port', 'returns options from yargs')
 
     t.end()

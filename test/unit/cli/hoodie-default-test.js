@@ -9,6 +9,7 @@ test('hoodie defaults test', function (group) {
       address: '127.0.0.1',
       adminPassword: undefined,
       data: '.hoodie',
+      dbAdapter: 'pouchdb-adapter-fs',
       dbUrl: undefined,
       inMemory: false,
       loglevel: 'warn',
