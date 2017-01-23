@@ -44,27 +44,14 @@ test('respond to all /hoodie/* - requests with an index.html', function (group) 
     checkRequestForPath(t, '/hoodie/store/')
   })
 
-  group.test('respond to simple /hoodie/', function (t) {
-    server.inject({
-      url: 'http://localhost:8090/hoodie/unkown.css',
-      headers: {
-        accept: 'text/css'
-      }
-    }, function (response) {
-      t.is(response.statusCode, 404, 'statusCode is 404')
-
-      t.end()
-    })
-  })
-
-  group.test('respond to simple /hoodie/', function (t) {
+  group.test('respond to /hoodie/unkown', function (t) {
     server.inject({
       url: 'http://localhost:8090/hoodie/unkown',
       headers: {
         accept: 'text/html'
       }
     }, function (response) {
-      t.is(response.statusCode, 200, 'statusCode is 200')
+      t.is(response.statusCode, 404, 'statusCode is 404')
 
       server.stop(t.end)
     })
@@ -72,7 +59,7 @@ test('respond to all /hoodie/* - requests with an index.html', function (group) 
 
   function checkRequestForPath (t, path) {
     server.inject({
-      url: 'http://localhost:8090' + path + 'unknownSubPath',
+      url: 'http://localhost:8090' + path,
       headers: {
         accept: 'text/html'
       }
