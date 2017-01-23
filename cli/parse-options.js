@@ -1,6 +1,8 @@
 module.exports = parseOptions
 
 var log = require('npmlog')
+var PouchDB = require('pouchdb-core')
+var urlParse = require('url').parse
 
 /**
  * Parse options into internal config structure.
@@ -18,14 +20,16 @@ var log = require('npmlog')
  * passe set the `inMemory: true` option. If it’s not set, leveldown is used
  * with the prefix set to `options.data` + 'data' (`.hoodie/data` by default).
  */
+
 function parseOptions (options) {
+  var dbOptions = {}
+
   var config = {
     loglevel: options.loglevel,
     paths: {
       data: options.data,
       public: options.public
     },
-    db: {},
     inMemory: Boolean(options.inMemory)
   }
 
@@ -35,13 +39,30 @@ function parseOptions (options) {
     config.url = options.url
   }
 
-  if (options.dbUrl) {
-    config.db.url = options.dbUrl
-  }
-
   if (options.adminPassword) {
     config.adminPassword = options.adminPassword
   }
+
+  PouchDB.plugin(require('pouchdb-mapreduce'))
+
+  if (options.dbUrl) {
+    if (!urlParse(options.dbUrl).auth) {
+      throw new Error('Authentication details missing from database URL: ' + options.db.url)
+    }
+
+    PouchDB.plugin(require('pouchdb-adapter-http'))
+    dbOptions.prefix = options.dbUrl
+    log.info('config', 'Storing all data in ' + options.dbUrl)
+  } else if (options.inMemory) {
+    PouchDB.plugin(require('pouchdb-adapter-memory'))
+    config.inMemory = true
+    log.info('config', 'Storing all data in memory only')
+  } else {
+    PouchDB.plugin(require('pouchdb-adapter-leveldb'))
+    dbOptions.prefix = config.paths.data + '/data/'
+    log.info('config', 'Storing all data in ' + dbOptions.prefix)
+  }
+  config.PouchDB = PouchDB.defaults(dbOptions)
 
   return config
 }
