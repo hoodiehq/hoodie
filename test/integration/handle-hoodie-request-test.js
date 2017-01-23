@@ -1,5 +1,8 @@
 var Hapi = require('hapi')
 var test = require('tap').test
+var PouchDB = require('pouchdb-core')
+  .plugin(require('pouchdb-mapreduce'))
+  .plugin(require('pouchdb-adapter-memory'))
 
 var hoodie = require('../../').register
 var hapiPluginOptions = {
@@ -7,7 +10,8 @@ var hapiPluginOptions = {
   options: {
     inMemory: true,
     loglevel: 'error',
-    paths: {}
+    paths: {},
+    PouchDB: PouchDB
   }
 }
 
@@ -82,4 +86,3 @@ test('respond to all /hoodie/* - requests with an index.html', function (group) 
 
   group.end()
 })
-

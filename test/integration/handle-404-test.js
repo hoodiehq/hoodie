@@ -1,5 +1,8 @@
 var Hapi = require('hapi')
 var test = require('tap').test
+var PouchDB = require('pouchdb-core')
+  .plugin(require('pouchdb-mapreduce'))
+  .plugin(require('pouchdb-adapter-memory'))
 
 var hoodie = require('../../').register
 var hapiPluginOptions = {
@@ -7,7 +10,8 @@ var hapiPluginOptions = {
   options: {
     inMemory: true,
     loglevel: 'error',
-    paths: {}
+    paths: {},
+    PouchDB: PouchDB
   }
 }
 
@@ -236,4 +240,3 @@ test('forward all hoodie requests that accept anything but html to 404.html', fu
 
   group.end()
 })
-

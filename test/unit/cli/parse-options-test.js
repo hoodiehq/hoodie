@@ -29,7 +29,6 @@ test('parse options', function (group) {
     var config = parseOptions({})
 
     t.notOk(config.hasOwnProperty('url'), 'does not set config.url by default')
-    t.notOk(config.db.hasOwnProperty('url'), 'does not set config.db.url by default')
     t.is(config.inMemory, false, 'sets config.inMemory to false by default')
 
     t.end()
@@ -48,9 +47,42 @@ test('parse options', function (group) {
     t.is(config.paths.data, 'options.data', 'uses data option as data path')
     t.is(config.url, 'options.url', 'sets config.url from options.url')
     t.is(config.paths.public, 'options.public', 'uses public option as public path')
-    t.is(config.db.url, 'http://foo:bar@baz.com', 'sets config.db.url from options.dbUrl')
     t.is(config.inMemory, true, 'Sets config.inMemory to boolean equivalent of options.inMemory')
     t.is(config.adminPassword, 'secret', 'Sets config.adminPassword')
+
+    t.end()
+  })
+
+  group.test('dbUrl', function (t) {
+    var config = parseOptions({
+      public: 'public',
+      data: 'data',
+      dbUrl: 'http://foo:bar@baz.com'
+    })
+    var defaults = config.PouchDB('hack', {skip_setup: true}).__opts
+    t.is(defaults.prefix, 'http://foo:bar@baz.com', 'Sets config.db.url')
+
+    t.end()
+  })
+
+  group.test('dbUrl lacking auth', function (t) {
+    t.throws(parseOptions.bind(null, {
+      public: 'public',
+      data: 'data',
+      dbUrl: 'http://baz.com'
+    }))
+
+    t.end()
+  })
+
+  group.test('inMemory', function (t) {
+    var config = parseOptions({
+      public: 'public',
+      data: 'data',
+      inMemory: true
+    })
+
+    t.is(config.inMemory, true, 'Sets config.inMemory to true')
 
     t.end()
   })

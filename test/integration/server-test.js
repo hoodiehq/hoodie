@@ -21,18 +21,6 @@ test('server', function (t) {
   })
 })
 
-test('server with options.db.url lacking auth', function (t) {
-  hapiPlugin.register(serverMock, {
-    db: {
-      url: 'http://localhost:5984'
-    }
-  }, function (error, config) {
-    t.ok(error, 'fails with error')
-    t.is(error.message, 'Authentication details missing from database URL: http://localhost:5984')
-    t.end()
-  })
-})
-
 test('does not modify the passed options object', function (t) {
   var options = {
     db: {
@@ -49,20 +37,6 @@ test('does not modify the passed options object', function (t) {
 test('server with empty options (#554)', function (t) {
   hapiPlugin.register(serverMock, {}, function (error, config) {
     t.error(error)
-    t.end()
-  })
-})
-
-test('paths without data-attribute', function (t) {
-  var options = {
-    paths: {
-      public: 'public'
-    }
-  }
-
-  hapiPlugin.register(serverMock, options, function (error, server, options) {
-    t.error(error)
-    t.is(options.paths.data, '.hoodie', 'Sets .hoodie as standard paths.data if not given')
     t.end()
   })
 })

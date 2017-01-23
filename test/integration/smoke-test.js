@@ -1,6 +1,9 @@
 var Hapi = require('hapi')
 var request = require('request')
 var test = require('tap').test
+var PouchDB = require('pouchdb-core')
+  .plugin(require('pouchdb-mapreduce'))
+  .plugin(require('pouchdb-adapter-memory'))
 
 var hoodie = require('../../').register
 var hapiOptions = {
@@ -14,7 +17,8 @@ var hapiPluginOptions = {
   options: {
     inMemory: true,
     loglevel: 'error',
-    paths: {}
+    paths: {},
+    PouchDB: PouchDB
   }
 }
 
@@ -44,4 +48,3 @@ test('smoke test', function (t) {
     })
   })
 })
-

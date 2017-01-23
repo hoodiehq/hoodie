@@ -2,6 +2,9 @@ var zlib = require('zlib')
 
 var Hapi = require('hapi')
 var test = require('tap').test
+var PouchDB = require('pouchdb-core')
+  .plugin(require('pouchdb-mapreduce'))
+  .plugin(require('pouchdb-adapter-memory'))
 
 var hoodie = require('../../').register
 var hapiOptions = {
@@ -15,7 +18,8 @@ var hapiPluginOptions = {
   options: {
     inMemory: true,
     loglevel: 'error',
-    paths: {}
+    paths: {},
+    PouchDB: PouchDB
   }
 }
 
@@ -74,4 +78,3 @@ function testGzip (group, server, response) {
     server.stop(group.end)
   })
 }
-
