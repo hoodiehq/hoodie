@@ -69,6 +69,11 @@ function getCliOptions (projectPath) {
         default: defaults.dbUrl,
         describe: 'If provided, uses external CouchDB. URL has to contain credentials.'
       },
+      dbAdapter: {
+        type: 'string',
+        default: defaults.dbAdapter,
+        describe: 'Default PouchDB Adapter (https://pouchdb.com/adapters.html).'
+      },
       url: {
         type: 'string',
         default: defaults.url,

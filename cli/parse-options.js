@@ -58,9 +58,9 @@ function parseOptions (options) {
     config.inMemory = true
     log.info('config', 'Storing all data in memory only')
   } else {
-    PouchDB.plugin(require('pouchdb-adapter-leveldb'))
+    PouchDB.plugin(require(options.dbAdapter))
     dbOptions.prefix = config.paths.data + '/data/'
-    log.info('config', 'Storing all data in ' + dbOptions.prefix)
+    log.info('config', 'Storing all data in ' + dbOptions.prefix + ' using ' + options.dbAdapter)
   }
   config.PouchDB = PouchDB.defaults(dbOptions)
 
