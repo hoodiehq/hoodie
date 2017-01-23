@@ -3,6 +3,7 @@ module.exports = run
 var log = require('npmlog')
 var Hapi = require('hapi')
 
+var assureFolders = require('./assure-folders')
 var compatibilityCheck = require('./compatibility-check.js')
 var getOptions = require('./options')
 var getHapiOptions = require('./hapi-options')
@@ -20,23 +21,30 @@ function run (callback) {
     var projectPath = process.cwd()
     var options = getOptions(projectPath)
 
-    log.level = options.loglevel || 'warn'
+    log.level = options.loglevel
     log.verbose('app', 'Initialising')
 
-    var hapiOptions = getHapiOptions(options)
-    var server = new Hapi.Server(hapiOptions.server)
-    server.connection(hapiOptions.connection)
-
-    server.register({
-      register: hoodie,
-      options: parseOptions(options)
-    }, function (error) {
+    assureFolders(options, function (error) {
       if (error) {
+        log.error('app', error.message)
         return callback(error)
       }
 
-      server.start(function (error) {
-        callback(error, server)
+      var hapiOptions = getHapiOptions(options)
+      var server = new Hapi.Server(hapiOptions.server)
+      server.connection(hapiOptions.connection)
+
+      server.register({
+        register: hoodie,
+        options: parseOptions(options)
+      }, function (error) {
+        if (error) {
+          return callback(error)
+        }
+
+        server.start(function (error) {
+          callback(error, server)
+        })
       })
     })
   })
