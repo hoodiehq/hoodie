@@ -66,19 +66,20 @@ npm start -- --port=8090 --inMemory
 
 Available CLI options are
 
-option                    | default       | description
-------------------------- | ------------- | -------------
-`--address`               | `'127.0.0.1'` | Address to which Hoodie binds
-`--data`                  | `'.hoodie'`   | Data path
-`--dbUrl`                 | –             | If provided, uses external CouchDB. URL has to contain credentials.
-`--adminPassword`         | –             | Password to login to Admin Dashboard. Login is not possible if `adminPassword` option is not set
-`--loglevel`              | `'warn'`      | One of: silent, error, warn, http, info, verbose, silly
-`-m`, `--inMemory`        | `false`       | Whether to start the PouchDB Server in memory
-`--port`                  | `8080`        | Port-number to run the Hoodie App on
-`--public`                | `'public'`    | path to static assets
-`--url`                   | -             | Optional: external URL at which Hoodie Server is accessible (e.g. `http://myhoodieapp.com`)
-`-h`, `--help`, `--usage` | -             | Prints help and available options
-`-v`, `--version`         | -             | Shows Hoodie version
+option                    | default              | description
+------------------------- | -------------------- | -------------
+`--address`               | `'127.0.0.1'`        | Address to which Hoodie binds
+`--data`                  | `'.hoodie'`          | Data path
+`--dbUrl`                 | –                    | If provided, uses external CouchDB. URL has to contain credentials
+`--dbAdapter`             | `pouchdb-adapter-fs` | Default [PouchDB adapter](https://pouchdb.com/adapters.html). Ignored if `dbUrl` or `inMemory` set
+`--adminPassword`         | –                    | Password to login to Admin Dashboard. Login is not possible if `adminPassword` option is not set
+`--loglevel`              | `'warn'`             | One of: silent, error, warn, http, info, verbose, silly
+`-m`, `--inMemory`        | `false`              | Whether to start the PouchDB Server in memory
+`--port`                  | `8080`               | Port-number to run the Hoodie App on
+`--public`                | `'public'`           | path to static assets
+`--url`                   | -                    | Optional: external URL at which Hoodie Server is accessible (e.g. `http://myhoodieapp.com`)
+`-h`, `--help`, `--usage` | -                    | Prints help and available options
+`-v`, `--version`         | -                    | Shows Hoodie version
 
 Hoodie CLI is using [rc](https://www.npmjs.com/package/rc) for configuration, so the same options can be set with environment variables and config files. Environment variables are prefixed with `hoodie_`. Examples: `hoodie_port=8090` or `hoodie_inMemory=true`. Configuration files can be in INI or JSON format and [can be placed at different locations](https://www.npmjs.com/package/rc#standards). Most commonly you would place a `.hoodierc` file in your app’s directory, and it can look like this
 
