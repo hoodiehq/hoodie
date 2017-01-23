@@ -4,6 +4,7 @@ module.exports.register.attributes = {
   dependencies: 'inert'
 }
 
+var createReadStream = require('fs').createReadStream
 var pathJoin = require('path').join
 
 function register (server, options, next) {
@@ -59,6 +60,36 @@ function register (server, options, next) {
       })
     }
   }])
+
+  // serve app whenever an html page is requested
+  // and no other document is available
+  var app = pathJoin(publicFolder, 'index.html')
+  server.ext('onPostHandler', function (request, reply) {
+    var response = request.response
+
+    if (!response.isBoom) {
+      return reply.continue()
+    }
+
+    var is404 = response.output.statusCode === 404
+    var isHtmlRequest = /text\/html/.test(request.headers.accept)
+    var isHoodiePath = /^\/hoodie\//.test(request.path)
+    var isAdminPublicPath = /^\/hoodie\/admin\//.test(request.path) && !(/^\/hoodie\/admin\/api\//).test(request.path)
+
+    if (isAdminPublicPath && isHtmlRequest) {
+      return reply(createReadStream(pathJoin(adminPublicPath, 'index.html')))
+    }
+
+    if (isHoodiePath) {
+      return reply.continue()
+    }
+
+    if (is404 && isHtmlRequest) {
+      return reply(createReadStream(app))
+    }
+
+    reply.continue()
+  })
 
   return next()
 }
