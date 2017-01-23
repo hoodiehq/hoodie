@@ -71,7 +71,7 @@ option                    | default       | description
 `--address`               | `'127.0.0.1'` | Address to which Hoodie binds
 `--data`                  | `'.hoodie'`   | Data path
 `--dbUrl`                 | –             | If provided, uses external CouchDB. URL has to contain credentials.
-`--adminPassword`         | –             | Password to login to Admin Dashboard. Login is not possible if `adminPassword` option is not set.
+`--adminPassword`         | –             | Password to login to Admin Dashboard. Login is not possible if `adminPassword` option is not set
 `--loglevel`              | `'warn'`      | One of: silent, error, warn, http, info, verbose, silly
 `-m`, `--inMemory`        | `false`       | Whether to start the PouchDB Server in memory
 `--port`                  | `8080`        | Port-number to run the Hoodie App on
@@ -137,14 +137,14 @@ The available options are
 
 option                    | default      | description
 ------------------------- | ------------ | -------------
+**PouchDB**               | –            | [PouchDB constructor](https://pouchdb.com/api.html#defaults). See also [custom PouchDB builds](https://pouchdb.com/2016/06/06/introducing-pouchdb-custom-builds.html)
 **paths.data**            | `'.hoodie'`  | Data path
 **paths.public**          | `'public'`   | Public path
-**db**                    | –            | [PouchDB options](https://pouchdb.com/api.html#create_database)
-**adminPassword**         | –            | Password to login to Admin Dashboard. Login is not possible if `adminPassword` option is not set.
+**adminPassword**         | –            | Password to login to Admin Dashboard. Login is not possible if `adminPassword` option is not set
 **inMemory**              | `false`      | If set to true, configuration and other files will not be read from / written to the file system
 **client**                | `{}`         | [Hoodie Client](https://github.com/hoodiehq/hoodie-client#constructor) options. `client.url` is set based on hapi’s `server.info.host`
-**account**               | `{}`         | [Hoodie Account Server](https://github.com/hoodiehq/hoodie-account-server/tree/master/plugin#options) options. `account.admins`, `account.secret` and `account.usersDb` are set based on `db` option above.
-**store**                 | `{}`         | [Hoodie Store Server](https://github.com/hoodiehq/hoodie-store-server#options) options. `store.couchdb`, `store.PouchDB` are set based on `db` option above. `store.hooks.onPreAuth` is set to bind user authentication for Hoodie Account to Hoodie Store.
+**account**               | `{}`         | [Hoodie Account Server](https://github.com/hoodiehq/hoodie-account-server/tree/master/plugin#options) options. `account.admins`, `account.secret` and `account.usersDb` are set based on `db` option above
+**store**                 | `{}`         | [Hoodie Store Server](https://github.com/hoodiehq/hoodie-store-server#options) options. `store.couchdb`, `store.PouchDB` are set based on `db` option above. `store.hooks.onPreAuth` is set to bind user authentication for Hoodie Account to Hoodie Store
 
 ## Extending Hoodie for your app
 
