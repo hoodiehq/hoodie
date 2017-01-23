@@ -31,22 +31,7 @@ function register (server, options, next) {
         return next(error)
       }
 
-      // we register a router handler for /hoodie/* which must be registered
-      // after all other plugins, otherwise routes like /hoodie/account/api/*
-      // will be handled by the public route handler
-      server.register({
-        register: require('./plugins/public'),
-        options: {
-          config: options
-        }
-      }, function (error) {
-        /* istanbul ignore next */
-        if (error) {
-          return next(error)
-        }
-
-        next(null, server, options)
-      })
+      next(null, server, options)
     })
   })
 }

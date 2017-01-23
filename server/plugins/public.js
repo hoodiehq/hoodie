@@ -4,12 +4,10 @@ module.exports.register.attributes = {
   dependencies: 'inert'
 }
 
-var fs = require('fs')
-var path = require('path')
+var pathJoin = require('path').join
 
 function register (server, options, next) {
   var publicFolder = options.config.paths.public
-  var app = path.join(publicFolder, 'index.html')
   var hoodieVersion
   try {
     hoodieVersion = require('hoodie/package.json').version
@@ -17,8 +15,8 @@ function register (server, options, next) {
     hoodieVersion = 'development'
   }
 
-  var hoodiePublicPath = path.join(require.resolve('../../package.json'), '..', 'public')
-  var adminPublicPath = path.join(require.resolve('@hoodie/admin/package.json'), '..', 'dist')
+  var hoodiePublicPath = pathJoin(require.resolve('../../package.json'), '..', 'public')
+  var adminPublicPath = pathJoin(require.resolve('@hoodie/admin/package.json'), '..', 'dist')
 
   server.route([{
     method: 'GET',
@@ -61,36 +59,6 @@ function register (server, options, next) {
       })
     }
   }])
-
-  // serve app whenever an html page is requested
-  // and no other document is available
-  server.ext('onPostHandler', function (request, reply) {
-    var response = request.response
-
-    if (!response.isBoom) {
-      return reply.continue()
-    }
-
-    var is404 = response.output.statusCode === 404
-    var isResource = /(text\/css|application\/json|application\/javascript|image\/png|image\/jpeg)/.test(request.headers.accept) || /.(css|js|png|jpg)$/.test(request.path)
-    var isAdminPath = /^\/hoodie\/admin\//.test(request.path)
-    var isHoodiePath = /^\/hoodie\//.test(request.path)
-
-    // We only care about 404 for html requests...
-    if (is404 && isResource) {
-      return reply(fs.createReadStream(path.join(hoodiePublicPath, '404.html'))).code(404)
-    }
-
-    if (isAdminPath) {
-      return reply(fs.createReadStream(path.join(adminPublicPath, 'index.html')))
-    }
-    if (isHoodiePath) {
-      return reply(fs.createReadStream(path.join(hoodiePublicPath, 'index.html')))
-    }
-
-    // Serve index.html
-    reply(fs.createReadStream(app))
-  })
 
   return next()
 }

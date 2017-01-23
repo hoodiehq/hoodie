@@ -27,7 +27,8 @@ function registerPlugins (server, config, callback) {
   var localPlugins = [
     './client',
     './logger',
-    './maybe-force-gzip'
+    './maybe-force-gzip',
+    './public'
   ]
     .concat(
   [
