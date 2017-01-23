@@ -1,6 +1,7 @@
 module.exports = parseOptions
 
 var log = require('npmlog')
+var path = require('path')
 var PouchDB = require('pouchdb-core')
 var urlParse = require('url').parse
 
@@ -59,7 +60,7 @@ function parseOptions (options) {
     log.info('config', 'Storing all data in memory only')
   } else {
     PouchDB.plugin(require(options.dbAdapter))
-    dbOptions.prefix = config.paths.data + '/data/'
+    dbOptions.prefix = path.join(config.paths.data, 'data') + path.sep
     log.info('config', 'Storing all data in ' + dbOptions.prefix + ' using ' + options.dbAdapter)
   }
   config.PouchDB = PouchDB.defaults(dbOptions)
