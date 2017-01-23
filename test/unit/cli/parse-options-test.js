@@ -27,6 +27,7 @@ var parseOptions = proxyquire('../../../cli/parse-options', {
 test('parse options', function (group) {
   group.test('unset keys', function (t) {
     var config = parseOptions({
+      data: '.hoodie',
       dbAdapter: 'pouchdb-adapter-fs'
     })
 
