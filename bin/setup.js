@@ -17,10 +17,11 @@ if (saveRequested) {
   packageJson.scripts = packageJson.scripts || {}
 
   if (packageJson.scripts[ 'start' ]) {
-    log.info('setup', 'start script already set to "' + packageJson.scripts[ 'start' ] +
-    ', you can start hoodie with "npm run start-hoodie" instead')
-
-    packageJson.scripts[ 'start-hoodie' ] = 'hoodie'
+    if (!(packageJson.scripts[ 'start' ].startsWith('hoodie'))) {
+      log.info('setup', 'start script already set to "' + packageJson.scripts[ 'start' ] +
+      ', you can start hoodie with "npm run start-hoodie" instead')
+      packageJson.scripts[ 'start-hoodie' ] = 'hoodie'
+    }
   } else {
     packageJson.scripts[ 'start' ] = 'hoodie'
   }
