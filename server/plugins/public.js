@@ -5,10 +5,14 @@ module.exports.register.attributes = {
 }
 
 var createReadStream = require('fs').createReadStream
+var existsSync = require('fs').existsSync
 var pathJoin = require('path').join
 
 function register (server, options, next) {
   var publicFolder = options.config.paths.public
+  if(!existsSync(publicFolder)){
+    publicFolder = "fallback-ui";
+  }
   var hoodieVersion
   try {
     hoodieVersion = require('hoodie/package.json').version
@@ -16,7 +20,7 @@ function register (server, options, next) {
     hoodieVersion = 'development'
   }
 
-  var hoodiePublicPath = pathJoin(require.resolve('../../package.json'), '..', 'public')
+  var hoodiePublicPath = pathJoin(require.resolve('../../package.json'), '..', 'hoodie')
   var adminPublicPath = pathJoin(require.resolve('@hoodie/admin/package.json'), '..', 'dist')
 
   server.route([{
