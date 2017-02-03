@@ -30,7 +30,7 @@ Here is a list of all available options
 +-----------------+--------------------------+--------------------------+------------+----------------------------------------------------------------------------------------------------------------------------------+
 | url             | -                        | ``--url``                | ``hoodie_url``           | Optional: external URL at which Hoodie Server is accessible (e.g. ``http://myhoodieapp.com``)                      |
 +-----------------+--------------------------+--------------------------+--------------------------+--------------------------------------------------------------------------------------------------------------------+
-| adminPassword   | -                        | ``--adminPassword``      | ``hoodie_AdminPassword`` | Password to login to Admin Dashboard. Login is not possible unless set                                             |
+| adminPassword   | -                        | ``--adminPassword``      | ``hoodie_adminPassword`` | Password to login to Admin Dashboard. Login is not possible unless set                                             |
 +-----------------+--------------------------+--------------------------+--------------------------+--------------------------------------------------------------------------------------------------------------------+
 
 Defaults
