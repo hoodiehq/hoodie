@@ -4,12 +4,20 @@ Files & Folders
 package.json
 ~~~~~~~~~~~~
 
-TO BE DONE: Describe package.json file
+Contains a list of javascript addon `packages`_ hosted on `npm`_. Hoodie includes a few addon packages but you can add more to the list if required. Addons provide additional features which you can use in your app. The npm website works as an addon package manager. It keeps track of specific versions of packages so your app won't break if a new version of an addon is released.
+
+.. _packages: https://docs.npmjs.com/files/package.json
+.. _npm: https://www.npmjs.com/
 
 README.md
 ~~~~~~~~~
 
-TO BE DONE: Describe README file
+The README file provides `guidance`_ about your app's code for new users or contributors. It's the place to describe what your app does and the motivation behind it. If you choose to host your code online using websites such as `gitlab`_ or `github`_, the README file is displayed prominently on the project page. The file is saved in `markdown`_ format. This allows you to write in plain text or use the markdown language to add formatting such as hyperlinks and or headings. 
+
+.. _github: https://github.com
+.. _gitlab: https://gitlab.com
+.. _markdown: https://en.wikipedia.org/wiki/Markdown
+.. _guidance: https://gist.github.com/indexzero/1363524
 
 .hoodie/
 ~~~~~~~~
