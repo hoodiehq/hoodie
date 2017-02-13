@@ -220,7 +220,7 @@ If you have commit access, please follow this process for merging patches and cu
    1. If there is a breaking change, make sure that `BREAKING CHANGE:` with
       _exactly_ that spelling (incl. the ":") is in body of the according
       commit message. This is _very important_, better look twice :)
-   2. Make sure there are `fix: ...` or `feat: ...` commits depending on wether
+   2. Make sure there are `fix: ...` or `feat: ...` commits depending on whether
       a bug was fixed or a feature was added. **Gotcha:** look for spaces before
       the prefixes of ` fix:` and ` feat:`, these get ignored by semantic-release.
    3. Use the "Rebase and merge" button to merge the pull request.
