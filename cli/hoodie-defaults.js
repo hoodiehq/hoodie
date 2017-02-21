@@ -11,6 +11,7 @@ function getHoodieDefaults () {
     inMemory: false,
     loglevel: 'warn',
     url: undefined,
-    adminPassword: undefined
+    adminPassword: undefined,
+    hoodie.plugins=[]
   }
 }
