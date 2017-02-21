@@ -32,11 +32,13 @@ function bundleClient (hoodieClientPath, bundleTargetPath, config, callback) {
     path.resolve('hoodie/client')
   ].filter(checkModule)
 
-  var thirdPartyPlugins = require('hoodie.plugins')
-  $.each(thirdPartyPlugins, function(){
-    concat(
-    path.resolve('hoodie/client').filter(checkModule)
-    )
+  var thirdPartyPlugins = config.plugins
+
+  thirdPartyPlugins.foreach(function (pluginName) {
+  var pluginPath = pluginName + '/hoodie/client'
+  if (checkModule(pluginPath)) {
+    plugins.push(require.resolve(pluginPath))
+    }
   })
   
   var getPluginsModifiedTimes = plugins.map(function (pluginPath) {
