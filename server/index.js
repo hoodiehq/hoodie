@@ -19,14 +19,11 @@ function register (server, options, next) {
 
   server.ext('onPreResponse', corsHeaders)
 
-  registerPlugins(server, options, function (error) {
+  server.register({register: hoodieServer, options: options}, function (error) {
     if (error) {
       return next(error)
     }
-    server.register({
-      register: hoodieServer,
-      options: options
-    }, function (error) {
+    registerPlugins(server, options, function (error) {
       if (error) {
         return next(error)
       }
