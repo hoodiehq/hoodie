@@ -43,6 +43,20 @@ function registerPlugins (server, config, callback) {
       }
     })
 
+  var thirdPartyPlugins = require('hoodie.plugins')
+
+  $.each(thirdPartyPlugins, function(){
+    concat(
+    path.resolve('hoodie/server').filter(checkModule)
+    )
+    .map(function (register) {
+      return {
+        options: options,
+        register : require(register)
+      }
+    })
+  })
+
   log.silly('hapi', 'Registering internal plugins')
   server.register(hapiPlugins.concat(localPlugins), function (error) {
     if (error) {

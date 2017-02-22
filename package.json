@@ -67,5 +67,6 @@
     "pretest": "standard",
     "test": "nyc tap --no-cov './test/{unit,integration}/**/*-test.js'",
     "postinstall": "node ./bin/setup.js"
-  }
+  },
+  "hoodie": {"plugins": []}
 }
