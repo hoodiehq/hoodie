@@ -51,7 +51,7 @@ function transform (data, enc, next) {
   }
 
   log.silly(data.event, data)
-  next(null, data)
+  next(null)
 }
 
 function findLogLevel (levels, tags) {
