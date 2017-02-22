@@ -155,7 +155,7 @@ test('logger', function (group) {
     logger._transform(eventMock, 'utf8', transformCallback)
 
     t.equals(transformCallback.callCount, 1, 'callback is called')
-    t.equals(transformCallback.lastCall.args[1], eventMock, 'data is passed through transform')
+    t.equals(transformCallback.lastCall.args[1], undefined, 'nothing is passed through transform')
 
     t.end()
   })
