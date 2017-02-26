@@ -43,7 +43,7 @@ npm install --save hoodie
 
 Now simply use `npm start` to start up your Hoodie app!
 
-You can find a more thorough description in our [Getting Started Guide](http://docs.hood.ie/camp/start/index.html).
+You can find a more thorough description in our [Getting Started Guide](http://docs.hood.ie/en/latest/guides/quickstart.html).
 
 ## Usage
 

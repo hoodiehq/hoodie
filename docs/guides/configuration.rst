@@ -33,6 +33,7 @@ Here is a list of all available options
 +-----------------+--------------------------+--------------------------+--------------------------+---------------------------------------------------------------------------------------------------------------------+
 | adminPassword   | -                        | ``--adminPassword``      | ``hoodie_adminPassword`` | Password to login to Admin Dashboard. Login is not possible unless set                                              |
 +-----------------+--------------------------+--------------------------+--------------------------+---------------------------------------------------------------------------------------------------------------------+
+
 Defaults
 --------
 
@@ -61,7 +62,7 @@ default values
 ~~~~~~~~~
 
 The ``.hoodierc`` can be used to set configuration when running your Hoodie
-backend in that folder. It should not be comitted to your repository.
+backend in that folder. It should not be committed to your repository.
 
 The content can be in JSON or INI format. See the `rc package on npm <https://www.npmjs.com/package/rc>`__
 for more information

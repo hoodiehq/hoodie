@@ -26,7 +26,7 @@ We define simple Hapi plugins for `logging <https://github.com/hoodiehq/hoodie/b
 and for `serving the app’s public assets and the Hoodie client <https://github.com/hoodiehq/hoodie/blob/master/server/plugins/public.js>`__.
 
 Once everything is setup, the server is then started at the end of
-`cli/start.js <https://github.com/hoodiehq/hoodie/blob/master/cli/start.js>`__
+`cli/start.js <https://github.com/hoodiehq/hoodie/blob/master/cli/index.js>`__
 and the URL where hoodie is running is logged to the terminal.
 
 Modules

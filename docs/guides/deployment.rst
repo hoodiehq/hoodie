@@ -4,9 +4,10 @@ Deployment
 One line deploy
 ~~~~~~~~~~~~~~~
 
-After you’ve built your Hoodie app you probably want to put it online. You can choose to deploy your app as read-only or deploy the backend couchdb database as well. This `video`_ and the text below descibes how to deploy your app using one line of code. Alternatively, you can deploy your app using Docker, please refer to the Docker section. 
+After you’ve built your Hoodie app you probably want to put it online. You can choose to deploy your app as read-only or deploy the backend couchdb database as well. This `video`_ and the text below describes how to deploy your app using one line of code. Alternatively, you can deploy your app using Docker, please refer to the Docker section. 
 
 .. _video: https://youtu.be/29Uclxq_1Vw
+
 Deploying to Now
 ~~~~~~~~~~~~~~~~
 .. _command line tool: https://github.com/zeit/now-cli
@@ -17,7 +18,7 @@ Deploying to Now
 
 $ now hoodiehq/hoodie-app-tracker --npm -e NODE_ENV=production -e hoodie_inMemory=true
 
-To decribe this further:
+To describe this further:
 
 - :code:`hoodiehq/hoodie-app-tracker` is the GitHub repository slug.
 
@@ -34,6 +35,7 @@ Alternatively, add this script to your package.json and you are good to go:
       "now-start": "hoodie --inMemory",
 
 .. _Now: https://zeit.co/now
+
 Store Data With Cloudant
 ~~~~~~~~~~~~~~~~~~~~~~~~
 .. _Cloudant: https://cloudant.com/_

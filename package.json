@@ -45,7 +45,11 @@
     "semantic-release": "^6.3.1",
     "simple-mock": "^0.7.0",
     "standard": "^8.0.0",
-    "tap": "^10.0.0"
+    "tap": "^10.0.0",
+    "textlint": "^6.8.0",
+    "textlint-rule-common-misspellings": "^1.0.1",
+    "textlint-rule-rousseau": "^1.4.5",
+    "textlint-rule-no-dead-link": "^3.1.1"
   },
   "engines": {
     "node": ">=4"
@@ -66,6 +70,7 @@
     "start": "./bin/start.js",
     "pretest": "standard",
     "test": "nyc tap --no-cov './test/{unit,integration}/**/*-test.js'",
-    "postinstall": "node ./bin/setup.js"
+    "postinstall": "node ./bin/setup.js",
+    "textlint": "textlint docs/**/*.md README.md"
   }
 }
