@@ -4,3 +4,4 @@ node_modules
 .DS_Store
 .hoodie
 .nyc_output
+docs/_build/
