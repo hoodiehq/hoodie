@@ -28,6 +28,22 @@ Then install two pip packages: `Sphinx <http://www.sphinx-doc.org/en/stable/>`_ 
 Change directory to ..hoodie/docs/
 
  ``make html``
+|
+
+If you are using windows powershell, note there is a little deviation.
+
+ ``pip install sphinx``
+
+ ``pip install sphinx_rtd_theme``
+
+Before execute the ``make html`` command you have to install `make <http://gnuwin32.sourceforge.net/packages/make.htm>`_ in windows if you are not already done. 
+You can also see this Stackoverflow `link <http://stackoverflow.com/questions/12881854/how-to-use-gnu-make-on-windows>`_ for a clear understanding.
+
+Now change directory to ..hoodie/docs/
+
+ ``make html``
+
+|
 
 After building, your updated documents are in the docs/_build/html subdirectory. Click on any .html document, this will open your web browser and the documents will be viewable.
 
