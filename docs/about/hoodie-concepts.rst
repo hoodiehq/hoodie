@@ -97,7 +97,7 @@ First.
 
 **Offline First means: build your apps without the assumption of
 permanent connectivity**. Cache data and apps locally. Build interfaces
-that accomodate the offline state elegantly. Design user interactions
+that accommodate the offline state elegantly. Design user interactions
 that will not break if their train goes into a tunnel. Don't freak out
 your users with network error messages or frustrate them with
 inaccessible data. **Offline First apps are faster, more robust, more
