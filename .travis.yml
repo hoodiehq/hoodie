@@ -1,4 +1,4 @@
-sudo: false
+sudo: required
 language: node_js
 notifications:
   email: false
@@ -7,6 +7,13 @@ node_js:
 before_script:
   - npm prune
   - bin/quick-start-test.sh
+  - wget https://github.com/jgm/pandoc/releases/download/1.16.0.2/pandoc-1.16.0.2-1-amd64.deb
+  - sudo dpkg -i pandoc-1.16.0.2-1-amd64.deb
+  - find ./ -iname "*.rst" -type f -exec sh -c 'pandoc "${0}" -o "${0%.md}.md"' {} \;
+  - rm docs/guides/quickstart.rst.md
+  - gem install awesome_bot
+  - awesome_bot --allow-redirect --allow-dupe docs/**/*.md README.md --white-list http://127.0.0.1:8080,http://myhoodieapp.com,https://pouchdb.com/adapters,https://hoodie-app-tracker-randomxyz.now.sh/,https://my-tracker-app.now.sh,https://hapijs.com/tutorials/,https://opencollective.com
+  - npm run textlint
 after_success:
   - npm run semantic-release
   - npm run coverage
