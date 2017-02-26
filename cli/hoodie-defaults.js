@@ -7,6 +7,8 @@ function getHoodieDefaults () {
     data: '.hoodie',
     public: 'public',
     dbUrl: undefined,
+    dbUrlPassword: undefined,
+    dbUrlUsername: undefined,
     dbAdapter: 'pouchdb-adapter-fs',
     inMemory: false,
     loglevel: 'warn',

@@ -69,7 +69,7 @@
     "semantic-release": "semantic-release pre && npm publish && semantic-release post",
     "start": "./bin/start.js",
     "pretest": "standard",
-    "test": "nyc tap --no-cov './test/{unit,integration}/**/*-test.js'",
+    "test": "nyc tap --no-cov ./test/{unit,integration}/**/*-test.js",
     "postinstall": "node ./bin/setup.js",
     "textlint": "textlint docs/**/*.md README.md"
   }

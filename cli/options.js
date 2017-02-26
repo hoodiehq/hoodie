@@ -67,7 +67,17 @@ function getCliOptions (projectPath) {
       dbUrl: {
         type: 'string',
         default: defaults.dbUrl,
-        describe: 'If provided, uses external CouchDB. URL has to contain credentials.'
+        describe: 'If provided, uses external CouchDB. (Can contain auth credentials)'
+      },
+      dbUrlPassword: {
+        type: 'string',
+        default: defaults.dbUrlPassword,
+        describe: 'Provides the password for auth with the db at dbUrl (requires dbUrl and/or dbUrlUsername)'
+      },
+      dbUrlUsername: {
+        type: 'string',
+        default: defaults.dbUrlUsername,
+        describe: 'Provides the username for auth with the db at dbUrl (requires dbUrl and dbUrlPassword)'
       },
       dbAdapter: {
         type: 'string',

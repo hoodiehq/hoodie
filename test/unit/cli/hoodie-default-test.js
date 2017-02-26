@@ -11,6 +11,8 @@ test('hoodie defaults test', function (group) {
       data: '.hoodie',
       dbAdapter: 'pouchdb-adapter-fs',
       dbUrl: undefined,
+      dbUrlPassword: undefined,
+      dbUrlUsername: undefined,
       inMemory: false,
       loglevel: 'warn',
       port: 8080,

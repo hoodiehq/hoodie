@@ -70,9 +70,11 @@ option                    | default              | description
 ------------------------- | -------------------- | -------------
 `--address`               | `'127.0.0.1'`        | Address to which Hoodie binds
 `--data`                  | `'.hoodie'`          | Data path
-`--dbUrl`                 | –                    | If provided, uses external CouchDB. URL has to contain credentials
+`--dbUrl`                 | -                    | If provided, uses external CouchDB listening at the given URL. (Can contain auth credentials)
+`--dbUrlUsername`         | -                    | Username to authenticate with the external CouchDB (requires --dbUrl and --dbUrlPassword to be set).
+`--dbUrlPassword`         | -                    | Password to authenticate with the external CouchDB (requires --dbUrl and/or --dbUrlUsername to be set).
 `--dbAdapter`             | `pouchdb-adapter-fs` | Default [PouchDB adapter](https://pouchdb.com/adapters.html). Ignored if `dbUrl` or `inMemory` set
-`--adminPassword`         | –                    | Password to login to Admin Dashboard. Login is not possible if `adminPassword` option is not set
+`--adminPassword`         | -                    | Password to login to Admin Dashboard. Login is not possible if `adminPassword` option is not set
 `--loglevel`              | `'warn'`             | One of: silent, error, warn, http, info, verbose, silly
 `-m`, `--inMemory`        | `false`              | Whether to start the PouchDB Server in memory
 `--port`                  | `8080`               | Port-number to run the Hoodie App on

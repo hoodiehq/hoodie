@@ -2,8 +2,10 @@ module.exports = parseOptions
 
 var log = require('npmlog')
 var path = require('path')
+
 var PouchDB = require('pouchdb-core')
-var urlParse = require('url').parse
+
+var createAuthDbUrl = require('./utils/create-auth-dbUrl')
 
 /**
  * Parse options into internal config structure.
@@ -20,6 +22,7 @@ var urlParse = require('url').parse
  * PouchDB is being used. A shortcut to set PouchDB’s adapter to memdown is to
  * passe set the `inMemory: true` option. If it’s not set, leveldown is used
  * with the prefix set to `options.data` + 'data' (`.hoodie/data` by default).
+ *
  */
 
 function parseOptions (options) {
@@ -46,11 +49,9 @@ function parseOptions (options) {
 
   PouchDB.plugin(require('pouchdb-mapreduce'))
 
-  if (options.dbUrl) {
-    if (!urlParse(options.dbUrl).auth) {
-      throw new Error('Authentication details missing from database URL: ' + options.db.url)
-    }
+  options.dbUrl = createAuthDbUrl(options.dbUrlUsername, options.dbUrlPassword, options.dbUrl)
 
+  if (options.dbUrl) {
     PouchDB.plugin(require('pouchdb-adapter-http'))
     dbOptions.prefix = options.dbUrl
     log.info('config', 'Storing all data in ' + options.dbUrl)
