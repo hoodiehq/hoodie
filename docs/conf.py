@@ -77,7 +77,7 @@ pygments_style = 'sphinx'
 #html_theme = ''
 #if not on_rtd:  # only import and set the theme if we're building docs locally
  #   import sphinx_rtd_theme
-    html_theme = 'sphinx_rtd_theme'
+ #   html_theme = 'sphinx_rtd_theme'
   #  html_theme_path = [sphinx_rtd_theme.get_html_theme_path()]
 #  Custom Hoodie theming?
 #    html_style = 'css/hoodie.css'
