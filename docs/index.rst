@@ -25,6 +25,12 @@ Hoodie Documentation
    :maxdepth: 1
    :caption: Developers
    
+   developers/CONTRIBUTING
+   developers/CODING_STYLE
+   developers/TRIAGING
+   developers/CONTRIBUTING_DOCS
+   developers/DOCS_STYLE
+
 .. toctree::
    :maxdepth: 1
    :caption: About
