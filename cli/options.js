@@ -64,20 +64,20 @@ function getCliOptions (projectPath) {
         default: defaults.inMemory,
         describe: 'Whether to start the PouchDB Server in memory'
       },
-      username: {
+      dbUrl: {
         type: 'string',
-        default: defaults.username,
-        describe: 'Provides the username (if required) for auth with the db at dbAddress (dbAddress must be set)'
+        default: defaults.dbUrl,
+        describe: 'If provided, uses external CouchDB. (Can contain auth credentials)'
       },
-      pass: {
+      dbUrlPassword: {
         type: 'string',
-        default: defaults.pass,
-        describe: 'Provides the password (if required) for auth with the db at dbAddress (dbAddress and username must be set)'
+        default: defaults.dbUrlPassword,
+        describe: 'Provides the password (if required) for auth with the db at dbUrl (requires dbUrl and/or dbUrlUsername)'
       },
-      dbAddress: {
+      dbUrlUsername: {
         type: 'string',
-        default: defaults.dbAddress,
-        describe: 'If provided, uses external CouchDB. Use --username and --pass to include credentials'
+        default: defaults.dbUrlUsername,
+        describe: 'Provides the username (if required) for auth with the db at dbUrl (requires dbUrl and dbUrlPassword)'
       },
       dbAdapter: {
         type: 'string',

@@ -16,7 +16,8 @@ var getDefaultsMock = function () {
 }
 getDefaultsMock['@noCallThru'] = true
 var logMock = {
-  info: function () {}
+  info: function () {},
+  warn: function () {}
 }
 
 var parseOptions = proxyquire('../../../cli/parse-options', {
@@ -43,6 +44,8 @@ test('parse options', function (group) {
       public: 'options.public',
       url: 'options.url',
       dbUrl: 'http://foo:bar@baz.com',
+      dbUrlPassword: 'I@mApassword',
+      dbUrlUsername: 'I@mAusername4db',
       inMemory: 'aNonNullString',
       adminPassword: 'secret'
     })
@@ -56,6 +59,7 @@ test('parse options', function (group) {
     t.end()
   })
 
+  // foo:bar@baz.com passing
   group.test('dbUrl', function (t) {
     var config = parseOptions({
       public: 'public',
@@ -64,6 +68,57 @@ test('parse options', function (group) {
     })
     var defaults = config.PouchDB('hack', {skip_setup: true}).__opts
     t.is(defaults.prefix, 'http://foo:bar@baz.com', 'Sets config.db.url')
+
+    t.end()
+  })
+
+  group.test('dbUrl', function (t) {
+    var config = parseOptions({
+      public: 'public',
+      data: 'data',
+      dbUrl: 'https://foo:bar@baz.com'
+    })
+    var defaults = config.PouchDB('hack', {skip_setup: true}).__opts
+    t.is(defaults.prefix, 'https://foo:bar@baz.com', 'Sets config.db.url')
+
+    t.end()
+  })
+
+  // https://foo@baz.com passing
+  group.test('dbUrl', function (t) {
+    var config = parseOptions({
+      public: 'public',
+      data: 'data',
+      dbUrl: 'https://https://foo@baz.com'
+    })
+    var defaults = config.PouchDB('hack', {skip_setup: true}).__opts
+    t.is(defaults.prefix, 'https://https:%2F%2Ffoo@baz.com', 'Sets config.db.url')
+
+    t.end()
+  })
+
+  // @@:@@@baz.com passing
+  group.test('dbUrl', function (t) {
+    var config = parseOptions({
+      public: 'public',
+      data: 'data',
+      dbUrl: 'http://@@:@@@baz.com'
+    })
+    var defaults = config.PouchDB('hack', {skip_setup: true}).__opts
+    t.is(defaults.prefix, 'http://%40%40:%40%40@baz.com', 'Sets config.db.url')
+
+    t.end()
+  })
+
+  // dasds@dasdsa.com:@dsadas@dasdas@@baz.com passing
+  group.test('dbUrl', function (t) {
+    var config = parseOptions({
+      public: 'public',
+      data: 'data',
+      dbUrl: 'http://dasds@dasdsa.com:@dsadas@dasdas@@baz.com'
+    })
+    var defaults = config.PouchDB('hack', {skip_setup: true}).__opts
+    t.is(defaults.prefix, 'http://dasds%40dasdsa.com:%40dsadas%40dasdas%40@baz.com', 'Sets config.db.url')
 
     t.end()
   })
