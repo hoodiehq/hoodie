@@ -38,7 +38,7 @@ function parseOptions (options) {
    * @throws Error if dbUrl is unparsable or authDetails are missing
    */
   function createAuthDbUrl (dbUsername, dbPassword, dbUrl) {
-    let dbUrlParts = {
+    var dbUrlParts = {
       prefix: '',
       authDetails: '',
       url: ''
