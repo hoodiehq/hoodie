@@ -26,4 +26,3 @@ function writeClientBundle (hasUpdate, inMemory, bundleTargetPath, bundleBuffer)
     log.info('client', 'bundle written to ' + bundleTargetPath)
   })
 }
-

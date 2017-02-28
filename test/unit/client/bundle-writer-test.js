@@ -70,4 +70,3 @@ test('bundle-writer', function (group) {
 
   group.end()
 })
-

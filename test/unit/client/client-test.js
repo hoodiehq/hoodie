@@ -61,4 +61,3 @@ test('client', function (group) {
 
   group.end()
 })
-

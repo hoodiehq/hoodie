@@ -29,4 +29,3 @@ function createBundleHandler (hoodieClientPath, bundleTargetPath, bundleConfig) 
     }).catch(reply)
   }
 }
-
