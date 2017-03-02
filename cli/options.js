@@ -108,7 +108,7 @@ function getCliOptions (projectPath) {
     log.warn('The use of --bindAddress is deprecated. Use the --address option instead.')
     options.address = options.bindAddress
   }
-
+  options.plugins = defaults.plugins
   options.public = webrootLocator(options.public)
 
   // rc & yargs are setting keys we are not interested in, like in-memory or _

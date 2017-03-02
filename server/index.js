@@ -3,6 +3,7 @@ module.exports.register.attributes = {
   name: 'hoodie'
 }
 
+
 var corsHeaders = require('hapi-cors-headers')
 var hoodieServer = require('@hoodie/server').register
 var _ = require('lodash')

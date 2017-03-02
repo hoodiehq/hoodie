@@ -32,7 +32,8 @@ function registerPlugins (server, config, callback) {
   ]
     .concat(
   [
-    path.resolve('hoodie/server')
+    path.resolve('hoodie/server'),
+    ...(config.plugins.map(i => `${i}/hoodie/server`))
   ]
     .filter(checkModule)
     )

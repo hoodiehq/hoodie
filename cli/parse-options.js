@@ -31,6 +31,7 @@ function parseOptions (options) {
       data: options.data,
       public: options.public
     },
+    plugins: options.plugins,
     inMemory: Boolean(options.inMemory)
   }
 
