@@ -114,20 +114,20 @@ on how to send one :)
     cd <repo-name>    
    
     # Assign the original repo to a remote called "upstream"    
-    git remote add upstream https://github.com/hoodiehq/<repo-name>``
+    git remote add upstream https://github.com/hoodiehq/<repo-name>
 
 2. If you cloned a while ago, get the latest changes from upstream:
 
 ::
 
-    git checkout master    git pull upstream master``
+    git checkout master    git pull upstream master
 
 3. Create a new topic branch (off the main project development branch)
    to contain your feature, change, or fix:
 
 ::    
 
-    git checkout -b <topic-branch-name>``
+    git checkout -b <topic-branch-name>
 
 4. Make sure to update, or add to the tests when appropriate. Patches
    and features will not be accepted without tests. Run ``npm test`` to
@@ -154,7 +154,9 @@ For Members of the Hoodie Contributors Team
 
 ::   
 
-    git clone https://github.com/hoodiehq/<repo-name>    cd <repo-name>    git checkout -b <topic-branch-name>``
+    git clone https://github.com/hoodiehq/<repo-name>    
+    cd <repo-name>    
+    git checkout -b <topic-branch-name>
 
 2. Make sure to update, or add to the tests when appropriate. Patches
    and features will not be accepted without tests. Run ``npm test`` to
@@ -168,7 +170,7 @@ For Members of the Hoodie Contributors Team
 
 ::    
 
-    git push origin <topic-branch-name>``
+    git push origin <topic-branch-name>
 
 5. Open a Pull Request using your branch with a clear title and
    description.
@@ -181,7 +183,7 @@ are too complicated, we can help you out and teach you as we go :)
 
 ::
 
-    git pull --rebase upstream master``
+    git pull --rebase upstream master
 
 Afterwards force push your changes to your remote feature branch.
 
