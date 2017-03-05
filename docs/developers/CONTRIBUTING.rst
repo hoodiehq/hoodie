@@ -103,18 +103,31 @@ tutorial <https://egghead.io/series/how-to-contribute-to-an-open-source-project-
 on how to send one :)
 
 1. `Fork <http://help.github.com/fork-a-repo/>`__ the project, clone
-   your fork, and configure the remotes:
+   your fork, and configure the remotes using command line:
 
-``bash    # Clone your fork of the repo into the current directory    git clone https://github.com/<your-username>/<repo-name>    # Navigate to the newly cloned directory    cd <repo-name>    # Assign the original repo to a remote called "upstream"    git remote add upstream https://github.com/hoodiehq/<repo-name>``
+::
+
+    # Clone your fork of the repo into the current directory    
+    git clone https://github.com/<your-username>/<repo-name>    
+   
+    # Navigate to the newly cloned directory    
+    cd <repo-name>    
+   
+    # Assign the original repo to a remote called "upstream"    
+    git remote add upstream https://github.com/hoodiehq/<repo-name>``
 
 2. If you cloned a while ago, get the latest changes from upstream:
 
-``bash    git checkout master    git pull upstream master``
+::
+
+    git checkout master    git pull upstream master``
 
 3. Create a new topic branch (off the main project development branch)
    to contain your feature, change, or fix:
 
-``bash    git checkout -b <topic-branch-name>``
+::    
+
+    git checkout -b <topic-branch-name>``
 
 4. Make sure to update, or add to the tests when appropriate. Patches
    and features will not be accepted without tests. Run ``npm test`` to
@@ -126,7 +139,9 @@ on how to send one :)
 
 6. Push your topic branch up to your fork:
 
-``bash    git push origin <topic-branch-name>``
+::    
+
+    git push origin <topic-branch-name>
 
 8. `Open a Pull
    Request <https://help.github.com/articles/using-pull-requests/>`__
@@ -137,7 +152,9 @@ For Members of the Hoodie Contributors Team
 
 1. Clone the repo and create a branch
 
-``bash    git clone https://github.com/hoodiehq/<repo-name>    cd <repo-name>    git checkout -b <topic-branch-name>``
+::   
+
+    git clone https://github.com/hoodiehq/<repo-name>    cd <repo-name>    git checkout -b <topic-branch-name>``
 
 2. Make sure to update, or add to the tests when appropriate. Patches
    and features will not be accepted without tests. Run ``npm test`` to
@@ -149,7 +166,9 @@ For Members of the Hoodie Contributors Team
 
 4. Push your topic branch up to our repo
 
-``bash    git push origin <topic-branch-name>``
+::    
+
+    git push origin <topic-branch-name>``
 
 5. Open a Pull Request using your branch with a clear title and
    description.
@@ -160,7 +179,9 @@ are too complicated, we can help you out and teach you as we go :)
 1. Update your branch to the latest changes in the upstream master
    branch. You can do that locally with
 
-``bash    git pull --rebase upstream master``
+::
+
+    git pull --rebase upstream master``
 
 Afterwards force push your changes to your remote feature branch.
 
