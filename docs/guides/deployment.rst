@@ -1,10 +1,78 @@
-### HOODIE APP DEPLOYMENT IN LINUX
+### DEPLOYMENT
+
+#### ONE LINE DEPLOY
+
+After you’ve built your Hoodie app you probably want to put it online. You can
+choose to deploy your app as read-only or deploy the backend couchdb database as well.
+This [video]( https://youtu.be/29Uclxq_1Vw) and the text below describes how to deploy your app using one line of code. Alternatively, you can deploy your app using Docker, please refer to the Docker section.
+
+#### DEPLOYING TO NOW
+
+[Now](https://zeit.co/now) allows you to deploy a Node application with its
+[command line tool](https://github.com/zeit/now-cli). It’s 100% free for Open Source projects.
+You can deploy an app from your computer or right from a GitHub repository.
+For example, to deploy our [Hoodie Tracker demo](https://github.com/hoodiehq/hoodie-app-tracker) app all you have to do is to run this command:
+
+    $ now hoodiehq/hoodie-app-tracker --npm -e NODE_ENV=production -e hoodie_inMemory=true
+To describe this further:
+
+    hoodiehq/hoodie-app-tracker
+Is the GitHub repository slug.
+
+    --npm
+Tells now to deploy using npm as there is also Dockerfile in the repository.
+
+    -e NODE_ENV=production
+
+Sets the NODE_ENV environment variable to production, which makes the deployment
+faster as no devDependencies will be installed.
+
+    -e hoodie_inMemory=true
+
+Makes the Hoodie app run in-memory mode, meaning that no data is persisted and no files are written. This is important because now is a read-only file system. That means that all user accounts and data will be lost on the next deployment, but it is great for for a quick test or demo of your application.
+Alternatively, add this script to your package.json and you are good to go:
+
+    "now-start": "hoodie --inMemory",
+#### STORE DATA WITH CLOUDANT
+
+[Cloudant](https://cloudant.com/_) is a DBaaS (database-as-a-service). It provides
+most of CouchDB’s APIs and can be used as Hoodie’s database backend. Signing up
+for a free account only takes a moment. After sign up, you need to slightly adjust
+the now deployment command above.
+
+    $ now hoodiehq/hoodie-app-tracker -e NODE_ENV=production -e
+    hoodie_inMemory=true -e hoodie_dbUrl=https://username:password@username.cloudant.com/
+
+The *hoodie_inMemory* environment variable makes sure that Hoodie does not try to 
+write any files like the bundled /hoodie/client.js library. The *hoodie_dbUrl*
+environment variable sets the address and credentials to your CouchDB. Replace
+username and password to whatever you signed up with.
+
+#### TEST AND SET AN ALIAS
+
+When you deploy with now you will receive a random subdomain where you can access
+your application. It looks something like https://hoodie-app-tracker-randomxyz.now.sh/
+and was already copied to your clipboard during the deployment. Open the URL in
+your browser to give it a try. Once everything is good, you can change the subdomain
+to your preference by running:
+
+    $ now alias set hoodie-app-tracker-randomxyz my-tracker-app
+
+That will make your deployed Hoodie Tracker app accessible at https://my-tracker-app.now.sh. For example, here is the app that I deployed myself: https://hoodie-app-tracker.now.sh/
+
+#### DOCKER
+
+We continuously deploy our [Hoodie Tracker App]( https://github.com/hoodiehq/hoodie-app-tracker)
+ using Docker. You can read about our continuous deployment set at [hoodie-app-tracker/deployment.md.](https://github.com/hoodiehq/hoodie-app-tracker/blob/master/deployment.md
+)
+
+### DEPLOYMENT IN LINUX
 
 
 This guide is for Linux only at this point.
 I have tried to deploy [Hoodie-App-Tracker](https://github.com/hoodiehq/hoodie-app-tracker) as an example:
 
-### INSTALL DEPENDENCIES
+#### INSTALL DEPENDENCIES
 
 
 1. [Install CouchDB](http://linoxide.com/linux-how-to/install-couchdb-futon-ubuntu-1604/) 1.2.0 or later, 1.4.0 or later recommended for performance.
@@ -17,7 +85,7 @@ I have tried to deploy [Hoodie-App-Tracker](https://github.com/hoodiehq/hoodie-a
 
 5. [Install git](https://www.digitalocean.com/community/tutorials/how-to-install-git-on-ubuntu-16-04).
 
-###  COUCHDB
+####  COUCHDB
 
 We assume you set up CouchDB with your package manager or manually following the
 [installation procedure]( http://linoxide.com/linux-how-to/install-couchdb-futon-ubuntu-1604/).
@@ -45,7 +113,7 @@ Next we want to change CouchDB’s default configuration on a few points. The ea
     couch_httpd_auth -> timeout: 1209600 ; that’s two weeks
 
 
-### SYSTEM
+#### SYSTEM
 
 
 Add this to  /etc/security/limits.conf :
@@ -112,7 +180,7 @@ Since this code was meant for the old hoodie version, to deploy the new one repl
 with this :
 
     npm start -- --address=127.0.0.1 --port=someport
-    
+
 And change *apphome* field to:
 
     /home/hoodie/hoodie-app-tracker/
