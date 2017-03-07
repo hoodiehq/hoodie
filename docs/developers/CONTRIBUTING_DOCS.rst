@@ -21,9 +21,9 @@ To build the docs locally, you will need to install `python 2.7+ <https://www.py
 
 Then install two pip packages: `Sphinx <http://www.sphinx-doc.org/en/stable/>`_ and `sphinx_rtd_theme <https://pypi.python.org/pypi/sphinx_rtd_theme>`_.
 
- ``sudo pip sphinx``
+ ``sudo pip install sphinx``
 
- ``sudo pip sphinx_rtd_theme``
+ ``sudo pip install sphinx_rtd_theme``
 
 Change directory to ..hoodie/docs/
 
