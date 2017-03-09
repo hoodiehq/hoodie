@@ -14,15 +14,16 @@ Initialisation
 --------------
 
 The Hoodie Client persists state in the browser, like the current user’s
-id, session or the connection status to the backend. On page load,
-Hoodie has to load this state from the local store before you can use
-its APIs. You can use the Promise returned by ``hoodie.ready`` to wait
-until all APIs are fully initialised
+id, session or the connection status to the backend.
 
 .. code:: js
 
-    hoodie.ready.then(function () {
-      // all hoodie APIs are ready now
+    hoodie.account.get('session').then(function (session) {
+      if (session) {
+        // user is signed in
+      } else {
+        // user is signed out
+      }
     })
 
 This is work in progress
