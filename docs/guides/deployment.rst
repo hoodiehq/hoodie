@@ -80,7 +80,7 @@ INSTALL DEPENDENCIES
 
 1. `Install CouchDB`_ 1.2.0 or later, 1.4.0 or later recommended for performance.
 
-2. `Install NodeJS`_ 0.10.0 or later.
+2. `Install NodeJS(LTS)`_ 6.0.0 or later.
 
 3. `Install nginx`_, any recent version will do.
 
@@ -90,7 +90,7 @@ INSTALL DEPENDENCIES
 
 .. _Install CouchDB: http://linoxide.com/linux-how-to/install-couchdb-futon-ubuntu-1604/
 
-.. _Install NodeJS: https://www.digitalocean.com/community/tutorials/how-to-install-node-js-on-ubuntu-16-04
+.. _Install NodeJS: https://nodejs.org/en/download/
 
 .. _Install nginx: https://www.digitalocean.com/community/tutorials/how-to-install-nginx-on-ubuntu-16-04
 
@@ -124,7 +124,6 @@ Next we have to change CouchDB’s default configuration on a few points. The ea
 
    couchdb -> delayed_commits: false
    couchdb -> max_dbs_open: 1024
-   couch_httpd_auth -> timeout: 1209600 ; that’s two weeks
 
 .. _installation procedure: http://linoxide.com/linux-how-to/install-couchdb-futon-ubuntu-1604/
 .. _port 5984: http://127.0.0.1:5984/
@@ -165,35 +164,29 @@ Give a password of your choice.
 To switch to **hoodie** user, run :
 ::
 
-$    sudo su hoodie
+$   sudo su hoodie
 
 As user Hoodie, install your application:
 ::
 
-$    git clone <repo url>
+$   git clone <repo url>
 
 make sure package.json has a valid `name` property.
 
-To start, copy over the script from `this gist`.Run:
+**cd** into the directory.Run :
 ::
 
-$    npm start -- --address=127.0.0.1 --port=someport --dbUrl=http://admin:secret@127.0.0.1:5984/
+$   cd <repo name>
 
-*secret* is the password you had set before for CouchDB.
+Now run:
+::
 
-And change *apphome* in *gist* field to:
-
-:code:  /home/hoodie/yourhoodieapp/
+$   npm install
 
 To run Hoodie as the root:
 ::
 
 $   sudo su hoodie
-
-To get permission to execute the file, run-
-::
-
-$   chmod +x hoodie-daemon.sh
 
 To launch Hoodie now, as root :
 ::
