@@ -206,7 +206,7 @@ test('parse options', function (group) {
   })
 
   // tests that will throw an ERROR
-  group.test('dbUrl http with user/pass in url, cannot separate username and pass credentials, ":" more than once', function (t) {
+  group.test('dbUrl http with user/pass in url, cannot separate username and pass credentials, ":" exists more than once', function (t) {
     t.throws(parseOptions.bind(null, {
       public: 'public',
       data: 'data',
