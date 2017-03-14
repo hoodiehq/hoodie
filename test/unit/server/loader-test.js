@@ -29,7 +29,7 @@ test('when require.resolve errors', function (t) {
   t.end()
 })
 
-test('when registerPlugins Error', function (t) {
+test('when registerPlugins errors', function (t) {
   var options = {
     paths: {
       public: 'public'
