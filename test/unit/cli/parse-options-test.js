@@ -59,8 +59,10 @@ test('parse options', function (group) {
     t.end()
   })
 
-  // foo:bar@baz.com passing
-  group.test('dbUrl', function (t) {
+  // *************
+  // dbURL TESTS
+  // tests that PASS
+  group.test('dbUrl http with normal user/pass in url', function (t) {
     var config = parseOptions({
       public: 'public',
       data: 'data',
@@ -72,7 +74,7 @@ test('parse options', function (group) {
     t.end()
   })
 
-  group.test('dbUrl', function (t) {
+  group.test('dbUrl https with normal user/pass in url', function (t) {
     var config = parseOptions({
       public: 'public',
       data: 'data',
@@ -85,7 +87,7 @@ test('parse options', function (group) {
   })
 
   // https://foo@baz.com passing
-  group.test('dbUrl', function (t) {
+  group.test('dbUrl https with user/pass in url, username: same as the start of the url', function (t) {
     var config = parseOptions({
       public: 'public',
       data: 'data',
@@ -98,7 +100,7 @@ test('parse options', function (group) {
   })
 
   // @@:@@@baz.com passing
-  group.test('dbUrl', function (t) {
+  group.test('dbUrl http with user/pass in url, user/pass only with @', function (t) {
     var config = parseOptions({
       public: 'public',
       data: 'data',
@@ -111,14 +113,105 @@ test('parse options', function (group) {
   })
 
   // dasds@dasdsa.com:@dsadas@dasdas@@baz.com passing
-  group.test('dbUrl', function (t) {
+  group.test('dbUrl http with user/pass in url, tricky user/pass', function (t) {
     var config = parseOptions({
       public: 'public',
       data: 'data',
-      dbUrl: 'http://dasds@dasdsa.com:@dsadas@dasdas@@baz.com'
+      dbUrl: 'http://das/^$ds@das!dsa.com:@dsadas@dasdas@@baz.com'
     })
     var defaults = config.PouchDB('hack', {skip_setup: true}).__opts
-    t.is(defaults.prefix, 'http://dasds%40dasdsa.com:%40dsadas%40dasdas%40@baz.com', 'Sets config.db.url')
+    t.is(defaults.prefix, 'http://das%2F%5E%24ds%40das!dsa.com:%40dsadas%40dasdas%40@baz.com', 'Sets config.db.url')
+
+    t.end()
+  })
+
+  group.test('dbUrl http with user/pass in params', function (t) {
+    var config = parseOptions({
+      public: 'public',
+      data: 'data',
+      dbUrlUsername: 'john@doe.com',
+      dbUrlPassword: 'password',
+      dbUrl: 'http://baz.com'
+    })
+    var defaults = config.PouchDB('hack', {skip_setup: true}).__opts
+    t.is(defaults.prefix, 'http://john%40doe.com:password@baz.com', 'Sets config.db.url')
+
+    t.end()
+  })
+
+  group.test('dbUrl http with user in url, password provided via params', function (t) {
+    var config = parseOptions({
+      public: 'public',
+      data: 'data',
+      dbUrlPassword: 'password',
+      dbUrl: 'http://john@doe.com@baz.com'
+    })
+    var defaults = config.PouchDB('hack', {skip_setup: true}).__opts
+    t.is(defaults.prefix, 'http://john%40doe.com:password@baz.com', 'Sets config.db.url')
+
+    t.end()
+  })
+
+  group.test('dbUrl http with user/pass in url and username in params, params override url details', function (t) {
+    var config = parseOptions({
+      public: 'public',
+      data: 'data',
+      dbUrlUsername: 'john',
+      dbUrl: 'http://test:anotherpass@baz.com'
+    })
+    var defaults = config.PouchDB('hack', {skip_setup: true}).__opts
+    t.is(defaults.prefix, 'http://john:anotherpass@baz.com', 'Sets config.db.url')
+
+    t.end()
+  })
+
+  group.test('dbUrl http with user/pass in url and pass in params, params override url details', function (t) {
+    var config = parseOptions({
+      public: 'public',
+      data: 'data',
+      dbUrlPassword: 'password',
+      dbUrl: 'http://test:anotherpass@baz.com'
+    })
+    var defaults = config.PouchDB('hack', {skip_setup: true}).__opts
+    t.is(defaults.prefix, 'http://test:password@baz.com', 'Sets config.db.url')
+
+    t.end()
+  })
+
+  group.test('dbUrl http with user/pass both in params and in url, params override url details', function (t) {
+    var config = parseOptions({
+      public: 'public',
+      data: 'data',
+      dbUrlUsername: 'john',
+      dbUrlPassword: 'password',
+      dbUrl: 'http://test:anotherpass@baz.com'
+    })
+    var defaults = config.PouchDB('hack', {skip_setup: true}).__opts
+    t.is(defaults.prefix, 'http://john:password@baz.com', 'Sets config.db.url')
+
+    t.end()
+  })
+
+  group.test('dbUrl no url is passed with user/pas in params. Test passes and local db initialized', function (t) {
+    parseOptions({
+      public: 'public',
+      data: 'data',
+      dbUrlUsername: 'john@doe.com',
+      dbUrlPassword: 'pass'
+    })
+
+    t.is(true)
+
+    t.end()
+  })
+
+  // tests that will throw an ERROR
+  group.test('dbUrl http with user/pass in url, cannot separate username and pass credentials, ":" more than once', function (t) {
+    t.throws(parseOptions.bind(null, {
+      public: 'public',
+      data: 'data',
+      dbUrl: 'http://jo:hn:deow::pass@baz.com'
+    }))
 
     t.end()
   })
@@ -132,6 +225,82 @@ test('parse options', function (group) {
 
     t.end()
   })
+
+  group.test('dbUrl lacking auth (@ is included in dbUrl)', function (t) {
+    t.throws(parseOptions.bind(null, {
+      public: 'public',
+      data: 'data',
+      dbUrl: 'http://@baz.com'
+    }))
+
+    t.end()
+  })
+
+  group.test('dbUrl lacking username (password and symbol "@" are included in dbUrl)', function (t) {
+    t.throws(parseOptions.bind(null, {
+      public: 'public',
+      data: 'data',
+      dbUrl: 'http://:dsadsa@baz.com'
+    }))
+
+    t.end()
+  })
+
+  group.test('dbUrl lacking username (password is included in provided params)', function (t) {
+    t.throws(parseOptions.bind(null, {
+      public: 'public',
+      data: 'data',
+      dbUrlPassword: 'asdasda',
+      dbUrl: 'http://baz.com'
+    }))
+
+    t.end()
+  })
+
+  group.test('dbUrl lacking password (username and symbol "@" are included in dbUrl)', function (t) {
+    t.throws(parseOptions.bind(null, {
+      public: 'public',
+      data: 'data',
+      dbUrl: 'http://dasdad:@baz.com'
+    }))
+
+    t.end()
+  })
+
+  group.test('dbUrl lacking password (username is included in provided params)', function (t) {
+    t.throws(parseOptions.bind(null, {
+      public: 'public',
+      data: 'data',
+      dbUrlUsername: 'asdasda',
+      dbUrl: 'http://baz.com'
+    }))
+
+    t.end()
+  })
+
+  group.test('dbUrl lacking pass (username is included in provided params)', function (t) {
+    t.throws(parseOptions.bind(null, {
+      public: 'public',
+      data: 'data',
+      dbUrlUsername: 'asdasda',
+      dbUrl: 'http://baz.com'
+    }))
+
+    t.end()
+  })
+
+  group.test('dbUrl lacking pass from parameters (username is included in url)', function (t) {
+    t.throws(parseOptions.bind(null, {
+      public: 'public',
+      data: 'data',
+      dbUrl: 'http://john@doe.com@baz.com'
+    }))
+
+    t.end()
+  })
+
+  // end of dbURL TESTS
+  // ****************
 
   group.test('inMemory', function (t) {
     var config = parseOptions({
