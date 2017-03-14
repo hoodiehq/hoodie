@@ -81,9 +81,9 @@ document.querySelector('body').addEventListener('click', function (event) {
   }
 })
 
-hoodie.ready.then(function () {
+hoodie.account.get('session').then(function (session) {
   // Client Rendering Logic
-  if (hoodie.account.isSignedIn()) {
+  if (session) {
     document.querySelector('.generic-loader-wrap').setAttribute('data-hide', 'true')
     document.querySelectorAll('.profile-forms').forEach(function (node) {
       return node.setAttribute('data-hide', 'false')

@@ -21,13 +21,29 @@ To build the docs locally, you will need to install `python 2.7+ <https://www.py
 
 Then install two pip packages: `Sphinx <http://www.sphinx-doc.org/en/stable/>`_ and `sphinx_rtd_theme <https://pypi.python.org/pypi/sphinx_rtd_theme>`_.
 
- ``sudo pip sphinx``
+ ``sudo pip install sphinx``
 
- ``sudo pip sphinx_rtd_theme``
+ ``sudo pip install sphinx_rtd_theme``
 
 Change directory to ..hoodie/docs/
 
  ``make html``
+|
+
+If you are using windows powershell, note there is a little deviation.
+
+ ``pip install sphinx``
+
+ ``pip install sphinx_rtd_theme``
+
+Before execute the ``make html`` command you have to install `make <http://gnuwin32.sourceforge.net/packages/make.htm>`_ in windows if you are not already done. 
+You can also see this Stackoverflow `link <http://stackoverflow.com/questions/12881854/how-to-use-gnu-make-on-windows>`_ for a clear understanding.
+
+Now change directory to ..hoodie/docs/
+
+ ``make html``
+
+|
 
 After building, your updated documents are in the docs/_build/html subdirectory. Click on any .html document, this will open your web browser and the documents will be viewable.
 

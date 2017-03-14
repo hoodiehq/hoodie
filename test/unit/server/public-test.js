@@ -17,7 +17,7 @@ test('public', function (group) {
           public: 'my-custom-public-directory'
         }
       }
-    }, function () { return })
+    }, function () { })
 
     done()
   })

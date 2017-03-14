@@ -100,4 +100,3 @@ test('bundle-handler-factory', function (group) {
 
   group.end()
 })
-
