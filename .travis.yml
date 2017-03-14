@@ -7,12 +7,17 @@ node_js:
 before_script:
   - npm prune
   - bin/quick-start-test.sh
+  # install pandoc cli tool for .rst to .md converting
   - wget https://github.com/jgm/pandoc/releases/download/1.16.0.2/pandoc-1.16.0.2-1-amd64.deb
   - sudo dpkg -i pandoc-1.16.0.2-1-amd64.deb
+  # convert .rst to .md (textlint and awesome_bot packages need .md to work)
   - find ./ -iname "*.rst" -type f -exec sh -c 'pandoc "${0}" -o "${0%.md}.md"' {} \;
-  - rm docs/guides/quickstart.rst.md
+  # remove following files to exclude from awesome_bot link checks because '127.0.0.'... links cause failure even when whitelisted
+  - rm docs/guides/quickstart.rst.md docs/guides/deployment.rst.md
   - gem install awesome_bot
+  # run dead link checks excluding white-listed links
   - awesome_bot --allow-redirect --allow-dupe docs/**/*.md README.md --white-list http://127.0.0.1:8080,http://myhoodieapp.com,https://pouchdb.com/adapters,https://hoodie-app-tracker-randomxyz.now.sh/,https://my-tracker-app.now.sh,https://hapijs.com/tutorials/,https://opencollective.com
+  # run spelling/grammar/style checks
   - npm run textlint
 after_success:
   - npm run semantic-release
