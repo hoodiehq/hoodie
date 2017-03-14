@@ -5,3 +5,4 @@ node_modules
 .hoodie
 .nyc_output
 docs/_build/
+.vscode

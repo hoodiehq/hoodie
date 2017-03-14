@@ -192,7 +192,7 @@ test('parse options', function (group) {
     t.end()
   })
 
-  group.test('dbUrl no url is passed with user/pas in params. Test passes and local db initialized', function (t) {
+  group.test('dbUrl no url is passed, with user/pass in params. Test passes and local db initialized', function (t) {
     parseOptions({
       public: 'public',
       data: 'data',
