@@ -72,12 +72,12 @@ function getCliOptions (projectPath) {
       dbUrlPassword: {
         type: 'string',
         default: defaults.dbUrlPassword,
-        describe: 'Provides the password (if required) for auth with the db at dbUrl (requires dbUrl and/or dbUrlUsername)'
+        describe: 'Provides the password for auth with the db at dbUrl (requires dbUrl and/or dbUrlUsername)'
       },
       dbUrlUsername: {
         type: 'string',
         default: defaults.dbUrlUsername,
-        describe: 'Provides the username (if required) for auth with the db at dbUrl (requires dbUrl and dbUrlPassword)'
+        describe: 'Provides the username for auth with the db at dbUrl (requires dbUrl and dbUrlPassword)'
       },
       dbAdapter: {
         type: 'string',
