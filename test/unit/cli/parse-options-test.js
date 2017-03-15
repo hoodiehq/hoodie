@@ -193,14 +193,15 @@ test('parse options', function (group) {
   })
 
   group.test('dbUrl no url is passed, with user/pass in params. Test passes and local db initialized', function (t) {
-    parseOptions({
+    var config = parseOptions({
       public: 'public',
       data: 'data',
       dbUrlUsername: 'john@doe.com',
-      dbUrlPassword: 'pass'
+      dbUrlPassword: 'pass',
+      dbAdapter: 'pouchdb-adapter-fs'
     })
 
-    t.is(true)
+    t.is(config.PouchDB.preferredAdapters[0], 'fs')
 
     t.end()
   })
