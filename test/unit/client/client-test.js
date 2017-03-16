@@ -1,3 +1,4 @@
+var path = require('path')
 var proxyquire = require('proxyquire').noCallThru().noPreserveCache()
 var simple = require('simple-mock')
 var test = require('tap').test
@@ -47,7 +48,7 @@ test('client', function (group) {
     client.register(mockServer, optionsMock, simple.stub())
     var handlerArgs = createBundleHandlerStub.lastCall.args
 
-    t.is(handlerArgs[1], '/example/path/client.js')
+    t.is(handlerArgs[1], path.sep + path.join('example', 'path', 'client.js'))
     t.end()
   })
 
@@ -55,7 +56,7 @@ test('client', function (group) {
     client.register(mockServer, {config: {}}, simple.stub())
 
     var handlerArgs = createBundleHandlerStub.lastCall.args
-    t.is(handlerArgs[1], '.hoodie/client.js')
+    t.is(handlerArgs[1], path.join('.hoodie', 'client.js'))
     t.end()
   })
 
