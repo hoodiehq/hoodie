@@ -29,7 +29,8 @@ function checkModule (module) {
  */
 function bundleClient (hoodieClientPath, bundleTargetPath, config, callback) {
   var plugins = [
-    path.resolve('hoodie/client')
+    path.resolve('hoodie/client'),
+    ...(config.plugins.map(i => `${i}/hoodie/client`))
   ].filter(checkModule)
   var getPluginsModifiedTimes = plugins.map(function (pluginPath) {
     return getModifiedTime.bind(null, requireResolve(pluginPath))

@@ -24,6 +24,7 @@ function register (server, options, next) {
     if (error) {
       return next(error)
     }
+
     registerPlugins(server, options, function (error) {
       if (error) {
         return next(error)
