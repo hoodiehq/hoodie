@@ -19,7 +19,6 @@ function getCliOptions (projectPath) {
   // 2. App defaults
   // 3. rc (https://www.npmjs.com/package/rc) – note we don’t read CLI through rc
   var defaults = rc('hoodie', hoodieDefaults, appDefaults)
-
   var options = yargs
     .options({
       loglevel: {
@@ -108,7 +107,13 @@ function getCliOptions (projectPath) {
     log.warn('The use of --bindAddress is deprecated. Use the --address option instead.')
     options.address = options.bindAddress
   }
+
   options.plugins = defaults.plugins
+  // include any plugin options
+  if (defaults.pluginOptions && Object.keys(defaults.pluginOptions).length) {
+    options.pluginOptions = defaults.pluginOptions
+  }
+
   options.public = webrootLocator(options.public)
 
   // rc & yargs are setting keys we are not interested in, like in-memory or _

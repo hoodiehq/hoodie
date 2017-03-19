@@ -66,5 +66,9 @@ function parseOptions (options) {
   }
   config.PouchDB = PouchDB.defaults(dbOptions)
 
+  if (options.pluginOptions) {
+    config.pluginOptions = options.pluginOptions
+  }
+
   return config
 }

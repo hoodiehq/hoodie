@@ -17,9 +17,9 @@ function checkModule (module) {
 }
 
 function registerPlugins (server, config, callback) {
-  var options = {
-    config: config
-  }
+
+  const options = Object.assign({ config }, config.pluginOptions)
+
   var hapiPlugins = [
     require('inert')
   ]
