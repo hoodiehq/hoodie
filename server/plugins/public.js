@@ -4,11 +4,14 @@ module.exports.register.attributes = {
   dependencies: 'inert'
 }
 
+const path = require('path')
 var createReadStream = require('fs').createReadStream
-var pathJoin = require('path').join
+var pathJoin = path.join
 
 function register (server, options, next) {
-  var publicFolder = options.config.paths.public
+  const { paths, plugins } = options.config
+  var publicFolder = paths.public
+
   var hoodieVersion
   try {
     hoodieVersion = require('hoodie/package.json').version
@@ -18,8 +21,7 @@ function register (server, options, next) {
 
   var hoodiePublicPath = pathJoin(require.resolve('../../package.json'), '..', 'public')
   var adminPublicPath = pathJoin(require.resolve('@hoodie/admin/package.json'), '..', 'dist')
-
-  server.route([{
+  const routes = [{
     method: 'GET',
     path: '/{p*}',
     handler: {
@@ -59,7 +61,22 @@ function register (server, options, next) {
         version: hoodieVersion
       })
     }
-  }])
+  }]
+
+  // add plugin routes
+  plugins.forEach(i => routes.push({
+    method: 'GET',
+    path: `/hoodie/${i}/{p*}`,
+    handler: {
+      directory: {
+        path: pathJoin(path.dirname(require.resolve(`${i}/package.json`)),  'hoodie', 'public'),
+        listing: false,
+        index: true,
+      }
+    }
+  }))
+
+  server.route(routes)
 
   // serve app whenever an html page is requested
   // and no other document is available
