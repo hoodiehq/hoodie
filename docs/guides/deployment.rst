@@ -39,7 +39,7 @@ Alternatively, add this script to your package.json and you are good to go:
 
 Store Data With Cloudant
 ~~~~~~~~~~~~~~~~~~~~~~~~
-.. _Cloudant: https://cloudant.com/_
+.. _Cloudant: https://cloudant.com/
 
 `Cloudant`_ is a DBaaS (database-as-a-service). It provides most of CouchDB’s APIs and can be used as Hoodie’s database backend. Signing up for a free account only takes a moment. After sign up, you need to slightly adjust the now deployment command above.
 
