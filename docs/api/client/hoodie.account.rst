@@ -42,7 +42,7 @@ hoodie.account.id
 hoodie.account.username
 -----------------------
 
-`Read-only`. Returns the username if signed in, otherwise ``undefined``. Cannot be accessed until the :ref:`label-hoodie-account-ready promise resolved.
+`Read-only`. Returns the username if signed in, otherwise ``undefined``. Cannot be accessed until the :ref:`label-hoodie-account-ready` promise resolved.
 
 hoodie.account.validate
 -----------------------
@@ -88,7 +88,7 @@ hoodie.account.isSignedIn
 -------------------------
 
 Returns ``true`` if user is currently signed in, otherwise ``false``. 
-Cannot be accessed until the :ref:`label-hoodie-account-ready promise resolved.
+Cannot be accessed until the :ref:`label-hoodie-account-ready` promise resolved.
 
 .. code:: js
 
@@ -99,7 +99,7 @@ hoodie.account.hasInvalidSession
 
 Checks ``hoodie.account.session.invalid property``. Returns ``true`` 
 if user has invalid session, otherwise ``undefined``. 
-Cannot be accessed until the :ref:`label-hoodie-account-ready promise resolved.
+Cannot be accessed until the :ref:`label-hoodie-account-ready` promise resolved.
 
 .. code:: js
 
