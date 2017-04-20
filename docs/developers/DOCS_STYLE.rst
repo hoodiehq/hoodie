@@ -9,7 +9,7 @@ Word choice and writing style are a personal choice and we understand documentat
 
 Testing
 -------
-The `contributing to docs guide <CONTRIBUTING_DOCS.md>`_ describes the process to follow when updating documentation. This process includes automatic testing. Testing provides you peace of mind that your contribution won't contain typos, broken links or other style whoopsies. Testing is not used to criticise your writing, we really love and appreciate any contributions. Please be patience through the testing and review process. Together we can keep Hoodie documentation awesome!
+The `contributing to docs guide <CONTRIBUTING_DOCS.html>`_ describes the process to follow when updating documentation. This process includes automatic testing. Testing provides you peace of mind that your contribution won't contain typos, broken links or other style whoopsies. Testing is not used to criticise your writing, we really love and appreciate any contributions. Please be patience through the testing and review process. Together we can keep Hoodie documentation awesome!
 
 Style guidance
 --------------
