@@ -1,16 +1,16 @@
 Architecture
 ============
 
-After `installing hoodie <../guides/quickstart>`__, ``npm start`` will run
+After `installing hoodie <../guides/quickstart.html>`__, ``npm start`` will run
 `cli/index.js <https://github.com/hoodiehq/hoodie/blob/master/cli/index.js>`__
-which reads out the `configuration <../guides/configuration>`__
+which reads out the `configuration <../guides/configuration.html>`__
 from all the different places using the `rc <https://www.npmjs.com/package/rc>`__
 package, then passes it as options to ``server/index.js``, the Hoodie core
 `hapi plugin <http://hapijs.com>`__.
 
 In `server/index.js <https://github.com/hoodiehq/hoodie/blob/master/server/index.js>`__,
 the passed options are merged with defaults and parsed into configuration for
-the Hapi server. It passes the configuration on to`hoodie-server <https://github.com/hoodiehq/hoodie-server#readme>`__,
+the Hapi server. It passes the configuration on to `hoodie-server <https://github.com/hoodiehq/hoodie-server#readme>`__,
 which combines the core server modules. It also bundles the Hoodie
 client on first request to ``/hoodie/client.js`` and passes in the
 configuration for the client. It also makes the app’s ``public`` folder
