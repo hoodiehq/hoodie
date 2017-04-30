@@ -7,7 +7,7 @@ require('npmlog').level = 'error'
 
 test('bundle client', function (group) {
   group.test('client & bundle with same mtime', function (t) {
-    var readFileMock = simple.stub().callbackWith(null, new Buffer('bundle content'))
+    var readFileMock = simple.stub().callbackWith(null, Buffer.from('bundle content'))
     var bundleClient = proxyquire('../../server/plugins/client/bundle', {
       fs: {
         readFile: readFileMock,
@@ -26,7 +26,7 @@ test('bundle client', function (group) {
   })
 
   group.test('bundle does not exist', function (t) {
-    var bundleMock = simple.stub().callbackWith(null, new Buffer('hoodie client content'))
+    var bundleMock = simple.stub().callbackWith(null, Buffer.from('hoodie client content'))
     var requireMock = simple.stub()
 
     var streamStub = {
@@ -71,7 +71,7 @@ test('bundle client', function (group) {
   })
 
   group.test('with client options', function (t) {
-    var bundleMock = simple.stub().callbackWith(null, new Buffer('hoodie client content'))
+    var bundleMock = simple.stub().callbackWith(null, Buffer.from('hoodie client content'))
     var requireMock = simple.stub()
 
     var streamStub = {
@@ -153,7 +153,7 @@ test('bundle client', function (group) {
   })
 
   group.test('app\'s root directory is specified', function (t) {
-    var bundleMock = simple.stub().callbackWith(null, new Buffer('hoodie client content'))
+    var bundleMock = simple.stub().callbackWith(null, Buffer.from('hoodie client content'))
     var requireMock = simple.stub()
     var unspecifiedError = new Error('UNSPECIFIED_ERROR')
     var savedPath = process.cwd()
@@ -244,7 +244,7 @@ test('bundle client', function (group) {
 
         return callback(null, {mtime: currentDate})
       })
-      fsMock.readFile = simple.stub().callbackWith(null, new Buffer('bundle content'))
+      fsMock.readFile = simple.stub().callbackWith(null, Buffer.from('bundle content'))
       process.chdir(pathResolve(__dirname, '../fixture/app-dir-with-server/'))
       bundleClient('client.js', 'bundle.js', {
         url: 'https://myapp.com'
