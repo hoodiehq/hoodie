@@ -56,7 +56,7 @@ Constructor
 -----------
 
 .. code:: js
-    
+
     new Store(dbName, options)
 
 +---------------------+-------------+--------------------------------+------------------------------------------------------------+
@@ -86,23 +86,26 @@ store.add(properties)
 
     store.add(properties)
 
-+-------------------+--------+-------------------------------------------------+------------+
-| Argument          | Type   | Description                                     | Required   |
-+-------------------+--------+-------------------------------------------------+------------+
-| ``properties``    | Object | properties of document                          | Yes        |
-+-------------------+--------+-------------------------------------------------+------------+
-| ``properties.id`` | String | If set, the document will be stored at given id | No         |
-+-------------------+--------+-------------------------------------------------+------------+
++--------------------+--------+-------------------------------------------------+------------+
+| Argument           | Type   | Description                                     | Required   |
++--------------------+--------+-------------------------------------------------+------------+
+| ``properties``     | Object | properties of document                          | Yes        |
++--------------------+--------+-------------------------------------------------+------------+
+| ``properties._id`` | String | If set, the document will be stored at given id | No         |
++--------------------+--------+-------------------------------------------------+------------+
 
-Resolves with properties and adds id (unless provided), createdAt and updatedAt properties.
+Resolves with properties and adds _id (unless provided), createdAt and updatedAt properties.
 
 .. code:: js
 
     {
-        "id": "12345678-1234-1234-1234-123456789ABC",
         "foo": "bar",
-        "createdAt": "2016-05-09T12:00:00.000Z",
-        "updatedAt": "2016-05-09T12:00:00.000Z"
+        "hoodie": {
+          "createdAt": "2016-05-09T12:00:00.000Z",
+          "updatedAt": "2016-05-09T12:00:00.000Z"
+        },
+        "_id": "12345678-1234-1234-1234-123456789ABC",
+        "_rev": "1-b1191b8cfee045f495594b1cf2823683"
     }
 
 Rejects with:
@@ -134,15 +137,18 @@ store.add(arrayOfProperties)
 | ''arrayOfProperties'' | Array | Array of properties, see store.add(properties) | Yes        |
 +-----------------------+-------+------------------------------------------------+------------+
 
-Resolves with properties and adds id (unless provided), createdAt and updatedAt properties. Resolves with array of properties items if called with propertiesArray.
+Resolves with properties and adds _id (unless provided), createdAt and updatedAt properties. Resolves with array of properties items if called with propertiesArray.
 
 .. code:: js
 
     {
-        "id": "12345678-1234-1234-1234-123456789ABC",
         "foo": "bar",
-        "createdAt": "2016-05-09T12:00:00.000Z",
-        "updatedAt": "2016-05-09T12:00:00.000Z"
+        "hoodie": {
+          "createdAt": "2016-05-09T12:00:00.000Z",
+          "updatedAt": "2016-05-09T12:00:00.000Z"
+        },
+        "_id": "12345678-1234-1234-1234-123456789ABC",
+        "_rev": "1-b1191b8cfee045f495594b1cf2823683"
     }
 
 Rejects with:
@@ -246,7 +252,7 @@ Rejects with:
 store.find(idsOrDocs)
 ---------------------
 
-.. code:: 
+.. code::
 
     store.find(idsOrDocs)
 
@@ -297,7 +303,7 @@ In Node.js
 Run all tests and validate JavaScript Code Style using standard
 
 ::
-    
+
     npm test
 
 To run only the tests
@@ -309,7 +315,7 @@ To run only the tests
 Run tests in browser
 
 ::
-    
+
     npm run test:browser:local
-    
+
 This will start a local server. All tests and coverage will be run at http://localhost:8080/__zuul
