@@ -28,10 +28,10 @@ id, session or the connection status to the backend.
 
 Hoodie integrates Hoodie’s client core modules:
 
--  `The account API <client/hoodie.account.html>`__
--  `The store API <client/hoodie.store.html>`__
--  `The connectionStatus API <client/hoodie.connection-status>`__
--  `The log API <client/hoodie.log.html>`__
+-  `The account API <hoodie.account.html>`__
+-  `The store API <hoodie.store.html>`__
+-  `The connectionStatus API <hoodie.connection-status.html>`__
+-  `The log API <hoodie.log.html>`__
 
 Example
 -------
