@@ -9,10 +9,10 @@ user </camp/hoodieverse/glossary.html#private-user-store>`__, it makes
 sense to familiarise yourself with **account** before you move on to
 `store </camp/techdocs/api/client/hoodie.store.html>`__.
 
-``hoodie-account-client`` is a JavaScript client for the 
-`Account JSON API <http://docs.accountjsonapi.apiary.io/>`_. 
-It persists session information in localStorage (or your own store API) and 
-provides front-end friendly APIs for the authentication-related operations as 
+``hoodie-account-client`` is a JavaScript client for the
+`Account JSON API <http://docs.accountjsonapi.apiary.io/>`_.
+It persists session information in localStorage (or your own store API) and
+provides front-end friendly APIs for the authentication-related operations as
 mentioned above.
 
 Example
@@ -26,23 +26,15 @@ Example
 
     hoodie.account.on('signout', redirectToHome)
 
-
-.. _label-hoodie-account-ready:
-
-hoodie.account.ready
---------------------
-
-`Read-only`. Promise that resolves once the account instance loaded its current state from the store.
-
 hoodie.account.id
 -----------------
 
-`Read-only`. Returns the account id. Cannot be accessed until the :ref:`label-hoodie-account-ready` promise resolved.
+`Read-only`. Returns the account id.
 
 hoodie.account.username
 -----------------------
 
-`Read-only`. Returns the username if signed in, otherwise ``undefined``. Cannot be accessed until the :ref:`label-hoodie-account-ready` promise resolved.
+`Read-only`. Returns the username if signed in, otherwise ``undefined``.
 
 hoodie.account.validate
 -----------------------
@@ -87,8 +79,7 @@ Example
 hoodie.account.isSignedIn
 -------------------------
 
-Returns ``true`` if user is currently signed in, otherwise ``false``. 
-Cannot be accessed until the :ref:`label-hoodie-account-ready` promise resolved.
+Returns ``true`` if user is currently signed in, otherwise ``false``.
 
 .. code:: js
 
@@ -97,9 +88,8 @@ Cannot be accessed until the :ref:`label-hoodie-account-ready` promise resolved.
 hoodie.account.hasInvalidSession
 --------------------------------
 
-Checks ``hoodie.account.session.invalid property``. Returns ``true`` 
-if user has invalid session, otherwise ``undefined``. 
-Cannot be accessed until the :ref:`label-hoodie-account-ready` promise resolved.
+Checks ``hoodie.account.session.invalid property``. Returns ``true``
+if user has invalid session, otherwise ``undefined``.
 
 .. code:: js
 
@@ -108,7 +98,7 @@ Cannot be accessed until the :ref:`label-hoodie-account-ready` promise resolved.
 hoodie.account.signUp
 ---------------------
 
-Creates a new user account on the Hoodie server. 
+Creates a new user account on the Hoodie server.
 Does `not` sign in the user automatically, :ref:`label-hoodie-account-signIn` must be called separately.
 
 .. code:: js
@@ -305,7 +295,7 @@ Example
 hoodie.account.get
 ------------------
 
-Returns account properties from local cache. Cannot be accessed until the :ref:`label-hoodie-account-ready` promise resolved.
+Returns account properties from local cache.
 
 .. code:: js
 
@@ -411,7 +401,7 @@ Rejects with:
 +--------------------------+----------------------------------------+
 | ``InvalidError``         | Custom validation error                |
 +--------------------------+----------------------------------------+
-| ``ConflictError``        | Username **<username>** already exists | 
+| ``ConflictError``        | Username **<username>** already exists |
 +--------------------------+----------------------------------------+
 | ``ConnectionError``      | Could not connect to server            |
 +--------------------------+----------------------------------------+
@@ -427,7 +417,7 @@ Example
 account.profile.get
 -------------------
 
-Returns profile properties from local cache. Cannot be accessed until the :ref:`label-hoodie-account-ready` promise resolved.
+Returns profile properties from local cache.
 
 .. code:: js
 
@@ -435,7 +425,7 @@ Returns profile properties from local cache. Cannot be accessed until the :ref:`
 
 +----------------+-----------------------------+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+------------+
 | Argument       | Type                        | Description                                                                                                                                                                   | Required   |
-+================+=============================+===============================================================================================================================================================================+============+       
++================+=============================+===============================================================================================================================================================================+============+
 | ``properties`` | String or Array of strings  | When String, only this property gets returned. If array of strings, only passed properties get returned. Property names can have `.` separators to return nested properties.  | No         |
 +----------------+-----------------------------+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+------------+
 
@@ -485,7 +475,7 @@ Rejects with:
 +--------------------------+--------------------------------+
 | ``UnauthenticatedError`` | Session is invalid             |
 +--------------------------+--------------------------------+
-| ``ConnectionError``      | Could not connect to server    |   
+| ``ConnectionError``      | Could not connect to server    |
 +--------------------------+--------------------------------+
 
 Examples
@@ -654,9 +644,9 @@ Events
 +--------------------+---------------------------------------------------------------------------------+--------------------------------------------------+
 | ``signout``        | Successfully signed out                                                         | ``accountProperties`` with ``.session property`` |
 +--------------------+---------------------------------------------------------------------------------+--------------------------------------------------+
-| ``passwordreset``  | Email with password reset token sent                                            |                                                  |	
+| ``passwordreset``  | Email with password reset token sent                                            |                                                  |
 +--------------------+---------------------------------------------------------------------------------+--------------------------------------------------+
-| ``unauthenticate`` | Server responded with "unauthenticated" when checking session                   |                                                  |	
+| ``unauthenticate`` | Server responded with "unauthenticated" when checking session                   |                                                  |
 +--------------------+---------------------------------------------------------------------------------+--------------------------------------------------+
 | ``reauthenticate`` | Successfully signed in with the same username (useful when session has expired) | ``accountProperties`` with ``.session property`` |
 +--------------------+---------------------------------------------------------------------------------+--------------------------------------------------+
