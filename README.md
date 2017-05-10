@@ -262,6 +262,12 @@ Show your support for Hoodie and [help us sustain our inclusive community](http:
 [![](https://opencollective.com/hoodie/sponsor/18/avatar)](https://opencollective.com/hoodie/sponsor/18/website)
 [![](https://opencollective.com/hoodie/sponsor/19/avatar)](https://opencollective.com/hoodie/sponsor/19/website)
 
+
+  
+    
+    
+      
+        
 ## License
 
 [Apache 2.0](LICENSE)
