@@ -26,11 +26,6 @@ Example
 
     hoodie.account.on('signout', redirectToHome)
 
-hoodie.account.id
------------------
-
-`Read-only`. Returns the account id.
-
 hoodie.account.validate
 -----------------------
 
