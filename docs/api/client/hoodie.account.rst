@@ -26,11 +26,6 @@ Example
 
     hoodie.account.on('signout', redirectToHome)
 
-hoodie.account.username
------------------------
-
-`Read-only`. Returns the username if signed in, otherwise ``undefined``.
-
 hoodie.account.validate
 -----------------------
 
@@ -198,7 +193,7 @@ Example
         username: 'pat',
         password: 'secret'
     }).then(function (sessionProperties) {
-        alert('Ohaj, ' + sessionProperties.account.username)
+        alert('Ohaj, ' + sessionProperties.username)
     }).catch(function (error) {
         alert(error)
     })
@@ -239,7 +234,7 @@ Example
 .. code:: js
 
     hoodie.account.signOut().then(function (sessionProperties) {
-        alert('Bye, ' + sessionProperties.hoodie.account.username)
+        alert('Bye, ' + sessionProperties.username)
     }).catch(function (error) {
         alert(error)
     })
@@ -282,7 +277,7 @@ Example
 .. code::
 
     hoodie.account.destroy().then(function (sessionProperties) {
-        alert('Bye, ' + sessionProperties.account.username)
+        alert('Bye, ' + sessionProperties.username)
     }).catch(function (error) {
         alert(error)
     })
