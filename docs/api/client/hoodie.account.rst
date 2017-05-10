@@ -20,9 +20,13 @@ Example
 
 .. code:: js
 
-    if (hoodie.account.isSignedIn()) {
-    renderWelcome(hoodie.account)
-    }
+    hoodie.account.get('session').then(function (sessionProperties) {
+      if (!sessionProperties) {
+        return redirectToHome()
+      }
+
+      renderWelcome(sessionProperties)
+    }).catch(redirectToHome)
 
     hoodie.account.on('signout', redirectToHome)
 
@@ -65,15 +69,6 @@ Example
     .catch(function (error) {
         console.log(error) // should be an error about the password being too short
     })
-
-hoodie.account.isSignedIn
--------------------------
-
-Returns ``true`` if user is currently signed in, otherwise ``false``.
-
-.. code:: js
-
-    hoodie.account.isSignedIn()
 
 hoodie.account.hasInvalidSession
 --------------------------------
