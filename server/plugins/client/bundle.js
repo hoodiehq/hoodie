@@ -28,10 +28,14 @@ function checkModule (module) {
  * and avoiding unneeded bundling with browserify saves a significant time.
  */
 function bundleClient (hoodieClientPath, bundleTargetPath, config, callback) {
+  config.plugins = config.plugins || []
   var plugins = [
     path.resolve('hoodie/client'),
-    ...(config.plugins.map(i => `${i}/hoodie/client`))
-  ].filter(checkModule)
+  ].concat(config.plugins.map(function (i) {
+     return i + '/hoodie/client'
+   }))
+  .filter(checkModule)
+
   var getPluginsModifiedTimes = plugins.map(function (pluginPath) {
     return getModifiedTime.bind(null, requireResolve(pluginPath))
   })

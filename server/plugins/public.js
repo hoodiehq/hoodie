@@ -4,13 +4,14 @@ module.exports.register.attributes = {
   dependencies: 'inert'
 }
 
-const path = require('path')
-const requireResolve = require('./resolver')
+var path = require('path')
+var requireResolve = require('./resolver')
 var createReadStream = require('fs').createReadStream
 var pathJoin = path.join
 
 function register (server, options, next) {
-  const { paths, plugins } = options.config
+  var paths = options.config.path
+  var plugins = options.config.plugins
   var publicFolder = paths.public
 
   var hoodieVersion
@@ -22,7 +23,7 @@ function register (server, options, next) {
 
   var hoodiePublicPath = pathJoin(requireResolve('../../package.json'), '..', 'public')
   var adminPublicPath = pathJoin(requireResolve('@hoodie/admin/package.json'), '..', 'dist')
-  const routes = [{
+  var routes = [{
     method: 'GET',
     path: '/{p*}',
     handler: {
@@ -65,11 +66,11 @@ function register (server, options, next) {
   }]
 
   // add plugin routes
-  plugins.forEach(i => {
-    let module
+  plugins.forEach(function (i) {
+    var module
     // check if module directory exists
     try {
-      module = requireResolve(`${i}/package.json`)
+      module = requireResolve(i + '/package.json')
     } catch (err) {
       if (err.code !== 'MODULE_NOT_FOUND') {
         throw err
@@ -79,7 +80,7 @@ function register (server, options, next) {
     if (module) {
       routes.push({
         method: 'GET',
-        path: `/hoodie/${i}/{p*}`,
+        path: '/hoodie/ ' + i + '/{p*}',
         handler: {
           directory: {
             path: pathJoin(path.dirname(require.resolve(module)),  'hoodie', 'public'),
