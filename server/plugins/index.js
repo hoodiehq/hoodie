@@ -18,12 +18,16 @@ function checkModule (module) {
 
 function registerPlugins (server, config, callback) {
 
-  const options = Object.assign({ config }, config.pluginOptions)
+  // TODO: port away from Objec.assign (or require Node 6.0.0+ for Hoodie)
+  var options = Object.assign({ config: config }, config.pluginOptions)
 
   var hapiPlugins = [
     require('inert')
   ]
-
+  config.plugins = config.plugins || [] // doesn’t work, config.plugins is {} here
+  if (Object.keys(config.plugins).length === 0) {
+    config.plugins = [] // workaround for above issue
+  }
   var localPlugins = [
     './client',
     './logger',
@@ -33,8 +37,8 @@ function registerPlugins (server, config, callback) {
     .concat(
   [
     path.resolve('hoodie/server'),
-    ...(config.plugins.map(i => `${i}/hoodie/server`))
   ]
+    .concat(config.plugins.map(function (i) { i + '/hoodie/server' }))
     .filter(checkModule)
     )
     .map(function (register) {
