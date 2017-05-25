@@ -1,7 +1,7 @@
 var proxyquire = require('proxyquire').noCallThru()
 var test = require('tap').test
 
-var getDefaultsMock = function () {
+function getDefaultsMock () {
   return {
     hoodie: {
       name: 'foo',
@@ -14,7 +14,7 @@ var getDefaultsMock = function () {
     }
   }
 }
-getDefaultsMock['@noCallThru'] = true
+
 var logMock = {
   info: function () {},
   warn: function () {}
