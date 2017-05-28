@@ -29,12 +29,12 @@ test('bundle-handler-factory', function (group) {
     done()
   })
 
-  group.test('passes clientPath, targetPath and config to bundleClient', function (t) {
+  group.test('passes clientPath, targetPath and options to bundleClient', function (t) {
     var clientPath = '/client/path'
     var targetPath = '/target/path'
-    var config = {}
+    var options = {}
 
-    var handler = createHandler(clientPath, targetPath, config)
+    var handler = createHandler(clientPath, targetPath, options)
     handler()
 
     t.is(bundleStub.callCount, 1, 'bundleClient gets called')
@@ -42,7 +42,7 @@ test('bundle-handler-factory', function (group) {
 
     t.is(bundleStubArgs[0], clientPath, 'passes clientPath as first argument')
     t.is(bundleStubArgs[1], targetPath, 'passes targetPath as second argument')
-    t.equals(bundleStubArgs[2], config, 'passes config as third argument')
+    t.equals(bundleStubArgs[2], options, 'passes options as third argument')
 
     t.end()
   })

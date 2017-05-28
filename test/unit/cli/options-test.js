@@ -38,17 +38,20 @@ var packageJsonMock = {
 
 var mockWebrootLocator = simple.stub()
 
+var hoodieDefaults = {
+  port: 'hoodie-default-port',
+  public: 'hoodie-default-public',
+  dbUrl: 'hoodie-default-dbUrl',
+  dbAdapter: 'hoodie-default-dbAdapter',
+  address: 'hoodie-localhost',
+  plugins: []
+}
+
 function createCliOptionsProxy (yargsApi) {
   return proxyquire('../../../cli/options', {
     'npmlog': { warn: simple.spy() },
     './hoodie-defaults': function () {
-      return {
-        port: 'hoodie-default-port',
-        public: 'hoodie-default-public',
-        dbUrl: 'hoodie-default-dbUrl',
-        dbAdapter: 'hoodie-default-dbAdapter',
-        address: 'hoodie-localhost'
-      }
+      return hoodieDefaults
     },
     './app-defaults': mockAppDefaults(),
     './webroot-locator': mockWebrootLocator,
@@ -124,6 +127,27 @@ test('bindAddress', function (t) {
   var options = getCliOptions('project-path')
 
   t.is(options.address, '0.0.0.0', 'is replaced with address')
+
+  t.end()
+})
+
+test('app plugin', function (t) {
+  var getOptions = proxyquire('../../../cli/options', {
+    'fs': {
+      existsSync: simple.stub().returnWith(true)
+    },
+    'npmlog': { warn: simple.spy() },
+    './hoodie-defaults': function () {
+      return hoodieDefaults
+    },
+    './app-defaults': mockAppDefaults(),
+    './webroot-locator': mockWebrootLocator,
+    'yargs': createYargsMock({}),
+    '../package.json': packageJsonMock
+  })
+
+  var options = getOptions('project-path')
+  t.deepEqual(options.plugins, ['project-path'])
 
   t.end()
 })

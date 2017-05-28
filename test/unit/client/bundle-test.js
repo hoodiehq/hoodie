@@ -8,14 +8,16 @@ require('npmlog').level = 'error'
 test('bundle client', function (group) {
   group.test('client & bundle with same mtime', function (t) {
     var readFileMock = simple.stub().callbackWith(null, Buffer.from('bundle content'))
-    var bundleClient = proxyquire('../../server/plugins/client/bundle', {
+    var bundleClient = proxyquire('../../../server/plugins/client/bundle', {
       fs: {
         readFile: readFileMock,
         stat: simple.stub().callbackWith(null, {mtime: new Date()})
       }
     })
 
-    bundleClient('client.js', 'bundle.js', {}, function (error) {
+    bundleClient('client.js', 'bundle.js', {plugins: [
+      'hoodie-plugin-foobar'
+    ]}, function (error) {
       t.error(error)
 
       t.is(readFileMock.callCount, 1, 'readFile called once')
@@ -32,7 +34,7 @@ test('bundle client', function (group) {
     var streamStub = {
       push: simple.stub()
     }
-    var bundleClient = proxyquire('../../server/plugins/client/bundle', {
+    var bundleClient = proxyquire('../../../server/plugins/client/bundle', {
       browserify: function () {
         return {
           bundle: bundleMock,
@@ -53,7 +55,7 @@ test('bundle client', function (group) {
       }
     })
 
-    bundleClient('client.js', 'bundle.js', {}, function (error, buffer) {
+    bundleClient('client.js', 'bundle.js', {plugins: []}, function (error, buffer) {
       t.error(error)
 
       t.is(bundleMock.callCount, 1, 'bundle called once')
@@ -77,7 +79,7 @@ test('bundle client', function (group) {
     var streamStub = {
       push: simple.stub()
     }
-    var bundleClient = proxyquire('../../server/plugins/client/bundle', {
+    var bundleClient = proxyquire('../../../server/plugins/client/bundle', {
       browserify: function () {
         return {
           bundle: bundleMock,
@@ -99,10 +101,11 @@ test('bundle client', function (group) {
     })
 
     bundleClient('client.js', 'bundle.js', {
-      url: 'https://myapp.com',
       client: {
         foo: 'bar'
-      }
+      },
+      plugins: [],
+      url: 'https://myapp.com'
     }, function (error, buffer) {
       t.error(error)
 
@@ -120,14 +123,14 @@ test('bundle client', function (group) {
   })
 
   group.test('fs.readFile fails', function (t) {
-    var bundleClient = proxyquire('../../server/plugins/client/bundle', {
+    var bundleClient = proxyquire('../../../server/plugins/client/bundle', {
       fs: {
         readFile: simple.stub().callbackWith(new Error('boom')),
         stat: simple.stub().callbackWith(null, {mtime: new Date()})
       }
     })
 
-    bundleClient('client.js', 'bundle.js', {}, function (error) {
+    bundleClient('client.js', 'bundle.js', {plugins: []}, function (error) {
       t.is(error.message, 'boom', 'passes error')
 
       t.end()
@@ -137,7 +140,7 @@ test('bundle client', function (group) {
   group.test('browserify.build failing throws error', function (t) {
     var testError = new Error('TestError')
 
-    var bundleClient = proxyquire('../../server/plugins/client/bundle', {
+    var bundleClient = proxyquire('../../../server/plugins/client/bundle', {
       browserify: function () {
         return {
           bundle: simple.stub().callbackWith(testError),
@@ -149,7 +152,7 @@ test('bundle client', function (group) {
       }
     })
 
-    bundleClient('client.js', 'bundle.js', {}, function (error) {
+    bundleClient('client.js', 'bundle.js', {plugins: []}, function (error) {
       t.ok(error)
       t.equal(error, testError)
       t.end()
@@ -162,11 +165,11 @@ test('bundle client', function (group) {
     var unspecifiedError = new Error('UNSPECIFIED_ERROR')
     var savedPath = process.cwd()
     var resolverMock = simple.stub().callFn(function (path) {
-      if (path === pathResolve(__dirname, '../fixture/app-dir-with-server/hoodie/client')) {
-        return pathResolve(__dirname, '../fixture/app-dir-with-server/hoodie/client.js')
+      if (path === pathResolve(__dirname, '../../fixture/app-dir-with-server/hoodie/client')) {
+        return pathResolve(__dirname, '../../fixture/app-dir-with-server/hoodie/client.js')
       }
 
-      if (path === pathResolve(__dirname, '../fixture/hoodie/client')) {
+      if (path === pathResolve(__dirname, '../../fixture/hoodie/client')) {
         throw unspecifiedError
       }
 
@@ -183,7 +186,7 @@ test('bundle client', function (group) {
       readFile: undefined,
       stat: undefined
     }
-    var bundleClient = proxyquire('../../server/plugins/client/bundle', {
+    var bundleClient = proxyquire('../../../server/plugins/client/bundle', {
       browserify: function () {
         return {
           bundle: bundleMock,
@@ -204,7 +207,7 @@ test('bundle client', function (group) {
     t.test('client module exists and is newer', function (t) {
       streamStub.push = simple.stub()
       fsMock.stat = simple.stub().callFn(function (path, callback) {
-        if (path === pathResolve(__dirname, '../fixture/app-dir-with-server/hoodie/client.js')) {
+        if (path === pathResolve(__dirname, '../../fixture/app-dir-with-server/hoodie/client.js')) {
           return callback(null, {mtime: currentDate})
         }
         if (path === 'client.js') {
@@ -214,8 +217,9 @@ test('bundle client', function (group) {
         return callback(null, {mtime: oneHourAgo})
       })
       fsMock.readFile = simple.stub()
-      process.chdir(pathResolve(__dirname, '../fixture/app-dir-with-server/'))
+      process.chdir(pathResolve(__dirname, '../../fixture/app-dir-with-server/'))
       bundleClient('client.js', 'bundle.js', {
+        plugins: [],
         url: 'https://myapp.com'
       }, function (error, buffer) {
         t.error(error)
@@ -229,7 +233,7 @@ test('bundle client', function (group) {
           '  PouchDB: require("pouchdb-browser")\n' +
           '}\n' +
           'module.exports = new Hoodie(options)\n' +
-          '  .plugin(require("' + pathResolve(__dirname, '../fixture/app-dir-with-server/hoodie/client') + '"))\n'
+          '  .plugin(require("' + pathResolve(__dirname, '../../fixture/app-dir-with-server/hoodie/client') + '"))\n'
         t.is(streamStub.push.calls[0].arg, expected)
 
         t.end()
@@ -239,7 +243,7 @@ test('bundle client', function (group) {
     t.test('client module exists and is older', function (t) {
       streamStub.push = simple.stub()
       fsMock.stat = simple.stub().callFn(function (path, callback) {
-        if (path === pathResolve(__dirname, '../fixture/app-dir-with-server/hoodie/client.js')) {
+        if (path === pathResolve(__dirname, '../../fixture/app-dir-with-server/hoodie/client.js')) {
           return callback(null, {mtime: oneHourAgo})
         }
         if (path === 'client.js') {
@@ -249,8 +253,9 @@ test('bundle client', function (group) {
         return callback(null, {mtime: currentDate})
       })
       fsMock.readFile = simple.stub().callbackWith(null, Buffer.from('bundle content'))
-      process.chdir(pathResolve(__dirname, '../fixture/app-dir-with-server/'))
+      process.chdir(pathResolve(__dirname, '../../fixture/app-dir-with-server/'))
       bundleClient('client.js', 'bundle.js', {
+        plugins: [],
         url: 'https://myapp.com'
       }, function (error, buffer) {
         t.error(error)
@@ -266,7 +271,7 @@ test('bundle client', function (group) {
     t.test('client module doesn\'t exist', function (t) {
       streamStub.push = simple.stub()
       fsMock.stat = simple.stub().callFn(function (path, callback) {
-        if (path === pathResolve(__dirname, '../fixture/app-dir-without-server/hoodie/client.js')) {
+        if (path === pathResolve(__dirname, '../../fixture/app-dir-without-server/hoodie/client.js')) {
           throw new Error('Boom')
         }
         if (path === 'client.js') {
@@ -276,8 +281,9 @@ test('bundle client', function (group) {
         callback(new Error('Boom'))
       })
       fsMock.readFile = simple.stub()
-      process.chdir(pathResolve(__dirname, '../fixture/app-dir-without-server/'))
+      process.chdir(pathResolve(__dirname, '../../fixture/app-dir-without-server/'))
       bundleClient('client.js', 'bundle.js', {
+        plugins: [],
         url: 'https://myapp.com'
       }, function (error, buffer) {
         t.error(error)
@@ -299,9 +305,10 @@ test('bundle client', function (group) {
     t.test('require.resolve rethrows other errors', function (t) {
       streamStub.push = simple.stub()
       fsMock.readFile = simple.stub()
-      process.chdir(pathResolve(__dirname, '../fixture/'))
+      process.chdir(pathResolve(__dirname, '../../fixture/'))
       t.throws(function () {
         bundleClient('client.js', 'bundle.js', {
+          plugins: [],
           url: 'https://myapp.com'
         }, function () {
           t.fail()

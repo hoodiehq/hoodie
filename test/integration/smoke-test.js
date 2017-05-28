@@ -18,7 +18,9 @@ var hapiPluginOptions = {
     inMemory: true,
     loglevel: 'error',
     paths: {},
-    PouchDB: PouchDB
+    PouchDB: PouchDB,
+    plugins: [],
+    app: {}
   }
 }
 

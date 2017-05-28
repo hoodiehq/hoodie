@@ -37,5 +37,22 @@ test('app options', function (group) {
     t.end()
   })
 
+  group.test('with hoodie.name', function (t) {
+    var getAppDefaults = proxyquire('../../../cli/app-defaults', {
+      'path': pathMock,
+      './package.json': {
+        name: 'pkg-name',
+        hoodie: {
+          name: 'foo'
+        }
+      }
+    })
+    var options = getAppDefaults()
+
+    t.deepEqual(options.name, 'foo', 'sets name from pkg.hoodie.name')
+
+    t.end()
+  })
+
   group.end()
 })

@@ -26,25 +26,25 @@ test('client', function (group) {
 
   group.test('always calls next()', function (t) {
     var next = simple.stub()
-    client.register(mockServer, {config: {}}, next)
+    client.register(mockServer, {}, next)
 
     t.is(next.callCount, 1, 'Calls next')
     t.end()
   })
 
-  group.test('passes options.config on to the handlerFactory', function (t) {
-    var configMock = {}
+  group.test('passes options on to the handlerFactory', function (t) {
+    var optionsMock = {}
     var next = simple.stub()
-    client.register(mockServer, {config: configMock}, next)
+    client.register(mockServer, optionsMock, next)
 
     var handlerArgs = createBundleHandlerStub.lastCall.args
 
-    t.equals(handlerArgs[2], configMock)
+    t.equals(handlerArgs[2], optionsMock)
     t.end()
   })
 
-  group.test('builds targetPath from config.data + "client.js"', function (t) {
-    var optionsMock = {config: {data: '/example/path'}}
+  group.test('builds targetPath from options.data + "client.js"', function (t) {
+    var optionsMock = {data: '/example/path'}
     client.register(mockServer, optionsMock, simple.stub())
     var handlerArgs = createBundleHandlerStub.lastCall.args
 
@@ -53,7 +53,7 @@ test('client', function (group) {
   })
 
   group.test('builds targetPath from folder ".hoodie" by default', function (t) {
-    client.register(mockServer, {config: {}}, simple.stub())
+    client.register(mockServer, {}, simple.stub())
 
     var handlerArgs = createBundleHandlerStub.lastCall.args
     t.is(handlerArgs[1], path.join('.hoodie', 'client.js'))
