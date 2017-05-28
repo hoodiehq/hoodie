@@ -14,7 +14,9 @@ function register (server, options, next) {
   _.defaultsDeep(options, {
     paths: {
       public: 'public'
-    }
+    },
+    plugins: [],
+    app: {}
   })
 
   server.ext('onPreResponse', corsHeaders)
@@ -23,6 +25,7 @@ function register (server, options, next) {
     if (error) {
       return next(error)
     }
+
     registerPlugins(server, options, function (error) {
       if (error) {
         return next(error)

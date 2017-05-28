@@ -4,11 +4,15 @@ module.exports.register.attributes = {
   dependencies: 'inert'
 }
 
+var path = require('path')
+var requireResolve = require('./resolver')
 var createReadStream = require('fs').createReadStream
-var pathJoin = require('path').join
 
 function register (server, options, next) {
-  var publicFolder = options.config.paths.public
+  var paths = options.paths
+  var plugins = options.plugins
+  var publicFolder = paths.public
+
   var hoodieVersion
   try {
     hoodieVersion = require('hoodie/package.json').version
@@ -16,10 +20,9 @@ function register (server, options, next) {
     hoodieVersion = 'development'
   }
 
-  var hoodiePublicPath = pathJoin(require.resolve('../../package.json'), '..', 'public')
-  var adminPublicPath = pathJoin(require.resolve('@hoodie/admin/package.json'), '..', 'dist')
-
-  server.route([{
+  var hoodiePublicPath = path.join(requireResolve('../../package.json'), '..', 'public')
+  var adminPublicPath = path.join(requireResolve('@hoodie/admin/package.json'), '..', 'dist')
+  var routes = [{
     method: 'GET',
     path: '/{p*}',
     handler: {
@@ -55,15 +58,49 @@ function register (server, options, next) {
     handler: function (request, reply) {
       reply({
         hoodie: true,
-        name: options.config.name,
+        name: options.name,
         version: hoodieVersion
       })
     }
-  }])
+  }]
+
+  // add plugin routes
+  plugins.forEach(function (pluginPath) {
+    // check if module directory exists
+    try {
+      var pluginPackagePath = requireResolve(pluginPath + '/package.json')
+    } catch (error) {
+      if (error.code !== 'MODULE_NOT_FOUND') {
+        throw error
+      }
+    }
+
+    if (!pluginPackagePath) {
+      return
+    }
+
+    var pkg = require(pluginPackagePath)
+
+    var name = pkg.hoodie ? pkg.hoodie.name || pkg.name : pkg.name
+
+    routes.push({
+      method: 'GET',
+      path: '/hoodie/' + name + '/{p*}',
+      handler: {
+        directory: {
+          path: path.join(path.dirname(pluginPackagePath), 'hoodie', 'public'),
+          listing: false,
+          index: true
+        }
+      }
+    })
+  })
+
+  server.route(routes)
 
   // serve app whenever an html page is requested
   // and no other document is available
-  var app = pathJoin(publicFolder, 'index.html')
+  var app = path.join(publicFolder, 'index.html')
   server.ext('onPostHandler', function (request, reply) {
     var response = request.response
 
@@ -77,7 +114,7 @@ function register (server, options, next) {
     var isAdminPublicPath = /^\/hoodie\/admin\//.test(request.path) && !(/^\/hoodie\/admin\/api\//).test(request.path)
 
     if (isAdminPublicPath && isHtmlRequest) {
-      return reply(createReadStream(pathJoin(adminPublicPath, 'index.html')))
+      return reply(createReadStream(path.join(adminPublicPath, 'index.html')))
     }
 
     if (isHoodiePath) {

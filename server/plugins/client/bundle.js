@@ -27,10 +27,15 @@ function checkModule (module) {
  * client, so we need to browserify on-the-fly to avoid dependency duplication,
  * and avoiding unneeded bundling with browserify saves a significant time.
  */
-function bundleClient (hoodieClientPath, bundleTargetPath, config, callback) {
-  var plugins = [
-    path.resolve('hoodie/client')
-  ].filter(checkModule)
+function bundleClient (hoodieClientPath, bundleTargetPath, options, callback) {
+  var pluginPaths = options.plugins.map(function (pluginName) {
+    return pluginName + '/hoodie/client'
+  })
+
+  var plugins = [path.resolve('hoodie/client')]
+    .concat(pluginPaths)
+    .filter(checkModule)
+
   var getPluginsModifiedTimes = plugins.map(function (pluginPath) {
     return getModifiedTime.bind(null, requireResolve(pluginPath))
   })
@@ -48,7 +53,7 @@ function bundleClient (hoodieClientPath, bundleTargetPath, config, callback) {
     var sourceTime = Math.max.apply(null, results)
     var hasUpdate = sourceTime > targetTime
 
-    var get = hasUpdate ? buildBundle.bind(null, config, plugins) : fs.readFile.bind(null, bundleTargetPath)
+    var get = hasUpdate ? buildBundle.bind(null, options, plugins) : fs.readFile.bind(null, bundleTargetPath)
 
     get(function (error, buffer) {
       if (error) {
@@ -71,7 +76,7 @@ function getModifiedTime (path, callback) {
   })
 }
 
-function buildBundle (config, plugins, callback) {
+function buildBundle (options, plugins, callback) {
   var ReadableStream = require('stream').Readable
   var browserify = require('browserify')
   var stream = new ReadableStream()
@@ -84,14 +89,14 @@ function buildBundle (config, plugins, callback) {
   hoodieBundleSource += 'var Hoodie = require("@hoodie/client")\n'
   hoodieBundleSource += 'var options = {\n'
 
-  if (config.client) {
-    Object.keys(config.client).forEach(function (key) {
-      hoodieBundleSource += '  "' + key + '": ' + JSON.stringify(config.client[key]) + ',\n'
+  if (options.client) {
+    Object.keys(options.client).forEach(function (key) {
+      hoodieBundleSource += '  "' + key + '": ' + JSON.stringify(options.client[key]) + ',\n'
     })
   }
 
-  if (config.url) {
-    hoodieBundleSource += '  url: "' + config.url + '",\n'
+  if (options.url) {
+    hoodieBundleSource += '  url: "' + options.url + '",\n'
   } else {
     hoodieBundleSource += '  url: location.origin,\n'
   }

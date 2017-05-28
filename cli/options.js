@@ -1,5 +1,8 @@
 module.exports = getCliOptions
 
+var fs = require('fs')
+var path = require('path')
+
 var log = require('npmlog')
 var pick = require('lodash').pick
 var rc = require('rc')
@@ -119,8 +122,16 @@ function getCliOptions (projectPath) {
     options.address = options.bindAddress
   }
 
+  options.name = defaults.name
   options.public = webrootLocator(options.public)
+  options.plugins = defaults.plugins
+  options.app = defaults.app
   options.client = defaults.client
+
+  // If app has a hoodie folder, add it to the list of plugins
+  if (fs.existsSync(path.join(projectPath, 'hoodie'))) {
+    options.plugins.push(projectPath)
+  }
 
   // rc & yargs are setting keys we are not interested in, like in-memory or _
   // so we only pick the relevant ones based on they keys of the default options.
