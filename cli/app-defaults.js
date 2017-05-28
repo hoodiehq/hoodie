@@ -6,7 +6,9 @@ function getAppDefaults (projectPath) {
   var pkg = require(join(projectPath, 'package.json'))
   var appOptions = pkg.hoodie || {}
 
-  appOptions.name = pkg.name
+  if (!appOptions.name) {
+    appOptions.name = pkg.name
+  }
 
   return appOptions
 }

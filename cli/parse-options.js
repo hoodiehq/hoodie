@@ -30,11 +30,14 @@ function parseOptions (options) {
   var dbOptions = {}
 
   var config = {
+    name: options.name,
     loglevel: options.loglevel,
     paths: {
       data: options.data,
       public: options.public
     },
+    plugins: options.plugins,
+    app: options.app,
     inMemory: Boolean(options.inMemory),
     client: options.client
   }

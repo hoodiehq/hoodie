@@ -23,7 +23,6 @@ function createBundleHandler (hoodieClientPath, bundleTargetPath, bundleConfig) 
         })
       })
     }
-
     bundlePromise.then(function (buffer) {
       reply(buffer).bytes(buffer.length).type('application/javascript')
     }).catch(reply)
