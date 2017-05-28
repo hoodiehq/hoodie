@@ -14,6 +14,7 @@ Hoodie Documentation
    guides/configuration
    guides/plugins
    guides/deployment
+   guides/hapi-plugin
 
 .. toctree::
    :maxdepth: 1
@@ -24,7 +25,7 @@ Hoodie Documentation
 .. toctree::
    :maxdepth: 1
    :caption: Developers
-   
+
    developers/CONTRIBUTING
    developers/CODING_STYLE
    developers/TRIAGING

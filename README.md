@@ -41,150 +41,19 @@ Next install hoodie and save it as dependency
 npm install --save hoodie
 ```
 
-Now simply use `npm start` to start up your Hoodie app!
-
-You can find a more thorough description in our [Getting Started Guide](http://docs.hood.ie/en/latest/guides/quickstart.html).
-
-## Usage
-
-`hoodie` can be used as as CLI (Command Line Interface) or as [hapi plugin](http://hapijs.com/tutorials/plugins).
-The options are slightly different, see below
-
-### CLI
-
-Once you finished the [setup](#setup), you can start your hoodie server with
+Now start up your Hoodie app
 
 ```
 npm start
 ```
 
-To pass CLI options to Hoodie, you have to separate them with `--`, for example:
+You can find a more thorough description in our [Getting Started Guide](http://docs.hood.ie/en/latest/guides/quickstart.html).
 
-```
-npm start -- --port=8090 --inMemory
-```
+## Usage
 
-Available CLI options are
-
-option                    | default              | description
-------------------------- | -------------------- | -------------
-`--address`               | `'127.0.0.1'`        | Address to which Hoodie binds
-`--data`                  | `'.hoodie'`          | Data path
-`--dbUrl`                 | -                    | If provided, uses external CouchDB listening at the given URL. (Can contain auth credentials)
-`--dbUrlUsername`         | -                    | Username to authenticate with the external CouchDB (requires --dbUrl and --dbUrlPassword to be set).
-`--dbUrlPassword`         | -                    | Password to authenticate with the external CouchDB (requires --dbUrl and/or --dbUrlUsername to be set).
-`--dbAdapter`             | `pouchdb-adapter-fs` | Default [PouchDB adapter](https://pouchdb.com/adapters.html). Ignored if `dbUrl` or `inMemory` set
-`--adminPassword`         | -                    | Password to login to Admin Dashboard. Login is not possible if `adminPassword` option is not set
-`--loglevel`              | `'warn'`             | One of: silent, error, warn, http, info, verbose, silly
-`-m`, `--inMemory`        | `false`              | Whether to start the PouchDB Server in memory
-`--port`                  | `8080`               | Port-number to run the Hoodie App on
-`--public`                | `'public'`           | path to static assets
-`--url`                   | -                    | Optional: external URL at which Hoodie Server is accessible (e.g. `http://myhoodieapp.com`)
-`-h`, `--help`, `--usage` | -                    | Prints help and available options
-`-v`, `--version`         | -                    | Shows Hoodie version
-
-Hoodie CLI is using [rc](https://www.npmjs.com/package/rc) for configuration, so the same options can be set with environment variables and config files. Environment variables are prefixed with `hoodie_`. Examples: `hoodie_port=8090` or `hoodie_inMemory=true`. Configuration files can be in INI or JSON format and [can be placed at different locations](https://www.npmjs.com/package/rc#standards). Most commonly you would place a `.hoodierc` file in your app’s directory, and it can look like this
-
-```json
-{
-  "port": 8090,
-  "inMemory": true,
-  "adminPassword": "secret"
-}
-```
-
-The priority of configuration:
-
-1. command line arguments
-2. Environment variables
-3. `.hoodierc` files
-4. Your app’s defaults form `"hoodie"` key in `"package.json"`
-5. Hoodie’s defaults as shown in table above
-
-### hapi plugin
-
-You can load `hoodie` as hapi plugin to use it in your existing hapi application:
-
-```js
-var Hapi = require('hapi')
-var hoodie = require('hoodie').register
-
-var server = new Hapi.Server()
-server.connection({
-  host: 'localhost',
-  port: 8000
-})
-
-server.register({
-  register: hoodie,
-  options: { // pass options here
-    inMemory: true,
-    public: 'dist'
-  }
-}, function (error) {
-  if (error) {
-    throw error
-  }
-
-  server.start(function (error) {
-    if (error) {
-      throw error
-    }
-
-    console.log(('Server running at:', server.info.uri)
-  })
-})
-```
-
-The available options are
-
-option                    | default      | description
-------------------------- | ------------ | -------------
-**PouchDB**               | –            | [PouchDB constructor](https://pouchdb.com/api.html#defaults). See also [custom PouchDB builds](https://pouchdb.com/2016/06/06/introducing-pouchdb-custom-builds.html)
-**paths.data**            | `'.hoodie'`  | Data path
-**paths.public**          | `'public'`   | Public path
-**adminPassword**         | –            | Password to login to Admin Dashboard. Login is not possible if `adminPassword` option is not set
-**inMemory**              | `false`      | If set to true, configuration and other files will not be read from / written to the file system
-**client**                | `{}`         | [Hoodie Client](https://github.com/hoodiehq/hoodie-client#constructor) options. `client.url` is set based on hapi’s `server.info.host`
-**account**               | `{}`         | [Hoodie Account Server](https://github.com/hoodiehq/hoodie-account-server/tree/master/plugin#options) options. `account.admins`, `account.secret` and `account.usersDb` are set based on `db` option above
-**store**                 | `{}`         | [Hoodie Store Server](https://github.com/hoodiehq/hoodie-store-server#options) options. `store.couchdb`, `store.PouchDB` are set based on `db` option above. `store.hooks.onPreAuth` is set to bind user authentication for Hoodie Account to Hoodie Store
-
-## Extending Hoodie for your app
-
-You can add custom behavior to your hoodie-based application in a few ways:
-
-1. The server-side functionality can be extended by adding a module constructed as a [hapi plugin](http://hapijs.com/tutorials/plugins)
- to the path `hoodie/server`. E.g:
-
-```js
-exports.register = function (server, options, next) {
-  // server-relevant code here
-  next();
-}
-
-exports.register.attributes = {
-  'name': 'my-app'
-}
-```
-
-2. The client-side functionality can be extended by adding a module that can be interpreted as a [hoodie plugin](https://github.com/hoodiehq/hoodie-client#hoodieplugin)
- to the path `hoodie/client`, which by default will be built into the client.js package by browserify.
-
-```js
-module.exports = {
-  demonstratePlugin: function () { // will be attached as hoodie.demonstratePlugin()
-    // client-relevant code here
-  }
-}
-```
-
-Both of the above paths will be imported as if Node modules, so the path to the entry file for each module can be
-`hoodie/{server,client}.js` or `hoodie/{server,client}/index.js`.
-
-Note that for now only the file modification time of the entry file of the client module is used to determine the
-freshness of the client bundle and therefore whether it should be rebuilt on the first request after a server restart.
-If your client code stretches to many files, you may need to update the `mtime` of the client entry file by using
-`touch` or a similar method before restarting your server to ensure that the client bundle is rebuilt.
+`hoodie` can be used standalone or as [hapi plugin](http://hapijs.com/tutorials/plugins).
+The options are slightly different. For the standalone usage, see [Hoodie’s configuration guide](http://docs.hood.ie/en/latest/guides/configuration.html).
+For the hapi plugin usage, see [Hoodie’s hapi plugin usage guide](http://docs.hood.ie/en/latest/guides/hapi-plugin.html)
 
 ## Testing
 
