@@ -22,7 +22,7 @@ RETRIES=60
 while [ "$RETRIES" -gt 0 ] ; do
   sleep 1
   kill -0 $HOODIE_PROCESS 2&>1 > /dev/null || { echo "Hoodie exited prematurely"; wait $HOODIE_PROCESS ; exit $? ; }
-  curl -I http://localhost:8080/hoodie/client.js > /dev/null && break
+  curl -fI http://localhost:8080/hoodie/client.js > /dev/null && break
   let RETRIES=RETRIES-1
 done
 
