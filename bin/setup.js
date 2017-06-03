@@ -4,10 +4,11 @@ var path = require('path')
 var fs = require('fs')
 var log = require('npmlog')
 
-var installIntoApp = process.env.PWD.indexOf('node_modules') !== -1
+var workingDirectory = process.env.PWD
+var installIntoApp = /node_modules/.test(workingDirectory)
 // This block only executes if Hoodie is installed with as a dependency
 if (installIntoApp) {
-  var pathToAppRoot = path.resolve('..', '..')
+  var pathToAppRoot = path.resolve(workingDirectory, '..', '..')
   var packageJson = require(path.join(pathToAppRoot, 'package.json'))
 
   packageJson.scripts = packageJson.scripts || {}
