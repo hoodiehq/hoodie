@@ -4,13 +4,9 @@ var path = require('path')
 var fs = require('fs')
 var log = require('npmlog')
 
-// use process.env to access npm config environment variables.
-// - https://docs.npmjs.com/misc/config#environment-variables
-// - https://docs.npmjs.com/misc/config#save
-var saveRequested = process.env.npm_config_save
-
-// This block only executes if Hoodie is installed with `-S` or `--save` flags.
-if (saveRequested) {
+var installIntoApp = process.env.PWD.indexOf('node_modules') !== -1
+// This block only executes if Hoodie is installed with as a dependency
+if (installIntoApp) {
   var pathToAppRoot = path.resolve('..', '..')
   var packageJson = require(path.join(pathToAppRoot, 'package.json'))
 
