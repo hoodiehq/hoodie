@@ -1,6 +1,7 @@
 module.exports = parseOptions
 
 var log = require('npmlog')
+
 var path = require('path')
 
 var PouchDB = require('pouchdb-core')
@@ -49,7 +50,7 @@ function parseOptions (options) {
 
   PouchDB.plugin(require('pouchdb-mapreduce'))
 
-  options.dbUrl = createAuthDbUrl(options.dbUrlUsername, options.dbUrlPassword, options.dbUrl)
+  options.dbUrl = createAuthDbUrl(log, options.dbUrlUsername, options.dbUrlPassword, options.dbUrl)
 
   if (options.dbUrl) {
     PouchDB.plugin(require('pouchdb-adapter-http'))

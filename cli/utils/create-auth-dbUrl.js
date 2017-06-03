@@ -1,8 +1,5 @@
 module.exports = createAuthDbUrl
 
-var log = require('npmlog')
-log.level = 'warn'
-
 /**
  * Parse username, password and url for external db, via options object and returns the modified dbUrl
  * with username and password encoded in URL encoding
@@ -18,7 +15,7 @@ log.level = 'warn'
  *
  */
 
-function createAuthDbUrl (dbUsername, dbPassword, dbUrl) {
+function createAuthDbUrl (log, dbUsername, dbPassword, dbUrl) {
   var dbUrlParts = {
     prefix: '',
     authDetails: '',
