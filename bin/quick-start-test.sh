@@ -6,14 +6,22 @@ trap "{ CODE=$?; popd; rm -rf $TEMP_ROOT; exit $CODE; }" EXIT
 
 ## docs/guides/quickstart.rst:41
 
+echo "$ npm init -y"
 npm init -y
 
 ## docs/guides/quickstart.rst:47
 
+echo "$ npm install $HOODIE_FOLDER --save"
 npm install $HOODIE_FOLDER --save
+
+## docs/guides/quickstart.rst:98
+
+echo "$ npm install --save pouchdb-browser @hoodie/client"
+npm install --save pouchdb-browser @hoodie/client
 
 ## docs/guides/quickstart.rst:72
 
+echo "$ npm start"
 npm start & HOODIE_PROCESS=$!
 
 ## Give the process a generous sixty seconds to start
