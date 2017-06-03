@@ -39,7 +39,7 @@
   "devDependencies": {
     "coveralls": "^2.11.9",
     "nock": "^9.0.0",
-    "nyc": "^10.1.0",
+    "nyc": "^11.0.2",
     "proxyquire": "^1.7.4",
     "request": "^2.72.0",
     "semantic-release": "^6.3.1",
