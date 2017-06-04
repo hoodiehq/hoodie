@@ -99,12 +99,16 @@ test('bundle client', function (group) {
     })
 
     bundleClient('client.js', 'bundle.js', {
-      url: 'https://myapp.com'
+      url: 'https://myapp.com',
+      client: {
+        foo: 'bar'
+      }
     }, function (error, buffer) {
       t.error(error)
 
       var expected = 'var Hoodie = require("@hoodie/client")\n' +
                      'var options = {\n' +
+                     '  "foo": "bar",\n' +
                      '  url: "https://myapp.com",\n' +
                      '  PouchDB: require("pouchdb-browser")\n' +
                      '}\n' +

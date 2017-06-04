@@ -8,6 +8,7 @@ test('hoodie defaults test', function (group) {
     t.deepEqual(defaults, {
       address: '127.0.0.1',
       adminPassword: undefined,
+      client: {},
       data: '.hoodie',
       dbAdapter: 'pouchdb-adapter-fs',
       dbUrl: undefined,
