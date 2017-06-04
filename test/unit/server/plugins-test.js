@@ -20,7 +20,13 @@ var registerPlugins = proxyquire('../../../server/plugins', {
       name: 'custom-name'
     }
   },
-  'hoodie-plugin-exists-with-custom-name/hoodie/server': {}
+  'hoodie-plugin-exists-with-custom-name/hoodie/server': {},
+  'hoodie-plugin-exists-with-register/hoodie/server': {
+    register: function () {}
+  },
+  'hoodie-plugin-exists-with-register/package.json': {
+    name: 'exists'
+  }
 })
 var registerPluginsError = new Error('Plugin Register Error')
 var serverMock = {
@@ -123,6 +129,27 @@ test('when requiring plugin errors', function (t) {
   var error = new Error('Module Not Found Error')
   error.code = 'MODULE_NOT_FOUND'
   mockResolver.throwWith(error)
+  registerPlugins(serverMock, options, function (error) {
+    t.ok(error)
+    t.equal(error, registerPluginsError)
+    t.end()
+  })
+})
+
+test('when requiring plugin which exports {register: plugin}', function (t) {
+  var options = {
+    paths: {
+      public: 'public'
+    },
+    plugins: [
+      'hoodie-plugin-exists-with-register'
+    ]
+  }
+
+  mockResolver.callFn(function (path) {
+    return path
+  })
+
   registerPlugins(serverMock, options, function (error) {
     t.ok(error)
     t.equal(error, registerPluginsError)
