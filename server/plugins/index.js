@@ -17,7 +17,7 @@ function checkModule (modulePath) {
 
 function registerPlugins (server, options, callback) {
   var hapiPlugins = [
-    'inert'
+    require('inert')
   ]
 
   var localPlugins = [
@@ -25,7 +25,12 @@ function registerPlugins (server, options, callback) {
     './logger',
     './maybe-force-gzip',
     './public'
-  ]
+  ].map(function (pluginPath) {
+    return {
+      options: options,
+      register: require(pluginPath)
+    }
+  })
 
   var externalPlugins = options.plugins
     .filter(function (pluginPath) {
@@ -34,24 +39,22 @@ function registerPlugins (server, options, callback) {
     .map(function (pluginPath) {
       var pkg = require(pluginPath + '/package.json')
       var pluginName = pkg.hoodie ? pkg.hoodie.name || pkg.name : pkg.name
+      var hapiPluginOptions = require(pluginPath + '/hoodie/server')
 
-      return {
-        register: pluginPath + '/hoodie/server',
-        routes: { prefix: '/hoodie/' + pluginName }
+      if (!hapiPluginOptions.register) {
+        hapiPluginOptions = {register: hapiPluginOptions}
       }
+
+      hapiPluginOptions.options = options
+      hapiPluginOptions.routes = { prefix: '/hoodie/' + pluginName }
+
+      return hapiPluginOptions
     })
 
   var plugins = hapiPlugins.concat(localPlugins, externalPlugins)
-    .map(function (register) {
-      var path = register.register ? register.register : register
-      return {
-        options: options,
-        register: require(path),
-        routes: register.routes
-      }
-    })
 
-  log.silly('hapi', 'Registering internal plugins')
+  log.silly('hapi', 'Registering plugins')
+
   server.register(plugins, function (error) {
     if (error) {
       return callback(error)
