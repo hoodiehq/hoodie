@@ -6,6 +6,7 @@ function getHoodieDefaults () {
     port: 8080,
     data: '.hoodie',
     public: 'public',
+    client: {},
     dbUrl: undefined,
     dbUrlPassword: undefined,
     dbUrlUsername: undefined,

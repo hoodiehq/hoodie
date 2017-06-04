@@ -83,12 +83,21 @@ function buildBundle (config, plugins, callback) {
 
   hoodieBundleSource += 'var Hoodie = require("@hoodie/client")\n'
   hoodieBundleSource += 'var options = {\n'
+
+  if (config.client) {
+    Object.keys(config.client).forEach(function (key) {
+      hoodieBundleSource += '  "' + key + '": ' + JSON.stringify(config.client[key]) + ',\n'
+    })
+  }
+
   if (config.url) {
     hoodieBundleSource += '  url: "' + config.url + '",\n'
   } else {
     hoodieBundleSource += '  url: location.origin,\n'
   }
+
   hoodieBundleSource += '  PouchDB: require("pouchdb-browser")\n'
+
   hoodieBundleSource += '}\n'
   hoodieBundleSource += 'module.exports = new Hoodie(options)\n'
   plugins.forEach(function (pluginPath) {

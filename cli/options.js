@@ -120,6 +120,7 @@ function getCliOptions (projectPath) {
   }
 
   options.public = webrootLocator(options.public)
+  options.client = defaults.client
 
   // rc & yargs are setting keys we are not interested in, like in-memory or _
   // so we only pick the relevant ones based on they keys of the default options.

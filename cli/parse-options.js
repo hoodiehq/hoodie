@@ -35,7 +35,8 @@ function parseOptions (options) {
       data: options.data,
       public: options.public
     },
-    inMemory: Boolean(options.inMemory)
+    inMemory: Boolean(options.inMemory),
+    client: options.client
   }
 
   log.level = config.loglevel
