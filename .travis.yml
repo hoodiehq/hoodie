@@ -17,7 +17,7 @@ before_script:
   - gem install awesome_bot
   # run dead link checks but silence no response, timeout, bad gateway, service unavailable and gateway timeout failures
   # (due to false postives), redirect, dupes and excluding white-listed links
-  - awesome_bot --allow 404,408,502,503,504 --allow-redirect --allow-dupe docs/**/*.md README.md --white-list http://127.0.0.1:8080,http://myhoodieapp.com,https://pouchdb.com/adapters,https://hoodie-app-tracker-randomxyz.now.sh/,https://my-tracker-app.now.sh,https://hapijs.com/tutorials/,https://opencollective.com
+  - awesome_bot --allow 404,408,502,503,504 --allow-redirect --allow-dupe --allow-timeout docs/**/*.md README.md --white-list http://127.0.0.1:8080,http://myhoodieapp.com,https://pouchdb.com/adapters,https://hoodie-app-tracker-randomxyz.now.sh/,https://my-tracker-app.now.sh,https://hapijs.com/tutorials/,https://opencollective.com
   # run spelling/grammar/style checks
   - npm run textlint
 after_success:
