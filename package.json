@@ -39,7 +39,6 @@
   "devDependencies": {
     "coveralls": "^2.11.9",
     "nock": "^9.0.0",
-    "nyc": "^11.0.2",
     "proxyquire": "^1.7.4",
     "request": "^2.72.0",
     "semantic-release": "^6.3.1",
@@ -65,11 +64,11 @@
     "url": "https://github.com/hoodiehq/hoodie.git"
   },
   "scripts": {
-    "coverage": "nyc report --reporter=text-lcov | coveralls",
+    "coverage": "tap --coverage-report=text-lcov | coveralls",
     "semantic-release": "semantic-release pre && npm publish && semantic-release post",
     "start": "./bin/start.js",
     "pretest": "standard",
-    "test": "nyc tap --no-cov './test/{unit,integration}/**/*-test.js'",
+    "test": "tap --100 --jobs-auto './test/{unit,integration}/**/*-test.js'",
     "postinstall": "node ./bin/setup.js",
     "textlint": "textlint docs/**/*.md README.md"
   }
