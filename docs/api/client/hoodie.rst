@@ -185,19 +185,6 @@ Examples
       hoodie.sayHi = function () { alert('hi') }
     })
 
-hoodie.reset
-------------
-
-TO BE DONE: `#12 <https://github.com/hoodiehq/hoodie-client/issues/12>`_
-
-Reset hoodie client and emit reset event so plugins can reset as well.
-
-.. code:: js
-
-    hoodie.reset()
-
-Resolves without argument.
-
 hoodie.on
 ---------
 
@@ -271,9 +258,7 @@ Events
 
 +------------------------+------------------------------------------+
 | Event                  | Decription                               |
-+========================+==========================================+ 
-| ``reset``              | triggered when hoodie.reset() succeeded  |
-+------------------------+------------------------------------------+
++========================+==========================================+
 | ``account:*``          | events, see account events               |
 +------------------------+------------------------------------------+
 | ``store:*``            | events, see store events                 |
