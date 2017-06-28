@@ -86,24 +86,7 @@ share maintenance responsibilities.
     2. store-client |store-client repository| |store-client build status|
        |store-client coverage status| |store-client dependency status|
 
-           Store client for data persistence and offline sync. It combines
-           `pouchdb-hoodie-api <https://github.com/hoodiehq/pouchdb-hoodie-api>`__
-           and
-           `pouchdb-hoodie-sync <https://github.com/hoodiehq/pouchdb-hoodie-sync>`__.
-
-       1. pouchdb-hoodie-api |pouchdb-hoodie-api repository|
-          |pouchdb-hoodie-api build status| |pouchdb-hoodie-api coverage
-          status| |pouchdb-hoodie-api dependency status|
-
-              `PouchDB <https://pouchdb.com>`__ plugin that provides simple
-              methods to add, find, update and remove data.
-
-       2. pouchdb-hoodie-sync |pouchdb-hoodie-sync repository|
-          |pouchdb-hoodie-sync build status| |pouchdb-hoodie-sync coverage
-          status| |pouchdb-hoodie-sync dependency status|
-
-              `PouchDB <https://pouchdb.com>`__ plugin that provides simple
-              methods to keep two databases in sync.
+           Store client for data persistence and offline sync.
 
     3. connection-status |connection-status repository| |connection-status
        build status| |connection-status coverage status| |connection-status
