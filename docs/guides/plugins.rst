@@ -25,7 +25,7 @@ Example
     }
 
 You can extend your Hoodie’s server routes and API by creating ``hoodie/server/index.js``
-in your app’s, which should export a `hapi plugin <https://hapijs.com/tutorials/plugins>`.
+in your app’s, which should export a `hapi plugin <https://hapijs.com/tutorials/plugins>`_.
 All server routes defined in the plugin will be prefixed with ``/hoodie/<app name>``
 
 Example
@@ -66,7 +66,7 @@ for app-specific plugins:
             └── index.html
 
 The server plugin must be loadable via ``require('hoodie-plugin-foo/hoodie/server')``.
-A Hoodie server plugin is a [hapi plugin](http://hapijs.com/tutorials/plugins).
+A Hoodie server plugin is a `hapi plugin <http://hapijs.com/tutorials/plugins>`_.
 The client plugin must be loadable via ``require('hoodie-plugin-foo/hoodie/client')``
 A Hoodie client plugin can be a function or an object,
 it will be passed into `hoodie.plugin() <../api/client/hoodie.html#hoodie-plugin>`
@@ -98,4 +98,4 @@ The order in which server/client plugins are loaded is
 2. 3rd party plugins (npm dependencies)
 3. app plugins
 
-For an example plugin, have a look at Hoodie’s `Hello, world! plugin <https://github.com/hoodiehq/hoodie-plugin-hello-world>`
+For an example plugin, have a look at Hoodie’s `"Hello, world!" <https://github.com/hoodiehq/hoodie-plugin-hello-world>`_ plugin .
