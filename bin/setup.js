@@ -6,10 +6,26 @@ var log = require('npmlog')
 
 var isInstallIntoApp = /node_modules/.test(process.cwd())
 
-// This block only executes if Hoodie is installed with as a dependency
+// Run setup only if Hoodie is installed explicitly (npm install hoodie)
 if (isInstallIntoApp) {
+  setup()
+}
+
+function setup () {
   var pathToAppRoot = path.resolve('..', '..')
-  var packageJson = require(path.join(pathToAppRoot, 'package.json'))
+
+  // log warning if package.json cannot be found (hoodiehq/hoodie#751)
+  try {
+    var packageJson = require(path.join(pathToAppRoot, 'package.json'))
+  } catch (error) {
+    if (error.code !== 'MODULE_NOT_FOUND') {
+      throw error
+    }
+    log.warn('setup', 'Could not find package.json at ' + path.join(pathToAppRoot, 'package.json'))
+    log.warn('setup', 'You must manually set the start script in your app’s package.json to "hoodie" in order for "npm start" to work')
+
+    return
+  }
 
   packageJson.scripts = packageJson.scripts || {}
 
