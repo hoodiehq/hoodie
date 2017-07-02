@@ -11,9 +11,6 @@
     "url": "https://github.com/hoodiehq/hoodie/issues"
   },
   "dependencies": {
-    "@hoodie/admin": "^1.0.1",
-    "@hoodie/client": "^10.0.0",
-    "@hoodie/server": "^23.0.0",
     "async": "^2.0.0",
     "browserify": "^14.0.0",
     "good": "^7.0.2",
@@ -53,6 +50,7 @@
   "engines": {
     "node": ">=4"
   },
+  "files":["@hoodie/admin", "@hoodie/client", "@hoodie/server"],
   "homepage": "https://github.com/hoodiehq/hoodie#readme",
   "keywords": [
     "nobackend",
