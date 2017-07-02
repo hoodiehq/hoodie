@@ -53,6 +53,9 @@
   "engines": {
     "node": ">=4"
   },
+  "files": [
+    "bin", "cli", "public", "server"
+  ],
   "homepage": "https://github.com/hoodiehq/hoodie#readme",
   "keywords": [
     "nobackend",
