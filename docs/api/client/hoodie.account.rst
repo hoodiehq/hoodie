@@ -399,14 +399,14 @@ Example
         alert('You are now known as ' + properties.username)
     })
 
-account.profile.get
+hoodie.account.profile.get
 -------------------
 
 Returns profile properties from local cache.
 
 .. code:: js
 
-    account.profile.get(properties)
+    hoodie.account.profile.get(properties)
 
 +----------------+-----------------------------+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+------------+
 | Argument       | Type                        | Description                                                                                                                                                                   | Required   |
@@ -420,21 +420,21 @@ Examples
 
 .. code:: js
 
-    var properties = account.profile.get()
+    var properties = hoodie.account.profile.get()
     alert('Hey there ' + properties.fullname)
-    var fullname = account.profile.get('fullname')
+    var fullname = hoodie.account.profile.get('fullname')
     alert('Hey there ' + fullname)
-    var properties = account.profile.get(['fullname', 'address.city'])
+    var properties = hoodie.account.profile.get(['fullname', 'address.city'])
     alert('Hey there ' + properties.fullname + '. How is ' + properties.address.city + '?')
 
-account.profile.fetch
+hoodie.account.profile.fetch
 ---------------------
 
 Fetches profile properties from server.
 
 .. code:: js
 
-    account.profile.fetch(options)
+    hoodie.account.profile.fetch(options)
 
 +----------------+----------------------------+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+----------+
 | Argument       | Type                       | Description                                                                                                                                                                  | Required |
@@ -467,24 +467,24 @@ Examples
 
 .. code:: js
 
-    account.fetch().then(function (properties) {
+    hoodie.account.fetch().then(function (properties) {
         alert('Hey there ' + properties.fullname)
     })
-    account.fetch('fullname').then(function (fullname) {
+    hoodie.account.fetch('fullname').then(function (fullname) {
         alert('Hey there ' + fullname)
     })
-    account.fetch(['fullname', 'address.city']).then(function (properties) {
+    hoodie.account.fetch(['fullname', 'address.city']).then(function (properties) {
         alert('Hey there ' + properties.fullname + '. How is ' + properties.address.city + '?')
     })
 
-account.profile.update
+hoodie.account.profile.update
 ----------------------
 
 Update profile properties on server and local cache
 
 .. code:: js
 
-    account.profile.update(changedProperties)
+    hoodie.account.profile.update(changedProperties)
 
 +-----------------------+--------+--------------------------------------------------------------------------------+----------+
 | Argument              | Type   | Description                                                                    | Required |
@@ -519,18 +519,18 @@ Example
 
 .. code:: js
 
-    account.profile.update({fullname: 'Prof Pat Hook'}).then(function (properties) {
+    hoodie.account.profile.update({fullname: 'Prof Pat Hook'}).then(function (properties) {
         alert('Congratulations, ' + properties.fullname)
     })
 
-account.request
+hoodie.account.request
 ---------------
 
 Sends a custom request to the server, for things like password resets, account upgrades, etc.
 
 .. code:: js
 
-    account.request(properties)
+    hoodie.account.request(properties)
 
 +---------------------+--------+------------------------------------------------+----------+
 | Argument            | Type   | Description                                    | Required |
@@ -566,56 +566,56 @@ Example
 
 .. code:: js
 
-    account.request({type: 'passwordreset', contact: 'pat@example.com'}).then(function (properties) {
+    hoodie.account.request({type: 'passwordreset', contact: 'pat@example.com'}).then(function (properties) {
         alert('A password reset link was sent to ' + properties.contact)
     })
 
-account.on
+hoodie.account.on
 ----------
 
 .. code:: js
 
-    account.on(event, handler)
+    hoodie.account.on(event, handler)
 
 Example
 
 .. code:: js
 
-    account.on('signin', function (accountProperties) {
+    hoodie.account.on('signin', function (accountProperties) {
         alert('Hello there, ' + accountProperties.username)
     })
 
-account.one
+hoodie.account.one
 -----------
 
 Call function once at given account event.
 
 .. code:: js
 
-    account.one(event, handler)
+    hoodie.account.one(event, handler)
 
 Example
 
 .. code:: js
 
-    account.one('signin', function (accountProperties) {
+    hoodie.account.one('signin', function (accountProperties) {
         alert('Hello there, ' + accountProperties.username)
     })
 
-account.off
+hoodie.account.off
 -----------
 
 Removes event handler that has been added before
 
 .. code:: js
 
-    account.off(event, handler)
+    hoodie.account.off(event, handler)
 
 Example
 
 .. code:: js
 
-    account.off('singin', showNotification)
+    hoodie.account.off('singin', showNotification)
 
 Events
 ------
@@ -644,10 +644,10 @@ Hooks
 .. code:: js
 
     // clear user’s local store signin and after signout
-    account.hook.before('signin', function (options) {
+    hoodie.account.hook.before('signin', function (options) {
         return localUserStore.clear()
     })
-    account.hook.after('signout', function (options) {
+    hoodie.account.hook.after('signout', function (options) {
         return localUserStore.clear()
     })
 
@@ -666,7 +666,7 @@ Requests
 
 Hoodie comes with a list of built-in account requests, which can be disabled, overwritten or extended in `hoodie-account-server <https://github.com/hoodiehq/hoodie-account-server/tree/master/plugin#optionsrequests>`_.
 
-When a request succeeds, an event with the same name as the request type gets emitted. For example, ``account.request({type: 'passwordreset', contact: 'pat@example.com')`` triggers a ``passwordreset`` event, with the ``requestProperties`` passed as argument.
+When a request succeeds, an event with the same name as the request type gets emitted. For example, ``hoodie.account.request({type: 'passwordreset', contact: 'pat@example.com')`` triggers a ``passwordreset`` event, with the ``requestProperties`` passed as argument.
 
 +--------------------+----------------------------------------+
 | ``passwordreset``  | Request a password reset token         |
