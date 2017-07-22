@@ -4,9 +4,13 @@ Using Hoodie as hapi plugin
 Here is an example usage of Hoodie as a hapi plugin:
 
 .. code:: js
+
     var Hapi = require('hapi')
     var hoodie = require('hoodie').register
-
+    var PouchDB = require('pouchdb-core')
+    .plugin(require('pouchdb-mapreduce'))
+    .plugin(require('pouchdb-adapter-memory'))
+  
     var server = new Hapi.Server()
     server.connection({
       host: 'localhost',
@@ -17,7 +21,8 @@ Here is an example usage of Hoodie as a hapi plugin:
       register: hoodie,
       options: { // pass options here
         inMemory: true,
-        public: 'dist'
+        public: 'dist',
+        PouchDB: PouchDB
       }
     }, function (error) {
       if (error) {
@@ -29,7 +34,7 @@ Here is an example usage of Hoodie as a hapi plugin:
           throw error
         }
 
-        console.log(('Server running at:', server.info.uri)
+        console.log(('Server running at:', server.info.uri))
       })
     })
 
