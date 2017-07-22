@@ -8,8 +8,8 @@ Here is an example usage of Hoodie as a hapi plugin:
     var Hapi = require('hapi')
     var hoodie = require('hoodie').register
     var PouchDB = require('pouchdb-core')
-    .plugin(require('pouchdb-mapreduce'))
-    .plugin(require('pouchdb-adapter-memory'))
+      .plugin(require('pouchdb-mapreduce'))
+      .plugin(require('pouchdb-adapter-memory'))
   
     var server = new Hapi.Server()
     server.connection({
