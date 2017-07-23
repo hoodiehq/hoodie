@@ -15,9 +15,6 @@ jQuery or lodash:
 .. code:: html
 
    <script src="/hoodie/client.js"></script>
-   <script type="javascript">
-     var hoodie = new Hoodie();
-   </script>
 
 From that point on, things get really powerful really quickly:
 
