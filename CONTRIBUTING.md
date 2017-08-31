@@ -215,7 +215,7 @@ If you have commit access, please follow this process for merging patches and cu
    Leave a comment about it so the author and others will know.
 7. Once everything looks good, add an "Approve" review. Don’t forget to say
    something nice 👏🐶💖✨
-8. If the commit messages follow [our conventions](@commit-message-conventions)
+8. If the commit messages follow [our conventions](https://conventionalcommits.org)
 
    1. If there is a breaking change, make sure that `BREAKING CHANGE:` with
       _exactly_ that spelling (incl. the ":") is in body of the according
