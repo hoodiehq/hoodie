@@ -1,7 +1,7 @@
 Configuration
 =============
 
-Your Hoodie backend can be configured using default options that are part of
+Your Hoodie back-end can be configured using default options that are part of
 your repository as well as using hidden files, CLI arguments and environment variables.
 
 Options
@@ -33,6 +33,8 @@ Here is a list of all available options
 +-----------------+--------------------------+--------------------------+--------------------------+---------------------------------------------------------------------------------------------------------------------+
 | adminPassword   | -                        | ``--adminPassword``      | ``hoodie_adminPassword`` | Password to login to Admin Dashboard. Login is not possible unless set                                              |
 +-----------------+--------------------------+--------------------------+--------------------------+---------------------------------------------------------------------------------------------------------------------+
+| name            | hoodie                   | ``--name``               | ``hoodie_name``          | Name your application.                                                                                              |
++-----------------+--------------------------+--------------------------+--------------------------+---------------------------------------------------------------------------------------------------------------------+
 
 Defaults
 --------
@@ -54,7 +56,8 @@ default values
         "inMemory": false,
         "loglevel": "warn",
         "url": "",
-        "adminPassword": ""
+        "adminPassword": "",
+        "name": "hoodie"
       }
     }
 
