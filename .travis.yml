@@ -21,7 +21,8 @@ before_script:
   # run spelling/grammar/style checks
   - npm run textlint
 after_success:
-  - npm run semantic-release
+  - npm install --global npx
+  - npx -p node@8 npm run semantic-release
   - npm run coverage
 branches:
   except:
