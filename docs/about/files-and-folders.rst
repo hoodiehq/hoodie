@@ -63,11 +63,11 @@ The ``hoodie/`` folder contains the JavaScript code that runs in your server
 and the user's browser, and the code that they share. Hoodie uses two files
 as hooks to package code for the client and server:
 
-  * ``hoodie/client/index.js`` is included as a `Hoodie plugin
-  <http://docs.hood.ie/en/latest/guides/plugins.html>`_ using `Browserify
-  <http://browserify.org/>`_, so it can use ``require()`` to include code from
-  dependencies or other folders.
-  * ``hoodie/server/index.js`` is included in the server as a `Hapi plugin
+- ``hoodie/client/index.js`` is included as a `Hoodie plugin
+  <http://docs.hood.ie/en/latest/guides/plugins.html>`_
+  using `Browserify <http://browserify.org/>`_, so it can use ``require()``
+  to include code from dependencies or other folders.
+- ``hoodie/server/index.js`` is included in the server as a `Hapi plugin
   <https://hapijs.com/tutorials/plugins>`_. It can define new routes and other
   server-side logic.
 
