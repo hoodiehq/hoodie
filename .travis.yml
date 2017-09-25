@@ -22,7 +22,7 @@ before_script:
   - npm run textlint
 after_success:
   - npm install --global npx
-  - npx -p node@8 semantic-release
+  - npx -p node@8 -c "semantic-release pre && npm publish && semantic-release post"
   - npm run coverage
 branches:
   except:
