@@ -180,6 +180,7 @@ complicated, we can help you out and teach you as we go :)
 
    - Commit test files with `test: ...` or `test(scope): ...` prefix
    - Commit bug fixes with `fix: ...` or `fix(scope): ...` prefix
+   - Commit new features with `feat: ...` or `feat(scope): ...` prefix
    - Commit breaking changes by adding `BREAKING CHANGE: ` in the commit body
      (not the subject line)
    - Commit changes to `package.json`, `.gitignore` and other meta files with
