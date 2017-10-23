@@ -38,7 +38,7 @@
   },
   "devDependencies": {
     "coveralls": "^3.0.0",
-    "nock": "^9.0.0",
+    "nock": "^9.0.25",
     "proxyquire": "^1.7.4",
     "request": "^2.72.0",
     "semantic-release": "^7.0.1",
