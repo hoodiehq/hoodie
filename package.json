@@ -44,7 +44,7 @@
     "semantic-release": "^7.0.1",
     "simple-mock": "^0.8.0",
     "standard": "^10.0.0",
-    "tap": "^10.0.0",
+    "tap": "^11.0.0",
     "textlint": "^9.0.0",
     "textlint-rule-common-misspellings": "^1.0.1",
     "textlint-rule-rousseau": "^1.4.5",
