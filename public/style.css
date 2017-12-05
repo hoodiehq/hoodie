@@ -7,7 +7,7 @@ body {
 /*this sets the styling for all h1 elements found in the html*/
 h1 {
   font-family:Helvetica, Arial, sans-serif;
-  color:#e94e1b;
+  color:#e94e1b;/*orange color*/
   text-align:center;
   letter-spacing:2px;
   font-size:39px;
@@ -27,8 +27,9 @@ h1 {
   text-align:center;
 }
 
+/*this sets the styling for all h2 elements found in the html*/
 h2 {
-  color:#e94e1b;
+  color:#e94e1b;/*orange color*/
   letter-spacing: 2px;
 }
 
