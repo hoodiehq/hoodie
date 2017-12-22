@@ -4,17 +4,6 @@
     "rousseau": {
         "severity" : "warning",
         "ignoreTypes": ["sentence:uppercase","sentence:start"]
-     },
-     "no-dead-link": {
-      "severity" : "warning",
-      "checkRelative": false,
-      "baseURI": "https://opencollective.com",
-      "ignore": ["https://david-dm.org",
-                 "http://127.0.0.1:8080",
-                 "http://myhoodieapp.com",
-                 "https://hoodie-app-tracker-randomxyz.now.sh/",
-                 "https://my-tracker-app.now.sh",
-                 "https://opencollective.com"]
-    }
+     }
   }
 }
