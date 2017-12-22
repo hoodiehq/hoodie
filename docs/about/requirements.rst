@@ -27,4 +27,4 @@ Browser Compatibilities (all latest stable)
 requirements`_, since Hoodie is using PouchDB for its in-browser
 storage.
 
-.. _PouchDB’s requirements: http://pouchdb.com/learn.html
+.. _PouchDB’s requirements: https://pouchdb.com/learn.html
