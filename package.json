@@ -47,14 +47,16 @@
     "tap": "^11.0.0",
     "textlint": "^10.0.0",
     "textlint-rule-common-misspellings": "^1.0.1",
-    "textlint-rule-rousseau": "^1.4.5",
-    "textlint-rule-no-dead-link": "^3.1.1"
+    "textlint-rule-rousseau": "^1.4.5"
   },
   "engines": {
     "node": ">=4"
   },
   "files": [
-    "bin", "cli", "public", "server"
+    "bin",
+    "cli",
+    "public",
+    "server"
   ],
   "homepage": "https://github.com/hoodiehq/hoodie#readme",
   "keywords": [

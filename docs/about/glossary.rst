@@ -41,6 +41,6 @@ Every user signed up with your Hoodie app has their private little database.
 Anything you do in the **hoodie.store** methods stores data in here.
 
 .. _CouchDB: http://couchdb.apache.org/
-.. _PouchDB: http://pouchdb.com/
-.. _hapi: http://hapijs.com/
+.. _PouchDB: https://pouchdb.com/
+.. _hapi: https://hapijs.com/
 .. _load hoodie as a hapi plugin: https://github.com/hoodiehq/hoodie#hapi-plugin

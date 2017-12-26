@@ -5,5 +5,5 @@
         "severity" : "warning",
         "ignoreTypes": ["sentence:uppercase","sentence:start"]
      }
-   } 
+  }
 }
