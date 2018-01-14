@@ -1,23 +1,41 @@
 sudo: required
 language: node_js
-notifications:
-  email: false
-node_js:
-  - 4
-before_script:
-  - npm prune
-  - bin/quick-start-test.sh
-  # install pandoc cli tool for .rst to .md converting
-  - wget https://github.com/jgm/pandoc/releases/download/1.16.0.2/pandoc-1.16.0.2-1-amd64.deb
-  - sudo dpkg -i pandoc-1.16.0.2-1-amd64.deb
-  # convert .rst to .md (textlint package needs .md file format to work)
-  - find ./ -iname "*.rst" -type f -exec sh -c 'pandoc "${0}" -o "${0%.md}.md"' {} \;
-  # run spelling/grammar/style/deadlink checks using textlint see '.textlintrc' configuration
-  # file for details. https://github.com/textlint/textlint
-  - npm run textlint
-after_success:
-  - npm run semantic-release
-  - npm run coverage
+
+# Trigger a push build on master and greenkeeper branches + PRs build on every branches
+# Avoid double build on PRs (See https://github.com/travis-ci/travis-ci/issues/1147)
 branches:
-  except:
-    - /^v\d+\.\d+\.\d+$/
+  only:
+    - master
+    - /^greenkeeper.*$/
+
+jobs:
+  include:
+    - stage: test
+      node_js: 4
+      script: 
+        - npm run test
+        - npm run coverage
+    - node_js: 4
+      script: bin/quick-start-test.sh
+    - stage: docs
+      node_js: lts/*
+      script:
+        # install pandoc cli tool for .rst to .md converting
+        - wget https://github.com/jgm/pandoc/releases/download/1.16.0.2/pandoc-1.16.0.2-1-amd64.deb
+        - sudo dpkg -i pandoc-1.16.0.2-1-amd64.deb
+        # convert .rst to .md (textlint package needs .md file format to work)
+        - find ./ -iname "*.rst" -type f -exec sh -c 'pandoc "${0}" -o "${0%.md}.md"' {} \;
+        # run spelling/grammar/style/deadlink checks using textlint see '.textlintrc' configuration
+        # file for details. https://github.com/textlint/textlint
+        - npm run textlint
+    - stage: release
+      node_js: lts/*
+      script:
+        - npm run semantic-release
+        
+stages:
+  - test
+  - name: docs
+    if: branch = master
+  - name: release
+    if: branch = master
