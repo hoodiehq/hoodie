@@ -70,7 +70,7 @@
   },
   "scripts": {
     "coverage": "tap --coverage-report=text-lcov | coveralls",
-    "semantic-release": "semantic-release pre && npm publish && semantic-release post",
+    "semantic-release": "semantic-release",
     "start": "./bin/start.js",
     "pretest": "standard",
     "test": "tap --100 --jobs-auto './test/{unit,integration}/**/*-test.js'",
