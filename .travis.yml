@@ -16,7 +16,8 @@ before_script:
   # file for details. https://github.com/textlint/textlint
   - npm run textlint
 after_success:
-  - npm run semantic-release
+  - npm install --global npx
+  - npx -p node@8 -c "semantic-release pre && npm publish && semantic-release post"
   - npm run coverage
 branches:
   except:
