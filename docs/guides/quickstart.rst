@@ -5,6 +5,11 @@ In this guide you’ll learn how to create a demo Hoodie app, learn about the
 basic structure of a Hoodie project and its folders, the endpoints and app URLs
 and how to include and use the Hoodie library in your project.
 
+|Remix on Glitch|
+
+.. |Remix on Glitch| image:: https://cdn.glitch.com/2703baf2-b643-4da7-ab91-7ee2a2d00b5b%2Fremix-button.svg
+   :target: https://glitch.com/edit/#!/remix/hoodie
+
 Prerequisites
 ~~~~~~~~~~~~~
 
