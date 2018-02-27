@@ -91,17 +91,6 @@ at http://127.0.0.1:8080 after you restart the server. All assets in the public
 folder, like images, CSS files or JavaScript files, will be served by your
 Hoodie Backend at :code:`http://127.0.0.1:8080/<path/to/your/file.ext>`.
 
-Note for npm v2
----------------
-
-Because of how npm v2 installs sub dependencies, the hoodie client cannot be
-bundled. As a workaround, just install ``pouchdb-browser`` and ``@hoodie/client``
-as a dependency of your hoodie app
-
-.. code:: bash
-
-    $ npm install --save pouchdb-browser @hoodie/client
-
 What’s next?
 ~~~~~~~~~~~~
 
