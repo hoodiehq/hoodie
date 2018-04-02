@@ -106,7 +106,7 @@ Go and try:
     hoodie.account.signUp({username: 'foo', password: 'secret'})
 
 
-Now, test using it offline and back online.  You can also open it in another browser and see the changes being replicated.
+Now, test using it offline and back online.  You can also open a second browser (incognito) and see the changes being replicated.
 
 
 
