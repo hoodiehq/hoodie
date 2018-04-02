@@ -95,12 +95,16 @@ If you just want to try, you can copy https://raw.githubusercontent.com/gr2m/swe
 Open the Console and try:
 
 .. code:: bash
+
     hoodie
+
 
 Go and try:
 
 .. code:: bash
+
     hoodie.account.signUp({username: 'foo', password: 'secret'})
+
 
 Now, test using it offline and back online.  You can also open it in another browser and see the changes being replicated.
 
