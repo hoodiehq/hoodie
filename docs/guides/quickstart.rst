@@ -99,7 +99,7 @@ Open the Console and try:
     hoodie
 
 
-Go and try:
+Also try:
 
 .. code:: bash
 
