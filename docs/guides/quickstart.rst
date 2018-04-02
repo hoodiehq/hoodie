@@ -93,10 +93,18 @@ Hoodie Backend at :code:`http://127.0.0.1:8080/<path/to/your/file.ext>`.
 
 If you just want to try, you can copy https://raw.githubusercontent.com/gr2m/sweet.la/master/public/index.html to  your index.html.  (This code was created to present Hoodie in an event, you can watch it at https://www.youtube.com/watch?v=TSDyxtVbbME&t=1272s)
 Open the Console and try:
+<<<<<<< HEAD
+=======
+
+>>>>>>> added more basic steps that seemed to add value for really newbies like me :-)
 .. code:: bash
     hoodie
 
 Go and try:
+<<<<<<< HEAD
+=======
+
+>>>>>>> added more basic steps that seemed to add value for really newbies like me :-)
 .. code:: bash
     hoodie.account.signUp({username: 'foo', password: 'secret'})
 
