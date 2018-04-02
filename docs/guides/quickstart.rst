@@ -43,7 +43,7 @@ questions, you can simply press enter to leave the default values.
 
 .. code:: bash
 
-    $ npm init
+    $ npm init -y
 
 Now we can install **hoodie** using npm
 
@@ -57,7 +57,7 @@ like this
 .. code:: json
 
     {
-      "name": "funky",
+      "name": "testapp",
       "version": "1.0.0",
       "description": "",
       "main": "index.js",
@@ -90,6 +90,19 @@ You can also create a :code:`public/index.html` file, which will be served
 at http://127.0.0.1:8080 after you restart the server. All assets in the public
 folder, like images, CSS files or JavaScript files, will be served by your
 Hoodie Backend at :code:`http://127.0.0.1:8080/<path/to/your/file.ext>`.
+
+If you just want to try, you can copy https://raw.githubusercontent.com/gr2m/sweet.la/master/public/index.html to  your index.html.  (This code was created to present Hoodie in an event, you can watch it at https://www.youtube.com/watch?v=TSDyxtVbbME&t=1272s)
+Open the Console and try:
+.. code:: bash
+    hoodie
+
+Go and try:
+.. code:: bash
+    hoodie.account.signUp({username: 'foo', password: 'secret'})
+
+Now, test using it offline and back online.  You can also open it in another browser and see the changes being replicated.
+
+
 
 Note for npm v2
 ---------------
