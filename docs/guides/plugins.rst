@@ -10,14 +10,15 @@ App-specific plugins
 ~~~~~~~~~~~~~~~~~~~~
 
 You can extend your Hoodie’s client by creating the file ``hoodie/client/index.js``
-in your app’s repository, which should export a `Hoodie Client plugin <../api/client/hoodie.html#hoodie-plugin>`.
-It will dynamically be bundled into your client accessible at the ``/hoodie/client.js`` route.
+in your app’s repository, which should export a `Hoodie Client plugin <http://docs.hood.ie/en/latest/api/client/hoodie.html#hoodie-plugin>`.
+It will dynamically be bundled into your client ``/hoodie/client.js``.
+
 
 Example
 
 .. code:: js
 
-    // /hoodie/client.js
+    // /hoodie/client/index.js
     module.exports = function (hoodie) {
       hoodie.hello = function (what) {
         return Promise.resolve('Hello, ' + (what || 'world') + '!')
@@ -49,11 +50,12 @@ Example
       next()
     }
 
+Try it it at http://localhost:8080/hoodie/<app name>/api
 
 3rd party plugins
 ~~~~~~~~~~~~~~~~~
 
-Hoodie plugins are npm modules. We recommend to prefix your plugin names with
+Hoodie plugins are `npm modules <https://www.npmjs.com/search?q=hoodie-plugin->`. We recommend to prefix your plugin names with
 ``hoodie-plugin-``, but it’s not required. The folder structure is the same as
 for app-specific plugins:
 
@@ -69,7 +71,7 @@ The server plugin must be loadable via ``require('hoodie-plugin-foo/hoodie/serve
 A Hoodie server plugin is a `hapi plugin <http://hapijs.com/tutorials/plugins>`_.
 The client plugin must be loadable via ``require('hoodie-plugin-foo/hoodie/client')``
 A Hoodie client plugin can be a function or an object,
-it will be passed into `hoodie.plugin() <../api/client/hoodie.html#hoodie-plugin>`
+it will be passed into `hoodie.plugin() <http://docs.hood.ie/en/latest/api/client/hoodie.html#hoodie-plugin>`
 
 Hoodie plugins can extend the Hoodie client, the Hoodie server and provide a
 web UI for `/hoodie/<plugin name>`. All extension points are optional.
