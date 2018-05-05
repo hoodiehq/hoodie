@@ -41,7 +41,7 @@
     "nock": "^9.0.0",
     "proxyquire": "^1.7.4",
     "request": "^2.72.0",
-    "semantic-release": "^12.2.2",
+    "semantic-release": "^15.3.0",
     "simple-mock": "^0.8.0",
     "standard": "^11.0.0",
     "tap": "^11.0.0",
