@@ -127,7 +127,7 @@ What’s next?
 Our `Hoodie Tracker App`_ is a great place to see how to use a Hoodie backend.
 It’s an intentionally simple and well commented application built with only
 HTML, JavaScript and CSS, without using any library or framework. You can see it
-running at https://tracker.hood.ie/
+running at https://hoodie-app-tracker.now.sh/
 
 Having Trouble?
 ~~~~~~~~~~~~~~~
