@@ -24,7 +24,8 @@ Browser Compatibilities (all latest stable)
 -  iOS Safari (7.1+)
 
 **Important**: This list is currently based on `PouchDB’s
-requirements`_, since Hoodie is using PouchDB for its in-browser
+requirements`_, since Hoodie is using `PouchDB` for its in-browser
 storage.
 
-.. _PouchDB’s requirements: https://pouchdb.com/learn.html
+.. _PouchDB’s requirements: https://pouchdb.com/learn.html#browser_support
+.. _PouchDB: https://pouchdb.com/learn.html
