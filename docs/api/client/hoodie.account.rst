@@ -70,16 +70,6 @@ Example
         console.log(error) // should be an error about the password being too short
     })
 
-hoodie.account.hasInvalidSession
---------------------------------
-
-Checks ``hoodie.account.session.invalid property``. Returns ``true``
-if user has invalid session, otherwise ``undefined``.
-
-.. code:: js
-
-    hoodie.account.hasInvalidSession()
-
 hoodie.account.signUp
 ---------------------
 
