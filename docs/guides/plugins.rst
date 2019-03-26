@@ -27,7 +27,7 @@ Example
 
 You can extend your Hoodie’s server routes and API by creating ``hoodie/server/index.js``
 in your app’s, which should export a `hapi plugin <https://hapijs.com/tutorials/plugins>`_.
-All server routes defined in the plugin will be prefixed with ``/hoodie/<app name>``
+All server routes defined in the plugin will be prefixed with ``/hoodie/<app name>`` where <app name> is your package.json "name" key.
 
 Example
 
