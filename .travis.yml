@@ -11,11 +11,11 @@ branches:
 jobs:
   include:
     - stage: test
-      node_js: 4
+      node_js: 6
       script: 
         - npm run test
         - npm run coverage
-    - node_js: 4
+    - node_js: 6
       script: bin/quick-start-test.sh
     - stage: docs
       node_js: lts/*
