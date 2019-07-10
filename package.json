@@ -71,7 +71,7 @@
   "scripts": {
     "coverage": "tap --coverage-report=text-lcov | coveralls",
     "semantic-release": "semantic-release",
-    "start": "./bin/start.js",
+    "start": "node start.js",
     "pretest": "standard",
     "test": "tap --100 --jobs-auto './test/{unit,integration}/**/*-test.js'",
     "postinstall": "node ./bin/setup.js",
