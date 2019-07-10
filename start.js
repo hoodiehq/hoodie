@@ -15,10 +15,6 @@ if (os.type() === 'Windows_NT') {
 } else {
   start = spawn('./bin/start.js')
 }
-  start = spawn('./bin/start.js')
-} else if (os.type() === 'Windows_NT') {
-  start = spawn('node', ['bin\\start.js'])
-}
 
 start.stdout.on('data', onLog)
 start.stderr.on('data', onError)
