@@ -10,7 +10,11 @@ function onError (data) {
   console.error(data.toString())
 }
 
-if (os.type() === 'Linux') {
+if (os.type() === 'Windows_NT') {
+  start = spawn('node', ['bin\\start.js'])
+} else {
+  start = spawn('./bin/start.js')
+}
   start = spawn('./bin/start.js')
 } else if (os.type() === 'Windows_NT') {
   start = spawn('node', ['bin\\start.js'])
