@@ -2,7 +2,7 @@ Hoodie's Concepts
 =====================================================================
 
 Hoodie was designed around a few core beliefs and concepts, and they
-explain a lot if the choices made in the code and the functionality.
+explain a lot of the choices made in the code and the functionality.
 They are:
 
 -  `Dreamcode <#dreamcode>`__
