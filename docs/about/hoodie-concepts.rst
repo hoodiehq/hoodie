@@ -53,7 +53,7 @@ things really shouldn't be difficult anymore. So we're proposing Hoodie
 as a noBackend solution. Yes, a backend does exist, but it doesn't have
 to exist in your head. You don't have to plan it or set it up. You
 simply don't have to worry about it for those basic operations, you can
-do all of them with Hoodie's frontend API. Of yourse, we let you dig as
+do all of them with Hoodie's frontend API. Of course, we let you dig as
 deep as you want, but for the start, you don't have to.
 
 noBackend gives you time to work on the hard problems, the parts of the
