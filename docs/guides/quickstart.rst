@@ -5,6 +5,11 @@ In this guide you’ll learn how to create a demo Hoodie app, learn about the
 basic structure of a Hoodie project and its folders, the endpoints and app URLs
 and how to include and use the Hoodie library in your project.
 
+|Remix on Glitch|
+
+.. |Remix on Glitch| image:: https://cdn.glitch.com/2703baf2-b643-4da7-ab91-7ee2a2d00b5b%2Fremix-button.svg
+   :target: https://glitch.com/edit/#!/remix/hoodie
+
 Prerequisites
 ~~~~~~~~~~~~~
 
@@ -38,7 +43,7 @@ questions, you can simply press enter to leave the default values.
 
 .. code:: bash
 
-    $ npm init
+    $ npm init -y
 
 Now we can install **hoodie** using npm
 
@@ -52,7 +57,7 @@ like this
 .. code:: json
 
     {
-      "name": "funky",
+      "name": "testapp",
       "version": "1.0.0",
       "description": "",
       "main": "index.js",
@@ -86,6 +91,25 @@ at http://127.0.0.1:8080 after you restart the server. All assets in the public
 folder, like images, CSS files or JavaScript files, will be served by your
 Hoodie Backend at :code:`http://127.0.0.1:8080/<path/to/your/file.ext>`.
 
+If you just want to try, you can copy https://raw.githubusercontent.com/gr2m/sweet.la/master/public/index.html to  your index.html.  (This code was created to present Hoodie in an event, you can watch it at https://www.youtube.com/watch?v=TSDyxtVbbME&t=1272s)
+Open the Console and try:
+
+.. code:: bash
+
+    hoodie
+
+
+Also try:
+
+.. code:: bash
+
+    hoodie.account.signUp({username: 'foo', password: 'secret'})
+
+
+Now, test using it offline and back online.  You can also open a second browser (incognito) and see the changes being replicated.
+
+
+
 Note for npm v2
 ---------------
 
@@ -103,7 +127,7 @@ What’s next?
 Our `Hoodie Tracker App`_ is a great place to see how to use a Hoodie backend.
 It’s an intentionally simple and well commented application built with only
 HTML, JavaScript and CSS, without using any library or framework. You can see it
-running at https://tracker.hood.ie/
+running at https://hoodie-app-tracker.now.sh/
 
 Having Trouble?
 ~~~~~~~~~~~~~~~
