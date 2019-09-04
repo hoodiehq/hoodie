@@ -104,7 +104,7 @@ for instructions.
 
 In this guide, we assume that your CouchDB is available at `port 5984`_.
 
-Create a CouchDB admin user called **admin** with a strong password of your choice at
+Create a CouchDB admin user called **admin** with a strong password of your choice
 by clicking on the *Fix this* at `Apache CouchDB-Futon:Overview`_ link in the
 lower right corner. Use **admin** as username and keep your password in mind.
 
