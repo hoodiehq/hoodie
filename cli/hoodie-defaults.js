@@ -8,6 +8,8 @@ function getHoodieDefaults () {
     data: '.hoodie',
     public: 'public',
     client: {},
+    account: {},
+    store: {},
     dbUrl: undefined,
     dbUrlPassword: undefined,
     dbUrlUsername: undefined,
