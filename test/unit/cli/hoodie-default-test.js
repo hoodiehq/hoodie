@@ -10,6 +10,8 @@ test('hoodie defaults test', function (group) {
       adminPassword: undefined,
       app: {},
       client: {},
+      account: {},
+      store: {},
       data: '.hoodie',
       dbAdapter: 'pouchdb-adapter-fs',
       dbUrl: undefined,

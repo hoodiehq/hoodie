@@ -127,6 +127,8 @@ function getCliOptions (projectPath) {
   options.plugins = defaults.plugins
   options.app = defaults.app
   options.client = defaults.client
+  options.account = defaults.account
+  options.store = defaults.store
 
   // If app has a hoodie folder, add it to the list of plugins
   if (fs.existsSync(path.join(projectPath, 'hoodie'))) {

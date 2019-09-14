@@ -39,7 +39,9 @@ function parseOptions (options) {
     plugins: options.plugins,
     app: options.app,
     inMemory: Boolean(options.inMemory),
-    client: options.client
+    client: options.client,
+    account: options.account,
+    store: options.store
   }
 
   log.level = config.loglevel
