@@ -13,6 +13,10 @@ h1 {
   font-size:39px;
 }
 
+#title {
+  font-size: 50px;
+}
+
 .info {
   margin-left:10%;
   margin-right:10%;
