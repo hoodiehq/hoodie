@@ -24,6 +24,8 @@ If you have any questions come say hi in our [chat](http://hood.ie/chat/).
 
 ## Setup
 
+This setup is working for all operating system, testing on Windows 8, Windows 8.1, Windows 10, Mac and Linux.
+
 Hoodie is a [Node.js](https://nodejs.org/en/) package. You need Node Version 4
 or higher and npm Version 2 or higher, check your installed version with `node -v` and `npm -v`.
 
@@ -68,7 +70,7 @@ npm install
 The `hoodie` test suite is run with `npm test`.
 You can [read more about testing Hoodie](test).
 
-You can start hoodie for itself using `npm start`. It will  serve the contents
+You can start hoodie for itself using `npm start`. It will serve the contents
 of the [public folder](public).
 
 ## Backers
