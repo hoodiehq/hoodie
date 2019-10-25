@@ -37,7 +37,7 @@ cd my-app
 npm init -y
 ```
 
-Next install hoodie and save it as dependency
+Next, install hoodie and save it as dependency
 
 ```
 npm install --save hoodie
