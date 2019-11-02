@@ -34,7 +34,7 @@
     "pouchdb-mapreduce": "^6.0.6",
     "rc": "^1.1.6",
     "semver": "^5.1.0",
-    "yargs": "^7.0.1"
+    "yargs": "^9.0.1"
   },
   "devDependencies": {
     "coveralls": "^3.0.0",
