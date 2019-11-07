@@ -15,7 +15,7 @@ jobs:
       script: 
         - npm run test
         - npm run coverage
-    - node_js: 6
+    - node_js: 8
       script: bin/quick-start-test.sh
     - stage: docs
       node_js: lts/*
