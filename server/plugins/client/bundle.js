@@ -34,7 +34,7 @@ function bundleClient (hoodieClientPath, bundleTargetPath, options, callback) {
 
   var plugins = [path.resolve('hoodie/client')]
     .concat(pluginPaths)
-    .map(p => p.replace(/\\/g,"/") )  // fix backslashes in Windows paths
+    .map(p => p.replace(/\\/g, '/')) // fix backslashes in Windows paths
     .filter(checkModule)
 
   var getPluginsModifiedTimes = plugins.map(function (pluginPath) {

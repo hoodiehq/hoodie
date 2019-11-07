@@ -21,7 +21,7 @@ require('npmlog').level = 'error'
 
 test('/does_not_exist with accept: text/html', function (t) {
   var server = new Hapi.Server()
-  server.connection({port: 8090})
+  server.connection({ port: 8090 })
   server.register(hapiPluginOptions, function (error) {
     t.error(error, 'hoodie loads without error')
 
@@ -41,7 +41,7 @@ test('/does_not_exist with accept: text/html', function (t) {
 
 test('/does_not_exist.css with accept: text/css', function (t) {
   var server = new Hapi.Server()
-  server.connection({port: 8090})
+  server.connection({ port: 8090 })
   server.register(hapiPluginOptions, function (error) {
     t.error(error, 'hoodie loads without error')
 
@@ -60,7 +60,7 @@ test('/does_not_exist.css with accept: text/css', function (t) {
 
 test('/hoodie/admin/login with accept: text/html', function (t) {
   var server = new Hapi.Server()
-  server.connection({port: 8090})
+  server.connection({ port: 8090 })
   server.register(hapiPluginOptions, function (error) {
     t.error(error, 'hoodie loads without error')
 

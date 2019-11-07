@@ -3,7 +3,7 @@ var simple = require('simple-mock')
 var test = require('tap').test
 
 function createYargsMock (argv) {
-  var yargsApi = {argv: argv}
+  var yargsApi = { argv: argv }
 
   ;[
     'alias',
@@ -49,13 +49,13 @@ var hoodieDefaults = {
 
 function createCliOptionsProxy (yargsApi) {
   return proxyquire('../../../cli/options', {
-    'npmlog': { warn: simple.spy() },
+    npmlog: { warn: simple.spy() },
     './hoodie-defaults': function () {
       return hoodieDefaults
     },
     './app-defaults': mockAppDefaults(),
     './webroot-locator': mockWebrootLocator,
-    'yargs': yargsApi,
+    yargs: yargsApi,
     '../package.json': packageJsonMock
   })
 }
@@ -133,16 +133,16 @@ test('bindAddress', function (t) {
 
 test('app plugin', function (t) {
   var getOptions = proxyquire('../../../cli/options', {
-    'fs': {
+    fs: {
       existsSync: simple.stub().returnWith(true)
     },
-    'npmlog': { warn: simple.spy() },
+    npmlog: { warn: simple.spy() },
     './hoodie-defaults': function () {
       return hoodieDefaults
     },
     './app-defaults': mockAppDefaults(),
     './webroot-locator': mockWebrootLocator,
-    'yargs': createYargsMock({}),
+    yargs: createYargsMock({}),
     '../package.json': packageJsonMock
   })
 

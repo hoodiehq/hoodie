@@ -27,7 +27,7 @@ test('logger', function (group) {
     require('../../../server/plugins/logger').register(serverMock)
     var transformModule = serverMock.register.lastCall.arg.options.reporters.hoodieReporter[1].module
     var TransformClass = proxyquire(transformModule, {
-      'npmlog': npmlogMock
+      npmlog: npmlogMock
     })
 
     // can also use with 'new', but just calling as a function so that line 9

@@ -24,7 +24,7 @@ test('respond to all /hoodie/* - requests with an index.html', function (group) 
 
   group.beforeEach(function (done) {
     server = new Hapi.Server()
-    server.connection({port: 8090})
+    server.connection({ port: 8090 })
     server.register(hapiPluginOptions, function () {
       done()
     })

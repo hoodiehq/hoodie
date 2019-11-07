@@ -21,7 +21,7 @@ function register (server, options, next) {
 
   server.ext('onPreResponse', corsHeaders)
 
-  server.register({register: hoodieServer, options: options}, function (error) {
+  server.register({ register: hoodieServer, options: options }, function (error) {
     if (error) {
       return next(error)
     }

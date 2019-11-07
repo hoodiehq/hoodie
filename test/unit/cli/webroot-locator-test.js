@@ -4,12 +4,12 @@ var test = require('tap').test
 var path = require('path')
 
 var fsMock = {
-  'existsSync': simple.stub(),
-  'statSync': simple.stub()
+  existsSync: simple.stub(),
+  statSync: simple.stub()
 }
 
 var statsMock = {
-  'isDirectory': simple.stub()
+  isDirectory: simple.stub()
 }
 
 test('webroot locator', function (group) {

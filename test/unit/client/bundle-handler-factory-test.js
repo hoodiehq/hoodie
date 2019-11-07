@@ -23,7 +23,7 @@ test('bundle-handler-factory', function (group) {
     createHandler = proxyquire('../../../server/plugins/client/bundle-handler-factory', {
       './bundle': bundleStub,
       './bundle-writer': bundleWriterStub,
-      'npmlog': npmlogStub
+      npmlog: npmlogStub
     })
 
     done()
@@ -49,7 +49,7 @@ test('bundle-handler-factory', function (group) {
 
   group.test('calls clientBundleWriter and replies bundleBuffer', function (t) {
     var targetPath = '/target/path'
-    var handler = createHandler('', targetPath, {inMemory: false})
+    var handler = createHandler('', targetPath, { inMemory: false })
 
     var bundleBuffer = []
     bundleStub.callbackWith(null, bundleBuffer, false)
@@ -94,8 +94,8 @@ test('bundle-handler-factory', function (group) {
 
   function createReplyMock (cb) {
     var typeStub = simple.stub().callFn(cb)
-    var bytesStub = simple.stub().returnWith({type: typeStub})
-    return simple.stub().returnWith({bytes: bytesStub})
+    var bytesStub = simple.stub().returnWith({ type: typeStub })
+    return simple.stub().returnWith({ bytes: bytesStub })
   }
 
   group.end()

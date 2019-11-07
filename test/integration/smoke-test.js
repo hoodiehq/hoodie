@@ -28,7 +28,7 @@ require('npmlog').level = 'error'
 
 test('smoke test', function (t) {
   var server = new Hapi.Server(hapiOptions)
-  server.connection({port: 8090})
+  server.connection({ port: 8090 })
 
   server.register(hapiPluginOptions, function (error) {
     t.error(error, 'loads hoodie plugin without error')

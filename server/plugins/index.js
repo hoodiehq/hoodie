@@ -42,7 +42,7 @@ function registerPlugins (server, options, callback) {
       var hapiPluginOptions = require(pluginPath + '/hoodie/server')
 
       if (!hapiPluginOptions.register) {
-        hapiPluginOptions = {register: hapiPluginOptions}
+        hapiPluginOptions = { register: hapiPluginOptions }
       }
 
       hapiPluginOptions.options = options

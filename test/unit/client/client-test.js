@@ -44,7 +44,7 @@ test('client', function (group) {
   })
 
   group.test('builds targetPath from options.data + "client.js"', function (t) {
-    var optionsMock = {data: '/example/path'}
+    var optionsMock = { data: '/example/path' }
     client.register(mockServer, optionsMock, simple.stub())
     var handlerArgs = createBundleHandlerStub.lastCall.args
 

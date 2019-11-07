@@ -11,8 +11,8 @@ test('assure folders', function (group) {
   group.test('default settings', function (t) {
     var mkdirpMock = simple.stub().callbackWith(null)
     var assureFolders = proxyquire('../../../cli/assure-folders', {
-      'path': pathMock,
-      'mkdirp': mkdirpMock
+      path: pathMock,
+      mkdirp: mkdirpMock
     })
     assureFolders({
       data: 'data'
@@ -30,8 +30,8 @@ test('assure folders', function (group) {
   group.test('inMemory', function (t) {
     var mkdirpMock = simple.stub().callbackWith(null)
     var assureFolders = proxyquire('../../../cli/assure-folders', {
-      'path': pathMock,
-      'mkdirp': mkdirpMock
+      path: pathMock,
+      mkdirp: mkdirpMock
     })
     assureFolders({
       inMemory: true
@@ -47,8 +47,8 @@ test('assure folders', function (group) {
   group.test('dbUrl', function (t) {
     var mkdirpMock = simple.stub().callbackWith(null)
     var assureFolders = proxyquire('../../../cli/assure-folders', {
-      'path': pathMock,
-      'mkdirp': mkdirpMock
+      path: pathMock,
+      mkdirp: mkdirpMock
     })
     assureFolders({
       dbUrl: 'http://example.com'
