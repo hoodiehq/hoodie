@@ -46,7 +46,7 @@ test('public', function (group) {
       t.equal(serverMock.route.callCount, 1, 'route was called')
       t.type(serverMock.route.lastCall.arg, Array, 'route was called with an array')
       t.contains(serverMock.route.lastCall.arg[0],
-        {'handler': {'directory': {'path': /^my-custom-public-directory$/}}},
+        { handler: { directory: { path: /^my-custom-public-directory$/ } } },
         'route was configured to correct public directory')
       t.end()
     })

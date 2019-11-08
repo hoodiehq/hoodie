@@ -11,13 +11,15 @@ test('bundle client', function (group) {
     var bundleClient = proxyquire('../../../server/plugins/client/bundle', {
       fs: {
         readFile: readFileMock,
-        stat: simple.stub().callbackWith(null, {mtime: new Date()})
+        stat: simple.stub().callbackWith(null, { mtime: new Date() })
       }
     })
 
-    bundleClient('client.js', 'bundle.js', {plugins: [
-      'hoodie-plugin-foobar'
-    ]}, function (error) {
+    bundleClient('client.js', 'bundle.js', {
+      plugins: [
+        'hoodie-plugin-foobar'
+      ]
+    }, function (error) {
       t.error(error)
 
       t.is(readFileMock.callCount, 1, 'readFile called once')
@@ -44,7 +46,7 @@ test('bundle client', function (group) {
       fs: {
         stat: simple.stub().callFn(function (path, callback) {
           if (path === 'client.js') {
-            return callback(null, {mtime: new Date()})
+            return callback(null, { mtime: new Date() })
           }
 
           callback(new Error('boom'))
@@ -55,7 +57,7 @@ test('bundle client', function (group) {
       }
     })
 
-    bundleClient('client.js', 'bundle.js', {plugins: []}, function (error, buffer) {
+    bundleClient('client.js', 'bundle.js', { plugins: [] }, function (error, buffer) {
       t.error(error)
 
       t.is(bundleMock.callCount, 1, 'bundle called once')
@@ -89,7 +91,7 @@ test('bundle client', function (group) {
       fs: {
         stat: simple.stub().callFn(function (path, callback) {
           if (path === 'client.js') {
-            return callback(null, {mtime: new Date()})
+            return callback(null, { mtime: new Date() })
           }
 
           callback(new Error('boom'))
@@ -126,11 +128,11 @@ test('bundle client', function (group) {
     var bundleClient = proxyquire('../../../server/plugins/client/bundle', {
       fs: {
         readFile: simple.stub().callbackWith(new Error('boom')),
-        stat: simple.stub().callbackWith(null, {mtime: new Date()})
+        stat: simple.stub().callbackWith(null, { mtime: new Date() })
       }
     })
 
-    bundleClient('client.js', 'bundle.js', {plugins: []}, function (error) {
+    bundleClient('client.js', 'bundle.js', { plugins: [] }, function (error) {
       t.is(error.message, 'boom', 'passes error')
 
       t.end()
@@ -152,7 +154,7 @@ test('bundle client', function (group) {
       }
     })
 
-    bundleClient('client.js', 'bundle.js', {plugins: []}, function (error) {
+    bundleClient('client.js', 'bundle.js', { plugins: [] }, function (error) {
       t.ok(error)
       t.equal(error, testError)
       t.end()
@@ -208,13 +210,13 @@ test('bundle client', function (group) {
       streamStub.push = simple.stub()
       fsMock.stat = simple.stub().callFn(function (path, callback) {
         if (path === pathResolve(__dirname, '../../fixture/app-dir-with-server/hoodie/client.js')) {
-          return callback(null, {mtime: currentDate})
+          return callback(null, { mtime: currentDate })
         }
         if (path === 'client.js') {
-          return callback(null, {mtime: twoHoursAgo})
+          return callback(null, { mtime: twoHoursAgo })
         }
 
-        return callback(null, {mtime: oneHourAgo})
+        return callback(null, { mtime: oneHourAgo })
       })
       fsMock.readFile = simple.stub()
       process.chdir(pathResolve(__dirname, '../../fixture/app-dir-with-server/'))
@@ -244,13 +246,13 @@ test('bundle client', function (group) {
       streamStub.push = simple.stub()
       fsMock.stat = simple.stub().callFn(function (path, callback) {
         if (path === pathResolve(__dirname, '../../fixture/app-dir-with-server/hoodie/client.js')) {
-          return callback(null, {mtime: oneHourAgo})
+          return callback(null, { mtime: oneHourAgo })
         }
         if (path === 'client.js') {
-          return callback(null, {mtime: twoHoursAgo})
+          return callback(null, { mtime: twoHoursAgo })
         }
 
-        return callback(null, {mtime: currentDate})
+        return callback(null, { mtime: currentDate })
       })
       fsMock.readFile = simple.stub().callbackWith(null, Buffer.from('bundle content'))
       process.chdir(pathResolve(__dirname, '../../fixture/app-dir-with-server/'))
@@ -275,7 +277,7 @@ test('bundle client', function (group) {
           throw new Error('Boom')
         }
         if (path === 'client.js') {
-          return callback(null, {mtime: twoHoursAgo})
+          return callback(null, { mtime: twoHoursAgo })
         }
 
         callback(new Error('Boom'))

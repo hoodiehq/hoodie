@@ -21,7 +21,7 @@ var logMock = {
 }
 
 var parseOptions = proxyquire('../../../cli/parse-options', {
-  'npmlog': logMock,
+  npmlog: logMock,
   './defaults': getDefaultsMock
 })
 
@@ -68,7 +68,7 @@ test('parse options', function (group) {
       data: 'data',
       dbUrl: 'http://foo:bar@baz.com'
     })
-    var defaults = config.PouchDB('hack', {skip_setup: true}).__opts
+    var defaults = config.PouchDB('hack', { skip_setup: true }).__opts
     t.is(defaults.prefix, 'http://foo:bar@baz.com', 'Sets config.db.url')
 
     t.end()
@@ -80,7 +80,7 @@ test('parse options', function (group) {
       data: 'data',
       dbUrl: 'https://foo:bar@baz.com'
     })
-    var defaults = config.PouchDB('hack', {skip_setup: true}).__opts
+    var defaults = config.PouchDB('hack', { skip_setup: true }).__opts
     t.is(defaults.prefix, 'https://foo:bar@baz.com', 'Sets config.db.url')
 
     t.end()
@@ -93,7 +93,7 @@ test('parse options', function (group) {
       data: 'data',
       dbUrl: 'https://https://foo@baz.com'
     })
-    var defaults = config.PouchDB('hack', {skip_setup: true}).__opts
+    var defaults = config.PouchDB('hack', { skip_setup: true }).__opts
     t.is(defaults.prefix, 'https://https:%2F%2Ffoo@baz.com', 'Sets config.db.url')
 
     t.end()
@@ -106,7 +106,7 @@ test('parse options', function (group) {
       data: 'data',
       dbUrl: 'http://@@:@@@baz.com'
     })
-    var defaults = config.PouchDB('hack', {skip_setup: true}).__opts
+    var defaults = config.PouchDB('hack', { skip_setup: true }).__opts
     t.is(defaults.prefix, 'http://%40%40:%40%40@baz.com', 'Sets config.db.url')
 
     t.end()
@@ -119,7 +119,7 @@ test('parse options', function (group) {
       data: 'data',
       dbUrl: 'http://das/^$ds@das!dsa.com:@dsadas@dasdas@@baz.com'
     })
-    var defaults = config.PouchDB('hack', {skip_setup: true}).__opts
+    var defaults = config.PouchDB('hack', { skip_setup: true }).__opts
     t.is(defaults.prefix, 'http://das%2F%5E%24ds%40das!dsa.com:%40dsadas%40dasdas%40@baz.com', 'Sets config.db.url')
 
     t.end()
@@ -133,7 +133,7 @@ test('parse options', function (group) {
       dbUrlPassword: 'password',
       dbUrl: 'http://baz.com'
     })
-    var defaults = config.PouchDB('hack', {skip_setup: true}).__opts
+    var defaults = config.PouchDB('hack', { skip_setup: true }).__opts
     t.is(defaults.prefix, 'http://john%40doe.com:password@baz.com', 'Sets config.db.url')
 
     t.end()
@@ -146,7 +146,7 @@ test('parse options', function (group) {
       dbUrlPassword: 'password',
       dbUrl: 'http://john@doe.com@baz.com'
     })
-    var defaults = config.PouchDB('hack', {skip_setup: true}).__opts
+    var defaults = config.PouchDB('hack', { skip_setup: true }).__opts
     t.is(defaults.prefix, 'http://john%40doe.com:password@baz.com', 'Sets config.db.url')
 
     t.end()
@@ -159,7 +159,7 @@ test('parse options', function (group) {
       dbUrlUsername: 'john',
       dbUrl: 'http://test:anotherpass@baz.com'
     })
-    var defaults = config.PouchDB('hack', {skip_setup: true}).__opts
+    var defaults = config.PouchDB('hack', { skip_setup: true }).__opts
     t.is(defaults.prefix, 'http://john:anotherpass@baz.com', 'Sets config.db.url')
 
     t.end()
@@ -172,7 +172,7 @@ test('parse options', function (group) {
       dbUrlPassword: 'password',
       dbUrl: 'http://test:anotherpass@baz.com'
     })
-    var defaults = config.PouchDB('hack', {skip_setup: true}).__opts
+    var defaults = config.PouchDB('hack', { skip_setup: true }).__opts
     t.is(defaults.prefix, 'http://test:password@baz.com', 'Sets config.db.url')
 
     t.end()
@@ -186,7 +186,7 @@ test('parse options', function (group) {
       dbUrlPassword: 'password',
       dbUrl: 'http://test:anotherpass@baz.com'
     })
-    var defaults = config.PouchDB('hack', {skip_setup: true}).__opts
+    var defaults = config.PouchDB('hack', { skip_setup: true }).__opts
     t.is(defaults.prefix, 'http://john:password@baz.com', 'Sets config.db.url')
 
     t.end()

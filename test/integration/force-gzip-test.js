@@ -30,20 +30,20 @@ require('npmlog').level = 'error'
 test('handle forced gzip', function (group) {
   group.test('receive gzip when gzip accept header sent', function (group) {
     var server = new Hapi.Server(hapiOptions)
-    server.connection({port: 8090})
+    server.connection({ port: 8090 })
     server.register(hapiPluginOptions, function (error) {
       group.error(error, 'hoodie loads without error')
 
       server.inject({
         url: 'http://localhost:8090/hoodie/info.json',
-        headers: {'Accept-Encoding': 'gzip, deflate'}
+        headers: { 'Accept-Encoding': 'gzip, deflate' }
       }, testGzip.bind(null, group, server))
     })
   })
 
   group.test('receive no gzip when no gzip accept header sent', function (group) {
     var server = new Hapi.Server(hapiOptions)
-    server.connection({port: 8090})
+    server.connection({ port: 8090 })
     server.register(hapiPluginOptions, function (error) {
       group.error(error, 'hoodie loads without error')
 
@@ -58,7 +58,7 @@ test('handle forced gzip', function (group) {
 
   group.test('receive gzip when gzip accept header sent', function (group) {
     var server = new Hapi.Server(hapiOptions)
-    server.connection({port: 8090})
+    server.connection({ port: 8090 })
     server.register(hapiPluginOptions, function (error) {
       group.error(error, 'hoodie loads without error')
 

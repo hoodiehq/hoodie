@@ -21,8 +21,8 @@ test('bundle-writer', function (group) {
     }
 
     writeClientBundle = proxyquire('../../../server/plugins/client/bundle-writer', {
-      'fs': fsStub,
-      'npmlog': npmlogStub
+      fs: fsStub,
+      npmlog: npmlogStub
     })
 
     done()
