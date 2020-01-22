@@ -91,7 +91,7 @@ anything about our users' connections. Just as we all had to learn to
 accept that screens now come in all shapes and sizes, **we'll have to
 learn that connections can be present or absent, fast or slow, steady or
 intermittent, free or expensive…** We reacted to the challenge of
-unknowable screen sizes with Responsive Webdesign and Mobile First, and
+unknowable screen sizes with Responsive Web design and Mobile First, and
 we will react to the challenge of unknowable connections with Offline
 First.
 
