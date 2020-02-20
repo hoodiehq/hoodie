@@ -136,6 +136,6 @@ function getCliOptions (projectPath) {
   }
 
   // rc & yargs are setting keys we are not interested in, like in-memory or _
-  // so we only pick the relevant ones based on they keys of the default options.
+  // so we only pick the relevant ones based on the keys of the default options.
   return pick(options, Object.keys(hoodieDefaults))
 }
