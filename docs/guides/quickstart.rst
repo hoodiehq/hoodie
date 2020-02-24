@@ -67,7 +67,10 @@ like this
       },
       "keywords": [],
       "author": "",
-      "license": "ISC"
+      "license": "ISC",
+      "dependencies": {
+        "hoodie": "^28.2.10"
+      }
     }
 
 Now you can start Hoodie with
