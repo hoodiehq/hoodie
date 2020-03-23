@@ -22,14 +22,12 @@ function register (server, options, next) {
   server.ext('onPreResponse', corsHeaders)
 
   server.register({ register: hoodieServer, options: options }, function (error) {
-    if (error) {
+    if (error)
       return next(error)
-    }
 
-    registerPlugins(server, options, function (error) {
-      if (error) {
+    registerPlugins(server, options,(error) => {
+      if (error)
         return next(error)
-      }
 
       next(null, server, options)
     })
