@@ -41,7 +41,7 @@ Open Source
 ~~~~~~~~~~~
 
 Hoodie is an Open Source project, so we don’t own it, can’t sell it, and
-it won’t suddenly vanish because we got aquired. The source code for
+it won’t suddenly vanish because we got acquired. The source code for
 Hoodie is available on GitHub under the Apache License 2.0.
 
 How to proceed
