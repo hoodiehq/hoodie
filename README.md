@@ -24,7 +24,7 @@ If you have any questions come and say hi in our [chat](http://hood.ie/chat/).
 
 ## Setup
 
-This setup is working for all operating system, tested on Windows 8, Windows 8.1, Windows 10, Mac and Linux.
+This setup is working for all operating system, testing on Windows 8, Windows 8.1, Windows 10, Mac and Linux.
 
 Hoodie is a [Node.js](https://nodejs.org/en/) package. You need Node Version 4
 or higher and npm Version 2 or higher, check your installed version with `node -v` and `npm -v`.
@@ -53,7 +53,7 @@ You can find a more thorough description in our [Getting Started Guide](http://d
 
 ## Usage
 
-`hoodie` can be used standalone or as [hapi plugin](http://hapijs.com/tutorials/plugins).
+`hoodie` can be used standalone or as a [hapi plugin](http://hapijs.com/tutorials/plugins).
 The options are slightly different. For the standalone usage, see [Hoodie’s configuration guide](http://docs.hood.ie/en/latest/guides/configuration.html).
 For the hapi plugin usage, see [Hoodie’s hapi plugin usage guide](http://docs.hood.ie/en/latest/guides/hapi-plugin.html)
 
