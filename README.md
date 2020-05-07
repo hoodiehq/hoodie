@@ -11,20 +11,20 @@
  alt="The Low-Profile Dog Hoodie Mascot" title="The Low-Profile Dog Hoodie Mascot" align="right" /></a>
 
 Hoodie lets you build apps [without _thinking_ about the backend](http://nobackend.org/)
-and makes sure that they work great [independent from connectivity](http://offlinefirst.org/).
+and makes sure that they work great [independent of connectivity](http://offlinefirst.org/).
 
 This is Hoodie’s main repository. It starts a server and serves the client API.
-Read more about [how the Hoodie server works](server).
+Read more about [How the Hoodie server works](server).
 
 A good place to start is our [Tracker App](https://github.com/hoodiehq/hoodie-app-tracker).
 You can play around with Hoodie’s APIs in the browser console and see how it
-works all together in its [simple HTML & JavaScript code](https://github.com/hoodiehq/hoodie-app-tracker/tree/master/public).
+works all together in its [simple HTML and JavaScript code](https://github.com/hoodiehq/hoodie-app-tracker/tree/master/public).
 
-If you have any questions come say hi in our [chat](http://hood.ie/chat/).
+If you have any questions come and say hi in our [chat](http://hood.ie/chat/).
 
 ## Setup
 
-This setup is working for all operating system, testing on Windows 8, Windows 8.1, Windows 10, Mac and Linux.
+This setup is working for all operating system, tested on Windows 8, Windows 8.1, Windows 10, Mac and Linux.
 
 Hoodie is a [Node.js](https://nodejs.org/en/) package. You need Node Version 4
 or higher and npm Version 2 or higher, check your installed version with `node -v` and `npm -v`.
@@ -70,7 +70,7 @@ npm install
 The `hoodie` test suite is run with `npm test`.
 You can [read more about testing Hoodie](test).
 
-You can start hoodie for itself using `npm start`. It will serve the contents
+You can start hoodie itself using `npm start`. It will serve the contents
 of the [public folder](public).
 
 ## Backers
@@ -110,7 +110,7 @@ of the [public folder](public).
 
 ## Official Sponsors
 
-Show your support for Hoodie and [help us sustain our inclusive community](http://hood.ie/blog/sustaining-hoodie.html). We will publicly appreciate your support and are happy to get your word out, as long as it aligns with our [Code of Conduct](http://hood.ie/code-of-conduct/).
+Show your support for Hoodie and [help us sustain our inclusive community](http://hood.ie/blog/sustaining-hoodie.html). We will publicly appreciate your support and happy to get your word out as well, as long as it aligns with our [Code of Conduct](http://hood.ie/code-of-conduct/).
 
 [![](https://opencollective.com/hoodie/sponsor/0/avatar)](https://opencollective.com/hoodie/sponsor/0/website)
 [![](https://opencollective.com/hoodie/sponsor/1/avatar)](https://opencollective.com/hoodie/sponsor/1/website)
