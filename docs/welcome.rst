@@ -53,6 +53,6 @@ why it looks and works the way it does.
 
 If you’re more interested in the technical details of Hoodie, check out
 :doc:`How Hoodie Works <about/how-hoodie-works>`. Learn how Hoodie handles data storage, does
-syncing, and where the offline support comes from.
+sync, and where the offline support comes from.
 
 Eager to build stuff? Skip ahead to the :doc:`quickstart guide </guides/quickstart>`!
