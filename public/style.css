@@ -1,5 +1,5 @@
 body {
-  background-color:#FCFCFC;
+  background-color:#rgb(252, 237, 214);
   animation-name: graytocolorimg;
   animation-duration: 2s;
 }
@@ -16,10 +16,10 @@ h1 {
 .info {
   margin-left:10%;
   margin-right:10%;
-  background-color: white;
+  background-color: whitesmoke;
   border-radius:25px;
   padding: 20px;
-  border: 1px solid lightgray;
+  border: 1px solid #rgb(206, 200, 200);
   font-family: sans-serif;
 }
 
@@ -34,7 +34,7 @@ h2 {
 }
 
 code {
-  background-color:#ECECEC;
+  background-color:#cecccc;
   padding:3px;
 }
 
