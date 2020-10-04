@@ -55,7 +55,7 @@ You can find a more thorough description in our [Getting Started Guide](http://d
 
 `hoodie` can be used standalone or as a [hapi plugin](http://hapijs.com/tutorials/plugins).
 The options are slightly different. For the standalone usage, see [Hoodie’s configuration guide](http://docs.hood.ie/en/latest/guides/configuration.html).
-For the hapi plugin usage, see [Hoodie’s hapi plugin usage guide](http://docs.hood.ie/en/latest/guides/hapi-plugin.html)
+For the hapi plugin usage, see [Hoodie’s hapi plugin usage guide](http://docs.hood.ie/en/latest/guides/hapi-plugin.html).
 
 ## Testing
 
@@ -70,7 +70,7 @@ npm install
 The `hoodie` test suite is run with `npm test`.
 You can [read more about testing Hoodie](test).
 
-You can start hoodie itself using `npm start`. It will serve the contents
+You can start hoodie itself by using `npm start`. It will serve the contents
 of the [public folder](public).
 
 ## Backers
