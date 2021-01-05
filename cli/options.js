@@ -16,11 +16,11 @@ function getCliOptions (projectPath) {
   var hoodieDefaults = getHoodieDefaults()
   var appDefaults = getAppDefaults(projectPath)
 
-  // Order of defaults
-  //
-  // 1. Hoodie defaults
-  // 2. App defaults
-  // 3. rc (https://www.npmjs.com/package/rc) – note we don’t read CLI through rc
+  /* Order of defaults
+  
+     1. Hoodie defaults
+     2. App defaults
+     3. rc (https://www.npmjs.com/package/rc) – note we don’t read CLI through rc*/
   var defaults = rc('hoodie', hoodieDefaults, appDefaults)
 
   var options = yargs
