@@ -20,7 +20,7 @@ A good place to start is our [Tracker App](https://github.com/hoodiehq/hoodie-ap
 You can play around with Hoodie’s APIs in the browser console and see how it
 works all together in its [simple HTML and JavaScript code](https://github.com/hoodiehq/hoodie-app-tracker/tree/master/public).
 
-If you have any questions come and say hi in our [chat](http://hood.ie/chat/).
+Got any question or queries? say hi in our [chat](http://hood.ie/chat/).
 
 ## Setup
 
