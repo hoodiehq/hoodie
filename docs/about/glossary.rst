@@ -30,7 +30,7 @@ Users
 Hoodie isn’t a CMS, but a backend for web apps, and as such, it is very
 much centered around users. All of the offline and sync features are
 specific to each individual user’s data, and each user’s data is
-encapsulated from that of all others by default. This allows Hoodie to
+encapsulated from of all others by default. This allows Hoodie to
 easily know what to sync between a user’s clients and the server: simply
 all of the user’s private data.
 
