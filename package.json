@@ -1,7 +1,7 @@
 {
-  "name": "hoodie",
+  "name": "Hoodie",
   "version": "0.0.0-semantically-released",
-  "description": "A generic backend with a client API for Offline First applications",
+  "description": "This app helps you create the best API's with just one click",
   "author": "The Hoodie Community",
   "bin": {
     "hoodie": "./bin/start.js"
