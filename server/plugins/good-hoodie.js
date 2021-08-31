@@ -1,8 +1,7 @@
-var Transform = require('stream').Transform
-var util = require('util')
-
-var log = require('npmlog')
-var qs = require('querystring')
+const Transform = require('stream').Transform
+const util = require('util')
+const log = require('npmlog')
+const qs = require('querystring')
 
 function HoodieTransform () {
   if (!(this instanceof HoodieTransform)) {
@@ -27,7 +26,7 @@ function transform (data, enc, next) {
   }
 
   if (data.event === 'response') {
-    var path = data.path +
+    let path = data.path +
       (Object.keys(data.query).length ? '?' + qs.stringify(data.query) : '')
     log.http(
       data.event,
@@ -41,7 +40,7 @@ function transform (data, enc, next) {
   }
 
   if (data.event === 'request' || data.event === 'log') {
-    var level = findLogLevel(Object.keys(log.levels), data.tags) || 'verbose'
+    let level = findLogLevel(Object.keys(log.levels), data.tags) || 'verbose'
     log[level](
       data.event,
       new Date(data.timestamp).toISOString(),
@@ -55,8 +54,8 @@ function transform (data, enc, next) {
 }
 
 function findLogLevel (levels, tags) {
-  for (var i = 0; i < tags.length; i++) {
-    for (var j = 0; j < levels.length; j++) {
+  for (let i = 0; i < tags.length; i++) {
+    for (let j = 0; j < levels.length; j++) {
       if (levels[j] === tags[i]) {
         tags.splice(i, 1)
         return levels[j]
