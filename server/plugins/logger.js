@@ -3,7 +3,7 @@ module.exports.register.attributes = {
   name: 'hoodie-local-logger'
 }
 
-var path = require('path')
+const path = require('path')
 
 function register (server, options, next) {
   server.register({
