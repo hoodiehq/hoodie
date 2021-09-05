@@ -4,25 +4,25 @@ module.exports.register.attributes = {
   dependencies: 'inert'
 }
 
-var path = require('path')
-var requireResolve = require('./resolver')
-var createReadStream = require('fs').createReadStream
+const path = require('path')
+const requireResolve = require('./resolver')
+const createReadStream = require('fs').createReadStream
 
 function register (server, options, next) {
-  var paths = options.paths
-  var plugins = options.plugins
-  var publicFolder = paths.public
+  let paths = options.paths
+  let plugins = options.plugins
+  let publicFolder = paths.public
 
-  var hoodieVersion
+  const hoodieVersion
   try {
     hoodieVersion = require('hoodie/package.json').version
   } catch (err) {
     hoodieVersion = 'development'
   }
 
-  var hoodiePublicPath = path.join(requireResolve('../../package.json'), '..', 'public')
-  var adminPublicPath = path.join(requireResolve('@hoodie/admin/package.json'), '..', 'dist')
-  var routes = [{
+  const hoodiePublicPath = path.join(requireResolve('../../package.json'), '..', 'public')
+  const adminPublicPath = path.join(requireResolve('@hoodie/admin/package.json'), '..', 'dist')
+  let routes = [{
     method: 'GET',
     path: '/{p*}',
     handler: {
@@ -79,9 +79,9 @@ function register (server, options, next) {
       return
     }
 
-    var pkg = require(pluginPackagePath)
+    const pkg = require(pluginPackagePath)
 
-    var name = pkg.hoodie ? pkg.hoodie.name || pkg.name : pkg.name
+    const name = pkg.hoodie ? pkg.hoodie.name || pkg.name : pkg.name
 
     routes.push({
       method: 'GET',
@@ -100,18 +100,18 @@ function register (server, options, next) {
 
   // serve app whenever an html page is requested
   // and no other document is available
-  var app = path.join(publicFolder, 'index.html')
+  const app = path.join(publicFolder, 'index.html')
   server.ext('onPostHandler', function (request, reply) {
-    var response = request.response
+    let response = request.response
 
     if (!response.isBoom) {
       return reply.continue()
     }
 
-    var is404 = response.output.statusCode === 404
-    var isHtmlRequest = /text\/html/.test(request.headers.accept)
-    var isHoodiePath = /^\/hoodie\//.test(request.path)
-    var isAdminPublicPath = /^\/hoodie\/admin\//.test(request.path) && !(/^\/hoodie\/admin\/api\//).test(request.path)
+    const is404 = response.output.statusCode === 404
+    const isHtmlRequest = /text\/html/.test(request.headers.accept)
+    const isHoodiePath = /^\/hoodie\//.test(request.path)
+    const isAdminPublicPath = /^\/hoodie\/admin\//.test(request.path) && !(/^\/hoodie\/admin\/api\//).test(request.path)
 
     if (isAdminPublicPath && isHtmlRequest) {
       return reply(createReadStream(path.join(adminPublicPath, 'index.html')))
