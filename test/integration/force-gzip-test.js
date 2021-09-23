@@ -58,7 +58,10 @@ test('handle forced gzip', function (group) {
 
   group.test('receive gzip when gzip accept header sent', function (group) {
     var server = new Hapi.Server(hapiOptions)
-    server.connection({ port: 8090 })
+    
+    server.connection({ port: 8090 }, function(error){
+      console.log(error)});
+    
     server.register(hapiPluginOptions, function (error) {
       group.error(error, 'hoodie loads without error')
 
