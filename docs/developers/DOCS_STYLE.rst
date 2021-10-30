@@ -79,7 +79,7 @@ The current tests we run on pull requests using Travis Continuous Integration (C
 Bonus style points
 ~~~~~~~~~~~~~~~~~~
 - Be fun and friendly as long as it does not distract or confuse the reader
-- Include videos or gifs to demostrated a feature
+- Include videos or gifs to demonstrated a feature
 - You can use Humour but remember the reader is looking for an *answer* not a comedy sketch
 - Cultural references and puns don't always translate - keep jokes light
 - Remember English is not the first language for many readers - keep language simple where possible
