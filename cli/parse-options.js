@@ -19,7 +19,7 @@ var createAuthDbUrl = require('./utils/create-auth-dbUrl')
  * app’s package.json (on the `"hoodie"` key).
  *
  * The parsing of the database configuration is a bit more complex. If `dbUrl`
- * is passed it means that a remote CouchDB is used for persistance, otherwise
+ * is passed it means that a remote CouchDB is used for persistence, otherwise
  * PouchDB is being used. A shortcut to set PouchDB’s adapter to memdown is to
  * passe set the `inMemory: true` option. If it’s not set, leveldown is used
  * with the prefix set to `options.data` + 'data' (`.hoodie/data` by default).
