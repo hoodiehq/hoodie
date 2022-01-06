@@ -11,7 +11,7 @@
  alt="The Low-Profile Dog Hoodie Mascot" title="The Low-Profile Dog Hoodie Mascot" align="right" /></a>
 
 Hoodie lets you build apps [without _thinking_ about the backend](http://nobackend.org/)
-and makes sure that they work great [independent of connectivity](http://offlinefirst.org/).
+and makes sure that they work with great [independent of connectivity](http://offlinefirst.org/).
 
 This is Hoodie’s main repository. It starts a server and serves the client API.
 Read more about [How the Hoodie server works](server).
