@@ -18,13 +18,13 @@ Read more about [How the Hoodie server works](server).
 
 A good place to start is our [Tracker App](https://github.com/hoodiehq/hoodie-app-tracker).
 You can play around with Hoodie’s APIs in the browser console and see how it
-works all together in its [simple HTML and JavaScript code](https://github.com/hoodiehq/hoodie-app-tracker/tree/master/public).
+works all together in it [simple HTML and JavaScript code](https://github.com/hoodiehq/hoodie-app-tracker/tree/master/public).
 
 If you have any questions come and say hi in our [chat](http://hood.ie/chat/).
 
 ## Setup
 
-This setup is working for all operating system, testing on Windows 8, Windows 8.1, Windows 10, Mac and Linux.
+This setup is working for all operating systems, testing on Windows 8, Windows 8.1, Windows 10, Mac and Linux.
 
 Hoodie is a [Node.js](https://nodejs.org/en/) package. You need Node Version 4
 or higher and npm Version 2 or higher, check your installed version with `node -v` and `npm -v`.
@@ -49,7 +49,7 @@ Now start up your Hoodie app
 npm start
 ```
 
-You can find a more thorough description in our [Getting Started Guide](http://docs.hood.ie/en/latest/guides/quickstart.html).
+You can find a more through description in our [Getting Started Guide](http://docs.hood.ie/en/latest/guides/quickstart.html).
 
 ## Usage
 
