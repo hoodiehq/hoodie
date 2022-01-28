@@ -1,6 +1,6 @@
-var spawn = require('child_process').spawn
-var os = require('os')
-var start
+const spawn = require('child_process').spawn
+const os = require('os')
+const start
 
 function onLog (data) {
   console.log(data.toString())
