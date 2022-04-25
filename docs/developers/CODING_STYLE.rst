@@ -35,7 +35,7 @@ all modules that you ``require`` alphabetically within their blocks.
 
     // require Node.js core modules in the 1st block (separaeted by empty line).
     // These are modules that come with Node.js and are not listed in package.json.
-    // See https://nodejs.org/api/ for a list of Node.js core modules
+    // See https://nodejs.org/api/ for a list of Node.js core modules.
     var EventEmitter = require('events').EventEmitter
     var util = require('util')
 
