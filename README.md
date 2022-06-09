@@ -29,11 +29,16 @@ This setup is working for all operating system, testing on Windows 8, Windows 8.
 Hoodie is a [Node.js](https://nodejs.org/en/) package. You need Node Version 4
 or higher and npm Version 2 or higher, check your installed version with `node -v` and `npm -v`.
 
-First, create a folder and a [package.json](https://docs.npmjs.com/files/package.json) file
+First, create a folder.
 
 ```
 mkdir my-app
 cd my-app
+```
+
+Next, Run the command below which will create a [package.json](https://docs.npmjs.com/files/package.json) file.
+
+```
 npm init -y
 ```
 
