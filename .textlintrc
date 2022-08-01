@@ -1,7 +1,9 @@
 {
-   "rules": {
+   "rules": 
+   {
    "common-misspellings": true,
-    "rousseau": {
+    "rousseau": 
+      {
         "severity" : "warning",
         "ignoreTypes": ["sentence:uppercase","sentence:start"]
      }
