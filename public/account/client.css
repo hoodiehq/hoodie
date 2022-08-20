@@ -22,7 +22,7 @@ body {
 }
 
 .generic-loader-wrap:before {
-  content: url(./low-profile-dog-1.png);
+  content: url(./low-profile-dog-1.png)alt="doggy";
   position: absolute;
   font-family: 'Open Sans', sans-serif;
   font-size: 1.3em;
