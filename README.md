@@ -1,4 +1,6 @@
-# hoodie
+<h1 align = center>Hoodie</h1>
+
+
 
 > A generic backend with a client API for Offline First applications
 
@@ -21,6 +23,23 @@ You can play around with Hoodie’s APIs in the browser console and see how it
 works all together in its [simple HTML and JavaScript code](https://github.com/hoodiehq/hoodie-app-tracker/tree/master/public).
 
 If you have any questions come and say hi in our [chat](http://hood.ie/chat/).
+
+
+---
+
+
+## Table of Contents
+
+  - [Table of Contents](#table-of-contents)
+  - [Setup](#setup)
+  - [Usage](#usage)
+  - [Testing](#testing)
+  - [Backers](#backers)
+  - [Official Sponsors](#official-sponsors)
+  - [Contributors](#contributors)
+
+
+---
 
 ## Setup
 
@@ -133,6 +152,22 @@ Show your support for Hoodie and [help us sustain our inclusive community](http:
 [![](https://opencollective.com/hoodie/sponsor/18/avatar)](https://opencollective.com/hoodie/sponsor/18/website)
 [![](https://opencollective.com/hoodie/sponsor/19/avatar)](https://opencollective.com/hoodie/sponsor/19/website)
 
-## License
+
+## Contributors
+
+*"Together we  Work as a Team 💘"*
+
+<a href="https://github.com/hoodiehq/hoodie/graphs/contributors">
+  <img src="https://contrib.rocks/image?repo=hoodiehq/hoodie" />
+</a>
+
+
+---
+
+<h2 align = center>
+
+License
 
 [Apache 2.0](LICENSE)
+
+</h2>
