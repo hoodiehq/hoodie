@@ -48,16 +48,16 @@ people to fix any potential bugs.
 
 Example:
 
-> Short and descriptive example bug report title
+> Short and descriptive example bug report title:
 >
 > A summary of the issue and the browser/OS environment in which it occurs. If
 > suitable, include the steps required to reproduce the bug.
 >
-> 1. This is the first step
-> 2. This is the second step
+> 1. This is the first step.
+> 2. This is the second step.
 > 3. Further steps, etc.
 >
-> `<url>` - a link to the reduced test case
+> `<url>` - a link to the reduced test case.
 >
 > Any other information you want to share that is relevant to the issue being
 > reported. This might include the lines of code that you have identified as
@@ -159,7 +159,7 @@ on how to create a pull request..
 5. Open a Pull Request using your branch with a clear title and description.
 
 Optionally, you can help us with these things. But don’t worry if they are too
-complicated, we can help you out and teach you as we go :)
+complicated, we can help you out and teach you as we go. :)
 
 1. Update your branch to the latest changes in the upstream master branch. You
    can do that locally with
@@ -215,27 +215,27 @@ If you have commit access, please follow this process for merging patches and cu
    it’s best to fix it yourself, you can directly commit to the author’s fork.
    Leave a comment about it so the author and others will know.
 7. Once everything looks good, add an "Approve" review. Don’t forget to say
-   something nice 👏🐶💖✨
+   something nice. 👏🐶💖✨
 8. If the commit messages follow [our conventions](https://conventionalcommits.org)
 
    1. If there is a breaking change, make sure that `BREAKING CHANGE:` with
       _exactly_ that spelling (incl. the ":") is in body of the according
-      commit message. This is _very important_, better look twice :)
+      commit message. This is _very important_, better look twice. :)
    2. Make sure there are `fix: ...` or `feat: ...` commits depending on whether
       a bug was fixed or a feature was added. **Gotcha:** look for spaces before
       the prefixes of ` fix:` and ` feat:`, these get ignored by semantic-release.
    3. Use the "Rebase and merge" button to merge the pull request.
-   4. Done! You are awesome! Thanks so much for your help 🤗
+   4. Done! You are awesome! Thanks so much for your help! 🤗
 
-9. If the commit messages _do not_ follow our conventions
+9. If the commit messages _do not_ follow our conventions:
 
    1. Use the "squash and merge" button to clean up the commits and merge at
       the same time: ✨🎩
    2. Is there a breaking change? Describe it in the commit body. Start with
       _exactly_ `BREAKING CHANGE:` followed by an empty line. For the commit
       subject:
-   3. Was a new feature added? Use `feat: ...` prefix in the commit subject
-   4. Was a bug fixed? Use `fix: ...` in the commit subject
+   3. Was a new feature added? Use `feat: ...` prefix in the commit subject.
+   4. Was a bug fixed? Use `fix: ...` in the commit subject.
 
 Sometimes there might be a good reason to merge changes locally. The process
 looks like this:
