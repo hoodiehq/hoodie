@@ -1,11 +1,13 @@
 # hoodie
 
+# hoodie
+
 > A generic backend with a client API for Offline First applications
 
-[![Build Status](https://travis-ci.org/hoodiehq/hoodie.svg?branch=master)](https://travis-ci.org/hoodiehq/hoodie)
-[![Coverage Status](https://coveralls.io/repos/hoodiehq/hoodie/badge.svg?branch=master)](https://coveralls.io/github/hoodiehq/hoodie?branch=master)
-[![Dependency Status](https://david-dm.org/hoodiehq/hoodie.svg)](https://david-dm.org/hoodiehq/hoodie)
-[![devDependency Status](https://david-dm.org/hoodiehq/hoodie/dev-status.svg)](https://david-dm.org/hoodiehq/hoodie#info=devDependencies)
+![Build Status](https://img.shields.io/badge/build-passing-brightgreen)
+![Coverage Status](https://coveralls.io/repos/hoodiehq/hoodie/badge.svg?branch=master)
+![Dependencies](https://img.shields.io/badge/dependencies-up%20to%20date-brightgreen)
+![devDependencies](https://img.shields.io/badge/devDependencies-up%20to%20date-brightgreen)
 
 <a href="http://hood.ie/animals/#low-profile-dog"><img src="https://avatars1.githubusercontent.com/u/1888826?v=3&s=200"
  alt="The Low-Profile Dog Hoodie Mascot" title="The Low-Profile Dog Hoodie Mascot" align="right" /></a>
