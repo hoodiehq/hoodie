@@ -1,53 +1,109 @@
-body {
-  background-color:#FCFCFC;
-  animation-name: graytocolorimg;
-  animation-duration: 2s;
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
 }
 
-/*this sets the styling for all h1 elements found in the html*/
+body {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  min-height: 100vh;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  color: #333;
+  padding: 40px 20px;
+  animation: fadeIn 0.5s ease-in;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
 h1 {
-  font-family:Helvetica, Arial, sans-serif;
-  color:#e94e1b;/*orange color*/
-  text-align:center;
-  letter-spacing:2px;
-  font-size:39px;
+  color: #fff;
+  text-align: center;
+  letter-spacing: 1px;
+  font-size: 48px;
+  margin-bottom: 30px;
+  font-weight: 700;
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+}
+
+h2 {
+  color: #667eea;
+  letter-spacing: 0.5px;
+  font-size: 24px;
+  margin-bottom: 20px;
+  font-weight: 600;
 }
 
 .info {
-  margin-left:10%;
-  margin-right:10%;
+  max-width: 900px;
+  margin: 0 auto;
   background-color: white;
-  border-radius:25px;
-  padding: 20px;
-  border: 1px solid lightgray;
-  font-family: sans-serif;
+  border-radius: 16px;
+  padding: 40px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  backdrop-filter: blur(10px);
+}
+
+.info p {
+  font-size: 16px;
+  line-height: 1.8;
+  margin-bottom: 15px;
+  color: #555;
+}
+
+.info strong {
+  color: #667eea;
+  font-weight: 600;
 }
 
 #doggy {
-  text-align:center;
+  text-align: center;
+  margin: 30px 0;
+  animation: bounce 2s infinite;
 }
 
-/*this sets the styling for all h2 elements found in the html*/
-h2 {
-  color:#e94e1b;/*orange color*/
-  letter-spacing: 2px;
+#doggy img {
+  max-width: 120px;
+  height: auto;
+  filter: drop-shadow(0 4px 15px rgba(0, 0, 0, 0.2));
+}
+
+@keyframes bounce {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-20px); }
 }
 
 code {
-  background-color:#ECECEC;
-  padding:3px;
+  background-color: #f5f5f5;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-family: 'Courier New', monospace;
+  color: #e94e1b;
+  font-weight: 500;
 }
 
 a {
-  color:orange;
-  text-decoration:none;
+  color: #667eea;
+  text-decoration: none;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  border-bottom: 2px solid transparent;
+}
+
+a:hover {
+  border-bottom-color: #667eea;
+  transform: translateY(-2px);
 }
 
 ol {
-  line-height:3em;
+  line-height: 2.2;
+  margin-left: 20px;
+  margin-top: 20px;
 }
 
-@keyframes graytocolorimg {
-  from {filter: grayscale(100%);}
-  to {filter: grayscale(0%);}
+ol li {
+  margin-bottom: 15px;
+  text-align: left;
 }
