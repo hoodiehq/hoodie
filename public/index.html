@@ -7,26 +7,29 @@
     <link rel="stylesheet" type="text/css" href="style.css">
   </head>
   <body>
-    <h1>Well done, you made it!</h1>
+    <h1>✨ Welcome to Hoodie!</h1>
     <div id="doggy">
-      <img src="low-profile-dog-1.png" />
+      <img src="low-profile-dog-1.png" alt="Hoodie mascot" />
     </div>
     <div class="info">
-      <p><strong>Hoodie is now running a local server.</strong></p>
-      <p>You are seeing this because your app has no <code>public/</code> folder.</p>
-      <p>But don't worry, we're here to get you started!</p>
-      <h2>Get going with Hoodie!</h2>
+      <p><strong>🎉 Hoodie is now running a local server.</strong></p>
+      <p>You're seeing this because your app doesn't have a <code>public/</code> folder yet. But don't worry, we'll get you started in no time!</p>
+      <h2>🚀 Getting Started with Hoodie</h2>
       <ol>
-        <li>Your first step should be creating a <code>public</code> folder inside your project folder.</li>
-        <li>Next up, just create your <code>index.html</code> inside that public directory.</li>
-        <li>We're almost here: Paste this into your <code>index.html</code> just before your closing tag for the body: <code> &lt;script src="hoodie/client.js"&gt;&lt;/script&gt;</code></li>
-        This is necessary for your own javascript files to pick up the hoodie methods.
-        Now handle it just like you would handle your frontend project, hoodie won't get in your way.
-        <li> Setup your asset folders and create your .css and .js files.</li>
-        <li> You’ll need to restart the Hoodie server so it servers assets from your app’s <code>public</code> folder</li>
+        <li><strong>Create a public folder</strong> – Start by creating a <code>public</code> folder in your project root.</li>
+        <li><strong>Add index.html</strong> – Create your <code>index.html</code> inside the <code>public</code> directory.</li>
+        <li><strong>Include Hoodie</strong> – Add this line just before your closing <code>&lt;/body&gt;</code> tag:
+          <br><code>&lt;script src="/hoodie/client.js"&gt;&lt;/script&gt;</code>
+          <br><em>This enables Hoodie methods in your JavaScript files.</em>
+        </li>
+        <li><strong>Organize your assets</strong> – Create folders for your CSS and JavaScript files.</li>
+        <li><strong>Restart the server</strong> – Restart Hoodie to serve assets from your <code>public</code> folder.</li>
       </ol>
-      <p>If you want to learn more, check out the <a href="http://docs.hood.ie"> documentation (work-in-progress).</a></p>
-      <p>Happy coding! 🐶</p>
+      
+      <p style="margin-top: 30px; padding-top: 20px; border-top: 2px solid #eee;">
+        📚 Want to learn more? Check out the <a href="http://docs.hood.ie">documentation</a> (work-in-progress).
+      </p>
+      <p style="margin-top: 15px; font-size: 18px;">Happy coding! 🐶</p>
     </div>
 
     <script src="/hoodie/client.js"></script>
