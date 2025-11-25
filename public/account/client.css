@@ -1,9 +1,13 @@
+/* Base Layout */
 body {
   text-align: center;
-  background-color: #FFF;
-  font-family: 'FiraSans', sans-serif;
+  background-color: #ffffff;
+  font-family: "Fira Sans", "Open Sans", Arial, sans-serif;
+  margin: 0;
+  padding: 0;
 }
 
+/* Data visibility toggles */
 [data-hide="false"] {
   display: block;
 }
@@ -12,34 +16,37 @@ body {
   display: none;
 }
 
+/* Loading Icon Wrapper */
 .generic-loader-wrap {
-  left: calc(50% - 50px);
   position: relative;
+  left: 50%;
+  transform: translateX(-50%);
   margin-top: 15%;
-  width:100px;
+  width: 100px;
   height: 100px;
   border-radius: 50%;
 }
 
 .generic-loader-wrap:before {
-  content: url(./low-profile-dog-1.png);
+  content: url("./low-profile-dog-1.png");
   position: absolute;
-  font-family: 'Open Sans', sans-serif;
+  left: 50%;
+  top: -40px;
+  transform: translateX(-50%);
+  font-family: "Open Sans", sans-serif;
   font-size: 1.3em;
-  margin-left: -30px;
-  margin-top: -40px;
-  color: #FFF;
+  color: #ffffff;
 }
 
+/* Loading text animation */
 .generic-loader-wrap:after {
   content: "Loading";
   position: absolute;
   top: 120px;
-  left: 25px;
-  width: 100%;
+  left: 50%;
+  transform: translateX(-50%);
   color: #e94e1b;
   animation: load 3s linear infinite;
-  -webkit-animation: load 3s linear infinite;
 }
 
 @keyframes load {
@@ -57,46 +64,51 @@ body {
   }
 }
 
-.profile-forms, .input-forms {
+/* Forms Layout */
+.profile-forms,
+.input-forms {
   position: relative;
   width: 300px;
-  left: calc(50% - 150px);
-  top: 50px;
-  margin-bottom: 30px;
+  margin: 50px auto 30px auto;
   text-align: center;
 }
 
-.profile-forms > label, .input-forms > label {
-  float: left;
-  position: relative;
-  left: 57px;
-  top: 5px;
+.profile-forms > label,
+.input-forms > label {
+  display: block;
+  text-align: left;
+  margin-left: 57px;
+  margin-bottom: 3px;
   font-size: 12px;
   text-transform: uppercase;
+  color: #333;
 }
 
+/* Password Tooltip */
 .password-tooltip {
   position: fixed;
   top: 10px;
   right: 10px;
   opacity: 0;
-  background-color: lightgrey;
+  background-color: rgba(0, 0, 0, 0.75); /* better contrast */
   color: #fff;
-  margin-left: 10px;
-  padding: 5px;
+  padding: 5px 8px;
   border-radius: 5px;
-  transition: all 0.4s;
+  transition: opacity 0.4s ease;
+  pointer-events: none; /* prevents odd hover flicker */
 }
 
-input, button {
-  padding: 4px 6px;
+input,
+button {
+  padding: 6px 8px;
   margin: 5px;
+  font-size: 14px;
 }
 
-input[name="update-password-field"]:hover + div {
+input[name="update-password-field"]:hover + .password-tooltip {
   opacity: 1;
 }
 
 h3 {
-  margin-bottom: 0px;
+  margin-bottom: 0;
 }
