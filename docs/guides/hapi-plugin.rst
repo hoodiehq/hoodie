@@ -1,42 +1,33 @@
-Using Hoodie as hapi plugin
-===========================
+const Hapi = require('@hapi/hapi');
+const Hoodie = require('hoodie').register;
 
-Here is an example usage of Hoodie as a hapi plugin:
+const PouchDB = require('pouchdb-core')
+  .plugin(require('pouchdb-mapreduce'))
+  .plugin(require('pouchdb-adapter-memory'));
 
-.. code:: js
+async function start() {
+  const server = Hapi.server({
+    host: 'localhost',
+    port: 8000
+  });
 
-    var Hapi = require('hapi')
-    var hoodie = require('hoodie').register
-    var PouchDB = require('pouchdb-core')
-      .plugin(require('pouchdb-mapreduce'))
-      .plugin(require('pouchdb-adapter-memory'))
-  
-    var server = new Hapi.Server()
-    server.connection({
-      host: 'localhost',
-      port: 8000
-    })
+  await server.register({
+    plugin: Hoodie,
+    options: {
+      inMemory: true,
+      public: 'dist',
+      PouchDB
+    }
+  });
 
-    server.register({
-      register: hoodie,
-      options: { // pass options here
-        inMemory: true,
-        public: 'dist',
-        PouchDB: PouchDB
-      }
-    }, function (error) {
-      if (error) {
-        throw error
-      }
+  await server.start();
+  console.log(`Server running at: ${server.info.uri}`);
+}
 
-      server.start(function (error) {
-        if (error) {
-          throw error
-        }
-
-        console.log(('Server running at:', server.info.uri))
-      })
-    })
+start().catch(err => {
+  console.error(err);
+  process.exit(1);
+});
 
 The available options are
 
