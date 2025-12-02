@@ -67,6 +67,9 @@ function parseOptions (options) {
     config.inMemory = true
     log.info('config', 'Storing all data in memory only')
   } else {
+    if (!options.dbAdapter || typeof options.dbAdapter !== 'string') {
+      throw new Error('dbAdapter must be specified as a string when not using dbUrl or inMemory mode')
+    }
     PouchDB.plugin(require(options.dbAdapter))
     dbOptions.prefix = path.join(config.paths.data, 'data') + path.sep
     log.info('config', 'Storing all data in ' + dbOptions.prefix + ' using ' + options.dbAdapter)

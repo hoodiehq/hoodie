@@ -16,8 +16,8 @@ function getDefaultsMock () {
 }
 
 var logMock = {
-  info: function () {},
-  warn: function () {}
+  info: function () { },
+  warn: function () { }
 }
 
 var parseOptions = proxyquire('../../../cli/parse-options', {
@@ -311,6 +311,18 @@ test('parse options', function (group) {
     })
 
     t.is(config.inMemory, true, 'Sets config.inMemory to true')
+
+    t.end()
+  })
+
+  group.test('missing dbAdapter throws error', function (t) {
+    t.throws(parseOptions.bind(null, {
+      public: 'public',
+      data: 'data'
+      // dbAdapter is intentionally missing
+      // dbUrl is not provided
+      // inMemory is not set
+    }), 'throws error when dbAdapter is missing')
 
     t.end()
   })
