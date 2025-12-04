@@ -10,32 +10,22 @@
   "bugs": {
     "url": "https://github.com/hoodiehq/hoodie/issues"
   },
+{
   "dependencies": {
-    "@hoodie/admin": "^1.0.1",
-    "@hoodie/client": "^10.0.0",
-    "@hoodie/server": "^23.0.0",
-    "async": "^3.1.0",
-    "browserify": "^16.0.0",
-    "good": "^7.0.2",
-    "good-squeeze": "^5.0.0",
-    "h2o2": "^6.0.0",
-    "hapi": "^16.4.2",
-    "hapi-cors-headers": "^1.0.0",
-    "inert": "^4.0.0",
-    "lodash": "^4.11.2",
-    "mkdirp": "^0.5.1",
-    "node-emoji": "^1.3.0",
-    "npmlog": "^4.0.0",
-    "pouchdb-adapter-fs": "^2.0.5",
-    "pouchdb-adapter-http": "^7.1.1",
-    "pouchdb-adapter-memory": "^7.1.1",
-    "pouchdb-browser": "^7.1.1",
-    "pouchdb-core": "^7.1.1",
-    "pouchdb-mapreduce": "^7.1.1",
-    "rc": "^1.1.6",
-    "semver": "^6.3.0",
-    "yargs": "^8.0.2"
-  },
+    "@hapi/hapi": "^20.0.0",
+    "@hapi/h2o2": "^9.0.0",
+    "@hapi/good-squeeze": "^6.0.0",
+    "@hapi/oppsy": "^4.0.0",
+    "@hapi/wreck": "^17.0.0",
+    "@hapi/joi": "^17.1.1",
+    "@hapi/hawk": "^9.0.0",
+    "@hapi/shot": "^5.0.0",
+    "@hapi/ammo": "^5.0.0",
+    "@hapi/bourne": "^3.0.0",
+    "@hapi/b64": "^5.0.0",
+    "@hapi/vise": "^4.0.0"
+  }
+}
   "devDependencies": {
     "coveralls": "^3.0.0",
     "nock": "^11.7.0",

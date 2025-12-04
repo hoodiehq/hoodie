@@ -57,6 +57,40 @@ You can find a more thorough description in our [Getting Started Guide](http://d
 The options are slightly different. For the standalone usage, see [Hoodie’s configuration guide](http://docs.hood.ie/en/latest/guides/configuration.html).
 For the hapi plugin usage, see [Hoodie’s hapi plugin usage guide](http://docs.hood.ie/en/latest/guides/hapi-plugin.html).
 
+
+# Hoodie
+
+> The Offline-First JavaScript Backend
+
+Hoodie is a fast, simple, and easy-to-use backend for apps. It allows you to build web applications with user accounts, data storage, and offline-first functionality — all without needing to write server-side code.
+
+Hoodie gives you:
+
+- Offline-first data storage
+- User authentication
+- Sync between client and backend
+- Simple JavaScript API
+- No backend expertise required
+
+---
+
+## Why Hoodie?
+
+- **Offline-first by default:** Data is stored locally first and syncs later.
+- **Front-end developer friendly:** No backend knowledge needed.
+- **Extendable:** Use plugins for account management, storage, or custom features.
+- **Community-driven:** Hoodie is built and maintained by open-source developers.
+
+---
+
+## Installation
+
+Install Hoodie using npm:
+
+```bash
+npm install
+
+
 ## Testing
 
 Local setup
