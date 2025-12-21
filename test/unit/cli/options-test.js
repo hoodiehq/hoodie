@@ -61,7 +61,10 @@ function createCliOptionsProxy (yargsApi) {
 }
 
 test('config', function (group) {
-  var yargsApi = createYargsMock({ port: 'cli-port' })
+  var yargsApi = createYargsMock({
+    port: 'cli-port',
+    dbAdapter: 'hoodie-default-dbAdapter'
+  })
   var getCliOptions = createCliOptionsProxy(yargsApi)
 
   group.test('config order', function (t) {
@@ -122,7 +125,10 @@ test('config', function (group) {
 })
 
 test('bindAddress', function (t) {
-  var getCliOptions = createCliOptionsProxy(createYargsMock({ bindAddress: '0.0.0.0' }))
+  var getCliOptions = createCliOptionsProxy(createYargsMock({
+    bindAddress: '0.0.0.0',
+    dbAdapter: 'hoodie-default-dbAdapter'
+  }))
 
   var options = getCliOptions('project-path')
 
@@ -142,12 +148,42 @@ test('app plugin', function (t) {
     },
     './app-defaults': mockAppDefaults(),
     './webroot-locator': mockWebrootLocator,
-    yargs: createYargsMock({}),
+    yargs: createYargsMock({
+      dbAdapter: 'hoodie-default-dbAdapter'
+    }),
     '../package.json': packageJsonMock
   })
 
   var options = getOptions('project-path')
   t.deepEqual(options.plugins, ['project-path'])
+
+  t.end()
+})
+
+test('defensive check', function (t) {
+  var hoodieDefaultsMissingAdapter = Object.assign({}, hoodieDefaults)
+  delete hoodieDefaultsMissingAdapter.dbAdapter
+
+  var getOptions = proxyquire('../../../cli/options', {
+    fs: {
+      existsSync: simple.stub().returnWith(true)
+    },
+    npmlog: { warn: simple.spy() },
+    './hoodie-defaults': function () {
+      return hoodieDefaultsMissingAdapter
+    },
+    './app-defaults': mockAppDefaults(),
+    './webroot-locator': mockWebrootLocator,
+    yargs: createYargsMock({}),
+    '../package.json': packageJsonMock
+  })
+
+  try {
+    getOptions('project-path')
+    t.fail('Should have thrown an error')
+  } catch (error) {
+    t.is(error.message, 'dbAdapter option is required when not using in-memory or external database URL.', 'Throws correct error message')
+  }
 
   t.end()
 })
