@@ -137,5 +137,11 @@ function getCliOptions (projectPath) {
 
   // rc & yargs are setting keys we are not interested in, like in-memory or _
   // so we only pick the relevant ones based on the keys of the default options.
-  return pick(options, Object.keys(hoodieDefaults))
+  var optionsWithDefaults = pick(options, Object.keys(hoodieDefaults))
+
+  if (!optionsWithDefaults.inMemory && !optionsWithDefaults.dbUrl && !optionsWithDefaults.dbAdapter) {
+    throw new Error('dbAdapter option is required when not using in-memory or external database URL.')
+  }
+
+  return optionsWithDefaults
 }
