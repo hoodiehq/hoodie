@@ -5,19 +5,16 @@ module.exports.register.attributes = {
 
 var corsHeaders = require('hapi-cors-headers')
 var hoodieServer = require('@hoodie/server').register
-var _ = require('lodash')
 
 var registerPlugins = require('./plugins')
 
 function register (server, options, next) {
-  options = _.cloneDeep(options)
-  _.defaultsDeep(options, {
-    paths: {
-      public: 'public'
-    },
-    plugins: [],
-    app: {}
-  })
+  options = Object.assign({}, options)
+  options.paths = Object.assign({
+    public: 'public'
+  }, options.paths)
+  options.plugins = options.plugins || []
+  options.app = options.app || {}
 
   server.ext('onPreResponse', corsHeaders)
 
