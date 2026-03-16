@@ -24,10 +24,10 @@ If you have any questions come and say hi in our [chat](http://hood.ie/chat/).
 
 ## Setup
 
-This setup is working for all operating system, testing on Windows 8, Windows 8.1, Windows 10, Mac and Linux.
+This setup works on all operating systems, and has been tested on Windows 8, Windows 8.1, Windows 10, macOS, and Linux.
 
-Hoodie is a [Node.js](https://nodejs.org/en/) package. You need Node Version 4
-or higher and npm Version 2 or higher, check your installed version with `node -v` and `npm -v`.
+Hoodie is a [Node.js](https://nodejs.org/en/) package. You need Node Version 8
+or higher, check your installed version with `node -v` and `npm -v`.
 
 First, create a folder and a [package.json](https://docs.npmjs.com/files/package.json) file
 
