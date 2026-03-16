@@ -1,4 +1,4 @@
-var _ = require('lodash')
+
 var proxyquire = require('proxyquire').noCallThru()
 var simple = require('simple-mock')
 var test = require('tap').test
@@ -10,12 +10,12 @@ var serverMock = {
 }
 
 function loadPublicPlugin (options, resolver, done) {
-  var mergedOptions = _.merge({
-    paths: {
-      public: 'my-custom-public-directory'
-    },
+  var mergedOptions = Object.assign({
     plugins: []
   }, options)
+  mergedOptions.paths = Object.assign({
+    public: 'my-custom-public-directory'
+  }, options && options.paths)
 
   proxyquire('../../../server/plugins/public', {
     './resolver': resolver,

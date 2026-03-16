@@ -4,7 +4,7 @@ var fs = require('fs')
 var path = require('path')
 
 var log = require('npmlog')
-var pick = require('lodash').pick
+
 var rc = require('rc')
 var yargs = require('yargs')
 
@@ -137,5 +137,10 @@ function getCliOptions (projectPath) {
 
   // rc & yargs are setting keys we are not interested in, like in-memory or _
   // so we only pick the relevant ones based on the keys of the default options.
-  return pick(options, Object.keys(hoodieDefaults))
+  return Object.keys(hoodieDefaults).reduce(function (acc, key) {
+    if (key in options) {
+      acc[key] = options[key]
+    }
+    return acc
+  }, {})
 }
