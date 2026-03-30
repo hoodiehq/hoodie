@@ -8,7 +8,7 @@ module.exports = createAuthDbUrl
  * @param dbPassword used for parsing options.dbUrlPassword
  * @param dbUrl used for parsing options.dbUrl
  *
- * @var dbUrlParts contains different parts of dbUrl, helping in modifing username and password
+ * @var dbUrlParts contains different parts of dbUrl, helping in modifying username and password
  *
  * @returns dbUrl based on the parameters
  * @throws Error if dbUrl is unparsable or authDetails are missing
