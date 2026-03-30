@@ -37,7 +37,7 @@ working with on the client side. It consists of:
    which lets you do user authentication, such as signing users up, in
    and out
 -  `The store API <client/hoodie.store.html>`__,
-   which provides means to store and retrieve data for each individial
+   which provides means to store and retrieve data for each individual
    user
 -  `The connectionStatus API <client/hoodie.connection-status.html>`__,
    which provides helpers for connectivity.
