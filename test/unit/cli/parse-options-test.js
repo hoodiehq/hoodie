@@ -303,6 +303,14 @@ test('parse options', function (group) {
   // end of dbURL TESTS
   // ****************
 
+  test('throws when dbAdapter is missing and neither dbUrl nor inMemory is set', function (t) {
+    t.plan(1)
+
+    t.throws(function () {
+      parseOptions({})
+    }, new Error('Missing required option: dbAdapter'))
+  })
+
   group.test('inMemory', function (t) {
     var config = parseOptions({
       public: 'public',
