@@ -4,8 +4,8 @@
 
 [![Build Status](https://travis-ci.org/hoodiehq/hoodie.svg?branch=master)](https://travis-ci.org/hoodiehq/hoodie)
 [![Coverage Status](https://coveralls.io/repos/hoodiehq/hoodie/badge.svg?branch=master)](https://coveralls.io/github/hoodiehq/hoodie?branch=master)
-[![Dependency Status](https://david-dm.org/hoodiehq/hoodie.svg)](https://david-dm.org/hoodiehq/hoodie)
-[![devDependency Status](https://david-dm.org/hoodiehq/hoodie/dev-status.svg)](https://david-dm.org/hoodiehq/hoodie#info=devDependencies)
+[![Dependency Status](http://web.archive.org/web/20250630224852/http://web.archive.org/web/20240520211731/https://david-dm.org/hoodiehq/hoodie.svg)](https://david-dm.org/hoodiehq/hoodie)
+[![devDependency Status](http://web.archive.org/web/20250630224853/https://david-dm.org/hoodiehq/hoodie/dev-status.svg)](http://web.archive.org/web/20240520211731/https://david-dm.org/hoodiehq/hoodie)
 
 <a href="http://hood.ie/animals/#low-profile-dog"><img src="https://avatars1.githubusercontent.com/u/1888826?v=3&s=200"
  alt="The Low-Profile Dog Hoodie Mascot" title="The Low-Profile Dog Hoodie Mascot" align="right" /></a>
@@ -20,7 +20,7 @@ A good place to start is our [Tracker App](https://github.com/hoodiehq/hoodie-ap
 You can play around with Hoodie’s APIs in the browser console and see how it
 works all together in its [simple HTML and JavaScript code](https://github.com/hoodiehq/hoodie-app-tracker/tree/master/public).
 
-If you have any questions come and say hi in our [chat](http://hood.ie/chat/).
+If you have any questions come and say hi in our [chat](http://web.archive.org/web/20221206020001/http://hood.ie/chat/).
 
 ## Setup
 
@@ -49,13 +49,13 @@ Now start up your Hoodie app
 npm start
 ```
 
-You can find a more thorough description in our [Getting Started Guide](http://docs.hood.ie/en/latest/guides/quickstart.html).
+You can find a more thorough description in our [Getting Started Guide](http://web.archive.org/web/20221205173818/http://docs.hood.ie/en/latest/guides/quickstart.html).
 
 ## Usage
 
 `hoodie` can be used standalone or as a [hapi plugin](http://hapijs.com/tutorials/plugins).
-The options are slightly different. For the standalone usage, see [Hoodie’s configuration guide](http://docs.hood.ie/en/latest/guides/configuration.html).
-For the hapi plugin usage, see [Hoodie’s hapi plugin usage guide](http://docs.hood.ie/en/latest/guides/hapi-plugin.html).
+The options are slightly different. For the standalone usage, see [Hoodie’s configuration guide](http://web.archive.org/web/20220329232919/http://docs.hood.ie/en/latest/guides/configuration.html).
+For the hapi plugin usage, see [Hoodie’s hapi plugin usage guide](http://web.archive.org/web/20210516234800/http://docs.hood.ie/en/latest/guides/hapi-plugin.html).
 
 ## Testing
 
