@@ -8,7 +8,7 @@ the developers managing and developing this open source project. In return,
 they should reciprocate that respect in addressing your issue, assessing
 changes, and helping you finalize your pull requests.
 
-As for everything else in the project, the contributions to Hoodie are governed by our [Code of Conduct](http://hood.ie/code-of-conduct/).
+Contributors are expected to communicate respectfully and follow the community standards established by the project.
 
 ## Using the issue tracker
 
@@ -18,8 +18,7 @@ The issue tracker is the preferred channel for [bug reports](#bugs),
 [features requests](#features) and [submitting pull
 requests](#pull-requests), but please respect the following restrictions:
 
-* Please **do not** use the issue tracker for personal support requests. Use
-  the [Hoodie Chat](http://hood.ie/chat/).
+* Please **do not** use the issue tracker for personal support requests.
 
 * Please **do not** derail or troll issues. Keep the discussion on topic and
   respect the opinions of others.
@@ -87,9 +86,9 @@ into the project.
 ### For new Contributors
 
 If you have never created a pull request before, welcome :tada: :smile: [Here is a great tutorial](https://egghead.io/series/how-to-contribute-to-an-open-source-project-on-github)
-on how to create a pull request..
+on how to create a pull request.
 
-1. [Fork](http://help.github.com/fork-a-repo/) the project, clone your fork,
+1. [Fork](https://docs.github.com/en/get-started/quickstart/fork-a-repo) the project, clone your fork,
    and configure the remotes:
 
    ```bash
@@ -129,7 +128,7 @@ on how to create a pull request..
    git push origin <topic-branch-name>
    ```
 
-8. [Open a Pull Request](https://help.github.com/articles/using-pull-requests/)
+8. [Open a Pull Request](https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/proposing-changes-to-your-work-with-pull-requests/creating-a-pull-request)
     with a clear title and description.
 
 ### For Members of the Hoodie Contributors Team
@@ -171,7 +170,7 @@ complicated, we can help you out and teach you as we go :)
    Afterwards force push your changes to your remote feature branch.
 
 2. Once a pull request is good to go, you can tidy up your commit messages using
-   Git's [interactive rebase](https://help.github.com/articles/interactive-rebase).
+   Git's [interactive rebase](https://docs.github.com/en/get-started/using-git/using-git-rebase-on-the-command-line).
    Please follow our commit message conventions shown below, as they are used by
    [semantic-release](https://github.com/semantic-release/semantic-release) to
    automatically determine the new version and release to npm. In a nutshell:
@@ -252,13 +251,14 @@ git merge feature-branch # replace name with your branch
 git push
 ```
 
-When merging PRs from forked repositories, we recommend you install the
-[hub](https://github.com/github/hub) command line tools.
+```markdown
+When working with pull requests locally, contributors may use the
+[GitHub CLI](https://cli.github.com/).
 
-This allows you to do:
+For example:
 
-```
-hub checkout link-to-pull-request
+```bash
+gh pr checkout <pull-request-number>
 ```
 
 meaning that you will automatically check out the branch for the pull request,
