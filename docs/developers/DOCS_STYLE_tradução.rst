@@ -1,46 +1,44 @@
-Documentation Style Guide
+Estilo de Documentação
 =========================
 
-This guide provides style advice for how to write documentation. Please take the time to read this before contributing a large change or update to documentation.
+Este guia oferece orientações de estilo para a elaboração de documentação. Reserve um tempo para lê-lo antes de contribuir com uma alteração ou atualização significativa na documentação.
 
-Style helps you and your reader
+O estilo ajuda você e o leitor
 -------------------------------
-Word choice and writing style are a personal choice and we understand documentation can be difficult to write. These recommendations have been designed to help you write clear and beautiful documents.
+A escolha das palavras e o estilo de redação são decisões pessoais, e entendemos que elaborar documentação pode ser uma tarefa difícil. Estas recomendações foram criadas para ajudar você a escrever documentos claros e bem elaborados.
 
-Testing
+Testando
 -------
-The `contributing to docs guide <CONTRIBUTING_DOCS.html>`_ describes the process to follow when updating documentation. This process includes automatic testing. Testing provides you peace of mind that your contribution won't contain typos, broken links or other style whoopsies. Testing is not used to criticise your writing, we really love and appreciate any contributions. Please be patience through the testing and review process. Together we can keep Hoodie documentation awesome!
+O `guia de contribuição para a documentação <CONTRIBUTING_DOCS.html>`_ descreve o processo a ser seguido ao atualizar a documentação. Esse processo inclui testes automáticos. Os testes garantem que sua contribuição não contenha erros de digitação, links quebrados ou outros deslizes de estilo. Os testes não servem para criticar sua escrita; nós realmente valorizamos e apreciamos qualquer contribuição. Pedimos um pouco de paciência durante o processo de testes e revisão. Juntos, podemos manter a documentação do Hoodie excelente!
 
-Style guidance
+guia
 --------------
 
-Please see the helpful `guide <https://docs.openstack.org/contributor-guide/writing-style/general-writing-guidelines.html>`_ provided by OpenStack documentation. This guide will further explain these key style tips:
-
-- Use standard English
-- Write in active voice
-- Use the present simple tense
-- Write in second person
-- Use appropriate mood
-- Keep sentences short
-- Avoid ambiguous titles
-- Be clear and concise
-- Write objectively
-- Describe the most common use case first
-- Do not humanize inanimate objects
-- Write positively
-- Avoid prepositions at the end of sentences
-- Do no overuse this, that, these, and it
-- Do not split infinitives
-- Avoid personification
-- Eliminate needless politeness
-- Use consistent terminology
-- Use spelling and grammar checking tools
+Please see the helpful `guide <https://docs.openstack.org/contributor-guide/writing-style/general-writing-guidelines.html>`_, disponibilizado pela documentação do OpenStack. Este guia detalha as seguintes diretrizes de estilo:
+- Utilize o português padrão 
+- Escreva na voz ativa 
+- Empregue o tempo verbal presente simples 
+- Escreva na segunda pessoa 
+- Utilize o modo verbal apropriado 
+- Mantenha as frases curtas 
+- Evite títulos ambíguos 
+- Seja claro e conciso 
+- Escreva de forma objetiva 
+- Descreva primeiro o caso de uso mais comum - Não atribua características humanas a objetos inanimados 
+- Escreva de maneira afirmativa 
+- Evite preposições ao final das frases 
+- Não utilize em excesso pronomes como *this*, *that*, *these* e *it* 
+- Não separe verbos no infinitivo (evite a "cisão do infinitivo")
+- Evite a personificação 
+- Elimine formalidades desnecessárias 
+- Utilize uma terminologia consistente 
+- Empregue ferramentas de verificação ortográfica e gramatical
 
 
-Automatic testing
+Teste automático
 ------------------
 
-The current tests we run on pull requests using Travis Continuous Integration (CI) service:
+Os testes que executamos atualmente em pull requests, utilizando o serviço Travis Continuous Integration (CI):
 
 +----------------------------------------------------------------+------------+-----------+------------+
 | Style guide                                                    | Tested     | Test type | Package    |
@@ -76,16 +74,12 @@ The current tests we run on pull requests using Travis Continuous Integration (C
 
 - Remember, follow the `Code of Conduct <http://hood.ie/code-of-conduct/>`__
 
-Bonus style points
+Bonus de estilo
 ~~~~~~~~~~~~~~~~~~
-- Be fun and friendly as long as it does not distract or confuse the reader
-- Include videos or gifs to demostrated a feature
-- You can use Humour but remember the reader is looking for an *answer* not a comedy sketch
-- Cultural references and puns don't always translate - keep jokes light
-- Remember English is not the first language for many readers - keep language simple where possible
+- Seja descontraído e amigável, desde que isso não distraia nem confunda o leitor. - Inclua vídeos ou GIFs para demonstrar uma funcionalidade. - Você pode usar humor, mas lembre-se de que o leitor está em busca de uma *resposta*, não de um esquete de comédia. - Referências culturais e trocadilhos nem sempre são bem compreendidos em outros idiomas; mantenha as brincadeiras leves. - Lembre-se de que, para muitos leitores, o inglês não é a língua materna; portanto, utilize uma linguagem simples sempre que possível.
 
 .. _second: https://docs.openstack.org/contributor-guide/writing-style/general-writing-guidelines.html#write-in-second-person
 
-Further reading
+Outras leituras
 ---------------
-This guide is influenced by the `Open Stack <https://docs.openstack.org/contributor-guide/writing-style/general-writing-guidelines.html#use-standard-english>`_ style guide.
+Esse guia é baseado em: `Open Stack <https://docs.openstack.org/contributor-guide/writing-style/general-writing-guidelines.html#use-standard-english>`_ style guide.
