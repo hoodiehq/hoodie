@@ -1,7 +1,7 @@
-Using Hoodie as hapi plugin
+Usando o Hoodie como api plugin
 ===========================
 
-Here is an example usage of Hoodie as a hapi plugin:
+Aqui está um exemplo de uso do Hoodie como um plugin do hapi:
 
 .. code:: js
 
@@ -38,7 +38,7 @@ Here is an example usage of Hoodie as a hapi plugin:
       })
     })
 
-The available options are
+As opções são:
 
 +-------------------------+---------------+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
 | option                  | default       | description                                                                                                                                                                                                 |
