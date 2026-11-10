@@ -119,7 +119,7 @@ Defina uma senha de sua preferência.
 
 **cd** in to that directory.
 
-Para mudar para **hoodie** user:
+Para mudar para usuário **hoodie**:
 
 .. code:: bash
 
@@ -131,7 +131,7 @@ Como usuário hoodie, instale a aplicação:
 
     $ git clone <repo url>
 
-make sure package.json has a valid `name` property.
+o package.json deve ter a propriedade `name.
 
 **cd** into the directory.Run :
 
@@ -145,19 +145,18 @@ Agora execute:
 
     $ npm install
 
-To run Hoodie as the root:
+Executar o Hoodie no root:
 
 .. code:: bash
 
     $ sudo su hoodie
 
-To launch Hoodie now, as root :
+Abrir o Hoodie, como root :
 
 .. code:: bash
 
     $ npm start -- --dbUrl=http://admin:yourpassword@localhost:5984/
 
-Replace :code:`yourpassword` with the password you choose when you created the
-admin user above.
+Substitua :code:`yourpassword` com a senha criada.
 
-That's it. The app should be running by now.
+Isso é tudo. O app deve funcionaragora.
