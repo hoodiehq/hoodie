@@ -1,0 +1,34 @@
+Arquivos de documentação para tradução
+
+README
+LICENSE
+CONTRIBUTING
+Docs:
+- welcome.rst
+- about:
+ - architecture.rst
+ - files-and-folders.rst
+ - glossary.rst
+ - hoodie-concepts.rst
+ - how-hoodie-works.rst
+ - requirements.rst
+- api:
+ - index.rst
+ - client:
+ - hoodie.account.rst
+ - hoodie.connection-status.rst
+ - hoodie.log.rst
+ - hoodie.rst
+ - hoodie.store.rst
+- developers:
+ - CODING_STYLE.rst
+ - CONTRIBUTING.rst
+ - CONTRIBUTING_DOCS.rst
+ - DOCS_STYLE.rst
+ - TRIAGING.rst
+- guides:
+ - configuration.rst
+ - deployment.rst
+ - hapi-plugin.rst
+ - plugins.rst
+ - quickstart.rst

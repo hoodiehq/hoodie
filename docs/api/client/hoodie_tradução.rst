@@ -2,19 +2,15 @@ hoodie
 ======
 
 
-Introduction
+Introdução
 ------------
 
-This document describes the functionality of the hoodie base object. It
-provides a number of helper methods dealing with event handling and
-connectivity, as well as a unique id generator and a means to set the
-endpoint which Hoodie communicates with.
+Este documento descreve a funcionalidade do objeto base do Hoodie. Ele disponibiliza diversos métodos auxiliares para lidar com o tratamento de eventos e a conectividade, além de um gerador de identificadores únicos e um mecanismo para definir o endpoint com o qual o Hoodie se comunica.
 
-Initialisation
+Inicialização
 --------------
 
-The Hoodie Client persists state in the browser, like the current user’s
-id, session or the connection status to the backend.
+O Hoodie Client mantém o estado no navegador, como o ID do usuário atual, a sessão ou o status da conexão com o backend.
 
 .. code:: js
 
@@ -26,7 +22,7 @@ id, session or the connection status to the backend.
       }
     })
 
-Hoodie integrates Hoodie’s client core modules:
+O Hoodie integra os módulos do cliente:
 
 -  `The account API <hoodie.account.html>`__
 -  `The store API <hoodie.store.html>`__

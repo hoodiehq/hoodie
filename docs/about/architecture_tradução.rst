@@ -1,121 +1,81 @@
 Architecture
 ============
 
-After `installing hoodie <../guides/quickstart.html>`__, ``npm start`` will run
-`cli/index.js <https://github.com/hoodiehq/hoodie/blob/master/cli/index.js>`__
-which reads out the `configuration <../guides/configuration.html>`__
-from all the different places using the `rc <https://www.npmjs.com/package/rc>`__
-package, then passes it as options to ``server/index.js``, the Hoodie core
-`hapi plugin <http://hapijs.com>`__.
+Após instalar o Hoodie, o comando `npm start` executa o arquivo `cli/index.js`, que lê as
+configurações de diversas fontes utilizando o pacote `rc` e, em seguida, as repassa como
+opções para o `server/index.js` — o principal plugin do hoodie.
+No arquivo `server/index.js`, as opções fornecidas são mescladas com as configurações
+padrão e processadas para formar a configuração do servidor Hapi. Essa configuração é
+então repassada ao `hoodie-server`, que integra os módulos principais do servidor. O
+sistema também encaminha o cliente Hoodie na primeira requisição para `/hoodie/client.js`,
+passando a configuração necessária para o cliente. Além disso, disponibiliza a pasta pública
+da aplicação na rota raiz (`/`) e as interfaces principais (Core UIs) do Hoodie nos caminhos
+`/hoodie/admin`, `/hoodie/account` e `/hoodie/store`.
+O Hoodie utiliza o CouchDB para persistência de dados. Caso `options.dbUrl` não esteja
+definido, ele recorre ao PouchDB. Após a conclusão de todas as configurações, os plugins
+internos são inicializados (consulte `server/plugins/index.js`). Definimos plugins simples do
+Hapi para registro de logs e para servir os ativos públicos da aplicação e o cliente do
+Hoodie. Uma vez concluída a configuração, o servidor é iniciado ao final de `cli/start.js`, e a
+URL onde o Hoodie está em execução é exibida no terminal.
 
-In `server/index.js <https://github.com/hoodiehq/hoodie/blob/master/server/index.js>`__,
-the passed options are merged with defaults and parsed into configuration for
-the Hapi server. It passes the configuration on to `hoodie-server <https://github.com/hoodiehq/hoodie-server#readme>`__,
-which combines the core server modules. It also bundles the Hoodie
-client on first request to ``/hoodie/client.js`` and passes in the
-configuration for the client. It also makes the app’s ``public`` folder
-accessible at the ``/`` root path, and Hoodie’s Core UIs at
-``/hoodie/admin``, ``/hoodie/account`` and ``/hoodie/store``.
+Módulos
+============
 
-Hoodie uses `CouchDB <https://couchdb.apache.org/>`__ for data
-persistence. If ``options.dbUrl`` is not set, it falls back to `PouchDB <https://pouchdb.com/>`__.
-
-Once all configuration is taken care of, the internal plugins are
-initialised (see `server/plugins/index.js <https://github.com/hoodiehq/hoodie/blob/master/server/plugins/index.js>`__).
-We define simple Hapi plugins for `logging <https://github.com/hoodiehq/hoodie/blob/master/server/plugins/logger.js>`__
-and for `serving the app’s public assets and the Hoodie client <https://github.com/hoodiehq/hoodie/blob/master/server/plugins/public.js>`__.
-
-Once everything is setup, the server is then started at the end of
-`cli/start.js <https://github.com/hoodiehq/hoodie/blob/master/cli/index.js>`__
-and the URL where hoodie is running is logged to the terminal.
-
-Modules
-~~~~~~~
-
-Hoodie is a server built on top of `hapi <http://hapijs.com>`__ with
-frontend APIs for account and store related tasks. It is split up in many small
-modules with the goal to lower the barrier to new code contributors and to
-share maintenance responsibilities.
-
-1. server |server repository| |server build status| |server coverage
-   status| |server dependency status|
-
-    Hoodie’s core server logic as hapi plugin. It integrates Hoodie’s
-    server core modules:
-    `account-server <https://github.com/hoodiehq/hoodie-account-server>`__,
-    `store-server <https://github.com/hoodiehq/hoodie-store-server>`__
-
-    1. account-server |account-server repository| |account-server build
-       status| |account-server coverage status| |account-server dependency
-       status|
-
-           `Hapi <http://hapijs.com/>`__ plugin that implements the `Account
-           JSON API <http://docs.accountjsonapi.apiary.io>`__ routes and
-           exposes a corresponding API at ``server.plugins.account.api.*``.
-
-    2. store-server |store-server repository| |store-server build status|
-       |store-server coverage status| |store-server dependency status|
-
-           `Hapi <http://hapijs.com/>`__ plugin that implements `CouchDB’s
-           Document
-           API <https://wiki.apache.org/couchdb/HTTP_Document_API>`__.
-           Compatible with `CouchDB <https://couchdb.apache.org/>`__ and
-           `PouchDB <https://pouchdb.com/>`__ for persistence.
-
-2. client |client repository| |client build status| |client coverage
-   status| |client dependency status|
-
-    Hoodie’s front-end client for the browser. It integrates Hoodie’s
-    client core modules:
-    `account-client <https://github.com/hoodiehq/hoodie-account-client>`__,
-    `store-client <https://github.com/hoodiehq/hoodie-store-client>`__,
-    `connection-status <https://github.com/hoodiehq/hoodie-connection-status>`__
-    and `log <https://github.com/hoodiehq/hoodie-log>`__
-
-    1. account-client |account-client repository| |account-client build
-       status| |account-client coverage status| |account-client dependency
-       status|
-
-           Client for the `Account JSON
-           API <http://docs.accountjsonapi.apiary.io>`__. It persists
-           session information on the client and provides front-end
-           friendly APIs for things like creating a user account,
-           confirming, resetting a password, changing profile information,
-           or closing the account.
-
-    2. store-client |store-client repository| |store-client build status|
-       |store-client coverage status| |store-client dependency status|
-
-           Store client for data persistence and offline sync.
-
-    3. connection-status |connection-status repository| |connection-status
-       build status| |connection-status coverage status| |connection-status
-       dependency status|
-
-           Browser library to monitor a connection status. It emits
-           ``disconnect`` & ``reconnect`` events if the request status
-           changes and persists its status on the client.
-
-    4. log |log repository| |log build status| |log coverage status| |log
-       dependency status|
-
-           JavaScript library for logging to the browser console. If
-           available, it takes advantage of `CSS-based styling of console
-           log
-           outputs <https://developer.mozilla.org/en-US/docs/Web/API/Console#Styling_console_output>`__.
-
-5. admin |admin repository| |admin build status| |admin dependency
-   status|
-
-    Hoodie’s built-in Admin Dashboard, built with
-    `Ember.js <http://emberjs.com>`__
-
-    1. admin-client |admin-client repository| |admin-client build status|
-       |admin-client coverage status| |admin-client dependency status|
-
-           Hoodie’s front-end admin client for the browser. Used in the
-           Admin Dashboard, but can also be used standalone for custom admin
-           dashboard.
+O Hoodie é um servidor construído sobre o hapi, com APIs de frontend para tarefas
+relacionadas a contas e lojas. Ele é dividido em vários módulos pequenos, com o objetivo
+de reduzir a barreira de entrada para novos colaboradores de código e compartilhar as
+responsabilidades de manutenção.
+1.Servidor: https://github.com/hoodiehq/hoodie-server#readme
+https://david-dm.org/hoodiehq/hoodie-server
+A lógica central do servidor do Hoodie como um plugin do hapi. Ela integra os módulos
+principais do servidor do Hoodie:
+https://github.com/hoodiehq/hoodie-account-server
+i.Servidor-conta
+https://github.com/hoodiehq/hoodie-account-server#readme
+https://travis-ci.org/hoodiehq/hoodie-account-server
+https://david-dm.org/hoodiehq/hoodie-account-server
+Plugin Hapi que implementa as rotas da API JSON da conta e expõe uma API
+correspondente em:
+server.plugins.account.api.*.
+ii.Store-server
+https://github.com/hoodiehq/hoodie-store-server#readme
+https://david-dm.org/hoodiehq/hoodie-store-server
+Plugin para Hapi que implementa a API de Documentos do CouchDB. Compatível com CouchDB e
+PouchDB para persistência.
+2. cliente |repositório do cliente| |status de build do cliente| |status de cobertura de testes do cliente|
+|status de dependências do cliente| Cliente front-end do Hoodie para o navegador. Ele integra os
+módulos principais do cliente Hoodie:
+`account-client <https://github.com/hoodiehq/hoodie-account-client>`__, `store-client <https://github.com/hoodiehq/hoodie-store-client>`__,
+`connection-status <https://github.com/hoodiehq/hoodie-connection-status>`__
+log <https://github.com/hoodiehq/hoodie-log>`__
+1. account-client |repositório account-client| |status de build do account-client| |status de cobertura do
+account-client| |status de dependência do account-client|
+Cliente para o JSON da conta
+API <http://docs.accountjsonapi.apiary.io>`__. Ela armazena informações de sessão no cliente e
+disponibiliza APIs amigáveis para o front-end para tarefas como criar uma conta de usuário,confirmar,
+redefinir senha, alterar informações de perfil ou encerrar a conta.
+store-client |repositório store-client| |status de build do store-client | | status de cobertura do
+store-client| |status de dependências do store-client|
+Cliente de armazenamento para persistência de dados e sincronização offline.
+3. status da conexão |status da conexão do repositório| |status da conexão do build| |status da
+conexão da cobertura de testes| |status da conexão das dependências|
+Biblioteca para navegador destinada a monitorar o status da conexão. Ela emite eventos
+``disconnect`` e ``reconnect`` caso o status da solicitação mude e mantém o registro desse status no
+cliente.
+4. log |registrar repositório| |registrar status da compilação| |registrar status da cobertura| |registrar
+status das dependências|
+Biblioteca JavaScript para registro de mensagens no console do navegador. Se estiver disponível, ela
+utiliza uma estilização CSS para logs do console.
+outputs
+<https://developer.mozilla.org/en-US/docs/Web/API/Console#Styling_console_output>`__.
+5. admin |repositório admin| |status de build admin| |status de dependência admin|
+Painel de Administração integrado do Hoodie, desenvolvido com `Ember.js
+<http://emberjs.com>`__
+1. admin-client |repositório admin-client| |status de build do admin-client| |status de cobertura do
+admin-client| |status de dependências do admin-client|
+Cliente de administração front-end do Hoodie para o navegador. Utilizado no Dashboard de
+Administração, mas também pode ser usado de forma independente para Dashboards de
+administração personalizados.
 
 .. |server repository| image:: https://assets-cdn.github.com/images/icons/emoji/octocat.png
    :target: https://github.com/hoodiehq/hoodie-server#readme

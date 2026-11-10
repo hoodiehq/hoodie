@@ -1,8 +1,7 @@
 hoodie.store
 ============
 
-If you want to do anything with data in Hoodie, this is where it
-happens and this is the Hoodie Client for data persistence & offline sync.
+Se você deseja realizar qualquer operação com dados no Hoodie, é aqui que isso acontece; este é o Hoodie Client, voltado para a persistência de dados e a sincronização offline.
 
 Example
 -------

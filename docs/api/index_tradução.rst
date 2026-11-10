@@ -1,20 +1,20 @@
 Hoodie API
 ==========
 
-Hoodie provides two APIs
+O Hoodie tem duas APIs
 
-1. The Hoodie Client API
+1. Hoodie Client API
 
-   The Hoodie Client API is what you load into your web application using a
-   script tag. It connects to your Hoodie Backend's routes
+   O Hoodie Client API é o que você carrega na sua aplicação web usando uma
+   script tag. Ela conecta ao Hoodie Backend.
 
 
-2. The Hoodie Server API
+2. Hoodie Server API
 
-   The Hoodie Server API is used within Hoodie’s route handlers and by plugins
-   to manage accounts, data and to securely integrate with 3rd party services.
+   O Hoodie Server API é usado com o  Hoodie e os route handlers e plugins
+   para gerenciar contas, dados e integrar outros dispositivos.
 
-The Hoodie Client API
+Hoodie Client API
 ~~~~~~~~~~~~~~~~~~~~~
 
 .. toctree::
@@ -44,10 +44,8 @@ working with on the client side. It consists of:
 -  `The log API <client/hoodie.log.html>`__, which
    provides a nice API for logging all the things
 
-The Hoodie Server API
+Hoodie Server API
 ~~~~~~~~~~~~~~~~~~~~~
 
-The Hoodie Server API is currently work-in-progress. But you can have a look
-at the `Account Server API <https://github.com/hoodiehq/hoodie-account-server-api>`__
+O Hoodie Server API está atualmente em progresso. Mas você pode dar uma olhada em `Account Server API <https://github.com/hoodiehq/hoodie-account-server-api>`__
 and the `Store Server API <https://github.com/hoodiehq/hoodie-store-server-api>`__
-for a sneak peak.

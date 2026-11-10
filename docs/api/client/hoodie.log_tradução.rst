@@ -1,10 +1,9 @@
 hoodie.log
 ==========
 
-``hoodie-log`` is a standalone JavaScript library for logging to the browser console. 
-If available, it takes advantage of `CSS-based styling of console log outputs <https://developer.mozilla.org/en-US/docs/Web/API/Console#Styling_console_output>`_.
+`hoodie-log` é uma biblioteca JavaScript independente para registrar mensagens no console do navegador. Se disponível, ela utiliza o recurso de `estilização via CSS das saídas do console <https://developer.mozilla.org/en-US/docs/Web/API/Console#Styling_console_output>`_.
 
-Example
+Exemplo
 -------
 
 .. code:: js
@@ -110,7 +109,7 @@ One of ``debug``, ``info``, ``warn`` or ``error``. ``debug`` is the lowest level
 
     log.level
 
-Example
+Exemplo
 
 .. code::
 
@@ -194,10 +193,10 @@ Example
     fooLog('baz!')
     // (hoodie:foo) baz!
 
-Testing
+Testes
 -------
 
-Local setup
+Local
 
 ::
 
@@ -205,13 +204,13 @@ Local setup
     cd hoodie-log
     npm install
 
-Run all tests and code style checks
+style checks
 
 ::
 
     npm test
 
-Run all tests on file change
+file change
 
 ::
     

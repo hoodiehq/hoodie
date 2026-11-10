@@ -1,0 +1,168 @@
+LicenÃ§a Apache
+VersÃ£o 2.0, janeiro de 2004
+http://www.apache.org/licenses/
+
+TERMOS E CONDIÃ‡Ã•ES DE USO, REPRODUÃ‡ÃƒO, E DISTRIBUIÃ‡ÃƒO
+
+1. DefiniÃ§Ãµes.
+
+	"licenÃ§a" significa que os termos e condiÃ§Ãµes para  uso,
+	reproduÃ§Ã£o, e distribuiÃ§Ã£o sÃ£o definidas pelas seÃ§Ãµes 1 Ã 
+	9 deste documento.
+
+	"Licenciante" significa que o proprietÃ¡rio dos direitos autorais
+	ou entidade autorizada pelo proprietÃ¡rio dos direitos autorais Ã©
+	aquele que estÃ¡ concedendo a LicenÃ§a.
+
+	"Entidade Legal" significa que a uniÃ£o da entidade agindo e todas
+	as outras entidades que controlam, sÃ£o controladas por, ou estÃ£o
+	sob controle comum com essa entidade. Pelos propÃ³sitos desta definiÃ§Ã£o,
+	"controle" diz (i) o poder, direto ou indireto, para causar direÃ§Ã£o ou
+	gestÃ£o de tal entidade, se pelo contrato ou caso contrÃ¡rio, ou (ii)
+	propriedade de cinquenta por cento (50%) ou mais aÃ§Ãµes em circulaÃ§Ã£o,
+	ou (iii) propriedade beneficiÃ¡ria de tal entidade.
+
+    "VocÃª" (ou "Seu/Sua") significarÃ¡ uma pessoa fÃ­sica ou jurÃ­dica exercendo
+    as permissÃµes concedidas por esta LicenÃ§a.
+
+    "Forma Fonte" significarÃ¡ a forma preferencial para fazer modificaÃ§Ãµes,
+    incluindo, mas nÃ£o se limitando a, cÃ³digo-fonte de software, fonte de documentaÃ§Ã£o
+     e arquivos de configuraÃ§Ã£o.
+
+    "Forma Objeto" significarÃ¡ qualquer forma resultante de transformaÃ§Ã£o
+    mecÃ¢nica ou traduÃ§Ã£o de uma Forma Fonte, incluindo, mas nÃ£o se limitando a,
+    cÃ³digo objeto compilado, documentaÃ§Ã£o gerada e conversÃµes para outros tipos de
+    mÃ­dia.
+
+   "Obra" significarÃ¡ a obra de autoria, seja na Forma Fonte ou Objeto,
+    disponibilizada sob a LicenÃ§a, conforme indicado por um aviso de direitos
+    autorais incluÃ­do ou anexado Ã  obra (um exemplo Ã© fornecido no ApÃªndice abaixo).
+
+    "Obras Derivadas" significarÃ¡ qualquer obra, seja na Forma Fonte ou Objeto,
+    que seja baseada (ou derivada) da Obra e para a qual as revisÃµes editoriais,
+    anotaÃ§Ãµes, elaboraÃ§Ãµes ou outras modificaÃ§Ãµes representem, como um todo, uma
+    obra original de autoria. Para os fins desta LicenÃ§a, Obras Derivadas nÃ£o incluirÃ£o 
+    obras que permaneÃ§am separÃ¡veis ou que meramente se vinculem (ou se conectem pelo nome)
+    Ã s interfaces da Obra e das Obras Derivadas dela.
+
+    "ContribuiÃ§Ã£o" significarÃ¡ qualquer obra de autoria, incluindo a versÃ£o original
+    da Obra e quaisquer modificaÃ§Ãµes ou adiÃ§Ãµes a essa Obra ou Obras Derivadas dela, que
+    seja intencionalmente submetida ao Licenciante para inclusÃ£o na Obra pelo detentor dos
+    direitos autorais ou por uma pessoa fÃ­sica ou jurÃ­dica autorizada a submeter em nome do
+    detentor dos direitos autorais. Para os fins desta definiÃ§Ã£o, "submetida" significa qualquer
+    forma de comunicaÃ§Ã£o eletrÃ´nica, verbal ou escrita enviada ao Licenciante ou aos seus representantes,
+    incluindo, mas nÃ£o se limitando a, comunicaÃ§Ã£o em listas de discussÃ£o eletrÃ´nicas, sistemas de
+    controle de cÃ³digo-fonte e sistemas de rastreamento de problemas gerenciados por, ou em nome do,
+    Licenciante com o propÃ³sito de discutir e melhorar a Obra, mas excluindo comunicaÃ§Ã£o que seja
+    notoriamente marcada ou de outra forma designada por escrito pelo detentor dos direitos autorais
+    como "NÃ£o Ã© uma ContribuiÃ§Ã£o".
+
+    "Contribuidor" significarÃ¡ o Licenciante e qualquer pessoa fÃ­sica ou jurÃ­dica em nome da qual
+    uma ContribuiÃ§Ã£o tenha sido recebida pelo Licenciante e subsequentemente incorporada Ã  Obra.   
+
+    ConcessÃ£o de LicenÃ§a de Direitos Autorais. Sujeito aos termos e condiÃ§Ãµes desta LicenÃ§a,
+    cada Contribuidor concede a VocÃª uma licenÃ§a de direitos autorais perpÃ©tua, mundial, nÃ£o exclusiva,
+    sem cobranÃ§a, livre de royalties, irrevogÃ¡vel para reproduzir, preparar Obras Derivadas de, exibir
+    publicamente, executar publicamente, sublicenciar e distribuir a Obra e tais Obras Derivadas em Forma
+    Fonte ou Objeto.   
+
+    ConcessÃ£o de LicenÃ§a de Patente. Sujeito aos termos e condiÃ§Ãµes desta LicenÃ§a, cada
+    Contribuidor concede a VocÃª uma licenÃ§a de patente perpÃ©tua, mundial, nÃ£o exclusiva, sem cobranÃ§a,
+    livre de royalties, irrevogÃ¡vel (exceto conforme estabelecido nesta seÃ§Ã£o) para fazer, mandar fazer
+    usar, oferecer para venda, vender, importar e de outra forma transferir a Obra, onde tal licenÃ§a,
+    se aplica apenas Ã quelas reivindicaÃ§Ãµes de patente licenciÃ¡veis por tal Contribuidor que sejam
+    necessariamente infringidas por sua(s) ContribuiÃ§Ã£o(Ãµes) isoladamente ou pela combinaÃ§Ã£o de sua(s)
+    ContribuiÃ§Ã£o(Ãµes) com a Obra Ã  qual tal(is) ContribuiÃ§Ã£o(Ãµes) foi/foram submetida(s). Se VocÃª instituir
+    um litÃ­gio de patente contra qualquer entidade (incluindo uma reconvenÃ§Ã£o ou contestaÃ§Ã£o em um processo
+    judicial) alegando que a Obra ou uma ContribuiÃ§Ã£o incorporada Ã  Obra constitui infringÃªncia direta ou
+    indireta de patente, entÃ£o quaisquer licenÃ§as de patente concedidas a VocÃª sob esta LicenÃ§a para essa
+    Obra serÃ£o rescindidas a partir da data em que tal litÃ­gio for ajuizado.
+
+    RedistribuiÃ§Ã£o. VocÃª pode reproduzir e distribuir cÃ³pias da Obra ou de Obras Derivadas
+    dela em qualquer meio, com ou sem modificaÃ§Ãµes, e em Forma Fonte ou Objeto, desde que VocÃª atenda
+    Ã s seguintes condiÃ§Ãµes:
+
+    (a) VocÃª deve fornecer a quaisquer outros destinatÃ¡rios da Obra ou de Obras Derivadas uma
+    cÃ³pia desta LicenÃ§a; e
+
+    (b) VocÃª deve fazer com que quaisquer arquivos modificados carreguem avisos em destaque
+    declarando que VocÃª alterou os arquivos; e
+
+    (c) VocÃª deve reter, na Forma Fonte de quaisquer Obras Derivadas que VocÃª distribuir,
+    todos os avisos de direitos autorais, patentes, marcas registradas e atribuiÃ§Ã£o da Forma Fonte
+    da Obra, excluindo aqueles avisos que nÃ£o pertencem a nenhuma parte das Obras Derivadas; e
+
+    (d) Se a Obra incluir um arquivo de texto "NOTICE" (AVISO) como parte de sua distribuiÃ§Ã£o,
+    entÃ£o quaisquer Obras Derivadas que VocÃª distribuir devem incluir uma cÃ³pia legÃ­vel dos avisos de
+    atribuiÃ§Ã£o contidos em tal arquivo NOTICE, excluindo aqueles avisos que nÃ£o pertencem a nenhuma
+    parte das Obras Derivadas, em pelo menos um dos seguintes locais: dentro de um arquivo de texto
+    NOTICE distribuÃ­do como parte das Obras Derivadas; dentro da Forma Fonte ou documentaÃ§Ã£o,
+    se fornecida juntamente com as Obras Derivadas; ou, dentro de uma exibiÃ§Ã£o gerada pelas Obras
+    Derivadas, se e onde quer que tais avisos de terceiros normalmente apareÃ§am. Os conteÃºdos do
+    arquivo NOTICE sÃ£o apenas para fins informativos e nÃ£o modificam a LicenÃ§a. VocÃª pode adicionar
+    seus prÃ³prios avisos de atribuiÃ§Ã£o em Obras Derivadas que VocÃª distribuir, juntamente ou como um
+    adendo ao texto do NOTICE da Obra, desde que tais avisos de atribuiÃ§Ã£o adicionais nÃ£o possam ser
+    interpretados como modificaÃ§Ã£o da LicenÃ§a.
+
+    VocÃª pode adicionar sua prÃ³pria declaraÃ§Ã£o de direitos autorais Ã s suas modificaÃ§Ãµes e pode fornecer
+    termos e condiÃ§Ãµes de licenÃ§a adicionais ou diferentes para o uso, reproduÃ§Ã£o ou distribuiÃ§Ã£o de suas
+    modificaÃ§Ãµes, ou para quaisquer Obras Derivadas como um todo, desde que o seu uso, reproduÃ§Ã£o e distribuiÃ§Ã£o
+     da Obra esteja em conformidade com as condiÃ§Ãµes estabelecidas nesta LicenÃ§a.   
+
+    SubmissÃ£o de ContribuiÃ§Ãµes. A menos que VocÃª declare explicitamente o contrÃ¡rio, qualquer ContribuiÃ§Ã£o
+    intencionalmente submetida para inclusÃ£o na Obra por VocÃª ao Licenciante estarÃ¡ sob os termos e condiÃ§Ãµes
+    desta LicenÃ§a, sem quaisquer termos ou condiÃ§Ãµes adicionais. NÃ£o obstante o disposto acima, nada aqui
+    contido substituirÃ¡ ou modificarÃ¡ os termos de qualquer contrato de licenÃ§a separado que vocÃª possa ter
+    celebrado com o Licenciante em relaÃ§Ã£o a tais ContribuiÃ§Ãµes.
+
+    Marcas Registradas. Esta LicenÃ§a nÃ£o concede permissÃ£o para usar os nomes comerciais, marcas registradas,
+    marcas de serviÃ§o ou nomes de produtos do Licenciante, exceto conforme exigido para o uso razoÃ¡vel e
+    costumeiro na descriÃ§Ã£o da origem da Obra e na reproduÃ§Ã£o do conteÃºdo do arquivo NOTICE.
+
+    IsenÃ§Ã£o de Garantia. Salvo disposiÃ§Ã£o em contrÃ¡rio exigida pela lei aplicÃ¡vel ou acordado por escrito, o
+    Licenciante fornece a Obra (e cada Contribuidor fornece suas ContribuiÃ§Ãµes) "COMO ESTÃ", SEM GARANTIAS OU
+    CONDIÃ‡Ã•ES DE QUALQUER TIPO, explÃ­citas ou implÃ­citas, incluindo, sem limitaÃ§Ã£o, quaisquer garantias ou
+    condiÃ§Ãµes de TÃTULO, NÃƒO VIOLAÃ‡ÃƒO, COMERCIABILIDADE ou ADEQUAÃ‡ÃƒO A UM PROPÃ“SITO ESPECÃFICO. VocÃª Ã© o Ãºnico
+    responsÃ¡vel por determinar a adequaÃ§Ã£o do uso ou redistribuiÃ§Ã£o da Obra e assume quaisquer riscos associados
+    ao seu exercÃ­cio de permissÃµes sob esta LicenÃ§a.   
+
+    LimitaÃ§Ã£o de Responsabilidade. Em nenhum momento e sob nenhuma teoria jurÃ­dica, seja por ato ilÃ­cito
+    (incluindo negligÃªncia), contrato ou de outra forma, a menos que exigido pela lei aplicÃ¡vel (como atos
+    deliberados e de negligÃªncia grave) ou acordado por escrito, nenhum Contribuidor serÃ¡ responsÃ¡vel perante
+    VocÃª por danos, incluindo quaisquer danos diretos, indiretos, especiais, incidentais ou consequenciais de
+    qualquer natureza decorrentes desta LicenÃ§a ou do uso ou incapacidade de usar a Obra (incluindo, mas nÃ£o
+    se limitando a, danos por perda de fundo de comÃ©rcio, interrupÃ§Ã£o de trabalho, falha ou mau funcionamento
+    do computador, ou quaisquer outros danos ou perdas comerciais), mesmo que tal Contribuidor tenha sido
+    avisado da possibilidade de tais danos.   
+
+    AceitaÃ§Ã£o de Garantia ou Responsabilidade Adicional. Ao redistribuir a Obra ou Obras Derivadas dela,
+    VocÃª pode optar por oferecer, e cobrar uma taxa por, aceitaÃ§Ã£o de suporte, garantia, indenizaÃ§Ã£o ou outras
+    obrigaÃ§Ãµes e/ou direitos de responsabilidade consistentes com esta LicenÃ§a. No entanto, ao aceitar tais
+    obrigaÃ§Ãµes, VocÃª pode agir apenas em seu prÃ³prio nome e sob sua inteira responsabilidade, nÃ£o em nome de
+    qualquer outro Contribuidor, e somente se VocÃª concordar em indenizar, defender e isentar cada Contribuidor
+    de qualquer responsabilidade incorrida por, ou reivindicaÃ§Ãµes feitas contra, tal Contribuidor em razÃ£o de vocÃª
+    aceitar qualquer garantia ou responsabilidade adicional.   
+
+    FIM DOS TERMOS E CONDIÃ‡Ã•ES
+
+    APÃŠNDICE: Como aplicar a LicenÃ§a Apache ao seu trabalho.
+
+    Para aplicar a LicenÃ§a Apache ao seu trabalho, anexe o seguinte aviso padronizado, substituindo os campos entre
+    colchetes "{}" por suas prÃ³prias informaÃ§Ãµes de identificaÃ§Ã£o. (NÃ£o inclua os colchetes!) O texto deve estar
+    envolvido na sintaxe de comentÃ¡rio apropriada para o formato do arquivo. TambÃ©m recomendamos que um nome
+    de arquivo ou classe e uma descriÃ§Ã£o do propÃ³sito sejam incluÃ­dos na mesma "pÃ¡gina impressa" que o aviso de
+    direitos autorais para facilitar a identificaÃ§Ã£o em arquivos de terceiros.
+
+    Copyright 2012-2019 Comunidade Hoodie e outros contribuidores.
+
+    Licenciado sob a LicenÃ§a Apache, VersÃ£o 2.0 (a "LicenÃ§a");
+    vocÃª nÃ£o pode usar este arquivo, exceto em conformidade com a LicenÃ§a.
+    VocÃª pode obter uma cÃ³pia da LicenÃ§a em
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+    A menos que exigido pela lei aplicÃ¡vel ou acordado por escrito, o software
+    distribuÃ­do sob a LicenÃ§a Ã© distribuÃ­do "COMO ESTÃ",
+    SEM GARANTIAS OU CONDIÃ‡Ã•ES DE QUALQUER TIPO, explÃ­citas ou implÃ­citas.
+    Consulte a LicenÃ§a para obter as permissÃµes e limitaÃ§Ãµes especÃ­ficas
+    sob a LicenÃ§a.

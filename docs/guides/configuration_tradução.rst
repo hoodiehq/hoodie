@@ -1,13 +1,12 @@
-Configuration
+Configuração
 =============
 
-Your Hoodie back-end can be configured using default options that are part of
-your repository as well as using hidden files, CLI arguments and environment variables.
+O back-end do seu Hoodie pode ser configurado utilizando opções padrão que fazem parte do seu repositório, bem como por meio de arquivos ocultos, argumentos de linha de comando (CLI) e variáveis ​​de ambiente.
 
-Options
+Opções
 ~~~~~~~
 
-Here is a list of all available options
+Aqui está uma lista de todas as opções:
 
 
 +-----------------+----------------------------------+--------------------------+--------------------------+-----------------------------------------------------------------------------------------------------------------------------------------------------------------+
@@ -40,12 +39,10 @@ Here is a list of all available options
 | name            | ``package.json``'s name property | ``--name``               | ``hoodie_name``          | Name your application.                                                                                                                                          |
 +-----------------+----------------------------------+--------------------------+--------------------------+-----------------------------------------------------------------------------------------------------------------------------------------------------------------+
 
-Defaults
+Default
 --------
 
-Default options are set in your app’s ``package.json`` file, using the
-``"hoodie"`` key. Here is an example with all available options and their
-default values
+As opções padrão são definidas no arquivo ``package.json`` do seu aplicativo, utilizando a chave ``"hoodie"``. Abaixo, segue um exemplo com todas as opções disponíveis e seus respectivos valores padrão.
 
 .. code:: json
 
@@ -68,36 +65,4 @@ default values
 .hoodierc
 ~~~~~~~~~
 
-The ``.hoodierc`` can be used to set configuration when running your Hoodie
-backend in that folder. It should not be committed to your repository.
-
-The content can be in JSON or INI format. See the `rc package on npm <https://www.npmjs.com/package/rc>`__
-for more information
-
-CLI arguments and environment variables
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-To pass CLI options when starting Hoodie, you have to separate them with ``--``, for example:
-
-.. code:: bash
-
-    $ npm start -- --port=8090 --inMemory
-
-All environment variables are prefixed with ``hoodie_``. So to set the port to
-``8090`` and to start Hoodie in memory mode, you have to
-
-- set the ``hoodie_port`` environment variable to ``8090``
-- set the ``hoodie_inMemory`` environment variable to ``true``
-
-Hoodie CLI is using `rc <https://www.npmjs.com/package/rc>`__ for configuration,
-so the same options can be set with environment variables and config files.
-Environment variables are prefixed with ``hoodie_``.
-
-The priority of configuration
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-1. Command line arguments
-2. Environment variables
-3. ``.hoodierc`` files
-4. Your app’s defaults form the ``"hoodie"`` key in ``"package.json"``
-5. Hoodie’s default values as shown in table above
+O arquivo ``.hoodierc`` pode ser usado para definir configurações ao executar o seu backend do Hoodie nessa pasta. Ele não deve ser incluído no seu repositório (commit). O conteúdo pode estar no formato JSON ou INI. Consulte o pacote `rc no npm <https://www.npmjs.com/package/rc>`__ para mais informações. Argumentos de linha de comando e variáveis ​​de ambiente ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Para passar opções via linha de comando ao iniciar o Hoodie, é necessário separá-las usando ``--``; por exemplo: .. code:: bash $ npm start -- --port=8090 --inMemory Todas as variáveis ​​de ambiente possuem o prefixo ``hoodie_``. Portanto, para definir a porta como ``8090`` e iniciar o Hoodie no modo "em memória" (in-memory), você deve: - definir a variável de ambiente ``hoodie_port`` como ``8090`` - definir a variável de ambiente ``hoodie_inMemory`` como ``true`` A CLI do Hoodie utiliza o pacote `rc <https://www.npmjs.com/package/rc>`__ para o gerenciamento de configurações; assim, as mesmas opções podem ser definidas tanto por meio de variáveis ​​de ambiente quanto por arquivos de configuração. As variáveis ​​de ambiente utilizam o prefixo ``hoodie_``. Prioridade das configurações ~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 1. Argumentos de linha de comando 2. Variáveis ​​de ambiente 3. Arquivos ``.hoodierc`` 4. Configurações padrão da sua aplicação, definidas na chave ``"hoodie"`` dentro do arquivo ``"package.json"`` 5. Valores padrão do Hoodie, conforme apresentados na tabela acima

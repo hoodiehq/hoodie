@@ -1,21 +1,9 @@
 hoodie.account
 ==============
 
-The account object in the client-side Hoodie API covers all user and
-authentication-related operations, and enables you to do previously
-complex operations, such as signing up a new user, with only a few lines
-of frontend code. Since `data in Hoodie is generally bound to a
-user </camp/hoodieverse/glossary.html#private-user-store>`__, it makes
-sense to familiarise yourself with **account** before you move on to
-`store </camp/techdocs/api/client/hoodie.store.html>`__.
+O objeto `account` na API do Hoodie (lado do cliente) abrange todas as operações relacionadas a usuários e autenticação, permitindo realizar tarefas que antes seriam complexas — como o cadastro de um novo usuário — com apenas algumas linhas de código no *frontend*. Como, no Hoodie, os dados geralmente estão vinculados a um usuário, é recomendável familiarizar-se com o `account` antes de passar para o `store`. O `hoodie-account-client` é um cliente JavaScript para a *Account JSON API*. Ele persiste as informações de sessão no `localStorage` (ou em uma API de armazenamento de sua preferência) e disponibiliza APIs voltadas ao *frontend* para as operações de autenticação mencionadas anteriormente.
 
-``hoodie-account-client`` is a JavaScript client for the
-`Account JSON API <http://docs.accountjsonapi.apiary.io/>`_.
-It persists session information in localStorage (or your own store API) and
-provides front-end friendly APIs for the authentication-related operations as
-mentioned above.
-
-Example
+Exemplo
 -------
 
 .. code:: js
@@ -53,7 +41,7 @@ Resolves with an argument.
 
 Rejects with any errors thrown by the function originally passed into the Constructor.
 
-Example
+Exemplo
 
 .. code:: js
 
