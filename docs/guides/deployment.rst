@@ -1,19 +1,19 @@
-Deployment
+Deploy
 ==========
 
-One line deploy
+Deploy em uma linha
 ~~~~~~~~~~~~~~~
 
-After you’ve built your Hoodie app you probably want to put it online. You can choose to deploy your app as read-only or deploy the backend couchdb database as well. This `video`_ and the text below describes how to deploy your app using one line of code. Alternatively, you can deploy your app using Docker, please refer to the Docker section.
+Depois de criar seu aplicativo Hoodie, provavelmente você desejará colocá-lo online. É possível optar por publicar o aplicativo em modo somente leitura ou incluir também o banco de dados backend (CouchDB). Este `vídeo`_ e o texto abaixo descrevem como publicar seu aplicativo usando apenas uma linha de código. Alternativamente, você pode publicar seu aplicativo utilizando o Docker; consulte a seção sobre Docker.
 
 .. _video: https://youtu.be/29Uclxq_1Vw
 
-Deploying to Now
+Deploy Now
 ~~~~~~~~~~~~~~~~
 .. _command line tool: https://github.com/zeit/now-cli
 .. _Hoodie Tracker demo: https://github.com/hoodiehq/hoodie-app-tracker
 
-`Now`_ allows you to deploy a Node application with its `command line tool`_. It’s 100% free for Open Source projects. You can deploy an app from your computer or right from a GitHub repository. For example, to deploy our `Hoodie Tracker demo`_ app all you have to do is to run this command:
+O `Now` permite que você faça o deploy de uma aplicação Node usando sua `ferramenta de linha de comando`. É 100% gratuito para projetos de código aberto (Open Source). Você pode realizar o deploy de uma aplicação a partir do seu computador ou diretamente de um repositório no GitHub. Por exemplo, para fazer o deploy da nossa aplicação de demonstração `Hoodie Tracker`, basta executar este comando:
 
 .. code:: bash
 
@@ -21,15 +21,13 @@ Deploying to Now
 
 To describe this further:
 
-- :code:`hoodiehq/hoodie-app-tracker` is the GitHub repository slug.
+- :code:`hoodiehq/hoodie-app-tracker` é o identificador (slug) do repositório no GitHub.
 
-- :code:`--npm` tells now to deploy using npm as there is also Dockerfile in the repository.
+- :code:`--npm` instrui o :code:`now` a realizar o deploy utilizando o npm, visto que também existe um :code:`Dockerfile` no repositório. - :code:`-e NODE_ENV=production` define a variável de ambiente :code:`NODE_ENV` como :code:`production`, o que torna o deploy mais rápido, já que as :code:`devDependencies` não serão instaladas. 
 
-- :code:`-e NODE_ENV=production` sets the NODE_ENV environment variable to production, which makes the deployment faster as no devDependencies will be installed.
+- :code:`-e hoodie_inMemory=true` faz com que a aplicação Hoodie seja executada em modo *in-memory* (na memória); isso significa que nenhum dado é persistido e nenhum arquivo é gravado. Isso é importante porque o sistema de arquivos do :code:`now` é somente leitura (*read-only*). Consequentemente, todas as contas de usuário e dados serão perdidos no próximo deploy, mas essa configuração é excelente para testes rápidos ou demonstrações da sua aplicação. 
 
-- :code:`-e hoodie_inMemory=true` makes the Hoodie app run in-memory mode, meaning that no data is persisted and no files are written. This is important because now is a read-only file system. That means that all user accounts and data will be lost on the next deployment, but it is great for a quick test or demo of your application.
-
-Alternatively, add this script to your package.json and you are good to go:
+Alternativamente, adicione este script ao seu :code:`package.json` e pronto:
 
 ::
 
@@ -37,79 +35,46 @@ Alternatively, add this script to your package.json and you are good to go:
 
 .. _Now: https://zeit.co/now
 
-Store Data With Cloudant
+Armazenamento Cloudant
 ~~~~~~~~~~~~~~~~~~~~~~~~
 .. _Cloudant: https://cloudant.com/
 
-`Cloudant`_ is a DBaaS (database-as-a-service). It provides most of CouchDB’s APIs and can be used as Hoodie’s database backend. Signing up for a free account only takes a moment. After sign up, you need to slightly adjust the now deployment command above.
+O `Cloudant`_ é um DBaaS (banco de dados como serviço). Ele oferece a maioria das APIs do CouchDB e pode ser utilizado como o banco de dados (backend) do Hoodie. Criar uma conta gratuita é rápido e simples. Após o cadastro, será necessário fazer um pequeno ajuste no comando de implantação (`now`) mencionado anteriormente. .. code:: bash $ now hoodiehq/hoodie-app-tracker -e NODE_ENV=production -e hoodie_inMemory=true -e hoodie_dbUrl=https://username:password@username.cloudant.com/ A variável de ambiente :code:`hoodie_inMemory` garante que o Hoodie não tente gravar arquivos, como a biblioteca `/hoodie/client.js` que vem integrada. A variável de ambiente :code:`hoodie_dbUrl` define o endereço e as credenciais de acesso ao seu CouchDB. Substitua `username` e `password` pelos dados que você utilizou no momento do cadastro.
 
-.. code:: bash
-
-    $ now hoodiehq/hoodie-app-tracker -e NODE_ENV=production -e hoodie_inMemory=true -e hoodie_dbUrl=https://username:password@username.cloudant.com/
-
-The :code:`hoodie_inMemory` environment variable makes sure that Hoodie does not try to write any files like the bundled /hoodie/client.js library. The :code:`hoodie_dbUrl` environment variable sets the address and credentials to your CouchDB. Replace username and password to whatever you signed up with.
-
-
-Test and set an alias
-~~~~~~~~~~~~~~~~~~~~~~
-
-When you deploy with now you will receive a random subdomain where you can access your application. It looks something like https://hoodie-app-tracker-randomxyz.now.sh/ and was already copied to your clipboard during the deployment. Open the URL in your browser to give it a try. Once everything is good, you can change the subdomain to your preference by running:
+Teste e ddefinição do alias ~~~~~~~~~~~~~~~~~~~~~~ 
+Ao realizar a implantação (deploy) com o `now`, você receberá um subdomínio aleatório pelo qual poderá acessar sua aplicação. Ele terá um formato semelhante a `https://hoodie-app-tracker-randomxyz.now.sh/` e já foi copiado para a sua área de transferência durante o processo de implantação. Abra essa URL no seu navegador para testar. Quando tudo estiver funcionando corretamente, você poderá alterar o subdomínio conforme sua preferência, executando o seguinte comando:
 
 .. code:: bash
 
     $ now alias set hoodie-app-tracker-randomxyz my-tracker-app
 
-That will make your deployed Hoodie Tracker app accessible at https://my-tracker-app.now.sh. For example, here is the app that I deployed myself: https://hoodie-app-tracker.now.sh/
+Isso tornará seu aplicativo Hoodie Tracker, após a implantação, acessível em https://my-tracker-app.now.sh. Por exemplo, aqui está o aplicativo que eu mesmo implantei: https://hoodie-app-tracker.now.sh/
 
 Docker
 ~~~~~~
 
-We continuously deploy our `Hoodie Tracker App`_ using Docker. You can read
-about our continuous
-deployment set at `hoodie-app-tracker/deployment.md`_.
+Realizamos a implantação contínua do nosso `Hoodie Tracker App`_ utilizando Docker. Você pode conferir detalhes sobre nossa configuração de implantação contínua em `hoodie-app-tracker/deployment.md`_.
 
 .. _Hoodie Tracker App: https://github.com/hoodiehq/hoodie-app-tracker
 .. _hoodie-app-tracker/deployment.md: https://github.com/hoodiehq/hoodie-app-tracker/blob/master/deployment.md
 
 
-Deployment in linux
+Deploy no linux
 ~~~~~~~~~~~~~~~~~~~
 
-This guide is for Linux only at this point.
-I have tried to deploy `Hoodie-App-Tracker <https://github.com/hoodiehq/hoodie-app-tracker>`__ as an example:
+Por enquanto, este guia é exclusivo para Linux. Tentei implantar o `Hoodie-App-Tracker <https://github.com/hoodiehq/hoodie-app-tracker>`__ como exemplo:
 
-install dependencies
+instalaveis
 --------------------
 
-1. `Install CouchDB <http://linoxide.com/linux-how-to/install-couchdb-futon-ubuntu-1604/>`__ 1.2.0 or later, 1.4.0 or later recommended for performance.
-2. `Install NodeJS <https://nodejs.org/en/>`__ LTS version or later. This includes npm.
-3. `Install git <https://www.digitalocean.com/community/tutorials/how-to-install-git-on-ubuntu-16-04>`__.
+1. `Instalar CouchDB <http://linoxide.com/linux-how-to/install-couchdb-futon-ubuntu-1604/>`__ 1.2.0 or later, 1.4.0 or later recommended for performance.
+2. `Instalar NodeJS <https://nodejs.org/en/>`__ LTS version or later. This includes npm.
+3. `Instalar git <https://www.digitalocean.com/community/tutorials/how-to-install-git-on-ubuntu-16-04>`__.
 
 CouchDB
 -------
 
-We assume you set up CouchDB with your package manager or manually following the
-`installation procedure`_.
-
-In order to test if CouchDB is running fine or not, we can simply run the following
-command which will retrieve the information through curl.
-
-.. code:: bash
-
-    $ curl localhost:5984
-
-If you are already using CouchDB for other things, we recommend starting a second
-instance of CouchDB that is completely separate from your original one. See below
-for instructions.
-
-In this guide, we assume that your CouchDB is available at `port 5984`_.
-
-Create a CouchDB admin user called **admin** with a strong password of your choice
-by clicking on the *Fix this* at `Apache CouchDB-Futon:Overview`_ link in the
-lower right corner. Use **admin** as username and keep your password in mind.
-
-Next we have to change CouchDB’s default configuration on a few points. The easiest thing is to go to and change the following fields (double click a value to enter the editing mode):
-
+We assume you set up CouchDB with your gerenciador de pacotes ou seguindo manualmente o `procedimento de instalação`_. Para verificar se o CouchDB está funcionando corretamente, basta executar o seguinte comando, que obterá as informações por meio do `curl`. .. code:: bash $ curl localhost:5984 Se você já utiliza o CouchDB para outras finalidades, recomendamos iniciar uma segunda instância do CouchDB, totalmente separada da original. Veja as instruções abaixo. Neste guia, pressupomos que o seu CouchDB esteja disponível na `porta 5984`_. Crie um usuário administrador no CouchDB chamado **admin**, definindo uma senha forte de sua preferência; para isso, clique em *Fix this* (Corrigir isso) no link `Apache CouchDB-Futon:Overview`_, localizado no canto inferior direito. Utilize **admin** como nome de usuário e lembre-se da senha escolhida. Em seguida, precisamos ajustar alguns pontos na configuração padrão do CouchDB. A maneira mais simples é acessar as configurações e alterar os campos a seguir (clique duas vezes em um valor para entrar no modo de edição):
 ::
 
    couchdb -> delayed_commits: false
@@ -119,10 +84,10 @@ Next we have to change CouchDB’s default configuration on a few points. The ea
 .. _port 5984: http://127.0.0.1:5984/
 .. _Apache CouchDB-Futon:Overview: http://127.0.0.1:5984/_utils/
 
-System
+Sistema
 ------
 
-Add this to  :code:`/etc/security/limits.conf`:
+Adicione  :code:`/etc/security/limits.conf`:
 
 ::
 
@@ -132,7 +97,7 @@ Add this to  :code:`/etc/security/limits.conf`:
 Hoodie
 ------
 
-Create a new system user:
+Criando um novo usuário:
 
 .. code:: bash
 
@@ -144,24 +109,23 @@ Create a new system user:
         -c "Hoodie Administrator" hoodie
 
 
-This will create a new user and its home directory /home/hoodie.
-But unless you have a password, you can not be a user. To set a password run:
+Isso criará um novo usuário e seu diretório pessoal /home/hoodie. Mas, sem uma senha, não é possível ser um usuário. Para definir uma senha, execute:
 
 .. code:: bash
 
     $ sudo passwd hoodie
 
-Give a password of your choice.
+Defina uma senha de sua preferência.
 
 **cd** in to that directory.
 
-To switch to **hoodie** user, run:
+Para mudar para **hoodie** user:
 
 .. code:: bash
 
     $ sudo su hoodie
 
-As user Hoodie, install your application:
+Como usuário hoodie, instale a aplicação:
 
 .. code:: bash
 
@@ -175,7 +139,7 @@ make sure package.json has a valid `name` property.
 
     $ cd <repo name>
 
-Now run:
+Agora execute:
 
 .. code:: bash
 
